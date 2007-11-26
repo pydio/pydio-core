@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Slider (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="local/webfxlayout.js"></script>
+
+<script type="text/javascript" src="js/range.js"></script>
+<script type="text/javascript" src="js/timer.js"></script>
+<script type="text/javascript" src="js/slider.js"></script>
+<link type="text/css" rel="StyleSheet" href="css/bluecurve/bluecurve.css" />
+
+</head>
+<body>
+<!-- WebFX Layout Include -->
+<script type="text/javascript">
+
+var articleMenu= new WebFXMenu;
+articleMenu.left  = 384;
+articleMenu.top   = 86;
+articleMenu.width = 140;
+articleMenu.add(new WebFXMenuItem("Slider", "slider.html"));
+articleMenu.add(new WebFXMenuItem("Implementation", "implementation.html"));
+articleMenu.add(new WebFXMenuItem("API", "api.html"));
+articleMenu.add(new WebFXMenuItem("Demo", "demo.html"));
+articleMenu.add(new WebFXMenuSeparator);
+articleMenu.add(new WebFXMenuItem("Download", "http://webfx.eae.net/download/slider102.zip"));
+webfxMenuBar.add(new WebFXMenuButton("Article Menu", null, null, articleMenu));
+
+webfxLayout.writeTitle("Slider");
+webfxLayout.writeMenu();
+webfxLayout.writeDesignedByEdger();
+
+</script>
+<div class="webfx-main-body">
+<!-- end WebFX Layout Includes -->
+
+<h2>Implementation</h2>
+
+<p>The slider implementation mostly consists of lots of event handlers that
+sets the value depending on the event arguments.</p>
+
+<h3>Range</h3>
+
+<p>The data model is handled by a class called Range (also known as BoundedRangeModel).
+This class has a few properties that fits perfectly with sliders, scrollbars and
+progress bars. A range has a minimum value, a value, an extent and a maximum value.
+The following is always true for a range object.</p>
+
+<pre>
+minimum &lt; value &lt; value + extent &lt; maximum
+</pre>
+
+<p>In the case of a slider the extent is always zero. Using a range for the data
+model allows the implementation of the slider to concentrate on other things than
+ensuring that the data model is valid.</p>
+
+<h3>Timer</h3>
+
+<p>For this implementation of the slider I decided to use an object oriented
+abstraction of <code>window.setTimeout</code>. A timer from the <code>Timer</code>
+class can be started and stopped and it fires a pseudo event called <code>ontimer</code>
+a certain amount of milliseconds after the timer is started.</p>
+
+<pre>
+Timer.prototype.start = function () {
+   if (this.isStarted())
+      this.stop();
+   var oThis = this;
+   this._timer = window.setTimeout(function () {
+      if (typeof oThis.ontimer == "function")
+         oThis.ontimer();
+   }, this._pauseTime);
+   this._isStarted = false;
+};
+
+Timer.prototype.stop = function () {
+   if (this._timer != null)
+      window.clearTimeout(this._timer);
+   this._isStarted = false;
+};
+</pre>
+
+<h3>Slider</h3>
+
+<p>The slider consists of a line element and a handle element. The line is only
+there for the visual effect. The handle on the other hand can be dragged and
+thereby changing the value. When dragging the handle the position of the mouse
+is used to calculate a new value for the data model. Once the value is changed
+the layout for the slider is recalculated.</p>
+
+<p>When the user holds down the mouse on the slider, but not on the handle, a
+timer is started and every time the timer triggers the <code>timer</code> event
+the value is changed by the <code>blockIncrement</code> towards the mouse
+pointer.</p>
+
+<p>The slider also allows the user to use the keyboard to change the value. This
+is done by listening to the <code>keydown</code> (and <code>keypress</code>)
+events. In the <code>keydown</code> handler the key is checked and the value for
+the data model is updated accordingly. The reason for the <code>keypress</code>
+handler is to disable the default actions in the browser.</p>
+
+<p>
+<a href="slider.html">Slider</a><br />
+<a href="implementation.html">Implementation</a><br />
+<a href="api.html">API</a><br />
+<a href="demo.html">Demo</a><br />
+<a href="http://webfx.eae.net/download/slider102.zip">Download</a>
+</p>
+
+<p class="author">Author: Erik Arvidsson</p>
+
+<!-- end webfx-main-body -->
+</div>
+
+</body>
+</html>

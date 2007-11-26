@@ -1,0 +1,177 @@
+<html>
+<head>
+<title>AjaXplorer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<? if($JS_DEBUG) {?>
+<script language="javascript" type="text/javascript">var dynamicLibLoading = false;</script>
+<script language="javascript" type="text/javascript" src="include/js/lib/prototype/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.pack.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.corner.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/dimensions.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/splitter.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/ufo/ufo.js"></script>
+<script language="javascript">jQuery.noConflict();</script>
+
+<script language="javascript" type="text/javascript" src="include/js/lib/webfx/slider/js/timer.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/webfx/slider/js/range.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/webfx/slider/js/slider.js"></script>
+
+<script language="javascript" type="text/javascript" src="include/js/lib/webfx/selectableelements.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/webfx/sortabletable.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/webfx/numberksorttype.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/leightbox/lightbox.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop"></script>
+
+<script language="javascript" type="text/javascript" src="include/js/lib/xloadtree/xtree.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/xloadtree/xloadtree.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/xloadtree/xmlextras.js"></script>
+
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Connexion.js"></script>
+
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/ajxp_multifile.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/ajxp_utils.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.User.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.ActionsManager.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.UserSelection.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.FilesList.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.FoldersTree.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.SearchEngine.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.InfoPanel.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.UserSelection.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Modal.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.ResizeableBar.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Ajaxplorer.js"></script>
+<? } else { ?>
+<script language="javascript" type="text/javascript">var dynamicLibLoading = true;</script>
+<script language="javascript" type="text/javascript" src="include/js/lib/prototype/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.pack.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Ajaxplorer.js"></script>
+<? } ?>
+
+<link rel="stylesheet" type="text/css" href="include/css/pnghack/pngHack.css">
+<link rel="stylesheet" type="text/css" href="include/js/lib/webfx/sortabletable.css">
+<link rel="stylesheet" type="text/css" href="include/js/lib/webfx/slider/css/bluecurve/bluecurve.css">
+<link rel="stylesheet" type="text/css" href="include/js/lib/xloadtree/xtree.css">
+<link rel="stylesheet" type="text/css" href="include/css/ajaxplorer.css">
+<link rel="stylesheet" type="text/css" href="include/js/lib/leightbox/screen.css">
+<script type="text/javascript">
+		var ajaxplorer;
+		Event.observe(window, "load", function(){
+			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", <?php print($ROOT_DIRS_LIST);?>, "<?php print($DEFAULT_DISPLAY);?>");
+			<?php 
+			if($BEGIN_MESSAGE != "") print("alert('".str_replace("'", "\'", $BEGIN_MESSAGE)."');");
+			?>
+			ajaxplorer.currentLanguage = '<?php print(ConfService::getLanguage()); ?>';
+		});
+ </script>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
+		
+<div id="loading_overlay">
+	<div id="progressBox">
+		<div class="dialogTitle">Welcome to AjaXplorer!</div>
+		<div class="dialogContent" style="text-align:left;">
+			<div id="progressBarBorder"><div id="progressBar" style="width:0px;"></div></div>
+			<div id="progressState">Loading Components</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">	jQuery('#progressBox').corner("round 10px");</script>
+<div title="<?php print($mess[98]); ?>"  id="message_div" onclick="ajaxplorer.closeMessageDiv();" class="messageBox" title="<?php print($mess[98]); ?>"><div id="message_content"></div></div>
+<div id="toolbars">
+<div id="action_bar">
+	<div id="buttons_bar">
+		<!-- PARENT FOLDER -->
+		<a href="" action="up_dir" id="up_button" title="<?php print($mess[24]); ?>" key="<?php print($mess["parent_access_key"]); ?>"><img width="22" height="22" src="images/crystal/up.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[24]); ?>" title="<?php print($mess[24]); ?>"><br><span><?php print($mess[148]); ?></span></a> 
+		<!-- REFRESH PAGE -->
+		<a href="" action="refresh" id="refresh_button"  key="<?php print($mess["refresh_access_key"]); ?>"><img width="22" height="22" src="images/crystal/reload.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[149]); ?>" title="<?php print($mess[149]); ?>"><br><span><?php print($mess[149]); ?></span></a> 
+		<!-- SWITCH DISPLAY MODE -->
+		<a href="" action="switch_display" id="sd_button"  key="<?php print($mess["display_access_key"]); ?>" title="<?php print($mess[151]); ?>"><img width="22" height="22" src="images/crystal/view_icon.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[151]); ?>"><br><span><?php print($mess[150]); ?></span></a> 
+		<!-- BOOKMARKS -->
+		<a href="" action="bookmark" id="bm_button" title="<?php print($mess[153]); ?>" key="<?php print($mess["bookmarks_access_key"]); ?>"><img width="22" height="22" src="images/crystal/bookmark.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[153]); ?>"><br><span><?php print($mess[152]); ?></span></a> 
+		<div class="separator"></div>
+		<!-- UPLOAD -->
+		<a href="" action="upload" id="upload_button"  key="<?php print($mess["upload_access_key"]); ?>" title="<?php print($mess[27]); ?>" write_access="true"><img width="22" height="22" src="images/crystal/yast_backup.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[27]); ?>"><br><span><?php print($mess[27]); ?></span></a> 
+		<!-- CREATE FOLDER -->
+		<a href="" action="create_dir" id="createdir_button"  key="<?php print($mess["folder_access_key"]); ?>"  write_access="true" title="<?php print($mess[155]);?>"><img width="22" height="22" src="images/crystal/folder_new.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[155]); ?>"><br><span><?php print($mess[154]); ?></span></a> 
+		<!-- CREATE FILE -->
+		<a href="" action="create_file" id="createfile_button"  key="<?php print($mess["file_access_key"]); ?>" write_access="true" title="<?php print($mess[157]);?>"><img width="22" height="22" src="images/crystal/filenew.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[157]); ?>"><br><span><?php print($mess[156]);?></span></a> 
+		<div class="separator" id="write_access_separator"></div>
+		<!-- RENAME -->
+		<a id="rename_button" class="disabled" href="" action="rename" selection="true" unique="true" file="true" folder="true" title="<?php print($mess[158]);?>"  write_access="true"  key="<?php print($mess["rename_access_key"]); ?>"><img width="22" height="22" src="images/crystal/applix.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[158]);?>" title="<?php print($mess[158]);?>"><br><span><?php print($mess[6]);?></span></a> 
+		<!-- COPY -->
+		<a id="copy_button" class="disabled" href="" action="copy" selection="true" unique="false" file="true" folder="true"  title="<?php print($mess[159]);?>" write_access="true" key="<?php print($mess["copy_access_key"]); ?>"><img width="22" height="22" src="images/crystal/editcopy.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[159]);?>"><br><span><?php print($mess[66]);?></span></a> 
+		<!-- MOVE -->
+		<a id="move_button" class="disabled" href="" action="move" selection="true" unique="false" file="true" folder="true"  title="<?php print($mess[160]);?>" write_access="true"  key="<?php print($mess["move_access_key"]); ?>"><img width="22" height="22" src="images/crystal/editpaste.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[160]);?>"><br><span><?php print($mess[70]);?></span></a>
+		<!-- DELETE -->
+		<a id="delete_button" class="disabled" href="" action="delete" selection="true" unique="false" file="true" folder="true" title="<?php print($mess[161]);?>" write_access="true" key="<?php print($mess["delete_access_key"]); ?>"><img width="22" height="22" src="images/crystal/editdelete.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[161]);?>"><br><span><?php print($mess[7]);?></span></a>
+		<!-- EDIT -->
+		<a id="edit_button" class="disabled" href="" action="edit" selection="true" unique="true" file="true" folder="false" editable="true" title="<?php print($mess[162]);?>" write_access="true" key="<?php print($mess["edit_access_key"]); ?>"><img width="22" height="22" src="images/crystal/edit.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[162]);?>"><br><span><?php print($mess[51]);?></span></a> 
+		<a id="view_button" class="disabled" href="" action="view" selection="true" unique="true" file="true" folder="false" editable="true" title="<?php print($mess[136]);?>" write_access="false" key="<?php print($mess["view_access_key"]); ?>"><img width="22" height="22" src="images/crystal/frame_image.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[136]);?>"><br><span><?php print($mess[129]);?></span></a> 
+		<!-- DOWNLOAD -->
+		<a id="download_button" class="disabled" href="" action="download" selection="true" unique="false" file="true" folder="false"  key="<?php print($mess["download_access_key"]); ?>" title="<?php print($mess[88]);?>"><img width="22" height="22" src="images/crystal/download_manager.png" border="0" align="ABSMIDDLE" alt="<?php print($mess[88]);?>"><br><span><?php print($mess[88]);?></span></a> 		
+		<div class="separator"></div>
+		<!-- LOGIN / LOGOUT -->
+		<a href="" action="login" id="login_button" title="<?php print($mess[163]);?>" key="none"><img width="22" height="22" src="images/crystal/yast_security.png" border="0" align="ABSMIDDLE" id="login_logout_image"><br><span id="login_logout_span"><?php print($mess[163]);?></span></a> 	
+		<!-- ADMIN SETTINGS -->
+		<a href="" action="admin" id="admin_button" title="<?php print($mess[165]);?>"  key="<?php print($mess["settings_access_key"]); ?>"><img width="22" height="22" src="images/crystal/admin.png" border="0" align="ABSMIDDLE" id="admin_image"><br><span id="admin_span"><?php print($mess[165]);?></span></a> 	
+		<!-- INFO ABOUT AJAXPLORER -->
+		<a href="" action="splash" id="splash_button" title="<?php print($mess[167]);?>"  key="<?php print($mess["about_access_key"]); ?>"><img width="22" height="22" src="images/crystal/info.png" border="0" align="ABSMIDDLE"><br><span><?php print($mess[166]);?></span></a> 	
+	</div>
+	<div id="locationbar_cont">
+		<div class="locationbar_title">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php print($mess[170]);?>&nbsp;</div><div id="location_form"><form style="display:inline;background-color:#ffffff;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><img src="images/crystal/folder_yellow.png" width="16" height="16" align="absmiddle"><input type="text" name="current_path" value="/" id="current_path"><input  align="absmiddle" title="<?php print($mess[104]); ?>" type="image" src="images/crystal/forward.png" id="goto_button" height="16" width="16"></form></div><div id="logging_string"></div>
+	</div>
+</div>
+<!--<div class="toolbars_separator"></div>-->
+<div id="hidden_frames" style="display:none;"></div>
+<!--<div id="hidden_forms" style="display:none;"></div>-->
+<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
+</div>
+<div id="bm_bar_cont">
+	<div id="bookmarks_bar"><div id="bmbar_title"><?php print($mess[145]); ?>&nbsp;&nbsp;<span id="bmbar_extension"></span></div><div style="display:inline;" id="bmbar_content"></div></div>
+</div>
+<div id="browser_round"><div id="browser">
+<div id="verticalSplitter" style="background-color: #aaa;">
+	<div id="sidebarSplitter" style="float:left; overflow:hidden;">
+		<div style="" id="topPane"  style="overflow: hidden; border: 1px solid black;">
+		    <div id="dir_chooser" class="panelHeader"><?php print $mess[130] ?> </div>
+	    	<div id="tree_container" style="overflow:auto;height:100%;">
+	    	
+	    	</div>
+		</div>
+		
+    	<div id="search_div" style="background-color: #fff;">
+    		<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
+    		<tr>
+		    	<td id="info_panel_header" onclick="ajaxplorer.toggleSidePanel('info');" class="toggleHeader">
+		    		<img width="20" height="20" align="absmiddle" src="images/crystal/effect.png"><a href="#"><?php print $mess[131] ?></a>
+		    	</td>
+		    	<td id="search_header" onclick="ajaxplorer.toggleSidePanel('search');" class="toggleHeader">
+		    		<img width="16" height="16" align="absmiddle" src="images/crystal/search.png"><a href="#"><?php print $mess[87] ?></a>
+		    	</td>
+		    </tr>
+	    	</table>
+	    	<div id="search_container">
+		    	<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="#" id="search_button" title="<?php print $mess[184] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/search.png" border="0"/></a><a href="#" id="stop_search_button" title="<?php print $mess[185] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/fileclose_16.png" border="0" /></a></div><div id="search_results"></div>
+	    	</div>
+	    	<div id="info_panel"></div>
+    	</div>     	
+    </div>
+	<div id="content_pane" style="overflow:auto; background-color: #fff;">
+	<TABLE width="100%" cellspacing="0"  id="selectable_div" class="sort-table">
+		<col\><col\><col\><col\>
+		<thead>	
+		<tr>
+			<td><?php print($mess[1]); ?></td>
+			<td><?php print($mess[2]); ?></td>
+			<td><?php print($mess[3]); ?></td>
+			<td id="last_header"><?php print($mess[4]); ?></td>
+		</tr>
+		</thead>
+	
+		<tbody>
+		</tbody>
+	</table>
+	</div>	
+</div>
+</div></div>

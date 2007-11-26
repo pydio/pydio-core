@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>XLoadTree (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="local/webfxlayout.js"></script>
+</head>
+<body>
+<!-- WebFX Layout Include -->
+<script type="text/javascript">
+
+var articleMenu= new WebFXMenu;
+articleMenu.left  = 384;
+articleMenu.top   = 86;
+articleMenu.width = 140;
+articleMenu.add(new WebFXMenuItem("Introduction", "xloadtree.html"));
+articleMenu.add(new WebFXMenuItem("Usage", "usage.html"));
+articleMenu.add(new WebFXMenuItem("API", "api.html"));
+articleMenu.add(new WebFXMenuItem("Implementation", "implementation.html"));
+articleMenu.add(new WebFXMenuItem("Demo", "demo.html"));
+articleMenu.add(new WebFXMenuSeparator);
+articleMenu.add(new WebFXMenuItem("Download", "http://webfx.eae.net/download/xloadtree111.zip"));
+webfxMenuBar.add(new WebFXMenuButton("Article Menu", null, null, articleMenu));
+
+webfxLayout.writeTitle("XLoadTree");
+webfxLayout.writeMenu();
+webfxLayout.writeDesignedByEdger();
+
+</script>
+<div class="webfx-main-body">
+<!-- end WebFX Layout Includes -->
+
+
+<p>
+	<span class="date">(2006-05-28)</span> Changed license to Apache Software License 2.0.
+	<span class="date">(2003-05-06)</span> Added target attribute support<br/>
+	<span class="date">(2002-10-10)</span> Added reload method
+</p>
+
+<h2>Introduction</h2>
+
+<p>About a year ago Emil visited me while I was living in USA and he came up with
+a brilliant idea for a next generation DHTML tree. After some discussions about this
+it took shape and in the end it turned out to be one of the best DHTML tree scripts
+I've ever seen.</p>
+
+<p>Since the original <a href="/dhtml/xtree/">xTree</a> script is implemented using
+Object Oriented JS it is very easy to extend and as soon as it started to take shape
+we got some wild ideas on how one could extend the tree. One idea that Emil implemented
+in the original tree was to add support for persistance. Another idea I had some time
+later was to allow subtrees to be loaded and populated at runtime. For this to work
+the <a href="/dhtml/xtree/">xTree</a> had to be updated a little to support data model
+changes at runtime. Emil added support for this after a while and now nothing was in my
+way to add the dynamic loading support.</p>
+
+<h3>Dynamic loading</h3>
+
+<p>The XLoadTree is an extended version of the <a href="/dhtml/xtree/">xTree</a> and it
+allows you to define a source property for each tree item that points to an xml file
+that is then loaded, transformed using DOM and inserted using tree item methods. The
+basic mechanism for this has been working for a long time but since I wanted to cover the
+<a href="/dhtml/xmlextras/xmlextras.html">xml loading mechanisms</a> before writing
+this article it is not until now that I can publish this.</p>
+
+<h3>Known Issues</h3>
+
+<p>The persistance from the original <a href="/dhtml/xtree/">xTree</a> is not
+sophisticated enough for dynamic loaded trees because the original persistance is
+dependent on the order of insertion and not the path. I will try to fix this in a later
+update.</p>
+
+<p>The xml object has some issues when using the file protocol (in IE) so this one only
+works when located on a web server. I'll see what can be done about this.</p>
+
+<p>
+<a href="xloadtree.html">Introduction</a><br />
+<a href="usage.html">Usage</a><br />
+<a href="api.html">API</a><br />
+<a href="implementation.html">Implementation</a><br />
+<a href="demo.html">Demo</a><br />
+<a href="http://webfx.eae.net/download/xloadtree111.zip">Download</a>
+</p>
+
+<p class="author">Author: Erik Arvidsson</p>
+
+<!-- end webfx-main-body -->
+</div>
+
+</body>
+</html>

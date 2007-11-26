@@ -1,0 +1,116 @@
+<html>
+<head>
+<title>AjaXplorer Content</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script language="javascript" type="text/javascript" src="include/js/lib/prototype/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects"></script>
+<script src=include/js/lib/codepress/codepress.js type=text/javascript></script>
+<script src=include/js/lib/jquery/jquery.pack.js type=text/javascript></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/dimensions.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.corner.js"></script>
+<link rel=stylesheet href="include/css/pnghack/pngHack.css" type="text/css">
+<script type="text/javascript">
+jQuery.noConflict();
+function fitHeightToBottom(element, parentElement, addMarginBottom)
+{
+	if(typeof(parentElement) == "undefined" || parentElement == null){
+		parentElement = Position.offsetParent($(element));
+	}
+	if(typeof(addMarginBottom) == "undefined" || addMarginBottom == null){
+		addMarginBottom = 0;
+	}
+	jQuery(parentElement).bind("resize", function(){
+		var $ms = jQuery(element);
+		var top = $ms.offset().top; // from dimensions.js
+		if(parentElement != window){
+			var parentTop = jQuery(parentElement).offset().top;
+			top = top - parentTop;
+		}
+		var wTmp = jQuery(parentElement).height();
+		var wh = parseInt(jQuery(parentElement).height());
+		// Account for margin or border on the splitter container
+		var mrg = parseInt($ms.css("marginBottom")) || 0;
+		var brd = parseInt($ms.css("borderBottomWidth")) || 0;
+		$ms.css("height", (wh-top-mrg-brd-addMarginBottom)+"px");
+		//	if ( !jQuery.browser.msie )
+		$ms.trigger("resize");			 
+	}).trigger("resize");
+	jQuery(element).trigger("resize");
+}
+var messageDivOpen = false;
+function closeMessageDiv()
+{
+	if(messageDivOpen)
+	{
+		new Effect.BlindUp('message_div');
+		messageDivOpen = false;
+	}
+}
+
+function tempoMessageDivClosing()
+{
+	messageDivOpen = true;
+	setTimeout('closeMessageDiv()', 10000);
+}
+
+function Diaporama(currentFile, nextButton, previousButton, imgTag)
+{
+	this.baseUrl = 'content.php?action=image_proxy&fic=';
+	this.currentFile = currentFile;
+	var allItems = parent.ajaxplorer.getFilesList().getItems();
+
+	var itCopy = new Array();
+	$A(allItems).each(function(rowItem){
+		if(rowItem.getAttribute('is_image')=='1') itCopy.push(rowItem.getAttribute('filename'));		
+	});	
+	this.items = itCopy.reverse();
+	var oThis = this;
+	nextButton.onclick = function(){
+		oThis.next();
+		oThis.updateButtons();
+	}
+	previousButton.onclick = function(){
+		oThis.previous();
+		oThis.updateButtons();
+	}
+	this.imgTag = $(imgTag);
+	this.nextButton = nextButton;
+	this.previousButton = previousButton;
+	this.updateButtons();
+}
+
+
+
+Diaporama.prototype.next = function()
+{
+	if(this.currentFile != this.items.last())
+	{
+		this.currentFile = this.items[this.items.indexOf(this.currentFile)+1];
+		this.imgTag.src = this.baseUrl + this.currentFile;
+	}
+}
+
+Diaporama.prototype.previous = function()
+{
+	if(this.currentFile != this.items.first())
+	{
+		this.currentFile = this.items[this.items.indexOf(this.currentFile)-1];
+		this.imgTag.src = this.baseUrl + this.currentFile;	
+	}
+}
+
+Diaporama.prototype.updateButtons = function()
+{
+	if(this.currentFile == this.items.first()) this.previousButton.addClassName("disabled");
+	else this.previousButton.removeClassName("disabled");
+	if(this.currentFile == this.items.last()) this.nextButton.addClassName("disabled");
+	else this.nextButton.removeClassName("disabled");
+}
+
+</script>
+
+<link rel="stylesheet" href="include/css/ajaxplorer.css">
+<style>body {background-color: #ddd;}</style>
+
+</head>
+<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
