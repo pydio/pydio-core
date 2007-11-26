@@ -1,0 +1,47 @@
+AjaXplorer Version 2.2.1 - 2007/11/22
+Please read /doc/INSTALL.txt to find help with configuration.
+
+[MAIN DEVELOPER]
+AjaXplorer is developed and maintained by Charles du Jeu, from Paris France.
+Project Page : http://ajaxplorer.sourceforge.net/
+Developer's Blog : http://blogs.mostar-style.net/charles 
+Developer's Band : http://www.almasound.com/ (reggae-salsa-dub)
+
+[EXTERNAL LIBRARIES]
+AjaXplorer was developed using various free libraries that are mentionned below. It is mainly an engineering work that used a lot of off-the-shelf components. Please check their websites!
+
+++ ORIGINAL PHP SCRIPT ++
+The original php script (simple file manager, no ajax gui) was called WebJeff File Manager and was developed 
+by Jean-François Gazet.
+http://www.webjeff.org
+
+++ JAVASCRIPT FRAMEWORKS & PLUGINS ++
+The Ajax client is mainly based on the prototype.js library.
+However, for the splitter bars (frame emulation) and the rounded corners, I used at some points the jQuery 
+library, with the following plugins developed by Dave Methvin : Splitter.js and Corner.js. Thanks Dave for the
+good work!
+http://www.prototypejs.org/
+http://jquery.com/
+http://methvin.com/jquery/jq-corner.html
+http://methvin.com/jquery/splitter/
+
+++ WEBFX WIDGETS ++
+The Ajax widgets used for the Tree (XLoadTree) and for table sorting and selection were developed by WebFX.
+http://webfx.eae.net/
+
+++ MODAL WINDOWS ++
+The modal windows are done with a modification of the Leightbox script (itself a modification of lightbox.js).
+
+http://www.eight.nl/files/leightbox/
+http://www.huddletogether.com/projects/lightbox/
+
+++ CODEPRESS : Syntax highlighting ++
+The online edition was done integrating CodePress. Very powerful!
+http://www.codepress.org/
+
+++ DEWPLAYER :  MP3 Flash Player ++
+The online mp3 flash player is developed by a french webagency, AlsaCréation.
+http://www.alsacreations.fr/mp3-dewplayer.html
+
+
+Big respect to those developers! 
