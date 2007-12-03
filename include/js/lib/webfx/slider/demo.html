@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Slider Demo (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--
+<link type="text/css" rel="StyleSheet" href="css/winclassic.css" />
+-->
+<style type="text/css">
+
+
+body {
+	font:		MessageBox;	
+	font:		Message-Box;
+}
+
+
+input {
+	width:				50px;
+	text-align:			right;
+	padding:			1px;
+	margin-right:		15px;
+}
+
+input, select, button {
+	vertical-align:		middle;
+}
+
+#slider-1 {
+	margin:	10px;
+	width:	auto;
+}
+
+#slider-2 {
+	margin:	10px;
+}
+
+#color-picker {
+	border:		0; /*1px solid rgb(90,97,90);*/
+	width:		350px;
+	height:		80px;
+}
+
+</style>
+<script type="text/javascript">
+//<![CDATA[
+
+function getQueryString( sProp ) {
+	var re = new RegExp( sProp + "=([^\\&]*)", "i" );
+	var a = re.exec( document.location.search );
+	if ( a == null )
+		return "";
+	return a[1];
+};
+
+function changeCssFile( sCssFile ) {
+	var loc = String(document.location);
+	var search = document.location.search;
+	if ( search != "" )
+		loc = loc.replace( search, "" );
+	loc = loc + "?css=" + sCssFile;
+	document.location.replace( loc );
+}
+
+var cssFile = getQueryString( "css" );
+if ( cssFile == "" )
+	cssFile = "css/bluecurve/bluecurve.css";
+
+document.write("<link type=\"text/css\" rel=\"StyleSheet\" href=\"" + cssFile + "\" />" );
+
+//]]>
+</script>
+<!--
+<link type="text/css" rel="StyleSheet" href="css/winclassic.css" />
+-->
+
+<script type="text/javascript" src="js/range.js"></script>
+<script type="text/javascript" src="js/timer.js"></script>
+<script type="text/javascript" src="js/slider.js"></script>
+</head>
+<body>
+
+<p>Horizontal</p>
+<div class="slider" id="slider-1" tabIndex="1">
+	<input class="slider-input" id="slider-input-1"/>
+</div>
+
+<p>
+Value: <input id="h-value" onchange="s.setValue(parseInt(this.value))"/>
+Minimum: <input id="h-min" onchange="s.setMinimum(parseInt(this.value))"/>
+Maximum: <input id="h-max" onchange="s.setMaximum(parseInt(this.value))"/>
+</p>
+
+<p>Vertical</p>
+<div class="slider" id="slider-2" tabIndex="1">
+	<input class="slider-input" id="slider-input-2"/>
+</div>
+
+<script type="text/javascript">
+
+var s = new Slider(document.getElementById("slider-1"), document.getElementById("slider-input-1"));
+var s2 = new Slider(document.getElementById("slider-2"), document.getElementById("slider-input-2"), "vertical");
+s.onchange = function () {
+	document.getElementById("h-value").value = s.getValue();
+	document.getElementById("h-min").value = s.getMinimum();
+	document.getElementById("h-max").value = s.getMaximum();
+	s2.setValue(s.getValue());
+	s2.setMinimum(s.getMinimum());
+	s2.setMaximum(s.getMaximum());
+};
+s.setValue(50);
+
+window.onresize = function () {
+	s.recalculate();
+};
+
+</script>
+
+<p>
+<select id="css-select">
+	<option value="css/winclassic.css">Windows Classic</option>
+	<option value="css/luna/luna.css">Windows XP Luna</option>
+	<option value="css/swing/swing.css">Java Swing</option>
+	<option value="css/bluecurve/bluecurve.css">Blue Curve</option>
+</select>
+<script type="text/javascript">
+document.getElementById('css-select').value = cssFile;
+</script>
+&nbsp;
+<button onclick="changeCssFile( document.getElementById('css-select').value )">Change</button>
+</p>
+<p>
+<iframe name="color-picker" id="color-picker" src="rgbdemo.html" frameborder="0"></iframe><br />
+Color: <span id="color-picker-out">&nbsp;</span></p>
+
+<script type="text/javascript">
+
+var f = window.frames["color-picker"];
+f.onchange = function () {
+	var rgb = f.getRgb();
+	var out = document.getElementById("color-picker-out");
+	out.firstChild.data = "rgb(" + rgb.r + ", " +
+							rgb.g + ", " +
+							rgb.b + ")";
+};
+
+</script>
+
+</body>
+</html>

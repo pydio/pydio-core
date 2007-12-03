@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<tree>
+	<tree text="Load &quot;tree1.xml&quot;" src="tree1.xml" />
+	<tree text="Loaded Item 1" action="http://webfx.eae.net" />
+	<tree text="Loaded Item 2">
+		<tree text="Loaded Item 2.1" action="javascript:alert(2.1)" />
+	</tree>
+	<tree text="Loaded Item 3 (with target)" action="http://www.google.com" target="_new" />
+	<tree text="Load &quot;tree1.xml&quot;" src="tree1.xml" />
+</tree>

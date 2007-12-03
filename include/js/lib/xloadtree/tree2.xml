@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<tree>
+	<tree text="Loaded File 2 Item 1" action="javascript:alert(1)" />
+	<tree text="Loaded File 2 Item 2" action="javascript:alert(2)">
+		<tree text="Loaded File 2 Item 2.1" action="javascript:alert(2.1)" />
+		<tree text="Loaded File 2 Item 2.2 (LOOP)" src="tree1.xml" action="javascript:alert(2.1)" />
+	</tree>
+	<tree text="Loaded File 2 Item 3" action="javascript:alert(3)" />
+</tree>

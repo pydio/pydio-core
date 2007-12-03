@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link type="text/css" rel="StyleSheet" href="css/bluecurve/bluecurve.css" />
+<style type="text/css">
+
+body, html {
+	overflow:	hidden;
+	margin:		0;
+	border:		0;
+	padding:	0;
+	width:		100%;
+	height:		100%;
+	background:	rgb(230,230,230);
+	font:		MessageBox;	
+	font:		Message-Box;
+}
+
+.color-picker {
+	background:	transparent;
+	width:		100%;
+	height:		100%;
+}
+
+.color-picker td {
+	padding:	1px;
+}
+
+.dynamic-slider-control {
+	width:		auto;
+	height:		20px;
+	margin:		0;
+}
+
+.color-picker input {
+	text-align:	right;
+	width:		30px;
+}
+.color-picker td,
+.color-picker input {
+	font:	Message-Box;
+	font:	MessageBox;
+}
+
+#color-result {
+	width:				60px;
+	border:				1px solid rgb(90,97,90);
+	background-color:	black;
+}
+
+</style>
+
+<script type="text/javascript" src="js/range.js"></script>
+<script type="text/javascript" src="js/timer.js"></script>
+<script type="text/javascript" src="js/slider.js"></script>
+</head>
+<body>
+
+<table class="color-picker" cellspacing="2" cellpadding="0" border="0">
+<col style="width: 40px" />
+<col style="" />
+<col style="width: 10px" />
+<col style="width: 50px" />
+<tr>
+	<td><label for="red-slider">Red:</label></td>
+	<td>
+		<div class="slider" id="red-slider" tabIndex="1">
+			<input class="slider-input" id="red-slider-input" />
+		</div>
+	</td>
+	<td><input id="red-input" maxlength="3" tabIndex="2" /></td>
+	<td rowspan="3" id="color-result"></td>
+</tr>
+<tr>
+	<td><label for="green-slider">Green:</label></td>
+	<td>
+		<div class="slider" id="green-slider" tabIndex="3">
+			<input class="slider-input" id="green-slider-input" />
+		</div>
+	</td>
+	<td><input id="green-input" maxlength="3" tabIndex="4" /></td>
+</tr>
+<tr>
+	<td><label for="blue-slider">Blue:</label></td>
+	<td>
+		<div class="slider" id="blue-slider" tabIndex="5">
+			<input class="slider-input" id="blue-slider-input" />
+		</div>
+	</td>
+	<td><input id="blue-input" maxlength="3" tabIndex="6" /></td>
+</tr>
+</table>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+// init code
+var r = new Slider(document.getElementById("red-slider"), document.getElementById("red-slider-input"));
+r.setMaximum(255);
+var g = new Slider(document.getElementById("green-slider"), document.getElementById("green-slider-input"));
+g.setMaximum(255);
+var b = new Slider(document.getElementById("blue-slider"), document.getElementById("blue-slider-input"));
+b.setMaximum(255);
+
+var ri = document.getElementById("red-input");
+ri.onchange = function () {
+	r.setValue(parseInt(this.value));
+};
+
+var gi = document.getElementById("green-input");
+gi.onchange = function () {
+	g.setValue(parseInt(this.value));
+};
+
+var bi = document.getElementById("blue-input");
+bi.onchange = function () {
+	b.setValue(parseInt(this.value));
+};
+
+r.onchange = g.onchange = b.onchange = function () {
+	var cr = document.getElementById("color-result");
+	cr.style.backgroundColor = "rgb(" + r.getValue() + "," + 
+								g.getValue() + "," + 
+								b.getValue() + ")";
+	ri.value = r.getValue();
+	gi.value = g.getValue();
+	bi.value = b.getValue();
+	
+	if (typeof window.onchange == "function")
+		window.onchange();
+};
+
+r.setValue(128);
+g.setValue(128);
+b.setValue(128);
+
+// end init
+
+function setRgb(nRed, nGreen, nBlue) {
+	r.setValue(nRed);
+	g.setValue(nGreen);
+	b.setValue(nBlue);
+}
+
+function getRgb() {
+	return {
+		r:	r.getValue(),
+		g:	g.getValue(),
+		b:	b.getValue()
+	};
+}
+
+function fixSize() {
+	r.recalculate();
+	g.recalculate();
+	b.recalculate();
+}
+
+window.onresize = fixSize;
+
+fixSize();
+
+
+</script>
+
+
+</body>
+</html>

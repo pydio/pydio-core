@@ -1,0 +1,105 @@
+<style>.dialogBox[id]{position:fixed;}</style>
+<div id="all_forms">
+
+<div id="generic_dialog_box" class="dialogBox">
+	<div class="dialogTitle"></div>
+	<div class="dialogContent"></div>
+</div>
+
+<div id="generic_edit_box" class="editBox">
+	<div class="dialogTitle"></div>
+	<div class="editContent"></div>
+</div>
+
+<div id="createdir_form" action="mkdir">
+<div class="dialogLegend"><?php print($mess[26]); ?><b class="replace_rep"></b></div>
+<br><?php print($mess[173]);?><br>
+<input type="text" name="nomdir" size="30" class="dialogFocus">
+</div>
+
+<div id="createfile_form" action="creer_fichier">
+<div class="dialogLegend"><?php print($mess[28]); ?><b class="replace_rep"></b></div>
+<br><?php print($mess[174]);?></br>
+<input type="text" name="nomfic" size="30" class="dialogFocus">
+</div>
+
+<div id="rename_form" action="rename_suite">
+<?php print($mess[6]); ?> <b class="replace_file"></b> <?php print($mess[42]); ?><br>
+<input type="text" name="fic_new" value="" id="fic_new" class="dialogFocus initFicName">
+</div>
+
+<div id="copymove_form" action="copier_suite">
+<input type="hidden" name="dest_node" value="">
+<div class="dialogLegend"><?php print($mess[175]);?></div>
+<span id="copymove_text_span"></span> &nbsp; 
+<div id="treeCopy" style="height:200px; width:250px; overflow:auto; text-align:left; background-color:white; border: 1px solid buttonshadow;" class="treeCopyContainer"></div>
+<br><?php print($mess[172]);?><br>
+<input type="text" name="dest" value="/" readonly style="background-color: buttonface;">
+<br>
+</div>
+
+<div id="delete_form" action="supprimer_suite">
+<span id="delete_message"></span>
+</div>
+
+<form id="login_form" action="login" style="display:none;">
+<input type="hidden" name="get_action" value="login">
+<div class="dialogLegend"><?php print($mess[180]);?></div>
+<table cellpadding="0" border="0" cellspacing="0">
+<tr><td align="right"><?php print($mess[181]);?> :</td><td><input type="text" name="userid" style="width: 100px;" class="dialogFocus"></td></tr>
+<tr><td align="right"><?php print($mess[182]);?> :</td><td><input type="password" name="password"  style="width: 100px;"></td></tr>
+</table>
+</form>
+
+
+<form action="content.php" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left;">
+<legend><?php print($mess[25]); ?><b class="replace_rep"></b></legend>
+<br><br><?php print($mess[171]);?><br>
+<input type="file" name="userfile_1" class="dialogFocus" size="30">
+<input type="hidden" name="get_action" value="upload">
+
+<br><br><?php print($mess[172]);?>
+<div id="upload_files_list" class="uploadFilesList"></div>
+</form>
+<script language="javascript">$('originalUploadForm').hide();</script>
+
+<div id="splash_form">
+<div id="splashScreen">
+<iframe src="content.php?get_action=display_doc&doc_file=CREDITS" id="docFileIframe"></iframe>
+</div>
+</div>
+
+<div id="admin_form">
+<div id="adminScreen">
+<iframe src="admin.php" id="adminIFrame"></iframe>
+</div>
+</div>
+
+<div id="multi_download_form" title="<?php print($mess[118]);?>">
+<div class="dialogLegend"><?php print($mess[119]);?></div><br>
+<div id="multiple_download_container"></div>
+</div>
+
+<form id="user_pref_form" action="user_pref" style="display:none;">
+<fieldset><legend><?php print($mess[190]);?></legend>
+<?php 
+$langs = ConfService::getConf("AVAILABLE_LANG");
+foreach ($langs as $lang => $display)
+{
+	print("<input type=\"radio\" name=\"lang\" value=\"$lang\" id=\"lang_".$lang."\" class=\"radio\"/>$display<br>");
+}
+?>
+</fieldset>
+<fieldset><legend><?php print($mess[191]);?></legend>
+	<input type="radio" name="display" id="display_list" value="list" class="radio"><?php print($mess[192]);?>
+	<input type="radio" name="display" id="display_thumb" value="thumb" class="radio"><?php print($mess[193]);?>
+</fieldset>
+<?php if(AuthService::changePasswordEnabled()){ ?>
+<fieldset><legend><?php print($mess[194]);?></legend>
+	<?php print($mess[198]);?> <input type="password" id="user_change_ownpass1" value="">
+	<?php print($mess[199]);?> <input type="password" id="user_change_ownpass2" value="">
+</fieldset>
+<?php } ?>
+</form>
+
+</div>
