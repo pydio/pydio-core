@@ -1,0 +1,10 @@
+
+
+<!ELEMENT tree (tree*)>
+<!ATTLIST tree
+			text		CDATA	#REQUIRED
+			src			CDATA	#IMPLIED
+			action		CDATA	#IMPLIED
+			icon		CDATA	#IMPLIED
+			openIcon	CDATA	#IMPLIED
+			target		CDATA	#IMPLIED>

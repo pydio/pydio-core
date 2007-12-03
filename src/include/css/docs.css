@@ -1,0 +1,23 @@
+body
+{
+    background-color:white;
+    font-family:Trebuchet MS, Helvetica, Arial;
+    font-size:11px;    
+}
+
+.title
+{
+    font-size:13px;
+    font-weight: bold;
+}
+
+.subtitle
+{
+    color: #79f;
+    font-size:12px;
+    font-weight: bold;
+}
+
+a:active, a:visited, a:link, a:hover{
+    color: blue;
+}

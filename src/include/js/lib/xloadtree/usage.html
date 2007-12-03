@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<html>
+<head>
+<title>XLoadTree Usage (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="local/webfxlayout.js"></script>
+</head>
+<body>
+<!-- WebFX Layout Include -->
+<script type="text/javascript">
+
+var articleMenu= new WebFXMenu;
+articleMenu.left  = 384;
+articleMenu.top   = 86;
+articleMenu.width = 140;
+articleMenu.add(new WebFXMenuItem("Introduction", "xloadtree.html"));
+articleMenu.add(new WebFXMenuItem("Usage", "usage.html"));
+articleMenu.add(new WebFXMenuItem("API", "api.html"));
+articleMenu.add(new WebFXMenuItem("Implementation", "implementation.html"));
+articleMenu.add(new WebFXMenuItem("Demo", "demo.html"));
+articleMenu.add(new WebFXMenuSeparator);
+articleMenu.add(new WebFXMenuItem("Download", "http://webfx.eae.net/download/xloadtree111.zip"));
+webfxMenuBar.add(new WebFXMenuButton("Article Menu", null, null, articleMenu));
+
+webfxLayout.writeTitle("XLoadTree");
+webfxLayout.writeMenu();
+webfxLayout.writeDesignedByEdger();
+
+</script>
+<div class="webfx-main-body">
+<!-- end WebFX Layout Includes -->
+
+<h2>Usage</h2>
+
+<p>The usage of the XLoadTree is almost identical to the xTree so if
+you do not remember how that is done take a look at the
+<a href="/dhtml/xtree/usage.html">xTree usage</a>. Anywhere the original xTree
+accepts a <code>WebFXTree</code> you can use a <code>WebFXLoadTree</code> and
+the same applies to <code>WebFXTreeItem</code> and <code>WebFXLoadTreeItem</code>.</p>
+
+<p>Taking the first example in the xTree usage and instead of using a
+<code>WebFXTreeItem</code> for the second tree item we use the load counterpart.</p>
+
+
+<pre>
+var tree = new WebFXTree("Root");
+tree.add(new WebFXTreeItem("Tree Item 1"));
+<strong>tree.add(new WebFXLoadTreeItem("Tree Item 2", "tree.xml"));</strong>
+tree.add(new WebFXTreeItem("Tree Item 3"));
+document.write(tree);
+</pre>
+
+<p>The code above should result in something looking like this:</p>
+
+<p>
+<img src="article-images/tree1.png" alt="The code above gives a tree like this" />
+</p>
+
+<p>When Tree Item 2 is expanded the file <a href="tree.xml">tree.xml</a> is loaded
+and during the load a dummy tree item is inserted to show that the subcontent is
+loading. This looks something like this:</p>
+
+<p>
+<img src="article-images/tree2.png" alt="The same tree while loading the subtree" />
+</p>
+
+<h3>The XML format</h3>
+
+<p>To be able to transform the xml file to an xTree the xml file must be of a certain
+format. Below is the xml code from the file <a href="tree.xml">tree.xml</a>:</p>
+
+<pre>
+&lt;?xml version="1.0"?&gt;
+
+&lt;tree&gt;
+   &lt;tree text="Loaded Item 1" action="href://webfx.eae.net" /&gt;
+   &lt;tree text="Loaded Item 2"&gt;
+      &lt;tree text="Loaded Item 2.1" action="javascript:alert(2.1)" /&gt;
+      &lt;tree text="Load &amp;quot;tree1.xml&amp;quot;" src="tree1.xml" /&gt;
+   &lt;/tree&gt;
+   &lt;tree text="Loaded Item 3" /&gt;
+&lt;/tree&gt;
+</pre>
+
+<p>When this xml file has been loaded and inserted into the tree it looks something like
+this:</p>
+
+<p>
+<img src="article-images/tree3.png" alt="The tree after the loading is complete" />
+</p>
+
+<p>Notice how the XML structure can contain nested tree items and tree items that
+points to other xml files. Notice also the top level tree item that is used to contain
+all the tree items that are supposed to be inserted into the current
+<code>WebFXLoadTreeItem</code>.</p>
+
+<p>To see what xml attributes are supported on the tree items see the
+<a href="api.html">api</a> page.</p>
+
+
+
+
+
+<p>
+<a href="xloadtree.html">Introduction</a><br />
+<a href="usage.html">Usage</a><br />
+<a href="api.html">API</a><br />
+<a href="implementation.html">Implementation</a><br />
+<a href="demo.html">Demo</a><br />
+<a href="http://webfx.eae.net/download/xloadtree111.zip">Download</a>
+</p>
+
+<p class="author">Author: Erik Arvidsson</p>
+
+<!-- end webfx-main-body -->
+</div>
+
+</body>
+</html>

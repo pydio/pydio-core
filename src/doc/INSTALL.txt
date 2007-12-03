@@ -1,0 +1,141 @@
+ ------------------------------------------------
+|      AjaXplorer Installation Instructions      |
+ ------------------------------------------------
+ 
+ 1 SYSTEM REQUIREMENTS & QUICK INSTALL
+ 
+ To be able to run this system on your webserver, it must have PHP 3 or higher
+ running, and you must have an FTP access to upload the files on the server. 
+ That's all! No database is needed.
+ 
+ If you want to use it as fast as possible, just change the ADMIN_PASSWORD in 
+ the conf/conf.php file and upload on your server. 
+ 
+ Check that the both "files" and "users" folders are both readable and writeable.
+ 
+ | INFO : FOR UPGRADE FROM 2.2 TO 2.2.1
+ |  Copy the files in a different folder.
+ |  + From the old distrib to the new one, copy the whole content of users/
+ | 	+ Backup the basic conf/conf.php file and copy the line with "$available_languages"
+ |  + Copy the old conf/conf.php in place of the new one, and update the $available_languages line.
+ |  That's it!
+ 
+ For further configuration, read below.
+ 
+ 2 CONFIGURATION
+ 
+ After unzipping the file into a local folder on your computer, use a text editor 
+ to edit the configuration file located in conf/conf.php
+ 
+ You have to main configuration to change: the $REPOSITORIES variable and all the USERS constants.
+ 
+ 2.1 REPOSITORIES 
+    
+    In AjaXplorer, a repository is a folder that you want to browse/modify with 
+    the application. A repository does not have to be inside the ajaxplorer installation 
+    folder, since you set it with an absolute path on your server.
+    
+    You can set as many repositories as you want : you will be able to switch from one to 
+    another when logged to AjaXplorer, and you can precisely set rights for each users (see 
+    paragraph 2.2) on each repository. Note that repository are really separated, and for 
+    example AjaXplorer does not let you copy a file from a repository to another.
+    
+    By default, the basic repository is set to the "files" folder inside the ajaxplorer 
+    installation folder. You can change it to whatever you want, using absolute path 
+    like : /home/login/www/location, or /C:/myfolder/ on windows.
+    
+    Note that a repository does not have to be accessible to the internet, AjaXplorer will 
+    work as a "proxy" between your files and the web.
+    
+ 2.2 USERS MANAGEMENT
+    
+    An evoluted users management system has been developed in AjaXplorer. You are encouraged 
+    to use it to secure your data, but it's up to you, you can disable it totally (for example 
+    if you are already working in a very secure zone, and don't need any users profiles).
+    
+    If you are a beginner, just change the ADMIN_PASSWORD variable before uploading on your 
+    server everything should be fine. If you do not change it, you will be reminded to change 
+    the first time you log in, because otherwise anybody knowing AjaXplorer could login with 
+    the standard initial password "admin"...
+    
+    You can add / modify / delete users by logging in AjaXplorer as "admin" and clicking on 
+    "Settings" button. For each user, you will be able to give read and/or right access separately 
+    on each repository. Note that a user that has no rights on any repository cannot log in.
+    
+    For a better integration in existing systems, AjaXplorer can "prelog" a user from external 
+    data or logging system. Users must still be created in AjaXplorer, since their rights on 
+    repositories and preferences are stored by the application. But they will not be able to 
+    change their password, since they are in that case managed by an external application.
+    
+    2.2.1 CONFIGURATION
+    	
+    	ENABLE_USERS => 1 	Users management is enabled
+    					0 	Users management is totally disabled. No logging required and all 
+    						users share the same preferences.
+    					
+    	ALLOW_GUEST_BROWSING => 1 	In the "Settings" console accessed by admin user, 
+    								a "guest" user is created on which you can set 
+    								rights on repositories like any other user. This 
+    								user will be automatically logged in if no user 
+    								is identified.
+    							0 	When no user is identified, the login screen appears 
+    								and no repository is loaded.
+    								
+    	AUTH_MODE => "ajaxplorer" Default value, Ajaxplorer is doing all the work.
+    	
+    				 "local_http" If you already use some ".htaccess" file for http 
+    				 			authentication in the zone where AjaXplorer will be installed, 
+    				 			AjaXplorer can retrieve the current logged user directly when 
+    				 			loading, avoiding the user to log him self again.
+    				 	
+    				 "remote" 	If a standard scenario would be that users come from another 
+    				 			server of yours on which they are logged, you can pass a session 
+    				 			identifier to AjaXplorer and configure it to ask a remote server for 
+    				 			the current user logged id. (cf 2.2.3)
+    				 			
+    2.2.3 REMOTE LOGGING
+    
+    	Here is how to configure the REMOTE_ config variables for asking a remote server the 
+    	current user logged.
+    	
+    	AUTH_MODE_REMOTE_SERVER => 	The host to request. 
+    								For example "www.yourdomain.com"
+    								
+		AUTH_MODE_REMOTE_URL 	=> 	The url to request on host. The script should take a 
+									session_id (or any identifier you want) as a GET variable 
+									in input and output a user login in its response.
+									For example /public/yourscript.php" or "logger.jsp". 
+									
+		AUTH_MODE_REMOTE_USER 	=> 	Http Authentication login on remote host.
+									Leave blank if not needed.
+									
+		AUTH_MODE_REMOTE_PASSWORD =>Http Authentication password on remote host.
+									Leave blank if not needed.
+									
+		AUTH_MODE_REMOTE_PORT 	=> 	Http Port to use
+		
+		AUTH_MODE_REMOTE_SESSION_NAME => Name of the variable in the GET query that will 
+										 contain your session id. 
+										 For example "session_id".
+		
+		Once this is properly configured, you can append the ajaxplorer url with the query string
+		 "?remote_session=YOURSESSIONID" and ajaXplorer will call your script with "session_id=YOURSESSIONID" 
+		 to check if a user is logged.
+
+ 2.3 FURTHER CONFIGURATION   
+ 
+	. $dft_langue		=> 		Default language to use, please use "en" or "fr" for the moment.
+	. $size_unit 		=>		Use "o" like "octets" or "b" like "bytes" for file size display.
+	. $max_caracteres	=>		Max number of characters for file and directory names.
+	. $showhidden		=>		Show hidden files or not when browsing folders.
+	. $upload_max_number=>		Allowed simultaneous upload to the server.
+	. $webmaster_email	=>		The email of the webmaster, not used for the moment
+	. $recycle_bin		=>		Create a recycle bin folder in your repositories to act as a 
+								buffer for files suppression (like windows recycle bin). 
+								Set it's name if you want to use it, or leave it blank otherwise.
+	. $user_https		=>		Set this to 'true' if you are working on https connexion.
+ 
+ 3 TIME TO WASTE?
+ 
+ 	Visit http://www.almasound.com/ and listen to good Reggae Dub & Salsa music!
+ 	

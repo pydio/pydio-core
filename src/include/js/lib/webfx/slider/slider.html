@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+<head>
+<title>Slider (WebFX)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="local/webfxlayout.js"></script>
+
+<script type="text/javascript" src="js/range.js"></script>
+<script type="text/javascript" src="js/timer.js"></script>
+<script type="text/javascript" src="js/slider.js"></script>
+<link type="text/css" rel="StyleSheet" href="css/bluecurve/bluecurve.css" />
+
+</head>
+<body>
+<!-- WebFX Layout Include -->
+<script type="text/javascript">
+
+var articleMenu= new WebFXMenu;
+articleMenu.left  = 384;
+articleMenu.top   = 86;
+articleMenu.width = 140;
+articleMenu.add(new WebFXMenuItem("Slider", "slider.html"));
+articleMenu.add(new WebFXMenuItem("Implementation", "implementation.html"));
+articleMenu.add(new WebFXMenuItem("API", "api.html"));
+articleMenu.add(new WebFXMenuItem("Demo", "demo.html"));
+articleMenu.add(new WebFXMenuSeparator);
+articleMenu.add(new WebFXMenuItem("Download", "http://webfx.eae.net/download/slider102.zip"));
+webfxMenuBar.add(new WebFXMenuButton("Article Menu", null, null, articleMenu));
+
+webfxLayout.writeTitle("Slider");
+webfxLayout.writeMenu();
+webfxLayout.writeDesignedByEdger();
+
+</script>
+<div class="webfx-main-body">
+<!-- end WebFX Layout Includes -->
+
+<p>
+	<span class="date">2002-10-07</span>: First public version released<br />
+	<span class="date">2006-05-28</span>: Changed license to Apache Software License 2.0.<br />
+</p>
+
+<h2>Introduction</h2>
+
+<p>Sliders are useful controls for choosing a value in a range of values.
+Common uses are volume controls, seekers for movie and sound files as well
+as color pickers. A few people have asked for an update to the old
+<a href="http://webfx.eae.net/dhtml/slidebar/slidebar.html">Slidebar</a>
+component to make it work in Mozilla and work better in IE. But since the
+original control was very basic and was not very usable I decided to
+create a new one.</p>
+
+<form onsubmit="return false;">
+<div class="slider" id="slider-1" tabIndex="1" style="width: auto; margin: 10px;">
+	<input class="slider-input" id="slider-input-1"/>
+</div>
+</form>
+
+<script type="text/javascript">
+
+var sliderEl = document.getElementById ? document.getElementById("slider-1") : null;
+var inputEl = document.forms[0]["slider-input-1"];
+var s = new Slider(sliderEl, inputEl);
+s.onchange = function () {
+	window.status = "Value: " + s.getValue();
+};
+s.setValue(50);
+
+</script>
+
+<p>When starting with the new slider a few main features where kept in mind:</p>
+
+<ul>
+	<li>Degrade gracefully for browser without the needed DOM support. This is
+		achieved by using a basic text input as the base for the control. In case
+		the browser does not support the needed features then the input can be used
+		in the normal way.</li>
+	<li>Full mouse support. Lots of slider controls does not support anything beyond dragging
+		the handle. The goal was to allow the user to be able to both drag the handle
+		and hold down the mouse anywhere on the slider to move the handle towards the
+		mouse.</li>
+	<li>Full keyboard support. Once the slider is focused the arrow keys and Page Up /
+		Page Down can be used to change the value.</li>
+	<li>Mouse wheel support where available.</li>
+	<li>Skinable using different CSS files.</li>
+</ul>
+
+<h2>Requirements</h2>
+
+<p>The slider works in <strong>any</strong> browser but the GUI component works in
+browsers with simple DOM level 1 support with one IE extended proprietary property.
+That property is <code>offsetWidth</code> (and <code>offsetHeight</code>) and this is
+known to be supported by IE5+, Mozilla 1.0+, Konqueror 3+ and it is assumed other future
+browsers will support this as well because it has become a de facto standard.</p>
+
+<h2>Usage</h2>
+
+<p>To use the slider we have to include a few JS files and a CSS file.</p>
+
+<pre>
+&lt;script type="text/javascript" src="<a href="js/range.js">js/range.js</a>"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="<a href="js/timer.js">js/timer.js</a>"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="<a href="js/slider.js">js/slider.js</a>"&gt;&lt;/script&gt;
+&lt;link type="text/css" rel="StyleSheet" href="<a href="css/winclassic.css">css/winclassic.css</a>" /&gt;
+</pre>
+
+<p>Then we need to define the HTML to use for the slider. Something like this:</p>
+
+<pre>
+&lt;div class="slider" id="slider-1" tabIndex="1"&gt;
+   &lt;input class="slider-input" id="slider-input-1"
+      name="slider-input-1"/&gt;
+&lt;/div&gt;
+</pre>
+
+<p>After this we have to create the JS object that handles the logic. If we only
+plan to use this in pages and applications that you know will support the dynamic
+slider control we can use the following script block. This should be placed directly
+after the slider div.</p>
+
+<pre>
+&lt;script type="text/javascript"&gt;
+
+var s = new Slider(document.getElementById("slider-1"),
+                   document.getElementById("slider-input-1"));
+
+&lt;/script&gt;
+</pre>
+
+<p>If we however cannot guarantee that all user uses browsers that support
+<code>document.getElementById</code> we should use <code>document.forms</code>
+to find the input and test whether <code>document.getElementById</code> is
+defined.</p>
+
+<pre>
+&lt;script type="text/javascript"&gt;
+
+var sliderEl = document.getElementById ?
+                  document.getElementById("slider-1") : null;
+var inputEl = document.forms[0]["slider-input-1"];
+var s = new Slider(sliderEl, inputEl);
+
+&lt;/script&gt;
+</pre>
+
+<p>
+<a href="slider.html">Slider</a><br />
+<a href="implementation.html">Implementation</a><br />
+<a href="api.html">API</a><br />
+<a href="demo.html">Demo</a><br />
+<a href="http://webfx.eae.net/download/slider102.zip">Download</a>
+</p>
+
+<p class="author">Author: Erik Arvidsson</p>
+
+<!-- end webfx-main-body -->
+</div>
+
+</body>
+</html>
