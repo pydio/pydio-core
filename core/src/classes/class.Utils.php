@@ -215,7 +215,7 @@ function is_editable($fichier)
 
 function editWithCodePress($fichier)
 {
-	if(eregi("\.php$|\.php3$|.php5$|\phtml$", $fichier)) return "php";
+	if(eregi("\.php$|\.php3$|\.php5$|\.phtml$", $fichier)) return "php";
 	elseif (eregi("\.js$", $fichier)) return "javascript";
 	elseif (eregi("\.java$", $fichier)) return "java";
 	elseif (eregi("\.pl$", $fichier)) return "perl";
