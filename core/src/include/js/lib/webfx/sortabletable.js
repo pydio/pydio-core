@@ -57,7 +57,7 @@
 \----------------------------------------------------------------------------*/
 
 
-function SortableTable(oTable, oSortTypes) {
+function SortableTable(oTable, oSortTypes, oTHead) {
 
 	this.sortTypes = oSortTypes || [];
 
@@ -70,7 +70,7 @@ function SortableTable(oTable, oSortTypes) {
 	};
 
 	if (oTable) {
-		this.setTable( oTable );
+		this.setTable( oTable, oTHead );
 		this.document = oTable.ownerDocument || oTable.document;
 	}
 	else {
@@ -103,11 +103,11 @@ SortableTable.prototype.defaultDescending = false;
 // to modify the prototype
 SortableTable.prototype._sortTypeInfo = {};
 
-SortableTable.prototype.setTable = function (oTable) {
+SortableTable.prototype.setTable = function (oTable, oTHead) {
 	if ( this.tHead )
 		this.uninitHeader();
 	this.element = oTable;
-	this.setTHead( oTable.tHead );
+	this.setTHead( (oTHead?oTHead:oTable.tHead) );
 	this.setTBody( oTable.tBodies[0] );
 };
 
