@@ -9,12 +9,6 @@ Modal.prototype.init = function()
 	this.htmlElement = $(this.elementName);
 	this.dialogTitle = this.htmlElement.getElementsBySelector(".dialogTitle")[0];
 	this.dialogContent = this.htmlElement.getElementsBySelector(".dialogContent")[0];
-	
-	this.editElementName = 'generic_edit_box';
-	this.editElement = $(this.editElementName);
-	this.editTitle = this.editElement.getElementsBySelector(".dialogTitle")[0];
-	this.editContent = this.editElement.getElementsBySelector(".editContent")[0];
-	
 	this.currentForm;
 	this.cachedForms = new Hash();
 	this.iframeIndex = 0;	
@@ -22,13 +16,13 @@ Modal.prototype.init = function()
 
 Modal.prototype.prepareHeader = function(sTitle, sIconSrc)
 {
-	var hString = "";
-	if(sIconSrc != "") hString = "<img src=\""+sIconSrc+"\" width=\"22\" height=\"22\" align=\"absmiddle\"/>&nbsp;";
-	hString += sTitle;
+	var hString = "<span class=\"titleString\">";
+	if(sIconSrc != "") hString = "<span class=\"titleString\"><img src=\""+sIconSrc+"\" width=\"22\" height=\"22\" align=\"absmiddle\"/>&nbsp;";
+	hString += sTitle + '</span>';
 	this.dialogTitle.innerHTML = hString;
 }
 
-Modal.prototype.showDialogForm = function(sTitle, sFormId, fOnLoad, fOnComplete, fOnCancel, bOkButtonOnly)
+Modal.prototype.showDialogForm = function(sTitle, sFormId, fOnLoad, fOnComplete, fOnCancel, bOkButtonOnly, skipButtons)
 {
 	this.clearContent(this.dialogContent);
 	//this.dialogTitle.innerHTML = sTitle;
@@ -60,7 +54,7 @@ Modal.prototype.showDialogForm = function(sTitle, sFormId, fOnLoad, fOnComplete,
 			newForm.appendChild(actionField);
 		}		
 	}
-	if(!this.cachedForms[sFormId]){
+	if(!this.cachedForms[sFormId] && !skipButtons){
 		this.addSubmitCancel(newForm, fOnCancel, bOkButtonOnly);
 	}
 	this.dialogContent.appendChild(newForm);
@@ -82,7 +76,7 @@ Modal.prototype.showDialogForm = function(sTitle, sFormId, fOnLoad, fOnComplete,
 			return false;
 		};
 	}
-	this.showContent(this.elementName);
+	this.showContent(this.elementName, $(sFormId).getAttribute("box_width"), $(sFormId).getAttribute("box_height"));
 	if($(newForm).getElementsBySelector(".dialogFocus").length)
 	{
 		objToFocus = $(newForm).getElementsBySelector(".dialogFocus")[0];
@@ -107,20 +101,59 @@ Modal.prototype.showDialogForm = function(sTitle, sFormId, fOnLoad, fOnComplete,
 	if(reloadIFrame) reloadIFrame.src = reloadIFrameSrc;
 }
 
-Modal.prototype.showContent = function(elementName)
+Modal.prototype.showContent = function(elementName, boxWidth, boxHeight)
 {
 	ajaxplorer.disableShortcuts();
 	ajaxplorer.disableNavigation();
 	ajaxplorer.filesList.blur();
 	jQuery('#'+elementName).corner("round 10px");
-	if (browser && browser == 'Internet Explorer'){
-		$(elementName).style.width = '280px';
+	var winWidth = $(document.body).getWidth();
+	var winHeight = $(document.body).getHeight();
+
+	// WIDTH / HEIGHT
+	if(boxWidth != null){
+		if(boxWidth.indexOf('%') > -1){
+			percentWidth = parseInt(boxWidth);
+			boxWidth = parseInt((winWidth * percentWidth) / 100);
+		}
+		$(elementName).setStyle({width:boxWidth+'px'});
+	}
+	if(boxHeight != null){
+		if(boxHeight.indexOf('%') > -1){
+			percentHeight = parseInt(boxHeight);
+			boxHeight = parseInt((winHeight * percentHeight) / 100);
+		}
+		$(elementName).setStyle({height:boxHeight+'px'});
+	}else{
+		if (browser && browser == 'Internet Explorer'){	
+			$(elementName).setStyle({height:'1%'});
+		}else{
+			$(elementName).setStyle({height:'auto'});
+		}
+	}
+	
+	// POSITION HORIZONTAL
+	boxWidth = $(elementName).getWidth();	
+	var offsetLeft = (winWidth - parseInt(boxWidth)) / 2;
+	$(elementName).setStyle({left:offsetLeft+'px'});
+	// POSITION VERTICAL
+	var boxHeight = $(elementName).getHeight();
+	var offsetTop = parseInt(((winHeight - boxHeight)/3));
+	$(elementName).setStyle({top:offsetTop+'px'});
+	
+	if (browser && browser == 'Internet Explorer'){		
 		jQuery('#'+elementName + ' .dialogTitle').corner("round top 10px");
 	}
-	displayLightBoxById(elementName);
+	
+	displayLightBoxById(elementName);	
+	
 	// FORCE ABSOLUTE FOR SAFARI!
 	$(elementName).style.position = 'absolute';
-	
+	// REFRESH PNG IMAGES FOR IE!
+	var imgs = this.dialogContent.getElementsBySelector('img');
+	if(imgs.length) imgs.each(function(img){
+		if(img.original_src) img.src = img.original_src;
+	});
 }
 
 Modal.prototype.getForm = function()
@@ -176,32 +209,6 @@ Modal.prototype.addSubmitCancel = function(oForm, fOnCancel, bOkButtonOnly)
 	oForm.hasButtons = true;
 }
 
-Modal.prototype.showDialogIFrame = function(sTitle, sSrc)
-{
-	this.clearContent(this.editContent);
-	this.editTitle.innerHTML = sTitle;
-	
-	form = document.createElement('form');
-
-	iframe = document.createElement('iframe');	
-	iframe.style.width = '100%';
-	iframe.style.border = 'none';
-	form.appendChild(iframe);
-
-	this.editContent.appendChild(form);
-	
-	this.showContent(this.editElementName);
-	iframe.src = sSrc;
-	this.editElement.style.width = $(document.body).getWidth()*90/100;
-	this.editElement.style.height = $(document.body).getHeight()*90/100;
-	this.editElement.style.top = $(document.body).getWidth()*3/100;
-	this.editElement.style.left = $(document.body).getHeight()*5/100;
-
-	ajaxplorer.fitHeightToBottom($(iframe), $(this.editElement));
-	
-	form.onsubmit = function(){ $(iframe).remove(); hideLightBox(); return false;}
-}
-
 Modal.prototype.setLoadingStepCounts = function(count){
 	this.loadingStepsCount = count;
 	this.loadingStep = count;
@@ -228,6 +235,17 @@ Modal.prototype.updateLoadingProgress = function(state)
 	if(this.loadingStep == 0){
 		$('loading_overlay').remove();
 		this.pageLoading = false;
+	}
+}
+
+Modal.prototype.setCloseAction = function(func){
+	this.closeFunction = func;
+}
+
+Modal.prototype.close = function(){	
+	if(this.closeFunction){
+		 this.closeFunction();
+		 this.closeFunction = null;
 	}
 }
 
