@@ -156,7 +156,7 @@ Ajaxplorer.prototype.logXmlUser = function(xmlResponse)
 	this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
 	this.foldersTree.reloadCurrentNode();
 	this.filesList.loadXmlList('/');
-	this.rootDirId = rootDirId;
+	//this.rootDirId = rootDirId;
 	this.actionBar.loadBookmarks();
 }
 
@@ -387,6 +387,7 @@ Ajaxplorer.prototype.initGUI = function()
 {
 	jQuery("#toolbars").corner("round bottom 10px");
 	jQuery("#action_bar a").corner("round 8px");
+	jQuery(".action_bar a").corner("round 8px");
 	//jQuery(".panelHeader").corner("round tl 5px");
 	//jQuery("#last_header").corner("round tr 5px");
 	//jQuery("#last_header").css("border-bottom", "1px solid #aaa");		
@@ -404,12 +405,12 @@ Ajaxplorer.prototype.initGUI = function()
 			});
 			
 	jQuery("#browser_round").corner("round 8px");
-	this.fitHeightToBottom($("browser"), window, 15);
-	this.fitHeightToBottom($("verticalSplitter"), $('browser'), (jQuery.browser.msie?8:0));
-	this.fitHeightToBottom($('tree_container'));
+	fitHeightToBottom($("browser"), window, 15);
+	fitHeightToBottom($("verticalSplitter"), $('browser'), (jQuery.browser.msie?8:0));
+	fitHeightToBottom($('tree_container'));
 	//jQuery("#search_div").corner("round bl 10px");
 	//jQuery("#content_pane").corner("round br 10px");
-	this.fitHeightToBottom(this.sEngine._resultsBox, null, 10);
+	fitHeightToBottom(this.sEngine._resultsBox, null, 10);
 	this.currentSideToggle = 'search';
 	this.toggleSidePanel('info');	
 	jQuery("#sidebarSplitter").trigger("resize");
@@ -564,41 +565,7 @@ Ajaxplorer.prototype.toggleSidePanel = function(srcName)
 		$(this.infoPanel.htmlElement).hide();
 		$('info_panel_header').addClassName("toggleInactive");
 		$('info_panel_header').getElementsBySelector("img")[0].hide();
-		this.fitHeightToBottom(this.sEngine._resultsBox, null, 5, true);
+		fitHeightToBottom(this.sEngine._resultsBox, null, 5, true);
 	}
 	this.currentSideToggle = srcName;
-}
-
-Ajaxplorer.prototype.fitHeightToBottom = function(element, parentElement, addMarginBottom, skipListener)
-{
-	if(typeof(parentElement) == "undefined" || parentElement == null){
-		parentElement = Position.offsetParent($(element));
-	}
-	if(typeof(addMarginBottom) == "undefined" || addMarginBottom == null){
-		addMarginBottom = 0;
-	}
-	if(!skipListener){
-		jQuery(parentElement).bind("resize", function(){
-			try{
-			var $ms = jQuery(element);
-			var top = parseInt($ms.offset().top); // from dimensions.js
-			if(parentElement != window){
-				var parentTop = jQuery(parentElement).offset().top;
-				top = top - parentTop;
-			}
-			var wTmp = jQuery(parentElement).height();
-			var wh = parseInt(jQuery(parentElement).height());
-			// Account for margin or border on the splitter container
-			var mrg = parseInt($ms.css("marginBottom")) || 0;
-			var brd = parseInt($ms.css("borderBottomWidth")) || 0;
-			$ms.css("height", (wh-top-mrg-brd-addMarginBottom)+"px");		
-			//if ( !jQuery.browser.msie )
-			$ms.trigger("resize");
-			}catch(e){}
-		}).trigger("resize");
-	}
-	else{
-		jQuery(parentElement).trigger("resize");
-	}
-	jQuery(element).trigger("resize");
 }
