@@ -390,7 +390,7 @@ ACTION BAR
 	vertical-align: middle;
 }
 
-#action_bar
+#action_bar, .action_bar
 {
     background-color: #e0ecff;
     font-family: Arial;
@@ -405,7 +405,7 @@ ACTION BAR
     background-color: #e0ecff;
 }
 
-#action_bar a
+#action_bar a, .action_bar a
 {    
     padding-bottom: 2px;
     padding-top: 4px;    
@@ -433,7 +433,8 @@ ACTION BAR
     margin-right: 1px;
 }
 
-#action_bar a:hover
+#action_bar a:hover, 
+.action_bar a:hover
 {
     text-decoration: none;
 	/*border: 1px solid #fff;*/
@@ -530,10 +531,16 @@ a.enabled
   -moz-opacity:1;
 }
 
-#action_bar a.disabled:hover
+#action_bar a.disabled:hover,
+.action_bar a.disabled:hover
 {
     background-color: transparent;
     cursor: default;
+}
+
+.action_bar
+{
+    background-color: #CCDDEE;
 }
 
 /*
@@ -622,7 +629,6 @@ UPLOAD MULTIFILE FORM
 {
    background-color: white;
    overflow: auto;
-   width: 450px;
    height: 140px;
    border: 1px solid buttonshadow;
    text-align: left;
@@ -646,11 +652,6 @@ UPLOAD MULTIFILE FORM
 {
     text-decoration:none;
     color: #d00;
-}
-
-#multiple_download_container
-{
-   width: 300px;
 }
 
 #multiple_download_container div a
@@ -1013,4 +1014,29 @@ ADMIN STYLES
 {
    width: 20px;
    border: none;
+}
+
+/***********************/
+/* EDITORS & DIAPORAMA */
+/***********************/
+textarea.editor
+{
+	background-color:white;
+	font-family:monospace;
+	font-size:13px;
+	line-height:16px;
+	white-space:pre;
+}
+
+.diaporamaButton
+{
+  filter:alpha(opacity=40);
+  opacity: 0.4;
+  -moz-opacity:0.4;
+}
+.diaporamaButton:hover
+{
+  filter:alpha(opacity=100);
+  opacity: 1;
+  -moz-opacity:1;
 }
