@@ -6,29 +6,59 @@
 	<div class="dialogContent"></div>
 </div>
 
-<div id="generic_edit_box" class="editBox">
-	<div class="dialogTitle"></div>
-	<div class="editContent"></div>
+<!-- VIEW IMAGE -->
+<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%">
+	<div class="action_bar" style="height: 42px; width: 500px;">
+		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
+		<a href="" id="prevButton"><img  width="22" height="22" src="images/crystal/back_22.png" alt="" border="0"><br><?php print $mess[178]; ?></a>
+		<a href="" id="nextButton"><img width="22" height="22" src="images/crystal/forward_22.png" alt="" border="0"><br><?php print $mess[179];?></a>
+		<a href="" id="downloadDiapoButton"><img width="22" height="22" src="images/crystal/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
+	</div>
+	<div align="right" style="background-image: url(images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
+	<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
+	<td><img class="diaporamaButton" width="16" height="16" src="images/crystal/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="images/crystal/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
+	<td><div class="slider" id="slider-2"><input class="slider-input" id="slider-input-2" name="slider-input-2"/></div></td>
+	<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td></tr></table>
+	</div>
+	<div style="width:100%; text-align:center; vertical-align:center;overflow:auto; background-color:#333; border:1px solid black;" id="imageContainer">
+	<img id="mainImage" src="" style="border: 4px solid white;">
+	</div>
 </div>
 
-<div id="createdir_form" action="mkdir">
+<!-- EDIT TEXT FILE -->
+<div id="edit_box" action="editer" box_width="80%" box_height="90%">
+	<div class="action_bar" style="height: 42px;">
+		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
+		<a href="" id="saveButton" onclick="saveForm();return false;"><img src="images/crystal/filesave.png" width="22" height="22" alt="<?php print $mess[53]; ?>" border="0"><br><?php print $mess[53]; ?></a>
+		<a href="" id="downloadFileButton"><img width="22" height="22" src="images/crystal/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
+	</div>
+	<input type="hidden" name="fic" value="">
+	<input type="hidden" name="rep" value="">
+	<input type="hidden" name="save" value="1">
+</div>
+
+<!-- MAKE DIRECTORY -->
+<div id="createdir_form" action="mkdir" box_width="280">
 <div class="dialogLegend"><?php print($mess[26]); ?><b class="replace_rep"></b></div>
 <br><?php print($mess[173]);?><br>
 <input type="text" name="nomdir" size="30" class="dialogFocus">
 </div>
 
-<div id="createfile_form" action="creer_fichier">
+<!-- MAKE NEW FILE -->
+<div id="createfile_form" action="creer_fichier" box_width="280">
 <div class="dialogLegend"><?php print($mess[28]); ?><b class="replace_rep"></b></div>
 <br><?php print($mess[174]);?></br>
 <input type="text" name="nomfic" size="30" class="dialogFocus">
 </div>
 
-<div id="rename_form" action="rename_suite">
+<!-- RENAME FILE -->
+<div id="rename_form" action="rename_suite" box_width="280">
 <?php print($mess[6]); ?> <b class="replace_file"></b> <?php print($mess[42]); ?><br>
 <input type="text" name="fic_new" value="" id="fic_new" class="dialogFocus initFicName">
 </div>
 
-<div id="copymove_form" action="copier_suite">
+<!-- COPY OR MOVE SELECTION -->
+<div id="copymove_form" action="copier_suite" box_width="270">
 <input type="hidden" name="dest_node" value="">
 <div class="dialogLegend"><?php print($mess[175]);?></div>
 <span id="copymove_text_span"></span> &nbsp; 
@@ -38,21 +68,23 @@
 <br>
 </div>
 
-<div id="delete_form" action="supprimer_suite">
+<!-- DELETE SELECTION -->
+<div id="delete_form" action="supprimer_suite" box_width="280">
 <span id="delete_message"></span>
 </div>
 
-<form id="login_form" action="login" style="display:none;">
+<!-- LOGIN SCREEN -->
+<form id="login_form" action="login" style="display:none;" box_width="210">
 <input type="hidden" name="get_action" value="login">
 <div class="dialogLegend"><?php print($mess[180]);?></div>
-<table cellpadding="0" border="0" cellspacing="0">
+<table cellpadding="0" border="0" cellspacing="0" style="font-size:11px;">
 <tr><td align="right"><?php print($mess[181]);?> :</td><td><input type="text" name="userid" style="width: 100px;" class="dialogFocus"></td></tr>
 <tr><td align="right"><?php print($mess[182]);?> :</td><td><input type="password" name="password"  style="width: 100px;"></td></tr>
 </table>
 </form>
 
-
-<form action="content.php" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left;">
+<!-- UPLOAD FORM -->
+<form action="content.php" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left;" box_width="470">
 <legend><?php print($mess[25]); ?><b class="replace_rep"></b></legend>
 <br><br><?php print($mess[171]);?><br>
 <input type="file" name="userfile_1" class="dialogFocus" size="30">
@@ -63,24 +95,28 @@
 </form>
 <script language="javascript">$('originalUploadForm').hide();</script>
 
-<div id="splash_form">
+<!-- SPLASH SCREEN -->
+<div id="splash_form" box_width="420">
 <div id="splashScreen">
 <iframe src="content.php?get_action=display_doc&doc_file=CREDITS" id="docFileIframe"></iframe>
 </div>
 </div>
 
-<div id="admin_form">
+<!-- USERS SETTINGS -->
+<div id="admin_form" box_width="660">
 <div id="adminScreen">
 <iframe src="admin.php" id="adminIFrame"></iframe>
 </div>
 </div>
 
-<div id="multi_download_form" title="<?php print($mess[118]);?>">
+<!-- MULTIPLE DOWNLOAD -->
+<div id="multi_download_form" title="<?php print($mess[118]);?>"  box_width="410">
 <div class="dialogLegend"><?php print($mess[119]);?></div><br>
 <div id="multiple_download_container"></div>
 </div>
 
-<form id="user_pref_form" action="user_pref" style="display:none;">
+<!-- USER'S PREFERENCES -->
+<form id="user_pref_form" action="user_pref" style="display:none;" box_width="280">
 <fieldset><legend><?php print($mess[190]);?></legend>
 <?php 
 $langs = ConfService::getConf("AVAILABLE_LANG");
