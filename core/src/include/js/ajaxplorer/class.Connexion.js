@@ -4,6 +4,7 @@ function Connexion(baseUrl)
 	if(baseUrl) this._baseUrl = baseUrl;
 	this._libUrl = 'include/js';
 	this._parameters = new Hash();
+	this._method = 'get';
 	this.addParameter('get_action', 'xml_listing');
 }
 
@@ -17,12 +18,17 @@ Connexion.prototype.setParameters = function(hParameters)
 	this._parameters = hParameters;
 }
 
+Connexion.prototype.setMethod = function(method)
+{
+	this._method = 'put';
+}
+
 Connexion.prototype.sendAsync = function()
 {	
 	var oThis = this;
 	new Ajax.Request(this._baseUrl, 
 	{
-		method:'get',
+		method:this._method,
 		onComplete:this.onComplete,
 		parameters:this._parameters
 	});
