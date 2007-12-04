@@ -160,9 +160,8 @@ switch($action)
 	//------------------------------------
 	//	EDITER / EDIT
 	//------------------------------------
-
 	case "editer";	
-	include($hautpage);
+	//include($hautpage);
 	if(isset($save) && $save==1)
 	{
 		$code=stripslashes($code);
@@ -172,84 +171,22 @@ switch($action)
 		fclose($fp);
 		Utils::enlever_controlM(ConfService::getRootDir()."/$fic");
 		$logMessage = $mess[115];
+		echo $logMessage;
 	}
-	if(isset($logMessage) || isset($errorMessage))
+	else 
 	{
-		echo "<div title=\"".$mess[98]."\" id=\"message_div_int\" onclick=\"new Effect.BlindUp('message_div_int');messageDivOpen=false;\" class=\"messageBox ".(isset($logMessage)?"logMessage":"errorMessage")."\"><table id=\"message_content\" style=\"padding:2px;\" width=\"100%\"><tr><td style=\"width: 66%;\">".(isset($logMessage)?$logMessage:$errorMessage)."</td><td style=\"color: #999; text-align: right;padding-right: 10px; width: 30%;\"><i>".$mess[98]."</i></tr></table></div>";		
-		echo "<script>
-		var messageDivOpen = true;
-		setTimeout(\"if(messageDivOpen){new Effect.BlindUp('message_div_int');messageDivOpen = false;}\", 3000);
-		</script>";
+		header("Content-type:text/plain");
+		$fp=fopen(ConfService::getRootDir()."/$fic","r");
+		while (!feof($fp))
+		{
+			$tmp=fgets($fp,4096);
+			echo "$tmp";
+		}
+		fclose($fp);
 	}
-	$codePressStyle = Utils::editWithCodePress($fic);
-	echo "<form action=\"content.php\" id=\"editForm\" method=\"post\">\n";
-	echo "<div id=\"action_bar\" style=\"height: 45px;\">";
-	//echo '<table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td>';
-	echo "<a href=\"#\" onclick=\"parent.hideLightBox();\"><img src=\"images/crystal/fileclose.png\"  width=\"22\" height=\"22\" alt=\"\" border=\"0\"><br>".$mess[86]."</a>\n";
-	echo "<a href=\"#\" onclick=\"saveForm();return false;\"><img src=\"images/crystal/filesave.png\" width=\"22\" height=\"22\" alt=\"$mess[53]\" border=\"0\"><br>".$mess[53]."</a>\n";
-	//echo '<td></tr></table>';
-	echo "</div>";
-	echo "<input type=\"hidden\" name=\"fic\" value=\"$fic\">\n";
-	echo "<input type=\"hidden\" name=\"rep\" value=\"$rep\">\n";
-	echo "<input type=\"hidden\" name=\"save\" value=\"1\">\n";
-	echo "<input type=\"hidden\" name=\"action\" value=\"editer\">\n";
-	if($codePressStyle != "")
-	{
-		echo "<input type=\"hidden\" id=\"code\" name=\"code\" value=\"\">\n";
-		echo "<TEXTAREA NAME=\"myCode\" id=\"myCode\" class=\"codepress $codePressStyle linenumbers-on\" id=\"myCode\" style=\"width:100%;\" wrap=\"OFF\" rows=30>\n";		
-	}
-	else
-	{
-		echo "<TEXTAREA NAME=\"code\" style=\"width:100%; \" wrap=\"OFF\" rows=30 id=\"myCode\">\n";
-	}
-	$fp=fopen(ConfService::getRootDir()."/$fic","r");
-	while (!feof($fp))
-	{
-		$tmp=fgets($fp,4096);
-		$tmp=str_replace("<","&lt;",$tmp);
-		echo "$tmp";
-	}
-	fclose($fp);
-	//echo "$fic";
-	echo "</TEXTAREA>\n";
-	echo "</form>\n";
-	echo "<script language=\"javascript\">
-	jQuery('#action_bar a').corner('round 8px');
-	fitHeightToBottom($('myCode'), window);
-	document.getElementById('myCode').focus();
-	function saveForm(){
-		".($codePressStyle!=""?"$('code').value = myCode.getCode();":"")."
-		$('editForm').submit();
-	}
-	</script>";	
-	include($baspage);
 	exit(0);
 	break;
 
-	//------------------------------------
-	//	VOIR UNE IMAGE
-	//------------------------------------
-
-	case "voir";
-	$nomdufichier=basename($fic);
-	include($hautpage);
-	echo "<style>body {background-color: buttonface;}</style>";
-	echo "<div id=\"action_bar\" style=\"height: 45px;\">";
-	echo "<a href=\"#\" onclick=\"parent.hideLightBox();\"><img width=\"22\" height=\"22\" src=\"images/crystal/fileclose.png\" alt=\"\" border=\"0\"><br>".$mess[86]."</a>";
-	echo "<a href=\"#\" id=\"prevButton\" onclick=\"diapo.previous(); return false;\"><img  width=\"22\" height=\"22\" src=\"images/crystal/back_22.png\" alt=\"\" border=\"0\"><br>".$mess[178]."</a>";
-	echo "<a href=\"#\" id=\"nextButton\" onclick=\"diapo.next(); return false;\"><img width=\"22\" height=\"22\" src=\"images/crystal/forward_22.png\" alt=\"\" border=\"0\"><br>".$mess[179]."</a>";	
-	echo "</div>\n";
-	echo "<div style=\"text-align:center; vertical-align:center;overflow:auto; background-color:#ccc; border:1px solid black;\" id=\"imageContainer\">";
-	echo "<img id=\"mainImage\" src=\"content.php?action=image_proxy&fic=$fic\">\n";
-	echo "</div>";
-	echo "<script language=\"javascript\">
-	jQuery('#action_bar a').corner('round 8px');
-	fitHeightToBottom($('imageContainer'), window);
-	var diapo = new Diaporama('$fic', $('prevButton'), $('nextButton'), $('mainImage'));
-	</script>";
-	include($baspage);
-	exit;
-	break;
 
 	//------------------------------------
 	//	AIDE / HELP
@@ -277,19 +214,12 @@ switch($action)
 	header("Expires: 0");
 	header("Cache-Control: no-cache, must-revalidate");
 	header("Pragma: no-cache");
-	// For SSL websites there is a bug with IE
-	// see article KB 323308
+	// For SSL websites there is a bug with IE see article KB 323308
 	// therefore we must reset the Cache-Control and Pragma Header
-	// (although Pragma and IE 7 were not mentioned they still 
-	// experience this problem)
-	// 1. Check for SSL-Usage
-	if (strcmp(substr(ConfService::getConf("USE_HTTPS"),0,6),"https:") == 0) 
+	if (ConfService::getConf("USE_HTTPS")==1) 
 	{
-		// check for IE (this also catches browser who fake IE usage
-		// like Opera
 		if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
 		{
-			// reset headers
 			header("Cache-Control:");
 			header("Pragma:");
 		}
@@ -751,20 +681,6 @@ switch($action)
 	//	BOOKMARK BAR
 	//------------------------------------
 	header("Content-type:text/html");
-	/*
-	$bookMarksManager = new BookmarksManager((isset($_GET["user"])?$_GET["user"]:"shared_bookmarks"));
-	if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
-	{
-		if($_GET["bm_action"] == "add_bookmark")
-		{
-			$bookMarksManager->addBookMark($_GET["bm_path"]);
-		}
-		else if($_GET["bm_action"] == "delete_bookmark")
-		{
-			$bookMarksManager->removeBookMark($_GET["bm_path"]);
-		}
-	}
-	*/
 	$bmUser = null;
 	if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
 	{
@@ -799,36 +715,7 @@ switch($action)
 	session_write_close();
 	exit(1);
 	break;
-	
-	/*
-	case "upgrade_old_bookmarks_2_users":
-		if(is_dir(OLD_USERS_DIR))
-		{
-			// READ DIR AND CREATE USERS!
-			$fp = opendir(OLD_USERS_DIR);
-			while ($file = readdir($fp)) {				
-				$split = split("\.", $file);
-				if(count($split) != 2 || $split[1] != "txt" || AuthService::userExists($split[0]))
-				{
-					continue;
-				}				
-				$newUser = new AJXP_User($split[0]);
-				$bmManager = new BookmarksManager($newUser->getId());
-				$allBMarks = $bmManager->getBookMarks(false);
-				print_r($allBMarks);
-				foreach ($allBMarks as $repId => $bmarks)
-				{					
-					foreach ($bmarks as $bmark) $newUser->addBookmark($bmark, $repId);
-				}
-				$newUser->save();
-				print("<div>Successfully Created user <b>".$newUser->getId()."</b> from old bookmarks.</div>");
-			}
-			//rmdir(OLD_USERS_DIR);
-		}
-	exit(1);
-	break;
-	*/
-	
+		
 	case "save_user_pref":
 		$userObject = AuthService::getLoggedUser();
 		if($userObject == null) exit(1);
