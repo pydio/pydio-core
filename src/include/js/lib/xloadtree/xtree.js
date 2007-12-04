@@ -356,7 +356,14 @@ WebFXTree.prototype.keydown = function(key) {
 		return false;
 	}
 	if (key == 37) { this.collapse(); return false; }
-	if ((key == 40) && (this.open) && (this.childNodes.length)) { this.childNodes[0].select(); return false; }	
+	if ((key == 40) && (this.open) && (this.childNodes.length)) { 
+		this.childNodes[0].select();
+		var toExec = this.childNodes[0];
+		if(WebFXtimer) clearTimeout(WebFXtimer);
+		var jsString = "javascript:";
+		WebFXtimer = window.setTimeout(function(){eval(toExec.action.substring(jsString.length));}, 1000);
+		return false; 		
+	}	
 	return true;
 }
 
@@ -505,7 +512,13 @@ WebFXTreeItem.prototype.keydown = function(key) {
 		return false;
 	}
 	else if (key == 40) {
-		if (this.open) { this.getFirst().select(); }
+		if (this.open) { 
+			this.getFirst().select(); 
+			var toExec = this.getFirst();
+			if(WebFXtimer) clearTimeout(WebFXtimer);
+			var jsString = "javascript:";
+			WebFXtimer = window.setTimeout(function(){eval(toExec.action.substring(jsString.length));}, 1000);
+		}
 		else {
 			var sib = this.getNextSibling();
 			if (sib) { 
