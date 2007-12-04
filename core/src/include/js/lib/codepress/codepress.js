@@ -9,7 +9,7 @@
  * Read the full licence: http://www.opensource.org/licenses/lgpl-license.php
  */
 
-CodePress = function(obj) {
+CodePress = function(obj, contentObserver) {
 	var self = document.createElement('iframe');
 	self.textarea = obj;
 	self.textarea.disabled = true;
@@ -22,6 +22,7 @@ CodePress = function(obj) {
 	self.style.visibility = 'hidden';
 	self.style.position = 'absolute';
 	self.options = self.textarea.className;
+	self.contentObserver = contentObserver;
 	
 	self.initialize = function() {
 		self.editor = self.contentWindow.CodePress;
@@ -33,6 +34,20 @@ CodePress = function(obj) {
 		self.style.position = 'static';
 		self.style.visibility = 'visible';
 		self.style.display = 'inline';
+		if(self.contentObserver){
+			self.pe = new PeriodicalExecuter(function(pe){
+				if(self.interrupt){pe.stop();return;}
+				var crtCode = self.getCode();
+				if(!self.prevCode){ self.prevCode = crtCode; return;}
+				if(self.prevCode != crtCode) self.contentObserver();
+				self.prevCode = crtCode;
+				return;				
+			}, 0.2);
+		}
+	}
+
+	self.close = function(){
+		self.interrupt = true;
 	}
 	
 	self.edit = function(id,language) {
