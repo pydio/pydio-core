@@ -284,7 +284,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 	}
 	if(!this.actionIsAllowed(buttonAction)) return;
 	var oThis = this;
-	if($A(["create_file", "rename", "upload", "create_dir", "copy", "move", "delete", "download", "splash", "login", "admin"]).indexOf(buttonAction) != -1)
+	if($A(["create_file", "rename", "upload", "create_dir", "copy", "move", "delete", "download", "splash", "login", "admin", "view", "edit"]).indexOf(buttonAction) != -1)
 	{
 		modal.prepareHeader(dialogTitle, iconSrc);
 	}
@@ -326,9 +326,6 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				rep.setAttribute('name', 'rep');
 				rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
 				oForm.appendChild(rep);
-				if (browser && browser == 'Internet Explorer'){
-					$(modal.elementName).style.width = '470px';
-				}
 			}
 			modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){
 				ajaxplorer.actionBar.multi_selector.submitMainForm();
@@ -443,8 +440,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				for(var i=0; i<fileNames.length;i++)
 				{
 					downloader.addListRow(fileNames[i]);
-				}
-				if (browser && browser == 'Internet Explorer')$(modal.elementName).style.width = '410px';
+				}				
 			};
 			var closeFunc = function(){
 				hideLightBox();
@@ -457,9 +453,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			modal.showDialogForm(
 				'Ajaxplorer', 
 				'splash_form', 
-				function(form){
-					if (browser && browser == 'Internet Explorer')$(modal.elementName).style.width = '420px';
-				}, 
+				null, 
 				function(){hideLightBox();return false;}, 
 				null, 
 				true);		
@@ -469,38 +463,41 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			modal.showDialogForm(
 				'Ajaxplorer Settings', 
 				'admin_form', 
-				function(form){
-					if (browser && browser == 'Internet Explorer'){	$(modal.elementName).style.width = '660px';	}
-					$(modal.elementName).style.top = '10%';
-					$(modal.elementName).style.left = '15%';
-				}, 
-				function(){
-					$(modal.elementName).style.top = '30%';
-					$(modal.elementName).style.left = '30%';					
+				null, 
+				function(){				
 					hideLightBox();return false;
 				}, 
 				null, 
 				true);		
 		break;
 		
-		case "edit":			
+		case "edit":	
 			var userSelection =  this._ajaxplorer.getFilesList().getUserSelection();
 			if(!userSelection.isEditable()) break;
-			newLoc = 'content.php?action=editer';
 			var sTitle = MessageHash[187]+userSelection.getUniqueFileName();
-			var newLoc = userSelection.updateFormOrUrl(null, newLoc);			
-			modal.showDialogIFrame(sTitle, newLoc);
-			this.update(true);			
+			modal.prepareHeader(sTitle, iconSrc);
+			var loadFunc = function(oForm){
+				ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+				oThis.editor = new Editor(oForm);
+				oThis.editor.createEditor(userSelection.getUniqueFileName());
+				oThis.editor.loadFile(userSelection.getUniqueFileName());
+			}
+			modal.showDialogForm('Edit Online', 'edit_box', loadFunc, null, null, true, true);
 		break;
 
-		case "view":
+		case "view":			
 			var userSelection =  this._ajaxplorer.getFilesList().getUserSelection();
 			if(!userSelection.isImage()) break;
-			var newLoc = 'content.php?action=voir';
-			var sTitle = MessageHash[186];
-			newLoc = userSelection.updateFormOrUrl(null, newLoc);			
-			modal.showDialogIFrame(sTitle, newLoc);
-			this.update(true);			
+			var loadFunc = function(oForm){
+				oThis.diaporama = new Diaporama($(oForm));
+				oThis.diaporama.open(ajaxplorer.getFilesList().getItems(), userSelection.getUniqueFileName());
+			}
+			var closeFunc = function(){
+				oThis.diaporama.close();
+				hideLightBox();
+				return false;
+			}
+			modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
 		break;
 		
 		case "switch_display":
