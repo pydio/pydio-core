@@ -176,6 +176,7 @@ function initialize(){
 		if(e.keyCode == 27)
 		{
 			ajaxplorer.cancelCopyOrMove();
+			modal.close();
 			hideLightBox();
 		}
 		if(e.keyCode == 9) return false;
