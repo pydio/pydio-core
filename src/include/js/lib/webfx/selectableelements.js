@@ -141,10 +141,10 @@ SelectableElements.prototype.blur = function()
 
 SelectableElements.prototype.selectFirst = function()
 {
-	if(this._selectedItems.length) return;
-	if(this.getItem(1) != null)
+	if(this._selectedItems.length) return;	
+	if(this.getItem(0) != null)
 	{
-		this.setItemSelected(this.getItem(1), true);
+		this.setItemSelected(this.getItem(0), true);
 	}
 }
 
