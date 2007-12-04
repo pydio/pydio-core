@@ -19,15 +19,10 @@ function FilesList(oElement, bSelectMultiple, oSortTypes, sCurrentRep, oAjaxplor
 	this.initGUI();
 		
 	var oThis = this;
-	$('content_pane').ownerDocument.onkeyup = function(e){
-		if (e == null) e = $('content_pane').ownerDocument.parentWindow.event;
-		oThis.keyup(e);
-	};
 	
-	Event.observe(document, "keydown", function(e){
-	//oElement.ownerDocument.onkeypress = function(e){
+	Event.observe(document, "keydown", function(e){	
 		if (e == null) e = $('content_pane').ownerDocument.parentWindow.event;
-		return oThis.keydown(e);
+		return oThis.keydown(e);		
 	});
 	
 	//window.onfocus = function(){oThis.selectFirst()};
@@ -46,25 +41,37 @@ FilesList.prototype.initGUI = function()
 {
 	if(this._displayMode == "list")
 	{
-		var buffer = '<TABLE width="100%" cellspacing="0"  id="selectable_div" class="sort-table">';
+		var buffer = '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
 		buffer = buffer + '<col\><col\><col\><col\>';
 		buffer = buffer + '<thead><tr>';
 		buffer = buffer + '<td>'+MessageHash[1]+'</td><td>'+MessageHash[2]+'</td><td>'+MessageHash[3]+'</td><td>'+MessageHash[4]+'</td>';
-		buffer = buffer + '</tr></thead><tbody></tbody></table>';
+		buffer = buffer + '</tr></thead></table><div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 		$('content_pane').innerHTML  = buffer;
 		oElement = $('selectable_div');
 		
 		SelectableElements.call(this, oElement, true); // "TRUE" ENABLES MULTIPLE SELECTION
-		this._sortableTable = new SortableTable(oElement, this._oSortTypes);
+		this._sortableTable = new SortableTable(oElement, this._oSortTypes, $('selectable_div_header'));
+		fitHeightToBottom($('table_rows_container'), $('content_pane'));
+		this.disableTextSelection($('selectable_div_header'));
+		var oThis = this;
+		Event.observe(window, "resize",  function(){			
+			setTimeout(function(){oThis.applyHeadersWidth();fitHeightToBottom($('table_rows_container'), $('content_pane'));}, 100);
+		});
+		
+		jQuery('#sidebarSplitter').bind("resize",  function(){			
+			oThis.applyHeadersWidth();
+			fitHeightToBottom($('table_rows_container'), $('content_pane'));
+		});
 	}
 	else if(this._displayMode == "thumb")
 	{
-		var buffer = '<TABLE width="100%" cellspacing="0" class="sort-table">';
+		var buffer = '<TABLE width="100%" cellspacing="0" cellpadding="0" class="sort-table">';
 		buffer = buffer + '<thead><tr>';
-		buffer = buffer + '<td style="border-right:0px;background-image:url(\'images/header_bg_plain\');" >'+MessageHash[126]+'</td>';
+		buffer = buffer + '<td style="border-right:0px;background-image:url(\'images/header_bg_plain.png\');" >'+MessageHash[126]+'</td>';
 		buffer = buffer + '<td align="right" id="last_header"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
-		buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" id="selectable_div"></td></tr></tbody></table>';
+		buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" style="padding:0px;"><div id="selectable_div" style="overflow:auto; padding:2px 5px;"></div></td></tr></tbody></table>';
 		$('content_pane').innerHTML  = buffer;
+		fitHeightToBottom($('selectable_div'), $('content_pane'));
 		this.slider = new Slider($("slider-1"), $("slider-input-1"));		
 		this.slider.setMaximum(200);
 		this.slider.setMinimum(30);		
@@ -81,7 +88,8 @@ FilesList.prototype.initGUI = function()
 		oElement = $('selectable_div');
 		
 		SelectableElements.call(this, oElement, true); // "TRUE" ENABLES MULTIPLE SELECTION
-	}
+	}	
+	
 	//jQuery("#last_header").corner("round tr 5px");
 	//jQuery("#last_header").css("border-bottom", "1px solid #aaa");
 }
@@ -97,11 +105,42 @@ FilesList.prototype.switchDisplayMode = function(mode)
 		if(this._displayMode == "thumb") this._displayMode = "list";
 		else this._displayMode = "thumb";
 	}
+	var currentSelection = this.getSelectedFileNames();
 	this.initGUI();
-	this.reload();
+	this.reload(currentSelection);
 	this.fireChange();
 	ajaxplorer.actionBar.updateDisplayButton(this._displayMode);
 	return this._displayMode;
+}
+
+FilesList.prototype.getHeadersWidth = function()
+{	
+	if(this._displayMode == 'thumb') return;
+	var tds = $('selectable_div_header').getElementsBySelector('td');
+	this.headersWidth = new Hash();
+	var index = 0;
+	var oThis = this;
+	tds.each(function(cell){		
+		oThis.headersWidth[index] = cell.getWidth() - 8;
+		index++;
+	});
+	//alert(this.headersWidth[0]);
+}
+
+FilesList.prototype.applyHeadersWidth = function(){
+	this.getHeadersWidth();
+	var allItems = this.getItems();
+	for(var i=0; i<allItems.length;i++)
+	{
+		var tds = $(allItems[i]).getElementsBySelector('td');
+		var index = 0;
+		var widthes = this.headersWidth;
+		tds.each(function(cell){		
+			if(index == (tds.size()-1)) return;
+			cell.setStyle({width:widthes[index]+'px'});
+			index++;
+		});	
+	}
 }
 
 FilesList.prototype.initRows = function()
@@ -110,13 +149,17 @@ FilesList.prototype.initRows = function()
 	var allItems = this.getItems();
 	for(var i=0; i<allItems.length;i++)
 	{
-		this.disableTextSelection(allItems[i]);
+		this.disableTextSelection(allItems[i]);			
 	}
 	if(this._displayMode == "thumb")
 	{
 		this.resizeThumbnails();
 		var oThis = this;
 		window.setTimeout(function(){oThis.loadNextImage();},10);		
+	}
+	else
+	{
+		this.applyHeadersWidth();	
 	}
 }
 
@@ -224,7 +267,14 @@ FilesList.prototype.parseXmlAndLoad = function(oXmlDoc)
 	}
 	if(this._pendingFile)
 	{
-		this.selectFile(this._pendingFile);
+		if(typeof this._pendingFile == 'string')
+		{
+			this.selectFile(this._pendingFile);
+		}else if(this._pendingFile.length){
+			for(var f=0;f<this._pendingFile.length; f++){
+				this.selectFile(this._pendingFile[f], true);
+			}
+		}
 		this.hasFocus = true;
 		this._pendingFile = null;
 	}	
@@ -318,14 +368,6 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 		this._htmlElement.appendChild(newRow);
 		
 		var fileName = xmlNode.getAttribute('filename');
-		/*
-		imagesHash["ajxp_image_"+crtIndex] = {filename:fileName, 
-			rowObject:$(newRow), 
-			height: newHeight, 
-			width: newWidth, 
-			marginTop: marginTop, 
-			marginBottom: marginBottom};
-			*/
 		var oImageToLoad = {
 			index:"ajxp_image_"+crtIndex,
 			filename:fileName, 
@@ -350,46 +392,6 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 		this._htmlElement.appendChild(newRow);
 	}
 
-	// NOW UPDATE IMAGES SOURCES
-	/*
-	if(imagesHash.size() > 0)
-	{
-		//window.setTimeout(function(){
-			imagesHash.each(function(pair){
-				console.log(pair.value.filename);
-				image.src = "content.php?action=image_proxy&get_thumb=true&fic="+pair.value.filename;
-				image.onload = function(){
-					var img = $(pair.key);
-					if(img == null) return;
-					img.src = "content.php?action=image_proxy&get_thumb=true&fic="+pair.value.filename;
-					img.height = pair.value.height;
-					img.width = pair.value.width;
-					img.setStyle({marginTop: pair.value.marginTop+'px',marginBottom: pair.value.marginBottom+'px'});
-					img.setAttribute("is_loaded", "true");
-					oThis.resizeThumbnails(pair.value.rowObject);					
-				}
-			});
-		//}, 100);
-	}
-	if(oImageToLoad)
-	{
-		var oThis = this;
-		window.setTimeout(function(){
-		if(oThis.loading) return;
-			console.log(oImageToLoad.filename);
-			image.src = "content.php?action=image_proxy&get_thumb=true&fic="+oImageToLoad.filename;
-			image.onload = function(){
-				var img = $(oImageToLoad.index);
-				if(img == null) return;
-				img.src = "content.php?action=image_proxy&get_thumb=true&fic="+oImageToLoad.filename;
-				img.height = oImageToLoad.height;
-				img.width = oImageToLoad.width;
-				img.setStyle({marginTop: oImageToLoad.marginTop+'px',marginBottom: oImageToLoad.marginBottom+'px'});
-				img.setAttribute("is_loaded", "true");
-				oThis.resizeThumbnails(oImageToLoad.rowObject);};
-		}, 100);
-	}
-	*/
 }
 
 FilesList.prototype.resizeThumbnails = function(one_element)
@@ -408,8 +410,8 @@ FilesList.prototype.resizeThumbnails = function(one_element)
 		var tW, tH, mT, mB;
 		if(is_image && image_element.getAttribute("is_loaded") == "true")
 		{
-			imgW = element.getAttribute("image_width");
-			imgH = element.getAttribute("image_height");			
+			imgW = parseInt(element.getAttribute("image_width"));
+			imgH = parseInt(element.getAttribute("image_height"));
 			if(imgW > imgH)
 			{				
 				tW = tSize;
@@ -517,7 +519,7 @@ FilesList.prototype.getSelectedFileNames = function() {
 	selRaw = this.getSelectedItems();
 	if(!selRaw.length)
 	{
-		alert('Please select a file!');
+		//alert('Please select a file!');
 		return;
 	}
 	var tmp = new Array(selRaw.length);
@@ -561,7 +563,7 @@ FilesList.prototype.hasFileType = function(fileType)
 	return false;
 }
 
-FilesList.prototype.selectFile = function(fileName)
+FilesList.prototype.selectFile = function(fileName, multiple)
 {
 	if(!this.fileNameExists(fileName)) 
 	{
@@ -574,7 +576,7 @@ FilesList.prototype.selectFile = function(fileName)
 		{
 			this.setItemSelected(allItems[i], true);
 		}
-		else
+		else if(multiple==null)
 		{
 			this.setItemSelected(allItems[i], false);
 		}
@@ -604,19 +606,19 @@ FilesList.prototype.disableTextSelection = function(target)
 	}
 }
 
-FilesList.prototype.keyup = function (event)
+FilesList.prototype.keydown = function (event)
 {
+	if(event.keyCode == 9 && !ajaxplorer.blockNavigation) return false;
 	if(!this.hasFocus) return true;
 	var keyCode = event.keyCode;
-	if(this._displayMode == "list" && keyCode != 38 && keyCode != 40 && keyCode != 13)
+	if(this._displayMode == "list" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
 	{
 		return true;
 	}
-	if(this._displayMode == "thumb" && keyCode != 37 && keyCode != 39 && keyCode != 13)
+	if(this._displayMode == "thumb" && keyCode != Event.KEY_UP && keyCode != Event.KEY_DOWN && keyCode != Event.KEY_LEFT && keyCode != Event.KEY_RIGHT &&  keyCode != Event.KEY_RETURN && keyCode != Event.KEY_END && keyCode != Event.KEY_HOME)
 	{
 		return true;
 	}
-	
 	var items = this._selectedItems;
 	if(items.length == 0) // No selection
 	{
@@ -626,14 +628,59 @@ FilesList.prototype.keyup = function (event)
 	var currentItem;
 	var shiftKey = event['shiftKey'];
 	currentItem = items[items.length-1];
-	
+	var allItems = this.getItems();
+	var currentItemIndex = this.getItemIndex(currentItem);
+	var selectLine = false;
+	//ENTER
+	if(event.keyCode == Event.KEY_RETURN)
+	{
+		for(var i=0; i<items.length; i++)
+		{
+			this.setItemSelected(items[i], false);
+		}
+		this.setItemSelected(currentItem, true);
+		this.fireDblClick(null);
+		return false;
+	}
+	if(event.keyCode == Event.KEY_END)
+	{
+		nextItem = allItems[allItems.length-1];
+		if(shiftKey && this._multiple){
+			selectLine = true;
+			nextItemIndex = allItems.length -1;
+		}
+	}
+	else if(event.keyCode == Event.KEY_HOME)
+	{
+		nextItem = allItems[0];
+		if(shiftKey && this._multiple){
+			selectLine = true;
+			nextItemIndex = 0;
+		}
+	}
 	// UP
-	if(event.keyCode == 38 || event.keyCode == 37)
+	else if(event.keyCode == Event.KEY_UP)
+	{
+		if(this._displayMode == 'list') nextItem = this.getPrevious(currentItem);
+		else{			
+			 nextItemIndex = this.findOverlappingItem(currentItemIndex, false);
+			 if(nextItemIndex != null){ nextItem = allItems[nextItemIndex];selectLine = true;}
+		}
+	}
+	else if(event.keyCode == Event.KEY_LEFT)
 	{
 		nextItem = this.getPrevious(currentItem);
 	}
 	//DOWN
-	else if(event.keyCode == 40 || event.keyCode == 39)
+	else if(event.keyCode == Event.KEY_DOWN)
+	{
+		if(this._displayMode == 'list') nextItem = this.getNext(currentItem);
+		else{
+			 nextItemIndex = this.findOverlappingItem(currentItemIndex, true);
+			 if(nextItemIndex != null){ nextItem = allItems[nextItemIndex];selectLine = true;}
+		}
+	}
+	else if(event.keyCode == Event.KEY_RIGHT)
 	{
 		nextItem = this.getNext(currentItem);
 	}
@@ -649,11 +696,52 @@ FilesList.prototype.keyup = function (event)
 			this.setItemSelected(items[i], false);
 		}		
 	}
+	else if(selectLine)
+	{
+		if(nextItemIndex >= currentItemIndex)
+		{
+			for(var i=currentItemIndex+1; i<nextItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
+		}else{
+			for(var i=nextItemIndex+1; i<currentItemIndex; i++) this.setItemSelected(allItems[i], !allItems[i]._selected);
+		}
+	}
 	this.setItemSelected(nextItem, !nextItem._selected);
 	return false;
 }
 
-FilesList.prototype.keydown = function (event)
+FilesList.prototype.findOverlappingItem = function(currentItemIndex, bDown)
+{	
+	if(!bDown && currentItemIndex == 0) return;
+	var allItems = this.getItems();
+	if(bDown && currentItemIndex == allItems.length - 1) return;
+	
+	var element = $(allItems[currentItemIndex]);	
+	var pos = Position.cumulativeOffset(element);
+	var dims = Element.getDimensions(element);
+	var searchingPosX = pos[0] + parseInt(dims.width/2);
+	if(bDown){
+		var searchingPosY = pos[1] + parseInt(dims.height*3/2);
+		for(var i=currentItemIndex+1; i<allItems.length;i++){
+			if(Position.within($(allItems[i]), searchingPosX, searchingPosY))
+			{
+				return i;
+			}
+		}
+		return null;
+	}else{
+		var searchingPosY = pos[1] - parseInt(dims.height/2);
+		for(var i=currentItemIndex-1; i>-1; i--){
+			if(Position.within($(allItems[i]), searchingPosX, searchingPosY))
+			{
+				return i;
+			}
+		}
+		return null;
+	}
+}
+
+/*
+FilesList.prototype.keydown_old = function (event)
 {
 	if(event.keyCode == 9 && !ajaxplorer.blockNavigation) return false;
 	if(!this.hasFocus) return true;
@@ -681,7 +769,7 @@ FilesList.prototype.keydown = function (event)
 		return false;
 	}	
 }
-
+*/
 
 
 FilesList.prototype.isItem = function (node) {
@@ -751,7 +839,7 @@ FilesList.prototype.getItem = function (nIndex) {
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i].nodeType == 1) {
-				if (j == nIndex-1)
+				if (j == nIndex)
 					return cs[i];
 				j++;
 			}
