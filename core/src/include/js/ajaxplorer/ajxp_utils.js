@@ -25,6 +25,15 @@ function editWithCodePress(fileName)
 	else return "";	
 }
 
+function refreshPNGImages(element){
+	
+	var imgs = $(element).getElementsBySelector('img');
+	if(imgs.length) imgs.each(function(img){
+		if(img.original_src) img.src = img.original_src;
+	});
+	return element;
+}
+
 var messageDivOpen = false;
 function closeMessageDiv()
 {
