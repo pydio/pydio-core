@@ -32,7 +32,8 @@ function FilesList(oElement, bSelectMultiple, oSortTypes, sCurrentRep, oAjaxplor
 	{
 		this.loadXmlList(this._currentRep);
 	}
-	
+	this.allDraggables = new Array();
+	this.allDroppables = new Array();
 }
 
 FilesList.prototype = new SelectableElements;
@@ -121,7 +122,7 @@ FilesList.prototype.getHeadersWidth = function()
 	var index = 0;
 	var oThis = this;
 	tds.each(function(cell){		
-		oThis.headersWidth[index] = cell.getWidth() - 8;
+		oThis.headersWidth.set(index, cell.getWidth() - 8);
 		index++;
 	});
 	//alert(this.headersWidth[0]);
@@ -137,7 +138,7 @@ FilesList.prototype.applyHeadersWidth = function(){
 		var widthes = this.headersWidth;
 		tds.each(function(cell){		
 			if(index == (tds.size()-1)) return;
-			cell.setStyle({width:widthes[index]+'px'});
+			cell.setStyle({width:widthes.get(index)+'px'});
 			index++;
 		});	
 	}
@@ -169,7 +170,7 @@ FilesList.prototype.loadNextImage = function()
 	{
 		var oThis = this;
 		if(oThis.loading) return;
-		var oImageToLoad = oThis.imagesHash.remove(oThis.imagesHash.keys()[0]);		
+		var oImageToLoad = oThis.imagesHash.unset(oThis.imagesHash.keys()[0]);		
 		var image = new Image();
 		image.src = "content.php?action=image_proxy&get_thumb=true&fic="+oImageToLoad.filename;
 		image.onload = function(){
@@ -216,6 +217,12 @@ FilesList.prototype.parseXmlAndLoad = function(oXmlDoc)
 	}
 	this.loading = false;
 	this.imagesHash = new Hash();
+	this.allDroppables.each(function(el){
+		Droppables.remove(el);
+	});
+	this.allDraggables.each(function(el){
+		el.destroy();
+	});
 	var root = oXmlDoc.documentElement;
 	// loop through all tree children
 	var cs = root.childNodes;
@@ -300,18 +307,35 @@ FilesList.prototype.xmlNodeToTableRow = function(xmlNode)
 	{
 		newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
 	}
-
+	var oThis = this;
 	["text", "filesize", "mimetype", "modiftime"].each(function(s){
 		var tableCell = document.createElement("td");
 		if(s == "text")
 		{
 			innerSpan = document.createElement("span");
-			innerSpan.setAttribute("style", "cursor:default;");			
+			innerSpan.setAttribute("style", "cursor:default;");
+			$(innerSpan).addClassName("list_selectable_span");
 			// Add icon
 			var imgString = "<img src=\"images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" ";
 			imgString =  imgString + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> " + xmlNode.getAttribute(s);
-			innerSpan.innerHTML = imgString;
+			innerSpan.innerHTML = imgString;			
 			tableCell.appendChild(innerSpan);
+			$(innerSpan).setStyle({display:'block'});
+			$(innerSpan).setAttribute('filename', newRow.getAttribute('filename'));
+			var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true});
+			if(xmlNode.getAttribute("is_file") == "non")
+			{
+				var ondrop = function(draggable, droppable, event){
+					//console.log(draggable.getAttribute('filename') + ' on ' + droppable.getAttribute('filename'));
+					ajaxplorer.actionBar.applyDragMove(draggable.getAttribute('filename'), 
+													   droppable.getAttribute('filename'), 
+													   null, 
+													   event['ctrlKey']);
+				}
+				Droppables.add(innerSpan, {hoverclass:'selected', onDrop:ondrop});
+				oThis.allDroppables[oThis.allDroppables.length] = innerSpan;
+			}
+			oThis.allDraggables[oThis.allDraggables.length] = newDrag;
 		}
 		else
 		{
@@ -319,7 +343,6 @@ FilesList.prototype.xmlNodeToTableRow = function(xmlNode)
 		}
 		newRow.appendChild(tableCell);
 	});	
-	
 	tBody.appendChild(newRow);
 }
 
@@ -377,7 +400,7 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 			marginTop: marginTop, 
 			marginBottom: marginBottom
 		};
-		this.imagesHash[oImageToLoad.index] = oImageToLoad;
+		this.imagesHash.set(oImageToLoad.index, oImageToLoad);
 		
 	}
 	else
@@ -391,7 +414,21 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 		newRow.appendChild(innerSpan);
 		this._htmlElement.appendChild(newRow);
 	}
-
+	try{
+		var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true});
+		this.allDraggables[this.allDraggables.length] = newDrag;
+	}catch(e){alert(e);}
+	if(xmlNode.getAttribute("is_file") == "non")
+	{
+		var ondrop = function(draggable, droppable, event){
+			ajaxplorer.actionBar.applyDragMove(draggable.getAttribute('filename'), 
+											   droppable.getAttribute('filename'), 
+											   null, 
+											   event['ctrlKey']);
+		}
+		Droppables.add(newRow, {hoverclass:'selected', onDrop:ondrop});	
+		this.allDroppables[this.allDroppables.length] = newRow;
+	}
 }
 
 FilesList.prototype.resizeThumbnails = function(one_element)
