@@ -27,7 +27,7 @@ User.prototype.canWrite = function(){
 }
 
 User.prototype.getPreference = function(prefName){
-    return this.preferences[prefName];	
+    return this.preferences.get(prefName);	
 }
 
 User.prototype.getRepositoriesList = function(){
@@ -36,7 +36,7 @@ User.prototype.getRepositoriesList = function(){
 
 User.prototype.setPreference = function(prefName, prefValue)
 {
-	this.preferences[prefName] = prefValue;
+	this.preferences.set(prefName, prefValue);
 }
 
 User.prototype.setRepositoriesList = function(repoHash)
