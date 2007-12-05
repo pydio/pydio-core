@@ -40,38 +40,52 @@ var AjxpDraggable = Class.create(Draggable, {
 			// Move all selection
 			// Make new div for element, clone all others.			
 			this._draggingMultiple = true;
-			this._clone = document.createElement('div');
-			//this._clone.innerHTML = 'files selected';
+			this._clone = document.createElement('div');			
+			if(ajaxplorer.filesList._displayMode == 'thumb'){
+				$(this._clone).addClassName('multiple_thumbnails_draggable');
+			}else{
+				$(this._clone).addClassName('multiple_selection_draggable');
+			}
 			this._clone.setAttribute('user_selection', 'true');
 			if (browser == 'Internet Explorer'){
 				$('browser').appendChild(this._clone);
+				$(this._clone).setStyle({width:$(this.element).getWidth()+'px'});
 			}else{
 				this.element.parentNode.appendChild(this._clone);
 			}
 			this.original = this.element;
 			this.element = this._clone;
-			Position.absolutize(this.element);
 			var selectedItems = ajaxplorer.filesList.getSelectedItems();			
 			for(var i=0; i<selectedItems.length;i++)
 			{	
 				var objectToClone;
-				if(ajaxplorer.filesList._displayMode == 'thumb') objectToClone = $(selectedItems[i]);
-				else objectToClone = $(selectedItems[i]).getElementsBySelector('span.list_selectable_span')[0];
-				
-				this.element.appendChild(refreshPNGImages(objectToClone.cloneNode(true)));
+				if(ajaxplorer.filesList._displayMode == 'thumb'){
+					 objectToClone = $(selectedItems[i]);
+				}
+				else {
+					objectToClone = $(selectedItems[i]).getElementsBySelector('span.list_selectable_span')[0];
+				}
+				var newObj = refreshPNGImages(objectToClone.cloneNode(true));				
+				this.element.appendChild(newObj);
+				if(ajaxplorer.filesList._displayMode == 'thumb'){
+					$(newObj).addClassName('simple_selection_draggable');
+				}
 			}
+			Position.absolutize(this.element);
 		}else{
 			this._clone = this.element.cloneNode(true);
 			refreshPNGImages(this._clone);
 			Position.absolutize(this.element);
 			this.element.parentNode.insertBefore(this._clone, this.element);
+			$(this.element).addClassName('simple_selection_draggable');
 			if(browser == 'Internet Explorer') // MOVE ELEMENT TO $('browser')
 			{
 				var newclone = this.element.cloneNode(true);
 				refreshPNGImages(newclone);
 				$('browser').appendChild(newclone);
+				$(newclone).setStyle({width:$(this._clone).getWidth()+'px'});
 				Element.remove(this.element);
-				this.element = newclone;
+				this.element = newclone;				
 			}
 		}
 	}
@@ -90,11 +104,7 @@ var AjxpDraggable = Class.create(Draggable, {
 	Draggables.notify('onStart', this, event);
 
 	if(this.options.starteffect){
-		if(this._draggingMultiple){
-			this.options.starteffect(this.original);
-		} else {
-			this.options.starteffect(this.element);			
-		}
+		this.options.starteffect(this.element);
 	}
 	
 
@@ -110,14 +120,12 @@ var AjxpDraggable = Class.create(Draggable, {
 	}
 
 	if(this.options.ghosting && !this._draggingMultiple) {
-		removeCopySpan(this.element);
+		this.removeCopyClass();
 		if(browser == 'Internet Explorer') // MOVE ELEMENT TO $('browser')
 		{
-			//var newclone = this.element.cloneNode(true);
 			this._clone.parentNode.insertBefore(this.element, this._clone);
-			//Element.remove(this.element);
-			//this.element = newclone;
-		}		
+		}
+		this.element.removeClassName('simple_selection_draggable');
 		Position.relativize(this.element);
 		Element.remove(this._clone);
 		this._clone = null;
@@ -150,42 +158,58 @@ var AjxpDraggable = Class.create(Draggable, {
 	}
 
 	if(this.options.endeffect){
-		if(this._draggingMultiple){
-			this.options.endeffect(this.original);
-		}else{
 			this.options.endeffect(this.element);
-		}
 	}
 	
 	if(this._draggingMultiple){
 		var selectDiv = this.element;
 		this.element = this.original;
 		Element.remove(selectDiv);
-		//this.original = null;
 	}
 
 	Draggables.deactivate(this);
 	Droppables.reset();
-}
+}, 
+
+	updateCtrlKey: function(event)
+	{
+		var ctrl = event['ctrlKey'];		
+		if(ctrl){
+			this.addCopyClass();
+		}else{
+			this.removeCopyClass();
+		}
+	},
+
+	addCopyClass : function()
+	{
+		if(this._draggingMultiple && ajaxplorer.filesList._displayMode == 'thumb')
+		{
+			$(this.element).select('div.thumbnail_selectable_cell').each(function(el){
+				el.addClassName('selection_ctrl_key');
+			});
+		}else{
+			$(this.element).addClassName('selection_ctrl_key');
+		}
+	},
+	
+	removeCopyClass : function()
+	{
+		if(this._draggingMultiple && ajaxplorer.filesList._displayMode == 'thumb')
+		{
+			$(this.element).select('div.thumbnail_selectable_cell').each(function(el){
+				el.removeClassName('selection_ctrl_key');
+			});
+		}else{
+			$(this.element).removeClassName('selection_ctrl_key');
+		}
+	}
+	
 });
 
-function updateCtrlKey(draggable, event)
-{
-	var ctrl = event['ctrlKey'];
-	var element = draggable.element;
-	if(!$(element).getElementsBySelector('span#copy').length){
-		cop = document.createElement('span');		
-		cop.id = 'copy';
-		element.appendChild(cop);
-	}else{
-		cop = $(element).getElementsBySelector('span#copy')[0];
+
+Draggables.addObserver({onDrag:function(eventName,element,event){
+	if(element.updateCtrlKey){
+		element.updateCtrlKey(event);
 	}
-	cop.innerHTML = (ctrl?'+':'');	
-}
-
-function removeCopySpan(element)
-{
-	Element.remove($(element).getElementsBySelector('span#copy')[0]);
-}
-
-Draggables.addObserver({onDrag:function(eventName,element,event){updateCtrlKey(element,event);}});
+}});
