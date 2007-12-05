@@ -262,7 +262,7 @@ switch($action)
 	if(count($error)) $errorMessage = join("\n", $error);
 	else $logMessage = join("\n", $success);
 	$reload_current_node = true;
-	$reload_dest_node = $dest_node;
+	if(isSet($dest_node)) $reload_dest_node = $dest_node;
 	$reload_file_list = true;
 	break;
 
@@ -615,7 +615,10 @@ switch($action)
 		}
 		else 
 		{
-			$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('$rep/".str_replace("&", "&amp;", $repName)."','$rep',CURRENT_ID)\"";		
+			$folderBaseName = str_replace("&", "&amp;", $repName);
+			$folderFullName = "$rep/".$folderBaseName;
+			$parentFolderName = $rep;
+			$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
 		}
 		print("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>");
 		print("</tree>");
