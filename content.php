@@ -626,7 +626,7 @@ switch($action)
 	if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$fileListMode)
 	{
 		// ADD RECYCLE BIN TO THE LIST
-		print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/recyclebin.png\" src=\"content.php?action=xml_listing&amp;rep=/".ConfService::getRecycleBinDir()."\" openIcon=\"images/recyclebin.png\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
+		print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/recyclebin.png\" src=\"content.php?action=xml_listing&amp;rep=/".ConfService::getRecycleBinDir()."\" openIcon=\"images/recyclebin.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
 	}
 	AJXP_XMLWriter::close();
 	exit(1);
