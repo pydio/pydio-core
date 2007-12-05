@@ -54,7 +54,7 @@ Modal.prototype.showDialogForm = function(sTitle, sFormId, fOnLoad, fOnComplete,
 			newForm.appendChild(actionField);
 		}		
 	}
-	if(!this.cachedForms[sFormId] && !skipButtons){
+	if(!this.cachedForms.get(sFormId) && !skipButtons){
 		this.addSubmitCancel(newForm, fOnCancel, bOkButtonOnly);
 	}
 	this.dialogContent.appendChild(newForm);
@@ -150,10 +150,7 @@ Modal.prototype.showContent = function(elementName, boxWidth, boxHeight)
 	// FORCE ABSOLUTE FOR SAFARI!
 	$(elementName).style.position = 'absolute';
 	// REFRESH PNG IMAGES FOR IE!
-	var imgs = this.dialogContent.getElementsBySelector('img');
-	if(imgs.length) imgs.each(function(img){
-		if(img.original_src) img.src = img.original_src;
-	});
+	refreshPNGImages(this.dialogContent);
 }
 
 Modal.prototype.getForm = function()
@@ -170,7 +167,7 @@ Modal.prototype.clearContent = function(object)
 		object.getElementsBySelector("form").each(function(currentForm){
 			if(currentForm.target == 'hidden_iframe' || currentForm.id=='login_form' || currentForm.id=='user_pref_form'){
 				currentForm.hide();
-				oThis.cachedForms[currentForm.id] = true;
+				oThis.cachedForms.set(currentForm.id,true);
 			}
 			else{
 				object.removeChild(currentForm);
