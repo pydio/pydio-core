@@ -177,6 +177,7 @@ function _xmlTreeToJsTree(oNode) {
 	var target = oNode.getAttribute("target");
 	var preloaded = oNode.getAttribute("preloaded");
 	var recycle = oNode.getAttribute("is_recycle");
+	var folderFullName = oNode.getAttribute("filename");
 	// create jsNode
 	var jsNode;
 	if (src != null && src != "")
@@ -193,8 +194,8 @@ function _xmlTreeToJsTree(oNode) {
 	if(src != null && src != "" && preloaded != null && preloaded == 'true')
 	{
 		jsNode.loaded = true;
-	}	
-		
+	}
+	jsNode.filename = folderFullName;
 	// go through childNOdes
 	var cs = oNode.childNodes;
 	var l = cs.length;
