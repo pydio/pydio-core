@@ -119,7 +119,7 @@ Ajaxplorer.prototype.logXmlUser = function(xmlResponse)
 					for(j=0;j<childs[i].childNodes.length;j++)
 					{
 						var repoChild = childs[i].childNodes[j];
-						if(repoChild.tagName == "repo") repositories[repoChild.getAttribute("id")] = repoChild.firstChild.nodeValue;
+						if(repoChild.tagName == "repo") repositories.set(repoChild.getAttribute("id"), repoChild.firstChild.nodeValue);
 					}
 					this.user.setRepositoriesList(repositories);
 				}
@@ -144,7 +144,7 @@ Ajaxplorer.prototype.logXmlUser = function(xmlResponse)
 	{
 		this.rootDirId = this.user.getActiveRepository();
 		var repList = this.user.getRepositoriesList();
-		this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), repList[this.user.getActiveRepository()]);
+		this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), repList.get(this.user.getActiveRepository()));
 		this.refreshRootDirMenu(this.user.getRepositoriesList(), this.user.getActiveRepository());
 	}
 	else

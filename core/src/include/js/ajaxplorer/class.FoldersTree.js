@@ -3,6 +3,7 @@ function FoldersTree(oElement, rootFolderName, rootFolderSrc, oAjaxplorer)
 	this._htmlElement = $(oElement);
 	this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, "javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 'explorer');
 	this._htmlElement.innerHTML = this.tree.toString();	
+	Droppables.add(this.tree.id, {hoverclass:'selected', onDrop:webFXTreeHandler.ondrop, onHover:webFXTreeHandler.onhover});
 	if(!this.tree.open && !this.tree.loading) this.tree.toggle();
 	var oThis = this;
 	this._htmlElement.observe("click", function(){
