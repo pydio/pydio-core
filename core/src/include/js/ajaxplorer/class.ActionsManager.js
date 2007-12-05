@@ -30,7 +30,7 @@ ActionsManager.prototype.init = function()
 		{
 			action = getBaseName(action);
 		}
-		this._actions[action] = i;
+		this._actions.set(action, i);
 		item.href = "javascript:ajaxplorer.getActionBar().fireAction('"+action+"')";
 		// Set keyboard shortcut
 		var textNode = item.lastChild;
@@ -45,7 +45,7 @@ ActionsManager.prototype.init = function()
 			firstKey = textNodeString.charAt(0);
 		}
 		replaceHtml = textNodeString.substring(0,textNodeString.indexOf(firstKey)) + '<u>'+firstKey+'</u>' + textNodeString.substring(textNodeString.indexOf(firstKey)+1, textNodeString.length);
-		this._registeredKeys[firstKey.toLowerCase()] = action;
+		this._registeredKeys.set(firstKey.toLowerCase(), action);
 		textNode.innerHTML = replaceHtml;
 	}
 	this.downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=telecharger&fic='); 
@@ -250,7 +250,7 @@ ActionsManager.prototype.update = function(bClear)
 
 ActionsManager.prototype.actionIsAllowed = function(buttonAction)
 {
-	var button = this._items[this._actions[buttonAction]];
+	var button = this._items[this._actions.get(buttonAction)];
 	var attSelection = ((button.getAttribute('selection') && button.getAttribute('selection') == 'true')?true:false);
 	var attUnique = ((button.getAttribute('unique') && button.getAttribute('unique') == 'true')?true:false);
 	var attFile = ((button.getAttribute('file') && button.getAttribute('file') == 'true')?true:false);
@@ -272,7 +272,7 @@ ActionsManager.prototype.actionIsAllowed = function(buttonAction)
 
 ActionsManager.prototype.fireAction = function (buttonAction)
 {
-	var button = this._items[this._actions[buttonAction]];
+	var button = this._items[this._actions.get(buttonAction)];
 	var dialogTitle = "";
 	var iconSrc = "";
 	if(button.getAttribute("title")) dialogTitle = button.getAttribute("title");
@@ -307,10 +307,10 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		
 		case "bookmark":
 			var params = new Hash();
-			params['get_action'] = 'display_bookmark_bar';
-			params['bm_action'] = 'add_bookmark';
-			params['user'] = this._currentUser;
-			params['bm_path'] = this.getLocationBarValue();
+			params.set('get_action', 'display_bookmark_bar');
+			params.set('bm_action', 'add_bookmark');
+			params.set('user',this._currentUser);
+			params.set('bm_path', this.getLocationBarValue());
 			var bmBar = this.bookmarksBar;
 			this.loadHtmlToDiv($('bmbar_content'), params, function(){bmBar.updateUI();});
 						
@@ -539,17 +539,76 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 ActionsManager.prototype.fireActionByKey = function(keyName)
 {	
 	//alert(ajaxplorer.blockShortcuts);
-	if(this._registeredKeys[keyName] && !ajaxplorer.blockShortcuts)
+	if(this._registeredKeys.get(keyName) && !ajaxplorer.blockShortcuts)
 	{
-		 this.fireAction(this._registeredKeys[keyName]);
+		 this.fireAction(this._registeredKeys.get(keyName));
 		 return false;
 	}
 	return true;
 }
 
 
-ActionsManager.prototype.applyCreate = function()
+ActionsManager.prototype.applyDragMove = function(fileName, destDir, destNodeName, copy)
 {
+	if(fileName == null) fileNames = ajaxplorer.filesList.getUserSelection().getFileNames();
+	else fileNames = [fileName];
+	if(destNodeName != null)
+	{
+		// Check that dest is not a child of the source
+		if(this.checkDestIsChildOfSource(fileNames, destNodeName)){
+			ajaxplorer.displayMessage('ERROR', 'Warning, recursive copy!');
+			return;
+		}
+		// Check that dest is not the source it self
+		for(var i=0; i<fileNames.length;i++)
+		{			
+			if(fileNames[i] == destDir){
+				ajaxplorer.displayMessage('ERROR', 'The source is included');
+				 return;
+			}
+		}
+		// Check that dest is not the direct parent of source, ie current rep!
+		if(destDir == ajaxplorer.filesList.getCurrentRep()){
+			ajaxplorer.displayMessage('ERROR', 'Cannot move into current folder!');
+			 return;
+		}
+	}
+	var connexion = new Connexion();
+	if(copy){
+		connexion.addParameter('get_action', 'copier_suite');
+	}else{
+		connexion.addParameter('get_action', 'deplacer_suite');
+	}
+	if(fileName != null){
+		connexion.addParameter('fic', fileName);
+	}else{
+		for(var i=0; i<fileNames.length;i++){
+			connexion.addParameter('fic_'+i, fileNames[i]);
+		}
+	}
+	connexion.addParameter('dest', destDir);
+	if(destNodeName) connexion.addParameter('dest_node', destNodeName);
+	connexion.addParameter('rep', ajaxplorer.getFilesList().getCurrentRep());
+	oThis = this;
+	connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
+	connexion.sendAsync();
+}
+
+ActionsManager.prototype.checkDestIsChildOfSource = function(srcNames, destNodeName)
+{
+	if(typeof srcNames == "string"){
+		srcNames = [srcNames];
+	}
+	var destNode = webFXTreeHandler.all[destNodeName];
+	while(destNode.parentNode){
+		for(var i=0; i<srcNames.length;i++){
+			if(destNode.filename == srcNames[i]){				
+				return true;
+			}
+		}
+		destNode = destNode.parentNode;
+	}
+	return false;
 }
 
 ActionsManager.prototype.updateDisplayButton = function (newDisplay)
@@ -643,10 +702,10 @@ ActionsManager.prototype.switchLoginButton = function(action)
 ActionsManager.prototype.removeBookmark = function (path)
 {
 	var params = new Hash();
-	params['get_action'] = 'display_bookmark_bar';
-	params['bm_action'] = 'delete_bookmark';
-	params['bm_path'] = path;
-	params['user'] = this._currentUser;	
+	params.set('get_action','display_bookmark_bar');
+	params.set('bm_action', 'delete_bookmark');
+	params.set('bm_path', path);
+	params.set('user', this._currentUser);
 	var bmBar = this.bookmarksBar;
 	this.loadHtmlToDiv($('bmbar_content'), params, function(){bmBar.updateUI();});	
 }
@@ -655,8 +714,8 @@ ActionsManager.prototype.loadBookmarks = function ()
 {
 	// LOAD BOOKMARKS
 	var params = new Hash();
-	params['get_action'] = 'display_bookmark_bar';
-	params['user'] = this._currentUser;
+	params.set('get_action','display_bookmark_bar');
+	params.set('user', this._currentUser);
 	var oThis = this;
 	this.loadHtmlToDiv($('bmbar_content'), params, function(){
 		oThis.bookmarksBar.updateUI();
