@@ -186,7 +186,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			foo = foo.parentNode;
 		}
 		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());		
-		Droppables.add(node.id, {hoverclass:'selected', onDrop:webFXTreeHandler.ondrop, onHover:webFXTreeHandler.onhover});
+		Droppables.add(node.id, {hoverclass:'droppableZone', onDrop:webFXTreeHandler.ondrop, onHover:webFXTreeHandler.onhover});
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		
 		if ((!this.folder) && (!this.openIcon)) {
