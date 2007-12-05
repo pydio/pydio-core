@@ -6,7 +6,7 @@ function AdminPageManager()
 AdminPageManager.prototype.loadUsers = function()
 {
 	var p = new Hash();
-	p['get_action'] = 'users_list';
+	p.set('get_action','users_list');
 	this.loadHtmlToDiv($('users_list'), p);	
 }
 
@@ -32,9 +32,9 @@ AdminPageManager.prototype.changeUserRight = function(oChckBox, userId, reposito
 	
 	var oThis = this;
 	var parameters = new Hash();
-	parameters['user_id'] = userId;
-	parameters['repository_id'] = repositoryId;
-	parameters['right'] = rightString;
+	parameters.set('user_id', userId);
+	parameters.set('repository_id', repositoryId);
+	parameters.set('right', rightString);
 	this.submitForm('update_user_right', parameters, null);
 }
 
@@ -48,8 +48,8 @@ AdminPageManager.prototype.changePassword = function(userId)
 		 return;
 	}
 	parameters = new Hash();
-	parameters['user_id'] = userId;
-	parameters['user_pwd'] = newPass.value;
+	parameters.set('user_id', userId);
+	parameters.set('user_pwd', newPass.value);
 	this.submitForm('update_user_pwd', parameters, null);
 	newPass.value = '';
 	newPassConf.value = '';
@@ -74,8 +74,8 @@ AdminPageManager.prototype.createUser = function ()
 	}
 	
 	var parameters = new Hash();
-	parameters['new_login'] = login.value;
-	parameters['new_pwd'] = pass.value;
+	parameters.set('new_login', login.value);
+	parameters.set('new_pwd', pass.value);
 	this.submitForm('create_user', parameters, null);
 	login.value = pass.value = passConf.value = '';
 	return;
@@ -90,7 +90,7 @@ AdminPageManager.prototype.deleteUser = function(userId)
 		return;
 	}
 	parameters = new Hash();
-	parameters['user_id'] = userId;
+	parameters.set('user_id', userId);
 	this.submitForm('delete_user', parameters, null);
 	chck.checked = false;
 }
