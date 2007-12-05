@@ -97,7 +97,23 @@ var webFXTreeHandler = {
 		r.collapse(false);
 		df = r.createContextualFragment(sHTML);
 		oElement.appendChild(df);
-	}		
+	},
+	
+	ondrop   : function(draggable, droppable, event){
+		var targetName = droppable.getAttribute('filename');
+		var srcName = draggable.getAttribute('filename');
+		if(WebFXtimer) clearTimeout(WebFXtimer);
+		ajaxplorer.actionBar.applyDragMove(srcName, targetName, droppable.id, event['ctrlKey']);
+	},
+	
+	onhover : function(draggable, droppable, event){
+		if(WebFXtimer) clearTimeout(WebFXtimer);
+		var jsString = "javascript:";			
+		WebFXtimer = window.setTimeout(function(){
+			var node = webFXTreeHandler.all[droppable.id];
+			if(node &&  node.folder && !node.open) node.expand();
+		}, 500);
+	}
 };
 
 /*
@@ -169,7 +185,10 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			else { foo.parentNode._last = false; }
 			foo = foo.parentNode;
 		}
-		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());
+		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());		
+		Droppables.add(node.id, {hoverclass:'selected', onDrop:webFXTreeHandler.ondrop, onHover:webFXTreeHandler.onhover});
+		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
+		
 		if ((!this.folder) && (!this.openIcon)) {
 			this.icon = webFXTreeConfig.folderIcon;
 			this.openIcon = webFXTreeConfig.openFolderIcon;
@@ -374,7 +393,7 @@ WebFXTree.prototype.toString = function() {
 		this.action = this.action.replace(new RegExp("CURRENT_ID", "g"), '\''+this.id+'\'');
 	}
 	
-	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
+	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\" filename=\"/\">" +
 		"<img id=\"" + this.id + "-icon\" class=\"webfx-tree-icon\" src=\"" + ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) + "\" onclick=\"webFXTreeHandler.select(this);\">" +
 		"<a href=\"" + this.action + "\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\"  onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +
 		(this.target ? " target=\"" + this.target + "\"" : "") +
@@ -407,6 +426,7 @@ function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon) {
 WebFXTreeItem.prototype = new WebFXTreeAbstractNode;
 
 WebFXTreeItem.prototype.remove = function() {
+	if(!document.getElementById(this.id+'-plus')) return;
 	var iconSrc = document.getElementById(this.id + '-plus').src;
 	var parentNode = this.parentNode;
 	var prevSibling = this.getPreviousSibling(true);
@@ -415,6 +435,7 @@ WebFXTreeItem.prototype.remove = function() {
 	var last = ((nextSibling) && (nextSibling.parentNode) && (nextSibling.parentNode.id == parentNode.id))?false:true;
 	this.getPreviousSibling().focus();
 	this._remove();
+	Droppables.remove($(this.id));
 	if (parentNode.childNodes.length == 0) {
 		document.getElementById(parentNode.id + '-cont').style.display = 'none';
 		parentNode.doCollapse();
@@ -437,7 +458,9 @@ WebFXTreeItem.prototype.remove = function() {
 		if (parentNode == prevSibling.parentNode) {
 			iconSrc = iconSrc.replace('minus', '').replace('plus', '');
 			document.getElementById(prevSibling.id + '-plus').src = iconSrc;
-}	}	}
+		}
+	}
+}
 
 WebFXTreeItem.prototype._remove = function() {
 	for (var i = this.childNodes.length - 1; i >= 0; i--) {
@@ -565,7 +588,7 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 	}
 	
 	var label = this.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
+	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\" filename=\""+this.filename+"\">" +
 		indent +
 		"<img  width=\"19\" height=\"16\" id=\"" + this.id + "-plus\" src=\"" + ((this.folder)?((this.open)?((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon):((this.parentNode._last)?webFXTreeConfig.lPlusIcon:webFXTreeConfig.tPlusIcon)):((this.parentNode._last)?webFXTreeConfig.lIcon:webFXTreeConfig.tIcon)) + "\" onclick=\"webFXTreeHandler.toggle(this);\">" +
 		"<img id=\"" + this.id + "-icon\" class=\"webfx-tree-icon\" src=\"" + ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) + "\" onclick=\"webFXTreeHandler.select(this);\">" +
@@ -578,6 +601,6 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 		sb[i] = this.childNodes[i].toString(i,this.childNodes.length);
 	}
 	this.plusIcon = ((this.parentNode._last)?webFXTreeConfig.lPlusIcon:webFXTreeConfig.tPlusIcon);
-	this.minusIcon = ((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon);
+	this.minusIcon = ((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon);	
 	return str + sb.join("") + "</div>";
 }
