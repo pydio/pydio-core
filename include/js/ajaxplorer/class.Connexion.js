@@ -10,12 +10,12 @@ function Connexion(baseUrl)
 
 Connexion.prototype.addParameter = function (paramName, paramValue)
 {
-	this._parameters[paramName] = paramValue;	
+	this._parameters.set(paramName, paramValue);	
 }
 
 Connexion.prototype.setParameters = function(hParameters)
 {
-	this._parameters = hParameters;
+	this._parameters = $H(hParameters);
 }
 
 Connexion.prototype.setMethod = function(method)
@@ -26,11 +26,12 @@ Connexion.prototype.setMethod = function(method)
 Connexion.prototype.sendAsync = function()
 {	
 	var oThis = this;
+	// WARNING, FINALLY PAS PAREMETERS AS AN OBJECT, PROTOTYPE 1.6.0 BUG Hash.toQueryString();
 	new Ajax.Request(this._baseUrl, 
 	{
 		method:this._method,
 		onComplete:this.onComplete,
-		parameters:this._parameters
+		parameters:this._parameters.toObject()
 	});
 }
 
