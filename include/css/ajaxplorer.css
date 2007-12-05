@@ -517,6 +517,63 @@ ACTION BAR
     color: highlighttext;
 }
 
+.droppableZone
+{
+   background-color: #c3d9ff;
+   /*border: 1px dotted #666;*/
+}
+
+
+div.simple_selection_draggable
+{
+    color: #000;
+    background-color: #ddd;
+    border: 1px dotted #333;
+    font-family: Trebuchet MS;
+    font-size: 11px;    
+}
+
+span.simple_selection_draggable
+{
+    color: #000;
+    background-color: #ddd;
+    padding: 2px;
+    border: 1px dotted #333;
+    font-family: Trebuchet MS;
+    font-size: 11px;
+    display:block;
+}
+.simple_selection_draggable img
+{
+    display: inline;
+}
+
+div.multiple_selection_draggable
+{
+    display: block;
+    color: #000;
+    background-color: #ddd;
+    padding: 2px;
+    border: 1px dotted #333;
+    font-family: Trebuchet MS;
+    font-size: 11px;    
+}
+
+div.multiple_thumbnails_draggable
+{
+    background-color: transparent;
+    border: none;
+    width: 50%;
+}
+
+.selection_ctrl_key
+{
+    background-image:url('../../images/plusCopy.gif');
+    background-repeat: no-repeat;
+    background-position: bottom right;
+}
+
+
 a.disabled
 {
   filter:alpha(opacity=30);
