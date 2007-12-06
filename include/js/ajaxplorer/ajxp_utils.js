@@ -27,7 +27,7 @@ function editWithCodePress(fileName)
 
 function refreshPNGImages(element){
 	if(element.getAttribute('is_image') && element.getAttribute('is_image')=='1'){
-		return;
+		return element;
 	}
 	var imgs = $(element).getElementsBySelector('img');
 	if(imgs.length) imgs.each(function(img){
