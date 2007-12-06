@@ -97,23 +97,7 @@ var webFXTreeHandler = {
 		r.collapse(false);
 		df = r.createContextualFragment(sHTML);
 		oElement.appendChild(df);
-	},
-	
-	ondrop   : function(draggable, droppable, event){
-		var targetName = droppable.getAttribute('filename');
-		var srcName = draggable.getAttribute('filename');
-		if(WebFXtimer) clearTimeout(WebFXtimer);
-		ajaxplorer.actionBar.applyDragMove(srcName, targetName, droppable.id, event['ctrlKey']);
-	},
-	
-	onhover : function(draggable, droppable, event){
-		if(WebFXtimer) clearTimeout(WebFXtimer);
-		var jsString = "javascript:";			
-		WebFXtimer = window.setTimeout(function(){
-			var node = webFXTreeHandler.all[droppable.id];
-			if(node &&  node.folder && !node.open) node.expand();
-		}, 500);
-	}
+	},	
 };
 
 /*
@@ -186,7 +170,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			foo = foo.parentNode;
 		}
 		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());		
-		Droppables.add(node.id, {hoverclass:'droppableZone', onDrop:webFXTreeHandler.ondrop, onHover:webFXTreeHandler.onhover});
+		AjxpDroppables.add(node.id);
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		
 		if ((!this.folder) && (!this.openIcon)) {
