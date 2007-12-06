@@ -77,6 +77,12 @@ var Droppables = {
   deactivate: function(drop) {
     if(drop.hoverclass)
       Element.removeClassName(drop.element, drop.hoverclass);
+      //
+      // WARNING PROTOTYPE HACK! "onOut" OPTION IS NOT STANDARD!
+      // 
+    if(drop.onOut){
+    	drop.onOut(drop.element);
+    }
     this.last_active = null;
   },
 
