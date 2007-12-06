@@ -97,7 +97,7 @@ var webFXTreeHandler = {
 		r.collapse(false);
 		df = r.createContextualFragment(sHTML);
 		oElement.appendChild(df);
-	},	
+	}
 };
 
 /*
