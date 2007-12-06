@@ -325,14 +325,7 @@ FilesList.prototype.xmlNodeToTableRow = function(xmlNode)
 			var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true});
 			if(xmlNode.getAttribute("is_file") == "non")
 			{
-				var ondrop = function(draggable, droppable, event){
-					//console.log(draggable.getAttribute('filename') + ' on ' + droppable.getAttribute('filename'));
-					ajaxplorer.actionBar.applyDragMove(draggable.getAttribute('filename'), 
-													   droppable.getAttribute('filename'), 
-													   null, 
-													   event['ctrlKey']);
-				}
-				Droppables.add(innerSpan, {hoverclass:'selected', onDrop:ondrop});
+				AjxpDroppables.add(innerSpan);
 				oThis.allDroppables[oThis.allDroppables.length] = innerSpan;
 			}
 			oThis.allDraggables[oThis.allDraggables.length] = newDrag;
@@ -420,13 +413,7 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 	}catch(e){alert(e);}
 	if(xmlNode.getAttribute("is_file") == "non")
 	{
-		var ondrop = function(draggable, droppable, event){
-			ajaxplorer.actionBar.applyDragMove(draggable.getAttribute('filename'), 
-											   droppable.getAttribute('filename'), 
-											   null, 
-											   event['ctrlKey']);
-		}
-		Droppables.add(newRow, {hoverclass:'selected', onDrop:ondrop});	
+		AjxpDroppables.add(newRow);
 		this.allDroppables[this.allDroppables.length] = newRow;
 	}
 }
