@@ -90,6 +90,9 @@ $selection->initFromHttpVars();
 if(isSet($action) || isSet($get_action)) $action = (isset($get_action)?$get_action:$action);
 else $action = "";
 
+if(isSet($rep) && $action != "upload") $rep = utf8_decode($rep);
+if(isSet($dest)) $dest = utf8_decode($dest);
+
 // FILTER ACTION FOR DELETE
 if(ConfService::useRecycleBin() && $action == "supprimer_suite" && $rep != "/".ConfService::getRecycleBinDir())
 {
@@ -162,6 +165,7 @@ switch($action)
 	//------------------------------------
 	case "editer";	
 	//include($hautpage);
+	$fic = utf8_decode($fic);
 	if(isset($save) && $save==1)
 	{
 		$code=stripslashes($code);
@@ -329,8 +333,9 @@ switch($action)
 	//	RENOMMER / RENAME
 	//------------------------------------
 	case "rename_suite";
+	$fic = utf8_decode($fic);
 	$nom_fic=basename($fic);
-	$fic_new=Utils::traite_nom_fichier($fic_new);
+	$fic_new=Utils::traite_nom_fichier(utf8_decode($fic_new));
 	$old=ConfService::getRootDir()."/$fic";
 	if(!is_writable($old))
 	{
@@ -368,7 +373,7 @@ switch($action)
 	case "mkdir";
 	$err="";
 	$messtmp="";
-	$nomdir=Utils::traite_nom_fichier($nomdir);
+	$nomdir=Utils::traite_nom_fichier(utf8_decode($nomdir));
 	if($nomdir=="")
 	{
 		$errorMessage="$mess[37]";
@@ -399,7 +404,7 @@ switch($action)
 	case "creer_fichier";
 	$err="";
 	$messtmp="";
-	$nomfic=Utils::traite_nom_fichier($nomfic);
+	$nomfic=Utils::traite_nom_fichier(utf8_decode($nomfic));
 	if($nomfic=="")
 	{
 		$errorMessage="$mess[37]"; break;
@@ -563,18 +568,19 @@ switch($action)
 		}
 	}
 	break;
-
+	
 	//------------------------------------
 	//	XML LISTING
 	//------------------------------------
-	case "xml_listing" ;
+	case "xml_listing":
 	
 	if(!isSet($rep) || $rep == "/") $rep = "";
-	$searchMode = $fileListMode = false;
+	$searchMode = $fileListMode = $completeMode = false;
 	if(isSet($mode)){
 		if($mode == "search") $searchMode = true;
-		else if($mode = "file_list") $fileListMode = true;
-	}
+		else if($mode == "file_list") $fileListMode = true;
+		else if($mode == "complete") $completeMode = true;
+	}	
 	$nom_rep = FS_Storage::initName($rep);
 	$result = FS_Storage::listing($nom_rep, !($searchMode || $fileListMode));
 	$reps = $result[0];
@@ -618,12 +624,14 @@ switch($action)
 			$folderBaseName = str_replace("&", "&amp;", $repName);
 			$folderFullName = "$rep/".$folderBaseName;
 			$parentFolderName = $rep;
-			$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
+			if(!$completeMode){
+				$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
+			}
 		}
-		print("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>");
+		print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
 		print("</tree>");
 	}
-	if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$fileListMode)
+	if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$fileListMode && !$completeMode)
 	{
 		// ADD RECYCLE BIN TO THE LIST
 		print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/recyclebin.png\" src=\"content.php?action=xml_listing&amp;rep=/".ConfService::getRecycleBinDir()."\" openIcon=\"images/recyclebin.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
