@@ -217,7 +217,7 @@ WebFXTreeAbstractNode.prototype.blur = function() {
 	{
 		document.getElementById(this.id + '-anchor').className = '';
 	}
-	if(browser == "Internet Explorer")
+	if(Prototype.Browser.IE)
 	{
 		document.getElementById(this.id + '-anchor').blur();
 	}
