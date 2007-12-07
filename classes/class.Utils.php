@@ -98,6 +98,7 @@ function traite_nom_fichier($nom)
 	$nom=str_replace("*","",$nom);
 	$nom=str_replace("|","",$nom);
 	$nom=str_replace("?","",$nom);
+	/*
 	$nom=str_replace("é","",$nom);
 	$nom=str_replace("è","",$nom);
 	$nom=str_replace("ç","",$nom);
@@ -109,6 +110,7 @@ function traite_nom_fichier($nom)
 	$nom=str_replace("û","",$nom);
 	$nom=str_replace("ù","",$nom);
 	$nom=str_replace("à","",$nom);
+	*/
 	$nom=str_replace("!","",$nom);
 	$nom=str_replace("§","",$nom);
 	$nom=str_replace("+","",$nom);
