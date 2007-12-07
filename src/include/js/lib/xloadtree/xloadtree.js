@@ -256,8 +256,9 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 	}
 
 	// show error in status bar
-	if (jsParentNode.errorText != "")
-		window.status = jsParentNode.errorText;
+	if (jsParentNode.errorText != ""){
+		//window.status = jsParentNode.errorText;
+	}
 
 	ajaxplorer.foldersTree.asyncExpandAndSelect();
 	if(modal.pageLoading) modal.updateLoadingProgress('Tree Loaded');
