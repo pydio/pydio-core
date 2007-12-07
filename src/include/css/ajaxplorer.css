@@ -1097,3 +1097,33 @@ textarea.editor
   opacity: 1;
   -moz-opacity:1;
 }
+
+div.autocomplete 
+{
+      position:absolute;
+      font-family:Trebuchet MS;
+      font-size: 11px;
+      width:250px;
+      background-color:white;
+      border:1px solid #888;
+      margin:0px;
+      padding:0px;
+}
+div.autocomplete ul 
+{
+      list-style-type:none;
+      margin:0px;
+      padding:0px;
+}
+div.autocomplete ul li.selected 
+{ 
+      background-color: #0a246a;
+}
+div.autocomplete ul li 
+{
+      list-style-type:none;
+      display:block;
+      margin:0;
+      padding:2px;
+      cursor:pointer;
+}
