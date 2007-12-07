@@ -20,7 +20,7 @@
 <script language="javascript" type="text/javascript" src="include/js/lib/webfx/sortabletable.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/lib/webfx/numberksorttype.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/lib/leightbox/lightbox.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop,controls"></script>
 
 <script language="javascript" type="text/javascript" src="include/js/lib/xloadtree/xtree.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/lib/xloadtree/xloadtree.js"></script>
@@ -34,6 +34,7 @@
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/ajxp_utils.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.User.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.AjxpDraggable.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.AjxpAutoCompleter.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.ActionsManager.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.UserSelection.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.FilesList.js"></script>
@@ -127,6 +128,7 @@
 		<div class="locationbar_title">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php print($mess[170]);?>&nbsp;</div><div id="location_form"><form style="display:inline;background-color:#ffffff;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><img src="images/crystal/folder_yellow.png" width="16" height="16" align="absmiddle"><input type="text" name="current_path" value="/" id="current_path"><input  align="absmiddle" title="<?php print($mess[104]); ?>" type="image" src="images/crystal/forward.png" id="goto_button" height="16" width="16"></form></div><div id="logging_string"></div>
 	</div>
 </div>
+
 <!--<div class="toolbars_separator"></div>-->
 <div id="hidden_frames" style="display:none;"></div>
 <!--<div id="hidden_forms" style="display:none;"></div>-->
@@ -180,3 +182,4 @@
 	</div>	
 </div>
 </div></div>
+<div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
