@@ -58,7 +58,7 @@ var AjxpDraggable = Class.create(Draggable, {
 					$(this._clone).addClassName('multiple_selection_draggable');
 				}
 				this._clone.setAttribute('user_selection', 'true');
-				if (browser == 'Internet Explorer'){
+				if (Prototype.Browser.IE || Prototype.Browser.Opera){
 					$('browser').appendChild(this._clone);
 					$(this._clone).setStyle({width:$(this.element).getWidth()+'px'});
 				}else{
@@ -89,7 +89,7 @@ var AjxpDraggable = Class.create(Draggable, {
 				Position.absolutize(this.element);
 				this.element.parentNode.insertBefore(this._clone, this.element);
 				$(this.element).addClassName('simple_selection_draggable');
-				if(browser == 'Internet Explorer') // MOVE ELEMENT TO $('browser')
+				if(Prototype.Browser.IE || Prototype.Browser.Opera) // MOVE ELEMENT TO $('browser')
 				{
 					var newclone = this.element.cloneNode(true);
 					refreshPNGImages(newclone);
@@ -132,7 +132,7 @@ var AjxpDraggable = Class.create(Draggable, {
 	
 		if(this.options.ghosting && !this._draggingMultiple) {
 			this.removeCopyClass();
-			if(browser == 'Internet Explorer') // MOVE ELEMENT TO $('browser')
+			if(Prototype.Browser.IE || Prototype.Browser.Opera) // MOVE ELEMENT TO $('browser')
 			{
 				this._clone.parentNode.insertBefore(this.element, this._clone);
 			}
