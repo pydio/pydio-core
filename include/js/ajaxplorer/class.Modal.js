@@ -125,7 +125,7 @@ Modal.prototype.showContent = function(elementName, boxWidth, boxHeight)
 		}
 		$(elementName).setStyle({height:boxHeight+'px'});
 	}else{
-		if (browser && browser == 'Internet Explorer'){	
+		if (Prototype.Browser.IE){	
 			$(elementName).setStyle({height:'1%'});
 		}else{
 			$(elementName).setStyle({height:'auto'});
@@ -141,7 +141,7 @@ Modal.prototype.showContent = function(elementName, boxWidth, boxHeight)
 	var offsetTop = parseInt(((winHeight - boxHeight)/3));
 	$(elementName).setStyle({top:offsetTop+'px'});
 	
-	if (browser && browser == 'Internet Explorer'){		
+	if (Prototype.Browser.IE){		
 		jQuery('#'+elementName + ' .dialogTitle').corner("round top 10px");
 	}
 	
