@@ -25,7 +25,7 @@ class UserSelection
 		}
 		if(isSet($array[$this->varPrefix]) && $array[$this->varPrefix] != "")
 		{
-			$this->files[] = $array[$this->varPrefix];
+			$this->files[] = utf8_decode($array[$this->varPrefix]);
 			$this->isUnique = true;
 			return ;
 		}
@@ -34,7 +34,7 @@ class UserSelection
 			$index = 0;			
 			while(isSet($array[$this->varPrefix."_".$index]))
 			{
-				$this->files[] = $array[$this->varPrefix."_".$index];
+				$this->files[] = utf8_decode($array[$this->varPrefix."_".$index]);
 				$index ++;
 			}
 			$this->isUnique = false;
