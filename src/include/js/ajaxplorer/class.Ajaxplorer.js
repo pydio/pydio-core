@@ -77,6 +77,8 @@ Ajaxplorer.prototype.init = function()
 	// INIT UP/DOWNLOADERS
 	//var downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=telecharger&fic='); 
 	//downloader.triggerEnd = function() {hideLightBox();};	
+	
+	new AjxpAutocompleter("current_path", "autocomplete_choices");
 }
 
 Ajaxplorer.prototype.getLoggedUserFromServer = function()
