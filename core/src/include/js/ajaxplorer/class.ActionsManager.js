@@ -556,20 +556,20 @@ ActionsManager.prototype.applyDragMove = function(fileName, destDir, destNodeNam
 	{
 		// Check that dest is not a child of the source
 		if(this.checkDestIsChildOfSource(fileNames, destNodeName)){
-			ajaxplorer.displayMessage('ERROR', 'Warning, recursive copy!');
+			ajaxplorer.displayMessage('ERROR', MessageHash[202]);
 			return;
 		}
 		// Check that dest is not the source it self
 		for(var i=0; i<fileNames.length;i++)
 		{			
 			if(fileNames[i] == destDir){
-				ajaxplorer.displayMessage('ERROR', 'The source is included');
+				ajaxplorer.displayMessage('ERROR', MessageHash[202]);
 				 return;
 			}
 		}
 		// Check that dest is not the direct parent of source, ie current rep!
 		if(destDir == ajaxplorer.filesList.getCurrentRep()){
-			ajaxplorer.displayMessage('ERROR', 'Cannot move into current folder!');
+			ajaxplorer.displayMessage('ERROR', MessageHash[203]);
 			 return;
 		}
 	}
