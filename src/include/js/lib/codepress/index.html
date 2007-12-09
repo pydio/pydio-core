@@ -102,7 +102,7 @@ if(isset($_GET['file'])) {
 <html>
 <head>
 	<title>CodePress - Real Time Syntax Highlighting Editor written in JavaScript</title>
-	<link type="text/css" href="languages/codepress-<?=$language?>.css" rel="stylesheet" id="cp-lang-style" />
+	<link type="text/css" href="languages/codepress-<?php print($language);?>.css" rel="stylesheet" id="cp-lang-style" />
 	<script type="text/javascript" src="codepress.js"></script>
 	<script type="text/javascript">
 		CodePress.language = '<?=$language?>';
