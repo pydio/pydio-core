@@ -5,26 +5,25 @@ function Editor(oFormObject)
 	this.saveButton = oFormObject.getElementsBySelector('a#saveButton')[0];
 	this.downloadButton = oFormObject.getElementsBySelector('a#downloadFileButton')[0];
 	this.ficInput = oFormObject.getElementsBySelector('input[name="fic"]')[0];
-	this.repInput = oFormObject.getElementsBySelector('input[name="rep"]')[0];
-	var oThis = this;
+	this.repInput = oFormObject.getElementsBySelector('input[name="rep"]')[0];	
 	this.closeButton.onclick = function(){
-		if(oThis.modified && !window.confirm('Warning, some changes are unsaved!\n Are you sure you want to close?')){
+		if(this.modified && !window.confirm('Warning, some changes are unsaved!\n Are you sure you want to close?')){
 				return false;
 		}
-		oThis.close();
+		this.close();
 		hideLightBox(true);
 		return false;
-	}
+	}.bind(this);
 	this.saveButton.onclick = function(){
-		oThis.saveFile();
+		this.saveFile();
 		return false;
-	}
+	}.bind(this);
 	this.downloadButton.onclick = function(){
-		if(!oThis.currentFile) return;		
-		document.location.href = 'content.php?action=telecharger&fic='+oThis.currentFile;
+		if(!this.currentFile) return;		
+		document.location.href = 'content.php?action=telecharger&fic='+this.currentFile;
 		return false;
-	}	
-	modal.setCloseAction(function(){oThis.close();});
+	}.bind(this);	
+	modal.setCloseAction(function(){this.close();}.bind(this));
 }
 
 
@@ -65,9 +64,8 @@ Editor.prototype.loadFile = function(fileName)
 	this.currentFile = fileName;
 	var connexion = new Connexion();
 	connexion.addParameter('get_action', 'editer');
-	connexion.addParameter('fic', fileName);
-	var oThis = this;
-	connexion.onComplete = function(transp){oThis.parseTxt(transp);};
+	connexion.addParameter('fic', fileName);	
+	connexion.onComplete = function(transp){this.parseTxt(transp);}.bind(this);
 	this.changeModifiedStatus(false);
 	this.setOnLoad();
 	connexion.sendAsync();
@@ -83,9 +81,8 @@ Editor.prototype.saveFile = function()
 	else value = this.textarea.value;
 	connexion.addParameter('code', value);
 	connexion.addParameter('fic', this.ficInput.value);
-	connexion.addParameter('rep', this.repInput.value);
-	var oThis = this;
-	connexion.onComplete = function(transp){oThis.parseXml(transp);};
+	connexion.addParameter('rep', this.repInput.value);	
+	connexion.onComplete = function(transp){this.parseXml(transp);}.bind(this);
 	this.setOnLoad();
 	connexion.setMethod('put');
 	connexion.sendAsync();
@@ -101,12 +98,10 @@ Editor.prototype.parseXml = function(transport)
 Editor.prototype.parseTxt = function(transport)
 {	
 	this.textarea.value = transport.responseText;
-	var oThis = this;
 	var contentObserver = function(el, value){
-		oThis.changeModifiedStatus(true);
-	};
+		this.changeModifiedStatus(true);
+	}.bind(this);
 	if(this.currentUseCp) {
-		//id = this.textarea.id;
 		this.textarea.id = 'cpCode_cp';
 		code = new CodePress(this.textarea, contentObserver);
 		this.cpCodeObject = code;
