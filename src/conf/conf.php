@@ -36,7 +36,7 @@ define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); //
 /* You can add as many as you want,  
 /* Just increment the "$REPOSITORIES" index.
 /*********************************************************/
-//$REPOSITORIES[0] = array("PATH"=> realpath(dirname(__FILE__)."/../files"), "DISPLAY"=>"Default Files");
+$REPOSITORIES[0] = array("PATH"=> realpath(dirname(__FILE__)."/../files"), "DISPLAY"=>"Default Files");
 //$REPOSITORIES[1] = array("PATH"=>"/home/user/www/your/location1/", "DISPLAY"=>"Web Files");
 //$REPOSITORIES[2] = array("PATH"=>"C:/your/location3/on/windows", "DISPLAY"=>"All Documents");
 
@@ -52,7 +52,7 @@ $max_caracteres=50;
 // AFFICHAGE DES FICHIERS CACHES : oui=1, non=0 (UN FICHIER CACHE COMMENCE PAR UN POINT)
 // (Show hidden files, yes=1, no=0)
 
-$showhidden=1;
+$showhidden=0;
 
 $upload_max_number = 6;
 
