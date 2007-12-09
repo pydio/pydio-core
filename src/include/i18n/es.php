@@ -226,6 +226,9 @@ $mess=array(
 "197" => "¡Preferencias de usuario correctamente cambiadas! \\n\\n. Si has cambiado tu clave, tendrá efecto tras la desconexión. \\n\\n. Si has cambiado tu idioma, pulsa Actualiza (F5) en tu navegador.",
 "198" => "Nuevo",
 "199" => "Confirmar",
-"200" => "Cambiar almacén a..."
+"200" => "Cambiar almacén a...",
+"201" => "Warning, some changes are unsaved!\\n Are you sure you want to close?",
+"202" => "Warning, recursive copy!",
+"203" => "Destintation folder is the same as original folder!"
 );
 ?>

@@ -225,6 +225,9 @@ $mess=array(
 "197" => "Vos préférences ont été sauvées avec succès. \\n\\n. Si vous avez changé de mot de passe, il sera pris en compte après la prochaine déconnexion. \\n\\n. Si vous avez changé de language, veuillez rafraichir la page avec la touche F5.",
 "198" => "Nouv.",
 "199" => "Confirmer",
-"200" => "Changer le répertoire racine..."
+"200" => "Changer le répertoire racine...",
+"201" => "Attention, certaines modifications n'ont pas été sauvegardées!\\n Etes vous sûr de vouloir fermer?",
+"202" => "Attention, copie récursive!",
+"203" => "Le répertoire de destination est le même que le répertoire d'origine!"
 );
 ?>
