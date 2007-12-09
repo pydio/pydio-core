@@ -224,6 +224,9 @@ $mess=array(
 "197" => "User preferences changed successfullly! \\n\\n. If you changed password it will take effect after your deconnexion. \\n\\n. If you changed language, please hit refresh (F5) on your browser.", 
 "198" => "New",
 "199" => "Confirm",
-"200" => "Switch Repository to..."
+"200" => "Switch Repository to...", 
+"201" => "Warning, some changes are unsaved!\\n Are you sure you want to close?",
+"202" => "Warning, recursive copy!",
+"203" => "Destintation folder is the same as original folder!"
 );
 ?>

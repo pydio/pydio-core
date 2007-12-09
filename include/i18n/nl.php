@@ -224,6 +224,9 @@ $mess=array(
 "197" => "Gebruikers voorkeuren succesvol veranderd! \\n\\n. Als je je passwoord hebt veranderd verandert dat pas nadat je bent uitgelogd. \\n\\n. Als je de taal veranderd hebt, ververs dan de pagina (F5).", 
 "198" => "Nieuw",
 "199" => "Bevestig",
-"200" => "Wijzig bestandsdepot naar..."
+"200" => "Wijzig bestandsdepot naar...",
+"201" => "Warning, some changes are unsaved!\\n Are you sure you want to close?",
+"202" => "Warning, recursive copy!",
+"203" => "Destintation folder is the same as original folder!"
 );
 ?>
