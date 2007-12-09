@@ -7,7 +7,7 @@ function Editor(oFormObject)
 	this.ficInput = oFormObject.getElementsBySelector('input[name="fic"]')[0];
 	this.repInput = oFormObject.getElementsBySelector('input[name="rep"]')[0];	
 	this.closeButton.onclick = function(){
-		if(this.modified && !window.confirm('Warning, some changes are unsaved!\n Are you sure you want to close?')){
+		if(this.modified && !window.confirm(MessageHash[201])){
 				return false;
 		}
 		this.close();
