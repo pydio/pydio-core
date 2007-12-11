@@ -32,6 +32,40 @@ ActionsManager.prototype.init = function()
 		}
 		this._actions.set(action, i);
 		item.href = "javascript:ajaxplorer.getActionBar().fireAction('"+action+"')";
+		// Set image
+		if(item.getAttribute('icon_src'))
+		{
+			var displayString = item.innerHTML;
+			item.innerHTML = '';
+			
+			var image = new Element('img');
+			item.appendChild(image);
+			image.width='22';
+			image.height='22';
+			image.src = 'images/crystal/actions/22/'+item.getAttribute('icon_src');
+			image.setAttribute('border', '0');
+			image.setAttribute('align', 'ABSMIDDLE');
+			image.setAttribute('alt', item.getAttribute('title'));
+			image.setAttribute('title', item.getAttribute('title'));			
+
+			if(item.getAttribute('key'))
+			{
+				if(item.getAttribute('key') == 'none') continue;
+				firstKey = item.getAttribute('key');
+			}
+			else
+			{
+				firstKey = displayString.charAt(0);
+			}
+			displayString = displayString.substring(0,displayString.indexOf(firstKey)) + '<u>'+firstKey+'</u>' + displayString.substring(displayString.indexOf(firstKey)+1, displayString.length);
+			this._registeredKeys.set(firstKey.toLowerCase(), action);			
+			
+			spanTitle = new Element('span');
+			spanTitle.innerHTML = displayString;
+			
+			item.appendChild(new Element('br'));
+			item.appendChild(spanTitle);
+		}else{
 		// Set keyboard shortcut
 		var textNode = item.lastChild;
 		var textNodeString = textNode.innerHTML;
@@ -47,6 +81,7 @@ ActionsManager.prototype.init = function()
 		replaceHtml = textNodeString.substring(0,textNodeString.indexOf(firstKey)) + '<u>'+firstKey+'</u>' + textNodeString.substring(textNodeString.indexOf(firstKey)+1, textNodeString.length);
 		this._registeredKeys.set(firstKey.toLowerCase(), action);
 		textNode.innerHTML = replaceHtml;
+		}
 	}
 	this.downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=telecharger&fic='); 
 	this.downloader.triggerEnd = function() {hideLightBox();};
@@ -270,6 +305,41 @@ ActionsManager.prototype.actionIsAllowed = function(buttonAction)
 	return true;
 }
 
+ActionsManager.prototype.getContextActions = function(srcElement)
+{	
+	var actionsSelectorAtt = 'selectionContext';
+	if(srcElement.id && (srcElement.id == 'table_rows_container' ||  srcElement.id == 'selectable_div'))
+	{
+		actionsSelectorAtt = 'genericContext';
+	}
+	else if(srcElement.id.substring(0,5)=='webfx')
+	{
+		actionsSelectorAtt = 'directoryContext';
+	}
+	var contextActions = new Array();
+	for(i=0; i<this._items.length; i++)
+	{
+		if($(this._items[i]).visible() && this._items[i].getAttribute(actionsSelectorAtt) && this._items[i].getAttribute(actionsSelectorAtt) == "true")
+		{
+			var img = $(this._items[i]).select('img')[0];
+			var text = $(this._items[i]).select('span')[0].innerHTML;
+			var alt = this._items[i].getAttribute('title');
+			var imgSrc = ('images/crystal/actions/16/'+this._items[i].getAttribute('icon_src'));
+			contextActions[contextActions.length] = {
+				name:text,
+				alt:alt,
+				image:imgSrc,
+				disabled:(this._items[i].className == 'disabled'?true:false),
+				className:"edit",
+				callback:function(e){
+					ajaxplorer.actionBar.fireAction(this.getAttribute('action'));
+				}.bind(this._items[i])
+			};
+		}
+	}
+	return contextActions;
+}
+
 ActionsManager.prototype.fireAction = function (buttonAction)
 {
 	var button = this._items[this._actions.get(buttonAction)];
@@ -317,20 +387,37 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		break;		
 		
 		case "upload":		
-			$('hidden_frames').innerHTML = '<iframe name="hidden_iframe" id="hidden_iframe"></iframe>';			
-			var onLoadFunction = function(oForm){
-				oThis.multi_selector = new MultiSelector(oForm, oForm.getElementsBySelector('div.uploadFilesList')[0], '6' );
-				oThis.multi_selector.addElement(oForm.getElementsBySelector('.dialogFocus')[0]);
-				var rep = document.createElement('input');
-				rep.setAttribute('type', 'hidden');
-				rep.setAttribute('name', 'rep');
-				rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
-				oForm.appendChild(rep);
+			if(this.getFlashVersion() >= 8)
+			{
+				modal.showDialogForm('Upload', 
+									'fancy_upload_form', 
+									null, 
+									function(){
+										hideLightBox();
+										return false;
+									}, 
+									null, 
+									true, true);				
 			}
-			modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){
-				ajaxplorer.actionBar.multi_selector.submitMainForm();
-				return false;
-			});		
+			else
+			{
+				$('hidden_frames').innerHTML = '<iframe name="hidden_iframe" id="hidden_iframe"></iframe>';			
+				var onLoadFunction = function(oForm){
+					oThis.multi_selector = new MultiSelector(oForm, oForm.getElementsBySelector('div.uploadFilesList')[0], '6' );
+					oThis.multi_selector.addElement(oForm.getElementsBySelector('.dialogFocus')[0]);
+					var rep = document.createElement('input');
+					rep.setAttribute('type', 'hidden');
+					rep.setAttribute('name', 'rep');
+					rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
+					oForm.appendChild(rep);
+				}
+				
+				modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){
+					ajaxplorer.actionBar.multi_selector.submitMainForm();
+					return false;
+				});
+				
+			}
 		break;
 		
 		case "create_file":
@@ -613,7 +700,7 @@ ActionsManager.prototype.checkDestIsChildOfSource = function(srcNames, destNodeN
 
 ActionsManager.prototype.updateDisplayButton = function (newDisplay)
 {
-	$('sd_button').getElementsBySelector('img')[0].src = 'images/crystal/'+(newDisplay=='list'?'view_icon.png':'view_text.png');
+	$('sd_button').getElementsBySelector('img')[0].src = 'images/crystal/actions/22/'+(newDisplay=='list'?'view_icon.png':'view_text.png');
 }
 
 ActionsManager.prototype.submitForm = function(formName)
@@ -685,14 +772,14 @@ ActionsManager.prototype.switchLoginButton = function(action)
 {
 	if(action == "loggedin")
 	{
-		$('login_logout_image').src = 'images/crystal/cancel.png';
+		$('login_logout_image').src = 'images/crystal/actions/22/cancel.png';
 		$('login_button').setAttribute('action', 'logout');
 		$('login_button').setAttribute('title', MessageHash[169]);
 		$('login_logout_span').innerHTML = MessageHash[164];	
 	}
 	else
 	{
-		$('login_logout_image').src = 'images/crystal/yast_security.png';
+		$('login_logout_image').src = 'images/crystal/actions/22/yast_security.png';
 		$('login_button').setAttribute('action', 'login');
 		$('login_button').setAttribute('title', MessageHash[168]);
 		$('login_logout_span').innerHTML = MessageHash[163];
@@ -768,4 +855,22 @@ ActionsManager.prototype.blur = function()
 {
 	$('current_path').blur();
 	this.hasFocus = false;
+}
+
+ActionsManager.prototype.getFlashVersion = function()
+{
+	if (!this.pluginVersion) {
+		var x;
+		if(navigator.plugins && navigator.mimeTypes.length){
+			x = navigator.plugins["Shockwave Flash"];
+			if(x && x.description) x = x.description;
+		} else if (Prototype.Browser.IE){
+			try {
+				x = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+				x = x.GetVariable("$version");
+			} catch(e){}
+		}
+		this.pluginVersion = (typeof(x) == 'string') ? parseInt(x.match(/\d+/)[0]) : 0;
+	}
+	return this.pluginVersion;
 }
