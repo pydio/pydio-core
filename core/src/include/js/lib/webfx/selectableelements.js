@@ -42,10 +42,18 @@ function SelectableElements(oElement, bMultiple) {
 
 	var oThis = this;
 	this._onclick = function (e) {
-		if (e == null) e = oElement.ownerDocument.parentWindow.event;
+		if (e == null) e = oElement.ownerDocument.parentWindow.event;		
 		oThis.click(e);
 	};
 
+	$(this._htmlElement).observe('contextmenu', function(e){
+		Event.stop(e);
+		if(this._selectedItems.length > 1){
+			 return;
+		}
+		this.click(e);
+	}.bind(this));
+	
 	this._ondblclick = function (e) {
 		if (e == null) e = oElement.ownerDocument.parentWindow.event;
 		oThis.dblClick(e);
@@ -104,7 +112,19 @@ SelectableElements.prototype.setItemSelected = function (oEl, bSelected) {
 SelectableElements.prototype.setItemSelectedUi = function (oEl, bSelected) {
 	if (bSelected){
 		addClassName(oEl, "selected");
-		addClassName(oEl, "selected-focus");		
+		addClassName(oEl, "selected-focus");
+		// CHECK THAT SCROLLING IS OK
+		
+		var parent = $('selectable_div');
+		if($('table_rows_container')) parent = $('table_rows_container');
+		var scrollOffset = $(oEl).positionedOffset()[1];
+		
+		if(scrollOffset+$(oEl).getHeight() > (parent.getHeight()+parent.scrollTop)){
+			parent.scrollTop = scrollOffset-parent.getHeight();
+		}else if(scrollOffset < (parent.scrollTop)){
+			parent.scrollTop = scrollOffset-$(oEl).getHeight();
+		}
+		
 	}
 	else{		
 		removeClassName(oEl, "selected");
@@ -183,7 +203,8 @@ SelectableElements.prototype.click = function (e) {
 	}
 	var oldFireChange = this._fireChange;
 	this._fireChange = false;
-
+	
+	
 	// create a copy to compare with after changes
 	var selectedBefore = this.getSelectedItems();	// is a cloned array
 
@@ -196,7 +217,6 @@ SelectableElements.prototype.click = function (e) {
 		this._fireChange = oldFireChange;
 		return;
 	}
-
 	var rIndex = el;
 	var aIndex = this._anchorIndex;
 
