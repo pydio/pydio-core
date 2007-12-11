@@ -17,7 +17,7 @@ class HTMLWriter
     	$mess = ConfService::getMessages();
 		foreach (array_reverse($allBookmarks) as $path)
 		{
-			echo '<div class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';"><img width="16" height="16" src="images/crystal/folder_yellow.png" border="0" align="ABSMIDDLE" style="float:left;"><a href="#" class="disabled" title="'.$mess[146].'" onclick="ajaxplorer.actionBar.removeBookmark(\''.$path.'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="images/crystal/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'.$mess[146].'"></a> <a href="#" onclick="ajaxplorer.goTo(\''.$path.'\'); return false;" class="bookmark_button">'.$path.'</a></div>';
+			echo '<div class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';"><img width="16" height="16" src="images/crystal/mimes/16/folder.png" border="0" align="ABSMIDDLE" style="float:left;"><a href="#" class="disabled" title="'.$mess[146].'" onclick="ajaxplorer.actionBar.removeBookmark(\''.$path.'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="images/crystal/actions/16/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'.$mess[146].'"></a> <a href="#" onclick="ajaxplorer.goTo(\''.$path.'\'); return false;" class="bookmark_button">'.$path.'</a></div>';
 		}
     }	
     
