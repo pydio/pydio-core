@@ -151,16 +151,16 @@
     	<div id="search_div" style="background-color: #fff;">
     		<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
     		<tr>
-		    	<td id="info_panel_header" onclick="ajaxplorer.toggleSidePanel('info');" class="toggleHeader">
-		    		<img width="20" height="20" align="absmiddle" src="images/crystal/actions/effect.png"><a href="#"><?php print $mess[131] ?></a>
+		    	<td id="info_panel_header" onclick="ajaxplorer.toggleSidePanel('info'); return false;" class="toggleHeader">
+		    		<img width="20" height="20" align="absmiddle" src="images/crystal/actions/effect.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[131] ?></a>
 		    	</td>
-		    	<td id="search_header" onclick="ajaxplorer.toggleSidePanel('search');" class="toggleHeader">
-		    		<img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png"><a href="#"><?php print $mess[87] ?></a>
+		    	<td id="search_header" onclick="ajaxplorer.toggleSidePanel('search'); return false;" class="toggleHeader">
+		    		<img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[87] ?></a>
 		    	</td>
 		    </tr>
 	    	</table>
 	    	<div id="search_container">
-		    	<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="#" id="search_button" title="<?php print $mess[184] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png" border="0"/></a><a href="#" id="stop_search_button" title="<?php print $mess[185] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>
+		    	<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" title="<?php print $mess[184] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" title="<?php print $mess[185] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>
 	    	</div>
 	    	<div id="info_panel"></div>
     	</div>     	
