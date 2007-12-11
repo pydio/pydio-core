@@ -117,6 +117,7 @@ var Droppables = {
   fire: function(event, element) {
     if(!this.last_active) return;
     Position.prepare();
+    Position.includeScrollOffsets = true;
 
     if (this.isAffected([Event.pointerX(event), Event.pointerY(event)], element, this.last_active))
       if (this.last_active.onDrop) {
@@ -366,6 +367,7 @@ var Draggable = Class.create({
     
     if(!this.options.quiet){
       Position.prepare();
+      Position.includeScrollOffsets = true;
       Droppables.show(pointer, this.element);
     }
     
@@ -406,6 +408,7 @@ var Draggable = Class.create({
     
     if(this.options.quiet){
       Position.prepare();
+      Position.includeScrollOffsets = true;
       var pointer = [Event.pointerX(event), Event.pointerY(event)];
       Droppables.show(pointer, this.element);
     }
@@ -534,6 +537,7 @@ var Draggable = Class.create({
     }
     
     Position.prepare();
+    Position.includeScrollOffsets = true;
     Droppables.show(Draggables._lastPointer, this.element);
     Draggables.notify('onDrag', this);
     if (this._isScrollChild) {
