@@ -129,7 +129,7 @@ AdminPageManager.prototype.submitForm = function(action, parameters, formName)
 	}
 	if(parameters)
 	{
-		parameters['get_action'] = action;
+		parameters.set('get_action', action);
 		connexion.setParameters(parameters);
 	}
 	oThis = this;
