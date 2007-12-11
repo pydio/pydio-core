@@ -75,6 +75,7 @@ var webFXTreeHandler = {
 	all       : {},
 	behavior  : null,
 	selected  : null,
+	contextMenu: null,
 	onSelect  : null, /* should be part of tree, not handler */
 	getId     : function() { return this.idPrefix + this.idCounter++; },
 	toggle    : function (oItem) { this.all[oItem.id.replace('-plus','')].toggle(); },
@@ -172,6 +173,11 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());		
 		AjxpDroppables.add(node.id);
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
+		if(webFXTreeHandler.contextMenu){
+			var action='';
+			Event.observe(node.id+'-anchor', 'contextmenu', function(e){eval(this.action);}.bind(node));
+			 webFXTreeHandler.contextMenu.addElements('#'+node.id+'-anchor');
+		}
 		
 		if ((!this.folder) && (!this.openIcon)) {
 			this.icon = webFXTreeConfig.folderIcon;
@@ -420,6 +426,7 @@ WebFXTreeItem.prototype.remove = function() {
 	this.getPreviousSibling().focus();
 	this._remove();
 	Droppables.remove($(this.id));
+	if(webFXTreeHandler.contextMenu) webFXTreeHandler.contextMenu.removeElements('#'+this.id);
 	if (parentNode.childNodes.length == 0) {
 		document.getElementById(parentNode.id + '-cont').style.display = 'none';
 		parentNode.doCollapse();
