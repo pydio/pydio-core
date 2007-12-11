@@ -9,14 +9,14 @@
 <!-- VIEW IMAGE -->
 <div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%">
 	<div class="action_bar" style="height: 42px; width: 500px;">
-		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
-		<a href="" id="prevButton"><img  width="22" height="22" src="images/crystal/back_22.png" alt="" border="0"><br><?php print $mess[178]; ?></a>
-		<a href="" id="nextButton"><img width="22" height="22" src="images/crystal/forward_22.png" alt="" border="0"><br><?php print $mess[179];?></a>
-		<a href="" id="downloadDiapoButton"><img width="22" height="22" src="images/crystal/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
+		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
+		<a href="" id="prevButton"><img  width="22" height="22" src="images/crystal/actions/22/back_22.png" alt="" border="0"><br><?php print $mess[178]; ?></a>
+		<a href="" id="nextButton"><img width="22" height="22" src="images/crystal/actions/22/forward_22.png" alt="" border="0"><br><?php print $mess[179];?></a>
+		<a href="" id="downloadDiapoButton"><img width="22" height="22" src="images/crystal/actions/22/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
 	</div>
 	<div align="right" style="background-image: url(images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
 	<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
-	<td><img class="diaporamaButton" width="16" height="16" src="images/crystal/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="images/crystal/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
+	<td><img class="diaporamaButton" width="16" height="16" src="images/crystal/actions/16/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="images/crystal/actions/16/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
 	<td><div class="slider" id="slider-2"><input class="slider-input" id="slider-input-2" name="slider-input-2"/></div></td>
 	<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td></tr></table>
 	</div>
@@ -28,9 +28,9 @@
 <!-- EDIT TEXT FILE -->
 <div id="edit_box" action="editer" box_width="80%" box_height="90%">
 	<div class="action_bar" style="height: 42px;">
-		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
-		<a href="" id="saveButton" onclick="saveForm();return false;"><img src="images/crystal/filesave.png" width="22" height="22" alt="<?php print $mess[53]; ?>" border="0"><br><?php print $mess[53]; ?></a>
-		<a href="" id="downloadFileButton"><img width="22" height="22" src="images/crystal/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
+		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
+		<a href="" id="saveButton" onclick="saveForm();return false;"><img src="images/crystal/actions/22/filesave.png" width="22" height="22" alt="<?php print $mess[53]; ?>" border="0"><br><?php print $mess[53]; ?></a>
+		<a href="" id="downloadFileButton"><img width="22" height="22" src="images/crystal/actions/22/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
 	</div>
 	<input type="hidden" name="fic" value="">
 	<input type="hidden" name="rep" value="">
@@ -94,6 +94,14 @@
 <div id="upload_files_list" class="uploadFilesList"></div>
 </form>
 <script language="javascript">$('originalUploadForm').hide();</script>
+
+<!-- MOOTOOLS UPLOAD FORM -->
+<div id="fancy_upload_form" box_width="420">
+<div id="fancyscreen">
+<iframe id="fancyframe" frameborder="0" src="content.php?get_action=fancy_uploader"></iframe>
+</div>
+<div class="dialogButtons"><input type="button" class="dialogButton" onclick="hideLightBox(true);" value="<?php print($mess[86]);?>" id="closeFancyUploadBox"></div>
+</div>
 
 <!-- SPLASH SCREEN -->
 <div id="splash_form" box_width="420">
