@@ -18,16 +18,11 @@ function FilesList(oElement, bSelectMultiple, oSortTypes, sCurrentRep, oAjaxplor
 
 	this.initGUI();
 		
-	var oThis = this;
-	
 	Event.observe(document, "keydown", function(e){	
 		if (e == null) e = $('content_pane').ownerDocument.parentWindow.event;
-		return oThis.keydown(e);		
-	});
-	
-	//window.onfocus = function(){oThis.selectFirst()};
-	//window.onblur = function(){oThis.blur()};
-	
+		return this.keydown(e);		
+	}.bind(this));
+				
 	if(this._currentRep != null)
 	{
 		this.loadXmlList(this._currentRep);
@@ -53,16 +48,15 @@ FilesList.prototype.initGUI = function()
 		SelectableElements.call(this, oElement, true); // "TRUE" ENABLES MULTIPLE SELECTION
 		this._sortableTable = new SortableTable(oElement, this._oSortTypes, $('selectable_div_header'));
 		fitHeightToBottom($('table_rows_container'), $('content_pane'));
-		this.disableTextSelection($('selectable_div_header'));
-		var oThis = this;
+		this.disableTextSelection($('selectable_div_header'));		
 		Event.observe(window, "resize",  function(){			
-			setTimeout(function(){oThis.applyHeadersWidth();fitHeightToBottom($('table_rows_container'), $('content_pane'));}, 100);
-		});
+			setTimeout(function(){this.applyHeadersWidth();fitHeightToBottom($('table_rows_container'), $('content_pane'));}.bind(this), 100);
+		}.bind(this));
 		
 		jQuery('#sidebarSplitter').bind("resize",  function(){			
-			oThis.applyHeadersWidth();
+			this.applyHeadersWidth();
 			fitHeightToBottom($('table_rows_container'), $('content_pane'));
-		});
+		}.bind(this));
 	}
 	else if(this._displayMode == "thumb")
 	{
@@ -77,13 +71,12 @@ FilesList.prototype.initGUI = function()
 		this.slider.setMaximum(200);
 		this.slider.setMinimum(30);		
 		this.slider.recalculate();
-		this.slider.setValue(this._thumbSize);
-		var oThis = this;
+		this.slider.setValue(this._thumbSize);		
 		this.slider.onchange = function()
 		{
-			oThis._thumbSize = oThis.slider.getValue();
-			oThis.resizeThumbnails();
-		}
+			this._thumbSize = this.slider.getValue();
+			this.resizeThumbnails();
+		}.bind(this);
 		
 
 		oElement = $('selectable_div');
@@ -93,6 +86,12 @@ FilesList.prototype.initGUI = function()
 	
 	//jQuery("#last_header").corner("round tr 5px");
 	//jQuery("#last_header").css("border-bottom", "1px solid #aaa");
+}
+
+FilesList.prototype.setContextualMenu = function(protoMenu)
+{
+	this.protoMenu = protoMenu;
+	this.protoMenu.addElements('#selectable_div, #content_pane');
 }
 
 FilesList.prototype.switchDisplayMode = function(mode)
@@ -119,12 +118,11 @@ FilesList.prototype.getHeadersWidth = function()
 	if(this._displayMode == 'thumb') return;
 	var tds = $('selectable_div_header').getElementsBySelector('td');
 	this.headersWidth = new Hash();
-	var index = 0;
-	var oThis = this;
+	var index = 0;	
 	tds.each(function(cell){		
-		oThis.headersWidth.set(index, cell.getWidth() - 8);
+		this.headersWidth.set(index, cell.getWidth() - 8);
 		index++;
-	});
+	}.bind(this));
 	//alert(this.headersWidth[0]);
 }
 
@@ -154,23 +152,34 @@ FilesList.prototype.initRows = function()
 	}
 	if(this._displayMode == "thumb")
 	{
-		this.resizeThumbnails();
-		var oThis = this;
-		window.setTimeout(function(){oThis.loadNextImage();},10);		
+		this.resizeThumbnails();		
+		window.setTimeout(function(){this.loadNextImage();}.bind(this),10);		
 	}
 	else
 	{
 		this.applyHeadersWidth();	
 	}
+	/*
+	this.protoMenu  = new Proto.Menu({
+	  selector: '#selectable_div, #content_pane', // context menu will be shown when element with class name of "contextmenu" is clicked
+	  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
+	  menuItems: []
+	});
+	var protoMenu = this.protoMenu;
+	protoMenu.options.beforeShow = function(e){setTimeout(function(){
+	  	this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e));
+	  	this.refreshList();
+	  }.bind(protoMenu),0);};
+	  */
+	if(this.protoMenu) this.protoMenu.addElements('.ajxp_draggable');	
 }
 
 FilesList.prototype.loadNextImage = function()
 {
 	if(this.imagesHash && this.imagesHash.size())
 	{
-		var oThis = this;
-		if(oThis.loading) return;
-		var oImageToLoad = oThis.imagesHash.unset(oThis.imagesHash.keys()[0]);		
+		if(this.loading) return;
+		var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
 		var image = new Image();
 		image.src = "content.php?action=image_proxy&get_thumb=true&fic="+oImageToLoad.filename;
 		image.onload = function(){
@@ -181,30 +190,29 @@ FilesList.prototype.loadNextImage = function()
 			img.width = oImageToLoad.width;
 			img.setStyle({marginTop: oImageToLoad.marginTop+'px',marginBottom: oImageToLoad.marginBottom+'px'});
 			img.setAttribute("is_loaded", "true");
-			oThis.resizeThumbnails(oImageToLoad.rowObject);
-			oThis.loadNextImage();
-		};	
+			this.resizeThumbnails(oImageToLoad.rowObject);
+			this.loadNextImage();
+		}.bind(this);
 	}	
 }
 
-FilesList.prototype.reload = function(pendingFileToSelect)
+FilesList.prototype.reload = function(pendingFileToSelect, url)
 {
-	if(this._currentRep != null) this.loadXmlList(this._currentRep, pendingFileToSelect);
+	if(this._currentRep != null) this.loadXmlList(this._currentRep, pendingFileToSelect, url);
 }
 
-FilesList.prototype.loadXmlList = function(repToLoad, pendingFileToSelect)
+FilesList.prototype.loadXmlList = function(repToLoad, pendingFileToSelect, url)
 {	
 	// TODO : THIS SHOULD BE SET ONCOMPLETE!
-	this._currentRep = repToLoad;	
-	var connexion = new Connexion();
+	this._currentRep = repToLoad;
+	var connexion = new Connexion(url);
 	connexion.addParameter('mode', 'file_list');
-	connexion.addParameter('rep', repToLoad);
-	var oThis = this;
+	connexion.addParameter('rep', repToLoad);	
 	this._pendingFile = pendingFileToSelect;
 	this.setOnLoad();
 	connexion.onComplete = function (transport){
-		oThis.parseXmlAndLoad(transport.responseXML);
-	}	
+		this.parseXmlAndLoad(transport.responseXML);
+	}.bind(this);	
 	connexion.sendAsync();
 }
 
@@ -218,11 +226,16 @@ FilesList.prototype.parseXmlAndLoad = function(oXmlDoc)
 	this.loading = false;
 	this.imagesHash = new Hash();
 	this.allDroppables.each(function(el){
-		Droppables.remove(el);
+		Droppables.remove(el);		
 	});
+	this.allDroppables = new Array();
 	this.allDraggables.each(function(el){
 		el.destroy();
 	});
+	this.allDraggables = new Array();
+	if(this.protoMenu){
+		this.protoMenu.removeElements('.ajxp_draggable');
+	}
 	var root = oXmlDoc.documentElement;
 	// loop through all tree children
 	var cs = root.childNodes;
@@ -307,7 +320,6 @@ FilesList.prototype.xmlNodeToTableRow = function(xmlNode)
 	{
 		newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
 	}
-	var oThis = this;
 	["text", "filesize", "mimetype", "modiftime"].each(function(s){
 		var tableCell = document.createElement("td");
 		if(s == "text")
@@ -322,20 +334,20 @@ FilesList.prototype.xmlNodeToTableRow = function(xmlNode)
 			tableCell.appendChild(innerSpan);
 			$(innerSpan).setStyle({display:'block'});
 			$(innerSpan).setAttribute('filename', newRow.getAttribute('filename'));
-			var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true});
+			var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'});
 			if(xmlNode.getAttribute("is_file") == "non")
 			{
 				AjxpDroppables.add(innerSpan);
-				oThis.allDroppables[oThis.allDroppables.length] = innerSpan;
+				this.allDroppables[this.allDroppables.length] = innerSpan;
 			}
-			oThis.allDraggables[oThis.allDraggables.length] = newDrag;
+			this.allDraggables[this.allDraggables.length] = newDrag;
 		}
 		else
 		{
 			tableCell.innerHTML = xmlNode.getAttribute(s);
 		}
 		newRow.appendChild(tableCell);
-	});	
+	}.bind(this));	
 	tBody.appendChild(newRow);
 }
 
@@ -356,7 +368,7 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 		this._crtImageIndex ++;
 		var imgIndex = this._crtImageIndex;
 		var textNode = xmlNode.getAttribute("text");
-		var imgString = "<img id=\"ajxp_image_"+imgIndex+"\" src=\"images/crystal/image.png\" width=\"64\" height=\"64\" style=\"margin:5px;\" align=\"ABSMIDDLE\" border=\"0\" is_loaded=\"false\"/><div class=\"thumbLabel\" title=\""+textNode+"\">"+textNode+"</div>";
+		var imgString = "<img id=\"ajxp_image_"+imgIndex+"\" src=\"images/crystal/mimes/64/image.png\" width=\"64\" height=\"64\" style=\"margin:5px;\" align=\"ABSMIDDLE\" border=\"0\" is_loaded=\"false\"/><div class=\"thumbLabel\" title=\""+textNode+"\">"+textNode+"</div>";
 		var width = xmlNode.getAttribute("image_width");
 		var height = xmlNode.getAttribute("image_height");		
 		var sizeString, marginTop, marginHeight, newHeight, newWidth;
@@ -376,8 +388,7 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 			marginBottom = 5;
 			sizeString = "height=\"64\" style=\"margin: 5px;\"";
 		}
-		var crtIndex = this._crtImageIndex;
-		var oThis = this;
+		var crtIndex = this._crtImageIndex;		
 		var image = new Image();
 		innerSpan.innerHTML = imgString;		
 		newRow.appendChild(innerSpan);
@@ -420,8 +431,7 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 
 FilesList.prototype.resizeThumbnails = function(one_element)
 {
-	
-	var oThis = this;
+		
 	var defaultMargin = 5;
 	var elList;
 	if(one_element) elList = [one_element]; 
@@ -430,7 +440,7 @@ FilesList.prototype.resizeThumbnails = function(one_element)
 		var is_image = (element.getAttribute('is_image')=='1'?true:false);
 		var image_element = element.getElementsBySelector('img')[0];		
 		var label_element = element.getElementsBySelector('.thumbLabel')[0];
-		var tSize = oThis._thumbSize;
+		var tSize = this._thumbSize;
 		var tW, tH, mT, mB;
 		if(is_image && image_element.getAttribute("is_loaded") == "true")
 		{
@@ -475,7 +485,7 @@ FilesList.prototype.resizeThumbnails = function(one_element)
 		//alert(element.getAttribute('text'));
 		label_element.innerHTML = label.truncate(nbChar, '...');
 		
-	});
+	}.bind(this));
 	
 }
 
@@ -648,6 +658,7 @@ FilesList.prototype.keydown = function (event)
 	{
 		return false;
 	}
+	Event.stop(event);
 	var nextItem;
 	var currentItem;
 	var shiftKey = event['shiftKey'];
