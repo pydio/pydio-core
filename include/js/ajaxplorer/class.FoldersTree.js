@@ -33,9 +33,17 @@ FoldersTree.prototype.focus = function(){
 }
 
 FoldersTree.prototype.blur = function(){
-	webFXTreeHandler.selected.blur();
+	if(webFXTreeHandler.selected)
+	{
+		webFXTreeHandler.selected.blur();
+	}
 	webFXTreeHandler.setFocus(false);
 	this.hasFocus = false;
+}
+
+FoldersTree.prototype.setContextualMenu = function(protoMenu)
+{
+	webFXTreeHandler.contextMenu = protoMenu;
 }
 
 FoldersTree.prototype.clickDir = function(url, parent_url, objectName)
