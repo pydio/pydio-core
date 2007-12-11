@@ -267,6 +267,13 @@ textarea#myCode
     font-size: 16px;
 }
 
+#fancyframe
+{
+    border:0px;
+    width: 400px;
+    height: 300px;
+}
+
 /********************/
 /* MESSAGE BOX      */
 /********************/
@@ -1098,6 +1105,10 @@ textarea.editor
   -moz-opacity:1;
 }
 
+
+/***********************/
+/* AUTOCOMPLETION DIV  */
+/***********************/
 div.autocomplete 
 {
       position:absolute;
@@ -1126,4 +1137,93 @@ div.autocomplete ul li
       margin:0;
       padding:2px;
       cursor:pointer;
+}
+
+/************************/
+/* CONTEXT MENU STYLES  */
+/************************/
+div.menu {
+	position: absolute;
+	top: 0;
+	left: 0;
+	font-family: verdana;
+}
+div.menu a {
+	display: block;
+	text-decoration: none;
+	cursor: default;
+	outline: none;
+	font-size: 11px;
+}
+.menu .separator {
+	height: 1px;
+	padding: 0;
+	overflow: hidden;
+	display: block;
+	font-size: 1px;
+}
+.menu ul, .menu li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.menu li {
+	list-style-position: outside;
+}
+
+.menu.desktop {
+        filter:alpha(opacity=95);
+        opacity: 0.95;
+        -moz-opacity:0.95;
+	width: 9em;
+	background: #e0ecff;
+	border: 1px solid #ddd;
+        /*border-bottom-color: #999;
+        border-right-color: #999;*/
+	padding: 0;
+        padding-top: 0px;
+        padding-bottom: 1px;
+}
+.menu.desktop ul, .menu.desktop li {
+	margin: 0;
+	padding: 0;
+}
+
+.menu.desktop li{
+        padding: 0px;
+        padding-top: 1px;
+        padding-bottom: 1px;
+}
+
+.menu.desktop li.separator {
+	height: 1px;
+}
+.menu.desktop a img{
+        margin-right: 3px;
+}
+
+.menu.desktop a {
+	color: #000;
+	padding: 2px 0 1px 12px;
+	margin: 0;
+	border: 1px solid #e0ecff;
+	height: 17px;
+        font-family: Arial;
+	font-size:11px;
+}
+.menu.desktop a.disabled {
+	opacity: 0.25;
+	filter: alpha(opacity=25);
+	zoom: 1;
+}
+.menu.desktop li.separator {
+	border-bottom: 1px solid #fff;
+	background: #aaa;
+	margin: 1px 1px 0 1px;
+	line-height: 1px !important;
+}
+/* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
+.menu.desktop a.enabled:hover {
+	background-color: #0A246A;
+	color: #fff;
 }
