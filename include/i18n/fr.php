@@ -228,6 +228,24 @@ $mess=array(
 "200" => "Changer le répertoire racine...",
 "201" => "Attention, certaines modifications n'ont pas été sauvegardées!\\n Etes vous sûr de vouloir fermer?",
 "202" => "Attention, copie récursive!",
-"203" => "Le répertoire de destination est le même que le répertoire d'origine!"
+"203" => "Le répertoire de destination est le même que le répertoire d'origine!",
+/* GROUPED SENTENCE : 'the file "filename.ext" exceeds size limit (1Mb)\nIt will not be uploaded.*/
+"204" => "Le fichier \"",
+"205" => "\" dépasse la taille autorisée (",
+"206" => "Mb).\\nIl ne sera pas transféré.",
+/* END SENTENCE */
+"207" => "Vous n'avez pas la permission en écriture",
+"208" => "Vous n'avez pas la permission en lecture", 
+"209" => "Erreur interne. Contactez votre administrateur!",
+"210" => "Echec lors du transfert.", 
+"211" => "Le fichier dépasse la taille autorisée", 
+"212" => "Pas de fichier trouvé sur le serveur!", 
+"213" => "Erreur lors de la copie du fichier temporaire.", 
+"214" => "Parcourir", 
+"215" => "Transférer", 
+"216" => "Vider la queue", 
+"217" => "Vider les fichiers transférés", 
+"218" => "Retirer de la queue", 
+"219" => "Terminé"
 );
 ?>
