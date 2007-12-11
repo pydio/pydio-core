@@ -184,6 +184,7 @@ var AjxpDraggable = Class.create(Draggable, {
 
 	updateCtrlKey: function(event)
 	{
+		if(!event) return;
 		var ctrl = event['ctrlKey'];		
 		if(ctrl){
 			this.addCopyClass();
