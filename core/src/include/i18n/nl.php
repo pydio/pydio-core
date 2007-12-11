@@ -227,6 +227,24 @@ $mess=array(
 "200" => "Wijzig bestandsdepot naar...",
 "201" => "Warning, some changes are unsaved!\\n Are you sure you want to close?",
 "202" => "Warning, recursive copy!",
-"203" => "Destintation folder is the same as original folder!"
+"203" => "Destintation folder is the same as original folder!",
+/* GROUPED SENTENCE : 'the file "filename.ext" exceeds size limit (1Mb)\nIt will not be uploaded.*/
+"204" => "The file \"",
+"205" => "\" exceeds size limit (",
+"206" => "Mb).\\nIt will not be uploaded.",
+/* END SENTENCE */
+"207" => "You have no write permission on this folder",
+"208" => "You have no read permission on this folder", 
+"209" => "Internal server error, please contact Administrator!",
+"210" => "Upload failed", 
+"211" => "The file is too big!", 
+"212" => "No file found on server!", 
+"213" => "Error while copying file to current folder", 
+"214" => "Browse files", 
+"215" => "Start Upload", 
+"216" => "Clear Queue", 
+"217" => "Clear Completed", 
+"218" => "Remove from queue", 
+"219" => "Completed"
 );
 ?>
