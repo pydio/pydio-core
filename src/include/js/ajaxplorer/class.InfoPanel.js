@@ -76,7 +76,7 @@ InfoPanel.prototype.displayImageInfo = function(imgData)
 	tString += '<br><b>'+MessageHash[134]+'</b> : #{imagetype}';
 	tString += '<br><b>'+MessageHash[135]+'</b> : #{dimension}';
 	tString += '<br><b>'+MessageHash[127]+'</b> : #{filesize}';
-	tString += '<div style="text-align:right;padding-top:5px;"><a href="#" onclick="ajaxplorer.actionBar.fireAction(\'view\'); return false;">'+MessageHash[136]+'</a> | <a href="#" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a></div>';
+	tString += '<div style="text-align:right;padding-top:5px;"><a href="" onclick="ajaxplorer.actionBar.fireAction(\'view\'); return false;">'+MessageHash[136]+'</a> | <a href="" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a></div>';
 	tString += '</div>';
 	var template = new Template(tString);
 	this.setContent(template.evaluate({url:imgUrl, dimattr:dimAttr, filename:fileName, imagetype:imageType, dimension:imageDimension,filesize:fileSize}));
@@ -109,9 +109,9 @@ InfoPanel.prototype.displayFileInfo = function(fileData)
 	if(is_file){
 		tString += '<div style="text-align:right;padding-top:5px;">';
 		if(is_editable && (ajaxplorer.user == null || ajaxplorer.user.canWrite())){
-			tString += '<a href="#" onclick="ajaxplorer.actionBar.fireAction(\'edit\'); return false;">'+MessageHash[139]+'</a> | ';
+			tString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\'edit\'); return false;">'+MessageHash[139]+'</a> | ';
 		}
-		tString += '<a href="#" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a>';
+		tString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a>';
 		tString += '</div>';
 	}
 	tString += '</div>';
@@ -134,13 +134,13 @@ InfoPanel.prototype.displayMP3Info = function(fileData)
 	tString += '<br><b>'+MessageHash[127]+'</b> : '+fileSize;
 	tString += '<br><b>'+MessageHash[138]+'</b> : '+ modifTime;
 	tString += '<div style="text-align:right;padding-top:5px;">';
-	tString += '<a href="#" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a>';
-	tString += '|<a href="#" id="folder2playlist">'+MessageHash[140]+'</a>';
+	tString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a>';
+	tString += '|<a href="" id="folder2playlist">'+MessageHash[140]+'</a>';
 	tString += '</div>';
 	tString += '</div>';
 	this.setContent(tString);	
 	var oThis = this;
-	$('folder2playlist').onclick = function(){oThis.folderAsPlaylist();};
+	$('folder2playlist').onclick = function(){oThis.folderAsPlaylist(); return false;};
 }
 
 InfoPanel.prototype.folderAsPlaylist = function()
