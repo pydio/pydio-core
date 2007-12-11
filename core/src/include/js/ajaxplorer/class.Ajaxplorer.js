@@ -54,7 +54,22 @@ Ajaxplorer.prototype.init = function()
 									null, 
 									this, 
 									this._initDefaultDisp);	
-									
+
+	this.contextMenu = new Proto.Menu({
+	  selector: '', // context menu will be shown when element with class name of "contextmenu" is clicked
+	  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
+	  menuItems: [],
+	  fade:true
+	});
+	var protoMenu = this.contextMenu;
+	protoMenu.options.beforeShow = function(e){setTimeout(function(){
+	  	this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e));
+	  	this.refreshList();
+	  }.bind(protoMenu),0);};
+
+	  this.filesList.setContextualMenu(this.contextMenu);
+	  this.foldersTree.setContextualMenu(this.contextMenu);
+	  
 	this.sEngine = new SearchEngine("search_container", "search_txt","search_results", "search_button", this);
 	this.infoPanel = new InfoPanel("info_panel");
 	this.messageBox = $('message_div');
@@ -79,6 +94,7 @@ Ajaxplorer.prototype.init = function()
 	//downloader.triggerEnd = function() {hideLightBox();};	
 	
 	new AjxpAutocompleter("current_path", "autocomplete_choices");
+	
 }
 
 Ajaxplorer.prototype.getLoggedUserFromServer = function()
@@ -408,8 +424,8 @@ Ajaxplorer.prototype.initGUI = function()
 			
 	jQuery("#browser_round").corner("round 8px");
 	fitHeightToBottom($("browser"), window, 15);
-	fitHeightToBottom($("verticalSplitter"), $('browser'), (jQuery.browser.msie?8:0));
-	fitHeightToBottom($('tree_container'));
+	fitHeightToBottom($("verticalSplitter"), $('browser'), (Prototype.Browser.IE?8:0));
+	fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:3));
 	//jQuery("#search_div").corner("round bl 10px");
 	//jQuery("#content_pane").corner("round br 10px");
 	fitHeightToBottom(this.sEngine._resultsBox, null, 10);
