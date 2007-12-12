@@ -68,7 +68,7 @@ if(ereg('Mac',$_SERVER['HTTP_USER_AGENT']) || ereg('Safari',$_SERVER['HTTP_USER_
 }
 $mess = ConfService::getMessages();
 include_once("include/html/gui.html");
-include_once("include/html/forms.html");
+//include_once("include/html/forms.html");
 HTMLWriter::writeI18nMessagesClass($mess);
 include_once("include/html/bas.htm");
 ?>
