@@ -18,6 +18,7 @@ require_once("classes/class.UserSelection.php");
 require_once("classes/class.HTMLWriter.php");
 require_once("classes/class.AJXP_XMLWriter.php");
 require_once("classes/class.AJXP_User.php");
+require_once("classes/class.RecycleBinManager.php");
 if(isSet($_GET["ajxp_sessid"]))
 {
 	$_COOKIE["PHPSESSID"] = $_GET["ajxp_sessid"];
@@ -103,6 +104,17 @@ if(ConfService::useRecycleBin() && $action == "supprimer_suite" && $rep != "/".C
 	$action = "deplacer_suite";
 	$dest = "/".ConfService::getRecycleBinDir();
 	$dest_node = "AJAXPLORER_RECYCLE_NODE";
+}
+// FILTER ACTION FOR RESTORE
+if(ConfService::useRecycleBin() &&  $action == "restore" && $rep == "/".ConfService::getRecycleBinDir())
+{
+	$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
+	if($originalRep != "")
+	{
+		$action = "deplacer_suite";
+		$dest = $originalRep;
+	}
+	
 }
 
 //--------------------------------------
@@ -468,7 +480,7 @@ switch($action)
 	
 	case "fancy_uploader":
 	case "get_template":
-	header("Content-type:text/html");
+	header("Content-type:text/html");	
 	if($get_action == "fancy_uploader"){
 		include("include/html/fancy_tpl.html");
 		include("include/html/bas.htm");
@@ -681,61 +693,21 @@ switch($action)
 		print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
 		print("</tree>");
 	}
-	if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$fileListMode && !$completeMode)
+	if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$completeMode)
 	{
-		// ADD RECYCLE BIN TO THE LIST
-		print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/recyclebin.png\" src=\"content.php?action=xml_listing&amp;rep=/".ConfService::getRecycleBinDir()."\" openIcon=\"images/recyclebin.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
+		if($fileListMode)
+		{
+			print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"non\" is_recycle=\"1\" mimetype=\"Trashcan\" modiftime=\"".FS_Storage::date_modif(ConfService::getRootDir()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
+		}
+		else 
+		{
+			// ADD RECYCLE BIN TO THE LIST
+			print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/crystal/mimes/16/trashcan.png\" src=\"content.php?action=xml_listing&amp;rep=/".ConfService::getRecycleBinDir()."\" openIcon=\"images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
+		}
 	}
 	AJXP_XMLWriter::close();
 	exit(1);
-	break;
-
-	case "root_tree":
-	//------------------------------------
-	//	ROOT TREE
-	//------------------------------------
-	include($hautpage);
-	$reloadPanel = false;
-	if(isSet($root_dir_index))
-	{
-		$dirList = ConfService::getRootDirsList();
-		if(!isSet($dirList[$root_dir_index]))
-		{
-			//$errorMessage = "Trying to switch to an unkown folder!";
-			//break;
-		}
-		ConfService::switchRootDir($root_dir_index);
-		$reloadPanel = true;
-	}
-   	HTMLWriter::writeSessionDataForJs();
-	HTMLWriter::writeRootDirChooser(ConfService::getRootDirsList(), ConfService::getCurrentRootDirIndex());
-	HTMLWriter::writeTree($reloadPanel);
-	include($baspage);
-	session_write_close();
-	exit(0);
-	break;
-	
-
-	case "display_action_bar":
-	//------------------------------------
-	//	ACTION BAR
-	//------------------------------------
-	if(isSet($_GET["loadrep"]))
-	{
-		$file = implode("\n", file($hautpage));
-		$jsString = "<script language=\"javascript\">var external_load_rep='".$_GET["loadrep"]."';</script>";
-		$file = str_replace("<body ", "$jsString\n<body onload=\"setTimeout('externalLoadRep()', 1000);\" ", $file);
-		print($file);
-	}
-	else 
-	{
-		include($hautpage);
-	}
-	HTMLWriter::toolbar((isset($_GET["user"])?$_GET["user"]:"shared_bookmarks"));
-	include($baspage);
-	exit(1);
-	break;
-	
+	break;		
 		
 	case "display_bookmark_bar":
 	//------------------------------------
