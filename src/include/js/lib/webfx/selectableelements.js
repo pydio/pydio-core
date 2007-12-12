@@ -168,6 +168,14 @@ SelectableElements.prototype.selectFirst = function()
 	}
 }
 
+SelectableElements.prototype.selectAll = function()
+{
+	var items = this.getItems();
+	for(var i=0; i<items.length; i++)
+	{
+		this.setItemSelected(items[i], true);
+	}
+}
 
 SelectableElements.prototype.getItemSelected = function (oEl) {
 	return Boolean(oEl._selected);
