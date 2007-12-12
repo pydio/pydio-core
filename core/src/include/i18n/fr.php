@@ -197,6 +197,8 @@ $mess=array(
 "download_access_key" => "g",
 "settings_access_key" => "m",
 "about_access_key" => "o",
+"empty_recycle_access_key" => "i", 
+"restore_access_key" => "r", 
 "171" => "Parcourir votre ordinateur",
 "172" => "Votre sélection",
 "173" => "Nom du nouveau répertoire",
@@ -246,6 +248,10 @@ $mess=array(
 "216" => "Vider la queue", 
 "217" => "Vider les fichiers transférés", 
 "218" => "Retirer de la queue", 
-"219" => "Terminé"
+"219" => "Terminé",
+"220" => "Vider", 
+"221" => "Vider la Corbeille", 
+"222" => "Restaurer", 
+"223" => "Restaurer le fichier à son emplacement d'origine"
 );
 ?>
