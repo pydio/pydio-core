@@ -240,7 +240,10 @@ Modal.prototype.updateLoadingProgress = function(state)
 						from:1.0,
 						to:0,
 						duration:0.3,
-						afterFinish:function(effect){$('loading_overlay').remove();}
+						afterFinish:function(effect){
+							$('loading_overlay').remove();
+							if(ajaxplorer) ajaxplorer.actionBar.update();
+						}
 					});
 			}
 		}
