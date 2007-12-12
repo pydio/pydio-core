@@ -9,29 +9,35 @@
 		<!-- SWITCH DISPLAY MODE -->
 		<a href="" action="switch_display" id="sd_button" icon_src="view_icon.png" genericContext="true"  key="<?php print($mess["display_access_key"]); ?>" title="<?php print($mess[151]); ?>"><?php print($mess[150]); ?></a> 
 		<!-- BOOKMARKS -->
-		<a href="" action="bookmark" id="bm_button" icon_src="bookmark.png" directoryContext="true" genericContext="true" title="<?php print($mess[153]); ?>" key="<?php print($mess["bookmarks_access_key"]); ?>"><?php print($mess[152]); ?></a> 
-		<div class="separator"></div>
+		<a href="" action="bookmark" id="bm_button" icon_src="bookmark.png" recycle_bin="hidden" directoryContext="true" genericContext="true" title="<?php print($mess[153]); ?>" key="<?php print($mess["bookmarks_access_key"]); ?>"><?php print($mess[152]); ?></a> 
+		<!-- EMPTY RECYCLE BIN -->
+		<a href="" action="empty_recycle" id="empty_recycle_button" icon_src="trashcan_empty.png" style="display:none;" recycle_bin="only" directoryContext="true" genericContext="true" title="<?php print($mess[221]); ?>" key="<?php print($mess["empty_recycle_access_key"]); ?>"><?php print($mess[220]); ?></a> 
+		<div class="separator" action=""></div>
 		<!-- UPLOAD -->
-		<a href="" action="upload" id="upload_button" icon_src="yast_backup.png" directoryContext="true" genericContext="true"  key="<?php print($mess["upload_access_key"]); ?>" title="<?php print($mess[27]); ?>" write_access="true"><?php print($mess[27]); ?></a> 
+		<a href="" action="upload" id="upload_button" icon_src="yast_backup.png" recycle_bin="disabled"  directoryContext="true" genericContext="true"  key="<?php print($mess["upload_access_key"]); ?>" title="<?php print($mess[27]); ?>" write_access="true"><?php print($mess[27]); ?></a> 
 		<!-- CREATE FOLDER -->
-		<a href="" action="create_dir" id="createdir_button" icon_src="folder_new.png" directoryContext="true" genericContext="true" key="<?php print($mess["folder_access_key"]); ?>"  write_access="true" title="<?php print($mess[155]);?>"><?php print($mess[154]); ?></a> 
+		<a href="" action="create_dir" id="createdir_button" icon_src="folder_new.png" recycle_bin="disabled" directoryContext="true" genericContext="true" key="<?php print($mess["folder_access_key"]); ?>"  write_access="true" title="<?php print($mess[155]);?>"><?php print($mess[154]); ?></a> 
 		<!-- CREATE FILE -->
-		<a href="" action="create_file" id="createfile_button" icon_src="filenew.png" directoryContext="true" genericContext="true" key="<?php print($mess["file_access_key"]); ?>" write_access="true" title="<?php print($mess[157]);?>"><?php print($mess[156]);?></a> 
-		<div class="separator" id="write_access_separator"></div>
-		<!-- RENAME -->
-		<a id="rename_button" class="disabled" href="" action="rename" selection="true" selectionContext="true" unique="true" file="true" folder="true" icon_src="applix.png" title="<?php print($mess[158]);?>"  write_access="true"  key="<?php print($mess["rename_access_key"]); ?>"><?php print($mess[6]);?></a> 
-		<!-- COPY -->
-		<a id="copy_button" class="disabled" href="" action="copy" selection="true" selectionContext="true" unique="false" file="true" folder="true" icon_src="editcopy.png" title="<?php print($mess[159]);?>" write_access="true" key="<?php print($mess["copy_access_key"]); ?>"><?php print($mess[66]);?></a> 
-		<!-- MOVE -->
-		<a id="move_button" class="disabled" href="" action="move" selection="true" unique="false" selectionContext="true" file="true" folder="true" icon_src="editpaste.png" title="<?php print($mess[160]);?>" write_access="true"  key="<?php print($mess["move_access_key"]); ?>"><?php print($mess[70]);?></a>
-		<!-- DELETE -->
-		<a id="delete_button" class="disabled" href="" action="delete" selection="true" unique="false" selectionContext="true" file="true" folder="true" icon_src="editdelete.png" title="<?php print($mess[161]);?>" write_access="true" key="<?php print($mess["delete_access_key"]); ?>"><?php print($mess[7]);?></a>
+		<a href="" action="create_file" id="createfile_button" icon_src="filenew.png" recycle_bin="disabled" directoryContext="true" genericContext="true" key="<?php print($mess["file_access_key"]); ?>" write_access="true" title="<?php print($mess[157]);?>"><?php print($mess[156]);?></a> 
+		<div class="separator" action="" id="write_access_separator"></div>
+		<!-- RESTORE RECYCLE FILE -->
+		<a id="restore_button" class="disabled" href="" action="restore" selection="true" recycle_bin="only"  selectionContext="true" unique="false" file="true" folder="true" icon_src="folder1_important.png" title="<?php print($mess[223]);?>"  write_access="true"  key="<?php print($mess["restore_access_key"]); ?>"><?php print($mess[222]);?></a> 
+		<!-- DOWNLOAD -->
+		<a id="download_button" class="disabled" href="" action="download" recycle_bin="hidden" selection="true" unique="false" selectionContext="true" file="true" folder="false"  key="<?php print($mess["download_access_key"]); ?>" icon_src="download_manager.png" title="<?php print($mess[88]);?>"><?php print($mess[88]);?></a> 		
 		<!-- EDIT -->
 		<a id="edit_button" class="disabled" href="" action="edit" selection="true" unique="true" selectionContext="true" file="true" folder="false" editable="true" icon_src="edit.png" title="<?php print($mess[162]);?>" write_access="true" key="<?php print($mess["edit_access_key"]); ?>"><?php print($mess[51]);?></a> 
+		<!-- VIEW -->
 		<a id="view_button" class="disabled" href="" action="view" selection="true" unique="true" selectionContext="true"  file="true" folder="false" editable="true" icon_src="frame_image.png" title="<?php print($mess[136]);?>" write_access="false" key="<?php print($mess["view_access_key"]); ?>"><?php print($mess[129]);?></a> 
-		<!-- DOWNLOAD -->
-		<a id="download_button" class="disabled" href="" action="download" selection="true" unique="false" selectionContext="true" file="true" folder="false"  key="<?php print($mess["download_access_key"]); ?>" icon_src="download_manager.png" title="<?php print($mess[88]);?>"><?php print($mess[88]);?></a> 		
-		<div class="separator"></div>
+		<div class="separator" action=""></div>
+		<!-- RENAME -->
+		<a id="rename_button" class="disabled" href="" action="rename" selection="true" recycle_bin="hidden"  selectionContext="true" unique="true" file="true" folder="true" icon_src="applix.png" title="<?php print($mess[158]);?>"  write_access="true"  key="<?php print($mess["rename_access_key"]); ?>"><?php print($mess[6]);?></a> 
+		<!-- COPY -->
+		<a id="copy_button" class="disabled" href="" action="copy" selection="true" recycle_bin="hidden" selectionContext="true" unique="false" file="true" folder="true" icon_src="editcopy.png" title="<?php print($mess[159]);?>" write_access="true" key="<?php print($mess["copy_access_key"]); ?>"><?php print($mess[66]);?></a> 
+		<!-- MOVE -->
+		<a id="move_button" class="disabled" href="" action="move" selection="true" recycle_bin="hidden" unique="false" selectionContext="true" file="true" folder="true" icon_src="editpaste.png" title="<?php print($mess[160]);?>" write_access="true"  key="<?php print($mess["move_access_key"]); ?>"><?php print($mess[70]);?></a>
+		<!-- DELETE -->
+		<a id="delete_button" class="disabled" href="" action="delete" selection="true" unique="false" selectionContext="true" file="true" folder="true" icon_src="editdelete.png" title="<?php print($mess[161]);?>" write_access="true" key="<?php print($mess["delete_access_key"]); ?>"><?php print($mess[7]);?></a>
+		<div class="separator" action=""></div>
 		<!-- LOGIN / LOGOUT -->
 		<a href="" action="login" id="login_button" title="<?php print($mess[163]);?>" key="none"><img width="22" height="22" src="images/crystal/actions/22/yast_security.png" border="0" align="ABSMIDDLE" id="login_logout_image"><br><span id="login_logout_span"><?php print($mess[163]);?></span></a> 	
 		<!-- ADMIN SETTINGS -->
