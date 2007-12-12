@@ -8,6 +8,7 @@ function UserSelection(aSelectedItems, sCurrentRep)
 	this._bDir = false;
 	this._bEditable = false;
 	this._bImage = false;
+	this._isRecycle = false;
 	if(!this._bEmpty)
 	{
 		this._bUnique = ((aSelectedItems.length == 1)?true:false);
@@ -21,6 +22,7 @@ function UserSelection(aSelectedItems, sCurrentRep)
 			if(selectedObj.getAttribute('is_editable') && selectedObj.getAttribute('is_editable') == '1') this._bEditable = true;
 			
 			if(selectedObj.getAttribute('is_image') && selectedObj.getAttribute('is_image') == '1') this._bImage = true;
+			if(selectedObj.getAttribute('is_recycle') && selectedObj.getAttribute('is_recycle') == '1') this._isRecycle = true;
 		}
 	}
 	
@@ -50,6 +52,10 @@ UserSelection.prototype.isEditable = function ()
 UserSelection.prototype.isImage = function ()
 {
 	return this._bImage;
+}
+UserSelection.prototype.isRecycle = function ()
+{
+	return this._isRecycle;
 }
 UserSelection.prototype.getCurrentRep = function ()
 {
