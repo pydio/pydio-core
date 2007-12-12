@@ -14,6 +14,7 @@ Modal.prototype.init = function()
 	this.iframeIndex = 0;	
 }
 
+
 Modal.prototype.prepareHeader = function(sTitle, sIconSrc)
 {
 	var hString = "<span class=\"titleString\">";
@@ -221,16 +222,37 @@ Modal.prototype.updateLoadingProgress = function(state)
 	this.loadingStep --;
 	var percent = (1 - (this.loadingStep / this.loadingStepsCount));
 	var width = parseInt(parseInt($('progressBarBorder').getWidth()) * percent);
+	/*
 	var command = "if($('progressBar')) $('progressBar').style.width = '"+width+"px';";
 	setTimeout(command, 0);
-	var widthString = width + 'px';
-	jQuery('#progressBar').trigger("resize");
+	*/
 	if(state){
-		$('progressState').innerHTML = state;
-		$('progressState').hide();$('progressState').show();
+		$('progressState').value = state;
+	}
+	if($('progressBar')){
+		 /*
+		 $('progressBar').style.width = width+'px';
+		 */
+		 var afterFinishFunc;
+		if(parseInt(percent)==1){
+			afterFinishFunc = function(effect){
+					new Effect.Opacity('loading_overlay', {
+						from:1.0,
+						to:0,
+						duration:0.3,
+						afterFinish:function(effect){$('loading_overlay').remove();}
+					});
+			}
+		}
+		 
+		new Effect.Morph('progressBar',{
+			style:'width:'+width + 'px',
+			duration:0.8,
+			afterFinish:afterFinishFunc
+		});
 	}
 	if(this.loadingStep == 0){
-		$('loading_overlay').remove();
+		//$('loading_overlay').remove();
 		this.pageLoading = false;
 	}
 }
@@ -247,6 +269,8 @@ Modal.prototype.close = function(){
 }
 
 var modal = new Modal();
+/*
 Event.observe(window, 'load', function(){
 	modal.init();
 });
+*/

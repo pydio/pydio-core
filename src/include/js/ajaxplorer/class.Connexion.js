@@ -35,6 +35,19 @@ Connexion.prototype.sendAsync = function()
 	});
 }
 
+Connexion.prototype.sendSync = function()
+{	
+	var oThis = this;
+	// WARNING, FINALLY PAS PAREMETERS AS AN OBJECT, PROTOTYPE 1.6.0 BUG Hash.toQueryString();
+	new Ajax.Request(this._baseUrl, 
+	{
+		method:this._method,
+		asynchronous: false,
+		onComplete:this.onComplete,
+		parameters:this._parameters.toObject()
+	});
+}
+
 Connexion.prototype.loadLibrary = function(fileName, onLoadedCode)
 {
 	var oThis = this;
@@ -54,16 +67,15 @@ Connexion.prototype.loadLibrary = function(fileName, onLoadedCode)
 				    }
 				    else{
 				    	//alert('eval for'+fileName);
-						window.eval( script );
-						/* TO TEST, THIS SEEM TO WORK ON SAFARI
+						//window.eval( script );
+						// TO TEST, THIS SEEM TO WORK ON SAFARI
 						window.my_code = script;
 						var script_tag = document.createElement('script');
 						script_tag.type = 'text/javascript';
 						script_tag.innerHTML = 'eval(window.my_code)';
 						document.getElementsByTagName('head')[0].appendChild(script_tag)
-						*/
 				    }
-					if(onLoadedCode != null) window.setTimeout(onLoadedCode, 1);
+					if(onLoadedCode != null) onLoadedCode();
 				}
 				catch(e)
 				{
@@ -74,4 +86,51 @@ Connexion.prototype.loadLibrary = function(fileName, onLoadedCode)
 			}
 		}
 	});	
+}
+
+Connexion.prototype.loadLibraries = function()
+{
+	if(!dynamicLibLoading) {return;}
+	var toLoad = $A([
+		"lib/webfx/slider/js/timer.js", 
+		"lib/webfx/slider/js/range.js", 
+		"lib/webfx/slider/js/slider.js", 
+		"lib/leightbox/lightbox.js", 
+		"lib/jquery/dimensions.js", 
+		"lib/jquery/splitter.js", 
+		"lib/ufo/ufo.js",
+		"lib/prototype/proto.menu.js",
+		"lib/codepress/codepress.js",
+		"lib/webfx/selectableelements.js", 
+		"lib/webfx/selectabletablerows.js", 
+		"lib/webfx/sortabletable.js", 
+		"lib/webfx/numberksorttype.js", 
+		"lib/webfx/slider/js/timer.js", 
+		"lib/webfx/slider/js/range.js", 
+		"lib/webfx/slider/js/slider.js", 
+		"lib/xloadtree/xtree.js", 
+		"lib/xloadtree/xloadtree.js", 
+		"lib/xloadtree/xmlextras.js",
+		"ajaxplorer/ajxp_multifile.js", 
+		"ajaxplorer/ajxp_utils.js", 
+		"ajaxplorer/class.User.js", 
+		"ajaxplorer/class.AjxpDraggable.js",
+		"ajaxplorer/class.AjxpAutoCompleter.js",
+		"ajaxplorer/class.Diaporama.js",
+		"ajaxplorer/class.Editor.js",
+		"ajaxplorer/class.ActionsManager.js", 
+		"ajaxplorer/class.FilesList.js", 
+		"ajaxplorer/class.FoldersTree.js", 
+		"ajaxplorer/class.SearchEngine.js", 
+		"ajaxplorer/class.InfoPanel.js", 
+		"ajaxplorer/class.ResizeableBar.js", 
+		"ajaxplorer/class.UserSelection.js"]);
+		
+		
+	modal.incrementStepCounts(toLoad.size());
+	toLoad.each(function(fileName){
+		var onLoad = function(){modal.updateLoadingProgress(fileName);};
+		if(fileName == toLoad.last()) onLoad = function(){modal.updateLoadingProgress(fileName);};
+		this.loadLibrary(fileName, onLoad);
+	}.bind(this));
 }
