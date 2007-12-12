@@ -144,7 +144,7 @@ switch ($action)
 			if($userId == "admin") $imgSrc = "user_sysadmin.png";
 			else if($userId == "guest") $imgSrc = "user_guest.png";
 			
-			print("<div class=\"user_id\" onclick=\"manager.toggleUser('".$userId."');\"><img align=\"absmiddle\" src=\"images/crystal/$imgSrc\" width=\"22\" height=\"22\">User <b>$userId</b></div>");
+			print("<div class=\"user_id\" onclick=\"manager.toggleUser('".$userId."');\"><img align=\"absmiddle\" src=\"images/crystal/actions/32/$imgSrc\" width=\"32\" height=\"32\">User <b>$userId</b></div>");
 			print("<div class=\"user_data\" id=\"user_data_".$userId."\" style=\"display: none;\">");
 			print("<fieldset><legend>Repositories Rights</legend><table class=\"repository\">");
 			foreach (ConfService::getRootDirsList() as $rootDirId => $rootDirData)
