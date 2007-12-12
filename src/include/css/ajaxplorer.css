@@ -315,21 +315,27 @@ textarea#myCode
 {
     display: block;
     z-index: 2002;
-    width: 250px;
+    width: 420px;
+    height: 300px;
+    top: 20%;
 }
 
 #progressBarBorder
 {
     border:1px solid black;
     background-color: #fff;
-    height: 15px;
+    height: 10px;
 }
 
 #progressBar
 {
-    background-color: highlight;
-    height: 15px;
-    width: 0%;
+	background-color: #0a246a;
+	filter:alpha(opacity=80);
+	opacity: 0.8;
+	-moz-opacity:0.8;
+	
+	height: 10px;
+	width: 0%;
 }
 
 #progressState
