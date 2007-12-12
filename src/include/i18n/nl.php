@@ -196,6 +196,8 @@ $mess=array(
 "download_access_key" => "o",
 "settings_access_key" => "s",
 "about_access_key" => "e", 
+"empty_recycle_access_key" => "y", 
+"restore_access_key" => "o", 
 "171" => "Browse je computer",
 "172" => "Jouw selectie",
 "173" => "Nieuwe map naam",
@@ -245,6 +247,10 @@ $mess=array(
 "216" => "Clear Queue", 
 "217" => "Clear Completed", 
 "218" => "Remove from queue", 
-"219" => "Completed"
+"219" => "Completed",
+"220" => "Empty", 
+"221" => "Empty Recycle Bin", 
+"222" => "Restore", 
+"223" => "Restore file to its original location"
 );
 ?>

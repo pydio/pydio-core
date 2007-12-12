@@ -193,9 +193,11 @@ $mess=array(
 "delete_access_key" => "S",
 "edit_access_key" => "E",
 "view_access_key" => "V",
-"download_access_key" => "o",
+"download_access_key" => "w",
 "settings_access_key" => "t",
 "about_access_key" => "A", 
+"empty_recycle_access_key" => "y", 
+"restore_access_key" => "o", 
 "171" => "Browse your computer",
 "172" => "Your Selection",
 "173" => "New folder name",
@@ -245,6 +247,10 @@ $mess=array(
 "216" => "Clear Queue", 
 "217" => "Clear Completed", 
 "218" => "Remove from queue", 
-"219" => "Completed"
+"219" => "Completed", 
+"220" => "Empty", 
+"221" => "Empty Recycle Bin", 
+"222" => "Restore", 
+"223" => "Restore file to its original location"
 );
 ?>
