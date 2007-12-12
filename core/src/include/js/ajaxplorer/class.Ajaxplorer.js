@@ -13,9 +13,27 @@ function Ajaxplorer(loadRep, usersEnabled, loggedUser, rootDirId, rootDirsList, 
 	this._initRootDirId = rootDirId;
 	this._initDefaultDisp = defaultDisplay;
 	if(!this.usersEnabled) this.rootDirId = rootDirId;
-	modal.setLoadingStepCounts(6);
+	modal.setLoadingStepCounts(8);
 
-	this.loadLibraries();
+	var connexion = new Connexion();
+	connexion.addParameter('get_action', 'get_template');
+	connexion.onComplete = function(transport){
+		$('all_forms').innerHTML += transport.responseText;
+	}
+	connexion.addParameter('template_name', 'forms_tpl.html');
+	connexion.sendSync();
+	modal.updateLoadingProgress('Dialogs loaded');
+	$('originalUploadForm').hide();
+
+	connexion.onComplete = function(transport){
+		document.body.innerHTML += transport.responseText;
+	}
+	connexion.addParameter('template_name', 'gui_tpl.html');
+	connexion.sendSync();
+	modal.updateLoadingProgress('Main template loaded');
+	//connexion.loadLibraries();
+	modal.init();
+	this.init();
 }
 
 Ajaxplorer.prototype.init = function()
@@ -186,19 +204,29 @@ Ajaxplorer.prototype.loadLibraries = function()
 		"lib/webfx/slider/js/timer.js", 
 		"lib/webfx/slider/js/range.js", 
 		"lib/webfx/slider/js/slider.js", 
+		"lib/leightbox/lightbox.js", 
 		"lib/jquery/dimensions.js", 
 		"lib/jquery/splitter.js", 
 		"lib/ufo/ufo.js",
+		"lib/prototype/proto.menu.js",
+		"lib/codepress/codepress.js",
 		"lib/webfx/selectableelements.js", 
 		"lib/webfx/selectabletablerows.js", 
 		"lib/webfx/sortabletable.js", 
 		"lib/webfx/numberksorttype.js", 
+		"lib/webfx/slider/js/timer.js", 
+		"lib/webfx/slider/js/range.js", 
+		"lib/webfx/slider/js/slider.js", 
 		"lib/xloadtree/xtree.js", 
 		"lib/xloadtree/xloadtree.js", 
 		"lib/xloadtree/xmlextras.js",
 		"ajaxplorer/ajxp_multifile.js", 
 		"ajaxplorer/ajxp_utils.js", 
 		"ajaxplorer/class.User.js", 
+		"ajaxplorer/class.AjxpDraggable.js",
+		"ajaxplorer/class.AjxpAutoCompleter.js",
+		"ajaxplorer/class.Diaporama.js",
+		"ajaxplorer/class.Editor.js",
 		"ajaxplorer/class.ActionsManager.js", 
 		"ajaxplorer/class.FilesList.js", 
 		"ajaxplorer/class.FoldersTree.js", 
@@ -210,8 +238,8 @@ Ajaxplorer.prototype.loadLibraries = function()
 		
 	modal.incrementStepCounts(toLoad.size());
 	toLoad.each(function(fileName){
-		var onLoad = 'ajaxplorer.libLoaded("'+fileName+'");';
-		if(fileName == toLoad.last()) onLoad += 'ajaxplorer.init();';
+		var onLoad = function(){modal.updateLoadingProgress(fileName);};
+		if(fileName == toLoad.last()) onLoad = function(){modal.updateLoadingProgress(fileName);this.init();}.bind(this);
 		connexion.loadLibrary(fileName, onLoad);
 	});
 }
