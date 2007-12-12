@@ -18,10 +18,11 @@ function ActionsManager(oElement, bUsersEnabled, oUser, oAjaxplorer)
 
 ActionsManager.prototype.init = function()
 {
-	this._items = this._htmlElement.getElementsByTagName('a');
+	this._items = this._htmlElement.select('[action]');
 	var oThis = this;
 	for(i=0; i<this._items.length;i++)
-	{
+	{	
+		if(!this._items[i].getAttribute('action')) continue;
 		// Set action link
 		var item = this._items[i];
 		var action = item.getAttribute('action');
@@ -93,10 +94,10 @@ ActionsManager.prototype.init = function()
 	var oThis = this;
 	$('current_path').onfocus = function(e)	{
 		ajaxplorer.disableShortcuts();
-		oThis.hasFocus = true;
+		this.hasFocus = true;
 		$('current_path').select();
 		return false;
-	};
+	}.bind(this);
 	var buttons = this._htmlElement.getElementsBySelector("input");
 	buttons.each(function(object){
 		$(object).onkeydown = function(e){
@@ -115,15 +116,14 @@ ActionsManager.prototype.init = function()
 	$('current_path').onblur = function(e)	{
 		if(!currentLightBox){
 			ajaxplorer.enableShortcuts();
-			oThis.hasFocus = false;
+			this.hasFocus = false;
 		}
-	};
+	}.bind(this);
 	if(!this.usersEnabled){
 		 $('login_button').hide();
 		 $('logging_string').hide();
 		 $('admin_button').hide();
 	}
-
 }
 
 ActionsManager.prototype.setUser = function(oUser)
@@ -157,6 +157,7 @@ ActionsManager.prototype.setUser = function(oUser)
 	$('logging_string').innerHTML = logging_string;	
 	for(var i=0; i<this._items.length; i++)
 	{
+		if(!this._items[i].getAttribute('action')) continue;
 		if(this._items[i].getAttribute('write_access') 
 			&& this._items[i].getAttribute('write_access')=='true' 
 			&& (this.oUser == null || !this.oUser.canWrite()))
@@ -238,7 +239,7 @@ ActionsManager.prototype.update = function(bClear)
 	else
 	{
 		var userSelection = this._ajaxplorer.getFilesList().getUserSelection();
-		if(!userSelection)
+		if(!userSelection || userSelection.isEmpty() || userSelection.isRecycle())
 		{
 			bSelection = false;
 		}
@@ -254,13 +255,34 @@ ActionsManager.prototype.update = function(bClear)
 	
 	for(i=0; i<this._items.length;i++)
 	{
+		if(!this._items[i].getAttribute('action')) continue;
 		var attSelection = ((this._items[i].getAttribute('selection') && this._items[i].getAttribute('selection') == 'true')?true:false);
 		var attUnique = ((this._items[i].getAttribute('unique') && this._items[i].getAttribute('unique') == 'true')?true:false);
 		var attFile = ((this._items[i].getAttribute('file') && this._items[i].getAttribute('file') == 'true')?true:false);
 		var attDir = ((this._items[i].getAttribute('folder') && this._items[i].getAttribute('folder') == 'true')?true:false);
 		var attEditable = ((this._items[i].getAttribute('editable') && this._items[i].getAttribute('editable') == 'true')?true:false);
+		var attRecycle = (this._items[i].getAttribute('recycle_bin')?this._items[i].getAttribute('recycle_bin'):'');
 				
 		this._items[i].className = 'disabled';
+		if(ajaxplorer && ajaxplorer.foldersTree && ajaxplorer.foldersTree.recycleEnabled())
+		{
+			if(ajaxplorer.foldersTree.currentIsRecycle())
+			{
+				if(attRecycle == 'hidden') { $(this._items[i]).hide();continue;}
+				if(attRecycle == 'disabled') continue;
+				if(attRecycle == 'only') $(this._items[i]).show();
+			}else{
+				if(attRecycle == 'hidden') $(this._items[i]).show();
+				if(attRecycle == 'only') {$(this._items[i]).hide();continue;}
+			}
+		}
+		else
+		{
+			if(attRecycle == 'only') 
+			{
+				$(this._items[i]).hide(); continue;
+			}
+		}
 		if(!attSelection)
 		{
 			this._items[i].className = 'enabled';		
@@ -292,6 +314,17 @@ ActionsManager.prototype.actionIsAllowed = function(buttonAction)
 	var attDir = ((button.getAttribute('folder') && button.getAttribute('folder') == 'true')?true:false);
 	var attEditable = ((button.getAttribute('editable') && button.getAttribute('editable') == 'true')?true:false);
 	var writeAccess = ((button.getAttribute('write_access') && button.getAttribute('write_access') == 'true')?true:false);
+	var attRecycle = (button.getAttribute('recycle_bin')?button.getAttribute('recycle_bin'):'');
+	
+	if(ajaxplorer && ajaxplorer.foldersTree && ajaxplorer.foldersTree.recycleEnabled())
+	{
+		if(ajaxplorer.foldersTree.currentIsRecycle() && (attRecycle=='hidden' || attRecycle =='disabled')) return false;
+		else if(!ajaxplorer.foldersTree.currentIsRecycle() && attRecycle == 'only') return false;
+	}
+	else
+	{
+		if(attRecycle == 'only') return false;
+	}
 	
 	var userSelection = this._ajaxplorer.getFilesList().getUserSelection();
 	
@@ -336,7 +369,16 @@ ActionsManager.prototype.getContextActions = function(srcElement)
 				}.bind(this._items[i])
 			};
 		}
+		else if(this._items[i].hasClassName('separator') && contextActions.length > 0 && !contextActions[contextActions.length-1].separator)
+		{
+			contextActions[contextActions.length] = {separator:true};
+		}
 	}
+	
+	if(contextActions[contextActions.length-1].separator){
+		contextActions.pop();
+	}
+	
 	return contextActions;
 }
 
@@ -385,6 +427,11 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			this.loadHtmlToDiv($('bmbar_content'), params, function(){bmBar.updateUI();});
 						
 		break;		
+		
+		case "empty_recycle":
+		    ajaxplorer.getFilesList().selectAll();
+		    this.fireAction('delete');
+		break;
 		
 		case "upload":		
 			if(this.getFlashVersion() >= 8)
@@ -449,6 +496,21 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 
 		break;
 		
+		case "restore":
+		   var userSelection = ajaxplorer.getFilesList().getUserSelection();
+		   var fileNames = $A(userSelection.getFileNames());
+		   var connexion = new Connexion();
+		   connexion.addParameter('get_action', 'restore');
+		   connexion.addParameter('rep', userSelection.getCurrentRep());
+		   connexion.onComplete = function(transport){
+		   		this.parseXmlMessage(transport.responseXML);
+		   }.bind(this);
+		   fileNames.each(function(filename){
+		   		connexion.addParameter('fic', filename);
+		   		connexion.sendAsync();
+		   }.bind(this));
+		break;
+		
 		case "copy":
 		case "move":
 			var onLoad = function(oForm){
@@ -459,7 +521,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
 				var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
 				if(!oThis.treeCopy){
-					oThis.treeCopy = new WebFXLoadTree('SELECT A DIR', 
+					this.treeCopy = new WebFXLoadTree('SELECT A DIR', 
 														'content.php?action=xml_listing', 
 														"javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 
 														'explorer');
@@ -467,12 +529,12 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				else{
 					window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
 				}				
-				oThis.treeCopyActive = true;
-				oThis.treeCopyActionDest = $A([eDestLabel]);
-				oThis.treeCopyActionDestNode = $A([eDestNodeHidden]);
-				container.innerHTML = oThis.treeCopy.toString();
-				oThis.treeCopy.focus();
-			};
+				this.treeCopyActive = true;
+				this.treeCopyActionDest = $A([eDestLabel]);
+				this.treeCopyActionDestNode = $A([eDestNodeHidden]);
+				container.innerHTML = this.treeCopy.toString();
+				this.treeCopy.focus();
+			}.bind(this);
 			var onCancel = function(){				
 				ajaxplorer.cancelCopyOrMove();
 			};
@@ -485,11 +547,11 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 					return false;
 				}
 				ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);				
-				oThis.treeCopyActive = false;
-				oThis.submitForm(oForm);
+				this.treeCopyActive = false;
+				this.submitForm(oForm);
 				hideLightBox(true);
 				return false;
-			};
+			}.bind(this);
 			modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
 		break;
 		
