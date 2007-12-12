@@ -334,13 +334,15 @@ FilesList.prototype.xmlNodeToTableRow = function(xmlNode)
 			tableCell.appendChild(innerSpan);
 			$(innerSpan).setStyle({display:'block'});
 			$(innerSpan).setAttribute('filename', newRow.getAttribute('filename'));
-			var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'});
+			if(!xmlNode.getAttribute("is_recycle") || xmlNode.getAttribute("is_recycle") != "1"){
+				var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'});
+				this.allDraggables[this.allDraggables.length] = newDrag;
+			}
 			if(xmlNode.getAttribute("is_file") == "non")
 			{
 				AjxpDroppables.add(innerSpan);
 				this.allDroppables[this.allDroppables.length] = innerSpan;
-			}
-			this.allDraggables[this.allDraggables.length] = newDrag;
+			}			
 		}
 		else
 		{
@@ -410,8 +412,9 @@ FilesList.prototype.xmlNodeToDiv = function(xmlNode)
 	else
 	{
 		// Add icon
-		if(xmlNode.getAttribute("is_file") == "non") src = "images/crystal/mimes/64/folder.png";
-		else src = "images/crystal/mimes/64/"+xmlNode.getAttribute('icon');
+		//if(xmlNode.getAttribute("is_file") == "non") src = "images/crystal/mimes/64/folder.png";
+		//else 
+		src = "images/crystal/mimes/64/"+xmlNode.getAttribute('icon');
 		var imgString = "<img src=\""+src+"\" ";
 		imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + xmlNode.getAttribute("text")+"\">" + xmlNode.getAttribute("text")+"</div>";
 		innerSpan.innerHTML = imgString;		
