@@ -1202,6 +1202,7 @@ div.menu a {
 }
 
 .menu.desktop li.separator {
+padding: 0px;
 	height: 1px;
 }
 .menu.desktop a img{
@@ -1224,7 +1225,7 @@ div.menu a {
 }
 .menu.desktop li.separator {
 	border-bottom: 1px solid #fff;
-	background: #aaa;
+	background: #cde;
 	margin: 1px 1px 0 1px;
 	line-height: 1px !important;
 }
