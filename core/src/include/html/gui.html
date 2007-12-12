@@ -52,6 +52,11 @@
 <script language="javascript" type="text/javascript">var dynamicLibLoading = true;</script>
 <script language="javascript" type="text/javascript" src="include/js/lib/prototype/prototype.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.pack.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.corner.js"></script>
+<script language="javascript">jQuery.noConflict();</script>
+<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop,controls"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Connexion.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Modal.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Ajaxplorer.js"></script>
 <? } ?>
 
@@ -75,112 +80,36 @@
 <body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
 		
 <div id="loading_overlay">
-	<div id="progressBox">
-		<div class="dialogTitle">Welcome to AjaXplorer!</div>
-		<div class="dialogContent" style="text-align:left;">
-			<div id="progressBarBorder"><div id="progressBar" style="width:0px;"></div></div>
-			<div id="progressState">Loading Components</div>
+	<div id="progressBox" style="background-color:#666666;">
+		<div id="loaderTitle" class="dialogTitle" style=" padding:0px;"><div style="padding:5px;">AjaXplorer v2.1</div></div>
+		<div id="loaderContent" class="dialogContent" style="text-align:left;background-color:#ccddee; padding:0px;">
+		<div style="padding:5px;">
+			<div align="center" style="font-size:64px;font-family:Trebuchet MS; font-weight:bold;color:#fff;">
+			<img src="images/ajxp_logo_64.gif" width="64" height="64" border="0"> AjaXplorer
+			</div>
+			<div align="left" style="font-size:12px;font-family:Trebuchet MS; font-weight:normal;color:#000;padding-left:87px;">
+			Written by Charles du Jeu - LGPL License. <br>
+			AjaXplorer web browser version 2.3.
+			</div>
+			<div id="progressBarBorder" style="margin-top:145px; font-size: 0.5em;" align="left"><div id="progressBar" style="width:0px;"></div></div>
+			<textarea style="width: 100%; height: 20px; border:none; background-color:#cde;overflow:hidden" id="progressState">Loading Components...</textarea>
+			</div>
 		</div>
 	</div>
 </div>
-<script type="text/javascript">	jQuery('#progressBox').corner("round 10px");</script>
-<div title="<?php print($mess[98]); ?>"  id="message_div" onclick="ajaxplorer.closeMessageDiv();" class="messageBox" title="<?php print($mess[98]); ?>"><div id="message_content"></div></div>
-<div id="toolbars">
-<div id="action_bar">
-	<div id="buttons_bar">
-		<!-- PARENT FOLDER -->
-		<a href="" action="up_dir" id="up_button" icon_src="up.png" genericContext="true" title="<?php print($mess[24]); ?>" key="<?php print($mess["parent_access_key"]); ?>" display_string=""><?php print($mess[148]); ?></a> 
-		<!-- REFRESH PAGE -->
-		<a href="" action="refresh" id="refresh_button" icon_src="reload.png" genericContext="true" key="<?php print($mess["refresh_access_key"]); ?>" title="<?php print($mess[149]); ?>" display_string=""><?php print($mess[149]); ?></a> 
-		<!-- SWITCH DISPLAY MODE -->
-		<a href="" action="switch_display" id="sd_button" icon_src="view_icon.png" genericContext="true"  key="<?php print($mess["display_access_key"]); ?>" title="<?php print($mess[151]); ?>"><?php print($mess[150]); ?></a> 
-		<!-- BOOKMARKS -->
-		<a href="" action="bookmark" id="bm_button" icon_src="bookmark.png" directoryContext="true" genericContext="true" title="<?php print($mess[153]); ?>" key="<?php print($mess["bookmarks_access_key"]); ?>"><?php print($mess[152]); ?></a> 
-		<div class="separator"></div>
-		<!-- UPLOAD -->
-		<a href="" action="upload" id="upload_button" icon_src="yast_backup.png" directoryContext="true" genericContext="true"  key="<?php print($mess["upload_access_key"]); ?>" title="<?php print($mess[27]); ?>" write_access="true"><?php print($mess[27]); ?></a> 
-		<!-- CREATE FOLDER -->
-		<a href="" action="create_dir" id="createdir_button" icon_src="folder_new.png" directoryContext="true" genericContext="true" key="<?php print($mess["folder_access_key"]); ?>"  write_access="true" title="<?php print($mess[155]);?>"><?php print($mess[154]); ?></a> 
-		<!-- CREATE FILE -->
-		<a href="" action="create_file" id="createfile_button" icon_src="filenew.png" directoryContext="true" genericContext="true" key="<?php print($mess["file_access_key"]); ?>" write_access="true" title="<?php print($mess[157]);?>"><?php print($mess[156]);?></a> 
-		<div class="separator" id="write_access_separator"></div>
-		<!-- RENAME -->
-		<a id="rename_button" class="disabled" href="" action="rename" selection="true" selectionContext="true" unique="true" file="true" folder="true" icon_src="applix.png" title="<?php print($mess[158]);?>"  write_access="true"  key="<?php print($mess["rename_access_key"]); ?>"><?php print($mess[6]);?></a> 
-		<!-- COPY -->
-		<a id="copy_button" class="disabled" href="" action="copy" selection="true" selectionContext="true" unique="false" file="true" folder="true" icon_src="editcopy.png" title="<?php print($mess[159]);?>" write_access="true" key="<?php print($mess["copy_access_key"]); ?>"><?php print($mess[66]);?></a> 
-		<!-- MOVE -->
-		<a id="move_button" class="disabled" href="" action="move" selection="true" unique="false" selectionContext="true" file="true" folder="true" icon_src="editpaste.png" title="<?php print($mess[160]);?>" write_access="true"  key="<?php print($mess["move_access_key"]); ?>"><?php print($mess[70]);?></a>
-		<!-- DELETE -->
-		<a id="delete_button" class="disabled" href="" action="delete" selection="true" unique="false" selectionContext="true" file="true" folder="true" icon_src="editdelete.png" title="<?php print($mess[161]);?>" write_access="true" key="<?php print($mess["delete_access_key"]); ?>"><?php print($mess[7]);?></a>
-		<!-- EDIT -->
-		<a id="edit_button" class="disabled" href="" action="edit" selection="true" unique="true" selectionContext="true" file="true" folder="false" editable="true" icon_src="edit.png" title="<?php print($mess[162]);?>" write_access="true" key="<?php print($mess["edit_access_key"]); ?>"><?php print($mess[51]);?></a> 
-		<a id="view_button" class="disabled" href="" action="view" selection="true" unique="true" selectionContext="true"  file="true" folder="false" editable="true" icon_src="frame_image.png" title="<?php print($mess[136]);?>" write_access="false" key="<?php print($mess["view_access_key"]); ?>"><?php print($mess[129]);?></a> 
-		<!-- DOWNLOAD -->
-		<a id="download_button" class="disabled" href="" action="download" selection="true" unique="false" selectionContext="true" file="true" folder="false"  key="<?php print($mess["download_access_key"]); ?>" icon_src="download_manager.png" title="<?php print($mess[88]);?>"><?php print($mess[88]);?></a> 		
-		<div class="separator"></div>
-		<!-- LOGIN / LOGOUT -->
-		<a href="" action="login" id="login_button" title="<?php print($mess[163]);?>" key="none"><img width="22" height="22" src="images/crystal/actions/22/yast_security.png" border="0" align="ABSMIDDLE" id="login_logout_image"><br><span id="login_logout_span"><?php print($mess[163]);?></span></a> 	
-		<!-- ADMIN SETTINGS -->
-		<a href="" action="admin" id="admin_button" title="<?php print($mess[165]);?>"  key="<?php print($mess["settings_access_key"]); ?>"><img width="22" height="22" src="images/crystal/actions/22/admin.png" border="0" align="ABSMIDDLE" id="admin_image"><br><span id="admin_span"><?php print($mess[165]);?></span></a> 	
-		<!-- INFO ABOUT AJAXPLORER -->
-		<a href="" action="splash" id="splash_button" icon_src="info.png" title="<?php print($mess[167]);?>"  key="<?php print($mess["about_access_key"]); ?>"><?php print($mess[166]);?></a>
-	</div>
-	<div id="locationbar_cont">
-		<div class="locationbar_title">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php print($mess[170]);?>&nbsp;</div><div id="location_form"><form style="display:inline;background-color:#ffffff;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><img src="images/crystal/mimes/16/folder.png" width="16" height="16" align="absmiddle"><input type="text" name="current_path" value="/" id="current_path"><input  align="absmiddle" title="<?php print($mess[104]); ?>" type="image" src="images/crystal/actions/16/forward.png" id="goto_button" height="16" width="16"></form></div><div id="logging_string"></div>
-	</div>
+<script type="text/javascript">
+jQuery('#loaderTitle').corner("top round 10px"); 
+jQuery('#loaderContent').corner("round bottom 10px"); 
+</script>
+<style>.dialogBox[id]{position:fixed;}</style>
+<div id="all_forms">
+<!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
+<form id="login_form" action="login" style="display:none;" box_width="210">
+<input type="hidden" name="get_action" value="login">
+<div class="dialogLegend"><?php print($mess[180]);?></div>
+<table cellpadding="0" border="0" cellspacing="0" style="font-size:11px;">
+<tr><td align="right"><?php print($mess[181]);?> :</td><td><input type="text" name="userid" style="width: 100px;" class="dialogFocus"></td></tr>
+<tr><td align="right"><?php print($mess[182]);?> :</td><td><input type="password" name="password"  style="width: 100px;"></td></tr>
+</table>
+</form>
 </div>
-
-<!--<div class="toolbars_separator"></div>-->
-<div id="hidden_frames" style="display:none;"></div>
-<!--<div id="hidden_forms" style="display:none;"></div>-->
-<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
-</div>
-<div id="bm_bar_cont">
-	<div id="bookmarks_bar"><div id="bmbar_title"><?php print($mess[145]); ?>&nbsp;&nbsp;<span id="bmbar_extension"></span></div><div style="display:inline;" id="bmbar_content"></div></div>
-</div>
-<div id="browser_round"><div id="browser">
-<div id="verticalSplitter" style="background-color: #aaa;">
-	<div id="sidebarSplitter" style="float:left; overflow:hidden;">
-		<div style="" id="topPane"  style="overflow: hidden; border: 1px solid black;">
-		    <div id="dir_chooser" class="panelHeader"><?php print $mess[130] ?> </div>
-	    	<div id="tree_container" style="overflow:auto;height:100%;">
-	    	
-	    	</div>
-		</div>
-		
-    	<div id="search_div" style="background-color: #fff;">
-    		<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
-    		<tr>
-		    	<td id="info_panel_header" onclick="ajaxplorer.toggleSidePanel('info'); return false;" class="toggleHeader">
-		    		<img width="20" height="20" align="absmiddle" src="images/crystal/actions/effect.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[131] ?></a>
-		    	</td>
-		    	<td id="search_header" onclick="ajaxplorer.toggleSidePanel('search'); return false;" class="toggleHeader">
-		    		<img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[87] ?></a>
-		    	</td>
-		    </tr>
-	    	</table>
-	    	<div id="search_container">
-		    	<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" title="<?php print $mess[184] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" title="<?php print $mess[185] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>
-	    	</div>
-	    	<div id="info_panel"></div>
-    	</div>     	
-    </div>
-	<div id="content_pane" style="background-color: #fff;">
-	<TABLE width="100%" cellspacing="0"  id="selectable_div" class="sort-table">
-		<col\><col\><col\><col\>
-		<thead>	
-		<tr>
-			<td><?php print($mess[1]); ?></td>
-			<td><?php print($mess[2]); ?></td>
-			<td><?php print($mess[3]); ?></td>
-			<td id="last_header"><?php print($mess[4]); ?></td>
-		</tr>
-		</thead>
-	
-		<tbody>
-		</tbody>
-	</table>
-	</div>	
-</div>
-</div></div>
-<div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
