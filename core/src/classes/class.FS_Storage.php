@@ -75,6 +75,11 @@ class FS_Storage
 		{
 			if($fichier!="." && $fichier!=".." && Utils::show_hidden_files($fichier)==1)
 			{
+				if(ConfService::getRecycleBinDir() != "" 
+					&& $nom_rep == ConfService::getRootDir()."/".ConfService::getRecycleBinDir() 
+					&& $fichier == RecycleBinManager::getCacheFileName()){
+					continue;
+				}
 				$poidsfic=filesize("$nom_rep/$fichier");
 				$poidstotal+=$poidsfic;
 				if(is_dir("$nom_rep/$fichier"))
@@ -153,6 +158,11 @@ class FS_Storage
 		else
 		{
 			if(file_exists("$location")) {unlink("$location");}
+		}
+		if(basename(dirname($location)) == ConfService::getRecycleBinDir())
+		{
+			// DELETING FROM RECYCLE
+			RecycleBinManager::deleteFromRecycle($location);
 		}
 	}
 	
@@ -253,6 +263,7 @@ class FS_Storage
 			$messagePart = $mess[74]." $destDir";
 			if($destDir == "/".ConfService::getRecycleBinDir())
 			{
+				RecycleBinManager::fileToRecycle($srcFile);
 				$messagePart = $mess[123]." ".$mess[122];
 			}
 			if(isset($dirRes))
@@ -266,6 +277,10 @@ class FS_Storage
 		}
 		else
 		{			
+			if($destDir == "/".ConfService::getRecycleBinDir())
+			{
+				RecycleBinManager::fileToRecycle($srcFile);
+			}
 			if(isSet($dirRes))
 			{
 				$success[] = $mess[117]." ".basename($srcFile)." ".$mess[73]." $destDir (".$dirRes." ".$mess[116].")";	
