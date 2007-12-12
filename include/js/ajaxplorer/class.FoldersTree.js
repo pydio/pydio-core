@@ -208,6 +208,13 @@ FoldersTree.prototype.getTreeChildNodeByName = function(childName)
 	{
 		return;		
 	}
+	if(webFXTreeHandler.recycleNode){
+		rec = webFXTreeHandler.all[webFXTreeHandler.recycleNode];
+		if(childName == rec.filename)
+		{
+			return webFXTreeHandler.recycleNode;
+		}
+	}
 	if(childName.lastIndexOf("/") != -1)
 	{
 		childName = childName.substr(childName.lastIndexOf("/")+1, childName.length);
@@ -219,7 +226,7 @@ FoldersTree.prototype.getTreeChildNodeByName = function(childName)
 		{
 			return currentNodeObject.childNodes[i].id;
 		}
-	}
+	}	
 }
 
 FoldersTree.prototype.goToDeepPath = function(url)
