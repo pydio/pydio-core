@@ -18,15 +18,19 @@ require_once("classes/class.UserSelection.php");
 require_once("classes/class.HTMLWriter.php");
 require_once("classes/class.AJXP_XMLWriter.php");
 require_once("classes/class.AJXP_User.php");
-
+if(isSet($_GET["ajxp_sessid"]))
+{
+	$_COOKIE["PHPSESSID"] = $_GET["ajxp_sessid"];
+}
+session_start();
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
-session_start();
 ConfService::init("conf/conf.php");
 $hautpage=ConfService::getConf("TOP_PAGE");
 $baspage=ConfService::getConf("BOTTOM_PAGE");
+$limitSize = Utils::convertBytes(ini_get('upload_max_filesize'));
 
 if(AuthService::usersEnabled())
 {
@@ -117,7 +121,6 @@ if(AuthService::usersEnabled())
 		case "rename_suite":
 		case "mkdir":
 		case "creer_fichier":
-		case "upload":
 			if($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))
 			{
 				AJXP_XMLWriter::header();
@@ -125,7 +128,26 @@ if(AuthService::usersEnabled())
 				AJXP_XMLWriter::requireAuth();
 				AJXP_XMLWriter::close();
 				exit(1);
-			}			
+			}
+		break;		
+		case "upload":		
+		case "fancy_uploader":
+			if($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))
+			{
+				if(isSet($_FILES['Filedata']))
+				{
+					header('HTTP/1.0 ' . '415 Not authorized');
+					die('Error 415 Not authorized!');
+				}
+				else
+				{
+					AJXP_XMLWriter::header();
+					AJXP_XMLWriter::sendMessage(null, $mess[207]);
+					AJXP_XMLWriter::requireAuth();
+					AJXP_XMLWriter::close();
+				}
+				exit(1);
+			}
 		break;
 		
 		// NEEDS READ RIGHTS
@@ -139,7 +161,7 @@ if(AuthService::usersEnabled())
 			if($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))
 			{
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage(null, "You have no read permission!");
+				AJXP_XMLWriter::sendMessage(null, $mess[208]);
 				AJXP_XMLWriter::requireAuth();
 				AJXP_XMLWriter::close();
 				exit(1);
@@ -443,6 +465,21 @@ switch($action)
 	//------------------------------------
 	//	UPLOAD
 	//------------------------------------
+	
+	case "fancy_uploader":
+	case "get_template":
+	header("Content-type:text/html");
+	if($get_action == "fancy_uploader"){
+		include("include/html/fancy_tpl.html");
+		include("include/html/bas.htm");
+	}else{
+		if(isset($template_name)){
+			include("include/html/".$template_name);
+		}
+	}
+	exit(0);	
+	break;
+	
 
 	case "upload":
 
@@ -455,6 +492,7 @@ switch($action)
 		break;
 	}	
 	$logMessage = "";
+	$fancyLoader = false;
 	foreach ($_FILES as $boxName => $boxData)
 	{
 		if(substr($boxName, 0, 9) == "userfile_")
@@ -465,6 +503,15 @@ switch($action)
 				$$varName = $usFileValue;
 			}
 		}
+		else if($boxName == 'Filedata')
+		{
+			$fancyLoader = true;
+			foreach($boxData as $usFileName=>$usFileValue)
+			{
+				$varName = "userfile_".$usFileName;
+				$$varName = $usFileValue;
+			}			
+		}
 		else 
 		{
 			continue;
@@ -472,9 +519,9 @@ switch($action)
 		if ($userfile_error != UPLOAD_ERR_OK)
 		{
 			$errorsArray = array();
-			$errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = "PHP : File is too big! Max is".ini_get("upload_max_filesize");
-			$errorsArray[UPLOAD_ERR_NO_FILE] = "PHP : No file found on server!($boxName)";
-			$errorsArray[UPLOAD_ERR_PARTIAL] = "PHP : File is partial";
+			$errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = "409 : File is too big! Max is".ini_get("upload_max_filesize");
+			$errorsArray[UPLOAD_ERR_NO_FILE] = "410 : No file found on server!($boxName)";
+			$errorsArray[UPLOAD_ERR_PARTIAL] = "410 : File is partial";
 			if($userfile_error == UPLOAD_ERR_NO_FILE && ereg('Opera',$_SERVER['HTTP_USER_AGENT']))
 			{
 				// BEURK : Opera hack, do not display "no file found error"
@@ -498,31 +545,34 @@ switch($action)
 		}
 		if ($userfile_tmp_name!="none" && $userfile_size!=0)
 		{
+			if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
 			$userfile_name=Utils::traite_nom_fichier($userfile_name);
-			if (!copy($userfile_tmp_name, "$destination/$userfile_name"))
+			if (!copy($userfile_tmp_name, "$destination/".$userfile_name))
 			{
-				$errorMessage="$mess[33] $userfile_name";
+				$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
 				break;
 			}
 			else
 			{
-				/* DO NOT CHANGE RETURN CHARACTER (CF EDITION ACTION)
-				if(Utils::is_editable($userfile_name))
-				{
-					Utils::enlever_controlM("$destination/$userfile_name");
-				}
-				*/
-				$logMessage.="$mess[34] $userfile_name $mess[35] $rep";
+				$logMessage.="$mess[34] ".$userfile_name." $mess[35] $rep";
 			}
 		}
 	}
-	print("<html><script language=\"javascript\">\n");
-	if(isSet($errorMessage)){
-		print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-	}else{		
-		print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+	if($fancyLoader)
+	{
+		header('HTTP/1.0 '.$errorMessage);
+		die('Error '.$errorMessage);
 	}
-	print("</script></html>");
+	else
+	{
+		print("<html><script language=\"javascript\">\n");
+		if(isSet($errorMessage)){
+			print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
+		}else{		
+			print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+		}
+		print("</script></html>");
+	}
 	exit;
 	break;
 
