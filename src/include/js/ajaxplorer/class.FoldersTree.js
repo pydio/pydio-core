@@ -198,7 +198,7 @@ FoldersTree.prototype.reloadNode = function(nodeName)
 		if(nodeName == 'AJAXPLORER_RECYCLE_NODE' && webFXTreeHandler.recycleNode){
 			nodeName = webFXTreeHandler.recycleNode;
 		}
-		if(webFXTreeHandler.all[nodeName]) webFXTreeHandler.all[nodeName].reload();
+		if(webFXTreeHandler.all[nodeName] && webFXTreeHandler.all[nodeName].reload) webFXTreeHandler.all[nodeName].reload();
 	}	
 }
 
