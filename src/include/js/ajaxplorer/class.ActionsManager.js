@@ -433,8 +433,8 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		    this.fireAction('delete');
 		break;
 		
-		case "upload":		
-			if(this.getFlashVersion() >= 8)
+		case "upload":				    
+			if(this.getFlashVersion() >= 8 && document.location.href.substring(0,5)!='https')
 			{
 				modal.showDialogForm('Upload', 
 									'fancy_upload_form', 
