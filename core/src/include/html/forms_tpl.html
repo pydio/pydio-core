@@ -42,14 +42,14 @@
 </div>
 
 <!-- MAKE NEW FILE -->
-<div id="createfile_form" action="creer_fichier" box_width="280">
+<div id="createfile_form" action="mkfile" box_width="280">
 <div class="dialogLegend"><?php print($mess[28]); ?><b class="replace_rep"></b></div>
 <br><?php print($mess[174]);?></br>
 <input type="text" name="nomfic" size="30" class="dialogFocus">
 </div>
 
 <!-- RENAME FILE -->
-<div id="rename_form" action="rename_suite" box_width="280">
+<div id="rename_form" action="rename" box_width="280">
 <?php print($mess[6]); ?> <b class="replace_file"></b> <?php print($mess[42]); ?><br>
 <input type="text" name="fic_new" value="" id="fic_new" class="dialogFocus initFicName">
 </div>
@@ -66,7 +66,7 @@
 </div>
 
 <!-- DELETE SELECTION -->
-<div id="delete_form" action="supprimer_suite" box_width="280">
+<div id="delete_form" action="delete" box_width="280">
 <span id="delete_message"></span>
 </div>
 
