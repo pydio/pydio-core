@@ -90,8 +90,7 @@ FilesList.prototype.initGUI = function()
 
 FilesList.prototype.setContextualMenu = function(protoMenu)
 {
-	this.protoMenu = protoMenu;
-	this.protoMenu.addElements('#selectable_div, #content_pane');
+	this.protoMenu = protoMenu;	
 }
 
 FilesList.prototype.switchDisplayMode = function(mode)
@@ -153,25 +152,15 @@ FilesList.prototype.initRows = function()
 	if(this._displayMode == "thumb")
 	{
 		this.resizeThumbnails();		
+		if(this.protoMenu) this.protoMenu.addElements('#selectable_div');	
 		window.setTimeout(function(){this.loadNextImage();}.bind(this),10);		
 	}
 	else
 	{
+		if(this.protoMenu) this.protoMenu.addElements('#table_rows_container');
 		this.applyHeadersWidth();	
 	}
-	/*
-	this.protoMenu  = new Proto.Menu({
-	  selector: '#selectable_div, #content_pane', // context menu will be shown when element with class name of "contextmenu" is clicked
-	  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
-	  menuItems: []
-	});
-	var protoMenu = this.protoMenu;
-	protoMenu.options.beforeShow = function(e){setTimeout(function(){
-	  	this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e));
-	  	this.refreshList();
-	  }.bind(protoMenu),0);};
-	  */
-	if(this.protoMenu) this.protoMenu.addElements('.ajxp_draggable');	
+	if(this.protoMenu)this.protoMenu.addElements('.ajxp_draggable');
 }
 
 FilesList.prototype.loadNextImage = function()
@@ -235,6 +224,7 @@ FilesList.prototype.parseXmlAndLoad = function(oXmlDoc)
 	this.allDraggables = new Array();
 	if(this.protoMenu){
 		this.protoMenu.removeElements('.ajxp_draggable');
+		this.protoMenu.removeElements('#selectable_div');
 	}
 	var root = oXmlDoc.documentElement;
 	// loop through all tree children
@@ -533,8 +523,12 @@ FilesList.prototype.fireChange = function()
 //
 // OVERRIDE DBL CLICK FUNCTION
 // 
-FilesList.prototype.fireDblClick = function (e) {
-	
+FilesList.prototype.fireDblClick = function (e) 
+{
+	if(ajaxplorer.foldersTree.currentIsRecycle())
+	{
+		return; // DO NOTHING IN RECYCLE BIN
+	}
 	selRaw = this.getSelectedItems();
 	if(!selRaw || !selRaw.length)
 	{
