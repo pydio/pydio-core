@@ -63,7 +63,7 @@ Editor.prototype.loadFile = function(fileName)
 {
 	this.currentFile = fileName;
 	var connexion = new Connexion();
-	connexion.addParameter('get_action', 'editer');
+	connexion.addParameter('get_action', 'edit');
 	connexion.addParameter('fic', fileName);	
 	connexion.onComplete = function(transp){this.parseTxt(transp);}.bind(this);
 	this.changeModifiedStatus(false);
@@ -74,7 +74,7 @@ Editor.prototype.loadFile = function(fileName)
 Editor.prototype.saveFile = function()
 {
 	var connexion = new Connexion();
-	connexion.addParameter('get_action', 'editer');
+	connexion.addParameter('get_action', 'edit');
 	connexion.addParameter('save', '1');
 	var value;
 	if(this.currentUseCp) value = this.oForm.getElementsBySelector('iframe')[0].getCode();
