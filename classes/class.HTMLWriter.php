@@ -78,11 +78,11 @@ class HTMLWriter
     	{
     		if(is_numeric($index))
     		{
-    			echo "MessageHash[$index]='".str_replace("'", "\'", $message)."';\n";
+    			echo utf8_encode("MessageHash[$index]='".str_replace("'", "\'", $message)."';\n");
     		}
     		else 
     		{
-    			echo "MessageHash['$index']='".str_replace("'", "\'", $message)."';\n";
+    			echo utf8_encode("MessageHash['$index']='".str_replace("'", "\'", $message)."';\n");
     		}
     			
     	}
