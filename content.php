@@ -1,7 +1,7 @@
 <?php
 //---------------------------------------------------------------------------------------------------
 //
-//	AjaXplorer v1.4
+//	AjaXplorer v2.3
 //
 //	Charles du Jeu
 //	http://sourceforge.net/projects/ajaxplorer
@@ -187,12 +187,14 @@ if(AuthService::usersEnabled())
 	}
 }
 
-//------------------------------------
-//	SWITCH ON ACTION VARIABLE
-//------------------------------------
+
 
 switch($action)
 {
+	//-----------------------------------------------------------------------------
+	//-------------------------- FILE ACTIONS -------------------------------------
+	//-----------------------------------------------------------------------------
+	
 	//------------------------------------
 	//	SWITCH THE ROOT REPOSITORY
 	//------------------------------------	
@@ -230,24 +232,6 @@ switch($action)
 		FS_Storage::readFile(ConfService::getRootDir()."/".$file, "mp3");
 		exit(0);
 	break;
-
-	//------------------------------------
-	//	GET AN HTML TEMPLATE
-	//------------------------------------
-	case "get_template":
-	
-		header("Content-type:text/html");
-		if(isset($template_name) && is_file("include/html/".$template_name))
-		{
-			if(!isSet($encode) || $encode != "false")
-			{
-				$mess = array_map("utf8_encode", $mess);
-			}
-			include("include/html/".$template_name);
-		}
-		exit(0);	
-		
-	break;
 	
 	//------------------------------------
 	//	ONLINE EDIT
@@ -271,7 +255,6 @@ switch($action)
 		}
 		exit(0);
 	break;
-
 
 	//------------------------------------
 	//	COPY / MOVE
@@ -321,7 +304,6 @@ switch($action)
 		
 	break;
 
-
 	//------------------------------------
 	//	RENOMMER / RENAME
 	//------------------------------------
@@ -338,7 +320,6 @@ switch($action)
 		$reload_file_list = basename($filename_new);
 
 	break;
-
 
 	//------------------------------------
 	//	CREER UN REPERTOIRE / CREATE DIR
@@ -377,63 +358,63 @@ switch($action)
 
 	break;
 	
-
 	//------------------------------------
 	//	UPLOAD
 	//------------------------------------	
 	case "upload":
 
-	if($dir!=""){$rep_source="/$dir";}
-	else $rep_source = "";
-	$destination=ConfService::getRootDir().$rep_source;
-	if(!FS_Storage::isWriteable($destination))
-	{
-		$errorMessage = "$mess[38] $dir $mess[99].";
-		break;
-	}	
-	$logMessage = "";
-	$fancyLoader = false;
-	foreach ($_FILES as $boxName => $boxData)
-	{
-		if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
-		if($boxName == "Filedata") $fancyLoader = true;
-		$err = Utils::parseFileDataErrors($boxData, $fancyLoader);
-		if($err != null)
+		if($dir!=""){$rep_source="/$dir";}
+		else $rep_source = "";
+		$destination=ConfService::getRootDir().$rep_source;
+		if(!FS_Storage::isWriteable($destination))
 		{
-			$errorMessage = $err;
+			$errorMessage = "$mess[38] $dir $mess[99].";
 			break;
-		}
-		$userfile_name = $boxData["name"];
-		if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
-		$userfile_name=Utils::processFileName($userfile_name);
-		if (!FS_Storage::simpleCopy($boxData["tmp_name"], "$destination/".$userfile_name))
+		}	
+		$logMessage = "";
+		$fancyLoader = false;
+		foreach ($_FILES as $boxName => $boxData)
 		{
-			$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
-			break;
+			if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
+			if($boxName == "Filedata") $fancyLoader = true;
+			$err = Utils::parseFileDataErrors($boxData, $fancyLoader);
+			if($err != null)
+			{
+				$errorMessage = $err;
+				break;
+			}
+			$userfile_name = $boxData["name"];
+			if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
+			$userfile_name=Utils::processFileName($userfile_name);
+			if (!FS_Storage::simpleCopy($boxData["tmp_name"], "$destination/".$userfile_name))
+			{
+				$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
+				break;
+			}
+			$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
 		}
-		$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
-	}
-	if($fancyLoader)
-	{
-		if(isSet($errorMessage)){
-			header('HTTP/1.0 '.$errorMessage);
-			die('Error '.$errorMessage);
-		}else{
-			header('HTTP/1.0 SUCCESS');
-			die($logMessage);
+		if($fancyLoader)
+		{
+			if(isSet($errorMessage)){
+				header('HTTP/1.0 '.$errorMessage);
+				die('Error '.$errorMessage);
+			}else{
+				header('HTTP/1.0 SUCCESS');
+				die($logMessage);
+			}
 		}
-	}
-	else
-	{
-		print("<html><script language=\"javascript\">\n");
-		if(isSet($errorMessage)){
-			print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-		}else{		
-			print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+		else
+		{
+			print("<html><script language=\"javascript\">\n");
+			if(isSet($errorMessage)){
+				print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
+			}else{		
+				print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+			}
+			print("</script></html>");
 		}
-		print("</script></html>");
-	}
-	exit;
+		exit;
+		
 	break;
 	
 	//------------------------------------
@@ -441,120 +422,149 @@ switch($action)
 	//------------------------------------
 	case "xml_listing":
 	
-	if(!isSet($dir) || $dir == "/") $dir = "";
-	$searchMode = $fileListMode = $completeMode = false;
-	if(isSet($mode)){
-		if($mode == "search") $searchMode = true;
-		else if($mode == "file_list") $fileListMode = true;
-		else if($mode == "complete") $completeMode = true;
-	}	
-	$nom_rep = FS_Storage::initName($dir);
-	$result = FS_Storage::listing($nom_rep, !($searchMode || $fileListMode));
-	$reps = $result[0];
-	AJXP_XMLWriter::header();
-	foreach ($reps as $repIndex => $repName)
-	{
-		$link = "content.php?id=&ordre=nom&sens=1&action=xml_listing&dir=".$dir."/".$repName;
-		$link = str_replace("/", "%2F", $link);
-		$link = str_replace("&", "&amp;", $link);
-		$attributes = "";
-		if($searchMode)
+		if(!isSet($dir) || $dir == "/") $dir = "";
+		$searchMode = $fileListMode = $completeMode = false;
+		if(isSet($mode)){
+			if($mode == "search") $searchMode = true;
+			else if($mode == "file_list") $fileListMode = true;
+			else if($mode == "complete") $completeMode = true;
+		}	
+		$nom_rep = FS_Storage::initName($dir);
+		$result = FS_Storage::listing($nom_rep, !($searchMode || $fileListMode));
+		$reps = $result[0];
+		AJXP_XMLWriter::header();
+		foreach ($reps as $repIndex => $repName)
 		{
-			if(is_file($nom_rep."/".$repIndex)) {$attributes = "is_file=\"true\" icon=\"$repName\""; $repName = $repIndex;}
-		}
-		else if($fileListMode)
-		{
-			$currentFile = $nom_rep."/".$repIndex;			
-			$atts = array();
-			$atts[] = "is_file=\"".(is_file($currentFile)?"oui":"non")."\"";
-			$atts[] = "is_editable=\"".Utils::is_editable($currentFile)."\"";
-			$atts[] = "is_image=\"".Utils::is_image($currentFile)."\"";
-			if(Utils::is_image($currentFile))
+			$link = "content.php?id=&ordre=nom&sens=1&action=xml_listing&dir=".$dir."/".$repName;
+			$link = str_replace("/", "%2F", $link);
+			$link = str_replace("&", "&amp;", $link);
+			$attributes = "";
+			if($searchMode)
 			{
-				list($width, $height, $type, $attr) = @getimagesize($currentFile);
-				$atts[] = "image_type=\"".image_type_to_mime_type($type)."\"";
-				$atts[] = "image_width=\"$width\"";
-				$atts[] = "image_height=\"$height\"";
+				if(is_file($nom_rep."/".$repIndex)) {$attributes = "is_file=\"true\" icon=\"$repName\""; $repName = $repIndex;}
 			}
-			$atts[] = "is_mp3=\"".Utils::is_mp3($currentFile)."\"";
-			$atts[] = "mimetype=\"".Utils::mimetype($currentFile, "type")."\"";
-			$atts[] = "modiftime=\"".FS_Storage::date_modif($currentFile)."\"";
-			$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
-			$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
-			$atts[] = "icon=\"".(is_file($currentFile)?$repName:"folder.png")."\"";
-			
-			$attributes = join(" ", $atts);
-			$repName = $repIndex;
+			else if($fileListMode)
+			{
+				$currentFile = $nom_rep."/".$repIndex;			
+				$atts = array();
+				$atts[] = "is_file=\"".(is_file($currentFile)?"oui":"non")."\"";
+				$atts[] = "is_editable=\"".Utils::is_editable($currentFile)."\"";
+				$atts[] = "is_image=\"".Utils::is_image($currentFile)."\"";
+				if(Utils::is_image($currentFile))
+				{
+					list($width, $height, $type, $attr) = @getimagesize($currentFile);
+					$atts[] = "image_type=\"".image_type_to_mime_type($type)."\"";
+					$atts[] = "image_width=\"$width\"";
+					$atts[] = "image_height=\"$height\"";
+				}
+				$atts[] = "is_mp3=\"".Utils::is_mp3($currentFile)."\"";
+				$atts[] = "mimetype=\"".Utils::mimetype($currentFile, "type")."\"";
+				$atts[] = "modiftime=\"".FS_Storage::date_modif($currentFile)."\"";
+				$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
+				$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
+				$atts[] = "icon=\"".(is_file($currentFile)?$repName:"folder.png")."\"";
+				
+				$attributes = join(" ", $atts);
+				$repName = $repIndex;
+			}
+			else 
+			{
+				$folderBaseName = str_replace("&", "&amp;", $repName);
+				$folderFullName = "$dir/".$folderBaseName;
+				$parentFolderName = $dir;
+				if(!$completeMode){
+					$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
+				}
+			}
+			print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
+			print("</tree>");
 		}
-		else 
+		if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$completeMode)
 		{
-			$folderBaseName = str_replace("&", "&amp;", $repName);
-			$folderFullName = "$dir/".$folderBaseName;
-			$parentFolderName = $dir;
-			if(!$completeMode){
-				$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
+			if($fileListMode)
+			{
+				print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"non\" is_recycle=\"1\" mimetype=\"Trashcan\" modiftime=\"".FS_Storage::date_modif(ConfService::getRootDir()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
+			}
+			else 
+			{
+				// ADD RECYCLE BIN TO THE LIST
+				print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/crystal/mimes/16/trashcan.png\"  openIcon=\"images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
 			}
 		}
-		print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
-		print("</tree>");
-	}
-	if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$completeMode)
-	{
-		if($fileListMode)
-		{
-			print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"non\" is_recycle=\"1\" mimetype=\"Trashcan\" modiftime=\"".FS_Storage::date_modif(ConfService::getRootDir()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
-		}
-		else 
-		{
-			// ADD RECYCLE BIN TO THE LIST
-			print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/crystal/mimes/16/trashcan.png\"  openIcon=\"images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
-		}
-	}
-	AJXP_XMLWriter::close();
-	exit(1);
-	break;		
+		AJXP_XMLWriter::close();
+		exit(1);
 		
-	case "display_bookmark_bar":
+	break;		
+
+	//-----------------------------------------------------------------------------
+	//-------------------------- AJXP ACTIONS -------------------------------------
+	//-----------------------------------------------------------------------------
+	
+	//------------------------------------
+	//	GET AN HTML TEMPLATE
+	//------------------------------------
+	case "get_template":
+	
+		header("Content-type:text/html");
+		if(isset($template_name) && is_file("include/html/".$template_name))
+		{
+			if(!isSet($encode) || $encode != "false")
+			{
+				$mess = array_map("utf8_encode", $mess);
+			}
+			include("include/html/".$template_name);
+		}
+		exit(0);	
+		
+	break;
+	
 	//------------------------------------
 	//	BOOKMARK BAR
 	//------------------------------------
-	header("Content-type:text/html");
-	$bmUser = null;
-	if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-	{
-		$bmUser = AuthService::getLoggedUser();
-	}
-	else if(!AuthService::usersEnabled())
-	{
-		$bmUser = new AJXP_User("shared");
-	}
-	if($bmUser == null) exit(1);
-	if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
-	{
-		if($_GET["bm_action"] == "add_bookmark")
+	case "display_bookmark_bar":
+		
+		header("Content-type:text/html");
+		$bmUser = null;
+		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
 		{
-			$bmUser->addBookMark($_GET["bm_path"]);
+			$bmUser = AuthService::getLoggedUser();
 		}
-		else if($_GET["bm_action"] == "delete_bookmark")
+		else if(!AuthService::usersEnabled())
 		{
-			$bmUser->removeBookmark($_GET["bm_path"]);
+			$bmUser = new AJXP_User("shared");
 		}
-	}
-	if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-	{
-		$bmUser->save();
-		AuthService::updateUser($bmUser);
-	}
-	else if(!AuthService::usersEnabled())
-	{
-		$bmUser->save();
-	}
-	HTMLWriter::bookmarkBar($bmUser->getBookMarks());
-	session_write_close();
-	exit(1);
+		if($bmUser == null) exit(1);
+		if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
+		{
+			if($_GET["bm_action"] == "add_bookmark")
+			{
+				$bmUser->addBookMark($_GET["bm_path"]);
+			}
+			else if($_GET["bm_action"] == "delete_bookmark")
+			{
+				$bmUser->removeBookmark($_GET["bm_path"]);
+			}
+		}
+		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
+		{
+			$bmUser->save();
+			AuthService::updateUser($bmUser);
+		}
+		else if(!AuthService::usersEnabled())
+		{
+			$bmUser->save();
+		}
+		HTMLWriter::bookmarkBar($bmUser->getBookMarks());
+		session_write_close();
+		exit(1);
+
 	break;
 		
+	//------------------------------------
+	//	SAVE USER PREFERENCE
+	//------------------------------------
 	case "save_user_pref":
+		
 		$userObject = AuthService::getLoggedUser();
 		if($userObject == null) exit(1);
 		$i = 0;
@@ -579,20 +589,20 @@ switch($action)
 		AJXP_XMLWriter::sendMessage("Done($i)", null);
 		AJXP_XMLWriter::close();
 		exit(1);
+		
 	break;
 	
+	//------------------------------------
+	//	DISPLAY DOC
+	//------------------------------------
 	case "display_doc":
-	{
+	
 		echo HTMLWriter::getDocFile($_GET["doc_file"]);
-		exit();
-	}
-	
-	
+		exit(0);
 		
-	//------------------------------------
-	//	DEFAUT
-	//------------------------------------
-
+	break;
+	
+			
 	default;
 	break;
 }
