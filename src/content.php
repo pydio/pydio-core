@@ -99,9 +99,9 @@ if(isSet($rep) && $action != "upload") $rep = utf8_decode($rep);
 if(isSet($dest)) $dest = utf8_decode($dest);
 
 // FILTER ACTION FOR DELETE
-if(ConfService::useRecycleBin() && $action == "supprimer_suite" && $rep != "/".ConfService::getRecycleBinDir())
+if(ConfService::useRecycleBin() && $action == "delete" && $rep != "/".ConfService::getRecycleBinDir())
 {
-	$action = "deplacer_suite";
+	$action = "move";
 	$dest = "/".ConfService::getRecycleBinDir();
 	$dest_node = "AJAXPLORER_RECYCLE_NODE";
 }
@@ -111,7 +111,7 @@ if(ConfService::useRecycleBin() &&  $action == "restore" && $rep == "/".ConfServ
 	$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
 	if($originalRep != "")
 	{
-		$action = "deplacer_suite";
+		$action = "move";
 		$dest = $originalRep;
 	}
 	
@@ -126,13 +126,13 @@ if(AuthService::usersEnabled())
 	switch ($action)
 	{
 		// NEEDS WRITE RIGHTS
-		case "editer":
-		case "copier_suite":
-		case "deplacer_suite":
-		case "supprimer_suite":
-		case "rename_suite":
+		case "edit":
+		case "copy":
+		case "move":
+		case "delete":
+		case "rename":
 		case "mkdir":
-		case "creer_fichier":
+		case "mkfile":
 			if($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))
 			{
 				AJXP_XMLWriter::header();
@@ -168,7 +168,7 @@ if(AuthService::usersEnabled())
 		case "mp3_proxy":
 		case "switch_root_dir":
 		case "xml_listing":
-		case "telecharger":
+		case "download":
 		case "root_tree":		
 			if($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))
 			{
@@ -195,9 +195,9 @@ if(AuthService::usersEnabled())
 switch($action)
 {
 	//------------------------------------
-	//	EDITER / EDIT
+	//	ONLINE EDIT
 	//------------------------------------
-	case "editer";	
+	case "edit";	
 	//include($hautpage);
 	$fic = utf8_decode($fic);
 	if(isset($save) && $save==1)
@@ -227,9 +227,9 @@ switch($action)
 
 
 	//------------------------------------
-	//	AIDE / HELP
+	//	HELP
 	//------------------------------------
-	case "aide";
+	case "help";
 	include($hautpage);
 	HTMLWriter::toolbar((isset($_GET["user"])?$_GET["user"]:"shared_bookmarks"));
 	include("include/${langue}_help.htm");
@@ -239,10 +239,10 @@ switch($action)
 
 
 	//------------------------------------
-	//	TELECHARGER / DOWNLOAD
+	//	DOWNLOAD
 	//------------------------------------
 
-	case "telecharger";
+	case "download";
 	$fic = utf8_decode($fic);
 	$NomFichier = basename($fic);
 	$taille=filesize(ConfService::getRootDir()."/$fic");
@@ -273,8 +273,8 @@ switch($action)
 	//	COPY / MOVE
 	//------------------------------------
 
-	case "copier_suite";
-	case "deplacer_suite";	
+	case "copy";
+	case "move";	
 	if($selection->isEmpty())
 	{
 		$errorMessage = $mess[113];
@@ -285,7 +285,7 @@ switch($action)
 		$errorMessage = $mess[38]." ".$dest." ".$mess[99];
 		break;
 	}
-	if($action == "deplacer_suite" && !is_writable(dirname(ConfService::getRootDir()."/".$selection->getUniqueFile())))
+	if($action == "move" && !is_writable(dirname(ConfService::getRootDir()."/".$selection->getUniqueFile())))
 	{
 		$errorMessage.= "\n".$mess[38]." ".dirname($selection->getUniqueFile())." ".$mess[99];
 		break;
@@ -295,7 +295,7 @@ switch($action)
 	$selectedFiles = $selection->getFiles();
 	foreach ($selectedFiles as $selectedFile)
 	{
-		FS_Storage::copyOrMoveFile($dest, $selectedFile, $error, $success, ($action=="deplacer_suite"?true:false));
+		FS_Storage::copyOrMoveFile($dest, $selectedFile, $error, $success, ($action=="move"?true:false));
 	}
 	
 	if(count($error)) $errorMessage = join("\n", $error);
@@ -325,7 +325,7 @@ switch($action)
 	//------------------------------------
 	//	SUPPRIMER / DELETE
 	//------------------------------------
-	case "supprimer_suite";
+	case "delete";
 	if($selection->isEmpty())
 	{
 		$errorMessage = $mess[113];
@@ -369,7 +369,7 @@ switch($action)
 	//------------------------------------
 	//	RENOMMER / RENAME
 	//------------------------------------
-	case "rename_suite";
+	case "rename";
 	$fic = utf8_decode($fic);
 	$nom_fic=basename($fic);
 	$fic_new=Utils::traite_nom_fichier(utf8_decode($fic_new));
@@ -438,7 +438,7 @@ switch($action)
 	//	CREER UN FICHIER / CREATE FILE
 	//------------------------------------
 
-	case "creer_fichier";
+	case "mkfile";
 	$err="";
 	$messtmp="";
 	$nomfic=Utils::traite_nom_fichier(utf8_decode($nomfic));

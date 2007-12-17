@@ -84,7 +84,7 @@ ActionsManager.prototype.init = function()
 		textNode.innerHTML = replaceHtml;
 		}
 	}
-	this.downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=telecharger&fic='); 
+	this.downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=download&fic='); 
 	this.downloader.triggerEnd = function() {hideLightBox();};
 
 	//this.multi_selector = new MultiSelector( $( 'upload_files_list' ), '6' );
@@ -515,8 +515,8 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		case "move":
 			var onLoad = function(oForm){
 				var getAction = oForm.getElementsBySelector('input[name="get_action"]')[0];
-				if(buttonAction == 'copy') getAction.value = 'copier_suite';
-				else getAction.value = 'deplacer_suite';
+				if(buttonAction == 'copy') getAction.value = 'copy';
+				else getAction.value = 'move';
 				var container = oForm.getElementsBySelector(".treeCopyContainer")[0];
 				var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
 				var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
@@ -576,14 +576,14 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			var userSelection = this._ajaxplorer.getFilesList().getUserSelection();
 			if(userSelection.isUnique())
 			{
-				var downloadUrl = 'content.php?action=telecharger';
+				var downloadUrl = 'content.php?action=download';
 				downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 				document.location.href = downloadUrl;
 				break;
 			}
 			var loadFunc = function(oForm){
 				var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-				var downloader = new MultiDownloader(dObject, 'content.php?action=telecharger&fic=');
+				var downloader = new MultiDownloader(dObject, 'content.php?action=download&fic=');
 				downloader.triggerEnd = function(){hideLightBox()};
 				fileNames = userSelection.getFileNames();
 				for(var i=0; i<fileNames.length;i++)
@@ -724,9 +724,9 @@ ActionsManager.prototype.applyDragMove = function(fileName, destDir, destNodeNam
 	}
 	var connexion = new Connexion();
 	if(copy){
-		connexion.addParameter('get_action', 'copier_suite');
+		connexion.addParameter('get_action', 'copy');
 	}else{
-		connexion.addParameter('get_action', 'deplacer_suite');
+		connexion.addParameter('get_action', 'move');
 	}
 	if(fileName != null){
 		connexion.addParameter('fic', fileName);

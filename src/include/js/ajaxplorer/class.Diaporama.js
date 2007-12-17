@@ -28,7 +28,7 @@ function Diaporama(div)
 	}	
 	this.downloadButton.onclick = function(){
 		if(!oThis.currentFile) return;		
-		document.location.href = 'content.php?action=telecharger&fic='+oThis.currentFile;
+		document.location.href = 'content.php?action=download&fic='+oThis.currentFile;
 		return false;
 	}
 	this.actualSizeButton.onclick = function(){
