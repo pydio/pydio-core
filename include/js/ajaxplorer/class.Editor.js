@@ -20,7 +20,7 @@ function Editor(oFormObject)
 	}.bind(this);
 	this.downloadButton.onclick = function(){
 		if(!this.currentFile) return;		
-		document.location.href = 'content.php?action=telecharger&fic='+this.currentFile;
+		document.location.href = 'content.php?action=download&fic='+this.currentFile;
 		return false;
 	}.bind(this);	
 	modal.setCloseAction(function(){this.close();}.bind(this));
