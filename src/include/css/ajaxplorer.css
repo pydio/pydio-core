@@ -935,18 +935,18 @@ UPLOAD MULTIFILE FORM
 
 #splashScreen
 {
-   width: 402px;
-   height: 302px;
-   background-image:url(../../images/splash.gif);
+   width: 430px;
+   height: 332px;
+   /*background-image:url(../../images/splash.gif);*/
 }
 
 #docFileIframe
 {
     position:relative;
-    top: 80px;
+    top: 10px;
     left: 15px;
-    width: 370px;
-    height: 177px;
+    width: 400px;
+    height: 230px;
     border: 1px solid #79f;
 }
 
