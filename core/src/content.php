@@ -199,22 +199,22 @@ switch($action)
 	//------------------------------------
 	case "edit";	
 	//include($hautpage);
-	$fic = utf8_decode($fic);
+	$file = utf8_decode($file);
 	if(isset($save) && $save==1)
 	{
 		$code=stripslashes($code);
 		$code=str_replace("&lt;","<",$code);
-		$fp=fopen(ConfService::getRootDir()."/$fic","w");
+		$fp=fopen(ConfService::getRootDir()."/$file","w");
 		fputs ($fp,$code);
 		fclose($fp);
-		Utils::enlever_controlM(ConfService::getRootDir()."/$fic");
+		Utils::removeWinReturn(ConfService::getRootDir()."/$file");
 		$logMessage = $mess[115];
 		echo $logMessage;
 	}
 	else 
 	{
 		header("Content-type:text/plain");
-		$fp=fopen(ConfService::getRootDir()."/$fic","r");
+		$fp=fopen(ConfService::getRootDir()."/$file","r");
 		while (!feof($fp))
 		{
 			$tmp=fgets($fp,4096);
@@ -243,13 +243,13 @@ switch($action)
 	//------------------------------------
 
 	case "download";
-	$fic = utf8_decode($fic);
-	$NomFichier = basename($fic);
-	$taille=filesize(ConfService::getRootDir()."/$fic");
-	header("Content-Type: application/force-download; name=\"$NomFichier\"");
+	$file = utf8_decode($file);
+	$filename = basename($file);
+	$taille=filesize(ConfService::getRootDir()."/$file");
+	header("Content-Type: application/force-download; name=\"$filename\"");
 	header("Content-Transfer-Encoding: binary");
 	header("Content-Length: $taille");
-	header("Content-Disposition: attachment; filename=\"$NomFichier\"");
+	header("Content-Disposition: attachment; filename=\"$filename\"");
 	header("Expires: 0");
 	header("Cache-Control: no-cache, must-revalidate");
 	header("Pragma: no-cache");
@@ -264,7 +264,7 @@ switch($action)
 		}
 	}
 	
-	readfile(ConfService::getRootDir()."/$fic");
+	readfile(ConfService::getRootDir()."/$file");
 	exit();
 	break;
 
@@ -306,19 +306,19 @@ switch($action)
 	break;
 
 	case "image_proxy":
-	$fic = utf8_decode($fic);
-	$taille=filesize(ConfService::getRootDir()."/$fic");
-	header("Content-Type: ".Utils::getImageMimeType($fic)."; name=\"".basename($fic)."\"");
+	$file = utf8_decode($file);
+	$taille=filesize(ConfService::getRootDir()."/$file");
+	header("Content-Type: ".Utils::getImageMimeType($file)."; name=\"".basename($file)."\"");
 	header('Cache-Control: public');
-	readfile(ConfService::getRootDir()."/$fic");
+	readfile(ConfService::getRootDir()."/$file");
 	exit(0);
 	break;
 	
 	case "mp3_proxy":
-	//$fic = utf8_decode($fic);
-	$taille=filesize(ConfService::getRootDir()."/$fic");
-	header("Content-Type: audio/mp3; name=\"".basename($fic)."\"");
-	readfile(ConfService::getRootDir()."/$fic");
+	//$file = utf8_decode($file);
+	$taille=filesize(ConfService::getRootDir()."/$file");
+	header("Content-Type: audio/mp3; name=\"".basename($file)."\"");
+	readfile(ConfService::getRootDir()."/$file");
 	exit(0);
 	break;
 	
@@ -370,24 +370,24 @@ switch($action)
 	//	RENOMMER / RENAME
 	//------------------------------------
 	case "rename";
-	$fic = utf8_decode($fic);
-	$nom_fic=basename($fic);
-	$fic_new=Utils::traite_nom_fichier(utf8_decode($fic_new));
-	$old=ConfService::getRootDir()."/$fic";
+	$file = utf8_decode($file);
+	$nom_fic=basename($file);
+	$filename_new=Utils::processFileName(utf8_decode($filename_new));
+	$old=ConfService::getRootDir()."/$file";
 	if(!is_writable($old))
 	{
 		$errorMessage = $mess[34]." ".$nom_fic." ".$mess[99];
 		break;		
 	}
-	$new=dirname($old)."/".$fic_new;
-	if($fic_new=="")
+	$new=dirname($old)."/".$filename_new;
+	if($filename_new=="")
 	{
 		$errorMessage="$mess[37]";
 		break;
 	}
 	if(file_exists($new))
 	{
-		$errorMessage="$fic_new $mess[43]"; 
+		$errorMessage="$filename_new $mess[43]"; 
 		break;
 	}
 	if(!file_exists($old))
@@ -397,7 +397,7 @@ switch($action)
 	}
 	rename($old,$new);
 	
-	$logMessage="$fic $mess[41] $fic_new";
+	$logMessage="$file $mess[41] $filename_new";
 	$reload_current_node = true;
 	$reload_file_list = basename($new);
 	break;
@@ -410,13 +410,13 @@ switch($action)
 	case "mkdir";
 	$err="";
 	$messtmp="";
-	$nomdir=Utils::traite_nom_fichier(utf8_decode($nomdir));
-	if($nomdir=="")
+	$dirname=Utils::processFileName(utf8_decode($dirname));
+	if($dirname=="")
 	{
 		$errorMessage="$mess[37]";
 		break;
 	}
-	if(file_exists(ConfService::getRootDir()."/$dir/$nomdir"))
+	if(file_exists(ConfService::getRootDir()."/$dir/$dirname"))
 	{
 		$errorMessage="$mess[40]"; 
 		break;
@@ -426,9 +426,9 @@ switch($action)
 		$errorMessage = $mess[38]." $dir ".$mess[99];
 		break;
 	}
-	mkdir(ConfService::getRootDir()."/$dir/$nomdir",0775);
-	$reload_file_list = $nomdir;
-	$messtmp.="$mess[38] $nomdir $mess[39] ";
+	mkdir(ConfService::getRootDir()."/$dir/$dirname",0775);
+	$reload_file_list = $dirname;
+	$messtmp.="$mess[38] $dirname $mess[39] ";
 	if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
 	$logMessage = $messtmp;
 	$reload_current_node = true;
@@ -441,12 +441,12 @@ switch($action)
 	case "mkfile";
 	$err="";
 	$messtmp="";
-	$nomfic=Utils::traite_nom_fichier(utf8_decode($nomfic));
-	if($nomfic=="")
+	$filename=Utils::processFileName(utf8_decode($filename));
+	if($filename=="")
 	{
 		$errorMessage="$mess[37]"; break;
 	}
-	if(file_exists(ConfService::getRootDir()."/$dir/$nomfic"))
+	if(file_exists(ConfService::getRootDir()."/$dir/$filename"))
 	{
 		$errorMessage="$mess[71]"; break;
 	}
@@ -455,23 +455,23 @@ switch($action)
 		$errorMessage="$mess[38] $dir $mess[99]";break;
 	}
 	
-	$fp=fopen(ConfService::getRootDir()."/$dir/$nomfic","w");
+	$fp=fopen(ConfService::getRootDir()."/$dir/$filename","w");
 	if($fp)
 	{
-		if(eregi("\.html$",$nomfic)||eregi("\.htm$",$nomfic))
+		if(eregi("\.html$",$filename)||eregi("\.htm$",$filename))
 		{
 			fputs($fp,"<html>\n<head>\n<title>Document sans titre</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
 		}
 		fclose($fp);
-		$messtmp.="$mess[34] $nomfic $mess[39] ";
+		$messtmp.="$mess[34] $filename $mess[39] ";
 		if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
 		$logMessage = $messtmp;
-		$reload_file_list = $nomfic;
+		$reload_file_list = $filename;
 	}
 	else
 	{
 		$err = 1;
-		$errorMessage = "$mess[102] $dir/$nomfic (".$fp.")";
+		$errorMessage = "$mess[102] $dir/$filename (".$fp.")";
 	}
 
 	break;
@@ -562,7 +562,7 @@ switch($action)
 		if ($userfile_tmp_name!="none" && $userfile_size!=0)
 		{
 			if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
-			$userfile_name=Utils::traite_nom_fichier($userfile_name);
+			$userfile_name=Utils::processFileName($userfile_name);
 			if (!copy($userfile_tmp_name, "$destination/".$userfile_name))
 			{
 				$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;

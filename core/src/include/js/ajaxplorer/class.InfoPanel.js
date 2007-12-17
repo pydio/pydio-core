@@ -55,7 +55,7 @@ InfoPanel.prototype.setContent = function(sHtml)
 
 InfoPanel.prototype.displayImageInfo = function(imgData)
 {
-	var baseUrl = "content.php?action=image_proxy&get_thumb=true&fic=";
+	var baseUrl = "content.php?action=image_proxy&get_thumb=true&file=";
 	var imgUrl = baseUrl + imgData.getAttribute("filename");
 	var fileName = getBaseName(imgData.getAttribute("filename"));
 	var imageType = imgData.getAttribute("image_type");
@@ -128,7 +128,7 @@ InfoPanel.prototype.displayMP3Info = function(fileData)
 	var template = new Template('<object type="application/x-shockwave-flash" data="include/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="include/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>');
 	
 	var tString = '<div style="padding:10px;">';
-	tString += '<div id="mp3_container" style="border:1px solid #79f; text-align:center; padding:5px; width:160px;">'+template.evaluate({mp3_url:'content.php?action=mp3_proxy%26fic=' + fileData.getAttribute("filename")})+'</div>';
+	tString += '<div id="mp3_container" style="border:1px solid #79f; text-align:center; padding:5px; width:160px;">'+template.evaluate({mp3_url:'content.php?action=mp3_proxy%26file=' + fileData.getAttribute("filename")})+'</div>';
 	tString += '<br><b>'+MessageHash[133]+'</b> : '+fileName;
 	tString += '<br><b>'+MessageHash[134]+'</b> : '+fileType;
 	tString += '<br><b>'+MessageHash[127]+'</b> : '+fileSize;
@@ -154,7 +154,7 @@ InfoPanel.prototype.folderAsPlaylist = function()
 	var mp3Items = itCopy.reverse();
 	var mp3_url = '';
 	mp3Items.each(function(url){
-		mp3_url += 'content.php?action=mp3_proxy%26fic='+url;
+		mp3_url += 'content.php?action=mp3_proxy%26file='+url;
 		if(url != mp3Items.last()) mp3_url += '|';
 	});
 //	alert(mp3_url);
@@ -165,7 +165,7 @@ InfoPanel.prototype.folderAsPlaylist = function()
 
 InfoPanel.prototype.displayFlashPlayer = function(fileName)
 {
-	var baseUrl = 'content.php?action=mp3_proxy%26fic=' + fileName;
+	var baseUrl = 'content.php?action=mp3_proxy%26file=' + fileName;
     var FO = { movie:"include/flash/dewplayer-mini.swf?mp3="+baseUrl, width:"150", height:"20"};
     UFO.create(FO, 'mp3_container');
 }

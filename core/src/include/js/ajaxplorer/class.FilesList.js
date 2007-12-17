@@ -170,11 +170,11 @@ FilesList.prototype.loadNextImage = function()
 		if(this.loading) return;
 		var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
 		var image = new Image();
-		image.src = "content.php?action=image_proxy&get_thumb=true&fic="+oImageToLoad.filename;
+		image.src = "content.php?action=image_proxy&get_thumb=true&file="+oImageToLoad.filename;
 		image.onload = function(){
 			var img = $(oImageToLoad.index);
 			if(img == null) return;
-			img.src = "content.php?action=image_proxy&get_thumb=true&fic="+oImageToLoad.filename;
+			img.src = "content.php?action=image_proxy&get_thumb=true&file="+oImageToLoad.filename;
 			img.height = oImageToLoad.height;
 			img.width = oImageToLoad.width;
 			img.setStyle({marginTop: oImageToLoad.marginTop+'px',marginBottom: oImageToLoad.marginBottom+'px'});
