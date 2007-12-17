@@ -39,28 +39,47 @@ class FS_Storage
 			AJXP_XMLWriter::close();
 			exit;
 		}
-		// the following code will only remove "solo-dots" 
-		// this may not work on windowsservers with \ instead of /
-		// as directory seperators
-		$dirs = explode('/', $nom_rep);
-		for ($i = 0; $i < count($dirs); $i++)
+		return $nom_rep;
+	}
+	
+	function readFile($filePath, $headerType="plain")
+	{
+		if($headerType == "plain")
 		{
-			if ($dirs[$i] == '.' or $dirs[$i] == '..')
+			header("Content-type:text/plain");			
+		}
+		else if($headerType == "image")
+		{
+			$size=filesize($filePath);
+			header("Content-Type: ".Utils::getImageMimeType(basename($filePath))."; name=\"".basename($filePath)."\"");
+			header("Content-Length: ".$size);
+			header('Cache-Control: public');			
+		}
+		else if($headerType == "mp3")
+		{
+			$size=filesize($filePath);
+			header("Content-Type: audio/mp3; name=\"".basename($filePath)."\"");
+			header("Content-Length: ".$size);
+		}
+		else 
+		{
+			$size=filesize($filePath);
+			header("Content-Type: application/force-download; name=\"".basename($filePath)."\"");
+			header("Content-Transfer-Encoding: binary");
+			header("Content-Length: ".$size);
+			header("Content-Disposition: attachment; filename=\"".basename($filePath)."\"");
+			header("Expires: 0");
+			header("Cache-Control: no-cache, must-revalidate");
+			header("Pragma: no-cache");
+			// For SSL websites there is a bug with IE see article KB 323308
+			// therefore we must reset the Cache-Control and Pragma Header
+			if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
 			{
-				$dirs[$i] = '';
+				header("Cache-Control:");
+				header("Pragma:");
 			}
 		}
-		// rebuild safe directory string
-		$nom_rep = implode('/', $dirs);
-		//Replace double slashes!
-		while (eregi('//', $nom_rep)) {
-			$nom_rep = str_replace('//', '/', $nom_rep);
-		}
-		/*
-		// Avoid possible hack with ../
-		$nom_rep = str_replace('.', '', $nom_rep);
-		*/
-		return $nom_rep;
+		readfile($filePath);
 	}
 	
 	
@@ -132,39 +151,6 @@ class FS_Storage
 	
 		return array($liste,$poidstotal);
 	}
-
-	function deldir($location)
-	{
-		if(is_dir($location))
-		{
-			$all=opendir($location);
-			while ($file=readdir($all))
-			{
-				if (is_dir("$location/$file") && $file !=".." && $file!=".")
-				{
-					FS_Storage::deldir("$location/$file");
-					if(file_exists("$location/$file")){rmdir("$location/$file"); }
-					unset($file);
-				}
-				elseif (!is_dir("$location/$file"))
-				{
-					if(file_exists("$location/$file")){unlink("$location/$file"); }
-					unset($file);
-				}
-			}
-			closedir($all);
-			rmdir($location);
-		}
-		else
-		{
-			if(file_exists("$location")) {unlink("$location");}
-		}
-		if(basename(dirname($location)) == ConfService::getRecycleBinDir())
-		{
-			// DELETING FROM RECYCLE
-			RecycleBinManager::deleteFromRecycle($location);
-		}
-	}
 	
 	function date_modif($file)
 	{
@@ -172,57 +158,136 @@ class FS_Storage
 		return date("d/m/Y H:i",$tmp);
 	}
 	
-
-	// A function to copy files from one directory to another one, including subdirectories and
-	// nonexisting or newer files. Function returns number of files copied.
-	// This function is PHP implementation of Windows xcopy  A:\dir1\* B:\dir2 /D /E /F /H /R /Y
-	// Syntaxis: [$number =] dircopy($sourcedirectory, $destinationdirectory [, $verbose]);
-	// Example: $num = dircopy('A:\dir1', 'B:\dir2', 1);
-
-	function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false) 
-	{
-		$num = 0;
-		if(!is_dir($dstdir)) mkdir($dstdir);
-		if($curdir = opendir($srcdir)) 
-		{
-			while($file = readdir($curdir)) 
-			{
-				if($file != '.' && $file != '..') 
-				{
-					$srcfile = $srcdir . DIRECTORY_SEPARATOR . $file;
-					$dstfile = $dstdir . DIRECTORY_SEPARATOR . $file;
-					if(is_file($srcfile)) 
-					{
-						if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
-						if($ow > 0) 
-						{
-							if($verbose) echo "Copying '$srcfile' to '$dstfile'...";
-							if(copy($srcfile, $dstfile)) 
-							{
-								touch($dstfile, filemtime($srcfile)); $num++;
-								if($verbose) echo "OK\n";
-								$success[] = $srcfile;
-							}
-							else 
-							{
-								$errors[] = $srcfile;
-							}
-						}
-					}
-					else if(is_dir($srcfile)) 
-					{
-						$num += FS_Storage::dircopy($srcfile, $dstfile, $errors, $success, $verbose);
-					}
-				}
-			}
-			closedir($curdir);
-		}
-		return $num;
-	}
-
-	function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
+	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
 	{
 		$mess = ConfService::getMessages();
+		if(!is_writable(ConfService::getRootDir()."/".$destDir))
+		{
+			$errorMessage = $mess[38]." ".$destDir." ".$mess[99];
+			break;
+		}
+				
+		foreach ($selectedFiles as $selectedFile)
+		{
+			if($move && !is_writable(dirname(ConfService::getRootDir()."/".$selectedFile)))
+			{
+				$error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
+				continue;
+			}
+			FS_Storage::copyOrMoveFile($destDir, $selectedFile, $error, $success, $move);
+		}
+	}
+	
+	
+	function rename($filePath, $filename_new)
+	{
+		$nom_fic=basename($filePath);
+		$mess = ConfService::getMessages();
+		$filename_new=Utils::processFileName(utf8_decode($filename_new));
+		$old=ConfService::getRootDir()."/$filePath";
+		if(!is_writable($old))
+		{
+			return $mess[34]." ".$nom_fic." ".$mess[99];
+		}
+		$new=dirname($old)."/".$filename_new;
+		if($filename_new=="")
+		{
+			return "$mess[37]";
+		}
+		if(file_exists($new))
+		{
+			return "$filename_new $mess[43]"; 
+		}
+		if(!file_exists($old))
+		{
+			return $mess[100]." $nom_fic";
+		}
+		rename($old,$new);		
+	}
+	
+	function mkDir($crtDir, $newDirName)
+	{
+		$mess = ConfService::getMessages();
+		if($newDirName=="")
+		{
+			return "$mess[37]";
+		}
+		if(file_exists(ConfService::getRootDir()."/$crtDir/$newDirName"))
+		{
+			return $errorMessage="$mess[40]"; 
+		}
+		if(!is_writable(ConfService::getRootDir()."/$crtDir"))
+		{
+			return $mess[38]." $dir ".$mess[99];
+		}
+		mkdir(ConfService::getRootDir()."/$crtDir/$newDirName",0775);		
+	}
+	
+	function createEmptyFile($crtDir, $newFileName)
+	{
+		$mess = ConfService::getMessages();
+		if($newFileName=="")
+		{
+			return "$mess[37]";
+		}
+		if(file_exists(ConfService::getRootDir()."/$crtDir/$newFileName"))
+		{
+			return "$mess[71]";
+		}
+		if(!is_writable(ConfService::getRootDir()."/$crtDir"))
+		{
+			return "$mess[38] $crtDir $mess[99]";
+		}
+		
+		$fp=fopen(ConfService::getRootDir()."/$crtDir/$newFileName","w");
+		if($fp)
+		{
+			if(eregi("\.html$",$newFileName)||eregi("\.htm$",$newFileName))
+			{
+				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
+			}
+			fclose($fp);
+		}
+		else
+		{
+			return "$mess[102] $crtDir/$newFileName (".$fp.")";
+		}
+		
+	}
+	
+	
+	function delete($selectedFiles, &$logMessages)
+	{
+		$mess = ConfService::getMessages();
+		foreach ($selectedFiles as $selectedFile)
+		{	
+			if($selectedFile == "" || $selectedFile == DIRECTORY_SEPARATOR)
+			{
+				return $mess[120];
+			}
+			$fileToDelete=ConfService::getRootDir().$selectedFile;
+			if(!file_exists($fileToDelete))
+			{
+				$logMessages[]=$mess[100]." $selectedFile";
+				continue;
+			}		
+			FS_Storage::deldir($fileToDelete);
+			if(is_dir($fileToDelete))
+			{
+				$logMessages[]="$mess[38] $selectedFile $mess[44].";
+			}
+			else 
+			{
+				$logMessages[]="$mess[34] $selectedFile $mess[44].";
+			}
+		}
+	}
+	
+	
+	
+	function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
+	{
+		$mess = ConfService::getMessages();		
 		$destFile = ConfService::getRootDir().$destDir."/".basename($srcFile);
 		$realSrcFile = ConfService::getRootDir()."/$srcFile";		
 		if(!file_exists($realSrcFile))
@@ -291,6 +356,87 @@ class FS_Storage
 			}
 		}
 		
+	}
+
+	// A function to copy files from one directory to another one, including subdirectories and
+	// nonexisting or newer files. Function returns number of files copied.
+	// This function is PHP implementation of Windows xcopy  A:\dir1\* B:\dir2 /D /E /F /H /R /Y
+	// Syntaxis: [$number =] dircopy($sourcedirectory, $destinationdirectory [, $verbose]);
+	// Example: $num = dircopy('A:\dir1', 'B:\dir2', 1);
+
+	function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false) 
+	{
+		$num = 0;
+		if(!is_dir($dstdir)) mkdir($dstdir);
+		if($curdir = opendir($srcdir)) 
+		{
+			while($file = readdir($curdir)) 
+			{
+				if($file != '.' && $file != '..') 
+				{
+					$srcfile = $srcdir . DIRECTORY_SEPARATOR . $file;
+					$dstfile = $dstdir . DIRECTORY_SEPARATOR . $file;
+					if(is_file($srcfile)) 
+					{
+						if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
+						if($ow > 0) 
+						{
+							if($verbose) echo "Copying '$srcfile' to '$dstfile'...";
+							if(copy($srcfile, $dstfile)) 
+							{
+								touch($dstfile, filemtime($srcfile)); $num++;
+								if($verbose) echo "OK\n";
+								$success[] = $srcfile;
+							}
+							else 
+							{
+								$errors[] = $srcfile;
+							}
+						}
+					}
+					else if(is_dir($srcfile)) 
+					{
+						$num += FS_Storage::dircopy($srcfile, $dstfile, $errors, $success, $verbose);
+					}
+				}
+			}
+			closedir($curdir);
+		}
+		return $num;
+	}
+	
+	
+	function deldir($location)
+	{
+		if(is_dir($location))
+		{
+			$all=opendir($location);
+			while ($file=readdir($all))
+			{
+				if (is_dir("$location/$file") && $file !=".." && $file!=".")
+				{
+					FS_Storage::deldir("$location/$file");
+					if(file_exists("$location/$file")){rmdir("$location/$file"); }
+					unset($file);
+				}
+				elseif (!is_dir("$location/$file"))
+				{
+					if(file_exists("$location/$file")){unlink("$location/$file"); }
+					unset($file);
+				}
+			}
+			closedir($all);
+			rmdir($location);
+		}
+		else
+		{
+			if(file_exists("$location")) {unlink("$location");}
+		}
+		if(basename(dirname($location)) == ConfService::getRecycleBinDir())
+		{
+			// DELETING FROM RECYCLE
+			RecycleBinManager::deleteFromRecycle($location);
+		}
 	}
 
 	
