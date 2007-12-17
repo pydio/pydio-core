@@ -306,6 +306,7 @@ switch($action)
 	break;
 
 	case "image_proxy":
+	$fic = utf8_decode($fic);
 	$taille=filesize(ConfService::getRootDir()."/$fic");
 	header("Content-Type: ".Utils::getImageMimeType($fic)."; name=\"".basename($fic)."\"");
 	header('Cache-Control: public');
@@ -314,6 +315,7 @@ switch($action)
 	break;
 	
 	case "mp3_proxy":
+	//$fic = utf8_decode($fic);
 	$taille=filesize(ConfService::getRootDir()."/$fic");
 	header("Content-Type: audio/mp3; name=\"".basename($fic)."\"");
 	readfile(ConfService::getRootDir()."/$fic");
