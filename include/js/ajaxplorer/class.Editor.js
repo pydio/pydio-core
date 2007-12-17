@@ -5,7 +5,7 @@ function Editor(oFormObject)
 	this.saveButton = oFormObject.getElementsBySelector('a#saveButton')[0];
 	this.downloadButton = oFormObject.getElementsBySelector('a#downloadFileButton')[0];
 	this.ficInput = oFormObject.getElementsBySelector('input[name="fic"]')[0];
-	this.repInput = oFormObject.getElementsBySelector('input[name="rep"]')[0];	
+	this.repInput = oFormObject.getElementsBySelector('input[name="dir"]')[0];	
 	this.closeButton.onclick = function(){
 		if(this.modified && !window.confirm(MessageHash[201])){
 				return false;
@@ -81,7 +81,7 @@ Editor.prototype.saveFile = function()
 	else value = this.textarea.value;
 	connexion.addParameter('code', value);
 	connexion.addParameter('fic', this.ficInput.value);
-	connexion.addParameter('rep', this.repInput.value);	
+	connexion.addParameter('dir', this.repInput.value);	
 	connexion.onComplete = function(transp){this.parseXml(transp);}.bind(this);
 	this.setOnLoad();
 	connexion.setMethod('put');

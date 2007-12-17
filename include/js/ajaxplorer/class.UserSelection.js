@@ -103,9 +103,9 @@ UserSelection.prototype.updateFormOrUrl = function (oFormElement, sUrl)
 			if(element.name.indexOf("fic_") != -1 || element.name=="fic") element.value = "";
 		});
 	}
-	// UPDATE THE 'REP' FIELDS
+	// UPDATE THE 'DIR' FIELDS
 	if(oFormElement && oFormElement.rep) oFormElement.rep.value = this._currentRep;
-	sUrl += '&rep='+this._currentRep;
+	sUrl += '&dir='+this._currentRep;
 	
 	// UPDATE THE 'FIC' FIELDS
 	if(this.isEmpty()) return sUrl;

@@ -5,7 +5,7 @@ AjxpAutocompleter = Class.create(Autocompleter.Base, {
     this.options.onComplete    = this.onComplete.bind(this);
     this.options.defaultParams = this.options.parameters || null;
     this.url                   = "content.php?get_action=xml_listing&mode=complete";
-    this.options.paramName	   = "rep";
+    this.options.paramName	   = "dir";
     this.options.minChars	   = 1;
     //this.options.callback	   = this.parseValueBeforeSending.bind(this);
   },

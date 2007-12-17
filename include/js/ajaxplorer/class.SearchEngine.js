@@ -157,7 +157,7 @@ SearchEngine.prototype.searchFolderContent = function(text, currentFolder)
 	var oThis = this;
 	var connexion = new Connexion();
 	connexion.addParameter('mode', 'search');
-	connexion.addParameter('rep', currentFolder);
+	connexion.addParameter('dir', currentFolder);
 	connexion.onComplete = function(transport){
 		oThis._parseXmlAndSearchString(transport.responseXML, text, currentFolder, queryIndex);
 	}
