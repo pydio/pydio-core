@@ -100,27 +100,27 @@ UserSelection.prototype.updateFormOrUrl = function (oFormElement, sUrl)
 	if(oFormElement)	
 	{
 		$(oFormElement).getElementsBySelector("input").each(function(element){
-			if(element.name.indexOf("fic_") != -1 || element.name=="fic") element.value = "";
+			if(element.name.indexOf("file_") != -1 || element.name=="file") element.value = "";
 		});
 	}
 	// UPDATE THE 'DIR' FIELDS
 	if(oFormElement && oFormElement.rep) oFormElement.rep.value = this._currentRep;
 	sUrl += '&dir='+this._currentRep;
 	
-	// UPDATE THE 'FIC' FIELDS
+	// UPDATE THE 'file' FIELDS
 	if(this.isEmpty()) return sUrl;
 	var fileNames = this.getFileNames();
 	if(this.isUnique())
 	{
-		sUrl += '&'+'fic='+fileNames[0];
-		if(oFormElement) this._addHiddenField(oFormElement, 'fic', fileNames[0]);
+		sUrl += '&'+'file='+fileNames[0];
+		if(oFormElement) this._addHiddenField(oFormElement, 'file', fileNames[0]);
 	}
 	else
 	{
 		for(var i=0;i<fileNames.length;i++)
 		{
-			sUrl += '&'+'fic_'+i+'='+fileNames[i];
-			if(oFormElement) this._addHiddenField(oFormElement, 'fic_'+i, fileNames[i]);
+			sUrl += '&'+'file_'+i+'='+fileNames[i];
+			if(oFormElement) this._addHiddenField(oFormElement, 'file_'+i, fileNames[i]);
 		}
 	}
 	return sUrl;

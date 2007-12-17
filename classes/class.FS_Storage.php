@@ -13,17 +13,17 @@ class FS_Storage
 		$this->rootDir = $rootDir;
 	}
 	
-	function initName($rep)
+	function initName($dir)
 	{
 		$racine = ConfService::getRootDir();
 		$mess = ConfService::getMessages();
-		if(!isset($rep) || $rep=="" || $rep == "/")
+		if(!isset($dir) || $dir=="" || $dir == "/")
 		{
 			$nom_rep=$racine;
 		}
 		else
 		{
-			$nom_rep="$racine/$rep";
+			$nom_rep="$racine/$dir";
 		}
 		if(!file_exists($racine))
 		{
@@ -35,7 +35,7 @@ class FS_Storage
 		if(!is_dir($nom_rep))
 		{
 			AJXP_XMLWriter::header();
-			echo "<error>$mess[100] $rep</error>";
+			echo "<error>$mess[100] $dir</error>";
 			AJXP_XMLWriter::close();
 			exit;
 		}
@@ -71,35 +71,35 @@ class FS_Storage
 		$ordre = "nom";
 		$poidstotal=0;
 		$handle=opendir($nom_rep);
-		while ($fichier = readdir($handle))
+		while ($file = readdir($handle))
 		{
-			if($fichier!="." && $fichier!=".." && Utils::show_hidden_files($fichier)==1)
+			if($file!="." && $file!=".." && Utils::showHiddenFiles($file)==1)
 			{
 				if(ConfService::getRecycleBinDir() != "" 
 					&& $nom_rep == ConfService::getRootDir()."/".ConfService::getRecycleBinDir() 
-					&& $fichier == RecycleBinManager::getCacheFileName()){
+					&& $file == RecycleBinManager::getCacheFileName()){
 					continue;
 				}
-				$poidsfic=filesize("$nom_rep/$fichier");
+				$poidsfic=filesize("$nom_rep/$file");
 				$poidstotal+=$poidsfic;
-				if(is_dir("$nom_rep/$fichier"))
+				if(is_dir("$nom_rep/$file"))
 				{					
-					if(ConfService::useRecycleBin() && ConfService::getRootDir()."/".ConfService::getRecycleBinDir() == "$nom_rep/$fichier")
+					if(ConfService::useRecycleBin() && ConfService::getRootDir()."/".ConfService::getRecycleBinDir() == "$nom_rep/$file")
 					{
 						continue;
 					}
-					if($ordre=="mod") {$liste_rep[$fichier]=filemtime("$nom_rep/$fichier");}
-					else {$liste_rep[$fichier]=$fichier;}
+					if($ordre=="mod") {$liste_rep[$file]=filemtime("$nom_rep/$file");}
+					else {$liste_rep[$file]=$file;}
 				}
 				else
 				{
 					if(!$dir_only)
 					{
-						if($ordre=="nom") {$liste_fic[$fichier]=Utils::mimetype("$nom_rep/$fichier","image");}
-						else if($ordre=="taille") {$liste_fic[$fichier]=$poidsfic;}
-						else if($ordre=="mod") {$liste_fic[$fichier]=filemtime("$nom_rep/$fichier");}
-						else if($ordre=="type") {$liste_fic[$fichier]=Utils::mimetype("$nom_rep/$fichier","type");}
-						else {$liste_fic[$fichier]=Utils::mimetype("$nom_rep/$fichier","image");}
+						if($ordre=="nom") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image");}
+						else if($ordre=="taille") {$liste_fic[$file]=$poidsfic;}
+						else if($ordre=="mod") {$liste_fic[$file]=filemtime("$nom_rep/$file");}
+						else if($ordre=="type") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type");}
+						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image");}
 					}
 				}
 			}
@@ -124,7 +124,7 @@ class FS_Storage
 		}
 		else ($liste_rep = array());
 	
-		$liste = Utils::assemble_tableaux($liste_rep,$liste_fic);
+		$liste = Utils::mergeArrays($liste_rep,$liste_fic);
 		if ($poidstotal >= 1073741824) {$poidstotal = round($poidstotal / 1073741824 * 100) / 100 . " G".$size_unit;}
 		elseif ($poidstotal >= 1048576) {$poidstotal = round($poidstotal / 1048576 * 100) / 100 . " M".$size_unit;}
 		elseif ($poidstotal >= 1024) {$poidstotal = round($poidstotal / 1024 * 100) / 100 . " K".$size_unit;}
@@ -166,9 +166,9 @@ class FS_Storage
 		}
 	}
 	
-	function date_modif($fichier)
+	function date_modif($file)
 	{
-		$tmp = filemtime($fichier);
+		$tmp = filemtime($file);
 		return date("d/m/Y H:i",$tmp);
 	}
 	

@@ -29,7 +29,7 @@
 		<a href="" id="saveButton" onclick="saveForm();return false;"><img src="images/crystal/actions/22/filesave.png" width="22" height="22" alt="<?php print $mess[53]; ?>" border="0"><br><?php print $mess[53]; ?></a>
 		<a href="" id="downloadFileButton"><img width="22" height="22" src="images/crystal/actions/22/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
 	</div>
-	<input type="hidden" name="fic" value="">
+	<input type="hidden" name="file" value="">
 	<input type="hidden" name="dir" value="">
 	<input type="hidden" name="save" value="1">
 </div>
@@ -38,20 +38,20 @@
 <div id="createdir_form" action="mkdir" box_width="280">
 <div class="dialogLegend"><?php print($mess[26]); ?><b class="replace_rep"></b></div>
 <br><?php print($mess[173]);?><br>
-<input type="text" name="nomdir" size="30" class="dialogFocus">
+<input type="text" name="dirname" size="30" class="dialogFocus">
 </div>
 
 <!-- MAKE NEW FILE -->
 <div id="createfile_form" action="mkfile" box_width="280">
 <div class="dialogLegend"><?php print($mess[28]); ?><b class="replace_rep"></b></div>
 <br><?php print($mess[174]);?></br>
-<input type="text" name="nomfic" size="30" class="dialogFocus">
+<input type="text" name="filename" size="30" class="dialogFocus">
 </div>
 
 <!-- RENAME FILE -->
 <div id="rename_form" action="rename" box_width="280">
 <?php print($mess[6]); ?> <b class="replace_file"></b> <?php print($mess[42]); ?><br>
-<input type="text" name="fic_new" value="" id="fic_new" class="dialogFocus initFicName">
+<input type="text" name="filename_new" value="" id="filename_new" class="dialogFocus initFicName">
 </div>
 
 <!-- COPY OR MOVE SELECTION -->

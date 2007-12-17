@@ -10,7 +10,7 @@ function Diaporama(div)
 	this.imgContainer = div.getElementsBySelector('div#imageContainer')[0];
 	fitHeightToBottom(this.imgContainer, null, 5);
 	this.zoomInput = div.getElementsBySelector('input#zoomValue')[0];
-	this.baseUrl = 'content.php?action=image_proxy&fic=';
+	this.baseUrl = 'content.php?action=image_proxy&file=';
 	var oThis = this;
 	this.nextButton.onclick = function(){
 		oThis.next();
@@ -28,7 +28,7 @@ function Diaporama(div)
 	}	
 	this.downloadButton.onclick = function(){
 		if(!oThis.currentFile) return;		
-		document.location.href = 'content.php?action=download&fic='+oThis.currentFile;
+		document.location.href = 'content.php?action=download&file='+oThis.currentFile;
 		return false;
 	}
 	this.actualSizeButton.onclick = function(){

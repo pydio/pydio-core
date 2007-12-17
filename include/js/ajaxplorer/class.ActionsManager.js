@@ -84,7 +84,7 @@ ActionsManager.prototype.init = function()
 		textNode.innerHTML = replaceHtml;
 		}
 	}
-	this.downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=download&fic='); 
+	this.downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=download&file='); 
 	this.downloader.triggerEnd = function() {hideLightBox();};
 
 	//this.multi_selector = new MultiSelector( $( 'upload_files_list' ), '6' );
@@ -472,7 +472,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			var divId = buttonAction.replace('_', '')+'_form';
 			modal.showDialogForm('Create', divId, null, function(){
 				var oForm = $(modal.getForm());	
-				var elementToCheck=(oForm['nomfic']?oForm['nomfic']:oForm['nomdir']);
+				var elementToCheck=(oForm['filename']?oForm['filename']:oForm['dirname']);
 				if(ajaxplorer.getFilesList().fileNameExists($(elementToCheck).getValue()))
 				{
 					alert(MessageHash[125]);
@@ -490,7 +490,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				var userSelection = ajaxplorer.getFilesList().getUserSelection();
 				userSelection.updateFormOrUrl(newForm, '');
 				var crtFileName = userSelection.getUniqueFileName();
-				newForm.fic_new.value = getBaseName(crtFileName);
+				newForm.filename_new.value = getBaseName(crtFileName);
 		 	}
 			modal.showDialogForm('Rename', 'rename_form', onLoad);
 
@@ -506,7 +506,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		   		this.parseXmlMessage(transport.responseXML);
 		   }.bind(this);
 		   fileNames.each(function(filename){
-		   		connexion.addParameter('fic', filename);
+		   		connexion.addParameter('file', filename);
 		   		connexion.sendAsync();
 		   }.bind(this));
 		break;
@@ -583,7 +583,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			}
 			var loadFunc = function(oForm){
 				var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-				var downloader = new MultiDownloader(dObject, 'content.php?action=download&fic=');
+				var downloader = new MultiDownloader(dObject, 'content.php?action=download&file=');
 				downloader.triggerEnd = function(){hideLightBox()};
 				fileNames = userSelection.getFileNames();
 				for(var i=0; i<fileNames.length;i++)
@@ -729,10 +729,10 @@ ActionsManager.prototype.applyDragMove = function(fileName, destDir, destNodeNam
 		connexion.addParameter('get_action', 'move');
 	}
 	if(fileName != null){
-		connexion.addParameter('fic', fileName);
+		connexion.addParameter('file', fileName);
 	}else{
 		for(var i=0; i<fileNames.length;i++){
-			connexion.addParameter('fic_'+i, fileNames[i]);
+			connexion.addParameter('file_'+i, fileNames[i]);
 		}
 	}
 	connexion.addParameter('dest', destDir);

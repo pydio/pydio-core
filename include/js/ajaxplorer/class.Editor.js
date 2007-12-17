@@ -4,7 +4,7 @@ function Editor(oFormObject)
 	this.closeButton = oFormObject.getElementsBySelector('a#closeButton')[0];
 	this.saveButton = oFormObject.getElementsBySelector('a#saveButton')[0];
 	this.downloadButton = oFormObject.getElementsBySelector('a#downloadFileButton')[0];
-	this.ficInput = oFormObject.getElementsBySelector('input[name="fic"]')[0];
+	this.ficInput = oFormObject.getElementsBySelector('input[name="file"]')[0];
 	this.repInput = oFormObject.getElementsBySelector('input[name="dir"]')[0];	
 	this.closeButton.onclick = function(){
 		if(this.modified && !window.confirm(MessageHash[201])){
@@ -20,7 +20,7 @@ function Editor(oFormObject)
 	}.bind(this);
 	this.downloadButton.onclick = function(){
 		if(!this.currentFile) return;		
-		document.location.href = 'content.php?action=download&fic='+this.currentFile;
+		document.location.href = 'content.php?action=download&file='+this.currentFile;
 		return false;
 	}.bind(this);	
 	modal.setCloseAction(function(){this.close();}.bind(this));
@@ -64,7 +64,7 @@ Editor.prototype.loadFile = function(fileName)
 	this.currentFile = fileName;
 	var connexion = new Connexion();
 	connexion.addParameter('get_action', 'edit');
-	connexion.addParameter('fic', fileName);	
+	connexion.addParameter('file', fileName);	
 	connexion.onComplete = function(transp){this.parseTxt(transp);}.bind(this);
 	this.changeModifiedStatus(false);
 	this.setOnLoad();
@@ -80,7 +80,7 @@ Editor.prototype.saveFile = function()
 	if(this.currentUseCp) value = this.oForm.getElementsBySelector('iframe')[0].getCode();
 	else value = this.textarea.value;
 	connexion.addParameter('code', value);
-	connexion.addParameter('fic', this.ficInput.value);
+	connexion.addParameter('file', this.ficInput.value);
 	connexion.addParameter('dir', this.repInput.value);	
 	connexion.onComplete = function(transp){this.parseXml(transp);}.bind(this);
 	this.setOnLoad();
