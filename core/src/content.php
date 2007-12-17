@@ -399,8 +399,8 @@ switch($action)
 				header('HTTP/1.0 '.$errorMessage);
 				die('Error '.$errorMessage);
 			}else{
-				header('HTTP/1.0 SUCCESS');
-				die($logMessage);
+				header('HTTP/1.0 200 OK');
+				die("200 OK");
 			}
 		}
 		else
