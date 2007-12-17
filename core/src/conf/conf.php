@@ -17,7 +17,7 @@
 /* French : fr
 /* English : en
 /*************************/
-$available_languages = array("en"=>"English", "fr"=>"Français", "nl"=>"Nederlands", "es"=>"Español");
+$available_languages = array("en"=>"English", "fr"=>"FranÃ§ais", "nl"=>"Nederlands", "es"=>"EspaÃ±ol");
 $dft_langue="en";
 
 define("ENABLE_USERS", 1);
@@ -85,8 +85,7 @@ define("INITIAL_ADMIN_PASSWORD", "admin");
 
 // PAGES D'ENTETE ET DE BAS DE PAGE
 // (header and footer files )
-$hautpage="include/html/haut.htm";
-$baspage="include/html/bas.htm";
+$baspage="include/html/bottom.html";
 
 
 ?>
