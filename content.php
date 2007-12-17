@@ -81,11 +81,11 @@ $mess = ConfService::getMessages();
 
 foreach($_GET as $getName=>$getValue)
 {
-	$$getName = $getValue;
+	$$getName = Utils::securePath($getValue);
 }
 foreach($_POST as $getName=>$getValue)
 {
-	$$getName = $getValue;
+	$$getName = Utils::securePath($getValue);
 }
 
 $selection = new UserSelection();
@@ -194,173 +194,131 @@ if(AuthService::usersEnabled())
 switch($action)
 {
 	//------------------------------------
+	//	SWITCH THE ROOT REPOSITORY
+	//------------------------------------	
+	case "switch_root_dir":
+	
+		if(!isSet($root_dir_index))
+		{
+			break;
+		}
+		$dirList = ConfService::getRootDirsList();
+		if(!isSet($dirList[$root_dir_index]))
+		{
+			$errorMessage = "Trying to switch to an unkown folder!";
+			break;
+		}
+		ConfService::switchRootDir($root_dir_index);
+		$logMessage = "Successfully Switched!";
+		
+	break;
+	
+	//------------------------------------
+	//	DOWNLOAD, IMAGE & MP3 PROXYS
+	//------------------------------------
+	case "download";
+		FS_Storage::readFile(ConfService::getRootDir()."/".utf8_decode($file), "force-download");
+		exit(0);
+	break;
+
+	case "image_proxy":
+		FS_Storage::readFile(ConfService::getRootDir()."/".utf8_decode($file), "image");
+		exit(0);
+	break;
+	
+	case "mp3_proxy":
+		FS_Storage::readFile(ConfService::getRootDir()."/".$file, "mp3");
+		exit(0);
+	break;
+
+	//------------------------------------
+	//	GET AN HTML TEMPLATE
+	//------------------------------------
+	case "get_template":
+	
+		header("Content-type:text/html");
+		if(isset($template_name) && is_file("include/html/".$template_name))
+		{
+			if(!isSet($encode) || $encode != "false")
+			{
+				$mess = array_map("utf8_encode", $mess);
+			}
+			include("include/html/".$template_name);
+		}
+		exit(0);	
+		
+	break;
+	
+	//------------------------------------
 	//	ONLINE EDIT
 	//------------------------------------
 	case "edit";	
-	$file = utf8_decode($file);
-	if(isset($save) && $save==1)
-	{
-		$code=stripslashes($code);
-		$code=str_replace("&lt;","<",$code);
-		$fp=fopen(ConfService::getRootDir()."/$file","w");
-		fputs ($fp,$code);
-		fclose($fp);
-		Utils::removeWinReturn(ConfService::getRootDir()."/$file");
-		$logMessage = $mess[115];
-		echo $logMessage;
-	}
-	else 
-	{
-		header("Content-type:text/plain");
-		$fp=fopen(ConfService::getRootDir()."/$file","r");
-		while (!feof($fp))
+		$file = utf8_decode($file);
+		if(isset($save) && $save==1)
 		{
-			$tmp=fgets($fp,4096);
-			echo "$tmp";
+			$code=stripslashes($code);
+			$code=str_replace("&lt;","<",$code);
+			$fp=fopen(ConfService::getRootDir()."/$file","w");
+			fputs ($fp,$code);
+			fclose($fp);
+			//Utils::removeWinReturn(ConfService::getRootDir()."/$file");
+			$logMessage = $mess[115];
+			echo $logMessage;
 		}
-		fclose($fp);
-	}
-	exit(0);
-	break;
-
-
-	//------------------------------------
-	//	HELP
-	//------------------------------------
-	/*
-	case "help";
-	HTMLWriter::toolbar((isset($_GET["user"])?$_GET["user"]:"shared_bookmarks"));
-	include("include/${langue}_help.htm");
-	include($baspage);
-	exit(0);
-	break;
-	*/
-
-	//------------------------------------
-	//	DOWNLOAD
-	//------------------------------------
-
-	case "download";
-	$file = utf8_decode($file);
-	$filename = basename($file);
-	$taille=filesize(ConfService::getRootDir()."/$file");
-	header("Content-Type: application/force-download; name=\"$filename\"");
-	header("Content-Transfer-Encoding: binary");
-	header("Content-Length: $taille");
-	header("Content-Disposition: attachment; filename=\"$filename\"");
-	header("Expires: 0");
-	header("Cache-Control: no-cache, must-revalidate");
-	header("Pragma: no-cache");
-	// For SSL websites there is a bug with IE see article KB 323308
-	// therefore we must reset the Cache-Control and Pragma Header
-	if (ConfService::getConf("USE_HTTPS")==1) 
-	{
-		if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+		else 
 		{
-			header("Cache-Control:");
-			header("Pragma:");
+			FS_Storage::readFile(ConfService::getRootDir()."/".$file, "plain");
 		}
-	}
-	
-	readfile(ConfService::getRootDir()."/$file");
-	exit();
+		exit(0);
 	break;
 
 
 	//------------------------------------
 	//	COPY / MOVE
 	//------------------------------------
-
 	case "copy";
-	case "move";	
-	if($selection->isEmpty())
-	{
-		$errorMessage = $mess[113];
-		break;
-	}
-	if(!is_writable(ConfService::getRootDir()."/".$dest))
-	{
-		$errorMessage = $mess[38]." ".$dest." ".$mess[99];
-		break;
-	}
-	if($action == "move" && !is_writable(dirname(ConfService::getRootDir()."/".$selection->getUniqueFile())))
-	{
-		$errorMessage.= "\n".$mess[38]." ".dirname($selection->getUniqueFile())." ".$mess[99];
-		break;
-	}
-	
-	$success = $error = array();
-	$selectedFiles = $selection->getFiles();
-	foreach ($selectedFiles as $selectedFile)
-	{
-		FS_Storage::copyOrMoveFile($dest, $selectedFile, $error, $success, ($action=="move"?true:false));
-	}
-	
-	if(count($error)) $errorMessage = join("\n", $error);
-	else $logMessage = join("\n", $success);
-	$reload_current_node = true;
-	if(isSet($dest_node)) $reload_dest_node = $dest_node;
-	$reload_file_list = true;
-	break;
-
-	case "image_proxy":
-	$file = utf8_decode($file);
-	$taille=filesize(ConfService::getRootDir()."/$file");
-	header("Content-Type: ".Utils::getImageMimeType($file)."; name=\"".basename($file)."\"");
-	header('Cache-Control: public');
-	readfile(ConfService::getRootDir()."/$file");
-	exit(0);
-	break;
-	
-	case "mp3_proxy":
-	//$file = utf8_decode($file);
-	$taille=filesize(ConfService::getRootDir()."/$file");
-	header("Content-Type: audio/mp3; name=\"".basename($file)."\"");
-	readfile(ConfService::getRootDir()."/$file");
-	exit(0);
+	case "move";
+		
+		if($selection->isEmpty())
+		{
+			$errorMessage = $mess[113];
+			break;
+		}
+		$success = $error = array();
+		
+		FS_Storage::copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
+		
+		if(count($error)){
+			$errorMessage = join("\n", $error);
+		}
+		else {
+			$logMessage = join("\n", $success);
+		}
+		$reload_current_node = true;
+		if(isSet($dest_node)) $reload_dest_node = $dest_node;
+		$reload_file_list = true;
+		
 	break;
 	
 	//------------------------------------
 	//	SUPPRIMER / DELETE
 	//------------------------------------
 	case "delete";
-	if($selection->isEmpty())
-	{
-		$errorMessage = $mess[113];
-		break;
-	}
-	$logMessages = array();
-	foreach ($selection->getFiles() as $selectedFile)
-	{	
-		$a_effacer=ConfService::getRootDir().$selectedFile;
-		if($selectedFile == "" || $selectedFile == DIRECTORY_SEPARATOR)
+	
+		if($selection->isEmpty())
 		{
-			$errorMessage = $mess[120];
+			$errorMessage = $mess[113];
 			break;
 		}
-		if(file_exists($a_effacer))
+		$logMessages = array();
+		$errorMessage = FS_Storage::delete($selection->getFiles(), $logMessages);
+		if(count($logMessages))
 		{
-			FS_Storage::deldir($a_effacer);
-			if(is_dir($a_effacer))
-			{
-				$logMessages[]="$mess[38] $selectedFile $mess[44].";
-			}
-			else 
-			{
-				$logMessages[]="$mess[34] $selectedFile $mess[44].";
-			}
+			$logMessage = join("\n", $logMessages);
 		}
-		else 
-		{
-			$logMessages[]=$mess[100]." $selectedFile";
-		}
-	}
-	if(count($logMessages))
-	{
-		$logMessage = join("\n", $logMessages);
-	}
-	$reload_current_node = true;
-	$reload_file_list = true;
+		$reload_current_node = true;
+		$reload_file_list = true;
+		
 	break;
 
 
@@ -368,133 +326,61 @@ switch($action)
 	//	RENOMMER / RENAME
 	//------------------------------------
 	case "rename";
-	$file = utf8_decode($file);
-	$nom_fic=basename($file);
-	$filename_new=Utils::processFileName(utf8_decode($filename_new));
-	$old=ConfService::getRootDir()."/$file";
-	if(!is_writable($old))
-	{
-		$errorMessage = $mess[34]." ".$nom_fic." ".$mess[99];
-		break;		
-	}
-	$new=dirname($old)."/".$filename_new;
-	if($filename_new=="")
-	{
-		$errorMessage="$mess[37]";
-		break;
-	}
-	if(file_exists($new))
-	{
-		$errorMessage="$filename_new $mess[43]"; 
-		break;
-	}
-	if(!file_exists($old))
-	{
-		$errorMessage = $mess[100]." $nom_fic";
-		break;
-	}
-	rename($old,$new);
 	
-	$logMessage="$file $mess[41] $filename_new";
-	$reload_current_node = true;
-	$reload_file_list = basename($new);
+		$file = utf8_decode($file);
+		$error = FS_Storage::rename($file, $filename_new);
+		if($error != null) {
+			$errorMessage  = $error;
+			break;
+		}
+		$logMessage="$file $mess[41] $filename_new";
+		$reload_current_node = true;
+		$reload_file_list = basename($filename_new);
+
 	break;
 
 
 	//------------------------------------
 	//	CREER UN REPERTOIRE / CREATE DIR
 	//------------------------------------
-
 	case "mkdir";
-	$err="";
-	$messtmp="";
-	$dirname=Utils::processFileName(utf8_decode($dirname));
-	if($dirname=="")
-	{
-		$errorMessage="$mess[37]";
-		break;
-	}
-	if(file_exists(ConfService::getRootDir()."/$dir/$dirname"))
-	{
-		$errorMessage="$mess[40]"; 
-		break;
-	}
-	if(!is_writable(ConfService::getRootDir()."/$dir"))
-	{
-		$errorMessage = $mess[38]." $dir ".$mess[99];
-		break;
-	}
-	mkdir(ConfService::getRootDir()."/$dir/$dirname",0775);
-	$reload_file_list = $dirname;
-	$messtmp.="$mess[38] $dirname $mess[39] ";
-	if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
-	$logMessage = $messtmp;
-	$reload_current_node = true;
+	
+		$messtmp="";
+		$dirname=Utils::processFileName(utf8_decode($dirname));
+		$error = FS_Storage::mkDir($dir, $dirname);
+		if(isSet($error)){
+			$errorMessage = $error; break;
+		}
+		$reload_file_list = $dirname;
+		$messtmp.="$mess[38] $dirname $mess[39] ";
+		if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
+		$logMessage = $messtmp;
+		$reload_current_node = true;
+		
 	break;
 
 	//------------------------------------
 	//	CREER UN FICHIER / CREATE FILE
 	//------------------------------------
-
 	case "mkfile";
-	$err="";
-	$messtmp="";
-	$filename=Utils::processFileName(utf8_decode($filename));
-	if($filename=="")
-	{
-		$errorMessage="$mess[37]"; break;
-	}
-	if(file_exists(ConfService::getRootDir()."/$dir/$filename"))
-	{
-		$errorMessage="$mess[71]"; break;
-	}
-	if(!is_writable(ConfService::getRootDir()."/$dir"))
-	{
-		$errorMessage="$mess[38] $dir $mess[99]";break;
-	}
 	
-	$fp=fopen(ConfService::getRootDir()."/$dir/$filename","w");
-	if($fp)
-	{
-		if(eregi("\.html$",$filename)||eregi("\.htm$",$filename))
-		{
-			fputs($fp,"<html>\n<head>\n<title>Document sans titre</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
+		$messtmp="";
+		$filename=Utils::processFileName(utf8_decode($filename));	
+		$error = FS_Storage::createEmptyFile($dir, $filename);
+		if(isSet($error)){
+			$errorMessage = $error; break;
 		}
-		fclose($fp);
 		$messtmp.="$mess[34] $filename $mess[39] ";
 		if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
 		$logMessage = $messtmp;
 		$reload_file_list = $filename;
-	}
-	else
-	{
-		$err = 1;
-		$errorMessage = "$mess[102] $dir/$filename (".$fp.")";
-	}
 
 	break;
-
+	
 
 	//------------------------------------
 	//	UPLOAD
-	//------------------------------------
-	
-	case "fancy_uploader":
-	case "get_template":
-	header("Content-type:text/html");
-	if($get_action == "fancy_uploader"){
-		include("include/html/fancy_tpl.html");
-		include(ConfService::getConf("BOTTOM_PAGE"));
-	}else{
-		if(isset($template_name)){
-			$mess = array_map("utf8_encode", $mess);
-			include("include/html/".$template_name);
-		}
-	}
-	exit(0);	
-	break;
-	
-
+	//------------------------------------	
 	case "upload":
 
 	if($dir!=""){$rep_source="/$dir";}
@@ -588,49 +474,6 @@ switch($action)
 		print("</script></html>");
 	}
 	exit;
-	break;
-
-	//---------------------------------------------------------------------------------------------------------------------------
-	//	EMAIL URL
-	//---------------------------------------------------------------------------------------------------------------------------
-	case "email_url":
-	$to      = $_POST['email_dest'];
-	$subject = "URL sent by AjaXplorer";
-	$message = "Hello, \n a friend of yours has sent you an URL to browse a folder in AjaXplorer : ";
-	$message .= "\n\n Sender : ".$_POST["email_exp"];
-	$message .= "\n The URL : ".$_POST["email_url"];
-	$message .= "\n Additional Comment : ".wordwrap($_POST["email_comment"], 70);
-	$headers = 'From: '.$webmaster_email. "\r\n" .
-	'Reply-To: '.$webmaster_email . "\r\n" .
-	'X-Mailer: PHP/' . phpversion();
-	
-	$res = @mail($to, $subject, $message, $headers);
-	if($res)
-	{
-		$logMessage = $mess[111].$message;
-	}
-	else 
-	{
-		$errorMessage = $mess[112];
-	}
-	break;
-	
-	case "switch_root_dir":
-	
-	if(isSet($root_dir_index))
-	{
-		$dirList = ConfService::getRootDirsList();
-		if(!isSet($dirList[$root_dir_index]))
-		{
-			$errorMessage = "Trying to switch to an unkown folder!";
-			break;
-		}
-		else
-		{
-			ConfService::switchRootDir($root_dir_index);
-			$logMessage = "Successfully Switched!";
-		}
-	}
 	break;
 	
 	//------------------------------------
