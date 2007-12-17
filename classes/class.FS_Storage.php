@@ -405,6 +405,15 @@ class FS_Storage
 		return $num;
 	}
 	
+	function simpleCopy($origFile, $destFile)
+	{
+		return copy($origFile, $destFile);
+	}
+	
+	function isWriteable($dir)
+	{
+		return is_writable($dir);
+	}
 	
 	function deldir($location)
 	{
