@@ -35,7 +35,7 @@ class RecycleBinManager
 	
 	function loadCache(){
 		$result = array();
-		if(ConfService::getRecycleBinDir() == "") return ;
+		if(ConfService::getRecycleBinDir() == "") return null;
 		$cachePath = ConfService::getRootDir()."/".ConfService::getRecycleBinDir()."/".RecycleBinManager::getCacheFileName();
 		if(is_file($cachePath))
 		{

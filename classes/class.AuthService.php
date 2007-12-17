@@ -93,7 +93,7 @@ class AuthService
 	{
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return 0;
-		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirData)
+		foreach (array_keys(ConfService::getRootDirsList()) as $rootDirIndex)
 		{			
 			if($loggedUser->canRead($rootDirIndex."")) return $rootDirIndex;
 		}
@@ -105,7 +105,7 @@ class AuthService
 	*/
 	function updateAdminRights($adminUser)
 	{
-		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirData)
+		foreach (array_keys(ConfService::getRootDirsList()) as $rootDirIndex)
 		{			
 			$adminUser->setRight($rootDirIndex, "rw");
 		}
@@ -145,6 +145,7 @@ class AuthService
 		if(array_key_exists($userId, $users)) return "exists";
 		$users[$userId] = crypt($userPass, "ajxp");
 		AuthService::saveLocalUsersList($users);
+		return null;
 	}
 	
 	function deleteUser($userId)
@@ -173,20 +174,11 @@ class AuthService
 	{
 		$allUsers = array();
 		$users = AuthService::loadLocalUsersList();
-		foreach ($users as $userId => $cryptedPass)
+		foreach (array_keys($users) as $userId)
 		{
 			if($userId == "guest" && !ALLOW_GUEST_BROWSING) continue;
 			$allUsers[$userId] = new AJXP_User($userId);
 		}
-		/*
-		$fp = opendir(USERS_DIR);
-		while ($file = readdir($fp)) {
-			if(is_file($file) || $file[0] == "." || $file == "CVS") continue;
-			if($file == "guest" && !ALLOW_GUEST_BROWSING) continue;
-			$allUsers[$file] = new AJXP_User($file);
-		}
-		closedir($fp);
-		*/
 		return $allUsers;
 	}
 	

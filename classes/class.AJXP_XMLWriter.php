@@ -40,7 +40,6 @@ class AJXP_XMLWriter
 	
 	function sendMessage($logMessage, $errorMessage)
 	{
-		$mess = ConfService::getMessages();
 		$messageType = ""; 
 		$message = "";
 		if($errorMessage == null)
