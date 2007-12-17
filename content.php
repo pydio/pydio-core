@@ -29,7 +29,6 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 ConfService::init("conf/conf.php");
-$hautpage=ConfService::getConf("TOP_PAGE");
 $baspage=ConfService::getConf("BOTTOM_PAGE");
 $limitSize = Utils::convertBytes(ini_get('upload_max_filesize'));
 
@@ -198,7 +197,6 @@ switch($action)
 	//	ONLINE EDIT
 	//------------------------------------
 	case "edit";	
-	//include($hautpage);
 	$file = utf8_decode($file);
 	if(isset($save) && $save==1)
 	{
@@ -229,14 +227,14 @@ switch($action)
 	//------------------------------------
 	//	HELP
 	//------------------------------------
+	/*
 	case "help";
-	include($hautpage);
 	HTMLWriter::toolbar((isset($_GET["user"])?$_GET["user"]:"shared_bookmarks"));
 	include("include/${langue}_help.htm");
 	include($baspage);
 	exit(0);
 	break;
-
+	*/
 
 	//------------------------------------
 	//	DOWNLOAD
@@ -486,7 +484,7 @@ switch($action)
 	header("Content-type:text/html");
 	if($get_action == "fancy_uploader"){
 		include("include/html/fancy_tpl.html");
-		include("include/html/bas.htm");
+		include(ConfService::getConf("BOTTOM_PAGE"));
 	}else{
 		if(isset($template_name)){
 			$mess = array_map("utf8_encode", $mess);
