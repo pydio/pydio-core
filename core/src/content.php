@@ -386,7 +386,7 @@ switch($action)
 	if($dir!=""){$rep_source="/$dir";}
 	else $rep_source = "";
 	$destination=ConfService::getRootDir().$rep_source;
-	if(!is_writable($destination))
+	if(!FS_Storage::isWriteable($destination))
 	{
 		$errorMessage = "$mess[38] $dir $mess[99].";
 		break;
@@ -395,73 +395,33 @@ switch($action)
 	$fancyLoader = false;
 	foreach ($_FILES as $boxName => $boxData)
 	{
-		if(substr($boxName, 0, 9) == "userfile_")
+		if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
+		if($boxName == "Filedata") $fancyLoader = true;
+		$err = Utils::parseFileDataErrors($boxData, $fancyLoader);
+		if($err != null)
 		{
-			foreach($boxData as $usFileName=>$usFileValue)
-			{
-				$varName = "userfile_".$usFileName;
-				$$varName = $usFileValue;
-			}
-		}
-		else if($boxName == 'Filedata')
-		{
-			$fancyLoader = true;
-			foreach($boxData as $usFileName=>$usFileValue)
-			{
-				$varName = "userfile_".$usFileName;
-				$$varName = $usFileValue;
-			}			
-		}
-		else 
-		{
-			continue;
-		}
-		if ($userfile_error != UPLOAD_ERR_OK)
-		{
-			$errorsArray = array();
-			$errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = "409 : File is too big! Max is".ini_get("upload_max_filesize");
-			$errorsArray[UPLOAD_ERR_NO_FILE] = "410 : No file found on server!($boxName)";
-			$errorsArray[UPLOAD_ERR_PARTIAL] = "410 : File is partial";
-			if($userfile_error == UPLOAD_ERR_NO_FILE && ereg('Opera',$_SERVER['HTTP_USER_AGENT']))
-			{
-				// BEURK : Opera hack, do not display "no file found error"
-				continue;
-			}
-			$errorMessage = $errorsArray[$userfile_error];
-			continue;
-		}
-		if ($userfile_size!=0)
-		{
-			$taille_ko=$userfile_size/1024;
-		}
-		else
-		{
-			$taille_ko=0;
-		}
-		if ($userfile_tmp_name=="none")
-		{
-			$errorMessage=$mess[31];
+			$errorMessage = $err;
 			break;
 		}
-		if ($userfile_tmp_name!="none" && $userfile_size!=0)
+		$userfile_name = $boxData["name"];
+		if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
+		$userfile_name=Utils::processFileName($userfile_name);
+		if (!FS_Storage::simpleCopy($boxData["tmp_name"], "$destination/".$userfile_name))
 		{
-			if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
-			$userfile_name=Utils::processFileName($userfile_name);
-			if (!copy($userfile_tmp_name, "$destination/".$userfile_name))
-			{
-				$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
-				break;
-			}
-			else
-			{
-				$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
-			}
+			$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
+			break;
 		}
+		$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
 	}
 	if($fancyLoader)
 	{
-		header('HTTP/1.0 '.$errorMessage);
-		die('Error '.$errorMessage);
+		if(isSet($errorMessage)){
+			header('HTTP/1.0 '.$errorMessage);
+			die('Error '.$errorMessage);
+		}else{
+			header('HTTP/1.0 SUCCESS');
+			die($logMessage);
+		}
 	}
 	else
 	{

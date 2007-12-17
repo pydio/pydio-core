@@ -30,6 +30,39 @@ class Utils
 		return $path;
 	}
 	
+	function parseFileDataErrors($boxData, $errorCodes)
+	{
+		$mess = ConfService::getMessages();
+		$userfile_error = $boxData["error"];		
+		$userfile_tmp_name = $boxData["tmp_name"];
+		$userfile_size = $boxData["size"];
+		if ($userfile_error != UPLOAD_ERR_OK)
+		{
+			$errorsArray = array();
+			$errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = ($errorCodes?"409 ":"")."File is too big! Max is".ini_get("upload_max_filesize");
+			$errorsArray[UPLOAD_ERR_NO_FILE] = ($errorCodes?"410 ":"")."No file found on server!";
+			$errorsArray[UPLOAD_ERR_PARTIAL] = ($errorCodes?"410 ":"")."File is partial";
+			$errorsArray[UPLOAD_ERR_INI_SIZE] = ($errorCodes?"410 ":"")."No file found on server!";
+			if($userfile_error == UPLOAD_ERR_NO_FILE)
+			{
+				// OPERA HACK, do not display "no file found error"
+				if(!ereg('Opera',$_SERVER['HTTP_USER_AGENT']))
+				{
+					return $errorsArray[$userfile_error];				
+				}
+			}
+			else
+			{
+				return $errorsArray[$userfile_error];
+			}
+		}
+		if ($userfile_tmp_name=="none" || $userfile_size == 0)
+		{
+			return ($errorCodes?"410 ":"").$mess[31];
+		}
+		return null;
+	}
+	
 	function mergeArrays($t1,$t2)
 	{
 		$liste = array();
@@ -38,8 +71,6 @@ class Utils
 		if(is_array($tab2)) {while (list($cle,$val) = each($tab2)) {$liste[$cle]=$val;}}
 		return $liste;
 	}
-	
-	
 	
 	function removeWinReturn($fileContent)
 	{
@@ -82,7 +113,6 @@ class Utils
 		$tips[] = "Use the 'o' key to download a file to your hard drive.";
 		return $tips[array_rand($tips, 1)];
 	}
-	
 	
 	function processFileName($fileName)
 	{
@@ -130,7 +160,6 @@ class Utils
 		$fileName = substr ($fileName,0,$max_caracteres);
 		return $fileName;
 	}
-	
 	
 	function mimetype($fileName,$mode)
 	{
@@ -226,7 +255,6 @@ class Utils
 		if($filesize==0) {$filesize="-";}
 		return $filesize;
 	}
-	
 	
 	function showHiddenFiles($fileName)
 	{
