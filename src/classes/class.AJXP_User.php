@@ -55,7 +55,7 @@ class AJXP_User
 		if(!isSet($this->bookmarks)) $this->bookmarks = array();
 		if($repId == -1) $repId = ConfService::getCurrentRootDirIndex();
 		if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
-		foreach ($this->bookmarks[$repId] as $k => $v)
+		foreach ($this->bookmarks[$repId] as $v)
 		{
 			if($v == trim($path)) return ; // RETURN IF ALREADY HERE!
 		}

@@ -163,8 +163,8 @@ class FS_Storage
 		$mess = ConfService::getMessages();
 		if(!is_writable(ConfService::getRootDir()."/".$destDir))
 		{
-			$errorMessage = $mess[38]." ".$destDir." ".$mess[99];
-			break;
+			$error[] = $mess[38]." ".$destDir." ".$mess[99];
+			return ;
 		}
 				
 		foreach ($selectedFiles as $selectedFile)
@@ -202,7 +202,8 @@ class FS_Storage
 		{
 			return $mess[100]." $nom_fic";
 		}
-		rename($old,$new);		
+		rename($old,$new);
+		return null;		
 	}
 	
 	function mkDir($crtDir, $newDirName)
@@ -214,13 +215,14 @@ class FS_Storage
 		}
 		if(file_exists(ConfService::getRootDir()."/$crtDir/$newDirName"))
 		{
-			return $errorMessage="$mess[40]"; 
+			return "$mess[40]"; 
 		}
 		if(!is_writable(ConfService::getRootDir()."/$crtDir"))
 		{
-			return $mess[38]." $dir ".$mess[99];
+			return $mess[38]." $crtDir ".$mess[99];
 		}
-		mkdir(ConfService::getRootDir()."/$crtDir/$newDirName",0775);		
+		mkdir(ConfService::getRootDir()."/$crtDir/$newDirName",0775);
+		return null;		
 	}
 	
 	function createEmptyFile($crtDir, $newFileName)
@@ -247,12 +249,12 @@ class FS_Storage
 				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
 			}
 			fclose($fp);
+			return null;
 		}
 		else
 		{
 			return "$mess[102] $crtDir/$newFileName (".$fp.")";
-		}
-		
+		}		
 	}
 	
 	
@@ -281,6 +283,7 @@ class FS_Storage
 				$logMessages[]="$mess[34] $selectedFile $mess[44].";
 			}
 		}
+		return null;
 	}
 	
 	
