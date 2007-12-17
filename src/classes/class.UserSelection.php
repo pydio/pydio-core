@@ -3,7 +3,7 @@
 class UserSelection
 {
 	var $files;
-	var $varPrefix = "fic";
+	var $varPrefix = "file";
 	var $isUnique = true;
 	
 	function UserSelection()

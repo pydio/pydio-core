@@ -2,7 +2,7 @@
 
 class Utils
 {
-	function assemble_tableaux($t1,$t2)
+	function mergeArrays($t1,$t2)
 	{
 		$liste = array();
 		$tab1=$t1; $tab2=$t2;
@@ -12,38 +12,11 @@ class Utils
 	}
 	
 	
-	function txt_vers_html($chaine)
-	{
-		$chaine=str_replace("&#8216;","'",$chaine);
-		$chaine=str_replace("&#339;","oe",$chaine);
-		$chaine=str_replace("&#8217;","'",$chaine);
-		$chaine=str_replace("&#8230;","...",$chaine);
-		$chaine=str_replace("&","&amp;",$chaine);
-		$chaine=str_replace("<","&lt;",$chaine);
-		$chaine=str_replace(">","&gt;",$chaine);
-		$chaine=str_replace("\"","&quot;",$chaine);
-		$chaine=str_replace("à","&agrave;",$chaine);
-		$chaine=str_replace("é","&eacute;",$chaine);
-		$chaine=str_replace("è","&egrave;",$chaine);
-		$chaine=str_replace("ù","&ugrave;",$chaine);
-		$chaine=str_replace("â","&acirc;",$chaine);
-		$chaine=str_replace("ê","&ecirc;",$chaine);
-		$chaine=str_replace("î","&icirc;",$chaine);
-		$chaine=str_replace("ô","&ocirc;",$chaine);
-		$chaine=str_replace("û","&ucirc;",$chaine);
-		$chaine=str_replace("ä","&auml;",$chaine);
-		$chaine=str_replace("ë","&euml;",$chaine);
-		$chaine=str_replace("ï","&iuml;",$chaine);
-		$chaine=str_replace("ö","&ouml;",$chaine);
-		$chaine=str_replace("ü","&uuml;",$chaine);
-		return $chaine;
-	}
 	
-	
-function enlever_controlM($fichier)
+function removeWinReturn($fileName)
 {
-	$fic=file($fichier);
-	$fp=fopen($fichier,"w");
+	$fic=file($fileName);
+	$fp=fopen($fileName,"w");
 	while (list ($cle, $val) = each ($fic))
 	{
 		$val=str_replace(CHR(10),"",$val);
@@ -78,175 +51,136 @@ function tipsandtricks()
 }
 
 
-function traite_nom_fichier($nom)
+function processFileName($fileName)
 {
 	$max_caracteres = ConfService::getConf("MAX_CHAR");
-	$nom=stripslashes($nom);
-	$nom=str_replace("'","",$nom);
-	$nom=str_replace("\"","",$nom);
-	$nom=str_replace("\"","",$nom);
-	$nom=str_replace("&","",$nom);
-	$nom=str_replace(",","",$nom);
-	$nom=str_replace(";","",$nom);
-	$nom=str_replace("/","",$nom);
-	$nom=str_replace("\\","",$nom);
-	$nom=str_replace("`","",$nom);
-	$nom=str_replace("<","",$nom);
-	$nom=str_replace(">","",$nom);
-	$nom=str_replace(" ","_",$nom);
-	$nom=str_replace(":","",$nom);
-	$nom=str_replace("*","",$nom);
-	$nom=str_replace("|","",$nom);
-	$nom=str_replace("?","",$nom);
+	$fileName=stripslashes($fileName);
+	$fileName=str_replace("'","",$fileName);
+	$fileName=str_replace("\"","",$fileName);
+	$fileName=str_replace("\"","",$fileName);
+	$fileName=str_replace("&","",$fileName);
+	$fileName=str_replace(",","",$fileName);
+	$fileName=str_replace(";","",$fileName);
+	$fileName=str_replace("/","",$fileName);
+	$fileName=str_replace("\\","",$fileName);
+	$fileName=str_replace("`","",$fileName);
+	$fileName=str_replace("<","",$fileName);
+	$fileName=str_replace(">","",$fileName);
+	$fileName=str_replace(" ","_",$fileName);
+	$fileName=str_replace(":","",$fileName);
+	$fileName=str_replace("*","",$fileName);
+	$fileName=str_replace("|","",$fileName);
+	$fileName=str_replace("?","",$fileName);
 	/*
-	$nom=str_replace("é","",$nom);
-	$nom=str_replace("è","",$nom);
-	$nom=str_replace("ç","",$nom);
-	$nom=str_replace("@","",$nom);
-	$nom=str_replace("â","",$nom);
-	$nom=str_replace("ê","",$nom);
-	$nom=str_replace("î","",$nom);
-	$nom=str_replace("ô","",$nom);
-	$nom=str_replace("û","",$nom);
-	$nom=str_replace("ù","",$nom);
-	$nom=str_replace("à","",$nom);
+	$fileName=str_replace("é","",$fileName);
+	$fileName=str_replace("è","",$fileName);
+	$fileName=str_replace("ç","",$fileName);
+	$fileName=str_replace("@","",$fileName);
+	$fileName=str_replace("â","",$fileName);
+	$fileName=str_replace("ê","",$fileName);
+	$fileName=str_replace("î","",$fileName);
+	$fileName=str_replace("ô","",$fileName);
+	$fileName=str_replace("û","",$fileName);
+	$fileName=str_replace("ù","",$fileName);
+	$fileName=str_replace("à","",$fileName);
 	*/
-	$nom=str_replace("!","",$nom);
-	$nom=str_replace("§","",$nom);
-	$nom=str_replace("+","",$nom);
-	$nom=str_replace("^","",$nom);
-	$nom=str_replace("(","",$nom);
-	$nom=str_replace(")","",$nom);
-	$nom=str_replace("#","",$nom);
-	$nom=str_replace("=","",$nom);
-	$nom=str_replace("$","",$nom);
-	$nom=str_replace("%","",$nom);
-	$nom = substr ($nom,0,$max_caracteres);
-	return $nom;
+	$fileName=str_replace("!","",$fileName);
+	$fileName=str_replace("§","",$fileName);
+	$fileName=str_replace("+","",$fileName);
+	$fileName=str_replace("^","",$fileName);
+	$fileName=str_replace("(","",$fileName);
+	$fileName=str_replace(")","",$fileName);
+	$fileName=str_replace("#","",$fileName);
+	$fileName=str_replace("=","",$fileName);
+	$fileName=str_replace("$","",$fileName);
+	$fileName=str_replace("%","",$fileName);
+	$fileName = substr ($fileName,0,$max_caracteres);
+	return $fileName;
 }
 
 
-function mimetype($fichier,$quoi)
+function mimetype($fileName,$mode)
 {
 	$mess = ConfService::getMessages();
-	if(!eregi("MSIE",$_SERVER['HTTP_USER_AGENT'])) {$client="netscape.gif";} else {$client="html.gif";}
-	/*
-	if(is_dir($fichier)){$image="dossier.gif";$nom_type=$mess[8];}
-	else if(eregi("\.mid$",$fichier)){$image="mid.gif";$nom_type=$mess[9];}
-	else if(eregi("\.txt$",$fichier)){$image="txt.gif";$nom_type=$mess[10];}
-	else if(eregi("\.sql$",$fichier)){$image="txt.gif";$nom_type=$mess[10];}
-	else if(eregi("\.js$",$fichier)){$image="js.gif";$nom_type=$mess[11];}
-	else if(eregi("\.gif$",$fichier)){$image="gif.gif";$nom_type=$mess[12];}
-	else if(eregi("\.jpg$",$fichier)){$image="jpg.gif";$nom_type=$mess[13];}
-	else if(eregi("\.html$",$fichier)){$image=$client;$nom_type=$mess[14];}
-	else if(eregi("\.htm$",$fichier)){$image=$client;$nom_type=$mess[15];}
-	else if(eregi("\.rar$",$fichier)){$image="rar.gif";$nom_type=$mess[60];}
-	else if(eregi("\.gz$",$fichier)){$image="zip.gif";$nom_type=$mess[61];}
-	else if(eregi("\.tgz$",$fichier)){$image="zip.gif";$nom_type=$mess[61];}
-	else if(eregi("\.z$",$fichier)){$image="zip.gif";$nom_type=$mess[61];}
-	else if(eregi("\.ra$",$fichier)){$image="ram.gif";$nom_type=$mess[16];}
-	else if(eregi("\.ram$",$fichier)){$image="ram.gif";$nom_type=$mess[17];}
-	else if(eregi("\.rm$",$fichier)){$image="ram.gif";$nom_type=$mess[17];}
-	else if(eregi("\.pl$",$fichier)){$image="pl.gif";$nom_type=$mess[18];}
-	else if(eregi("\.zip$",$fichier)){$image="zip.gif";$nom_type=$mess[19];}
-	else if(eregi("\.wav$",$fichier)){$image="wav.gif";$nom_type=$mess[20];}
-	else if(eregi("\.php$",$fichier)){$image="php.gif";$nom_type=$mess[21];}
-	else if(eregi("\.php3$",$fichier)){$image="php.gif";$nom_type=$mess[22];}
-	else if(eregi("\.phtml$",$fichier)){$image="php.gif";$nom_type=$mess[22];}
-	else if(eregi("\.exe$",$fichier)){$image="exe.gif";$nom_type=$mess[50];}
-	else if(eregi("\.bmp$",$fichier)){$image="bmp.gif";$nom_type=$mess[56];}
-	else if(eregi("\.png$",$fichier)){$image="gif.gif";$nom_type=$mess[57];}
-	else if(eregi("\.css$",$fichier)){$image="css.gif";$nom_type=$mess[58];}
-	else if(eregi("\.mp3$",$fichier)){$image="mp3.gif";$nom_type=$mess[59];}
-	else if(eregi("\.xls$",$fichier)){$image="xls.gif";$nom_type=$mess[64];}
-	else if(eregi("\.doc$",$fichier)){$image="doc.gif";$nom_type=$mess[65];}
-	else if(eregi("\.pdf$",$fichier)){$image="pdf.gif";$nom_type=$mess[79];}
-	else if(eregi("\.mov$",$fichier)){$image="mov.gif";$nom_type=$mess[80];}
-	else if(eregi("\.avi$",$fichier)){$image="avi.gif";$nom_type=$mess[81];}
-	else if(eregi("\.mpg$",$fichier)){$image="mpg.gif";$nom_type=$mess[82];}
-	else if(eregi("\.mpeg$",$fichier)){$image="mpeg.gif";$nom_type=$mess[83];}
-	else if(eregi("\.swf$",$fichier)){$image="flash.gif";$nom_type=$mess[91];}
-	else {$image="defaut.gif";$nom_type=$mess[23];}
-	*/
-	if(!eregi("MSIE",$_SERVER['HTTP_USER_AGENT'])) {$client="html.png";} else {$client="html.png";}
-	if(is_dir($fichier)){$image="folder.png";$nom_type=$mess[8];}
-	else if(eregi("\.mid$",$fichier)){$image="midi.png";$nom_type=$mess[9];}
-	else if(eregi("\.txt$",$fichier)){$image="txt2.png";$nom_type=$mess[10];}
-	else if(eregi("\.sql$",$fichier)){$image="txt2.png";$nom_type=$mess[10];}
-	else if(eregi("\.js$",$fichier)){$image="javascript.png";$nom_type=$mess[11];}
-	else if(eregi("\.gif$",$fichier)){$image="image.png";$nom_type=$mess[12];}
-	else if(eregi("\.jpg$",$fichier)){$image="image.png";$nom_type=$mess[13];}
-	else if(eregi("\.html$",$fichier)){$image=$client;$nom_type=$mess[14];}
-	else if(eregi("\.htm$",$fichier)){$image=$client;$nom_type=$mess[15];}
-	else if(eregi("\.rar$",$fichier)){$image="archive.png";$nom_type=$mess[60];}
-	else if(eregi("\.gz$",$fichier)){$image="archive.png";$nom_type=$mess[61];}
-	else if(eregi("\.tgz$",$fichier)){$image="archive.png";$nom_type=$mess[61];}
-	else if(eregi("\.z$",$fichier)){$image="archive.png";$nom_type=$mess[61];}
-	else if(eregi("\.ra$",$fichier)){$image="video.png";$nom_type=$mess[16];}
-	else if(eregi("\.ram$",$fichier)){$image="video.png";$nom_type=$mess[17];}
-	else if(eregi("\.rm$",$fichier)){$image="video.png";$nom_type=$mess[17];}
-	else if(eregi("\.pl$",$fichier)){$image="source_pl.png";$nom_type=$mess[18];}
-	else if(eregi("\.zip$",$fichier)){$image="archive.png";$nom_type=$mess[19];}
-	else if(eregi("\.wav$",$fichier)){$image="sound.png";$nom_type=$mess[20];}
-	else if(eregi("\.php$",$fichier)){$image="php.png";$nom_type=$mess[21];}
-	else if(eregi("\.php3$",$fichier)){$image="php.png";$nom_type=$mess[22];}
-	else if(eregi("\.phtml$",$fichier)){$image="php.png";$nom_type=$mess[22];}
-	else if(eregi("\.exe$",$fichier)){$image="exe.png";$nom_type=$mess[50];}
-	else if(eregi("\.bmp$",$fichier)){$image="image.png";$nom_type=$mess[56];}
-	else if(eregi("\.png$",$fichier)){$image="image.png";$nom_type=$mess[57];}
-	else if(eregi("\.css$",$fichier)){$image="css.png";$nom_type=$mess[58];}
-	else if(eregi("\.mp3$",$fichier)){$image="sound.png";$nom_type=$mess[59];}
-	else if(eregi("\.xls$",$fichier)){$image="spreadsheet.png";$nom_type=$mess[64];}
-	else if(eregi("\.doc$",$fichier)){$image="document.png";$nom_type=$mess[65];}
-	else if(eregi("\.pdf$",$fichier)){$image="pdf.png";$nom_type=$mess[79];}
-	else if(eregi("\.mov$",$fichier)){$image="video.png";$nom_type=$mess[80];}
-	else if(eregi("\.avi$",$fichier)){$image="video.png";$nom_type=$mess[81];}
-	else if(eregi("\.mpg$",$fichier)){$image="video.png";$nom_type=$mess[82];}
-	else if(eregi("\.mpeg$",$fichier)){$image="video.png";$nom_type=$mess[83];}
-	else if(eregi("\.swf$",$fichier)){$image="flash.png";$nom_type=$mess[91];}
-	else {$image="mime_empty.png";$nom_type=$mess[23];}
-	if($quoi=="image"){return $image;} else {return $nom_type;}
+	if(is_dir($fileName)){$image="folder.png";$typeName=$mess[8];}
+	else if(eregi("\.mid$",$fileName)){$image="midi.png";$typeName=$mess[9];}
+	else if(eregi("\.txt$",$fileName)){$image="txt2.png";$typeName=$mess[10];}
+	else if(eregi("\.sql$",$fileName)){$image="txt2.png";$typeName=$mess[10];}
+	else if(eregi("\.js$",$fileName)){$image="javascript.png";$typeName=$mess[11];}
+	else if(eregi("\.gif$",$fileName)){$image="image.png";$typeName=$mess[12];}
+	else if(eregi("\.jpg$",$fileName)){$image="image.png";$typeName=$mess[13];}
+	else if(eregi("\.html$",$fileName)){$image="html.png";$typeName=$mess[14];}
+	else if(eregi("\.htm$",$fileName)){$image="html.png";$typeName=$mess[15];}
+	else if(eregi("\.rar$",$fileName)){$image="archive.png";$typeName=$mess[60];}
+	else if(eregi("\.gz$",$fileName)){$image="archive.png";$typeName=$mess[61];}
+	else if(eregi("\.tgz$",$fileName)){$image="archive.png";$typeName=$mess[61];}
+	else if(eregi("\.z$",$fileName)){$image="archive.png";$typeName=$mess[61];}
+	else if(eregi("\.ra$",$fileName)){$image="video.png";$typeName=$mess[16];}
+	else if(eregi("\.ram$",$fileName)){$image="video.png";$typeName=$mess[17];}
+	else if(eregi("\.rm$",$fileName)){$image="video.png";$typeName=$mess[17];}
+	else if(eregi("\.pl$",$fileName)){$image="source_pl.png";$typeName=$mess[18];}
+	else if(eregi("\.zip$",$fileName)){$image="archive.png";$typeName=$mess[19];}
+	else if(eregi("\.wav$",$fileName)){$image="sound.png";$typeName=$mess[20];}
+	else if(eregi("\.php$",$fileName)){$image="php.png";$typeName=$mess[21];}
+	else if(eregi("\.php3$",$fileName)){$image="php.png";$typeName=$mess[22];}
+	else if(eregi("\.phtml$",$fileName)){$image="php.png";$typeName=$mess[22];}
+	else if(eregi("\.exe$",$fileName)){$image="exe.png";$typeName=$mess[50];}
+	else if(eregi("\.bmp$",$fileName)){$image="image.png";$typeName=$mess[56];}
+	else if(eregi("\.png$",$fileName)){$image="image.png";$typeName=$mess[57];}
+	else if(eregi("\.css$",$fileName)){$image="css.png";$typeName=$mess[58];}
+	else if(eregi("\.mp3$",$fileName)){$image="sound.png";$typeName=$mess[59];}
+	else if(eregi("\.xls$",$fileName)){$image="spreadsheet.png";$typeName=$mess[64];}
+	else if(eregi("\.doc$",$fileName)){$image="document.png";$typeName=$mess[65];}
+	else if(eregi("\.pdf$",$fileName)){$image="pdf.png";$typeName=$mess[79];}
+	else if(eregi("\.mov$",$fileName)){$image="video.png";$typeName=$mess[80];}
+	else if(eregi("\.avi$",$fileName)){$image="video.png";$typeName=$mess[81];}
+	else if(eregi("\.mpg$",$fileName)){$image="video.png";$typeName=$mess[82];}
+	else if(eregi("\.mpeg$",$fileName)){$image="video.png";$typeName=$mess[83];}
+	else if(eregi("\.swf$",$fileName)){$image="flash.png";$typeName=$mess[91];}
+	else {$image="mime_empty.png";$typeName=$mess[23];}
+	if($mode=="image"){return $image;} else {return $typeName;}
 }
 
-function is_editable($fichier)
+function is_editable($fileName)
 {
-	$retour=0;
-	if(eregi("\.txt$|\.sql$|\.php$|\.php3$|\.phtml$|\.htm$|\.html$|\.cgi$|\.pl$|\.js$|\.css$|\.inc$",$fichier)) {$retour=1;}
-	return $retour;
+	if(eregi("\.txt$|\.sql$|\.php$|\.php3$|\.phtml$|\.htm$|\.html$|\.cgi$|\.pl$|\.js$|\.css$|\.inc$",$fileName)){
+		 return 1;
+	}
+	return 0;
 }
 
-function editWithCodePress($fichier)
+function editWithCodePress($fileName)
 {
-	if(eregi("\.php$|\.php3$|\.php5$|\.phtml$", $fichier)) return "php";
-	elseif (eregi("\.js$", $fichier)) return "javascript";
-	elseif (eregi("\.java$", $fichier)) return "java";
-	elseif (eregi("\.pl$", $fichier)) return "perl";
-	elseif (eregi("\.sql$", $fichier)) return "sql";
-	elseif (eregi("\.htm$|\.html$", $fichier)) return "html";
-	elseif (eregi("\.css$", $fichier)) return "css";
+	if(eregi("\.php$|\.php3$|\.php5$|\.phtml$", $fileName)) return "php";
+	elseif (eregi("\.js$", $fileName)) return "javascript";
+	elseif (eregi("\.java$", $fileName)) return "java";
+	elseif (eregi("\.pl$", $fileName)) return "perl";
+	elseif (eregi("\.sql$", $fileName)) return "sql";
+	elseif (eregi("\.htm$|\.html$", $fileName)) return "html";
+	elseif (eregi("\.css$", $fileName)) return "css";
 	else return "";
 }
 
-function is_image($fichier)
+function is_image($fileName)
 {
-	$retour=0;
-	if(eregi("\.png$|\.bmp$|\.jpg$|\.jpeg$|\.gif$",$fichier)) {$retour=1;}
-	return $retour;
+	if(eregi("\.png$|\.bmp$|\.jpg$|\.jpeg$|\.gif$",$fileName)){
+		return 1;
+	}
+	return 0;
 }
 
-function is_mp3($fichier)
+function is_mp3($fileName)
 {
-	$retour=0;
-	if(eregi("\.mp3$",$fichier)) {$retour=1;}
-	return $retour;
+	if(eregi("\.mp3$",$fileName)) return 1;
+	return 0;
 }
 
-function getImageMimeType($fichier)
+function getImageMimeType($fileName)
 {
-	if(eregi("\.jpg$|\.jpeg$",$fichier)){return "image/jpeg";}
-	else if(eregi("\.png$",$fichier)){return "image/png";}	
-	else if(eregi("\.bmp$",$fichier)){return "image/bmp";}	
-	else if(eregi("\.gif$",$fichier)){return "image/gif";}	
+	if(eregi("\.jpg$|\.jpeg$",$fileName)){return "image/jpeg";}
+	else if(eregi("\.png$",$fileName)){return "image/png";}	
+	else if(eregi("\.bmp$",$fileName)){return "image/bmp";}	
+	else if(eregi("\.gif$",$fileName)){return "image/gif";}	
 }
 
 function roundSize($filesize)
@@ -261,12 +195,13 @@ function roundSize($filesize)
 }
 
 
-function show_hidden_files($fichier)
+function showHiddenFiles($fileName)
 {
 	$showhidden = ConfService::getConf("SHOW_HIDDEN");
-	$retour=1;
-	if(substr($fichier,0,1)=="." && $showhidden==0) {$retour=0;}
-	return $retour;
+	if(substr($fileName,0,1)=="." && $showhidden==0) {
+		return 0;
+	}
+	return 1;
 }
 
 /**
