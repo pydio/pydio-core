@@ -10,7 +10,6 @@ global $G_WM_EMAIL;
 global $G_SIZE_UNIT;
 global $G_MAX_CHAR;
 global $G_SHOW_HIDDEN;
-global $G_TOP_PAGE;
 global $G_BOTTOM_PAGE;
 global $G_UPLOAD_MAX_NUMBER;
 global $G_RECYCLE_BIN;
@@ -22,7 +21,7 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_MESSAGES,$G_ROOT_DIR,$G_ROOT_DIRS_LIST,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_TOP_PAGE,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_RECYCLE_BIN;
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_MESSAGES,$G_ROOT_DIR,$G_ROOT_DIRS_LIST,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_RECYCLE_BIN;
 		if(!isset($langue) || $langue=="") {$langue=$dft_langue;}
 		$G_LANGUE = $langue;
 		$G_AVAILABLE_LANG = $available_languages;
@@ -31,7 +30,6 @@ class ConfService
 		$G_SIZE_UNIT = $size_unit;
 		$G_MAX_CHAR = $max_caracteres;
 		$G_SHOW_HIDDEN = $showhidden;
-		$G_TOP_PAGE = $hautpage;
 		$G_BOTTOM_PAGE = $baspage;
 		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
 		$G_ROOT_DIRS_LIST = $REPOSITORIES;
@@ -116,7 +114,7 @@ class ConfService
 
 	function getConf($varName)	
 	{
-		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_ROOT_DIR,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_TOP_PAGE,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER;
+		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_ROOT_DIR,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER;
 		$globVarName = "G_".$varName;
 		return $$globVarName;
 	}
