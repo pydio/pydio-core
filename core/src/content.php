@@ -243,6 +243,7 @@ switch($action)
 	//------------------------------------
 
 	case "telecharger";
+	$fic = utf8_decode($fic);
 	$NomFichier = basename($fic);
 	$taille=filesize(ConfService::getRootDir()."/$fic");
 	header("Content-Type: application/force-download; name=\"$NomFichier\"");
@@ -480,12 +481,13 @@ switch($action)
 	
 	case "fancy_uploader":
 	case "get_template":
-	header("Content-type:text/html");	
+	header("Content-type:text/html");
 	if($get_action == "fancy_uploader"){
 		include("include/html/fancy_tpl.html");
 		include("include/html/bas.htm");
 	}else{
 		if(isset($template_name)){
+			$mess = array_map("utf8_encode", $mess);
 			include("include/html/".$template_name);
 		}
 	}
