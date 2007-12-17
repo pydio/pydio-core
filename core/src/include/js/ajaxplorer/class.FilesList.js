@@ -196,7 +196,7 @@ FilesList.prototype.loadXmlList = function(repToLoad, pendingFileToSelect, url)
 	this._currentRep = repToLoad;
 	var connexion = new Connexion(url);
 	connexion.addParameter('mode', 'file_list');
-	connexion.addParameter('rep', repToLoad);	
+	connexion.addParameter('dir', repToLoad);	
 	this._pendingFile = pendingFileToSelect;
 	this.setOnLoad();
 	connexion.onComplete = function (transport){

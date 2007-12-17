@@ -95,18 +95,18 @@ $selection->initFromHttpVars();
 if(isSet($action) || isSet($get_action)) $action = (isset($get_action)?$get_action:$action);
 else $action = "";
 
-if(isSet($rep) && $action != "upload") $rep = utf8_decode($rep);
+if(isSet($dir) && $action != "upload") $dir = utf8_decode($dir);
 if(isSet($dest)) $dest = utf8_decode($dest);
 
 // FILTER ACTION FOR DELETE
-if(ConfService::useRecycleBin() && $action == "delete" && $rep != "/".ConfService::getRecycleBinDir())
+if(ConfService::useRecycleBin() && $action == "delete" && $dir != "/".ConfService::getRecycleBinDir())
 {
 	$action = "move";
 	$dest = "/".ConfService::getRecycleBinDir();
 	$dest_node = "AJAXPLORER_RECYCLE_NODE";
 }
 // FILTER ACTION FOR RESTORE
-if(ConfService::useRecycleBin() &&  $action == "restore" && $rep == "/".ConfService::getRecycleBinDir())
+if(ConfService::useRecycleBin() &&  $action == "restore" && $dir == "/".ConfService::getRecycleBinDir())
 {
 	$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
 	if($originalRep != "")
@@ -416,20 +416,20 @@ switch($action)
 		$errorMessage="$mess[37]";
 		break;
 	}
-	if(file_exists(ConfService::getRootDir()."/$rep/$nomdir"))
+	if(file_exists(ConfService::getRootDir()."/$dir/$nomdir"))
 	{
 		$errorMessage="$mess[40]"; 
 		break;
 	}
-	if(!is_writable(ConfService::getRootDir()."/$rep"))
+	if(!is_writable(ConfService::getRootDir()."/$dir"))
 	{
-		$errorMessage = $mess[38]." $rep ".$mess[99];
+		$errorMessage = $mess[38]." $dir ".$mess[99];
 		break;
 	}
-	mkdir(ConfService::getRootDir()."/$rep/$nomdir",0775);
+	mkdir(ConfService::getRootDir()."/$dir/$nomdir",0775);
 	$reload_file_list = $nomdir;
 	$messtmp.="$mess[38] $nomdir $mess[39] ";
-	if($rep=="") {$messtmp.="/";} else {$messtmp.="$rep";}
+	if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
 	$logMessage = $messtmp;
 	$reload_current_node = true;
 	break;
@@ -446,16 +446,16 @@ switch($action)
 	{
 		$errorMessage="$mess[37]"; break;
 	}
-	if(file_exists(ConfService::getRootDir()."/$rep/$nomfic"))
+	if(file_exists(ConfService::getRootDir()."/$dir/$nomfic"))
 	{
 		$errorMessage="$mess[71]"; break;
 	}
-	if(!is_writable(ConfService::getRootDir()."/$rep"))
+	if(!is_writable(ConfService::getRootDir()."/$dir"))
 	{
-		$errorMessage="$mess[38] $rep $mess[99]";break;
+		$errorMessage="$mess[38] $dir $mess[99]";break;
 	}
 	
-	$fp=fopen(ConfService::getRootDir()."/$rep/$nomfic","w");
+	$fp=fopen(ConfService::getRootDir()."/$dir/$nomfic","w");
 	if($fp)
 	{
 		if(eregi("\.html$",$nomfic)||eregi("\.htm$",$nomfic))
@@ -464,14 +464,14 @@ switch($action)
 		}
 		fclose($fp);
 		$messtmp.="$mess[34] $nomfic $mess[39] ";
-		if($rep=="") {$messtmp.="/";} else {$messtmp.="$rep";}
+		if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
 		$logMessage = $messtmp;
 		$reload_file_list = $nomfic;
 	}
 	else
 	{
 		$err = 1;
-		$errorMessage = "$mess[102] $rep/$nomfic (".$fp.")";
+		$errorMessage = "$mess[102] $dir/$nomfic (".$fp.")";
 	}
 
 	break;
@@ -499,12 +499,12 @@ switch($action)
 
 	case "upload":
 
-	if($rep!=""){$rep_source="/$rep";}
+	if($dir!=""){$rep_source="/$dir";}
 	else $rep_source = "";
 	$destination=ConfService::getRootDir().$rep_source;
 	if(!is_writable($destination))
 	{
-		$errorMessage = "$mess[38] $rep $mess[99].";
+		$errorMessage = "$mess[38] $dir $mess[99].";
 		break;
 	}	
 	$logMessage = "";
@@ -570,7 +570,7 @@ switch($action)
 			}
 			else
 			{
-				$logMessage.="$mess[34] ".$userfile_name." $mess[35] $rep";
+				$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
 			}
 		}
 	}
@@ -640,20 +640,20 @@ switch($action)
 	//------------------------------------
 	case "xml_listing":
 	
-	if(!isSet($rep) || $rep == "/") $rep = "";
+	if(!isSet($dir) || $dir == "/") $dir = "";
 	$searchMode = $fileListMode = $completeMode = false;
 	if(isSet($mode)){
 		if($mode == "search") $searchMode = true;
 		else if($mode == "file_list") $fileListMode = true;
 		else if($mode == "complete") $completeMode = true;
 	}	
-	$nom_rep = FS_Storage::initName($rep);
+	$nom_rep = FS_Storage::initName($dir);
 	$result = FS_Storage::listing($nom_rep, !($searchMode || $fileListMode));
 	$reps = $result[0];
 	AJXP_XMLWriter::header();
 	foreach ($reps as $repIndex => $repName)
 	{
-		$link = "content.php?id=&ordre=nom&sens=1&action=xml_listing&rep=".$rep."/".$repName;
+		$link = "content.php?id=&ordre=nom&sens=1&action=xml_listing&dir=".$dir."/".$repName;
 		$link = str_replace("/", "%2F", $link);
 		$link = str_replace("&", "&amp;", $link);
 		$attributes = "";
@@ -679,7 +679,7 @@ switch($action)
 			$atts[] = "mimetype=\"".Utils::mimetype($currentFile, "type")."\"";
 			$atts[] = "modiftime=\"".FS_Storage::date_modif($currentFile)."\"";
 			$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
-			$atts[] = "filename=\"".$rep."/".str_replace("&", "&amp;", $repIndex)."\"";
+			$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
 			$atts[] = "icon=\"".(is_file($currentFile)?$repName:"folder.png")."\"";
 			
 			$attributes = join(" ", $atts);
@@ -688,8 +688,8 @@ switch($action)
 		else 
 		{
 			$folderBaseName = str_replace("&", "&amp;", $repName);
-			$folderFullName = "$rep/".$folderBaseName;
-			$parentFolderName = $rep;
+			$folderFullName = "$dir/".$folderBaseName;
+			$parentFolderName = $dir;
 			if(!$completeMode){
 				$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
 			}
