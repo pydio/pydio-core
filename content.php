@@ -706,7 +706,7 @@ switch($action)
 		else 
 		{
 			// ADD RECYCLE BIN TO THE LIST
-			print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/crystal/mimes/16/trashcan.png\" src=\"content.php?action=xml_listing&amp;rep=/".ConfService::getRecycleBinDir()."\" openIcon=\"images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
+			print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/crystal/mimes/16/trashcan.png\"  openIcon=\"images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
 		}
 	}
 	AJXP_XMLWriter::close();
