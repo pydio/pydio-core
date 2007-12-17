@@ -181,7 +181,7 @@ switch ($action)
 	break;
 }
 
-include("include/html/haut_admin.html");
-include("include/html/bas.htm");
+include("include/html/admin.html");
+include(ConfService::getConf("BOTTOM_PAGE"));
 session_write_close();
 ?>
