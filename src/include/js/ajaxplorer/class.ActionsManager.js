@@ -454,7 +454,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 					oThis.multi_selector.addElement(oForm.getElementsBySelector('.dialogFocus')[0]);
 					var rep = document.createElement('input');
 					rep.setAttribute('type', 'hidden');
-					rep.setAttribute('name', 'rep');
+					rep.setAttribute('name', 'dir');
 					rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
 					oForm.appendChild(rep);
 				}
@@ -501,7 +501,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		   var fileNames = $A(userSelection.getFileNames());
 		   var connexion = new Connexion();
 		   connexion.addParameter('get_action', 'restore');
-		   connexion.addParameter('rep', userSelection.getCurrentRep());
+		   connexion.addParameter('dir', userSelection.getCurrentRep());
 		   connexion.onComplete = function(transport){
 		   		this.parseXmlMessage(transport.responseXML);
 		   }.bind(this);
@@ -737,7 +737,7 @@ ActionsManager.prototype.applyDragMove = function(fileName, destDir, destNodeNam
 	}
 	connexion.addParameter('dest', destDir);
 	if(destNodeName) connexion.addParameter('dest_node', destNodeName);
-	connexion.addParameter('rep', ajaxplorer.getFilesList().getCurrentRep());
+	connexion.addParameter('dir', ajaxplorer.getFilesList().getCurrentRep());
 	oThis = this;
 	connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
 	connexion.sendAsync();
@@ -776,7 +776,7 @@ ActionsManager.prototype.submitForm = function(formName)
 		}
 		connexion.addParameter(fElement.name, fValue);
 	});
-	connexion.addParameter('rep', ajaxplorer.getFilesList().getCurrentRep());
+	connexion.addParameter('dir', ajaxplorer.getFilesList().getCurrentRep());
 	oThis = this;
 	connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
 	connexion.sendAsync();
