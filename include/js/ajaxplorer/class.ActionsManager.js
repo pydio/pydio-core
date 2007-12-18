@@ -11,9 +11,7 @@ function ActionsManager(oElement, bUsersEnabled, oUser, oAjaxplorer)
 	}
 	else this._currentUser = 'shared';
 	this.oUser = oUser;
-	// LOAD BOOKMARKS
-	this.bookmarksBar = new ResizeableBar("bmbar_content", "bookmarks_bar", "bm", "bmbar_title", "bmbar_extension");
-	this.loadBookmarks();
+	this.bookmarksBar = new BookmarksBar();
 }
 
 ActionsManager.prototype.init = function()
@@ -124,6 +122,11 @@ ActionsManager.prototype.init = function()
 		 $('logging_string').hide();
 		 $('admin_button').hide();
 	}
+}
+
+ActionsManager.prototype.setContextualMenu = function(contextualMenu)
+{
+	this.bookmarksBar.setContextualMenu(contextualMenu);
 }
 
 ActionsManager.prototype.setUser = function(oUser)
@@ -339,7 +342,7 @@ ActionsManager.prototype.actionIsAllowed = function(buttonAction)
 }
 
 ActionsManager.prototype.getContextActions = function(srcElement)
-{	
+{		
 	var actionsSelectorAtt = 'selectionContext';
 	if(srcElement.id && (srcElement.id == 'table_rows_container' ||  srcElement.id == 'selectable_div'))
 	{
@@ -348,6 +351,14 @@ ActionsManager.prototype.getContextActions = function(srcElement)
 	else if(srcElement.id.substring(0,5)=='webfx')
 	{
 		actionsSelectorAtt = 'directoryContext';
+	}
+	else
+	{
+		// find the bookmark origin
+		var bm = this.bookmarksBar.findBookmarkEventSource(srcElement);
+		if(bm != null){
+			return this.bookmarksBar.getContextActions(bm);
+		}
 	}
 	var contextActions = new Array();
 	for(i=0; i<this._items.length; i++)
@@ -418,14 +429,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		break;
 		
 		case "bookmark":
-			var params = new Hash();
-			params.set('get_action', 'display_bookmark_bar');
-			params.set('bm_action', 'add_bookmark');
-			params.set('user',this._currentUser);
-			params.set('bm_path', this.getLocationBarValue());
-			var bmBar = this.bookmarksBar;
-			this.loadHtmlToDiv($('bmbar_content'), params, function(){bmBar.updateUI();});
-						
+			this.bookmarksBar.addBookmark(this.getLocationBarValue());						
 		break;		
 		
 		case "empty_recycle":
@@ -477,7 +481,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				{
 					alert(MessageHash[125]);
 					return false;
-				}				
+				}
 				oThis.submitForm(oForm);				
 				hideLightBox(true);
 				return false;
@@ -521,7 +525,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
 				var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
 				if(!oThis.treeCopy){
-					this.treeCopy = new WebFXLoadTree('SELECT A DIR', 
+					this.treeCopy = new WebFXLoadTree('/', 
 														'content.php?action=xml_listing', 
 														"javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 
 														'explorer');
@@ -850,6 +854,8 @@ ActionsManager.prototype.switchLoginButton = function(action)
 
 ActionsManager.prototype.removeBookmark = function (path)
 {
+	this.bookmarksBar.removeBookmark(path);
+	/*
 	var params = new Hash();
 	params.set('get_action','display_bookmark_bar');
 	params.set('bm_action', 'delete_bookmark');
@@ -857,10 +863,13 @@ ActionsManager.prototype.removeBookmark = function (path)
 	params.set('user', this._currentUser);
 	var bmBar = this.bookmarksBar;
 	this.loadHtmlToDiv($('bmbar_content'), params, function(){bmBar.updateUI();});	
+	*/
 }
 
 ActionsManager.prototype.loadBookmarks = function ()
 {
+	this.bookmarksBar.load();
+	/*
 	// LOAD BOOKMARKS
 	var params = new Hash();
 	params.set('get_action','display_bookmark_bar');
@@ -869,6 +878,7 @@ ActionsManager.prototype.loadBookmarks = function ()
 	this.loadHtmlToDiv($('bmbar_content'), params, function(){
 		oThis.bookmarksBar.updateUI();
 	});	
+	*/
 }
 
 ActionsManager.prototype.loadHtmlToDiv = function(div, parameters, completeFunc)
