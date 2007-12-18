@@ -88,7 +88,6 @@ ResizeableBar.prototype.toggleExtension = function(hideOnly)
 	{		
 		// build menu and show next to button.
 		this.menu = $(document.createElement("div"));
-		//this.menu.setAttribute("style", "position:absolute; z-index:1500; border:1px solid black; background-color: white; text-align:left;");
 		this.menu.setStyle({
 			position:"absolute", 
 			zIndex:1500, 

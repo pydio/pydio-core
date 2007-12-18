@@ -18,7 +18,7 @@ Modal.prototype.init = function()
 Modal.prototype.prepareHeader = function(sTitle, sIconSrc)
 {
 	var hString = "<span class=\"titleString\">";
-	if(sIconSrc != "") hString = "<span class=\"titleString\"><img src=\""+sIconSrc+"\" width=\"22\" height=\"22\" align=\"absmiddle\"/>&nbsp;";
+	if(sIconSrc != "") hString = "<span class=\"titleString\"><img src=\""+sIconSrc.replace('22', '16')+"\" width=\"16\" height=\"16\" align=\"top\"/>&nbsp;";
 	hString += sTitle + '</span>';
 	this.dialogTitle.innerHTML = hString;
 }
@@ -107,7 +107,13 @@ Modal.prototype.showContent = function(elementName, boxWidth, boxHeight)
 	ajaxplorer.disableShortcuts();
 	ajaxplorer.disableNavigation();
 	ajaxplorer.filesList.blur();
-	jQuery('#'+elementName).corner("round 10px");
+	//jQuery('#'+elementName).corner("round top 5px");
+	jQuery('#'+elementName + ' .dialogTitle').corner("round top 7px");
+	if(!this.isRounded)
+	{
+		ajxpCorners($(elementName), 'bottom');
+		this.isRounded = true;		
+	}
 	var winWidth = $(document.body).getWidth();
 	var winHeight = $(document.body).getHeight();
 
@@ -142,9 +148,9 @@ Modal.prototype.showContent = function(elementName, boxWidth, boxHeight)
 	var offsetTop = parseInt(((winHeight - boxHeight)/3));
 	$(elementName).setStyle({top:offsetTop+'px'});
 	
-	if (Prototype.Browser.IE){		
-		jQuery('#'+elementName + ' .dialogTitle').corner("round top 10px");
-	}
+	//if (Prototype.Browser.IE){		
+		
+	//}
 	
 	displayLightBoxById(elementName);	
 	
