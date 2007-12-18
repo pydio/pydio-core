@@ -253,6 +253,8 @@ $mess=array(
 "220" => "Empty", 
 "221" => "Empty Recycle Bin", 
 "222" => "Restore", 
-"223" => "Restore file to its original location"
+"223" => "Restore file to its original location", 
+"224" => "Go to", 
+"225" => "Rename bookmark"
 );
 ?>

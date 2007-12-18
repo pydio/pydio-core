@@ -252,6 +252,8 @@ $mess=array(
 "220" => "Vider", 
 "221" => "Vider la Corbeille", 
 "222" => "Restaurer", 
-"223" => "Restaurer le fichier à son emplacement d'origine"
+"223" => "Restaurer le fichier à son emplacement d'origine", 
+"224" => "Aller à", 
+"225" => "Renommer le favori"
 );
 ?>
