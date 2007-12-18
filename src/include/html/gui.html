@@ -47,6 +47,7 @@
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.UserSelection.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Modal.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.ResizeableBar.js"></script>
+<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.BookmarksBar.js"></script>
 <script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Ajaxplorer.js"></script>
 <? } else { ?>
 <script language="javascript" type="text/javascript">var dynamicLibLoading = true;</script>
@@ -106,10 +107,10 @@ jQuery('#loaderContent').corner("round bottom 10px");
 <!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
 <form id="login_form" action="login" style="display:none;" box_width="210">
 <input type="hidden" name="get_action" value="login">
-<div class="dialogLegend"><?php print($mess[180]);?></div>
-<table cellpadding="0" border="0" cellspacing="0" style="font-size:11px;">
-<tr><td align="right"><?php print($mess[181]);?> :</td><td><input type="text" name="userid" style="width: 100px;" class="dialogFocus"></td></tr>
-<tr><td align="right"><?php print($mess[182]);?> :</td><td><input type="password" name="password"  style="width: 100px;"></td></tr>
+<div class="dialogLegend" style="margin-bottom: 7px;"><?php print($mess[180]);?></div>
+<table cellpadding="3" border="0" cellspacing="0" style="font-size:11px;">
+<tr><td align="right"><?php print($mess[181]);?> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
+<tr><td align="right"><?php print($mess[182]);?> :</td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td></tr>
 </table>
 </form>
 </div>
