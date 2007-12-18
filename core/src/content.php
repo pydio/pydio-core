@@ -521,6 +521,52 @@ switch($action)
 	//------------------------------------
 	//	BOOKMARK BAR
 	//------------------------------------
+	case "get_bookmarks":
+		
+		$bmUser = null;
+		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
+		{
+			$bmUser = AuthService::getLoggedUser();
+		}
+		else if(!AuthService::usersEnabled())
+		{
+			$bmUser = new AJXP_User("shared");
+		}
+		if($bmUser == null) exit(1);
+		if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
+		{
+			if($_GET["bm_action"] == "add_bookmark")
+			{
+				$title = "";
+				if(isSet($_GET["title"])) $title = $_GET["title"];
+				if($title == "" && $_GET["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
+				$bmUser->addBookMark($_GET["bm_path"], $title);
+			}
+			else if($_GET["bm_action"] == "delete_bookmark")
+			{
+				$bmUser->removeBookmark($_GET["bm_path"]);
+			}
+			else if($_GET["bm_action"] == "rename_bookmark" && isset($_GET["bm_title"]))
+			{
+				$bmUser->renameBookmark($_GET["bm_path"], $_GET["bm_title"]);
+			}
+		}
+		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
+		{
+			$bmUser->save();
+			AuthService::updateUser($bmUser);
+		}
+		else if(!AuthService::usersEnabled())
+		{
+			$bmUser->save();
+		}		
+		AJXP_XMLWriter::header();
+		AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks());
+		AJXP_XMLWriter::close();
+		exit(1);
+	
+	break;
+	
 	case "display_bookmark_bar":
 		
 		header("Content-type:text/html");
