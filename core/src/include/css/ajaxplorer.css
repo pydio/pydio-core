@@ -169,7 +169,7 @@ DIALOG BOXES
     border-top-color:#fff;
     border-left-color:#fff;
     */
-    background-color: #cde;
+    background-color: #fff;
     font-family: Trebuchet MS;
     font-size: 12px;
     /*width:250px;*/
@@ -187,16 +187,18 @@ DIALOG BOXES
 {
     background-color: #79f !important;
     color: #fff;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
-    padding: 3px;
-    padding-left: 7px;
+    padding: 4px;
+    padding-left: 6px;
+    padding-bottom: 1px;
     cursor:move;    
 }
 
 .dialogContent
 {
-    padding: 8px;
+    padding: 10px 10px;
+    border: 1px solid #79f;    
     /*text-align: center;*/
 }
 
@@ -204,6 +206,7 @@ DIALOG BOXES
 {
     margin-left:0px;
     width: 250px;
+    border: 1px solid #666;
 }
 
 .dialogLegend
@@ -219,7 +222,11 @@ DIALOG BOXES
 .dialogButtons input
 {
     margin-left: 10px;
-    width: 65px;
+    width: 65px;    
+    background-color: #79f;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #79f;
 }
 
 .editContent, .editContent div
@@ -998,16 +1005,17 @@ ADMIN STYLES
     background-color: #fff;
 }
 
-.user_data fieldset
+fieldset
 {
     border: 1px solid #ccc;
     padding: 10px;
+    margin-bottom: 5px;
 }
 
-.user_data legend
+legend
 {
-    color: #ccc;
- 
+    color: #79f;
+    font-weight: bold;
 }
 
 .repository, .repository td, .password td
@@ -1077,7 +1085,9 @@ ADMIN STYLES
 
 #user_pref_form input
 {
-   width: 80px;
+   width: 70px;
+   padding: 0px;
+   margin-right: 5px;
 }
 
 #user_pref_form input.radio
