@@ -38,6 +38,22 @@ class AJXP_XMLWriter
 		else print "<reload_instruction object=\"list\"/>";
 	}
 	
+	function writeBookmarks($allBookmarks)
+	{
+		foreach ($allBookmarks as $bookmark)
+		{
+			$path = ""; $title = "";
+			if(is_array($bookmark)){
+				$path = $bookmark["PATH"];
+				$title = $bookmark["TITLE"];
+			}else if(is_string($bookmark)){
+				$path = $bookmark;
+				$title = basename($bookmark);
+			}
+			print("<bookmark path=\"".$path."\" title=\"".$title."\"/>");
+		}
+	}
+	
 	function sendMessage($logMessage, $errorMessage)
 	{
 		$messageType = ""; 

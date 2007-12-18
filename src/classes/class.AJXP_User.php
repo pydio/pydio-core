@@ -51,25 +51,51 @@ class AJXP_User
 		$this->prefs[$prefName] = $prefValue;
 	}
 		
-	function addBookmark($path, $repId = -1){
+	function addBookmark($path, $title="", $repId = -1){
 		if(!isSet($this->bookmarks)) $this->bookmarks = array();
 		if($repId == -1) $repId = ConfService::getCurrentRootDirIndex();
+		if($title == "") $title = basename($path);
 		if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
 		foreach ($this->bookmarks[$repId] as $v)
 		{
-			if($v == trim($path)) return ; // RETURN IF ALREADY HERE!
+			$toCompare = "";
+			if(is_string($v)) $toCompare = $v;
+			else if(is_array($v)) $toCompare = $v["PATH"];
+			if($toCompare == trim($path)) return ; // RETURN IF ALREADY HERE!
 		}
-		$this->bookmarks[$repId][] = trim($path);
+		$this->bookmarks[$repId][] = array("PATH"=>trim($path), "TITLE"=>$title);
 	}
 	
 	function removeBookmark($path){
+		$repId = ConfService::getCurrentRootDirIndex();
 		if(isSet($this->bookmarks) 
-			&& isSet($this->bookmarks[ConfService::getCurrentRootDirIndex()])
-			&& is_array($this->bookmarks[ConfService::getCurrentRootDirIndex()]))
+			&& isSet($this->bookmarks[$repId])
+			&& is_array($this->bookmarks[$repId]))
 			{
-				foreach ($this->bookmarks[ConfService::getCurrentRootDirIndex()] as $k => $v)
+				foreach ($this->bookmarks[$repId] as $k => $v)
 				{
-					if($v == trim($path)) unset($this->bookmarks[ConfService::getCurrentRootDirIndex()][$k]);
+					$toCompare = "";
+					if(is_string($v)) $toCompare = $v;
+					else if(is_array($v)) $toCompare = $v["PATH"];					
+					if($toCompare == trim($path)) unset($this->bookmarks[$repId][$k]);
+				}
+			} 		
+	}
+	
+	function renameBookmark($path, $title){
+		$repId = ConfService::getCurrentRootDirIndex();
+		if(isSet($this->bookmarks) 
+			&& isSet($this->bookmarks[$repId])
+			&& is_array($this->bookmarks[$repId]))
+			{
+				foreach ($this->bookmarks[$repId] as $k => $v)
+				{
+					$toCompare = "";
+					if(is_string($v)) $toCompare = $v;
+					else if(is_array($v)) $toCompare = $v["PATH"];					
+					if($toCompare == trim($path)){
+						 $this->bookmarks[$repId][$k] = array("PATH"=>trim($path), "TITLE"=>$title);
+					}
 				}
 			} 		
 	}
