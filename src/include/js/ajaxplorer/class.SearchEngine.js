@@ -136,7 +136,7 @@ SearchEngine.prototype.addResult = function(folderName, fileName, icon)
 	var stringToDisplay = fileName;	
 	
 	divElement.innerHTML = imageString+stringToDisplay;
-	divElement.title = 'Go to '+ folderName;
+	divElement.title = MessageHash[224]+' '+ folderName;
 	if(isFolder)
 	{
 		divElement.onclick = function(e){ajaxplorer.goTo(folderName);}

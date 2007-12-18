@@ -60,11 +60,9 @@ Ajaxplorer.prototype.init = function()
 			this.getLoggedUserFromServer();
 		}
 	}
-	//this.actionBar = new ActionsManager($("action_bar"), crtUser, this);
+	
 	this.actionBar.init();
 	modal.updateLoadingProgress('ActionBar Initialized');
-	
-	//this.foldersTree = new FoldersTree('tree_container', rootDirName, 'content.php?action=xml_listing', this);
 	
 	this.filesList = new FilesList($("selectable_div"), 
 									true, 
@@ -77,7 +75,8 @@ Ajaxplorer.prototype.init = function()
 	  selector: '', // context menu will be shown when element with class name of "contextmenu" is clicked
 	  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
 	  menuItems: [],
-	  fade:true
+	  fade:true,
+	  zIndex:2000
 	});
 	var protoMenu = this.contextMenu;
 	protoMenu.options.beforeShow = function(e){setTimeout(function(){
@@ -87,6 +86,7 @@ Ajaxplorer.prototype.init = function()
 
 	  this.filesList.setContextualMenu(this.contextMenu);
 	  this.foldersTree.setContextualMenu(this.contextMenu);
+	  this.actionBar.setContextualMenu(this.contextMenu);
 	  
 	this.sEngine = new SearchEngine("search_container", "search_txt","search_results", "search_button", this);
 	this.infoPanel = new InfoPanel("info_panel");
@@ -116,8 +116,7 @@ Ajaxplorer.prototype.getLoggedUserFromServer = function()
 {
 	var connexion = new Connexion();
 	connexion.addParameter('get_action', 'logged_user');
-	oThis = this;
-	connexion.onComplete = function(transport){oThis.logXmlUser(transport.responseXML);};
+	connexion.onComplete = function(transport){this.logXmlUser(transport.responseXML);}.bind(this);
 	connexion.sendAsync();	
 }
 
@@ -189,7 +188,6 @@ Ajaxplorer.prototype.logXmlUser = function(xmlResponse)
 	this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
 	this.foldersTree.reloadCurrentNode();
 	this.filesList.loadXmlList('/');
-	//this.rootDirId = rootDirId;
 	this.actionBar.loadBookmarks();
 }
 
@@ -573,21 +571,21 @@ Ajaxplorer.prototype.triggerRootDirChange = function(rootDirId)
 	connexion.addParameter('root_dir_index', rootDirId);
 	oThis = this;
 	connexion.onComplete = function(transport){
-		if(oThis.usersEnabled)
+		if(this.usersEnabled)
 		{
-			oThis.getLoggedUserFromServer();
+			this.getLoggedUserFromServer();
 		}
 		else
 		{
-			oThis.foldersTree.setCurrentNodeName(oThis.foldersTree.getRootNodeId());
-			oThis.foldersTree.changeNodeLabel(oThis.foldersTree.getRootNodeId(), oThis._initRootDirsList[rootDirId]);
-			oThis.actionBar.parseXmlMessage(transport.responseXML);
-			oThis.foldersTree.reloadCurrentNode();
-			oThis.filesList.loadXmlList('/');
-			oThis.rootDirId = rootDirId;
-			oThis.actionBar.loadBookmarks();
+			this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
+			this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);
+			this.actionBar.parseXmlMessage(transport.responseXML);
+			this.foldersTree.reloadCurrentNode();
+			this.filesList.loadXmlList('/');
+			this.rootDirId = rootDirId;
+			this.actionBar.loadBookmarks();			
 		}
-	};
+	}.bind(this);
 	connexion.sendAsync();
 }
 
