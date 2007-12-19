@@ -116,11 +116,11 @@ SelectableElements.prototype.setItemSelectedUi = function (oEl, bSelected) {
 		// CHECK THAT SCROLLING IS OK
 		
 		var parent = $('selectable_div');
-		if($('table_rows_container')) parent = $('table_rows_container');
-		var scrollOffset = $(oEl).positionedOffset()[1];
+		if($('table_rows_container')) parent = $('table_rows_container');		
+		var scrollOffset = oEl.offsetTop;
 		
-		if(scrollOffset+$(oEl).getHeight() > (parent.getHeight()+parent.scrollTop)){
-			parent.scrollTop = scrollOffset-parent.getHeight();
+		if(scrollOffset+$(oEl).getHeight() > (parent.getHeight()+parent.scrollTop)){			
+			parent.scrollTop = scrollOffset-parent.getHeight()+$(oEl).getHeight();
 		}else if(scrollOffset < (parent.scrollTop)){
 			parent.scrollTop = scrollOffset-$(oEl).getHeight();
 		}
