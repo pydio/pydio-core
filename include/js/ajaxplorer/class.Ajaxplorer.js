@@ -428,7 +428,9 @@ Ajaxplorer.prototype.initGUI = function()
 {
 	jQuery("#toolbars").corner("round bottom 10px");
 	jQuery("#action_bar a").corner("round 8px");
-	jQuery(".action_bar a").corner("round 8px");
+	if(!Prototype.Browser.WebKit){ // Do not try this on safari, not working good.
+		jQuery(".action_bar a").corner("round 8px");
+	}
 	//jQuery(".panelHeader").corner("round tl 5px");
 	//jQuery("#last_header").corner("round tr 5px");
 	//jQuery("#last_header").css("border-bottom", "1px solid #aaa");		

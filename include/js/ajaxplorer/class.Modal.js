@@ -108,7 +108,11 @@ Modal.prototype.showContent = function(elementName, boxWidth, boxHeight)
 	ajaxplorer.disableNavigation();
 	ajaxplorer.filesList.blur();
 	//jQuery('#'+elementName).corner("round top 5px");
-	jQuery('#'+elementName + ' .dialogTitle').corner("round top 7px");
+	if(Prototype.Browser.IE){
+		jQuery('#'+elementName + ' .dialogTitle').corner("round top 7px");
+	}else{
+		jQuery('#'+elementName).corner("round top 7px");
+	}
 	if(!this.isRounded)
 	{
 		ajxpCorners($(elementName), 'bottom');

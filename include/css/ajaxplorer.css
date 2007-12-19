@@ -428,12 +428,11 @@ ACTION BAR
 #action_bar a, .action_bar a
 {    
     padding-bottom: 2px;
-    padding-top: 4px;    
-    border: 1px solid #ddd;
+    padding-top: 4px;
     display: block;
     float: left;
     text-align: center;
-    width: 53px;    
+    width: 53px; 
     font-size: 10px;
 }
 

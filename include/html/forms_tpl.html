@@ -6,10 +6,10 @@
 <!-- VIEW IMAGE -->
 <div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%">
 	<div class="action_bar" style="height: 42px; width: 500px; background-color: #fff;">
-		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
-		<a href="" id="prevButton"><img  width="22" height="22" src="images/crystal/actions/22/back_22.png" alt="" border="0"><br><?php print $mess[178]; ?></a>
-		<a href="" id="nextButton"><img width="22" height="22" src="images/crystal/actions/22/forward_22.png" alt="" border="0"><br><?php print $mess[179];?></a>
-		<a href="" id="downloadDiapoButton"><img width="22" height="22" src="images/crystal/actions/22/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
+		<a href="#" onclick="return false;" id="closeButton"><img src="images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
+		<a href="#" id="prevButton" onclick="return false;"><img  width="22" height="22" src="images/crystal/actions/22/back_22.png" alt="" border="0"><br><?php print $mess[178]; ?></a>
+		<a href="#" id="nextButton" onclick="return false;"><img width="22" height="22" src="images/crystal/actions/22/forward_22.png" alt="" border="0"><br><?php print $mess[179];?></a>
+		<a href="#" id="downloadDiapoButton" onclick="return false;"><img width="22" height="22" src="images/crystal/actions/22/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
 	</div>
 	<div align="right" style="background-image: url(images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
 	<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
@@ -25,9 +25,9 @@
 <!-- EDIT TEXT FILE -->
 <div id="edit_box" action="editer" box_width="80%" box_height="90%">
 	<div class="action_bar" style="height: 42px; background-color: #fff;">
-		<a href="" id="closeButton" onclick="parent.hideLightBox();"><img src="images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
-		<a href="" id="saveButton" onclick="saveForm();return false;"><img src="images/crystal/actions/22/filesave.png" width="22" height="22" alt="<?php print $mess[53]; ?>" border="0"><br><?php print $mess[53]; ?></a>
-		<a href="" id="downloadFileButton"><img width="22" height="22" src="images/crystal/actions/22/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
+		<a href="#" onclick="return false;" id="closeButton"><img src="images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><?php print $mess[86]; ?></a>
+		<a href="#" onclick="return false;" id="saveButton" onclick="saveForm();return false;"><img src="images/crystal/actions/22/filesave.png" width="22" height="22" alt="<?php print $mess[53]; ?>" border="0"><br><?php print $mess[53]; ?></a>
+		<a href="#" onclick="return false;" id="downloadFileButton"><img width="22" height="22" src="images/crystal/actions/22/download_manager.png" alt="" border="0"><br><?php print $mess[88];?></a>
 	</div>
 	<input type="hidden" name="file" value="">
 	<input type="hidden" name="dir" value="">
