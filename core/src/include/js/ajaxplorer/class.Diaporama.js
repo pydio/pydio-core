@@ -1,63 +1,64 @@
 function Diaporama(div)
 {
-	this.nextButton = div.getElementsBySelector('a#nextButton')[0];
-	this.previousButton = div.getElementsBySelector('a#prevButton')[0];
-	this.closeButton = div.getElementsBySelector('a#closeButton')[0];
-	this.downloadButton = div.getElementsBySelector('a#downloadDiapoButton')[0];
-	this.actualSizeButton = div.getElementsBySelector('img#actualSizeButton')[0];
-	this.fitToScreenButton = div.getElementsBySelector('img#fitToScreenButton')[0];
-	this.imgTag = div.getElementsBySelector('img#mainImage')[0];
-	this.imgContainer = div.getElementsBySelector('div#imageContainer')[0];
+	this.element = div;
+	this.nextButton = div.select('a[id="nextButton"]')[0];
+	this.previousButton = div.select('a[id="prevButton"]')[0];
+	this.closeButton = div.select('a[id="closeButton"]')[0];
+	this.downloadButton = div.select('a[id="downloadDiapoButton"]')[0];
+	this.actualSizeButton = div.select('img[id="actualSizeButton"]')[0];
+	this.fitToScreenButton = div.select('img[id="fitToScreenButton"]')[0];
+	this.imgTag = div.select('img[id="mainImage"]')[0];
+	this.imgContainer = div.select('div[id="imageContainer"]')[0];
 	fitHeightToBottom(this.imgContainer, null, 5);
-	this.zoomInput = div.getElementsBySelector('input#zoomValue')[0];
+	this.zoomInput = div.select('input[id="zoomValue"]')[0];
 	this.baseUrl = 'content.php?action=image_proxy&file=';
-	var oThis = this;
 	this.nextButton.onclick = function(){
-		oThis.next();
-		oThis.updateButtons();
+		this.next();
+		this.updateButtons();
 		return false;
-	}
+	}.bind(this);
 	this.previousButton.onclick = function(){
-		oThis.previous();
-		oThis.updateButtons();
+		this.previous();
+		this.updateButtons();
 		return false;
-	}
+	}.bind(this);
 	this.closeButton.onclick = function(){
 		hideLightBox(true);
 		return false;
 	}	
 	this.downloadButton.onclick = function(){
-		if(!oThis.currentFile) return;		
-		document.location.href = 'content.php?action=download&file='+oThis.currentFile;
+		if(!this.currentFile) return;		
+		document.location.href = 'content.php?action=download&file='+this.currentFile;
 		return false;
-	}
+	}.bind(this);
 	this.actualSizeButton.onclick = function(){
-		oThis.slider.setValue(100);
-		oThis.resizeImage();
-	}
+		this.slider.setValue(100);
+		this.resizeImage();
+	}.bind(this);
 	this.fitToScreenButton.onclick = function(){
-		oThis.fitToScreen();
-	}
+		this.fitToScreen();
+	}.bind(this);
 	
 	this.imgTag.onload = function(){
-		oThis.resizeImage();
-		oThis.downloadButton.removeClassName("disabled");
-		oThis.updateModalTitle();
-	}
+		this.resizeImage();
+		this.downloadButton.removeClassName("disabled");
+		this.updateModalTitle();
+	}.bind(this);
 	Event.observe(this.zoomInput, "keypress", function(e){
 		if(e == null) e = window.event;
 		if(e.keyCode == Event.KEY_RETURN || e.keyCode == Event.KEY_UP || e.keyCode == Event.KEY_DOWN){
 			if(e.keyCode == Event.KEY_UP || e.keyCode == Event.KEY_DOWN)
 			{
-				var crtValue = parseInt(oThis.zoomInput.value);
+				var crtValue = parseInt(this.zoomInput.value);
 				var value = (e.keyCode == Event.KEY_UP?(e.shiftKey?crtValue+10:crtValue+1):(e.shiftKey?crtValue-10:crtValue-1));
-				oThis.zoomInput.value = value;
+				this.zoomInput.value = value;
 			}
-			oThis.slider.setValue(oThis.zoomInput.value);
-			oThis.resizeImage();
+			this.slider.setValue(this.zoomInput.value);
+			this.resizeImage();
+			Event.stop(e);
 		}
 		return true;
-	});
+	}.bind(this));
 	this.containerDim = $(this.imgContainer).getDimensions();
 }
 
@@ -67,26 +68,25 @@ Diaporama.prototype.open = function(aFilesList, sCurrentFile)
 	var allItems = aFilesList;
 	this.items = new Array();
 	this.sizes = new Hash();
-	var oThis = this;
 	$A(allItems).each(function(rowItem){
 		if(rowItem.getAttribute('is_image')=='1'){
-			oThis.items.push(rowItem.getAttribute('filename'));
-			oThis.sizes.set(rowItem.getAttribute('filename'),  {height:rowItem.getAttribute('image_height'), 
+			this.items.push(rowItem.getAttribute('filename'));
+			this.sizes.set(rowItem.getAttribute('filename'),  {height:rowItem.getAttribute('image_height'), 
 														   width:rowItem.getAttribute('image_width')});
 		}
-	});	
+	}.bind(this));	
 	
-	this.slider = new Slider($("slider-2"), $("slider-input-2"));		
+	var sliderDiv = this.element.select('div[id="slider-2"]')[0];
+	var sliderInput = this.element.select('input[id="slider-input-2"]')[0];
+	this.slider = new Slider(sliderDiv, sliderInput);
 	this.slider.setMaximum(200);
 	this.slider.setMinimum(10);	
 	this.slider.setValue(100);
 	this.zoomInput.value = '100';
 	this.slider.recalculate();
-	var oThis = this;
-	this.slider.onchange = function()
-	{
-		oThis.resizeImage();
-	}
+	this.slider.onchange = function(){
+		this.resizeImage();
+	}.bind(this);
 
 	this.updateImage();
 	this.updateButtons();
@@ -95,8 +95,8 @@ Diaporama.prototype.open = function(aFilesList, sCurrentFile)
 Diaporama.prototype.updateModalTitle = function()
 {
 	var titleDiv = $(modal.dialogTitle);
-	var crtTitle = titleDiv.getElementsBySelector('span.titleString')[0];
-	var filenameSpans = crtTitle.getElementsBySelector('span');
+	var crtTitle = titleDiv.select('span.titleString')[0];
+	var filenameSpans = crtTitle.select('span');
 	var text = ' - '+getBaseName(this.currentFile) + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
 	if(filenameSpans.length) filenameSpans[0].innerHTML = text;
 	else {

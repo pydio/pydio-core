@@ -565,7 +565,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 		    	if(ajaxplorer.foldersTree.recycleEnabled() && !ajaxplorer.foldersTree.currentIsRecycle()){
 		    		message = MessageHash[176];
 		    	}
-   		    	$(oForm).getElementsBySelector('span#delete_message')[0].innerHTML = message;
+   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
 			}
 			modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 				var oForm = modal.getForm();
@@ -642,14 +642,14 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			var userSelection =  this._ajaxplorer.getFilesList().getUserSelection();
 			if(!userSelection.isImage()) break;
 			var loadFunc = function(oForm){
-				oThis.diaporama = new Diaporama($(oForm));
-				oThis.diaporama.open(ajaxplorer.getFilesList().getItems(), userSelection.getUniqueFileName());
-			}
+				this.diaporama = new Diaporama($(oForm));
+				this.diaporama.open(ajaxplorer.getFilesList().getItems(), userSelection.getUniqueFileName());
+			}.bind(this);
 			var closeFunc = function(){
-				oThis.diaporama.close();
+				this.diaporama.close();
 				hideLightBox();
 				return false;
-			}
+			}.bind(this);
 			modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
 		break;
 		
