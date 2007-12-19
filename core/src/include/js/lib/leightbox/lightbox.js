@@ -271,5 +271,8 @@ function addLightboxMarkupToElement(element, skipElement)
 
 function removeLightboxFromElement(element)
 {
-	element.getElementsBySelector('#element_overlay')[0].remove();
+	var  tmp = $(element).select('#element_overlay');
+	if(tmp.length){
+		tmp[0].remove();
+	}
 }
