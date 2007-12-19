@@ -46,11 +46,10 @@ function SelectableElements(oElement, bMultiple) {
 		oThis.click(e);
 	};
 
-	$(this._htmlElement).observe('contextmenu', function(e){
-		Event.stop(e);
-		if(this._selectedItems.length > 1){
-			 return;
-		}
+	$(this._htmlElement).observe('contextmenu', function(e){		
+		Event.stop(e);		
+		if(this._selectedItems.length > 1) return;
+		if(Prototype.Browser.WebKit) return;
 		this.click(e);
 	}.bind(this));
 	

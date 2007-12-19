@@ -1,28 +1,28 @@
 function Editor(oFormObject)
 {
 	this.oForm = $(oFormObject);
-	this.closeButton = oFormObject.getElementsBySelector('a#closeButton')[0];
-	this.saveButton = oFormObject.getElementsBySelector('a#saveButton')[0];
-	this.downloadButton = oFormObject.getElementsBySelector('a#downloadFileButton')[0];
-	this.ficInput = oFormObject.getElementsBySelector('input[name="file"]')[0];
-	this.repInput = oFormObject.getElementsBySelector('input[name="dir"]')[0];	
-	this.closeButton.onclick = function(){
+	this.closeButton = oFormObject.select('a[id="closeButton"]')[0];
+	this.saveButton = oFormObject.select('a[id="saveButton"]')[0];
+	this.downloadButton = oFormObject.select('a[id="downloadFileButton"]')[0];
+	this.ficInput = oFormObject.select('input[name="file"]')[0];
+	this.repInput = oFormObject.select('input[name="dir"]')[0];	
+	this.closeButton.observe('click', function(){
 		if(this.modified && !window.confirm(MessageHash[201])){
 				return false;
 		}
 		this.close();
 		hideLightBox(true);
 		return false;
-	}.bind(this);
-	this.saveButton.onclick = function(){
+	}.bind(this));
+	this.saveButton.observe('click', function(){
 		this.saveFile();
 		return false;
-	}.bind(this);
-	this.downloadButton.onclick = function(){
+	}.bind(this));
+	this.downloadButton.observe('click', function(){
 		if(!this.currentFile) return;		
 		document.location.href = 'content.php?action=download&file='+this.currentFile;
 		return false;
-	}.bind(this);	
+	}.bind(this));
 	modal.setCloseAction(function(){this.close();}.bind(this));
 }
 
@@ -77,7 +77,7 @@ Editor.prototype.saveFile = function()
 	connexion.addParameter('get_action', 'edit');
 	connexion.addParameter('save', '1');
 	var value;
-	if(this.currentUseCp) value = this.oForm.getElementsBySelector('iframe')[0].getCode();
+	if(this.currentUseCp) value = this.oForm.select('iframe')[0].getCode();
 	else value = this.textarea.value;
 	connexion.addParameter('code', value);
 	connexion.addParameter('file', this.ficInput.value);
@@ -116,7 +116,7 @@ Editor.prototype.parseTxt = function(transport)
 
 Editor.prototype.changeModifiedStatus = function(bModified){
 	this.modified = bModified;
-	var crtTitle = modal.dialogTitle.getElementsBySelector('span.titleString')[0];
+	var crtTitle = modal.dialogTitle.select('span.titleString')[0];
 	if(this.modified){
 		this.saveButton.removeClassName('disabled');
 		if(crtTitle.innerHTML.charAt(crtTitle.innerHTML.length - 1) != "*"){
@@ -135,7 +135,7 @@ Editor.prototype.setOnLoad = function(){
 	addLightboxMarkupToElement(this.textareaContainer);
 	var img = document.createElement("img");
 	img.src = "images/loadingImage.gif";
-	$(this.textareaContainer).getElementsBySelector("#element_overlay")[0].appendChild(img);
+	$(this.textareaContainer).select("#element_overlay")[0].appendChild(img);
 	this.loading = true;
 }
 
