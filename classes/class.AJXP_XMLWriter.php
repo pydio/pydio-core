@@ -34,7 +34,7 @@ class AJXP_XMLWriter
 	
 	function reloadFileList($fileOrBool)
 	{
-		if(is_string($fileOrBool)) print "<reload_instruction object=\"list\" file=\"$fileOrBool\"/>";
+		if(is_string($fileOrBool)) print "<reload_instruction object=\"list\" file=\"".utf8_encode($fileOrBool)."\"/>";
 		else print "<reload_instruction object=\"list\"/>";
 	}
 	
