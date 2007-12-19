@@ -245,9 +245,7 @@ switch($action)
 			$fp=fopen(ConfService::getRootDir()."/$file","w");
 			fputs ($fp,$code);
 			fclose($fp);
-			//Utils::removeWinReturn(ConfService::getRootDir()."/$file");
-			$logMessage = $mess[115];
-			echo $logMessage;
+			echo utf8_encode($mess[115]);
 		}
 		else 
 		{
