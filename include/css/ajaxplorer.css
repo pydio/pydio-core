@@ -534,7 +534,7 @@ ACTION BAR
 .selected-focus
 {
     background: #0a246a;    
-    color: highlighttext;
+    color: #fff;
 }
 
 .droppableZone
