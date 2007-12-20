@@ -12,6 +12,7 @@ function Ajaxplorer(loadRep, usersEnabled, loggedUser, rootDirId, rootDirsList, 
 	this._initRootDirsList = rootDirsList;
 	this._initRootDirId = rootDirId;
 	this._initDefaultDisp = defaultDisplay;
+	this.histCount=0;
 	if(!this.usersEnabled) this.rootDirId = rootDirId;
 	modal.setLoadingStepCounts(8);
 
@@ -97,7 +98,6 @@ Ajaxplorer.prototype.init = function()
 	this.initTabNavigation();
 	modal.updateLoadingProgress('Navigation loaded');
 	this.focusOn(this.foldersTree);
-	this.goTo(loadRep);
 	document.onkeydown = function(event){		
 		if(event == null)
 		{
@@ -109,7 +109,10 @@ Ajaxplorer.prototype.init = function()
 	this.blockNavigation = false;
 	
 	new AjxpAutocompleter("current_path", "autocomplete_choices");
-	
+	this.history = new Proto.History(function(hash){
+		this.goTo(this.historyHashToPath(hash));
+	}.bind(this));
+	this.goTo(loadRep);	
 }
 
 Ajaxplorer.prototype.getLoggedUserFromServer = function()
@@ -249,7 +252,7 @@ Ajaxplorer.prototype.goTo = function(rep, selectFile)
 	this.actionBar.updateLocationBar(rep);
 	this.actionBar.update(true);
 	this.foldersTree.goToDeepPath(rep);	
-	this.filesList.loadXmlList(rep, selectFile);
+	this.filesList.loadXmlList(rep, selectFile);	
 }
 
 Ajaxplorer.prototype.clickDir = function(url, parent_url, objectName)
@@ -267,6 +270,35 @@ Ajaxplorer.prototype.clickDir = function(url, parent_url, objectName)
 		this.getActionBar().update(true);
 	}
 }
+
+Ajaxplorer.prototype.updateHistory = function(path){
+	this.history.historyLoad(this.pathToHistoryHash(path));
+}
+
+Ajaxplorer.prototype.pathToHistoryHash = function(path){
+	document.title = 'AjaXplorer - '+(getBaseName(path)?getBaseName(path):'/');
+	if(!this.pathesHash){
+		this.pathesHash = new Hash();
+		this.histCount = -1;
+	}
+	var foundKey;
+	this.pathesHash.each(function(pair){
+		if(pair.value == path) foundKey = pair.key;
+	});
+	if(foundKey != undefined) return foundKey;
+
+	this.histCount++;
+	this.pathesHash.set(this.histCount, path);
+	return this.histCount;
+}
+
+Ajaxplorer.prototype.historyHashToPath = function(hash){
+	if(!this.pathesHash) return "/";
+	var path = this.pathesHash.get(hash);
+	if(path == undefined) return "/";
+	return path;
+}
+
 
 Ajaxplorer.prototype.cancelCopyOrMove = function()
 {
