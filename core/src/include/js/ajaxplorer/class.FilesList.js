@@ -270,6 +270,7 @@ FilesList.prototype.parseXmlAndLoad = function(oXmlDoc)
 
 	this.initRows();
 	this.removeOnLoad();
+	ajaxplorer.updateHistory(this._currentRep);
 	if(this._displayMode == "list")
 	{
 		this._sortableTable.sortColumn = -1;

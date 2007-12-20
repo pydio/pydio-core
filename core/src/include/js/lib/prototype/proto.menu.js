@@ -97,11 +97,12 @@ Proto.Menu = Class.create({
 							href: '#',
 							title: item.alt,
 							className: (item.className || '') + (item.disabled ? ' disabled' : ' enabled'),
-							style:''//'background-image:url('+item.image+');'
+							style:''//'background-image:url('+item.image+');' 							
 						}), { _callback: item.callback })
+						.writeAttribute('onclick', 'return false;')
 						.observe('click', this.onClick.bind(this))
 						.observe('contextmenu', Event.stop)
-						.update('<img src="'+item.image+'" border="0" height="16" width="16" align="absmiddle"> '+item.name)
+						.update('<img src="'+item.image+'" border="0" height="16" width="16" align="absmiddle"> '+item.name)						
 				)
 			)
 		}.bind(this));
@@ -137,6 +138,6 @@ Proto.Menu = Class.create({
 			if (this.ie) this.shim.hide();
 			this.container.hide();
 			e.target._callback(this.event);
-		}
+		}		
 	}
 })
