@@ -109,9 +109,11 @@ Ajaxplorer.prototype.init = function()
 	this.blockNavigation = false;
 	
 	new AjxpAutocompleter("current_path", "autocomplete_choices");
-	this.history = new Proto.History(function(hash){
-		this.goTo(this.historyHashToPath(hash));
-	}.bind(this));
+	if(Prototype.Browser.Gecko){
+		this.history = new Proto.History(function(hash){
+			this.goTo(this.historyHashToPath(hash));
+		}.bind(this));
+	}
 	this.goTo(loadRep);	
 }
 
@@ -272,7 +274,7 @@ Ajaxplorer.prototype.clickDir = function(url, parent_url, objectName)
 }
 
 Ajaxplorer.prototype.updateHistory = function(path){
-	this.history.historyLoad(this.pathToHistoryHash(path));
+	if(this.history) this.history.historyLoad(this.pathToHistoryHash(path));
 }
 
 Ajaxplorer.prototype.pathToHistoryHash = function(path){
