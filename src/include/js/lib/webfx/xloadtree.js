@@ -150,9 +150,9 @@ WebFXLoadTreeItem.prototype.reload = function () {
 function _startLoadXmlTree(sSrc, jsNode) {
 	if (jsNode.loading || jsNode.loaded)
 		return;
-	jsNode.loading = true;
-	var connexion = new Connexion(sSrc);
-	connexion.onComplete = function(transport){
+	jsNode.loading = true;	
+	var connexion = new Connexion(encodeURI(unescape(sSrc)));
+	connexion.onComplete = function(transport){		
 		_xmlFileLoaded(transport.responseXML, jsNode);
 	};
 	connexion.sendAsync();	
@@ -223,19 +223,24 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 
 		// loop through all tree children
 		var cs = root.childNodes;
-		var l = cs.length;
-		for (var i = 0; i < l; i++) {
+		var l = cs.length;		
+		for (var i = 0; i < l; i++) {			
 			if (cs[i].tagName == "tree") {
 				bAnyChildren = true;
 				bIndent = true;
 				jsParentNode.add( _xmlTreeToJsTree(cs[i]), true);
 			}
+			else if(cs[i].tagName == "error")
+			{
+				jsParentNode.errorText = cs[i].firstChild.nodeValue;
+			}
+			
 		}
 
 		// if no children we got an error
-		if (!bAnyChildren)
-			jsParentNode.errorText = parseTemplateString(webFXTreeConfig.emptyErrorTextTemplate,
-										jsParentNode.src);
+		//if (!bAnyChildren)
+			//jsParentNode.errorText = parseTemplateString(webFXTreeConfig.emptyErrorTextTemplate,
+			//							jsParentNode.src);
 	}
 
 	// remove dummy
@@ -251,7 +256,7 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 
 	// show error in status bar
 	if (jsParentNode.errorText != ""){
-		//window.status = jsParentNode.errorText;
+		window.status = jsParentNode.errorText;
 	}
 
 	if(ajaxplorer) ajaxplorer.foldersTree.asyncExpandAndSelect();
