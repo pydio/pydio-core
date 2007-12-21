@@ -1,3 +1,0 @@
-<!ENTITY one "un">
-<!ENTITY two "duex">
-<!ENTITY three "trois">
