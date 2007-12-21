@@ -1,3 +1,0 @@
-<!ENTITY one "ett">
-<!ENTITY two "tvaa">
-<!ENTITY three "tre">

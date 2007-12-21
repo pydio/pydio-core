@@ -8,34 +8,22 @@
 | An extension to xTree that allows sub trees to be loaded at runtime by      |
 | reading XML files from the server. Works with IE5+ and Mozilla 1.0+         |
 |-----------------------------------------------------------------------------|
-|                   Copyright (c) 1999 - 2002 Erik Arvidsson                  |
+|             Copyright (c) 2001, 2002, 2003, 2006 Erik Arvidsson             |
 |-----------------------------------------------------------------------------|
-| This software is provided "as is", without warranty of any kind, express or |
-| implied, including  but not limited  to the warranties of  merchantability, |
-| fitness for a particular purpose and noninfringement. In no event shall the |
-| authors or  copyright  holders be  liable for any claim,  damages or  other |
-| liability, whether  in an  action of  contract, tort  or otherwise, arising |
-| from,  out of  or in  connection with  the software or  the  use  or  other |
-| dealings in the software.                                                   |
+| Licensed under the Apache License, Version 2.0 (the "License"); you may not |
+| use this file except in compliance with the License.  You may obtain a copy |
+| of the License at http://www.apache.org/licenses/LICENSE-2.0                |
 | - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-| This  software is  available under the  three different licenses  mentioned |
-| below.  To use this software you must chose, and qualify, for one of those. |
-| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-| The WebFX Non-Commercial License          http://webfx.eae.net/license.html |
-| Permits  anyone the right to use the  software in a  non-commercial context |
-| free of charge.                                                             |
-| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-| The WebFX Commercial license           http://webfx.eae.net/commercial.html |
-| Permits the  license holder the right to use  the software in a  commercial |
-| context. Such license must be specifically obtained, however it's valid for |
-| any number of  implementations of the licensed software.                    |
-| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
-| GPL - The GNU General Public License    http://www.gnu.org/licenses/gpl.txt |
-| Permits anyone the right to use and modify the software without limitations |
-| as long as proper  credits are given  and the original  and modified source |
-| code are included. Requires  that the final product, software derivate from |
-| the original  source or any  software  utilizing a GPL  component, such  as |
-| this, is also licensed under the GPL license.                               |
+| Unless  required  by  applicable law or  agreed  to  in  writing,  software |
+| distributed under the License is distributed on an  "AS IS" BASIS,  WITHOUT |
+| WARRANTIES OR  CONDITIONS OF ANY KIND,  either express or implied.  See the |
+| License  for the  specific language  governing permissions  and limitations |
+| under the License.                                                          |
+|-----------------------------------------------------------------------------|
+| Dependencies: xtree.js     - original xtree library                         |
+|               xtree.css    - simple css styling of xtree                    |
+|               xmlextras.js - provides xml http objects and xml document     |
+|                              objects                                        |
 |-----------------------------------------------------------------------------|
 | 2001-09-27 | Original Version Posted.                                       |
 | 2002-01-19 | Added some simple error handling and string templates for      |
@@ -44,15 +32,10 @@
 |            | twice.                                                         |
 | 2002-10-10 | (1.1) Added reload method that reloads the XML file from the   |
 |            | server.                                                        |
-| 2003-03-02 | Changed to XmlDocument to enable resolveExternals              |
-|            | Improved the error checking a little                           |
+| 2003-05-06 | Added support for target attribute                             |
+| 2006-05-28 | Changed license to Apache Software License 2.0.                |
 |-----------------------------------------------------------------------------|
-| Dependencies: xtree.js - original xtree library                             |
-|               xtree.css - simple css styling of xtree                       |
-|               xmlextras.js - provides xml http objects and xml document     |
-|                              objects                                        |
-|-----------------------------------------------------------------------------|
-| Created 2001-09-27 | All changes are in the log above. | Updated 2002-10-10 |
+| Created 2001-09-27 | All changes are in the log above. | Updated 2006-05-28 |
 \----------------------------------------------------------------------------*/
 
 
@@ -68,13 +51,13 @@ function WebFXLoadTree(sText, sXmlSrc, sAction, sBehavior, sIcon, sOpenIcon) {
 	// call super
 	this.WebFXTree = WebFXTree;
 	this.WebFXTree(sText, sAction, sBehavior, sIcon, sOpenIcon);
-	
+
 	// setup default property values
 	this.src = sXmlSrc;
 	this.loading = false;
 	this.loaded = false;
 	this.errorText = "";
-	
+
 	// check start state and load if open
 	if (this.open)
 		_startLoadXmlTree(this.src, this);
@@ -82,7 +65,7 @@ function WebFXLoadTree(sText, sXmlSrc, sAction, sBehavior, sIcon, sOpenIcon) {
 		// and create loading item if not
 		this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);
 		this.add(this._loadingItem);
-	}
+	}	
 }
 
 WebFXLoadTree.prototype = new WebFXTree;
@@ -111,7 +94,7 @@ function WebFXLoadTreeItem(sText, sXmlSrc, sAction, eParent, sIcon, sOpenIcon) {
 	this.loading = false;
 	this.loaded = false;
 	this.errorText = "";
-	
+
 	// check start state and load if open
 	if (this.open)
 		_startLoadXmlTree(this.src, this);
@@ -120,6 +103,7 @@ function WebFXLoadTreeItem(sText, sXmlSrc, sAction, eParent, sIcon, sOpenIcon) {
 		this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);
 		this.add(this._loadingItem);
 	}
+	
 }
 
 WebFXLoadTreeItem.prototype = new WebFXTreeItem;
@@ -135,7 +119,7 @@ WebFXLoadTreeItem.prototype.expand = function() {
 };
 
 // reloads the src file if already loaded
-WebFXLoadTree.prototype.reload = 
+WebFXLoadTree.prototype.reload =
 WebFXLoadTreeItem.prototype.reload = function () {
 	// if loading do nothing
 	if (this.loaded) {
@@ -143,41 +127,35 @@ WebFXLoadTreeItem.prototype.reload = function () {
 		// remove
 		while (this.childNodes.length > 0)
 			this.childNodes[this.childNodes.length - 1].remove();
-		
+
 		this.loaded = false;
-		
+
 		this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);
 		this.add(this._loadingItem);
-		
+
 		if (open)
 			this.expand();
 	}
-	else if (this.open && !this.loading)
+	else if (this.open && !this.loading)	
 		_startLoadXmlTree(this.src, this);
+		
+	if(!this.open && !this.loading) this.toggle();
 };
 
 /*
  * Helper functions
  */
 
-
 // creates the xmlhttp object and starts the load of the xml document
 function _startLoadXmlTree(sSrc, jsNode) {
 	if (jsNode.loading || jsNode.loaded)
 		return;
 	jsNode.loading = true;
-	var xmlDoc = XmlDocument.create();
-	xmlDoc.async = true;
-	xmlDoc.resolveExternals = true;
-	xmlDoc.onreadystatechange = function () {
-		if (xmlDoc.readyState == 4) {
-			_xmlFileLoaded(xmlDoc, jsNode);
-		}
+	var connexion = new Connexion(sSrc);
+	connexion.onComplete = function(transport){
+		_xmlFileLoaded(transport.responseXML, jsNode);
 	};
-	// call in new thread to allow ui to update
-	window.setTimeout(function () {
-		xmlDoc.load(sSrc);
-	}, 10);
+	connexion.sendAsync();	
 }
 
 
@@ -190,7 +168,10 @@ function _xmlTreeToJsTree(oNode) {
 	var icon = oNode.getAttribute("icon");
 	var openIcon = oNode.getAttribute("openIcon");
 	var src = oNode.getAttribute("src");
-	
+	var target = oNode.getAttribute("target");
+	var preloaded = oNode.getAttribute("preloaded");
+	var recycle = oNode.getAttribute("is_recycle");
+	var folderFullName = oNode.getAttribute("filename");
 	// create jsNode
 	var jsNode;
 	if (src != null && src != "")
@@ -198,6 +179,17 @@ function _xmlTreeToJsTree(oNode) {
 	else
 		jsNode = new WebFXTreeItem(text, action, parent, icon, openIcon);
 		
+	if (target != "")
+		jsNode.target = target;
+		
+	if (recycle != null && !(ajaxplorer && ajaxplorer.actionBar && ajaxplorer.actionBar.treeCopyActive))
+		webFXTreeHandler.recycleNode = jsNode.id;
+
+	if(src != null && src != "" && preloaded != null && preloaded == 'true')
+	{
+		jsNode.loaded = true;
+	}
+	jsNode.filename = folderFullName;
 	// go through childNOdes
 	var cs = oNode.childNodes;
 	var l = cs.length;
@@ -205,7 +197,7 @@ function _xmlTreeToJsTree(oNode) {
 		if (cs[i].tagName == "tree")
 			jsNode.add( _xmlTreeToJsTree(cs[i]), true );
 	}
-	
+
 	return jsNode;
 }
 
@@ -221,12 +213,7 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 
 	// check that the load of the xml file went well
 	if( oXmlDoc == null || oXmlDoc.documentElement == null) {
-		if (oXmlDoc && oXmlDoc.parseError != null) {
-			alert(oXmlDoc.parseError.reason);
-		}
-		else {
-			alert("XML parse error");
-		}
+		alert(oXmlDoc.xml);
 		jsParentNode.errorText = parseTemplateString(webFXTreeConfig.loadErrorTextTemplate,
 							jsParentNode.src);
 	}
@@ -250,32 +237,36 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 			jsParentNode.errorText = parseTemplateString(webFXTreeConfig.emptyErrorTextTemplate,
 										jsParentNode.src);
 	}
-	
+
 	// remove dummy
 	if (jsParentNode._loadingItem != null) {
 		jsParentNode._loadingItem.remove();
 		bIndent = true;
 	}
-	
+
 	if (bIndent) {
 		// indent now that all items are added
 		jsParentNode.indent();
 	}
-	
+
 	// show error in status bar
-	if (jsParentNode.errorText != "")
-		window.status = jsParentNode.errorText;
+	if (jsParentNode.errorText != ""){
+		//window.status = jsParentNode.errorText;
+	}
+
+	if(ajaxplorer) ajaxplorer.foldersTree.asyncExpandAndSelect();
+	if(modal.pageLoading) modal.updateLoadingProgress('Tree Loaded');
 }
 
 // parses a string and replaces %n% with argument nr n
 function parseTemplateString(sTemplate) {
 	var args = arguments;
 	var s = sTemplate;
-	
+
 	s = s.replace(/\%\%/g, "%");
-	
+
 	for (var i = 1; i < args.length; i++)
 		s = s.replace( new RegExp("\%" + i + "\%", "g"), args[i] )
-	
+
 	return s;
 }
