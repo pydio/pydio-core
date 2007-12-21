@@ -1,4 +1,4 @@
-AjaXplorer Version 2.2.1 - 2007/11/22
+AjaXplorer Version 2.3 - 2007/12/22
 Please read /doc/INSTALL.txt to find help with configuration.
 
 [MAIN DEVELOPER]
