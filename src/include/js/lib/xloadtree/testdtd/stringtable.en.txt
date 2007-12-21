@@ -1,3 +1,0 @@
-<!ENTITY one "one">
-<!ENTITY two "two">
-<!ENTITY three "three">
