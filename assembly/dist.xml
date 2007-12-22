@@ -10,7 +10,57 @@
 			<outputDirectory></outputDirectory>
 			<directory>src</directory>
 			<includes>
+				<include>*.php</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>classes</outputDirectory>
+			<directory>src/classes</directory>
+			<includes>
 				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>conf</outputDirectory>
+			<directory>src/conf</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>doc</outputDirectory>
+			<directory>src/doc</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>files</outputDirectory>
+			<directory>src/files</directory>
+			<includes>
+				<include>.htaccess</include>
+				<include>INSTALL-SelectMeAndClickEdit.txt</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>images</outputDirectory>
+			<directory>src/images</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>include</outputDirectory>
+			<directory>src/include</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>users</outputDirectory>
+			<directory>src/users</directory>
+			<includes>
+				<include>.htaccess</include>
 			</includes>
 		</fileSet>
 	</fileSets>
