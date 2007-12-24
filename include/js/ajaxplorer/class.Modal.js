@@ -4,7 +4,7 @@ Modal = Class.create({
 	initialize: function(){
 	},
 	
-	init: function(){
+	initForms: function(){
 		this.elementName = 'generic_dialog_box';
 		this.htmlElement = $(this.elementName);
 		this.dialogTitle = this.htmlElement.getElementsBySelector(".dialogTitle")[0];
