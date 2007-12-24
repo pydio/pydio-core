@@ -17,7 +17,12 @@ Ajaxplorer = Class.create({
 		this.histCount=0;
 		if(!this.usersEnabled) this.rootDirId = rootDirId;
 		modal.setLoadingStepCounts(8);
+		this.initTemplates();
+		modal.initForms();
+		this.initObjects();
+	},
 	
+	initTemplates:function(){
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_template');
 		connexion.onComplete = function(transport){
@@ -33,14 +38,10 @@ Ajaxplorer = Class.create({
 		}
 		connexion.addParameter('template_name', 'gui_tpl.html');
 		connexion.sendSync();
-		modal.updateLoadingProgress('Main template loaded');
-		//connexion.loadLibraries();
-		modal.init();
-		this.init();
+		modal.updateLoadingProgress('Main template loaded');	
 	},
 	
-	init: function()
-	{
+	initObjects: function(){
 		loadRep = this._initLoadRep;
 		crtUser = this._initCrtUser;
 		rootDirName = this._initRootDir;
@@ -88,9 +89,9 @@ Ajaxplorer = Class.create({
 		  	this.refreshList();
 		  }.bind(protoMenu),0);};
 	
-		  this.filesList.setContextualMenu(this.contextMenu);
-		  this.foldersTree.setContextualMenu(this.contextMenu);
-		  this.actionBar.setContextualMenu(this.contextMenu);
+		this.filesList.setContextualMenu(this.contextMenu);
+		this.foldersTree.setContextualMenu(this.contextMenu);
+		this.actionBar.setContextualMenu(this.contextMenu);
 		  
 		this.sEngine = new SearchEngine("search_container", "search_txt","search_results", "search_button", this);
 		this.infoPanel = new InfoPanel("info_panel");
@@ -128,54 +129,17 @@ Ajaxplorer = Class.create({
 	},
 	
 	logXmlUser: function(xmlResponse){
-		try{
-			
+		this.user = null;
+		try{			
 			var childs = xmlResponse.documentElement.childNodes;		
-			for(var i=0; i<childs.length;i++)
-			{
-				if(childs[i].tagName == "user")
-				{
+			for(var i=0; i<childs.length;i++){
+				if(childs[i].tagName == "user"){
 					var userId = childs[i].getAttribute('id');
 					childs = childs[i].childNodes;
 					break;
 				}		
 			}	
-			if(userId)
-			{
-				this.user = new User(userId);	
-				var repositories = new Hash();
-				for(var i=0; i<childs.length;i++)
-				{
-					if(childs[i].tagName == "active_repo")
-					{
-						this.user.setActiveRepository(childs[i].getAttribute('id'), 
-														childs[i].getAttribute('read'), 
-														childs[i].getAttribute('write'));
-					}
-					else if(childs[i].tagName == "repositories")
-					{
-						for(j=0;j<childs[i].childNodes.length;j++)
-						{
-							var repoChild = childs[i].childNodes[j];
-							if(repoChild.tagName == "repo") repositories.set(repoChild.getAttribute("id"), repoChild.firstChild.nodeValue);
-						}
-						this.user.setRepositoriesList(repositories);
-					}
-					else if(childs[i].tagName == "preferences")
-					{
-						for(j=0;j<childs[i].childNodes.length;j++)
-						{
-							var prefChild = childs[i].childNodes[j];
-							if(prefChild.tagName == "pref") this.user.setPreference(prefChild.getAttribute("name"), 
-																					prefChild.getAttribute("value"));
-						}					
-					}
-				}
-			}
-			else
-			{
-				this.user = null;
-			}
+			if(userId) this.user = new User(userId, childs);
 		}catch(e){alert('Error parsing XML for user : '+e);}
 		
 		if(this.user != null)
@@ -196,58 +160,7 @@ Ajaxplorer = Class.create({
 		this.filesList.loadXmlList('/');
 		this.actionBar.loadBookmarks();
 	},
-	
-	loadLibraries: function(){
-		if(!dynamicLibLoading) {this.init(); return;}
-		var connexion = new Connexion();
-		var toLoad = $A([
-			"lib/webfx/slider/js/timer.js", 
-			"lib/webfx/slider/js/range.js", 
-			"lib/webfx/slider/js/slider.js", 
-			"lib/leightbox/lightbox.js", 
-			"lib/jquery/dimensions.js", 
-			"lib/jquery/splitter.js", 
-			"lib/ufo/ufo.js",
-			"lib/prototype/proto.menu.js",
-			"lib/codepress/codepress.js",
-			"lib/webfx/selectableelements.js", 
-			"lib/webfx/selectabletablerows.js", 
-			"lib/webfx/sortabletable.js", 
-			"lib/webfx/numberksorttype.js", 
-			"lib/webfx/slider/js/timer.js", 
-			"lib/webfx/slider/js/range.js", 
-			"lib/webfx/slider/js/slider.js", 
-			"lib/xloadtree/xtree.js", 
-			"lib/xloadtree/xloadtree.js", 
-			"lib/xloadtree/xmlextras.js",
-			"ajaxplorer/ajxp_multifile.js", 
-			"ajaxplorer/ajxp_utils.js", 
-			"ajaxplorer/class.User.js", 
-			"ajaxplorer/class.AjxpDraggable.js",
-			"ajaxplorer/class.AjxpAutoCompleter.js",
-			"ajaxplorer/class.Diaporama.js",
-			"ajaxplorer/class.Editor.js",
-			"ajaxplorer/class.ActionsManager.js", 
-			"ajaxplorer/class.FilesList.js", 
-			"ajaxplorer/class.FoldersTree.js", 
-			"ajaxplorer/class.SearchEngine.js", 
-			"ajaxplorer/class.InfoPanel.js", 
-			"ajaxplorer/class.ResizeableBar.js", 
-			"ajaxplorer/class.UserSelection.js"]);
-			
-			
-		modal.incrementStepCounts(toLoad.size());
-		toLoad.each(function(fileName){
-			var onLoad = function(){modal.updateLoadingProgress(fileName);};
-			if(fileName == toLoad.last()) onLoad = function(){modal.updateLoadingProgress(fileName);this.init();}.bind(this);
-			connexion.loadLibrary(fileName, onLoad);
-		});
-	},
-	
-	libLoaded: function(fileName){	
-		modal.updateLoadingProgress('Loaded : ' + fileName);
-	},
-	
+		
 	goTo: function(rep, selectFile){
 		this.actionBar.updateLocationBar(rep);
 		this.actionBar.update(true);
@@ -394,23 +307,14 @@ Ajaxplorer = Class.create({
 	
 	
 	initTabNavigation: function(){
-		var objects = [this.foldersTree, this.filesList, this.actionBar];
-		var oThis = this;
-		// FIRST TOTALLY DISABLE TAB KEY
-		/*
-		document.onkeydown = function(e){
-			if (e == null) e = document.parentWindow.event;		
-			if (e.keyCode == 9 && !ajaxplorer.blockNavigation){return false;}
-			return true;
-		}
-		*/	
-		// NOW ASSIGN OBSERVER
+		var objects = [this.foldersTree, this.filesList, this.actionBar];		
+		// ASSIGN OBSERVER
 		Event.observe(document, "keydown", function(e)
 		{
 			if (e == null) e = document.parentWindow.event;
 			if(e.keyCode == Event.KEY_TAB)
 			{			
-				if(ajaxplorer.blockNavigation) return;			
+				if(this.blockNavigation) return;			
 				var shiftKey = e['shiftKey'];
 				for(i=0; i<objects.length;i++)
 				{
@@ -420,15 +324,10 @@ Ajaxplorer = Class.create({
 						var nextIndex;
 						if(shiftKey)
 						{
-							if(i>0)
-							{
-								nextIndex=i-1;
-							}
-							else 
-							{
-								nextIndex = (objects.length) - 1;
-							}
-						}else
+							if(i>0) nextIndex=i-1;
+							else nextIndex = (objects.length) - 1;
+						}
+						else
 						{
 							if(i<objects.length-1)nextIndex=i+1;
 							else nextIndex = 0;
@@ -439,10 +338,10 @@ Ajaxplorer = Class.create({
 				}
 				return false;
 			}
-			if(ajaxplorer.blockShortcuts || e['ctrlKey']) return true;
+			if(this.blockShortcuts || e['ctrlKey']) return true;
 			if(e.keyCode > 90 || e.keyCode < 65) return true;
-			else return oThis.actionBar.fireActionByKey(String.fromCharCode(e.keyCode).toLowerCase());
-		});
+			else return this.actionBar.fireActionByKey(String.fromCharCode(e.keyCode).toLowerCase());
+		}.bind(this));
 	},
 	
 	initGUI: function(){
@@ -451,9 +350,6 @@ Ajaxplorer = Class.create({
 		if(!Prototype.Browser.WebKit){ // Do not try this on safari, not working good.
 			jQuery(".action_bar a").corner("round 8px");
 		}
-		//jQuery(".panelHeader").corner("round tl 5px");
-		//jQuery("#last_header").corner("round tr 5px");
-		//jQuery("#last_header").css("border-bottom", "1px solid #aaa");		
 		jQuery("#location_form").corner("round 8px");
 		
 		jQuery("#verticalSplitter").splitter({
@@ -471,8 +367,6 @@ Ajaxplorer = Class.create({
 		fitHeightToBottom($("browser"), window, 15);
 		fitHeightToBottom($("verticalSplitter"), $('browser'), (Prototype.Browser.IE?8:0));
 		fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:3));
-		//jQuery("#search_div").corner("round bl 10px");
-		//jQuery("#content_pane").corner("round br 10px");
 		fitHeightToBottom(this.sEngine._resultsBox, null, 10);
 		this.currentSideToggle = 'search';
 		this.toggleSidePanel('info');	
@@ -494,96 +388,50 @@ Ajaxplorer = Class.create({
 	},
 	
 	refreshRootDirMenu: function(rootDirsList, rootDirId){
-		if(this.usersEnabled)
-		{	
-			if(this.rootDirsButton) {this.rootDirsButton.remove();this.rootDirsButton = null;}
-			if(this.rootDirsMenu && this.rootDirsMenu.parentNode) {this.rootDirsMenu.remove();};
-			if(this.rootDirsMenuVisible) this.rootDirsMenuVisible = false;
+		if(this.rootDirsButton) {
+			this.rootDirsButton.remove();this.rootDirsButton = null;
 		}
-		if(rootDirsList && rootDirsList.size() > 1)
-		{
-			var oThis = this;
-			// CREATE BUTTON
-			var img = $(document.createElement("img"));
-			img.src = 'images/crystal/lower.png';
-			img.setAttribute("align", "absmiddle");
-			img.setStyle({cursor:"pointer"});		
-			$('dir_chooser').appendChild(img);
-			Event.observe(img, 'click', function(){oThis.toggleRootDirMenu();});
-			this.rootDirsButton = img;
-			
-			// CREATE MENU
-			// build menu and show next to button.
-			this.rootDirsMenu = $(document.createElement("div"));
-			this.rootDirsMenu.addClassName("rootDirChooser");
-			var titleDiv = $(document.createElement('span'));
-			titleDiv.addClassName('rootDirTitle');
-			titleDiv.appendChild(document.createTextNode(MessageHash[200]));
-			this.rootDirsMenu.appendChild(titleDiv);
-			rootDirsList.each(function(pair){
-				var element = document.createElement('a');
-				var img = document.createElement('img');
-				img.src = "images/foldericon.png";
-				img.setAttribute("align", "absmiddle");
-				img.setAttribute("hspace", "3");
-				element.appendChild(img);
-				element.appendChild(document.createTextNode(pair.value));
-				element.rootDirId = pair.key;
-				element.href = "javascript:ajaxplorer.triggerRootDirChange("+pair.key+");";
-				oThis.rootDirsMenu.appendChild(element);
-			});		
-		}
+		if(!rootDirsList || rootDirsList.size() <= 1) return;
+		// CREATE BUTTON
+		var img = new Element('img', {
+				id:'root_dir_button', 
+				src:'images/crystal/lower.png',
+				alt:MessageHash[200],
+				align:'absmiddle'
+			}).setStyle({cursor:'pointer'});			
+		$('dir_chooser').appendChild(img);
+		this.rootDirsButton = img;
+		var actions = new Array();
+		rootDirsList.each(function(pair){
+			var value = pair.value;
+			var key = pair.key;
+			var selected = (key == this.rootDirId ? true:false);
+			actions[actions.length] = {
+				name:value,
+				alt:value,				
+				image:'images/foldericon.png',				
+				className:"edit",
+				disabled:selected,
+				callback:function(e){
+					ajaxplorer.triggerRootDirChange(''+key);
+				}
+			}
+		}.bind(this));		
+		
+		this.rootMenu = new Proto.Menu({
+			selector: '[id="root_dir_button"]',
+			className: 'menu rootDirChooser',
+			mouseClick:'left',
+			anchor:img,
+			menuTitle:MessageHash[200],
+			menuItems: actions,
+			fade:true,
+			zIndex:2000
+		});			
 	},
 	
-	toggleRootDirMenu: function(hideOnly){
-		if(!this.rootDirsMenuVisible && !hideOnly)
-		{
-			// Refresh list with current rootdir active
-			var oThis = this;
-			this.rootDirsMenu.getElementsBySelector("a").each(function(element){
-				if(element.rootDirId == oThis.rootDirId) {
-					element.setStyle({fontWeight:"bold", cursor:"default"});
-					element.onclick = function(){return false;};
-					element.getElementsBySelector("img")[0].src = "images/openfoldericon.png";
-				}
-				else{
-					element.setStyle({fontWeight:"normal", cursor:"pointer"});
-					element.onclick = function(){return true;};
-					element.getElementsBySelector("img")[0].src = "images/foldericon.png";
-				}
-			});
-			
-			// Position list
-			var buttonPosition = Position.cumulativeOffset($(this.rootDirsButton));
-			var topPos = buttonPosition[1] + $(this.rootDirsButton).getHeight();
-			var leftPos = buttonPosition[0];
-			this.rootDirsMenu.style.top = topPos + "px";
-			this.rootDirsMenu.style.left = leftPos + "px";
-			
-			
-			// Show and set click handlers
-			document.body.appendChild(this.rootDirsMenu);
-			this.rootDirsMenuVisible = true;
-			var oThis = this;
-			var closeHandler = function(){
-				window.setTimeout(function(){oThis.toggleRootDirMenu(true)}, 100); 
-				Event.stopObserving(document.body,"click", closeHandler); 
-				return true;};
-			window.setTimeout(function(){ Event.observe(document.body,"click", closeHandler);}, 1);
-		}
-		else if(this.rootDirsMenuVisible)
-		{
-			document.body.removeChild(this.rootDirsMenu);
-			this.rootDirsMenuVisible = false;
-		}
-	},
 
 	triggerRootDirChange: function(rootDirId){
-		// CALL CONTENT TO SWITCH ROOT DIR
-		// THEN RELOAD EVERYTHING
-		// alert(rootDirId);
-		//this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
-		//this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);
 		this.actionBar.updateLocationBar('/');
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'switch_root_dir');
@@ -600,6 +448,7 @@ Ajaxplorer = Class.create({
 				this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);
 				this.actionBar.parseXmlMessage(transport.responseXML);
 				this.foldersTree.reloadCurrentNode();
+				this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);
 				this.filesList.loadXmlList('/');
 				this.rootDirId = rootDirId;
 				this.actionBar.loadBookmarks();			
@@ -627,6 +476,22 @@ Ajaxplorer = Class.create({
 			fitHeightToBottom(this.sEngine._resultsBox, null, 5, true);
 		}
 		this.currentSideToggle = srcName;
+	},
+
+	loadLibraries: function(){
+		if(!dynamicLibLoading) {this.init(); return;}
+		var connexion = new Connexion();
+		var toLoad = $A([]);			
+		modal.incrementStepCounts(toLoad.size());
+		toLoad.each(function(fileName){
+			var onLoad = function(){modal.updateLoadingProgress(fileName);};
+			if(fileName == toLoad.last()) onLoad = function(){modal.updateLoadingProgress(fileName);this.init();}.bind(this);
+			connexion.loadLibrary(fileName, onLoad);
+		});
+	},
+	
+	libLoaded: function(fileName){	
+		modal.updateLoadingProgress('Loaded : ' + fileName);
 	}
 
 });

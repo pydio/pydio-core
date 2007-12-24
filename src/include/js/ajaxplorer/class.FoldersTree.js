@@ -43,21 +43,12 @@ FoldersTree = Class.create({
 	},
 	
 	setContextualMenu: function(protoMenu){
+		Event.observe(this.rootNodeId+'-anchor', 'contextmenu', function(e){eval(this.action);}.bind(webFXTreeHandler.all[this.rootNodeId]));
+		protoMenu.addElements('#'+this.rootNodeId+'-anchor');
 		webFXTreeHandler.contextMenu = protoMenu;
 	},
 	
 	clickDir: function(url, parent_url, objectName)	{
-		if(this.treeInDestMode)
-		{
-			alert('TODO / Tree In Dest Mode!');
-			/*
-			copymoveForm = getFrame('panel').document.getElementById('copymove_form');
-			copymoveForm.dest.value = url;
-			copymoveForm.dest_node.value = objectName;
-			*/
-			return;
-		}
-		
 		currentParentUrl = parent_url;	
 		if(objectName != null)
 		{
