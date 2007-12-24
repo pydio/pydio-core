@@ -1,8 +1,8 @@
-var BookmarksBar = Class.create({
+var BookmarksBar = Class.create(ResizeableBar, {
 	
-	initialize: function(){
-		this.oElement = $('bmbar_content');
-		this.resizeableBar = new ResizeableBar("bmbar_content", "bookmarks_bar", "bm", "bmbar_title", "bmbar_extension");
+	initialize: function($super){
+		this.oElement = $('bmbar_content');		
+		$super("bmbar_content", "bookmarks_bar", "bm", "bmbar_title", "bmbar_extension");
 		this.load();
 		this.currentCount = 0;
 	},
@@ -17,7 +17,7 @@ var BookmarksBar = Class.create({
 			if(root.childNodes[i].tagName != 'bookmark') continue;			
 			this.displayBookmark(root.childNodes[i].getAttribute('path'), root.childNodes[i].getAttribute('title'));
 		}
-		this.resizeableBar.updateUI();
+		this.updateUI();
 		if(this.contextMenu) this.contextMenu.addElements('div.bm');
 		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
 	},
