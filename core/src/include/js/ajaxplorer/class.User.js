@@ -7,10 +7,11 @@ User = Class.create({
 	preferences:undefined,
 	repositories: undefined,
 
-	initialize:function(id){
+	initialize:function(id, xmlDef){
 		this.id = id;
 		this.preferences = new Hash();
 		this.repositories = new Hash();
+		if(xmlDef) this.loadFromXml(xmlDef);
 	},
 
 	setActiveRepository : function (id, read, write){
@@ -63,5 +64,40 @@ User = Class.create({
 		}
 		conn.onComplete = onCompleteFunc;
 		conn.sendAsync();
+	}, 
+	
+	loadFromXml: function(userNodes){
+	
+		var repositories = new Hash();
+		for(var i=0; i<userNodes.length;i++)
+		{
+			if(userNodes[i].tagName == "active_repo")
+			{
+				this.setActiveRepository(userNodes[i].getAttribute('id'), 
+										userNodes[i].getAttribute('read'), 
+										userNodes[i].getAttribute('write'));
+			}
+			else if(userNodes[i].tagName == "repositories")
+			{
+				for(j=0;j<userNodes[i].childNodes.length;j++)
+				{
+					var repoChild = userNodes[i].childNodes[j];
+					if(repoChild.tagName == "repo") repositories.set(repoChild.getAttribute("id"), repoChild.firstChild.nodeValue);
+				}
+				this.setRepositoriesList(repositories);
+			}
+			else if(userNodes[i].tagName == "preferences")
+			{
+				for(j=0;j<userNodes[i].childNodes.length;j++)
+				{
+					var prefChild = userNodes[i].childNodes[j];
+					if(prefChild.tagName == "pref") {
+						this.setPreference(prefChild.getAttribute("name"), 
+							 				prefChild.getAttribute("value"));
+					}
+				}					
+			}
+		}
+			
 	}
 });
