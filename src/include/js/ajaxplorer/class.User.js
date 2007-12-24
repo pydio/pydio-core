@@ -63,5 +63,5 @@ User = Class.create({
 		}
 		conn.onComplete = onCompleteFunc;
 		conn.sendAsync();
-	},
+	}
 });

@@ -11,7 +11,7 @@ function Ajaxplorer(loadRep, usersEnabled, loggedUser, rootDirId, rootDirsList, 
 	this._initLoggedUser = loggedUser;
 	this._initRootDirsList = rootDirsList;
 	this._initRootDirId = rootDirId;
-	this._initDefaultDisp = defaultDisplay;
+	this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 	this.histCount=0;
 	if(!this.usersEnabled) this.rootDirId = rootDirId;
 	modal.setLoadingStepCounts(8);
@@ -63,6 +63,7 @@ Ajaxplorer.prototype.init = function()
 	}
 	
 	this.actionBar.init();
+	this.actionBar.updateDisplayButton(this._initDefaultDisp);
 	modal.updateLoadingProgress('ActionBar Initialized');
 	
 	this.filesList = new FilesList($("selectable_div"), 
