@@ -10,9 +10,9 @@ ResizeableBar = Class.create({
 		this.buttonElementName = buttonElementName;
 		this.widthReferenceElement = $(widthReferenceName);
 	
-		this.hiddenElements = new Array();		
+		this.hiddenElements = new Array();
 		this.buttonImage = new Element('img', {
-			src:'images/crystal/lower.png',
+			src:ajxpResourcesFolder+'/images/crystal/lower.png',
 			style:'cursor:pointer',
 			align:'absmiddle'
 		});

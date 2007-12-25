@@ -3,70 +3,74 @@
 <title>AjaXplorer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <? if($JS_DEBUG) {?>
+<script type="text/javascript">
+		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
+		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
+</script>
 <script language="javascript" type="text/javascript">var dynamicLibLoading = false;</script>
-<script language="javascript" type="text/javascript" src="include/js/lib/prototype/prototype.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.pack.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.corner.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/dimensions.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/splitter.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/ufo/ufo.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/jquery.pack.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/jquery.corner.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/dimensions.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/splitter.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/ufo/ufo.js"></script>
 <script language="javascript">jQuery.noConflict();</script>
 
-<script language="javascript" type="text/javascript" src="include/js/lib/webfx/slider/js/timer.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/webfx/slider/js/range.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/webfx/slider/js/slider.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/slider/js/timer.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/slider/js/range.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/slider/js/slider.js"></script>
 
-<script language="javascript" type="text/javascript" src="include/js/lib/prototype/webfx.selectable.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/prototype/webfx.sortable.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/prototype/proto.menu.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/prototype/proto.history.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/leightbox/lightbox.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop,controls"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/webfx.selectable.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/webfx.sortable.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/proto.menu.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/proto.history.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/leightbox/lightbox.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop,controls"></script>
 
-<script language="javascript" type="text/javascript" src="include/js/lib/webfx/xtree.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/webfx/xloadtree.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/xtree.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/xloadtree.js"></script>
 
-<script language="javascript" type="text/javascript" src="include/js/lib/codepress/codepress.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/codepress/codepress.js"></script>
 
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Connexion.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Connexion.js"></script>
 
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/ajxp_multifile.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/ajxp_utils.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.User.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.AjxpDraggable.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.AjxpSortable.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.AjxpAutoCompleter.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.ActionsManager.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.UserSelection.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.FilesList.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.FoldersTree.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.SearchEngine.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.InfoPanel.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Diaporama.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Editor.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.UserSelection.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Modal.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.ResizeableBar.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.BookmarksBar.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Ajaxplorer.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/ajxp_multifile.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/ajxp_utils.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.User.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.AjxpDraggable.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.AjxpSortable.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.AjxpAutoCompleter.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.ActionsManager.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.UserSelection.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.FilesList.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.FoldersTree.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.SearchEngine.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.InfoPanel.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Diaporama.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Editor.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.UserSelection.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Modal.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.ResizeableBar.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.BookmarksBar.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Ajaxplorer.js"></script>
 <? } else { ?>
 <script language="javascript" type="text/javascript">var dynamicLibLoading = true;</script>
-<script language="javascript" type="text/javascript" src="include/js/lib/prototype/prototype.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.pack.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.corner.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/jquery.pack.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/jquery.corner.js"></script>
 <script language="javascript">jQuery.noConflict();</script>
-<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop,controls"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Connexion.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Modal.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Ajaxplorer.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop,controls"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Connexion.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Modal.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Ajaxplorer.js"></script>
 <? } ?>
 
-<link rel="stylesheet" type="text/css" href="include/css/pnghack/pngHack.css">
-<link rel="stylesheet" type="text/css" href="include/css/sortabletable.css">
-<link rel="stylesheet" type="text/css" href="include/js/lib/webfx/slider/css/bluecurve/bluecurve.css">
-<link rel="stylesheet" type="text/css" href="include/js/lib/webfx/xtree.css">
-<link rel="stylesheet" type="text/css" href="include/css/ajaxplorer.css">
-<link rel="stylesheet" type="text/css" href="include/js/lib/leightbox/screen.css">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/pnghack/pngHack.css">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/sortabletable.css">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/slider/css/bluecurve/bluecurve.css">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/xtree.css">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/ajaxplorer.css">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/leightbox/screen.css">
 <script type="text/javascript">
 		var ajaxplorer;
 		Event.observe(window, "load", function(){
@@ -74,7 +78,7 @@
 			<?php 
 			if($BEGIN_MESSAGE != "") print("alert('".str_replace("'", "\'", $BEGIN_MESSAGE)."');");
 			?>
-			ajaxplorer.currentLanguage = '<?php print(ConfService::getLanguage()); ?>';
+			ajaxplorer.currentLanguage = '<?php print(ConfService::getLanguage()); ?>';						
 		});
  </script>
 </head>
@@ -86,7 +90,7 @@
 		<div id="loaderContent" class="dialogContent" style="text-align:left;background-color:#ccddee; padding:0px;">
 		<div style="padding:5px;">
 			<div align="center" style="font-size:64px;font-family:Trebuchet MS; font-weight:bold;color:#fff;">
-			<img src="images/ajxp_logo_64.gif" width="64" height="64" border="0"> AjaXplorer
+			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/ajxp_logo_64.gif" width="64" height="64" border="0"> AjaXplorer
 			</div>
 			<div align="left" style="font-size:12px;font-family:Trebuchet MS; font-weight:normal;color:#000;padding-left:87px;">
 			Written by Charles du Jeu - LGPL License. <br>

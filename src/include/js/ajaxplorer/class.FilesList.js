@@ -60,7 +60,7 @@ FilesList = Class.create(SelectableElements, {
 		{
 			var buffer = '<TABLE width="100%" cellspacing="0" cellpadding="0" class="sort-table">';
 			buffer = buffer + '<thead><tr>';
-			buffer = buffer + '<td style="border-right:0px;background-image:url(\'images/header_bg_plain.png\');" >'+MessageHash[126]+'</td>';
+			buffer = buffer + '<td style="border-right:0px;background-image:url(\''+ajxpResourcesFolder+'/images/header_bg_plain.png\');" >'+MessageHash[126]+'</td>';
 			buffer = buffer + '<td align="right" id="last_header"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
 			buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" style="padding:0px;"><div id="selectable_div" style="overflow:auto; padding:2px 5px;"></div></td></tr></tbody></table>';
 			$('content_pane').innerHTML  = buffer;
@@ -305,7 +305,7 @@ FilesList = Class.create(SelectableElements, {
 				innerSpan.setAttribute("style", "cursor:default;");
 				$(innerSpan).addClassName("list_selectable_span");
 				// Add icon
-				var imgString = "<img src=\"images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" ";
+				var imgString = "<img src=\""+ajxpResourcesFolder+"/images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" ";
 				imgString =  imgString + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> " + xmlNode.getAttribute(s);
 				innerSpan.innerHTML = imgString;			
 				tableCell.appendChild(innerSpan);
@@ -346,7 +346,7 @@ FilesList = Class.create(SelectableElements, {
 			this._crtImageIndex ++;
 			var imgIndex = this._crtImageIndex;
 			var textNode = xmlNode.getAttribute("text");
-			var imgString = "<img id=\"ajxp_image_"+imgIndex+"\" src=\"images/crystal/mimes/64/image.png\" width=\"64\" height=\"64\" style=\"margin:5px;\" align=\"ABSMIDDLE\" border=\"0\" is_loaded=\"false\"/><div class=\"thumbLabel\" title=\""+textNode+"\">"+textNode+"</div>";
+			var imgString = "<img id=\"ajxp_image_"+imgIndex+"\" src=\""+ajxpResourcesFolder+"/images/crystal/mimes/64/image.png\" width=\"64\" height=\"64\" style=\"margin:5px;\" align=\"ABSMIDDLE\" border=\"0\" is_loaded=\"false\"/><div class=\"thumbLabel\" title=\""+textNode+"\">"+textNode+"</div>";
 			var width = xmlNode.getAttribute("image_width");
 			var height = xmlNode.getAttribute("image_height");		
 			var sizeString, marginTop, marginHeight, newHeight, newWidth;
@@ -390,7 +390,7 @@ FilesList = Class.create(SelectableElements, {
 			// Add icon
 			//if(xmlNode.getAttribute("is_file") == "non") src = "images/crystal/mimes/64/folder.png";
 			//else 
-			src = "images/crystal/mimes/64/"+xmlNode.getAttribute('icon');
+			src = ajxpResourcesFolder+'/images/crystal/mimes/64/'+xmlNode.getAttribute('icon');
 			var imgString = "<img src=\""+src+"\" ";
 			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + xmlNode.getAttribute("text")+"\">" + xmlNode.getAttribute("text")+"</div>";
 			innerSpan.innerHTML = imgString;		
@@ -483,7 +483,7 @@ FilesList = Class.create(SelectableElements, {
 		var parentObject = Position.offsetParent($(this._htmlElement));	
 		addLightboxMarkupToElement(parentObject, $(this._htmlElement).getElementsBySelector('tr')[0]);
 		var img = document.createElement("img");
-		img.src = "images/loadingImage.gif";
+		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
 		$(parentObject).getElementsBySelector("#element_overlay")[0].appendChild(img);
 		this.loading = true;
 	},

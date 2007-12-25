@@ -23,7 +23,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 	},
 	
 	displayBookmark: function(path, title){
-		this.oElement.innerHTML += '<div id="bookmark_'+this.currentCount+'" bm_path="'+path+'" class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';" title="'+path+'"><img width="16" height="16" src="images/crystal/mimes/16/folder.png" border="0" align="ABSMIDDLE"  hspace="5" style="float:left;"><!--<a href="#" class="disabled" title="'+MessageHash[146]+'" onclick="ajaxplorer.actionBar.removeBookmark(\''+path+'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="images/crystal/actions/16/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'+MessageHash[146]+'"></a>--> <a href="#" onclick="ajaxplorer.goTo(\''+path+'\'); return false;" class="bookmark_button">'+title+'</a></div>';			
+		this.oElement.innerHTML += '<div id="bookmark_'+this.currentCount+'" bm_path="'+path+'" class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';" title="'+path+'"><img width="16" height="16" src="'+ajxpResourcesFolder+'/images/crystal/mimes/16/folder.png" border="0" align="ABSMIDDLE"  hspace="5" style="float:left;"><!--<a href="#" class="disabled" title="'+MessageHash[146]+'" onclick="ajaxplorer.actionBar.removeBookmark(\''+path+'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'+MessageHash[146]+'"></a>--> <a href="#" onclick="ajaxplorer.goTo(\''+path+'\'); return false;" class="bookmark_button">'+title+'</a></div>';			
 		this.currentCount++;
 	},
 	
@@ -53,7 +53,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 		var removeAction = {
 				name:MessageHash[146],
 				alt:MessageHash[146],
-				image:'images/crystal/actions/16/delete_bookmark.png',
+				image:ajxpResourcesFolder+'/images/crystal/actions/16/delete_bookmark.png',
 				disabled:false,
 				className:"edit",
 				callback:function(e){
@@ -64,7 +64,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 		var goToAction = {
 				name:MessageHash[224],
 				alt:MessageHash[104],
-				image:'images/crystal/actions/16/forward.png',
+				image:ajxpResourcesFolder+'/images/crystal/actions/16/forward.png',
 				disabled:false,
 				className:"edit",
 				callback:function(e){
@@ -75,7 +75,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 		var renameAction = {
 				name:MessageHash[6],
 				alt:MessageHash[6],
-				image:'images/crystal/actions/16/applix.png',
+				image:ajxpResourcesFolder+'/images/crystal/actions/16/applix.png',
 				disabled:false,
 				className:"edit",
 				callback:function(e){
@@ -90,7 +90,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 	
 	toggleRenameForm:function(bmElement){
 		
-		modal.prepareHeader(MessageHash[225], 'images/crystal/actions/16/bookmark.png');
+		modal.prepareHeader(MessageHash[225], ajxpResourcesFolder+'/images/crystal/actions/16/bookmark.png');
 	 	var onLoad = function(newForm){
 	 		$(newForm).bm_path.value = bmElement.getAttribute('bm_path');
 	 		$(newForm).bm_title.value = bmElement.select('a.bookmark_button')[0].innerHTML;

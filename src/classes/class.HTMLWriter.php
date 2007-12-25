@@ -17,7 +17,7 @@ class HTMLWriter
 		foreach (array_reverse($allBookmarks) as $path)
 		{
 			if(is_array($path)) $path = $path["PATH"];
-			echo '<div class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';"><img width="16" height="16" src="images/crystal/mimes/16/folder.png" border="0" align="ABSMIDDLE" style="float:left;"><a href="#" class="disabled" title="'.$mess[146].'" onclick="ajaxplorer.actionBar.removeBookmark(\''.$path.'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="images/crystal/actions/16/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'.$mess[146].'"></a> <a href="#" onclick="ajaxplorer.goTo(\''.$path.'\'); return false;" class="bookmark_button">'.$path.'</a></div>';
+			echo '<div class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';"><img width="16" height="16" src="'.CLIENT_RESOURCES_FOLDER.'/images/crystal/mimes/16/folder.png" border="0" align="ABSMIDDLE" style="float:left;"><a href="#" class="disabled" title="'.$mess[146].'" onclick="ajaxplorer.actionBar.removeBookmark(\''.$path.'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="'.CLIENT_RESOURCES_FOLDER.'/images/crystal/actions/16/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'.$mess[146].'"></a> <a href="#" onclick="ajaxplorer.goTo(\''.$path.'\'); return false;" class="bookmark_button">'.$path.'</a></div>';
 		}
     }	
     
@@ -26,7 +26,7 @@ class HTMLWriter
     	$realName = dirname(__FILE__)."/../doc/".$docFileName.".txt";
     	if(is_file($realName))
     	{
-    		$string = "<html><link rel=\"stylesheet\" type=\"text/css\" href=\"include/css/docs.css\"><body>";
+    		$string = "<html><link rel=\"stylesheet\" type=\"text/css\" href=\"".CLIENT_RESOURCES_FOLDER."/css/docs.css\"><body>";
     		$content = implode("<br>", file($realName));
     		$content = preg_replace("(http:\/\/[a-z|.|\/|\-|0-9]*)", "<a target=\"_blank\" href=\"$0\">$0</a>", $content);
     		$content = preg_replace("(\[(.*)\])", "<div class=\"title\">$1</div>", $content);
@@ -36,19 +36,7 @@ class HTMLWriter
     	}
     	return "File not found : ".$docFileName;
     }
-    
-    function writeRootDirChooser($rootDirsList, $crtIndex)
-    {
-    	echo '<select id="rootDirChooser" onChange="document.location.href=\'content.php?action=root_tree&root_dir_index=\'+this.options[this.selectedIndex].value;">';
-    	foreach ($rootDirsList as $rIndex => $rName)
-    	{
-    		$selected = "";
-    		if($rIndex == $crtIndex) $selected = " selected";
-    		echo '<option value="'.$rIndex.'"'.$selected.'>'.$rName["DISPLAY"].' ('.$rName["PATH"].')</option>';
-    	}
-    	echo '</select>';
-    }
-    
+        
     function writeRootDirListAsJsString($rootDirsList)
     {
     	$buffer = "\$H({";

@@ -75,10 +75,10 @@ InfoPanel = Class.create({
 		
 		var tString = '<div style="padding:10px;">';
 		if(!is_file){
-			tString += '<div class="folderImage"><img src="images/crystal/mimes/64/folder.png" height="64" width="64"></div>';
+			tString += '<div class="folderImage"><img src="'+ajxpResourcesFolder+'/images/crystal/mimes/64/folder.png" height="64" width="64"></div>';
 		}
 		else{
-			tString += '<div class="folderImage"><img src="images/crystal/mimes/64/'+icon+'" height="64" width="64"></div>';
+			tString += '<div class="folderImage"><img src="'+ajxpResourcesFolder+'/images/crystal/mimes/64/'+icon+'" height="64" width="64"></div>';
 		}
 		
 		tString += '<b>'+MessageHash[133]+'</b> : '+fileName;
@@ -105,7 +105,7 @@ InfoPanel = Class.create({
 		var fileSize = fileData.getAttribute("filesize");
 		var modifTime = fileData.getAttribute("modiftime");
 		
-		var template = new Template('<object type="application/x-shockwave-flash" data="include/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="include/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>');
+		var template = new Template('<object type="application/x-shockwave-flash" data="'+ajxpResourcesFolder+'/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="'+ajxpResourcesFolder+'/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>');
 		
 		var tString = '<div style="padding:10px;">';
 		tString += '<div id="mp3_container" style="border:1px solid #79f; text-align:center; padding:5px; width:160px;">'+template.evaluate({mp3_url:'content.php?action=mp3_proxy%26file=' + fileData.getAttribute("filename")})+'</div>';
@@ -123,7 +123,7 @@ InfoPanel = Class.create({
 	},
 	
 	folderAsPlaylist : function(){
-		var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="include/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="include/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
+		var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="'+ajxpResourcesFolder+'/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="'+ajxpResourcesFolder+'/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
 		
 		var itCopy = new Array();
 		$A(ajaxplorer.getFilesList().getItems()).each(function(rowItem){
@@ -143,7 +143,7 @@ InfoPanel = Class.create({
 	
 	displayFlashPlayer :function(fileName){
 		var baseUrl = 'content.php?action=mp3_proxy%26file=' + fileName;
-	    var FO = { movie:"include/flash/dewplayer-mini.swf?mp3="+baseUrl, width:"150", height:"20"};
+	    var FO = { movie:ajxpResourcesFolder+"/flash/dewplayer-mini.swf?mp3="+baseUrl, width:"150", height:"20"};
 	    UFO.create(FO, 'mp3_container');
 	}
 });

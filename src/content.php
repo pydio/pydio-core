@@ -433,7 +433,7 @@ switch($action)
 		AJXP_XMLWriter::header();
 		foreach ($reps as $repIndex => $repName)
 		{
-			$link = "content.php?id=&ordre=nom&sens=1&action=xml_listing&dir=".$dir."/".$repName;
+			$link = SERVER_ACCESS."?id=&ordre=nom&sens=1&action=xml_listing&dir=".$dir."/".$repName;
 			$link = str_replace("/", "%2F", $link);
 			$link = str_replace("&", "&amp;", $link);
 			$attributes = "";
@@ -471,7 +471,7 @@ switch($action)
 				$folderFullName = "$dir/".$folderBaseName;
 				$parentFolderName = $dir;
 				if(!$completeMode){
-					$attributes = "icon=\"images/foldericon.png\"  openicon=\"images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
+					$attributes = "icon=\"".CLIENT_RESOURCES_FOLDER."/images/foldericon.png\"  openicon=\"".CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
 				}
 			}
 			print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
@@ -486,7 +486,7 @@ switch($action)
 			else 
 			{
 				// ADD RECYCLE BIN TO THE LIST
-				print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"images/crystal/mimes/16/trashcan.png\"  openIcon=\"images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
+				print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
 			}
 		}
 		AJXP_XMLWriter::close();
@@ -504,13 +504,13 @@ switch($action)
 	case "get_template":
 	
 		header("Content-type:text/html");
-		if(isset($template_name) && is_file("include/html/".$template_name))
+		if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
 		{
 			if(!isSet($encode) || $encode != "false")
 			{
 				$mess = array_map("utf8_encode", $mess);
 			}
-			include("include/html/".$template_name);
+			include(CLIENT_RESOURCES_FOLDER."/html/".$template_name);
 		}
 		exit(0);	
 		

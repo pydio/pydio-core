@@ -2,15 +2,19 @@
 <head>
 <title>AjaXplorer Content</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<script language="javascript" type="text/javascript" src="include/js/lib/prototype/prototype.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Connexion.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.AdminPageManager.js"></script>
-<script src=include/js/lib/codepress/codepress.js type=text/javascript></script>
-<script src=include/js/lib/jquery/jquery.pack.js type=text/javascript></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/dimensions.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.corner.js"></script>
-<link rel=stylesheet href="include/css/pnghack/pngHack.css" type="text/css">
+<script type="text/javascript">
+		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
+		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
+</script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Connexion.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.AdminPageManager.js"></script>
+<script src=<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/codepress/codepress.js type=text/javascript></script>
+<script src=<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/jquery.pack.js type=text/javascript></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/dimensions.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/jquery/jquery.corner.js"></script>
+<link rel=stylesheet href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/pnghack/pngHack.css" type="text/css">
 <script type="text/javascript">
 jQuery.noConflict();
 var manager;
@@ -19,7 +23,7 @@ window.onload = function(){
 };
 </script>
 
-<link rel="stylesheet" href="include/css/ajaxplorer.css">
+<link rel="stylesheet" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/ajaxplorer.css">
 <style>
 body {background-color: #ddd;}
 body, html
@@ -34,7 +38,7 @@ body, html
 <body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
 <div id="user_admin_bar">
 <div id="message_div" onclick="manager.closeMessageDiv();" class="messageBox"><div id="message_content"></div></div>
- 	<img src="images/crystal/actions/32/user_create.png" align="absmiddle" width="32" height="32"> <b>Create user</b>  
+ 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/user_create.png" align="absmiddle" width="32" height="32"> <b>Create user</b>  
  	    &nbsp;&nbsp;&nbsp;&nbsp;
  		Login <input type="text" id="new_user_login">
  		Password <input type="password" id="new_user_pwd">

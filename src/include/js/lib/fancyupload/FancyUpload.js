@@ -105,7 +105,7 @@ var FancyUpload = new Class({
 					click: this.browse.bind(this)
 				}
 			}).injectBefore(this.element);
-			link.innerHTML = '<img src="images/crystal/actions/32/view_choose.png" width="32" height="32"><br>'+parent.MessageHash[214];
+			link.innerHTML = '<img src="'+ajxpResourcesFolder+'/images/crystal/actions/32/view_choose.png" width="32" height="32"><br>'+parent.MessageHash[214];
 			/*
 			new Element('img', {
 				src: 'images/crystal/actions/22/folder.png',
@@ -214,7 +214,7 @@ var FancyUpload = new Class({
 			size: size,
 			status: 0,
 			percentage: 0,
-			element: new Element('li').setHTML('<img style="margin-bottom:4px;margin-right:3px;" align="absmiddle" src="images/crystal/actions/16/filenew.png" width="16" height="16"><span class="queue-file">'+ name +'</span><span class="queue-size" title="'+ size +' byte">~'+ Math.ceil(size / 1000) +' kb</span>').injectInside(this.queue)
+			element: new Element('li').setHTML('<img style="margin-bottom:4px;margin-right:3px;" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/filenew.png" width="16" height="16"><span class="queue-file">'+ name +'</span><span class="queue-size" title="'+ size +' byte">~'+ Math.ceil(size / 1000) +' kb</span>').injectInside(this.queue)
 		});
 		new Element('a', {
 			href: 'javascript:void(0)',
@@ -223,7 +223,7 @@ var FancyUpload = new Class({
 			events: {
 				click: this.cancelFile.bindWithEvent(this, [name, size])
 			}
-		}).setHTML('<img src="images/recyclebin.png" width="16" height="16">').injectBefore(this.fileList.getLast().element.getFirst());
+		}).setHTML('<img src="'+ajxpResourcesFolder+'/images/recyclebin.png" width="16" height="16">').injectBefore(this.fileList.getLast().element.getFirst());
 		this.highlight(this.fileList.length - 1, 'e1ff80');
 		if(this.fileList.length) $('clear_button').className='enabled';
 		if(this.fileList.length) $('upload_button').className='enabled';
