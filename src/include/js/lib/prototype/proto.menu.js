@@ -18,9 +18,16 @@ Proto.Menu = Class.create({
 			mouseClick: 'right',
 			anchor: 'mouse',
 			pageOffset: 25,
+			topOffset:0,
+			leftOffset:0,
 			menuTitle:'',
 			fade: false,
 			zIndex: 100,
+			createAnchor:false,
+			anchorContainer:null,
+			anchorSrc:'',
+			anchorTitle:'',
+			anchorPosition:'last',
 			beforeShow: e,
 			beforeHide: e,
 			beforeSelect: e
@@ -31,6 +38,9 @@ Proto.Menu = Class.create({
 			src: 'javascript:false;',
 			frameborder: 0
 		});
+		if(this.options.createAnchor){
+			this.createAnchor();		
+		}
 		this.eventToObserve = ((this.options.mouseClick!='right' || Prototype.Browser.Opera)?'click':'contextmenu');
 		this.options.fade = this.options.fade && !Object.isUndefined(Effect);
 		this.container = new Element('div', {className: this.options.className, style: 'display:none'});
@@ -142,10 +152,22 @@ Proto.Menu = Class.create({
 	computeAnchorOffset: function(){
 		if(this.anchorOffset) return this.anchorOffset;
 		var anchorPosition = Position.cumulativeOffset($(this.options.anchor));
-		var topPos = anchorPosition[1] + $(this.options.anchor).getHeight();
-		var leftPos = anchorPosition[0];
+		var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset;
+		var leftPos = anchorPosition[0] + this.options.leftOffset;
 		this.anchorOffset = {top:topPos+'px', left:leftPos+'px'};
 		return this.anchorOffset;
+	},
+	
+	createAnchor:function(){
+		if(!this.options.createAnchor || this.options.anchor == 'mouse') return;
+		this.options.anchor = new Element('img', {
+				id:this.options.anchor, 
+				src:this.options.anchorSrc,
+				alt:this.options.anchorTitle,
+				align:'absmiddle'
+			}).setStyle({cursor:'pointer'});
+		this.options.anchorContainer.appendChild(this.options.anchor);
+		this.options.selector = '[id="'+this.options.anchor.id+'"]';		
 	},
 	
 	onClick: function(e) {

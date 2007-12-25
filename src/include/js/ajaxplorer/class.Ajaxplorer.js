@@ -388,19 +388,10 @@ Ajaxplorer = Class.create({
 	},
 	
 	refreshRootDirMenu: function(rootDirsList, rootDirId){
-		if(this.rootDirsButton) {
-			this.rootDirsButton.remove();this.rootDirsButton = null;
+		if($('root_dir_button')) {
+			$('root_dir_button').remove();
 		}
 		if(!rootDirsList || rootDirsList.size() <= 1) return;
-		// CREATE BUTTON
-		var img = new Element('img', {
-				id:'root_dir_button', 
-				src:'images/crystal/lower.png',
-				alt:MessageHash[200],
-				align:'absmiddle'
-			}).setStyle({cursor:'pointer'});			
-		$('dir_chooser').appendChild(img);
-		this.rootDirsButton = img;
 		var actions = new Array();
 		rootDirsList.each(function(pair){
 			var value = pair.value;
@@ -418,11 +409,15 @@ Ajaxplorer = Class.create({
 			}
 		}.bind(this));		
 		
-		this.rootMenu = new Proto.Menu({
-			selector: '[id="root_dir_button"]',
+		this.rootMenu = new Proto.Menu({			
 			className: 'menu rootDirChooser',
 			mouseClick:'left',
-			anchor:img,
+			anchor:'root_dir_button',
+			createAnchor:true,
+			anchorContainer:$('dir_chooser'),
+			anchorSrc:'images/crystal/lower.png',
+			anchorTitle:MessageHash[200],
+			topOffset:-2,
 			menuTitle:MessageHash[200],
 			menuItems: actions,
 			fade:true,

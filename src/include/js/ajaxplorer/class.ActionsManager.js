@@ -855,44 +855,11 @@ ActionsManager.prototype.switchLoginButton = function(action)
 ActionsManager.prototype.removeBookmark = function (path)
 {
 	this.bookmarksBar.removeBookmark(path);
-	/*
-	var params = new Hash();
-	params.set('get_action','display_bookmark_bar');
-	params.set('bm_action', 'delete_bookmark');
-	params.set('bm_path', path);
-	params.set('user', this._currentUser);
-	var bmBar = this.bookmarksBar;
-	this.loadHtmlToDiv($('bmbar_content'), params, function(){bmBar.updateUI();});	
-	*/
 }
 
 ActionsManager.prototype.loadBookmarks = function ()
 {
 	this.bookmarksBar.load();
-	/*
-	// LOAD BOOKMARKS
-	var params = new Hash();
-	params.set('get_action','display_bookmark_bar');
-	params.set('user', this._currentUser);
-	var oThis = this;
-	this.loadHtmlToDiv($('bmbar_content'), params, function(){
-		oThis.bookmarksBar.updateUI();
-	});	
-	*/
-}
-
-ActionsManager.prototype.loadHtmlToDiv = function(div, parameters, completeFunc)
-{
-	var connexion = new Connexion();
-	parameters.each(function(pair){
-		connexion.addParameter(pair.key, pair.value);
-	});
-	connexion.onComplete = function(transport){		
-		div.innerHTML = transport.responseText;
-		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
-		if(completeFunc) completeFunc();
-	};
-	connexion.sendAsync();	
 }
 
 ActionsManager.prototype.locationBarSubmit = function (url)
