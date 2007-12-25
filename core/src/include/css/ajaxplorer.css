@@ -63,47 +63,6 @@ textarea{
    background-color: #ffffc0;
 }
 
-.rootDirChooser
-{
-   font-size: 11px;
-   font-family: Trebuchet MS, Helvetica, sans-serif;
-   position:absolute;
-   z-index: 1500;
-   background-color:white;  
-   border: 1px solid black;
-}
-
-.rootDirChooser img
-{
-   border: 0px;
-}
-
-.rootDirChooser a
-{
-   display: block;
-   padding: 1px;
-   padding-right: 20px;
-}
-
-.rootDirChooser span.rootDirTitle
-{
-   display: block;
-   font-size: 12px;
-   font-weight: bold;
-   padding-top: 1px;
-   padding-left: 5px;
-   padding-right: 50px;   
-   color: #ccc;
-   border-bottom: 0px solid #ddd;
-   text-align: left;
-   font-style: italic;
-}
-
-.rootDirChooser a:hover
-{
-   background-color: #ddd;
-}
-
 #sidebar_rootdir_td
 {
    height: 17px;
@@ -1210,12 +1169,13 @@ div.menu a {
         padding-bottom: 1px;
 }
 
-.menu.desktop li.menuTitle {
+.rootDirChooser li.menuTitle {
    font-size: 11px;
    font-weight: bold;
-   padding-top: 1px;
+   padding-top: 2px;
    padding-left: 5px;
-   padding-right: 50px;   
+   padding-right: 25px;
+   padding-bottom: 5px;   
    color: #ccc;
    border-bottom: 0px solid #ddd;
    text-align: left;
@@ -1254,4 +1214,46 @@ padding: 0px;
 .menu.desktop a.enabled:hover {
 	background-color: #0A246A;
 	color: #fff;
+}
+
+.rootDirChooser
+{
+   font-size: 11px;
+   font-family: Trebuchet MS, Helvetica, sans-serif;
+   position:absolute;
+   z-index: 1500;
+   background-color:white;  
+   border: 1px solid #999;
+}
+
+.rootDirChooser img
+{
+   border: 0px;
+}
+
+.rootDirChooser a
+{
+   display: block;
+   padding: 2px;
+   padding-right: 20px;
+   padding-left: 5px;
+}
+
+.rootDirChooser span.rootDirTitle
+{
+   display: block;
+   font-size: 12px;
+   font-weight: bold;
+   padding-top: 1px;
+   padding-left: 5px;
+   padding-right: 50px;   
+   color: #ccc;
+   border-bottom: 0px solid #ddd;
+   text-align: left;
+   font-style: italic;
+}
+
+.rootDirChooser a:hover
+{
+   background-color: #ddd;
 }
