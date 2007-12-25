@@ -130,7 +130,7 @@ SearchEngine = Class.create({
 			if(folderName != "/") folderName += "/";
 			folderName += fileName;
 		}	
-		var imageString = '<img align="absmiddle" width="16" height="16" src="images/crystal/mimes/16/'+icon+'"> ';
+		var imageString = '<img align="absmiddle" width="16" height="16" src="'+ajxpResourcesFolder+'/images/crystal/mimes/16/'+icon+'"> ';
 		var stringToDisplay = fileName;	
 		
 		divElement.innerHTML = imageString+stringToDisplay;

@@ -39,14 +39,14 @@
 		<a id="delete_button" class="disabled" href="" action="delete" selection="true" unique="false" selectionContext="true" file="true" folder="true" icon_src="editdelete.png" title="<?php print($mess[161]);?>" write_access="true" key="<?php print($mess["delete_access_key"]); ?>"><?php print($mess[7]);?></a>
 		<div class="separator" action=""></div>
 		<!-- LOGIN / LOGOUT -->
-		<a href="" action="login" id="login_button" title="<?php print($mess[163]);?>" key="none"><img width="22" height="22" src="images/crystal/actions/22/yast_security.png" border="0" align="ABSMIDDLE" id="login_logout_image"><br><span id="login_logout_span"><?php print($mess[163]);?></span></a> 	
+		<a href="" action="login" id="login_button" title="<?php print($mess[163]);?>" key="none"><img width="22" height="22" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/22/yast_security.png" border="0" align="ABSMIDDLE" id="login_logout_image"><br><span id="login_logout_span"><?php print($mess[163]);?></span></a> 	
 		<!-- ADMIN SETTINGS -->
-		<a href="" action="admin" id="admin_button" title="<?php print($mess[165]);?>"  key="<?php print($mess["settings_access_key"]); ?>"><img width="22" height="22" src="images/crystal/actions/22/admin.png" border="0" align="ABSMIDDLE" id="admin_image"><br><span id="admin_span"><?php print($mess[165]);?></span></a> 	
+		<a href="" action="admin" id="admin_button" title="<?php print($mess[165]);?>"  key="<?php print($mess["settings_access_key"]); ?>"><img width="22" height="22" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/22/admin.png" border="0" align="ABSMIDDLE" id="admin_image"><br><span id="admin_span"><?php print($mess[165]);?></span></a> 	
 		<!-- INFO ABOUT AJAXPLORER -->
 		<a href="" action="splash" id="splash_button" icon_src="info.png" title="<?php print($mess[167]);?>"  key="<?php print($mess["about_access_key"]); ?>"><?php print($mess[166]);?></a>
 	</div>
 	<div id="locationbar_cont">
-		<div class="locationbar_title">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php print($mess[170]);?>&nbsp;</div><div id="location_form"><form style="display:inline;background-color:#ffffff;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><img src="images/crystal/mimes/16/folder.png" width="16" height="16" align="absmiddle"><input type="text" name="current_path" value="/" id="current_path"><input  align="absmiddle" title="<?php print($mess[104]); ?>" type="image" src="images/crystal/actions/16/forward.png" id="goto_button" height="16" width="16"></form></div><div id="logging_string"></div>
+		<div class="locationbar_title">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php print($mess[170]);?>&nbsp;</div><div id="location_form"><form style="display:inline;background-color:#ffffff;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/mimes/16/folder.png" width="16" height="16" align="absmiddle"><input type="text" name="current_path" value="/" id="current_path"><input  align="absmiddle" title="<?php print($mess[104]); ?>" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/forward.png" id="goto_button" height="16" width="16"></form></div><div id="logging_string"></div>
 	</div>
 </div>
 
@@ -72,15 +72,15 @@
     		<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
     		<tr>
 		    	<td id="info_panel_header" onclick="ajaxplorer.toggleSidePanel('info'); return false;" class="toggleHeader">
-		    		<img width="20" height="20" align="absmiddle" src="images/crystal/actions/effect.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[131] ?></a>
+		    		<img width="20" height="20" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/effect.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[131] ?></a>
 		    	</td>
 		    	<td id="search_header" onclick="ajaxplorer.toggleSidePanel('search'); return false;" class="toggleHeader">
-		    		<img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[87] ?></a>
+		    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/search.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[87] ?></a>
 		    	</td>
 		    </tr>
 	    	</table>
 	    	<div id="search_container">
-		    	<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" title="<?php print $mess[184] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" title="<?php print $mess[185] ?>"><img width="16" height="16" align="absmiddle" src="images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>
+		    	<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" title="<?php print $mess[184] ?>"><img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" title="<?php print $mess[185] ?>"><img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>
 	    	</div>
 	    	<div id="info_panel"></div>
     	</div>     	

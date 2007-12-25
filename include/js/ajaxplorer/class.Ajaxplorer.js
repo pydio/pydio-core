@@ -1,7 +1,7 @@
 if(dynamicLibLoading)
 {
 	jQuery.noConflict();
-	document.write('<script language="javascript" type="text/javascript" src="include/js/lib/jquery/jquery.corner.js"></script><script language="javascript" type="text/javascript" src="include/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop"></script><script language="javascript" type="text/javascript" src="include/js/lib/leightbox/lightbox.js"></script><script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Connexion.js"></script><script language="javascript" type="text/javascript" src="include/js/ajaxplorer/class.Modal.js"></script>');
+	document.write('<script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/jquery/jquery.corner.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/leightbox/lightbox.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Connexion.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Modal.js"></script>');
 }
 
 Ajaxplorer = Class.create({
@@ -52,13 +52,13 @@ Ajaxplorer = Class.create({
 			fakeUser.setActiveRepository(this._initRootDirId, 1, 1);
 			fakeUser.setRepositoriesList(this._initRootDirsList);
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
-			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList[this._initRootDirId], 'content.php?action=xml_listing', this);
+			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList[this._initRootDirId], ajxpServerAccessPath+'?action=xml_listing', this);
 			this.refreshRootDirMenu(this._initRootDirsList, this._initRootDirId);
 		}
 		else
 		{
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, null, this);
-			this.foldersTree = new FoldersTree('tree_container', 'No Repository', 'content.php?action=xml_listing', this);
+			this.foldersTree = new FoldersTree('tree_container', 'No Repository', ajxpServerAccessPath+'?action=xml_listing', this);
 			if(this._initLoggedUser)
 			{
 				this.getLoggedUserFromServer();
@@ -400,7 +400,7 @@ Ajaxplorer = Class.create({
 			actions[actions.length] = {
 				name:value,
 				alt:value,				
-				image:'images/foldericon.png',				
+				image:ajxpResourcesFolder+'/images/foldericon.png',				
 				className:"edit",
 				disabled:selected,
 				callback:function(e){
@@ -415,7 +415,7 @@ Ajaxplorer = Class.create({
 			anchor:'root_dir_button',
 			createAnchor:true,
 			anchorContainer:$('dir_chooser'),
-			anchorSrc:'images/crystal/lower.png',
+			anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
 			anchorTitle:MessageHash[200],
 			topOffset:-2,
 			menuTitle:MessageHash[200],

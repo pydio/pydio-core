@@ -132,7 +132,7 @@ Editor = Class.create({
 	setOnLoad : function(){	
 		addLightboxMarkupToElement(this.textareaContainer);
 		var img = document.createElement("img");
-		img.src = "images/loadingImage.gif";
+		img.src = ajxpResourcesFolder+"/images/loadingImage.gif";
 		$(this.textareaContainer).select("#element_overlay")[0].appendChild(img);
 		this.loading = true;
 	},
