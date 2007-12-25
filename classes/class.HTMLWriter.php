@@ -10,7 +10,6 @@ class HTMLWriter
 		echo "<script>tempoMessageDivClosing();</script>";
 	}
 	
-	
     function bookmarkBar($allBookmarks)
     {
     	//echo '<div id="bmbar_title">MyBookmarks&nbsp;&nbsp;</div>';
@@ -60,15 +59,6 @@ class HTMLWriter
     	}
     	$buffer .= "})";
     	return $buffer;
-    }
-    
-
-    function writeSessionDataForJs()
-    {
-    	if(session_id()!= "")
-    	{
-    		echo "<script language=\"javascript\">document.PHPSESSID='".session_id()."';</script>\n";
-    	}
     }
     
     function writeI18nMessagesClass($mess)
