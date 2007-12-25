@@ -140,7 +140,7 @@ function MultiSelector( formObject, list_target, max ){
 		// Delete button
 		var new_row_button = document.createElement( 'img' );
 		//new_row_button.appendChild(document.createTextNode('remove'));
-		new_row_button.src = 'images/recyclebin.png';
+		new_row_button.src = ajxpResourcesFolder+'/images/recyclebin.png';
 		new_row_button.align = 'absmiddle';
 		new_row_button.setAttribute("style", "border:0px;cursor:pointer;");
 
@@ -215,9 +215,9 @@ function MultiSelector( formObject, list_target, max ){
 			return;
 		}
 		var stateImg = $(row).getElementsBySelector("img")[0];
-		if(state == 'loading') stateImg.src = "images/crystal/yellowled.png";
-		else if(state == 'done') stateImg.src = "images/crystal/greenled.png";
-		else if(state == 'error') stateImg.src = "images/crystal/redled.png";
+		if(state == 'loading') stateImg.src = ajxpResourcesFolder+'/images/crystal/yellowled.png';
+		else if(state == 'done') stateImg.src = ajxpResourcesFolder+'/images/crystal/greenled.png';
+		else if(state == 'error') stateImg.src = ajxpResourcesFolder+'/images/crystal/redled.png';
 	}
 	
 	

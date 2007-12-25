@@ -41,7 +41,7 @@ ActionsManager.prototype.init = function()
 			item.appendChild(image);
 			image.width='22';
 			image.height='22';
-			image.src = 'images/crystal/actions/22/'+item.getAttribute('icon_src');
+			image.src = ajxpResourcesFolder+'/images/crystal/actions/22/'+item.getAttribute('icon_src');
 			image.setAttribute('border', '0');
 			image.setAttribute('align', 'ABSMIDDLE');
 			image.setAttribute('alt', item.getAttribute('title'));
@@ -82,7 +82,7 @@ ActionsManager.prototype.init = function()
 		textNode.innerHTML = replaceHtml;
 		}
 	}
-	this.downloader = new MultiDownloader($('multiple_download_container'), 'content.php?action=download&file='); 
+	this.downloader = new MultiDownloader($('multiple_download_container'), ajxpServerAccessPath+'?action=download&file='); 
 	this.downloader.triggerEnd = function() {hideLightBox();};
 
 	//this.multi_selector = new MultiSelector( $( 'upload_files_list' ), '6' );
@@ -368,7 +368,7 @@ ActionsManager.prototype.getContextActions = function(srcElement)
 			var img = $(this._items[i]).select('img')[0];
 			var text = $(this._items[i]).select('span')[0].innerHTML;
 			var alt = this._items[i].getAttribute('title');
-			var imgSrc = ('images/crystal/actions/16/'+this._items[i].getAttribute('icon_src'));
+			var imgSrc = (ajxpResourcesFolder+'/images/crystal/actions/16/'+this._items[i].getAttribute('icon_src'));
 			contextActions[contextActions.length] = {
 				name:text,
 				alt:alt,
@@ -526,7 +526,7 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 				var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
 				if(!oThis.treeCopy){
 					this.treeCopy = new WebFXLoadTree('/', 
-														'content.php?action=xml_listing', 
+														ajxpServerAccessPath+'?action=xml_listing', 
 														"javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 
 														'explorer');
 				}
@@ -580,14 +580,14 @@ ActionsManager.prototype.fireAction = function (buttonAction)
 			var userSelection = this._ajaxplorer.getFilesList().getUserSelection();
 			if(userSelection.isUnique())
 			{
-				var downloadUrl = 'content.php?action=download';
+				var downloadUrl = ajxpServerAccessPath+'?action=download';
 				downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 				document.location.href = downloadUrl;
 				break;
 			}
 			var loadFunc = function(oForm){
 				var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-				var downloader = new MultiDownloader(dObject, 'content.php?action=download&file=');
+				var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
 				downloader.triggerEnd = function(){hideLightBox()};
 				fileNames = userSelection.getFileNames();
 				for(var i=0; i<fileNames.length;i++)
@@ -766,7 +766,7 @@ ActionsManager.prototype.checkDestIsChildOfSource = function(srcNames, destNodeN
 
 ActionsManager.prototype.updateDisplayButton = function (newDisplay)
 {
-	$('sd_button').getElementsBySelector('img')[0].src = 'images/crystal/actions/22/'+(newDisplay=='list'?'view_icon.png':'view_text.png');
+	$('sd_button').getElementsBySelector('img')[0].src = ajxpResourcesFolder+'/images/crystal/actions/22/'+(newDisplay=='list'?'view_icon.png':'view_text.png');
 }
 
 ActionsManager.prototype.submitForm = function(formName)
@@ -838,14 +838,14 @@ ActionsManager.prototype.switchLoginButton = function(action)
 {
 	if(action == "loggedin")
 	{
-		$('login_logout_image').src = 'images/crystal/actions/22/cancel.png';
+		$('login_logout_image').src = ajxpResourcesFolder+'/images/crystal/actions/22/cancel.png';
 		$('login_button').setAttribute('action', 'logout');
 		$('login_button').setAttribute('title', MessageHash[169]);
 		$('login_logout_span').innerHTML = MessageHash[164];	
 	}
 	else
 	{
-		$('login_logout_image').src = 'images/crystal/actions/22/yast_security.png';
+		$('login_logout_image').src = ajxpResourcesFolder+'/images/crystal/actions/22/yast_security.png';
 		$('login_button').setAttribute('action', 'login');
 		$('login_button').setAttribute('title', MessageHash[168]);
 		$('login_logout_span').innerHTML = MessageHash[163];

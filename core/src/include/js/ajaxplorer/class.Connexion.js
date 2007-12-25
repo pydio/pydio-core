@@ -2,9 +2,9 @@ Connexion = Class.create({
 
 	initialize: function(baseUrl)
 	{
-		this._baseUrl = 'content.php';
+		this._baseUrl = ajxpServerAccessPath;
 		if(baseUrl) this._baseUrl = baseUrl;
-		this._libUrl = 'include/js';
+		this._libUrl = ajxpResourcesFolder+'/js';
 		this._parameters = new Hash();
 		this._method = 'get';
 		this.addParameter('get_action', 'xml_listing');

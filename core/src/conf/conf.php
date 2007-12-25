@@ -80,12 +80,19 @@ $use_https=false;
 
 $installPath = realpath(dirname(__FILE__)."/..");
 define("USERS_DIR", $installPath."/users");
+define("SERVER_ACCESS", "content.php");
+define("ADMIN_ACCESS", "admin.php");
+define("IMAGES_FOLDER", "images");
+define("CLIENT_RESOURCES_FOLDER", "include");
+define("SERVER_RESOURCES_FOLDER", "");
+define("DOCS_FOLDER", "doc");
+
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 
 // PAGES D'ENTETE ET DE BAS DE PAGE
 // (header and footer files )
-$baspage="include/html/bottom.html";
+$baspage=CLIENT_RESOURCES_FOLDER."/html/bottom.html";
 
 
 ?>

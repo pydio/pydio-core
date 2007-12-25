@@ -354,7 +354,7 @@ ACTION BAR
 	border-color:	#fff ButtonShadow
 					ButtonShadow #fff;
 */					
-	background-image:url("../../images/header_bg.png");
+	background-image:url("../images/header_bg.png");
 	background-repeat:no-repeat;
 	background-position:top right;
     border: none;
@@ -546,7 +546,7 @@ div.multiple_thumbnails_draggable
 
 .selection_ctrl_key
 {
-    background-image:url('../../images/plusCopy.gif');
+    background-image:url('../images/plusCopy.gif');
     background-repeat: no-repeat;
     background-position: bottom right;
 }
@@ -901,8 +901,7 @@ UPLOAD MULTIFILE FORM
 #splashScreen
 {
    width: 430px;
-   height: 332px;
-   /*background-image:url(../../images/splash.gif);*/
+   height: 332px;   
 }
 
 #docFileIframe

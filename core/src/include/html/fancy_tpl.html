@@ -1,13 +1,17 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<script language="javascript" type="text/javascript" src="include/js/lib/fancyupload/mootools-release-1.11.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/fancyupload/Swiff.Base.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/fancyupload/Swiff.Uploader.js"></script>
-<script language="javascript" type="text/javascript" src="include/js/lib/fancyupload/FancyUpload.js"></script>
+<script type="text/javascript">
+		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
+		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
+</script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload/mootools-release-1.11.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload/Swiff.Base.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload/Swiff.Uploader.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload/FancyUpload.js"></script>
 <style>
 img{
-    behavior: url(include/css/pnghack/pngHack.htc);
+    behavior: url(<?php print(CLIENT_RESOURCES_FOLDER);?>/css/pnghack/pngHack.htc);
     border: none;
 }
 body
@@ -56,13 +60,11 @@ a
 }
 .photoupload-queue li
 {
-	/*background:				url(../../images/crystal/actions/16/filenew.png) no-repeat 0 5px;*/
 	padding:				5px 5px 5px 20px;
 }
 
 .photoupload-queue span img
 {
-	/*background:				url(../../images/crystal/actions/16/filenew.png) no-repeat 0 5px;*/
 	margin-right:           2px;
 }
 
@@ -104,7 +106,6 @@ a
 {
 	width:					16px;
 	height:					16px;
-	/*background:				url(../../images/recyclebin.png) no-repeat 0 0;*/
 	text-decoration:		none;
 	border:					none;
 	float:					right;
@@ -131,12 +132,12 @@ a
 		</td>
 		<td>
 			<a id="upload_button" onclick="parent.document.getElementById('closeFancyUploadBox').disabled=true;fUploader.upload(); return false;" class="disabled">
-			<img src="images/crystal/actions/32/button_ok.png" width="32" height="32"><br> <?php print($mess[215]);?>
+			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/32/button_ok.png" width="32" height="32"><br> <?php print($mess[215]);?>
 			</a>
 		</td>
 		<td>
 			<a id="clear_button" onclick="fUploader.clearList(true); return false;" class="disabled">
-			<img src="images/crystal/actions/32/trashcan_empty.png" width="32" height="32"><br> <?php print($mess[216]);?>
+			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/32/trashcan_empty.png" width="32" height="32"><br> <?php print($mess[216]);?>
 			</a>
 		</td>
 	</tr>
@@ -153,7 +154,7 @@ if(parent.ajaxplorer){
 	url = url+'&dir='+escape(parent.ajaxplorer.filesList.getCurrentRep());
 }
 var fUploader = new FancyUpload($('userfile_1'), {
-	swf:'include/flash/Swiff.Uploader.swf',
+	swf:'<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/Swiff.Uploader.swf',
 	url: url,
 	types: {'All (*.*)': '*.*'},
 	limitSize: <?php echo $limitSize;?>,

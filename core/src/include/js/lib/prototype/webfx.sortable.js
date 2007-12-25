@@ -149,7 +149,7 @@ SortableTable = Class.create({
 			c = cells[i];
 			if (this.sortTypes[i] != null && this.sortTypes[i] != "None") {
 				img = doc.createElement("IMG");
-				img.src = "images/blank.png";
+				img.src = ajxpResourcesFolder+'/images/blank.png';
 				c.appendChild(img);
 				if (this.sortTypes[i] != null)
 					c._sortType = this.sortTypes[i];

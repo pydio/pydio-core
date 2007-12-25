@@ -14,7 +14,7 @@
 
 	var needHack = needHack();
 
-	var transparentImage = "include/css/pnghack/transparent.gif";
+	var transparentImage = ajxpResourcesFolder+"/css/pnghack/transparent.gif";
 
 	pngHack();
 

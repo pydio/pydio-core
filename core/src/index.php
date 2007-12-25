@@ -67,7 +67,7 @@ if(ereg('Mac',$_SERVER['HTTP_USER_AGENT']) || ereg('Safari',$_SERVER['HTTP_USER_
 	$JS_DEBUG = true; // DISABLE DYNAMIC LOADING ON MAC ANYWAY!
 }
 $mess = ConfService::getMessages();
-include_once("include/html/gui.html");
+include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
 HTMLWriter::writeI18nMessagesClass($mess);
 include_once(ConfService::getConf("BOTTOM_PAGE"));
 ?>

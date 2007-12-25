@@ -48,21 +48,21 @@
 |-----------------------------------------------------------------------------|
 | Created 2000-12-11 | All changes are in the log above. | Updated 2006-05-26 |
 \----------------------------------------------------------------------------*/
-
+var resourcesFolder = ajxpResourcesFolder;
 var webFXTreeConfig = {
-	rootIcon        : 'images/foldericon.png',
-	openRootIcon    : 'images/openfoldericon.png',
-	folderIcon      : 'images/foldericon.png',
-	openFolderIcon  : 'images/openfoldericon.png',
-	fileIcon        : 'images/foldericon.png',
-	iIcon           : 'images/I.png',
-	lIcon           : 'images/L.png',
-	lMinusIcon      : 'images/Lminus.png',
-	lPlusIcon       : 'images/Lplus.png',
-	tIcon           : 'images/T.png',
-	tMinusIcon      : 'images/Tminus.png',
-	tPlusIcon       : 'images/Tplus.png',
-	blankIcon       : 'images/blank.png',
+	rootIcon        : resourcesFolder+'/images/foldericon.png',
+	openRootIcon    : resourcesFolder+'/images/openfoldericon.png',
+	folderIcon      : resourcesFolder+'/images/foldericon.png',
+	openFolderIcon  : resourcesFolder+'/images/openfoldericon.png',
+	fileIcon        : resourcesFolder+'/images/foldericon.png',
+	iIcon           : resourcesFolder+'/images/I.png',
+	lIcon           : resourcesFolder+'/images/L.png',
+	lMinusIcon      : resourcesFolder+'/images/Lminus.png',
+	lPlusIcon       : resourcesFolder+'/images/Lplus.png',
+	tIcon           : resourcesFolder+'/images/T.png',
+	tMinusIcon      : resourcesFolder+'/images/Tminus.png',
+	tPlusIcon       : resourcesFolder+'/images/Tplus.png',
+	blankIcon       : resourcesFolder+'/images/blank.png',
 	defaultText     : 'Tree Item',
 	defaultAction   : 'javascript:void(0);',
 	defaultBehavior : 'classic',
