@@ -97,43 +97,6 @@ class AJXP_XMLWriter
 		print("<logging_result value=\"$result\"/>");
 	}
 	
-    function bookmarkBar($currentUser, $allBookmarks)
-    {
-		echo '<div id="bm_bar_cont"><div id="bookmarks_bar">';
-		foreach ($allBookmarks as $path)
-		{
-			echo '<div><img src="images/foldericon.png" border="0" align="ABSMIDDLE"><a class="delete_bm_button" href="content.php?action=display_bookmark_bar&user='.$currentUser.'&bm_action=delete_bookmark&bm_path='.$path.'"><img src="images/crystal/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="Delete Bookmark" title="Delete Bookmark"></a> <a href="#" onclick="getFrame(\'actionbar\').ActionBar.locationBarSubmit(\''.$path.'\'); return false;" class="bookmark_button">'.$path.'</a></div>';
-		}
-		echo '</div></div>';		
-    }	
-    
-    function writeRootDirChooser($rootDirsList, $crtIndex)
-    {
-    	echo '<select id="rootDirChooser" onChange="document.location.href=\'content.php?action=root_tree&root_dir_index=\'+this.options[this.selectedIndex].value;">';
-    	foreach ($rootDirsList as $rIndex => $rName)
-    	{
-    		$selected = "";
-    		if($rIndex == $crtIndex) $selected = " selected";
-    		echo '<option value="'.$rIndex.'"'.$selected.'>'.$rName["DISPLAY"].' ('.$rName["PATH"].')</option>';
-    	}
-    	echo '</select>';
-    }
-    
-    function writeSessionDataForJs()
-    {
-    	if(session_id()!= "")
-    	{
-    		echo "<script language=\"javascript\">document.PHPSESSID='".session_id()."';</script>\n";
-    	}
-    }
-    
-    function writeI18nMessagesClass($mess)
-    {
-    	echo "<script language=\"javascript\">";
-    	echo "var MessageClass = {askOverwrite:'".str_replace("'", "\'", $mess[124])."', filenameExists:'".str_replace("'", "\'", $mess[125])."'};";
-    	echo "</script>";
-    }
-    
 }
 
 ?>
