@@ -46,7 +46,7 @@ $REPOSITORIES[0] = array(
 /*
 $REPOSITORIES[1] = array(
 	"PATH"			=>	"/home/username/example/public/files",
-	"DISPLAY"		=>	"Web Files", 
+	"DISPLAY"		=>"Web Files", 
 	"ACCESS"		=>	"filesystem", 
 	"CREATE"		=>	false,
 	"RECYCLE_BIN" 	=> 	''
@@ -54,8 +54,8 @@ $REPOSITORIES[1] = array(
 */
 /*
 $REPOSITORIES[2] = array(
-	"PATH"=>"C:/your/location3/on/windows", 
-	"DISPLAY"=>"All Documents"
+	"PATH"=>"C:\your\location3\on\windows", 
+	"DISPLAY"=>"Windows Documents"
 );
 */
 // UNITE DE TAILLE DES FICHIER (octets "o", bytes "b")

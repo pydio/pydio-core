@@ -25,6 +25,7 @@ class Repository {
 	 * @param String $path
 	 */
 	function setPath($path) {
+		$path = str_replace("\\", "/", $path); // windows like
 		$this->path = $path;
 	}
 	/**
