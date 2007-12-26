@@ -106,7 +106,7 @@ class ConfService
 		global $G_MESSAGES, $G_LANGUE;		
 		if(!isset($G_MESSAGES))
 		{			
-			require(CLIENT_RESOURCES_FOLDER."/i18n/${G_LANGUE}.php");
+			require(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/${G_LANGUE}.php");
 			$G_MESSAGES = $mess;
 		}
 		return $G_MESSAGES;

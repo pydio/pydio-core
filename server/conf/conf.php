@@ -36,7 +36,7 @@ define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); //
 /* You can add as many as you want,  
 /* Just increment the "$REPOSITORIES" index.
 /*********************************************************/
-$REPOSITORIES[0] = array("PATH"=> realpath(dirname(__FILE__)."/../files"), "DISPLAY"=>"Default Files");
+$REPOSITORIES[0] = array("PATH"=> realpath(dirname(__FILE__)."/../../files"), "DISPLAY"=>"Default Files");
 //$REPOSITORIES[1] = array("PATH"=>"/home/user/www/your/location1/", "DISPLAY"=>"Web Files");
 //$REPOSITORIES[2] = array("PATH"=>"C:/your/location3/on/windows", "DISPLAY"=>"All Documents");
 
@@ -78,14 +78,15 @@ $use_https=false;
 
 
 
-$installPath = realpath(dirname(__FILE__)."/..");
-define("USERS_DIR", $installPath."/users");
+$installPath = realpath(dirname(__FILE__)."/../..");
+define("INSTALL_PATH", $installPath);
+define("USERS_DIR", $installPath."/server/users");
 define("SERVER_ACCESS", "content.php");
 define("ADMIN_ACCESS", "admin.php");
-define("IMAGES_FOLDER", "images");
-define("CLIENT_RESOURCES_FOLDER", "include");
-define("SERVER_RESOURCES_FOLDER", "");
-define("DOCS_FOLDER", "doc");
+define("IMAGES_FOLDER", "client/images");
+define("CLIENT_RESOURCES_FOLDER", "client");
+define("SERVER_RESOURCES_FOLDER", "server/classes");
+define("DOCS_FOLDER", "client/doc");
 
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");

@@ -10,15 +10,15 @@
 //---------------------------------------------------------------------------------------------------
 
 //require_once("classes/class.BookmarksManager.php");
-require_once("classes/class.Utils.php");
-require_once("classes/class.ConfService.php");
-require_once("classes/class.AuthService.php");
-require_once("classes/class.FS_Storage.php");
-require_once("classes/class.UserSelection.php");
-require_once("classes/class.HTMLWriter.php");
-require_once("classes/class.AJXP_XMLWriter.php");
-require_once("classes/class.AJXP_User.php");
-require_once("classes/class.RecycleBinManager.php");
+require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.ConfService.php");
+require_once("server/classes/class.AuthService.php");
+require_once("server/classes/class.FS_Storage.php");
+require_once("server/classes/class.UserSelection.php");
+require_once("server/classes/class.HTMLWriter.php");
+require_once("server/classes/class.AJXP_XMLWriter.php");
+require_once("server/classes/class.AJXP_User.php");
+require_once("server/classes/class.RecycleBinManager.php");
 if(isSet($_GET["ajxp_sessid"]))
 {
 	$_COOKIE["PHPSESSID"] = $_GET["ajxp_sessid"];
@@ -28,7 +28,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
-ConfService::init("conf/conf.php");
+ConfService::init("server/conf/conf.php");
 $baspage=ConfService::getConf("BOTTOM_PAGE");
 $limitSize = Utils::convertBytes(ini_get('upload_max_filesize'));
 

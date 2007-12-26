@@ -1,10 +1,10 @@
 <?php
-require_once("classes/class.HTMLWriter.php");
-require_once("classes/class.ConfService.php");
-require_once("classes/class.AJXP_User.php");
-require_once("classes/class.AuthService.php");
+require_once("server/classes/class.HTMLWriter.php");
+require_once("server/classes/class.ConfService.php");
+require_once("server/classes/class.AJXP_User.php");
+require_once("server/classes/class.AuthService.php");
 session_start();
-ConfService::init("conf/conf.php");
+ConfService::init("server/conf/conf.php");
 $USERS_ENABLED = "false";
 $LOGGED_USER = "false";
 $BEGIN_MESSAGE = "";
