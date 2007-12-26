@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------------------------------
 
 require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.HTMLWriter.php");
@@ -147,9 +148,9 @@ switch ($action)
 			print("<div class=\"user_id\" onclick=\"manager.toggleUser('".$userId."');\"><img align=\"absmiddle\" src=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/actions/32/$imgSrc\" width=\"32\" height=\"32\">User <b>$userId</b></div>");
 			print("<div class=\"user_data\" id=\"user_data_".$userId."\" style=\"display: none;\">");
 			print("<fieldset><legend>Repositories Rights</legend><table class=\"repository\">");
-			foreach (ConfService::getRootDirsList() as $rootDirId => $rootDirData)
+			foreach (ConfService::getRootDirsList() as $rootDirId => $rootDirObject)
 			{
-				print("<tr><td style=\"width: 40%;\">".$rootDirId.". ".$rootDirData["DISPLAY"]." : </td>");
+				print("<tr><td style=\"width: 40%;\">".$rootDirId.". ".$rootDirObject->getDisplay()." : </td>");
 				print("<td style=\"width: 60%;\">");
 				$disabledString = "";
 				if($userId == "admin") $disabledString = "disabled";

@@ -11,6 +11,7 @@
 
 //require_once("classes/class.BookmarksManager.php");
 require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.FS_Storage.php");

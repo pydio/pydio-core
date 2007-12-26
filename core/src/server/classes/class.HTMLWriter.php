@@ -40,9 +40,9 @@ class HTMLWriter
     function writeRootDirListAsJsString($rootDirsList)
     {
     	$buffer = "\$H({";
-    	foreach ($rootDirsList as $rIndex => $rName)
+    	foreach ($rootDirsList as $rIndex => $rObject)
     	{
-    		$buffer .= "$rIndex:'".$rName["DISPLAY"]."'";
+    		$buffer .= "$rIndex:'".$rObject->getDisplay()."'";
     		if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
     	}
     	$buffer .= "})";
