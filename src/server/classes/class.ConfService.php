@@ -3,6 +3,8 @@
 global $G_LANGUE;
 global $G_AVAILABLE_LANG;
 global $G_MESSAGES;
+global $G_REPOSITORIES;
+global $G_REPOSITORY;
 global $G_ROOT_DIRS_LIST;
 global $G_ROOT_DIR;
 global $G_USE_HTTPS;
@@ -21,7 +23,7 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_MESSAGES,$G_ROOT_DIR,$G_ROOT_DIRS_LIST,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_RECYCLE_BIN;
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_RECYCLE_BIN;
 		if(!isset($langue) || $langue=="") {$langue=$dft_langue;}
 		$G_LANGUE = $langue;
 		$G_AVAILABLE_LANG = $available_languages;
@@ -32,60 +34,82 @@ class ConfService
 		$G_SHOW_HIDDEN = $showhidden;
 		$G_BOTTOM_PAGE = $baspage;
 		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
-		$G_ROOT_DIRS_LIST = $REPOSITORIES;
-		
-		// INIT ROOT DIR FROM SESSION
-		if(isSet($_SESSION['ROOT_DIR']) && array_key_exists($_SESSION['ROOT_DIR'], $G_ROOT_DIRS_LIST))
-		{
-			$G_ROOT_DIR = $G_ROOT_DIRS_LIST[$_SESSION['ROOT_DIR']]["PATH"];
+		//$G_ROOT_DIRS_LIST = $REPOSITORIES;
+		$G_REPOSITORIES = ConfService::initRepositoriesList($REPOSITORIES);
+		ConfService::switchRootDir();
+	}
+
+	function switchRootDir($rootDirIndex=-1)
+	{
+		global $G_REPOSITORY, $G_REPOSITORIES;
+		if($rootDirIndex == -1){
+			if(isSet($_SESSION['REPO_ID']) && array_key_exists($_SESSION['REPO_ID'], $G_REPOSITORIES))
+			{			
+				$G_REPOSITORY = $G_REPOSITORIES[$_SESSION['REPO_ID']];
+			}
+			else 
+			{
+				$G_REPOSITORY = $G_REPOSITORIES[0];
+				$_SESSION['REPO_ID'] = 0;
+			}
 		}
 		else 
 		{
-			$G_ROOT_DIR = $G_ROOT_DIRS_LIST[0]["PATH"];
-			$_SESSION['ROOT_DIR'] = 0;
+			$G_REPOSITORY = $G_REPOSITORIES[$rootDirIndex];			
+			$_SESSION['REPO_ID'] = $rootDirIndex;
 		}
 
-		// INIT RECYCLE BIN
-		if(isSet($recycle_bin) && $recycle_bin != "")
-		{
-			$G_RECYCLE_BIN = $recycle_bin;
-			if(!is_dir($G_ROOT_DIR."/".$recycle_bin))
-			{
-				@mkdir($G_ROOT_DIR."/".$recycle_bin);
-				if(!is_dir($G_ROOT_DIR."/".$recycle_bin))
-				{
-					unset($G_RECYCLE_BIN);
-				}
+		if($G_REPOSITORY->getCreate() == true){
+			if(!is_dir($G_REPOSITORY->getPath())) @mkdir($G_REPOSITORY->getPath());
+			if($G_REPOSITORY->getRecycle()!= "" && !is_dir($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle())){
+				@mkdir($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle());
 			}
 		}
-	}
-
-	function switchRootDir($rootDirIndex)
-	{
-		$_SESSION['ROOT_DIR'] = $rootDirIndex;
-		global $G_ROOT_DIR, $G_ROOT_DIRS_LIST;
-		$G_ROOT_DIR = $G_ROOT_DIRS_LIST[$rootDirIndex]["PATH"];
+		// INIT RECYCLE BIN
+		global $G_RECYCLE_BIN;
+		//print($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle());
+		if($G_REPOSITORY->getRecycle()!= "" && is_dir($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle())){			
+			$G_RECYCLE_BIN = $G_REPOSITORY->getRecycle();
+		}		
 	}
 	
 	function getRootDirsList()
 	{
-		global $G_ROOT_DIRS_LIST;
-		return $G_ROOT_DIRS_LIST;
+		global $G_REPOSITORIES;
+		return $G_REPOSITORIES;
 	}
 	
 	function getCurrentRootDirIndex()
 	{
-		if(isSet($_SESSION['ROOT_DIR']))
+		if(isSet($_SESSION['REPO_ID']))
 		{
-			return $_SESSION['ROOT_DIR'];
+			return $_SESSION['REPO_ID'];
 		}
 		return 0;
 	}
 	
 	function getCurrentRootDirDisplay()
 	{
-		global $G_ROOT_DIRS_LIST;
-		return $G_ROOT_DIRS_LIST[ConfService::getCurrentRootDirIndex()]["DISPLAY"];
+		global $G_REPOSITORY;
+		return $G_REPOSITORY->getDisplay();
+	}
+	
+	/**
+	 * @param array $repositories
+	 * @return array
+	 */
+	function initRepositoriesList($repositories)
+	{
+		$objList =  array();
+		foreach($repositories as $index=>$repository)
+		{
+			$repo = new Repository($index, $repository["PATH"], $repository["DISPLAY"]);
+			if(array_key_exists("ACCESS", $repository)) $repo->setAccessType($repository["ACCESS"]);
+			if(array_key_exists("RECYCLE_BIN", $repository)) $repo->setRecycle($repository["RECYCLE_BIN"]);
+			if(array_key_exists("CREATE", $repository)) $repo->setCreate($repository["CREATE"]);
+			$objList[$index] = $repo;
+		}
+		return $objList;
 	}
 	
 	function useRecycleBin()
@@ -136,8 +160,17 @@ class ConfService
 	
 	function getRootDir()
 	{
-		global $G_ROOT_DIR;
-		return $G_ROOT_DIR;
+		global $G_REPOSITORY;
+		return $G_REPOSITORY->getPath();
+	}
+	
+	/**
+	 * @return Repository
+	 */
+	function getRepository()
+	{
+		global $G_REPOSITORY;
+		return $G_REPOSITORY;
 	}
 	
 }
