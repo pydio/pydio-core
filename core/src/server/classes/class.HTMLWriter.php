@@ -23,7 +23,7 @@ class HTMLWriter
     
     function getDocFile($docFileName)
     {
-    	$realName = dirname(__FILE__)."/../doc/".$docFileName.".txt";
+    	$realName = INSTALL_PATH."/".DOCS_FOLDER."/".$docFileName.".txt";
     	if(is_file($realName))
     	{
     		$string = "<html><link rel=\"stylesheet\" type=\"text/css\" href=\"".CLIENT_RESOURCES_FOLDER."/css/docs.css\"><body>";
