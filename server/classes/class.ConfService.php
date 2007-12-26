@@ -13,6 +13,7 @@ global $G_SHOW_HIDDEN;
 global $G_BOTTOM_PAGE;
 global $G_UPLOAD_MAX_NUMBER;
 global $G_RECYCLE_BIN;
+global $G_ACCESS_DRIVER;
 
 
 class ConfService
@@ -38,7 +39,7 @@ class ConfService
 
 	function switchRootDir($rootDirIndex=-1)
 	{
-		global $G_REPOSITORY, $G_REPOSITORIES;
+		global $G_REPOSITORY, $G_REPOSITORIES, $G_ACCESS_DRIVER;
 		if($rootDirIndex == -1){
 			if(isSet($_SESSION['REPO_ID']) && array_key_exists($_SESSION['REPO_ID'], $G_REPOSITORIES))
 			{			
@@ -54,6 +55,7 @@ class ConfService
 		{
 			$G_REPOSITORY = $G_REPOSITORIES[$rootDirIndex];			
 			$_SESSION['REPO_ID'] = $rootDirIndex;
+			if(isSet($G_ACCESS_DRIVER)) unset($G_ACCESS_DRIVER);
 		}
 
 		if($G_REPOSITORY->getCreate() == true){
@@ -167,6 +169,31 @@ class ConfService
 	{
 		global $G_REPOSITORY;
 		return $G_REPOSITORY;
+	}
+	
+	/**
+	 * Returns the repository access driver
+	 *
+	 * @return AbstractDriver
+	 */
+	function getRepositoryDriver()
+	{
+		global $G_ACCESS_DRIVER;
+		if(isSet($G_ACCESS_DRIVER) && is_a($G_ACCESS_DRIVER, "AbstractDriver")){			
+			return $G_ACCESS_DRIVER;
+		}
+		$crtRepository = ConfService::getRepository();
+		$accessType = $crtRepository->getAccessType();
+		$driverName = $accessType."Driver";
+		$filePath = INSTALL_PATH."/plugins/ajxp.".$accessType."/class.".$driverName.".php";
+		if(is_file($filePath)){
+			include_once($filePath);
+			if(class_exists($driverName)){
+				$G_ACCESS_DRIVER = new $driverName($crtRepository);
+				return $G_ACCESS_DRIVER;
+			}
+		}
+		
 	}
 	
 }
