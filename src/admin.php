@@ -9,19 +9,19 @@
 //
 //---------------------------------------------------------------------------------------------------
 
-require_once("classes/class.Utils.php");
-require_once("classes/class.ConfService.php");
-require_once("classes/class.AuthService.php");
-require_once("classes/class.HTMLWriter.php");
-require_once("classes/class.AJXP_XMLWriter.php");
-require_once("classes/class.AJXP_User.php");
+require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.ConfService.php");
+require_once("server/classes/class.AuthService.php");
+require_once("server/classes/class.HTMLWriter.php");
+require_once("server/classes/class.AJXP_XMLWriter.php");
+require_once("server/classes/class.AJXP_User.php");
 
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 session_start();
-ConfService::init("conf/conf.php");
+ConfService::init("server/conf/conf.php");
 if(!AuthService::usersEnabled())
 {
 	print("Forbidden");
