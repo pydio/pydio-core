@@ -1,21 +1,19 @@
 <?php
 
-class FS_Storage
+class fsDriver extends AbstractDriver 
 {
-	
 	/**
-	* @var String
+	* @var Repository
 	*/
-	var $rootDir;
+	var $repository;
 	
-	function  FS_Storage($rootDir)
-	{
-		$this->rootDir = $rootDir;
+	function  fsDriver($repository){
+		$this->repository = $repository;
 	}
 	
 	function initName($dir)
 	{
-		$racine = ConfService::getRootDir();
+		$racine = $this->repository->getPath();
 		$mess = ConfService::getMessages();
 		if(!isset($dir) || $dir=="" || $dir == "/")
 		{
@@ -27,17 +25,11 @@ class FS_Storage
 		}
 		if(!file_exists($racine))
 		{
-			AJXP_XMLWriter::header();
-			echo "<error>$mess[72] $racine</error>";
-			AJXP_XMLWriter::close();
-			exit;
+			return new AJXP_Exception(72);
 		}
 		if(!is_dir($nom_rep))
 		{
-			AJXP_XMLWriter::header();
-			echo "<error>$mess[100] $dir</error>";
-			AJXP_XMLWriter::close();
-			exit;
+			return new AJXP_Exception(100);
 		}
 		return $nom_rep;
 	}
@@ -174,7 +166,7 @@ class FS_Storage
 				$error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
 				continue;
 			}
-			FS_Storage::copyOrMoveFile($destDir, $selectedFile, $error, $success, $move);
+			$this->copyOrMoveFile($destDir, $selectedFile, $error, $success, $move);
 		}
 	}
 	
@@ -183,7 +175,7 @@ class FS_Storage
 	{
 		$nom_fic=basename($filePath);
 		$mess = ConfService::getMessages();
-		$filename_new=Utils::processFileName(utf8_decode($filename_new));
+		$filename_new=Utils::processFileName($filename_new);
 		$old=ConfService::getRootDir()."/$filePath";
 		if(!is_writable($old))
 		{
@@ -273,7 +265,7 @@ class FS_Storage
 				$logMessages[]=$mess[100]." $selectedFile";
 				continue;
 			}		
-			FS_Storage::deldir($fileToDelete);
+			$this->deldir($fileToDelete);
 			if(is_dir($fileToDelete))
 			{
 				$logMessages[]="$mess[38] $selectedFile $mess[44].";
@@ -307,7 +299,7 @@ class FS_Storage
 		{
 			$errors = array();
 			$succFiles = array();
-			$dirRes = FS_Storage::dircopy($realSrcFile, $destFile, $errors, $succFiles);
+			$dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
 			if(count($errors))
 			{
 				$error[] = $mess[114];
@@ -327,7 +319,7 @@ class FS_Storage
 		if($move)
 		{
 			// Now delete original
-			FS_Storage::deldir($realSrcFile); // both file and dir
+			$this->deldir($realSrcFile); // both file and dir
 			$messagePart = $mess[74]." $destDir";
 			if($destDir == "/".ConfService::getRecycleBinDir())
 			{
@@ -399,7 +391,7 @@ class FS_Storage
 					}
 					else if(is_dir($srcfile)) 
 					{
-						$num += FS_Storage::dircopy($srcfile, $dstfile, $errors, $success, $verbose);
+						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose);
 					}
 				}
 			}
@@ -427,7 +419,7 @@ class FS_Storage
 			{
 				if (is_dir("$location/$file") && $file !=".." && $file!=".")
 				{
-					FS_Storage::deldir("$location/$file");
+					$this->deldir("$location/$file");
 					if(file_exists("$location/$file")){rmdir("$location/$file"); }
 					unset($file);
 				}
@@ -450,9 +442,6 @@ class FS_Storage
 			RecycleBinManager::deleteFromRecycle($location);
 		}
 	}
-
-	
 }
-
 
 ?>
