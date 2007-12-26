@@ -12,9 +12,10 @@
 //require_once("classes/class.BookmarksManager.php");
 require_once("server/classes/class.Utils.php");
 require_once("server/classes/class.Repository.php");
+require_once("server/classes/class.AJXP_Exception.php");
+require_once("server/classes/class.AbstractDriver.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
-require_once("server/classes/class.FS_Storage.php");
 require_once("server/classes/class.UserSelection.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
@@ -188,7 +189,14 @@ if(AuthService::usersEnabled())
 	}
 }
 
-
+// INIT DRIVER
+$Driver = ConfService::getRepositoryDriver();
+if($Driver == null || !is_a($Driver, "AbstractDriver")){
+	AJXP_XMLWriter::header();
+	AJXP_XMLWriter::sendMessage(null, "Cannot find driver!");
+	AJXP_XMLWriter::close();
+	exit(1);
+}
 
 switch($action)
 {
@@ -197,40 +205,20 @@ switch($action)
 	//-----------------------------------------------------------------------------
 	
 	//------------------------------------
-	//	SWITCH THE ROOT REPOSITORY
-	//------------------------------------	
-	case "switch_root_dir":
-	
-		if(!isSet($root_dir_index))
-		{
-			break;
-		}
-		$dirList = ConfService::getRootDirsList();
-		if(!isSet($dirList[$root_dir_index]))
-		{
-			$errorMessage = "Trying to switch to an unkown folder!";
-			break;
-		}
-		ConfService::switchRootDir($root_dir_index);
-		$logMessage = "Successfully Switched!";
-		
-	break;
-	
-	//------------------------------------
 	//	DOWNLOAD, IMAGE & MP3 PROXYS
 	//------------------------------------
 	case "download";
-		FS_Storage::readFile(ConfService::getRootDir()."/".utf8_decode($file), "force-download");
+		$Driver->readFile(ConfService::getRootDir()."/".utf8_decode($file), "force-download");
 		exit(0);
 	break;
 
 	case "image_proxy":
-		FS_Storage::readFile(ConfService::getRootDir()."/".utf8_decode($file), "image");
+		$Driver->readFile(ConfService::getRootDir()."/".utf8_decode($file), "image");
 		exit(0);
 	break;
 	
 	case "mp3_proxy":
-		FS_Storage::readFile(ConfService::getRootDir()."/".$file, "mp3");
+		$Driver->readFile(ConfService::getRootDir()."/".$file, "mp3");
 		exit(0);
 	break;
 	
@@ -250,7 +238,7 @@ switch($action)
 		}
 		else 
 		{
-			FS_Storage::readFile(ConfService::getRootDir()."/".$file, "plain");
+			$Driver->readFile(ConfService::getRootDir()."/".$file, "plain");
 		}
 		exit(0);
 	break;
@@ -268,7 +256,7 @@ switch($action)
 		}
 		$success = $error = array();
 		
-		FS_Storage::copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
+		$Driver->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
 		
 		if(count($error)){
 			$errorMessage = join("\n", $error);
@@ -293,7 +281,7 @@ switch($action)
 			break;
 		}
 		$logMessages = array();
-		$errorMessage = FS_Storage::delete($selection->getFiles(), $logMessages);
+		$errorMessage = $Driver->delete($selection->getFiles(), $logMessages);
 		if(count($logMessages))
 		{
 			$logMessage = join("\n", $logMessages);
@@ -309,7 +297,8 @@ switch($action)
 	case "rename";
 	
 		$file = utf8_decode($file);
-		$error = FS_Storage::rename($file, $filename_new);
+		$filename_new = utf8_decode($filename_new);
+		$error = $Driver->rename($file, $filename_new);
 		if($error != null) {
 			$errorMessage  = $error;
 			break;
@@ -327,7 +316,7 @@ switch($action)
 	
 		$messtmp="";
 		$dirname=Utils::processFileName(utf8_decode($dirname));
-		$error = FS_Storage::mkDir($dir, $dirname);
+		$error = $Driver->mkDir($dir, $dirname);
 		if(isSet($error)){
 			$errorMessage = $error; break;
 		}
@@ -346,7 +335,7 @@ switch($action)
 	
 		$messtmp="";
 		$filename=Utils::processFileName(utf8_decode($filename));	
-		$error = FS_Storage::createEmptyFile($dir, $filename);
+		$error = $Driver->createEmptyFile($dir, $filename);
 		if(isSet($error)){
 			$errorMessage = $error; break;
 		}
@@ -365,7 +354,7 @@ switch($action)
 		if($dir!=""){$rep_source="/$dir";}
 		else $rep_source = "";
 		$destination=ConfService::getRootDir().$rep_source;
-		if(!FS_Storage::isWriteable($destination))
+		if(!$Driver->isWriteable($destination))
 		{
 			$errorMessage = "$mess[38] $dir $mess[99].";
 			break;
@@ -385,7 +374,7 @@ switch($action)
 			$userfile_name = $boxData["name"];
 			if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
 			$userfile_name=Utils::processFileName($userfile_name);
-			if (!FS_Storage::simpleCopy($boxData["tmp_name"], "$destination/".$userfile_name))
+			if (!$Driver->simpleCopy($boxData["tmp_name"], "$destination/".$userfile_name))
 			{
 				$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
 				break;
@@ -428,8 +417,9 @@ switch($action)
 			else if($mode == "file_list") $fileListMode = true;
 			else if($mode == "complete") $completeMode = true;
 		}	
-		$nom_rep = FS_Storage::initName($dir);
-		$result = FS_Storage::listing($nom_rep, !($searchMode || $fileListMode));
+		$nom_rep = $Driver->initName($dir);
+		AJXP_Exception::errorToXml($nom_rep);
+		$result = $Driver->listing($nom_rep, !($searchMode || $fileListMode));
 		$reps = $result[0];
 		AJXP_XMLWriter::header();
 		foreach ($reps as $repIndex => $repName)
@@ -458,7 +448,7 @@ switch($action)
 				}
 				$atts[] = "is_mp3=\"".Utils::is_mp3($currentFile)."\"";
 				$atts[] = "mimetype=\"".Utils::mimetype($currentFile, "type")."\"";
-				$atts[] = "modiftime=\"".FS_Storage::date_modif($currentFile)."\"";
+				$atts[] = "modiftime=\"".$Driver->date_modif($currentFile)."\"";
 				$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
 				$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
 				$atts[] = "icon=\"".(is_file($currentFile)?$repName:"folder.png")."\"";
@@ -482,7 +472,7 @@ switch($action)
 		{
 			if($fileListMode)
 			{
-				print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"non\" is_recycle=\"1\" mimetype=\"Trashcan\" modiftime=\"".FS_Storage::date_modif(ConfService::getRootDir()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
+				print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"non\" is_recycle=\"1\" mimetype=\"Trashcan\" modiftime=\"".$Driver->date_modif(ConfService::getRootDir()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
 			}
 			else 
 			{
@@ -498,6 +488,26 @@ switch($action)
 	//-----------------------------------------------------------------------------
 	//-------------------------- AJXP ACTIONS -------------------------------------
 	//-----------------------------------------------------------------------------
+
+	//------------------------------------
+	//	SWITCH THE ROOT REPOSITORY
+	//------------------------------------	
+	case "switch_root_dir":
+	
+		if(!isSet($root_dir_index))
+		{
+			break;
+		}
+		$dirList = ConfService::getRootDirsList();
+		if(!isSet($dirList[$root_dir_index]))
+		{
+			$errorMessage = "Trying to switch to an unkown folder!";
+			break;
+		}
+		ConfService::switchRootDir($root_dir_index);
+		$logMessage = "Successfully Switched!";
+		
+	break;	
 	
 	//------------------------------------
 	//	GET AN HTML TEMPLATE
@@ -565,46 +575,7 @@ switch($action)
 		exit(1);
 	
 	break;
-	
-	case "display_bookmark_bar":
-		
-		header("Content-type:text/html");
-		$bmUser = null;
-		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-		{
-			$bmUser = AuthService::getLoggedUser();
-		}
-		else if(!AuthService::usersEnabled())
-		{
-			$bmUser = new AJXP_User("shared");
-		}
-		if($bmUser == null) exit(1);
-		if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
-		{
-			if($_GET["bm_action"] == "add_bookmark")
-			{
-				$bmUser->addBookMark($_GET["bm_path"]);
-			}
-			else if($_GET["bm_action"] == "delete_bookmark")
-			{
-				$bmUser->removeBookmark($_GET["bm_path"]);
-			}
-		}
-		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-		{
-			$bmUser->save();
-			AuthService::updateUser($bmUser);
-		}
-		else if(!AuthService::usersEnabled())
-		{
-			$bmUser->save();
-		}
-		HTMLWriter::bookmarkBar($bmUser->getBookMarks());
-		session_write_close();
-		exit(1);
-
-	break;
-		
+			
 	//------------------------------------
 	//	SAVE USER PREFERENCE
 	//------------------------------------

@@ -39,7 +39,7 @@ define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); //
 $REPOSITORIES[0] = array(
 	"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
 	"DISPLAY"		=>	"Default Files", 
-	"ACCESS"		=>	"filesystem", 
+	"ACCESS"		=>	"fs", 
 	"CREATE"		=>	true,
 	"RECYCLE_BIN" 	=> 	'recycle_bin'
 );
