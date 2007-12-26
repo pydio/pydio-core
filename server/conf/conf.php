@@ -36,10 +36,28 @@ define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); //
 /* You can add as many as you want,  
 /* Just increment the "$REPOSITORIES" index.
 /*********************************************************/
-$REPOSITORIES[0] = array("PATH"=> realpath(dirname(__FILE__)."/../../files"), "DISPLAY"=>"Default Files");
-//$REPOSITORIES[1] = array("PATH"=>"/home/user/www/your/location1/", "DISPLAY"=>"Web Files");
-//$REPOSITORIES[2] = array("PATH"=>"C:/your/location3/on/windows", "DISPLAY"=>"All Documents");
-
+$REPOSITORIES[0] = array(
+	"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
+	"DISPLAY"		=>	"Default Files", 
+	"ACCESS"		=>	"filesystem", 
+	"CREATE"		=>	true,
+	"RECYCLE_BIN" 	=> 	'recycle_bin'
+);
+/*
+$REPOSITORIES[1] = array(
+	"PATH"			=>	"/home/username/example/public/files",
+	"DISPLAY"		=>	"Web Files", 
+	"ACCESS"		=>	"filesystem", 
+	"CREATE"		=>	false,
+	"RECYCLE_BIN" 	=> 	''
+);
+*/
+/*
+$REPOSITORIES[2] = array(
+	"PATH"=>"C:/your/location3/on/windows", 
+	"DISPLAY"=>"All Documents"
+);
+*/
 // UNITE DE TAILLE DES FICHIER (octets "o", bytes "b")
 // (Unit of file size, "o" or "b")
 $size_unit="o";

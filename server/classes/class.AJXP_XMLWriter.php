@@ -79,9 +79,9 @@ class AJXP_XMLWriter
 			print("<user id=\"".$loggedUser->id."\">");
 			print("<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>");
 			print("<repositories>");
-			foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirData)
+			foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
 			{
-				if($loggedUser->canRead($rootDirIndex)) print("<repo id=\"".$rootDirIndex."\">".utf8_encode($rootDirData["DISPLAY"])."</repo>");
+				if($loggedUser->canRead($rootDirIndex)) print("<repo id=\"".$rootDirIndex."\">".utf8_encode($rootDirObject->getDisplay())."</repo>");
 			}
 			print("</repositories>");
 			print("<preferences>");
