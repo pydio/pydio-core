@@ -5,8 +5,6 @@ global $G_AVAILABLE_LANG;
 global $G_MESSAGES;
 global $G_REPOSITORIES;
 global $G_REPOSITORY;
-global $G_ROOT_DIRS_LIST;
-global $G_ROOT_DIR;
 global $G_USE_HTTPS;
 global $G_WM_EMAIL;
 global $G_SIZE_UNIT;
@@ -34,7 +32,6 @@ class ConfService
 		$G_SHOW_HIDDEN = $showhidden;
 		$G_BOTTOM_PAGE = $baspage;
 		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
-		//$G_ROOT_DIRS_LIST = $REPOSITORIES;
 		$G_REPOSITORIES = ConfService::initRepositoriesList($REPOSITORIES);
 		ConfService::switchRootDir();
 	}
@@ -67,7 +64,6 @@ class ConfService
 		}
 		// INIT RECYCLE BIN
 		global $G_RECYCLE_BIN;
-		//print($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle());
 		if($G_REPOSITORY->getRecycle()!= "" && is_dir($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle())){			
 			$G_RECYCLE_BIN = $G_REPOSITORY->getRecycle();
 		}		
@@ -138,7 +134,7 @@ class ConfService
 
 	function getConf($varName)	
 	{
-		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_ROOT_DIR,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER;
+		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER;
 		$globVarName = "G_".$varName;
 		return $$globVarName;
 	}
