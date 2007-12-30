@@ -157,7 +157,7 @@ var fUploader = new FancyUpload($('userfile_1'), {
 	swf:'<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/Swiff.Uploader.swf',
 	url: url,
 	types: {'All (*.*)': '*.*'},
-	limitSize: <?php echo $limitSize;?>,
+	limitSize: <?php echo Utils::convertBytes(ini_get('upload_max_filesize'));?>,
 	queueList: 'fancy_queue',
 	container: $E('queue_container'),
 	onAllComplete:function(){

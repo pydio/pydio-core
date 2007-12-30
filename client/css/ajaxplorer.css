@@ -384,6 +384,11 @@ ACTION BAR
     background-color: #e0ecff;
 }
 
+#buttons_bar
+{
+	height: 35px;
+}
+
 #action_bar a, .action_bar a
 {    
     padding-bottom: 2px;

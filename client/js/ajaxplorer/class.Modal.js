@@ -32,7 +32,8 @@ Modal = Class.create({
 		}
 		else
 		{
-			var formDiv = $(sFormId);	
+			var formDiv = $(sFormId);
+			//var formDiv = $('all_forms').select('[id="'+sFormId+'"]')[0];	
 			var newForm = document.createElement('form');
 			newForm.id = 'action_form';
 			newForm.setAttribute('action', 'cont.php');
@@ -244,7 +245,7 @@ Modal = Class.create({
 							duration:0.3,
 							afterFinish:function(effect){
 								$('loading_overlay').remove();
-								if(ajaxplorer) ajaxplorer.actionBar.update();
+								//if(ajaxplorer) ajaxplorer.actionBar.update();
 							}
 						});
 				}

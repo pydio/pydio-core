@@ -14,6 +14,7 @@ require_once("server/classes/class.Utils.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.AJXP_Exception.php");
 require_once("server/classes/class.AbstractDriver.php");
+require_once("server/classes/class.AJXP_ClientDriver.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.UserSelection.php");
@@ -32,7 +33,6 @@ header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 ConfService::init("server/conf/conf.php");
 $baspage=ConfService::getConf("BOTTOM_PAGE");
-$limitSize = Utils::convertBytes(ini_get('upload_max_filesize'));
 
 if(AuthService::usersEnabled())
 {
@@ -99,25 +99,6 @@ else $action = "";
 if(isSet($dir) && $action != "upload") $dir = utf8_decode($dir);
 if(isSet($dest)) $dest = utf8_decode($dest);
 
-// FILTER ACTION FOR DELETE
-if(ConfService::useRecycleBin() && $action == "delete" && $dir != "/".ConfService::getRecycleBinDir())
-{
-	$action = "move";
-	$dest = "/".ConfService::getRecycleBinDir();
-	$dest_node = "AJAXPLORER_RECYCLE_NODE";
-}
-// FILTER ACTION FOR RESTORE
-if(ConfService::useRecycleBin() &&  $action == "restore" && $dir == "/".ConfService::getRecycleBinDir())
-{
-	$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
-	if($originalRep != "")
-	{
-		$action = "move";
-		$dest = $originalRep;
-	}
-	
-}
-
 //--------------------------------------
 // FIRST CHECK RIGHTS FOR THIS ACTION
 //--------------------------------------
@@ -131,7 +112,6 @@ if(AuthService::usersEnabled())
 		case "copy":
 		case "move":
 		case "delete":
-		case "rename":
 		case "mkdir":
 		case "mkfile":
 			if($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))
@@ -189,6 +169,18 @@ if(AuthService::usersEnabled())
 	}
 }
 
+// FIRST INIT STD DRIVER
+$ajxpDriver = new AJXP_ClientDriver(ConfService::getRepository());
+if($ajxpDriver->hasAction($action)){
+	$xmlBuffer = $ajxpDriver->applyAction($action, array_merge($_GET, $_POST), $_FILES);
+	if($xmlBuffer != ""){
+		AJXP_XMLWriter::header();
+		AJXP_XMLWriter::write($xmlBuffer, true);
+		AJXP_XMLWriter::close();
+		exit(1);
+	}
+}
+
 // INIT DRIVER
 $Driver = ConfService::getRepositoryDriver();
 if($Driver == null || !is_a($Driver, "AbstractDriver")){
@@ -197,432 +189,36 @@ if($Driver == null || !is_a($Driver, "AbstractDriver")){
 	AJXP_XMLWriter::close();
 	exit(1);
 }
-
-switch($action)
-{
-	//-----------------------------------------------------------------------------
-	//-------------------------- FILE ACTIONS -------------------------------------
-	//-----------------------------------------------------------------------------
-	
-	//------------------------------------
-	//	DOWNLOAD, IMAGE & MP3 PROXYS
-	//------------------------------------
-	case "download";
-		$Driver->readFile(ConfService::getRootDir()."/".utf8_decode($file), "force-download");
-		exit(0);
-	break;
-
-	case "image_proxy":
-		$Driver->readFile(ConfService::getRootDir()."/".utf8_decode($file), "image");
-		exit(0);
-	break;
-	
-	case "mp3_proxy":
-		$Driver->readFile(ConfService::getRootDir()."/".$file, "mp3");
-		exit(0);
-	break;
-	
-	//------------------------------------
-	//	ONLINE EDIT
-	//------------------------------------
-	case "edit";	
-		$file = utf8_decode($file);
-		if(isset($save) && $save==1)
-		{
-			$code=stripslashes($code);
-			$code=str_replace("&lt;","<",$code);
-			$fp=fopen(ConfService::getRootDir()."/$file","w");
-			fputs ($fp,$code);
-			fclose($fp);
-			echo utf8_encode($mess[115]);
-		}
-		else 
-		{
-			$Driver->readFile(ConfService::getRootDir()."/".$file, "plain");
-		}
-		exit(0);
-	break;
-
-	//------------------------------------
-	//	COPY / MOVE
-	//------------------------------------
-	case "copy";
-	case "move";
-		
-		if($selection->isEmpty())
-		{
-			$errorMessage = $mess[113];
-			break;
-		}
-		$success = $error = array();
-		
-		$Driver->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
-		
-		if(count($error)){
-			$errorMessage = join("\n", $error);
-		}
-		else {
-			$logMessage = join("\n", $success);
-		}
-		$reload_current_node = true;
-		if(isSet($dest_node)) $reload_dest_node = $dest_node;
-		$reload_file_list = true;
-		
-	break;
-	
-	//------------------------------------
-	//	SUPPRIMER / DELETE
-	//------------------------------------
-	case "delete";
-	
-		if($selection->isEmpty())
-		{
-			$errorMessage = $mess[113];
-			break;
-		}
-		$logMessages = array();
-		$errorMessage = $Driver->delete($selection->getFiles(), $logMessages);
-		if(count($logMessages))
-		{
-			$logMessage = join("\n", $logMessages);
-		}
-		$reload_current_node = true;
-		$reload_file_list = true;
-		
-	break;
-
-	//------------------------------------
-	//	RENOMMER / RENAME
-	//------------------------------------
-	case "rename";
-	
-		$file = utf8_decode($file);
-		$filename_new = utf8_decode($filename_new);
-		$error = $Driver->rename($file, $filename_new);
-		if($error != null) {
-			$errorMessage  = $error;
-			break;
-		}
-		$logMessage="$file $mess[41] $filename_new";
-		$reload_current_node = true;
-		$reload_file_list = basename($filename_new);
-
-	break;
-
-	//------------------------------------
-	//	CREER UN REPERTOIRE / CREATE DIR
-	//------------------------------------
-	case "mkdir";
-	
-		$messtmp="";
-		$dirname=Utils::processFileName(utf8_decode($dirname));
-		$error = $Driver->mkDir($dir, $dirname);
-		if(isSet($error)){
-			$errorMessage = $error; break;
-		}
-		$reload_file_list = $dirname;
-		$messtmp.="$mess[38] $dirname $mess[39] ";
-		if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
-		$logMessage = $messtmp;
-		$reload_current_node = true;
-		
-	break;
-
-	//------------------------------------
-	//	CREER UN FICHIER / CREATE FILE
-	//------------------------------------
-	case "mkfile";
-	
-		$messtmp="";
-		$filename=Utils::processFileName(utf8_decode($filename));	
-		$error = $Driver->createEmptyFile($dir, $filename);
-		if(isSet($error)){
-			$errorMessage = $error; break;
-		}
-		$messtmp.="$mess[34] $filename $mess[39] ";
-		if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
-		$logMessage = $messtmp;
-		$reload_file_list = $filename;
-
-	break;
-	
-	//------------------------------------
-	//	UPLOAD
-	//------------------------------------	
-	case "upload":
-
-		if($dir!=""){$rep_source="/$dir";}
-		else $rep_source = "";
-		$destination=ConfService::getRootDir().$rep_source;
-		if(!$Driver->isWriteable($destination))
-		{
-			$errorMessage = "$mess[38] $dir $mess[99].";
-			break;
-		}	
-		$logMessage = "";
-		$fancyLoader = false;
-		foreach ($_FILES as $boxName => $boxData)
-		{
-			if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
-			if($boxName == "Filedata") $fancyLoader = true;
-			$err = Utils::parseFileDataErrors($boxData, $fancyLoader);
-			if($err != null)
-			{
-				$errorMessage = $err;
-				break;
+if($Driver->hasAction($action)){
+	// CHECK RIGHTS
+	if(AuthService::usersEnabled()){
+		$loggedUser = AuthService::getLoggedUser();
+		if( $Driver->actionNeedsRight($action, "r") && 
+			($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))){
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage(null, $mess[208]);
+				AJXP_XMLWriter::requireAuth();
+				AJXP_XMLWriter::close();
+				exit(1);
 			}
-			$userfile_name = $boxData["name"];
-			if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
-			$userfile_name=Utils::processFileName($userfile_name);
-			if (!$Driver->simpleCopy($boxData["tmp_name"], "$destination/".$userfile_name))
-			{
-				$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
-				break;
+		if( $Driver->actionNeedsRight($action, "w") && 
+			($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))){
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage(null, $mess[207]);
+				AJXP_XMLWriter::requireAuth();
+				AJXP_XMLWriter::close();
+				exit(1);
 			}
-			$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
-		}
-		if($fancyLoader)
-		{
-			if(isSet($errorMessage)){
-				header('HTTP/1.0 '.$errorMessage);
-				die('Error '.$errorMessage);
-			}else{
-				header('HTTP/1.0 200 OK');
-				die("200 OK");
-			}
-		}
-		else
-		{
-			print("<html><script language=\"javascript\">\n");
-			if(isSet($errorMessage)){
-				print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-			}else{		
-				print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
-			}
-			print("</script></html>");
-		}
-		exit;
-		
-	break;
+	}
 	
-	//------------------------------------
-	//	XML LISTING
-	//------------------------------------
-	case "xml_listing":
-	
-		if(!isSet($dir) || $dir == "/") $dir = "";
-		$searchMode = $fileListMode = $completeMode = false;
-		if(isSet($mode)){
-			if($mode == "search") $searchMode = true;
-			else if($mode == "file_list") $fileListMode = true;
-			else if($mode == "complete") $completeMode = true;
-		}	
-		$nom_rep = $Driver->initName($dir);
-		AJXP_Exception::errorToXml($nom_rep);
-		$result = $Driver->listing($nom_rep, !($searchMode || $fileListMode));
-		$reps = $result[0];
+	$xmlResult = $Driver->applyAction($action, array_merge($_GET, $_POST), $_FILES);
+	if($xmlResult != ""){
 		AJXP_XMLWriter::header();
-		foreach ($reps as $repIndex => $repName)
-		{
-			$link = SERVER_ACCESS."?id=&ordre=nom&sens=1&action=xml_listing&dir=".$dir."/".$repName;
-			$link = str_replace("/", "%2F", $link);
-			$link = str_replace("&", "&amp;", $link);
-			$attributes = "";
-			if($searchMode)
-			{
-				if(is_file($nom_rep."/".$repIndex)) {$attributes = "is_file=\"true\" icon=\"$repName\""; $repName = $repIndex;}
-			}
-			else if($fileListMode)
-			{
-				$currentFile = $nom_rep."/".$repIndex;			
-				$atts = array();
-				$atts[] = "is_file=\"".(is_file($currentFile)?"oui":"non")."\"";
-				$atts[] = "is_editable=\"".Utils::is_editable($currentFile)."\"";
-				$atts[] = "is_image=\"".Utils::is_image($currentFile)."\"";
-				if(Utils::is_image($currentFile))
-				{
-					list($width, $height, $type, $attr) = @getimagesize($currentFile);
-					$atts[] = "image_type=\"".image_type_to_mime_type($type)."\"";
-					$atts[] = "image_width=\"$width\"";
-					$atts[] = "image_height=\"$height\"";
-				}
-				$atts[] = "is_mp3=\"".Utils::is_mp3($currentFile)."\"";
-				$atts[] = "mimetype=\"".Utils::mimetype($currentFile, "type")."\"";
-				$atts[] = "modiftime=\"".$Driver->date_modif($currentFile)."\"";
-				$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
-				$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
-				$atts[] = "icon=\"".(is_file($currentFile)?$repName:"folder.png")."\"";
-				
-				$attributes = join(" ", $atts);
-				$repName = $repIndex;
-			}
-			else 
-			{
-				$folderBaseName = str_replace("&", "&amp;", $repName);
-				$folderFullName = "$dir/".$folderBaseName;
-				$parentFolderName = $dir;
-				if(!$completeMode){
-					$attributes = "icon=\"".CLIENT_RESOURCES_FOLDER."/images/foldericon.png\"  openicon=\"".CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.clickDir('".$folderFullName."','".$parentFolderName."',CURRENT_ID)\"";
-				}
-			}
-			print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
-			print("</tree>");
-		}
-		if($nom_rep == ConfService::getRootDir() && ConfService::useRecycleBin() && !$completeMode)
-		{
-			if($fileListMode)
-			{
-				print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"non\" is_recycle=\"1\" mimetype=\"Trashcan\" modiftime=\"".$Driver->date_modif(ConfService::getRootDir()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
-			}
-			else 
-			{
-				// ADD RECYCLE BIN TO THE LIST
-				print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.clickDir('/".ConfService::getRecycleBinDir()."','/',CURRENT_ID)\"/>");
-			}
-		}
+		print($xmlResult);
 		AJXP_XMLWriter::close();
 		exit(1);
-		
-	break;		
-
-	//-----------------------------------------------------------------------------
-	//-------------------------- AJXP ACTIONS -------------------------------------
-	//-----------------------------------------------------------------------------
-
-	//------------------------------------
-	//	SWITCH THE ROOT REPOSITORY
-	//------------------------------------	
-	case "switch_root_dir":
-	
-		if(!isSet($root_dir_index))
-		{
-			break;
-		}
-		$dirList = ConfService::getRootDirsList();
-		if(!isSet($dirList[$root_dir_index]))
-		{
-			$errorMessage = "Trying to switch to an unkown folder!";
-			break;
-		}
-		ConfService::switchRootDir($root_dir_index);
-		$logMessage = "Successfully Switched!";
-		
-	break;	
-	
-	//------------------------------------
-	//	GET AN HTML TEMPLATE
-	//------------------------------------
-	case "get_template":
-	
-		header("Content-type:text/html");
-		if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
-		{
-			if(!isSet($encode) || $encode != "false")
-			{
-				$mess = array_map("utf8_encode", $mess);
-			}
-			include(CLIENT_RESOURCES_FOLDER."/html/".$template_name);
-		}
-		exit(0);	
-		
-	break;
-	
-	//------------------------------------
-	//	BOOKMARK BAR
-	//------------------------------------
-	case "get_bookmarks":
-		
-		$bmUser = null;
-		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-		{
-			$bmUser = AuthService::getLoggedUser();
-		}
-		else if(!AuthService::usersEnabled())
-		{
-			$bmUser = new AJXP_User("shared");
-		}
-		if($bmUser == null) exit(1);
-		if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
-		{
-			if($_GET["bm_action"] == "add_bookmark")
-			{
-				$title = "";
-				if(isSet($_GET["title"])) $title = $_GET["title"];
-				if($title == "" && $_GET["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
-				$bmUser->addBookMark($_GET["bm_path"], $title);
-			}
-			else if($_GET["bm_action"] == "delete_bookmark")
-			{
-				$bmUser->removeBookmark($_GET["bm_path"]);
-			}
-			else if($_GET["bm_action"] == "rename_bookmark" && isset($_GET["bm_title"]))
-			{
-				$bmUser->renameBookmark($_GET["bm_path"], $_GET["bm_title"]);
-			}
-		}
-		if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-		{
-			$bmUser->save();
-			AuthService::updateUser($bmUser);
-		}
-		else if(!AuthService::usersEnabled())
-		{
-			$bmUser->save();
-		}		
-		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks());
-		AJXP_XMLWriter::close();
-		exit(1);
-	
-	break;
-			
-	//------------------------------------
-	//	SAVE USER PREFERENCE
-	//------------------------------------
-	case "save_user_pref":
-		
-		$userObject = AuthService::getLoggedUser();
-		if($userObject == null) exit(1);
-		$i = 0;
-		while(isSet($_GET["pref_name_".$i]) && isSet($_GET["pref_value_".$i]))
-		{
-			$prefName = $_GET["pref_name_".$i];
-			$prefValue = $_GET["pref_value_".$i];
-			if($prefName != "password")
-			{
-				$userObject->setPref($prefName, $prefValue);
-				$userObject->save();
-				AuthService::updateUser($userObject);
-				setcookie("AJXP_$prefName", $prefValue);
-			}
-			else
-			{
-				AuthService::updatePassword($userObject->getId(), $prefValue);
-			}
-			$i++;
-		}
-		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::sendMessage("Done($i)", null);
-		AJXP_XMLWriter::close();
-		exit(1);
-		
-	break;
-	
-	//------------------------------------
-	//	DISPLAY DOC
-	//------------------------------------
-	case "display_doc":
-	
-		echo HTMLWriter::getDocFile($_GET["doc_file"]);
-		exit(0);
-		
-	break;
-	
-			
-	default;
-	break;
+	}
 }
-
 
 
 AJXP_XMLWriter::header();

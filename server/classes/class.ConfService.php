@@ -185,11 +185,13 @@ class ConfService
 		$crtRepository = ConfService::getRepository();
 		$accessType = $crtRepository->getAccessType();
 		$driverName = $accessType."Driver";
-		$filePath = INSTALL_PATH."/plugins/ajxp.".$accessType."/class.".$driverName.".php";
-		if(is_file($filePath)){
+		$path = INSTALL_PATH."/plugins/ajxp.".$accessType;
+		$filePath = $path."/class.".$driverName.".php";
+		$xmlPath = $path."/".$accessType."Actions.xml";
+		if(is_file($filePath) && is_file($xmlPath)){
 			include_once($filePath);
 			if(class_exists($driverName)){
-				$G_ACCESS_DRIVER = new $driverName($crtRepository);
+				$G_ACCESS_DRIVER = new $driverName($accessType, $xmlPath, $crtRepository);
 				return $G_ACCESS_DRIVER;
 			}
 		}

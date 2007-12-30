@@ -115,6 +115,12 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 	jQuery(element).trigger("resize");
 }
 
+function bgCorners(element, cornersString)
+{
+	//if(element instanceof String) element = '#'+element;
+	jQuery(element).corner(cornersString);
+}
+
 function ajxpCorners(oElement, cornersString)
 {
 	var tr, tl, bl, br;
