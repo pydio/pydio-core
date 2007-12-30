@@ -179,6 +179,10 @@ FilesList = Class.create(SelectableElements, {
 		if(this._currentRep != null) this.loadXmlList(this._currentRep, pendingFileToSelect, url);
 	},
 	
+	setPendingSelection: function(pendingFilesToSelect){
+		this._pendingFile = pendingFilesToSelect;
+	},
+	
 	loadXmlList: function(repToLoad, pendingFileToSelect, url){	
 		// TODO : THIS SHOULD BE SET ONCOMPLETE!
 		this._currentRep = repToLoad;
@@ -497,8 +501,9 @@ FilesList = Class.create(SelectableElements, {
 	// OVERRIDE CHANGE FUNCTION
 	// 
 	fireChange: function()
-	{
-		this._ajaxplorer.getActionBar().update();
+	{		
+		//this._ajaxplorer.getActionBar().update();
+		ajaxplorer.actionBar.fireSelectionChange();
 		this._ajaxplorer.infoPanel.update();
 	},
 	
@@ -520,11 +525,11 @@ FilesList = Class.create(SelectableElements, {
 		fileName = selRaw[0].getAttribute('filename');
 		if(isFile == 'oui')
 		{
-			this._ajaxplorer.getActionBar().fireAction("download");
+			ajaxplorer.getActionBar().fireDefaultAction("file");
 		}
 		else
 		{
-			this._ajaxplorer.clickDir(fileName, this._currentRep, null);
+			ajaxplorer.getActionBar().fireDefaultAction("dir", selRaw[0].getAttribute('filename'));
 		}
 	},
 	
@@ -752,39 +757,7 @@ FilesList = Class.create(SelectableElements, {
 			}
 			return null;
 		}
-	},
-	
-	/*
-	keydown_old: function (event)
-	{
-		if(event.keyCode == 9 && !ajaxplorer.blockNavigation) return false;
-		if(!this.hasFocus) return true;
-		var keyCode = event.keyCode;
-		if(keyCode != 13)
-		{
-			return true;
-		}
-		var items = this._selectedItems;
-		if(items.length == 0) // No selection
-		{
-			return false;
-		}
-		currentItem = items[items.length-1];
-		
-		//ENTER
-		if(event.keyCode == 13)
-		{
-			for(var i=0; i<items.length; i++)
-			{
-				this.setItemSelected(items[i], false);
-			}
-			this.setItemSelected(currentItem, true);
-			this.fireDblClick(null);
-			return false;
-		}	
-	},
-	*/
-	
+	},	
 	
 	isItem: function (node) {
 		if(this._displayMode == "list")

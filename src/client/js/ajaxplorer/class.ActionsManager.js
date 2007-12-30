@@ -14,10 +14,15 @@ ActionsManager = Class.create({
 		else this._currentUser = 'shared';
 		this.oUser = oUser;
 		this.bookmarksBar = new BookmarksBar();
-	},
+		
+		this.actions = new Hash();
+		this.defaultActions = new Hash();
+		this.toolbars = new Hash();		
+		this.loadActions('ajxp');
+	},	
 	
 	init: function()
-	{
+	{		
 		this._items = this._htmlElement.select('[action]');
 		var oThis = this;
 		for(i=0; i<this._items.length;i++)
@@ -83,13 +88,7 @@ ActionsManager = Class.create({
 			this._registeredKeys.set(firstKey.toLowerCase(), action);
 			textNode.innerHTML = replaceHtml;
 			}
-		}
-		this.downloader = new MultiDownloader($('multiple_download_container'), ajxpServerAccessPath+'?action=download&file='); 
-		this.downloader.triggerEnd = function() {hideLightBox();};
-	
-		//this.multi_selector = new MultiSelector( $( 'upload_files_list' ), '6' );
-		//this.multi_selector.addElement( $( 'upload_focus' ) );
-		
+		}		
 		//alert(this._registeredKeys['u']);
 		var oThis = this;
 		$('current_path').onfocus = function(e)	{
@@ -120,9 +119,9 @@ ActionsManager = Class.create({
 			}
 		}.bind(this);
 		if(!this.usersEnabled){
-			 $('login_button').hide();
-			 $('logging_string').hide();
-			 $('admin_button').hide();
+			// $('login_button').hide();
+			// $('logging_string').hide();
+			// $('admin_button').hide();
 		}
 	},
 	
@@ -139,7 +138,6 @@ ActionsManager = Class.create({
 		{
 			if(oUser.id != 'guest') 
 			{
-				this.switchLoginButton('loggedin');
 				logging_string = MessageHash[142]+'<i style="cursor:pointer;text-decoration:underline;" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+'</i>.';
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
@@ -149,35 +147,14 @@ ActionsManager = Class.create({
 			}
 			else 
 			{
-				this.switchLoginButton('loggedout');
 				logging_string = MessageHash[143];
 			}
 		}
 		else 
 		{
-			this.switchLoginButton('loggedout');
-			$('admin_button').hide();
 			logging_string = MessageHash[144];
 		}
-		$('logging_string').innerHTML = logging_string;	
-		for(var i=0; i<this._items.length; i++)
-		{
-			if(!this._items[i].getAttribute('action')) continue;
-			if(this._items[i].getAttribute('write_access') 
-				&& this._items[i].getAttribute('write_access')=='true' 
-				&& (this.oUser == null || !this.oUser.canWrite()))
-				{
-					this._items[i].hide();
-				}
-			else this._items[i].show();
-		}
-		if(this.oUser == null || !this.oUser.canWrite()) $('write_access_separator').hide();
-		else $('write_access_separator').show();
-		if(oUser != null && oUser.id == 'admin') $('admin_button').show();
-		else  $('admin_button').hide();
-		$('view_button').hide();
-		$('edit_button').hide();
-	
+		$('logging_string').innerHTML = logging_string;
 		if(oUser != null)
 		{
 			disp = oUser.getPreference("display");
@@ -185,8 +162,7 @@ ActionsManager = Class.create({
 			{
 				if(disp != ajaxplorer.filesList._displayMode) ajaxplorer.filesList.switchDisplayMode(disp);
 			}
-		}
-		
+		}		
 		this.loadBookmarks();
 	},
 	
@@ -234,85 +210,10 @@ ActionsManager = Class.create({
 		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
 	},
 	
-	update: function(bClear)
-	{
-		var bSelection;
-		if(!this._ajaxplorer.getFilesList() || bClear) 
-		{
-			bSelection = false;
-		}
-		else
-		{
-			var userSelection = this._ajaxplorer.getFilesList().getUserSelection();
-			if(!userSelection || userSelection.isEmpty() || userSelection.isRecycle())
-			{
-				bSelection = false;
-			}
-			else
-			{
-				bSelection = !userSelection.isEmpty();
-				var bUnique = userSelection.isUnique();
-				var bFile = userSelection.hasFile();
-				var bDir = userSelection.hasDir();
-				var bEditable = userSelection.isEditable()||userSelection.isImage();			
-			}
-		}
-		
-		for(i=0; i<this._items.length;i++)
-		{
-			if(!this._items[i].getAttribute('action')) continue;
-			var attSelection = ((this._items[i].getAttribute('selection') && this._items[i].getAttribute('selection') == 'true')?true:false);
-			var attUnique = ((this._items[i].getAttribute('unique') && this._items[i].getAttribute('unique') == 'true')?true:false);
-			var attFile = ((this._items[i].getAttribute('file') && this._items[i].getAttribute('file') == 'true')?true:false);
-			var attDir = ((this._items[i].getAttribute('folder') && this._items[i].getAttribute('folder') == 'true')?true:false);
-			var attEditable = ((this._items[i].getAttribute('editable') && this._items[i].getAttribute('editable') == 'true')?true:false);
-			var attRecycle = (this._items[i].getAttribute('recycle_bin')?this._items[i].getAttribute('recycle_bin'):'');
-					
-			this._items[i].className = 'disabled';
-			if(ajaxplorer && ajaxplorer.foldersTree && ajaxplorer.foldersTree.recycleEnabled())
-			{
-				if(ajaxplorer.foldersTree.currentIsRecycle())
-				{
-					if(attRecycle == 'hidden') { $(this._items[i]).hide();continue;}
-					if(attRecycle == 'disabled') continue;
-					if(attRecycle == 'only') $(this._items[i]).show();
-				}else{
-					if(attRecycle == 'hidden') $(this._items[i]).show();
-					if(attRecycle == 'only') {$(this._items[i]).hide();continue;}
-				}
-			}
-			else
-			{
-				if(attRecycle == 'only') 
-				{
-					$(this._items[i]).hide(); continue;
-				}
-			}
-			if(!attSelection)
-			{
-				this._items[i].className = 'enabled';		
-				continue;
-			}
-			if(attSelection && !bSelection) continue;
-			if((attFile || attDir) && !bFile && !bDir)continue;
-			if(attFile && !attDir && !bFile)continue;
-			if(attDir && !attFile && !bDir)continue;
-			if(attEditable && !bEditable) continue;
-			if(attUnique && !bUnique) continue;
-			if(!attFile && bFile) continue;
-			if(!attDir && bDir) continue;
-			this._items[i].className = 'enabled';		
-		}
-		// EDIT - VIEW BUTTON
-		$('view_button').hide();
-		$('edit_button').hide();
-		if(bUnique && userSelection.isImage()) $('view_button').show();
-		else if(bUnique && userSelection.isEditable() && (this.oUser==null || this.oUser.canWrite()))$('edit_button').show();
-	},
-	
 	actionIsAllowed: function(buttonAction)
 	{
 		var button = this._items[this._actions.get(buttonAction)];
+		if(!button) return true;
 		var attSelection = ((button.getAttribute('selection') && button.getAttribute('selection') == 'true')?true:false);
 		var attUnique = ((button.getAttribute('unique') && button.getAttribute('unique') == 'true')?true:false);
 		var attFile = ((button.getAttribute('file') && button.getAttribute('file') == 'true')?true:false);
@@ -395,300 +296,23 @@ ActionsManager = Class.create({
 		return contextActions;
 	},
 	
-	fireAction: function (buttonAction)
-	{
-		var button = this._items[this._actions.get(buttonAction)];
-		var dialogTitle = "";
-		var iconSrc = "";
-		if(button.getAttribute("title")) dialogTitle = button.getAttribute("title");
-		var oImage = $(button).getElementsBySelector("img")[0];
-		if(oImage.original_src){
-			iconSrc = oImage.original_src; // IF IE PNG HACK, THE SRC IS "transparent.gif", THE REAL ONE IS IN original_src
-		}else{
-			iconSrc = oImage.src;
+	fireDefaultAction: function(defaultName){
+		var actionName = this.defaultActions.get(defaultName); 
+		if(actionName != null){
+			arguments[0] = actionName;
+			this.fireAction.apply(this, arguments);
 		}
-		if(!this.actionIsAllowed(buttonAction)) return;
-		var oThis = this;
-		if($A(["create_file", "rename", "upload", "create_dir", "copy", "move", "delete", "download", "splash", "login", "admin", "view", "edit"]).indexOf(buttonAction) != -1)
-		{
-			modal.prepareHeader(dialogTitle, iconSrc);
+	},
+	
+	fireAction: function (buttonAction)	{
+		if(!this.actionIsAllowed(buttonAction)) return;		
+		var action = this.actions.get(buttonAction);
+		if(action != null) {
+			var args = $A(arguments);
+			args.shift();
+			action.apply(args);
+			return;
 		}
-		switch(buttonAction)
-		{	
-			case "up_dir":
-				url = this.getLocationBarValue();
-				currentParentUrl = url.substr(0, url.lastIndexOf('/'));
-				if(currentParentUrl == "") currentParentUrl = "/";
-				ajaxplorer.getFilesList().loadXmlList(currentParentUrl);
-				ajaxplorer.getFoldersTree().goToParentNode();
-				this.updateLocationBar(currentParentUrl);			
-			break;
-			
-			case "refresh":
-				ajaxplorer.getFilesList().reload();
-				ajaxplorer.getFoldersTree().reloadCurrentNode();
-				this.update(true);
-			break;
-			
-			case "bookmark":
-				this.bookmarksBar.addBookmark(this.getLocationBarValue());						
-			break;		
-			
-			case "empty_recycle":
-			    ajaxplorer.getFilesList().selectAll();
-			    this.fireAction('delete');
-			break;
-			
-			case "upload":				    
-				if(this.getFlashVersion() >= 8 && document.location.href.substring(0,5)!='https')
-				{
-					modal.showDialogForm('Upload', 
-										'fancy_upload_form', 
-										null, 
-										function(){
-											hideLightBox();
-											return false;
-										}, 
-										null, 
-										true, true);				
-				}
-				else
-				{
-					$('hidden_frames').innerHTML = '<iframe name="hidden_iframe" id="hidden_iframe"></iframe>';			
-					var onLoadFunction = function(oForm){
-						oThis.multi_selector = new MultiSelector(oForm, oForm.getElementsBySelector('div.uploadFilesList')[0], '6' );
-						oThis.multi_selector.addElement(oForm.getElementsBySelector('.dialogFocus')[0]);
-						var rep = document.createElement('input');
-						rep.setAttribute('type', 'hidden');
-						rep.setAttribute('name', 'dir');
-						rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
-						oForm.appendChild(rep);
-					}
-					
-					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){
-						ajaxplorer.actionBar.multi_selector.submitMainForm();
-						return false;
-					});
-					
-				}
-			break;
-			
-			case "create_file":
-			case "create_dir":
-				var divId = buttonAction.replace('_', '')+'_form';
-				modal.showDialogForm('Create', divId, null, function(){
-					var oForm = $(modal.getForm());	
-					var elementToCheck=(oForm['filename']?oForm['filename']:oForm['dirname']);
-					if(ajaxplorer.getFilesList().fileNameExists($(elementToCheck).getValue()))
-					{
-						alert(MessageHash[125]);
-						return false;
-					}
-					oThis.submitForm(oForm);				
-					hideLightBox(true);
-					return false;
-				});
-	
-			break;
-			
-			case "rename":
-			 	var onLoad = function(newForm){		 		
-					var userSelection = ajaxplorer.getFilesList().getUserSelection();
-					userSelection.updateFormOrUrl(newForm, '');
-					var crtFileName = userSelection.getUniqueFileName();
-					newForm.filename_new.value = getBaseName(crtFileName);
-			 	}
-				modal.showDialogForm('Rename', 'rename_form', onLoad);
-	
-			break;
-			
-			case "restore":
-			   var userSelection = ajaxplorer.getFilesList().getUserSelection();
-			   var fileNames = $A(userSelection.getFileNames());
-			   var connexion = new Connexion();
-			   connexion.addParameter('get_action', 'restore');
-			   connexion.addParameter('dir', userSelection.getCurrentRep());
-			   connexion.onComplete = function(transport){
-			   		this.parseXmlMessage(transport.responseXML);
-			   }.bind(this);
-			   fileNames.each(function(filename){
-			   		connexion.addParameter('file', filename);
-			   		connexion.sendAsync();
-			   }.bind(this));
-			break;
-			
-			case "copy":
-			case "move":
-				var onLoad = function(oForm){
-					var getAction = oForm.getElementsBySelector('input[name="get_action"]')[0];
-					if(buttonAction == 'copy') getAction.value = 'copy';
-					else getAction.value = 'move';
-					var container = oForm.getElementsBySelector(".treeCopyContainer")[0];
-					var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-					var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
-					if(!oThis.treeCopy){
-						this.treeCopy = new WebFXLoadTree('/', 
-															ajxpServerAccessPath+'?action=xml_listing', 
-															"javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 
-															'explorer');
-					}
-					else{
-						window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
-					}				
-					this.treeCopyActive = true;
-					this.treeCopyActionDest = $A([eDestLabel]);
-					this.treeCopyActionDestNode = $A([eDestNodeHidden]);
-					container.innerHTML = this.treeCopy.toString();
-					this.treeCopy.focus();
-				}.bind(this);
-				var onCancel = function(){				
-					ajaxplorer.cancelCopyOrMove();
-				};
-				var onSubmit = function(){
-					var oForm = modal.getForm();
-					var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-					if(eDestLabel.value == ajaxplorer.filesList.getCurrentRep())
-					{
-						alert(MessageHash[183]);
-						return false;
-					}
-					ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);				
-					this.treeCopyActive = false;
-					this.submitForm(oForm);
-					hideLightBox(true);
-					return false;
-				}.bind(this);
-				modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
-			break;
-			
-			case "delete":
-				var onLoad = function(oForm){
-			    	var message = MessageHash[177];
-			    	if(ajaxplorer.foldersTree.recycleEnabled() && !ajaxplorer.foldersTree.currentIsRecycle()){
-			    		message = MessageHash[176];
-			    	}
-	   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
-				}
-				modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
-					var oForm = modal.getForm();
-					ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-					oThis.submitForm(oForm);
-					hideLightBox(true);
-					return false;				
-				});
-			break;
-			
-			case "download":
-				var userSelection = this._ajaxplorer.getFilesList().getUserSelection();
-				if(userSelection.isUnique())
-				{
-					var downloadUrl = ajxpServerAccessPath+'?action=download';
-					downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-					document.location.href = downloadUrl;
-					break;
-				}
-				var loadFunc = function(oForm){
-					var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-					var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
-					downloader.triggerEnd = function(){hideLightBox()};
-					fileNames = userSelection.getFileNames();
-					for(var i=0; i<fileNames.length;i++)
-					{
-						downloader.addListRow(fileNames[i]);
-					}				
-				};
-				var closeFunc = function(){
-					hideLightBox();
-					return false;
-				};
-				modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
-			break;
-			
-			case "splash":
-				modal.showDialogForm(
-					'Ajaxplorer', 
-					'splash_form', 
-					null, 
-					function(){hideLightBox();return false;}, 
-					null, 
-					true);		
-			break;
-			
-			case "admin":
-				modal.showDialogForm(
-					'Ajaxplorer Settings', 
-					'admin_form', 
-					null, 
-					function(){				
-						hideLightBox();return false;
-					}, 
-					null, 
-					true);		
-			break;
-			
-			case "edit":	
-				var userSelection =  this._ajaxplorer.getFilesList().getUserSelection();
-				if(!userSelection.isEditable()) break;
-				var sTitle = MessageHash[187]+userSelection.getUniqueFileName();
-				modal.prepareHeader(sTitle, iconSrc);
-				var loadFunc = function(oForm){
-					ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-					oThis.editor = new Editor(oForm);
-					oThis.editor.createEditor(userSelection.getUniqueFileName());
-					oThis.editor.loadFile(userSelection.getUniqueFileName());
-				}
-				modal.showDialogForm('Edit Online', 'edit_box', loadFunc, null, null, true, true);
-			break;
-	
-			case "view":			
-				var userSelection =  this._ajaxplorer.getFilesList().getUserSelection();
-				if(!userSelection.isImage()) break;
-				var loadFunc = function(oForm){
-					this.diaporama = new Diaporama($(oForm));
-					this.diaporama.open(ajaxplorer.getFilesList().getItems(), userSelection.getUniqueFileName());
-				}.bind(this);
-				var closeFunc = function(){
-					this.diaporama.close();
-					hideLightBox();
-					return false;
-				}.bind(this);
-				modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
-			break;
-			
-			case "switch_display":
-				var newDisplay = ajaxplorer.filesList.switchDisplayMode();
-				this.updateDisplayButton(newDisplay);
-			
-			break;
-			
-			case "login":			
-				if($('login_button').getAttribute('action') == 'logout' 
-				|| getBaseName($('login_button').getAttribute('action')) == 'logout') // opera...
-				{
-					var connexion = new Connexion();
-					connexion.addParameter('get_action', 'logout');
-					oThis = this;
-					connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
-					connexion.sendAsync();
-				}
-				else
-				{
-					modal.showDialogForm('Log In', 'login_form', null, function(){
-						var oForm = modal.getForm();
-						//ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-						oThis.submitForm(oForm);
-						//hideLightBox(true);
-						return false;				
-					});
-				}
-			
-			break;
-			
-			default:
-				alert("Cannot find action '"+buttonAction+"'");
-			break;
-		}
-		
 	},
 	
 	fireActionByKey: function(keyName)
@@ -768,7 +392,7 @@ ActionsManager = Class.create({
 	
 	updateDisplayButton: function (newDisplay)
 	{
-		$('sd_button').getElementsBySelector('img')[0].src = ajxpResourcesFolder+'/images/crystal/actions/22/'+(newDisplay=='list'?'view_icon.png':'view_text.png');
+		//$('sd_button').getElementsBySelector('img')[0].src = ajxpResourcesFolder+'/images/crystal/actions/22/'+(newDisplay=='list'?'view_icon.png':'view_text.png');
 	},
 	
 	submitForm: function(formName)
@@ -838,6 +462,7 @@ ActionsManager = Class.create({
 	
 	switchLoginButton: function(action)
 	{
+	return;
 		if(action == "loggedin")
 		{
 			$('login_logout_image').src = ajxpResourcesFolder+'/images/crystal/actions/22/cancel.png';
@@ -862,6 +487,132 @@ ActionsManager = Class.create({
 	loadBookmarks: function ()
 	{
 		this.bookmarksBar.load();
+	},
+	
+	fireSelectionChange: function(){
+		var userSelection = null;
+		if (ajaxplorer && ajaxplorer.getFilesList() && ajaxplorer.getFilesList().getUserSelection()){
+			userSelection = ajaxplorer.getFilesList().getUserSelection();
+		} 
+		this.actions.each(function(pair){
+			pair.value.fireSelectionChange(userSelection);
+		});
+	},
+	
+	fireContextChange: function(){
+		var crtRecycle = false;
+		if(ajaxplorer && ajaxplorer.foldersTree){ 
+			crtRecycle = ajaxplorer.foldersTree.currentIsRecycle();
+		}	
+		this.actions.each(function(pair){			
+			pair.value.fireContextChange(this.usersEnabled, 
+									 this.oUser, 
+									 crtRecycle);
+		}.bind(this));
+		this.refreshToolbarsSeparator();
+	},
+	
+	initToolbars: function () {
+		var crtCount = 0;
+		var toolbarsList = $A(['default', 'put', 'get', 'change', 'user']);
+		toolbarsList.each(function(toolbar){
+			var tBar = this.initToolbar(toolbar);
+			if(tBar && tBar.actionsCount){
+				if(crtCount < toolbarsList.size()-1) tBar.insert(new Element('div', {class:'separator'}));
+				$('buttons_bar').insert(tBar);
+				crtCount ++;
+			}			
+		}.bind(this));
+		bgCorners("#action_bar a", "round 8px");
+	},
+	
+	refreshToolbarsSeparator: function(){
+		this.toolbars.each(function(pair){
+			var toolbar = $('buttons_bar').select('[id="'+pair.key+'_toolbar"]')[0];
+			var sep = toolbar.select('div.separator')[0];
+			if(!sep) return;
+			var hasVisibleActions = false;
+			toolbar.select('a').each(function(action){
+				if(action.visible()) hasVisibleActions = true;
+			});
+			if(hasVisibleActions) sep.show();
+			else sep.hide();
+		});
+	},
+	
+	initToolbar: function(toolbar){
+		if(!this.toolbars.get(toolbar)) return;
+		var toolEl = $(toolbar+'_toolbar');		
+		if(!toolEl){ 
+			var toolEl = new Element('div', {
+				id: toolbar+'_toolbar',
+				style: 'display:inline;',
+			});
+		}
+		toolEl.actionsCount = 0;
+		this.toolbars.get(toolbar).each(function(actionName){
+			var action = this.actions.get(actionName);			
+			toolEl.insert(action.toActionBar());
+			toolEl.actionsCount ++;
+		}.bind(this));
+		return toolEl;
+	},
+	
+	emptyToolbars: function(){
+		$('buttons_bar').select('div').each(function(divElement){			
+			divElement.remove();
+		}.bind(this));
+		this.toolbars = new Hash();
+	},
+		
+	removeActions: function(){
+		this.actions.each(function(pair){
+			pair.value.remove();
+		});
+		this.actions = new Hash();
+		this.emptyToolbars();
+	},
+	
+	loadActions: function(type){
+		this.removeActions();
+		var connexion = new Connexion();
+		connexion.onComplete = function(transport){
+			this.parseActions(transport.responseXML);
+		}.bind(this);
+		connexion.addParameter('get_action', 'get_ajxp_actions');
+		connexion.sendSync();
+		if(!type){
+			connexion.addParameter('get_action', 'get_driver_actions');
+			connexion.sendSync();
+		}		
+		this.initToolbars();
+		this.fireContextChange();
+		this.fireSelectionChange();	
+	},
+	
+	parseActions: function(xmlResponse){		
+		if(xmlResponse == null || xmlResponse.documentElement == null) return;
+		var actions = xmlResponse.documentElement.childNodes;		
+		for(var i=0;i<actions.length;i++){
+			var newAction = new Action();
+			newAction.createFromXML(actions[i]);			
+			this.actions.set(actions[i].getAttribute('name'), newAction);
+			if(actions[i].getAttribute('dirDefault') && actions[i].getAttribute('dirDefault') == "true"){
+				this.defaultActions.set('dir', actions[i].getAttribute('name'));
+			} 
+			if(actions[i].getAttribute('fileDefault') && actions[i].getAttribute('fileDefault') == "true"){
+				this.defaultActions.set('file', actions[i].getAttribute('name'));
+			} 
+			if(actions[i].getAttribute('dragndropDefault') && actions[i].getAttribute('dragndropDefault') == "true"){
+				this.defaultActions.set('dragndrop', actions[i].getAttribute('name'));
+			}
+			if(newAction.context.actionBar){
+				if(this.toolbars.get(newAction.context.actionBarGroup) == null){
+					this.toolbars.set(newAction.context.actionBarGroup, new Array());
+				}
+				this.toolbars.get(newAction.context.actionBarGroup).push(newAction.options.name);
+			} 
+		}
 	},
 	
 	locationBarSubmit: function (url)

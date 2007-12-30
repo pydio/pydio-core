@@ -206,7 +206,8 @@ function hideLightBox(onFormSubmit)
 		{
 			currentLightBox = null;
 		}
-		ajaxplorer.getActionBar().update();
+		ajaxplorer.getActionBar().fireContextChange();
+		ajaxplorer.getActionBar().fireSelectionChange();
 		ajaxplorer.getFilesList().focus();
 		ajaxplorer.enableNavigation();
 		ajaxplorer.focusOn(ajaxplorer.filesList);

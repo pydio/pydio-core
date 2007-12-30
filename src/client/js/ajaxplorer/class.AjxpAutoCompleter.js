@@ -4,7 +4,7 @@ AjxpAutocompleter = Class.create(Autocompleter.Base, {
     this.options.asynchronous  = true;
     this.options.onComplete    = this.onComplete.bind(this);
     this.options.defaultParams = this.options.parameters || null;
-    this.url                   = ajxpServerAccessPath+"?get_action=xml_listing&mode=complete";
+    this.url                   = ajxpServerAccessPath+"?get_action=ls&mode=complete";
     this.options.paramName	   = "dir";
     this.options.minChars	   = 1;
     //this.options.callback	   = this.parseValueBeforeSending.bind(this);
