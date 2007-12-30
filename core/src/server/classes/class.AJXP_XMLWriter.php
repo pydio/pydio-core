@@ -17,25 +17,34 @@ class AJXP_XMLWriter
 		print("</tree>");
 	}
 	
-	function reloadCurrentNode()
-	{
-		print("<reload_instruction object=\"tree\"/>");
+	function write($data, $print){
+		if($print) {
+			print($data);
+			return "";		
+		}else{
+			return $data;
+		}
 	}
 	
-	function reloadNode($nodeName)
+	function reloadCurrentNode($print = true)
 	{
-		print("<reload_instruction object=\"tree\" node=\"$nodeName\"/>");
+		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\"/>", $print);
 	}
 	
-	function requireAuth()
+	function reloadNode($nodeName, $print = true)
 	{
-		print("<require_auth/>");
+		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\" node=\"$nodeName\"/>", $print);
+	}
+		
+	function requireAuth($print = true)
+	{
+		return AJXP_XMLWriter::write("<require_auth/>", $print);
 	}
 	
-	function reloadFileList($fileOrBool)
+	function reloadFileList($fileOrBool, $print = true)
 	{
-		if(is_string($fileOrBool)) print "<reload_instruction object=\"list\" file=\"".utf8_encode($fileOrBool)."\"/>";
-		else print "<reload_instruction object=\"list\"/>";
+		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".utf8_encode($fileOrBool)."\"/>", $print);
+		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	
 	function writeBookmarks($allBookmarks)
@@ -54,7 +63,7 @@ class AJXP_XMLWriter
 		}
 	}
 	
-	function sendMessage($logMessage, $errorMessage)
+	function sendMessage($logMessage, $errorMessage, $print = true)
 	{
 		$messageType = ""; 
 		$message = "";
@@ -68,7 +77,7 @@ class AJXP_XMLWriter
 			$messageType = "ERROR";
 			$message = $errorMessage;
 		}
-		print("<message type=\"$messageType\">".utf8_encode($message)."</message>");
+		return AJXP_XMLWriter::write("<message type=\"$messageType\">".utf8_encode($message)."</message>", $print);
 	}
 	
 	function sendUserData()

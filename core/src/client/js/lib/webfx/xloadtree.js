@@ -182,8 +182,10 @@ function _xmlTreeToJsTree(oNode) {
 	if (target != "")
 		jsNode.target = target;
 		
-	if (recycle != null && !(ajaxplorer && ajaxplorer.actionBar && ajaxplorer.actionBar.treeCopyActive))
+	if (recycle != null && !(ajaxplorer && ajaxplorer.actionBar && ajaxplorer.actionBar.treeCopyActive)){
 		webFXTreeHandler.recycleNode = jsNode.id;
+		jsNode.isRecycle = true;
+	}
 
 	if(src != null && src != "" && preloaded != null && preloaded == 'true')
 	{

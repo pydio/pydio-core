@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<driver name="ajxpclient">
+	<actions>
+		<action name="switch_root_dir">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_template">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_bookmarks">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="save_user_pref">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="display_doc">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="up_dir">
+			<gui text="148" title="24" src="up.png"
+				accessKey="parent_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>			
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					url = ajaxplorer.actionBar.getLocationBarValue();
+					currentParentUrl = url.substr(0, url.lastIndexOf('/'));
+					if(currentParentUrl == "") currentParentUrl = "/";
+					ajaxplorer.getFilesList().loadXmlList(currentParentUrl);
+					ajaxplorer.getFoldersTree().goToParentNode();
+					ajaxplorer.actionBar.updateLocationBar(currentParentUrl);
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="refresh">
+			<gui text="149" title="149" src="reload.png"
+				accessKey="refresh_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					ajaxplorer.getFilesList().reload();
+					ajaxplorer.getFoldersTree().reloadCurrentNode();
+					ajaxplorer.actionBar.update(true);
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="switch_display">
+			<gui text="150" title="151" src="view_icon.png"
+				accessKey="display_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="default">
+				</context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					var newDisplay = ajaxplorer.filesList.switchDisplayMode();
+					ajaxplorer.actionBar.updateDisplayButton(newDisplay);
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="bookmark">
+			<gui text="152" title="153" src="bookmark.png"
+				accessKey="bookmarks_access_key">
+				<context selection="false" dir="" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="default">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					ajaxplorer.actionBar.bookmarksBar.addBookmark(ajaxplorer.actionBar.getLocationBarValue());						
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="delete_bookmark">
+			<gui text="154" title="155" src="folder_new.png"
+				accessKey="folder_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="false" contextMenu="false" infoPanel="false">
+				</context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					// TO DO
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="rename_bookmark">
+			<gui text="154" title="155" src="folder_new.png"
+				accessKey="folder_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="false" contextMenu="false" infoPanel="false">
+				</context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[]]></clientCallback>
+				<clientForm id="rename_bookmark"><![CDATA[
+				<div id="rename_bookmark" action="get_bookmarks" box_width="280">
+				<input type="text" name="bm_title" value="" id="bm_title" class="dialogFocus">
+				<input type="hidden" name="bm_path" value="">
+				</div>				
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="login">
+			<gui text="163" title="168" src="yast_security.png"
+				accessKey="">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="user">
+				</context>
+			</gui>
+			<rightsContext noUser="false" userLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					modal.showDialogForm('Log In', 'login_form', null, function(){
+						var oForm = modal.getForm();
+						ajaxplorer.actionBar.submitForm(oForm);
+						return false;				
+					});
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="logout">
+			<gui text="164" title="169" src="cancel.png"
+				accessKey="">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="user">
+				</context>
+			</gui>
+			<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly=""></rightsContext>			
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					var connexion = new Connexion();
+					connexion.addParameter('get_action', 'logout');
+					connexion.onComplete = function(transport){
+						ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+					connexion.sendAsync();
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="admin">
+			<gui text="165" title="165" src="admin.png"
+				accessKey="settings_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="user">
+				</context>
+			</gui>
+			<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="true"></rightsContext>			
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+				modal.showDialogForm(
+					'Ajaxplorer Settings', 
+					'admin_form', 
+					null, 
+					function(){				
+						hideLightBox();return false;
+					}, 
+					null, 
+					true);		
+					]]></clientCallback>
+				<clientForm id="admin_form"><![CDATA[
+					<div id="admin_form" box_width="665">
+					<div id="adminScreen">
+					<iframe src="admin.php" id="adminIFrame" frameborder="0"></iframe>
+					</div>
+					</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+		<action name="splash">
+			<gui text="166" title="167" src="info.png"
+				accessKey="about_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="user">
+				</context>
+			</gui>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+				modal.showDialogForm(
+					'Ajaxplorer', 
+					'splash_form', 
+					null, 
+					function(){hideLightBox();return false;}, 
+					null, 
+					true);		
+					]]></clientCallback>
+				<clientForm id="splash_form"><![CDATA[
+					<div id="splash_form" box_width="455">
+						<div id="splashScreen">
+							<div align="center" style="font-size:64px;font-family:Trebuchet MS; font-weight:bold;color:#79f;">
+								<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/ajxp_logo_w_64.gif" width="64" height="64" border="0"> AjaXplorer
+							</div>
+							<iframe frameborder="0" src="AJXP_SERVER_ACCESS?get_action=display_doc&doc_file=CREDITS" id="docFileIframe"></iframe>
+						</div>
+					</div>				
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+	</actions>
+</driver>

@@ -28,10 +28,11 @@ Ajaxplorer = Class.create({
 		connexion.onComplete = function(transport){
 			$('all_forms').innerHTML += transport.responseText;
 		}
+		/*
 		connexion.addParameter('template_name', 'forms_tpl.html');
 		connexion.sendSync();
-		modal.updateLoadingProgress('Dialogs loaded');
-		$('originalUploadForm').hide();
+		*/
+		modal.updateLoadingProgress('TODO REMOVE Dialog Loaded');
 	
 		connexion.onComplete = function(transport){
 			document.body.innerHTML += transport.responseText;
@@ -52,13 +53,14 @@ Ajaxplorer = Class.create({
 			fakeUser.setActiveRepository(this._initRootDirId, 1, 1);
 			fakeUser.setRepositoriesList(this._initRootDirsList);
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
-			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList[this._initRootDirId], ajxpServerAccessPath+'?action=xml_listing', this);
+			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList[this._initRootDirId], ajxpServerAccessPath+'?action=ls', this);
 			this.refreshRootDirMenu(this._initRootDirsList, this._initRootDirId);
+			this.actionBar.loadActions();
 		}
 		else
 		{
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, null, this);
-			this.foldersTree = new FoldersTree('tree_container', 'No Repository', ajxpServerAccessPath+'?action=xml_listing', this);
+			this.foldersTree = new FoldersTree('tree_container', 'No Repository', ajxpServerAccessPath+'?action=ls', this);
 			if(this._initLoggedUser)
 			{
 				this.getLoggedUserFromServer();
@@ -142,45 +144,100 @@ Ajaxplorer = Class.create({
 			if(userId) this.user = new User(userId, childs);
 		}catch(e){alert('Error parsing XML for user : '+e);}
 		
+		var repLabel = 'No Repository';
+		var repList = null;
+		var repId = null;
 		if(this.user != null)
 		{
-			this.rootDirId = this.user.getActiveRepository();
-			var repList = this.user.getRepositoriesList();
-			this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), repList.get(this.user.getActiveRepository()));
-			this.refreshRootDirMenu(this.user.getRepositoriesList(), this.user.getActiveRepository());
-		}
-		else
-		{
-			this.refreshRootDirMenu(null, null);
-			this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), 'No Repository');
+			repId = this.user.getActiveRepository();
+			repList = this.user.getRepositoriesList();			
+			repLabel = repList.get(repId);
 		}
 		this.actionBar.setUser(this.user);
-		this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
-		this.foldersTree.reloadCurrentNode();
-		this.filesList.loadXmlList('/');
-		this.actionBar.loadBookmarks();
+		this.refreshRootDirMenu(repList, repId);
+		this.loadRepository(repId, repLabel);
 	},
 		
+	loadRepository: function(repositoryId, repositoryLabel){
+		this.foldersTree.reloadFullTree(repositoryLabel);
+		this.filesList.loadXmlList('/');
+		this.rootDirId = repositoryId;
+		this.actionBar.loadBookmarks();
+		this.actionBar.loadActions();
+	},
+
 	goTo: function(rep, selectFile){
 		this.actionBar.updateLocationBar(rep);
-		this.actionBar.update(true);
+		//this.actionBar.update(true);
 		this.foldersTree.goToDeepPath(rep);	
 		this.filesList.loadXmlList(rep, selectFile);	
 	},
 	
-	clickDir: function(url, parent_url, objectName){
-		if(this.actionBar.treeCopyActive)
-		{
-			if(this.actionBar.treeCopyActionDest) this.actionBar.treeCopyActionDest.each(function(element){element.value = url});
-			if(this.actionBar.treeCopyActionDestNode) this.actionBar.treeCopyActionDestNode.each(function(element){element.value = objectName});
+	refreshRootDirMenu: function(rootDirsList, rootDirId){
+		if($('root_dir_button')) {
+			$('root_dir_button').remove();
 		}
-		else
-		{
-			this.getFoldersTree().clickDir(url, parent_url, objectName);
-			this.getFilesList().loadXmlList(url);
-			this.getActionBar().updateLocationBar(url);
-			this.getActionBar().update(true);
-		}
+		if(!rootDirsList || rootDirsList.size() <= 1) return;
+		var actions = new Array();
+		rootDirsList.each(function(pair){
+			var value = pair.value;
+			var key = pair.key;
+			var selected = (key == parseInt(rootDirId) ? true:false);
+			actions[actions.length] = {
+				name:value,
+				alt:value,				
+				image:ajxpResourcesFolder+'/images/foldericon.png',				
+				className:"edit",
+				disabled:selected,
+				callback:function(e){
+					ajaxplorer.triggerRootDirChange(''+key);
+				}
+			}
+		}.bind(this));		
+		
+		this.rootMenu = new Proto.Menu({			
+			className: 'menu rootDirChooser',
+			mouseClick:'left',
+			anchor:'root_dir_button',
+			createAnchor:true,
+			anchorContainer:$('dir_chooser'),
+			anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
+			anchorTitle:MessageHash[200],
+			topOffset:-2,
+			menuTitle:MessageHash[200],
+			menuItems: actions,
+			fade:true,
+			zIndex:2000
+		});			
+	},
+	
+
+	triggerRootDirChange: function(rootDirId){
+		this.actionBar.updateLocationBar('/');
+		var connexion = new Connexion();
+		connexion.addParameter('get_action', 'switch_root_dir');
+		connexion.addParameter('root_dir_index', rootDirId);
+		oThis = this;
+		connexion.onComplete = function(transport){
+			if(this.usersEnabled)
+			{
+				this.getLoggedUserFromServer();
+			}
+			else
+			{
+				this.actionBar.parseXmlMessage(transport.responseXML);
+				this.loadRepository(rootDirId, this._initRootDirsList[rootDirId]);
+				/*
+				this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
+				this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);				
+				this.foldersTree.reloadCurrentNode();
+				this.filesList.loadXmlList('/');
+				this.rootDirId = rootDirId;
+				this.actionBar.loadBookmarks();
+				*/			
+			}
+		}.bind(this);
+		connexion.sendAsync();
 	},
 	
 	updateHistory: function(path){
@@ -386,72 +443,7 @@ Ajaxplorer = Class.create({
 		disableTextSelection($('dir_chooser'));
 		
 	},
-	
-	refreshRootDirMenu: function(rootDirsList, rootDirId){
-		if($('root_dir_button')) {
-			$('root_dir_button').remove();
-		}
-		if(!rootDirsList || rootDirsList.size() <= 1) return;
-		var actions = new Array();
-		rootDirsList.each(function(pair){
-			var value = pair.value;
-			var key = pair.key;
-			var selected = (key == this.rootDirId ? true:false);
-			actions[actions.length] = {
-				name:value,
-				alt:value,				
-				image:ajxpResourcesFolder+'/images/foldericon.png',				
-				className:"edit",
-				disabled:selected,
-				callback:function(e){
-					ajaxplorer.triggerRootDirChange(''+key);
-				}
-			}
-		}.bind(this));		
 		
-		this.rootMenu = new Proto.Menu({			
-			className: 'menu rootDirChooser',
-			mouseClick:'left',
-			anchor:'root_dir_button',
-			createAnchor:true,
-			anchorContainer:$('dir_chooser'),
-			anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
-			anchorTitle:MessageHash[200],
-			topOffset:-2,
-			menuTitle:MessageHash[200],
-			menuItems: actions,
-			fade:true,
-			zIndex:2000
-		});			
-	},
-	
-
-	triggerRootDirChange: function(rootDirId){
-		this.actionBar.updateLocationBar('/');
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'switch_root_dir');
-		connexion.addParameter('root_dir_index', rootDirId);
-		oThis = this;
-		connexion.onComplete = function(transport){
-			if(this.usersEnabled)
-			{
-				this.getLoggedUserFromServer();
-			}
-			else
-			{
-				this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
-				this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);
-				this.actionBar.parseXmlMessage(transport.responseXML);
-				this.foldersTree.reloadCurrentNode();
-				this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);
-				this.filesList.loadXmlList('/');
-				this.rootDirId = rootDirId;
-				this.actionBar.loadBookmarks();			
-			}
-		}.bind(this);
-		connexion.sendAsync();
-	},
-	
 	toggleSidePanel: function(srcName){	
 		if(srcName == 'info' && this.currentSideToggle != 'info'){
 			$(this.sEngine.htmlElement).hide();

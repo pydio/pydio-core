@@ -11,10 +11,14 @@ class UserSelection
 		$this->files = array();
 	}
 	
-	function initFromHttpVars()
+	function initFromHttpVars($passedArray=null)
 	{
-		$this->initFromArray($_GET);
-		$this->initFromArray($_POST);
+		if($passedArray != null){
+			$this->initFromArray($passedArray);
+		}else{
+			$this->initFromArray($_GET);
+			$this->initFromArray($_POST);
+		}
 	}
 	
 	function initFromArray($array)

@@ -3,7 +3,7 @@ FoldersTree = Class.create({
 	initialize: function (oElement, rootFolderName, rootFolderSrc, oAjaxplorer)
 	{
 		this._htmlElement = $(oElement);
-		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, "javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 'explorer');
+		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, "javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 'explorer');
 		this._htmlElement.innerHTML = this.tree.toString();	
 		AjxpDroppables.add(this.tree.id);
 		if(!this.tree.open && !this.tree.loading) this.tree.toggle();		
@@ -48,20 +48,14 @@ FoldersTree = Class.create({
 		webFXTreeHandler.contextMenu = protoMenu;
 	},
 	
-	clickDir: function(url, parent_url, objectName)	{
-		currentParentUrl = parent_url;	
-		if(objectName != null)
-		{
-			this.setCurrentNodeName(objectName);
+	clickNode: function(nodeId){		
+		var path = webFXTreeHandler.all[nodeId].url;
+		if(path){
+			this.setCurrentNodeName(nodeId);
+			ajaxplorer.actionBar.fireDefaultAction("dir", path);
 		}
-		else
-		{
-			this.openCurrentAndGoToNext(url);
-			//alert(res);
-		}
-		if(WebFXtimer) clearTimeout(WebFXtimer);
 	},
-	
+		
 	setCurrentNodeName: function(newId){
 		this.currentNodeName = newId;
 		//alert(newId);
@@ -119,10 +113,6 @@ FoldersTree = Class.create({
 			}
 			
 		}
-		else
-		{
-			//alert('not loaded!');
-		}		
 	},	
 	
 	asyncExpandAndSelect: function(){
@@ -154,13 +144,19 @@ FoldersTree = Class.create({
 	
 	goToParentNode: function(){
 		if(this.currentNodeName == null || this.currentNodeName == this.getRootNodeId()) return;
-		this.setCurrentNodeName(webFXTreeHandler.all[this.currentNodeName].parentNode.id);
-		//this._ajaxplorergetActionBar().update(true);
+		this.setCurrentNodeName(webFXTreeHandler.all[this.currentNodeName].parentNode.id);		
 	},
 	
 	reloadCurrentNode: function(){
 		this.reloadNode(this.currentNodeName);
 		return;
+	},
+	
+	reloadFullTree: function(repositoryLabel){
+		webFXTreeHandler.recycleNode = null;
+		this.setCurrentToRoot();
+		this.changeRootLabel(repositoryLabel);
+		this.reloadCurrentNode();
 	},
 	
 	reloadNode: function(nodeName){
@@ -188,7 +184,7 @@ FoldersTree = Class.create({
 		}
 		if(webFXTreeHandler.recycleNode){
 			rec = webFXTreeHandler.all[webFXTreeHandler.recycleNode];
-			if(childName == rec.filename)
+			if(getBaseName(childName) == getBaseName(rec.filename))
 			{
 				return webFXTreeHandler.recycleNode;
 			}
@@ -206,42 +202,48 @@ FoldersTree = Class.create({
 			}
 		}	
 	},
-	
+		
 	goToDeepPath: function(url){
-		//alert(url);
+		var currentPath = "/";
+		if(this.currentNodeName && webFXTreeHandler.all[this.currentNodeName] && webFXTreeHandler.all[this.currentNodeName].url){
+			currentPath = webFXTreeHandler.all[this.currentNodeName].url;		
+		}
+		var currentSplit = currentPath.split("/");
+		currentSplit.shift();
+		var isChild = false;
+		var path = this.cleanPathToArray(url);
+				
+		if(currentPath!= "/" && url.substring(0, currentPath.length) == currentPath){
+			isChild = true;			
+			for(var i=0;i<currentSplit.length; i++){				
+				path.shift();				
+			}
+		}
+
+		this.currentDeepPath = path;
+		this.currentDeepIndex = 0;
+		if(!isChild){
+			this.setCurrentNodeName(this.getRootNodeId());
+		}				
+		if(this.currentDeepPath.length > 0){
+			this.openCurrentAndGoToNext(this.currentDeepPath[0]);
+		}
+		return false;	
+	},
+	
+	cleanPathToArray: function(url){
 		var splitPath = url.split("/");
 		var path = new Array();
 		var j = 0;
-		var openUrl, parentUrl;
-		openUrl = parentUrl = '';
 		for(i=0; i<splitPath.length; i++)
 		{
 			if(splitPath[i] != '') 
 			{
 				path[j] = splitPath[i];
 				j++;
-				openUrl = openUrl + '/' + splitPath[i];
-				if (i < splitPath.length - 1)
-				{
-					parentUrl = parentUrl + '/' + splitPath[i];
-				}
 			}
 		}
-		this.currentDeepPath = path;
-		this.currentDeepIndex = 0;
-		this.setCurrentNodeName(this.getRootNodeId());
-		
-		
-		currentParentUrl = parentUrl;	
-		if(this.currentDeepPath.length == 0)
-		{
-			this.setCurrentNodeName(this.getRootNodeId());		
-		}
-		else
-		{
-			this.openCurrentAndGoToNext(this.currentDeepPath[0]);
-		}
-		return false;	
+		return path;		
 	},
 	
 	getRootNodeId: function(){
@@ -260,6 +262,14 @@ FoldersTree = Class.create({
 		}
 		
 		return false;
+	},
+	
+	setCurrentToRoot: function(){
+		this.setCurrentNodeName(this.getRootNodeId());
+	},
+	
+	changeRootLabel: function(newLabel){
+		this.changeNodeLabel(this.getRootNodeId(), newLabel);	
 	},
 	
 	changeNodeLabel: function(nodeId, newLabel){	
