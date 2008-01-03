@@ -21,14 +21,14 @@
 						ajaxplorer.getFoldersTree().goToDeepPath(path);
 						ajaxplorer.filesList.loadXmlList(path);
 						ajaxplorer.getActionBar().updateLocationBar(path);
-						ajaxplorer.getActionBar().fireContextChange(true);				
+						ajaxplorer.getActionBar().fireContextChange();
 					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
 		<action name="upload">
-			<gui text="27" title="27" src="yast_backup.png" accessKey="upload_access_key">
+			<gui text="27" title="27" src="yast_backup.png" accessKey="upload_access_key" hasAccessKey="true">
 				<context selection="false" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put">
@@ -93,7 +93,7 @@
 				</processing>
 		</action>
 		<action name="empty_recycle">
-			<gui text="220" title="221" src="trashcan_empty.png" accessKey="empty_recycle_access_key">
+			<gui text="220" title="221" src="trashcan_empty.png" accessKey="empty_recycle_access_key" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="only" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default"></context>
 			</gui>
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""></rightsContext>
@@ -106,7 +106,7 @@
 				</processing>
 		</action>
 		<action name="mkdir">			
-			<gui text="154" title="155" src="folder_new.png" accessKey="folder_access_key">
+			<gui text="154" title="155" src="folder_new.png" accessKey="folder_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put"></context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -135,7 +135,7 @@
 				</processing>
 		</action>
 		<action name="mkfile">
-			<gui text="156" title="157" src="filenew.png" accessKey="file_access_key">
+			<gui text="156" title="157" src="filenew.png" accessKey="file_access_key" hasAccessKey="true">
 				<context selection="false" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put">
@@ -165,7 +165,7 @@ AJXP_MESSAGE[174]<br/>
 				</processing>
 		</action>
 		<action name="restore">
-			<gui text="222" title="223" src="folder1_important.png" accessKey="restore_access_key">
+			<gui text="222" title="223" src="folder1_important.png" accessKey="restore_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="only"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -191,7 +191,7 @@ AJXP_MESSAGE[174]<br/>
 				</processing>
 		</action>
 		<action name="rename">
-			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key">
+			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -218,7 +218,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</processing>
 		</action>
 		<action name="copy" dragndropDefault="">
-			<gui text="66" title="159" src="editcopy.png" accessKey="copy_access_key">
+			<gui text="66" title="159" src="editcopy.png" accessKey="copy_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -282,7 +282,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</processing>
 		</action>
 		<action name="move">
-			<gui text="70" title="160" src="editpaste.png" accessKey="edit_access_key">
+			<gui text="70" title="160" src="editpaste.png" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -335,7 +335,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</processing>
 		</action>
 		<action name="delete">			
-			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key">
+			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -367,7 +367,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</processing>
 		</action>
 		<action name="download" fileDefault="true">
-			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key">
+			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get">
@@ -413,7 +413,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</processing>
 		</action>
 		<action name="edit">
-			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key">
+			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get">
@@ -450,7 +450,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</processing>
 		</action>
 		<action name="view">
-			<gui text="129" title="136" src="frame_image.png" accessKey="view_access_key">
+			<gui text="129" title="136" src="frame_image.png" accessKey="view_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get">
