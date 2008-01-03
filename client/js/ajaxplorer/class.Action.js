@@ -6,10 +6,11 @@ Action = Class.create({
 			src:'',
 			text:'',
 			title:'',
-			hasAccessKey:true,
+			hasAccessKey:false,
 			accessKey:'',
 			callbackCode:'',
 			callback:Prototype.emptyFunction,
+			displayAction:false,
 			prepareModal:false, 
 			formId:undefined, 
 			formCode:undefined
@@ -58,10 +59,11 @@ Action = Class.create({
 	},
 	
 	fireContextChange: function(){
-		if(arguments.length < 3) return;
+		if(arguments.length < 4) return;
 		var usersEnabled = arguments[0]
 		var crtUser = arguments[1];
 		var crtIsRecycle = arguments[2];
+		var crtDisplayMode = arguments[3];
 		var rightsContext = this.rightsContext;
 		if(!rightsContext.noUser && !usersEnabled){
 			return this.hideForContext();				
@@ -88,7 +90,10 @@ Action = Class.create({
 			if(this.context.recycle == 'hidden' && crtIsRecycle){
 				return this.hideForContext();
 			}
-		}			
+		}
+		if(this.options.displayAction && this.options.displayAction == crtDisplayMode){
+			return this.hideForContext();
+		}
 		this.showForContext();				
 		
 	},
@@ -153,15 +158,21 @@ Action = Class.create({
 					}else if(processNode.tagName == "clientCallback"){
 						this.options.callbackCode = '<script>'+processNode.firstChild.nodeValue+'</script>';
 						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
-							this.options.prepareModal = true;
-						} 
+							this.options.prepareModal = true;						
+						}
+						if(processNode.getAttribute('displayModeButton') && processNode.getAttribute('displayModeButton') != ''){
+							this.options.displayAction = processNode.getAttribute('displayModeButton');
+						}						
 					}
 				}
 			}else if(node.tagName == "gui"){
 				this.options.text = MessageHash[node.getAttribute('text')];
 				this.options.title = MessageHash[node.getAttribute('title')];
-				this.options.src = node.getAttribute('src');
-				this.options.accessKey = node.getAttribute('accessKey');
+				this.options.src = node.getAttribute('src');				
+				if(node.getAttribute('hasAccessKey') && node.getAttribute('hasAccessKey') == "true"){
+					this.options.accessKey = node.getAttribute('accessKey');
+					this.options.hasAccessKey = true;
+				}
 				for(var j=0; j<node.childNodes.length;j++){
 					if(node.childNodes[j].tagName == "context"){
 						this.attributesToObject(this.context, node.childNodes[j]);
@@ -174,6 +185,15 @@ Action = Class.create({
 			}else if(node.tagName == "rightsContext"){
 				this.attributesToObject(this.rightsContext, node);
 			}			
+		}
+		if(!this.options.hasAccessKey) return;
+		if(this.options.accessKey == '' 
+			|| !MessageHash[this.options.accessKey] 
+			|| this.options.text.indexOf(MessageHash[this.options.accessKey]) == -1)
+		{
+			this.options.accessKey == this.options.text.charAt(0);
+		}else{
+			this.options.accessKey = MessageHash[this.options.accessKey];
 		}
 	}, 
 	
@@ -196,7 +216,7 @@ Action = Class.create({
 			title:this.options.title
 		});
 		var titleSpan = new Element('span');
-		button.insert(img).insert(new Element('br')).insert(titleSpan.update(this.options.text));		
+		button.insert(img).insert(new Element('br')).insert(titleSpan.update(this.getKeyedText()));
 		this.elements.push(button);
 		return button;
 	},
@@ -255,6 +275,16 @@ Action = Class.create({
 		if(this.options.formId && $('all_forms').select('[id="'+this.options.formId+'"]').length){
 			$('all_forms').select('[id="'+this.options.formId+'"]')[0].remove();
 		}
+	},
+	
+	getKeyedText: function(){
+		var displayString = this.options.text;
+		if(!this.options.hasAccessKey) return displayString;
+		var accessKey = this.options.accessKey;
+		returnString = displayString.substring(0,displayString.indexOf(accessKey));
+		returnString += '<u>'+accessKey+'</u>';
+		returnString += displayString.substring(displayString.indexOf(accessKey)+1, displayString.length);
+		return returnString;
 	},
 	
 	insertForm: function(){

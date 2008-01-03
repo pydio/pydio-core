@@ -118,11 +118,6 @@ ActionsManager = Class.create({
 				this.hasFocus = false;
 			}
 		}.bind(this);
-		if(!this.usersEnabled){
-			// $('login_button').hide();
-			// $('logging_string').hide();
-			// $('admin_button').hide();
-		}
 	},
 	
 	setContextualMenu: function(contextualMenu)
@@ -209,41 +204,7 @@ ActionsManager = Class.create({
 		modal.prepareHeader(MessageHash[195], '');
 		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
 	},
-	
-	actionIsAllowed: function(buttonAction)
-	{
-		var button = this._items[this._actions.get(buttonAction)];
-		if(!button) return true;
-		var attSelection = ((button.getAttribute('selection') && button.getAttribute('selection') == 'true')?true:false);
-		var attUnique = ((button.getAttribute('unique') && button.getAttribute('unique') == 'true')?true:false);
-		var attFile = ((button.getAttribute('file') && button.getAttribute('file') == 'true')?true:false);
-		var attDir = ((button.getAttribute('folder') && button.getAttribute('folder') == 'true')?true:false);
-		var attEditable = ((button.getAttribute('editable') && button.getAttribute('editable') == 'true')?true:false);
-		var writeAccess = ((button.getAttribute('write_access') && button.getAttribute('write_access') == 'true')?true:false);
-		var attRecycle = (button.getAttribute('recycle_bin')?button.getAttribute('recycle_bin'):'');
 		
-		if(ajaxplorer && ajaxplorer.foldersTree && ajaxplorer.foldersTree.recycleEnabled())
-		{
-			if(ajaxplorer.foldersTree.currentIsRecycle() && (attRecycle=='hidden' || attRecycle =='disabled')) return false;
-			else if(!ajaxplorer.foldersTree.currentIsRecycle() && attRecycle == 'only') return false;
-		}
-		else
-		{
-			if(attRecycle == 'only') return false;
-		}
-		
-		var userSelection = this._ajaxplorer.getFilesList().getUserSelection();
-		
-		if(writeAccess && this.oUser != null && !this.oUser.canWrite()) return false;	
-		if(attSelection && userSelection.isEmpty()) return false;
-		if((attFile || attDir) && !userSelection.hasFile() && !userSelection.hasDir()) return false;
-		if(attFile && !attDir && !userSelection.hasFile())return false;
-		if(attDir && !attFile && !userSelection.hasDir())return false;
-		if(attEditable && !(userSelection.isEditable()||userSelection.isImage()))return false;	
-		
-		return true;
-	},
-	
 	getContextActions: function(srcElement)
 	{		
 		var actionsSelectorAtt = 'selectionContext';
@@ -304,8 +265,7 @@ ActionsManager = Class.create({
 		}
 	},
 	
-	fireAction: function (buttonAction)	{
-		if(!this.actionIsAllowed(buttonAction)) return;		
+	fireAction: function (buttonAction)	{		
 		var action = this.actions.get(buttonAction);
 		if(action != null) {
 			var args = $A(arguments);
@@ -315,9 +275,16 @@ ActionsManager = Class.create({
 		}
 	},
 	
+	registerKey: function(key, actionName){		
+		this._registeredKeys.set(key.toLowerCase(), actionName);
+	},
+	
+	clearRegisteredKeys: function(){
+		this._registeredKeys = new Hash();
+	},
+	
 	fireActionByKey: function(keyName)
 	{	
-		//alert(ajaxplorer.blockShortcuts);
 		if(this._registeredKeys.get(keyName) && !ajaxplorer.blockShortcuts)
 		{
 			 this.fireAction(this._registeredKeys.get(keyName));
@@ -459,26 +426,7 @@ ActionsManager = Class.create({
 			}
 		}
 	},
-	
-	switchLoginButton: function(action)
-	{
-	return;
-		if(action == "loggedin")
-		{
-			$('login_logout_image').src = ajxpResourcesFolder+'/images/crystal/actions/22/cancel.png';
-			$('login_button').setAttribute('action', 'logout');
-			$('login_button').setAttribute('title', MessageHash[169]);
-			$('login_logout_span').innerHTML = MessageHash[164];	
-		}
-		else
-		{
-			$('login_logout_image').src = ajxpResourcesFolder+'/images/crystal/actions/22/yast_security.png';
-			$('login_button').setAttribute('action', 'login');
-			$('login_button').setAttribute('title', MessageHash[168]);
-			$('login_logout_span').innerHTML = MessageHash[163];
-		}
-	},
-	
+		
 	removeBookmark: function (path)
 	{
 		this.bookmarksBar.removeBookmark(path);
@@ -504,10 +452,13 @@ ActionsManager = Class.create({
 		if(ajaxplorer && ajaxplorer.foldersTree){ 
 			crtRecycle = ajaxplorer.foldersTree.currentIsRecycle();
 		}	
+		var displayMode = '';
+		if(ajaxplorer && ajaxplorer.filesList) displayMode = ajaxplorer.filesList.getDisplayMode();
 		this.actions.each(function(pair){			
 			pair.value.fireContextChange(this.usersEnabled, 
 									 this.oUser, 
-									 crtRecycle);
+									 crtRecycle, 
+									 displayMode);
 		}.bind(this));
 		this.refreshToolbarsSeparator();
 	},
@@ -571,10 +522,11 @@ ActionsManager = Class.create({
 		});
 		this.actions = new Hash();
 		this.emptyToolbars();
+		this.clearRegisteredKeys();
 	},
 	
 	loadActions: function(type){
-		this.removeActions();
+		this.removeActions();		
 		var connexion = new Connexion();
 		connexion.onComplete = function(transport){
 			this.parseActions(transport.responseXML);
@@ -611,6 +563,9 @@ ActionsManager = Class.create({
 					this.toolbars.set(newAction.context.actionBarGroup, new Array());
 				}
 				this.toolbars.get(newAction.context.actionBarGroup).push(newAction.options.name);
+			}
+			if(newAction.options.hasAccessKey){
+				this.registerKey(newAction.options.accessKey, newAction.options.name);
 			} 
 		}
 	},
