@@ -105,6 +105,10 @@ FilesList = Class.create(SelectableElements, {
 		return this._displayMode;
 	},
 	
+	getDisplayMode: function(){
+		return this._displayMode;
+	},
+	
 	getHeadersWidth: function(){	
 		if(this._displayMode == 'thumb') return;
 		var tds = $('selectable_div_header').getElementsBySelector('td');
@@ -291,6 +295,7 @@ FilesList = Class.create(SelectableElements, {
 			this._ajaxplorer.actionBar.blur();
 			this._ajaxplorer.foldersTree.focus();
 		}
+		ajaxplorer.getActionBar().fireContextChange();
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
 	
