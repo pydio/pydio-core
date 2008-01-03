@@ -51,6 +51,13 @@ FoldersTree = Class.create({
 	clickNode: function(nodeId){		
 		var path = webFXTreeHandler.all[nodeId].url;
 		if(path){
+			if(ajaxplorer.actionBar.treeCopyActive){
+	  			if(ajaxplorer.actionBar.treeCopyActionDest) 
+	  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = path});
+ 				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
+ 					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = nodeId});
+ 				return;
+ 			}
 			this.setCurrentNodeName(nodeId);
 			ajaxplorer.actionBar.fireDefaultAction("dir", path);
 		}
