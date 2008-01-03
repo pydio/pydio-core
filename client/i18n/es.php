@@ -184,7 +184,8 @@ $mess=array(
 "170" => "Carpeta Actual",
 "parent_access_key" => "u",
 "refresh_access_key" => "z",
-"display_access_key" => "i",
+"list_access_key" => "L",
+"thumbs_access_key" => "i",
 "bookmarks_access_key" => "F",
 "upload_access_key" => "E",
 "folder_access_key" => "D",
@@ -255,6 +256,10 @@ $mess=array(
 "222" => "Restaurar", 
 "223" => "Restaurar archivo a su ubicación original", 
 "224" => "Ir a", 
-"225" => "Renombrar favorito"
+"225" => "Renombrar favorito", 
+"226" => "Lista",
+"227" => "Detalles Lista",
+"228" => "Miniat.",
+"229" => "Miniaturas"
 );
 ?>
