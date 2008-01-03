@@ -227,14 +227,6 @@ Ajaxplorer = Class.create({
 			{
 				this.actionBar.parseXmlMessage(transport.responseXML);
 				this.loadRepository(rootDirId, this._initRootDirsList[rootDirId]);
-				/*
-				this.foldersTree.setCurrentNodeName(this.foldersTree.getRootNodeId());
-				this.foldersTree.changeNodeLabel(this.foldersTree.getRootNodeId(), this._initRootDirsList[rootDirId]);				
-				this.foldersTree.reloadCurrentNode();
-				this.filesList.loadXmlList('/');
-				this.rootDirId = rootDirId;
-				this.actionBar.loadBookmarks();
-				*/			
 			}
 		}.bind(this);
 		connexion.sendAsync();
