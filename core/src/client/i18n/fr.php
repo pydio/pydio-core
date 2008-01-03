@@ -183,8 +183,9 @@ $mess=array(
 "170" => "Répertoire Courant :",
 "parent_access_key" => "P",
 "refresh_access_key" => "h",
-"display_access_key" => "A",
-"bookmarks_access_key" => "v",
+"thumbs_access_key" => "V",
+"list_access_key" => "L",
+"bookmarks_access_key" => "a",
 "upload_access_key" => "T",
 "folder_access_key" => "R",
 "file_access_key" => "F",
@@ -254,6 +255,10 @@ $mess=array(
 "222" => "Restaurer", 
 "223" => "Restaurer le fichier à son emplacement d'origine", 
 "224" => "Aller à", 
-"225" => "Renommer le favori"
+"225" => "Renommer le favori", 
+"226" => "Liste",
+"227" => "Passer en vue Liste Détaillée",
+"228" => "Vignettes",
+"229" => "Passer en vue Vignettes"
 );
 ?>
