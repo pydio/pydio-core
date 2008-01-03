@@ -27,7 +27,7 @@
 			</processing>
 		</action>
 		<action name="up_dir">
-			<gui text="148" title="24" src="up.png"
+			<gui text="148" title="24" src="up.png" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default">
@@ -47,7 +47,7 @@
 			</processing>
 		</action>		
 		<action name="refresh">
-			<gui text="149" title="149" src="reload.png"
+			<gui text="149" title="149" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false">
@@ -57,30 +57,43 @@
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					ajaxplorer.getFilesList().reload();
-					ajaxplorer.getFoldersTree().reloadCurrentNode();
-					ajaxplorer.actionBar.update(true);
+					ajaxplorer.getFoldersTree().reloadCurrentNode();					
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>		
-		<action name="switch_display">
-			<gui text="150" title="151" src="view_icon.png"
-				accessKey="display_access_key">
+		<action name="thumb_display">
+			<gui text="228" title="229" src="view_icon.png" hasAccessKey="true"
+				accessKey="thumbs_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="default">
+				</context>				
+			</gui>
+			<processing>
+				<clientCallback prepareModal="false" displayModeButton="thumb"><![CDATA[
+					ajaxplorer.filesList.switchDisplayMode('thumb');
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="list_display">
+			<gui text="226" title="227" src="view_text.png" hasAccessKey="true"
+				accessKey="list_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="default">
 				</context>
 			</gui>
 			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					var newDisplay = ajaxplorer.filesList.switchDisplayMode();
-					ajaxplorer.actionBar.updateDisplayButton(newDisplay);
+				<clientCallback prepareModal="false" displayModeButton="list"><![CDATA[
+					ajaxplorer.filesList.switchDisplayMode('list');
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
 		<action name="bookmark">
-			<gui text="152" title="153" src="bookmark.png"
+			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
 				<context selection="false" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
@@ -129,7 +142,7 @@
 		</action>		
 		<action name="login">
 			<gui text="163" title="168" src="yast_security.png"
-				accessKey="">
+				accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="user">
@@ -149,7 +162,7 @@
 		</action>		
 		<action name="logout">
 			<gui text="164" title="169" src="cancel.png"
-				accessKey="">
+				accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="user">
@@ -169,7 +182,7 @@
 			</processing>
 		</action>		
 		<action name="admin">
-			<gui text="165" title="165" src="admin.png"
+			<gui text="165" title="165" src="admin.png" hasAccessKey="true"
 				accessKey="settings_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
@@ -178,7 +191,7 @@
 			</gui>
 			<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="true"></rightsContext>			
 			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
+				<clientCallback prepareModal="true"><![CDATA[
 				modal.showDialogForm(
 					'Ajaxplorer Settings', 
 					'admin_form', 
@@ -200,7 +213,7 @@
 			</processing>
 		</action>		
 		<action name="splash">
-			<gui text="166" title="167" src="info.png"
+			<gui text="166" title="167" src="info.png" hasAccessKey="true"
 				accessKey="about_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
