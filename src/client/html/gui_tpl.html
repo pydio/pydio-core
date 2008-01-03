@@ -1,0 +1,64 @@
+<div title="<?php print($mess[98]); ?>"  id="message_div" onclick="ajaxplorer.closeMessageDiv();" class="messageBox" title="<?php print($mess[98]); ?>"><div id="message_content"></div></div>
+<div id="toolbars">
+<div id="action_bar">
+	<div id="buttons_bar">
+	</div>
+	<div id="locationbar_cont">
+		<div class="locationbar_title">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php print($mess[170]);?>&nbsp;</div><div id="location_form"><form style="display:inline;background-color:#ffffff;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/mimes/16/folder.png" width="16" height="16" align="absmiddle"><input type="text" name="current_path" value="/" id="current_path"><input  align="absmiddle" title="<?php print($mess[104]); ?>" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/forward.png" id="goto_button" height="16" width="16"></form></div><div id="logging_string"></div>
+	</div>
+</div>
+
+<!--<div class="toolbars_separator"></div>-->
+<div id="hidden_frames" style="display:none;"></div>
+<!--<div id="hidden_forms" style="display:none;"></div>-->
+<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
+</div>
+<div id="bm_bar_cont">
+	<div id="bookmarks_bar"><div id="bmbar_title"><?php print($mess[145]); ?>&nbsp;&nbsp;<span id="bmbar_extension"></span></div><div style="display:inline;" id="bmbar_content"></div></div>
+</div>
+<div id="browser_round"><div id="browser">
+<div id="verticalSplitter" style="background-color: #aaa;">
+	<div id="sidebarSplitter" style="float:left; overflow:hidden;">
+		<div style="" id="topPane"  style="overflow: hidden; border: 1px solid black;">
+		    <div id="dir_chooser" class="panelHeader"><?php print $mess[130] ?> </div>
+	    	<div id="tree_container" style="overflow:auto;height:100%;">
+	    	
+	    	</div>
+		</div>
+		
+    	<div id="search_div" style="background-color: #fff;">
+    		<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
+    		<tr>
+		    	<td id="info_panel_header" onclick="ajaxplorer.toggleSidePanel('info'); return false;" class="toggleHeader">
+		    		<img width="20" height="20" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/effect.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[131] ?></a>
+		    	</td>
+		    	<td id="search_header" onclick="ajaxplorer.toggleSidePanel('search'); return false;" class="toggleHeader">
+		    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/search.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;"><?php print $mess[87] ?></a>
+		    	</td>
+		    </tr>
+	    	</table>
+	    	<div id="search_container">
+		    	<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" title="<?php print $mess[184] ?>"><img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" title="<?php print $mess[185] ?>"><img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>
+	    	</div>
+	    	<div id="info_panel"></div>
+    	</div>     	
+    </div>
+	<div id="content_pane" style="background-color: #fff;">
+	<TABLE width="100%" cellspacing="0"  id="selectable_div" class="sort-table">
+		<col\><col\><col\><col\>
+		<thead>	
+		<tr>
+			<td><?php print($mess[1]); ?></td>
+			<td><?php print($mess[2]); ?></td>
+			<td><?php print($mess[3]); ?></td>
+			<td id="last_header"><?php print($mess[4]); ?></td>
+		</tr>
+		</thead>
+	
+		<tbody>
+		</tbody>
+	</table>
+	</div>	
+</div>
+</div></div>
+<div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
