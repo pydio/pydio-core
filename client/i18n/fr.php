@@ -259,6 +259,10 @@ $mess=array(
 "226" => "Liste",
 "227" => "Passer en vue Liste Détaillée",
 "228" => "Vignettes",
-"229" => "Passer en vue Vignettes"
+"229" => "Passer en vue Vignettes",
+"230" => "Play",
+"231" => "Play Slideshow", 
+"232" => "Stop", 
+"233" => "Stop Slideshow"
 );
 ?>

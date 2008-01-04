@@ -7,12 +7,16 @@ Diaporama = Class.create({
 		this.previousButton = div.select('a[id="prevButton"]')[0];
 		this.closeButton = div.select('a[id="closeButton"]')[0];
 		this.downloadButton = div.select('a[id="downloadDiapoButton"]')[0];
+		this.playButton = div.select('a[id="playButton"]')[0];
+		this.stopButton = div.select('a[id="stopButton"]')[0];
+
 		this.actualSizeButton = div.select('img[id="actualSizeButton"]')[0];
 		this.fitToScreenButton = div.select('img[id="fitToScreenButton"]')[0];
 		this.imgTag = div.select('img[id="mainImage"]')[0];
 		this.imgContainer = div.select('div[id="imageContainer"]')[0];
 		fitHeightToBottom(this.imgContainer, null, 5);
 		this.zoomInput = div.select('input[id="zoomValue"]')[0];
+		this.timeInput = div.select('input[id="time"]')[0];
 		this.baseUrl = 'content.php?action=image_proxy&file=';
 		this.nextButton.onclick = function(){
 			this.next();
@@ -40,6 +44,16 @@ Diaporama = Class.create({
 		this.fitToScreenButton.onclick = function(){
 			this.fitToScreen();
 		}.bind(this);
+		this.playButton.onclick = function(){
+			this.play();
+			this.updateButtons();
+			return false;
+		}.bind(this);
+		this.stopButton.onclick = function(){
+			this.stop();
+			this.updateButtons();
+			return false;
+		}.bind(this);
 		
 		this.imgTag.onload = function(){
 			this.resizeImage();
@@ -60,6 +74,12 @@ Diaporama = Class.create({
 				Event.stop(e);
 			}
 			return true;
+		}.bind(this));
+		this.timeInput.observe('change', function(e){
+			if(this.slideShowPlaying && this.pe){
+				this.stop();
+				this.play();
+			}
 		}.bind(this));
 		this.containerDim = $(this.imgContainer).getDimensions();
 	},
@@ -144,12 +164,28 @@ Diaporama = Class.create({
 		this.currentFile = null;
 		this.items = null;
 		this.imgTag.src = '';
+		if(this.pe) this.pe.stop();
+	},
+	
+	play: function(){
+		if(!this.timeInput.value) this.timeInput.value = 3;
+		this.pe = new PeriodicalExecuter(this.next.bind(this), parseInt(this.timeInput.value));
+		this.slideShowPlaying = true;
+	},
+	
+	stop: function(){
+		if(this.pe) this.pe.stop();
+		this.slideShowPlaying = false;
 	},
 	
 	next : function(){
 		if(this.currentFile != this.items.last())
 		{
 			this.currentFile = this.items[this.items.indexOf(this.currentFile)+1];
+			this.updateImage();
+		}
+		else if(this.slideShowPlaying){
+			this.currentFile = this.items[0];
 			this.updateImage();
 		}
 	},
@@ -163,9 +199,18 @@ Diaporama = Class.create({
 	},
 	
 	updateButtons : function(){
-		if(this.currentFile == this.items.first()) this.previousButton.addClassName("disabled");
-		else this.previousButton.removeClassName("disabled");
-		if(this.currentFile == this.items.last()) this.nextButton.addClassName("disabled");
-		else this.nextButton.removeClassName("disabled");
+		if(this.slideShowPlaying){
+			this.previousButton.addClassName("disabled");
+			this.nextButton.addClassName("disabled");
+			this.playButton.addClassName("disabled");
+			this.stopButton.removeClassName("disabled");
+		}else{
+			if(this.currentFile == this.items.first()) this.previousButton.addClassName("disabled");
+			else this.previousButton.removeClassName("disabled");
+			if(this.currentFile == this.items.last()) this.nextButton.addClassName("disabled");
+			else this.nextButton.removeClassName("disabled");
+			this.playButton.removeClassName("disabled");
+			this.stopButton.addClassName("disabled");
+		}
 	}
 });

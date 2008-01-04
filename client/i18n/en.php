@@ -258,6 +258,10 @@ $mess=array(
 "226" => "List",
 "227" => "Switch to details list view",
 "228" => "Thumbs",
-"229" => "Switch to thumbnails view"
+"229" => "Switch to thumbnails view", 
+"230" => "Play",
+"231" => "Play Slideshow", 
+"232" => "Stop", 
+"233" => "Stop Slideshow"
 );
 ?>
