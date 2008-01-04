@@ -52,7 +52,7 @@ class HTMLWriter
     function writeI18nMessagesClass($mess)
     {
     	echo "<script language=\"javascript\">\n";
-    	echo "var MessageHash = new Hash();\n";
+    	echo "if(!MessageHash) var MessageHash = new Hash();\n";
     	foreach ($mess as $index => $message)
     	{
     		if(is_numeric($index))
@@ -65,6 +65,7 @@ class HTMLWriter
     		}
     			
     	}
+    	echo "MessageHash;";
     	echo "</script>\n";
     }
     
