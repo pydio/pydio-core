@@ -276,13 +276,16 @@ AJXP_MESSAGE[174]<br/>
 						<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[86]</a>
 						<a href="#" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/back_22.png" alt="" border="0"><br>AJXP_MESSAGE[178]</a>
 						<a href="#" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/forward_22.png" alt="" border="0"><br>AJXP_MESSAGE[179]</a>
+						<a href="#" id="stopButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/player_stop.png" alt="AJXP_MESSAGE[233]" border="0"><br>AJXP_MESSAGE[232]</a>
+						<a href="#" id="playButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/player_play.png" alt="AJXP_MESSAGE[231]" border="0"><br>AJXP_MESSAGE[230]</a>
 						<a href="#" id="downloadDiapoButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="" border="0"><br>AJXP_MESSAGE[88]</a>
 					</div>
 					<div align="right" style="background-image: url(AJXP_CLIENT_RESOURCES_FOLDER/images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
 					<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
 					<td><img class="diaporamaButton" width="16" height="16" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
 					<td><div class="slider" id="slider-2"><input class="slider-input" id="slider-input-2" name="slider-input-2"/></div></td>
-					<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td></tr></table>
+					<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td>
+					<td style="padding-left: 10px;"><input id="time" type="text" value="3" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> s</td></tr></table>
 					</div>
 					<div style="width:100%; text-align:center; vertical-align:center;overflow:auto; background-color:#333; border:1px solid black;" id="imageContainer">
 					<img id="mainImage" src="" style="border: 4px solid white;">
