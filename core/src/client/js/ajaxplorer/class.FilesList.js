@@ -38,7 +38,7 @@ FilesList = Class.create(SelectableElements, {
 			var buffer = '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
 			buffer = buffer + '<col\><col\><col\><col\>';
 			buffer = buffer + '<thead><tr>';
-			buffer = buffer + '<td>'+MessageHash[1]+'</td><td>'+MessageHash[2]+'</td><td>'+MessageHash[3]+'</td><td>'+MessageHash[4]+'</td>';
+			buffer = buffer + '<td ajxp_message_id="1">'+MessageHash[1]+'</td><td ajxp_message_id="2">'+MessageHash[2]+'</td><td ajxp_message_id="3">'+MessageHash[3]+'</td><td ajxp_message_id="4">'+MessageHash[4]+'</td>';
 			buffer = buffer + '</tr></thead></table><div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			$('content_pane').innerHTML  = buffer;
 			oElement = $('selectable_div');
@@ -60,7 +60,7 @@ FilesList = Class.create(SelectableElements, {
 		{
 			var buffer = '<TABLE width="100%" cellspacing="0" cellpadding="0" class="sort-table">';
 			buffer = buffer + '<thead><tr>';
-			buffer = buffer + '<td style="border-right:0px;background-image:url(\''+ajxpResourcesFolder+'/images/header_bg_plain.png\');" >'+MessageHash[126]+'</td>';
+			buffer = buffer + '<td style="border-right:0px;background-image:url(\''+ajxpResourcesFolder+'/images/header_bg_plain.png\');" ajxp_message_id="126">'+MessageHash[126]+'</td>';
 			buffer = buffer + '<td align="right" id="last_header"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
 			buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" style="padding:0px;"><div id="selectable_div" style="overflow:auto; padding:2px 5px;"></div></td></tr></tbody></table>';
 			$('content_pane').innerHTML  = buffer;
@@ -296,6 +296,7 @@ FilesList = Class.create(SelectableElements, {
 			this._ajaxplorer.foldersTree.focus();
 		}
 		ajaxplorer.getActionBar().fireContextChange();
+		ajaxplorer.getActionBar().fireSelectionChange();
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
 	

@@ -32,7 +32,7 @@ Action = Class.create({
 			unique:true,
 			image:true,
 			mp3:true,
-			editable:true,			
+			editable:true			
 			}, arguments[2] || { });
 		this.rightsContext = Object.extend({			
 			noUser:true,
@@ -117,7 +117,7 @@ Action = Class.create({
 			var bRecycle = userSelection.isRecycle();
 		}
 		var selectionContext = this.selectionContext;
-		if(selectionContext.image || selectionContext.editable) {
+		if(selectionContext.image || selectionContext.editable) {			
 			this.hide();
 		}
 		if(selectionContext.unique && !bUnique){
@@ -144,7 +144,7 @@ Action = Class.create({
 		
 	},
 		
-	createFromXML:function(xmlNode){
+	createFromXML:function(xmlNode){		
 		this.options.name = xmlNode.getAttribute('name');
 		for(var i=0; i<xmlNode.childNodes.length;i++){
 			var node = xmlNode.childNodes[i];
@@ -194,7 +194,7 @@ Action = Class.create({
 			this.options.accessKey == this.options.text.charAt(0);
 		}else{
 			this.options.accessKey = MessageHash[this.options.accessKey];
-		}
+		}		
 	}, 
 	
 	toActionBar:function(){

@@ -42,6 +42,31 @@ Ajaxplorer = Class.create({
 		modal.updateLoadingProgress('Main template loaded');	
 	},
 	
+	loadI18NMessages: function(newLanguage){
+		var connexion = new Connexion();
+		connexion.addParameter('get_action', 'get_i18n_messages');
+		connexion.onComplete = function(transport){
+			if(transport.responseText){
+				var result = transport.responseText.evalScripts();
+				MessageHash = result[0];
+				this.updateI18nTags();
+				if(this.infoPanel) this.infoPanel.update();
+				if(this.actionBar) this.actionBar.loadActions();
+				this.currentLanguage = newLanguage;
+			}
+		}.bind(this);
+		connexion.sendSync();
+	},
+	
+	updateI18nTags: function(){
+		$$('[ajxp_message_id]').each(function(tag){			
+			tag.update(MessageHash[tag.readAttribute("ajxp_message_id")]);
+		});
+		$$('[ajxp_message_title_id]').each(function(tag){			
+			tag.writeAttribute('title', MessageHash[tag.readAttribute("ajxp_message_title_id")]);
+		});
+	},
+	
 	initObjects: function(){
 		loadRep = this._initLoadRep;
 		crtUser = this._initCrtUser;

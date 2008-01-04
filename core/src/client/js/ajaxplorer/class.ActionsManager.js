@@ -133,21 +133,20 @@ ActionsManager = Class.create({
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = MessageHash[142]+'<i style="cursor:pointer;text-decoration:underline;" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+'</i>.';
+				logging_string = '<ajxp_message ajxp_message_id="142">'+MessageHash[142]+'</ajxp_message><i style="cursor:pointer;text-decoration:underline;" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+'</i>.';
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
-					res = confirm(MessageHash[196]);
-					if(res) window.location.href = window.location.href;
+					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
 				}
 			}
 			else 
 			{
-				logging_string = MessageHash[143];
+				logging_string = '<ajxp_message ajxp_message_id="143">'+MessageHash[143]+'</ajxp_message>';
 			}
 		}
 		else 
 		{
-			logging_string = MessageHash[144];
+			logging_string = '<ajxp_message ajxp_message_id="142">'+MessageHash[144]+'</ajxp_message>';
 		}
 		$('logging_string').innerHTML = logging_string;
 		if(oUser != null)
@@ -174,6 +173,7 @@ ActionsManager = Class.create({
 					elem.checked = true;
 				}
 			});
+			$('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
 		};
 		
 		var onComplete = function(){
@@ -194,7 +194,12 @@ ActionsManager = Class.create({
 				userPass = $('user_change_ownpass1').value;
 			}
 			var onComplete = function(transport){
-				alert(MessageHash[197]);
+				if(userPass != null) alert(MessageHash[197]);
+				var oUser = ajaxplorer.user;
+				if(oUser.getPreference('lang') != null 
+					&& oUser.getPreference('lang') != "" 
+					&& oUser.getPreference('lang') != ajaxplorer.currentLanguage)
+				ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
 				hideLightBox(true);
 			}
 			ajaxplorer.user.savePreferences(userPass, onComplete);
@@ -466,13 +471,17 @@ ActionsManager = Class.create({
 	initToolbars: function () {
 		var crtCount = 0;
 		var toolbarsList = $A(['default', 'put', 'get', 'change', 'user']);
-		toolbarsList.each(function(toolbar){
-			var tBar = this.initToolbar(toolbar);
-			if(tBar && tBar.actionsCount){
-				if(crtCount < toolbarsList.size()-1) tBar.insert(new Element('div', {class:'separator'}));
+		toolbarsList.each(function(toolbar){			
+			var tBar = this.initToolbar(toolbar);			
+			if(tBar && tBar.actionsCount){				
+				if(crtCount < toolbarsList.size()-1) {
+					var separator = new Element('div');
+					separator.addClassName('separator');
+					tBar.insert(separator);
+				}
 				$('buttons_bar').insert(tBar);
 				crtCount ++;
-			}			
+			}
 		}.bind(this));
 		bgCorners("#action_bar a", "round 8px");
 	},
@@ -492,19 +501,21 @@ ActionsManager = Class.create({
 	},
 	
 	initToolbar: function(toolbar){
-		if(!this.toolbars.get(toolbar)) return;
+		if(!this.toolbars.get(toolbar)) {
+			return;
+		}
 		var toolEl = $(toolbar+'_toolbar');		
 		if(!toolEl){ 
 			var toolEl = new Element('div', {
 				id: toolbar+'_toolbar',
-				style: 'display:inline;',
+				style: 'display:inline;'
 			});
 		}
 		toolEl.actionsCount = 0;
 		this.toolbars.get(toolbar).each(function(actionName){
 			var action = this.actions.get(actionName);			
 			toolEl.insert(action.toActionBar());
-			toolEl.actionsCount ++;
+			toolEl.actionsCount ++;			
 		}.bind(this));
 		return toolEl;
 	},
@@ -545,7 +556,7 @@ ActionsManager = Class.create({
 	parseActions: function(xmlResponse){		
 		if(xmlResponse == null || xmlResponse.documentElement == null) return;
 		var actions = xmlResponse.documentElement.childNodes;		
-		for(var i=0;i<actions.length;i++){
+		for(var i=0;i<actions.length;i++){			
 			var newAction = new Action();
 			newAction.createFromXML(actions[i]);			
 			this.actions.set(actions[i].getAttribute('name'), newAction);
@@ -557,8 +568,8 @@ ActionsManager = Class.create({
 			} 
 			if(actions[i].getAttribute('dragndropDefault') && actions[i].getAttribute('dragndropDefault') == "true"){
 				this.defaultActions.set('dragndrop', actions[i].getAttribute('name'));
-			}
-			if(newAction.context.actionBar){
+			}			
+			if(newAction.context.actionBar){				
 				if(this.toolbars.get(newAction.context.actionBarGroup) == null){
 					this.toolbars.set(newAction.context.actionBarGroup, new Array());
 				}
@@ -566,7 +577,7 @@ ActionsManager = Class.create({
 			}
 			if(newAction.options.hasAccessKey){
 				this.registerKey(newAction.options.accessKey, newAction.options.name);
-			} 
+			} 			
 		}
 	},
 	
