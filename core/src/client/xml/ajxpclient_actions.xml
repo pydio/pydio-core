@@ -34,8 +34,8 @@
 		<action name="up_dir">
 			<gui text="148" title="24" src="up.png" hasAccessKey="true"
 				accessKey="parent_access_key">
-				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default">
+				<context selection="false" dir="false" recycle="false"
+					actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="default">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>			
@@ -54,7 +54,7 @@
 		<action name="refresh">
 			<gui text="149" title="149" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
-				<context selection="false" dir="" recycle="false"
+				<context selection="false" dir="true" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
@@ -71,7 +71,7 @@
 			<gui text="228" title="229" src="view_icon.png" hasAccessKey="true"
 				accessKey="thumbs_access_key">
 				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="default">
 				</context>				
 			</gui>
@@ -86,7 +86,7 @@
 			<gui text="226" title="227" src="view_text.png" hasAccessKey="true"
 				accessKey="list_access_key">
 				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="default">
 				</context>
 			</gui>
@@ -100,7 +100,7 @@
 		<action name="bookmark">
 			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
-				<context selection="false" dir="" recycle="hidden"
+				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="default">
 				</context>
