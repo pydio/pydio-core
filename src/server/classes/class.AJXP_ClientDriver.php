@@ -59,6 +59,27 @@ class AJXP_ClientDriver extends AbstractDriver
 			break;
 			
 			//------------------------------------
+			//	GET I18N MESSAGES
+			//------------------------------------
+			case "get_i18n_messages":
+			
+				header("Content-type:text/javascript");				
+				HTMLWriter::writeI18nMessagesClass(ConfService::getMessages());
+				/*
+				if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
+				{
+					if(!isSet($encode) || $encode != "false")
+					{
+						$mess = array_map("utf8_encode", $mess);
+					}
+					include(CLIENT_RESOURCES_FOLDER."/html/".$template_name);
+				}
+				*/
+				exit(0);	
+				
+			break;
+			
+			//------------------------------------
 			//	BOOKMARK BAR
 			//------------------------------------
 			case "get_bookmarks":
