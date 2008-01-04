@@ -260,6 +260,10 @@ $mess=array(
 "226" => "Lista",
 "227" => "Detalles Lista",
 "228" => "Miniat.",
-"229" => "Miniaturas"
+"229" => "Miniaturas", 
+"230" => "Play",
+"231" => "Play Slideshow", 
+"232" => "Stop", 
+"233" => "Stop Slideshow"
 );
 ?>
