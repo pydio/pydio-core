@@ -11,6 +11,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="get_i18n_messages">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="get_bookmarks">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
