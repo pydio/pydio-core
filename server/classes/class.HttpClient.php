@@ -88,7 +88,7 @@ class HttpClient {
 				case -5:
 					$this->errormsg = 'Connection refused or timed out (-5)';
 				default:
-					$this->errormsg = 'Connection failed ('.$errno.')';
+					$this->errormsg = 'Connection failed on '.$this->host.'('.$errno.')';
 			    $this->errormsg .= ' '.$errstr;
 			    $this->debug($this->errormsg);
 			}
@@ -156,8 +156,10 @@ class HttpClient {
         // If data is compressed, uncompress it
         if (isset($this->headers['content-encoding']) && $this->headers['content-encoding'] == 'gzip') {
             $this->debug('Content is gzip encoded, unzipping it');
-            $this->content = substr($this->content, 10); // See http://www.php.net/manual/en/function.gzencode.php
-            $this->content = gzinflate($this->content);
+            if(!$this->headers_only){
+	            $this->content = substr($this->content, 10); // See http://www.php.net/manual/en/function.gzencode.php
+	            $this->content = gzinflate($this->content);
+            }
         }
         // If $persist_cookies, deal with any cookies
         if ($this->persist_cookies && isset($this->headers['set-cookie']) && $this->host == $this->cookie_host) {
