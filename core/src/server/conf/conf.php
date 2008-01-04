@@ -17,7 +17,7 @@
 /* French : fr
 /* English : en
 /*************************/
-$available_languages = array("en"=>"English", "fr"=>"Français", "nl"=>"Nederlands", "es"=>"Español");
+$available_languages = array("en"=>"English", "fr"=>"Français", "nl"=>"Nederlands", "es"=>"Español", "de"=>"Deutsch");
 $dft_langue="en";
 
 define("ENABLE_USERS", 1);
