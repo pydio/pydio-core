@@ -5,7 +5,7 @@ class Repository {
 	var $id;
 	var $path;
 	var $display;
-	var $accessType = "filesystem";
+	var $accessType = "fs";
 	var $recycle = "";
 	var $create = true;
 	
@@ -13,6 +13,7 @@ class Repository {
 		$this->setPath($path);
 		$this->setDisplay($display);
 		$this->setId($id);
+		$this->options = array();
 	}
 	/**
 	 * @return String
@@ -42,7 +43,17 @@ class Repository {
 		$this->recycle = $recycle;
 	}
 
-
+	function addOption($oName, $oValue){
+		$this->options[$oName] = $oValue;
+	}
+	
+	function getOption($oName){
+		if($this->options[$oName]){
+			return $this->options[$oName];
+		}
+		return "";
+	}
+	
 	
 	/**
 	 * @return String
