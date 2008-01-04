@@ -230,34 +230,25 @@ ActionsManager = Class.create({
 			}
 		}
 		var contextActions = new Array();
-		for(i=0; i<this._items.length; i++)
-		{
-			if($(this._items[i]).visible() && this._items[i].getAttribute(actionsSelectorAtt) && this._items[i].getAttribute(actionsSelectorAtt) == "true")
-			{
-				var img = $(this._items[i]).select('img')[0];
-				var text = $(this._items[i]).select('span')[0].innerHTML;
-				var alt = this._items[i].getAttribute('title');
-				var imgSrc = (ajxpResourcesFolder+'/images/crystal/actions/16/'+this._items[i].getAttribute('icon_src'));
-				contextActions[contextActions.length] = {
-					name:text,
-					alt:alt,
-					image:imgSrc,
-					disabled:(this._items[i].className == 'disabled'?true:false),
-					className:"edit",
-					callback:function(e){
-						ajaxplorer.actionBar.fireAction(this.getAttribute('action'));
-					}.bind(this._items[i])
-				};
+		var crtGroup;
+		this.actions.each(function(pair){
+			var action = pair.value;
+			if(!action.context.contextMenu) return;
+			if(actionsSelectorAtt == 'selectionContext' && !action.context.selection) return;
+			if(actionsSelectorAtt == 'directoryContext' && !action.context.dir) return;
+			if(actionsSelectorAtt == 'genericContext' && action.context.selection) return;
+			if(action.contextHidden || action.deny) return;
+			if(crtGroup && crtGroup != action.context.actionBarGroup){
+				contextActions.push({separator:true});
 			}
-			else if(this._items[i].hasClassName('separator') && contextActions.length > 0 && !contextActions[contextActions.length-1].separator)
-			{
-				contextActions[contextActions.length] = {separator:true};
-			}
-		}
-		
-		if(contextActions[contextActions.length-1].separator){
-			contextActions.pop();
-		}
+			contextActions.push({
+				name:action.options.text,
+				alt:action.options.title,
+				image:ajxpResourcesFolder+'/images/crystal/actions/16/'+action.options.src,				
+				callback:function(e){this.apply()}.bind(action)
+			});
+			crtGroup = action.context.actionBarGroup;
+		}.bind(this));
 		
 		return contextActions;
 	},
