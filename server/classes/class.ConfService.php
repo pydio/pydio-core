@@ -102,9 +102,14 @@ class ConfService
 		foreach($repositories as $index=>$repository)
 		{
 			$repo = new Repository($index, $repository["PATH"], $repository["DISPLAY"]);
-			if(array_key_exists("ACCESS", $repository)) $repo->setAccessType($repository["ACCESS"]);
+			if(array_key_exists("DRIVER", $repository)) $repo->setAccessType($repository["DRIVER"]);
 			if(array_key_exists("RECYCLE_BIN", $repository)) $repo->setRecycle($repository["RECYCLE_BIN"]);
 			if(array_key_exists("CREATE", $repository)) $repo->setCreate($repository["CREATE"]);
+			if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
+				foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
+					$repo->addOption($oName, $oValue);
+				}
+			}
 			$objList[$index] = $repo;
 		}
 		return $objList;
@@ -188,7 +193,7 @@ class ConfService
 		$path = INSTALL_PATH."/plugins/ajxp.".$accessType;
 		$filePath = $path."/class.".$driverName.".php";
 		$xmlPath = $path."/".$accessType."Actions.xml";
-		if(is_file($filePath) && is_file($xmlPath)){
+		if(is_file($filePath)){
 			include_once($filePath);
 			if(class_exists($driverName)){
 				$G_ACCESS_DRIVER = new $driverName($accessType, $xmlPath, $crtRepository);
