@@ -490,8 +490,9 @@ FilesList = Class.create(SelectableElements, {
 	},
 	
 	setOnLoad: function()	{
+		if(this.loading) return;
 		var parentObject = Position.offsetParent($(this._htmlElement));	
-		addLightboxMarkupToElement(parentObject, $(this._htmlElement).getElementsBySelector('tr')[0]);
+		addLightboxMarkupToElement(parentObject);
 		var img = document.createElement("img");
 		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
 		$(parentObject).getElementsBySelector("#element_overlay")[0].appendChild(img);
