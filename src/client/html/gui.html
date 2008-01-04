@@ -117,16 +117,16 @@ jQuery('#loaderContent').corner("round bottom 10px");
 <!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
 <form id="login_form" action="login" style="display:none;" box_width="210">
 <input type="hidden" name="get_action" value="login">
-<div class="dialogLegend" style="margin-bottom: 7px;"><?php print($mess[180]);?></div>
+<div class="dialogLegend" style="margin-bottom: 7px;" ajxp_message_id="180"><?php print($mess[180]);?></div>
 <table cellpadding="3" border="0" cellspacing="0" style="font-size:11px;">
-<tr><td align="right"><?php print($mess[181]);?> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
-<tr><td align="right"><?php print($mess[182]);?> :</td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td></tr>
+<tr><td align="right"><ajxp_message ajxp_message_id="181"><?php print($mess[181]);?></ajxp_message> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
+<tr><td align="right"><ajxp_message ajxp_message_id="182"><?php print($mess[182]);?></ajxp_message> :</td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td></tr>
 </table>
 </form>
 
 <!-- USER'S PREFERENCES -->
 <form id="user_pref_form" action="user_pref" style="display:none;" box_width="300">
-<fieldset><legend><?php print($mess[190]);?></legend>
+<fieldset><legend ajxp_message_id="190"><?php print($mess[190]);?></legend>
 <?php 
 $langs = ConfService::getConf("AVAILABLE_LANG");
 foreach ($langs as $lang => $display)
@@ -135,14 +135,14 @@ foreach ($langs as $lang => $display)
 }
 ?>
 </fieldset>
-<fieldset><legend><?php print($mess[191]);?></legend>
-	<input type="radio" name="display" id="display_list" value="list" class="radio"><?php print($mess[192]);?>
-	<input type="radio" name="display" id="display_thumb" value="thumb" class="radio"><?php print($mess[193]);?>
+<fieldset><legend ajxp_message_id="191"><?php print($mess[191]);?></legend>
+	<input type="radio" name="display" id="display_list" value="list" class="radio"><ajxp_message ajxp_message_id="192"><?php print($mess[192]);?></ajxp_message>
+	<input type="radio" name="display" id="display_thumb" value="thumb" class="radio"><ajxp_message ajxp_message_id="193"><?php print($mess[193]);?></ajxp_message>
 </fieldset>
 <?php if(AuthService::changePasswordEnabled()){ ?>
-<fieldset><legend><?php print($mess[194]);?></legend>
-	<?php print($mess[198]);?> <input type="password" id="user_change_ownpass1" value="">
-	<?php print($mess[199]);?> <input type="password" id="user_change_ownpass2" value="">
+<fieldset><legend ajxp_message_id="194"><?php print($mess[194]);?></legend>
+	<ajxp_message ajxp_message_id="198"><?php print($mess[198]);?></ajxp_message> <input type="password" id="user_change_ownpass1" value="">
+	<ajxp_message ajxp_message_id="199"><?php print($mess[199]);?></ajxp_message> <input type="password" id="user_change_ownpass2" value="">
 </fieldset>
 <?php } ?>
 </form>
