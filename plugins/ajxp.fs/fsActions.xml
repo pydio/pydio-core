@@ -21,7 +21,6 @@
 						ajaxplorer.getFoldersTree().goToDeepPath(path);
 						ajaxplorer.filesList.loadXmlList(path);
 						ajaxplorer.getActionBar().updateLocationBar(path);
-						ajaxplorer.getActionBar().fireContextChange();
 					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -29,7 +28,7 @@
 		</action>
 		<action name="upload">
 			<gui text="27" title="27" src="yast_backup.png" accessKey="upload_access_key" hasAccessKey="true">
-				<context selection="false" dir="" recycle="hidden"
+				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put">
 				</context></gui>
@@ -94,7 +93,7 @@
 		</action>
 		<action name="empty_recycle">
 			<gui text="220" title="221" src="trashcan_empty.png" accessKey="empty_recycle_access_key" hasAccessKey="true">
-				<context selection="false" dir="false" recycle="only" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default"></context>
+				<context selection="false" dir="true" recycle="only" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default"></context>
 			</gui>
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
@@ -136,7 +135,7 @@
 		</action>
 		<action name="mkfile">
 			<gui text="156" title="157" src="filenew.png" accessKey="file_access_key" hasAccessKey="true">
-				<context selection="false" dir="" recycle="hidden"
+				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put">
 				</context></gui>
@@ -161,6 +160,135 @@
 AJXP_MESSAGE[174]<br/>
 <input type="text" name="filename" size="30" class="dialogFocus">
 </div>				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="download" fileDefault="true">
+			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="get">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback><![CDATA[
+					var userSelection = ajaxplorer.getFilesList().getUserSelection();					
+					if(userSelection.isUnique())
+					{
+						var downloadUrl = ajxpServerAccessPath+'?action=download';
+						downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
+						document.location.href = downloadUrl;
+						
+					}
+					else
+					{
+						var loadFunc = function(oForm){
+							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
+							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
+							downloader.triggerEnd = function(){hideLightBox()};
+							fileNames = userSelection.getFileNames();
+							for(var i=0; i<fileNames.length;i++)
+							{
+								downloader.addListRow(fileNames[i]);
+							}				
+						};
+						var closeFunc = function(){
+							hideLightBox();
+							return false;
+						};
+						modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
+					}
+					]]></clientCallback>
+					<clientForm id="multi_download_form"><![CDATA[
+					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="410">
+					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
+					<div id="multiple_download_container"></div>
+					</div>]]>
+					</clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="edit">
+			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="get">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" image="false" mp3="false" editable="true"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+					if(userSelection.isEditable()){
+						var sTitle = MessageHash[187]+userSelection.getUniqueFileName();						
+						var loadFunc = function(oForm){
+							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+							ajaxplorer.actionBar.editor = new Editor(oForm);
+							ajaxplorer.actionBar.editor.createEditor(userSelection.getUniqueFileName());
+							ajaxplorer.actionBar.editor.loadFile(userSelection.getUniqueFileName());
+						};
+						modal.showDialogForm('Edit Online', 'edit_box', loadFunc, null, null, true, true);
+					}				
+					]]></clientCallback>
+				<clientForm id="edit_box"><![CDATA[
+					<div id="edit_box" action="editer" box_width="80%" box_height="90%">
+						<div class="action_bar" style="height: 42px; background-color: #fff;">
+							<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[86]</a>
+							<a href="#" onclick="return false;" id="saveButton" onclick="saveForm();return false;"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br>AJXP_MESSAGE[53]</a>
+							<a href="#" onclick="return false;" id="downloadFileButton"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="AJXP_MESSAGE[88]" border="0"><br>AJXP_MESSAGE[88]</a>
+						</div>
+						<input type="hidden" name="file" value="">
+						<input type="hidden" name="dir" value="">
+						<input type="hidden" name="save" value="1">
+					</div>				
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="view">
+			<gui text="129" title="136" src="frame_image.png" accessKey="view_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="get">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" image="true" mp3="false" editable="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+					if(userSelection.isImage()){
+						var loadFunc = function(oForm){
+							ajaxplorer.actionBar.diaporama = new Diaporama($(oForm));
+							ajaxplorer.actionBar.diaporama.open(ajaxplorer.getFilesList().getItems(), userSelection.getUniqueFileName());
+						};
+						var closeFunc = function(){
+							ajaxplorer.actionBar.diaporama.close();
+							hideLightBox();
+							return false;
+						};
+						modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
+					}				
+					]]></clientCallback>
+				<clientForm id="diaporama_box"><![CDATA[
+				<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%">
+					<div class="action_bar" style="height: 42px; width: 500px; background-color: #fff;">
+						<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[86]</a>
+						<a href="#" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/back_22.png" alt="" border="0"><br>AJXP_MESSAGE[178]</a>
+						<a href="#" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/forward_22.png" alt="" border="0"><br>AJXP_MESSAGE[179]</a>
+						<a href="#" id="downloadDiapoButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="" border="0"><br>AJXP_MESSAGE[88]</a>
+					</div>
+					<div align="right" style="background-image: url(AJXP_CLIENT_RESOURCES_FOLDER/images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
+					<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
+					<td><img class="diaporamaButton" width="16" height="16" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
+					<td><div class="slider" id="slider-2"><input class="slider-input" id="slider-input-2" name="slider-input-2"/></div></td>
+					<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td></tr></table>
+					</div>
+					<div style="width:100%; text-align:center; vertical-align:center;overflow:auto; background-color:#333; border:1px solid black;" id="imageContainer">
+					<img id="mainImage" src="" style="border: 4px solid white;">
+					</div>
+				</div>				
+				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
@@ -196,7 +324,7 @@ AJXP_MESSAGE[174]<br/>
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -350,7 +478,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				    		message = MessageHash[176];
 				    	}
 		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
-					}
+					};
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
 						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
@@ -363,135 +491,6 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<div id="delete_form" action="delete" box_width="280">
 <span id="delete_message"></span>
 </div>				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
-		<action name="download" fileDefault="true">
-			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="get">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback><![CDATA[
-					var userSelection = ajaxplorer.getFilesList().getUserSelection();					
-					if(userSelection.isUnique())
-					{
-						var downloadUrl = ajxpServerAccessPath+'?action=download';
-						downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-						document.location.href = downloadUrl;
-						
-					}
-					else
-					{
-						var loadFunc = function(oForm){
-							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
-							downloader.triggerEnd = function(){hideLightBox()};
-							fileNames = userSelection.getFileNames();
-							for(var i=0; i<fileNames.length;i++)
-							{
-								downloader.addListRow(fileNames[i]);
-							}				
-						};
-						var closeFunc = function(){
-							hideLightBox();
-							return false;
-						};
-						modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
-					}
-					]]></clientCallback>
-					<clientForm id="multi_download_form"><![CDATA[
-					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="410">
-					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
-					<div id="multiple_download_container"></div>
-					</div>]]>
-					</clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
-		<action name="edit">
-			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="get">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" image="false" mp3="false" editable="true"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
-					if(userSelection.isEditable()){
-						var sTitle = MessageHash[187]+userSelection.getUniqueFileName();						
-						var loadFunc = function(oForm){
-							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-							ajaxplorer.actionBar.editor = new Editor(oForm);
-							ajaxplorer.actionBar.editor.createEditor(userSelection.getUniqueFileName());
-							ajaxplorer.actionBar.editor.loadFile(userSelection.getUniqueFileName());
-						}
-						modal.showDialogForm('Edit Online', 'edit_box', loadFunc, null, null, true, true);
-					}				
-					]]></clientCallback>
-				<clientForm id="edit_box"><![CDATA[
-					<div id="edit_box" action="editer" box_width="80%" box_height="90%">
-						<div class="action_bar" style="height: 42px; background-color: #fff;">
-							<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[86]</a>
-							<a href="#" onclick="return false;" id="saveButton" onclick="saveForm();return false;"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br>AJXP_MESSAGE[53]</a>
-							<a href="#" onclick="return false;" id="downloadFileButton"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="AJXP_MESSAGE[88]" border="0"><br>AJXP_MESSAGE[88]</a>
-						</div>
-						<input type="hidden" name="file" value="">
-						<input type="hidden" name="dir" value="">
-						<input type="hidden" name="save" value="1">
-					</div>				
-				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
-		<action name="view">
-			<gui text="129" title="136" src="frame_image.png" accessKey="view_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="get">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" image="true" mp3="false" editable="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
-					if(userSelection.isImage()){
-						var loadFunc = function(oForm){
-							ajaxplorer.actionBar.diaporama = new Diaporama($(oForm));
-							ajaxplorer.actionBar.diaporama.open(ajaxplorer.getFilesList().getItems(), userSelection.getUniqueFileName());
-						};
-						var closeFunc = function(){
-							ajaxplorer.actionBar.diaporama.close();
-							hideLightBox();
-							return false;
-						};
-						modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
-					}				
-					]]></clientCallback>
-				<clientForm id="diaporama_box"><![CDATA[
-				<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%">
-					<div class="action_bar" style="height: 42px; width: 500px; background-color: #fff;">
-						<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[86]</a>
-						<a href="#" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/back_22.png" alt="" border="0"><br>AJXP_MESSAGE[178]</a>
-						<a href="#" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/forward_22.png" alt="" border="0"><br>AJXP_MESSAGE[179]</a>
-						<a href="#" id="downloadDiapoButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="" border="0"><br>AJXP_MESSAGE[88]</a>
-					</div>
-					<div align="right" style="background-image: url(AJXP_CLIENT_RESOURCES_FOLDER/images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
-					<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
-					<td><img class="diaporamaButton" width="16" height="16" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
-					<td><div class="slider" id="slider-2"><input class="slider-input" id="slider-input-2" name="slider-input-2"/></div></td>
-					<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td></tr></table>
-					</div>
-					<div style="width:100%; text-align:center; vertical-align:center;overflow:auto; background-color:#333; border:1px solid black;" id="imageContainer">
-					<img id="mainImage" src="" style="border: 4px solid white;">
-					</div>
-				</div>				
-				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
