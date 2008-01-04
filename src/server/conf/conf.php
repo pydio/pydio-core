@@ -39,15 +39,20 @@ define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); //
 $REPOSITORIES[0] = array(
 	"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
 	"DISPLAY"		=>	"Default Files", 
-	"ACCESS"		=>	"fs", 
+	"DRIVER"		=>	"fs", 
 	"CREATE"		=>	true,
 	"RECYCLE_BIN" 	=> 	'recycle_bin'
 );
 /*
 $REPOSITORIES[1] = array(
-	"PATH"			=>	"/home/username/example/public/files",
-	"DISPLAY"		=>"Web Files", 
-	"ACCESS"		=>	"filesystem", 
+	"PATH"			=>	"",
+	"DISPLAY"		=>	"Web Files", 
+	"DRIVER"		=>	"remote_fs", 
+	"DRIVER_OPTIONS"=>  array("HOST"	 => "www.remoteHost.com", 
+							  "URI"		 => "/ajaxplorer/content.php", 
+							  "AUTH_URI" => "/ajaxplorer/index.php", 
+							  "AUTH_NAME"=> "userName", 
+							  "AUTH_PASS"=> "userPass"),
 	"CREATE"		=>	false,
 	"RECYCLE_BIN" 	=> 	''
 );
