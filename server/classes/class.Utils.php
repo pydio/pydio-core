@@ -202,27 +202,18 @@ class Utils
 		else {$image="mime_empty.png";$typeName=$mess[23];}
 		if($mode=="image"){return $image;} else {return $typeName;}
 	}
-	
-	function is_editable($fileName)
-	{
-		if(eregi("\.txt$|\.sql$|\.php$|\.php3$|\.phtml$|\.htm$|\.html$|\.cgi$|\.pl$|\.js$|\.css$|\.inc$",$fileName)){
-			 return 1;
+		
+	function getAjxpMimes($keyword){
+		if($keyword == "editable"){
+			return "txt,sql,php,php3,phtml,htm,html,cgi,pl,js,css,inc,xml,xsl";
+		}else if($keyword == "image"){
+			return "png,bmp,jpg,jpeg,gif";
+		}else if($keyword == "audio"){
+			return "mp3";
 		}
-		return 0;
+		return "";
 	}
-	
-	function editWithCodePress($fileName)
-	{
-		if(eregi("\.php$|\.php3$|\.php5$|\.phtml$", $fileName)) return "php";
-		elseif (eregi("\.js$", $fileName)) return "javascript";
-		elseif (eregi("\.java$", $fileName)) return "java";
-		elseif (eregi("\.pl$", $fileName)) return "perl";
-		elseif (eregi("\.sql$", $fileName)) return "sql";
-		elseif (eregi("\.htm$|\.html$", $fileName)) return "html";
-		elseif (eregi("\.css$", $fileName)) return "css";
-		else return "";
-	}
-	
+		
 	function is_image($fileName)
 	{
 		if(eregi("\.png$|\.bmp$|\.jpg$|\.jpeg$|\.gif$",$fileName)){
