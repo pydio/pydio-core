@@ -101,7 +101,6 @@ FilesList = Class.create(SelectableElements, {
 		this.initGUI();
 		this.reload(currentSelection);
 		this.fireChange();
-		ajaxplorer.actionBar.updateDisplayButton(this._displayMode);
 		return this._displayMode;
 	},
 	
@@ -307,7 +306,7 @@ FilesList = Class.create(SelectableElements, {
 		{
 			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
 		}
-		["text", "filesize", "mimetype", "modiftime"].each(function(s){
+		["text", "filesize", "mimestring", "modiftime"].each(function(s){
 			var tableCell = document.createElement("td");
 			if(s == "text")
 			{
@@ -325,7 +324,7 @@ FilesList = Class.create(SelectableElements, {
 					var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'});
 					this.allDraggables[this.allDraggables.length] = newDrag;
 				}
-				if(xmlNode.getAttribute("is_file") == "non")
+				if(xmlNode.getAttribute("is_file") == "0")
 				{
 					AjxpDroppables.add(innerSpan);
 					this.allDroppables[this.allDroppables.length] = innerSpan;
@@ -398,7 +397,7 @@ FilesList = Class.create(SelectableElements, {
 		else
 		{
 			// Add icon
-			//if(xmlNode.getAttribute("is_file") == "non") src = "images/crystal/mimes/64/folder.png";
+			//if(xmlNode.getAttribute("is_file") == "0") src = "images/crystal/mimes/64/folder.png";
 			//else 
 			src = ajxpResourcesFolder+'/images/crystal/mimes/64/'+xmlNode.getAttribute('icon');
 			var imgString = "<img src=\""+src+"\" ";
@@ -411,7 +410,7 @@ FilesList = Class.create(SelectableElements, {
 			var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true});
 			this.allDraggables[this.allDraggables.length] = newDrag;
 		}catch(e){alert(e);}
-		if(xmlNode.getAttribute("is_file") == "non")
+		if(xmlNode.getAttribute("is_file") == "0")
 		{
 			AjxpDroppables.add(newRow);
 			this.allDroppables[this.allDroppables.length] = newRow;
@@ -530,7 +529,7 @@ FilesList = Class.create(SelectableElements, {
 		}
 		isFile = selRaw[0].getAttribute('is_file');
 		fileName = selRaw[0].getAttribute('filename');
-		if(isFile == 'oui')
+		if(isFile == '1')
 		{
 			ajaxplorer.getActionBar().fireDefaultAction("file");
 		}

@@ -79,7 +79,7 @@ AjxpSortable = Class.create(SortableTable, {
 		else
 			s = this.getInnerText(c);
 		if(s[0] == ' ') s = s.substr(1, (s.length-1));	
-		if(oRow.getAttribute('is_file') == 'non'){		
+		if(oRow.getAttribute('is_file') == '0'){		
 			s = '000'+s;
 		}
 		return s.toUpperCase();
