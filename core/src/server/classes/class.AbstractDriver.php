@@ -29,6 +29,7 @@ class AbstractDriver {
 		$this->parseXMLActions();
 		// Create fake action for sending its own actions to client.
 		$this->actions["get_driver_actions"] = array();
+		$this->actions["get_driver_info_panels"] = array();
 	}
 	
 	function hasAction($actionName){
@@ -50,6 +51,10 @@ class AbstractDriver {
 		if($actionName == "get_driver_actions" || $actionName == "get_ajxp_actions"){
 			$this->sendActionsToClient(false, null);
 			exit(1);
+		}
+		else if($actionName == "get_ajxp_info_panels" || $actionName == "get_driver_info_panels"){
+			$this->sendInfoPanelsDef();
+			return;
 		}
 		if(isSet($this->actions[$actionName])){
 			// use callback;
@@ -76,19 +81,27 @@ class AbstractDriver {
 				if($user==null || !$user->canWrite($this->repository->getId())) continue;
 			}
 			$xml = $action["XML"];
-			$messages = ConfService::getMessages();			
-			$matches = array();
-			$xml = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $xml);
-			$xml = str_replace("AJXP_SERVER_ACCESS", SERVER_ACCESS, $xml);
-			if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
-				foreach($matches as $match){
-					$messId = str_replace("]", "", str_replace("[", "", $match[1]));
-					$xml = str_replace("AJXP_MESSAGE[$messId]", utf8_encode($messages[$messId]), $xml);
-				}
-			}
+			$xml = $this->replaceAjxpXmlKeywords($xml);
 			AJXP_XMLWriter::write($xml, true);
 		}
 		AJXP_XMLWriter::close();
+	}
+	
+	function replaceAjxpXmlKeywords($xml){
+		$messages = ConfService::getMessages();			
+		$matches = array();
+		$xml = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $xml);
+		$xml = str_replace("AJXP_SERVER_ACCESS", SERVER_ACCESS, $xml);
+		$xml = str_replace("AJXP_MIMES_EDITABLE", Utils::getAjxpMimes("editable"), $xml);
+		$xml = str_replace("AJXP_MIMES_IMAGE", Utils::getAjxpMimes("image"), $xml);
+		$xml = str_replace("AJXP_MIMES_AUDIO", Utils::getAjxpMimes("audio"), $xml);
+		if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
+			foreach($matches as $match){
+				$messId = str_replace("]", "", str_replace("[", "", $match[1]));
+				$xml = str_replace("AJXP_MESSAGE[$messId]", utf8_encode($messages[$messId]), $xml);
+			}
+		}
+		return $xml;		
 	}
 	
 	function fillActionsWithXML(){
@@ -99,6 +112,18 @@ class AbstractDriver {
 			$actionXML = $matches[0][0];
 			$this->actions[$actionName]["XML"] = $actionXML;			
 		}
+	}
+	
+	function sendInfoPanelsDef(){
+		$fileData = file_get_contents($this->xmlFilePath);
+		$matches = array();
+		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
+		if(count($matches)){
+			AJXP_XMLWriter::header();
+			AJXP_XMLWriter::write($this->replaceAjxpXmlKeywords(str_replace("\n", "",$matches[0])), true);
+			AJXP_XMLWriter::close();
+			exit(1);
+		}		
 	}
 	
 	function parseXMLActions()

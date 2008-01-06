@@ -6,7 +6,9 @@ class AJXP_ClientDriver extends AbstractDriver
 	function AJXP_ClientDriver($repository) {
 		parent::AbstractDriver ( "ajxp_actions", CLIENT_RESOURCES_FOLDER."/xml/ajxpclient_actions.xml", $repository );
 		unset($this->actions["get_driver_actions"]);
+		unset($this->actions["get_driver_info_panels"]);
 		$this->actions["get_ajxp_actions"] = array();
+		$this->actions["get_ajxp_info_panels"] = array();
 	}
 	
 	function switchAction($action, $httpVars, $fileVars)
