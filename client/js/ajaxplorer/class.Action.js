@@ -18,7 +18,8 @@ Action = Class.create({
 		this.context = Object.extend({
 			selection:true,
 			dir:false,
-			recycle:false,			
+			recycle:false,
+			behaviour:'hidden',
 			actionBar:false,
 			actionBarGroup:'default',
 			contextMenu:false,
@@ -29,10 +30,9 @@ Action = Class.create({
 			dir:false,
 			file:true,
 			recycle:false,
-			unique:true,
-			image:true,
-			mp3:true,
-			editable:true			
+			behaviour:'disabled',
+			allowedMimes:$A([]),			
+			unique:true
 			}, arguments[2] || { });
 		this.rightsContext = Object.extend({			
 			noUser:true,
@@ -112,13 +112,12 @@ Action = Class.create({
 			var bUnique = userSelection.isUnique();
 			var bFile = userSelection.hasFile();
 			var bDir = userSelection.hasDir();
-			var bImage = userSelection.isImage();
-			var bEditable = userSelection.isEditable();
 			var bRecycle = userSelection.isRecycle();
 		}
 		var selectionContext = this.selectionContext;
-		if(selectionContext.image || selectionContext.editable) {			
-			this.hide();
+		if(selectionContext.allowedMimes.size()){
+			if(selectionContext.behaviour == 'hidden') this.hide();
+			else this.disable();
 		}
 		if(selectionContext.unique && !bUnique){
 			return this.disable();
@@ -133,11 +132,9 @@ Action = Class.create({
 		if(!selectionContext.recycle && bRecycle){
 			return this.disable();
 		}
-		if(selectionContext.image && !bImage){
-			return this.hide();
-		} 
-		if(selectionContext.editable && !bEditable){
-			return this.hide();		
+		if(selectionContext.allowedMimes.size() && userSelection && !userSelection.hasMime(selectionContext.allowedMimes)){
+			if(selectionContext.behaviour == 'hidden') return this.hide();
+			else return this.disable();
 		}
 		this.show();
 		this.enable();
@@ -222,7 +219,7 @@ Action = Class.create({
 	},
 	
 	toInfoPanel:function(){
-	
+		return this.options;
 	},
 	
 	toContextMenu:function(){
@@ -240,28 +237,28 @@ Action = Class.create({
 	},
 	
 	hide: function(){		
-		if(this.elements.size() > 0) this.deny = true;
+		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = true;
 		this.elements.each(function(elem){
 			elem.hide();
 		});
 	},
 	
 	show: function(){
-		if(this.elements.size() > 0) this.deny = false;
+		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = false;
 		this.elements.each(function(elem){
 			elem.show();
 		});
 	},
 	
 	disable: function(){
-		if(this.elements.size() > 0) this.deny = true;
+		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = true;
 		this.elements.each(function(elem){
 			elem.addClassName('disabled');
 		});	
 	},
 	
 	enable: function(){
-		if(this.elements.size() > 0) this.deny = false;
+		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = false;
 		this.elements.each(function(elem){
 			elem.removeClassName('disabled');
 		});	
@@ -299,6 +296,13 @@ Action = Class.create({
 				value = node.getAttribute(key);
 				if(value == 'true') value = true;
 				else if(value == 'false') value = false;
+				if(key == 'allowedMimes'){
+					if(value && value.split(',').length){
+						value = $A(value.split(','));
+					}else{
+						value = $A([]);
+					}					
+				}
 				this[key] = value;
 			}
 		}.bind(object));
