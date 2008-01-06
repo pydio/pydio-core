@@ -6,8 +6,6 @@ UserSelection = Class.create({
 	_bUnique: false,
 	_bFile: false,
 	_bDir: false,
-	_bEditable: false,
-	_bImage: false,
 	_isRecycle: false,
 
 
@@ -22,12 +20,9 @@ UserSelection = Class.create({
 			{
 				var selectedObj = aSelectedItems[i];
 				
-				if(selectedObj.getAttribute('is_file') && selectedObj.getAttribute('is_file') == 'oui') this._bFile = true;
+				if(selectedObj.getAttribute('is_file') && selectedObj.getAttribute('is_file') == '1') this._bFile = true;
 				else this._bDir = true;
 				
-				if(selectedObj.getAttribute('is_editable') && selectedObj.getAttribute('is_editable') == '1') this._bEditable = true;
-				
-				if(selectedObj.getAttribute('is_image') && selectedObj.getAttribute('is_image') == '1') this._bImage = true;
 				if(selectedObj.getAttribute('is_recycle') && selectedObj.getAttribute('is_recycle') == '1') this._isRecycle = true;
 			}
 		}		
@@ -48,15 +43,7 @@ UserSelection = Class.create({
 	hasDir : function (){
 		return this._bDir;
 	},
-	
-	isEditable : function (){
-		return this._bEditable;
-	},
-	
-	isImage : function (){
-		return this._bImage;
-	},
-	
+			
 	isRecycle : function (){
 		return this._isRecycle;
 	},
@@ -70,6 +57,18 @@ UserSelection = Class.create({
 		return false;
 	},
 	
+	hasMime : function(mimeTypes){
+		var has = false;
+		mimeTypes.each(function(mime){
+			for(i=0;i<this._selectedItems.length;i++){
+				if(getFileExtension(this._selectedItems[i].getAttribute('filename')) == mime){
+					has = true;
+					return;
+				}
+			}
+		}.bind(this));
+		return has;
+	},
 	
 	getFileNames : function(){
 		if(!this._selectedItems.length)
