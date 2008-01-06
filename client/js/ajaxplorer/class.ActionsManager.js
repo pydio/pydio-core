@@ -253,6 +253,15 @@ ActionsManager = Class.create({
 		return contextActions;
 	},
 	
+	getInfoPanelActions:function(){
+		var actions = $A([]);
+		this.actions.each(function(pair){
+			var action = pair.value;
+			if(action.context.infoPanel && !action.deny) actions.push(action);
+		});
+		return actions;
+	},
+	
 	fireDefaultAction: function(defaultName){
 		var actionName = this.defaultActions.get(defaultName); 
 		if(actionName != null){
@@ -352,12 +361,7 @@ ActionsManager = Class.create({
 		}
 		return false;
 	},
-	
-	updateDisplayButton: function (newDisplay)
-	{
-		//$('sd_button').getElementsBySelector('img')[0].src = ajxpResourcesFolder+'/images/crystal/actions/22/'+(newDisplay=='list'?'view_icon.png':'view_text.png');
-	},
-	
+		
 	submitForm: function(formName)
 	{
 		var connexion = new Connexion();
@@ -538,8 +542,9 @@ ActionsManager = Class.create({
 		if(!type){
 			connexion.addParameter('get_action', 'get_driver_actions');
 			connexion.sendSync();
-		}		
+		}
 		this.initToolbars();
+		if(ajaxplorer && ajaxplorer.infoPanel) ajaxplorer.infoPanel.load();
 		this.fireContextChange();
 		this.fireSelectionChange();	
 	},
