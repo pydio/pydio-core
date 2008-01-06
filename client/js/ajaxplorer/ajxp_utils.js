@@ -13,6 +13,13 @@ function getRepName(fileName)
 	return repName;	
 }
 
+function getFileExtension(fileName)
+{
+	var split = getBaseName(fileName).split('.');
+	if(split.length > 1) return split[split.length-1];
+	return '';
+}
+
 function editWithCodePress(fileName)
 {	
 	if(Prototype.Browser.WebKit) return "";
@@ -21,7 +28,7 @@ function editWithCodePress(fileName)
 	else if (fileName.search("\.java$") > -1) return "java";
 	else if (fileName.search("\.pl$") > -1) return "perl";
 	else if (fileName.search("\.sql$") > -1) return "sql";
-	else if (fileName.search("\.htm$|\.html$") > -1) return "html";
+	else if (fileName.search("\.htm$|\.html$|\.xml$") > -1) return "html";
 	else if (fileName.search("\.css$") > -1) return "css";
 	else return "";	
 }
