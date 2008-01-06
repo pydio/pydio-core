@@ -3,6 +3,14 @@ InfoPanel = Class.create({
 	initialize: function(htmlElement){
 		this.htmlElement = $(htmlElement);
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
+		this.mimesTemplates = new Hash();
+		this.registeredMimes = new Hash();
+	},
+	
+	setTemplateForMime: function(mimeType, templateString, attributes, messages){
+		var tId = this.mimesTemplate.size();
+		this.registeredMimes.set(mimeType, tId);
+		this.mimesTemplates.push($A([templateString,attributes, messages]));
 	},
 	
 	update : function(){	
@@ -15,135 +23,121 @@ InfoPanel = Class.create({
 		}
 		if(!userSelection.isUnique())
 		{
-			this.setContent(userSelection.getFileNames().length + ' files selected.');
+			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center>');
 			return;
 		}
-		if(userSelection.isImage())
-		{
-			this.displayImageInfo(userSelection.getUniqueItem());
-			return;
-		}
+		
 		var uniqItem = userSelection.getUniqueItem();
-		if(uniqItem.getAttribute('is_mp3') == '1')
-		{
-			this.displayMP3Info(uniqItem);
-			return;
+		if(uniqItem.getAttribute('is_file')=='0'){
+			this.evalTemplateForMime('generic_dir', uniqItem);
 		}
-		this.displayFileInfo(uniqItem);
+		else{
+			var extension = getFileExtension(uniqItem.getAttribute('filename'));
+			if(this.registeredMimes.get(extension)){
+				this.evalTemplateForMime(extension, uniqItem);
+			}
+			else{
+				this.evalTemplateForMime('generic_file', uniqItem);
+			}			
+		}
 	},
 	
 	setContent : function(sHtml){
 		this.htmlElement.update(sHtml);
 	},
 	
-	displayImageInfo : function(imgData){
-		var baseUrl = "content.php?action=image_proxy&get_thumb=true&file=";
-		var imgUrl = baseUrl + imgData.getAttribute("filename");
-		var fileName = getBaseName(imgData.getAttribute("filename"));
-		var imageType = imgData.getAttribute("image_type");
-		var imageDimension = imgData.getAttribute("image_width") + 'px X ' + imgData.getAttribute("image_height")+'px';
-		var fileSize = imgData.getAttribute("filesize");
-		
-		var width = imgData.getAttribute("image_width");
-		var height = imgData.getAttribute("image_height");
-		
-		var newHeight = 150;
-		if(height < newHeight) newHeight = height;
-		var newWidth = newHeight*width/height;
-		var dimAttr = 'height="'+newHeight+'"';
-		if(newWidth > $('info_panel').getWidth() - 16) dimAttr = 'width="100%"';
-		
-		var tString = '<div style="padding:10px;"><center style="border:1px solid #79f;"><img src="#{url}" #{dimattr}></center>';
-		tString += '<br><b>'+MessageHash[133]+'</b> : #{filename}';
-		tString += '<br><b>'+MessageHash[134]+'</b> : #{imagetype}';
-		tString += '<br><b>'+MessageHash[135]+'</b> : #{dimension}';
-		tString += '<br><b>'+MessageHash[127]+'</b> : #{filesize}';
-		tString += '<div style="text-align:right;padding-top:5px;"><a href="" onclick="ajaxplorer.actionBar.fireAction(\'view\'); return false;">'+MessageHash[136]+'</a> | <a href="" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a></div>';
-		tString += '</div>';
-		var template = new Template(tString);
-		this.setContent(template.evaluate({url:imgUrl, dimattr:dimAttr, filename:fileName, imagetype:imageType, dimension:imageDimension,filesize:fileSize}));
-	},
-	
-	displayFileInfo : function(fileData){
-		var fileName = getBaseName(fileData.getAttribute("filename"));
-		var fileType = fileData.getAttribute("mimetype");
-		var fileSize = fileData.getAttribute("filesize");
-		var modifTime = fileData.getAttribute("modiftime");
-		var is_file = (fileData.getAttribute("is_file")=='oui'?true:false);
-		var is_editable = (fileData.getAttribute("is_editable")=='1'?true:false);
-		var icon = fileData.getAttribute("icon");
-		
-		var tString = '<div style="padding:10px;">';
-		if(!is_file){
-			tString += '<div class="folderImage"><img src="'+ajxpResourcesFolder+'/images/crystal/mimes/64/folder.png" height="64" width="64"></div>';
-		}
-		else{
-			tString += '<div class="folderImage"><img src="'+ajxpResourcesFolder+'/images/crystal/mimes/64/'+icon+'" height="64" width="64"></div>';
-		}
-		
-		tString += '<b>'+MessageHash[133]+'</b> : '+fileName;
-		if(is_file){
-			tString += '<br><b>'+MessageHash[127]+'</b> : '+fileSize;
-			tString += '<br><b>'+MessageHash[134]+'</b> : '+fileType;
-		}
-		tString += '<br><b>'+MessageHash[138]+'</b> : '+ modifTime;
-		if(is_file){
-			tString += '<div style="text-align:right;padding-top:5px;">';
-			if(is_editable && (ajaxplorer.user == null || ajaxplorer.user.canWrite())){
-				tString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\'edit\'); return false;">'+MessageHash[139]+'</a> | ';
+	evalTemplateForMime: function(mimeType, fileData){		
+		if(!this.registeredMimes.get(mimeType)) return;		
+		var templateData = this.mimesTemplates.get(this.registeredMimes.get(mimeType));
+		var tString = templateData[0];
+		var tAttributes = templateData[1];
+		var tMessages = templateData[2];
+		var tArgs = new Object();
+		tAttributes.each(function(attName){
+			if(attName == 'basename' && fileData.getAttribute('filename')){
+				this[attName] = getBaseName(fileData.getAttribute('filename'));						
 			}
-			tString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a>';
-			tString += '</div>';
+			else if(attName == 'compute_image_dimensions'){
+				if(fileData.getAttribute('image_width') && fileData.getAttribute('image_height')){
+					var width = fileData.getAttribute('image_width');
+					var height = fileData.getAttribute('image_height');
+					var newHeight = 150;
+					if(height < newHeight) newHeight = height;
+					var newWidth = newHeight*width/height;
+					var dimAttr = 'height="'+newHeight+'"';
+					if(newWidth > $('info_panel').getWidth() - 16) dimAttr = 'width="100%"';
+				}else{
+					dimAttr = 'height="64" width="64"';
+				}
+				this[attName] = dimAttr;
+			}
+			else if(fileData.getAttribute(attName)){
+				this[attName] = fileData.getAttribute(attName);
+			}
+			else{ 
+				this[attName] = '';
+			}
+		}.bind(tArgs));
+		tMessages.each(function(pair){
+			this[pair.key] = MessageHash[pair.value];
+		}.bind(tArgs));
+		var template = new Template(tString);
+		this.setContent(template.evaluate(tArgs));
+		this.addActions();
+	},
+		
+	addActions: function(){
+		var actions = ajaxplorer.actionBar.getInfoPanelActions();
+		var actionString = '<div style="text-align:right;padding-right:10px;">';
+		var count = 0;
+		actions.each(function(action){
+			if(count > 0) actionString += ' | ';
+			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;">'+action.options.title+'</a>';
+			count++;
+		}.bind(this));
+		actionString += '</div>';
+		this.htmlElement.insert(actionString);
+	},
+	
+	load: function(){
+		var connexion = new Connexion();
+		connexion.addParameter('get_action', 'get_driver_info_panels');
+		connexion.onComplete = function(transport){
+			this.parseXML(transport.responseXML);
+		}.bind(this);
+		connexion.sendSync();
+	},
+	
+	parseXML: function(xmlResponse){
+		if(xmlResponse == null || xmlResponse.documentElement == null) return;		
+		var childs = xmlResponse.documentElement.childNodes;
+		if(!childs.length) return;
+		var panels = childs[0].childNodes;
+		for(var i = 0; i<panels.length; i++){
+			if(panels[i].nodeName != 'infoPanel') continue;
+			var panelMimes = panels[i].getAttribute('mime');
+			var attributes = $A(panels[i].getAttribute('attributes').split(","));
+			var messages = new Hash();
+			var htmlContent = '';
+			var panelChilds = panels[i].childNodes;
+			for(j=0;j<panelChilds.length;j++){
+				if(panelChilds[j].nodeName == 'messages'){
+					var messagesList = panelChilds[j].childNodes;					
+					for(k=0;k<messagesList.length;k++){
+						if(messagesList[k].nodeName != 'message') continue;
+						messages.set(messagesList[k].getAttribute("key"), parseInt(messagesList[k].getAttribute("id")));
+					}
+				}
+				else if(panelChilds[j].nodeName == 'html'){
+					htmlContent = panelChilds[j].firstChild.nodeValue;
+				}
+			}
+			var tId = 't_'+this.mimesTemplates.size();
+			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages]));				
+			$A(panelMimes.split(",")).each(function(mime){
+				this.registeredMimes.set(mime, tId);				
+			}.bind(this));
 		}
-		tString += '</div>';
-		this.setContent(tString);
-	},
-	
-	displayMP3Info : function(fileData){
-		var fileName = getBaseName(fileData.getAttribute("filename"));
-		var fileType = fileData.getAttribute("mimetype");
-		var fileSize = fileData.getAttribute("filesize");
-		var modifTime = fileData.getAttribute("modiftime");
-		
-		var template = new Template('<object type="application/x-shockwave-flash" data="'+ajxpResourcesFolder+'/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="'+ajxpResourcesFolder+'/flash/dewplayer-mini.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>');
-		
-		var tString = '<div style="padding:10px;">';
-		tString += '<div id="mp3_container" style="border:1px solid #79f; text-align:center; padding:5px; width:160px;">'+template.evaluate({mp3_url:'content.php?action=mp3_proxy%26file=' + fileData.getAttribute("filename")})+'</div>';
-		tString += '<br><b>'+MessageHash[133]+'</b> : '+fileName;
-		tString += '<br><b>'+MessageHash[134]+'</b> : '+fileType;
-		tString += '<br><b>'+MessageHash[127]+'</b> : '+fileSize;
-		tString += '<br><b>'+MessageHash[138]+'</b> : '+ modifTime;
-		tString += '<div style="text-align:right;padding-top:5px;">';
-		tString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\'download\'); return false;">'+MessageHash[88]+'</a>';
-		tString += '|<a href="" id="folder2playlist">'+MessageHash[140]+'</a>';
-		tString += '</div>';
-		tString += '</div>';
-		this.setContent(tString);
-		$('folder2playlist').onclick = function(){this.folderAsPlaylist(); return false;}.bind(this);
-	},
-	
-	folderAsPlaylist : function(){
-		var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="'+ajxpResourcesFolder+'/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="'+ajxpResourcesFolder+'/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
-		
-		var itCopy = new Array();
-		$A(ajaxplorer.getFilesList().getItems()).each(function(rowItem){
-			if(rowItem.getAttribute('is_mp3')=='1') itCopy.push(rowItem.getAttribute('filename'));
-		});	
-		var mp3Items = itCopy.reverse();
-		var mp3_url = '';
-		mp3Items.each(function(url){
-			mp3_url += 'content.php?action=mp3_proxy%26file='+url;
-			if(url != mp3Items.last()) mp3_url += '|';
-		});
-	//	alert(mp3_url);
-		newWin = window.open('', 'mp3_multi_player', 'width=260,height=30,directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no');
-		newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getFilesList().getCurrentRep()}));
-		newWin.document.close();
-	},
-	
-	displayFlashPlayer :function(fileName){
-		var baseUrl = 'content.php?action=mp3_proxy%26file=' + fileName;
-	    var FO = { movie:ajxpResourcesFolder+"/flash/dewplayer-mini.swf?mp3="+baseUrl, width:"150", height:"20"};
-	    UFO.create(FO, 'mp3_container');
 	}
+	
 });
