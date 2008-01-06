@@ -93,7 +93,6 @@ Ajaxplorer = Class.create({
 		}
 		
 		this.actionBar.init();
-		this.actionBar.updateDisplayButton(this._initDefaultDisp);
 		modal.updateLoadingProgress('ActionBar Initialized');
 		
 		this.filesList = new FilesList($("selectable_div"), 
