@@ -274,8 +274,7 @@ class fsDriver extends AbstractDriver
 					{
 						$currentFile = $nom_rep."/".$repIndex;			
 						$atts = array();
-						$atts[] = "is_file=\"".(is_file($currentFile)?"oui":"non")."\"";
-						$atts[] = "is_editable=\"".Utils::is_editable($currentFile)."\"";
+						$atts[] = "is_file=\"".(is_file($currentFile)?"1":"0")."\"";
 						$atts[] = "is_image=\"".Utils::is_image($currentFile)."\"";
 						if(Utils::is_image($currentFile))
 						{
@@ -285,7 +284,7 @@ class fsDriver extends AbstractDriver
 							$atts[] = "image_height=\"$height\"";
 						}
 						$atts[] = "is_mp3=\"".Utils::is_mp3($currentFile)."\"";
-						$atts[] = "mimetype=\"".Utils::mimetype($currentFile, "type")."\"";
+						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type")."\"";
 						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
 						$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
@@ -310,7 +309,7 @@ class fsDriver extends AbstractDriver
 				{
 					if($fileListMode)
 					{
-						print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"non\" is_recycle=\"1\" mimetype=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getPath()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
+						print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getPath()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
 					}
 					else 
 					{

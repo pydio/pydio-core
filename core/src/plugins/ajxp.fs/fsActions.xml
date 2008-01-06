@@ -166,7 +166,7 @@ AJXP_MESSAGE[174]<br/>
 		<action name="download" fileDefault="true">
 			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
 				<selectionContext dir="false" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
@@ -211,25 +211,23 @@ AJXP_MESSAGE[174]<br/>
 		</action>
 		<action name="edit">
 			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
+				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" image="false" mp3="false" editable="true"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
-					if(userSelection.isEditable()){
-						var sTitle = MessageHash[187]+userSelection.getUniqueFileName();						
-						var loadFunc = function(oForm){
-							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-							ajaxplorer.actionBar.editor = new Editor(oForm);
-							ajaxplorer.actionBar.editor.createEditor(userSelection.getUniqueFileName());
-							ajaxplorer.actionBar.editor.loadFile(userSelection.getUniqueFileName());
-						};
-						modal.showDialogForm('Edit Online', 'edit_box', loadFunc, null, null, true, true);
-					}				
+					var sTitle = MessageHash[187]+userSelection.getUniqueFileName();						
+					var loadFunc = function(oForm){
+						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.actionBar.editor = new Editor(oForm);
+						ajaxplorer.actionBar.editor.createEditor(userSelection.getUniqueFileName());
+						ajaxplorer.actionBar.editor.loadFile(userSelection.getUniqueFileName());
+					};
+					modal.showDialogForm('Edit Online', 'edit_box', loadFunc, null, null, true, true);
 					]]></clientCallback>
 				<clientForm id="edit_box"><![CDATA[
 					<div id="edit_box" action="editer" box_width="80%" box_height="90%">
@@ -249,10 +247,10 @@ AJXP_MESSAGE[174]<br/>
 		<action name="view">
 			<gui text="129" title="136" src="frame_image.png" accessKey="view_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" image="true" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_IMAGE" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -497,12 +495,36 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="play_whole_folder">
+			<gui text="140" title="140" src="applix.png" accessKey=""><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="true"></context><selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_AUDIO"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback><![CDATA[
+					var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
+					
+					var itCopy = new Array();
+					$A(ajaxplorer.getFilesList().getItems()).each(function(rowItem){
+						if(rowItem.getAttribute('is_mp3')=='1') itCopy.push(rowItem.getAttribute('filename'));
+					});	
+					var mp3Items = itCopy.reverse();
+					var mp3_url = '';
+					mp3Items.each(function(url){
+						mp3_url += 'content.php?action=mp3_proxy%26file='+url;
+						if(url != mp3Items.last()) mp3_url += '|';
+					});
+				//	alert(mp3_url);
+					newWin = window.open('', 'mp3_multi_player', 'width=260,height=30,directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no');
+					newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getFilesList().getCurrentRep()}));
+					newWin.document.close();
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
 		<action name="image_proxy">
 			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key"><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"></context><selectionContext dir="true" file="true" recycle="false" unique="true" image="" mp3="" editable=""></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
-				<clientCallback>
-					<![CDATA[
+				<clientCallback><![CDATA[
 					// PUT HERE CODE TO EXECUTE IN JAVASCRIPT
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -512,12 +534,87 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key"><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"></context><selectionContext dir="true" file="true" recycle="false" unique="true" image="" mp3="" editable=""></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
-				<clientCallback>
-					<![CDATA[
+				<clientCallback><![CDATA[
 					// PUT HERE CODE TO EXECUTE IN JAVASCRIPT
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>						
 	</actions>
+	<infoPanels>
+		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,modiftime">
+			<messages>
+				<message key="name_string" id="133"/>
+				<message key="size_string" id="127"/>
+				<message key="type_string" id="134"/>
+				<message key="modif_string" id="138"/>
+			</messages>
+			<html><![CDATA[
+			<div style="padding:10px;">
+				<div class="folderImage">
+					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+				</div>
+				<b>#{name_string}</b> : #{basename}
+				<br><b>#{size_string}</b> : #{filesize}
+				<br><b>#{type_string}</b> : #{mimestring}
+				<br><b>#{modif_string}</b> : #{modiftime}
+			</div>
+			]]></html>
+		</infoPanel>
+		<infoPanel mime="generic_dir" attributes="basename,icon,modiftime">
+			<messages>
+				<message key="name_string" id="133"/>
+				<message key="modif_string" id="138"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<div class="folderImage">
+						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+					</div>
+					<b>#{name_string}</b> : #{basename}
+					<br><b>#{modif_string}</b> : #{modiftime}
+				</div>
+			]]></html>
+		</infoPanel>
+		<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,modiftime">
+			<messages>
+				<message key="name_string" id="133"/>
+				<message key="size_string" id="127"/>
+				<message key="type_string" id="134"/>				
+				<message key="modif_string" id="138"/>
+				<message key="dim_string" id="135"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<center style="border:1px solid #79f;">
+						<img src="content.php?action=image_proxy&get_thumb=true&file=#{filename}" #{compute_image_dimensions}>
+					</center>
+					<b>#{name_string}</b> : #{basename}
+					<br><b>#{dim_string}</b> : #{image_width}px X #{image_height}px
+					<br><b>#{size_string}</b> : #{filesize}
+					<br><b>#{type_string}</b> : #{image_type}
+					<br><b>#{modif_string}</b> : #{modiftime}
+				</div>
+			]]></html>
+		</infoPanel>
+		<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,filename,icon,filesize,mimestring,modiftime">
+			<messages>
+				<message key="name_string" id="133"/>
+				<message key="size_string" id="127"/>
+				<message key="type_string" id="134"/>				
+				<message key="modif_string" id="138"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<div id="mp3_container" style="border:1px solid #79f; text-align:center; padding:5px; width:160px;">
+						<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
+					</div>
+					<b>#{name_string}</b> : #{basename}
+					<br><b>#{size_string}</b> : #{filesize}
+					<br><b>#{type_string}</b> : #{mimestring}
+					<br><b>#{modif_string}</b> : #{modiftime}
+				</div>
+			]]></html>
+		</infoPanel>
+	</infoPanels>
 </driver>
