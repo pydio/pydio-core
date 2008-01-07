@@ -24,73 +24,6 @@ ActionsManager = Class.create({
 	init: function()
 	{		
 		this._items = this._htmlElement.select('[action]');
-		var oThis = this;
-		for(i=0; i<this._items.length;i++)
-		{	
-			if(!this._items[i].getAttribute('action')) continue;
-			// Set action link
-			var item = this._items[i];
-			var action = item.getAttribute('action');
-			// OPERA : OPERA ADDS "http://yourdomain.com/ajaxplorer/" to the action attribute value...
-			if(action.substr(0,4)=='http')
-			{
-				action = getBaseName(action);
-			}
-			this._actions.set(action, i);
-			item.href = "javascript:ajaxplorer.getActionBar().fireAction('"+action+"')";
-			// Set image
-			if(item.getAttribute('icon_src'))
-			{
-				var displayString = item.innerHTML;
-				item.innerHTML = '';
-				
-				var image = new Element('img');
-				item.appendChild(image);
-				image.width='22';
-				image.height='22';
-				image.src = ajxpResourcesFolder+'/images/crystal/actions/22/'+item.getAttribute('icon_src');
-				image.setAttribute('border', '0');
-				image.setAttribute('align', 'ABSMIDDLE');
-				image.setAttribute('alt', item.getAttribute('title'));
-				image.setAttribute('title', item.getAttribute('title'));			
-	
-				if(item.getAttribute('key'))
-				{
-					if(item.getAttribute('key') == 'none') continue;
-					firstKey = item.getAttribute('key');
-				}
-				else
-				{
-					firstKey = displayString.charAt(0);
-				}
-				displayString = displayString.substring(0,displayString.indexOf(firstKey)) + '<u>'+firstKey+'</u>' + displayString.substring(displayString.indexOf(firstKey)+1, displayString.length);
-				this._registeredKeys.set(firstKey.toLowerCase(), action);			
-				
-				spanTitle = new Element('span');
-				spanTitle.innerHTML = displayString;
-				
-				item.appendChild(new Element('br'));
-				item.appendChild(spanTitle);
-			}else{
-			// Set keyboard shortcut
-			var textNode = item.lastChild;
-			var textNodeString = textNode.innerHTML;
-			if(item.getAttribute('key'))
-			{
-				if(item.getAttribute('key') == 'none') continue;
-				firstKey = item.getAttribute('key');
-			}
-			else
-			{
-				firstKey = textNodeString.charAt(0);
-			}
-			replaceHtml = textNodeString.substring(0,textNodeString.indexOf(firstKey)) + '<u>'+firstKey+'</u>' + textNodeString.substring(textNodeString.indexOf(firstKey)+1, textNodeString.length);
-			this._registeredKeys.set(firstKey.toLowerCase(), action);
-			textNode.innerHTML = replaceHtml;
-			}
-		}		
-		//alert(this._registeredKeys['u']);
-		var oThis = this;
 		$('current_path').onfocus = function(e)	{
 			ajaxplorer.disableShortcuts();
 			this.hasFocus = true;
@@ -133,7 +66,7 @@ ActionsManager = Class.create({
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = '<ajxp_message ajxp_message_id="142">'+MessageHash[142]+'</ajxp_message><i style="cursor:pointer;text-decoration:underline;" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+'</i>.';
+				logging_string = '<ajxp_message ajxp_message_id="142">'+MessageHash[142]+'</ajxp_message><i style="cursor:pointer;text-decoration:underline;" ajxp_message_title_id="189" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></i>.';
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
 					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
@@ -173,7 +106,8 @@ ActionsManager = Class.create({
 					elem.checked = true;
 				}
 			});
-			$('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
+			$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
+			
 		};
 		
 		var onComplete = function(){
@@ -183,30 +117,47 @@ ActionsManager = Class.create({
 					 ajaxplorer.user.setPreference(elem.name, elem.value);
 				}
 			});
+			var userOldPass = null;
 			var userPass = null;
 			if($('user_change_ownpass1') && $('user_change_ownpass1').value != "" && $('user_change_ownpass2').value != "")
 			{
-				if($('user_change_ownpass1').value != $('user_change_ownpass2').value)
-				{
-					alert('Passwords differ!');
+				if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
+					alert(MessageHash[238]);
 					return false;
 				}
+				if($('user_change_ownpass_old').value == ''){
+					alert(MessageHash[239]);
+					return false;					
+				}
 				userPass = $('user_change_ownpass1').value;
+				userOldPass = $('user_change_ownpass_old').value;
 			}
 			var onComplete = function(transport){
-				if(userPass != null) alert(MessageHash[197]);
 				var oUser = ajaxplorer.user;
 				if(oUser.getPreference('lang') != null 
 					&& oUser.getPreference('lang') != "" 
 					&& oUser.getPreference('lang') != ajaxplorer.currentLanguage)
-				ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
-				hideLightBox(true);
+				{
+					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
+				}
+					
+				if(userPass != null){
+					if(transport.responseText == 'PASS_ERROR'){
+						alert(MessageHash[240]);
+					}else if(transport.responseText == 'SUCCESS'){
+						ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
+						hideLightBox(true);
+					}
+				}else{
+					ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+					hideLightBox(true);
+				}
 			}
-			ajaxplorer.user.savePreferences(userPass, onComplete);
+			ajaxplorer.user.savePreferences(userOldPass, userPass, onComplete);
 			return false;		
 		}
 		
-		modal.prepareHeader(MessageHash[195], '');
+		modal.prepareHeader(MessageHash[195], ajxpResourcesFolder+'/images/crystal/actions/16/configure.png');
 		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
 	},
 		

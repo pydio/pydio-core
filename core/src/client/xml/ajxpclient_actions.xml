@@ -146,7 +146,7 @@
 			</processing>
 		</action>		
 		<action name="login">
-			<gui text="163" title="168" src="yast_security.png"
+			<gui text="163" title="168" src="encrypted.png"
 				accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
@@ -166,7 +166,7 @@
 			</processing>
 		</action>		
 		<action name="logout">
-			<gui text="164" title="169" src="cancel.png"
+			<gui text="164" title="169" src="decrypted.png"
 				accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
