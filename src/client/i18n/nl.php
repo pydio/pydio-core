@@ -265,6 +265,11 @@ $mess=array(
 "233" => "Stop Slideshow", 
 "234" => "View selected images",
 "235" => "Fullscreen",
-"236" => "Restore"
+"236" => "Restore",
+"237" => "Old password", 
+"238" => "Passwords differ!",
+"239" => "Please fill you current password",
+"240" => "Wrong password!",
+"241" => "Your preferences has been saved successfully"
 );
 ?>
