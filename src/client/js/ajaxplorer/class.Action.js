@@ -32,7 +32,8 @@ Action = Class.create({
 			recycle:false,
 			behaviour:'disabled',
 			allowedMimes:$A([]),			
-			unique:true
+			unique:true,
+			multipleOnly:false
 			}, arguments[2] || { });
 		this.rightsContext = Object.extend({			
 			noUser:true,
@@ -141,7 +142,7 @@ Action = Class.create({
 		
 	},
 		
-	createFromXML:function(xmlNode){		
+	createFromXML:function(xmlNode){
 		this.options.name = xmlNode.getAttribute('name');
 		for(var i=0; i<xmlNode.childNodes.length;i++){
 			var node = xmlNode.childNodes[i];
