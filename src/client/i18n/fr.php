@@ -260,9 +260,12 @@ $mess=array(
 "227" => "Passer en vue Liste Détaillée",
 "228" => "Vignettes",
 "229" => "Passer en vue Vignettes",
-"230" => "Play",
-"231" => "Play Slideshow", 
+"230" => "Auto",
+"231" => "Faire défiler les images", 
 "232" => "Stop", 
-"233" => "Stop Slideshow"
+"233" => "Arrêter le défilement automatique", 
+"234" => "Voir les images sélectionnées",
+"235" => "PleinEcran",
+"236" => "Restaurer"
 );
 ?>

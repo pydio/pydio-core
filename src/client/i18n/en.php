@@ -262,6 +262,9 @@ $mess=array(
 "230" => "Play",
 "231" => "Play Slideshow", 
 "232" => "Stop", 
-"233" => "Stop Slideshow"
+"233" => "Stop Slideshow", 
+"234" => "View selected images",
+"235" => "Fullscreen",
+"236" => "Restore"
 );
 ?>
