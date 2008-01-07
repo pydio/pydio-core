@@ -17,7 +17,7 @@ $mess=array(
 "4" => "Modifié le",
 "5" => "Actions",
 "6" => "Renommer",
-"7" => "Suppr.",
+"7" => "Supprimer",
 "8" => "Dossier",
 "9" => "Fichier MIDI",
 "10" => "Document texte",
@@ -266,6 +266,11 @@ $mess=array(
 "233" => "Arrêter le défilement automatique", 
 "234" => "Voir les images sélectionnées",
 "235" => "PleinEcran",
-"236" => "Restaurer"
+"236" => "Restaurer",
+"237" => "Ancien mot de passe", 
+"238" => "Les mots de passe sont différents!",
+"239" => "Veuillez remplir votre mot de passe",
+"240" => "Mauvais mot de passe",
+"241" => "Vos préférences ont été sauvées avec succès"
 );
 ?>
