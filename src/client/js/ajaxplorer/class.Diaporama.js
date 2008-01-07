@@ -1,15 +1,21 @@
+var DiaporamaFirstOccurence = true;
 Diaporama = Class.create({
 
+	fullscreenMode: false,
+	
 	initialize: function(div)
 	{
 		this.element = div;
+		this.fullBox = this.element.select('div[id="diaporama_box"]')[0];
 		this.nextButton = div.select('a[id="nextButton"]')[0];
 		this.previousButton = div.select('a[id="prevButton"]')[0];
 		this.closeButton = div.select('a[id="closeButton"]')[0];
 		this.downloadButton = div.select('a[id="downloadDiapoButton"]')[0];
 		this.playButton = div.select('a[id="playButton"]')[0];
 		this.stopButton = div.select('a[id="stopButton"]')[0];
-
+		this.fsButton = div.select('a[id="fsButton"]')[0];
+		this.nofsButton = div.select('a[id="nofsButton"]')[0];
+		
 		this.actualSizeButton = div.select('img[id="actualSizeButton"]')[0];
 		this.fitToScreenButton = div.select('img[id="fitToScreenButton"]')[0];
 		this.imgTag = div.select('img[id="mainImage"]')[0];
@@ -29,9 +35,11 @@ Diaporama = Class.create({
 			return false;
 		}.bind(this);
 		this.closeButton.onclick = function(){
+			if(this.fullscreenMode) this.exitFullScreen();
+			this.close();
 			hideLightBox(true);
 			return false;
-		}	
+		}.bind(this);	
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
 			document.location.href = 'content.php?action=download&file='+this.currentFile;
@@ -54,6 +62,17 @@ Diaporama = Class.create({
 			this.updateButtons();
 			return false;
 		}.bind(this);
+		this.fsButton.onclick = function(){
+			this.setFullScreen();
+			this.fsButton.hide();
+			this.nofsButton.show();
+		}.bind(this);
+		this.nofsButton.onclick = function(){
+			this.exitFullScreen();
+			this.nofsButton.hide();
+			this.fsButton.show();
+		}.bind(this);
+		modal.setCloseAction(this.close.bind(this));
 		
 		this.imgTag.onload = function(){
 			this.resizeImage();
@@ -75,7 +94,7 @@ Diaporama = Class.create({
 			}
 			return true;
 		}.bind(this));
-		this.timeInput.observe('change', function(e){
+		this.timeInput.observe('change', function(e){			
 			if(this.slideShowPlaying && this.pe){
 				this.stop();
 				this.play();
@@ -86,7 +105,6 @@ Diaporama = Class.create({
 	
 	open : function(aFilesList, sCurrentFile)
 	{
-		this.currentFile = sCurrentFile;
 		var allItems = aFilesList;
 		this.items = new Array();
 		this.sizes = new Hash();
@@ -97,6 +115,9 @@ Diaporama = Class.create({
 															   width:rowItem.getAttribute('image_width')});
 			}
 		}.bind(this));	
+		
+		if(!sCurrentFile && this.items.length) sCurrentFile = this.items[0];		
+		this.currentFile = sCurrentFile;
 		
 		var sliderDiv = this.element.select('div[id="slider-2"]')[0];
 		var sliderInput = this.element.select('input[id="slider-input-2"]')[0];
@@ -112,6 +133,10 @@ Diaporama = Class.create({
 	
 		this.updateImage();
 		this.updateButtons();
+		if(DiaporamaFirstOccurence){
+			bgCorners(".action_bar a", "round 8px");
+			DiaporamaFirstOccurence = false;
+		}
 	},
 	
 	updateModalTitle : function(){
@@ -144,6 +169,30 @@ Diaporama = Class.create({
 		
 	},
 	
+	setFullScreen: function(){
+		this.fullBox.absolutize();
+		$(document.body).insert(this.fullBox);
+		this.fullBox.setStyle({
+			top:0,
+			left:0,
+			backgroundColor:'#fff',
+			width:'100%',
+			height:document.viewport.getHeight(),
+			zIndex:3000});		
+		this.origContainerHeight = this.imgContainer.getHeight();
+		fitHeightToBottom(this.imgContainer, this.fullBox);
+		this.fullscreenMode = true;
+	},
+	
+	exitFullScreen: function(){
+		this.fullBox.relativize();
+		$(this.element).insert(this.fullBox);
+		this.fullBox.setStyle({top:0,left:0,zIndex:100});
+		//fitHeightToBottom(this.imgContainer, null, 5);
+		this.imgContainer.setStyle({height:this.origContainerHeight});
+		this.fullscreenMode = false;
+	},
+	
 	updateImage : function(){
 		var dimObject = this.sizes.get(this.currentFile);
 		this.crtHeight = dimObject.height;
@@ -164,7 +213,8 @@ Diaporama = Class.create({
 		this.currentFile = null;
 		this.items = null;
 		this.imgTag.src = '';
-		if(this.pe) this.pe.stop();
+		this.stop();
+		if(this.fullscreenMode) this.exitFullScreen();
 	},
 	
 	play: function(){
