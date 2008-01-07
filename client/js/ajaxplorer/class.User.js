@@ -48,7 +48,7 @@ User = Class.create({
 		this.repositories = repoHash;
 	},
 	
-	savePreferences : function(newPass, onCompleteFunc){
+	savePreferences : function(oldPass, newPass, onCompleteFunc){
 		var conn = new Connexion();
 		conn.addParameter("get_action", "save_user_pref");
 		var i=0;
@@ -57,10 +57,11 @@ User = Class.create({
 			conn.addParameter("pref_value_"+i, pair.value);
 			i++;
 		});
-		if(newPass)
+		if(oldPass && newPass)
 		{
 			conn.addParameter("pref_name_"+i, "password");
 			conn.addParameter("pref_value_"+i, newPass);
+			conn.addParameter("crt", oldPass);
 		}
 		conn.onComplete = onCompleteFunc;
 		conn.sendAsync();

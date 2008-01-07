@@ -126,7 +126,7 @@ jQuery('#loaderContent').corner("round bottom 10px");
 
 <!-- USER'S PREFERENCES -->
 <form id="user_pref_form" action="user_pref" style="display:none;" box_width="300">
-<fieldset><legend ajxp_message_id="190"><?php print($mess[190]);?></legend>
+<fieldset><legend><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/flag.png" align="absmiddle" border="0" width="16" height="16"> <ajxp_message ajxp_message_id="190"><?php print($mess[190]);?></ajxp_message></legend>
 <?php 
 $langs = ConfService::getConf("AVAILABLE_LANG");
 foreach ($langs as $lang => $display)
@@ -135,14 +135,23 @@ foreach ($langs as $lang => $display)
 }
 ?>
 </fieldset>
-<fieldset><legend ajxp_message_id="191"><?php print($mess[191]);?></legend>
+<fieldset><legend><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/view_choose.png" align="absmiddle" border="0" width="16" height="16"> <ajxp_message ajxp_message_id="191"><?php print($mess[191]);?></ajxp_message></legend>
 	<input type="radio" name="display" id="display_list" value="list" class="radio"><ajxp_message ajxp_message_id="192"><?php print($mess[192]);?></ajxp_message>
 	<input type="radio" name="display" id="display_thumb" value="thumb" class="radio"><ajxp_message ajxp_message_id="193"><?php print($mess[193]);?></ajxp_message>
 </fieldset>
 <?php if(AuthService::changePasswordEnabled()){ ?>
-<fieldset><legend ajxp_message_id="194"><?php print($mess[194]);?></legend>
-	<ajxp_message ajxp_message_id="198"><?php print($mess[198]);?></ajxp_message> <input type="password" id="user_change_ownpass1" value="">
-	<ajxp_message ajxp_message_id="199"><?php print($mess[199]);?></ajxp_message> <input type="password" id="user_change_ownpass2" value="">
+<fieldset><legend><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/yast_security.png" align="absmiddle" border="0" width="16" height="16"> <ajxp_message ajxp_message_id="194"><?php print($mess[194]);?></ajxp_message></legend>
+<table cellpadding="2" cellspacing="0" border="0" style="font-size:11px;">
+	<tr>
+		<td align="right" style="width:90px; text-align:right;"><ajxp_message ajxp_message_id="237"><?php print($mess[237]);?></ajxp_message></td><td><input type="password" id="user_change_ownpass_old" value=""></td>
+	</tr>
+	<tr>
+		<td align="right" style="text-align:right;"><ajxp_message ajxp_message_id="198"><?php print($mess[198]);?></ajxp_message></td><td><input type="password" id="user_change_ownpass1" value=""></td>
+	</tr>
+	<tr>
+		<td align="right" style="text-align:right;"><ajxp_message ajxp_message_id="199"><?php print($mess[199]);?></ajxp_message></td><td><input type="password" id="user_change_ownpass2" value=""></td>
+	</tr>
+</table>
 </fieldset>
 <?php } ?>
 </form>
