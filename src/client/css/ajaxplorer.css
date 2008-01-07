@@ -322,7 +322,7 @@ ACTION BAR
     width: 94%;   
     left:3%;
     margin-bottom:2px;
-    min-width: 880px;
+    min-width: 890px;
     width:expression(document.body.clientWidth < 980? "890px" : "94%" ); 
 }
 
@@ -400,6 +400,7 @@ ACTION BAR
     font-size: 10px;
 }
 
+.action_bar div.separator,
 #action_bar div.separator
 {    
     padding-bottom: 2px;
@@ -414,6 +415,11 @@ ACTION BAR
     height: 30px;
     margin-left: 1px;
     margin-right: 1px;
+}
+
+.action_bar div.separator
+{
+    border-right: 1px solid #79f;
 }
 
 #action_bar a:hover, 
@@ -701,9 +707,7 @@ UPLOAD MULTIFILE FORM
 #multiple_download_container div a:hover
 {
     text-decoration:none;
-    color: #0A0;
-    font-weight:bold;
-    display: block;
+    color: #79f;
 }
 
 
@@ -847,7 +851,7 @@ UPLOAD MULTIFILE FORM
     background-color:#aaa;
     padding:0px;
     margin-bottom:0px;
-    min-width: 880px;
+    min-width: 890px;
     width:expression(document.body.clientWidth < 980? "890px" : "94%" );     
 }
 
