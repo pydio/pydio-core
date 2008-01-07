@@ -172,7 +172,7 @@ AJXP_MESSAGE[174]<br/>
 				<selectionContext dir="false" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
-				<clientCallback><![CDATA[
+				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getFilesList().getUserSelection();					
 					if(userSelection.isUnique())
 					{
@@ -255,7 +255,6 @@ AJXP_MESSAGE[174]<br/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
-					if(userSelection.isImage()){
 						var loadFunc = function(oForm){
 							ajaxplorer.actionBar.diaporama = new Diaporama($(oForm));
 							ajaxplorer.actionBar.diaporama.open(ajaxplorer.getFilesList().getItems(), userSelection.getUniqueFileName());
@@ -266,16 +265,20 @@ AJXP_MESSAGE[174]<br/>
 							return false;
 						};
 						modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
-					}				
 					]]></clientCallback>
 				<clientForm id="diaporama_box"><![CDATA[
 				<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%">
 					<div class="action_bar" style="height: 42px; width: 500px; background-color: #fff;">
 						<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[86]</a>
+						<a href="#" onclick="return false;" id="fsButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[235]</a>
+						<a href="#" onclick="return false;" id="nofsButton" style="display:none;"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br>AJXP_MESSAGE[236]</a>
+						<div class="separator"></div>
 						<a href="#" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/back_22.png" alt="" border="0"><br>AJXP_MESSAGE[178]</a>
 						<a href="#" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/forward_22.png" alt="" border="0"><br>AJXP_MESSAGE[179]</a>
+						<div class="separator"></div>
 						<a href="#" id="stopButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/player_stop.png" alt="AJXP_MESSAGE[233]" border="0"><br>AJXP_MESSAGE[232]</a>
 						<a href="#" id="playButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/player_play.png" alt="AJXP_MESSAGE[231]" border="0"><br>AJXP_MESSAGE[230]</a>
+						<div class="separator"></div>
 						<a href="#" id="downloadDiapoButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="" border="0"><br>AJXP_MESSAGE[88]</a>
 					</div>
 					<div align="right" style="background-image: url(AJXP_CLIENT_RESOURCES_FOLDER/images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
@@ -290,6 +293,30 @@ AJXP_MESSAGE[174]<br/>
 					</div>
 				</div>				
 				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="slideshow_sel">
+			<gui text="234" title="234" src="frame_image.png" accessKey="" hasAccessKey="false">
+				<context selection="true" dir="" recycle="hidden"
+					actionBar="false" contextMenu="true" infoPanel="true"
+					actionBarGroup="get">
+				</context>
+				<selectionContext dir="true" file="true" recycle="true" unique="false" multipleOnly="true" allowedMimes="AJXP_MIMES_IMAGE" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[					
+						var loadFunc = function(oForm){
+							ajaxplorer.actionBar.diaporama = new Diaporama($(oForm));
+							ajaxplorer.actionBar.diaporama.open(ajaxplorer.getFilesList().getSelectedItems());
+						};
+						var closeFunc = function(){
+							ajaxplorer.actionBar.diaporama.close();
+							hideLightBox();
+							return false;
+						};
+						modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
+					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
