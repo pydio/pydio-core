@@ -119,13 +119,6 @@ Ajaxplorer = Class.create({
 		this.initTabNavigation();
 		modal.updateLoadingProgress('Navigation loaded');
 		this.focusOn(this.foldersTree);
-		document.onkeydown = function(event){		
-			if(event == null)
-			{
-				event = window.event;				
-				if(event.keyCode == 9){return false;}
-			}		
-		};
 		this.blockShortcuts = false;
 		this.blockNavigation = false;
 		
@@ -374,11 +367,10 @@ Ajaxplorer = Class.create({
 		var objects = [this.foldersTree, this.filesList, this.actionBar];		
 		// ASSIGN OBSERVER
 		Event.observe(document, "keydown", function(e)
-		{
-			if (e == null) e = document.parentWindow.event;
+		{			
 			if(e.keyCode == Event.KEY_TAB)
-			{			
-				if(this.blockNavigation) return;			
+			{
+				if(this.blockNavigation) return;
 				var shiftKey = e['shiftKey'];
 				for(i=0; i<objects.length;i++)
 				{
@@ -400,11 +392,11 @@ Ajaxplorer = Class.create({
 						break;
 					}
 				}
-				return false;
+				Event.stop(e);
 			}
-			if(this.blockShortcuts || e['ctrlKey']) return true;
-			if(e.keyCode > 90 || e.keyCode < 65) return true;
-			else return this.actionBar.fireActionByKey(String.fromCharCode(e.keyCode).toLowerCase());
+			if(this.blockShortcuts || e['ctrlKey']) return;
+			if(e.keyCode > 90 || e.keyCode < 65) return;
+			else return this.actionBar.fireActionByKey(e, String.fromCharCode(e.keyCode).toLowerCase());
 		}.bind(this));
 	},
 	
