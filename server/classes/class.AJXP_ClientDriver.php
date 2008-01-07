@@ -151,11 +151,20 @@ class AJXP_ClientDriver extends AbstractDriver
 					}
 					else
 					{
-						AuthService::updatePassword($userObject->getId(), $prefValue);
+						if(isSet($_GET["crt"]) && AuthService::checkPassword($userObject->getId(), $_GET["crt"])){
+							AuthService::updatePassword($userObject->getId(), $prefValue);
+						}else{
+							//$errorMessage = "Wrong password!";
+							header("text/plain");
+							print "PASS_ERROR";
+							exit(1);
+						}
 					}
 					$i++;
 				}
-				$logMessage = "Done($i)";
+				header("text/plain");
+				print "SUCCESS";
+				exit(1);
 				
 			break;
 			
