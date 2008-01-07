@@ -16,7 +16,7 @@ Ajaxplorer = Class.create({
 		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 		this.histCount=0;
 		if(!this.usersEnabled) this.rootDirId = rootDirId;
-		modal.setLoadingStepCounts(8);
+		modal.setLoadingStepCounts(7);
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
@@ -26,16 +26,7 @@ Ajaxplorer = Class.create({
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_template');
 		connexion.onComplete = function(transport){
-			$('all_forms').innerHTML += transport.responseText;
-		}
-		/*
-		connexion.addParameter('template_name', 'forms_tpl.html');
-		connexion.sendSync();
-		*/
-		modal.updateLoadingProgress('TODO REMOVE Dialog Loaded');
-	
-		connexion.onComplete = function(transport){
-			document.body.innerHTML += transport.responseText;
+			$(document.body).insert({top:transport.responseText});
 		}
 		connexion.addParameter('template_name', 'gui_tpl.html');
 		connexion.sendSync();
