@@ -323,11 +323,11 @@ function MultiDownloader( list_target, downloadUrl ){
 
 		this.count ++;
 		// Row div
-		var new_row = document.createElement( 'div' );
+		var new_row = new Element( 'div' );
 
-		var new_row_button = document.createElement( 'a' );
+		var new_row_button = new Element('a');
 		new_row_button.href= this.downloadUrl + fileName;		
-		new_row_button.appendChild(document.createTextNode(getBaseName(fileName)));
+		new_row_button.insert('<img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/download_manager.png" height="16" width="16" align="absmiddle" border="0"> '+getBaseName(fileName));
 
 		new_row_button.multidownloader = this;
 		
@@ -343,10 +343,10 @@ function MultiDownloader( list_target, downloadUrl ){
 			}
 		};
 		
-		new_row.appendChild(new_row_button);
+		new_row.insert(new_row_button);
 		
 		// Add it to the list
-		this.list_target.appendChild( new_row );
+		$(this.list_target).insert( new_row );
 		
 	};
 	
