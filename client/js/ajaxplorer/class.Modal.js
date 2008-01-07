@@ -148,15 +148,16 @@ Modal = Class.create({
 		var boxHeight = $(elementName).getHeight();
 		var offsetTop = parseInt(((winHeight - boxHeight)/3));
 		$(elementName).setStyle({top:offsetTop+'px'});
-		
-		//if (Prototype.Browser.IE){		
 			
-		//}
+		displayLightBoxById(elementName);
 		
-		displayLightBoxById(elementName);	
-		
-		// FORCE ABSOLUTE FOR SAFARI!
+		// FORCE ABSOLUTE FOR SAFARI
 		$(elementName).style.position = 'absolute';
+		// FORCE FIXED FOR FIREFOX
+		if (Prototype.Browser.Gecko){					
+			$(elementName).style.position = 'fixed';
+		}
+		
 		// REFRESH PNG IMAGES FOR IE!
 		refreshPNGImages(this.dialogContent);
 	},
