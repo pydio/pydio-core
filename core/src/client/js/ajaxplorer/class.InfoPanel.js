@@ -4,7 +4,7 @@ InfoPanel = Class.create({
 		this.htmlElement = $(htmlElement);
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
 		this.mimesTemplates = new Hash();
-		this.registeredMimes = new Hash();
+		this.registeredMimes = new Hash();		
 	},
 	
 	setTemplateForMime: function(mimeType, templateString, attributes, messages){
@@ -23,7 +23,8 @@ InfoPanel = Class.create({
 		}
 		if(!userSelection.isUnique())
 		{
-			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center>');
+			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
+			this.addActions('multiple');
 			return;
 		}
 		
@@ -83,14 +84,16 @@ InfoPanel = Class.create({
 		}.bind(tArgs));
 		var template = new Template(tString);
 		this.setContent(template.evaluate(tArgs));
-		this.addActions();
+		this.addActions('unique');
 	},
 		
-	addActions: function(){
+	addActions: function(selectionType){
 		var actions = ajaxplorer.actionBar.getInfoPanelActions();
 		var actionString = '<div style="text-align:right;padding-right:10px;">';
 		var count = 0;
 		actions.each(function(action){
+			if(selectionType == 'multiple' && action.selectionContext.unique) return; 
+			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;
 			if(count > 0) actionString += ' | ';
 			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;">'+action.options.title+'</a>';
 			count++;
