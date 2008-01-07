@@ -552,9 +552,10 @@ ActionsManager = Class.create({
 	parseActions: function(xmlResponse){		
 		if(xmlResponse == null || xmlResponse.documentElement == null) return;
 		var actions = xmlResponse.documentElement.childNodes;		
-		for(var i=0;i<actions.length;i++){			
+		for(var i=0;i<actions.length;i++){
+			if(actions[i].nodeName != 'action') continue;
 			var newAction = new Action();
-			newAction.createFromXML(actions[i]);			
+			newAction.createFromXML(actions[i]);
 			this.actions.set(actions[i].getAttribute('name'), newAction);
 			if(actions[i].getAttribute('dirDefault') && actions[i].getAttribute('dirDefault') == "true"){
 				this.defaultActions.set('dir', actions[i].getAttribute('name'));
