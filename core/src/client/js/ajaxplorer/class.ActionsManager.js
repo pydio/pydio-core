@@ -288,14 +288,14 @@ ActionsManager = Class.create({
 		this._registeredKeys = new Hash();
 	},
 	
-	fireActionByKey: function(keyName)
+	fireActionByKey: function(event, keyName)
 	{	
 		if(this._registeredKeys.get(keyName) && !ajaxplorer.blockShortcuts)
 		{
 			 this.fireAction(this._registeredKeys.get(keyName));
-			 return false;
+			 Event.stop(event);
 		}
-		return true;
+		return;
 	},
 	
 	
