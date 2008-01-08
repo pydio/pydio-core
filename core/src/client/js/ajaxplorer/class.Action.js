@@ -145,15 +145,15 @@ Action = Class.create({
 	createFromXML:function(xmlNode){
 		this.options.name = xmlNode.getAttribute('name');
 		for(var i=0; i<xmlNode.childNodes.length;i++){
-			var node = xmlNode.childNodes[i];
+			var node = xmlNode.childNodes[i];			
 			if(node.tagName == "processing"){
 				for(var j=0; j<node.childNodes.length; j++){
 					var processNode = node.childNodes[j];
-					if(processNode.tagName == "clientForm"){
+					if(processNode.nodeName == "clientForm"){
 						this.options.formId = processNode.getAttribute("id");
 						this.options.formCode = processNode.firstChild.nodeValue;
 						this.insertForm();
-					}else if(processNode.tagName == "clientCallback"){
+					}else if(processNode.nodeName == "clientCallback" && processNode.firstChild){
 						this.options.callbackCode = '<script>'+processNode.firstChild.nodeValue+'</script>';
 						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
 							this.options.prepareModal = true;						
