@@ -452,9 +452,10 @@ ActionsManager = Class.create({
 		}
 		var toolEl = $(toolbar+'_toolbar');		
 		if(!toolEl){ 
+			var bgColor = $('action_bar').getStyle('backgroundColor');
 			var toolEl = new Element('div', {
 				id: toolbar+'_toolbar',
-				style: 'display:inline;'
+				style: 'display:inline;background-color:'+bgColor
 			});
 		}
 		toolEl.actionsCount = 0;
