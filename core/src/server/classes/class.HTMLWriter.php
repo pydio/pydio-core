@@ -26,7 +26,7 @@ class HTMLWriter
     	$realName = INSTALL_PATH."/".DOCS_FOLDER."/".$docFileName.".txt";
     	if(is_file($realName))
     	{
-    		$string = "<html><link rel=\"stylesheet\" type=\"text/css\" href=\"".CLIENT_RESOURCES_FOLDER."/css/docs.css\"><body>";
+    		$string = "<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"".CLIENT_RESOURCES_FOLDER."/css/docs.css\"></head><body>";
     		$content = implode("<br>", file($realName));
     		$content = preg_replace("(http:\/\/[a-z|.|\/|\-|0-9]*)", "<a target=\"_blank\" href=\"$0\">$0</a>", $content);
     		$content = preg_replace("(\[(.*)\])", "<div class=\"title\">$1</div>", $content);
