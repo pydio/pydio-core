@@ -99,73 +99,16 @@ else $action = "";
 if(isSet($dir) && $action != "upload") $dir = utf8_decode($dir);
 if(isSet($dest)) $dest = utf8_decode($dest);
 
-//--------------------------------------
-// FIRST CHECK RIGHTS FOR THIS ACTION
-//--------------------------------------
+//------------------------------------------------------------
+// SPECIAL HANDLING FOR FANCY UPLOADER RIGHTS FOR THIS ACTION
+//------------------------------------------------------------
 if(AuthService::usersEnabled())
 {
 	$loggedUser = AuthService::getLoggedUser();	
-	switch ($action)
+	if($action == "upload" && ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex()."")) && isSet($_FILES['Filedata']))
 	{
-		// NEEDS WRITE RIGHTS
-		case "edit":
-		case "copy":
-		case "move":
-		case "delete":
-		case "mkdir":
-		case "mkfile":
-			if($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))
-			{
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage(null, "You have no write permission!");
-				AJXP_XMLWriter::requireAuth();
-				AJXP_XMLWriter::close();
-				exit(1);
-			}
-		break;		
-		case "upload":		
-		case "fancy_uploader":
-			if($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))
-			{
-				if(isSet($_FILES['Filedata']))
-				{
-					header('HTTP/1.0 ' . '415 Not authorized');
-					die('Error 415 Not authorized!');
-				}
-				else
-				{
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, $mess[207]);
-					AJXP_XMLWriter::requireAuth();
-					AJXP_XMLWriter::close();
-				}
-				exit(1);
-			}
-		break;
-		
-		// NEEDS READ RIGHTS
-		case "voir":
-		case "image_proxy":
-		case "mp3_proxy":
-		case "switch_root_dir":
-		case "xml_listing":
-		case "download":
-		case "root_tree":		
-			if($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))
-			{
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage(null, $mess[208]);
-				AJXP_XMLWriter::requireAuth();
-				AJXP_XMLWriter::close();
-				exit(1);
-			}			
-		break;
-		// NO SPECIFIC RIGHTS
-		case "display_action_bar":
-		case "display_bookmark_bar":
-		case "display_doc":
-		default:
-		break;
+		header('HTTP/1.0 ' . '415 Not authorized');
+		die('Error 415 Not authorized!');
 	}
 }
 
@@ -222,34 +165,27 @@ if($Driver->hasAction($action)){
 
 
 AJXP_XMLWriter::header();
-
 if(isset($logMessage) || isset($errorMessage))
 {
 	AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null));
 }
-
 if(isset($requireAuth))
 {
 	AJXP_XMLWriter::requireAuth();
 }
-
 if(isset($reload_current_node) && $reload_current_node == "true")
 {
 	AJXP_XMLWriter::reloadCurrentNode();
 }
-
 if(isset($reload_dest_node) && $reload_dest_node != "")
 {
 	AJXP_XMLWriter::reloadNode($reload_dest_node);
 }
-
 if(isset($reload_file_list))
 {
 	AJXP_XMLWriter::reloadFileList($reload_file_list);
 }
-
 AJXP_XMLWriter::close();
-
 
 
 session_write_close();
