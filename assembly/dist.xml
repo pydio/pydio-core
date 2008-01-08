@@ -14,24 +14,38 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<outputDirectory>classes</outputDirectory>
-			<directory>src/classes</directory>
+			<outputDirectory>client</outputDirectory>
+			<directory>src/client</directory>
 			<includes>
 				<include>**/*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<outputDirectory>conf</outputDirectory>
-			<directory>src/conf</directory>
+			<outputDirectory>plugins</outputDirectory>
+			<directory>src/plugins</directory>
 			<includes>
 				<include>**/*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
-			<outputDirectory>doc</outputDirectory>
-			<directory>src/doc</directory>
+			<outputDirectory>server/classes</outputDirectory>
+			<directory>src/server/classes</directory>
 			<includes>
 				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>server/conf</outputDirectory>
+			<directory>src/server/conf</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>server/users</outputDirectory>
+			<directory>src/server/users</directory>
+			<includes>
+				<include>.htaccess</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -40,27 +54,6 @@
 			<includes>
 				<include>.htaccess</include>
 				<include>INSTALL-SelectMeAndClickEdit.txt</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>images</outputDirectory>
-			<directory>src/images</directory>
-			<includes>
-				<include>**/*</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>include</outputDirectory>
-			<directory>src/include</directory>
-			<includes>
-				<include>**/*</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>users</outputDirectory>
-			<directory>src/users</directory>
-			<includes>
-				<include>.htaccess</include>
 			</includes>
 		</fileSet>
 	</fileSets>
