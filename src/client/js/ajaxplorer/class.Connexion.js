@@ -88,8 +88,6 @@ Connexion = Class.create({
 			"lib/webfx/slider/js/range.js", 
 			"lib/webfx/slider/js/slider.js", 
 			"lib/leightbox/lightbox.js", 
-			"lib/jquery/dimensions.js", 
-			"lib/jquery/splitter.js", 
 			"lib/ufo/ufo.js",
 			"lib/prototype/proto.menu.js",
 			"lib/codepress/codepress.js",

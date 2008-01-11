@@ -429,7 +429,7 @@ ActionsManager = Class.create({
 				crtCount ++;
 			}
 		}.bind(this));
-		bgCorners("#action_bar a", "round 8px");
+		new Effect.Corner($$("#action_bar a")[0], "round 8px");
 	},
 	
 	refreshToolbarsSeparator: function(){
