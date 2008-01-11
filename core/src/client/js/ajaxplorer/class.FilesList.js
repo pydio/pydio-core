@@ -48,12 +48,7 @@ FilesList = Class.create(SelectableElements, {
 			fitHeightToBottom($('table_rows_container'), $('content_pane'));
 			this.disableTextSelection($('selectable_div_header'));		
 			Event.observe(window, "resize",  function(){			
-				setTimeout(function(){this.applyHeadersWidth();fitHeightToBottom($('table_rows_container'), $('content_pane'));}.bind(this), 100);
-			}.bind(this));
-			
-			jQuery('#sidebarSplitter').bind("resize",  function(){			
-				this.applyHeadersWidth();
-				fitHeightToBottom($('table_rows_container'), $('content_pane'));
+				setTimeout(function(){fitHeightToBottom($('table_rows_container'), $('content_pane'));}.bind(this), 100);
 			}.bind(this));
 		}
 		else if(this._displayMode == "thumb")
@@ -79,8 +74,6 @@ FilesList = Class.create(SelectableElements, {
 			this.initSelectableItems($('selectable_div'), true);
 		}	
 		
-		//jQuery("#last_header").corner("round tr 5px");
-		//jQuery("#last_header").css("border-bottom", "1px solid #aaa");
 	},
 	
 	setContextualMenu: function(protoMenu){

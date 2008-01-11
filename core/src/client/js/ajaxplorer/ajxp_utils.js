@@ -16,7 +16,7 @@ function getRepName(fileName)
 function getFileExtension(fileName)
 {
 	var split = getBaseName(fileName).split('.');
-	if(split.length > 1) return split[split.length-1];
+	if(split.length > 1) return split[split.length-1].toLowerCase();
 	return '';
 }
 
@@ -86,46 +86,55 @@ function disableTextSelection(target)
 		});
 	}
 }
-
+var heightsManager = new Hash();
 function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener)
 {
+	element = $(element);
 	if(typeof(parentElement) == "undefined" || parentElement == null){
 		parentElement = Position.offsetParent($(element));
+	}else{
+		parentElement = $(parentElement);
 	}
 	if(typeof(addMarginBottom) == "undefined" || addMarginBottom == null){
 		addMarginBottom = 0;
 	}
+		
+	var observer = function(){
+		var top =0;
+		if(parentElement == window){
+			offset = element.cumulativeOffset();
+			top = offset.top;
+		}else{
+			offset1 = parentElement.cumulativeOffset();
+			offset2 = element.cumulativeOffset();
+			top = offset2.top - offset1.top;
+		}
+		var wh;
+		if(parentElement == window){
+			wh = document.viewport.getHeight();
+		}else{
+			wh = parentElement.getHeight();
+		}
+		var mrg = parseInt(element.getStyle('marginBottom')) ||0;
+		var brd = parseInt(element.getStyle('borderBottomWidth'))||0;			
+		var pad = parseInt((parentElement!=window?parentElement.getStyle('paddingBottom'):0))||0;			
+		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-addMarginBottom))+'px'});
+		element.fire("resize");
+	};
+	
+	observer();
+		
+	if(!heightsManager.size()){
+		Event.observe(window, 'resize', function(e){
+			heightsManager.each(function(pair){
+				pair.value();
+			});
+		});
+	}
 	if(!skipListener){
-		jQuery(parentElement).bind("resize", function(){
-			try{
-			var $ms = jQuery(element);			
-			var top = parseInt($ms.offset().top); // from dimensions.js			
-			if(parentElement != window){				
-				var parentTop = jQuery(parentElement).offset().top;
-				top = top - parentTop;				
-			}
-			//if(jQuery(parentElement).height) return;
-			var wTmp = jQuery(parentElement).height();			
-			var wh = parseInt(jQuery(parentElement).height());
-			// Account for margin or border on the splitter container
-			var mrg = parseInt($ms.css("marginBottom")) || 0;
-			var brd = parseInt($ms.css("borderBottomWidth")) || 0;
-			$ms.css("height", (wh-top-mrg-brd-addMarginBottom)+"px");		
-			//if ( !jQuery.browser.msie )
-			$ms.trigger("resize");
-			}catch(e){}
-		}).trigger("resize");
+		heightsManager.set(element.id, observer);
 	}
-	else{
-		jQuery(parentElement).trigger("resize");
-	}
-	jQuery(element).trigger("resize");
-}
-
-function bgCorners(element, cornersString)
-{
-	//if(element instanceof String) element = '#'+element;
-	jQuery(element).corner(cornersString);
+	return observer;
 }
 
 function ajxpCorners(oElement, cornersString)
