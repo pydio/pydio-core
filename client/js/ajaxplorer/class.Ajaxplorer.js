@@ -1,7 +1,6 @@
 if(dynamicLibLoading)
 {
-	jQuery.noConflict();
-	document.write('<script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/jquery/jquery.corner.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/leightbox/lightbox.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Connexion.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Modal.js"></script>');
+	document.write('<script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/leightbox/lightbox.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Connexion.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Modal.js"></script>');
 }
 
 Ajaxplorer = Class.create({
@@ -86,12 +85,6 @@ Ajaxplorer = Class.create({
 		this.actionBar.init();
 		modal.updateLoadingProgress('ActionBar Initialized');
 		
-		this.filesList = new FilesList($("selectable_div"), 
-										true, 
-										["StringDirFile", "NumberKo", "String", "MyDate"], 
-										null, 
-										this, 
-										this._initDefaultDisp);	
 	
 		this.contextMenu = new Proto.Menu({
 		  selector: '', // context menu will be shown when element with class name of "contextmenu" is clicked
@@ -106,7 +99,6 @@ Ajaxplorer = Class.create({
 		  	this.refreshList();
 		  }.bind(protoMenu),0);};
 	
-		this.filesList.setContextualMenu(this.contextMenu);
 		this.foldersTree.setContextualMenu(this.contextMenu);
 		this.actionBar.setContextualMenu(this.contextMenu);
 		  
@@ -114,6 +106,13 @@ Ajaxplorer = Class.create({
 		this.infoPanel = new InfoPanel("info_panel");
 		this.messageBox = $('message_div');
 		this.initGUI();	
+		this.filesList = new FilesList($("selectable_div"), 
+										true, 
+										["StringDirFile", "NumberKo", "String", "MyDate"], 
+										null, 
+										this, 
+										this._initDefaultDisp);	
+		this.filesList.setContextualMenu(this.contextMenu);
 		modal.updateLoadingProgress('GUI Initialized');
 		this.initFocusBehaviours();
 		this.initTabNavigation();
@@ -333,7 +332,7 @@ Ajaxplorer = Class.create({
 		this.messageBox.style.top = topPosition+'px';
 		this.messageBox.style.left = leftPosition+'px';
 		this.messageBox.style.width = boxWidth+'px';
-		jQuery(this.messageBox).corner("round");
+		new Effect.Corner(this.messageBox,"round");
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
 	},
@@ -401,32 +400,37 @@ Ajaxplorer = Class.create({
 	},
 	
 	initGUI: function(){
-		jQuery("#toolbars").corner("round bottom 10px");
-		jQuery("#action_bar a").corner("round 8px");
+		try{			
+		new Effect.Corner('toolbars', "round bottom 10px");
+		$('action_bar').select('a').each(function(el){new Effect.Corner(el, "round 8px");});
 		if(!Prototype.Browser.WebKit){ // Do not try this on safari, not working good.
-			jQuery(".action_bar a").corner("round 8px");
+			$$(".action_bar a").each(function(el){new Effect.Corner(el, "round 8px");});
 		}
-		jQuery("#location_form").corner("round 8px");
-		
-		jQuery("#verticalSplitter").splitter({
-				type: "v",
-				initA: 200, maxA:400, minA:50
-				});
-		jQuery("#sidebarSplitter").splitter({
-				type: "h",
-				initB: 150,
-				minB: 23,
-				maxB: 500
-				});
-				
-		jQuery("#browser_round").corner("round 8px");
+		new Effect.Corner('location_form', "round 8px");
+		new Effect.Corner('browser_round', "round 8px");
 		fitHeightToBottom($("browser"), window, 15);
-		fitHeightToBottom($("verticalSplitter"), $('browser'), (Prototype.Browser.IE?8:0));
-		fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:3));
-		fitHeightToBottom(this.sEngine._resultsBox, null, 10);
+		fitHeightToBottom($("verticalSplitter"), $('browser'), 8);
+		var s1 = new Splitter('sidebarSplitter',{
+				direction: "horizontal",
+				initB: 150,
+				minB: 24,
+				maxB: 500,
+				onDrag:function(){
+						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:3), true);
+						fitHeightToBottom(this.sEngine._resultsBox, null, 10, true);
+					}.bind(this)
+				});
+		new Splitter('verticalSplitter', {
+				direction: "vertical",
+				initA: 200, maxA:400, minA:50, 
+				onDrag: function(){
+					s1.resizeGroup();
+					if(this.filesList)this.filesList.applyHeadersWidth();
+				}.bind(this)
+		});
+		
 		this.currentSideToggle = 'search';
 		this.toggleSidePanel('info');	
-		jQuery("#sidebarSplitter").trigger("resize");
 		
 		new Effect.Fade(this.messageBox);
 		$(this.actionBar._htmlElement).getElementsBySelector('a', 'input[type="image"]').each(function(element){
@@ -440,6 +444,7 @@ Ajaxplorer = Class.create({
 		disableTextSelection($('panelsToggle'));
 		disableTextSelection($('info_panel'));
 		disableTextSelection($('dir_chooser'));
+		}catch(e){alert(e);}
 		
 	},
 		

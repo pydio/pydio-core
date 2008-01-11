@@ -194,7 +194,7 @@ AdminPageManager = Class.create({
 		this.messageBox.style.top = '80%';
 		this.messageBox.style.left = '60%';
 		this.messageBox.style.width = '30%';
-		jQuery(this.messageBox).corner("round");
+		new Effect.Corner(this.messageBox,"round");
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
 	}

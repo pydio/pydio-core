@@ -58,7 +58,7 @@ Editor = Class.create({
 		this.textarea.setAttribute('wrap', 'off');	
 		this.oForm.appendChild(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
-		fitHeightToBottom($(this.textarea), $(modal.elementName), 5);
+		fitHeightToBottom($(this.textarea), $(modal.elementName), 5, true);
 	},
 	
 	loadFile : function(fileName){

@@ -104,11 +104,10 @@ Modal = Class.create({
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.filesList.blur();
-		//jQuery('#'+elementName).corner("round top 5px");
 		if(Prototype.Browser.IE){
-			jQuery('#'+elementName + ' .dialogTitle').corner("round top 7px");
+			new Effect.Corner($$('#'+elementName + ' .dialogTitle')[0],"round top 7px");
 		}else{
-			jQuery('#'+elementName).corner("round top 7px");
+			new Effect.Corner(elementName,"round top 7px");
 		}
 		if(!this.isRounded)
 		{
