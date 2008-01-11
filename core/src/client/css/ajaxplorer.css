@@ -317,7 +317,7 @@ ACTION BAR
 {
     background-color: #e0ecff;
     padding:0px;
-    padding-bottom:3px;
+    padding-bottom:2px;
     position:relative;
     width: 94%;   
     left:3%;
@@ -870,40 +870,40 @@ UPLOAD MULTIFILE FORM
     width: 200px;
 }
 
-#verticalSplitter .vsplitbar
+.vsplitbar
 {
    width: 4px;
-   background: #bbb url(../js/lib/jquery/vgrabber.gif) no-repeat center;
+   background: #bbb url(../images/vgrabber.gif) no-repeat center;
    /*border: 1px solid;*/
 	border-color:	#fff ButtonShadow
 					ButtonShadow #fff;
    
 }
-#verticalSplitter .vsplitbar.active
+.vsplitbar.active
 {
-  background: #666 url(../js/lib/jquery/vgrabber.gif) no-repeat center;
+  background: #666 url(../images/vgrabber.gif) no-repeat center;
 }
 
-#verticalSplitter .vsplitbar:hover 
+.vsplitbar:hover 
 {
-  background: #ccc url(../js/lib/jquery/vgrabber.gif) no-repeat center;
+  background: #ccc url(../images/vgrabber.gif) no-repeat center;
 }
 
-#verticalSplitter .hsplitbar
+.hsplitbar
 {
    height: 4px;
-   background: #bbb url(../js/lib/jquery/hgrabber.gif) no-repeat center;
+   background: #bbb url(../images/hgrabber.gif) no-repeat center;
    /*border: 1px solid;   */
 	border-color:	#fff ButtonShadow
 					ButtonShadow #fff;
 }
-#verticalSplitter .hsplitbar.active
+.hsplitbar.active
 {
-  background: #666 url(../js/lib/jquery/hgrabber.gif) no-repeat center;
+  background: #666 url(../images/hgrabber.gif) no-repeat center;
 }
 
-#verticalSplitter .hsplitbar:hover{
-  background: #ccc url(../js/lib/jquery/hgrabber.gif) no-repeat center;
+.hsplitbar:hover{
+  background: #ccc url(../images/hgrabber.gif) no-repeat center;
 }
 
 
