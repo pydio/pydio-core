@@ -134,7 +134,9 @@ Diaporama = Class.create({
 		this.updateImage();
 		this.updateButtons();
 		if(DiaporamaFirstOccurence){
-			new Effect.Corner($$(".action_bar a")[0], "round 8px");
+			$$(".action_bar a").each(function(el){
+				new Effect.Corner(el, "round 8px");
+			});
 			DiaporamaFirstOccurence = false;
 		}
 	},
