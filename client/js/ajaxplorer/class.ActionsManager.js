@@ -14,6 +14,8 @@ ActionsManager = Class.create({
 		else this._currentUser = 'shared';
 		this.oUser = oUser;
 		this.bookmarksBar = new BookmarksBar();
+		this.bgManager = new BackgroundManager(this);
+		
 		
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
@@ -374,7 +376,20 @@ ActionsManager = Class.create({
 				{
 					ajaxplorer.getLoggedUserFromServer();
 				}
+			}else if(childs[i].tagName == "trigger_bg_action"){
+				var name = childs[i].getAttribute("name");
+				var messageId = childs[i].getAttribute("messageId");
+				var parameters = new Hash();
+				for(var j=0;j<childs[i].childNodes.length;j++){
+					var paramChild = childs[i].childNodes[j];
+					if(paramChild.tagName == 'param'){
+						parameters.set(paramChild.getAttribute("name"), paramChild.getAttribute("value"));
+					}
+				}
+				this.bgManager.queueAction(name, parameters, messageId);
+				this.bgManager.next();
 			}
+
 		}
 	},
 		
