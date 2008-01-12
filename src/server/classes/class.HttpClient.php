@@ -39,6 +39,10 @@ class HttpClient {
     // Tracker variables
     var $redirect_count = 0;
     var $cookie_host = '';
+    var $postFileName = "userfile";
+    var $postFileData = array();
+    var $postDataArray = array();
+    
     function HttpClient($host, $port=80) {
         $this->host = $host;
         $this->port = $port;
@@ -57,6 +61,16 @@ class HttpClient {
         $this->postdata = $this->buildQueryString($data);
     	return $this->doRequest();
     }
+    function postFile($path, $postData, $fileVarName, $fileData){
+    	$this->path = $path;
+    	$this->method = 'POST';
+    	$this->postFileData = $fileData;
+    	$this->postDataArray = $postData;
+    	$this->postFileName = $fileVarName;
+    	$this->postdata = $this->buildQueryString($postData);
+    	return $this->doRequest();
+    }
+    
     function buildQueryString($data) {
         $querystring = '';
         if (is_array($data)) {
@@ -223,12 +237,36 @@ class HttpClient {
     	if ($this->username && $this->password) {
     	    $headers[] = 'Authorization: BASIC '.base64_encode($this->username.':'.$this->password);
     	}
-    	// If this is a POST, set the content type and length
-    	if ($this->postdata) {
-    	    $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-    	    $headers[] = 'Content-Length: '.strlen($this->postdata);
+    	if(!count($this->postFileData)){
+	    	// If this is a POST, set the content type and length
+	    	if ($this->postdata) {    		
+	    	    $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+	    	    $headers[] = 'Content-Length: '.strlen($this->postdata);
+	    	}
+    		$request = implode("\r\n", $headers)."\r\n\r\n".$this->postdata;
+    	}else{
+	        srand((double)microtime()*1000000);
+	        $boundary = "----".substr(md5(rand(0,32000)),0,10);    		
+	        $headers[] = "Content-type: multipart/form-data, boundary=$boundary";
+	        $data = array();
+	        // attach post vars
+	        foreach($this->postDataArray as $index => $value){
+	            $data[]="--$boundary";
+	            $data[]= "content-disposition: form-data; name=\"".$index."\"";
+	            $data[]= "\r\n".$value."";
+	            $data[]="--$boundary";
+	        }
+	        // and attach the file
+	        //$data[]= "--$boundary";
+	        $content_file = join("", file($this->postFileData["tmp_name"]));
+	        $data[]="content-disposition: form-data; name=\"".$this->postFileName."\"; filename=\"".$this->postFileData["name"]."\"";
+	        $data[]= "Content-Type: ".$this->postFileData['type']."\r\n";
+	        $data[]= "".$content_file."";
+	        $data[]="--$boundary--";
+	        $data = implode("\r\n", $data);
+	        $headers[]= "Content-length: " . strlen($data);
+    		$request = implode("\r\n", $headers)."\r\n\r\n".$data;
     	}
-    	$request = implode("\r\n", $headers)."\r\n\r\n".$this->postdata;
     	return $request;
     }
     function getStatus() {
