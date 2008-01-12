@@ -80,9 +80,11 @@ class AbstractDriver {
 			if($filterByRight && $this->actionNeedsRight($name, "w")){
 				if($user==null || !$user->canWrite($this->repository->getId())) continue;
 			}
-			$xml = $action["XML"];
-			$xml = $this->replaceAjxpXmlKeywords($xml);
-			AJXP_XMLWriter::write($xml, true);
+			if(isSet($action["XML"])){
+				$xml = $action["XML"];
+				$xml = $this->replaceAjxpXmlKeywords($xml);
+				AJXP_XMLWriter::write($xml, true);
+			}
 		}
 		AJXP_XMLWriter::close();
 	}
@@ -109,8 +111,10 @@ class AbstractDriver {
 		$matches = array();
 		foreach ($this->actions as $actionName => $actionData){
 			preg_match_all('/(<action name=\"'.$actionName.'\".*?>.*?<\/action>)/', str_replace("\n", "", $fileData), $matches);
-			$actionXML = $matches[0][0];
-			$this->actions[$actionName]["XML"] = $actionXML;			
+			if(count($matches) && count($matches[0])){
+				$actionXML = $matches[0][0];
+				$this->actions[$actionName]["XML"] = $actionXML;
+			}
 		}
 	}
 	
