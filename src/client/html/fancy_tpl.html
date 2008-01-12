@@ -161,8 +161,7 @@ var fUploader = new FancyUpload($('userfile_1'), {
 	queueList: 'fancy_queue',
 	container: $E('queue_container'),
 	onAllComplete:function(){
-		parent.document.getElementById('closeFancyUploadBox').disabled=false;
-		parent.ajaxplorer.filesList.reload();
+		parent.modal.close();
 	}
 	//onError:function(name, size, message){alert('Error:'+message)}
 });
