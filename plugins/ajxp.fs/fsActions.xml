@@ -37,6 +37,10 @@
 				<clientCallback prepareModal="true"><![CDATA[
 				if(ajaxplorer.actionBar.getFlashVersion() >= 8 && document.location.href.substring(0,5)!='https')
 				{
+					modal.setCloseAction(function(){
+						$('closeFancyUploadBox').disabled=false;
+						ajaxplorer.filesList.reload();
+					});
 					modal.showDialogForm('Upload', 
 										'fancy_upload_form', 
 										null, 
@@ -60,6 +64,9 @@
 						oForm.appendChild(rep);
 					}.bind(ajaxplorer.actionBar);
 					
+					modal.setCloseAction(function(){						
+						ajaxplorer.filesList.reload();
+					});
 					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){
 						ajaxplorer.actionBar.multi_selector.submitMainForm();
 						return false;
