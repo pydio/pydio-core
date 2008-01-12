@@ -41,6 +41,15 @@ class AJXP_XMLWriter
 		return AJXP_XMLWriter::write("<require_auth/>", $print);
 	}
 	
+	function triggerBgAction($actionName, $parameters, $messageId, $print=true){
+		$data = AJXP_XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\">", $print);
+		foreach ($parameters as $paramName=>$paramValue){
+			$data .= AJXP_XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
+		}
+		$data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
+		return $data;		
+	}
+	
 	function reloadFileList($fileOrBool, $print = true)
 	{
 		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".utf8_encode($fileOrBool)."\"/>", $print);
