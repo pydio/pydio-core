@@ -13,6 +13,11 @@ InfoPanel = Class.create({
 		this.mimesTemplates.push($A([templateString,attributes, messages]));
 	},
 	
+	clearPanels:function(){
+		this.mimesTemplates = new Hash();
+		this.registeredMimes = new Hash();
+	},
+	
 	update : function(){	
 		var filesList = ajaxplorer.getFilesList();
 		var userSelection = filesList.getUserSelection();
@@ -108,6 +113,7 @@ InfoPanel = Class.create({
 		connexion.onComplete = function(transport){
 			this.parseXML(transport.responseXML);
 		}.bind(this);
+		this.clearPanels();
 		connexion.sendSync();
 	},
 	

@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="fs" className="class.fsDriver.php">
 	<actions>
-		<action name="ls" dirDefault="true">
+		<action name="ls" dirDefault="true">			
+			<displayDefinitions>
+				<display mode="list">
+					<column messageId="1" attributeName="text"/>
+					<column messageId="2" attributeName="filesize"/>
+					<column messageId="3" attributeName="mimestring"/>
+					<column messageId="4" attributeName="modiftime"/>
+				</display>
+			</displayDefinitions>
 			<gui text="154" title="155" src="folder_new.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
@@ -380,7 +388,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="copy" dragndropDefault="">
+		<action name="copy" ctrlDragndropDefault="true">
 			<gui text="66" title="159" src="editcopy.png" accessKey="copy_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
@@ -444,7 +452,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="move">
+		<action name="move" dragndropDefault="true">
 			<gui text="70" title="160" src="editpaste.png" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"

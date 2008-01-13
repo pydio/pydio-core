@@ -254,6 +254,10 @@ ActionsManager = Class.create({
 	
 	applyDragMove: function(fileName, destDir, destNodeName, copy)
 	{
+		if((!copy && !this.defaultActions.get('dragndrop')) || 
+			(copy && !this.defaultActions.get('ctrldragndrop'))){
+			return;
+		}
 		if(fileName == null) fileNames = ajaxplorer.filesList.getUserSelection().getFileNames();
 		else fileNames = [fileName];
 		if(destNodeName != null)
@@ -279,9 +283,9 @@ ActionsManager = Class.create({
 		}
 		var connexion = new Connexion();
 		if(copy){
-			connexion.addParameter('get_action', 'copy');
+			connexion.addParameter('get_action', this.defaultActions.get('ctrldragndrop'));
 		}else{
-			connexion.addParameter('get_action', 'move');
+			connexion.addParameter('get_action', this.defaultActions.get('dragndrop'));
 		}
 		if(fileName != null){
 			connexion.addParameter('file', fileName);
@@ -523,17 +527,20 @@ ActionsManager = Class.create({
 		var actions = xmlResponse.documentElement.childNodes;		
 		for(var i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
-			var newAction = new Action();
+			var newAction = new Action();			
 			newAction.createFromXML(actions[i]);
 			this.actions.set(actions[i].getAttribute('name'), newAction);
 			if(actions[i].getAttribute('dirDefault') && actions[i].getAttribute('dirDefault') == "true"){
 				this.defaultActions.set('dir', actions[i].getAttribute('name'));
 			} 
-			if(actions[i].getAttribute('fileDefault') && actions[i].getAttribute('fileDefault') == "true"){
+			else if(actions[i].getAttribute('fileDefault') && actions[i].getAttribute('fileDefault') == "true"){
 				this.defaultActions.set('file', actions[i].getAttribute('name'));
 			} 
-			if(actions[i].getAttribute('dragndropDefault') && actions[i].getAttribute('dragndropDefault') == "true"){
+			else if(actions[i].getAttribute('dragndropDefault') && actions[i].getAttribute('dragndropDefault') == "true"){
 				this.defaultActions.set('dragndrop', actions[i].getAttribute('name'));
+			}			
+			else if(actions[i].getAttribute('ctrlDragndropDefault') && actions[i].getAttribute('ctrlDragndropDefault') == "true"){
+				this.defaultActions.set('ctrldragndrop', actions[i].getAttribute('name'));
 			}			
 			if(newAction.context.actionBar){				
 				if(this.toolbars.get(newAction.context.actionBarGroup) == null){
@@ -543,7 +550,32 @@ ActionsManager = Class.create({
 			}
 			if(newAction.options.hasAccessKey){
 				this.registerKey(newAction.options.accessKey, newAction.options.name);
-			} 			
+			}
+			if(ajaxplorer && ajaxplorer.filesList && newAction.options.name == "ls"){
+				for(var j=0;j<actions[i].childNodes.length;j++){
+					if(actions[i].childNodes[j].nodeName == 'displayDefinitions'){
+						var displayDef = actions[i].childNodes[j];
+						break;
+					}					
+				}
+				if(!displayDef) continue;
+				for(var j=0; j<displayDef.childNodes.length;j++){
+					if(displayDef.childNodes[j].nodeName == 'display' && displayDef.childNodes[j].getAttribute('mode') == 'list'){
+						var columnsDef = displayDef.childNodes[j];
+					}
+				}
+				if(!columnsDef) continue;
+				var columns = $A([]);
+				$A(columnsDef.childNodes).each(function(column){
+					if(column.nodeName == "column"){
+						columns.push({
+							messageId:column.getAttribute("messageId"),
+							attributeName:column.getAttribute("attributeName")
+						});
+					}
+				});
+				ajaxplorer.filesList.setColumnsDef(columns);						
+			}
 		}
 	},
 	
