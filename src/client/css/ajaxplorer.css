@@ -1265,3 +1265,15 @@ padding: 0px;
 {
    background-color: #ddd;
 }
+
+
+.backgroundPanel{
+   position:absolute;
+   width: 150px;   
+   right:2px;
+   bottom:2px;
+   padding:2px;
+   font-size:11px;
+   font-family: Trebuchet MS;
+   background-color:#ddd;
+}
