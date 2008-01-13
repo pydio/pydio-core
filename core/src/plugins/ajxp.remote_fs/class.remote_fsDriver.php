@@ -12,27 +12,50 @@ class remote_fsDriver extends AbstractDriver
 	}
 	
 	function switchAction($action, $httpVars, $filesVars){		
-		
+		/*
 		require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
 		$crtRep = ConfService::getRepository();
 		$httpClient = new HttpClient($crtRep->getOption("HOST"));
 		$httpClient->cookie_host = $crtRep->getOption("HOST");
 		$httpClient->timeout = 50;
-		//$httpClient->setDebug(true);
+		$httpClient->setDebug(true);
 		if($crtRep->getOption("AUTH_URI") != ""){
 			$httpClient->setAuthorization($crtRep->getOption("AUTH_NAME"), $crtRep->getOption("AUTH_PASS"));
+		}
+		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"])){			
 			$httpClient->setHeadersOnly(true);
 			$httpClient->get($crtRep->getOption("AUTH_URI"));
 			$httpClient->setHeadersOnly(false);
 			$cookies = $httpClient->getCookies();		
-			if(isSet($cookies["PHPSESSID"])) $httpVars["ajxp_sessid"] = $cookies["PHPSESSID"];
+			if(isSet($cookies["PHPSESSID"])){
+				$_SESSION["AJXP_REMOTE_SESSION"] = $cookies["PHPSESSID"];
+				$httpVars["ajxp_sessid"] = $cookies["PHPSESSID"];
+			}
+		}else{
+			$httpVars["ajxp_sessid"] = $_SESSION["AJXP_REMOTE_SESSION"];
 		}
+		*/
+		$sessionId = "";
+		$crtRep = ConfService::getRepository();
+		$httpClient = $this->getRemoteConnexion($sessionId);
+		$httpVars["ajxp_sessid"] = $sessionId;
 		$method = "get";
 		if($action == "edit" && isSet($httpVars["save"])) $method = "post";
 		if($method == "get"){
 			$httpClient->get($crtRep->getOption("URI"), $httpVars);
 		}else{			
 			$httpClient->post($crtRep->getOption("URI"), $httpVars);
+		}
+		// check if session is expired
+		if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
+			$httpClient = $this->getRemoteConnexion($sessionId, true);
+			$httpVars["ajxp_sessid"] = $sessionId;
+			$method = "get";
+			if($method == "get"){
+				$httpClient->get($crtRep->getOption("URI"), $httpVars);
+			}else{			
+				$httpClient->post($crtRep->getOption("URI"), $httpVars);
+			}
 		}
 
 		switch ($action){			
@@ -71,6 +94,7 @@ class remote_fsDriver extends AbstractDriver
 			break;
 		}
 		print $httpClient->getContent();
+		session_write_close();
 		exit();
 	}
 	
@@ -94,22 +118,20 @@ class remote_fsDriver extends AbstractDriver
 				$crtRep = ConfService::getRepository();
 				session_write_close();
 				
-				require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
-				$httpClient = new HttpClient($crtRep->getOption("HOST"));
-				$httpClient->cookie_host = $crtRep->getOption("HOST");
-				$httpClient->timeout = 50;
-				//$httpClient->setDebug(true);
-				if($crtRep->getOption("AUTH_URI") != ""){
-					$httpClient->setAuthorization($crtRep->getOption("AUTH_NAME"), $crtRep->getOption("AUTH_PASS"));
-					$httpClient->setHeadersOnly(true);
-					$httpClient->get($crtRep->getOption("AUTH_URI"));
-					$httpClient->setHeadersOnly(false);
-					$cookies = $httpClient->getCookies();		
-					if(isSet($cookies["PHPSESSID"])) $httpVars["ajxp_sessid"] = $cookies["PHPSESSID"];
+				$sessionId = "";
+				$httpClient = $this->getRemoteConnexion($sessionId);
+				$postData = array(
+					"get_action"=>"upload", 
+					"dir"=>$fData["destination"], 
+					"ajxp_sessid"=>$sessionId);
+					
+				$httpClient->postFile($crtRep->getOption("URI"), $postData, "Filedata", $fData);
+				if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
+					$httpClient = $this->getRemoteConnexion($sessionId, true);
+					$postData["ajxp_sessid"] = $sessionId;
+					$httpClient->postFile($crtRep->getOption("URI"), $postData, "Filedata", $fData);
 				}
-				$postData = array("get_action"=>"upload", "dir"=>"/");
-				//$postData = array("dir"=>$boxData["destination"]);
-				$httpClient->postFile($crtRep->getOption("URI"), $postData, "Filedata", $fData);				
+				
 				$response = $httpClient->getContent();				
 				AJXP_XMLWriter::header();
 				if(intval($response)>=400){
@@ -142,9 +164,13 @@ class remote_fsDriver extends AbstractDriver
 					}
 					$boxData["destination"] = $rep_source;
 					$destCopy = INSTALL_PATH."/".$this->repository->getOption("TMP_UPLOAD");
-					copy($boxData["tmp_name"], $destCopy."/".$boxData["name"]);
-					$boxData["tmp_name"] = $destCopy."/".$boxData["name"];
-					$this->storeFileToCopy($boxData);
+					if(move_uploaded_file($boxData["tmp_name"], $destCopy."/".$boxData["name"])){
+						$boxData["tmp_name"] = $destCopy."/".$boxData["name"];
+						$this->storeFileToCopy($boxData);
+					}else{
+						$mess = ConfService::getMessages();
+						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$boxData["name"];
+					}
 				}
 				if($fancyLoader)
 				{
@@ -175,6 +201,34 @@ class remote_fsDriver extends AbstractDriver
 			break;			
 		}
 		
+	}
+	
+	/**
+	* @return HttpClient
+	*/
+	function getRemoteConnexion(&$remoteSessionId, $refreshSessId=false){
+		require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
+		$crtRep = ConfService::getRepository();
+		$httpClient = new HttpClient($crtRep->getOption("HOST"));
+		$httpClient->cookie_host = $crtRep->getOption("HOST");
+		$httpClient->timeout = 50;
+		//$httpClient->setDebug(true);
+		if($crtRep->getOption("AUTH_URI") != ""){
+			$httpClient->setAuthorization($crtRep->getOption("AUTH_NAME"), $crtRep->getOption("AUTH_PASS"));
+		}
+		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"]) || $refreshSessId){			
+			$httpClient->setHeadersOnly(true);
+			$httpClient->get($crtRep->getOption("AUTH_URI"));
+			$httpClient->setHeadersOnly(false);
+			$cookies = $httpClient->getCookies();		
+			if(isSet($cookies["PHPSESSID"])){
+				$_SESSION["AJXP_REMOTE_SESSION"] = $cookies["PHPSESSID"];
+				$remoteSessionId = $cookies["PHPSESSID"];
+			}
+		}else{
+			$remoteSessionId = $_SESSION["AJXP_REMOTE_SESSION"];
+		}
+		return $httpClient;
 	}
 	
 	function storeFileToCopy($fileData){
