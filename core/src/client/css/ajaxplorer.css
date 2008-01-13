@@ -1080,6 +1080,7 @@ textarea.editor
   opacity: 0.4;
   -moz-opacity:0.4;
 }
+.diaporamaButtonActive,
 .diaporamaButton:hover
 {
   filter:alpha(opacity=100);
