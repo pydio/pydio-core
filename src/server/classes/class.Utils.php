@@ -161,10 +161,10 @@ class Utils
 		return $fileName;
 	}
 	
-	function mimetype($fileName,$mode)
+	function mimetype($fileName,$mode, $isDir)
 	{
 		$mess = ConfService::getMessages();
-		if(is_dir($fileName)){$image="folder.png";$typeName=$mess[8];}
+		if($isDir){$image="folder.png";$typeName=$mess[8];}
 		else if(eregi("\.mid$",$fileName)){$image="midi.png";$typeName=$mess[9];}
 		else if(eregi("\.txt$",$fileName)){$image="txt2.png";$typeName=$mess[10];}
 		else if(eregi("\.sql$",$fileName)){$image="txt2.png";$typeName=$mess[10];}
