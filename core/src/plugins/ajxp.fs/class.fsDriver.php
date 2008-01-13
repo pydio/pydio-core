@@ -283,7 +283,6 @@ class fsDriver extends AbstractDriver
 							$atts[] = "image_width=\"$width\"";
 							$atts[] = "image_height=\"$height\"";
 						}
-						$atts[] = "is_mp3=\"".Utils::is_mp3($currentFile)."\"";
 						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
 						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
