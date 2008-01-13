@@ -284,7 +284,7 @@ class fsDriver extends AbstractDriver
 							$atts[] = "image_height=\"$height\"";
 						}
 						$atts[] = "is_mp3=\"".Utils::is_mp3($currentFile)."\"";
-						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type")."\"";
+						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
 						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
 						$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
@@ -446,11 +446,11 @@ class fsDriver extends AbstractDriver
 				{
 					if(!$dir_only)
 					{
-						if($ordre=="nom") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image");}
+						if($ordre=="nom") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 						else if($ordre=="taille") {$liste_fic[$file]=$poidsfic;}
 						else if($ordre=="mod") {$liste_fic[$file]=filemtime("$nom_rep/$file");}
-						else if($ordre=="type") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type");}
-						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image");}
+						else if($ordre=="type") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
+						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 					}
 				}
 			}
