@@ -17,8 +17,15 @@ FilesList = Class.create(SelectableElements, {
 		this._pendingFile = null;
 		this._currentRep = sCurrentRep;	
 		this.allDraggables = new Array();
-		this.allDroppables = new Array();
-	
+		this.allDroppables = new Array();		
+		
+		// Default headersDef
+		this.columnsDef = $A([]);
+		this.columnsDef.push({messageId:1,attributeName:'text'});
+		this.columnsDef.push({messageId:2,attributeName:'filesize'});
+		this.columnsDef.push({messageId:3,attributeName:'mimestring'});
+		this.columnsDef.push({messageId:4,attributeName:'modiftime'});
+		
 		this.initGUI();
 			
 		Event.observe(document, "keydown", function(e){	
@@ -36,9 +43,11 @@ FilesList = Class.create(SelectableElements, {
 		if(this._displayMode == "list")
 		{
 			var buffer = '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
-			buffer = buffer + '<col\><col\><col\><col\>';
+			this.columnsDef.each(function(column){buffer = buffer + '<col\>';});
 			buffer = buffer + '<thead><tr>';
-			buffer = buffer + '<td ajxp_message_id="1">'+MessageHash[1]+'</td><td ajxp_message_id="2">'+MessageHash[2]+'</td><td ajxp_message_id="3">'+MessageHash[3]+'</td><td ajxp_message_id="4">'+MessageHash[4]+'</td>';
+			this.columnsDef.each(function(column){
+				buffer = buffer + '<td ajxp_message_id="'+column.messageId+'">'+MessageHash[column.messageId]+'</td>';
+			});
 			buffer = buffer + '</tr></thead></table><div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			$('content_pane').innerHTML  = buffer;
 			oElement = $('selectable_div');
@@ -74,6 +83,13 @@ FilesList = Class.create(SelectableElements, {
 			this.initSelectableItems($('selectable_div'), true);
 		}	
 		
+	},
+	
+	setColumnsDef:function(aColumns){
+		this.columnsDef = aColumns;
+		if(this._displayMode == "list"){
+			this.initGUI();
+		}
 	},
 	
 	setContextualMenu: function(protoMenu){
@@ -299,7 +315,11 @@ FilesList = Class.create(SelectableElements, {
 		{
 			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
 		}
-		["text", "filesize", "mimestring", "modiftime"].each(function(s){
+		var attributeList = $A([]);
+		this.columnsDef.each(function(column){
+			attributeList.push(column.attributeName);
+		});
+		attributeList.each(function(s){
 			var tableCell = document.createElement("td");
 			if(s == "text")
 			{
@@ -568,18 +588,7 @@ FilesList = Class.create(SelectableElements, {
 		}
 		return false;
 	},
-	
-	hasFileType: function(fileType)
-	{
-		if(fileType != 'image' && fileType != 'mp3') return false;
-		$A(this.getItems()).each(function(item){
-			if( (fileType == 'image' && item.getAttribute('is_image') && item.getAttribute('is_image')=='1') 
-			|| (fileType == 'mp3' && item.getAttribute('is_mp3') && item.getAttribute('is_mp3')=='1') )
-			return true;		
-		});
-		return false;
-	},
-	
+		
 	selectFile: function(fileName, multiple)
 	{
 		if(!this.fileNameExists(fileName)) 
