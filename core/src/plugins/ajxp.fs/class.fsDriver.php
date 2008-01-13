@@ -212,7 +212,7 @@ class fsDriver extends AbstractDriver
 					$userfile_name = $boxData["name"];
 					if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
 					$userfile_name=Utils::processFileName($userfile_name);
-					if (!$this->simpleCopy($boxData["tmp_name"], "$destination/".$userfile_name))
+					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
 					{
 						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
 						break;
