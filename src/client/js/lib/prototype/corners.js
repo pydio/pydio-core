@@ -7,7 +7,6 @@
  *   http://www.opensource.org/licenses/mit-license.php
  *   http://www.gnu.org/licenses/gpl.html
  */
-
 /**
  * The Effect.Corner class provides a simple way of styling DOM elements.  
  *
