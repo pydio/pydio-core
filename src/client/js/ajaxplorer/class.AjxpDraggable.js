@@ -14,12 +14,14 @@ Event.observe(window, "load", function(){
 });
 Event.observe(window, "unload", function(){
 	Draggables.removeObserver(timerClearObserver);
-	ajaxplorer.filesList.allDraggables.each(function(el){
-		el.destroy();
-	});
-	ajaxplorer.filesList.allDroppables.each(function(el){
-		Droppables.remove(el);
-	});
+	if(ajaxplorer){
+		ajaxplorer.filesList.allDraggables.each(function(el){
+			el.destroy();
+		});
+		ajaxplorer.filesList.allDroppables.each(function(el){
+			Droppables.remove(el);
+		});
+	}
 });
 
 
