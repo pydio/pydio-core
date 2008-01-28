@@ -55,10 +55,7 @@ FilesList = Class.create(SelectableElements, {
 			this.initSelectableItems(oElement, true);
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
 			fitHeightToBottom($('table_rows_container'), $('content_pane'));
-			this.disableTextSelection($('selectable_div_header'));		
-			Event.observe(window, "resize",  function(){			
-				setTimeout(function(){fitHeightToBottom($('table_rows_container'), $('content_pane'));}.bind(this), 100);
-			}.bind(this));
+			this.disableTextSelection($('selectable_div_header'));
 		}
 		else if(this._displayMode == "thumb")
 		{
