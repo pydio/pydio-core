@@ -2,7 +2,7 @@ BackgroundManager = Class.create({
 	queue: $A([]),
 	initialize:function(actionManager){
 		this.actionManager = actionManager;
-		this.panel = new Element('<div>').addClassName('backgroundPanel');
+		this.panel = new Element('div').addClassName('backgroundPanel');
 		this.panel.hide();
 		this.working = false;
 		document.body.insert(this.panel);
@@ -30,9 +30,11 @@ BackgroundManager = Class.create({
 			this.parseAnswer(transport.responseXML);
 		}.bind(this);
 		connexion.sendAsync();		
-		this.panel.update(actionDef.get('messageId'));
+		var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" height="16" width="16" align="absmiddle">';
+		this.panel.update(imgString+' '+actionDef.get('messageId'));
 		this.panel.show();
-		new Effect.Corner(this.panel, "round 3px");		
+		new Effect.Corner(this.panel, "round 8px bl");
+		new Effect.Corner(this.panel, "round 8px tl");
 		this.queue.shift();
 		this.working = true;
 	},
