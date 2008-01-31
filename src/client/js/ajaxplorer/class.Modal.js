@@ -270,7 +270,7 @@ Modal = Class.create({
 	close: function(){	
 		if(this.closeFunction){
 			 this.closeFunction();
-			 this.closeFunction = null;
+			 //this.closeFunction = null;
 		}
 	}
 });
