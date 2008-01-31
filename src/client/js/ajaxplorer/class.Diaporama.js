@@ -47,7 +47,7 @@ Diaporama = Class.create({
 		}.bind(this);
 		this.actualSizeButton.onclick = function(){
 			this.slider.setValue(100);
-			this.resizeImage();
+			this.resizeImage(true);
 		}.bind(this);
 		this.fitToScreenButton.onclick = function(){
 			this.toggleFitToScreen();
@@ -75,7 +75,7 @@ Diaporama = Class.create({
 		modal.setCloseAction(this.close.bind(this));
 		
 		this.imgTag.onload = function(){
-			this.resizeImage();
+			this.resizeImage(true);
 			this.downloadButton.removeClassName("disabled");
 			this.updateModalTitle();
 		}.bind(this);
@@ -89,7 +89,7 @@ Diaporama = Class.create({
 					this.zoomInput.value = value;
 				}
 				this.slider.setValue(this.zoomInput.value);
-				this.resizeImage();
+				this.resizeImage(false);
 				Event.stop(e);
 			}
 			return true;
@@ -128,7 +128,7 @@ Diaporama = Class.create({
 		this.zoomInput.value = '100';
 		this.slider.recalculate();
 		this.slider.onchange = function(){
-			this.resizeImage();
+			this.resizeImage(false);
 		}.bind(this);
 	
 		this.updateImage();
@@ -154,21 +154,27 @@ Diaporama = Class.create({
 		}
 	},
 	
-	resizeImage : function(){	
+	resizeImage : function(morph){	
+		if(this.autoFit){
+			this.computeFitToScreenFactor();
+		}
 		var nPercent = this.slider.getValue();
 		this.zoomInput.value = nPercent;
 		var height = parseInt(nPercent*this.crtHeight / 100);	
 		var width = parseInt(nPercent*this.crtWidth / 100);
-		this.imgTag.setStyle({height:height+'px', width:width+'px'});
 		// Center vertically
+		var margin=0;
 		if (height < this.containerDim.height){
 			var margin = parseInt((this.containerDim.height - height) / 2)-5;
-			this.imgTag.setStyle({marginTop:margin+'px'});
 		}
-		else{
-			this.imgTag.setStyle({marginTop:'0px'});
+		if(morph){
+			new Effect.Morph(this.imgTag,{
+				style:{height:height+'px', width:width+'px',margin:margin+'px'}, 
+				duration:0.5
+				});
+		}else{
+			this.imgTag.setStyle({height:height+'px', width:width+'px',margin:margin+'px'});
 		}
-		
 	},
 	
 	setFullScreen: function(){
@@ -201,15 +207,18 @@ Diaporama = Class.create({
 		this.crtWidth = dimObject.width;
 		this.crtRatio = this.crtHeight / this.crtWidth;
 		this.downloadButton.addClassName("disabled");
-		this.imgTag.src  = this.baseUrl + this.currentFile;	
-		if(this.autoFit) this.fitToScreen();
+		this.imgTag.src  = this.baseUrl + this.currentFile;			
 	},
 
 	fitToScreen : function(){
+		this.computeFitToScreenFactor();
+		this.resizeImage(true);
+	},
+	
+	computeFitToScreenFactor: function(){
 		zoomFactor1 = parseInt(this.imgContainer.getHeight() / this.crtHeight * 100);
 		zoomFactor2 = parseInt(this.imgContainer.getWidth() / this.crtWidth * 100);
-		this.slider.setValue(Math.min(zoomFactor1, zoomFactor2)-1);
-		this.resizeImage();
+		this.slider.setValue(Math.min(zoomFactor1, zoomFactor2)-1);		
 	},
 	
 	toggleFitToScreen:function(){
