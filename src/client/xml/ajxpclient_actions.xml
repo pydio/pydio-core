@@ -153,12 +153,18 @@
 					actionBarGroup="user">
 				</context>
 			</gui>
-			<rightsContext noUser="false" userLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
+			<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>			
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					modal.showDialogForm('Log In', 'login_form', null, function(){
+					modal.showDialogForm('Log In', 'login_form', 
+					function(){
+						var oForm = modal.getForm();
+					}, 
+					function(){
 						var oForm = modal.getForm();
 						ajaxplorer.actionBar.submitForm(oForm);
+						oForm.userid.value = '';
+						oForm.password.value = '';
 						return false;				
 					});
 					]]></clientCallback>
@@ -173,7 +179,7 @@
 					actionBarGroup="user">
 				</context>
 			</gui>
-			<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly=""></rightsContext>			
+			<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					var connexion = new Connexion();
