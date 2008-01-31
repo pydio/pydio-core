@@ -420,7 +420,7 @@ Ajaxplorer = Class.create({
 						fitHeightToBottom(this.sEngine._resultsBox, null, 10, true);
 					}.bind(this)
 				});
-		new Splitter('verticalSplitter', {
+		this.splitter = new Splitter('verticalSplitter', {
 				direction: "vertical",
 				initA: 200, maxA:400, minA:50, 
 				onDrag: function(){
