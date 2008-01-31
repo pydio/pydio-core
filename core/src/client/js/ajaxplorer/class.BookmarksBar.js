@@ -8,9 +8,9 @@ var BookmarksBar = Class.create(ResizeableBar, {
 	},
 	
 	parseXml: function(transport){
-		var oXmlDoc = transport.responseXML;
-		if(oXmlDoc == null || oXmlDoc.documentElement == null) return;
 		this.clearElement();
+		var oXmlDoc = transport.responseXML;
+		if(oXmlDoc == null || oXmlDoc.documentElement == null) return;		
 		var root = oXmlDoc.documentElement;
 		for (var i=0; i < root.childNodes.length;i++)
 		{
