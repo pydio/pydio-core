@@ -176,7 +176,7 @@ function initialize(){
 		if(e.keyCode == 27)
 		{
 			ajaxplorer.cancelCopyOrMove();
-			modal.close();
+			//modal.close();
 			hideLightBox();
 		}
 		if(e.keyCode == 9) return false;
@@ -214,6 +214,11 @@ function hideLightBox(onFormSubmit)
 		ajaxplorer.enableShortcuts();
 	}
 	if(currentDraggable) currentDraggable.destroy();
+	if(modal.closeFunction){
+		modal.closeFunction();
+		modal.closeFunction = null;
+	}
+	
 }
 
 function setOverlay()
