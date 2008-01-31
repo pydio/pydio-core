@@ -37,7 +37,8 @@ Action = Class.create({
 			}, arguments[2] || { });
 		this.rightsContext = Object.extend({			
 			noUser:true,
-			userLogged:true,			
+			userLogged:true,
+			guestLogged:false,
 			read:true,
 			write:false,
 			adminOnly:false
@@ -69,10 +70,11 @@ Action = Class.create({
 		if(!rightsContext.noUser && !usersEnabled){
 			return this.hideForContext();				
 		}
-		if(rightsContext.userLogged == 'only' && crtUser == null){
+		if((rightsContext.userLogged == 'only' && crtUser == null) ||
+			(rightsContext.guestLogged && rightsContext.guestLogged=='hidden' & crtUser!=null && crtUser.id=='guest')){
 			return this.hideForContext();
 		}
-		if(rightsContext.userLogged == 'hidden' && crtUser != null){
+		if(rightsContext.userLogged == 'hidden' && crtUser != null && !(crtUser.id=='guest' && rightsContext.guestLogged && rightsContext.guestLogged=='show') ){
 			return this.hideForContext();
 		}
 		if(rightsContext.adminOnly && (crtUser == null || crtUser.id != 'admin')){
