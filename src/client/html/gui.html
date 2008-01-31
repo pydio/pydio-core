@@ -2,7 +2,7 @@
 <head>
 <title>AjaXplorer</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<? if($JS_DEBUG) {?>
+<?php if($JS_DEBUG) {?>
 <script type="text/javascript">
 		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
 		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
@@ -47,18 +47,19 @@
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.InfoPanel.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Diaporama.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Editor.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.SVNLogger.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Modal.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.ResizeableBar.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.BookmarksBar.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Ajaxplorer.js"></script>
-<? } else { ?>
+<?php } else { ?>
 <script language="javascript" type="text/javascript">var dynamicLibLoading = true;</script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/prototype.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop,controls"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Connexion.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Modal.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Ajaxplorer.js"></script>
-<? } ?>
+<?php } ?>
 
 <link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/pnghack/pngHack.css">
 <link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/sortabletable.css">
