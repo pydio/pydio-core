@@ -43,21 +43,22 @@ $REPOSITORIES[0] = array(
 	"CREATE"		=>	true,
 	"RECYCLE_BIN" 	=> 	'recycle_bin'
 );
+
 /*
 $REPOSITORIES[1] = array(
 	"PATH"			=>	"",
 	"DISPLAY"		=>	"Web Files", 
 	"DRIVER"		=>	"remote_fs", 
-	"DRIVER_OPTIONS"=>  array("HOST"	 => "www.remoteHost.com", 
-							  "URI"		 => "/ajaxplorer/content.php", 
-							  "AUTH_URI" => "/ajaxplorer/index.php", 
-							  "AUTH_NAME"=> "userName", 
-							  "AUTH_PASS"=> "userPass"),
+	"DRIVER_OPTIONS"=>  array("HOST"	 => "www.remoteserver.com", 
+							  "URI"		 => "/path_to_remote/ajaxplorer/content.php", 
+							  "AUTH_URI" => "/path_to_remote/ajaxplorer/index.php", 
+							  "AUTH_NAME"=> "name", 
+							  "AUTH_PASS"=> "password", 
+							  "TMP_UPLOAD"=>"tmp"),
 	"CREATE"		=>	false,
 	"RECYCLE_BIN" 	=> 	''
 );
-*/
-/*
+
 $REPOSITORIES[2] = array(
 	"PATH"=>"C:\your\location3\on\windows", 
 	"DISPLAY"=>"Windows Documents"
@@ -65,7 +66,7 @@ $REPOSITORIES[2] = array(
 */
 // UNITE DE TAILLE DES FICHIER (octets "o", bytes "b")
 // (Unit of file size, "o" or "b")
-$size_unit="o";
+$size_unit="b";
 
 // NOMBRE DE CARACTERES MAXIMUM POUR LES NOMS DE FICHIER
 // (max number chars for file and directory names)
