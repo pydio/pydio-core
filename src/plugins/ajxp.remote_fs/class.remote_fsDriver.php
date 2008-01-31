@@ -12,29 +12,6 @@ class remote_fsDriver extends AbstractDriver
 	}
 	
 	function switchAction($action, $httpVars, $filesVars){		
-		/*
-		require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
-		$crtRep = ConfService::getRepository();
-		$httpClient = new HttpClient($crtRep->getOption("HOST"));
-		$httpClient->cookie_host = $crtRep->getOption("HOST");
-		$httpClient->timeout = 50;
-		$httpClient->setDebug(true);
-		if($crtRep->getOption("AUTH_URI") != ""){
-			$httpClient->setAuthorization($crtRep->getOption("AUTH_NAME"), $crtRep->getOption("AUTH_PASS"));
-		}
-		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"])){			
-			$httpClient->setHeadersOnly(true);
-			$httpClient->get($crtRep->getOption("AUTH_URI"));
-			$httpClient->setHeadersOnly(false);
-			$cookies = $httpClient->getCookies();		
-			if(isSet($cookies["PHPSESSID"])){
-				$_SESSION["AJXP_REMOTE_SESSION"] = $cookies["PHPSESSID"];
-				$httpVars["ajxp_sessid"] = $cookies["PHPSESSID"];
-			}
-		}else{
-			$httpVars["ajxp_sessid"] = $_SESSION["AJXP_REMOTE_SESSION"];
-		}
-		*/
 		$sessionId = "";
 		$crtRep = ConfService::getRepository();
 		$httpClient = $this->getRemoteConnexion($sessionId);
@@ -108,7 +85,7 @@ class remote_fsDriver extends AbstractDriver
 				AJXP_XMLWriter::close();
 				exit(1);
 			break;
-			case "next_to_remote":
+			case "next_to_remote":			
 				if(!$this->hasFilesToCopy()) break;
 				$fData = $this->getNextFileToCopy();				
 				$nextFile = '';
@@ -120,18 +97,18 @@ class remote_fsDriver extends AbstractDriver
 				
 				$sessionId = "";
 				$httpClient = $this->getRemoteConnexion($sessionId);
+				//$httpClient->setDebug(true);
 				$postData = array(
 					"get_action"=>"upload", 
-					"dir"=>$fData["destination"], 
-					"ajxp_sessid"=>$sessionId);
+					"dir"=>$fData["destination"]);
 					
-				$httpClient->postFile($crtRep->getOption("URI"), $postData, "Filedata", $fData);
+				$httpClient->postFile($crtRep->getOption("URI")."?ajxp_sessid=$sessionId", $postData, "Filedata", $fData);
 				if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
 					$httpClient = $this->getRemoteConnexion($sessionId, true);
 					$postData["ajxp_sessid"] = $sessionId;
 					$httpClient->postFile($crtRep->getOption("URI"), $postData, "Filedata", $fData);
 				}
-				
+				unlink($fData["tmp_name"]);
 				$response = $httpClient->getContent();				
 				AJXP_XMLWriter::header();
 				if(intval($response)>=400){
@@ -147,7 +124,7 @@ class remote_fsDriver extends AbstractDriver
 				exit(1);
 			break;
 			case "upload":
-				if($dir!=""){$rep_source="/$dir";}
+				if(isSet($httpVars['dir']) && $httpVars['dir']!=""){$rep_source=$httpVars['dir'];}
 				else $rep_source = "/";
 				$destination=$this->repository->getPath().$rep_source;
 				$logMessage = "";
@@ -164,8 +141,9 @@ class remote_fsDriver extends AbstractDriver
 					}
 					$boxData["destination"] = $rep_source;
 					$destCopy = INSTALL_PATH."/".$this->repository->getOption("TMP_UPLOAD");
-					if(move_uploaded_file($boxData["tmp_name"], $destCopy."/".$boxData["name"])){
-						$boxData["tmp_name"] = $destCopy."/".$boxData["name"];
+					$destName = $destCopy."/".basename($boxData["tmp_name"]);
+					if(move_uploaded_file($boxData["tmp_name"], $destName)){
+						$boxData["tmp_name"] = $destName;
 						$this->storeFileToCopy($boxData);
 					}else{
 						$mess = ConfService::getMessages();
@@ -249,7 +227,7 @@ class remote_fsDriver extends AbstractDriver
 		$user = AuthService::getLoggedUser();
 		$files = $user->loadUserFile("tmp_upload");
 		$fData = $files[0];
-		array_shift($files);
+		array_shift($files);		
 		$user->saveUserFile("tmp_upload", $files);
 		return $fData;
 	}
