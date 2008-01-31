@@ -107,8 +107,8 @@ if(AuthService::usersEnabled())
 	$loggedUser = AuthService::getLoggedUser();	
 	if($action == "upload" && ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex()."")) && isSet($_FILES['Filedata']))
 	{
-		header('HTTP/1.0 ' . '415 Not authorized');
-		die('Error 415 Not authorized!');
+		header('HTTP/1.0 ' . '410 Not authorized');
+		die('Error 410 Not authorized!');
 	}
 }
 
