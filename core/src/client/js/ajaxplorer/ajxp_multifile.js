@@ -294,7 +294,7 @@ function MultiSelector( formObject, list_target, max ){
 		}
 		else
 		{
-			modal.close();
+			//modal.close();
 			hideLightBox();
 		}
 		
