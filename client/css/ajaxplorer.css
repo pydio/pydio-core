@@ -1269,12 +1269,16 @@ padding: 0px;
 
 
 .backgroundPanel{
-   position:absolute;
-   width: 150px;   
-   right:2px;
-   bottom:2px;
-   padding:2px;
+   position:absolute;   
+   right:0;
+   bottom:20px;
+   padding:1px 5px 3px 7px;
    font-size:11px;
+   font-weight:bold;
+   color: #fff;
    font-family: Trebuchet MS;
-   background-color:#ddd;
+   background-color:#79f;
+   filter:alpha(opacity=80);
+   opacity: 0.8;
+   -moz-opacity:0.8;
 }
