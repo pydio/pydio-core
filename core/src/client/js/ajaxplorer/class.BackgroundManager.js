@@ -3,6 +3,9 @@ BackgroundManager = Class.create({
 	initialize:function(actionManager){
 		this.actionManager = actionManager;
 		this.panel = new Element('div').addClassName('backgroundPanel');
+		if(Prototype.Browser.IE){
+			this.panel.setStyle({width:'35%'});
+		}
 		this.panel.hide();
 		this.working = false;
 		document.body.insert(this.panel);
@@ -27,7 +30,15 @@ BackgroundManager = Class.create({
 		connexion.setParameters(actionDef.get('parameters'));
 		connexion.addParameter('get_action', actionDef.get('name'));		
 		connexion.onComplete = function(transport){
+			var xmlResponse = transport.responseXML;
+			if(xmlResponse == null || xmlResponse.documentElement == null) {
+				alert(transport.responseText);
+				this.working = false;
+				this.next();
+				return;
+			}
 			this.parseAnswer(transport.responseXML);
+			this.working = false;
 		}.bind(this);
 		connexion.sendAsync();		
 		var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" height="16" width="16" align="absmiddle">';
@@ -40,7 +51,6 @@ BackgroundManager = Class.create({
 	},
 	
 	parseAnswer:function(xmlResponse){
-		if(xmlResponse == null || xmlResponse.documentElement == null) return;
 		var childs = xmlResponse.documentElement.childNodes;	
 		
 		for(var i=0; i<childs.length;i++)
@@ -52,7 +62,7 @@ BackgroundManager = Class.create({
 					return this.interruptOnError(childs[i].firstChild.nodeValue);
 				}
 			}
-			else if(childs[i].tagName == "trigger_bg_action"){
+			else if(childs[i].nodeName == "trigger_bg_action"){
 				var name = childs[i].getAttribute("name");
 				var messageId = childs[i].getAttribute("messageId");
 				var parameters = new Hash();
