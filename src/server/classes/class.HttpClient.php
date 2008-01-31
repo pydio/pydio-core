@@ -111,7 +111,7 @@ class HttpClient {
         socket_set_timeout($fp, $this->timeout);
         $request = $this->buildRequest();
         $this->debug('Request', $request);
-        fwrite($fp, $request);
+        @fwrite($fp, $request);
     	// Reset all the variables that should not persist between requests
     	$this->headers = array();
     	$this->content = '';
@@ -247,24 +247,28 @@ class HttpClient {
     	}else{
 	        srand((double)microtime()*1000000);
 	        $boundary = "----".substr(md5(rand(0,32000)),0,10);    		
-	        $headers[] = "Content-type: multipart/form-data, boundary=$boundary";
+	        $headers[] = "Content-Type: multipart/form-data; boundary=$boundary";	        
 	        $data = array();
 	        // attach post vars
+	        $this->postDataArray["Filename"] = $this->postFileData["name"];
 	        foreach($this->postDataArray as $index => $value){
 	            $data[]="--$boundary";
 	            $data[]= "content-disposition: form-data; name=\"".$index."\"";
-	            $data[]= "\r\n".$value."";
-	            $data[]="--$boundary";
+	            $data[]= "\r\n".$value."";	            
 	        }
 	        // and attach the file
 	        //$data[]= "--$boundary";
 	        $content_file = join("", file($this->postFileData["tmp_name"]));
+	        $data[]="--$boundary";
 	        $data[]="content-disposition: form-data; name=\"".$this->postFileName."\"; filename=\"".$this->postFileData["name"]."\"";
 	        $data[]= "Content-Type: ".$this->postFileData['type']."\r\n";
 	        $data[]= "".$content_file."";
 	        $data[]="--$boundary--";
+	        //$headers[]= "Content-Length: " . strlen(implode("",$data));
 	        $data = implode("\r\n", $data);
-	        $headers[]= "Content-length: " . strlen($data);
+	        $headers[]= "Content-Length: " . strlen($data);
+	        $headers[] = "Cache-Control: no-cache";
+	        $headers[] = "Connection: Keep-Alive";
     		$request = implode("\r\n", $headers)."\r\n\r\n".$data;
     	}
     	return $request;
