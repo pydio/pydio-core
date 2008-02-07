@@ -205,6 +205,7 @@ class remote_fsDriver extends AbstractDriver
 			}
 		}else{
 			$remoteSessionId = $_SESSION["AJXP_REMOTE_SESSION"];
+			$httpClient->setCookies(array("PHPSESSID"=>$remoteSessionId));
 		}
 		return $httpClient;
 	}
@@ -237,6 +238,19 @@ class remote_fsDriver extends AbstractDriver
 		$files = $user->loadUserFile("tmp_upload");
 		return (count($files)?true:false);	
 	}
+	
+	function sendInfoPanelsDef(){
+		$fileData = file_get_contents(INSTALL_PATH."/plugins/ajxp.fs/fsActions.xml");
+		$matches = array();
+		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
+		if(count($matches)){
+			AJXP_XMLWriter::header();
+			AJXP_XMLWriter::write($this->replaceAjxpXmlKeywords(str_replace("\n", "",$matches[0])), true);
+			AJXP_XMLWriter::close();
+			exit(1);
+		}		
+	}
+	
 	
 }
 
