@@ -83,6 +83,8 @@ class AbstractDriver {
 			if(isSet($action["XML"])){
 				$xml = $action["XML"];
 				$xml = $this->replaceAjxpXmlKeywords($xml);
+				$xml = preg_replace("/[\n\r]?/", "", $xml);
+				$xml = preg_replace("/\t/", " ", $xml);
 				AJXP_XMLWriter::write($xml, true);
 			}
 		}
