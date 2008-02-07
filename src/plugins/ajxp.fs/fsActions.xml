@@ -75,10 +75,7 @@
 					modal.setCloseAction(function(){						
 						ajaxplorer.filesList.reload();
 					});
-					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){
-						ajaxplorer.actionBar.multi_selector.submitMainForm();
-						return false;
-					});
+					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
 					
 				}				
 					]]></clientCallback>
@@ -376,7 +373,7 @@ AJXP_MESSAGE[174]<br/>
 						userSelection.updateFormOrUrl(newForm, '');
 						var crtFileName = userSelection.getUniqueFileName();
 						newForm.filename_new.value = getBaseName(crtFileName);
-				 	}
+				 	};
 					modal.showDialogForm('Rename', 'rename_form', onLoad);					
 					]]></clientCallback>
 				<clientForm id="rename_form"><![CDATA[
@@ -554,7 +551,6 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						mp3_url += 'content.php?action=mp3_proxy%26file='+url;
 						if(url != mp3Items.last()) mp3_url += '|';
 					});
-				//	alert(mp3_url);
 					newWin = window.open('', 'mp3_multi_player', 'width=260,height=30,directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no');
 					newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getFilesList().getCurrentRep()}));
 					newWin.document.close();
