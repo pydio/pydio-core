@@ -24,7 +24,6 @@
 				{
 					modal.setCloseAction(function(){
 						$('closeFancyUploadBox').disabled=false;
-						//ajaxplorer.filesList.reload();
 						var bgManager = ajaxplorer.actionBar.bgManager;
 						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
 						bgManager.next();
@@ -58,11 +57,7 @@
 						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
 						bgManager.next();
 					});
-					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){
-						ajaxplorer.actionBar.multi_selector.submitMainForm();
-						return false;
-					});
-					
+					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
 				}				
 					]]></clientCallback>
 				<clientForm id="fancy_upload_form"><![CDATA[
