@@ -164,6 +164,9 @@ function _xmlTreeToJsTree(oNode) {
 	// retreive attributes
 	var text = oNode.getAttribute("text");
 	var action = oNode.getAttribute("action");
+	if(!action){
+		action = "javascript:ajaxplorer.getFoldersTree().clickNode(CURRENT_ID)";
+	}
 	var parent = null;
 	var icon = oNode.getAttribute("icon");
 	var openIcon = oNode.getAttribute("openIcon");
