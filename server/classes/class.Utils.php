@@ -129,34 +129,14 @@ class Utils
 		$fileName=str_replace("`","",$fileName);
 		$fileName=str_replace("<","",$fileName);
 		$fileName=str_replace(">","",$fileName);
-		$fileName=str_replace(" ","_",$fileName);
 		$fileName=str_replace(":","",$fileName);
 		$fileName=str_replace("*","",$fileName);
 		$fileName=str_replace("|","",$fileName);
 		$fileName=str_replace("?","",$fileName);
-		/*
-		$fileName=str_replace("é","",$fileName);
-		$fileName=str_replace("è","",$fileName);
-		$fileName=str_replace("ç","",$fileName);
-		$fileName=str_replace("@","",$fileName);
-		$fileName=str_replace("â","",$fileName);
-		$fileName=str_replace("ê","",$fileName);
-		$fileName=str_replace("î","",$fileName);
-		$fileName=str_replace("ô","",$fileName);
-		$fileName=str_replace("û","",$fileName);
-		$fileName=str_replace("ù","",$fileName);
-		$fileName=str_replace("à","",$fileName);
-		*/
 		$fileName=str_replace("!","",$fileName);
 		$fileName=str_replace("§","",$fileName);
 		$fileName=str_replace("+","",$fileName);
 		$fileName=str_replace("^","",$fileName);
-		$fileName=str_replace("(","",$fileName);
-		$fileName=str_replace(")","",$fileName);
-		$fileName=str_replace("#","",$fileName);
-		$fileName=str_replace("=","",$fileName);
-		$fileName=str_replace("$","",$fileName);
-		$fileName=str_replace("%","",$fileName);
 		$fileName = substr ($fileName,0,$max_caracteres);
 		return $fileName;
 	}
