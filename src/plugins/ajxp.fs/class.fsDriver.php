@@ -298,7 +298,7 @@ class fsDriver extends AbstractDriver
 						$folderFullName = "$dir/".$folderBaseName;
 						$parentFolderName = $dir;
 						if(!$completeMode){
-							$attributes = "icon=\"".CLIENT_RESOURCES_FOLDER."/images/foldericon.png\"  openicon=\"".CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png\" filename=\"$folderFullName\" parentname=\"$parentFolderName\" src=\"$link\" action=\"javascript:ajaxplorer.getFoldersTree().clickNode(CURRENT_ID)\"";
+							$attributes = "icon=\"".CLIENT_RESOURCES_FOLDER."/images/foldericon.png\"  openicon=\"".CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png\" filename=\"$folderFullName\" src=\"$link\"";
 						}
 					}
 					print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
@@ -313,7 +313,7 @@ class fsDriver extends AbstractDriver
 					else 
 					{
 						// ADD RECYCLE BIN TO THE LIST
-						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\" action=\"javascript:ajaxplorer.getFoldersTree().clickNode(CURRENT_ID)\"/>");
+						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\"/>");
 					}
 				}
 				AJXP_XMLWriter::close();
