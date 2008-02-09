@@ -6,10 +6,11 @@
 	default-lazy-init="true">
 
 	<bean id="driver.file"
-		class="org.argeo.ajaxplorer.jdrivers.SimpleDriver">
+		class="org.argeo.ajaxplorer.jdrivers.SimpleAxpDriver">
 		<property name="actions">
 			<map>
 				<entry key="ls" value-ref="action.file.ls" />
+				<entry key="download" value-ref="action.file.download" />
 			</map>
 		</property>
 	</bean>
@@ -23,6 +24,10 @@
 
 	<bean id="action.file.ls"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileLsAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+	<bean id="action.file.download"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileDownloadAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
 

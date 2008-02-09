@@ -57,7 +57,7 @@ public class FileLsAction extends FileAction {
 		return new AxpLsAnswer(axpFiles, mode);
 	}
 
-	private class AxpLsAnswer implements AxpAnswer {
+	protected class AxpLsAnswer implements AxpAnswer {
 		private final List<AxpFile> files;
 		private final LsMode mode;
 
