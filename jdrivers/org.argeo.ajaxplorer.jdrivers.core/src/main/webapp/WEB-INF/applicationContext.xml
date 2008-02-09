@@ -11,6 +11,8 @@
 			<map>
 				<entry key="ls" value-ref="action.file.ls" />
 				<entry key="download" value-ref="action.file.download" />
+				<entry key="image_proxy"
+					value-ref="action.file.image_proxy" />
 			</map>
 		</property>
 	</bean>
@@ -21,13 +23,19 @@
 			value="/Users/mbaudier/dev/AjaXplorer/test" />
 	</bean>
 
-
+	<!-- ACTIONS -->
 	<bean id="action.file.ls"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileLsAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
+
 	<bean id="action.file.download"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileDownloadAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+
+	<bean id="action.file.image_proxy"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileImageProxyAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
 

@@ -1,5 +1,7 @@
 package org.argeo.ajaxplorer.jdrivers.file;
 
+import java.io.File;
+
 import org.argeo.ajaxplorer.jdrivers.AxpDriverException;
 
 public enum FileType {
@@ -37,6 +39,12 @@ public enum FileType {
 			return "image/png";
 		}
 		throw new AxpDriverException("Image type undefined for " + this);
+	}
+
+	public static FileType findType(File file) {
+		String ext = file.isDirectory() ? null : file.getName().substring(
+				file.getName().indexOf('.') + 1);
+		return findType(ext);
 	}
 
 	/**
