@@ -25,7 +25,7 @@
 	<bean id="fileDriverContext"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileDriverContext">
 		<property name="basePath"
-			value="/Users/mbaudier/dev/AjaXplorer/test" />
+			value="C:/mbaudier/test/ajxpRoot/" />
 	</bean>
 
 	<!-- ACTIONS -->
@@ -59,4 +59,7 @@
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
 
+	<bean id="filterMultipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	</bean>
 </beans>

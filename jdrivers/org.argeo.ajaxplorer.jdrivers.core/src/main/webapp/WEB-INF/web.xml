@@ -42,4 +42,19 @@
 		<url-pattern>*.file</url-pattern>
 	</servlet-mapping>
 
+	<filter>
+		<filter-name>multipart</filter-name>
+		<filter-class>
+			org.springframework.web.multipart.support.MultipartFilter
+		</filter-class>
+		<init-param>
+			<param-name>multipartResolverBeanName</param-name>
+			<param-value>filterMultipartResolver</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>multipart</filter-name>
+		<servlet-name>file</servlet-name>
+	</filter-mapping>
 </web-app>
