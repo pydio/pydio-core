@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
@@ -19,8 +18,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public class FileUploadAction extends FileAction {
 
 	public AjxpAnswer execute(HttpServletRequest request) {
-		log.debug("Execute upload");
-
 		if (!(request instanceof MultipartHttpServletRequest)) {
 			throw new AjxpDriverException(
 					"Cann only deal with MultipartHttpServletRequest");

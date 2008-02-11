@@ -17,6 +17,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.HttpServletBean;
 
 public class AjxpDriverServlet extends HttpServletBean {
+	static final long serialVersionUID = 1l;
+
 	protected final Log log = LogFactory.getLog(getClass());
 	private String driverName;
 	private AjxpDriver driver;

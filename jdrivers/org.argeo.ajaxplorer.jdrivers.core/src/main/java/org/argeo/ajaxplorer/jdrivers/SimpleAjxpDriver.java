@@ -1,18 +1,12 @@
 package org.argeo.ajaxplorer.jdrivers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
 public class SimpleAjxpDriver implements AjxpDriver {
 	protected final Log log = LogFactory.getLog(getClass());
