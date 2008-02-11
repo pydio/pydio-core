@@ -13,6 +13,11 @@
 				<entry key="download" value-ref="action.file.download" />
 				<entry key="image_proxy"
 					value-ref="action.file.image_proxy" />
+				<entry key="trigger_remote_copy"
+					value-ref="action.file.trigger_remote_copy" />
+				<entry key="next_to_remote"
+					value-ref="action.file.next_to_remote" />
+				<entry key="upload" value-ref="action.file.upload" />
 			</map>
 		</property>
 	</bean>
@@ -36,6 +41,21 @@
 
 	<bean id="action.file.image_proxy"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileImageProxyAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+
+	<bean id="action.file.trigger_remote_copy"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+
+	<bean id="action.file.next_to_remote"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+
+	<bean id="action.file.upload"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
 
