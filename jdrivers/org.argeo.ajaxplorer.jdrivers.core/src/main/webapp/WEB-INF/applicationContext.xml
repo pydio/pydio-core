@@ -28,14 +28,14 @@
 					value-ref="action.file.image_proxy" />
 				<entry key="upload" value-ref="action.svn.upload" />
 				<entry key="mkdir" value-ref="action.svn.mkdir" />
+				<entry key="delete" value-ref="action.svn.delete" />
 			</map>
 		</property>
 	</bean>
 
 	<bean id="fileDriverContext"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileDriverContext">
-		<property name="basePath"
-			value="C:/mbaudier/test/ajxpRoot/" />
+		<property name="basePath" value="C:/mbaudier/test/ajxpRoot/" />
 	</bean>
 
 	<!-- ACTIONS FS -->
@@ -58,12 +58,17 @@
 		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
-	
+
 	<bean id="action.file.mkdir"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileMkdirAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
-	
+
+	<bean id="action.file.delete"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileDeleteAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+
 	<!-- ACTIONS SVN -->
 	<bean id="action.svn.ls"
 		class="org.argeo.ajaxplorer.jdrivers.svn.SvnLsAction">
@@ -79,7 +84,12 @@
 		class="org.argeo.ajaxplorer.jdrivers.svn.SvnMkdirAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
-	
+
+	<bean id="action.svn.delete"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnDeleteAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+
 
 	<bean id="filterMultipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
