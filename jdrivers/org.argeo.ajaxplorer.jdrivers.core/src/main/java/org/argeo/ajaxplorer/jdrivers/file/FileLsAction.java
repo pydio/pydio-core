@@ -1,6 +1,7 @@
 package org.argeo.ajaxplorer.jdrivers.file;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Vector;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
+import org.omg.CORBA.Request;
 
 public class FileLsAction extends FileAction {
 	public AjxpAnswer execute(HttpServletRequest request) {
@@ -43,7 +45,7 @@ public class FileLsAction extends FileAction {
 		if (!dir.exists())
 			throw new AjxpDriverException("Dir " + dir + " does not exist.");
 
-		File[] files = dir.listFiles();
+		File[] files = dir.listFiles(createFileFilter(request, dir));
 		List<AjxpFile> ajxpFiles = new Vector<AjxpFile>();
 		for (File file : files) {
 			if (file.isDirectory()) {
@@ -55,6 +57,16 @@ public class FileLsAction extends FileAction {
 		}
 
 		return new AxpLsAnswer(ajxpFiles, mode);
+	}
+
+	/** To be overridden. Accept all by default. */
+	protected FileFilter createFileFilter(HttpServletRequest request, File dir) {
+		return new FileFilter() {
+			public boolean accept(File pathname) {
+				return true;
+			}
+
+		};
 	}
 
 	protected class AxpLsAnswer implements AjxpAnswer {

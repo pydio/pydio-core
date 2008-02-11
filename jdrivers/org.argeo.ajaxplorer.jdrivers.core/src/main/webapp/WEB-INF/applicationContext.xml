@@ -13,10 +13,6 @@
 				<entry key="download" value-ref="action.file.download" />
 				<entry key="image_proxy"
 					value-ref="action.file.image_proxy" />
-				<entry key="trigger_remote_copy"
-					value-ref="action.file.trigger_remote_copy" />
-				<entry key="next_to_remote"
-					value-ref="action.file.next_to_remote" />
 				<entry key="upload" value-ref="action.file.upload" />
 			</map>
 		</property>
@@ -26,7 +22,7 @@
 		class="org.argeo.ajaxplorer.jdrivers.SimpleAjxpDriver">
 		<property name="actions">
 			<map>
-				<entry key="ls" value-ref="action.file.ls" />
+				<entry key="ls" value-ref="action.svn.ls" />
 				<entry key="download" value-ref="action.file.download" />
 				<entry key="image_proxy"
 					value-ref="action.file.image_proxy" />
@@ -41,7 +37,7 @@
 			value="C:/mbaudier/test/ajxpRoot/" />
 	</bean>
 
-	<!-- ACTIONS -->
+	<!-- ACTIONS FS -->
 	<bean id="action.file.ls"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileLsAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
@@ -57,20 +53,17 @@
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
 
-	<bean id="action.file.trigger_remote_copy"
-		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
-		<property name="fileDriverContext" ref="fileDriverContext" />
-	</bean>
-
-	<bean id="action.file.next_to_remote"
-		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
-		<property name="fileDriverContext" ref="fileDriverContext" />
-	</bean>
-
 	<bean id="action.file.upload"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
+	
+	<!-- ACTIONS SVN -->
+	<bean id="action.svn.ls"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnLsAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+
 	<bean id="action.svn.upload"
 		class="org.argeo.ajaxplorer.jdrivers.svn.SvnUploadAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
