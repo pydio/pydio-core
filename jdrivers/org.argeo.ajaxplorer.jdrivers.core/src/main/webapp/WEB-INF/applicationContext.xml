@@ -27,6 +27,7 @@
 				<entry key="image_proxy"
 					value-ref="action.file.image_proxy" />
 				<entry key="upload" value-ref="action.svn.upload" />
+				<entry key="mkdir" value-ref="action.svn.mkdir" />
 			</map>
 		</property>
 	</bean>
@@ -58,6 +59,11 @@
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
 	
+	<bean id="action.file.mkdir"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileMkdirAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+	
 	<!-- ACTIONS SVN -->
 	<bean id="action.svn.ls"
 		class="org.argeo.ajaxplorer.jdrivers.svn.SvnLsAction">
@@ -68,6 +74,12 @@
 		class="org.argeo.ajaxplorer.jdrivers.svn.SvnUploadAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
+
+	<bean id="action.svn.mkdir"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnMkdirAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+	
 
 	<bean id="filterMultipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

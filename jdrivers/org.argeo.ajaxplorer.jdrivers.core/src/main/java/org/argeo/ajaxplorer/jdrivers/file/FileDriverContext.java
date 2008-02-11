@@ -1,5 +1,7 @@
 package org.argeo.ajaxplorer.jdrivers.file;
 
+import java.io.File;
+
 public class FileDriverContext {
 	private String basePath;
 	private String encoding = "UTF-8";
@@ -22,4 +24,11 @@ public class FileDriverContext {
 		this.encoding = encoding;
 	}
 
+	public File getFile(String relpath) {
+		return new File(getBasePath() + relpath).getAbsoluteFile();
+	}
+
+	public File getFile(String dir, String fileName) {
+		return getFile(dir + File.separator + fileName);
+	}
 }

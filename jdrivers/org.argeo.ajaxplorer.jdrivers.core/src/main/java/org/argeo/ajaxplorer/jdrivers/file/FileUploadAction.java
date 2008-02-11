@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
@@ -32,8 +31,7 @@ public class FileUploadAction extends FileAction {
 		try {
 			MultipartFile mpfile = mpr.getFile("Filedata");
 			in = mpfile.getInputStream();
-			file = new File(getFileDriverContext().getBasePath() + dir
-					+ File.separator + fileName);
+			file = getFileDriverContext().getFile(dir, fileName);
 			out = new FileOutputStream(file);
 			IOUtils.copy(in, out);
 		} catch (IOException e) {
@@ -44,19 +42,10 @@ public class FileUploadAction extends FileAction {
 		}
 		postProcess(file);
 
-		return new AxpUploadAnswer();
+		return AjxpAnswer.DO_NOTHING;
 	}
 
 	protected void postProcess(File file) {
-
-	}
-
-	protected class AxpUploadAnswer implements AjxpAnswer {
-
-		public void updateResponse(HttpServletResponse response) {
-			// TODO Auto-generated method stub
-
-		}
 
 	}
 

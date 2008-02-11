@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
-import org.omg.CORBA.Request;
 
 public class FileLsAction extends FileAction {
+
 	public AjxpAnswer execute(HttpServletRequest request) {
 		String modeStr = request.getParameter("mode");
 		final LsMode mode;
@@ -40,7 +40,7 @@ public class FileLsAction extends FileAction {
 			dirOnly = true;
 		}
 
-		File dir = new File(getFileDriverContext().getBasePath() + path);
+		File dir = getFileDriverContext().getFile(path);
 
 		if (!dir.exists())
 			throw new AjxpDriverException("Dir " + dir + " does not exist.");
