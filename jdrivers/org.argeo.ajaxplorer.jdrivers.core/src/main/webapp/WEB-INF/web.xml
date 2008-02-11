@@ -29,7 +29,7 @@
 	<servlet>
 		<servlet-name>file</servlet-name>
 		<servlet-class>
-			org.argeo.ajaxplorer.jdrivers.web.AxpDriverServlet
+			org.argeo.ajaxplorer.jdrivers.web.AjxpDriverServlet
 		</servlet-class>
 		<init-param>
 			<param-name>driverName</param-name>

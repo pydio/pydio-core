@@ -2,6 +2,6 @@ package org.argeo.ajaxplorer.jdrivers;
 
 import javax.servlet.http.HttpServletResponse;
 
-public interface AxpAnswer {
+public interface AjxpAnswer {
 	public void updateResponse(HttpServletResponse response);
 }

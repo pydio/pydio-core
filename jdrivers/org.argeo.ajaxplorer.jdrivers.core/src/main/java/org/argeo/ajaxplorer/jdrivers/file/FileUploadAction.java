@@ -11,18 +11,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.argeo.ajaxplorer.jdrivers.AxpAnswer;
-import org.argeo.ajaxplorer.jdrivers.AxpDriverException;
+import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
+import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public class FileUploadAction extends FileAction {
 
-	public AxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(HttpServletRequest request) {
 		log.debug("Execute upload");
 
 		if (!(request instanceof MultipartHttpServletRequest)) {
-			throw new AxpDriverException(
+			throw new AjxpDriverException(
 					"Cann only deal with MultipartHttpServletRequest");
 		}
 		MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request;
@@ -40,14 +40,14 @@ public class FileUploadAction extends FileAction {
 			IOUtils.copy(in, out);
 			return new AxpUploadAnswer();
 		} catch (IOException e) {
-			throw new AxpDriverException("Cannot upload file.", e);
+			throw new AjxpDriverException("Cannot upload file.", e);
 		} finally {
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
 	}
 
-	protected class AxpUploadAnswer implements AxpAnswer {
+	protected class AxpUploadAnswer implements AjxpAnswer {
 
 		public void updateResponse(HttpServletResponse response) {
 			// TODO Auto-generated method stub

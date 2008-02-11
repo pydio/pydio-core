@@ -5,9 +5,9 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.argeo.ajaxplorer.jdrivers.AxpDriverException;
+import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
-public class AxpFile {
+public class AjxpFile {
 	// FIXME: more generic modif time format?
 	private final static SimpleDateFormat sdf = new SimpleDateFormat(
 			"dd/MM/yyyy hh:mm");
@@ -19,7 +19,7 @@ public class AxpFile {
 	private final String ext;
 	private final FileType type;
 
-	public AxpFile(File file, String parentPath) {
+	public AjxpFile(File file, String parentPath) {
 		this.file = file;
 		this.parentPath = parentPath;
 		this.filePath = parentPath + "/" + file.getName();
@@ -85,7 +85,7 @@ public class AxpFile {
 			buf.append("/>");
 			return buf.toString();
 		} catch (Exception e) {
-			throw new AxpDriverException("Could not serialize file " + file, e);
+			throw new AjxpDriverException("Could not serialize file " + file, e);
 		}
 	}
 

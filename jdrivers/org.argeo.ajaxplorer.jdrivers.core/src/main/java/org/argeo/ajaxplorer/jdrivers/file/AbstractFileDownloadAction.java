@@ -9,14 +9,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.argeo.ajaxplorer.jdrivers.AxpAnswer;
-import org.argeo.ajaxplorer.jdrivers.AxpDriverException;
+import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
+import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
 public abstract class AbstractFileDownloadAction extends FileAction {
-	public AxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(HttpServletRequest request) {
 		String fileStr = request.getParameter(getFileParameter());
 		if (fileStr == null) {
-			throw new AxpDriverException(
+			throw new AjxpDriverException(
 					"A  file to download needs to be provided.");
 		}
 		File file = new File(getFileDriverContext().getBasePath() + fileStr);
@@ -33,7 +33,7 @@ public abstract class AbstractFileDownloadAction extends FileAction {
 		// do nothing
 	}
 
-	protected class AxpBasicDownloadAnswer implements AxpAnswer {
+	protected class AxpBasicDownloadAnswer implements AjxpAnswer {
 		private final File file;
 
 		public AxpBasicDownloadAnswer(File file) {
@@ -56,7 +56,7 @@ public abstract class AbstractFileDownloadAction extends FileAction {
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new AxpDriverException("Cannot download file " + file, e);
+				throw new AjxpDriverException("Cannot download file " + file, e);
 			} finally {
 				IOUtils.closeQuietly(in);
 				IOUtils.closeQuietly(out);

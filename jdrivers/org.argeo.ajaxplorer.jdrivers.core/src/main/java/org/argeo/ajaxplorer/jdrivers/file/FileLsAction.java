@@ -10,11 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.argeo.ajaxplorer.jdrivers.AxpAnswer;
-import org.argeo.ajaxplorer.jdrivers.AxpDriverException;
+import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
+import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
 public class FileLsAction extends FileAction {
-	public AxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(HttpServletRequest request) {
 		String modeStr = request.getParameter("mode");
 		final LsMode mode;
 		if (modeStr == null)
@@ -26,7 +26,7 @@ public class FileLsAction extends FileAction {
 		else if (modeStr.equals("search"))
 			mode = LsMode.SEARCH;
 		else
-			throw new AxpDriverException("Unkown mode " + modeStr);
+			throw new AjxpDriverException("Unkown mode " + modeStr);
 
 		String path = request.getParameter("dir");
 		if (path == null) {
@@ -41,27 +41,27 @@ public class FileLsAction extends FileAction {
 		File dir = new File(getFileDriverContext().getBasePath() + path);
 
 		if (!dir.exists())
-			throw new AxpDriverException("Dir " + dir + " does not exist.");
+			throw new AjxpDriverException("Dir " + dir + " does not exist.");
 
 		File[] files = dir.listFiles();
-		List<AxpFile> axpFiles = new Vector<AxpFile>();
+		List<AjxpFile> ajxpFiles = new Vector<AjxpFile>();
 		for (File file : files) {
 			if (file.isDirectory()) {
-				axpFiles.add(new AxpFile(file, path));
+				ajxpFiles.add(new AjxpFile(file, path));
 			} else {
 				if (!dirOnly)
-					axpFiles.add(new AxpFile(file, path));
+					ajxpFiles.add(new AjxpFile(file, path));
 			}
 		}
 
-		return new AxpLsAnswer(axpFiles, mode);
+		return new AxpLsAnswer(ajxpFiles, mode);
 	}
 
-	protected class AxpLsAnswer implements AxpAnswer {
-		private final List<AxpFile> files;
+	protected class AxpLsAnswer implements AjxpAnswer {
+		private final List<AjxpFile> files;
 		private final LsMode mode;
 
-		public AxpLsAnswer(List<AxpFile> files, LsMode mode) {
+		public AxpLsAnswer(List<AjxpFile> files, LsMode mode) {
 			this.files = files;
 			this.mode = mode;
 		}
@@ -79,14 +79,14 @@ public class FileLsAction extends FileAction {
 				writer.write("<?xml version=\"1.0\" encoding=\"" + encoding
 						+ "\"?>");
 				writer.write("<tree>");
-				for (AxpFile file : files) {
+				for (AjxpFile file : files) {
 					writer.write(file.toXml(mode, encoding));
 				}
 				writer.write("</tree>");
 				writer.flush();
 
 			} catch (Exception e) {
-				throw new AxpDriverException("Could not write response.", e);
+				throw new AjxpDriverException("Could not write response.", e);
 			} finally {
 				IOUtils.closeQuietly(writer);
 				IOUtils.closeQuietly(out);

@@ -9,17 +9,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.argeo.ajaxplorer.jdrivers.AxpAction;
-import org.argeo.ajaxplorer.jdrivers.AxpAnswer;
-import org.argeo.ajaxplorer.jdrivers.AxpDriver;
+import org.argeo.ajaxplorer.jdrivers.AjxpAction;
+import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
+import org.argeo.ajaxplorer.jdrivers.AjxpDriver;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.HttpServletBean;
 
-public class AxpDriverServlet extends HttpServletBean {
+public class AjxpDriverServlet extends HttpServletBean {
 	protected final Log log = LogFactory.getLog(getClass());
 	private String driverName;
-	private AxpDriver driver;
+	private AjxpDriver driver;
 
 	@Override
 	public void init(ServletConfig sc) throws ServletException {
@@ -28,7 +28,7 @@ public class AxpDriverServlet extends HttpServletBean {
 				.getRequiredWebApplicationContext(sc.getServletContext());
 		driverName = sc.getInitParameter("driverName");
 		logger.info("Loading driver " + driverName);
-		driver = (AxpDriver) context.getBean(driverName);
+		driver = (AjxpDriver) context.getBean(driverName);
 	}
 
 	@Override
@@ -51,8 +51,8 @@ public class AxpDriverServlet extends HttpServletBean {
 					.debug(id + " Received " + method + ": "
 							+ req.getParameterMap());
 
-			AxpAction action = driver.getAction(req);
-			AxpAnswer answer = action.execute(req);
+			AjxpAction action = driver.getAction(req);
+			AjxpAnswer answer = action.execute(req);
 			answer.updateResponse(resp);
 
 			log.debug(id + " " + method + " completed");

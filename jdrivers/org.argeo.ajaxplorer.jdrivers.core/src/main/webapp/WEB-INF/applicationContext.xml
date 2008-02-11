@@ -6,7 +6,7 @@
 	default-lazy-init="true">
 
 	<bean id="driver.file"
-		class="org.argeo.ajaxplorer.jdrivers.SimpleAxpDriver">
+		class="org.argeo.ajaxplorer.jdrivers.SimpleAjxpDriver">
 		<property name="actions">
 			<map>
 				<entry key="ls" value-ref="action.file.ls" />

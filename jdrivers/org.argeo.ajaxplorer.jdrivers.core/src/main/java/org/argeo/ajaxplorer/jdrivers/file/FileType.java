@@ -2,7 +2,7 @@ package org.argeo.ajaxplorer.jdrivers.file;
 
 import java.io.File;
 
-import org.argeo.ajaxplorer.jdrivers.AxpDriverException;
+import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
 public enum FileType {
 	FOLDER("folder.png", "Directory"), UNKNOWN("mime_empty.png", "Unkown"), GIF(
@@ -38,7 +38,7 @@ public enum FileType {
 		case PNG:
 			return "image/png";
 		}
-		throw new AxpDriverException("Image type undefined for " + this);
+		throw new AjxpDriverException("Image type undefined for " + this);
 	}
 
 	public static FileType findType(File file) {

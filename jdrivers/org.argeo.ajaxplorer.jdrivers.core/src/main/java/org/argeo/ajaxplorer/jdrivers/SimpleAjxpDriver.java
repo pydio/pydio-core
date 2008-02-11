@@ -14,11 +14,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
-public class SimpleAxpDriver implements AxpDriver {
+public class SimpleAjxpDriver implements AjxpDriver {
 	protected final Log log = LogFactory.getLog(getClass());
-	private Map<String, AxpAction> actions = new TreeMap<String, AxpAction>();
+	private Map<String, AjxpAction> actions = new TreeMap<String, AjxpAction>();
 
-	public AxpAction getAction(HttpServletRequest request) {
+	public AjxpAction getAction(HttpServletRequest request) {
 /*
 		log.debug("Request " + request + ", " + request.getMethod() + ", "
 				+ request.getParameterMap() + ", ");
@@ -67,12 +67,12 @@ public class SimpleAxpDriver implements AxpDriver {
 			action = request.getParameter("action");
 		}
 		if (!actions.containsKey(action)) {
-			throw new AxpDriverException("Action " + action + " not defined.");
+			throw new AjxpDriverException("Action " + action + " not defined.");
 		}
 		return actions.get(action);
 	}
 
-	public void setActions(Map<String, AxpAction> actions) {
+	public void setActions(Map<String, AjxpAction> actions) {
 		this.actions = actions;
 	}
 

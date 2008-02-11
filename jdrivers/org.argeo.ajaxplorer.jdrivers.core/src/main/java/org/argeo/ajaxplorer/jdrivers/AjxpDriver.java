@@ -2,6 +2,6 @@ package org.argeo.ajaxplorer.jdrivers;
 
 import javax.servlet.http.HttpServletRequest;
 
-public interface AxpAction {
-	public AxpAnswer execute(HttpServletRequest request);
+public interface AjxpDriver {
+	public AjxpAction getAction(HttpServletRequest request); 
 }
