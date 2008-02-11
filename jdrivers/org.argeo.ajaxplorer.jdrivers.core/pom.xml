@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.argeo.ajaxplorer.jdrivers</groupId>
-	<artifactId>ajaxplorer-jdrivers-core</artifactId>
+	<artifactId>org.argeo.ajaxplorer.jdrivers.core</artifactId>
 	<packaging>war</packaging>
 	<version>0.1-SNAPSHOT</version>
 	<description>Sparta Web Application</description>
@@ -13,10 +13,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.5-SNAPSHOT</version>
 				<configuration>
-					<!--  <wtpversion>2.0</wtpversion>-->
+					<wtpversion>2.0</wtpversion>
 					<downloadSources>true</downloadSources>
+					<workspace>C:\mbaudier\workspace</workspace>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -28,25 +29,25 @@
 				</configuration>
 			</plugin>
 			<!-- 
-			<plugin>
+				<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>
-								src/main/webapp/WEB-INF/lib
-							</outputDirectory>
-						</configuration>
-					</execution>
+				<execution>
+				<id>copy-dependencies</id>
+				<phase>package</phase>
+				<goals>
+				<goal>copy-dependencies</goal>
+				</goals>
+				<configuration>
+				<outputDirectory>
+				src/main/webapp/WEB-INF/lib
+				</outputDirectory>
+				</configuration>
+				</execution>
 				</executions>
-
-			</plugin>
+				
+				</plugin>
 			-->
 		</plugins>
 	</build>
@@ -99,33 +100,27 @@
 				<checksumPolicy>warn</checksumPolicy>
 			</releases>
 		</repository>
-		<!--  
-			<repository>
+		<repository>
 			<id>apache.snapshots</id>
 			<url>
-			http://people.apache.org/maven-snapshot-repository/
+				http://people.apache.org/maven-snapshot-repository/
 			</url>
-			</repository>
-			<repository>
+		</repository>
+		<repository>
 			<id>eclipse</id>
 			<url>http://repo1.maven.org/eclipse</url>
-			</repository>
-			<repository>
+		</repository>
+		<repository>
 			<id>codehaus</id>
-			<url>
-			http://repository.codehaus.org
-			</url>
-			</repository>
-		-->
+			<url>http://repository.codehaus.org</url>
+		</repository>
 	</repositories>
-	<!--  
-		<pluginRepositories>
+	<pluginRepositories>
 		<pluginRepository>
-		<id>apache.snapshots</id>
-		<url>
-		http://people.apache.org/maven-snapshot-repository/
-		</url>
+			<id>apache.snapshots</id>
+			<url>
+				http://people.apache.org/maven-snapshot-repository/
+			</url>
 		</pluginRepository>
-		</pluginRepositories>
-	-->
+	</pluginRepositories>
 </project>
