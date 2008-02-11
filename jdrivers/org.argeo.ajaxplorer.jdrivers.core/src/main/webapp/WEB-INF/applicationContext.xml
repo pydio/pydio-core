@@ -22,6 +22,19 @@
 		</property>
 	</bean>
 
+	<bean id="driver.svn"
+		class="org.argeo.ajaxplorer.jdrivers.SimpleAjxpDriver">
+		<property name="actions">
+			<map>
+				<entry key="ls" value-ref="action.file.ls" />
+				<entry key="download" value-ref="action.file.download" />
+				<entry key="image_proxy"
+					value-ref="action.file.image_proxy" />
+				<entry key="upload" value-ref="action.svn.upload" />
+			</map>
+		</property>
+	</bean>
+
 	<bean id="fileDriverContext"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileDriverContext">
 		<property name="basePath"
@@ -56,6 +69,10 @@
 
 	<bean id="action.file.upload"
 		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction">
+		<property name="fileDriverContext" ref="fileDriverContext" />
+	</bean>
+	<bean id="action.svn.upload"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnUploadAction">
 		<property name="fileDriverContext" ref="fileDriverContext" />
 	</bean>
 

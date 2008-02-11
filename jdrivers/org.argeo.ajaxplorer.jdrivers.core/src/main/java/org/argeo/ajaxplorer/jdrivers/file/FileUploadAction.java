@@ -28,20 +28,27 @@ public class FileUploadAction extends FileAction {
 
 		InputStream in = null;
 		OutputStream out = null;
+		File file = null;
 		try {
-			MultipartFile file = mpr.getFile("Filedata");
-			in = file.getInputStream();
-			out = new FileOutputStream(getFileDriverContext()
-					.getBasePath()
-					+ dir + File.separator + fileName);
+			MultipartFile mpfile = mpr.getFile("Filedata");
+			in = mpfile.getInputStream();
+			file = new File(getFileDriverContext().getBasePath() + dir
+					+ File.separator + fileName);
+			out = new FileOutputStream(file);
 			IOUtils.copy(in, out);
-			return new AxpUploadAnswer();
 		} catch (IOException e) {
 			throw new AjxpDriverException("Cannot upload file.", e);
 		} finally {
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
+		postProcess(file);
+
+		return new AxpUploadAnswer();
+	}
+
+	protected void postProcess(File file) {
+
 	}
 
 	protected class AxpUploadAnswer implements AjxpAnswer {

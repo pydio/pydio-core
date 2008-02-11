@@ -18,6 +18,9 @@
     <dependent-module archiveName="ganymed-ssh2-build210.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/ch/ethz/ganymed/ganymed-ssh2/build210/ganymed-ssh2-build210.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
+    <dependent-module archiveName="junit-3.8.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/junit/junit/3.8.2/junit-3.8.2.jar">
+      <dependency-type>uses</dependency-type>
+    </dependent-module>
     <dependent-module archiveName="log4j-1.2.14.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/var/M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar">
       <dependency-type>uses</dependency-type>
     </dependent-module>
