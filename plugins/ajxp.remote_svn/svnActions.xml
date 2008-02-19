@@ -5,7 +5,7 @@
 			<gui text="242" title="242" src="applix.png" accessKey="svn_log_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change">
+					actionBarGroup="get">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -26,16 +26,21 @@
 						modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
 					]]></clientCallback>
 				<clientForm id="svnlog_box"><![CDATA[
-				<div id="svnlog_box" action="svnlog" box_width="400" box_height="300" style="overflow:auto"></div>
+				<div id="svnlog_box" action="svnlog" box_width="400"></div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="svnLogAction"></serverCallback>
 				</processing>
 		</action>		
 		<action name="svndownload">
+			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key"><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"></context><selectionContext dir="true" file="true" recycle="false" unique="true" image="" mp3="" editable=""></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>		
+				<clientCallback><![CDATA[
+					// PUT HERE CODE TO EXECUTE IN JAVASCRIPT
+					]]></clientCallback>
+				<serverCallback methodName="svnLogAction"></serverCallback>
+				</processing>
+		</action>				
 	</actions>
 	<infoPanels>
 		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,modiftime,author,revision">
@@ -44,6 +49,8 @@
 				<message key="size_string" id="127"/>
 				<message key="type_string" id="134"/>
 				<message key="modif_string" id="138"/>
+				<message key="author_string" id="244"/>
+				<message key="revision_string" id="243"/>
 			</messages>
 			<html><![CDATA[
 			<div style="padding:10px;">
@@ -51,8 +58,8 @@
 					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
 				</div>
 				<b>#{name_string}</b> : #{basename}
-				<br><b>Author:</b> : #{author}
-				<br><b>Revision:</b> : #{revision}
+				<br><b>#{author_string}</b> : #{author}
+				<br><b>#{revision_string}</b> : #{revision}
 				<br><b>#{size_string}</b> : #{filesize}
 				<br><b>#{type_string}</b> : #{mimestring}
 				<br><b>#{modif_string}</b> : #{modiftime}
