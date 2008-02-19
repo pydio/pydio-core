@@ -83,6 +83,8 @@
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="modif_string" id="138"/>
+				<message key="author_string" id="244"/>
+				<message key="revision_string" id="243"/>
 			</messages>
 			<html><![CDATA[
 				<div style="padding:10px;">
@@ -90,8 +92,8 @@
 						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{basename}
-					<br><b>Author:</b> : #{author}
-					<br><b>Revision:</b> : #{revision}
+					<br><b>#{author_string}</b> : #{author}
+					<br><b>#{revision_string}</b> : #{revision}
 					<br><b>#{modif_string}</b> : #{modiftime}
 				</div>
 			]]></html>
