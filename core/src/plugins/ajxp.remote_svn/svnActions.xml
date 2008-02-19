@@ -28,7 +28,7 @@
 				<clientForm id="svnlog_box"><![CDATA[
 				<div id="svnlog_box" action="svnlog" box_width="400"></div>
 				]]></clientForm>
-				<serverCallback methodName="svnLogAction"></serverCallback>
+				<serverCallback methodName="svnStubAction"></serverCallback>
 				</processing>
 		</action>		
 		<action name="svndownload">
@@ -38,7 +38,7 @@
 				<clientCallback><![CDATA[
 					// PUT HERE CODE TO EXECUTE IN JAVASCRIPT
 					]]></clientCallback>
-				<serverCallback methodName="svnLogAction"></serverCallback>
+				<serverCallback methodName="svnStubAction"></serverCallback>
 				</processing>
 		</action>				
 	</actions>
