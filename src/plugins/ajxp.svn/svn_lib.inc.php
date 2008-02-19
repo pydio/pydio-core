@@ -611,6 +611,16 @@ define('IDX_VALUE', 1);
 		$pipes = NULL;
 		
 		$cmdline = $cmd." ".$switches." ".$arg;
+		$output = shell_exec($cmdline);
+		$result = array();
+		$result[IDX_CMDLINE] = $cmdline;
+		if(strpos($switches, "xml")){
+			$result[IDX_STDOUT] = $output;
+		}else{
+			$result[IDX_STDOUT] = split("\n", $output);
+		}
+		$result[IDX_ERROUT] = "";
+		/*
 		$process = proc_open($cmdline, $descriptorspec, $pipes);
 		
 		$result = array();
@@ -623,8 +633,9 @@ define('IDX_VALUE', 1);
 			// $pipes now looks like this:
 			// 0 => writeable handle connected to child stdin
 			// 1 => readable handle connected to child stdout
-			// 1 => readable handle connected to child errout
-		
+			// 2 => readable handle connected to child errout
+			fclose($pipes[0]);
+
 			$result = array();
 			$result[IDX_CMDLINE] = $cmdline;
 			if(strpos($switches, "xml")){
@@ -632,11 +643,11 @@ define('IDX_VALUE', 1);
 			}else{
 				$result[IDX_STDOUT] = GetLineArray($pipes[1]);
 			}
-			$result[IDX_ERROUT] = GetLineArray($pipes[2]);
-			
-			fclose($pipes[0]);
 			fclose($pipes[1]);
+			
+			$result[IDX_ERROUT] = GetLineArray($pipes[2]);
 			fclose($pipes[2]);
+			
 		
 			// It is important that you close any pipes before calling
 			// proc_close in order to avoid a deadlock
@@ -645,6 +656,7 @@ define('IDX_VALUE', 1);
 //		echo "CMD: $cmdline<br/>";
 //		PrintDebugArray($result, "Result");
 		}
+		*/
 		return $result;
 	}
 		

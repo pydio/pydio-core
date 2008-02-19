@@ -25,6 +25,7 @@ class svnDriver extends AbstractDriver {
 			}			
 			$this->crtListingMode = (isSet($httpVars["mode"])?$httpVars["mode"]:"complete");
 			$res = ListRepository($this->repository, $this->crtPath);
+			//$res[IDX_STDOUT] = "";
 			//header("content-type:text/xml");
 			//print_r($res[IDX_STDOUT]);
 			$this->parseListing($res[IDX_STDOUT]);
