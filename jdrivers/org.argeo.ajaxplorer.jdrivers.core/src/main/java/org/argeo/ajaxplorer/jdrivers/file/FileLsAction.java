@@ -16,7 +16,8 @@ import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
 public class FileLsAction extends FileAction {
 
-	public AjxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(FileDriver driver,
+			HttpServletRequest request) {
 		String modeStr = request.getParameter("mode");
 		final LsMode mode;
 		if (modeStr == null)
@@ -40,7 +41,7 @@ public class FileLsAction extends FileAction {
 			dirOnly = true;
 		}
 
-		File dir = getFileDriverContext().getFile(path);
+		File dir = driver.getFile(path);
 
 		if (!dir.exists())
 			throw new AjxpDriverException("Dir " + dir + " does not exist.");
@@ -56,7 +57,7 @@ public class FileLsAction extends FileAction {
 			}
 		}
 
-		return new AxpLsAnswer(ajxpFiles, mode);
+		return new AxpLsAnswer(driver,ajxpFiles, mode);
 	}
 
 	/** To be overridden. Accept all by default. */
@@ -72,14 +73,16 @@ public class FileLsAction extends FileAction {
 	protected class AxpLsAnswer implements AjxpAnswer {
 		private final List<AjxpFile> files;
 		private final LsMode mode;
+		private final FileDriver driver;
 
-		public AxpLsAnswer(List<AjxpFile> files, LsMode mode) {
+		public AxpLsAnswer(FileDriver driver,List<AjxpFile> files, LsMode mode) {
 			this.files = files;
 			this.mode = mode;
+			this.driver = driver;
 		}
 
 		public void updateResponse(HttpServletResponse response) {
-			final String encoding = getFileDriverContext().getEncoding();
+			final String encoding = driver.getEncoding();
 			response.setCharacterEncoding(encoding);
 			response.setContentType("text/xml");
 

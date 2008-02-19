@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public class FileUploadAction extends FileAction {
 
-	public AjxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(FileDriver driver, HttpServletRequest request) {
 		if (!(request instanceof MultipartHttpServletRequest)) {
 			throw new AjxpDriverException(
 					"Cann only deal with MultipartHttpServletRequest");
@@ -31,7 +31,7 @@ public class FileUploadAction extends FileAction {
 		try {
 			MultipartFile mpfile = mpr.getFile("Filedata");
 			in = mpfile.getInputStream();
-			file = getFileDriverContext().getFile(dir, fileName);
+			file = driver.getFile(dir, fileName);
 			out = new FileOutputStream(file);
 			IOUtils.copy(in, out);
 		} catch (IOException e) {
@@ -40,12 +40,12 @@ public class FileUploadAction extends FileAction {
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
-		postProcess(file);
+		postProcess(driver, file);
 
 		return AjxpAnswer.DO_NOTHING;
 	}
 
-	protected void postProcess(File file) {
+	protected void postProcess(FileDriver driver,File file) {
 
 	}
 

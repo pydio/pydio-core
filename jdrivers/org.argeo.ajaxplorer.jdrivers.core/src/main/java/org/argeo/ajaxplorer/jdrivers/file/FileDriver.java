@@ -2,7 +2,9 @@ package org.argeo.ajaxplorer.jdrivers.file;
 
 import java.io.File;
 
-public class FileDriverContext {
+import org.argeo.ajaxplorer.jdrivers.SimpleAjxpDriver;
+
+public class FileDriver extends SimpleAjxpDriver{
 	private String basePath;
 	private String encoding = "UTF-8";
 

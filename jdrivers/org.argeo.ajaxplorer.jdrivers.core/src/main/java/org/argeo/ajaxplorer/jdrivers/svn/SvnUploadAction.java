@@ -3,6 +3,7 @@ package org.argeo.ajaxplorer.jdrivers.svn;
 import java.io.File;
 
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
+import org.argeo.ajaxplorer.jdrivers.file.FileDriver;
 import org.argeo.ajaxplorer.jdrivers.file.FileUploadAction;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
@@ -15,9 +16,9 @@ public class SvnUploadAction extends FileUploadAction {
 	}
 
 	@Override
-	protected void postProcess(File file) {
+	protected void postProcess(FileDriver driver, File file) {
 		SVNClientManager manager = SVNClientManager.newInstance();
-		File baseDir = new File(getFileDriverContext().getBasePath());
+		File baseDir = new File(driver.getBasePath());
 		try {
 			log.debug("SVN Update: " + baseDir);
 			manager.getUpdateClient().doUpdate(baseDir, SVNRevision.HEAD, true);

@@ -9,7 +9,7 @@ import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 
 public class FileDeleteAction extends FileAction {
 
-	public AjxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(FileDriver driver, HttpServletRequest request) {
 		Map<Object, Object> params = request.getParameterMap();
 		for (Object paramKey : params.keySet()) {
 			String param = paramKey.toString();
@@ -21,8 +21,8 @@ public class FileDeleteAction extends FileAction {
 				if (param.substring(0, 4).equals("file")) {
 					String[] values = (String[]) params.get(paramKey);
 					for (String path : values) {
-						File file = getFileDriverContext().getFile(path);
-						executeDelete(file);
+						File file = driver.getFile(path);
+						executeDelete(driver, file);
 					}
 				}
 			}
@@ -31,7 +31,7 @@ public class FileDeleteAction extends FileAction {
 		return AjxpAnswer.DO_NOTHING;
 	}
 
-	protected void executeDelete(File file) {
+	protected <T extends FileDriver> void executeDelete(T driver, File file) {
 		log.debug("Delete file " + file);
 		file.delete();
 	}

@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 import org.argeo.ajaxplorer.jdrivers.file.FileDeleteAction;
+import org.argeo.ajaxplorer.jdrivers.file.FileDriver;
+
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
@@ -19,8 +21,8 @@ public class SvnDeleteAction extends FileDeleteAction {
 	}
 
 	@Override
-	protected void executeDelete(File file) {
-		File baseDir = new File(getFileDriverContext().getBasePath());
+	protected void executeDelete(FileDriver driver, File file) {
+		File baseDir = new File(driver.getBasePath());
 		try {
 			log.debug("SVN Update: " + baseDir);
 			manager.getUpdateClient().doUpdate(baseDir, SVNRevision.HEAD, true);

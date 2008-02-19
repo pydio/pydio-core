@@ -8,20 +8,20 @@ import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 
 public class FileMkdirAction extends FileAction {
 
-	public AjxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(FileDriver driver,
+			HttpServletRequest request) {
 		String dir = request.getParameter("dir");
 		String dirName = request.getParameter("dirname");
 
-		File newDir = getFileDriverContext().getFile(dir, dirName);
+		File newDir = driver.getFile(dir, dirName);
 		newDir.mkdirs();
 
-		postProcess(newDir);
-		
+		postProcess(driver,newDir);
+
 		return AjxpAnswer.DO_NOTHING;
 	}
 
-	
-	protected void postProcess(File newDir){
-		
+	protected void postProcess(FileDriver driver,File newDir) {
+
 	}
 }

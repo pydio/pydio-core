@@ -13,13 +13,13 @@ import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
 public abstract class AbstractFileDownloadAction extends FileAction {
-	public AjxpAnswer execute(HttpServletRequest request) {
+	public AjxpAnswer execute(FileDriver driver, HttpServletRequest request) {
 		String fileStr = request.getParameter(getFileParameter());
 		if (fileStr == null) {
 			throw new AjxpDriverException(
 					"A  file to download needs to be provided.");
 		}
-		File file = new File(getFileDriverContext().getBasePath() + fileStr);
+		File file = new File(driver.getBasePath() + fileStr);
 		return new AxpBasicDownloadAnswer(file);
 	}
 

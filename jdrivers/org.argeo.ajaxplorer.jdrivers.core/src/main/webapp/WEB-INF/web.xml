@@ -32,8 +32,12 @@
 			org.argeo.ajaxplorer.jdrivers.web.AjxpDriverServlet
 		</servlet-class>
 		<init-param>
-			<param-name>driverName</param-name>
+			<param-name>driverBean</param-name>
 			<param-value>driver.svn</param-value>
+		</init-param>
+		<init-param>
+			<param-name>driver.svn.basePath</param-name>
+			<param-value>D:\dev\test\AjaXplorerSVN\svn\testAX</param-value>
 		</init-param>
 	</servlet>
 

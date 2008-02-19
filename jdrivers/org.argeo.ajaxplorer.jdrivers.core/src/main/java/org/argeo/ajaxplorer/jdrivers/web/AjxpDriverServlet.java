@@ -1,6 +1,7 @@
 package org.argeo.ajaxplorer.jdrivers.web;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -12,6 +13,10 @@ import org.apache.commons.logging.LogFactory;
 import org.argeo.ajaxplorer.jdrivers.AjxpAction;
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 import org.argeo.ajaxplorer.jdrivers.AjxpDriver;
+
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.BeansException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.servlet.HttpServletBean;
@@ -20,7 +25,7 @@ public class AjxpDriverServlet extends HttpServletBean {
 	static final long serialVersionUID = 1l;
 
 	protected final Log log = LogFactory.getLog(getClass());
-	private String driverName;
+	private String driverBean;
 	private AjxpDriver driver;
 
 	@Override
@@ -28,9 +33,33 @@ public class AjxpDriverServlet extends HttpServletBean {
 		super.init(sc);
 		WebApplicationContext context = WebApplicationContextUtils
 				.getRequiredWebApplicationContext(sc.getServletContext());
-		driverName = sc.getInitParameter("driverName");
-		logger.info("Loading driver " + driverName);
-		driver = (AjxpDriver) context.getBean(driverName);
+		driverBean = sc.getInitParameter("driverBean");
+		if (driverBean == null) {
+			throw new ServletException(
+					"No driver found, please set the driverBean property");
+		}
+
+		logger.info("Loading driver " + driverBean);
+		driver = (AjxpDriver) context.getBean(driverBean);
+
+		BeanWrapper wrapper = new BeanWrapperImpl(driver);
+		Enumeration<String> en = sc.getInitParameterNames();
+		while (en.hasMoreElements()) {
+			String name = en.nextElement();
+			if (name.indexOf(driverBean + '.') == 0
+					&& name.length() > (driverBean.length() + 1)) {
+				String propertyName = name.substring(driverBean.length() + 1);
+				String value = sc.getInitParameter(name);
+				if (value != null) {
+					try {
+						wrapper.setPropertyValue(propertyName, value);
+					} catch (BeansException e) {
+						throw new ServletException("Cannot set property "
+								+ propertyName + " of bean " + driverBean, e);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -53,8 +82,10 @@ public class AjxpDriverServlet extends HttpServletBean {
 					.debug(id + " Received " + method + ": "
 							+ req.getParameterMap());
 
-			AjxpAction action = driver.getAction(req);
-			AjxpAnswer answer = action.execute(req);
+			// AjxpAction action = driver.getAction(req);
+			// AjxpAnswer answer = action.execute(req);
+			AjxpAnswer answer = driver.executeAction(req);
+
 			answer.updateResponse(resp);
 
 			log.debug(id + " " + method + " completed");
@@ -65,8 +96,8 @@ public class AjxpDriverServlet extends HttpServletBean {
 
 	}
 
-	public void setDriverName(String driverName) {
-		this.driverName = driverName;
+	public void setDriverBean(String driverName) {
+		this.driverBean = driverName;
 	}
 
 }
