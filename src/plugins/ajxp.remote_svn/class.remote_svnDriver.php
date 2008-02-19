@@ -22,7 +22,7 @@ class remote_svnDriver extends remote_fsDriver
 		}		
 	}
 	
-	function svnLogAction($actionName, $httpVars, $filesVars){
+	function svnStubAction($actionName, $httpVars, $filesVars){
 		if($actionName == "svnlog"){
 			AJXP_XMLWriter::header();
 			echo '<log><logentry revision="310"><author>cdujeu</author><date>2008-02-19</date><msg>Commit type errors</msg></logentry><logentry revision="308"><author>mbronni</author><date>2008-02-19</date><msg>New Function</msg></logentry><logentry revision="300"><author>cdujeu</author><date>2008-02-19</date><msg>New Factory Class</msg></logentry></log>
