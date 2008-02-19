@@ -261,6 +261,12 @@ $mess=array(
 "238" => "Les mots de passe sont différents!",
 "239" => "Veuillez remplir votre mot de passe",
 "240" => "Mauvais mot de passe",
-"241" => "Vos préférences ont été sauvées avec succès"
+"241" => "Vos préférences ont été sauvées avec succès",
+"242" => "Svn Log",
+"svn_log_access_key" => "L",
+"243" => "Revision",
+"244" => "Author", 
+"245" => "Date",
+"246" => "Message"
 );
 ?>

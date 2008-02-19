@@ -272,6 +272,12 @@ $mess=array(
 "238" => "Passwords differ!",
 "239" => "Please fill you current password",
 "240" => "Wrong password!",
-"241" => "Your preferences has been saved successfully"
+"241" => "Your preferences has been saved successfully",
+"242" => "Svn Log",
+"svn_log_access_key" => "L",
+"243" => "Revision",
+"244" => "Author", 
+"245" => "Date",
+"246" => "Message"
 );
 ?>
