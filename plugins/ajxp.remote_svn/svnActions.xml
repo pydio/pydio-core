@@ -16,7 +16,7 @@
 							ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
 							var crtRep = userSelection.getCurrentRep();
 							if(crtRep == '/') crtRep = '';
-							ajaxplorer.actionBar.svnLogger.open(crtRep+'/'+userSelection.getUniqueFileName());
+							ajaxplorer.actionBar.svnLogger.open(userSelection.getUniqueFileName());
 						};
 						var closeFunc = function(){
 							ajaxplorer.actionBar.svnLogger.close();
@@ -28,7 +28,7 @@
 				<clientForm id="svnlog_box"><![CDATA[
 				<div id="svnlog_box" action="svnlog" box_width="400"></div>
 				]]></clientForm>
-				<serverCallback methodName="svnStubAction"></serverCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>		
 		<action name="svndownload">
@@ -38,7 +38,7 @@
 				<clientCallback><![CDATA[
 					// PUT HERE CODE TO EXECUTE IN JAVASCRIPT
 					]]></clientCallback>
-				<serverCallback methodName="svnStubAction"></serverCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>				
 	</actions>
