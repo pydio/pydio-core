@@ -41,12 +41,14 @@ public class SvnDownloadAction implements AjxpAction<SvnDriver> {
 		public void updateResponse(HttpServletResponse response) {
 			ServletOutputStream out = null;
 			try {
+				FileDownloadAction.setDefaultDownloadHeaders(response,
+						getFileName(), null);
+				response.setHeader("AjaXplorer-SvnFileName", getFileName());
+
 				SVNRepository repository = driver.getRepository();
 				out = response.getOutputStream();
 				repository.getFile(path, rev, null, out);
 
-				FileDownloadAction.setDefaultDownloadHeaders(response,
-						getFileName(), null);
 
 			} catch (Exception e) {
 				throw new AjxpDriverException("Cannot download revision " + rev
@@ -65,9 +67,9 @@ public class SvnDownloadAction implements AjxpAction<SvnDriver> {
 				origFileName = path;
 			}
 
-			int firstIndexPoint = origFileName.indexOf('.');
-			String prefix = origFileName.substring(0, firstIndexPoint);
-			String ext = origFileName.substring(firstIndexPoint);
+			int lastIndexPoint = origFileName.lastIndexOf('.');
+			String prefix = origFileName.substring(0, lastIndexPoint);
+			String ext = origFileName.substring(lastIndexPoint);
 			return prefix + "-" + rev + ext;
 		}
 	}
