@@ -61,10 +61,13 @@ class remote_svnDriver extends remote_fsDriver
 		
 		$size=strlen($httpClient->content);
 		$filePath = $httpVars["file"];
-		header("Content-Type: application/force-download; name=\"".basename($filePath)."\"");
+		
+		$svnFileName = $httpClient->getHeader("AjaXplorer-SvnFileName");
+		
+		header("Content-Type: application/force-download; name=\"".$svnFileName."\"");
 		header("Content-Transfer-Encoding: binary");
 		header("Content-Length: ".$size);
-		header("Content-Disposition: attachment; filename=\"".basename($filePath)."\"");
+		header("Content-Disposition: attachment; filename=\"".$svnFileName."\"");
 		header("Expires: 0");
 		header("Cache-Control: no-cache, must-revalidate");
 		header("Pragma: no-cache");
