@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 
-public class FileMkdirAction extends FileAction {
+public class FileMkdirAction<T extends FileDriver> extends FileAction {
 
 	public AjxpAnswer execute(FileDriver driver,
 			HttpServletRequest request) {
@@ -16,12 +16,12 @@ public class FileMkdirAction extends FileAction {
 		File newDir = driver.getFile(dir, dirName);
 		newDir.mkdirs();
 
-		postProcess(driver,newDir);
+		postProcess((T)driver,newDir);
 
 		return AjxpAnswer.DO_NOTHING;
 	}
 
-	protected void postProcess(FileDriver driver,File newDir) {
+	protected void postProcess(T driver,File newDir) {
 
 	}
 }

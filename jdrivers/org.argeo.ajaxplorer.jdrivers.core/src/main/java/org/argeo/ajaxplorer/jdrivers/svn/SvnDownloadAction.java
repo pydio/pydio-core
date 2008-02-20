@@ -48,8 +48,6 @@ public class SvnDownloadAction implements AjxpAction<SvnDriver> {
 				SVNRepository repository = driver.getRepository();
 				out = response.getOutputStream();
 				repository.getFile(path, rev, null, out);
-
-
 			} catch (Exception e) {
 				throw new AjxpDriverException("Cannot download revision " + rev
 						+ " of path " + path, e);

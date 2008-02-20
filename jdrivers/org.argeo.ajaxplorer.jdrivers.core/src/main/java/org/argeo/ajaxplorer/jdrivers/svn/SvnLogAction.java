@@ -4,14 +4,11 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
-import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.xml.SVNXMLLogHandler;
 import org.tmatesoft.svn.core.wc.xml.SVNXMLSerializer;
@@ -26,12 +23,6 @@ import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
 public class SvnLogAction implements AjxpAction<SvnDriver> {
 	private final Log log = LogFactory.getLog(getClass());
-	protected final SVNClientManager manager;
-
-	public SvnLogAction() {
-		FSRepositoryFactory.setup();
-		manager = SVNClientManager.newInstance();
-	}
 
 	public AjxpAnswer execute(SvnDriver driver, HttpServletRequest request) {
 		String fileStr = request.getParameter("file");
@@ -63,21 +54,21 @@ public class SvnLogAction implements AjxpAction<SvnDriver> {
 				writer.append("<log>");
 				SVNXMLSerializer serializer = new SVNXMLSerializer(writer);
 				SVNXMLLogHandler logHandler = new SVNXMLLogHandler(serializer);
-				manager.getLogClient().doLog(new File[] { file },
+				driver.getManager().getLogClient().doLog(new File[] { file },
 						SVNRevision.create(0), SVNRevision.HEAD, true, false,
 						100, logHandler);
 				writer.append("</log>");
 				writer.append("</tree>");
 
 				String message = writer.toString();
-				if(log.isTraceEnabled()){
+				if (log.isTraceEnabled()) {
 					log.trace(message);
 				}
-				
+
 				reader = new StringReader(message);
-				
+
 				servletWriter = response.getWriter();
-				
+
 				List<String> lines = IOUtils.readLines(reader);
 				IOUtils.writeLines(lines, "", servletWriter);
 			} catch (Exception e) {

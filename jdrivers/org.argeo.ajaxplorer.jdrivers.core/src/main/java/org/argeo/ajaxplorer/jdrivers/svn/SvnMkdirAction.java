@@ -2,22 +2,17 @@ package org.argeo.ajaxplorer.jdrivers.svn;
 
 import java.io.File;
 
-import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
-import org.argeo.ajaxplorer.jdrivers.file.FileDriver;
-import org.argeo.ajaxplorer.jdrivers.file.FileMkdirAction;
 import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 
-public class SvnMkdirAction extends FileMkdirAction {
-	static {
-		FSRepositoryFactory.setup();
-	}
+import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
+import org.argeo.ajaxplorer.jdrivers.file.FileMkdirAction;
 
+public class SvnMkdirAction extends FileMkdirAction<SvnDriver> {
 	@Override
-	protected void postProcess(FileDriver driver, File newDir) {
-		SVNClientManager manager = SVNClientManager.newInstance();
+	protected void postProcess(SvnDriver driver, File newDir) {
+		SVNClientManager manager = driver.getManager();
 		File baseDir = new File(driver.getBasePath());
 		try {
 			log.debug("SVN Update: " + baseDir);

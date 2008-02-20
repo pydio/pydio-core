@@ -14,7 +14,7 @@ import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-public class FileUploadAction extends FileAction {
+public class FileUploadAction<T extends FileDriver> extends FileAction {
 
 	public AjxpAnswer execute(FileDriver driver, HttpServletRequest request) {
 		if (!(request instanceof MultipartHttpServletRequest)) {
@@ -40,12 +40,12 @@ public class FileUploadAction extends FileAction {
 			IOUtils.closeQuietly(in);
 			IOUtils.closeQuietly(out);
 		}
-		postProcess(driver, file);
+		postProcess((T)driver, file);
 
 		return AjxpAnswer.DO_NOTHING;
 	}
 
-	protected void postProcess(FileDriver driver,File file) {
+	protected void postProcess(T driver,File file) {
 
 	}
 
