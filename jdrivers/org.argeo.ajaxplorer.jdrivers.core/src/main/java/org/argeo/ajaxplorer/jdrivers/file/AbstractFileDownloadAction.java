@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
@@ -51,7 +52,7 @@ public abstract class AbstractFileDownloadAction extends FileAction {
 				in = FileUtils.openInputStream(file);
 				out = response.getOutputStream();
 
-				IOUtils.copy(in, out);
+				copyFile(in, out);
 				out.flush();
 
 			} catch (Exception e) {
@@ -62,6 +63,11 @@ public abstract class AbstractFileDownloadAction extends FileAction {
 				IOUtils.closeQuietly(out);
 			}
 
+		}
+
+		protected void copyFile(InputStream in, OutputStream out)
+				throws Exception {
+			IOUtils.copy(in, out);
 		}
 
 	}

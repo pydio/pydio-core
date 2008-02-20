@@ -8,12 +8,18 @@ public class FileDownloadAction extends AbstractFileDownloadAction {
 
 	@Override
 	protected void setHeaders(HttpServletResponse response, File file) {
+		setDefaultDownloadHeaders(response, file.getName(), file.length());
+	}
+
+	public static void setDefaultDownloadHeaders(HttpServletResponse response,
+			String fileName, Long fileLength) {
 		response.setContentType("application/force-download; name=\""
-				+ file.getName() + "\"");
+				+ fileName + "\"");
 		response.setHeader("Content-Transfer-Encoding", "binary");
-		response.setContentLength((int) file.length());
+		if (fileLength != null)
+			response.setContentLength(fileLength.intValue());
 		response.setHeader("Content-Disposition", "attachement; filename=\""
-				+ file.getName() + "\"");
+				+ fileName + "\"");
 		response.setHeader("Expires", "0");
 		response.setHeader("Cache-Control", "no-cache, must-revalidate");
 		response.setHeader("Pragma", "no-cache");

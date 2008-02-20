@@ -2,6 +2,7 @@ package org.argeo.ajaxplorer.jdrivers.web;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -42,6 +43,72 @@ public class AjxpDriverServlet extends HttpServletBean {
 		logger.info("Loading driver " + driverBean);
 		driver = (AjxpDriver) context.getBean(driverBean);
 
+		// overrideBeanProperties(sc);
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		processRequest("GET", req, resp);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		processRequest("POST", req, resp);
+	}
+
+	protected void processRequest(String method, HttpServletRequest req,
+			HttpServletResponse resp) throws ServletException, IOException {
+		long id = System.currentTimeMillis();
+		try {
+			if (log.isDebugEnabled())
+				logRequest(id, method, req);
+
+			AjxpAnswer answer = driver.executeAction(req);
+			answer.updateResponse(resp);
+
+			if (log.isDebugEnabled())
+				log.debug(id + " " + method + " completed");
+		} catch (Exception e) {
+			log.error(id + " Cannot process request.", e);
+			throw new ServletException("Cannot process request " + id, e);
+		}
+
+	}
+
+	public void setDriverBean(String driverName) {
+		this.driverBean = driverName;
+	}
+
+	protected void logRequest(long id, String method, HttpServletRequest req) {
+		if (log.isDebugEnabled()) {
+			StringBuffer buf = new StringBuffer(id + " Received " + method
+					+ ": ");
+			buf.append('{');
+			Map<String, String[]> params = req.getParameterMap();
+			int count1 = 0;
+			for (Map.Entry<String, String[]> entry : params.entrySet()) {
+				if (count1 != 0)
+					buf.append(", ");
+				buf.append(entry.getKey()).append("={");
+				int count2 = 0;
+				for (String value : entry.getValue()) {
+					if (count2 != 0)
+						buf.append(',');
+					buf.append(value);
+					count2++;
+				}
+				buf.append('}');
+				count1++;
+			}
+			buf.append('}');
+			log.debug(buf.toString());
+		}
+	}
+
+	protected void overrideBeanProperties(ServletConfig sc)
+			throws ServletException {
 		BeanWrapper wrapper = new BeanWrapperImpl(driver);
 		Enumeration<String> en = sc.getInitParameterNames();
 		while (en.hasMoreElements()) {
@@ -61,43 +128,4 @@ public class AjxpDriverServlet extends HttpServletBean {
 			}
 		}
 	}
-
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		processRequest("GET", req, resp);
-	}
-
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		processRequest("POST", req, resp);
-	}
-
-	protected void processRequest(String method, HttpServletRequest req,
-			HttpServletResponse resp) throws ServletException, IOException {
-		long id = System.currentTimeMillis();
-		try {
-			log
-					.debug(id + " Received " + method + ": "
-							+ req.getParameterMap());
-
-			// AjxpAction action = driver.getAction(req);
-			// AjxpAnswer answer = action.execute(req);
-			AjxpAnswer answer = driver.executeAction(req);
-
-			answer.updateResponse(resp);
-
-			log.debug(id + " " + method + " completed");
-		} catch (Exception e) {
-			log.error(id + " Cannot process request.", e);
-			throw new ServletException("Cannot process request " + id, e);
-		}
-
-	}
-
-	public void setDriverBean(String driverName) {
-		this.driverBean = driverName;
-	}
-
 }
