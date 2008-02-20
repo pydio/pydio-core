@@ -36,6 +36,37 @@ class remote_svnDriver extends remote_fsDriver
 		exit(1);
 	}
 	
+	function svnDownload($actionName, $httpVars, $filesVars){
+		$sessionId = "";
+		$crtRep = ConfService::getRepository();
+		$httpClient = $this->getRemoteConnexion($sessionId);
+		$httpVars["ajxp_sessid"] = $sessionId;
+		$method = "get";
+		if($method == "get"){
+			$httpClient->get($crtRep->getOption("URI"), $httpVars);
+		}else{			
+			$httpClient->post($crtRep->getOption("URI"), $httpVars);
+		}
+		// check if session is expired
+		if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
+			$httpClient = $this->getRemoteConnexion($sessionId, true);
+			$httpVars["ajxp_sessid"] = $sessionId;
+			$method = "get";
+			if($method == "get"){
+				$httpClient->get($crtRep->getOption("URI"), $httpVars);
+			}else{			
+				$httpClient->post($crtRep->getOption("URI"), $httpVars);
+			}
+		}
+		
+		$headers = $httpClient->getHeaders();
+		foreach ($headers as $hName => $hValue){
+			header($hName.":".$hValue);
+		}		
+		print $httpClient->getContent();
+		session_write_close();
+		exit();				
+	}
 }
 
 ?>
