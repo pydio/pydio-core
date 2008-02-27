@@ -20,10 +20,14 @@ public class SvnDriver extends FileDriver implements BeanNameAware {
 			.getProperty("user.home")
 			+ File.separator + "AjaXplorerArchiver" + File.separator + "data";
 
+	private final static long WRITE_ACTION_TIMEOUT = 10 * 60 * 1000;
+
 	private SVNURL baseUrl;
 	private SVNClientManager manager;
 
 	private String beanName;
+
+	private boolean isInWriteAction = false;
 
 	public void init() {
 		FSRepositoryFactory.setup();
@@ -157,6 +161,69 @@ public class SvnDriver extends FileDriver implements BeanNameAware {
 			throw new AjxpDriverException("Cannot create repository at "
 					+ repoDir, e);
 		}
+	}
+
+	private void updateIfRequired(File dir) {
+		try {
+			SVNInfo wcInfo = manager.getWCClient().doInfo(getBaseDir(),
+					SVNRevision.WORKING);
+			SVNRevision wcRev = wcInfo.getRevision();
+			SVNInfo repoInfo = manager.getWCClient().doInfo(getBaseUrl(),
+					null, SVNRevision.HEAD);
+			SVNRevision repoRev = repoInfo.getRevision();
+
+			if (log.isTraceEnabled())
+				log
+						.trace("WC Revision=" + wcRev + ", Repo Revision="
+								+ repoRev);
+
+			if (!wcRev.equals(repoRev)) {
+				log.debug("Update working copy from revision " + wcRev
+						+ " to revision " + repoRev);
+				manager.getUpdateClient().doUpdate(getBaseDir(),
+						SVNRevision.HEAD, true);
+			}
+		} catch (SVNException e) {
+			throw new AjxpDriverException("Cannot update working copy "
+					+ getBaseDir(),e);
+		}
+	}
+
+	public synchronized void beginWriteAction(File dir) {
+		if (isInWriteAction) {
+			try {
+				wait(WRITE_ACTION_TIMEOUT);
+			} catch (InterruptedException e) {
+				// silent
+			}
+			if (isInWriteAction) {
+				throw new AjxpDriverException(
+						"Still in write action after timeout "
+								+ WRITE_ACTION_TIMEOUT + " ms.");
+			}
+		}
+
+		isInWriteAction = true;
+		updateIfRequired(dir);
+	}
+
+	public synchronized void completeWriteAction(File dir) {
+		isInWriteAction = false;
+		notifyAll();
+	}
+
+	public synchronized void rollbackWriteAction(File dir) {
+		// TODO: revert?
+		isInWriteAction = false;
+		notifyAll();
+	}
+	
+	public void commitAll(String message) throws SVNException{
+		if(log.isTraceEnabled())
+		log.trace("SVN Commit: " + getBaseDir());
+		manager.getCommitClient().doCommit(new File[] { getBaseDir() }, true,
+				message, true, true);
+
 	}
 
 	/** Spring bean name, set at initialization. */

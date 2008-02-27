@@ -11,6 +11,10 @@ public class FileDriver extends SimpleAjxpDriver{
 	public String getBasePath() {
 		return basePath;
 	}
+	
+	public File getBaseDir(){
+		return new File(getBasePath());
+	}
 
 	public void setBasePath(String basePath) {
 		if (basePath.charAt(basePath.length() - 1) != File.separatorChar)

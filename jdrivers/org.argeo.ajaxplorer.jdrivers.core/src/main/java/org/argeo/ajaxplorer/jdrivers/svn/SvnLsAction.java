@@ -8,7 +8,9 @@ import java.util.Vector;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNWCClient;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 import org.argeo.ajaxplorer.jdrivers.file.FileLsAction;
@@ -26,6 +28,8 @@ public class SvnLsAction extends FileLsAction<SvnDriver, SvnAjxpFile> {
 			FileFilter filter = createFileFilter(dir);
 			File[] files = dir.listFiles(filter);
 			for (File file : files) {
+				//SVNStatus status = driver.getManager().getStatusClient().doStatus(file, false);
+				
 				SVNInfo info = client.doInfo(file, SVNRevision.WORKING);
 				if (dirOnly) {
 					if (file.isDirectory())
@@ -36,7 +40,7 @@ public class SvnLsAction extends FileLsAction<SvnDriver, SvnAjxpFile> {
 			}
 			return res;
 		} catch (SVNException e) {
-			throw new AjxpDriverException("Cannot list svn dir " + path);
+			throw new AjxpDriverException("Cannot list svn dir " + path, e);
 		}
 	}
 
