@@ -11,13 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+
 import org.argeo.ajaxplorer.jdrivers.AjxpAnswer;
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
-public class FileLsAction extends FileAction {
+public class FileLsAction<T extends FileDriver, F extends AjxpFile> extends FileAction {
 
-	public AjxpAnswer execute(FileDriver driver,
-			HttpServletRequest request) {
+	public AjxpAnswer execute(FileDriver driver, HttpServletRequest request) {
 		String modeStr = request.getParameter("mode");
 		final LsMode mode;
 		if (modeStr == null)
@@ -41,27 +41,39 @@ public class FileLsAction extends FileAction {
 			dirOnly = true;
 		}
 
+		List<F> ajxpFiles = listFiles((T)driver, path, dirOnly);
+		/*
+		 * File[] files = dir.listFiles(createFileFilter(request, dir)); List<AjxpFile>
+		 * ajxpFiles = new Vector<AjxpFile>(); for (File file : files) { if
+		 * (file.isDirectory()) { ajxpFiles.add(new AjxpFile(file, path)); }
+		 * else { if (!dirOnly) ajxpFiles.add(new AjxpFile(file, path)); } }
+		 */
+		return new AxpLsAnswer(driver, ajxpFiles, mode);
+	}
+
+	protected List<F> listFiles(T driver,
+			String path, boolean dirOnly) {
 		File dir = driver.getFile(path);
 
 		if (!dir.exists())
 			throw new AjxpDriverException("Dir " + dir + " does not exist.");
 
-		File[] files = dir.listFiles(createFileFilter(request, dir));
-		List<AjxpFile> ajxpFiles = new Vector<AjxpFile>();
+		FileFilter filter = createFileFilter(dir);
+		File[] files = dir.listFiles(filter);
+		List<F> ajxpFiles = new Vector<F>();
 		for (File file : files) {
 			if (file.isDirectory()) {
-				ajxpFiles.add(new AjxpFile(file, path));
+				ajxpFiles.add((F)new AjxpFile(file, path));
 			} else {
 				if (!dirOnly)
-					ajxpFiles.add(new AjxpFile(file, path));
+					ajxpFiles.add((F)new AjxpFile(file, path));
 			}
 		}
-
-		return new AxpLsAnswer(driver,ajxpFiles, mode);
+		return ajxpFiles;
 	}
 
 	/** To be overridden. Accept all by default. */
-	protected FileFilter createFileFilter(HttpServletRequest request, File dir) {
+	protected FileFilter createFileFilter(File dir) {
 		return new FileFilter() {
 			public boolean accept(File pathname) {
 				return true;
@@ -71,11 +83,11 @@ public class FileLsAction extends FileAction {
 	}
 
 	protected class AxpLsAnswer implements AjxpAnswer {
-		private final List<AjxpFile> files;
+		private final List<F> files;
 		private final LsMode mode;
 		private final FileDriver driver;
 
-		public AxpLsAnswer(FileDriver driver,List<AjxpFile> files, LsMode mode) {
+		public AxpLsAnswer(FileDriver driver, List<F> files, LsMode mode) {
 			this.files = files;
 			this.mode = mode;
 			this.driver = driver;

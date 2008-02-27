@@ -5,9 +5,14 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 
 public class AjxpFile {
+	private final static Log log = LogFactory.getLog(AjxpFile.class);
+
 	// FIXME: more generic modif time format?
 	private final static SimpleDateFormat sdf = new SimpleDateFormat(
 			"dd/MM/yyyy hh:mm");
@@ -22,7 +27,11 @@ public class AjxpFile {
 	public AjxpFile(File file, String parentPath) {
 		this.file = file;
 		this.parentPath = parentPath;
-		this.filePath = parentPath + "/" + file.getName();
+		if (parentPath.equals("/")) {
+			this.filePath = "/" + file.getName();
+		} else {
+			this.filePath = parentPath + "/" + file.getName();
+		}
 		this.ext = file.isDirectory() ? null : file.getName().substring(
 				file.getName().indexOf('.') + 1);
 		this.type = FileType.findType(ext);
@@ -82,7 +91,14 @@ public class AjxpFile {
 				}
 
 			}
+
+			addAdditionalAttrs(buf, mode, encoding);
+
 			buf.append("/>");
+
+			if (log.isTraceEnabled())
+				log.trace(buf.toString());
+
 			return buf.toString();
 		} catch (Exception e) {
 			throw new AjxpDriverException("Could not serialize file " + file, e);
@@ -97,8 +113,14 @@ public class AjxpFile {
 		return (file.length() / 1024) + " Kb";
 	}
 
-	private void addAttr(String attrName, String attrValue, StringBuffer buf) {
+	protected void addAttr(String attrName, String attrValue, StringBuffer buf) {
 		buf.append(" ").append(attrName).append("=\"").append(attrValue)
 				.append("\"");
+	}
+
+	/** To be overridden, do nothing by default. */
+	protected void addAdditionalAttrs(final StringBuffer buf,
+			final LsMode mode, final String encoding) {
+
 	}
 }

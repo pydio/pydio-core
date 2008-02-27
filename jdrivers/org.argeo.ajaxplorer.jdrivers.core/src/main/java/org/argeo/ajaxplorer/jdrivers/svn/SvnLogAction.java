@@ -2,8 +2,6 @@ package org.argeo.ajaxplorer.jdrivers.svn;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +15,6 @@ import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.wc.SVNRevision;
-import org.tmatesoft.svn.core.wc.xml.SVNXMLLogHandler;
-import org.tmatesoft.svn.core.wc.xml.SVNXMLSerializer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -54,16 +50,10 @@ public class SvnLogAction implements AjxpAction<SvnDriver> {
 
 		public void updateResponse(HttpServletResponse response) {
 			PrintWriter writer = null;
-//			PrintWriter servletWriter = null;
-//			StringReader reader = null;
 			try {
 				writer = response.getWriter();
-				// writer = new StringWriter();
 				writer.append("<tree>");
 				writer.append("<log>");
-				// SVNXMLSerializer serializer = new SVNXMLSerializer(writer);
-				// SVNXMLLogHandler logHandler = new
-				// SVNXMLLogHandler(serializer);
 
 				final List<SVNLogEntry> logEntries = new Vector<SVNLogEntry>();
 				ISVNLogEntryHandler logHandler = new ISVNLogEntryHandler() {
@@ -83,25 +73,11 @@ public class SvnLogAction implements AjxpAction<SvnDriver> {
 
 				writer.append("</log>");
 				writer.append("</tree>");
-/*
-				String message = writer.toString();
-				if (log.isTraceEnabled()) {
-					log.trace(message);
-				}
-
-				reader = new StringReader(message);
-
-				servletWriter = response.getWriter();
-
-				List<String> lines = IOUtils.readLines(reader);
-				IOUtils.writeLines(lines, "", servletWriter);*/
 			} catch (Exception e) {
 				throw new AjxpDriverException(
 						"Cannot retrieve log for " + file, e);
 			} finally {
 				IOUtils.closeQuietly(writer);
-//				IOUtils.closeQuietly(reader);
-//				IOUtils.closeQuietly(servletWriter);
 			}
 		}
 
@@ -111,7 +87,7 @@ public class SvnLogAction implements AjxpAction<SvnDriver> {
 		StringBuffer buf = new StringBuffer();
 		buf.append("<logentry");
 		buf.append(" revision=\"").append(entry.getRevision()).append("\"");
-		buf.append(" is_dir=\"").append(file.isDirectory() ? "true" : "false")
+		buf.append(" is_file=\"").append(file.isDirectory() ? "0" : "1")
 				.append("\"");
 		buf.append(">");
 
@@ -127,7 +103,7 @@ public class SvnLogAction implements AjxpAction<SvnDriver> {
 		buf.append("</paths>");
 
 		buf.append("<msg>").append(entry.getMessage()).append("</msg>");
-		
+
 		buf.append("</logentry>");
 		return buf.toString();
 	}

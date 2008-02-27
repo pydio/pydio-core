@@ -45,12 +45,12 @@ public class SvnDriver extends FileDriver implements BeanNameAware {
 					+ "svnwc" + File.separator + beanName;
 			log.warn("No base path provided, use " + defaultBasePath);
 			setBasePath(defaultBasePath);
-			
+
 			File baseDir = new File(getBasePath());
-			if(!baseDir.exists()){
+			if (!baseDir.exists()) {
 				baseDir.mkdirs();
 			}
-			
+
 			if (baseDirChecks(baseDir)) {
 				if (getBaseUrl() == null) {
 					String defaultRepoPath = DEFAULT_DATA_PATH + File.separator
@@ -62,8 +62,8 @@ public class SvnDriver extends FileDriver implements BeanNameAware {
 				checkOut(new File(getBasePath()));
 			}
 		}
-		log.info("SVN driver initialized with base url " + baseUrl
-				+ " and base path " + basePath);
+		log.info("SVN driver initialized with base url " + getBaseUrl()
+				+ " and base path " + getBasePath());
 	}
 
 	/** Builds a SVN URL. */
