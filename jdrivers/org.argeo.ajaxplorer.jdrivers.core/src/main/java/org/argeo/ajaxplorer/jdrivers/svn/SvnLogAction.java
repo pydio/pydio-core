@@ -64,11 +64,14 @@ public class SvnLogAction implements AjxpAction<SvnDriver> {
 				};
 
 				driver.getManager().getLogClient().doLog(new File[] { file },
-						SVNRevision.create(0), SVNRevision.HEAD, true, false,
+						SVNRevision.create(0), SVNRevision.HEAD, true, true,
 						100, logHandler);
 
 				for (int i = logEntries.size() - 1; i >= 0; i--) {
-					writer.append(logEntryAsXml(logEntries.get(i), file));
+					String xml = logEntryAsXml(logEntries.get(i), file);
+					if(log.isTraceEnabled())
+						log.trace(xml);
+					writer.append(xml);
 				}
 
 				writer.append("</log>");
