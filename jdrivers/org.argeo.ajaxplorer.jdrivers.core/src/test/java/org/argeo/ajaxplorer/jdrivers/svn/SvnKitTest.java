@@ -11,8 +11,8 @@ import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
-public class SvnKitTest extends TestCase {
-
+public class SvnKitTest {//extends TestCase {
+/*
 	public void testUpdate() throws Exception {
 		SVNRepositoryFactoryImpl.setup();
 		FSRepositoryFactory.setup();
@@ -21,5 +21,5 @@ public class SvnKitTest extends TestCase {
 		ISVNOptions options = SVNWCUtil.createDefaultOptions(true);
 		SVNClientManager manager = SVNClientManager.newInstance(options);
 		manager.getUpdateClient().doUpdate(file, SVNRevision.HEAD, true);
-	}
+	}*/
 }

@@ -2,6 +2,7 @@ package org.argeo.ajaxplorer.jdrivers.svn;
 
 import java.io.File;
 
+import org.springframework.beans.factory.BeanNameAware;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
@@ -9,13 +10,20 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
 import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc.admin.SVNAdminClient;
 
 import org.argeo.ajaxplorer.jdrivers.AjxpDriverException;
 import org.argeo.ajaxplorer.jdrivers.file.FileDriver;
 
-public class SvnDriver extends FileDriver {
+public class SvnDriver extends FileDriver implements BeanNameAware {
+	private final static String DEFAULT_DATA_PATH = System
+			.getProperty("user.home")
+			+ File.separator + "AjaXplorerArchiver" + File.separator + "data";
+
 	private SVNURL baseUrl;
 	private SVNClientManager manager;
+
+	private String beanName;
 
 	public void init() {
 		FSRepositoryFactory.setup();
@@ -33,8 +41,26 @@ public class SvnDriver extends FileDriver {
 				checkOut(baseDir);
 			}
 		} else {
-			throw new AjxpDriverException("No base path was provided.");
-			// TODO: default base path?
+			String defaultBasePath = DEFAULT_DATA_PATH + File.separator
+					+ "svnwc" + File.separator + beanName;
+			log.warn("No base path provided, use " + defaultBasePath);
+			setBasePath(defaultBasePath);
+			
+			File baseDir = new File(getBasePath());
+			if(!baseDir.exists()){
+				baseDir.mkdirs();
+			}
+			
+			if (baseDirChecks(baseDir)) {
+				if (getBaseUrl() == null) {
+					String defaultRepoPath = DEFAULT_DATA_PATH + File.separator
+							+ "svnrepos" + File.separator + beanName;
+					log.warn("No base URL found, create repository at "
+							+ defaultRepoPath);
+					baseUrl = createRepository(new File(defaultRepoPath));
+				}
+				checkOut(new File(getBasePath()));
+			}
 		}
 		log.info("SVN driver initialized with base url " + baseUrl
 				+ " and base path " + basePath);
@@ -104,7 +130,7 @@ public class SvnDriver extends FileDriver {
 	}
 
 	protected void checkOut(File baseDir) {
-		if (baseUrl == null) {
+		if (getBaseUrl() == null) {
 			throw new AjxpDriverException(
 					"No SVN URL provided, cannot check out.");
 		}
@@ -112,8 +138,30 @@ public class SvnDriver extends FileDriver {
 		// Make sure directory exists
 		baseDir.mkdirs();
 
-		throw new AjxpDriverException(
-				"Automatic check out not yet implemented.");
+		try {
+			long revision = manager.getUpdateClient().doCheckout(getBaseUrl(),
+					baseDir, SVNRevision.UNDEFINED, SVNRevision.HEAD, true);
+			log.info("Checked out from " + baseUrl + " to " + baseDir
+					+ " at revision " + revision);
+		} catch (SVNException e) {
+			throw new AjxpDriverException("Cannot check out from " + baseUrl
+					+ " to " + baseDir, e);
+		}
+	}
+
+	protected SVNURL createRepository(File repoDir) {
+		try {
+			SVNAdminClient adminClient = manager.getAdminClient();
+			return adminClient.doCreateRepository(repoDir, null, true, false);
+		} catch (SVNException e) {
+			throw new AjxpDriverException("Cannot create repository at "
+					+ repoDir, e);
+		}
+	}
+
+	/** Spring bean name, set at initialization. */
+	public void setBeanName(String beanName) {
+		this.beanName = beanName;
 	}
 
 	public void setBaseUrl(String baseUrl) {
@@ -122,6 +170,10 @@ public class SvnDriver extends FileDriver {
 		} catch (SVNException e) {
 			throw new AjxpDriverException("Cannot parse SVN URL " + baseUrl, e);
 		}
+	}
+
+	public SVNURL getBaseUrl() {
+		return baseUrl;
 	}
 
 	public SVNClientManager getManager() {

@@ -27,23 +27,19 @@
 	</listener>
 
 	<servlet>
-		<servlet-name>file</servlet-name>
+		<servlet-name>defaultSvnArchiver</servlet-name>
 		<servlet-class>
 			org.argeo.ajaxplorer.jdrivers.web.AjxpDriverServlet
 		</servlet-class>
 		<init-param>
 			<param-name>driverBean</param-name>
-			<param-value>driver.svn</param-value>
-		</init-param>
-		<init-param>
-			<param-name>driver.svn.basePath</param-name>
-			<param-value>D:\dev\test\AjaXplorerSVN\svn\testAX</param-value>
+			<param-value>defaultSvnArchiver</param-value>
 		</init-param>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>file</servlet-name>
-		<url-pattern>*.file</url-pattern>
+		<servlet-name>defaultSvnArchiver</servlet-name>
+		<url-pattern>/defaultSvnArchiver</url-pattern>
 	</servlet-mapping>
 
 	<filter>
@@ -59,6 +55,6 @@
 
 	<filter-mapping>
 		<filter-name>multipart</filter-name>
-		<servlet-name>file</servlet-name>
+		<servlet-name>defaultSvnArchiver</servlet-name>
 	</filter-mapping>
 </web-app>
