@@ -148,7 +148,7 @@ Action = Class.create({
 		this.options.name = xmlNode.getAttribute('name');
 		for(var i=0; i<xmlNode.childNodes.length;i++){
 			var node = xmlNode.childNodes[i];			
-			if(node.tagName == "processing"){
+			if(node.nodeName == "processing"){
 				for(var j=0; j<node.childNodes.length; j++){
 					var processNode = node.childNodes[j];
 					if(processNode.nodeName == "clientForm"){
@@ -165,7 +165,7 @@ Action = Class.create({
 						}						
 					}
 				}
-			}else if(node.tagName == "gui"){
+			}else if(node.nodeName == "gui"){
 				this.options.text = MessageHash[node.getAttribute('text')];
 				this.options.title = MessageHash[node.getAttribute('title')];
 				this.options.src = node.getAttribute('src');				
@@ -174,17 +174,17 @@ Action = Class.create({
 					this.options.hasAccessKey = true;
 				}
 				for(var j=0; j<node.childNodes.length;j++){
-					if(node.childNodes[j].tagName == "context"){
+					if(node.childNodes[j].nodeName == "context"){
 						this.attributesToObject(this.context, node.childNodes[j]);
 					}
-					else if(node.childNodes[j].tagName == "selectionContext"){
+					else if(node.childNodes[j].nodeName == "selectionContext"){
 						this.attributesToObject(this.selectionContext, node.childNodes[j]);
 					}
 				}
 							
-			}else if(node.tagName == "rightsContext"){
+			}else if(node.nodeName == "rightsContext"){
 				this.attributesToObject(this.rightsContext, node);
-			}			
+			}
 		}
 		if(!this.options.hasAccessKey) return;
 		if(this.options.accessKey == '' 
