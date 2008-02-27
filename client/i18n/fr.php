@@ -265,7 +265,7 @@ $mess=array(
 "242" => "Svn Log",
 "svn_log_access_key" => "L",
 "243" => "Revision",
-"244" => "Author", 
+"244" => "Auteur", 
 "245" => "Date",
 "246" => "Message"
 );
