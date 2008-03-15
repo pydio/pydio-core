@@ -141,6 +141,16 @@ class remote_fsDriver extends AbstractDriver
 					}
 					$boxData["destination"] = $rep_source;
 					$destCopy = INSTALL_PATH."/".$this->repository->getOption("TMP_UPLOAD");
+					if(!is_dir($destCopy)){
+						if(! @mkdir($destCopy)){
+							$errorMessage = "Warning, cannot create folder for temporary copy.";
+							break;
+						}						
+					}
+					if(!is_writeable($destCopy)){
+						$errorMessage = "Warning, cannot write into temporary folder.";
+						break;
+					}
 					$destName = $destCopy."/".basename($boxData["tmp_name"]);
 					if(move_uploaded_file($boxData["tmp_name"], $destName)){
 						$boxData["tmp_name"] = $destName;
