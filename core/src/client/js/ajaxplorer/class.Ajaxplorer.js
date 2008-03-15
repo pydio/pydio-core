@@ -166,11 +166,11 @@ Ajaxplorer = Class.create({
 	},
 		
 	loadRepository: function(repositoryId, repositoryLabel){
+		this.actionBar.loadActions();
 		this.foldersTree.reloadFullTree(repositoryLabel);
 		this.filesList.loadXmlList('/');
 		this.rootDirId = repositoryId;
 		this.actionBar.loadBookmarks();
-		this.actionBar.loadActions();
 	},
 
 	goTo: function(rep, selectFile){
