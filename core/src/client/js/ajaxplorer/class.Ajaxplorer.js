@@ -42,6 +42,7 @@ Ajaxplorer = Class.create({
 				this.updateI18nTags();
 				if(this.infoPanel) this.infoPanel.update();
 				if(this.actionBar) this.actionBar.loadActions();
+				if(this.filesList) this.filesList.reload();
 				this.currentLanguage = newLanguage;
 			}
 		}.bind(this);
