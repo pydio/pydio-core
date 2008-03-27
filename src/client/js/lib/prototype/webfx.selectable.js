@@ -38,7 +38,7 @@ SelectableElements = Class.create({
 		this.initSelectableItems(oElement, bMultiple);
 	},
 
-	initSelectableItems: function(oElement, bMultiple) {
+	initSelectableItems: function(oElement, bMultiple, dragSelectionElement) {
 	
 		this._htmlElement = oElement;
 		this._multiple = Boolean(bMultiple);
@@ -70,9 +70,97 @@ SelectableElements = Class.create({
 			oElement.attachEvent("onclick", this._onclick);
 			oElement.attachEvent("ondblclick", this._ondblclick);
 		}
+		this.eventMouseUp = this.dragEnd.bindAsEventListener(this);
+		this.eventMouseDown = this.dragStart.bindAsEventListener(this);
+		this.eventMouseMove = this.drag.bindAsEventListener(this);
+		this.selectorAdded = false;
+		if(dragSelectionElement){
+			this.dragSelectionElement = $(dragSelectionElement);
+		}else{
+			this.dragSelectionElement = $(oElement);
+		}
+		Event.observe(this.dragSelectionElement, "mousedown", this.eventMouseDown);
+	},
+	dragStart : function(e){
+		var oElement = this._htmlElement;
+		Event.observe(document, "mousemove", this.eventMouseMove);
+		Event.observe(document, "mouseup", this.eventMouseUp);
+		this.originalX = e.clientX;
+		this.originalY = e.clientY;
+		if(!this.divSelector){
+			this.divSelector = new Element('div', {
+				style:"border : 1px dashed #ccc; z-index:100000;position:absolute;top:0px;left:0px;height:0px;width:0px;"
+			});
+		}
+		$(this.dragSelectionElement).setStyle({
+			cursor : "move"
+		});
 	},
 	
+	drag : function(e){
+		if(!this.selectorAdded){
+			this.body = document.getElementsByTagName('body')[0];
+			this.body.appendChild(this.divSelector);			
+			this.selectorAdded = true;
+		}
+		var crtX = e.clientX;
+		var crtY = e.clientY;
+		var top,left,width,height;
+		if(crtX > this.originalX){
+			left = this.originalX;
+			width = crtX - this.originalX;
+		}else{
+			left = crtX;
+			width = this.originalX - crtX;
+		}
+		
+		if(crtY > this.originalY){
+			top = this.originalY;
+			height = crtY - this.originalY;
+		}else{
+			top = crtY;
+			height = this.originalY - crtY;
+		}
+		this.divSelector.setStyle({
+			top : top+'px',
+			left : left+'px',
+			width : width+'px',
+			height : height+'px'
+		});
+		//console.log(crtX, crtY, top,left,width,height);
+		var allItems = this.getItems();
+		var minX = left;
+		var maxX = left+width;
+		var minY = top;
+		var maxY = top+height;
+		for(var i=0; i<allItems.length;i++){
+			var element = $(allItems[i]);
+			var pos = Position.cumulativeOffset(element);
+			var dims = Element.getDimensions(element);
+			var x1 = pos[0]; var x2 = pos[0]+dims.width;
+			var y1 = pos[1]; var y2 = pos[1]+dims.height;
+			if( ( (x1>=minX && x1<=maxX) || (x2>=minX && x2<=maxX)  || (minX>=x1 && maxX<=x2))
+			&& ( (y1>=minY && y1<=maxY) || (y2>=minY && y2<=maxY) || (minY>=y1 && maxY<=y2) ))
+			{
+				this.setItemSelected(allItems[i], true);	
+			}else{
+				this.setItemSelected(allItems[i], false);
+			}
+				
+		}
+	},
 	
+	dragEnd : function(e){
+		Event.stopObserving(document, "mousemove", this.eventMouseMove);
+		Event.stopObserving(document, "mouseup", this.eventMouseUp);
+		if(this.selectorAdded){
+			this.body.removeChild(this.divSelector);
+			this.selectorAdded = false;
+		}
+		$(this.dragSelectionElement).setStyle({
+			cursor : "default"
+		});		
+	},
 	setItemSelected: function (oEl, bSelected) {
 		if (!this._multiple) {
 			if (bSelected) {
