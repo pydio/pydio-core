@@ -73,6 +73,7 @@ SelectableElements = Class.create({
 		this.eventMouseUp = this.dragEnd.bindAsEventListener(this);
 		this.eventMouseDown = this.dragStart.bindAsEventListener(this);
 		this.eventMouseMove = this.drag.bindAsEventListener(this);
+		
 		this.selectorAdded = false;
 		if(dragSelectionElement){
 			this.dragSelectionElement = $(dragSelectionElement);
@@ -89,12 +90,14 @@ SelectableElements = Class.create({
 		this.originalY = e.clientY;
 		if(!this.divSelector){
 			this.divSelector = new Element('div', {
-				style:"border : 1px dashed #ccc; z-index:100000;position:absolute;top:0px;left:0px;height:0px;width:0px;"
+				style:"border : 1px solid #666; background-color:#79F;	filter:alpha(opacity=40);opacity: 0.4;-moz-opacity:0.4;z-index:100000;position:absolute;top:0px;left:0px;height:0px;width:0px;"
 			});
 		}
 		$(this.dragSelectionElement).setStyle({
 			cursor : "move"
 		});
+		this.dSEPosition = Position.cumulativeOffset(this.dragSelectionElement);
+		this.dSEDimension = Element.getDimensions(this.dragSelectionElement);
 	},
 	
 	drag : function(e){
@@ -105,29 +108,27 @@ SelectableElements = Class.create({
 		}
 		var crtX = e.clientX;
 		var crtY = e.clientY;
-		var top,left,width,height;
-		if(crtX > this.originalX){
-			left = this.originalX;
-			width = crtX - this.originalX;
-		}else{
-			left = crtX;
-			width = this.originalX - crtX;
-		}
+		var minDSEX = this.dSEPosition[0];
+		var minDSEY = this.dSEPosition[1];
+		var maxDSEX = minDSEX + this.dSEDimension.width;
+		var maxDSEY = minDSEY + this.dSEDimension.height;
+		crtX = Math.max(crtX, minDSEX);
+		crtY = Math.max(crtY, minDSEY);
+		crtX = Math.min(crtX, maxDSEX);
+		crtY = Math.min(crtY, maxDSEY);
 		
-		if(crtY > this.originalY){
-			top = this.originalY;
-			height = crtY - this.originalY;
-		}else{
-			top = crtY;
-			height = this.originalY - crtY;
-		}
+		var top,left,width,height;
+		left = Math.min(this.originalX, crtX);
+		width = Math.abs((this.originalX - crtX));
+		top = Math.min(this.originalY, crtY);
+		height = Math.abs((this.originalY - crtY));
+						
 		this.divSelector.setStyle({
 			top : top+'px',
 			left : left+'px',
 			width : width+'px',
 			height : height+'px'
 		});
-		//console.log(crtX, crtY, top,left,width,height);
 		var allItems = this.getItems();
 		var minX = left;
 		var maxX = left+width;
@@ -144,7 +145,9 @@ SelectableElements = Class.create({
 			{
 				this.setItemSelected(allItems[i], true);	
 			}else{
-				this.setItemSelected(allItems[i], false);
+				if(!e['shiftKey']){
+					this.setItemSelected(allItems[i], false);
+				}
 			}
 				
 		}
@@ -161,6 +164,7 @@ SelectableElements = Class.create({
 			cursor : "default"
 		});		
 	},
+		
 	setItemSelected: function (oEl, bSelected) {
 		if (!this._multiple) {
 			if (bSelected) {
