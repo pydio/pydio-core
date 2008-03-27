@@ -43,7 +43,7 @@ else
 	$ROOT_DIRS_LIST = HTMLWriter::writeRootDirListAsJsString(ConfService::getRootDirsList());
 }
 $EXT_REP = "/";
-if(isSet($_GET["folder"])) $EXT_REP = $_GET["folder"];
+if(isSet($_GET["folder"])) $EXT_REP = utf8_encode(urldecode($_GET["folder"]));
 $CRT_USER = "shared_bookmarks";
 if(isSet($_GET["user"])) $CRT_USER = $_GET["user"];
 
