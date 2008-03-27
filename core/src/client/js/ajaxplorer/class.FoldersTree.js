@@ -212,6 +212,7 @@ FoldersTree = Class.create({
 		
 	goToDeepPath: function(url){
 		var currentPath = "/";
+		if(!this.currentNodeName) this.setCurrentToRoot();
 		if(this.currentNodeName && webFXTreeHandler.all[this.currentNodeName] && webFXTreeHandler.all[this.currentNodeName].url){
 			currentPath = webFXTreeHandler.all[this.currentNodeName].url;		
 		}
