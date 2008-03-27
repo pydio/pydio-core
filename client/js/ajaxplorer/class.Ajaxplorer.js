@@ -172,6 +172,10 @@ Ajaxplorer = Class.create({
 		this.filesList.loadXmlList('/');
 		this.rootDirId = repositoryId;
 		this.actionBar.loadBookmarks();
+		if(this._initLoadRep){
+			this.goTo(this._initLoadRep);
+			this._initLoadRep = null;
+		}
 	},
 
 	goTo: function(rep, selectFile){
