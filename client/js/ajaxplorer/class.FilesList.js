@@ -52,10 +52,11 @@ FilesList = Class.create(SelectableElements, {
 			$('content_pane').innerHTML  = buffer;
 			oElement = $('selectable_div');
 			
-			this.initSelectableItems(oElement, true);
+			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
 			fitHeightToBottom($('table_rows_container'), $('content_pane'));
 			this.disableTextSelection($('selectable_div_header'));
+			this.disableTextSelection($('table_rows_container'));
 		}
 		else if(this._displayMode == "thumb")
 		{
@@ -76,7 +77,7 @@ FilesList = Class.create(SelectableElements, {
 				this._thumbSize = this.slider.getValue();
 				this.resizeThumbnails();
 			}.bind(this);
-				
+			this.disableTextSelection($('selectable_div'));
 			this.initSelectableItems($('selectable_div'), true);
 		}	
 		
@@ -144,11 +145,6 @@ FilesList = Class.create(SelectableElements, {
 	
 	initRows: function(){
 		// Disable text select on elements
-		var allItems = this.getItems();
-		for(var i=0; i<allItems.length;i++)
-		{
-			this.disableTextSelection(allItems[i]);			
-		}
 		if(this._displayMode == "thumb")
 		{
 			this.resizeThumbnails();		
@@ -161,6 +157,11 @@ FilesList = Class.create(SelectableElements, {
 			this.applyHeadersWidth();	
 		}
 		if(this.protoMenu)this.protoMenu.addElements('.ajxp_draggable');
+		var allItems = this.getItems();
+		for(var i=0; i<allItems.length;i++)
+		{
+			this.disableTextSelection(allItems[i]);
+		}
 	},
 	
 	loadNextImage: function(){
@@ -619,12 +620,13 @@ FilesList = Class.create(SelectableElements, {
 	
 	disableTextSelection: function(target)
 	{
-		if (typeof target.onselectstart!="undefined")
+		if (typeof target.onselectstart)
 		{ //IE route
 			target.onselectstart=function(){return false;}
 		}
-		else if (typeof target.style.MozUserSelect!="undefined")
+		else if (target.style.MozUserSelect)
 		{ //Firefox route
+			target.unselectable = "on";
 			target.style.MozUserSelect="none";
 		}
 	},
