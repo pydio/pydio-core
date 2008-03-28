@@ -624,11 +624,8 @@ FilesList = Class.create(SelectableElements, {
 		{ //IE route
 			target.onselectstart=function(){return false;}
 		}
-		else if (target.style.MozUserSelect)
-		{ //Firefox route
-			target.unselectable = "on";
-			target.style.MozUserSelect="none";
-		}
+		target.unselectable = "on";
+		target.style.MozUserSelect="none";
 	},
 	
 	keydown: function (event)
