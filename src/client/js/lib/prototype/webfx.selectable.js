@@ -90,7 +90,7 @@ SelectableElements = Class.create({
 		this.originalY = e.clientY;
 		if(!this.divSelector){
 			this.divSelector = new Element('div', {
-				style:"border : 1px solid #666; background-color:#79F;	filter:alpha(opacity=40);opacity: 0.4;-moz-opacity:0.4;z-index:100000;position:absolute;top:0px;left:0px;height:0px;width:0px;"
+				style:"border : 1px dotted #999; background-color:#ddd;	filter:alpha(opacity=50);opacity: 0.5;-moz-opacity:0.5;z-index:100000;position:absolute;top:0px;left:0px;height:0px;width:0px;"
 			});
 		}
 		$(this.dragSelectionElement).setStyle({
@@ -145,7 +145,7 @@ SelectableElements = Class.create({
 			{
 				this.setItemSelected(allItems[i], true);	
 			}else{
-				if(!e['shiftKey']){
+				if(!e['shiftKey'] && !e['crtlKey']){
 					this.setItemSelected(allItems[i], false);
 				}
 			}
