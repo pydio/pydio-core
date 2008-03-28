@@ -181,7 +181,7 @@ AJXP_MESSAGE[174]<br/>
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -195,21 +195,27 @@ AJXP_MESSAGE[174]<br/>
 					}
 					else
 					{
-						var loadFunc = function(oForm){
-							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
-							downloader.triggerEnd = function(){hideLightBox()};
-							fileNames = userSelection.getFileNames();
-							for(var i=0; i<fileNames.length;i++)
-							{
-								downloader.addListRow(fileNames[i]);
-							}				
-						};
-						var closeFunc = function(){
-							hideLightBox();
-							return false;
-						};
-						modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
+						if(!zipEnabled){
+							var loadFunc = function(oForm){
+								var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
+								var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
+								downloader.triggerEnd = function(){hideLightBox()};
+								fileNames = userSelection.getFileNames();
+								for(var i=0; i<fileNames.length;i++)
+								{
+									downloader.addListRow(fileNames[i]);
+								}				
+							};
+							var closeFunc = function(){
+								hideLightBox();
+								return false;
+							};
+							modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
+						}else{
+							var downloadUrl = ajxpServerAccessPath+'?action=download';
+							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
+							document.location.href = downloadUrl;							
+						}
 					}
 					]]></clientCallback>
 					<clientForm id="multi_download_form"><![CDATA[

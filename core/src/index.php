@@ -46,7 +46,7 @@ $EXT_REP = "/";
 if(isSet($_GET["folder"])) $EXT_REP = utf8_encode(urldecode($_GET["folder"]));
 $CRT_USER = "shared_bookmarks";
 if(isSet($_GET["user"])) $CRT_USER = $_GET["user"];
-
+$ZIP_ENABLED = (class_exists("ZipArchive")?"true":"false");
 $loggedUser = AuthService::getLoggedUser();
 $DEFAULT_DISPLAY = "list";
 if($loggedUser != null && $loggedUser->getId() != "guest")

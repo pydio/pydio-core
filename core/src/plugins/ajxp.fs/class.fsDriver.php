@@ -46,7 +46,17 @@ class fsDriver extends AbstractDriver
 			//	DOWNLOAD, IMAGE & MP3 PROXYS
 			//------------------------------------
 			case "download";
-				$this->readFile($this->repository->getPath()."/".utf8_decode($file), "force-download");
+				if(!$selection->isUnique()){
+					// Make a temp zip and send it as download
+					$loggedUser = AuthService::getLoggedUser();
+					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpDownload.zip";
+					$res = $this->makeZip($selection->getFiles(), $file);
+					if(!$res) AJXP_Exception::errorToXml("Error!");
+					$this->readFile($file, "force-download");
+					unlink($file);
+				}else{
+					$this->readFile($this->repository->getPath()."/".utf8_decode($file), "force-download");
+				}
 				exit(0);
 			break;
 		
@@ -787,6 +797,46 @@ class fsDriver extends AbstractDriver
 			RecycleBinManager::deleteFromRecycle($location);
 		}
 	}
+	
+    function makeZip ($src, $dest)
+    {
+        $zip = new ZipArchive();
+        $src = is_array($src) ? $src : array($src);
+        if ($zip->open($dest, ZipArchive::CREATE) === true)
+        {        	
+            foreach ($src as $item){
+            	$item = $this->repository->getPath().$item;            	
+                if (file_exists($item)){
+                    $this->addZipItem($zip, realpath(dirname($item)).DIRECTORY_SEPARATOR, realpath($item));
+                }
+            }
+            $zip->close();
+            return true;
+        }
+        return false;
+    }
+    
+    function addZipItem ($zip, $racine, $dir)
+    {
+        if (is_dir($dir))
+        {
+            //$zip->addEmptyDir(str_replace($racine, '', $dir));
+            $lst = scandir($dir);
+            array_shift($lst);
+            array_shift($lst);
+            foreach ($lst as $item){
+                $this->addZipItem($zip, $racine, $dir.DIRECTORY_SEPARATOR.$item);
+            }
+        }
+        elseif (is_file($dir)){
+        	$localName = $this->limitAsciiChars((str_replace($racine, '', $dir)));            
+           	$zip->addFile($this->limitAsciiChars($dir), $localName);
+        }
+    }
+    
+    function limitAsciiChars($name){
+    	return iconv("utf-8", "utf-8//IGNORE", $name);
+    }
 }
 
 ?>
