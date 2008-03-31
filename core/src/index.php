@@ -46,7 +46,19 @@ $EXT_REP = "/";
 if(isSet($_GET["folder"])) $EXT_REP = utf8_encode(urldecode($_GET["folder"]));
 $CRT_USER = "shared_bookmarks";
 if(isSet($_GET["user"])) $CRT_USER = $_GET["user"];
-$ZIP_ENABLED = (class_exists("ZipArchive")?"true":"false");
+
+$ZIP_ENABLED = "false";
+$zipArchive = (class_exists("ZipArchive")?true:false);
+if($zipArchive) $ZIP_ENABLED = "true";
+else{
+	if(function_exists("gzcompress")){
+		require("server/classes/class.zipfile.php");
+		if(class_exists("zipfile")){
+			$ZIP_ENABLED = "true";
+		}
+	}
+}
+
 $loggedUser = AuthService::getLoggedUser();
 $DEFAULT_DISPLAY = "list";
 if($loggedUser != null && $loggedUser->getId() != "guest")
