@@ -44,18 +44,10 @@ class remote_fsDriver extends AbstractDriver
 			break;
 			case "download":
 				$size=strlen($httpClient->content);
-				$filePath = $httpVars["file"];
-				header("Content-Type: application/force-download; name=\"".basename($filePath)."\"");
-				header("Content-Transfer-Encoding: binary");
-				header("Content-Length: ".$size);
-				header("Content-Disposition: attachment; filename=\"".basename($filePath)."\"");
-				header("Expires: 0");
-				header("Cache-Control: no-cache, must-revalidate");
-				header("Pragma: no-cache");
-				// For SSL websites, bug with IE see article KB 323308
-				if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])){
-					header("Cache-Control:");
-					header("Pragma:");
+				foreach ($httpClient->headers as $key=>$value){
+					if($key != "content-encoding"){
+						header(ucfirst($key).": ".$value);
+					}
 				}
 			break;
 			case "mp3_proxy":
