@@ -800,20 +800,34 @@ class fsDriver extends AbstractDriver
 	
     function makeZip ($src, $dest)
     {
-        $zip = new ZipArchive();
         $src = is_array($src) ? $src : array($src);
-        if ($zip->open($dest, ZipArchive::CREATE) === true)
-        {        	
-            foreach ($src as $item){
-            	$item = $this->repository->getPath().$item;            	
-                if (file_exists($item)){
-                    $this->addZipItem($zip, realpath(dirname($item)).DIRECTORY_SEPARATOR, realpath($item));
-                }
-            }
-            $zip->close();
-            return true;
-        }
-        return false;
+    	if(class_exists("ZipArchive")){
+	        $zip = new ZipArchive();
+	        if ($zip->open($dest, ZipArchive::CREATE) === true)
+	        {        	
+	            foreach ($src as $item){
+	            	$item = $this->repository->getPath().$item;            	
+	                if (file_exists($item)){
+	                    $this->addZipItem($zip, realpath(dirname($item)).DIRECTORY_SEPARATOR, realpath($item));
+	                }
+	            }
+	            $zip->close();
+	            return true;
+	        }
+	        return false;
+    	}else{
+    		require(SERVER_RESOURCES_FOLDER."/class.zipfile.php");
+    		 if(class_exists("zipfile")){ 	        
+	    		$zip = new zipfile();
+	    		foreach ($src as $item){
+	    			$path = $this->repository->getPath().$item;
+	    			$zip->addFile(file_get_contents($path), $item);
+	    		}
+	   			$zip->output($dest);
+	   			return true;
+	    	}
+    	}
+    	return false;
     }
     
     function addZipItem ($zip, $racine, $dir)

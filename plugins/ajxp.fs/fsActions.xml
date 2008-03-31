@@ -181,7 +181,7 @@ AJXP_MESSAGE[174]<br/>
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
