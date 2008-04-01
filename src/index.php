@@ -48,16 +48,7 @@ $CRT_USER = "shared_bookmarks";
 if(isSet($_GET["user"])) $CRT_USER = $_GET["user"];
 
 $ZIP_ENABLED = "false";
-$zipArchive = (class_exists("ZipArchive")?true:false);
-if($zipArchive) $ZIP_ENABLED = "true";
-else{
-	if(function_exists("gzcompress")){
-		require("server/classes/class.zipfile.php");
-		if(class_exists("zipfile")){
-			$ZIP_ENABLED = "true";
-		}
-	}
-}
+if(function_exists("gzcompress")) $ZIP_ENABLED = "true";
 
 $loggedUser = AuthService::getLoggedUser();
 $DEFAULT_DISPLAY = "list";
