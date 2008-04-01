@@ -19,6 +19,9 @@ class remote_fsDriver extends AbstractDriver
 		$method = "get";
 		if($action == "edit" && isSet($httpVars["save"])) $method = "post";
 		if($method == "get"){
+			if($action == "download" || $action=="image_proxy" || $action=="mp3_proxy"){
+				$httpClient->directForwarding = true;
+			}
 			$httpClient->get($crtRep->getOption("URI"), $httpVars);
 		}else{			
 			$httpClient->post($crtRep->getOption("URI"), $httpVars);
@@ -29,7 +32,10 @@ class remote_fsDriver extends AbstractDriver
 			$httpVars["ajxp_sessid"] = $sessionId;
 			$method = "get";
 			if($method == "get"){
-				$httpClient->get($crtRep->getOption("URI"), $httpVars);
+				if($action == "download"){
+					$httpClient->directForwarding = true;
+				}
+				$httpClient->get($crtRep->getOption("URI"), $httpVars);				
 			}else{			
 				$httpClient->post($crtRep->getOption("URI"), $httpVars);
 			}
@@ -37,23 +43,10 @@ class remote_fsDriver extends AbstractDriver
 
 		switch ($action){			
 			case "image_proxy":
-				$size=strlen($httpClient->content);
-				header("Content-Type: ".Utils::getImageMimeType(basename($httpVars["file"]))."; name=\"".basename($httpVars["file"])."\"");
-				header("Content-Length: ".$size);
-				header('Cache-Control: public');							
-			break;
 			case "download":
-				$size=strlen($httpClient->content);
-				foreach ($httpClient->headers as $key=>$value){
-					if($key != "content-encoding"){
-						header(ucfirst($key).": ".$value);
-					}
-				}
-			break;
 			case "mp3_proxy":
-				$size=strlen($httpClient->content);
-				header("Content-Type: audio/mp3; name=\"".basename($httpVars["file"])."\"");
-				header("Content-Length: ".$size);
+				session_write_close();
+				exit();
 			break;
 			case "edit":
 				header("Content-type:text/plain");
