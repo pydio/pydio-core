@@ -102,6 +102,9 @@ Action = Class.create({
 	},
 		
 	fireSelectionChange: function(){
+		if(this.options.listeners && this.options.listeners["selectionChange"]){
+			this.options.listeners["selectionChange"].evalScripts();
+		}
 		if(arguments.length < 1 
 			|| this.contextHidden 
 			|| !this.context.selection) {	
@@ -163,6 +166,9 @@ Action = Class.create({
 						if(processNode.getAttribute('displayModeButton') && processNode.getAttribute('displayModeButton') != ''){
 							this.options.displayAction = processNode.getAttribute('displayModeButton');
 						}						
+					}else if(processNode.nodeName == "clientListener" && processNode.firstChild){
+						if(!this.options.listeners) this.options.listeners = [];
+						this.options.listeners[processNode.getAttribute('name')] = '<script>'+processNode.firstChild.nodeValue+'</script>';
 					}
 				}
 			}else if(node.nodeName == "gui"){
@@ -207,6 +213,7 @@ Action = Class.create({
 		}.bind(this));
 		var imgPath = 'client/images/crystal/actions/22/'+this.options.src;
 		var img = new Element('img', {
+			id:this.options.name +'_button_icon',
 			src:imgPath,
 			width:22,
 			height:22,
