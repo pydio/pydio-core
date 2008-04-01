@@ -47,12 +47,10 @@ class fsDriver extends AbstractDriver
 			//------------------------------------
 			case "download";
 				if(!$selection->isUnique()){
-					// Make a temp zip and send it as download
-					$loggedUser = AuthService::getLoggedUser();
-					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpDownload.zip";
-					$res = $this->makeZip($selection->getFiles(), $file);
-					if(!$res) AJXP_Exception::errorToXml("Error!");
-					$this->readFile($file, "force-download");
+					$zipFile = $this->makeZip($selection->getFiles());
+					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing");
+					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
+					$this->readFile($zipFile->file(), "force-download", $localName, true, false);
 					unlink($file);
 				}else{
 					$this->readFile($this->repository->getPath()."/".utf8_decode($file), "force-download");
@@ -383,32 +381,34 @@ class fsDriver extends AbstractDriver
 		return $nom_rep;
 	}
 	
-	function readFile($filePath, $headerType="plain", $localName="")
+	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=true)
 	{
+		$size = ($data?strlen($filePathOrData):filesize($filePathOrData));
+		$localName = ($localName==""?basename($filePathOrData):$localName);
 		if($headerType == "plain")
 		{
 			header("Content-type:text/plain");			
 		}
 		else if($headerType == "image")
 		{
-			$size=filesize($filePath);
-			header("Content-Type: ".Utils::getImageMimeType(basename($filePath))."; name=\"".basename($filePath)."\"");
+			//$size=filesize($filePathOrData);
+			header("Content-Type: ".Utils::getImageMimeType(basename($filePathOrData))."; name=\"".basename($filePathOrData)."\"");
 			header("Content-Length: ".$size);
 			header('Cache-Control: public');			
 		}
 		else if($headerType == "mp3")
 		{
-			$size=filesize($filePath);
-			header("Content-Type: audio/mp3; name=\"".basename($filePath)."\"");
+			//$size=filesize($filePathOrData);
+			header("Content-Type: audio/mp3; name=\"".basename($filePathOrData)."\"");
 			header("Content-Length: ".$size);
 		}
 		else 
 		{
-			$size=filesize($filePath);
-			if($localName == "") $localName = basename($filePath);
+			//$size=filesize($filePathOrData);
+			//if($localName == "") $localName = basename($filePathOrData);
 			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
-			header("Content-Encoding: gzip");
+			if(!$gzip) header("Content-Encoding: gzip");
 			header("Content-Length: ".$size);
 			header("Content-Disposition: attachment; filename=\"".$localName."\"");
 			header("Expires: 0");
@@ -421,10 +421,20 @@ class fsDriver extends AbstractDriver
 				header("Cache-Control:");
 				header("Pragma:");
 			}
-			print gzencode(file_get_contents($filePath), 9);
-			return ;
+			if(!$gzip){
+				if($data){
+					print(gzencode($filePathOrData, 9));
+				}else{
+					print gzencode(file_get_contents($filePathOrData), 9);
+				}				
+				return ;
+			}
 		}
-		readfile($filePath);
+		if($data){
+			print($filePathOrData);
+		}else{
+			readfile($filePathOrData);
+		}
 	}
 	
 	
@@ -802,34 +812,20 @@ class fsDriver extends AbstractDriver
 		}
 	}
 	
-    function makeZip ($src, $dest)
+	/**
+	 * @return zipfile
+	 */ 
+    function makeZip ($src)
     {
+		require(SERVER_RESOURCES_FOLDER."/class.zipfile.php");
         $src = is_array($src) ? $src : array($src);
-    	if(class_exists("ZipArchive")){
-	        $zip = new ZipArchive();
-	        if ($zip->open($dest, ZipArchive::CREATE) === true)
-	        {        	
-	            foreach ($src as $item){
-	            	$item = $this->repository->getPath().$item;            	
-	                if (file_exists($item)){
-	                    $this->addZipItem($zip, realpath(dirname($item)).DIRECTORY_SEPARATOR, realpath($item));
-	                }
-	            }
-	            $zip->close();
-	            return true;
-	        }
-	        return false;
-    	}else{
-    		require(SERVER_RESOURCES_FOLDER."/class.zipfile.php");
-    		 if(class_exists("zipfile")){ 	        
-	    		$zip = new zipfile();
-	    		foreach ($src as $item){
-	    			$path = $this->repository->getPath().$item;
-	    			$zip->addFile(file_get_contents($path), $item);
-	    		}
-	   			$zip->output($dest);
-	   			return true;
-	    	}
+		 if(class_exists("zipfile")){ 	        
+    		$zip = new zipfile();
+    		foreach ($src as $item){
+    			$path = $this->repository->getPath().$item;
+    			$zip->addFile(file_get_contents($path), $item);
+    		}
+   			return $zip;
     	}
     	return false;
     }
