@@ -47,10 +47,13 @@ class fsDriver extends AbstractDriver
 			//------------------------------------
 			case "download";
 				if(!$selection->isUnique()){
-					$zipFile = $this->makeZip($selection->getFiles());
+					// Make a temp zip and send it as download
+					$loggedUser = AuthService::getLoggedUser();
+					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpDownload.zip";
+					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing");
 					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
-					$this->readFile($zipFile->file(), "force-download", $localName, true, false);
+					$this->readFile($file, "force-download", $localName, false, false);
 					unlink($file);
 				}else{
 					$this->readFile($this->repository->getPath()."/".utf8_decode($file), "force-download");
@@ -815,8 +818,9 @@ class fsDriver extends AbstractDriver
 	/**
 	 * @return zipfile
 	 */ 
-    function makeZip ($src)
+    function makeZip ($src, $dest, $basedir)
     {
+    	/*
 		require(SERVER_RESOURCES_FOLDER."/class.zipfile.php");
         $src = is_array($src) ? $src : array($src);
 		 if(class_exists("zipfile")){ 	        
@@ -828,6 +832,22 @@ class fsDriver extends AbstractDriver
    			return $zip;
     	}
     	return false;
+    	*/
+    	set_time_limit(60);
+    	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
+    	$filePaths = array();
+    	$totalSize = 0;
+    	foreach ($src as $item){
+    		$filePaths[] = $this->repository->getPath().$item;
+    		//$totalSize += filesize($this->repository->getPath().$item);
+    	}
+    	$archive = new PclZip($dest);
+    	//if($totalSize > 500000){
+	    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->repository->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
+    	//}else{
+    	//	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->repository->getPath().$basedir);
+    	//}
+    	if($vList == 0) return false;
     }
     
     function addZipItem ($zip, $racine, $dir)
