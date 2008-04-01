@@ -547,11 +547,11 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<clientCallback><![CDATA[
 					var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
 					
-					var itCopy = new Array();
+					var mp3Items = new Array();
 					$A(ajaxplorer.getFilesList().getItems()).each(function(rowItem){
-						if(rowItem.getAttribute('is_mp3')=='1') itCopy.push(rowItem.getAttribute('filename'));
-					});	
-					var mp3Items = itCopy.reverse();
+						var filename = rowItem.getAttribute('filename');
+						if(getFileExtension(filename) == 'mp3') mp3Items.push(filename);
+					});						
 					var mp3_url = '';
 					mp3Items.each(function(url){
 						mp3_url += 'content.php?action=mp3_proxy%26file='+url;
