@@ -383,7 +383,7 @@ class fsDriver extends AbstractDriver
 		return $nom_rep;
 	}
 	
-	function readFile($filePath, $headerType="plain")
+	function readFile($filePath, $headerType="plain", $localName="")
 	{
 		if($headerType == "plain")
 		{
@@ -405,10 +405,12 @@ class fsDriver extends AbstractDriver
 		else 
 		{
 			$size=filesize($filePath);
-			header("Content-Type: application/force-download; name=\"".basename($filePath)."\"");
+			if($localName == "") $localName = basename($filePath);
+			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
+			header("Content-Encoding: gzip");
 			header("Content-Length: ".$size);
-			header("Content-Disposition: attachment; filename=\"".basename($filePath)."\"");
+			header("Content-Disposition: attachment; filename=\"".$localName."\"");
 			header("Expires: 0");
 			header("Cache-Control: no-cache, must-revalidate");
 			header("Pragma: no-cache");
@@ -419,6 +421,8 @@ class fsDriver extends AbstractDriver
 				header("Cache-Control:");
 				header("Pragma:");
 			}
+			print gzencode(file_get_contents($filePath), 9);
+			return ;
 		}
 		readfile($filePath);
 	}
