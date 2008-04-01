@@ -42,6 +42,7 @@ class HttpClient {
     var $postFileName = "userfile";
     var $postFileData = array();
     var $postDataArray = array();
+    var $directForwarding = false;
     
     function HttpClient($host, $port=80) {
         $this->host = $host;
@@ -151,6 +152,11 @@ class HttpClient {
     	        }
     	        $key = strtolower(trim($m[1]));
     	        $val = trim($m[2]);
+	            if($this->directForwarding){
+	            	header($line, true);
+	            	continue;
+	            }
+
     	        // Deal with the possibility of multiple headers of same name
     	        if (isset($this->headers[$key])) {
     	            if (is_array($this->headers[$key])) {
@@ -164,9 +170,16 @@ class HttpClient {
     	        continue;
     	    }
     	    // We're not in the headers, so append the line to the contents
+    	    if($this->directForwarding){
+    	    	print $line;
+    	    	continue;
+    	    }
     	    $this->content .= $line;
         }
         fclose($fp);
+   	    if($this->directForwarding){
+   	    	return ;
+   	    }
         // If data is compressed, uncompress it
         if (isset($this->headers['content-encoding']) && $this->headers['content-encoding'] == 'gzip') {
             $this->debug('Content is gzip encoded, unzipping it');
