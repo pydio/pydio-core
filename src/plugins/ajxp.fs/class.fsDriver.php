@@ -48,7 +48,10 @@ class fsDriver extends AbstractDriver
 			case "download";
 				$zip = false;
 				if($selection->isUnique()){
-					if(is_dir($this->repository->getPath()."/".utf8_decode($file))) $zip = true;
+					if(is_dir($this->repository->getPath()."/".utf8_decode($file))) {
+						$zip = true;
+						$dir .= "/".basename($file);						
+					}
 				}else{
 					$zip = true;
 				}
