@@ -579,6 +579,10 @@ ActionsManager = Class.create({
 		}
 	},
 	
+	getActionByName : function(actionName){
+		return this.actions.get(actionName);		
+	},
+	
 	locationBarSubmit: function (url)
 	{
 		if(url == '') return false;	
