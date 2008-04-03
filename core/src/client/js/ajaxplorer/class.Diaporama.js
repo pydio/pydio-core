@@ -66,11 +66,13 @@ Diaporama = Class.create({
 			this.setFullScreen();
 			this.fsButton.hide();
 			this.nofsButton.show();
+			return false;
 		}.bind(this);
 		this.nofsButton.onclick = function(){
 			this.exitFullScreen();
 			this.nofsButton.hide();
 			this.fsButton.show();
+			return false;
 		}.bind(this);
 		modal.setCloseAction(this.close.bind(this));
 		
