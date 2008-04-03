@@ -228,6 +228,13 @@ Action = Class.create({
 		return button;
 	},
 	
+	setIconSrc : function(newSrc){
+		this.options.src = newSrc;
+		if($(this.options.name +'_button_icon')){
+			$(this.options.name +'_button_icon').src = 'client/images/crystal/actions/22/'+this.options.src;
+		}		
+	},
+	
 	toInfoPanel:function(){
 		return this.options;
 	},
