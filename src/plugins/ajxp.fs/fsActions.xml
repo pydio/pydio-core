@@ -181,12 +181,12 @@ AJXP_MESSAGE[174]<br/>
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getFilesList().getUserSelection();
-					if(userSelection.isUnique())
+					if(userSelection.isUnique() && !userSelection.hasDir())
 					{
 						var downloadUrl = ajxpServerAccessPath+'?action=download';
 						downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
@@ -228,7 +228,7 @@ AJXP_MESSAGE[174]<br/>
 						var userSelection = ajaxplorer.getFilesList().getUserSelection();
 						var button = $('download_button_icon');
 						if(button){
-							if(userSelection.isUnique() || userSelection.isEmpty()){
+							if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
 								button.src = ajxpResourcesFolder+'/images/crystal/actions/22/download_manager.png';
 							}else{
 								button.src = ajxpResourcesFolder+'/images/crystal/actions/22/accessories-archiver.png';
