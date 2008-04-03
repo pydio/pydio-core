@@ -46,7 +46,13 @@ class fsDriver extends AbstractDriver
 			//	DOWNLOAD, IMAGE & MP3 PROXYS
 			//------------------------------------
 			case "download";
-				if(!$selection->isUnique()){
+				$zip = false;
+				if($selection->isUnique()){
+					if(is_dir($this->repository->getPath()."/".utf8_decode($file))) $zip = true;
+				}else{
+					$zip = true;
+				}
+				if($zip){
 					// Make a temp zip and send it as download
 					$loggedUser = AuthService::getLoggedUser();
 					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpDownload.zip";
