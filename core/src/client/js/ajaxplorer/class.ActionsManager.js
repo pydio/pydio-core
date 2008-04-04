@@ -419,8 +419,10 @@ ActionsManager = Class.create({
 	
 	fireContextChange: function(){
 		var crtRecycle = false;
+		var crtInZip = false;
 		if(ajaxplorer && ajaxplorer.foldersTree){ 
 			crtRecycle = ajaxplorer.foldersTree.currentIsRecycle();
+			crtInZip = ajaxplorer.foldersTree.currentInZip()
 		}	
 		var displayMode = '';
 		if(ajaxplorer && ajaxplorer.filesList) displayMode = ajaxplorer.filesList.getDisplayMode();
@@ -428,7 +430,8 @@ ActionsManager = Class.create({
 			pair.value.fireContextChange(this.usersEnabled, 
 									 this.oUser, 
 									 crtRecycle, 
-									 displayMode);
+									 displayMode, 
+									 crtInZip);
 		}.bind(this));
 		this.refreshToolbarsSeparator();
 	},

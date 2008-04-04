@@ -18,6 +18,7 @@ Action = Class.create({
 		this.context = Object.extend({
 			selection:true,
 			dir:false,
+			inZip:true,
 			recycle:false,
 			behaviour:'hidden',
 			actionBar:false,
@@ -61,11 +62,12 @@ Action = Class.create({
 	},
 	
 	fireContextChange: function(){
-		if(arguments.length < 4) return;
+		if(arguments.length < 5) return;
 		var usersEnabled = arguments[0]
 		var crtUser = arguments[1];
 		var crtIsRecycle = arguments[2];
 		var crtDisplayMode = arguments[3];
+		var crtInZip = arguments[4];
 		var rightsContext = this.rightsContext;
 		if(!rightsContext.noUser && !usersEnabled){
 			return this.hideForContext();				
@@ -93,6 +95,9 @@ Action = Class.create({
 			if(this.context.recycle == 'hidden' && crtIsRecycle){
 				return this.hideForContext();
 			}
+		}
+		if(!this.context.inZip && crtInZip){
+			return this.hideForContext();
 		}
 		if(this.options.displayAction && this.options.displayAction == crtDisplayMode){
 			return this.hideForContext();

@@ -66,6 +66,7 @@ var webFXTreeConfig = {
 	defaultText     : 'Tree Item',
 	defaultAction   : 'javascript:void(0);',
 	defaultBehavior : 'classic',
+	zipRegexp		: new RegExp(/\.zip$/),
 	usePersistence	: true
 };
 
@@ -148,12 +149,18 @@ function WebFXTreeAbstractNode(sText, sAction) {
 
 WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	node.parentNode = this;
-	var url = node.parentNode.url; 
+	var url = node.parentNode.url; 	
 	if(url == "/") url = "";
 	if(node.isRecycle){
 		node.url = url + "/" + getBaseName(node.filename);
 	}else{
 		node.url = url + "/" + node.text;
+	}
+	if(node.parentNode.inZip) node.inZip = true;
+	else{		
+		if(webFXTreeConfig.zipRegexp.test(node.text) !== false){
+			node.inZip = true;
+		}
 	}
 	this.childNodes[this.childNodes.length] = node;
 	var root = this;
@@ -179,7 +186,9 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			foo = foo.parentNode;
 		}
 		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());		
-		AjxpDroppables.add(node.id);
+		if(!node.inZip){
+			AjxpDroppables.add(node.id);
+		}
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){
 			var action='';
