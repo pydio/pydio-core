@@ -169,7 +169,7 @@ function _xmlTreeToJsTree(oNode) {
 	}
 	var parent = null;
 	var icon = oNode.getAttribute("icon");
-	var openIcon = oNode.getAttribute("openIcon");
+	var openIcon = oNode.getAttribute("openicon");
 	var src = oNode.getAttribute("src");
 	var target = oNode.getAttribute("target");
 	var preloaded = oNode.getAttribute("preloaded");
