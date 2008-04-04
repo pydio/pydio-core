@@ -20,7 +20,7 @@ UserSelection = Class.create({
 			{
 				var selectedObj = aSelectedItems[i];
 				
-				if(selectedObj.getAttribute('is_file') && selectedObj.getAttribute('is_file') == '1') this._bFile = true;
+				if(selectedObj.getAttribute('is_file') && (selectedObj.getAttribute('is_file') == '1' || selectedObj.getAttribute('is_file') == 'true')) this._bFile = true;
 				else this._bDir = true;
 				
 				if(selectedObj.getAttribute('is_recycle') && selectedObj.getAttribute('is_recycle') == '1') this._isRecycle = true;

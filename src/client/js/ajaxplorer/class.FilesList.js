@@ -387,7 +387,7 @@ FilesList = Class.create(SelectableElements, {
 				sizeString = "height=\"64\" style=\"margin: 5px;\"";
 			}
 			var crtIndex = this._crtImageIndex;		
-			var image = new Image();
+			//var image = new Image();
 			innerSpan.innerHTML = imgString;		
 			newRow.appendChild(innerSpan);
 			this._htmlElement.appendChild(newRow);

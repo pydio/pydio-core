@@ -272,6 +272,15 @@ FoldersTree = Class.create({
 		return false;
 	},
 	
+	currentInZip : function(){
+		if(this.currentNodeName 
+		&& webFXTreeHandler.all[this.currentNodeName] 
+		&& webFXTreeHandler.all[this.currentNodeName].inZip){
+			return true;
+		}
+		return false;		
+	},
+	
 	setCurrentToRoot: function(){
 		this.setCurrentNodeName(this.getRootNodeId());
 	},
