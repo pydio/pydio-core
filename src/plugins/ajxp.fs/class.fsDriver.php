@@ -46,11 +46,16 @@ class fsDriver extends AbstractDriver
 			//	DOWNLOAD, IMAGE & MP3 PROXYS
 			//------------------------------------
 			case "download";
+				if($selection->inZip()){
+					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
+					@mkdir($this->repository->getPath()."/".$tmpDir);
+					$this->convertSelectionToTmpFiles($tmpDir, $selection);
+				}
 				$zip = false;
 				if($selection->isUnique()){
-					if(is_dir($this->repository->getPath()."/".utf8_decode($file))) {
+					if(is_dir($this->repository->getPath()."/".$selection->getUniqueFile())) {
 						$zip = true;
-						$dir .= "/".basename($file);						
+						$dir .= "/".basename($selection->getUniqueFile());
 					}
 				}else{
 					$zip = true;
@@ -65,18 +70,40 @@ class fsDriver extends AbstractDriver
 					$this->readFile($file, "force-download", $localName, false, false);
 					unlink($file);
 				}else{
-					$this->readFile($this->repository->getPath()."/".utf8_decode($file), "force-download");
+					$this->readFile($this->repository->getPath()."/".$selection->getUniqueFile(), "force-download");
+				}
+				if(isSet($tmpDir)){
+					$this->deldir($this->repository->getPath()."/".$tmpDir);
 				}
 				exit(0);
 			break;
 		
 			case "image_proxy":
-				$this->readFile($this->repository->getPath()."/".utf8_decode($file), "image");
+				if($split = UserSelection::detectZip(utf8_decode($file))){
+					require_once("server/classes/pclzip.lib.php");
+					$zip = new PclZip($this->repository->getPath().$split[0]);
+					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);
+					header("Content-Type: ".Utils::getImageMimeType(basename($split[1]))."; name=\"".basename($split[1])."\"");
+					header("Content-Length: ".strlen($data[0]["content"]));
+					header('Cache-Control: public');
+					print($data[0]["content"]);
+				}else{
+					$this->readFile($this->repository->getPath()."/".utf8_decode($file), "image");
+				}
 				exit(0);
 			break;
 			
 			case "mp3_proxy":
-				$this->readFile($this->repository->getPath()."/".$file, "mp3");
+				if($split = UserSelection::detectZip($file)){
+					require_once("server/classes/pclzip.lib.php");
+					$zip = new PclZip($this->repository->getPath().$split[0]);
+					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);					
+					header("Content-Type: audio/mp3; name=\"".basename($split[1])."\"");
+					header("Content-Length: ".strlen($data[0]["content"]));
+					print($data[0]["content"]);
+				}else{
+					$this->readFile($this->repository->getPath()."/".$file, "mp3");
+				}
 				exit(0);
 			break;
 			
@@ -111,6 +138,12 @@ class fsDriver extends AbstractDriver
 				{
 					$errorMessage = $mess[113];
 					break;
+				}
+				if($selection->inZip()){
+					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
+					@mkdir($this->repository->getPath()."/".$tmpDir);					
+					$this->convertSelectionToTmpFiles($tmpDir, $selection);
+					if(is_dir($tmpDir))	$this->deldir($this->repository->getPath()."/".$tmpDir);					
 				}
 				$success = $error = array();
 				
@@ -275,6 +308,47 @@ class fsDriver extends AbstractDriver
 					else if($mode == "file_list") $fileListMode = true;
 					else if($mode == "complete") $completeMode = true;
 				}	
+				if($test = UserSelection::detectZip($dir)){
+					$liste = array();
+					$zip = $this->zipListing($test[0], $test[1], $liste);
+					AJXP_XMLWriter::header();
+					$tmpDir = $this->repository->getPath().dirname($test[0]).".tmpZipExtract";					
+					foreach ($liste as $zipEntry){
+						$atts = array();
+						if(!$fileListMode && !$zipEntry["folder"]) continue;
+						$atts[] = "is_file=\"".($zipEntry["folder"]?"false":"true")."\"";
+						$atts[] = "text=\"".basename($zipEntry["stored_filename"])."\"";
+						$atts[] = "filename=\"".$zipEntry["filename"]."\"";
+						if($fileListMode){
+							$atts[] = "filesize=\"".Utils::roundSize($zipEntry["size"])."\"";
+							$atts[] = "modiftime=\"".date("d/m/Y H:i",$zipEntry["mtime"])."\"";
+							$atts[] = "mimestring=\"".Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"])."\"";
+							$atts[] = "icon=\"".Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"])."\"";
+							$is_image = Utils::is_image(basename($zipEntry["stored_filename"]));
+							$atts[] = "is_image=\"".$is_image."\"";
+							if($is_image){
+								if(!is_dir($tmpDir)) mkdir($tmpDir);
+								$currentFile = $tmpDir."/".basename($zipEntry["stored_filename"]);								
+								$data = $zip->extract(PCLZIP_OPT_BY_NAME, $zipEntry["stored_filename"], PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_PATH, $tmpDir);
+								list($width, $height, $type, $attr) = @getimagesize($currentFile);
+								$atts[] = "image_type=\"".image_type_to_mime_type($type)."\"";
+								$atts[] = "image_width=\"$width\"";
+								$atts[] = "image_height=\"$height\"";
+								unlink($currentFile);
+							}
+						}else{							
+							$atts[] = "icon=\"client/images/foldericon.png\"";
+							$atts[] = "openicon=\"client/images/foldericon.png\"";
+							$atts[] = "src=\"content.php?dir=".urlencode($zipEntry["filename"])."\"";
+						}						
+						print(utf8_encode("<tree ".join(" ", $atts)."/>"));
+						if(is_dir($tmpDir)){
+							rmdir($tmpDir);
+						}
+					}
+					AJXP_XMLWriter::close();
+					exit(0);
+				}
 				$nom_rep = $this->initName($dir);
 				AJXP_Exception::errorToXml($nom_rep);
 				$result = $this->listing($nom_rep, !($searchMode || $fileListMode));
@@ -318,7 +392,12 @@ class fsDriver extends AbstractDriver
 						$folderFullName = "$dir/".$folderBaseName;
 						$parentFolderName = $dir;
 						if(!$completeMode){
-							$attributes = "icon=\"".CLIENT_RESOURCES_FOLDER."/images/foldericon.png\"  openicon=\"".CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png\" filename=\"$folderFullName\" src=\"$link\"";
+							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
+							$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
+							if(eregi("\.zip$",$repName)){
+								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
+							}
+							$attributes = "icon=\"$icon\"  openicon=\"$openicon\" filename=\"$folderFullName\" src=\"$link\"";
 						}
 					}
 					print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
@@ -368,6 +447,33 @@ class fsDriver extends AbstractDriver
 		}
 		
 		return $xmlBuffer;
+	}
+	
+	function zipListing($zipPath, $localPath, &$filteredList){
+		require_once("server/classes/pclzip.lib.php");
+		$crtZip = new PclZip($this->repository->getPath()."/".$zipPath);
+		$liste = $crtZip->listContent();
+		$files = array();
+		if($localPath[strlen($localPath)-1] != "/") $localPath.="/";
+		foreach ($liste as $item){
+			$stored = $item["stored_filename"];			
+			if($stored[0] != "/") $stored = "/".$stored;						
+			$pathPos = strpos($stored, $localPath);
+			if($pathPos !== false){
+				$afterPath = substr($stored, $pathPos+strlen($localPath));
+				if($afterPath != "" && strpos($afterPath, "/")=== false || strpos($afterPath, "/") == strlen($afterPath)-1){
+					$item["filename"] = $zipPath.$localPath.$afterPath;
+					if($item["folder"]){
+						$filteredList[] = $item;
+					}else{
+						$files[] = $item;
+					}
+				}
+				
+			}
+		}
+		$filteredList = array_merge($filteredList, $files);
+		return $crtZip;		
 	}
 	
 	function initName($dir)
@@ -487,6 +593,10 @@ class fsDriver extends AbstractDriver
 						else if($ordre=="type") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
 						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 					}
+					else if(eregi("\.zip$",$file)){
+						if(!isSet($liste_zip)) $liste_zip = array();
+						$liste_zip[$file] = $file;
+					}
 				}
 			}
 		}
@@ -511,6 +621,7 @@ class fsDriver extends AbstractDriver
 		else ($liste_rep = array());
 	
 		$liste = Utils::mergeArrays($liste_rep,$liste_fic);
+		$liste = Utils::mergeArrays($liste,$liste_zip);
 		if ($poidstotal >= 1073741824) {$poidstotal = round($poidstotal / 1073741824 * 100) / 100 . " G".$size_unit;}
 		elseif ($poidstotal >= 1048576) {$poidstotal = round($poidstotal / 1048576 * 100) / 100 . " M".$size_unit;}
 		elseif ($poidstotal >= 1024) {$poidstotal = round($poidstotal / 1024 * 100) / 100 . " K".$size_unit;}
@@ -829,57 +940,41 @@ class fsDriver extends AbstractDriver
 	 */ 
     function makeZip ($src, $dest, $basedir)
     {
-    	/*
-		require(SERVER_RESOURCES_FOLDER."/class.zipfile.php");
-        $src = is_array($src) ? $src : array($src);
-		 if(class_exists("zipfile")){ 	        
-    		$zip = new zipfile();
-    		foreach ($src as $item){
-    			$path = $this->repository->getPath().$item;
-    			$zip->addFile(file_get_contents($path), $item);
-    		}
-   			return $zip;
-    	}
-    	return false;
-    	*/
     	set_time_limit(60);
     	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	$totalSize = 0;
     	foreach ($src as $item){
     		$filePaths[] = $this->repository->getPath().$item;
-    		//$totalSize += filesize($this->repository->getPath().$item);
     	}
     	$archive = new PclZip($dest);
-    	//if($totalSize > 500000){
-	    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->repository->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
-    	//}else{
-    	//	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->repository->getPath().$basedir);
-    	//}
+    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->repository->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
     	if($vList == 0) return false;
     }
     
-    function addZipItem ($zip, $racine, $dir)
-    {
-        if (is_dir($dir))
-        {
-            //$zip->addEmptyDir(str_replace($racine, '', $dir));
-            $lst = scandir($dir);
-            array_shift($lst);
-            array_shift($lst);
-            foreach ($lst as $item){
-                $this->addZipItem($zip, $racine, $dir.DIRECTORY_SEPARATOR.$item);
-            }
-        }
-        elseif (is_file($dir)){
-        	$localName = $this->limitAsciiChars((str_replace($racine, '', $dir)));            
-           	$zip->addFile($this->limitAsciiChars($dir), $localName);
-        }
+    
+    /**
+     * @param $selection UserSelection
+     */
+    function convertSelectionToTmpFiles($tmpDir, $selection){
+    	$zipPath = $selection->getZipPath();
+    	$localDir = $selection->getZipLocalPath();
+    	$files = $selection->getFiles();
+    	foreach ($files as $key => $item){// Remove path
+    		$item = substr($item, strlen($zipPath));
+    		if($item[0] == "/") $item = substr($item, 1);
+    		$files[$key] = $item;
+    	}
+    	require_once("server/classes/pclzip.lib.php");
+    	$zip = new PclZip($this->repository->getPath().$zipPath);
+    	$err = $zip->extract(PCLZIP_OPT_BY_NAME, $files, 
+    				  PCLZIP_OPT_PATH, $this->repository->getPath()."/".$tmpDir);
+    	foreach ($files as $key => $item){// Remove path
+    		$files[$key] = $tmpDir."/".$item;
+    	}
+    	$selection->setFiles($files);
     }
     
-    function limitAsciiChars($name){
-    	return iconv("utf-8", "utf-8//IGNORE", $name);
-    }
 }
 
 ?>

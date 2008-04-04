@@ -38,7 +38,7 @@
 			<gui text="27" title="27" src="yast_backup.png" accessKey="upload_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="put">
+					actionBarGroup="put" inZip="false">
 				</context></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
@@ -118,7 +118,7 @@
 		</action>
 		<action name="mkdir">			
 			<gui text="154" title="155" src="folder_new.png" accessKey="folder_access_key" hasAccessKey="true">
-				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put"></context>
+				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
@@ -149,7 +149,7 @@
 			<gui text="156" title="157" src="filenew.png" accessKey="file_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="put">
+					actionBarGroup="put" inZip="false">
 				</context></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
@@ -242,7 +242,7 @@ AJXP_MESSAGE[174]<br/>
 			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get">
+					actionBarGroup="get" inZip="false">
 				</context>
 				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -379,7 +379,7 @@ AJXP_MESSAGE[174]<br/>
 			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change">
+					actionBarGroup="change" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -470,7 +470,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<gui text="70" title="160" src="editpaste.png" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change">
+					actionBarGroup="change" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -523,7 +523,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change">
+					actionBarGroup="change" inZip="false">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
