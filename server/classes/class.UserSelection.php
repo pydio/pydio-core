@@ -4,7 +4,13 @@ class UserSelection
 {
 	var $files;
 	var $varPrefix = "file";
+	var $dirPrefix = "dir";
 	var $isUnique = true;
+	var $dir;
+	
+	var $inZip = false;
+	var $zipFile;
+	var $localZipPath;
 	
 	function UserSelection()
 	{
@@ -31,7 +37,7 @@ class UserSelection
 		{
 			$this->files[] = utf8_decode($array[$this->varPrefix]);
 			$this->isUnique = true;
-			return ;
+			//return ;
 		}
 		if(isSet($array[$this->varPrefix."_0"]))
 		{
@@ -46,13 +52,33 @@ class UserSelection
 			{
 				$this->isUnique = true;
 			}
-			return ;
+			//return ;
+		}
+		if(isSet($array[$this->dirPrefix])){
+			$this->dir = $array[$this->dirPrefix];
+			if($test = $this->detectZip($this->dir)){
+				$this->inZip = true;
+				$this->zipFile = $test[0];
+				$this->localZipPath = $test[1];
+			}
 		}
 	}
 	
 	function isUnique()
 	{
 		return $this->isUnique;
+	}
+	
+	function inZip(){
+		return $this->inZip;
+	}
+	
+	function getZipPath(){
+		return $this->zipFile;
+	}
+	
+	function getZipLocalPath(){
+		return $this->localZipPath;
 	}
 	
 	function getCount()
@@ -78,6 +104,22 @@ class UserSelection
 		}
 		return false;
 	}
+	
+	function detectZip($dirPath){
+		$contExt = stripos($dirPath, ".zip");
+		if($contExt !== false){
+			$zipPath = substr($dirPath, 0, $contExt+4);
+			$localPath = substr($dirPath, $contExt+4);
+			if($localPath == "") $localPath = "/";
+			return array($zipPath, $localPath);
+		}
+		return false;
+	}
+	
+	function setFiles($files){
+		$this->files = $files;
+	}
+		
 }
 
 ?>
