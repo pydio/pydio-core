@@ -42,7 +42,7 @@ $mess=array(
 "29" => "Maak",
 "30" => "Type een naam voor het bestand, klik daarna op &quot;Maak&quot;",
 "31" => "Je moet een bestand selecteren",
-"32" => "Ga terug",
+"32" => "Explore",
 "33" => "Fout bij het uploaden van het bestand!",
 "34" => "Het bestand",
 "35" => "is succesvol aangemaakt in de map",
@@ -276,6 +276,8 @@ $mess=array(
 "243" => "Revision",
 "244" => "Author", 
 "245" => "Date",
-"246" => "Message"
+"246" => "Message",
+"247" => "Extract",
+"248" => "Extract selection from zip to..."
 );
 ?>

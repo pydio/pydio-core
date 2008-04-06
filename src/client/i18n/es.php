@@ -44,7 +44,7 @@ $mess=array(
 "29" => "Crear",
 "30" => "Write a name for the directory then click on &quot;Create&quot;",
 "31" => "Debes seleccionar un archivo",
-"32" => "Ir atrás",
+"32" => "Explore",
 "33" => "¡Error al enviar el archivo!",
 "34" => "El archivo",
 "35" => "ha sido correctamente creado en el directorio",
@@ -278,6 +278,8 @@ $mess=array(
 "243" => "Revision",
 "244" => "Author", 
 "245" => "Date",
-"246" => "Message"
+"246" => "Message",
+"247" => "Extract",
+"248" => "Extract selection from zip to..."
 );
 ?>

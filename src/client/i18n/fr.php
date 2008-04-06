@@ -32,7 +32,7 @@ $mess=array(
 "29" => "Créer",
 "30" => "Saisissez un nom de répertoire et cliquez sur 'Créer'",
 "31" => "Vous n'avez pas sélectionné de fichier",
-"32" => "Retour",
+"32" => "Explorer",
 "33" => "Erreur de transfert !",
 "34" => "Le Fichier",
 "35" => "a été enregistré dans le répertoire",
@@ -267,6 +267,8 @@ $mess=array(
 "243" => "Revision",
 "244" => "Auteur", 
 "245" => "Date",
-"246" => "Message"
+"246" => "Message",
+"247" => "Extract",
+"248" => "Extract selection from zip to..."
 );
 ?>
