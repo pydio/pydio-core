@@ -209,7 +209,7 @@ ActionsManager = Class.create({
 				}
 			}
 			contextActions.push({
-				name:action.options.text,
+				name:action.getKeyedText(),
 				alt:action.options.title,
 				image:ajxpResourcesFolder+'/images/crystal/actions/16/'+action.options.src,
 				isDefault:isDefault,
