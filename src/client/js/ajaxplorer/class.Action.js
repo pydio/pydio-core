@@ -68,6 +68,9 @@ Action = Class.create({
 		var crtIsRecycle = arguments[2];
 		var crtDisplayMode = arguments[3];
 		var crtInZip = arguments[4];
+		if(this.options.listeners && this.options.listeners["contextChange"]){
+			this.options.listeners["contextChange"].evalScripts();
+		}		
 		var rightsContext = this.rightsContext;
 		if(!rightsContext.noUser && !usersEnabled){
 			return this.hideForContext();				
@@ -143,7 +146,8 @@ Action = Class.create({
 		if(!selectionContext.recycle && bRecycle){
 			return this.disable();
 		}
-		if(selectionContext.allowedMimes.size() && userSelection && !userSelection.hasMime(selectionContext.allowedMimes)){
+		if((selectionContext.allowedMimes.size() && userSelection && !userSelection.hasMime(selectionContext.allowedMimes)) 
+			&& !(selectionContext.dir && bDir)){
 			if(selectionContext.behaviour == 'hidden') return this.hide();
 			else return this.disable();
 		}
@@ -227,7 +231,7 @@ Action = Class.create({
 			alt:this.options.title,
 			title:this.options.title
 		});
-		var titleSpan = new Element('span');
+		var titleSpan = new Element('span', {id:this.options.name+'_button_label'});
 		button.insert(img).insert(new Element('br')).insert(titleSpan.update(this.getKeyedText()));
 		this.elements.push(button);
 		return button;
@@ -238,6 +242,18 @@ Action = Class.create({
 		if($(this.options.name +'_button_icon')){
 			$(this.options.name +'_button_icon').src = 'client/images/crystal/actions/22/'+this.options.src;
 		}		
+	},
+	
+	setLabel : function(newLabel, newTitle){
+		this.options.text = MessageHash[newLabel];
+		if($(this.options.name+'_button_label')){
+			$(this.options.name+'_button_label').update(this.getKeyedText());
+		}
+		if(!newTitle) return;
+		this.options.title = MessageHash[newTitle];
+		if($(this.options.name+'_button_icon')){
+			$(this.options.name+'_button_icon').title = this.options.title;
+		}
 	},
 	
 	toInfoPanel:function(){
@@ -300,6 +316,14 @@ Action = Class.create({
 		var displayString = this.options.text;
 		if(!this.options.hasAccessKey) return displayString;
 		var accessKey = this.options.accessKey;
+		var keyPos = displayString.toLowerCase().indexOf(accessKey.toLowerCase());
+		if(keyPos==-1){
+			return displayString + ' (<u>' + accessKey + '</u>)';
+		}
+		if(displayString.charAt(keyPos) != accessKey){
+			// case differ
+			accessKey = displayString.charAt(keyPos);
+		}
 		returnString = displayString.substring(0,displayString.indexOf(accessKey));
 		returnString += '<u>'+accessKey+'</u>';
 		returnString += displayString.substring(displayString.indexOf(accessKey)+1, displayString.length);
