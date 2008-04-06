@@ -64,12 +64,13 @@ SelectableElements = Class.create({
 			this.dblClick(e);
 		}.bind(this);
 	
-		if (oElement.addEventListener)
+		if (oElement.addEventListener){
 			oElement.addEventListener("click", this._onclick, false);
-		else if (oElement.attachEvent){
+		}else if (oElement.attachEvent){
 			oElement.attachEvent("onclick", this._onclick);
 			oElement.attachEvent("ondblclick", this._ondblclick);
 		}
+		
 		this.eventMouseUp = this.dragEnd.bindAsEventListener(this);
 		this.eventMouseDown = this.dragStart.bindAsEventListener(this);
 		this.eventMouseMove = this.drag.bindAsEventListener(this);
@@ -424,6 +425,16 @@ SelectableElements = Class.create({
 	
 	isItem: function (node) {
 		return node != null && node.nodeType == 1 && node.parentNode == this._htmlElement;
+	},
+	
+	findSelectableParent : function(el, setSelected){
+		while (el != null && !this.isItem(el)){
+			el = el.parentNode;
+		}
+		if(el != null && setSelected){
+			this.setItemSelected(el, true);
+		}
+		return el;
 	},
 	
 	destroy: function () {
