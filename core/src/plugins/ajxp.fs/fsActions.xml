@@ -189,7 +189,7 @@ AJXP_MESSAGE[174]<br/>
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -233,13 +233,19 @@ AJXP_MESSAGE[174]<br/>
 					</div>]]>
 					</clientForm>
 					<clientListener name="selectionChange"><![CDATA[
-						var userSelection = ajaxplorer.getFilesList().getUserSelection();						
+						var userSelection = ajaxplorer.getFilesList().getUserSelection();
 						var action = ajaxplorer.getActionBar().getActionByName("download");
-						if(action){
-							if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
-								action.setIconSrc('download_manager.png');
-							}else{
-								action.setIconSrc('accessories-archiver.png');
+						if(zipEnabled){
+							if(action){
+								if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
+									action.setIconSrc('download_manager.png');
+								}else{
+									action.setIconSrc('accessories-archiver.png');
+								}
+							}
+						}else{
+							if(userSelection.hasDir() && action){
+								action.selectionContext.dir = false;
 							}
 						}
 					]]></clientListener>

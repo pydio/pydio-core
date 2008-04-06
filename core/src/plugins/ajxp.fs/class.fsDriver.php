@@ -593,7 +593,7 @@ class fsDriver extends AbstractDriver
 						else if($ordre=="type") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
 						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 					}
-					else if(eregi("\.zip$",$file)){
+					else if(eregi("\.zip$",$file) && ConfService::zipEnabled()){
 						if(!isSet($liste_zip)) $liste_zip = array();
 						$liste_zip[$file] = $file;
 					}
