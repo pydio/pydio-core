@@ -44,7 +44,7 @@ $mess=array(
 "29" => "Erstellen",
 "30" => "Gib einen Namen für das Verzeichnis ein und klicke dann auf &quot;Erstellen&quot;",
 "31" => "Eine Datei muss ausgwählt werden",
-"32" => "Zurück",
+"32" => "Explore",
 "33" => "Fehler beim Hochladen !",
 "34" => "Die Datei",
 "35" => "wurde erfolgreich erstellt im Verzeichnis",
@@ -276,6 +276,8 @@ $mess=array(
 "243" => "Revision",
 "244" => "Author", 
 "245" => "Date",
-"246" => "Message"
+"246" => "Message",
+"247" => "Extract",
+"248" => "Extract selection from zip to..."
 );
 ?>
