@@ -191,7 +191,11 @@ class Utils
 		}else if($keyword == "audio"){
 			return "mp3";
 		}else if($keyword == "zip"){
-			return "zip";
+			if(ConfService::zipEnabled()){
+				return "zip";
+			}else{
+				return "none_allowed";
+			}
 		}
 		return "";
 	}
