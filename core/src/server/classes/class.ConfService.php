@@ -128,6 +128,11 @@ class ConfService
 		return $G_RECYCLE_BIN;
 	}
 	
+	function zipEnabled()
+	{
+		return (function_exists("gzopen")?true:false);		
+	}
+	
 	function getMessages()
 	{
 		global $G_MESSAGES, $G_LANGUE;		
