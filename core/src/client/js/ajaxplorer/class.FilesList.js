@@ -540,7 +540,7 @@ FilesList = Class.create(SelectableElements, {
 		}
 		isFile = selRaw[0].getAttribute('is_file');
 		fileName = selRaw[0].getAttribute('filename');
-		if(isFile == '1')
+		if(isFile == '1' || isFile=='true')
 		{
 			ajaxplorer.getActionBar().fireDefaultAction("file");
 		}

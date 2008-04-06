@@ -39,7 +39,7 @@ var AjxpDraggable = Class.create(Draggable, {
 	
 		this.dragging = true;
 		this._draggingMultiple = false;
-	
+		
 		if(this.options.zindex) {
 			this.originalZ = parseInt(Element.getStyle(this.element,'z-index') || 0);
 			this.element.style.zIndex = this.options.zindex;
@@ -86,6 +86,9 @@ var AjxpDraggable = Class.create(Draggable, {
 				}
 				Position.absolutize(this.element);
 			}else{
+				if(selection.isEmpty()){
+					ajaxplorer.getFilesList().findSelectableParent(this.element, true);
+				}
 				this._clone = this.element.cloneNode(true);
 				refreshPNGImages(this._clone);
 				Position.absolutize(this.element);
@@ -120,6 +123,8 @@ var AjxpDraggable = Class.create(Draggable, {
 			this.options.starteffect(this.element);
 		}
 		
+		this.dndAction = ajaxplorer.getActionBar().getDefaultAction('dragndrop');
+		this.ctrlDndAction = ajaxplorer.getActionBar().getDefaultAction('ctrldragndrop');			
 	
 	},
 
@@ -188,7 +193,7 @@ var AjxpDraggable = Class.create(Draggable, {
 	{
 		if(!event) return;
 		var ctrl = event['ctrlKey'];		
-		if(ctrl){
+		if(this.ctrlDndAction && (ctrl || (this.dndAction.deny))){
 			this.addCopyClass();
 		}else{
 			this.removeCopyClass();
