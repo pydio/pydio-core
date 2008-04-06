@@ -621,7 +621,9 @@ class fsDriver extends AbstractDriver
 		else ($liste_rep = array());
 	
 		$liste = Utils::mergeArrays($liste_rep,$liste_fic);
-		$liste = Utils::mergeArrays($liste,$liste_zip);
+		if(isSet($liste_zip)){
+			$liste = Utils::mergeArrays($liste,$liste_zip);
+		}
 		if ($poidstotal >= 1073741824) {$poidstotal = round($poidstotal / 1073741824 * 100) / 100 . " G".$size_unit;}
 		elseif ($poidstotal >= 1048576) {$poidstotal = round($poidstotal / 1048576 * 100) / 100 . " M".$size_unit;}
 		elseif ($poidstotal >= 1024) {$poidstotal = round($poidstotal / 1024 * 100) / 100 . " K".$size_unit;}
