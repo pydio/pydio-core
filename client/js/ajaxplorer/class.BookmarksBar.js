@@ -17,9 +17,15 @@ var BookmarksBar = Class.create(ResizeableBar, {
 			if(root.childNodes[i].tagName != 'bookmark') continue;			
 			this.displayBookmark(root.childNodes[i].getAttribute('path'), root.childNodes[i].getAttribute('title'));
 		}
-		this.updateUI();
 		if(this.contextMenu) this.contextMenu.addElements('div.bm');
 		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
+		window.setTimeout(function(){
+			this.updateUI();		
+			if(Prototype.Browser.WebKit){ // hack for display problem!
+				window.resizeBy(1,0);
+				window.resizeBy(-1,0);
+			}
+		}.bind(this), 0);
 	},
 	
 	displayBookmark: function(path, title){
