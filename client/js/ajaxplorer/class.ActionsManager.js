@@ -194,10 +194,25 @@ ActionsManager = Class.create({
 			if(crtGroup && crtGroup != action.context.actionBarGroup){
 				contextActions.push({separator:true});
 			}
+			var isDefault = false;
+			if(actionsSelectorAtt == 'selectionContext'){
+				// set default in bold
+				var userSelection = ajaxplorer.getFilesList().getUserSelection();
+				if(!userSelection.isEmpty()){
+					var defaultAction = 'file';
+					if(userSelection.isUnique() && userSelection.hasDir()){
+						defaultAction = 'dir';
+					}
+					if(this.defaultActions.get(defaultAction) && action.options.name == this.defaultActions.get(defaultAction)){
+						isDefault = true;
+					}
+				}
+			}
 			contextActions.push({
 				name:action.options.text,
 				alt:action.options.title,
-				image:ajxpResourcesFolder+'/images/crystal/actions/16/'+action.options.src,				
+				image:ajxpResourcesFolder+'/images/crystal/actions/16/'+action.options.src,
+				isDefault:isDefault,
 				callback:function(e){this.apply()}.bind(action)
 			});
 			crtGroup = action.context.actionBarGroup;
@@ -219,6 +234,10 @@ ActionsManager = Class.create({
 		var actionName = this.defaultActions.get(defaultName); 
 		if(actionName != null){
 			arguments[0] = actionName;
+			if(actionName == "ls"){
+				var action = this.actions.get(actionName);
+				if(action) action.enable(); // Force enable on default action
+			}
 			this.fireAction.apply(this, arguments);
 		}
 	},
@@ -255,7 +274,7 @@ ActionsManager = Class.create({
 	applyDragMove: function(fileName, destDir, destNodeName, copy)
 	{
 		if((!copy && !this.defaultActions.get('dragndrop')) || 
-			(copy && !this.defaultActions.get('ctrldragndrop'))){
+			(copy && (!this.defaultActions.get('ctrldragndrop')||this.getDefaultAction('ctrldragndrop').deny))){
 			return;
 		}
 		if(fileName == null) fileNames = ajaxplorer.filesList.getUserSelection().getFileNames();
@@ -300,6 +319,13 @@ ActionsManager = Class.create({
 		oThis = this;
 		connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
+	},
+	
+	getDefaultAction : function(defaultName){
+		if(this.defaultActions.get(defaultName)){
+			return this.actions.get(this.defaultActions.get(defaultName));
+		}
+		return null;
 	},
 	
 	checkDestIsChildOfSource: function(srcNames, destNodeName)
