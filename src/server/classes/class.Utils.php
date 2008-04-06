@@ -154,14 +154,14 @@ class Utils
 		else if(eregi("\.html$",$fileName)){$image="html.png";$typeName=$mess[14];}
 		else if(eregi("\.htm$",$fileName)){$image="html.png";$typeName=$mess[15];}
 		else if(eregi("\.rar$",$fileName)){$image="archive.png";$typeName=$mess[60];}
-		else if(eregi("\.gz$",$fileName)){$image="archive.png";$typeName=$mess[61];}
+		else if(eregi("\.gz$",$fileName)){$image="zip.png";$typeName=$mess[61];}
 		else if(eregi("\.tgz$",$fileName)){$image="archive.png";$typeName=$mess[61];}
 		else if(eregi("\.z$",$fileName)){$image="archive.png";$typeName=$mess[61];}
 		else if(eregi("\.ra$",$fileName)){$image="video.png";$typeName=$mess[16];}
 		else if(eregi("\.ram$",$fileName)){$image="video.png";$typeName=$mess[17];}
 		else if(eregi("\.rm$",$fileName)){$image="video.png";$typeName=$mess[17];}
 		else if(eregi("\.pl$",$fileName)){$image="source_pl.png";$typeName=$mess[18];}
-		else if(eregi("\.zip$",$fileName)){$image="archive.png";$typeName=$mess[19];}
+		else if(eregi("\.zip$",$fileName)){$image="zip.png";$typeName=$mess[19];}
 		else if(eregi("\.wav$",$fileName)){$image="sound.png";$typeName=$mess[20];}
 		else if(eregi("\.php$",$fileName)){$image="php.png";$typeName=$mess[21];}
 		else if(eregi("\.php3$",$fileName)){$image="php.png";$typeName=$mess[22];}
@@ -190,6 +190,8 @@ class Utils
 			return "png,bmp,jpg,jpeg,gif";
 		}else if($keyword == "audio"){
 			return "mp3";
+		}else if($keyword == "zip"){
+			return "zip";
 		}
 		return "";
 	}
