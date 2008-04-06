@@ -1,4 +1,4 @@
-AjaXplorer Version 2.3 - 2007/12/22
+AjaXplorer Version 2.3.4 - 2008/04/06
 Please read /doc/INSTALL.txt to find help with configuration.
 
 [MAIN DEVELOPER]
@@ -15,15 +15,13 @@ The original php script (simple file manager, no ajax gui) was called WebJeff Fi
 by Jean-François Gazet.
 http://www.webjeff.org
 
+++ ZIP FUNCTIONNALITIES ++
+All the zip/unzip functionnalities implemented are based on the excellent PclZip class developped by PhpConcept.
+http://www.phpconcept.net/pclzip/index.en.php
+
 ++ JAVASCRIPT FRAMEWORKS & PLUGINS ++
 The Ajax client is mainly based on the prototype.js library.
-However, for the splitter bars (frame emulation) and the rounded corners, I used at some points the jQuery 
-library, with the following plugins developed by Dave Methvin : Splitter.js and Corner.js. Thanks Dave for the
-good work!
 http://www.prototypejs.org/
-http://jquery.com/
-http://methvin.com/jquery/jq-corner.html
-http://methvin.com/jquery/splitter/
 
 ++ WEBFX WIDGETS ++
 The Ajax widgets used for the Tree (XLoadTree) and for table sorting and selection were developed by WebFX.
