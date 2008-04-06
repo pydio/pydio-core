@@ -103,12 +103,12 @@ Proto.Menu = Class.create({
 							href: '#',
 							title: item.alt,
 							className: (item.className || '') + (item.disabled ? ' disabled' : ' enabled'),
-							style:''//'background-image:url('+item.image+');' 							
+							style:(item.isDefault?'font-weight:bold':'')
 						}), { _callback: item.callback })
 						.writeAttribute('onclick', 'return false;')
 						.observe('click', this.onClick.bind(this))
 						.observe('contextmenu', Event.stop)
-						.update('<img src="'+item.image+'" border="0" height="16" width="16" align="absmiddle"> '+item.name)						
+						.update('<img src="'+item.image+'" border="0" height="16" width="16" align="absmiddle"> '+ item.name)						
 				)
 			)
 		}.bind(this));
