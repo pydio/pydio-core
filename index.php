@@ -47,8 +47,7 @@ if(isSet($_GET["folder"])) $EXT_REP = utf8_encode(urldecode($_GET["folder"]));
 $CRT_USER = "shared_bookmarks";
 if(isSet($_GET["user"])) $CRT_USER = $_GET["user"];
 
-$ZIP_ENABLED = "false";
-if(function_exists("gzcompress")) $ZIP_ENABLED = "true";
+$ZIP_ENABLED = (ConfService::zipEnabled()?"true":"false");
 
 $loggedUser = AuthService::getLoggedUser();
 $DEFAULT_DISPLAY = "list";
