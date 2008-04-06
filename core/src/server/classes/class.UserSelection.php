@@ -106,7 +106,7 @@ class UserSelection
 	}
 	
 	function detectZip($dirPath){
-		$contExt = stripos($dirPath, ".zip");
+		$contExt = strpos(strtolower($dirPath), ".zip");
 		if($contExt !== false){
 			$zipPath = substr($dirPath, 0, $contExt+4);
 			$localPath = substr($dirPath, $contExt+4);
