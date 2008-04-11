@@ -20,12 +20,8 @@ class Repository {
 	/**
 	 * @return String
 	 */
-	function getPath() {
-		if(array_key_exists("PATH", $this->options)) {
-			return $this->options["PATH"];
-		}else{
-			return "";
-		}
+	function getPath() {		
+		return $this->getOption("PATH");
 	}
 	
 	/**
@@ -40,11 +36,7 @@ class Repository {
 	 * @return unknown
 	 */
 	function getRecycle() {
-		if(array_key_exists("RECYCLE_BIN", $this->options)) {
-			return $this->options["RECYCLE_BIN"];
-		}else{
-			return "";
-		}		
+		return $this->getOption("RECYCLE_BIN");
 	}
 	
 	/**
@@ -61,9 +53,26 @@ class Repository {
 		$this->options[$oName] = $oValue;
 	}
 	
-	function getOption($oName){
+	function getOption($oName){		
 		if($this->options[$oName]){
-			return $this->options[$oName];
+			$value = $this->options[$oName];
+			if(is_string($value) && strpos($value, "AJXP_USER")!==false){
+				if(AuthService::usersEnabled()){
+					$loggedUser = AuthService::getLoggedUser();
+					if($loggedUser != null){
+						$loggedUser = $loggedUser->getId();
+						$value = str_replace("AJXP_USER", $loggedUser, $value);
+					}else{
+						return "";
+					}
+				}else{
+					$value = str_replace("AJXP_USER", "shared", $value);
+				}
+			}
+			if(is_string($value) && strpos($value, "AJXP_INSTALL_PATH") !== false){
+				$value = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $value);
+			}
+			return $value;
 		}
 		return "";
 	}
@@ -94,11 +103,7 @@ class Repository {
 	 * @return boolean
 	 */
 	function getCreate() {
-		if(array_key_exists("CREATE", $this->options)) {
-			return $this->options["CREATE"];
-		}else{
-			return false;
-		}
+		return $this->getOption("CREATE");
 	}
 	
 	/**
