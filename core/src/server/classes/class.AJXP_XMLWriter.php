@@ -3,18 +3,18 @@
 class AJXP_XMLWriter
 {
 	
-	function header()
+	function header($docNode="tree")
 	{
 		header('Content-Type: text/xml; charset=UTF-8');
 		header('Cache-Control: no-cache');
 		print('<?xml version="1.0" encoding="UTF-8"?>');
-		print("<tree>");
+		print("<$docNode>");
 		
 	}
 	
-	function close()
+	function close($docNode="tree")
 	{
-		print("</tree>");
+		print("</$docNode>");
 	}
 	
 	function write($data, $print){
