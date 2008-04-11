@@ -1,5 +1,7 @@
 <?php
 
+global $G_DEFAULT_REPOSITORIES;
+
 global $G_LANGUE;
 global $G_AVAILABLE_LANG;
 global $G_MESSAGES;
@@ -22,7 +24,7 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_RECYCLE_BIN;
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_RECYCLE_BIN, $G_DEFAULT_REPOSITORIES;
 		if(!isset($langue) || $langue=="") {$langue=$dft_langue;}
 		$G_LANGUE = $langue;
 		$G_AVAILABLE_LANG = $available_languages;
@@ -33,7 +35,8 @@ class ConfService
 		$G_SHOW_HIDDEN = $showhidden;
 		$G_BOTTOM_PAGE = $baspage;
 		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
-		$G_REPOSITORIES = ConfService::initRepositoriesList($REPOSITORIES);
+		$G_DEFAULT_REPOSITORIES = $REPOSITORIES;
+		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 		ConfService::switchRootDir();
 	}
 
@@ -96,23 +99,64 @@ class ConfService
 	 * @param array $repositories
 	 * @return array
 	 */
-	function initRepositoriesList($repositories)
+	function initRepositoriesList($defaultRepositories)
 	{
 		$objList =  array();
-		foreach($repositories as $index=>$repository)
+		foreach($defaultRepositories as $index=>$repository)
 		{
-			$repo = new Repository($index, $repository["PATH"], $repository["DISPLAY"]);
-			if(array_key_exists("DRIVER", $repository)) $repo->setAccessType($repository["DRIVER"]);
-			if(array_key_exists("RECYCLE_BIN", $repository)) $repo->setRecycle($repository["RECYCLE_BIN"]);
-			if(array_key_exists("CREATE", $repository)) $repo->setCreate($repository["CREATE"]);
-			if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
-				foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
-					$repo->addOption($oName, $oValue);
-				}
-			}
+			$repo = ConfService::createRepositoryFromArray($index, $repository);
+			$repo->setWriteable(false);
 			$objList[$index] = $repo;
 		}
+		$confRepo = ConfService::loadRepoFile();
+		foreach ($confRepo as $repo){			
+			$repo->setWriteable(true);
+			$objList[] = $repo;
+		}
 		return $objList;
+	}
+	
+	function createRepositoryFromArray($index, $repository){
+		$repo = new Repository($index, $repository["DISPLAY"], $repository["DRIVER"]);
+		if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
+			foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
+				$repo->addOption($oName, $oValue);
+			}
+		}			
+		// Old grammar, this is now a fs driver option
+		if(array_key_exists("RECYCLE_BIN", $repository)) $repo->setRecycle($repository["RECYCLE_BIN"]);
+		if(array_key_exists("PATH", $repository)) $repo->setPath($repository["PATH"]);
+		if(array_key_exists("CREATE", $repository)) $repo->setCreate($repository["CREATE"]);
+		return $repo;
+	}
+	
+	function addRepository($oRepository){
+		// update list
+		$confRepoList = ConfService::loadRepoFile();
+		$confRepoList[] = $oRepository;
+		$res = ConfService::saveRepoFile($confRepoList);
+		if($res == -1){
+			return $res;
+		}
+		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
+		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
+	}
+	
+	function deleteRepository($repoLabel){
+		$confRepoList = ConfService::loadRepoFile();
+		$newList = array();
+		foreach ($confRepoList as $repo){
+			if($repo->getDisplay() == $repoLabel){
+				continue;
+			}
+			$newList[] = $repo;
+		}
+		$res = ConfService::saveRepoFile($newList);
+		if($res == -1){
+			return $res;
+		}
+		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
+		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);		
 	}
 	
 	function useRecycleBin()
@@ -207,6 +251,42 @@ class ConfService
 		}
 		
 	}
+	
+	function availableDriversToXML(){
+		$manifests = array();
+		$base = INSTALL_PATH."/plugins";
+		$xmlString = "";
+		if($fp = opendir($base)){
+			while (($subdir = readdir($fp))!==false) {
+				$manifName = $base."/".$subdir."/manifest.xml";
+				if(is_file($manifName) && is_readable($manifName)){
+					$lines = file($manifName);
+					array_shift($lines);// Remove first line (xml declaration);					
+					$xmlString .= implode("", $lines);
+				}
+			}
+			closedir($fp);
+		}
+		return str_replace("\t", "", str_replace("\n", "", $xmlString));
+	}
+	
+	function loadRepoFile(){
+		$result = array();
+		if(is_file(INSTALL_PATH."/server/conf/repo.ser"))
+		{
+			$fileLines = file(INSTALL_PATH."/server/conf/repo.ser");
+			$result = unserialize($fileLines[0]);
+		}
+		return $result;
+	}
+	
+	function saveRepoFile($value){		
+		if(!is_writeable(INSTALL_PATH."/server/conf")) return -1;
+		$fp = @fopen(INSTALL_PATH."/server/conf/repo.ser", "w");
+		fwrite($fp, serialize($value));
+		fclose($fp);
+	}
+	
 	
 }
 
