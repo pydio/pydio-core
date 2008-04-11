@@ -180,6 +180,81 @@ switch ($action)
 		//print("</div>");	
 		exit(1);
 	break;
+		
+	case "drivers_list":
+		AJXP_XMLWriter::header("ajxpdrivers");
+		print(ConfService::availableDriversToXML());
+		AJXP_XMLWriter::close("ajxpdrivers");
+		exit(1);
+	break;
+	
+	case "create_repository" : 
+		$options = array();
+		$repDef = $_GET;
+		unset($repDef["get_action"]);
+		foreach ($repDef as $key => $value){
+			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0){
+				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
+				unset($repDef[$key]);
+			}
+		}
+		if(count($options)){
+			$repDef["DRIVER_OPTIONS"] = $options;
+		}
+		// NOW SAVE THIS REPOSITORY!
+		$newRep = ConfService::createRepositoryFromArray(0, $repDef);
+		$res = ConfService::addRepository($newRep);
+		AJXP_XMLWriter::header();
+		if($res == -1){
+			AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
+		}else{
+			AJXP_XMLWriter::sendMessage("Successfully created repository", null);
+		}
+		AJXP_XMLWriter::close();
+		exit(1);
+	break;
+	
+	case "repository_list" : 
+		$repList = ConfService::getRootDirsList();
+		AJXP_XMLWriter::header("repositories");		
+		foreach ($repList as $index => $value){			
+			$nested = array();
+			print("<repository index=\"$index\"");
+			foreach ($value as $name => $option){
+				if(!is_array($option)){
+					print(" $name=\"$option\" ");
+				}else if(is_array($option)){
+					$nested[] = $option;
+				}
+			}
+			if(count($nested)){
+				print(">");
+				foreach ($nested as $option){
+					foreach ($option as $key => $optValue){
+						if(strpos(strtolower($key), "auth") !== false) continue;
+						print("<param name=\"$key\" value=\"$optValue\"/>");
+					}
+				}
+				print("</repository>");
+			}else{
+				print("/>");
+			}
+		}
+		AJXP_XMLWriter::close("repositories");
+		exit(1);
+	break;
+	
+	case "delete_repository" :
+		$res = ConfService::deleteRepository($_GET["repo_label"]);
+		AJXP_XMLWriter::header();
+		if($res == -1){
+			AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
+		}else{
+			AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);
+		}
+		AJXP_XMLWriter::close();		
+		exit(1);
+	break;
 }
 
 include(CLIENT_RESOURCES_FOLDER."/html/admin.html");

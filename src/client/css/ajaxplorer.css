@@ -925,9 +925,10 @@ UPLOAD MULTIFILE FORM
 
 #adminIFrame
 {
-    border: 1px solid black;
-    width: 640px;
+    border: 1px solid white;
+    width: 641px;
     height: 390px;
+    background-color: #fff;
 }
 
 /*********************
@@ -935,7 +936,7 @@ ADMIN STYLES
 **********************/
 #users_list
 {
-    height: 300px;
+    height: 272px;
     overflow: auto;
 }
 .users_list_title
@@ -1018,7 +1019,7 @@ legend
 {
     color: #666;
 }
-#user_admin_bar
+#user_admin_bar, #repo_create_form
 {
    font-family: Trebuchet MS;
    padding: 15px;
@@ -1043,7 +1044,8 @@ legend
    width: 30px;
 }
 
-#user_admin_bar b
+#user_admin_bar b,
+#repo_create_form b
 {
    font-size: 17px;
    color: #666;   
@@ -1060,6 +1062,46 @@ legend
 {
    width: 20px;
    border: none;
+}
+
+#repo_create_form select
+{
+   border: 1px solid #79f;
+   height: 20px;
+}
+
+#driver_form input.text
+{
+   padding:0px;
+   padding-left:2px;
+   padding-right:2px;
+   margin-left: 0px;
+   width: 200px;
+   height: 18px;
+   border: 1px solid #999;   
+}
+
+#driver_form input.radio
+{
+   border : none;
+   margin-left: 0px;
+}
+
+#driver_form input.button
+{
+	background-color:#bbb;
+	border:1px solid #999;
+	color:white;
+	font-weight:bold;
+	margin-left:10px;
+	width:50px;
+	height: 20px;
+	padding: 0px;
+}
+
+#driver_form b
+{
+   font-size:12px;
 }
 
 /***********************/
