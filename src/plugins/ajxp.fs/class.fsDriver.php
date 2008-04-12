@@ -46,6 +46,7 @@ class fsDriver extends AbstractDriver
 			//	DOWNLOAD, IMAGE & MP3 PROXYS
 			//------------------------------------
 			case "download";
+				AJXP_Logger::logAction("Download", array("files"=>$selection));
 				if($selection->inZip()){
 					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
 					@mkdir($this->repository->getPath()."/".$tmpDir);
@@ -114,6 +115,7 @@ class fsDriver extends AbstractDriver
 				$file = utf8_decode($file);
 				if(isset($save) && $save==1)
 				{
+					AJXP_Logger::logAction("Online Edition", array("file"=>$file));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
 					$fp=fopen($this->repository->getPath()."/$file","w");
@@ -154,6 +156,7 @@ class fsDriver extends AbstractDriver
 				}
 				else {
 					$logMessage = join("\n", $success);
+					AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
 				}
 				$reload_current_node = true;
 				if(isSet($dest_node)) $reload_dest_node = $dest_node;
@@ -177,6 +180,7 @@ class fsDriver extends AbstractDriver
 				{
 					$logMessage = join("\n", $logMessages);
 				}
+				AJXP_Logger::logAction("Delete", array("files"=>$selection));
 				$reload_current_node = true;
 				$reload_file_list = true;
 				
@@ -197,6 +201,7 @@ class fsDriver extends AbstractDriver
 				$logMessage="$file $mess[41] $filename_new";
 				$reload_current_node = true;
 				$reload_file_list = basename($filename_new);
+				AJXP_Logger::logAction("Rename", array("original"=>$file, "new"=>$filename_new));
 				
 			break;
 		
@@ -216,6 +221,7 @@ class fsDriver extends AbstractDriver
 				if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
 				$logMessage = $messtmp;
 				$reload_current_node = true;
+				AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
 				
 			break;
 		
@@ -234,6 +240,7 @@ class fsDriver extends AbstractDriver
 				if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
 				$logMessage = $messtmp;
 				$reload_file_list = $filename;
+				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
 		
 			break;
 			
@@ -271,6 +278,7 @@ class fsDriver extends AbstractDriver
 						break;
 					}
 					$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
+					AJXP_Logger::logAction("Upload File", array("file"=>$dir."/".$userfile_name));
 				}
 				if($fancyLoader)
 				{
