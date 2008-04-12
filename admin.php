@@ -23,6 +23,7 @@ header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 session_start();
 ConfService::init("server/conf/conf.php");
+require_once("server/classes/class.AJXP_Logger.php");
 if(!AuthService::usersEnabled())
 {
 	print("Forbidden");
@@ -253,6 +254,22 @@ switch ($action)
 			AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);
 		}
 		AJXP_XMLWriter::close();		
+		exit(1);
+	break;
+	
+	case "list_logs" : 
+		AJXP_XMLWriter::header("log_files");
+		AJXP_Logger::xmlListLogFiles();
+		AJXP_XMLWriter::close("log_files");		
+		exit(1);
+	break;
+	
+	case "read_log" : 
+		$logDate = (isSet($_GET["date"])?$_GET["date"]:date('m-d-y'));
+		
+		AJXP_XMLWriter::header("logs");
+		AJXP_Logger::xmlLogs($logDate);
+		AJXP_XMLWriter::close("logs");
 		exit(1);
 	break;
 }

@@ -32,6 +32,7 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 ConfService::init("server/conf/conf.php");
+require_once("server/classes/class.AJXP_Logger.php");
 $baspage=ConfService::getConf("BOTTOM_PAGE");
 
 if(AuthService::usersEnabled())
