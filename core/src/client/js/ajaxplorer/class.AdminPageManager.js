@@ -4,28 +4,47 @@ AdminPageManager = Class.create({
 		this.loadUsers();
 		this.loadDrivers();
 		this.loadRepList();
+		this.loadLogList();
 		this.usersPanel = $('users_management');
 		this.repoPanel = $('repositories_management');		
-		this.toggleSidePanel('users');
+		this.logsPanel = $('logs_management');		
+		this.toggleSidePanel('logs');
 		if(Prototype.Browser.IE) $('repo_create_form').setStyle({height:'62px'});
 	},
 	
 	toggleSidePanel: function(srcName){	
-		if(srcName == 'users' && this.currentSideToggle != 'users'){
+		if(srcName == 'users'){
 			this.repoPanel.hide();
 			$('repositories_header').addClassName("toggleInactive");
 			$('repositories_header').getElementsBySelector("img")[0].hide();
+			this.logsPanel.hide();
+			$('logs_header').addClassName("toggleInactive");
+			$('logs_header').getElementsBySelector("img")[0].hide();
 			this.usersPanel.show();
 			$('users_header').removeClassName("toggleInactive");
 			$('users_header').getElementsBySelector("img")[0].show();
 		}
-		else if(srcName == 'repositories' && this.currentSideToggle != 'repositories'){
+		else if(srcName == 'repositories'){
 			this.repoPanel.show();
 			$('repositories_header').removeClassName("toggleInactive");
 			$('repositories_header').getElementsBySelector("img")[0].show();
 			this.usersPanel.hide();
 			$('users_header').addClassName("toggleInactive");
 			$('users_header').getElementsBySelector("img")[0].hide();			
+			this.logsPanel.hide();
+			$('logs_header').addClassName("toggleInactive");
+			$('logs_header').getElementsBySelector("img")[0].hide();
+		}
+		else if(srcName == 'logs'){
+			this.repoPanel.hide();
+			$('repositories_header').addClassName("toggleInactive");
+			$('repositories_header').getElementsBySelector("img")[0].hide();
+			this.usersPanel.hide();
+			$('users_header').addClassName("toggleInactive");
+			$('users_header').getElementsBySelector("img")[0].hide();			
+			this.logsPanel.show();
+			$('logs_header').removeClassName("toggleInactive");
+			$('logs_header').getElementsBySelector("img")[0].show();
 		}
 		this.currentSideToggle = srcName;
 	},
@@ -162,6 +181,79 @@ AdminPageManager = Class.create({
 			this.loadRepList();
 			this.loadUsers();
 		}.bind(this));
+	},
+	
+	loadLogList : function(){
+		this.submitForm('list_logs', new Hash());
+	},
+	
+	updateLogsSelector : function(){
+		var selector = $('log_selector');
+		if(!this.logFiles || !selector) return;
+		this.logFiles.each(function(pair){
+			var option = new Element('option');
+			option.setAttribute('value', pair.key);
+			option.update(pair.value);
+			selector.insert({'top':option});
+		});
+		selector.onchange = this.logSelectorChange.bind(this);
+		// Select first
+		selector.selectedIndex = 0;
+		this.logSelectorChange();
+		
+	},
+	
+	logSelectorChange : function(){
+		if($('log_selector').getValue()) this.loadLogs($('log_selector').getValue());
+	},
+	
+	loadLogs : function(date){
+		var param = new Hash();
+		param.set('date', date);
+		this.submitForm('read_log', param, null, this.updateLogBrowser.bind(this));
+	},
+	
+	updateLogBrowser : function(xmlResponse){
+		if(xmlResponse == null || xmlResponse.documentElement == null) return;
+		browser = $('log_browser');
+		var childs = xmlResponse.documentElement.childNodes;
+		this.even = true;
+		var table = new Element('table', {width:'100%', className:'logs_table',cellPadding:'0',cellSpacing:'1'});
+		browser.update(table);
+		this.insertRow(table, ["Date","IP","Level","User", "Action", "Parameters"], true);
+		for(var i=0;i<childs.length;i++){
+			var child = childs[i];
+			this.insertRow(table, [
+				child.getAttribute("date"),
+				child.getAttribute("ip"),
+				child.getAttribute("level"),
+				child.getAttribute("user"),
+				child.getAttribute("action"),
+				child.getAttribute("params"),
+			], false);			
+			if(i>1 && i%8==0){
+				this.insertRow(table, ["Date","IP","Level","User", "Action", "Parameters"], true);
+			}
+		}
+		var transp = new Element('div');
+		browser.insert({'bottom':transp});
+		browser.scrollTop = transp.offsetTop;
+	},
+	
+	insertRow : function(table, values, isHeader){		
+		var tdSt = '<tr>';
+		var className="";
+		if(!isHeader && !this.even){className="odd"};
+		this.even = !this.even;
+		values.each(function(cell){
+			if(cell){
+			while(cell.indexOf(';')>-1) cell = cell.replace(';', '<br>');
+			while(cell.indexOf(',')>-1) cell = cell.replace(',', '<br>');
+			tdSt = tdSt + '<td class="'+(isHeader?'header':className)+'">'+cell+'</td>';
+			}
+		});
+		tsSt = tdSt+'</tr>';
+		table.insert({'bottom':tdSt});
 	},
 	
 	changeUserRight: function(oChckBox, userId, repositoryId, rightName){	
@@ -310,6 +402,8 @@ AdminPageManager = Class.create({
 		var driversList = false;
 		var driversAtts = $A(['name', 'type', 'label', 'description', 'default', 'mandatory']);
 		var repList = false;
+		var logFilesList = false;
+		var logsList = false;
 		
 		for(var i=0; i<childs.length;i++)
 		{
@@ -359,12 +453,20 @@ AdminPageManager = Class.create({
 				repList = true;
 				this.repositories.set(childs[i].getAttribute('display'), childs[i].getAttribute('writeable'));
 			}
+			else if(childs[i].nodeName == "file"){
+				if(!this.logFiles) this.logFiles = new Hash();
+				logFilesList = true;
+				this.logFiles.set(childs[i].getAttribute('date'), childs[i].getAttribute('display'));
+			}
 		}
 		if(driversList){
 			this.updateDriverSelector();
 		}
 		if(repList){
 			this.updateRepList();
+		}
+		if(logFilesList){
+			this.updateLogsSelector();
 		}
 	},
 
