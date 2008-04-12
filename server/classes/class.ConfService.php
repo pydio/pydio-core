@@ -138,6 +138,7 @@ class ConfService
 		if($res == -1){
 			return $res;
 		}
+		AJXP_Logger::logAction("Create Repository", array("repo_name"=>$oRepository->getDisplay()));
 		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 	}
@@ -155,6 +156,7 @@ class ConfService
 		if($res == -1){
 			return $res;
 		}
+		AJXP_Logger::logAction("Delete Repository", array("repo_name"=>$repoLabel));
 		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);		
 	}
