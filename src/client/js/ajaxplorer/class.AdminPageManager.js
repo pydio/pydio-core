@@ -8,7 +8,7 @@ AdminPageManager = Class.create({
 		this.usersPanel = $('users_management');
 		this.repoPanel = $('repositories_management');		
 		this.logsPanel = $('logs_management');		
-		this.toggleSidePanel('logs');
+		this.toggleSidePanel('users');
 		if(Prototype.Browser.IE) $('repo_create_form').setStyle({height:'62px'});
 	},
 	
