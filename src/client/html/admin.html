@@ -32,6 +32,9 @@ body, html
     padding: 0px;    
     /*overflow: auto;*/
 }
+.toggleInactive{
+   border-left: 1px solid white;
+}
 </style>
 
 </head>
@@ -46,7 +49,9 @@ body, html
     	<td id="repositories_header" onclick="manager.toggleSidePanel('repositories'); return false;" class="toggleHeader" style="width:190px;">
     		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/folder_red.png"><a href="" onclick="manager.toggleSidePanel('repositories'); return false;" ajxp_message_id="250"><?php print $mess[250] ?></a>
     	</td>
-    	<td class="toggleHeader toggleInactive" style="background-color:#fff;width:200px;">&nbsp;</td>
+    	<td id="logs_header" onclick="manager.toggleSidePanel('logs'); return false;" class="toggleHeader" style="width:200px;">
+    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/toggle_log.png"><a href="" onclick="manager.toggleSidePanel('logs'); return false;" ajxp_message_id="251"><?php print $mess[251] ?></a>
+    	</td>
     </tr>
 	</table>
 	<div id="users_management" style="border:1px solid #79F; border-top:0px;">
@@ -74,6 +79,19 @@ body, html
 		<div class="users_list_title">Repositories List</div>
 		<div id="repo_list">
 		List
+		</div>
+	</div>
+	<div id="logs_management"  style="border:1px solid #79F; border-top:0px;height:362px;">
+		<div id="log_chooser">
+		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/toggle_log.png" align="absmiddle" width="32" height="32"> <b>Logs Monitoring</b>  
+		 	    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 		Choose a log file <select id="log_selector"></select>
+		 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;		 		
+		 		<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/reload.png" onclick="manager.logSelectorChange(); return false;" style="cursor:pointer;" align="absmiddle" width="32" height="32" title="Reload logs">
+		</div>
+		<div id="log_browser" style="height:299px; overflow:auto;">
 		</div>
 	</div>
 </div>     	
