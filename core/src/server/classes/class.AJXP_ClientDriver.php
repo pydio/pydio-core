@@ -39,6 +39,7 @@ class AJXP_ClientDriver extends AbstractDriver
 				}
 				ConfService::switchRootDir($root_dir_index);
 				$logMessage = "Successfully Switched!";
+				AJXP_Logger::logAction("Switch Repository", array("rep. id"=>$root_dir_index));
 				
 			break;	
 						

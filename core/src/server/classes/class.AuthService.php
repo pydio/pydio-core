@@ -76,6 +76,7 @@ class AuthService
 			$user = AuthService::updateAdminRights($user);
 		}
 		$_SESSION["AJXP_USER"] = $user;
+		AJXP_Logger::logAction("Log In");
 		return 1;
 	}
 	
@@ -86,7 +87,10 @@ class AuthService
 	
 	function disconnect()
 	{
-		if(isSet($_SESSION["AJXP_USER"])) unset($_SESSION["AJXP_USER"]);
+		if(isSet($_SESSION["AJXP_USER"])){
+			AJXP_Logger::logAction("Log Out");
+			unset($_SESSION["AJXP_USER"]);
+		}
 	}
 	
 	function getDefaultRootId()
@@ -135,6 +139,7 @@ class AuthService
 		if(!is_array($users) || !array_key_exists($userId, $users)) return "Error!";
 		$users[$userId] = crypt($userPass, "ajxp");
 		AuthService::saveLocalUsersList($users);
+		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
 		return true;
 	}
 	
@@ -145,6 +150,7 @@ class AuthService
 		if(array_key_exists($userId, $users)) return "exists";
 		$users[$userId] = crypt($userPass, "ajxp");
 		AuthService::saveLocalUsersList($users);
+		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;
 	}
 	
@@ -167,6 +173,7 @@ class AuthService
 			}
 			@rmdir(USERS_DIR."/".$userId);
 		}
+		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId));
 		return true;
 	}
 	
