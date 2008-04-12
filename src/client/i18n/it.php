@@ -281,6 +281,9 @@ $mess=array(
 "245" => "Data",
 "246" => "Messaggio",
 "247" => "Extract",
-"248" => "Extract selection from zip to..."
+"248" => "Extract selection from zip to...",
+"249" => "Users Management",
+"250" => "Repositories Management",
+"251" => "Logs"
 );
 ?>
