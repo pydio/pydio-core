@@ -1019,7 +1019,7 @@ legend
 {
     color: #666;
 }
-#user_admin_bar, #repo_create_form
+#user_admin_bar, #repo_create_form, #log_chooser
 {
    font-family: Trebuchet MS;
    padding: 15px;
@@ -1103,6 +1103,26 @@ legend
 {
    font-size:12px;
 }
+
+.logs_table{
+   font-size:12px;
+   width:'100%';
+}
+.logs_table td{
+   width:'10%';
+   vertical-align:top;
+   padding: 2px;
+}
+.logs_table td.header{
+   font-weight:bold;
+   background-color: #ccc;
+   color: white;
+   padding: 2px;
+}
+.logs_table td.odd{
+   background-color:#eee;
+}
+
 
 /***********************/
 /* EDITORS & DIAPORAMA */
