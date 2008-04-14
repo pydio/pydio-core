@@ -149,7 +149,7 @@ FilesList = Class.create(SelectableElements, {
 		{
 			this.resizeThumbnails();		
 			if(this.protoMenu) this.protoMenu.addElements('#selectable_div');	
-			window.setTimeout(function(){this.loadNextImage();}.bind(this),10);		
+			window.setTimeout(this.loadNextImage.bind(this),10);		
 		}
 		else
 		{
@@ -169,10 +169,10 @@ FilesList = Class.create(SelectableElements, {
 		{
 			if(this.loading) return;
 			var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
-			var image = new Image();
-			image.src = "content.php?action=image_proxy&get_thumb=true&file="+oImageToLoad.filename;
-			image.onload = function(){
-				var img = $(oImageToLoad.index);
+			window.loader = new Image();
+			loader.src = "content.php?action=image_proxy&get_thumb=true&file="+oImageToLoad.filename;
+			loader.onload = function(){
+				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);
 				if(img == null) return;
 				img.src = "content.php?action=image_proxy&get_thumb=true&file="+oImageToLoad.filename;
 				img.height = oImageToLoad.height;
@@ -180,8 +180,10 @@ FilesList = Class.create(SelectableElements, {
 				img.setStyle({marginTop: oImageToLoad.marginTop+'px',marginBottom: oImageToLoad.marginBottom+'px'});
 				img.setAttribute("is_loaded", "true");
 				this.resizeThumbnails(oImageToLoad.rowObject);
-				this.loadNextImage();
+				this.loadNextImage();				
 			}.bind(this);
+		}else{
+			if(window.loader) window.loader = null;
 		}	
 	},
 	
@@ -352,31 +354,43 @@ FilesList = Class.create(SelectableElements, {
 	
 	
 	xmlNodeToDiv: function(xmlNode){
-		var newRow = document.createElement("div");	
-		$(newRow).addClassName("thumbnail_selectable_cell");
+		var newRow = new Element('div', {className:"thumbnail_selectable_cell"});
+		var tmpAtts = new Hash();
 		for(i=0;i<xmlNode.attributes.length;i++)
 		{
 			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
+			tmpAtts.set(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
 		}
-	
-		var innerSpan = document.createElement("span");
-		innerSpan.setAttribute("style", "cursor:default;");	
-		if(xmlNode.getAttribute("is_image") == "1")
+		
+		var innerSpan = new Element('span', {style:"cursor:default;"});
+		if(tmpAtts.get("is_image") == "1")
 		{
 			this._crtImageIndex ++;
 			var imgIndex = this._crtImageIndex;
-			var textNode = xmlNode.getAttribute("text");
-			var imgString = "<img id=\"ajxp_image_"+imgIndex+"\" src=\""+ajxpResourcesFolder+"/images/crystal/mimes/64/image.png\" width=\"64\" height=\"64\" style=\"margin:5px;\" align=\"ABSMIDDLE\" border=\"0\" is_loaded=\"false\"/><div class=\"thumbLabel\" title=\""+textNode+"\">"+textNode+"</div>";
-			var width = xmlNode.getAttribute("image_width");
-			var height = xmlNode.getAttribute("image_height");		
-			var sizeString, marginTop, marginHeight, newHeight, newWidth;
+			var textNode = tmpAtts.get("text");			
+			var img = new Element('img', {
+				id:"ajxp_image_"+imgIndex,
+				src:ajxpResourcesFolder+"/images/crystal/mimes/64/image.png",
+				width:"64",
+				height:"64",
+				style:"margin:5px",
+				align:"ABSMIDDLE",
+				border:"0",
+				is_loaded:"false"
+			});
+			var label = new Element('div', {
+				className:"thumbLabel",
+				title:textNode
+			});
+			label.innerHTML = textNode;
+			var width = tmpAtts.get("image_width");
+			var height = tmpAtts.get("image_height");		
+			var marginTop, marginHeight, newHeight, newWidth;
 			if(width >= height){
-				sizeString = "width=\"64\"";
 				newWidth = 64;
 				newHeight = parseInt(height / width * 64);
 				marginTop = parseInt((64 - newHeight)/2) + 5;
 				marginBottom = 64+10-newHeight-marginTop-1;
-				sizeString += " style='margin: 5px;margin-top:"+marginTop+"px;margin-bottom:"+marginBottom+"px;'";
 			}
 			else
 			{
@@ -384,19 +398,20 @@ FilesList = Class.create(SelectableElements, {
 				newWidth = parseInt(width / height * 64);
 				marginTop = 5;
 				marginBottom = 5;
-				sizeString = "height=\"64\" style=\"margin: 5px;\"";
 			}
-			var crtIndex = this._crtImageIndex;		
-			//var image = new Image();
-			innerSpan.innerHTML = imgString;		
-			newRow.appendChild(innerSpan);
+			var crtIndex = this._crtImageIndex;
+			innerSpan.insert({"bottom":img});
+			innerSpan.insert({"bottom":label});
+			newRow.insert({"bottom": innerSpan});
+			newRow.IMAGE_ELEMENT = img;
+			newRow.LABEL_ELEMENT = label;
 			this._htmlElement.appendChild(newRow);
 			
-			var fileName = xmlNode.getAttribute('filename');
+			var fileName = tmpAtts.get('filename');			
 			var oImageToLoad = {
 				index:"ajxp_image_"+crtIndex,
 				filename:fileName, 
-				rowObject:$(newRow), 
+				rowObject:newRow, 
 				height: newHeight, 
 				width: newWidth, 
 				marginTop: marginTop, 
@@ -410,9 +425,9 @@ FilesList = Class.create(SelectableElements, {
 			// Add icon
 			//if(xmlNode.getAttribute("is_file") == "0") src = "images/crystal/mimes/64/folder.png";
 			//else 
-			src = ajxpResourcesFolder+'/images/crystal/mimes/64/'+xmlNode.getAttribute('icon');
+			src = ajxpResourcesFolder+'/images/crystal/mimes/64/'+tmpAtts.get('icon');
 			var imgString = "<img src=\""+src+"\" ";
-			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + xmlNode.getAttribute("text")+"\">" + xmlNode.getAttribute("text")+"</div>";
+			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + tmpAtts.get("text")+"\">" + tmpAtts.get("text")+"</div>";
 			innerSpan.innerHTML = imgString;		
 			newRow.appendChild(innerSpan);
 			this._htmlElement.appendChild(newRow);
@@ -421,11 +436,13 @@ FilesList = Class.create(SelectableElements, {
 			var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true});
 			this.allDraggables[this.allDraggables.length] = newDrag;
 		}catch(e){alert(e);}
-		if(xmlNode.getAttribute("is_file") == "0")
+		if(tmpAtts.get("is_file") == "0")
 		{
 			AjxpDroppables.add(newRow);
 			this.allDroppables[this.allDroppables.length] = newRow;
 		}
+		delete(tmpAtts);
+		delete(xmlNode);
 	},
 	
 	resizeThumbnails: function(one_element){
@@ -435,9 +452,9 @@ FilesList = Class.create(SelectableElements, {
 		if(one_element) elList = [one_element]; 
 		else elList = this._htmlElement.getElementsBySelector('.thumbnail_selectable_cell');
 		elList.each(function(element){
-			var is_image = (element.getAttribute('is_image')=='1'?true:false);
-			var image_element = element.getElementsBySelector('img')[0];		
-			var label_element = element.getElementsBySelector('.thumbLabel')[0];
+			var is_image = (element.getAttribute('is_image')=='1'?true:false);			
+			var image_element = element.IMAGE_ELEMENT || element.getElementsBySelector('img')[0];		
+			var label_element = element.LABEL_ELEMENT || element.getElementsBySelector('.thumbLabel')[0];
 			var tSize = this._thumbSize;
 			var tW, tH, mT, mB;
 			if(is_image && image_element.getAttribute("is_loaded") == "true")
@@ -479,7 +496,7 @@ FilesList = Class.create(SelectableElements, {
 			var el_width = tSize + 25;
 			var charRatio = 6;
 			var nbChar = parseInt(el_width/charRatio);
-			var label = new String(element.getElementsBySelector('.thumbLabel')[0].getAttribute('title'));
+			var label = new String(label_element.getAttribute('title'));
 			//alert(element.getAttribute('text'));
 			label_element.innerHTML = label.truncate(nbChar, '...');
 			
@@ -495,7 +512,12 @@ FilesList = Class.create(SelectableElements, {
 		else if(this._displayMode == "thumb") rows = $(this._htmlElement).getElementsBySelector('div');
 		for(i=0; i<rows.length;i++)
 		{
-			if(this.isItem(rows[i])) rows[i].remove();
+			rows[i].innerHTML = '';
+			if(rows[i].IMAGE_ELEMENT){
+				delete rows[i].IMAGE_ELEMENT;
+				rows[i].IMAGE_ELEMENT = null;
+			}
+			if(this.isItem(rows[i])) rows[i].remove();			
 		}
 	},
 	
