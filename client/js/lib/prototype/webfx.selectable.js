@@ -169,7 +169,7 @@ SelectableElements = Class.create({
 	setItemSelected: function (oEl, bSelected) {
 		if (!this._multiple) {
 			if (bSelected) {
-				var old = this._selectedItems[0]
+				var old = this._selectedItems[0] ;
 				if (oEl == old)
 					return;
 				if (old != null)
@@ -485,7 +485,7 @@ SelectableElements = Class.create({
 		var l = cs.length;
 		for (var i = 0; i < l; i++) {
 			if (cs[i].nodeType == 1)
-				tmp[j++] = cs[i]
+				tmp[j++] = cs[i] ;
 		}
 		return tmp;
 	},

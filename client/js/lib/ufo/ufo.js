@@ -268,7 +268,7 @@ var UFO = {
 
 	cleanupIELeaks: function() {
 		var _o = document.getElementsByTagName("object");
-		var _l = _o.length
+		var _l = _o.length ;
 		for (var i = 0; i < _l; i++) {
 			_o[i].style.display = "none";
 			for (var x in _o[i]) {

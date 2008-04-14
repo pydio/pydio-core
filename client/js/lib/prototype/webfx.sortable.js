@@ -247,7 +247,7 @@ SortableTable = Class.create({
 	
 	// IE returns wrong cellIndex when columns are hidden
 	getCellIndex: function (oTd) {
-		var cells = oTd.parentNode.childNodes
+		var cells = oTd.parentNode.childNodes ;
 		var l = cells.length;
 		var i;
 		for (i = 0; cells[i] != oTd && i < l; i++)

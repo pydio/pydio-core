@@ -276,7 +276,7 @@ function parseTemplateString(sTemplate) {
 	s = s.replace(/\%\%/g, "%");
 
 	for (var i = 1; i < args.length; i++)
-		s = s.replace( new RegExp("\%" + i + "\%", "g"), args[i] )
+		s = s.replace( new RegExp("\%" + i + "\%", "g"), args[i] ) ;
 
 	return s;
 }
