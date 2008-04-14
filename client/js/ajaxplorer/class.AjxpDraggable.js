@@ -3,7 +3,7 @@ var timerClearObserver = {
 	onEnd:function(){
 		if(WebFXtimer) clearTimeout(WebFXtimer);
 	}
-}
+} ;
 Event.observe(window, "load", function(){
 	Draggables.addObserver(timerClearObserver);
 	Draggables.addObserver({onDrag:function(eventName,element,event){

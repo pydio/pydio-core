@@ -154,10 +154,10 @@ ActionsManager = Class.create({
 					ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
 					hideLightBox(true);
 				}
-			}
+			};
 			ajaxplorer.user.savePreferences(userOldPass, userPass, onComplete);
 			return false;		
-		}
+		};
 		
 		modal.prepareHeader(MessageHash[195], ajxpResourcesFolder+'/images/crystal/actions/16/configure.png');
 		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
@@ -181,7 +181,7 @@ ActionsManager = Class.create({
 			if(bm != null){
 				return this.bookmarksBar.getContextActions(bm);
 			}
-		}
+		};
 		var contextActions = new Array();
 		var crtGroup;
 		this.actions.each(function(pair){
