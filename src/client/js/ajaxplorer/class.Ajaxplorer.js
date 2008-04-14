@@ -8,6 +8,7 @@ Ajaxplorer = Class.create({
 	initialize: function(loadRep, usersEnabled, loggedUser, rootDirId, rootDirsList, defaultDisplay)
 	{	
 		this._initLoadRep = loadRep;
+		this._initObj = true ;
 		this.usersEnabled = usersEnabled;
 		this._initLoggedUser = loggedUser;
 		this._initRootDirsList = rootDirsList;
@@ -26,7 +27,7 @@ Ajaxplorer = Class.create({
 		connexion.addParameter('get_action', 'get_template');
 		connexion.onComplete = function(transport){
 			$(document.body).insert({top:transport.responseText});
-		}
+		};
 		connexion.addParameter('template_name', 'gui_tpl.html');
 		connexion.sendSync();
 		modal.updateLoadingProgress('Main template loaded');	
@@ -112,7 +113,7 @@ Ajaxplorer = Class.create({
 										["StringDirFile", "NumberKo", "String", "MyDate"], 
 										null, 
 										this, 
-										this._initDefaultDisp);	
+										this._initDefaultDisp) ;
 		this.filesList.setContextualMenu(this.contextMenu);
 		modal.updateLoadingProgress('GUI Initialized');
 		this.initFocusBehaviours();
@@ -169,9 +170,11 @@ Ajaxplorer = Class.create({
 	loadRepository: function(repositoryId, repositoryLabel){
 		this.actionBar.loadActions();
 		this.foldersTree.reloadFullTree(repositoryLabel);
-		this.filesList.loadXmlList('/');
-		this.rootDirId = repositoryId;
-		this.actionBar.loadBookmarks();
+		if(!this._initObj) { 
+			this.filesList.loadXmlList('/') ;
+			this.rootDirId = repositoryId;
+			this.actionBar.loadBookmarks();
+		} else { this._initObj = null ;}
 		if(this._initLoadRep){
 			this.goTo(this._initLoadRep);
 			this._initLoadRep = null;
