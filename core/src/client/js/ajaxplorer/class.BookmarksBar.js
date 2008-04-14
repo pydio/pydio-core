@@ -3,7 +3,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 	initialize: function($super){
 		this.oElement = $('bmbar_content');		
 		$super("bmbar_content", "bookmarks_bar", "bm", "bmbar_title", "bmbar_extension");
-		this.load();
+//khoi		this.load();
 		this.currentCount = 0;
 	},
 	
@@ -100,7 +100,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 	 	var onLoad = function(newForm){
 	 		$(newForm).bm_path.value = bmElement.getAttribute('bm_path');
 	 		$(newForm).bm_title.value = bmElement.select('a.bookmark_button')[0].innerHTML;
-	 	}
+	 	};
 	 	var onComplete = function(){	 		
 	 		this.renameBookmark(modal.getForm().bm_path.value, modal.getForm().bm_title.value);
 	 		hideLightBox(true);

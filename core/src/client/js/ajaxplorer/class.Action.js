@@ -63,7 +63,7 @@ Action = Class.create({
 	
 	fireContextChange: function(){
 		if(arguments.length < 5) return;
-		var usersEnabled = arguments[0]
+		var usersEnabled = arguments[0];
 		var crtUser = arguments[1];
 		var crtIsRecycle = arguments[2];
 		var crtDisplayMode = arguments[3];

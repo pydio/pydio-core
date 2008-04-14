@@ -218,7 +218,7 @@ function MultiSelector( formObject, list_target, max ){
 		if(state == 'loading') stateImg.src = ajxpResourcesFolder+'/images/crystal/yellowled.png';
 		else if(state == 'done') stateImg.src = ajxpResourcesFolder+'/images/crystal/greenled.png';
 		else if(state == 'error') stateImg.src = ajxpResourcesFolder+'/images/crystal/redled.png';
-	}
+	};
 	
 	
 	this.submitMainForm = function(){
