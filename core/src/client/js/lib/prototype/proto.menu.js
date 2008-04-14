@@ -179,4 +179,4 @@ Proto.Menu = Class.create({
 			e.target._callback(this.event);
 		}		
 	}
-})
+});

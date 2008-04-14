@@ -94,7 +94,7 @@ function Slider(oElement, oInput, sOrientation) {
 		//this.element.onkeydown		= Slider.eventHandlers.onkeydown;
 		//this.element.onkeypress		= Slider.eventHandlers.onkeypress;
 		this.element.onmousewheel	= Slider.eventHandlers.onmousewheel;
-		this.handle.onselectstart	=
+//		this.handle.onselectstart	=
 		this.element.onselectstart	= function () { return false; };
 
 		this._timer.ontimer = function () {
@@ -178,7 +178,7 @@ Slider.eventHandlers = {
 	},
 
 	onblur:	function (e) {
-		var s = this.slider
+		var s = this.slider ;
 		s._focused = false;
 		s.handle.className = "handle";
 	},
