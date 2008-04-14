@@ -27,14 +27,14 @@ function getBrowserInfo() {
 		browser = "Konqueror";
 		OS = "Linux";
 	}
-	else if (checkIt('safari')) browser 	= "Safari"
-	else if (checkIt('omniweb')) browser 	= "OmniWeb"
-	else if (checkIt('opera')) browser 		= "Opera"
+	else if (checkIt('safari')) browser 	= "Safari" ;
+	else if (checkIt('omniweb')) browser 	= "OmniWeb" ;
+	else if (checkIt('opera')) browser 		= "Opera" ;
 	else if (checkIt('webtv')) browser 		= "WebTV";
-	else if (checkIt('icab')) browser 		= "iCab"
-	else if (checkIt('msie')) browser 		= "Internet Explorer"
+	else if (checkIt('icab')) browser 		= "iCab" ;
+	else if (checkIt('msie')) browser 		= "Internet Explorer" ;
 	else if (!checkIt('compatible')) {
-		browser = "Netscape Navigator"
+		browser = "Netscape Navigator" ;
 		version = detect.charAt(8);
 	}
 	else browser = "An unknown browser";
@@ -44,9 +44,9 @@ function getBrowserInfo() {
 	if (!OS) {
 		if (checkIt('linux')) OS 		= "Linux";
 		else if (checkIt('x11')) OS 	= "Unix";
-		else if (checkIt('mac')) OS 	= "Mac"
-		else if (checkIt('win')) OS 	= "Windows"
-		else OS 								= "an unknown operating system";
+		else if (checkIt('mac')) OS 	= "Mac" ;
+		else if (checkIt('win')) OS 	= "Windows" ;
+		else OS 		= "an unknown operating system";
 	}
 }
 
@@ -157,7 +157,7 @@ lightbox.prototype = {
 		
 		this.displayLightbox("none");
 	}
-}
+};
 
 /*-----------------------------------------------------------------------------------------------*/
 

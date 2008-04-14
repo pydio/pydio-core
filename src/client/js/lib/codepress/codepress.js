@@ -44,11 +44,11 @@ CodePress = function(obj, contentObserver) {
 				return;				
 			}, 0.2);
 		}
-	}
+	} ;
 
 	self.close = function(){
 		self.interrupt = true;
-	}
+	} ;
 	
 	self.edit = function(id,language) {
 		if(id) self.textarea.value = document.getElementById(id).value;
@@ -58,36 +58,36 @@ CodePress = function(obj, contentObserver) {
 		self.src = CodePress.path+'codepress.html?language='+self.language+'&ts='+(new Date).getTime();
 		if(self.attachEvent) self.attachEvent('onload',self.initialize);
 		else self.addEventListener('load',self.initialize,false);
-	}
+	} ;
 
 	self.setOptions = function() {
 		if(self.options.match('autocomplete-off')) self.toggleAutoComplete();
 		if(self.options.match('readonly-on')) self.toggleReadOnly();
 		if(self.options.match('linenumbers-off')) self.toggleLineNumbers();
-	}
+	};
 	
 	self.getCode = function() {
 		return self.textarea.disabled ? self.editor.getCode() : self.textarea.value;
-	}
+	};
 
 	self.setCode = function(code) {
 		self.textarea.disabled ? self.editor.setCode(code) : self.textarea.value = code;
-	}
+	};
 
 	self.toggleAutoComplete = function() {
 		self.editor.autocomplete = (self.editor.autocomplete) ? false : true;
-	}
+	};
 	
 	self.toggleReadOnly = function() {
 		self.textarea.readOnly = (self.textarea.readOnly) ? false : true;
 		if(self.style.display != 'none') // prevent exception on FF + iframe with display:none
 			self.editor.readOnly(self.textarea.readOnly ? true : false);
-	}
+	};
 	
 	self.toggleLineNumbers = function() {
 		var cn = self.editor.body.className;
 		self.editor.body.className = (cn==''||cn=='show-line-numbers') ? 'hide-line-numbers' : 'show-line-numbers';
-	}
+	};
 	
 	self.toggleEditor = function() {
 		if(self.textarea.disabled) {
@@ -103,11 +103,11 @@ CodePress = function(obj, contentObserver) {
 			self.style.display = 'inline';
 			self.textarea.style.display = 'none';
 		}
-	}
+	};
 
 	self.edit();
 	return self;
-}
+};
 
 CodePress.languages = {	
 	css : 'CSS', 
@@ -120,7 +120,7 @@ CodePress.languages = {
 	php : 'PHP', 
 	text : 'Text', 
 	sql : 'SQL'
-}
+};
 
 
 CodePress.run = function() {
@@ -139,7 +139,7 @@ CodePress.run = function() {
 			t[i].parentNode.insertBefore(eval(id), t[i]);
 		} 
 	}
-}
+} ;
 
 if(window.attachEvent) window.attachEvent('onload',CodePress.run);
 else window.addEventListener('DOMContentLoaded',CodePress.run,false);
