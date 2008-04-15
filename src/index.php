@@ -64,14 +64,18 @@ else
 	&& ($_COOKIE["AJXP_display"]=="list" || $_COOKIE["AJXP_display"]=="thumb")) $DEFAULT_DISPLAY = $_COOKIE["AJXP_display"];
 }
 
-
-$JS_DEBUG = true;
-if(ereg('Mac',$_SERVER['HTTP_USER_AGENT']) || ereg('Safari',$_SERVER['HTTP_USER_AGENT']))
-{
-	$JS_DEBUG = true; // DISABLE DYNAMIC LOADING ON MAC ANYWAY!
+if(isSet($_GET["compile"])){
+	require_once(SERVER_RESOURCES_FOLDER."/class.AJXP_JSPacker.php");
+	AJXP_JSPacker::pack();
 }
+
+$JS_DEBUG = false;
 $mess = ConfService::getMessages();
-include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
+if($JS_DEBUG){
+	include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
+}else{
+	include_once(CLIENT_RESOURCES_FOLDER."/html/gui-z.html");
+}
 HTMLWriter::writeI18nMessagesClass($mess);
 include_once(ConfService::getConf("BOTTOM_PAGE"));
 ?>
