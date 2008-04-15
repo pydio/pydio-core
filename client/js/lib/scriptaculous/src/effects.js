@@ -1092,7 +1092,7 @@ Effect.Methods = {
     return element;
   },
   visualEffect: function(element, effect, options) {
-    element = $(element)
+    element = $(element);
     var s = effect.dasherize().camelize(), klass = s.charAt(0).toUpperCase() + s.substring(1);
     new Effect[klass](element, options);
     return element;
