@@ -6,10 +6,15 @@ class AJXP_JSPacker{
 	 * Static function for packing all js into two big files
 	 */
 	function pack(){
-		return (AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/js/lista.txt", CLIENT_RESOURCES_FOLDER."/js/ajaxplorer.js"));
+		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/js/scriptslist.txt", 
+										CLIENT_RESOURCES_FOLDER."/js/ajaxplorer.js", 
+										"Normal");
+		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/css/csslist.txt", 
+										CLIENT_RESOURCES_FOLDER."/css/allz.css",
+										"None");
 	}
 	
-	function concatListAndPack($src, $out){
+	function concatListAndPack($src, $out, $mode){
 		
 		if(!is_file($src) || !is_readable($src)){
 			return false;
@@ -31,7 +36,7 @@ class AJXP_JSPacker{
 		
 		// Pack and write to file
 		require_once("packer/class.JavaScriptPacker.php");
-		$packer = new JavaScriptPacker($jscode, 'Normal' , true, false);
+		$packer = new JavaScriptPacker($jscode, $mode , true, false);
 		$packed = $packer->pack();
 		@file_put_contents($out, $packed);
 		
