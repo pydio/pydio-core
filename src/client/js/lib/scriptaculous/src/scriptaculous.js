@@ -34,7 +34,7 @@ var Scriptaculous = {
     function convertVersionString(versionString){
       var r = versionString.split('.');
       return parseInt(r[0])*100000 + parseInt(r[1])*1000 + parseInt(r[2]);
-    }
+    };
  
     if((typeof Prototype=='undefined') || 
        (typeof Element == 'undefined') || 
@@ -53,6 +53,6 @@ var Scriptaculous = {
        function(include) { Scriptaculous.require(path+include+'.js') });
     });
   }
-}
+};
 
 Scriptaculous.load();
