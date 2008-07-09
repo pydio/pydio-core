@@ -196,7 +196,7 @@ FilesList = Class.create(SelectableElements, {
 	},
 	
 	loadXmlList: function(repToLoad, pendingFileToSelect, url){	
-		// TODO : THIS SHOULD BE SET ONCOMPLETE!
+		// TODO : THIS SHOULD BE SET ONCOMPLETE!		
 		this._currentRep = repToLoad;
 		var connexion = new Connexion(url);
 		connexion.addParameter('mode', 'file_list');
@@ -204,7 +204,13 @@ FilesList = Class.create(SelectableElements, {
 		this._pendingFile = pendingFileToSelect;
 		this.setOnLoad();
 		connexion.onComplete = function (transport){
-			this.parseXmlAndLoad(transport.responseXML);
+			try{
+				this.parseXmlAndLoad(transport.responseXML);
+			}catch(e){
+				alert('Erreur au chargement :'+ e.message);				
+			}finally{
+				this.removeOnLoad();
+			}
 		}.bind(this);	
 		connexion.sendAsync();
 	},
@@ -212,7 +218,6 @@ FilesList = Class.create(SelectableElements, {
 	parseXmlAndLoad: function(oXmlDoc){	
 		if( oXmlDoc == null || oXmlDoc.documentElement == null) 
 		{
-			this.removeOnLoad();
 			return;
 		}
 		this.loading = false;
@@ -238,14 +243,12 @@ FilesList = Class.create(SelectableElements, {
 		{
 			if(cs[i].tagName == "error")
 			{
-				this.removeOnLoad();
 				alert(cs[i].firstChild.nodeValue);
 				return;
 			}
 			else if(cs[i].tagName == "require_auth")
 			{
 				if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
-				this.removeOnLoad();
 				ajaxplorer.actionBar.fireAction('login');
 			}
 		}
@@ -258,7 +261,7 @@ FilesList = Class.create(SelectableElements, {
 		// NOW PARSE LINES
 		for (var i = 0; i < l; i++) 
 		{
-			if (cs[i].tagName == "tree") 
+			if (cs[i].nodeName == "tree") 
 			{
 				if(this._displayMode == "list") 
 				{
@@ -270,9 +273,7 @@ FilesList = Class.create(SelectableElements, {
 				}
 			}
 		}	
-	
 		this.initRows();
-		this.removeOnLoad();
 		ajaxplorer.updateHistory(this._currentRep);
 		if(this._displayMode == "list")
 		{
@@ -507,17 +508,21 @@ FilesList = Class.create(SelectableElements, {
 	
 	
 	removeCurrentLines: function(){
-		var rows;
+		var rows;		
 		if(this._displayMode == "list") rows = $(this._htmlElement).getElementsBySelector('tr');
 		else if(this._displayMode == "thumb") rows = $(this._htmlElement).getElementsBySelector('div');
 		for(i=0; i<rows.length;i++)
 		{
-			rows[i].innerHTML = '';
-			if(rows[i].IMAGE_ELEMENT){
-				delete rows[i].IMAGE_ELEMENT;
-				rows[i].IMAGE_ELEMENT = null;
-			}
-			if(this.isItem(rows[i])) rows[i].remove();			
+			try{
+				rows[i].innerHTML = '';
+				if(rows[i].IMAGE_ELEMENT){
+					rows[i].IMAGE_ELEMENT = null;
+					// Does not work on IE, silently catch exception
+					delete rows[i].IMAGE_ELEMENT;
+				}
+			}catch(e){
+			}			
+			if(this.isItem(rows[i])) rows[i].remove();
 		}
 	},
 	
