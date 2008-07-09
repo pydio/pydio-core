@@ -16,7 +16,7 @@ Ajaxplorer = Class.create({
 		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 		this.histCount=0;
 		if(!this.usersEnabled) this.rootDirId = rootDirId;
-		modal.setLoadingStepCounts(7);
+		modal.setLoadingStepCounts(this.usersEnabled?7:6);
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
@@ -63,6 +63,7 @@ Ajaxplorer = Class.create({
 		loadRep = this._initLoadRep;
 		crtUser = this._initCrtUser;
 		rootDirName = this._initRootDir;
+		this.infoPanel = new InfoPanel("info_panel");
 		//modal.updateLoadingProgress('Libraries loaded');
 		if(!this.usersEnabled)
 		{
@@ -73,6 +74,7 @@ Ajaxplorer = Class.create({
 			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList[this._initRootDirId], ajxpServerAccessPath+'?action=ls', this);
 			this.refreshRootDirMenu(this._initRootDirsList, this._initRootDirId);
 			this.actionBar.loadActions();
+			this.infoPanel.load();
 		}
 		else
 		{
@@ -105,7 +107,6 @@ Ajaxplorer = Class.create({
 		this.actionBar.setContextualMenu(this.contextMenu);
 		  
 		this.sEngine = new SearchEngine("search_container", "search_txt","search_results", "search_button", this);
-		this.infoPanel = new InfoPanel("info_panel");
 		this.messageBox = $('message_div');
 		this.initGUI();	
 		this.filesList = new FilesList($("selectable_div"), 
