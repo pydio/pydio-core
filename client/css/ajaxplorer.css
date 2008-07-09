@@ -400,13 +400,14 @@ ACTION BAR
     font-size: 10px;
 }
 
-.action_bar div.separator,
-#action_bar div.separator
+#action_bar div.separator,
+.action_bar div.separator
 {    
     padding-bottom: 2px;
     padding-top: 4px;    
-    border-right: 1px solid #fff;
-    /*border-left: 1px solid buttonshadow;*/
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-right-color: #ffffff;
     display: block;
     float: left;
     text-align: center;
