@@ -38,6 +38,9 @@ class AJXP_JSPacker{
 		require_once("packer/class.JavaScriptPacker.php");
 		$packer = new JavaScriptPacker($jscode, $mode , true, false);
 		$packed = $packer->pack();
+		if($mode == "None"){ // css case, hack for I.E.
+			$packed = str_replace("solid#", "solid #", $packed);
+		}
 		@file_put_contents($out, $packed);
 		
 		return true;
