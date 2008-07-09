@@ -2,5 +2,5 @@ css/pnghack/pngHack.css
 css/sortabletable.css
 js/lib/webfx/slider/css/bluecurve/bluecurve.css
 js/lib/webfx/xtree.css
-js/lib/leightbox/screen.css
 css/ajaxplorer.css
+js/lib/leightbox/screen.css
