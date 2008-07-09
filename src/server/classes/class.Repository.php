@@ -54,7 +54,7 @@ class Repository {
 	}
 	
 	function getOption($oName){		
-		if($this->options[$oName]){
+		if(isSet($this->options[$oName])){
 			$value = $this->options[$oName];
 			if(is_string($value) && strpos($value, "AJXP_USER")!==false){
 				if(AuthService::usersEnabled()){
