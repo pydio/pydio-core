@@ -86,7 +86,7 @@ function disableTextSelection(target)
 		});
 	}
 }
-var heightsManager = new Hash();
+
 function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener)
 {
 	element = $(element);
@@ -99,7 +99,8 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 		addMarginBottom = 0;
 	}
 		
-	var observer = function(){		
+	var observer = function(){	
+		if(!element) return;	
 		var top =0;
 		if(parentElement == window){
 			offset = element.cumulativeOffset();
@@ -123,25 +124,8 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 	};
 	
 	observer();
-
-	Event.observe(window, 'resize', function(e){
-		if(element) observer();
-	});
-	/*
-	if(!heightsManager.size()){
-		Event.observe(window, 'resize', function(e){
-			heightsManager.each(function(pair){
-				if(!$(pair.key)){
-					heightsManager.unset(pair.key);
-				}else{
-					pair.value();
-				}
-			});
-		});
-	}
-	*/
 	if(!skipListener){
-		heightsManager.set(element.id, observer);
+		Event.observe(window, 'resize', observer);
 	}
 	return observer;
 }
