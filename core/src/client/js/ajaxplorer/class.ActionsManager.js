@@ -68,7 +68,7 @@ ActionsManager = Class.create({
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = '<ajxp_message ajxp_message_id="142">'+MessageHash[142]+'</ajxp_message><i style="cursor:pointer;text-decoration:underline;" ajxp_message_title_id="189" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></i>.';
+				logging_string = '<ajxp_message ajxp_message_id="142">'+MessageHash[142]+'</ajxp_message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></i>';
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
 					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
@@ -477,9 +477,11 @@ ActionsManager = Class.create({
 				crtCount ++;
 			}
 		}.bind(this));
+		/*
 		$$("#action_bar a").each(function(el){
 			new Effect.Corner(el, "round 8px");
 		});
+		*/
 	},
 	
 	refreshToolbarsSeparator: function(){
