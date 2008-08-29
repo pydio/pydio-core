@@ -277,6 +277,7 @@ class fsDriver extends AbstractDriver
 						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
 						break;
 					}
+					chmod($destination."/".$userfile_name, 0777);
 					$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
 					AJXP_Logger::logAction("Upload File", array("file"=>$dir."/".$userfile_name));
 				}
