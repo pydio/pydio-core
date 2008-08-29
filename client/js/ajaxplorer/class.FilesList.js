@@ -45,9 +45,17 @@ FilesList = Class.create(SelectableElements, {
 			var buffer = '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
 			this.columnsDef.each(function(column){buffer = buffer + '<col\>';});
 			buffer = buffer + '<thead><tr>';
+			for(var i=0; i<this.columnsDef.length;i++){
+				var column = this.columnsDef[i];
+				var last = '';
+				if(i==this.columnsDef.length-1) last = ' id="last_header"';
+				buffer = buffer + '<td ajxp_message_id="'+column.messageId+'"'+last+'>'+MessageHash[column.messageId]+'</td>';
+			}
+			/*
 			this.columnsDef.each(function(column){
 				buffer = buffer + '<td ajxp_message_id="'+column.messageId+'">'+MessageHash[column.messageId]+'</td>';
 			});
+			*/
 			buffer = buffer + '</tr></thead></table><div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			$('content_pane').innerHTML  = buffer;
 			oElement = $('selectable_div');
@@ -66,7 +74,7 @@ FilesList = Class.create(SelectableElements, {
 			buffer = buffer + '<td align="right" id="last_header"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
 			buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" style="padding:0px;"><div id="selectable_div" style="overflow:auto; padding:2px 5px;"></div></td></tr></tbody></table>';
 			$('content_pane').innerHTML  = buffer;
-			fitHeightToBottom($('selectable_div'), $('content_pane'));
+			fitHeightToBottom($('selectable_div'), $('content_pane'), 2);
 			this.slider = new Slider($("slider-1"), $("slider-input-1"));		
 			this.slider.setMaximum(200);
 			this.slider.setMinimum(30);		
