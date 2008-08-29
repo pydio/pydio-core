@@ -225,9 +225,10 @@ var FancyUpload2 = new Class({
 	fileComplete: function(file, response) {
 		this.options.processResponse || this
 		var json = $H(JSON.decode(response, true));
-		if (json.get('result') == 'success') {
+		if (json.get('result') == 'success' || response == '200 OK') {
 			file.element.addClass('file-success');
-			file.info.set('html', json.get('size'));
+			//file.info.set('html', json.get('size'));
+			file.info.set('html', 'OK');
 		} else {
 			file.element.addClass('file-failed');
 			file.info.set('html', json.get('error') || response);
