@@ -195,8 +195,12 @@ SortableTable = Class.create({
 	
 	// remove arrows and events
 	uninitHeader: function () {
-		if (!this.tHead) return;
-		var cells = this.tHead.rows[0].cells;
+		if (!this.tHead || !this.tHead.rows || !this.tHead.rows[0]) return;
+		try{
+			var cells = this.tHead.rows[0].cells;
+		}catch(e){
+			return;
+		}
 		var l = cells.length;
 		var c;
 		for (var i = 0; i < l; i++) {
