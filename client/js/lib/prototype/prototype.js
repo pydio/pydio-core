@@ -2008,6 +2008,8 @@ Element.Methods = {
     do {
       valueT += element.offsetTop  || 0;
       valueL += element.offsetLeft || 0;
+      try { element.offsetParent } 
+	  catch(e) { return Element._returnOffset(0,0) } 
       element = element.offsetParent;
     } while (element);
     return Element._returnOffset(valueL, valueT);
@@ -3923,11 +3925,12 @@ Object.extend(Event, (function() {
       if (element == document && document.createEvent && !element.dispatchEvent)
         element = document.documentElement;
 
+      var event;
       if (document.createEvent) {
-        var event = document.createEvent("HTMLEvents");
+        event = document.createEvent("HTMLEvents");
         event.initEvent("dataavailable", true, true);
       } else {
-        var event = document.createEventObject();
+        event = document.createEventObject();
         event.eventType = "ondataavailable";
       }
 
@@ -3937,7 +3940,9 @@ Object.extend(Event, (function() {
       if (document.createEvent) {
         element.dispatchEvent(event);
       } else {
-        element.fireEvent(event.eventType, event);
+        try{
+      		element.fireEvent(event.eventType, event);
+        }catch(e){}
       }
 
       return event;
