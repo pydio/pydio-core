@@ -104,11 +104,13 @@ Modal = Class.create({
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.filesList.blur();
+		/*
 		if(Prototype.Browser.IE){
 			new Effect.Corner($$('#'+elementName + ' .dialogTitle')[0],"round top 7px");
 		}else{
 			new Effect.Corner(elementName,"round top 7px");
 		}
+		*/
 		if(!this.isRounded)
 		{
 			ajxpCorners($(elementName), 'bottom');
@@ -230,7 +232,7 @@ Modal = Class.create({
 		setTimeout(command, 0);
 		*/
 		if(state){
-			$('progressState').value = state;
+			$('progressState').update(state);
 		}
 		if($('progressBar')){
 			 /*
