@@ -3,15 +3,33 @@ Editor = Class.create({
 	initialize: function(oFormObject)
 	{
 		this.oForm = $(oFormObject);
+		this.actionBar = this.oForm.select('.action_bar')[0];		
 		this.closeButton = oFormObject.select('a[id="closeButton"]')[0];
 		this.saveButton = oFormObject.select('a[id="saveButton"]')[0];
 		this.downloadButton = oFormObject.select('a[id="downloadFileButton"]')[0];
 		this.ficInput = oFormObject.select('input[name="file"]')[0];
 		this.repInput = oFormObject.select('input[name="dir"]')[0];	
+
+		this.fsButton = oFormObject.select('a[id="fsButton"]')[0];
+		this.nofsButton = oFormObject.select('a[id="nofsButton"]')[0];
+		this.fsButton.onclick = function(){
+			this.setFullScreen();
+			this.fsButton.hide();
+			this.nofsButton.show();
+			return false;
+		}.bind(this);
+		this.nofsButton.onclick = function(){
+			this.exitFullScreen();
+			this.nofsButton.hide();
+			this.fsButton.show();
+			return false;
+		}.bind(this);
+		
 		this.closeButton.observe('click', function(){
 			if(this.modified && !window.confirm(MessageHash[201])){
 					return false;
 			}
+			if(this.fullscreenMode) this.exitFullScreen();
 			this.close();
 			hideLightBox(true);
 			return false;
@@ -46,6 +64,7 @@ Editor = Class.create({
 			$(this.textarea).addClassName(cpStyle);
 			$(this.textarea).addClassName('linenumbers-on');
 			this.currentUseCp = true;
+			this.fsButton.setStyle({display:"none"});
 		}
 		else
 		{
@@ -147,5 +166,53 @@ Editor = Class.create({
 			this.cpCodeObject.close();
 			modal.clearContent(modal.dialogContent);		
 		}
+	},
+	
+	setFullScreen: function(){
+		this.oForm.absolutize();
+		$(document.body).insert(this.oForm);
+		this.oForm.setStyle({
+			top:0,
+			left:0,
+			backgroundColor:'#fff',
+			width:'100%',
+			height:document.viewport.getHeight(),
+			zIndex:3000});
+		this.actionBar.setStyle({marginTop: 0});
+		if(!this.currentUseCp){
+			this.origContainerHeight = this.textarea.getHeight();
+			this.heightObserver = fitHeightToBottom(this.textarea, this.oForm, 0, true);
+		}else{
+			
+		}		
+		var listener = this.fullScreenListener.bind(this);
+		Event.observe(window, "resize", listener);
+		this.oForm.observe("fullscreen:exit", function(e){
+			Event.stopObserving(window, "resize", listener);
+			//Event.stopObserving(window, "resize", this.heightObserver);
+		}.bind(this));		
+		this.fullscreenMode = true;
+	},
+	
+	exitFullScreen: function(){
+		this.oForm.relativize();
+		$$('.dialogContent')[0].insert(this.oForm);
+		this.oForm.setStyle({top:0,left:0,zIndex:100});
+		this.actionBar.setStyle({marginTop: -10});
+		this.oForm.fire("fullscreen:exit");
+		if(!this.currentUseCp){
+			this.textarea.setStyle({height:this.origContainerHeight});
+		}else{
+			
+		}		
+		this.fullscreenMode = false;
+	},
+	
+	fullScreenListener : function(){
+		this.oForm.setStyle({
+			height:document.viewport.getHeight()
+		});
+		if(!this.currentUseCp) {fitHeightToBottom(this.textarea, this.oForm, 0, true);}
 	}
+	
 });

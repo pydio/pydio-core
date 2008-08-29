@@ -7,6 +7,7 @@ Diaporama = Class.create({
 	{
 		this.element = div;
 		this.fullBox = this.element.select('div[id="diaporama_box"]')[0];
+		this.actionBar = this.fullBox.select('.action_bar')[0];
 		this.nextButton = div.select('a[id="nextButton"]')[0];
 		this.previousButton = div.select('a[id="prevButton"]')[0];
 		this.closeButton = div.select('a[id="closeButton"]')[0];
@@ -136,9 +137,11 @@ Diaporama = Class.create({
 		this.updateImage();
 		this.updateButtons();
 		if(DiaporamaFirstOccurence){
+			/*
 			$$(".action_bar a").each(function(el){
 				new Effect.Corner(el, "round 8px");
 			});
+			*/
 			DiaporamaFirstOccurence = false;
 		}
 	},
@@ -188,8 +191,14 @@ Diaporama = Class.create({
 			backgroundColor:'#fff',
 			width:'100%',
 			height:document.viewport.getHeight(),
-			zIndex:3000});		
+			zIndex:3000});
+		this.actionBar.setStyle({marginTop: 0});
 		this.origContainerHeight = this.imgContainer.getHeight();
+		var listener = this.fullScreenListener.bind(this);
+		Event.observe(window, "resize", listener);
+		this.fullBox.observe("fullscreen:exit", function(e){
+			Event.stopObserving(window, "resize", listener);
+		});
 		fitHeightToBottom(this.imgContainer, this.fullBox);
 		this.fullscreenMode = true;
 	},
@@ -198,9 +207,16 @@ Diaporama = Class.create({
 		this.fullBox.relativize();
 		$(this.element).insert(this.fullBox);
 		this.fullBox.setStyle({top:0,left:0,zIndex:100});
-		//fitHeightToBottom(this.imgContainer, null, 5);
+		this.actionBar.setStyle({marginTop: -10});
+		this.fullBox.fire("fullscreen:exit");
 		this.imgContainer.setStyle({height:this.origContainerHeight});
 		this.fullscreenMode = false;
+	},
+	
+	fullScreenListener : function(){
+		this.fullBox.setStyle({
+			height:document.viewport.getHeight()
+		});
 	},
 	
 	updateImage : function(){
