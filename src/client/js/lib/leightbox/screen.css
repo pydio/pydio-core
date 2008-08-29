@@ -34,9 +34,9 @@
 	height:100%;
 	z-index:1000;
 	background-color:#eee;
-	-moz-opacity: 0.6;
-	opacity:.60;
-	filter: alpha(opacity=60);
+	-moz-opacity: 0.8;
+	opacity:.80;
+	filter: alpha(opacity=80);
 }
 
 #loading_overlay{
