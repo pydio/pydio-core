@@ -124,8 +124,12 @@ lightbox.prototype = {
 		window.scrollTo(x, y); 
 	},
 	
-	displayLightbox: function(display){
-		$('overlay').style.display = display;
+	displayLightbox: function(display){		
+		if(display == 'none'){
+			$('overlay').fade({duration:0.5});
+		}else{
+			$('overlay').style.display = display;
+		}
 		if(this.content != null)
 		{
 			$(this.content).style.display = display;
