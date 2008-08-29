@@ -1,31 +1,49 @@
-var BookmarksBar = Class.create(ResizeableBar, {
+var BookmarksBar = Class.create({
 	
 	initialize: function($super){
-		this.oElement = $('bmbar_content');		
-		$super("bmbar_content", "bookmarks_bar", "bm", "bmbar_title", "bmbar_extension");
-//khoi		this.load();
-		this.currentCount = 0;
+		this.oElement = $('bmbar_content');
+		this.currentCount = 0;	
+		this.bookmarks = $A([]);
+		this.createMenu();
 	},
 	
 	parseXml: function(transport){
-		this.clearElement();
+		this.bookmarks = $A([]);
+		//this.clearElement();
 		var oXmlDoc = transport.responseXML;
 		if(oXmlDoc == null || oXmlDoc.documentElement == null) return;		
 		var root = oXmlDoc.documentElement;
 		for (var i=0; i < root.childNodes.length;i++)
 		{
 			if(root.childNodes[i].tagName != 'bookmark') continue;			
-			this.displayBookmark(root.childNodes[i].getAttribute('path'), root.childNodes[i].getAttribute('title'));
+			var bookmark = {
+				name:root.childNodes[i].getAttribute('title'),
+				alt:root.childNodes[i].getAttribute('path'),
+				image:ajxpResourcesFolder+'/images/crystal/actions/16/favorite-folder.png'
+			};
+			bookmark.callback = function(e){ajaxplorer.goTo(this.alt)}.bind(bookmark);
+			bookmark.moreActions = this.getContextActions(bookmark.alt, bookmark.name);
+			this.bookmarks.push(bookmark);
 		}
-		if(this.contextMenu) this.contextMenu.addElements('div.bm');
+		//this.createMenu();
+		this.bmMenu.options.menuItems = this.bookmarks;
+		this.bmMenu.refreshList();
+		//if(this.contextMenu) this.contextMenu.addElements('div.bm');
 		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
-		window.setTimeout(function(){
-			this.updateUI();		
-			if(Prototype.Browser.WebKit){ // hack for display problem!
-				window.resizeBy(1,0);
-				window.resizeBy(-1,0);
-			}
-		}.bind(this), 0);
+	},
+	
+	createMenu : function(){
+		this.bmMenu = new Proto.Menu({			
+			className: 'menu bookmarksMenu',
+			mouseClick:'left',
+			anchor:'bm_goto_button',
+			createAnchor:false,
+			topOffset:4,
+			leftOffset:-2,
+			menuItems: this.bookmarks,
+			fade:true,
+			zIndex:2000
+		});
 	},
 	
 	displayBookmark: function(path, title){
@@ -54,7 +72,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 		}
 	},
 	
-	getContextActions: function(bmElement){
+	getContextActions: function(bmPath, bmTitle){
 		
 		var removeAction = {
 				name:MessageHash[146],
@@ -63,7 +81,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 				disabled:false,
 				className:"edit",
 				callback:function(e){
-					this.removeBookmark(bmElement.getAttribute('bm_path'));
+					this.removeBookmark(bmPath);
 				}.bind(this)
 			};
 		
@@ -74,7 +92,7 @@ var BookmarksBar = Class.create(ResizeableBar, {
 				disabled:false,
 				className:"edit",
 				callback:function(e){
-					ajaxplorer.goTo(bmElement.getAttribute('bm_path'));
+					ajaxplorer.goTo(bmPath);
 				}
 			};
 		
@@ -85,21 +103,21 @@ var BookmarksBar = Class.create(ResizeableBar, {
 				disabled:false,
 				className:"edit",
 				callback:function(e){
-					this.toggleRenameForm(bmElement);
+					this.toggleRenameForm(bmPath, bmTitle);
 				}.bind(this)
 			};
 		
 			
 			
-		return new Array(goToAction, renameAction, removeAction);
+		return new Array(renameAction, removeAction);
 	},
 	
-	toggleRenameForm:function(bmElement){
+	toggleRenameForm:function(bmPath, bmTitle){
 		
 		modal.prepareHeader(MessageHash[225], ajxpResourcesFolder+'/images/crystal/actions/16/bookmark.png');
 	 	var onLoad = function(newForm){
-	 		$(newForm).bm_path.value = bmElement.getAttribute('bm_path');
-	 		$(newForm).bm_title.value = bmElement.select('a.bookmark_button')[0].innerHTML;
+	 		$(newForm).bm_path.value = bmPath;
+	 		$(newForm).bm_title.value = bmTitle;
 	 	};
 	 	var onComplete = function(){	 		
 	 		this.renameBookmark(modal.getForm().bm_path.value, modal.getForm().bm_title.value);
