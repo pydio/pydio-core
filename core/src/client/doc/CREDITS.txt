@@ -1,4 +1,4 @@
-AjaXplorer Version 2.3.4 - 2008/04/06
+AjaXplorer Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
 Please read /doc/INSTALL.txt to find help with configuration.
 
 [MAIN DEVELOPER]
