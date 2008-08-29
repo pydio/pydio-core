@@ -40,6 +40,8 @@ Proto.Menu = Class.create({
 		});
 		if(this.options.createAnchor){
 			this.createAnchor();		
+		}else if(this.options.anchor != 'mouse'){
+			this.options.selector = '[id="'+this.options.anchor+'"]';			
 		}
 		this.eventToObserve = ((this.options.mouseClick!='right' || Prototype.Browser.Opera)?'click':'contextmenu');
 		this.options.fade = this.options.fade && !Object.isUndefined(Effect);
@@ -95,8 +97,26 @@ Proto.Menu = Class.create({
 			);		
 		}
 		this.options.menuItems.each(function(item) {
-			list.insert(
-				new Element('li', {className: item.separator ? 'separator' : ''}).insert(
+			
+			var newItem = new Element('li', {className: item.separator ? 'separator' : ''});
+			
+			if(item.moreActions){
+				var actionsContainer = new Element('div', {className:'menuActions'});
+				item.moreActions.each(function(action){
+					actionsContainer.insert(
+						new Element('a', {
+							title:action.name,
+							href:'#'
+						})
+						.writeAttribute('onclick', 'return false;')
+						.observe('click', action.callback)
+						.insert('<img src="'+action.image+'" width="16" height="16" border="0">')
+					);
+				});
+				newItem.insert(actionsContainer);
+			}
+			
+			newItem.insert(
 					item.separator 
 						? '' 
 						: Object.extend(new Element('a', {
@@ -109,8 +129,8 @@ Proto.Menu = Class.create({
 						.observe('click', this.onClick.bind(this))
 						.observe('contextmenu', Event.stop)
 						.update('<img src="'+item.image+'" border="0" height="16" width="16" align="absmiddle"> '+ item.name)						
-				)
-			)
+				);
+			list.insert(newItem);
 		}.bind(this));
 		this.container.insert(list);
 	},
