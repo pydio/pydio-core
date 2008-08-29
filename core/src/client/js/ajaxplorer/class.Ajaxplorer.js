@@ -180,6 +180,7 @@ Ajaxplorer = Class.create({
 			this.goTo(this._initLoadRep);
 			this._initLoadRep = null;
 		}
+		$('repo_path').value = repositoryLabel;
 	},
 
 	goTo: function(rep, selectFile){
@@ -214,12 +215,14 @@ Ajaxplorer = Class.create({
 		this.rootMenu = new Proto.Menu({			
 			className: 'menu rootDirChooser',
 			mouseClick:'left',
-			anchor:'root_dir_button',
-			createAnchor:true,
+			//anchor:'root_dir_button',
+			anchor:'goto_repo_button',
+			createAnchor:false,
 			anchorContainer:$('dir_chooser'),
 			anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
 			anchorTitle:MessageHash[200],
-			topOffset:-2,
+			topOffset:5,
+			leftOffset:-107,
 			menuTitle:MessageHash[200],
 			menuItems: actions,
 			fade:true,
@@ -409,7 +412,8 @@ Ajaxplorer = Class.create({
 	},
 	
 	initGUI: function(){
-		try{			
+		try{						
+		/*
 		new Effect.Corner('toolbars', "round bottom 10px");
 		$('action_bar').select('a').each(function(el){new Effect.Corner(el, "round 8px");});
 		if(!Prototype.Browser.WebKit){ // Do not try this on safari, not working good.
@@ -417,8 +421,9 @@ Ajaxplorer = Class.create({
 		}
 		new Effect.Corner('location_form', "round 8px");
 		new Effect.Corner('browser_round', "round 8px");
+		*/
 		fitHeightToBottom($("browser"), window, 15);
-		fitHeightToBottom($("verticalSplitter"), $('browser'), 8);
+		fitHeightToBottom($("verticalSplitter"), $('browser'), 8);		
 		var s1 = new Splitter('sidebarSplitter',{
 				direction: "horizontal",
 				initB: 150,
@@ -426,6 +431,7 @@ Ajaxplorer = Class.create({
 				maxB: 500,
 				onDrag:function(){
 						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:3), true);
+						fitHeightToBottom($('bottomSplitPane'), null, 1, true);
 						fitHeightToBottom(this.sEngine._resultsBox, null, 10, true);
 					}.bind(this)
 				});
@@ -434,9 +440,10 @@ Ajaxplorer = Class.create({
 				initA: 200, maxA:400, minA:50, 
 				onDrag: function(){
 					s1.resizeGroup();
-					if(this.filesList)this.filesList.applyHeadersWidth();
+					if(this.filesList)this.filesList.applyHeadersWidth();					
 				}.bind(this)
 		});
+		fitHeightToBottom($("content_pane"), $('rightSplitPane'),1);
 		
 		this.currentSideToggle = 'search';
 		this.toggleSidePanel('info');	
@@ -473,7 +480,7 @@ Ajaxplorer = Class.create({
 			$(this.infoPanel.htmlElement).hide();
 			$('info_panel_header').addClassName("toggleInactive");
 			$('info_panel_header').getElementsBySelector("img")[0].hide();
-			fitHeightToBottom(this.sEngine._resultsBox, null, 5, true);
+			fitHeightToBottom(this.sEngine._resultsBox, null, 10, true);
 		}
 		this.currentSideToggle = srcName;
 	},
