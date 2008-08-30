@@ -34,7 +34,7 @@ input, textarea
     margin-top: 1px;
     margin-left: 10px;
     padding: 2px;
-    border: 1px solid #79f;
+    border: 1px solid #aaa;
     font-size: 11px;
     font-family: Trebuchet MS;
 }
@@ -174,7 +174,8 @@ DIALOG BOXES
     /*text-align: center;*/
 }
 
-.dialogContent input[type="text"]
+.dialogContent input[type="text"],
+.dialogContent input[type="password"]
 {
     margin-left:0px;
     width: 250px;
@@ -251,8 +252,8 @@ textarea#myCode
 #fancyframe
 {
     border:0px;
-    width: 400px;
-    height: 300px;
+    width: 410px;
+    height: 385px;
 }
 
 /********************/
@@ -542,6 +543,14 @@ ACTION BAR
     border-left: 0px;
 }
 
+#goto_repo_button.disabled,
+#bm_goto_button.disabled
+{
+	filter:alpha(opacity=30);
+	opacity: 0.3;
+	-moz-opacity:0.3;
+}
+
 #repository_goto
 {
    border-right: 0px;
@@ -825,7 +834,7 @@ UPLOAD MULTIFILE FORM
 #multiple_download_container div a:hover
 {
     text-decoration:none;
-    color: #79f;
+    color: #aaa;
 }
 
 
@@ -941,14 +950,22 @@ UPLOAD MULTIFILE FORM
     cursor: pointer;
 }
 
+.infoPanelActions
+{
+    padding: 0px 10px;    
+}
+
 #info_panel a, #info_panel a:hover
 {
     color:#79f;
-    
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+    padding-bottom: 10px;
 }
 #info_panel a:hover
 {
-   text-decoration:underline;
+   text-decoration:none;
 }
 
 #info_panel .folderImage
@@ -1039,7 +1056,7 @@ UPLOAD MULTIFILE FORM
     left: 15px;
     width: 400px;
     height: 230px;
-    border: 1px solid #79f;
+    border: 1px solid #aaa;
 }
 
 #adminIFrame
@@ -1172,7 +1189,7 @@ legend
 
 #user_pref_form input
 {
-   width: 70px;
+   width: 65px;
    padding: 0px;
    margin-right: 5px;
 }
