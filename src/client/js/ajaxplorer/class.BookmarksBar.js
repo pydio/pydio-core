@@ -8,8 +8,7 @@ var BookmarksBar = Class.create({
 	},
 	
 	parseXml: function(transport){
-		this.bookmarks = $A([]);
-		//this.clearElement();
+		this.clear();
 		var oXmlDoc = transport.responseXML;
 		if(oXmlDoc == null || oXmlDoc.documentElement == null) return;		
 		var root = oXmlDoc.documentElement;
@@ -25,10 +24,9 @@ var BookmarksBar = Class.create({
 			bookmark.moreActions = this.getContextActions(bookmark.alt, bookmark.name);
 			this.bookmarks.push(bookmark);
 		}
-		//this.createMenu();
 		this.bmMenu.options.menuItems = this.bookmarks;
 		this.bmMenu.refreshList();
-		//if(this.contextMenu) this.contextMenu.addElements('div.bm');
+		if(this.bookmarks.length) $('bm_goto_button').removeClassName('disabled');
 		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
 	},
 	
@@ -51,10 +49,10 @@ var BookmarksBar = Class.create({
 		this.currentCount++;
 	},
 	
-	clearElement: function(){
-		this.oElement.update();
+	clear: function(){
 		this.currentCount = 0;
-		if(this.contextMenu) this.contextMenu.removeElements('div.bm');
+		this.bookmarks = $A([]);
+		$('bm_goto_button').addClassName('disabled');
 	},
 	
 	setContextualMenu:function(oMenu){
@@ -127,6 +125,7 @@ var BookmarksBar = Class.create({
 	},
 	
 	load: function(actionsParameters){
+		this.clear();
 		var connexion = new Connexion();
 		if(!actionsParameters) actionsParameters = new Hash();
 		actionsParameters.set('get_action', 'get_bookmarks');
