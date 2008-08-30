@@ -100,7 +100,7 @@
 					</form>
 					
 					<!-- MOOTOOLS UPLOAD FORM -->
-					<div id="fancy_upload_form" box_width="425">
+					<div id="fancy_upload_form" box_width="426">
 					<div id="fancyscreen">
 					<iframe id="fancyframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=fancy_tpl2.html&encode=false"></iframe>
 					</div>
@@ -674,7 +674,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			</messages>
 			<html><![CDATA[
 				<div style="padding:10px;">
-					<center style="border:1px solid #79f;">
+					<center style="border:1px solid #aaa; margin-bottom: 5px;">
 						<img src="content.php?action=image_proxy&get_thumb=true&file=#{filename}" #{compute_image_dimensions}>
 					</center>
 					<b>#{name_string}</b> : #{basename}
@@ -694,7 +694,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			</messages>
 			<html><![CDATA[
 				<div style="padding:10px;">
-					<div id="mp3_container" style="border:1px solid #79f; text-align:center; padding:5px; width:160px;">
+					<div id="mp3_container" style="text-align:center; padding:5px; width:160px;margin-bottom: 5px;">
 						<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
 					</div>
 					<b>#{name_string}</b> : #{basename}
