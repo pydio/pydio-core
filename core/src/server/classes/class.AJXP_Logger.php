@@ -113,7 +113,7 @@ class AJXP_Logger {
 
 		if ($this->fileHandle !== false) {
 			
-			if (fwrite($this->fileHandle, $textMessage) === false) {
+			if (@fwrite($this->fileHandle, $textMessage) === false) {
 				//print "There was an error writing to log file.";
 			}
 		}
@@ -125,8 +125,8 @@ class AJXP_Logger {
 	 *
 	 * @access public
 	 */
-	function close() {		
-		$success = fclose($this->fileHandle);
+	function close() {
+		$success = @fclose($this->fileHandle);
 		if ($success === false) {
 			// Failure to close the log file
 			$this->write("AJXP_Logger failed to close the handle to the log file", LOG_LEVEL_ERROR);
