@@ -139,6 +139,7 @@ Proto.Menu = Class.create({
 		//e.stop();
 		this.options.beforeShow(e);
 		this.refreshList();
+		if(!this.options.menuItems.length) return;
 		var elOff = {};
 		elDim = this.container.getDimensions();
 		if(this.options.anchor == 'mouse'){
