@@ -25,9 +25,9 @@ window.onload = function(){
 
 <link rel="stylesheet" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/ajaxplorer.css">
 <style>
-body {background-color: #ddd;}
 body, html
 {
+ 	background-color: #fff !important;
     margin: 0px;
     padding: 0px;    
     /*overflow: auto;*/
@@ -41,7 +41,7 @@ body, html
 <body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
 <div id="message_div" onclick="manager.closeMessageDiv();" class="messageBox"><div id="message_content"></div></div>
 <div id="search_div" style="background-color: #fff;">
-	<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
+	<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle" style="border: 1px solid #aaa; border-bottom: 0px;">
 	<tr>
     	<td id="users_header" onclick="manager.toggleSidePanel('users'); return false;" class="panelHeader toggleHeader" style="width:150px;">
     		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/yast_kuser.png"><a href="" onclick="manager.toggleSidePanel('users'); return false;" ajxp_message_id="249"><?php print $mess[249] ?></a>
@@ -54,7 +54,7 @@ body, html
     	</td>
     </tr>
 	</table>
-	<div id="users_management" style="border:1px solid #79F; border-top:0px;">
+	<div id="users_management" style="border:1px solid #aaa; border-top:0px;">
 		<div id="user_admin_bar">
 		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/user_create.png" align="absmiddle" width="32" height="32"> <b>Create user</b>  
 		 	    &nbsp;&nbsp;&nbsp;&nbsp;
@@ -66,7 +66,7 @@ body, html
 		<div class="users_list_title">Users List</div>
 		<div id="users_list"></div>
 	</div>
-	<div id="repositories_management" style="border:1px solid #79F; border-top:0px;height:362px;overflow:auto;">
+	<div id="repositories_management" style="border:1px solid #aaa; border-top:0px;height:362px;overflow:auto;">
 		<div id="repo_create_form" style="overflow:hidden; height:32px;">
 		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/folder_red.png" align="absmiddle" width="32" height="32"> <b>Create Repository</b>
 		 	&nbsp;&nbsp;&nbsp;
@@ -81,7 +81,7 @@ body, html
 		List
 		</div>
 	</div>
-	<div id="logs_management"  style="border:1px solid #79F; border-top:0px;height:362px;">
+	<div id="logs_management"  style="border:1px solid #aaa; border-top:0px;height:362px;">
 		<div id="log_chooser">
 		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/toggle_log.png" align="absmiddle" width="32" height="32"> <b>Logs Monitoring</b>  
 		 	    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
