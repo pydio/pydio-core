@@ -29,8 +29,8 @@
 					if(window.actionArguments && window.actionArguments.length>0){
 						var path = window.actionArguments[0];						
 						ajaxplorer.getFoldersTree().goToDeepPath(path);
-						ajaxplorer.filesList.loadXmlList(path);
 						ajaxplorer.getActionBar().updateLocationBar(path);
+						ajaxplorer.filesList.loadXmlList(path);
 					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
