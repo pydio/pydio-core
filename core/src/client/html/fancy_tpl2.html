@@ -19,6 +19,7 @@ body
 	padding: 0px;
 	padding-left: 3px;
 	margin: 0px;
+	background-image: url('<?php print(CLIENT_RESOURCES_FOLDER);?>/images/strip.png');
 }
 
 div, a
@@ -42,10 +43,10 @@ a.enabled
 }
 a
 {
-    display: block;
-    width: 131px;
+    display: inline;
+    width: 30px;
     text-align: center;
-    cursor: pointer;
+    cursor: pointer;    
 }
 
 /**
@@ -53,9 +54,9 @@ a
  */
 #status
 {
-	background-color:		#F9F7ED;
-	padding:				10px 15px;
-	width:					365px;
+	
+	padding:				5px 5px;
+	width:					285px;
 }
 
 #status .progress
@@ -117,7 +118,7 @@ a
 }
 #queue_container li.file .file-info
 {
-	display:				block;
+	display:				none;
 	margin-left:			44px;
 	font-size:				0.9em;
 	line-height:			20px;
@@ -128,7 +129,7 @@ a
 	clear:					right;
 	float:					right;
 	line-height:			18px;
-	margin-right:			6px;
+	margin-right:			20px;
 }
 
 
@@ -196,7 +197,7 @@ a
 #queue_container
 {
     width: 395px;  
-    height: 140px;
+    height: 250px;
     background-color: #fff;
     border: 1px solid #ccc;
     overflow: auto;
@@ -206,41 +207,41 @@ a
 <head>
 <body bgcolor="ffffff">
 <form name="upload_form" id="upload_form" action="<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&dir=%2F&ajxp_sessid=<?php echo session_id(); ?>">
-<table cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-			<a id="browse_button">
-			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/32/view_choose.png" width="32" height="32"><br> <?php print($mess[214]);?>
-			</a>
-		</td>
-		<td>
-			<a id="upload_button">
-			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/32/button_ok.png" width="32" height="32"><br> <?php print($mess[215]);?>
-			</a>
-		</td>
-		<td>
-			<a id="clear_button">
-			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/32/trashcan_empty.png" width="32" height="32"><br> <?php print($mess[216]);?>
-			</a>
-		</td>
-	</tr>
-</table>
-<div id="status">
-		<div>
-			<strong class="overall-title">Overall progress</strong><br />
-			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload2/bar.gif" class="progress overall-progress" />
-		</div>
-		<div>
-			<strong class="current-title">File Progress</strong><br />
-			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload2/bar.gif" class="progress current-progress" />
-		</div>
-		<div class="current-text"></div>
+<div style="border: 1px solid #ccc; border-bottom: 0px; width: 250px; padding: 5px 0px; background-color: #fff;">
+	&nbsp;<a id="browse_button">
+	<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/22/view_choose.png" width="22" align="absmiddle" height="22" title="<?php print($mess[214]);?>"> <?php print($mess[214]);?>
+	</a>
+	<a id="clear_button">
+	<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/22/trashcan_empty.png" width="22" height="22" align="absmiddle" title="<?php print($mess[216]);?>"> <?php print($mess[216]);?>
+	</a>
 </div>
 <div id="queue_container">
 <ul id="fancy_queue" class="photoupload-queue">
 <li style="display: none" />
 </ul>
 </div>
+<table cellpadding="0" cellspacing="0" style="">
+	<tr>
+		<td>
+			<a id="upload_button" style="display: block; width: 100px;">
+			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/32/button_ok.png" width="32" height="32"><br> <?php print($mess[215]);?>
+			</a>
+		</td>
+		<td>
+			<div id="status">
+					<div>
+						<strong class="overall-title">Overall progress</strong><br />
+						<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload2/bar.gif" class="progress overall-progress" />
+					</div>
+					<div>
+						<strong class="current-title">File Progress</strong><br />
+						<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/fancyupload2/bar.gif" class="progress current-progress" />
+					</div>
+					<div class="current-text" style="display:none;"></div>
+			</div>
+		</td>
+	</tr>
+</table>
 </form>
 <script language="javascript" type="text/javascript">
 var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&ajxp_sessid=<?php echo session_id(); ?>';
@@ -253,7 +254,7 @@ window.addEvent('load', function() {
 		'url': url,
 		'path': 'client/flash/Swiff.Uploader_2.swf',
 		'limitSize' :  <?php echo Utils::convertBytes(ini_get('upload_max_filesize'));?>,
-		'limitFile': 30,
+		'limitFiles': 30,
 		'onLoad': function() {
 		}
 	});
