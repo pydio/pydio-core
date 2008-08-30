@@ -191,43 +191,48 @@ Ajaxplorer = Class.create({
 	},
 	
 	refreshRootDirMenu: function(rootDirsList, rootDirId){
-		if($('root_dir_button')) {
-			$('root_dir_button').remove();
-		}
-		if(!rootDirsList || rootDirsList.size() <= 1) return;
+		$('goto_repo_button').addClassName('disabled');
+		//if(!rootDirsList || rootDirsList.size() <= 1) return;
 		var actions = new Array();
-		rootDirsList.each(function(pair){
-			var value = pair.value;
-			var key = pair.key;
-			var selected = (key == parseInt(rootDirId) ? true:false);
-			actions[actions.length] = {
-				name:value,
-				alt:value,				
-				image:ajxpResourcesFolder+'/images/foldericon.png',				
-				className:"edit",
-				disabled:selected,
-				callback:function(e){
-					ajaxplorer.triggerRootDirChange(''+key);
+		if(rootDirsList && rootDirsList.size() > 1){
+			rootDirsList.each(function(pair){
+				var value = pair.value;
+				var key = pair.key;
+				var selected = (key == parseInt(rootDirId) ? true:false);
+				actions[actions.length] = {
+					name:value,
+					alt:value,				
+					image:ajxpResourcesFolder+'/images/foldericon.png',				
+					className:"edit",
+					disabled:selected,
+					callback:function(e){
+						ajaxplorer.triggerRootDirChange(''+key);
+					}
 				}
-			}
-		}.bind(this));		
-		
-		this.rootMenu = new Proto.Menu({			
-			className: 'menu rootDirChooser',
-			mouseClick:'left',
-			//anchor:'root_dir_button',
-			anchor:'goto_repo_button',
-			createAnchor:false,
-			anchorContainer:$('dir_chooser'),
-			anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
-			anchorTitle:MessageHash[200],
-			topOffset:5,
-			leftOffset:-107,
-			menuTitle:MessageHash[200],
-			menuItems: actions,
-			fade:true,
-			zIndex:2000
-		});			
+			}.bind(this));		
+		}
+		if(this.rootMenu){
+			this.rootMenu.options.menuItems = actions;
+			this.rootMenu.refreshList();
+		}else{
+			this.rootMenu = new Proto.Menu({			
+				className: 'menu rootDirChooser',
+				mouseClick:'left',
+				//anchor:'root_dir_button',
+				anchor:'goto_repo_button',
+				createAnchor:false,
+				anchorContainer:$('dir_chooser'),
+				anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
+				anchorTitle:MessageHash[200],
+				topOffset:5,
+				leftOffset:-107,
+				menuTitle:MessageHash[200],
+				menuItems: actions,
+				fade:true,
+				zIndex:2000
+			});		
+		}
+		if(actions.length) $('goto_repo_button').removeClassName('disabled');
 	},
 	
 
