@@ -94,13 +94,13 @@ InfoPanel = Class.create({
 		
 	addActions: function(selectionType){
 		var actions = ajaxplorer.actionBar.getInfoPanelActions();
-		var actionString = '<div style="text-align:right;padding-right:10px;">';
+		var actionString = '<div class="infoPanelActions">';
 		var count = 0;
 		actions.each(function(action){
 			if(selectionType == 'multiple' && action.selectionContext.unique) return; 
 			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;
-			if(count > 0) actionString += ' | ';
-			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;">'+action.options.title+'</a>';
+			//if(count > 0) actionString += ' | ';
+			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/22/'+action.options.src+'" width="22" height="22" align="absmiddle" border="0"> '+action.options.title+'</a>';
 			count++;
 		}.bind(this));
 		actionString += '</div>';
