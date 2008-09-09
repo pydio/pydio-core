@@ -968,7 +968,7 @@ UPLOAD MULTIFILE FORM
    text-decoration:none;
 }
 
-#info_panel .folderImage
+#info_panel div.folderImage
 {
    text-align:center;
    padding-bottom: 10px;
