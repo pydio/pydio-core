@@ -535,7 +535,7 @@ class fsDriver extends AbstractDriver
 			//if($localName == "") $localName = basename($filePathOrData);
 			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
-			if(!$gzip) header("Content-Encoding: gzip");
+			if($gzip) header("Content-Encoding: gzip");
 			header("Content-Length: ".$size);
 			header("Content-Disposition: attachment; filename=\"".$localName."\"");
 			header("Expires: 0");
@@ -548,7 +548,7 @@ class fsDriver extends AbstractDriver
 				header("Cache-Control:");
 				header("Pragma:");
 			}
-			if(!$gzip){
+			if($gzip){
 				if($data){
 					print(gzencode($filePathOrData, 9));
 				}else{
