@@ -1,0 +1,90 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script type="text/javascript">
+		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
+		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
+</script>
+<style>
+img{
+    behavior: url(<?php print(CLIENT_RESOURCES_FOLDER);?>/css/pnghack/pngHack.htc);
+    border: none;
+}
+body
+{
+	padding: 0px;
+	padding-left: 3px;
+	margin: 0px;
+	background-image: url('<?php print(CLIENT_RESOURCES_FOLDER);?>/images/strip.png');
+}
+
+div, a
+{
+    font-family: Trebuchet MS;
+    font-size: 12px;
+}
+a.disabled
+{
+	filter:alpha(opacity=30);
+	opacity: 0.3;
+	-moz-opacity:0.3;	
+	cursor:default;
+}
+a.enabled
+{
+	filter:alpha(opacity=100);
+	opacity: 1;
+	-moz-opacity:1;
+	cursor:pointer;
+}
+a
+{
+    display: inline;
+    
+    text-align: center;
+    cursor: pointer;    
+}
+</style>
+<head>
+<body bgcolor="ffffff">
+<form name="upload_form" id="upload_form" action="<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&dir=%2F&ajxp_sessid=<?php echo session_id(); ?>">
+<div style="border: 1px solid #ccc; border-bottom: 0px; width: 585px; height:385px; padding: 5px 0px; background-color: #fff;">
+<script language="javascript" type="text/javascript">
+function UploadComplete()
+{
+    // Put upload complete handler here
+    if(parent.ajaxplorer){
+    	parent.ajaxplorer.filesList.reload();
+    }
+}
+
+var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&ajxp_sessid=<?php echo session_id(); ?>';
+if(parent.ajaxplorer){
+	url = url+'&dir='+escape(parent.ajaxplorer.filesList.getCurrentRep());
+}
+<?php 
+        $UploadMaxSize = Utils::convertBytes(ini_get('upload_max_filesize'));
+	$FlashVar = '&completeFunction=UploadComplete()&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize=&fileSizeLimit'.$UploadMaxSize.'&uploadPage=';
+?>
+  var FlashVarValue = "<?php echo $FlashVar; ?>";
+
+document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="575" height="365" id="fileUpload" align="middle">\
+<param name="allowScriptAccess" value="sameDomain" /> \
+<param name="movie" value="<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf" /> \
+<param name="quality" value="high" /> \
+<param name="wmode" value="transparent"> \
+<param name="FlashVars" value="' + FlashVarValue + escape(url) + '">\
+<embed src="<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf" \
+FlashVars="' + FlashVarValue + escape(url) + '" \
+quality="high" wmode="transparent" width="575" height="365" name="fileUpload" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"\
+pluginspage="http://www.macromedia.com/go/getflashplayer" />\
+</object>');
+
+
+
+</script>
+
+</div>
+</form>
+</body>
+</html>
