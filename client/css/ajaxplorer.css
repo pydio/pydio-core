@@ -256,6 +256,13 @@ textarea#myCode
     height: 385px;
 }
 
+#flashframe
+{
+    border:0px;
+    width: 600px;
+    height: 450px;
+}
+
 /********************/
 /* MESSAGE BOX      */
 /********************/
