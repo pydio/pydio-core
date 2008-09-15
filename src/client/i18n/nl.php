@@ -3,7 +3,7 @@
 //							
 //	WebJeff - FileManager v1.6
 //	
-//	Jean-François GAZET
+//	Jean-FranÃ§ois GAZET
 //	http://www.webjeff.org
 //	webmaster@webjeff.org	
 //
@@ -238,49 +238,4 @@ $mess=array(
 /* END SENTENCE */
 "207" => "You have no write permission on this folder",
 "208" => "You have no read permission on this folder", 
-"209" => "Internal server error, please contact Administrator!",
-"210" => "Upload failed", 
-"211" => "The file is too big!", 
-"212" => "No file found on server!", 
-"213" => "Error while copying file to current folder", 
-"214" => "Browse files", 
-"215" => "Start Upload", 
-"216" => "Clear Queue", 
-"217" => "Clear Completed", 
-"218" => "Remove from queue", 
-"219" => "Completed",
-"220" => "Empty", 
-"221" => "Empty Recycle Bin", 
-"222" => "Restore", 
-"223" => "Restore file to its original location", 
-"224" => "Go to", 
-"225" => "Rename bookmark", 
-"226" => "Lijst",
-"227" => "Detail Lijst",
-"228" => "Thumbs",
-"229" => "Thumbnails",
-"230" => "Play",
-"231" => "Play Slideshow", 
-"232" => "Stop", 
-"233" => "Stop Slideshow", 
-"234" => "View selected images",
-"235" => "Fullscreen",
-"236" => "Restore",
-"237" => "Old password", 
-"238" => "Passwords differ!",
-"239" => "Please fill you current password",
-"240" => "Wrong password!",
-"241" => "Your preferences has been saved successfully",
-"242" => "Svn Log",
-"svn_log_access_key" => "L",
-"243" => "Revision",
-"244" => "Author", 
-"245" => "Date",
-"246" => "Message",
-"247" => "Extract",
-"248" => "Extract selection from zip to...",
-"249" => "Users Management",
-"250" => "Repositories Management",
-"251" => "Logs"
-);
-?>
+"209" => "Internal serv

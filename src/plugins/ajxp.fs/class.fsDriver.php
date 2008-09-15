@@ -19,8 +19,8 @@ class fsDriver extends AbstractDriver
 		}
 		$selection = new UserSelection();
 		$selection->initFromHttpVars($httpVars);
-		if(isSet($dir) && $action != "upload") $dir = utf8_decode($dir);
-		if(isSet($dest)) $dest = utf8_decode($dest);
+		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
+		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 		$mess = ConfService::getMessages();
 		// FILTER ACTION FOR DELETE
 		if(ConfService::useRecycleBin() && $action == "delete" && $dir != "/".ConfService::getRecycleBinDir())
@@ -80,7 +80,7 @@ class fsDriver extends AbstractDriver
 			break;
 		
 			case "image_proxy":
-				if($split = UserSelection::detectZip(utf8_decode($file))){
+				if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($file))){
 					require_once("server/classes/pclzip.lib.php");
 					$zip = new PclZip($this->repository->getPath().$split[0]);
 					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);
@@ -89,13 +89,13 @@ class fsDriver extends AbstractDriver
 					header('Cache-Control: public');
 					print($data[0]["content"]);
 				}else{
-					$this->readFile($this->repository->getPath()."/".utf8_decode($file), "image");
+					$this->readFile($this->repository->getPath()."/".SystemTextEncoding::fromUTF8($file), "image");
 				}
 				exit(0);
 			break;
 			
 			case "mp3_proxy":
-				if($split = UserSelection::detectZip($file)){
+				if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($file))){
 					require_once("server/classes/pclzip.lib.php");
 					$zip = new PclZip($this->repository->getPath().$split[0]);
 					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);					
@@ -103,7 +103,7 @@ class fsDriver extends AbstractDriver
 					header("Content-Length: ".strlen($data[0]["content"]));
 					print($data[0]["content"]);
 				}else{
-					$this->readFile($this->repository->getPath()."/".$file, "mp3");
+					$this->readFile($this->repository->getPath()."/".SystemTextEncoding::fromUTF8($file), "mp3");
 				}
 				exit(0);
 			break;
@@ -112,20 +112,19 @@ class fsDriver extends AbstractDriver
 			//	ONLINE EDIT
 			//------------------------------------
 			case "edit";	
-				$file = utf8_decode($file);
 				if(isset($save) && $save==1)
 				{
 					AJXP_Logger::logAction("Online Edition", array("file"=>$file));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
-					$fp=fopen($this->repository->getPath()."/$file","w");
+					$fp=fopen($this->repository->getPath().parent.fromUTF8("/$file"),"w");
 					fputs ($fp,$code);
 					fclose($fp);
-					echo utf8_encode($mess[115]);
+					echo $mess[115];
 				}
 				else 
 				{
-					$this->readFile($this->repository->getPath()."/".$file, "plain");
+					$this->readFile($this->repository->getPath()."/".SystemTextEncoding::fromUTF8($file), "plain");
 				}
 				exit(0);
 			break;
@@ -191,8 +190,8 @@ class fsDriver extends AbstractDriver
 			//------------------------------------
 			case "rename";
 			
-				$file = utf8_decode($file);
-				$filename_new = utf8_decode($filename_new);
+				$file = SystemTextEncoding::fromUTF8($file);
+				$filename_new = SystemTextEncoding::fromUTF8($filename_new);
 				$error = $this->rename($file, $filename_new);
 				if($error != null) {
 					$errorMessage  = $error;
@@ -211,7 +210,7 @@ class fsDriver extends AbstractDriver
 			case "mkdir";
 			
 				$messtmp="";
-				$dirname=Utils::processFileName(utf8_decode($dirname));
+				$dirname=Utils::processFileName(SystemTextEncoding::fromUTF8($dirname));
 				$error = $this->mkDir($dir, $dirname);
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -231,7 +230,7 @@ class fsDriver extends AbstractDriver
 			case "mkfile";
 			
 				$messtmp="";
-				$filename=Utils::processFileName(utf8_decode($filename));	
+				$filename=Utils::processFileName(SystemTextEncoding::fromUTF8($filename));	
 				$error = $this->createEmptyFile($dir, $filename);
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -248,10 +247,10 @@ class fsDriver extends AbstractDriver
 			//	UPLOAD
 			//------------------------------------	
 			case "upload":
-		
+
 				if($dir!=""){$rep_source="/$dir";}
 				else $rep_source = "";
-				$destination=$this->repository->getPath().$rep_source;
+				$destination=SystemTextEncoding::fromUTF8($this->repository->getPath().$rep_source);
 				if(!$this->isWriteable($destination))
 				{
 					$errorMessage = "$mess[38] $dir $mess[99].";
@@ -270,7 +269,7 @@ class fsDriver extends AbstractDriver
 						break;
 					}
 					$userfile_name = $boxData["name"];
-					if($fancyLoader) $userfile_name = utf8_decode($userfile_name);
+					if($fancyLoader) $userfile_name = SystemTextEncoding::fromUTF8($userfile_name);
 					$userfile_name=Utils::processFileName($userfile_name);
 					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
 					{
@@ -326,8 +325,8 @@ class fsDriver extends AbstractDriver
 						$atts = array();
 						if(!$fileListMode && !$zipEntry["folder"]) continue;
 						$atts[] = "is_file=\"".($zipEntry["folder"]?"false":"true")."\"";
-						$atts[] = "text=\"".basename($zipEntry["stored_filename"])."\"";
-						$atts[] = "filename=\"".$zipEntry["filename"]."\"";
+						$atts[] = "text=\"".basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"]))."\"";
+						$atts[] = "filename=\"".SystemTextEncoding::toUTF8($zipEntry["filename"])."\"";
 						if($fileListMode){
 							$atts[] = "filesize=\"".Utils::roundSize($zipEntry["size"])."\"";
 							$atts[] = "modiftime=\"".date("d/m/Y H:i",$zipEntry["mtime"])."\"";
@@ -348,9 +347,9 @@ class fsDriver extends AbstractDriver
 						}else{							
 							$atts[] = "icon=\"client/images/foldericon.png\"";
 							$atts[] = "openicon=\"client/images/foldericon.png\"";
-							$atts[] = "src=\"content.php?dir=".urlencode($zipEntry["filename"])."\"";
+							$atts[] = "src=\"content.php?dir=".urlencode(SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
 						}						
-						print(utf8_encode("<tree ".join(" ", $atts)."/>"));
+						print("<tree ".join(" ", $atts)."/>");
 						if(is_dir($tmpDir)){
 							rmdir($tmpDir);
 						}
@@ -365,7 +364,7 @@ class fsDriver extends AbstractDriver
 				AJXP_XMLWriter::header();
 				foreach ($reps as $repIndex => $repName)
 				{
-					$link = SERVER_ACCESS."?dir=".$dir."/".$repName;
+					$link = SERVER_ACCESS."?dir=".$safeDir."/".$repName;
 					$link = str_replace("/", "%2F", $link);
 					$link = str_replace("&", "&amp;", $link);
 					$attributes = "";
@@ -389,7 +388,7 @@ class fsDriver extends AbstractDriver
 						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
 						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
-						$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", $repIndex)."\"";
+						$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($repIndex))."\"";
 						$atts[] = "icon=\"".(is_file($currentFile)?$repName:"folder.png")."\"";
 						
 						$attributes = join(" ", $atts);
@@ -406,17 +405,17 @@ class fsDriver extends AbstractDriver
 							if(eregi("\.zip$",$repName)){
 								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
 							}
-							$attributes = "icon=\"$icon\"  openicon=\"$openicon\" filename=\"$folderFullName\" src=\"$link\"";
+							$attributes = "icon=\"$icon\"  openicon=\"$openicon\" filename=\"".SystemTextEncoding::toUTF8($folderFullName)."\" src=\"$link\"";
 						}
 					}
-					print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $repName)."\" $attributes>"));
+					print("<tree text=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($repName))."\" $attributes>");
 					print("</tree>");
 				}
 				if($nom_rep == $this->repository->getPath() && ConfService::useRecycleBin() && !$completeMode)
 				{
 					if($fileListMode)
 					{
-						print(utf8_encode("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getPath()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>"));
+						print("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getPath()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>");
 					}
 					else 
 					{
@@ -669,8 +668,8 @@ class fsDriver extends AbstractDriver
 	
 	function renameAction($actionName, $httpVars)
 	{
-		$filePath = utf8_decode($httpVars["file"]);
-		$newFilename = utf8_decode($httpVars["filename_new"]);
+		$filePath = SystemTextEncoding::fromUTF8($httpVars["file"]);
+		$newFilename = SystemTextEncoding::fromUTF8($httpVars["filename_new"]);
 		return $this->rename($filePath, $newFilename);
 	}
 	
