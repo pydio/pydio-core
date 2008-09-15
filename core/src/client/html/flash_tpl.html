@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script type="text/javascript">
 		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
 		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
@@ -53,20 +53,60 @@ a
 function UploadComplete()
 {
     // Put upload complete handler here
-    if(parent.ajaxplorer){
-    	parent.ajaxplorer.filesList.reload();
-    }
 }
 
 var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&ajxp_sessid=<?php echo session_id(); ?>';
 if(parent.ajaxplorer){
 	url = url+'&dir='+escape(parent.ajaxplorer.filesList.getCurrentRep());
 }
+var names = new Array(
+"maxFileSizeLimitText", 
+"maxFileSizeText", 
+"HTTPErrorText", 
+"IOErrorText", 
+"securityErrorText",
+"uploadedText",
+"removeText",
+"addFilesText",
+"clearFilesText",
+"uploadFilesText",
+"cancelUploadText",
+"totalFilesText",
+"totalSizeText",
+"bytesText");
+
+var texts= new Array(
+"<?php echo $mess[252]; ?>", 
+"<?php echo $mess[211]; ?>", 
+"<?php echo $mess[253]; ?>",
+"<?php echo $mess[254]; ?>",
+"<?php echo $mess[255]; ?>",
+"<?php echo $mess[256]; ?>",
+"<?php echo $mess[257]; ?>",
+"<?php echo $mess[214]; ?>",
+"<?php echo $mess[216]; ?>",
+"<?php echo $mess[77]; ?>",
+"<?php echo $mess[232]; ?>",
+"<?php echo $mess[258]; ?>",
+"<?php echo $mess[259]; ?>",
+"<?php echo $mess[260]; ?>");
+
+function getTranslationsAsParam()
+{
+    var ret = new Array();
+	var i = 0;
+	for (var i = 0; i < names.length; i++)
+	{
+	    ret.push(names[i] + '=' + escape(texts[i]));
+	}
+	return ret.join('&');
+}
+
 <?php 
         $UploadMaxSize = Utils::convertBytes(ini_get('upload_max_filesize'));
-	$FlashVar = '&completeFunction=UploadComplete()&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize=&fileSizeLimit'.$UploadMaxSize.'&uploadPage=';
+	$FlashVar = '&completeFunction=UploadComplete()&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize='.$UploadMaxSize.'&fileSizeLimit'.$UploadMaxSize.'&uploadPage=';
 ?>
-  var FlashVarValue = "<?php echo $FlashVar; ?>";
+var FlashVarValue = getTranslationsAsParam()+"<?php echo $FlashVar; ?>";
 
 document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="575" height="365" id="fileUpload" align="middle">\
 <param name="allowScriptAccess" value="sameDomain" /> \
