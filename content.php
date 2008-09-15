@@ -11,6 +11,7 @@
 
 //require_once("classes/class.BookmarksManager.php");
 require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.AJXP_Exception.php");
 require_once("server/classes/class.AbstractDriver.php");
@@ -97,8 +98,8 @@ $selection->initFromHttpVars();
 if(isSet($action) || isSet($get_action)) $action = (isset($get_action)?$get_action:$action);
 else $action = "";
 
-if(isSet($dir) && $action != "upload") $dir = utf8_decode($dir);
-if(isSet($dest)) $dest = utf8_decode($dest);
+if(isSet($dir) && $action != "upload") $dir = SystemTextEncoding::fromUTF8($dir);
+if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 
 //------------------------------------------------------------
 // SPECIAL HANDLING FOR FANCY UPLOADER RIGHTS FOR THIS ACTION

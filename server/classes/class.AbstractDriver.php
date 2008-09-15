@@ -103,7 +103,7 @@ class AbstractDriver {
 		if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
 			foreach($matches as $match){
 				$messId = str_replace("]", "", str_replace("[", "", $match[1]));
-				$xml = str_replace("AJXP_MESSAGE[$messId]", utf8_encode($messages[$messId]), $xml);
+				$xml = str_replace("AJXP_MESSAGE[$messId]", $messages[$messId], $xml);
 			}
 		}
 		return $xml;		
@@ -165,9 +165,9 @@ class AbstractDriver {
 			$this->actions[$this->crtAction["name"]] = $this->crtAction;
 		}
 	}
-	
+
 	function _cData($parser, $data){}
-		
+	
 }
 
 ?>

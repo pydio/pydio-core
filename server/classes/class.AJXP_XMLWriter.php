@@ -52,7 +52,7 @@ class AJXP_XMLWriter
 	
 	function reloadFileList($fileOrBool, $print = true)
 	{
-		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".utf8_encode($fileOrBool)."\"/>", $print);
+		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".SystemTextEncoding::toUTF8($fileOrBool)."\"/>", $print);
 		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	
@@ -86,7 +86,7 @@ class AJXP_XMLWriter
 			$messageType = "ERROR";
 			$message = $errorMessage;
 		}
-		return AJXP_XMLWriter::write("<message type=\"$messageType\">".utf8_encode($message)."</message>", $print);
+		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}
 	
 	function sendUserData()
@@ -99,7 +99,7 @@ class AJXP_XMLWriter
 			print("<repositories>");
 			foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
 			{
-				if($loggedUser->canRead($rootDirIndex)) print("<repo id=\"".$rootDirIndex."\">".utf8_encode($rootDirObject->getDisplay())."</repo>");
+				if($loggedUser->canRead($rootDirIndex)) print("<repo id=\"".$rootDirIndex."\">".SystemTextEncoding::toUTF8($rootDirObject->getDisplay())."</repo>");
 			}
 			print("</repositories>");
 			print("<preferences>");
