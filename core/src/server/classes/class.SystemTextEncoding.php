@@ -18,11 +18,19 @@ class SystemTextEncoding
         }
 
         function fromUTF8($filesystemElement){
+        	if(function_exists("iconv")){
                return iconv("UTF-8", SystemTextEncoding::getEncoding(), $filesystemElement);
+        	}else{
+        		return utf8_decode($filesystemElement);
+        	}
         }
 
         function toUTF8($filesystemElement){
+        	if(function_exists("iconv")){
                return iconv(SystemTextEncoding::getEncoding(), "UTF-8", $filesystemElement);
+        	}else{
+        		return utf8_encode($filesystemElement);
+        	}
         }
 
 }
