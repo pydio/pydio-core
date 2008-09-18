@@ -117,7 +117,7 @@ class fsDriver extends AbstractDriver
 					AJXP_Logger::logAction("Online Edition", array("file"=>$file));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
-					$fp=fopen($this->repository->getPath().parent.fromUTF8("/$file"),"w");
+					$fp=fopen($this->repository->getPath().SystemTextEncoding::fromUTF8("/$file"),"w");
 					fputs ($fp,$code);
 					fclose($fp);
 					echo $mess[115];
