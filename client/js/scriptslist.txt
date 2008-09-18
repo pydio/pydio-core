@@ -16,7 +16,6 @@ js/lib/prototype/corners.js
 js/lib/webfx/xtree.js
 js/lib/webfx/xloadtree.js
 js/lib/webfx/slider/js/slider.js
-js/lib/codepress/codepress.js
 js/ajaxplorer/class.Connexion.js
 js/ajaxplorer/ajxp_multifile.js
 js/ajaxplorer/ajxp_utils.js
