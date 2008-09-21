@@ -114,7 +114,7 @@ class fsDriver extends AbstractDriver
 			case "edit";	
 				if(isset($save) && $save==1)
 				{
-					AJXP_Logger::logAction("Online Edition", array("file"=>$file));
+					AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
 					$fp=fopen($this->repository->getPath().SystemTextEncoding::fromUTF8("/$file"),"w");
@@ -197,7 +197,7 @@ class fsDriver extends AbstractDriver
 					$errorMessage  = $error;
 					break;
 				}
-				$logMessage="$file $mess[41] $filename_new";
+				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
 				$reload_current_node = true;
 				$reload_file_list = basename($filename_new);
 				AJXP_Logger::logAction("Rename", array("original"=>$file, "new"=>$filename_new));
@@ -208,7 +208,7 @@ class fsDriver extends AbstractDriver
 			//	CREER UN REPERTOIRE / CREATE DIR
 			//------------------------------------
 			case "mkdir";
-			
+			        
 				$messtmp="";
 				$dirname=Utils::processFileName(SystemTextEncoding::fromUTF8($dirname));
 				$error = $this->mkDir($dir, $dirname);
@@ -216,8 +216,8 @@ class fsDriver extends AbstractDriver
 					$errorMessage = $error; break;
 				}
 				$reload_file_list = $dirname;
-				$messtmp.="$mess[38] $dirname $mess[39] ";
-				if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
+				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
+				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
 				$reload_current_node = true;
 				AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
@@ -235,8 +235,8 @@ class fsDriver extends AbstractDriver
 				if(isSet($error)){
 					$errorMessage = $error; break;
 				}
-				$messtmp.="$mess[34] $filename $mess[39] ";
-				if($dir=="") {$messtmp.="/";} else {$messtmp.="$dir";}
+				$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
+				if($dir=="") {$messtmp.="/";} else {$messtmp.=SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
 				$reload_file_list = $filename;
 				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
@@ -253,7 +253,7 @@ class fsDriver extends AbstractDriver
 				$destination=SystemTextEncoding::fromUTF8($this->repository->getPath().$rep_source);
 				if(!$this->isWriteable($destination))
 				{
-					$errorMessage = "$mess[38] $dir $mess[99].";
+					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
 					break;
 				}	
 				$logMessage = "";
@@ -277,7 +277,7 @@ class fsDriver extends AbstractDriver
 						break;
 					}
 					chmod($destination."/".$userfile_name, 0777);
-					$logMessage.="$mess[34] ".$userfile_name." $mess[35] $dir";
+					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
 					AJXP_Logger::logAction("Upload File", array("file"=>$dir."/".$userfile_name));
 				}
 				if($fancyLoader)
@@ -364,9 +364,6 @@ class fsDriver extends AbstractDriver
 				AJXP_XMLWriter::header();
 				foreach ($reps as $repIndex => $repName)
 				{
-					$link = SERVER_ACCESS."?dir=".$safeDir."/".$repName;
-					$link = str_replace("/", "%2F", $link);
-					$link = str_replace("&", "&amp;", $link);
 					$attributes = "";
 					if($searchMode)
 					{
@@ -388,14 +385,16 @@ class fsDriver extends AbstractDriver
 						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
 						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
-						$atts[] = "filename=\"".$dir."/".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($repIndex))."\"";
-						$atts[] = "icon=\"".(is_file($currentFile)?$repName:"folder.png")."\"";
+						$atts[] = "filename=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($dir."/".$repIndex))."\"";
+						$atts[] = "icon=\"".(is_file($currentFile)?SystemTextEncoding::toUTF8($repName):"folder.png")."\"";
 						
 						$attributes = join(" ", $atts);
 						$repName = $repIndex;
 					}
 					else 
 					{
+						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?dir=".$dir."/".$repName);
+						$link = urlencode($link);
 						$folderBaseName = str_replace("&", "&amp;", $repName);
 						$folderFullName = "$dir/".$folderBaseName;
 						$parentFolderName = $dir;
@@ -764,17 +763,17 @@ class fsDriver extends AbstractDriver
 			$fileToDelete=$this->repository->getPath().$selectedFile;
 			if(!file_exists($fileToDelete))
 			{
-				$logMessages[]=$mess[100]." $selectedFile";
+				$logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
 				continue;
 			}		
 			$this->deldir($fileToDelete);
 			if(is_dir($fileToDelete))
 			{
-				$logMessages[]="$mess[38] $selectedFile $mess[44].";
+				$logMessages[]="$mess[38] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
 			}
 			else 
 			{
-				$logMessages[]="$mess[34] $selectedFile $mess[44].";
+				$logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
 			}
 		}
 		return null;
@@ -822,7 +821,7 @@ class fsDriver extends AbstractDriver
 		{
 			// Now delete original
 			$this->deldir($realSrcFile); // both file and dir
-			$messagePart = $mess[74]." $destDir";
+			$messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
 			if($destDir == "/".ConfService::getRecycleBinDir())
 			{
 				RecycleBinManager::fileToRecycle($srcFile);
@@ -830,11 +829,11 @@ class fsDriver extends AbstractDriver
 			}
 			if(isset($dirRes))
 			{
-				$success[] = $mess[117]." ".basename($srcFile)." ".$messagePart." ($dirRes ".$mess[116].") ";
+				$success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
 			}
 			else 
 			{
-				$success[] = $mess[34]." ".basename($srcFile)." ".$messagePart;
+				$success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
 			}
 		}
 		else
@@ -845,11 +844,11 @@ class fsDriver extends AbstractDriver
 			}
 			if(isSet($dirRes))
 			{
-				$success[] = $mess[117]." ".basename($srcFile)." ".$mess[73]." $destDir (".$dirRes." ".$mess[116].")";	
+				$success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir)." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].")";	
 			}
 			else 
 			{
-				$success[] = $mess[34]." ".basename($srcFile)." ".$mess[73]." $destDir";
+				$success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir);
 			}
 		}
 		
