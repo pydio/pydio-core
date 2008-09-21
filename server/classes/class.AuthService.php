@@ -135,6 +135,8 @@ class AuthService
 		$users = AuthService::loadLocalUsersList();
 		if(!$encodedPass){
 			$cPass = AuthService::encodePassword($userPass);
+		}else{
+			$cPass = $userPass;
 		}
 		if(!array_key_exists($userId, $users) || $users[$userId] != $cPass) return false;
 		else return true;
