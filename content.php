@@ -38,6 +38,7 @@ $baspage=ConfService::getConf("BOTTOM_PAGE");
 
 if(AuthService::usersEnabled())
 {
+	$rememberLogin = "";
 	$rememberPass = "";
 	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "logout")
 	{
@@ -48,10 +49,11 @@ if(AuthService::usersEnabled())
 	{
 		$userId = (isSet($_GET["userid"])?$_GET["userid"]:null);
 		$userPass = (isSet($_GET["password"])?$_GET["password"]:null);
-		$rememberMe = (isSet($_GET["rememberme"])?true:false);
+		$rememberMe = ((isSet($_GET["remember_me"]) && $_GET["remember_me"] == "on")?true:false);
 		$cookieLogin = (isSet($_GET["cookie_login"])?true:false); 
 		$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin);
 		if($rememberMe && $loggingResult == 1){
+			$rememberLogin = $userId;
 			$rememberPass = AuthService::encodePassword($userPass);
 		}
 	}
@@ -75,7 +77,7 @@ if(AuthService::usersEnabled())
 	if(isset($loggingResult) || (isSet($_GET["get_action"]) && $_GET["get_action"] == "logged_user"))
 	{
 		AJXP_XMLWriter::header();
-		if(isSet($loggingResult)) AJXP_XMLWriter::loggingResult($loggingResult, $rememberPass);
+		if(isSet($loggingResult)) AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass);
 		AJXP_XMLWriter::sendUserData();
 		AJXP_XMLWriter::close();
 		exit(1);
