@@ -395,6 +395,11 @@ ActionsManager = Class.create({
 				if(result == '1')
 				{
 					hideLightBox(true);
+					if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
+						var login = childs[i].getAttribute('remember_login');
+						var pass = childs[i].getAttribute('remember_pass');
+						storeRememberData(login, pass);
+					}
 					ajaxplorer.getLoggedUserFromServer();
 				}
 				else if(result == '0' || result == '-1')
@@ -403,7 +408,7 @@ ActionsManager = Class.create({
 					alert('User does not exists, please try again');
 				}
 				else if(result == '2')
-				{
+				{					
 					ajaxplorer.getLoggedUserFromServer();
 				}
 			}else if(childs[i].tagName == "trigger_bg_action"){

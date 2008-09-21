@@ -33,6 +33,25 @@ function editWithCodePress(fileName)
 	else return "";	
 }
 
+function storeRememberData(user, pass){
+	var cookieJar = new CookieJar({
+		expire: 3600*24*10, 
+		path: '',
+		secure: true
+	});
+	cookieJar.put('ajxp_remember', {user:user, pass:pass});
+}
+
+function retrieveRememberData(){
+	var cookieJar = new CookieJar({});
+	return cookieJar.get('ajxp_remember');
+}
+
+function clearRememberData(){
+	var cookieJar = new CookieJar({});
+	cookieJar.remove('ajxp_remember');
+}
+
 function refreshPNGImages(element){
 	if(element.getAttribute('is_image') && element.getAttribute('is_image')=='1'){
 		return element;

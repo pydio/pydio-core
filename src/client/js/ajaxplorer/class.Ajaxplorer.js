@@ -83,6 +83,8 @@ Ajaxplorer = Class.create({
 			if(this._initLoggedUser)
 			{
 				this.getLoggedUserFromServer();
+			}else{
+				this.tryLogUserFromCookie();
 			}
 		}
 		
@@ -132,9 +134,27 @@ Ajaxplorer = Class.create({
 		}
 		this.goTo(loadRep);	
 	},
+
+	
+	tryLogUserFromCookie : function(){
+		var connexion = new Connexion();
+		var rememberData = retrieveRememberData();
+		if(rememberData!=null){
+			connexion.addParameter('get_action', 'login');
+			connexion.addParameter('userid', rememberData.user);
+			connexion.addParameter('password', rememberData.pass);
+			connexion.addParameter('cookie_login', 'true');
+			connexion.onComplete = function(transport){this.actionBar.parseXmlMessage(transport.responseXML);}.bind(this);
+		}else{
+			connexion.addParameter('get_action', 'logged_user');
+			connexion.onComplete = function(transport){this.logXmlUser(transport.responseXML);}.bind(this);
+		}
+		connexion.sendAsync();	
+	},
 	
 	getLoggedUserFromServer: function(){
 		var connexion = new Connexion();
+		var rememberData = retrieveRememberData();
 		connexion.addParameter('get_action', 'logged_user');
 		connexion.onComplete = function(transport){this.logXmlUser(transport.responseXML);}.bind(this);
 		connexion.sendAsync();	
@@ -148,10 +168,11 @@ Ajaxplorer = Class.create({
 				if(childs[i].tagName == "user"){
 					var userId = childs[i].getAttribute('id');
 					childs = childs[i].childNodes;
-					break;
-				}		
+				}
 			}	
-			if(userId) this.user = new User(userId, childs);
+			if(userId){ 
+				this.user = new User(userId, childs);
+			}
 		}catch(e){alert('Error parsing XML for user : '+e);}
 		
 		var repLabel = 'No Repository';

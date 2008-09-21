@@ -182,6 +182,7 @@
 			<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
+					clearRememberData();
 					var connexion = new Connexion();
 					connexion.addParameter('get_action', 'logout');
 					connexion.onComplete = function(transport){
