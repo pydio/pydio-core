@@ -292,7 +292,7 @@ $mess=array(
 "257" => "Eliminar",
 "258" => "Número de archivos :",
 "259" => "Tamaño combinado :",
-"260" => "bytes"
-
+"260" => "bytes",
+"261" => "Remember Me"
 );
 ?>
