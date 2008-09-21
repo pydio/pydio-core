@@ -281,7 +281,7 @@ $mess=array(
 "257" => "Retirer",
 "258" => "Nombre de fichiers :",
 "259" => "Taille cumulée :",
-"260" => "octets"
-
+"260" => "octets",
+"261" => "Remember Me"
 );
 ?>

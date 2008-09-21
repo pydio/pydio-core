@@ -290,6 +290,7 @@ $mess=array(
 "257" => "Remove",
 "258" => "File count :",
 "259" => "Total size :",
-"260" => "bytes"
+"260" => "bytes",
+"261" => "Remember Me"
 );
 ?>
