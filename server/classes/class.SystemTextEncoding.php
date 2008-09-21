@@ -2,6 +2,12 @@
 
 class SystemTextEncoding
 {
+		function changeCharset($inputCharset, $outputCharset, $text){
+			// Due to iconv bug when dealing with text with non ASCII encoding for last char, we use this workaround http://fr.php.net/manual/fr/function.iconv.php#81494
+			return iconv($inputCharset, $outputCharset, $text);
+			$content = @htmlentities($text, ENT_QUOTES, $inputCharset);  
+			return @html_entity_decode($content, ENT_QUOTES , $outputCharset);
+		}
         function getEncoding(){
                // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
                $currentLocale = setlocale(LC_CTYPE, 0);
@@ -18,19 +24,11 @@ class SystemTextEncoding
         }
 
         function fromUTF8($filesystemElement){
-        	if(function_exists("iconv")){
-               return iconv("UTF-8", SystemTextEncoding::getEncoding(), $filesystemElement);
-        	}else{
-        		return utf8_decode($filesystemElement);
-        	}
+               return SystemTextEncoding::changeCharset("UTF-8", SystemTextEncoding::getEncoding(), $filesystemElement);
         }
 
         function toUTF8($filesystemElement){
-        	if(function_exists("iconv")){
-               return iconv(SystemTextEncoding::getEncoding(), "UTF-8", $filesystemElement);
-        	}else{
-        		return utf8_encode($filesystemElement);
-        	}
+               return SystemTextEncoding::changeCharset(SystemTextEncoding::getEncoding(), "UTF-8", $filesystemElement);
         }
 
 }
