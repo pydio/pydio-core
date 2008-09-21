@@ -110,9 +110,13 @@ class AJXP_XMLWriter
 		}		
 	}
 	
-	function loggingResult($result)
+	function loggingResult($result, $rememberPass = "")
 	{
-		print("<logging_result value=\"$result\"/>");
+		print("<logging_result value=\"$result\">");
+		if($rememberPass != ""){
+			print("<remember_pass value=\"$rememberPass\"/>");
+		}
+		print ("</logging_result>");
 	}
 	
 }
