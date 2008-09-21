@@ -290,7 +290,7 @@ $mess=array(
 "257" => "Entfernen",
 "258" => "Anzahl der Dateien :",
 "259" => "Größe kumulierte :",
-"260" => "bytes"
-
+"260" => "bytes",
+"261" => "Remember Me"
 );
 ?>

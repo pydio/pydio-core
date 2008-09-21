@@ -281,6 +281,16 @@ $mess=array(
 "248" => "Extract selection from zip to...",
 "249" => "Users Management",
 "250" => "Repositories Management",
-"251" => "Logs"
+"251" => "Logs",
+"252" => "The total file size limit has been reached.",
+"253" => "There has been an HTTP Error:",
+"254" => "There has been an IO Error:",
+"255" => "These has been a Security Error:",
+"256" => "Uploaded",
+"257" => "Remove",
+"258" => "File count :",
+"259" => "Total size :",
+"260" => "bytes",
+"261" => "Remember Me"
 );
 ?>
