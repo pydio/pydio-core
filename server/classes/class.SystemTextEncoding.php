@@ -4,9 +4,12 @@ class SystemTextEncoding
 {
 		function changeCharset($inputCharset, $outputCharset, $text){
 			// Due to iconv bug when dealing with text with non ASCII encoding for last char, we use this workaround http://fr.php.net/manual/fr/function.iconv.php#81494
-			return iconv($inputCharset, $outputCharset, $text);
-			$content = @htmlentities($text, ENT_QUOTES, $inputCharset);  
-			return @html_entity_decode($content, ENT_QUOTES , $outputCharset);
+			if(function_exists("iconv")){
+				return iconv($inputCharset, $outputCharset, $text);
+			}else{
+				$content = @htmlentities($text, ENT_QUOTES, $inputCharset);  
+				return @html_entity_decode($content, ENT_QUOTES , $outputCharset);
+			}
 		}
         function getEncoding(){
                // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
