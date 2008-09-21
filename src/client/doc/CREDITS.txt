@@ -3,8 +3,7 @@ Please read /doc/INSTALL.txt to find help with configuration.
 
 [MAIN DEVELOPER]
 AjaXplorer is developed and maintained by Charles du Jeu, from Paris France.
-Project Page : http://ajaxplorer.sourceforge.net/
-Developer's Blog : http://blogs.mostar-style.net/charles 
+Project Page : http://www.ajaxplorer.info/
 Developer's Band : http://www.almasound.com/ (reggae-salsa-dub)
 
 [EXTERNAL LIBRARIES]
