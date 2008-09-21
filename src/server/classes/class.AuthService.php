@@ -47,7 +47,7 @@ class AuthService
 		}
 	}
 	
-	function logUser($user_id, $pwd, $bypass_pwd = false)
+	function logUser($user_id, $pwd, $bypass_pwd = false, $encodedPwd = false)
 	{
 		if($user_id == null)
 		{
@@ -68,7 +68,7 @@ class AuthService
 		// CHECK USER PASSWORD HERE!
 		if(!AuthService::userExists($user_id)) return 0;
 		if(!$bypass_pwd){
-			if(!AuthService::checkPassword($user_id, $pwd)) return -1;
+			if(!AuthService::checkPassword($user_id, $pwd, $encodedPwd)) return -1;
 		}
 		$user = new AJXP_User($user_id);
 		if($user_id == "admin")
@@ -125,11 +125,18 @@ class AuthService
 		//return(is_dir(USERS_DIR."/".$userId));
 	}
 	
-	function checkPassword($userId, $userPass)
+	function encodePassword($pass){
+		return crypt($pass, "ajxp");
+	}
+	
+	function checkPassword($userId, $userPass, $encodedPass = false)
 	{
 		if($userId == "guest") return true;		
 		$users = AuthService::loadLocalUsersList();
-		if(!array_key_exists($userId, $users) || $users[$userId] != crypt($userPass, "ajxp")) return false;
+		if(!$encodedPass){
+			$cPass = AuthService::encodePassword($userPass);
+		}
+		if(!array_key_exists($userId, $users) || $users[$userId] != $cPass) return false;
 		else return true;
 	}
 	
@@ -137,7 +144,7 @@ class AuthService
 	{
 		$users = AuthService::loadLocalUsersList();
 		if(!is_array($users) || !array_key_exists($userId, $users)) return "Error!";
-		$users[$userId] = crypt($userPass, "ajxp");
+		$users[$userId] = AuthService::encodePassword($userPass);
 		AuthService::saveLocalUsersList($users);
 		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
 		return true;
@@ -148,7 +155,7 @@ class AuthService
 		$users = AuthService::loadLocalUsersList();
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($userId, $users)) return "exists";
-		$users[$userId] = crypt($userPass, "ajxp");
+		$users[$userId] = AuthService::encodePassword($userPass);
 		AuthService::saveLocalUsersList($users);
 		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;
