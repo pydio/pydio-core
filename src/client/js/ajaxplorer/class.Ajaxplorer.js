@@ -448,7 +448,11 @@ Ajaxplorer = Class.create({
 		new Effect.Corner('location_form', "round 8px");
 		new Effect.Corner('browser_round', "round 8px");
 		*/
-		fitHeightToBottom($("browser"), window, 15);
+		var marginBottom = 15;
+		if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
+			marginBottom = $('optional_bottom_div').getHeight();
+		}
+		fitHeightToBottom($("browser"), window, marginBottom);
 		fitHeightToBottom($("verticalSplitter"), $('browser'), 8);		
 		var s1 = new Splitter('sidebarSplitter',{
 				direction: "horizontal",
