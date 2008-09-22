@@ -5,6 +5,10 @@ FoldersTree = Class.create({
 		this._htmlElement = $(oElement);
 		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, "javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 'explorer');
 		this._htmlElement.innerHTML = this.tree.toString();	
+		$(this.tree.id).observe("click", function(e){
+			this.clickNode(this.tree.id);
+			Event.stop(e);
+		}.bind(this));
 		AjxpDroppables.add(this.tree.id);
 		if(!this.tree.open && !this.tree.loading) this.tree.toggle();		
 		this._htmlElement.observe("click", function(){

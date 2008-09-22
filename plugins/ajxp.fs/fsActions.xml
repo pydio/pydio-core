@@ -461,7 +461,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						if(!this.treeCopy){
 							this.treeCopy = new WebFXLoadTree('/', 
 																ajxpServerAccessPath+'?get_action=ls', 
-																"javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 
+																"javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 
 																'explorer');
 						}
 						else{
@@ -471,6 +471,10 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						this.treeCopyActionDest = $A([eDestLabel]);
 						this.treeCopyActionDestNode = $A([eDestNodeHidden]);
 						container.innerHTML = this.treeCopy.toString();
+						$(this.treeCopy.id).observe("click", function(e){
+							ajaxplorer.foldersTree.clickNode(this.treeCopy.id);
+							Event.stop(e);
+						}.bind(this));
 						this.treeCopy.focus();
 					}.bind(ajaxplorer.actionBar);
 					var onCancel = function(){				
@@ -539,7 +543,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						if(!this.treeCopy){
 							this.treeCopy = new WebFXLoadTree('/', 
 																ajxpServerAccessPath+'?action=xml_listing', 
-																"javascript:ajaxplorer.clickDir(\'/\',\'/\',CURRENT_ID)", 
+																"javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 
 																'explorer');
 						}
 						else{
@@ -549,6 +553,10 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						this.treeCopyActionDest = $A([eDestLabel]);
 						this.treeCopyActionDestNode = $A([eDestNodeHidden]);
 						container.innerHTML = this.treeCopy.toString();
+						$(this.treeCopy.id).observe("click", function(e){
+							ajaxplorer.foldersTree.clickNode(this.treeCopy.id);
+							Event.stop(e);
+						}.bind(this));						
 						this.treeCopy.focus();
 					}.bind(ajaxplorer.actionBar);
 					var onCancel = function(){				
