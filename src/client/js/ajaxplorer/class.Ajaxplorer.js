@@ -201,6 +201,9 @@ Ajaxplorer = Class.create({
 			this.goTo(this._initLoadRep);
 			this._initLoadRep = null;
 		}
+		if(this.sEngine){
+			this.sEngine.clear();
+		}
 		$('repo_path').value = repositoryLabel;
 	},
 
