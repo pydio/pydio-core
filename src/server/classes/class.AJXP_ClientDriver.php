@@ -51,11 +51,13 @@ class AJXP_ClientDriver extends AbstractDriver
 				header("Content-type:text/html");				
 				if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
 				{
-				//	if(!isSet($encode) || $encode != "false")
-				//	{
-				//		$mess = array_map("utf8_encode", $mess);
-				//	}
+					if($template_name == "gui_tpl.html"){
+						include(CLIENT_RESOURCES_FOLDER."/html/usertemplate_top.html");
+					}
 					include(CLIENT_RESOURCES_FOLDER."/html/".$template_name);
+					if($template_name == "gui_tpl.html"){
+						include(CLIENT_RESOURCES_FOLDER."/html/usertemplate_bottom.html");
+					}
 				}
 				exit(0);	
 				
@@ -68,16 +70,6 @@ class AJXP_ClientDriver extends AbstractDriver
 			
 				header("Content-type:text/javascript");				
 				HTMLWriter::writeI18nMessagesClass(ConfService::getMessages());
-				/*
-				if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
-				{
-					if(!isSet($encode) || $encode != "false")
-					{
-						$mess = array_map("utf8_encode", $mess);
-					}
-					include(CLIENT_RESOURCES_FOLDER."/html/".$template_name);
-				}
-				*/
 				exit(0);	
 				
 			break;
