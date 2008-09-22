@@ -201,6 +201,7 @@ Diaporama = Class.create({
 		});
 		fitHeightToBottom(this.imgContainer, this.fullBox);
 		this.fullscreenMode = true;
+		this.resizeImage();
 	},
 	
 	exitFullScreen: function(){
@@ -211,6 +212,7 @@ Diaporama = Class.create({
 		this.fullBox.fire("fullscreen:exit");
 		this.imgContainer.setStyle({height:this.origContainerHeight});
 		this.fullscreenMode = false;
+		this.resizeImage();
 	},
 	
 	fullScreenListener : function(){
