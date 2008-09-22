@@ -171,7 +171,7 @@ class Utils
 		
 	function getAjxpMimes($keyword){
 		if($keyword == "editable"){
-			return "txt,sql,php,php3,phtml,htm,html,cgi,pl,js,css,inc,xml,xsl";
+			return "txt,sql,php,php3,phtml,htm,html,cgi,pl,js,css,inc,xml,xsl,java";
 		}else if($keyword == "image"){
 			return "png,bmp,jpg,jpeg,gif";
 		}else if($keyword == "audio"){
