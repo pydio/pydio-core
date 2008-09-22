@@ -110,6 +110,11 @@ SearchEngine = Class.create({
 		}
 	},
 	
+	clear: function(){
+		this.clearResults();
+		this._inputBox.value = "";
+	},
+	
 	clearResults : function(){
 		// Clear the results	
 		while(this._resultsBox.childNodes.length)

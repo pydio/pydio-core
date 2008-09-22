@@ -252,12 +252,14 @@ FilesList = Class.create(SelectableElements, {
 			if(cs[i].tagName == "error")
 			{
 				alert(cs[i].firstChild.nodeValue);
+				this.fireChange();
 				return;
 			}
 			else if(cs[i].tagName == "require_auth")
 			{
 				if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 				ajaxplorer.actionBar.fireAction('login');
+				this.fireChange();
 			}
 		}
 		var items = this.getItems();
