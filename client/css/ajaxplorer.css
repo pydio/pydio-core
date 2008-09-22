@@ -338,6 +338,14 @@ textarea#myCode
 /*
 ACTION BAR
 */
+.centeredWidth{
+	position: relative;
+    width: 94%;   
+    left:3%;
+    min-width: 900px;
+    width:expression(document.body.clientWidth < 980? "900px" : "94%" ); 
+}
+
 #toolbars
 {
     /*background-color: #e0ecff;*/
