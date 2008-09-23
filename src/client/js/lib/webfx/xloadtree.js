@@ -151,7 +151,7 @@ function _startLoadXmlTree(sSrc, jsNode) {
 	if (jsNode.loading || jsNode.loaded)
 		return;
 	jsNode.loading = true;	
-	var connexion = new Connexion(encodeURI(unescape(sSrc)));
+	var connexion = new Connexion(encodeURI(decodeURIComponent(sSrc)));
 	connexion.onComplete = function(transport){		
 		_xmlFileLoaded(transport.responseXML, jsNode);
 	};
