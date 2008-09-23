@@ -1,4 +1,3 @@
-css/pnghack/pngHack.css
 css/sortabletable.css
 js/lib/webfx/xtree.css
 css/ajaxplorer.css
