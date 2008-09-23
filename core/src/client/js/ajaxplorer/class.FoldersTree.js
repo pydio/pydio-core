@@ -67,19 +67,13 @@ FoldersTree = Class.create({
 		}
 	},
 		
-	setCurrentNodeName: function(newId){
+	setCurrentNodeName: function(newId, skipSelect){
 		this.currentNodeName = newId;
-		//alert(newId);
-		//alert(webFXTreeHandler.all[currentNodeName].text);
-		for(var i=0; i<webFXTreeHandler.all.length;i++)
-		{
-			webFXTreeHandler.all[i].deSelect();
-		}
-		webFXTreeHandler.all[this.currentNodeName].select();
+		if(!skipSelect) this.selectCurrentNodeName();
 		if(this.goToNextWhenLoaded != null)
 		{
 			this.goToNextWhenLoaded = null;
-		}	
+		}
 	},
 	
 	selectCurrentNodeName: function(){
@@ -98,15 +92,14 @@ FoldersTree = Class.create({
 		this.treeInDestMode = false;
 	},
 	
-	openCurrentAndGoToNext: function(url){
-		//alert(this.currentNodeName);
+	openCurrentAndGoToNext: function(url){		
 		if(this.currentNodeName == null) return;
 		webFXTreeHandler.all[this.currentNodeName].expand();
 		this.goToNextWhenLoaded = url;
 		firstTry = this.getTreeChildNodeByName(url);	
 		if(firstTry)
 		{
-			this.setCurrentNodeName(firstTry);
+			this.setCurrentNodeName(firstTry, true);
 			this.goToNextWhenLoaded = null;
 			if(this.currentDeepPath != null && this.currentDeepIndex != null)
 			{
@@ -120,7 +113,12 @@ FoldersTree = Class.create({
 				{
 					this.currentDeepPath = null;
 					this.currentDeepIndex = null;
+					this.selectCurrentNodeName();
 				}
+			}
+			else
+			{
+				this.selectCurrentNodeName();
 			}
 			
 		}
@@ -130,7 +128,7 @@ FoldersTree = Class.create({
 		if(this.goToNextWhenLoaded != null)
 		{		
 			secondTry = this.getTreeChildNodeByName(this.goToNextWhenLoaded);
-			if(secondTry) this.setCurrentNodeName(secondTry);
+			if(secondTry) this.setCurrentNodeName(secondTry, true);
 			//
 			if(this.currentDeepPath != null && this.currentDeepIndex != null)
 			{
@@ -144,11 +142,13 @@ FoldersTree = Class.create({
 					this.currentDeepPath = null;
 					this.currentDeepIndex = null;
 					//goToNextWhenLoaded = null;
+					this.selectCurrentNodeName();
 				}
 			}
 			else
 			{
 				this.goToNextWhenLoaded = null;
+				this.selectCurrentNodeName();
 			}
 		}	
 	},
@@ -216,7 +216,7 @@ FoldersTree = Class.create({
 		
 	goToDeepPath: function(url){
 		var currentPath = "/";
-		if(!this.currentNodeName) this.setCurrentToRoot();
+		if(!this.currentNodeName) this.setCurrentToRoot(true);
 		if(this.currentNodeName && webFXTreeHandler.all[this.currentNodeName] && webFXTreeHandler.all[this.currentNodeName].url){
 			currentPath = webFXTreeHandler.all[this.currentNodeName].url;		
 		}
@@ -235,7 +235,7 @@ FoldersTree = Class.create({
 		this.currentDeepPath = path;
 		this.currentDeepIndex = 0;
 		if(!isChild){
-			this.setCurrentNodeName(this.getRootNodeId());
+			this.setCurrentNodeName(this.getRootNodeId(), true);
 		}				
 		if(this.currentDeepPath.length > 0){
 			this.openCurrentAndGoToNext(this.currentDeepPath[0]);
@@ -285,8 +285,8 @@ FoldersTree = Class.create({
 		return false;		
 	},
 	
-	setCurrentToRoot: function(){
-		this.setCurrentNodeName(this.getRootNodeId());
+	setCurrentToRoot: function(skipSelect){
+		this.setCurrentNodeName(this.getRootNodeId(), skipSelect);
 	},
 	
 	changeRootLabel: function(newLabel){
