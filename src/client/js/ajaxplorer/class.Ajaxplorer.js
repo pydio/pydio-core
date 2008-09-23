@@ -441,16 +441,7 @@ Ajaxplorer = Class.create({
 	},
 	
 	initGUI: function(){
-		try{						
-		/*
-		new Effect.Corner('toolbars', "round bottom 10px");
-		$('action_bar').select('a').each(function(el){new Effect.Corner(el, "round 8px");});
-		if(!Prototype.Browser.WebKit){ // Do not try this on safari, not working good.
-			$$(".action_bar a").each(function(el){new Effect.Corner(el, "round 8px");});
-		}
-		new Effect.Corner('location_form', "round 8px");
-		new Effect.Corner('browser_round', "round 8px");
-		*/
+		try{
 		var marginBottom = 15;
 		if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
 			marginBottom = $('optional_bottom_div').getHeight();
@@ -463,8 +454,8 @@ Ajaxplorer = Class.create({
 				minB: 24,
 				maxB: 500,
 				onDrag:function(){
-						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:3), true);
-						fitHeightToBottom($('bottomSplitPane'), null, 1, true);
+						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
+						fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?-1:1), true);
 						fitHeightToBottom(this.sEngine._resultsBox, null, 10, true);
 					}.bind(this)
 				});
@@ -472,11 +463,10 @@ Ajaxplorer = Class.create({
 				direction: "vertical",
 				initA: 200, maxA:400, minA:50, 
 				onDrag: function(){
-					s1.resizeGroup();
+					s1.resizeGroup(null, null, true);
 					if(this.filesList)this.filesList.applyHeadersWidth();					
 				}.bind(this)
 		});
-		fitHeightToBottom($("content_pane"), $('rightSplitPane'),1);
 		
 		this.currentSideToggle = 'search';
 		this.toggleSidePanel('info');	

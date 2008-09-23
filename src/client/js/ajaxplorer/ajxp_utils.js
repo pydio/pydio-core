@@ -134,9 +134,12 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 			wh = document.viewport.getHeight();
 		}else{
 			wh = parentElement.getHeight();
+			if(Prototype.Browser.IE && parentElement.getStyle('height')){				
+				wh = parseInt(parentElement.getStyle('height'));
+			}
 		}
-		var mrg = parseInt(element.getStyle('marginBottom')) ||0;
-		var brd = parseInt(element.getStyle('borderBottomWidth'))||0;			
+		var mrg = parseInt(element.getStyle('marginBottom')) ||0;		
+		var brd = parseInt(element.getStyle('borderWidth'))||0;
 		var pad = parseInt((parentElement!=window?parentElement.getStyle('paddingBottom'):0))||0;			
 		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-addMarginBottom))+'px'});
 		element.fire("resize");
