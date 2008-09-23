@@ -62,7 +62,7 @@ FilesList = Class.create(SelectableElements, {
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
-			fitHeightToBottom($('table_rows_container'), $('content_pane'));
+			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
 			this.disableTextSelection($('selectable_div_header'));
 			this.disableTextSelection($('table_rows_container'));
 		}
@@ -74,7 +74,7 @@ FilesList = Class.create(SelectableElements, {
 			buffer = buffer + '<td align="right" id="last_header"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
 			buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" style="padding:0px;"><div id="selectable_div" style="overflow:auto; padding:2px 5px;"></div></td></tr></tbody></table>';
 			$('content_pane').innerHTML  = buffer;
-			fitHeightToBottom($('selectable_div'), $('content_pane'), 2);
+			fitHeightToBottom($('selectable_div'), $('content_pane'), (!Prototype.Browser.IE?3:0));
 			this.slider = new Slider($("slider-1"), $("slider-input-1"));		
 			this.slider.setMaximum(200);
 			this.slider.setMinimum(30);		

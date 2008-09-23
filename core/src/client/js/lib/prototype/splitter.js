@@ -83,12 +83,12 @@ Splitter = Class.create({
 		divs.each(function(div){
 			div.setStyle({
 				position:'absolute',
-				margin:0,
-				border:0				
+				margin:0
 			});
 		});
 		this.paneA = divs[0];
 		this.paneB = divs[1];
+		this.initBorderB = parseInt(this.paneB.getStyle('borderWidth'));
 		
 		this.splitbar = new Element('div', {unselectable:'on'});
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
@@ -115,8 +115,9 @@ Splitter = Class.create({
 		
 		var optName = this.options.fixed;
 		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed+'px')); 
-		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed+'px')); 
-		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));
+		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);
+		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdj+'px')); 
+		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
 		this.moveSplitter(size||(!this.options.initB?this.paneA[this.options.offsetAdjust]:this.group._adjust-this.paneB[this.options.offsetAdjust]-this.splitbar._adjust));
 	},
 	
@@ -139,7 +140,6 @@ Splitter = Class.create({
 		this.splitbar.removeClassName(this.options.activeClass);
 		Event.stopObserving(document, "mousemove", this.moveObserver);
 		Event.stopObserving(document, "mouseup", this.upObserver);
-		
 	}, 
 	
 	moveSplitter:function(np){
@@ -151,7 +151,11 @@ Splitter = Class.create({
 		this.splitbar.setStyle(this.makeStyleObject(this.options.set, np+'px'));
 		this.paneA.setStyle(this.makeStyleObject(this.options.adjust, np-this.paneA._padAdjust+'px'));
 		this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
-		this.paneB.setStyle(this.makeStyleObject(this.options.adjust, this.group._adjust-this.splitbar._adjust-this.paneB._padAdjust-np+"px"));
+		var borderAdj = 0;
+		if(!Prototype.Browser.IE && this.initBorderB){
+			borderAdj = this.initBorderB*2;
+		}		
+		this.paneB.setStyle(this.makeStyleObject(this.options.adjust, this.group._adjust-this.splitbar._adjust-this.paneB._padAdjust-np-borderAdj+"px"));
 		if(!Prototype.Browser.IE){
 			this.paneA.fire("resize");
 			this.paneB.fire("resize");
