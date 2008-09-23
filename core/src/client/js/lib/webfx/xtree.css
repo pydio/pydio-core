@@ -1,14 +1,16 @@
 .webfx-tree-container {
 	margin: 0px;
 	padding: 0px;
-	font: icon;
+	font-family: Trebuchet MS;
 	white-space: nowrap;
+	font-size: 11px;
 }
 
 .webfx-tree-item {
 	padding: 0px;
 	margin: 0px;
-	font: icon;
+	font-family: Trebuchet MS;
+	font-size: 11px;
 	color: WindowText;
 	white-space: nowrap;
 	height: 16px;
