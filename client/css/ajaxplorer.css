@@ -148,19 +148,13 @@ DIALOG BOXES
 
 .dialogTitle
 {
-/*    background-color: #79f !important;
-    color: #fff;
-    font-size: 14px;
-    font-weight: bold;
-    
-    padding-left: 6px;
-    padding-bottom: 1px;
-    */
     padding: 4px;
     padding-top: 2px;
     padding-bottom: 0px;
     border: 1px solid #aaa;
     background-image:url('../images/header_bg.png');
+    background-position: top;
+    background-repeat: repeat-x;
     color: #333;
     cursor:move;    
 }
@@ -171,7 +165,6 @@ DIALOG BOXES
     border: 1px solid #aaa;    
     border-top: 0px;
     background-image: url('../images/strip.png');
-    /*text-align: center;*/
 }
 
 .dialogContent input[type="text"],
@@ -372,7 +365,7 @@ ACTION BAR
 }
 
 #topPane{
-    background-color: #aaa;
+    /*background-color: #aaa;*/
 }
 
 #tree_container{
