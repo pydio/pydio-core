@@ -85,10 +85,19 @@ SelectableElements = Class.create({
 	},
 	dragStart : function(e){
 		var oElement = this._htmlElement;
-		Event.observe(document, "mousemove", this.eventMouseMove);
-		Event.observe(document, "mouseup", this.eventMouseUp);
 		this.originalX = e.clientX;
 		this.originalY = e.clientY;
+		
+		this.dSEPosition = Position.cumulativeOffset(this.dragSelectionElement);
+		this.dSEDimension = Element.getDimensions(this.dragSelectionElement);
+		
+		var h = parseInt(this.dragSelectionElement.getStyle('height'));
+		if(this.dragSelectionElement.scrollHeight > h){
+			// there is a scroll bar 
+			if(this.originalX > (this.dSEPosition[0]+this.dSEDimension.width) - 18) return;
+		}
+		Event.observe(document, "mousemove", this.eventMouseMove);
+		Event.observe(document, "mouseup", this.eventMouseUp);
 		if(!this.divSelector){
 			this.divSelector = new Element('div', {
 				style:"border : 1px dotted #999; background-color:#ddd;	filter:alpha(opacity=50);opacity: 0.5;-moz-opacity:0.5;z-index:100000;position:absolute;top:0px;left:0px;height:0px;width:0px;"
@@ -97,8 +106,6 @@ SelectableElements = Class.create({
 		$(this.dragSelectionElement).setStyle({
 			cursor : "move"
 		});
-		this.dSEPosition = Position.cumulativeOffset(this.dragSelectionElement);
-		this.dSEDimension = Element.getDimensions(this.dragSelectionElement);
 	},
 	
 	drag : function(e){
