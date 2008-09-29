@@ -246,7 +246,18 @@ FilesList = Class.create(SelectableElements, {
 		// loop through all tree children
 		var cs = root.childNodes;
 		var l = cs.length;
-		// FIRST PASS FOR ERRORS CHECK
+		// FIRST PASS FOR REQUIRE AUTH
+		for (var i = 0; i < l; i++) 
+		{
+			if(cs[i].tagName == "require_auth")
+			{
+				if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
+				ajaxplorer.actionBar.fireAction('login');
+				this.fireChange();
+				return;
+			}
+		}
+		// SECOND PASS FOR ERRORS CHECK
 		for (var i = 0; i < l; i++) 
 		{
 			if(cs[i].tagName == "error" || cs[i].tagName == "message")
@@ -255,18 +266,13 @@ FilesList = Class.create(SelectableElements, {
 				if(cs[i].tagName == "message") type = cs[i].getAttribute('type');
 				if(modal.pageLoading){
 					alert(type+':'+cs[i].firstChild.nodeValue);
+					this.fireChange();
 				}else{
 					ajaxplorer.displayMessage(type, cs[i].firstChild.nodeValue);
+					this.fireChange();
+					return;
 				}
-				this.fireChange();
-				return;
-			}
-			else if(cs[i].tagName == "require_auth")
-			{
-				if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
-				ajaxplorer.actionBar.fireAction('login');
-				this.fireChange();
-			}
+			}			
 		}
 		var items = this.getItems();
 		for(var i=0; i<items.length; i++)
