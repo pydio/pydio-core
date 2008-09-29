@@ -12,7 +12,7 @@ img{
 body
 {
 	padding: 0px;
-	padding-left: 3px;
+	padding-left: 0px;
 	margin: 0px;
 	background-image: url('<?php print(CLIENT_RESOURCES_FOLDER);?>/images/strip.png');
 }
@@ -44,10 +44,10 @@ a
     cursor: pointer;    
 }
 </style>
-<head>
+</head>
 <body bgcolor="ffffff">
 <form name="upload_form" id="upload_form" action="<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&dir=%2F&ajxp_sessid=<?php echo session_id(); ?>">
-<div style="border: 1px solid #ccc; border-bottom: 0px; width: 585px; height:385px; padding: 5px 0px; background-color: #fff;">
+<div style="border: 0px solid #ccc; border-bottom: 0px; width: 422px; height:470px; padding: 0px 0px;">
 <script language="javascript" type="text/javascript">
 function UploadComplete()
 {
@@ -107,7 +107,7 @@ function getTranslationsAsParam()
 ?>
 var FlashVarValue = getTranslationsAsParam()+"<?php echo $FlashVar; ?>";
 
-document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="575" height="365" id="fileUpload" align="middle">\
+document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="422" height="470" id="fileUpload" align="middle">\
 <param name="allowScriptAccess" value="sameDomain" /> \
 <param name="movie" value="<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf" /> \
 <param name="quality" value="high" /> \
@@ -115,7 +115,7 @@ document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" cod
 <param name="FlashVars" value="' + FlashVarValue + escape(url) + '">\
 <embed src="<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf" \
 FlashVars="' + FlashVarValue + escape(url) + '" \
-quality="high" wmode="transparent" width="575" height="365" name="fileUpload" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"\
+quality="high" wmode="transparent" width="422" height="470" name="fileUpload" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"\
 pluginspage="http://www.macromedia.com/go/getflashplayer" />\
 </object>');
 

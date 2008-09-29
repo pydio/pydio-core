@@ -121,7 +121,7 @@
 					</form>
 					
 					<!-- MOOTOOLS UPLOAD FORM -->
-					<div id="flash_upload_form" box_width="620">
+					<div id="flash_upload_form" box_width="445">
 					<div id="flashscreen">
 					<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>
 					</div>
