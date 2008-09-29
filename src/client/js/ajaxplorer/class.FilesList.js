@@ -249,9 +249,15 @@ FilesList = Class.create(SelectableElements, {
 		// FIRST PASS FOR ERRORS CHECK
 		for (var i = 0; i < l; i++) 
 		{
-			if(cs[i].tagName == "error")
+			if(cs[i].tagName == "error" || cs[i].tagName == "message")
 			{
-				alert(cs[i].firstChild.nodeValue);
+				var type = "ERROR";
+				if(cs[i].tagName == "message") type = cs[i].getAttribute('type');
+				if(modal.pageLoading){
+					alert(type+':'+cs[i].firstChild.nodeValue);
+				}else{
+					ajaxplorer.displayMessage(type, cs[i].firstChild.nodeValue);
+				}
 				this.fireChange();
 				return;
 			}
