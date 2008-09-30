@@ -132,7 +132,7 @@ $mess=array(
 "129"=> "Aperçu",
 "130"=> "Répertoires", 
 "131"=> "Details", 
-"132"=> "Aucun fichier sélectionné",
+"132"=> "Aucun fichier ou répertoire.",
 "133"=> "Nom",
 "134"=> "Type",
 "135"=> "Dimensions",
@@ -285,6 +285,8 @@ $mess=array(
 "261" => "Remember Me",
 "262" => "Un ou plusieur fichiers existent déjà \\ndans le répertoire de destination!\\nQue voulez-vous faire?",
 "263" => "Ecraser",
-"264" => "Passer"
+"264" => "Passer", 
+"265" => "Fichiers",
+"266" => "o"
 );
 ?>

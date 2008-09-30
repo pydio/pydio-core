@@ -33,6 +33,14 @@ function editWithCodePress(fileName)
 	else return "";	
 }
 
+function roundSize(filesize, size_unit){
+	if (filesize >= 1073741824) {filesize = Math.round(filesize / 1073741824 * 100) / 100 + " G"+size_unit;}
+	else if (filesize >= 1048576) {filesize = Math.round(filesize / 1048576 * 100) / 100 + " M"+size_unit;}
+	else if (filesize >= 1024) {filesize = Math.round(filesize / 1024 * 100) / 100 + " K"+size_unit;}
+	else {filesize = filesize + " "+size_unit;}
+	return filesize;
+}
+
 function storeRememberData(user, pass){
 	var cookieJar = new CookieJar({
 		expire: 3600*24*10, 

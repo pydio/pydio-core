@@ -23,7 +23,30 @@ InfoPanel = Class.create({
 		var userSelection = filesList.getUserSelection();
 		if(userSelection.isEmpty())
 		{
-			this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');
+			var currentRep = getBaseName(filesList.getCurrentRep());
+			if(currentRep == ""){
+				currentRep = $('repo_path').value;
+			}
+			var items = filesList.getItems();
+			var size = 0;
+			var folderNumber = 0;
+			var filesNumber = 0;
+			for(var i=0;i<items.length;i++){
+				if(items[i].getAttribute("is_file")=="0") folderNumber++;
+				else filesNumber++;
+				if(items[i].getAttribute("bytesize") && items[i].getAttribute("bytesize")!=""){
+					size += parseInt(items[i].getAttribute("bytesize"));
+				}
+			}
+			var content = '<div style="padding:10px;"><big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center;"><img width="16" hspace="5" height="16" border="0" align="absmiddle" src="client/images/crystal/mimes/16/folder.png"/>'+currentRep+'</big>';
+			if(folderNumber) content+= '<br><b>'+MessageHash[130]+'</b> : '+folderNumber;
+			if(filesNumber) content+= '<br><b>'+MessageHash[265]+'</b> : '+filesNumber;
+			if(size) content += '<br><b>'+MessageHash[259]+'</b> '+roundSize(size, MessageHash[266]);
+			if(!folderNumber && !filesNumber){
+				content +="<br>"+MessageHash[132];
+			}
+			content += '</div>';
+			this.setContent(content);
 			return;
 		}
 		if(!userSelection.isUnique())
