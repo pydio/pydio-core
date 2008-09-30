@@ -293,6 +293,9 @@ $mess=array(
 "258" => "Número de archivos :",
 "259" => "Tamaño combinado :",
 "260" => "bytes",
-"261" => "Remember Me"
+"261" => "Remember Me",
+"262" => "One or more files appear to exist \\nalready in the destination folder.\\nWhat do you want to do?",
+"263" => "Overwrite",
+"264" => "Skip"
 );
 ?>

@@ -243,9 +243,9 @@ $mess=array(
 "211" => "The file is too big!", 
 "212" => "No file found on server!", 
 "213" => "Error while copying file to current folder", 
-"214" => "Browse files", 
+"214" => "Browse", 
 "215" => "Start Upload", 
-"216" => "Clear Queue", 
+"216" => "Clear", 
 "217" => "Clear Completed", 
 "218" => "Remove from queue", 
 "219" => "Completed", 
@@ -291,6 +291,9 @@ $mess=array(
 "258" => "File count :",
 "259" => "Total size :",
 "260" => "bytes",
-"261" => "Remember Me"
+"261" => "Remember Me",
+"262" => "One or more files appear to exist \\nalready in the destination folder.\\nWhat do you want to do?",
+"263" => "Overwrite",
+"264" => "Skip"
 );
 ?>
