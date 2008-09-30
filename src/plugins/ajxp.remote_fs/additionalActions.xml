@@ -23,13 +23,13 @@
 				if(ajaxplorer.actionBar.getFlashVersion() >= 8 && document.location.href.substring(0,5)!='https')
 				{
 					modal.setCloseAction(function(){
-						$('closeFancyUploadBox').disabled=false;
+						$('closeFlashUploadBox').disabled=false;
 						var bgManager = ajaxplorer.actionBar.bgManager;
 						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
 						bgManager.next();
 					});
 					modal.showDialogForm('Upload', 
-										'fancy_upload_form', 
+										'flash_upload_form', 
 										null, 
 										function(){
 											hideLightBox();
@@ -60,7 +60,7 @@
 					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
 				}				
 					]]></clientCallback>
-				<clientForm id="fancy_upload_form"><![CDATA[
+				<clientForm id="flash_upload_form"><![CDATA[
 					<!-- UPLOAD FORM -->
 					<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="470">
 					<legend>AJXP_MESSAGE[25]<b class="replace_rep"></b></legend>
@@ -73,11 +73,11 @@
 					</form>
 					
 					<!-- MOOTOOLS UPLOAD FORM -->
-					<div id="fancy_upload_form" box_width="425">
-					<div id="fancyscreen">
-					<iframe id="fancyframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=fancy_tpl.html&encode=false"></iframe>
+					<div id="flash_upload_form" box_width="445">
+					<div id="flashscreen">
+					<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>
 					</div>
-					<div class="dialogButtons"><input type="button" class="dialogButton" onclick="hideLightBox(true);" value="AJXP_MESSAGE[86]" id="closeFancyUploadBox"></div>
+					<div class="dialogButtons"><input type="button" class="dialogButton" onclick="hideLightBox(true);" value="AJXP_MESSAGE[86]" id="closeFlashUploadBox"></div>
 					</div>
 					<script language="javascript">$('originalUploadForm').hide();</script>
 				]]></clientForm>
