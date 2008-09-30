@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<custom:ApplicationClass xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*" 
+	xmlns:custom="components.*" layout="vertical"
+	 	backgroundAlpha="1"  backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#E0ECFF, #E0ECFF]" width="422" paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10" height="470" borderStyle="solid" borderColor="#D4D4D4" cornerRadius="0" borderThickness="1">
+
+    <mx:Script>
+        <![CDATA[
+            [Bindable]
+            [Embed(source='components/trashcan_empty.png')]
+            public var RemoveIcon:Class;
+        ]]>
+    </mx:Script>                            
+
+	<mx:HBox width="400" height="62">
+		<mx:Button id="browseButton" label="Browse" width="70"   icon="@Embed(source='components/view_choose.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
+		<mx:Button id="clearButton" label="Clear" enabled="false" width="70"   icon="@Embed(source='components/trashcan_empty.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
+		<mx:Button id="uploadButton" label="Upload" enabled="false" width="70"  icon="@Embed(source='components/yast_backup.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
+		<mx:Button id="cancelButton" label="Cancel" enabled="false" width="70"  icon="@Embed(source='components/fileclose.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
+		<mx:Text id="mytext" />
+	</mx:HBox>
+	<mx:HBox width="400">
+		<mx:VBox width="100%" id="fileContainer">
+			<mx:VBox id="fileUploadBox" maxHeight="250" width="100%" label="Files to Upload"  height="318" borderStyle="solid" borderColor="#FFFFFF" cornerRadius="8" backgroundColor="#FFFFFF">
+			</mx:VBox>
+			<mx:VBox id="uploadStats" width="400" visible="false" backgroundColor="#EEEEEE" cornerRadius="8" borderStyle="solid" borderColor="#B7BABC" paddingBottom="5" paddingLeft="10" paddingRight="10" paddingTop="5">				
+				<mx:HBox width="100%">
+					<mx:Text text="Total Files:" id="totalText" /><mx:Text id="totalFiles" />
+					<mx:Text text="Total Size:" id="sizeText" /><mx:Text id="totalSize" />
+				</mx:HBox>
+				<mx:ProgressBar id="totalProgressBar" width="375" mode="manual" visible="false"  labelPlacement="right"/>
+			</mx:VBox>
+		</mx:VBox>
+		
+	</mx:HBox>
+</custom:ApplicationClass>
