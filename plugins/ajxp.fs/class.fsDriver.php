@@ -271,6 +271,9 @@ class fsDriver extends AbstractDriver
 					$userfile_name = $boxData["name"];
 					if($fancyLoader) $userfile_name = SystemTextEncoding::fromUTF8($userfile_name);
 					$userfile_name=Utils::processFileName($userfile_name);
+					if(isSet($auto_rename)){
+						$userfile_name = fsDriver::autoRenameForDest($destination, $userfile_name);
+					}
 					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
 					{
 						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
@@ -697,6 +700,25 @@ class fsDriver extends AbstractDriver
 		}
 		rename($old,$new);
 		return null;		
+	}
+	
+	function autoRenameForDest($destination, $fileName){
+		if(!is_file($destination."/".$fileName)) return $fileName;
+		$i = 1;
+		$ext = "";
+		$name = "";
+		$split = split("\.", $fileName);
+		if(count($split) > 1){
+			$ext = ".".$split[count($split)-1];
+			array_pop($split);
+			$name = join("\.", $split);
+		}else{
+			$name = $fileName;
+		}
+		while (is_file($destination."/".$name."-$i".$ext)) {
+			$i++; // increment i until finding a non existing file.
+		}
+		return $name."-$i".$ext;
 	}
 	
 	function mkDir($crtDir, $newDirName)
