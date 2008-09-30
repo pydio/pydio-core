@@ -72,7 +72,11 @@ var names = new Array(
 "cancelUploadText",
 "totalFilesText",
 "totalSizeText",
-"bytesText");
+"bytesText", 
+"existingFilesFound", 
+"overwrite", 
+"skip", 
+"rename");
 
 var texts= new Array(
 "<?php echo $mess[252]; ?>", 
@@ -88,7 +92,11 @@ var texts= new Array(
 "<?php echo $mess[232]; ?>",
 "<?php echo $mess[258]; ?>",
 "<?php echo $mess[259]; ?>",
-"<?php echo $mess[260]; ?>");
+"<?php echo $mess[260]; ?>", 
+"<?php echo $mess[262]; ?>", 
+"<?php echo $mess[263]; ?>", 
+"<?php echo $mess[264]; ?>",
+"<?php echo $mess[6]; ?>");
 
 function getTranslationsAsParam()
 {
@@ -102,10 +110,15 @@ function getTranslationsAsParam()
 }
 
 <?php 
-        $UploadMaxSize = Utils::convertBytes(ini_get('upload_max_filesize'));
-	$FlashVar = '&completeFunction=UploadComplete()&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize='.$UploadMaxSize.'&fileSizeLimit'.$UploadMaxSize.'&uploadPage=';
+    $UploadMaxSize = Utils::convertBytes(ini_get('upload_max_filesize'));
+    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
+    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
+    $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
+    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");
+    
+	$FlashVar = '&completeFunction=UploadComplete()&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber;
 ?>
-var FlashVarValue = getTranslationsAsParam()+"<?php echo $FlashVar; ?>";
+var FlashVarValue = getTranslationsAsParam()+"<?php echo $FlashVar; ?>" + "&currentFolderFiles=" + parent.ajaxplorer.filesList.getfileNamesAsString("__AJXP_SEP__")+"&separator=__AJXP_SEP__&uploadPage=";
 
 document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="422" height="470" id="fileUpload" align="middle">\
 <param name="allowScriptAccess" value="sameDomain" /> \
