@@ -1,4 +1,5 @@
 <?php
+require_once("server/classes/class.Utils.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");
