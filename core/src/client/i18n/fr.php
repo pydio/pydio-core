@@ -236,7 +236,7 @@ $mess=array(
 "213" => "Erreur lors de la copie du fichier temporaire.", 
 "214" => "Parcourir", 
 "215" => "Transférer", 
-"216" => "Vider la liste", 
+"216" => "Vider", 
 "217" => "Vider les fichiers transférés", 
 "218" => "Retirer de la queue", 
 "219" => "Terminé",
@@ -282,6 +282,9 @@ $mess=array(
 "258" => "Nombre de fichiers :",
 "259" => "Taille cumulée :",
 "260" => "octets",
-"261" => "Remember Me"
+"261" => "Remember Me",
+"262" => "Un ou plusieur fichiers existent déjà \\ndans le répertoire de destination!\\nQue voulez-vous faire?",
+"263" => "Ecraser",
+"264" => "Passer"
 );
 ?>
