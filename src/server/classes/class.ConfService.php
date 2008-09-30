@@ -1,5 +1,4 @@
 <?php
-
 global $G_DEFAULT_REPOSITORIES;
 
 global $G_LANGUE;
@@ -14,6 +13,8 @@ global $G_MAX_CHAR;
 global $G_SHOW_HIDDEN;
 global $G_BOTTOM_PAGE;
 global $G_UPLOAD_MAX_NUMBER;
+global $G_UPLOAD_MAX_FILE;
+global $G_UPLOAD_MAX_TOTAL;
 global $G_RECYCLE_BIN;
 global $G_ACCESS_DRIVER;
 
@@ -24,7 +25,7 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_RECYCLE_BIN, $G_DEFAULT_REPOSITORIES;
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_RECYCLE_BIN, $G_DEFAULT_REPOSITORIES;
 		if(!isset($langue) || $langue=="") {$langue=$dft_langue;}
 		$G_LANGUE = $langue;
 		$G_AVAILABLE_LANG = $available_languages;
@@ -35,6 +36,8 @@ class ConfService
 		$G_SHOW_HIDDEN = $showhidden;
 		$G_BOTTOM_PAGE = $baspage;
 		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
+		$G_UPLOAD_MAX_FILE = Utils::convertBytes($upload_max_size_per_file);
+		$G_UPLOAD_MAX_TOTAL = Utils::convertBytes($upload_max_size_total);
 		$G_DEFAULT_REPOSITORIES = $REPOSITORIES;
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 		ConfService::switchRootDir();
@@ -192,7 +195,7 @@ class ConfService
 
 	function getConf($varName)	
 	{
-		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER;
+		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_MAX_FILE;
 		$globVarName = "G_".$varName;
 		return $$globVarName;
 	}
