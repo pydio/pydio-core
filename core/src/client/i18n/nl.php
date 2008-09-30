@@ -294,6 +294,8 @@ $mess=array(
 "261" => "Remember Me",
 "262" => "One or more files appear to exist \\nalready in the destination folder.\\nWhat do you want to do?",
 "263" => "Overwrite",
-"264" => "Skip"
+"264" => "Skip", 
+"265" => "Files",
+"266" => "B"
 );
 ?>

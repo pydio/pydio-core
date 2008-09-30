@@ -3,7 +3,7 @@
 //							
 //	WebJeff - FileManager v1.6
 //	
-//	Jean-François GAZET
+//	Jean-Franï¿½ois GAZET
 //	http://www.webjeff.org
 //	webmaster@webjeff.org	
 //
@@ -142,7 +142,7 @@ $mess=array(
 "129"=> "View",
 "130"=> "Folders", 
 "131"=> "Details", 
-"132"=> "No file selected", 
+"132"=> "No file or folder", 
 "133"=> "Name",
 "134"=> "Type",
 "135"=> "Dimensions",
@@ -294,6 +294,8 @@ $mess=array(
 "261" => "Remember Me",
 "262" => "One or more files appear to exist \\nalready in the destination folder.\\nWhat do you want to do?",
 "263" => "Overwrite",
-"264" => "Skip"
+"264" => "Skip", 
+"265" => "Files",
+"266" => "B"
 );
 ?>

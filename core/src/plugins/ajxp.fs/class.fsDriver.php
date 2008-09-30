@@ -332,6 +332,7 @@ class fsDriver extends AbstractDriver
 						$atts[] = "filename=\"".SystemTextEncoding::toUTF8($zipEntry["filename"])."\"";
 						if($fileListMode){
 							$atts[] = "filesize=\"".Utils::roundSize($zipEntry["size"])."\"";
+							$atts[] = "bytesize=\"".$zipEntry["size"]."\"";
 							$atts[] = "modiftime=\"".date("d/m/Y H:i",$zipEntry["mtime"])."\"";
 							$atts[] = "mimestring=\"".Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"])."\"";
 							$atts[] = "icon=\"".Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"])."\"";
@@ -388,6 +389,7 @@ class fsDriver extends AbstractDriver
 						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
 						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
+						$atts[] = "bytesize=\"".filesize($currentFile)."\"";
 						$atts[] = "filename=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($dir."/".$repIndex))."\"";
 						$atts[] = "icon=\"".(is_file($currentFile)?SystemTextEncoding::toUTF8($repName):"folder.png")."\"";
 						

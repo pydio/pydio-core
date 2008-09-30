@@ -328,6 +328,7 @@ FilesList = Class.create(SelectableElements, {
 		}
 		ajaxplorer.getActionBar().fireContextChange();
 		ajaxplorer.getActionBar().fireSelectionChange();
+		ajaxplorer.infoPanel.update();
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
 	
