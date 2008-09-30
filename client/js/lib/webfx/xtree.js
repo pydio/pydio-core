@@ -192,10 +192,14 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){
 			var action='';
-			Event.observe(node.id+'-anchor', 'contextmenu', function(e){eval(this.action);}.bind(node));
+			Event.observe(node.id+'-anchor', 'contextmenu', function(e){
+				ajaxplorer.focusOn(ajaxplorer.foldersTree);
+				eval(this.action);				
+			}.bind(node));
 			 webFXTreeHandler.contextMenu.addElements('#'+node.id+'-anchor');
 		}
 		Event.observe(node.id+'-anchor', 'click', function(e){
+			ajaxplorer.focusOn(ajaxplorer.foldersTree);
 			eval(this.action);Event.stop(e);
 		}.bind(node));
 		if ((!this.folder) && (!this.openIcon)) {
