@@ -67,6 +67,40 @@ $REPOSITORIES[2] = array(
 	"DISPLAY"=>"Windows Documents"
 );
 */
+
+//------------------------
+//		UPLOAD CONFIG
+//------------------------
+
+// Maximum number of files for each upload. Leave to 0 for no limit.
+$upload_max_number = 0;
+
+// Maximum size per file allowed to upload. By default, this is fixed by php config 'upload_max_filesize'.
+// Use this one only if you want to set it smaller than the php config. If you want to increase the php value, 
+// please check the PHP documentation for how to set a php config.
+//
+// Use either the php config syntax with letters for size (e.g. "2M" for 2MegaBytes , "1G" for one gigabyte, etc.) 
+// or an integer value like 2097152 for 2 gigabytes.
+$upload_max_size_per_file = 0;
+
+// Maximum total size (all files size cumulated) by upload.
+// Leave to 0 if you do not want any limit.
+// See the previous variable for syntax ("2M" or 2097152 )
+$upload_max_size_total = 0;
+
+/*********************************************/
+/* WEBMASTER EMAIL / NOT USED AT THE MOMENT!!
+/*********************************************/
+$webmaster_email = "webmaster@yourdomain.com";
+
+/* RECYCLE BIN : leave blank if you do not want to use it.
+/********************************/
+$recycle_bin = "recycle_bin";
+
+/*  HTTPS DOMAIN? (USED TO CORRECT A BUG IN IE)
+/**************************************************/
+$use_https=false;
+
 // UNITE DE TAILLE DES FICHIER (octets "o", bytes "b")
 // (Unit of file size, "o" or "b")
 $size_unit="b";
@@ -80,20 +114,6 @@ $max_caracteres=50;
 // (Show hidden files, yes=1, no=0)
 
 $showhidden=0;
-
-$upload_max_number = 6;
-
-/* WEBMASTER EMAIL
-/*********************************/
-$webmaster_email = "webmaster@yourdomain.com";
-
-/* RECYCLE BIN : leave blank if you do not want to use it.
-/********************************/
-$recycle_bin = "recycle_bin";
-
-/*  HTTPS DOMAIN? (USED TO CORRECT A BUG IN IE)
-/**************************************************/
-$use_https=false;
 
 
 
