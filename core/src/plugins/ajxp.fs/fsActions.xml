@@ -87,27 +87,6 @@
 					
 				}				
 					]]></clientCallback>
-				<clientForm id="fancy_upload_form"><![CDATA[
-					<!-- UPLOAD FORM -->
-					<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="470">
-					<legend>AJXP_MESSAGE[25]<b class="replace_rep"></b></legend>
-					<br><br>AJXP_MESSAGE[171]<br>
-					<input type="file" name="userfile_1" class="dialogFocus" size="30">
-					<input type="hidden" name="get_action" value="upload">
-					
-					<br><br>AJXP_MESSAGE[172]
-					<div id="upload_files_list" class="uploadFilesList"></div>
-					</form>
-					
-					<!-- MOOTOOLS UPLOAD FORM -->
-					<div id="fancy_upload_form" box_width="426">
-					<div id="fancyscreen">
-					<iframe id="fancyframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=fancy_tpl2.html&encode=false"></iframe>
-					</div>
-					<div class="dialogButtons"><input type="button" class="dialogButton" onclick="hideLightBox(true);" value="AJXP_MESSAGE[86]" id="closeFancyUploadBox"></div>
-					</div>
-					<script language="javascript">$('originalUploadForm').hide();</script>
-				]]></clientForm>
 				<clientForm id="flash_upload_form"><![CDATA[
 					<!-- UPLOAD FORM -->
 					<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="640">
