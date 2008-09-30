@@ -635,7 +635,17 @@ FilesList = Class.create(SelectableElements, {
 		}
 		return false;
 	},
-		
+	
+	getfileNamesAsString : function(separator){
+		var fNames = $A([]);
+		var allItems = this.getItems();
+		for(var i=0;i<allItems.length;i++){
+			fNames.push(getBaseName(allItems[i].getAttribute('filename')));
+		}
+		return fNames.join(separator);
+	},
+
+
 	selectFile: function(fileName, multiple)
 	{
 		if(!this.fileNameExists(fileName)) 
