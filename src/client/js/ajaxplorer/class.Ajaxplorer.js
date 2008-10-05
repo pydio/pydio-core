@@ -442,7 +442,7 @@ Ajaxplorer = Class.create({
 	
 	initGUI: function(){
 		try{
-		var marginBottom = 15;
+		var marginBottom = (Prototype.Browser.IE?18:15);
 		if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
 			marginBottom = $('optional_bottom_div').getHeight();
 		}
