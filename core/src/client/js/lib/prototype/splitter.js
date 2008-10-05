@@ -88,7 +88,7 @@ Splitter = Class.create({
 		});
 		this.paneA = divs[0];
 		this.paneB = divs[1];
-		this.initBorderB = parseInt(this.paneB.getStyle('borderWidth'));
+		this.initBorderB = parseInt(this.paneB.getStyle('borderWidth')) || 0;
 		
 		this.splitbar = new Element('div', {unselectable:'on'});
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
@@ -115,7 +115,7 @@ Splitter = Class.create({
 		
 		var optName = this.options.fixed;
 		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed+'px')); 
-		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);
+		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);		
 		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdj+'px')); 
 		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
 		this.moveSplitter(size||(!this.options.initB?this.paneA[this.options.offsetAdjust]:this.group._adjust-this.paneB[this.options.offsetAdjust]-this.splitbar._adjust));
