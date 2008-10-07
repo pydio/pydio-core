@@ -59,14 +59,13 @@ UserSelection = Class.create({
 	
 	hasMime : function(mimeTypes){
 		var has = false;
+		var selectedItems = $A(this._selectedItems);
 		mimeTypes.each(function(mime){
-			for(i=0;i<this._selectedItems.length;i++){
-				if(getFileExtension(this._selectedItems[i].getAttribute('filename')) == mime){
-					has = true;
-					return;
-				}
-			}
-		}.bind(this));
+			if(has) return;
+			has = selectedItems.any(function(item){
+				return (getFileExtension(item.getAttribute('filename')) == mime);
+			});
+		});
 		return has;
 	},
 	
