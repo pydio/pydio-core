@@ -593,7 +593,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</processing>
 		</action>
 		<action name="play_whole_folder">
-			<gui text="140" title="140" src="applix.png" accessKey=""><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="true"></context><selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_AUDIO"></selectionContext></gui>
+			<gui text="140" title="140" src="player_play.png" accessKey=""><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="true"></context><selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_AUDIO"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback><![CDATA[
