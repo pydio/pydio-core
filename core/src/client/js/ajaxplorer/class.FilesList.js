@@ -570,8 +570,10 @@ FilesList = Class.create(SelectableElements, {
 	fireChange: function()
 	{		
 		//this._ajaxplorer.getActionBar().update();
-		ajaxplorer.actionBar.fireSelectionChange();
-		this._ajaxplorer.infoPanel.update();
+		if(this._fireChange){
+			ajaxplorer.actionBar.fireSelectionChange();
+			this._ajaxplorer.infoPanel.update();
+		}
 	},
 	
 	//
@@ -706,6 +708,14 @@ FilesList = Class.create(SelectableElements, {
 		{
 			return false;
 		}
+		
+		// CREATE A COPY TO COMPARE WITH AFTER CHANGES
+		// DISABLE FIRECHANGE CALL
+		var oldFireChange = this._fireChange;
+		this._fireChange = false;
+		var selectedBefore = this.getSelectedItems();	// is a cloned array
+		
+		
 		Event.stop(event);
 		var nextItem;
 		var currentItem;
@@ -723,6 +733,7 @@ FilesList = Class.create(SelectableElements, {
 			}
 			this.setItemSelected(currentItem, true);
 			this.fireDblClick(null);
+			this._fireChange = oldFireChange;
 			return false;
 		}
 		if(event.keyCode == Event.KEY_END)
@@ -770,6 +781,7 @@ FilesList = Class.create(SelectableElements, {
 		
 		if(nextItem == null)
 		{
+			this._fireChange = oldFireChange;
 			return false;
 		}
 		if(!shiftKey || !this._multiple) // Unselect everything
@@ -789,6 +801,32 @@ FilesList = Class.create(SelectableElements, {
 			}
 		}
 		this.setItemSelected(nextItem, !nextItem._selected);
+		
+		
+		// NOW FIND CHANGES IN SELECTION!!!
+		var found;
+		var changed = selectedBefore.length != this._selectedItems.length;
+		if (!changed) {
+			for (var i = 0; i < selectedBefore.length; i++) {
+				found = false;
+				for (var j = 0; j < this._selectedItems.length; j++) {
+					if (selectedBefore[i] == this._selectedItems[j]) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					changed = true;
+					break;
+				}
+			}
+		}
+	
+		this._fireChange = oldFireChange;
+		if (changed && this._fireChange){
+			this.fireChange();
+		}		
+		
 		return false;
 	},
 	
