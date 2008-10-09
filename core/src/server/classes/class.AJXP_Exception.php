@@ -15,6 +15,8 @@ class AJXP_Exception {
 			if(isSet($mixed->messageId) && array_key_exists($mixed->messageId, $messages))
 			{
 				$error = $messages[$mixed->messageId];
+			}else{
+				$error = $mixed->messageId;
 			}
 
 			AJXP_XMLWriter::header();
