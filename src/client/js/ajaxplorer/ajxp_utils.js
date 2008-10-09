@@ -15,6 +15,7 @@ function getRepName(fileName)
 
 function getFileExtension(fileName)
 {
+	if(!fileName || fileName == "") return "";
 	var split = getBaseName(fileName).split('.');
 	if(split.length > 1) return split[split.length-1].toLowerCase();
 	return '';
