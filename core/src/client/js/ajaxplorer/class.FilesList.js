@@ -19,12 +19,19 @@ FilesList = Class.create(SelectableElements, {
 		this.allDraggables = new Array();
 		this.allDroppables = new Array();		
 		
+		// List mode style : file list or tableur mode ?
+		this.gridStyle = "grid";
+		this.paginationData = null;
+		this.even = true;
+		
 		// Default headersDef
 		this.columnsDef = $A([]);
 		this.columnsDef.push({messageId:1,attributeName:'text'});
 		this.columnsDef.push({messageId:2,attributeName:'filesize'});
 		this.columnsDef.push({messageId:3,attributeName:'mimestring'});
 		this.columnsDef.push({messageId:4,attributeName:'modiftime'});
+		// Associated Defaults
+		this._oSortTypes = ["StringDirFile", "NumberKo", "String", "MyDate"];
 		
 		this.initGUI();
 			
@@ -49,16 +56,15 @@ FilesList = Class.create(SelectableElements, {
 				var column = this.columnsDef[i];
 				var last = '';
 				if(i==this.columnsDef.length-1) last = ' id="last_header"';
-				buffer = buffer + '<td ajxp_message_id="'+column.messageId+'"'+last+'>'+MessageHash[column.messageId]+'</td>';
+				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
 			}
-			/*
-			this.columnsDef.each(function(column){
-				buffer = buffer + '<td ajxp_message_id="'+column.messageId+'">'+MessageHash[column.messageId]+'</td>';
-			});
-			*/
 			buffer = buffer + '</tr></thead></table><div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			$('content_pane').innerHTML  = buffer;
 			oElement = $('selectable_div');
+			
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+				$('table_rows_container').insert({before:this.createPaginator()});
+			}
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
@@ -91,11 +97,37 @@ FilesList = Class.create(SelectableElements, {
 		
 	},
 	
+	createPaginator: function(){
+		var current = parseInt(this.paginationData.get('current'));
+		var total = parseInt(this.paginationData.get('total'));
+		var div = new Element('div').setStyle({height: '20px', backgroundColor:'#FFFFC1', borderBottom: '1px solid #ddd',fontFamily:'Trebuchet MS', fontSize:'11px', textAlign:'center', paddingTop: '2px'});
+		div.update('Page '+current+'/'+total);
+		if(current>1){
+			var prevA = new Element('a', {href:'#', style:'font-size:12px;'}).update('<b>&lt;&lt;</b>&nbsp;&nbsp;&nbsp;').observe('click', function(e){
+				this.loadXmlList(this._currentRep, null, null, $H({page:current-1}));	
+				Event.stop(e);
+			}.bind(this));
+			div.insert({top:prevA});
+		}
+		if(total > 1 && current < total){
+			var nextA = new Element('a', {href:'#', style:'font-size:12px;'}).update('&nbsp;&nbsp;&nbsp;<b>&gt;&gt;</b>').observe('click', function(e){
+				this.loadXmlList(this._currentRep, null, null, $H({page:current+1}));	
+				Event.stop(e);
+			}.bind(this));
+			div.insert({bottom:nextA});
+		}
+		return div;
+	},
+	
 	setColumnsDef:function(aColumns){
 		this.columnsDef = aColumns;
 		if(this._displayMode == "list"){
 			this.initGUI();
 		}
+	},
+	
+	getColumnsDef:function(){
+		return this.columnsDef;
 	},
 	
 	setContextualMenu: function(protoMenu){
@@ -135,7 +167,28 @@ FilesList = Class.create(SelectableElements, {
 		//alert(this.headersWidth[0]);
 	},
 	
-	applyHeadersWidth: function(){
+	applyHeadersWidth: function(){		
+		if(this.gridStyle == "grid"){
+			window.setTimeout(function(){
+			// Reverse!
+			var allItems = this.getItems();
+			if(!allItems.length) return;
+			var tds = $(allItems[0]).getElementsBySelector('td');
+			var headerCells = $('selectable_div_header').getElementsBySelector('td');
+			var index = 0;
+			headerCells.each(function(cell){				
+				cell.setStyle({padding:0});
+				var div = new Element('div').update(cell.innerHTML);
+				div.setStyle({height: cell.getHeight(), overflow: 'hidden'});
+				div.setStyle({width:tds[index].getWidth()-4+'px'});
+				div.setAttribute("title", cell.innerHTML);
+				cell.update(div);
+				cell.setStyle({width:tds[index].getWidth()+'px'});
+				index++;
+			});
+			}.bind(this), 10);
+			return;
+		}
 		this.getHeadersWidth();
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length;i++)
@@ -196,19 +249,30 @@ FilesList = Class.create(SelectableElements, {
 	},
 	
 	reload: function(pendingFileToSelect, url){
-		if(this._currentRep != null) this.loadXmlList(this._currentRep, pendingFileToSelect, url);
+		if(this._currentRep != null){
+			if(this.paginationData && this.paginationData.get('current') > 1){
+				this.loadXmlList(this._currentRep, pendingFileToSelect, url, $H({page:this.paginationData.get('current')}));
+			}else{
+				this.loadXmlList(this._currentRep, pendingFileToSelect, url);
+			}
+		}
 	},
 	
 	setPendingSelection: function(pendingFilesToSelect){
 		this._pendingFile = pendingFilesToSelect;
 	},
 	
-	loadXmlList: function(repToLoad, pendingFileToSelect, url){	
+	loadXmlList: function(repToLoad, pendingFileToSelect, url, additionnalParameters){	
 		// TODO : THIS SHOULD BE SET ONCOMPLETE!		
 		this._currentRep = repToLoad;
 		var connexion = new Connexion(url);
 		connexion.addParameter('mode', 'file_list');
-		connexion.addParameter('dir', repToLoad);	
+		connexion.addParameter('dir', repToLoad);
+		if(additionnalParameters){
+			additionnalParameters.each(function(pair){
+				connexion.addParameter(pair.key,pair.value);
+			});
+		}
 		this._pendingFile = pendingFileToSelect;
 		this.setOnLoad();
 		connexion.onComplete = function (transport){
@@ -257,13 +321,19 @@ FilesList = Class.create(SelectableElements, {
 				return;
 			}
 		}
-		// SECOND PASS FOR ERRORS CHECK
+		// SECOND PASS FOR ERRORS CHECK AND COLUMNS DECLARATION
+		var refreshGUI = false;
+		this.gridStyle = 'file';
+		if(this.paginationData){
+			this.paginationData = null;
+			refreshGUI = true;
+		}
 		for (var i = 0; i < l; i++) 
 		{
-			if(cs[i].tagName == "error" || cs[i].tagName == "message")
+			if(cs[i].nodeName == "error" || cs[i].nodeName == "message")
 			{
 				var type = "ERROR";
-				if(cs[i].tagName == "message") type = cs[i].getAttribute('type');
+				if(cs[i].nodeName == "message") type = cs[i].getAttribute('type');
 				if(modal.pageLoading){
 					alert(type+':'+cs[i].firstChild.nodeValue);
 					this.fireChange();
@@ -272,7 +342,46 @@ FilesList = Class.create(SelectableElements, {
 					this.fireChange();
 					return;
 				}
-			}			
+			}
+			else if(cs[i].nodeName == "columns")
+			{
+				//Dynamically redefine columns!
+				if(cs[i].getAttribute('switchGridMode')){
+					this.gridStyle = cs[i].getAttribute('switchGridMode');
+				}
+				var newCols = $A([]);
+				var sortTypes = $A([]);
+				for(var j=0;j<cs[i].childNodes.length;j++){
+					var col = cs[i].childNodes[j];
+					if(col.nodeName == "column"){
+						var obj = {};
+						$A(col.attributes).each(function(att){
+							obj[att.nodeName]=att.nodeValue;
+							if(att.nodeName == "sortType"){
+								sortTypes.push(att.nodeValue);
+							}
+						});
+						newCols.push(obj);
+					}
+				}
+				if(newCols.size()){
+					this.columnsDef = newCols;
+					this._oSortTypes = sortTypes;
+					if(this._displayMode == "list") refreshGUI = true;
+				}
+			}
+			else if(cs[i].nodeName == "pagination")
+			{
+				this.paginationData = new Hash();
+				$A(cs[i].attributes).each(function(att){
+					this.paginationData.set(att.nodeName, att.nodeValue);
+				}.bind(this));
+				refreshGUI = true;
+			}
+		}
+		if(refreshGUI)
+		{
+			this.initGUI();
 		}
 		var items = this.getItems();
 		for(var i=0; i<items.length; i++)
@@ -344,7 +453,7 @@ FilesList = Class.create(SelectableElements, {
 			attributeList.push(column.attributeName);
 		});
 		attributeList.each(function(s){
-			var tableCell = document.createElement("td");
+			var tableCell = document.createElement("td");			
 			if(s == "text")
 			{
 				innerSpan = document.createElement("span");
@@ -371,9 +480,26 @@ FilesList = Class.create(SelectableElements, {
 			{
 				tableCell.innerHTML = xmlNode.getAttribute(s);
 			}
+			if(this.gridStyle == "grid"){
+				$(tableCell).setAttribute('valign', 'top');				
+				$(tableCell).setStyle({
+					verticalAlign:'top', 
+					borderRight:'1px solid #eee'
+				});
+				if(this.even){
+					$(tableCell).setStyle({borderRightColor: '#fff'});					
+				}
+				if (tableCell.innerHTML == '') tableCell.innerHTML = '&nbsp;';
+			}
 			newRow.appendChild(tableCell);
 		}.bind(this));	
 		tBody.appendChild(newRow);
+		if(this.gridStyle == "grid"){
+			if(this.even){
+				$(newRow).setStyle({backgroundColor: '#eee'});					
+			}
+			this.even = !this.even;
+		}
 	},
 	
 	
