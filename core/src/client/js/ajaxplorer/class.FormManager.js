@@ -44,6 +44,7 @@ FormManager = Class.create({
 				});
 			}else if(element.nodeName.toLowerCase() == 'textarea'){
 				element.update(value[fieldName]);
+				element.value = value[fieldName];
 			}
 		});
 	},
