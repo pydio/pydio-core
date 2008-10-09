@@ -263,6 +263,10 @@ FoldersTree = Class.create({
 		return this.rootNodeId;
 	},
 	
+	currentIsRoot: function(){
+		return (this.rootNodeId == this.currentNodeName);
+	},
+	
 	recycleEnabled: function(){
 		if(webFXTreeHandler.recycleNode) return true;
 		return false;

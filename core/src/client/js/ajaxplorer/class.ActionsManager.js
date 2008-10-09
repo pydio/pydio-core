@@ -345,9 +345,12 @@ ActionsManager = Class.create({
 		return false;
 	},
 		
-	submitForm: function(formName)
+	submitForm: function(formName, post)
 	{
 		var connexion = new Connexion();
+		if(post){
+			connexion.setMethod('POST');
+		}
 		$(formName).getElements().each(function(fElement){
 			// OPERA : ADDS 'http://www.yourdomain.com/ajaxplorer/' to the action attribute value
 			var fValue = fElement.getValue();
@@ -451,9 +454,11 @@ ActionsManager = Class.create({
 	fireContextChange: function(){
 		var crtRecycle = false;
 		var crtInZip = false;
+		var crtIsRoot = false;
 		if(ajaxplorer && ajaxplorer.foldersTree){ 
 			crtRecycle = ajaxplorer.foldersTree.currentIsRecycle();
-			crtInZip = ajaxplorer.foldersTree.currentInZip()
+			crtInZip = ajaxplorer.foldersTree.currentInZip();
+			crtIsRoot = ajaxplorer.foldersTree.currentIsRoot();
 		}	
 		var displayMode = '';
 		if(ajaxplorer && ajaxplorer.filesList) displayMode = ajaxplorer.filesList.getDisplayMode();
@@ -462,7 +467,8 @@ ActionsManager = Class.create({
 									 this.oUser, 
 									 crtRecycle, 
 									 displayMode, 
-									 crtInZip);
+									 crtInZip, 
+									 crtIsRoot);
 		}.bind(this));
 		this.refreshToolbarsSeparator();
 	},
