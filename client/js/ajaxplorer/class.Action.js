@@ -18,6 +18,7 @@ Action = Class.create({
 		this.context = Object.extend({
 			selection:true,
 			dir:false,
+			root:true,
 			inZip:true,
 			recycle:false,
 			behaviour:'hidden',
@@ -68,6 +69,7 @@ Action = Class.create({
 		var crtIsRecycle = arguments[2];
 		var crtDisplayMode = arguments[3];
 		var crtInZip = arguments[4];
+		var crtIsRoot = arguments[5];
 		if(this.options.listeners && this.options.listeners["contextChange"]){
 			this.options.listeners["contextChange"].evalScripts();
 		}		
@@ -100,6 +102,9 @@ Action = Class.create({
 			}
 		}
 		if(!this.context.inZip && crtInZip){
+			return this.hideForContext();
+		}
+		if(!this.context.root && crtIsRoot){
 			return this.hideForContext();
 		}
 		if(this.options.displayAction && this.options.displayAction == crtDisplayMode){
