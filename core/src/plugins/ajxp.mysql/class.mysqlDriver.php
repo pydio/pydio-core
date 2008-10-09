@@ -137,6 +137,40 @@ class mysqlDriver extends AbstractDriver
 			//	SUPPRIMER / DELETE
 			//------------------------------------
 			case "delete";
+				$dir = basename($dir);
+				$link = $this->createDbLink();
+				if(trim($dir) == ""){
+					// ROOT NODE => DROP TABLES
+					$tables = $selection->getFiles();
+					$query = "DROP TABLE";
+					foreach ($tables as $index => $tableName){
+						$tables[$index] = basename($tableName);
+					}
+					$query.= " ".join(",", $tables);
+					$res = $this->execQuery($query);
+				}else{
+					// TABLE NODE => DELETE RECORDS
+					$tableName = $dir;
+					$pks = $selection->getFiles();
+					foreach ($pks as $key => $pkString){
+						$parts = split("\.", $pkString);
+						array_pop($parts); // remove .pk extension
+						array_shift($parts); // remove record prefix
+						foreach ($parts as $index => $pkPart){
+							$parts[$index] = str_replace("__", "='", $pkPart)."'";
+						}
+						$pks[$key] = "(".implode(" AND ", $parts).")";
+					}
+					$query = "DELETE FROM $tableName WHERE ". implode(" OR ", $pks);
+					$res = $this->execQuery($query);
+				}
+				AJXP_Exception::errorToXml($res);
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage($query, null);
+				AJXP_XMLWriter::reloadFileList(false);
+				AJXP_XMLWriter::close();									
+				$this->closeDbLink($link);
+				exit(1);
 			break;
 		
 			//------------------------------------
@@ -182,14 +216,20 @@ class mysqlDriver extends AbstractDriver
 					print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'"/>';
 					foreach ($result["ROWS"] as $row){
 						print '<tree ';
+						$pkString = "";
 						foreach ($row as $key=>$value){							
 							$value = str_replace("\"", "", $value);
 							$value = str_replace("&", "&amp;", $value);
 							$value = str_replace(">", "", $value);
 							print $key.'="'.SystemTextEncoding::toUTF8($value).'" ';
+							if($result["HAS_PK"]>0){
+								if(in_array($key, $result["PK_FIELDS"])){
+									$pkString .= $key."__".$value.".";
+								}
+							}
 						}
 						if($result["HAS_PK"] > 0){
-							print 'filename="record.pk" ';
+							print 'filename="record.'.$pkString.'pk" ';
 						}else{
 							print 'filename="record.no_pk" ';
 						}
@@ -427,7 +467,7 @@ class mysqlDriver extends AbstractDriver
 			}
 
 		}
-		return array("COLUMNS" => $columns, "ROWS" => $rows, "HAS_PK"=>$cpk, "TOTAL_PAGES"=>$totalPages);
+		return array("COLUMNS" => $columns, "ROWS" => $rows, "HAS_PK"=>$cpk, "TOTAL_PAGES"=>$totalPages, "PK_FIELDS"=>$pkfield);
 	}
 
 	
