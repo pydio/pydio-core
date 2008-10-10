@@ -35,7 +35,7 @@
 			</processing>
 		</action>
 		<action name="mkdir">			
-			<gui text="154" title="155" src="folder_new.png" accessKey="folder_access_key" hasAccessKey="true">
+			<gui text="267" title="268" src="table_new.png" accessKey="folder_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -52,7 +52,7 @@
 				</processing>
 		</action>
 		<action name="mkfile">
-			<gui text="156" title="157" src="filenew.png" accessKey="file_access_key" hasAccessKey="true">
+			<gui text="273" title="274" src="table_record_new.png" accessKey="file_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false" root="false">
@@ -74,7 +74,7 @@
 				</processing>
 		</action>
 		<action name="edit_table">
-			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+			<gui text="269" title="270" src="table_edit.png" accessKey="edit_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden" 
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="put" inZip="false" root="false">
@@ -111,7 +111,7 @@
 							<tbody>
 								<tr>
 									<td new="false"></td>
-									<td><input name="field_name" type="text"/></td>
+									<td><input name="field_name" type="text"/><input type="hidden" name="field_origname"/></td>
 									<td><input name="field_type" type="text"/></td>
 									<td><input name="field_size" type="text"/></td>
 									<td>
@@ -147,7 +147,7 @@
 				</processing>
 		</action>
 		<action name="edit_record">
-			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+			<gui text="51" title="276" src="table_record_edit.png" accessKey="edit_access_key" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden" 
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false" root="false">
@@ -168,27 +168,24 @@
 					modal.showDialogForm('Edit Online', 'mysql_edit_record', loadFunc, completeFunc, null);
 					]]></clientCallback>
 				<clientForm id="mysql_edit_record"><![CDATA[
-					<div id="mysql_edit_record" action="edit_record" box_width="50%">
+					<div id="mysql_edit_record" action="edit_record" box_width="50%">					
 					</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="delete">			
-			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true">
+		<action name="delete_table">
+			<gui text="271" title="272" src="table_delete.png" accessKey="delete_access_key" hasAccessKey="false">
 				<context selection="true" dir="true" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change" inZip="false">
+					actionBarGroup="put" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" allowedMimes="pk"></selectionContext></gui>
+				<selectionContext dir="true" file="false" recycle="false" unique="false" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){
-				    	var message = MessageHash[177];
-				    	if(ajaxplorer.foldersTree.recycleEnabled() && !ajaxplorer.foldersTree.currentIsRecycle()){
-				    		message = MessageHash[176];
-				    	}
+				    	var message = MessageHash[275];
 		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
 					};
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
@@ -200,7 +197,36 @@
 					});
 					]]></clientCallback>
 				<clientForm id="delete_form"><![CDATA[
-				<div id="delete_form" action="delete" box_width="280">
+				<div id="delete_form" action="delete_table" box_width="280">
+<span id="delete_message"></span>
+</div>				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<action name="delete_record">
+			<gui text="7" title="277" src="table_record_delete.png" accessKey="delete_access_key" hasAccessKey="true">
+				<context selection="true" dir="true" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" allowedMimes="pk" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var onLoad = function(oForm){
+				    	var message = MessageHash[278];
+		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
+					};
+					modal.showDialogForm('Delete', 'delete_record_form', onLoad, function(){
+						var oForm = modal.getForm();
+						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.actionBar.submitForm(oForm);
+						hideLightBox(true);
+						return false;
+					});
+					]]></clientCallback>
+				<clientForm id="delete_record_form"><![CDATA[
+				<div id="delete_record_form" action="delete_record" box_width="280">
 <span id="delete_message"></span>
 </div>				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
