@@ -287,6 +287,18 @@ $mess=array(
 "263" => "Ecraser",
 "264" => "Passer", 
 "265" => "Fichiers",
-"266" => "o"
+"266" => "o",
+"267" => "Creer",
+"268" => "Creer une nouvelle table",
+"269" => "Structure",
+"270" => "Editer la structure de la table",
+"271" => "Drop", 
+"272" => "Effacer la ou les table(s)",
+"273" => "Insèrer",
+"274" => "Inserer un nouvel enregistrement", 
+"275" => "Etes-vous sûr de vouloir effacer la ou les table(s) sélectionnée(s)?", 
+"276" => "Editer l'enregistrement",
+"277" => "Effacer le ou les enregistrement(s)",
+"278" => "Etes vous sûr de vouloir effacer le ou les enregistrement(s) sélectionné(s)?"
 );
 ?>
