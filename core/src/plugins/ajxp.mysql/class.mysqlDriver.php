@@ -86,7 +86,34 @@ class mysqlDriver extends AbstractDriver
 			//	CHANGE COLUMNS OR CREATE TABLE
 			//------------------------------------
 			case "edit_table":
-				$fields = array("name", "default", "null", "size", "type", "flags", "pk");
+				$link = $this->createDbLink();				
+				if(isSet($httpVars["current_table"])){
+					if(isSet($httpVars["delete_column"])){
+						$query = "ALTER TABLE ".$httpVars["current_table"]." DROP COLUMN ".$httpVars["delete_column"];
+						$res = $this->execQuery($query);
+						if(is_a($res, "AJXP_Exception")){
+							$errorMessage = $res->messageId;
+						}else{
+							$logMessage = $query;
+							$reload_file_list = true;							
+						}
+						break;
+					}
+					if(isSet($httpVars["add_column"])){
+						$defString = $this->makeColumnDef($httpVars, "add_field_");
+						$query = "ALTER TABLE ".$httpVars["current_table"]." ADD COLUMN ($defString)";
+						$res = $this->execQuery($query);
+						if(is_a($res, "AJXP_Exception")){
+							$errorMessage = $res->messageId;
+						}else{
+							$logMessage = $query;
+							$reload_file_list = true;							
+						}
+						break;
+					}
+				}
+				
+				$fields = array("origname","name", "default", "null", "size", "type", "flags", "pk");
 				$rows = array();
 				foreach ($httpVars as $k=>$val){
 					$split = split("_", $k);
@@ -95,10 +122,11 @@ class mysqlDriver extends AbstractDriver
 						$rows[intval($split[2])][$split[1]] = $val;
 					}
 				}
-				$link = $this->createDbLink();
 				if(isSet($current_table)){
 					foreach ($rows as $row){
-						$query = "ALTER TABLE $current_table CHANGE ".$row["name"]." ".$row["name"]." ".$row["type"]."(".$row["size"].") ".$row["null"];
+						$sizeString = ($row["size"]!=""?"(".$row["size"].")":"");
+						$defString = ($row["default"]!=""?" DEFAULT ".$row["default"]."":"");
+						$query = "ALTER TABLE $current_table CHANGE ".$row["origname"]." ".$row["name"]." ".$row["type"].$sizeString.$defString." ".$row["null"];
 						$res = $this->execQuery(trim($query));
 						AJXP_Exception::errorToXml($res);
 						AJXP_XMLWriter::header();
@@ -108,18 +136,17 @@ class mysqlDriver extends AbstractDriver
 					}
 				}else if(isSet($new_table)){
 					$fieldsDef = "";
-					foreach ($rows as $row){
-						$defString = "";
-						if(isSet($row["default"]) && trim($row["default"]) != ""){
-							$defString = " DEFAULT ".$row["default"];
-						}
-						$fieldsDef.= $row["name"]." ".$row["type"]."(".$row["size"].")".$defString." ".$row["null"]." ".$row["flags"].",";
+					foreach ($rows as $index=>$row){
+						$fieldsDef .= $this->makeColumnDef($row);
 						if($row["pk"] == "1"){
 							$pk = $row;
 						}
+						if($index < count($rows)-1){
+							$fieldsDef.=",";
+						}
 					}
 					if(isSet($pk)){
-						$fieldsDef.= "PRIMARY KEY (".$pk["name"].")";
+						$fieldsDef.= ",PRIMARY KEY (".$pk["name"].")";
 					}
 					$query = "CREATE TABLE $new_table ($fieldsDef)"; 
 					$res = $this->execQuery((trim($query)));
@@ -136,7 +163,8 @@ class mysqlDriver extends AbstractDriver
 			//------------------------------------
 			//	SUPPRIMER / DELETE
 			//------------------------------------
-			case "delete";
+			case "delete_table":
+			case "delete_record":
 				$dir = basename($dir);
 				$link = $this->createDbLink();
 				if(trim($dir) == ""){
@@ -197,7 +225,7 @@ class mysqlDriver extends AbstractDriver
 				if($dir == ""){
 					$tables = $this->listTables();
 					print '<columns switchGridMode="filelist"><column messageString="Table Name" attributeName="text" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>';
-					$icon = ($mode == "file_list"?"folder.png":CLIENT_RESOURCES_FOLDER."/images/foldericon.png");
+					$icon = ($mode == "file_list"?"table_empty.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/table_empty_tree.png");
 					foreach ($tables as $tableName){
 						$size = $this->getSize($tableName);
 						$count = $this->getCount($tableName);
@@ -336,6 +364,16 @@ class mysqlDriver extends AbstractDriver
 			return mysql_fetch_array($res);
 			// ["Field", "Type", "Null", "Key", "Default", "Extra"] => Type is like "enum('a', 'b', 'c')"
 		}
+	}
+	
+	function makeColumnDef($row, $prefix="", $suffix=""){
+		$defString = "";
+		if(isSet($row[$prefix."default".$suffix]) && trim($row[$prefix."default".$suffix]) != ""){
+			$defString = " DEFAULT ".$row[$prefix."default".$suffix];
+		}
+		$sizeString = ($row[$prefix."size".$suffix]!=""?"(".$row[$prefix."size".$suffix].")":"");
+		$fieldsDef = $row[$prefix."name".$suffix]." ".$row[$prefix."type".$suffix].$sizeString.$defString." ".$row[$prefix."null".$suffix]." ".$row[$prefix."flags".$suffix];
+		return $fieldsDef;
 	}
 	
 	function cleanFlagString($flagString){
@@ -478,7 +516,7 @@ class mysqlDriver extends AbstractDriver
 			if($result){
 				return $result;
 			}else{
-				return new AJXP_Exception("<b>".$sql."</b> :".mysql_error());
+				return new AJXP_Exception($sql.":".mysql_error());
 			}
 		}else{
 			return new AJXP_Exception('Empty Query');
