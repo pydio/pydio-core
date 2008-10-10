@@ -20,19 +20,28 @@ SQLEditor = Class.create({
 	createRecordEditor: function(userSelection){
 		var columns = ajaxplorer.filesList.getColumnsDef();
 		var crtTableName = getBaseName(ajaxplorer.filesList.getCurrentRep());
-		
 		this.oForm.insert(new Element('input', {type:'hidden',name:'table_name', value:crtTableName}));
-		var table = new Element('table', {className:'sqlRecordForm'});
+		var table = new Element('table', {width:'96%', className:'sqlRecordForm'});
+		var tBody = new Element('tbody');
+		table.insert(tBody);
 		this.fields = $A([]);
 		
 		$A(columns).each(function(col){			
 			this.fields.push(col.attributeName);
+			var disable = false;
+			var auto_inc = false;
 			if(col.field_pk == "1"){
 				this.oForm.insert(new Element('input', {type:'hidden',name:'pk_name', value:col.attributeName}));
+				if(userSelection && !userSelection.isEmpty()){
+					disable = true;
+				}else if(col.field_flags.search('auto_increment') > -1){
+					disable = true;
+					auto_inc = true;
+				}
 			}
 			var tr= new Element('tr');
 			var labelTD = new Element('td', {className:'sqlLabelTd'}).update(col.attributeName + ' :');
-			var typeTD = new Element('td', {className:'sqlTypeTd'}).update('('+col.field_type+')');
+			var typeTD = new Element('td', {className:'sqlTypeTd'}).update('('+col.field_type+(auto_inc?',auto':'')+')');
 			var inputTD = new Element('td', {className:'sqlInputTd'});
 			var input;
 			var type = col.field_type.toLowerCase();			
@@ -68,14 +77,16 @@ SQLEditor = Class.create({
 					input = new Element('input', {name:col.attributeName});
 					break;
 			}
+			if(disable) input.disable();
 			inputTD.update(input);
 			tr.insert(labelTD);
 			tr.insert(inputTD);
 			tr.insert(typeTD);
-			table.insert(tr);			
+			tBody.insert(tr);
 		}.bind(this));
 		
-		this.oForm.insert({top:table});		
+		var crtElement = this.oForm.select('div[id="mysql_edit_record"]')[0];
+		crtElement.insert({top:table});		
 		var newRec = new Element('input', {type:'hidden',name:'record_is_new', value:'true'});
 		this.oForm.insert(newRec);
 		if(userSelection && !userSelection.isEmpty()){
@@ -106,8 +117,10 @@ SQLEditor = Class.create({
 			this.displayReplicationChooser();			
 		}else{
 			var columns = ajaxplorer.filesList.getColumnsDef();
-			var fields = $A(["field_name", "field_type", "field_size", "field_flags", "field_default", "field_pk", "field_null"]);
-			
+			var fields = $A(["field_name", "field_origname", "field_type", "field_size", "field_flags", "field_default", "field_pk", "field_null"]);
+			columns.each(function(col){
+				col['field_origname'] = col['field_name'];
+			});
 			this.oForm.insert(new Element('input', {type:'hidden',name:'current_table',value:getBaseName(tableName)}));
 			this.displayTableEditorForm(columns.length, fields, columns);
 		}
@@ -139,28 +152,81 @@ SQLEditor = Class.create({
 		var templateTable = $('create_table_template').cloneNode(true).setStyle({display:'block'});
 		var templateRow = templateTable.select('tbody > tr')[0];
 		if(values){
+			// MAKE "ADD COLUMN"
+			var addTable = $('create_table_template').cloneNode(true).setStyle({display:'block'});
+			addTable.select('input', 'select', 'textarea').each(function(fElem){
+				fElem.name = 'add_'+fElem.name;
+			});
+			addTable.select('td[edit="false"]').invoke('remove');
+			addRow = addTable.select('tbody tr')[0];
+			var addButton = new Element('input', {type:'button', value:'Add'});
+			var submitDiv = new Element('div', {className:'dialogButtons'}).insert(addButton);
+			var submitRow = new Element('tr').insert(new Element('td', {colspan:"9"}).insert(submitDiv));
+			addRow.insert({after:submitRow});
+			addButton.observe('click', function(e){
+				this.triggerAddColumn();
+			}.bind(this));
+			
+			
+			// MAKE ACTIONS
 			templateTable.select('td[edit="false"]').invoke('remove');
 			templateRow.select('input', 'textarea', 'select').invoke('disable');
 			templateRow.setAttribute('enabled', 'false');
-			var activator = new Element('a', {href:'#', className:'enableRow'}).update('E');
+			var activator = new Element('img', {
+				src:ajxpResourcesFolder+'/images/crystal/actions/16/encrypted.png',
+				height:'16',
+				width:'16',
+				border:'0',
+				className:'enableRow',
+				style:'cursor:pointer;'
+			});
 			templateRow.select('td[new="false"]')[0].update(activator);
+			// Additionnal actions
+			var deleteCol = new Element('img', {
+				src:ajxpResourcesFolder+'/images/crystal/actions/16/button_cancel.png',
+				height:'16',
+				width:'16',
+				hspace:'5',
+				border:'0',
+				className:'deleteRow',
+				style:'cursor:pointer;'
+			});
+			activator.insert({before:deleteCol});
 			templateTable.observe('click', function(e){
-				if(e.findElement('a') && e.findElement('a').hasClassName('enableRow')){
+				if(e.findElement('img') && e.findElement('img').hasClassName('enableRow')){
 					var row = e.findElement('tr');
 					if(row.getAttribute('enabled') && row.getAttribute('enabled') == "true"){
 						row.select('input', 'textarea', 'select').invoke('disable');
 						row.setAttribute('enabled', 'false');
-						e.findElement('a').update('E');						
+						e.findElement('img').src=ajxpResourcesFolder+'/images/crystal/actions/16/encrypted.png';
 					}else{
 						row.select('input', 'textarea', 'select').invoke('enable');
 						row.setAttribute('enabled', 'true');
-						e.findElement('a').update('D');
+						e.findElement('img').src=ajxpResourcesFolder+'/images/crystal/actions/16/decrypted.png';
 					}
 					Event.stop(e);
+				}else if(e.findElement('img') && e.findElement('img').hasClassName('deleteRow')){
+					var row = e.findElement('tr');
+					var origName = '';
+					row.select('input').each(function(input){
+						if(input.name.search('field_origname') > -1){
+							origName = input.value;
+							return;
+						}
+					});
+					if(origName != ''){
+						var confirm = window.confirm('Are you sure you want to delete the column '+origName+'?');
+						if(confirm){
+							this.triggerDeleteColumn(origName);
+						}
+					}
 				}
-			});
+			}.bind(this));
 		}else{
 			templateTable.select('td[new="false"]').invoke('remove');
+		}
+		if(addTable){
+			this.oForm.insert(addTable);
 		}
 		this.oForm.insert(templateTable);
 		var fManager = new FormManager();
@@ -183,10 +249,35 @@ SQLEditor = Class.create({
 		}.bind(this);
 	},
 	
-	loadFile : function(fileName){
+	triggerDeleteColumn : function(columnName){
+		var currentTable = this.oForm.select('input[name="current_table"]')[0].value;
+		var parameters = new Hash();
+		parameters.set('get_action', 'edit_table');
+		parameters.set('delete_column', columnName);
+		parameters.set('current_table', currentTable);
+		var connexion = new Connexion();
+		connexion.setParameters(parameters);		
+		connexion.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+		connexion.sendAsync();
+		hideLightBox();
 	},
 	
-	saveFile : function(){
+	triggerAddColumn : function(){
+		var params = new Hash();
+		var currentTable = this.oForm.select('input[name="current_table"]')[0].value;
+		params.set('get_action', 'edit_table');
+		params.set('add_column', 'true');
+		params.set('current_table', currentTable);
+		this.oForm.select('input', 'textarea', 'select').each(function(elem){
+			if(elem.name.search("add_") == 0){
+				params.set(elem.name, elem.value);
+			}
+		});		
+		var connexion = new Connexion();
+		connexion.setParameters(params);		
+		connexion.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+		connexion.sendAsync();
+		hideLightBox();		
 	},
 	
 	parseXml : function(transport){
