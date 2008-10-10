@@ -296,6 +296,18 @@ $mess=array(
 "263" => "Overwrite",
 "264" => "Skip", 
 "265" => "Files",
-"266" => "B"
+"266" => "B",
+"267" => "Create",
+"268" => "Create a new table",
+"269" => "Structure",
+"270" => "Edit table structure",
+"271" => "Drop", 
+"272" => "Drop open table",
+"273" => "Insert",
+"274" => "Insert a new record", 
+"275" => "Are you sure you want to drop the selected table(s)?", 
+"276" => "Edit selected record",
+"277" => "Delete selected records",
+"278" => "Are you sure you want to delete the selected record(s)?"
 );
 ?>
