@@ -3516,7 +3516,7 @@ Form.Element.Methods = {
 
   disable: function(element) {
     element = $(element);
-    element.blur();
+    try{element.blur();}catch(e){}
     element.disabled = true;
     return element;
   },
