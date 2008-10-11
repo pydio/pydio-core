@@ -99,6 +99,7 @@ SQLEditor = Class.create({
 			var formManager = new FormManager();
 			formManager.fetchValueToForm(this.oForm, this.fields, value.toObject());
 		}
+		modal.refreshDialogPosition(true, $('mysql_edit_record'));
 	},
 	
 	submitRecordForm : function(){
@@ -157,9 +158,10 @@ SQLEditor = Class.create({
 			addTable.select('input', 'select', 'textarea').each(function(fElem){
 				fElem.name = 'add_'+fElem.name;
 			});
-			addTable.select('td[edit="false"]').invoke('remove');
+			//addTable.select('td[edit="false"]').invoke('remove');
+			addTable.select('td[new="false"]')[0].setStyle({width:'40px'});
 			addRow = addTable.select('tbody tr')[0];
-			var addButton = new Element('input', {type:'button', value:'Add'});
+			var addButton = new Element('input', {type:'button', value:'Add', className:'dialogButton'});
 			var submitDiv = new Element('div', {className:'dialogButtons'}).insert(addButton);
 			var submitRow = new Element('tr').insert(new Element('td', {colspan:"9"}).insert(submitDiv));
 			addRow.insert({after:submitRow});
@@ -226,9 +228,11 @@ SQLEditor = Class.create({
 			templateTable.select('td[new="false"]').invoke('remove');
 		}
 		if(addTable){
-			this.oForm.insert(addTable);
+			this.oForm.insert(this.createFieldSet('Add column', addTable));
+			this.oForm.insert(this.createFieldSet('Change columns (unlock to edit)', templateTable));
+		}else{
+			this.oForm.insert(this.createFieldSet('Step 2: Edit columns for table \"'+this.newTableName+'"', templateTable));
 		}
-		this.oForm.insert(templateTable);
 		var fManager = new FormManager();
 		fManager.replicateRow(templateRow, numberReplicates);
 		if(fields && values){
@@ -247,6 +251,7 @@ SQLEditor = Class.create({
 			hideLightBox();
 			return false;			
 		}.bind(this);
+		modal.refreshDialogPosition(true, $('create_table_template'));
 	},
 	
 	triggerDeleteColumn : function(columnName){
@@ -270,7 +275,7 @@ SQLEditor = Class.create({
 		params.set('current_table', currentTable);
 		this.oForm.select('input', 'textarea', 'select').each(function(elem){
 			if(elem.name.search("add_") == 0){
-				params.set(elem.name, elem.value);
+				params.set(elem.name, elem.getValue());
 			}
 		});		
 		var connexion = new Connexion();
@@ -278,6 +283,11 @@ SQLEditor = Class.create({
 		connexion.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
 		hideLightBox();		
+	},
+	
+	createFieldSet:function(legend, content){
+		var fSet = new Element('fieldset').insert(new Element('legend').update(legend)).insert(content);
+		return fSet;		
 	},
 	
 	parseXml : function(transport){
