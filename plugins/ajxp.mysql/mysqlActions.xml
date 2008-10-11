@@ -92,7 +92,7 @@
 					modal.showDialogForm('Edit Table Columns', 'mysql_edit_table', loadFunc, null, null, true, true);
 					]]></clientCallback>
 				<clientForm id="mysql_edit_table"><![CDATA[
-					<div id="mysql_edit_table" action="edit_table" box_width="80%">
+					<div id="mysql_edit_table" action="edit_table" box_width="800">
 					</div>
 					<div id="create_table_template" class="sqlForm">
 						<table>
@@ -106,13 +106,44 @@
 								<td>Default</td>
 								<td>Other Flags</td>
 								<td edit="false">PK</td>
+								<td edit="false">IDX</td>
+								<td edit="false">UNIQ</td>
 							</tr>
 							</thead>
 							<tbody>
 								<tr>
 									<td new="false"></td>
 									<td><input name="field_name" type="text"/><input type="hidden" name="field_origname"/></td>
-									<td><input name="field_type" type="text"/></td>
+									<td><select name="field_type">
+											<option value="tinyint">TINYINT</option>
+											<option value="smallint">SMALLINT</option>
+											<option value="mediumint">MEDIUMINT</option>
+											<option value="int">INT</option>
+											<option value="integer">INTEGER</option>
+											<option value="bigint">BIGINT</option>
+											<option value="real">REAL</option>
+											<option value="double">DOUBLE</option>
+											<option value="float">FLOAT</option>
+											<option value="decimal">DECIMAL</option>
+											<option value="numeric">NUMERIC</option>
+											<option value="date">DATE</option>
+											<option value="time">TIME</option>
+											<option value="timestamp">TIMESTAMP</option>
+											<option value="datetime">DATETIME</option>
+											<option value="char">CHAR</option>
+											<option value="varchar">VARCHAR</option>
+											<option value="tinyblob">TINYBLOB</option>
+											<option value="blob">BLOB</option>
+											<option value="mediumblob">MEDIUMBLOB</option>
+											<option value="longblob">LONGBLOB</option>
+											<option value="tinytext">TINYTEXT</option>
+											<option value="text">TEXT</option>
+											<option value="mediumtext">MEDIUMTEXT</option>
+											<option value="longtext">LONGTEXT</option>
+											<option value="enum">ENUM</option>
+											<option value="set">SET</option>
+										</select>
+									</td>
 									<td><input name="field_size" type="text"/></td>
 									<td>
 										<select name="field_null">
@@ -124,11 +155,15 @@
 									<td><input name="field_default" type="text"/></td>
 									<td><input name="field_flags" type="text"/></td>
 									<td edit="false"><input name="field_pk" type="checkbox" value="1"/></td>
+									<td edit="false"><input name="field_index" type="checkbox" value="1"/></td>
+									<td edit="false"><input name="field_uniq" type="checkbox" value="1"/></td>
 								</tr>
 							</tbod>
 						</table>
 					</div>
 					<div id="replication_chooser">
+					<fieldset>
+						<legend>Step 1: Choose a number of fields</legend>
 					<table class="sqlRecordForm">
 						<tr>
 						<td class="sqlLabelTd">Name of the table : </td><td class="sqlFieldTd"><input type="text" id="table_name"/></td>
@@ -137,10 +172,11 @@
 						<td class="sqlLabelTd">Number of fields : </td><td class="sqlFieldTd"><input style="width:30px !important;" type="text" id="fields_number"/></td>
 						</tr>
 					</table>
-					<div class="dialogButtons">
-						<input type="button" id="can" value="Cancel"/>
-						<input type="button" id="toNext" value="Next &gt;&gt;"/>
+					<div class="dialogButtons">					
+						<input type="button" id="can" value="Cancel" class="dialogButton"/>
+						<input type="button" id="toNext" value="Next &gt;&gt;" class="dialogButton"/>
 					</div>
+					</fieldset>
 					</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -168,7 +204,7 @@
 					modal.showDialogForm('Edit Online', 'mysql_edit_record', loadFunc, completeFunc, null);
 					]]></clientCallback>
 				<clientForm id="mysql_edit_record"><![CDATA[
-					<div id="mysql_edit_record" action="edit_record" box_width="50%">					
+					<div id="mysql_edit_record" action="edit_record" box_width="600">					
 					</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -180,7 +216,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put" inZip="false">
 				</context>
-				<selectionContext dir="true" file="false" recycle="false" unique="false" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="true" file="false" recycle="false" unique="false" allowedMimes="*" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -234,6 +270,21 @@
 		</action>
 	</actions>
 	<infoPanels>
+		<infoPanel mime="no_selection" attributes="">
+			<messages>
+				<message key="folders_string" id="279"/>
+				<message key="files_string" id="280"/>
+				<message key="totalsize_string" id="259"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">#{current_folder}</big>
+					<div id="filelist_folders_count"><b>#{folders_string}</b> : #{filelist_folders_count}</div>
+					<div id="filelist_files_count"><b>#{files_string}</b> : #{filelist_files_count}</div>
+					<div id="filelist_totalsize"><b>#{totalsize_string}</b> #{filelist_totalsize}</div>
+				</div>
+			]]></html>
+		</infoPanel>
 	<!--
 		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,modiftime">
 			<messages>

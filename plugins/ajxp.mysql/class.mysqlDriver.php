@@ -72,14 +72,15 @@ class mysqlDriver extends AbstractDriver
 					$query = "UPDATE $tableName SET $string WHERE $pkName='$pkValue'";					
 				}
 				$link = $this->createDbLink();
-				$this->execQuery($query);
+				$res = $this->execQuery($query);
 				$this->closeDbLink($link);
 				
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($query, null);
-				AJXP_XMLWriter::reloadFileList(true);
-				AJXP_XMLWriter::close();
-				exit(1);				
+				if(is_a($res, "AJXP_Exception")){
+					$errorMessage = $res->messageId;
+				}else{
+					$logMessage = $query;
+					$reload_file_list = true;							
+				}
 			break;
 					
 			//------------------------------------
@@ -97,11 +98,21 @@ class mysqlDriver extends AbstractDriver
 							$logMessage = $query;
 							$reload_file_list = true;							
 						}
+						$this->closeDbLink($link);
 						break;
 					}
 					if(isSet($httpVars["add_column"])){
 						$defString = $this->makeColumnDef($httpVars, "add_field_");
 						$query = "ALTER TABLE ".$httpVars["current_table"]." ADD COLUMN ($defString)";
+						if(isSet($httpVars["add_field_pk"]) && $httpVars["add_field_pk"]=="1"){
+							$query.= ", ADD PRIMARY KEY (".$httpVars["add_field_name"].")";
+						}
+						if(isSet($httpVars["add_field_index"]) && $httpVars["add_field_index"]=="1"){
+							$query.= ", ADD INDEX (".$httpVars["add_field_name"].")";
+						}
+						if(isSet($httpVars["add_field_uniq"]) && $httpVars["add_field_uniq"]=="1"){
+							$query.= ", ADD UNIQUE (".$httpVars["add_field_name"].")";
+						}
 						$res = $this->execQuery($query);
 						if(is_a($res, "AJXP_Exception")){
 							$errorMessage = $res->messageId;
@@ -109,11 +120,12 @@ class mysqlDriver extends AbstractDriver
 							$logMessage = $query;
 							$reload_file_list = true;							
 						}
+						$this->closeDbLink($link);
 						break;
 					}
 				}
 				
-				$fields = array("origname","name", "default", "null", "size", "type", "flags", "pk");
+				$fields = array("origname","name", "default", "null", "size", "type", "flags", "pk", "index", "uniq");
 				$rows = array();
 				foreach ($httpVars as $k=>$val){
 					$split = split("_", $k);
@@ -123,41 +135,58 @@ class mysqlDriver extends AbstractDriver
 					}
 				}
 				if(isSet($current_table)){
+					$qMessage = '';
 					foreach ($rows as $row){
 						$sizeString = ($row["size"]!=""?"(".$row["size"].")":"");
 						$defString = ($row["default"]!=""?" DEFAULT ".$row["default"]."":"");
 						$query = "ALTER TABLE $current_table CHANGE ".$row["origname"]." ".$row["name"]." ".$row["type"].$sizeString.$defString." ".$row["null"];
 						$res = $this->execQuery(trim($query));
-						AJXP_Exception::errorToXml($res);
-						AJXP_XMLWriter::header();
-						AJXP_XMLWriter::sendMessage($query, null);
-						AJXP_XMLWriter::reloadFileList(false);
-						AJXP_XMLWriter::close();				
+						if(is_a($res, "AJXP_Exception")){
+							$errorMessage = $res->messageId;
+							$this->closeDbLink($link);
+							break;
+						}else{
+							$qMessage .= $query;
+							$reload_file_list = true;							
+						}
 					}
+					$logMessage = $qMessage;
 				}else if(isSet($new_table)){
 					$fieldsDef = "";
+					$pks = array();
+					$indexes = array();
+					$uniqs = array();
 					foreach ($rows as $index=>$row){
 						$fieldsDef .= $this->makeColumnDef($row);
-						if($row["pk"] == "1"){
-							$pk = $row;
-						}
+						// Analyse keys
+						if($row["pk"] == "1")$pks[] = $row["name"];
+						if($row["index"]=="1") $indexes[] = $row["name"];
+						if($row["uniq"]=="1") $uniqs[] = $row["name"];
+						
 						if($index < count($rows)-1){
 							$fieldsDef.=",";
 						}
 					}
-					if(isSet($pk)){
-						$fieldsDef.= ",PRIMARY KEY (".$pk["name"].")";
+					if(count($pks)){
+						$fieldsDef.= ",PRIMARY KEY (".join(",", $pks).")";
+					}
+					if(count($indexes)){
+						$fieldsDef.=",INDEX (".join(",", $indexes).")";
+					}
+					if(count($uniqs)){
+						$fieldsDef.=",UNIQUE (".join(",", $uniqs).")";
 					}
 					$query = "CREATE TABLE $new_table ($fieldsDef)"; 
 					$res = $this->execQuery((trim($query)));
-					AJXP_Exception::errorToXml($res);
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage($query, null);
-					AJXP_XMLWriter::reloadFileList(false);
-					AJXP_XMLWriter::close();				
+					if(is_a($res, "AJXP_Exception")){
+						$errorMessage = $res->messageId;
+					}else{
+						$logMessage = $query;
+						$reload_file_list = true;	
+						$reload_current_node = true;						
+					}
 				}
 				$this->closeDbLink($link);
-				exit(1);
 			break;
 			
 			//------------------------------------
@@ -176,6 +205,7 @@ class mysqlDriver extends AbstractDriver
 					}
 					$query.= " ".join(",", $tables);
 					$res = $this->execQuery($query);
+					$reload_current_node = true;
 				}else{
 					// TABLE NODE => DELETE RECORDS
 					$tableName = $dir;
@@ -193,12 +223,13 @@ class mysqlDriver extends AbstractDriver
 					$res = $this->execQuery($query);
 				}
 				AJXP_Exception::errorToXml($res);
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($query, null);
-				AJXP_XMLWriter::reloadFileList(false);
-				AJXP_XMLWriter::close();									
+				if(is_a($res, "AJXP_Exception")){
+					$errorMessage = $res->messageId;
+				}else{
+					$logMessage = $query;
+					$reload_file_list = true;							
+				}
 				$this->closeDbLink($link);
-				exit(1);
 			break;
 		
 			//------------------------------------
@@ -224,7 +255,7 @@ class mysqlDriver extends AbstractDriver
 				AJXP_XMLWriter::header();
 				if($dir == ""){
 					$tables = $this->listTables();
-					print '<columns switchGridMode="filelist"><column messageString="Table Name" attributeName="text" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>';
+					print '<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="text" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>';
 					$icon = ($mode == "file_list"?"table_empty.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/table_empty_tree.png");
 					foreach ($tables as $tableName){
 						$size = $this->getSize($tableName);
@@ -236,7 +267,7 @@ class mysqlDriver extends AbstractDriver
 					if(isSet($page))$currentPage = $page;
 					else $currentPage = 1;
 					$result = $this->showRecords("SELECT * FROM $tableName", $tableName, $currentPage);
-					print '<columns switchGridMode="grid">';
+					print '<columns switchDisplayMode="list" switchGridMode="grid">';
 					foreach ($result["COLUMNS"] as $col){
 						print "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(eregi("primary", $col["FLAGS"])?"1":"0")."\" field_null=\"".(eregi("not_null", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
 					}
@@ -373,7 +404,7 @@ class mysqlDriver extends AbstractDriver
 		}
 		$sizeString = ($row[$prefix."size".$suffix]!=""?"(".$row[$prefix."size".$suffix].")":"");
 		$fieldsDef = $row[$prefix."name".$suffix]." ".$row[$prefix."type".$suffix].$sizeString.$defString." ".$row[$prefix."null".$suffix]." ".$row[$prefix."flags".$suffix];
-		return $fieldsDef;
+		return trim($fieldsDef);
 	}
 	
 	function cleanFlagString($flagString){
@@ -514,6 +545,7 @@ class mysqlDriver extends AbstractDriver
 		if($sql !=''){
 			$result= @mysql_query( $sql );
 			if($result){
+				AJXP_Logger::logAction("exec", array($sql));
 				return $result;
 			}else{
 				return new AJXP_Exception($sql.":".mysql_error());
