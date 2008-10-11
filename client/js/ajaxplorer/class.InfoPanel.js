@@ -38,15 +38,24 @@ InfoPanel = Class.create({
 					size += parseInt(items[i].getAttribute("bytesize"));
 				}
 			}
-			var content = '<div style="padding:10px;"><big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center;"><img width="16" hspace="5" height="16" border="0" align="absmiddle" src="client/images/crystal/mimes/16/folder.png"/>'+currentRep+'</big>';
-			if(folderNumber) content+= '<br><b>'+MessageHash[130]+'</b> : '+folderNumber;
-			if(filesNumber) content+= '<br><b>'+MessageHash[265]+'</b> : '+filesNumber;
-			if(size) content += '<br><b>'+MessageHash[259]+'</b> '+roundSize(size, MessageHash[266]);
-			if(!folderNumber && !filesNumber){
-				content +="<br>"+MessageHash[132];
-			}
-			content += '</div>';
-			this.setContent(content);
+			
+			this.evalTemplateForMime("no_selection", null, {
+				filelist_folders_count:folderNumber,
+				filelist_files_count:filesNumber,
+				filelist_totalsize:roundSize(size, MessageHash[266]),
+				current_folder:currentRep
+			});
+				try{
+				if(!folderNumber && $(this.htmlElement).select('filelist_folders_count')){
+					$(this.htmlElement).select('[id="filelist_folders_count"]')[0].hide();
+				}
+				if(!filesNumber && $(this.htmlElement).select('filelist_files_count')){
+					$(this.htmlElement).select('[id="filelist_files_count"]')[0].hide();
+				}
+				if(!size && $(this.htmlElement).select('filelist_totalsize')){
+					$(this.htmlElement).select('[id="filelist_totalsize"]')[0].hide();
+				}
+			}catch(e){}
 			return;
 		}
 		if(!userSelection.isUnique())
@@ -75,38 +84,42 @@ InfoPanel = Class.create({
 		this.htmlElement.update(sHtml);
 	},
 	
-	evalTemplateForMime: function(mimeType, fileData){		
+	evalTemplateForMime: function(mimeType, fileData, tArgs){
 		if(!this.registeredMimes.get(mimeType)) return;		
 		var templateData = this.mimesTemplates.get(this.registeredMimes.get(mimeType));
 		var tString = templateData[0];
 		var tAttributes = templateData[1];
 		var tMessages = templateData[2];
-		var tArgs = new Object();
-		tAttributes.each(function(attName){
-			if(attName == 'basename' && fileData.getAttribute('filename')){
-				this[attName] = getBaseName(fileData.getAttribute('filename'));						
-			}
-			else if(attName == 'compute_image_dimensions'){
-				if(fileData.getAttribute('image_width') && fileData.getAttribute('image_height')){
-					var width = fileData.getAttribute('image_width');
-					var height = fileData.getAttribute('image_height');
-					var newHeight = 150;
-					if(height < newHeight) newHeight = height;
-					var newWidth = newHeight*width/height;
-					var dimAttr = 'height="'+newHeight+'"';
-					if(newWidth > $('info_panel').getWidth() - 16) dimAttr = 'width="100%"';
-				}else{
-					dimAttr = 'height="64" width="64"';
+		if(!tArgs){
+			tArgs = new Object();
+		}
+		if(fileData){
+			tAttributes.each(function(attName){
+				if(attName == 'basename' && fileData.getAttribute('filename')){
+					this[attName] = getBaseName(fileData.getAttribute('filename'));						
 				}
-				this[attName] = dimAttr;
-			}
-			else if(fileData.getAttribute(attName)){
-				this[attName] = fileData.getAttribute(attName);
-			}
-			else{ 
-				this[attName] = '';
-			}
-		}.bind(tArgs));
+				else if(attName == 'compute_image_dimensions'){
+					if(fileData.getAttribute('image_width') && fileData.getAttribute('image_height')){
+						var width = fileData.getAttribute('image_width');
+						var height = fileData.getAttribute('image_height');
+						var newHeight = 150;
+						if(height < newHeight) newHeight = height;
+						var newWidth = newHeight*width/height;
+						var dimAttr = 'height="'+newHeight+'"';
+						if(newWidth > $('info_panel').getWidth() - 16) dimAttr = 'width="100%"';
+					}else{
+						dimAttr = 'height="64" width="64"';
+					}
+					this[attName] = dimAttr;
+				}
+				else if(fileData.getAttribute(attName)){
+					this[attName] = fileData.getAttribute(attName);
+				}
+				else{ 
+					this[attName] = '';
+				}
+			}.bind(tArgs));
+		}
 		tMessages.each(function(pair){
 			this[pair.key] = MessageHash[pair.value];
 		}.bind(tArgs));
