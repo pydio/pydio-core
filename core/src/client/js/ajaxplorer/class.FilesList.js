@@ -31,7 +31,8 @@ FilesList = Class.create(SelectableElements, {
 		this.columnsDef.push({messageId:3,attributeName:'mimestring'});
 		this.columnsDef.push({messageId:4,attributeName:'modiftime'});
 		// Associated Defaults
-		this._oSortTypes = ["StringDirFile", "NumberKo", "String", "MyDate"];
+		this.defaultSortTypes = ["StringDirFile", "NumberKo", "String", "MyDate"];
+		this._oSortTypes = this.defaultSortTypes;
 		
 		this.initGUI();
 			
@@ -49,7 +50,11 @@ FilesList = Class.create(SelectableElements, {
 	{
 		if(this._displayMode == "list")
 		{
-			var buffer = '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
+			var buffer = '';
+			if(this.gridStyle == "grid"){
+				buffer = buffer + '<div style="overflow:hidden;">';
+			}
+			buffer = buffer + '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
 			this.columnsDef.each(function(column){buffer = buffer + '<col\>';});
 			buffer = buffer + '<thead><tr>';
 			for(var i=0; i<this.columnsDef.length;i++){
@@ -58,7 +63,11 @@ FilesList = Class.create(SelectableElements, {
 				if(i==this.columnsDef.length-1) last = ' id="last_header"';
 				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
 			}
-			buffer = buffer + '</tr></thead></table><div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
+			buffer = buffer + '</tr></thead></table>';
+			if(this.gridStyle == "grid"){
+				buffer = buffer + '</div>';
+			}			
+			buffer = buffer + '<div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			$('content_pane').innerHTML  = buffer;
 			oElement = $('selectable_div');
 			
@@ -68,6 +77,9 @@ FilesList = Class.create(SelectableElements, {
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
+			if(this.gridStyle == "grid"){
+				this._sortableTable.onsort = this.redistributeBackgrounds.bind(this);
+			}
 			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
 			this.disableTextSelection($('selectable_div_header'));
 			this.disableTextSelection($('table_rows_container'));
@@ -178,10 +190,10 @@ FilesList = Class.create(SelectableElements, {
 			var index = 0;
 			headerCells.each(function(cell){				
 				cell.setStyle({padding:0});
-				var div = new Element('div').update(cell.innerHTML);
+				var div = new Element('div').update('&nbsp;'+cell.innerHTML);
 				div.setStyle({height: cell.getHeight(), overflow: 'hidden'});
 				div.setStyle({width:tds[index].getWidth()-4+'px'});
-				div.setAttribute("title", cell.innerHTML);
+				div.setAttribute("title", new String(cell.innerHTML).stripTags());
 				cell.update(div);
 				cell.setStyle({width:tds[index].getWidth()+'px'});
 				index++;
@@ -324,6 +336,7 @@ FilesList = Class.create(SelectableElements, {
 		// SECOND PASS FOR ERRORS CHECK AND COLUMNS DECLARATION
 		var refreshGUI = false;
 		this.gridStyle = 'file';
+		this._oSortTypes = this.defaultSortTypes;
 		if(this.paginationData){
 			this.paginationData = null;
 			refreshGUI = true;
@@ -348,6 +361,12 @@ FilesList = Class.create(SelectableElements, {
 				//Dynamically redefine columns!
 				if(cs[i].getAttribute('switchGridMode')){
 					this.gridStyle = cs[i].getAttribute('switchGridMode');
+				}
+				if(cs[i].getAttribute('switchDisplayMode')){
+					var dispMode = cs[i].getAttribute('switchDisplayMode');
+					if(dispMode != this._displayMode){
+						this.switchDisplayMode(dispMode);
+					}
 				}
 				var newCols = $A([]);
 				var sortTypes = $A([]);
@@ -390,6 +409,7 @@ FilesList = Class.create(SelectableElements, {
 		}	
 		this.removeCurrentLines();
 		// NOW PARSE LINES
+		this.parsingCache = new Hash();
 		for (var i = 0; i < l; i++) 
 		{
 			if (cs[i].nodeName == "tree") 
@@ -441,17 +461,24 @@ FilesList = Class.create(SelectableElements, {
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
 	
-	xmlNodeToTableRow: function(xmlNode){
-		var newRow = document.createElement("tr");
-		var tBody = this._htmlElement.getElementsBySelector("tbody")[0];
+	xmlNodeToTableRow: function(xmlNode){		
+		var newRow = document.createElement("tr");		
+		var tBody = this.parsingCache.get('tBody') || this._htmlElement.getElementsBySelector("tbody")[0];
+		this.parsingCache.set('tBody', tBody);
 		for(i=0;i<xmlNode.attributes.length;i++)
 		{
 			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
 		}
-		var attributeList = $A([]);
-		this.columnsDef.each(function(column){
-			attributeList.push(column.attributeName);
-		});
+		var attributeList;
+		if(!this.parsingCache.get('attributeList')){
+			attributeList = $A([]);
+			this.columnsDef.each(function(column){
+				attributeList.push(column.attributeName);
+			});
+			this.parsingCache.set('attributeList', attributeList);
+		}else{
+			attributeList = this.parsingCache.get('attributeList');
+		}
 		attributeList.each(function(s){
 			var tableCell = document.createElement("td");			
 			if(s == "text")
@@ -654,7 +681,13 @@ FilesList = Class.create(SelectableElements, {
 		
 	},
 	
-	
+	redistributeBackgrounds: function(){
+		var allItems = this.getItems();
+		for(var i=0;i<allItems.length;i++){
+			$(allItems[i]).setStyle({backgroundColor:(this.even?'#eee':'')});
+			this.even = !this.even;
+		}
+	},
 	
 	removeCurrentLines: function(){
 		var rows;		
@@ -677,7 +710,7 @@ FilesList = Class.create(SelectableElements, {
 	
 	setOnLoad: function()	{
 		if(this.loading) return;
-		var parentObject = Position.offsetParent($(this._htmlElement));	
+		var parentObject = Position.offsetParent($(this._htmlElement));			
 		addLightboxMarkupToElement(parentObject);
 		var img = document.createElement("img");
 		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
