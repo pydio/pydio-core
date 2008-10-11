@@ -85,7 +85,7 @@ lightbox.prototype = {
 			this.getScroll();
 			this.prepareIE('100%', 'hidden');
 			this.setScroll(0,0);
-			this.hideSelects('hidden');
+			//this.hideSelects('hidden');
 		}
 		this.displayLightbox("block");
 	},
@@ -156,7 +156,7 @@ lightbox.prototype = {
 		if (browser == "Internet Explorer"){
 			this.setScroll(0,this.yPos);
 			this.prepareIE("auto", "auto");
-			this.hideSelects("visible");
+			//this.hideSelects("visible");
 		}
 		
 		this.displayLightbox("none");
@@ -255,9 +255,9 @@ function addLightboxMarkupToElement(element, skipElement)
 {
 	overlay 			= document.createElement('div');
 	overlay.id			= 'element_overlay';
-	getBrowserInfo();
-	if (browser == 'Internet Explorer'){
+	if (Prototype.Browser.IE){
 		var position = Position.positionedOffset($(element)); // IE CASE
+		//Position.offsetParent(element);
 		overlay.style.top = position[1];
 		overlay.style.left = 0;
 	}
