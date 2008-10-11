@@ -104,13 +104,6 @@ Modal = Class.create({
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.filesList.blur();
-		/*
-		if(Prototype.Browser.IE){
-			new Effect.Corner($$('#'+elementName + ' .dialogTitle')[0],"round top 7px");
-		}else{
-			new Effect.Corner(elementName,"round top 7px");
-		}
-		*/
 		if(!this.isRounded)
 		{
 			ajxpCorners($(elementName), 'bottom');
@@ -141,14 +134,7 @@ Modal = Class.create({
 			}
 		}
 		
-		// POSITION HORIZONTAL
-		boxWidth = $(elementName).getWidth();	
-		var offsetLeft = (winWidth - parseInt(boxWidth)) / 2;
-		$(elementName).setStyle({left:offsetLeft+'px'});
-		// POSITION VERTICAL
-		var boxHeight = $(elementName).getHeight();
-		var offsetTop = parseInt(((winHeight - boxHeight)/3));
-		$(elementName).setStyle({top:offsetTop+'px'});
+		this.refreshDialogPosition();
 			
 		displayLightBoxById(elementName);
 		
@@ -158,13 +144,39 @@ Modal = Class.create({
 		if (Prototype.Browser.Gecko){					
 			$(elementName).style.position = 'fixed';
 		}
-		
-		// REFRESH PNG IMAGES FOR IE!
-		refreshPNGImages(this.dialogContent);
+		else if(Prototype.Browser.IE){
+			$$('select').invoke('show');
+			// REFRESH PNG IMAGES FOR IE!
+			refreshPNGImages(this.dialogContent);			
+		}
 	},
 	
 	getForm: function()	{
 		return this.currentForm;
+	},
+	
+	refreshDialogPosition: function(checkHeight, elementToScroll){
+		var winWidth = $(document.body).getWidth();
+		var winHeight = $(document.body).getHeight();
+		boxWidth = $(this.elementName).getWidth();	
+		var boxHeight = $(this.elementName).getHeight();
+		
+		if(checkHeight && boxHeight > parseInt(winHeight*90/100)){
+			var maxHeight = parseInt(winHeight*90/100);
+			var crtScrollHeight = elementToScroll.getHeight();
+			var crtOffset = boxHeight - crtScrollHeight;
+			elementToScroll.setStyle({
+				overflow:'auto',
+				height:(maxHeight-crtOffset)+'px'
+			});
+			boxHeight = $(this.elementName).getHeight();
+		}
+		// POSITION HORIZONTAL
+		var offsetLeft = (winWidth - parseInt(boxWidth)) / 2;
+		$(this.elementName).setStyle({left:offsetLeft+'px'});
+		// POSITION VERTICAL
+		var offsetTop = parseInt(((winHeight - boxHeight)/3));
+		$(this.elementName).setStyle({top:offsetTop+'px'});		
 	},
 	
 	clearContent: function(object){
