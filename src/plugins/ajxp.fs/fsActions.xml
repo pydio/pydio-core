@@ -638,6 +638,23 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 		</action>						
 	</actions>
 	<infoPanels>
+		<infoPanel mime="no_selection" attributes="">
+			<messages>
+				<message key="folders_string" id="130"/>
+				<message key="files_string" id="265"/>
+				<message key="totalsize_string" id="259"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">
+						<img width="16" hspace="5" height="16" border="0" align="absmiddle" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/16/folder.png"/>#{current_folder}
+					</big>
+					<b>#{folders_string}</b> : #{filelist_folders_count}
+					<br><b>#{files_string}</b> : #{filelist_files_count}
+					<br><b>#{totalsize_string}</b> #{filelist_totalsize}
+				</div>
+			]]></html>
+		</infoPanel>
 		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,modiftime">
 			<messages>
 				<message key="name_string" id="133"/>
