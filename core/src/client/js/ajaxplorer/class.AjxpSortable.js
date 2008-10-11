@@ -15,18 +15,19 @@ AjxpSortable = Class.create(SortableTable, {
 			/(([0-9]*\.)?[0-9]+([eE][-+]?[0-9]+)?)(.*)/,
 		 "$1"+splitstr+"$4").split(splitstr);
 		var num = Number(ar[0]).valueOf();
-		var ml = ar[1].replace(/\s*([KMGB])\s*/, "$1");
-	
-		if (ml == "K")
-			num *= 1024;
-		else if(ml == "M")
-			num *= 1024 * 1024;
-		else if (ml == "G")
-			num *= 1024 * 1024 * 1024;
-		else if (ml == "T")
-			num *= 1024 * 1024 * 1024 * 1024;
-		// B and no prefix
-	
+		if(ar[1]){
+			var ml = ar[1].replace(/\s*([KMGB])\s*/, "$1");
+		
+			if (ml == "K")
+				num *= 1024;
+			else if(ml == "M")
+				num *= 1024 * 1024;
+			else if (ml == "G")
+				num *= 1024 * 1024 * 1024;
+			else if (ml == "T")
+				num *= 1024 * 1024 * 1024 * 1024;
+			// B and no prefix
+		}	
 		return num;
 	},
 	
@@ -41,18 +42,19 @@ AjxpSortable = Class.create(SortableTable, {
 			/(([0-9]*\.)?[0-9]+([eE][-+]?[0-9]+)?)(.*)/,
 		 "$1"+splitstr+"$4").split(splitstr);
 		var num = Number(ar[0]).valueOf();
-		var ml = ar[1].replace(/\s*(KO|MO|GO|T|KB|MB|GB)\s*/, "$1");
-	
-		if (ml == "KO" || ml == "KB")
-			num *= 1024;
-		else if(ml == "MO" || ml == "MB")
-			num *= 1024 * 1024;
-		else if (ml == "GO" || ml == "GB")
-			num *= 1024 * 1024 * 1024;
-		else if (ml == "T")
-			num *= 1024 * 1024 * 1024 * 1024;
-		// B and no prefix
-	
+		if(ar[1]){
+			var ml = ar[1].replace(/\s*(KO|MO|GO|T|KB|MB|GB)\s*/, "$1");
+		
+			if (ml == "KO" || ml == "KB")
+				num *= 1024;
+			else if(ml == "MO" || ml == "MB")
+				num *= 1024 * 1024;
+			else if (ml == "GO" || ml == "GB")
+				num *= 1024 * 1024 * 1024;
+			else if (ml == "T")
+				num *= 1024 * 1024 * 1024 * 1024;
+			// B and no prefix
+		}
 		return num;
 	},
 	
