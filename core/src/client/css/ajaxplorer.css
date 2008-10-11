@@ -1532,7 +1532,15 @@ padding: 0px;
 }
 
 .sqlForm input[type="text"]{
-   width: 150px !important;
+   width: 108px !important;
+}
+
+.sqlForm thead td {
+	background-color:#ccc;
+	color:#666;
+	font-size:13px;
+	padding:1px 5px;
+	text-align:center;
 }
 
 .sqlRecordForm{
