@@ -299,6 +299,8 @@ $mess=array(
 "275" => "Etes-vous sûr de vouloir effacer la ou les table(s) sélectionnée(s)?", 
 "276" => "Editer l'enregistrement",
 "277" => "Effacer le ou les enregistrement(s)",
-"278" => "Etes vous sûr de vouloir effacer le ou les enregistrement(s) sélectionné(s)?"
+"278" => "Etes vous sûr de vouloir effacer le ou les enregistrement(s) sélectionné(s)?",
+"279" => "Tables",
+"280" => "Enregistrements"
 );
 ?>

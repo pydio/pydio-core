@@ -310,6 +310,8 @@ $mess=array(
 "275" => "Are you sure you want to drop the selected table(s)?", 
 "276" => "Edit selected record",
 "277" => "Delete selected records",
-"278" => "Are you sure you want to delete the selected record(s)?"
+"278" => "Are you sure you want to delete the selected record(s)?",
+"279" => "Tables",
+"280" => "Records"
 );
 ?>
