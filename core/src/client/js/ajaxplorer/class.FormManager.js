@@ -4,18 +4,22 @@ FormManager = Class.create({
 		
 	},
 	
-	replicateRow : function(templateRow, number){		
+	replicateRow : function(templateRow, number, form){		
 		for(var index=0;index < number-1 ;index++){
 			tr = $(templateRow.cloneNode(true));
 			if(tr.id) tr.id = tr.id+'_'+(index+1);
 			var inputs = tr.select('input', 'select', 'textarea');
 			inputs.each(function(input){
-				input.setAttribute('name', input.getAttribute('name')+'_'+(index+1));
+				var newName = input.getAttribute('name')+'_'+(index+1);
+				input.setAttribute('name', newName);
+				if(form && Prototype.Browser.IE){form[newName] = input;}
 			});
 			templateRow.up().insert({bottom:tr});
 		}
 		templateRow.select('input', 'select', 'textarea').each(function(origInput){
-			origInput.setAttribute('name', origInput.getAttribute('name')+'_0');
+			var newName = origInput.getAttribute('name')+'_0';
+			origInput.setAttribute('name', newName);
+			if(form && Prototype.Browser.IE){form[newName] = origInput;}
 		});
 	},
 	
@@ -27,24 +31,30 @@ FormManager = Class.create({
 			}else{
 				realFieldName = fieldName;
 			}
-			var select = $(form).select('[name="'+realFieldName+'"]');
-			if(!select || !select.length) return;
-			var element = select[0];			
-			if(element.nodeName.toLowerCase() == 'input'){
-				if(element.getAttribute('type') == "checkbox"){
-					if(element.value == value[fieldName]) element.checked = true;
-				}else{
-					element.value = value[fieldName];
-				}
-			}else if(element.nodeName.toLowerCase() == 'select'){
-				element.select('option').each(function(option){
-					if(option.value == value[fieldName]){
-						option.selected = true;
+			var element = form[realFieldName];
+			if(!element)return;
+			var nodeName = element.nodeName.toLowerCase();
+			switch(nodeName){
+				case 'input':
+					if(element.getAttribute('type') == "checkbox"){
+						if(element.value == value[fieldName]) element.checked = true;
+					}else{
+						element.value = value[fieldName];
 					}
-				});
-			}else if(element.nodeName.toLowerCase() == 'textarea'){
-				element.update(value[fieldName]);
-				element.value = value[fieldName];
+				break;
+				case 'select':
+					element.select('option').each(function(option){
+						if(option.value == value[fieldName]){
+							option.selected = true;
+						}
+					});
+				break;
+				case 'textarea':
+					element.update(value[fieldName]);
+					element.value = value[fieldName];
+				break;
+				default:
+				break;
 			}
 		});
 	},
