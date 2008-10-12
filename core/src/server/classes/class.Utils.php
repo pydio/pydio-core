@@ -260,7 +260,9 @@ class Utils
 	    }
 	}
 
-
+	function xmlEntities($string){
+		return str_replace(array("&", "<",">"), array("&amp;", "&lt;","&gt;"), $string);
+	}
 
 
 }
