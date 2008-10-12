@@ -94,7 +94,11 @@ SQLEditor = Class.create({
 			var item = userSelection.getUniqueItem();
 			var value = new Hash();
 			this.fields.each(function(fName){
-				value.set(fName, item.getAttribute(fName));
+				if(Prototype.Browser.IE && fName == "ID"){
+					value.set(fName, item.getAttribute("ajxp_sql_"+fName));
+				}else{
+					value.set(fName, item.getAttribute(fName));
+				}
 			});
 			var formManager = new FormManager();
 			formManager.fetchValueToForm(this.oForm, this.fields, value.toObject());
@@ -234,9 +238,9 @@ SQLEditor = Class.create({
 			this.oForm.insert(this.createFieldSet('Step 2: Edit columns for table \"'+this.newTableName+'"', templateTable));
 		}
 		var fManager = new FormManager();
-		fManager.replicateRow(templateRow, numberReplicates);
+		fManager.replicateRow(templateRow, numberReplicates, this.oForm);
 		if(fields && values){
-			fManager.fetchMultipleValueToForm(templateTable, fields, values);
+			fManager.fetchMultipleValueToForm(this.oForm, fields, values);
 		}
 		if(this.newTableName){
 			this.oForm.insert(new Element('input', {type:'hidden',name:'new_table',value:this.newTableName}));
@@ -251,7 +255,7 @@ SQLEditor = Class.create({
 			hideLightBox();
 			return false;			
 		}.bind(this);
-		modal.refreshDialogPosition(true, $('create_table_template'));
+		modal.refreshDialogPosition(true, templateTable);
 	},
 	
 	triggerDeleteColumn : function(columnName){

@@ -35,7 +35,8 @@ Modal = Class.create({
 			var formDiv = $(sFormId);
 			//var formDiv = $('all_forms').select('[id="'+sFormId+'"]')[0];	
 			var newForm = document.createElement('form');
-			newForm.id = 'action_form';
+			newForm.id = 'modal_action_form';
+			newForm.setAttribute('name','modal_action_form');
 			newForm.setAttribute('action', 'cont.php');
 			newForm.appendChild(formDiv.cloneNode(true));
 			var reloadIFrame = null;
@@ -165,14 +166,16 @@ Modal = Class.create({
 			var maxHeight = parseInt(winHeight*90/100);
 			var crtScrollHeight = elementToScroll.getHeight();
 			var crtOffset = boxHeight - crtScrollHeight;
-			elementToScroll.setStyle({
-				overflow:'auto',
-				height:(maxHeight-crtOffset)+'px'
-			});
-			boxHeight = $(this.elementName).getHeight();
+			if(maxHeight > crtOffset){ 
+				elementToScroll.setStyle({
+					overflow:'auto',
+					height:(maxHeight-crtOffset)+'px'
+				});		
+				boxHeight = $(this.elementName).getHeight();
+			}
 		}
 		// POSITION HORIZONTAL
-		var offsetLeft = (winWidth - parseInt(boxWidth)) / 2;
+		var offsetLeft = parseInt((winWidth - parseInt(boxWidth)) / 2);
 		$(this.elementName).setStyle({left:offsetLeft+'px'});
 		// POSITION VERTICAL
 		var offsetTop = parseInt(((winHeight - boxHeight)/3));

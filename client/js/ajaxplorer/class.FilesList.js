@@ -115,20 +115,25 @@ FilesList = Class.create(SelectableElements, {
 		var div = new Element('div').setStyle({height: '20px', backgroundColor:'#FFFFC1', borderBottom: '1px solid #ddd',fontFamily:'Trebuchet MS', fontSize:'11px', textAlign:'center', paddingTop: '2px'});
 		div.update('Page '+current+'/'+total);
 		if(current>1){
-			var prevA = new Element('a', {href:'#', style:'font-size:12px;'}).update('<b>&lt;&lt;</b>&nbsp;&nbsp;&nbsp;').observe('click', function(e){
-				this.loadXmlList(this._currentRep, null, null, $H({page:current-1}));	
-				Event.stop(e);
-			}.bind(this));
-			div.insert({top:prevA});
+			div.insert({top:this.createPaginatorLink(current-1, '<b>&lt;</b>&nbsp;&nbsp;&nbsp;', 'Previous')});
+			if(current > 2){
+				div.insert({top:this.createPaginatorLink(1, '<b>&lt;&lt;</b>&nbsp;&nbsp;&nbsp;', 'First')});
+			}
 		}
 		if(total > 1 && current < total){
-			var nextA = new Element('a', {href:'#', style:'font-size:12px;'}).update('&nbsp;&nbsp;&nbsp;<b>&gt;&gt;</b>').observe('click', function(e){
-				this.loadXmlList(this._currentRep, null, null, $H({page:current+1}));	
-				Event.stop(e);
-			}.bind(this));
-			div.insert({bottom:nextA});
+			div.insert({bottom:this.createPaginatorLink(current+1, '&nbsp;&nbsp;&nbsp;<b>&gt;</b>', 'Next')});
+			if(current < (total-1)){
+				div.insert({bottom:this.createPaginatorLink(total, '&nbsp;&nbsp;&nbsp;<b>&gt;&gt;</b>', 'Last')});
+			}
 		}
 		return div;
+	},
+	
+	createPaginatorLink:function(page, text, title){
+		return new Element('a', {href:'#', style:'font-size:12px;', title:title}).update(text).observe('click', function(e){
+			this.loadXmlList(this._currentRep, null, null, $H({page:page}));
+			Event.stop(e);
+		}.bind(this));		
 	},
 	
 	setColumnsDef:function(aColumns){
@@ -227,7 +232,7 @@ FilesList = Class.create(SelectableElements, {
 		else
 		{
 			if(this.protoMenu) this.protoMenu.addElements('#table_rows_container');
-			this.applyHeadersWidth();	
+			this.applyHeadersWidth();
 		}
 		if(this.protoMenu)this.protoMenu.addElements('.ajxp_draggable');
 		var allItems = this.getItems();
@@ -468,6 +473,9 @@ FilesList = Class.create(SelectableElements, {
 		for(i=0;i<xmlNode.attributes.length;i++)
 		{
 			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
+			if(Prototype.Browser.IE && xmlNode.attributes[i].nodeName == "ID"){
+				newRow.setAttribute("ajxp_sql_"+xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
+			}
 		}
 		var attributeList;
 		if(!this.parsingCache.get('attributeList')){
