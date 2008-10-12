@@ -158,7 +158,7 @@
 									<td edit="false"><input name="field_index" type="checkbox" value="1"/></td>
 									<td edit="false"><input name="field_uniq" type="checkbox" value="1"/></td>
 								</tr>
-							</tbod>
+							</tbody>
 						</table>
 					</div>
 					<div id="replication_chooser">
