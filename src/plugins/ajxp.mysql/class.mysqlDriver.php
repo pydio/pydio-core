@@ -447,7 +447,7 @@ class mysqlDriver extends AbstractDriver
 	}
 	
 	
-	function showRecords($query, $tablename, $currentPage=1, $rpp=100, $searchval='' ){
+	function showRecords($query, $tablename, $currentPage=1, $rpp=50, $searchval='' ){
 		$repo = ConfService::getRepository();
 		$dbname=$repo->getOption("DB_NAME");
 		$result=$this->execQuery($query);
