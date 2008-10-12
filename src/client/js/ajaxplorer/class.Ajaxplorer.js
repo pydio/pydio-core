@@ -205,6 +205,7 @@ Ajaxplorer = Class.create({
 			this.sEngine.clear();
 		}
 		$('repo_path').value = repositoryLabel;
+		$('repo_icon').src = this.user.getRepositoryIcon(parseInt(repositoryId)) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
 	},
 
 	goTo: function(rep, selectFile){
@@ -226,7 +227,7 @@ Ajaxplorer = Class.create({
 				actions[actions.length] = {
 					name:value,
 					alt:value,				
-					image:ajxpResourcesFolder+'/images/foldericon.png',				
+					image:this.user.getRepositoryIcon(parseInt(key)) || ajxpResourcesFolder+'/images/foldericon.png',
 					className:"edit",
 					disabled:selected,
 					callback:function(e){
