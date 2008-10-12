@@ -267,23 +267,33 @@ class mysqlDriver extends AbstractDriver
 					if(isSet($page))$currentPage = $page;
 					else $currentPage = 1;
 					$result = $this->showRecords("SELECT * FROM $tableName", $tableName, $currentPage);
+					$blobCols = array();
 					print '<columns switchDisplayMode="list" switchGridMode="grid">';
 					foreach ($result["COLUMNS"] as $col){
 						print "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(eregi("primary", $col["FLAGS"])?"1":"0")."\" field_null=\"".(eregi("not_null", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
+						if(stristr($col["TYPE"],"blob")!==false && ($col["FLAGS"]!="" && stristr($col["FLAGS"], "binary"))){
+							$blobCols[]=$col["NAME"];
+						}
 					}
+					
 					print '</columns>';
 					print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'"/>';
 					foreach ($result["ROWS"] as $row){
 						print '<tree ';
 						$pkString = "";
-						foreach ($row as $key=>$value){							
-							$value = str_replace("\"", "", $value);
-							$value = str_replace("&", "&amp;", $value);
-							$value = str_replace(">", "", $value);
-							print $key.'="'.SystemTextEncoding::toUTF8($value).'" ';
-							if($result["HAS_PK"]>0){
-								if(in_array($key, $result["PK_FIELDS"])){
-									$pkString .= $key."__".$value.".";
+						foreach ($row as $key=>$value){
+							if(in_array($key, $blobCols)){
+								$sizeStr = "-NULL";
+								if(strlen($value)) $sizeStr = "-".Utils::roundSize(strlen($sizeStr));
+								print "$key=\"BLOB$sizeStr\" ";
+							}else{
+								$value = str_replace("\"", "", $value);
+								$value = Utils::xmlEntities($value);
+								print $key.'="'.SystemTextEncoding::toUTF8($value).'" ';
+								if($result["HAS_PK"]>0){
+									if(in_array($key, $result["PK_FIELDS"])){
+										$pkString .= $key."__".$value.".";
+									}
 								}
 							}
 						}
