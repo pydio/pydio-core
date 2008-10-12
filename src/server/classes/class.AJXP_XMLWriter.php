@@ -99,7 +99,9 @@ class AJXP_XMLWriter
 			print("<repositories>");
 			foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
 			{
-				if($loggedUser->canRead($rootDirIndex)) print("<repo id=\"".$rootDirIndex."\">".SystemTextEncoding::toUTF8($rootDirObject->getDisplay())."</repo>");
+				$iconString = "";
+				if($rootDirObject->hasIcon()) $iconString = "icon=\"".$rootDirObject->getIconPath()."\" ";
+				if($loggedUser->canRead($rootDirIndex)) print("<repo id=\"".$rootDirIndex."\" $iconString>".SystemTextEncoding::toUTF8($rootDirObject->getDisplay())."</repo>");
 			}
 			print("</repositories>");
 			print("<preferences>");
