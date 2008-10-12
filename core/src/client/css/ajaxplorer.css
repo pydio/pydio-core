@@ -1531,8 +1531,31 @@ padding: 0px;
    -moz-opacity:0.8;
 }
 
-.sqlForm input[type="text"]{
+.sqlForm input{
    width: 108px !important;
+   height: 20px;
+   margin:0;
+}
+.sqlForm input.dialogButton
+{
+    margin-left: 10px;
+    width: 65px !important;    
+    background-image: url('../images/ButtonBg.png');
+    color: white;
+    font-weight: bold;
+}
+
+
+.sqlForm input[type="checkbox"], 
+.sqlForm input.checkbox{
+   border: 0px;
+   margin:0;
+   width: 20px !important;
+}
+
+.sqlForm select{
+	padding:0px;
+    border: 1px solid #aaa;    
 }
 
 .sqlForm thead td {
