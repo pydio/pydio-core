@@ -154,9 +154,9 @@
 									</td>
 									<td><input name="field_default" type="text"/></td>
 									<td><input name="field_flags" type="text"/></td>
-									<td edit="false"><input name="field_pk" type="checkbox" value="1"/></td>
-									<td edit="false"><input name="field_index" type="checkbox" value="1"/></td>
-									<td edit="false"><input name="field_uniq" type="checkbox" value="1"/></td>
+									<td edit="false"><input name="field_pk" type="checkbox" value="1" class="checkbox"/></td>
+									<td edit="false"><input name="field_index" type="checkbox" value="1" class="checkbox"/></td>
+									<td edit="false"><input name="field_uniq" type="checkbox" value="1" class="checkbox"/></td>
 								</tr>
 							</tbody>
 						</table>
