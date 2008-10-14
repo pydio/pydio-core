@@ -185,6 +185,9 @@ FoldersTree = Class.create({
 			if(nodeName == 'AJAXPLORER_RECYCLE_NODE' && webFXTreeHandler.recycleNode){
 				nodeName = webFXTreeHandler.recycleNode;
 			}
+			else if(webFXTreeHandler.ajxpNodes.nodeName){
+				nodeName = webFXTreeHandler.ajxpNodes.nodeName;
+			}
 			if(webFXTreeHandler.all[nodeName] && webFXTreeHandler.all[nodeName].reload) webFXTreeHandler.all[nodeName].reload();
 		}	
 	},
@@ -200,6 +203,10 @@ FoldersTree = Class.create({
 			{
 				return webFXTreeHandler.recycleNode;
 			}
+		}
+		console.log(webFXTreeHandler.ajxpNodes);
+		if(webFXTreeHandler.ajxpNodes[getBaseName(childName)]){
+			return webFXTreeHandler.ajxpNodes[getBaseName(childName)];
 		}
 		if(childName.lastIndexOf("/") != -1)
 		{
@@ -237,7 +244,7 @@ FoldersTree = Class.create({
 		this.currentDeepIndex = 0;
 		if(!isChild){
 			this.setCurrentNodeName(this.getRootNodeId(), true);
-		}				
+		}
 		if(this.currentDeepPath.length > 0){
 			this.openCurrentAndGoToNext(this.currentDeepPath[0]);
 		}
