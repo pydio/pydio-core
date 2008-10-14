@@ -265,7 +265,7 @@ class mysqlDriver extends AbstractDriver
 						$count = $this->getCount($tableName);
 						print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\"/>";
 					}
-					print "<tree is_file=\"0\" text=\"Search Results\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"".($mode == "file_list"?"search.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/search.png")."\"/>";
+					print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"".($mode == "file_list"?"search.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/search.png")."\"/>";
 					AJXP_XMLWriter::close();
 				}else{
 					$tableName = basename($dir);
