@@ -190,6 +190,11 @@ function _xmlTreeToJsTree(oNode) {
 		jsNode.isRecycle = true;
 	}
 
+	if(oNode.getAttribute('ajxp_node') && oNode.getAttribute('ajxp_node')=="true"){
+		jsNode.ajxpNode = true;
+		webFXTreeHandler.ajxpNodes[getBaseName(folderFullName)] = jsNode.id;
+	}
+	
 	if(src != null && src != "" && preloaded != null && preloaded == 'true')
 	{
 		jsNode.loaded = true;
