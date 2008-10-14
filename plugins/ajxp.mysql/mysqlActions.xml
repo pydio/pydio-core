@@ -34,6 +34,23 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="set_query">
+			<gui text="32" title="32" src="fileopen.png"
+				accessKey="folder_access_key">
+				<context selection="false" dir="" recycle="false"
+					actionBar="false" actionBarGroup="get" contextMenu="false" infoPanel="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false"
+					unique="true" allowedMimes="">
+				</selectionContext>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true"
+				write="false" adminOnly="false">
+			</rightsContext>
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="mkdir">			
 			<gui text="267" title="268" src="table_new.png" accessKey="folder_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>

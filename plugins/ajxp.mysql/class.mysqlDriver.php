@@ -235,7 +235,10 @@ class mysqlDriver extends AbstractDriver
 			//------------------------------------
 			//	RENOMMER / RENAME
 			//------------------------------------
-			case "rename";
+			case "set_query":
+				$query = $httpVars["query"];
+				$_SESSION["LAST_SQL_QUERY"] = $query;
+				print("<tree store=\"true\"></tree>");
 			break;
 										
 			//------------------------------------
@@ -252,9 +255,9 @@ class mysqlDriver extends AbstractDriver
 				}	
 				$link = $this->createDbLink();
 				AJXP_Exception::errorToXml($link);
-				AJXP_XMLWriter::header();
 				if($dir == ""){
-					$tables = $this->listTables();
+					AJXP_XMLWriter::header();
+					$tables = $this->listTables();					
 					print '<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="text" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>';
 					$icon = ($mode == "file_list"?"table_empty.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/table_empty_tree.png");
 					foreach ($tables as $tableName){
@@ -262,11 +265,34 @@ class mysqlDriver extends AbstractDriver
 						$count = $this->getCount($tableName);
 						print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\"/>";
 					}
+					print "<tree is_file=\"0\" text=\"Search Results\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"".($mode == "file_list"?"search.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/search.png")."\"/>";
+					AJXP_XMLWriter::close();
 				}else{
 					$tableName = basename($dir);
 					if(isSet($page))$currentPage = $page;
 					else $currentPage = 1;
-					$result = $this->showRecords("SELECT * FROM $tableName", $tableName, $currentPage);
+					$query = "SELECT * FROM $tableName";
+					$searchQuery = false;
+					if($tableName == "ajxpmysqldriver_searchresults"){
+						if(isSet($_SESSION["LAST_SQL_QUERY"])){
+							$query = $_SESSION["LAST_SQL_QUERY"];
+							$matches = array();
+							if(preg_match("/SELECT \S* FROM (\S*).*/i", $query, $matches)!==false){
+								$tableName = $matches[1];
+								$searchQuery = true;
+							}else{
+								break;
+							}
+						}else{
+							break;
+						}
+					}
+					$result = $this->showRecords($query, $tableName, $currentPage);					
+					if($searchQuery && is_a($result, "AJXP_Exception")){
+						unset($_SESSION["LAST_SQL_QUERY"]); // Do not store wrong query!
+					}
+					AJXP_Exception::errorToXml($result);
+					AJXP_XMLWriter::header();
 					$blobCols = array();
 					print '<columns switchDisplayMode="list" switchGridMode="grid">';
 					foreach ($result["COLUMNS"] as $col){
@@ -304,9 +330,9 @@ class mysqlDriver extends AbstractDriver
 						}
 						print 'is_file="1" />';
 					}
+					AJXP_XMLWriter::close();
 				}
 				$this->closeDbLink($link);
-				AJXP_XMLWriter::close();
 				exit(1);
 												
 			break;		
@@ -457,7 +483,8 @@ class mysqlDriver extends AbstractDriver
 	}
 	
 	
-	function showRecords($query, $tablename, $currentPage=1, $rpp=50, $searchval='' ){
+	function showRecords($query, $tablename, $currentPage=1, $rpp=50, $searchval='' ){		
+		
 		$repo = ConfService::getRepository();
 		$dbname=$repo->getOption("DB_NAME");
 		$result=$this->execQuery($query);
@@ -465,87 +492,86 @@ class mysqlDriver extends AbstractDriver
 		$columns = array();
 		$rows = array();
 		
-		if($result){
-
-			$num_rows = mysql_num_rows($result);
-			$pg=$currentPage-1;
-			if(isset($_POST['first'])){
-				$pg=0;
-			}else if(isset($_POST['back'])){
-				$pg=$pg-1;
-			}else if(isset($_POST['next'])){
-				$pg++;
-			}else if(isset($_POST['last'])){
-				$pgs = $num_rows/$rpp;
-				$pg=ceil($pgs)-1;
-			}
-			if($pg < 0 ){
-				$pg=0;
-			}
-			if($pg > $num_rows/$rpp){
-				$pg=ceil($num_rows/$rpp)-1;
-			}
-			$totalPages = ceil($num_rows/$rpp);
-			$beg = $pg * $rpp;
-
-			$flds = mysql_num_fields($result);
-			$fields = mysql_list_fields( $dbname, $tablename);
-			$z=0;
-			$x=0;
-			$pkfield=array();
-
-			// MAKE COLUMNS HEADER
-			for ($i = 0; $i < $flds; $i++) {
-				$c=$i+1;
-				$title=mysql_field_name($fields, $i);
-				$type=mysql_field_type($fields, $i);
-				$size=mysql_field_len($fields, $i);
-				$flagstring = mysql_field_flags ($fields, $i);
-				$colData = $this->getColumnData($tablename, $title);
-				$colDataType = $colData["Type"];
-				if(preg_match("/(.*)\((.*)\)/", $colDataType, $matches)){
-					$type = $matches[1];
-					$size = $matches[2];
-				}
-				$columns[] = array("NAME" => $title, "TYPE"=>$type, "LENGTH"=>$size, "FLAGS"=>$flagstring, "DEFAULT"=>$colData["Default"]);
-
-				//Find the primary key
-				$flagstring = mysql_field_flags ($result, $i);
-				if(eregi("primary",$flagstring )){
-					$pk[$z] = $i;
-					$pkfield[$z]= mysql_field_name($fields, $i);
-					$z++;
-				}
-			}
-			$v=$flds+1;
-
-			if($z > 0){
-				$cpk=count($pk);
-			}else{
-				$cpk=0;
-			}
-
-			// MAKE ROWS RESULT
-			for ($s=$beg; $s < $beg + $rpp; $s++){
-				if($s < $num_rows){
-					if (!mysql_data_seek ($result, $s)) {
-						continue;
-					}
-					$row=mysql_fetch_array($result);
-					if(!isset($pk)){
-						$pk=' ';
-						$pkfield= array();
-					}
-					$values = array();
-					for($col = 0; $col < $flds; $col ++)
-					{
-						$values[mysql_field_name($fields, $col)] = stripslashes($row[$col]);
-					}					
-					$rows[] = $values;
-				}
-			}
-
+		if(is_a($result, "AJXP_Exception")) return $result;
+		
+		$num_rows = mysql_num_rows($result);
+		$pg=$currentPage-1;
+		if(isset($_POST['first'])){
+			$pg=0;
+		}else if(isset($_POST['back'])){
+			$pg=$pg-1;
+		}else if(isset($_POST['next'])){
+			$pg++;
+		}else if(isset($_POST['last'])){
+			$pgs = $num_rows/$rpp;
+			$pg=ceil($pgs)-1;
 		}
+		if($pg < 0 ){
+			$pg=0;
+		}
+		if($pg > $num_rows/$rpp){
+			$pg=ceil($num_rows/$rpp)-1;
+		}
+		$totalPages = ceil($num_rows/$rpp);
+		$beg = $pg * $rpp;
+
+		$flds = mysql_num_fields($result);
+		$fields = mysql_list_fields( $dbname, $tablename);
+		$z=0;
+		$x=0;
+		$pkfield=array();
+
+		// MAKE COLUMNS HEADER
+		for ($i = 0; $i < $flds; $i++) {
+			$c=$i+1;
+			$title=mysql_field_name($fields, $i);
+			$type=mysql_field_type($fields, $i);
+			$size=mysql_field_len($fields, $i);
+			$flagstring = mysql_field_flags ($fields, $i);
+			$colData = $this->getColumnData($tablename, $title);
+			$colDataType = $colData["Type"];
+			if(preg_match("/(.*)\((.*)\)/", $colDataType, $matches)){
+				$type = $matches[1];
+				$size = $matches[2];
+			}
+			$columns[] = array("NAME" => $title, "TYPE"=>$type, "LENGTH"=>$size, "FLAGS"=>$flagstring, "DEFAULT"=>$colData["Default"]);
+
+			//Find the primary key
+			$flagstring = mysql_field_flags ($result, $i);
+			if(eregi("primary",$flagstring )){
+				$pk[$z] = $i;
+				$pkfield[$z]= mysql_field_name($fields, $i);
+				$z++;
+			}
+		}
+		$v=$flds+1;
+
+		if($z > 0){
+			$cpk=count($pk);
+		}else{
+			$cpk=0;
+		}
+
+		// MAKE ROWS RESULT
+		for ($s=$beg; $s < $beg + $rpp; $s++){
+			if($s < $num_rows){
+				if (!mysql_data_seek ($result, $s)) {
+					continue;
+				}
+				$row=mysql_fetch_array($result);
+				if(!isset($pk)){
+					$pk=' ';
+					$pkfield= array();
+				}
+				$values = array();
+				for($col = 0; $col < $flds; $col ++)
+				{
+					$values[mysql_field_name($fields, $col)] = stripslashes($row[$col]);
+				}					
+				$rows[] = $values;
+			}
+		}
+
 		return array("COLUMNS" => $columns, "ROWS" => $rows, "HAS_PK"=>$cpk, "TOTAL_PAGES"=>$totalPages, "PK_FIELDS"=>$pkfield);
 	}
 
