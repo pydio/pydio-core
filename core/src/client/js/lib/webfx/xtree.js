@@ -88,6 +88,7 @@ var webFXTreeHandler = {
 	keydown   : function (oItem, e) { return this.all[oItem.id].keydown(e.keyCode); },
 	linkKeyPress : function(oItem, e){if(!this.hasFocus || e.keyCode == 9) return false;return true;},
 	cookies   : new WebFXCookie(),
+	ajxpNodes : {},
 	insertHTMLBeforeEnd	:	function (oElement, sHTML) {
 		if (oElement.insertAdjacentHTML != null) {
 			oElement.insertAdjacentHTML("BeforeEnd", sHTML) ;
@@ -151,7 +152,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	node.parentNode = this;
 	var url = node.parentNode.url; 	
 	if(url == "/") url = "";
-	if(node.isRecycle){
+	if(node.isRecycle || node.ajxpNode){
 		node.url = url + "/" + getBaseName(node.filename);
 	}else{
 		node.url = url + "/" + node.text;
@@ -407,6 +408,10 @@ WebFXTree.prototype.toString = function() {
 	if(position = this.action.indexOf("CURRENT_ID",0) > 0)
 	{
 		this.action = this.action.replace(new RegExp("CURRENT_ID", "g"), '\''+this.id+'\'');
+	}
+	if(this.ajxpNode)
+	{
+		webFXTreeHandler.ajxpNodes[this.folderFullName]=this.id;
 	}
 	
 	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\" filename=\"/\">" +
