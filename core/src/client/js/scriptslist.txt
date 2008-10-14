@@ -31,6 +31,7 @@ js/ajaxplorer/class.UserSelection.js
 js/ajaxplorer/class.FilesList.js
 js/ajaxplorer/class.FoldersTree.js
 js/ajaxplorer/class.SearchEngine.js
+js/ajaxplorer/class.SQLSearchEngine.js
 js/ajaxplorer/class.InfoPanel.js
 js/ajaxplorer/class.Diaporama.js
 js/ajaxplorer/class.Editor.js

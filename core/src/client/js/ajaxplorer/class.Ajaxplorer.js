@@ -108,7 +108,7 @@ Ajaxplorer = Class.create({
 		this.foldersTree.setContextualMenu(this.contextMenu);
 		this.actionBar.setContextualMenu(this.contextMenu);
 		  
-		this.sEngine = new SearchEngine("search_container", "search_txt","search_results", "search_button", this);
+		this.sEngine = new SearchEngine("search_container");
 		this.messageBox = $('message_div');
 		this.initGUI();	
 		this.filesList = new FilesList($("selectable_div"), 
@@ -201,11 +201,11 @@ Ajaxplorer = Class.create({
 			this.goTo(this._initLoadRep);
 			this._initLoadRep = null;
 		}
-		if(this.sEngine){
-			this.sEngine.clear();
-		}
 		$('repo_path').value = repositoryLabel;
 		$('repo_icon').src = this.user.getRepositoryIcon(parseInt(repositoryId)) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
+		
+		var sEngineName = this.user.getRepoSearchEngine(parseInt(repositoryId)) || 'SQLSearchEngine';		
+		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 
 	goTo: function(rep, selectFile){
@@ -457,7 +457,7 @@ Ajaxplorer = Class.create({
 				onDrag:function(){
 						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
 						fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?-1:1), true);
-						fitHeightToBottom(this.sEngine._resultsBox, null, 10, true);
+						this.sEngine.resize();
 					}.bind(this)
 				});
 		this.splitter = new Splitter('verticalSplitter', {
@@ -474,9 +474,6 @@ Ajaxplorer = Class.create({
 		
 		new Effect.Fade(this.messageBox);
 		$(this.actionBar._htmlElement).getElementsBySelector('a', 'input[type="image"]').each(function(element){
-			disableTextSelection(element);
-		});
-		$('search_container').getElementsBySelector('a', 'div[id="search_results"]').each(function(element){
 			disableTextSelection(element);
 		});
 		disableTextSelection($('tree_container'));
@@ -503,8 +500,8 @@ Ajaxplorer = Class.create({
 			$('search_header').getElementsBySelector("img")[0].show();
 			$(this.infoPanel.htmlElement).hide();
 			$('info_panel_header').addClassName("toggleInactive");
-			$('info_panel_header').getElementsBySelector("img")[0].hide();
-			fitHeightToBottom(this.sEngine._resultsBox, null, 10, true);
+			$('info_panel_header').getElementsBySelector("img")[0].hide();			
+			this.sEngine.resize();
 		}
 		this.currentSideToggle = srcName;
 	},

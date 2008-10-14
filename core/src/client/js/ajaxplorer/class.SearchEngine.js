@@ -8,36 +8,48 @@ SearchEngine = Class.create({
 	_runningQueries:undefined,
 	_queriesIndex:0,
 
-	initialize: function(mainElementName, inputName, resultsDivName, buttonName, oAjaxplorer)
+	initialize: function(mainElementName)
 	{
 		this.htmlElement = $(mainElementName);
-		this._inputBox = $(inputName);
-		this._resultsBox = $(resultsDivName);
-		this._searchButtonName = buttonName;
+		this.initGUI();
+	},
+	
+	initGUI : function(){
+		
+		this.htmlElement.update('<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>');
+		
+		this._inputBox = $("search_txt");
+		this._resultsBox = $("search_results");
+		this._searchButtonName = "search_button";
 		this._runningQueries = new Array();
-				
+		
 		$('stop_'+this._searchButtonName).addClassName("disabled");
 		
-		$(inputName).onkeypress = function(e){
+		this.htmlElement.select('a', 'div[id="search_results"]').each(function(element){
+			disableTextSelection(element);
+		});
+
+		
+		this._inputBox.onkeypress = function(e){
 			if (e==null) e = window.event;
 			if(e.keyCode == 13) this.search();
 			if(e.keyCode == 9) return false;		
 		}.bind(this);
 		
-		$(inputName).onkeydown  = function(e){
+		this._inputBox.onkeydown  = function(e){
 			if(e == null) e = window.event;
 			if(e.keyCode == 9) return false;
 			return true;		
 		};
 		
-		$(inputName).onfocus = function(e){
+		this._inputBox.onfocus = function(e){
 			ajaxplorer.disableShortcuts();
 			this.hasFocus = true;
-			$(inputName).select();
+			this._inputBox.select();
 			return false;
 		}.bind(this);
 			
-		$(inputName).onblur = function(e){
+		this._inputBox.onblur = function(e){
 			ajaxplorer.enableShortcuts();
 			this.hasFocus = false;
 		}.bind(this);
@@ -52,6 +64,11 @@ SearchEngine = Class.create({
 			return false;
 		}.bind(this);
 		
+		this.resize();
+	},
+	
+	resize: function(){
+		fitHeightToBottom(this._resultsBox, null, 10, true);
 	},
 	
 	focus : function(){

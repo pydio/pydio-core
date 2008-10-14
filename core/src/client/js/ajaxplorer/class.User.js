@@ -7,12 +7,14 @@ User = Class.create({
 	preferences:undefined,
 	repositories: undefined,
 	repoIcons:undefined,
+	repoSearchEngines:undefined,
 
 	initialize:function(id, xmlDef){
 		this.id = id;
 		this.preferences = new Hash();
 		this.repositories = new Hash();
 		this.repoIcon = new Hash();
+		this.repoSearchEngines = new Hash();
 		if(xmlDef) this.loadFromXml(xmlDef);
 	},
 
@@ -54,6 +56,10 @@ User = Class.create({
 		return this.repoIcon.get(repoId);
 	},
 	
+	getRepoSearchEngine : function(repoId){
+		return this.repoSearchEngines.get(repoId);
+	},
+	
 	savePreferences : function(oldPass, newPass, onCompleteFunc){
 		var conn = new Connexion();
 		conn.addParameter("get_action", "save_user_pref");
@@ -93,6 +99,9 @@ User = Class.create({
 						repositories.set(repoChild.getAttribute("id"), repoChild.firstChild.nodeValue);
 						if(repoChild.getAttribute("icon")){
 							this.repoIcon.set(parseInt(repoChild.getAttribute("id")), repoChild.getAttribute("icon"));
+						}
+						if(repoChild.getAttribute("search_engine")){
+							this.repoSearchEngines.set(parseInt(repoChild.getAttribute("id")), repoChild.getAttribute("search_engine"));
 						}
 					}
 				}
