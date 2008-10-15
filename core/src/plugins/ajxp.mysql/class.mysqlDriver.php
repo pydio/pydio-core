@@ -277,7 +277,7 @@ class mysqlDriver extends AbstractDriver
 						if(isSet($_SESSION["LAST_SQL_QUERY"])){
 							$query = $_SESSION["LAST_SQL_QUERY"];
 							$matches = array();
-							if(preg_match("/SELECT \S* FROM (\S*).*/i", $query, $matches)!==false){
+							if(preg_match("/SELECT [\S, ]* FROM (\S*).*/i", $query, $matches)!==false){
 								$tableName = $matches[1];
 								$searchQuery = true;
 							}else{
@@ -516,7 +516,10 @@ class mysqlDriver extends AbstractDriver
 		$beg = $pg * $rpp;
 
 		$flds = mysql_num_fields($result);
-		$fields = mysql_list_fields( $dbname, $tablename);
+		$fields = @mysql_list_fields( $dbname, $tablename);
+		if(!$fields){
+			return new AJXP_Exception("Non matching fields for table '$tablename'");
+		}
 		$z=0;
 		$x=0;
 		$pkfield=array();
