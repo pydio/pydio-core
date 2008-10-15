@@ -53,14 +53,6 @@ class Repository {
 		return $settingLine;
 	}
 	
-	function hasIcon(){
-		return is_file(INSTALL_PATH."/".$this->getIconPath());
-	}
-	
-	function getIconPath(){
-		return "plugins/ajxp.".$this->accessType."/".$this->accessType."_icon.png";
-	}
-	
 	/**
 	 * @param unknown_type $recycle
 	 */
