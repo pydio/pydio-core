@@ -204,7 +204,7 @@ Ajaxplorer = Class.create({
 		$('repo_path').value = repositoryLabel;
 		$('repo_icon').src = this.user.getRepositoryIcon(parseInt(repositoryId)) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
 		
-		var sEngineName = this.user.getRepoSearchEngine(parseInt(repositoryId)) || 'SQLSearchEngine';		
+		var sEngineName = this.user.getRepoSearchEngine(parseInt(repositoryId)) || 'SearchEngine';		
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 

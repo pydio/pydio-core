@@ -39,6 +39,20 @@ class Repository {
 		return $this->getOption("RECYCLE_BIN");
 	}
 	
+	function getClientSettings(){
+		$fileName = INSTALL_PATH."/plugins/ajxp.".$this->accessType."/manifest.xml";
+		$settingLine = "";
+		if(is_readable($fileName)){
+			$lines = file($fileName);			
+			foreach ($lines as $line){
+				if(eregi("client_settings", trim($line)) > -1){
+					$settingLine = str_replace(array("<client_settings","/>"), "", trim($line));
+				}
+			}
+		}
+		return $settingLine;
+	}
+	
 	function hasIcon(){
 		return is_file(INSTALL_PATH."/".$this->getIconPath());
 	}
