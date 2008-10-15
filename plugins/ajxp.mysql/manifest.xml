@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="mysql" label="Mysql Database" description="Browse and update records in a MySQL database">
-	<client_settings search_engine="SQLSearchEngine"/>
+	<client_settings icon="plugins/ajxp.mysql/mysql_icon.png" search_engine="SQLSearchEngine"/>
 	<param name="DB_HOST" type="string" label="Host" description="Host to the MySQL Server" mandatory="true"/>
 	<param name="DB_NAME" type="string" label="Database" description="Database name" mandatory="true"/>
 	<param name="DB_USER" type="string" label="User" description="User name (must have privileges to access this db)" mandatory="true"/>
