@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="remote_fs" label="Remote Server (via API)" description="Access a remote server implementing the AjaXplorer API (remote server with an ajaxplorer installed for example)">
+	<client_settings icon="plugins/ajxp.remote_fs/remote_fs_icon.png" search_engine="SearchEngine"/>
 	<param name="HOST" type="string" label="Host" description="Domain name or IP to the remote server, without http" mandatory="true"/>
 	<param name="URI" type="string" label="Uri" description="Path of the API implementor on the remote server." default="ajaxplorer/content.php" mandatory="true"/>
 	<param name="AUTH_URI" type="string" label="Authentication URI" description="Path to the authentication script, e.g. ajaxplorer/index.php" default="" mandatory="false"/>
