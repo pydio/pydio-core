@@ -52,7 +52,7 @@ FilesList = Class.create(SelectableElements, {
 		{
 			var buffer = '';
 			if(this.gridStyle == "grid"){
-				buffer = buffer + '<div style="overflow:hidden;">';
+				buffer = buffer + '<div style="overflow:hidden;background-color: #aaa;">';
 			}
 			buffer = buffer + '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
 			this.columnsDef.each(function(column){buffer = buffer + '<col\>';});
@@ -192,6 +192,11 @@ FilesList = Class.create(SelectableElements, {
 			if(!allItems.length) return;
 			var tds = $(allItems[0]).getElementsBySelector('td');
 			var headerCells = $('selectable_div_header').getElementsBySelector('td');
+			var divDim = $('selectable_div').getDimensions();
+			var contDim = $('table_rows_container').getDimensions();
+			if(divDim.height > contDim.height && !(divDim.width > contDim.width) ){
+				$('selectable_div_header').setStyle({width:($('selectable_div_header').getWidth()-17)+'px'});
+			}
 			var index = 0;
 			headerCells.each(function(cell){				
 				cell.setStyle({padding:0});
@@ -334,6 +339,7 @@ FilesList = Class.create(SelectableElements, {
 			{
 				if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 				ajaxplorer.actionBar.fireAction('login');
+				this.removeCurrentLines();
 				this.fireChange();
 				return;
 			}
