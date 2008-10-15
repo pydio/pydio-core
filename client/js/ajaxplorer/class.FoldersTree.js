@@ -203,8 +203,7 @@ FoldersTree = Class.create({
 			{
 				return webFXTreeHandler.recycleNode;
 			}
-		}
-		console.log(webFXTreeHandler.ajxpNodes);
+		}		
 		if(webFXTreeHandler.ajxpNodes[getBaseName(childName)]){
 			return webFXTreeHandler.ajxpNodes[getBaseName(childName)];
 		}
