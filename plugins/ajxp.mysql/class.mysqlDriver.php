@@ -375,10 +375,14 @@ class mysqlDriver extends AbstractDriver
 		$pass = $repo->getOption("DB_PASS");
 		$host = $repo->getOption("DB_HOST");
 		$dbname = $repo->getOption("DB_NAME");
-		$link = mysql_connect($host, $user, $pass);
-		if(!$link) return new AJXP_Exception("Cannot connect to server!");
-		if(!mysql_select_db($dbname, $link)){
-			return new AJXP_Exception("Cannot find database!");
+		$link = @mysql_connect($host, $user, $pass);
+		if(!$link) {
+			$ajxpExp = new AJXP_Exception("Cannot connect to server!");
+			AJXP_Exception::errorToXml($ajxpExp);
+		}
+		if(!@mysql_select_db($dbname, $link)){
+			$ajxpExp = new AJXP_Exception("Cannot find database!");
+			AJXP_Exception::errorToXml($ajxpExp);
 		}
 		return $link;
 	}
