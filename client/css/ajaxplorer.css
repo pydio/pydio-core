@@ -1579,6 +1579,10 @@ padding: 0px;
    width: 150px;
 }
 
+.sqlRecordForm td.sqlInputTd{
+	width: 255px;
+}
+
 .sqlRecordForm td.sqlTypeTd{
    color: #999;
    padding-left: 5px;
