@@ -313,6 +313,10 @@ $mess=array(
 "277" => "Delete selected records",
 "278" => "Are you sure you want to delete the selected record(s)?",
 "279" => "Tables",
-"280" => "Records"
+"280" => "Records",
+"281" => "Limits",
+"282" => "Size per File",
+"283" => "Total Size",
+"284" => "Files Number"
 );
 ?>

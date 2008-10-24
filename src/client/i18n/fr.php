@@ -301,6 +301,10 @@ $mess=array(
 "277" => "Effacer le ou les enregistrement(s)",
 "278" => "Etes vous sûr de vouloir effacer le ou les enregistrement(s) sélectionné(s)?",
 "279" => "Tables",
-"280" => "Enregistrements"
+"280" => "Enregistrements",
+"281" => "Limites",
+"282" => "Taille Fichier",
+"283" => "Taille Totale",
+"284" => "Nb. Fichiers"
 );
 ?>
