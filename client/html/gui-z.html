@@ -38,11 +38,11 @@
 		new Effect.Corner('loaderContent', "round bottom 10px");
 		var ajaxplorer;
 		Event.observe(window, "load", function(){
-			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", <?php print($ROOT_DIRS_LIST);?>, "<?php print($DEFAULT_DISPLAY);?>");
+			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", <?php print($ROOT_DIRS_LIST);?>, <?php print($ROOT_DIRS_SETTINGS); ?>, "<?php print($DEFAULT_DISPLAY);?>");
 			<?php 
 			if($BEGIN_MESSAGE != "") print("alert('".str_replace("'", "\'", $BEGIN_MESSAGE)."');");
 			?>
-			ajaxplorer.currentLanguage = '<?php print(ConfService::getLanguage()); ?>';						
+			ajaxplorer.currentLanguage = '<?php print(ConfService::getLanguage()); ?>';
 		});
  </script>
 <style>.dialogBox[id]{position:fixed;}</style>
