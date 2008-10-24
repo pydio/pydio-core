@@ -438,6 +438,7 @@ AdminPageManager = Class.create({
 				var params = $A([]);
 				var dChilds = childs[i].childNodes;
 				for(var j=0;j<dChilds.length;j++){
+					if(dChilds[j].nodeName != 'param') continue;
 					var paramProp = new Hash();
 					driversAtts.each(function(attName){
 						paramProp.set(attName, (dChilds[j].getAttribute(attName) || ''));
