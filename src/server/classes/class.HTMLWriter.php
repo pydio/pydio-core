@@ -51,6 +51,19 @@ class HTMLWriter
     	return $buffer;
     }
     
+    function writeRepoSettingsAsJS($rootDirsList){
+    	$buffer = "\$H({";
+    	foreach ($rootDirsList as $rIndex => $rObject)
+    	{
+    		$buffer .= "$rIndex:";
+    		$props = $rObject->getClientSettings();
+    		$buffer .= "\$H({".str_replace(array(" ", "\"", "="), array(",", "'", ":"), trim($props))."})";
+    		if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
+    	}
+    	$buffer .= "})";
+    	return $buffer;    	
+    }
+    
     function writeI18nMessagesClass($mess)
     {
     	echo "<script language=\"javascript\">\n";
