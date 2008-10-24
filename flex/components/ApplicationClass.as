@@ -42,7 +42,7 @@ package components
 		public var clearButton:Button;
 		public var uploadButton:Button;
 		public var cancelButton:Button;
-		public var mytext:Text;		
+		public var limitsText:Text;		
 		
 		
 		// constructor
@@ -67,23 +67,39 @@ package components
 			uploadButton.addEventListener(MouseEvent.CLICK,OnUploadFilesClicked);
 			cancelButton.addEventListener(MouseEvent.CLICK,OnCancelClicked);
 			
+			var limitString:String = GetTextFor("UploadLimitsTitle")+"<br>";
+			var limitSet:Boolean = false;
 			var temp:String = Application.application.parameters.fileSizeLimit;
-			if(temp != null && temp != "")
+			if(temp != null && temp != ""){
 			    _uploadFileSize = new Number(temp);
-			else
+			    if(_uploadFileSize != 0){
+				    limitString = limitString + GetTextFor("UploadLimitsSizePerFile")+": " + FileUpload.FormatSize(_uploadFileSize, "B") + "<br>";
+				    limitSet = true;
+				}
+			}else
 			    _uploadFileSize = 0;
 			    
 			temp = Application.application.parameters.totalUploadSize;
-			if(temp != null && temp != "")
+			if(temp != null && temp != ""){
 			    _totalUploadSize = new Number(temp);
-			else
+			    if(_totalUploadSize != 0){
+				    limitString = limitString + GetTextFor("UploadLimitsTotalSize")+": " + FileUpload.FormatSize(_totalUploadSize, "B") + "<br>";
+				    limitSet = true;
+			    }
+			}else
 			    _totalUploadSize = 0;
 			 
 			temp = Application.application.parameters.maxFileNumber;
-			if(temp != null && temp != "")
+			if(temp != null && temp != ""){
 			    _fileMaxNumber = new Number(temp);
-			else
+			    if(_fileMaxNumber != 0){
+				    limitString = limitString + GetTextFor("UploadLimitsFilesNumber")+": " + _fileMaxNumber + "<br>";
+				    limitSet = true;
+			    }			    
+			}else
 			    _fileMaxNumber = 0;
+			 
+			 if(limitSet) limitsText.htmlText = limitString;
 			 
 			 temp = Application.application.parameters.currentFolderFiles;
 			 var tempSep:String = Application.application.parameters.separator;
@@ -147,6 +163,8 @@ package components
 			
 			// set the button visibility
 			uploadButton.enabled = false;
+			browseButton.enabled = false;
+			clearButton.enabled = false;
 			cancelButton.enabled = true;
 			// go through the files to check if they have been uploaded and get the first that hasn't
 			for(var x:uint=0;x<fileUploadArray.length;x++)
@@ -185,6 +203,8 @@ package components
 			// reset the labels and set the button visibility
 			SetLabels();
 			uploadButton.enabled = true;
+			browseButton.enabled = true;
+			clearButton.enabled = true;
 			cancelButton.enabled = false;
 		}
 		

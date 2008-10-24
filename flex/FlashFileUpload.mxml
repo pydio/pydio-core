@@ -16,7 +16,7 @@
 		<mx:Button id="clearButton" label="Clear" enabled="false" width="70"   icon="@Embed(source='components/trashcan_empty.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
 		<mx:Button id="uploadButton" label="Upload" enabled="false" width="70"  icon="@Embed(source='components/yast_backup.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
 		<mx:Button id="cancelButton" label="Cancel" enabled="false" width="70"  icon="@Embed(source='components/fileclose.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
-		<mx:Text id="mytext" />
+		<mx:Text id="limitsText"  width="84" height="61" fontSize="8" text="Limits &#xa;Max Files: &#xa;Size per File:&#xa;Total Size: " textAlign="right"/>
 	</mx:HBox>
 	<mx:HBox width="400">
 		<mx:VBox width="100%" id="fileContainer">

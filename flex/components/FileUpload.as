@@ -175,7 +175,7 @@ package components
 			if(this._renameFlag){
 				_uploadUrl += '&auto_rename=true';
 			}
-			_file.upload(new URLRequest(_uploadUrl));
+			_file.upload(new URLRequest(_uploadUrl), "Filedata", true);
 		}
 		
 		// cancels the upload of a file
@@ -206,7 +206,7 @@ package components
 			var temp:String = String(size);
 			var index:int = temp.lastIndexOf(".");
 			if(index == -1)
-				return temp + ".00";
+				return temp;// + ".00";
 			else if(index == temp.length - 2)
 				return temp + "0";
 			else
