@@ -20,8 +20,8 @@
 $available_languages = array("en"=>"English", "fr"=>"Français", "nl"=>"Nederlands", "es"=>"Español", "de"=>"Deutsch", "it"=>"Italiano");
 $dft_langue="en";
 
-define("AJXP_VERSION", "2.3.6");
-define("AJXP_VERSION_DATE", "2008/08/30");
+define("AJXP_VERSION", "2.3.7");
+define("AJXP_VERSION_DATE", "2008/10/24");
 
 define("ENABLE_USERS", 1);
 define("ADMIN_PASSWORD", "admin");
