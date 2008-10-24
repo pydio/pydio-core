@@ -73,7 +73,7 @@ $REPOSITORIES[2] = array(
 //------------------------
 
 // Maximum number of files for each upload. Leave to 0 for no limit.
-$upload_max_number = 0;
+$upload_max_number = 16;
 
 // Maximum size per file allowed to upload. By default, this is fixed by php config 'upload_max_filesize'.
 // Use this one only if you want to set it smaller than the php config. If you want to increase the php value, 
