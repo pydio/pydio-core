@@ -5,13 +5,14 @@ if(dynamicLibLoading)
 
 Ajaxplorer = Class.create({
 
-	initialize: function(loadRep, usersEnabled, loggedUser, rootDirId, rootDirsList, defaultDisplay)
+	initialize: function(loadRep, usersEnabled, loggedUser, rootDirId, rootDirsList, rootDirsSettings, defaultDisplay)
 	{	
 		this._initLoadRep = loadRep;
 		this._initObj = true ;
 		this.usersEnabled = usersEnabled;
 		this._initLoggedUser = loggedUser;
 		this._initRootDirsList = rootDirsList;
+		this._initRootDirsSettings = rootDirsSettings;
 		this._initRootDirId = rootDirId;
 		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 		this.histCount=0;
@@ -71,7 +72,7 @@ Ajaxplorer = Class.create({
 			fakeUser.setActiveRepository(this._initRootDirId, 1, 1);
 			fakeUser.setRepositoriesList(this._initRootDirsList);
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
-			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList[this._initRootDirId], ajxpServerAccessPath+'?action=ls', this);
+			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList.get(parseInt(this._initRootDirId)), ajxpServerAccessPath+'?action=ls', this);
 			this.refreshRootDirMenu(this._initRootDirsList, this._initRootDirId);
 			this.actionBar.loadActions();
 			this.infoPanel.load();
@@ -202,9 +203,16 @@ Ajaxplorer = Class.create({
 			this._initLoadRep = null;
 		}
 		$('repo_path').value = repositoryLabel;
-		$('repo_icon').src = this.user.getRepositoryIcon(parseInt(repositoryId)) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
-		
-		var sEngineName = this.user.getRepoSearchEngine(parseInt(repositoryId)) || 'SearchEngine';		
+		var sEngineName = 'SearchEngine';
+		if(this.usersEnabled){
+			$('repo_icon').src = this.user.getRepositoryIcon(parseInt(repositoryId)) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
+			sEngineName = this.user.getRepoSearchEngine(parseInt(repositoryId)) || 'SearchEngine';		
+		}else{
+			$('repo_icon').src = this._initRootDirsSettings.get(parseInt(repositoryId)).get('icon') || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
+			sEngineName = this._initRootDirsSettings.get(parseInt(repositoryId)).get('search_engine') || 'SearchEngine';
+			this.refreshRootDirMenu(this._initRootDirsList, repositoryId);
+		}
+				
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 
@@ -223,11 +231,17 @@ Ajaxplorer = Class.create({
 			rootDirsList.each(function(pair){
 				var value = pair.value;
 				var key = pair.key;
-				var selected = (key == parseInt(rootDirId) ? true:false);
+				var selected = (parseInt(key) == parseInt(rootDirId) ? true:false);
+				var repoImage = null;
+				if(this.usersEnabled){
+					repoImage = (this.user?this.user.getRepositoryIcon(parseInt(key)):null);				
+				}else{
+					repoImage = this._initRootDirsSettings.get(parseInt(key)).get('icon') || null;
+				}
 				actions[actions.length] = {
 					name:value,
 					alt:value,				
-					image:this.user.getRepositoryIcon(parseInt(key)) || ajxpResourcesFolder+'/images/foldericon.png',
+					image:repoImage || ajxpResourcesFolder+'/images/foldericon.png',
 					className:"edit",
 					disabled:selected,
 					callback:function(e){
@@ -275,7 +289,7 @@ Ajaxplorer = Class.create({
 			else
 			{
 				this.actionBar.parseXmlMessage(transport.responseXML);
-				this.loadRepository(rootDirId, this._initRootDirsList[rootDirId]);
+				this.loadRepository(rootDirId, this._initRootDirsList.get(parseInt(rootDirId)));
 			}
 		}.bind(this);
 		connexion.sendAsync();
