@@ -7,13 +7,13 @@ package components
 	import flash.net.FileReferenceList;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
+	import flash.utils.Timer;
 	
 	import mx.containers.*;
 	import mx.controls.*;
 	import mx.core.Application;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
-	
 
 	public class ApplicationClass extends Application
 	{
@@ -28,6 +28,7 @@ package components
 		private var _fileTypeDescription:String;
 		private var _fileTypes:String;
 		private var _currentFolderFiles:Array;
+		private var jsReady:Boolean;
 		
 		// all controls in the mxml file must be public variables in the code behind
 		public var fileContainer:VBox;
@@ -50,15 +51,15 @@ package components
 		{
 			super();
 			addEventListener (FlexEvent.CREATION_COMPLETE, OnLoad);
-			
-			
 		}
 		
 		private function OnLoad(event:Event):void{
 			// instantiate and initialize variables
 			fileRefList = new FileReferenceList();
 			_totalSize = 0;
-			_uploadedBytes = 0;			
+			_uploadedBytes = 0;
+			jsReady = false;
+			intializeExternalComm();			
 			
 			// hook up our event listeners
 			fileRefList.addEventListener(Event.SELECT,OnSelect);
@@ -119,6 +120,54 @@ package components
 			totalText.text = GetTextFor("TotalFile");
 			sizeText.text = GetTextFor("SizeText");
 			
+		}
+		
+		private function intializeExternalComm():void{
+		    // Check if the container is able to use the external API.
+		    if (ExternalInterface.available){
+		        try{
+		            var containerReady:Boolean = isContainerReady();
+		            if (containerReady){
+		                setupCallbacks();
+		            }else{
+		                var readyTimer:Timer = new Timer(100);
+		                readyTimer.addEventListener(TimerEvent.TIMER, timerHandler);
+		                readyTimer.start();
+		            }
+		        }catch(e:Error){
+		        	Alert.show(e.message);
+		        }
+		    }else{
+		        trace("External interface is not available for this container.");
+		    }			
+		}
+		
+		private function isContainerReady():Boolean
+		{
+		    var result:Boolean = ExternalInterface.call("isReady");
+		    return result;
+		}
+		
+		private function timerHandler(event:TimerEvent):void
+		{
+		    var isReady:Boolean = isContainerReady();
+		    if (isReady)
+		    {
+		        Timer(event.target).stop();
+		        setupCallbacks();
+		    }
+		}
+		
+		private function setupCallbacks():void{
+			jsReady = true;
+		}
+		
+		private function triggerJSEvent(eventType:String):*{
+			if(jsReady){				
+				return ExternalInterface.call("triggerFlashEvent", eventType);
+			}else{
+				//Alert.show("Not ready");
+			}
 		}
 		
 		// brings up file browse dialog when add file button is pressed
@@ -183,11 +232,7 @@ package components
 			if(!fileUploading)
 			{
 				OnCancelClicked(null);
-				// get the javascript complete funtion to call
-				var completeFunction:String = Application.application.parameters.completeFunction;
-				// if a complete function is passed in, set in flashvars
-				if(completeFunction != null && completeFunction != "")							
-					navigateToURL(new URLRequest("javascript:"+completeFunction),"_self");
+				triggerJSEvent("uploadComplete");
 			}
 		}
 		
@@ -236,13 +281,21 @@ package components
 					continue;
 				}
 				var localFoundExisting:Boolean = false;
-				for(j=0;j<_currentFolderFiles.length;j++){
-					if(fileName == String(_currentFolderFiles[j]).toLocaleLowerCase()){
-						foundExisting = true;
-						localFoundExisting = true;
-						break;
+				try{
+					var _crtFilesString:String = triggerJSEvent("currentFiles").toString();
+					if(_crtFilesString != null){
+						_currentFolderFiles = _crtFilesString.split("__AJXP_SEP__");
 					}
-				}				
+					for(j=0;j<_currentFolderFiles.length;j++){
+						if(fileName == String(_currentFolderFiles[j]).toLocaleLowerCase()){
+							foundExisting = true;
+							localFoundExisting = true;
+							break;
+						}
+					}				
+				}catch(e:Error){
+					Alert.show(e.message);
+				}
 				
 				// create new FileUpload and add handlers then add it to the fileuploadbox
 				if(_uploadFileSize > 0 && fileRefList.fileList[i].size > _uploadFileSize){
@@ -302,40 +355,11 @@ package components
 		}
 		
 		private function GetTextFor(text:String):String{
-		    if (text == "MaxFilesSizeLimit")
-				return Application.application.parameters.maxFileSizeLimitText == undefined ? "The total file size limit has been reached." : Application.application.parameters.maxFileSizeLimitText;
-			else if (text == "MaxFileSize")
-				return Application.application.parameters.maxFileSizeText == undefined ? "The file is too large and will not be added" : Application.application.parameters.maxFileSizeText;
-			else if (text == "MaxFilesNumber")
-				return Application.application.parameters.maxFilesNumber == undefined ? "The total file size number has been reached" : Application.application.parameters.maxFilesNumber;
-			else if (text == "HTTPError")
-				return Application.application.parameters.HTTPErrorText == undefined ? "There has been an HTTP Error: status code " : Application.application.parameters.HTTPErrorText;
-			else if (text == "IOError")
-				return Application.application.parameters.IOErrorText == undefined ? "There has been an IO Error: " : Application.application.parameters.IOErrorText;
-			else if (text == "SecurityError")
-				return Application.application.parameters.securityErrorText == undefined ? "There has been a Security Error: " : Application.application.parameters.securityErrorText;
-			else if (text == "Uploaded")
-				return Application.application.parameters.uploadedText == undefined ? "Uploaded" : Application.application.parameters.uploadedText;
-			else if (text == "Remove")
-				return Application.application.parameters.removeText == undefined ? "Remove" : Application.application.parameters.removeText;
-			else if (text == "Add")
-				return Application.application.parameters.addFilesText == undefined ? "Add files" : Application.application.parameters.addFilesText;
-			else if (text == "Clear")
-				return Application.application.parameters.clearFilesText == undefined ? "Clear files" : Application.application.parameters.clearFilesText;
-			else if (text == "Upload")
-				return Application.application.parameters.uploadFilesText == undefined ? "Upload files" : Application.application.parameters.uploadFilesText;
-			else if (text == "Cancel")
-				return Application.application.parameters.cancelUploadText == undefined ? "Cancel upload" : Application.application.parameters.cancelUploadText;
-			else if (text == "TotalFile")
-				return Application.application.parameters.totalFilesText == undefined ? "Total Files:" : Application.application.parameters.totalFilesText;
-			else if (text == "SizeText")
-				return Application.application.parameters.totalSizeText == undefined ? "Total Size:" : Application.application.parameters.totalSizeText;
-			else if (text == "Byte")
-				return Application.application.parameters.bytesText == undefined ? "bytes" : Application.application.parameters.bytesText;
-			else{
-				return (Application.application.parameters[text] == undefined ? text : Application.application.parameters[text]);
+			if(jsReady){
+				return ExternalInterface.call("triggerFlashEvent", "getMessage", text);
+			}else{
+				return text;
 			}
-			return "";
 		}
 		
 		private function OnTotalFileSizeLimitReached():void{
