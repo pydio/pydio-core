@@ -812,13 +812,17 @@ FilesList = Class.create(SelectableElements, {
 		return false;
 	},
 	
-	getfileNamesAsString : function(separator){
+	getFileNames : function(separator){
 		var fNames = $A([]);
 		var allItems = this.getItems();
 		for(var i=0;i<allItems.length;i++){
 			fNames.push(getBaseName(allItems[i].getAttribute('filename')));
 		}
-		return fNames.join(separator);
+		if(separator){
+			return fNames.join(separator);
+		}else {
+			return fNames.toArray();
+		}
 	},
 
 
