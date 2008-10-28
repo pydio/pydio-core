@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Untitled Document</title>
+<style type="text/css">
+<!--
+.style1 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+.style4 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style9 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	font-style: italic;
+}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF">
+<h2 class="style1">AjaXplorer Users Manual</h2>
+<p class="style4">AjaXplorer is an easy-to-install file explorer for   remotely managing files on a web server or operation as a simple file-sharing   system.  Its rich layout and actions make it easily accessible to virtually any   end-user.  It requires PHP and server access (either local or remote via FTP)   for installation.  It uses an AJAX based interface, providing streamlined and intuitive functionalities, similar to   that of a standard file-system explorer on any operating system.</p>
+<p class="style1"><strong>Quick Links:</strong></p>
+<p class="style4">Project: <a href="http://ajaxplorer.info/">http://ajaxplorer.info/</a><br />
+  Demo: <a href="http://www.ajaxplorer.info/demo/">http://www.ajaxplorer.info/demo/</a><br />
+  Download: <a href="http://sourceforge.net/project/showfiles.php?group_id=192639">http://sourceforge.net/project/showfiles.php?group_id=192639</a></p>
+<p class="style4">Copyright (c) 2008 Trent Scott - <a href="mailto: trescott3@users.sourceforge.net">trescott3[at]users.sourceforge.net</a><br />
+  Doc Version: 2.3.7</p>
+<p class="style1">Contents:</p>
+<ul>
+  <li><span class="style4"><strong>Chapter 1: </strong>Introduction to AjaXplorer</span>
+    <ul>
+      <li class="style4"><a href="#c11">1.1 About AjaXplorer</a></li>
+      <li class="style4"><a href="#c12">1.2 Features</a></li>
+    </ul>
+  </li>
+  <li class="style4"><strong>Chapter 2: </strong> Basics
+    <ul>
+      <li><a href="#c21">2.1 Download</a></li>
+      <li><a href="#c22">2.2 Installation</a></li>
+      <li><a href="#c23">2.3 Configuration</a></li>
+      <li><a href="#c24">2.4 Required Settings</a></li>
+      <li><a href="#c25">2.5 Optional Settings</a></li>
+      <li><a href="#c26">2.6 Protect Your Installation</a></li>
+      <li><a href="#c27">2.7 Running AjaXplorer</a></li>
+    </ul>
+  </li>
+  <li class="style4"><strong>Chapter 3:</strong> Toolbar
+    <ul>
+      <li><a href="#c31">Buttons</a></li>
+    </ul>
+  </li>
+  <li><span class="style4"><strong>Chapter 4:</strong> Details/Search Pane </span>
+    <ul>
+      <li class="style4"><a href="#c41">4.1 Details</a></li>
+      <li class="style4"><a href="#c42">4.2 Search</a></li>
+    </ul>
+  </li>
+  <li class="style4"><strong>Chapter 5:</strong> Navigation
+    <ul>
+      <li><a href="#c51">5.1 Folders Pane</a></li>
+      <li><a href="#c52">5.2 Path</a></li>
+    </ul>
+  </li>
+  <li class="style4"><strong>Chapter 6:</strong> User Settings
+    <ul>
+      <li>6.1 <a href="#c61">User Preferences</a></li>
+    </ul>
+  </li>
+  <li class="style4"><strong>Chapter 7: </strong>Admin Settings
+    <ul>
+      <li><a href="#c71">7.1 User Management</a></li>
+      <li><a href="#c72">7.2 Repositories Management</a></li>
+      <li><a href="#c73">7.3 Logs</a></li>
+    </ul>
+  </li>
+  <li class="style4"><strong>Chapter 8:</strong> FAQ
+    <ul>
+      <li><a href="#c81">8.1 Where are the log files?</a></li>
+      <li><a href="#c82">8.2 My file upload size is limited, how can I change this?</a></li>
+      <li><a href="#c83">8.3 I created a repository but cannot see it</a>?</li>
+      <li><a href="#c84">8.4 How do I create user-specific repositories accessible only to them?</a></li>
+      <li><a href="#c85">8.5 I want to develop my own extensions but the JavaScript and CSS files are unreadable?</a></li>
+    </ul>
+  </li>
+  <li class="style4"><strong>Chapter 9:</strong> <a href="#c9">Credits</a></li>
+</ul>
+<hr />
+<p class="style1"><strong>Chapter 1: </strong>Introduction to AjaXplorer</p>
+<p class="style7">1.1 About AjaXplorer<a name="c11" id="c11"></a></p>
+<p class="style4">AjaXplorer is an easy-to-install file explorer for   remotely managing files on a web server or operation as a simple file-sharing   system.  Its rich layout and actions make it easily accessible to virtually any   end-user.  It requires PHP and server access (either local or remote via FTP)   for installation.  It uses an AJAX based interface, providing streamlined and intuitive functionalities, similar to   that of a standard file-system explorer on any operating system.</p>
+<p class="style7">1.2  Features<a name="c12" id="c12"></a></p>
+<ul>
+  <li><span class="style4"><strong>File Manipulation</strong> </span>
+    <ul>
+      <li class="style4"><strong>Rename/Copy/Move/Delete/Download</strong> files or folders</li>
+      <li class="style4"><strong>Upload </strong>multiple files and track status with progress bar (Flash required and no https)</li>
+      <li> <span class="style4"><strong>Create </strong>folders and empty files</span></li>
+      <li> <span class="style4"><strong>Edit Text </strong>files and code files (js, php, html, java, sql, perl),  syntax is highlighted in the editor</span></li>
+      <li class="style4"><strong> View Images</strong> online, preview images in the list, diaporama of a given folder</li>
+      <li> <span class="style4"><strong>Listen to MP3s</strong> online without downloading them</span></li>
+    </ul>
+  </li>
+  <ul>
+    <li class="style4"><strong>Browse and Extract ZIP</strong> files online</li>
+  </ul>
+  <li><span class="style4"><strong>Rich GUI</strong> </span>
+    <ul>
+      <li class="style4"><strong>Select </strong>multiple files or folders (copy/move/delete action can be applied)</li>
+      <li class="style4"><strong>Drag'n'Drop</strong> selection to copy/move</li>
+      <li class="style4"><strong>List/Thumbnail</strong> Display</li>
+      <li class="style4"><strong>Keyboard Shortcuts:</strong> Ctrl + Up/Down Arrow = toggle selection, Tab = navigate between panels, Esc =   close dialog windows</li>
+    </ul>
+  </li>
+  <li><span class="style4"><strong>Advanced Features</strong> </span>
+    <ul>
+      <li class="style4"><strong>Bookmarks</strong> system</li>
+      <li class="style4"><strong>Search </strong>recursively in folders</li>
+      <li class="style4"><strong>Send URLs</strong> with file links to a friend for convenient sharing</li>
+      <li class="style4"><strong>Recycle Bin</strong> with &quot;restore action</li>
+      <li class="style4"><strong>User Preferences</strong> to set preferred language, display or  password</li>
+      <li class="style4"><strong>Multiple Languages</strong>: English, French, Dutch, German, Italian and Spanish</li>
+      <li class="style4"><strong>Customizable GUI</strong> with header and footer templates</li>
+    </ul>
+  </li>
+  <li><span class="style4"><strong>Admin Features </strong> </span>
+    <ul>
+      <li class="style4"><strong>User Management</strong> system</li>
+      <li class="style4"><strong>Multiple Root Directory</strong> to define separate repositories and assign access rights for each user</li>
+      <li class="style4"><strong>Logging</strong> system</li>
+    </ul>
+  </li>
+  <li><span class="style4"><strong>Development</strong> </span>
+    <ul>
+      <li><span class="style4"><strong>Plug-In Architecture</strong> to easily extend the application </span>
+        <ul>
+          <li class="style4">Currently supported plug-ins: fs (filesystem), remote_fs (remote server with AjaXplorer installed), MySQL (browse, edit and search MySQL database), and demo (all write actions disabled)</li>
+        </ul>
+      </li>
+      <li class="style4"><strong>MySQL DB Management</strong> (AJXP.MySQL Driver)
+        <ul>
+          <li>Configure a repository with your MySQL data (host, username, password, database) and browse the tables, execute MySQL queries and edit/add/remove records or structures within tables</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<hr />
+<p class="style1"><strong>Chapter 2:  Basics</strong></p>
+<p class="style7">2.1 Download<a name="c21" id="c"></a></p>
+<p class="style4">The current build of AjaXplorer can be downloaded from <a href="http://sourceforge.net/projects/ajaxplorer/" target="_blank"><U>http://sourceforge.net/projects/ajaxplorer/</U></a>.  Unzip using WinZip, ZipGenius or tar <em>-xzf AjaXplorer-core-2.3.7-dist.zip</em>.</p>
+<p class="style7">2.2 Installation<a name="c22" id="c22"></a></p>
+<p class="style4">Now that we’ve got our files, we can upload the whole directory to the web server (using your favorite FTP program) in case you’re not already working there.</p>
+<p class="style4">AjaXplorer needs to save/download files and be able to modify user registry.  Therefore make sure the following directories (and file within) are writeable for the web server:</p>
+<ul>
+  <li class="style4">files</li>
+  <li class="style4">server/user</li>
+</ul>
+<p class="style4"><strong>2.3 Configuration<a name="c23" id="c23"></a></strong></p>
+<p class="style4">Browse to server/conf and open the file conf.php.  Use your favorite text editor to open and modify this document.  We’ll customize settings in this file for your unique server configuration and security purposes.   Make the mandatory changes listed in section <a href="#c24">2.4 Required Settings</a>.</p>
+<p class="style4"><strong>2.4 Required Settings<a name="c24" id="c24"></a></strong></p>
+<ul>
+  <li class="style4">$dft_langue=&quot;en&quot;: Set the default language to be used (modify bold portion).</li>
+  <li class="style4">define(&quot;ADMIN_PASSWORD&quot;, &quot;admin&quot;): Set the administrator password which is granted most permissions (access) on your file server (modify bold portion).</li>
+</ul>
+<p class="style4"><strong>2.5 Optional Settings</strong><a name="c25" id="c25"></a></p>
+<ul>
+  <li class="style4">ENABLE_USERS: Toggle user accounts on/off.</li>
+  <li class="style4">ALLOW_GUEST_BROWSING: Toggle whether guests (unauthenticated users) can browse your files.</li>
+  <li class="style4">AUTH_MODE: Specify the method of authentication to be used by the server for user accounts [default=ajaxplorer].</li>
+  <li class="style4">AUTH_MODE_REMOTE_XXXXX: Specific settings for a remote server (optional).</li>
+  <li class="style4">$size_unit: Unit of file size (b=bytes, o=octets) [default=b].</li>
+  <li class="style4">$max_caracteres: Maximum number of characters for file/directory names [default=50].</li>
+  <li class="style4">$showhidden: Toggle whether hidden files are visible (1) or invisible (0).</li>
+  <li class="style4">$upload_max_number: Maximum number of files allowed to be uploaded at once [default=6].</li>
+  <li class="style4">$webmaster_email: Administrator’s email address (also from address used in ‘Send Link to Friend’ email function).  *Note: your servers “mail” function must be enabled.</li>
+  <li class="style4">$recycle_bin: Clearing the value in this field will turn off recycle bin functionality (archive of deleted files).</li>
+  <li class="style4">$use_https: Change value to “true” if using an HTTPS (SSL) domain.</li>
+</ul>
+<p class="style7">2.6 Protect Your Installation<a name="c26" id="c26"></a></p>
+<p class="style4">Access through your web server to the following directories should be denied upon completing configuration:</p>
+<ul>
+  <li class="style9">server/conf</li>
+  <li class="style9"> server/users</li>
+</ul>
+<p class="style4">Note: AjaXplorer uses .htaccess files to protect these directories automatically, be sure to allow override of the Limit directives on your web server (contact your Webmaster).</p>
+<p class="style4"><strong>2.7 Running AjaXplorer</strong><a name="c27" id="c27"></a></p>
+<p class="style4">Upon completing installation, browse to your live site on the web server (http://yourdomain.com). As AjaXplorer loads, it will display <em>&quot;Loading Components… Main Template Loaded… Action Bar Initialized… List Loaded&quot;.</em> Once you arrive at the login screen, login using your credentials. <strong>[default username=admin /  password=admin]</strong></p>
+<p class="style4">Select <em><strong>Remember Me</strong></em> to save a cookie with your login credentials to the local machine. Note: Do not use on public computers.</p>
+<hr />
+<p class="style1">Chapter 3: Toolbar</p>
+<p class="style7">3.1 Buttons<a name="c31" id="c31"></a></p>
+<p class="style4">AjaXplorer’s intuitive toolbar (top of the screen) has 15 buttons, corresponding to unique features/functions that can be performed.  From left to right, the buttons are as follows:</p>
+<ul>
+  <li class="style4">Parent: Switch the active view up to the main hierarchical file level. This is the root folder of whatever repository is specified for a user.</li>
+  <li class="style4">Refresh: Updates the window to display the current files and folders. After making changes, a refresh of the current screen might be necessary.</li>
+  <li class="style4">Thumbs/List: Change the display output of the files and folders in AjaXplorer. Toggle between thumbnail and list view (including details like size, directory, type and date/time last modified).</li>
+  <li class="style4">Bookmark: Save a current location as a favorite for quick and easy access.</li>
+  <li class="style4">Upload: Add files to the current repository [default=6 max]. From the Upload window, click <em><strong>Browse</strong>,</em> select the file(s) on your local drive to add and click <strong><em>Send</em></strong> to begin the process.  To remove all files from the  queue for uploading click <strong><em>Clear</em></strong>. To interrupt the upload process, click <em><strong>Stop</strong></em>.</li>
+  <li class="style4">New Folder: Create a new folder in the current repository.</li>
+  <li class="style4">New File: Create a new text file (.txt) in the current repository.</li>
+  <li class="style4">Download: Download the current selection. This may be an individual file, group of files or entire directory (downloaded as a .zip file).</li>
+  <li class="style4">Rename: Change the name of a selected file or folder.</li>
+  <li class="style4">Copy: Make a duplicate of selected file(s) or folders.</li>
+  <li class="style4">Move: Relocate selected file(s) or folders to a different location in the current repository.</li>
+  <li class="style4">Delete: Delete selected file(s) or folders from the current repository. Deleted items will move to the recycle bin, if enabled in the <a href="#c25">Settings</a>.</li>
+  <li class="style4">Logout: Terminate the active session in AjaXplorer.</li>
+</ul>
+<hr />
+<p class="style1">Chapter 4: Details/Search Pane</p>
+<p class="style7">4.1 Details</p>
+<p class="style4">Click the <em><strong>Details</strong></em> tab in the lower left pane (below Folders) to display current file or folder attributes (<em>name, date/time modified</em>). If a folder is selected, click <em><strong>Explore</strong></em> to view its contents. Click <em><strong>Download</strong></em> to compress the folder contents into a .zip file and download them to your local machine.</p>
+<p class="style7">4.2 Search</p>
+<p class="style4">Click the<em><strong> Search</strong></em> tab in the lower left pane (below Folders) to enter a search string (phrase) to find in the current repository. File or folder names are acceptable queries. Click the <em><strong>magnifying glass</strong></em> icon to begin the search or <em><strong>X</strong></em> icon to clear the field. Previous searches are displayed in the box below.</p>
+<hr />
+<p class="style1">Chapter 5: Navigation</p>
+<p class="style4"><strong>5.1 Folders Pane</strong><a name="c51" id="c51"></a></p>
+<p class="style4">The Folders pane (left) provides a quick view of all folders in the current repository. To browse folders within the current repository, simply click the folder name listed. Click the <em><strong>+</strong></em> icon next to a folder to display its subfolders.</p>
+<p class="style4">The Folders pane is also used to navigate between other repositories (file spaces). To switch repositories, select the repository name from the dropdown menu with <em><strong><a href="#c72">Default Files</a></strong></em> (unless modifed) as the current repository.</p>
+<p class="style4"><strong>5.2 Path</strong><a name="c52" id="c52"></a></p>
+<p class="style4">The field below the <a href="#c31">toolbar</a> (top) displays the current path relative to the root directory (<a href="#c72">default repository</a>). You can traverse between folders by modifying the path listed here as an alternative to the file browser (below). Click the <em><strong>blue arrow</strong></em> icon to go to the given location and the <em><strong>gold star</strong></em> to <a href="#c31">bookmark</a> it.</p>
+<hr />
+<p class="style1">Chapter 6: User Settings</p>
+<p class="style4"><strong>6.1 User Preferences<a name="c61" id="c61"></a></strong></p>
+<p class="style4">To modify your individual user settings (the account you're logged in on), click <em><strong>Logged in as xxxx</strong></em> in the upper right corner (xxxx=your username). This opens the <em><strong>User Preferences</strong></em> window wherein you can specify the current <em>Language, Default Display</em> method (details or thumbnails) and<em> Change Password</em> for the account<em>.</em></p>
+<hr />
+<span class="style1">Chapter 7: Admin Settings</span>
+<p class="style4">Note: Admin account is required to change server settings. <strong>[default username=admin /  password=admin]</strong></p>
+<p class="style4"><strong>7.1  User Management</strong><a name="c71" id="c71"></a></p>
+<p class="style4">In the Settings window, click <strong><em>User Management</em></strong> at the top. Under the section labeled <strong><em>Create User</em></strong>, you can specify a new username/password.</p>
+<p class="style4">The <em><strong>User List</strong></em> section displays all current users on your AjaXplorer file system. To edit a user, click on their name (must be done from admin account). You can specify their <strong><em>Repositories Rights</em></strong> (read/write privileges), modify their password or delete the account.</p>
+<p class="style4"><strong>7.2 Repositories Management</strong><a name="c72" id="c72"></a></p>
+<p class="style4">In the Settings window, click <strong><em>Repositories Management</em></strong> at the top. All current repositories (file spaces) will be displayed here and new repositories can be created by giving them a unique label (name) and choosing an access driver.</p>
+<p class="style4">After specifying the name and driver, you must specify the path to root folder on the server (e.g. files/).  You also have the option to specify the name for the recycle bin folder to be used for deleted files.</p>
+<p class="style4">When finished, click <strong><em>Create</em></strong> (if it is a new repository) or <strong><em>Save</em></strong> (if modifying settings for an existing repository).</p>
+<p class="style4">To delete a repository, click the red <em>X</em> next to its name under the <strong><em>Repositories List</em></strong>.</p>
+<p class="style4"><strong>7.3 Logs<a name="c73" id="c73"></a></strong></p>
+<p class="style4">The built-in logging system in AjaXplorer is useful for debugging and troubleshooting your file server. In the Settings window, click <em><strong>Logs</strong></em> and specify a log file (by date) using the dropdown menu labeled<em><strong> Choose a log file</strong></em>. Log entries are sorted by <em>Date/Time, IP address, Level, User, Action </em>(whatever was done) <em>and Parameters </em>(specific to each operation)<em>.</em></p>
+<hr />
+<p class="style1">Chapter 8: FAQ</p>
+<p class="style4"><strong>8.1 Where are the log files?</strong><a name="c81" id="c81"></a></p>
+<p class="style4">As admin, open the “Settings” window. You probably see a <em><strong>Logs</strong></em> tab but nothing listed inside of it. If so, there is probably a write permission missing -- the “logs” folder is created inside the “server” folder. Thus the <em>/path/to/install/server/</em> folder should be writeable.</p>
+<p class="style7">8.2 My file upload size is limited, how can I change this?<a name="c82" id="c82"></a></p>
+<p class="style4">File upload size limit is not an AjaXplorer limitation, but a server configuration for PHP. If on a shared host, it is unlikely that you can access this configuration. If you are on your own server and can edit the PHP configuration file (php.ini), please have a look at the “<a href="http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize">upload_max_filesize</a>” instruction on the PHP website.</p>
+<p class="style7">8.3 I created a repository but cannot see it?<a name="c83" id="c83"></a></p>
+<p class="style4">This often happens if you have created a repository but not granted access to this repository for each user. Logged in as “admin”, open the <em><strong>Settings</strong></em> window, <em><strong>Users Management</strong></em> tab, and give read/write access to the newly created repository to whichever user you want.</p>
+<p class="style7">8.4 How do I create user-specific repositories accessible only to them?<a name="c84" id="c84"></a></p>
+<p class="style4">As admin, open the <em><strong>Settings</strong></em> window, click <em><strong>Create Repository</strong></em>” and in the <em>Path</em> form, use the AJXP_USER keyword to create a path that will be adapted to each user. For example, use the following configuration:</p>
+<p class="style4">Repository Label : “My Files”<br />
+  Driver : “File System”<br />
+  Path : “AJXP_INSTALL_PATH/files/AJPX_USER”<br />
+  Create : “Yes”<br />
+  Recycle bin folder : “recycle_bin”<br />
+</p>
+<p class="style4">(Each user will have their own unique repository and the admin can view them when browsing the <em>Default Repository</em> packed with AjaXplorer.)</p>
+<p class="style7">8.5 I want to develop my own extensions but the JavaScript and CSS files are unreadable?<a name="c85" id="c85"></a></p>
+<p class="style4">Change the $JS_DEBUG variable to true in the file index.php at line 72. After doing so, AjaXplorer will load all JS files and CSS files separately, instead of the big compressed file used normally.</p>
+<hr />
+<p class="style1"><strong>Chapter 9:</strong> Credits<a name="c9" id="c9"></a></p>
+<p class="style4">AjaXplorer was created by <a href="mailto: cdujeu@users.sourceforge.net">Charles du Jeu</a>. Other developers include <a href="mailto: mbaudier@users.sourceforge.net">Mathieu Baudier</a>, <a href="mailto: trescott3@users.sourceforge.net">Trent Scott</a> and <a href="mailto: stagenex@users.sourceforge.net">Stage NexVistion</a>. </p>
+<p class="style4">Components: WebFX widgets (XLoadTree, SortableTable and Selectable), LightBox modified by Leightbox, and the very nice CodePress syntax highlighter.</p>
+<p class="style4">Please visit our website, <a href="http://ajaxplorer.info">http://ajaxplorer.info</a> for more information.</p>
+</body>
+</html>
