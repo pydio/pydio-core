@@ -1,5 +1,6 @@
 <?php
 $mess=array(
+"languageLabel" => "Français",
 "0" => "Dernière version",
 "1" => "Nom du fichier",
 "2" => "Taille",
