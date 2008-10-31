@@ -28,7 +28,11 @@ class ConfService
 		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_RECYCLE_BIN, $G_DEFAULT_REPOSITORIES;
 		if(!isset($langue) || $langue=="") {$langue=$dft_langue;}
 		$G_LANGUE = $langue;
-		$G_AVAILABLE_LANG = $available_languages;
+		if(isSet($available_languages)){
+			$G_AVAILABLE_LANG = $available_languages;
+		}else{
+			$G_AVAILABLE_LANG = ConfService::listAvailableLanguages();
+		}
 		$G_USE_HTTPS = $use_https;
 		$G_WM_EMAIL = $webmaster_email;
 		$G_SIZE_UNIT = $size_unit;
@@ -191,6 +195,31 @@ class ConfService
 			$G_MESSAGES = $mess;
 		}
 		return $G_MESSAGES;
+	}
+	
+	function listAvailableLanguages(){
+		// Cache in session!
+		if(isSet($_SESSION["AJXP_LANGUAGES"]) && !isSet($_GET["refresh_langs"])){
+			return $_SESSION["AJXP_LANGUAGES"];
+		}
+		$langDir = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n";
+		$languages = array();
+		if($dh = opendir($langDir)){
+			while (($file = readdir($dh)) !== false) {
+				$matches = array();
+				if(preg_match("/(.*)\.php/", $file, $matches) == 1){
+					$fRadical = $matches[1];
+					include($langDir."/".$fRadical.".php");
+					$langName = isSet($mess["languageLabel"])?$mess["languageLabel"]:"Not Found";
+					$languages[$fRadical] = $langName;
+				}
+			}
+			closedir($dh);
+		}
+		if(count($languages)){
+			$_SESSION["AJXP_LANGUAGES"] = $languages;
+		}
+		return $languages;
 	}
 
 	function getConf($varName)	
