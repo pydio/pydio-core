@@ -13,11 +13,7 @@
 //--------------------------------------------------------
 
 
-/* DEFAULT LANGUAGE
-/* French : fr
-/* English : en
-/*************************/
-$available_languages = array("en"=>"English", "fr"=>"Français", "nl"=>"Nederlands", "es"=>"Español", "de"=>"Deutsch", "it"=>"Italiano");
+/* DEFAULT LANGUAGE */
 $dft_langue="en";
 
 define("AJXP_VERSION", "2.3.7");
