@@ -28,7 +28,7 @@ class demoDriver extends fsDriver
 				}
 				else 
 				{
-					$this->readFile($this->repository->getPath()."/".SystemTextEncoding::fromUTF8(Utils::securePath($_GET["file"])), "plain");
+					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8(Utils::securePath($_GET["file"])), "plain");
 				}
 				exit(0);
 			break;

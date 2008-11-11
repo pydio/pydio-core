@@ -42,24 +42,28 @@ class HTMLWriter
     function writeRootDirListAsJsString($rootDirsList)
     {
     	$buffer = "\$H({";
+    	$parts = array();
     	foreach ($rootDirsList as $rIndex => $rObject)
     	{
-    		$buffer .= "$rIndex:'".$rObject->getDisplay()."'";
-    		if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
+    		$parts[] = "\"$rIndex\":'".$rObject->getDisplay()."'";
+    		//if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
     	}
+    	$buffer.=join(", ", $parts);
     	$buffer .= "})";
     	return $buffer;
     }
     
     function writeRepoSettingsAsJS($rootDirsList){
     	$buffer = "\$H({";
+    	$hashParts = array();
     	foreach ($rootDirsList as $rIndex => $rObject)
     	{
-    		$buffer .= "$rIndex:";
+    		//$buffer .= "$rIndex:";
     		$props = $rObject->getClientSettings();
-    		$buffer .= "\$H({".str_replace(array(" ", "\"", "="), array(",", "'", ":"), trim($props))."})";
-    		if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
+    		$hashParts[] = "\"$rIndex\":\$H({".str_replace(array(" ", "\"", "="), array(",", "'", ":"), trim($props))."})";
+    		//if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
     	}
+    	$buffer .= join(", ", $hashParts);
     	$buffer .= "})";
     	return $buffer;    	
     }
