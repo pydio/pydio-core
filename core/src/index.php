@@ -5,6 +5,7 @@ require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AJXP_User.php");
 require_once("server/classes/class.AuthService.php");
+require_once("server/classes/class.AbstractDriver.php");
 session_start();
 ConfService::init("server/conf/conf.php");
 require_once("server/classes/class.AJXP_Logger.php");

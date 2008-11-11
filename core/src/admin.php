@@ -16,6 +16,8 @@ require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.AJXP_User.php");
+require_once("server/classes/class.AbstractDriver.php");
+
 
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -151,7 +153,7 @@ switch ($action)
 			print("<fieldset><legend>Repositories Rights</legend><table class=\"repository\">");
 			foreach (ConfService::getRootDirsList() as $rootDirId => $rootDirObject)
 			{
-				print("<tr><td style=\"width: 40%;\">".$rootDirId.". ".$rootDirObject->getDisplay()." : </td>");
+				print("<tr><td style=\"width: 40%;\">. ".$rootDirObject->getDisplay()." : </td>");
 				print("<td style=\"width: 60%;\">");
 				$disabledString = "";
 				if($userId == "admin") $disabledString = "disabled";
