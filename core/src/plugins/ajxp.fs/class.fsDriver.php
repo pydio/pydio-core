@@ -11,6 +11,18 @@ class fsDriver extends AbstractDriver
 		parent::AbstractDriver($driverName, $filePath, $repository);
 	}
 	
+	function initRepository(){
+		$create = $this->repository->getOption("CREATE");
+		$path = $this->repository->getOption("PATH");
+		$recycle = $this->repository->getOption("RECYCLE_BIN");
+		if($create == true){
+			if(!is_dir($path)) @mkdir($path);
+			if($recycle!= "" && !is_dir($path."/".$recycle)){
+				@mkdir($path."/".$recycle);
+			}
+		}
+	}
+	
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
@@ -22,15 +34,16 @@ class fsDriver extends AbstractDriver
 		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
 		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 		$mess = ConfService::getMessages();
+		$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
 		// FILTER ACTION FOR DELETE
-		if(ConfService::useRecycleBin() && $action == "delete" && $dir != "/".ConfService::getRecycleBinDir())
+		if($recycleBinOption!="" && $action == "delete" && $dir != "/".$recycleBinOption)
 		{
 			$action = "move";
-			$dest = "/".ConfService::getRecycleBinDir();			
+			$dest = "/".$recycleBinOption;
 			$dest_node = "AJAXPLORER_RECYCLE_NODE";
 		}
 		// FILTER ACTION FOR RESTORE
-		if(ConfService::useRecycleBin() &&  $action == "restore" && $dir == "/".ConfService::getRecycleBinDir())
+		if($recycleBinOption!="" &&  $action == "restore" && $dir == "/".$recycleBinOption)
 		{
 			$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
 			if($originalRep != "")
@@ -49,12 +62,12 @@ class fsDriver extends AbstractDriver
 				AJXP_Logger::logAction("Download", array("files"=>$selection));
 				if($selection->inZip()){
 					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
-					@mkdir($this->repository->getPath()."/".$tmpDir);
+					@mkdir($this->getPath()."/".$tmpDir);
 					$this->convertSelectionToTmpFiles($tmpDir, $selection);
 				}
 				$zip = false;
 				if($selection->isUnique()){
-					if(is_dir($this->repository->getPath()."/".$selection->getUniqueFile())) {
+					if(is_dir($this->getPath()."/".$selection->getUniqueFile())) {
 						$zip = true;
 						$dir .= "/".basename($selection->getUniqueFile());
 					}
@@ -71,10 +84,10 @@ class fsDriver extends AbstractDriver
 					$this->readFile($file, "force-download", $localName, false, false);
 					unlink($file);
 				}else{
-					$this->readFile($this->repository->getPath()."/".$selection->getUniqueFile(), "force-download");
+					$this->readFile($this->getPath()."/".$selection->getUniqueFile(), "force-download");
 				}
 				if(isSet($tmpDir)){
-					$this->deldir($this->repository->getPath()."/".$tmpDir);
+					$this->deldir($this->getPath()."/".$tmpDir);
 				}
 				exit(0);
 			break;
@@ -82,14 +95,14 @@ class fsDriver extends AbstractDriver
 			case "image_proxy":
 				if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($file))){
 					require_once("server/classes/pclzip.lib.php");
-					$zip = new PclZip($this->repository->getPath().$split[0]);
+					$zip = new PclZip($this->getPath().$split[0]);
 					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);
 					header("Content-Type: ".Utils::getImageMimeType(basename($split[1]))."; name=\"".basename($split[1])."\"");
 					header("Content-Length: ".strlen($data[0]["content"]));
 					header('Cache-Control: public');
 					print($data[0]["content"]);
 				}else{
-					$this->readFile($this->repository->getPath()."/".SystemTextEncoding::fromUTF8($file), "image");
+					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "image");
 				}
 				exit(0);
 			break;
@@ -97,13 +110,13 @@ class fsDriver extends AbstractDriver
 			case "mp3_proxy":
 				if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($file))){
 					require_once("server/classes/pclzip.lib.php");
-					$zip = new PclZip($this->repository->getPath().$split[0]);
+					$zip = new PclZip($this->getPath().$split[0]);
 					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);					
 					header("Content-Type: audio/mp3; name=\"".basename($split[1])."\"");
 					header("Content-Length: ".strlen($data[0]["content"]));
 					print($data[0]["content"]);
 				}else{
-					$this->readFile($this->repository->getPath()."/".SystemTextEncoding::fromUTF8($file), "mp3");
+					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "mp3");
 				}
 				exit(0);
 			break;
@@ -117,14 +130,14 @@ class fsDriver extends AbstractDriver
 					AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
-					$fp=fopen($this->repository->getPath().SystemTextEncoding::fromUTF8("/$file"),"w");
+					$fp=fopen($this->getPath().SystemTextEncoding::fromUTF8("/$file"),"w");
 					fputs ($fp,$code);
 					fclose($fp);
 					echo $mess[115];
 				}
 				else 
 				{
-					$this->readFile($this->repository->getPath()."/".SystemTextEncoding::fromUTF8($file), "plain");
+					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "plain");
 				}
 				exit(0);
 			break;
@@ -142,9 +155,9 @@ class fsDriver extends AbstractDriver
 				}
 				if($selection->inZip()){
 					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
-					@mkdir($this->repository->getPath()."/".$tmpDir);					
+					@mkdir($this->getPath()."/".$tmpDir);					
 					$this->convertSelectionToTmpFiles($tmpDir, $selection);
-					if(is_dir($tmpDir))	$this->deldir($this->repository->getPath()."/".$tmpDir);					
+					if(is_dir($tmpDir))	$this->deldir($this->getPath()."/".$tmpDir);					
 				}
 				$success = $error = array();
 				
@@ -250,7 +263,7 @@ class fsDriver extends AbstractDriver
 
 				if($dir!=""){$rep_source="/$dir";}
 				else $rep_source = "";
-				$destination=SystemTextEncoding::fromUTF8($this->repository->getPath().$rep_source);
+				$destination=SystemTextEncoding::fromUTF8($this->getPath().$rep_source);
 				if(!$this->isWriteable($destination))
 				{
 					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
@@ -323,7 +336,7 @@ class fsDriver extends AbstractDriver
 					$liste = array();
 					$zip = $this->zipListing($test[0], $test[1], $liste);
 					AJXP_XMLWriter::header();
-					$tmpDir = $this->repository->getPath().dirname($test[0]).".tmpZipExtract";					
+					$tmpDir = $this->getPath().dirname($test[0]).".tmpZipExtract";					
 					foreach ($liste as $zipEntry){
 						$atts = array();
 						if(!$fileListMode && !$zipEntry["folder"]) continue;
@@ -415,16 +428,16 @@ class fsDriver extends AbstractDriver
 					print("<tree text=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($repName))."\" $attributes>");
 					print("</tree>");
 				}
-				if($nom_rep == $this->repository->getPath() && ConfService::useRecycleBin() && !$completeMode)
+				if($nom_rep == $this->repository->getOption("PATH") && $recycleBinOption!="" && !$completeMode)
 				{
 					if($fileListMode)
 					{
-						print("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getPath()."/".ConfService::getRecycleBinDir())."\" filename=\"/".ConfService::getRecycleBinDir()."\" icon=\"trashcan.png\"></tree>");
+						print("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
 					}
 					else 
 					{
 						// ADD RECYCLE BIN TO THE LIST
-						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".ConfService::getRecycleBinDir()."\"/>");
+						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".$recycleBinOption."\"/>");
 					}
 				}
 				AJXP_XMLWriter::close();
@@ -461,9 +474,13 @@ class fsDriver extends AbstractDriver
 		return $xmlBuffer;
 	}
 	
+	function getPath(){
+		return $this->repository->getOption("PATH");
+	}
+	
 	function zipListing($zipPath, $localPath, &$filteredList){
 		require_once("server/classes/pclzip.lib.php");
-		$crtZip = new PclZip($this->repository->getPath()."/".$zipPath);
+		$crtZip = new PclZip($this->getPath()."/".$zipPath);
 		$liste = $crtZip->listContent();
 		$files = array();
 		if($localPath[strlen($localPath)-1] != "/") $localPath.="/";
@@ -490,7 +507,7 @@ class fsDriver extends AbstractDriver
 	
 	function initName($dir)
 	{
-		$racine = $this->repository->getPath();
+		$racine = $this->getPath();		
 		$mess = ConfService::getMessages();
 		if(!isset($dir) || $dir=="" || $dir == "/")
 		{
@@ -575,12 +592,13 @@ class fsDriver extends AbstractDriver
 		$ordre = "nom";
 		$poidstotal=0;
 		$handle=opendir($nom_rep);
+		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		while ($file = readdir($handle))
 		{
 			if($file!="." && $file!=".." && Utils::showHiddenFiles($file)==1)
 			{
-				if(ConfService::getRecycleBinDir() != "" 
-					&& $nom_rep == $this->repository->getPath()."/".ConfService::getRecycleBinDir() 
+				if($recycle != "" 
+					&& $nom_rep == $this->repository->getOption("PATH")."/".$recycle 
 					&& $file == RecycleBinManager::getCacheFileName()){
 					continue;
 				}
@@ -588,7 +606,7 @@ class fsDriver extends AbstractDriver
 				$poidstotal+=$poidsfic;
 				if(is_dir("$nom_rep/$file"))
 				{					
-					if(ConfService::useRecycleBin() && $this->repository->getPath()."/".ConfService::getRecycleBinDir() == "$nom_rep/$file")
+					if($recycle != "" && $this->getPath()."/".$recycle == "$nom_rep/$file")
 					{
 						continue;
 					}
@@ -653,7 +671,7 @@ class fsDriver extends AbstractDriver
 	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
 	{
 		$mess = ConfService::getMessages();
-		if(!is_writable($this->repository->getPath()."/".$destDir))
+		if(!is_writable($this->getPath()."/".$destDir))
 		{
 			$error[] = $mess[38]." ".$destDir." ".$mess[99];
 			return ;
@@ -661,7 +679,7 @@ class fsDriver extends AbstractDriver
 				
 		foreach ($selectedFiles as $selectedFile)
 		{
-			if($move && !is_writable(dirname($this->repository->getPath()."/".$selectedFile)))
+			if($move && !is_writable(dirname($this->getPath()."/".$selectedFile)))
 			{
 				$error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
 				continue;
@@ -682,7 +700,7 @@ class fsDriver extends AbstractDriver
 		$nom_fic=basename($filePath);
 		$mess = ConfService::getMessages();
 		$filename_new=Utils::processFileName($filename_new);
-		$old=$this->repository->getPath()."/$filePath";
+		$old=$this->getPath()."/$filePath";
 		if(!is_writable($old))
 		{
 			return $mess[34]." ".$nom_fic." ".$mess[99];
@@ -730,15 +748,15 @@ class fsDriver extends AbstractDriver
 		{
 			return "$mess[37]";
 		}
-		if(file_exists($this->repository->getPath()."/$crtDir/$newDirName"))
+		if(file_exists($this->getPath()."/$crtDir/$newDirName"))
 		{
 			return "$mess[40]"; 
 		}
-		if(!is_writable($this->repository->getPath()."/$crtDir"))
+		if(!is_writable($this->getPath()."/$crtDir"))
 		{
 			return $mess[38]." $crtDir ".$mess[99];
 		}
-		mkdir($this->repository->getPath()."/$crtDir/$newDirName",0775);
+		mkdir($this->getPath()."/$crtDir/$newDirName",0775);
 		return null;		
 	}
 	
@@ -749,16 +767,16 @@ class fsDriver extends AbstractDriver
 		{
 			return "$mess[37]";
 		}
-		if(file_exists($this->repository->getPath()."/$crtDir/$newFileName"))
+		if(file_exists($this->getPath()."/$crtDir/$newFileName"))
 		{
 			return "$mess[71]";
 		}
-		if(!is_writable($this->repository->getPath()."/$crtDir"))
+		if(!is_writable($this->getPath()."/$crtDir"))
 		{
 			return "$mess[38] $crtDir $mess[99]";
 		}
 		
-		$fp=fopen($this->repository->getPath()."/$crtDir/$newFileName","w");
+		$fp=fopen($this->getPath()."/$crtDir/$newFileName","w");
 		if($fp)
 		{
 			if(eregi("\.html$",$newFileName)||eregi("\.htm$",$newFileName))
@@ -784,7 +802,7 @@ class fsDriver extends AbstractDriver
 			{
 				return $mess[120];
 			}
-			$fileToDelete=$this->repository->getPath().$selectedFile;
+			$fileToDelete=$this->getPath().$selectedFile;
 			if(!file_exists($fileToDelete))
 			{
 				$logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
@@ -808,8 +826,9 @@ class fsDriver extends AbstractDriver
 	function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
 	{
 		$mess = ConfService::getMessages();		
-		$destFile = $this->repository->getPath().$destDir."/".basename($srcFile);
-		$realSrcFile = $this->repository->getPath()."/$srcFile";		
+		$destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
+		$realSrcFile = $this->repository->getOption("PATH")."/$srcFile";
+		$recycle = $this->repository->getOption("RECYCLE_BIN");		
 		if(!file_exists($realSrcFile))
 		{
 			$error[] = $mess[100].$srcFile;
@@ -846,7 +865,7 @@ class fsDriver extends AbstractDriver
 			// Now delete original
 			$this->deldir($realSrcFile); // both file and dir
 			$messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
-			if($destDir == "/".ConfService::getRecycleBinDir())
+			if($destDir == "/".$recycle)
 			{
 				RecycleBinManager::fileToRecycle($srcFile);
 				$messagePart = $mess[123]." ".$mess[122];
@@ -862,7 +881,7 @@ class fsDriver extends AbstractDriver
 		}
 		else
 		{			
-			if($destDir == "/".ConfService::getRecycleBinDir())
+			if($destDir == "/".$this->repository->getOption("RECYCLE_BIN"))
 			{
 				RecycleBinManager::fileToRecycle($srcFile);
 			}
@@ -961,7 +980,7 @@ class fsDriver extends AbstractDriver
 		{
 			if(file_exists("$location")) {unlink("$location");}
 		}
-		if(basename(dirname($location)) == ConfService::getRecycleBinDir())
+		if(basename(dirname($location)) == $this->repository->getOption("RECYCLE_BIN"))
 		{
 			// DELETING FROM RECYCLE
 			RecycleBinManager::deleteFromRecycle($location);
@@ -978,10 +997,10 @@ class fsDriver extends AbstractDriver
     	$filePaths = array();
     	$totalSize = 0;
     	foreach ($src as $item){
-    		$filePaths[] = $this->repository->getPath().$item;
+    		$filePaths[] = $this->getPath().$item;
     	}
     	$archive = new PclZip($dest);
-    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->repository->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
+    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
     	if($vList == 0) return false;
     }
     
@@ -999,9 +1018,9 @@ class fsDriver extends AbstractDriver
     		$files[$key] = $item;
     	}
     	require_once("server/classes/pclzip.lib.php");
-    	$zip = new PclZip($this->repository->getPath().$zipPath);
+    	$zip = new PclZip($this->getPath().$zipPath);
     	$err = $zip->extract(PCLZIP_OPT_BY_NAME, $files, 
-    				  PCLZIP_OPT_PATH, $this->repository->getPath()."/".$tmpDir);
+    				  PCLZIP_OPT_PATH, $this->getPath()."/".$tmpDir);
     	foreach ($files as $key => $item){// Remove path
     		$files[$key] = $tmpDir."/".$item;
     	}

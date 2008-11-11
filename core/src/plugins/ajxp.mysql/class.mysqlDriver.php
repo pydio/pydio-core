@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * MySQL browser
+ * @todo Put the DB content encoding as a driver option, then manually for current encoding 
+ *       in SystemTextEncoding.
+ */
 class mysqlDriver extends AbstractDriver 
 {
 	/**

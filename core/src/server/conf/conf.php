@@ -31,38 +31,21 @@ define("AUTH_MODE_REMOTE_PASSWORD", ""); //
 define("AUTH_MODE_REMOTE_PORT", 80); // 
 define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); // 
 
-/* ABSOLUTE PATH(S) AND PUBLIC NAME OF THE FILES TO EXPLORE
-/* You can add as many as you want,  
-/* Just increment the "$REPOSITORIES" index.
+/* 
+/* BASIC REPOSITORY CONFIGURATION.
+/* Use the GUI to add new repositories to explore!
+/*   + Log in as "admin" and go to "Settings">"Repositories"
 /*********************************************************/
 $REPOSITORIES[0] = array(
-	"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
 	"DISPLAY"		=>	"Default Files", 
 	"DRIVER"		=>	"fs", 
-	"CREATE"		=>	true,
-	"RECYCLE_BIN" 	=> 	'recycle_bin'
+	"DRIVER_OPTIONS"=> array(
+		"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
+		"CREATE"		=>	true,
+		"RECYCLE_BIN" 	=> 	'recycle_bin'
+	)
 );
 
-/*
-$REPOSITORIES[1] = array(
-	"PATH"			=>	"",
-	"DISPLAY"		=>	"Web Files", 
-	"DRIVER"		=>	"remote_fs", 
-	"DRIVER_OPTIONS"=>  array("HOST"	 => "www.remoteserver.com", 
-							  "URI"		 => "/path_to_remote/ajaxplorer/content.php", 
-							  "AUTH_URI" => "/path_to_remote/ajaxplorer/index.php", 
-							  "AUTH_NAME"=> "name", 
-							  "AUTH_PASS"=> "password", 
-							  "TMP_UPLOAD"=>"tmp"),
-	"CREATE"		=>	false,
-	"RECYCLE_BIN" 	=> 	''
-);
-
-$REPOSITORIES[2] = array(
-	"PATH"=>"C:\your\location3\on\windows", 
-	"DISPLAY"=>"Windows Documents"
-);
-*/
 
 //------------------------
 //		UPLOAD CONFIG

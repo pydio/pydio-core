@@ -35,8 +35,9 @@ class RecycleBinManager
 	
 	function loadCache(){
 		$result = array();
-		if(ConfService::getRecycleBinDir() == "") return null;
-		$cachePath = ConfService::getRootDir()."/".ConfService::getRecycleBinDir()."/".RecycleBinManager::getCacheFileName();
+		$recycle = ConfService::getRepository()->getOption("RECYCLE_BIN");
+		if($recycle == "") return null;
+		$cachePath = ConfService::getRepository()->getOption("PATH")."/".$recycle."/".RecycleBinManager::getCacheFileName();
 		if(is_file($cachePath))
 		{
 			$fileLines = file($cachePath);
@@ -46,11 +47,12 @@ class RecycleBinManager
 	}
 	
 	function saveCache($value){
-		if(ConfService::getRecycleBinDir() == "") return ;
-		$cachePath = ConfService::getRootDir()."/".ConfService::getRecycleBinDir()."/".RecycleBinManager::getCacheFileName();
-		if(!is_dir(ConfService::getRootDir()."/".ConfService::getRecycleBinDir()))
+		$recycle = ConfService::getRepository()->getOption("RECYCLE_BIN");
+		if($recycle == "") return ;
+		$cachePath = ConfService::getRepository()->getOption("PATH")."/".$recycle."/".RecycleBinManager::getCacheFileName();
+		if(!is_dir(ConfService::getRepository()->getOption("PATH")."/".$recycle))
 		{
-			mkdir(ConfService::getRootDir()."/".ConfService::getRecycleBinDir());
+			mkdir(ConfService::getRepository()->getOption("PATH")."/".$recycle);
 		}
 		$fp = fopen($cachePath, "w");
 		fwrite($fp, serialize($value));
