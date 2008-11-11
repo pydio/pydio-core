@@ -98,10 +98,10 @@ User = Class.create({
 					if(repoChild.tagName == "repo") {
 						repositories.set(repoChild.getAttribute("id"), repoChild.firstChild.nodeValue);
 						if(repoChild.getAttribute("icon")){
-							this.repoIcon.set(parseInt(repoChild.getAttribute("id")), repoChild.getAttribute("icon"));
+							this.repoIcon.set(repoChild.getAttribute("id"), repoChild.getAttribute("icon"));
 						}
 						if(repoChild.getAttribute("search_engine")){
-							this.repoSearchEngines.set(parseInt(repoChild.getAttribute("id")), repoChild.getAttribute("search_engine"));
+							this.repoSearchEngines.set(repoChild.getAttribute("id"), repoChild.getAttribute("search_engine"));
 						}
 					}
 				}
