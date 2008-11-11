@@ -111,7 +111,6 @@ class remote_fsDriver extends AbstractDriver
 			case "upload":
 				if(isSet($httpVars['dir']) && $httpVars['dir']!=""){$rep_source=$httpVars['dir'];}
 				else $rep_source = "/";
-				$destination=$this->repository->getPath().$rep_source;
 				$logMessage = "";
 				$fancyLoader = false;				
 				foreach ($filesVars as $boxName => $boxData)

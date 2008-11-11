@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package info.ajaxplorer
+ *
+ */
 
 class AbstractDriver {
 	
@@ -30,6 +34,10 @@ class AbstractDriver {
 		// Create fake action for sending its own actions to client.
 		$this->actions["get_driver_actions"] = array();
 		$this->actions["get_driver_info_panels"] = array();
+	}
+	
+	function initRepository(){
+		// To be implemented by subclasses
 	}
 	
 	function hasAction($actionName){

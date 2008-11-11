@@ -15,7 +15,6 @@ global $G_BOTTOM_PAGE;
 global $G_UPLOAD_MAX_NUMBER;
 global $G_UPLOAD_MAX_FILE;
 global $G_UPLOAD_MAX_TOTAL;
-global $G_RECYCLE_BIN;
 global $G_ACCESS_DRIVER;
 
 
@@ -25,7 +24,7 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_RECYCLE_BIN, $G_DEFAULT_REPOSITORIES;
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_DEFAULT_REPOSITORIES;
 		if(!isset($langue) || $langue=="") {$langue=$dft_langue;}
 		$G_LANGUE = $langue;
 		if(isSet($available_languages)){
@@ -57,8 +56,9 @@ class ConfService
 			}
 			else 
 			{
-				$G_REPOSITORY = $G_REPOSITORIES[0];
-				$_SESSION['REPO_ID'] = 0;
+				$keys = array_keys($G_REPOSITORIES);
+				$G_REPOSITORY = $G_REPOSITORIES[$keys[0]];
+				$_SESSION['REPO_ID'] = $keys[0];
 			}
 		}
 		else 
@@ -68,17 +68,8 @@ class ConfService
 			if(isSet($G_ACCESS_DRIVER)) unset($G_ACCESS_DRIVER);
 		}
 
-		if($G_REPOSITORY->getCreate() == true){
-			if(!is_dir($G_REPOSITORY->getPath())) @mkdir($G_REPOSITORY->getPath());
-			if($G_REPOSITORY->getRecycle()!= "" && !is_dir($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle())){
-				@mkdir($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle());
-			}
-		}
-		// INIT RECYCLE BIN
-		global $G_RECYCLE_BIN;
-		if($G_REPOSITORY->getRecycle()!= "" && is_dir($G_REPOSITORY->getPath()."/".$G_REPOSITORY->getRecycle())){			
-			$G_RECYCLE_BIN = $G_REPOSITORY->getRecycle();
-		}		
+		$driver = ConfService::getRepositoryDriver();
+		$driver->initRepository();
 	}
 	
 	function getRootDirsList()
@@ -89,11 +80,13 @@ class ConfService
 	
 	function getCurrentRootDirIndex()
 	{
-		if(isSet($_SESSION['REPO_ID']))
+		global $G_REPOSITORIES;
+		if(isSet($_SESSION['REPO_ID']) &&  isSet($G_REPOSITORIES[$_SESSION['REPO_ID']]))
 		{
 			return $_SESSION['REPO_ID'];
 		}
-		return 0;
+		$keys = array_keys($G_REPOSITORIES);
+		return $keys[0];
 	}
 	
 	function getCurrentRootDirDisplay()
@@ -113,30 +106,39 @@ class ConfService
 		{
 			$repo = ConfService::createRepositoryFromArray($index, $repository);
 			$repo->setWriteable(false);
-			$objList[$index] = $repo;
+			$objList[$repo->getUniqueId()] = $repo;
 		}
 		$confRepo = ConfService::loadRepoFile();
 		foreach ($confRepo as $repo){			
 			$repo->setWriteable(true);
-			$objList[] = $repo;
+			$objList[$repo->getUniqueId()] = $repo;
 		}
 		return $objList;
 	}
 	
+	/**
+	 * Create a repository object from a config options array
+	 *
+	 * @param integer $index
+	 * @param Array $repository
+	 * @return Repository
+	 */
 	function createRepositoryFromArray($index, $repository){
 		$repo = new Repository($index, $repository["DISPLAY"], $repository["DRIVER"]);
 		if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
 			foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
 				$repo->addOption($oName, $oValue);
 			}
-		}			
-		// Old grammar, this is now a fs driver option
-		if(array_key_exists("RECYCLE_BIN", $repository)) $repo->setRecycle($repository["RECYCLE_BIN"]);
-		if(array_key_exists("PATH", $repository)) $repo->setPath($repository["PATH"]);
-		if(array_key_exists("CREATE", $repository)) $repo->setCreate($repository["CREATE"]);
+		}
 		return $repo;
 	}
 	
+	/**
+	 * Add dynamically created repository
+	 *
+	 * @param Repository $oRepository
+	 * @return -1 if error
+	 */
 	function addRepository($oRepository){
 		// update list
 		$confRepoList = ConfService::loadRepoFile();
@@ -167,20 +169,7 @@ class ConfService
 		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);		
 	}
-	
-	function useRecycleBin()
-	{
-		global $G_RECYCLE_BIN;
-		if(!isset($G_RECYCLE_BIN)) return false;
-		return true;
-	}
-	
-	function getRecycleBinDir()
-	{
-		global $G_RECYCLE_BIN;
-		return $G_RECYCLE_BIN;
-	}
-	
+		
 	function zipEnabled()
 	{
 		return (function_exists("gzopen")?true:false);		
@@ -243,13 +232,7 @@ class ConfService
 		global $G_LANGUE;
 		return $G_LANGUE;
 	}
-	
-	function getRootDir()
-	{
-		global $G_REPOSITORY;
-		return $G_REPOSITORY->getPath();
-	}
-	
+		
 	/**
 	 * @return Repository
 	 */

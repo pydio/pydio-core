@@ -17,26 +17,9 @@ class Repository {
 		$this->setDisplay($display);
 		$this->setId($id);		
 	}
-	/**
-	 * @return String
-	 */
-	function getPath() {		
-		return $this->getOption("PATH");
-	}
 	
-	/**
-	 * @param String $path
-	 */
-	function setPath($path) {
-		$path = str_replace("\\", "/", $path); // windows like
-		//$this->path = $path;
-		$this->options["PATH"] = $path;
-	}
-	/**
-	 * @return unknown
-	 */
-	function getRecycle() {
-		return $this->getOption("RECYCLE_BIN");
+	function getUniqueId(){
+		return md5(serialize($this));
 	}
 	
 	function getClientSettings(){
@@ -53,12 +36,6 @@ class Repository {
 		return $settingLine;
 	}
 	
-	/**
-	 * @param unknown_type $recycle
-	 */
-	function setRecycle($recycle) {
-		$this->options["RECYCLE_BIN"] = $recycle;
-	}
 
 	function addOption($oName, $oValue){
 		if(strpos($oName, "PATH") !== false){
