@@ -72,7 +72,7 @@ Ajaxplorer = Class.create({
 			fakeUser.setActiveRepository(this._initRootDirId, 1, 1);
 			fakeUser.setRepositoriesList(this._initRootDirsList);
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
-			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList.get(parseInt(this._initRootDirId)), ajxpServerAccessPath+'?action=ls', this);
+			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList.get(this._initRootDirId), ajxpServerAccessPath+'?action=ls', this);
 			this.refreshRootDirMenu(this._initRootDirsList, this._initRootDirId);
 			this.actionBar.loadActions();
 			this.infoPanel.load();
@@ -205,11 +205,11 @@ Ajaxplorer = Class.create({
 		$('repo_path').value = repositoryLabel;
 		var sEngineName = 'SearchEngine';
 		if(this.usersEnabled){
-			$('repo_icon').src = this.user.getRepositoryIcon(parseInt(repositoryId)) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
-			sEngineName = this.user.getRepoSearchEngine(parseInt(repositoryId)) || 'SearchEngine';		
+			$('repo_icon').src = this.user.getRepositoryIcon(repositoryId) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
+			sEngineName = this.user.getRepoSearchEngine(repositoryId) || 'SearchEngine';		
 		}else{
-			$('repo_icon').src = this._initRootDirsSettings.get(parseInt(repositoryId)).get('icon') || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
-			sEngineName = this._initRootDirsSettings.get(parseInt(repositoryId)).get('search_engine') || 'SearchEngine';
+			$('repo_icon').src = this._initRootDirsSettings.get(repositoryId).get('icon') || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
+			sEngineName = this._initRootDirsSettings.get(repositoryId).get('search_engine') || 'SearchEngine';
 			this.refreshRootDirMenu(this._initRootDirsList, repositoryId);
 		}
 				
@@ -231,12 +231,12 @@ Ajaxplorer = Class.create({
 			rootDirsList.each(function(pair){
 				var value = pair.value;
 				var key = pair.key;
-				var selected = (parseInt(key) == parseInt(rootDirId) ? true:false);
+				var selected = (key == rootDirId ? true:false);
 				var repoImage = null;
 				if(this.usersEnabled){
-					repoImage = (this.user?this.user.getRepositoryIcon(parseInt(key)):null);				
+					repoImage = (this.user?this.user.getRepositoryIcon(key):null);				
 				}else{
-					repoImage = this._initRootDirsSettings.get(parseInt(key)).get('icon') || null;
+					repoImage = this._initRootDirsSettings.get(key).get('icon') || null;
 				}
 				actions[actions.length] = {
 					name:value,
@@ -289,7 +289,7 @@ Ajaxplorer = Class.create({
 			else
 			{
 				this.actionBar.parseXmlMessage(transport.responseXML);
-				this.loadRepository(rootDirId, this._initRootDirsList.get(parseInt(rootDirId)));
+				this.loadRepository(rootDirId, this._initRootDirsList.get(rootDirId));
 			}
 		}.bind(this);
 		connexion.sendAsync();
