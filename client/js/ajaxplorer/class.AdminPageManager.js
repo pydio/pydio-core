@@ -341,21 +341,31 @@ AdminPageManager = Class.create({
 		if($('user_data_'+userId).visible())
 		{
 			// closing
-			color = "#ddd";
+			color = "#fff";
+			border = "#fff";
 		}
 		else
 		{
 			// opening
 			$$('div.user').each(function(element){
-				element.setStyle({backgroundColor:"#ddd"});
+				element.setStyle({
+					backgroundColor:"#fff",
+					borderColor: "#fff"
+				});
 			});
 			$$('div.user_data').each(function(element){
 				element.hide();
 			});
-			color = "#fff";
+			color = "#ddd";
+			border = "#bbb";
 		}
-		$('user_block_'+userId).setStyle({backgroundColor:color});
-		$('user_data_'+userId).toggle();	
+		$('user_block_'+userId).setStyle({
+			backgroundColor:color,
+			borderColor: border
+		});
+		//$('user_data_'+userId).toggle();	
+		$('users_detail_panel').insert({top:$('user_data_'+userId)});
+		$('user_data_'+userId).toggle();
 	},
 	
 	submitForm: function(action, parameters, formName, callback){

@@ -53,7 +53,7 @@ body, html
     	</td>
     </tr>
 	</table>
-	<div id="users_management" style="border:1px solid #aaa; border-top:0px;">
+	<div id="users_management" style="border:1px solid #aaa; border-top:0px; height:362px;">
 		<div id="user_admin_bar">
 		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/user_create.png" align="absmiddle" width="32" height="32"> <b>Create user</b>  
 		 	    &nbsp;&nbsp;&nbsp;&nbsp;
@@ -62,8 +62,9 @@ body, html
 		 		Confirm <input type="password" id="new_user_pwd_conf">
 		 		<input type="submit" value="OK" class="submit_button" onclick="manager.createUser(); return false;">
 		</div>
-		<div class="users_list_title">Users List</div>
+		<!--<div class="users_list_title">All Users</div>-->
 		<div id="users_list"></div>
+		<div id="users_detail_panel"></div>
 	</div>
 	<div id="repositories_management" style="border:1px solid #aaa; border-top:0px;height:362px;overflow:auto;">
 		<div id="repo_create_form" style="overflow:hidden; height:32px;">
