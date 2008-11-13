@@ -1080,9 +1080,20 @@ ADMIN STYLES
 **********************/
 #users_list
 {
-    height: 272px;
+    height: 300px;
+    width: 200px;
+    float: left;
+    padding-top: 5px;
     overflow: auto;
 }
+#users_detail_panel{
+	width: 435px;
+    height: 300px;
+    float: left;
+	border-left: 1px solid #bbb;
+    overflow: auto;
+}
+
 .users_list_title
 {
     font-family: Trebuchet MS;
@@ -1097,12 +1108,14 @@ ADMIN STYLES
 
 .user
 {    
-    border-bottom: 1px solid #fff;
     padding-top: 15px;
-    padding-left: 10px;
+    padding-left: 5px;
     padding-bottom: 15px;
-    background-color: #ddd;
-    border-top: 1px solid #ddd;    
+    background-color: #fff;
+    border-top: 1px solid #fff; 
+    border-bottom: 1px solid #fff;
+    border-left: 1px solid #fff;
+    margin-left: 5px;
 }
 
 .user_id, .user_data, .repository, .password
@@ -1150,7 +1163,7 @@ legend
 .user_data
 {
     padding: 10px;
-    padding-right: 20px;
+    /*padding-right: 20px;*/
 }
 
 .user_id
@@ -1169,8 +1182,8 @@ legend
    padding: 15px;
    font-size: 12px;
    border: 0px solid #ddd;
-   background-color: #fff;
-   border-bottom: 1px solid #999;
+   background-color: #ddd;
+   border-bottom: 1px solid #bbb;
 }
 
 #user_admin_bar input, .password input
