@@ -153,8 +153,8 @@ switch ($action)
 			print("<fieldset><legend>Repositories Rights</legend><table class=\"repository\">");
 			foreach (ConfService::getRootDirsList() as $rootDirId => $rootDirObject)
 			{
-				print("<tr><td style=\"width: 40%;\">. ".$rootDirObject->getDisplay()." : </td>");
-				print("<td style=\"width: 60%;\">");
+				print("<tr><td style=\"width: 45%;\">. ".$rootDirObject->getDisplay()." : </td>");
+				print("<td style=\"width: 55%;\">");
 				$disabledString = "";
 				if($userId == "admin") $disabledString = "disabled";
 				print("Read <input type=\"checkbox\" id=\"chck_".$userId."_".$rootDirId."_read\" onclick=\"manager.changeUserRight(this, '$userId', '$rootDirId', 'read');\" $disabledString ".($userObject->canRead($rootDirId)?"checked":"").">");
