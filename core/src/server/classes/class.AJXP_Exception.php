@@ -6,6 +6,10 @@ class AJXP_Exception {
 		$this->messageId = $messageId;
 	}
 	
+	function getMessage(){
+		return $this->messageId;
+	}
+	
 	function errorToXml($mixed)
 	{
 		if(is_a($mixed, "AJXP_Exception"))
