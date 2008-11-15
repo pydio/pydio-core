@@ -207,7 +207,11 @@
 				modal.showDialogForm(
 					'Ajaxplorer Settings', 
 					'admin_form', 
-					null, 
+					function(form){
+					    setTimeout(function(){
+							form.select('iframe')[0].src='admin.php';
+						}, 10);
+					}, 
 					function(){				
 						hideLightBox();return false;
 					}, 
@@ -217,7 +221,7 @@
 				<clientForm id="admin_form"><![CDATA[
 					<div id="admin_form" box_width="665">
 					<div id="adminScreen">
-					<iframe src="admin.php" id="adminIFrame" frameborder="0"></iframe>
+					<iframe id="adminIFrame" frameborder="0"></iframe>
 					</div>
 					</div>
 				]]></clientForm>
