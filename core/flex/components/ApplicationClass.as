@@ -257,6 +257,7 @@ package components
 		private function OnSelect(event:Event):void{
 			// get the page to upload to, set in flashvars
 			var uploadPage:String = Application.application.parameters.uploadPage;
+			uploadPage += "&dir="+ triggerJSEvent("currentFolder");
 			
 			var tempSize:Number = _totalSize;
 			
