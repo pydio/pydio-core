@@ -67,9 +67,7 @@ class ConfService
 			$_SESSION['REPO_ID'] = $rootDirIndex;
 			if(isSet($G_ACCESS_DRIVER)) unset($G_ACCESS_DRIVER);
 		}
-
-		$driver = ConfService::getRepositoryDriver();
-		$driver->initRepository();
+		
 	}
 	
 	function getRootDirsList()
@@ -263,6 +261,11 @@ class ConfService
 			include_once($filePath);
 			if(class_exists($driverName)){
 				$G_ACCESS_DRIVER = new $driverName($accessType, $xmlPath, $crtRepository);
+				$res = $G_ACCESS_DRIVER->initRepository();
+				if($res!=null && is_a($res, "AJXP_Exception")){
+					$G_ACCESS_DRIVER = null;
+					return $res;
+				}				
 				return $G_ACCESS_DRIVER;
 			}
 		}

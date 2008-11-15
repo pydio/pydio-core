@@ -138,7 +138,11 @@ if($ajxpDriver->hasAction($action)){
 $Driver = ConfService::getRepositoryDriver();
 if($Driver == null || !is_a($Driver, "AbstractDriver")){
 	AJXP_XMLWriter::header();
-	AJXP_XMLWriter::sendMessage(null, "Cannot find driver!");
+	if(is_a($Driver, "AJXP_Exception")){
+		AJXP_XMLWriter::sendMessage(null, "Cannot initialize driver : ".$Driver->getMessage());
+	}else{
+		AJXP_XMLWriter::sendMessage(null, "Cannot find driver!");
+	}
 	AJXP_XMLWriter::close();
 	exit(1);
 }

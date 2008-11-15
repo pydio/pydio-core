@@ -16,7 +16,6 @@ require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.AJXP_User.php");
-require_once("server/classes/class.AbstractDriver.php");
 
 
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
