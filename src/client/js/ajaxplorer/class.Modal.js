@@ -98,7 +98,7 @@ Modal = Class.create({
 			fOnLoad(this.currentForm);
 		}
 		// SAFARI => FORCE IFRAME RELOADING
-		if(reloadIFrame) reloadIFrame.src = reloadIFrameSrc;
+		if(Prototype.Browser.WebKit && reloadIFrame && reloadIFrameSrc) reloadIFrame.src = reloadIFrameSrc;
 	},
 	
 	showContent: function(elementName, boxWidth, boxHeight){
