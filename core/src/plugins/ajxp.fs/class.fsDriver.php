@@ -17,8 +17,18 @@ class fsDriver extends AbstractDriver
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
+			if(!is_dir($path)){
+				return new AJXP_Exception("Cannot create root path for repository. Please check repository configuration or that your folder is writeable!");
+			}
 			if($recycle!= "" && !is_dir($path."/".$recycle)){
 				@mkdir($path."/".$recycle);
+				if(!is_dir($path."/".$recycle)){
+					return new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+				}
+			}
+		}else{
+			if(!is_dir($path)){
+				return new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
 			}
 		}
 	}
