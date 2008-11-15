@@ -15,6 +15,11 @@ class mysqlDriver extends AbstractDriver
 		parent::AbstractDriver($driverName, $filePath, $repository);		
 	}
 	
+	function initRepository(){
+		$link = $this->createDbLink();
+		$this->closeDbLink($link);
+	}
+	
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
