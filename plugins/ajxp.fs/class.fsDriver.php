@@ -304,7 +304,7 @@ class fsDriver extends AbstractDriver
 					}
 					chmod($destination."/".$userfile_name, 0777);
 					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
-					AJXP_Logger::logAction("Upload File", array("file"=>$dir."/".$userfile_name));
+					AJXP_Logger::logAction("Upload File", array("file"=>SystemTextEncoding::fromUTF8($dir)."/".$userfile_name));
 				}
 				if($fancyLoader)
 				{
@@ -538,7 +538,7 @@ class fsDriver extends AbstractDriver
 		return $nom_rep;
 	}
 	
-	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=true)
+	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
 		$size = ($data?strlen($filePathOrData):filesize($filePathOrData));
 		$localName = ($localName==""?basename($filePathOrData):$localName);
