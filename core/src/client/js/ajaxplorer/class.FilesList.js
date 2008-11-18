@@ -535,12 +535,10 @@ FilesList = Class.create(SelectableElements, {
 			newRow.appendChild(tableCell);
 		}.bind(this));	
 		tBody.appendChild(newRow);
-		if(this.gridStyle == "grid"){
-			if(this.even){
-				$(newRow).setStyle({backgroundColor: '#eee'});					
-			}
-			this.even = !this.even;
+		if(this.even){
+			$(newRow).setStyle({backgroundColor: '#eee'});					
 		}
+		this.even = !this.even;
 	},
 	
 	
