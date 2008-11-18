@@ -105,11 +105,6 @@ Modal = Class.create({
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.filesList.blur();
-		if(!this.isRounded)
-		{
-			ajxpCorners($(elementName), 'bottom');
-			this.isRounded = true;		
-		}
 		var winWidth = $(document.body).getWidth();
 		var winHeight = $(document.body).getHeight();
 	
@@ -150,6 +145,17 @@ Modal = Class.create({
 			// REFRESH PNG IMAGES FOR IE!
 			refreshPNGImages(this.dialogContent);			
 		}
+		
+		Shadower.shadow($(elementName), 
+			{
+				distance: 4,
+				angle: 130,
+				opacity: 0.5,
+				nestedShadows: 3,
+				color: '#000000',
+				shadowStyle:{display:'block'}
+			}, true);
+		
 	},
 	
 	getForm: function()	{
@@ -285,6 +291,7 @@ Modal = Class.create({
 	},
 	
 	close: function(){	
+		Shadower.deshadow($(this.elementName));
 		if(this.closeFunction){
 			 this.closeFunction();
 			 //this.closeFunction = null;
