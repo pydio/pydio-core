@@ -50,7 +50,6 @@ var messages =
 function triggerFlashEvent(){
 	if(arguments.length < 1) return;
 	var eventType = arguments[0];
-	console.log(eventType);
 	switch(eventType){
 		case "currentFiles":
 			return parent.ajaxplorer.filesList.getFileNames("__AJXP_SEP__");
