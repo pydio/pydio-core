@@ -422,7 +422,9 @@ ACTION BAR
 #action_bar a, 
 .action_bar a
 {    
-background:transparent url(../images/toolbar-button.png) no-repeat scroll center;
+background-image:url('../images/toolbar-button.png');
+background-repeat: no-repeat;
+background-position: center;
 border:1px solid #E0ECFF;
 color:#084165;
 display:block;
@@ -499,7 +501,9 @@ width:expression('59px');
     margin-top:22px;
     height: 22px;
     border: 1px solid #999;
-    background: transparent url('../images/header_bg.png') repeat-x top;
+    background-image:url('../images/header_bg.png');
+    background-repeat:  repeat-x;
+    background-position: top;
 }
 
 #location_form,
@@ -562,7 +566,9 @@ width:expression('59px');
 #location_goto:hover,
 #repository_goto:hover,
 #bookmarks_goto:hover{
-	background : transparent url(../images/header_bg_on.png) top repeat-x;
+	background-image:url(../images/header_bg_on.png);
+	background-position:top;
+	background-repeat: repeat-x;
 }
 
 #goto_repo_button.disabled,
@@ -952,7 +958,7 @@ UPLOAD MULTIFILE FORM
     padding: 0px;
     height: 20px;
     border: 1px solid #aaa;
-	background-image:url(../images/locationBg.gif);
+	background-image:url('../images/locationBg.gif');
 	background-position:left top;
 	background-repeat:no-repeat;    
 }
@@ -1024,7 +1030,10 @@ UPLOAD MULTIFILE FORM
 .vsplitbar
 {
    width: 5px;
-   background: #e0ecff url(../images/vgrabber.gif) no-repeat center;
+   background-color: #e0ecff;
+   background-image: url(../images/vgrabber.gif);
+   background-repeat: no-repeat;
+   background-position: center;
    /*border: 1px solid;*/
 	border-color:	#fff ButtonShadow
 					ButtonShadow #fff;
@@ -1032,29 +1041,32 @@ UPLOAD MULTIFILE FORM
 }
 .vsplitbar.active
 {
-  background: #666 url(../images/vgrabber.gif) no-repeat center;
+  background-color: #666;
 }
 
 .vsplitbar:hover 
 {
-  background: #ccc url(../images/vgrabber.gif) no-repeat center;
+  background-color: #ccc;
 }
 
 .hsplitbar
 {
    height: 5px;
-   background: #e0ecff url(../images/hgrabber.gif) no-repeat center;
+   background-color: #e0ecff;
+   background-image: url(../images/hgrabber.gif);
+   background-repeat: no-repeat;
+   background-position: center;
    /*border: 1px solid;   */
 	border-color:	#fff ButtonShadow
 					ButtonShadow #fff;
 }
 .hsplitbar.active
 {
-  background: #666 url(../images/hgrabber.gif) no-repeat center;
+  background-color: #666;
 }
 
 .hsplitbar:hover{
-  background: #ccc url(../images/hgrabber.gif) no-repeat center;
+  background-color: #ccc;
 }
 
 
