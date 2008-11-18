@@ -5,24 +5,26 @@
 <link rel="icon" type="image/x-png" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/html-folder.png">
 <link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/allz.css">
 <link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/slider/css/bluecurve/bluecurve.css">
+<?php
+	if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
+	echo '<link rel="stylesheet" type="text/css" href="'.CLIENT_RESOURCES_FOLDER.'/css/pngHack/pngHack.css">';
+	}
+?>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/codepress/codepress.js"></script>
 </head>
 <body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
 		
-<div id="loading_overlay">
-	<div id="progressBox" style="background-color:#666666;">
-		<div id="loaderTitle" class="dialogTitle" style=" padding:0px;"><div style="padding:2px; height: 16px;">AjaXplorer <?php print(AJXP_VERSION);?></div></div>
-		<div id="loaderContent" class="dialogContent" style="text-align:left;background-color:#ccddee; padding:0px;">
+<div id="loading_overlay" style="background-color:#dbe7fa;">
+	<div id="progressBox" style="background-color:#dbe7fa;">
+		<div id="loaderContent" style="text-align:left; width:416px; height: 321px; background-image:url('<?php print(CLIENT_RESOURCES_FOLDER);?>/images/SplashGradBG.png');background-repeat:no-repeat; padding:0px;">
 		<div style="padding:5px;">
-			<div align="center" style="font-size:64px;font-family:Trebuchet MS; font-weight:bold;color:#fff;">
-			<img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/ajxp_logo_64.gif" width="64" height="64" border="0"> AjaXplorer
-			</div>
-			<div align="left" style="font-size:12px;font-family:Trebuchet MS; font-weight:normal;color:#000;padding-left:87px;">
+			<div align="left" style="font-size:12px;font-family:Trebuchet MS; font-weight:normal;color:#084165;position: relative;top:210px; left: 10px;">
 			Written by Charles du Jeu - LGPL License. <br>
-			AjaXplorer web browser version <?php print(AJXP_VERSION);?>
+			AjaXplorer web browser version <?php print(AJXP_VERSION);?> - <?php print(AJXP_VERSION_DATE);?>
+			
+			<div style="margin-top: 10px;" id="progressState">Loading AjaXplorer</div>
+			<div id="progressBarBorder" style="font-size: 0.5em;" align="left"><div id="progressBar" style="width:0px;"></div></div>
 			</div>
-			<div id="progressBarBorder" style="margin-top:125px; font-size: 0.5em;" align="left"><div id="progressBar" style="width:0px;"></div></div>
-			<div style="width: 100%; height: 20px; border:none; overflow:hidden" id="progressState">Loading Components...</div>
 			</div>
 		</div>
 	</div>
@@ -35,7 +37,6 @@
 <script language="javascript" type="text/javascript">var dynamicLibLoading = false;</script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer.js"></script>
 <script type="text/javascript">
-		new Effect.Corner('loaderContent', "round bottom 10px");
 		var ajaxplorer;
 		Event.observe(window, "load", function(){
 			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", <?php print($ROOT_DIRS_LIST);?>, <?php print($ROOT_DIRS_SETTINGS); ?>, "<?php print($DEFAULT_DISPLAY);?>");

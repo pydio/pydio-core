@@ -117,7 +117,10 @@ DIALOG BOXES
     background-color: #eee;
 }
 #all_forms div{display:none;}
-#all_forms div div{display:block;}
+
+#all_forms div div, 
+#all_forms div.shadow_class
+{display:block;}
 
 .dialogBox, .editBox, #progressBox
 {
@@ -152,6 +155,8 @@ DIALOG BOXES
     padding-top: 2px;
     padding-bottom: 0px;
     border: 1px solid #aaa;
+    border-bottom: 0px;
+    height: 23px;
     background-image:url('../images/header_bg.png');
     background-position: top;
     background-repeat: repeat-x;
@@ -297,7 +302,7 @@ textarea#myCode
 {
     display: block;
     z-index: 2002;
-    width: 420px;
+    width: 400px;
     height: 300px;
     top: 20%;
 }
@@ -305,26 +310,22 @@ textarea#myCode
 #progressBarBorder
 {
     border:1px solid black;
+    width: 380px;
     background-color: #fff;
     height: 10px;
+    margin-top: 5px;
 }
 
 #progressBar
 {
-	background-image:url('../images/progress.gif');
-	/*
-	background-color: #0a246a;
-	filter:alpha(opacity=80);
-	opacity: 0.8;
-	-moz-opacity:0.8;
-	*/
+	background-color: #084165;
 	height: 10px;
 	width: 0%;
 }
 
 #progressState
 {
-    color:#666;
+    color:#084165;
 }
 
 
@@ -333,10 +334,10 @@ ACTION BAR
 */
 .centeredWidth{
 	position: relative;
-    width: 94%;   
-    left:3%;
-    min-width: 900px;
-    width:expression(document.body.clientWidth < 980? "900px" : "94%" ); 
+    width: 96%;   
+    left:2%;
+    min-width: 1080px;
+    width:expression(document.body.clientWidth < 1140? "1090px" : "96%" ); 
 }
 
 #toolbars
@@ -345,11 +346,7 @@ ACTION BAR
     padding:0px;
     padding-bottom:2px;
     position:relative;
-    width: 94%;   
-    left:3%;
     margin-bottom:3px;
-    min-width: 900px;
-    width:expression(document.body.clientWidth < 980? "900px" : "94%" ); 
 }
 
 .toolbars_separator
@@ -388,11 +385,11 @@ ACTION BAR
 	background-color: #fff;
 	font-family: Trebuchet MS;
 	font-size: 12px;
-	padding-top: 1px;
+	padding-top: 0px;
 	padding-left: 7px;
 	margin-bottom:0px;
 	color: #666;
-	height:21px;
+	height:23px;
 	vertical-align: middle;
 }
 
@@ -402,7 +399,7 @@ ACTION BAR
     /*background-color: #e0ecff;*/
     font-family: Arial;
     font-size: 12px;
-    height: 80px;
+    height: 104px;
     padding: 0px;        
 }
 .action_bar
@@ -418,38 +415,34 @@ ACTION BAR
 
 #buttons_bar
 {
-	height: 47px !important;
-	padding-left: 3px;
+	padding-left: 0px;
+	padding-top: 7px;
 }
 
 #action_bar a, 
 .action_bar a
 {    
-    padding-bottom: 6px;
-    padding-top: 0px;
-    display: block;
-    float: left;
-    text-align: center;
-    width: 53px; 
-    font-size: 9px;
-    color: #666;    
-	background-image:url("../images/ActionButtonBg_t.gif");
-	background-repeat:no-repeat;
-	background-position:bottom;
-    height: 34px;
+background:transparent url(../images/toolbar-button.png) no-repeat scroll center;
+border:1px solid #E0ECFF;
+color:#084165;
+display:block;
+float:left;
+font-size:9px;
+height:49px;
+height:expression('51px');
+margin-right:5px;
+padding-bottom:0px;
+padding-top:0px;
+text-align:center;
+width:57px;
+width:expression('59px');
 }
 
 #action_bar a:hover, 
 .action_bar a:hover
 {
+	color: #fff;
     text-decoration: none;
-	/*border: 1px solid #fff;*/
-	/*background-color:#c3d9ff;*/
-	background-image:url("../images/ActionButtonBg.gif");
-	background-repeat:no-repeat;
-	background-position:bottom;
-	color: black;
-	height: 45px;
 }
 
 
@@ -461,6 +454,7 @@ ACTION BAR
 
 }
 
+/*
 #action_bar a span,
 .action_bar a span
 {
@@ -472,6 +466,7 @@ ACTION BAR
 {
 	display: block;
 }
+*/
 
 #action_bar div.separator,
 .action_bar div.separator
@@ -501,7 +496,10 @@ ACTION BAR
 {
     width: 100%;
     float:left;
-    margin-top:6px;
+    margin-top:22px;
+    height: 22px;
+    border: 1px solid #999;
+    background: transparent url('../images/header_bg.png') repeat-x top;
 }
 
 #location_form,
@@ -509,7 +507,9 @@ ACTION BAR
 {
     background-color:#fff;
     border: 1px solid #bbb;
+    border-width: 0px 1px 0px 1px;
     height: 20px;
+    height:expression('22px');
     width: 350px;
     float:left;
     padding:2px 0px 0px 5px;
@@ -519,9 +519,15 @@ ACTION BAR
     
 }
 
+#location_form
+{
+    margin-left: 0px;
+}
+
 #repository_form
 {
     width: 100px;
+    border-left: 0px;
 }
 
 #location_form input, 
@@ -545,10 +551,18 @@ ACTION BAR
 #bookmarks_goto
 {
     border: 1px solid #bbb;
+    border-top:0px;
+    border-bottom:0px;
     float: left;
     height: 22px;
     padding-right: 2px;
     border-left: 0px;
+}
+
+#location_goto:hover,
+#repository_goto:hover,
+#bookmarks_goto:hover{
+	background : transparent url(../images/header_bg_on.png) top repeat-x;
 }
 
 #goto_repo_button.disabled,
@@ -561,20 +575,20 @@ ACTION BAR
 
 #repository_goto
 {
-   border-right: 0px;
    padding: 0px;
    cursor: pointer;
+   border-right:0px;
 }
 
 #logging_string
 {
    float: right;
    /*color: #c3d9ff;*/
-   color: #79f;
+   color: #084165;
    font-size: 15px;
    font-family: Trebuchet MS;      
    font-weight: bold;
-   padding-top: 2px;
+   padding-top: 0px;
    padding-right: 3px;
 }
 
@@ -852,7 +866,7 @@ UPLOAD MULTIFILE FORM
 
 #panelsToggle
 {
-    height: 21px;
+    height: 23px;
     cursor:pointer;
 }
 
@@ -984,15 +998,8 @@ UPLOAD MULTIFILE FORM
 
 #browser_round
 {
-    position:relative;
-    width: 94%;   
-    left:3%;
-    /*background-color: #79f;*/
-    /*background-color:#aaa;*/
     padding:0px;
     margin-bottom:0px;
-    min-width: 900px;
-    width:expression(document.body.clientWidth < 980? "900px" : "94%" );     
 }
 
 #browser{
@@ -1087,8 +1094,8 @@ ADMIN STYLES
     overflow: auto;
 }
 #users_detail_panel{
-	width: 435px;
-    height: 300px;
+	width: 438px;
+    height: 299px;
     float: left;
 	border-left: 1px solid #bbb;
     overflow: auto;
@@ -1280,6 +1287,22 @@ legend
    background-color:#eee;
 }
 
+#install_log{
+	padding: 10px;
+	overflow: auto;
+}
+
+#install_log div{
+	border-bottom : 1px solid #bbb;
+}
+
+#install_log span{
+   font-weight: bold;
+   display: block;
+   float: left;
+   width: 150px;
+}
+
 
 /***********************/
 /* EDITORS & DIAPORAMA */
@@ -1318,8 +1341,8 @@ div.autocomplete
       font-size: 11px;
       width:250px;
       background-color:white;
-      border:1px solid #888;
-      margin:0px;
+      border:1px solid #bbb;
+      margin:8px 0px 0px;
       padding:0px;
 }
 div.autocomplete ul 
@@ -1374,17 +1397,14 @@ div.menu a {
 }
 
 .menu.desktop {
-        filter:alpha(opacity=95);
-        opacity: 0.95;
-        -moz-opacity:0.95;
 	width: 9em;
-	background: #e0ecff;
-	border: 1px solid #ddd;
-        /*border-bottom-color: #999;
-        border-right-color: #999;*/
+	background: #fff;
+	border: 1px solid #999;
+    /*border-bottom-color: #999;
+    border-right-color: #999;*/
 	padding: 0;
-        padding-top: 0px;
-        padding-bottom: 1px;
+    padding-top: 0px;
+    padding-bottom: 1px;
 }
 .menu.desktop ul, .menu.desktop li {
 	margin: 0;
@@ -1392,9 +1412,9 @@ div.menu a {
 }
 
 .menu.desktop li{
-        padding: 0px;
-        padding-top: 1px;
-        padding-bottom: 1px;
+    padding: 0px;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 .rootDirChooser li.menuTitle {
@@ -1421,11 +1441,10 @@ padding: 0px;
 
 .menu.desktop a {
 	color: #000;
-	padding: 2px 0 1px 12px;
+	padding: 5px 0 2px 12px;
 	margin: 0;
-	border: 1px solid #e0ecff;
 	height: 17px;
-        font-family: Arial;
+    font-family: Arial;
 	font-size:11px;
 }
 .menu.desktop a.disabled {

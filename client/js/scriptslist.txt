@@ -13,6 +13,7 @@ js/lib/scriptaculous/src/builder.js
 js/lib/scriptaculous/src/effects.js
 js/lib/scriptaculous/src/dragdrop.js
 js/lib/scriptaculous/src/controls.js
+js/lib/prototype/shadower.js
 js/lib/prototype/corners.js
 js/lib/webfx/xtree.js
 js/lib/webfx/xloadtree.js

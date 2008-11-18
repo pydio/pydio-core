@@ -40,7 +40,7 @@ body, html
 <body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
 <div id="message_div" onclick="manager.closeMessageDiv();" class="messageBox"><div id="message_content"></div></div>
 <div id="search_div" style="background-color: #fff;">
-	<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle" style="border: 1px solid #aaa; border-bottom: 0px;">
+	<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle" style="border: 1px solid #aaa; border-bottom: 0px; height: 24px;">
 	<tr>
     	<td id="users_header" onclick="manager.toggleSidePanel('users'); return false;" class="panelHeader toggleHeader" style="width:150px;">
     		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/yast_kuser.png"><a href="" onclick="manager.toggleSidePanel('users'); return false;" ajxp_message_id="249"><?php print $mess[249] ?></a>
@@ -50,6 +50,9 @@ body, html
     	</td>
     	<td id="logs_header" onclick="manager.toggleSidePanel('logs'); return false;" class="panelHeader toggleHeader" style="width:200px;">
     		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/toggle_log.png"><a href="" onclick="manager.toggleSidePanel('logs'); return false;" ajxp_message_id="251"><?php print $mess[251] ?></a>
+    	</td>
+    	<td id="install_header" onclick="manager.toggleSidePanel('install'); return false;" class="panelHeader toggleHeader" style="width:200px;">
+    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/admin.png"><a href="" onclick="manager.toggleSidePanel('install'); return false;">Install</a>
     	</td>
     </tr>
 	</table>
@@ -93,5 +96,9 @@ body, html
 		</div>
 		<div id="log_browser" style="height:299px; overflow:auto;">
 		</div>
+	</div>
+	<div id="install_management" style="border:1px solid #aaa; border-top:0px;height:362px;">
+		<div style="padding: 10px;">Please copy and paste the following data when you ask a question in the forum or by email, it will help solve your problems!</div>
+		<div id="install_log"></div>
 	</div>
 </div>     	
