@@ -1,11 +1,10 @@
 <?php
 //---------------------------------------------------------------------------------------------------
 //							
-//	WebJeff - FileManager v1.6
+//	AjaXplorer
 //	
-//	Jean-Fran&#65533;ois GAZET
-//	http://www.webjeff.org
-//	webmaster@webjeff.org	
+//	Copyright 2007-2008 Charles du Jeu - LGPL
+//  www.Ajaxplorer.info
 //
 //	Translation by Luca Zorzi
 //	http://lublog.tuttoeniente.net/

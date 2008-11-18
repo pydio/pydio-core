@@ -1,12 +1,11 @@
 <?php
 //---------------------------------------------------------------------------------------------------
 //							
-//	WebJeff - FileManager v1.6
+//	AjaXplorer
 //	
-//	Jean-François GAZET
-//	http://www.webjeff.org
-//	webmaster@webjeff.org	
-//
+//	Copyright 2007-2008 Charles du Jeu - LGPL
+//  www.Ajaxplorer.info
+//	
 //	Portuguese Brazilian translation: Andre Domarques <andre@dmd2.com.br>
 //
 //---------------------------------------------------------------------------------------------------
