@@ -273,6 +273,26 @@ switch ($action)
 		AJXP_XMLWriter::close("logs");
 		exit(1);
 	break;
+	
+	case "install_log" : 
+		$log = array();
+		$log["PHP Version"] = phpversion();
+		$log["AJXP Version"] = AJXP_VERSION;
+		$log["Server OS"] = PHP_OS;
+		require_once("server/classes/class.SystemTextEncoding.php");
+		$log["Server detected encoding"] = SystemTextEncoding::getEncoding();
+		$log["'server' folder writeable"] = is_writable(INSTALL_PATH."/server");
+		$log["'logs' folder writeable"] = is_writable(INSTALL_PATH."/server/logs");
+		$log["'conf' folder writeable"] = is_writable(INSTALL_PATH."/server/conf");
+		$log["Users enabled"] = ENABLE_USERS;
+		$log["Guest enabled"] = ALLOW_GUEST_BROWSING;
+		$log["Gzip configuration"] = GZIP_DOWNLOAD;		
+		$log["Client"] = $_SERVER['HTTP_USER_AGENT'];		
+		foreach ($log as $id => $value){
+			print "<div><span>$id</span> : $value</div>";
+		}
+		exit(1);
+	break;
 }
 
 include(CLIENT_RESOURCES_FOLDER."/html/admin.html");
