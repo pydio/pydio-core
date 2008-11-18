@@ -1,9 +1,10 @@
 <?php
 //---------------------------------------------------------------------------------------------------
 //							
-//	AjaXplorer(zh-tw)
+//	AjaXplorer
 //	
-//	Charles du Jeu
+//	Copyright 2007-2008 Charles du Jeu - LGPL
+//  www.Ajaxplorer.info
 //	
 //  Traditional Chinese (zh-tw UTF-8) translated by: Tommy Lam (Nov 13, 2008)
 //---------------------------------------------------------------------------------------------------

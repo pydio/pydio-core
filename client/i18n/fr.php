@@ -1,4 +1,14 @@
 <?php
+//---------------------------------------------------------------------------------------------------
+//							
+//	AjaXplorer
+//	
+//	Copyright 2007-2008 Charles du Jeu - LGPL
+//  www.Ajaxplorer.info
+//
+//  French Translation by Charles du Jeu
+//
+//-----------------------------------------------------
 $mess=array(
 "languageLabel" => "Français",
 "0" => "Dernière version",

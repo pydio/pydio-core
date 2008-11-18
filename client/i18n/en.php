@@ -1,12 +1,13 @@
 <?php
 //---------------------------------------------------------------------------------------------------
 //							
-//	WebJeff - FileManager v1.6
+//	AjaXplorer
 //	
-//	Jean-Fran�ois GAZET
-//	http://www.webjeff.org
-//	webmaster@webjeff.org	
+//	Copyright 2007-2008 Charles du Jeu - LGPL
+//  www.Ajaxplorer.info
 //
+//  Reference dictionnary for translations
+// 
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
@@ -280,8 +281,8 @@ $mess=array(
 "246" => "Message",
 "247" => "Extract",
 "248" => "Extract selection from zip to...",
-"249" => "Users Management",
-"250" => "Repositories Management",
+"249" => "Users",
+"250" => "Repositories",
 "251" => "Logs",
 "252" => "The total file size limit has been reached.",
 "253" => "There has been an HTTP Error:",
