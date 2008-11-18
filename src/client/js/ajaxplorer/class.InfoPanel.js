@@ -112,6 +112,9 @@ InfoPanel = Class.create({
 					}
 					this[attName] = dimAttr;
 				}
+				else if(attName == 'filename'){
+					this[attName] = escape(encodeURI(fileData.getAttribute('filename')));
+				}
 				else if(fileData.getAttribute(attName)){
 					this[attName] = fileData.getAttribute(attName);
 				}
