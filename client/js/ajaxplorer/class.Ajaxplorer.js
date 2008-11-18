@@ -263,12 +263,12 @@ Ajaxplorer = Class.create({
 				anchorContainer:$('dir_chooser'),
 				anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
 				anchorTitle:MessageHash[200],
-				topOffset:5,
+				topOffset:6,
 				leftOffset:-107,
 				menuTitle:MessageHash[200],
 				menuItems: actions,
 				fade:true,
-				zIndex:2000
+				zIndex:1500
 			});		
 		}
 		if(actions.length) $('goto_repo_button').removeClassName('disabled');

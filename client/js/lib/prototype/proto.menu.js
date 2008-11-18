@@ -30,8 +30,16 @@ Proto.Menu = Class.create({
 			anchorPosition:'last',
 			beforeShow: e,
 			beforeHide: e,
-			beforeSelect: e
+			beforeSelect: e,
+			shadowOptions :	{
+				distance: 4,
+				angle: 130,
+				opacity: 0.3,
+				nestedShadows: 3,
+				color: '#000000'
+			}
 		}, arguments[0] || { });
+		
 		
 		this.shim = new Element('iframe', {
 			style: 'position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);display:none',
@@ -53,11 +61,12 @@ Proto.Menu = Class.create({
 			$(document.body).insert(this.container);
 		}		
 		if (this.ie) { $(document.body).insert(this.shim) }
-		
+
 		document.observe('click', function(e) {
 			if (this.container.visible() && !e.isRightClick()) {
 				this.options.beforeHide(e);
 				if (this.ie) this.shim.hide();
+				Shadower.deshadow(this.container);
 				this.container.hide();
 			}
 		}.bind(this));
@@ -133,12 +142,15 @@ Proto.Menu = Class.create({
 			list.insert(newItem);
 		}.bind(this));
 		this.container.insert(list);
+		try{
+		Shadower.shadow(this.container,this.options.shadowOptions, true);
+		}catch(e){}
 	},
 	
 	show: function(e) {
 		//e.stop();
 		this.options.beforeShow(e);
-		this.refreshList();
+		this.refreshList();	
 		if(!this.options.menuItems.length) return;
 		var elOff = {};
 		elDim = this.container.getDimensions();
@@ -147,11 +159,22 @@ Proto.Menu = Class.create({
 		}else{
 			elOff = this.computeAnchorOffset();		
 		}
-		this.container.setStyle(elOff).setStyle({zIndex: this.options.zIndex});
+		this.container.setStyle(elOff);		
+		this.container.setStyle({zIndex: this.options.zIndex});
 		if (this.ie) { 
 			this.shim.setStyle(Object.extend(Object.extend(elDim, elOff), {zIndex: this.options.zIndex - 1})).show();
+		}				
+		if(this.options.fade){
+			Effect.Appear(this.container, {
+				duration: 0.25, 
+				afterFinish : function(e){
+					Shadower.showShadows(this.container, this.options.shadowOptions);
+				}.bind(this)
+			});
+		}else{
+			this.container.show();
+			Shadower.showShadows(this.container, this.options.shadowOptions);
 		}
-		this.options.fade ? Effect.Appear(this.container, {duration: 0.25}) : this.container.show();
 		this.event = e;
 	},
 	
@@ -196,6 +219,7 @@ Proto.Menu = Class.create({
 		if (e.target._callback && !e.target.hasClassName('disabled')) {
 			this.options.beforeSelect(e);
 			if (this.ie) this.shim.hide();
+			Shadower.deshadow(this.container);
 			this.container.hide();
 			e.target._callback(this.event);
 		}		
