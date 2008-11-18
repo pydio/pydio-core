@@ -117,6 +117,8 @@ define("DOCS_FOLDER", "client/doc");
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 
+define("GZIP_DOWNLOAD", true);
+
 // PAGES D'ENTETE ET DE BAS DE PAGE
 // (header and footer files )
 $baspage=CLIENT_RESOURCES_FOLDER."/html/bottom.html";
