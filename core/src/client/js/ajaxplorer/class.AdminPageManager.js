@@ -5,9 +5,11 @@ AdminPageManager = Class.create({
 		this.loadDrivers();
 		this.loadRepList();
 		this.loadLogList();
+		this.loadInstallLog();
 		this.usersPanel = $('users_management');
 		this.repoPanel = $('repositories_management');		
-		this.logsPanel = $('logs_management');		
+		this.logsPanel = $('logs_management');
+		this.installPanel = $('install_management');
 		this.toggleSidePanel('users');
 		if(Prototype.Browser.IE) $('repo_create_form').setStyle({height:'62px'});
 	},
@@ -20,6 +22,9 @@ AdminPageManager = Class.create({
 			this.logsPanel.hide();
 			$('logs_header').addClassName("toggleInactive");
 			$('logs_header').getElementsBySelector("img")[0].hide();
+			this.installPanel.hide();
+			$('install_header').addClassName("toggleInactive");
+			$('install_header').getElementsBySelector("img")[0].hide();
 			this.usersPanel.show();
 			$('users_header').removeClassName("toggleInactive");
 			$('users_header').getElementsBySelector("img")[0].show();
@@ -31,6 +36,9 @@ AdminPageManager = Class.create({
 			this.usersPanel.hide();
 			$('users_header').addClassName("toggleInactive");
 			$('users_header').getElementsBySelector("img")[0].hide();			
+			this.installPanel.hide();
+			$('install_header').addClassName("toggleInactive");
+			$('install_header').getElementsBySelector("img")[0].hide();
 			this.logsPanel.hide();
 			$('logs_header').addClassName("toggleInactive");
 			$('logs_header').getElementsBySelector("img")[0].hide();
@@ -42,9 +50,26 @@ AdminPageManager = Class.create({
 			this.usersPanel.hide();
 			$('users_header').addClassName("toggleInactive");
 			$('users_header').getElementsBySelector("img")[0].hide();			
+			this.installPanel.hide();
+			$('install_header').addClassName("toggleInactive");
+			$('install_header').getElementsBySelector("img")[0].hide();
 			this.logsPanel.show();
 			$('logs_header').removeClassName("toggleInactive");
 			$('logs_header').getElementsBySelector("img")[0].show();
+		}
+		else if(srcName == 'install'){
+			this.repoPanel.hide();
+			$('repositories_header').addClassName("toggleInactive");
+			$('repositories_header').getElementsBySelector("img")[0].hide();
+			this.usersPanel.hide();
+			$('users_header').addClassName("toggleInactive");
+			$('users_header').getElementsBySelector("img")[0].hide();			
+			this.logsPanel.hide();
+			$('logs_header').addClassName("toggleInactive");
+			$('logs_header').getElementsBySelector("img")[0].hide();
+			this.installPanel.show();
+			$('install_header').removeClassName("toggleInactive");
+			$('install_header').getElementsBySelector("img")[0].show();
 		}
 		this.currentSideToggle = srcName;
 	},
@@ -58,6 +83,10 @@ AdminPageManager = Class.create({
 	
 	loadDrivers : function(){
 		this.submitForm('drivers_list', new Hash());
+	},
+	
+	loadInstallLog : function(){
+		this.loadHtmlToDiv($('install_log'), new Hash({'get_action':'install_log'}));
 	},
 	
 	updateDriverSelector : function(){
