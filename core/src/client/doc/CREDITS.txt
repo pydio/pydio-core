@@ -11,7 +11,7 @@ AjaXplorer was developed using various free libraries that are mentionned below.
 
 ++ ORIGINAL PHP SCRIPT ++
 The original php script (simple file manager, no ajax gui) was called WebJeff File Manager and was developed 
-by Jean-François Gazet.
+by Jean-FranÃ§ois Gazet.
 http://www.webjeff.org
 
 ++ ZIP FUNCTIONNALITIES ++
@@ -37,8 +37,11 @@ The online edition was done integrating CodePress. Very powerful!
 http://www.codepress.org/
 
 ++ DEWPLAYER :  MP3 Flash Player ++
-The online mp3 flash player is developed by a french webagency, AlsaCréation.
+The online mp3 flash player is developed by a french webagency, AlsaCrÃ©ation.
 http://www.alsacreations.fr/mp3-dewplayer.html
 
+++ MC MEDIA PLAYER : FLV Player ++
+MC Media Player is a Flash-based media player for embedding video, audio and still images in web pages. It is free to use for both non-profit and commercial websites.
+http://www.mcmediaplayer.com/
 
 Big respect to those developers! 
