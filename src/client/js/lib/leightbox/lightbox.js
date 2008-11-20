@@ -83,7 +83,7 @@ lightbox.prototype = {
 	activate: function(){
 		if (browser == 'Internet Explorer'){
 			this.getScroll();
-			this.prepareIE('100%', 'hidden');
+			//this.prepareIE('100%', 'hidden');
 			this.setScroll(0,0);
 			//this.hideSelects('hidden');
 		}
@@ -176,7 +176,7 @@ lightbox.prototype = {
 	deactivate: function(){
 		if (browser == "Internet Explorer"){
 			this.setScroll(0,this.yPos);
-			this.prepareIE("auto", "auto");
+			//this.prepareIE("auto", "hidden");
 			//this.hideSelects("visible");
 		}
 		
