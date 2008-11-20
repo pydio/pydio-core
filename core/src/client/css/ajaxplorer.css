@@ -172,6 +172,7 @@ DIALOG BOXES
     background-image: url('../images/strip.png');
 }
 
+.dialogContent input,
 .dialogContent input[type="text"],
 .dialogContent input[type="password"]
 {
@@ -1237,7 +1238,8 @@ legend
 #user_pref_form input.radio
 {
    width: 20px;
-   border: none;
+   border: 0px;
+   background-image: none;
 }
 
 #repo_create_form select
@@ -1406,6 +1408,7 @@ div.menu a {
 }
 .menu li {
 	list-style-position: outside;
+	height: 22px;
 }
 
 .menu.desktop {
