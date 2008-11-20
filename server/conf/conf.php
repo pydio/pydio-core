@@ -1,10 +1,10 @@
 <?php
 //--------------------------------------------------------
 //
-//	ajaXplorer v2.2
+//	AjaXplorer 
 //
 //	Charles du Jeu
-//	http://sourceforge.net/projects/ajaxplorer/
+//	http://www.ajaxplorer.info/
 //
 //--------------------------------------------------------
 
@@ -16,8 +16,8 @@
 /* DEFAULT LANGUAGE */
 $dft_langue="en";
 
-define("AJXP_VERSION", "2.3.7");
-define("AJXP_VERSION_DATE", "2008/10/24");
+define("AJXP_VERSION", "2.3.8");
+define("AJXP_VERSION_DATE", "2008/11/20");
 
 define("ENABLE_USERS", 1);
 define("ADMIN_PASSWORD", "admin");
