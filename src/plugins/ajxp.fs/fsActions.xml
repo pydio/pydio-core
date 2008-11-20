@@ -728,5 +728,21 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</div>
 			]]></html>
 		</infoPanel>
+		<infoPanel mime="flv" attributes="basename,encoded_filename,icon,filesize,mimestring,modiftime,uri">
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<center style="border:1px solid #aaa; margin-bottom: 5px;">
+					<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="100%" height="200">
+						<param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/mcmp.swf">
+						<param name="allowScriptAccess" value="always">
+						<param name="quality" value="high">
+						<param name="allowFullScreen" value="true">
+						<param name="FlashVars" value="fpFileURL=#{uri}/content.php?action=download%26file=#{encoded_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10">
+						<embed src="AJXP_CLIENT_RESOURCES_FOLDER/flash/mcmp.swf" width="100%" height="200" quality="high" allowFullScreen="true" allowscriptaccess="always" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" FlashVars="fpFileURL=#{uri}/content.php?action=download%26file=#{encoded_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10"></embed>
+					</object>
+					</center>
+				</div>
+			]]></html>
+		</infoPanel>
 	</infoPanels>
 </driver>
