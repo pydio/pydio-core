@@ -115,6 +115,16 @@ InfoPanel = Class.create({
 				else if(attName == 'encoded_filename' && fileData.getAttribute('filename')){
 					this[attName] = escape(encodeURI(fileData.getAttribute('filename')));
 				}
+				else if(attName == 'uri'){
+					var url = document.location.href;
+					if(url.indexOf('/#') > -1){
+						url = url.substr(0, url.indexOf('#'));
+					}
+					if(url[(url.length-1)] == '/'){
+						url = url.substr(0, url.length-1);
+					}
+					this[attName] = url;
+				}
 				else if(fileData.getAttribute(attName)){
 					this[attName] = fileData.getAttribute(attName);
 				}
