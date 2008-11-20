@@ -128,6 +128,12 @@ class ConfService
 				$repo->addOption($oName, $oValue);
 			}
 		}
+		// BACKWARD COMPATIBILITY!
+		if(array_key_exists("PATH", $repository)){
+			$repo->addOption("PATH", $repository["PATH"]);
+			$repo->addOption("CREATE", $repository["CREATE"]);
+			$repo->addOption("RECYCLE_BIN", $repository["RECYCLE_BIN"]);
+		}
 		return $repo;
 	}
 	
