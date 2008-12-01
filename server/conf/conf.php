@@ -59,7 +59,7 @@ $upload_max_number = 16;
 // please check the PHP documentation for how to set a php config.
 //
 // Use either the php config syntax with letters for size (e.g. "2M" for 2MegaBytes , "1G" for one gigabyte, etc.) 
-// or an integer value like 2097152 for 2 gigabytes.
+// or an integer value like 2097152 for 2 megabytes.
 $upload_max_size_per_file = 0;
 
 // Maximum total size (all files size cumulated) by upload.
