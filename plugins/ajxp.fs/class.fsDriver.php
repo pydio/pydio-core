@@ -412,7 +412,9 @@ class fsDriver extends AbstractDriver
 						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
 						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
-						$atts[] = "bytesize=\"".filesize($currentFile)."\"";
+						$bytesize = filesize($currentFile);
+						if($bytesize < 0) $bytesize = sprintf("%u", $bytesize);
+						$atts[] = "bytesize=\"".$bytesize."\"";
 						$atts[] = "filename=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($dir."/".$repIndex))."\"";
 						$atts[] = "icon=\"".(is_file($currentFile)?SystemTextEncoding::toUTF8($repName):"folder.png")."\"";
 						
@@ -541,6 +543,13 @@ class fsDriver extends AbstractDriver
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
 		$size = ($data?strlen($filePathOrData):filesize($filePathOrData));
+		if(!$data && $size < 0){
+			// fix files above 2Gb 
+			$size = sprintf("%u", $size);
+		}
+		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
+			$gzip = false; // disable gzip
+		}
 		$localName = ($localName==""?basename($filePathOrData):$localName);
 		if($headerType == "plain")
 		{
@@ -565,7 +574,12 @@ class fsDriver extends AbstractDriver
 			//if($localName == "") $localName = basename($filePathOrData);
 			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
-			if($gzip) header("Content-Encoding: gzip");
+			if($gzip){
+				header("Content-Encoding: gzip");
+				// If gzip, recompute data size!
+				$gzippedData = ($data?gzencode($filePathOrData,9):gzencode(file_get_contents($filePathOrData), 9));
+				$size = strlen($gzippedData);
+			}
 			header("Content-Length: ".$size);
 			header("Content-Disposition: attachment; filename=\"".$localName."\"");
 			header("Expires: 0");
@@ -579,11 +593,7 @@ class fsDriver extends AbstractDriver
 				header("Pragma:");
 			}
 			if($gzip){
-				if($data){
-					print(gzencode($filePathOrData, 9));
-				}else{
-					print gzencode(file_get_contents($filePathOrData), 9);
-				}				
+				print $gzippedData;
 				return ;
 			}
 		}
@@ -1007,7 +1017,8 @@ class fsDriver extends AbstractDriver
     	$filePaths = array();
     	$totalSize = 0;
     	foreach ($src as $item){
-    		$filePaths[] = $this->getPath().$item;
+    		$filePaths[] = array(PCLZIP_ATT_FILE_NAME => $this->getPath().$item, 
+    							 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
     	}
     	$archive = new PclZip($dest);
     	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
