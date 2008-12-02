@@ -22,7 +22,7 @@ define("AJXP_VERSION_DATE", "2008/11/20");
 define("ENABLE_USERS", 1);
 define("ADMIN_PASSWORD", "admin");
 define("ALLOW_GUEST_BROWSING", 0);
-define("AUTH_MODE", "ajaxplorer"); // "ajaxplorer", "local_http", "remote"
+define("AUTH_MODE", "ajaxplorer"); // "ajaxplorer", "local_http", "remote", "wordpress"
 
 define("AUTH_MODE_REMOTE_SERVER", "www.yourdomain.com"); //
 define("AUTH_MODE_REMOTE_URL", "/answering_script.php"); // 
@@ -46,6 +46,21 @@ $REPOSITORIES[0] = array(
 	)
 );
 
+
+/**
+ * Specific config for wordpress plugin, do not touch if you are not sure!
+ */
+if(AUTH_MODE == "wordpress"){
+	$REPOSITORIES[0] = array(
+		"DISPLAY"		=>	"Wordpress", 
+		"DRIVER"		=>	"fs", 
+		"DRIVER_OPTIONS"=> array(
+			"PATH"			=>	realpath(dirname(__FILE__)."/../../../../../wp-content"), 
+			"CREATE"		=>	false,
+			"RECYCLE_BIN" 	=> 	'recycle_bin'
+		)
+	);
+}
 
 //------------------------
 //		UPLOAD CONFIG

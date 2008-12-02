@@ -7,6 +7,15 @@ require_once("server/classes/class.AJXP_User.php");
 require_once("server/classes/class.AuthService.php");
 session_start();
 ConfService::init("server/conf/conf.php");
+
+if(AUTH_MODE == "wordpress"){
+	require_once("../../../wp-config.php");
+	require_once("../../../wp-includes/capabilities.php");
+	require_once("../../../wp-includes/user.php");
+	require_once("../../../wp-includes/plugin.php");
+	require_once("../../../wp-includes/pluggable.php");
+}
+
 require_once("server/classes/class.AJXP_Logger.php");
 $USERS_ENABLED = "false";
 $LOGGED_USER = "false";
