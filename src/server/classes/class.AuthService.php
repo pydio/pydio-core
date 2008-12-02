@@ -45,6 +45,14 @@ class AuthService
 				if(AuthService::userExists($user)) AuthService::logUser($user, "", true);
 			}
 		}
+		else if(AUTH_MODE == "wordpress"){
+			global $current_user;
+			wp_get_current_user();
+			if($current_user->user_login == '' || $current_user->wp_user_level < 8 || !function_exists('ajxp_content')){
+				die("You are not allowed to see this page!");
+			}
+			AuthService::logUser($current_user->user_login, "", true);
+		}
 	}
 	
 	function logUser($user_id, $pwd, $bypass_pwd = false, $encodedPwd = false)
