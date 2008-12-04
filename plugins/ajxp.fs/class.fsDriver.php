@@ -135,8 +135,10 @@ class fsDriver extends AbstractDriver
 			//	ONLINE EDIT
 			//------------------------------------
 			case "edit";	
-				if(isset($save) && $save==1)
+				if(isset($save) && $save==1 && isSet($code))
 				{
+					// Reload "code" variable directly from POST array, do not "securePath"...
+					$code = $_POST["code"];
 					AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
