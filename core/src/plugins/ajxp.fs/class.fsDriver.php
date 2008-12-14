@@ -92,7 +92,7 @@ class fsDriver extends AbstractDriver
 					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing");
 					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					$this->readFile($file, "force-download", $localName, false, false);
-					unlink($file);
+					register_shutdown_function("unlink", $file);
 				}else{
 					$this->readFile($this->getPath()."/".$selection->getUniqueFile(), "force-download");
 				}
