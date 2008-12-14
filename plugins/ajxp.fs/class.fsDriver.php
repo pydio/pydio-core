@@ -343,7 +343,12 @@ class fsDriver extends AbstractDriver
 					if($mode == "search") $searchMode = true;
 					else if($mode == "file_list") $fileListMode = true;
 					else if($mode == "complete") $completeMode = true;
-				}	
+				}				
+				if(isSet($skipZip) && $skipZip == "true"){
+					$skipZip = true;
+				}else{
+					$skipZip = false;
+				}
 				if($test = UserSelection::detectZip($dir)){
 					$liste = array();
 					$zip = $this->zipListing($test[0], $test[1], $liste);
@@ -393,6 +398,7 @@ class fsDriver extends AbstractDriver
 				AJXP_XMLWriter::header();
 				foreach ($reps as $repIndex => $repName)
 				{
+					if(eregi("\.zip$",$repName) && $skipZip) continue;
 					$attributes = "";
 					if($searchMode)
 					{

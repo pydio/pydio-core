@@ -438,7 +438,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
 						if(!this.treeCopy){
 							this.treeCopy = new WebFXLoadTree('/', 
-																ajxpServerAccessPath+'?get_action=ls', 
+																ajxpServerAccessPath+'?skipZip=true&get_action=ls', 
 																"javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 
 																'explorer');
 						}
@@ -520,7 +520,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
 						if(!this.treeCopy){
 							this.treeCopy = new WebFXLoadTree('/', 
-																ajxpServerAccessPath+'?action=xml_listing', 
+																ajxpServerAccessPath+'?skipZip=true&get_action=ls', 
 																"javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 
 																'explorer');
 						}
