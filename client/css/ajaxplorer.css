@@ -36,7 +36,7 @@ input, textarea
     padding: 2px;
     border: 1px solid #aaa;
     font-size: 11px;
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, sans-serif, Nimbus Sans L;
 }
 
 textarea{
@@ -47,7 +47,7 @@ textarea{
 }
 
 .titre {
-	font-family: Trebuchet MS, Helvetica, sans-serif;
+	font-family: Trebuchet MS, Helvetica, Nimbus Sans L, sans-serif;
 	font-size: 14px;
 	font-weight: bold;
 	color: black;
@@ -136,7 +136,7 @@ DIALOG BOXES
     border-left-color:#fff;
     */
     background-color: #fff;
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, sans-serif;
     font-size: 12px;
     /*width:250px;*/
 }
@@ -274,7 +274,7 @@ textarea#myCode
 }
 #message_content
 {
-    font-family: Trebuchet MS, Helvetica, Arial;
+    font-family: Trebuchet MS, sans-serif, Helvetica, Arial;
     font-size: 11px;
     color:#666;    
     padding: 10px;
@@ -384,7 +384,7 @@ ACTION BAR
 	background-position:top right;
     border: none;
 	background-color: #fff;
-	font-family: Trebuchet MS;
+	font-family: Trebuchet MS, sans-serif;
 	font-size: 12px;
 	padding-top: 0px;
 	padding-left: 7px;
@@ -593,7 +593,7 @@ width:expression('59px');
    /*color: #c3d9ff;*/
    color: #084165;
    font-size: 15px;
-   font-family: Trebuchet MS;      
+   font-family: Trebuchet MS, sans-serif;      
    font-weight: bold;
    padding-top: 0px;
    padding-right: 3px;
@@ -611,7 +611,7 @@ width:expression('59px');
 .locationbar_title
 {
     display:inline;
-    font-family:Trebuchet MS, Helvetica, Arial;
+    font-family:Trebuchet MS, sans-serif, Helvetica, Arial;
     color: #79f;
     font-size:15px;
     font-weight:bold;
@@ -655,7 +655,7 @@ div.simple_selection_draggable
     color: #000;
     background-color: #ddd;
     border: 1px dotted #333;
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, sans-serif;
     font-size: 11px;    
 }
 
@@ -665,7 +665,7 @@ span.simple_selection_draggable
     background-color: #ddd;
     padding: 2px;
     border: 1px dotted #333;
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, sans-serif;
     font-size: 11px;
     display:block;
 }
@@ -681,7 +681,7 @@ div.multiple_selection_draggable
     background-color: #ddd;
     padding: 2px;
     border: 1px dotted #333;
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, sans-serif;
     font-size: 11px;    
 }
 
@@ -770,7 +770,7 @@ BOOKMARKS BAR
     color: #ddd;
     float:right;
     display:inline;
-    font-family:Trebuchet MS, Helvetica, Arial;
+    font-family:Trebuchet MS, sans-serif, Helvetica, Arial;
     font-size:15px;
     font-weight:bold;
 }
@@ -800,7 +800,7 @@ div.bm, div.bm_hover
     padding: 3px;
     margin-right: 5px;
     /*background-color: #ddd;*/
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, sans-serif;
     color: #333;    
 }
 
@@ -909,7 +909,7 @@ UPLOAD MULTIFILE FORM
 #search_div
 {
 /*    width: 100%;*/
-    font-family: Trebuchet MS, Helvetica, Arial, Sans-serif;
+    font-family: Trebuchet MS, sans-serif, Helvetica, Arial, Sans-serif;
     font-size: 11px;
 }
 
@@ -1116,7 +1116,7 @@ ADMIN STYLES
 
 .users_list_title
 {
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, Nimbus Sans L, sans-serif;
     font-size: 20px;
     font-weight: bold;
     color: white;
@@ -1140,7 +1140,7 @@ ADMIN STYLES
 
 .user_id, .user_data, .repository, .password
 {
-    font-family: Trebuchet MS;
+    font-family: Trebuchet MS, sans-serif;
     font-size: 13px;
 }
 
@@ -1198,7 +1198,7 @@ legend
 }
 #user_admin_bar, #repo_create_form, #log_chooser
 {
-   font-family: Trebuchet MS;
+   font-family: Trebuchet MS, sans-serif;
    padding: 15px;
    font-size: 12px;
    border: 0px solid #ddd;
@@ -1351,7 +1351,7 @@ textarea.editor
 div.autocomplete 
 {
       position:absolute;
-      font-family:Trebuchet MS;
+      font-family:Trebuchet MS, sans-serif;
       font-size: 11px;
       width:250px;
       background-color:white;
@@ -1482,7 +1482,7 @@ padding: 0px;
 .rootDirChooser
 {
    font-size: 11px;
-   font-family: Trebuchet MS, Helvetica, sans-serif;
+   font-family: Trebuchet MS, sans-serif, Helvetica, sans-serif;
    position:absolute;
    z-index: 1500;
    background-color:white;  
@@ -1571,7 +1571,7 @@ padding: 0px;
    font-size:11px;
    font-weight:bold;
    color: #fff;
-   font-family: Trebuchet MS;
+   font-family: Trebuchet MS, sans-serif;
    background-color:#79f;
    filter:alpha(opacity=80);
    opacity: 0.8;

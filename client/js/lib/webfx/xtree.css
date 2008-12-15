@@ -1,7 +1,7 @@
 .webfx-tree-container {
 	margin: 0px;
 	padding: 0px;
-	font-family: Trebuchet MS;
+	font-family: Trebuchet MS, sans-serif;
 	white-space: nowrap;
 	font-size: 11px;
 }
@@ -9,7 +9,7 @@
 .webfx-tree-item {
 	padding: 0px;
 	margin: 0px;
-	font-family: Trebuchet MS;
+	font-family: Trebuchet MS, sans-serif;
 	font-size: 11px;
 	color: WindowText;
 	white-space: nowrap;
