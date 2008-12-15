@@ -287,6 +287,7 @@ switch ($action)
 		$log["Users enabled"] = ENABLE_USERS;
 		$log["Guest enabled"] = ALLOW_GUEST_BROWSING;
 		$log["Gzip configuration"] = GZIP_DOWNLOAD;		
+		$log["Magic Quotes Gpc"] = get_magic_quotes_gpc();
 		$log["Client"] = $_SERVER['HTTP_USER_AGENT'];		
 		foreach ($log as $id => $value){
 			print "<div><span>$id</span> : $value</div>";
