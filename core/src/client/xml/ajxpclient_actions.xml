@@ -249,7 +249,7 @@
 				<clientForm id="splash_form"><![CDATA[
 					<div id="splash_form" box_width="455">
 						<div id="splashScreen">
-							<div align="center" style="font-size:64px;font-family:Trebuchet MS; font-weight:bold;color:#79f;">
+							<div align="center" style="font-size:50px;font-family:Trebuchet MS, sans-serif; font-weight:bold;color:#79f;">
 								<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/ajxp_logo_w_64.gif" width="64" height="64" border="0"> AjaXplorer
 							</div>
 							<iframe frameborder="0" src="AJXP_SERVER_ACCESS?get_action=display_doc&doc_file=CREDITS" id="docFileIframe"></iframe>
