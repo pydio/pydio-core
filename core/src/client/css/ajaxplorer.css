@@ -1209,11 +1209,11 @@ legend
 #user_admin_bar input, .password input
 {
    height: 18px;
-   width: 80px;
+   width: 78px;
    font-size: 12px;
    padding: 0px;
    margin-left: 0px;
-   margin-right: 10px;
+   margin-right: 5px;
 }
 
 #user_admin_bar .submit_button, .password .submit_button 
@@ -1222,9 +1222,10 @@ legend
 }
 
 #user_admin_bar b,
-#repo_create_form b
+#repo_create_form b,
+#log_chooser b
 {
-   font-size: 17px;
+   font-size: 15px;
    color: #666;   
 }
 
@@ -1246,6 +1247,7 @@ legend
 {
    border: 1px solid #79f;
    height: 20px;
+   width: 160px;
 }
 
 #driver_form input.text
