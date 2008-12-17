@@ -448,15 +448,15 @@ class fsDriver extends AbstractDriver
 					print("<tree text=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($repName))."\" $attributes>");
 					print("</tree>");
 				}
-				if($nom_rep == $this->repository->getOption("PATH") && $recycleBinOption!="" && !$completeMode)
+				// ADD RECYCLE BIN TO THE LIST
+				if($nom_rep == $this->repository->getOption("PATH") && $recycleBinOption!="" && !$completeMode && !$skipZip)
 				{
 					if($fileListMode)
 					{
 						print("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
 					}
 					else 
-					{
-						// ADD RECYCLE BIN TO THE LIST
+					{						
 						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".$recycleBinOption."\"/>");
 					}
 				}
