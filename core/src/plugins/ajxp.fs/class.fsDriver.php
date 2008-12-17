@@ -97,7 +97,9 @@ class fsDriver extends AbstractDriver
 					$this->readFile($this->getPath()."/".$selection->getUniqueFile(), "force-download");
 				}
 				if(isSet($tmpDir)){
-					$this->deldir($this->getPath()."/".$tmpDir);
+					//$this->deldir($this->getPath()."/".$tmpDir);
+					$delDir = $this->getPath()."/".$tmpDir;
+					register_shutdown_function(array($this, "deldir"), $delDir);
 				}
 				exit(0);
 			break;
@@ -1037,7 +1039,7 @@ class fsDriver extends AbstractDriver
     /**
      * @param $selection UserSelection
      */
-    function convertSelectionToTmpFiles($tmpDir, $selection){
+    function convertSelectionToTmpFiles($tmpDir, &$selection){
     	$zipPath = $selection->getZipPath();
     	$localDir = $selection->getZipLocalPath();
     	$files = $selection->getFiles();
