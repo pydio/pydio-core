@@ -132,8 +132,8 @@ define("DOCS_FOLDER", "client/doc");
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 
-define("GZIP_DOWNLOAD", true);
-define("GZIP_LIMIT", 50*1048576); // Do not Gzip files above 50M
+define("GZIP_DOWNLOAD", false);
+define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 50M
 
 // PAGES D'ENTETE ET DE BAS DE PAGE
 // (header and footer files )
