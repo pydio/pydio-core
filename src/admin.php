@@ -108,6 +108,8 @@ switch ($action)
 			AJXP_XMLWriter::close();
 			exit(1);									
 		}
+		if(get_magic_quotes_gpc()) $_GET["new_login"] = stripslashes($_GET["new_login"]);
+		$_GET["new_login"] = str_replace("'", "", $_GET["new_login"]);
 		$newUser = new AJXP_User($_GET["new_login"]);
 		$newUser->save();
 		//AuthService::updatePassword($_GET["new_login"], $_GET["new_pwd"]);
@@ -195,9 +197,12 @@ switch ($action)
 		$repDef = $_GET;
 		unset($repDef["get_action"]);
 		foreach ($repDef as $key => $value){
+			if(get_magic_quotes_gpc()) $value = stripslashes($value);
 			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0){
 				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
 				unset($repDef[$key]);
+			}else{
+				$repDef[$key] = $value;				
 			}
 		}
 		if(count($options)){
@@ -247,7 +252,9 @@ switch ($action)
 	break;
 	
 	case "delete_repository" :
-		$res = ConfService::deleteRepository($_GET["repo_label"]);
+		$repLabel = $_GET["repo_label"];
+		if(get_magic_quotes_gpc()) $repLabel = stripslashes($repLabel);
+		$res = ConfService::deleteRepository($repLabel);
 		AJXP_XMLWriter::header();
 		if($res == -1){
 			AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
