@@ -46,13 +46,13 @@ InfoPanel = Class.create({
 				current_folder:currentRep
 			});
 				try{
-				if(!folderNumber && $(this.htmlElement).select('filelist_folders_count')){
+				if(!folderNumber && $(this.htmlElement).select('[id="filelist_folders_count"]').length){
 					$(this.htmlElement).select('[id="filelist_folders_count"]')[0].hide();
 				}
-				if(!filesNumber && $(this.htmlElement).select('filelist_files_count')){
+				if(!filesNumber && $(this.htmlElement).select('[id="filelist_files_count').length){
 					$(this.htmlElement).select('[id="filelist_files_count"]')[0].hide();
 				}
-				if(!size && $(this.htmlElement).select('filelist_totalsize')){
+				if(!size && $(this.htmlElement).select('[id="filelist_totalsize"]').length){
 					$(this.htmlElement).select('[id="filelist_totalsize"]')[0].hide();
 				}
 			}catch(e){}
