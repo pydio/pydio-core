@@ -197,7 +197,7 @@ AdminPageManager = Class.create({
 		this.repositories.each(function(pair){
 			var deleteButton = '';
 			if(pair.value){
-				deleteButton = '<img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/button_cancel.png" width="16" height="16" onclick="manager.deleteRepository(\''+pair.key+'\');return false;" style="cursor:pointer;margin-left: 20px;">';
+				deleteButton = '<img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/button_cancel.png" width="16" height="16" onclick="manager.deleteRepository(\''+pair.key.replace('\'', '\\\'')+'\');return false;" style="cursor:pointer;margin-left: 20px;">';
 			}
 			$('repo_list').insert({"bottom":'<div class="user user_id" style="cursor:default; height:25px; padding-top:0px;"><img align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/32/folder_red.png" width="32" height="32" style="padding:5px;">Repository <b>'+pair.key+'</b>'+deleteButton+'</div>'});
 		});
