@@ -375,7 +375,9 @@ ActionsManager = Class.create({
 		{
 			if(childs[i].tagName == "message")
 			{
-				ajaxplorer.displayMessage(childs[i].getAttribute('type'), childs[i].firstChild.nodeValue);
+				var messageTxt = "No message";
+				if(childs[i].firstChild) messageTxt = childs[i].firstChild.nodeValue;
+				ajaxplorer.displayMessage(childs[i].getAttribute('type'), messageTxt);
 			}
 			else if(childs[i].tagName == "reload_instruction")
 			{
