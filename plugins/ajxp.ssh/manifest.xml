@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="ssh" label="FileSystem over SSH Server" description="Standard access to the filesystem on another server">
+	<client_settings icon="plugins/ajxp.ssh/icon.png" search_engine="SearchEngine"/>
+	<param name="PATH" type="string" label="Path" description="Real path to the root folder and the server like bob.myserver.com:/home/" mandatory="true"/>
+</ajxpdriver>
