@@ -140,7 +140,7 @@ switch ($action)
 	case "users_list":
 		$allUsers = AuthService::listUsers();
 		$userObject = new AJXP_User("");
-		//print("<div id=\"users_list\">");
+		header("Content-Type:text/html;charset=UTF-8");
 		foreach ($allUsers as $userId => $userObject)
 		{
 			if($userId == "shared") continue;
@@ -295,7 +295,8 @@ switch ($action)
 		$log["Guest enabled"] = ALLOW_GUEST_BROWSING;
 		$log["Gzip configuration"] = GZIP_DOWNLOAD;		
 		$log["Magic Quotes Gpc"] = get_magic_quotes_gpc();
-		$log["Client"] = $_SERVER['HTTP_USER_AGENT'];		
+		$log["Client"] = $_SERVER['HTTP_USER_AGENT'];	
+		header("Content-Type:text/html;charset=UTF-8");	
 		foreach ($log as $id => $value){
 			print "<div><span>$id</span> : $value</div>";
 		}
