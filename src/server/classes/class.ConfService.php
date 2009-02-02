@@ -257,7 +257,7 @@ class ConfService
 		if(isSet($G_ACCESS_DRIVER) && is_a($G_ACCESS_DRIVER, "AbstractDriver")){			
 			return $G_ACCESS_DRIVER;
 		}
-        	ConfService::switchRootDir();
+        ConfService::switchRootDir();
 		$crtRepository = ConfService::getRepository();
 		$accessType = $crtRepository->getAccessType();
 		$driverName = $accessType."Driver";
