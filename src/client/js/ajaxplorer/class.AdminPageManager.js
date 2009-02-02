@@ -121,29 +121,7 @@ AdminPageManager = Class.create({
 		}
 		var dOpt = this.drivers.get(driverName);
 		$('driver_form').update('<div style="padding-top:4px;color:#79f;"><b style="color:#79f;">'+dOpt.get('label') + '</b> : ' + dOpt.get('description')+'<br></div>');
-		dOpt.get('params').each(function(param){
-			var label = param.get('label');
-			var name = param.get('name');
-			var type = param.get('type');
-			var desc = param.get('description');
-			var mandatory = false;
-			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
-			var defaultValue = param.get('default') || "";
-			var element;
-			if(type == 'string'){
-				element = '<input type="text" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'">';
-			}else if(type == 'boolean'){
-				var selectTrue, selectFalse;
-				if(defaultValue){
-					if(defaultValue == "true") selectTrue = true;
-					if(defaultValue == "false") selectFalse = true;
-				}
-				element = '<input type="radio" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+'> Yes';
-				element = element + '<input type="radio" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"> No';
-			}
-			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:20%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:80%">'+element+' &nbsp;<small style="color:#AAA;">'+desc+'</small></div>');
-			$('driver_form').insert({'bottom':div});
-		});
+		this.createParametersInputs($('driver_form'), dOpt.get('params'), true);
 		var buttons = '<div align="center" style="clear:left;padding-top:5px;"><input type="button" value="Save" class="button" onclick="return manager.repoButtonClick(true);"> <input type="button" value="Cancel" class="button" onclick="return manager.repoButtonClick(false);"></div>';
 		$('driver_form').insert({'bottom':buttons});
 	},
@@ -164,18 +142,7 @@ AdminPageManager = Class.create({
 		}
 		toSubmit.set('DRIVER', $('drivers_selector').options[$('drivers_selector').selectedIndex].value);
 		
-		$('driver_form').select('input').each(function(el){			
-			if(el.type == "text"){
-				if(el.getAttribute('ajxp_mandatory') == 'true' && el.value == ''){
-					missingMandatory = true;
-				}
-				toSubmit.set('DRIVER_OPTION_'+el.name, el.value);				
-			}
-			else if(el.type=="radio" && el.checked){
-				toSubmit.set('DRIVER_OPTION_'+el.name, el.value)
-			};
-		});
-		if(missingMandatory){
+		if(missingMandatory || this.submitParametersInputs($('driver_form'), toSubmit, 'DRIVER_OPTION_')){
 			this.displayMessage("ERROR", "Mandatory fields are missing!");
 			return false;
 		}		
@@ -187,6 +154,52 @@ AdminPageManager = Class.create({
 		return false;		
 	},
 	
+	createParametersInputs : function(form, parametersDefinitions, showTip, values){		
+		parametersDefinitions.each(function(param){		
+			var label = param.get('label');
+			var name = param.get('name');
+			var type = param.get('type');
+			var desc = param.get('description');
+			var mandatory = false;
+			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
+			var defaultValue = param.get('default') || "";
+			if(values && values.get(name)){
+				defaultValue = values.get(name);
+			}
+			var element;
+			if(type == 'string'){
+				element = '<input type="text" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'">';
+			}else if(type == 'boolean'){
+				var selectTrue, selectFalse;
+				if(defaultValue){
+					if(defaultValue == "true") selectTrue = true;
+					if(defaultValue == "false") selectFalse = true;
+				}
+				element = '<input type="radio" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+'> Yes';
+				element = element + '<input type="radio" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"> No';
+			}
+			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:30%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:70%">'+element+(showTip?' &nbsp;<small style="color:#AAA;">'+desc+'</small>':'')+'</div>');
+			form.insert({'bottom':div});
+		});
+	},
+	
+	submitParametersInputs : function(form, parametersHash, prefix){
+		prefix = prefix || '';
+		var missingMandatory = false;
+		form.select('input').each(function(el){			
+			if(el.type == "text"){
+				if(el.getAttribute('ajxp_mandatory') == 'true' && el.value == ''){
+					missingMandatory = true;
+				}
+				parametersHash.set(prefix+el.name, el.value);				
+			}
+			else if(el.type=="radio" && el.checked){
+				parametersHash.set(prefix+el.name, el.value)
+			};			
+		});		
+		return missingMandatory;
+	},
+		
 	loadRepList : function(){
 		this.submitForm('repository_list', new Hash());
 	},
@@ -361,6 +374,42 @@ AdminPageManager = Class.create({
 		
 	},
 	
+	addRepositoryUserParams : function(userId){
+		if($('user_data_'+userId).getAttribute('repoParams')) return;				
+		this.drivers.each(function(pair){
+			if(!pair.value.get('user_params') || !pair.value.get('user_params').length) return;
+			$('user_data_'+userId).select("td[driver_name='"+pair.key+"']").each(function(cell){
+				var repoId = cell.getAttribute('repository_id');
+				var newTd = new Element('td', {colspan:2, className:'driver_form', id:'repo_user_params_'+userId+'_'+repoId});
+				var newTr = new Element('tr').update(newTd);
+				cell.up('tr').insert({after:newTr});
+				
+				var repoValues = $H({});
+				$('user_data_'+userId).select("wallet_data[repo_id='"+repoId+"']").each(function(tag){					
+					repoValues.set(tag.getAttribute('option_name'), tag.getAttribute('option_value'));
+				});				
+				this.createParametersInputs(newTd, pair.value.get('user_params'), false, repoValues);
+				var submitButton = new Element('input', {type:'submit', value:'SAVE', className:'submit'});
+				submitButton.observe("click", function(){
+					this.submitUserParamsForm(userId, repoId);
+				}.bind(this));
+				newTd.insert(submitButton);
+			}.bind(this));
+		}.bind(this));
+		$('user_data_'+userId).writeAttribute('repoParams', 'true');
+	},
+	
+	submitUserParamsForm : function(userId, repositoryId){
+		var parameters = new Hash();
+		parameters.set('user_id', userId);
+		parameters.set('repository_id', repositoryId);
+		if(this.submitParametersInputs($('repo_user_params_'+userId+'_'+repositoryId), parameters, "DRIVER_OPTION_")){
+			this.displayMessage("ERROR", "Mandatory fields are missing!");
+			return false;
+		}
+		this.submitForm('save_repository_user_params', parameters, null);
+	},
+	
 	deleteUser: function(userId){
 		var chck = $('delete_confirm_'+userId);
 		if(!chck.checked){
@@ -403,6 +452,7 @@ AdminPageManager = Class.create({
 		//$('user_data_'+userId).toggle();	
 		$('users_detail_panel').insert({top:$('user_data_'+userId)});
 		$('user_data_'+userId).toggle();
+		this.addRepositoryUserParams(userId);
 	},
 	
 	submitForm: function(action, parameters, formName, callback){
@@ -483,16 +533,21 @@ AdminPageManager = Class.create({
 				dOption.set('label', childs[i].getAttribute('label'));
 				dOption.set('description', childs[i].getAttribute('description'));
 				var params = $A([]);
+				var userParams = $A([]);
 				var dChilds = childs[i].childNodes;
 				for(var j=0;j<dChilds.length;j++){
-					if(dChilds[j].nodeName != 'param') continue;
-					var paramProp = new Hash();
-					driversAtts.each(function(attName){
-						paramProp.set(attName, (dChilds[j].getAttribute(attName) || ''));
-					});
-					params.push(paramProp);
+					var childNodeName = dChilds[j].nodeName;
+					if(childNodeName == 'param' || childNodeName == 'user_param'){
+						var paramProp = new Hash();
+						driversAtts.each(function(attName){
+							paramProp.set(attName, (dChilds[j].getAttribute(attName) || ''));
+						});
+						if(childNodeName == 'param') params.push(paramProp);
+						else userParams.push(paramProp);
+					}
 				}
 				dOption.set('params', params);
+				dOption.set('user_params', userParams);
 				this.drivers.set(dName, dOption);
 			}
 			else if(childs[i].nodeName == "repository")

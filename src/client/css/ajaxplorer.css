@@ -1288,7 +1288,8 @@ legend
    width: 160px;
 }
 
-#driver_form input.text
+#driver_form input.text,
+.driver_form input.text
 {
    padding:0px;
    padding-left:2px;
@@ -1299,13 +1300,15 @@ legend
    border: 1px solid #999;   
 }
 
-#driver_form input.radio
+#driver_form input.radio,
+.driver_form input.radio
 {
    border : none;
    margin-left: 0px;
 }
 
-#driver_form input.button
+#driver_form input.button,
+.driver_form input.button
 {
 	background-color:#bbb;
 	border:1px solid #999;
@@ -1317,7 +1320,8 @@ legend
 	padding: 0px;
 }
 
-#driver_form b
+#driver_form b,
+.driver_form b
 {
    font-size:12px;
 }
