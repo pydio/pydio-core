@@ -114,6 +114,16 @@ class fsDriver extends AbstractDriver
 					header('Cache-Control: public');
 					print($data[0]["content"]);
 				}else{
+					
+					if(isSet($get_thumb) && $get_thumb == "true" && GENERATE_THUMBNAIL){
+						require_once("server/classes/PThumb.lib.php");
+						$pThumb = new PThumb();
+						$pThumb->use_cache = USE_THUMBNAIL_CACHE;
+						$pThumb->cache_dir = INSTALL_PATH."/".THUMBNAIL_CACHE_DIR;
+						$pThumb->fit_thumbnail($this->getPath()."/".SystemTextEncoding::fromUTF8($file), 200);
+						exit(0);
+					}
+					
 					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "image");
 				}
 				exit(0);

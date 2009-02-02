@@ -109,6 +109,10 @@ $max_caracteres=50;
 
 $showhidden=0;
 
+// THUMBNAIL MANAGEMENT (FS DRIVER)
+define("GENERATE_THUMBNAIL", true);
+define("USE_THUMBNAIL_CACHE", false);
+define("THUMBNAIL_CACHE_DIR", "server/tmp/"); // Must end with a slash!
 
 
 
