@@ -59,7 +59,6 @@ switch ($action)
 		exit(1);
 	break;
 
-	
 	case "update_user_right" :
 		if(!isSet($_GET["user_id"]) 
 			|| !isSet($_GET["repository_id"]) 
@@ -82,6 +81,28 @@ switch ($action)
 		exit(1);
 	break;
 
+	case "save_repository_user_params" : 
+		$userId = $_GET["user_id"];
+		$user = new AJXP_User($userId);
+		$wallet = $user->getPref("AJXP_WALLET");
+		if(!is_array($wallet)) $wallet = array();
+		if(!array_key_exists($_GET["repository_id"], $wallet)){
+			$wallet[$_GET["repository_id"]] = array();
+		}
+		foreach ($_GET as $key=>$value){
+			if(strstr($key, "DRIVER_OPTION_") !== false){
+				$key = substr($key, strlen("DRIVER_OPTION_"));
+				$wallet[$_GET["repository_id"]][$key] = trim($value);
+			}
+		}
+		$user->setPref("AJXP_WALLET", $wallet);
+		$user->save();
+		AJXP_XMLWriter::header();
+		AJXP_XMLWriter::sendMessage("Saved data ".$_GET["user_id"], null);
+		AJXP_XMLWriter::close();
+		exit(1);	
+	break;
+	
 	case "update_user_pwd" : 
 		if(!isSet($_GET["user_id"]) || !isSet($_GET["user_pwd"]) || !AuthService::userExists($_GET["user_id"]) || trim($_GET["user_pwd"]) == "")
 		{
@@ -165,11 +186,11 @@ switch ($action)
 			
 			print("<div class=\"user_id\" onclick=\"manager.toggleUser('".$userId."');\"><img align=\"absmiddle\" src=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/actions/32/$imgSrc\" width=\"32\" height=\"32\">User <b>$userId</b></div>");
 			print("<div class=\"user_data\" id=\"user_data_".$userId."\" style=\"display: none;\">");
-			print("<fieldset><legend>Repositories Rights</legend><table class=\"repository\">");
+			print("<fieldset><legend>Repositories Rights</legend><table width=\"100%\" class=\"repository\">");
 			foreach (ConfService::getRootDirsList() as $rootDirId => $rootDirObject)
 			{
 				print("<tr><td style=\"width: 45%;\">. ".$rootDirObject->getDisplay()." : </td>");
-				print("<td style=\"width: 55%;\">");
+				print("<td style=\"width: 55%;\" driver_name=\"".$rootDirObject->getAccessType()."\" repository_id=\"$rootDirId\">");
 				$disabledString = "";
 				if($userObject->isAdmin()) $disabledString = "disabled";
 				print("Read <input type=\"checkbox\" id=\"chck_".$userId."_".$rootDirId."_read\" onclick=\"manager.changeUserRight(this, '$userId', '$rootDirId', 'read');\" $disabledString ".($userObject->canRead($rootDirId)?"checked":"").">");
@@ -193,6 +214,17 @@ switch ($action)
 				print("<fieldset><legend>Delete User</legend>");
 				print("To delete, check the box to confirm <input type=\"checkbox\" class=\"user_delete_confirm\" id=\"delete_confirm_$userId\"><input type=\"submit\" value=\"OK\" onclick=\"manager.deleteUser('$userId'); return false;\">");
 				print("</fieldset>");		
+			}
+			// Add WALLET DATA
+			$wallet = $userObject->getPref("AJXP_WALLET");
+			if(is_array($wallet)){
+				print("<wallet>");
+				foreach($wallet as $repoId => $options){
+					foreach ($options as $optName=>$optValue){
+						print("<wallet_data repo_id=\"$repoId\" option_name=\"$optName\" option_value=\"$optValue\"/>");
+					}
+				}
+				print("</wallet>");
 			}
 			print("</div>");
 			print("</div>");
