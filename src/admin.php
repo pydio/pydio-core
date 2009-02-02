@@ -36,7 +36,7 @@ if(AuthService::getLoggedUser() == null)
 	exit(0);
 }
 $loggedUser = AuthService::getLoggedUser();
-if($loggedUser->getId() != "admin")
+if(!$loggedUser->isAdmin())
 {
 	print("Forbidden");
 	exit(0);	
@@ -47,6 +47,18 @@ if(isSet($_GET["get_action"])) $action = $_GET["get_action"];
 
 switch ($action)
 {
+	
+	case "change_admin_right" :
+		$userId = $_GET["user_id"];
+		$user = new AJXP_User($userId);
+		$user->setAdmin(($_GET["right_value"]=="1"?true:false));
+		$user->save();
+		AJXP_XMLWriter::header();
+		AJXP_XMLWriter::sendMessage("Changed admin right for user ".$_GET["user_id"], null);
+		AJXP_XMLWriter::close();
+		exit(1);
+	break;
+
 	
 	case "update_user_right" :
 		if(!isSet($_GET["user_id"]) 
@@ -100,7 +112,7 @@ switch ($action)
 			AJXP_XMLWriter::close();
 			exit(1);						
 		}
-		$forbidden = array("guest", "admin", "share");
+		$forbidden = array("guest", "share");
 		if(AuthService::userExists($_GET["new_login"]) || in_array($_GET["new_login"], $forbidden))
 		{
 			AJXP_XMLWriter::header();
@@ -122,8 +134,10 @@ switch ($action)
 	break;
 	
 	case "delete_user" : 
-		$forbidden = array("guest", "admin", "share");
-		if(!isset($_GET["user_id"]) || $_GET["user_id"]=="" || in_array($_GET["user_id"], $forbidden))
+		$forbidden = array("guest", "share");
+		if(!isset($_GET["user_id"]) || $_GET["user_id"]=="" 
+			|| in_array($_GET["user_id"], $forbidden)
+			|| $loggedUser->getId() == $_GET["user_id"])
 		{
 			AJXP_XMLWriter::header();
 			AJXP_XMLWriter::sendMessage(null, "Wrong Arguments!");
@@ -146,7 +160,7 @@ switch ($action)
 			if($userId == "shared") continue;
 			print("<div class=\"user\" id=\"user_block_$userId\">");
 			$imgSrc = "user_normal.png";
-			if($userId == "admin") $imgSrc = "user_sysadmin.png";
+			if($userObject->isAdmin()) $imgSrc = "user_sysadmin.png";
 			else if($userId == "guest") $imgSrc = "user_guest.png";
 			
 			print("<div class=\"user_id\" onclick=\"manager.toggleUser('".$userId."');\"><img align=\"absmiddle\" src=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/actions/32/$imgSrc\" width=\"32\" height=\"32\">User <b>$userId</b></div>");
@@ -157,7 +171,7 @@ switch ($action)
 				print("<tr><td style=\"width: 45%;\">. ".$rootDirObject->getDisplay()." : </td>");
 				print("<td style=\"width: 55%;\">");
 				$disabledString = "";
-				if($userId == "admin") $disabledString = "disabled";
+				if($userObject->isAdmin()) $disabledString = "disabled";
 				print("Read <input type=\"checkbox\" id=\"chck_".$userId."_".$rootDirId."_read\" onclick=\"manager.changeUserRight(this, '$userId', '$rootDirId', 'read');\" $disabledString ".($userObject->canRead($rootDirId)?"checked":"").">");
 				print("&nbsp;&nbsp;&nbsp;&nbsp;Write <input type=\"checkbox\" id=\"chck_".$userId."_".$rootDirId."_write\" onclick=\"manager.changeUserRight(this, '$userId', '$rootDirId', 'write');\" $disabledString ".($userObject->canWrite($rootDirId)?"checked":"").">");
 				print("</td></tr>");
@@ -171,8 +185,11 @@ switch ($action)
 				print("<td><input name=\"new_pass\" type=\"submit\" value=\"OK\"  class=\"submit_button\" onclick=\"manager.changePassword('$userId'); return false;\"></td></tr>");
 				print("</table></fieldset>");
 			}
-			if($userId != "admin" && $userId !="guest")
+			if($userId !="guest" && $userId != $loggedUser->getId())
 			{
+				print("<fieldset><legend>Add User Admin Rights</legend>");
+				print("User has admin rights : <input type=\"checkbox\" class=\"user_delete_confirm\" id=\"admin_rights_$userId\" ".($userObject->isAdmin()?"checked":"")." onclick=\"manager.changeAdminRight(this, '$userId');\">");
+				print("</fieldset>");				
 				print("<fieldset><legend>Delete User</legend>");
 				print("To delete, check the box to confirm <input type=\"checkbox\" class=\"user_delete_confirm\" id=\"delete_confirm_$userId\"><input type=\"submit\" value=\"OK\" onclick=\"manager.deleteUser('$userId'); return false;\">");
 				print("</fieldset>");		

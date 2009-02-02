@@ -311,6 +311,14 @@ AdminPageManager = Class.create({
 		this.submitForm('update_user_right', parameters, null);
 	},
 	
+	changeAdminRight: function(oChckBox, userId){
+		var boxValue = oChckBox.checked;
+		var parameters = new Hash();
+		parameters.set('user_id', userId);
+		parameters.set('right_value', (boxValue?'1':'0'));
+		this.submitForm('change_admin_right', parameters, null);
+	},
+	
 	changePassword: function(userId){
 		var newPass = $('new_pass_'+userId);
 		var newPassConf = $('new_pass_confirm_'+userId);
