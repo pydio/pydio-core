@@ -79,7 +79,7 @@ class AuthService
 			if(!AuthService::checkPassword($user_id, $pwd, $encodedPwd)) return -1;
 		}
 		$user = new AJXP_User($user_id);
-		if($user_id == "admin")
+		if($user->isAdmin())
 		{
 			$user = AuthService::updateAdminRights($user);
 		}
@@ -160,19 +160,51 @@ class AuthService
 		return true;
 	}
 	
-	function createUser($userId, $userPass)
+	function createUser($userId, $userPass, $isAdmin=false)
 	{
 		$users = AuthService::loadLocalUsersList();
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($userId, $users)) return "exists";
 		$users[$userId] = AuthService::encodePassword($userPass);
 		AuthService::saveLocalUsersList($users);
+		if($isAdmin){
+			$user = new AJXP_User($userId);
+			$user->setAdmin(true);			
+			$user->save();
+		}
 		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;
 	}
 	
+	function countAdminUsers(){
+		$users = AuthService::loadLocalUsersList();
+		if(!is_array($users)) return 0;
+		if(!array_key_exists("ajxp.admin.users", $users)){			
+			if(AuthService::userExists("admin")) return -1;
+			return 0;
+		}
+		return count($users["ajxp.admin.users"]);
+	}
+	
+	function setUserAdmin($userId, $isAdmin){
+		$users = AuthService::loadLocalUsersList();
+		if($isAdmin){
+			if(!array_key_exists("ajxp.admin.users", $users)){
+				$users["ajxp.admin.users"] = array();
+			}
+			$users["ajxp.admin.users"][$userId] = true;
+			AuthService::saveLocalUsersList($users);
+		}else{
+			if(array_key_exists("ajxp.admin.users", $users) && array_key_exists($userId, $users["ajxp.admin.users"])){
+				unset($users["ajxp.admin.users"][$userId]);
+				AuthService::saveLocalUsersList($users);
+			}
+		}
+	}
+	
 	function deleteUser($userId)
 	{
+		AuthService::setUserAdmin($userId, false);
 		$users = AuthService::loadLocalUsersList();
 		if(is_array($users) && array_key_exists($userId, $users))
 		{
@@ -200,7 +232,7 @@ class AuthService
 		$users = AuthService::loadLocalUsersList();
 		foreach (array_keys($users) as $userId)
 		{
-			if($userId == "guest" && !ALLOW_GUEST_BROWSING) continue;
+			if(($userId == "guest" && !ALLOW_GUEST_BROWSING) || $userId == "ajxp.admin.users") continue;
 			$allUsers[$userId] = new AJXP_User($userId);
 		}
 		return $allUsers;

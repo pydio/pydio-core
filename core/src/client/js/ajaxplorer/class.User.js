@@ -8,6 +8,7 @@ User = Class.create({
 	repositories: undefined,
 	repoIcons:undefined,
 	repoSearchEngines:undefined,
+	isAdmin:false,
 
 	initialize:function(id, xmlDef){
 		this.id = id;
@@ -84,18 +85,18 @@ User = Class.create({
 		var repositories = new Hash();
 		for(var i=0; i<userNodes.length;i++)
 		{
-			if(userNodes[i].tagName == "active_repo")
+			if(userNodes[i].nodeName == "active_repo")
 			{
 				this.setActiveRepository(userNodes[i].getAttribute('id'), 
 										userNodes[i].getAttribute('read'), 
 										userNodes[i].getAttribute('write'));
 			}
-			else if(userNodes[i].tagName == "repositories")
+			else if(userNodes[i].nodeName == "repositories")
 			{
 				for(j=0;j<userNodes[i].childNodes.length;j++)
 				{
 					var repoChild = userNodes[i].childNodes[j];
-					if(repoChild.tagName == "repo") {
+					if(repoChild.nodeName == "repo") {
 						repositories.set(repoChild.getAttribute("id"), repoChild.firstChild.nodeValue);
 						if(repoChild.getAttribute("icon")){
 							this.repoIcon.set(repoChild.getAttribute("id"), repoChild.getAttribute("icon"));
@@ -107,16 +108,21 @@ User = Class.create({
 				}
 				this.setRepositoriesList(repositories);
 			}
-			else if(userNodes[i].tagName == "preferences")
+			else if(userNodes[i].nodeName == "preferences")
 			{
 				for(j=0;j<userNodes[i].childNodes.length;j++)
 				{
 					var prefChild = userNodes[i].childNodes[j];
-					if(prefChild.tagName == "pref") {
+					if(prefChild.nodeName == "pref") {
 						this.setPreference(prefChild.getAttribute("name"), 
 							 				prefChild.getAttribute("value"));
 					}
 				}					
+			}
+			else if(userNodes[i].nodeName == "special_rights")
+			{
+				var attr = userNodes[i].getAttribute("is_admin");
+				if(attr && attr == "1") this.isAdmin = true;
 			}
 		}
 			
