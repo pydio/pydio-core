@@ -37,7 +37,7 @@ class AuthService
 			if(AUTH_MODE_REMOTE_USER != ""){
 				$client->setAuthorization(AUTH_MODE_REMOTE_USER, AUTH_MODE_REMOTE_PASSWORD);
 			}			
-			$client->setCookies(array("PHPSESSID", $remoteSessionId));
+			$client->setCookies(array(AUTH_MODE_REMOTE_SESSION_NAME ? AUTH_MODE_REMOTE_SESSION_NAME : "PHPSESSID") => $remoteSessionId));
 			$result = $client->get(AUTH_MODE_REMOTE_URL, array("session_id"=>$remoteSessionId));			
 			if($result)
 			{

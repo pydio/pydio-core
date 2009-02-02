@@ -552,7 +552,7 @@ class fsDriver extends AbstractDriver
 	
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
-		$size = ($data?strlen($filePathOrData):filesize($filePathOrData));
+		$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
 		if(!$data && $size < 0){
 			// fix files above 2Gb 
 			$size = sprintf("%u", $size);
@@ -560,7 +560,7 @@ class fsDriver extends AbstractDriver
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
 		}
-		$localName = ($localName==""?basename($filePathOrData):$localName);
+		$localName = ($localName=="" ? basename($filePathOrData) : $localName);
 		if($headerType == "plain")
 		{
 			header("Content-type:text/plain");			
