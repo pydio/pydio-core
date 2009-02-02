@@ -84,7 +84,7 @@ Action = Class.create({
 		if(rightsContext.userLogged == 'hidden' && crtUser != null && !(crtUser.id=='guest' && rightsContext.guestLogged && rightsContext.guestLogged=='show') ){
 			return this.hideForContext();
 		}
-		if(rightsContext.adminOnly && (crtUser == null || crtUser.id != 'admin')){
+		if(rightsContext.adminOnly && (crtUser == null || !crtUser.isAdmin)){
 			return this.hideForContext();
 		}
 		if(rightsContext.read && crtUser != null && !crtUser.canRead()){

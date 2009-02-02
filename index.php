@@ -25,12 +25,18 @@ if(AuthService::usersEnabled())
 	AuthService::preLogUser((isSet($_GET["remote_session"])?$_GET["remote_session"]:""));
 	if(!is_readable(USERS_DIR)) $BEGIN_MESSAGE = "Warning, the users directory is not readable!";
 	else if(!is_writeable(USERS_DIR)) $BEGIN_MESSAGE = "Warning, the users directory is not writeable!";
-	if(!AuthService::userExists("admin")){
-		 AuthService::createUser("admin", ADMIN_PASSWORD);
+	if(AuthService::countAdminUsers() == 0){
+		 AuthService::createUser("admin", ADMIN_PASSWORD, true);
 		 if(ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD)
 		 {
 			 $BEGIN_MESSAGE .= "Warning! User 'admin' was created with the initial common password 'admin'. \\nPlease log in as admin and change the password now!";
 		 }
+	}else if(AuthService::countAdminUsers() == -1){
+		// Here we may come from a previous version! Check the "admin" user and set its right as admin.
+		$adminUser = new AJXP_User("admin");
+		$adminUser->setAdmin(true);
+		$adminUser->save();
+		$BEGIN_MESSAGE .= "You may come from a previous version. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
 	}
 	$USERS_ENABLED = "true";	
 	if(AuthService::getLoggedUser() != null || AuthService::logUser(null, null) == 1)

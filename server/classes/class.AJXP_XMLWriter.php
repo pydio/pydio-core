@@ -107,6 +107,7 @@ class AJXP_XMLWriter
 			print("<pref name=\"display\" value=\"".$loggedUser->getPref("display")."\"/>");
 			print("<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>");
 			print("</preferences>");
+			print("<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>");
 			print("</user>");
 		}		
 	}

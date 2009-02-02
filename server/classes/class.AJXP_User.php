@@ -17,6 +17,15 @@ class AJXP_User
 		return $this->id;
 	}
 	
+	function isAdmin(){
+		return (isSet($this->rights["ajxp.admin"])?$this->rights["ajxp.admin"]:false);
+	}
+	
+	function setAdmin($boolean){
+		$this->rights["ajxp.admin"] = $boolean;
+		AuthService::setUserAdmin($this->id, $boolean);
+	}
+	
 	function getRight($rootDirId){
 		if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
 		return "";
