@@ -12,6 +12,7 @@
  
 $mess=array( 
 "languageLabel" => "日本語", 
+"date_format"  => "Y/m/d H:i",
 "0" => "最新バージョン", 
 "1" => "ファイル名", 
 "2" => "サイズ", 

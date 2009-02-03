@@ -12,6 +12,7 @@
 
 $mess=array(
 "languageLabel" => "Nederlands",
+"date_format"  => "Y/m/d H:i",
 "0" => "Laatste versie",
 "1" => "Bestandsnaam",
 "2" => "Grote",
