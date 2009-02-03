@@ -7,7 +7,7 @@
 					<column messageId="1" attributeName="text"/>
 					<column messageId="2" attributeName="filesize"/>
 					<column messageId="3" attributeName="mimestring"/>
-					<column messageId="4" attributeName="modiftime"/>
+					<column messageId="4" attributeName="ajxp_modiftime"/>
 				</display>
 			</displayDefinitions>
 			<gui text="32" title="32" src="fileopen.png"
