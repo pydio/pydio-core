@@ -375,7 +375,7 @@ class fsDriver extends AbstractDriver
 						if($fileListMode){
 							$atts[] = "filesize=\"".Utils::roundSize($zipEntry["size"])."\"";
 							$atts[] = "bytesize=\"".$zipEntry["size"]."\"";
-							$atts[] = "modiftime=\"".date("d/m/Y H:i",$zipEntry["mtime"])."\"";
+							$atts[] = "ajxp_modiftime=\"".$zipEntry["mtime"]."\"";
 							$atts[] = "mimestring=\"".Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"])."\"";
 							$atts[] = "icon=\"".Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"])."\"";
 							$is_image = Utils::is_image(basename($zipEntry["stored_filename"]));
@@ -430,7 +430,7 @@ class fsDriver extends AbstractDriver
 							$atts[] = "image_height=\"$height\"";
 						}
 						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
-						$atts[] = "modiftime=\"".$this->date_modif($currentFile)."\"";
+						$atts[] = "ajxp_modiftime=\"".$this->date_modif($currentFile)."\"";
 						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
 						$bytesize = filesize($currentFile);
 						if($bytesize < 0) $bytesize = sprintf("%u", $bytesize);
@@ -465,7 +465,7 @@ class fsDriver extends AbstractDriver
 				{
 					if($fileListMode)
 					{
-						print("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
+						print("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
 					}
 					else 
 					{						
@@ -705,7 +705,8 @@ class fsDriver extends AbstractDriver
 	function date_modif($file)
 	{
 		$tmp = filemtime($file);
-		return date("d/m/Y H:i",$tmp);
+		$messages = ConfService::getMessages();
+		return $tmp;// date("d,m L Y H:i:s",$tmp);
 	}
 	
 	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)

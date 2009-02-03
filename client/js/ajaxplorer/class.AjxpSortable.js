@@ -4,7 +4,7 @@ AjxpSortable = Class.create(SortableTable, {
 		$super(oTable, oSortTypes, oTHead);
 		this.addSortType( "NumberK", this.replace8a8 );
 		this.addSortType( "NumberKo", this.replace8oa8 );
-		this.addSortType( "MyDate", this.replaceDate );
+		this.addSortType( "MyDate", null, false, this.sortTimes);
 		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
 	},
 
@@ -85,6 +85,12 @@ AjxpSortable = Class.create(SortableTable, {
 			s = '000'+s;
 		}
 		return s.toUpperCase();
-	}	
+	},
+
+	sortTimes : function(oRow, nColumn){
+		if(oRow.ajxp_modiftime){
+			return oRow.ajxp_modiftime;
+		}
+	}
 	
 });

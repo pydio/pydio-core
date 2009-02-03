@@ -42,6 +42,19 @@ function roundSize(filesize, size_unit){
 	return filesize;
 }
 
+function formatDate(dateObject, format){
+	if(!format) format = MessageHash["date_format"];
+	format = format.replace("d", (dateObject.getDate()<10?'0'+dateObject.getDate():dateObject.getDate()));
+	format = format.replace("D", dateObject.getDay());
+	format = format.replace("Y", dateObject.getFullYear());
+	format = format.replace("y", dateObject.getYear());
+	format = format.replace("m", (dateObject.getMonth()<10?'0'+dateObject.getMonth():dateObject.getMonth()));
+	format = format.replace("H", dateObject.getHours());
+	format = format.replace("i", dateObject.getMinutes());
+	format = format.replace("s", dateObject.getSeconds());
+	return format;
+}
+
 function storeRememberData(user, pass){
 	var cookieJar = new CookieJar({
 		expire: 3600*24*10, 

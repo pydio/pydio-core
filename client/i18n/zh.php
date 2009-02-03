@@ -11,6 +11,7 @@
 
 $mess=array(
 "languageLabel" => "Chinese-zhCN.UTF-8",
+"date_format"  => "Y/m/d H:i",
 "0" => "最新版本",
 "1" => "文件名",
 "2" => "大小",

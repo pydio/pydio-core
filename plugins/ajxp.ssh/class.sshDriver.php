@@ -351,7 +351,7 @@ class sshDriver extends AbstractDriver
                         $atts[] = "is_file=\"".(1 - $file["isDir"])."\"";
                         $atts[] = "is_image=\"".Utils::is_image($fileName)."\"";
                         $atts[] = "mimestring=\"".Utils::mimetype($fileName, "type", $file["isDir"]==1)."\"";
-                        $atts[] = "modiftime=\"".$this->dateModif($file["time"])."\"";
+                        $atts[] = "ajxp_modiftime=\"".$this->dateModif($file["time"])."\"";
                         $atts[] = "filesize=\"".Utils::roundSize($file["size"])."\"";
                         $atts[] = "bytesize=\"".$file["size"]."\"";
                         $atts[] = "filename=\"".str_replace("&", "&amp;", $dir."/".$fileName)."\"";
@@ -532,7 +532,7 @@ class sshDriver extends AbstractDriver
 	function dateModif($time)
 	{
 		$tmp = mktime(substr($time, 11, 2), substr($time, 14, 2), 0, substr($time, 5, 2), substr($time, 8, 2), substr($time, 0, 4));
-		return date("d/m/Y H:i",$tmp);
+		return $tmp;//date("d/m/Y H:i",$tmp);
 	}
 	
 	function renameAction($actionName, $httpVars)

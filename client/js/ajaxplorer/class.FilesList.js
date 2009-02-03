@@ -29,7 +29,7 @@ FilesList = Class.create(SelectableElements, {
 		this.columnsDef.push({messageId:1,attributeName:'text'});
 		this.columnsDef.push({messageId:2,attributeName:'filesize'});
 		this.columnsDef.push({messageId:3,attributeName:'mimestring'});
-		this.columnsDef.push({messageId:4,attributeName:'modiftime'});
+		this.columnsDef.push({messageId:4,attributeName:'ajxp_modiftime'});
 		// Associated Defaults
 		this.defaultSortTypes = ["StringDirFile", "NumberKo", "String", "MyDate"];
 		this._oSortTypes = this.defaultSortTypes;
@@ -515,7 +515,12 @@ FilesList = Class.create(SelectableElements, {
 				{
 					AjxpDroppables.add(innerSpan);
 					this.allDroppables[this.allDroppables.length] = innerSpan;
-				}			
+				}
+			}else if(s=="ajxp_modiftime"){
+				var date = new Date();
+				date.setTime(parseInt(xmlNode.getAttribute(s))*1000);
+				newRow.ajxp_modiftime = date;
+				tableCell.innerHTML = formatDate(date);
 			}
 			else
 			{
