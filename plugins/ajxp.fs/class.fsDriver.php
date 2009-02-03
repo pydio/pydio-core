@@ -884,8 +884,12 @@ class fsDriver extends AbstractDriver
 		{
 			$errors = array();
 			$succFiles = array();
-			$dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
-			if(count($errors))
+			if($move){
+				$res = rename($realSrcFile, $destFile);
+			}else{
+				$dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
+			}
+			if(count($errors) || (isSet($res) && $res!==true))
 			{
 				$error[] = $mess[114];
 				return ;
@@ -893,7 +897,11 @@ class fsDriver extends AbstractDriver
 		}
 		else 
 		{
-			$res = copy($realSrcFile,$destFile);
+			if($move){
+				$res = rename($realSrcFile, $destFile);
+			}else{
+				$res = copy($realSrcFile,$destFile);
+			}
 			if($res != 1)
 			{
 				$error[] = $mess[114];
@@ -904,7 +912,7 @@ class fsDriver extends AbstractDriver
 		if($move)
 		{
 			// Now delete original
-			$this->deldir($realSrcFile); // both file and dir
+			// $this->deldir($realSrcFile); // both file and dir
 			$messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
 			if($destDir == "/".$recycle)
 			{
