@@ -301,9 +301,9 @@ switch ($action)
 	break;
 	
 	case "delete_repository" :
-		$repLabel = $_GET["repo_label"];
-		if(get_magic_quotes_gpc()) $repLabel = stripslashes($repLabel);
-		$res = ConfService::deleteRepository($repLabel);
+		$repId = $_GET["repository_id"];
+		//if(get_magic_quotes_gpc()) $repLabel = stripslashes($repLabel);
+		$res = ConfService::deleteRepository($repId);
 		AJXP_XMLWriter::header();
 		if($res == -1){
 			AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
