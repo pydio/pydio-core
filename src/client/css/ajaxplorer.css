@@ -1136,20 +1136,33 @@ UPLOAD MULTIFILE FORM
 /*********************
 ADMIN STYLES
 **********************/
-#users_list
+#users_list,
+#repo_list
 {
-    height: 300px;
+    height: 299px;
     width: 200px;
     float: left;
     padding-top: 5px;
     overflow: auto;
 }
-#users_detail_panel{
+#users_detail_panel, 
+#repo_detail_panel{
 	width: 438px;
     height: 299px;
     float: left;
 	border-left: 1px solid #bbb;
     overflow: auto;
+}
+
+#repo_list{
+    height: 294px;
+}
+
+#repo_detail_panel fieldset
+{
+	margin:10px;
+    font-family: Trebuchet MS, sans-serif;
+    font-size: 13px;	
 }
 
 .users_list_title

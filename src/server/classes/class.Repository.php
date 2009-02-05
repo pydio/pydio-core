@@ -2,6 +2,7 @@
 
 class Repository {
 
+	var $uuid;
 	var $id;
 	var $path;
 	var $display;
@@ -15,11 +16,24 @@ class Repository {
 	function Repository($id, $display, $driver){
 		$this->setAccessType($driver);
 		$this->setDisplay($display);
-		$this->setId($id);		
+		$this->setId($id);
+		$this->uuid = md5(time());
 	}
 	
-	function getUniqueId(){
-		return md5(serialize($this));
+	function upgradeId(){
+		if(!isSet($this->uuid)) {
+			$this->uuid = md5(serialize($this));
+			//$this->uuid = md5(time());
+			return true;
+		}
+		return false;
+	}
+	
+	function getUniqueId($serial=false){
+		if($serial){
+			return md5(serialize($this));
+		}
+		return $this->uuid;
 	}
 	
 	function getClientSettings(){
