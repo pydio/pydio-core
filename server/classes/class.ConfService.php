@@ -104,13 +104,19 @@ class ConfService
 		{
 			$repo = ConfService::createRepositoryFromArray($index, $repository);
 			$repo->setWriteable(false);
-			$objList[$repo->getUniqueId()] = $repo;
+			$objList[$index] = $repo;
 		}
 		$confRepo = ConfService::loadRepoFile();
-		foreach ($confRepo as $repo){			
+		$upgrade = false;
+		foreach ($confRepo as $index => $repo){
+			if($repo->upgradeId()){
+				$confRepo[$index] = $repo;
+				$upgrade = true;
+			}
 			$repo->setWriteable(true);
 			$objList[$repo->getUniqueId()] = $repo;
 		}
+		if($upgrade) ConfService::saveRepoFile($confRepo);
 		return $objList;
 	}
 	
@@ -156,21 +162,56 @@ class ConfService
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 	}
 	
-	function deleteRepository($repoLabel){
+	function getRepositoryById($repoId){
 		$confRepoList = ConfService::loadRepoFile();
-		$newList = array();
 		foreach ($confRepoList as $repo){
-			if($repo->getDisplay() == $repoLabel){
-				continue;
+			if($repo->getUniqueId() == $repoId){
+				return $repo;
 			}
-			$newList[] = $repo;
 		}
-		$res = ConfService::saveRepoFile($newList);
+		return null;
+	}
+	
+	/**
+	 * Replace a repository by an update one.
+	 *
+	 * @param String $oldId
+	 * @param Repository $oRepositoryObject
+	 * @return mixed
+	 */
+	function replaceRepository($oldId, $oRepositoryObject){
+		$confRepoList = ConfService::loadRepoFile();
+		foreach ($confRepoList as $index => $repo){
+			if($repo->getUniqueId() == $oldId){
+				$confRepoList[$index] = $oRepositoryObject ;
+			}
+		}
+		$res = ConfService::saveRepoFile($confRepoList);
 		if($res == -1){
 			return $res;
 		}
-		AJXP_Logger::logAction("Delete Repository", array("repo_name"=>$repoLabel));
+		AJXP_Logger::logAction("Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
 		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
+		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);				
+	}
+	
+	function deleteRepository($repoId){
+		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
+		$newList = array();
+		$found = false;
+		foreach ($G_REPOSITORIES as  $repId => $repo){			
+			if($repId == $repoId){
+				$found = true;
+				continue;
+			}
+			if(!$repo->isWriteable()) continue;
+			$newList[] = $repo;
+		}
+		$res = ConfService::saveRepoFile($newList);
+		if($res == -1 || !$found){
+			return -1;
+		}
+		AJXP_Logger::logAction("Delete Repository", array("repo_id"=>$repoId));
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);		
 	}
 		

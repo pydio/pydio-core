@@ -172,8 +172,8 @@ AdminPageManager = Class.create({
 			}else if(type == 'boolean'){
 				var selectTrue, selectFalse;
 				if(defaultValue){
-					if(defaultValue == "true") selectTrue = true;
-					if(defaultValue == "false") selectFalse = true;
+					if(defaultValue == "true" || defaultValue == "1") selectTrue = true;
+					if(defaultValue == "false" || defaultValue == "0") selectFalse = true;
 				}
 				element = '<input type="radio" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+'> Yes';
 				element = element + '<input type="radio" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"> No';
@@ -209,16 +209,92 @@ AdminPageManager = Class.create({
 		$('repo_list').update('');
 		this.repositories.each(function(pair){
 			var deleteButton = '';
-			if(pair.value){
-				deleteButton = '<img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/button_cancel.png" width="16" height="16" onclick="manager.deleteRepository(\''+pair.key.replace('\'', '\\\'')+'\');return false;" style="cursor:pointer;margin-left: 20px;">';
-			}
-			$('repo_list').insert({"bottom":'<div class="user user_id" style="cursor:default; height:25px; padding-top:0px;"><img align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/32/folder_red.png" width="32" height="32" style="padding:5px;">Repository <b>'+pair.key+'</b>'+deleteButton+'</div>'});
+			var index = pair.key;
+			var xmlNode = pair.value;
+			var item = new Element('div', {className:'user user_id'}).update('<img align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/32/folder_red.png" width="32" height="32" style="padding-right:5px;"><b>'+xmlNode.getAttribute("display")+'</b>');
+			item.observe("click", function(e){
+				$$('div.user').each(function(div){
+					div.setStyle({backgroundColor:"#fff",border:"1px solid #fff",borderWidth:"1 0 1 1"});
+				});
+				item.setStyle({backgroundColor:"#ddd",border:"1px solid #bbb",borderWidth:"1 0 1 1"});
+				this.loadRepository(index);
+			}.bind(this));
+			$('repo_list').insert({"bottom":item});
+		}.bind(this));
+	},
+	
+	loadRepository : function(repId){
+
+		var repo = this.repositories.get(repId);
+		
+		var driverName = repo.getAttribute("accessType");
+		var driver = this.drivers.get(driverName);
+		
+		var labelSet = new Element('fieldset');
+		labelSet.update('<legend>Repository Label</legend>');
+		labelInput = new Element('input', {type:"text", value:repo.getAttribute("display")});
+		labelSave = new Element('input', {type:"button", value:"SAVE"});
+		labelSet.insert(labelInput);
+		labelSet.insert(labelSave);
+		labelSave.observe("click", function(){
+			this.submitForm('edit_repository', new Hash({repository_id:repId,newLabel:labelInput.getValue()}), null, function(){
+				this.loadRepList();
+				this.loadUsers();
+			}.bind(this) );
+		}.bind(this));
+		
+		$('repo_detail_panel').update(labelSet);
+		
+		var fieldset = new Element('fieldset');
+		var form = new Element('div');
+		fieldset.update(new Element('legend').update(driverName.toUpperCase()+' Driver Options'));
+		fieldset.insert({bottom:form});
+		
+		var paramsValues = new Hash();
+		$A(repo.childNodes).each(function(child){
+			if(child.nodeName != 'param') return;
+			paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
 		});
+		
+		this.createParametersInputs(form, driver.get('params'), true, paramsValues);
+
+		var submitButton = new Element("input", {type:"button",value:"SAVE CHANGES"});
+		submitButton.observe("click", function(e){
+			var toSubmit = new Hash();
+			toSubmit.set("repository_id", repId);
+			this.submitParametersInputs(form, toSubmit, 'DRIVER_OPTION_');
+			this.submitForm('edit_repository', toSubmit, null, function(){
+				this.loadRepList();
+				this.loadUsers();
+			}.bind(this));			
+		}.bind(this));
+		fieldset.insert({bottom:new Element('div', {align:'right'}).update(submitButton)});
+		
+		$('repo_detail_panel').insert(fieldset);
+		
+		var writeable = repo.getAttribute("writeable");
+		if(!writeable || writeable != "1") return;
+		
+		var deleteSet = new Element('fieldset').update('<legend>Delete Repository</legend>Check the box to confirm deletion :');
+		var deleteBox = new Element('input', {type:"checkbox"});
+		var deleteButton = new Element('input', {type:"button", value:"Delete"});
+		deleteSet.insert(deleteBox);
+		deleteSet.insert(deleteButton);
+		
+		deleteButton.observe('click', function(){
+			if(!deleteBox.checked) {
+				alert("Please check the box to confirm!");
+				return;
+			}
+			this.deleteRepository(repId);
+		}.bind(this));
+		
+		$('repo_detail_panel').insert(deleteSet);
 	},
 	
 	deleteRepository : function(repLabel){
 		var params = new Hash();
-		params.set('repo_label', repLabel);
+		params.set('repository_id', repLabel);
 		this.submitForm('delete_repository', params, null, function(){
 			this.loadRepList();
 			this.loadUsers();
@@ -554,7 +630,7 @@ AdminPageManager = Class.create({
 			{
 				if(!this.repositories || !repList) this.repositories = new Hash();
 				repList = true;
-				this.repositories.set(childs[i].getAttribute('display'), childs[i].getAttribute('writeable'));
+				this.repositories.set(childs[i].getAttribute('index'), childs[i]);
 			}
 			else if(childs[i].nodeName == "file"){
 				if(!this.logFiles) this.logFiles = new Hash();
