@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------------------------------
 
 require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
@@ -192,7 +193,7 @@ switch ($action)
 				print("<tr><td style=\"width: 45%;\">. ".$rootDirObject->getDisplay()." : </td>");
 				print("<td style=\"width: 55%;\" driver_name=\"".$rootDirObject->getAccessType()."\" repository_id=\"$rootDirId\">");
 				$disabledString = "";
-				if($userObject->isAdmin()) $disabledString = "disabled";
+				//if($userObject->isAdmin()) $disabledString = "disabled";
 				print("Read <input type=\"checkbox\" id=\"chck_".$userId."_".$rootDirId."_read\" onclick=\"manager.changeUserRight(this, '$userId', '$rootDirId', 'read');\" $disabledString ".($userObject->canRead($rootDirId)?"checked":"").">");
 				print("&nbsp;&nbsp;&nbsp;&nbsp;Write <input type=\"checkbox\" id=\"chck_".$userId."_".$rootDirId."_write\" onclick=\"manager.changeUserRight(this, '$userId', '$rootDirId', 'write');\" $disabledString ".($userObject->canWrite($rootDirId)?"checked":"").">");
 				print("</td></tr>");
@@ -246,7 +247,7 @@ switch ($action)
 		$repDef = $_GET;
 		unset($repDef["get_action"]);
 		foreach ($repDef as $key => $value){
-			if(get_magic_quotes_gpc()) $value = stripslashes($value);
+			$value = SystemTextEncoding::magicDequote($value);
 			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0){
 				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
 				unset($repDef[$key]);
@@ -299,6 +300,31 @@ switch ($action)
 		AJXP_XMLWriter::close("repositories");
 		exit(1);
 	break;
+	
+	case "edit_repository" : 
+		$repId = $_GET["repository_id"];
+		$repo = ConfService::getRepositoryById($repId);
+		$res = 0;
+		if(isSet($_GET["newLabel"])){
+			$repo->setDisplay($_GET["newLabel"]);
+			$res = ConfService::replaceRepository($repId, $repo);
+		}else{
+			foreach ($_GET as $key => $value){
+				$value = SystemTextEncoding::magicDequote($value);
+				if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0){
+					 $repo->addOption(substr($key, strlen("DRIVER_OPTION_")), $value);
+				}
+			}
+			ConfService::replaceRepository($repId, $repo);
+		}
+		AJXP_XMLWriter::header();
+		if($res == -1){
+			AJXP_XMLWriter::sendMessage(null, "Error while trying to edit repository");
+		}else{
+			AJXP_XMLWriter::sendMessage("Successfully edited repository", null);
+		}
+		AJXP_XMLWriter::close();		
+		exit(1);
 	
 	case "delete_repository" :
 		$repId = $_GET["repository_id"];

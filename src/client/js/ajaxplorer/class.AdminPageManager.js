@@ -154,7 +154,7 @@ AdminPageManager = Class.create({
 		return false;		
 	},
 	
-	createParametersInputs : function(form, parametersDefinitions, showTip, values){		
+	createParametersInputs : function(form, parametersDefinitions, showTip, values){
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
 			var name = param.get('name');
@@ -162,7 +162,7 @@ AdminPageManager = Class.create({
 			var desc = param.get('description');
 			var mandatory = false;
 			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
-			var defaultValue = param.get('default') || "";
+			var defaultValue = (values?'':(param.get('default') || ""));
 			if(values && values.get(name)){
 				defaultValue = values.get(name);
 			}
@@ -201,6 +201,7 @@ AdminPageManager = Class.create({
 	},
 		
 	loadRepList : function(){
+		$('repo_detail_panel').update('');
 		this.submitForm('repository_list', new Hash());
 	},
 	
@@ -229,22 +230,7 @@ AdminPageManager = Class.create({
 		
 		var driverName = repo.getAttribute("accessType");
 		var driver = this.drivers.get(driverName);
-		
-		var labelSet = new Element('fieldset');
-		labelSet.update('<legend>Repository Label</legend>');
-		labelInput = new Element('input', {type:"text", value:repo.getAttribute("display")});
-		labelSave = new Element('input', {type:"button", value:"SAVE"});
-		labelSet.insert(labelInput);
-		labelSet.insert(labelSave);
-		labelSave.observe("click", function(){
-			this.submitForm('edit_repository', new Hash({repository_id:repId,newLabel:labelInput.getValue()}), null, function(){
-				this.loadRepList();
-				this.loadUsers();
-			}.bind(this) );
-		}.bind(this));
-		
-		$('repo_detail_panel').update(labelSet);
-		
+				
 		var fieldset = new Element('fieldset');
 		var form = new Element('div');
 		fieldset.update(new Element('legend').update(driverName.toUpperCase()+' Driver Options'));
@@ -270,10 +256,26 @@ AdminPageManager = Class.create({
 		}.bind(this));
 		fieldset.insert({bottom:new Element('div', {align:'right'}).update(submitButton)});
 		
-		$('repo_detail_panel').insert(fieldset);
+		$('repo_detail_panel').update(fieldset);
 		
 		var writeable = repo.getAttribute("writeable");
 		if(!writeable || writeable != "1") return;
+		
+		var labelSet = new Element('fieldset');
+		labelSet.update('<legend>Repository Label</legend>');
+		labelInput = new Element('input', {type:"text", value:repo.getAttribute("display")});
+		labelSave = new Element('input', {type:"button", value:"SAVE"});
+		labelSet.insert(labelInput);
+		labelSet.insert(labelSave);
+		labelSave.observe("click", function(){
+			this.submitForm('edit_repository', new Hash({repository_id:repId,newLabel:labelInput.getValue()}), null, function(){
+				this.loadRepList();
+				this.loadUsers();
+			}.bind(this) );
+		}.bind(this));
+		
+		$('repo_detail_panel').insert({top:labelSet});
+		
 		
 		var deleteSet = new Element('fieldset').update('<legend>Delete Repository</legend>Check the box to confirm deletion :');
 		var deleteBox = new Element('input', {type:"checkbox"});
