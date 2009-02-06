@@ -61,7 +61,7 @@ User = Class.create({
 		return this.repoSearchEngines.get(repoId);
 	},
 	
-	savePreferences : function(oldPass, newPass, onCompleteFunc){
+	savePreferences : function(oldPass, newPass, seed, onCompleteFunc){
 		var conn = new Connexion();
 		conn.addParameter("get_action", "save_user_pref");
 		var i=0;
@@ -75,6 +75,7 @@ User = Class.create({
 			conn.addParameter("pref_name_"+i, "password");
 			conn.addParameter("pref_value_"+i, newPass);
 			conn.addParameter("crt", oldPass);
+			conn.addParameter("pass_seed", seed);
 		}
 		conn.onComplete = onCompleteFunc;
 		conn.sendAsync();

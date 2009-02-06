@@ -1,5 +1,6 @@
 js/lib/prototype/prototype.js
 js/lib/ufo/ufo.js
+js/lib/md5/md5.js
 js/lib/webfx/slider/js/timer.js
 js/lib/webfx/slider/js/range.js
 js/lib/prototype/webfx.selectable.js

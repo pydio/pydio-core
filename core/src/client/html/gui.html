@@ -39,6 +39,7 @@
 <script language="javascript" type="text/javascript">var dynamicLibLoading = false;</script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/prototype.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/ufo/ufo.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/md5/md5.js"></script>
 
 
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/slider/js/timer.js"></script>
@@ -107,6 +108,7 @@
 <!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
 <form id="login_form" action="login" style="display:none;" box_width="210">
 <input type="hidden" name="get_action" value="login">
+<input type="hidden" name="login_seed" id="login_seed" value="">
 <div class="dialogLegend" style="margin-bottom: 7px;" ajxp_message_id="180"><?php print($mess[180]);?></div>
 <table cellpadding="3" border="0" cellspacing="0" style="font-size:11px;">
 <tr><td align="right"><ajxp_message ajxp_message_id="181"><?php print($mess[181]);?></ajxp_message> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
@@ -132,6 +134,7 @@ foreach ($langs as $lang => $display)
 </fieldset>
 <?php if(AuthService::changePasswordEnabled()){ ?>
 <fieldset><legend><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/yast_security.png" align="absmiddle" border="0" width="16" height="16"> <ajxp_message ajxp_message_id="194"><?php print($mess[194]);?></ajxp_message></legend>
+<input type="hidden" name="pass_seed" id="pass_seed" value="">
 <table cellpadding="2" cellspacing="0" border="0" style="font-size:11px;">
 	<tr>
 		<td align="right" style="width:90px; text-align:right;"><ajxp_message ajxp_message_id="237"><?php print($mess[237]);?></ajxp_message></td><td><input type="password" id="user_change_ownpass_old" value=""></td>
