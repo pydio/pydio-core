@@ -62,7 +62,7 @@ class AJXP_ClientDriver extends AbstractDriver
 				exit(0);	
 				
 			break;
-			
+						
 			//------------------------------------
 			//	GET I18N MESSAGES
 			//------------------------------------
@@ -144,7 +144,7 @@ class AJXP_ClientDriver extends AbstractDriver
 					}
 					else
 					{
-						if(isSet($_GET["crt"]) && AuthService::checkPassword($userObject->getId(), $_GET["crt"])){
+						if(isSet($_GET["crt"]) && AuthService::checkPassword($userObject->getId(), $_GET["crt"], false, $_GET["pass_seed"])){
 							AuthService::updatePassword($userObject->getId(), $prefValue);
 						}else{
 							//$errorMessage = "Wrong password!";

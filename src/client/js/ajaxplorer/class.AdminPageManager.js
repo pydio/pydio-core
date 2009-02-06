@@ -420,7 +420,7 @@ AdminPageManager = Class.create({
 		}
 		parameters = new Hash();
 		parameters.set('user_id', userId);
-		parameters.set('user_pwd', newPass.value);
+		parameters.set('user_pwd', hex_md5(newPass.value));
 		this.submitForm('update_user_pwd', parameters, null);
 		newPass.value = '';
 		newPassConf.value = '';
