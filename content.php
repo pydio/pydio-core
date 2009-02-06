@@ -40,6 +40,11 @@ if(AuthService::usersEnabled())
 {
 	$rememberLogin = "";
 	$rememberPass = "";
+	if(isset($_GET["get_action"]) && $_GET["get_action"] == "get_seed"){
+		header("Content-type:text/plain; charset:UTF-8");
+		print AuthService::generateSeed();				
+		exit(0);
+	}	
 	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "logout")
 	{
 		AuthService::disconnect();
@@ -51,10 +56,10 @@ if(AuthService::usersEnabled())
 		$userPass = (isSet($_GET["password"])?$_GET["password"]:null);
 		$rememberMe = ((isSet($_GET["remember_me"]) && $_GET["remember_me"] == "on")?true:false);
 		$cookieLogin = (isSet($_GET["cookie_login"])?true:false); 
-		$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin);
+		$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $_GET["login_seed"]);
 		if($rememberMe && $loggingResult == 1){
 			$rememberLogin = $userId;
-			$rememberPass = AuthService::encodePassword($userPass);
+			$rememberPass =  AuthService::encodeCookiePass($userId);
 		}
 	}
 	else 

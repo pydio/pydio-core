@@ -12,6 +12,20 @@ class AuthService
 		return (AUTH_MODE == "ajaxplorer");
 	}
 	
+	function generateSeed(){
+		$seed = md5(time());
+		$_SESSION["AJXP_CURRENT_SEED"] = $seed;
+		return $seed;
+	}
+	
+	function encodeCookiePass($user, $pass = null){
+		if($pass == null){
+			$users = AuthService::loadLocalUsersList();
+			$pass = $users[$user];
+		}
+		return md5($user.":".$pass.":ajxp");
+	}
+		
 	function getLoggedUser()
 	{
 		if(isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
@@ -55,7 +69,7 @@ class AuthService
 		}
 	}
 	
-	function logUser($user_id, $pwd, $bypass_pwd = false, $encodedPwd = false)
+	function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{
 		if($user_id == null)
 		{
@@ -76,7 +90,7 @@ class AuthService
 		// CHECK USER PASSWORD HERE!
 		if(!AuthService::userExists($user_id)) return 0;
 		if(!$bypass_pwd){
-			if(!AuthService::checkPassword($user_id, $pwd, $encodedPwd)) return -1;
+			if(!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) return -1;
 		}
 		$user = new AJXP_User($user_id);
 		if($user->isAdmin())
@@ -134,27 +148,28 @@ class AuthService
 	}
 	
 	function encodePassword($pass){
-		return crypt($pass, "ajxp");
+		return md5($pass);
 	}
 	
-	function checkPassword($userId, $userPass, $encodedPass = false)
+	function checkPassword($userId, $userPass, $encodedPass = false, $returnSeed = "")
 	{
 		if($userId == "guest") return true;		
 		$users = AuthService::loadLocalUsersList();
-		if(!$encodedPass){
-			$cPass = AuthService::encodePassword($userPass);
+		if(!array_key_exists($userId, $users)) return false;
+		if($encodedPass){			
+			return (AuthService::encodeCookiePass($userId, $users[$userId]) == $userPass);
 		}else{
-			$cPass = $userPass;
-		}
-		if(!array_key_exists($userId, $users) || $users[$userId] != $cPass) return false;
-		else return true;
+			$seed = $_SESSION["AJXP_CURRENT_SEED"];
+			if($seed != $returnSeed) return false;
+			return (md5($users[$userId].''.$returnSeed) == $userPass);
+		}		
 	}
 	
 	function updatePassword($userId, $userPass)
 	{
 		$users = AuthService::loadLocalUsersList();
 		if(!is_array($users) || !array_key_exists($userId, $users)) return "Error!";
-		$users[$userId] = AuthService::encodePassword($userPass);
+		$users[$userId] = $userPass; // AuthService::encodePassword($userPass); it is already encoded
 		AuthService::saveLocalUsersList($users);
 		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
 		return true;
