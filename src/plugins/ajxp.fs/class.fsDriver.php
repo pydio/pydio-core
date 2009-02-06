@@ -37,7 +37,7 @@ class fsDriver extends AbstractDriver
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
-			$$getName = Utils::securePath($getValue);
+			$$getName = Utils::securePath(SystemTextEncoding::magicDequote($getValue));
 		}
 		$selection = new UserSelection();
 		$selection->initFromHttpVars($httpVars);
@@ -118,10 +118,12 @@ class fsDriver extends AbstractDriver
 					if(isSet($get_thumb) && $get_thumb == "true" && GENERATE_THUMBNAIL){
 						require_once("server/classes/PThumb.lib.php");
 						$pThumb = new PThumb();
-						$pThumb->use_cache = USE_THUMBNAIL_CACHE;
-						$pThumb->cache_dir = INSTALL_PATH."/".THUMBNAIL_CACHE_DIR;
-						$pThumb->fit_thumbnail($this->getPath()."/".SystemTextEncoding::fromUTF8($file), 200);
-						exit(0);
+						if(!$pThumb->isError()){
+							$pThumb->use_cache = USE_THUMBNAIL_CACHE;
+							$pThumb->cache_dir = INSTALL_PATH."/".THUMBNAIL_CACHE_DIR;
+							$pThumb->fit_thumbnail($this->getPath()."/".SystemTextEncoding::fromUTF8($file), 200);
+							exit(0);
+						}
 					}
 					
 					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "image");
@@ -561,7 +563,7 @@ class fsDriver extends AbstractDriver
 	}
 	
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
-	{
+	{		
 		$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
 		if(!$data && $size < 0){
 			// fix files above 2Gb 
@@ -591,7 +593,7 @@ class fsDriver extends AbstractDriver
 		else 
 		{
 			//$size=filesize($filePathOrData);
-			//if($localName == "") $localName = basename($filePathOrData);
+			//if($localName == "") $localName = basename($filePathOrData);			
 			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
 			if($gzip){

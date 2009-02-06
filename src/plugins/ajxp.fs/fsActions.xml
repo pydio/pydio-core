@@ -688,7 +688,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,modiftime">
+		<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,modiftime">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="size_string" id="127"/>
@@ -699,7 +699,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<html><![CDATA[
 				<div style="padding:10px;">
 					<center style="border:1px solid #aaa; margin-bottom: 5px;">
-						<img src="content.php?action=image_proxy&get_thumb=true&file=#{filename}" #{compute_image_dimensions}>
+						<img src="content.php?action=image_proxy&get_thumb=true&file=#{encoded_filename}" #{compute_image_dimensions}>
 					</center>
 					<b>#{name_string}</b> : #{basename}
 					<br><b>#{dim_string}</b> : #{image_width}px X #{image_height}px
@@ -709,7 +709,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,encoded_filename,icon,filesize,mimestring,modiftime">
+		<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,escaped_filename,icon,filesize,mimestring,modiftime">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="size_string" id="127"/>
@@ -719,7 +719,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<html><![CDATA[
 				<div style="padding:10px;">
 					<div id="mp3_container" style="text-align:center; padding:5px; width:160px;margin-bottom: 5px;">
-						<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{encoded_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{encoded_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
+						<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
 					</div>
 					<b>#{name_string}</b> : #{basename}
 					<br><b>#{size_string}</b> : #{filesize}
@@ -728,7 +728,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="flv" attributes="basename,encoded_filename,icon,filesize,mimestring,modiftime,uri">
+		<infoPanel mime="flv" attributes="basename,escaped_filename,icon,filesize,mimestring,modiftime,uri">
 			<html><![CDATA[
 				<div style="padding:10px;">
 					<center style="border:1px solid #aaa; margin-bottom: 5px;">
@@ -737,8 +737,8 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						<param name="allowScriptAccess" value="always">
 						<param name="quality" value="high">
 						<param name="allowFullScreen" value="true">
-						<param name="FlashVars" value="fpFileURL=#{uri}/content.php?action=download%26file=#{encoded_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10">
-						<embed src="AJXP_CLIENT_RESOURCES_FOLDER/flash/mcmp.swf" width="100%" height="200" quality="high" allowFullScreen="true" allowscriptaccess="always" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" FlashVars="fpFileURL=#{uri}/content.php?action=download%26file=#{encoded_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10"></embed>
+						<param name="FlashVars" value="fpFileURL=#{uri}/content.php?action=download%26file=#{escaped_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10">
+						<embed src="AJXP_CLIENT_RESOURCES_FOLDER/flash/mcmp.swf" width="100%" height="200" quality="high" allowFullScreen="true" allowscriptaccess="always" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" FlashVars="fpFileURL=#{uri}/content.php?action=download%26file=#{escaped_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10"></embed>
 					</object>
 					</center>
 				</div>

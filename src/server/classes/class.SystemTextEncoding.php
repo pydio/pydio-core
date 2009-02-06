@@ -47,7 +47,7 @@ class SystemTextEncoding
     function magicDequote($text)
     {
 	    // If the PHP server enables magic quotes, remove them
-	    if (get_magic_quotes_gpc() == 1)
+	    if (get_magic_quotes_gpc())
 	        return stripslashes($text);
 	    return $text;  
     }
