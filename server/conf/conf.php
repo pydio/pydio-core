@@ -31,6 +31,8 @@ define("AUTH_MODE_REMOTE_PASSWORD", ""); //
 define("AUTH_MODE_REMOTE_PORT", 80); // 
 define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); // 
 
+define("HTTPS_POLICY_FILE", "");
+
 /* 
 /* BASIC REPOSITORY CONFIGURATION.
 /* Use the GUI to add new repositories to explore!
