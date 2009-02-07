@@ -407,9 +407,11 @@ ACTION BAR
 {
 	margin-top: -10px;
 	height: 52px;
+	/*
     background-image : url('../images/GradientBg.gif');
     background-repeat : repeat-x;
     background-position: top;	
+    */
 }
 
 #buttons_bar, #locationbar_cont
@@ -441,6 +443,12 @@ padding-top:0px;
 text-align:center;
 width:48px;
 overflow:visible;
+}
+
+.action_bar a
+{
+	color:#084165!important;
+	color: expression('#084165');
 }
 
 #action_bar a:hover, 

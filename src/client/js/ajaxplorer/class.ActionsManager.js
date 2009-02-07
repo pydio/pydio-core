@@ -415,12 +415,16 @@ ActionsManager = Class.create({
 				}
 				else if(result == '0' || result == '-1')
 				{
-					// Update Form!
-					alert('User does not exists, please try again');
+					// Update Form!					
+					alert(MessageHash[285]);
 				}
 				else if(result == '2')
 				{					
 					ajaxplorer.getLoggedUserFromServer();
+				}
+				else if(result == '-2')
+				{
+					alert(MessageHash[286]);
 				}
 			}else if(childs[i].tagName == "trigger_bg_action"){
 				var name = childs[i].getAttribute("name");
