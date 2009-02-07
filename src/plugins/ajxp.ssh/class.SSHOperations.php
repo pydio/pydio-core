@@ -198,6 +198,34 @@ class SSHOperations
         pclose($handle);
         return $writtenSize == strlen($content);
     }
+    
+    /** Execute the given command, expecting only to write input to the command
+        @param $server     The server to contact
+        @param $account    The account to use while connecting on the remote server
+        @param $password   The account password to use while connecting on the remote server
+        @param $command    The command to execute (must be full command and valid on the remote side)
+        @param $filePointer  A pointer on a file that'll be read and sent to the remote side (the file is closed on output)
+        @return the command output text */
+    function executeRemoteTransfering($server, $account, $password, $command, $filePointer)
+    {
+        $fileName = __FILE__;
+        $fileName = substr($fileName, 0, strrpos($fileName, "/"));
+        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ssh ".$account."@".$server." ".$command;
+        $handle = popen($finalCommand, "w");
+        $writtenSize = 0;
+        if (is_resource($handle))
+        {
+            while (!feof($filePointer))
+            {
+                $content = @fread($filePointer, 1024);
+                $writtenSize += @fwrite($handle, $content);
+            }
+        }
+        pclose($handle);
+        fclose($filePointer);
+        return $writtenSize;
+    }
+                                                                                                                                                                                                                            
 /*
     function remoteCommand
         while (!feof($handle))
@@ -254,7 +282,7 @@ class SSHOperations
     function checkConnection()
     {
         $pwd = $this->executeRemoteCommand($this->server, $this->account, $this->password, "pwd");
-        $charset = $this->executeRemoteCommand($this->server, $this->account, $this->password, $this->getCharsetCommand);
+        $charset = $this->executeRemoteCommand($this->server, $this->account, $this->password, $this->getServerCharsetCommand);
         $pwd = trim($pwd); $charset = trim($charset);
         $retArray = array($pwd, $charset);
         return $retArray;
@@ -300,7 +328,7 @@ class SSHOperations
         {
             // Need to get an archive here
             $command = $this->copyCommand.implode($pathToFile, " ");
-            return $this->executeRemoteCommand($this->server, $this->account, $this->password, '"'.$command.'"');
+            return $this->executeRemoteCommand($this->server, $this->account, $this->password, '"'.$command." ".$finalPath.'"');
         } else
         {
             // Single file download
@@ -337,6 +365,17 @@ class SSHOperations
             return $this->executeRemoteCommand($this->server, $this->account, $this->password, '"'.$this->deleteCommand.$pathToFile.'"');
         }
     }
+    
+    /** Upload a file in the given server */
+    function uploadFile($localFile, $pathToFile)
+    {
+        $command = '"'.$this->setFileCommand.str_replace('"', '\\"', $pathToFile).'"';
+        $fileSize = @filesize($localFile);
+        if ($fileSize === FALSE) return false;
+        $filePointer = @fopen($localFile, "rb");
+        return $this->executeRemoteTransfering($this->server, $this->account, $this->password, $command, $filePointer) == $fileSize;
+    }
+                                                        
 }
 
 ?>
