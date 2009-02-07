@@ -114,8 +114,8 @@ Diaporama = Class.create({
 		$A(allItems).each(function(rowItem){
 			if(rowItem.getAttribute('is_image')=='1'){
 				this.items.push(rowItem.getAttribute('filename'));
-				this.sizes.set(rowItem.getAttribute('filename'),  {height:rowItem.getAttribute('image_height'), 
-															   width:rowItem.getAttribute('image_width')});
+				this.sizes.set(rowItem.getAttribute('filename'),  {height:rowItem.getAttribute('image_height')||'n/a', 
+															   width:rowItem.getAttribute('image_width')||'n/a'});
 			}
 		}.bind(this));	
 		
@@ -137,11 +137,6 @@ Diaporama = Class.create({
 		this.updateImage();
 		this.updateButtons();
 		if(DiaporamaFirstOccurence){
-			/*
-			$$(".action_bar a").each(function(el){
-				new Effect.Corner(el, "round 8px");
-			});
-			*/
 			DiaporamaFirstOccurence = false;
 		}
 	},
@@ -225,9 +220,16 @@ Diaporama = Class.create({
 		var dimObject = this.sizes.get(this.currentFile);
 		this.crtHeight = dimObject.height;
 		this.crtWidth = dimObject.width;
-		this.crtRatio = this.crtHeight / this.crtWidth;
+		if(this.crtWidth){
+			this.crtRatio = this.crtHeight / this.crtWidth;
+		}
 		this.downloadButton.addClassName("disabled");
-		this.imgTag.src  = this.baseUrl + this.currentFile;			
+		this.imgTag.src  = this.baseUrl + this.currentFile;
+		if(!this.crtWidth && !this.crtHeight){
+			this.crtWidth = this.imgTag.getWidth();
+			this.crtHeight = this.imgTag.getHeight();
+			this.crtRatio = this.crtHeight / this.crtWidth;
+		}
 	},
 
 	fitToScreen : function(){
