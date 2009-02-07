@@ -8,6 +8,7 @@ class SystemTextEncoding
 		// Due to iconv bug when dealing with text with non ASCII encoding for last char, we use this workaround http://fr.php.net/manual/fr/function.iconv.php#81494
 		if(function_exists("iconv"))
 		{
+		    
 			return iconv($inputCharset, $outputCharset, $text);
 		}else
 		{
@@ -22,7 +23,7 @@ class SystemTextEncoding
 		if (is_numeric($encoding))
 		{
 			$encoding = "windows-".$encoding;
-		} else if ($currentLocale == "C")
+		} else if ($locale == "C")
 		{   // Locale not set correctly, most probable error cause is /etc/init.d/apache having "LANG=C" defined
 			// In any case, "C" is ASCII-7 bit so it's safe to use the extra bit as if it was UTF-8 
 			$encoding = "UTF-8";
@@ -33,7 +34,7 @@ class SystemTextEncoding
 	function getEncoding(){
 	       global $_SESSION;
 	       // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
-	       if (isset($_SESSION["charset"])) return $_SESSION["charset"];
+	       if (isset($_SESSION["charset"]) && strlen($_SESSION["charset"])) return $_SESSION["charset"];
 	       // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
 	       return SystemTextEncoding::parseCharset(setlocale(LC_CTYPE, 0));
 	}

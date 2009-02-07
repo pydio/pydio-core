@@ -32,18 +32,30 @@ class sshDriver extends AbstractDriver
             $repositoryPath = substr($repositoryPath, $accountLimit+1);
             $repository->setOption("PATH", $repositoryPath);            
         }
-        // TODO Set the password from a per user specific config
-        $account = "ajaxplorer";
-        $password = "dumbpass";
+        // Set the password from a per user specific config
+        $account = "ajaxplorer";//$this->getUserName();
+        $password = "dumbpass"; //$this->getPassword();
         $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);
 		parent::AbstractDriver($driverName, $filePath, $repository);
 	}
+
+    function getUserName(){
+        $logUser = AuthService::getLoggedUser(); 
+        $wallet = $logUser->getPref("wallet");
+        return $wallet[$this->repository->getUniqueId()]["remote_username"];
+    }
+
+    function getPassword(){
+        $logUser = AuthService::getLoggedUser(); 
+        $wallet = $logUser->getPref("wallet");
+        return $wallet[$this->repository->getUniqueId()]["remote_password"];
+    }
 	
 	function initRepository(){
 		$path = $this->repository->getOption("PATH");
 		// We cache this in the session object so it's only done once
 		global $_SESSION;
-		if (!isset($_SESSION["cwd"]))
+		if (!isset($_SESSION["cwd"]) || !strlen($_SESSION["cwd"]))
 		{
  		    $param = $this->SSHOperation->checkConnection();
 		    if (count($param)==0)
@@ -51,7 +63,8 @@ class sshDriver extends AbstractDriver
 		        return new AJXP_Exception("Cannot connect to remote server. Please check repository configuration and install.txt!");
 		    }
 		    $_SESSION["cwd"] = trim($param[0]);
-		    $_SESSION["charset"] = trim($param[1]);
+		    $fullCharset = explode('.', trim($param[1]));
+		    $_SESSION["charset"] = array_pop($fullCharset);
 		}
 		// If it's set, then cache the result to avoid multiple connection on the remote server 
 		$this->serverCwd = rtrim(trim($_SESSION["cwd"]), '/').'/';
@@ -62,7 +75,7 @@ class sshDriver extends AbstractDriver
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
-			$$getName = Utils::securePath($getValue);
+			$$getName = Utils::securePath(SystemTextEncoding::magicDequote($getValue));
 		}
 		$selection = new UserSelection();
 		$selection->initFromHttpVars($httpVars);
@@ -154,19 +167,25 @@ class sshDriver extends AbstractDriver
 					$errorMessage = $mess[113];
 					break;
 				}
-				$success = $error = array();
 				
+				$result = "";
 				if ($action == "move")
-				    $this->SSHOperation->moveFile($this->makeName($selection->getFiles()), $this->makeName($dest));
+				    $result = $this->SSHOperation->moveFile($this->makeName($selection->getFiles()), $this->makeName($dest));
 				else
-				    $this->SSHOperation->copyFile($this->makeName($selection->getFiles()), $this->makeName($dest));
+				    $result = $this->SSHOperation->copyFile($this->makeName($selection->getFiles()), $this->makeName($dest));
 				
-				if(count($error)){
-					$errorMessage = join("\n", $error);
-				}
-				else {
-					$logMessage = join("\n", $success);
-					AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
+				{
+				    $mess = ConfService::getMessages();
+				    if(strlen($result))
+				    {
+					    $errorMessage = $mess[114];
+				    }
+   				    else 
+				    {
+					    foreach($selection->getFiles() as $files)
+                            $logMessage .= $mess[34]." ".SystemTextEncoding::toUTF8(basename($file))." ".$mess[$action=="move" ? 74:73]." ".SystemTextEncoding::toUTF8($dest)."\n";
+					    AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
+				     }
 				}
 				$reload_current_node = true;
 				if(isSet($dest_node)) $reload_dest_node = $dest_node;
@@ -185,9 +204,17 @@ class sshDriver extends AbstractDriver
 					break;
 				}
 				$logMessages = array();
-				$errorMessage = $this->SSHOperation->deleteFile($this->makeName($selection->getFiles()));
-				if(count($logMessages))
+				$result = $this->SSHOperation->deleteFile($this->makeName($selection->getFiles()));
+				if(strlen($result))
 				{
+				    $mess = ConfService::getMessages();
+                    $errorMessage = $mess[120];				 
+				}   
+				else
+				{   
+				    $mess = ConfService::getMessages();
+				    foreach($selection->getFiles() as $file)
+				        $logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($file)." $mess[44].";
 					$logMessage = join("\n", $logMessages);
 				}
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
@@ -257,66 +284,53 @@ class sshDriver extends AbstractDriver
 			//	UPLOAD
 			//------------------------------------	
 			case "upload":
-                $errorMessage="411 Error";
-                break;
-                /*
-				if($dir!=""){$rep_source="/$dir";}
-				else $rep_source = "";
-				$destination=SystemTextEncoding::fromUTF8($this->getPath().$rep_source);
-				if(!$this->isWriteable($destination))
-				{
-					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
-					break;
-				}	
-				$logMessage = "";
-				$fancyLoader = false;
-				foreach ($fileVars as $boxName => $boxData)
-				{
-					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
-					if($boxName == "Filedata") $fancyLoader = true;
-					$err = Utils::parseFileDataErrors($boxData, $fancyLoader);
-					if($err != null)
-					{
-						$errorMessage = $err;
-						break;
-					}
-					$userfile_name = $boxData["name"];
-					if($fancyLoader) $userfile_name = SystemTextEncoding::fromUTF8($userfile_name);
-					$userfile_name=Utils::processFileName($userfile_name);
-					if(isSet($auto_rename)){
-						$userfile_name = sshFSDriver::autoRenameForDest($destination, $userfile_name);
-					}
-					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
-					{
-						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
-						break;
-					}
-					chmod($destination."/".$userfile_name, 0777);
-					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
-					AJXP_Logger::logAction("Upload File", array("file"=>$dir."/".$userfile_name));
-				}
-				if($fancyLoader)
-				{
-					if(isSet($errorMessage)){
-						header('HTTP/1.0 '.$errorMessage);
-						die('Error '.$errorMessage);
-					}else{
-						header('HTTP/1.0 200 OK');
-						die("200 OK");
-					}
-				}
-				else
-				{
-					print("<html><script language=\"javascript\">\n");
-					if(isSet($errorMessage)){
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-					}else{		
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
-					}
-					print("</script></html>");
-				}
-				exit;
-				*/
+                if($dir!=""){$rep_source="/$dir";}
+                else $rep_source = "";
+                $destination = $rep_source;
+                $logMessage = "";
+                $fancyLoader = false;
+                foreach ($fileVars as $boxName => $boxData)
+                {
+                    if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_") continue;
+                    if($boxName == "Filedata") $fancyLoader = true;
+                    $err = Utils::parseFileDataErrors($boxData, $fancyLoader);
+                    if($err != null)
+                    {
+                        $errorMessage = $err;
+                        break;
+                    }
+                    $userfile_name = $boxData["name"];
+                    $userfile_name=Utils::processFileName($userfile_name);
+                    if (!$this->SSHOperation->uploadFile($boxData["tmp_name"], $this->makeName($destination."/".$userfile_name)))
+                    {
+                        $errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
+                        break;
+                    }
+                    $logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
+                    AJXP_Logger::logAction("Upload File", array("file"=>$dir."/".$userfile_name));
+                }
+                if($fancyLoader)
+                {
+                    if(isSet($errorMessage)){
+                        header('HTTP/1.0 '.$errorMessage);
+                        die('Error '.$errorMessage);
+                    }else{
+                        header('HTTP/1.0 200 OK');
+                        die("200 OK");
+                    }
+                }
+                else
+                {
+                    print("<html><script language=\"javascript\">\n");
+                    if(isSet($errorMessage)){
+                        print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");
+                    }else{
+                        print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+                    }
+                    print("</script></html>");
+                }
+                exit;
+                                                                                 
 			break;
 			
 			//------------------------------------
@@ -491,7 +505,7 @@ class sshDriver extends AbstractDriver
 		$size = strlen($filePath);
 		if($headerType == "plain")
 		{
-			header("Content-type:text/plain");			
+			header("Content-type:text/plain");
 		}
 		else if($headerType == "image")
 		{
