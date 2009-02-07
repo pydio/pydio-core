@@ -111,11 +111,22 @@ $max_caracteres=50;
 
 $showhidden=0;
 
-// THUMBNAIL MANAGEMENT (FS DRIVER)
+/************************************/
+/* THUMBNAIL MANAGEMENT (FS DRIVER) */
+/************************************/
 define("GENERATE_THUMBNAIL", true);
+// "Quality" parameter (defaults is 3). Fractional values are allowed, for example 1.5. Must be greater than zero.
+// Between 0 and 1 = Fast, but mosaic results, closer to 0 increases the mosaic effect.
+// 1 = Up to 350 times faster. Poor results, looks very similar to imagecopyresized.
+// 2 = Up to 95 times faster.  Images appear a little sharp, some prefer this over a quality of 3.
+// 3 = Up to 60 times faster.  Will give high quality smooth results very close to imagecopyresampled, just faster.
+// 4 = Up to 25 times faster.  Almost identical to imagecopyresampled for most images.
+// 5 = No speedup. Just uses imagecopyresampled, no advantage over imagecopyresampled.
+define("THUMBNAIL_QUALITY", 1);
+// Whether they are stored in a cache dir. At the moment, there is no mechanism for clearing the cache
+// So if you use it, it will be faster for the users, but the cache repository will increase size without stoping.
 define("USE_THUMBNAIL_CACHE", false);
 define("THUMBNAIL_CACHE_DIR", "server/tmp/"); // Must end with a slash!
-
 
 
 
