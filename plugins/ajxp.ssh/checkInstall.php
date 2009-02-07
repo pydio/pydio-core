@@ -61,11 +61,13 @@ if ($_GET["destServer"] == "")
    echo "<form method=GET>Please enter SSH server address to test:<input type=text name='destServer' value=''><input type='submit' value='Ok'></form>";
 } else
 { 
-   $handle = popen("export DISPLAY=xxx && export SSH_ASKPASS=/bin/sh && ssh -T -t -o StrictHostKeyChecking=yes ".$_GET["destServer"]." 2>&1", "r");
+   $handle = popen("export DISPLAY=xxx && export SSH_ASKPASS=/bin/sh && ssh -T -t -o StrictHostKeyChecking=yes -o LogLevel=QUIET".$_GET["destServer"]." 2>&1", "r");
    $key = fread($handle, 30);
-   if (strpos($key, "ould") == 1)
+   if (strpos($key, "Host") == 1)
+   {
       echo "ERROR: The server ".$_GET["destServer"]." you are trying to contact doesn't have its host key installed<br>
       Please install server host key in /etc/ssh/ssh_known_hosts file, as the webserver user can't store server's key";
+   }
    else
       echo "Server host key installed and working";   
    pclose($handle);
