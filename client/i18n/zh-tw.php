@@ -316,6 +316,8 @@ $mess=array(
 "281" => "限制",
 "282" => "每個檔案大小",
 "283" => "總計大小",
-"284" => "檔案數目"
+"284" => "檔案數目",
+"285" => "Cannot find user, please try again.\\n Make sur your Caps Lock is not engaged!",
+"286" => "Your user is out of date with the current version, please use the upgrade procedure."
 );
 ?>

@@ -317,6 +317,8 @@ $mess=array(
 "281" => "Limit",
 "282" => "Größe pro Datei",
 "283" => "Gesamtgröße",
-"284" => "Dateinummer"
+"284" => "Dateinummer",
+"285" => "Cannot find user, please try again.\\n Make sur your Caps Lock is not engaged!",
+"286" => "Your user is out of date with the current version, please use the upgrade procedure."
 );
 ?>
