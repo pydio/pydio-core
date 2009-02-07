@@ -90,7 +90,14 @@ class AuthService
 		// CHECK USER PASSWORD HERE!
 		if(!AuthService::userExists($user_id)) return 0;
 		if(!$bypass_pwd){
-			if(!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) return -1;
+			if(!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)){
+				// Check upgrade
+				$user = new AJXP_User($userId);
+				if($user->getVersion() != "2.4"){
+					return -2;
+				}				
+				return -1;
+			}
 		}
 		$user = new AJXP_User($user_id);
 		if($user->isAdmin())

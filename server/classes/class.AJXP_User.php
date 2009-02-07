@@ -7,6 +7,7 @@ class AJXP_User
 	var $rights;
 	var $prefs;
 	var $bookmarks;
+	var $version;
 	
 	function AJXP_User($id){
 		$this->id = $id;
@@ -15,6 +16,15 @@ class AJXP_User
 	
 	function getId(){
 		return $this->id;
+	}
+	
+	function getVersion(){
+		if(!isSet($this->version)) return "";
+		return $this->version;
+	}
+	
+	function setVersion($v){
+		$this->version = $v;
 	}
 	
 	function isAdmin(){
