@@ -317,6 +317,8 @@ $mess=array(
 "281" => "Limites",
 "282" => "Taille Fichier",
 "283" => "Taille Totale",
-"284" => "Nb. Fichiers"
+"284" => "Nb. Fichiers",
+"285" => "Cannot find user, please try again.\\n Make sur your Caps Lock is not engaged!",
+"286" => "Your user is out of date with the current version, please use the upgrade procedure."
 );
 ?>
