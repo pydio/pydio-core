@@ -49,9 +49,9 @@ function formatDate(dateObject, format){
 	format = format.replace("Y", dateObject.getFullYear());
 	format = format.replace("y", dateObject.getYear());
 	format = format.replace("m", (dateObject.getMonth()<10?'0'+dateObject.getMonth():dateObject.getMonth()));
-	format = format.replace("H", dateObject.getHours());
-	format = format.replace("i", dateObject.getMinutes());
-	format = format.replace("s", dateObject.getSeconds());
+	format = format.replace("H", (dateObject.getHours()<10?'0':'')+dateObject.getHours());
+	format = format.replace("i", (dateObject.getMinutes()<10?'0':'')+dateObject.getMinutes());
+	format = format.replace("s", (dateObject.getSeconds()<10?'0':'')+dateObject.getSeconds());
 	return format;
 }
 

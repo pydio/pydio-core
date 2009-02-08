@@ -26,7 +26,7 @@ FilesList = Class.create(SelectableElements, {
 		
 		// Default headersDef
 		this.columnsDef = $A([]);
-		this.columnsDef.push({messageId:1,attributeName:'text'});
+		this.columnsDef.push({messageId:1,attributeName:'ajxp_label'});
 		this.columnsDef.push({messageId:2,attributeName:'filesize'});
 		this.columnsDef.push({messageId:3,attributeName:'mimestring'});
 		this.columnsDef.push({messageId:4,attributeName:'ajxp_modiftime'});
@@ -347,6 +347,7 @@ FilesList = Class.create(SelectableElements, {
 		// SECOND PASS FOR ERRORS CHECK AND COLUMNS DECLARATION
 		var refreshGUI = false;
 		this.gridStyle = 'file';
+		this.even = false;
 		this._oSortTypes = this.defaultSortTypes;
 		if(this.paginationData){
 			this.paginationData = null;
@@ -495,14 +496,14 @@ FilesList = Class.create(SelectableElements, {
 		}
 		attributeList.each(function(s){
 			var tableCell = document.createElement("td");			
-			if(s == "text")
+			if(s == "ajxp_label")
 			{
 				innerSpan = document.createElement("span");
 				innerSpan.setAttribute("style", "cursor:default;");
 				$(innerSpan).addClassName("list_selectable_span");
 				// Add icon
 				var imgString = "<img src=\""+ajxpResourcesFolder+"/images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" ";
-				imgString =  imgString + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> " + xmlNode.getAttribute(s);
+				imgString =  imgString + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> " + xmlNode.getAttribute('text');
 				innerSpan.innerHTML = imgString;			
 				tableCell.appendChild(innerSpan);
 				$(innerSpan).setStyle({display:'block'});
@@ -541,7 +542,8 @@ FilesList = Class.create(SelectableElements, {
 		}.bind(this));	
 		tBody.appendChild(newRow);
 		if(this.even){
-			$(newRow).setStyle({backgroundColor: '#eee'});					
+			//$(newRow).setStyle({backgroundColor: '#eee'});					
+			$(newRow).addClassName('even');
 		}
 		this.even = !this.even;
 	},
@@ -698,10 +700,14 @@ FilesList = Class.create(SelectableElements, {
 		
 	},
 	
-	redistributeBackgrounds: function(){
+	redistributeBackgrounds: function(){		
 		var allItems = this.getItems();
 		for(var i=0;i<allItems.length;i++){
-			$(allItems[i]).setStyle({backgroundColor:(this.even?'#eee':'')});
+			if(this.even){
+				$(allItems[i]).addClassName('even').removeClassName('odd');				
+			}else{
+				$(allItems[i]).removeClassName('even').addClassName('odd');
+			}
 			this.even = !this.even;
 		}
 	},

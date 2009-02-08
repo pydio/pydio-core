@@ -676,17 +676,27 @@ overflow:visible;
     font-size: 11px;
 }
 
+.even
+{
+    background-color: #eee;
+}
+
+.odd
+{
+    background-color: #fff;
+}
 
 .selected
 {
 	background: #ddd;
+	color : #404040;
 	text-decoration: none;
 }
 
 .selected-focus
 {
     background: #0a246a !important;
-    color: #fff;
+    color: #fff !important;
 }
 
 .droppableZone

@@ -4,7 +4,7 @@
 		<action name="ls" dirDefault="true">			
 			<displayDefinitions>
 				<display mode="list">
-					<column messageId="1" attributeName="text"/>
+					<column messageId="1" attributeName="ajxp_label"/>
 					<column messageId="2" attributeName="filesize"/>
 					<column messageId="3" attributeName="mimestring"/>
 					<column messageId="4" attributeName="ajxp_modiftime"/>
@@ -654,7 +654,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,modiftime">
+		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,formated_date">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="size_string" id="127"/>
@@ -669,11 +669,11 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<b>#{name_string}</b> : #{basename}
 				<br><b>#{size_string}</b> : #{filesize}
 				<br><b>#{type_string}</b> : #{mimestring}
-				<br><b>#{modif_string}</b> : #{modiftime}
+				<br><b>#{modif_string}</b> : #{formated_date}
 			</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="generic_dir" attributes="basename,icon,modiftime">
+		<infoPanel mime="generic_dir" attributes="basename,icon,formated_date">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="modif_string" id="138"/>
@@ -684,11 +684,11 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{basename}
-					<br><b>#{modif_string}</b> : #{modiftime}
+					<br><b>#{modif_string}</b> : #{formated_date}
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,modiftime">
+		<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,formated_date">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="size_string" id="127"/>
@@ -705,11 +705,11 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					<br><b>#{dim_string}</b> : #{image_width}px X #{image_height}px
 					<br><b>#{size_string}</b> : #{filesize}
 					<br><b>#{type_string}</b> : #{image_type}
-					<br><b>#{modif_string}</b> : #{modiftime}
+					<br><b>#{modif_string}</b> : #{formated_date}
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,escaped_filename,icon,filesize,mimestring,modiftime">
+		<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="size_string" id="127"/>
@@ -724,11 +724,11 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					<b>#{name_string}</b> : #{basename}
 					<br><b>#{size_string}</b> : #{filesize}
 					<br><b>#{type_string}</b> : #{mimestring}
-					<br><b>#{modif_string}</b> : #{modiftime}
+					<br><b>#{modif_string}</b> : #{formated_date}
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="flv" attributes="basename,escaped_filename,icon,filesize,mimestring,modiftime,uri">
+		<infoPanel mime="flv" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
 			<html><![CDATA[
 				<div style="padding:10px;">
 					<center style="border:1px solid #aaa; margin-bottom: 5px;">
