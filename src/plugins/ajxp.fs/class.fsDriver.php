@@ -68,9 +68,9 @@ class fsDriver extends AbstractDriver
 			//------------------------------------
 			//	DOWNLOAD, IMAGE & MP3 PROXYS
 			//------------------------------------
-			case "download";
-				AJXP_Logger::logAction("Download", array("files"=>$selection));
-				if($selection->inZip()){
+			case "download":
+				AJXP_Logger::logAction("Download", array("files"=>$selection));				
+				if($selection->inZip){
 					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
 					@mkdir($this->getPath()."/".$tmpDir);
 					$this->convertSelectionToTmpFiles($tmpDir, $selection);
@@ -445,10 +445,10 @@ class fsDriver extends AbstractDriver
 					}
 					else 
 					{
-						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?dir=".$dir."/".$repName);
-						$link = urlencode($link);
 						$folderBaseName = str_replace("&", "&amp;", $repName);
-						$folderFullName = "$dir/".$folderBaseName;
+						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?dir=".$dir."/".$folderBaseName);
+						$link = urlencode($link);						
+						$folderFullName = str_replace("&", "&amp;", $dir)."/".$folderBaseName;
 						$parentFolderName = $dir;
 						if(!$completeMode){
 							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
@@ -572,7 +572,7 @@ class fsDriver extends AbstractDriver
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
 		}
-		$localName = ($localName=="" ? basename($filePathOrData) : $localName);
+		$localName = ($localName=="" ? basename($filePathOrData) : $localName);		
 		if($headerType == "plain")
 		{
 			header("Content-type:text/plain");			

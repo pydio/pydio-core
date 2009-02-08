@@ -96,6 +96,17 @@ Modal = Class.create({
 		if(fOnLoad != null)
 		{
 			fOnLoad(this.currentForm);
+			// Reload shadow if the content has changed after the fOnLoad call
+			Shadower.shadow($(this.elementName), 
+				{
+					distance: 4,
+					angle: 130,
+					opacity: 0.5,
+					nestedShadows: 3,
+					color: '#000000',
+					shadowStyle:{display:'block'}
+				}, true);
+			
 		}
 		// SAFARI => FORCE IFRAME RELOADING
 		if(Prototype.Browser.WebKit && reloadIFrame && reloadIFrameSrc) reloadIFrame.src = reloadIFrameSrc;
