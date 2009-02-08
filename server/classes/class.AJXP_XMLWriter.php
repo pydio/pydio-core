@@ -52,7 +52,7 @@ class AJXP_XMLWriter
 	
 	function reloadFileList($fileOrBool, $print = true)
 	{
-		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".SystemTextEncoding::toUTF8($fileOrBool)."\"/>", $print);
+		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
 		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	
@@ -79,12 +79,12 @@ class AJXP_XMLWriter
 		if($errorMessage == null)
 		{
 			$messageType = "SUCCESS";
-			$message = $logMessage;
+			$message = str_replace("&", "&amp;", $logMessage);
 		}
 		else
 		{
 			$messageType = "ERROR";
-			$message = $errorMessage;
+			$message = str_replace("&", "&amp;",$errorMessage);
 		}
 		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}

@@ -77,9 +77,9 @@ FilesList = Class.create(SelectableElements, {
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
-			if(this.gridStyle == "grid"){
+			//if(this.gridStyle == "grid"){
 				this._sortableTable.onsort = this.redistributeBackgrounds.bind(this);
-			}
+			//}
 			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
 			this.disableTextSelection($('selectable_div_header'));
 			this.disableTextSelection($('table_rows_container'));
@@ -700,8 +700,9 @@ FilesList = Class.create(SelectableElements, {
 		
 	},
 	
-	redistributeBackgrounds: function(){		
-		var allItems = this.getItems();
+	redistributeBackgrounds: function(){
+		var allItems = this.getItems();		
+		this.even = false;
 		for(var i=0;i<allItems.length;i++){
 			if(this.even){
 				$(allItems[i]).addClassName('even').removeClassName('odd');				

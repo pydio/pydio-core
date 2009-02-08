@@ -224,7 +224,7 @@ Diaporama = Class.create({
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
 		this.downloadButton.addClassName("disabled");
-		this.imgTag.src  = this.baseUrl + this.currentFile;
+		this.imgTag.src  = this.baseUrl + encodeURIComponent(this.currentFile);
 		if(!this.crtWidth && !this.crtHeight){
 			this.crtWidth = this.imgTag.getWidth();
 			this.crtHeight = this.imgTag.getHeight();

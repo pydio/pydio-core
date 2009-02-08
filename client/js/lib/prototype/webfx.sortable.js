@@ -320,8 +320,9 @@ SortableTable = Class.create({
 	
 		this.destroyCache(a);
 	
-		if (typeof this.onsort == "function")
+		if (typeof this.onsort == "function"){			
 			this.onsort();
+		}
 	},
 	
 	asyncSort: function (nColumn, bDescending, sSortType) {

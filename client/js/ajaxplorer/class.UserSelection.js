@@ -102,21 +102,21 @@ UserSelection = Class.create({
 		}
 		// UPDATE THE 'DIR' FIELDS
 		if(oFormElement && oFormElement.rep) oFormElement.rep.value = this._currentRep;
-		sUrl += '&dir='+this._currentRep;
+		sUrl += '&dir='+encodeURIComponent(this._currentRep);
 		
 		// UPDATE THE 'file' FIELDS
 		if(this.isEmpty()) return sUrl;
 		var fileNames = this.getFileNames();
 		if(this.isUnique())
 		{
-			sUrl += '&'+'file='+fileNames[0];
+			sUrl += '&'+'file='+encodeURIComponent(fileNames[0]);
 			if(oFormElement) this._addHiddenField(oFormElement, 'file', fileNames[0]);
 		}
 		else
 		{
 			for(var i=0;i<fileNames.length;i++)
 			{
-				sUrl += '&'+'file_'+i+'='+fileNames[i];
+				sUrl += '&'+'file_'+i+'='+encodeURIComponent(fileNames[i]);
 				if(oFormElement) this._addHiddenField(oFormElement, 'file_'+i, fileNames[i]);
 			}
 		}
