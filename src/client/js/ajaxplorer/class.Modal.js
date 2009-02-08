@@ -112,7 +112,7 @@ Modal = Class.create({
 		if(Prototype.Browser.WebKit && reloadIFrame && reloadIFrameSrc) reloadIFrame.src = reloadIFrameSrc;
 	},
 	
-	showContent: function(elementName, boxWidth, boxHeight){
+	showContent: function(elementName, boxWidth, boxHeight, skipShadow){
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.filesList.blur();
@@ -157,6 +157,7 @@ Modal = Class.create({
 			refreshPNGImages(this.dialogContent);			
 		}
 		
+		if(skipShadow) return;
 		Shadower.shadow($(elementName), 
 			{
 				distance: 4,
