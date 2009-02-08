@@ -187,7 +187,7 @@ switch ($action)
 			
 			print("<div class=\"user_id\" onclick=\"manager.toggleUser('".$userId."');\"><img align=\"absmiddle\" src=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/actions/32/$imgSrc\" width=\"32\" height=\"32\">User <b>$userId</b></div>");
 			print("<div class=\"user_data\" id=\"user_data_".$userId."\" style=\"display: none;\">");
-			print("<fieldset><legend>Repositories Rights</legend><table width=\"100%\" class=\"repository\">");
+			print("<fieldset id=\"repo_rights_$userId\"><legend>Repositories Rights</legend><table width=\"100%\" class=\"repository\">");
 			foreach (ConfService::getRootDirsList() as $rootDirId => $rootDirObject)
 			{
 				print("<tr><td style=\"width: 45%;\">. ".$rootDirObject->getDisplay()." : </td>");
