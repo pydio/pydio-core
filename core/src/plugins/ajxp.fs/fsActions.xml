@@ -403,13 +403,18 @@ AJXP_MESSAGE[174]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var onLoad = function(newForm){		 		
-						var userSelection = ajaxplorer.getFilesList().getUserSelection();
-						userSelection.updateFormOrUrl(newForm, '');
-						var crtFileName = userSelection.getUniqueFileName();
-						newForm.filename_new.value = getBaseName(crtFileName);
-				 	};
-					modal.showDialogForm('Rename', 'rename_form', onLoad);					
+					var callback = function(item, newValue){						
+						var filename = item.getAttribute('filename');
+						var conn = new Connexion();
+						conn.addParameter('get_action', 'rename');
+						conn.addParameter('file', filename);
+						conn.addParameter('filename_new', newValue);
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendSync();
+					};
+					ajaxplorer.filesList.switchCurrentLabelToEdition(callback);
 					]]></clientCallback>
 				<clientForm id="rename_form"><![CDATA[
 				<div id="rename_form" action="rename" box_width="280">
