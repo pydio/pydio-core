@@ -133,7 +133,9 @@ Ajaxplorer = Class.create({
 				this.goTo(this.historyHashToPath(hash));
 			}.bind(this));
 		}
-		this.goTo(loadRep);	
+		if(!this.usersEnabled){
+			this.goTo(loadRep);	
+		}
 	},
 
 	
