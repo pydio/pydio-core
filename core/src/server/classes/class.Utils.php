@@ -123,7 +123,7 @@ class Utils
 		// I've found this regular expression for Windows file name validation, not sure how it applies for linux :
 		// ^[^\\\./:\*\?\"<>\|]{1}[^\\/:\*\?\"<>\|]{0,254}$   This reg ex remove ^ \ . / : * ? " < > | as the first char, and (same thing but . for any other char), and it limits to 254 chars (could use max_caracteres instead)
 		// Anyway, here is the corrected version of the big str_replace calls below that doesn't kill UTF8 encoding
-		$fileNameTmp=ereg_replace("[\"&,;/`<>:\*\|\?!\^]", "", $fileName);
+		$fileNameTmp=ereg_replace("[\",;/`<>:\*\|\?!\^]", "", $fileName);
 		return substr($fileNameTmp, 0, $max_caracteres);
 	}
 	

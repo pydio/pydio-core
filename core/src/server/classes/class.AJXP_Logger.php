@@ -168,6 +168,7 @@ class AJXP_Logger {
 	function xmlListLogFiles(){
 		$dir = LOCAL_STORAGE_DIR;
 		if(!is_dir(LOCAL_STORAGE_DIR)) return ;
+		$logs = array();
 		if(($handle = opendir(LOCAL_STORAGE_DIR))!==false){
 			while($file = readdir($handle)){				
 				$split = split("\.", $file);
@@ -175,11 +176,14 @@ class AJXP_Logger {
 				$split2 = split("_", $split[0]);
 				$date = $split2[1];
 				$dSplit = split("-", $date);
-				$display = date("D. d M. Y", mktime(0,0,1,$dSplit[0], $dSplit[1], $dSplit[2]));
-				print("<file date=\"$date\" display=\"$display\"/>");
+				$time = mktime(0,0,1,$dSplit[0], $dSplit[1], $dSplit[2]);
+				$display = date("D. d M. Y", $time);
+				$logs[$time] = "<file date=\"$date\" display=\"$display\"/>";
 			}
 			closedir($handle);	
 		}
+		ksort($logs);
+		foreach($logs as $log) print($log);
 		return ;		
 	}
 	
@@ -191,6 +195,7 @@ class AJXP_Logger {
 		$res = "";
 		$lines = file($fName);
 		foreach ($lines as $line){
+			$line = str_replace("&", "&amp;", $line);
 			$matches = array();
 			if(preg_match("/(.*)\t(.*)\t(.*)\t(.*)\t(.*)\t(.*)$/", $line, $matches)!==false){
 				print(utf8_encode("<log date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\"/>"));
