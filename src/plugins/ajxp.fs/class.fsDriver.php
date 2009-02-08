@@ -372,8 +372,8 @@ class fsDriver extends AbstractDriver
 						$atts = array();
 						if(!$fileListMode && !$zipEntry["folder"]) continue;
 						$atts[] = "is_file=\"".($zipEntry["folder"]?"false":"true")."\"";
-						$atts[] = "text=\"".basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"]))."\"";
-						$atts[] = "filename=\"".SystemTextEncoding::toUTF8($zipEntry["filename"])."\"";
+						$atts[] = "text=\"".str_replace("&", "&amp;", basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])))."\"";
+						$atts[] = "filename=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
 						if($fileListMode){
 							$atts[] = "filesize=\"".Utils::roundSize($zipEntry["size"])."\"";
 							$atts[] = "bytesize=\"".$zipEntry["size"]."\"";
@@ -607,6 +607,11 @@ class fsDriver extends AbstractDriver
 			header("Expires: 0");
 			header("Cache-Control: no-cache, must-revalidate");
 			header("Pragma: no-cache");
+			if (preg_match('/ MSIE 6/',$_SERVER['HTTP_USER_AGENT'])){
+				header("Cache-Control: max_age=0");
+				header("Pragma: public");
+			}
+			
 			// For SSL websites there is a bug with IE see article KB 323308
 			// therefore we must reset the Cache-Control and Pragma Header
 			if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))

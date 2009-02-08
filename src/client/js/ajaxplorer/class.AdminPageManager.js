@@ -453,25 +453,32 @@ AdminPageManager = Class.create({
 	},
 	
 	addRepositoryUserParams : function(userId){
-		if($('user_data_'+userId).getAttribute('repoParams')) return;				
+		if($('user_data_'+userId).getAttribute('repoParams')) return;
 		this.drivers.each(function(pair){
 			if(!pair.value.get('user_params') || !pair.value.get('user_params').length) return;
+			if(!$('repo_wallet_'+userId)){
+				var walletFieldSet = new Element('fieldset', {id:'repo_wallet_'+userId}).update('<legend>Repositories Specific Data</legend>');
+				$('repo_rights_'+userId).insert({after:walletFieldSet});
+			}
+			var repoSet = new Element('fieldset');
 			$('user_data_'+userId).select("td[driver_name='"+pair.key+"']").each(function(cell){
 				var repoId = cell.getAttribute('repository_id');
-				var newTd = new Element('td', {colspan:2, className:'driver_form', id:'repo_user_params_'+userId+'_'+repoId});
-				var newTr = new Element('tr').update(newTd);
-				cell.up('tr').insert({after:newTr});
-				
+				var newTd = new Element('div', {className:'driver_form', id:'repo_user_params_'+userId+'_'+repoId});
+				var tdTitle = new Element('legend').update(this.repositories.get(repoId).getAttribute('display'));
+				repoSet.insert(tdTitle);
+				repoSet.insert(newTd);
 				var repoValues = $H({});
 				$('user_data_'+userId).select("wallet_data[repo_id='"+repoId+"']").each(function(tag){					
 					repoValues.set(tag.getAttribute('option_name'), tag.getAttribute('option_value'));
 				});				
 				this.createParametersInputs(newTd, pair.value.get('user_params'), false, repoValues);
-				var submitButton = new Element('input', {type:'submit', value:'SAVE', className:'submit'});
+				var submitButton = new Element('input', {type:'submit', value:'SAVE', className:'submit'}).setStyle({padding:0});
 				submitButton.observe("click", function(){
 					this.submitUserParamsForm(userId, repoId);
 				}.bind(this));
-				newTd.insert(submitButton);
+				tdTitle.insert({bottom:submitButton});
+				//newTd.insert(submitButton);
+				$('repo_wallet_'+userId).insert({bottom:repoSet});
 			}.bind(this));
 		}.bind(this));
 		$('user_data_'+userId).writeAttribute('repoParams', 'true');
