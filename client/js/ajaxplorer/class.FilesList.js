@@ -473,6 +473,46 @@ FilesList = Class.create(SelectableElements, {
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
 	
+	switchCurrentLabelToEdition : function(callback){
+		var sel = this.getSelectedItems();
+		var item = sel[0]; // We assume this action was triggered with a single-selection active.
+		var offset = {top:0,left:0};
+		if(this._displayMode == "list"){
+			var span = item.select('span.ajxp_label')[0];
+			var posSpan = item.select('span.list_selectable_span')[0];
+			offset.top=1;
+			offset.left=20;
+		}else{
+			var span = item.select('div.thumbLabel')[0];
+			var posSpan = span;
+			offset.top=2;
+			offset.left=2;
+		}
+		var pos = posSpan.cumulativeOffset();
+		var text = span.innerHTML;
+		var edit = new Element('input', {value:item.getAttribute('text'), id:'editbox'}).setStyle({
+			zIndex:5000, 
+			position:'absolute',
+			marginLeft:0,
+			marginTop:0
+		});
+		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
+		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);
+		edit.setStyle({left:pos.left+offset.left, top:(pos.top+offset.top)});
+		window.setTimeout(function(){edit.focus();}, 1000);
+		var closeFunc = function(){edit.remove();};
+		modal.setCloseAction(closeFunc);
+		edit.observe("keydown", function(event){
+			if(event.keyCode == Event.KEY_RETURN){				
+				Event.stop(event);
+				var newValue = edit.getValue();
+				callback(item, newValue);
+				hideLightBox();
+				modal.close();
+			}
+		}.bind(this));
+	},
+	
 	xmlNodeToTableRow: function(xmlNode){		
 		var newRow = document.createElement("tr");		
 		var tBody = this.parsingCache.get('tBody') || this._htmlElement.getElementsBySelector("tbody")[0];
@@ -503,7 +543,7 @@ FilesList = Class.create(SelectableElements, {
 				$(innerSpan).addClassName("list_selectable_span");
 				// Add icon
 				var imgString = "<img src=\""+ajxpResourcesFolder+"/images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" ";
-				imgString =  imgString + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> " + xmlNode.getAttribute('text');
+				imgString =  imgString + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + xmlNode.getAttribute('text')+"</span>";
 				innerSpan.innerHTML = imgString;			
 				tableCell.appendChild(innerSpan);
 				$(innerSpan).setStyle({display:'block'});
@@ -867,18 +907,30 @@ FilesList = Class.create(SelectableElements, {
 		return new UserSelection(this.getSelectedItems(), this._currentRep);
 	},
 	
+	enableTextSelection : function(target){
+		if (target.origOnSelectStart)
+		{ //IE route
+			target.onselectstart=target.origOnSelectStart;
+		}
+		target.unselectable = "off";
+		target.style.MozUserSelect = "text";
+	},
+	
 	disableTextSelection: function(target)
 	{
-		if (typeof target.onselectstart)
+		if (target.onselectstart)
 		{ //IE route
+			target.origOnSelectStart = target.onselectstart;
 			target.onselectstart=function(){return false;}
 		}
 		target.unselectable = "on";
 		target.style.MozUserSelect="none";
+		
 	},
 	
 	keydown: function (event)
 	{
+		if(this.blockNavigation) return false;
 		if(event.keyCode == 9 && !ajaxplorer.blockNavigation) return false;
 		if(!this.hasFocus) return true;
 		var keyCode = event.keyCode;
