@@ -23,7 +23,7 @@ class sshDriver extends AbstractDriver
     var $charset;
     
 	
-	function  sshDriver($driverName, $filePath, $repository){
+	function  sshDriver($driverName, $filePath, $repository){	
         $repositoryPath = $repository->getOption("PATH");
         $accountLimit = strpos($repositoryPath, "@");
         if ($accountLimit !== false) 
@@ -33,22 +33,22 @@ class sshDriver extends AbstractDriver
             $repository->setOption("PATH", $repositoryPath);            
         }
         // Set the password from a per user specific config
-        $account = "ajaxplorer";//$this->getUserName();
-        $password = "dumbpass"; //$this->getPassword();
+        $account = $this->getUserName($repository); // "ajaxplorer"
+        $password = $this->getPassword($repository); // "dumbpass"
         $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);
 		parent::AbstractDriver($driverName, $filePath, $repository);
 	}
 
-    function getUserName(){
+    function getUserName($repository){
         $logUser = AuthService::getLoggedUser(); 
-        $wallet = $logUser->getPref("wallet");
-        return $wallet[$this->repository->getUniqueId()]["remote_username"];
+        $wallet = $logUser->getPref("AJXP_WALLET");
+        return $wallet[$repository->getUniqueId()]["remote_username"];
     }
 
-    function getPassword(){
+    function getPassword($repository){
         $logUser = AuthService::getLoggedUser(); 
-        $wallet = $logUser->getPref("wallet");
-        return $wallet[$this->repository->getUniqueId()]["remote_password"];
+        $wallet = $logUser->getPref("AJXP_WALLET");
+        return $wallet[$repository->getUniqueId()]["remote_password"];
     }
 	
 	function initRepository(){
@@ -390,7 +390,7 @@ class sshDriver extends AbstractDriver
 					}
 					if (strlen($attributes) > 0)
 					{
-					    print("<tree text=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($this->SSHOperation->unescapeFileName($file["name"])))."\" $attributes>");
+					    print("<tree ajxp_label=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($this->SSHOperation->unescapeFileName($file["name"])))."\" $attributes>");
 					    print("</tree>");
 					}
                 }
