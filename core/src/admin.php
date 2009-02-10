@@ -84,7 +84,11 @@ switch ($action)
 
 	case "save_repository_user_params" : 
 		$userId = $_GET["user_id"];
-		$user = new AJXP_User($userId);
+		if($userId == $loggedUser->getId()){
+			$user = $loggedUser;
+		}else{
+			$user = new AJXP_User($userId);
+		}
 		$wallet = $user->getPref("AJXP_WALLET");
 		if(!is_array($wallet)) $wallet = array();
 		if(!array_key_exists($_GET["repository_id"], $wallet)){
@@ -98,8 +102,12 @@ switch ($action)
 		}
 		$user->setPref("AJXP_WALLET", $wallet);
 		$user->save();
+		
+		if($loggedUser->getId() == $user->getId()){
+			AuthService::updateUser($user);
+		}
 		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::sendMessage("Saved data ".$_GET["user_id"], null);
+		AJXP_XMLWriter::sendMessage("Saved data for user ".$_GET["user_id"], null);
 		AJXP_XMLWriter::close();
 		exit(1);	
 	break;
