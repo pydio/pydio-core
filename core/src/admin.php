@@ -97,7 +97,20 @@ switch ($action)
 		foreach ($_GET as $key=>$value){
 			if(strstr($key, "DRIVER_OPTION_") !== false){
 				$key = substr($key, strlen("DRIVER_OPTION_"));
-				$wallet[$_GET["repository_id"]][$key] = trim($value);
+				$value = trim($value);
+                if (substr($key, -2) == "##")
+                {   // Need to cypher the value here
+                    $key = substr($key, 0, -2);                   
+                    if (function_exists('mcrypt_encrypt'))
+                    {
+                        $users = AuthService::loadLocalUsersList();
+                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+                        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
+                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $users[$userId], $value, MCRYPT_MODE_ECB, $iv));
+                    }
+                }				
+				$wallet[$_GET["repository_id"]][$key] = $value;
 			}
 		}
 		$user->setPref("AJXP_WALLET", $wallet);
