@@ -1,0 +1,8 @@
+AjaXplorer Selenium Tests
+
+To run these test, first you have to install the Selenium IDE as an extension to Firefox.
+
++ 0pen the test suite "GUITestSuite.html" in Selenium
++ The basic "admin" with password "admin" must have access to the default repository "Default Files" (must be called Default Files like ine the distrbution).
++ Create a new empty directory anywhere
++ Run the test cases at "slow" pace, so that various submissions have time fulfill. 
