@@ -155,7 +155,19 @@ class AJXP_User
 		fwrite($fp, serialize($value));
 		fclose($fp);
 	}
-		
+
+    /** Decode a user supplied password before using it */
+    function decodeUserPassword($password){
+        if (function_exists('mcrypt_decrypt'))
+        {
+             $users = AuthService::loadLocalUsersList();
+             // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+             $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+             // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
+             $password = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $users[$this->getId()], base64_decode($password), MCRYPT_MODE_ECB, $iv));
+        }
+        return $password;
+    }
 }
 
 

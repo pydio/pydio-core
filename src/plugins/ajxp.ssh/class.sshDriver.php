@@ -48,7 +48,7 @@ class sshDriver extends AbstractDriver
     function getPassword($repository){
         $logUser = AuthService::getLoggedUser(); 
         $wallet = $logUser->getPref("AJXP_WALLET");
-        return is_array($wallet) ? $wallet[$repository->getUniqueId()]["remote_password"] : "";
+        return is_array($wallet) ? $logUser->decodeUserPassword($wallet[$repository->getUniqueId()]["remote_password"]) : "";
     }
 	
 	function initRepository(){

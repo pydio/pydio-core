@@ -169,6 +169,8 @@ AdminPageManager = Class.create({
 			var element;
 			if(type == 'string'){
 				element = '<input type="text" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'">';
+		    }else if(type == 'password'){
+				element = '<input type="password" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'##" class="text" value="'+defaultValue+'">';
 			}else if(type == 'boolean'){
 				var selectTrue, selectFalse;
 				if(defaultValue){
@@ -187,7 +189,7 @@ AdminPageManager = Class.create({
 		prefix = prefix || '';
 		var missingMandatory = false;
 		form.select('input').each(function(el){			
-			if(el.type == "text"){
+			if(el.type == "text" || el.type == "password"){
 				if(el.getAttribute('ajxp_mandatory') == 'true' && el.value == ''){
 					missingMandatory = true;
 				}
