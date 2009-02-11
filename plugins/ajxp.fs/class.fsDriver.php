@@ -892,6 +892,7 @@ class fsDriver extends AbstractDriver
 			$errors = array();
 			$succFiles = array();
 			if($move){
+				if(is_file($destFile)) unlink($destFile);
 				$res = rename($realSrcFile, $destFile);
 			}else{
 				$dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
@@ -905,6 +906,7 @@ class fsDriver extends AbstractDriver
 		else 
 		{
 			if($move){
+				if(is_file($destFile)) unlink($destFile);
 				$res = rename($realSrcFile, $destFile);
 			}else{
 				$res = copy($realSrcFile,$destFile);
