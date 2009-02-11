@@ -33,8 +33,8 @@ class sshDriver extends AbstractDriver
             $repository->setOption("PATH", $repositoryPath);            
         }
         // Set the password from a per user specific config
-        $account = $this->getUserName($repository); // "ajaxplorer"
-        $password = $this->getPassword($repository); // "dumbpass"
+        $account = $this->getUserName($repository); 
+        $password = $this->getPassword($repository); 
         $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);
 		parent::AbstractDriver($driverName, $filePath, $repository);
 	}
@@ -42,13 +42,13 @@ class sshDriver extends AbstractDriver
     function getUserName($repository){
         $logUser = AuthService::getLoggedUser(); 
         $wallet = $logUser->getPref("AJXP_WALLET");
-        return $wallet[$repository->getUniqueId()]["remote_username"];
+        return is_array($wallet) ? $wallet[$repository->getUniqueId()]["remote_username"] : "";
     }
 
     function getPassword($repository){
         $logUser = AuthService::getLoggedUser(); 
         $wallet = $logUser->getPref("AJXP_WALLET");
-        return $wallet[$repository->getUniqueId()]["remote_password"];
+        return is_array($wallet) ? $wallet[$repository->getUniqueId()]["remote_password"] : "";
     }
 	
 	function initRepository(){
@@ -390,7 +390,7 @@ class sshDriver extends AbstractDriver
 					}
 					if (strlen($attributes) > 0)
 					{
-					    print("<tree ajxp_label=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($this->SSHOperation->unescapeFileName($file["name"])))."\" $attributes>");
+					    print("<tree text=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($this->SSHOperation->unescapeFileName($file["name"])))."\" $attributes>");
 					    print("</tree>");
 					}
                 }
