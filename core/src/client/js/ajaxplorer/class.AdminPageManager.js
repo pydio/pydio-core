@@ -460,12 +460,12 @@ AdminPageManager = Class.create({
 		if($('user_data_'+userId).getAttribute('repoParams')) return;
 		this.drivers.each(function(pair){
 			if(!pair.value.get('user_params') || !pair.value.get('user_params').length) return;
-			if(!$('repo_wallet_'+userId)){
-				var walletFieldSet = new Element('fieldset', {id:'repo_wallet_'+userId}).update('<legend>Repositories Specific Data</legend>');
-				$('repo_rights_'+userId).insert({after:walletFieldSet});
-			}
 			var repoSet = new Element('fieldset');
 			$('user_data_'+userId).select("td[driver_name='"+pair.key+"']").each(function(cell){
+				if(!$('repo_wallet_'+userId)){
+					var walletFieldSet = new Element('fieldset', {id:'repo_wallet_'+userId}).update('<legend>Repositories Specific Data</legend>');
+					$('repo_rights_'+userId).insert({after:walletFieldSet});
+				}
 				var repoId = cell.getAttribute('repository_id');
 				var newTd = new Element('div', {className:'driver_form', id:'repo_user_params_'+userId+'_'+repoId});
 				var tdTitle = new Element('legend').update(this.repositories.get(repoId).getAttribute('display'));
