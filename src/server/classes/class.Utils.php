@@ -118,7 +118,7 @@ class Utils
 	{
 		$max_caracteres = ConfService::getConf("MAX_CHAR");
 		// Don't allow those chars : ' " & , ; / \ ` < > : * ? | ! + ^ 
-		$fileName=stripslashes($fileName);
+		$fileName=SystemTextEncoding::magicDequote($fileName);
 		// Unless I'm mistaken, ' is a valid char for a file name (under both Linux and Windows).
 		// I've found this regular expression for Windows file name validation, not sure how it applies for linux :
 		// ^[^\\\./:\*\?\"<>\|]{1}[^\\/:\*\?\"<>\|]{0,254}$   This reg ex remove ^ \ . / : * ? " < > | as the first char, and (same thing but . for any other char), and it limits to 254 chars (could use max_caracteres instead)
