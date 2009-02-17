@@ -93,9 +93,11 @@ class AuthService
 			if(!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)){
 				// Check upgrade
 				$user = new AJXP_User($userId);
+				/*
 				if($user->getVersion() != "2.4"){
 					return -2;
-				}				
+				}	
+				*/			
 				return -1;
 			}
 		}
