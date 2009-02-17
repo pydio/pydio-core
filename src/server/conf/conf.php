@@ -44,7 +44,8 @@ $REPOSITORIES[0] = array(
 	"DRIVER_OPTIONS"=> array(
 		"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
 		"CREATE"		=>	true,
-		"RECYCLE_BIN" 	=> 	'recycle_bin'
+		"RECYCLE_BIN" 	=> 	'recycle_bin',
+		"CHMOD_VALUE"   =>  '0600'
 	)
 );
 

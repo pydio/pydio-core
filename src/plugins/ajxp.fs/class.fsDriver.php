@@ -721,7 +721,7 @@ class fsDriver extends AbstractDriver
 		$chmodValue = $this->repository->getOption("CHMOD_VALUE");
 		if(isSet($chmodValue) && $chmodValue != "")
 		{
-			chmod($filePath, octdec(ltrim("0", $chmodValue)));
+			chmod($filePath, octdec(ltrim($chmodValue, "0")));
 		}		
 	}
 	
@@ -818,7 +818,7 @@ class fsDriver extends AbstractDriver
 		$chmodValue = $this->repository->getOption("CHMOD_VALUE");
 		if(isSet($chmodValue) && $chmodValue != "")
 		{
-			$dirMode = octdec(ltrim("0", $chmodValue));
+			$dirMode = octdec(ltrim($chmodValue, "0"));
 			if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
 			if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
 			if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory			
