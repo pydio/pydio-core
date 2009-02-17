@@ -318,7 +318,7 @@ class fsDriver extends AbstractDriver
 						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
 						break;
 					}
-					chmod($destination."/".$userfile_name, 0777);
+					$this->changeMode($destination."/".$userfile_name);
 					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
 					AJXP_Logger::logAction("Upload File", array("file"=>SystemTextEncoding::fromUTF8($dir)."/".$userfile_name));
 				}
@@ -716,6 +716,13 @@ class fsDriver extends AbstractDriver
 		return $tmp;// date("d,m L Y H:i:s",$tmp);
 	}
 	
+	function changeMode($filePath){
+		$chmodValue = $this->repository->getOption("CHMOD_VALUE");
+		if(isSet($chmodValue) && $chmodValue != ""){
+			chmod($filePath, octdec(ltrim("0", $chmodValue)));
+		}		
+	}
+	
 	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
 	{
 		$mess = ConfService::getMessages();
@@ -832,6 +839,7 @@ class fsDriver extends AbstractDriver
 				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
 			}
 			fclose($fp);
+			$this->changeMode($this->getPath()."/$crtDir/$newFileName");
 			return null;
 		}
 		else
