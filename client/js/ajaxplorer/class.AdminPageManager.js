@@ -121,7 +121,7 @@ AdminPageManager = Class.create({
 		}
 		var dOpt = this.drivers.get(driverName);
 		$('driver_form').update('<div style="padding-top:4px;color:#79f;"><b style="color:#79f;">'+dOpt.get('label') + '</b> : ' + dOpt.get('description')+'<br></div>');
-		this.createParametersInputs($('driver_form'), dOpt.get('params'), true);
+		this.createParametersInputs($('driver_form'), dOpt.get('params'), false);
 		var buttons = '<div align="center" style="clear:left;padding-top:5px;"><input type="button" value="Save" class="button" onclick="return manager.repoButtonClick(true);"> <input type="button" value="Cancel" class="button" onclick="return manager.repoButtonClick(false);"></div>';
 		$('driver_form').insert({'bottom':buttons});
 	},
@@ -154,7 +154,7 @@ AdminPageManager = Class.create({
 		return false;		
 	},
 	
-	createParametersInputs : function(form, parametersDefinitions, showTip, values){
+	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled){
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
 			var name = param.get('name');
@@ -167,20 +167,21 @@ AdminPageManager = Class.create({
 				defaultValue = values.get(name);
 			}
 			var element;
+			var disabledString = (disabled?' disabled="true" ':'');
 			if(type == 'string'){
-				element = '<input type="text" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'">';
+				element = '<input type="text" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'"'+disabledString+'>';
 		    }else if(type == 'password'){
-				element = '<input type="password" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'##" class="text" value="'+defaultValue+'">';
+				element = '<input type="password" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'##" class="text" value="'+defaultValue+'"'+disabledString+'>';
 			}else if(type == 'boolean'){
 				var selectTrue, selectFalse;
 				if(defaultValue){
 					if(defaultValue == "true" || defaultValue == "1") selectTrue = true;
 					if(defaultValue == "false" || defaultValue == "0") selectFalse = true;
 				}
-				element = '<input type="radio" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+'> Yes';
-				element = element + '<input type="radio" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"> No';
+				element = '<input type="radio" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
+				element = element + '<input type="radio" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
 			}
-			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:30%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:70%">'+element+(showTip?' &nbsp;<small style="color:#AAA;">'+desc+'</small>':'')+'</div>');
+			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:30%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:70%">'+element+(showTip?' &nbsp;<small style="color:#AAA;">'+desc+'</small>':' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/help-about.png" alt="'+desc+'"  title="'+desc+'" width="16" height="16" align="absmiddle" class="helpImage"/>')+'</div>');
 			form.insert({'bottom':div});
 		});
 	},
@@ -234,7 +235,7 @@ AdminPageManager = Class.create({
 		var driver = this.drivers.get(driverName);
 				
 		var fieldset = new Element('fieldset');
-		var form = new Element('div');
+		var form = new Element('div', {className:'driver_form'});
 		fieldset.update(new Element('legend').update(driverName.toUpperCase()+' Driver Options'));
 		fieldset.insert({bottom:form});
 		
@@ -243,24 +244,25 @@ AdminPageManager = Class.create({
 			if(child.nodeName != 'param') return;
 			paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
 		});
-		
-		this.createParametersInputs(form, driver.get('params'), true, paramsValues);
+		var writeable = repo.getAttribute("writeable");			
+		this.createParametersInputs(form, driver.get('params'), false, paramsValues, !writeable);
 
-		var submitButton = new Element("input", {type:"button",value:"SAVE CHANGES"});
-		submitButton.observe("click", function(e){
-			var toSubmit = new Hash();
-			toSubmit.set("repository_id", repId);
-			this.submitParametersInputs(form, toSubmit, 'DRIVER_OPTION_');
-			this.submitForm('edit_repository', toSubmit, null, function(){
-				this.loadRepList();
-				this.loadUsers();
-			}.bind(this));			
-		}.bind(this));
-		fieldset.insert({bottom:new Element('div', {align:'right'}).update(submitButton)});
+		if(writeable){
+			var submitButton = new Element("input", {type:"button",value:"SAVE CHANGES"});
+			submitButton.observe("click", function(e){
+				var toSubmit = new Hash();
+				toSubmit.set("repository_id", repId);
+				this.submitParametersInputs(form, toSubmit, 'DRIVER_OPTION_');
+				this.submitForm('edit_repository', toSubmit, null, function(){
+					this.loadRepList();
+					this.loadUsers();
+				}.bind(this));			
+			}.bind(this));
+			fieldset.insert({bottom:new Element('div', {align:'right'}).update(submitButton)});
+		}
 		
 		$('repo_detail_panel').update(fieldset);
 		
-		var writeable = repo.getAttribute("writeable");
 		if(!writeable || writeable != "1") return;
 		
 		var labelSet = new Element('fieldset');

@@ -1319,6 +1319,11 @@ legend
    width: 160px;
 }
 
+.helpImage{
+	cursor: help;
+	margin-bottom: 1px;
+}
+
 #driver_form input.text,
 .driver_form input.text
 {
