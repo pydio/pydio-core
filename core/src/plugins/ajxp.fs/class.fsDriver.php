@@ -579,21 +579,17 @@ class fsDriver extends AbstractDriver
 		}
 		else if($headerType == "image")
 		{
-			//$size=filesize($filePathOrData);
-			header("Content-Type: ".Utils::getImageMimeType(basename($filePathOrData))."; name=\"".basename($filePathOrData)."\"");
+			header("Content-Type: ".Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
 			header("Content-Length: ".$size);
 			header('Cache-Control: public');			
 		}
 		else if($headerType == "mp3")
 		{
-			//$size=filesize($filePathOrData);
-			header("Content-Type: audio/mp3; name=\"".basename($filePathOrData)."\"");
+			header("Content-Type: audio/mp3; name=\"".$localName."\"");
 			header("Content-Length: ".$size);
 		}
 		else 
 		{
-			//$size=filesize($filePathOrData);
-			//if($localName == "") $localName = basename($filePathOrData);			
 			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
 			if($gzip){
@@ -621,7 +617,7 @@ class fsDriver extends AbstractDriver
 			}
 			if($gzip){
 				print $gzippedData;
-				return ;
+				return;
 			}
 		}
 		if($data){
