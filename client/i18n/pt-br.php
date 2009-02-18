@@ -318,7 +318,7 @@ $mess=array(
 "282" => "Tamanho por arquivo",
 "283" => "Tamanho total",
 "284" => "Número de arquivos",
-"285" => "Cannot find user, please try again.\\n Make sur your Caps Lock is not engaged!",
-"286" => "Your user is out of date with the current version, please use the upgrade procedure."
+"285" => "Não foi possível encontrar o usuário, por favor tente novamente.\\n Verifique se o Caps Lock não está ativado!",
+"286" => "Seu usuário está desatualizado para esta versão, por favor use o procedimento de atualização."
 );
 ?>
