@@ -16,8 +16,8 @@
 /* DEFAULT LANGUAGE */
 $dft_langue="en";
 
-define("AJXP_VERSION", "2.3.9");
-define("AJXP_VERSION_DATE", "2008/12/17");
+define("AJXP_VERSION", "2.4.rc2");
+define("AJXP_VERSION_DATE", "2009/02/17");
 
 define("ENABLE_USERS", 1);
 define("ADMIN_PASSWORD", "admin");
