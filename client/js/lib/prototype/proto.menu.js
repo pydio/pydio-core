@@ -168,14 +168,29 @@ Proto.Menu = Class.create({
 			Effect.Appear(this.container, {
 				duration: 0.25, 
 				afterFinish : function(e){
+					this.checkHeight(elOff.top);
 					Shadower.showShadows(this.container, this.options.shadowOptions);
 				}.bind(this)
 			});
 		}else{
 			this.container.show();
-			Shadower.showShadows(this.container, this.options.shadowOptions);
+			this.checkHeight(elOff.top);
+			Shadower.showShadows(this.container, this.options.shadowOptions);			
 		}
 		this.event = e;
+	},
+	
+	checkHeight : function(offsetTop){
+		if(this.options.anchor == 'mouse') return;
+		var vpDim = document.viewport.getDimensions();
+		var vpOff = document.viewport.getScrollOffsets();
+		var elDim = this.container.getDimensions();
+		var y = parseInt(offsetTop);
+		if((y - vpOff.top + elDim.height) > vpDim.height){
+			this.container.setStyle({height:(vpDim.height-(y - vpOff.top))+'px',overflowY:'scroll', width:(elDim.width+16)+'px'});
+		}else{
+			this.container.setStyle({height:'auto', overflowY:'hidden'});
+		}		
 	},
 	
 	computeMouseOffset: function(e){
