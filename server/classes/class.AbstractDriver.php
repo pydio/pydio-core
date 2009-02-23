@@ -54,8 +54,16 @@ class AbstractDriver {
 	var $xml_parser;
 	var $xml_data;
 	var $crtAction;
+	var $driverConf = array();
 	
 	function AbstractDriver($driverName, $filePath, $repository) {
+		// Load config file if there is one
+		if(is_file(INSTALL_PATH."/server/conf/conf.".$driverName.".inc")){
+			include_once(INSTALL_PATH."/server/conf/conf.".$driverName.".inc");
+			if(isSet($DRIVER_CONF)){
+				$this->driverConf = $DRIVER_CONF;
+			}
+		}
 		$this->driverName = $driverName;
 		$this->xmlFilePath = $filePath;
 		$this->repository = $repository;
