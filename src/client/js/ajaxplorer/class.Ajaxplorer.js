@@ -466,7 +466,10 @@ Ajaxplorer = Class.create({
 			marginBottom = $('optional_bottom_div').getHeight();
 		}
 		fitHeightToBottom($("browser"), window, marginBottom);
-		fitHeightToBottom($("verticalSplitter"), $('browser'), 8);		
+		fitHeightToBottom($("verticalSplitter"), $('browser'), 8);	
+		if(Prototype.Browser.IE){
+			fitHeightToBottom($("content_pane"), $('verticalSplitter'));
+		}
 		var s1 = new Splitter('sidebarSplitter',{
 				direction: "horizontal",
 				initB: 150,
@@ -486,6 +489,7 @@ Ajaxplorer = Class.create({
 					if(this.filesList)this.filesList.applyHeadersWidth();					
 				}.bind(this)
 		});
+		
 		
 		this.currentSideToggle = 'search';
 		this.toggleSidePanel('info');	
