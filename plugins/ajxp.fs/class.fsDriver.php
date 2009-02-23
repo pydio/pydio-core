@@ -445,7 +445,7 @@ class fsDriver extends AbstractDriver
 				AJXP_XMLWriter::header();
 				foreach ($reps as $repIndex => $repName)
 				{
-					if(eregi("\.zip$",$repName) && $skipZip) continue;
+					if((eregi("\.zip$",$repName) && $skipZip)) continue;
 					$attributes = "";
 					if($searchMode)
 					{
@@ -572,6 +572,30 @@ class fsDriver extends AbstractDriver
 		return $crtZip;		
 	}
 	
+	function filterFile($fileName){
+		$pathParts = pathinfo($fileName);
+		if(array_key_exists("HIDE_FILENAMES", $this->driverConf) && is_array($this->driverConf["HIDE_FILENAMES"])){
+			foreach ($this->driverConf["HIDE_FILENAMES"] as $search){
+				if(strcasecmp($search, $pathParts["basename"]) == 0) return true;
+			}
+		}
+		if(array_key_exists("HIDE_EXTENSIONS", $this->driverConf) && is_array($this->driverConf["HIDE_EXTENSIONS"])){
+			foreach ($this->driverConf["HIDE_EXTENSIONS"] as $search){
+				if(strcasecmp($search, $pathParts["extension"]) == 0) return true;
+			}
+		}
+		return false;
+	}
+	
+	function filterFolder($folderName){
+		if(array_key_exists("HIDE_FOLDERS", $this->driverConf) && is_array($this->driverConf["HIDE_FOLDERS"])){
+			foreach ($this->driverConf["HIDE_FOLDERS"] as $search){
+				if(strcasecmp($search, $folderName) == 0) return true;
+			}
+		}
+		return false;		
+	}
+	
 	function initName($dir)
 	{
 		$racine = $this->getPath();		
@@ -684,7 +708,8 @@ class fsDriver extends AbstractDriver
 				$poidsfic=filesize("$nom_rep/$file");
 				$poidstotal+=$poidsfic;
 				if(is_dir("$nom_rep/$file"))
-				{					
+				{	
+					if($this->filterFolder($file)) continue;				
 					if($recycle != "" && $this->getPath()."/".$recycle == "$nom_rep/$file")
 					{
 						continue;
@@ -694,6 +719,7 @@ class fsDriver extends AbstractDriver
 				}
 				else
 				{
+					if($this->filterFile($file)) continue;
 					if(!$dir_only)
 					{
 						if($ordre=="nom") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
