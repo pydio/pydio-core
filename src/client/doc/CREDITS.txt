@@ -9,11 +9,6 @@ Developer's Band : http://www.almasound.com/ (reggae-salsa-dub)
 [EXTERNAL LIBRARIES]
 AjaXplorer was developed using various free libraries that are mentionned below. It is mainly an engineering work that used a lot of off-the-shelf components. Please check their websites!
 
-++ ORIGINAL PHP SCRIPT ++
-The original php script (simple file manager, no ajax gui) was called WebJeff File Manager and was developed 
-by Jean-François Gazet.
-http://www.webjeff.org
-
 ++ ZIP FUNCTIONNALITIES ++
 All the zip/unzip functionnalities implemented are based on the excellent PclZip class developped by PhpConcept.
 http://www.phpconcept.net/pclzip/index.en.php
@@ -37,7 +32,7 @@ The online edition was done integrating CodePress. Very powerful!
 http://www.codepress.org/
 
 ++ DEWPLAYER :  MP3 Flash Player ++
-The online mp3 flash player is developed by a french webagency, AlsaCréation.
+The online mp3 flash player is developed by a french webagency, AlsaCreation.
 http://www.alsacreations.fr/mp3-dewplayer.html
 
 ++ MC MEDIA PLAYER : FLV Player ++
