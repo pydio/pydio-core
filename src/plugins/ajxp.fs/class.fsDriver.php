@@ -590,6 +590,9 @@ class fsDriver extends AbstractDriver
 		}
 		else 
 		{
+			if(preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])){
+				$localName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($localName)));
+			}			
 			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
 			if($gzip){
