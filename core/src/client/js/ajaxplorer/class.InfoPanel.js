@@ -152,9 +152,14 @@ InfoPanel = Class.create({
 				else if(attName == 'escaped_filename' && fileData.getAttribute('filename')){
 					this[attName] = escape(encodeURIComponent(fileData.getAttribute('filename')));					
 				}else if(attName == 'formated_date' && fileData.getAttribute('ajxp_modiftime')){
-					var date = new Date();
-					date.setTime(parseInt(fileData.getAttribute('ajxp_modiftime'))*1000);
-					this[attName] = formatDate(date);					
+					var modiftime = fileData.getAttribute('ajxp_modiftime');
+					if(modiftime instanceof Object){
+						this[attName] = formatDate(modiftime);
+					}else{
+						var date = new Date();
+						date.setTime(parseInt(fileData.getAttribute('ajxp_modiftime'))*1000);
+						this[attName] = formatDate(date);
+					}
 				}
 				else if(attName == 'uri'){
 					var url = document.location.href;
