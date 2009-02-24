@@ -1585,6 +1585,12 @@ padding: 0px;
    padding-top: 4px;
 }
 
+.rootDirChooser a.disabled IMG{
+	filter: alpha(opacity=30);
+	opacity: 0.3;
+	-moz-opacity: 0.3	
+}
+
 .rootDirChooser span.rootDirTitle
 {
    display: block;
