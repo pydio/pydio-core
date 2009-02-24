@@ -51,7 +51,7 @@ Ajaxplorer = Class.create({
 		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 		this.histCount=0;
 		if(!this.usersEnabled) this.rootDirId = rootDirId;
-		modal.setLoadingStepCounts(this.usersEnabled?7:6);
+		modal.setLoadingStepCounts(this.usersEnabled?6:5);
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
