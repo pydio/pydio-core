@@ -162,7 +162,7 @@ Ajaxplorer = Class.create({
 		this.blockNavigation = false;
 		
 		new AjxpAutocompleter("current_path", "autocomplete_choices");
-		if(Prototype.Browser.Gecko){
+		if(!Prototype.Browser.WebKit){
 			this.history = new Proto.History(function(hash){
 				this.goTo(this.historyHashToPath(hash));
 			}.bind(this));
