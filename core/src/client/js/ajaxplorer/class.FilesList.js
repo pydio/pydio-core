@@ -511,16 +511,19 @@ FilesList = Class.create(SelectableElements, {
 		var sel = this.getSelectedItems();
 		var item = sel[0]; // We assume this action was triggered with a single-selection active.
 		var offset = {top:0,left:0};
+		var scrollTop = 0;
 		if(this._displayMode == "list"){
 			var span = item.select('span.ajxp_label')[0];
 			var posSpan = item.select('span.list_selectable_span')[0];
 			offset.top=1;
 			offset.left=20;
+			scrollTop = $('table_rows_container').scrollTop;
 		}else{
 			var span = item.select('div.thumbLabel')[0];
 			var posSpan = span;
 			offset.top=2;
 			offset.left=2;
+			scrollTop = $('selectable_div').scrollTop;
 		}
 		var pos = posSpan.cumulativeOffset();
 		var text = span.innerHTML;
@@ -532,7 +535,7 @@ FilesList = Class.create(SelectableElements, {
 		});
 		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
 		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);
-		edit.setStyle({left:pos.left+offset.left, top:(pos.top+offset.top)});
+		edit.setStyle({left:pos.left+offset.left, top:(pos.top+offset.top-scrollTop)});
 		window.setTimeout(function(){edit.focus();}, 1000);
 		var closeFunc = function(){edit.remove();};
 		modal.setCloseAction(closeFunc);
