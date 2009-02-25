@@ -2,7 +2,7 @@
 /**
  * @package info.ajaxplorer
  * 
- * Copyright 2007-2009 Charles du Jeu
+ * Copyright 2007-2009 Charles du Jeu, Cyril Russo
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
