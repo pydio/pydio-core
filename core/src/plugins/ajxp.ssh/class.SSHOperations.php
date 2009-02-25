@@ -2,7 +2,7 @@
 /**
  * @package info.ajaxplorer.plugins
  * 
- * Copyright 2007-2009 Cyril
+ * Copyright 2007-2009 Cyril Russo
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
