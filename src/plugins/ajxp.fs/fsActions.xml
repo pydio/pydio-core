@@ -609,10 +609,19 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						if(getFileExtension(filename) == 'mp3') mp3Items.push(escape(encodeURIComponent(filename)));
 					});						
 					var mp3_url = '';
+					var tmp_url = '';
+					var limited = false;
 					mp3Items.each(function(url){
-						mp3_url += 'content.php?action=mp3_proxy%26file='+url;
-						if(url != mp3Items.last()) mp3_url += '|';
+						tmp_url += 'content.php?action=mp3_proxy%26file='+url;
+						if(url != mp3Items.last()) tmp_url += '|';
+						if(Prototype.Browser.IE && tmp_url.length > 2000){
+							limited = true; return;
+						}
+						mp3_url=tmp_url;
 					});
+					if(limited){
+						alert('Due to the flash player and an Internet Explorer restriction on URL length,\n only a part of the folder can be read.');
+					}
 					newWin = window.open('', 'mp3_multi_player', 'width=260,height=30,directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no');
 					newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getFilesList().getCurrentRep()}));
 					newWin.document.close();
