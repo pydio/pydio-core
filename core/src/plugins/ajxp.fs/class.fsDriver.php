@@ -465,13 +465,14 @@ class fsDriver extends AbstractDriver
 							$atts[] = "image_height=\"$height\"";
 						}
 						$atts[] = "mimestring=\"".Utils::mimetype($currentFile, "type", is_dir($currentFile))."\"";
-						$atts[] = "ajxp_modiftime=\"".$this->date_modif($currentFile)."\"";
-						$atts[] = "filesize=\"".Utils::roundSize(filesize($currentFile))."\"";
-						$bytesize = filesize($currentFile);
+						$datemodif = $this->date_modif($currentFile);
+						$atts[] = "ajxp_modiftime=\"".($datemodif ? $datemodif : "0")."\"";
+						$bytesize = @filesize($currentFile) or 0;
 						if($bytesize < 0) $bytesize = sprintf("%u", $bytesize);
+						$atts[] = "filesize=\"".Utils::roundSize($bytesize)."\"";
 						$atts[] = "bytesize=\"".$bytesize."\"";
 						$atts[] = "filename=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($dir."/".$repIndex))."\"";
-						$atts[] = "icon=\"".(is_file($currentFile)?SystemTextEncoding::toUTF8($repName):"folder.png")."\"";
+						$atts[] = "icon=\"".(is_file($currentFile)?SystemTextEncoding::toUTF8($repName):(is_dir($currentFile) ? "folder.png" : "mime-empty.png"))."\"";
 						
 						$attributes = join(" ", $atts);
 						$repName = $repIndex;
@@ -705,7 +706,7 @@ class fsDriver extends AbstractDriver
 					&& $file == RecycleBinManager::getCacheFileName()){
 					continue;
 				}
-				$poidsfic=filesize("$nom_rep/$file");
+				$poidsfic=@filesize("$nom_rep/$file") or 0;
 				$poidstotal+=$poidsfic;
 				if(is_dir("$nom_rep/$file"))
 				{	
@@ -769,8 +770,7 @@ class fsDriver extends AbstractDriver
 	
 	function date_modif($file)
 	{
-		$tmp = filemtime($file);
-		$messages = ConfService::getMessages();
+		$tmp = @filemtime($file) or 0;
 		return $tmp;// date("d,m L Y H:i:s",$tmp);
 	}
 	
