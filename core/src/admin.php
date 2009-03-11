@@ -412,6 +412,7 @@ switch ($action)
 		$log["'conf' folder writeable"] = is_writable(INSTALL_PATH."/server/conf");
 		$log["Users enabled"] = ENABLE_USERS;
 		$log["Guest enabled"] = ALLOW_GUEST_BROWSING;
+		$log["Zlib Extension"] = (function_exists('gzopen')?"1":"0");		
 		$log["Gzip configuration"] = GZIP_DOWNLOAD;		
 		$log["Magic Quotes Gpc"] = get_magic_quotes_gpc();
 		$log["Client"] = $_SERVER['HTTP_USER_AGENT'];	
