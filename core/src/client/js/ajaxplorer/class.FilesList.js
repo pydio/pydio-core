@@ -350,18 +350,21 @@ FilesList = Class.create(SelectableElements, {
 		}
 		this.loading = false;
 		this.imagesHash = new Hash();
-		this.allDroppables.each(function(el){
-			Droppables.remove(el);		
-		});
-		this.allDroppables = new Array();
-		this.allDraggables.each(function(el){
-			el.destroy();
-		});
-		this.allDraggables = new Array();
 		if(this.protoMenu){
 			this.protoMenu.removeElements('.ajxp_draggable');
 			this.protoMenu.removeElements('#selectable_div');
 		}
+		
+		for(var i = 0; i< this.allDroppables.length;i++){
+			Droppables.remove(this.allDroppables[i]);
+			delete this.allDroppables[i];
+		}
+		for(i = 0;i<this.allDraggables.length;i++){
+			this.allDraggables[i].destroy();
+			delete this.allDraggables[i];
+		}
+		this.allDraggables = new Array();
+		this.allDroppables = new Array();
 		var root = oXmlDoc.documentElement;
 		// loop through all tree children
 		var cs = root.childNodes;
@@ -448,26 +451,24 @@ FilesList = Class.create(SelectableElements, {
 		{
 			this.initGUI();
 		}
-		var items = this.getItems();
+		
+		var items = this.getSelectedItems();
+		var setItemSelected = this.setItemSelected.bind(this);
 		for(var i=0; i<items.length; i++)
 		{
-			this.setItemSelected(items[i], false);
-		}	
+			setItemSelected(items[i], false);
+		}
 		this.removeCurrentLines();
+		var parseXmlNodeFunc;
+		if(this._displayMode == "list") parseXmlNodeFunc = this.xmlNodeToTableRow.bind(this);
+		else parseXmlNodeFunc = this.xmlNodeToDiv.bind(this);
 		// NOW PARSE LINES
 		this.parsingCache = new Hash();
 		for (var i = 0; i < l; i++) 
 		{
 			if (cs[i].nodeName == "tree") 
 			{
-				if(this._displayMode == "list") 
-				{
-					this.xmlNodeToTableRow(cs[i]);
-				}
-				else if(this._displayMode == "thumb")
-				{
-					this.xmlNodeToDiv(cs[i]);
-				}
+				parseXmlNodeFunc(cs[i]);
 			}
 		}	
 		this.initRows();
@@ -552,9 +553,9 @@ FilesList = Class.create(SelectableElements, {
 	
 	xmlNodeToTableRow: function(xmlNode){		
 		var newRow = document.createElement("tr");		
-		var tBody = this.parsingCache.get('tBody') || this._htmlElement.getElementsBySelector("tbody")[0];
+		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
 		this.parsingCache.set('tBody', tBody);
-		for(i=0;i<xmlNode.attributes.length;i++)
+		for(var i=0;i<xmlNode.attributes.length;i++)
 		{
 			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
 			if(Prototype.Browser.IE && xmlNode.attributes[i].nodeName == "ID"){
@@ -571,29 +572,32 @@ FilesList = Class.create(SelectableElements, {
 		}else{
 			attributeList = this.parsingCache.get('attributeList');
 		}
-		attributeList.each(function(s){
-			var tableCell = document.createElement("td");			
+		//var getNodeAttribute = xmlNode.getAttribute.bind();
+		for(i = 0; i<attributeList.length;i++ ){
+			var s = attributeList[i];			
+			var tableCell = new Element("td");			
 			if(s == "ajxp_label")
 			{
-				innerSpan = document.createElement("span");
-				innerSpan.setAttribute("style", "cursor:default;");
-				$(innerSpan).addClassName("list_selectable_span");
-				// Add icon
-				var imgString = "<img src=\""+ajxpResourcesFolder+"/images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" ";
-				imgString =  imgString + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + xmlNode.getAttribute('text')+"</span>";
-				innerSpan.innerHTML = imgString;			
-				tableCell.appendChild(innerSpan);
-				$(innerSpan).setStyle({display:'block'});
-				$(innerSpan).setAttribute('filename', newRow.getAttribute('filename'));
-				if(!xmlNode.getAttribute("is_recycle") || xmlNode.getAttribute("is_recycle") != "1"){
-					var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'});
-					this.allDraggables[this.allDraggables.length] = newDrag;
-				}
-				if(xmlNode.getAttribute("is_file") == "0")
-				{
-					AjxpDroppables.add(innerSpan);
-					this.allDroppables[this.allDroppables.length] = innerSpan;
-				}
+				var innerSpan = new Element("span", {
+					className:"list_selectable_span", 
+					style:"cursor:default;display:block;"
+				}).update("<img src=\""+ajxpResourcesFolder+"/images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + xmlNode.getAttribute('text')+"</span>");
+				innerSpan.setAttribute('filename', newRow.getAttribute('filename'));
+				tableCell.insert(innerSpan);
+				
+				// Defer Drag'n'drop assignation for performances
+				window.setTimeout(function(){
+					if(!xmlNode.getAttribute("is_recycle") || xmlNode.getAttribute("is_recycle") != "1"){
+							var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'});
+							this.allDraggables.push(newDrag);						
+					}
+					if(xmlNode.getAttribute("is_file") == "0")
+					{
+						AjxpDroppables.add(innerSpan);
+						this.allDroppables.push(innerSpan);
+					}
+				}.bind(this), 500);
+				
 			}else if(s=="ajxp_modiftime"){
 				var date = new Date();
 				date.setTime(parseInt(xmlNode.getAttribute(s))*1000);
@@ -605,18 +609,18 @@ FilesList = Class.create(SelectableElements, {
 				tableCell.innerHTML = xmlNode.getAttribute(s);
 			}
 			if(this.gridStyle == "grid"){
-				$(tableCell).setAttribute('valign', 'top');				
-				$(tableCell).setStyle({
+				tableCell.setAttribute('valign', 'top');				
+				tableCell.setStyle({
 					verticalAlign:'top', 
 					borderRight:'1px solid #eee'
 				});
 				if(this.even){
-					$(tableCell).setStyle({borderRightColor: '#fff'});					
+					tableCell.setStyle({borderRightColor: '#fff'});					
 				}
 				if (tableCell.innerHTML == '') tableCell.innerHTML = '&nbsp;';
 			}
 			newRow.appendChild(tableCell);
-		}.bind(this));	
+		}
 		tBody.appendChild(newRow);
 		if(this.even){
 			//$(newRow).setStyle({backgroundColor: '#eee'});					
@@ -705,15 +709,20 @@ FilesList = Class.create(SelectableElements, {
 			newRow.appendChild(innerSpan);
 			this._htmlElement.appendChild(newRow);
 		}
-		try{
-			var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true});
-			this.allDraggables[this.allDraggables.length] = newDrag;
-		}catch(e){alert(e);}
-		if(tmpAtts.get("is_file") == "0")
+		
+		// Defer Drag'n'drop assignation for performances
+		if(!tmpAtts.get("is_recycle") || tmpAtts.get("is_recycle") != "1"){
+			window.setTimeout(function(){
+				var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true,scroll:'tree_container'});
+				this.allDraggables.push(newDrag);						
+			}.bind(this), 500);
+		}
+		if(xmlNode.getAttribute("is_file") == "0")
 		{
 			AjxpDroppables.add(newRow);
-			this.allDroppables[this.allDroppables.length] = newRow;
+			this.allDroppables.push(newRow);
 		}
+		
 		delete(tmpAtts);
 		delete(xmlNode);
 	},
@@ -792,8 +801,8 @@ FilesList = Class.create(SelectableElements, {
 	
 	removeCurrentLines: function(){
 		var rows;		
-		if(this._displayMode == "list") rows = $(this._htmlElement).getElementsBySelector('tr');
-		else if(this._displayMode == "thumb") rows = $(this._htmlElement).getElementsBySelector('div');
+		if(this._displayMode == "list") rows = $(this._htmlElement).select('tr');
+		else if(this._displayMode == "thumb") rows = $(this._htmlElement).select('div');
 		for(i=0; i<rows.length;i++)
 		{
 			try{
@@ -805,13 +814,14 @@ FilesList = Class.create(SelectableElements, {
 				}
 			}catch(e){
 			}			
-			if(this.isItem(rows[i])) rows[i].remove();
+			//if(this.isItem(rows[i])) rows[i].remove();
+			rows[i].remove();
 		}
 	},
 	
 	setOnLoad: function()	{
 		if(this.loading) return;
-		var parentObject = Position.offsetParent($(this._htmlElement));			
+		var parentObject = $('content_pane');
 		addLightboxMarkupToElement(parentObject);
 		var img = document.createElement("img");
 		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
@@ -820,7 +830,7 @@ FilesList = Class.create(SelectableElements, {
 	},
 	
 	removeOnLoad: function(){
-		removeLightboxFromElement(Position.offsetParent($(this._htmlElement)));
+		removeLightboxFromElement($('content_pane'));
 		this.loading = false;
 	},
 	
