@@ -67,6 +67,13 @@ var AjxpDraggable = Class.create(Draggable, {
 		$super(element, options);
 	},
 	
+	destroy : function(){
+	    Event.stopObserving(this.handle, "mousedown", this.eventMouseDown);
+	    this.element.removeClassName('ajxp_draggable');
+	    this.element = null;
+	    Draggables.unregister(this);
+	},
+	
     startDrag : function(event){
 	
 	    if(!this.delta)
