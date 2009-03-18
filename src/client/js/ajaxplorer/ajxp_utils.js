@@ -82,7 +82,8 @@ function formatDate(dateObject, format){
 	format = format.replace("D", dateObject.getDay());
 	format = format.replace("Y", dateObject.getFullYear());
 	format = format.replace("y", dateObject.getYear());
-	format = format.replace("m", (dateObject.getMonth()<10?'0'+dateObject.getMonth():dateObject.getMonth()));
+	var month = dateObject.getMonth() + 1;
+	format = format.replace("m", (month<10?'0'+month:month));
 	format = format.replace("H", (dateObject.getHours()<10?'0':'')+dateObject.getHours());
 	format = format.replace("i", (dateObject.getMinutes()<10?'0':'')+dateObject.getMinutes());
 	format = format.replace("s", (dateObject.getSeconds()<10?'0':'')+dateObject.getSeconds());
