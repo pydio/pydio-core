@@ -402,6 +402,17 @@ switch ($action)
 	
 	case "install_log" : 
 		$log = array();
+		header("Content-Type:text/html;charset=UTF-8");	
+		if(is_file(TESTS_RESULT_FILE)){
+			include_once(TESTS_RESULT_FILE);			
+			foreach ($diagResults as $id => $value){
+				print "<div><span>$id</span> : $value</div>";
+			}
+		}else{
+			print "Cannot find test result file. Please run the tests first!";
+		}
+		exit(1);
+		/*
 		$log["PHP Version"] = phpversion();
 		$log["AJXP Version"] = AJXP_VERSION;
 		$log["Server OS"] = PHP_OS;
@@ -416,11 +427,7 @@ switch ($action)
 		$log["Gzip configuration"] = GZIP_DOWNLOAD;		
 		$log["Magic Quotes Gpc"] = get_magic_quotes_gpc();
 		$log["Client"] = $_SERVER['HTTP_USER_AGENT'];	
-		header("Content-Type:text/html;charset=UTF-8");	
-		foreach ($log as $id => $value){
-			print "<div><span>$id</span> : $value</div>";
-		}
-		exit(1);
+		*/
 	break;
 }
 
