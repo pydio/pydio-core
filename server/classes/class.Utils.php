@@ -285,7 +285,98 @@ class Utils
 		return str_replace(array("&", "<",">"), array("&amp;", "&lt;","&gt;"), $string);
 	}
 
-
+	function testResultsToTable($outputArray, $testedParams, $showSkipLink = true){
+		$style = '
+		<style>
+		body {
+		background-color:#e0ecff;
+		background-image:url(client/images/GradientBg.gif);
+		background-position:center top;
+		background-repeat:repeat-x;
+		margin:0;
+		padding:20;
+		}
+		* {font-family:arial, sans-serif;font-size:11px;color:#006}
+		h1 {font-size: 20px; color:#e0ecff}
+		thead tr{background-color: #ccc; font-weight:bold;}
+		tr.dump{background-color: #ee9;}
+		tr.passed{background-color: #ae9;}
+		tr.failed{background-color: #ea9;}
+		td {padding: 3px 6px;}
+		td.col{font-weight: bold;}
+		</style>
+		';
+		$html = "<html><head>$style</head><body><h1>AjaXplorer Diagnostic Tool</h1><p>Test failed : you are likely to have problems running AjaXplorer! Please check the red lines below!</p>";
+		$html .= "<table width='500' border='0' cellpadding='0' cellspacing='1'><thead><tr><td>Name</td><td>Result</td><td>Info</td></tr></thead>"; 
+		$dumpRows = "";
+		$passedRows = "";
+		foreach($outputArray as $item)
+		{
+		    // A test is output only if it hasn't succeeded (doText returned FALSE)
+		    $result = $item["result"] ? "passed" : ($item["level"] == "info" ? "dump" : "failed");
+		    $success = $result == "passed";    
+		    $row = "<tr class='$result'><td class='col'>".$item["name"]."</td><td>".$result."&nbsp;</td><td>".(!$success ? $item["info"] : "")."&nbsp;</td></tr>";
+		    if($result == "dump"){
+		    	$dumpRows .= $row;
+		    }else if($result == "passed"){
+		    	$passedRows .= $row;
+		    }else{
+		    	$html .= $row;
+		    }
+		}
+		$html .= $passedRows;
+		$html .= $dumpRows;
+		$html .= "</table>";
+		if($showSkipLink){
+			$html .= "<p><a href='index.php?ignore_tests=true'>It's, ok i can handle this, let me use ajaxplorer!.</a></p>";
+		}
+		$html.="</body></html>";
+		return $html;
+	}
+	
+	function runTests(&$outputArray, &$testedParams){
+		// At first, list folder in the tests subfolder
+		chdir(INSTALL_PATH.'/server/tests');
+		$files = glob('*.php'); 
+		
+		$outputArray = array();
+		$testedParams = array();
+		$passed = true;
+		foreach($files as $file)
+		{
+		    require_once($file);
+		    // Then create the test class
+		    $testName = str_replace(".php", "", substr($file, 5));
+		    $class = new $testName();
+		    
+		    $result = $class->doTest();
+		    if(!$result && $class->failedLevel != "info") $passed = false;
+		    $outputArray[] = array(
+		    	"name"=>$class->name, 
+		    	"result"=>$result, 
+		    	"level"=>$class->failedLevel, 
+		    	"info"=>$class->failedInfo); 
+		   	if(count($class->testedParams)){
+			    $testedParams = array_merge($testedParams, $class->testedParams);
+		   	}
+		}
+		return $passed;
+	}	
+	
+	function testResultsToFile($outputArray, $testedParams){
+		ob_start();
+		echo '$diagResults = ';
+		var_export($testedParams);
+		echo ';';
+		echo '$outputArray = ';
+		var_export($outputArray);
+		echo ';';
+		$content = '<?php '.ob_get_contents().' ?>';
+		ob_end_clean();
+		//print_r($content);
+		file_put_contents(TESTS_RESULT_FILE, $content);		
+	}
+		
 }
 
 ?>
