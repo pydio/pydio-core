@@ -43,7 +43,7 @@ class PHPVersion extends AbstractTest
     { 
         $version = phpversion(); 
     	$this->testedParams["PHP Version"] = $version;
-    	return false;
+    	//return false;
         if (floatval($version) < 4.2) return FALSE; 
         $locale = setlocale(LC_CTYPE, 0);
         $dirSep = DIRECTORY_SEPARATOR;
