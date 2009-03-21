@@ -148,13 +148,16 @@ class fsDriver extends AbstractDriver
 					print($data[0]["content"]);
 				}else{
 					
-					if(isSet($get_thumb) && $get_thumb == "true" && GENERATE_THUMBNAIL){
+					if(isSet($get_thumb) && $get_thumb == "true" && $this->driverConf["GENERATE_THUMBNAIL"]){
 						require_once("server/classes/PThumb.lib.php");
-						$pThumb = new PThumb();
-						if(!$pThumb->isError()){
-							$pThumb->use_cache = USE_THUMBNAIL_CACHE;
-							$pThumb->cache_dir = INSTALL_PATH."/".THUMBNAIL_CACHE_DIR;
+						$pThumb = new PThumb($this->driverConf["THUMBNAIL_QUALITY"]);						
+						if(!$pThumb->isError()){							
+							$pThumb->use_cache = $this->driverConf["USE_THUMBNAIL_CACHE"];
+							$pThumb->cache_dir = INSTALL_PATH."/".$this->driverConf["THUMBNAIL_CACHE_DIR"];	
 							$pThumb->fit_thumbnail($this->getPath()."/".SystemTextEncoding::fromUTF8($file), 200);
+							if($pThumb->isError()){
+								print_r($pThumb->error_array);
+							}
 							exit(0);
 						}
 					}
@@ -691,7 +694,8 @@ class fsDriver extends AbstractDriver
 	
 	function listing($nom_rep, $dir_only = false)
 	{
-		$size_unit = ConfService::getConf("SIZE_UNIT");
+		$mess = ConfService::getMessages();
+		$size_unit = $mess["byte_unit_symbol"];
 		$sens = 0;
 		$ordre = "nom";
 		$poidstotal=0;
@@ -699,7 +703,7 @@ class fsDriver extends AbstractDriver
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		while ($file = readdir($handle))
 		{
-			if($file!="." && $file!=".." && Utils::showHiddenFiles($file)==1)
+			if($file!="." && $file!=".." && !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"]))
 			{
 				if($recycle != "" 
 					&& $nom_rep == $this->repository->getOption("PATH")."/".$recycle 

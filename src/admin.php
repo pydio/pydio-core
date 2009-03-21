@@ -425,6 +425,5 @@ switch ($action)
 }
 
 include(CLIENT_RESOURCES_FOLDER."/html/admin.html");
-include(ConfService::getConf("BOTTOM_PAGE"));
 session_write_close();
 ?>

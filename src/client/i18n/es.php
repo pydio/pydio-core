@@ -13,6 +13,7 @@
 $mess=array(
 "languageLabel" => "Español",
 "date_format"  => "Y/m/d H:i",
+"byte_unit_symbol" => "b",
 "0" => "Última ver.",
 "1" => "Nombre",
 "2" => "Tamaño",

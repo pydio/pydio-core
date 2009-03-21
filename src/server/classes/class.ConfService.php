@@ -42,10 +42,7 @@ global $G_REPOSITORIES;
 global $G_REPOSITORY;
 global $G_USE_HTTPS;
 global $G_WM_EMAIL;
-global $G_SIZE_UNIT;
 global $G_MAX_CHAR;
-global $G_SHOW_HIDDEN;
-global $G_BOTTOM_PAGE;
 global $G_UPLOAD_MAX_NUMBER;
 global $G_UPLOAD_MAX_FILE;
 global $G_UPLOAD_MAX_TOTAL;
@@ -58,8 +55,8 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_DEFAULT_REPOSITORIES;
-		if(!isset($langue) || $langue=="") {$langue=$dft_langue;}
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_DEFAULT_REPOSITORIES;
+		if(!isset($langue) || $langue=="") {$langue=$default_language;}
 		$G_LANGUE = $langue;
 		if(isSet($available_languages)){
 			$G_AVAILABLE_LANG = $available_languages;
@@ -68,10 +65,7 @@ class ConfService
 		}
 		$G_USE_HTTPS = $use_https;
 		$G_WM_EMAIL = $webmaster_email;
-		$G_SIZE_UNIT = $size_unit;
 		$G_MAX_CHAR = $max_caracteres;
-		$G_SHOW_HIDDEN = $showhidden;
-		$G_BOTTOM_PAGE = $baspage;
 		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
 		$G_UPLOAD_MAX_FILE = Utils::convertBytes($upload_max_size_per_file);
 		$G_UPLOAD_MAX_TOTAL = Utils::convertBytes($upload_max_size_total);
@@ -292,7 +286,7 @@ class ConfService
 
 	function getConf($varName)	
 	{
-		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_SIZE_UNIT,$G_MAX_CHAR,$G_SHOW_HIDDEN,$G_BOTTOM_PAGE, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_MAX_FILE;
+		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_MAX_FILE;
 		$globVarName = "G_".$varName;
 		return $$globVarName;
 	}
