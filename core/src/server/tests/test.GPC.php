@@ -41,6 +41,7 @@ class GPC extends AbstractTest
     function GPC() { parent::AbstractTest("Magic quotes", "Magic quotes enabled : ".get_magic_quotes_gpc()); }
     function doTest() 
     { 
+    	$this->testedParams["Magic Quotes Enabled"] = (get_magic_quotes_gpc()?"Yes":"No");
         $this->failedLevel = "info";
         return FALSE;
     }

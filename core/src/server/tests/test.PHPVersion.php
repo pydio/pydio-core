@@ -42,8 +42,14 @@ class PHPVersion extends AbstractTest
     function doTest() 
     { 
         $version = phpversion(); 
+    	$this->testedParams["PHP Version"] = $version;
+    	return false;
         if (floatval($version) < 4.2) return FALSE; 
-        if (floatval($version) < 5.1 && setlocale(LC_CTYPE, 0) != "C" && DIRECTORY_SEPARATOR != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
+        $locale = setlocale(LC_CTYPE, 0);
+        $dirSep = DIRECTORY_SEPARATOR;
+        $this->testedParams["Locale"] = $locale;
+        $this->testedParams["Directory Separator"] = $dirSep;
+        if (floatval($version) < 5.1 && $locale != "C" && $dirSep != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
         return TRUE;
     }
 };

@@ -41,6 +41,7 @@ class Zlib extends AbstractTest
     function Zlib() { parent::AbstractTest("Zlib extension (ZIP)", "Extension enabled : ".(function_exists('gzopen')?"1":"0")); }
     function doTest() 
     { 
+    	$this->testedParams["Zlib Enabled"] = (function_exists('gzopen')?"Yes":"No");
         $this->failedLevel = "info";
         return FALSE;
     }
