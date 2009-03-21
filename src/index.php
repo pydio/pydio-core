@@ -40,6 +40,19 @@ require_once("server/classes/class.AuthService.php");
 session_start();
 ConfService::init("server/conf/conf.php");
 
+$outputArray = array();
+$testedParams = array();
+$passed = true;
+if(!is_file(TESTS_RESULT_FILE)){
+	$passed = Utils::runTests($outputArray, $testedParams);
+	if(!$passed && !isset($_GET["ignore_tests"])){
+		die(Utils::testResultsToTable($outputArray, $testedParams));
+	}else{
+		Utils::testResultsToFile($outputArray, $testedParams);
+	}
+}
+
+
 if(AUTH_MODE == "wordpress"){
 	require_once("../../../wp-config.php");
 	require_once("../../../wp-includes/capabilities.php");

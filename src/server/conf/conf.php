@@ -140,6 +140,8 @@ define("IMAGES_FOLDER", "client/images");
 define("CLIENT_RESOURCES_FOLDER", "client");
 define("SERVER_RESOURCES_FOLDER", "server/classes");
 define("DOCS_FOLDER", "client/doc");
+define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
+
 
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
