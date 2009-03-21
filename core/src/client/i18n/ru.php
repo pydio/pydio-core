@@ -13,6 +13,7 @@
 $mess=array(
 "languageLabel" => "Russian",
 "date_format"  => "Y/m/d H:i",
+"byte_unit_symbol" => "b",
 "0" => "Версия",
 "1" => "Имя файла",
 "2" => "Размер",

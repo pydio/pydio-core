@@ -13,6 +13,7 @@
 $mess=array(
 "languageLabel" => "Nederlands",
 "date_format"  => "Y/m/d H:i",
+"byte_unit_symbol" => "b",
 "0" => "Laatste versie",
 "1" => "Bestandsnaam",
 "2" => "Grote",

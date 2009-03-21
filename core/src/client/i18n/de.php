@@ -13,6 +13,7 @@
 $mess=array(
 "languageLabel" => "Deutsch",
 "date_format"  => "Y/m/d H:i",
+"byte_unit_symbol" => "b",
 "0" => "Aktuelle Version",
 "1" => "Dateiname",
 "2" => "Größe",

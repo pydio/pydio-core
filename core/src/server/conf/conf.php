@@ -33,10 +33,6 @@
  * 
  * Description : configuration file
  */
-
-/* DEFAULT LANGUAGE */
-$dft_langue="en";
-
 define("AJXP_VERSION", "2.4.rc2");
 define("AJXP_VERSION_DATE", "2009/02/17");
 
@@ -54,7 +50,7 @@ define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); //
 
 define("HTTPS_POLICY_FILE", "");
 
-/* 
+/*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.
 /* Use the GUI to add new repositories to explore!
 /*   + Log in as "admin" and go to "Settings">"Repositories"
@@ -72,7 +68,10 @@ $REPOSITORIES[0] = array(
 
 
 /**
- * Specific config for wordpress plugin, do not touch if you are not sure!
+ * Specific config for wordpress plugin, still experimental, do not touch if you are not sure!
+ * If you add this and create an "admin" user in ajaxplorer, 
+ * you should be able to access your files in the wordpress "admin" section, 
+ * in the "Manage" chapter, new tab "Ajaxplorer File Management". Tested on WP 2.1
  */
 if(AUTH_MODE == "wordpress"){
 	$REPOSITORIES[0] = array(
@@ -86,10 +85,16 @@ if(AUTH_MODE == "wordpress"){
 	);
 }
 
-//------------------------
-//		UPLOAD CONFIG
-//------------------------
+/*********************************************/
+/*	DEFAULT LANGUAGE
+/*  Check i18n folder for available values.
+/*********************************************/
+$default_language="en";
 
+
+/*********************************************/
+/*	GLOBAL UPLOAD CONFIG
+/*********************************************/
 // Maximum number of files for each upload. Leave to 0 for no limit.
 $upload_max_number = 16;
 
@@ -111,53 +116,21 @@ $upload_max_size_total = 0;
 /*********************************************/
 $webmaster_email = "webmaster@yourdomain.com";
 
-/* RECYCLE BIN : leave blank if you do not want to use it.
-/********************************/
-$recycle_bin = "recycle_bin";
-
+/**************************************************/
 /*  HTTPS DOMAIN? (USED TO CORRECT A BUG IN IE)
 /**************************************************/
 $use_https=false;
 
-// UNITE DE TAILLE DES FICHIER (octets "o", bytes "b")
-// (Unit of file size, "o" or "b")
-$size_unit="b";
-
-// NOMBRE DE CARACTERES MAXIMUM POUR LES NOMS DE FICHIER
-// (max number chars for file and directory names)
-
+/**************************************************/
+/* MAX NUMBER CHARS FOR FILE AND DIRECTORY NAMES
+/**************************************************/
 $max_caracteres=50;
 
-// AFFICHAGE DES FICHIERS CACHES : oui=1, non=0 (UN FICHIER CACHE COMMENCE PAR UN POINT)
-// (Show hidden files, yes=1, no=0)
-
-$showhidden=0;
-
-/************************************/
-/* THUMBNAIL MANAGEMENT (FS DRIVER) */
-/************************************/
-define("GENERATE_THUMBNAIL", true);
-// "Quality" parameter (defaults is 3). Fractional values are allowed, for example 1.5. Must be greater than zero.
-// Between 0 and 1 = Fast, but mosaic results, closer to 0 increases the mosaic effect.
-// 1 = Up to 350 times faster. Poor results, looks very similar to imagecopyresized.
-// 2 = Up to 95 times faster.  Images appear a little sharp, some prefer this over a quality of 3.
-// 3 = Up to 60 times faster.  Will give high quality smooth results very close to imagecopyresampled, just faster.
-// 4 = Up to 25 times faster.  Almost identical to imagecopyresampled for most images.
-// 5 = No speedup. Just uses imagecopyresampled, no advantage over imagecopyresampled.
-define("THUMBNAIL_QUALITY", 1);
-// Whether they are stored in a cache dir. At the moment, there is no mechanism for clearing the cache
-// So if you use it, it will be faster for the users, but the cache repository will increase size without stoping.
-define("USE_THUMBNAIL_CACHE", false);
-define("THUMBNAIL_CACHE_DIR", "server/tmp/"); // Must end with a slash!
 
 
-
-//------------------------------------------------------
-//		DO NOT CHANGE THESE VARIABLES BELOW
-//------------------------------------------------------
-
-
-
+/**************************************************/
+/*	ADVANCED : DO NOT CHANGE THESE VARIABLES BELOW
+/**************************************************/
 $installPath = realpath(dirname(__FILE__)."/../..");
 define("INSTALL_PATH", $installPath);
 define("USERS_DIR", $installPath."/server/users");
@@ -173,10 +146,4 @@ define("INITIAL_ADMIN_PASSWORD", "admin");
 
 define("GZIP_DOWNLOAD", false);
 define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 1M
-
-// PAGES D'ENTETE ET DE BAS DE PAGE
-// (header and footer files )
-$baspage=CLIENT_RESOURCES_FOLDER."/html/bottom.html";
-
-
 ?>
