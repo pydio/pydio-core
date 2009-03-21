@@ -41,9 +41,9 @@ class Writeability extends AbstractTest
     function Writeability() { parent::AbstractTest("Required writeable folder", "You must set the writeable flags for: "); }
     function doTest() 
     { 
-        if (!is_writable(INSTALL_PATH."/server")) { $this->failedInfo .= "INSTALL_PATH/server folder"; return FALSE; }
-        if (!is_writable(INSTALL_PATH."/server/logs")) { $this->failedInfo .= "INSTALL_PATH/server/logs folder"; return FALSE; }
-        if (!is_writable(INSTALL_PATH."/server/conf")) { $this->failedInfo .= "INSTALL_PATH/server/conf folder"; return FALSE; }
+        if (!is_writable("../")) { $this->failedInfo .= "INSTALL_PATH/server folder"; return FALSE; }
+        if (!is_writable("../logs")) { $this->failedInfo .= "INSTALL_PATH/server/logs folder"; return FALSE; }
+        if (!is_writable("../conf")) { $this->failedInfo .= "INSTALL_PATH/server/conf folder"; return FALSE; }
         
         return TRUE;
     }
