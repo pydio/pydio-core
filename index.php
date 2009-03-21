@@ -127,5 +127,5 @@ if($JS_DEBUG){
 	include_once(CLIENT_RESOURCES_FOLDER."/html/gui-z.html");
 }
 HTMLWriter::writeI18nMessagesClass($mess);
-include_once(ConfService::getConf("BOTTOM_PAGE"));
+HTMLWriter::closeBodyAndPage();
 ?>

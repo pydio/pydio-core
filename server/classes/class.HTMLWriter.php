@@ -121,6 +121,10 @@ class HTMLWriter
     	echo "</script>\n";
     }
     
+    function closeBodyAndPage(){
+    	print("</body></html>");
+    }
+    
 }
 
 ?>

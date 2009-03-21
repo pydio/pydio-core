@@ -110,17 +110,6 @@ class Utils
 		$fileContent = str_replace(chr(10), "", $fileContent);
 		$fileContent = str_replace(chr(13), "", $fileContent);
 		return $fileContent;
-		/*
-		$fic=file($fileName);
-		$fp=fopen($fileName,"w");
-		while (list ($cle, $val) = each ($fic))
-		{
-			$val=str_replace(CHR(10),"",$val);
-			$val=str_replace(CHR(13),"",$val);
-			fputs($fp,"$val\n");
-		}
-		fclose($fp);
-		*/
 	}
 	
 	function tipsandtricks()
@@ -243,7 +232,8 @@ class Utils
 	
 	function roundSize($filesize)
 	{
-		$size_unit = ConfService::getConf("SIZE_UNIT");
+		$mess = ConfService::getMessages();
+		$size_unit = $mess["byte_unit_symbol"];
 		if($filesize < 0){
 			$filesize = sprintf("%u", $filesize);
 		}
@@ -254,14 +244,9 @@ class Utils
 		if($filesize==0) {$filesize="-";}
 		return $filesize;
 	}
-	
-	function showHiddenFiles($fileName)
-	{
-		$showhidden = ConfService::getConf("SHOW_HIDDEN");
-		if(substr($fileName,0,1)=="." && $showhidden==0) {
-			return 0;
-		}
-		return 1;
+		
+	function isHidden($fileName){
+		return (substr($fileName,0,1) == ".");
 	}
 	
 	/**

@@ -123,12 +123,15 @@ class PThumb{
 	     */
     var $file_ext = array();
     
+    var $thumb_quality = 3;
+    
     /**#@-*/
     /**
 	     * The class constructor.
 	     * @access public
 	     */
-    function PThumb(){
+    function PThumb($quality){
+    	$this->thumb_quality = $quality;
 		$this -> error_array["fatal"] = array();
 		$this -> error_array["warning"] = array();
         if (!function_exists("gd_info")){
@@ -425,7 +428,7 @@ class PThumb{
 			imagesavealpha($thumbnail, true);
 		}
 		//Resize it
-        if (!$this->fastimagecopyresampled($thumbnail,$handle,0,0,0,0,$width,$height,ImageSX($handle),ImageSY($handle), THUMBNAIL_QUALITY)){
+        if (!$this->fastimagecopyresampled($thumbnail,$handle,0,0,0,0,$width,$height,ImageSX($handle),ImageSY($handle), $this->thumb_quality)){
             return $this -> set_error("Method print_thumbnail: Failed resizing image '$image'.");  
         }
         //Cache it
