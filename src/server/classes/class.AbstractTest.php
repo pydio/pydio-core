@@ -44,6 +44,8 @@ class AbstractTest
     var $failedInfo;
     /** The test results output (used for report) */
     var $resultOutput;
+    /** Tested params - When used as a diagnostic tool, can store variables used by the test*/
+    var $testedParas;
     /** The test level when failed (warning, info or error, default to error) */
     var $failedLevel;
     /** The test parameters */
@@ -55,6 +57,7 @@ class AbstractTest
         $this->failedInfo = $failedInfo;
         $this->params = $params;
         $this->failedLevel = "error";
+        $this->testedParams = array();
         global $MAIN_testsArray;
         $MAIN_testsArray[] = $this;
     }

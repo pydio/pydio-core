@@ -41,6 +41,7 @@ class PHPOS extends AbstractTest
     function PHPOS() { parent::AbstractTest("PHP operating system", "Current operating system ".PHP_OS); }
     function doTest() 
     { 
+    	$this->testedParams["Serveur OS"] = PHP_OS;
         $this->failedLevel = "info";
         return FALSE;
     }

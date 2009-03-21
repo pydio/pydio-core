@@ -42,7 +42,11 @@ class PHPGDVersion extends AbstractTest
     function doTest() 
     { 
         $this->failedLevel = "warning";
-        if (!function_exists("gd_info") || !function_exists("imagecopyresized") || !function_exists("imagecopyresampled")) return FALSE;
+        if (!function_exists("gd_info") || !function_exists("imagecopyresized") || !function_exists("imagecopyresampled")){
+        	$this->testedParams["GD Enabled"] = "No";
+        	return FALSE;
+        }
+        $this->testedParams["GD Enabled"] = "Yes";
         return TRUE;
     }
 };
