@@ -302,6 +302,7 @@ class Utils
 		tr.dump{background-color: #ee9;}
 		tr.passed{background-color: #ae9;}
 		tr.failed{background-color: #ea9;}
+		tr.warning{background-color: #f90;}
 		td {padding: 3px 6px;}
 		td.col{font-weight: bold;}
 		</style>
@@ -313,7 +314,7 @@ class Utils
 		foreach($outputArray as $item)
 		{
 		    // A test is output only if it hasn't succeeded (doText returned FALSE)
-		    $result = $item["result"] ? "passed" : ($item["level"] == "info" ? "dump" : "failed");
+		    $result = $item["result"] ? "passed" : ($item["level"] == "info" ? "dump" : ($item["level"]=="warning"? "warning":"failed"));
 		    $success = $result == "passed";    
 		    $row = "<tr class='$result'><td class='col'>".$item["name"]."</td><td>".$result."&nbsp;</td><td>".(!$success ? $item["info"] : "")."&nbsp;</td></tr>";
 		    if($result == "dump"){
