@@ -11,7 +11,7 @@
  If you want to use it as fast as possible, just change the ADMIN_PASSWORD in 
  the conf/conf.php file and upload on your server. 
  
- Check that the both "files" and "users" folders are both readable and writeable.
+ Check that the "server/conf", "server/logs" and "server/users" folders are writeable by apache user.
  
  For further configuration, read below.
  
@@ -19,8 +19,6 @@
  
  After unzipping the file into a local folder on your computer, use a text editor 
  to edit the configuration file located in conf/conf.php
- 
- You have to main configuration to change: the $REPOSITORIES variable and all the USERS constants.
  
  2.1 REPOSITORIES 
     
@@ -117,16 +115,10 @@
 
  2.3 FURTHER CONFIGURATION   
  
-	. $dft_langue		=> 		Default language to use, please use "en" or "fr" for the moment.
-	. $size_unit 		=>		Use "o" like "octets" or "b" like "bytes" for file size display.
 	. $max_caracteres	=>		Max number of characters for file and directory names.
-	. $showhidden		=>		Show hidden files or not when browsing folders.
 	. $upload_max_number=>		Allowed simultaneous upload to the server.
 	. $webmaster_email	=>		The email of the webmaster, not used for the moment
-	. $recycle_bin		=>		Create a recycle bin folder in your repositories to act as a 
-								buffer for files suppression (like windows recycle bin). 
-								Set it's name if you want to use it, or leave it blank otherwise.
-	. $user_https		=>		Set this to 'true' if you are working on https connexion.
+	. $use_https		=>		Set this to 'true' if you are working on https connexion.
  
  3 TIME TO WASTE?
  
