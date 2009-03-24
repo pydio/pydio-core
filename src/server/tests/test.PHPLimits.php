@@ -36,21 +36,18 @@
                                  
 require_once('../classes/class.AbstractTest.php');
 
-class Writeability extends AbstractTest
+class PHPLimits extends AbstractTest
 {
-    function Writeability() { parent::AbstractTest("Required writeable folder", "One of the following folder should be writeable and is not : "); }
+    function PHPLimits() { parent::AbstractTest("PHP Limits variables", "<b>Testing configs</b>"); }
     function doTest() 
     { 
-        $server = is_writable("../");
-        $logs = is_writable("../logs");
-        $conf = is_writable("../conf");
-        $this->testedParams["[Server, logs, conf]"] = "[$server,$logs,$conf]";
-        if(!$server || !$logs || !$conf){
-        	$this->failedInfo .= "INSTALL_PATH/server, INSTALL_PATH/server/conf, INSTALL_PATH/server/logs";
-        	return FALSE;
-        }
+    	$this->testedParams["Upload Max Size"] = ini_get("upload_max_filesize");
+    	$this->testedParams["Memory Limit"] = ((ini_get("memory_limit")!="")?ini_get("memory_limit"):get_cfg_var("memory_limit"));
+    	$this->testedParams["Max execution time"] = ini_get("max_execution_time");
+    	foreach ($this->testedParams as $paramName => $paramValue){
+    		$this->failedInfo .= "<br>$paramName=$paramValue";
+    	}
         $this->failedLevel = "info";
-        $this->failedInfo = "[$server,$logs,$conf]";
         return FALSE;
     }
 };
