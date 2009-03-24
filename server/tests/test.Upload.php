@@ -36,21 +36,29 @@
                                  
 require_once('../classes/class.AbstractTest.php');
 
-class Writeability extends AbstractTest
+class Upload extends AbstractTest
 {
-    function Writeability() { parent::AbstractTest("Required writeable folder", "One of the following folder should be writeable and is not : "); }
+    function Upload() { parent::AbstractTest("Upload particularities", "<b>Testing configs</b>"); }
     function doTest() 
     { 
-        $server = is_writable("../");
-        $logs = is_writable("../logs");
-        $conf = is_writable("../conf");
-        $this->testedParams["[Server, logs, conf]"] = "[$server,$logs,$conf]";
-        if(!$server || !$logs || !$conf){
-        	$this->failedInfo .= "INSTALL_PATH/server, INSTALL_PATH/server/conf, INSTALL_PATH/server/logs";
-        	return FALSE;
-        }
+    	include("../conf/conf.php");
+    	$this->testedParams["Upload Tmp Dir Writeable"] = is_writable(ini_get("upload_tmp_dir"));
+    	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
+    	$this->testedParams["AJXP Upload Max Size"] = $this->returnBytes($upload_max_size_per_file);
+    	foreach ($this->testedParams as $paramName => $paramValue){
+    		$this->failedInfo .= "<br>$paramName=$paramValue";
+    	}
+    	if(!$this->testedParams["Upload Tmp Dir Writeable"]){
+    		$this->failedLevel = "error";
+    		$this->failedInfo = "The temporary folder used by PHP to upload files is either incorrect or not writeable! Upload will not work. Please check : ".ini_get("upload_tmp_dir");
+    		return FALSE;
+    	}
+    	if($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Upload Max Size"]){
+    		$this->failedLevel = "warning";
+    		$this->failedInfo .= "<br>Ajaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("upload_max_filesize")." per file.";
+    		return FALSE;
+    	}
         $this->failedLevel = "info";
-        $this->failedInfo = "[$server,$logs,$conf]";
         return FALSE;
     }
 };

@@ -64,7 +64,22 @@ class AbstractTest
     
     /** Perform the test, should be overwritten in concrete classes */
     function doTest() { return FALSE; }
-};
+    
+    function returnBytes($val) {
+    	$val = trim($val);
+    	$last = strtolower($val[strlen($val)-1]);
+    	switch($last) {
+    		// Le modifieur 'G' est disponible depuis PHP 5.1.0
+    		case 'g':
+    			$val *= 1024;
+    		case 'm':
+    			$val *= 1024;
+    		case 'k':
+    			$val *= 1024;
+    	}
 
+    	return $val;
+    }
+};
 
 ?>
