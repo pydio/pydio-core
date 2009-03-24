@@ -307,8 +307,11 @@ class Utils
 		td.col{font-weight: bold;}
 		</style>
 		';
-		$html = "<html><head>$style</head><body><h1>AjaXplorer Diagnostic Tool</h1><p>Test failed : you are likely to have problems running AjaXplorer! Please check the red lines below!</p>";
-		$html .= "<table width='500' border='0' cellpadding='0' cellspacing='1'><thead><tr><td>Name</td><td>Result</td><td>Info</td></tr></thead>"; 
+		$html = "<html><head><title>AjaXplorer : Diagnostic Tool</title>$style</head><body><h1>AjaXplorer Diagnostic Tool</h1>";
+		if($showSkipLink){
+			$html .= "<p>Test failed : you are likely to have problems running AjaXplorer! Please check the red lines below!</p>";
+		}
+		$html .= "<table width='700' border='0' cellpadding='0' cellspacing='1'><thead><tr><td>Name</td><td>Result</td><td>Info</td></tr></thead>"; 
 		$dumpRows = "";
 		$passedRows = "";
 		foreach($outputArray as $item)

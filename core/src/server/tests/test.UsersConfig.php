@@ -36,21 +36,14 @@
                                  
 require_once('../classes/class.AbstractTest.php');
 
-class Writeability extends AbstractTest
+class UsersConfig extends AbstractTest
 {
-    function Writeability() { parent::AbstractTest("Required writeable folder", "One of the following folder should be writeable and is not : "); }
+    function UsersConfig() { parent::AbstractTest("Users Configuration", "Current config for users"); }
     function doTest() 
     { 
-        $server = is_writable("../");
-        $logs = is_writable("../logs");
-        $conf = is_writable("../conf");
-        $this->testedParams["[Server, logs, conf]"] = "[$server,$logs,$conf]";
-        if(!$server || !$logs || !$conf){
-        	$this->failedInfo .= "INSTALL_PATH/server, INSTALL_PATH/server/conf, INSTALL_PATH/server/logs";
-        	return FALSE;
-        }
+    	$this->testedParams["Users enabled"] = ENABLE_USERS;
+    	$this->testedParams["Guest enabled"] = ALLOW_GUEST_BROWSING;
         $this->failedLevel = "info";
-        $this->failedInfo = "[$server,$logs,$conf]";
         return FALSE;
     }
 };
