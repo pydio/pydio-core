@@ -55,7 +55,9 @@ class SystemTextEncoding
 		$encoding = substr(strrchr($locale, "."), 1);
 		if (is_numeric($encoding))
 		{
-			$encoding = "windows-".$encoding;
+		    if (substr($encoding, 0, 2) == "12") // CP12xx are changed to Windows-12xx to allow PHP4 conversion
+  			    $encoding = "windows-".$encoding;
+  			else $encoding = "CP".$encoding; // In other cases, PHP4 won't work anyway, so use CPxxxx encoding (that iconv supports)
 		} else if ($locale == "C")
 		{   // Locale not set correctly, most probable error cause is /etc/init.d/apache having "LANG=C" defined
 			// In any case, "C" is ASCII-7 bit so it's safe to use the extra bit as if it was UTF-8 
