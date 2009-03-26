@@ -287,11 +287,11 @@ FilesList = Class.create(SelectableElements, {
 			if(this.loading) return;
 			var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
 			window.loader = new Image();
-			loader.src = "content.php?action=image_proxy&get_thumb=true&file="+oImageToLoad.filename;
+			loader.src = "content.php?action=image_proxy&get_thumb=true&file="+encodeURIComponent(oImageToLoad.filename);
 			loader.onload = function(){
 				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);
 				if(img == null) return;
-				img.src = "content.php?action=image_proxy&get_thumb=true&file="+oImageToLoad.filename;
+				img.src = "content.php?action=image_proxy&get_thumb=true&file="+encodeURIComponent(oImageToLoad.filename);
 				img.height = oImageToLoad.height;
 				img.width = oImageToLoad.width;
 				img.setStyle({marginTop: oImageToLoad.marginTop+'px',marginBottom: oImageToLoad.marginBottom+'px'});
@@ -814,8 +814,10 @@ FilesList = Class.create(SelectableElements, {
 				}
 			}catch(e){
 			}			
-			//if(this.isItem(rows[i])) rows[i].remove();
-			rows[i].remove();
+			//if(this.isItem(rows[i])) rows[i].remove();i
+			if(rows[i].parentNode){
+				rows[i].remove();
+			}
 		}
 	},
 	
