@@ -42,6 +42,20 @@
 			</includes>
 		</fileSet>
 		<fileSet>
+			<outputDirectory>server/tests</outputDirectory>
+			<directory>src/server/tests</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory>server/logs</outputDirectory>
+			<directory>src/server/logs</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
 			<outputDirectory>server/users</outputDirectory>
 			<directory>src/server/users</directory>
 			<includes>
