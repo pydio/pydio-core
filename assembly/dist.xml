@@ -38,7 +38,9 @@
 			<outputDirectory>server/conf</outputDirectory>
 			<directory>src/server/conf</directory>
 			<includes>
-				<include>**/*</include>
+				<include>conf.php</include>
+				<include>conf.fs.inc</include>
+				<include>.htaccess</include>
 			</includes>
 		</fileSet>
 		<fileSet>
@@ -52,7 +54,7 @@
 			<outputDirectory>server/logs</outputDirectory>
 			<directory>src/server/logs</directory>
 			<includes>
-				<include>**/*</include>
+				<include>.htaccess</include>
 			</includes>
 		</fileSet>
 		<fileSet>
