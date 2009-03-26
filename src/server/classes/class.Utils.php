@@ -381,7 +381,7 @@ class Utils
         require_once("../classes/class.ConfService.php");
         require_once("../classes/class.Repository.php");
         include("../conf/conf.php");
-        foreach($REPOSITORIES as $îndex => $repo){
+        foreach($REPOSITORIES as $index => $repo){
             $repoList[] = ConfService::createRepositoryFromArray($index, $repo);
         }        
         // Try with the serialized repositories
