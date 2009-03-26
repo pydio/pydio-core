@@ -1,0 +1,100 @@
+<html>
+<head>
+<title>AjaXplorer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="icon" type="image/x-png" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/html-folder.png">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/allz.css">
+<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/webfx/slider/css/bluecurve/bluecurve.css">
+<?php
+	if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
+	echo '<link rel="stylesheet" type="text/css" href="'.CLIENT_RESOURCES_FOLDER.'/css/pngHack/pngHack.css">';
+	}
+?>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/codepress/codepress.js"></script>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
+		
+<div id="loading_overlay" style="background-color:#dbe7fa;">
+	<div id="progressBox" style="background-color:#dbe7fa;">
+		<div id="loaderContent" style="text-align:left; width:416px; height: 321px; background-image:url('<?php print(CLIENT_RESOURCES_FOLDER);?>/images/SplashGradBG.png');background-repeat:no-repeat; padding:0px;">
+		<div style="padding:5px;">
+			<div align="left" style="font-size:12px;font-family:Trebuchet MS, sans-serif; font-weight:normal;color:#084165;position: relative;top:210px; left: 10px;">
+			Written by Charles du Jeu - LGPL License. <br>
+			AjaXplorer web browser version <?php print(AJXP_VERSION);?> - <?php print(AJXP_VERSION_DATE);?>
+			
+			<div style="margin-top: 10px;" id="progressState">Loading AjaXplorer</div>
+			<div id="progressBarBorder" style="font-size: 0.5em;" align="left"><div id="progressBar" style="width:0px;"></div></div>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
+		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
+		var zipEnabled = <?php print($ZIP_ENABLED); ?>;
+</script>
+<script language="javascript" type="text/javascript">var dynamicLibLoading = false;</script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer.js"></script>
+<script type="text/javascript">
+		var ajaxplorer;
+		Event.observe(window, "load", function(){
+			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", <?php print($ROOT_DIRS_LIST);?>, <?php print($ROOT_DIRS_SETTINGS); ?>, "<?php print($DEFAULT_DISPLAY);?>");
+			<?php 
+			if($BEGIN_MESSAGE != "") print("alert('".str_replace("'", "\'", $BEGIN_MESSAGE)."');");
+			?>
+			ajaxplorer.currentLanguage = '<?php print(ConfService::getLanguage()); ?>';
+		});
+ </script>
+<style>.dialogBox[id]{position:fixed;}</style>
+<div id="all_forms">
+<div id="generic_dialog_box" class="dialogBox">
+	<div class="dialogTitle"></div>
+	<div class="dialogContent"></div>
+</div>
+
+<!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
+<form id="login_form" action="login" style="display:none;" box_width="210">
+<input type="hidden" name="get_action" value="login">
+<input type="hidden" name="login_seed" id="login_seed" value="">
+<div class="dialogLegend" style="margin-bottom: 7px;" ajxp_message_id="180"><?php print($mess[180]);?></div>
+<table cellpadding="3" border="0" cellspacing="0" style="font-size:11px;">
+<tr><td align="right"><ajxp_message ajxp_message_id="181"><?php print($mess[181]);?></ajxp_message> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
+<tr><td align="right"><ajxp_message ajxp_message_id="182"><?php print($mess[182]);?></ajxp_message> :</td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td></tr>
+<tr><td align="left" colspan="2"><input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp_message ajxp_message_id="261"><?php print($mess[261]);?></ajxp_message></td></tr>
+</table>
+</form>
+
+<!-- USER'S PREFERENCES -->
+<form id="user_pref_form" action="user_pref" style="display:none;" box_width="300">
+<fieldset><legend><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/flag.png" align="absmiddle" border="0" width="16" height="16"> <ajxp_message ajxp_message_id="190"><?php print($mess[190]);?></ajxp_message></legend>
+<?php 
+$langs = ConfService::getConf("AVAILABLE_LANG");
+foreach ($langs as $lang => $display)
+{
+	print("<input type=\"radio\" name=\"lang\" value=\"$lang\" id=\"lang_".$lang."\" class=\"radio\"/>$display<br>");
+}
+?>
+</fieldset>
+<fieldset><legend><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/view_choose.png" align="absmiddle" border="0" width="16" height="16"> <ajxp_message ajxp_message_id="191"><?php print($mess[191]);?></ajxp_message></legend>
+	<input type="radio" name="display" id="display_list" value="list" class="radio"><ajxp_message ajxp_message_id="192"><?php print($mess[192]);?></ajxp_message>
+	<input type="radio" name="display" id="display_thumb" value="thumb" class="radio"><ajxp_message ajxp_message_id="193"><?php print($mess[193]);?></ajxp_message>
+</fieldset>
+<?php if(AuthService::changePasswordEnabled()){ ?>
+<fieldset><legend><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/yast_security.png" align="absmiddle" border="0" width="16" height="16"> <ajxp_message ajxp_message_id="194"><?php print($mess[194]);?></ajxp_message></legend>
+<input type="hidden" name="pass_seed" id="pass_seed" value="">
+<table cellpadding="2" cellspacing="0" border="0" style="font-size:11px;">
+	<tr>
+		<td align="right" style="width:90px; text-align:right;"><ajxp_message ajxp_message_id="237"><?php print($mess[237]);?></ajxp_message></td><td><input type="password" id="user_change_ownpass_old" value=""></td>
+	</tr>
+	<tr>
+		<td align="right" style="text-align:right;"><ajxp_message ajxp_message_id="198"><?php print($mess[198]);?></ajxp_message></td><td><input type="password" id="user_change_ownpass1" value=""></td>
+	</tr>
+	<tr>
+		<td align="right" style="text-align:right;"><ajxp_message ajxp_message_id="199"><?php print($mess[199]);?></ajxp_message></td><td><input type="password" id="user_change_ownpass2" value=""></td>
+	</tr>
+</table>
+</fieldset>
+<?php } ?>
+</form>
+</div>

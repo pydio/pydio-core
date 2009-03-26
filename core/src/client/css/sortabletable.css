@@ -1,0 +1,95 @@
+.sort-table {
+	font-family:Trebuchet MS, sans-serif;
+	font-size: 11px;
+	/*border:		1px Solid ThreeDShadow;*/
+	background:	Window;
+	color:		WindowText;
+}
+
+.sort-table thead {
+	background-color:	#aaa;
+}
+
+.sort-table td {
+	padding:	2px 5px;
+}
+
+.sort-table thead td {
+    background-color: #ddd;
+	border-bottom:	none;
+	cursor:			pointer;
+	border-right: 	1px solid buttonhighlight;
+	font-size:12px;
+	color: #666;
+	padding: 0px;
+	padding-left: 7px;
+	padding-top: 2px;
+	height:23px;
+	background-image:url("../images/header_bg.png");
+	background-repeat:no-repeat;
+	background-position:top right;
+}
+
+#last_header{
+   border-right: 	0px solid #ddd;
+}
+
+#last_header:active{
+	background-image:url("../images/header_bg.png");
+	background-repeat:no-repeat;
+	background-position:top right;
+}
+.sort-table thead td:active {
+	background-image:url("../images/header_bg_on.png");
+	background-repeat:no-repeat;
+	background-position:top right;
+    /*color: #79f;*/
+}
+
+.sort-table thead td.desc
+{
+	background-image:url("../images/header_bg_down.png");
+	background-repeat:no-repeat;
+	background-position:top right;
+
+}
+
+.sort-table thead td.asc
+{
+	background-image:url("../images/header_bg_up.png");
+	background-repeat:no-repeat;
+	background-position:top right;
+
+}
+/*
+.sort-table thead td[_sortType=None]:active {
+	border-color:	ButtonHighlight ButtonShadow
+					ButtonShadow ButtonHighlight;
+	padding:		2px 5px;
+}
+*/
+.sort-arrow {
+	width:					11px;
+	height:					11px;
+	background-position:	center center;
+	background-repeat:		no-repeat;
+	margin:					0 2px;
+}
+
+.sort-arrow.descending {
+	background-image:		url("../images/downsimple.png");
+
+}
+
+.sort-arrow.ascending {
+	background-image:		url("../images/upsimple.png");
+}
+
+div.tipsandtricks
+{
+   color: buttonShadow;
+   font-family: Arial;
+   font-size: 11px;
+   padding-top: 70px;
+   text-align: center;
+}

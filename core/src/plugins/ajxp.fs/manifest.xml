@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="fs" label="File System (Standard)" description="Standard access to the filesystem on your server">
+	<client_settings icon="plugins/ajxp.fs/icon.png" search_engine="SearchEngine"/>
+	<param name="PATH" type="string" label="Path" description="Real path to the root folder on the server" mandatory="true"/>
+	<param name="CREATE" type="boolean" label="Create" description="Create folder if it does not exists" default="true" mandatory="true"/>
+	<param name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>	
+	<param name="CHMOD_VALUE" type="string" label="File Creation Mask" description="Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." default="0666"/>	
+</ajxpdriver>

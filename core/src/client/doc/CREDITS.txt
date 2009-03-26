@@ -1,0 +1,42 @@
+AjaXplorer Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
+Please read /doc/INSTALL.txt to find help with configuration.
+
+[MAIN DEVELOPER]
+AjaXplorer is developed and maintained by Charles du Jeu, from Paris France.
+Project Page : http://www.ajaxplorer.info/
+Developer's Band : http://www.almasound.com/ (reggae-salsa-dub)
+
+[EXTERNAL LIBRARIES]
+AjaXplorer was developed using various free libraries that are mentionned below. It is mainly an engineering work that used a lot of off-the-shelf components. Please check their websites!
+
+++ ZIP FUNCTIONNALITIES ++
+All the zip/unzip functionnalities implemented are based on the excellent PclZip class developped by PhpConcept.
+http://www.phpconcept.net/pclzip/index.en.php
+
+++ JAVASCRIPT FRAMEWORKS & PLUGINS ++
+The Ajax client is mainly based on the prototype.js library.
+http://www.prototypejs.org/
+
+++ WEBFX WIDGETS ++
+The Ajax widgets used for the Tree (XLoadTree) and for table sorting and selection were developed by WebFX.
+http://webfx.eae.net/
+
+++ MODAL WINDOWS ++
+The modal windows are done with a modification of the Leightbox script (itself a modification of lightbox.js).
+
+http://www.eight.nl/files/leightbox/
+http://www.huddletogether.com/projects/lightbox/
+
+++ CODEPRESS : Syntax highlighting ++
+The online edition was done integrating CodePress. Very powerful!
+http://www.codepress.org/
+
+++ DEWPLAYER :  MP3 Flash Player ++
+The online mp3 flash player is developed by a french webagency, AlsaCreation.
+http://www.alsacreations.fr/mp3-dewplayer.html
+
+++ MC MEDIA PLAYER : FLV Player ++
+MC Media Player is a Flash-based media player for embedding video, audio and still images in web pages. It is free to use for both non-profit and commercial websites.
+http://www.mcmediaplayer.com/
+
+Big respect to those developers! 

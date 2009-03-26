@@ -1,0 +1,110 @@
+<?php
+$mess = ConfService::getMessages();
+?>
+<html>
+<head>
+<title>AjaXplorer Content</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
+		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
+</script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/prototype.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/corners.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/md5/md5.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Connexion.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.AdminPageManager.js"></script>
+<script src=<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/codepress/codepress.js type=text/javascript></script>
+<script type="text/javascript">
+var manager;
+window.onload = function(){
+	manager = new AdminPageManager();
+};
+</script>
+
+<link rel="stylesheet" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/ajaxplorer.css">
+<?php
+	if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
+	echo '<link rel="stylesheet" type="text/css" href="'.CLIENT_RESOURCES_FOLDER.'/css/pngHack/pngHack.css">';
+	}
+?>
+<style>
+body, html
+{
+ 	background-color: #fff !important;
+    margin: 0px;
+    padding: 0px;    
+    /*overflow: auto;*/
+}
+.toggleInactive{
+   border-left: 1px solid white;
+}
+</style>
+
+</head>
+<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0">
+<div id="message_div" onclick="manager.closeMessageDiv();" class="messageBox"><div id="message_content"></div></div>
+<div id="search_div" style="background-color: #fff;">
+	<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle" style="border: 1px solid #aaa; border-bottom: 0px; height: 24px;">
+	<tr>
+    	<td id="users_header" onclick="manager.toggleSidePanel('users'); return false;" class="panelHeader toggleHeader" style="width:150px;">
+    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/yast_kuser.png"><a href="" onclick="manager.toggleSidePanel('users'); return false;" ajxp_message_id="249"><?php print $mess[249] ?></a>
+    	</td>
+    	<td id="repositories_header" onclick="manager.toggleSidePanel('repositories'); return false;" class="panelHeader toggleHeader" style="width:190px;">
+    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/folder_red.png"><a href="" onclick="manager.toggleSidePanel('repositories'); return false;" ajxp_message_id="250"><?php print $mess[250] ?></a>
+    	</td>
+    	<td id="logs_header" onclick="manager.toggleSidePanel('logs'); return false;" class="panelHeader toggleHeader" style="width:200px;">
+    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/toggle_log.png"><a href="" onclick="manager.toggleSidePanel('logs'); return false;" ajxp_message_id="251"><?php print $mess[251] ?></a>
+    	</td>
+    	<td id="install_header" onclick="manager.toggleSidePanel('install'); return false;" class="panelHeader toggleHeader" style="width:200px;">
+    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/admin.png"><a href="" onclick="manager.toggleSidePanel('install'); return false;">Install</a>
+    	</td>
+    </tr>
+	</table>
+	<div id="users_management" style="border:1px solid #aaa; border-top:0px; height:362px;">
+		<div id="user_admin_bar">
+		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/user_create.png" align="absmiddle" width="32" height="32"> <b>Create user</b>  
+		 	    &nbsp;&nbsp;&nbsp;&nbsp;
+		 		Login <input type="text" id="new_user_login">
+		 		Password <input type="password" id="new_user_pwd">
+		 		Confirm <input type="password" id="new_user_pwd_conf">
+		 		<input type="submit" value="OK" class="submit_button" onclick="manager.createUser(); return false;">
+		</div>
+		<!--<div class="users_list_title">All Users</div>-->
+		<div id="users_list"></div>
+		<div id="users_detail_panel"></div>
+	</div>
+	<div id="repositories_management" style="border:1px solid #aaa; border-top:0px;height:362px;overflow:auto;">
+		<div id="repo_create_form" style="overflow:hidden; height:32px;">
+		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/folder_red.png" align="absmiddle" width="32" height="32"> <b>Create Repository</b>
+		 	&nbsp;&nbsp;&nbsp;
+		 	Label<input type="text" name="DISPLAY" id="driver_label">&nbsp;&nbsp;
+		 	Driver <select id="drivers_selector" name="DRIVER">
+		 		<option selected value="0">Choose an access driver</option>
+		 	</select>
+		 	<div id="driver_form" style="padding-bottom:5px;"></div>
+		</div>
+		<!--<div class="users_list_title">Repositories List</div>-->
+		<div id="repo_list"></div>
+		<div id="repo_detail_panel"></div>
+	</div>
+	<div id="logs_management"  style="border:1px solid #aaa; border-top:0px;height:362px;">
+		<div id="log_chooser">
+		 	<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/toggle_log.png" align="absmiddle" width="32" height="32"> <b>Logs Monitoring</b>  
+		 	    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 		Choose a log file <select id="log_selector"></select>
+		 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 			 		
+		 		<img src="<?php print(CLIENT_RESOURCES_FOLDER); ?>/images/crystal/actions/32/reload.png" onclick="manager.logSelectorChange(); return false;" style="cursor:pointer;" align="absmiddle" width="32" height="32" title="Reload logs">
+		</div>
+		<div id="log_browser" style="height:299px; overflow:auto;">
+		</div>
+	</div>
+	<div id="install_management" style="border:1px solid #aaa; border-top:0px;height:362px;">
+		<div style="padding: 10px;">Please copy and paste the following data when you ask a question in the forum or by email, it will help solve your problems!</div>
+		<div id="install_log"></div>
+	</div>
+</div>     	
+</body>
+</html>

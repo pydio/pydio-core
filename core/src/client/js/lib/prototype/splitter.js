@@ -1,0 +1,211 @@
+/*
+ * jquery.splitter.js - two-pane splitter window plugin
+ *
+ * version 1.01 (01/05/2007) 
+ * 
+ * Dual licensed under the MIT and GPL licenses: 
+ *   http://www.opensource.org/licenses/mit-license.php 
+ *   http://www.gnu.org/licenses/gpl.html 
+ * 
+ * Ported to Prototype by Charles du Jeu
+ */
+
+/**
+ * The splitter() plugin implements a two-pane resizable splitter window.
+ * The selected elements in the jQuery object are converted to a splitter;
+ * each element should have two child elements which are used for the panes
+ * of the splitter. The plugin adds a third child element for the splitbar.
+ * 
+ * For more details see: http://methvin.com/jquery/splitter/
+ *
+ *
+ * @example $('#MySplitter').splitter();
+ * @desc Create a vertical splitter with default settings 
+ *
+ * @example $('#MySplitter').splitter({direction: 'h', accessKey: 'M'});
+ * @desc Create a horizontal splitter resizable via Alt+Shift+M
+ *
+ * @name splitter
+ * @type jQuery
+ * @param String options Options for the splitter
+ * @cat Plugins/Splitter
+ * @return jQuery
+ * @author Dave Methvin (dave.methvin@gmail.com)
+ */
+
+Splitter = Class.create({
+	
+	initialize: function(container, options){				
+		this.options = Object.extend({
+			direction: 		'vertical',
+			activeClass:	'active',
+			onDrag : 		Prototype.EmptyFunction
+			// initA, initB
+			// minA, maxA, minB, maxB
+		}, arguments[1]||{});
+		var verticalOpts = {
+			cursor:			'e-resize',
+			splitbarClass: 	'vsplitbar',
+			eventPointer:	Event.pointerX,
+			set:			'left',
+			adjust:			'width', 
+			getAdjust:		this.getWidth,
+			offsetAdjust:	'offsetWidth', 
+			adjSide1:		'Left',
+			adjSide2:		'Right',
+			fixed:			'height',
+			getFixed:		this.getHeight,
+			offsetFixed:	'offsetHeight',
+			fixSide1:		'Top',
+			fixSide2:		'Bottom'
+		};
+		var horizontalOpts = {
+			cursor:			'n-resize',
+			splitbarClass: 	'hsplitbar',
+			eventPointer:	Event.pointerY,
+			set:			'top',			
+			adjust:			'height', 
+			getAdjust:		this.getHeight,
+			offsetAdjust:	'offsetHeight', 
+			adjSide1:		'Top',
+			adjSide2:		'Bottom',
+			fixed:			'width',
+			getFixed:		this.getWidth,
+			offsetFixed:	'offsetWidth',
+			fixSide1:		'Left',
+			fixSide2:		'Right'			
+		};
+		if(this.options.direction == 'vertical') Object.extend(this.options, verticalOpts);
+		else Object.extend(this.options, horizontalOpts);
+		
+		this.group = $(container).setStyle({position:'relative'});
+		var divs = this.group.childElements();
+		divs.each(function(div){
+			div.setStyle({
+				position:'absolute',
+				margin:0
+			});
+		});
+		this.paneA = divs[0];
+		this.paneB = divs[1];
+		this.initBorderB = parseInt(this.paneB.getStyle('borderWidth')) || 0;
+		
+		this.splitbar = new Element('div', {unselectable:'on'});
+		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
+		this.paneA.insert({after:this.splitbar});
+		this.splitbar.observe("mousedown", this.startSplit.bind(this));
+		
+		this.initCaches();
+		
+		this.paneA._init = (this.options.initA==true?parseInt(this.options.getAdjust(this.paneA)):this.options.initA) || 0;
+		this.paneB._init = (this.options.initB==true?parseInt(this.options.getAdjust(this.paneB)):this.options.initB) || 0;
+		if(this.paneB._init){
+			this.paneB._init = this.group[this.options.offsetAdjust] - this.group._borderAdjust - this.paneB._init - this.splitbar._adjust;
+		}
+		Event.observe(window,"resize", function(e){this.resizeGroup(e);}.bind(this));
+		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
+		//this.resizeGroup();
+	},
+	
+	resizeGroup: function(event, size, keepPercents){		
+		this.group._fixed = this.options.getFixed(this.group) - this.group._borderFixed;
+		this.group._adjust = this.group[this.options.offsetAdjust] - this.group._borderAdjust;
+		
+		if(this.group._fixed <= 0 || this.group._adjust <= 0) return;
+		
+		var optName = this.options.fixed;
+		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed+'px')); 
+		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);		
+		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdj+'px')); 
+		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
+		this.moveSplitter(size||(!this.options.initB?this.paneA[this.options.offsetAdjust]:this.group._adjust-this.paneB[this.options.offsetAdjust]-this.splitbar._adjust));
+	},
+	
+	startSplit: function(event){
+		this.splitbar.addClassName(this.options.activeClass);
+		this.paneA._posAdjust = this.paneA[this.options.offsetAdjust] - this.options.eventPointer(event);
+		if(!this.moveObserver){
+			this.moveObserver = this.doSplitMouse.bind(this);
+			this.upObserver = this.endSplit.bind(this);
+		}
+		Event.observe(document, "mousemove", this.moveObserver);
+		Event.observe(document, "mouseup", this.upObserver);
+	},
+	
+	doSplitMouse: function(event){
+		this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
+	}, 
+	
+	endSplit: function(event){
+		this.splitbar.removeClassName(this.options.activeClass);
+		Event.stopObserving(document, "mousemove", this.moveObserver);
+		Event.stopObserving(document, "mouseup", this.upObserver);
+	}, 
+	
+	moveSplitter:function(np){
+		np = Math.max(this.paneA._min+this.paneA._padAdjust, this.group._adjust - (this.paneB._max||9999), 16,
+				Math.min(np, this.paneA._max||9999, this.group._adjust - this.splitbar._adjust - 
+				Math.max(this.paneB._min+this.paneB._padAdjust, 16)));
+		var optNameSet = this.options.set;				
+		var optNameAdjust = this.options.adjust;				
+		this.splitbar.setStyle(this.makeStyleObject(this.options.set, np+'px'));
+		this.paneA.setStyle(this.makeStyleObject(this.options.adjust, np-this.paneA._padAdjust+'px'));
+		this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
+		var borderAdj = 0;
+		if(!Prototype.Browser.IE && this.initBorderB){
+			borderAdj = this.initBorderB*2;
+		}		
+		this.paneB.setStyle(this.makeStyleObject(this.options.adjust, this.group._adjust-this.splitbar._adjust-this.paneB._padAdjust-np-borderAdj+"px"));
+		if(!Prototype.Browser.IE){
+			this.paneA.fire("resize");
+			this.paneB.fire("resize");
+		}
+		if(this.options.onDrag) this.options.onDrag();
+	}, 
+	
+	cssCache:function(jq,n,pf,m1,m2){
+		var boxModel = (!Prototype.Browser.IE || document.compatMode == "CSS1Compat");
+		jq[n] = boxModel? (parseInt(jq.getStyle(pf+m1))||0) + (parseInt(jq.getStyle(pf+m2))||0) : 0;
+	},
+	
+	optCache: function(jq, pane){
+		jq._min = Math.max(0, this.options["min"+pane] || parseInt(jq.getStyle("min-"+this.options.adjust)) || 0);
+		jq._max = Math.max(0, this.options["max"+pane] || parseInt(jq.getStyle("max-"+this.options.adjust)) || 0);		
+	}, 
+	
+	initCaches: function(){
+		this.splitbar._adjust = this.splitbar[this.options.offsetAdjust];
+		this.cssCache(this.group, "_borderAdjust", "border", this.options.adjSide1, this.options.adjSide2);
+		this.cssCache(this.group, "_borderFixed",  "border", this.options.fixSide1, this.options.fixSide2);
+		this.cssCache(this.paneA, "_padAdjust", "padding", this.options.adjSide1, this.options.adjSide2);
+		this.cssCache(this.paneA, "_padFixed",  "padding", this.options.fixSide1, this.options.fixSide2);
+		this.cssCache(this.paneB, "_padAdjust", "padding", this.options.adjSide1, this.options.adjSide2);
+		this.cssCache(this.paneB, "_padFixed",  "padding", this.options.fixSide1, this.options.fixSide2);
+		this.optCache(this.paneA, 'A');
+		this.optCache(this.paneB, 'B');		
+	},
+	
+    getWidth: function(el) {
+	    return el.offsetWidth;
+    },
+  
+    getHeight: function(el) {
+        if (el.offsetHeight){
+            return parseInt(el.offsetHeight);                                 //ie
+        } else {
+        	var h = el.getHeight();
+        	if(!h){        		
+        		 h = $(el.parentNode).getHeight();
+        		 if(!Prototype.Browser.IE) h -= parseInt($(el.parentNode).paddingHeight*2);
+        	}
+            return h;
+        }
+    }, 
+    
+    makeStyleObject: function(propStringName, propValue){
+    	var sObject = {};
+    	sObject[propStringName] = propValue;
+    	return sObject;
+    }
+
+});

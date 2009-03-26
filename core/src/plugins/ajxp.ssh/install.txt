@@ -1,0 +1,48 @@
+Quick and dirty install step:
+
+You must be able to set a script as executable on the server for this plugin to work.
+While you're reading this file, I guess you've correctly extracted the plugin.
+
+Point your browser to the checkInstall.php script to check your installation automatically.
+
+Manually, you'll have to perform:
+
+- In a server shell (or through FTP), issue a "chmod +x /path/to/showPass.php" (for the webserver user), to 
+allow this script to be executed by the ssh command.
+
+- Similarly, the host you are trying to connect to must be in your known host, as there is no way 
+for the script to ask you if you want to add it.
+If it doesn't work with the script make sure the command:
+"ssh bob@myserver.com ls" returns the listing of bob's home directory on myserver.com
+If it does, issue the following command, as root:
+# su -l apache_user
+$ ssh bob@myserver.com ls
+Should list the files in the default directory of bob on myserver.com
+
+If you wonder what showPass does, it simply print out the environement variable 
+SSH_PASSWORD the plugin has set when using SSH.
+
+That way, the password (when decyphered) is never written to disk, as environment 
+of script execution is hard to read (but not impossible).
+
+Concerning security, any user with read access to /proc/PID_SSH_PROCESS/environ could be 
+able to read the password (with PID_SSH_PROCESS being the process ID of the SSH process being run).
+
+Fortunately, only the calling user is allowed (usually Apache's default user) to read such 
+environment.
+Moreover, even if another script hack this server to poll for such files (randomly), the SSH process doesn't live 
+for too long (and when it closes, there is no trace of password anywhere).
+It's more than difficult. (BTW, theorically you can defeat any security system by dumping /dev/memory at the right time)
+
+If it's not safe enough for you, then you could hack the SSHOperation script to write 
+the password(cyphered with the script process PID, salt, and remote user name) to a shared memory area.
+Then hack the showPass.php script to read from the same shared memory, and decypher with parent pid (so any other 
+process wouldn't be able to get clear text because it can't infer the parent PID and the chose salt).
+
+The showPass's argv[1] is the user name. Use posix_getppid() to get parent pid. Good luck
+
+Currently, the SSH client auto configure itself on first launch. If this doesn't work for 
+you (SSH server on non-unix based system, for example), you can still hack the command that 
+work for your server in SSHOperation script.
+
+

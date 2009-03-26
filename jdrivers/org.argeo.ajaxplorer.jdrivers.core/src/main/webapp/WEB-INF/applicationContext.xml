@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
+	default-lazy-init="true">
+
+	<import
+		resource="classpath:/org/argeo/ajaxplorer/jdrivers/svn/beans.xml" />
+
+	<bean id="defaultSvnArchiver" parent="driver.svn.template">
+		<!-- 
+			<property name="basePath"
+			value="${user.home}\AjaXplorerArchiver\data\svnwc\defaultSvnArchiver" />
+		-->
+	</bean>
+
+	<!--  WEB -->
+	<bean id="filterMultipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	</bean>
+</beans>

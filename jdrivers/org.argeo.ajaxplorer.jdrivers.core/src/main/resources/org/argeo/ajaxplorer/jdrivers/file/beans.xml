@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
+	default-lazy-init="true">
+
+	<bean id="driver.file.template"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileDriver"
+		abstract="true">
+		<property name="actions">
+			<map>
+				<entry key="ls" value-ref="action.file.ls" />
+				<entry key="download" value-ref="action.file.download" />
+				<entry key="image_proxy"
+					value-ref="action.file.image_proxy" />
+				<entry key="upload" value-ref="action.file.upload" />
+				<entry key="mkdir" value-ref="action.file.mkdir" />
+				<entry key="delete" value-ref="action.file.delete" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- ACTIONS FS -->
+	<bean id="action.file.ls"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileLsAction" />
+
+	<bean id="action.file.download"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileDownloadAction" />
+
+	<bean id="action.file.image_proxy"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileImageProxyAction" />
+
+	<bean id="action.file.upload"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileUploadAction" />
+
+	<bean id="action.file.mkdir"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileMkdirAction" />
+
+	<bean id="action.file.delete"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileDeleteAction" />
+</beans>

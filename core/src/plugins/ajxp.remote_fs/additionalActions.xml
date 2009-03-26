@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<driver name="remote_fs">
+	<actions>
+		<action name="next_to_remote">
+			<processing>
+				<serverCallback methodName="uploadActions"></serverCallback>
+			</processing>
+		</action>
+		<action name="trigger_remote_copy">
+			<processing>
+				<serverCallback methodName="uploadActions"></serverCallback>
+			</processing>
+		</action>
+		<action name="upload">
+			<gui text="27" title="27" src="yast_backup.png" accessKey="upload_access_key" hasAccessKey="true">
+				<context selection="false" dir="true" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="put">
+				</context></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+				if(ajaxplorer.actionBar.getFlashVersion() >= 8 && document.location.href.substring(0,5)!='https')
+				{
+					modal.setCloseAction(function(){
+						$('closeFlashUploadBox').disabled=false;
+						var bgManager = ajaxplorer.actionBar.bgManager;
+						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
+						bgManager.next();
+					});
+					modal.showDialogForm('Upload', 
+										'flash_upload_form', 
+										null, 
+										function(){
+											hideLightBox();
+											return false;
+										}, 
+										null, 
+										true, true);				
+				}
+				else
+				{
+					$('hidden_frames').innerHTML = '<iframe name="hidden_iframe" id="hidden_iframe"></iframe>';			
+					var onLoadFunction = function(oForm){
+						this.multi_selector = new MultiSelector(oForm, oForm.getElementsBySelector('div.uploadFilesList')[0], '6' );
+						this.multi_selector.addElement(oForm.getElementsBySelector('.dialogFocus')[0]);
+						var rep = document.createElement('input');
+						rep.setAttribute('type', 'hidden');
+						rep.setAttribute('name', 'dir');
+						rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
+						oForm.appendChild(rep);
+					}.bind(ajaxplorer.actionBar);
+					
+					modal.setCloseAction(function(){						
+						ajaxplorer.filesList.reload();
+						var bgManager = ajaxplorer.actionBar.bgManager;
+						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
+						bgManager.next();
+					});
+					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
+				}				
+					]]></clientCallback>
+				<clientForm id="flash_upload_form"><![CDATA[
+					<!-- UPLOAD FORM -->
+					<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="470">
+					<legend>AJXP_MESSAGE[25]<b class="replace_rep"></b></legend>
+					<br><br>AJXP_MESSAGE[171]<br>
+					<input type="file" name="userfile_1" class="dialogFocus" size="30">
+					<input type="hidden" name="get_action" value="upload">
+					
+					<br><br>AJXP_MESSAGE[172]
+					<div id="upload_files_list" class="uploadFilesList"></div>
+					</form>
+					
+					<!-- MOOTOOLS UPLOAD FORM -->
+					<div id="flash_upload_form" box_width="445">
+					<div id="flashscreen">
+					<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>
+					</div>
+					<div class="dialogButtons"><input type="button" class="dialogButton" onclick="hideLightBox(true);" value="AJXP_MESSAGE[86]" id="closeFlashUploadBox"></div>
+					</div>
+					<script language="javascript">$('originalUploadForm').hide();</script>
+				]]></clientForm>
+				<serverCallback methodName="uploadActions"></serverCallback>
+				</processing>
+		</action>		
+	</actions>
+</driver>

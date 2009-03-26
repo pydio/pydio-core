@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd"
+	default-lazy-init="true">
+
+	<import
+		resource="classpath:/org/argeo/ajaxplorer/jdrivers/file/beans.xml" />
+
+	<bean id="driver.svn.template"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnDriver" init-method="init"
+		abstract="true">
+		<property name="actions">
+			<map>
+				<entry key="ls" value-ref="action.svn.ls" />
+				<entry key="download" value-ref="action.svn.download" />
+				<entry key="image_proxy"
+					value-ref="action.svn.image_proxy" />
+				<entry key="upload" value-ref="action.svn.upload" />
+				<entry key="mkdir" value-ref="action.svn.mkdir" />
+				<entry key="delete" value-ref="action.svn.delete" />
+				<entry key="svnlog" value-ref="action.svn.svnlog" />
+				<entry key="svndownload"
+					value-ref="action.svn.svndownload" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- ACTIONS SVN -->
+	<bean id="action.svn.ls"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnLsAction" />
+
+	<bean id="action.svn.upload"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnUploadAction" />
+
+	<bean id="action.svn.mkdir"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnMkdirAction" />
+
+	<bean id="action.svn.delete"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnDeleteAction" />
+
+	<bean id="action.svn.svnlog"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnLogAction" />
+
+	<bean id="action.svn.download"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileDownloadAction" />
+
+	<bean id="action.svn.image_proxy"
+		class="org.argeo.ajaxplorer.jdrivers.file.FileImageProxyAction" />
+
+	<bean id="action.svn.svndownload"
+		class="org.argeo.ajaxplorer.jdrivers.svn.SvnDownloadAction" />
+
+
+</beans>

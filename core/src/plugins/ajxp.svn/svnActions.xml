@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<driver name="fs" className="class.svnDriver.php">
+	<actions>
+		<action name="svnlog">
+			<gui text="242" title="242" src="applix.png" accessKey="svn_log_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" mp3="false" editable="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+						var loadFunc = function(oForm){
+							ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
+							var crtRep = userSelection.getCurrentRep();
+							if(crtRep == '/') crtRep = '';
+							ajaxplorer.actionBar.svnLogger.open(crtRep+'/'+userSelection.getUniqueFileName());
+						};
+						var closeFunc = function(){
+							ajaxplorer.actionBar.svnLogger.close();
+							hideLightBox();
+							return false;
+						};
+						modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
+					]]></clientCallback>
+				<clientForm id="svnlog_box"><![CDATA[
+				<div id="svnlog_box" action="svnlog" box_width="400" box_height="300" style="overflow:auto"></div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>		
+		<action name="svndownload">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
+	</actions>
+	<infoPanels>
+		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,modiftime,author,revision">
+			<messages>
+				<message key="name_string" id="133"/>
+				<message key="size_string" id="127"/>
+				<message key="type_string" id="134"/>
+				<message key="modif_string" id="138"/>
+			</messages>
+			<html><![CDATA[
+			<div style="padding:10px;">
+				<div class="folderImage">
+					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+				</div>
+				<b>#{name_string}</b> : #{basename}
+				<br><b>Author:</b> : #{author}
+				<br><b>Revision:</b> : #{revision}
+				<br><b>#{size_string}</b> : #{filesize}
+				<br><b>#{type_string}</b> : #{mimestring}
+				<br><b>#{modif_string}</b> : #{modiftime}
+			</div>
+			]]></html>
+		</infoPanel>
+		<infoPanel mime="generic_dir" attributes="basename,icon,modiftime,author,revision">
+			<messages>
+				<message key="name_string" id="133"/>
+				<message key="modif_string" id="138"/>
+				<message key="author_string" id="244"/>
+				<message key="revision_string" id="243"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<div class="folderImage">
+						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+					</div>
+					<b>#{name_string}</b> : #{basename}
+					<br><b>#{author_string}</b> : #{author}
+					<br><b>#{revision_string}</b> : #{revision}
+					<br><b>#{modif_string}</b> : #{modiftime}
+				</div>
+			]]></html>
+		</infoPanel>
+	</infoPanels>
+</driver>
