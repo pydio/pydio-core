@@ -36,9 +36,9 @@
                                  
 require_once('../../classes/class.AbstractTest.php');
 
-class ajxp_sshfs extends AbstractTest
+class ajxp_ssh extends AbstractTest
 {
-    function ajxp_sshfs() { parent::AbstractTest("Remote SSH Filesystem Plugin", ""); }
+    function ajxp_ssh() { parent::AbstractTest("Remote SSH Filesystem Plugin", ""); }
     
     function doRepositoryTest($repo)
     {
