@@ -34,48 +34,49 @@
  * Description : Abstract representation of an action driver. Must be implemented.
  */
                                  
-require_once('../classes/class.AbstractTest.php');
-if ( !function_exists('sys_get_temp_dir')) 
-{
-    function sys_get_temp_dir() 
-    {
-        if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
-        if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
-        if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
-        $tempfile=tempnam(uniqid(rand(),TRUE),'');
-        if (file_exists($tempfile)) {
-            unlink($tempfile);
-            return realpath(dirname($tempfile));
-        }
-    }
-}
+require_once('../../classes/class.AbstractTest.php');
 
-class Upload extends AbstractTest
+class ajxp_fs extends AbstractTest
 {
-    function Upload() { parent::AbstractTest("Upload particularities", "<b>Testing configs</b>"); }
+    function ajxp_fs() { parent::AbstractTest("Filesystem Plugin", ""); }
+    function testFS($repo)
+    {
+        if ($repo["DRIVER"]=='fs')
+        {
+            // Check the destination path
+            $path = $repo["DRIVER_OPTIONS"]["PATH"];
+            $create = $repo["DRIVER_OPTIONS"]["CREATE"];
+            if (!$create && !is_dir($path))
+            { $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE; }
+            else if (!$create && !is_writeable($path))
+            { $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE; }
+            // Do more tests here  
+        }
+        return TRUE;    
+    }
+
     function doTest() 
     { 
-    	include("../conf/conf.php");
-    	$tmpDir = ini_get("upload_tmp_dir");
-    	if (!$tmpDir) $tmpDir = sys_get_temp_dir();
-    	$this->testedParams["Upload Tmp Dir Writeable"] = is_writable($tmpDir);
-    	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
-    	$this->testedParams["AJXP Upload Max Size"] = $this->returnBytes($upload_max_size_per_file);
-    	foreach ($this->testedParams as $paramName => $paramValue){
-    		$this->failedInfo .= "<br>$paramName=$paramValue";
-    	}
-    	if(!$this->testedParams["Upload Tmp Dir Writeable"]){
-    		$this->failedLevel = "error";
-    		$this->failedInfo = "The temporary folder used by PHP to upload files is either incorrect or not writeable! Upload will not work. Please check : ".ini_get("upload_tmp_dir");
-    		return FALSE;
-    	}
-    	if($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Upload Max Size"]){
-    		$this->failedLevel = "warning";
-    		$this->failedInfo .= "<br>Ajaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("upload_max_filesize")." per file.";
-    		return FALSE;
-    	}
-        $this->failedLevel = "info";
-        return FALSE;
+        // Check if the given filesystem is writeable
+        include("../../conf/conf.php");
+        foreach($REPOSITORIES as $repo)
+        {
+            if ($this->testFS($repo) === FALSE) return FALSE;
+        }
+        
+        // Try with the serialized repositories
+        if(is_file("../../conf/repo.ser"))
+        {
+            $fileLines = file("../../conf/repo.ser");
+            $repos = unserialize($fileLines[0]);
+            foreach($repos as $repoClass)
+            {
+                $repo = array("DRIVER"=>$repoClass->accessType, "DRIVER_OPTIONS"=>$repoClass->options);
+                if ($this->testFS($repo) === FALSE) return FALSE;
+            }
+        }
+                                                                                                     
+        return TRUE;
     }
 };
 
