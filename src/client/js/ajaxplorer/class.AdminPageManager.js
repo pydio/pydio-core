@@ -239,6 +239,7 @@ AdminPageManager = Class.create({
 		
 	loadRepList : function(){
 		$('repo_detail_panel').update('');
+		$('repo_detail_panel').hide();
 		this.submitForm('repository_list', new Hash());
 	},
 	
@@ -296,6 +297,7 @@ AdminPageManager = Class.create({
 		}
 		
 		$('repo_detail_panel').update(fieldset);
+		$('repo_detail_panel').show();
 		
 		if(!writeable || writeable != "1") return;
 		
