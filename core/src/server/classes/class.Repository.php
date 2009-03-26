@@ -91,10 +91,10 @@ class Repository {
 		$this->options[$oName] = $oValue;
 	}
 	
-	function getOption($oName){		
+	function getOption($oName, $safe=false){		
 		if(isSet($this->options[$oName])){
 			$value = $this->options[$oName];
-			if(is_string($value) && strpos($value, "AJXP_USER")!==false){
+			if(is_string($value) && strpos($value, "AJXP_USER")!==false && !$safe){
 				if(AuthService::usersEnabled()){
 					$loggedUser = AuthService::getLoggedUser();
 					if($loggedUser != null){

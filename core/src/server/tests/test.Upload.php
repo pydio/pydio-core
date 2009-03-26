@@ -62,7 +62,7 @@ class Upload extends AbstractTest
     	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
     	$this->testedParams["AJXP Upload Max Size"] = $this->returnBytes($upload_max_size_per_file);
     	foreach ($this->testedParams as $paramName => $paramValue){
-    		$this->failedInfo .= "<br>$paramName=$paramValue";
+    		$this->failedInfo .= "\n$paramName=$paramValue";
     	}
     	if(!$this->testedParams["Upload Tmp Dir Writeable"]){
     		$this->failedLevel = "error";
@@ -71,7 +71,7 @@ class Upload extends AbstractTest
     	}
     	if($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Upload Max Size"]){
     		$this->failedLevel = "warning";
-    		$this->failedInfo .= "<br>Ajaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("upload_max_filesize")." per file.";
+    		$this->failedInfo .= "\nAjaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("upload_max_filesize")." per file.";
     		return FALSE;
     	}
         $this->failedLevel = "info";

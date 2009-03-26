@@ -45,7 +45,7 @@ class PHPLimits extends AbstractTest
     	$this->testedParams["Memory Limit"] = ((ini_get("memory_limit")!="")?ini_get("memory_limit"):get_cfg_var("memory_limit"));
     	$this->testedParams["Max execution time"] = ini_get("max_execution_time");
     	foreach ($this->testedParams as $paramName => $paramValue){
-    		$this->failedInfo .= "<br>$paramName=$paramValue";
+    		$this->failedInfo .= "\n$paramName=$paramValue";
     	}
         $this->failedLevel = "info";
         return FALSE;

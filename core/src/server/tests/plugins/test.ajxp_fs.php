@@ -39,45 +39,27 @@ require_once('../../classes/class.AbstractTest.php');
 class ajxp_fs extends AbstractTest
 {
     function ajxp_fs() { parent::AbstractTest("Filesystem Plugin", ""); }
-    function testFS($repo)
-    {
-        if ($repo["DRIVER"]=='fs')
-        {
-            // Check the destination path
-            $path = $repo["DRIVER_OPTIONS"]["PATH"];
-            $create = $repo["DRIVER_OPTIONS"]["CREATE"];
-            if (!$create && !is_dir($path))
-            { $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE; }
-            else if (!$create && !is_writeable($path))
-            { $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE; }
-            // Do more tests here  
-        }
-        return TRUE;    
-    }
 
-    function doTest() 
-    { 
-        // Check if the given filesystem is writeable
-        include("../../conf/conf.php");
-        foreach($REPOSITORIES as $repo)
-        {
-            if ($this->testFS($repo) === FALSE) return FALSE;
-        }
-        
-        // Try with the serialized repositories
-        if(is_file("../../conf/repo.ser"))
-        {
-            $fileLines = file("../../conf/repo.ser");
-            $repos = unserialize($fileLines[0]);
-            foreach($repos as $repoClass)
-            {
-                $repo = array("DRIVER"=>$repoClass->accessType, "DRIVER_OPTIONS"=>$repoClass->options);
-                if ($this->testFS($repo) === FALSE) return FALSE;
-            }
-        }
-                                                                                                     
-        return TRUE;
+    /**
+     * Test Repository
+     *
+     * @param Repository $repo
+     * @return Boolean
+     */
+    function doRepositoryTest($repo){
+        if ($repo->accessType != 'fs' ) return -1;
+        // Check the destination path
+        $path = $repo->getOption("PATH", true);
+        $create = $repo->getOption("CREATE");
+        if(strstr($path, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!
+        if (!$create && !is_dir($path))
+        { $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE; }
+        else if (!$create && !is_writeable($path))
+        { $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE; }
+        // Do more tests here  
+        return TRUE;    	
     }
+    
 };
 
 ?>
