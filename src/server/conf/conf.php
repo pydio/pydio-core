@@ -33,8 +33,8 @@
  * 
  * Description : configuration file
  */
-define("AJXP_VERSION", "2.4.rc2");
-define("AJXP_VERSION_DATE", "2009/02/17");
+define("AJXP_VERSION", "2.4");
+define("AJXP_VERSION_DATE", "2009/03/26");
 
 define("ENABLE_USERS", 1);
 define("ADMIN_PASSWORD", "admin");
