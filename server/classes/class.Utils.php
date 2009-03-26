@@ -307,13 +307,14 @@ class Utils
 		td.col{font-weight: bold;}
 		</style>
 		';
-		$html = "<html><head><title>AjaXplorer : Diagnostic Tool</title>$style</head><body><h1>AjaXplorer Diagnostic Tool</h1>";
+		$htmlHead = "<html><head><title>AjaXplorer : Diagnostic Tool</title>$style</head><body><h1>AjaXplorer Diagnostic Tool</h1>";
 		if($showSkipLink){
-			$html .= "<p>Test failed : you are likely to have problems running AjaXplorer! Please check the red lines below!</p>";
+			$htmlHead .= "<p>Test failed : you are likely to have problems running AjaXplorer! Please check the red lines below!</p>";
 		}
-		$html .= "<table width='700' border='0' cellpadding='0' cellspacing='1'><thead><tr><td>Name</td><td>Result</td><td>Info</td></tr></thead>"; 
+		$html = "<table width='700' border='0' cellpadding='0' cellspacing='1'><thead><tr><td>Name</td><td>Result</td><td>Info</td></tr></thead>"; 
 		$dumpRows = "";
 		$passedRows = "";
+		$warnRows = "";
 		foreach($outputArray as $item)
 		{
 		    // A test is output only if it hasn't succeeded (doText returned FALSE)
@@ -324,10 +325,13 @@ class Utils
 		    	$dumpRows .= $row;
 		    }else if($result == "passed"){
 		    	$passedRows .= $row;
+		    }else if($item["level"] == "warning"){
+		    	$warnRows .= $row;
 		    }else{
 		    	$html .= $row;
 		    }
 		}
+		$html .= $warnRows;
 		$html .= $passedRows;
 		$html .= $dumpRows;
 		$html .= "</table>";
@@ -335,7 +339,7 @@ class Utils
 			$html .= "<p><a href='index.php?ignore_tests=true'>It's, ok i can handle this, let me use ajaxplorer!.</a></p>";
 		}
 		$html.="</body></html>";
-		return $html;
+		return $htmlHead.nl2br($html);
 	}
 	
 	function runTests(&$outputArray, &$testedParams){
@@ -364,7 +368,23 @@ class Utils
 			    $testedParams = array_merge($testedParams, $class->testedParams);
 		   	}
 		}
-		// Then try the plugin tests too
+		
+        // PREPARE REPOSITORY LISTS
+        $repoList = array();
+        require_once("../classes/class.ConfService.php");
+        require_once("../classes/class.Repository.php");
+        include("../conf/conf.php");
+        foreach($REPOSITORIES as $îndex => $repo){
+            $repoList[] = ConfService::createRepositoryFromArray($index, $repo);
+        }        
+        // Try with the serialized repositories
+        if(is_file("../conf/repo.ser")){
+            $fileLines = file("../conf/repo.ser");
+            $repos = unserialize($fileLines[0]);
+            $repoList = array_merge($repoList, $repos);
+        }
+		
+		// NOW TRY THE PLUGIN TESTS
 		chdir(INSTALL_PATH.'/server/tests/plugins');
 		$files = glob('*.php'); 
 		foreach($files as $file)
@@ -373,17 +393,20 @@ class Utils
 		    // Then create the test class
 		    $testName = str_replace(".php", "", substr($file, 5));
 		    $class = new $testName();
-		    
-		    $result = $class->doTest();
-		    if(!$result && $class->failedLevel != "info") $passed = false;
-		    $outputArray[] = array(
-		    	"name"=>$class->name, 
-		    	"result"=>$result, 
-		    	"level"=>$class->failedLevel, 
-		    	"info"=>$class->failedInfo); 
-		   	if(count($class->testedParams)){
-			    $testedParams = array_merge($testedParams, $class->testedParams);
-		   	}
+		    foreach ($repoList as $repository){
+			    $result = $class->doRepositoryTest($repository);
+			    if($result === false || $result === true){			    	
+				    if(!$result && $class->failedLevel != "info") $passed = false;
+				    $outputArray[] = array(
+				    	"name"=>$class->name . "\n Testing repository : ".$repository->getDisplay(), 
+				    	"result"=>$result, 
+				    	"level"=>$class->failedLevel, 
+				    	"info"=>$class->failedInfo); 				    
+				   	if(count($class->testedParams)){
+					    $testedParams = array_merge($testedParams, $class->testedParams);
+				   	}
+			    }
+		    }
 		}
 		
 		return $passed;
