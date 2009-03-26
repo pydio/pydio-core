@@ -304,7 +304,9 @@ switch ($action)
 		}
 		// NOW SAVE THIS REPOSITORY!
 		$newRep = ConfService::createRepositoryFromArray(0, $repDef);
-		if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php")){
+		if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php"))
+		{
+		    chdir(INSTALL_PATH."/server/tests/plugins");
 			include(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php");
 			$className = "ajxp_".$newRep->getAccessType();
 			$class = new $className();
@@ -372,6 +374,7 @@ switch ($action)
 				}
 			}
 			if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php")){
+			    chdir(INSTALL_PATH."/server/tests/plugins");
 				include(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php");
 				$className = "ajxp_".$repo->getAccessType();
 				$class = new $className();
