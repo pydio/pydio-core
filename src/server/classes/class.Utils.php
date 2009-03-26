@@ -364,6 +364,28 @@ class Utils
 			    $testedParams = array_merge($testedParams, $class->testedParams);
 		   	}
 		}
+		// Then try the plugin tests too
+		chdir(INSTALL_PATH.'/server/tests/plugins');
+		$files = glob('*.php'); 
+		foreach($files as $file)
+		{
+		    require_once($file);
+		    // Then create the test class
+		    $testName = str_replace(".php", "", substr($file, 5));
+		    $class = new $testName();
+		    
+		    $result = $class->doTest();
+		    if(!$result && $class->failedLevel != "info") $passed = false;
+		    $outputArray[] = array(
+		    	"name"=>$class->name, 
+		    	"result"=>$result, 
+		    	"level"=>$class->failedLevel, 
+		    	"info"=>$class->failedInfo); 
+		   	if(count($class->testedParams)){
+			    $testedParams = array_merge($testedParams, $class->testedParams);
+		   	}
+		}
+		
 		return $passed;
 	}	
 	
