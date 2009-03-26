@@ -309,12 +309,13 @@ class Utils
 		';
 		$htmlHead = "<html><head><title>AjaXplorer : Diagnostic Tool</title>$style</head><body><h1>AjaXplorer Diagnostic Tool</h1>";
 		if($showSkipLink){
-			$htmlHead .= "<p>Test failed : you are likely to have problems running AjaXplorer! Please check the red lines below!</p>";
+			$htmlHead .= "<p>The diagnostic tool detected some errors or warning : you are likely to have problems running AjaXplorer!</p>";
 		}
 		$html = "<table width='700' border='0' cellpadding='0' cellspacing='1'><thead><tr><td>Name</td><td>Result</td><td>Info</td></tr></thead>"; 
 		$dumpRows = "";
 		$passedRows = "";
 		$warnRows = "";
+		$errs = $warns = 0;
 		foreach($outputArray as $item)
 		{
 		    // A test is output only if it hasn't succeeded (doText returned FALSE)
@@ -327,8 +328,10 @@ class Utils
 		    	$passedRows .= $row;
 		    }else if($item["level"] == "warning"){
 		    	$warnRows .= $row;
+		    	$warns ++;
 		    }else{
 		    	$html .= $row;
+		    	$errs ++;
 		    }
 		}
 		$html .= $warnRows;
@@ -336,7 +339,11 @@ class Utils
 		$html .= $dumpRows;
 		$html .= "</table>";
 		if($showSkipLink){
-			$html .= "<p><a href='index.php?ignore_tests=true'>It's, ok i can handle this, let me use ajaxplorer!.</a></p>";
+			if(!$errs){
+				$htmlHead .= "<p>STATUS : You have some warning, but no fatal error, AjaXplorer should run ok, <a href='index.php?ignore_tests=true'>click here to continue to AjaXplorer!</a> (this test won't be launched anymore)</p>";
+			}else{
+				$htmlHead .= "<p>STATUS : You have some errors that may prevent AjaXplorer from running. Please check the red lines to see what action you should do. If you are confident enough and know that your usage of AjaXplorer does not need these errors to fixed, <a href='index.php?ignore_tests=true'>continue here to Ajaxplorer!.</a></p>";
+			}
 		}
 		$html.="</body></html>";
 		return $htmlHead.nl2br($html);
