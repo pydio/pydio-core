@@ -1132,7 +1132,10 @@ class fsDriver extends AbstractDriver
 	 */ 
     function makeZip ($src, $dest, $basedir)
     {
-    	set_time_limit(60);
+    	$safeMode =  (@ini_get("safe_mode") == 'On' || @init_get("safe_mode") === 1) ? TRUE : FALSE;
+    	if(!$safeMode){
+	    	set_time_limit(60);
+    	}
     	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	$totalSize = 0;

@@ -39,8 +39,11 @@ require_once('../../classes/class.AbstractTest.php');
 class ajxp_sshfs extends AbstractTest
 {
     function ajxp_sshfs() { parent::AbstractTest("Remote SSH Filesystem Plugin", ""); }
-    function testFS($repo)
+    
+    function doRepositoryTest($repo)
     {
+    	if($repo->accessType != "ssh") return -1;
+    	
         $basePath = "../../../plugins/ajxp.ssh/";
         // Check file exists
         if (!file_exists($basePath."class.sshDriver.php")
@@ -73,28 +76,6 @@ class ajxp_sshfs extends AbstractTest
         return TRUE;    
     }
 
-    function doTest() 
-    { 
-        // Check if the one of the repository use SSH
-        include("../../conf/conf.php");
-        foreach($REPOSITORIES as $repo)
-        {
-            if ($repo['DRIVER'] == 'ssh') return $this->testFS($repo);
-        }
-
-        // Try with the serialized repositories
-        if(is_file("../../conf/repo.ser"))
-        {
-            $fileLines = file("../../conf/repo.ser");
-            $repos = unserialize($fileLines[0]);
-            foreach($repos as $repo)
-            {
-                if ($repo->accessType == 'ssh') return $this->testFS($repo);
-            }
-        }
-                                                                                                     
-        return TRUE;
-    }
 };
 
 ?>

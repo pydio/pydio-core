@@ -65,6 +65,19 @@ class AbstractTest
     /** Perform the test, should be overwritten in concrete classes */
     function doTest() { return FALSE; }
     
+    /** 
+     * Perform the test on a given repository object, should be overwritten in concrete classes 
+     * @param Repository $repository
+     * @return Boolean
+     */
+    function doRepositoryTest($repository) { return FALSE; }
+    
+    /**
+     * Utilitary to convert php config to numerical values.
+     *
+     * @param String $val
+     * @return Integer
+     */
     function returnBytes($val) {
     	$val = trim($val);
     	$last = strtolower($val[strlen($val)-1]);
