@@ -34,7 +34,7 @@
  * Description : Abstract representation of an action driver. Must be implemented.
  */
                                  
-require_once('../../classes/class.AbstractTest.php');
+require_once(INSTALL_PATH.'/server/classes/class.AbstractTest.php');
 
 class ajxp_ssh extends AbstractTest
 {

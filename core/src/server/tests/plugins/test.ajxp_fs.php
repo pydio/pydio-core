@@ -34,7 +34,7 @@
  * Description : Abstract representation of an action driver. Must be implemented.
  */
                                  
-require_once('../../classes/class.AbstractTest.php');
+require_once(INSTALL_PATH.'/server/classes/class.AbstractTest.php');
 
 class ajxp_fs extends AbstractTest
 {
@@ -50,10 +50,13 @@ class ajxp_fs extends AbstractTest
         if ($repo->accessType != 'fs' ) return -1;
         // Check the destination path
         $path = $repo->getOption("PATH", true);
-        $create = $repo->getOption("CREATE");
-        if(strstr($path, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!
+        $createOpt = $repo->getOption("CREATE");
+        $create = (($createOpt=="true"||$createOpt===true)?true:false);
+        if(strstr($path, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!        
         if (!$create && !is_dir($path))
-        { $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE; }
+        { 
+        	$this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE; 
+        }
         else if (!$create && !is_writeable($path))
         { $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE; }
         // Do more tests here  

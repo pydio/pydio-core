@@ -304,6 +304,18 @@ switch ($action)
 		}
 		// NOW SAVE THIS REPOSITORY!
 		$newRep = ConfService::createRepositoryFromArray(0, $repDef);
+		if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php")){
+			include(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php");
+			$className = "ajxp_".$newRep->getAccessType();
+			$class = new $className();
+			$result = $class->doRepositoryTest($newRep);
+			if(!$result){
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage(null, $class->failedInfo);
+				AJXP_XMLWriter::close();
+				exit(1);
+			}
+		}
 		$res = ConfService::addRepository($newRep);
 		AJXP_XMLWriter::header();
 		if($res == -1){
@@ -359,6 +371,19 @@ switch ($action)
 					 $repo->addOption(substr($key, strlen("DRIVER_OPTION_")), $value);
 				}
 			}
+			if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php")){
+				include(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php");
+				$className = "ajxp_".$repo->getAccessType();
+				$class = new $className();
+				$result = $class->doRepositoryTest($repo);
+				if(!$result){
+					AJXP_XMLWriter::header();
+					AJXP_XMLWriter::sendMessage(null, $class->failedInfo);
+					AJXP_XMLWriter::close();
+					exit(1);
+				}
+			}
+			
 			ConfService::replaceRepository($repId, $repo);
 		}
 		AJXP_XMLWriter::header();
