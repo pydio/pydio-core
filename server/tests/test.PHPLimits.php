@@ -44,6 +44,8 @@ class PHPLimits extends AbstractTest
     	$this->testedParams["Upload Max Size"] = ini_get("upload_max_filesize");
     	$this->testedParams["Memory Limit"] = ((ini_get("memory_limit")!="")?ini_get("memory_limit"):get_cfg_var("memory_limit"));
     	$this->testedParams["Max execution time"] = ini_get("max_execution_time");
+    	$this->testedParams["Safe Mode"] = (ini_get("safe_mode")?"1":"0");
+    	$this->testedParams["Safe Mode GID"] = (ini_get("safe_mode_gid")?"1":"0");
     	foreach ($this->testedParams as $paramName => $paramValue){
     		$this->failedInfo .= "\n$paramName=$paramValue";
     	}
