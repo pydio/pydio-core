@@ -81,6 +81,9 @@ class SSHOperations
    /** The delete command */
    var $deleteCommand;
    
+   /** The SSH command itself */
+   var $sshCommand;
+   
    function SSHOperations($server, $account, $password, $configFile = "/etc/ssh/ssh_config")
    {
       // We use this command because it fixes the output style, and permit to distinguish from link to directory to simple link
@@ -94,6 +97,7 @@ class SSHOperations
       $this->moveCommand = "mv ";
       $this->makeDirCommand = "mkdir -p ";
       $this->deleteCommand = "rm -rf ";
+      $this->sshCommand = "ssh -o \"ConnectTimeout=5\""; 
       $this->server = $server;
       $this->account = $account;
       $this->password = $password;
@@ -207,7 +211,7 @@ class SSHOperations
     {
         $fileName = __FILE__;
         $fileName = substr($fileName, 0, strrpos($fileName, "/"));
-        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ssh ".$account."@".$server." ".$command;
+        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ".$this->sshCommand." ".$account."@".$server." ".$command;
         $handle = popen($finalCommand, "r");
         $output = $this->streamGetContents($handle);
         pclose($handle);
@@ -224,7 +228,7 @@ class SSHOperations
     {
         $fileName = __FILE__;
         $fileName = substr($fileName, 0, strrpos($fileName, "/"));
-        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ssh ".$account."@".$server." ".$command;
+        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ".$this->sshCommand." ".$account."@".$server." ".$command;
         $handle = popen($finalCommand, "w");
         $writtenSize = 0;
         if (is_resource($handle)) $writtenSize = @fwrite($handle, $content); 
@@ -243,7 +247,7 @@ class SSHOperations
     {
         $fileName = __FILE__;
         $fileName = substr($fileName, 0, strrpos($fileName, "/"));
-        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ssh ".$account."@".$server." ".$command;
+        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ".$this->sshCommand." ".$account."@".$server." ".$command;
         $handle = popen($finalCommand, "w");
         $writtenSize = 0;
         if (is_resource($handle))
