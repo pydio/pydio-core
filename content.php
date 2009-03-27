@@ -92,7 +92,7 @@ if(AuthService::usersEnabled())
 	$loggedUser = AuthService::getLoggedUser();
 	if($loggedUser != null)
 	{
-		if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) && AuthService::getDefaultRootId() != ConfService::getCurrentRootDirIndex())
+		if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()))
 		{
 			ConfService::switchRootDir(AuthService::getDefaultRootId());
 		}
