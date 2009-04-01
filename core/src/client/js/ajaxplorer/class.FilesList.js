@@ -589,7 +589,8 @@ FilesList = Class.create(SelectableElements, {
 				window.setTimeout(function(){
 					if(!xmlNode.getAttribute("is_recycle") || xmlNode.getAttribute("is_recycle") != "1"){
 							var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'});
-							this.allDraggables.push(newDrag);						
+							this.allDraggables.push(newDrag);
+							if(this.protoMenu) this.protoMenu.addElements(innerSpan);						
 					}
 					if(xmlNode.getAttribute("is_file") == "0")
 					{
