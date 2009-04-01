@@ -87,10 +87,14 @@ Proto.Menu = Class.create({
 							this.observerFunction.bind(this));
 	},
 	
-	addElements:function(selector){
-		$$(selector).invoke('observe', 
-							this.eventToObserve,
-							this.observerFunction.bind(this));		
+	addElements:function(selectorOrObject){
+		if(typeof(selectorOrObject) == "string"){
+			$$(selectorOrObject).invoke('observe', 
+								this.eventToObserve,
+								this.observerFunction.bind(this));		
+		}else{
+			$(selectorOrObject).observe(this.eventToObserve, this.observerFunction.bind(this));
+		}
 	},
 	
 	refreshList: function() {
