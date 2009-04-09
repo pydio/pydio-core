@@ -748,6 +748,12 @@ class fsDriver extends AbstractDriver
 			else if($ordre=="mod") {if($sens==0){arsort($liste_fic);}else{asort($liste_fic);}}
 			else if($ordre=="taille"||$ordre=="type") {if($sens==0){asort($liste_fic);}else{arsort($liste_fic);}}
 			else {if($sens==0){ksort($liste_fic);}else{krsort($liste_fic);}}
+
+			if($ordre != "nom"){
+				foreach ($liste_fic as $index=>$value){
+					$liste_fic[$index] = Utils::mimetype($index, "image", false);
+				}
+			}
 		}
 		else
 		{
@@ -757,9 +763,14 @@ class fsDriver extends AbstractDriver
 		{
 			if($ordre=="mod") {if($sens==0){arsort($liste_rep);}else{asort($liste_rep);}}
 			else {if($sens==0){ksort($liste_rep);}else{krsort($liste_rep);}}
+			if($ordre != "nom"){
+				foreach ($liste_rep as $index=>$value){
+					$liste_rep[$index] = $index;
+				}
+			}
 		}
 		else ($liste_rep = array());
-	
+
 		$liste = Utils::mergeArrays($liste_rep,$liste_fic);
 		if(isSet($liste_zip)){
 			$liste = Utils::mergeArrays($liste,$liste_zip);
@@ -1132,7 +1143,7 @@ class fsDriver extends AbstractDriver
 	 */ 
     function makeZip ($src, $dest, $basedir)
     {
-    	$safeMode =  (@ini_get("safe_mode") == 'On' || @init_get("safe_mode") === 1) ? TRUE : FALSE;
+    	$safeMode =  (@ini_get("safe_mode") == 'On' || @ini_get("safe_mode") === 1) ? TRUE : FALSE;
     	if(!$safeMode){
 	    	set_time_limit(60);
     	}
