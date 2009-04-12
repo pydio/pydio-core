@@ -432,6 +432,44 @@ class Utils
 		//print_r($content);
 		file_put_contents(TESTS_RESULT_FILE, $content);		
 	}
+	
+	/**
+	 * Load an array stored serialized inside a file.
+	 *
+	 * @param String $filePath Full path to the file
+	 * @return Array
+	 */
+	function loadSerialFile($filePath){
+		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
+		$result = array();
+		if(is_file($filePath))
+		{
+			$fileLines = file($filePath);
+			$result = unserialize($fileLines[0]);
+		}
+		return $result;
+	}
+	
+	/**
+	 * Stores an Array as a serialized string inside a file.
+	 *
+	 * @param String $filePath Full path to the file
+	 * @param Array $value The value to store
+	 * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
+	 */
+	function saveSerialFile($filePath, $value, $createDir=true){
+		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
+		if($createDir && !is_dir(dirname($filePath))) {			
+			if(!is_writeable(dirname(dirname($filePath)))){
+				die("Cannot write into ".dirname(dirname($filePath)));
+			}
+			mkdir(dirname($filePath));
+		}
+		$fp = fopen($filePath, "w");
+		fwrite($fp, serialize($value));
+		fclose($fp);
+	}
+	
 		
 }
 
