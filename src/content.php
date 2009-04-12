@@ -32,7 +32,6 @@
  * Description : main script called by any Ajax query. Will dispatch the actions on the plugins.
  */
 
-//require_once("classes/class.BookmarksManager.php");
 require_once("server/classes/class.Utils.php");
 require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.Repository.php");
