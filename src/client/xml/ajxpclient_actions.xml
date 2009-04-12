@@ -168,7 +168,9 @@
 					}, 
 					function(){
 						var oForm = modal.getForm();
-						oForm.password.value = hex_md5(hex_md5(oForm.password.value)+$('login_seed').value);
+						if($('login_seed').value != '-1'){
+							oForm.password.value = hex_md5(hex_md5(oForm.password.value)+$('login_seed').value);
+						}
 						ajaxplorer.actionBar.submitForm(oForm);
 						oForm.userid.value = '';
 						oForm.password.value = '';
