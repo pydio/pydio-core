@@ -33,56 +33,31 @@
  * 
  * Description : User abstraction
  */
-class AJXP_User
+require_once(INSTALL_PATH."/server/classes/class.AbstractAjxpUser.php");
+
+class AJXP_User extends AbstractAjxpUser 
 {
 	var $id;
-	var $name;
+	var $hasAdmin = false;
 	var $rights;
 	var $prefs;
 	var $bookmarks;
 	var $version;
 	
-	function AJXP_User($id){
-		$this->id = $id;
-		$this->load();
-	}
+	/**
+	 * Conf Storage implementation
+	 *
+	 * @var AbstractConfDriver
+	 */
+	var $storage;
 	
-	function getId(){
-		return $this->id;
+	function AJXP_User($id, $storage=null){
+		parent::AbstractAjxpUser($id, $storage);
 	}
-	
-	function getVersion(){
-		if(!isSet($this->version)) return "";
-		return $this->version;
-	}
-	
-	function setVersion($v){
-		$this->version = $v;
-	}
-	
-	function isAdmin(){
-		return (isSet($this->rights["ajxp.admin"])?$this->rights["ajxp.admin"]:false);
-	}
-	
-	function setAdmin($boolean){
-		$this->rights["ajxp.admin"] = $boolean;
-	}
-	
+			
 	function getRight($rootDirId){
 		if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
 		return "";
-	}
-	
-	function canRead($rootDirId){
-		$right = $this->getRight($rootDirId);
-		if($right == "rw" || $right == "r") return true;
-		return false;
-	}
-	
-	function canWrite($rootDirId){
-		$right = $this->getRight($rootDirId);
-		if($right == "rw") return true;
-		return false;
 	}
 	
 	function setRight($rootDirId, $rightString){
@@ -160,27 +135,48 @@ class AJXP_User
 	}
 	
 	function load(){
-		$storage = ConfService::getConfStorageImpl();
-		$storage->loadUser($this);
+		$serialDir = $this->storage->getOption("USERS_DIRPATH");
+		$this->rights = Utils::loadSerialFile($serialDir."/".$this->getId()."/rights.ser");
+		$this->prefs = Utils::loadSerialFile($serialDir."/".$this->getId()."/prefs.ser");
+		$this->bookmarks = Utils::loadSerialFile($serialDir."/".$this->getId()."/bookmarks.ser");
+		if(isSet($this->rights["ajxp.admin"]) && $this->rights["ajxp.admin"] === true){
+			$this->setAdmin(true);
+		}
 	}
 	
 	function save(){
-		$storage = ConfService::getConfStorageImpl();
-		$storage->saveUser($this);
+		$serialDir = $this->storage->getOption("USERS_DIRPATH");
+		if($this->isAdmin() === true){
+			$this->rights["ajxp.admin"] = true;
+		}else{
+			$this->rights["ajxp.admin"] = false;
+		}
+		Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights);
+		Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs);
+		Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks);		
 	}	
+	
+	/**
+	 * Static function for deleting a user
+	 *
+	 * @param String $userId
+	 */
+	function deleteUser($userId){
+		$storage = ConfService::getConfStorageImpl();
+		$serialDir = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $storage->getOption("USERS_DIRPATH"));
+		if(is_file($serialDir."/".$userId."/rights.ser")){
+			unlink($serialDir."/".$userId."/rights.ser");
+		}
+		if(is_file($serialDir."/".$userId."/prefs.ser")){
+			unlink($serialDir."/".$userId."/prefs.ser");
+		}
+		if(is_file($serialDir."/".$userId."/bookmarks.ser")){
+			unlink($serialDir."/".$userId."/bookmarks.ser");
+		}
+		rmdir($serialDir."/".$userId);
+		
+	}
 
-    /** Decode a user supplied password before using it */
-    function decodeUserPassword($password){
-        if (function_exists('mcrypt_decrypt'))
-        {
-             $users = AuthService::loadLocalUsersList();
-             // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-             $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-             // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
-             $password = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $users[$this->getId()], base64_decode($password), MCRYPT_MODE_ECB, $iv));
-        }
-        return $password;
-    }
 }
 
 

@@ -35,10 +35,11 @@ require_once("server/classes/class.Utils.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");
-require_once("server/classes/class.AJXP_User.php");
 require_once("server/classes/class.AuthService.php");
-session_start();
 ConfService::init("server/conf/conf.php");
+$confStorageDriver = ConfService::getConfStorageImpl();
+include_once($confStorageDriver->getUserClassFileName());
+session_start();
 
 $outputArray = array();
 $testedParams = array();
@@ -78,7 +79,8 @@ if(AuthService::usersEnabled())
 		 }
 	}else if(AuthService::countAdminUsers() == -1){
 		// Here we may come from a previous version! Check the "admin" user and set its right as admin.
-		$adminUser = new AJXP_User("admin");
+		$confStorage = ConfService::getConfStorageImpl();
+		$adminUser = $confStorage->createUserObject("admin"); 
 		$adminUser->setAdmin(true);
 		$adminUser->save();
 		$BEGIN_MESSAGE .= "You may come from a previous version. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
@@ -132,7 +134,7 @@ if(isSet($_GET["compile"])){
 	AJXP_JSPacker::pack();
 }
 
-$JS_DEBUG = false;
+$JS_DEBUG = true;
 $mess = ConfService::getMessages();
 if($JS_DEBUG){
 	include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
