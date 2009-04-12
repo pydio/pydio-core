@@ -46,8 +46,10 @@ global $G_MAX_CHAR;
 global $G_UPLOAD_MAX_NUMBER;
 global $G_UPLOAD_MAX_FILE;
 global $G_UPLOAD_MAX_TOTAL;
-global $G_ACCESS_DRIVER;
 
+global $G_ACCESS_DRIVER;
+global $G_CONF_DRIVER;
+global $G_AUTH_DRIVER;
 
 class ConfService
 {
@@ -70,8 +72,52 @@ class ConfService
 		$G_UPLOAD_MAX_FILE = Utils::convertBytes($upload_max_size_per_file);
 		$G_UPLOAD_MAX_TOTAL = Utils::convertBytes($upload_max_size_total);
 		$G_DEFAULT_REPOSITORIES = $REPOSITORIES;
+		ConfService::initConfStorageImpl($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
+		ConfService::initAuthDriverImpl($AUTH_DRIVER["NAME"], $AUTH_DRIVER["OPTIONS"]);
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 		ConfService::switchRootDir();
+	}
+	
+	function initConfStorageImpl($name, $options){
+		global $G_CONF_STORAGE_DRIVER;
+		$filePath = INSTALL_PATH."/plugins/conf.".$name."/class.".$name."ConfDriver.php";
+		if(!is_file($filePath)){
+			die("Warning, cannot find driver for conf storage! ($name, $filePath)");
+		}
+		require_once($filePath);
+		$className = $name."ConfDriver";
+		$G_CONF_STORAGE_DRIVER = new $className();
+		$G_CONF_STORAGE_DRIVER->init($options);
+	}
+	
+	/**
+	 * Returns the current conf storage driver
+	 * @return AbstractConfDriver
+	 */
+	function getConfStorageImpl(){
+		global $G_CONF_STORAGE_DRIVER;
+		return $G_CONF_STORAGE_DRIVER;
+	}
+
+	function initAuthDriverImpl($name, $options){
+		global $G_AUTH_DRIVER;
+		$filePath = INSTALL_PATH."/plugins/auth.".$name."/class.".$name."AuthDriver.php";
+		if(!is_file($filePath)){
+			die("Warning, cannot find driver for Authentication method! ($name, $filePath)");
+		}
+		require_once($filePath);
+		$className = $name."AuthDriver";
+		$G_AUTH_DRIVER = new $className();
+		$G_AUTH_DRIVER->init($options);
+	}
+	
+	/**
+	 * Returns the current Aithentication driver
+	 * @return AbstractAuthDriver
+	 */
+	function getAuthDriverImpl(){
+		global $G_AUTH_DRIVER;
+		return $G_AUTH_DRIVER;
 	}
 
 	function switchRootDir($rootDirIndex=-1)
@@ -127,24 +173,20 @@ class ConfService
 	 */
 	function initRepositoriesList($defaultRepositories)
 	{
-		$objList =  array();
+		// APPEND CONF FILE REPOSITORIES
+		$objList = array();
 		foreach($defaultRepositories as $index=>$repository)
 		{
 			$repo = ConfService::createRepositoryFromArray($index, $repository);
 			$repo->setWriteable(false);
 			$objList[$index] = $repo;
 		}
-		$confRepo = ConfService::loadRepoFile();
-		$upgrade = false;
-		foreach ($confRepo as $index => $repo){
-			if($repo->upgradeId()){
-				$confRepo[$index] = $repo;
-				$upgrade = true;
-			}
-			$repo->setWriteable(true);
-			$objList[$repo->getUniqueId()] = $repo;
+		// LOAD FROM DRIVER
+		$confDriver = ConfService::getConfStorageImpl();
+		$drvList = $confDriver->listRepositories();
+		if(is_array($drvList)){
+			$objList = array_merge($objList, $drvList);
 		}
-		if($upgrade) ConfService::saveRepoFile($confRepo);
 		return $objList;
 	}
 	
@@ -178,10 +220,8 @@ class ConfService
 	 * @return -1 if error
 	 */
 	function addRepository($oRepository){
-		// update list
-		$confRepoList = ConfService::loadRepoFile();
-		$confRepoList[] = $oRepository;
-		$res = ConfService::saveRepoFile($confRepoList);
+		$confStorage = ConfService::getConfStorageImpl();
+		$res = $confStorage->saveRepository($oRepository);		
 		if($res == -1){
 			return $res;
 		}
@@ -191,13 +231,8 @@ class ConfService
 	}
 	
 	function getRepositoryById($repoId){
-		$confRepoList = ConfService::loadRepoFile();
-		foreach ($confRepoList as $repo){
-			if($repo->getUniqueId() == $repoId){
-				return $repo;
-			}
-		}
-		return null;
+		$confStorage = ConfService::getConfStorageImpl();
+		return $confStorage->getRepositoryById($repoId);
 	}
 	
 	/**
@@ -208,13 +243,8 @@ class ConfService
 	 * @return mixed
 	 */
 	function replaceRepository($oldId, $oRepositoryObject){
-		$confRepoList = ConfService::loadRepoFile();
-		foreach ($confRepoList as $index => $repo){
-			if($repo->getUniqueId() == $oldId){
-				$confRepoList[$index] = $oRepositoryObject ;
-			}
-		}
-		$res = ConfService::saveRepoFile($confRepoList);
+		$confStorage = ConfService::getConfStorageImpl();
+		$res = $confStorage->saveRepository($oRepository, true);
 		if($res == -1){
 			return $res;
 		}
@@ -224,21 +254,12 @@ class ConfService
 	}
 	
 	function deleteRepository($repoId){
+		$confStorage = ConfService::getConfStorageImpl();
+		$res = $confStorage->deleteRepository($repoId);
+		if($res == -1){
+			return $res;
+		}				
 		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
-		$newList = array();
-		$found = false;
-		foreach ($G_REPOSITORIES as  $repId => $repo){			
-			if($repId == $repoId){
-				$found = true;
-				continue;
-			}
-			if(!$repo->isWriteable()) continue;
-			$newList[] = $repo;
-		}
-		$res = ConfService::saveRepoFile($newList);
-		if($res == -1 || !$found){
-			return -1;
-		}
 		AJXP_Logger::logAction("Delete Repository", array("repo_id"=>$repoId));
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);		
 	}
@@ -355,7 +376,7 @@ class ConfService
 		if($fp = opendir($base)){
 			while (($subdir = readdir($fp))!==false) {
 				$manifName = $base."/".$subdir."/manifest.xml";
-				if(is_file($manifName) && is_readable($manifName)){
+				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("ajxp."))=="ajxp."){
 					$lines = file($manifName);
 					array_shift($lines);// Remove first line (xml declaration);					
 					$xmlString .= implode("", $lines);
@@ -365,25 +386,7 @@ class ConfService
 		}
 		return str_replace("\t", "", str_replace("\n", "", $xmlString));
 	}
-	
-	function loadRepoFile(){
-		$result = array();
-		if(is_file(INSTALL_PATH."/server/conf/repo.ser"))
-		{
-			$fileLines = file(INSTALL_PATH."/server/conf/repo.ser");
-			$result = unserialize($fileLines[0]);
-		}
-		return $result;
-	}
-	
-	function saveRepoFile($value){		
-		if(!is_writeable(INSTALL_PATH."/server/conf")) return -1;
-		$fp = @fopen(INSTALL_PATH."/server/conf/repo.ser", "w");
-		fwrite($fp, serialize($value));
-		fclose($fp);
-	}
-	
-	
+		
 }
 
 

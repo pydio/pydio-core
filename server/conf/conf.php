@@ -33,7 +33,7 @@
  * 
  * Description : configuration file
  */
-define("AJXP_VERSION", "2.4");
+define("AJXP_VERSION", "2.5");
 define("AJXP_VERSION_DATE", "2009/03/26");
 
 define("ENABLE_USERS", 1);
@@ -49,6 +49,28 @@ define("AUTH_MODE_REMOTE_PORT", 80); //
 define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); // 
 
 define("HTTPS_POLICY_FILE", "");
+
+/*********************************************************/
+/* CONFIGURATION STORAGE DRIVER
+/* This is how the repositories and users data are stored
+/* by AjaXplorer. By default, you don't need to change this.
+/* Possible drivers can be found in the folder /plugins/ under
+/* each folders beginning with "conf.".
+/* At the moment, only conf.serial is implemented, that stores 
+/* users and repository data inside files on the server.
+/*********************************************************/
+$CONF_STORAGE = array(
+	"NAME"		=> "serial",
+	"OPTIONS"	=> array(
+		"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/server/conf/repo.ser",
+		"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users")
+);
+
+$AUTH_DRIVER = array(
+	"NAME"		=> "serial",
+	"OPTIONS"	=> array(
+		"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser")
+);
 
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.

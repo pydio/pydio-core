@@ -66,7 +66,6 @@ class AJXP_User
 	
 	function setAdmin($boolean){
 		$this->rights["ajxp.admin"] = $boolean;
-		AuthService::setUserAdmin($this->id, $boolean);
 	}
 	
 	function getRight($rootDirId){
@@ -161,33 +160,14 @@ class AJXP_User
 	}
 	
 	function load(){
-		$this->rights = $this->loadUserFile("rights");
-		$this->prefs = $this->loadUserFile("prefs");
-		$this->bookmarks = $this->loadUserFile("bookmarks");
+		$storage = ConfService::getConfStorageImpl();
+		$storage->loadUser($this);
 	}
 	
 	function save(){
-		$this->saveUserFile("rights", $this->rights);
-		$this->saveUserFile("prefs", $this->prefs);
-		$this->saveUserFile("bookmarks", $this->bookmarks);
-	}
-	
-	function loadUserFile($file){
-		$result = array();
-		if(is_file(USERS_DIR."/".$this->id."/".$file.".ser"))
-		{
-			$fileLines = file(USERS_DIR."/".$this->id."/".$file.".ser");
-			$result = unserialize($fileLines[0]);
-		}
-		return $result;
-	}
-	
-	function saveUserFile($file, $value){
-		if(!is_dir(USERS_DIR."/".$this->id)) mkdir(USERS_DIR."/".$this->id);
-		$fp = fopen(USERS_DIR."/".$this->id."/".$file.".ser", "w");
-		fwrite($fp, serialize($value));
-		fclose($fp);
-	}
+		$storage = ConfService::getConfStorageImpl();
+		$storage->saveUser($this);
+	}	
 
     /** Decode a user supplied password before using it */
     function decodeUserPassword($password){
