@@ -53,7 +53,8 @@ class AuthService
 	
 	function encodeCookiePass($user, $pass = null){
 		if($pass == null){
-			$users = AuthService::loadLocalUsersList();
+			$authDriver = ConfService::getAuthDriverImpl();
+			$users = $authDriver->listUsers();
 			$pass = $users[$user];
 		}
 		return md5($user.":".$pass.":ajxp");
@@ -68,6 +69,11 @@ class AuthService
 	function preLogUser($remoteSessionId = "")
 	{
 		if(AuthService::getLoggedUser() != null) return ;
+		$authDriver = ConfService::getAuthDriverImpl();
+		$authDriver->preLogUser($remoteSessionId);
+		return ;
+		/*
+		// TODO : CREATE APPROPRIATE AUTH DRIVERS
 		if(AUTH_MODE == "local_http")
 		{
 			$localHttpLogin = $_SERVER["REMOTE_USER"];
@@ -100,16 +106,18 @@ class AuthService
 			}
 			AuthService::logUser($current_user->user_login, "", true);
 		}
+		*/
 	}
 	
 	function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{
+		$authDriver = ConfService::getAuthDriverImpl();
 		if($user_id == null)
 		{
 			if(isSet($_SESSION["AJXP_USER"])) return 1; 
 			if(ALLOW_GUEST_BROWSING)
 			{
-				if(!AuthService::userExists("guest"))
+				if(!$authDriver->userExists("guest"))
 				{
 					AuthService::createUser("guest", "");
 					$guest = new AJXP_User("guest");
@@ -121,16 +129,9 @@ class AuthService
 			return 0;
 		}
 		// CHECK USER PASSWORD HERE!
-		if(!AuthService::userExists($user_id)) return 0;
+		if(!$authDriver->userExists($user_id)) return 0;
 		if(!$bypass_pwd){
 			if(!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)){
-				// Check upgrade
-				$user = new AJXP_User($userId);
-				/*
-				if($user->getVersion() != "2.4"){
-					return -2;
-				}	
-				*/			
 				return -1;
 			}
 		}
@@ -183,10 +184,8 @@ class AuthService
 	
 	function userExists($userId)
 	{
-		$users = AuthService::loadLocalUsersList();
-		if(!is_array($users) || !array_key_exists($userId, $users)) return false;
-		return true;
-		//return(is_dir(USERS_DIR."/".$userId));
+		$authDriver = ConfService::getAuthDriverImpl();
+		return $authDriver->userExists($userId);
 	}
 	
 	function encodePassword($pass){
@@ -196,34 +195,22 @@ class AuthService
 	function checkPassword($userId, $userPass, $encodedPass = false, $returnSeed = "")
 	{
 		if($userId == "guest") return true;		
-		$users = AuthService::loadLocalUsersList();
-		if(!array_key_exists($userId, $users)) return false;
-		if($encodedPass){			
-			return (AuthService::encodeCookiePass($userId, $users[$userId]) == $userPass);
-		}else{
-			$seed = $_SESSION["AJXP_CURRENT_SEED"];
-			if($seed != $returnSeed) return false;
-			return (md5($users[$userId].''.$returnSeed) == $userPass);
-		}		
+		$authDriver = ConfService::getAuthDriverImpl();
+		return $authDriver->checkPassword($userId, $userPass, $encodedPass, $returnSeed);
 	}
 	
 	function updatePassword($userId, $userPass)
 	{
-		$users = AuthService::loadLocalUsersList();
-		if(!is_array($users) || !array_key_exists($userId, $users)) return "Error!";
-		$users[$userId] = $userPass; // AuthService::encodePassword($userPass); it is already encoded
-		AuthService::saveLocalUsersList($users);
+		$authDriver = ConfService::getAuthDriverImpl();
+		$authDriver->changePassword($userId, $userPass);
 		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
 		return true;
 	}
 	
 	function createUser($userId, $userPass, $isAdmin=false)
 	{
-		$users = AuthService::loadLocalUsersList();
-		if(!is_array($users)) $users = array();
-		if(array_key_exists($userId, $users)) return "exists";
-		$users[$userId] = AuthService::encodePassword($userPass);
-		AuthService::saveLocalUsersList($users);
+		$authDriver = ConfService::getAuthDriverImpl();
+		$authDriver->createUser($userId, AuthService::encodePassword($userPass));
 		if($isAdmin){
 			$user = new AJXP_User($userId);
 			$user->setAdmin(true);			
@@ -234,59 +221,36 @@ class AuthService
 	}
 	
 	function countAdminUsers(){
-		$users = AuthService::loadLocalUsersList();
-		if(!is_array($users)) return 0;
-		if(!array_key_exists("ajxp.admin.users", $users)){			
-			if(AuthService::userExists("admin")) return -1;
-			return 0;
+		$auth = ConfService::getAuthDriverImpl();	
+		$count = 0;
+		$users = $auth->listUsers();
+		foreach (array_keys($users) as $userId){
+			$userObject = new AJXP_User($userId);
+			$userObject->load();			
+			if($userObject->isAdmin()) $count++;
 		}
-		return count($users["ajxp.admin.users"]);
+		if(!$count && $auth->userExists("admin")){
+			return -1;
+		}		
+		return $count;
 	}
-	
-	function setUserAdmin($userId, $isAdmin){
-		$users = AuthService::loadLocalUsersList();
-		if($isAdmin){
-			if(!array_key_exists("ajxp.admin.users", $users)){
-				$users["ajxp.admin.users"] = array();
-			}
-			$users["ajxp.admin.users"][$userId] = true;
-			AuthService::saveLocalUsersList($users);
-		}else{
-			if(array_key_exists("ajxp.admin.users", $users) && array_key_exists($userId, $users["ajxp.admin.users"])){
-				unset($users["ajxp.admin.users"][$userId]);
-				AuthService::saveLocalUsersList($users);
-			}
-		}
-	}
-	
+		
 	function deleteUser($userId)
 	{
-		AuthService::setUserAdmin($userId, false);
-		$users = AuthService::loadLocalUsersList();
-		if(is_array($users) && array_key_exists($userId, $users))
-		{
-			unset($users[$userId]);
-			AuthService::saveLocalUsersList($users);
-		}
-		if(is_dir(USERS_DIR."/".$userId))
-		{
-			$rp = opendir(USERS_DIR."/".$userId);
-			while ($file = readdir($rp)) {
-				if($file != "." && $file != "..")
-				{
-					unlink(USERS_DIR."/".$userId."/".$file);
-				}
-			}
-			@rmdir(USERS_DIR."/".$userId);
-		}
+		$authDriver = ConfService::getAuthDriverImpl();
+		$confDriver = ConfService::getConfStorageImpl();
+		$authDriver->deleteUser($userId);
+		$confDriver->deleteUser($userId);
+		
 		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId));
 		return true;
 	}
 	
 	function listUsers()
 	{
+		$authDriver = ConfService::getAuthDriverImpl();		
 		$allUsers = array();
-		$users = AuthService::loadLocalUsersList();
+		$users = $authDriver->listUsers();
 		foreach (array_keys($users) as $userId)
 		{
 			if(($userId == "guest" && !ALLOW_GUEST_BROWSING) || $userId == "ajxp.admin.users") continue;
@@ -295,23 +259,6 @@ class AuthService
 		return $allUsers;
 	}
 	
-	function loadLocalUsersList()
-	{
-		$result = array();
-		if(is_file(USERS_DIR."/users.ser") && is_readable(USERS_DIR."/users.ser"))
-		{
-			$fileLines = file(USERS_DIR."/users.ser");
-			$result = unserialize($fileLines[0]);
-		}
-		return $result;		
-	}
-	
-	function saveLocalUsersList($usersList)
-	{
-		$fp = fopen(USERS_DIR."/users.ser", "w");
-		fwrite($fp, serialize($usersList));
-		fclose($fp);
-	}
 }
 
 ?>
