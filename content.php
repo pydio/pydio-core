@@ -43,19 +43,20 @@ require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.UserSelection.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
-require_once("server/classes/class.AJXP_User.php");
 require_once("server/classes/class.RecycleBinManager.php");
 if(isSet($_GET["ajxp_sessid"]))
 {
 	$_COOKIE["PHPSESSID"] = $_GET["ajxp_sessid"];
 }
-session_start();
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 ConfService::init("server/conf/conf.php");
+$confStorageDriver = ConfService::getConfStorageImpl();
+require_once($confStorageDriver->getUserClassFileName());
 require_once("server/classes/class.AJXP_Logger.php");
+session_start();
 
 if(AuthService::usersEnabled())
 {

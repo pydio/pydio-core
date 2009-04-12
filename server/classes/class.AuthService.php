@@ -112,6 +112,7 @@ class AuthService
 	function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
+		$confDriver = ConfService::getConfStorageImpl();
 		if($user_id == null)
 		{
 			if(isSet($_SESSION["AJXP_USER"])) return 1; 
@@ -120,7 +121,7 @@ class AuthService
 				if(!$authDriver->userExists("guest"))
 				{
 					AuthService::createUser("guest", "");
-					$guest = new AJXP_User("guest");
+					$guest = $confDriver->createUserObject("guest");
 					$guest->save();
 				}
 				AuthService::logUser("guest", null);
@@ -135,7 +136,7 @@ class AuthService
 				return -1;
 			}
 		}
-		$user = new AJXP_User($user_id);
+		$user = $confDriver->createUserObject($user_id);
 		if($user->isAdmin())
 		{
 			$user = AuthService::updateAdminRights($user);
@@ -210,9 +211,10 @@ class AuthService
 	function createUser($userId, $userPass, $isAdmin=false)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
+		$confDriver = ConfService::getConfStorageImpl();
 		$authDriver->createUser($userId, AuthService::encodePassword($userPass));
 		if($isAdmin){
-			$user = new AJXP_User($userId);
+			$user = $confDriver->createUserObject($userId);
 			$user->setAdmin(true);			
 			$user->save();
 		}
@@ -222,10 +224,11 @@ class AuthService
 	
 	function countAdminUsers(){
 		$auth = ConfService::getAuthDriverImpl();	
+		$confDriver = ConfService::getConfStorageImpl();
 		$count = 0;
 		$users = $auth->listUsers();
 		foreach (array_keys($users) as $userId){
-			$userObject = new AJXP_User($userId);
+			$userObject = $confDriver->createUserObject($userId);
 			$userObject->load();			
 			if($userObject->isAdmin()) $count++;
 		}
@@ -240,7 +243,7 @@ class AuthService
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
 		$authDriver->deleteUser($userId);
-		$confDriver->deleteUser($userId);
+		AJXP_User::deleteUser($userId);
 		
 		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId));
 		return true;
@@ -249,12 +252,13 @@ class AuthService
 	function listUsers()
 	{
 		$authDriver = ConfService::getAuthDriverImpl();		
+		$confDriver = ConfService::getConfStorageImpl();
 		$allUsers = array();
 		$users = $authDriver->listUsers();
 		foreach (array_keys($users) as $userId)
 		{
 			if(($userId == "guest" && !ALLOW_GUEST_BROWSING) || $userId == "ajxp.admin.users") continue;
-			$allUsers[$userId] = new AJXP_User($userId);
+			$allUsers[$userId] = $confDriver->createUserObject($userId);
 		}
 		return $allUsers;
 	}

@@ -87,32 +87,23 @@ class AbstractConfDriver {
 	function listUsers(){
 		
 	}
+	
+	
 	/**
-	 * Load a user by its ID
-	 *
-	 * @param AJXP_User $userObject
-	 * @return AJXP_User
-	 */
-	function loadUser(&$userObject){
-		
-	}
-	/**
-	 * Add or update a given User object
-	 *
-	 * @param AJXP_USER $userObject
-	 */
-	function saveUser($userObject){
-		
-	}
-	/**
-	 * Delete a user by it's ID.
+	 * Instantiate a new AJXP_User
 	 *
 	 * @param String $userId
+	 * @return AbstractAjxpUser
 	 */
-	function deleteUser($userId){
-		
+	function createUserObject($userId){
 	}
-
+	
+	function getUserClassFileName(){		
+	}
+	
+	function getOption($optionName){		
+	}
+	
 	
 	// SAVE / EDIT / CREATE / DELETE CONF ??
 	

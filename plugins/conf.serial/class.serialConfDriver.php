@@ -38,7 +38,10 @@ class serialConfDriver {
 	var $repoSerialFile;
 	var $usersSerialDir;
 	
+	var $options;
+	
 	function init($options){
+		$this->options = $options;
 		$this->repoSerialFile = $options["REPOSITORIES_FILEPATH"];
 		$this->usersSerialDir = $options["USERS_DIRPATH"];
 	}
@@ -104,51 +107,22 @@ class serialConfDriver {
 	
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
 	/**
-	 * Retrieve the list of available users
-	 * @return Array
-	 */
-	function listUsers(){
-		
-	}
-	/**
-	 * Load a user by its ID
-	 *
-	 * @param AJXP_User $userObject The object to initialize (must contain at least its own ID).
-	 * @return AJXP_User
-	 */
-	function loadUser(&$userObject){
-		$userObject->rights = Utils::loadSerialFile($this->usersSerialDir."/".$userObject->getId()."/rights.ser");
-		$userObject->prefs = Utils::loadSerialFile($this->usersSerialDir."/".$userObject->getId()."/prefs.ser");
-		$userObject->bookmarks = Utils::loadSerialFile($this->usersSerialDir."/".$userObject->getId()."/bookmarks.ser");
-	}
-	/**
-	 * Add or update a given User object
-	 *
-	 * @param AJXP_User $userObject
-	 */
-	function saveUser($userObject){
-		Utils::saveSerialFile($this->usersSerialDir."/".$userObject->getId()."/rights.ser", $userObject->rights);
-		Utils::saveSerialFile($this->usersSerialDir."/".$userObject->getId()."/prefs.ser", $userObject->prefs);
-		Utils::saveSerialFile($this->usersSerialDir."/".$userObject->getId()."/bookmarks.ser", $userObject->bookmarks);
-	}
-	/**
-	 * Delete a user by it's ID.
+	 * Instantiate a new AJXP_User
 	 *
 	 * @param String $userId
+	 * @return AbstractAjxpUser
 	 */
-	function deleteUser($userId){
-		if(is_file($this->usersSerialDir."/".$userId."/rights.ser")){
-			unlink($this->usersSerialDir."/".$userId."/rights.ser");
-		}
-		if(is_file($this->usersSerialDir."/".$userId."/prefs.ser")){
-			unlink($this->usersSerialDir."/".$userId."/prefs.ser");
-		}
-		if(is_file($this->usersSerialDir."/".$userId."/bookmarks.ser")){
-			unlink($this->usersSerialDir."/".$userId."/bookmarks.ser");
-		}
-		rmdir($this->usersSerialDir."/".$userId);
+	function createUserObject($userId){		
+		return new AJXP_User($userId, $this);
 	}
 	
-
+	function getUserClassFileName(){
+		return INSTALL_PATH."/plugins/conf.serial/class.AJXP_User.php";
+	}
+	
+	function getOption($optionName){		
+		return $this->options[$optionName];
+	}
+	
 }
 ?>

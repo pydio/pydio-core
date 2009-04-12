@@ -119,7 +119,8 @@ class AJXP_ClientDriver extends AbstractDriver
 				}
 				else if(!AuthService::usersEnabled())
 				{
-					$bmUser = new AJXP_User("shared");
+					$confStorage = ConfService::getConfStorageImpl();
+					$bmUser = $confStorage->createUserObject("shared");
 				}
 				if($bmUser == null) exit(1);
 				if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
