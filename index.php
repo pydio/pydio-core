@@ -134,7 +134,7 @@ if(isSet($_GET["compile"])){
 	AJXP_JSPacker::pack();
 }
 
-$JS_DEBUG = true;
+$JS_DEBUG = false;
 $mess = ConfService::getMessages();
 if($JS_DEBUG){
 	include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
