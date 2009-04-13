@@ -228,7 +228,18 @@ Ajaxplorer = Class.create({
 		
 	loadRepository: function(repositoryId, repositoryLabel){
 		this.actionBar.loadActions();
-		this.foldersTree.reloadFullTree(repositoryLabel);
+		var newIcon;
+		var defaultIcon = ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
+		var sEngineName='SearchEngine';
+		if(this.usersEnabled && this.user){
+			newIcon = this.user.getRepositoryIcon(repositoryId) || defaultIcon;			
+			sEngineName = this.user.getRepoSearchEngine(repositoryId) || 'SearchEngine';
+		}else if(this._initRootDirsSettings){
+			newIcon = this._initRootDirsSettings.get(repositoryId).get('icon') || defaultIcon;
+			sEngineName = this._initRootDirsSettings.get(repositoryId).get('search_engine') || 'SearchEngine';			
+		}
+		
+		this.foldersTree.reloadFullTree(repositoryLabel, newIcon);
 		if(!this._initObj) { 
 			this.filesList.loadXmlList('/') ;
 			this.rootDirId = repositoryId;
@@ -239,18 +250,11 @@ Ajaxplorer = Class.create({
 			this._initLoadRep = null;
 		}
 		$('repo_path').value = repositoryLabel;
+		$('repo_icon').src = newIcon;
 		var sEngineName = 'SearchEngine';
-		if(this.usersEnabled && this.user){
-			$('repo_icon').src = this.user.getRepositoryIcon(repositoryId) || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
-			sEngineName = this.user.getRepoSearchEngine(repositoryId) || 'SearchEngine';		
-		}else{
-			if(this._initRootDirsSettings){
-				$('repo_icon').src = this._initRootDirsSettings.get(repositoryId).get('icon') || ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
-				sEngineName = this._initRootDirsSettings.get(repositoryId).get('search_engine') || 'SearchEngine';
-				this.refreshRootDirMenu(this._initRootDirsList, repositoryId);
-			}
+		if(!(this.usersEnabled && this.user) && this._initRootDirsSettings){
+			this.refreshRootDirMenu(this._initRootDirsList, repositoryId);			
 		}
-				
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 
