@@ -62,6 +62,10 @@ class AbstractAjxpUser
 		return $this->id;
 	}
 	
+	function storageExists(){
+		
+	}
+	
 	function getVersion(){
 		if(!isSet($this->version)) return "";
 		return $this->version;
@@ -175,6 +179,9 @@ class AbstractAjxpUser
 	
 	function save(){
 	}	
+
+	function deleteUser($userId){
+	}
 
     /** Decode a user supplied password before using it */
     function decodeUserPassword($password){

@@ -55,6 +55,10 @@ class AJXP_User extends AbstractAjxpUser
 		parent::AbstractAjxpUser($id, $storage);
 	}
 			
+	function storageExists(){		
+		return is_dir(str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $this->storage->getOption("USERS_DIRPATH")."/".$this->getId()));
+	}
+	
 	function getRight($rootDirId){
 		if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
 		return "";
@@ -173,7 +177,7 @@ class AJXP_User extends AbstractAjxpUser
 		if(is_file($serialDir."/".$userId."/bookmarks.ser")){
 			unlink($serialDir."/".$userId."/bookmarks.ser");
 		}
-		rmdir($serialDir."/".$userId);
+		if(is_dir($serialDir."/".$userId)) rmdir($serialDir."/".$userId);
 		
 	}
 
