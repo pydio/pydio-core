@@ -345,13 +345,6 @@ FoldersTree = Class.create({
 			var realNode = webFXTreeHandler.all[nodeId];
 			realNode.icon = newIcon;
 			realNode.openIcon = newIcon;
-			/*
-			var img = $(nodeId+'-icon');
-			if(img){
-				window.setTimeout(function(){img.src = $('repo_icon').src;}, 100);
-				console.log(nodeId+'-icon'+'//' + img.src);
-			}
-			*/
 		}
 	}
 });
