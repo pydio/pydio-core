@@ -198,10 +198,10 @@ FoldersTree = Class.create({
 		return;
 	},
 	
-	reloadFullTree: function(repositoryLabel){
+	reloadFullTree: function(repositoryLabel, newIcon){		
 		webFXTreeHandler.recycleNode = null;
 		this.setCurrentToRoot();
-		this.changeRootLabel(repositoryLabel);
+		this.changeRootLabel(repositoryLabel, newIcon);		
 		this.reloadCurrentNode();
 	},
 	
@@ -334,12 +334,24 @@ FoldersTree = Class.create({
 		this.setCurrentNodeName(this.getRootNodeId(), skipSelect);
 	},
 	
-	changeRootLabel: function(newLabel){
-		this.changeNodeLabel(this.getRootNodeId(), newLabel);	
+	changeRootLabel: function(newLabel, newIcon){
+		this.changeNodeLabel(this.getRootNodeId(), newLabel, newIcon);	
 	},
 	
-	changeNodeLabel: function(nodeId, newLabel){	
+	changeNodeLabel: function(nodeId, newLabel, newIcon){	
 		var node = $(nodeId+'-anchor');
 		node.firstChild.nodeValue = newLabel;
+		if(newIcon){
+			var realNode = webFXTreeHandler.all[nodeId];
+			realNode.icon = newIcon;
+			realNode.openIcon = newIcon;
+			/*
+			var img = $(nodeId+'-icon');
+			if(img){
+				window.setTimeout(function(){img.src = $('repo_icon').src;}, 100);
+				console.log(nodeId+'-icon'+'//' + img.src);
+			}
+			*/
+		}
 	}
 });
