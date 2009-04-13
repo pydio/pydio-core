@@ -115,6 +115,11 @@ class Repository {
 		return "";
 	}
 	
+	function getDefaultRight(){
+		$opt = $this->getOption("DEFAULT_RIGHTS");
+		return (isSet($opt)?$opt:"");
+	}
+	
 	
 	/**
 	 * @return String

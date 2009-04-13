@@ -75,7 +75,8 @@ switch ($action)
 	
 	case "change_admin_right" :
 		$userId = $_GET["user_id"];
-		$user = new AJXP_User($userId);
+		$confStorage = ConfService::getConfStorageImpl();		
+		$user = $confStorage->createUserObject($userId);
 		$user->setAdmin(($_GET["right_value"]=="1"?true:false));
 		$user->save();
 		AJXP_XMLWriter::header();
@@ -96,7 +97,8 @@ switch ($action)
 			AJXP_XMLWriter::close();
 			exit(1);
 		}
-		$user = new AJXP_User($_GET["user_id"]);
+		$confStorage = ConfService::getConfStorageImpl();		
+		$user = $confStorage->createUserObject($_GET["user_id"]);
 		$user->setRight($_GET["repository_id"], $_GET["right"]);
 		$user->save();
 		AJXP_XMLWriter::header();
@@ -111,7 +113,8 @@ switch ($action)
 		if($userId == $loggedUser->getId()){
 			$user = $loggedUser;
 		}else{
-			$user = new AJXP_User($userId);
+			$confStorage = ConfService::getConfStorageImpl();		
+			$user = $confStorage->createUserObject($userId);
 		}
 		$wallet = $user->getPref("AJXP_WALLET");
 		if(!is_array($wallet)) $wallet = array();
@@ -189,7 +192,9 @@ switch ($action)
 		}
 		if(get_magic_quotes_gpc()) $_GET["new_login"] = stripslashes($_GET["new_login"]);
 		$_GET["new_login"] = str_replace("'", "", $_GET["new_login"]);
-		$newUser = new AJXP_User($_GET["new_login"]);
+		
+		$confStorage = ConfService::getConfStorageImpl();		
+		$newUser = $confStorage->createUserObject($_GET["new_login"]);
 		$newUser->save();
 		//AuthService::updatePassword($_GET["new_login"], $_GET["new_pwd"]);
 		AuthService::createUser($_GET["new_login"], $_GET["new_pwd"]);
@@ -211,7 +216,7 @@ switch ($action)
 			AJXP_XMLWriter::close();
 			exit(1);									
 		}
-		$res = AJXP_User::deleteUser($_GET["user_id"]);
+		$res = AuthService::deleteUser($_GET["user_id"]);
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::sendMessage("User successfully erased", null);
 		print("<refresh_user_list/>");
@@ -220,7 +225,8 @@ switch ($action)
 
 	case "users_list":
 		$allUsers = AuthService::listUsers();
-		$userObject = new AJXP_User("");
+		$confStorage = ConfService::getConfStorageImpl();		
+		$userObject = $confStorage->createUserObject("");		
 		header("Content-Type:text/html;charset=UTF-8");
 		foreach ($allUsers as $userId => $userObject)
 		{

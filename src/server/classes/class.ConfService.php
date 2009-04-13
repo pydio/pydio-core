@@ -144,6 +144,17 @@ class ConfService
 		
 	}
 	
+	function getRepositoriesList()
+	{
+		global $G_REPOSITORIES;
+		return $G_REPOSITORIES;
+	}
+	
+	/**
+	 * Deprecated, use getRepositoriesList instead.
+	 *
+	 * @return Array
+	 */
 	function getRootDirsList()
 	{
 		global $G_REPOSITORIES;
@@ -244,7 +255,7 @@ class ConfService
 	 */
 	function replaceRepository($oldId, $oRepositoryObject){
 		$confStorage = ConfService::getConfStorageImpl();
-		$res = $confStorage->saveRepository($oRepository, true);
+		$res = $confStorage->saveRepository($oRepositoryObject, true);
 		if($res == -1){
 			return $res;
 		}

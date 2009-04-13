@@ -35,12 +35,14 @@
  */
 class AbstractConfDriver {
 		
+	var $options;
 	/**
 	 * Initialize the driver with a given set of options
 	 *
 	 * @param Array $options Array of options as defined by the manifest.xml file
 	 */
 	function init($options){		
+		$this->options = $options;
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
@@ -96,12 +98,27 @@ class AbstractConfDriver {
 	 * @return AbstractAjxpUser
 	 */
 	function createUserObject($userId){
+		$abstractUser = $this->instantiateAbstractUserImpl($userId);
+		if(!$abstractUser->storageExists()){			
+			AuthService::updateDefaultRights($abstractUser);
+		}
+		return $abstractUser;
+	}
+	
+	/**
+	 * Instantiate the right class
+	 *
+	 * @param AbstractAjxpUser $userId
+	 */
+	function instantiateAbstractUserImpl($userId){
+		
 	}
 	
 	function getUserClassFileName(){		
 	}
 	
-	function getOption($optionName){		
+	function getOption($optionName){	
+		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
 	}
 	
 	
