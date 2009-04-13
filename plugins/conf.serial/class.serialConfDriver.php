@@ -33,15 +33,14 @@
  * 
  * Description : Serialized Files implementation of AbstractConfDriver
  */
-class serialConfDriver {
+require_once(INSTALL_PATH."/server/classes/class.AbstractConfDriver.php");
+class serialConfDriver extends AbstractConfDriver {
 		
 	var $repoSerialFile;
 	var $usersSerialDir;
 	
-	var $options;
-	
 	function init($options){
-		$this->options = $options;
+		parent::init($options);
 		$this->repoSerialFile = $options["REPOSITORIES_FILEPATH"];
 		$this->usersSerialDir = $options["USERS_DIRPATH"];
 	}
@@ -107,22 +106,17 @@ class serialConfDriver {
 	
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
 	/**
-	 * Instantiate a new AJXP_User
+	 * Instantiate the right class
 	 *
-	 * @param String $userId
-	 * @return AbstractAjxpUser
+	 * @param AbstractAjxpUser $userId
 	 */
-	function createUserObject($userId){		
+	function instantiateAbstractUserImpl($userId){
 		return new AJXP_User($userId, $this);
 	}
 	
+	
 	function getUserClassFileName(){
 		return INSTALL_PATH."/plugins/conf.serial/class.AJXP_User.php";
-	}
-	
-	function getOption($optionName){		
-		return $this->options[$optionName];
-	}
-	
+	}	
 }
 ?>

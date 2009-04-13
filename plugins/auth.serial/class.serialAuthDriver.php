@@ -33,11 +33,13 @@
  * 
  * Description : Abstract representation of an access to an authentication system (ajxp, ldap, etc).
  */
-class serialAuthDriver {
+require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
+class serialAuthDriver extends AbstractAuthDriver {
 	
 	var $usersSerFile;
 	
 	function init($options){
+		parent::init($options);
 		$this->usersSerFile = $options["USERS_FILEPATH"];
 	}
 			

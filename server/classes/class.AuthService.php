@@ -142,6 +142,9 @@ class AuthService
 			$user = AuthService::updateAdminRights($user);
 		}
 		$_SESSION["AJXP_USER"] = $user;
+		if($authDriver->autoCreateUser() && !$user->storageExists()){
+			$user->save();
+		}
 		AJXP_Logger::logAction("Log In");
 		return 1;
 	}
@@ -181,6 +184,20 @@ class AuthService
 		}
 		$adminUser->save();
 		return $adminUser;
+	}
+	
+	/**
+	 * Update a user object with the default repositories rights
+	 *
+	 * @param AbstractAjxpUser $userObject
+	 */
+	function updateDefaultRights(&$userObject){
+		foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
+		{			
+			if($repoObject->getDefaultRight() != ""){
+				$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
+			}
+		}
 	}
 	
 	function userExists($userId)

@@ -35,10 +35,10 @@
  */
 class AbstractAuthDriver {
 	
-	var $usersSerFile;
+	var $options;
 	
 	function init($options){
-		$this->usersSerFile = $options["USERS_FILEPATH"];
+		$this->options = $options;
 	}
 			
 	function preLogUser($sessionId){}	
@@ -59,6 +59,16 @@ class AbstractAuthDriver {
 	 * @return boolean
 	 */
 	function useDirectLogin(){return true;}
-
+	
+	function getOption($optionName){	
+		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
+	}
+	
+	function autoCreateUser(){
+		$opt = $this->getOption("AUTOCREATE_AJXPUSER");
+		if($opt === true) return true;
+		return false;
+	}
+	
 }
 ?>

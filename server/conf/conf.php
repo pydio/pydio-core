@@ -69,7 +69,9 @@ $CONF_STORAGE = array(
 $AUTH_DRIVER = array(
 	"NAME"		=> "serial",
 	"OPTIONS"	=> array(
-		"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser")
+		"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser",
+		"AUTOCREATE_AJXPUSER" 	=> false, 
+		"ENCODE_PASS"			=> true)
 );
 
 /*********************************************************/
@@ -84,8 +86,10 @@ $REPOSITORIES[0] = array(
 		"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
 		"CREATE"		=>	true,
 		"RECYCLE_BIN" 	=> 	'recycle_bin',
-		"CHMOD_VALUE"   =>  '0600'
-	)
+		"CHMOD_VALUE"   =>  '0600',
+		"DEFAULT_RIGHTS"=>  "r"
+	),
+	
 );
 
 
