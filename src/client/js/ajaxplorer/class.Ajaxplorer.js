@@ -39,18 +39,26 @@ if(dynamicLibLoading)
 
 Ajaxplorer = Class.create({
 
-	initialize: function(loadRep, usersEnabled, loggedUser, rootDirId, rootDirsList, rootDirsSettings, defaultDisplay)
+	initialize: function(loadRep, usersEnabled, loggedUser, repositoryId, repoListXML, defaultDisplay)
 	{	
 		this._initLoadRep = loadRep;
 		this._initObj = true ;
 		this.usersEnabled = usersEnabled;
 		this._initLoggedUser = loggedUser;
-		this._initRootDirsList = rootDirsList;
-		this._initRootDirsSettings = rootDirsSettings;
-		this._initRootDirId = rootDirId;
+		this._initRepositoriesList = $H({});
+		if(repoListXML && repoListXML.childNodes.length){
+			for(j=0;j<repoListXML.documentElement.childNodes.length;j++)
+			{
+				var repoChild = repoListXML.documentElement.childNodes[j];
+				if(repoChild.nodeName != "repo") continue;				
+				var repository = new Repository(repoChild.getAttribute("id"), repoChild);
+				this._initRepositoriesList.set(repoChild.getAttribute("id"), repository);
+			}
+		}
+		this._initRepositoryId = repositoryId;
 		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 		this.histCount=0;
-		if(!this.usersEnabled) this.rootDirId = rootDirId;
+		if(!this.usersEnabled) this.repositoryId = repositoryId;
 		modal.setLoadingStepCounts(this.usersEnabled?6:5);
 		this.initTemplates();
 		modal.initForms();
@@ -103,13 +111,15 @@ Ajaxplorer = Class.create({
 		if(!this.usersEnabled)
 		{
 			var fakeUser = new User("shared");
-			fakeUser.setActiveRepository(this._initRootDirId, 1, 1);
-			fakeUser.setRepositoriesList(this._initRootDirsList);
+			fakeUser.setActiveRepository(this._initRepositoryId, 1, 1);
+			fakeUser.setRepositoriesList(this._initRepositoriesList);
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
-			this.foldersTree = new FoldersTree('tree_container', this._initRootDirsList.get(this._initRootDirId), ajxpServerAccessPath+'?action=ls', this);
-			this.refreshRootDirMenu(this._initRootDirsList, this._initRootDirId);
+			var repoObject = this._initRepositoriesList.get(this._initRepositoryId);
+			this.foldersTree = new FoldersTree('tree_container', repoObject.getLabel(), ajxpServerAccessPath+'?action=ls', this);
+			this.refreshRootDirMenu(this._initRepositoriesList, this._initRepositoryId);
 			this.actionBar.loadActions();
 			this.infoPanel.load();
+			this.foldersTree.changeRootLabel(repoObject.getLabel(), repoObject.getIcon());
 		}
 		else
 		{
@@ -212,48 +222,42 @@ Ajaxplorer = Class.create({
 			}
 		}catch(e){alert('Error parsing XML for user : '+e);}
 		
-		var repLabel = 'No Repository';
 		var repList = null;
 		var repId = null;
+		var repositoryObject = new Repository(null);
 		if(this.user != null)
 		{
 			repId = this.user.getActiveRepository();
 			repList = this.user.getRepositoriesList();			
-			repLabel = repList.get(repId);
+			repositoryObject = repList.get(repId);
 		}
 		this.actionBar.setUser(this.user);
 		this.refreshRootDirMenu(repList, repId);
-		this.loadRepository(repId, repLabel);
+		this.loadRepository(repositoryObject);
 	},
 		
-	loadRepository: function(repositoryId, repositoryLabel){
+	loadRepository: function(repository){
+		repository.loadResources();
+		var repositoryId = repository.getId();
 		this.actionBar.loadActions();
-		var newIcon;
-		var defaultIcon = ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png';
-		var sEngineName='SearchEngine';
-		if(this.usersEnabled && this.user){
-			newIcon = this.user.getRepositoryIcon(repositoryId) || defaultIcon;			
-			sEngineName = this.user.getRepoSearchEngine(repositoryId) || 'SearchEngine';
-		}else if(this._initRootDirsSettings){
-			newIcon = this._initRootDirsSettings.get(repositoryId).get('icon') || defaultIcon;
-			sEngineName = this._initRootDirsSettings.get(repositoryId).get('search_engine') || 'SearchEngine';			
-		}
 		
-		this.foldersTree.reloadFullTree(repositoryLabel, newIcon);
+		var	newIcon = repository.getIcon(); 
+		var sEngineName = repository.getSearchEngine();
+		
+		this.foldersTree.reloadFullTree(repository.getLabel(), newIcon);
 		if(!this._initObj) { 
 			this.filesList.loadXmlList('/') ;
-			this.rootDirId = repositoryId;
+			this.repositoryId = repositoryId;
 			this.actionBar.loadBookmarks();
 		} else { this._initObj = null ;}
 		if(this._initLoadRep){
 			this.goTo(this._initLoadRep);
 			this._initLoadRep = null;
 		}
-		$('repo_path').value = repositoryLabel;
+		$('repo_path').value = repository.getLabel();
 		$('repo_icon').src = newIcon;
-		var sEngineName = 'SearchEngine';
-		if(!(this.usersEnabled && this.user) && this._initRootDirsSettings){
-			this.refreshRootDirMenu(this._initRootDirsList, repositoryId);			
+		if(!(this.usersEnabled && this.user) && this._initRepositoriesList){
+			this.refreshRootDirMenu(this._initRepositoriesList, repositoryId);			
 		}
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
@@ -265,25 +269,19 @@ Ajaxplorer = Class.create({
 		this.filesList.loadXmlList(rep, selectFile);	
 	},
 	
-	refreshRootDirMenu: function(rootDirsList, rootDirId){
+	refreshRootDirMenu: function(rootDirsList, repositoryId){
 		$('goto_repo_button').addClassName('disabled');
 		//if(!rootDirsList || rootDirsList.size() <= 1) return;
 		var actions = new Array();
 		if(rootDirsList && rootDirsList.size() > 1){
 			rootDirsList.each(function(pair){
-				var value = pair.value;
+				var repoObject = pair.value;
 				var key = pair.key;
-				var selected = (key == rootDirId ? true:false);
-				var repoImage = null;
-				if(this.usersEnabled){
-					repoImage = (this.user?this.user.getRepositoryIcon(key):null);				
-				}else{
-					repoImage = this._initRootDirsSettings.get(key).get('icon') || null;
-				}
+				var selected = (key == repositoryId ? true:false);
 				actions[actions.length] = {
-					name:value,
-					alt:value,				
-					image:repoImage || ajxpResourcesFolder+'/images/foldericon.png',
+					name:repoObject.getLabel(),
+					alt:repoObject.getLabel(),				
+					image:repoObject.getIcon(),
 					className:"edit",
 					disabled:selected,
 					callback:function(e){
@@ -317,11 +315,11 @@ Ajaxplorer = Class.create({
 	},
 	
 
-	triggerRootDirChange: function(rootDirId){
+	triggerRootDirChange: function(repositoryId){
 		this.actionBar.updateLocationBar('/');
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'switch_root_dir');
-		connexion.addParameter('root_dir_index', rootDirId);
+		connexion.addParameter('root_dir_index', repositoryId);
 		oThis = this;
 		connexion.onComplete = function(transport){
 			if(this.usersEnabled)
@@ -331,7 +329,7 @@ Ajaxplorer = Class.create({
 			else
 			{
 				this.actionBar.parseXmlMessage(transport.responseXML);
-				this.loadRepository(rootDirId, this._initRootDirsList.get(rootDirId));
+				this.loadRepository(this._initRepositoriesList.get(repositoryId));
 			}
 		}.bind(this);
 		connexion.sendAsync();

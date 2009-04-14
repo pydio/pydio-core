@@ -4,29 +4,15 @@
 	<div id="buttons_bar">
 	</div>
 	<div id="locationbar_cont">
-<!--
-	<table cellpadding="0" cellspacing="0" border="0" width="100%" style="height: 34px;">
-			<tr>
-				<td style="background:transparent url('client/images/locationbar_left.png') top left no-repeat; width: 17px;">&nbsp;</td>
-				<td style="background:transparent url('client/images/locationbar_bg.png') top repeat-x; vertical-align:top;padding-top:3px;" valign="top">
--->				
 		<div id="repository_form"><img id="repo_icon" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/network-wired.png" width="16" height="16" align="absmiddle"><input type="text" name="repo_path" value="Default Files" id="repo_path"></div>
 		<div id="repository_goto"><img  align="absmiddle" title="<?php print($mess[200]); ?>" ajxp_message_title_id="200" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/lower.png" id="goto_repo_button" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;"></div>
 		<form style="display:inline;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><div id="location_form"><img src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/mimes/16/folder.png" width="16" height="16" align="absmiddle"><input type="text" name="current_path" value="/" id="current_path"></div><div id="location_goto"><input  align="" title="<?php print($mess[104]); ?>" ajxp_message_title_id="104" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/media-playback-start.png" id="goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div></form><div id="bookmarks_goto"><input  align="" title="<?php print($mess[145]); ?>" ajxp_message_title_id="145" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/bookmark.png" id="bm_goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div>
 		
 		<div id="logging_string"></div>
-<!--				
-				</td>
-				<td style="background:transparent url('client/images/locationbar_right.png') top right no-repeat; width: 17px;"></td>
-			</tr>
-		</table>
--->
 	</div>
 </div>
 
-<!--<div class="toolbars_separator"></div>-->
 <div id="hidden_frames" style="display:none;"></div>
-<!--<div id="hidden_forms" style="display:none;"></div>-->
 <div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
 </div>
 <div id="bm_bar_cont" style="">

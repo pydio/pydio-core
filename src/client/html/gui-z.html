@@ -38,8 +38,22 @@
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer.js"></script>
 <script type="text/javascript">
 		var ajaxplorer;
+		var repoXmlString = '<?php print($ROOT_DIR_XML); ?>';
+		var repositoriesXML;
+		if(repoXmlString != ''){
+		    // Mozilla and Netscape browsers
+		    if (document.implementation.createDocument) {
+		        var parser = new DOMParser()
+		        repositoriesXML = parser.parseFromString(repoXmlString, "text/xml")
+		    // MSIE
+		    } else if (window.ActiveXObject) {
+		        repositoriesXML = new ActiveXObject("Microsoft.XMLDOM")
+		        repositoriesXML.async="false"
+		        repositoriesXML.loadXML(repoXmlString)
+		    }
+		}
 		Event.observe(window, "load", function(){
-			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", <?php print($ROOT_DIRS_LIST);?>, <?php print($ROOT_DIRS_SETTINGS); ?>, "<?php print($DEFAULT_DISPLAY);?>");
+			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", repositoriesXML, "<?php print($DEFAULT_DISPLAY);?>");
 			<?php 
 			if($BEGIN_MESSAGE != "") print("alert('".str_replace("'", "\'", $BEGIN_MESSAGE)."');");
 			?>

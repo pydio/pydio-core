@@ -131,14 +131,9 @@ User = Class.create({
 				for(j=0;j<userNodes[i].childNodes.length;j++)
 				{
 					var repoChild = userNodes[i].childNodes[j];
-					if(repoChild.nodeName == "repo") {
-						repositories.set(repoChild.getAttribute("id"), repoChild.firstChild.nodeValue);
-						if(repoChild.getAttribute("icon")){
-							this.repoIcon.set(repoChild.getAttribute("id"), repoChild.getAttribute("icon"));
-						}
-						if(repoChild.getAttribute("search_engine")){
-							this.repoSearchEngines.set(repoChild.getAttribute("id"), repoChild.getAttribute("search_engine"));
-						}
+					if(repoChild.nodeName == "repo") {	
+						var repository = new Repository(repoChild.getAttribute("id"), repoChild);
+						repositories.set(repoChild.getAttribute("id"), repository);
 					}
 				}
 				this.setRepositoriesList(repositories);
