@@ -52,7 +52,8 @@ InfoPanel = Class.create({
 		this.registeredMimes = new Hash();
 	},
 	
-	update : function(){	
+	update : function(){
+		if(!this.htmlElement) return;
 		var filesList = ajaxplorer.getFilesList();
 		var userSelection = filesList.getUserSelection();
 		if(userSelection.isEmpty())
@@ -115,10 +116,18 @@ InfoPanel = Class.create({
 	},
 	
 	setContent : function(sHtml){
+		if(!this.htmlElement) return;
 		this.htmlElement.update(sHtml);
 	},
 	
+	showElement : function(show){
+		if(!this.htmlElement) return;
+		if(show) this.htmlElement.show();
+		else this.htmlElement.hide();
+	},
+	
 	evalTemplateForMime: function(mimeType, fileData, tArgs){
+		if(!this.htmlElement) return;
 		if(!this.registeredMimes.get(mimeType)) return;		
 		var templateData = this.mimesTemplates.get(this.registeredMimes.get(mimeType));
 		var tString = templateData[0];
@@ -140,7 +149,7 @@ InfoPanel = Class.create({
 						if(height < newHeight) newHeight = height;
 						var newWidth = newHeight*width/height;
 						var dimAttr = 'height="'+newHeight+'"';
-						if(newWidth > $('info_panel').getWidth() - 16) dimAttr = 'width="100%"';
+						if(newWidth > this.htmlElement.getWidth() - 16) dimAttr = 'width="100%"';
 					}else{
 						dimAttr = 'height="64" width="64"';
 					}
@@ -203,6 +212,7 @@ InfoPanel = Class.create({
 	},
 	
 	load: function(){
+		if(!this.htmlElement) return;
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_driver_info_panels');
 		connexion.onComplete = function(transport){

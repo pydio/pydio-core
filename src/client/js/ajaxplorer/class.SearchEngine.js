@@ -50,6 +50,8 @@ SearchEngine = Class.create({
 	
 	initGUI : function(){
 		
+		if(!this.htmlElement) return;
+		
 		this.htmlElement.update('<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>');
 		
 		this._inputBox = $("search_txt");
@@ -101,19 +103,27 @@ SearchEngine = Class.create({
 		this.resize();
 	},
 	
+	showElement : function(show){
+		if(!this.htmlElement) return;
+		if(show) this.htmlElement.show();
+		else this.htmlElement.hide();
+	},
+	
 	resize: function(){
 		fitHeightToBottom(this._resultsBox, null, 10, true);
 	},
 	
 	focus : function(){
-		if(this.htmlElement.visible()){
+		if(this.htmlElement && this.htmlElement.visible()){
 			this._inputBox.activate();
 			this.hasFocus = true;
 		}
 	},
 	
 	blur : function(){
-		this._inputBox.blur();
+		if(this._inputBox){
+			this._inputBox.blur();
+		}
 		this.hasFocus = false;
 	},
 	
@@ -163,7 +173,9 @@ SearchEngine = Class.create({
 	
 	clear: function(){
 		this.clearResults();
-		this._inputBox.value = "";
+		if(this._inputBox){
+			this._inputBox.value = "";
+		}
 	},
 	
 	clearResults : function(){
