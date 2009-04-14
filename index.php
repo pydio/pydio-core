@@ -137,11 +137,7 @@ if(isSet($_GET["compile"])){
 
 $JS_DEBUG = false;
 $mess = ConfService::getMessages();
-if($JS_DEBUG){
-	include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
-}else{
-	include_once(CLIENT_RESOURCES_FOLDER."/html/gui-z.html");
-}
+include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
 HTMLWriter::writeI18nMessagesClass($mess);
 HTMLWriter::closeBodyAndPage();
 ?>
