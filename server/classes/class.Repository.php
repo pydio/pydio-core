@@ -73,10 +73,18 @@ class Repository {
 		$fileName = INSTALL_PATH."/plugins/ajxp.".$this->accessType."/manifest.xml";
 		$settingLine = "";
 		if(is_readable($fileName)){
-			$lines = file($fileName);			
+			$lines = file($fileName);	
+			$inside = false;		
 			foreach ($lines as $line){
-				if(eregi("client_settings", trim($line)) > -1){
-					$settingLine = str_replace(array("<client_settings","/>"), "", trim($line));
+				if(eregi("<client_settings", trim($line)) > -1){
+					$settingLine = trim($line);
+					if(eregi("/>", trim($line))>-1 || eregi("</client_settings>", trim($line)>-1)){
+						return $settingLine;
+					}
+					$inside = true;					
+				}else{
+					if($inside) $settingLine.=trim($line);
+					if(eregi("</client_settings>", trim($line))>-1) return $settingLine;
 				}
 			}
 		}

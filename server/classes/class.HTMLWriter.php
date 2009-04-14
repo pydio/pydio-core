@@ -71,6 +71,13 @@ class HTMLWriter
     	}
     	return "File not found : ".$docFileName;
     }
+    
+    function repositoryDataAsJS(){
+    	if(AuthService::usersEnabled()) return "";
+    	require_once(INSTALL_PATH."/server/classes/class.SystemTextEncoding.php");
+    	require_once(INSTALL_PATH."/server/classes/class.AJXP_XMLWriter.php");
+    	return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
+    }
         
     function writeRootDirListAsJsString($rootDirsList)
     {

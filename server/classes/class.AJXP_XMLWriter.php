@@ -129,13 +129,7 @@ class AJXP_XMLWriter
 		{
 			print("<user id=\"".$loggedUser->id."\">");
 			print("<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>");
-			print("<repositories>");
-			foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
-			{
-				$iconString = "";
-				if($loggedUser->canRead($rootDirIndex)) print("<repo id=\"".$rootDirIndex."\" ".$iconString." ".$rootDirObject->getClientSettings().">".SystemTextEncoding::toUTF8($rootDirObject->getDisplay())."</repo>");
-			}
-			print("</repositories>");
+			print(AJXP_XMLWriter::writeRepositoriesData($loggedUser));
 			print("<preferences>");
 			print("<pref name=\"display\" value=\"".$loggedUser->getPref("display")."\"/>");
 			print("<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>");
@@ -143,6 +137,17 @@ class AJXP_XMLWriter
 			print("<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>");
 			print("</user>");
 		}		
+	}
+	
+	function writeRepositoriesData($loggedUser){
+		$st = "";
+		$st .= "<repositories>";
+		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
+		{			
+			if($loggedUser == null || $loggedUser->canRead($rootDirIndex)) $st .= "<repo id=\"".$rootDirIndex."\"><label>".SystemTextEncoding::toUTF8($rootDirObject->getDisplay())."</label>".$rootDirObject->getClientSettings()."</repo>";
+		}
+		$st .= "</repositories>";
+		return $st;
 	}
 	
 	function loggingResult($result, $rememberLogin="", $rememberPass = "")
