@@ -37,7 +37,6 @@ js/ajaxplorer/class.SearchEngine.js
 js/ajaxplorer/class.InfoPanel.js
 js/ajaxplorer/class.Diaporama.js
 js/ajaxplorer/class.Editor.js
-js/ajaxplorer/class.SVNLogger.js
 js/ajaxplorer/class.Modal.js
 js/ajaxplorer/class.BookmarksBar.js
 js/ajaxplorer/class.FormManager.js
