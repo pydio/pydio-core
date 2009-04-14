@@ -32,11 +32,6 @@
  * 
  * Description : The main JavaScript class instantiated at startup.
  */
-if(dynamicLibLoading)
-{
-	document.write('<script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/scriptaculous/src/scriptaculous.js?load=builder,effects,dragdrop"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/lib/leightbox/lightbox.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Connexion.js"></script><script language="javascript" type="text/javascript" src="'+ajxpResourcesFolder+'/js/ajaxplorer/class.Modal.js"></script>');
-}
-
 Ajaxplorer = Class.create({
 
 	initialize: function(loadRep, usersEnabled, loggedUser, repositoryId, repoListXML, defaultDisplay)
@@ -562,22 +557,5 @@ Ajaxplorer = Class.create({
 			this.sEngine.resize();
 		}
 		this.currentSideToggle = srcName;
-	},
-
-	loadLibraries: function(){
-		if(!dynamicLibLoading) {this.init(); return;}
-		var connexion = new Connexion();
-		var toLoad = $A([]);			
-		modal.incrementStepCounts(toLoad.size());
-		toLoad.each(function(fileName){
-			var onLoad = function(){modal.updateLoadingProgress(fileName);};
-			if(fileName == toLoad.last()) onLoad = function(){modal.updateLoadingProgress(fileName);this.init();}.bind(this);
-			connexion.loadLibrary(fileName, onLoad);
-		});
-	},
-	
-	libLoaded: function(fileName){	
-		modal.updateLoadingProgress('Loaded : ' + fileName);
 	}
-
 });

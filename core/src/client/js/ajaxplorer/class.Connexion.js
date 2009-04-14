@@ -114,48 +114,5 @@ Connexion = Class.create({
 				}
 			}
 		});	
-	},
-	
-	loadLibraries : function(){
-		if(!dynamicLibLoading) {return;}
-		var toLoad = $A([
-			"lib/webfx/slider/js/timer.js", 
-			"lib/webfx/slider/js/range.js", 
-			"lib/webfx/slider/js/slider.js", 
-			"lib/leightbox/lightbox.js", 
-			"lib/ufo/ufo.js",
-			"lib/prototype/proto.menu.js",
-			"lib/codepress/codepress.js",
-			"lib/webfx/selectableelements.js", 
-			"lib/webfx/selectabletablerows.js", 
-			"lib/webfx/sortabletable.js", 
-			"lib/webfx/numberksorttype.js", 
-			"lib/webfx/slider/js/timer.js", 
-			"lib/webfx/slider/js/range.js", 
-			"lib/webfx/slider/js/slider.js", 
-			"lib/xloadtree/xtree.js", 
-			"lib/xloadtree/xloadtree.js", 
-			"lib/xloadtree/xmlextras.js",
-			"ajaxplorer/ajxp_multifile.js", 
-			"ajaxplorer/ajxp_utils.js", 
-			"ajaxplorer/class.User.js", 
-			"ajaxplorer/class.AjxpDraggable.js",
-			"ajaxplorer/class.AjxpAutoCompleter.js",
-			"ajaxplorer/class.Diaporama.js",
-			"ajaxplorer/class.Editor.js",
-			"ajaxplorer/class.ActionsManager.js", 
-			"ajaxplorer/class.FilesList.js", 
-			"ajaxplorer/class.FoldersTree.js", 
-			"ajaxplorer/class.SearchEngine.js", 
-			"ajaxplorer/class.InfoPanel.js", 
-			"ajaxplorer/class.ResizeableBar.js", 
-			"ajaxplorer/class.UserSelection.js"]);
-			
-		modal.incrementStepCounts(toLoad.size());
-		toLoad.each(function(fileName){
-			var onLoad = function(){modal.updateLoadingProgress(fileName);};
-			if(fileName == toLoad.last()) onLoad = function(){modal.updateLoadingProgress(fileName);};
-			this.loadLibrary(fileName, onLoad);
-		}.bind(this));
 	}
 });
