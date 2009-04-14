@@ -78,36 +78,7 @@ class HTMLWriter
     	require_once(INSTALL_PATH."/server/classes/class.AJXP_XMLWriter.php");
     	return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
     }
-        
-    function writeRootDirListAsJsString($rootDirsList)
-    {
-    	$buffer = "\$H({";
-    	$parts = array();
-    	foreach ($rootDirsList as $rIndex => $rObject)
-    	{
-    		$parts[] = "\"$rIndex\":'".$rObject->getDisplay()."'";
-    		//if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
-    	}
-    	$buffer.=join(", ", $parts);
-    	$buffer .= "})";
-    	return $buffer;
-    }
-    
-    function writeRepoSettingsAsJS($rootDirsList){
-    	$buffer = "\$H({";
-    	$hashParts = array();
-    	foreach ($rootDirsList as $rIndex => $rObject)
-    	{
-    		//$buffer .= "$rIndex:";
-    		$props = $rObject->getClientSettings();
-    		$hashParts[] = "\"$rIndex\":\$H({".str_replace(array(" ", "\"", "="), array(",", "'", ":"), trim($props))."})";
-    		//if($rIndex < count($rootDirsList)-1) $buffer .= ", ";
-    	}
-    	$buffer .= join(", ", $hashParts);
-    	$buffer .= "})";
-    	return $buffer;    	
-    }
-    
+            
     function writeI18nMessagesClass($mess)
     {
     	echo "<script language=\"javascript\">\n";
