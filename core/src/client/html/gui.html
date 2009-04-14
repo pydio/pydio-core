@@ -34,7 +34,7 @@
 <script type="text/javascript">
 		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
 		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
-		var zipEnabled = <?php print($ZIP_ENABLED); ?>;
+		var zipEnabled = <?php print($ZIP_ENABLED); ?>;		
 </script>
 <script language="javascript" type="text/javascript">var dynamicLibLoading = false;</script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/lib/prototype/prototype.js"></script>
@@ -66,6 +66,7 @@
 
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/ajxp_multifile.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/ajxp_utils.js"></script>
+<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Repository.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.User.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.AjxpDraggable.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.AjxpSortable.js"></script>
@@ -77,7 +78,6 @@
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.FilesList.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.FoldersTree.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.SearchEngine.js"></script>
-<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.SQLSearchEngine.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.InfoPanel.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Diaporama.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Editor.js"></script>
@@ -86,12 +86,25 @@
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.ResizeableBar.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.BookmarksBar.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.FormManager.js"></script>
-<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.SQLEditor.js"></script>
 <script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer/class.Ajaxplorer.js"></script>
 <script type="text/javascript">
 		var ajaxplorer;
+		var repoXmlString = '<?php print($ROOT_DIR_XML); ?>';
+		var repositoriesXML;
+		if(repoXmlString != ''){
+		    // Mozilla and Netscape browsers
+		    if (document.implementation.createDocument) {
+		        var parser = new DOMParser()
+		        repositoriesXML = parser.parseFromString(repoXmlString, "text/xml")
+		    // MSIE
+		    } else if (window.ActiveXObject) {
+		        repositoriesXML = new ActiveXObject("Microsoft.XMLDOM")
+		        repositoriesXML.async="false"
+		        repositoriesXML.loadXML(repoXmlString)
+		    }
+		}
 		Event.observe(window, "load", function(){
-			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", <?php print($ROOT_DIRS_LIST);?>, <?php print($ROOT_DIRS_SETTINGS); ?>, "<?php print($DEFAULT_DISPLAY);?>");
+			ajaxplorer = new Ajaxplorer("<?php print($EXT_REP);?>", <?php print($USERS_ENABLED);?>, <?php print($LOGGED_USER);?>, "<?php print($ROOT_DIR_ID);?>", repositoriesXML, "<?php print($DEFAULT_DISPLAY);?>");
 			<?php 
 			if($BEGIN_MESSAGE != "") print("alert('".str_replace("'", "\'", $BEGIN_MESSAGE)."');");
 			?>

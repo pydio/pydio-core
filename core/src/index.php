@@ -105,6 +105,7 @@ else
 {
 	$ROOT_DIR_NAME = ConfService::getCurrentRootDirDisplay();
 	$ROOT_DIR_ID = ConfService::getCurrentRootDirIndex();
+	$ROOT_DIR_XML = HTMLWriter::repositoryDataAsJS();
 	$ROOT_DIRS_LIST = HTMLWriter::writeRootDirListAsJsString(ConfService::getRootDirsList());
 	$ROOT_DIRS_SETTINGS = HTMLWriter::writeRepoSettingsAsJS(ConfService::getRootDirsList());
 }

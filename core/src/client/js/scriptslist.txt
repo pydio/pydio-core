@@ -23,6 +23,7 @@ js/ajaxplorer/class.Connexion.js
 js/ajaxplorer/ajxp_multifile.js
 js/ajaxplorer/ajxp_utils.js
 js/ajaxplorer/class.User.js
+js/ajaxplorer/class.Repository.js
 js/ajaxplorer/class.AjxpDraggable.js
 js/ajaxplorer/class.AjxpSortable.js
 js/ajaxplorer/class.AjxpAutoCompleter.js
@@ -33,7 +34,6 @@ js/ajaxplorer/class.UserSelection.js
 js/ajaxplorer/class.FilesList.js
 js/ajaxplorer/class.FoldersTree.js
 js/ajaxplorer/class.SearchEngine.js
-js/ajaxplorer/class.SQLSearchEngine.js
 js/ajaxplorer/class.InfoPanel.js
 js/ajaxplorer/class.Diaporama.js
 js/ajaxplorer/class.Editor.js
@@ -42,5 +42,4 @@ js/ajaxplorer/class.Modal.js
 js/ajaxplorer/class.ResizeableBar.js
 js/ajaxplorer/class.BookmarksBar.js
 js/ajaxplorer/class.FormManager.js
-js/ajaxplorer/class.SQLEditor.js
 js/ajaxplorer/class.Ajaxplorer.js
