@@ -27,12 +27,11 @@
 }
 
 .webfx-tree-item a:hover {
-	color: blue;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .webfx-tree-item a:active {
-	background: highlight;
+	background-color:#E0ECFF;
 	color: white;
 	text-decoration: none;
 }

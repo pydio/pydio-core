@@ -138,6 +138,7 @@ function tempoMessageDivClosing()
 
 function disableTextSelection(target)
 {
+	if(!target) return;
 	if (typeof target.onselectstart!="undefined")
 	{ //IE route
 		target.onselectstart=function(){return false;}
@@ -164,8 +165,9 @@ function disableTextSelection(target)
 }
 
 function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener)
-{
+{	
 	element = $(element);
+	if(!element) return;
 	if(typeof(parentElement) == "undefined" || parentElement == null){
 		parentElement = Position.offsetParent($(element));
 	}else{

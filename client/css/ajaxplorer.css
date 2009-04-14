@@ -695,8 +695,11 @@ overflow:visible;
 
 .selected-focus
 {
-    background: #0a246a !important;
+    /*background: #0a246a !important;*/
     color: #fff !important;
+background-color:#22507f !important;
+background-image:url(../images/GradientBgSelected.gif);
+background-position:center middle;    
 }
 
 .droppableZone

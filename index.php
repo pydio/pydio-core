@@ -98,16 +98,12 @@ if(AuthService::usersEnabled())
 	}
 	$ROOT_DIR_NAME = "null";
 	$ROOT_DIR_ID = "null";
-	$ROOT_DIRS_LIST = "null";
-	$ROOT_DIRS_SETTINGS = "null";
 }
 else 
 {
 	$ROOT_DIR_NAME = ConfService::getCurrentRootDirDisplay();
 	$ROOT_DIR_ID = ConfService::getCurrentRootDirIndex();
 	$ROOT_DIR_XML = HTMLWriter::repositoryDataAsJS();
-	$ROOT_DIRS_LIST = HTMLWriter::writeRootDirListAsJsString(ConfService::getRootDirsList());
-	$ROOT_DIRS_SETTINGS = HTMLWriter::writeRepoSettingsAsJS(ConfService::getRootDirsList());
 }
 $EXT_REP = "/";
 if(isSet($_GET["folder"])) $EXT_REP = urldecode($_GET["folder"]);
