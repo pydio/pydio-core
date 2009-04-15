@@ -310,7 +310,7 @@ Object.extend(Function.prototype, (function() {
 
   function delay(timeout) {
     var __method = this, args = slice.call(arguments, 1);
-    timeout = timeout * 1000
+    timeout = timeout * 1000;
     return window.setTimeout(function() {
       return __method.apply(__method, args);
     }, timeout);
@@ -1095,7 +1095,7 @@ Array.from = $A;
 
   if (!arrayProto._reverse)
     arrayProto._reverse = arrayProto.reverse;
-
+  
   Object.extend(arrayProto, {
     _each:     _each,
     clear:     clear,
@@ -1116,7 +1116,7 @@ Array.from = $A;
 
   var CONCAT_ARGUMENTS_BUGGY = (function() {
     return [].concat(arguments)[0][0] !== 1;
-  })(1,2)
+  })(1,2);
 
   if (CONCAT_ARGUMENTS_BUGGY) arrayProto.concat = concat;
 
@@ -2913,7 +2913,7 @@ Object.extend(Element, Element.Methods);
 
   div = null;
 
-})(document.createElement('div'))
+})(document.createElement('div'));
 
 Element.extend = (function() {
 
@@ -3131,7 +3131,6 @@ document.viewport = {
 
   viewport.getHeight = define.curry('Height');
 })(document.viewport);
-
 
 Element.Storage = {
   UID: 1
@@ -3461,7 +3460,7 @@ Object.extend(Selector, {
         while (e && le != e && (/\S/).test(e)) {
           le = e;
           for (var i = 0; i<len; i++) {
-            name = p[i].name
+            name = p[i].name;
             if (m = e.match(p[i].re)) {
               v = Object.isFunction(x[name]) ? x[name](m) : new Template(x[name]).evaluate(m);
               exclusion.push("(" + v.substring(1, v.length - 1) + ")");
@@ -4502,7 +4501,7 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
       } else {
         responder = function(event) {
           Event.extend(event, element);
-          handler.call(element, event);
+          if(handler) handler.call(element, event);
         };
       }
     }
