@@ -2336,6 +2336,8 @@ Element.Methods = {
     do {
       valueT += element.offsetTop  || 0;
       valueL += element.offsetLeft || 0;
+      try{element.offsetParent}
+      catch(e){return Element._returnOffset(0,0);}
       element = element.offsetParent;
     } while (element);
     return Element._returnOffset(valueL, valueT);
@@ -4640,7 +4642,9 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
     if (document.createEvent)
       element.dispatchEvent(event);
     else
-      element.fireEvent(event.eventType, event);
+	    try{
+    	  element.fireEvent(event.eventType, event);
+	    }catch(e){}
 
     return Event.extend(event);
   }
