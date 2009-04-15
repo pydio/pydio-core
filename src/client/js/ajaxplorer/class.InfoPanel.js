@@ -136,6 +136,7 @@ InfoPanel = Class.create({
 		if(!tArgs){
 			tArgs = new Object();
 		}
+		var panelWidth = this.htmlElement.getWidth();
 		if(fileData){
 			tAttributes.each(function(attName){
 				if(attName == 'basename' && fileData.getAttribute('filename')){
@@ -149,7 +150,7 @@ InfoPanel = Class.create({
 						if(height < newHeight) newHeight = height;
 						var newWidth = newHeight*width/height;
 						var dimAttr = 'height="'+newHeight+'"';
-						if(newWidth > this.htmlElement.getWidth() - 16) dimAttr = 'width="100%"';
+						if(newWidth > panelWidth - 16) dimAttr = 'width="100%"';
 					}else{
 						dimAttr = 'height="64" width="64"';
 					}
