@@ -67,6 +67,7 @@ Proto.Menu = Class.create({
 				this.options.beforeHide(e);
 				if (this.ie) this.shim.hide();
 				Shadower.deshadow(this.container);
+				this.container.setStyle({height:'auto', overflowY:'hidden'});
 				this.container.hide();
 			}
 		}.bind(this));
@@ -157,7 +158,7 @@ Proto.Menu = Class.create({
 		this.refreshList();	
 		if(!this.options.menuItems.length) return;
 		var elOff = {};
-		elDim = this.container.getDimensions();
+		var elDim = this.container.getDimensions();
 		if(this.options.anchor == 'mouse'){
 			elOff = this.computeMouseOffset(e);		
 		}else{
@@ -186,12 +187,14 @@ Proto.Menu = Class.create({
 	
 	checkHeight : function(offsetTop){
 		if(this.options.anchor == 'mouse') return;
-		var vpDim = document.viewport.getDimensions();
+		var vpHeight = getViewPortHeight();
 		var vpOff = document.viewport.getScrollOffsets();
 		var elDim = this.container.getDimensions();
 		var y = parseInt(offsetTop);
-		if((y - vpOff.top + elDim.height) > vpDim.height){
-			this.container.setStyle({height:(vpDim.height-(y - vpOff.top))+'px',overflowY:'scroll', width:(elDim.width+16)+'px'});
+		if((y - vpOff.top + elDim.height) > vpHeight){			
+			this.container.setStyle({height:(vpHeight-(y - vpOff.top))+'px',overflowY:'scroll'}); 
+			if(!this.containerShrinked) this.container.setStyle({width:elDim.width+16+'px'});
+			this.containerShrinked = true;
 		}else{
 			this.container.setStyle({height:'auto', overflowY:'hidden'});
 		}		

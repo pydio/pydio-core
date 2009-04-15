@@ -118,7 +118,7 @@ Proto.History = Class.create({
 		}
 		this.historyCurrentHash = newhash;
 		
-		if(Prototype.Browser.IE) {			
+		if(Prototype.Browser.IE) {						
 			var iframe = $("prototype_history").contentWindow.document;
 			iframe.open();
 			iframe.close();
