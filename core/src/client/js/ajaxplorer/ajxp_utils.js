@@ -190,19 +190,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 		}
 		var wh;
 		if(parentElement == window){
-			//wh = document.viewport.getHeight();
-			//var myWidth = 0, myHeight = 0;			
-			if( typeof( window.innerHeight ) == 'number' ) {
-				//Non-IE
-				wh = window.innerHeight;
-			} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-				//IE 6+ in 'standards compliant mode'
-				wh = document.documentElement.clientHeight;
-			} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-				//IE 4 compatible
-				wh = document.body.clientHeight;
-			}
-			//wh = window.innerHeight;
+			wh = getViewPortHeight();
 		}else{
 			wh = parentElement.getHeight();
 			if(Prototype.Browser.IE && parentElement.getStyle('height')){				
@@ -221,6 +209,21 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 		Event.observe(window, 'resize', observer);
 	}
 	return observer;
+}
+
+function getViewPortHeight(){
+	var wh;
+	if( typeof( window.innerHeight ) == 'number' ) {
+		//Non-IE
+		wh = window.innerHeight;
+	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+		//IE 6+ in 'standards compliant mode'
+		wh = document.documentElement.clientHeight;
+	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+		//IE 4 compatible
+		wh = document.body.clientHeight;
+	}
+	return wh;
 }
 
 function ajxpCorners(oElement, cornersString)
