@@ -1146,7 +1146,7 @@ var Hash = Class.create(Enumerable, (function() {
   }
 
   function get(key) {
-    if (this._object[key] !== Object.prototype[key])
+    if (this._object && this._object[key] !== Object.prototype[key])
       return this._object[key];
   }
 
@@ -2248,12 +2248,16 @@ Element.Methods = {
       return styles.include('opacity') ?
         element.setOpacity(styles.match(/opacity:\s*(\d?\.?\d*)/)[1]) : element;
     }
-    for (var property in styles)
-      if (property == 'opacity') element.setOpacity(styles[property]);
-      else
-        elementStyle[(property == 'float' || property == 'cssFloat') ?
-          (Object.isUndefined(elementStyle.styleFloat) ? 'cssFloat' : 'styleFloat') :
-            property] = styles[property];
+  	try{
+	    for (var property in styles)
+	      if (property == 'opacity') element.setOpacity(styles[property]);
+	      else{
+		        elementStyle[(property == 'float' || property == 'cssFloat') ?         
+		          (Object.isUndefined(elementStyle.styleFloat) ? 'cssFloat' : 'styleFloat') :
+		            property] = styles[property];
+	      }
+  	}catch(e){}
+      
 
     return element;
   },
