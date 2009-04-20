@@ -142,14 +142,16 @@ ActionsManager = Class.create({
 					elem.checked = true;
 				}
 			});
-			$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
-			// Update pass_seed
-			var connexion = new Connexion();
-			connexion.addParameter("get_action", "get_seed");
-			connexion.onComplete = function(transport){
-				$('pass_seed').value = transport.responseText;
-			};
-			connexion.sendSync();			
+			if($('user_change_ownpass_old')){
+				$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
+				// Update pass_seed
+				var connexion = new Connexion();
+				connexion.addParameter("get_action", "get_seed");
+				connexion.onComplete = function(transport){
+					$('pass_seed').value = transport.responseText;
+				};
+				connexion.sendSync();			
+			}
 		};
 		
 		var onComplete = function(){
@@ -161,6 +163,7 @@ ActionsManager = Class.create({
 			});
 			var userOldPass = null;
 			var userPass = null;
+			var passSeed = null;
 			if($('user_change_ownpass1') && $('user_change_ownpass1').value != "" && $('user_change_ownpass2').value != "")
 			{
 				if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
@@ -173,6 +176,7 @@ ActionsManager = Class.create({
 				}
 				userPass = hex_md5($('user_change_ownpass1').value);
 				userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
+				passSeed = $('pass_seed').value;
 			}
 			var onComplete = function(transport){
 				var oUser = ajaxplorer.user;
@@ -195,7 +199,7 @@ ActionsManager = Class.create({
 					hideLightBox(true);
 				}
 			};
-			ajaxplorer.user.savePreferences(userOldPass, userPass, $('pass_seed').value, onComplete);
+			ajaxplorer.user.savePreferences(userOldPass, userPass, passSeed, onComplete);
 			return false;		
 		};
 		
