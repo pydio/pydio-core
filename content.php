@@ -161,6 +161,14 @@ if($ajxpDriver->hasAction($action)){
 	}
 }
 
+// TRYING TO GET A DRIVER WHEN NO USER IS LOGGED
+if(AuthService::usersEnabled() && AuthService::getLoggedUser()==null && !ALLOW_GUEST_BROWSING){
+	AJXP_XMLWriter::header();
+	AJXP_XMLWriter::requireAuth(true);
+	AJXP_XMLWriter::close();
+	exit(1);
+}
+
 // INIT DRIVER
 $Driver = ConfService::getRepositoryDriver();
 if($Driver == null || !is_a($Driver, "AbstractDriver")){
