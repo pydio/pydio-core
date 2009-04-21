@@ -458,9 +458,21 @@ AdminPageManager = Class.create({
 			 this.displayMessage('ERROR', 'Warning, password and confirmation differ!');
 			 return;
 		}
+		// First get a seed to check whether the pass should be encoded or not.
+		var sync = new Connexion();
+		var seed;
+		sync.addParameter('get_action', 'get_seed');
+		sync.onComplete = function(transport){
+			seed = transport.responseText;			
+		}		
+		sync.sendSync();
 		parameters = new Hash();
 		parameters.set('user_id', userId);
-		parameters.set('user_pwd', hex_md5(newPass.value));
+		if(seed != '-1'){
+			parameters.set('user_pwd', hex_md5(newPass.value));
+		}else{
+			parameters.set('user_pwd', newPass.value);
+		}
 		this.submitForm('update_user_pwd', parameters, null);
 		newPass.value = '';
 		newPassConf.value = '';

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="serial" label="Serialized Storage" description="Stores the Authentication data as serialized PHP values on the filesystem.">
+	<param name="USERS_FILEPATH" type="string" label="Users" description="The users list" mandatory="true"/>
+</authdriver>
