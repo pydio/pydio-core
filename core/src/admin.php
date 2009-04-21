@@ -437,6 +437,12 @@ switch ($action)
 	
 	case "install_log" : 
 		$log = array();
+		
+		$outputArray = array();
+		$testedParams = array();
+		Utils::runTests($outputArray, $testedParams);		
+		Utils::testResultsToFile($outputArray, $testedParams);
+		
 		header("Content-Type:text/html;charset=UTF-8");	
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			
