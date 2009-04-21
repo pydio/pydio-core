@@ -34,23 +34,31 @@
  * Description : Abstract representation of an access to an authentication system (ajxp, ldap, etc).
  */
 require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
-class serialAuthDriver extends AbstractAuthDriver {
+require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
+class sqlAuthDriver extends AbstractAuthDriver {
 	
-	var $usersSerFile;
+	var $sqlDriver;
 	
 	function init($options){
 		parent::init($options);
-		$this->usersSerFile = $options["USERS_FILEPATH"];
+		$this->sqlDriver = $options["SQL_DRIVER"];
+		try {
+			dibi::connect($this->sqlDriver);		
+		} catch (DibiException $e) {
+			echo get_class($e), ': ', $e->getMessage(), "\n";
+			exit(1);
+		}		
 	}
 			
 	function listUsers(){
-		return Utils::loadSerialFile($this->usersSerFile);
+		$res = dibi::query("SELECT * FROM [ajxp_users]");
+		$pairs = $res->fetchPairs('login', 'password');
+		return $pairs;
 	}
 	
 	function userExists($login){
-		$users = $this->listUsers();
-		if(!is_array($users) || !array_key_exists($login, $users)) return false;
-		return true;
+		$res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login]=%s", $login);
+		return($res->getRowCount());
 	}	
 	
 	function checkPassword($login, $pass, $seed){
@@ -79,36 +87,33 @@ class serialAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
+		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $passwd;
+			$userData["password"] = $passwd;
 		}else{
-			$users[$login] = md5($passwd);
+			$userData["password"] = md5($passwd);
 		}
-		Utils::saveSerialFile($this->usersSerFile, $users);		
+		dibi::query('INSERT INTO [ajxp_users]', $userData);
 	}	
 	function changePassword($login, $newPass){
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
+		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $newPass;
+			$userData["password"] = $newPass;
 		}else{
-			$users[$login] = md5($newPass);
+			$userData["password"] = md5($newPass);
 		}
-		Utils::saveSerialFile($this->usersSerFile, $users);
+		dibi::query("UPDATE [ajxp_users] SET ", $userData, "WHERE `login`=%s", $login);
 	}	
 	function deleteUser($login){
-		$users = $this->listUsers();
-		if(is_array($users) && array_key_exists($login, $users))
-		{
-			unset($users[$login]);
-			Utils::saveSerialFile($this->usersSerFile, $users);
-		}		
+		dibi::query("DELETE FROM [ajxp_users] WHERE `login`=%s", $login);
 	}
 
 	function getUserPass($login){
-		if(!$this->userExists($login)) return false;
-		$users = $this->listUsers();
-		return $users[$login];
+		$res = dibi::query("SELECT [password] FROM [ajxp_users] WHERE [login]=%s", $login);
+		$pass = $res->fetchSingle();		
+		return $pass;
 	}
 
 }

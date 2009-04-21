@@ -71,8 +71,26 @@ $AUTH_DRIVER = array(
 	"OPTIONS"	=> array(
 		"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser",
 		"AUTOCREATE_AJXPUSER" 	=> false, 
-		"ENCODE_PASS"			=> true)
+		"TRANSMIT_CLEAR_PASS"	=> false)
 );
+
+/*
+$AUTH_DRIVER = array(
+	"NAME"		=> "sql",
+	"OPTIONS"	=> array(
+		"AUTOCREATE_AJXPUSER" 	=> false, 
+		"TRANSMIT_CLEAR_PASS"	=> true,
+		"SQL_DRIVER"			=> array(
+			"driver"=>"mysql", 
+			"host"=>"localhost", 
+			"username"=>"root", 
+			"password"=>"", 
+			"database"=>"ajxp", 
+			"charset"=>"utf8"
+		)
+	)
+);
+*/
 
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.
