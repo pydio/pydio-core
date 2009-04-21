@@ -42,22 +42,18 @@ class AuthService
 	
 	function changePasswordEnabled()
 	{
-		return (AUTH_MODE == "ajaxplorer");
+		$authDriver = ConfService::getAuthDriverImpl();
+		return $authDriver->passwordsEditable();
 	}
 	
 	function generateSeed(){
-		$seed = md5(time());
-		$_SESSION["AJXP_CURRENT_SEED"] = $seed;
-		return $seed;
+		$authDriver = ConfService::getAuthDriverImpl();
+		return $authDriver->getSeed(true);
 	}
 	
-	function encodeCookiePass($user, $pass = null){
-		if($pass == null){
-			$authDriver = ConfService::getAuthDriverImpl();
-			$users = $authDriver->listUsers();
-			$pass = $users[$user];
-		}
-		return md5($user.":".$pass.":ajxp");
+	function encodeCookiePass($user){
+		$authDriver = ConfService::getAuthDriverImpl();
+		return $authDriver->createCookieString($user);
 	}
 		
 	function getLoggedUser()
@@ -210,11 +206,17 @@ class AuthService
 		return md5($pass);
 	}
 	
-	function checkPassword($userId, $userPass, $encodedPass = false, $returnSeed = "")
+	function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
 	{
 		if($userId == "guest") return true;		
 		$authDriver = ConfService::getAuthDriverImpl();
-		return $authDriver->checkPassword($userId, $userPass, $encodedPass, $returnSeed);
+		$userStoredPass = $authDriver->getUserPass($userId);
+		if($cookieString){			
+			return ($authDriver->createCookieString($userId) == $userPass);
+		}		
+		$seed = $authDriver->getSeed(false);
+		if($seed != $returnSeed) return false;					
+		return $authDriver->checkPassword($userId, $userPass, $returnSeed);
 	}
 	
 	function updatePassword($userId, $userPass)
@@ -229,7 +231,7 @@ class AuthService
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
-		$authDriver->createUser($userId, AuthService::encodePassword($userPass));
+		$authDriver->createUser($userId, $userPass);
 		if($isAdmin){
 			$user = $confDriver->createUserObject($userId);
 			$user->setAdmin(true);			

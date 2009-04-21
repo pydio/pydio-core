@@ -45,7 +45,9 @@ class AbstractAuthDriver {
 
 	function listUsers(){}
 	function userExists($login){}	
-	function checkPassword($login, $pass, $encodedPass = false, $returnSeed = ""){}
+	function checkPassword($login, $pass, $seed){}
+	function createCookieString($login){}
+	
 	
 	function usersEditable(){}
 	function passwordsEditable(){}
@@ -53,12 +55,6 @@ class AbstractAuthDriver {
 	function createUser($login, $passwd){}	
 	function changePassword($login, $oldPass, $newPass){}	
 	function deleteUser($login){}
-
-	/**
-	 * Wether the password is encoded on the GUI side or not
-	 * @return boolean
-	 */
-	function useDirectLogin(){return true;}
 	
 	function getOption($optionName){	
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
@@ -69,6 +65,17 @@ class AbstractAuthDriver {
 		if($opt === true) return true;
 		return false;
 	}
-	
+
+	function getSeed($new=true){
+		if($this->getOption("TRANSMIT_CLEAR_PASS") === true) return -1;
+		if($new){
+			$seed = md5(time());
+			$_SESSION["AJXP_CURRENT_SEED"] = $seed;	
+			return $seed;		
+		}else{
+			return (isSet($_SESSION["AJXP_CURRENT_SEED"])?$_SESSION["AJXP_CURRENT_SEED"]:0);
+		}
+	}	
+		
 }
 ?>
