@@ -460,6 +460,9 @@ class fsDriver extends AbstractDriver
 						$atts = array();
 						$atts[] = "is_file=\"".(is_file($currentFile)?"1":"0")."\"";
 						$atts[] = "is_image=\"".Utils::is_image($currentFile)."\"";
+						$atts[] = "file_group=\"".filegroup($currentFile)."\"";
+						$atts[] = "file_owner=\"".fileowner($currentFile)."\"";
+						$atts[] = "file_perms=\"".substr(decoct( fileperms($currentFile) ), (is_file($currentFile)?2:1))."\"";
 						if(Utils::is_image($currentFile))
 						{
 							list($width, $height, $type, $attr) = @getimagesize($currentFile);
