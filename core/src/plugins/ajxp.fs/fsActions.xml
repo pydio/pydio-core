@@ -367,6 +367,38 @@ AJXP_MESSAGE[174]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="properties">
+			<gui text="287" title="287" src="ksysv.png" accessKey="" hasAccessKey="false">
+				<context selection="true" dir="true" recycle="hidden"  behaviour="hidden"
+					actionBar="false" contextMenu="true" infoPanel="true"
+					actionBarGroup="put" inZip="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" allowedMimes="" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getFilesList().getUserSelection();					
+					var loadFunc = function(oForm){
+						ajaxplorer.actionBar.propertyPane = new PropertyPanel(userSelection, oForm);
+					};
+					var completeFunc = function(){
+						if(!ajaxplorer.actionBar.propertyPane.valueChanged()){
+							hideLightBox();
+							return false;					
+						}
+						userSelection.updateFormOrUrl(modal.getForm());
+						ajaxplorer.actionBar.submitForm(modal.getForm());
+						hideLightBox();
+						return false;
+					};
+					modal.showDialogForm('Edit Online', 'properties_box', loadFunc, completeFunc);
+					]]></clientCallback>
+				<clientForm id="properties_box"><![CDATA[
+					<div id="properties_box" action="chmod" box_width="200"></div>				
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
 		<action name="restore">
 			<gui text="222" title="223" src="folder1_important.png" accessKey="restore_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="only"
