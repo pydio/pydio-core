@@ -43,8 +43,6 @@ class serialAuthDriver extends AbstractAuthDriver {
 		$this->usersSerFile = $options["USERS_FILEPATH"];
 	}
 			
-	function preLogUser($sessionId){}	
-
 	function listUsers(){
 		return Utils::loadSerialFile($this->usersSerFile);
 	}
@@ -55,17 +53,21 @@ class serialAuthDriver extends AbstractAuthDriver {
 		return true;
 	}	
 	
-	function checkPassword($userId, $userPass, $encodedPass = false, $returnSeed = ""){
-		$users = $this->listUsers();				
-		if($encodedPass){			
-			return (AuthService::encodeCookiePass($userId, $users[$userId]) == $userPass);
+	function checkPassword($login, $pass, $seed){
+		$userStoredPass = $this->getUserPass($login);
+		if(!$userStoredPass) return false;
+		if($seed == "-1"){ // Seed = -1 means that password is not encoded.
+			return ($userStoredPass == $pass);
 		}else{
-			$seed = $_SESSION["AJXP_CURRENT_SEED"];
-			if($seed != $returnSeed) return false;			
-			return (md5($users[$userId].''.$returnSeed) == $userPass);
+			return (md5($userStoredPass.$seed) == $pass);
 		}
 	}
 	
+	function createCookieString($login){
+		$userPass = $this->getUserPass($login);
+		return md5($login.":".$userPass.":ajxp");
+	}
+		
 	function usersEditable(){
 		return true;
 	}
@@ -77,7 +79,11 @@ class serialAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
-		$users[$login] = $passwd;
+		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
+			$users[$login] = $passwd;
+		}else{
+			$users[$login] = md5($passwd);
+		}
 		Utils::saveSerialFile($this->usersSerFile, $users);		
 	}	
 	function changePassword($login, $newPass){
@@ -95,11 +101,11 @@ class serialAuthDriver extends AbstractAuthDriver {
 		}		
 	}
 
-	/**
-	 * Wether the password is encoded on the GUI side or not
-	 * @return boolean
-	 */
-	function useDirectLogin(){return true;}
+	function getUserPass($login){
+		if(!$this->userExists($login)) return false;
+		$users = $this->listUsers();
+		return $users[$login];
+	}
 
 }
 ?>
