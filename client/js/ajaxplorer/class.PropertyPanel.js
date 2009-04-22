@@ -56,11 +56,7 @@ PropertyPanel = Class.create({
 		this.htmlElement.insert(this.valueInput);
 
 		if(userSelection.hasDir()){
-			var recuDiv = new Element('div', {style:'padding-top:8px;'});
-			var recurBox = new Element('input', {type:'checkbox', name:'recursive'}).setStyle({width:'25px'});
-			recuDiv.insert(recurBox);
-			recuDiv.insert(MessageHash[291]);
-			this.htmlElement.insert(recuDiv);
+			this.createRecursiveBox();
 		}		
 	},
 	
@@ -98,6 +94,38 @@ PropertyPanel = Class.create({
 		}.bind(this));
 		this.checks.set(accessor+'_'+right, box);
 		return div;
+	},
+	
+	createRecursiveBox : function(){
+		var recuDiv = new Element('div', {style:'padding-top:8px;'});
+		var recurBox = new Element('input', {type:'checkbox', name:'recursive'}).setStyle({width:'25px'});
+		recuDiv.insert(recurBox);
+		recuDiv.insert(MessageHash[291]);
+		this.htmlElement.insert(recuDiv);
+		
+		var choices = { "both":"Both", "file":"Files", "dir":"Folders"};
+		var choicesDiv = new Element('div');
+		recuDiv.insert(choicesDiv);
+		for(var key in choices){
+			var choiceDiv = new Element('div', {style:'padding-left:25px'});
+			choiceDiv.insert(new Element('input', {
+				type:'radio',
+				name:'recur_apply_to',
+				value:key,
+				style:'width:25px;', 
+				checked:(key=='both')
+			}));
+			choiceDiv.insert(choices[key]);
+			choicesDiv.insert(choiceDiv); 
+		}
+		choicesDiv.hide();
+		
+		recurBox.observe('change', function(e){
+			if(recurBox.checked) choicesDiv.show();
+			else choicesDiv.hide();
+			modal.refreshDialogAppearance();
+		});
+		
 	},
 	
 	updateValueFromBoxes : function(){

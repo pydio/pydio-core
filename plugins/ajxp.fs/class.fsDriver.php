@@ -319,6 +319,27 @@ class fsDriver extends AbstractDriver
 			break;
 			
 			//------------------------------------
+			//	CHANGE FILE PERMISSION
+			//------------------------------------
+			case "chmod";
+			
+				$messtmp="";
+				$files = $selection->getFiles();
+				$changedFiles = array();
+				foreach ($files as $fileName){
+					$error = $this->chmod($this->getPath().$fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
+				}
+				if(isSet($error)){
+					$errorMessage = $error; break;
+				}
+				//$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
+				$logMessage="Successfully changed permission for ".count($changedFiles)." files or folders";
+				$reload_file_list = $dir;
+				AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "filesCount"=>count($changedFiles)));
+		
+			break;
+			
+			//------------------------------------
 			//	UPLOAD
 			//------------------------------------	
 			case "upload":
@@ -1138,6 +1159,35 @@ class fsDriver extends AbstractDriver
 		{
 			// DELETING FROM RECYCLE
 			RecycleBinManager::deleteFromRecycle($location);
+		}
+	}
+	
+	/**
+	 * Change file permissions 
+	 *
+	 * @param String $path
+	 * @param String $chmodValue
+	 * @param Boolean $recursive
+	 * @param String $nodeType "both", "file", "dir"
+	 */
+	function chmod($path, $chmodValue, $recursive=false, $nodeType="both", &$changedFiles)
+	{
+		if(is_file($path) && ($nodeType=="both" || $nodeType=="file")){
+			chmod($path, $chmodValue);
+			$changedFiles[] = $path;
+		}else if(is_dir($path)){
+			if($nodeType=="both" || $nodeType=="dir"){
+				chmod($path, $chmodValue);				
+				$changedFiles[] = $path;
+			}
+			if($recursive){
+				$handler = opendir($path);
+				while ($child=readdir($handler)) {
+					if($child == "." || $child == "..") continue;
+					$this->chmod($path."/".$child, $chmodValue, $recursive, $nodeType, $changedFiles);
+				}
+				closedir($handler);
+			}
 		}
 	}
 	
