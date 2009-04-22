@@ -131,16 +131,7 @@ Modal = Class.create({
 		{
 			fOnLoad(this.currentForm);
 			// Reload shadow if the content has changed after the fOnLoad call
-			Shadower.shadow($(this.elementName), 
-				{
-					distance: 4,
-					angle: 130,
-					opacity: 0.5,
-					nestedShadows: 3,
-					color: '#000000',
-					shadowStyle:{display:'block'}
-				}, true);
-			
+			this.refreshDialogAppearance();
 		}
 		// SAFARI => FORCE IFRAME RELOADING
 		if(Prototype.Browser.WebKit && reloadIFrame && reloadIFrameSrc) reloadIFrame.src = reloadIFrameSrc;
@@ -232,6 +223,18 @@ Modal = Class.create({
 		// POSITION VERTICAL
 		var offsetTop = parseInt(((winHeight - boxHeight)/3));
 		$(this.elementName).setStyle({top:offsetTop+'px'});		
+	},
+	
+	refreshDialogAppearance:function(){
+		Shadower.shadow($(this.elementName), 
+			{
+				distance: 4,
+				angle: 130,
+				opacity: 0.5,
+				nestedShadows: 3,
+				color: '#000000',
+				shadowStyle:{display:'block'}
+			}, true);		
 	},
 	
 	clearContent: function(object){

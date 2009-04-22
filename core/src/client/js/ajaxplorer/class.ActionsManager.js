@@ -401,6 +401,7 @@ ActionsManager = Class.create({
 			if(fElement.name == 'get_action' && fValue.substr(0,4) == 'http'){			
 				fValue = getBaseName(fValue);
 			}
+			if(fElement.type == 'radio' && !fElement.checked) return;
 			connexion.addParameter(fElement.name, fValue);
 		});
 		connexion.addParameter('dir', ajaxplorer.getFilesList().getCurrentRep());

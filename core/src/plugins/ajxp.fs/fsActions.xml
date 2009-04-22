@@ -367,7 +367,7 @@ AJXP_MESSAGE[174]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="properties">
+		<action name="chmod">
 			<gui text="287" title="287" src="ksysv.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="true" recycle="hidden"  behaviour="hidden"
 					actionBar="false" contextMenu="true" infoPanel="true"
