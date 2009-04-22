@@ -49,7 +49,7 @@ PropertyPanel = Class.create({
 		this.createChmodForm();
 		
 		this.valueInput = new Element('input', {value:this.origValue, name:'chmod_value'}).setStyle({width:'76px', marginLeft:'55px'});
-		this.valueInput.observe('input', function(e){
+		this.valueInput.observe((Prototype.Browser.IE?'change':'input'), function(e){
 			this.updateBoxesFromValue(this.valueInput.value);
 		}.bind(this));
 		this.updateBoxesFromValue(this.valueInput.value);		
@@ -87,7 +87,7 @@ PropertyPanel = Class.create({
 	},
 	
 	createCheckBox : function(accessor, right){
-		var box = new Element('input', {type:'checkbox', id:accessor+'_'+right}).setStyle({width:'25px'});
+		var box = new Element('input', {type:'checkbox', id:accessor+'_'+right}).setStyle({width:'25px',borderWidth:'0'});
 		var div = new Element('div').insert(box).setStyle({cssFloat:'left',width:'30px'});
 		box.observe('click', function(e){
 			this.updateValueFromBoxes();
@@ -98,7 +98,7 @@ PropertyPanel = Class.create({
 	
 	createRecursiveBox : function(){
 		var recuDiv = new Element('div', {style:'padding-top:8px;'});
-		var recurBox = new Element('input', {type:'checkbox', name:'recursive'}).setStyle({width:'25px'});
+		var recurBox = new Element('input', {type:'checkbox', name:'recursive'}).setStyle({width:'25px',borderWidth:'0'});
 		recuDiv.insert(recurBox);
 		recuDiv.insert(MessageHash[291]);
 		this.htmlElement.insert(recuDiv);
@@ -108,19 +108,22 @@ PropertyPanel = Class.create({
 		recuDiv.insert(choicesDiv);
 		for(var key in choices){
 			var choiceDiv = new Element('div', {style:'padding-left:25px'});
-			choiceDiv.insert(new Element('input', {
+			var choiceDivBox = new Element('input', {
 				type:'radio',
 				name:'recur_apply_to',
 				value:key,
-				style:'width:25px;', 
-				checked:(key=='both')
-			}));
+				style:'width:25px;border:0;'
+			});
+			choiceDiv.insert(choiceDivBox);
+			if(key=='both'){
+				choiceDivBox.checked = true;
+			}
 			choiceDiv.insert(choices[key]);
 			choicesDiv.insert(choiceDiv); 
 		}
 		choicesDiv.hide();
 		
-		recurBox.observe('change', function(e){
+		recurBox.observe('click', function(e){
 			if(recurBox.checked) choicesDiv.show();
 			else choicesDiv.hide();
 			modal.refreshDialogAppearance();
@@ -147,7 +150,7 @@ PropertyPanel = Class.create({
 	updateBoxesFromValue : function(value){
 		if(value.length != 4 )return;
 		for(var i=0;i<3;i++){
-			this.valueToBoxes(parseInt(value[i+1]), this.accessors[i]);
+			this.valueToBoxes(parseInt(value.charAt(i+1)), this.accessors[i]);
 		}
 	},
 	
