@@ -117,6 +117,10 @@ FilesList = Class.create(SelectableElements, {
 			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
 			this.disableTextSelection($('selectable_div_header'));
 			this.disableTextSelection($('table_rows_container'));
+			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
+			document.observe("ajaxplorer:loaded", function(){
+				fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
+			});			
 		}
 		else if(this._displayMode == "thumb")
 		{
