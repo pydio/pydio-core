@@ -31,6 +31,7 @@
 		</div>
 		
     	<div id="search_div" style="background-color: #fff;">
+    	
     	<div id="bottomSplitPane" style="border: 1px solid #999;">    	
     		<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
     		<tr>
@@ -45,7 +46,7 @@
 	    	</table>
 	    	<div id="search_container"></div>
 	    	<div id="info_panel"></div>
-    	</div>
+    	</div>    	
     	</div>     	    	
     </div>
 	<div id="content_pane" style="border: 1px solid #999; background-color: #fff;">	
@@ -67,3 +68,60 @@
 </div>
 </div></div>
 <div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
+<script type="text/javascript">
+try{
+	var marginBottom = (Prototype.Browser.IE?18:15);
+	if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
+		marginBottom = $('optional_bottom_div').getHeight();
+	}
+	fitHeightToBottom($("browser"), window, marginBottom);
+	fitHeightToBottom($("verticalSplitter"), $('browser'), 8);	
+	if(Prototype.Browser.IE){
+		fitHeightToBottom($("content_pane"), $('verticalSplitter'));
+	}
+	if($('bottomSplitPane')){
+		var sideSplit = new Splitter('sidebarSplitter',{
+				direction: "horizontal",
+				initB: 150,
+				minB: 24,
+				maxB: 500,
+				onDrag:function(){
+						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
+						fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?-1:1), true);
+						if(ajaxplorer)ajaxplorer.sEngine.resize();
+					}
+				});
+	}else{
+		fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
+	}
+	var splitter = new Splitter('verticalSplitter', {
+			direction: "vertical",
+			initA: 200, maxA:400, minA:50, 
+			onDrag: function(){
+				if(sideSplit) {
+					sideSplit.resizeGroup(null, null, true);
+				}
+				else{
+					fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
+				}
+				if(ajaxplorer && ajaxplorer.filesList)ajaxplorer.filesList.applyHeadersWidth();					
+			}
+	});
+	
+	disableTextSelection($('tree_container'));
+	disableTextSelection($('bookmarks_bar'));
+	disableTextSelection($('panelsToggle'));
+	disableTextSelection($('info_panel'));
+	disableTextSelection($('dir_chooser'));
+}catch(e){
+	alert(e);
+}
+
+Event.observe(document, "ajaxplorer:loaded", function(){
+	ajaxplorer.currentSideToggle = 'search';
+	ajaxplorer.toggleSidePanel('info');	
+	$(ajaxplorer.actionBar._htmlElement).getElementsBySelector('a', 'input[type="image"]').each(function(element){
+		disableTextSelection(element);
+	});
+});
+</script>
