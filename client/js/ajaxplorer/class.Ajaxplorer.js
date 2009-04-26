@@ -58,6 +58,7 @@ Ajaxplorer = Class.create({
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
+		window.setTimeout(function(){document.fire('ajaxplorer:loaded');}, 500);
 	},
 	
 	initTemplates:function(){
@@ -150,7 +151,6 @@ Ajaxplorer = Class.create({
 		  
 		this.sEngine = new SearchEngine("search_container");
 		this.messageBox = $('message_div');
-		this.initGUI();	
 		this.filesList = new FilesList($("selectable_div"), 
 										true, 
 										["StringDirFile", "NumberKo", "String", "MyDate"], 
@@ -489,64 +489,7 @@ Ajaxplorer = Class.create({
 			else return this.actionBar.fireActionByKey(e, String.fromCharCode(e.keyCode).toLowerCase());
 		}.bind(this));
 	},
-	
-	initGUI: function(){
-		try{
-		var marginBottom = (Prototype.Browser.IE?18:15);
-		if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
-			marginBottom = $('optional_bottom_div').getHeight();
-		}
-		fitHeightToBottom($("browser"), window, marginBottom);
-		fitHeightToBottom($("verticalSplitter"), $('browser'), 8);	
-		if(Prototype.Browser.IE){
-			fitHeightToBottom($("content_pane"), $('verticalSplitter'));
-		}
-		if($('bottomSplitPane')){
-			var sideSplit = new Splitter('sidebarSplitter',{
-					direction: "horizontal",
-					initB: 150,
-					minB: 24,
-					maxB: 500,
-					onDrag:function(){
-							fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
-							fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?-1:1), true);
-							this.sEngine.resize();
-						}.bind(this)
-					});
-		}else{
-			fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
-		}
-		this.splitter = new Splitter('verticalSplitter', {
-				direction: "vertical",
-				initA: 200, maxA:400, minA:50, 
-				onDrag: function(){
-					if(sideSplit) {
-						sideSplit.resizeGroup(null, null, true);
-					}
-					else{
-						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
-					}
-					if(this.filesList)this.filesList.applyHeadersWidth();					
-				}.bind(this)
-		});
-		
-		
-		this.currentSideToggle = 'search';
-		this.toggleSidePanel('info');	
-		
-		new Effect.Fade(this.messageBox);
-		$(this.actionBar._htmlElement).getElementsBySelector('a', 'input[type="image"]').each(function(element){
-			disableTextSelection(element);
-		});
-		disableTextSelection($('tree_container'));
-		disableTextSelection($('bookmarks_bar'));
-		disableTextSelection($('panelsToggle'));
-		disableTextSelection($('info_panel'));
-		disableTextSelection($('dir_chooser'));
-		}catch(e){alert(e);}
-		
-	},
-		
+			
 	toggleSidePanel: function(srcName){			
 		if(srcName == 'info' && this.currentSideToggle != 'info'){
 			this.sEngine.showElement(false);
