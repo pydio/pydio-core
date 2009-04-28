@@ -36,9 +36,17 @@
 class AbstractAuthDriver {
 	
 	var $options;
+	var $driverName = "abstract";
 	
 	function init($options){
 		$this->options = $options;
+	}
+	
+	function getDriverActions(){
+		$xmlFile = INSTALL_PATH."/plugins/auth.".$this->driverName."/class.".$this->driverName."AuthDriver.php";
+		if(is_file($xmlFile)){
+			
+		}
 	}
 			
 	function preLogUser($sessionId){}	

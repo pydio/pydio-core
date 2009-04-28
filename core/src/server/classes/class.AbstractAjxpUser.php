@@ -54,8 +54,18 @@ class AbstractAjxpUser
 		if($storage == null){
 			$storage = ConfService::getConfStorageImpl();
 		}
-		$this->storage = $storage;
+		$this->storage = $storage;		
 		$this->load();
+	}
+	
+	function getCookieString(){
+		$hash = $this->getPref("cookie_hash");
+		if($hash == ""){
+			$hash = md5($this->id.":".time());
+			$this->setPref("cookie_hash", $hash);
+			$this->save();
+		}
+		return md5($this->id.":".$hash.":ajxp");
 	}
 	
 	function getId(){

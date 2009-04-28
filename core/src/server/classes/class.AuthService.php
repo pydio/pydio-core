@@ -51,11 +51,11 @@ class AuthService
 		return $authDriver->getSeed(true);
 	}
 	
-	function encodeCookiePass($user){
-		$authDriver = ConfService::getAuthDriverImpl();
-		return $authDriver->createCookieString($user);
-	}
-		
+	/**
+	 * Get the currently logged user object
+	 *
+	 * @return AbstractAjxpUser
+	 */
 	function getLoggedUser()
 	{
 		if(isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
@@ -211,8 +211,11 @@ class AuthService
 		if($userId == "guest") return true;		
 		$authDriver = ConfService::getAuthDriverImpl();
 		$userStoredPass = $authDriver->getUserPass($userId);
-		if($cookieString){			
-			return ($authDriver->createCookieString($userId) == $userPass);
+		if($cookieString){		
+			$confDriver = ConfService::getConfStorageImpl();
+			$userObject = $confDriver->createUserObject($userId);	
+			$userCookieString = $userObject->getCookieString();
+			return ($userCookieString == $userPass);
 		}		
 		$seed = $authDriver->getSeed(false);
 		if($seed != $returnSeed) return false;					

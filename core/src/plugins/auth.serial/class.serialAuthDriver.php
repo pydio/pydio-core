@@ -37,6 +37,7 @@ require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
 class serialAuthDriver extends AbstractAuthDriver {
 	
 	var $usersSerFile;
+	var $driverName = "serial";
 	
 	function init($options){
 		parent::init($options);
@@ -63,11 +64,6 @@ class serialAuthDriver extends AbstractAuthDriver {
 		}
 	}
 	
-	function createCookieString($login){
-		$userPass = $this->getUserPass($login);
-		return md5($login.":".$userPass.":ajxp");
-	}
-		
 	function usersEditable(){
 		return true;
 	}
