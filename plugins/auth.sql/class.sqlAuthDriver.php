@@ -38,6 +38,7 @@ require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
 class sqlAuthDriver extends AbstractAuthDriver {
 	
 	var $sqlDriver;
+	var $driverName = "sql";	
 	
 	function init($options){
 		parent::init($options);
@@ -71,11 +72,6 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		}
 	}
 	
-	function createCookieString($login){
-		$userPass = $this->getUserPass($login);
-		return md5($login.":".$userPass.":ajxp");
-	}
-		
 	function usersEditable(){
 		return true;
 	}
