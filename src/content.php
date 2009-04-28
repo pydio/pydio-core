@@ -81,7 +81,8 @@ if(AuthService::usersEnabled())
 		$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $_GET["login_seed"]);
 		if($rememberMe && $loggingResult == 1){
 			$rememberLogin = $userId;
-			$rememberPass =  AuthService::encodeCookiePass($userId);
+			$loggedUser = AuthService::getLoggedUser();
+			$rememberPass =  $loggedUser->getCookieString();
 		}
 	}
 	else 
