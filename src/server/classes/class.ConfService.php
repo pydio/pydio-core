@@ -50,6 +50,7 @@ global $G_UPLOAD_MAX_TOTAL;
 global $G_ACCESS_DRIVER;
 global $G_CONF_DRIVER;
 global $G_AUTH_DRIVER;
+global $G_AUTH_DRIVER_DEF;
 
 class ConfService
 {
@@ -57,7 +58,7 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_DEFAULT_REPOSITORIES;
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_DEFAULT_REPOSITORIES, $G_AUTH_DRIVER_DEF;
 		if(!isset($langue) || $langue=="") {$langue=$default_language;}
 		$G_LANGUE = $langue;
 		if(isSet($available_languages)){
@@ -72,8 +73,8 @@ class ConfService
 		$G_UPLOAD_MAX_FILE = Utils::convertBytes($upload_max_size_per_file);
 		$G_UPLOAD_MAX_TOTAL = Utils::convertBytes($upload_max_size_total);
 		$G_DEFAULT_REPOSITORIES = $REPOSITORIES;
+		$G_AUTH_DRIVER_DEF = $AUTH_DRIVER;
 		ConfService::initConfStorageImpl($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
-		ConfService::initAuthDriverImpl($AUTH_DRIVER["NAME"], $AUTH_DRIVER["OPTIONS"]);
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 		ConfService::switchRootDir();
 	}
@@ -99,8 +100,10 @@ class ConfService
 		return $G_CONF_STORAGE_DRIVER;
 	}
 
-	function initAuthDriverImpl($name, $options){
-		global $G_AUTH_DRIVER;
+	function initAuthDriverImpl(){		
+		global $G_AUTH_DRIVER_DEF, $G_AUTH_DRIVER;
+		$name = $G_AUTH_DRIVER_DEF["NAME"];
+		$options = $G_AUTH_DRIVER_DEF["OPTIONS"];
 		$filePath = INSTALL_PATH."/plugins/auth.".$name."/class.".$name."AuthDriver.php";
 		if(!is_file($filePath)){
 			die("Warning, cannot find driver for Authentication method! ($name, $filePath)");
@@ -117,6 +120,9 @@ class ConfService
 	 */
 	function getAuthDriverImpl(){
 		global $G_AUTH_DRIVER;
+		if($G_AUTH_DRIVER == null){			
+			ConfService::initAuthDriverImpl();
+		}
 		return $G_AUTH_DRIVER;
 	}
 
