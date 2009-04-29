@@ -192,4 +192,7 @@ define("INITIAL_ADMIN_PASSWORD", "admin");
 
 define("GZIP_DOWNLOAD", false);
 define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 1M
+
+$logger = AJXP_Logger::getInstance();
+$logger->initStorage(INSTALL_PATH."/server/logs/");
 ?>
