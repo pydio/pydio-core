@@ -36,6 +36,7 @@ require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
+require_once("server/classes/class.AJXP_Logger.php");
 ConfService::init("server/conf/conf.php");
 $confStorageDriver = ConfService::getConfStorageImpl();
 include_once($confStorageDriver->getUserClassFileName());
@@ -62,7 +63,6 @@ if(AUTH_MODE == "wordpress"){
 	require_once("../../../wp-includes/pluggable.php");
 }
 
-require_once("server/classes/class.AJXP_Logger.php");
 $USERS_ENABLED = "false";
 $LOGGED_USER = "false";
 $BEGIN_MESSAGE = "";
