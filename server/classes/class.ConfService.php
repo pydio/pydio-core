@@ -87,7 +87,7 @@ class ConfService
 		}
 		require_once($filePath);
 		$className = $name."ConfDriver";
-		$G_CONF_STORAGE_DRIVER = new $className();
+		$G_CONF_STORAGE_DRIVER = new $className($name);
 		$G_CONF_STORAGE_DRIVER->init($options);
 	}
 	
@@ -110,7 +110,7 @@ class ConfService
 		}
 		require_once($filePath);
 		$className = $name."AuthDriver";
-		$G_AUTH_DRIVER = new $className();
+		$G_AUTH_DRIVER = new $className($name);
 		$G_AUTH_DRIVER->init($options);
 	}
 	
