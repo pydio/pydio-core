@@ -33,11 +33,11 @@
  * 
  * Description : This driver will access another installation of AjaXplorer on a remote machine, thus acting as a proxy.
  */
-class remote_fsDriver extends AbstractDriver 
+class remote_fsDriver extends AbstractAccessDriver 
 {
 	
 	function remote_fsDriver($driverName, $filePath, $repository){
-		parent::AbstractDriver($driverName, INSTALL_PATH."/plugins/ajxp.fs/fsActions.xml", $repository);
+		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/ajxp.fs/fsActions.xml", $repository);
 		unset($this->actions["upload"]);
 		// ADD additional actions
 		$this->xmlFilePath = INSTALL_PATH."/plugins/ajxp.remote_fs/additionalActions.xml";

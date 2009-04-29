@@ -421,7 +421,8 @@ switch ($action)
 	
 	case "list_logs" : 
 		AJXP_XMLWriter::header("log_files");
-		AJXP_Logger::xmlListLogFiles();
+		$logger = AJXP_Logger::getInstance();
+		$logger->xmlListLogFiles();
 		AJXP_XMLWriter::close("log_files");		
 		exit(1);
 	break;
@@ -430,7 +431,8 @@ switch ($action)
 		$logDate = (isSet($_GET["date"])?$_GET["date"]:date('m-d-y'));
 		
 		AJXP_XMLWriter::header("logs");
-		AJXP_Logger::xmlLogs($logDate);
+		$logger = AJXP_Logger::getInstance();
+		$logger->xmlLogs($logDate);
 		AJXP_XMLWriter::close("logs");
 		exit(1);
 	break;

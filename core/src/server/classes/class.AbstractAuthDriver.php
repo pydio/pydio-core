@@ -33,7 +33,7 @@
  * 
  * Description : Abstract representation of an access to an authentication system (ajxp, ldap, etc).
  */
-class AbstractAuthDriver {
+class AbstractAuthDriver extends AbstractDriver {
 	
 	var $options;
 	var $driverName = "abstract";

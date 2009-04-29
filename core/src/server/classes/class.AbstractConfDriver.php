@@ -33,7 +33,7 @@
  * 
  * Description : Abstract representation of Ajaxplorer Data Access
  */
-class AbstractConfDriver {
+class AbstractConfDriver extends AbstractDriver {
 		
 	var $options;
 	/**

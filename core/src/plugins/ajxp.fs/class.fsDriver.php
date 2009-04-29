@@ -33,7 +33,7 @@
  * 
  * Description : The most used and standard plugin : FileSystem access
  */
-class fsDriver extends AbstractDriver 
+class fsDriver extends AbstractAccessDriver 
 {
 	/**
 	* @var Repository
@@ -41,7 +41,7 @@ class fsDriver extends AbstractDriver
 	var $repository;
 	
 	function  fsDriver($driverName, $filePath, $repository){
-		parent::AbstractDriver($driverName, $filePath, $repository);
+		parent::AbstractAccessDriver($driverName, $filePath, $repository);
 	}
 	
 	function initRepository(){

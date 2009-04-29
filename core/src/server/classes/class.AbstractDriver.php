@@ -44,10 +44,6 @@ class AbstractDriver {
 	 */
 	var $xmlFilePath;
 	/**
-	* @var Repository
-	*/
-	var $repository;
-	/**
 	 * @var array
 	 */
 	var $actions;
@@ -56,7 +52,7 @@ class AbstractDriver {
 	var $crtAction;
 	var $driverConf = array();
 	
-	function AbstractDriver($driverName, $filePath, $repository) {
+	function AbstractDriver($driverName) {
 		// Load config file if there is one
 		if(is_file(INSTALL_PATH."/server/conf/conf.".$driverName.".inc")){
 			include_once(INSTALL_PATH."/server/conf/conf.".$driverName.".inc");
@@ -65,18 +61,15 @@ class AbstractDriver {
 			}
 		}
 		$this->driverName = $driverName;
+		$this->actions = array();
+	}
+	
+	function initXmlActionsFile($filePath){
 		$this->xmlFilePath = $filePath;
-		$this->repository = $repository;
 		$this->parseXMLActions();
-		// Create fake action for sending its own actions to client.
 		$this->actions["get_driver_actions"] = array();
-		$this->actions["get_driver_info_panels"] = array();
 	}
-	
-	function initRepository(){
-		// To be implemented by subclasses
-	}
-	
+		
 	function hasAction($actionName){
 		return isSet($this->actions[$actionName]);
 	}
@@ -97,10 +90,6 @@ class AbstractDriver {
 			$this->sendActionsToClient(false, null);
 			exit(1);
 		}
-		else if($actionName == "get_ajxp_info_panels" || $actionName == "get_driver_info_panels"){
-			$this->sendInfoPanelsDef();
-			return;
-		}
 		if(isSet($this->actions[$actionName])){
 			// use callback;
 			$action = $this->actions[$actionName];
@@ -115,15 +104,15 @@ class AbstractDriver {
 	 * @param boolean $filterByRight
 	 * @param User $user
 	 */
-	function sendActionsToClient($filterByRight, $user){
+	function sendActionsToClient($filterByRight, $user, $repository){
 		AJXP_XMLWriter::header();
 		foreach($this->actions as $name => $action){
 			if($name == "get_driver_actions" || $name == "get_ajxp_actions") continue;
 			if($filterByRight && $this->actionNeedsRight($name, "r")){
-				if($user==null || !$user->canRead($this->repository->getId())) continue;
+				if($user==null || !$user->canRead($repository->getId())) continue;
 			}
 			if($filterByRight && $this->actionNeedsRight($name, "w")){
-				if($user==null || !$user->canWrite($this->repository->getId())) continue;
+				if($user==null || !$user->canWrite($repository->getId())) continue;
 			}
 			if(isSet($action["XML"])){
 				$xml = $action["XML"];
@@ -165,19 +154,7 @@ class AbstractDriver {
 			}
 		}
 	}
-	
-	function sendInfoPanelsDef(){
-		$fileData = file_get_contents($this->xmlFilePath);
-		$matches = array();
-		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
-		if(count($matches)){
-			AJXP_XMLWriter::header();
-			AJXP_XMLWriter::write($this->replaceAjxpXmlKeywords(str_replace("\n", "",$matches[0])), true);
-			AJXP_XMLWriter::close();
-			exit(1);
-		}		
-	}
-	
+		
 	function parseXMLActions()
 	{
 		$this->xml_data = file_get_contents($this->xmlFilePath);
