@@ -68,6 +68,10 @@ class AbstractAuthDriver {
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
 	}
 	
+	function isAjxpAdmin($login){
+		return ($this->getOption("AJXP_ADMIN_LOGIN") === $login);
+	}
+	
 	function autoCreateUser(){
 		$opt = $this->getOption("AUTOCREATE_AJXPUSER");
 		if($opt === true) return true;
