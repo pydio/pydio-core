@@ -33,7 +33,6 @@
  * 
  * Description : A simple logger class
  */
-define("LOCAL_STORAGE_DIR", INSTALL_PATH."/server/logs/");
 define("LOG_FILE_NAME", 'log_' . date('m-d-y') . '.txt');		// The name of the log file
 define("LOG_GROUP_RIGHTS", 0770);
 define("LOG_LEVEL_DEBUG", "Debug");
@@ -56,6 +55,8 @@ global $AJXP_LOGGER;
 class AJXP_Logger {
 	var $USER_GROUP_RIGHTS = 0770;
 	var $fileHandle;
+	var $stack;
+	var $storageDir = "";
 	/*
 	var $severityDescription = Array(
 			DEBUG => "Debug", 
@@ -72,27 +73,39 @@ class AJXP_Logger {
 	function AJXP_Logger() {
 
 		$this->severityDescription = 0;
-
-		if (!file_exists(LOCAL_STORAGE_DIR)) {
-			@mkdir(LOCAL_STORAGE_DIR, LOG_GROUP_RIGHTS);
+		$this->stack = array();
+		$this->fileHandle = false;
+	}
+	
+	function __destruct(){
+		if($this->fileHandle !== false);
+		$this->close();
+	}
+	
+	function initStorage($storageDir){
+		$this->storageDir = $storageDir;
+		if (!file_exists($storageDir)) {
+			@mkdir($storageDir, LOG_GROUP_RIGHTS);
 		}
-
-		$this->fileHandle = fopen(LOCAL_STORAGE_DIR . LOG_FILE_NAME, "at+");
-		
-		if ($this->fileHandle === false) {
-			//print "Failed to obtain a handle to log file '" . LOG_FILE_NAME . "'";
-		}
-
+		$this->open();
+	}
+	
+	function open(){
+		if($this->storageDir!=""){
+			$this->fileHandle = @fopen($this->storageDir . LOG_FILE_NAME, "at+");
+			if($this->fileHandle !== false && count($this->stack)){
+				$this->stackFlush();
+			}		
+		}		
 	}
 
 	function logAction($action, $params=array()){
-		$logger = AJXP_Logger::getInstance();
+		$logger = AJXP_Logger::getInstance();		
 		$message = "$action\t";		
 		if(count($params)){
 			$message.=$logger->arrayToString($params);
-		}
-		$logger->write($message, LOG_LEVEL_INFO);
-		$logger->close();
+		}		
+		$logger->write($message, LOG_LEVEL_INFO);		
 	}
 	
 	function arrayToString($params){
@@ -145,12 +158,22 @@ class AJXP_Logger {
 		$textMessage = $this->formatMessage($textMessage, $severityLevel);
 
 		if ($this->fileHandle !== false) {
-			
+			if(count($this->stack)) $this->stackFlush();						
 			if (@fwrite($this->fileHandle, $textMessage) === false) {
 				//print "There was an error writing to log file.";
 			}
+		}else{			
+			$this->stack[] = $textMessage;
 		}
 		
+	}
+	
+	function stackFlush(){
+		// Flush stack for messages that could have been written before the file opening.
+		foreach ($this->stack as $message){
+			@fwrite($this->fileHandle, $message);
+		}
+		$this->stack = array();
 	}
 	
 	/**
@@ -199,10 +222,10 @@ class AJXP_Logger {
 	}
 	
 	function xmlListLogFiles(){
-		$dir = LOCAL_STORAGE_DIR;
-		if(!is_dir(LOCAL_STORAGE_DIR)) return ;
+		$dir = $this->storageDir;
+		if(!is_dir($this->storageDir)) return ;
 		$logs = array();
-		if(($handle = opendir(LOCAL_STORAGE_DIR))!==false){
+		if(($handle = opendir($this->storageDir))!==false){
 			while($file = readdir($handle)){				
 				$split = split("\.", $file);
 				if(!count($split) || $split[0] == "") continue;
@@ -222,7 +245,7 @@ class AJXP_Logger {
 	
 	function xmlLogs($date){
 				
-		$fName = LOCAL_STORAGE_DIR."log_".$date.".txt";
+		$fName = $this->storageDir."log_".$date.".txt";
 		if(!is_file($fName) || !is_readable($fName)) return;
 		
 		$res = "";
