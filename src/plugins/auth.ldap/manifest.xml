@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="ldap" label="LDAP Directory" description="Authentication datas are stored on the LDAP server.">
+	<param name="LDAP_URL" type="string" label="LDAP URL" description="LDAP Server URL (IP or name)" mandatory="true"/>
+	<param name="LDAP_PORT" type="string" label="LDAP Port" description="LDAP Server Port (leave blank for default)" mandatory="false"/>
+	<param name="LDAP_USER" type="string" label="LDAP Admin Username" description="Username (uid + dn) of LDAP administrator" mandatory="false"/>
+	<param name="LDAP_PASSWORD" type="string" label="LDAP Admin password" description="Password of LDAP administrator" mandatory="false"/>
+	<param name="LDAP_DN" type="string" label="People DN" description="DN where the users are stored" mandatory="false"/>
+</authdriver>
