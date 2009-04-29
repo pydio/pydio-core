@@ -35,7 +35,7 @@
  * @todo Put the DB content encoding as a driver option, then manually for current encoding 
  *       in SystemTextEncoding.
  */
-class mysqlDriver extends AbstractDriver 
+class mysqlDriver extends AbstractAccessDriver 
 {
 	/**
 	* @var Repository
@@ -43,7 +43,7 @@ class mysqlDriver extends AbstractDriver
 	var $repository;
 	
 	function  mysqlDriver($driverName, $filePath, $repository){
-		parent::AbstractDriver($driverName, $filePath, $repository);		
+		parent::AbstractAccessDriver($driverName, $filePath, $repository);		
 	}
 	
 	function initRepository(){

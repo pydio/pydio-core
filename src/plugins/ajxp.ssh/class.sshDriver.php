@@ -35,7 +35,7 @@
  */
 require_once("class.SSHOperations.php");
 
-class sshDriver extends AbstractDriver 
+class sshDriver extends AbstractAccessDriver 
 {
 	/** Should be in the form bob@distantServer.com or distantServer
 	* @var Repository
@@ -70,7 +70,7 @@ class sshDriver extends AbstractDriver
         $account = $this->getUserName($repository); 
         $password = $this->getPassword($repository); 
         $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);
-		parent::AbstractDriver($driverName, $filePath, $repository);
+		parent::AbstractAccessDriver($driverName, $filePath, $repository);
 	}
 
     function getUserName($repository){

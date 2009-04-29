@@ -37,6 +37,7 @@ require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.AJXP_Exception.php");
 require_once("server/classes/class.AbstractDriver.php");
+require_once("server/classes/class.AbstractAccessDriver.php");
 require_once("server/classes/class.AJXP_ClientDriver.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
