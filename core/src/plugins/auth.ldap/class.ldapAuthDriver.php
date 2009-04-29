@@ -47,14 +47,14 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
     function init($options){
         parent::init($options);
+        AJXP_Logger::logAction('Auth.ldap :: init');
         $this->ldapUrl = $options["LDAP_URL"];
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
         $this->ldapconn = $this->LDAP_Connect();
-        if ($this->ldapconn == null) error_log('LDAP Server connexion could NOT be established');
-        error_log('ldapAuthDriver::init');
+        if ($this->ldapconn == null) AJXP_Logger::logAction('LDAP Server connexion could NOT be established');
     }
 
     function __deconstruct(){
@@ -64,19 +64,19 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
     function LDAP_Connect(){
         $ldapconn = ldap_connect($this->ldapUrl, $this->ldapPort)
-        or die("Impossible de se connecter au serveur LDAP.");
+        or die("Cannot connect to LDAP server");
         //@todo : return error_code
 
         if ($ldapconn) {
-            error_log("We are connected");
+            //AJXP_Logger::logAction("auth.ldap:We are connected");
             ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
 
             if ($this->ldapAdminUsername === null){
                 //connecting anonymously
-                error_log('on se connecte sans username');
+                AJXP_Logger::logAction('Anonymous LDAP connexion');
                 $ldapbind = @ldap_bind($ldapconn);
             } else {
-                error_log('on se connecte avec un username');
+                AJXP_Logger::logAction('Standard LDAP connexion');
                 $ldapbind = @ldap_bind($ldapconn, $this->ldapAdminUsername, $this->ldapAdminPassword);
             }
 
@@ -87,7 +87,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             }
             
         } else {
-            error_log("erreur à la connexion LDAP");
+            AJXP_Logger::logAction("Error while connection to LDAP server");
         }
 
     }
@@ -103,19 +103,16 @@ class ldapAuthDriver extends AbstractAuthDriver {
         unset($entries['count']);
         foreach($entries as $id => $person){
             //if ($id != 'count'){
-            error_log('on traite le user '.$person['uid'][0]);
+            //AJXP_Logger::logAction('auth.ldap:Handling user '.$person['uid'][0]);
             $persons[$person['uid'][0]] = "XXX";
             //}
         }
 
-        error_log('debut');
-        error_log(print_r($persons, true));
-        error_log('fin');
+        //error_log(print_r($persons, true));
         return $persons;
     }
 
-    function userExists($login){
-        error_log('ldapAuthDriver::userExists');
+    function userExists($login){        
         //return true;
         $users = $this->listUsers();
         if(!is_array($users) || !array_key_exists($login, $users)) return false;
@@ -124,21 +121,21 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
     function checkPassword($login, $pass, $seed){
        
-        error_log('ldapAuthDriver::checkPassword');
+        //AJXP_Logger::logAction('auth.ldap:ldapAuthDriver::checkPassword');
         $ret = ldap_search($this->ldapconn,$this->ldapDN,"uid=".$login);
         $entries = ldap_get_entries($this->ldapconn, $ret);
-        error_log(print_r($entries, true));
+        //error_log(print_r($entries, true));
         if ($entries['count']>0) {
-            error_log('j ai trouve quelqu un');
+            //AJXP_Logger::logAction('auth.ldap:Found user!');
 
             //error_log(print_r($entries[0]["dn"], true));
             if (@ldap_bind($this->ldapconn,$entries[0]["dn"],$pass)) {
-                error_log('j ai le user '.$entries[0]["cn"][0]);
+                AJXP_Logger::logAction('Ldap Password Check:Got user '.$entries[0]["cn"][0]);
                 return true;
             }
             return false;
         } else {
-            error_log("Aucun utilisateur $user_id trouvé...");
+            AJXP_Logger::logAction("Ldap Password Check:No user $user_id found");
             return false;
         }
     }
