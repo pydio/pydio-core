@@ -107,13 +107,13 @@ class AuthService
 	
 	function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{
-		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
 		if($user_id == null)
 		{
 			if(isSet($_SESSION["AJXP_USER"])) return 1; 
 			if(ALLOW_GUEST_BROWSING)
 			{
+				$authDriver = ConfService::getAuthDriverImpl();
 				if(!$authDriver->userExists("guest"))
 				{
 					AuthService::createUser("guest", "");
@@ -125,6 +125,7 @@ class AuthService
 			}
 			return 0;
 		}
+		$authDriver = ConfService::getAuthDriverImpl();
 		// CHECK USER PASSWORD HERE!
 		if(!$authDriver->userExists($user_id)) return 0;
 		if(!$bypass_pwd){
@@ -133,6 +134,9 @@ class AuthService
 			}
 		}
 		$user = $confDriver->createUserObject($user_id);
+		if($authDriver->isAjxpAdmin($user_id)){
+			$user->setAdmin(true);
+		}
 		if($user->isAdmin())
 		{
 			$user = AuthService::updateAdminRights($user);
@@ -210,7 +214,6 @@ class AuthService
 	{
 		if($userId == "guest") return true;		
 		$authDriver = ConfService::getAuthDriverImpl();
-		$userStoredPass = $authDriver->getUserPass($userId);
 		if($cookieString){		
 			$confDriver = ConfService::getConfStorageImpl();
 			$userObject = $confDriver->createUserObject($userId);	
