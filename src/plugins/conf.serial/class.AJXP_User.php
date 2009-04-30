@@ -160,6 +160,14 @@ class AJXP_User extends AbstractAjxpUser
 		Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks);		
 	}	
 	
+	function getTemporaryData($key){
+		return Utils::loadSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser");
+	}
+	
+	function saveTemporaryData($key, $value){
+		return Utils::saveSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser", $value);
+	}
+	
 	/**
 	 * Static function for deleting a user
 	 *

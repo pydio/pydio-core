@@ -40,8 +40,12 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
 		unset($this->actions["upload"]);
 		// ADD additional actions
+		/*
 		$this->xmlFilePath = INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml";
 		$this->parseXMLActions();
+		*/
+		$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
+		$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
 	}
 	
 	function switchAction($action, $httpVars, $filesVars){		
@@ -239,45 +243,32 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 	
 	function storeFileToCopy($fileData){
 		$user = AuthService::getLoggedUser();
-		$files = $user->loadUserFile("tmp_upload");
+		$files = $user->getTemporaryData("tmp_upload");
 		$files[] = $fileData;
-		$user->saveUserFile("tmp_upload", $files);
+		$user->saveTemporaryData("tmp_upload", $files);
 	}
 	
 	function getFileNameToCopy(){
 		$user = AuthService::getLoggedUser();
-		$files = $user->loadUserFile("tmp_upload");
+		$files = $user->getTemporaryData("tmp_upload");
 		return $files[0]["name"];
 	}
 	
 	function getNextFileToCopy(){
 		if(!$this->hasFilesToCopy()) return "";
 		$user = AuthService::getLoggedUser();
-		$files = $user->loadUserFile("tmp_upload");
+		$files = $user->getTemporaryData("tmp_upload");
 		$fData = $files[0];
 		array_shift($files);		
-		$user->saveUserFile("tmp_upload", $files);
+		$user->saveTemporaryData("tmp_upload", $files);
 		return $fData;
 	}
 	
 	function hasFilesToCopy(){
 		$user = AuthService::getLoggedUser();
-		$files = $user->loadUserFile("tmp_upload");
+		$files = $user->getTemporaryData("tmp_upload");
 		return (count($files)?true:false);	
 	}
-	
-	function sendInfoPanelsDef(){
-		$fileData = file_get_contents(INSTALL_PATH."/plugins/access.fs/fsActions.xml");
-		$matches = array();
-		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
-		if(count($matches)){
-			AJXP_XMLWriter::header();
-			AJXP_XMLWriter::write($this->replaceAjxpXmlKeywords(str_replace("\n", "",$matches[0])), true);
-			AJXP_XMLWriter::close();
-			exit(1);
-		}		
-	}
-	
 	
 }
 
