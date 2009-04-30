@@ -36,9 +36,9 @@
                                  
 require_once(INSTALL_PATH.'/server/classes/class.AbstractTest.php');
 
-class ajxp_fs extends AbstractTest
+class fsAccessTest extends AbstractTest
 {
-    function ajxp_fs() { parent::AbstractTest("Filesystem Plugin", ""); }
+    function fsAccessTest() { parent::AbstractTest("Filesystem Plugin", ""); }
 
     /**
      * Test Repository

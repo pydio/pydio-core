@@ -398,7 +398,7 @@ class Utils
 		{
 		    require_once($file);
 		    // Then create the test class
-		    $testName = str_replace(".php", "", substr($file, 5));
+		    $testName = str_replace(".php", "", substr($file, 5))."Test";
 		    $class = new $testName();
 		    foreach ($repoList as $repository){
 			    $result = $class->doRepositoryTest($repository);
