@@ -192,6 +192,14 @@ class AbstractAjxpUser
 
 	function deleteUser($userId){
 	}
+	
+	function getTemporaryData($key){
+		
+	}
+	
+	function saveTemporaryData($key, $value){
+		
+	}
 
     /** Decode a user supplied password before using it */
     function decodeUserPassword($password){
