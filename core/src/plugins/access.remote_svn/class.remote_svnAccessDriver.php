@@ -43,18 +43,6 @@ class remote_svnAccessDriver extends remote_fsAccessDriver
 		$this->xmlFilePath = INSTALL_PATH."/plugins/access.remote_svn/svnActions.xml";
 		$this->parseXMLActions();
 	}
-
-	function sendInfoPanelsDef(){
-		$fileData = file_get_contents(INSTALL_PATH."/plugins/access.remote_svn/svnActions.xml");
-		$matches = array();
-		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
-		if(count($matches)){
-			AJXP_XMLWriter::header();
-			AJXP_XMLWriter::write($this->replaceAjxpXmlKeywords(str_replace("\n", "",$matches[0])), true);
-			AJXP_XMLWriter::close();
-			exit(1);
-		}		
-	}
 	
 	function svnStubAction($actionName, $httpVars, $filesVars){
 		if($actionName == "svnlog"){
