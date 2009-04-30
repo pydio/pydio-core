@@ -367,8 +367,8 @@ class ConfService
         ConfService::switchRootDir();
 		$crtRepository = ConfService::getRepository();
 		$accessType = $crtRepository->getAccessType();
-		$driverName = $accessType."Driver";
-		$path = INSTALL_PATH."/plugins/ajxp.".$accessType;
+		$driverName = $accessType."AccessDriver";
+		$path = INSTALL_PATH."/plugins/access.".$accessType;
 		$filePath = $path."/class.".$driverName.".php";
 		$xmlPath = $path."/".$accessType."Actions.xml";
 		if(is_file($filePath)){
@@ -393,7 +393,7 @@ class ConfService
 		if($fp = opendir($base)){
 			while (($subdir = readdir($fp))!==false) {
 				$manifName = $base."/".$subdir."/manifest.xml";
-				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("ajxp."))=="ajxp."){
+				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("access."))=="access."){
 					$lines = file($manifName);
 					array_shift($lines);// Remove first line (xml declaration);					
 					$xmlString .= implode("", $lines);

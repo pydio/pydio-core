@@ -33,17 +33,17 @@
  * 
  * Description : The copy of FS driver but with no "write" access
  */
-require_once(INSTALL_PATH."/plugins/ajxp.fs/class.fsDriver.php");
+require_once(INSTALL_PATH."/plugins/access.fs/class.fsAccessDriver.php");
 
-class demoDriver extends fsDriver 
+class demoAccessDriver extends fsAccessDriver 
 {
 	/**
 	* @var Repository
 	*/
 	var $repository;
 	
-	function demoDriver($driverName, $filePath, $repository){
-		parent::fsDriver($driverName, INSTALL_PATH."/plugins/ajxp.fs/fsActions.xml", $repository);		
+	function demoAccessDriver($driverName, $filePath, $repository){
+		parent::fsAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);		
 	}
 	
 	function switchAction($action, $httpVars, $fileVars){

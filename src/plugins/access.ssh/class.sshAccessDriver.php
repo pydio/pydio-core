@@ -35,7 +35,7 @@
  */
 require_once("class.SSHOperations.php");
 
-class sshDriver extends AbstractAccessDriver 
+class sshAccessDriver extends AbstractAccessDriver 
 {
 	/** Should be in the form bob@distantServer.com or distantServer
 	* @var Repository
