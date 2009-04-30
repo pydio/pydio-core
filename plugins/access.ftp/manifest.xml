@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="ftp" label="FTP Server" description="Connect to a remote FTP server">
+	<client_settings icon="plugins/access.ftp/icon.png" search_engine="SearchEngine"/>
+	<param name="FTP_HOST" type="string" label="Host" description="Ftp Host to connect to" mandatory="true"/>
+	<param name="FTP_PORT" type="string" label="Port" description="Ftp Host port" mandatory="true" default="21"/>
+	<param name="PATH" type="string" label="Path" description="Real path to the root folder on the server" mandatory="true"/>
+	<param name="FTP_USER" type="string" label="User" description="Ftp User name" mandatory="true"/>
+	<param name="FTP_PASS" type="string" label="Password" description="Ftp User password" mandatory="false"/>
+</ajxpdriver>
