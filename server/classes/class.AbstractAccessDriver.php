@@ -39,6 +39,7 @@ class AbstractAccessDriver extends AbstractDriver {
 	* @var Repository
 	*/
 	var $repository;
+	var $driverType = "access";
 	
 	function AbstractAccessDriver($driverName, $filePath, $repository) {
 		
