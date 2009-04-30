@@ -354,7 +354,7 @@ switch ($action)
 				print(">");
 				foreach ($nested as $option){
 					foreach ($option as $key => $optValue){
-						if(strpos(strtolower($key), "auth") !== false) continue;
+						//if(strpos(strtolower($key), "auth") !== false) continue;
 						print("<param name=\"$key\" value=\"$optValue\"/>");
 					}
 				}
