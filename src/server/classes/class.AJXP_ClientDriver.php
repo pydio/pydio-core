@@ -33,15 +33,31 @@
  * 
  * Description : Basic implementation of the AbstractDriver, handle low level actions (docs, templates, etc).
  */
-class AJXP_ClientDriver extends AbstractAccessDriver 
+class AJXP_ClientDriver extends AbstractDriver 
 {
 	
 	function AJXP_ClientDriver($repository) {
-		parent::AbstractAccessDriver ( "ajxp_actions", CLIENT_RESOURCES_FOLDER."/xml/ajxpclient_actions.xml", $repository );
+		parent::AbstractDriver("ajxp_actions");
+		$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/ajxpclient_actions.xml");
 		unset($this->actions["get_driver_actions"]);
 		unset($this->actions["get_driver_info_panels"]);
 		$this->actions["get_ajxp_actions"] = array();
 		$this->actions["get_ajxp_info_panels"] = array();
+	}
+	
+	function applyAction($actionName, $httpVars, $filesVar){
+		if($actionName == "get_ajxp_actions"){
+			AJXP_XMLWriter::header();
+			$this->sendActionsToClient(false, null, null);
+			$authDriver = ConfService::getAuthDriverImpl();
+			$authDriver->sendActionsToClient(false, null, null);
+			$confDriver = ConfService::getConfStorageImpl();
+			$confDriver->sendActionsToClient(false, null, null);
+			AJXP_XMLWriter::close();
+			exit(1);
+		}else{
+			parent::applyAction($actionName, $httpVars, $filesVar);
+		}
 	}
 	
 	function switchAction($action, $httpVars, $fileVars)
@@ -54,7 +70,7 @@ class AJXP_ClientDriver extends AbstractAccessDriver
 		if(isSet($dir) && $action != "upload") $dir = SystemTextEncoding::fromUTF8($dir);
 		$mess = ConfService::getMessages();
 		
-		switch ($action){
+		switch ($action){			
 			//------------------------------------
 			//	SWITCH THE ROOT REPOSITORY
 			//------------------------------------	
