@@ -464,9 +464,31 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				$nom_rep = $this->initName($dir);
 				AJXP_Exception::errorToXml($nom_rep);
-				$result = $this->listing($nom_rep, !($searchMode || $fileListMode));
+				
+				if($fileListMode){
+					$countFiles = $this->countFiles($nom_rep);
+					if($countFiles > 500){
+						$limitPerPage = 200;
+						$offset = 0;
+						$crtPage = 1;
+						if(isSet($page)){
+							$offset = (intval($page)-1)*$limitPerPage; 
+							$crtPage = $page;
+						}
+						$totalPages = ($countFiles % $limitPerPage);						
+						$result = $this->listing($nom_rep, false, $offset, $limitPerPage);						
+					}else{
+						$result = $this->listing($nom_rep, $searchMode);
+					}
+				}else{
+					$result = $this->listing($nom_rep, !$searchMode);
+				}
 				$reps = $result[0];
 				AJXP_XMLWriter::header();
+				if(isSet($totalPages) && isSet($crtPage)){
+					print '<columns switchDisplayMode="list" switchGridMode="filelist"/>';
+					print '<pagination total="'.$totalPages.'" current="'.$crtPage.'"/>';
+				}
 				foreach ($reps as $repIndex => $repName)
 				{
 					if((eregi("\.zip$",$repName) && $skipZip)) continue;
@@ -716,7 +738,19 @@ class fsAccessDriver extends AbstractAccessDriver
 	}
 	
 	
-	function listing($nom_rep, $dir_only = false)
+	function countFiles($dirName){
+		$handle=opendir($dirName);
+		$count = 0;
+		while ($file = readdir($handle))
+		{
+			if($file != "." && $file !=".." && !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])){
+				$count++;
+			}
+		}
+		return $count;
+	}
+	
+	function listing($nom_rep, $dir_only = false, $offset=0, $limit=0)
 	{
 		$mess = ConfService::getMessages();
 		$size_unit = $mess["byte_unit_symbol"];
@@ -725,10 +759,19 @@ class fsAccessDriver extends AbstractAccessDriver
 		$poidstotal=0;
 		$handle=opendir($nom_rep);
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
+		$cursor = 0;
 		while ($file = readdir($handle))
 		{
 			if($file!="." && $file!=".." && !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"]))
 			{
+				if($offset > 0 && $cursor < $offset){
+					$cursor ++;
+					continue;
+				}
+				if($limit > 0 && ($cursor - $offset) >= $limit) {
+					break;
+				}
+				$cursor ++;
 				if($recycle != "" 
 					&& $nom_rep == $this->repository->getOption("PATH")."/".$recycle 
 					&& $file == RecycleBinManager::getCacheFileName()){
