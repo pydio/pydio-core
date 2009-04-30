@@ -151,17 +151,16 @@ if(AuthService::usersEnabled())
 	}
 }
 
-// FIRST INIT STD DRIVER
+// Look for the action in the "fixed" drivers : AjxpClient, Auth & Conf
 $ajxpDriver = new AJXP_ClientDriver(ConfService::getRepository());
-if($ajxpDriver->hasAction($action)){
-	$xmlBuffer = $ajxpDriver->applyAction($action, array_merge($_GET, $_POST), $_FILES);
-	if($xmlBuffer != ""){
-		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::write($xmlBuffer, true);
-		AJXP_XMLWriter::close();
-		exit(1);
-	}
-}
+$ajxpDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
+
+$authDriver = ConfService::getAuthDriverImpl();
+$authDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
+
+$confDriver = ConfService::getConfStorageImpl();
+$confDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
+
 
 // TRYING TO GET A DRIVER WHEN NO USER IS LOGGED
 if(AuthService::usersEnabled() && AuthService::getLoggedUser()==null && !ALLOW_GUEST_BROWSING){

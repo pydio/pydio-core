@@ -93,8 +93,10 @@ class AbstractDriver {
 	
 	function applyAction($actionName, $httpVars, $filesVar)
 	{
-		if($actionName == "get_driver_actions" || $actionName == "get_ajxp_actions"){
-			$this->sendActionsToClient(false, null);
+		if($actionName == "get_driver_actions"){
+			AJXP_XMLWriter::header();
+			$this->sendActionsToClient(false, null, null);
+			AJXP_XMLWriter::close();
 			exit(1);
 		}
 		if(isSet($this->actions[$actionName])){
@@ -105,6 +107,18 @@ class AbstractDriver {
 		}
 	}
 	
+	function applyIfExistsAndExit($action,  $httpVars, $filesVar){
+		if($this->hasAction($action)){
+			$xmlBuffer = $this->applyAction($action, $httpVars, $filesVar);
+			if($xmlBuffer != ""){
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::write($xmlBuffer, true);
+				AJXP_XMLWriter::close();
+				exit(1);
+			}
+		}		
+	}
+	
 	/**
 	 * Print the XML for actions
 	 *
@@ -112,7 +126,7 @@ class AbstractDriver {
 	 * @param User $user
 	 */
 	function sendActionsToClient($filterByRight, $user, $repository){
-		AJXP_XMLWriter::header();
+		//AJXP_XMLWriter::header();
 		foreach($this->actions as $name => $action){
 			if($name == "get_driver_actions" || $name == "get_ajxp_actions") continue;
 			if($filterByRight && $this->actionNeedsRight($name, "r")){
@@ -129,7 +143,7 @@ class AbstractDriver {
 				AJXP_XMLWriter::write($xml, true);
 			}
 		}
-		AJXP_XMLWriter::close();
+		//AJXP_XMLWriter::close();
 	}
 	
 	function replaceAjxpXmlKeywords($xml){

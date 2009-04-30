@@ -45,6 +45,8 @@ class AbstractConfDriver extends AbstractDriver {
 	 */
 	function init($options){		
 		$this->options = $options;
+		$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/standard_conf_actions.xml");
+		unset($this->actions["get_driver_actions"]);		
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY

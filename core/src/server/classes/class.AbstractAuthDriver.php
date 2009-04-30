@@ -41,15 +41,10 @@ class AbstractAuthDriver extends AbstractDriver {
 	
 	function init($options){
 		$this->options = $options;
+		$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/standard_auth_actions.xml");
+		unset($this->actions["get_driver_actions"]);
 	}
-	
-	function getDriverActions(){
-		$xmlFile = INSTALL_PATH."/plugins/auth.".$this->driverName."/class.".$this->driverName."AuthDriver.php";
-		if(is_file($xmlFile)){
-			
-		}
-	}
-			
+				
 	function preLogUser($sessionId){}	
 
 	function listUsers(){}
