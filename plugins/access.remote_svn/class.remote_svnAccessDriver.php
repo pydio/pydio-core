@@ -33,19 +33,19 @@
  * 
  * Description : Still experimental, browse an SVN repository.
  */
-include_once(INSTALL_PATH."/plugins/ajxp.remote_fs/class.remote_fsDriver.php");
+include_once(INSTALL_PATH."/plugins/access.remote_fs/class.remote_fsAccessDriver.php");
 
-class remote_svnDriver extends remote_fsDriver 
+class remote_svnAccessDriver extends remote_fsAccessDriver 
 {
-	function remote_svnDriver($driverName, $filePath, $repository){
-		parent::remote_fsDriver($driverName, "", $repository);
+	function remote_svnAccessDriver($driverName, $filePath, $repository){
+		parent::remote_fsAccessDriver($driverName, "", $repository);
 		// ADDITIONNAL ACTIONS
-		$this->xmlFilePath = INSTALL_PATH."/plugins/ajxp.remote_svn/svnActions.xml";
+		$this->xmlFilePath = INSTALL_PATH."/plugins/access.remote_svn/svnActions.xml";
 		$this->parseXMLActions();
 	}
 
 	function sendInfoPanelsDef(){
-		$fileData = file_get_contents(INSTALL_PATH."/plugins/ajxp.remote_svn/svnActions.xml");
+		$fileData = file_get_contents(INSTALL_PATH."/plugins/access.remote_svn/svnActions.xml");
 		$matches = array();
 		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
 		if(count($matches)){

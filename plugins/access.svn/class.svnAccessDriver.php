@@ -35,7 +35,7 @@
  */
 require_once("svn_lib.inc.php");
 
-class svnDriver extends AbstractAccessDriver {
+class svnAccessDriver extends AbstractAccessDriver {
 	
 	var $listingParser;
 	var $xmlOutput = "";
@@ -45,7 +45,7 @@ class svnDriver extends AbstractAccessDriver {
 	var $crtElement = array();
 	var $crtPath;
 	
-	function svnDriver($driverName, $filePath, $repository){
+	function svnAccessDriver($driverName, $filePath, $repository){
 		parent::AbstractAccessDriver($driverName, $filePath, $repository);
 	}
 	
