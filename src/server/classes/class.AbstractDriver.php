@@ -38,7 +38,14 @@ class AbstractDriver {
 	/**
 	 * @var String
 	 */
-	var $driverName;
+	var $driverName = "";
+	
+	/**
+	 *
+	 * @var String
+	 */
+	var $driverType = "";
+	
 	/**
 	 * @var String
 	 */
@@ -54,8 +61,8 @@ class AbstractDriver {
 	
 	function AbstractDriver($driverName) {
 		// Load config file if there is one
-		if(is_file(INSTALL_PATH."/server/conf/conf.".$driverName.".inc")){
-			include_once(INSTALL_PATH."/server/conf/conf.".$driverName.".inc");
+		if(is_file(INSTALL_PATH."/server/conf/conf.".$this->driverType.".".$driverName.".inc")){
+			include_once(INSTALL_PATH."/server/conf/conf.".$this->driverType.".".$driverName.".inc");
 			if(isSet($DRIVER_CONF)){
 				$this->driverConf = $DRIVER_CONF;
 			}

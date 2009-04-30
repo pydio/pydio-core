@@ -36,6 +36,8 @@
 class AbstractConfDriver extends AbstractDriver {
 		
 	var $options;
+	var $driverType = "conf";
+
 	/**
 	 * Initialize the driver with a given set of options
 	 *

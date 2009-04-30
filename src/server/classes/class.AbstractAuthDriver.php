@@ -37,6 +37,7 @@ class AbstractAuthDriver extends AbstractDriver {
 	
 	var $options;
 	var $driverName = "abstract";
+	var $driverType = "auth";
 	
 	function init($options){
 		$this->options = $options;
