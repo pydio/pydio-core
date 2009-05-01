@@ -476,6 +476,20 @@ FilesList = Class.create(SelectableElements, {
 			}
 		}	
 		this.initRows();
+		/*
+		if(this.paginationData && this.paginationData.get('count') && l < parseInt(this.paginationData.get('count'))){
+			for(var p=0;p<(parseInt(this.paginationData.get('count'))-l);p++){
+				var newRow = new Element("div", {id:"fake_row_"+(p+l-2)});		
+				var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
+				newRow.setStyle({height:'24px'});
+				tBody.insert(newRow);
+				
+			}
+			$('table_rows_container').observe('scroll', function(e){
+				this.scrollDelayer(e);
+			}.bind(this) );
+		}
+		*/
 		ajaxplorer.updateHistory(this._currentRep);
 		if(this._displayMode == "list")
 		{
@@ -510,6 +524,28 @@ FilesList = Class.create(SelectableElements, {
 		ajaxplorer.getActionBar().fireSelectionChange();
 		ajaxplorer.infoPanel.update();
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
+	},
+	
+	scrollDelayer : function(event){		
+		if(this.scrollTimer){
+			window.clearTimeout(this.scrollTimer);
+		}
+		this.scrollTimer = window.setTimeout(function(){
+			this.scrollObserver(event);
+		}.bind(this), 500);
+	},
+	
+	scrollObserver : function(event){
+		var target = event.target;
+		var scrollHeight = target.scrollHeight;
+		var scrollTop = target.scrollTop;
+		//console.log(scrollTop);		
+		var rank = Math.floor(scrollTop / 24);
+		//$('fake_row_'+rank).insert(new Element('td', {colspan:4,style:'background-color:blue;'}));
+		if($('fake_row_'+rank)){
+			$('fake_row_'+rank).setStyle({backgroundColor:"blue"});
+		}
+		//Lazy load a given set of data, remove the "far ones"
 	},
 	
 	switchCurrentLabelToEdition : function(callback){
