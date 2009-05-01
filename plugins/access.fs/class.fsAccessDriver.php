@@ -475,7 +475,7 @@ class fsAccessDriver extends AbstractAccessDriver
 							$offset = (intval($page)-1)*$limitPerPage; 
 							$crtPage = $page;
 						}
-						$totalPages = ($countFiles % $limitPerPage);						
+						$totalPages = floor($countFiles / $limitPerPage) + 1;
 						$result = $this->listing($nom_rep, false, $offset, $limitPerPage);						
 					}else{
 						$result = $this->listing($nom_rep, $searchMode);
@@ -487,7 +487,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header();
 				if(isSet($totalPages) && isSet($crtPage)){
 					print '<columns switchDisplayMode="list" switchGridMode="filelist"/>';
-					print '<pagination total="'.$totalPages.'" current="'.$crtPage.'"/>';
+					print '<pagination count="'.$countFiles.'" total="'.$totalPages.'" current="'.$crtPage.'"/>';
 				}
 				foreach ($reps as $repIndex => $repName)
 				{
@@ -745,8 +745,9 @@ class fsAccessDriver extends AbstractAccessDriver
 		{
 			if($file != "." && $file !=".." && !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])){
 				$count++;
-			}
+			}			
 		}
+		closedir($handle);
 		return $count;
 	}
 	
