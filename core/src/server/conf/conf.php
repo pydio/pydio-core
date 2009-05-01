@@ -48,6 +48,8 @@ define("AUTH_MODE_REMOTE_PASSWORD", ""); //
 define("AUTH_MODE_REMOTE_PORT", 80); // 
 define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); // 
 
+// If you want to allow public URL to uploaded file, please set this folder writeable
+define("PUBLIC_URL_FOLDER", realpath(dirname(__FILE__)."/../../public")); // Set to '' to disable
 define("HTTPS_POLICY_FILE", "");
 
 /*********************************************************/

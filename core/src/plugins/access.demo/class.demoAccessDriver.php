@@ -42,7 +42,7 @@ class demoAccessDriver extends fsAccessDriver
 	*/
 	var $repository;
 	
-	function demoAccessDriver($driverName, $filePath, $repository){
+	function demoAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
 		parent::fsAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);		
 	}
 	

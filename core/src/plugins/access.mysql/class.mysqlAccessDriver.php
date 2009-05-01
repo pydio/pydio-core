@@ -37,18 +37,46 @@
  */
 class mysqlAccessDriver extends AbstractAccessDriver 
 {
-	/**
-	* @var Repository
-	*/
-	var $repository;
+    /** The user name */
+    var $user;
+    /** The user password */
+    var $password;
 	
-	function  mysqlAccessDriver($driverName, $filePath, $repository){
+	function  mysqlAccessDriver($driverName, $filePath, $repository, $optOptions = NULL)
+    {
+        $this->user = $optOptions ? $optOptions["user"] : $repository->getOption("DB_USER");
+        $this->password = $optOptions ? $optOptions["password"] : $repository->getOption("DB_PASS");
+    
 		parent::AbstractAccessDriver($driverName, $filePath, $repository);		
 	}
 	
 	function initRepository(){
 		$link = $this->createDbLink();
 		$this->closeDbLink($link);
+	}
+	
+
+	function createDbLink(){
+		$link = FALSE;
+		//Connects to the MySQL Database.		
+		$host = $this->repository->getOption("DB_HOST");
+		$dbname = $this->repository->getOption("DB_NAME");
+		$link = @mysql_connect($host, $this->user, $this->pass);
+		if(!$link) {
+			$ajxpExp = new AJXP_Exception("Cannot connect to server!");
+			AJXP_Exception::errorToXml($ajxpExp);
+		}
+		if(!@mysql_select_db($dbname, $link)){
+			$ajxpExp = new AJXP_Exception("Cannot find database!");
+			AJXP_Exception::errorToXml($ajxpExp);
+		}
+		return $link;
+	}
+	
+	function closeDbLink($link){
+		if(!mysql_close($link)){
+			return new AJXP_Exception("Cannot close connection!");
+		}
 	}
 	
 	function switchAction($action, $httpVars, $fileVars){
@@ -404,33 +432,6 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		}
 		
 		return $xmlBuffer;
-	}
-	
-
-	function createDbLink(){
-		$link = FALSE;
-		//Connects to the MySQL Database.		
-		$repo = ConfService::getRepository();
-		$user = $repo->getOption("DB_USER");
-		$pass = $repo->getOption("DB_PASS");
-		$host = $repo->getOption("DB_HOST");
-		$dbname = $repo->getOption("DB_NAME");
-		$link = @mysql_connect($host, $user, $pass);
-		if(!$link) {
-			$ajxpExp = new AJXP_Exception("Cannot connect to server!");
-			AJXP_Exception::errorToXml($ajxpExp);
-		}
-		if(!@mysql_select_db($dbname, $link)){
-			$ajxpExp = new AJXP_Exception("Cannot find database!");
-			AJXP_Exception::errorToXml($ajxpExp);
-		}
-		return $link;
-	}
-	
-	function closeDbLink($link){
-		if(!mysql_close($link)){
-			return new AJXP_Exception("Cannot close connection!");
-		}
 	}
 	
 	function getSize($tablename){

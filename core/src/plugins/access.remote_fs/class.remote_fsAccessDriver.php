@@ -36,7 +36,7 @@
 class remote_fsAccessDriver extends AbstractAccessDriver 
 {
 	
-	function remote_fsAccessDriver($driverName, $filePath, $repository){
+	function remote_fsAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
 		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
 		unset($this->actions["upload"]);
 		// ADD additional actions

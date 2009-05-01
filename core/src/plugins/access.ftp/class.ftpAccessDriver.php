@@ -11,8 +11,15 @@ class ftpAccessDriver extends AbstractAccessDriver
 	* @var Repository
 	*/
 	var $connect;
+    /** The user to connect to */
+    var $user;
+    /** The password to use */
+    var $password;
 
-	function  ftpAccessDriver($driverName, $filePath, $repository){
+	function  ftpAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
+        $this->user = $optOptions ? $optOptions["user"] : $repo->getOption("FTP_USER");
+        $this->password = $optOptions ? $optOptions["password"] : $repo->getOption("FTP_PASS");
+
 		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
 	}
 	
@@ -23,17 +30,14 @@ class ftpAccessDriver extends AbstractAccessDriver
 	function createFTPLink(){ 
         $link = FALSE;  
         //Connects to the FTP.          
-        $repo = ConfService::getRepository();
-        $user = $repo->getOption("FTP_USER");
-        $pass = $repo->getOption("FTP_PASS");
-        $host = $repo->getOption("FTP_HOST");
-        $this->path = $repo->getOption("PATH");
+        $host = $this->repository->getOption("FTP_HOST");
+        $this->path = $this->repository->getOption("PATH");
         $link = @ftp_connect($host);
         if(!$link) {
                 $ajxpExp = new AJXP_Exception("Cannot connect to FTP server!");
                 AJXP_Exception::errorToXml($ajxpExp);
         }
-        if(!@ftp_login($link,$user,$pass)){
+        if(!@ftp_login($link,$this->user,$this->pass)){
                 $ajxpExp = new AJXP_Exception("Cannot login to FTP server!");
                 AJXP_Exception::errorToXml($ajxpExp);
         }
