@@ -248,8 +248,12 @@ class ConfService
 	}
 	
 	function getRepositoryById($repoId){
+		global $G_REPOSITORIES;
+		if(isSet($G_REPOSITORIES[$repoId])) return $G_REPOSITORIES[$repoId];
+		/*
 		$confStorage = ConfService::getConfStorageImpl();
 		return $confStorage->getRepositoryById($repoId);
+		*/
 	}
 	
 	/**
