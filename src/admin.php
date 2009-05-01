@@ -119,8 +119,7 @@ switch ($action)
 		}
 		$wallet = $user->getPref("AJXP_WALLET");
 		if(!is_array($wallet)) $wallet = array();
-		$repo = ConfService::getRepositoryById($_GET["repository_id"]);
-		$repoID = $repo->getUniqueId();
+		$repoID = $_GET["repository_id"];
 		if(!array_key_exists($repoID, $wallet)){
 			$wallet[$repoID] = array();
 		}
