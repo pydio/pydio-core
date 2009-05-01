@@ -80,6 +80,8 @@ class SSHOperations
    var $makeDirCommand;
    /** The delete command */
    var $deleteCommand;
+   /** The chmod command */
+   var $chmodCommand;
    
    /** The SSH command itself */
    var $sshCommand;
@@ -97,6 +99,7 @@ class SSHOperations
       $this->moveCommand = "mv ";
       $this->makeDirCommand = "mkdir -p ";
       $this->deleteCommand = "rm -rf ";
+      $this->chmodCommand = "chmod -R ";
       $this->sshCommand = "ssh -o \"ConnectTimeout=5\""; 
       $this->server = $server;
       $this->account = $account;
@@ -384,7 +387,22 @@ class SSHOperations
         } else
         {
             // Single file download
-            return $this->executeRemoteCommand($this->server, $this->account, $this->password, '"'.$this->moveCommand.$pathToFile." ".$finalPath.'"');
+            return $this->executeRemoteCommand($this->server, $this->account, $this->password, '"'.$this->chmodCommand.$pathToFile." ".$finalPath.'"');
+        }
+    }
+    
+    /** Change the permission of a file (or directory) */
+    function chmodFile($pathToFile, $value)
+    {
+        if (is_array($pathToFile))
+        {
+            // Need to get an archive here
+            $command = $this->chmodCommand.$value." ".implode($pathToFile, " ");
+            return $this->executeRemoteCommand($this->server, $this->account, $this->password, '"'.$command.'"');
+        } else
+        {
+            // Single file download
+            return $this->executeRemoteCommand($this->server, $this->account, $this->password, '"'.$this->chmodCommand.$value." ".$pathToFile.'"');
         }
     }
     

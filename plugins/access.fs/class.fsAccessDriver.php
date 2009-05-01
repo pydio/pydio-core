@@ -333,7 +333,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$errorMessage = $error; break;
 				}
 				//$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
-				$logMessage="Successfully changed permission for ".count($changedFiles)." files or folders";
+				$logMessage="Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders";
 				$reload_file_list = $dir;
 				AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "filesCount"=>count($changedFiles)));
 		
@@ -1215,6 +1215,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	 */
 	function chmod($path, $chmodValue, $recursive=false, $nodeType="both", &$changedFiles)
 	{
+	    $chmodValue = octdec(ltrim($chmodValue, "0"));
 		if(is_file($path) && ($nodeType=="both" || $nodeType=="file")){
 			chmod($path, $chmodValue);
 			$changedFiles[] = $path;
