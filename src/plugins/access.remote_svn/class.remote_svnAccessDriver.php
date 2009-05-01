@@ -37,8 +37,8 @@ include_once(INSTALL_PATH."/plugins/access.remote_fs/class.remote_fsAccessDriver
 
 class remote_svnAccessDriver extends remote_fsAccessDriver 
 {
-	function remote_svnAccessDriver($driverName, $filePath, $repository){
-		parent::remote_fsAccessDriver($driverName, "", $repository);
+	function remote_svnAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
+		parent::remote_fsAccessDriver($driverName, "", $repository, $optOptions);
 		// ADDITIONNAL ACTIONS
 		$this->xmlFilePath = INSTALL_PATH."/plugins/access.remote_svn/svnActions.xml";
 		$this->parseXMLActions();

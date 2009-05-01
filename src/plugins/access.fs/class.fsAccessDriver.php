@@ -40,7 +40,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	*/
 	var $repository;
 	
-	function  fsAccessDriver($driverName, $filePath, $repository){
+	function  fsAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
 		parent::AbstractAccessDriver($driverName, $filePath, $repository);
 	}
 	

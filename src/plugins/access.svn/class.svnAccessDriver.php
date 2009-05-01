@@ -45,7 +45,7 @@ class svnAccessDriver extends AbstractAccessDriver {
 	var $crtElement = array();
 	var $crtPath;
 	
-	function svnAccessDriver($driverName, $filePath, $repository){
+	function svnAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
 		parent::AbstractAccessDriver($driverName, $filePath, $repository);
 	}
 	

@@ -37,10 +37,6 @@ require_once("class.SSHOperations.php");
 
 class sshAccessDriver extends AbstractAccessDriver 
 {
-	/** Should be in the form bob@distantServer.com or distantServer
-	* @var Repository
-	*/
-	var $repository;
 	/** The SSH operation object
 	* @var SSHOperation
 	*/
@@ -57,7 +53,7 @@ class sshAccessDriver extends AbstractAccessDriver
     var $charset;
     
 	
-	function  sshAccessDriver($driverName, $filePath, $repository){	
+	function  sshAccessDriver($driverName, $filePath, $repository, $optOption = NULL){	
         $repositoryPath = $repository->getOption("PATH");
         $accountLimit = strpos($repositoryPath, "@");
         if ($accountLimit !== false) 
@@ -67,8 +63,8 @@ class sshAccessDriver extends AbstractAccessDriver
             $repository->setOption("PATH", $repositoryPath);            
         }
         // Set the password from a per user specific config
-        $account = $this->getUserName($repository); 
-        $password = $this->getPassword($repository);
+        $account = $optOption ? $optOption["account"] : $this->getUserName($repository); 
+        $password = $optOption ? $optOption["password"] : $this->getPassword($repository);
         $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);
 		parent::AbstractAccessDriver($driverName, $filePath, $repository);
 	}
