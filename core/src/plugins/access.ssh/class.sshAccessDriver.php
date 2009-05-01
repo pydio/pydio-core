@@ -57,7 +57,7 @@ class sshAccessDriver extends AbstractAccessDriver
     var $charset;
     
 	
-	function  sshDriver($driverName, $filePath, $repository){	
+	function  sshAccessDriver($driverName, $filePath, $repository){	
         $repositoryPath = $repository->getOption("PATH");
         $accountLimit = strpos($repositoryPath, "@");
         if ($accountLimit !== false) 
@@ -68,7 +68,7 @@ class sshAccessDriver extends AbstractAccessDriver
         }
         // Set the password from a per user specific config
         $account = $this->getUserName($repository); 
-        $password = $this->getPassword($repository); 
+        $password = $this->getPassword($repository);
         $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);
 		parent::AbstractAccessDriver($driverName, $filePath, $repository);
 	}
@@ -227,6 +227,30 @@ class sshAccessDriver extends AbstractAccessDriver
 				
 			break;
 			
+            //------------------------------------
+            //  CHANGE FILE PERMISSION
+            //------------------------------------
+            case "chmod";
+
+                $messtmp="";
+                $changedFiles = array();
+                $value = "0".decoct(octdec(ltrim($chmod_value, "0"))); // On error, the command will fail
+  		        $result = $this->SSHOperation->chmodFile($this->makeName($selection->getFiles()), $chmod_value);
+				{
+				    $mess = ConfService::getMessages();
+				    if(strlen($result))
+				    {
+					    $errorMessage = $mess[114];
+				    }
+   				    else 
+				    {
+                        $logMessage="Successfully changed permission to ".$chmod_value." for ".count($selection->getFiles())." files or folders";
+                        AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "filesCount"=>count($selection->getFiles())));
+                        $reload_file_list = $dir;
+				     }
+				}
+
+            break;
 			//------------------------------------
 			//	SUPPRIMER / DELETE
 			//------------------------------------
@@ -686,7 +710,6 @@ class sshAccessDriver extends AbstractAccessDriver
 			return "$mess[102] $crtDir/$newFileName (".$fp.")";
 		}		
 	}
-	
 	
 	function delete($selectedFiles, &$logMessages)
 	{
