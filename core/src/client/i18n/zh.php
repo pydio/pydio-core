@@ -319,6 +319,11 @@ $mess=array(
 "283" => "总大小",
 "284" => "文件数量",
 "285" => "Cannot find user, please try again.\\n Make sur your Caps Lock is not engaged!",
-"286" => "Your user is out of date with the current version, please use the upgrade procedure."
+"286" => "Your user is out of date with the current version, please use the upgrade procedure.",
+"287" => "File Permissions",
+"288" => "User", 
+"289" => "Group",
+"290" => "All",
+"291" => "Apply recursively?"
 );
 ?>

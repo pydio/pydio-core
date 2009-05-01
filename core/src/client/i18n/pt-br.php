@@ -320,6 +320,11 @@ $mess=array(
 "283" => "Tamanho total",
 "284" => "Número de arquivos",
 "285" => "Não foi possível encontrar o usuário, por favor tente novamente.\\n Verifique se o Caps Lock não está ativado!",
-"286" => "Seu usuário está desatualizado para esta versão, por favor use o procedimento de atualização."
+"286" => "Seu usuário está desatualizado para esta versão, por favor use o procedimento de atualização.",
+"287" => "File Permissions",
+"288" => "User", 
+"289" => "Group",
+"290" => "All",
+"291" => "Apply recursively?"
 );
 ?>
