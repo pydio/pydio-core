@@ -325,6 +325,11 @@ $mess=array(
 "288" => "User", 
 "289" => "Group",
 "290" => "All",
-"291" => "Apply recursively?"
+"291" => "Apply recursively?",
+"292" => "Public link",
+"293" => "Create a public link to this file",
+"294" => "Link time expiration (in days)",
+"295" => "Password (leave blank for now)",
+"296" => "Please copy the link below:",
 );
 ?>
