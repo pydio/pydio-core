@@ -253,6 +253,56 @@ AJXP_MESSAGE[174]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="public_url" fileDefault="false">
+			<gui text="292" title="292" src="public_url.png" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="get">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection = ajaxplorer.getFilesList().getUserSelection();
+					if(userSelection.isUnique() && !userSelection.hasDir())
+					{
+						var publicUrl = ajxpServerAccessPath+'?action=public_url';
+						publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
+					}
+                    modal.showDialogForm('Get', 'public_url_form', null, function(){
+                        var oForm = $(modal.getForm());
+                        ajaxplorer.actionBar.submitForm(oForm);
+                        hideLightBox(true);
+                        return false;
+                    });
+					]]></clientCallback>
+					<clientForm id="public_url_form"><![CDATA[
+					<div id="public_url_form" title="AJXP_MESSAGE[293]"  box_width="410">
+					<div class="dialogLegend">AJXP_MESSAGE[294] <input name="expiration" type="text" value="0"></div><br/>
+					<div class="dialogLegend">AJXP_MESSAGE[295] <input name="password" type="password" value=""></div><br/>
+					<div class="dialogLegend">AJXP_MESSAGE[296]</div><br/>
+					<div id="public_url_container"></div>
+					</div>]]>
+					</clientForm>
+					<clientListener name="selectionChange"><![CDATA[
+					if(ajaxplorer){
+						var userSelection = ajaxplorer.getFilesList().getUserSelection();
+						var action = ajaxplorer.getActionBar().getActionByName("public_url");
+                        if(userSelection.isEmpty() && action){
+                            action.disable();
+                        }
+						else if(userSelection.hasDir() && action){
+						    action.selectionContext.dir = false;
+                            action.disable();
+						}
+						else if(userSelection.isUnique() && action){
+						    action.enable();
+						}
+					}
+					]]></clientListener>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
 		<action name="edit">
 			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
