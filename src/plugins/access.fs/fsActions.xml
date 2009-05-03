@@ -263,43 +263,41 @@ AJXP_MESSAGE[174]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection = ajaxplorer.getFilesList().getUserSelection();
-					if(userSelection.isUnique() && !userSelection.hasDir())
-					{
-						var publicUrl = ajxpServerAccessPath+'?action=public_url';
-						publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
-					}
+					if(!window.ajxpPublicUrlCallback){
+						window.ajxpPublicUrlCallback = function(){
+							var userSelection = ajaxplorer.getFilesList().getUserSelection();
+							if(!userSelection.isUnique() || userSelection.hasDir()) return;
+							var userSelection = ajaxplorer.getFilesList().getUserSelection();
+							var publicUrl = ajxpServerAccessPath+'?get_action=public_url';
+							publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
+	                        var oForm = $(modal.getForm());
+	                        var conn = new Connexion(publicUrl);
+	                        conn.addParameter('get_action','public_url');
+	                        conn.onComplete = function(transport){
+	                        	var cont = oForm.select('input[id="public_url_container"]')[0];
+	                        	if(cont){
+	                        		cont.value = transport.responseText;
+	                        		cont.select();
+	                        	}
+	                        	modal.refreshDialogAppearance();
+	                        };
+	                        conn.sendSync();
+	                    };
+                    }
                     modal.showDialogForm('Get', 'public_url_form', null, function(){
-                        var oForm = $(modal.getForm());
-                        ajaxplorer.actionBar.submitForm(oForm);
                         hideLightBox(true);
                         return false;
-                    });
+                    }, null, true);
 					]]></clientCallback>
-					<clientForm id="public_url_form"><![CDATA[
-					<div id="public_url_form" title="AJXP_MESSAGE[293]"  box_width="410">
-					<div class="dialogLegend">AJXP_MESSAGE[294] <input name="expiration" type="text" value="0"></div><br/>
-					<div class="dialogLegend">AJXP_MESSAGE[295] <input name="password" type="password" value=""></div><br/>
-					<div class="dialogLegend">AJXP_MESSAGE[296]</div><br/>
-					<div id="public_url_container"></div>
+					<clientForm id="public_url"><![CDATA[
+					<div id="public_url_form" title="AJXP_MESSAGE[293]"  box_width="280" action="public_url">
+					<div class="dialogLegend"><span message_id="294">AJXP_MESSAGE[294]</span> <input name="expiration" type="text" value="0" style="width:25px;"></div>
+					<div class="dialogLegend"><span message_id="295">AJXP_MESSAGE[295]</span> <input name="password" type="password" value=""></div>
+					<div class="dialogButtons" style="margin-bottom:20px;"><input type="button" name="generate" value="Generate" class="dialogButton dialogFocus" onClick="window.ajxpPublicUrlCallback(); return false;"/></div>
+					<div class="dialogLegend"><span message_id="296">AJXP_MESSAGE[296]</span></div>
+					<input id="public_url_container" type="text"/>
 					</div>]]>
-					</clientForm>
-					<clientListener name="selectionChange"><![CDATA[
-					if(ajaxplorer){
-						var userSelection = ajaxplorer.getFilesList().getUserSelection();
-						var action = ajaxplorer.getActionBar().getActionByName("public_url");
-                        if(userSelection.isEmpty() && action){
-                            action.disable();
-                        }
-						else if(userSelection.hasDir() && action){
-						    action.selectionContext.dir = false;
-                            action.disable();
-						}
-						else if(userSelection.isUnique() && action){
-						    action.enable();
-						}
-					}
-					]]></clientListener>
+					</clientForm>					
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
