@@ -119,7 +119,7 @@ class AbstractAccessDriver extends AbstractDriver {
         '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
         '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
         '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv));  '."\n".
-        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 ".md5($inputData)); exit(); } '."\n".
+        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"; exit(); } '."\n".
         '   // Ok extract the data '."\n".
         '   $data = unserialize($inputData); AbstractAccessDriver::loadPubliclet($data); ?'.'>';
         if (@file_put_contents(PUBLIC_URL_FOLDER."/".$hash.".php", $fileData) === FALSE)
