@@ -48,8 +48,18 @@ define("AUTH_MODE_REMOTE_PASSWORD", ""); //
 define("AUTH_MODE_REMOTE_PORT", 80); // 
 define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); // 
 
-// If you want to allow public URL to uploaded file, please set this folder writeable
-define("PUBLIC_URL_FOLDER", realpath(dirname(__FILE__)."/../../public")); // Set to '' to disable
+// If you want to allow public URL to uploaded file please create this folder.
+// Set it writeable by the server and accessible to public (see next variable).
+// This is the absolute path of the folder on the server, The default value expects 
+// a "public" folder at the root of your ajaxplorer directory.
+define("PUBLIC_DOWNLOAD_FOLDER", realpath(dirname(__FILE__)."/../../public")); // Set to '' to disable
+
+// By default, the public download url will be "your ajaxplorer root install"/PUBLIC_DOWNLOAD_FOLDER.
+// If you want to set this to another value, use the variable below; otherwise leave empty.
+// Example : http://www.mypublicdomain.com/publicdata [NO TRAILING SLASH!]
+define("PUBLIC_DOWNLOAD_URL", "");
+
+
 define("HTTPS_POLICY_FILE", "");
 
 /*********************************************************/
@@ -75,24 +85,6 @@ $AUTH_DRIVER = array(
 		"AUTOCREATE_AJXPUSER" 	=> false, 
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
-
-/*
-$AUTH_DRIVER = array(
-	"NAME"		=> "sql",
-	"OPTIONS"	=> array(
-		"AUTOCREATE_AJXPUSER" 	=> false, 
-		"TRANSMIT_CLEAR_PASS"	=> true,
-		"SQL_DRIVER"			=> array(
-			"driver"=>"mysql", 
-			"host"=>"localhost", 
-			"username"=>"root", 
-			"password"=>"", 
-			"database"=>"ajxp", 
-			"charset"=>"utf8"
-		)
-	)
-);
-*/
 
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.

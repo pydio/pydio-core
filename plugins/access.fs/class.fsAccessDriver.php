@@ -441,8 +441,8 @@ class fsAccessDriver extends AbstractAccessDriver
 						$atts = array();
 						if(!$fileListMode && !$zipEntry["folder"]) continue;
 						$atts[] = "is_file=\"".($zipEntry["folder"]?"false":"true")."\"";
-						$atts[] = "text=\"".str_replace("&", "&amp;", basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])))."\"";
-						$atts[] = "filename=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
+						$atts[] = "text=\"".Utils::xmlEntities( basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])))."\"";
+						$atts[] = "filename=\"".Utils::xmlEntities( SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
 						if($fileListMode){
 							$atts[] = "filesize=\"".Utils::roundSize($zipEntry["size"])."\"";
 							$atts[] = "bytesize=\"".$zipEntry["size"]."\"";
@@ -532,7 +532,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						if($bytesize < 0) $bytesize = sprintf("%u", $bytesize);
 						$atts[] = "filesize=\"".Utils::roundSize($bytesize)."\"";
 						$atts[] = "bytesize=\"".$bytesize."\"";
-						$atts[] = "filename=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($dir."/".$repIndex))."\"";
+						$atts[] = "filename=\"".Utils::xmlEntities( SystemTextEncoding::toUTF8($dir."/".$repIndex))."\"";
 						$atts[] = "icon=\"".(is_file($currentFile)?SystemTextEncoding::toUTF8($repName):(is_dir($currentFile) ? "folder.png" : "mime-empty.png"))."\"";
 						
 						$attributes = join(" ", $atts);
@@ -540,10 +540,10 @@ class fsAccessDriver extends AbstractAccessDriver
 					}
 					else 
 					{
-						$folderBaseName = str_replace("&", "&amp;", $repName);
+						$folderBaseName = Utils::xmlEntities( $repName);
 						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?dir=".$dir."/".$folderBaseName);
 						$link = urlencode($link);						
-						$folderFullName = str_replace("&", "&amp;", $dir)."/".$folderBaseName;
+						$folderFullName = Utils::xmlEntities( $dir)."/".$folderBaseName;
 						$parentFolderName = $dir;
 						if(!$completeMode){
 							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
@@ -554,7 +554,7 @@ class fsAccessDriver extends AbstractAccessDriver
 							$attributes = "icon=\"$icon\"  openicon=\"$openicon\" filename=\"".SystemTextEncoding::toUTF8($folderFullName)."\" src=\"$link\"";
 						}
 					}
-					print("<tree text=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($repName))."\" $attributes>");
+					print("<tree text=\"".Utils::xmlEntities( SystemTextEncoding::toUTF8($repName))."\" $attributes>");
 					print("</tree>");
 				}
 				// ADD RECYCLE BIN TO THE LIST
@@ -562,7 +562,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				{
 					if($fileListMode)
 					{
-						print("<tree text=\"".str_replace("&", "&amp;", $mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
+						print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
 					}
 					else 
 					{						

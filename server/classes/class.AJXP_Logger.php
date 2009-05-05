@@ -251,7 +251,7 @@ class AJXP_Logger {
 		$res = "";
 		$lines = file($fName);
 		foreach ($lines as $line){
-			$line = str_replace("&", "&amp;", $line);
+			$line = Utils::xmlEntities($line);
 			$matches = array();
 			if(preg_match("/(.*)\t(.*)\t(.*)\t(.*)\t(.*)\t(.*)$/", $line, $matches)!==false){
 				print(utf8_encode("<log date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\"/>"));
