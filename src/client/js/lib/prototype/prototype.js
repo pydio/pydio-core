@@ -3127,7 +3127,13 @@ document.viewport = {
 
     property[D] = 'client' + D;
 
-    viewport['get' + D] = function() { return element[property[D]] };
+    viewport['get' + D] = function() { 
+    	if(element[property[D]] && element[property[D]]!=0){
+	    	return element[property[D]] 
+    	}else{
+    		return document.getElementsByTagName('body')[0][property[D]];
+    	}
+    };
     return viewport['get' + D]();
   }
 
@@ -4342,10 +4348,11 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
   function element(event) {
     event = Event.extend(event);
 
-    var node = event.target, type = event.type,
-     currentTarget = event.currentTarget;
+    var node = event.target;    
+    var currentTarget = event.currentTarget;
 
     if (currentTarget && currentTarget.tagName) {
+   	  var type = event.type;
       if (type === 'load' || type === 'error' ||
         (type === 'click' && currentTarget.tagName.toLowerCase() === 'input'
           && currentTarget.type === 'radio'))
