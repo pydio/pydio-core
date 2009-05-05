@@ -346,8 +346,8 @@ switch ($action)
 			$nested = array();
 			print("<repository index=\"$index\"");
 			foreach ($value as $name => $option){
-				if(!is_array($option)){
-					print(" $name=\"$option\" ");
+				if(!is_array($option)){					
+					print(" $name=\"".Utils::xmlEntities($option)."\" ");
 				}else if(is_array($option)){
 					$nested[] = $option;
 				}

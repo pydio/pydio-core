@@ -270,8 +270,9 @@ AJXP_MESSAGE[174]<br/>
 							var userSelection = ajaxplorer.getFilesList().getUserSelection();
 							var publicUrl = ajxpServerAccessPath+'?get_action=public_url';
 							publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
-	                        var oForm = $(modal.getForm());
+	                        var oForm = $(modal.getForm());	                        
 	                        var conn = new Connexion(publicUrl);
+	                        conn.setParameters(oForm.serialize(true));
 	                        conn.addParameter('get_action','public_url');
 	                        conn.onComplete = function(transport){
 	                        	var cont = oForm.select('input[id="public_url_container"]')[0];

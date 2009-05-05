@@ -63,6 +63,13 @@ class AbstractAccessDriver extends AbstractDriver {
 		return parent::applyAction($actionName, $httpVars, $filesVar);
 	}
 	
+	function initXmlActionsFile($filePath){
+		parent::initXmlActionsFile($filePath);
+		if(isSet($this->actions["public_url"]) && !defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER)){
+			unset($this->actions["public_url"]);
+		}		
+	}
+	
 	/**
 	 * Print the XML for actions
 	 *
@@ -98,6 +105,9 @@ class AbstractAccessDriver extends AbstractDriver {
     */
     function writePubliclet($data)
     {
+    	if(!defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER)){
+    		return "Public URL folder does not exist!";
+    	}
         $data["DRIVER_NAME"] = $this->driverName;
         $data["XML_FILE_PATH"] = $this->xmlFilePath;
         $data["REPOSITORY"] = $this->repository;
@@ -119,15 +129,19 @@ class AbstractAccessDriver extends AbstractDriver {
         '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
         '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
         '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv));  '."\n".
-        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"; exit(); } '."\n".
+        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
         '   // Ok extract the data '."\n".
         '   $data = unserialize($inputData); AbstractAccessDriver::loadPubliclet($data); ?'.'>';
-        if (@file_put_contents(PUBLIC_URL_FOLDER."/".$hash.".php", $fileData) === FALSE)
+        if (@file_put_contents(PUBLIC_DOWNLOAD_FOLDER."/".$hash.".php", $fileData) === FALSE){
             return "Can't write to PUBLIC URL";
-        
-        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
-        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
-        return $fullUrl.str_replace(INSTALL_PATH, "", PUBLIC_URL_FOLDER)."/".$hash.".php";
+        }
+        if(defined('PUBLIC_DOWNLOAD_URL') && PUBLIC_DOWNLOAD_URL != ""){
+        	return PUBLIC_DOWNLOAD_URL."/".$hash.".php";
+        }else{
+	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
+	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
+	        return str_replace("\\", "/", $fullUrl.str_replace(INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER)."/".$hash.".php");
+        }
     }
 
     /** Load a uncyphered publiclet */
@@ -138,7 +152,7 @@ class AbstractAccessDriver extends AbstractDriver {
         if ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"])
         {
             // Remove the publiclet, it's done
-            if (strstr(PUBLIC_URL_FOLDER, $_SERVER["SCRIPT_FILENAME"]) !== FALSE)
+            if (strstr(PUBLIC_DOWNLOAD_FOLDER, $_SERVER["SCRIPT_FILENAME"]) !== FALSE)
                 unlink($_SERVER["SCRIPT_FILENAME"]);
             
             echo "Link is expired, sorry.";
@@ -163,7 +177,7 @@ class AbstractAccessDriver extends AbstractDriver {
         $driver->switchAction($data["ACTION"], array("file"=>$data["FILE_PATH"]), "");
     }
 
-    /** Create a publiclet object, that will be saved in PUBLIC_URL_FOLDER
+    /** Create a publiclet object, that will be saved in PUBLIC_DOWNLOAD_FOLDER
         Typically, the class will simply create a data array, and call return writePubliclet($data)
         @param $filePath The path to the file to share
         @return The full public URL to the publiclet.
