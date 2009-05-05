@@ -338,11 +338,18 @@ class sshAccessDriver extends AbstractAccessDriver
 			//	UPLOAD
 			//------------------------------------	
 			case "upload":
+				
+				$fancyLoader = false;
+				if(isSet($fileVars["Filedata"])){
+					$fancyLoader = true;
+					if($dir!="") $dir = "/".base64_decode($dir);
+				}
+				
                 if($dir!=""){$rep_source="/$dir";}
                 else $rep_source = "";
                 $destination = $rep_source;
                 $logMessage = "";
-                $fancyLoader = false;
+                //$fancyLoader = false;
                 foreach ($fileVars as $boxName => $boxData)
                 {
                     if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_") continue;

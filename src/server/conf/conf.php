@@ -48,8 +48,11 @@ define("AUTH_MODE_REMOTE_PASSWORD", ""); //
 define("AUTH_MODE_REMOTE_PORT", 80); // 
 define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); // 
 
-// If you want to allow public URL to uploaded file please create this folder.
-// Set it writeable by the server and accessible to public (see next variable).
+// If you want to allow public URL to uploaded file please do the following : 
+// + Create this folder.
+// + Set it writeable by the server and accessible to public (see next variable).
+// + Create an empty index.html file inside it, to be sure that the files listing is not directly browsable.
+//
 // This is the absolute path of the folder on the server, The default value expects 
 // a "public" folder at the root of your ajaxplorer directory.
 define("PUBLIC_DOWNLOAD_FOLDER", realpath(dirname(__FILE__)."/../../public")); // Set to '' to disable
