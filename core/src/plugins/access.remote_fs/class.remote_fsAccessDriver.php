@@ -122,7 +122,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				//$httpClient->setDebug(true);
 				$postData = array(
 					"get_action"=>"upload", 
-					"dir"=>$fData["destination"]);
+					"dir"=>base64_encode($fData["destination"]));
 					
 				$httpClient->postFile($crtRep->getOption("URI")."?ajxp_sessid=$sessionId", $postData, "Filedata", $fData);
 				if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
@@ -146,10 +146,16 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				exit(1);
 			break;
 			case "upload":
+				
+				$fancyLoader = false;
+				if(isSet($fileVars["Filedata"])){
+					$fancyLoader = true;
+					if($httpVars['dir']!="") $httpVars['dir'] = "/".base64_decode($httpVars['dir']);
+				}				
 				if(isSet($httpVars['dir']) && $httpVars['dir']!=""){$rep_source=$httpVars['dir'];}
 				else $rep_source = "/";
 				$logMessage = "";
-				$fancyLoader = false;				
+				//$fancyLoader = false;				
 				foreach ($filesVars as $boxName => $boxData)
 				{					
 					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;

@@ -103,7 +103,11 @@ class AbstractDriver {
 			// use callback;
 			$action = $this->actions[$actionName];
 			$callBack = $action["callback"];
-			return call_user_func(array(&$this, $callBack), $actionName, $httpVars, $filesVar);
+			try{
+				return call_user_func(array(&$this, $callBack), $actionName, $httpVars, $filesVar);
+			}catch (Exception $e){
+				return AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($e->getMessage())." (".basename($e->getFile())." - L.".$e->getLine().")", false);
+			}
 		}
 	}
 	

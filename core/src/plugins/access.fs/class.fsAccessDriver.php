@@ -345,16 +345,26 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------	
 			case "upload":
 
+				$fancyLoader = false;
+				if(isSet($fileVars["Filedata"])){
+					$fancyLoader = true;
+					if($dir!="") $dir = "/".base64_decode($dir);
+				}
 				if($dir!=""){$rep_source="/$dir";}
 				else $rep_source = "";
 				$destination=SystemTextEncoding::fromUTF8($this->getPath().$rep_source);
 				if(!$this->isWriteable($destination))
 				{
 					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
-					break;
+					if($fancyLoader){
+						header('HTTP/1.0 412 '.$errorMessage);
+						die('Error 412 '.$errorMessage);
+					}else{
+						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
+						break;
+					}
 				}	
 				$logMessage = "";
-				$fancyLoader = false;
 				foreach ($fileVars as $boxName => $boxData)
 				{
 					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
@@ -1195,12 +1205,16 @@ class fsAccessDriver extends AbstractAccessDriver
 				if (is_dir("$location/$file") && $file !=".." && $file!=".")
 				{
 					$this->deldir("$location/$file");
-					if(file_exists("$location/$file")){rmdir("$location/$file"); }
+					if(file_exists("$location/$file")){
+						rmdir("$location/$file"); 
+					}
 					unset($file);
 				}
 				elseif (!is_dir("$location/$file"))
 				{
-					if(file_exists("$location/$file")){unlink("$location/$file"); }
+					if(file_exists("$location/$file")){
+						unlink("$location/$file"); 
+					}
 					unset($file);
 				}
 			}
@@ -1209,7 +1223,10 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		else
 		{
-			if(file_exists("$location")) {unlink("$location");}
+			if(file_exists("$location")) {
+				$test = @unlink("$location");
+				if(!$test) throw new Exception("Cannot delete file ".$location);
+			}
 		}
 		if(basename(dirname($location)) == $this->repository->getOption("RECYCLE_BIN"))
 		{

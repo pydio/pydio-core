@@ -65,7 +65,7 @@ class AbstractAccessDriver extends AbstractDriver {
 	
 	function initXmlActionsFile($filePath){
 		parent::initXmlActionsFile($filePath);
-		if(isSet($this->actions["public_url"]) && !defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER)){
+		if(isSet($this->actions["public_url"]) && !defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER)){
 			unset($this->actions["public_url"]);
 		}		
 	}
