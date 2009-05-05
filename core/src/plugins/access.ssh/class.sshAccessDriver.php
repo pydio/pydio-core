@@ -386,6 +386,17 @@ class sshAccessDriver extends AbstractAccessDriver
                 exit;
                                                                                  
 			break;
+
+            //------------------------------------
+            // Public URL
+            //------------------------------------
+            case "public_url":
+				$file = SystemTextEncoding::fromUTF8($file);
+                $url = $this->makePubliclet($file, $password, $expiration);
+                header("Content-type:text/plain");
+                echo $url;
+                exit(1);                
+            break;
 			
 			//------------------------------------
 			//	XML LISTING
@@ -504,6 +515,14 @@ class sshAccessDriver extends AbstractAccessDriver
         }
     }
 	
+    /** The publiclet URL making */
+    function makePubliclet($filePath, $password, $expire)
+    {
+        $data = array("DRIVER"=>"ssh", "OPTIONS"=>array('account'=>$this->getUserName($this->repository), 'password'=>$this->getPassword($this->repository)), "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
+        return $this->writePubliclet($data);
+    }
+
+    
 	function zipListing($zipPath, $localPath, &$filteredList){
 		require_once("server/classes/pclzip.lib.php");
 		$crtZip = new PclZip($this->getPath()."/".$zipPath);
@@ -531,6 +550,8 @@ class sshAccessDriver extends AbstractAccessDriver
 		return $crtZip;		
 	}
 	
+    
+    
 	function initName($dir)
 	{
 		$racine = $this->getPath();		
@@ -601,304 +622,6 @@ class sshAccessDriver extends AbstractAccessDriver
 	{
 		$tmp = mktime(substr($time, 11, 2), substr($time, 14, 2), 0, substr($time, 5, 2), substr($time, 8, 2), substr($time, 0, 4));
 		return $tmp;//date("d/m/Y H:i",$tmp);
-	}
-	
-	function renameAction($actionName, $httpVars)
-	{
-		$filePath = SystemTextEncoding::fromUTF8($httpVars["file"]);
-		$newFilename = SystemTextEncoding::fromUTF8($httpVars["filename_new"]);
-		return $this->rename($filePath, $newFilename);
-	}
-	
-	function rename($filePath, $filename_new)
-	{
-		$nom_fic=basename($filePath);
-		$mess = ConfService::getMessages();
-		$filename_new=Utils::processFileName($filename_new);
-		$old=$this->getPath()."/$filePath";
-		if(!is_writable($old))
-		{
-			return $mess[34]." ".$nom_fic." ".$mess[99];
-		}
-		$new=dirname($old)."/".$filename_new;
-		if($filename_new=="")
-		{
-			return "$mess[37]";
-		}
-		if(file_exists($new))
-		{
-			return "$filename_new $mess[43]"; 
-		}
-		if(!file_exists($old))
-		{
-			return $mess[100]." $nom_fic";
-		}
-		rename($old,$new);
-		return null;		
-	}
-	
-	function autoRenameForDest($destination, $fileName){
-		if(!is_file($destination."/".$fileName)) return $fileName;
-		$i = 1;
-		$ext = "";
-		$name = "";
-		$split = split("\.", $fileName);
-		if(count($split) > 1){
-			$ext = ".".$split[count($split)-1];
-			array_pop($split);
-			$name = join("\.", $split);
-		}else{
-			$name = $fileName;
-		}
-		while (is_file($destination."/".$name."-$i".$ext)) {
-			$i++; // increment i until finding a non existing file.
-		}
-		return $name."-$i".$ext;
-	}
-	
-	function mkDir($crtDir, $newDirName)
-	{
-		$mess = ConfService::getMessages();
-		if($newDirName=="")
-		{
-			return "$mess[37]";
-		}
-		if(file_exists($this->getPath()."/$crtDir/$newDirName"))
-		{
-			return "$mess[40]"; 
-		}
-		if(!is_writable($this->getPath()."/$crtDir"))
-		{
-			return $mess[38]." $crtDir ".$mess[99];
-		}
-		mkdir($this->getPath()."/$crtDir/$newDirName",0775);
-		return null;		
-	}
-	
-	function createEmptyFile($crtDir, $newFileName)
-	{
-		$mess = ConfService::getMessages();
-		if($newFileName=="")
-		{
-			return "$mess[37]";
-		}
-		if(file_exists($this->getPath()."/$crtDir/$newFileName"))
-		{
-			return "$mess[71]";
-		}
-		if(!is_writable($this->getPath()."/$crtDir"))
-		{
-			return "$mess[38] $crtDir $mess[99]";
-		}
-		
-		$fp=fopen($this->getPath()."/$crtDir/$newFileName","w");
-		if($fp)
-		{
-			if(eregi("\.html$",$newFileName)||eregi("\.htm$",$newFileName))
-			{
-				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
-			}
-			fclose($fp);
-			return null;
-		}
-		else
-		{
-			return "$mess[102] $crtDir/$newFileName (".$fp.")";
-		}		
-	}
-	
-	function delete($selectedFiles, &$logMessages)
-	{
-		$mess = ConfService::getMessages();
-		foreach ($selectedFiles as $selectedFile)
-		{	
-			if($selectedFile == "" || $selectedFile == DIRECTORY_SEPARATOR)
-			{
-				return $mess[120];
-			}
-			$fileToDelete=$this->getPath().$selectedFile;
-			if(!file_exists($fileToDelete))
-			{
-				$logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
-				continue;
-			}		
-			$this->deldir($fileToDelete);
-			if(is_dir($fileToDelete))
-			{
-				$logMessages[]="$mess[38] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
-			}
-			else 
-			{
-				$logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
-			}
-		}
-		return null;
-	}
-	
-	
-	
-	function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
-	{
-		$mess = ConfService::getMessages();		
-		$destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
-		$realSrcFile = $this->repository->getOption("PATH")."/$srcFile";
-		$recycle = $this->repository->getOption("RECYCLE_BIN");		
-		if(!file_exists($realSrcFile))
-		{
-			$error[] = $mess[100].$srcFile;
-			return ;
-		}
-		if($realSrcFile==$destFile)
-		{
-			$error[] = $mess[101];
-			return ;
-		}
-		if(is_dir($realSrcFile))
-		{
-			$errors = array();
-			$succFiles = array();
-			$dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
-			if(count($errors))
-			{
-				$error[] = $mess[114];
-				return ;
-			}			
-		}
-		else 
-		{
-			$res = copy($realSrcFile,$destFile);
-			if($res != 1)
-			{
-				$error[] = $mess[114];
-				return ;
-			}
-		}
-		
-		if($move)
-		{
-			// Now delete original
-			$this->deldir($realSrcFile); // both file and dir
-			$messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
-			if($destDir == "/".$recycle)
-			{
-				RecycleBinManager::fileToRecycle($srcFile);
-				$messagePart = $mess[123]." ".$mess[122];
-			}
-			if(isset($dirRes))
-			{
-				$success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
-			}
-			else 
-			{
-				$success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
-			}
-		}
-		else
-		{			
-			if($destDir == "/".$this->repository->getOption("RECYCLE_BIN"))
-			{
-				RecycleBinManager::fileToRecycle($srcFile);
-			}
-			if(isSet($dirRes))
-			{
-				$success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir)." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].")";	
-			}
-			else 
-			{
-				$success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir);
-			}
-		}
-		
-	}
-
-	// A function to copy files from one directory to another one, including subdirectories and
-	// nonexisting or newer files. Function returns number of files copied.
-	// This function is PHP implementation of Windows xcopy  A:\dir1\* B:\dir2 /D /E /F /H /R /Y
-	// Syntaxis: [$number =] dircopy($sourcedirectory, $destinationdirectory [, $verbose]);
-	// Example: $num = dircopy('A:\dir1', 'B:\dir2', 1);
-
-	function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false) 
-	{
-		$num = 0;
-		if(!is_dir($dstdir)) mkdir($dstdir);
-		if($curdir = opendir($srcdir)) 
-		{
-			while($file = readdir($curdir)) 
-			{
-				if($file != '.' && $file != '..') 
-				{
-					$srcfile = $srcdir . DIRECTORY_SEPARATOR . $file;
-					$dstfile = $dstdir . DIRECTORY_SEPARATOR . $file;
-					if(is_file($srcfile)) 
-					{
-						if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
-						if($ow > 0) 
-						{
-							if($verbose) echo "Copying '$srcfile' to '$dstfile'...";
-							if(copy($srcfile, $dstfile)) 
-							{
-								touch($dstfile, filemtime($srcfile)); $num++;
-								if($verbose) echo "OK\n";
-								$success[] = $srcfile;
-							}
-							else 
-							{
-								$errors[] = $srcfile;
-							}
-						}
-					}
-					else if(is_dir($srcfile)) 
-					{
-						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose);
-					}
-				}
-			}
-			closedir($curdir);
-		}
-		return $num;
-	}
-	
-	function simpleCopy($origFile, $destFile)
-	{
-		return copy($origFile, $destFile);
-	}
-	
-	function isWriteable($dir)
-	{
-		return is_writable($dir);
-	}
-	
-	function deldir($location)
-	{
-		if(is_dir($location))
-		{
-			$all=opendir($location);
-			while ($file=readdir($all))
-			{
-				if (is_dir("$location/$file") && $file !=".." && $file!=".")
-				{
-					$this->deldir("$location/$file");
-					if(file_exists("$location/$file")){rmdir("$location/$file"); }
-					unset($file);
-				}
-				elseif (!is_dir("$location/$file"))
-				{
-					if(file_exists("$location/$file")){unlink("$location/$file"); }
-					unset($file);
-				}
-			}
-			closedir($all);
-			rmdir($location);
-		}
-		else
-		{
-			if(file_exists("$location")) {unlink("$location");}
-		}
-		if(basename(dirname($location)) == $this->repository->getOption("RECYCLE_BIN"))
-		{
-			// DELETING FROM RECYCLE
-			RecycleBinManager::deleteFromRecycle($location);
-		}
 	}
 	
 	/**
