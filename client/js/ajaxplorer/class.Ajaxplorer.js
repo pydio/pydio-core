@@ -405,7 +405,7 @@ Ajaxplorer = Class.create({
 	
 	tempoMessageDivClosing: function(){
 		this.messageDivOpen = true;
-		setTimeout('ajaxplorer.closeMessageDiv()', 3000);
+		setTimeout('ajaxplorer.closeMessageDiv()', 6000);
 	},
 	
 	displayMessage: function(messageType, message){
