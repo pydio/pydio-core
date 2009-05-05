@@ -89,7 +89,7 @@ class AbstractAccessDriver extends AbstractDriver {
         @param $data The publiclet data array to write 
                      The data array must have the following keys:
                      - DRIVER      The driver used to get the file's content      
-                     - OPTION      The driver options to be successfully constructed (usually, the user and password)
+                     - OPTIONS     The driver options to be successfully constructed (usually, the user and password)
                      - FILE_PATH   The path to the file's content
                      - PASSWORD    If set, the written publiclet will ask for this password before sending the content
                      - ACTION      If set, action to perform
@@ -98,49 +98,69 @@ class AbstractAccessDriver extends AbstractDriver {
     */
     function writePubliclet($data)
     {
-          $data["DRIVER_NAME"] = $this->driverName;
-          $data["XML_FILE_PATH"] = $this->xmlFilePath;
-          $data["REPOSITORY"] = $this->repository;
-          if ($data["ACTION"] == "") $data["ACTION"] = "download";
-          // Create a random key
-          $data["FINAL_KEY"] = md5(mt_rand().time());
-          // Cypher the data with a random key
-          $outputData = serialize($data);
-          // Hash the data to make sure it wasn't modified
-          $hash = md5($outputData);
-          // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-          $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-          // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
-          $outputData = serialize(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB, $iv));
-          // Okay, write the file:
-          $fileData = "<"."?"."php \n".
-          '   require_once("'.AXJP_INSTALL_PATH.'"/server/conf/conf.php"); '."\n".
-          '   require_once("'.AXJP_INSTALL_PATH.'"/server/classes/class.AbstractDriver.php"); '."\n".
-          '   $id = str_replace(".php", "", basename($_SERVER["PHP_SELF"])); '."\n". // Not using "" as php would replace $ inside
-          '   $cypheredData = unserialize("'.$outputData.'"); '."\n".
-          '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
-          '   $inputData = unserialize(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv));  '."\n".
-          '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed"); exit(); } '."\n".
-          '   // Ok extract the data '."\n".
-          '   $data = unserialize($inputData); AbstractAccessDriver::loadPubliclet($data); ?'.'>';
-          file_put_content(PUBLIC_URL_FOLDER."/".$hash.".php");   
-          return str_replace(AJXP_INSTALL_PATH, substr($_SERVER["REQUEST_URI"], 0, strlen($_SERVER["REQUEST_URI"]) - strlen(basename($_SERVER["REQUEST_URI"]))), 
-                             PUBLIC_URL_FOLDER."/".$hash.".php");
+        $data["DRIVER_NAME"] = $this->driverName;
+        $data["XML_FILE_PATH"] = $this->xmlFilePath;
+        $data["REPOSITORY"] = $this->repository;
+        if ($data["ACTION"] == "") $data["ACTION"] = "download";
+        // Create a random key
+        $data["FINAL_KEY"] = md5(mt_rand().time());
+        // Cypher the data with a random key
+        $outputData = serialize($data);
+        // Hash the data to make sure it wasn't modified
+        $hash = md5($outputData);
+        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+        // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
+        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB, $iv));
+        // Okay, write the file:
+        $fileData = "<"."?"."php \n".
+        '   require_once("'.INSTALL_PATH.'/publicLet.inc.php"); '."\n".
+        '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
+        '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
+        '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
+        '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv));  '."\n".
+        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 ".md5($inputData)); exit(); } '."\n".
+        '   // Ok extract the data '."\n".
+        '   $data = unserialize($inputData); AbstractAccessDriver::loadPubliclet($data); ?'.'>';
+        if (@file_put_contents(PUBLIC_URL_FOLDER."/".$hash.".php", $fileData) === FALSE)
+            return "Can't write to PUBLIC URL";
+        
+        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
+        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
+        return $fullUrl.str_replace(INSTALL_PATH, "", PUBLIC_URL_FOLDER)."/".$hash.".php";
     }
 
     /** Load a uncyphered publiclet */
     function loadPubliclet($data)
     {
         // create driver from $data
-        $className = "class.".$data["DRIVER"]."AccessDriver.php";
-        $filePath = INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/".$className;
+        $className = $data["DRIVER"]."AccessDriver";
+        if ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"])
+        {
+            // Remove the publiclet, it's done
+            if (strstr(PUBLIC_URL_FOLDER, $_SERVER["SCRIPT_FILENAME"]) !== FALSE)
+                unlink($_SERVER["SCRIPT_FILENAME"]);
+            
+            echo "Link is expired, sorry.";
+            exit();
+        }
+        // Check password
+        if (strlen($data["PASSWORD"]))
+        {
+            if ($_POST['password'] != $data["PASSWORD"])
+            {
+                echo "<html><body><form method='post'>This file requires a password<br><input type='password' name='password'><input type='submit' value='download'></form></body></html>";
+                exit();
+            }
+        }
+        $filePath = INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
         if(!is_file($filePath)){
                 die("Warning, cannot find driver for conf storage! ($name, $filePath)");
         }
         require_once($filePath);
         $driver = new $className( $data["DRIVER_NAME"], $data["XML_FILE_PATH"], $data["REPOSITORY"], $data["OPTIONS"]);
         $driver->initRepository();
-        $driver->getAction($data["ACTION"], array("file"=>$data["FILEPATH"]), "");
+        $driver->switchAction($data["ACTION"], array("file"=>$data["FILE_PATH"]), "");
     }
 
     /** Create a publiclet object, that will be saved in PUBLIC_URL_FOLDER
