@@ -73,6 +73,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			$$getName = Utils::securePath(SystemTextEncoding::magicDequote($getValue));
 		}
 		$selection = new UserSelection();
+
 		$selection->initFromHttpVars($httpVars);
 		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
 		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
@@ -402,6 +403,17 @@ class fsAccessDriver extends AbstractAccessDriver
 				exit;
 				
 			break;
+            
+            //------------------------------------
+            // Public URL
+            //------------------------------------
+            case "public_url":
+				$file = SystemTextEncoding::fromUTF8($file);
+                $url = $this->makePubliclet($file, $password, $expiration);
+                header("Content-type:text/plain");
+                echo $url;
+                exit(1);                
+            break;
 			
 			//------------------------------------
 			//	XML LISTING
@@ -1279,6 +1291,13 @@ class fsAccessDriver extends AbstractAccessDriver
     	}
     	$selection->setFiles($files);
     }
+    
+    /** The publiclet URL making */
+    function makePubliclet($filePath, $password, $expire)
+    {
+        $data = array("DRIVER"=>"fs", "OPTIONS"=>NULL, "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
+        return $this->writePubliclet($data);
+     }
     
 }
 
