@@ -36,46 +36,23 @@
                                  
 require_once(INSTALL_PATH.'/server/classes/class.AbstractTest.php');
 
-class sshAccessTest extends AbstractTest
+class ftpAccessTest extends AbstractTest
 {
-    function sshAccessTest() { parent::AbstractTest("Remote SSH Filesystem Plugin", ""); }
+    function ftpAccessTest() { parent::AbstractTest("Remote FTP Filesystem Plugin", ""); }
     
     function doRepositoryTest($repo)
     {
-    	if($repo->accessType != "ssh") return -1;
+    	if($repo->accessType != "ftp") return -1;
     	
-        $basePath = "../../../plugins/access.ssh/";
+        $basePath = "../../../plugins/access.ftp/";
         // Check file exists
-        if (!file_exists($basePath."class.sshAccessDriver.php")
-         || !file_exists($basePath."class.SSHOperations.php")
+        if (!file_exists($basePath."class.ftpAccessDriver.php")
          || !file_exists($basePath."manifest.xml")
-         || !file_exists($basePath."showPass.php")
-         || !file_exists($basePath."sshActions.xml"))
-        { $this->failedInfo .= "Missing at least one of the plugin files (class.sshDriver.php, class.SSHOperations.php, manifest.xml, showPass.php, sshActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
+         || !file_exists($basePath."ftpActions.xml"))
+        { $this->failedInfo .= "Missing at least one of the plugin files (class.ftpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
         
-        // Check if showPass is executable from ssh
-        $stat = stat($basePath."showPass.php");
-        $mode = $stat['mode'] & 0x7FFF; // We don't care about the type
-        if (!is_executable($basePath.'showPass.php')
-         && (($mode & 0x40) && $stat['uid'] == posix_getuid())
-         && (($mode & 0x08) && $stat['gid'] == posix_getgid())
-         && ($mode & 0x01))
-        { 
-            chmod($basePath.'showPass.php', 0555);
-            if (!is_executable($basePath.'showPass.php'))
-            { $this->failedInfo .= "showPass.php must be executable. Please log in on your server and set showPass.php as executable (chmod u+x showPass.php)."; return FALSE; }
-        }
-        
-        // Check if ssh is accessible
-        $handle = popen("ssh 2>&1", "r");
-        $usage = fread($handle, 30);
-        pclose($handle);
-        if (strpos($usage, "usage") === FALSE)
-        { $this->failedInfo .= "Couldn't find or execute 'ssh' on your system. Please install latest SSH client."; return FALSE; }
-                                            
         return TRUE;    
     }
-
 };
 
 ?>
