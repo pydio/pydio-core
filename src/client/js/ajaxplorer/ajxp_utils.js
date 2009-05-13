@@ -47,6 +47,10 @@ function getRepName(fileName)
 	return repName;	
 }
 
+function getAjxpMimeType(item){
+	return (item.getAttribute('ajxp_mime') || getFileExtension(item.getAttribute('filename')));
+}
+
 function getFileExtension(fileName)
 {
 	if(!fileName || fileName == "") return "";

@@ -5,7 +5,7 @@
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
-					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true">
+					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
 				</context>
 				<selectionContext dir="true" file="false" recycle="false"
 					unique="true" allowedMimes="">
@@ -299,6 +299,17 @@
 					<div id="filelist_folders_count"><b>#{folders_string}</b> : #{filelist_folders_count}</div>
 					<div id="filelist_files_count"><b>#{files_string}</b> : #{filelist_files_count}</div>
 					<div id="filelist_totalsize"><b>#{totalsize_string}</b> #{filelist_totalsize}</div>
+				</div>
+			]]></html>
+		</infoPanel>
+		<infoPanel mime="table" attributes="count,text">
+			<messages>
+				<message key="files_string" id="280"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">#{text}</big>
+					<div><b>#{files_string}</b> : #{count}</div>
 				</div>
 			]]></html>
 		</infoPanel>
