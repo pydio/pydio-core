@@ -326,7 +326,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 				if($dir == ""){
 					AJXP_XMLWriter::header();
 					$tables = $this->listTables();					
-					print '<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="text" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>';
+					print '<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>';
 					$icon = ($mode == "file_list"?"table_empty.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/table_empty_tree.png");
 					foreach ($tables as $tableName){
 						$size = $this->getSize($tableName);
