@@ -12,7 +12,7 @@
 	var lh = location.href;
 	
 	if(ua.match('MSIE')) engine = 'msie';
-	else if(ua.match('KHTML')) engine = 'khtml'; 
+	else if(ua.match('AppleWebKit')) engine = 'webkit'; 
 	else if(ua.match('Opera')) engine = 'opera'; 
 	else if(ua.match('Gecko')) engine = 'gecko';
 
@@ -27,10 +27,8 @@
 </head>
 
 <script type="text/javascript">
-if (engine == "gecko") document.write('<body> </body>');
-else if(engine == "msie") document.write('<body><pre></pre></body>');
+if(engine == "msie" || engine == "gecko" || engine == "webkit") document.write('<body><pre> </pre></body>');
 else if(engine == "opera") document.write('<body></body>');
-// else if(engine == "khtml") document.write('<body> </body>');
 </script>
 
 </html>
