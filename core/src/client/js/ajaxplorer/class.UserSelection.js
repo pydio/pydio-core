@@ -97,7 +97,7 @@ UserSelection = Class.create({
 		mimeTypes.each(function(mime){
 			if(has) return;
 			has = selectedItems.any(function(item){
-				return (getFileExtension(item.getAttribute('filename')) == mime);
+				return (getAjxpMimeType(item) == mime);
 			});
 		});
 		return has;

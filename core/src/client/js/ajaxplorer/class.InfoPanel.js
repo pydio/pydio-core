@@ -101,18 +101,14 @@ InfoPanel = Class.create({
 		}
 		
 		var uniqItem = userSelection.getUniqueItem();
-		if(uniqItem.getAttribute('is_file')=='0'){
-			this.evalTemplateForMime('generic_dir', uniqItem);
+		var extension = getAjxpMimeType(uniqItem);
+		if(extension != "" && this.registeredMimes.get(extension)){
+			this.evalTemplateForMime(extension, uniqItem);
 		}
 		else{
-			var extension = getFileExtension(uniqItem.getAttribute('filename'));
-			if(this.registeredMimes.get(extension)){
-				this.evalTemplateForMime(extension, uniqItem);
-			}
-			else{
-				this.evalTemplateForMime('generic_file', uniqItem);
-			}			
-		}
+			var isFile = parseInt(uniqItem.getAttribute('is_file'));
+			this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqItem);
+		}			
 	},
 	
 	setContent : function(sHtml){
