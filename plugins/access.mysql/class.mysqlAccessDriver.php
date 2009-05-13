@@ -393,10 +393,12 @@ class mysqlAccessDriver extends AbstractAccessDriver
 						}
 						if($result["HAS_PK"] > 0){
 							print 'filename="record.'.$pkString.'pk" ';
+							print 'is_file="1" ajxp_mime="pk"/>';
 						}else{
 							print 'filename="record.no_pk" ';
+							print 'is_file="1" ajxp_mime="row"/>';
 						}
-						print 'is_file="1" ajxp_mime="row"/>';
+						
 					}
 					AJXP_XMLWriter::close();
 				}
