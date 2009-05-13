@@ -331,7 +331,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					foreach ($tables as $tableName){
 						$size = $this->getSize($tableName);
 						$count = $this->getCount($tableName);
-						print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\"/>";
+						print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
 					}
 					print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"".($mode == "file_list"?"search.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/search.png")."\"/>";
 					AJXP_XMLWriter::close();
@@ -396,7 +396,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 						}else{
 							print 'filename="record.no_pk" ';
 						}
-						print 'is_file="1" />';
+						print 'is_file="1" ajxp_mime="row"/>';
 					}
 					AJXP_XMLWriter::close();
 				}
