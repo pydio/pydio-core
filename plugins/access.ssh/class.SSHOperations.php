@@ -100,7 +100,7 @@ class SSHOperations
       $this->makeDirCommand = "mkdir -p ";
       $this->deleteCommand = "rm -rf ";
       $this->chmodCommand = "chmod -R ";
-      $this->sshCommand = "ssh -o \"ConnectTimeout=5\""; 
+      $this->sshCommand = "ssh -o \"ConnectTimeout=5\" -o \"PasswordAuthentication=no\" -o \"ServerAliveInterval=10\" -o \"ServerAliveCountMax=3\""; 
       $this->server = $server;
       $this->account = $account;
       $this->password = $password;
@@ -118,9 +118,23 @@ class SSHOperations
        if ($maxLength == -1)
        {
            $buffer = "";
-           while (!feof($stream)) $buffer.= fread($stream, 1);
+           while (!feof($stream) && connection_status()==0) $buffer.= fread($stream, 1);
            return $buffer;
        } else return fread($stream, $maxLength);
+   }
+
+   /** Helper function to copy the content of a stream to another stream */
+   function streamCopyTo($stream, $out, $maxLength = -1, $offset = 0)
+   {
+       if (function_exists(stream_copy_to_stream)) return stream_copy_to_stream($stream, $out, $maxLength, $offset);
+       // Else, first get all the bytes up to the given offset
+       @fread($stream, $offset);
+       // Then get the content
+       if ($maxLength == -1)
+       {
+           while (!feof($stream) && connection_status()==0) 
+                fwrite($out, fread($stream, 2048));
+       } else fwrite($out, fread($stream, $maxLength));
    }
 
    /** This function split the given text in fields with space as a separator 
@@ -204,6 +218,19 @@ class SSHOperations
        return $retArray;
     }
 
+    /** Used internally for debugging 
+        @return the command output text */
+    function testConnection($server, $account, $password)
+    {
+        $fileName = __FILE__;
+        $fileName = substr($fileName, 0, strrpos($fileName, "/"));
+        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ".$this->sshCommand." ".$account."@".$server." echo test";
+        echo $finalCommand."<br>";
+        $handle = popen($finalCommand, "r");
+        $output = $this->streamGetContents($handle);
+        pclose($handle);
+        echo $output."<br>";
+    }
     /** Execute the given command, expecting only to read input from the command 
         @param $server      The server to contact
         @param $account     The account to use while connecting on the remote server
@@ -219,6 +246,25 @@ class SSHOperations
         $output = $this->streamGetContents($handle);
         pclose($handle);
         return $output;
+    }
+
+    /** Execute the given download, expecting only to read input from the command 
+        @param $out         The output stream to feed
+        @param $server      The server to contact
+        @param $account     The account to use while connecting on the remote server
+        @param $password    The account password to use while connecting on the remote server
+        @param $command     The command to execute (must be full command and valid on the remote side) 
+        @return the command output text */
+    function executeRemoteDownload($out, $server, $account, $password, $command)
+    {
+        $fileName = __FILE__;
+        $fileName = substr($fileName, 0, strrpos($fileName, "/"));
+        $finalCommand = "export DISPLAY=xxx && export SSH_PASSWORD=".$password." && export SSH_ASKPASS='".$fileName."/showPass.php' && ".$this->sshCommand." ".$account."@".$server." ".$command;
+        $handle = popen($finalCommand, "r");
+        register_shutdown_function('pclose', $handle); // Might be interrupted by user
+        if (is_resource($handle))
+            $output = $this->streamCopyTo($handle, $out);
+        pclose($handle);
     }
 
     /** Execute the given command, expecting only to write input to the command 
@@ -343,6 +389,26 @@ class SSHOperations
             return $this->executeRemoteCommand($this->server, $this->account, $this->password, $this->catCommand.$pathToFile);
         }
     }
+
+    /** Download the given file to the output stream
+        @param $pathToFile   Can be an array or a string if a single file */
+    function downloadRemoteFile($pathToFile)
+    {
+        $out = fopen("php://output", "a");
+        if (is_array($pathToFile))
+        {
+            // Need to get an archive here
+            $command = $this->zipCommand.implode($pathToFile, " ");
+            $this->executeRemoteDownload($out, $this->server, $this->account, $this->password, '"'.$command.'"');//'"'.$this->zipCommand.implode(" ", $pathToFile).'"');
+        } else
+        {
+            // Single file download
+            $this->executeRemoteDownload($out, $this->server, $this->account, $this->password, $this->catCommand.$pathToFile);
+        }
+        fclose($out);
+    }
+
+
     
     /** Save the given content onto the given file on the server
         @param $pathToFile   The full, escaped path to the destination file
