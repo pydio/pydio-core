@@ -36,6 +36,7 @@
 require_once("class.SSHOperations.php");
 
    $SSHOp = new SSHOperations("ssh.alwaysdata.com", "ajaxplorer", "dumbpass");
+   $SSHOp->testConnection("ssh.alwaysdata.com", "ajaxplorer", "dumbpass");
    echo "<h1>Testing connection</h1>";
    var_dump($SSHOp->checkConnection())."<br>";
    
