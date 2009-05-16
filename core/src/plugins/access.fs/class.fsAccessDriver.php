@@ -763,7 +763,7 @@ class fsAccessDriver extends AbstractAccessDriver
                 fseek($file, $relOffset, SEEK_CUR);
         
                 $readSize = 0.0;
-                while (!feof($file) && $readSize < $length)
+                while (!feof($file) && $readSize < $length && connection_status() == 0)
                 {
                     echo fread($file, 2048);
                     $readSize += 2048.0;

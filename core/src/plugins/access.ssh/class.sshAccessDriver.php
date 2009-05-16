@@ -150,20 +150,20 @@ class sshAccessDriver extends AbstractAccessDriver
 				}
 				if($zip){
 					// Make a temp zip and send it as download
-					$this->sendFile($this->SSHOperation->getRemoteContent($this->makeName($selection->getFiles())), "force-download", "archive.zip", false);
+					$this->downFile($this->makeName($selection->getFiles()), "force-download", "archive.zip");
 				}else{
-					$this->sendFile($this->SSHOperation->getRemoteContent($this->makeName($selection->getUniqueFile())), "force-download", $selection->getUniqueFile());
+					$this->downFile($this->makeName($selection->getUniqueFile()), "force-download", $selection->getUniqueFile());
 				}
 				exit(0);
 			break;
 		
 			case "image_proxy":
-			    $this->sendFile($this->SSHOperation->getRemoteContent($this->makeName($file)), "image", $file);
+			    $this->downFile($this->makeName($file), "image", $file);
 				exit(0);
 			break;
 			
 			case "mp3_proxy":
-				$this->sendFile($this->SSHOperation->getRemoteContent($this->makeName($file)), "mp3", $file);
+				$this->downFile($this->makeName($file), "mp3", $file);
 				exit(0);
 			break;
 			
@@ -623,6 +623,41 @@ class sshAccessDriver extends AbstractAccessDriver
 			}
 		}
     	print($filePath);
+	}
+
+	function downFile($fileArray, $headerType="plain", $fileName)
+	{
+		if($headerType == "plain")
+		{
+			header("Content-type:text/plain");
+		}
+		else if($headerType == "image")
+		{
+			header("Content-Type: ".Utils::getImageMimeType(basename($fileName))."; name=\"".basename($fileName)."\"");
+			header('Cache-Control: public');			
+		}
+		else if($headerType == "mp3")
+		{
+			header("Content-Type: audio/mp3; name=\"".basename($fileName)."\"");
+		}
+		else 
+		{
+			header("Content-Type: application/force-download; name=\"".$fileName."\"");
+			header("Content-Transfer-Encoding: binary");
+			if($gzip) header("Content-Encoding: gzip");
+			header("Content-Disposition: attachment; filename=\"".$fileName."\"");
+			header("Expires: 0");
+			header("Cache-Control: no-cache, must-revalidate");
+			header("Pragma: no-cache");
+			// For SSL websites there is a bug with IE see article KB 323308
+			// therefore we must reset the Cache-Control and Pragma Header
+			if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+			{
+				header("Cache-Control:");
+				header("Pragma:");
+			}
+		}
+        $this->SSHOperation->downloadRemoteFile($fileArray);
 	}
 	
 	function dateModif($time)
