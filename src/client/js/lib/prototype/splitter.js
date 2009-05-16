@@ -94,6 +94,7 @@ Splitter = Class.create({
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
 		this.paneA.insert({after:this.splitbar});
 		this.splitbar.observe("mousedown", this.startSplit.bind(this));
+		this.splitbar.observe("mouseup", this.endSplit.bind(this));
 		
 		this.initCaches();
 		
@@ -133,13 +134,18 @@ Splitter = Class.create({
 	},
 	
 	doSplitMouse: function(event){
-		this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
+        if (!this.splitbar.hasClassName(this.options.activeClass)) return this.endSplit(event);
+        var rightBorderPos = Element.viewportOffset(this.paneA).left + Element.getWidth(this.paneA);
+        if (event.pointerX() < rightBorderPos + 10)
+		    this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
+        else this.endSplit(event);
 	}, 
 	
 	endSplit: function(event){
 		this.splitbar.removeClassName(this.options.activeClass);
 		Event.stopObserving(document, "mousemove", this.moveObserver);
 		Event.stopObserving(document, "mouseup", this.upObserver);
+        this.moveObserver = 0; this.upObserver = 0;
 	}, 
 	
 	moveSplitter:function(np){
