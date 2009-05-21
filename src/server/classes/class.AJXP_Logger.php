@@ -221,7 +221,7 @@ class AJXP_Logger {
 		return $msg;			
 	}
 	
-	function xmlListLogFiles(){
+	function xmlListLogFiles($nodeName="file"){
 		$dir = $this->storageDir;
 		if(!is_dir($this->storageDir)) return ;
 		$logs = array();
@@ -234,7 +234,7 @@ class AJXP_Logger {
 				$dSplit = split("-", $date);
 				$time = mktime(0,0,1,$dSplit[0], $dSplit[1], $dSplit[2]);
 				$display = date("D. d M. Y", $time);
-				$logs[$time] = "<file date=\"$date\" display=\"$display\"/>";
+				$logs[$time] = "<$nodeName date=\"$date\" display=\"$display\" text=\"$display\"/>";
 			}
 			closedir($handle);	
 		}
