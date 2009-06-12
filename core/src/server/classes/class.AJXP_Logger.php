@@ -242,9 +242,9 @@ class AJXP_Logger {
 				$fullMonth = date("F", $time);
 				if($year != null && $fullYear != $year) continue;
 				if($month != null && $fullMonth != $month) continue;
-				$logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"1\" filename=\"$date\"/>";
-				$years[$logY] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" src=\"content.php?dir=%2Flogs%2F$fullYear\"/>";
-				$months[$logM] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" src=\"content.php?dir=%2Flogs%2F$fullYear%2F$fullMonth\"/>";
+				$logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"/logs/$fullYear/$fullMonth/$date\"/>";
+				$years[$logY] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" src=\"content.php?dir=%2Flogs%2F$fullYear\" filename=\"/logs/$fullYear\"/>";
+				$months[$logM] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" src=\"content.php?dir=%2Flogs%2F$fullYear%2F$fullMonth\" filename=\"/logs/$fullYear/$fullMonth\"/>";
 			}
 			closedir($handle);	
 		}

@@ -42,7 +42,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		$loggedUser = AuthService::getLoggedUser();
-		if($loggedUser == null || !$loggedUser->isAdmin()) return ;
+		if(ENABLE_USERS && !$loggedUser->isAdmin()) return ;
 		
 		if($action == "edit"){
 			if(isSet($httpVars["sub_action"])){
@@ -60,7 +60,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"users" => array("LABEL" => "Users", "ICON" => "yast_kuser.png"),
 					"repositories" => array("LABEL" => "Repositories", "ICON" => "folder_red.png"),
 					"logs" => array("LABEL" => "Logs", "ICON" => "toggle_log.png"),
-					"diagnostic" => array("LABEL" => "Diagnostic", "ICON" => "admin.png")
+					"diagnostic" => array("LABEL" => "Diagnostic", "ICON" => "susehelpcenter.png")
 				);
 				$dir = (isset($httpVars["dir"])?$httpVars["dir"]:"");
 				$splits = split("/", $dir);
@@ -277,7 +277,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
 						unset($repDef[$key]);
 					}else{
-						if($key == "DISLPAY"){
+						if($key == "DISPLAY"){
 							$value = SystemTextEncoding::fromPostedFileName($value);
 						}
 						$repDef[$key] = $value;		
@@ -330,7 +330,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				print("<repository index=\"$repId\"");
 				foreach ($repository as $name => $option){
 					if(!is_array($option)){					
-						print(" $name=\"".Utils::xmlEntities($option)."\" ");
+						print(" $name=\"".SystemTextEncoding::toUTF8(Utils::xmlEntities($option))."\" ");
 					}else if(is_array($option)){
 						$nested[] = $option;
 					}
@@ -358,7 +358,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repo = ConfService::getRepositoryById($repId);
 				$res = 0;
 				if(isSet($_GET["newLabel"])){
-					$repo->setDisplay($_GET["newLabel"]);
+					$repo->setDisplay(SystemTextEncoding::fromPostedFileName($_GET["newLabel"]));
 					$res = ConfService::replaceRepository($repId, $repo);
 				}else{
 					foreach ($_GET as $key => $value){
@@ -439,6 +439,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	function listUsers(){
 		print '<columns switchGridMode="filelist"><column messageString="User Name" attributeName="ajxp_label" sortType="String"/><column messageString="Is Admin" attributeName="isAdmin" sortType="String"/></columns>';		
+		if(!ENABLE_USERS) return ;
 		$users = AuthService::listUsers();
 		$loggedUser = AuthService::getLoggedUser();		
 		foreach ($users as $userObject){
@@ -462,16 +463,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		print '<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>';		
 		$repos = ConfService::getRepositoriesList();
 		foreach ($repos as $repoIndex => $repoObject){
+			if($repoObject->getAccessType() == "ajxp_conf") continue;
 			print '<tree 
-				text="'.$repoObject->getDisplay().'" 
+				text="'.SystemTextEncoding::toUTF8($repoObject->getDisplay()).'" 
 				is_file="1" 
 				repository_id="'.$repoIndex.'" 
 				accessType="'.$repoObject->getAccessType().'" 
 				icon="folder_red.png" 
 				openicon="folder_red.png" 
-				filename="/users/'.$repoObject->getDisplay().'" 
+				filename="/users/'.SystemTextEncoding::toUTF8($repoObject->getDisplay()).'" 
 				parentname="/users" 
-				src="content.php?dir=%2Fusers%2F'.$repoObject->getDisplay().'" 
+				src="content.php?dir=%2Fusers%2F'.SystemTextEncoding::toUTF8($repoObject->getDisplay()).'" 
 				ajxp_mime="repository'.($repoObject->isWriteable()?"_editable":"").'"
 				/>';
 		}
@@ -503,7 +505,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			
 			foreach ($diagResults as $id => $value){
-				print "<tree icon=\"admin.png\" text=\"$id\" data=\"$value\"/>";
+				print "<tree icon=\"susehelpcenter.png\" filename=\"$id\" text=\"$id\" data=\"$value\"/>";
 			}
 		}		
 	}
