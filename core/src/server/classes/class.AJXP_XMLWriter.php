@@ -122,14 +122,17 @@ class AJXP_XMLWriter
 		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}
 	
-	function sendUserData()
+	function sendUserData($userObject = null, $details=false)
 	{
 		$loggedUser = AuthService::getLoggedUser();
+		if($userObject != null) $loggedUser = $userObject;
 		if($loggedUser != null)
 		{
 			print("<user id=\"".$loggedUser->id."\">");
-			print("<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>");
-			print(AJXP_XMLWriter::writeRepositoriesData($loggedUser));
+			if(!$details){
+				print("<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>");
+			}
+			print(AJXP_XMLWriter::writeRepositoriesData($loggedUser, $details));
 			print("<preferences>");
 			print("<pref name=\"display\" value=\"".$loggedUser->getPref("display")."\"/>");
 			print("<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>");
@@ -139,12 +142,18 @@ class AJXP_XMLWriter
 		}		
 	}
 	
-	function writeRepositoriesData($loggedUser){
+	function writeRepositoriesData($loggedUser, $details=false){
 		$st = "";
 		$st .= "<repositories>";
 		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
 		{			
-			if($loggedUser == null || $loggedUser->canRead($rootDirIndex)) $st .= "<repo id=\"".$rootDirIndex."\"><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $details) {
+				$rightString = "";
+				if($details){
+					$rightString = " r=\"".($loggedUser->canRead($rootDirIndex)?"1":"0")."\" w=\"".($loggedUser->canWrite($rootDirIndex)?"1":"0")."\"";
+				}
+				$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+			}
 		}
 		$st .= "</repositories>";
 		return $st;
