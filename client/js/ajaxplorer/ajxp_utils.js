@@ -230,6 +230,107 @@ function getViewPortHeight(){
 	return wh;
 }
 
+/**
+ * Selects the first XmlNode that matches the XPath expression.
+ *
+ * @param element {Element | Document} root element for the search
+ * @param query {String} XPath query
+ * @return {Element} first matching element
+ * @signature function(element, query)
+ */
+function XPathSelectSingleNode(element, query){
+	if(Prototype.Browser.IE){
+		return element.selectSingleNode(query);
+	}
+
+	if(!window.__xpe) {
+	  window.__xpe = new XPathEvaluator();
+	}
+	
+	var xpe = window.__xpe;
+	
+	try {
+	  	return xpe.evaluate(query, element, xpe.createNSResolver(element), XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	} catch(err) {
+	  	throw new Error("selectSingleNode: query: " + query + ", element: " + element + ", error: " + err);
+	}
+}
+
+
+/**
+ * Selects a list of nodes matching the XPath expression.
+ *
+ * @param element {Element | Document} root element for the search
+ * @param query {String} XPath query
+ * @return {Element[]} List of matching elements
+ * @signature function(element, query)
+ */
+function XPathSelectNodes(element, query){
+	if(Prototype.Browser.IE){
+		return element.selectNodes(query);
+	}
+
+    var xpe = window.__xpe;
+
+    if(!xpe) {
+      window.__xpe = xpe = new XPathEvaluator();
+    }
+
+    try {
+      var result = xpe.evaluate(query, element, xpe.createNSResolver(element), XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    } catch(err) {
+      throw new Error("selectNodes: query: " + query + ", element: " + element + ", error: " + err);
+    }
+
+    var nodes = [];
+    for (var i=0; i<result.snapshotLength; i++) {
+      nodes[i] = result.snapshotItem(i);
+    }
+
+    return nodes;
+}
+
+
+/**
+ * Selects the first XmlNode that matches the XPath expression and returns the text content of the element
+ *
+ * @param element {Element|Document} root element for the search
+ * @param query {String}  XPath query
+ * @return {String} the joined text content of the found element or null if not appropriate.
+ * @signature function(element, query)
+ */
+function XPathGetSingleNodeText(element, query){
+  var node = XPathSelectSingleNode(element, query);  
+  return getDomNodeText(node);
+}
+
+function getDomNodeText(node){
+	if(!node || !node.nodeType) {
+		return null;
+	}
+
+	switch(node.nodeType)
+	{
+		case 1: // NODE_ELEMENT
+		var i, a=[], nodes = node.childNodes, length = nodes.length;
+		for (i=0; i<length; i++) {
+			a[i] = getDomNodeText(nodes[i]);
+		};
+
+		return a.join("");
+
+		case 2: // NODE_ATTRIBUTE
+		return node.nodeValue;
+		break;
+
+		case 3: // NODE_TEXT
+		return node.nodeValue;
+		break;
+	}
+
+	return null;
+}
+
 function ajxpCorners(oElement, cornersString)
 {
 	var tr, tl, bl, br;
