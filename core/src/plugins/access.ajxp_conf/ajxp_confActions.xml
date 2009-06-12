@@ -13,10 +13,10 @@
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
-					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true">
+					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false"
-					unique="true" allowedMimes="AJXP_MIMES_ZIP">
+				<selectionContext dir="true" file="false" recycle="false"
+					unique="true" allowedMimes="*">
 				</selectionContext>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true"
@@ -43,7 +43,7 @@
 			</processing>
 		</action>
 		<action name="create_user">
-			<gui text="51" title="162" src="folder_new.png" accessKey="" hasAccessKey="false">
+			<gui text="297" title="298" src="yast_user_add.png" accessKey="create_user_accesskey" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -84,61 +84,9 @@
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-		</action>				
-		<action name="edit_user" fileDefault="true">
-			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
-					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get" inZip="false">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user" behaviour="hidden"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
-					var sTitle = MessageHash[187]+userSelection.getUniqueFileName();						
-					var loadFunc = function(oForm){
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.editor = new ConfigEditor(oForm);
-						ajaxplorer.actionBar.editor.loadUser(getBaseName(userSelection.getUniqueFileName()));
-					};
-					modal.showDialogForm('Edit Online', 'edit_box', loadFunc, function(){hideLightBox();}, null, true);
-					]]></clientCallback>
-				<clientForm id="edit_user_box"><![CDATA[
-					<div id="edit_box" action="edit_user" box_width="420" style="overflow:auto;height:400px;">
-						<fieldset id="rights_pane">
-							<legend>Repositories Acess</legend>
-							<table class="repository" width="100%">
-								<tr id="loading_row"><td>Loading...</td></tr>
-							</table>
-						</fieldset>
-						<fieldset id="password_pane">
-							<legend>Modify password</legend>
-							<table class="password">
-								<tr>
-									<td>New Password <input type="password" id="new_pass" style="width:78px;"/></td>
-									<td>Confirm Password <input type="password" id="new_pass_confirm" style="width:78px;"/></td>
-									<td><input type="submit" class="submit_button" style="width:30px;" value="OK" name="new_pass_button" onclick="return false;"/></td>
-								</tr>
-							</table>							
-						</fieldset>
-						<fieldset id="admin_right_pane"><legend>Admin Right</legend>
-						User has admin rights :
-							<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:30px;" />
-						</fieldset>
-						<fieldset id="delete_user_pane">
-							<legend>Delete User</legend>
-							To delete, check the box to confirm
-							<input id="delete_confirm" class="user_delete_confirm" style="width:30px" type="checkbox"/>
-							<input type="submit" onclick="return false;"  style="width:30px" value="OK"/>
-						</fieldset>						
-					</div>				
-				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>		
+		</action>	
 		<action name="create_repository">
-			<gui text="51" title="162" src="folder_new.png" accessKey="" hasAccessKey="false">
+			<gui text="299" title="300" src="folder_red_new.png" accessKey="create_repo_accesskey" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -149,68 +97,158 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var loadFunc = function(oForm){
 						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.editor = new ConfigEditor(oForm);						
-						ajaxplorer.actionBar.editor.initCreateRepoWizard();
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.initCreateRepoWizard();
 					};				
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
 				<clientForm id="create_repository_box"><![CDATA[
-					<div id="create_repository_box" action="create_repository" box_width="400" style="overflow:auto;">
-						Repository Label : <input name="new_user_login" type="text" size="30" class="dialogFocus"/>
-						Repository Driver : <select><option>Loading...</option></select>
+					<div id="create_repository_box" action="create_repository" box_width="430" style="overflow:auto;">
+						<div style="padding: 2px; clear: left;">
+							<div style="float: left; width: 30%; text-align: right;"><b>Repository Label*</b> : </div>
+							<div style="float: left; width: 65%;">
+								<input name="new_user_login" type="text" size="30" class="dialogFocus"/>
+							</div>
+						</div>
+						<div style="padding: 2px; clear: left;">
+							<div style="float: left; width: 30%; text-align: right;"><b>Repository Driver*</b> : </div>
+							<div style="float: left; width: 65%;">
+								<select><option>Loading...</option></select>
+							</div>
+						</div>
 						<div id="driver_form"></div>
-						<div align="center" style="clear:left;padding-top:5px;">
-							<input type="button" id="submit_create_repo" value="Save" class="button" onclick="return false;">
-							<input type="button" value="Cancel" class="button" onclick="hideLightBox();return false;">
+						<div class="dialogButtons">
+							<input type="button" class="dialogButton" id="submit_create_repo" value="Save" class="button" onclick="return false;">
+							<input type="button" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
 						</div>
 					</div>				
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-		</action>						
-		<action name="edit_repository" fileDefault="true">
-			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+		</action>					
+		<action name="edit" fileDefault="true">
+			<gui text="51" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get" inZip="false">
+					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
-					var sTitle = MessageHash[187]+userSelection.getUniqueFileName();						
-					var loadFunc = function(oForm){
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.editor = new ConfigEditor(oForm);						
-						ajaxplorer.actionBar.editor.loadRepository(userSelection.getUniqueItem().getAttribute("repository_id"));
-					};
-					modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, function(){hideLightBox();}, null, true);
+					var item = userSelection.getUniqueItem();
+					if(item.getAttribute("ajxp_mime") == "user" || item.getAttribute("ajxp_mime") == "user_editable"){
+						var loadFunc = function(oForm){
+							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+							if(!ajaxplorer.actionBar.configEditor){
+								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+							}						
+							ajaxplorer.actionBar.configEditor.setForm(oForm);
+							ajaxplorer.actionBar.configEditor.loadUser(item.getAttribute("text"));
+						};
+						modal.showDialogForm('Edit Online', 'edit_box', loadFunc, function(){hideLightBox();}, null, true);					
+					}else{
+						var loadFunc = function(oForm){
+							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+							if(!ajaxplorer.actionBar.configEditor){
+								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+							}						
+							ajaxplorer.actionBar.configEditor.setForm(oForm);
+							ajaxplorer.actionBar.configEditor.loadRepository(item.getAttribute("repository_id"));
+						};
+						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, function(){hideLightBox();}, null, true);
+					}					
 					]]></clientCallback>
-				<clientForm id="edit_repository_box"><![CDATA[
-					<div id="edit_repo_box" action="edit_repository" box_width="450" style="overflow:auto;height:250px;">
+				<clientForm id="edit_box"><![CDATA[
+					<div id="edit_box" action="edit_user" box_width="440" style="overflow:auto;height:370px;">
+						<fieldset id="rights_pane">
+							<legend>Repositories Acess</legend>
+							<table class="repository" width="100%">
+								<tbody>
+								<tr id="loading_row"><td>Loading...</td></tr>
+								</tbody>
+							</table>
+						</fieldset>
+						<fieldset id="password_pane">
+							<legend>Modify password</legend>
+							<table class="password">
+								<tr>
+									<td valign="bottom" style="vertical-align:bottom;">New Password <input type="password" id="new_pass" style="width:100px;"/></td>
+									<td valign="bottom" style="vertical-align:bottom;">Confirm Password <input type="password" id="new_pass_confirm" style="width:100px;"/></td>
+									<td valign="bottom" style="vertical-align:bottom;"><input type="submit" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;"/></td>
+								</tr>
+							</table>							
+						</fieldset>
+						<fieldset id="admin_right_pane"><legend>Admin Right</legend>
+						User has admin rights :
+							<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:30px;" />
+						</fieldset>
+					</div>
+					<div id="edit_repo_box" action="edit_repository" box_width="450" style="overflow:auto;height:300px;">
 						<fieldset id="label_pane">
 							<legend>Repository Label</legend>
 							<input type="text" value=""/>
-							<input type="button" value="SAVE"/>
+							<input type="button" class="dialogButton" value="SAVE"/>
 						</fieldset>
 						<fieldset id="options_pane">
 							Loading...
 						</fieldset>
-						<fieldset id="delete_repo_pane">
-							<legend>Delete User</legend>
-							To delete, check the box to confirm
-							<input id="delete_confirm" class="user_delete_confirm" style="width:30px" type="checkbox"/>
-							<input type="button" onclick="return false;"  style="width:30px" value="OK"/>
-						</fieldset>						
-					</div>				
+					</div>													
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-		</action>		
+		</action>	
+		<action name="delete">			
+			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable" image="false" mp3="false" editable="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+					var item = userSelection.getUniqueItem();
+					var deleteMessage, fieldName, fieldValue;
+					if(item.getAttribute("ajxp_mime") == "user_editable"){
+						deleteMessage = "Are you sure you want to delete this user? This operation is not reversible!";
+						fieldName = "user_id";
+						fieldValue = item.getAttribute("text");
+					}else{
+						deleteMessage = "Are you sure you want to delete this repository? This operation is not reversible!";
+						fieldName = "repository_id";
+						fieldValue = item.getAttribute("repository_id");
+					}
+					var onLoad = function(oForm){
+		   		    	$(oForm).select('span[id="delete_message"]')[0].update(deleteMessage);
+		   		    	var hidden = $(oForm).select('input[type="hidden"]')[0];
+		   		    	hidden.setAttribute("name", fieldName);
+		   		    	hidden.setAttribute("value", fieldValue);
+					};
+					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
+						var oForm = modal.getForm();						
+						ajaxplorer.actionBar.submitForm(oForm);
+						hideLightBox(true);
+						return false;
+					});
+					]]></clientCallback>
+				<clientForm id="delete_form"><![CDATA[
+				<div id="delete_form" action="delete" box_width="280">
+					<span id="delete_message"></span>
+					<input type="hidden" name="" value=""/>
+				</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>					
 	</actions>
 	<infoPanels>
-		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,modiftime">
+		<infoPanel mime="generic_file" attributes="basename,icon">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="size_string" id="127"/>
@@ -223,13 +261,10 @@
 					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
 				</div>
 				<b>#{name_string}</b> : #{basename}
-				<br><b>#{size_string}</b> : #{filesize}
-				<br><b>#{type_string}</b> : #{mimestring}
-				<br><b>#{modif_string}</b> : #{modiftime}
 			</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="generic_dir" attributes="basename,icon,modiftime">
+		<infoPanel mime="generic_dir" attributes="basename,icon">
 			<messages>
 				<message key="name_string" id="133"/>
 				<message key="modif_string" id="138"/>
@@ -240,7 +275,6 @@
 						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{basename}
-					<br><b>#{modif_string}</b> : #{modiftime}
 				</div>
 			]]></html>
 		</infoPanel>

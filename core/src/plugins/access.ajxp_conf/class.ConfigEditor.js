@@ -35,10 +35,12 @@
 ConfigEditor = Class.create({
 
 	initialize: function(oForm){
-		this.form = oForm;
-		this.userId = 0;
+		if(oForm) this.form = oForm;
 	},
 	
+	setForm : function(oForm){
+		this.form = oForm;
+	},	
 	
 	
 	/*************************************/
@@ -47,7 +49,8 @@ ConfigEditor = Class.create({
 	loadUser: function(userId){
 		this.userId = userId;
 		var params = new Hash();
-		params.set("get_action", "edit_user");
+		params.set("get_action", "edit");
+		params.set("sub_action", "edit_user");
 		params.set("user_id", userId);
 		var connexion = new Connexion();
 		connexion.setParameters(params);
@@ -60,18 +63,15 @@ ConfigEditor = Class.create({
 	},	
 	
 	feedUserForm : function(xmlData){
-		
-		//window.XMLDATA = xmlData;
-		
-		
+				
 		var editPass = XPathGetSingleNodeText(xmlData, "admin_data/edit_options/@edit_pass")=="1";
 		var editAdminRight = XPathGetSingleNodeText(xmlData, "admin_data/edit_options/@edit_admin_right")=="1";
 		var editDelete = XPathGetSingleNodeText(xmlData, "admin_data/edit_options/@edit_delete")=="1";
 		var adminStatus = (XPathGetSingleNodeText(xmlData, "admin_data/user/special_rights/@is_admin") == "1");		
 						
 		var rightsPane = this.form.select('[id="rights_pane"]')[0];
-		var rightsTable = rightsPane.select('table')[0];		
-		var repositories = XPathSelectNodes(xmlData, "//repo");				
+		var rightsTable = rightsPane.select('tbody')[0];		
+		var repositories = XPathSelectNodes(xmlData, "//repo");						
 		for(var i=0;i<repositories.length;i++){
 			var repoNode = repositories[i];
 			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
@@ -79,13 +79,11 @@ ConfigEditor = Class.create({
 			var accessType = XPathGetSingleNodeText(repoNode, "@access_type");
 			
 			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'}).setStyle({width:'25px'});
-			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'}).setStyle({width:'25px'});			
-			readBox.checked = (XPathGetSingleNodeText(repoNode, "@r")=='1');
-			writeBox.checked = (XPathGetSingleNodeText(repoNode, "@w")=='1');			
+			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'}).setStyle({width:'25px'});						
 			readBox.observe('click', this.changeUserRight.bind(this));
 			writeBox.observe('click', this.changeUserRight.bind(this));
 			
-			var rightsCell = new Element('td', {width:'55%'});
+			var rightsCell = new Element('td', {width:'55%', align:'right'});
 			rightsCell.insert("Read ");
 			rightsCell.insert(readBox);
 			rightsCell.insert("Write ");
@@ -94,7 +92,11 @@ ConfigEditor = Class.create({
 			var titleCell = new Element('td', {width:'45%'}).update(repoLabel);
 			tr.insert(titleCell);
 			tr.insert(rightsCell);
-			rightsTable.insert({"bottom":tr});
+			rightsTable.insert({bottom:tr});			
+
+			// FOR IE, set checkboxes state AFTER dom insertion.
+			readBox.checked = (XPathGetSingleNodeText(repoNode, "@r")=='1');
+			writeBox.checked = (XPathGetSingleNodeText(repoNode, "@w")=='1');			
 			
 			var walletParams = XPathSelectNodes(xmlData, "admin_data/drivers/ajxpdriver[@name='"+accessType+"']/user_param");				
 			var walletValues = XPathSelectNodes(xmlData, "admin_data/user_wallet/wallet_data[@repo_id='"+repoId+"']");			
@@ -102,8 +104,8 @@ ConfigEditor = Class.create({
 				var walletCell = new Element("td", {colspan:"2"});
 				var newRow = new Element("tr");
 				newRow.insert(walletCell);
-				rightsTable.insert({"bottom":newRow});				
-				var walletPane = new Element('div', {style:"border:1px solid #ccc;", id:"wallet_pane_"+repoId});
+				rightsTable.insert({bottom:newRow});				
+				var walletPane = new Element('div', {style:"border:1px solid #ccc; margin-left:12px;padding:4px 0px; background-color: white;", id:"wallet_pane_"+repoId});
 				walletCell.insert({bottom:walletPane});				
 				this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
 				walletPane.hide();
@@ -118,7 +120,9 @@ ConfigEditor = Class.create({
 				});
 				titleCell.insert({top:image});
 			}else{
-				titleCell.setStyle({paddingLeft:12});
+				//titleCell.setStyle({paddingLeft:12});
+				var image = new Element("img", {src:ajxpResourcesFolder+"/images/2.gif"}).setStyle({marginRight:3});
+				titleCell.insert({top:image});
 			}
 			
 		}
@@ -141,37 +145,30 @@ ConfigEditor = Class.create({
 			adminButton.observe('click', function(){
 				this.changeAdminRight(adminButton);
 			}.bind(this));			
-		}
-		
-		var deletePane = this.form.select('[id="delete_user_pane"]')[0];
-		if(!editDelete){
-			deletePane.hide();
-		}else{
-			var deleteButton = deletePane.select('input[type="submit"]')[0];
-			deleteButton.observe('click', this.deleteUser.bind(this));
-		}				
+		}		
 	},
 	
 	
 	addRepositoryUserParams : function(walletPane, repoId, walletParams, walletValues){
 		var repoParams = $A([]);
-		walletParams.each(function(walletParam){
-			repoParams.push(this.driverParamNodeToHash(walletParam));
-		}.bind(this) );
+		for(var i=0;i<walletParams.length;i++){
+			repoParams.push(this.driverParamNodeToHash(walletParams[i]));
+		}
 		
 		var userId = this.userId;		
 		var newTd = new Element('div', {className:'driver_form', id:'repo_user_params_'+userId+'_'+repoId});
 		walletPane.insert(newTd);
 		var repoValues = $H({});
-		walletValues.each(function(tag){
+		for(i=0;i<walletValues.length;i++){
+			var tag = walletValues[i];
 			repoValues.set(tag.getAttribute('option_name'), tag.getAttribute('option_value'));
-		});
+		}
 		this.createParametersInputs(newTd, repoParams, false, repoValues);
-		var submitButton = new Element('input', {type:'submit', value:'SAVE', className:'submit', onClick:'return false;'}).setStyle({padding:0,width:30});
+		var submitButton = new Element('input', {type:'submit', value:'SAVE', className:'dialogButton', onClick:'return false;'});
 		submitButton.observe("click", function(){
 			this.submitUserParamsForm(userId, repoId);
 		}.bind(this));
-		newTd.insert({bottom:submitButton});
+		newTd.insert({bottom: new Element('div', {align:"right",style:"padding-top:23px; padding-right:5px; text-align:right;"}).update(submitButton)});
 	},
 	
 	submitUserParamsForm : function(userId, repositoryId){
@@ -304,34 +301,41 @@ ConfigEditor = Class.create({
 			this.repoButtonClick(true);
 		}.bind(this));
 		this.drivers = new Hash();
-		this.submitForm('create_repository', 'get_drivers_definition', new Hash(), null, function(xmlData){
-			console.log(xmlData);
-			var driverNodes = XPathSelectNodes(xmlData, "ajxpdriver");
-			driversNodes.each(function(driver){
+		this.submitForm('create_repository', 'get_drivers_definition', new Hash(), null, function(xmlData){			
+			var driverNodes = XPathSelectNodes(xmlData, "drivers/ajxpdriver");			
+			for(var i=0;i<driverNodes.length;i++){				
+				var driver = driverNodes[i];
 				var driverDef = new Hash();
 				var driverLabel = XPathGetSingleNodeText(driver, "@label");
+				var driverName = XPathGetSingleNodeText(driver, "@name");
 				var driverParams = XPathSelectNodes(driver, "param");
 				driverDef.set('label', driverLabel);
+				driverDef.set('description', XPathGetSingleNodeText(driver, "@description"));
+				driverDef.set('name', driverName);
 				var driverParamsArray = new Array();
-				driverParams.each(function(paramNode){
+				for(j=0;j<driverParams.length;j++){
+					var paramNode = driverParams[j];
 					driverParamsArray.push(this.driverParamNodeToHash(paramNode));
-				});
+				}
 				driverDef.set('params', driverParamsArray);
-				this.drivers.set(driverLabel, driverDef);
-			}); 
+				this.drivers.set(driverName, driverDef);
+			}
 			this.updateDriverSelector();
-		});
+		}.bind(this) );
 	},
 	
-	updateDriverSelector : function(){		
+	updateDriverSelector : function(){				
 		if(!this.drivers || !this.driverSelector) return;
+		if(Prototype.Browser.IE){this.driverSelector.hide();}
 		this.driverSelector.update('<option value="0"></option>');
 		this.drivers.each(function(pair){
 			var option = new Element('option');
 			option.setAttribute('value', pair.key);
 			option.update(pair.value.get('label'));
 			this.driverSelector.insert({'bottom':option});
+			console.log('option inserted!');
 		}.bind(this) );
+		if(Prototype.Browser.IE){this.driverSelector.show();}
 		this.driverSelector.onchange = this.driverSelectorChange.bind(this);
 	},
 	
@@ -340,7 +344,7 @@ ConfigEditor = Class.create({
 		var dName = this.driverSelector.getValue();
 		this.createDriverForm(dName);
 		if(dName != "0"){
-			var height = 100 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
+			var height = 120 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
 			if(height > 400) height=400;
 		}
 		new Effect.Morph(this.driverForm.up('div'),{
@@ -359,10 +363,8 @@ ConfigEditor = Class.create({
 			return;
 		}
 		var dOpt = this.drivers.get(driverName);
-		this.driverForm.update('<div style="padding-top:4px;color:#79f;"><b style="color:#79f;">'+dOpt.get('label') + '</b> : ' + dOpt.get('description')+'<br></div>');
+		this.driverForm.update('<div style="padding-top:2px; padding-left:127px; margin-top: 30px; color:#79f; border-top:1px solid #ccc;">' + dOpt.get('description')+'<br></div>');
 		this.createParametersInputs(this.driverForm, dOpt.get('params'), false);
-		//var buttons = '';
-		//this.driverForm.insert({'bottom':buttons});
 	},
 	
 	repoButtonClick  : function(validate){
@@ -385,10 +387,7 @@ ConfigEditor = Class.create({
 			this.displayMessage("ERROR", "Mandatory fields are missing!");
 			return false;
 		}		
-		this.submitForm('create_repository', '', toSubmit, null, function(){
-			//this.repoButtonClick(false);
-			//this.loadRepList();
-			//this.loadUsers();
+		this.submitForm('edit_repository', 'create_repository', toSubmit, null, function(){
 			hideLightBox();			
 		}.bind(this));
 		return false;		
@@ -396,7 +395,8 @@ ConfigEditor = Class.create({
 	
 	loadRepository : function(repId){
 		var params = new Hash();
-		params.set("get_action", "edit_repository");
+		params.set("get_action", "edit");
+		params.set("sub_action", "edit_repository");
 		params.set("repository_id", repId);
 		var connexion = new Connexion();
 		connexion.setParameters(params);
@@ -415,9 +415,9 @@ ConfigEditor = Class.create({
 		var optionsPane = this.form.select('[id="options_pane"]')[0];		
 			
 		var driverParamsHash = $A([]);
-		driverParams.each(function(param){
-			driverParamsHash.push(this.driverParamNodeToHash(param));
-		}.bind(this));		
+		for(var i=0;i<driverParams.length;i++){
+			driverParamsHash.push(this.driverParamNodeToHash(driverParams[i]));
+		}
 				
 		var form = new Element('div', {className:'driver_form'});
 		optionsPane.update(new Element('legend').update(XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' Driver Options'));
@@ -432,7 +432,7 @@ ConfigEditor = Class.create({
 		this.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable);
 
 		if(writeable){
-			var submitButton = new Element("input", {type:"button",value:"SAVE CHANGES"});
+			var submitButton = new Element("input", {type:"button",value:"SAVE", className:"dialogButton"});
 			submitButton.observe("click", function(e){
 				var toSubmit = new Hash();
 				toSubmit.set("repository_id", repo.getAttribute("index"));
@@ -448,10 +448,8 @@ ConfigEditor = Class.create({
 		
 				
 		var labelPane = this.form.select('[id="label_pane"]')[0];
-		var deleteRepoPane = this.form.select('[id="delete_repo_pane"]')[0];
 		if(!writeable || writeable != "1"){
 			labelPane.hide();
-			deleteRepoPane.hide();
 		}else{
 			var repoId = XPathGetSingleNodeText(repo, "@index");
 			var repoLabel = XPathGetSingleNodeText(repo, "@display");
@@ -461,21 +459,8 @@ ConfigEditor = Class.create({
 			labelSave = labelPane.select('input[type="button"]')[0];
 			labelSave.observe("click", function(){
 				this.submitForm('edit_repository', 'edit_repository_label', new Hash({repository_id:repoId,newLabel:labelInput.getValue()}), null, function(){
-					//this.loadRepList();
-					//this.loadUsers();
 				}.bind(this) );
-			}.bind(this));
-			
-			var deleteBox = deleteRepoPane.select('input[type="checkbox"]')[0]; 
-			var deleteButton = deleteRepoPane.select('input[type="button"]')[0]; 		
-			console.log(deleteBox, deleteButton);
-			deleteButton.observe('click', function(){
-				if(!deleteBox.checked) {
-					alert("Please check the box to confirm!");
-					return;
-				}
-				this.deleteRepository(repoId);
-			}.bind(this));
+			}.bind(this));			
 		}
 	},
 	
@@ -526,7 +511,7 @@ ConfigEditor = Class.create({
 				element = '<input type="radio" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
 				element = element + '<input type="radio" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
 			}
-			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:30%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:70%">'+element+(showTip?' &nbsp;<small style="color:#AAA;">'+desc+'</small>':' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/help-about.png" alt="'+desc+'"  title="'+desc+'" width="16" height="16" align="absmiddle" class="helpImage"/>')+'</div>');
+			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:30%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:'+(Prototype.Browser.IE?'65%':'70%')+'">'+element+(showTip?' &nbsp;<small style="color:#AAA;">'+desc+'</small>':' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/help-about.png" alt="'+desc+'"  title="'+desc+'" width="16" height="16" align="absmiddle" class="helpImage"/>')+'</div>');
 			form.insert({'bottom':div});
 		});
 	},
@@ -559,7 +544,7 @@ ConfigEditor = Class.create({
 		}
 		if(parameters)
 		{
-			parameters.set('get_action', mainAction);
+			parameters.set('get_action', "edit");			
 			parameters.set('sub_action', action);
 			connexion.setParameters(parameters);
 		}
@@ -615,56 +600,27 @@ ConfigEditor = Class.create({
 				if(write != 'old') $('chck_'+repositoryId+'_write').checked = (write=='1'?true:false);
 				$('chck_'+repositoryId+'_write').disabled = false;
 			}
-			else if(childs[i].nodeName == "refresh_user_list")
-			{
-				this.loadUsers();
-			}
-			else if(childs[i].nodeName == "ajxpdriver")
-			{
-				driversList = true;
-				if(!this.drivers) this.drivers = new Hash();
-				var dOption = new Hash();
-				var dName = childs[i].getAttribute('name');
-				dOption.set('label', childs[i].getAttribute('label'));
-				dOption.set('description', childs[i].getAttribute('description'));
-				var params = $A([]);
-				var userParams = $A([]);
-				var dChilds = childs[i].childNodes;
-				for(var j=0;j<dChilds.length;j++){
-					var childNodeName = dChilds[j].nodeName;
-					if(childNodeName == 'param' || childNodeName == 'user_param'){
-						var paramProp = new Hash();
-						driversAtts.each(function(attName){
-							paramProp.set(attName, (dChilds[j].getAttribute(attName) || ''));
-						});
-						if(childNodeName == 'param') params.push(paramProp);
-						else userParams.push(paramProp);
-					}
-				}
-				dOption.set('params', params);
-				dOption.set('user_params', userParams);
-				this.drivers.set(dName, dOption);
-			}
 			else if(childs[i].nodeName == "repository")
 			{
 				if(!this.repositories || !repList) this.repositories = new Hash();
 				repList = true;
 				this.repositories.set(childs[i].getAttribute('index'), childs[i]);
 			}
-			else if(childs[i].nodeName == "file"){
-				if(!this.logFiles) this.logFiles = new Hash();
-				logFilesList = true;
-				this.logFiles.set(childs[i].getAttribute('date'), childs[i].getAttribute('display'));
-			}
-		}
-		if(driversList){
-			this.updateDriverSelector();
-		}
-		if(repList){
-			this.updateRepList();
-		}
-		if(logFilesList){
-			this.updateLogsSelector();
+			else if(childs[i].tagName == "reload_instruction")
+			{
+				var obName = childs[i].getAttribute('object');
+				if(obName == 'tree')
+				{
+					var node = childs[i].getAttribute('node');				
+					if(node == null) ajaxplorer.foldersTree.reloadCurrentNode();
+					else ajaxplorer.foldersTree.reloadNode(node);
+				}
+				else if(obName == 'list')
+				{
+					var file = childs[i].getAttribute('file');
+					ajaxplorer.filesList.reload(file);				
+				}
+			}			
 		}
 	},
 
