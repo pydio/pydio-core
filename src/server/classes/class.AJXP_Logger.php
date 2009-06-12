@@ -221,10 +221,12 @@ class AJXP_Logger {
 		return $msg;			
 	}
 	
-	function xmlListLogFiles($nodeName="file"){
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null){
 		$dir = $this->storageDir;
 		if(!is_dir($this->storageDir)) return ;
 		$logs = array();
+		$years = array();
+		$months = array();
 		if(($handle = opendir($this->storageDir))!==false){
 			while($file = readdir($handle)){				
 				$split = split("\.", $file);
@@ -232,18 +234,33 @@ class AJXP_Logger {
 				$split2 = split("_", $split[0]);
 				$date = $split2[1];
 				$dSplit = split("-", $date);
+				$logY = $dSplit[2];
+				$logM = $dSplit[0];
 				$time = mktime(0,0,1,$dSplit[0], $dSplit[1], $dSplit[2]);
-				$display = date("D. d M. Y", $time);
-				$logs[$time] = "<$nodeName date=\"$date\" display=\"$display\" text=\"$display\"/>";
+				$display = date("l d", $time);
+				$fullYear = date("Y", $time);
+				$fullMonth = date("F", $time);
+				if($year != null && $fullYear != $year) continue;
+				if($month != null && $fullMonth != $month) continue;
+				$logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"1\" filename=\"$date\"/>";
+				$years[$logY] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" src=\"content.php?dir=%2Flogs%2F$fullYear\"/>";
+				$months[$logM] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" src=\"content.php?dir=%2Flogs%2F$fullYear%2F$fullMonth\"/>";
 			}
 			closedir($handle);	
 		}
-		ksort($logs);
-		foreach($logs as $log) print($log);
+		$result = $years;
+		if($year != null){
+			$result = $months;
+			if($month != null){
+				$result = $logs;
+			}
+		}
+		krsort($result);
+		foreach($result as $log) print($log);
 		return ;		
 	}
 	
-	function xmlLogs($date){
+	function xmlLogs($date, $nodeName = "log"){
 				
 		$fName = $this->storageDir."log_".$date.".txt";
 		if(!is_file($fName) || !is_readable($fName)) return;
@@ -254,7 +271,7 @@ class AJXP_Logger {
 			$line = Utils::xmlEntities($line);
 			$matches = array();
 			if(preg_match("/(.*)\t(.*)\t(.*)\t(.*)\t(.*)\t(.*)$/", $line, $matches)!==false){
-				print(utf8_encode("<log date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\"/>"));
+				print(utf8_encode("<$nodeName date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\"/>"));
 			}
 		}
 		return ;
