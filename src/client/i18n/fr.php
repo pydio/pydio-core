@@ -331,5 +331,12 @@ $mess=array(
 "294" => "Durée de validité du lien (en jours)",
 "295" => "Mot de passe (laisser vide pour aucun)",
 "296" => "Veuillez trouver le lien ci dessous:",
+"297" => "New User",
+"298" => "Create a new user",
+"299" => "New Repo.",
+"300" => "Create a new repository",
+"create_repo_accesskey" => "R",
+"create_user_accesskey" => "U",
+"301" => "Edit configuration"
 );
 ?>
