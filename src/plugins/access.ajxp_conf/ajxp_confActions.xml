@@ -278,5 +278,17 @@
 				</div>
 			]]></html>
 		</infoPanel>
+		<infoPanel mime="no_selection" attributes="">
+			<messages>
+				<message key="files_string" id="265"/>
+			</messages>
+			<html><![CDATA[
+				<div style="padding:10px;">
+					<div class="folderImage">
+						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/admin.png" height="64" width="64">
+					</div>
+				</div>
+			]]></html>
+		</infoPanel>		
 	</infoPanels>
 </driver>

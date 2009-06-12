@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="ajxpclient">
 	<actions>
+	<!--
 		<action name="admin">
 			<gui text="165" title="165" src="admin.png" hasAccessKey="true"
 				accessKey="settings_access_key">
@@ -36,5 +37,6 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>		
+	-->
 	</actions>
 </driver>

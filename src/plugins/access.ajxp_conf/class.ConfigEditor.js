@@ -332,8 +332,7 @@ ConfigEditor = Class.create({
 			var option = new Element('option');
 			option.setAttribute('value', pair.key);
 			option.update(pair.value.get('label'));
-			this.driverSelector.insert({'bottom':option});
-			console.log('option inserted!');
+			this.driverSelector.insert({'bottom':option});			
 		}.bind(this) );
 		if(Prototype.Browser.IE){this.driverSelector.show();}
 		this.driverSelector.onchange = this.driverSelectorChange.bind(this);
