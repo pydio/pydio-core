@@ -146,14 +146,29 @@ class AJXP_XMLWriter
 		$st = "";
 		$st .= "<repositories>";
 		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
-		{			
+		{		
+			$toLast = false;
+			if($rootDirObject->getAccessType()=="ajxp_conf"){
+				if(ENABLE_USERS && !$loggedUser->isAdmin()){
+					continue;
+				}else{
+					$toLast = true;
+				}				
+			}
 			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $details) {
 				$rightString = "";
 				if($details){
 					$rightString = " r=\"".($loggedUser->canRead($rootDirIndex)?"1":"0")."\" w=\"".($loggedUser->canWrite($rootDirIndex)?"1":"0")."\"";
 				}
-				$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+				if($toLast){
+					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+				}else{
+					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+				}
 			}
+		}
+		if(isSet($lastString)){
+			$st.= $lastString;
 		}
 		$st .= "</repositories>";
 		return $st;

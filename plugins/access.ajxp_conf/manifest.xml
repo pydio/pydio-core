@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="ajxp_conf" label="Admin Driver" description="Access AjaXplorer configuration data.">
-	<client_settings icon="plugins/access.fs/icon.png" search_engine="SearchEngine">
+	<client_settings icon="client/images/crystal/mimes/16/admin.png" search_engine="SearchEngine">
 		<resources>
 			<js file="plugins/access.ajxp_conf/class.ConfigEditor.js" className="ConfigEditor"/>
 		</resources>

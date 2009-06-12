@@ -89,12 +89,18 @@ $AUTH_DRIVER = array(
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
 
+// DO NOT REMOVE THIS!
+$REPOSITORIES[0] = array(
+	"DISPLAY"		=>	"Settings", 
+	"DRIVER"		=>	"ajxp_conf", 
+	"DRIVER_OPTIONS"=> array()	
+);
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.
 /* Use the GUI to add new repositories to explore!
-/*   + Log in as "admin" and go to "Settings">"Repositories"
+/*   + Log in as "admin" and open the "Settings" Repository
 /*********************************************************/
-$REPOSITORIES[0] = array(
+$REPOSITORIES[1] = array(
 	"DISPLAY"		=>	"Default Files", 
 	"DRIVER"		=>	"fs", 
 	"DRIVER_OPTIONS"=> array(

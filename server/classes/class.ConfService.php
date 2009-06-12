@@ -398,10 +398,11 @@ class ConfService
 			while (($subdir = readdir($fp))!==false) {
 				$manifName = $base."/".$subdir."/manifest.xml";
 				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("access."))=="access."){
-					if($filterByDriverName != ""){
-						$dName = substr($subdir, strlen("access."));
+					$dName = substr($subdir, strlen("access."));
+					if($dName == "ajxp_conf") continue;
+					if($filterByDriverName != ""){						
 						if($dName!=$filterByDriverName) continue;
-					}
+					}					
 					$lines = file($manifName);
 					if($filterByTagName!=""){
 						$filterLines = array();
