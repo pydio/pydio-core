@@ -324,6 +324,18 @@ $mess=array(
 "288" => "User", 
 "289" => "Group",
 "290" => "All",
-"291" => "Apply recursively?"
+"291" => "Apply recursively?",
+"292" => "Public link",
+"293" => "Create a public link to this file",
+"294" => "Link time expiration (in days)",
+"295" => "Password (leave blank for now)",
+"296" => "Please copy the link below:",
+"297" => "New User",
+"298" => "Create a new user",
+"299" => "New Repo.",
+"300" => "Create a new repository",
+"create_repo_accesskey" => "R",
+"create_user_accesskey" => "U",
+"301" => "Edit configuration"
 );
 ?>
