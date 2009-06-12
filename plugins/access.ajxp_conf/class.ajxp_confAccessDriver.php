@@ -44,7 +44,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null || !$loggedUser->isAdmin()) return ;
 		
-		if($action == "edit_user" || $action == "edit_repository"){
+		if($action == "edit"){
 			if(isSet($httpVars["sub_action"])){
 				$action = $httpVars["sub_action"];
 			}
@@ -152,27 +152,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::close();
 				exit(1);										
 			break;
-			
-			case "delete_user" : 
-				$forbidden = array("guest", "share");
-				if(!isset($_GET["user_id"]) || $_GET["user_id"]=="" 
-					|| in_array($_GET["user_id"], $forbidden)
-					|| $loggedUser->getId() == $_GET["user_id"])
-				{
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, "Wrong Arguments!");
-					AJXP_XMLWriter::close();
-					exit(1);									
-				}
-				$res = AuthService::deleteUser($_GET["user_id"]);
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("User successfully erased", null);
-				AJXP_XMLWriter::reloadCurrentNode();
-				AJXP_XMLWriter::close();
-				exit(1);
-			break;			
-					
-					
+								
 			case "change_admin_right" :
 				$userId = $_GET["user_id"];
 				$confStorage = ConfService::getConfStorageImpl();		
@@ -181,7 +161,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$user->save();
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage("Changed admin right for user ".$_GET["user_id"], null);
-				AJXP_XMLWriter::reloadCurrentNode();
+				AJXP_XMLWriter::reloadFileList(false);
 				AJXP_XMLWriter::close();
 				exit(1);
 			break;
@@ -277,14 +257,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				exit(1);						
 			break;
 	
+			case  "get_drivers_definition":
+				
+				AJXP_XMLWriter::header("drivers");
+				print(ConfService::availableDriversToXML("param"));
+				AJXP_XMLWriter::close("drivers");
+				exit(1);
+				
+			break;
+			
 			case "create_repository" : 
 			
-				if(isSet($httpVars["sub_action"]) && $httpVars["sub_action"] == "get_drivers_definition"){
-					AJXP_XMLWriter::header("drivers");
-					print(ConfService::availableDriversToXML("param"));
-					AJXP_XMLWriter::close("drivers");
-					exit(1);
-				}
 				$options = array();
 				$repDef = $_GET;
 				unset($repDef["get_action"]);
@@ -294,7 +277,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
 						unset($repDef[$key]);
 					}else{
-						$repDef[$key] = $value;				
+						if($key == "DISLPAY"){
+							$value = SystemTextEncoding::fromPostedFileName($value);
+						}
+						$repDef[$key] = $value;		
 					}
 				}
 				if(count($options)){
@@ -322,6 +308,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
 				}else{
 					AJXP_XMLWriter::sendMessage("Successfully created repository", null);
+					AJXP_XMLWriter::reloadFileList($newRep->getDisplay());
 				}
 				AJXP_XMLWriter::close();
 				exit(1);
@@ -334,6 +321,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repList = ConfService::getRootDirsList();
 				//print_r($repList);
 				AJXP_XMLWriter::header("admin_data");		
+				if(!isSet($repList[$repId])){
+					AJXP_XMLWriter::close("admin_data");
+					exit(1);
+				}
 				$repository = $repList[$repId];				
 				$nested = array();
 				print("<repository index=\"$repId\"");
@@ -396,23 +387,45 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if($res == -1){
 					AJXP_XMLWriter::sendMessage(null, "Error while trying to edit repository");
 				}else{
-					AJXP_XMLWriter::sendMessage("Successfully edited repository", null);
+					AJXP_XMLWriter::sendMessage("Successfully edited repository", null);					
+					AJXP_XMLWriter::reloadFileList(false);
 				}
 				AJXP_XMLWriter::close();		
 				exit(1);
 			
-			case "delete_repository" :
-				$repId = $_GET["repository_id"];
-				//if(get_magic_quotes_gpc()) $repLabel = stripslashes($repLabel);
-				$res = ConfService::deleteRepository($repId);
-				AJXP_XMLWriter::header();
-				if($res == -1){
-					AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
+			case "delete" :
+				if(isSet($httpVars["repository_id"])){
+					$repId = $httpVars["repository_id"];
+					//if(get_magic_quotes_gpc()) $repLabel = stripslashes($repLabel);
+					$res = ConfService::deleteRepository($repId);
+					AJXP_XMLWriter::header();
+					if($res == -1){
+						AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
+					}else{
+						AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);
+						AJXP_XMLWriter::reloadFileList(false);
+					}
+					AJXP_XMLWriter::close();		
+					exit(1);
 				}else{
-					AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);
+					$forbidden = array("guest", "share");
+					if(!isset($httpVars["user_id"]) || $httpVars["user_id"]=="" 
+						|| in_array($_GET["user_id"], $forbidden)
+						|| $loggedUser->getId() == $httpVars["user_id"])
+					{
+						AJXP_XMLWriter::header();
+						AJXP_XMLWriter::sendMessage(null, "Wrong Arguments!");
+						AJXP_XMLWriter::close();
+						exit(1);									
+					}
+					$res = AuthService::deleteUser($httpVars["user_id"]);
+					AJXP_XMLWriter::header();
+					AJXP_XMLWriter::sendMessage("User successfully erased", null);
+					AJXP_XMLWriter::reloadFileList($httpVars["user_id"]);
+					AJXP_XMLWriter::close();
+					exit(1);
+					
 				}
-				AJXP_XMLWriter::close();		
-				exit(1);
 			break;
 			
 			
@@ -427,8 +440,21 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	function listUsers(){
 		print '<columns switchGridMode="filelist"><column messageString="User Name" attributeName="ajxp_label" sortType="String"/><column messageString="Is Admin" attributeName="isAdmin" sortType="String"/></columns>';		
 		$users = AuthService::listUsers();
+		$loggedUser = AuthService::getLoggedUser();		
 		foreach ($users as $userObject){
-			print '<tree text="'.$userObject->getId().'" isAdmin="'.($userObject->isAdmin()?"True":"False").'" icon="yast_kuser.png" openicon="yast_kuser.png" filename="/users/'.$userObject->getId().'" parentname="/users" is_file="1" ajxp_mime="user"/>';
+			$isAdmin = $userObject->isAdmin();
+			$userId = $userObject->getId();
+			$icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
+			print '<tree 
+				text="'.$userId.'"
+				isAdmin="'.($isAdmin?"True":"False").'" 
+				icon="'.$icon.'.png" 
+				openicon="'.$icon.'.png" 
+				filename="/users/'.$userId.'" 
+				parentname="/users" 
+				is_file="1" 
+				ajxp_mime="user'.(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"").'"
+				/>';
 		}
 	}
 	
@@ -436,7 +462,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		print '<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>';		
 		$repos = ConfService::getRepositoriesList();
 		foreach ($repos as $repoIndex => $repoObject){
-			print '<tree text="'.$repoObject->getDisplay().'" is_file="1" repository_id="'.$repoIndex.'" accessType="'.$repoObject->getAccessType().'" icon="folder_red.png" openicon="folder_red.png" filename="/users/'.$repoObject->getDisplay().'" parentname="/users" src="content.php?dir=%2Fusers%2F'.$repoObject->getDisplay().'" ajxp_mime="repository"/>';
+			print '<tree 
+				text="'.$repoObject->getDisplay().'" 
+				is_file="1" 
+				repository_id="'.$repoIndex.'" 
+				accessType="'.$repoObject->getAccessType().'" 
+				icon="folder_red.png" 
+				openicon="folder_red.png" 
+				filename="/users/'.$repoObject->getDisplay().'" 
+				parentname="/users" 
+				src="content.php?dir=%2Fusers%2F'.$repoObject->getDisplay().'" 
+				ajxp_mime="repository'.($repoObject->isWriteable()?"_editable":"").'"
+				/>';
 		}
 		
 	}
