@@ -390,7 +390,7 @@ class ConfService
 		
 	}
 	
-	function availableDriversToXML(){
+	function availableDriversToXML($filterByTagName = "", $filterByDriverName=""){
 		$manifests = array();
 		$base = INSTALL_PATH."/plugins";
 		$xmlString = "";
@@ -398,8 +398,22 @@ class ConfService
 			while (($subdir = readdir($fp))!==false) {
 				$manifName = $base."/".$subdir."/manifest.xml";
 				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("access."))=="access."){
+					if($filterByDriverName != ""){
+						$dName = substr($subdir, strlen("access."));
+						if($dName!=$filterByDriverName) continue;
+					}
 					$lines = file($manifName);
-					array_shift($lines);// Remove first line (xml declaration);					
+					if($filterByTagName!=""){
+						$filterLines = array();
+						foreach ($lines as $line){
+							if(strstr(trim($line), "<$filterByTagName")!==false || strstr(trim($line), "<ajxpdriver")!==false || strstr(trim($line), "</ajxpdriver>")!==false){
+								$filterLines[] = $line;
+							}
+						}
+						$lines = $filterLines;
+					}else{
+						array_shift($lines);// Remove first line (xml declaration);
+					}
 					$xmlString .= implode("", $lines);
 				}
 			}
