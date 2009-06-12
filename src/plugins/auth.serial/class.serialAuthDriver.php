@@ -76,9 +76,9 @@ class serialAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $passwd;
-		}else{
 			$users[$login] = md5($passwd);
+		}else{
+			$users[$login] = $passwd;
 		}
 		Utils::saveSerialFile($this->usersSerFile, $users);		
 	}	
@@ -86,9 +86,9 @@ class serialAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$users[$login] = $newPass;
-		}else{
 			$users[$login] = md5($newPass);
+		}else{
+			$users[$login] = $newPass;
 		}
 		Utils::saveSerialFile($this->usersSerFile, $users);
 	}	
