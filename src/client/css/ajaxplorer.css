@@ -174,7 +174,8 @@ DIALOG BOXES
 
 .dialogContent input,
 .dialogContent input[type="text"],
-.dialogContent input[type="password"]
+.dialogContent input[type="password"],
+.dialogContent select
 {
     margin-left:0px;
     width: 250px;
@@ -194,7 +195,8 @@ DIALOG BOXES
     text-align: center;
 }
 
-.dialogButtons input
+.dialogButtons input,
+fieldSet input.dialogButton
 {
     margin-left: 10px;
     width: 65px;    
@@ -1288,7 +1290,8 @@ legend
    margin-right: 5px;
 }
 
-#user_admin_bar .submit_button, .password .submit_button 
+#user_admin_bar .submit_button, .password .submit_button,
+#options_pane .submit_button, .password .submit_button 
 {
    width: 30px;
 }
@@ -1340,10 +1343,12 @@ legend
 }
 
 #driver_form input.radio,
-.driver_form input.radio
+.driver_form input.radio, 
+ input.radio
 {
    border : none;
    margin-left: 0px;
+   width: 20px;
 }
 
 #driver_form input.button,
