@@ -1,42 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="ajxpclient">
 	<actions>
-	<!--
-		<action name="admin">
-			<gui text="165" title="165" src="admin.png" hasAccessKey="true"
-				accessKey="settings_access_key">
-				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="user">
-				</context>
-			</gui>
-			<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="true"></rightsContext>			
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-				modal.showDialogForm(
-					'Ajaxplorer Settings', 
-					'admin_form', 
-					function(form){
-					    setTimeout(function(){
-							form.select('iframe')[0].src='admin.php';
-						}, 10);
-					}, 
-					function(){				
-						hideLightBox();return false;
-					}, 
-					null, 
-					true);		
-					]]></clientCallback>
-				<clientForm id="admin_form"><![CDATA[
-					<div id="admin_form" box_width="665">
-					<div id="adminScreen">
-					<iframe id="adminIFrame" frameborder="0"></iframe>
-					</div>
-					</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>		
-	-->
 	</actions>
 </driver>
