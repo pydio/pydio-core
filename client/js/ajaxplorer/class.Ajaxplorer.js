@@ -112,7 +112,7 @@ Ajaxplorer = Class.create({
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
 			var repoObject = this._initRepositoriesList.get(this._initRepositoryId);
 			this.foldersTree = new FoldersTree('tree_container', repoObject.getLabel(), ajxpServerAccessPath+'?action=ls', this);
-			this.refreshRootDirMenu(this._initRepositoriesList, this._initRepositoryId);
+			this.refreshRepositoriesMenu(this._initRepositoriesList, this._initRepositoryId);
 			this.actionBar.loadActions();
 			this.infoPanel.load();
 			this.foldersTree.changeRootLabel(repoObject.getLabel(), repoObject.getIcon());
@@ -196,7 +196,7 @@ Ajaxplorer = Class.create({
 	
 	getLoggedUserFromServer: function(){
 		var connexion = new Connexion();
-		var rememberData = retrieveRememberData();
+		//var rememberData = retrieveRememberData();
 		connexion.addParameter('get_action', 'logged_user');
 		connexion.onComplete = function(transport){this.logXmlUser(transport.responseXML);}.bind(this);
 		connexion.sendAsync();	
@@ -227,10 +227,37 @@ Ajaxplorer = Class.create({
 			repositoryObject = repList.get(repId);
 		}
 		this.actionBar.setUser(this.user);
-		this.refreshRootDirMenu(repList, repId);
+		this.refreshRepositoriesMenu(repList, repId);
 		this.loadRepository(repositoryObject);
 	},
 		
+	reloadRepositoriesList : function(){
+		if(!this.user) return;
+		var connexion = new Connexion();
+		connexion.addParameter('get_action', 'logged_user');
+		connexion.onComplete = function(transport){			
+			try{			
+				var childs = transport.responseXML.documentElement.childNodes;		
+				for(var i=0; i<childs.length;i++){
+					if(childs[i].tagName == "user"){
+						var userId = childs[i].getAttribute('id');
+						childs = childs[i].childNodes;
+					}
+				}	
+				if(userId != this.user.id){ 
+					return;
+				}
+				this.user.loadFromXml(childs);
+			}catch(e){alert('Error parsing XML for user : '+e);}
+			
+			repId = this.user.getActiveRepository();
+			repList = this.user.getRepositoriesList();
+			this.refreshRepositoriesMenu(repList, repId);
+			
+		}.bind(this);
+		connexion.sendAsync();			
+	},
+	
 	loadRepository: function(repository){
 		repository.loadResources();
 		var repositoryId = repository.getId();
@@ -252,7 +279,7 @@ Ajaxplorer = Class.create({
 		$('repo_path').value = repository.getLabel();
 		$('repo_icon').src = newIcon;
 		if(!(this.usersEnabled && this.user) && this._initRepositoriesList){
-			this.refreshRootDirMenu(this._initRepositoriesList, repositoryId);			
+			this.refreshRepositoriesMenu(this._initRepositoriesList, repositoryId);			
 		}
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
@@ -264,7 +291,7 @@ Ajaxplorer = Class.create({
 		this.filesList.loadXmlList(rep, selectFile);	
 	},
 	
-	refreshRootDirMenu: function(rootDirsList, repositoryId){
+	refreshRepositoriesMenu: function(rootDirsList, repositoryId){
 		$('goto_repo_button').addClassName('disabled');
 		//if(!rootDirsList || rootDirsList.size() <= 1) return;
 		var actions = new Array();

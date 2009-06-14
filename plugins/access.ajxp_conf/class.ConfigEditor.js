@@ -446,6 +446,7 @@ ConfigEditor = Class.create({
 		
 		
 				
+		/*
 		var labelPane = this.form.select('[id="label_pane"]')[0];
 		if(!writeable || writeable != "1"){
 			labelPane.hide();
@@ -461,6 +462,7 @@ ConfigEditor = Class.create({
 				}.bind(this) );
 			}.bind(this));			
 		}
+		*/
 	},
 	
 	deleteRepository : function(repId){
@@ -618,6 +620,8 @@ ConfigEditor = Class.create({
 				{
 					var file = childs[i].getAttribute('file');
 					ajaxplorer.filesList.reload(file);				
+				}else if(obName == "repository_list"){
+					ajaxplorer.reloadRepositoriesList();
 				}
 			}			
 		}

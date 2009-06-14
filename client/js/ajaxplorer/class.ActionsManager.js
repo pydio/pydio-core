@@ -437,6 +437,8 @@ ActionsManager = Class.create({
 				{
 					var file = childs[i].getAttribute('file');
 					ajaxplorer.filesList.reload(file);				
+				}else if(obName == 'repository_list'){
+					ajaxplorer.reloadRepositoriesList();
 				}
 			}
 			else if(childs[i].tagName == "logging_result")

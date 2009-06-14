@@ -187,9 +187,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$user = $confStorage->createUserObject($_GET["user_id"]);
 				$user->setRight($_GET["repository_id"], $_GET["right"]);
 				$user->save();
+				$loggedUser = AuthService::getLoggedUser();
+				if($loggedUser->getId() == $user->getId()){
+					AuthService::updateUser($user);
+				}
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage("Changed right for user ".$_GET["user_id"], null);
 				print("<update_checkboxes user_id=\"".$_GET["user_id"]."\" repository_id=\"".$_GET["repository_id"]."\" read=\"".$user->canRead($_GET["repository_id"])."\" write=\"".$user->canWrite($_GET["repository_id"])."\"/>");
+				AJXP_XMLWriter::reloadRepositoryList();
 				AJXP_XMLWriter::close();
 				exit(1);
 			break;
@@ -314,6 +319,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}else{
 					AJXP_XMLWriter::sendMessage("Successfully created repository", null);
 					AJXP_XMLWriter::reloadFileList($newRep->getDisplay());
+					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();
 				exit(1);
@@ -393,7 +399,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, "Error while trying to edit repository");
 				}else{
 					AJXP_XMLWriter::sendMessage("Successfully edited repository", null);					
-					AJXP_XMLWriter::reloadFileList(false);
+					AJXP_XMLWriter::reloadFileList((isSet($_GET["newLabel"])?SystemTextEncoding::fromPostedFileName($_GET["newLabel"]):false));
+					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();		
 				exit(1);
@@ -407,8 +414,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					if($res == -1){
 						AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
 					}else{
-						AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);
+						AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);						
 						AJXP_XMLWriter::reloadFileList(false);
+						AJXP_XMLWriter::reloadRepositoryList();
 					}
 					AJXP_XMLWriter::close();		
 					exit(1);
