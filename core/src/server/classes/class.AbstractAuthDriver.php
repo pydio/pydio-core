@@ -60,6 +60,21 @@ class AbstractAuthDriver extends AbstractDriver {
 	function changePassword($login, $oldPass, $newPass){}	
 	function deleteUser($login){}
 	
+	function getLoginRedirect(){
+		if(isSet($this->options["LOGIN_REDIRECT"])){
+			return $this->options["LOGIN_REDIRECT"];
+		}else{
+			return false;
+		}
+	}
+	
+	function replaceAjxpXmlKeywords($xml){	
+		$xml = parent::replaceAjxpXmlKeywords($xml);
+		$loginRedirect = $this->getLoginRedirect();		
+		$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
+		return $xml;
+	}
+	
 	function getOption($optionName){	
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
 	}

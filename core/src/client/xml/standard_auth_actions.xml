@@ -12,26 +12,31 @@
 			<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>			
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					modal.showDialogForm('Log In', 'login_form', 
-					function(){
-						var oForm = modal.getForm();
-						var connexion = new Connexion();
-						connexion.addParameter("get_action", "get_seed");
-						connexion.onComplete = function(transport){
-							$('login_seed').value = transport.responseText;
-						};
-						connexion.sendSync();
-					}, 
-					function(){
-						var oForm = modal.getForm();
-						if($('login_seed').value != '-1'){
-							oForm.password.value = hex_md5(hex_md5(oForm.password.value)+$('login_seed').value);
-						}
-						ajaxplorer.actionBar.submitForm(oForm);
-						oForm.userid.value = '';
-						oForm.password.value = '';
-						return false;				
-					});
+					var loginRedirect = AJXP_LOGIN_REDIRECT;
+					if(loginRedirect){
+						document.location.href=loginRedirect;
+					}else{
+						modal.showDialogForm('Log In', 'login_form', 
+						function(){
+							var oForm = modal.getForm();
+							var connexion = new Connexion();
+							connexion.addParameter("get_action", "get_seed");
+							connexion.onComplete = function(transport){
+								$('login_seed').value = transport.responseText;
+							};
+							connexion.sendSync();
+						}, 
+						function(){
+							var oForm = modal.getForm();
+							if($('login_seed').value != '-1'){
+								oForm.password.value = hex_md5(hex_md5(oForm.password.value)+$('login_seed').value);
+							}
+							ajaxplorer.actionBar.submitForm(oForm);
+							oForm.userid.value = '';
+							oForm.password.value = '';
+							return false;				
+						});
+					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>

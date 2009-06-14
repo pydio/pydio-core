@@ -118,7 +118,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					}
 					print("</user_wallet>");
 				}
-				print("<edit_options edit_pass=\"".($userId!="guest"?"1":"0")."\" edit_admin_right=\"".(($userId!="guest"&&$userId!=$loggedUser->getId())?"1":"0")."\" edit_delete=\"".(($userId!="guest"&&$userId!=$loggedUser->getId())?"1":"0")."\"/>");
+				$editPass = ($userId!="guest"?"1":"0");
+				$authDriver = ConfService::getAuthDriverImpl();
+				if(!$authDriver->passwordsEditable()){
+					$editPass = "0";
+				}
+				print("<edit_options edit_pass=\"".$editPass."\" edit_admin_right=\"".(($userId!="guest"&&$userId!=$loggedUser->getId())?"1":"0")."\" edit_delete=\"".(($userId!="guest"&&$userId!=$loggedUser->getId()&&$authDriver->usersEditable())?"1":"0")."\"/>");
 				AJXP_XMLWriter::close("admin_data");
 				exit(1) ;
 			break;
