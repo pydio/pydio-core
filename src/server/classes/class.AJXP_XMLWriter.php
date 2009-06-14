@@ -69,6 +69,16 @@ class AJXP_XMLWriter
 		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\" node=\"$nodeName\"/>", $print);
 	}
 		
+	function reloadFileList($fileOrBool, $print = true)
+	{
+		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".Utils::xmlEntities(SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
+		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
+	}
+	
+	function reloadRepositoryList($print = true){
+		return AJXP_XMLWriter::write("<reload_instruction object=\"repository_list\"/>", $print);
+	}
+	
 	function requireAuth($print = true)
 	{
 		return AJXP_XMLWriter::write("<require_auth/>", $print);
@@ -81,12 +91,6 @@ class AJXP_XMLWriter
 		}
 		$data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
 		return $data;		
-	}
-	
-	function reloadFileList($fileOrBool, $print = true)
-	{
-		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".Utils::xmlEntities(SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
-		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	
 	function writeBookmarks($allBookmarks)

@@ -128,7 +128,33 @@
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-		</action>					
+		</action>	
+		<action name="rename">
+			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					var callback = function(item, newValue){						
+						var conn = new Connexion();
+						conn.addParameter('get_action', 'edit');
+						conn.addParameter('sub_action', 'edit_repository_label');
+						conn.addParameter('repository_id', item.getAttribute('repository_id'));
+						conn.addParameter('newLabel', newValue);
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendSync();
+					};
+					ajaxplorer.filesList.switchCurrentLabelToEdition(callback);
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>						
 		<action name="edit" fileDefault="true">
 			<gui text="51" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
@@ -188,12 +214,7 @@
 							<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:30px;" />
 						</fieldset>
 					</div>
-					<div id="edit_repo_box" action="edit_repository" box_width="450" style="overflow:auto;height:300px;">
-						<fieldset id="label_pane">
-							<legend>Repository Label</legend>
-							<input type="text" value=""/>
-							<input type="button" class="dialogButton" value="SAVE"/>
-						</fieldset>
+					<div id="edit_repo_box" action="edit_repository" box_width="450" style="overflow:auto;height:200px;">
 						<fieldset id="options_pane">
 							Loading...
 						</fieldset>
