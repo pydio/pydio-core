@@ -135,10 +135,10 @@ Splitter = Class.create({
 	
 	doSplitMouse: function(event){
         if (!this.splitbar.hasClassName(this.options.activeClass)) return this.endSplit(event);
-        var rightBorderPos = Element.viewportOffset(this.paneA).left + Element.getWidth(this.paneA);
-        if (event.pointerX() < rightBorderPos + 10)
+        //var rightBorderPos = Element.viewportOffset(this.paneA).left + Element.getWidth(this.paneA);
+        //if (event.pointerX() < rightBorderPos + 10)
 		    this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
-        else this.endSplit(event);
+        //else this.endSplit(event);
 	}, 
 	
 	endSplit: function(event){
