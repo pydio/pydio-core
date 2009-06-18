@@ -91,6 +91,12 @@ class mysqlAccessDriver extends AbstractAccessDriver
 			$safeDir = $dir; 
 			$dir = SystemTextEncoding::fromUTF8($dir); 
 		}
+		// FILTER DIR PAGINATION ANCHOR
+		if(isSet($dir) && strstr($dir, "#")!==false){
+			$parts = split("#", $dir);
+			$dir = $parts[0];
+			$page = $parts[1];
+		}				
 		if(isSet($dest)) {
 			$dest = SystemTextEncoding::fromUTF8($dest);			
 		}

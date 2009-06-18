@@ -98,6 +98,9 @@ FoldersTree = Class.create({
  				return;
  			}
 			this.setCurrentNodeName(nodeId);
+			if(this.getCurrentNodeProperty("pagination_anchor")){
+				path = path + "#" + this.getCurrentNodeProperty("pagination_anchor");
+			}
 			ajaxplorer.actionBar.fireDefaultAction("dir", path);
 		}
 	},
@@ -117,6 +120,19 @@ FoldersTree = Class.create({
 			webFXTreeHandler.all[i].deSelect();
 		}
 		webFXTreeHandler.all[this.currentNodeName].select();	
+	},
+	
+	setCurrentNodeProperty : function(key, value){
+		if(webFXTreeHandler.all[this.currentNodeName]){
+			webFXTreeHandler.all[this.currentNodeName].key = value;
+		}
+	},
+	
+	getCurrentNodeProperty : function(key){
+		if(webFXTreeHandler.all[this.currentNodeName]){
+			return webFXTreeHandler.all[this.currentNodeName].key;
+		}
+		return null;
 	},
 	
 	setTreeInDestMode: function(){
