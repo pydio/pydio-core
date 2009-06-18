@@ -430,21 +430,23 @@ ACTION BAR
 #action_bar a, 
 .action_bar a
 {    
-background-repeat: no-repeat;
-background-position: center;
-color:#dfebfe;
-color: expression('#dfebfe');
-display:block;
-float:left;
-font-size:9px;
-height:44px;
-margin-right:5px;
-margin-top:3px;
-padding-bottom:0px;
-padding-top:0px;
-text-align:center;
-width:48px;
-overflow:visible;
+	background-repeat: no-repeat;
+	background-position: center;
+	color:#dfebfe;
+	color: expression('#dfebfe');
+	display:block;
+	float:left;
+	font-size:9px;
+	height:44px;
+	margin-right:5px;
+	margin-top:3px;
+	padding:0px;
+	text-align:center;
+	overflow:visible;
+}
+
+.action_bar a span{
+	padding: 0 5px;
 }
 
 .action_bar a
@@ -452,23 +454,10 @@ overflow:visible;
 	color:#084165!important;
 	color: expression('#084165');
 }
-
 #action_bar a:hover, 
 .action_bar a:hover
 {
-	padding-top:3px;
-	font-size: 11px;	
 	color: #fff;
-    text-decoration: none;
-}
-
-#action_bar a.disabled:hover, 
-.action_bar a.disabled:hover
-{	
-	padding-top:0px;
-	font-size: 9px;
-	color: #dfebfe;
-    text-decoration: none;
 }
 
 #action_bar a.disabled,
@@ -483,41 +472,9 @@ overflow:visible;
 .action_bar a img
 {
     margin-bottom: 3px;
-    margin-top: 3px;    
+    margin-top: 8px;    
 }
 
-#action_bar a:hover img,
-.action_bar a:hover img
-{
-    margin-bottom: 3px;
-    margin-top: 3px;
-    width:23px;
-    height:23px;
-}
-
-#action_bar a.disabled img,
-.action_bar a.disabled img,
-#action_bar a.disabled:hover img,
-.action_bar a.disabled:hover img
-{
-    margin-bottom: 3px;
-    margin-top: 3px;
-    width:21px;
-    height:21px;
-}
-
-/*
-#action_bar a span,
-.action_bar a span
-{
-	display: none;	
-}
-
-#action_bar a:hover span,
-.action_bar a:hover span
-{
-	display: block;
-}*/
 
 #action_bar div.separator,
 .action_bar div.separator
@@ -535,7 +492,7 @@ overflow:visible;
 	padding-bottom:2px;
 	padding-top:0px;
 	text-align:center;
-	width:2px;
+	width:1px;
 }
 
 .action_bar div.separator
@@ -635,25 +592,34 @@ overflow:visible;
    cursor: pointer;
    border-right:0px;
 }
-
+/*
 #logging_string
 {
-   float: right;
-   /*color: #c3d9ff;*/
    color: #084165;
    font-size: 15px;
    font-family: Trebuchet MS, sans-serif;      
    font-weight: bold;
-   padding-top: 0px;
    padding-right: 3px;
 }
-
+*/
+#logging_string {
+   float: right;
+	color:#666666;
+	font-family:Trebuchet MS,sans-serif;
+	font-size:12px;
+   padding-top: 3px;
+}
+#logging_string i
+{
+	font-weight:bold;
+}
 #logging_string i img
 {
     font-style: normal;    
     cursor: pointer;
-	/*border: 1px solid #aaa;*/
-	padding: 1px 3px;
+	margin-left:3px;
+	margin-right:7px;
+	margin-top:-4px;
 }
 
 
@@ -1284,7 +1250,7 @@ legend
 #user_admin_bar input, .password input
 {
    height: 18px;
-   width: 78px;
+   width: 90px;
    font-size: 12px;
    padding: 0px;
    margin-left: 0px;
