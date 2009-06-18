@@ -52,6 +52,10 @@ InfoPanel = Class.create({
 		this.registeredMimes = new Hash();
 	},
 	
+	empty : function(){
+		this.setContent('');
+	},
+	
 	update : function(){
 		if(!this.htmlElement) return;
 		var filesList = ajaxplorer.getFilesList();
