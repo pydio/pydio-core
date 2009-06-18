@@ -169,7 +169,14 @@ FilesList = Class.create(SelectableElements, {
 	
 	createPaginatorLink:function(page, text, title){
 		return new Element('a', {href:'#', style:'font-size:12px;', title:title}).update(text).observe('click', function(e){
-			this.loadXmlList(this._currentRep, null, null, $H({page:page}));
+			var path = this._currentRep;
+			if(this._currentRep.indexOf("#") > -1){
+				var path = this._currentRep.substring(0, this._currentRep.indexOf("#"));
+			}
+			path  = path + "#" + page;
+			ajaxplorer.actionBar.updateLocationBar(path);
+			ajaxplorer.foldersTree.setCurrentNodeProperty("pagination_anchor", page);
+			this.loadXmlList(path);
 			Event.stop(e);
 		}.bind(this));		
 	},
@@ -310,11 +317,7 @@ FilesList = Class.create(SelectableElements, {
 	
 	reload: function(pendingFileToSelect, url){
 		if(this._currentRep != null){
-			if(this.paginationData && this.paginationData.get('current') > 1){
-				this.loadXmlList(this._currentRep, pendingFileToSelect, url, $H({page:this.paginationData.get('current')}));
-			}else{
-				this.loadXmlList(this._currentRep, pendingFileToSelect, url);
-			}
+			this.loadXmlList(this._currentRep, pendingFileToSelect, url);
 		}
 	},
 	
