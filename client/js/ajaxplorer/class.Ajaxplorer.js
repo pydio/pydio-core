@@ -90,12 +90,19 @@ Ajaxplorer = Class.create({
 	},
 	
 	updateI18nTags: function(){
-		$$('[ajxp_message_id]').each(function(tag){			
-			tag.update(MessageHash[tag.readAttribute("ajxp_message_id")]);
+		var messageTags = $$('[ajxp_message_id]');		
+		messageTags.each(function(tag){	
+			var messageId = tag.getAttribute("ajxp_message_id");
+			try{
+				console.log(MessageHash[messageId]);
+				tag.innerHTML = MessageHash[messageId];
+			}catch(e){}
 		});
-		$$('[ajxp_message_title_id]').each(function(tag){			
-			tag.writeAttribute('title', MessageHash[tag.readAttribute("ajxp_message_title_id")]);
+		/*
+		$$('[ajxp_message_title_id]').each(function(tag){
+			tag.setAttribute('title', MessageHash[tag.getAttribute("ajxp_message_title_id")]);
 		});
+		*/
 	},
 	
 	initObjects: function(){

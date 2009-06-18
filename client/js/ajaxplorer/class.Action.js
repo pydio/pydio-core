@@ -263,17 +263,47 @@ Action = Class.create({
 		var img = new Element('img', {
 			id:this.options.name +'_button_icon',
 			src:imgPath,
-			width:22,
-			height:22,
+			width:18,
+			height:18,
 			border:0,
 			align:'absmiddle',
 			alt:this.options.title,
 			title:this.options.title
 		});
-		var titleSpan = new Element('span', {id:this.options.name+'_button_label'});
+		var titleSpan = new Element('span', {id:this.options.name+'_button_label'}).setStyle({paddingLeft:6,paddingRight:6, cursor:'pointer'});
 		button.insert(img).insert(new Element('br')).insert(titleSpan.update(this.getKeyedText()));
 		this.elements.push(button);
+		button.observe("mouseover", function(){
+			if(button.hasClassName('disabled')) return;
+			if(this.hideTimeout) clearTimeout(this.hideTimeout);
+			new Effect.Morph(img, {
+				style:'width:25px; height:25px;margin-top:0px;',
+				duration:0.08,
+				transition:Effect.Transitions.sinoidal,
+				afterFinish: function(){this.updateTitleSpan(titleSpan, 'big');}.bind(this)
+			});
+		}.bind(this) );
+		button.observe("mouseout", function(){
+			if(button.hasClassName('disabled')) return;
+			this.hideTimeout = setTimeout(function(){				
+				new Effect.Morph(img, {
+					style:'width:18px; height:18px;margin-top:8px;',
+					duration:0.2,
+					transition:Effect.Transitions.sinoidal,
+					afterFinish: function(){this.updateTitleSpan(titleSpan, 'small');}.bind(this)
+				});	
+			}.bind(this), 10);
+		}.bind(this) );
 		return button;
+	},
+	
+	updateTitleSpan : function(span, state){		
+		if(!span.orig_width && state == 'big'){
+			var origWidth = span.getWidth();
+			span.setStyle({display:'block',width:origWidth, overflow:'visible', padding:0});
+			span.orig_width = origWidth;
+		}
+		span.setStyle({fontSize:(state=='big'?'11px':'9px')});
 	},
 	
 	setIconSrc : function(newSrc){
