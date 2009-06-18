@@ -550,6 +550,7 @@ overflow:visible;
     margin-top:6px;
     height: 22px;
     border: 1px solid #999;
+    border-width: 1px 0px;
     background-image:url('../images/header_bg.png');
     background-repeat:  repeat-x;
     background-position: top;
