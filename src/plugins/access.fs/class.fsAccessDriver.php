@@ -96,6 +96,12 @@ class fsAccessDriver extends AbstractAccessDriver
 				$dest = $originalRep;
 			}
 		}
+		// FILTER DIR PAGINATION ANCHOR
+		if(isSet($dir) && strstr($dir, "#")!==false){
+			$parts = split("#", $dir);
+			$dir = $parts[0];
+			$page = $parts[1];
+		}		
 		
 		switch($action)
 		{			

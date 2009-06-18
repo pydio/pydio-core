@@ -44,8 +44,10 @@
 					url = ajaxplorer.actionBar.getLocationBarValue();
 					currentParentUrl = url.substr(0, url.lastIndexOf('/'));
 					if(currentParentUrl == "") currentParentUrl = "/";
-					ajaxplorer.getFilesList().loadXmlList(currentParentUrl);
 					ajaxplorer.getFoldersTree().goToParentNode();
+					var anchor = ajaxplorer.getFoldersTree().getCurrentNodeProperty("pagination_anchor");
+					if(anchor) currentParentUrl = currentParentUrl + "#" + anchor;
+					ajaxplorer.getFilesList().loadXmlList(currentParentUrl);
 					ajaxplorer.actionBar.updateLocationBar(currentParentUrl);
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
