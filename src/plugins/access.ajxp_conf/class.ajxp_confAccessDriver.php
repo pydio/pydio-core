@@ -313,6 +313,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				print("<repository index=\"$repId\"");
 				foreach ($repository as $name => $option){
 					if(!is_array($option)){					
+						if(is_bool($option)){
+							$option = ($option?"true":"false");
+						}
 						print(" $name=\"".SystemTextEncoding::toUTF8(Utils::xmlEntities($option))."\" ");
 					}else if(is_array($option)){
 						$nested[] = $option;
@@ -322,7 +325,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					print(">");
 					foreach ($nested as $option){
 						foreach ($option as $key => $optValue){
-							//if(strpos(strtolower($key), "auth") !== false) continue;
+							if(is_bool($optValue)){
+								$optValue = ($optValue?"true":"false");
+							}
 							print("<param name=\"$key\" value=\"$optValue\"/>");
 						}
 					}
