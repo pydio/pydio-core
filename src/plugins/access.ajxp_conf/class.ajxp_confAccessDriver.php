@@ -213,26 +213,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(!array_key_exists($repoID, $wallet)){
 					$wallet[$repoID] = array();
 				}
-				foreach ($_GET as $key=>$value){
-					if(strstr($key, "DRIVER_OPTION_") !== false){
-						$key = substr($key, strlen("DRIVER_OPTION_"));
-						$value = trim($value);
-		                if (substr($key, -2) == "##")
-		                {   // Need to cypher the value here
-		                    $key = substr($key, 0, -2);                   
-		                    if (function_exists('mcrypt_encrypt'))
-		                    {
-		                        $users = AuthService::listUsers();
-		                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-		                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-		                        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-		                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx$¨op#"), $value, MCRYPT_MODE_ECB, $iv));
-		                        $hashPass = $value;
-		                    }
-		                }				
-						$wallet[$repoID][$key] = $value;
-					}
-				}
+				$options = $wallet[$repoID];
+				$this->parseParameters($_GET, $options, $userId);
+				$wallet[$repoID] = $options;
 				$user->setPref("AJXP_WALLET", $wallet);
 				$user->save();
 				
@@ -281,18 +264,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$options = array();
 				$repDef = $_GET;
 				unset($repDef["get_action"]);
-				foreach ($repDef as $key => $value){
-					$value = SystemTextEncoding::magicDequote($value);
-					if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0){
-						$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
-						unset($repDef[$key]);
-					}else{
-						if($key == "DISPLAY"){
-							$value = SystemTextEncoding::fromPostedFileName($value);
-						}
-						$repDef[$key] = $value;		
-					}
-				}
+				$this->parseParameters($repDef, $options);
 				if(count($options)){
 					$repDef["DRIVER_OPTIONS"] = $options;
 				}
@@ -372,11 +344,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$repo->setDisplay(SystemTextEncoding::fromPostedFileName($_GET["newLabel"]));
 					$res = ConfService::replaceRepository($repId, $repo);
 				}else{
-					foreach ($_GET as $key => $value){
-						$value = SystemTextEncoding::magicDequote($value);
-						if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0){
-							 $repo->addOption(substr($key, strlen("DRIVER_OPTION_")), $value);
-						}
+					$options = array();
+					$this->parseParameters($_GET, $options);
+					if(count($options)){
+						foreach ($options as $key=>$value) $repo->addOption($key, $value);
 					}
 					if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php")){
 					    chdir(INSTALL_PATH."/server/tests/plugins");
@@ -519,6 +490,40 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			include_once(TESTS_RESULT_FILE);			
 			foreach ($diagResults as $id => $value){
 				print "<tree icon=\"susehelpcenter.png\" filename=\"$id\" text=\"$id\" data=\"$value\"/>";
+			}
+		}		
+	}
+	
+	function parseParameters(&$repDef, &$options, $userId = null){
+		
+		foreach ($repDef as $key => $value)
+		{
+			$value = SystemTextEncoding::magicDequote($value);
+			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0 && strpos($key, "ajxptype") === false){
+				if(isSet($repDef[$key."_ajxptype"])){
+					$type = $repDef[$key."_ajxptype"];
+					if($type == "boolean"){
+						$value = ($value == "true"?true:false);
+					}else if($type == "integer"){
+						$value = intval($value);
+					}else if($type == "password" && $userId!=null){
+	                    if (function_exists('mcrypt_encrypt'))
+	                    {
+	                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+	                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+	                        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
+	                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx$¨op#"), $value, MCRYPT_MODE_ECB, $iv));
+	                    }						
+					}
+					unset($repDef[$key."_ajxptype"]);
+				}
+				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
+				unset($repDef[$key]);
+			}else{
+				if($key == "DISPLAY"){
+					$value = SystemTextEncoding::fromPostedFileName($value);
+				}
+				$repDef[$key] = $value;		
 			}
 		}		
 	}
