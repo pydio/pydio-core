@@ -247,6 +247,12 @@ class ConfService
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 	}
 	
+	/**
+	 * Retrieve a repository object
+	 *
+	 * @param String $repoId
+	 * @return Repository
+	 */
 	function getRepositoryById($repoId){
 		global $G_REPOSITORIES;
 		if(isSet($G_REPOSITORIES[$repoId])) return $G_REPOSITORIES[$repoId];
