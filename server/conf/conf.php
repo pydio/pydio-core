@@ -109,7 +109,9 @@ $REPOSITORIES[1] = array(
 		"CREATE"		=>	true,
 		"RECYCLE_BIN" 	=> 	'recycle_bin',
 		"CHMOD_VALUE"   =>  '0600',
-		"DEFAULT_RIGHTS"=>  "r"
+		"DEFAULT_RIGHTS"=>  "r",
+		"PAGINATION_THRESHOLD" => 500,
+		"PAGINATION_NUMBER" => 200
 	),
 	
 );
