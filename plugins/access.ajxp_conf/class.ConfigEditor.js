@@ -499,18 +499,18 @@ ConfigEditor = Class.create({
 			}
 			var element;
 			var disabledString = (disabled?' disabled="true" ':'');
-			if(type == 'string'){
-				element = '<input type="text" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'"'+disabledString+'>';
+			if(type == 'string' || type == 'integer'){
+				element = '<input type="text" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'"'+disabledString+'>';
 		    }else if(type == 'password'){
-				element = '<input type="password" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'##" class="text" value="'+defaultValue+'"'+disabledString+'>';
+				element = '<input type="password" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'"'+disabledString+'>';
 			}else if(type == 'boolean'){
 				var selectTrue, selectFalse;
 				if(defaultValue){
 					if(defaultValue == "true" || defaultValue == "1") selectTrue = true;
 					if(defaultValue == "false" || defaultValue == "0") selectFalse = true;
 				}
-				element = '<input type="radio" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
-				element = element + '<input type="radio" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
+				element = '<input type="radio" ajxp_type="'+type+'" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
+				element = element + '<input type="radio" ajxp_type="'+type+'" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
 			}
 			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:30%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:'+(Prototype.Browser.IE?'65%':'70%')+'">'+element+(showTip?' &nbsp;<small style="color:#AAA;">'+desc+'</small>':' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/help-about.png" alt="'+desc+'"  title="'+desc+'" width="16" height="16" align="absmiddle" class="helpImage"/>')+'</div>');
 			form.insert({'bottom':div});
@@ -529,7 +529,10 @@ ConfigEditor = Class.create({
 			}
 			else if(el.type=="radio" && el.checked){
 				parametersHash.set(prefix+el.name, el.value)
-			};			
+			};
+			if(el.getAttribute('ajxp_type')){
+				parametersHash.set(prefix+el.name+'_ajxptype', el.getAttribute('ajxp_type'));
+			}
 		});		
 		return missingMandatory;
 	},	

@@ -5,5 +5,7 @@
 	<param name="CREATE" type="boolean" label="Create" description="Create folder if it does not exists" default="true" mandatory="true"/>
 	<param name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>	
 	<param name="CHMOD_VALUE" type="string" label="File Creation Mask" description="Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." default="0666"/>	
-	<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>		
+	<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>
+	<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
+	<param name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
 </ajxpdriver>
