@@ -1,0 +1,79 @@
+.sqlForm input{
+   width: 108px !important;
+   height: 20px;
+   margin:0;
+}
+.sqlForm input.dialogButton
+{
+    margin-left: 10px;
+    width: 65px !important;    
+    background-image: url('../images/ButtonBg.png');
+    color: white;
+    font-weight: bold;
+}
+
+
+.sqlForm input[type="checkbox"], 
+.sqlForm input.checkbox{
+   border: 0px;
+   margin:0;
+   width: 20px !important;
+}
+
+.sqlForm select{
+	padding:0px;
+    border: 1px solid #aaa;    
+    width: 90px;
+}
+
+.sqlForm thead td {
+	background-color:#ccc;
+	color:#666;
+	font-size:13px;
+	padding:1px 5px;
+	text-align:center;
+}
+
+.sqlRecordForm{
+   font-size: 13px
+}
+
+.sqlRecordForm td.sqlLabelTd{
+   font-weight: bold;
+   font-size: 16px;
+   color: #666;
+   text-align: right;
+   padding: 5px 5px;
+   width: 150px;
+}
+
+.sqlRecordForm td.sqlInputTd{
+	width: 255px;
+}
+
+.sqlRecordForm td.sqlTypeTd{
+   color: #999;
+   padding-left: 5px;
+   font-size: 14px;
+   font-style: italic;
+}
+
+.sqlRecordForm input,
+.sqlRecordForm select
+{
+   margin-left: 0px;
+   width: 250px !important;
+}
+
+.sqlRecordForm input.numeric
+{
+   margin-left: 0px;
+   width: 30px !important;
+}
+
+
+.sqlRecordForm textarea
+{
+   width: 250px !important;
+   height: 70px;
+}
