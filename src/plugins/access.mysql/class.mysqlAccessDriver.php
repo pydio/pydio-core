@@ -361,6 +361,19 @@ class mysqlAccessDriver extends AbstractAccessDriver
 							break;
 						}
 					}
+					if(isSet($order_column)){
+						$query .= " ORDER BY $order_column ".strtoupper($order_direction);
+						if(!isSet($_SESSION["AJXP_ORDER_DATA"])){
+							$_SESSION["AJXP_ORDER_DATA"] = array();
+						}
+						$_SESSION["AJXP_ORDER_DATA"][$this->repository->getUniqueId()."_".$tableName] = array("column" => $order_column, "dir" => $order_direction);
+					}else if(isSet($_SESSION["AJXP_ORDER_DATA"])){
+						if(isSet($_SESSION["AJXP_ORDER_DATA"][$this->repository->getUniqueId()."_".$tableName])){
+							$order_column = $_SESSION["AJXP_ORDER_DATA"][$this->repository->getUniqueId()."_".$tableName]["column"];
+							$order_direction = $_SESSION["AJXP_ORDER_DATA"][$this->repository->getUniqueId()."_".$tableName]["dir"];
+							$query .= " ORDER BY $order_column ".strtoupper($order_direction);
+						}
+					}
 					$result = $this->showRecords($query, $tableName, $currentPage);					
 					if($searchQuery && is_a($result, "AJXP_Exception")){
 						unset($_SESSION["LAST_SQL_QUERY"]); // Do not store wrong query!
@@ -377,7 +390,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					}
 					
 					print '</columns>';
-					print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'"/>';
+					print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
 					foreach ($result["ROWS"] as $row){
 						print '<tree ';
 						$pkString = "";

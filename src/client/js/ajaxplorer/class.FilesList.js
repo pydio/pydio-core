@@ -111,9 +111,12 @@ FilesList = Class.create(SelectableElements, {
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
-			//if(this.gridStyle == "grid"){
-				this._sortableTable.onsort = this.redistributeBackgrounds.bind(this);
-			//}
+			this._sortableTable.onsort = this.redistributeBackgrounds.bind(this);
+			if(this.paginationData && this.paginationData.get('remote_order') && parseInt(this.paginationData.get('total')) > 1){
+				this._sortableTable.setPaginationBehaviour(function(params){
+					this.reload(null, null, params);
+				}.bind(this), this.columnsDef, this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
+			}
 			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
 			this.disableTextSelection($('selectable_div_header'));
 			this.disableTextSelection($('table_rows_container'));
@@ -315,9 +318,9 @@ FilesList = Class.create(SelectableElements, {
 		}	
 	},
 	
-	reload: function(pendingFileToSelect, url){
+	reload: function(pendingFileToSelect, url, additionnalParameters){
 		if(this._currentRep != null){
-			this.loadXmlList(this._currentRep, pendingFileToSelect, url);
+			this.loadXmlList(this._currentRep, pendingFileToSelect, url, additionnalParameters);
 		}
 	},
 	
@@ -494,7 +497,7 @@ FilesList = Class.create(SelectableElements, {
 		}
 		*/
 		ajaxplorer.updateHistory(this._currentRep);
-		if(this._displayMode == "list")
+		if(this._displayMode == "list" && (!this.paginationData || !this.paginationData.get('remote_order')))
 		{
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();

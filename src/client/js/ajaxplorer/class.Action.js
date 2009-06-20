@@ -52,6 +52,7 @@ Action = Class.create({
 		this.context = Object.extend({
 			selection:true,
 			dir:false,
+			allowedMimes:$A([]),
 			root:true,
 			inZip:true,
 			recycle:false,
@@ -104,6 +105,7 @@ Action = Class.create({
 		var crtDisplayMode = arguments[3];
 		var crtInZip = arguments[4];
 		var crtIsRoot = arguments[5];
+		var crtAjxpMime = arguments[6] || '';
 		if(this.options.listeners && this.options.listeners["contextChange"]){
 			this.options.listeners["contextChange"].evalScripts();
 		}		
@@ -126,6 +128,11 @@ Action = Class.create({
 		}
 		if(rightsContext.write && crtUser != null && !crtUser.canWrite()){
 			return this.hideForContext();
+		}
+		if(this.context.allowedMimes.length){
+			if(!this.context.allowedMimes.indexOf(crtAjxpMime)==-1){
+				return this.hideForContext();
+			}
 		}
 		if(this.context.recycle){
 			if(this.context.recycle == 'only' && !crtIsRecycle){

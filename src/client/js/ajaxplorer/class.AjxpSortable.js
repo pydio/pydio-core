@@ -42,6 +42,47 @@ AjxpSortable = Class.create(SortableTable, {
 		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
 	},
 
+	setPaginationBehaviour : function(loaderFunc, columnsDefs, crtOrderName, crtOrderDir){
+		this.paginationLoaderFunc = loaderFunc;
+		this.columnsDefs = columnsDefs;
+		var found = -1;
+		for(var i=0;i<columnsDefs.length;i++){
+			if(columnsDefs[i]['field_name'] == crtOrderName){
+				found = i;
+				break;
+			}
+		}
+		this.sortColumn = found;
+		this.descending = (crtOrderDir == 'desc');
+		this.updateHeaderArrows();
+	},
+	
+	
+	headerOnclick: function (e) {
+
+		// find TD element
+		var el = e.target || e.srcElement;
+		while (el.tagName != "TD"){
+			el = el.parentNode;
+		}		
+		var cellColumn = (this.msie ? this.getCellIndex(el) : el.cellIndex);
+		
+		if(this.paginationLoaderFunc){
+			var params = $H({});
+			if (this.sortColumn != cellColumn){
+				this.descending = this.defaultDescending;
+			}else{
+				this.descending = !this.descending;
+			}
+			var column = this.columnsDefs[cellColumn];
+			params.set('order_column', column['field_name'] || cellColumn);
+			params.set('order_direction', (this.descending?'desc':'asc'));
+			this.paginationLoaderFunc(params);
+		}else{
+			this.sort(cellColumn);
+		}
+	},
+	
 	replace8a8: function(str) {
 		str = str.toUpperCase();
 		var splitstr = "____";
