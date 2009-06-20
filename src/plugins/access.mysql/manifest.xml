@@ -4,6 +4,7 @@
 		<resources>
 			<js file="plugins/access.mysql/class.SQLEditor.js" className="SQLEditor"/>
 			<js file="plugins/access.mysql/class.SQLSearchEngine.js" className="SQLSearchEngine"/>
+			<css file="plugins/access.mysql/sqlEditor.css"/>
 		</resources>
 	</client_settings>
 	<param name="DB_HOST" type="string" label="Host" description="Host to the MySQL Server" mandatory="true"/>

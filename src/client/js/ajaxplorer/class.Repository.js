@@ -78,10 +78,22 @@ Repository = Class.create({
 		this.resources.js.push({fileName:fileName,className:className});
 	},
 	
+	addCSSResource : function(fileName){
+		if(!this.resources.css){
+			this.resources.css = [];
+		}
+		this.resources.css.push(fileName);
+	},
+	
 	loadResources : function(){
 		if(this.resources.js){
 			this.resources.js.each(function(value){
 				this.loadJSResource(value.fileName, value.className);
+			}.bind(this));
+		}
+		if(this.resources.css){
+			this.resources.css.each(function(value){
+				this.loadCSSResource(value);
 			}.bind(this));
 		}
 	},
@@ -99,6 +111,17 @@ Repository = Class.create({
 		}
 	},
 	
+	loadCSSResource : function(fileName){
+		var head = $$('head')[0];
+		var cssNode = new Element('link', {
+			type : 'text/css',
+			rel  : 'stylesheet',
+			href : fileName,
+			media : 'screen'
+		});
+		head.insert(cssNode);
+	},
+	
 	loadFromXml: function(repoNode){
 		for(var i=0;i<repoNode.childNodes.length;i++){
 			var childNode = repoNode.childNodes[i];
@@ -113,6 +136,8 @@ Repository = Class.create({
 						for(var k=0;k<subCh.childNodes.length;k++){
 							if(subCh.childNodes[k].nodeName == 'js'){
 								this.addJSResource(subCh.childNodes[k].getAttribute('file'), subCh.childNodes[k].getAttribute('className'));
+							}else if(subCh.childNodes[k].nodeName == 'css'){
+								this.addCSSResource(subCh.childNodes[k].getAttribute('file'));
 							}
 						}
 					}
