@@ -507,14 +507,14 @@ class fsAccessDriver extends AbstractAccessDriver
 							$crtPage = $page;
 						}
 						$totalPages = floor($countFiles / $limitPerPage) + 1;
-						$result = $this->listing($nom_rep, false, $offset, $limitPerPage);						
+						$reps = $this->listing($nom_rep, false, $offset, $limitPerPage);						
 					}else{
-						$result = $this->listing($nom_rep, $searchMode);
+						$reps = $this->listing($nom_rep, $searchMode);
 					}
 				}else{
-					$result = $this->listing($nom_rep, !$searchMode);
+					$reps = $this->listing($nom_rep, !$searchMode);
 				}
-				$reps = $result[0];
+				//$reps = $result[0];
 				AJXP_XMLWriter::header();
 				if(isSet($totalPages) && isSet($crtPage)){
 					print '<columns switchDisplayMode="list" switchGridMode="filelist"/>';
@@ -840,9 +840,8 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		$mess = ConfService::getMessages();
 		$size_unit = $mess["byte_unit_symbol"];
-		$sens = 0;
-		$ordre = "nom";
-		$poidstotal=0;
+		$orderDir = 0;
+		$orderBy = "filename";
 		$handle=opendir($nom_rep);
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		$cursor = 0;
@@ -864,7 +863,6 @@ class fsAccessDriver extends AbstractAccessDriver
 					continue;
 				}
 				$poidsfic=@filesize("$nom_rep/$file") or 0;
-				$poidstotal+=$poidsfic;
 				if(is_dir("$nom_rep/$file"))
 				{	
 					if($this->filterFolder($file)) continue;				
@@ -872,7 +870,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					{
 						continue;
 					}
-					if($ordre=="mod") {$liste_rep[$file]=filemtime("$nom_rep/$file");}
+					if($orderBy=="mod") {$liste_rep[$file]=filemtime("$nom_rep/$file");}
 					else {$liste_rep[$file]=$file;}
 				}
 				else
@@ -880,10 +878,10 @@ class fsAccessDriver extends AbstractAccessDriver
 					if($this->filterFile($file)) continue;
 					if(!$dir_only)
 					{
-						if($ordre=="nom") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
-						else if($ordre=="taille") {$liste_fic[$file]=$poidsfic;}
-						else if($ordre=="mod") {$liste_fic[$file]=filemtime("$nom_rep/$file");}
-						else if($ordre=="type") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
+						if($orderBy=="filename") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
+						else if($orderBy=="filesize") {$liste_fic[$file]=$poidsfic;}
+						else if($orderBy=="mod") {$liste_fic[$file]=filemtime("$nom_rep/$file");}
+						else if($orderBy=="filetype") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
 						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 					}
 					else if(eregi("\.zip$",$file) && ConfService::zipEnabled()){
@@ -897,12 +895,12 @@ class fsAccessDriver extends AbstractAccessDriver
 	
 		if(isset($liste_fic) && is_array($liste_fic))
 		{
-			if($ordre=="nom") {if($sens==0){ksort($liste_fic);}else{krsort($liste_fic);}}
-			else if($ordre=="mod") {if($sens==0){arsort($liste_fic);}else{asort($liste_fic);}}
-			else if($ordre=="taille"||$ordre=="type") {if($sens==0){asort($liste_fic);}else{arsort($liste_fic);}}
-			else {if($sens==0){ksort($liste_fic);}else{krsort($liste_fic);}}
+			if($orderBy=="filename") {if($orderDir==0){ksort($liste_fic);}else{krsort($liste_fic);}}
+			else if($orderBy=="mod") {if($orderDir==0){arsort($liste_fic);}else{asort($liste_fic);}}
+			else if($orderBy=="filesize"||$orderBy=="filetype") {if($orderDir==0){asort($liste_fic);}else{arsort($liste_fic);}}
+			else {if($orderDir==0){ksort($liste_fic);}else{krsort($liste_fic);}}
 
-			if($ordre != "nom"){
+			if($orderBy != "filename"){
 				foreach ($liste_fic as $index=>$value){
 					$liste_fic[$index] = Utils::mimetype($index, "image", false);
 				}
@@ -914,9 +912,9 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		if(isset($liste_rep) && is_array($liste_rep))
 		{
-			if($ordre=="mod") {if($sens==0){arsort($liste_rep);}else{asort($liste_rep);}}
-			else {if($sens==0){ksort($liste_rep);}else{krsort($liste_rep);}}
-			if($ordre != "nom"){
+			if($orderBy=="mod") {if($orderDir==0){arsort($liste_rep);}else{asort($liste_rep);}}
+			else {if($orderDir==0){ksort($liste_rep);}else{krsort($liste_rep);}}
+			if($orderBy != "filename"){
 				foreach ($liste_rep as $index=>$value){
 					$liste_rep[$index] = $index;
 				}
@@ -928,12 +926,8 @@ class fsAccessDriver extends AbstractAccessDriver
 		if(isSet($liste_zip)){
 			$liste = Utils::mergeArrays($liste,$liste_zip);
 		}
-		if ($poidstotal >= 1073741824) {$poidstotal = round($poidstotal / 1073741824 * 100) / 100 . " G".$size_unit;}
-		elseif ($poidstotal >= 1048576) {$poidstotal = round($poidstotal / 1048576 * 100) / 100 . " M".$size_unit;}
-		elseif ($poidstotal >= 1024) {$poidstotal = round($poidstotal / 1024 * 100) / 100 . " K".$size_unit;}
-		else {$poidstotal = $poidstotal . " ".$size_unit;}
 	
-		return array($liste,$poidstotal);
+		return $liste;
 	}
 	
 	function date_modif($file)
