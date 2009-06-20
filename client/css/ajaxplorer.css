@@ -1664,6 +1664,7 @@ padding: 0px;
 .sqlForm select{
 	padding:0px;
     border: 1px solid #aaa;    
+    width: 90px;
 }
 
 .sqlForm thead td {

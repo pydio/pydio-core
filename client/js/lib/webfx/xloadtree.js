@@ -205,6 +205,10 @@ function _xmlTreeToJsTree(oNode) {
 		webFXTreeHandler.ajxpNodes[getBaseName(folderFullName)] = jsNode.id;
 	}
 	
+	if(oNode.getAttribute('ajxp_mime')){
+		jsNode.ajxpMime = oNode.getAttribute('ajxp_mime');
+	}
+	
 	if(src != null && src != "" && preloaded != null && preloaded == 'true')
 	{
 		jsNode.loaded = true;

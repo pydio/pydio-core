@@ -502,26 +502,30 @@ ActionsManager = Class.create({
 		this.actions.each(function(pair){
 			pair.value.fireSelectionChange(userSelection);
 		});
+		this.refreshToolbarsSeparator();
 	},
 	
 	fireContextChange: function(){
 		var crtRecycle = false;
 		var crtInZip = false;
 		var crtIsRoot = false;
+		var crtMime;
 		if(ajaxplorer && ajaxplorer.foldersTree){ 
 			crtRecycle = ajaxplorer.foldersTree.currentIsRecycle();
 			crtInZip = ajaxplorer.foldersTree.currentInZip();
 			crtIsRoot = ajaxplorer.foldersTree.currentIsRoot();
+			crtMime = ajaxplorer.foldersTree.getCurrentNodeMime();
 		}	
 		var displayMode = '';
 		if(ajaxplorer && ajaxplorer.filesList) displayMode = ajaxplorer.filesList.getDisplayMode();
 		this.actions.each(function(pair){			
 			pair.value.fireContextChange(this.usersEnabled, 
-									 this.oUser, 
+									 this.oUser, 									 
 									 crtRecycle, 
 									 displayMode, 
 									 crtInZip, 
-									 crtIsRoot);
+									 crtIsRoot,
+									 crtMime);
 		}.bind(this));
 		this.refreshToolbarsSeparator();
 	},

@@ -346,6 +346,16 @@ FoldersTree = Class.create({
 		return false;		
 	},
 	
+	getCurrentNodeMime : function(){
+		if((this.rootNodeId == this.currentNodeName)){
+			return "ajxp_root";
+		}
+		if(this.currentNodeName && webFXTreeHandler.all[this.currentNodeName]){
+			return webFXTreeHandler.all[this.currentNodeName].ajxpMime;
+		}
+		return null;
+	},
+	
 	setCurrentToRoot: function(skipSelect){
 		this.setCurrentNodeName(this.getRootNodeId(), skipSelect);
 	},
