@@ -14,15 +14,18 @@ class ftpAccessDriver extends  AbstractAccessDriver
         /** The user to connect to */
         var $user;
         /** The password to use */
-        var $password;
+	var $password;
+	var $path;
 
         function  ftpAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
         	$this->user = $optOptions ? $optOptions["user"] : $this->getUserName($repository);
         	$this->password = $optOptions ? $optOptions["password"] : $this->getPassword($repository);
+		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
+		unset($this->actions["upload"]);
+		$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
+		$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
+	}
 
-		    $this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
-		    parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
-        }
 
         function initRepository(){
             $this->connect = $this->createFTPLink();
@@ -113,24 +116,6 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
 		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 		$mess = ConfService::getMessages();
-		$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
-		// FILTER ACTION FOR DELETE
-		if($recycleBinOption!="" && $action == "delete" && $dir != "/".$recycleBinOption)
-		{
-			$action = "move";
-			$dest = "/".$recycleBinOption;
-			$dest_node = "AJAXPLORER_RECYCLE_NODE";
-		}
-		// FILTER ACTION FOR RESTORE
-		if($recycleBinOption!="" &&  $action == "restore" && $dir == "/".$recycleBinOption)
-		{
-			$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
-			if($originalRep != "")
-			{
-				$action = "move";
-				$dest = $originalRep;
-			}
-		}
 		
 		switch($action)
 		{			
@@ -141,10 +126,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			case "image_proxy":
 			case "mp3_proxy":
 				AJXP_Logger::logAction("Download", array("files"=>$selection));
-                $this->sendRemoteFile($selection->files[0], $action == "download");
-//				$this->ftp_get_contents($selection->files[0]);
-//				$this->readFile("files/".basename($selection->files[0]),"Download");	
-//				$this->ftpRemoveFileTmp("files/".basename($selection->files[0]));
+               			$this->sendRemoteFile($selection->files[0], $action == "download");
 				exit(0);		
 			break;
 		
@@ -294,10 +276,18 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			//------------------------------------	
 			case "upload":
 
-				exit;
-				
-			break;
-			
+                        break;
+
+            //------------------------------------
+            // Public URL
+            //------------------------------------
+            case "public_url":
+                                $file = SystemTextEncoding::fromUTF8($file);
+                $url = $this->makePubliclet($file, $password, $expiration);
+                header("Content-type:text/plain");
+                echo $url;
+                exit(1);
+            break;
 			//------------------------------------
 			//	XML LISTING
 			//------------------------------------
@@ -458,6 +448,135 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		
 		return $xmlBuffer;
 	}
+
+	function uploadActions($action, $httpVars, $filesVars){
+                switch ($action){
+                        case "trigger_remote_copy":
+				if(!$this->hasFilesToCopy()) break;
+                                $toCopy = $this->getFileNameToCopy();
+				AJXP_XMLWriter::header();
+                                AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$toCopy." to ftp server");
+                                AJXP_XMLWriter::close();
+                                exit(1);
+                        break;
+                        case "next_to_remote":             
+                                if(!$this->hasFilesToCopy()) break;
+				$fData = $this->getNextFileToCopy();
+                                $nextFile = '';
+                                if($this->hasFilesToCopy()){
+                                        $nextFile = $this->getFileNameToCopy();
+				}
+				@ftp_put($this->connect,$this->secureFtpPath($this->path.base64_decode($fData['destination'])."/".$fData['name']),$fData['tmp_name'], FTP_BINARY);
+                                unlink($fData["tmp_name"]);
+                               AJXP_XMLWriter::header();
+                                        if($nextFile!=''){
+                                                AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
+					}else{
+						AJXP_XMLWriter::sendMessage("Done", null);
+                                        }
+				AJXP_XMLWriter::close();
+				exit(1);
+                        break;
+                        case "upload":
+                                $fancyLoader = false;
+                                if(isSet($fileVars["Filedata"])){
+                                        $fancyLoader = true;
+                                        if($httpVars['dir']!="") $httpVars['dir'] = "/".base64_decode($httpVars['dir']);
+                                }
+                                if(isSet($httpVars['dir']) && $httpVars['dir']!=""){$rep_source=$httpVars['dir'];}
+                                else $rep_source = "/";
+                                $logMessage = "";
+                                //$fancyLoader = false;                         
+                                foreach ($filesVars as $boxName => $boxData)
+                                {
+                                        if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")     continue;
+                                        if($boxName == "Filedata") $fancyLoader = true;
+                                        $err = Utils::parseFileDataErrors($boxData, $fancyLoader);
+                                        if($err != null)
+                                        {
+                                                $errorMessage = $err;
+                                                break;
+                                        }
+                                        $boxData["destination"] = $rep_source;
+                                        $destCopy = INSTALL_PATH."/tmp";
+                                        if(!is_dir($destCopy)){
+                                                if(! @mkdir($destCopy)){
+                                                        $errorMessage = "Warning, cannot create folder for temporary copy.";
+                                                        break;
+                                                }
+                                        }
+                                        if(!is_writeable($destCopy)){
+                                                $errorMessage = "Warning, cannot write into temporary folder.";
+                                                break;
+                                        }
+                                        $destName = $destCopy."/".basename($boxData["tmp_name"]);
+					if(move_uploaded_file($boxData["tmp_name"], $destName)){
+                                                $boxData["tmp_name"] = $destName;
+                                                $this->storeFileToCopy($boxData);
+                                        }else{
+                                                $mess = ConfService::getMessages();
+                                                $errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$boxData["name"];
+                                        }
+                                }
+                                if($fancyLoader)
+                                {
+                                        session_write_close();
+                                        if(isSet($errorMessage)){
+                                                header('HTTP/1.0 '.$errorMessage);
+                                                die('Error '.$errorMessage);
+                                        }else{
+                                                header('HTTP/1.0 200 OK');
+                                                die("200 OK");
+                                        }
+                                }
+                                else
+                                {
+                                        print("<html><script language=\"javascript\">\n");
+                                        if(isSet($errorMessage)){
+                                                print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");
+                                        }else{
+                                                print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+                                        }
+                                        print("</script></html>");
+                                }
+                                session_write_close();
+                                exit;
+
+                        break;
+                        default:
+                        break;
+                }
+
+        }
+
+        function storeFileToCopy($fileData){
+                $user = AuthService::getLoggedUser();
+                $files = $user->getTemporaryData("tmp_upload");
+                $files[] = $fileData;
+                $user->saveTemporaryData("tmp_upload", $files);
+        }
+
+        function getFileNameToCopy(){
+                $user = AuthService::getLoggedUser();
+                $files = $user->getTemporaryData("tmp_upload");
+                return $files[0]["name"];
+        }
+
+        function getNextFileToCopy(){
+                if(!$this->hasFilesToCopy()) return "";
+                $user = AuthService::getLoggedUser();
+                $files = $user->getTemporaryData("tmp_upload");
+                $fData = $files[0];
+                array_shift($files);
+                $user->saveTemporaryData("tmp_upload", $files);
+                return $fData;
+        }
+
+        function hasFilesToCopy(){
+                $user = AuthService::getLoggedUser();
+                $files = $user->getTemporaryData("tmp_upload");
+                return (count($files)?true:false);
+        }
 
 	
 	function getPath(){
@@ -1011,6 +1130,16 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		$mode = (string)("0".$mode);	
 		return  $mode;
 	}	
+
+    /** The publiclet URL making */
+    function makePubliclet($filePath, $password, $expire)
+    {
+        $data = array("DRIVER"=>"ftp", "OPTIONS"=>array('account'=>$this->getUserName($this->repository), 'password'=>$this->getPassword($this->repository)), "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
+        return $this->writePubliclet($data);
+    }
+
+   
+
 }
 
 ?>
