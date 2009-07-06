@@ -52,7 +52,7 @@
 			</processing>
 		</action>
 		<action name="mkdir">			
-			<gui text="267" title="268" src="table_new.png" accessKey="folder_access_key" hasAccessKey="false">
+			<gui text="267" title="268" src="sql_images/actions/ICON_SIZE/table_new.png" accessKey="folder_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -69,7 +69,7 @@
 				</processing>
 		</action>
 		<action name="mkfile">
-			<gui text="273" title="274" src="table_record_new.png" accessKey="file_access_key" hasAccessKey="false">
+			<gui text="273" title="274" src="sql_images/actions/ICON_SIZE/table_record_new.png" accessKey="file_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false" root="false">
@@ -91,7 +91,7 @@
 				</processing>
 		</action>
 		<action name="edit_table">
-			<gui text="269" title="270" src="table_edit.png" accessKey="edit_access_key" hasAccessKey="false">
+			<gui text="269" title="270" src="sql_images/actions/ICON_SIZE/table_edit.png" accessKey="edit_access_key" hasAccessKey="false">
 				<context selection="false" dir="true" recycle="hidden" 
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="put" inZip="false" root="false">
@@ -200,7 +200,7 @@
 				</processing>
 		</action>
 		<action name="edit_record">
-			<gui text="51" title="276" src="table_record_edit.png" accessKey="edit_access_key" hasAccessKey="false">
+			<gui text="51" title="276" src="sql_images/actions/ICON_SIZE/table_record_edit.png" accessKey="edit_access_key" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden" 
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false" root="false">
@@ -228,7 +228,7 @@
 				</processing>
 		</action>
 		<action name="delete_table">
-			<gui text="271" title="272" src="table_delete.png" accessKey="delete_access_key" hasAccessKey="false">
+			<gui text="271" title="272" src="sql_images/actions/ICON_SIZE/table_delete.png" accessKey="delete_access_key" hasAccessKey="false">
 				<context selection="true" dir="true" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -257,7 +257,7 @@
 				</processing>
 		</action>
 		<action name="delete_record">
-			<gui text="7" title="277" src="table_record_delete.png" accessKey="delete_access_key" hasAccessKey="true">
+			<gui text="7" title="277" src="sql_images/actions/ICON_SIZE/table_record_delete.png" accessKey="delete_access_key" hasAccessKey="true">
 				<context selection="true" dir="true" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
