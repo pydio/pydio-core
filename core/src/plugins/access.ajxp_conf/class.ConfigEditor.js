@@ -221,6 +221,25 @@ ConfigEditor = Class.create({
 		this.submitForm("edit_user", 'change_admin_right', parameters, null);
 	},
 	
+	encodePassword : function(password){
+		// First get a seed to check whether the pass should be encoded or not.
+		var sync = new Connexion();
+		var seed;
+		sync.addParameter('get_action', 'get_seed');
+		sync.onComplete = function(transport){
+			seed = transport.responseText;			
+		}		
+		sync.sendSync();
+		var encoded;
+		if(seed != '-1'){
+			encoded = hex_md5(password);
+		}else{
+			encoded = password;
+		}
+		return encoded;
+		
+	},
+	
 	changePassword: function(){
 		var newPass = $('new_pass');
 		var newPassConf = $('new_pass_confirm');
@@ -230,23 +249,34 @@ ConfigEditor = Class.create({
 			 return;
 		}
 		// First get a seed to check whether the pass should be encoded or not.
-		var sync = new Connexion();
-		var seed;
-		sync.addParameter('get_action', 'get_seed');
-		sync.onComplete = function(transport){
-			seed = transport.responseText;			
-		}		
-		sync.sendSync();
 		parameters = new Hash();
 		parameters.set('user_id', this.userId);
-		if(seed != '-1'){
-			parameters.set('user_pwd', hex_md5(newPass.value));
-		}else{
-			parameters.set('user_pwd', newPass.value);
-		}
+		parameters.set('user_pwd', this.encodePassword(newPass.value));
 		this.submitForm("edit_user", 'update_user_pwd', parameters, null);
 		newPass.value = '';
 		newPassConf.value = '';
+	},
+	
+	submitCreateUser : function(){
+		var login = this.form.select('[name="new_user_login"]')[0];
+		var pass = this.form.select('[name="new_user_pwd"]')[0];
+		var passConf = this.form.select('[name="new_user_pwd_conf"]')[0];
+		if(login.value == ''){
+			ajaxplorer.displayMessage("ERROR", "Please fill the login field!");
+			return;
+		}
+		if(pass.value == '' || passConf.value == ''){
+			ajaxplorer.displayMessage("ERROR", "Please fill both password fields!");
+			return;
+		}
+		if(pass.value != passConf.value){
+			ajaxplorer.displayMessage("ERROR", "Password and confirmation differ!");
+			return;
+		}
+		parameters = new Hash();
+		parameters.set('new_user_login', login.value);
+		parameters.set('new_user_pwd', this.encodePassword(pass.value));
+		this.submitForm("create_user", 'create_user', parameters, null);
 	},
 
 	deleteUser: function(){
