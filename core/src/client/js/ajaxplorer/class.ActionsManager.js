@@ -255,7 +255,7 @@ ActionsManager = Class.create({
 			contextActions.push({
 				name:action.getKeyedText(),
 				alt:action.options.title,
-				image:ajxpResourcesFolder+'/images/crystal/actions/16/'+action.options.src,
+				image:resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16),
 				isDefault:isDefault,
 				callback:function(e){this.apply()}.bind(action)
 			});

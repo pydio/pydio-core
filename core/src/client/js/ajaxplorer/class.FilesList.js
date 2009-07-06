@@ -627,7 +627,7 @@ FilesList = Class.create(SelectableElements, {
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
-				}).update("<img src=\""+ajxpResourcesFolder+"/images/crystal/mimes/16/"+xmlNode.getAttribute('icon')+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + xmlNode.getAttribute('text')+"</span>");
+				}).update("<img src=\""+resolveImageSource(xmlNode.getAttribute('icon'), "/images/crystal/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + xmlNode.getAttribute('text')+"</span>");
 				innerSpan.setAttribute('filename', newRow.getAttribute('filename'));
 				tableCell.insert(innerSpan);
 				
@@ -749,7 +749,7 @@ FilesList = Class.create(SelectableElements, {
 			// Add icon
 			//if(xmlNode.getAttribute("is_file") == "0") src = "images/crystal/mimes/64/folder.png";
 			//else 
-			src = ajxpResourcesFolder+'/images/crystal/mimes/64/'+tmpAtts.get('icon');
+			src = resolveImageSource(tmpAtts.get('icon'), "/images/crystal/mimes/ICON_SIZE/", 64);//ajxpResourcesFolder+'/images/crystal/mimes/64/'+tmpAtts.get('icon');
 			var imgString = "<img src=\""+src+"\" ";
 			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + tmpAtts.get("text")+"\">" + tmpAtts.get("text")+"</div>";
 			innerSpan.innerHTML = imgString;		
