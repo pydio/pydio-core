@@ -303,7 +303,42 @@ class ConfService
 		{			
 			require(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/${G_LANGUE}.php");
 			$G_MESSAGES = $mess;
+			$xml = ConfService::availableDriversToXML("i18n");
+			$results = array();
+			preg_match_all("<i18n [^\>]*\/>", $xml, $results);			
+			$libs = array();
+			//print_r($xml);
+			if(isSet($results[0]) && count($results[0])){
+				foreach ($results[0] as $found){
+					$parts = split(" ", $found);
+					$nameSpace = "";
+					$path = "";
+					foreach($parts as $attPart){
+						if(strstr($attPart, "=") === false) continue;
+						$split = split("=", $attPart);
+						$attName = $split[0];						
+						$attValue = substr($split[1], 1, strlen($split[1])-2);
+						if($attName == "namespace") $nameSpace = $attValue;
+						else if($attName == "path") $path = $attValue;						
+					}
+					$libs[$nameSpace] = $path;
+				}
+			}
+			//print_r($libs);
+			foreach ($libs as $nameSpace => $path){
+				$lang = $G_LANGUE;
+				if(!is_file($path."/".$G_LANGUE.".php")){
+					$lang = "en"; // Default language, minimum required.
+				}
+				if(is_file($path."/".$lang.".php")){
+					require($path."/".$lang.".php");					
+					foreach ($mess as $key => $message){
+						$G_MESSAGES[$nameSpace.".".$key] = $message;
+					}
+				}
+			}
 		}
+		
 		return $G_MESSAGES;
 	}
 	
