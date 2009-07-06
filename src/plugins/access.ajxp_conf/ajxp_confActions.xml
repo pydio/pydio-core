@@ -53,23 +53,12 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var completeFunc = function(){
-						var form = modal.getForm();
-						var login = form.select('[name="new_user_login"]')[0];
-						var pass = form.select('[name="new_user_pwd"]')[0];
-						var passConf = form.select('[name="new_user_pwd_conf"]')[0];
-						if(login.value == ''){
-							ajaxplorer.displayMessage("ERROR", "Please fill the login field!");
-							return;
+						var oForm = modal.getForm();
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 						}
-						if(pass.value == '' || passConf.value == ''){
-							ajaxplorer.displayMessage("ERROR", "Please fill both password fields!");
-							return;
-						}
-						if(pass.value != passConf.value){
-							ajaxplorer.displayMessage("ERROR", "Password and confirmation differ!");
-							return;
-						}
-						ajaxplorer.actionBar.submitForm(form);
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.submitCreateUser();
 						hideLightBox();
 						return false;
 					};
