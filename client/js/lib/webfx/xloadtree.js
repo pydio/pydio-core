@@ -170,12 +170,12 @@ function _xmlTreeToJsTree(oNode) {
 	var parent = null;
 	var icon = oNode.getAttribute("icon");
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
-		icon = ajxpResourcesFolder+"/images/crystal/mimes/16/"+icon;
+		icon = resolveImageSource(icon, "/images/crystal/mimes/ICON_SIZE", 16);
 	}
 	var openIcon = oNode.getAttribute("openicon");
 	if(openIcon){
 		if(openIcon.indexOf(ajxpResourcesFolder+"/") != 0){
-			openIcon = ajxpResourcesFolder+"/images/crystal/mimes/16/"+openIcon;
+			openIcon = resolveImageSource(openIcon, "/images/crystal/mimes/ICON_SIZE", 16);
 		}
 	}else{
 		openIcon = icon;

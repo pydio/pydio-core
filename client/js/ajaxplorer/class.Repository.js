@@ -138,6 +138,8 @@ Repository = Class.create({
 								this.addJSResource(subCh.childNodes[k].getAttribute('file'), subCh.childNodes[k].getAttribute('className'));
 							}else if(subCh.childNodes[k].nodeName == 'css'){
 								this.addCSSResource(subCh.childNodes[k].getAttribute('file'));
+							}else if(subCh.childNodes[k].nodeName == 'img_library'){
+								addImageLibrary(subCh.childNodes[k].getAttribute('alias'), subCh.childNodes[k].getAttribute('path'));
 							}
 						}
 					}

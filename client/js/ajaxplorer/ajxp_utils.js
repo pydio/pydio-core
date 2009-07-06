@@ -59,6 +59,25 @@ function getFileExtension(fileName)
 	return '';
 }
 
+function addImageLibrary(aliasName, aliasPath){		
+	if(!window.AjxpImageLibraries) window.AjxpImageLibraries = {};
+	window.AjxpImageLibraries[aliasName] = aliasPath;
+}
+
+function resolveImageSource(src, defaultPath, size){
+	if(!window.AjxpImageLibraries || src.indexOf("/")==-1){
+		return ajxpResourcesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
+	}
+	var radic = src.substring(0,src.indexOf("/"));
+	if(window.AjxpImageLibraries[radic]){
+		var src = src.replace(radic, window.AjxpImageLibraries[radic]);
+		return (size?src.replace("ICON_SIZE", size):src);
+	}else{
+		return ajxpResourcesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
+	}
+}
+
+
 function editWithCodePress(fileName)
 {	
 	//if(Prototype.Browser.WebKit) return "";
