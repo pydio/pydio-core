@@ -34,6 +34,8 @@
  */
 Action = Class.create({
 
+	__DEFAULT_ICON_PATH : "/images/crystal/actions/ICON_SIZE",
+	
 	initialize:function(){
 		this.options = Object.extend({
 			name:'',
@@ -89,7 +91,10 @@ Action = Class.create({
 	apply: function(){
 		if(this.deny) return;
 		if(this.options.prepareModal){
-			modal.prepareHeader(this.options.title, ajxpResourcesFolder+'/images/crystal/actions/16/'+this.options.src);
+			modal.prepareHeader(
+				this.options.title, 
+				resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 16)
+			);
 		}
 		window.actionArguments = $A([]);
 		if(arguments[0]) window.actionArguments = $A(arguments[0]);
@@ -266,7 +271,7 @@ Action = Class.create({
 			Event.stop(e);
 			this.apply();
 		}.bind(this));
-		var imgPath = 'client/images/crystal/actions/22/'+this.options.src;
+		var imgPath = resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 22);
 		var img = new Element('img', {
 			id:this.options.name +'_button_icon',
 			src:imgPath,
@@ -316,7 +321,7 @@ Action = Class.create({
 	setIconSrc : function(newSrc){
 		this.options.src = newSrc;
 		if($(this.options.name +'_button_icon')){
-			$(this.options.name +'_button_icon').src = 'client/images/crystal/actions/22/'+this.options.src;
+			$(this.options.name +'_button_icon').src = resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 22);
 		}		
 	},
 	

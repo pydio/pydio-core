@@ -94,7 +94,7 @@ Ajaxplorer = Class.create({
 		messageTags.each(function(tag){	
 			var messageId = tag.getAttribute("ajxp_message_id");
 			try{
-				console.log(MessageHash[messageId]);
+				//console.log(MessageHash[messageId]);
 				tag.innerHTML = MessageHash[messageId];
 			}catch(e){}
 		});
@@ -104,7 +104,7 @@ Ajaxplorer = Class.create({
 		});
 		*/
 	},
-	
+		
 	initObjects: function(){
 		loadRep = this._initLoadRep;
 		crtUser = this._initCrtUser;
@@ -232,6 +232,9 @@ Ajaxplorer = Class.create({
 			repId = this.user.getActiveRepository();
 			repList = this.user.getRepositoriesList();			
 			repositoryObject = repList.get(repId);
+			if(!repositoryObject){
+				alert("Empty repository object!");
+			}
 		}
 		this.actionBar.setUser(this.user);
 		this.refreshRepositoriesMenu(repList, repId);
@@ -265,7 +268,7 @@ Ajaxplorer = Class.create({
 		connexion.sendAsync();			
 	},
 	
-	loadRepository: function(repository){
+	loadRepository: function(repository){		
 		repository.loadResources();
 		var repositoryId = repository.getId();
 		this.actionBar.loadActions();
