@@ -255,7 +255,49 @@
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
+		</action>		
+		<action name="copyAsText">			
+			<gui text="302" title="303" src="editcopy.png" accessKey="" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" allowedMimes="log,testResult"  image="false" mp3="false" editable="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var onLoad = function(oForm){
+						var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+						var items = userSelection._selectedItems;
+						var firstItem = userSelection.getUniqueItem();
+						var mime = firstItem.getAttribute("ajxp_mime");
+		   		    	var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
+		   		    	var attributes = [];
+		   		    	columnsDef = ajaxplorer.getFilesList().columnsDef;
+		   		    	columnsDef.each(function(def){attributes.push(def.attributeName);});
+			   		    var message = attributes.join("\t") + "\n\n";
+		   		    	items.each(function(item){		   		    		
+		   		    		for(var i=0;i<attributes.length;i++){
+		   		    			message += item.getAttribute(attributes[i]) + '\t';
+		   		    		}
+			   		    	message += '\n';
+		   		    	});
+		   		    	copyDiv.setValue(message);
+					};
+					modal.showDialogForm('Delete', 'copy_as_text', onLoad, function(){
+						hideLightBox(true);
+						return false;
+					},null,true);
+					]]></clientCallback>
+				<clientForm id="copy_as_text"><![CDATA[
+				<div id="copy_as_text" action="copy" box_width="600">
+					<textarea id="text_copy" style="width:580px; height: 400px;"></textarea>
+				</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
 		</action>					
+					
 	</actions>
 	<infoPanels>
 		<infoPanel mime="generic_file" attributes="basename,icon">
