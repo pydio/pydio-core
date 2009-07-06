@@ -92,6 +92,7 @@ UserSelection = Class.create({
 	},
 	
 	hasMime : function(mimeTypes){
+		if(mimeTypes.length==1 && mimeTypes[0] == "*") return true;
 		var has = false;
 		var selectedItems = $A(this._selectedItems);
 		mimeTypes.each(function(mime){
