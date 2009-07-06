@@ -306,6 +306,7 @@ Action = Class.create({
 				});	
 			}.bind(this), 10);
 		}.bind(this) );
+		button.hide();
 		return button;
 	},
 	
