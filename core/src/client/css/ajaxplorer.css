@@ -423,6 +423,7 @@ ACTION BAR
 
 #buttons_bar
 {
+	height: 53px;
 	padding-left: 7px;
 	padding-top: 6px;
 }

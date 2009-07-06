@@ -22,6 +22,10 @@ class ftpAccessDriver extends  AbstractAccessDriver
         	$this->password = $optOptions ? $optOptions["password"] : $this->getPassword($repository);
 		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
 		unset($this->actions["upload"]);
+		// DISABLE NON-IMPLEMENTED FUNCTIONS FOR THE MOMENT
+		unset($this->actions["copy"]);
+		unset($this->actions["move"]);
+		unset($this->actions["chmod"]);
 		$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
 		$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
 	}
@@ -706,24 +710,33 @@ class ftpAccessDriver extends  AbstractAccessDriver
         }
 		foreach($contents as $entry)
 	       	{
-                	$info = array();                              
-			$vinfo = preg_split("/[\s]+/", $entry, 9);                            
+                $info = array();                              
+				$vinfo = preg_split("/[\s]+/", $entry, 9);
         		if ($vinfo[0] !== "total")
 		       	{
 			        $info['chmod'] = $vinfo[0];                                         
-				$info['num']   = $vinfo[1];
+					$info['num']   = $vinfo[1];
 	          		$info['owner'] = $vinfo[2];
 	          		$info['group'] = $vinfo[3];
 	          		$info['size']  = $vinfo[4];
 	          		$info['month'] = $vinfo[5];
 	          		$info['day']   = $vinfo[6];
-	          		$info['time']  = $vinfo[7];
+	          		$info['timeOrYear']  = $vinfo[7];
 	          		$info['name']  = $vinfo[8];
     			 }
-        		 $file  = trim($info['name']);
+        	 $file  = trim($info['name']);
 			 $filetaille= trim($info['size']);
-        		 $filedate  = trim($info['day'])." ".trim($info['month'])." ".trim($info['time']);
-       			 $fileperms = trim($info['chmod']);
+			 if(strstr($info["timeOrYear"], ":")){
+			 	$info["time"] = $info["timeOrYear"];
+			 	$info["year"] = date("Y");
+			 }else{
+			 	$info["time"] = '09:00';
+			 	$info["year"] = $info["timeOrYear"];
+			 }
+        	 $filedate  = trim($info['day'])." ".trim($info['month'])." ".trim($info['year'])." ".trim($info['time']);
+        	 $filedate  = strtotime($filedate);        	 
+        	 
+        	 $fileperms = trim($info['chmod']);
 			 $info['chmod1'] = $this->convertingChmod(trim($info['chmod']));
 			 $isDir =false;
 			 $info['modifTime']=$filedate;
