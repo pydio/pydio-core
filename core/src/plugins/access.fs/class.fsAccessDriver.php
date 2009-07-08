@@ -496,10 +496,10 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($fileListMode){
 					$countFiles = $this->countFiles($nom_rep);
 					$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
-					if(!isSet($threshold)) $threshold = 500;					
+					if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;					
 					if($countFiles > $threshold){
 						$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
-						if(!isset($limitPerPage)) $limitPerPage = 200;
+						if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
 						$offset = 0;
 						$crtPage = 1;
 						if(isSet($page)){
