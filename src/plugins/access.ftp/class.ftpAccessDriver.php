@@ -981,14 +981,14 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	{
 		$mess = ConfService::getMessages();
 		$result = $this->listing($this->secureFtpPath($this->getPath().$dir));
-                foreach ($selectedFiles as $selectedFile)
-                {
+		foreach ($selectedFiles as $selectedFile)
+        {
  			$data ="";
 			$selectedFile =  basename($selectedFile);
-                       	if($selectedFile == "" || $selectedFile == DIRECTORY_SEPARATOR)
-                       	{
-                               	return $mess[120];
-                       	}
+			if($selectedFile == "" || $selectedFile == DIRECTORY_SEPARATOR)
+			{
+			   	return $mess[120];
+			}
 
 			if (array_key_exists($selectedFile,$result[0]))
 			{
@@ -1022,14 +1022,14 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			{
            			if (preg_match("/^[.]{2}$|^[.]{1}$/", $file)==0) 
 				{
-             				$info = array();
-             				$vinfo = preg_split("/[\s]+/", $file, 9);
-             				if ($vinfo[0] !== "total") 
+             		$info = array();
+             		$vinfo = preg_split("/[\s]+/", $file, 9);
+					if ($vinfo[0] !== "total") 
 					{
-               					$fileperms = $vinfo[0];
-               					$filename  = $vinfo[8];
-             				}
-             				if (strpos($fileperms,"d")!==FALSE)
+       					$fileperms = $vinfo[0];
+       					$filename  = $vinfo[8];
+     				}
+     				if (strpos($fileperms,"d")!==FALSE)
 					{
 						$this->deldir($dir."/".$filename,$currentDir);
 					}
@@ -1041,7 +1041,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 						}
 						else
 						{
-             						@ftp_delete($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir."/".$filename));
+             				@ftp_delete($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir."/".$filename));
 						}
 					}
 				}			

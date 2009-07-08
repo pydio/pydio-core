@@ -165,7 +165,7 @@
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
 							ajaxplorer.actionBar.configEditor.loadUser(item.getAttribute("text"));
 						};
-						modal.showDialogForm('Edit Online', 'edit_box', loadFunc, function(){hideLightBox();}, null, true);					
+						modal.showDialogForm('Edit Online', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
 					}else{
 						var loadFunc = function(oForm){
 							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
@@ -178,8 +178,8 @@
 						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, function(){hideLightBox();}, null, true);
 					}					
 					]]></clientCallback>
-				<clientForm id="edit_box"><![CDATA[
-					<div id="edit_box" action="edit_user" box_width="440" style="overflow:auto;height:370px;">
+				<clientForm id="edit_config_box"><![CDATA[
+					<div id="edit_config_box" action="edit_user" box_width="440" style="overflow:auto;height:370px;">
 						<fieldset id="rights_pane">
 							<legend>Repositories Acess</legend>
 							<table class="repository" width="100%">
@@ -240,15 +240,15 @@
 		   		    	hidden.setAttribute("name", fieldName);
 		   		    	hidden.setAttribute("value", fieldValue);
 					};
-					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
+					modal.showDialogForm('Delete', 'delete_config_form', onLoad, function(){
 						var oForm = modal.getForm();						
 						ajaxplorer.actionBar.submitForm(oForm);
 						hideLightBox(true);
 						return false;
 					});
 					]]></clientCallback>
-				<clientForm id="delete_form"><![CDATA[
-				<div id="delete_form" action="delete" box_width="280">
+				<clientForm id="delete_config_form"><![CDATA[
+				<div id="delete_config_form" action="delete" box_width="280">
 					<span id="delete_message"></span>
 					<input type="hidden" name="" value=""/>
 				</div>
@@ -278,7 +278,9 @@
 			   		    var message = attributes.join("\t") + "\n\n";
 		   		    	items.each(function(item){		   		    		
 		   		    		for(var i=0;i<attributes.length;i++){
-		   		    			message += item.getAttribute(attributes[i]) + '\t';
+		   		    			var attName = attributes[i];
+		   		    			if(attName == "ajxp_label") attName = "text";
+		   		    			message += item.getAttribute(attName) + '\t';
 		   		    		}
 			   		    	message += '\n';
 		   		    	});
