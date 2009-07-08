@@ -39,14 +39,6 @@ define("AJXP_VERSION_DATE", "2009/07/08");
 define("ENABLE_USERS", 1);
 define("ADMIN_PASSWORD", "admin");
 define("ALLOW_GUEST_BROWSING", 0);
-define("AUTH_MODE", "ajaxplorer"); // "ajaxplorer", "local_http", "remote", "wordpress"
-
-define("AUTH_MODE_REMOTE_SERVER", "www.yourdomain.com"); //
-define("AUTH_MODE_REMOTE_URL", "/answering_script.php"); // 
-define("AUTH_MODE_REMOTE_USER", ""); // 
-define("AUTH_MODE_REMOTE_PASSWORD", ""); // 
-define("AUTH_MODE_REMOTE_PORT", 80); // 
-define("AUTH_MODE_REMOTE_SESSION_NAME", "session_id"); // 
 
 // If you want to allow public URL to uploaded file please do the following : 
 // + Create this folder.
@@ -123,7 +115,7 @@ $REPOSITORIES[1] = array(
  * you should be able to access your files in the wordpress "admin" section, 
  * in the "Manage" chapter, new tab "Ajaxplorer File Management". Tested on WP 2.1
  */
-if(AUTH_MODE == "wordpress"){
+/*
 	$REPOSITORIES[0] = array(
 		"DISPLAY"		=>	"Wordpress", 
 		"DRIVER"		=>	"fs", 
@@ -133,8 +125,7 @@ if(AUTH_MODE == "wordpress"){
 			"RECYCLE_BIN" 	=> 	'recycle_bin'
 		)
 	);
-}
-
+*/
 /*********************************************/
 /*	DEFAULT LANGUAGE
 /*  Check i18n folder for available values.
