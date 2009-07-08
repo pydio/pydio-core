@@ -70,31 +70,7 @@ class AuthService
 		return ;
 		/*
 		// TODO : CREATE APPROPRIATE AUTH DRIVERS
-		if(AUTH_MODE == "local_http")
-		{
-			$localHttpLogin = $_SERVER["REMOTE_USER"];
-			if(isSet($localHttpLogin) && AuthService::userExists($localHttpLogin))
-			{
-				AuthService::logUser($localHttpLogin, "", true);
-			}
-		}
-		else if(AUTH_MODE == "remote" && $remoteSessionId != "")
-		{
-			require_once("class.HttpClient.php");
-			$client = new HttpClient(AUTH_MODE_REMOTE_SERVER, AUTH_MODE_REMOTE_PORT);
-			$client->setDebug(false);
-			if(AUTH_MODE_REMOTE_USER != ""){
-				$client->setAuthorization(AUTH_MODE_REMOTE_USER, AUTH_MODE_REMOTE_PASSWORD);
-			}						
-			$client->setCookies(array((AUTH_MODE_REMOTE_SESSION_NAME ? AUTH_MODE_REMOTE_SESSION_NAME : "PHPSESSID") => $remoteSessionId));
-			$result = $client->get(AUTH_MODE_REMOTE_URL, array("session_id"=>$remoteSessionId));			
-			if($result)
-			{
-				$user = $client->getContent();
-				if(AuthService::userExists($user)) AuthService::logUser($user, "", true);
-			}
-		}
-		else if(AUTH_MODE == "wordpress"){
+		if(AUTH_MODE == "wordpress"){
 			global $current_user;
 			wp_get_current_user();
 			if($current_user->user_login == '' || $current_user->wp_user_level < 8 || !function_exists('ajxp_content')){
