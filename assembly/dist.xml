@@ -10,7 +10,10 @@
 			<outputDirectory></outputDirectory>
 			<directory>src</directory>
 			<includes>
-				<include>*.php</include>
+				<include>content.php</include>
+				<include>index.php</include>
+				<include>publicLet.inc.php</include>
+				<include>runTests.php</include>
 			</includes>
 		</fileSet>
 		<fileSet>
