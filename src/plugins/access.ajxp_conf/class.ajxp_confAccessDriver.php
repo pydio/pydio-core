@@ -490,6 +490,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	function printDiagnostic(){
+		$outputArray = array();
+		$testedParams = array();
+		$passed = Utils::runTests($outputArray, $testedParams);
+		Utils::testResultsToFile($outputArray, $testedParams);		
 		print '<columns switchGridMode="filelist"><column messageString="Test Name" attributeName="ajxp_label" sortType="String"/><column messageString="Test Data" attributeName="data" sortType="String"/></columns>';		
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			
