@@ -39,7 +39,7 @@
 			<directory>src/server/conf</directory>
 			<includes>
 				<include>conf.php</include>
-				<include>conf.fs.inc</include>
+				<include>conf.access.fs.inc</include>
 				<include>.htaccess</include>
 			</includes>
 		</fileSet>
