@@ -73,7 +73,12 @@ if(AuthService::usersEnabled())
 	if(!is_readable(USERS_DIR)) $BEGIN_MESSAGE = "Warning, the users directory is not readable!";
 	else if(!is_writeable(USERS_DIR)) $BEGIN_MESSAGE = "Warning, the users directory is not writeable!";
 	if(AuthService::countAdminUsers() == 0){
-		 AuthService::createUser("admin", ADMIN_PASSWORD, true);
+		$authDriver = ConfService::getAuthDriverImpl();
+		$adminPass = ADMIN_PASSWORD;
+		if($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true){
+			$adminPass = md5(ADMIN_PASSWORD);
+		}
+		 AuthService::createUser("admin", $adminPass, true);
 		 if(ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD)
 		 {
 			 $BEGIN_MESSAGE .= "Warning! User 'admin' was created with the initial common password 'admin'. \\nPlease log in as admin and change the password now!";
