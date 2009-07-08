@@ -65,6 +65,10 @@ class demoAccessDriver extends fsAccessDriver
 				}
 				exit(0);
 			break;
+			case "public_url":
+				print($errorMessage);
+				exit(0);
+			break;
 			//------------------------------------
 			//	COPY / MOVE
 			//------------------------------------
