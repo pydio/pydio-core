@@ -78,6 +78,7 @@ class demoAccessDriver extends fsAccessDriver
 			case "delete":
 			case "mkdir":
 			case "mkfile":
+			case "chmod":
 				return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
 			break;
 			
