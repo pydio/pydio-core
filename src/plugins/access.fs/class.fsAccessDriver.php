@@ -700,121 +700,140 @@ class fsAccessDriver extends AbstractAccessDriver
 		return $nom_rep;
 	}
 
-    function getTrueSize($file) {
-        if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN'))
-            return trim(`stat -Lc%s $file`);
-        else if (extension_loaded("COM")){
-            $fsobj = new COM("Scripting.FileSystemObject");
-            $f = $fsobj->GetFile($file);
-            return floatval($file->Size);
-        }
-        else if (is_file($file)){
-            return exec('FOR %A IN ("'.$file.'") DO @ECHO %~zA');
-        }
-        else return '0';
-    } 	
+	function getTrueSize($file) {
+		if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')){
+			$cmd = "stat -L -c%s \"".$file."\"";
+			$val = trim(`$cmd`);
+			if (strlen($val) == 0 || floatval($val) == 0)
+			{
+				// No stat on system
+				$cmd = "ls -1s --block-size=1 \"".$file."\"";
+				$val = trim(`$cmd`);
+			}
+			if (strlen($val) == 0 || floatval($val) == 0)
+			{
+				// No block-size on system (probably busybox), try long output
+				$cmd = "ls -l \"".$file."\"";
+
+				$arr = preg_split("/[\s]+/", `$cmd`);
+				$val = trim($arr[4]);
+			}
+			return floatval($val);
+		}else if (extension_loaded("COM")){
+			$fsobj = new COM("Scripting.FileSystemObject");
+			$f = $fsobj->GetFile($file);
+			return floatval($file->Size);
+		}
+		else if (is_file($file)){
+			return exec('FOR %A IN ("'.$file.'") DO @ECHO %~zA');
+		}
+		else return '0';
+	}
 
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
-	{		
+	{
 		session_write_close();
+		if(defined("QNAP_SERVER")){			
+			if (QNAP_SERVER && !$data && !file_exists($filePathOrData)) $filePathOrData = SystemTextEncoding::changeCharset("ISO8859-1", "UTF-8", $filePathOrData);
+		}
 		$size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
-        $isFile = !$data && !$gzip;
+		$isFile = !$data && !$gzip;
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
 		}
-		$localName = ($localName=="" ? basename($filePathOrData) : $localName);		
+		$localName = ($localName=="" ? basename($filePathOrData) : $localName);
 		if($headerType == "plain")
 		{
-			header("Content-type:text/plain");			
+			header("Content-type:text/plain");
 		}
 		else if($headerType == "image")
 		{
 			header("Content-Type: ".Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
 			header("Content-Length: ".$size);
-			header('Cache-Control: public');			
+			header('Cache-Control: public');
 		}
 		else if($headerType == "mp3")
 		{
 			header("Content-Type: audio/mp3; name=\"".$localName."\"");
 			header("Content-Length: ".$size);
 		}
-		else 
+		else
 		{
 			if(preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])){
 				$localName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($localName)));
-			}			
+			}
 
-            if ($isFile) header("Accept-Ranges: bytes");
-            // Check if we have a range header (we are resuming a transfer)
-            if ( isset($_SERVER['HTTP_RANGE']) &&  $isFile ) 
-            {
-                // multiple ranges, which can become pretty complex, so ignore it for now
-                $ranges = explode('=', $_SERVER['HTTP_RANGE']);
-                $offsets = explode('-', $ranges[1]);
-                $offset = floatval($offsets[0]); 
+			if ($isFile) header("Accept-Ranges: bytes");
+			// Check if we have a range header (we are resuming a transfer)
+			if ( isset($_SERVER['HTTP_RANGE']) && $isFile && $size != 0 )
+			{
+				// multiple ranges, which can become pretty complex, so ignore it for now
+				$ranges = explode('=', $_SERVER['HTTP_RANGE']);
+				$offsets = explode('-', $ranges[1]);
+				$offset = floatval($offsets[0]);
 
-                $length = floatval($offsets[1]) - $offset;
-                if (!$length) $length = $size - $offset;
-                if ($length + $offset > $size || $length < 0) $length = $size - $offset;
-                header('HTTP/1.1 206 Partial Content');
+				$length = floatval($offsets[1]) - $offset;
+				if (!$length) $length = $size - $offset;
+				if ($length + $offset > $size || $length < 0) $length = $size - $offset;
+				header('HTTP/1.1 206 Partial Content');
 
-                header('Content-Range: bytes ' . $offset . '-' . ($offset + $length - 1) . '/' . $size);
-                header("Content-Length: ". $length);
-                $file = fopen($filePathOrData, 'rb');
-                fseek($file, 0);
-                $relOffset = $offset;
-                while ($relOffset > 2.0E9)
-                {
-                     // seek to the requested offset, this is 0 if it's not a partial content request
-                     fseek($file, 2000000000, SEEK_CUR);
-                     $relOffset -= 2000000000;
-                     // This works because we never overcome the PHP 32 bit limit
-                }
-                fseek($file, $relOffset, SEEK_CUR);
-        
-                $readSize = 0.0;
-                while (!feof($file) && $readSize < $length && connection_status() == 0)
-                {
-                    echo fread($file, 2048);
-                    $readSize += 2048.0;
-                    flush();
-                }
-                fclose($file);
-                return;        
-            } else 
-            {
-			    header("Content-Type: application/force-download; name=\"".$localName."\"");
-			    header("Content-Transfer-Encoding: binary");
-			    if($gzip){
-				    header("Content-Encoding: gzip");
-				    // If gzip, recompute data size!
-				    $gzippedData = ($data?gzencode($filePathOrData,9):gzencode(file_get_contents($filePathOrData), 9));
-				    $size = strlen($gzippedData);
-			    }
-			    header("Content-Length: ".$size);
-                if ($isFile) header("Content-Range: bytes 0-" . $size - 1 . "/" . $size . ";");
-  			    header("Content-Disposition: attachment; filename=\"".$localName."\"");
-			    header("Expires: 0");
-			    header("Cache-Control: no-cache, must-revalidate");
-			    header("Pragma: no-cache");
-			    if (preg_match('/ MSIE 6/',$_SERVER['HTTP_USER_AGENT'])){
-			    	header("Cache-Control: max_age=0");
-				    header("Pragma: public");
-			    }
-			
-			    // For SSL websites there is a bug with IE see article KB 323308
-			    // therefore we must reset the Cache-Control and Pragma Header
-			    if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
-			    {
-			    	header("Cache-Control:");
-			    	header("Pragma:");
-			    }
-			    if($gzip){
-			    	print $gzippedData;
-			    	return;
-			    }
-		    }
-        }
+				header('Content-Range: bytes ' . $offset . '-' . ($offset + $length - 1) . '/' . $size);
+				header("Content-Length: ". $length);
+				$file = fopen($filePathOrData, 'rb');
+				fseek($file, 0);
+				$relOffset = $offset;
+				while ($relOffset > 2.0E9)
+				{
+					// seek to the requested offset, this is 0 if it's not a partial content request
+					fseek($file, 2000000000, SEEK_CUR);
+					$relOffset -= 2000000000;
+					// This works because we never overcome the PHP 32 bit limit
+				}
+				fseek($file, $relOffset, SEEK_CUR);
+
+				$readSize = 0.0;
+				while (!feof($file) && $readSize < $length && connection_status() == 0)
+				{
+					echo fread($file, 2048);
+					$readSize += 2048.0;
+					flush();
+				}
+				fclose($file);
+				return;
+			} else
+			{
+				header("Content-Type: application/force-download; name=\"".$localName."\"");
+				header("Content-Transfer-Encoding: binary");
+				if($gzip){
+					header("Content-Encoding: gzip");
+					// If gzip, recompute data size!
+					$gzippedData = ($data?gzencode($filePathOrData,9):gzencode(file_get_contents($filePathOrData), 9));
+					$size = strlen($gzippedData);
+				}
+				header("Content-Length: ".$size);
+				if ($isFile && ($size != 0)) header("Content-Range: bytes 0-" . ($size - 1) . "/" . $size . ";");
+				header("Content-Disposition: attachment; filename=\"".$localName."\"");
+				header("Expires: 0");
+				header("Cache-Control: no-cache, must-revalidate");
+				header("Pragma: no-cache");
+				if (preg_match('/ MSIE 6/',$_SERVER['HTTP_USER_AGENT'])){
+					header("Cache-Control: max_age=0");
+					header("Pragma: public");
+				}
+
+				// For SSL websites there is a bug with IE see article KB 323308
+				// therefore we must reset the Cache-Control and Pragma Header
+				if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+				{
+					header("Cache-Control:");
+					header("Pragma:");
+				}
+				if($gzip){
+					print $gzippedData;
+					return;
+				}
+			}
+		}
 
 		if($data){
 			print($filePathOrData);
@@ -822,8 +841,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			readfile($filePathOrData);
 		}
 	}
-	
-	
+
 	function countFiles($dirName){
 		$handle=opendir($dirName);
 		$count = 0;
