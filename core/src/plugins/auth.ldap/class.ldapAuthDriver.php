@@ -41,6 +41,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapAdminUsername;
     var $ldapAdminPassword;
     var $ldapDN;
+    var $ldapFilter;
 
     var $ldapconn = null;
 
@@ -53,6 +54,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
+        if ($options["LDAP_FILTER"]) $this->ldapFilter = $options["LDAP_FILTER"];
         $this->ldapconn = $this->LDAP_Connect();
         if ($this->ldapconn == null) AJXP_Logger::logAction('LDAP Server connexion could NOT be established');
     }
@@ -97,7 +99,12 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
 
     function listUsers(){
-        $ret = ldap_search($this->ldapconn,$this->ldapDN,"objectClass=person");
+		if ($this->ldapFilter === null){
+			$ret = ldap_search($this->ldapconn,$this->ldapDN,"objectClass=person");
+		} else {
+			$ret = ldap_search($this->ldapconn,$this->ldapDN,$this->ldapFilter);
+		}    	
+        //$ret = ldap_search($this->ldapconn,$this->ldapDN,"objectClass=person");
         $entries = ldap_get_entries($this->ldapconn, $ret);
         $persons = array();
         unset($entries['count']);
