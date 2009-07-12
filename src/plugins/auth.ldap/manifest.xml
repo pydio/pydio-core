@@ -5,4 +5,5 @@
 	<param name="LDAP_USER" type="string" label="LDAP Admin Username" description="Username (uid + dn) of LDAP administrator" mandatory="false"/>
 	<param name="LDAP_PASSWORD" type="string" label="LDAP Admin password" description="Password of LDAP administrator" mandatory="false"/>
 	<param name="LDAP_DN" type="string" label="People DN" description="DN where the users are stored" mandatory="false"/>
+	<param name="LDAP_FILTER" type="string" label="LDAP Filter" description="Filter which users to fetch." mandatory="false"/>
 </authdriver>
