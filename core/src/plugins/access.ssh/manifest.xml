@@ -4,4 +4,5 @@
 	<param name="PATH" type="string" label="Path" description="Real path to the root folder and the server like bob.myserver.com:/home/" mandatory="true"/>
 	<user_param name="remote_username" type="string" label="Remote login" description="User login" mandatory="true"/>
 	<user_param name="remote_password" type="password" label="Remote pass" description="User password" mandatory="true"/>
+	<param name="CHARSET" type="string" label="Charset" description="The remote charset (leave empty to autodetect)" mandatory="false" default=""/>
 </ajxpdriver>

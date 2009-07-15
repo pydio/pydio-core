@@ -94,11 +94,11 @@ class sshAccessDriver extends AbstractAccessDriver
 		    }
 		    $_SESSION["cwd"] = trim($param[0]);
 		    $fullCharset = explode('.', trim($param[1]));
-		    $_SESSION["charset"] = array_pop($fullCharset);
+		    if ($_SESSION["AJXP_CHARSET"] == "") $_SESSION["AJXP_CHARSET"] = array_pop($fullCharset);
 		}
 		// If it's set, then cache the result to avoid multiple connection on the remote server 
 		$this->serverCwd = rtrim(trim($_SESSION["cwd"]), '/').'/';
-		$this->charset = trim($_SESSION["charset"]);
+		$this->charset = trim($_SESSION["AJXP_CHARSET"]);
 	}
 	
 	function switchAction($action, $httpVars, $fileVars){
