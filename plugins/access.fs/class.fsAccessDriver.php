@@ -733,11 +733,18 @@ class fsAccessDriver extends AbstractAccessDriver
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
 		session_write_close();
-		if(defined("QNAP_SERVER")){			
-			if (QNAP_SERVER && !$data && !file_exists($filePathOrData)) $filePathOrData = SystemTextEncoding::changeCharset("ISO8859-1", "UTF-8", $filePathOrData);
-		}
-		$size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
 		$isFile = !$data && !$gzip;
+        if (!$data) {
+            // Check if we have right to read this file 
+            $file = @fopen($filePathOrData, "r"); 
+            if ($file === FALSE) {
+                header('HTTP/1.1 403 Forbidden');
+                return;
+            }
+            fclose($file);
+        }
+
+		$size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
 		}
