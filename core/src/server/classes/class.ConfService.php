@@ -148,6 +148,15 @@ class ConfService
 			if(isSet($G_ACCESS_DRIVER)) unset($G_ACCESS_DRIVER);
 		}
 		
+		if(isSet($G_REPOSITORY) && $G_REPOSITORY->getOption("CHARSET")!=""){
+			$_SESSION["AJXP_CHARSET"] = $G_REPOSITORY->getOption("CHARSET");
+		}else{
+			if(isSet($_SESSION["AJXP_CHARSET"])){
+				unset($_SESSION["AJXP_CHARSET"]);
+			}
+		}
+		
+		
 	}
 	
 	function getRepositoriesList()
