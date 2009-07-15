@@ -38,8 +38,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
             if (!isset($_SESSION["ftpCharset"]) || !strlen($_SESSION["ftpCharset"]))
             {
                 $features = $this->getServerFeatures();
-                $_SESSION["charset"] = $features["charset"];
-                $_SESSION["ftpCharset"] = $features["charset"];
+                if ($_SESSION["AJXP_CHARSET"] == "") $_SESSION["AJXP_CHARSET"] = $features["charset"];
+                $_SESSION["ftpCharset"] = $_SESSION["AJXP_CHARSET"];
             }
         }
 
