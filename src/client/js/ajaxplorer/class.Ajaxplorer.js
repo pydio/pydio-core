@@ -396,6 +396,30 @@ Ajaxplorer = Class.create({
 	},
 	
 	
+	triggerDownload : function(fileUrl){
+		if(Prototype.Browser.IE){
+			document.location.href=fileUrl;
+			return;
+		}
+		var ifDoc = $('download_iframe').contentWindow.document || $('download_iframe').contentDocument;
+		if(ifDoc){
+			var fBody = ifDoc.body;
+			if(fBody){
+				$(fBody).innerHTML = '';
+			}
+		}
+		$('download_iframe').src = fileUrl;
+		window.setTimeout(function(){
+			var ifDoc = $('download_iframe').contentWindow.document || $('download_iframe').contentDocument;
+			if(ifDoc){
+				var fBody = ifDoc.body;
+				if(fBody && fBody.innerHTML != ''){
+					ajaxplorer.displayMessage('ERROR', fBody.innerHTML);
+				}
+			}
+		}, 1000);
+	},
+	
 	cancelCopyOrMove: function(){
 		this.foldersTree.setTreeInNormalMode();
 		this.foldersTree.selectCurrentNodeName();

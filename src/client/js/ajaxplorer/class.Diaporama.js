@@ -77,7 +77,8 @@ Diaporama = Class.create({
 		}.bind(this);	
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
-			document.location.href = 'content.php?action=download&file='+this.currentFile;
+			//document.location.href = 'content.php?action=download&file='+this.currentFile;
+			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
 			return false;
 		}.bind(this);
 		this.actualSizeButton.onclick = function(){

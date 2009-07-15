@@ -74,7 +74,7 @@ Editor = Class.create({
 		}.bind(this));
 		this.downloadButton.observe('click', function(){
 			if(!this.currentFile) return;		
-			document.location.href = 'content.php?action=download&file='+this.currentFile;
+			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
 			return false;
 		}.bind(this));
 		modal.setCloseAction(function(){this.close();}.bind(this));
