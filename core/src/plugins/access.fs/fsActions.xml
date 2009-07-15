@@ -197,7 +197,7 @@ AJXP_MESSAGE[174]<br/>
 					{
 						var downloadUrl = ajxpServerAccessPath+'?action=download';
 						downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-						document.location.href = downloadUrl;
+						ajaxplorer.triggerDownload(downloadUrl);
 						
 					}
 					else
@@ -221,7 +221,7 @@ AJXP_MESSAGE[174]<br/>
 						}else{
 							var downloadUrl = ajxpServerAccessPath+'?action=download';
 							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-							document.location.href = downloadUrl;							
+							ajaxplorer.triggerDownload(downloadUrl);							
 						}
 					}
 					]]></clientCallback>
