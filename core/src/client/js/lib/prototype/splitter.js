@@ -106,25 +106,35 @@ Splitter = Class.create({
 		if(this.paneA._init){
 			this.paneA.setStyle(this.makeStyleObject(this.options.adjust, this.paneA._init));
 		}
-		Event.observe(window,"resize", function(e){this.resizeGroup(e);}.bind(this));
+		Event.observe(window,"resize", function(e){this.resizeGroup(e, null, true);}.bind(this));
 		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 		//this.resizeGroup();
 	},
 	
 	resizeGroup: function(event, size, keepPercents){	
-		//console.log("Resize", this.options.direction, size);	
+		//console.log("Resize", this.options.direction, size);
+		var groupInitAdjust = this.group._adjust;
 		this.group._fixed = this.options.getFixed(this.group) - this.group._borderFixed;
 		this.group._adjust = this.group[this.options.offsetAdjust] - this.group._borderAdjust;
 		
 		if(this.group._fixed <= 0 || this.group._adjust <= 0) return;
 		
+		// Recompute fixed
 		var optName = this.options.fixed;
 		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed+'px')); 
 		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);		
 		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdj+'px')); 
 		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
 		
-		this.moveSplitter(size||(!this.options.initB?this.paneA[this.options.offsetAdjust]:this.group._adjust-this.paneB[this.options.offsetAdjust]-this.splitbar._adjust));
+		// Recompute adjust
+		if(keepPercents && !size && groupInitAdjust){			
+			size = parseInt(this.paneA[this.options.offsetAdjust] * this.group._adjust / groupInitAdjust );
+			//console.log("moveSplitter::keep", this.options.direction, size);
+		}else{
+			size = size||(!this.options.initB?this.paneA[this.options.offsetAdjust]:this.group._adjust-this.paneB[this.options.offsetAdjust]-this.splitbar._adjust);
+			//console.log("moveSplitter::nokeep", this.options.direction, size);
+		}
+		this.moveSplitter(size);
 	},
 	
 	startSplit: function(event){
@@ -153,8 +163,7 @@ Splitter = Class.create({
         this.moveObserver = 0; this.upObserver = 0;
 	}, 
 	
-	moveSplitter:function(np){
-		//console.log("moveSplitter", this.options.direction, np);
+	moveSplitter:function(np){		
 		np = Math.max(this.paneA._min+this.paneA._padAdjust, this.group._adjust - (this.paneB._max||9999), 16,
 				Math.min(np, this.paneA._max||9999, this.group._adjust - this.splitbar._adjust - 
 				Math.max(this.paneB._min+this.paneB._padAdjust, 16)));
