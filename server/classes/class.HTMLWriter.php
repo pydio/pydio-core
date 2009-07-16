@@ -103,6 +103,11 @@ class HTMLWriter
     	print("</body></html>");
     }
     
+    function javascriptErrorHandler($errorType, $errorMessage){    	
+    	restore_error_handler();    	
+    	die("<script language='javascript'>parent.ajaxplorer.displayMessage('ERROR', '".str_replace("'", "\'", $errorMessage)."');</script>");
+    }
+    
 }
 
 ?>

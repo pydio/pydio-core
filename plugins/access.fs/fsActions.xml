@@ -193,42 +193,42 @@ AJXP_MESSAGE[174]<br/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getFilesList().getUserSelection();
-					if(userSelection.isUnique() && !userSelection.hasDir())
+					if((userSelection.isUnique() && !userSelection.hasDir()) || zipEnabled)
 					{
-						var downloadUrl = ajxpServerAccessPath+'?action=download';
-						downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-						ajaxplorer.triggerDownload(downloadUrl);
-						
+						var userSelection = ajaxplorer.getFilesList().getUserSelection();
+						$('download_form').select("input").each(function(input){
+							if(input.name!='get_action') input.remove();
+						});
+						userSelection.updateFormOrUrl($('download_form'));
+						$('download_form').submit();
 					}
 					else
 					{
-						if(!zipEnabled){
-							var loadFunc = function(oForm){
-								var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-								var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
-								downloader.triggerEnd = function(){hideLightBox()};
-								fileNames = userSelection.getFileNames();
-								for(var i=0; i<fileNames.length;i++)
-								{
-									downloader.addListRow(fileNames[i]);
-								}				
-							};
-							var closeFunc = function(){
-								hideLightBox();
-								return false;
-							};
-							modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
-						}else{
-							var downloadUrl = ajxpServerAccessPath+'?action=download';
-							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
-							ajaxplorer.triggerDownload(downloadUrl);							
-						}
+						var loadFunc = function(oForm){
+							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
+							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
+							downloader.triggerEnd = function(){hideLightBox()};
+							fileNames = userSelection.getFileNames();
+							for(var i=0; i<fileNames.length;i++)
+							{
+								downloader.addListRow(fileNames[i]);
+							}				
+						};
+						var closeFunc = function(){
+							hideLightBox();
+							return false;
+						};
+						modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
 					}
 					]]></clientCallback>
 					<clientForm id="multi_download_form"><![CDATA[
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="410">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
+					<form style="display:inline;" action="content.php" method="GET" id="download_form" target="download_iframe">
+						<input type="hidden" name="get_action" value="download">
+					</form>
+					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>					
 					</div>]]>
 					</clientForm>
 					<clientListener name="selectionChange"><![CDATA[
