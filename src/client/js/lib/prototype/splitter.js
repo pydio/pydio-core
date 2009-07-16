@@ -101,14 +101,18 @@ Splitter = Class.create({
 		this.paneA._init = (this.options.initA==true?parseInt(this.options.getAdjust(this.paneA)):this.options.initA) || 0;
 		this.paneB._init = (this.options.initB==true?parseInt(this.options.getAdjust(this.paneB)):this.options.initB) || 0;
 		if(this.paneB._init){
-			this.paneB._init = this.group[this.options.offsetAdjust] - this.group._borderAdjust - this.paneB._init - this.splitbar._adjust;
+			this.paneB.setStyle(this.makeStyleObject(this.options.adjust, this.paneB._init));
+		}
+		if(this.paneA._init){
+			this.paneA.setStyle(this.makeStyleObject(this.options.adjust, this.paneA._init));
 		}
 		Event.observe(window,"resize", function(e){this.resizeGroup(e);}.bind(this));
 		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 		//this.resizeGroup();
 	},
 	
-	resizeGroup: function(event, size, keepPercents){		
+	resizeGroup: function(event, size, keepPercents){	
+		//console.log("Resize", this.options.direction, size);	
 		this.group._fixed = this.options.getFixed(this.group) - this.group._borderFixed;
 		this.group._adjust = this.group[this.options.offsetAdjust] - this.group._borderAdjust;
 		
@@ -119,6 +123,7 @@ Splitter = Class.create({
 		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);		
 		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdj+'px')); 
 		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
+		
 		this.moveSplitter(size||(!this.options.initB?this.paneA[this.options.offsetAdjust]:this.group._adjust-this.paneB[this.options.offsetAdjust]-this.splitbar._adjust));
 	},
 	
@@ -149,6 +154,7 @@ Splitter = Class.create({
 	}, 
 	
 	moveSplitter:function(np){
+		//console.log("moveSplitter", this.options.direction, np);
 		np = Math.max(this.paneA._min+this.paneA._padAdjust, this.group._adjust - (this.paneB._max||9999), 16,
 				Math.min(np, this.paneA._max||9999, this.group._adjust - this.splitbar._adjust - 
 				Math.max(this.paneB._min+this.paneB._padAdjust, 16)));
