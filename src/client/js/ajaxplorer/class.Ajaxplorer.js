@@ -393,35 +393,8 @@ Ajaxplorer = Class.create({
 		var path = this.pathesHash.get(hash);
 		if(path == undefined) return "/";
 		return path;
-	},
-	
-	
-	triggerDownload : function(fileUrl){
-		if(Prototype.Browser.IE){
-			//alert('http://127.0.0.1/ajaxplorer/content.php?action=download&dir=/&file=AaaTest.txt');
-			$('download_iframe').src = fileUrl;
-			//document.location.href=fileUrl;
-			return;
-		}
-		var ifDoc = $('download_iframe').contentWindow.document || $('download_iframe').contentDocument;
-		if(ifDoc){
-			var fBody = ifDoc.body;
-			if(fBody){
-				$(fBody).innerHTML = '';
-			}
-		}
-		$('download_iframe').src = fileUrl;
-		window.setTimeout(function(){
-			var ifDoc = $('download_iframe').contentWindow.document || $('download_iframe').contentDocument;
-			if(ifDoc){
-				var fBody = ifDoc.body;
-				if(fBody && fBody.innerHTML != ''){
-					ajaxplorer.displayMessage('ERROR', fBody.innerHTML);
-				}
-			}
-		}, 1000);
-	},
-	
+	},	
+			
 	cancelCopyOrMove: function(){
 		this.foldersTree.setTreeInNormalMode();
 		this.foldersTree.selectCurrentNodeName();
