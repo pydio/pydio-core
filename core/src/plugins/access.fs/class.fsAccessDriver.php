@@ -109,7 +109,9 @@ class fsAccessDriver extends AbstractAccessDriver
 			//	DOWNLOAD, IMAGE & MP3 PROXYS
 			//------------------------------------
 			case "download":
-				AJXP_Logger::logAction("Download", array("files"=>$selection));				
+				AJXP_Logger::logAction("Download", array("files"=>$selection));
+				set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
+				register_shutdown_function("restore_error_handler");				
 				if($selection->inZip){
 					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
 					@mkdir($this->getPath()."/".$tmpDir);
@@ -734,15 +736,8 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		session_write_close();
 		if(!$data){
-			if(!is_file($filePathOrData) || !is_readable($filePathOrData)){
-				header('HTTP/1.1 301 Moved Permanently');
-				if(!is_file($filePathOrData)){
-					echo "Cannot find file!";
-				}else{
-					echo "The file is not readable!";
-				}
-				exit(0);
-			}
+			$test = fopen($filePathOrData, "r");
+			if($test) fclose($test);
 		}
 		$size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
