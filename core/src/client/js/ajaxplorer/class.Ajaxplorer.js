@@ -398,7 +398,9 @@ Ajaxplorer = Class.create({
 	
 	triggerDownload : function(fileUrl){
 		if(Prototype.Browser.IE){
-			document.location.href=fileUrl;
+			//alert('http://127.0.0.1/ajaxplorer/content.php?action=download&dir=/&file=AaaTest.txt');
+			$('download_iframe').src = fileUrl;
+			//document.location.href=fileUrl;
 			return;
 		}
 		var ifDoc = $('download_iframe').contentWindow.document || $('download_iframe').contentDocument;

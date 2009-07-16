@@ -85,7 +85,7 @@ try{
 	if($('bottomSplitPane')){
 		var sideSplit = new Splitter('sidebarSplitter',{
 				direction: "horizontal",
-				initB: 150,
+				initB: parseInt($('browser').getHeight()*2/5),
 				minB: 24,
 				maxB: 500,
 				onDrag:function(){
