@@ -720,6 +720,10 @@ class fsAccessDriver extends AbstractAccessDriver
 				$arr = preg_split("/[\s]+/", `$cmd`);
 				$val = trim($arr[4]);
 			}
+			if (strlen($val) == 0 || floatval($val) == 0){
+				// Still not working, get a value at least, not 0...
+				$val = sprintf("%u", filesize($file));
+			}
 			return floatval($val);
 		}else if (extension_loaded("COM")){
 			$fsobj = new COM("Scripting.FileSystemObject");
@@ -729,7 +733,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		else if (is_file($file)){
 			return exec('FOR %A IN ("'.$file.'") DO @ECHO %~zA');
 		}
-		else return '0';
+		else return sprintf("%u", filesize($file));
 	}
 
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
