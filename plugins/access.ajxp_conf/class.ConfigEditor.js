@@ -457,7 +457,7 @@ ConfigEditor = Class.create({
 			if(child.nodeName != 'param') return;
 			paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
 		});
-		var writeable = repo.getAttribute("writeable");			
+		var writeable = (repo.getAttribute("writeable")?(repo.getAttribute("writeable")=="true"):false);			
 		this.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable);
 
 		if(writeable){

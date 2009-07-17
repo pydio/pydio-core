@@ -82,12 +82,6 @@ $AUTH_DRIVER = array(
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
 
-// DO NOT REMOVE THIS!
-$REPOSITORIES[0] = array(
-	"DISPLAY"		=>	"Settings", 
-	"DRIVER"		=>	"ajxp_conf", 
-	"DRIVER_OPTIONS"=> array()	
-);
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.
 /* Use the GUI to add new repositories to explore!
@@ -108,6 +102,13 @@ $REPOSITORIES[1] = array(
 	
 );
 
+// DO NOT REMOVE THIS!
+// ADMIN REPOSITORY
+$REPOSITORIES[0] = array(
+	"DISPLAY"		=>	"Settings", 
+	"DRIVER"		=>	"ajxp_conf", 
+	"DRIVER_OPTIONS"=> array()	
+);
 
 /**
  * Specific config for wordpress plugin, still experimental, do not touch if you are not sure!
