@@ -4,11 +4,11 @@
     <artifactId>ajaxplorer-core</artifactId>
     <packaging>pom</packaging>
     <name>AjaXplorer Core</name>
-    <version>2.5.2-SNAPSHOT</version>
+    <version>2.5.2</version>
     <description>AjaXplorer Core Package</description>
     <scm>
-        <connection>scm:svn:https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/trunk/core</connection>
-        <url>https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/trunk/core</url>
+        <connection>scm:svn:https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/tags/ajaxplorer-core-2.5.2</connection>
+        <url>https://ajaxplorer.svn.sourceforge.net/svnroot/ajaxplorer/tags/ajaxplorer-core-2.5.2</url>
     </scm>
     <licenses>
         <license>
