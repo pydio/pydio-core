@@ -38,7 +38,7 @@ require_once('../classes/class.AbstractTest.php');
 
 class ServerEncoding extends AbstractTest
 {
-    function ServerEncoding() { parent::AbstractTest("Server charset encoding", "You must set a correct charset encoding in your locale definition in the form: en_us.UTF-8. Please refer to setlocale man page. "); }
+    function ServerEncoding() { parent::AbstractTest("Server charset encoding", "You must set a correct charset encoding in your locale definition in the form: en_us.UTF-8. Please refer to setlocale man page. If your detected locale is C, please check <a href=\"http://www.ajaxplorer.info/documentation/chapter-8-faq/#c87\">http://www.ajaxplorer.info/documentation/chapter-8-faq/#c87</a>. "); }
     function doTest() 
     { 
         // Get the locale
