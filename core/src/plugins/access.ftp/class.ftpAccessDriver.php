@@ -38,8 +38,9 @@ class ftpAccessDriver extends  AbstractAccessDriver
             if (!isset($_SESSION["ftpCharset"]) || !strlen($_SESSION["ftpCharset"]))
             {
                 $features = $this->getServerFeatures();
+                if(!isSet($_SESSION["AJXP_CHARSET"])) $_SESSION["AJXP_CHARSET"] = "";
                 if ($_SESSION["AJXP_CHARSET"] == "") $_SESSION["AJXP_CHARSET"] = $features["charset"];
-                $_SESSION["ftpCharset"] = $_SESSION["AJXP_CHARSET"];
+	            $_SESSION["ftpCharset"] = $_SESSION["AJXP_CHARSET"];
             }
         }
 
@@ -364,7 +365,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				foreach ($reps as $repIndex => $repName)
 				{
 				 
-					if((eregi("\.zip$",$repName) && $skipZip)) continue;
+					if(is_string($repName) && (eregi("\.zip$",$repName) && $skipZip)) continue;
 					$attributes = "";
 					if($searchMode)
 					{

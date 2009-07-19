@@ -66,7 +66,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$splits = split("/", $dir);
 				if(count($splits)){
 					if($splits[0] == "") array_shift($splits);
-					$strippedDir = strtolower(urldecode($splits[0]));
+					if(count($splits)) $strippedDir = strtolower(urldecode($splits[0]));
+					else $strippedDir = "";
 				}				
 				if(array_key_exists($strippedDir, $rootNodes)){
 					AJXP_XMLWriter::header();
@@ -473,7 +474,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$logger = AJXP_Logger::getInstance();
 		$parts = split("/", $dir);
 		if(count($parts)>4){
-			print '<columns switchGridMode="grid">
+			print '<columns switchDisplayMode="list" switchGridMode="grid">
 				<column messageString="Date" attributeName="date" sortType="Date" width="10%"/>
 				<column messageString="I.P." attributeName="ip" sortType="String"/>
 				<column messageString="Level" attributeName="level" sortType="String"/>
@@ -521,7 +522,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
 	                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 	                        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-	                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx$¨op#"), $value, MCRYPT_MODE_ECB, $iv));
+	                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
 	                    }						
 					}
 					unset($repDef[$key."_ajxptype"]);
