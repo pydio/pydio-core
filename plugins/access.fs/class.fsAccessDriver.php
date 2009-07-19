@@ -743,6 +743,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			$test = fopen($filePathOrData, "r");
 			if($test) fclose($test);
 		}
+		$isFile = !$data && !$gzip; 
 		$size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip

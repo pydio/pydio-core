@@ -55,7 +55,7 @@ if(!is_file(TESTS_RESULT_FILE)){
 	}
 }
 
-
+/*
 if(AUTH_MODE == "wordpress"){
 	require_once("../../../wp-config.php");
 	require_once("../../../wp-includes/capabilities.php");
@@ -63,7 +63,7 @@ if(AUTH_MODE == "wordpress"){
 	require_once("../../../wp-includes/plugin.php");
 	require_once("../../../wp-includes/pluggable.php");
 }
-
+*/
 $USERS_ENABLED = "false";
 $LOGGED_USER = "false";
 $BEGIN_MESSAGE = "";
@@ -104,6 +104,7 @@ if(AuthService::usersEnabled())
 	}
 	$ROOT_DIR_NAME = "null";
 	$ROOT_DIR_ID = "null";
+	$ROOT_DIR_XML = "";
 }
 else 
 {
