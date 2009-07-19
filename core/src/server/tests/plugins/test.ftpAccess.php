@@ -47,8 +47,7 @@ class ftpAccessTest extends AbstractTest
         $basePath = "../../../plugins/access.ftp/";
         // Check file exists
         if (!file_exists($basePath."class.ftpAccessDriver.php")
-         || !file_exists($basePath."manifest.xml")
-         || !file_exists($basePath."ftpActions.xml"))
+         || !file_exists($basePath."manifest.xml"))
         { $this->failedInfo .= "Missing at least one of the plugin files (class.ftpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
         
         return TRUE;    
