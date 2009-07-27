@@ -80,7 +80,54 @@ class AuthService
 		}
 		*/
 	}
-	
+
+    function getTempDir()
+    {
+        if ( !function_exists('sys_get_temp_dir')) {
+            if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
+            if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
+            if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
+            $tempfile = tempnam(uniqid(rand(),TRUE),'');
+            if (file_exists($tempfile)) {
+                unlink($tempfile);
+                return realpath(dirname($tempfile));
+            }
+        }
+        return sys_get_temp_dir();
+    }
+
+    function getBruteForceLoginArray()
+    {
+        $failedLog = AuthService::getTempDir()."/failedAJXP.log";
+        $loginAttempt = @file_get_contents($failedLog);
+        // Filter the array (all old time are removed)
+        $loginArray = unserialize($loginAttempt);
+        $ret = array();
+        $curTime = time();
+        if (is_array($loginArray))
+            foreach($loginArray as $key => $login)
+            {
+                if (($curTime - $login["time"]) <= 300) $ret[$key] = $login;
+            }
+        return $ret;
+    }
+    function setBruteForceLoginArray($loginArray)
+    {
+        $failedLog = AuthService::getTempDir()."/failedAJXP.log";
+        @file_put_contents($failedLog, serialize($loginArray));
+    }
+
+    function checkBruteForceLogin(&$loginArray)
+    {
+        $login = $loginArray[$_SERVER["REMOTE_ADDR"]];
+        if (is_array($login)){
+            $login["count"]++;
+        } else $login = array("count"=>1, "time"=>time());
+        $loginArray[$_SERVER["REMOTE_ADDR"]] = $login;
+        if ($login["count"] > 4) return FALSE;
+        return TRUE;
+    }
+
 	function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{
 		$confDriver = ConfService::getConfStorageImpl();
@@ -103,12 +150,25 @@ class AuthService
 		}
 		$authDriver = ConfService::getAuthDriverImpl();
 		// CHECK USER PASSWORD HERE!
-		if(!$authDriver->userExists($user_id)) return 0;
+        $loginAttempt = AuthService::getBruteForceLoginArray();
+        $bruteForceLogin = AuthService::checkBruteForceLogin($loginAttempt);
+        AuthService::setBruteForceLoginArray($loginAttempt);
+        if ($bruteForceLogin === FALSE){
+            return -1;    
+        }
+
+		if(!$authDriver->userExists($user_id)){
+             return 0;
+        }
 		if(!$bypass_pwd){
 			if(!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)){
 				return -1;
 			}
 		}
+        // Successful login attempt
+        unset($loginAttempt[$_SERVER["REMOTE_ADDR"]]);
+        AuthService::setBruteForceLoginArray($loginAttempt);
+
 		$user = $confDriver->createUserObject($user_id);
 		if($authDriver->isAjxpAdmin($user_id)){
 			$user->setAdmin(true);
