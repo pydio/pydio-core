@@ -168,7 +168,15 @@ $use_https=false;
 /**************************************************/
 $max_caracteres=50;
 
-
+/*************************************************/
+/* WHEN SET, USE SYSTEM CODE TO GET FILESIZE. 
+/* Enable this on 32bits machine, to overcome PHP 
+/* 4GB limit on file size. This requires shell_exec 
+/* permission on linux, and fork permission on 
+/* windows. Under Windows, it's faster to install 
+/* COM PHP Extension.
+/*************************************************/
+$allowRealSizeProbing=true;
 
 /**************************************************/
 /*	ADVANCED : DO NOT CHANGE THESE VARIABLES BELOW
