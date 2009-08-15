@@ -331,12 +331,17 @@ $mess=array(
 "294" => "Durée de validité du lien (en jours)",
 "295" => "Mot de passe (laisser vide pour aucun)",
 "296" => "Veuillez trouver le lien ci dessous:",
-"297" => "New User",
-"298" => "Create a new user",
-"299" => "New Repo.",
-"300" => "Create a new repository",
+"297" => "Nouv. util",
+"298" => "Créer un nouvel utilisateur",
+"299" => "Nouv Repo.",
+"300" => "Créer un nouveau repositoire",
 "create_repo_accesskey" => "R",
 "create_user_accesskey" => "U",
-"301" => "Edit configuration"
+"301" => "Editer la configuration",
+"302" => "Copier comme texte",
+"303" => "Copier la sélection comme des textes séparés par des tab.",
+"304" => "Retour",
+"305" => "Retourner à l'interface principale",
+
 );
 ?>

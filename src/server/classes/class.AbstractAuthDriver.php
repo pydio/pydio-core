@@ -67,11 +67,17 @@ class AbstractAuthDriver extends AbstractDriver {
 			return false;
 		}
 	}
+
+	function getLogoutRedirect(){
+        return false;
+    }
 	
 	function replaceAjxpXmlKeywords($xml){	
 		$xml = parent::replaceAjxpXmlKeywords($xml);
 		$loginRedirect = $this->getLoginRedirect();		
 		$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
+        $xml = str_replace("AJXP_REMOTE_AUTH", "false", $xml);
+        $xml = str_replace("AJXP_NOT_REMOTE_AUTH", "true", $xml);
 		return $xml;
 	}
 	
