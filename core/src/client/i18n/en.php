@@ -339,6 +339,8 @@ $mess=array(
 "create_user_accesskey" => "U",
 "301" => "Edit configuration",
 "302" => "Copy as Text",
-"303" => "Copy selection as tab-separated text."
+"303" => "Copy selection as tab-separated text.",
+"304" => "Back",
+"305" => "Go back to main page",
 );
 ?>

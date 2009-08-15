@@ -739,6 +739,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
 		session_write_close();
+        global $allowRealSizeProbing;
 		if(!$data){
 			$test = fopen($filePathOrData, "r");
 			if($test) fclose($test);
