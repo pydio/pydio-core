@@ -532,7 +532,7 @@ ActionsManager = Class.create({
 	
 	initToolbars: function () {
 		var crtCount = 0;
-		var toolbarsList = $A(['default', 'put', 'get', 'change', 'user']);
+		var toolbarsList = $A(['default', 'put', 'get', 'change', 'user', 'remote']);
 		toolbarsList.each(function(toolbar){			
 			var tBar = this.initToolbar(toolbar);			
 			if(tBar && tBar.actionsCount){				
@@ -621,6 +621,7 @@ ActionsManager = Class.create({
 		var actions = xmlResponse.documentElement.childNodes;		
 		for(var i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
+            if(actions[i].getAttribute('enabled') == 'false') continue;
 			var newAction = new Action();			
 			newAction.createFromXML(actions[i]);
 			this.actions.set(actions[i].getAttribute('name'), newAction);

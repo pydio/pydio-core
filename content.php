@@ -57,6 +57,7 @@ require_once("server/classes/class.AJXP_Logger.php");
 ConfService::init("server/conf/conf.php");
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
+session_name("AjaXplorer");
 session_start();
 
 if(AuthService::usersEnabled())
@@ -73,6 +74,13 @@ if(AuthService::usersEnabled())
 		AuthService::disconnect();
 		$loggingResult = 2;
 	}	//AuthService::disconnect();
+    if(isSet($_GET["get_action"]) && $_GET["get_action"] == "back")
+    {
+		AJXP_XMLWriter::header("url");
+        echo AuthService::getLogoutAddress(false);
+        AJXP_XMLWriter::close("url");
+		exit(1);
+    }
 	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "login")
 	{
 		$userId = (isSet($_GET["userid"])?$_GET["userid"]:null);

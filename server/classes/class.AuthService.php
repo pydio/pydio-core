@@ -197,6 +197,17 @@ class AuthService
 			unset($_SESSION["AJXP_USER"]);
 		}
 	}
+    
+    function getLogoutAddress($logUserOut = true)
+    {
+        $authDriver = ConfService::getAuthDriverImpl();
+        $logout = $authDriver->getLogoutRedirect();
+        if($logUserOut && isSet($_SESSION["AJXP_USER"])){
+			AJXP_Logger::logAction("Log Out");
+			unset($_SESSION["AJXP_USER"]);
+		}
+        return $logout;
+    }
 	
 	function getDefaultRootId()
 	{
