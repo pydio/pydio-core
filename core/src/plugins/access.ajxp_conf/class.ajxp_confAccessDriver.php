@@ -434,7 +434,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$loggedUser = AuthService::getLoggedUser();		
 		foreach ($users as $userObject){
 			$isAdmin = $userObject->isAdmin();
-			$userId = $userObject->getId();
+			$userId = Utils::xmlEntities($userObject->getId());
 			$icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
 			print '<tree 
 				text="'.$userId.'"
@@ -454,16 +454,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$repos = ConfService::getRepositoriesList();
 		foreach ($repos as $repoIndex => $repoObject){
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
-			print '<tree 
-				text="'.SystemTextEncoding::toUTF8($repoObject->getDisplay()).'" 
+                        $name = Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
+			print '<tree 				
+				text="'.$name.'" 
 				is_file="1" 
 				repository_id="'.$repoIndex.'" 
 				accessType="'.$repoObject->getAccessType().'" 
 				icon="folder_red.png" 
 				openicon="folder_red.png" 
-				filename="/users/'.SystemTextEncoding::toUTF8($repoObject->getDisplay()).'" 
+				filename="/users/'.$name.'" 
 				parentname="/users" 
-				src="content.php?dir=%2Fusers%2F'.SystemTextEncoding::toUTF8($repoObject->getDisplay()).'" 
+				src="content.php?dir=%2Fusers%2F'.$name.'" 
 				ajxp_mime="repository'.($repoObject->isWriteable()?"_editable":"").'"
 				/>';
 		}
