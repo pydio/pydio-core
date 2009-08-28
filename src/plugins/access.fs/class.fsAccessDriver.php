@@ -725,10 +725,10 @@ class fsAccessDriver extends AbstractAccessDriver
 				$val = sprintf("%u", filesize($file));
 			}
 			return floatval($val);
-		}else if (extension_loaded("COM")){
+		}else if (class_exists("COM")){
 			$fsobj = new COM("Scripting.FileSystemObject");
 			$f = $fsobj->GetFile($file);
-			return floatval($file->Size);
+			return floatval($f->Size);
 		}
 		else if (is_file($file)){
 			return exec('FOR %A IN ("'.$file.'") DO @ECHO %~zA');
