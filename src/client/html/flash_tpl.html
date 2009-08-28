@@ -84,7 +84,7 @@ if(parent.ajaxplorer){
 var FlashObject = "<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf";
 var FlashVarValue = "<?php echo $FlashVar; ?>" + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
 
-document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="422" height="470" id="fileUpload" align="middle">\
+document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + window.location.protocol + '//fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="422" height="470" id="fileUpload" align="middle">\
 <param name="allowScriptAccess" value="sameDomain" /> \
 <param name="movie" value="'+FlashObject+'" /> \
 <param name="quality" value="high" /> \
