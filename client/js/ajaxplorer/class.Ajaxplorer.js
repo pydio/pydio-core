@@ -72,6 +72,10 @@ Ajaxplorer = Class.create({
 		modal.updateLoadingProgress('Main template loaded');	
 	},
 	
+    triggerDownload: function(url){
+        document.location.href = url;
+    },
+
 	loadI18NMessages: function(newLanguage){
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_i18n_messages');
