@@ -363,8 +363,9 @@ class fsAccessDriver extends AbstractAccessDriver
 				$destination=SystemTextEncoding::fromUTF8($this->getPath().$rep_source);
 				if(!$this->isWriteable($destination))
 				{
+                    global $_GET;
 					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
-					if($fancyLoader){
+					if($fancyLoader || isset($_GET["ajxp_sessid"])){
 						header('HTTP/1.0 412 '.$errorMessage);
 						die('Error 412 '.$errorMessage);
 					}else{
