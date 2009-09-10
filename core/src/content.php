@@ -47,7 +47,7 @@ require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.RecycleBinManager.php");
 if(isSet($_GET["ajxp_sessid"]))
 {
-	$_COOKIE["PHPSESSID"] = $_GET["ajxp_sessid"];
+	$_COOKIE["AjaXplorer"] = $_GET["ajxp_sessid"];
 }
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
