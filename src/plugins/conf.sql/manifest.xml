@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<confdriver name="sql" label="DB Storage" description="Stores the conf data in an SQL database.">
+<param name="SQL_DRIVER" type="array" label="Connexion" description="The Database Connexion" mandatory="true"/>
+</confdriver>
