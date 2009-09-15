@@ -73,7 +73,6 @@ $CONF_STORAGE = array(
 		"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users")
 );
 
-/*
 $AUTH_DRIVER = array(
 	"NAME"		=> "serial",
 	"OPTIONS"	=> array(
@@ -84,13 +83,14 @@ $AUTH_DRIVER = array(
 );
 /**/
 /** FOR USE WITH CMS SYSTEM ONLY */
+/*
 $AUTH_DRIVER = array(
 	"NAME"		=> "remote",
 	"OPTIONS"	=> array(
 		"SLAVE_MODE"		=> true, // true for hook based CMS (like Wordpress), false for url based CMS
 		"USERS_FILEPATH"	=> "AJXP_INSTALL_PATH/server/users/users.ser",
-		"LOGIN_URL" 	    => "/index.php",  // The URL to redirect (or call) upon login 
-        "LOGOUT_URL"        => "/index.php",  // The URL to redirect upon login out
+		"LOGIN_URL" 	    => "index.php",  // The URL to redirect (or call) upon login 
+        "LOGOUT_URL"        => "index.php",  // The URL to redirect upon login out
         "SECRET"            => "myprivatesecret", // This is a security measure. The remote end must know the secret too for us to act.
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
