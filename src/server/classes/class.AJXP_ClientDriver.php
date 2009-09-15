@@ -198,14 +198,14 @@ class AJXP_ClientDriver extends AbstractDriver
 							AuthService::updatePassword($userObject->getId(), $prefValue);
 						}else{
 							//$errorMessage = "Wrong password!";
-							header("text/plain");
+							header("Content-Type:text/plain");
 							print "PASS_ERROR";
 							exit(1);
 						}
 					}
 					$i++;
 				}
-				header("text/plain");
+				header("Content-Type:text/plain");
 				print "SUCCESS";
 				exit(1);
 				
