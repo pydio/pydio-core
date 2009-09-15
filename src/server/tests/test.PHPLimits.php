@@ -46,6 +46,7 @@ class PHPLimits extends AbstractTest
     	$this->testedParams["Max execution time"] = ini_get("max_execution_time");
     	$this->testedParams["Safe Mode"] = (ini_get("safe_mode")?"1":"0");
     	$this->testedParams["Safe Mode GID"] = (ini_get("safe_mode_gid")?"1":"0");
+    	$this->testedParams["Xml parser enabled"] = (function_exists("xml_parser_create")?"1":"0");
     	foreach ($this->testedParams as $paramName => $paramValue){
     		$this->failedInfo .= "\n$paramName=$paramValue";
     	}
