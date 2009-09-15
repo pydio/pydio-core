@@ -550,6 +550,7 @@ ActionsManager = Class.create({
 	refreshToolbarsSeparator: function(){
 		this.toolbars.each(function(pair){
 			var toolbar = $('buttons_bar').select('[id="'+pair.key+'_toolbar"]')[0];
+			if(!toolbar) return;
 			var sep = toolbar.select('div.separator')[0];
 			if(!sep) return;
 			var hasVisibleActions = false;
