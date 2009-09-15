@@ -41,7 +41,7 @@ $mess=array(
 "22" => "PHP script",
 "23" => "Bestand",
 "24" => "Bovenliggende map",
-"25" => "Upload één of meerdere bestanden (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") in de map : ",
+"25" => "Upload ï¿½ï¿½n of meerdere bestanden (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") in de map : ",
 "26" => "Maak een nieuwe map in : ",
 "27" => "Upload",
 "28" => "Maak een nieuwe bestand in : ",
@@ -339,6 +339,11 @@ $mess=array(
 "300" => "Maak een nieuw bestandsdepot",
 "create_repo_accesskey" => "d",
 "create_user_accesskey" => "u",
-"301" => "Bewerk configuratie"
+"301" => "Bewerk configuratie",
+"302" => "Copy as Text",
+"303" => "Copy selection as tab-separated text.",
+"304" => "Back",
+"305" => "Go back to main page",
+"306" => "Too many folders"
 );
 ?>

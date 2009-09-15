@@ -342,5 +342,6 @@ $mess=array(
 "303" => "Copy selection as tab-separated text.",
 "304" => "Back",
 "305" => "Go back to main page",
+"306" => "Too many folders"
 );
 ?>
