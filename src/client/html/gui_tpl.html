@@ -90,10 +90,15 @@ try{
 				maxB: 500,
 				onDrag:function(){
 						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
-						fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?-1:1), true);
+						fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?1:1), true);
+						fitHeightToBottom($('info_panel'), null, (Prototype.Browser.IE?2:1), true, 100);
 						if(ajaxplorer)ajaxplorer.sEngine.resize();
 					}
-				});
+				});		
+		window.setTimeout(function(){
+			fitHeightToBottom($('info_panel'), null, (Prototype.Browser.IE?2:1), true);	
+		}, 500);
+		
 	}else{
 		fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
 	}
@@ -105,7 +110,7 @@ try{
 					sideSplit.resizeGroup(null, null, true);
 				}
 				else{
-					fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);
+					fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);					
 				}
 				if(ajaxplorer && ajaxplorer.filesList)ajaxplorer.filesList.applyHeadersWidth();					
 			}
