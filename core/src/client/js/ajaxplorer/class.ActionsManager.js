@@ -174,9 +174,14 @@ ActionsManager = Class.create({
 					alert(MessageHash[239]);
 					return false;					
 				}
-				userPass = hex_md5($('user_change_ownpass1').value);
-				userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
 				passSeed = $('pass_seed').value;
+				if(passSeed == '-1'){
+					userPass = $('user_change_ownpass1').value;
+					userOldPass = $('user_change_ownpass_old').value;
+				}else{
+					userPass = hex_md5($('user_change_ownpass1').value);
+					userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
+				}				
 			}
 			var onComplete = function(transport){
 				var oUser = ajaxplorer.user;
