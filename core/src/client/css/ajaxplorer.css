@@ -1013,6 +1013,11 @@ UPLOAD MULTIFILE FORM
     padding: 0px 10px;    
 }
 
+#info_panel
+{
+	overflow:auto;
+}
+
 #info_panel a, #info_panel a:hover
 {
     color:#79f;
