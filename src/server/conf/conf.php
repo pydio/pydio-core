@@ -72,7 +72,6 @@ $CONF_STORAGE = array(
 		"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/server/conf/repo.ser",
 		"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users")
 );
-
 $AUTH_DRIVER = array(
 	"NAME"		=> "serial",
 	"OPTIONS"	=> array(
@@ -81,6 +80,21 @@ $AUTH_DRIVER = array(
 		"AUTOCREATE_AJXPUSER" 	=> false, 
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
+/*
+$AUTH_DRIVER = array(
+	"NAME"	=> "sql",
+	"OPTIONS" 	=> array(
+		"SQL_DRIVER" => array(
+			"driver" => "mysql",
+			"host"	=> "localhost",
+			"database" => "ajxp",
+			"user"	=> "root",
+			"password" => ""
+			),
+		"TRANSMIT_CLEAR_PASS" => false
+	)
+);
+*/
 /**/
 /** FOR USE WITH CMS SYSTEM ONLY */
 /*

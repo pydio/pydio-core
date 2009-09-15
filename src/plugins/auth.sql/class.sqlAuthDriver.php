@@ -64,9 +64,10 @@ class sqlAuthDriver extends AbstractAuthDriver {
 	
 	function checkPassword($login, $pass, $seed){
 		$userStoredPass = $this->getUserPass($login);
-		if(!$userStoredPass) return false;
-		if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-			return ($userStoredPass == $pass);
+		if(!$userStoredPass) return false;		
+		
+		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){ // Seed = -1 means that password is not encoded.
+			return ($userStoredPass == md5($pass));
 		}else{
 			return (md5($userStoredPass.$seed) == $pass);
 		}
@@ -85,9 +86,9 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		if(array_key_exists($login, $users)) return "exists";
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = $passwd;
-		}else{
 			$userData["password"] = md5($passwd);
+		}else{
+			$userData["password"] = $passwd;
 		}
 		dibi::query('INSERT INTO [ajxp_users]', $userData);
 	}	
@@ -96,9 +97,9 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = $newPass;
-		}else{
 			$userData["password"] = md5($newPass);
+		}else{
+			$userData["password"] = $newPass;
 		}
 		dibi::query("UPDATE [ajxp_users] SET ", $userData, "WHERE `login`=%s", $login);
 	}	
