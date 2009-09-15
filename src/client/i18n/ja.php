@@ -337,6 +337,11 @@ $mess=array(
 "300" => "Create a new repository",
 "create_repo_accesskey" => "R",
 "create_user_accesskey" => "U",
-"301" => "Edit configuration"
+"301" => "Edit configuration",
+"302" => "Copy as Text",
+"303" => "Copy selection as tab-separated text.",
+"304" => "Back",
+"305" => "Go back to main page",
+"306" => "Too many folders"
 ); 
 ?>

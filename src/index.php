@@ -139,7 +139,7 @@ if(isSet($_GET["compile"])){
 	AJXP_JSPacker::pack();
 }
 
-$JS_DEBUG = true;
+$JS_DEBUG = false;
 $mess = ConfService::getMessages();
 include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
 HTMLWriter::writeI18nMessagesClass($mess);

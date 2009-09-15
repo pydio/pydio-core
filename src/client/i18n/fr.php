@@ -336,12 +336,12 @@ $mess=array(
 "299" => "Nouv Repo.",
 "300" => "Créer un nouveau repositoire",
 "create_repo_accesskey" => "R",
-"create_user_accesskey" => "U",
+"create_user_accesskey" => "u",
 "301" => "Editer la configuration",
 "302" => "Copier comme texte",
 "303" => "Copier la sélection comme des textes séparés par des tab.",
 "304" => "Retour",
 "305" => "Retourner à l'interface principale",
-
+"306" => "Trop de répertoires"
 );
 ?>

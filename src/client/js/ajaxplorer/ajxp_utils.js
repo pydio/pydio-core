@@ -187,7 +187,7 @@ function disableTextSelection(target)
 	}
 }
 
-function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener)
+function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener, delay)
 {	
 	element = $(element);
 	if(!element) return;
@@ -229,7 +229,13 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 	
 	observer();
 	if(!skipListener){
-		Event.observe(window, 'resize', observer);
+		if(delay){
+			Event.observe(window, 'resize', function(){
+				window.setTimeout(function(){observer();}, delay);
+			});
+		}else{
+			Event.observe(window, 'resize', observer);
+		}
 	}
 	return observer;
 }
