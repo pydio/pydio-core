@@ -496,13 +496,14 @@ class fsAccessDriver extends AbstractAccessDriver
 				$nom_rep = $this->initName($dir);
 				AJXP_Exception::errorToXml($nom_rep);
 				
+				$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
+				if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
+				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
+				if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
+				
 				if($fileListMode){
 					$countFiles = $this->countFiles($nom_rep);
-					$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
-					if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;					
 					if($countFiles > $threshold){
-						$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
-						if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
 						$offset = 0;
 						$crtPage = 1;
 						if(isSet($page)){
@@ -515,6 +516,16 @@ class fsAccessDriver extends AbstractAccessDriver
 						$reps = $this->listing($nom_rep, $searchMode);
 					}
 				}else{
+					$countFolders = $this->countFiles($nom_rep, true);
+					if($countFolders > $threshold){
+						AJXP_XMLWriter::header();
+						$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
+						$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
+						$attributes = "icon=\"$icon\"  openicon=\"$openicon\"";
+						print("<tree text=\"$mess[306] ($countFolders)...\" $attributes></tree>");
+						AJXP_XMLWriter::close();
+						exit(1) ;
+					}
 					$reps = $this->listing($nom_rep, !$searchMode);
 				}
 				//$reps = $result[0];
@@ -856,12 +867,14 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 	}
 
-	function countFiles($dirName){
+	function countFiles($dirName, $foldersOnly = false){
 		$handle=opendir($dirName);
 		$count = 0;
 		while ($file = readdir($handle))
 		{
-			if($file != "." && $file !=".." && !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])){
+			if($file != "." && $file !=".." 
+				&& !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])
+				&& !($foldersOnly && is_file($dirName."/".$file)) ){
 				$count++;
 			}			
 		}
