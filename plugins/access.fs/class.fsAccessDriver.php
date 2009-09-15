@@ -201,10 +201,17 @@ class fsAccessDriver extends AbstractAccessDriver
 					AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
-					$fp=fopen($this->getPath().SystemTextEncoding::fromUTF8("/$file"),"w");
+					$fileName = $this->getPath().SystemTextEncoding::fromUTF8("/$file");
+					if(!is_file($fileName) || !is_writable($fileName)){
+						header("Content-Type:text/plain");
+						print((!is_writable($fileName)?"1001":"1002"));
+						exit(1);
+					}
+					$fp=fopen($fileName,"w");
 					fputs ($fp,$code);
 					fclose($fp);
-					echo $mess[115];
+					header("Content-Type:text/plain");
+					print($mess[115]);
 				}
 				else 
 				{

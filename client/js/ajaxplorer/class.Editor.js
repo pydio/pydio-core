@@ -142,8 +142,11 @@ Editor = Class.create({
 	},
 	
 	parseXml : function(transport){
-		//alert(transport.responseText);
-		this.changeModifiedStatus(false);
+		if(parseInt(transport.responseText).toString() == transport.responseText){
+			alert("Cannot write the file to disk (Error code : "+transport.responseText+")");
+		}else{
+			this.changeModifiedStatus(false);
+		}
 		this.removeOnLoad();
 	},
 	
