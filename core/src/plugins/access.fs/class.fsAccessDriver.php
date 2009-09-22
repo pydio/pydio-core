@@ -877,7 +877,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	function countFiles($dirName, $foldersOnly = false){
 		$handle=opendir($dirName);
 		$count = 0;
-		while ($file = readdir($handle))
+		while (strlen($file = readdir($handle)) > 0)
 		{
 			if($file != "." && $file !=".." 
 				&& !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])
@@ -898,7 +898,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$handle=opendir($nom_rep);
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		$cursor = 0;
-		while ($file = readdir($handle))
+		while (strlen($file = readdir($handle)) > 0)
 		{
 			if($file!="." && $file!=".." && !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"]))
 			{
