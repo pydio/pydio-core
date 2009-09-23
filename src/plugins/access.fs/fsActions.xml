@@ -292,12 +292,29 @@ AJXP_MESSAGE[174]<br/>
 					]]></clientCallback>
 					<clientForm id="public_url"><![CDATA[
 					<div id="public_url_form" title="AJXP_MESSAGE[293]"  box_width="280" action="public_url">
-					<div class="dialogLegend"><span message_id="294">AJXP_MESSAGE[294]</span> <input name="expiration" type="text" value="0" style="width:25px;"></div>
-					<div class="dialogLegend"><span message_id="295">AJXP_MESSAGE[295]</span> <input name="password" type="password" value=""></div>
-					<div class="dialogButtons" style="margin-bottom:20px;"><input type="button" name="generate" value="Generate" class="dialogButton dialogFocus" onClick="window.ajxpPublicUrlCallback(); return false;"/></div>
-					<div class="dialogLegend"><span message_id="296">AJXP_MESSAGE[296]</span></div>
-					<input id="public_url_container" type="text"/>
-					</div>]]>
+						<fieldset>
+							<legend>1 : AJXP_MESSAGE[307]</legend>
+							<div class="dialogLegend">
+								<input type="text" style="width: 25px; float: right;" value="0" name="expiration"/>
+								<span message_id="294">AJXP_MESSAGE[294]</span> 
+							</div>
+							<div class="dialogLegend" style="clear: both; margin-top: 10px;">
+								<input type="password" value="" name="password" style="float: right; width: 100px;"/>
+								<span message_id="295">AJXP_MESSAGE[295]</span>
+							</div>
+						</fieldset>
+						<fieldset>
+							<legend>2 : AJXP_MESSAGE[308]</legend>
+							<div align="center" style="color: white; margin-top:5px; font-size:10px;">
+								<div align="center" style="text-align:center; cursor: pointer; width:50px; border: 1px solid #aaa;background-color: #bbb;padding:5 10 3 10;" onclick="window.ajxpPublicUrlCallback(); return false;"><img src="client/images/crystal/actions/22/public_url.png" height="22" width="22"/><br/>AJXP_MESSAGE[309]</div>
+							</div>
+						</fieldset>
+						<fieldset>
+							<legend>3 : AJXP_MESSAGE[296]</legend>
+							<input type="text" style="width:230px;" id="public_url_container"/>
+						</fieldset>
+					</div>
+					]]>
 					</clientForm>					
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
