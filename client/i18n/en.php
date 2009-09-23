@@ -330,7 +330,7 @@ $mess=array(
 "293" => "Create a public link to this file",
 "294" => "Link time expiration (in days)",
 "295" => "Password",
-"296" => "Please copy the link below:",
+"296" => "Copy the URL below:",
 "297" => "New User",
 "298" => "Create a new user",
 "299" => "New Repo.",
@@ -342,6 +342,9 @@ $mess=array(
 "303" => "Copy selection as tab-separated text.",
 "304" => "Back",
 "305" => "Go back to main page",
-"306" => "Too many folders"
+"306" => "Too many folders",
+"307" => "Fill optional fields",
+"308" => "Generate Link",
+"309" => "Generate"
 );
 ?>
