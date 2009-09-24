@@ -134,7 +134,7 @@ else
 	&& ($_COOKIE["AJXP_display"]=="list" || $_COOKIE["AJXP_display"]=="thumb")) $DEFAULT_DISPLAY = $_COOKIE["AJXP_display"];
 }
 
-$JS_DEBUG = true;
+$JS_DEBUG = false;
 
 if($JS_DEBUG && isSet($_GET["compile"])){
 	require_once(SERVER_RESOURCES_FOLDER."/class.AJXP_JSPacker.php");
