@@ -315,7 +315,7 @@ $mess=array(
 "278" => "Are you sure you want to delete the selected record(s)?",
 "279" => "Tables",
 "280" => "Records",
-"281" => "Limits",
+"281" => "Upload Limits",
 "282" => "Size per File",
 "283" => "Total Size",
 "284" => "Files Number",
@@ -345,6 +345,9 @@ $mess=array(
 "306" => "Too many folders",
 "307" => "Fill optional fields",
 "308" => "Generate Link",
-"309" => "Generate"
+"309" => "Generate",
+"310" => "Options",
+"311" => "Upload automatically when a file is added",
+"312" => "Uploader Options",
 );
 ?>
