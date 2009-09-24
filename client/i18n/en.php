@@ -348,6 +348,6 @@ $mess=array(
 "309" => "Generate",
 "310" => "Options",
 "311" => "Upload automatically when a file is added",
-"312" => "Uploader Options",
+"312" => "Uploader Options"
 );
 ?>
