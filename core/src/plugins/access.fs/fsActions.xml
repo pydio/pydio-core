@@ -53,9 +53,6 @@
 				<clientCallback prepareModal="true"><![CDATA[
 				if(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE))
 				{
-					modal.setCloseAction(function(){
-						$('closeFlashUploadBox').disabled=false;
-					});
 					modal.showDialogForm('Upload', 
 										'flash_upload_form', 
 										null, 
@@ -98,12 +95,11 @@
 					<div id="upload_files_list" class="uploadFilesList"></div>
 					</form>
 					
-					<!-- MOOTOOLS UPLOAD FORM -->
-					<div id="flash_upload_form" box_width="445">
+					<!-- FLEX UPLOAD FORM -->
+					<div id="flash_upload_form" box_width="470">
 					<div id="flashscreen">
 					<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>
 					</div>
-					<div class="dialogButtons"><input type="button" class="dialogButton" onclick="hideLightBox(true);" value="AJXP_MESSAGE[86]" id="closeFlashUploadBox"></div>
 					</div>
 					<script language="javascript">$('originalUploadForm').hide();</script>
 				]]></clientForm>
