@@ -21,5 +21,20 @@
 			<type>2</type>
 			<location>E:/charlie/software/APPS/ajaxplorer/SVN_Sourceforge/core/src/client/flash/FlashUploader-debug</location>
 		</link>
+		<link>
+			<name>bin-release1</name>
+			<type>2</type>
+			<location>E:/charlie/software/APPS/ajaxplorer/SVN_Sourceforge/core/src/client/flash</location>
+		</link>
+		<link>
+			<name>bin-release2</name>
+			<type>2</type>
+			<location>E:/charlie/software/APPS/ajaxplorer/SVN_Sourceforge/core/src/tmp/flash_build</location>
+		</link>
+		<link>
+			<name>bin-release</name>
+			<type>2</type>
+			<location>E:/charlie/software/APPS/ajaxplorer/SVN_Sourceforge/core/src/client/flash/FlashUploader</location>
+		</link>
 	</linkedResources>
 </projectDescription>

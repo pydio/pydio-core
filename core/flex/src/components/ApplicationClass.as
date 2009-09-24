@@ -5,8 +5,6 @@ package components
 	import flash.external.*;
 	import flash.net.FileFilter;
 	import flash.net.FileReferenceList;
-	import flash.net.URLRequest;
-	import flash.net.navigateToURL;
 	import flash.utils.Timer;
 	
 	import mx.containers.*;
@@ -14,6 +12,7 @@ package components
 	import mx.core.Application;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
+	import mx.managers.PopUpManager;
 
 	public class ApplicationClass extends Application
 	{
@@ -29,11 +28,12 @@ package components
 		private var _fileTypes:String;
 		private var _currentFolderFiles:Array;
 		private var jsReady:Boolean;
+		private var limitsText:Object;
 		
 		// all controls in the mxml file must be public variables in the code behind
 		public var fileContainer:VBox;
 		public var fileUploadBox:VBox;
-		public var uploadStats:VBox;
+		public var uploadStats:HBox;
 		public var totalFiles:Text;
 		public var totalSize:Text;
 		public var totalText:Text;
@@ -43,7 +43,11 @@ package components
 		public var clearButton:Button;
 		public var uploadButton:Button;
 		public var cancelButton:Button;
-		public var limitsText:Text;		
+		public var optionButton:Button;
+		public var closeButton:Button;
+		public var spacer:Spacer;
+		
+		public var autoUpload:Boolean;		
 		
 		
 		// constructor
@@ -67,7 +71,10 @@ package components
 			clearButton.addEventListener(MouseEvent.CLICK,OnClearFilesClicked);
 			uploadButton.addEventListener(MouseEvent.CLICK,OnUploadFilesClicked);
 			cancelButton.addEventListener(MouseEvent.CLICK,OnCancelClicked);
+			optionButton.addEventListener(MouseEvent.CLICK,OnOptionsClicked);
+			closeButton.addEventListener(MouseEvent.CLICK,OnCloseClicked);
 			
+			limitsText = new Object();
 			var limitString:String = GetTextFor("UploadLimitsTitle")+"<br>";
 			var limitSet:Boolean = false;
 			var temp:String = Application.application.parameters.fileSizeLimit;
@@ -75,6 +82,7 @@ package components
 			    _uploadFileSize = new Number(temp);
 			    if(_uploadFileSize != 0){
 				    limitString = limitString + GetTextFor("UploadLimitsSizePerFile")+": " + FileUpload.FormatSize(_uploadFileSize, "B") + "<br>";
+				    limitsText[GetTextFor("UploadLimitsSizePerFile")] = FileUpload.FormatSize(_uploadFileSize, "B");
 				    limitSet = true;
 				}
 			}else
@@ -85,6 +93,7 @@ package components
 			    _totalUploadSize = new Number(temp);
 			    if(_totalUploadSize != 0){
 				    limitString = limitString + GetTextFor("UploadLimitsTotalSize")+": " + FileUpload.FormatSize(_totalUploadSize, "B") + "<br>";
+				    limitsText[GetTextFor("UploadLimitsTotalSize")] = FileUpload.FormatSize(_totalUploadSize, "B");
 				    limitSet = true;
 			    }
 			}else
@@ -95,12 +104,11 @@ package components
 			    _fileMaxNumber = new Number(temp);
 			    if(_fileMaxNumber != 0){
 				    limitString = limitString + GetTextFor("UploadLimitsFilesNumber")+": " + _fileMaxNumber + "<br>";
+				    limitsText[GetTextFor("UploadLimitsFilesNumber")] = _fileMaxNumber;
 				    limitSet = true;
 			    }			    
 			}else
 			    _fileMaxNumber = 0;
-			 
-			 if(limitSet) limitsText.htmlText = limitString;
 			 
 			 temp = Application.application.parameters.currentFolderFiles;
 			 var tempSep:String = Application.application.parameters.separator;
@@ -114,12 +122,15 @@ package components
 			_fileTypes = Application.application.parameters.fileTypes;
 			
 			browseButton.label = GetTextFor("Add");
-			clearButton.label = GetTextFor("Clear");
-			uploadButton.label = GetTextFor("Upload");
-			cancelButton.label = GetTextFor("Cancel");
+			clearButton.toolTip = GetTextFor("Clear");
+			uploadButton.toolTip = GetTextFor("Upload");
+			cancelButton.toolTip = GetTextFor("Cancel");
 			totalText.text = GetTextFor("TotalFile");
 			sizeText.text = GetTextFor("SizeText");
+			closeButton.label = GetTextFor("CloseText");
+			optionButton.label = GetTextFor("OptionsText");
 			
+			LoadAutoUpload();			
 		}
 		
 		private function intializeExternalComm():void{
@@ -168,6 +179,15 @@ package components
 			}else{
 				//Alert.show("Not ready");
 			}
+		}
+		
+		private function OnCloseClicked(event:Event):void{
+			triggerJSEvent("closeModal");
+		}
+		
+		private function OnOptionsClicked(event:Event):void{
+			var optionsPane:OptionsPane = OptionsPane(PopUpManager.createPopUp(this, OptionsPane, true));
+			optionsPane.setLabels(limitsText, autoUpload); 
 		}
 		
 		// brings up file browse dialog when add file button is pressed
@@ -334,10 +354,14 @@ package components
 			}
 			if(foundExisting){
 				OnFileAlreadyExistingFound();
+				SetLabels();
+			}else{
+				SetLabels();
+				if(autoUpload){						
+					OnUploadFilesClicked(null);
+				}
 			}
 			
-			// reset labels
-			SetLabels();
 		}
 		
 		// fired when a the remove file button is clicked
@@ -354,8 +378,8 @@ package components
 			_currentUpload == null;
 			OnUploadFilesClicked(null);
 		}
-		
-		private function GetTextFor(text:String):String{
+				
+		public function GetTextFor(text:String):String{
 			if(jsReady){
 				return ExternalInterface.call("triggerFlashEvent", "getMessage", text);
 			}else{
@@ -409,8 +433,35 @@ package components
 			}
 			Alert.yesLabel = "OK";
 			Alert.noLabel = "Cancel";
+			if(autoUpload){
+				OnUploadFilesClicked(null);
+			}
 		}
-				
+		
+		public function ChangeAutoUpload(newValue:Boolean):void{
+			autoUpload = newValue;
+			uploadButton.setVisible(!newValue);
+			uploadButton.height = (newValue?0:32);
+			spacer.height = (newValue?102+32:102);
+			if(jsReady){
+				ExternalInterface.call("triggerFlashEvent", "storeProperty", "autoUpload", String(newValue) );
+			}
+		}
+		
+		public function LoadAutoUpload():void{
+			if(jsReady){
+				var value:Object = ExternalInterface.call("triggerFlashEvent", "getProperty", "autoUpload");
+				if(value == null){
+					autoUpload = true;
+				}else{
+					autoUpload = Boolean(value);
+				}
+			}
+			uploadButton.setVisible(!autoUpload);	
+			uploadButton.height = (autoUpload?0:32);
+			spacer.height = (autoUpload?102+32:102);		
+		}
+		
 		//  error handlers
 		private function OnHttpError(event:HTTPStatusEvent):void{
 			Alert.show(GetTextFor("HTTPError") + event.status);
@@ -449,11 +500,15 @@ package components
 				}
 				totalSize.text = FileUpload.FormatSize(_totalSize, GetTextFor("Byte"));
 				SetProgressBar();
-				clearButton.enabled = uploadButton.enabled = totalProgressBar.visible =  uploadStats.visible = true;					
+				clearButton.enabled = uploadButton.enabled = true;					
 			}
 			else
 			{
-				clearButton.enabled = uploadButton.enabled = totalProgressBar.visible = uploadStats.visible = false;					
+				totalFiles.text = String(0);
+				_totalSize = 0;
+				totalSize.text = FileUpload.FormatSize(_totalSize, GetTextFor("Byte"));
+				SetProgressBar();
+				clearButton.enabled = uploadButton.enabled = false;					
 			}
 		}	
 	}

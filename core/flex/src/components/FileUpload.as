@@ -12,7 +12,7 @@ package components
 	{
 		private var bar:ProgressBar;
 		private var _file:FileReference;
-		private var nameText:Text;
+		private var nameText:Label;
 		private var _uploaded:Boolean;
 		private var _uploading:Boolean;
 		private var _bytesUploaded:uint;
@@ -36,9 +36,9 @@ package components
 			
 			// set styles
 			setStyle("backgroundColor","#eeeeee");
-			setStyle("paddingBottom","5");
-			setStyle("paddingTop","5");
-			setStyle("paddingLeft","10");
+			setStyle("paddingBottom","2");
+			setStyle("paddingTop","2");
+			setStyle("paddingLeft","7");
 			setStyle("verticalAlign", "middle");			
 			verticalScrollPolicy = ScrollPolicy.OFF;
 			
@@ -51,17 +51,19 @@ package components
 			
 			// add controls
 			var vbox:VBox = new VBox();	
-			vbox.setStyle("paddingLeft","10");		
+			vbox.setStyle("paddingLeft","5");		
+			vbox.setStyle("verticalGap", "0");
 						
 			button = new Button();
 			button.setStyle("icon", removeIcon);
-			button.height = 30;
-			button.width = 30;			
+			button.height = 25;
+			button.width = 25;			
 			button.label = remove;			
 			this.addChild(button);			
 			button.addEventListener(MouseEvent.CLICK,OnRemoveButtonClicked);
 			
-			nameText = new Text();
+			nameText = new Label();
+			nameText.width = 275;		
 			nameText.text = _file.name + "-" + FormatSize(_file.size, byteText);			
 			vbox.addChild(nameText);
 			
