@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical" 
+	width="300" 
+	height="200"
+	status="active" 
+	showCloseButton="true" 
+	close="PopUpManager.removePopUp(this);"
+	verticalGap="5"
+	x="80"
+	y="40" title="AjaXplorer Uploader"
+	paddingTop="10" paddingLeft="10">
+    <mx:Script>
+        <![CDATA[
+        	import mx.containers.GridRow;
+        	import mx.containers.GridItem;       
+            import mx.managers.PopUpManager;
+            import mx.containers.Grid;
+           
+            // A reference to the Grid control in which to put the result.
+           
+           public function setLabels(texts:Object, autoUpload:Boolean):void{
+           		uploaderOptionsLabel.text = this.parentApplication.GetTextFor("UploaderOptionsLabel");
+           		uploaderLimitLabel.text = this.parentApplication.GetTextFor("UploaderLimitLabel");
+           		autoUploadLabel.text = this.parentApplication.GetTextFor("AutoUploadLabel");
+           		for(var key:String in texts){
+           			var row:GridRow = new mx.containers.GridRow();
+           			
+           			var g1:GridItem = new mx.containers.GridItem()
+           			var l1:Label = new Label();
+           			l1.text = key;
+           			l1.setStyle("fontStyle","italic");
+           			g1.addChild(l1);
+           			row.addChild(g1);
+           			
+           			var g2:GridItem = new mx.containers.GridItem()
+           			var l2:Label = new Label();
+           			l2.text = texts[key];
+           			g1.addChild(l2);
+           			row.addChild(g2);
+           			
+           			limitsGrid.addChild(row);
+           		}
+           		autoUploadCheckbox.selected = autoUpload;
+           }
+           
+           private function checkboxClicked():void{
+           		this.parentApplication.ChangeAutoUpload(autoUploadCheckbox.selected);
+           }
+           
+            // Event handler for the OK button.
+            private function okButton():void {
+                PopUpManager.removePopUp(this);
+            }
+        ]]>
+    </mx:Script>
+    <mx:Label text="Uploader Options" id="uploaderOptionsLabel" fontWeight="bold" fontSize="10"></mx:Label>
+    <mx:Grid>
+    	<mx:GridRow>
+    		<mx:GridItem>
+    			<mx:CheckBox id="autoUploadCheckbox"  click="checkboxClicked()"/>
+    		</mx:GridItem>
+    		<mx:GridItem>
+    			<mx:Label id="autoUploadLabel" text="Upload automatically when file is added"/>
+    		</mx:GridItem>
+    	</mx:GridRow>
+    </mx:Grid>    
+    <mx:Label text="Upload Limits" id="uploaderLimitLabel" fontWeight="bold" width="250" height="21"/>
+    <mx:Grid  id="limitsGrid">
+    </mx:Grid>
+</mx:TitleWindow>

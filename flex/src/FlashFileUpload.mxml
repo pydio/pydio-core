@@ -1,35 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <custom:ApplicationClass xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:local="*" 
-	xmlns:custom="components.*" layout="vertical"
-	 	backgroundAlpha="1"  backgroundGradientAlphas="[1.0, 1.0]" backgroundGradientColors="[#E0ECFF, #E0ECFF]" width="422" paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10" height="470" borderStyle="solid" borderColor="#D4D4D4" cornerRadius="0" borderThickness="1">
-
+	xmlns:custom="components.*" layout="horizontal"
+	 	backgroundAlpha="1" 
+	 	backgroundGradientAlphas="[1.0, 1.0]" 
+	 	backgroundGradientColors="[#FFFFFF, #FFFFFF]" 
+	 	width="452" 
+	 	paddingTop="10" 
+	 	paddingLeft="10" 
+	 	paddingRight="10" 
+	 	paddingBottom="10" 
+	 	height="312" 
+	 	horizontalAlign="center" 
+	 	verticalAlign="middle"
+	 >
+	<mx:Style>
+		Application {    
+		    background-image:   Embed("components/strip.png");
+		    background-repeat:   repeat;
+		    background-position: center;
+		    background-blend:    multiply;
+		    background-color: #ffffff;
+		    border-style : none;
+		    borderSkin: ClassReference("com.degrafa.skins.CSSSkin");
+		} 		
+	</mx:Style>
     <mx:Script>
         <![CDATA[
             [Bindable]
-            [Embed(source='components/trashcan_empty.png')]
+            [Embed(source='components/button_cancel.png')]
             public var RemoveIcon:Class;
         ]]>
     </mx:Script>                            
 
-	<mx:HBox width="400" height="62">
-		<mx:Button id="browseButton" label="Browse" width="70"   icon="@Embed(source='components/view_choose.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
-		<mx:Button id="clearButton" label="Clear" enabled="false" width="70"   icon="@Embed(source='components/trashcan_empty.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
-		<mx:Button id="uploadButton" label="Upload" enabled="false" width="70"  icon="@Embed(source='components/yast_backup.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
-		<mx:Button id="cancelButton" label="Cancel" enabled="false" width="70"  icon="@Embed(source='components/fileclose.png')" labelPlacement="bottom" height="60" paddingLeft="0" paddingRight="0"/>
-		<mx:Text id="limitsText"  width="84" height="61" fontSize="8" text="Limits &#xa;Max Files: &#xa;Size per File:&#xa;Total Size: " textAlign="right"/>
-	</mx:HBox>
-	<mx:HBox width="400">
-		<mx:VBox width="100%" id="fileContainer">
-			<mx:VBox id="fileUploadBox" maxHeight="250" width="100%" label="Files to Upload"  height="318" borderStyle="solid" borderColor="#FFFFFF" cornerRadius="8" backgroundColor="#FFFFFF">
-			</mx:VBox>
-			<mx:VBox id="uploadStats" width="400" visible="false" backgroundColor="#EEEEEE" cornerRadius="8" borderStyle="solid" borderColor="#B7BABC" paddingBottom="5" paddingLeft="10" paddingRight="10" paddingTop="5">				
-				<mx:HBox width="100%">
+	<mx:VBox width="65" height="287" horizontalAlign="right" verticalGap="4" paddingTop="3">
+		<mx:Button id="browseButton" label="Browse" width="60"   icon="@Embed(source='components/view_choose.png')" labelPlacement="bottom" height="55" paddingLeft="0" paddingRight="0"/>
+		<mx:Button id="uploadButton" visible="true" enabled="false" width="32"  icon="@Embed(source='components/yast_backup.png')" labelPlacement="bottom" height="32" paddingLeft="0" paddingRight="0"/>
+		<mx:Button id="cancelButton" enabled="false" width="32"  icon="@Embed(source='components/fileclose.png')" labelPlacement="bottom" height="32" paddingLeft="0" paddingRight="0"/>		
+		<mx:Spacer height="102" id="spacer">
+			
+		</mx:Spacer>
+		<mx:Button id="optionButton" enabled="true" width="60" labelPlacement="right" height="21" paddingLeft="0" paddingRight="0" label="Options"/>
+		<mx:Button id="closeButton" label="Close" width="60"  height="21" paddingLeft="0" paddingRight="0"/>
+	</mx:VBox>
+	<mx:VBox width="346" id="fileContainer" height="286" horizontalAlign="center">
+		<mx:VBox id="fileUploadBox" maxHeight="250" width="342" label="Files to Upload"  height="233" borderStyle="solid" borderColor="#CCCCCC" cornerRadius="8" backgroundColor="#FFFFFF" verticalGap="2">
+		</mx:VBox>
+		<mx:HBox id="uploadStats" width="342" visible="true" backgroundColor="#FFFFFF" cornerRadius="8" borderStyle="solid" borderColor="#CCCCCC" paddingBottom="5" paddingLeft="10" paddingRight="10" paddingTop="5" verticalGap="0" height="46" horizontalGap="6" horizontalAlign="center">
+			<mx:VBox verticalGap="0" width="280">				
+				<mx:HBox width="274" horizontalGap="7" height="16">
 					<mx:Text text="Total Files:" id="totalText" /><mx:Text id="totalFiles" />
 					<mx:Text text="Total Size:" id="sizeText" /><mx:Text id="totalSize" />
 				</mx:HBox>
-				<mx:ProgressBar id="totalProgressBar" width="375" mode="manual" visible="false"  labelPlacement="right"/>
+				<mx:ProgressBar id="totalProgressBar" width="273" mode="manual" visible="true"  labelPlacement="right"/>
 			</mx:VBox>
-		</mx:VBox>
+			<mx:Button id="clearButton" enabled="false" width="32"   icon="@Embed(source='components/trashcan_empty.png')" height="32" paddingLeft="0" paddingRight="0"/>				
+		</mx:HBox>
+	</mx:VBox>
 		
-	</mx:HBox>
 </custom:ApplicationClass>
