@@ -260,8 +260,10 @@ textarea#myCode
 #flashframe
 {
     border:0px;
-    width: 430px;
-    height: 490px;
+    width: 450px;
+    height: 300px;
+    overflow:hidden;
+    margin-top: -9px;
 }
 
 /********************/
