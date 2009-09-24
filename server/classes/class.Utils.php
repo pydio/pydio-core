@@ -285,6 +285,42 @@ class Utils
 		return str_replace(array("&", "<",">"), array("&amp;", "&lt;","&gt;"), $string);
 	}
 
+	function updateI18nFiles(){
+		include(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/en.php");
+		$reference = $mess;
+		$languages = ConfService::listAvailableLanguages();
+		foreach ($languages as $key=>$value){
+			$filename = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/".$key.".php";
+			include($filename);
+			$missing = array();
+			foreach ($reference as $messKey=>$message){
+				if(!array_key_exists($messKey, $mess)){
+					$missing[] = "\"$messKey\" => \"$message\",";
+				}
+			}
+			//print_r($missing);
+			if(count($missing)){
+				$header = array();
+				$currentMessages = array();
+				$footer = array();
+				$fileLines = file($filename);
+				foreach ($fileLines as $line){
+					if(strstr($line, "\"") !== false){
+						$currentMessages[] = trim($line);
+					}else{
+						if(!count($currentMessages)){
+							$header[] = trim($line);
+						}else{
+							$footer[] = trim($line);
+						}
+					}
+				}
+				$currentMessages = array_merge($header, $currentMessages, $missing, $footer);
+				file_put_contents($filename, join("\n", $currentMessages));
+			}
+		}
+	}
+	
 	function testResultsToTable($outputArray, $testedParams, $showSkipLink = true){
 		$style = '
 		<style>
