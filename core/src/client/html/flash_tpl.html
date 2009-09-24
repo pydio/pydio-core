@@ -11,8 +11,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
 </head>
-<body bgcolor="ffffff" onload="setReady();" style="padding: 0px; padding-left: 0px; margin: 0px; background-image: url('<?php print(CLIENT_RESOURCES_FOLDER);?>/images/strip.png');">
-<div style="border: 0px solid #ccc; border-bottom: 0px; width: 422px; height:470px; padding: 0px 0px;">
+<body bgcolor="ffffff" onload="setReady();" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px; background-image: url('<?php print(CLIENT_RESOURCES_FOLDER);?>/images/strip.png');">
 <script language="javascript" type="text/javascript">
 var jsReady = false;
 function isReady(){
@@ -68,6 +67,20 @@ function triggerFlashEvent(){
 			}
 			return messageId;			
 		break;
+		case "closeModal":
+			parent.hideLightBox(true);
+		break;
+		case "getProperty":
+			var pName = arguments[1];
+			var value = parent.getAjxpCookie(pName);
+			if(!value) return null;
+			return (value == "true"?true:false);
+		break;
+		case "storeProperty":
+			var pName = arguments[1];
+			var pValue = arguments[2];
+			return parent.setAjxpCookie(pName, pValue);
+		break;
 		default: 
 		break;
 	}
@@ -84,7 +97,7 @@ if(parent.ajaxplorer){
 var FlashObject = "<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf";
 var FlashVarValue = "<?php echo $FlashVar; ?>" + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
 
-document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + window.location.protocol + '//fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="422" height="470" id="fileUpload" align="middle">\
+document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + window.location.protocol + '//fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="450" height="310" id="fileUpload" align="middle">\
 <param name="allowScriptAccess" value="sameDomain" /> \
 <param name="movie" value="'+FlashObject+'" /> \
 <param name="quality" value="high" /> \
@@ -92,10 +105,9 @@ document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" cod
 <param name="FlashVars" value="' + FlashVarValue +'">\
 <embed src="'+FlashObject+'" \
 FlashVars="' + FlashVarValue + '" \
-quality="high" wmode="transparent" width="422" height="470" name="fileUpload" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"\
+quality="high" wmode="transparent" width="450" height="310" name="fileUpload" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"\
 pluginspage="http://www.macromedia.com/go/getflashplayer" />\
 </object>');
 </script>
-</div>
 </body>
 </html>

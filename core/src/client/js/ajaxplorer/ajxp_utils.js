@@ -114,22 +114,34 @@ function formatDate(dateObject, format){
 }
 
 function storeRememberData(user, pass){
+	setAjxpCookie('remember', {user:user,pass:pass});
+}
+
+function retrieveRememberData(){
+	return getAjxpCookie('remember');
+}
+
+function clearRememberData(){
+	deleteAjxpCookie('remember');
+}
+
+function setAjxpCookie(name, value){
 	var cookieJar = new CookieJar({
 		expire: 3600*24*10, 
 		path: '',
 		secure: true
 	});
-	cookieJar.put('ajxp_remember', {user:user, pass:pass});
+	cookieJar.put('ajxp_'+name, value);	
 }
 
-function retrieveRememberData(){
+function getAjxpCookie(name){
 	var cookieJar = new CookieJar({});
-	return cookieJar.get('ajxp_remember');
+	return cookieJar.get('ajxp_'+name);	
 }
 
-function clearRememberData(){
+function deleteAjxpCookie(name){
 	var cookieJar = new CookieJar({});
-	cookieJar.remove('ajxp_remember');
+	cookieJar.remove('ajxp_'+name);	
 }
 
 function refreshPNGImages(element){
