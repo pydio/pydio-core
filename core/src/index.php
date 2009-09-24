@@ -134,12 +134,17 @@ else
 	&& ($_COOKIE["AJXP_display"]=="list" || $_COOKIE["AJXP_display"]=="thumb")) $DEFAULT_DISPLAY = $_COOKIE["AJXP_display"];
 }
 
-if(isSet($_GET["compile"])){
+$JS_DEBUG = true;
+
+if($JS_DEBUG && isSet($_GET["compile"])){
 	require_once(SERVER_RESOURCES_FOLDER."/class.AJXP_JSPacker.php");
 	AJXP_JSPacker::pack();
 }
 
-$JS_DEBUG = false;
+if($JS_DEBUG && isSet($_GET["update_i18n"])){
+	Utils::updateI18nFiles();
+}
+
 $mess = ConfService::getMessages();
 include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
 HTMLWriter::writeI18nMessagesClass($mess);
