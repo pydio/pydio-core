@@ -1,8 +1,8 @@
 <?php
 //---------------------------------------------------------------------------------------------------
-//							
+//
 //	AjaXplorer
-//	
+//
 //	Copyright 2007-2008 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
@@ -240,7 +240,6 @@ $mess=array(
 "204" => "Il file \"",
 "205" => "\" supera il limite di destinazione (",
 "206" => "Mb).\\nNon sar&agrave; inviato.",
-/* END SENTENCE */
 "207" => "Non hai i permessi di scrittura su questa cartella",
 "208" => "Non hai i permessi di lettura su questa cartella",
 "209" => "Errore interno del server, contatta l'Amministratore!",
@@ -263,15 +262,15 @@ $mess=array(
 "226" => "Lista",
 "227" => "Passa alla visualizzazione dettagliata",
 "228" => "Miniature",
-"229" => "Passa alla visualizzazione miniature", 
+"229" => "Passa alla visualizzazione miniature",
 "230" => "Riproduci",
-"231" => "Riproduci la sequenza", 
-"232" => "Ferma", 
-"233" => "Ferma la sequenza", 
+"231" => "Riproduci la sequenza",
+"232" => "Ferma",
+"233" => "Ferma la sequenza",
 "234" => "Visualizza le immagini selezionate",
 "235" => "Schermo intero",
 "236" => "Ripristina",
-"237" => "Vecchia password", 
+"237" => "Vecchia password",
 "238" => "Le password sono diverse!",
 "239" => "Inserisci la tua password attuale",
 "240" => "Password errata!",
@@ -279,7 +278,7 @@ $mess=array(
 "242" => "Log SVN",
 "svn_log_access_key" => "L",
 "243" => "Revisione",
-"244" => "Autore", 
+"244" => "Autore",
 "245" => "Data",
 "246" => "Messaggio",
 "247" => "Extract",
@@ -299,18 +298,18 @@ $mess=array(
 "261" => "Remember Me",
 "262" => "One or more files appear to exist \\nalready in the destination folder.\\nWhat do you want to do?",
 "263" => "Overwrite",
-"264" => "Skip", 
+"264" => "Skip",
 "265" => "Files",
 "266" => "B",
 "267" => "Create",
 "268" => "Create a new table",
 "269" => "Structure",
 "270" => "Edit table structure",
-"271" => "Drop", 
+"271" => "Drop",
 "272" => "Drop open table",
 "273" => "Insert",
-"274" => "Insert a new record", 
-"275" => "Are you sure you want to drop the selected table(s)?", 
+"274" => "Insert a new record",
+"275" => "Are you sure you want to drop the selected table(s)?",
 "276" => "Edit selected record",
 "277" => "Delete selected records",
 "278" => "Are you sure you want to delete the selected record(s)?",
@@ -323,7 +322,7 @@ $mess=array(
 "285" => "Cannot find user, please try again.\\n Make sure your Caps Lock is not engaged!",
 "286" => "Your user is out of date with the current version, please use the upgrade procedure.",
 "287" => "File Permissions",
-"288" => "User", 
+"288" => "User",
 "289" => "Group",
 "290" => "All",
 "291" => "Apply recursively?",
@@ -343,6 +342,13 @@ $mess=array(
 "303" => "Copy selection as tab-separated text.",
 "304" => "Back",
 "305" => "Go back to main page",
-"306" => "Too many folders"
+"306" => "Too many folders",
+"307" => "Fill optional fields",
+"308" => "Generate Link",
+"309" => "Generate",
+"310" => "Options",
+"311" => "Upload automatically when a file is added",
+"312" => "Uploader Options",
+/* END SENTENCE */
 );
 ?>
