@@ -126,7 +126,7 @@ class ConfService
 		return $G_AUTH_DRIVER;
 	}
 
-	function switchRootDir($rootDirIndex=-1)
+	function switchRootDir($rootDirIndex=-1, $temporary=false)
 	{
 		global $G_REPOSITORY, $G_REPOSITORIES, $G_ACCESS_DRIVER;
 		if($rootDirIndex == -1){
@@ -143,6 +143,10 @@ class ConfService
 		}
 		else 
 		{
+			if($temporary && isSet($_SESSION['REPO_ID'])){
+				$crtId = $_SESSION['REPO_ID'];
+				register_shutdown_function(array("ConfService","switchRootDir"), $crtId);
+			}
 			$G_REPOSITORY = $G_REPOSITORIES[$rootDirIndex];			
 			$_SESSION['REPO_ID'] = $rootDirIndex;
 			if(isSet($G_ACCESS_DRIVER)) unset($G_ACCESS_DRIVER);

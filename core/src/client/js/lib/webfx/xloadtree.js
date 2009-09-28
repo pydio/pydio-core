@@ -47,13 +47,14 @@ webFXTreeConfig.emptyErrorTextTemplate = "Error \"%1%\" does not contain any tre
  * WebFXLoadTree class
  */
 
-function WebFXLoadTree(sText, sXmlSrc, sAction, sBehavior, sIcon, sOpenIcon) {
+function WebFXLoadTree(sText, sXmlSrc, sAction, sBehavior, sIcon, sOpenIcon, queryParameters) {
 	// call super
 	this.WebFXTree = WebFXTree;
 	this.WebFXTree(sText, sAction, sBehavior, sIcon, sOpenIcon);
 
 	// setup default property values
-	this.src = sXmlSrc;
+	this.queryParameters = queryParameters;
+	this.src = sXmlSrc + (this.queryParameters||"");
 	this.loading = false;
 	this.loaded = false;
 	this.errorText = "";
@@ -90,7 +91,8 @@ function WebFXLoadTreeItem(sText, sXmlSrc, sAction, eParent, sIcon, sOpenIcon) {
 	this.WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon);
 
 	// setup default property values
-	this.src = sXmlSrc;
+	this.queryParameters = (eParent && eParent.queryParameters?eParent.queryParameters:null);
+	this.src = sXmlSrc  + (this.queryParameters||"");
 	this.loading = false;
 	this.loaded = false;
 	this.errorText = "";
@@ -160,7 +162,7 @@ function _startLoadXmlTree(sSrc, jsNode) {
 
 
 // Converts an xml tree to a js tree. See article about xml tree format
-function _xmlTreeToJsTree(oNode) {
+function _xmlTreeToJsTree(oNode, parentNode) {
 	// retreive attributes
 	var text = oNode.getAttribute("text");
 	var action = oNode.getAttribute("action");
@@ -181,6 +183,10 @@ function _xmlTreeToJsTree(oNode) {
 		openIcon = icon;
 	}
 	var src = oNode.getAttribute("src");
+	if(parentNode && parentNode.queryParameters){
+		src = src + parentNode.queryParameters;
+		var qParams = parentNode.queryParameters;
+	}
 	var target = oNode.getAttribute("target");
 	var preloaded = oNode.getAttribute("preloaded");
 	var recycle = oNode.getAttribute("is_recycle");
@@ -192,8 +198,12 @@ function _xmlTreeToJsTree(oNode) {
 	else
 		jsNode = new WebFXTreeItem(text, action, parent, icon, openIcon);
 		
-	if (target != "")
+	if (target != ""){
 		jsNode.target = target;
+	}
+	if(qParams){
+		jsNode.queryParameters = qParams;
+	}
 		
 	if (recycle != null && !(ajaxplorer && ajaxplorer.actionBar && ajaxplorer.actionBar.treeCopyActive)){
 		webFXTreeHandler.recycleNode = jsNode.id;
@@ -219,7 +229,7 @@ function _xmlTreeToJsTree(oNode) {
 	var l = cs.length;
 	for (var i = 0; i < l; i++) {
 		if (cs[i].tagName == "tree")
-			jsNode.add( _xmlTreeToJsTree(cs[i]), true );
+			jsNode.add( _xmlTreeToJsTree(cs[i], jsNode), true );
 	}
 
 	return jsNode;
@@ -252,7 +262,7 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 			if (cs[i].tagName == "tree") {
 				bAnyChildren = true;
 				bIndent = true;
-				jsParentNode.add( _xmlTreeToJsTree(cs[i]), true);
+				jsParentNode.add( _xmlTreeToJsTree(cs[i], jsParentNode), true);
 			}
 			else if(cs[i].tagName == "error")
 			{
