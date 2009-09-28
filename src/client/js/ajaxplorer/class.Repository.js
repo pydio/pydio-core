@@ -39,6 +39,7 @@ Repository = Class.create({
 	icon:ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png',
 	searchEngine:'SearchEngine',
 	resources:undefined,
+	allowCrossRepositoryCopy:false,
 
 	initialize:function(id, xmlDef){
 		this.id = id;
