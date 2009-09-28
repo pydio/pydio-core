@@ -529,17 +529,22 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
+					if(ajaxplorer.user){
+						var activeRepository = ajaxplorer.user.getActiveRepository();
+					}
 					var onLoad = function(oForm){
 						var getAction = oForm.getElementsBySelector('input[name="get_action"]')[0];
 						getAction.value = 'copy';
 						var container = oForm.getElementsBySelector(".treeCopyContainer")[0];
 						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
 						var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
+						$('external_repository').hide();
+						
 						if(!this.treeCopy){
 							this.treeCopy = new WebFXLoadTree('/', 
-																ajxpServerAccessPath+'?skipZip=true&get_action=ls', 
+																ajxpServerAccessPath+'?get_action=ls', 
 																"javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 
-																'explorer');
+																'explorer', null, null, '&skipZip=true');
 						}
 						else{
 							window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
@@ -553,17 +558,43 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 							Event.stop(e);
 						}.bind(this));
 						this.treeCopy.focus();
+						
+						if(ajaxplorer.user){
+							var repoList = ajaxplorer.user.getRepositoriesList();							
+							var index=-1;
+							repoList.each(function(pair){
+								var repoObject = pair.value;
+								if(repoObject.allowCrossRepositoryCopy){
+									index++;
+									if(index) $('external_repository').show();
+									if(repoObject.getId() == activeRepository) return;
+									$('external_repository').insert('<option value="'+repoObject.getId()+'">'+repoObject.getLabel()+'</option>');
+								}
+							});							
+							if(!index) return;
+							$('external_repository').insert({top:'<option value="'+activeRepository+'">Current Repository</option>'});
+							$('external_repository').observe("change", function(e){
+								externalRepo = $('external_repository').getValue();								
+								this.treeCopy.src += '&tmp_repository_id='+externalRepo;
+								this.treeCopy.queryParameters += '&tmp_repository_id='+externalRepo;
+								this.treeCopy.reload();
+							}.bind(this));
+						}
 					}.bind(ajaxplorer.actionBar);
 					var onCancel = function(){				
 						ajaxplorer.cancelCopyOrMove();
 					};
 					var onSubmit = function(){
 						var oForm = modal.getForm();
-						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						if(eDestLabel.value == ajaxplorer.filesList.getCurrentRep())
-						{
-							alert(MessageHash[183]);
-							return false;
+						if(activeRepository && $('external_repository').visible() && $('external_repository').getValue() != activeRepository){
+							oForm.select('input[name="get_action"]')[0].value = "cross_copy" ;
+						}else{
+							var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
+							if(eDestLabel.value == ajaxplorer.filesList.getCurrentRep())
+							{
+								alert(MessageHash[183]);
+								return false;
+							}
 						}
 						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);				
 						this.treeCopyActive = false;
@@ -578,9 +609,10 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					<input type="hidden" name="dest_node" value="">
 					<span id="copymove_text_span"></span>
 					<div class="dialogLegend">AJXP_MESSAGE[175]</div>
+					<select id="external_repository" style="width: 248px; font-size: 12px; height: 21px; margin-bottom: 0px; border: 1px solid #ccc;"></select>
 					<div style="height:250px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
-					<input type="text" name="dest" value="/" readonly  style="width:100%; border: none; border-bottom: 1px solid #ccc;"/>
-					<div id="treeCopy" style="height:222px; padding: 3px 2px; overflow:auto; text-align:left;" class="treeCopyContainer"></div>
+					<input type="text" name="dest" value="/" readonly  style="width:100%; border: none; border-bottom: 1px solid #ccc; background-image:none;"/>
+					<div id="treeCopy" style="height:222px; padding: 3px 2px; overflow:auto; text-align:left;background-image:none;background-color:white;" class="treeCopyContainer"></div>
 					</div>
 					</div>
 				]]></clientForm>

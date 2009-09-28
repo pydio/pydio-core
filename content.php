@@ -60,6 +60,10 @@ require_once($confStorageDriver->getUserClassFileName());
 session_name("AjaXplorer");
 session_start();
 
+if(isSet($_GET["tmp_repository_id"])){
+	ConfService::switchRootDir($_GET["tmp_repository_id"], true);
+}
+
 if(AuthService::usersEnabled())
 {
 	$rememberLogin = "";
