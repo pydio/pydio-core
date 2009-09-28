@@ -1042,7 +1042,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 						}
 						else
 						{
-             				@ftp_delete($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir."/".$filename));
+             				@ftp_delete($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$filename));
 						}
 					}
 				}			
