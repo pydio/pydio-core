@@ -136,11 +136,11 @@ class AbstractAccessDriver extends AbstractDriver {
             return "Can't write to PUBLIC URL";
         }
         if(defined('PUBLIC_DOWNLOAD_URL') && PUBLIC_DOWNLOAD_URL != ""){
-        	return PUBLIC_DOWNLOAD_URL."/".$hash.".php";
+        	return rtrim(PUBLIC_DOWNLOAD_URL, "/")."/".$hash.".php";
         }else{
 	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
 	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
-	        return str_replace("\\", "/", $fullUrl.str_replace(INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER)."/".$hash.".php");
+	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/")."/".$hash.".php");
         }
     }
 
