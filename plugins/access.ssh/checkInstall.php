@@ -8,7 +8,7 @@ echo "<html><head>
       
 // First test, check that the required files are all present
 echo "<h1>Testing installation</h1>";
-if (!file_exists("class.sshDriver.php") 
+if (!file_exists("class.sshAccessDriver.php") 
  || !file_exists("class.SSHOperations.php")
  || !file_exists("manifest.xml")
  || !file_exists("showPass.php")
@@ -61,11 +61,11 @@ if ($_GET["destServer"] == "")
    echo "<form method=GET>Please enter SSH server address to test:<input type=text name='destServer' value=''><input type='submit' value='Ok'></form>";
 } else
 { 
-   $handle = popen("export DISPLAY=xxx && export SSH_ASKPASS=/bin/sh && ssh -T -t -o StrictHostKeyChecking=yes -o LogLevel=QUIET".$_GET["destServer"]." 2>&1", "r");
-   $key = fread($handle, 30);
-   if (strpos($key, "Host") <= 4)
+   $handle = popen("export DISPLAY=xxx && export SSH_ASKPASS=/bin/sh && ssh -T -t -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/etc/ssh/ssh_known_hosts -o LogLevel=QUIET ".$_GET["destServer"]." 2>&1", "r");
+   $key = fread($handle, 320);
+   if (strpos($key, "/bin/sh") === FALSE)
    {
-      echo "ERROR: The server ".$_GET["destServer"]." you are trying to contact doesn't have its host key installed<br>
+      echo "ERROR: The server ".$_GET["destServer"]." you are trying to contact doesn't have its host key installed<br><br>Received output: [$key]<br><br>
       Please install server host key in /etc/ssh/ssh_known_hosts file, as the webserver user can't store server's key";
       echo "<br>You should type this command as root to add the key to the main host file:<br>ssh -o StrictHostKeyChecking=ask -o UserKnownHostsFile=/etc/ssh/ssh_known_hosts ".$_GET["destServer"]."<br>";
    }
