@@ -149,6 +149,7 @@ class AJXP_XMLWriter
 	function writeRepositoriesData($loggedUser, $details=false){
 		$st = "";
 		$st .= "<repositories>";
+		$streams = ConfService::detectRepositoryStreams(false);
 		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
 		{		
 			$toLast = false;
@@ -164,10 +165,14 @@ class AJXP_XMLWriter
 				if($details){
 					$rightString = " r=\"".($loggedUser->canRead($rootDirIndex)?"1":"0")."\" w=\"".($loggedUser->canWrite($rootDirIndex)?"1":"0")."\"";
 				}
+				$streamString = "";
+				if(in_array($rootDirObject->accessType, $streams)){
+					$streamString = "allowCrossRepositoryCopy=\"true\"";
+				}
 				if($toLast){
-					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				}else{
-					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				}
 			}
 		}
