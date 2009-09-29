@@ -47,7 +47,7 @@ class AbstractAccessDriver extends AbstractDriver {
 		$this->repository = $repository;
 		$this->initXmlActionsFile($filePath);		
 		$this->actions["get_driver_info_panels"] = array();
-		if($repository->detectStreamWrapper()){
+		if(is_object($repository) && $repository->detectStreamWrapper()){
 			$this->actions["cross_copy"] = array();
 		}
 	}
