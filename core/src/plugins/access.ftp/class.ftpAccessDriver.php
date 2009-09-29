@@ -20,15 +20,15 @@ class ftpAccessDriver extends  AbstractAccessDriver
         function  ftpAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
         	$this->user = $optOptions ? $optOptions["user"] : $this->getUserName($repository);
         	$this->password = $optOptions ? $optOptions["password"] : $this->getPassword($repository);
-		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
-		unset($this->actions["upload"]);
-		// DISABLE NON-IMPLEMENTED FUNCTIONS FOR THE MOMENT
-		unset($this->actions["copy"]);
-		unset($this->actions["move"]);
-		unset($this->actions["chmod"]);
-		$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
-		$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
-	}
+			parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
+			unset($this->actions["upload"]);
+			// DISABLE NON-IMPLEMENTED FUNCTIONS FOR THE MOMENT
+			unset($this->actions["copy"]);
+			unset($this->actions["move"]);
+			unset($this->actions["chmod"]);
+			$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
+			$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
+		}
 
 
         function initRepository(){
@@ -84,7 +84,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
             return TRUE;
         }
 
-        function createFTPLink(){
+        function createFTPLink($registerClose = true){
         	$link = FALSE;
        		//Connects to the FTP.          
 	        $host = $this->repository->getOption("FTP_HOST");
@@ -95,7 +95,9 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	            AJXP_Exception::errorToXml($ajxpExp);
 	               
 	 	    }
-            register_shutdown_function('ftp_close', $link);
+	 	    if($registerClose){
+	            register_shutdown_function('ftp_close', $link);
+	 	    }
             @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
 		    if(!@ftp_login($link,$this->user,$this->password)){
 	            $ajxpExp = new AJXP_Exception("Cannot login to FTP server!");

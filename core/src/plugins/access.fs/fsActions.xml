@@ -547,6 +547,8 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 																'explorer', null, null, '&skipZip=true');
 						}
 						else{
+							this.treeCopy.src = ajxpServerAccessPath+'?get_action=ls';
+							this.treeCopy.queryParameters = '&skipZip=true';
 							window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
 						}				
 						this.treeCopyActive = true;
@@ -559,7 +561,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						}.bind(this));
 						this.treeCopy.focus();
 						
-						if(ajaxplorer.user){
+						if(ajaxplorer.user && !ajaxplorer.getFilesList().getUserSelection().hasDir()){
 							var repoList = ajaxplorer.user.getRepositoriesList();							
 							var index=-1;
 							repoList.each(function(pair){
@@ -572,7 +574,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 								}
 							});							
 							if(!index) return;
-							$('external_repository').insert({top:'<option value="'+activeRepository+'">Current Repository</option>'});
+							$('external_repository').insert({top:'<option value="'+activeRepository+'">&lt;Current Repository&gt;</option>'});
 							$('external_repository').observe("change", function(e){
 								externalRepo = $('external_repository').getValue();								
 								this.treeCopy.src += '&tmp_repository_id='+externalRepo;
@@ -597,9 +599,8 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 							}
 						}
 						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);				
-						this.treeCopyActive = false;
 						this.submitForm(oForm);
-						hideLightBox(true);
+						ajaxplorer.cancelCopyOrMove();						
 						return false;
 					}.bind(ajaxplorer.actionBar);
 					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);				
@@ -609,7 +610,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					<input type="hidden" name="dest_node" value="">
 					<span id="copymove_text_span"></span>
 					<div class="dialogLegend">AJXP_MESSAGE[175]</div>
-					<select id="external_repository" style="width: 248px; font-size: 12px; height: 21px; margin-bottom: 0px; border: 1px solid #ccc;"></select>
+					<select id="external_repository" name="dest_repository_id" style="width: 248px; font-size: 12px; height: 21px; margin-bottom: 0px; border: 1px solid #ccc;"></select>
 					<div style="height:250px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
 					<input type="text" name="dest" value="/" readonly  style="width:100%; border: none; border-bottom: 1px solid #ccc; background-image:none;"/>
 					<div id="treeCopy" style="height:222px; padding: 3px 2px; overflow:auto; text-align:left;background-image:none;background-color:white;" class="treeCopyContainer"></div>

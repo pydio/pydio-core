@@ -47,6 +47,9 @@ class AbstractAccessDriver extends AbstractDriver {
 		$this->repository = $repository;
 		$this->initXmlActionsFile($filePath);		
 		$this->actions["get_driver_info_panels"] = array();
+		if($repository->detectStreamWrapper()){
+			$this->actions["cross_copy"] = array();
+		}
 	}
 	
 	function initRepository(){
@@ -59,6 +62,9 @@ class AbstractAccessDriver extends AbstractDriver {
 		if($actionName == "get_ajxp_info_panels" || $actionName == "get_driver_info_panels"){
 			$this->sendInfoPanelsDef();
 			return;
+		}else if($actionName == "cross_copy"){
+			$this->crossRepositoryCopy($httpVars);
+			return ;
 		}
 		return parent::applyAction($actionName, $httpVars, $filesVar);
 	}
@@ -183,6 +189,42 @@ class AbstractAccessDriver extends AbstractDriver {
         @return The full public URL to the publiclet.
     */
     function makePubliclet($filePath) {}
+    
+    function crossRepositoryCopy($httpVars){
+    	ConfService::detectRepositoryStreams(true);
+		$selection = new UserSelection();
+		$selection->initFromHttpVars($httpVars);
+    	$files = $selection->getFiles();
+    	
+    	$accessType = $this->repository->getAccessType();    	
+    	$repositoryId = $this->repository->getId();
+    	$origStreamURL = "ajxp.$accessType://$repositoryId";
+    	
+    	$destRepoId = $httpVars["dest_repository_id"];
+    	$destRepoObject = ConfService::getRepositoryById($destRepoId);
+    	$destRepoAccess = $destRepoObject->getAccessType();
+    	$destStreamURL = "ajxp.$destRepoAccess://$destRepoId";
+    	AJXP_XMLWriter::header();
+    	foreach ($files as $file){
+    		$origFile = $origStreamURL.$file;
+    		$destFile = $destStreamURL.$httpVars["dest"]."/".basename($file);
+			$origHandler = fopen($origFile, "r");			
+			$destHandler = fopen($destFile, "w");
+			if($origHandler === false || $destHandler === false) {
+				AJXP_XMLWriter::sendMessage(null, "ERROR $origFile -- $destFile ", true);
+				continue;
+			}
+			while(!feof($origHandler)){
+				fwrite($destHandler, fgets($origHandler));
+			}
+			fflush($destHandler);
+			fclose($origHandler); 
+			fclose($destHandler);			
+    	}
+    	AJXP_XMLWriter::sendMessage("SUCCESS!", null, true);
+    	AJXP_XMLWriter::close();
+    	exit(0);
+    }
 
 }
 
