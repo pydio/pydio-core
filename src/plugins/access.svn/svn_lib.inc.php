@@ -617,7 +617,7 @@ define('IDX_VALUE', 1);
 		if(strpos($switches, "xml")){
 			$result[IDX_STDOUT] = $output;
 		}else{
-			$result[IDX_STDOUT] = split("\n", $output);
+			$result[IDX_STDOUT] = explode("\n", $output);
 		}
 		$result[IDX_ERROUT] = "";
 		/*

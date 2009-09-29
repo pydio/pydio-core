@@ -93,7 +93,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		}
 		// FILTER DIR PAGINATION ANCHOR
 		if(isSet($dir) && strstr($dir, "#")!==false){
-			$parts = split("#", $dir);
+			$parts = explode("#", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
 		}				
@@ -202,7 +202,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 				$fields = array("origname","name", "default", "null", "size", "type", "flags", "pk", "index", "uniq");
 				$rows = array();
 				foreach ($httpVars as $k=>$val){
-					$split = split("_", $k);
+					$split = explode("_", $k);
 					if(count($split) == 3 && $split[0]=="field" && is_numeric($split[2]) && in_array($split[1], $fields)){
 						if(!isSet($rows[intval($split[2])])) $rows[intval($split[2])] = array();
 						$rows[intval($split[2])][$split[1]] = $val;
@@ -285,7 +285,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					$tableName = $dir;
 					$pks = $selection->getFiles();
 					foreach ($pks as $key => $pkString){
-						$parts = split("\.", $pkString);
+						$parts = explode("\.", $pkString);
 						array_pop($parts); // remove .pk extension
 						array_shift($parts); // remove record prefix
 						foreach ($parts as $index => $pkPart){
@@ -383,7 +383,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					$blobCols = array();
 					print '<columns switchDisplayMode="list" switchGridMode="grid">';
 					foreach ($result["COLUMNS"] as $col){
-						print "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(eregi("primary", $col["FLAGS"])?"1":"0")."\" field_null=\"".(eregi("not_null", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
+						print "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(preg_match("primary", $col["FLAGS"])?"1":"0")."\" field_null=\"".(preg_match("not_null", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
 						if(stristr($col["TYPE"],"blob")!==false && ($col["FLAGS"]!="" && stristr($col["FLAGS"], "binary"))){
 							$blobCols[]=$col["NAME"];
 						}
@@ -510,7 +510,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 	}
 	
 	function cleanFlagString($flagString){
-		$arr = split(" ", $flagString);
+		$arr = explode(" ", $flagString);
 		$newFlags = array();
 		foreach ($arr as $flag){
 			if($flag == "primary_key" || $flag == "null" || $flag == "not_null"){
@@ -607,7 +607,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 
 			//Find the primary key
 			$flagstring = mysql_field_flags ($result, $i);
-			if(eregi("primary",$flagstring )){
+			if(preg_match("primary",$flagstring )){
 				$pk[$z] = $i;
 				$pkfield[$z]= mysql_field_name($fields, $i);
 				$z++;

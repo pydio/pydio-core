@@ -56,7 +56,7 @@ class Utils
 		//
 		// REPLACE DOUBLE SLASHES
 		//
-		while (eregi('//', $path)) 
+		while (preg_match('/\/\//', $path)) 
 		{
 			$path = str_replace('//', '/', $path);
 		}
@@ -145,48 +145,49 @@ class Utils
 		// I've found this regular expression for Windows file name validation, not sure how it applies for linux :
 		// ^[^\\\./:\*\?\"<>\|]{1}[^\\/:\*\?\"<>\|]{0,254}$   This reg ex remove ^ \ . / : * ? " < > | as the first char, and (same thing but . for any other char), and it limits to 254 chars (could use max_caracteres instead)
 		// Anyway, here is the corrected version of the big str_replace calls below that doesn't kill UTF8 encoding
-		$fileNameTmp=ereg_replace("[\",;/`<>:\*\|\?!\^]", "", $fileName);
+		$fileNameTmp=preg_replace("/[\",;\/`<>:\*\|\?!\^]/", "", $fileName);
 		return substr($fileNameTmp, 0, $max_caracteres);
 	}
 	
 	function mimetype($fileName,$mode, $isDir)
 	{
 		$mess = ConfService::getMessages();
+		$fileName = strtolower($fileName);
 		if($isDir){$image="folder.png";$typeName=$mess[8];}
-		else if(eregi("\.mid$",$fileName)){$image="midi.png";$typeName=$mess[9];}
-		else if(eregi("\.txt$",$fileName)){$image="txt2.png";$typeName=$mess[10];}
-		else if(eregi("\.sql$",$fileName)){$image="txt2.png";$typeName=$mess[10];}
-		else if(eregi("\.js$",$fileName)){$image="javascript.png";$typeName=$mess[11];}
-		else if(eregi("\.gif$",$fileName)){$image="image.png";$typeName=$mess[12];}
-		else if(eregi("\.jpg$",$fileName)){$image="image.png";$typeName=$mess[13];}
-		else if(eregi("\.html$",$fileName)){$image="html.png";$typeName=$mess[14];}
-		else if(eregi("\.htm$",$fileName)){$image="html.png";$typeName=$mess[15];}
-		else if(eregi("\.rar$",$fileName)){$image="archive.png";$typeName=$mess[60];}
-		else if(eregi("\.gz$",$fileName)){$image="zip.png";$typeName=$mess[61];}
-		else if(eregi("\.tgz$",$fileName)){$image="archive.png";$typeName=$mess[61];}
-		else if(eregi("\.z$",$fileName)){$image="archive.png";$typeName=$mess[61];}
-		else if(eregi("\.ra$",$fileName)){$image="video.png";$typeName=$mess[16];}
-		else if(eregi("\.ram$",$fileName)){$image="video.png";$typeName=$mess[17];}
-		else if(eregi("\.rm$",$fileName)){$image="video.png";$typeName=$mess[17];}
-		else if(eregi("\.pl$",$fileName)){$image="source_pl.png";$typeName=$mess[18];}
-		else if(eregi("\.zip$",$fileName)){$image="zip.png";$typeName=$mess[19];}
-		else if(eregi("\.wav$",$fileName)){$image="sound.png";$typeName=$mess[20];}
-		else if(eregi("\.php$",$fileName)){$image="php.png";$typeName=$mess[21];}
-		else if(eregi("\.php3$",$fileName)){$image="php.png";$typeName=$mess[22];}
-		else if(eregi("\.phtml$",$fileName)){$image="php.png";$typeName=$mess[22];}
-		else if(eregi("\.exe$",$fileName)){$image="exe.png";$typeName=$mess[50];}
-		else if(eregi("\.bmp$",$fileName)){$image="image.png";$typeName=$mess[56];}
-		else if(eregi("\.png$",$fileName)){$image="image.png";$typeName=$mess[57];}
-		else if(eregi("\.css$",$fileName)){$image="css.png";$typeName=$mess[58];}
-		else if(eregi("\.mp3$",$fileName)){$image="sound.png";$typeName=$mess[59];}
-		else if(eregi("\.xls$",$fileName)){$image="spreadsheet.png";$typeName=$mess[64];}
-		else if(eregi("\.doc$",$fileName)){$image="document.png";$typeName=$mess[65];}
-		else if(eregi("\.pdf$",$fileName)){$image="pdf.png";$typeName=$mess[79];}
-		else if(eregi("\.mov$",$fileName)){$image="video.png";$typeName=$mess[80];}
-		else if(eregi("\.avi$",$fileName)){$image="video.png";$typeName=$mess[81];}
-		else if(eregi("\.mpg$",$fileName)){$image="video.png";$typeName=$mess[82];}
-		else if(eregi("\.mpeg$",$fileName)){$image="video.png";$typeName=$mess[83];}
-		else if(eregi("\.swf$",$fileName)){$image="flash.png";$typeName=$mess[91];}
+		else if(preg_match("/\.mid$/",$fileName)){$image="midi.png";$typeName=$mess[9];}
+		else if(preg_match("/\.txt$/",$fileName)){$image="txt2.png";$typeName=$mess[10];}
+		else if(preg_match("/\.sql$/",$fileName)){$image="txt2.png";$typeName=$mess[10];}
+		else if(preg_match("/\.js$/",$fileName)){$image="javascript.png";$typeName=$mess[11];}
+		else if(preg_match("/\.gif$/",$fileName)){$image="image.png";$typeName=$mess[12];}
+		else if(preg_match("/\.jpg$/",$fileName)){$image="image.png";$typeName=$mess[13];}
+		else if(preg_match("/\.html$/",$fileName)){$image="html.png";$typeName=$mess[14];}
+		else if(preg_match("/\.htm$/",$fileName)){$image="html.png";$typeName=$mess[15];}
+		else if(preg_match("/\.rar$/",$fileName)){$image="archive.png";$typeName=$mess[60];}
+		else if(preg_match("/\.gz$/",$fileName)){$image="zip.png";$typeName=$mess[61];}
+		else if(preg_match("/\.tgz$/",$fileName)){$image="archive.png";$typeName=$mess[61];}
+		else if(preg_match("/\.z$/",$fileName)){$image="archive.png";$typeName=$mess[61];}
+		else if(preg_match("/\.ra$/",$fileName)){$image="video.png";$typeName=$mess[16];}
+		else if(preg_match("/\.ram$/",$fileName)){$image="video.png";$typeName=$mess[17];}
+		else if(preg_match("/\.rm$/",$fileName)){$image="video.png";$typeName=$mess[17];}
+		else if(preg_match("/\.pl$/",$fileName)){$image="source_pl.png";$typeName=$mess[18];}
+		else if(preg_match("/\.zip$/",$fileName)){$image="zip.png";$typeName=$mess[19];}
+		else if(preg_match("/\.wav$/",$fileName)){$image="sound.png";$typeName=$mess[20];}
+		else if(preg_match("/\.php$/",$fileName)){$image="php.png";$typeName=$mess[21];}
+		else if(preg_match("/\.php3$/",$fileName)){$image="php.png";$typeName=$mess[22];}
+		else if(preg_match("/\.phtml$/",$fileName)){$image="php.png";$typeName=$mess[22];}
+		else if(preg_match("/\.exe$/",$fileName)){$image="exe.png";$typeName=$mess[50];}
+		else if(preg_match("/\.bmp$/",$fileName)){$image="image.png";$typeName=$mess[56];}
+		else if(preg_match("/\.png$/",$fileName)){$image="image.png";$typeName=$mess[57];}
+		else if(preg_match("/\.css$/",$fileName)){$image="css.png";$typeName=$mess[58];}
+		else if(preg_match("/\.mp3$/",$fileName)){$image="sound.png";$typeName=$mess[59];}
+		else if(preg_match("/\.xls$/",$fileName)){$image="spreadsheet.png";$typeName=$mess[64];}
+		else if(preg_match("/\.doc$/",$fileName)){$image="document.png";$typeName=$mess[65];}
+		else if(preg_match("/\.pdf$/",$fileName)){$image="pdf.png";$typeName=$mess[79];}
+		else if(preg_match("/\.mov$/",$fileName)){$image="video.png";$typeName=$mess[80];}
+		else if(preg_match("/\.avi$/",$fileName)){$image="video.png";$typeName=$mess[81];}
+		else if(preg_match("/\.mpg$/",$fileName)){$image="video.png";$typeName=$mess[82];}
+		else if(preg_match("/\.mpeg$/",$fileName)){$image="video.png";$typeName=$mess[83];}
+		else if(preg_match("/\.swf$/",$fileName)){$image="flash.png";$typeName=$mess[91];}
 		else {$image="mime_empty.png";$typeName=$mess[23];}
 		if($mode=="image"){return $image;} else {return $typeName;}
 	}
@@ -210,7 +211,7 @@ class Utils
 		
 	function is_image($fileName)
 	{
-		if(eregi("\.png$|\.bmp$|\.jpg$|\.jpeg$|\.gif$",$fileName)){
+		if(preg_match("/\.png$|\.bmp$|\.jpg$|\.jpeg$|\.gif$/i",$fileName)){
 			return 1;
 		}
 		return 0;
@@ -218,16 +219,16 @@ class Utils
 	
 	function is_mp3($fileName)
 	{
-		if(eregi("\.mp3$",$fileName)) return 1;
+		if(preg_match("/\.mp3$/i",$fileName)) return 1;
 		return 0;
 	}
 	
 	function getImageMimeType($fileName)
 	{
-		if(eregi("\.jpg$|\.jpeg$",$fileName)){return "image/jpeg";}
-		else if(eregi("\.png$",$fileName)){return "image/png";}	
-		else if(eregi("\.bmp$",$fileName)){return "image/bmp";}	
-		else if(eregi("\.gif$",$fileName)){return "image/gif";}	
+		if(preg_match("/\.jpg$|\.jpeg$/i",$fileName)){return "image/jpeg";}
+		else if(preg_match("/\.png$/i",$fileName)){return "image/png";}	
+		else if(preg_match("/\.bmp$/i",$fileName)){return "image/bmp";}	
+		else if(preg_match("/\.gif$/i",$fileName)){return "image/gif";}	
 	}
 	
 	function roundSize($filesize)
