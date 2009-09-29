@@ -454,7 +454,7 @@ class sshAccessDriver extends AbstractAccessDriver
 						if(!$completeMode){
 							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
 							$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
-							if(eregi("\.zip$",$file["name"])){
+							if(preg_match("/\.zip$/",$file["name"])){
 								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
 							}
 							$attributes = "icon=\"$icon\"  openicon=\"$openicon\" filename=\"".$folderFullName."\" src=\"$link\"";

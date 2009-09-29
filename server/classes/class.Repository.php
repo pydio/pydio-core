@@ -76,15 +76,16 @@ class Repository {
 			$lines = file($fileName);	
 			$inside = false;		
 			foreach ($lines as $line){
-				if(eregi("<client_settings", trim($line)) > -1){
+				$line = strtolower($line);
+				if(preg_match('/\<client_settings/', trim($line)) > 0){
 					$settingLine = trim($line);
-					if(eregi("/>", trim($line))>-1 || eregi("</client_settings>", trim($line)>-1)){
+					if(preg_match("/\/\>/", trim($line))>0 || preg_match("/\<\/client_settings\>/", trim($line)>0)){
 						return $settingLine;
 					}
 					$inside = true;					
 				}else{
 					if($inside) $settingLine.=trim($line);
-					if(eregi("</client_settings>", trim($line))>-1) return $settingLine;
+					if(preg_match("/\<\/client_settings\>/", trim($line))>0) return $settingLine;
 				}
 			}
 		}

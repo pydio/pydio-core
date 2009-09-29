@@ -63,7 +63,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"diagnostic" => array("LABEL" => "Diagnostic", "ICON" => "susehelpcenter.png")
 				);
 				$dir = (isset($httpVars["dir"])?$httpVars["dir"]:"");
-				$splits = split("/", $dir);
+				$splits = explode("/", $dir);
 				if(count($splits)){
 					if($splits[0] == "") array_shift($splits);
 					if(count($splits)) $strippedDir = strtolower(urldecode($splits[0]));
@@ -473,7 +473,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	function listLogFiles($dir){	
 		$logger = AJXP_Logger::getInstance();
-		$parts = split("/", $dir);
+		$parts = explode("/", $dir);
 		if(count($parts)>4){
 			print '<columns switchDisplayMode="list" switchGridMode="grid">
 				<column messageString="Date" attributeName="date" sortType="Date" width="10%"/>

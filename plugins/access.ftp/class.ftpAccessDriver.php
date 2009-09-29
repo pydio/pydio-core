@@ -367,7 +367,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				foreach ($reps as $repIndex => $repName)
 				{
 				 
-					if(is_string($repName) && (eregi("\.zip$",$repName) && $skipZip)) continue;
+					if(is_string($repName) && (preg_match("/\.zip$/",$repName) && $skipZip)) continue;
 					$attributes = "";
 					if($searchMode)
 					{
@@ -413,7 +413,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 						if(!$completeMode){
 							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
 							$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
-							if(eregi("\.zip$",$repName)){
+							if(preg_match("/\.zip$/",$repName)){
 								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
 							}
 							$attributes = "icon=\"$icon\"  openicon=\"$openicon\" filename=\"".SystemTextEncoding::toUTF8($folderFullName)."\" src=\"$link\"";
@@ -775,7 +775,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 						$liste_fic[$file]['icon']=Utils::mimetype("$nom_rep/$file","image", $isDir);
 						$liste_fic[$file]['type']=Utils::mimetype("$nom_rep/$file","type", $isDir); 
 					}
-					else if(eregi("\.zip$",$file) && ConfService::zipEnabled()){
+					else if(preg_match("/\.zip$/",$file) && ConfService::zipEnabled()){
 						if(!isSet($liste_zip)) $liste_zip = array();
 						$liste_zip[$file] = $file;
 					}
@@ -867,7 +867,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		$fp=fopen("files/".$newFileName,"x+");
 		if($fp)
 		{
-			if(eregi("\.html$",$newFileName)||eregi("\.htm$",$newFileName))
+			if(preg_match("/\.html$/",$newFileName)||preg_match("/\.htm$/",$newFileName))
 			{
 				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
 			}

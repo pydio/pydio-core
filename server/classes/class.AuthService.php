@@ -119,11 +119,20 @@ class AuthService
 
     function checkBruteForceLogin(&$loginArray)
     {
-        $login = $loginArray[$_SERVER["REMOTE_ADDR"]];
+    	$serverAddress = "";
+    	if(isSet($_SERVER['REMOTE_ADDR'])){
+    		$serverAddress = $_SERVER['REMOTE_ADDR'];
+    	}else{
+    		$serverAddress = $_SERVER['SERVER_ADDR'];
+    	}
+    	$login = null;
+    	if(isSet($loginArray[$serverAddress])){
+	        $login = $loginArray[$serverAddress];		
+    	}
         if (is_array($login)){
             $login["count"]++;
         } else $login = array("count"=>1, "time"=>time());
-        $loginArray[$_SERVER["REMOTE_ADDR"]] = $login;
+        $loginArray[$serverAddress] = $login;
         if ($login["count"] > 4) return FALSE;
         return TRUE;
     }
