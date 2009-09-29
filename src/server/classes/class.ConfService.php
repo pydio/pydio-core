@@ -209,7 +209,7 @@ class ConfService
 		{
 			$repo = ConfService::createRepositoryFromArray($index, $repository);
 			$repo->setWriteable(false);
-			$objList[$index] = $repo;
+			$objList[$repo->getId()] = $repo;
 		}
 		// LOAD FROM DRIVER
 		$confDriver = ConfService::getConfStorageImpl();
@@ -218,6 +218,15 @@ class ConfService
 			$objList = array_merge($objList, $drvList);
 		}
 		return $objList;
+	}
+	
+	function detectRepositoryStreams($register = false){
+		global $G_REPOSITORIES;
+		$streams = array();
+		foreach ($G_REPOSITORIES as $repository) {
+			$repository->detectStreamWrapper($register, $streams);
+		}
+		return $streams;
 	}
 	
 	/**

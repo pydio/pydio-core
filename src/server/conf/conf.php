@@ -115,7 +115,7 @@ $AUTH_DRIVER = array(
 /* Use the GUI to add new repositories to explore!
 /*   + Log in as "admin" and open the "Settings" Repository
 /*********************************************************/
-$REPOSITORIES[1] = array(
+$REPOSITORIES[0] = array(
 	"DISPLAY"		=>	"Default Files", 
 	"DRIVER"		=>	"fs", 
 	"DRIVER_OPTIONS"=> array(
@@ -132,7 +132,7 @@ $REPOSITORIES[1] = array(
 
 // DO NOT REMOVE THIS!
 // ADMIN REPOSITORY
-$REPOSITORIES[0] = array(
+$REPOSITORIES[1] = array(
 	"DISPLAY"		=>	"Settings", 
 	"DRIVER"		=>	"ajxp_conf", 
 	"DRIVER_OPTIONS"=> array()	

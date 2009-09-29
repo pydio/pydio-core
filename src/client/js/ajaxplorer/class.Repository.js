@@ -124,6 +124,9 @@ Repository = Class.create({
 	},
 	
 	loadFromXml: function(repoNode){
+		if(repoNode.getAttribute('allowCrossRepositoryCopy') && repoNode.getAttribute('allowCrossRepositoryCopy') == "true"){
+			this.allowCrossRepositoryCopy = true;
+		}
 		for(var i=0;i<repoNode.childNodes.length;i++){
 			var childNode = repoNode.childNodes[i];
 			if(childNode.nodeName == "label"){
