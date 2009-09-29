@@ -91,7 +91,7 @@ class svnAccessDriver extends AbstractAccessDriver {
 			$res = GetWebspaceLog($this->repository, $httpVars["file"]);
 			//print_r($res);
 			AJXP_XMLWriter::header();
-			if(is_array($res)) print(ereg_replace("[\r\n]","",str_replace('<?xml version="1.0"?>', "", $res[IDX_STDOUT])));
+			if(is_array($res)) print(preg_replace("/[\r\n]/","",str_replace('<?xml version="1.0"?>', "", $res[IDX_STDOUT])));
 			AJXP_XMLWriter::close();
 			exit(1);
 		}
@@ -156,9 +156,9 @@ class svnAccessDriver extends AbstractAccessDriver {
 			$this->crtElement["filesize"] = Utils::roundSize(intval($this->cdataBuffer));
 		}else if($tag == "DATE" && $this->crtListingMode == "file_list"){
 			$date = $this->cdataBuffer;
-			$split = split("T",$date);
+			$split = explode("T",$date);
 			$realDate = $split[0];
-			$split = split("\.", $split[1]);
+			$split = explode("\.", $split[1]);
 			$realTime = $split[0];
 			$this->crtElement["modiftime"] = date("d/m/Y H:i", strtotime($realDate." ".$realTime));
 		}

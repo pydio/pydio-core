@@ -332,12 +332,12 @@ class ConfService
 			//print_r($xml);
 			if(isSet($results[0]) && count($results[0])){
 				foreach ($results[0] as $found){
-					$parts = split(" ", $found);
+					$parts = explode(" ", $found);
 					$nameSpace = "";
 					$path = "";
 					foreach($parts as $attPart){
 						if(strstr($attPart, "=") === false) continue;
-						$split = split("=", $attPart);
+						$split = explode("=", $attPart);
 						$attName = $split[0];						
 						$attValue = substr($split[1], 1, strlen($split[1])-2);
 						if($attName == "namespace") $nameSpace = $attValue;

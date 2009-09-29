@@ -229,11 +229,11 @@ class AJXP_Logger {
 		$months = array();
 		if(($handle = opendir($this->storageDir))!==false){
 			while($file = readdir($handle)){				
-				$split = split("\.", $file);
+				$split = explode("\.", $file);
 				if(!count($split) || $split[0] == "") continue;
-				$split2 = split("_", $split[0]);
+				$split2 = explode("_", $split[0]);
 				$date = $split2[1];
-				$dSplit = split("-", $date);
+				$dSplit = explode("-", $date);
 				$logY = $dSplit[2];
 				$logM = $dSplit[0];
 				$time = mktime(0,0,1,$dSplit[0], $dSplit[1], $dSplit[2]);

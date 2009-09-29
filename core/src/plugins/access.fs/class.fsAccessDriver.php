@@ -98,7 +98,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		// FILTER DIR PAGINATION ANCHOR
 		if(isSet($dir) && strstr($dir, "#")!==false){
-			$parts = split("#", $dir);
+			$parts = explode("#", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
 		}		
@@ -543,7 +543,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				foreach ($reps as $repIndex => $repName)
 				{
-					if((eregi("\.zip$",$repName) && $skipZip)) continue;
+					if((preg_match("/\.zip$/",$repName) && $skipZip)) continue;
 					$attributes = "";
 					if($searchMode)
 					{
@@ -588,7 +588,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						if(!$completeMode){
 							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
 							$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
-							if(eregi("\.zip$",$repName)){
+							if(preg_match("/\.zip$/",$repName)){
 								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
 							}
 							$attributes = "icon=\"$icon\"  openicon=\"$openicon\" filename=\"".SystemTextEncoding::toUTF8($folderFullName)."\" src=\"$link\"";
@@ -736,7 +736,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				// No block-size on system (probably busybox), try long output
 				$cmd = "ls -l \"".$file."\"";
 
-				$arr = preg_split("/[\s]+/", `$cmd`);
+				$arr = preg_explode("/[\s]+/", `$cmd`);
 				$val = trim($arr[4]);
 			}
 			if (strlen($val) == 0 || floatval($val) == 0){
@@ -937,7 +937,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						else if($orderBy=="filetype") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
 						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 					}
-					else if(eregi("\.zip$",$file) && ConfService::zipEnabled()){
+					else if(preg_match("/\.zip$/",$file) && ConfService::zipEnabled()){
 						if(!isSet($liste_zip)) $liste_zip = array();
 						$liste_zip[$file] = $file;
 					}
@@ -1057,7 +1057,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$i = 1;
 		$ext = "";
 		$name = "";
-		$split = split("\.", $fileName);
+		$split = explode("\.", $fileName);
 		if(count($split) > 1){
 			$ext = ".".$split[count($split)-1];
 			array_pop($split);
@@ -1119,7 +1119,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$fp=fopen($this->getPath()."/$crtDir/$newFileName","w");
 		if($fp)
 		{
-			if(eregi("\.html$",$newFileName)||eregi("\.htm$",$newFileName))
+			if(preg_match("/\.html$/",$newFileName)||preg_match("/\.htm$/",$newFileName))
 			{
 				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
 			}

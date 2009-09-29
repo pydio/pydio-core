@@ -178,7 +178,7 @@ class SSHOperations
     function parseLs($content)
     {
         // Check the first line 
-        $lines = split("\n", $content);
+        $lines = explode("\n", $content);
         if (stristr($lines[0], "total")) array_shift($lines);
 
         // Ok, split each line with a file
