@@ -88,7 +88,7 @@ class sshAccessDriver extends AbstractAccessDriver
 		if (!isset($_SESSION["cwd"]) || !strlen($_SESSION["cwd"]))
 		{
  		    $param = $this->SSHOperation->checkConnection();
-		    if (count($param)==0)
+		    if (count($param)==0 || strlen($param[0])==0)
 		    {
 		        return new AJXP_Exception("Cannot connect to remote server. Please check repository configuration and install.txt!");
 		    }
