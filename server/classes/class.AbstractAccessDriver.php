@@ -106,6 +106,7 @@ class AbstractAccessDriver extends AbstractDriver {
                      - FILE_PATH   The path to the file's content
                      - PASSWORD    If set, the written publiclet will ask for this password before sending the content
                      - ACTION      If set, action to perform
+                     - USER        If set, the AJXP user 
                      - EXPIRE_TIME If set, the publiclet will deny downloading after this time, and probably self destruct.
         @return the URL to the downloaded file
     */
@@ -121,6 +122,8 @@ class AbstractAccessDriver extends AbstractDriver {
         $data["DRIVER_NAME"] = $this->driverName;
         $data["XML_FILE_PATH"] = $this->xmlFilePath;
         $data["REPOSITORY"] = $this->repository;
+        // Force expanded path in publiclet
+        $data["REPOSITORY"]->addOption("PATH", $this->repository->getOption("PATH"));
         if ($data["ACTION"] == "") $data["ACTION"] = "download";
         // Create a random key
         $data["FINAL_KEY"] = md5(mt_rand().time());
