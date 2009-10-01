@@ -25,7 +25,6 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			// DISABLE NON-IMPLEMENTED FUNCTIONS FOR THE MOMENT
 			unset($this->actions["copy"]);
 			unset($this->actions["move"]);
-			unset($this->actions["chmod"]);
 			$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
 			$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
 		}
@@ -271,10 +270,18 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			//------------------------------------
 			case "chmod";
 			
-				$errorMessage = "function not implemented";
-	                        $reload_current_node = true;
-        	                if(isSet($dest_node)) $reload_dest_node = $dest_node;
-                	        $reload_file_list = true;
+				$files = $selection->getFiles();
+                	        if(@ftp_chmod($this->connect,$chmod_value, $this->getPath().$files[0])===false)
+                        	{
+                                	$error = "Error chmod";
+                        	}
+                        	if(isSet($error)){
+                                	$errorMessage = $error; break;
+                        	}
+                        	$logMessage="Successfully changed permission to ".$chmod_value." for ".$files[0];
+                        	$reload_file_list = $dir;
+                        	AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "file"=>$files[0]));
+	
 
 			break;
 			
