@@ -114,7 +114,9 @@ class fsAccessDriver extends AbstractAccessDriver
 				register_shutdown_function("restore_error_handler");				
 				if($selection->inZip){
 					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
-					@mkdir($this->getPath()."/".$tmpDir);
+ 			        $delDir = $this->getPath()."/".$tmpDir;
+					@mkdir($delDir);
+				    register_shutdown_function(array($this, "deldir"), $delDir);
 					$this->convertSelectionToTmpFiles($tmpDir, $selection);
 				}
 				$zip = false;
@@ -132,16 +134,11 @@ class fsAccessDriver extends AbstractAccessDriver
 					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpDownload.zip";
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing");
+					register_shutdown_function("unlink", $file);
 					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					$this->readFile($file, "force-download", $localName, false, false);
-					register_shutdown_function("unlink", $file);
 				}else{
 					$this->readFile($this->getPath()."/".$selection->getUniqueFile(), "force-download");
-				}
-				if(isSet($tmpDir)){
-					//$this->deldir($this->getPath()."/".$tmpDir);
-					$delDir = $this->getPath()."/".$tmpDir;
-					register_shutdown_function(array($this, "deldir"), $delDir);
 				}
 				exit(0);
 			break;
