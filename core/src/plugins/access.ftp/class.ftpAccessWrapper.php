@@ -21,7 +21,7 @@ class ftpAccessWrapper extends ftpAccessDriver implements AjxpWrapper {
     /**
      * Opens the strem
      *
-     * @param String $path Maybe in the form "ajxp.fs://repositoryId/pathToFile" 
+     * @param String $path Maybe in the form "ajxp.ftp://repositoryId/pathToFile" 
      * @param String $mode
      * @param unknown_type $options
      * @param unknown_type $opened_path
@@ -40,6 +40,15 @@ class ftpAccessWrapper extends ftpAccessDriver implements AjxpWrapper {
     	
     	$res = $this->initRepository();
     	$this->path = $this->secureFtpPath($this->path."/".$url["path"]);
+    	
+    	if($mode == "r"){    		
+    		if ($contents = @ftp_rawlist($this->connect,$this->path)!==FALSE){
+	    		$this->cacheRHandler = tmpfile();
+		        @ftp_fget($this->connect, $this->cacheRHandler, $this->path, FTP_BINARY, 0);
+	    		rewind($this->cacheRHandler);
+    		}
+    	}
+    	
     	return true;    	
     }
 
@@ -47,9 +56,7 @@ class ftpAccessWrapper extends ftpAccessDriver implements AjxpWrapper {
     {
     	if(!isSet($this->connect)) return ;
     	if(!isSet($this->cacheRHandler)){
-    		$this->cacheRHandler = tmpfile();
-	        ftp_fget($this->connect, $this->cacheRHandler, $this->path, FTP_BINARY, 0);
-    		rewind($this->cacheRHandler);
+    		return false;
     	}
         return fread($this->cacheRHandler, $count);
     }

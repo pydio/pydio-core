@@ -199,6 +199,7 @@ class AbstractAccessDriver extends AbstractDriver {
     function makePubliclet($filePath) {}
     
     function crossRepositoryCopy($httpVars){
+    	
     	ConfService::detectRepositoryStreams(true);
     	$mess = ConfService::getMessages();
 		$selection = new UserSelection();
@@ -214,23 +215,26 @@ class AbstractAccessDriver extends AbstractDriver {
     	$destRepoAccess = $destRepoObject->getAccessType();
     	$destStreamURL = "ajxp.$destRepoAccess://$destRepoId";
     	$messages = array();
-    	AJXP_XMLWriter::header();
     	foreach ($files as $file){
     		$origFile = $origStreamURL.$file;
-    		$destFile = $destStreamURL.$httpVars["dest"]."/".basename($file);
-			$origHandler = fopen($origFile, "r");			
+    		$destFile = $destStreamURL.$httpVars["dest"]."/".basename($file);    		
+			$origHandler = fopen($origFile, "r");
 			$destHandler = fopen($destFile, "w");
 			if($origHandler === false || $destHandler === false) {
-				AJXP_XMLWriter::sendMessage(null, $mess[114]." ($origFile to $destFile)", true);
+				$errorMessages[] = AJXP_XMLWriter::sendMessage(null, $mess[114]." ($origFile to $destFile)", false);
 				continue;
 			}
 			while(!feof($origHandler)){
-				fwrite($destHandler, fgets($origHandler));
+				fwrite($destHandler, fread($origHandler, 4096));
 			}
 			fflush($destHandler);
 			fclose($origHandler); 
 			fclose($destHandler);			
 			$messages[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($origFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destFile);
+    	}
+    	AJXP_XMLWriter::header();    	
+    	if(count($errorMessages)){
+    		AJXP_XMLWriter::sendMessage(null, join("\n", $errorMessages), true);
     	}
     	AJXP_XMLWriter::sendMessage(join("\n", $messages), null, true);
     	AJXP_XMLWriter::close();
