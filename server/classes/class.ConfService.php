@@ -215,6 +215,10 @@ class ConfService
 		$confDriver = ConfService::getConfStorageImpl();
 		$drvList = $confDriver->listRepositories();
 		if(is_array($drvList)){
+			foreach ($drvList as $repoId=>$repoObject){
+				$repoObject->setId($repoId);
+				$drvList[$repoId] = $repoObject;
+			}
 			$objList = array_merge($objList, $drvList);
 		}
 		return $objList;
@@ -277,11 +281,9 @@ class ConfService
 	 */
 	function getRepositoryById($repoId){
 		global $G_REPOSITORIES;
-		if(isSet($G_REPOSITORIES[$repoId])) return $G_REPOSITORIES[$repoId];
-		/*
-		$confStorage = ConfService::getConfStorageImpl();
-		return $confStorage->getRepositoryById($repoId);
-		*/
+		if(isSet($G_REPOSITORIES[$repoId])){ 
+			return $G_REPOSITORIES[$repoId];
+		}
 	}
 	
 	/**

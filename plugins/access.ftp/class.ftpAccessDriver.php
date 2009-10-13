@@ -40,6 +40,11 @@ class ftpAccessDriver extends  AbstractAccessDriver
                 if ($_SESSION["AJXP_CHARSET"] == "") $_SESSION["AJXP_CHARSET"] = $features["charset"];
 	            $_SESSION["ftpCharset"] = $_SESSION["AJXP_CHARSET"];
             }
+			$recycle = $this->repository->getOption("RECYCLE_BIN");
+			if($recycle != "" && $this->repository->detectStreamWrapper(true)){
+				RecycleBinManager::init("ajxp.ftp://".$this->repository->getUniqueId(), "/".$recycle);
+			}
+            
         }
 
         function getUserName($repository){
@@ -121,6 +126,10 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
 		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 		$mess = ConfService::getMessages();
+		$newArgs = RecycleBinManager::filterActions($action, $selection, $dir);
+		foreach ($newArgs as $argName => $argValue){
+			$$argName = $argValue;
+		}			
 		
 		switch($action)
 		{			
@@ -376,7 +385,6 @@ class ftpAccessDriver extends  AbstractAccessDriver
                 }
 				foreach ($reps as $repIndex => $repName)
 				{
-				 
 					if(is_string($repName) && (preg_match("/\.zip$/",$repName) && $skipZip)) continue;
 					$attributes = "";
 					if($searchMode)
@@ -432,6 +440,19 @@ class ftpAccessDriver extends  AbstractAccessDriver
 					print("<tree text=\"".str_replace("&", "&amp;", SystemTextEncoding::toUTF8($repName))."\" $attributes>");
 					print("</tree>");
 				}
+				// ADD RECYCLE BIN TO THE LIST				
+				if($nom_rep == $this->repository->getOption("PATH") && RecycleBinManager::recycleEnabled() && !$completeMode && !$skipZip)
+				{
+					$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
+					if($fileListMode)
+					{
+						print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
+					}
+					else 
+					{						
+						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".$recycleBinOption."\"/>");
+					}
+				}				
 				AJXP_XMLWriter::close();
 				exit(1);
 				
@@ -769,10 +790,20 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		                                                        
 			if($file!="." && $file!=".." )
 			{
+				if(RecycleBinManager::recycleEnabled()
+					&& $nom_rep == $this->repository->getOption("PATH")."/".$this->repository->getOption("RECYCLE_BIN")
+					&& $file == RecycleBinManager::getCacheFileName()){
+					continue;
+				}
 
 				$poidstotal+=$filetaille;
 				if($isDir)
 				{	
+					if(RecycleBinManager::recycleEnabled() 
+						&& $this->repository->getOption("PATH")."/".$this->repository->getOption("RECYCLE_BIN") == "$nom_rep/$file")
+					{
+						continue;
+					}					
 					$liste_rep[$file]=$info;
 					$liste_rep[$file]['icon']=Utils::mimetype("$nom_rep/$file","image", $isDir);
 					$liste_rep[$file]['type']=Utils::mimetype("$nom_rep/$file","type", $isDir);
@@ -908,8 +939,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
         
     function ftpMove($destDir, $srcFile, &$error, &$success){
 		$mess = ConfService::getMessages();
-        $destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
-        $realSrcFile = $this->repository->getOption("PATH")."/$srcFile";
+        $destFile = $this->secureFtpPath($this->repository->getOption("PATH").$destDir."/".basename($srcFile));
+        $realSrcFile = $this->secureFtpPath($this->repository->getOption("PATH")."/$srcFile");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");        
         
         $test = @ftp_rename($this->connect, $realSrcFile, $destFile);
@@ -921,6 +952,9 @@ class ftpAccessDriver extends  AbstractAccessDriver
         }
         if($test){
                 $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
+                if(RecycleBinManager::currentLocationIsRecycle(dirname($srcFile))){
+                	RecycleBinManager::deleteFromRecycle(basename($srcFile));
+                }
         }else{
         		$error[] = $mess[114];
         }
@@ -1055,13 +1089,16 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				{
 					$logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
 				}							
+				if(RecycleBinManager::currentLocationIsRecycle($dir)){
+					RecycleBinManager::deleteFromRecycle($selectedFile);
+				}
 			}
 			else
 			{
 				$logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
                                 continue;
 			}
-		}		
+		}
 		return null;
 	}
 
