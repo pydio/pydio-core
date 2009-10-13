@@ -20,7 +20,7 @@ class fsAccessWrapper implements AjxpWrapper {
     	$url = parse_url($path);
     	$repoId = $url["host"];
     	$repoObject = ConfService::getRepositoryById($repoId);
-    	if(!isSet($repoObject)) return false;
+    	if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
     	$filePath = $repoObject->getOption("PATH")."/".$url["path"];
     	try{
 	        $this->fp = fopen($filePath, $mode, $options);

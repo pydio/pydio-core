@@ -48,6 +48,9 @@ class fsAccessDriver extends AbstractAccessDriver
 		$create = $this->repository->getOption("CREATE");
 		$path = $this->repository->getOption("PATH");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
+		if($recycle != ""){
+			RecycleBinManager::init($path, "/".$recycle);
+		}
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
 			if(!is_dir($path)){
@@ -78,23 +81,10 @@ class fsAccessDriver extends AbstractAccessDriver
 		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
 		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 		$mess = ConfService::getMessages();
-		$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
-		// FILTER ACTION FOR DELETE
-		if($recycleBinOption!="" && $action == "delete" && $dir != "/".$recycleBinOption)
-		{
-			$action = "move";
-			$dest = "/".$recycleBinOption;
-			$dest_node = "AJAXPLORER_RECYCLE_NODE";
-		}
-		// FILTER ACTION FOR RESTORE
-		if($recycleBinOption!="" &&  $action == "restore" && $dir == "/".$recycleBinOption)
-		{
-			$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
-			if($originalRep != "")
-			{
-				$action = "move";
-				$dest = $originalRep;
-			}
+		
+		$newArgs = RecycleBinManager::filterActions($action, $selection, $dir);
+		foreach ($newArgs as $argName => $argValue){
+			$$argName = $argValue;
 		}
 		// FILTER DIR PAGINATION ANCHOR
 		if(isSet($dir) && strstr($dir, "#")!==false){
@@ -595,8 +585,9 @@ class fsAccessDriver extends AbstractAccessDriver
 					print("</tree>");
 				}
 				// ADD RECYCLE BIN TO THE LIST
-				if($nom_rep == $this->repository->getOption("PATH") && $recycleBinOption!="" && !$completeMode && !$skipZip)
+				if($nom_rep == $this->repository->getOption("PATH") && RecycleBinManager::recycleEnabled() && !$completeMode && !$skipZip)
 				{
+					$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
 					if($fileListMode)
 					{
 						print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
