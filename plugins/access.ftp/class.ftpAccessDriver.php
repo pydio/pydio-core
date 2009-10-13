@@ -23,8 +23,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
 			unset($this->actions["upload"]);
 			// DISABLE NON-IMPLEMENTED FUNCTIONS FOR THE MOMENT
-			unset($this->actions["copy"]);
-			unset($this->actions["move"]);
+			//unset($this->actions["copy"]);			
 			$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
 			$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
 		}
@@ -176,8 +175,12 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				$errorMessage = $mess[113];
 				break;
 			}
-			$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));	
-			$errorMessage = "function not implemented";
+			$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
+			if(count($error)){
+				$errorMessage = join("\n", $error);
+			}else{
+				$logMessage = join("\n", $success);
+			}			
 			$reload_current_node = true;
 			if(isSet($dest_node)) $reload_dest_node = $dest_node;
 			$reload_file_list = true;
@@ -895,14 +898,53 @@ class ftpAccessDriver extends  AbstractAccessDriver
 
                 foreach ($selectedFiles as $selectedFile)
                 {
-                        if($move && !is_writable(dirname($this->getPath()."/".$selectedFile)))
-                        {
-                                $error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
-                                continue;
-                        }
-                        $this->copyOrMoveFile($destDir, $selectedFile, $error, $success, $move);
+                	if($move){
+                		$this->ftpMove($destDir, $selectedFile, $error, $success);
+                	}else{
+                		$this->ftpCopy($destDir, $selectedFile, $error, $success);
+                	}
                 }
         }
+        
+    function ftpMove($destDir, $srcFile, &$error, &$success){
+		$mess = ConfService::getMessages();
+        $destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
+        $realSrcFile = $this->repository->getOption("PATH")."/$srcFile";
+		$recycle = $this->repository->getOption("RECYCLE_BIN");        
+        
+        $test = @ftp_rename($this->connect, $realSrcFile, $destFile);
+        $messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
+        if($destDir == "/".$recycle)
+        {
+                RecycleBinManager::fileToRecycle($srcFile);
+                $messagePart = $mess[123]." ".$mess[122];
+        }
+        if($test){
+                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
+        }else{
+        		$error[] = $mess[114];
+        }
+        
+    }
+
+    function ftpCopy($destDir, $srcFile, &$error, &$success){
+		$mess = ConfService::getMessages();
+		$this->repository->detectStreamWrapper(true);
+        $destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
+        $realSrcFile = $this->repository->getOption("PATH")."/$srcFile";
+        $tmpFile = tmpfile();
+        if(ftp_fget($this->connect, $tmpFile, $realSrcFile, FTP_BINARY)){
+        	rewind($tmpFile);
+        	$res = ftp_fput($this->connect, $destFile, $tmpFile, FTP_BINARY);
+        }
+        $messagePart = $mess[73]." ".SystemTextEncoding::toUTF8($destDir);
+        if($res){
+                $success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
+        }else{
+        		$error[] = $mess[114];
+        }
+    }
+        
 
 	function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
         {
@@ -1004,7 +1046,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			{
 				$data = $result[0][$selectedFile];
 
-				$this->deldir($data['name'],$dir);
+				$this->deldir($data['name'],$dir, $data['isDir']);
 				if ($data['isDir'])
 				{
 					$logMessages[]="$mess[38] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
@@ -1024,10 +1066,22 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	}
 
 
-	function deldir($dir,$currentDir) 
+	function deldir($dir,$currentDir, $isDir) 
 	{
 		if (($contents = ftp_rawlist($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir)))!==FALSE) 
 		{
+			if(!$isDir){
+					if (strpos($dir, $this->getPath())!== false)
+					{
+						@ftp_delete($this->connect,$this->secureFtpPath($dir));
+					}
+					else
+					{
+	     				@ftp_delete($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".basename($dir)));
+					}
+					return ;
+			}
+
 			foreach($contents as $file) 
 			{
            			if (preg_match("/^[.]{2}$|^[.]{1}$/", $file)==0) 
@@ -1056,7 +1110,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 					}
 				}			
 			}
-         		@ftp_rmdir($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir."/"));
+       		@ftp_rmdir($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir."/"));
 		} 
 	}
 	

@@ -59,6 +59,14 @@ class AJXP_XMLWriter
 		}
 	}
 	
+	function catchError($code, $message, $fichier, $ligne, $context){
+		$message = "$code : $message in $fichier (l.$ligne)";
+		AJXP_XMLWriter::header();
+		AJXP_XMLWriter::sendMessage(null, $message, true);
+		AJXP_XMLWriter::close();
+		exit(1);
+	}
+	
 	function reloadCurrentNode($print = true)
 	{
 		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\"/>", $print);
