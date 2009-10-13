@@ -236,7 +236,7 @@ class AJXP_Logger {
 				$dSplit = explode("-", $date);
 				$logY = $dSplit[2];
 				$logM = $dSplit[0];
-				$time = mktime(0,0,1,$dSplit[0], $dSplit[1], $dSplit[2]);
+				$time = mktime(0,0,1,intval($dSplit[0]), intval($dSplit[1]), intval($dSplit[2]));
 				$display = date("l d", $time);
 				$fullYear = date("Y", $time);
 				$fullMonth = date("F", $time);
@@ -262,9 +262,8 @@ class AJXP_Logger {
 	
 	function xmlLogs($date, $nodeName = "log"){
 				
-		$fName = $this->storageDir."log_".$date.".txt";
-		if(!is_file($fName) || !is_readable($fName)) return;
-		
+		$fName = $this->storageDir."log_".$date;
+		if(!is_file($fName) || !is_readable($fName)) return;		
 		$res = "";
 		$lines = file($fName);
 		foreach ($lines as $line){
