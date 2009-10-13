@@ -41,7 +41,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	            $_SESSION["ftpCharset"] = $_SESSION["AJXP_CHARSET"];
             }
 			$recycle = $this->repository->getOption("RECYCLE_BIN");
-			if($recycle != "" && $this->repository->detectStreamWrapper(true)){
+			if(class_exists("RecycleBinManager") && $recycle != "" && $this->repository->detectStreamWrapper(true)){
 				RecycleBinManager::init("ajxp.ftp://".$this->repository->getUniqueId(), "/".$recycle);
 			}
             
@@ -126,10 +126,12 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
 		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 		$mess = ConfService::getMessages();
-		$newArgs = RecycleBinManager::filterActions($action, $selection, $dir);
-		foreach ($newArgs as $argName => $argValue){
-			$$argName = $argValue;
-		}			
+		if(class_exists("RecycleBinManager")){
+			$newArgs = RecycleBinManager::filterActions($action, $selection, $dir);
+			foreach ($newArgs as $argName => $argValue){
+				$$argName = $argValue;
+			}			
+		}
 		
 		switch($action)
 		{			
@@ -1248,7 +1250,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
     /** The publiclet URL making */
     function makePubliclet($filePath, $password, $expire)
     {
-        $data = array("DRIVER"=>"ftp", "OPTIONS"=>array('account'=>$this->getUserName($this->repository), 'password'=>$this->getPassword($this->repository)), "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
+        $data = array("DRIVER"=>"ftp", 
+        			  "OPTIONS"=>array('user'=>$this->getUserName($this->repository), 'password'=>$this->getPassword($this->repository)), "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
         return $this->writePubliclet($data);
     }
 
