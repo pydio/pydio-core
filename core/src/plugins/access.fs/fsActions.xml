@@ -666,7 +666,8 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						$(this.treeCopy.id).observe("click", function(e){
 							ajaxplorer.foldersTree.clickNode(this.treeCopy.id);
 							Event.stop(e);
-						}.bind(this));						
+						}.bind(this));
+						$('external_repository').hide();
 						this.treeCopy.focus();
 					}.bind(ajaxplorer.actionBar);
 					var onCancel = function(){				
