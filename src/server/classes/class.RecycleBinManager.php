@@ -129,15 +129,15 @@ class RecycleBinManager
 		$result = array();
 		if(!RecycleBinManager::recycleEnabled()) return null;
 		$cachePath = RecycleBinManager::getRecyclePath()."/".RecycleBinManager::getCacheFileName();
-		$fp = fopen($cachePath, "r");
+		$fp = @fopen($cachePath, "r");
 		if($fp){
 			$s = "";
 			while(!feof($fp)){
 				$s .= fread($fp, 4096);
 			}
 			fclose($fp);
-		}
-		$result = unserialize($s);
+			$result = unserialize($s);
+		}		
 		return $result;
 	}
 	
