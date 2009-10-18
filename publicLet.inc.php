@@ -8,6 +8,7 @@ require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.UserSelection.php"); 
 require_once("server/classes/class.AbstractAccessDriver.php"); 
 require_once("server/classes/class.HTMLWriter.php"); 
+require_once("server/classes/class.RecycleBinManager.php"); 
 
 // Non working conf service 
 class ConfService
