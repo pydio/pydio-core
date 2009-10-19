@@ -61,7 +61,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		//Connects to the MySQL Database.		
 		$host = $this->repository->getOption("DB_HOST");
 		$dbname = $this->repository->getOption("DB_NAME");
-		$link = @mysql_connect($host, $this->user, $this->pass);
+		$link = @mysql_connect($host, $this->user, $this->password);
 		if(!$link) {
 			$ajxpExp = new AJXP_Exception("Cannot connect to server!");
 			AJXP_Exception::errorToXml($ajxpExp);
@@ -383,7 +383,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					$blobCols = array();
 					print '<columns switchDisplayMode="list" switchGridMode="grid">';
 					foreach ($result["COLUMNS"] as $col){
-						print "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(preg_match("primary", $col["FLAGS"])?"1":"0")."\" field_null=\"".(preg_match("not_null", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
+						print "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(preg_match("/primary/", $col["FLAGS"])?"1":"0")."\" field_null=\"".(preg_match("/not_null/", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
 						if(stristr($col["TYPE"],"blob")!==false && ($col["FLAGS"]!="" && stristr($col["FLAGS"], "binary"))){
 							$blobCols[]=$col["NAME"];
 						}
@@ -607,7 +607,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 
 			//Find the primary key
 			$flagstring = mysql_field_flags ($result, $i);
-			if(preg_match("primary",$flagstring )){
+			if(preg_match("/primary/",$flagstring )){
 				$pk[$z] = $i;
 				$pkfield[$z]= mysql_field_name($fields, $i);
 				$z++;
