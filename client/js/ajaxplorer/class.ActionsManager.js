@@ -544,7 +544,7 @@ ActionsManager = Class.create({
 				if(crtCount < toolbarsList.size()-1) {
 					var separator = new Element('div');
 					separator.addClassName('separator');
-					tBar.insert(separator);
+					tBar.insert({top:separator});
 				}
 				$('buttons_bar').insert(tBar);
 				crtCount ++;

@@ -111,7 +111,7 @@ Editor = Class.create({
 		this.textarea.setAttribute('wrap', 'off');	
 		this.oForm.appendChild(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
-		fitHeightToBottom($(this.textarea), $(modal.elementName), 5, true);
+		fitHeightToBottom($(this.textarea), $(modal.elementName), 0, true);
 	},
 	
 	loadFile : function(fileName){
@@ -235,7 +235,6 @@ Editor = Class.create({
 		this.oForm.relativize();
 		$$('.dialogContent')[0].insert(this.oForm);
 		this.oForm.setStyle({top:0,left:0,zIndex:100});
-		this.actionBar.setStyle({marginTop: -10});
 		this.oForm.fire("fullscreen:exit");
 		if(!this.currentUseCp){
 			this.textarea.setStyle({height:this.origContainerHeight});

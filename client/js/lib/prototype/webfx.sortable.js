@@ -149,8 +149,9 @@ SortableTable = Class.create({
 			c = cells[i];
 			if (this.sortTypes[i] != null && this.sortTypes[i] != "None") {
 				img = doc.createElement("IMG");
-				img.src = ajxpResourcesFolder+'/images/blank.png';
-				c.appendChild(img);
+				img.src = ajxpResourcesFolder+'/images/blank.png';				
+				$(c).insert({"top":img});
+				$(img).setStyle({cssFloat:'right', marginRight:'5px'});
 				if (this.sortTypes[i] != null)
 					c._sortType = this.sortTypes[i];
 				if (typeof c.addEventListener != "undefined")
@@ -206,7 +207,7 @@ SortableTable = Class.create({
 		for (var i = 0; i < l; i++) {
 			c = cells[i];
 			if (c._sortType != null && c._sortType != "None") {
-				c.removeChild(c.lastChild);
+				c.removeChild(c.firstChild);
 				if (typeof c.removeEventListener != "undefined")
 					c.removeEventListener("click", this._headerOnclick, false);
 				else if (typeof c.detachEvent != "undefined")
@@ -224,11 +225,10 @@ SortableTable = Class.create({
 		var img;
 		for (var i = 0; i < l; i++) {
 			if (cells[i]._sortType != null && cells[i]._sortType != "None") {
-				img = cells[i].lastChild;
+				img = cells[i].firstChild;
 				if (i == this.sortColumn)
 				{
-					//img.className = "sort-arrow " + (this.descending ? "descending" : "ascending");
-					img.className = "sort-arrow";
+					img.className = "sort-arrow " + (this.descending ? "descending" : "ascending");					
 					$(cells[i]).className = (this.descending ? "desc" : "asc");
 				}
 				else
