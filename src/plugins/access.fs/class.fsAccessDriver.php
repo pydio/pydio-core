@@ -724,7 +724,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				// No block-size on system (probably busybox), try long output
 				$cmd = "ls -l \"".$file."\"";
 
-				$arr = preg_explode("/[\s]+/", `$cmd`);
+				$arr = explode("/[\s]+/", `$cmd`);
 				$val = trim($arr[4]);
 			}
 			if (strlen($val) == 0 || floatval($val) == 0){
