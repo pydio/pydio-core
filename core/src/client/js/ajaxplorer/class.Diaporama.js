@@ -55,7 +55,7 @@ Diaporama = Class.create({
 		this.fitToScreenButton = div.select('img[id="fitToScreenButton"]')[0];
 		this.imgTag = div.select('img[id="mainImage"]')[0];
 		this.imgContainer = div.select('div[id="imageContainer"]')[0];
-		fitHeightToBottom(this.imgContainer, null, 5);
+		fitHeightToBottom(this.imgContainer);
 		this.zoomInput = div.select('input[id="zoomValue"]')[0];
 		this.timeInput = div.select('input[id="time"]')[0];
 		this.baseUrl = 'content.php?action=image_proxy&file=';
@@ -238,7 +238,6 @@ Diaporama = Class.create({
 		this.fullBox.relativize();
 		$(this.element).insert(this.fullBox);
 		this.fullBox.setStyle({top:0,left:0,zIndex:100});
-		this.actionBar.setStyle({marginTop: -10});
 		this.fullBox.fire("fullscreen:exit");
 		this.imgContainer.setStyle({height:this.origContainerHeight});
 		this.fullscreenMode = false;

@@ -2,20 +2,20 @@
 MAJOR STYLES
 */
 a:link {
-	color: #404040;
+	color: #676965;
 	text-decoration: none;
 }
 a:visited {
 	text-decoration: none;
-	color: #404040;
+	color: #676965;
 }
 a:hover {
 	text-decoration: none;
-	color: #404040;
+	color: #676965;
 }
 a:active {
 	text-decoration: none;
-	color: #404040;
+	color: #676965;
 }
 
 body, html
@@ -23,10 +23,7 @@ body, html
     margin: 0px;
     padding: 0px;    
     overflow: hidden;
-    background-color: #e0ecff;
-    background-image : url('../images/GradientBg.gif');
-    background-repeat : repeat-x;
-    background-position: top;
+    background-color: #c4c7c1;
 }
 
 input, textarea
@@ -129,16 +126,9 @@ DIALOG BOXES
     top: 30%;
     left: 30%;
     z-index: 1002;
-    /*
-    padding: 4px;
-    border:1px solid #ccc;
-    border-top-color:#fff;
-    border-left-color:#fff;
-    */
     background-color: #fff;
     font-family: Trebuchet MS, sans-serif;
     font-size: 12px;
-    /*width:250px;*/
 }
 
 .editBox
@@ -151,23 +141,18 @@ DIALOG BOXES
 
 .dialogTitle
 {
-    padding: 4px;
-    padding-top: 2px;
-    padding-bottom: 0px;
-    border: 1px solid #aaa;
-    border-bottom: 0px;
-    height: 23px;
-    background-image:url('../images/header_bg.png');
-    background-position: top;
-    background-repeat: repeat-x;
-    color: #333;
-    cursor:move;    
+	background-color:#DADDD7;
+	border:1px solid #989A95;
+	color:#333333;
+	cursor:move;
+	height:22px;
+	padding:3px 4px 0;
 }
 
 .dialogContent
 {
     padding: 10px 10px;
-    border: 1px solid #aaa;    
+    border: 1px solid #989A95;    
     border-top: 0px;
     background-image: url('../images/strip.png');
 }
@@ -339,19 +324,15 @@ ACTION BAR
 */
 .centeredWidth{
 	position: relative;
-    width: 96%;   
-    left:2%;
+    width: 99%;   
+    left:4px;
     min-width: 950px;
-    width:expression(document.body.clientWidth < 1000? "950px" : "96%" ); 
+    width:expression(document.body.clientWidth < 1000? "950px" : "99%" ); 
 }
 
 #toolbars
 {
-    /*background-color: #e0ecff;*/
-    padding:0px;
-    padding-bottom:2px;
     position:relative;
-    margin-bottom:3px;
 }
 
 .toolbars_separator
@@ -372,50 +353,46 @@ ACTION BAR
 
 #tree_container{
     background-color: #fff;
-    padding-top: 3px;
-    padding-left: 2px;
-    border-bottom: 1px solid #aaa;
+    /*padding-top: 3px;
+    padding-left: 2px;*/
+    border-bottom: 1px solid #676965;
 }
 
 .panelHeader{
-/*
-	border:	1px solid;
-	border-color:	#fff ButtonShadow
-					ButtonShadow #fff;
-*/					
-	background-image:url("../images/header_bg.png");
-	background-repeat:no-repeat;
-	background-position:top right;
     border: none;
-	background-color: #fff;
+	background-color: #f1f1ef;
 	font-family: Trebuchet MS, sans-serif;
 	font-size: 12px;
-	padding-top: 0px;
+	padding-top: 1px;
 	padding-left: 7px;
 	margin-bottom:0px;
-	color: #666;
-	height:23px;
+	color: #676965;
+	height:22px;
 	vertical-align: middle;
+	background-color: #f1f1ef;
+	border-bottom : 1px solid #676965;
 }
 
 #action_bar, 
 .action_bar
 {
-    /*background-color: #e0ecff;*/
+    background-color: #f1f1ef;
     font-family: Arial;
     font-size: 12px;
-    height: 88px;
-    padding: 0px;        
+    height: 86px;
+    padding: 0px;
 }
+
+#action_bar{
+    min-width: 950px;
+    width:expression(document.body.clientWidth < 1000? "950px" : "100%" ); 
+}
+
 .action_bar
 {
-	margin-top: -10px;
-	height: 52px;
-	/*
-    background-image : url('../images/GradientBg.gif');
-    background-repeat : repeat-x;
-    background-position: top;	
-    */
+	height: 51px;
+    background-color: transparent;
+    background-image:url(../images/ToolbarBg.gif);
 }
 
 #buttons_bar, #locationbar_cont
@@ -425,9 +402,11 @@ ACTION BAR
 
 #buttons_bar
 {
-	height: 53px;
-	padding-left: 7px;
-	padding-top: 6px;
+	background-image:url(../images/ToolbarBg.gif);
+	border-bottom:1px solid #C4C7C1;
+	height:51px;
+	padding-left:0px;
+	padding-top:0;
 }
 
 #action_bar a, 
@@ -435,8 +414,6 @@ ACTION BAR
 {    
 	background-repeat: no-repeat;
 	background-position: center;
-	color:#dfebfe;
-	color: expression('#dfebfe');
 	display:block;
 	float:left;
 	font-size:9px;
@@ -454,13 +431,10 @@ ACTION BAR
 
 .action_bar a
 {
-	color:#084165!important;
-	color: expression('#084165');
 }
 #action_bar a:hover, 
 .action_bar a:hover
 {
-	color: #fff;
 }
 
 #action_bar a.disabled,
@@ -482,20 +456,17 @@ ACTION BAR
 #action_bar div.separator,
 .action_bar div.separator
 {    
-	background-color:#FFFFFF;
+	border-left:1px solid #c4c7c1;
+	border-right:1px solid #c4c7c1;
 	display:block;
 	float:left;
 	font-size:10px;
 	height:51px;
-	margin-left:0px;
+	margin-left:0;
 	margin-right:9px;
-	filter:alpha(opacity=30);
-	opacity: 0.3;
-	-moz-opacity:0.3;
-	padding-bottom:2px;
-	padding-top:0px;
+	padding-top:0;
 	text-align:center;
-	width:1px;
+	width:3px;
 }
 
 .action_bar div.separator
@@ -505,32 +476,25 @@ ACTION BAR
 
 #locationbar_cont
 {
-    width: 100%;
-    float:left;
-    margin-top:6px;
-    height: 22px;
-    border: 1px solid #999;
-    border-width: 1px 0px;
-    background-image:url('../images/header_bg.png');
-    background-repeat:  repeat-x;
-    background-position: top;
+	background-image:url(../images/ToolbarBg.gif);
+	background-position:center center;
+	background-repeat:repeat-x;
+	float:left;
+	width:100%;
 }
 
 #location_form,
 #repository_form
 {
-    background-color:#fff;
-    border: 1px solid #bbb;
-    border-width: 0px 1px 0px 1px;
-    height: 20px;
-    height:expression('22px');
-    width: 350px;
-    float:left;
-    padding:2px 0px 0px 5px;
-    background-image:url('../images/locationBg.gif');
-    background-repeat: no-repeat;
-    background-position: top left;
-    
+	background-color:#FFFFFF;
+	background-image:url(../images/locationBg.gif);
+	background-position:left top;
+	background-repeat:no-repeat;
+	border:1px solid #BBBBBB;
+	float:left;
+	height:20px;
+	padding:2px 0 0 5px;
+	width:350px;    
 }
 
 #location_form
@@ -540,8 +504,7 @@ ACTION BAR
 
 #repository_form
 {
-    width: 100px;
-    border-left: 0px;
+    width: 120px;
 }
 
 #location_form input, 
@@ -556,7 +519,7 @@ ACTION BAR
 
 #repository_form input
 {
-    width: 70px;
+    width: 90px;
     margin-left: 3px;
 }
 
@@ -565,8 +528,6 @@ ACTION BAR
 #bookmarks_goto
 {
     border: 1px solid #bbb;
-    border-top:0px;
-    border-bottom:0px;
     float: left;
     height: 22px;
     padding-right: 2px;
@@ -593,7 +554,7 @@ ACTION BAR
 {
    padding: 0px;
    cursor: pointer;
-   border-right:0px;
+   margin-right : 7px;
 }
 /*
 #logging_string
@@ -611,6 +572,7 @@ ACTION BAR
 	font-family:Trebuchet MS,sans-serif;
 	font-size:12px;
    padding-top: 3px;
+   padding-right: 4px;
 }
 #logging_string i
 {
@@ -667,11 +629,8 @@ ACTION BAR
 
 .selected-focus
 {
-    /*background: #0a246a !important;*/
     color: #fff !important;
-background-color:#22507f !important;
-background-image:url(../images/GradientBgSelected.gif);
-background-position:center middle;    
+	background-color:#73a2d7 !important;
 }
 
 .droppableZone
@@ -911,7 +870,6 @@ UPLOAD MULTIFILE FORM
 .toggleHeader
 {
     width: 50%;
-    background-image: url('../images/header_bg_on.png');
 	cursor:	pointer;
 	padding-right: 2px;
 }
@@ -928,7 +886,7 @@ UPLOAD MULTIFILE FORM
 
 .toggleInactive
 {
-    background-image: url('../images/header_bg.png');
+    background-color:#DADDD7;
 }
 
 .toggleInactive a, .toggleInactive a:link, .toggleInactive a:visited, .toggleInactive a:hover , .toggleInactive a:active
@@ -1012,7 +970,12 @@ UPLOAD MULTIFILE FORM
 
 .infoPanelActions
 {
-    padding: 0px 10px;    
+	background-color:#F1F1EF;
+	border:1px solid #676965;
+	margin-bottom:10px;
+	margin-left:10px;
+	margin-right:10px;
+	padding:5px;
 }
 
 #info_panel
@@ -1020,14 +983,23 @@ UPLOAD MULTIFILE FORM
 	overflow:auto;
 }
 
-#info_panel a, #info_panel a:hover
+#info_panel a
 {
-    color:#79f;
-    font-size: 14px;
-    font-weight: bold;
+    color:#676965;
     display: block;
-    padding-bottom: 10px;
+    padding: 5px 3px;
 }
+
+#info_panel a:hover
+{
+	color : #000;
+	font-weight : bold;
+}
+
+#info_panel a img{
+	margin-right : 5px;
+} 
+
 #info_panel a:hover
 {
    text-decoration:none;
@@ -1041,12 +1013,11 @@ UPLOAD MULTIFILE FORM
 
 #browser_round
 {
-    padding:0px;
-    margin-bottom:0px;
+	border : 1px solid #676965;
+    padding:4px;
 }
 
 #browser{
-   /*padding: 8px;*/
    padding-bottom:0px;
 }
 
@@ -1066,8 +1037,9 @@ UPLOAD MULTIFILE FORM
 
 .vsplitbar
 {
-   width: 5px;
+   width: 4px;
    background-color: #e0ecff;
+   background-color: #c4c7c1;
    background-image: url(../images/vgrabber.gif);
    background-repeat: no-repeat;
    background-position: center;
@@ -1088,8 +1060,9 @@ UPLOAD MULTIFILE FORM
 
 .hsplitbar
 {
-   height: 5px;
+   height: 4px;
    background-color: #e0ecff;
+   background-color: #c4c7c1;
    background-image: url(../images/hgrabber.gif);
    background-repeat: no-repeat;
    background-position: center;
@@ -1115,12 +1088,12 @@ UPLOAD MULTIFILE FORM
 
 #docFileIframe
 {
-    position:relative;
-    top: 10px;
-    left: 15px;
-    width: 400px;
-    height: 230px;
-    border: 1px solid #aaa;
+	border-bottom:1px solid #AAAAAA;
+	height:300px;
+	left:0;
+	position:relative;
+	top:0;
+	width:100%;
 }
 
 #adminIFrame
@@ -1430,7 +1403,7 @@ div.autocomplete ul
 }
 div.autocomplete ul li.selected 
 { 
-      background-color: #0a246a;
+      background-color: #73a2d7;
 }
 div.autocomplete ul li 
 {
@@ -1476,10 +1449,8 @@ div.menu a {
 
 .menu.desktop {
 	width: 9em;
-	background: #fff;
-	border: 1px solid #999;
-    /*border-bottom-color: #999;
-    border-right-color: #999;*/
+	background: #f1f1ef;
+	border: 1px solid #676965;
 	padding: 0;
     padding-top: 0px;
     padding-bottom: 1px;
@@ -1532,13 +1503,12 @@ padding: 0px;
 }
 .menu.desktop li.separator {
 	border-bottom: 1px solid #fff;
-	background: #cde;
 	margin: 1px 1px 0 1px;
 	line-height: 1px !important;
 }
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
-	background-color: #0A246A;
+	background-color: #73a2d7;
 	color: #fff;
 }
 
@@ -1548,9 +1518,9 @@ padding: 0px;
    font-family: Trebuchet MS, sans-serif, Helvetica, sans-serif;
    position:absolute;
    z-index: 1500;
-   background-color:white;  
-   width: 130px;
-   border: 1px solid #aaa;
+   background-color:#f1f1ef;  
+   width: 150px;
+   border: 1px solid #676965;
 }
 
 .rootDirChooser img
@@ -1600,8 +1570,8 @@ padding: 0px;
    font-family: Trebuchet MS, Helvetica, sans-serif;
    position:absolute;
    z-index: 1500;
-   background-color:white;  
-   border: 1px solid #aaa;
+   background-color:#f1f1ef;  
+   border: 1px solid #676965;
    width: 250px;
    padding: 2px;
 }
