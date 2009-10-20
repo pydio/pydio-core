@@ -336,7 +336,7 @@ AJXP_MESSAGE[174]<br/>
 					modal.showDialogForm('Edit Online', 'edit_box', loadFunc, null, null, true, true);
 					]]></clientCallback>
 				<clientForm id="edit_box"><![CDATA[
-					<div id="edit_box" action="editer" box_width="80%" box_height="90%">
+					<div id="edit_box" action="editer" box_width="80%" box_height="90%" box_padding="0">
 						<div class="action_bar">
 							<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86">AJXP_MESSAGE[86]</span></a>
 							<a href="#" onclick="return false;" id="fsButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235">AJXP_MESSAGE[235]</span></a>
@@ -376,8 +376,9 @@ AJXP_MESSAGE[174]<br/>
 						modal.showDialogForm('Diaporama', 'diaporama_box', loadFunc, closeFunc, null, true, true);
 					]]></clientCallback>
 				<clientForm id="diaporama_box"><![CDATA[
-				<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%">
-					<div class="action_bar" style="width: 500px;">
+				<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_padding="0">
+					<div class="action_bar" style="width: 100%;">
+						<div class="separator"></div>
 						<a href="#" onclick="return false;" id="closeButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86">AJXP_MESSAGE[86]</span></a>
 						<a href="#" onclick="return false;" id="fsButton"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235">AJXP_MESSAGE[235]</span></a>
 						<a href="#" onclick="return false;" id="nofsButton" style="display:none;"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236">AJXP_MESSAGE[236]</span></a>
@@ -390,14 +391,14 @@ AJXP_MESSAGE[174]<br/>
 						<div class="separator"></div>
 						<a href="#" id="downloadDiapoButton" onclick="return false;"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="" border="0"><br><span message_id="88">AJXP_MESSAGE[88]</span></a>
 					</div>
-					<div align="right" style="background-image: url(AJXP_CLIENT_RESOURCES_FOLDER/images/header_bg_plain.png); padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
+					<div align="right" style="background-image: url(AJXP_CLIENT_RESOURCES_FOLDER/images/ToolbarBg.gif); background-position:center center; padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
 					<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
 					<td><img class="diaporamaButton" width="16" height="16" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
 					<td><div class="slider" id="slider-2"><input class="slider-input" id="slider-input-2" name="slider-input-2"/></div></td>
 					<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td>
 					<td style="padding-left: 10px;"><input id="time" type="text" value="3" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> s</td></tr></table>
 					</div>
-					<div style="width:100%; text-align:center; vertical-align:center;overflow:auto; background-color:#333; border:1px solid black;" id="imageContainer">
+					<div style="text-align:center; vertical-align:center;overflow:auto; background-color:#676965; border:1px solid black;" id="imageContainer">
 					<img id="mainImage" src="" style="border: 4px solid white;">
 					</div>
 				</div>				
