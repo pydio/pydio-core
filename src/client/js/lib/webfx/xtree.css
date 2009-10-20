@@ -6,14 +6,26 @@
 	font-size: 11px;
 }
 
-.webfx-tree-item {
+.webfx-tree-item
+{
 	padding: 0px;
 	margin: 0px;
 	font-family: Trebuchet MS, sans-serif;
 	font-size: 11px;
 	color: WindowText;
 	white-space: nowrap;
-	height: 16px;
+	height: 20px;
+}
+
+.selected-webfx-tree-item {
+	background-color : #73a2d7;
+	color : white;
+}
+
+.selected-webfx-tree-item-inactive 
+{
+	background: #ddd;
+	text-decoration: none;
 }
 
 .webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover {
@@ -21,8 +33,7 @@
 	padding: 0px 2px 1px 2px;
 }
 
-.webfx-tree-item a {
-	color: black;
+.webfx-tree-item a {	
 	text-decoration: none;
 }
 
@@ -30,22 +41,22 @@
 	text-decoration: none;
 }
 
-.webfx-tree-item a:active {
-	background-color:#E0ECFF;
-	color: white;
+.webfx-tree-item a:focus {
+	outline:none;
+}
+
+*::-moz-focus-inner { 
+	border: none; 
+}
+
+.selected-webfx-tree-item a {
+	color: white !important;
 	text-decoration: none;
 }
 
 
 .webfx-tree-item a.selected-focus{
       color: white;
-}
-
-.webfx-tree-item a.selected-inactive 
-{
-	border: 1px solid #ddd;
-	background: #ddd;
-	text-decoration: none;
 }
 
 .webfx-tree-item img {

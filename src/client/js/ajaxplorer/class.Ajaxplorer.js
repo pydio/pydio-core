@@ -340,7 +340,7 @@ Ajaxplorer = Class.create({
 				anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
 				anchorTitle:MessageHash[200],
 				topOffset:6,
-				leftOffset:-107,
+				leftOffset:-127,
 				menuTitle:MessageHash[200],
 				menuItems: actions,
 				fade:true,

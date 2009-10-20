@@ -92,6 +92,10 @@ Modal = Class.create({
 			this.addSubmitCancel(newForm, fOnCancel, bOkButtonOnly);
 		}
 		this.dialogContent.appendChild(newForm);
+		var boxPadding = $(sFormId).getAttribute("box_padding");
+		if(!boxPadding) boxPadding = 10;
+		this.dialogContent.setStyle({padding:boxPadding});
+
 		
 		if(fOnComplete)	{
 			newForm.onsubmit = function(){
