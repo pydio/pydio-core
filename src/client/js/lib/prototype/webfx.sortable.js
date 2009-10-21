@@ -148,10 +148,10 @@ SortableTable = Class.create({
 		for (var i = 0; i < l; i++) {
 			c = cells[i];
 			if (this.sortTypes[i] != null && this.sortTypes[i] != "None") {
-				img = doc.createElement("IMG");
-				img.src = ajxpResourcesFolder+'/images/blank.png';				
+				img = doc.createElement("div");
+				$(img).setStyle({cssFloat:'right', marginRight:'5px', width:'16px', height:'16px'});				
 				$(c).insert({"top":img});
-				$(img).setStyle({cssFloat:'right', marginRight:'5px'});
+				$(img).addClassName("sort-arrow");
 				if (this.sortTypes[i] != null)
 					c._sortType = this.sortTypes[i];
 				if (typeof c.addEventListener != "undefined")
