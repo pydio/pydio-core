@@ -4,7 +4,7 @@
 	<div id="buttons_bar">
 	</div>
 	<div id="locationbar_cont">
-		<div style="height: 34px;" class="separator"></div>
+		<div style="height: 33px;" class="separator"></div>
 		<div style="padding-top : 5px;">
 			<div id="repository_form"><img id="repo_icon" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/network-wired.png" width="16" height="16" align="absmiddle"><input type="text" name="repo_path" value="Default Files" id="repo_path"></div>
 			<div id="repository_goto"><img  align="absmiddle" title="<?php print($mess[200]); ?>" ajxp_message_title_id="200" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/lower.png" id="goto_repo_button" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;"></div>
@@ -28,7 +28,7 @@
 	<div id="sidebarSplitter" style="float:left; overflow:hidden;">
 		<div style="" id="topPane"  style="overflow: hidden;">
 		<div style="border: 1px solid #676965;border-bottom: 0px;">
-		    <div id="dir_chooser" class="panelHeader"><div style="padding-top:2px;"><ajxp:message ajxp_message_id="130"><?php print $mess[130] ?></ajxp:message> </div></div>
+		    <div id="dir_chooser" class="panelHeader"><ajxp:message ajxp_message_id="130"><?php print $mess[130] ?></ajxp:message></div>
 	    	<div id="tree_container" style="overflow:auto;height:100%;width:100%;">
 	    	
 	    	</div>
@@ -76,7 +76,7 @@
 <div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
 <script type="text/javascript">
 try{
-	var marginBottom = (Prototype.Browser.IE?8:5);
+	var marginBottom = (Prototype.Browser.IE?4:3);
 	if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
 		marginBottom = $('optional_bottom_div').getHeight();
 	}
