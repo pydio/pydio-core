@@ -157,7 +157,7 @@ FilesList = Class.create(SelectableElements, {
 	createPaginator: function(){
 		var current = parseInt(this.paginationData.get('current'));
 		var total = parseInt(this.paginationData.get('total'));
-		var div = new Element('div').setStyle({height: '20px', backgroundColor:'#FFFFC1', borderBottom: '1px solid #ddd',fontFamily:'Trebuchet MS', fontSize:'11px', textAlign:'center', paddingTop: '2px'});
+		var div = new Element('div').addClassName("paginator");
 		div.update('Page '+current+'/'+total);
 		if(current>1){
 			div.insert({top:this.createPaginatorLink(current-1, '<b>&lt;</b>&nbsp;&nbsp;&nbsp;', 'Previous')});

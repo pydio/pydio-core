@@ -308,14 +308,14 @@ textarea#myCode
 
 #progressBar
 {
-	background-color: #084165;
+	background-color: #73a2d7;
 	height: 10px;
 	width: 0%;
 }
 
 #progressState
 {
-    color:#084165;
+    color:#f1f1ef;
 }
 
 
@@ -327,7 +327,7 @@ ACTION BAR
     width: 99%;   
     left:4px;
     min-width: 950px;
-    width:expression(document.body.clientWidth < 1000? "950px" : "99%" ); 
+    width:expression(document.body.clientWidth < 950? "950px" : "99%" ); 
 }
 
 #toolbars
@@ -363,11 +363,9 @@ ACTION BAR
 	background-color: #f1f1ef;
 	font-family: Trebuchet MS, sans-serif;
 	font-size: 12px;
-	padding-top: 1px;
-	padding-left: 7px;
+	padding: 3 2 2 7;
 	margin-bottom:0px;
 	color: #676965;
-	height:22px;
 	vertical-align: middle;
 	background-color: #f1f1ef;
 	border-bottom : 1px solid #676965;
@@ -379,7 +377,7 @@ ACTION BAR
     background-color: #f1f1ef;
     font-family: Arial;
     font-size: 12px;
-    height: 86px;
+    height: 85px;
     padding: 0px;
 }
 
@@ -423,18 +421,11 @@ ACTION BAR
 	padding:0px;
 	text-align:center;
 	overflow:visible;
+	color: expression('#676965');
 }
 
 .action_bar a span{
 	padding: 0 5px;
-}
-
-.action_bar a
-{
-}
-#action_bar a:hover, 
-.action_bar a:hover
-{
 }
 
 #action_bar a.disabled,
@@ -442,7 +433,7 @@ ACTION BAR
 #action_bar a.disabled:hover,
 .action_bar a.disabled:hover
 {
-    color: expression('#8caac3');
+    color: expression('#c4c7c1');
 }
 
 #action_bar a img,
@@ -637,6 +628,19 @@ ACTION BAR
 {
    background-color: #c3d9ff;
    /*border: 1px dotted #666;*/
+}
+
+.paginator
+{
+	background-color:#fff8d1;
+	border-bottom-color:#dddddd;
+	border-bottom-style:solid;
+	border-bottom-width:1px;
+	font-family:Trebuchet MS;
+	font-size:11px;
+	height:20px;
+	padding-top:2px;
+	text-align:center;
 }
 
 
@@ -1014,7 +1018,7 @@ UPLOAD MULTIFILE FORM
 #browser_round
 {
 	border : 1px solid #676965;
-    padding:4px;
+    padding:3px;
 }
 
 #browser{

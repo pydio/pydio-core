@@ -50,15 +50,15 @@
 	background-color: #daddd7;
 }
 .sort-arrow {
-	width:					16px;
-	height:					16px;
+	display:block;
+	width:16px;
+	height:16px;	
 }
 
 .sort-arrow.descending {
 	background-image:		url("../images/crystal/raise.png");
 	background-repeat : no-repeat;
 	background-position : right center;
-
 }
 
 .sort-arrow.ascending {
