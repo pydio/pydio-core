@@ -110,7 +110,7 @@ SearchEngine = Class.create({
 	},
 	
 	resize: function(){
-		fitHeightToBottom(this._resultsBox, null, 10, true);
+		fitHeightToBottom(this._resultsBox, null, (Prototype.Browser.IE?1:2), true);
 	},
 	
 	focus : function(){
