@@ -229,7 +229,7 @@ class AJXP_Logger {
 		$months = array();
 		if(($handle = opendir($this->storageDir))!==false){
 			while($file = readdir($handle)){				
-				$split = explode("\.", $file);
+				$split = explode(".", $file);
 				if(!count($split) || $split[0] == "") continue;
 				$split2 = explode("_", $split[0]);
 				$date = $split2[1];
@@ -262,7 +262,7 @@ class AJXP_Logger {
 	
 	function xmlLogs($date, $nodeName = "log"){
 				
-		$fName = $this->storageDir."log_".$date;
+		$fName = $this->storageDir."log_".$date.".txt";
 		if(!is_file($fName) || !is_readable($fName)) return;		
 		$res = "";
 		$lines = file($fName);
