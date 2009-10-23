@@ -210,6 +210,7 @@ InfoPanel = Class.create({
 			count++;
 		}.bind(this));
 		actionString += '</div>';
+		if(!count) return;
 		this.htmlElement.insert(actionString);
 	},
 	
