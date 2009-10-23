@@ -86,7 +86,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * 							enabled BOOLEAN );
 	 * 
 	 * Additionally, the options are stored in a separate table:
-	 * CREATE TABLE ajxp_repo_options ( oid INTEGER PRIMARY KEY, uuid VARCHAR(33), key VARCHAR(50), value VARCHAR(255) );
+	 * CREATE TABLE ajxp_repo_options ( oid INTEGER PRIMARY KEY, uuid VARCHAR(33), name VARCHAR(50), val VARCHAR(255) );
 	 * 
 	 * I recommend an index to increase performance of uuid lookups:
 	 * CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options ( uuid );
@@ -157,7 +157,7 @@ class sqlConfDriver extends AbstractConfDriver {
 		foreach ($all as $repo_row) {
 
 			$res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-			$opts = $res_opts->fetchPairs('key', 'value');
+			$opts = $res_opts->fetchPairs('name', 'val');
 			$repo = $this->repoFromDb($repo_row, $opts);
 						
 			$repositories[$repo->getUniqueId()] = $repo;	
@@ -178,7 +178,7 @@ class sqlConfDriver extends AbstractConfDriver {
 		if (count($res) > 0) {
 			$repo_row = $res->fetchSingle();
 			$res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-			$opts = $res_opts->fetchPairs('key', 'value');
+			$opts = $res_opts->fetchPairs('name', 'val');
 			$repository = $this->repoFromDb($repo_row, $opts);	
 			return $repository;
 		}
@@ -207,8 +207,8 @@ class sqlConfDriver extends AbstractConfDriver {
 					dibi::query('INSERT INTO [ajxp_repo_options]', 
 						Array(
 							'uuid' => $repositoryObject->getUniqueId(),
-							'key' => $k,
-							'value' => $v
+							'name' => $k,
+							'val' => $v
 						)
 					);
 				}
@@ -221,15 +221,8 @@ class sqlConfDriver extends AbstractConfDriver {
 				dibi::query('UPDATE [ajxp_repo] SET ', $repository_array);
 				
 				foreach ($options as $k => $v ) {
-					dibi::query('UPDATE [ajxp_repo_options] SET [value] = %s WHERE [uuid] = %s AND [key] = %s', 
+					dibi::query('UPDATE [ajxp_repo_options] SET [val] = %s WHERE [uuid] = %s AND [name] = %s', 
 						$v, $repositoryObject->getUniqueId(), $k);
-						/*
-						Array(
-							'uuid' => $repositoryObject->getUniqueId(),
-							'key' => $k,
-							'value' => $v
-						)
-					);*/
 						
 				}
 			}
