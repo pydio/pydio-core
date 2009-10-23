@@ -44,7 +44,7 @@ require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
  * The class will expect these schema objects to be present:
  *
  * CREATE TABLE ajxp_user_rights ( rid INTEGER PRIMARY KEY, login VARCHAR(255), repo_uuid VARCHAR(33), rights VARCHAR(20));
- * CREATE TABLE ajxp_user_prefs ( rid INTEGER PRIMARY KEY, login VARCHAR(255), key VARCHAR(255), value VARCHAR(255));
+ * CREATE TABLE ajxp_user_prefs ( rid INTEGER PRIMARY KEY, login VARCHAR(255), name VARCHAR(255), val VARCHAR(255));
  * CREATE TABLE ajxp_user_bookmarks ( rid INTEGER PRIMARY KEY, login VARCHAR(255), repo_uuid VARCHAR(33), path VARCHAR(255), title VARCHAR(255));
  * 
  * 		
@@ -264,7 +264,7 @@ class AJXP_User extends AbstractAjxpUser
 				// Delete an existing preferences row, because the value has been unset.
 				if ('' == $prefValue) {
 	
-					dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s AND [key] = %s', $this->getId(), $prefName);
+					dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
 					
 					$this->log('DELETE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
 					unset($this->prefs[$prefName]); // Update the internal array only if successful.
@@ -272,7 +272,7 @@ class AJXP_User extends AbstractAjxpUser
 				// Update an existing rights row, because only some of the rights have changed.
 				} else {
 	
-					dibi::query('UPDATE [ajxp_user_prefs] SET ', Array('value'=>$prefValue), 'WHERE [login] = %s AND [key] = %s', $this->getId(), $prefName);
+					dibi::query('UPDATE [ajxp_user_prefs] SET ', Array('val'=>$prefValue), 'WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
 					
 					$this->log('UPDATE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
 					$this->prefs[$prefName] = $prefValue;
@@ -283,8 +283,8 @@ class AJXP_User extends AbstractAjxpUser
 	
 				dibi::query('INSERT INTO [ajxp_user_prefs]', Array(
 					'login' => $this->getId(),
-					'key' => $prefName,
-					'value' => $prefValue		
+					'name' => $prefName,
+					'val' => $prefValue		
 				));
 				
 				$this->log('INSERT PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
@@ -419,8 +419,8 @@ class AJXP_User extends AbstractAjxpUser
 			$this->setAdmin(true);
 		}
 		
-		$result_prefs = dibi::query('SELECT [key], [value] FROM [ajxp_user_prefs] WHERE [login] = %s', $this->getId());
-		$this->prefs = $result_prefs->fetchPairs('key', 'value');
+		$result_prefs = dibi::query('SELECT [name], [val] FROM [ajxp_user_prefs] WHERE [login] = %s', $this->getId());
+		$this->prefs = $result_prefs->fetchPairs('name', 'val');
 		
 		$result_bookmarks = dibi::query('SELECT [repo_uuid], [path], [title] FROM [ajxp_user_bookmarks] WHERE [login] = %s', $this->getId());
 		$all_bookmarks = $result_bookmarks->fetchAll();
@@ -448,18 +448,10 @@ class AJXP_User extends AbstractAjxpUser
 		$this->log('Saving user...');
 		
 		if($this->isAdmin() === true){
-			//$this->rights["ajxp.admin"] = true;
 			$this->setRight("ajxp.admin", "1");
 		}else{
-			//$this->rights["ajxp.admin"] = false;
 			$this->setRight("ajxp.admin", "0");
 		}
-		
-		/*
-		$this->saveRights();
-		$this->savePrefs();
-		$this->saveBookmarks();
-		*/
 	}	
 	
 	/*
