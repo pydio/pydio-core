@@ -2369,7 +2369,7 @@
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
       //--(MAGIC-PclTrace)--//PclTraceFctMessage(__FILE__, __LINE__, 4, "Read $v_read_size bytes");
-      $v_buffer = fread($this->zip_fd, $v_read_size);
+      $v_buffer = @fread($this->zip_fd, $v_read_size);
       @fwrite($v_zip_temp_fd, $v_buffer, $v_read_size);
       $v_size -= $v_read_size;
     }
@@ -2858,7 +2858,9 @@
         }
 
         // ----- Read the file content
-        $v_content = @fread($v_file, $p_header['size']);
+        if(filesize($p_filename)>0){
+	        $v_content = @fread($v_file, $p_header['size']);
+        }
 
         // ----- Close the file
         @fclose($v_file);
@@ -3070,7 +3072,7 @@
     while ($v_size != 0) {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
       //--(MAGIC-PclTrace)--//PclTraceFctMessage(__FILE__, __LINE__, 2, "Read $v_read_size bytes");
-      $v_buffer = fread($v_file, $v_read_size);
+      $v_buffer = @fread($v_file, $v_read_size);
       //$v_binary_data = pack('a'.$v_read_size, $v_buffer);
       @gzputs($v_file_compressed, $v_buffer, $v_read_size);
       $v_size -= $v_read_size;
@@ -3150,7 +3152,7 @@
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
       //--(MAGIC-PclTrace)--//PclTraceFctMessage(__FILE__, __LINE__, 2, "Read $v_read_size bytes");
-      $v_buffer = fread($v_file_compressed, $v_read_size);
+      $v_buffer = @fread($v_file_compressed, $v_read_size);
       //$v_binary_data = pack('a'.$v_read_size, $v_buffer);
       @fwrite($this->zip_fd, $v_buffer, $v_read_size);
       $v_size -= $v_read_size;
