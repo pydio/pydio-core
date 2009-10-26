@@ -107,8 +107,9 @@ if(AuthService::usersEnabled())
 	// Check that current user can access current repository, try to switch otherwise.
 	$loggedUser = AuthService::getLoggedUser();
 	if($loggedUser != null)
-	{
-		if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()))
+	{		
+		$currentRepo = ConfService::getRepositoryById(ConfService::getCurrentRootDirIndex());
+		if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) || ($currentRepo->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()))
 		{
 			ConfService::switchRootDir(AuthService::getDefaultRootId());
 		}
