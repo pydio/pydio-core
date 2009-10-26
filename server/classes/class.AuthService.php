@@ -257,7 +257,6 @@ class AuthService
 	function updateDefaultRights(&$userObject){
 		foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
 		{			
-			print_r($repoObject);
 			if($repoObject->getDefaultRight() != ""){
 				$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
 			}
