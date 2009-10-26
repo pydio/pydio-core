@@ -80,6 +80,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 	}
 	
 	function switchAction($action, $httpVars, $fileVars){
+		$repo = ConfService::getRepository();
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
@@ -93,7 +94,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		}
 		// FILTER DIR PAGINATION ANCHOR
 		if(isSet($dir) && strstr($dir, "#")!==false){
-			$parts = explode("#", $dir);
+			$parts = split("#", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
 		}				
@@ -202,7 +203,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 				$fields = array("origname","name", "default", "null", "size", "type", "flags", "pk", "index", "uniq");
 				$rows = array();
 				foreach ($httpVars as $k=>$val){
-					$split = explode("_", $k);
+					$split = split("_", $k);
 					if(count($split) == 3 && $split[0]=="field" && is_numeric($split[2]) && in_array($split[1], $fields)){
 						if(!isSet($rows[intval($split[2])])) $rows[intval($split[2])] = array();
 						$rows[intval($split[2])][$split[1]] = $val;
@@ -285,7 +286,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					$tableName = $dir;
 					$pks = $selection->getFiles();
 					foreach ($pks as $key => $pkString){
-						$parts = explode("\.", $pkString);
+						$parts = split("\.", $pkString);
 						array_pop($parts); // remove .pk extension
 						array_shift($parts); // remove record prefix
 						foreach ($parts as $index => $pkPart){
@@ -510,7 +511,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 	}
 	
 	function cleanFlagString($flagString){
-		$arr = explode(" ", $flagString);
+		$arr = split(" ", $flagString);
 		$newFlags = array();
 		foreach ($arr as $flag){
 			if($flag == "primary_key" || $flag == "null" || $flag == "not_null"){
@@ -535,7 +536,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 				return "String";
 		}
 	}
-	
+	/*	<--- add a slash at the beggining of this line to switch between the 2 functions
 	function listTables(){
 		$repo = ConfService::getRepository();
 		$result = mysql_list_tables($repo->getOption("DB_NAME"));
@@ -547,7 +548,17 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		}
 		return $allTables;
 	}
-	
+	/*/
+	function listTables(){
+		$repo = ConfService::getRepository();
+		$result = mysql_query("SHOW TABLES FROM ".$repo->getOption("DB_NAME")." LIKE '".$repo->getOption("DB_PTRN")."%'");
+		$allTables = array();
+		while ($row = mysql_fetch_row($result)) {
+		   $allTables[] = $row[0];
+		}
+		return $allTables;
+	}
+	//*/
 	
 	function showRecords($query, $tablename, $currentPage=1, $rpp=50, $searchval='' ){		
 		
@@ -648,7 +659,8 @@ class mysqlAccessDriver extends AbstractAccessDriver
 	function execQuery($sql =''){
 		$output='';
 		if($sql !=''){
-			$result= @mysql_query( $sql );
+			//$sql=mysql_real_escape_string($sql);
+			$result= @mysql_query(stripslashes($sql));
 			if($result){
 				AJXP_Logger::logAction("exec", array($sql));
 				return $result;
