@@ -222,9 +222,16 @@ class AuthService
 	{
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return 0;
-		foreach (array_keys(ConfService::getRootDirsList()) as $rootDirIndex)
+		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
 		{			
-			if($loggedUser->canRead($rootDirIndex."")) return $rootDirIndex;
+			if($loggedUser->canRead($rootDirIndex."")) {
+				// Warning : do not grant access to admin repository to a non admin, or there will be 
+				// an "Empty Repository Object" error.
+				if($rootDirObject->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()){
+					continue;
+				}
+				return $rootDirIndex;
+			}
 		}
 		return 0;
 	}
@@ -250,6 +257,7 @@ class AuthService
 	function updateDefaultRights(&$userObject){
 		foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
 		{			
+			print_r($repoObject);
 			if($repoObject->getDefaultRight() != ""){
 				$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
 			}
