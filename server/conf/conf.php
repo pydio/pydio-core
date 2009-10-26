@@ -123,7 +123,7 @@ $REPOSITORIES[0] = array(
 		"CREATE"		=>	true,
 		"RECYCLE_BIN" 	=> 	'recycle_bin',
 		"CHMOD_VALUE"   =>  '0600',
-		"DEFAULT_RIGHTS"=>  "r",
+		"DEFAULT_RIGHTS"=>  "",
 		"PAGINATION_THRESHOLD" => 500,
 		"PAGINATION_NUMBER" => 200
 	),
