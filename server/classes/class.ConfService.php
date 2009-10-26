@@ -193,8 +193,12 @@ class ConfService
 	
 	function getCurrentRootDirDisplay()
 	{
-		global $G_REPOSITORY;
-		return $G_REPOSITORY->getDisplay();
+		global $G_REPOSITORIES;
+		if(isSet($G_REPOSITORIES[$_SESSION['REPO_ID']])){
+			$repo = $G_REPOSITORIES[$_SESSION['REPO_ID']];
+			return $repo->getDisplay();
+		}
+		return "";
 	}
 	
 	/**
@@ -418,7 +422,10 @@ class ConfService
 	 */
 	function getRepository()
 	{
-		global $G_REPOSITORY;
+		global $G_REPOSITORY, $G_REPOSITORIES;
+		if(isSet($_SESSION['REPO_ID']) && isSet($G_REPOSITORIES[$_SESSION['REPO_ID']])){
+			return $G_REPOSITORIES[$_SESSION['REPO_ID']];
+		}
 		return $G_REPOSITORY;
 	}
 	
