@@ -36,22 +36,35 @@
                                  
 require_once('../classes/class.AbstractTest.php');
 
-class PHPVersion extends AbstractTest
+class PHPErrorLevel extends AbstractTest
 {
-    function PHPVersion() { parent::AbstractTest("PHP version", "Minimum required version is PHP 5.0.0, PHP 5.2 or higher recommended when using foreign language"); }
+    function PHPErrorLevel() { parent::AbstractTest("PHP error level", PHPErrorLevel::error2string(error_reporting())); }
     function doTest() 
     { 
-        $version = phpversion(); 
-    	$this->testedParams["PHP Version"] = $version;
-    	//return false;
-        if (floatval($version) < 5.0) return FALSE; 
-        $locale = setlocale(LC_CTYPE, 0);
-        $dirSep = DIRECTORY_SEPARATOR;
-        $this->testedParams["Locale"] = $locale;
-        $this->testedParams["Directory Separator"] = $dirSep;
-        if (floatval($version) < 5.1 && $locale != "C" && $dirSep != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
-        return TRUE;
+        $this->failedLevel = "info";
+        return FALSE;        
     }
+	    
+	function error2string($value)
+	{
+	    $level_names = array(
+	        E_ERROR => 'E_ERROR', E_WARNING => 'E_WARNING',
+	        E_PARSE => 'E_PARSE', E_NOTICE => 'E_NOTICE',
+	        E_CORE_ERROR => 'E_CORE_ERROR', E_CORE_WARNING => 'E_CORE_WARNING',
+	        E_COMPILE_ERROR => 'E_COMPILE_ERROR', E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+	        E_USER_ERROR => 'E_USER_ERROR', E_USER_WARNING => 'E_USER_WARNING',
+	        E_USER_NOTICE => 'E_USER_NOTICE' );
+	    if(defined('E_STRICT')) $level_names[E_STRICT]='E_STRICT';
+	    $levels=array();
+	    if(($value&E_ALL)==E_ALL)
+	    {
+	        $levels[]='E_ALL';
+	        $value&=~E_ALL;
+	    }
+	    foreach($level_names as $level=>$name)
+	        if(($value&$level)==$level) $levels[]=$name;
+	    return implode(' | ',$levels);
+	}    
 };
 
 ?>
