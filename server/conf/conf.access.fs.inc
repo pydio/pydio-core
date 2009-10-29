@@ -69,7 +69,7 @@ $DRIVER_CONF = array(
 	// Whether they are stored in a cache dir. At the moment, there is no mechanism for clearing the cache
 	// So if you use it, it will be faster for the users, but the cache repository will increase size without stoping.
 	"USE_THUMBNAIL_CACHE" => false,
-	"THUMBNAIL_CACHE_DIR" => "server/tmp/" // Must end with a slash!
+	"THUMBNAIL_CACHE_DIR" => INSTALL_PATH."/server/tmp/" // Must end with a slash! Should be placed outside the distribution, since it can grow heavily!
 	
 );
 ?>
