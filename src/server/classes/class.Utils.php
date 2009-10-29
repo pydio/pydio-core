@@ -187,7 +187,9 @@ class Utils
 		else if(preg_match("/\.avi$/",$fileName)){$image="video.png";$typeName=$mess[81];}
 		else if(preg_match("/\.mpg$/",$fileName)){$image="video.png";$typeName=$mess[82];}
 		else if(preg_match("/\.mpeg$/",$fileName)){$image="video.png";$typeName=$mess[83];}
+		else if(preg_match("/\.wmv$/",$fileName)){$image="video.png";$typeName=$mess[81];}
 		else if(preg_match("/\.swf$/",$fileName)){$image="flash.png";$typeName=$mess[91];}
+		else if(preg_match("/\.flv$/",$fileName)){$image="flash.png";$typeName=$mess[91];}
 		else {$image="mime_empty.png";$typeName=$mess[23];}
 		if($mode=="image"){return $image;} else {return $typeName;}
 	}
