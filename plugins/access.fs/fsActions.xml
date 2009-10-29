@@ -563,7 +563,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						this.treeCopy.focus();
 						
 						if(ajaxplorer.user && !ajaxplorer.getFilesList().getUserSelection().hasDir()){
-							var repoList = ajaxplorer.user.getRepositoriesList();							
+							var repoList = ajaxplorer.user.getRepositoriesList();	
 							var index=-1;
 							repoList.each(function(pair){
 								var repoObject = pair.value;
@@ -871,17 +871,15 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="flv" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
+		<infoPanel mime="flv,mov" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
 			<html><![CDATA[
 				<div style="padding:10px;">
-					<center style="border:1px solid #aaa; margin-bottom: 5px;">
-					<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,19,0" width="100%" height="200">
-						<param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/mcmp.swf">
-						<param name="allowScriptAccess" value="always">
+					<center style="border:1px solid #676965; margin-bottom: 5px;">
+					<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" width="100%" height="200">
+						<param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" />
 						<param name="quality" value="high">
-						<param name="allowFullScreen" value="true">
-						<param name="FlashVars" value="fpFileURL=#{uri}/content.php?action=download%26file=#{escaped_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10">
-						<embed src="AJXP_CLIENT_RESOURCES_FOLDER/flash/mcmp.swf" width="100%" height="200" quality="high" allowFullScreen="true" allowscriptaccess="always" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" FlashVars="fpFileURL=#{uri}/content.php?action=download%26file=#{escaped_filename}&fpButtonSize=50x50&cpBackgroundOpacity=40&cpHidePanel=mouseout&cpHideDelay=10"></embed>
+						<param name="allowFullScreen" value="true" />
+						<param name="FlashVars" value="flv=#{uri}/content.php?action=download%26file=#{escaped_filename}&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />
 					</object>
 					</center>
 				</div>
