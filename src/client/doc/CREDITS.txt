@@ -35,8 +35,8 @@ http://www.codepress.org/
 The online mp3 flash player is developed by a french webagency, AlsaCreation.
 http://www.alsacreations.fr/mp3-dewplayer.html
 
-++ MC MEDIA PLAYER : FLV Player ++
+++ MEDIA PLAYER : FLV Player ++
 MC Media Player is a Flash-based media player for embedding video, audio and still images in web pages. It is free to use for both non-profit and commercial websites.
-http://www.mcmediaplayer.com/
+http://www.flv-player.net/
 
 Big respect to those developers! 
