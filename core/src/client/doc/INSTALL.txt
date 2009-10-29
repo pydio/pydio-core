@@ -4,21 +4,14 @@
  
  1 SYSTEM REQUIREMENTS & QUICK INSTALL
  
- To be able to run this system on your webserver, it must have PHP 3 or higher
+ To be able to run this system on your webserver, it must have PHP 5 or higher
  running, and you must have an FTP access to upload the files on the server. 
  That's all! No database is needed.
  
  If you want to use it as fast as possible, just change the ADMIN_PASSWORD in 
  the conf/conf.php file and upload on your server. 
  
- Check that the both "files" and "users" folders are both readable and writeable.
- 
- | INFO : FOR UPGRADE FROM 2.2 TO 2.2.1
- |  Copy the files in a different folder.
- |  + From the old distrib to the new one, copy the whole content of users/
- | 	+ Backup the basic conf/conf.php file and copy the line with "$available_languages"
- |  + Copy the old conf/conf.php in place of the new one, and update the $available_languages line.
- |  That's it!
+ Check that the "server/conf", "server/logs" and "server/users" folders are writeable by apache user.
  
  For further configuration, read below.
  
@@ -26,8 +19,6 @@
  
  After unzipping the file into a local folder on your computer, use a text editor 
  to edit the configuration file located in conf/conf.php
- 
- You have to main configuration to change: the $REPOSITORIES variable and all the USERS constants.
  
  2.1 REPOSITORIES 
     
@@ -37,8 +28,7 @@
     
     You can set as many repositories as you want : you will be able to switch from one to 
     another when logged to AjaXplorer, and you can precisely set rights for each users (see 
-    paragraph 2.2) on each repository. Note that repository are really separated, and for 
-    example AjaXplorer does not let you copy a file from a repository to another.
+    paragraph 2.2) on each repository. 
     
     By default, the basic repository is set to the "files" folder inside the ajaxplorer 
     installation folder. You can change it to whatever you want, using absolute path 
@@ -67,7 +57,7 @@
     repositories and preferences are stored by the application. But they will not be able to 
     change their password, since they are in that case managed by an external application.
     
-    2.2.1 CONFIGURATION
+    2.2.1 BASIC USERS CONFIGURATION
     	
     	ENABLE_USERS => 1 	Users management is enabled
     					0 	Users management is totally disabled. No logging required and all 
@@ -80,60 +70,27 @@
     								is identified.
     							0 	When no user is identified, the login screen appears 
     								and no repository is loaded.
-    								
-    	AUTH_MODE => "ajaxplorer" Default value, Ajaxplorer is doing all the work.
-    	
-    				 "local_http" If you already use some ".htaccess" file for http 
-    				 			authentication in the zone where AjaXplorer will be installed, 
-    				 			AjaXplorer can retrieve the current logged user directly when 
-    				 			loading, avoiding the user to log him self again.
-    				 	
-    				 "remote" 	If a standard scenario would be that users come from another 
-    				 			server of yours on which they are logged, you can pass a session 
-    				 			identifier to AjaXplorer and configure it to ask a remote server for 
-    				 			the current user logged id. (cf 2.2.3)
-    				 			
-    2.2.3 REMOTE LOGGING
-    
-    	Here is how to configure the REMOTE_ config variables for asking a remote server the 
-    	current user logged.
-    	
-    	AUTH_MODE_REMOTE_SERVER => 	The host to request. 
-    								For example "www.yourdomain.com"
-    								
-		AUTH_MODE_REMOTE_URL 	=> 	The url to request on host. The script should take a 
-									session_id (or any identifier you want) as a GET variable 
-									in input and output a user login in its response.
-									For example /public/yourscript.php" or "logger.jsp". 
-									
-		AUTH_MODE_REMOTE_USER 	=> 	Http Authentication login on remote host.
-									Leave blank if not needed.
-									
-		AUTH_MODE_REMOTE_PASSWORD =>Http Authentication password on remote host.
-									Leave blank if not needed.
-									
-		AUTH_MODE_REMOTE_PORT 	=> 	Http Port to use
-		
-		AUTH_MODE_REMOTE_SESSION_NAME => Name of the variable in the GET query that will 
-										 contain your session id. 
-										 For example "session_id".
-		
-		Once this is properly configured, you can append the ajaxplorer url with the query string
-		 "?remote_session=YOURSESSIONID" and ajaXplorer will call your script with "session_id=YOURSESSIONID" 
-		 to check if a user is logged.
 
+	2.2.2 AUTHENTICATION METHOD
+	
+	In ajaXplorer, Authentication is (like the repositories as access and the configuration )
+	plugin-based. By default, in the conf.php file you can see that the basic auth.serial plugin 
+	is used to manage your users. This means that the users and their rights and personnal data 
+	will be stored on the filesystem, in a specific ajaxplorer format. This plugin is the most
+	performant, but may not be suited for managing a huge amount of users, or when managing users
+	already created in an external system like a CMS. In that case, you should have a look at the auth.ldap
+	or auth.remote plugins, or even auth.mysql, each of these plugin giving you more features for 
+	managing plugin.
+    								
+    				 			
  2.3 FURTHER CONFIGURATION   
  
-	. $dft_langue		=> 		Default language to use, please use "en" or "fr" for the moment.
-	. $size_unit 		=>		Use "o" like "octets" or "b" like "bytes" for file size display.
 	. $max_caracteres	=>		Max number of characters for file and directory names.
-	. $showhidden		=>		Show hidden files or not when browsing folders.
 	. $upload_max_number=>		Allowed simultaneous upload to the server.
 	. $webmaster_email	=>		The email of the webmaster, not used for the moment
-	. $recycle_bin		=>		Create a recycle bin folder in your repositories to act as a 
-								buffer for files suppression (like windows recycle bin). 
-								Set it's name if you want to use it, or leave it blank otherwise.
-	. $user_https		=>		Set this to 'true' if you are working on https connexion.
+	. $use_https		=>		Set this to 'true' if you are working on https connexion. This will not
+								set up an secure server! This is here to fix a bug with Internet Explorer
+								when working on a secure server.
  
  3 TIME TO WASTE?
  
