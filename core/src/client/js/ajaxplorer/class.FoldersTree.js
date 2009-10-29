@@ -95,6 +95,7 @@ FoldersTree = Class.create({
 	  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = path});
  				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
  					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = nodeId});
+ 				this.setCurrentNodeName(nodeId);
  				return;
  			}
 			this.setCurrentNodeName(nodeId);
