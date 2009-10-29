@@ -149,7 +149,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						$pThumb = new PThumb($this->driverConf["THUMBNAIL_QUALITY"]);						
 						if(!$pThumb->isError()){							
 							$pThumb->use_cache = $this->driverConf["USE_THUMBNAIL_CACHE"];
-							$pThumb->cache_dir = INSTALL_PATH."/".$this->driverConf["THUMBNAIL_CACHE_DIR"];	
+							$pThumb->cache_dir = $this->driverConf["THUMBNAIL_CACHE_DIR"];	
 							$pThumb->fit_thumbnail($this->getPath()."/".SystemTextEncoding::fromUTF8($file), 200);
 							if($pThumb->isError()){
 								print_r($pThumb->error_array);
