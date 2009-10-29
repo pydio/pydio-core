@@ -208,12 +208,24 @@ class AbstractAccessDriver extends AbstractDriver {
     	
     	$accessType = $this->repository->getAccessType();    	
     	$repositoryId = $this->repository->getId();
-    	$origStreamURL = "ajxp.$accessType://$repositoryId";
+    	$origStreamURL = "ajxp.$accessType://$repositoryId";    	
     	
     	$destRepoId = $httpVars["dest_repository_id"];
     	$destRepoObject = ConfService::getRepositoryById($destRepoId);
     	$destRepoAccess = $destRepoObject->getAccessType();
     	$destStreamURL = "ajxp.$destRepoAccess://$destRepoId";
+    	
+    	// Check rights
+    	if(AuthService::usersEnabled()){
+	    	$loggedUser = AuthService::getLoggedUser();
+	    	if(!$loggedUser->canRead($repositoryId) || !$loggedUser->canWrite($destRepoId)){
+	    		AJXP_XMLWriter::header();
+	    		AJXP_XMLWriter::sendMessage(null, "You do not have the right to access one of the repositories!");
+	    		AJXP_XMLWriter::close();
+	    		exit(1);
+	    	}
+    	}
+    	
     	$messages = array();
     	foreach ($files as $file){
     		$origFile = $origStreamURL.$file;
