@@ -29,7 +29,7 @@
 }
 
 .webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover {
-	margin-left: 3px;
+	margin-left: 0px;
 	padding: 0px 2px 1px 2px;
 }
 
@@ -67,6 +67,7 @@
 .webfx-tree-icon {
 	width: 16px;
 	height: 16px;
+	margin-right:3px;
 }
 
 .selected
