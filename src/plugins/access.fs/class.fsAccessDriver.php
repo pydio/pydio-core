@@ -542,9 +542,17 @@ class fsAccessDriver extends AbstractAccessDriver
 						$atts = array();
 						$atts[] = "is_file=\"".(is_file($currentFile)?"1":"0")."\"";
 						$atts[] = "is_image=\"".Utils::is_image($currentFile)."\"";
-						$atts[] = "file_group=\"".filegroup($currentFile)."\"";
-						$atts[] = "file_owner=\"".fileowner($currentFile)."\"";
-						$atts[] = "file_perms=\"".substr(decoct( fileperms($currentFile) ), (is_file($currentFile)?2:1))."\"";
+						$fGroup = @filegroup($currentFile) || "unknown";
+						$atts[] = "file_group=\"".$fGroup."\"";
+						$fOwner = @fileowner($currentFile) || "unknown";
+						$atts[] = "file_owner=\"".$fOwner."\"";
+						$fPerms = @fileperms($currentFile);
+						if($fPerms !== false){
+							$fPerms = substr(decoct( $fPerms ), (is_file($currentFile)?2:1));
+						}else{
+							$fPerms = '0000';
+						}
+						$atts[] = "file_perms=\"".$fPerms."\"";
 						if(Utils::is_image($currentFile))
 						{
 							list($width, $height, $type, $attr) = @getimagesize($currentFile);
