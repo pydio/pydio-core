@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="fs" className="class.svnDriver.php">
 	<actions>
+		<action name="ls" dirDefault="true">			
+			<displayDefinitions>
+				<display mode="list">
+					<column messageId="1" attributeName="text"/>
+					<column messageId="2" attributeName="filesize"/>
+					<column messageId="3" attributeName="mimestring"/>
+					<column messageId="4" attributeName="modiftime"/>
+					<column messageId="244" attributeName="author"/>
+					<column messageId="243" attributeName="revision"/>
+				</display>
+			</displayDefinitions>
+			<gui text="154" title="155" src="folder_new.png"
+				accessKey="folder_access_key">
+				<context selection="true" dir="" recycle="false"
+					actionBar="false" contextMenu="false" infoPanel="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false"
+					unique="true" image="false" mp3="false" editable="false">
+				</selectionContext>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true"
+				write="false" adminOnly="false">
+			</rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[					
+					if(window.actionArguments && window.actionArguments.length>0){
+						var path = window.actionArguments[0];						
+						ajaxplorer.getFoldersTree().goToDeepPath(path);
+						ajaxplorer.getActionBar().updateLocationBar(path);
+						ajaxplorer.filesList.loadXmlList(path);
+					}
+					]]></clientCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
 		<action name="svnlog">
 			<gui text="242" title="242" src="applix.png" accessKey="svn_log_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
