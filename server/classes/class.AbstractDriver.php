@@ -182,6 +182,9 @@ class AbstractDriver {
 		
 	function parseXMLActions()
 	{
+		if(!is_file($this->xmlFilePath)){
+			return ;
+		}
 		$this->xml_data = file_get_contents($this->xmlFilePath);
 	    $this->xml_parser = xml_parser_create( "UTF-8" );
 	

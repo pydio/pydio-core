@@ -328,15 +328,12 @@ class Utils
 		$style = '
 		<style>
 		body {
-		background-color:#e0ecff;
-		background-image:url(client/images/GradientBg.gif);
-		background-position:center top;
-		background-repeat:repeat-x;
+		background-color:#f1f1ef;
 		margin:0;
 		padding:20;
 		}
 		* {font-family:arial, sans-serif;font-size:11px;color:#006}
-		h1 {font-size: 20px; color:#e0ecff}
+		h1 {font-size: 20px; color:black}
 		thead tr{background-color: #ccc; font-weight:bold;}
 		tr.dump{background-color: #ee9;}
 		tr.passed{background-color: #ae9;}
