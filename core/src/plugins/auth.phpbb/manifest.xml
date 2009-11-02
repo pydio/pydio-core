@@ -1,0 +1,25 @@
+<!--
+USAGE : 
+In /server/conf/conf.php 
+
+$AUTH_DRIVER = array(
+	"NAME"			=> "phpbb",
+	"OPTIONS"		=> array(
+		"SLAVE_MODE"		=> true,
+		"LOGIN_URL"		=> 'http://www.ajaxplorer.info/',
+		"LOGOUT_URL"		=> 'http://www.ajaxplorer.info/',
+		"PHPBB_PATH"		=> '../../forum/',
+		"USERS_FILEPATH"	=> 'AJXP_INSTALL_PATH/server/users/users.ser',
+		"AUTOCREATE_AJXPUSER" 	=> true
+	)
+);
+
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="phpbb" label="Remote authentication" description="Authentication is done remotely (useful in CMS system).">
+	<param name="SLAVE_MODE" type="boolean" label="Authentication mode" description="If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required" default="true" mandatory="true" />
+	<param name="LOGIN_URL" type="string" label="Login URL" description="When not in slave mode, AJXP calls the given URL as URL?name=XXX&pass=XXX&key=XXX. Else it redirect to the given URL" mandatory="true" />
+	<param name="LOGOUT_URL" type="string" label="Logout URL" description="Redirect to the given URL on loggin out" mandatory="false" />
+	<param name="PHPBB_PATH" type="string" label="PHPbb" description="The phpbb path" mandatory="true"/>
+	<param name="USERS_FILEPATH" type="string" label="Users" description="The users list" mandatory="true"/>
+</authdriver>
