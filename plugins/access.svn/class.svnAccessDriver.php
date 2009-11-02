@@ -61,6 +61,7 @@ class svnAccessDriver extends AbstractAccessDriver {
 			//$res[IDX_STDOUT] = "";
 			//header("content-type:text/xml");
 			//print_r($res[IDX_STDOUT]);
+			//print_r($res);
 			$this->parseListing($res[IDX_STDOUT]);
 			//print_r($this->listElements);
 			//exit();
