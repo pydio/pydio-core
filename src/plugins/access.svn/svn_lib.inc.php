@@ -606,13 +606,16 @@ define('IDX_VALUE', 1);
 			1 => array("pipe", "w"),  	// stdout is a pipe that the child will write to
 			2 => array("pipe", "w") 	// stderr is a pipe to write to
 		);
-		
+		set_time_limit(100);
 		$cwd = NULL; //'/tmp';
 		$pipes = NULL;
 		
 		$cmdline = $cmd." ".$switches." ".$arg;
+		
+		/*
 		$output = shell_exec($cmdline);
 		$result = array();
+		
 		$result[IDX_CMDLINE] = $cmdline;
 		if(strpos($switches, "xml")){
 			$result[IDX_STDOUT] = $output;
@@ -620,8 +623,10 @@ define('IDX_VALUE', 1);
 			$result[IDX_STDOUT] = explode("\n", $output);
 		}
 		$result[IDX_ERROUT] = "";
-		/*
-		$process = proc_open($cmdline, $descriptorspec, $pipes);
+		return $result;
+		*/
+		
+		$process = proc_open($cmdline, $descriptorspec, $pipes, NULL, NULL, array("bypass_shell"=>false));
 		
 		$result = array();
 		$result[IDX_CMDLINE] = $cmdline;
@@ -656,7 +661,6 @@ define('IDX_VALUE', 1);
 //		echo "CMD: $cmdline<br/>";
 //		PrintDebugArray($result, "Result");
 		}
-		*/
 		return $result;
 	}
 		
