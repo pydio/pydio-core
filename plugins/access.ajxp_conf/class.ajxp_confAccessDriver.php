@@ -517,8 +517,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$value = ($value == "true"?true:false);
 					}else if($type == "integer"){
 						$value = intval($value);
-					}else if($type == "password" && $userId!=null){
-	                    if (function_exists('mcrypt_encrypt'))
+					}else if($type == "password" && $userId!=null){						
+	                    if (trim($value != "") && function_exists('mcrypt_encrypt'))
 	                    {
 	                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
 	                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);

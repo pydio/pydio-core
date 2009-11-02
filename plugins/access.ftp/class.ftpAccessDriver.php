@@ -50,13 +50,13 @@ class ftpAccessDriver extends  AbstractAccessDriver
         function getUserName($repository){
             $logUser = AuthService::getLoggedUser();
             $wallet = $logUser->getPref("AJXP_WALLET");
-            return is_array($wallet) ? $wallet[$repository->getUniqueId()]["FTP_USER"] : "";
+            return is_array($wallet) ? $wallet[$repository->getUniqueId()]["FTP_USER"] : $repository->getOption("FTP_USER");
         }
 
         function getPassword($repository){
             $logUser = AuthService::getLoggedUser();
             $wallet = $logUser->getPref("AJXP_WALLET");
-            return is_array($wallet) ? $logUser->decodeUserPassword($wallet[$repository->getUniqueId()]["FTP_PASS"]) : "";
+            return is_array($wallet) ? $logUser->decodeUserPassword($wallet[$repository->getUniqueId()]["FTP_PASS"]) : $repository->getOption("FTP_PASS");
         }
 
         /** This method retrieves the FTP server features as described in RFC2389
@@ -103,7 +103,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	 	    }
             @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
 		    if(!@ftp_login($link,$this->user,$this->password)){
-	            $ajxpExp = new AJXP_Exception("Cannot login to FTP server!");
+	            $ajxpExp = new AJXP_Exception("Cannot login to FTP server with user $this->user");
 	            AJXP_Exception::errorToXml($ajxpExp);
 	        }
             if ($this->repository->getOption("FTP_DIRECT") != "TRUE")

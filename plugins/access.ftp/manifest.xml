@@ -4,8 +4,10 @@
 	<param name="FTP_HOST" type="string" label="Host" description="Ftp Host to connect to" mandatory="true"/>
 	<param name="FTP_PORT" type="string" label="Port" description="Ftp Host port" mandatory="true" default="21"/>
 	<param name="PATH" type="string" label="Path" description="Real path to the root folder on the server" mandatory="true" default="/"/>
+	<param name="FTP_USER" type="string" label="User" description="Ftp User name - Can be overriden on a per-user basis." mandatory="false"/>
+	<param name="FTP_PASS" type="password" label="Password" description="Ftp User password - Can be overriden on a per-user basis." mandatory="false"/>
 	<param name="CHARSET" type="string" label="Character encoding" description="When not advertized by server, use this encoding" mandatory="true" default="ISO-8859-1"/>
 	<param name="RECYCLE_BIN" type="string" label="Recycle folder" description="Buffer before real suppression of files on the server."/>
-	<user_param name="FTP_USER" type="string" label="User" description="Ftp User name" mandatory="true"/>
+	<user_param name="FTP_USER" type="string" label="User" description="Ftp User name" mandatory="false"/>
 	<user_param name="FTP_PASS" type="password" label="Password" description="Ftp User password" mandatory="false"/>
 </ajxpdriver>
