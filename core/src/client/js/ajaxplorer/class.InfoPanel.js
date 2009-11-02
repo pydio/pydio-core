@@ -173,11 +173,10 @@ InfoPanel = Class.create({
 				}
 				else if(attName == 'uri'){
 					var url = document.location.href;
-					if(url.indexOf('/#') > -1){
-						url = url.substr(0, url.indexOf('#'));
-					}
 					if(url[(url.length-1)] == '/'){
 						url = url.substr(0, url.length-1);
+					}else if(url.lastIndexOf('/') > -1){
+						url = url.substr(0, url.lastIndexOf('/'));
 					}
 					this[attName] = url;
 				}
