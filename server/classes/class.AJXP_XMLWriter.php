@@ -159,7 +159,7 @@ class AJXP_XMLWriter
 		$st = "";
 		$st .= "<repositories>";
 		$streams = ConfService::detectRepositoryStreams(false);
-		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
+		foreach (ConfService::getRepositoriesList() as $rootDirIndex => $rootDirObject)
 		{		
 			$toLast = false;
 			if($rootDirObject->getAccessType()=="ajxp_conf"){
