@@ -348,6 +348,7 @@ Ajaxplorer = Class.create({
 			});		
 		}
 		if(actions.length) $('goto_repo_button').removeClassName('disabled');
+        actions.sort(function(a,b) { return a.name > b.name; });
 	},
 	
 

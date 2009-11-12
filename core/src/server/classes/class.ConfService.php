@@ -166,6 +166,7 @@ class ConfService
 	function getRepositoriesList()
 	{
 		global $G_REPOSITORIES;
+        
 		return $G_REPOSITORIES;
 	}
 	
