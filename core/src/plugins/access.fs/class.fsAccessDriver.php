@@ -596,14 +596,16 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($nom_rep == $this->repository->getOption("PATH") && RecycleBinManager::recycleEnabled() && !$completeMode && !$skipZip)
 				{
 					$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
-					$recycleIcon = ($this->countFiles($this->repository->getOption("PATH")."/".$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
-					if($fileListMode)
-					{
-						print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"$recycleIcon\"></tree>");
-					}
-					else 
-					{						
-						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/$recycleIcon\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/$recycleIcon\" filename=\"/".$recycleBinOption."\"/>");
+					if(is_dir($this->repository->getOption("PATH")."/".$recycleBinOption)){
+						$recycleIcon = ($this->countFiles($this->repository->getOption("PATH")."/".$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
+						if($fileListMode)
+						{
+							print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"$recycleIcon\"></tree>");
+						}
+						else 
+						{						
+							print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/$recycleIcon\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/$recycleIcon\" filename=\"/".$recycleBinOption."\"/>");
+						}
 					}
 				}
 				AJXP_XMLWriter::close();

@@ -125,7 +125,7 @@ try{
 	disableTextSelection($('info_panel'));
 	disableTextSelection($('dir_chooser'));
 }catch(e){
-	alert(e);
+	alert('Error on loading (gui_tpl l.128)' + e);
 }
 
 Event.observe(document, "ajaxplorer:loaded", function(){
