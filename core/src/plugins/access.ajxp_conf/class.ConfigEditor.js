@@ -71,7 +71,8 @@ ConfigEditor = Class.create({
 						
 		var rightsPane = this.form.select('[id="rights_pane"]')[0];
 		var rightsTable = rightsPane.select('tbody')[0];		
-		var repositories = XPathSelectNodes(xmlData, "//repo");						
+		var repositories = XPathSelectNodes(xmlData, "//repo");
+        repositories.sort(function(a,b) { var albl = XPathGetSingleNodeText(a, "label"); var blbl = XPathGetSingleNodeText(b, "label"); return albl > blbl; });
 		for(var i=0;i<repositories.length;i++){
 			var repoNode = repositories[i];
 			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
