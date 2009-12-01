@@ -247,7 +247,7 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 
 	// check that the load of the xml file went well
 	if( oXmlDoc == null || oXmlDoc.documentElement == null) {
-		alert(oXmlDoc.xml);
+		//alert(oXmlDoc.xml);
 		jsParentNode.errorText = parseTemplateString(webFXTreeConfig.loadErrorTextTemplate,
 							jsParentNode.src);
 	}
