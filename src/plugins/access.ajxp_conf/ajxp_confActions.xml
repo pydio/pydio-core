@@ -181,7 +181,7 @@
 				<clientForm id="edit_config_box"><![CDATA[
 					<div id="edit_config_box" action="edit_user" box_width="440" style="overflow:auto;height:370px;">
 						<fieldset id="rights_pane">
-							<legend>Repositories Acess</legend>
+							<legend>Repositories Access</legend>
 							<table class="repository" width="100%">
 								<tbody>
 								<tr id="loading_row"><td>Loading...</td></tr>

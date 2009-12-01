@@ -432,7 +432,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		if(!ENABLE_USERS) return ;
 		$users = AuthService::listUsers();
 		$loggedUser = AuthService::getLoggedUser();		
+        $userArray = array();
 		foreach ($users as $userObject){
+            $userArray[Utils::xmlEntities($userObject->getId())] = $userObject;
+        }
+        ksort($userArray);
+        foreach($userArray as $userObject) {
 			$isAdmin = $userObject->isAdmin();
 			$userId = Utils::xmlEntities($userObject->getId());
 			$icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
@@ -452,9 +457,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	function listRepositories(){
 		print '<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>';		
 		$repos = ConfService::getRepositoriesList();
+        $repoArray = array();
 		foreach ($repos as $repoIndex => $repoObject){
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
-                        $name = Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
+            $name = Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
+            $repoArray[$name] = $repoIndex;
+        }
+        // Sort the list now by name
+        ksort($repoArray);
+        foreach ($repoArray as $name => $repoIndex) {
+            $repoObject =& $repos[$repoIndex];
 			print '<tree 				
 				text="'.$name.'" 
 				is_file="1" 
