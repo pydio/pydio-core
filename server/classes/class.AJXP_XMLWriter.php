@@ -62,6 +62,7 @@ class AJXP_XMLWriter
 	function catchError($code, $message, $fichier, $ligne, $context){
 		if(error_reporting() == 0) return ;
 		$message = "$code : $message in $fichier (l.$ligne)";
+		AJXP_Logger::logAction("error", array("message" => $message));
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::sendMessage(null, $message, true);
 		AJXP_XMLWriter::close();

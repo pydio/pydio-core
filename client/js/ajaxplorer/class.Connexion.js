@@ -61,7 +61,7 @@ Connexion = Class.create({
 		new Ajax.Request(this._baseUrl, 
 		{
 			method:this._method,
-			onComplete:this.onComplete,
+			onComplete:this.applyComplete.bind(this),
 			parameters:this._parameters.toObject()
 		});
 	},
@@ -72,9 +72,23 @@ Connexion = Class.create({
 		{
 			method:this._method,
 			asynchronous: false,
-			onComplete:this.onComplete,
+			onComplete:this.applyComplete.bind(this),
 			parameters:this._parameters.toObject()
 		});
+	},
+	
+	applyComplete : function(transport){
+		if(Prototype.Browser.Gecko && transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName=="parsererror"){
+			alert("Parsing error : \n" + transport.responseXML.documentElement.firstChild.textContent);					
+			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
+		}else if(Prototype.Browser.IE && transport.responseXML.parseError && transport.responseXML.parseError.errorCode != 0){
+			alert("Parsing Error : \n" + transport.responseXML.parseError.reason);
+			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
+		}else if(transport.getAllResponseHeaders().indexOf("text/xml")>-1 && transport.responseXML == null){
+			alert("Unknown Parsing Error!");
+			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
+		}
+		this.onComplete(transport);
 	},
 	
 	loadLibrary : function(fileName, onLoadedCode){
