@@ -49,6 +49,7 @@ global $G_UPLOAD_MAX_TOTAL;
 
 global $G_ACCESS_DRIVER;
 global $G_CONF_DRIVER;
+global $G_CONF_PLUGINNAME;
 global $G_AUTH_DRIVER;
 global $G_AUTH_DRIVER_DEF;
 
@@ -58,7 +59,7 @@ class ConfService
 	{
 		include_once($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_DEFAULT_REPOSITORIES, $G_AUTH_DRIVER_DEF;
+		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, $G_DEFAULT_REPOSITORIES, $G_AUTH_DRIVER_DEF, $G_CONF_PLUGINNAME;
 		if(!isset($langue) || $langue=="") {$langue=$default_language;}
 		$G_LANGUE = $langue;
 		if(isSet($available_languages)){
@@ -74,6 +75,7 @@ class ConfService
 		$G_UPLOAD_MAX_TOTAL = Utils::convertBytes($upload_max_size_total);
 		$G_DEFAULT_REPOSITORIES = $REPOSITORIES;
 		$G_AUTH_DRIVER_DEF = $AUTH_DRIVER;
+        $G_CONF_PLUGINNAME = $CONF_STORAGE["NAME"];
 		ConfService::initConfStorageImpl($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
 		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
 		ConfService::switchRootDir();
