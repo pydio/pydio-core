@@ -142,7 +142,7 @@ class AuthService
 		$confDriver = ConfService::getConfStorageImpl();
 		if($user_id == null)
 		{
-			if(isSet($_SESSION["AJXP_USER"])) return 1; 
+			if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1; 
 			if(ALLOW_GUEST_BROWSING)
 			{
 				$authDriver = ConfService::getAuthDriverImpl();
