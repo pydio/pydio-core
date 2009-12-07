@@ -67,7 +67,8 @@ if (basename(__FILE__) != basename($_SERVER['SCRIPT_FILENAME']) && $_SERVER['PHP
     require_once("$CURRENTPATH/../../server/classes/class.AuthService.php");
     define ("CLIENT_RESOURCES_FOLDER", "$CURRENTPATH/../../client");
     ConfService::init("$CURRENTPATH/../../server/conf/conf.php"); 
-    require_once("$CURRENTPATH/../../plugins/conf.serial/class.AJXP_User.php");
+    global $G_CONF_PLUGINNAME;
+    require_once("$CURRENTPATH/../../plugins/conf.$G_CONF_PLUGINNAME/class.AJXP_User.php");
     
     global $plugInAction;
     switch($plugInAction)
