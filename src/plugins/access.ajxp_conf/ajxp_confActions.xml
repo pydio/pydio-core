@@ -243,6 +243,21 @@
 					modal.showDialogForm('Delete', 'delete_config_form', onLoad, function(){
 						var oForm = modal.getForm();						
 						ajaxplorer.actionBar.submitForm(oForm);
+                        if (userSelection.isMultiple()) {
+                           var i = 1; 
+	   		    	       var hidden = $(oForm).select('input[type="hidden"]')[0];
+                           while (true) {
+                              try {
+                                  item = userSelection.getItem(i);
+                                  hidden.setAttribute("value", item.getAttribute("ajxp_mime") == "user_editable" ? item.getAttribute("text") : item.getAttribute("repository_id"));
+            					  ajaxplorer.actionBar.submitForm(oForm);
+                                  i++;
+                              } catch (e) 
+                              {
+                                  break;
+                              }
+                           }
+                        }
 						hideLightBox(true);
 						return false;
 					});
