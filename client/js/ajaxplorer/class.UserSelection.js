@@ -126,6 +126,10 @@ UserSelection = Class.create({
 	getUniqueItem : function(){
 		return this._selectedItems[0];
 	},
+
+    getItem : function(i) {
+        return this._selectedItems[i];
+    },
 	
 	updateFormOrUrl : function (oFormElement, sUrl){
 		// CLEAR FROM PREVIOUS ACTIONS!

@@ -757,14 +757,14 @@ class fsAccessDriver extends AbstractAccessDriver
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
 		session_write_close();
-        global $allowRealSizeProbing;
+        global $G_PROBE_REAL_SIZE;
 		if(!$data){
 			$test = fopen($filePathOrData, "r");
 			if($test) fclose($test);
 		}
 
 		$isFile = !$data && !$gzip; 
-        if (!$allowRealSizeProbing || ini_get('safe_mode'))
+        if (!$G_PROBE_REAL_SIZE || ini_get('safe_mode'))
             $size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
 	    else
             $size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
@@ -822,6 +822,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				fseek($file, $relOffset, SEEK_CUR);
 
+                while(ob_get_level()) ob_end_flush();
 				$readSize = 0.0;
 				while (!feof($file) && $readSize < $length && connection_status() == 0)
 				{
@@ -869,7 +870,12 @@ class fsAccessDriver extends AbstractAccessDriver
 		if($data){
 			print($filePathOrData);
 		}else{
-			readfile($filePathOrData);
+            $file = fopen($filePathOrData, "rb");
+            if ($file !== FALSE) 
+            {
+                fpassthru($file);
+                fclose($file);
+            }
 		}
 	}
 

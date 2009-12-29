@@ -126,7 +126,6 @@ else
 }
 
 $JS_DEBUG = false;
-
 if($JS_DEBUG && isSet($_GET["compile"])){
 	require_once(SERVER_RESOURCES_FOLDER."/class.AJXP_JSPacker.php");
 	AJXP_JSPacker::pack();
