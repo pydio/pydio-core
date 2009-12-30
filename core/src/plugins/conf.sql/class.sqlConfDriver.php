@@ -125,7 +125,7 @@ class sqlConfDriver extends AbstractConfDriver {
 
 		$repository_row = Array(
 				'uuid' => $repository->getUniqueId(),
-				'path' => $repository->path,
+				'path' => $repository->options['PATH'],
 				'display' => $repository->getDisplay(),
 				'accessType' => $repository->getAccessType(),
 				'recycle' => $repository->recycle, 
