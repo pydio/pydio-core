@@ -96,8 +96,14 @@ try{
 						fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?1:1), true);
 						fitHeightToBottom($('info_panel'), null, (Prototype.Browser.IE?2:1), true, 100);
 						if(ajaxplorer)ajaxplorer.sEngine.resize();
+				},
+				endDrag : function(paneSize){
+					if(ajaxplorer && ajaxplorer.user){
+						ajaxplorer.user.setPreference('sidebar_splitter_size', paneSize);
+						ajaxplorer.user.savePreferences();
 					}
-				});		
+				}
+			});		
 		window.setTimeout(function(){
 			fitHeightToBottom($('info_panel'), null, (Prototype.Browser.IE?2:1), true);	
 		}, 500);
@@ -107,7 +113,7 @@ try{
 	}
 	var splitter = new Splitter('verticalSplitter', {
 			direction: "vertical",
-			initA: 200, maxA:400, minA:50, 
+			initA: 200, maxA:600, minA:50, 
 			onDrag: function(){
 				if(sideSplit) {
 					sideSplit.resizeGroup(null, null, true);
@@ -116,6 +122,12 @@ try{
 					fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);					
 				}
 				if(ajaxplorer && ajaxplorer.filesList)ajaxplorer.filesList.applyHeadersWidth();					
+			},
+			endDrag : function(paneSize){
+				if(ajaxplorer && ajaxplorer.user){
+					ajaxplorer.user.setPreference('vertical_splitter_size', paneSize);
+					ajaxplorer.user.savePreferences();
+				}
 			}
 	});
 	
@@ -124,6 +136,19 @@ try{
 	disableTextSelection($('panelsToggle'));
 	disableTextSelection($('info_panel'));
 	disableTextSelection($('dir_chooser'));
+
+	Event.observe(document, "ajaxplorer:user_logged", function(){		
+		if(!ajaxplorer || !ajaxplorer.user) return;
+		var sidebar = ajaxplorer.user.getPreference("sidebar_splitter_size");
+		var vertical = ajaxplorer.user.getPreference("vertical_splitter_size");
+		if(sidebar){
+			sideSplit.moveSplitter(parseInt(sidebar));
+		}
+		if(vertical){
+			splitter.moveSplitter(parseInt(vertical));
+		}
+	});
+	
 }catch(e){
 	alert('Error on loading (gui_tpl l.128)' + e);
 }
