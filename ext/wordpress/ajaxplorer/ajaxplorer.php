@@ -2,7 +2,7 @@
 /*
 Plugin Name: Ajaxplorer
 Plugin URI: http://www.ajaxplorer.info/wp_ajaxplorer
-Description: This plugin allow to associate directly AjaXplorer users to wordpress ones (using WP as the master). Warning, it will not work until you open the "Settings > AjaXplorer" panel (here on the left) to edit your AjaXplorer installation path.
+Description: This plugin allow to associate directly AjaXplorer users to wordpress ones (using WP as the master). Warning, it will not work until you open the "Settings > AjaXplorer" panel (here on the left) to edit your AjaXplorer installation path. Tested with WP 2.8 & AjaXplorer 2.5.4
 Version: 0.2
 Author: Charles du Jeu
 Author URI: http://www.ajaxplorer.info/
