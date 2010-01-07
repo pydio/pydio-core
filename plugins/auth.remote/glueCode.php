@@ -53,9 +53,9 @@
   */
   
 // Only /index.php can include us
-if (basename(__FILE__) != basename($_SERVER['SCRIPT_FILENAME']) && $_SERVER['PHP_SELF'] == '/index.php')
+//if (basename(__FILE__) != basename($_SERVER['SCRIPT_FILENAME']) && $_SERVER['PHP_SELF'] == '/index.php')
 {
-    if (!$CURRENTPATH) $CURRENTPATH=dirname(__FILE__);
+    if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
     require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
 //    require_once();
     require_once("$CURRENTPATH/../../server/classes/class.AbstractDriver.php");
@@ -64,12 +64,12 @@ if (basename(__FILE__) != basename($_SERVER['SCRIPT_FILENAME']) && $_SERVER['PHP
 //    include_once("$CURRENTPATH/class.remoteAuthDriver.php");
     if (!class_exists("SessionSwitcher")) require_once("$CURRENTPATH/sessionSwitcher.php");
     require_once("$CURRENTPATH/../../server/classes/class.ConfService.php");
-    require_once("$CURRENTPATH/../../server/classes/class.AuthService.php");
-    define ("CLIENT_RESOURCES_FOLDER", "$CURRENTPATH/../../client");
+    require_once("$CURRENTPATH/../../server/classes/class.AuthService.php");    
+    define ("CLIENT_RESOURCES_FOLDER", "client");
     ConfService::init("$CURRENTPATH/../../server/conf/conf.php"); 
     global $G_CONF_PLUGINNAME;
     require_once("$CURRENTPATH/../../plugins/conf.$G_CONF_PLUGINNAME/class.AJXP_User.php");
-    
+      
     global $plugInAction;
     switch($plugInAction)
     {
