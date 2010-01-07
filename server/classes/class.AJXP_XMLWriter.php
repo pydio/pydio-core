@@ -150,6 +150,11 @@ class AJXP_XMLWriter
 			print("<preferences>");
 			print("<pref name=\"display\" value=\"".$loggedUser->getPref("display")."\"/>");
 			print("<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>");
+			print("<pref name=\"diapo_autofit\" value=\"".$loggedUser->getPref("diapo_autofit")."\"/>");
+			print("<pref name=\"sidebar_splitter_size\" value=\"".$loggedUser->getPref("sidebar_splitter_size")."\"/>");
+			print("<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>");
+			print("<pref name=\"history_last_repository\" value=\"".$loggedUser->getPref("history_last_repository")."\"/>");
+			print("<pref name=\"history_last_listing\" value=\"".$loggedUser->getPref("history_last_listing")."\"/>");
 			print("</preferences>");
 			print("<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>");
 			print("</user>");

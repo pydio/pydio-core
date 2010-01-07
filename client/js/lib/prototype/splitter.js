@@ -37,9 +37,11 @@ Splitter = Class.create({
 	
 	initialize: function(container, options){				
 		this.options = Object.extend({
-			direction: 		'vertical',
-			activeClass:	'active',
-			onDrag : 		Prototype.EmptyFunction
+			direction	: 	'vertical',
+			activeClass	:	'active',
+			onDrag 		:	Prototype.EmptyFunction,
+			endDrag 	:	Prototype.EmptyFunction,
+			startDrag 	:	Prototype.EmptyFunction
 			// initA, initB
 			// minA, maxA, minB, maxB
 		}, arguments[1]||{});
@@ -93,6 +95,7 @@ Splitter = Class.create({
 		this.splitbar = new Element('div', {unselectable:'on'});
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
 		this.paneA.insert({after:this.splitbar});
+
 		this.splitbar.observe("mousedown", this.startSplit.bind(this));
 		this.splitbar.observe("mouseup", this.endSplit.bind(this));
 		
@@ -144,23 +147,33 @@ Splitter = Class.create({
 			this.moveObserver = this.doSplitMouse.bind(this);
 			this.upObserver = this.endSplit.bind(this);
 		}
-		Event.observe(document, "mousemove", this.moveObserver);
-		Event.observe(document, "mouseup", this.upObserver);
+		Event.observe(this.group, "mousemove", this.moveObserver);
+		Event.observe(this.group, "mouseup", this.upObserver);
+		if(this.options.startDrag){
+			this.options.startDrag(this.getCurrentSize());
+		}
 	},
 	
 	doSplitMouse: function(event){
-        if (!this.splitbar.hasClassName(this.options.activeClass)) return this.endSplit(event);
-        //var rightBorderPos = Element.viewportOffset(this.paneA).left + Element.getWidth(this.paneA);
-        //if (event.pointerX() < rightBorderPos + 10)
-		    this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
-        //else this.endSplit(event);
+        if (!this.splitbar.hasClassName(this.options.activeClass)){        	
+        	return this.endSplit(event);
+        }
+		this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
 	}, 
 	
 	endSplit: function(event){
+		if (!this.splitbar.hasClassName(this.options.activeClass)){
+			return;
+		}
 		this.splitbar.removeClassName(this.options.activeClass);
-		Event.stopObserving(document, "mousemove", this.moveObserver);
-		Event.stopObserving(document, "mouseup", this.upObserver);
-        this.moveObserver = 0; this.upObserver = 0;
+		if(this.moveObserver){
+			Event.stopObserving(this.group, "mousemove", this.moveObserver);
+			Event.stopObserving(this.group, "mouseup", this.upObserver);
+        	this.moveObserver = 0; this.upObserver = 0;
+		}
+		if(this.options.endDrag){
+			this.options.endDrag(this.getCurrentSize());
+		}
 	}, 
 	
 	moveSplitter:function(np){		
@@ -227,6 +240,10 @@ Splitter = Class.create({
     	var sObject = {};
     	sObject[propStringName] = propValue;
     	return sObject;
+    },
+    
+    getCurrentSize : function(){
+    	return this.options.getAdjust(this.paneA);
     }
 
 });
