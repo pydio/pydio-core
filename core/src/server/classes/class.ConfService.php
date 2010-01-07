@@ -167,6 +167,12 @@ class ConfService
 		}
 		
 		
+		if($rootDirIndex!=-1 && AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
+			$loggedUser = AuthService::getLoggedUser();
+			$loggedUser->setPref("history_last_repository", $rootDirIndex);
+			$loggedUser->save();
+		}		
+		
 	}
 	
 	function getRepositoriesList()

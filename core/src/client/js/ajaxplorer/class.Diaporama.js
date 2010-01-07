@@ -139,6 +139,15 @@ Diaporama = Class.create({
 			}
 		}.bind(this));
 		this.containerDim = $(this.imgContainer).getDimensions();
+		// Init preferences
+		if(ajaxplorer && ajaxplorer.user){
+			var autoFit = ajaxplorer.user.getPreference('diapo_autofit');
+			if(autoFit && autoFit == "true"){
+				this.autoFit = true;
+				this.fitToScreenButton.addClassName('diaporamaButtonActive');
+			}
+		}
+		
 	},
 	
 	open : function(aFilesList, sCurrentFile)
@@ -285,6 +294,10 @@ Diaporama = Class.create({
 			this.autoFit = true;
 			this.fitToScreenButton.addClassName('diaporamaButtonActive');
 			this.fitToScreen();
+		}
+		if(ajaxplorer && ajaxplorer.user){
+			ajaxplorer.user.setPreference("diapo_autofit", (this.autoFit?'true':'false'));
+			ajaxplorer.user.savePreferences();
 		}
 	},
 	

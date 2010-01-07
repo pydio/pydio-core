@@ -17,7 +17,13 @@ class ConfService
    public function getConf($str) { if ($str == "USE_HTTPS") return (!empty($_SERVER['HTTPS'])) ? 1 : 0; return NULL; }
 };
 
-// Non working auth service
+/**
+ * 
+ * Non working auth service / Fake. 
+ * Get the currently logged user object
+ *
+ * @return AbstractAjxpUser
+ */
 class AuthService
 {
     public function usersEnabled() { return FALSE; }
