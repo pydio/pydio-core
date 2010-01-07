@@ -108,6 +108,18 @@ $AUTH_DRIVER = array(
         "SECRET"            => "myprivatesecret", // This is a security measure. The remote end must know the secret too for us to act.
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
+// For example, for use with the wp_ajaxplorer Wordpress plugin, this could be values like this : 
+$AUTH_DRIVER = array(
+        "NAME"          => "remote",
+        "OPTIONS"       => array(
+                "SLAVE_MODE" 		=> true, // true for hook based CMS (like Wordpress and likely yours too), false for url based CMS
+                "USERS_FILEPATH"	=> "AJXP_INSTALL_PATH/server/users/users.ser", // Required to get public links to work
+                "LOGIN_URL"			=> "/wordpress/wp-login.php",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
+        		"LOGOUT_URL"		=> "/wordpress/",  // The URL to redirect upon login out (see above)
+        		"SECRET"			=> "myprivatesecret", // This is a security measure. The remote end must know the secret too for us to act. // Currently ignore, but please keep it.
+                "TRANSMIT_CLEAR_PASS"   => false) // Don't touch this. It's unsafe (and useless here) to transmit clear password.
+);
+
 /**/
 
 /*********************************************************/
