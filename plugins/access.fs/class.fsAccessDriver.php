@@ -1174,7 +1174,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		$mess = ConfService::getMessages();		
 		$destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
-		$realSrcFile = $this->repository->getOption("PATH")."/$srcFile";
+		$realSrcFile = $this->repository->getOption("PATH")."$srcFile";
 		$recycle = $this->repository->getOption("RECYCLE_BIN");		
 		if(!file_exists($realSrcFile))
 		{
@@ -1222,7 +1222,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			// Now delete original
 			// $this->deldir($realSrcFile); // both file and dir
 			$messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
-			if($destDir == "/".$recycle)
+			if(RecycleBinManager::recycleEnabled() && $destDir == "/".$recycle)
 			{
 				RecycleBinManager::fileToRecycle($srcFile);
 				$messagePart = $mess[123]." ".$mess[122];
@@ -1238,7 +1238,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		else
 		{			
-			if($destDir == "/".$this->repository->getOption("RECYCLE_BIN"))
+			if(RecycleBinManager::recycleEnabled() && $destDir == "/".$this->repository->getOption("RECYCLE_BIN"))
 			{
 				RecycleBinManager::fileToRecycle($srcFile);
 			}
