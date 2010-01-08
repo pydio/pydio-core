@@ -1181,10 +1181,32 @@ class fsAccessDriver extends AbstractAccessDriver
 			$error[] = $mess[100].$srcFile;
 			return ;
 		}
-		if($realSrcFile==$destFile)
+		if(dirname($realSrcFile)==dirname($destFile))
 		{
-			$error[] = $mess[101];
-			return ;
+			if($move){
+				$error[] = $mess[101];
+				return ;
+			}else{
+				$base = basename($srcFile);
+				$i = 1;
+				if(is_file($realSrcFile)){
+					$dotPos = strrpos($base, ".");
+					if($dotPos>-1){
+						$radic = substr($base, 0, $dotPos);
+						$ext = substr($base, $dotPos);
+					}
+				}
+				// auto rename file
+				$i = 1;
+				$newName = $base;
+				while (file_exists($this->repository->getOption("PATH").$destDir."/".$newName)) {
+					$suffix = "-$i";
+					if(isSet($radic)) $newName = $radic . $suffix . $ext;
+					else $newName = $base.$suffix;
+					$i++;
+				}
+				$destFile = $this->repository->getOption("PATH").$destDir."/".$newName;
+			}
 		}
 		if(is_dir($realSrcFile))
 		{
