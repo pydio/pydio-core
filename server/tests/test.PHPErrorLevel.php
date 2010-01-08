@@ -41,6 +41,12 @@ class PHPErrorLevel extends AbstractTest
     function PHPErrorLevel() { parent::AbstractTest("PHP error level", PHPErrorLevel::error2string(error_reporting())); }
     function doTest() 
     { 
+        if (error_reporting() & E_USER_NOTICE)
+        {
+            $this->failedLevel = "error";
+            $this->failedInfo = "You must lower your PHP error level in php.ini NOT TO INCLUDE E_USER_NOTICE";
+            return false;
+        }
         $this->failedLevel = "info";
         return FALSE;        
     }
