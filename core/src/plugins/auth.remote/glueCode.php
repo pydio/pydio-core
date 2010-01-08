@@ -52,9 +52,10 @@
   *
   */
   
-// Only /index.php can include us
-//if (basename(__FILE__) != basename($_SERVER['SCRIPT_FILENAME']) && $_SERVER['PHP_SELF'] == '/index.php')
+global $secret, $result;
+
 {
+    
     if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
     require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
 //    require_once();
@@ -69,12 +70,22 @@
     ConfService::init("$CURRENTPATH/../../server/conf/conf.php"); 
     global $G_CONF_PLUGINNAME;
     require_once("$CURRENTPATH/../../plugins/conf.$G_CONF_PLUGINNAME/class.AJXP_User.php");
-      
+
     global $plugInAction;
+    global $G_AUTH_DRIVER_DEF;
+    if ($secret == "")
+    {
+        if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME']))
+           die("This file must be included and can't be called directly");
+        if ($_SERVER['PHP_SELF'] != $G_AUTH_DRIVER_DEF["OPTIONS"]["LOGIN_URL"])
+           $plugInAction = "zoooorg"; // Used to debug the whole shit in the main file
+    } else if ($secret != $G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"])
+        $plugInAction = "zuuuuup"; // Used to debug the whole shit in the main file
+      
     switch($plugInAction)
     {
     case 'login':
-        global $login, $result;
+        global $login;
         if (is_array($login))
         {
             $newSession = new SessionSwitcher("AjaXplorer");
@@ -82,14 +93,13 @@
         }
         break;
     case 'logout':
-        global $result;
         $newSession = new SessionSwitcher("AjaXplorer");
         global $_SESSION;
         $_SESSION = array();
         $result = TRUE;
         break;
     case 'addUser':
-        global $user, $result;
+        global $user;
         if (is_array($user))
         {
             $newSession = new SessionSwitcher("AjaXplorer");
@@ -98,7 +108,7 @@
         }
         break;
     case 'delUser':
-        global $userName, $result;
+        global $userName;
         if (strlen($userName))
         {
             $newSession = new SessionSwitcher("AjaXplorer");
@@ -107,7 +117,7 @@
         }
         break;
     case 'updateUser':
-        global $user, $result;
+        global $user;
         if (is_array($user))
         {
             $newSession = new SessionSwitcher("AjaXplorer");
@@ -126,11 +136,10 @@
         }
         break;
     case 'installDB':
-        global $user, $reset, $result;
+        global $user, $reset;
         $result = TRUE;
         break;            
     default:
-        global $result;
         $result = FALSE;
     }
 }  
