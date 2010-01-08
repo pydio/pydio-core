@@ -38,6 +38,16 @@ FilesList = Class.create(SelectableElements, {
 	{
 		$super(oElement, bSelectMultiple);
 		this._displayMode = sDefaultDisplay;		
+		
+		Event.observe(document, "ajaxplorer:user_logged", function(){
+			if(!ajaxplorer || !ajaxplorer.user) return;
+			this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));	
+			if(this.slider){
+				this.slider.setValue(this._thumbSize);
+				this.resizeThumbnails();
+			}
+		}.bind(this));
+		
 		this._thumbSize = 64;
 		this._crtImageIndex = 0;
 	
@@ -138,8 +148,13 @@ FilesList = Class.create(SelectableElements, {
 				fitHeightToBottom($('selectable_div'), $('content_pane'), (!Prototype.Browser.IE?6:0), false, 100);
 			});			
 			
+			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("thumb_size")){
+				this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
+			}
+
+			
 			this.slider = new Slider($("slider-1"), $("slider-input-1"));		
-			this.slider.setMaximum(200);
+			this.slider.setMaximum(250);
 			this.slider.setMinimum(30);		
 			this.slider.recalculate();
 			this.slider.setValue(this._thumbSize);		
@@ -147,6 +162,14 @@ FilesList = Class.create(SelectableElements, {
 			{
 				this._thumbSize = this.slider.getValue();
 				this.resizeThumbnails();
+				if(!ajaxplorer || !ajaxplorer.user) return;
+				
+				if(this.sliderTimer) clearTimeout(this.sliderTimer);
+				this.sliderTimer = setTimeout(function(){
+					ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
+					ajaxplorer.user.savePreferences();
+				}.bind(this), 100);
+				
 			}.bind(this);
 			this.disableTextSelection($('selectable_div'));
 			this.initSelectableItems($('selectable_div'), true);
@@ -217,6 +240,10 @@ FilesList = Class.create(SelectableElements, {
 		this.initGUI();
 		this.reload(currentSelection);
 		this.fireChange();
+		if(ajaxplorer && ajaxplorer.user){
+			ajaxplorer.user.setPreference("display", this._displayMode);
+			ajaxplorer.user.savePreferences();
+		}
 		return this._displayMode;
 	},
 	

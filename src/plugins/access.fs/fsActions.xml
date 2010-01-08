@@ -588,12 +588,12 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						ajaxplorer.cancelCopyOrMove();
 					};
 					var onSubmit = function(){
-						var oForm = modal.getForm();
+						var oForm = modal.getForm();						
 						if(activeRepository && $('external_repository').visible() && $('external_repository').getValue() != activeRepository){
 							oForm.select('input[name="get_action"]')[0].value = "cross_copy" ;
 						}else{
 							var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-							if(eDestLabel.value == ajaxplorer.filesList.getCurrentRep())
+							if(eDestLabel.value == ajaxplorer.filesList.getCurrentRep() && oForm.select('input[name="get_action"]')[0].value=="move")
 							{
 								alert(MessageHash[183]);
 								return false;
