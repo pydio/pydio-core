@@ -954,10 +954,10 @@ class fsAccessDriver extends AbstractAccessDriver
 	
 		if(isset($liste_fic) && is_array($liste_fic))
 		{
-			if($orderBy=="filename") {if($orderDir==0){ksort($liste_fic);}else{krsort($liste_fic);}}
+			if($orderBy=="filename") {if($orderDir==0){Utils::natksort($liste_fic);}else{Utils::natkrsort($liste_fic);}}
 			else if($orderBy=="mod") {if($orderDir==0){arsort($liste_fic);}else{asort($liste_fic);}}
 			else if($orderBy=="filesize"||$orderBy=="filetype") {if($orderDir==0){asort($liste_fic);}else{arsort($liste_fic);}}
-			else {if($orderDir==0){ksort($liste_fic);}else{krsort($liste_fic);}}
+			else {if($orderDir==0){Utils::natksort($liste_fic);}else{Utils::natkrsort($liste_fic);}}
 
 			if($orderBy != "filename"){
 				foreach ($liste_fic as $index=>$value){
@@ -972,7 +972,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		if(isset($liste_rep) && is_array($liste_rep))
 		{
 			if($orderBy=="mod") {if($orderDir==0){arsort($liste_rep);}else{asort($liste_rep);}}
-			else {if($orderDir==0){ksort($liste_rep);}else{krsort($liste_rep);}}
+			else {if($orderDir==0){Utils::natksort($liste_rep);}else{Utils::natkrsort($liste_rep);}}
 			if($orderBy != "filename"){
 				foreach ($liste_rep as $index=>$value){
 					$liste_rep[$index] = $index;
