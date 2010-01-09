@@ -252,7 +252,7 @@ Modal = Class.create({
 					oThis.cachedForms.set(currentForm.id,true);
 				}
 				else{
-					object.removeChild(currentForm);
+					try{object.removeChild(currentForm);}catch(e){}
 				}
 			});		
 		}	
