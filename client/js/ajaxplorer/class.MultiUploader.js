@@ -89,9 +89,9 @@ MultiUploader = Class.create({
 		}
 		if(formObject.select('input[type="file"]').length > 1){
 			var index = 0;
-			$(formObject).getElementsBySelector('input[type="file"]').each(function(element){
-				if(Prototype.Browser.Gecko) element.setStyle({left:'-100px'});
-				if(index > 0) formObject.removeChild(element);
+			$(formObject).select('input[type="file"]').each(function(element){
+				if(Prototype.Browser.Gecko) element.setStyle({left:'-100px'});				
+				if(index > 0) element.remove();
 				index++;
 			});
 		}
@@ -146,9 +146,12 @@ MultiUploader = Class.create({
 				// Update list
 				this.multi_selector.addListRow( this );
 
-				// Hide this: we can't use display:none because Safari doesn't like it
+				// Hide this: we can't use display:none because Safari doesn't like it				
 				this.style.position = 'absolute';
 				this.style.left = '-1000px';
+				if(Prototype.Browser.IE){
+					this.onchange = null;
+				}
 
 			};
 			// If we've reached maximum number, disable input element
