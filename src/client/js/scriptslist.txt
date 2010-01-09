@@ -20,7 +20,6 @@ js/lib/webfx/xtree.js
 js/lib/webfx/xloadtree.js
 js/lib/webfx/slider/js/slider.js
 js/ajaxplorer/class.Connexion.js
-js/ajaxplorer/ajxp_multifile.js
 js/ajaxplorer/ajxp_utils.js
 js/ajaxplorer/class.User.js
 js/ajaxplorer/class.Repository.js
@@ -41,4 +40,6 @@ js/ajaxplorer/class.Editor.js
 js/ajaxplorer/class.Modal.js
 js/ajaxplorer/class.BookmarksBar.js
 js/ajaxplorer/class.FormManager.js
+js/ajaxplorer/class.MultiUploader.js
+js/ajaxplorer/class.MultiDownloader.js
 js/ajaxplorer/class.Ajaxplorer.js

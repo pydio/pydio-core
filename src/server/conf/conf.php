@@ -177,6 +177,13 @@ $default_language="en";
 /*********************************************/
 /*	GLOBAL UPLOAD CONFIG
 /*********************************************/
+// Whether the flash upload is enabled or not.
+// In most case, it will work ok and greatly enhance the upload
+// feature, by providing multiple file selection and progress bar.
+// But in somecase it may conflict with the server config. In that case
+// you can switch to the old simple HTML+JavaScript version.
+$upload_enable_flash = true;
+
 // Maximum number of files for each upload. Leave to 0 for no limit.
 $upload_max_number = 16;
 
@@ -192,6 +199,20 @@ $upload_max_size_per_file = 0;
 // Leave to 0 if you do not want any limit.
 // See the previous variable for syntax ("2M" or 2097152 )
 $upload_max_size_total = 0;
+
+/********************************************/
+/* DOWNLOAD OPTIONS
+/*********************************************/
+// Gzip files on-the-fly before download (unique files)
+define("GZIP_DOWNLOAD", false);
+define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 1M
+
+// Disable multiple files and folders download by creating a zip archive.
+// If enabled, it uses PclZip php library, based on the gz php functions.
+// If you are encountering problems with this, set this to true. A "multiple downloader"
+// will appear instead.
+define("DISABLE_MULTIPLE_FILES_DL", false);
+
 
 /*********************************************/
 /* WEBMASTER EMAIL / NOT USED AT THE MOMENT!!
@@ -235,9 +256,6 @@ define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
 
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
-
-define("GZIP_DOWNLOAD", false);
-define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 1M
 
 $logger = AJXP_Logger::getInstance();
 $logger->initStorage(INSTALL_PATH."/server/logs/");
