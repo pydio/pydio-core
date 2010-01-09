@@ -46,6 +46,7 @@ global $G_MAX_CHAR;
 global $G_UPLOAD_MAX_NUMBER;
 global $G_UPLOAD_MAX_FILE;
 global $G_UPLOAD_MAX_TOTAL;
+global $G_UPLOAD_ENABLE_FLASH;
 
 global $G_ACCESS_DRIVER;
 global $G_CONF_DRIVER;
@@ -61,7 +62,8 @@ class ConfService
 		include_once($confFile);
 		// INIT AS GLOBAL
 		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS, 
-               $G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, $G_UPLOAD_MAX_TOTAL, 
+               $G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, 
+               $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_ENABLE_FLASH,
                $G_DEFAULT_REPOSITORIES, $G_AUTH_DRIVER_DEF, $G_CONF_PLUGINNAME, $G_PROBE_REAL_SIZE;
 		if(!isset($langue) || $langue=="") {$langue=$default_language;}
 		$G_LANGUE = $langue;
@@ -74,6 +76,7 @@ class ConfService
 		$G_WM_EMAIL = $webmaster_email;
 		$G_MAX_CHAR = $max_caracteres;
 		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
+		$G_UPLOAD_ENABLE_FLASH = $upload_enable_flash;
 		$G_UPLOAD_MAX_FILE = Utils::convertBytes($upload_max_size_per_file);
 		$G_UPLOAD_MAX_TOTAL = Utils::convertBytes($upload_max_size_total);
 		$G_DEFAULT_REPOSITORIES = $REPOSITORIES;
@@ -410,7 +413,7 @@ class ConfService
 
 	function getConf($varName)	
 	{
-		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_MAX_FILE;
+		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_MAX_FILE, $G_UPLOAD_ENABLE_FLASH;
 		$globVarName = "G_".$varName;
 		return $$globVarName;
 	}

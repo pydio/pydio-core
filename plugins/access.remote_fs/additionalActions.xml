@@ -40,16 +40,14 @@
 				}
 				else
 				{
-					$('hidden_frames').innerHTML = '<iframe name="hidden_iframe" id="hidden_iframe"></iframe>';			
-					var onLoadFunction = function(oForm){
-						this.multi_selector = new MultiSelector(oForm, oForm.getElementsBySelector('div.uploadFilesList')[0], '6' );
-						this.multi_selector.addElement(oForm.getElementsBySelector('.dialogFocus')[0]);
-						var rep = document.createElement('input');
-						rep.setAttribute('type', 'hidden');
-						rep.setAttribute('name', 'dir');
-						rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
-						oForm.appendChild(rep);
-					}.bind(ajaxplorer.actionBar);
+					modal.showDialogForm('Upload', 
+										'originalUploadForm', 
+										function(oForm){
+											ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm, '6' );
+										}, 
+										null, 
+										null, 
+										true, true);					
 					
 					modal.setCloseAction(function(){						
 						ajaxplorer.filesList.reload();
@@ -62,17 +60,29 @@
 					]]></clientCallback>
 				<clientForm id="flash_upload_form"><![CDATA[
 					<!-- UPLOAD FORM -->
-					<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="640">
-					<legend>AJXP_MESSAGE[25]<b class="replace_rep"></b></legend>
-					<br><br>AJXP_MESSAGE[171]<br>
-					<input type="file" name="userfile_1" class="dialogFocus" size="30">
-					<input type="hidden" name="get_action" value="upload">
-					
-					<br><br>AJXP_MESSAGE[172]
-					<div id="upload_files_list" class="uploadFilesList"></div>
+					<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="470">					
+					<table>
+						<tr>	
+							<td id="fileInputContainer" valign="top" align="right">
+								<input type="file" name="userfile_1" class="dialogFocus">
+								<div id="uploadBrowseButton" class="fakeUploadButton" align="center"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/view_list_details.png"><br/>AJXP_MESSAGE[171]</div>
+								<div id="uploadSendButton" class="fakeUploadButton" align="center"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/yast_backup.png"><br/>AJXP_MESSAGE[77]</div>
+							</td>
+							<td rowspan="2" id="uploadFilesListContainer" valign="top">
+								<div id="upload_files_list" class="uploadFilesList"></div>
+							</td>
+						</tr>
+						<tr>	
+							<td valign="bottom" align="right">
+								<div class="fakeUploadButton fakeOptionButton" id="uploadOptionsButton" align="center">AJXP_MESSAGE[310]</div>
+								<div class="fakeUploadButton fakeOptionButton" id="uploadCloseButton" align="center">AJXP_MESSAGE[86]</div>
+							</td>
+						</tr>
+					</table>
+					<input type="hidden" name="get_action" value="upload">	
 					</form>
 					
-					<!-- MOOTOOLS UPLOAD FORM -->
+					<!-- FLEX UPLOAD FORM -->
 					<div id="flash_upload_form" box_width="470">
 					<div id="flashscreen">
 					<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>

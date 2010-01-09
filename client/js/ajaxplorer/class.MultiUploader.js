@@ -1,35 +1,37 @@
 /**
- * Convert a single file-input element into a 'multiple' input list
- *
- * Usage:
- *
- *   1. Create a file input element (no name)
- *      eg. <input type="file" id="first_file_element">
- *
- *   2. Create a DIV for the output to be written to
- *      eg. <div id="files_list"></div>
- *
- *   3. Instantiate a MultiSelector object, passing in the DIV and an (optional) maximum number of files
- *      eg. var multi_selector = new MultiSelector( document.getElementById( 'files_list' ), 3 );
- *
- *   4. Add the first element
- *      eg. multi_selector.addElement( document.getElementById( 'first_file_element' ) );
- *
- *   5. That's it.
- *
- *   You might (will) want to play around with the addListRow() method to make the output prettier.
- *
- *   You might also want to change the line 
- *       element.name = 'file_' + this.count;
- *   ...to a naming convention that makes more sense to you.
+ * @package info.ajaxplorer.js
  * 
- * Licence:
- *   Use this however/wherever you like, just don't blame me if it breaks anything.
+ * Copyright 2007-2009 Charles du Jeu
+ * This file is part of AjaXplorer.
+ * The latest code can be found at http://www.ajaxplorer.info/
+ * 
+ * This program is published under the LGPL Gnu Lesser General Public License.
+ * You should have received a copy of the license along with AjaXplorer.
+ * 
+ * The main conditions are as follow : 
+ * You must conspicuously and appropriately publish on each copy distributed 
+ * an appropriate copyright notice and disclaimer of warranty and keep intact 
+ * all the notices that refer to this License and to the absence of any warranty; 
+ * and give any other recipients of the Program a copy of the GNU Lesser General 
+ * Public License along with the Program. 
+ * 
+ * If you modify your copy or copies of the library or any portion of it, you may 
+ * distribute the resulting library provided you do so under the GNU Lesser 
+ * General Public License. However, programs that link to the library may be 
+ * licensed under terms of your choice, so long as the library itself can be changed. 
+ * Any translation of the GNU Lesser General Public License must be accompanied by the 
+ * GNU Lesser General Public License.
+ * 
+ * If you copy or distribute the program, you must accompany it with the complete 
+ * corresponding machine-readable source code or with a written offer, valid for at 
+ * least three years, to furnish the complete corresponding machine-readable source code. 
+ * 
+ * Any of the above conditions can be waived if you get permission from the copyright holder.
+ * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * Credit:
- *   If you're nice, you'll leave this bit:
- *  
- *   Class by Stickman -- http://www.the-stickman.com
+ *   Original class by Stickman -- http://www.the-stickman.com
  *      with thanks to:
  *      [for Safari fixes]
  *         Luis Torrefranca -- http://www.law.pitt.edu
@@ -37,44 +39,83 @@
  *         Shawn Parker & John Pennypacker -- http://www.fuzzycoconut.com
  *      [for duplicate name bug]
  *         'neal'
+ * 
+ * Description : Class for simple Ajax/HTML multiple upload
  */
-function MultiSelector( formObject, list_target, max ){
+MultiUploader = Class.create({
+	
+	
+	initialize : function( formObject, max ){
 
-	// Main form
-	this.mainForm = formObject;
-	
-	// Where to write the list
-	this.list_target = list_target;
-	// How many elements?
-	this.count = 0;
-	// Current index
-	this.id = 0;
-	// Is there a maximum?
-	if( max ){
-		this.max = max;
-	} else {
-		this.max = -1;
-	};
-	
-	this.crtList = ajaxplorer.getFilesList();
-	
-	// Clear list_target
-	if(list_target.childNodes.length){
-		$A(list_target.childNodes).each(function(node){
-			list_target.removeChild(node);
+		formObject = $(formObject);
+		// Main form
+		this.mainForm = formObject;
+		
+		// Where to write the list
+		this.list_target = formObject.select('div.uploadFilesList')[0];
+		// How many elements?
+		this.count = 0;
+		// Current index
+		this.id = 0;
+		// Is there a maximum?
+		if( max ){
+			this.max = max;
+		} else {
+			this.max = -1;
+		};
+		
+		this.crtList = ajaxplorer.getFilesList();		
+		this.addElement(formObject.select('.dialogFocus')[0]);
+		var rep = new Element('input', {
+			type:'hidden', 
+			name:'dir', 
+			value:this.crtList.getCurrentRep()
 		});
-	}
-	if($(formObject).getElementsBySelector('input[type="file"]').length > 1){
-		var index = 0;
-		$(formObject).getElementsBySelector('input[type="file"]').each(function(element){
-			if(index > 0) formObject.removeChild(element);
-			index++;
-		});
-	}
+		formObject.insert(rep);		
+		
+		this.currentFileUploading = null;
+		this.nextToUpload = -1;
+		$('hidden_forms').getElementsBySelector("form").each(function(element){
+			element.remove();
+		});		
+		$('hidden_frames').innerHTML = '<iframe name="hidden_iframe" id="hidden_iframe"></iframe>';
+		
+		
+		// Clear list_target
+		if(this.list_target.childNodes.length){
+			$A(this.list_target.childNodes).each(function(node){
+				this.removeChild(node);
+			}.bind(this.list_target) );
+		}
+		if(formObject.select('input[type="file"]').length > 1){
+			var index = 0;
+			$(formObject).getElementsBySelector('input[type="file"]').each(function(element){
+				if(Prototype.Browser.Gecko) element.setStyle({left:'-100px'});
+				if(index > 0) formObject.removeChild(element);
+				index++;
+			});
+		}
+		
+		var sendButton = formObject.select('div[id="uploadSendButton"]')[0];
+		var optionsButton = formObject.select('div[id="uploadOptionsButton"]')[0];
+		var closeButton = formObject.select('div[id="uploadCloseButton"]')[0];
+		
+		sendButton.observe("click", function(){
+			this.submitMainForm();
+		}.bind(this));
+		optionsButton.observe("click", function(){
+			
+		}.bind(this));
+		closeButton.observe("click", function(){
+			hideLightBox();
+		}.bind(this));
+		
+	},
+	
 	/**
 	 * Add a new file input element
 	 */
-	this.addElement = function( element ){
+	addElement : function( element ){
 
 		// Make sure it's a file input element
 		if( element.tagName == 'INPUT' && element.type == 'file' ){
@@ -83,7 +124,7 @@ function MultiSelector( formObject, list_target, max ){
 			element.multi_index = this.id;
 			element.id = element.name;
 			$(element).addClassName("dialogFocus");
-
+			if(Prototype.Browser.Gecko) $(element).setStyle({left:'-100px'});
 			// Add reference to this object
 			element.multi_selector = this;
 
@@ -127,12 +168,12 @@ function MultiSelector( formObject, list_target, max ){
 			alert( 'Error: not a file input element' );
 		};
 
-	};
+	},
 
 	/**
 	 * Add a new row to the list of files
 	 */
-	this.addListRow = function( element ){
+	addListRow : function( element ){
 
 		// Row div
 		var new_row = document.createElement( 'div' );		
@@ -140,7 +181,7 @@ function MultiSelector( formObject, list_target, max ){
 		// Delete button
 		var new_row_button = document.createElement( 'img' );
 		//new_row_button.appendChild(document.createTextNode('remove'));
-		new_row_button.src = ajxpResourcesFolder+'/images/recyclebin.png';
+		new_row_button.src = ajxpResourcesFolder+'/images/crystal/actions/22/editdelete.png';
 		new_row_button.align = 'absmiddle';
 		new_row_button.setAttribute("style", "border:0px;cursor:pointer;");
 
@@ -187,9 +228,9 @@ function MultiSelector( formObject, list_target, max ){
 		// Add it to the list
 		this.list_target.appendChild( new_row );
 		
-	};
+	},
 	
-	this.getFileNames = function(){
+	getFileNames : function(){
 		
 		var fileNames = new Array();
 		for(var i=0; i<this.list_target.childNodes.length;i++)
@@ -198,9 +239,9 @@ function MultiSelector( formObject, list_target, max ){
 		}
 		return fileNames;
 		
-	};
+	},
 
-	this.updateRowByIndex = function(multiIndex, state){
+	updateRowByIndex : function(multiIndex, state){
 		var row;
 		for(var i=0; i<this.list_target.childNodes.length;i++)
 		{
@@ -218,21 +259,15 @@ function MultiSelector( formObject, list_target, max ){
 		if(state == 'loading') stateImg.src = ajxpResourcesFolder+'/images/crystal/yellowled.png';
 		else if(state == 'done') stateImg.src = ajxpResourcesFolder+'/images/crystal/greenled.png';
 		else if(state == 'error') stateImg.src = ajxpResourcesFolder+'/images/crystal/redled.png';
-	};
+	},
 	
 	
-	this.submitMainForm = function(){
+	submitMainForm : function(){
 
-		currentFileUploading = null;
-		nextToUpload = -1;
-		$('hidden_forms').getElementsBySelector("form").each(function(element){
-			element.remove();
-		});
+		this.currentFileUploading = null;
+		this.nextToUpload = -1;
 		var formsCount = 0;
 		var i = 0;
-		//alert('Submitting'+this.mainForm.action);
-		//this.mainForm.submit();
-		//return;
 		for(i=0;i<this.id + 1;i++)
 		{
 
@@ -266,21 +301,21 @@ function MultiSelector( formObject, list_target, max ){
 			}
 		}
 		this.submitNext();		
-	};
+	},
 	
-	this.submitNext = function(error)
+	submitNext : function(error)
 	{
-		nextToUpload ++;
-		if(currentFileUploading){
-			if(error)this.updateRowByIndex(currentFileUploading, 'error');
-			else this.updateRowByIndex(currentFileUploading, 'done');
+		this.nextToUpload ++;
+		if(this.currentFileUploading){
+			if(error)this.updateRowByIndex(this.currentFileUploading, 'error');
+			else this.updateRowByIndex(this.currentFileUploading, 'done');
 		}
 		if(error && typeof(error) == "string") alert(error);
-		var nextToSubmit = $('pendingform_'+nextToUpload);
+		var nextToSubmit = $('pendingform_'+this.nextToUpload);
 		if(nextToSubmit)
 		{			
-			currentFileUploading = nextToSubmit.multi_index;
-			this.updateRowByIndex(currentFileUploading, 'loading');
+			this.currentFileUploading = nextToSubmit.multi_index;
+			this.updateRowByIndex(this.currentFileUploading, 'loading');
 			var crtValue = $(nextToSubmit).getElementsBySelector('input[type="file"]')[0].value;
 			if(this.crtList.fileNameExists(crtValue))
 			{
@@ -295,64 +330,10 @@ function MultiSelector( formObject, list_target, max ){
 		else
 		{
 			//modal.close();
-			hideLightBox();
+			//hideLightBox();
+			this.crtList.reload();
 		}
 		
-	};
+	}
 	
-};
-var currentFileUploading, nextToUpload;
-
-
-function MultiDownloader( list_target, downloadUrl ){
-
-	// Where to write the list
-	this.list_target = list_target;
-	// How many elements?
-	this.count = 0;
-	// How many elements?
-	this.id = 0;
-	// Download Url
-	this.downloadUrl = downloadUrl;
-
-	/**
-	 * Add a new row to the list of files
-	 */
-	this.addListRow = function( fileName )
-	{
-
-		this.count ++;
-		// Row div
-		var new_row = new Element( 'div' );
-
-		var new_row_button = new Element('a');
-		new_row_button.href= this.downloadUrl + fileName;		
-		new_row_button.insert('<img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/download_manager.png" height="16" width="16" align="absmiddle" border="0"> '+getBaseName(fileName));
-
-		new_row_button.multidownloader = this;
-		
-		// Delete function
-		new_row_button.onclick= function()
-		{
-			// Remove this row from the list
-			this.parentNode.parentNode.removeChild( this.parentNode );
-			this.multidownloader.count --;
-			if(this.multidownloader.count == 0 && this.multidownloader.triggerEnd)
-			{
-				this.multidownloader.triggerEnd();
-			}
-		};
-		
-		new_row.insert(new_row_button);
-		
-		// Add it to the list
-		$(this.list_target).insert( new_row );
-		
-	};
-	
-	this.emptyList = function()
-	{
-		
-	};
-
-};
+});
