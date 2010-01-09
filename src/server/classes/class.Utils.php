@@ -36,6 +36,29 @@
 class Utils
 {
 	
+	/**
+	* Performs a natural sort on the array keys. 
+	* Behaves the same as ksort() with natural sorting added. 
+	* 
+	* @param Array $array The array to sort 
+	*/  
+	function natksort(&$array) {
+		uksort($array, 'strnatcasecmp');
+		return true;
+	}
+
+	/**
+	* Performs a reverse natural sort on the array keys 
+	* Behaves the same as krsort() with natural sorting added. 
+	* 
+	* @param Array $array The array to sort 
+	*/  
+	function natkrsort(&$array) {
+		natksort($array);
+		$array = array_reverse($array,TRUE);
+		return true;
+	}
+
 	function securePath($path)
 	{
 		if($path == null) $path = ""; 
