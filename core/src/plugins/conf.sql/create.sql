@@ -22,7 +22,7 @@ CREATE TABLE ajxp_user_bookmarks (
 
 CREATE TABLE ajxp_repo ( 
 	uuid VARCHAR(33) PRIMARY KEY, 
- 	path VARCHAR(255) NOT NULL, 
+ 	path VARCHAR(255), 
  	display VARCHAR(255), 
  	accessType VARCHAR(20), 
  	recycle VARCHAR(255), 
