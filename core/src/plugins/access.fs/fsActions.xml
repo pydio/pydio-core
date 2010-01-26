@@ -300,6 +300,18 @@ AJXP_MESSAGE[174]<br/>
 					<input type="text" name="archive_name" value="" id="archive_name" class="dialogFocus initFicName">
 				</div>
 				]]></clientForm>					
+				<clientListener name="selectionChange"><![CDATA[
+				if(ajaxplorer){
+					var userSelection = ajaxplorer.getFilesList().getUserSelection();
+					var action = ajaxplorer.getActionBar().getActionByName("compress");
+					if(!zipEnabled || !multipleFilesDownloadEnabled){
+						if(action){
+							if(userSelection.isUnique()) action.selectionContext.multipleOnly = true;
+							else action.selectionContext.unique = true;
+						}
+					}
+				}
+				]]></clientListener>				
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
