@@ -142,7 +142,7 @@ $mess=array(
 "123" => "Ta&#351;&#305;nd&#305;&#287;&#305; yer ",
 "124" => "Varolan dosyalar&#305;n uzerine mi yaz&#305;ls&#305;n?",
 "125" => "Bu isimli dosya/klasor zaten mevcut (isimler buyuk harf duyars&#305;z). Farkl&#305; bir isim secin!",
-"126" => "M&#304;NYAT&Uuml;RLER", 
+"126" => "M&#304;NYAT&Uuml;RLER",
 "127" => "Boyut",
 "128" => "Secilmi&#351; dosyalar.",
 "129" => "&#304;NCELE",
@@ -222,7 +222,7 @@ $mess=array(
 "185" => "Aramay&#305; durdur",
 "186" => "Resim ornekleri",
 "187" => "Online surumu - ",
-"189" => "Tercihlerimi duzenle", 
+"189" => "Tercihlerimi duzenle",
 "190" => "Dil",
 "191" => "Varsay&#305;lan Gorunum",
 "192" => "AYRINTILI L&#304;STE",
@@ -350,6 +350,9 @@ $mess=array(
 "310" => "Secenekler",
 "311" => "Bir dosya eklendi&#287;i zaman otomatikman yukle",
 "312" => "Yukleme Secenekleri",
+"313" => "Compress...",
+"314" => "Compress selection to zip...",
+"315" => "Compress selection to",
 /* END SENTENCE */
 );
 ?>

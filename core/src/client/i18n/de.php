@@ -348,6 +348,9 @@ $mess=array(
 "310" => "Optionen",
 "311" => "Eine neue Datei automatisch hochladen",
 "312" => "Optionen zum Upload",
+"313" => "Compress...",
+"314" => "Compress selection to zip...",
+"315" => "Compress selection to",
 /* END SENTENCE */
 );
 ?>
