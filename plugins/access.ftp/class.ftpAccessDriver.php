@@ -963,11 +963,36 @@ class ftpAccessDriver extends  AbstractAccessDriver
         
     }
 
+    function normalizePath($path) {
+        return preg_replace("/[\/]+/", "/", $path);
+    } 
+
     function ftpCopy($destDir, $srcFile, &$error, &$success){
 		$mess = ConfService::getMessages();
 		$this->repository->detectStreamWrapper(true);
-        $destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
-        $realSrcFile = $this->repository->getOption("PATH")."/$srcFile";
+        $destFile = $this->normalizePath($this->repository->getOption("PATH").$destDir."/".basename($srcFile));
+        $realSrcFile = $this->normalizePath($this->repository->getOption("PATH")."/$srcFile");
+        if(dirname($realSrcFile)==dirname($destFile))
+        {
+            $base = basename($srcFile);
+            $i = 1;
+            $dotPos = strrpos($base, ".");
+            if($dotPos>-1){
+                $radic = substr($base, 0, $dotPos);
+                $ext = substr($base, $dotPos);
+            }
+            // auto rename file
+            $i = 1;
+            $newName = $base;
+            $fileList = ftp_nlist($this->connect, $this->repository->getOption("PATH").$destDir."/");
+            while (array_search($this->normalizePath(dirname($realSrcFile)."/".$newName), $fileList) !== FALSE) {
+                $suffix = "-$i";
+                if(isSet($radic)) $newName = $radic . $suffix . $ext;
+                else $newName = $base.$suffix;
+                $i++;
+            }
+            $destFile = $this->repository->getOption("PATH").$destDir."/".$newName;
+        }
         $tmpFile = tmpfile();
         if(ftp_fget($this->connect, $tmpFile, $realSrcFile, FTP_BINARY)){
         	rewind($tmpFile);
