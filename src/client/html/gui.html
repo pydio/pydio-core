@@ -63,7 +63,7 @@ if($JS_DEBUG){
 		var ajxpResourcesFolder = '<?php print(CLIENT_RESOURCES_FOLDER); ?>';
 		var ajxpServerAccessPath = '<?php print(SERVER_ACCESS); ?>';
 		var zipEnabled = <?php print($ZIP_ENABLED); ?>;
-		var multipleFilesDownloadEnabled = <?php print((DISABLE_MULTIPLE_FILES_DL?"false":"true"));?>;
+		var multipleFilesDownloadEnabled = <?php print((DISABLE_ZIP_CREATION?"false":"true"));?>;
 		var flashUploaderEnabled = <?php print((ConfService::getConf("UPLOAD_ENABLE_FLASH")?"true":"false")); ?>;
 </script>
 <?php

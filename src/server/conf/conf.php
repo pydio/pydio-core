@@ -201,7 +201,7 @@ define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 1M
 // If enabled, it uses PclZip php library, based on the gz php functions.
 // If you are encountering problems with this, set this to true. A "multiple downloader"
 // will appear instead.
-define("DISABLE_MULTIPLE_FILES_DL", false);
+define("DISABLE_ZIP_CREATION", false);
 
 /**********************************************/
 /* GOOGLE ANALYTICS SETUP
