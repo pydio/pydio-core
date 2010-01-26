@@ -374,8 +374,8 @@ ConfigEditor = Class.create({
 		var dName = this.driverSelector.getValue();
 		this.createDriverForm(dName);
 		if(dName != "0"){
-			var height = 120 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
-			if(height > 400) height=400;
+			var height = 130 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
+			if(height > 425) height=425;
 		}
 		new Effect.Morph(this.driverForm.up('div'),{
 			style:'height:'+height + 'px',
@@ -459,41 +459,10 @@ ConfigEditor = Class.create({
 			paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
 		});
 		var writeable = (repo.getAttribute("writeable")?(repo.getAttribute("writeable")=="true"):false);			
+		this.currentForm = form;
+		this.currentRepoId = repo.getAttribute("index");
+		this.currentRepoWriteable = writeable;
 		this.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable);
-
-		if(writeable){
-			var submitButton = new Element("input", {type:"button",value:"SAVE", className:"dialogButton"});
-			submitButton.observe("click", function(e){
-				var toSubmit = new Hash();
-				toSubmit.set("repository_id", repo.getAttribute("index"));
-				this.submitParametersInputs(form, toSubmit, 'DRIVER_OPTION_');
-				this.submitForm('edit_repository', 'edit_repository_data', toSubmit, null, function(){
-					this.loadRepList();
-					this.loadUsers();
-				}.bind(this));			
-			}.bind(this));
-			optionsPane.insert({bottom:new Element('div', {align:'right'}).update(submitButton)});
-		}
-		
-		
-				
-		/*
-		var labelPane = this.form.select('[id="label_pane"]')[0];
-		if(!writeable || writeable != "1"){
-			labelPane.hide();
-		}else{
-			var repoId = XPathGetSingleNodeText(repo, "@index");
-			var repoLabel = XPathGetSingleNodeText(repo, "@display");
-			
-			labelInput = labelPane.select('input[type="text"]')[0]; 
-			labelInput.value = repoLabel;
-			labelSave = labelPane.select('input[type="button"]')[0];
-			labelSave.observe("click", function(){
-				this.submitForm('edit_repository', 'edit_repository_label', new Hash({repository_id:repoId,newLabel:labelInput.getValue()}), null, function(){
-				}.bind(this) );
-			}.bind(this));			
-		}
-		*/
 	},
 	
 	deleteRepository : function(repId){
