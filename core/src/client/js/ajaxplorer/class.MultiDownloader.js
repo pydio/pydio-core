@@ -72,6 +72,7 @@ MultiDownloader = Class.create({
 			{
 				this.multidownloader.triggerEnd();
 			}
+			gaTrackEvent("Data", "Download", fileName);
 		};
 		
 		new_row.insert(new_row_button);
