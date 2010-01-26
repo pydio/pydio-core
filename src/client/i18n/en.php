@@ -351,6 +351,6 @@ $mess=array(
 "312" => "Uploader Options",
 "313" => "Compress...",
 "314" => "Compress selection to zip...",
-"315" => "Compress selection to"
+"315" => "Compress selection to",
 );
 ?>

@@ -175,7 +175,22 @@
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
 							ajaxplorer.actionBar.configEditor.loadRepository(item.getAttribute("repository_id"));
 						};
-						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, function(){hideLightBox();}, null, true);
+						var closeFunc = function(){
+							var toSubmit = new Hash();
+							var configEditor = ajaxplorer.actionBar.configEditor;
+							if(!configEditor.currentRepoWriteable){
+								hideLightBox();
+								return;
+							}
+							toSubmit.set("repository_id", configEditor.currentRepoId);
+							configEditor.submitParametersInputs(configEditor.currentForm, toSubmit, 'DRIVER_OPTION_');
+							configEditor.submitForm('edit_repository', 'edit_repository_data', toSubmit, null, function(){
+								this.loadRepList();
+								this.loadUsers();
+							}.bind(configEditor));							
+							hideLightBox();
+						};
+						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, closeFunc);
 					}					
 					]]></clientCallback>
 				<clientForm id="edit_config_box"><![CDATA[
@@ -203,7 +218,7 @@
 							<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:30px;" />
 						</fieldset>
 					</div>
-					<div id="edit_repo_box" action="edit_repository" box_width="450" style="overflow:auto;height:200px;">
+					<div id="edit_repo_box" action="edit_repository" box_width="450">
 						<fieldset id="options_pane">
 							Loading...
 						</fieldset>

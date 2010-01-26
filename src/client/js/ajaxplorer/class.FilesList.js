@@ -143,6 +143,9 @@ FilesList = Class.create(SelectableElements, {
 			buffer = buffer + '<td align="right" id="last_header"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
 			buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" style="padding:0px;"><div id="selectable_div" style="overflow:auto; padding:2px 5px;"></div></td></tr></tbody></table>';
 			$('content_pane').innerHTML  = buffer;
+			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
+				$('selectable_div').insert({before:this.createPaginator()});
+			}
 			fitHeightToBottom($('selectable_div'), $('content_pane'), (!Prototype.Browser.IE?6:0), false, 100);
 			document.observe("ajaxplorer:loaded", function(){
 				fitHeightToBottom($('selectable_div'), $('content_pane'), (!Prototype.Browser.IE?6:0), false, 100);

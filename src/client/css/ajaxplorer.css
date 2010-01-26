@@ -1341,13 +1341,12 @@ legend
 #driver_form input.text,
 .driver_form input.text
 {
-   padding:0px;
-   padding-left:2px;
-   padding-right:2px;
-   margin-left: 0px;
-   width: 200px;
-   height: 18px;
-   border: 1px solid #999;   
+	margin-left: 0px;
+	border:1px solid #999999;
+	height:21px;
+	margin-bottom:9px;
+	padding:1px 3px;
+	width:185px;
 }
 
 #driver_form input.radio,

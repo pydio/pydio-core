@@ -540,7 +540,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				//$reps = $result[0];
 				AJXP_XMLWriter::header();
 				if(isSet($totalPages) && isSet($crtPage)){
-					print '<columns switchDisplayMode="list" switchGridMode="filelist"/>';
+					//print '<columns switchDisplayMode="list" switchGridMode="filelist"/>';
 					print '<pagination count="'.$countFiles.'" total="'.$totalPages.'" current="'.$crtPage.'"/>';
 				}
 				foreach ($reps as $repIndex => $repName)
