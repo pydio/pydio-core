@@ -1579,7 +1579,9 @@ padding: 0px;
    position:absolute;
    z-index: 1500;
    background-color:#f1f1ef;  
-   width: 150px;
+   min-width: 150px;
+   /* IE */
+   width:expression("250px"); 
    border: 1px solid #676965;
 }
 
