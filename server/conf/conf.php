@@ -33,7 +33,7 @@
  * 
  * Description : configuration file
  */
-define("AJXP_VERSION", "2.5.4");
+define("AJXP_VERSION", "2.5.5");
 define("AJXP_VERSION_DATE", "2009/11/02");
 
 define("ENABLE_USERS", 1);
@@ -80,7 +80,9 @@ $AUTH_DRIVER = array(
 		"AUTOCREATE_AJXPUSER" 	=> false, 
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
+
 /*
+// Sample auth.sql usage 
 $AUTH_DRIVER = array(
 	"NAME"	=> "sql",
 	"OPTIONS" 	=> array(
@@ -95,20 +97,8 @@ $AUTH_DRIVER = array(
 	)
 );
 */
-/**/
-/** FOR USE WITH CMS SYSTEM ONLY */
 /*
-$AUTH_DRIVER = array(
-	"NAME"		=> "remote",
-	"OPTIONS"	=> array(
-		"SLAVE_MODE"		=> true, // true for hook based CMS (like Wordpress), false for url based CMS
-		"USERS_FILEPATH"	=> "AJXP_INSTALL_PATH/server/users/users.ser",
-		"LOGIN_URL" 	    => "index.php",  // The URL to redirect (or call) upon login 
-        "LOGOUT_URL"        => "index.php",  // The URL to redirect upon login out
-        "SECRET"            => "myprivatesecret", // This is a security measure. The remote end must know the secret too for us to act.
-		"TRANSMIT_CLEAR_PASS"	=> false)
-);
-// For example, for use with the wp_ajaxplorer Wordpress plugin, this could be values like this : 
+// Sample auth.remote usage for use with the wp_ajaxplorer Wordpress plugin 
 $AUTH_DRIVER = array(
         "NAME"          => "remote",
         "OPTIONS"       => array(
@@ -116,10 +106,10 @@ $AUTH_DRIVER = array(
                 "USERS_FILEPATH"	=> "AJXP_INSTALL_PATH/server/users/users.ser", // Required to get public links to work
                 "LOGIN_URL"			=> "/wordpress/wp-login.php",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
         		"LOGOUT_URL"		=> "/wordpress/",  // The URL to redirect upon login out (see above)
-        		"SECRET"			=> "myprivatesecret", // This is a security measure. The remote end must know the secret too for us to act. // Currently ignore, but please keep it.
+        		"SECRET"			=> "myprivatesecret", // This is a security measure. The remote end MUST know the secret too for us to act.
                 "TRANSMIT_CLEAR_PASS"   => false) // Don't touch this. It's unsafe (and useless here) to transmit clear password.
 );
-
+*/
 /**/
 
 /*********************************************************/
