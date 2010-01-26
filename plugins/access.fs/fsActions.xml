@@ -256,6 +256,53 @@ AJXP_MESSAGE[174]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="compress">
+			<gui text="313" title="314" src="archive_insert.png" accessKey="" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false"
+					actionBar="false" contextMenu="true" infoPanel="true"
+					actionBarGroup="get" inZip="false">
+				</context>
+				<selectionContext dir="true" file="file" recycle="false" unique="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var filesList = ajaxplorer.getFilesList();
+					var userSelection = filesList.getUserSelection();					
+					if((zipEnabled && multipleFilesDownloadEnabled))
+					{
+						var loadFunc = function(oForm){
+							var zipName;
+							if(userSelection.isUnique()){
+								zipName = getBaseName(userSelection.getUniqueFileName());
+								if(!userSelection.hasDir()) zipName = zipName.substr(0, zipName.lastIndexOf("\."));
+							}else{
+								zipName = getBaseName(filesList.getCurrentRep());
+								if(zipName == "") zipName = "Archive";
+							}
+							var index=1;
+							var buff = zipName;
+							while(filesList.fileNameExists(zipName + ".zip")){
+								zipName = buff + "-" + index; index ++ ;
+							}
+							oForm.select('input[id="archive_name"]')[0].value = zipName + ".zip" ;
+						};
+						var closeFunc = function(){
+							userSelection.updateFormOrUrl(modal.getForm());
+							ajaxplorer.actionBar.submitForm(modal.getForm());			
+							hideLightBox();
+						};
+						modal.showDialogForm('Compress selection to ...', 'compress_form', loadFunc, closeFunc);
+					}
+				]]></clientCallback>
+				<clientForm id="compress_form"><![CDATA[
+				<div id="compress_form" action="compress" box_width="280">
+					AJXP_MESSAGE[315]<br/>
+					<input type="text" name="archive_name" value="" id="archive_name" class="dialogFocus initFicName">
+				</div>
+				]]></clientForm>					
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
 		<action name="public_url" fileDefault="false">
 			<gui text="292" title="292" src="public_url.png" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"
@@ -517,13 +564,7 @@ AJXP_MESSAGE[174]<br/>
 						conn.sendSync();
 					};
 					ajaxplorer.filesList.switchCurrentLabelToEdition(callback);
-					]]></clientCallback>
-				<clientForm id="rename_form"><![CDATA[
-				<div id="rename_form" action="rename" box_width="280">
-AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
-<input type="text" name="filename_new" value="" id="filename_new" class="dialogFocus initFicName">
-</div>
-				]]></clientForm>
+				]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>

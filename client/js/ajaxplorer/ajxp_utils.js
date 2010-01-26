@@ -271,7 +271,7 @@ function getViewPortHeight(){
  * Track event in Google Analytics
  */
 function gaTrackEvent(eventCateg, eventName, eventData, eventValue){
-	if(_gaq && _gaTrackEvents){
+	if(window._gaq && window._gaTrackEvents){
 		_gaq.push(['_trackEvent', eventCateg, eventName, eventData, eventValue]);
 	}
 }

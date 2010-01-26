@@ -348,6 +348,9 @@ $mess=array(
 "310" => "Instillinger",
 "311" => "Upload automatisk når en fil bliver tilføjet",
 "312" => "Upload instillinger",
+"313" => "Compress...",
+"314" => "Compress selection to zip...",
+"315" => "Compress selection to",
 /* END SENTENCE */
 );
 ?>
