@@ -91,7 +91,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			$parts = explode("#", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
-		}		
+		}					
 		
 		switch($action)
 		{			
@@ -133,6 +133,21 @@ class fsAccessDriver extends AbstractAccessDriver
 				exit(0);
 			break;
 		
+			case "compress" : 					
+					// Make a temp zip and send it as download					
+					if(isSet($archive_name)){
+						$localName = SystemTextEncoding::fromUTF8($archive_name);
+					}else{
+						$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
+					}
+					$file = $this->getPath()."/".$dir."/".$localName;
+					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
+					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing file $localName");
+					$reload_current_node = true;
+					$reload_file_list = $localName;
+					
+			break;
+			
 			case "image_proxy":
 				if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($file))){
 					require_once("server/classes/pclzip.lib.php");
@@ -480,9 +495,9 @@ class fsAccessDriver extends AbstractAccessDriver
 							$atts[] = "src=\"content.php?dir=".urlencode(SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
 						}						
 						print("<tree ".join(" ", $atts)."/>");
-						if(is_dir($tmpDir)){
-							rmdir($tmpDir);
-						}
+					}
+					if(is_dir($tmpDir)){
+						rmdir($tmpDir);
 					}
 					AJXP_XMLWriter::close();
 					exit(0);

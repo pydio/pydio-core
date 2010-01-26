@@ -348,6 +348,9 @@ $mess=array(
 "309" => "Generate",
 "310" => "Options",
 "311" => "Upload automatically when a file is added",
-"312" => "Uploader Options"
+"312" => "Uploader Options",
+"313" => "Compress...",
+"314" => "Compress selection to zip...",
+"315" => "Compress selection to"
 );
 ?>
