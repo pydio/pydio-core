@@ -9,8 +9,9 @@ Author URI: http://www.ajaxplorer.info/
 */
 
 define("AJXP_WP_GLUE_PATH", "plugins/auth.remote/glueCode.php");
-global $options;
+global $options, $secret;
 $options = get_option("wp_ajxp_options");
+$secret = (isSet($options["ajxp_secret_key"])?$options["ajxp_secret_key"]:null);
 
 // AJXP FUNCTIONS
 function AjxpAuthenticate($username, $password = "")
@@ -76,6 +77,7 @@ function plugin_admin_init(){
 	register_setting( 'wp_ajxp_options', 'wp_ajxp_options', 'plugin_options_validate' );
 	add_settings_section('plugin_main', 'AjaXplorer Installation', 'install_section_text', 'plugin');
 	add_settings_field('plugin_text_string', 'AjaXplorer Path', 'plugin_setting_string', 'plugin', 'plugin_main');
+	add_settings_field('plugin_secret_string', 'Secret Key (must be the same as the AUTH_DRIVER "SECRET" option in your configuration.', 'plugin_secret_string', 'plugin', 'plugin_main');
 	add_settings_section('plugin_repo', 'Creating AjaXplorer Repositories', 'repo_section_text', 'plugin');
 }
 
@@ -105,16 +107,23 @@ function plugin_setting_string() {
 	echo "<input id='plugin_text_string' name='wp_ajxp_options[ajxp_install_path]' size='70' type='text' value='{$options['ajxp_install_path']}' />";
 }
 
+function plugin_secret_string() {
+	$options = get_option('wp_ajxp_options');
+	echo "<input id='plugin_secret_string' name='wp_ajxp_options[ajxp_secret_key]' size='70' type='text' value='{$options['ajxp_secret_key']}' />";
+}
+
 function plugin_options_validate($input) {
 	
+	$newinput = array();
 	$newinput['ajxp_install_path'] = trim($input['ajxp_install_path']);
+	$newinput['ajxp_secret_key'] = trim($input['ajxp_secret_key']);
 	$install = $newinput['ajxp_install_path'];
 	if(substr($install, strlen($install)-1) == "/"){
 		$newinput['ajxp_install_path'] = substr($install, 0, strlen($install)-1);
 	}
 	if(!is_dir($newinput['ajxp_install_path'])){
 		$newinput["ajxp_install_path"] = "";
-	}
+	}	
 	return $newinput;
 }
 
