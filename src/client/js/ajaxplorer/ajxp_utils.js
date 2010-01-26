@@ -268,6 +268,15 @@ function getViewPortHeight(){
 }
 
 /**
+ * Track event in Google Analytics
+ */
+function gaTrackEvent(eventCateg, eventName, eventData, eventValue){
+	if(_gaq && _gaTrackEvents){
+		_gaq.push(['_trackEvent', eventCateg, eventName, eventData, eventValue]);
+	}
+}
+
+/**
  * Selects the first XmlNode that matches the XPath expression.
  *
  * @param element {Element | Document} root element for the search

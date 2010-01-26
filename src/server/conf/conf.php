@@ -203,6 +203,21 @@ define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 1M
 // will appear instead.
 define("DISABLE_MULTIPLE_FILES_DL", false);
 
+/**********************************************/
+/* GOOGLE ANALYTICS SETUP
+/**********************************************/
+// Set this is to you GA id : something like UE-XXXXX-Y
+// This will append the Async Loading code to ajaxplorer.
+define("GOOGLE_ANALYTICS_ID", "");
+// Add this if you want to set the domain artificially.
+// If you don't know what it's about, you should probably
+// leave it empty!
+define("GOOGLE_ANALYTICS_DOMAIN", "");
+// If this is set to true and your ID is not empty,
+// this will log various actions as Events in your 
+// analytics report. Only some of them are implemented
+// at the moment.
+define("GOOGLE_ANALYTICS_EVENT", false);
 
 /*********************************************/
 /* WEBMASTER EMAIL / NOT USED AT THE MOMENT!!
