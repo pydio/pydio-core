@@ -195,12 +195,15 @@ AJXP_MESSAGE[174]<br/>
 					var userSelection = ajaxplorer.getFilesList().getUserSelection();
 					if((userSelection.isUnique() && !userSelection.hasDir()) || (zipEnabled && multipleFilesDownloadEnabled))
 					{
-						var userSelection = ajaxplorer.getFilesList().getUserSelection();
 						$('download_form').select("input").each(function(input){
 							if(input.name!='get_action') input.remove();
 						});
 						userSelection.updateFormOrUrl($('download_form'));
 						$('download_form').submit();
+						fileNames = userSelection.getFileNames();						
+						for(var i=0; i<fileNames.length;i++){
+							gaTrackEvent("Data", "Download", fileNames[i]);
+						}												
 					}
 					else
 					{
