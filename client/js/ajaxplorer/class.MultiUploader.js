@@ -96,15 +96,23 @@ MultiUploader = Class.create({
 			});
 		}
 		
+		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
 		var sendButton = formObject.select('div[id="uploadSendButton"]')[0];
+		if(sendButton.observerSet) return;		
 		var optionsButton = formObject.select('div[id="uploadOptionsButton"]')[0];
 		var closeButton = formObject.select('div[id="uploadCloseButton"]')[0];
-		
+		sendButton.observerSet = true;
 		sendButton.observe("click", function(){
 			this.submitMainForm();
 		}.bind(this));
 		optionsButton.observe("click", function(){
-			
+			if(window.htmlMultiUploaderOptions){
+				var message = MessageHash[281] + '\n';
+				for(var key in window.htmlMultiUploaderOptions){
+					message += '. '+ MessageHash[key] + ' : ' + window.htmlMultiUploaderOptions[key] + '\n';
+				}
+				alert(message);
+			}
 		}.bind(this));
 		closeButton.observe("click", function(){
 			hideLightBox();

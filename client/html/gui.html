@@ -65,6 +65,15 @@ if($JS_DEBUG){
 		var zipEnabled = <?php print($ZIP_ENABLED); ?>;
 		var multipleFilesDownloadEnabled = <?php print((DISABLE_ZIP_CREATION?"false":"true"));?>;
 		var flashUploaderEnabled = <?php print((ConfService::getConf("UPLOAD_ENABLE_FLASH")?"true":"false")); ?>;
+		<?php 
+			if(!ConfService::getConf("UPLOAD_ENABLE_FLASH")){
+			    $UploadMaxSize = Utils::convertBytes(ini_get('upload_max_filesize'));
+			    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
+			    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
+			    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");				
+				print "window.htmlMultiUploaderOptions = {'282':'$UploadMaxSize','284':'$confTotalNumber'};";
+			}
+		?>
 </script>
 <?php
 if($JS_DEBUG){
