@@ -66,16 +66,16 @@ PropertyPanel = Class.create({
 	
 	createChmodForm : function(){
 		this.checks = $H({});
-		var chmodDiv = new Element('div').setStyle({width: '140px'});
+		var chmodDiv = new Element('div').setStyle({width: '142px'});
 		// Header Line
-		var emptyLabel = new Element('div').setStyle({cssFloat:'left',width:'50px', height:'16px'});
+		var emptyLabel = new Element('div').setStyle({cssFloat:'left',width:'52px', height:'16px'});
 		chmodDiv.insert(emptyLabel);
 		for(var j=0;j<3;j++){
 			chmodDiv.insert(new Element('div').update(this.rightsLabels[j]+'&nbsp;&nbsp;').setStyle({cssFloat:'left',width:'30px', textAlign:'center'}));
 		}
 		// Boxes lines
 		for(var i=0;i<3;i++){
-			var label = new Element('div').setStyle({cssFloat:'left',width:'50px', height:'16px', textAlign:'right'});
+			var label = new Element('div').setStyle({cssFloat:'left',width:'50px', height:'16px', textAlign:'right',paddingRight:'2px'});
 			label.insert(this.accessLabels[i]);
 			chmodDiv.insert(label);
 			for(var j=0;j<3;j++){
@@ -87,8 +87,8 @@ PropertyPanel = Class.create({
 	},
 	
 	createCheckBox : function(accessor, right){
-		var box = new Element('input', {type:'checkbox', id:accessor+'_'+right}).setStyle({width:'25px',borderWidth:'0'});
-		var div = new Element('div').insert(box).setStyle({cssFloat:'left',width:'30px'});
+		var box = new Element('input', {type:'checkbox', id:accessor+'_'+right}).setStyle({width:'14px',height:'14px',borderWidth:'0'});
+		var div = new Element('div', {align:"center"}).insert(box).setStyle({cssFloat:'left',width:'30px',height:'25px'});
 		box.observe('click', function(e){
 			this.updateValueFromBoxes();
 		}.bind(this));
@@ -98,7 +98,7 @@ PropertyPanel = Class.create({
 	
 	createRecursiveBox : function(){
 		var recuDiv = new Element('div', {style:'padding-top:8px;'});
-		var recurBox = new Element('input', {type:'checkbox', name:'recursive'}).setStyle({width:'25px',borderWidth:'0'});
+		var recurBox = new Element('input', {type:'checkbox', name:'recursive'}).setStyle({width:'14px',height:'14px',borderWidth:'0'});
 		recuDiv.insert(recurBox);
 		recuDiv.insert(MessageHash[291]);
 		this.htmlElement.insert(recuDiv);
