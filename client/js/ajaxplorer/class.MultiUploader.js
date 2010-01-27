@@ -63,6 +63,9 @@ MultiUploader = Class.create({
 		} else {
 			this.max = -1;
 		};
+		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['284']){
+			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
+		}
 		
 		this.crtList = ajaxplorer.getFilesList();		
 		this.addElement(formObject.select('.dialogFocus')[0]);
