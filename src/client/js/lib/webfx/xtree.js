@@ -238,7 +238,7 @@ WebFXTreeAbstractNode.prototype.focus = function() {
 	if ((webFXTreeHandler.selected) && (webFXTreeHandler.selected != this)) { webFXTreeHandler.selected.deSelect(); }
 	webFXTreeHandler.selected = this;
 	if ((this.openIcon) && (webFXTreeHandler.behavior != 'classic')) { document.getElementById(this.id + '-icon').src = this.openIcon; }
-	document.getElementById(this.id + '-anchor').focus();
+	try{document.getElementById(this.id + '-anchor').focus();}catch(e){}
 	document.getElementById(this.id).className = 'webfx-tree-item selected-webfx-tree-item';
 	if (webFXTreeHandler.onSelect) { webFXTreeHandler.onSelect(this); }	
 } ;
