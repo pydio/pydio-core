@@ -71,8 +71,8 @@ ConfigEditor = Class.create({
 						
 		var rightsPane = this.form.select('[id="rights_pane"]')[0];
 		var rightsTable = rightsPane.select('tbody')[0];		
-		var repositories = XPathSelectNodes(xmlData, "//repo");
-        repositories.sort(function(a,b) { var albl = XPathGetSingleNodeText(a, "label"); var blbl = XPathGetSingleNodeText(b, "label"); return albl > blbl; });
+		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
+        repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
 		for(var i=0;i<repositories.length;i++){
 			var repoNode = repositories[i];
 			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
@@ -127,7 +127,7 @@ ConfigEditor = Class.create({
 			}
 			
 		}
-				
+			
 		rightsTable.select('[id="loading_row"]')[0].remove();		
 				
 		var passwordPane = this.form.select('[id="password_pane"]')[0];
