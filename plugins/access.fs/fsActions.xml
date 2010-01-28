@@ -636,6 +636,7 @@ AJXP_MESSAGE[174]<br/>
 							});							
 							if(!index) return;
 							$('external_repository').insert({top:'<option value="'+activeRepository+'">&lt;Current Repository&gt;</option>'});
+							$('external_repository').selectedIndex = 0;
 							$('external_repository').observe("change", function(e){
 								externalRepo = $('external_repository').getValue();								
 								this.treeCopy.src += '&tmp_repository_id='+externalRepo;
