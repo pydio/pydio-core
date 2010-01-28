@@ -266,10 +266,12 @@ FilesList = Class.create(SelectableElements, {
 		//alert(this.headersWidth[0]);
 	},
 	
-	applyHeadersWidth: function(){		
+	applyHeadersWidth: function(){
+		if(this._displayMode == "thumb") return; // Sometimes happens in IE...
 		if(this.gridStyle == "grid"){
 			window.setTimeout(function(){
-			// Reverse!
+			
+				// Reverse!
 			var allItems = this.getItems();
 			if(!allItems.length) return;
 			var tds = $(allItems[0]).getElementsBySelector('td');
