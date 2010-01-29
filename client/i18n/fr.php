@@ -334,7 +334,7 @@ $mess=array(
 "298" => "Créer un nouvel utilisateur",
 "299" => "Nouv. Dépôt.",
 "300" => "Créer un nouveau dépot",
-"create_repo_accesskey" => "R",
+"create_repo_accesskey" => "d",
 "create_user_accesskey" => "u",
 "301" => "Editer la configuration",
 "302" => "Copier comme texte",
@@ -346,11 +346,11 @@ $mess=array(
 "308" => "Générer le lien",
 "309" => "Générer",
 "310" => "Options",
-"311" => "Upload automatically when a file is added",
-"312" => "Uploader Options",
-"313" => "Compress...",
-"314" => "Compress selection to zip...",
-"315" => "Compress selection to",
+"311" => "Uploader automatiquement lorsqu'un fichier est ajouté",
+"312" => "Options de l'Uploadeur",
+"313" => "Compresser...",
+"314" => "Compresser la sélection en zip...",
+"315" => "Compresser la sélection en",
 /* END SENTENCE */
 );
 ?>
