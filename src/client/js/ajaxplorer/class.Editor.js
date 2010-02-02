@@ -32,57 +32,27 @@
  * 
  * Description : The "online edition" manager, encapsulate the CodePress highlighter for some extensions.
  */
-Editor = Class.create({
+Editor = Class.create(AbstractEditor, {
 
-	initialize: function(oFormObject)
+	initialize: function($super, oFormObject)
 	{
-		this.oForm = $(oFormObject);
-		this.actionBar = this.oForm.select('.action_bar')[0];		
-		this.closeButton = oFormObject.select('a[id="closeButton"]')[0];
-		this.saveButton = oFormObject.select('a[id="saveButton"]')[0];
-		this.downloadButton = oFormObject.select('a[id="downloadFileButton"]')[0];
-		this.ficInput = oFormObject.select('input[name="file"]')[0];
-		this.repInput = oFormObject.select('input[name="dir"]')[0];	
-
-		this.fsButton = oFormObject.select('a[id="fsButton"]')[0];
-		this.nofsButton = oFormObject.select('a[id="nofsButton"]')[0];
-		this.fsButton.onclick = function(){
-			this.setFullScreen();
-			this.fsButton.hide();
-			this.nofsButton.show();
-			return false;
-		}.bind(this);
-		this.nofsButton.onclick = function(){
-			this.exitFullScreen();
-			this.nofsButton.hide();
-			this.fsButton.show();
-			return false;
-		}.bind(this);
-		
-		this.closeButton.observe('click', function(){
-			if(this.modified && !window.confirm(MessageHash[201])){
-					return false;
-			}
-			if(this.fullscreenMode) this.exitFullScreen();
-			this.close();
-			hideLightBox(true);
-			return false;
-		}.bind(this));
-		this.saveButton.observe('click', function(){
+		$super(oFormObject);
+		this.actions.get("saveButton").observe('click', function(){
 			this.saveFile();
 			return false;
 		}.bind(this));
-		this.downloadButton.observe('click', function(){
+		this.actions.get("downloadFileButton").observe('click', function(){
 			if(!this.currentFile) return;		
 			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
 			return false;
 		}.bind(this));
-		modal.setCloseAction(function(){this.close();}.bind(this));
 	},
 	
 	
-	createEditor : function(fileName){
-	
+	open : function($super, userSelection, filesList){
+		$super(userSelection, filesList);
+		var fileName = userSelection.getUniqueFileName();
+		// CREATE GUI
 		var cpStyle = editWithCodePress(getBaseName(fileName));
 		var textarea;
 		this.textareaContainer = document.createElement('div');
@@ -92,13 +62,25 @@ Editor = Class.create({
 			var hidden = document.createElement('input');
 			hidden.type = 'hidden';
 			hidden.name = hidden.id = 'code';		
-			this.oForm.appendChild(hidden);
+			this.element.appendChild(hidden);
 			this.textarea.name = this.textarea.id = 'cpCode';
 			$(this.textarea).addClassName('codepress');
 			$(this.textarea).addClassName(cpStyle);
 			$(this.textarea).addClassName('linenumbers-on');
 			this.currentUseCp = true;
-			this.fsButton.setStyle({display:"none"});
+			this.contentMainContainer = this.textarea.parentNode;
+			this.element.observe("editor:resize", function(event){
+				var cpIframe = $(this.contentMainContainer).select('iframe')[0];
+				if(!cpIframe) return;
+				if(event.memo && Object.isNumber(event.memo)){
+					cpIframe.setStyle({height:event.memo});
+				}else{
+					cpIframe.setStyle({width:'100%'});
+					fitHeightToBottom(cpIframe, this.element, 0, true);
+				}
+			}.bind(this));
+			this.element.observe("editor:enterFS", function(e){this.textarea.value = this.element.select('iframe')[0].getCode();}.bind(this) );
+			this.element.observe("editor:exitFS", function(e){this.textarea.value = this.element.select('iframe')[0].getCode();}.bind(this) );
 		}
 		else
 		{
@@ -106,22 +88,28 @@ Editor = Class.create({
 			this.textarea.addClassName('dialogFocus');
 			this.textarea.addClassName('editor');
 			this.currentUseCp = false;
+			this.contentMainContainer = this.textarea;
 		}
 		this.textarea.setStyle({width:'100%'});	
 		this.textarea.setAttribute('wrap', 'off');	
-		this.oForm.appendChild(this.textareaContainer);
+		this.element.appendChild(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
 		fitHeightToBottom($(this.textarea), $(modal.elementName), 0, true);
+		// LOAD FILE NOW
+		this.loadFileContent(fileName);
 	},
 	
-	loadFile : function(fileName){
+	loadFileContent : function(fileName){
 		this.currentFile = fileName;
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'edit');
 		connexion.addParameter('file', fileName);	
-		connexion.onComplete = function(transp){this.parseTxt(transp);}.bind(this);
-		this.changeModifiedStatus(false);
-		this.setOnLoad();
+		connexion.onComplete = function(transp){
+			this.parseTxt(transp);
+			this.updateTitle(getBaseName(fileName));
+		}.bind(this);
+		this.setModified(false);
+		this.setOnLoad(this.textareaContainer);
 		connexion.sendAsync();
 	},
 	
@@ -130,13 +118,19 @@ Editor = Class.create({
 		connexion.addParameter('get_action', 'edit');
 		connexion.addParameter('save', '1');
 		var value;
-		if(this.currentUseCp) value = this.oForm.select('iframe')[0].getCode();
-		else value = this.textarea.value;
+		if(this.currentUseCp){
+			value = this.element.select('iframe')[0].getCode();
+			this.textarea.value = value;
+		}else{			
+			value = this.textarea.value;
+		}
 		connexion.addParameter('code', value);
-		connexion.addParameter('file', this.ficInput.value);
-		connexion.addParameter('dir', this.repInput.value);	
-		connexion.onComplete = function(transp){this.parseXml(transp);}.bind(this);
-		this.setOnLoad();
+		connexion.addParameter('file', this.userSelection.getUniqueFileName());
+		connexion.addParameter('dir', this.userSelection.getCurrentRep());	
+		connexion.onComplete = function(transp){
+			this.parseXml(transp);			
+		}.bind(this);
+		this.setOnLoad(this.textareaContainer);
 		connexion.setMethod('put');
 		connexion.sendAsync();
 	},
@@ -145,110 +139,31 @@ Editor = Class.create({
 		if(parseInt(transport.responseText).toString() == transport.responseText){
 			alert("Cannot write the file to disk (Error code : "+transport.responseText+")");
 		}else{
-			this.changeModifiedStatus(false);
+			this.setModified(false);
 		}
-		this.removeOnLoad();
+		this.removeOnLoad(this.textareaContainer);
 	},
 	
 	parseTxt : function(transport){	
 		this.textarea.value = transport.responseText;
 		var contentObserver = function(el, value){
-			this.changeModifiedStatus(true);
+			this.setModified(true);
 		}.bind(this);
 		if(this.currentUseCp) {
 			this.textarea.id = 'cpCode_cp';
 			code = new CodePress(this.textarea, contentObserver);
 			this.cpCodeObject = code;
 			this.textarea.parentNode.insertBefore(code, this.textarea);
+			this.contentMainContainer = this.textarea.parentNode;
+			this.element.observe("editor:close", function(){
+				this.cpCodeObject.close();
+				modal.clearContent(modal.dialogContent);		
+			}, this );			
 		}
 		else{
 			new Form.Element.Observer(this.textarea, 0.2, contentObserver);
 		}
-		this.removeOnLoad();
+		this.removeOnLoad(this.textareaContainer);
 		
-	},
-	
-	changeModifiedStatus : function(bModified){
-		this.modified = bModified;
-		var crtTitle = modal.dialogTitle.select('span.titleString')[0];
-		if(this.modified){
-			this.saveButton.removeClassName('disabled');
-			if(crtTitle.innerHTML.charAt(crtTitle.innerHTML.length - 1) != "*"){
-				crtTitle.innerHTML  = crtTitle.innerHTML + '*';
-			}
-		}else{
-			this.saveButton.addClassName('disabled');
-			if(crtTitle.innerHTML.charAt(crtTitle.innerHTML.length - 1) == "*"){
-				crtTitle.innerHTML  = crtTitle.innerHTML.substring(0, crtTitle.innerHTML.length - 1);
-			}		
-		}
-		// ADD / REMOVE STAR AT THE END OF THE FILENAME
-	},
-	
-	setOnLoad : function(){	
-		addLightboxMarkupToElement(this.textareaContainer);
-		var img = document.createElement("img");
-		img.src = ajxpResourcesFolder+"/images/loadingImage.gif";
-		$(this.textareaContainer).select("#element_overlay")[0].appendChild(img);
-		this.loading = true;
-	},
-	
-	removeOnLoad : function(){
-		removeLightboxFromElement(this.textareaContainer);
-		this.loading = false;	
-	},
-	
-	close : function(){
-		if(this.currentUseCp){
-			this.cpCodeObject.close();
-			modal.clearContent(modal.dialogContent);		
-		}
-	},
-	
-	setFullScreen: function(){
-		this.oForm.absolutize();
-		$(document.body).insert(this.oForm);
-		this.oForm.setStyle({
-			top:0,
-			left:0,
-			backgroundColor:'#fff',
-			width:'100%',
-			height:document.viewport.getHeight(),
-			zIndex:3000});
-		this.actionBar.setStyle({marginTop: 0});
-		if(!this.currentUseCp){
-			this.origContainerHeight = this.textarea.getHeight();
-			this.heightObserver = fitHeightToBottom(this.textarea, this.oForm, 0, true);
-		}else{
-			
-		}		
-		var listener = this.fullScreenListener.bind(this);
-		Event.observe(window, "resize", listener);
-		this.oForm.observe("fullscreen:exit", function(e){
-			Event.stopObserving(window, "resize", listener);
-			//Event.stopObserving(window, "resize", this.heightObserver);
-		}.bind(this));		
-		this.fullscreenMode = true;
-	},
-	
-	exitFullScreen: function(){
-		this.oForm.relativize();
-		$$('.dialogContent')[0].insert(this.oForm);
-		this.oForm.setStyle({top:0,left:0,zIndex:100});
-		this.oForm.fire("fullscreen:exit");
-		if(!this.currentUseCp){
-			this.textarea.setStyle({height:this.origContainerHeight});
-		}else{
-			
-		}		
-		this.fullscreenMode = false;
-	},
-	
-	fullScreenListener : function(){
-		this.oForm.setStyle({
-			height:document.viewport.getHeight()
-		});
-		if(!this.currentUseCp) {fitHeightToBottom(this.textarea, this.oForm, 0, true);}
 	}
-	
 });
