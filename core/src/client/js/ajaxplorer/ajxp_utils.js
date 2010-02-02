@@ -80,7 +80,7 @@ function resolveImageSource(src, defaultPath, size){
 
 function editWithCodePress(fileName)
 {	
-	//if(Prototype.Browser.WebKit) return "";
+	if(Prototype.Browser.Opera) return "";
 	if(fileName.search('\.php$|\.php3$|\.php5$|\.phtml$') > -1) return "php";
 	else if (fileName.search("\.js$") > -1) return "javascript";
 	else if (fileName.search("\.java$") > -1) return "java";
