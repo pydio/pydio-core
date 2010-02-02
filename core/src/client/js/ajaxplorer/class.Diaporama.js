@@ -32,32 +32,27 @@
  * 
  * Description : The image gallery manager.
  */
-var DiaporamaFirstOccurence = true;
-Diaporama = Class.create({
+Diaporama = Class.create(AbstractEditor, {
 
 	fullscreenMode: false,
 	
-	initialize: function(div)
+	initialize: function($super, oFormObject)
 	{
-		this.element = div;
-		this.fullBox = this.element.select('div[id="diaporama_box"]')[0];
-		this.actionBar = this.fullBox.select('.action_bar')[0];
-		this.nextButton = div.select('a[id="nextButton"]')[0];
-		this.previousButton = div.select('a[id="prevButton"]')[0];
-		this.closeButton = div.select('a[id="closeButton"]')[0];
-		this.downloadButton = div.select('a[id="downloadDiapoButton"]')[0];
-		this.playButton = div.select('a[id="playButton"]')[0];
-		this.stopButton = div.select('a[id="stopButton"]')[0];
-		this.fsButton = div.select('a[id="fsButton"]')[0];
-		this.nofsButton = div.select('a[id="nofsButton"]')[0];
+		$super(oFormObject);
 		
-		this.actualSizeButton = div.select('img[id="actualSizeButton"]')[0];
-		this.fitToScreenButton = div.select('img[id="fitToScreenButton"]')[0];
-		this.imgTag = div.select('img[id="mainImage"]')[0];
-		this.imgContainer = div.select('div[id="imageContainer"]')[0];
+		this.nextButton = this.actions.get("nextButton");
+		this.previousButton = this.actions.get("prevButton");
+		this.downloadButton = this.actions.get("downloadDiapoButton");
+		this.playButton = this.actions.get("playButton");
+		this.stopButton = this.actions.get("stopButton");
+		
+		this.actualSizeButton = this.element.select('img[id="actualSizeButton"]')[0];
+		this.fitToScreenButton = this.element.select('img[id="fitToScreenButton"]')[0];
+		this.imgTag = this.element.select('img[id="mainImage"]')[0];
+		this.imgContainer = this.element.select('div[id="imageContainer"]')[0];
 		fitHeightToBottom(this.imgContainer);
-		this.zoomInput = div.select('input[id="zoomValue"]')[0];
-		this.timeInput = div.select('input[id="time"]')[0];
+		this.zoomInput = this.element.select('input[id="zoomValue"]')[0];
+		this.timeInput = this.element.select('input[id="time"]')[0];
 		this.baseUrl = 'content.php?action=image_proxy&file=';
 		this.nextButton.onclick = function(){
 			this.next();
@@ -69,15 +64,8 @@ Diaporama = Class.create({
 			this.updateButtons();
 			return false;
 		}.bind(this);
-		this.closeButton.onclick = function(){
-			if(this.fullscreenMode) this.exitFullScreen();
-			this.close();
-			hideLightBox(true);
-			return false;
-		}.bind(this);	
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
-			//document.location.href = 'content.php?action=download&file='+this.currentFile;
 			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
 			return false;
 		}.bind(this);
@@ -98,24 +86,12 @@ Diaporama = Class.create({
 			this.updateButtons();
 			return false;
 		}.bind(this);
-		this.fsButton.onclick = function(){
-			this.setFullScreen();
-			this.fsButton.hide();
-			this.nofsButton.show();
-			return false;
-		}.bind(this);
-		this.nofsButton.onclick = function(){
-			this.exitFullScreen();
-			this.nofsButton.hide();
-			this.fsButton.show();
-			return false;
-		}.bind(this);
-		modal.setCloseAction(this.close.bind(this));
 		
 		this.imgTag.onload = function(){
 			this.resizeImage(true);
 			this.downloadButton.removeClassName("disabled");
-			this.updateModalTitle();
+			var text = getBaseName(this.currentFile) + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
+			this.updateTitle(text);
 		}.bind(this);
 		Event.observe(this.zoomInput, "keypress", function(e){
 			if(e == null) e = window.event;
@@ -147,12 +123,26 @@ Diaporama = Class.create({
 				this.fitToScreenButton.addClassName('diaporamaButtonActive');
 			}
 		}
-		
+		this.contentMainContainer = this.imgContainer ;
+		this.element.observe("editor:resize", this.resizeImage.bind(this));
+		this.element.observe("editor:close", function(){
+			this.currentFile = null;
+			this.items = null;
+			this.imgTag.src = '';
+			this.stop();
+		}.bind(this) );
 	},
 	
-	open : function(aFilesList, sCurrentFile)
+	open : function($super, userSelection, aFilesList)
 	{
-		var allItems = aFilesList;
+		$super(userSelection, aFilesList);
+		var allItems, sCurrentFile;
+		if(userSelection.isUnique()){
+			allItems = aFilesList.getItems();
+			sCurrentFile = userSelection.getUniqueFileName();
+		}else{
+			allItems = aFilesList.getSelectedItems();
+		}		
 		this.items = new Array();
 		this.sizes = new Hash();
 		$A(allItems).each(function(rowItem){
@@ -180,24 +170,8 @@ Diaporama = Class.create({
 	
 		this.updateImage();
 		this.updateButtons();
-		if(DiaporamaFirstOccurence){
-			DiaporamaFirstOccurence = false;
-		}
 	},
-	
-	updateModalTitle : function(){
-		var titleDiv = $(modal.dialogTitle);
-		var crtTitle = titleDiv.select('span.titleString')[0];
-		var filenameSpans = crtTitle.select('span');
-		var text = ' - '+getBaseName(this.currentFile) + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
-		if(filenameSpans.length) filenameSpans[0].innerHTML = text;
-		else {
-			newSpan = document.createElement('span');
-			newSpan.appendChild(document.createTextNode(text));
-			crtTitle.appendChild(newSpan);
-		}
-	},
-	
+		
 	resizeImage : function(morph){	
 		if(this.autoFit){
 			this.computeFitToScreenFactor();
@@ -221,43 +195,6 @@ Diaporama = Class.create({
 		}
 	},
 	
-	setFullScreen: function(){
-		this.fullBox.absolutize();
-		$(document.body).insert(this.fullBox);
-		this.fullBox.setStyle({
-			top:0,
-			left:0,
-			backgroundColor:'#fff',
-			width:'100%',
-			height:document.viewport.getHeight(),
-			zIndex:3000});
-		this.actionBar.setStyle({marginTop: 0});
-		this.origContainerHeight = this.imgContainer.getHeight();
-		var listener = this.fullScreenListener.bind(this);
-		Event.observe(window, "resize", listener);
-		this.fullBox.observe("fullscreen:exit", function(e){
-			Event.stopObserving(window, "resize", listener);
-		});
-		fitHeightToBottom(this.imgContainer, this.fullBox);
-		this.fullscreenMode = true;
-		this.resizeImage();
-	},
-	
-	exitFullScreen: function(){
-		this.fullBox.relativize();
-		$(this.element).insert(this.fullBox);
-		this.fullBox.setStyle({top:0,left:0,zIndex:100});
-		this.fullBox.fire("fullscreen:exit");
-		this.imgContainer.setStyle({height:this.origContainerHeight});
-		this.fullscreenMode = false;
-		this.resizeImage();
-	},
-	
-	fullScreenListener : function(){
-		this.fullBox.setStyle({
-			height:document.viewport.getHeight()
-		});
-	},
 	
 	updateImage : function(){
 		var dimObject = this.sizes.get(this.currentFile);
@@ -300,15 +237,7 @@ Diaporama = Class.create({
 			ajaxplorer.user.savePreferences();
 		}
 	},
-	
-	close : function(){
-		this.currentFile = null;
-		this.items = null;
-		this.imgTag.src = '';
-		this.stop();
-		if(this.fullscreenMode) this.exitFullScreen();
-	},
-	
+		
 	play: function(){
 		if(!this.timeInput.value) this.timeInput.value = 3;
 		this.pe = new PeriodicalExecuter(this.next.bind(this), parseInt(this.timeInput.value));
