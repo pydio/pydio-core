@@ -422,6 +422,12 @@ ACTION BAR
 	text-align:center;
 	overflow:visible;
 	color: expression('#676965');
+	outline:none;
+}
+
+#action_bar a.menuAnchorSelected
+{
+   background:white;
 }
 
 .action_bar a span{
@@ -1571,6 +1577,12 @@ padding: 0px;
 	color: #fff;
 }
 
+.menu.desktop li.menuAnchorSelected,
+.menu.desktop li.menuAnchorSelected a {
+	background-color: #73a2d7;
+	color: #fff !important;
+}
+
 .rootDirChooser
 {
    font-size: 11px;
@@ -1622,7 +1634,8 @@ padding: 0px;
 .rootDirChooser a:hover,
 .bookmarksMenu a:hover
 {
-   background-color: #ddd;
+   background-color: #73a2d7;
+   color: #fff;
 }
 
 .bookmarksMenu
