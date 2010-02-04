@@ -195,7 +195,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "edit";	
+			case "open_with";	
 				if(isset($save) && $save==1 && isSet($code))
 				{
 					// Reload "code" variable directly from POST array, do not "securePath"...
