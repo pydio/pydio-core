@@ -381,6 +381,48 @@ AJXP_MESSAGE[174]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="open_with">
+			<gui text="316" title="316" src="edit.png" accessKey="open_with_access" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBarGroup="get" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,AJXP_MIMES_IMAGE" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<subMenu>
+				<dynamicBuilder><![CDATA[
+					var context = window.builderContext;
+					context.builderMenuItems = $A([]);					
+					var selectedMime = getAjxpMimeType(ajaxplorer.filesList.getUserSelection().getUniqueItem());
+					var editors = ajaxplorer.findEditorsForMime(selectedMime);
+					editors.each(function(el){
+						context.builderMenuItems.push({
+							name:el.text,
+							alt:el.title,
+							image:resolveImageSource(el.icon, '/images/crystal/actions/ICON_SIZE', 22),						
+							callback:function(e){this.apply([el]);}.bind(context)
+						} );
+					} );					
+				]]></dynamicBuilder>
+			</subMenu>			
+			<processing>			
+				<clientCallback prepareModal="false"><![CDATA[		
+					var editorData = window.actionArguments[0];
+					modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/crystal/actions/ICON_SIZE', 16));
+					modal.openEditorDialog(editorData.editorClass,editorData.formId);
+				]]></clientCallback>
+				<clientForm id="edit_box"><![CDATA[
+					<div id="edit_box" action="editer" box_width="80%" box_height="90%" box_padding="0">
+						<div class="action_bar">
+							<a href="#" onclick="return false;" id="saveButton" onclick="saveForm();return false;"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a>
+							<a href="#" onclick="return false;" id="downloadFileButton"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="AJXP_MESSAGE[88]" border="0"><br><span message_id="88">AJXP_MESSAGE[88]</span></a>
+						</div>
+					</div>				
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>
+		<!--
 		<action name="edit">
 			<gui text="51" title="162" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
@@ -391,7 +433,7 @@ AJXP_MESSAGE[174]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					modal.openEditorDialog(Editor, 'edit_box');
+					modal.openEditorDialog(CodePressEditor, 'edit_box');
 				]]></clientCallback>
 				<clientForm id="edit_box"><![CDATA[
 					<div id="edit_box" action="editer" box_width="80%" box_height="90%" box_padding="0">
@@ -442,6 +484,7 @@ AJXP_MESSAGE[174]<br/>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		-->
 		<action name="slideshow_sel">
 			<gui text="234" title="234" src="frame_image.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
