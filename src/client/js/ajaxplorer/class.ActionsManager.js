@@ -50,7 +50,7 @@ ActionsManager = Class.create({
 		this.bookmarksBar = new BookmarksBar();
 		this.bgManager = new BackgroundManager(this);
 		
-		
+		this.subMenus = [];				
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
 		this.toolbars = new Hash();		
@@ -257,13 +257,23 @@ ActionsManager = Class.create({
 					}
 				}
 			}
-			contextActions.push({
+			var menuItem = {
 				name:action.getKeyedText(),
 				alt:action.options.title,
 				image:resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16),
 				isDefault:isDefault,
 				callback:function(e){this.apply()}.bind(action)
-			});
+			};
+			if(action.options.subMenu){
+				menuItem.subMenu = [];
+				if(action.subMenuItems.staticOptions){
+					menuItem.subMenu = action.subMenuItems.staticOptions;
+				}
+				if(action.subMenuItems.dynamicBuilder){
+					menuItem.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
+				}
+			}
+			contextActions.push(menuItem);
 			crtGroup = action.context.actionBarGroup;
 		}.bind(this));
 		
@@ -301,7 +311,10 @@ ActionsManager = Class.create({
 		}
 	},
 	
-	registerKey: function(key, actionName){		
+	registerKey: function(key, actionName, optionnalCommand){		
+		if(optionnalCommand){
+			actionName = actionName + "::" + optionnalCommand;
+		}
 		this._registeredKeys.set(key.toLowerCase(), actionName);
 	},
 	
@@ -313,8 +326,13 @@ ActionsManager = Class.create({
 	{	
 		if(this._registeredKeys.get(keyName) && !ajaxplorer.blockShortcuts)
 		{
-			 this.fireAction(this._registeredKeys.get(keyName));
-			 Event.stop(event);
+			if(this._registeredKeys.get(keyName).indexOf("::")!==false){
+				var parts = this._registeredKeys.get(keyName).split("::");
+				this.fireAction(parts[0], parts[1]);
+			}else{
+				this.fireAction(this._registeredKeys.get(keyName));
+			}
+			Event.stop(event);
 		}
 		return;
 	},
@@ -628,7 +646,7 @@ ActionsManager = Class.create({
 		for(var i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
             if(actions[i].getAttribute('enabled') == 'false') continue;
-			var newAction = new Action();			
+			var newAction = new Action(this);			
 			newAction.createFromXML(actions[i]);
 			this.actions.set(actions[i].getAttribute('name'), newAction);
 			if(actions[i].getAttribute('dirDefault') && actions[i].getAttribute('dirDefault') == "true"){
