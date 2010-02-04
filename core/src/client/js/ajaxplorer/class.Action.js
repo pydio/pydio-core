@@ -37,6 +37,7 @@ Action = Class.create({
 	__DEFAULT_ICON_PATH : "/images/crystal/actions/ICON_SIZE",
 	
 	initialize:function(){
+		this.actionBar = arguments[0];
 		this.options = Object.extend({
 			name:'',
 			src:'',
@@ -44,13 +45,14 @@ Action = Class.create({
 			title:'',
 			hasAccessKey:false,
 			accessKey:'',
+			subMenu:false,
 			callbackCode:'',
 			callback:Prototype.emptyFunction,
 			displayAction:false,
 			prepareModal:false, 
 			formId:undefined, 
 			formCode:undefined
-			}, arguments[0] || { });
+			}, arguments[1] || { });
 		this.context = Object.extend({
 			selection:true,
 			dir:false,
@@ -63,7 +65,7 @@ Action = Class.create({
 			actionBarGroup:'default',
 			contextMenu:false,
 			infoPanel:false			
-			}, arguments[1] || { });
+			}, arguments[2] || { });
 			
 		this.selectionContext = Object.extend({			
 			dir:false,
@@ -73,7 +75,7 @@ Action = Class.create({
 			allowedMimes:$A([]),			
 			unique:true,
 			multipleOnly:false
-			}, arguments[2] || { });
+			}, arguments[3] || { });
 		this.rightsContext = Object.extend({			
 			noUser:true,
 			userLogged:true,
@@ -81,11 +83,14 @@ Action = Class.create({
 			read:true,
 			write:false,
 			adminOnly:false
-			}, arguments[3] || { });
-		
+			}, arguments[4] || { });
+		this.subMenuItems = {};
 		this.elements = new Array();
 		this.contextHidden = false;
 		this.deny = false;
+		if(this.options.subMenu && !this.actionBar){
+			alert('Warning, wrong action definition. Cannot use a subMenu if not displayed in the actionBar!');
+		}
 	}, 
 	
 	apply: function(){
@@ -234,7 +239,7 @@ Action = Class.create({
 			}else if(node.nodeName == "gui"){
 				this.options.text = MessageHash[node.getAttribute('text')];
 				this.options.title = MessageHash[node.getAttribute('title')];
-				this.options.src = node.getAttribute('src');				
+				this.options.src = node.getAttribute('src');								
 				if(node.getAttribute('hasAccessKey') && node.getAttribute('hasAccessKey') == "true"){
 					this.options.accessKey = node.getAttribute('accessKey');
 					this.options.hasAccessKey = true;
@@ -250,6 +255,29 @@ Action = Class.create({
 							
 			}else if(node.nodeName == "rightsContext"){
 				this.attributesToObject(this.rightsContext, node);
+			}else if(node.nodeName == "subMenu"){
+				this.options.subMenu = true;
+				for(var j=0;j<node.childNodes.length;j++){
+					if(node.childNodes[j].nodeName == "staticItems" || node.childNodes[j].nodeName == "dynamicItems"){
+						this.subMenuItems[node.childNodes[j].nodeName] = [];
+						for(var k=0;k<node.childNodes[j].childNodes.length;k++){
+							if(node.childNodes[j].childNodes[k].nodeName == "item"){
+								var item = {};
+								for(var z=0;z<node.childNodes[j].childNodes[k].attributes.length;z++){
+									var attribute = node.childNodes[j].childNodes[k].attributes[z];
+									item[attribute.nodeName] = attribute.nodeValue;
+								}
+								this.subMenuItems[node.childNodes[j].nodeName].push(item);
+							}
+						}
+					}
+				}
+				if(this.subMenuItems.staticItems){
+					this.buildSubmenuStaticItems();
+				}
+				if(this.subMenuItems.dynamicItems){
+					this.prepareSubmenuDynamicBuilder();
+				}
 			}
 		}
 		if(!this.options.hasAccessKey) return;
@@ -269,7 +297,11 @@ Action = Class.create({
 			id:this.options.name +'_button'
 		}).observe('click', function(e){
 			Event.stop(e);
-			this.apply();
+			if(this.options.subMenu){
+				this.subMenu.show(e);
+			}else{
+				this.apply();
+			}
 		}.bind(this));
 		var imgPath = resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 22);
 		var img = new Element('img', {
@@ -307,7 +339,77 @@ Action = Class.create({
 			}.bind(this), 10);
 		}.bind(this) );
 		button.hide();
+		if(this.options.subMenu){
+			this.buildActionBarSubMenu(button);
+		}
 		return button;
+	},
+	
+	buildSubmenuStaticItems : function(){
+		var menuItems = [];
+		if(this.subMenuItems.staticItems){
+			this.subMenuItems.staticItems.each(function(item){
+				var itemText = MessageHash[item.text];
+				if(item.hasAccessKey && item.hasAccessKey=='true' && MessageHash[item.accessKey]){
+					itemText = this.getKeyedText(MessageHash[item.text],true,MessageHash[item.accessKey]);
+					if(!this.subMenuItems.accessKeys) this.subMenuItems.accessKeys = [];
+					this.actionBar.registerKey(MessageHash[item.accessKey],this.options.name, item.command);
+					//@todo REGISTER THESE ACCESSKEYS
+				}
+				menuItems.push({
+					name:itemText,
+					alt:MessageHash[item.title],
+					image:resolveImageSource(item.src, '/images/crystal/actions/ICON_SIZE', 22),
+					isDefault:(item.isDefault?true:false),
+					callback:function(e){this.apply([item.command]);}.bind(this)
+				});
+			}, this);
+		}
+		this.subMenuItems.staticOptions = menuItems;
+	},
+	
+	prepareSubmenuDynamicBuilder : function(){		
+		this.subMenuItems.dynamicBuilder = function(protoMenu){
+			setTimeout(function(){
+		  		var menuItems = [];
+		  		this.subMenuItems.dynamicItems.each(function(item){
+		  			var action = this.actionBar.actions.get(item['actionId']);
+		  			if(action.deny) return;
+					menuItems.push({
+						name:action.getKeyedText(),
+						alt:action.options.title,
+						image:resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16),						
+						callback:function(e){this.apply();}.bind(action)
+					});
+		  		}, this);
+			  	protoMenu.options.menuItems = menuItems;
+			  	protoMenu.refreshList();
+			}.bind(this),0);
+		}.bind(this);		
+	},
+	
+	buildActionBarSubMenu : function(button){
+		this.subMenu = new Proto.Menu({
+		  mouseClick:"over",
+		  anchor: button, // context menu will be shown when element with class name of "contextmenu" is clicked
+		  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
+		  topOffset : 2,
+		  leftOffset : -1,	
+		  parent : this.actionBar,	 
+		  menuItems: this.subMenuItems.staticOptions || [],
+		  fade:true,
+		  zIndex:2000		  
+		});		
+		this.subMenu.options.beforeShow = function(e){
+			button.addClassName("menuAnchorSelected");
+		  	if(this.subMenuItems.dynamicItems){
+		  		this.subMenuItems.dynamicBuilder(this.subMenu);
+		  	}
+		}.bind(this);		
+		this.subMenu.options.beforeHide = function(e){
+			button.removeClassName("menuAnchorSelected");
+		}.bind(this);
+		this.actionBar.subMenus.push(this.subMenu);
 	},
 	
 	updateTitleSpan : function(span, state){		
@@ -394,10 +496,17 @@ Action = Class.create({
 		}
 	},
 	
-	getKeyedText: function(){
-		var displayString = this.options.text;
-		if(!this.options.hasAccessKey) return displayString;
-		var accessKey = this.options.accessKey;
+	getKeyedText: function(displayString, hasAccessKey, accessKey){
+		if(!displayString){
+			displayString = this.options.text;
+		}
+		if(!hasAccessKey){
+			hasAccessKey = this.options.hasAccessKey;
+		}
+		if(!accessKey){
+			accessKey = this.options.accessKey;
+		}
+		if(!hasAccessKey) return displayString;
 		var keyPos = displayString.toLowerCase().indexOf(accessKey.toLowerCase());
 		if(keyPos==-1){
 			return displayString + ' (<u>' + accessKey + '</u>)';

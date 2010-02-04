@@ -20,6 +20,7 @@ Proto.Menu = Class.create({
 			pageOffset: 25,
 			topOffset:0,
 			leftOffset:0,
+			position:'bottom',
 			menuTitle:'',
 			fade: false,
 			zIndex: 100,
@@ -40,7 +41,7 @@ Proto.Menu = Class.create({
 			}
 		}, arguments[0] || { });
 		
-		
+		this.subMenus = [];
 		this.shim = new Element('iframe', {
 			style: 'position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);display:none',
 			src: 'javascript:false;',
@@ -48,10 +49,15 @@ Proto.Menu = Class.create({
 		});
 		if(this.options.createAnchor){
 			this.createAnchor();		
-		}else if(this.options.anchor != 'mouse'){
+		}else if(typeof(this.options.anchor) == "string" && this.options.anchor != 'mouse'){
 			this.options.selector = '[id="'+this.options.anchor+'"]';			
+		}else if(typeof(this.options.anchor) != "string"){
+			this.options.selector = this.options.anchor; // OBJECT
 		}
 		this.eventToObserve = ((this.options.mouseClick!='right' || Prototype.Browser.Opera)?'click':'contextmenu');
+		if(this.options.mouseClick == 'over'){
+			this.eventToObserve = 'mouseover';
+		}
 		this.options.fade = this.options.fade && !Object.isUndefined(Effect);
 		this.container = new Element('div', {className: this.options.className, style: 'display:none'});
 		if(this.options.mouseClick == 'right'){			
@@ -61,6 +67,10 @@ Proto.Menu = Class.create({
 			$(document.body).insert(this.container);
 		}		
 		if (this.ie) { $(document.body).insert(this.shim) }
+		if(this.eventToObserve == 'mouseover'){
+			this.container.observe("mouseover", this.mouseoverFunction.bind(this) );
+			this.container.observe("mouseout",this.mouseoutFunction.bind(this) );
+		}		
 
 		document.observe('click', function(e) {
 			if (this.container.visible() && !e.isRightClick()) {
@@ -72,29 +82,50 @@ Proto.Menu = Class.create({
 			}
 		}.bind(this));
 		
-		$$(this.options.selector).invoke('observe', 
-										 this.eventToObserve, 
-										 this.observerFunction.bind(this));
+		this.addElements(this.options.selector);
 	},
 	
 	observerFunction:function(e){
 		if (this.options.mouseClick == 'right' && Prototype.Browser.Opera && !e.ctrlKey) return;
-		this.show(e);		
+		this.show(e);
 	},
 	
-	removeElements:function(selector){
-		$$(selector).invoke('stopObserving', 
-							this.eventToObserve, 
-							this.observerFunction.bind(this));
+	mouseoverFunction:function(e){
+		if(this.timer){
+			window.clearTimeout(this.timer);
+			this.timer = null;
+		}
+	},
+	
+	mouseoutFunction:function(e){
+		this.timer = window.setTimeout(function(){
+			this.hide(e);
+		}.bind(this), 300);
+	},
+	
+	removeElements:function(selectorOrObject){
+		if(typeof(selectorOrObject) == "string"){
+			$$(selectorOrObject).invoke('stopObserving', 
+								this.eventToObserve,
+								this.observerFunction.bind(this));		
+		}else{
+			$(selectorOrObject).stopObserving(this.eventToObserve, this.observerFunction.bind(this));
+		}
 	},
 	
 	addElements:function(selectorOrObject){
 		if(typeof(selectorOrObject) == "string"){
-			$$(selectorOrObject).invoke('observe', 
-								this.eventToObserve,
-								this.observerFunction.bind(this));		
+			$$(selectorOrObject).invoke('observe', this.eventToObserve, this.observerFunction.bind(this));		
+			if(this.eventToObserve == "mouseover"){
+					$$(selectorOrObject).invoke('observe', 'mouseover', this.mouseoverFunction.bind(this));
+					$$(selectorOrObject).invoke('observe', 'mouseout', this.mouseoutFunction.bind(this));
+			}			
 		}else{
 			$(selectorOrObject).observe(this.eventToObserve, this.observerFunction.bind(this));
+			if(this.eventToObserve == "mouseover"){
+				$(selectorOrObject).observe("mouseover", this.mouseoverFunction.bind(this) );
+				$(selectorOrObject).observe("mouseout", this.mouseoutFunction.bind(this));
+			}
 		}
 	},
 	
@@ -136,24 +167,70 @@ Proto.Menu = Class.create({
 						: Object.extend(new Element('a', {
 							href: '#',
 							title: item.alt,
-							className: (item.className || '') + (item.disabled ? ' disabled' : ' enabled'),
+							className: (item.className?item.className+' ':'') + (item.disabled ? 'disabled' : 'enabled'),
 							style:(item.isDefault?'font-weight:bold':'')
 						}), { _callback: item.callback })
 						.writeAttribute('onclick', 'return false;')
 						.observe('click', this.onClick.bind(this))
 						.observe('contextmenu', Event.stop)
-						.update('<img src="'+item.image+'" border="0" height="16" width="16" align="absmiddle"> '+ item.name)						
+						.update(Object.extend(new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'}), {_callback:item.callback} ))
+						.insert(item.name)						
 				);
+				newItem._callback = item.callback;					
+			if(item.subMenu){
+				if(!item.subMenuBeforeShow){
+					item.subMenuBeforeShow = Prototype.emptyFunction;
+				}
+				if(!item.subMenuBeforeHide){
+					item.subMenuBeforeHide = Prototype.emptyFunction;
+				}
+				newItem.subMenu = new Proto.Menu({
+				  mouseClick:"over",
+				  anchor: newItem, 
+				  className: 'menu desktop', 
+				  topOffset : 2,
+				  leftOffset : -1,		 
+				  menuItems: item.subMenu,
+				  fade:false,
+				  zIndex:2010,
+				  position:'right',
+				  parent:this,
+				  beforeShow:function(){
+				  	var object = newItem.subMenu;
+				  	if(object.options.parent && object.options.parent.subMenus){
+				  		object.options.parent.subMenus.invoke('hide');
+				  	}
+				  	if(object.options.anchor){
+				  		object.options.anchor.addClassName('menuAnchorSelected');
+				  	}
+				  	window.setTimeout(function(){item.subMenuBeforeShow(object);},0);
+				  },
+				  beforeHide:function(){
+				  	var object = newItem.subMenu;
+				  	if(object.options.anchor){
+				  		object.options.anchor.removeClassName('menuAnchorSelected');
+				  	}
+				  	window.setTimeout(function(){item.subMenuBeforeHide(object);},0);				  	
+				  }
+				});
+				window.setTimeout(function(){item.subMenuBeforeShow(newItem.subMenu);},0);
+				this.subMenus.push(newItem.subMenu);
+			}			
 			list.insert(newItem);
 		}.bind(this));
-		this.container.insert(list);
+		this.container.insert(list);		
 		try{
-		Shadower.shadow(this.container,this.options.shadowOptions, true);
+			Shadower.shadow(this.container,this.options.shadowOptions, true);
 		}catch(e){}
 	},
 	
 	show: function(e) {
 		//e.stop();
+	  	if(this.options.parent && this.options.parent.subMenus){
+	  		this.options.parent.subMenus.map(function(el){
+	  			if(el != this) el.hide();
+	  		}.bind(this)) ;
+	  	}		
 		this.options.beforeShow(e);
 		this.refreshList();	
 		if(!this.options.menuItems.length) return;
@@ -171,7 +248,7 @@ Proto.Menu = Class.create({
 		}				
 		if(this.options.fade){
 			Effect.Appear(this.container, {
-				duration: 0.25, 
+				duration: this.options.fadeTime || 0.15, 
 				afterFinish : function(e){
 					this.checkHeight(elOff.top);
 					Shadower.showShadows(this.container, this.options.shadowOptions);
@@ -218,8 +295,13 @@ Proto.Menu = Class.create({
 	computeAnchorOffset: function(){
 		if(this.anchorOffset) return this.anchorOffset;
 		var anchorPosition = Position.cumulativeOffset($(this.options.anchor));
-		var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset;
-		var leftPos = anchorPosition[0] + this.options.leftOffset;
+		if(this.options.position == 'bottom'){
+			var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset;
+			var leftPos = anchorPosition[0] + this.options.leftOffset;
+		}else if(this.options.position == 'right'){
+			var topPos = anchorPosition[1] + this.options.topOffset;
+			var leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset;			
+		}
 		this.anchorOffset = {top:topPos+'px', left:leftPos+'px'};
 		return this.anchorOffset;
 	},
@@ -233,17 +315,28 @@ Proto.Menu = Class.create({
 				align:'absmiddle'
 			}).setStyle({cursor:'pointer'});
 		this.options.anchorContainer.appendChild(this.options.anchor);
-		this.options.selector = '[id="'+this.options.anchor.id+'"]';		
+		this.options.selector = this.options.anchor;
 	},
 	
 	onClick: function(e) {
 		//e.stop();
 		if (e.target._callback && !e.target.hasClassName('disabled')) {
 			this.options.beforeSelect(e);
+			if(this.options.anchor && typeof(this.options.anchor)!="string"){
+				this.options.anchor.removeClassName('menuAnchorSelected');
+			}
 			if (this.ie) this.shim.hide();
 			Shadower.deshadow(this.container);
 			this.container.hide();
 			e.target._callback(this.event);
 		}		
+	},
+	
+	hide : function(e){
+		this.options.beforeHide(e);
+		if (this.ie) this.shim.hide();
+		Shadower.deshadow(this.container);
+		this.container.setStyle({height:'auto', overflowY:'hidden'});
+		this.container.hide();
 	}
 });
