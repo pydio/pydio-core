@@ -270,12 +270,14 @@ Action = Class.create({
 								this.subMenuItems[node.childNodes[j].nodeName].push(item);
 							}
 						}
+					}else if(node.childNodes[j].nodeName == "dynamicBuilder"){
+						this.subMenuItems.dynamicBuilderCode = '<script>'+node.childNodes[j].firstChild.nodeValue+'</script>';
 					}
 				}
 				if(this.subMenuItems.staticItems){
 					this.buildSubmenuStaticItems();
 				}
-				if(this.subMenuItems.dynamicItems){
+				if(this.subMenuItems.dynamicItems || this.subMenuItems.dynamicBuilderCode){
 					this.prepareSubmenuDynamicBuilder();
 				}
 			}
@@ -353,8 +355,7 @@ Action = Class.create({
 				if(item.hasAccessKey && item.hasAccessKey=='true' && MessageHash[item.accessKey]){
 					itemText = this.getKeyedText(MessageHash[item.text],true,MessageHash[item.accessKey]);
 					if(!this.subMenuItems.accessKeys) this.subMenuItems.accessKeys = [];
-					this.actionBar.registerKey(MessageHash[item.accessKey],this.options.name, item.command);
-					//@todo REGISTER THESE ACCESSKEYS
+					this.actionBar.registerKey(MessageHash[item.accessKey],this.options.name, item.command);					
 				}
 				menuItems.push({
 					name:itemText,
@@ -371,17 +372,23 @@ Action = Class.create({
 	prepareSubmenuDynamicBuilder : function(){		
 		this.subMenuItems.dynamicBuilder = function(protoMenu){
 			setTimeout(function(){
-		  		var menuItems = [];
-		  		this.subMenuItems.dynamicItems.each(function(item){
-		  			var action = this.actionBar.actions.get(item['actionId']);
-		  			if(action.deny) return;
-					menuItems.push({
-						name:action.getKeyedText(),
-						alt:action.options.title,
-						image:resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16),						
-						callback:function(e){this.apply();}.bind(action)
-					});
-		  		}, this);
+				if(this.subMenuItems.dynamicBuilderCode){
+					window.builderContext = this;
+					this.subMenuItems.dynamicBuilderCode.evalScripts();
+					var menuItems = this.builderMenuItems || [];					
+				}else{
+			  		var menuItems = [];
+			  		this.subMenuItems.dynamicItems.each(function(item){
+			  			var action = this.actionBar.actions.get(item['actionId']);
+			  			if(action.deny) return;
+						menuItems.push({
+							name:action.getKeyedText(),
+							alt:action.options.title,
+							image:resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16),						
+							callback:function(e){this.apply();}.bind(action)
+						});
+			  		}, this);
+				}
 			  	protoMenu.options.menuItems = menuItems;
 			  	protoMenu.refreshList();
 			}.bind(this),0);
@@ -392,9 +399,9 @@ Action = Class.create({
 		this.subMenu = new Proto.Menu({
 		  mouseClick:"over",
 		  anchor: button, // context menu will be shown when element with class name of "contextmenu" is clicked
-		  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
-		  topOffset : 2,
-		  leftOffset : -1,	
+		  className: 'menu desktop toolbarmenu', // this is a class which will be attached to menu container (used for css styling)
+		  topOffset : 0,
+		  leftOffset : 0,	
 		  parent : this.actionBar,	 
 		  menuItems: this.subMenuItems.staticOptions || [],
 		  fade:true,
@@ -402,7 +409,7 @@ Action = Class.create({
 		});		
 		this.subMenu.options.beforeShow = function(e){
 			button.addClassName("menuAnchorSelected");
-		  	if(this.subMenuItems.dynamicItems){
+		  	if(this.subMenuItems.dynamicBuilder){
 		  		this.subMenuItems.dynamicBuilder(this.subMenu);
 		  	}
 		}.bind(this);		

@@ -202,7 +202,11 @@ Modal = Class.create({
 	openEditorDialog : function(editorKlass, formId){
 		var loadFunc = function(oForm){
 			var fList =  ajaxplorer.getFilesList();
-			ajaxplorer.actionBar.editor = new editorKlass(oForm);
+			if(typeof(editorKlass) == "string"){
+				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm)');
+			}else{
+				ajaxplorer.actionBar.editor = new editorKlass(oForm);
+			}
 			ajaxplorer.actionBar.editor.open(fList.getUserSelection(),fList);
 		};
 		this.showDialogForm('', formId, loadFunc, null, null, true, true);		

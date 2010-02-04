@@ -16,6 +16,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="get_editors_registry">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="get_bookmarks">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
