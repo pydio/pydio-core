@@ -32,20 +32,11 @@
  * 
  * Description : The "online edition" manager, encapsulate the CodePress highlighter for some extensions.
  */
-TextEditor = Class.create(AbstractEditor, {
+CodePressEditor = Class.create(TextEditor, {
 
 	initialize: function($super, oFormObject)
 	{
 		$super(oFormObject);
-		this.actions.get("saveButton").observe('click', function(){
-			this.saveFile();
-			return false;
-		}.bind(this));
-		this.actions.get("downloadFileButton").observe('click', function(){
-			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
-			return false;
-		}.bind(this));
 	},
 	
 	
@@ -53,14 +44,33 @@ TextEditor = Class.create(AbstractEditor, {
 		this.userSelection = userSelection;
 		this.listItems = filesList.getItems();
 		var fileName = userSelection.getUniqueFileName();
+		// CREATE GUI
+		var cpStyle = this.codePressStyle(getBaseName(fileName));
 		var textarea;
 		this.textareaContainer = document.createElement('div');
 		this.textarea = $(document.createElement('textarea'));
-		this.textarea.name =  this.textarea.id = 'code';
-		this.textarea.addClassName('dialogFocus');
-		this.textarea.addClassName('editor');
-		this.currentUseCp = false;
-		this.contentMainContainer = this.textarea;
+		var hidden = document.createElement('input');
+		hidden.type = 'hidden';
+		hidden.name = hidden.id = 'code';		
+		this.element.appendChild(hidden);
+		this.textarea.name = this.textarea.id = 'cpCode';
+		$(this.textarea).addClassName('codepress');
+		$(this.textarea).addClassName(cpStyle);
+		$(this.textarea).addClassName('linenumbers-on');
+		this.currentUseCp = true;
+		this.contentMainContainer = this.textarea.parentNode;
+		this.element.observe("editor:resize", function(event){
+			var cpIframe = $(this.contentMainContainer).select('iframe')[0];
+			if(!cpIframe) return;
+			if(event.memo && Object.isNumber(event.memo)){
+				cpIframe.setStyle({height:event.memo});
+			}else{
+				cpIframe.setStyle({width:'100%'});
+				fitHeightToBottom(cpIframe, this.element, 0, true);
+			}
+		}.bind(this));
+		this.element.observe("editor:enterFS", function(e){this.textarea.value = this.element.select('iframe')[0].getCode();}.bind(this) );
+		this.element.observe("editor:exitFS", function(e){this.textarea.value = this.element.select('iframe')[0].getCode();}.bind(this) );
 		this.textarea.setStyle({width:'100%'});	
 		this.textarea.setAttribute('wrap', 'off');	
 		this.element.appendChild(this.textareaContainer);
@@ -69,57 +79,47 @@ TextEditor = Class.create(AbstractEditor, {
 		// LOAD FILE NOW
 		this.loadFileContent(fileName);
 	},
-	
-	loadFileContent : function(fileName){
-		this.currentFile = fileName;
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'open_with');
-		connexion.addParameter('file', fileName);	
-		connexion.onComplete = function(transp){
-			this.parseTxt(transp);
-			this.updateTitle(getBaseName(fileName));
-		}.bind(this);
-		this.setModified(false);
-		this.setOnLoad(this.textareaContainer);
-		connexion.sendAsync();
-	},
-	
-	prepareSaveConnexion : function(){
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'open_with');
-		connexion.addParameter('save', '1');
-		connexion.addParameter('file', this.userSelection.getUniqueFileName());
-		connexion.addParameter('dir', this.userSelection.getCurrentRep());	
-		connexion.onComplete = function(transp){
-			this.parseXml(transp);			
-		}.bind(this);
-		this.setOnLoad(this.textareaContainer);
-		connexion.setMethod('put');		
-		return connexion;
-	},
-	
+			
 	saveFile : function(){
 		var connexion = this.prepareSaveConnexion();
-		connexion.addParameter('code', this.textarea.value);		
+		var value;
+		value = this.element.select('iframe')[0].getCode();
+		this.textarea.value = value;		
+		connexion.addParameter('code', value);
 		connexion.sendAsync();
 	},
-	
-	parseXml : function(transport){
-		if(parseInt(transport.responseText).toString() == transport.responseText){
-			alert("Cannot write the file to disk (Error code : "+transport.responseText+")");
-		}else{
-			this.setModified(false);
-		}
-		this.removeOnLoad(this.textareaContainer);
-	},
-	
+		
 	parseTxt : function(transport){	
 		this.textarea.value = transport.responseText;
 		var contentObserver = function(el, value){
 			this.setModified(true);
 		}.bind(this);
-		new Form.Element.Observer(this.textarea, 0.2, contentObserver);
+
+		this.textarea.id = 'cpCode_cp';
+		code = new CodePress(this.textarea, contentObserver);
+		this.cpCodeObject = code;
+		this.textarea.parentNode.insertBefore(code, this.textarea);
+		this.contentMainContainer = this.textarea.parentNode;
+		this.element.observe("editor:close", function(){
+			this.cpCodeObject.close();
+			modal.clearContent(modal.dialogContent);		
+		}, this );			
 		this.removeOnLoad(this.textareaContainer);
-		
+				
+	},
+
+	codePressStyle : function(fileName)
+	{	
+		if(Prototype.Browser.Opera) return "";
+		if(fileName.search('\.php$|\.php3$|\.php5$|\.phtml$') > -1) return "php";
+		else if (fileName.search("\.js$") > -1) return "javascript";
+		else if (fileName.search("\.java$") > -1) return "java";
+		else if (fileName.search("\.pl$") > -1) return "perl";
+		else if (fileName.search("\.sql$") > -1) return "sql";
+		else if (fileName.search("\.htm$|\.html$|\.xml$") > -1) return "html";
+		else if (fileName.search("\.css$") > -1) return "css";
+		else return "";	
 	}
+
+	
 });

@@ -10,7 +10,7 @@
 //	http://lublog.tuttoeniente.net/
 //	luca [AT] tuttoeniente [DOT] net
 //
-//	Updated for AjaXplorer 2.5.5 by 
+//	Updated for AjaXplorer 2.5.5 by
 //      Davide Cavalca <davide at cavalca dot name>
 //
 //---------------------------------------------------------------------------------------------------
@@ -356,6 +356,10 @@ $mess=array(
 "313" => "Comprimi...",
 "314" => "Comprimi la selezione in uno zip...",
 "315" => "Comprimi la selezione in",
+"316" => "Open with...",
+"open_with_access" => "O",
+"317" => "Source viewer",
+"318" => "CodePress source code viewer",
 /* END SENTENCE */
 );
 ?>

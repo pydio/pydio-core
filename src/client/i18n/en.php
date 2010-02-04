@@ -65,7 +65,7 @@ $mess=array(
 "48" => "OK",
 "49" => "CANCEL",
 "50" => "Exe file",
-"51" => "Edit",
+"51" => "Simple Editor",
 "52" => "Editing file",
 "53" => "Save",
 "54" => "Cancel",
@@ -352,5 +352,9 @@ $mess=array(
 "313" => "Compress...",
 "314" => "Compress selection to zip...",
 "315" => "Compress selection to",
+"316" => "Open with...",
+"open_with_access" => "O",
+"317" => "Source viewer",
+"318" => "CodePress source code viewer",
 );
 ?>

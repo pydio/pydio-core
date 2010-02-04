@@ -351,6 +351,10 @@ $mess=array(
 "313" => "Compresser...",
 "314" => "Compresser la sélection en zip...",
 "315" => "Compresser la sélection en",
+"316" => "Open with...",
+"open_with_access" => "O",
+"317" => "Source viewer",
+"318" => "CodePress source code viewer",
 /* END SENTENCE */
 );
 ?>

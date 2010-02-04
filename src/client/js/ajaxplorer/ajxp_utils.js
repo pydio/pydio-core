@@ -77,20 +77,6 @@ function resolveImageSource(src, defaultPath, size){
 	}
 }
 
-
-function editWithCodePress(fileName)
-{	
-	if(Prototype.Browser.Opera) return "";
-	if(fileName.search('\.php$|\.php3$|\.php5$|\.phtml$') > -1) return "php";
-	else if (fileName.search("\.js$") > -1) return "javascript";
-	else if (fileName.search("\.java$") > -1) return "java";
-	else if (fileName.search("\.pl$") > -1) return "perl";
-	else if (fileName.search("\.sql$") > -1) return "sql";
-	else if (fileName.search("\.htm$|\.html$|\.xml$") > -1) return "html";
-	else if (fileName.search("\.css$") > -1) return "css";
-	else return "";	
-}
-
 function roundSize(filesize, size_unit){
 	if (filesize >= 1073741824) {filesize = Math.round(filesize / 1073741824 * 100) / 100 + " G"+size_unit;}
 	else if (filesize >= 1048576) {filesize = Math.round(filesize / 1048576 * 100) / 100 + " M"+size_unit;}
