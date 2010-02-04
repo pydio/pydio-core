@@ -356,6 +356,10 @@ $mess=array(
 "313" => "Compress...",
 "314" => "Compress selection to zip...",
 "315" => "Compress selection to",
+"316" => "Open with...",
+"open_with_access" => "O",
+"317" => "Source viewer",
+"318" => "CodePress source code viewer",
 /* END SENTENCE */
 );
 ?>

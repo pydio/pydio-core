@@ -1515,11 +1515,26 @@ div.menu a {
 .menu.desktop {
 	width: 9em;
 	background: #f1f1ef;
-	border: 1px solid #676965;
+	border: 1px solid #676965;	
 	padding: 0;
     padding-top: 0px;
     padding-bottom: 1px;
 }
+
+.menu.desktop.toolbarmenu {
+	border: 1px solid #fff;	
+	background: #fff;
+    padding-bottom: 0px;
+	width: auto;
+   /* IE */
+   width:expression("150px"); 	
+}
+
+.menu.desktop.toolbarmenu img {
+	width: 22px;
+	height:22px;
+}
+
 .menu.desktop ul, .menu.desktop li {
 	margin: 0;
 	padding: 0;
@@ -1529,6 +1544,12 @@ div.menu a {
     padding: 0px;
     padding-top: 1px;
     padding-bottom: 1px;
+}
+
+.menu.desktop.toolbarmenu li {
+	height: auto;
+    padding-top: 1px;
+    padding-bottom: 0px;
 }
 
 .rootDirChooser li.menuTitle {
@@ -1546,11 +1567,11 @@ div.menu a {
 }
 
 .menu.desktop li.separator {
-padding: 0px;
+	padding: 0px;
 	height: 1px;
 }
 .menu.desktop a img{
-        margin-right: 3px;
+    margin-right: 3px;
 }
 
 .menu.desktop a {
@@ -1561,6 +1582,21 @@ padding: 0px;
     font-family: Arial;
 	font-size:11px;
 }
+
+.menu.desktop.toolbarmenu a img{
+    margin-right: 6px;
+}
+
+.menu.desktop.toolbarmenu a {
+	color: #000;
+	padding: 8px 20px 2px 8px;
+	margin: 0;
+	height: 26px;
+    font-family: Arial;
+	font-size:11px;
+}
+
+
 .menu.desktop a.disabled {
 	opacity: 0.25;
 	filter: alpha(opacity=25);
