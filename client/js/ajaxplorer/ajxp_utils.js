@@ -108,6 +108,10 @@ function formatDate(dateObject, format){
 	var month = dateObject.getMonth() + 1;
 	format = format.replace("m", (month<10?'0'+month:month));
 	format = format.replace("H", (dateObject.getHours()<10?'0':'')+dateObject.getHours());
+	// Support 12 hour format compatibility
+	format = format.replace("h", (dateObject.getHours() % 12 || 12));
+	format = format.replace("p", (dateObject.getHours() < 12 ? "am" : "pm"));
+	format = format.replace("P", (dateObject.getHours() < 12 ? "AM" : "PM"));	
 	format = format.replace("i", (dateObject.getMinutes()<10?'0':'')+dateObject.getMinutes());
 	format = format.replace("s", (dateObject.getSeconds()<10?'0':'')+dateObject.getSeconds());
 	return format;
