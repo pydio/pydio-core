@@ -123,6 +123,18 @@ class AJXP_ClientDriver extends AbstractDriver
 				
 			break;
 			
+			case "get_editors_registry":
+				
+				header("Content-type:application/xml;charset:UTF-8");
+				if(is_file(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/xml/editors_registry.xml")){
+					$lines = file(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/xml/editors_registry.xml");
+					$lines = array_map(array($this, "replaceAjxpXmlKeywords"), $lines);
+					print(join("", $lines));
+				}
+				exit(0);
+					
+			break;
+			
 			//------------------------------------
 			//	BOOKMARK BAR
 			//------------------------------------
