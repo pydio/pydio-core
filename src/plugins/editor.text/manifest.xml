@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.text" text="51" title="162" icon="edit.png" className="TextEditor" mimes="AJXP_MIMES_EDITABLE" formId="edit_box">
+	<resources>
+		<js file="plugins/editor.text/class.TextEditor.js" className="TextEditor"/>
+	</resources>
+	<clientForm id="edit_box"><![CDATA[
+		<div id="edit_box" action="editer" box_width="80%" box_height="90%" box_padding="0">
+			<div class="action_bar">
+				<a href="#" onclick="return false;" id="saveButton" onclick="saveForm();return false;"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a>
+				<a href="#" onclick="return false;" id="downloadFileButton"><img width="22" height="22" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/download_manager.png" alt="AJXP_MESSAGE[88]" border="0"><br><span message_id="88">AJXP_MESSAGE[88]</span></a>
+			</div>
+		</div>				
+	]]></clientForm>	
+</editor>
