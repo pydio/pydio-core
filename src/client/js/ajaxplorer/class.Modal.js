@@ -199,7 +199,9 @@ Modal = Class.create({
 		
 	},
 	
-	openEditorDialog : function(editorKlass, formId){
+	openEditorDialog : function(editorData){
+		var editorKlass = editorData.editorClass;
+		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/crystal/actions/ICON_SIZE', 16));
 		var loadFunc = function(oForm){
 			var fList =  ajaxplorer.getFilesList();
 			if(typeof(editorKlass) == "string"){
@@ -209,7 +211,7 @@ Modal = Class.create({
 			}
 			ajaxplorer.actionBar.editor.open(fList.getUserSelection(),fList);
 		};
-		this.showDialogForm('', formId, loadFunc, null, null, true, true);		
+		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);		
 	},
 	
 	getForm: function()	{

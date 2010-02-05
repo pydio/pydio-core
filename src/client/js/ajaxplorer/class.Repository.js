@@ -38,12 +38,12 @@ Repository = Class.create({
 	label:'No Repository',
 	icon:ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png',
 	searchEngine:'SearchEngine',
-	resources:undefined,
+	resourcesManager:undefined,
 	allowCrossRepositoryCopy:false,
 
 	initialize:function(id, xmlDef){
 		this.id = id;
-		this.resources = {};
+		this.resourcesManager = new ResourcesManager();
 		if(xmlDef) this.loadFromXml(xmlDef);
 	},
 	
@@ -72,55 +72,8 @@ Repository = Class.create({
 		this.searchEngine = searchEngine;
 	},
 	
-	addJSResource : function(fileName, className){
-		if(!this.resources.js){
-			this.resources.js = [];
-		}
-		this.resources.js.push({fileName:fileName,className:className});
-	},
-	
-	addCSSResource : function(fileName){
-		if(!this.resources.css){
-			this.resources.css = [];
-		}
-		this.resources.css.push(fileName);
-	},
-	
 	loadResources : function(){
-		if(this.resources.js){
-			this.resources.js.each(function(value){
-				this.loadJSResource(value.fileName, value.className);
-			}.bind(this));
-		}
-		if(this.resources.css){
-			this.resources.css.each(function(value){
-				this.loadCSSResource(value);
-			}.bind(this));
-		}
-	},
-	
-	loadJSResource : function(fileName, className){
-		try{
-			eval('window.testTemporaryObject = '+className);
-			delete(window.testTemporaryObject);
-		}catch(e){
-			if(typeof(className)!='function' || typeof(className.prototype)!='object'){
-				var conn = new Connexion();
-				conn._libUrl = false;
-				conn.loadLibrary(fileName);
-			}
-		}
-	},
-	
-	loadCSSResource : function(fileName){
-		var head = $$('head')[0];
-		var cssNode = new Element('link', {
-			type : 'text/css',
-			rel  : 'stylesheet',
-			href : fileName,
-			media : 'screen'
-		});
-		head.insert(cssNode);
+		this.resourcesManager.load();
 	},
 	
 	loadFromXml: function(repoNode){
@@ -137,15 +90,7 @@ Repository = Class.create({
 				for(var j=0; j<childNode.childNodes.length;j++){
 					var subCh = childNode.childNodes[j];
 					if(subCh.nodeName == 'resources'){
-						for(var k=0;k<subCh.childNodes.length;k++){
-							if(subCh.childNodes[k].nodeName == 'js'){
-								this.addJSResource(subCh.childNodes[k].getAttribute('file'), subCh.childNodes[k].getAttribute('className'));
-							}else if(subCh.childNodes[k].nodeName == 'css'){
-								this.addCSSResource(subCh.childNodes[k].getAttribute('file'));
-							}else if(subCh.childNodes[k].nodeName == 'img_library'){
-								addImageLibrary(subCh.childNodes[k].getAttribute('alias'), subCh.childNodes[k].getAttribute('path'));
-							}
-						}
+						this.resourcesManager.loadFromXmlNode(subCh);
 					}
 				}
 			}
