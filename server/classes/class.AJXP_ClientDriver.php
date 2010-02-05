@@ -126,11 +126,22 @@ class AJXP_ClientDriver extends AbstractDriver
 			case "get_editors_registry":
 				
 				header("Content-type:application/xml;charset:UTF-8");
-				if(is_file(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/xml/editors_registry.xml")){
-					$lines = file(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/xml/editors_registry.xml");
-					$lines = array_map(array($this, "replaceAjxpXmlKeywords"), $lines);
-					print(join("", $lines));
+				$pluginDir = INSTALL_PATH."/plugins";
+				$handler = opendir($pluginDir);
+				AJXP_XMLWriter::header("editors");
+				while ($plug = readdir($handler)) {
+					$parts = split("\.", $plug);
+					if(count($parts) > 1 && $parts[0] == "editor"){
+						$manifest = INSTALL_PATH."/plugins/".$plug."/manifest.xml";
+						if(!is_file($manifest)) continue;
+						$lines = file($manifest);
+						$lines = array_map(array($this, "replaceAjxpXmlKeywords"), $lines);
+						array_shift($lines);						
+						print(join("", $lines));
+					}
 				}
+				closedir($handler);
+				AJXP_XMLWriter::close("editors");
 				exit(0);
 					
 			break;
