@@ -81,7 +81,7 @@
 					actionBarGroup="default">
 				</context>				
 			</gui>
-			<subMenu>
+			<subMenu updateImageOnSelect="true" updateTitleOnSelect="false">
 				<staticItems>
 					<item text="228" title="229" src="view_icon.png" command="thumb" 
 						hasAccessKey="true" accessKey="thumbs_access_key"/>
@@ -98,44 +98,19 @@
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					if(window.actionArguments){
-						ajaxplorer.filesList.switchDisplayMode(window.actionArguments[0]);
+						ajaxplorer.filesList.switchDisplayMode(window.actionArguments[0].command);
 					}
 					]]></clientCallback>
+				<clientListener name="init"><![CDATA[
+					window.setTimeout(function(){					
+						var displayMode = ajaxplorer.filesList.getDisplayMode();
+						var item = this.subMenuItems.staticItems.detect(function(item){return item.command == displayMode;});
+						this.setActiveSubMenu(item);
+					}.bind(window.listenerContext), 500);					
+				]]></clientListener>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
-		<!--
-		<action name="thumb_display">
-			<gui text="228" title="229" src="view_icon.png" hasAccessKey="true"
-				accessKey="thumbs_access_key">
-				<context selection="false" dir="" recycle="false"
-					actionBar="false" contextMenu="false" infoPanel="false"
-					actionBarGroup="default">
-				</context>				
-			</gui>
-			<processing>
-				<clientCallback prepareModal="false" displayModeButton="thumb"><![CDATA[
-					ajaxplorer.filesList.switchDisplayMode('thumb');
-					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
-		<action name="list_display">
-			<gui text="226" title="227" src="view_text.png" hasAccessKey="true"
-				accessKey="list_access_key">
-				<context selection="false" dir="" recycle="false"
-					actionBar="false" contextMenu="false" infoPanel="false"
-					actionBarGroup="default">
-				</context>
-			</gui>
-			<processing>
-				<clientCallback prepareModal="false" displayModeButton="list"><![CDATA[
-					ajaxplorer.filesList.switchDisplayMode('list');
-					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
-		-->
 		<action name="bookmark">
 			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
 				accessKey="bookmarks_access_key">

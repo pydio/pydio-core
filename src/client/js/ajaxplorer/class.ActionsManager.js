@@ -695,6 +695,14 @@ ActionsManager = Class.create({
 				});
 				ajaxplorer.filesList.setColumnsDef(columns);						
 			}
+			if(newAction.options.listeners['init']){				
+				try{
+					window.listenerContext = newAction;
+					newAction.options.listeners['init'].evalScripts();
+				}catch(e){
+					alert(e);
+				}
+			}
 		}
 	},
 	

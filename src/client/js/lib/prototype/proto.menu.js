@@ -20,6 +20,7 @@ Proto.Menu = Class.create({
 			pageOffset: 25,
 			topOffset:0,
 			leftOffset:0,
+			submenuArrow:'client/images/crystal/arrow_right.png',
 			position:'bottom',
 			menuTitle:'',
 			fade: false,
@@ -160,6 +161,11 @@ Proto.Menu = Class.create({
 				});
 				newItem.insert(actionsContainer);
 			}
+			if(item.subMenu){
+				var arrowContainer = new Element('div', {className:'menuActions',style:'padding-top:7px;padding-right:5px'});
+				arrowContainer.insert(new Element('img', {src:this.options.submenuArrow, width:6,height:10}));
+				newItem.insert(arrowContainer);
+			}
 			
 			newItem.insert(
 					item.separator 
@@ -188,7 +194,7 @@ Proto.Menu = Class.create({
 				  mouseClick:"over",
 				  anchor: newItem, 
 				  className: 'menu desktop', 
-				  topOffset : 2,
+				  topOffset : 0,
 				  leftOffset : -1,		 
 				  menuItems: item.subMenu,
 				  fade:false,
@@ -295,12 +301,17 @@ Proto.Menu = Class.create({
 	computeAnchorOffset: function(){
 		if(this.anchorOffset) return this.anchorOffset;
 		var anchorPosition = Position.cumulativeOffset($(this.options.anchor));
+		
 		if(this.options.position == 'bottom'){
 			var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset;
 			var leftPos = anchorPosition[0] + this.options.leftOffset;
 		}else if(this.options.position == 'right'){
+			var vpDim = document.viewport.getDimensions();
 			var topPos = anchorPosition[1] + this.options.topOffset;
-			var leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset;			
+			var leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset;
+			if(leftPos + this.container.getDimensions().width > vpDim.width){
+				leftPos = anchorPosition[0] - (this.container.getDimensions().width);
+			}
 		}
 		this.anchorOffset = {top:topPos+'px', left:leftPos+'px'};
 		return this.anchorOffset;

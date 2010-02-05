@@ -50,6 +50,7 @@ Action = Class.create({
 			callback:Prototype.emptyFunction,
 			displayAction:false,
 			prepareModal:false, 
+			listeners : [],
 			formId:undefined, 
 			formCode:undefined
 			}, arguments[1] || { });
@@ -104,7 +105,22 @@ Action = Class.create({
 		window.actionArguments = $A([]);
 		if(arguments[0]) window.actionArguments = $A(arguments[0]);
 		if(this.options.callbackCode) this.options.callbackCode.evalScripts();
+		if(this.subMenu && arguments[0] && arguments[0][0]){
+			this.setActiveSubMenu(arguments[0][0]);
+		}
 		window.actionArguments = null;
+	},
+	
+	setActiveSubMenu : function(submenuItem){
+		if(this.subMenuUpdateImage && submenuItem.src){
+			var src = submenuItem.src;
+			this.elements.each(function(el){
+				var images = el.select('img[id="'+this.options.name +'_button_icon"]');
+				if(!images.length) return;
+				images[0].src = resolveImageSource(src, this.__DEFAULT_ICON_PATH,22);
+				this.options.src = src;
+			}.bind(this) );
+		}		
 	},
 	
 	fireContextChange: function(){
@@ -116,8 +132,9 @@ Action = Class.create({
 		var crtInZip = arguments[4];
 		var crtIsRoot = arguments[5];
 		var crtAjxpMime = arguments[6] || '';
-		if(this.options.listeners && this.options.listeners["contextChange"]){
-			this.options.listeners["contextChange"].evalScripts();
+		if(this.options.listeners["contextChange"]){
+			window.listenerContext = this;
+			this.options.listeners["contextChange"].evalScripts();			
 		}		
 		var rightsContext = this.rightsContext;
 		if(!rightsContext.noUser && !usersEnabled){
@@ -166,8 +183,9 @@ Action = Class.create({
 	},
 		
 	fireSelectionChange: function(){
-		if(this.options.listeners && this.options.listeners["selectionChange"]){
-			this.options.listeners["selectionChange"].evalScripts();
+		if(this.options.listeners["selectionChange"]){
+			window.listenerContext = this;
+			this.options.listeners["selectionChange"].evalScripts();			
 		}
 		if(arguments.length < 1 
 			|| this.contextHidden 
@@ -231,8 +249,7 @@ Action = Class.create({
 						if(processNode.getAttribute('displayModeButton') && processNode.getAttribute('displayModeButton') != ''){
 							this.options.displayAction = processNode.getAttribute('displayModeButton');
 						}						
-					}else if(processNode.nodeName == "clientListener" && processNode.firstChild){
-						if(!this.options.listeners) this.options.listeners = [];
+					}else if(processNode.nodeName == "clientListener" && processNode.firstChild){						
 						this.options.listeners[processNode.getAttribute('name')] = '<script>'+processNode.firstChild.nodeValue+'</script>';
 					}
 				}
@@ -257,6 +274,12 @@ Action = Class.create({
 				this.attributesToObject(this.rightsContext, node);
 			}else if(node.nodeName == "subMenu"){
 				this.options.subMenu = true;
+				if(node.getAttribute("updateImageOnSelect") && node.getAttribute("updateImageOnSelect") == "true"){
+					this.subMenuUpdateImage = true;
+				}
+				if(node.getAttribute("updateTitleOnSelect") && node.getAttribute("updateTitleOnSelect") == "true"){
+					this.subMenuUpdateTitle = true;
+				}
 				for(var j=0;j<node.childNodes.length;j++){
 					if(node.childNodes[j].nodeName == "staticItems" || node.childNodes[j].nodeName == "dynamicItems"){
 						this.subMenuItems[node.childNodes[j].nodeName] = [];
@@ -294,7 +317,7 @@ Action = Class.create({
 	}, 
 	
 	toActionBar:function(){
-		var button = new Element('a', {
+		this.button = new Element('a', {
 			href:this.options.name,
 			id:this.options.name +'_button'
 		}).observe('click', function(e){
@@ -317,34 +340,52 @@ Action = Class.create({
 			title:this.options.title
 		});
 		var titleSpan = new Element('span', {id:this.options.name+'_button_label'}).setStyle({paddingLeft:6,paddingRight:6, cursor:'pointer'});
-		button.insert(img).insert(new Element('br')).insert(titleSpan.update(this.getKeyedText()));
-		this.elements.push(button);
-		button.observe("mouseover", function(){
-			if(button.hasClassName('disabled')) return;
-			if(this.hideTimeout) clearTimeout(this.hideTimeout);
-			new Effect.Morph(img, {
-				style:'width:25px; height:25px;margin-top:0px;',
-				duration:0.08,
-				transition:Effect.Transitions.sinoidal,
-				afterFinish: function(){this.updateTitleSpan(titleSpan, 'big');}.bind(this)
-			});
-		}.bind(this) );
-		button.observe("mouseout", function(){
-			if(button.hasClassName('disabled')) return;
-			this.hideTimeout = setTimeout(function(){				
-				new Effect.Morph(img, {
-					style:'width:18px; height:18px;margin-top:8px;',
-					duration:0.2,
-					transition:Effect.Transitions.sinoidal,
-					afterFinish: function(){this.updateTitleSpan(titleSpan, 'small');}.bind(this)
-				});	
-			}.bind(this), 10);
-		}.bind(this) );
-		button.hide();
+		this.button.insert(img).insert(new Element('br')).insert(titleSpan.update(this.getKeyedText()));
+		this.elements.push(this.button);
 		if(this.options.subMenu){
-			this.buildActionBarSubMenu(button);
+			this.buildActionBarSubMenu(this.button);
+			this.arrowDiv = new Element('div');
+			this.arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/crystal/arrow_down.png',height:6,width:10,border:0}));
+			this.arrowDiv.imgRef = img;
+			this.button.insert(this.arrowDiv);
+		}else{
+			this.button.observe("mouseover", this.buttonStateHover.bind(this) );
+			this.button.observe("mouseout", this.buttonStateOut.bind(this) );
 		}
-		return button;
+		this.button.hide();
+		return this.button;
+	},
+	
+	placeArrowDiv : function(){
+		if(this.arrowDiv){
+			var imgPos = Position.cumulativeOffset(this.arrowDiv.imgRef)[0] + 11;
+			this.arrowDiv.setStyle({position:'absolute',top:18,left:imgPos});		
+		}
+	},
+	
+	buttonStateHover : function(){
+		if(!this.button) return;
+		if(this.button.hasClassName('disabled')) return;
+		if(this.hideTimeout) clearTimeout(this.hideTimeout);
+		new Effect.Morph(this.button.select('img[id="'+this.options.name +'_button_icon"]')[0], {
+			style:'width:22px; height:22px;margin-top:3px;',
+			duration:0.08,
+			transition:Effect.Transitions.sinoidal,
+			afterFinish: function(){this.updateTitleSpan(this.button.select('span')[0], 'big');}.bind(this)
+		});		
+	},
+	
+	buttonStateOut : function(){
+		if(!this.button) return;
+		if(this.button.hasClassName('disabled')) return;
+		this.hideTimeout = setTimeout(function(){				
+			new Effect.Morph(this.button.select('img[id="'+this.options.name +'_button_icon"]')[0], {
+				style:'width:18px; height:18px;margin-top:8px;',
+				duration:0.2,
+				transition:Effect.Transitions.sinoidal,
+				afterFinish: function(){this.updateTitleSpan(this.button.select('span')[0], 'small');}.bind(this)
+			});	
+		}.bind(this), 10);		
 	},
 	
 	buildSubmenuStaticItems : function(){
@@ -362,7 +403,7 @@ Action = Class.create({
 					alt:MessageHash[item.title],
 					image:resolveImageSource(item.src, '/images/crystal/actions/ICON_SIZE', 22),
 					isDefault:(item.isDefault?true:false),
-					callback:function(e){this.apply([item.command]);}.bind(this)
+					callback:function(e){this.apply([item]);}.bind(this)
 				});
 			}, this);
 		}
@@ -406,15 +447,18 @@ Action = Class.create({
 		  menuItems: this.subMenuItems.staticOptions || [],
 		  fade:true,
 		  zIndex:2000		  
-		});		
+		});	
+		var titleSpan = button.select('span')[0];	
 		this.subMenu.options.beforeShow = function(e){
 			button.addClassName("menuAnchorSelected");
+			this.buttonStateHover();
 		  	if(this.subMenuItems.dynamicBuilder){
 		  		this.subMenuItems.dynamicBuilder(this.subMenu);
 		  	}
 		}.bind(this);		
 		this.subMenu.options.beforeHide = function(e){
 			button.removeClassName("menuAnchorSelected");
+			this.buttonStateOut();
 		}.bind(this);
 		this.actionBar.subMenus.push(this.subMenu);
 	},
@@ -477,6 +521,7 @@ Action = Class.create({
 		this.elements.each(function(elem){
 			elem.show();
 		});
+		this.placeArrowDiv();
 	},
 	
 	disable: function(){
@@ -491,6 +536,7 @@ Action = Class.create({
 		this.elements.each(function(elem){
 			elem.removeClassName('disabled');
 		});	
+		this.placeArrowDiv();
 	},
 	
 	remove: function(){
