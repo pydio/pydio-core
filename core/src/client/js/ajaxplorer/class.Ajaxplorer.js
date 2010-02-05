@@ -51,12 +51,13 @@ Ajaxplorer = Class.create({
 			}
 		}
 		this._initRepositoryId = repositoryId;
+		this._resourcesRegistry = {};
 		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 		this.histCount=0;
 		if(!this.usersEnabled) this.repositoryId = repositoryId;
 		modal.setLoadingStepCounts(this.usersEnabled?7:6);
 		this.initTemplates();
-		this.initEditorsRegistry();
+		this.initEditorsRegistry();		
 		modal.initForms();
 		this.initObjects();
 		window.setTimeout(function(){document.fire('ajaxplorer:loaded');}, 500);
@@ -71,23 +72,22 @@ Ajaxplorer = Class.create({
 			if(xmlResponse == null || xmlResponse.documentElement == null) return;
 			var editors = xmlResponse.documentElement.childNodes;		
 			for(var i=0;i<editors.length;i++){
-				if(editors[i].nodeName == "editor"){
-					this.editorsRegistry.push({
+				if(editors[i].nodeName == "editor"){					
+					var editorDefinition = {
+						id : editors[i].getAttribute("id"),
 						text : MessageHash[editors[i].getAttribute("text")],
 						title : MessageHash[editors[i].getAttribute("title")],
 						icon : editors[i].getAttribute("icon"),
 						editorClass : editors[i].getAttribute("className"),
 						mimes : $A(editors[i].getAttribute("mimes").split(",")),
-						formId : editors[i].getAttribute("formId") || null
-					});
+						formId : editors[i].getAttribute("formId") || null,
+						resourcesManager : new ResourcesManager()
+					};
+					this._resourcesRegistry[editorDefinition.id] = editorDefinition.resourcesManager;
+					this.editorsRegistry.push(editorDefinition);					
 					for(var j=0;j<editors[i].childNodes.length;j++){
 						var child = editors[i].childNodes[j];
-						if(child.nodeName == "clientForm"){
-							var clientFormId = child.getAttribute("id");
-							if(!$('all_forms').select('[id="'+clientFormId+'"]').length){
-								$('all_forms').insert(child.firstChild.nodeValue);
-							}
-						}
+						editorDefinition.resourcesManager.loadFromXmlNode(child);
 					}
 				}
 				
@@ -103,6 +103,11 @@ Ajaxplorer = Class.create({
 			if(el.mimes.include(mime)) editors.push(el);
 		});
 		return editors;
+	},
+	
+	loadEditorResources : function(resourcesManager){
+		var registry = this._resourcesRegistry;
+		resourcesManager.load(registry);
 	},
 	
 	initTemplates:function(){
