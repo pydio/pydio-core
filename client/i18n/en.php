@@ -65,7 +65,7 @@ $mess=array(
 "48" => "OK",
 "49" => "CANCEL",
 "50" => "Exe file",
-"51" => "Simple Editor",
+"51" => "Editor",
 "52" => "Editing file",
 "53" => "Save",
 "54" => "Cancel",
@@ -356,5 +356,7 @@ $mess=array(
 "open_with_access" => "O",
 "317" => "Source viewer",
 "318" => "CodePress source code viewer",
+"319" => "HTML Editor",
+"320" => "WYSIWYG editor for HTML"
 );
 ?>
