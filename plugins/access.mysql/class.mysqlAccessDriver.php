@@ -551,7 +551,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 	/*/
 	function listTables(){
 		$repo = ConfService::getRepository();
-		$result = mysql_query("SHOW TABLES FROM ".$repo->getOption("DB_NAME")." LIKE '".$repo->getOption("DB_PTRN")."%'");
+		$result = mysql_query("SHOW TABLES FROM `".$repo->getOption("DB_NAME")."` LIKE '".$repo->getOption("DB_PTRN")."%'");
 		$allTables = array();
 		while ($row = mysql_fetch_row($result)) {
 		   $allTables[] = $row[0];
