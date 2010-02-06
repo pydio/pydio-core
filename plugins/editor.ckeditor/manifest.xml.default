@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.ckeditor" text="319" title="320" icon="ckeditor_images/html_edit.png" className="AjxpCkEditor" mimes="html,htm" formId="edit_box">
+	<dependencies>
+		<pluginResources pluginName="editor.text"/>
+	</dependencies>
+	<resources>
+		<js file="plugins/editor.ckeditor/ckeditor/ckeditor.js" className="CKEDITOR"/>
+		<js file="plugins/editor.ckeditor/class.AjxpCkEditor.js" className="AjxpCkEditor"/>
+		<img_library alias="ckeditor_images" path="plugins/editor.ckeditor"/>
+	</resources>
+	<clientForm id="ck_box"><![CDATA[
+		<script type="text/javascript">window.CKEDITOR_BASEPATH = 'plugins/editor.ckeditor/ckeditor/';</script>
+	]]></clientForm>		
+</editor>
