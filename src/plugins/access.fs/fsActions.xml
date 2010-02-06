@@ -382,7 +382,7 @@ AJXP_MESSAGE[174]<br/>
 				</processing>
 		</action>
 		<action name="open_with">
-			<gui text="316" title="316" src="edit.png" accessKey="open_with_access" hasAccessKey="true">
+			<gui text="316" title="316" src="fileopen.png" accessKey="open_with_access" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get" inZip="false">
@@ -399,7 +399,7 @@ AJXP_MESSAGE[174]<br/>
 						context.builderMenuItems.push({
 							name:el.text,
 							alt:el.title,
-							image:resolveImageSource(el.icon, '/images/crystal/actions/ICON_SIZE', 22),						
+							image:resolveImageSource(el.icon, '/images/crystal/actions/ICON_SIZE', 22),
 							callback:function(e){this.apply([el]);}.bind(context)
 						} );
 					} );					

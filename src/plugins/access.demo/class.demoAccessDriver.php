@@ -54,7 +54,7 @@ class demoAccessDriver extends fsAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "edit":	
+			case "open_with":	
 				if(isset($save) && $save==1)
 				{
 					$xmlBuffer .= AJXP_XMLWriter::sendMessage(null, $errorMessage, false);

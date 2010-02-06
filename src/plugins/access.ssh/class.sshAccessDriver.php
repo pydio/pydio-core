@@ -170,7 +170,7 @@ class sshAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "edit";	
+			case "open_with";	
 				if(isset($save) && $save==1)
 				{
 					AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
