@@ -46,6 +46,11 @@ ResourcesManager = Class.create({
 				}
 			}.bind(this) );
 		}		
+		if(this.resources.forms){
+			$H(this.resources.forms).each(function(pair){
+				this.loadGuiForm(pair.key, pair.value);
+			}.bind(this) );
+		}
 		if(this.resources.js){
 			this.resources.js.each(function(value){
 				this.loadJSResource(value.fileName, value.className);
@@ -55,11 +60,6 @@ ResourcesManager = Class.create({
 			this.resources.css.each(function(value){
 				this.loadCSSResource(value);
 			}.bind(this));
-		}
-		if(this.resources.forms){
-			$H(this.resources.forms).each(function(pair){
-				this.loadGuiForm(pair.key, pair.value);
-			}.bind(this) );
 		}
 		this.loaded = true;
 	},
@@ -90,7 +90,8 @@ ResourcesManager = Class.create({
 
 	loadGuiForm : function(formId, htmlSnippet){
 		if(!$(this.mainFormContainerId).select('[id="'+formId+'"]').length){
-			$(this.mainFormContainerId).insert(htmlSnippet);
+			htmlSnippet.evalScripts();
+			$(this.mainFormContainerId).insert(htmlSnippet.stripScripts());
 		}
 	},
 	

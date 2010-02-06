@@ -157,6 +157,7 @@ AbstractEditor = Class.create({
 		this.refreshFullScreenTitle();
 		this.resize();
 		this.fullScreenMode = true;
+		this.element.fire("editor:enterFSend");
 	},
 	exitFullScreen : function(){
 		if(!this.fullScreenMode) return;
@@ -170,6 +171,7 @@ AbstractEditor = Class.create({
 		this.actions.get("nofsButton").hide();		
 		document.title = this.originalWindowTitle;
 		this.fullScreenMode = false;
+		this.element.fire("editor:exitFSend");
 	},
 	resize : function(size){
 		if(size){
