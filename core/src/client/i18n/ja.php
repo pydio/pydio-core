@@ -355,6 +355,8 @@ $mess=array(
 "open_with_access" => "O",
 "317" => "Source viewer",
 "318" => "CodePress source code viewer",
+"319" => "HTML Editor",
+"320" => "WYSIWYG editor for HTML",
 /* 文章終了 */
 );
 ?>

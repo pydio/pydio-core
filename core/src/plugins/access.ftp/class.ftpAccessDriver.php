@@ -149,7 +149,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "edit";	
+			case "open_with";	
 			$file_name = basename($file);
 			$this->ftp_get_contents($file);
 			if(isset($save) && $save==1 && isSet($code))
