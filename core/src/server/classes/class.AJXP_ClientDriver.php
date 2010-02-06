@@ -130,7 +130,7 @@ class AJXP_ClientDriver extends AbstractDriver
 				$handler = opendir($pluginDir);
 				AJXP_XMLWriter::header("editors");
 				while ($plug = readdir($handler)) {
-					$parts = split("\.", $plug);
+					$parts = explode(".", $plug);
 					if(count($parts) > 1 && $parts[0] == "editor"){
 						$manifest = INSTALL_PATH."/plugins/".$plug."/manifest.xml";
 						if(!is_file($manifest)) continue;
