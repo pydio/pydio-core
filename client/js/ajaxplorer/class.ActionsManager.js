@@ -599,7 +599,8 @@ ActionsManager = Class.create({
 		}
 		toolEl.actionsCount = 0;
 		this.toolbars.get(toolbar).each(function(actionName){
-			var action = this.actions.get(actionName);			
+			var action = this.actions.get(actionName);		
+			if(!action) return;	
 			toolEl.insert(action.toActionBar());
 			toolEl.actionsCount ++;			
 		}.bind(this));
@@ -637,7 +638,7 @@ ActionsManager = Class.create({
 		this.initToolbars();
 		if(ajaxplorer && ajaxplorer.infoPanel) ajaxplorer.infoPanel.load();
 		this.fireContextChange();
-		this.fireSelectionChange();	
+		this.fireSelectionChange();			
 	},
 	
 	parseActions: function(xmlResponse){		
@@ -702,6 +703,13 @@ ActionsManager = Class.create({
 				}catch(e){
 					alert(e);
 				}
+			}
+		}
+		if(this.defaultActions.get("select")){
+			this.defaultActions.set("file", this.defaultActions.get("select"));
+		}else{
+			if(this.actions.get("ext_select")){
+				this.actions.unset("ext_select");
 			}
 		}
 	},

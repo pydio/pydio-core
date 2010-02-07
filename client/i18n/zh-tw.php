@@ -356,6 +356,8 @@ $mess=array(
 "318" => "CodePress source code viewer",
 "319" => "HTML Editor",
 "320" => "WYSIWYG editor for HTML",
+"321" => "Select",
+"322" => "Select the current file",
 /* END SENTENCE */
 );
 ?>
