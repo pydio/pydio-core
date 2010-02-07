@@ -99,6 +99,22 @@ class HTMLWriter
     	echo "</script>\n";
     }
     
+    function writeExternalSelectorData($type, $data){
+    	echo "<script language=\"javascript\">\n";
+    	echo 'document.observe("ajaxplorer:loaded", function(){    		
+    		ajaxplorer.actionBar.defaultActions.set("select", "ext_select");
+    		ajaxplorer.actionBar.selectorData = new Hash();
+    		ajaxplorer.actionBar.selectorData.set("type", "'.$type.'");
+    		var ajxpSelData = {};';
+    	foreach ($data as $key => $value){
+    		echo 'ajxpSelData["'.$key.'"] = ["'.$value.'"];';
+    	}
+    	echo '
+    		ajaxplorer.actionBar.selectorData.set("data", ajxpSelData);    		
+    	});
+    	</script>';
+    }
+    
     function closeBodyAndPage(){
     	print("</body></html>");
     }
