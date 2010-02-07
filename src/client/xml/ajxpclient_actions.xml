@@ -111,6 +111,32 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="ext_select">
+			<gui text="321" title="322" src="download_manager.png" accessKey="" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false"
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="put" inZip="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="false"><![CDATA[
+					var userSelection = ajaxplorer.getFilesList().getUserSelection();
+					if((userSelection.isUnique() && !userSelection.hasDir()))
+					{
+						var fileName = userSelection.getUniqueFileName();
+						var selectorData = ajaxplorer.actionBar.selectorData;
+						if(selectorData.get('type') == "ckeditor"){
+							var ckData = selectorData.get('data');
+							if (ckData['CKEditorFuncNum']) {
+								window.opener.CKEDITOR.tools.callFunction(ckData['CKEditorFuncNum'], 'content.php?get_action=image_proxy&file=' + fileName);
+								window.close();
+							}
+						}
+					}
+					]]></clientCallback>
+				</processing>
+		</action>		
 		<action name="bookmark">
 			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
 				accessKey="bookmarks_access_key">

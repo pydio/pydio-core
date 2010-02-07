@@ -138,5 +138,10 @@ if($JS_DEBUG && isSet($_GET["update_i18n"])){
 $mess = ConfService::getMessages();
 include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
 HTMLWriter::writeI18nMessagesClass($mess);
+
+if(isSet($_GET["external_selector_type"])){
+	HTMLWriter::writeExternalSelectorData($_GET["external_selector_type"], $_GET);
+}
+
 HTMLWriter::closeBodyAndPage();
 ?>

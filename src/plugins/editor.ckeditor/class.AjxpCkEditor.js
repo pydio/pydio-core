@@ -40,6 +40,10 @@ AjxpCkEditor = Class.create(TextEditor, {
 		this.editorConfig = {
 			resize_enabled:false,
 			toolbar : "Ajxp",
+			filebrowserBrowseUrl : 'index.php?external_selector_type=ckeditor',
+			filebrowserImageBrowseUrl : 'index.php?external_selector_type=ckeditor',
+			filebrowserFlashBrowseUrl : 'index.php?external_selector_type=ckeditor',
+			language : ajaxplorer.currentLanguage,
 			toolbar_Ajxp : [
 				['Source','Preview','Templates'],
 			    ['Undo','Redo','-', 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Print', 'SpellChecker', 'Scayt'],
