@@ -1130,7 +1130,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	}
 
 
-	function deldir($dir,$currentDir, $isDir) 
+	function deldir($dir,$currentDir, $isDir=true) 
 	{
 		if (($contents = ftp_rawlist($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir)))!==FALSE) 
 		{
@@ -1169,7 +1169,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 						}
 						else
 						{
-             				@ftp_delete($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$filename));
+						        @ftp_delete($this->connect,$this->secureFtpPath($this->getPath().$currentDir."/".$dir."/".$filename));
 						}
 					}
 				}			
