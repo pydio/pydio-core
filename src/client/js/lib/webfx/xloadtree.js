@@ -183,19 +183,22 @@ function _xmlTreeToJsTree(oNode, parentNode) {
 		openIcon = icon;
 	}
 	var src = oNode.getAttribute("src");
-	if(parentNode && parentNode.queryParameters){
-		src = src + parentNode.queryParameters;
-		var qParams = parentNode.queryParameters;
-	}
 	var target = oNode.getAttribute("target");
 	var preloaded = oNode.getAttribute("preloaded");
 	var recycle = oNode.getAttribute("is_recycle");
 	var folderFullName = oNode.getAttribute("filename");
 	// create jsNode
 	var jsNode;
+	if(!src){
+		src = ajxpServerAccessPath + "?get_action=ls&dir=" + folderFullName;
+	}
+	if(parentNode && parentNode.queryParameters){
+		src = src + parentNode.queryParameters;
+		var qParams = parentNode.queryParameters;
+	}
 	if (src != null && src != "")
 		jsNode = new WebFXLoadTreeItem(text, src, action, parent, icon, openIcon);
-	else
+	else		
 		jsNode = new WebFXTreeItem(text, action, parent, icon, openIcon);
 		
 	if (target != ""){
