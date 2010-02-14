@@ -59,6 +59,18 @@ class AJXP_XMLWriter
 		}
 	}
 	
+	function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array()){
+		$string = "<tree";
+		$metaData["filename"] = $nodeName;
+		$metaData["text"] = $nodeLabel;
+		$metaData["is_file"] = ($isLeaf?"true":"false");
+		foreach ($metaData as $key => $value){
+			$string .= " $key=\"$value\"";
+		}
+		$string .= "/>";
+		AJXP_XMLWriter::write($string);
+	}
+	
 	function catchError($code, $message, $fichier, $ligne, $context){
 		if(error_reporting() == 0) return ;
 		$message = "$code : $message in $fichier (l.$ligne)";

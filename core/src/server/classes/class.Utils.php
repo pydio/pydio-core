@@ -275,6 +275,10 @@ class Utils
 		return (substr($fileName,0,1) == ".");
 	}
 	
+	function isBrowsableArchive($fileName){
+		return preg_match("/\.zip$/",$fileName);
+	}
+	
 	/**
 	 * Convert a shorthand byte value from a PHP configuration directive to an integer value
 	 * @param    string   $value
