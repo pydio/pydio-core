@@ -535,14 +535,21 @@ AJXP_MESSAGE[174]<br/>
 						$('external_repository').hide();
 						
 						if(!this.treeCopy){
+							var action = function(e){
+								if(ajaxplorer.actionBar.treeCopyActive){
+						  			if(ajaxplorer.actionBar.treeCopyActionDest) 
+						  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = this.url}.bind(this));
+					 				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
+					 					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = this.id}.bind(this));
+					 			}
+					 			this.select();
+							};						
 							this.treeCopy = new WebFXLoadTree('/', 
 																ajxpServerAccessPath+'?get_action=ls', 
-																"javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 
-																'explorer', null, null, '&skipZip=true');
+																action, 
+																'explorer', null, null, '&options=d');
 						}
 						else{
-							this.treeCopy.src = ajxpServerAccessPath+'?get_action=ls';
-							this.treeCopy.queryParameters = '&skipZip=true';
 							window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
 						}				
 						this.treeCopyActive = true;
@@ -550,9 +557,9 @@ AJXP_MESSAGE[174]<br/>
 						this.treeCopyActionDestNode = $A([eDestNodeHidden]);
 						container.innerHTML = this.treeCopy.toString();
 						$(this.treeCopy.id).observe("click", function(e){
-							ajaxplorer.foldersTree.clickNode(this.treeCopy.id);
+							this.action();
 							Event.stop(e);
-						}.bind(this));
+						}.bind(this.treeCopy));
 						this.treeCopy.focus();
 						
 						if(ajaxplorer.user && !ajaxplorer.getFilesList().getUserSelection().hasDir()){
@@ -645,11 +652,20 @@ AJXP_MESSAGE[174]<br/>
 						var container = oForm.getElementsBySelector(".treeCopyContainer")[0];
 						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
 						var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
+						$('external_repository').hide();
 						if(!this.treeCopy){
+							var action = function(e){
+								if(ajaxplorer.actionBar.treeCopyActive){
+						  			if(ajaxplorer.actionBar.treeCopyActionDest) 
+						  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = this.url}.bind(this));
+					 				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
+					 					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = this.id}.bind(this));
+					 			}
+							};						
 							this.treeCopy = new WebFXLoadTree('/', 
-																ajxpServerAccessPath+'?skipZip=true&get_action=ls', 
-																"javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 
-																'explorer');
+																ajxpServerAccessPath+'?get_action=ls', 
+																action, 
+																'explorer', null, null, '&options=d');
 						}
 						else{
 							window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
@@ -657,12 +673,11 @@ AJXP_MESSAGE[174]<br/>
 						this.treeCopyActive = true;
 						this.treeCopyActionDest = $A([eDestLabel]);
 						this.treeCopyActionDestNode = $A([eDestNodeHidden]);
-						container.innerHTML = this.treeCopy.toString();
+						$(container).insert(this.treeCopy.toString());
 						$(this.treeCopy.id).observe("click", function(e){
-							ajaxplorer.foldersTree.clickNode(this.treeCopy.id);
+							this.action();
 							Event.stop(e);
-						}.bind(this));
-						$('external_repository').hide();
+						}.bind(this.treeCopy));
 						this.treeCopy.focus();
 					}.bind(ajaxplorer.actionBar);
 					var onCancel = function(){				

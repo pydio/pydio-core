@@ -220,7 +220,8 @@ SearchEngine = Class.create({
 		var queryIndex = this._queriesIndex;
 		this.registerQuery(this._queriesIndex);
 		var connexion = new Connexion();
-		connexion.addParameter('mode', 'search');
+		connexion.addParameter('get_action', 'ls');
+		connexion.addParameter('options', 'a');
 		connexion.addParameter('dir', currentFolder);
 		connexion.onComplete = function(transport){
 			this._parseXmlAndSearchString(transport.responseXML, text, currentFolder, queryIndex);
@@ -254,7 +255,7 @@ SearchEngine = Class.create({
 					{
 						this.addResult(currentFolder, cs[i].getAttribute('text'), icon);
 					}
-					if(cs[i].getAttribute('is_file') == null)
+					if(cs[i].getAttribute('is_file') == "false")
 					{
 						this.searchFolderContent(text, currentFolder+"/"+cs[i].getAttribute('text'));
 					}

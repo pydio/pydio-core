@@ -66,6 +66,15 @@ class AbstractAccessDriver extends AbstractDriver {
 			$this->crossRepositoryCopy($httpVars);
 			return ;
 		}
+		if($actionName == "ls"){
+			// UPWARD COMPATIBILTY
+			if(isSet($httpVars["options"])){
+				if($httpVars["options"] == "al") $httpVars["mode"] = "file_list";
+				else if($httpVars["options"] == "a") $httpVars["mode"] = "search";
+				else if($httpVars["options"] == "d") $httpVars["skipZip"] = "true";
+				// skip "complete" mode that was in fact quite the same as standard tree listing (dz)
+			}
+		}
 		return parent::applyAction($actionName, $httpVars, $filesVar);
 	}
 	
