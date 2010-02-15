@@ -59,6 +59,11 @@ class AJXP_XMLWriter
 		}
 	}
 	
+	function renderPaginationData($count, $currentPage, $totalPages){
+		$string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png"/>';		
+		AJXP_XMLWriter::write($string, true);
+	}
+	
 	function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array()){
 		$string = "<tree";
 		$metaData["filename"] = $nodeName;
@@ -68,7 +73,7 @@ class AJXP_XMLWriter
 			$string .= " $key=\"$value\"";
 		}
 		$string .= "/>";
-		AJXP_XMLWriter::write($string);
+		AJXP_XMLWriter::write($string, true);
 	}
 	
 	function catchError($code, $message, $fichier, $ligne, $context){

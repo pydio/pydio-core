@@ -169,6 +169,9 @@ function _xmlTreeToJsTree(oNode, parentNode) {
 	if(!action){
 		action = "javascript:ajaxplorer.getFoldersTree().clickNode(CURRENT_ID)";
 	}
+	if(oNode.tagName == "pagination"){
+		text = MessageHash[oNode.getAttribute("overflowMessage")] + ' ('+oNode.getAttribute("count")+')';
+	}
 	var parent = null;
 	var icon = oNode.getAttribute("icon");
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
@@ -189,9 +192,6 @@ function _xmlTreeToJsTree(oNode, parentNode) {
 	var folderFullName = oNode.getAttribute("filename");
 	// create jsNode
 	var jsNode;
-	if(!src){
-		src = ajxpServerAccessPath + "?get_action=ls&dir=" + folderFullName;
-	}
 	if(parentNode && parentNode.queryParameters){
 		src = src + parentNode.queryParameters;
 		var qParams = parentNode.queryParameters;
@@ -262,13 +262,11 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 		var cs = root.childNodes;
 		var l = cs.length;		
 		for (var i = 0; i < l; i++) {			
-			if (cs[i].tagName == "tree") {
+			if (cs[i].tagName == "tree" || cs[i].tagName == "pagination") {
 				bAnyChildren = true;
 				bIndent = true;
 				jsParentNode.add( _xmlTreeToJsTree(cs[i], jsParentNode), true);
-			}
-			else if(cs[i].tagName == "error")
-			{
+			}else if(cs[i].tagName == "error"){
 				jsParentNode.errorText = cs[i].firstChild.nodeValue;
 			}
 			
