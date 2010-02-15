@@ -567,7 +567,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						}else{
 							$fPerms = '0000';
 						}
-						$metaData["fPerms"] = $fPerms;
+						$metaData["file_perms"] = $fPerms;
 						if(Utils::is_image($currentFile))
 						{
 							list($width, $height, $type, $attr) = @getimagesize($currentFile);
