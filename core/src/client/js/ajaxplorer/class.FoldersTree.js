@@ -37,13 +37,18 @@ FoldersTree = Class.create({
 	initialize: function (oElement, rootFolderName, rootFolderSrc, oAjaxplorer, dontLoad)
 	{
 		this._htmlElement = $(oElement);
-		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, "javascript:ajaxplorer.foldersTree.clickNode(CURRENT_ID)", 'explorer');
+		var action = function(e){
+			if(!ajaxplorer) return;
+			ajaxplorer.focusOn(ajaxplorer.foldersTree);
+			ajaxplorer.foldersTree.clickNode(this.id);
+		};
+		
+		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, action, 'explorer');
 		this._htmlElement.innerHTML = this.tree.toString();	
 		$(this.tree.id).observe("click", function(e){
-			ajaxplorer.focusOn(this);
-			this.clickNode(this.tree.id);
+			this.action(e);
 			Event.stop(e);
-		}.bind(this));
+		}.bind(this.tree));
 		AjxpDroppables.add(this.tree.id);
 		if(!this.tree.open && !this.tree.loading && !dontLoad) this.tree.toggle();		
 		this._htmlElement.observe("click", function(){			
@@ -90,14 +95,6 @@ FoldersTree = Class.create({
 	clickNode: function(nodeId){		
 		var path = webFXTreeHandler.all[nodeId].url;
 		if(path){
-			if(ajaxplorer.actionBar.treeCopyActive){
-	  			if(ajaxplorer.actionBar.treeCopyActionDest) 
-	  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = path});
- 				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
- 					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = nodeId});
- 				this.setCurrentNodeName(nodeId);
- 				return;
- 			}
 			this.setCurrentNodeName(nodeId);
 			if(this.getCurrentNodeProperty("pagination_anchor")){
 				path = path + "#" + this.getCurrentNodeProperty("pagination_anchor");

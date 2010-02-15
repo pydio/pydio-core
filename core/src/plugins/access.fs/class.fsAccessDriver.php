@@ -449,27 +449,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "ls":
 			
 				if(!isSet($dir) || $dir == "/") $dir = "";
-				if(isSet($lsOptions)){
-					$lsOptions = $this->parseLsOptions($lsOptions);					
-				}else{
-					// BACKWARD COMPATIBILITY
-					$searchMode = $fileListMode = $completeMode = false;
-					if(isSet($mode)){
-						if($mode == "search") $searchMode = true;
-						else if($mode == "file_list") $fileListMode = true;
-						else if($mode == "complete") $completeMode = true;
-					}				
-					if(isSet($skipZip) && $skipZip == "true"){
-						$skipZip = true;
-					}else{
-						$skipZip = false;
-					}
-					$lsOptions = "d";
-					if(!$skipZip) $lsOptions .= "z";
-					if($mode != "search") $lsOptions .= "l"; //List details
-					if(isSet($mode) && $mode!="complete") $lsOptions .= "a";
-					$lsOptions = $this->parseLsOptions($lsOptions);
-				}
+				$lsOptions = $this->parseLsOptions((isSet($options)?$options:"a"));
 				
 				if($test = UserSelection::detectZip($dir)){
 					$liste = array();
@@ -483,7 +463,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						$nodeName = Utils::xmlEntities( SystemTextEncoding::toUTF8($zipEntry["filename"]));
 						$metaData["icon"] = Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"]);
 						if($zipEntry["folder"]){
-							$metaData["src"] = "content.php?dir=".urlencode(SystemTextEncoding::toUTF8($zipEntry["filename"]));
+							$metaData["src"] = urlencode("content.php?get_action=ls&options=dz&dir=".SystemTextEncoding::toUTF8($zipEntry["filename"]));
 							$metaData["openicon"] = "folder_open.png";
 						}
 						if($lsOptions["l"]){
@@ -553,7 +533,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						$metaData["openicon"] = "folder_open.png";
 					}
 					if(is_dir($currentFile) || Utils::isBrowsableArchive($nodeName)){
-						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?dir=".$dir."/".$nodeName);
+						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?get_action=ls&options=dz&dir=".$dir."/".$nodeName);
 						$link = urlencode($link);						
 						$metaData["src"] = $link;
 					}

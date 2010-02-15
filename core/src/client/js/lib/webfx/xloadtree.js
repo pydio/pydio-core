@@ -167,7 +167,13 @@ function _xmlTreeToJsTree(oNode, parentNode) {
 	var text = oNode.getAttribute("text");
 	var action = oNode.getAttribute("action");
 	if(!action){
-		action = "javascript:ajaxplorer.getFoldersTree().clickNode(CURRENT_ID)";
+		/*
+		action = function(e){
+			if(!ajaxplorer) return;
+			ajaxplorer.focusOn(ajaxplorer.foldersTree);
+			ajaxplorer.foldersTree.clickNode(this.id);
+		};
+		*/
 	}
 	if(oNode.tagName == "pagination"){
 		text = MessageHash[oNode.getAttribute("overflowMessage")] + ' ('+oNode.getAttribute("count")+')';
