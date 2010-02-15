@@ -368,7 +368,8 @@ FilesList = Class.create(SelectableElements, {
 		// TODO : THIS SHOULD BE SET ONCOMPLETE!		
 		this._currentRep = repToLoad;
 		var connexion = new Connexion(url);
-		connexion.addParameter('mode', 'file_list');
+		connexion.addParameter('get_action', 'ls');
+		connexion.addParameter('options', 'al');
 		connexion.addParameter('dir', repToLoad);
 		if(additionnalParameters){
 			additionnalParameters.each(function(pair){

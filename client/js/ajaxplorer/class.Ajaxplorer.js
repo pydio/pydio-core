@@ -171,7 +171,7 @@ Ajaxplorer = Class.create({
 			fakeUser.setRepositoriesList(this._initRepositoriesList);
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
 			var repoObject = this._initRepositoriesList.get(this._initRepositoryId);
-			this.foldersTree = new FoldersTree('tree_container', repoObject.getLabel(), ajxpServerAccessPath+'?action=ls', this);
+			this.foldersTree = new FoldersTree('tree_container', repoObject.getLabel(), ajxpServerAccessPath+'?get_action=ls&options=dz', this);
 			this.refreshRepositoriesMenu(this._initRepositoriesList, this._initRepositoryId);
 			this.actionBar.loadActions();
 			this.infoPanel.load();
@@ -180,7 +180,7 @@ Ajaxplorer = Class.create({
 		else
 		{
 			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, null, this);
-			this.foldersTree = new FoldersTree('tree_container', 'No Repository', ajxpServerAccessPath+'?action=ls', this);
+			this.foldersTree = new FoldersTree('tree_container', 'No Repository', ajxpServerAccessPath+'?get_action=ls&options=dz', this);
 			if(this._initLoggedUser)
 			{
 				this.getLoggedUserFromServer();
