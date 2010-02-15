@@ -467,7 +467,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$lsOptions = "d";
 					if(!$skipZip) $lsOptions .= "z";
 					if($mode != "search") $lsOptions .= "l"; //List details
-					if(isSet($mode)) $lsOptions .= "a";
+					if(isSet($mode) && $mode!="complete") $lsOptions .= "a";
 					$lsOptions = $this->parseLsOptions($lsOptions);
 				}
 				
@@ -477,38 +477,37 @@ class fsAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					$tmpDir = $this->getPath().dirname($test[0]).".tmpZipExtract";					
 					foreach ($liste as $zipEntry){
-						$atts = array();
-						if(!$fileListMode && !$zipEntry["folder"]) continue;
-						$atts[] = "is_file=\"".($zipEntry["folder"]?"false":"true")."\"";
-						$atts[] = "text=\"".Utils::xmlEntities( basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])))."\"";
-						$atts[] = "filename=\"".Utils::xmlEntities( SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
-						if($fileListMode){
-							$atts[] = "filesize=\"".Utils::roundSize($zipEntry["size"])."\"";
-							$atts[] = "bytesize=\"".$zipEntry["size"]."\"";
-							$atts[] = "ajxp_modiftime=\"".$zipEntry["mtime"]."\"";
-							$atts[] = "mimestring=\"".Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"])."\"";
-							$atts[] = "icon=\"".Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"])."\"";
+						$metaData = array();
+						if(!$lsOptions["f"] && !$zipEntry["folder"]) continue;
+						$nodeLabel = Utils::xmlEntities( basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])));
+						$nodeName = Utils::xmlEntities( SystemTextEncoding::toUTF8($zipEntry["filename"]));
+						$metaData["icon"] = Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"]);
+						if($zipEntry["folder"]){
+							$metaData["src"] = "content.php?dir=".urlencode(SystemTextEncoding::toUTF8($zipEntry["filename"]));
+							$metaData["openicon"] = "folder_open.png";
+						}
+						if($lsOptions["l"]){
+							$metaData["filesize"] = Utils::roundSize($zipEntry["size"]);
+							$metaData["bytesize"] = $zipEntry["size"];
+							$metaData["ajxp_modiftime"] = $zipEntry["mtime"];
+							$metaData["mimestring"] = Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"]);
 							$is_image = Utils::is_image(basename($zipEntry["stored_filename"]));
-							$atts[] = "is_image=\"".$is_image."\"";
+							$metaData["is_image"] = $is_image;
 							if($is_image){
-								if(!is_dir($tmpDir)) mkdir($tmpDir);
+								if(!is_dir($tmpDir)) {
+									mkdir($tmpDir);
+									register_shutdown_function("rmdir", $tmpDir);
+								}
 								$currentFile = $tmpDir."/".basename($zipEntry["stored_filename"]);								
 								$data = $zip->extract(PCLZIP_OPT_BY_NAME, $zipEntry["stored_filename"], PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_PATH, $tmpDir);
 								list($width, $height, $type, $attr) = @getimagesize($currentFile);
-								$atts[] = "image_type=\"".image_type_to_mime_type($type)."\"";
-								$atts[] = "image_width=\"$width\"";
-								$atts[] = "image_height=\"$height\"";
+								$metaData["image_type"] = image_type_to_mime_type($type);
+								$metaData["image_width"] = $width;
+								$metaData["image_height"] = $height;
 								unlink($currentFile);
 							}
-						}else{							
-							$atts[] = "icon=\"client/images/foldericon.png\"";
-							$atts[] = "openicon=\"client/images/foldericon.png\"";
-							$atts[] = "src=\"content.php?dir=".urlencode(SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
-						}						
-						print("<tree ".join(" ", $atts)."/>");
-					}
-					if(is_dir($tmpDir)){
-						rmdir($tmpDir);
+						}					
+						AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $zipEntry["folder"], $metaData);
 					}
 					AJXP_XMLWriter::close();
 					exit(0);
@@ -521,54 +520,44 @@ class fsAccessDriver extends AbstractAccessDriver
 				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
 				if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
 				
-				if($fileListMode){
-					$countFiles = $this->countFiles($path);
-					if($countFiles > $threshold){
-						$offset = 0;
-						$crtPage = 1;
-						if(isSet($page)){
-							$offset = (intval($page)-1)*$limitPerPage; 
-							$crtPage = $page;
-						}
-						$totalPages = floor($countFiles / $limitPerPage) + 1;
-						$reps = $this->listing($path, false, $offset, $limitPerPage);						
-					}else{
-						$reps = $this->listing($path, $searchMode);
+				$countFiles = $this->countFiles($path, !$lsOptions["f"]);
+				if($countFiles > $threshold){
+					$offset = 0;
+					$crtPage = 1;
+					if(isSet($page)){
+						$offset = (intval($page)-1)*$limitPerPage; 
+						$crtPage = $page;
 					}
+					$totalPages = floor($countFiles / $limitPerPage) + 1;						
 				}else{
-					$countFolders = $this->countFiles($path, true);
-					if($countFolders > $threshold){
-						AJXP_XMLWriter::header();
-						$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
-						$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
-						$attributes = "icon=\"$icon\"  openicon=\"$openicon\"";
-						print("<tree text=\"$mess[306] ($countFolders)...\" $attributes></tree>");
-						AJXP_XMLWriter::close();
-						exit(1) ;
-					}
-					$reps = $this->listing($path, !$searchMode);
-				}
-				
-				$reps = $this->lsListing($path, $lsOptions);				
-				
+					$offset = $limitPerPage = 0;
+				}					
+				$reps = $this->lsListing($path, $lsOptions, $offset, $limitPerPage);
+								
 				AJXP_XMLWriter::header();
 				if(isSet($totalPages) && isSet($crtPage)){
-					print '<pagination count="'.$countFiles.'" total="'.$totalPages.'" current="'.$crtPage.'"/>';
+					AJXP_XMLWriter::renderPaginationData($countFiles, $crtPage, $totalPages);
+					if(!$lsOptions["f"]){
+						AJXP_XMLWriter::close();
+						exit(1);
+					}
 				}
 				foreach ($reps as $nodeName)
 				{
 					$metaData = array();
-					if($searchMode)
-					{
-						if(is_file($path."/".$nodeName)) {
-							$metaData["is_file"] = "true";
-							$metaData["icon"]= Utils::mimetype($nodeName, "image", false);
-						}
+					$currentFile = $path."/".$nodeName;									
+					$metaData["is_file"] = (is_file($currentFile)?"1":"0");
+					$metaData["filename"] = Utils::xmlEntities(SystemTextEncoding::toUTF8($dir."/".$nodeName));
+					$metaData["icon"] = Utils::mimetype($nodeName, "image", is_dir($currentFile));
+					if($metaData["icon"] == "folder.png"){
+						$metaData["openicon"] = "folder_open.png";
 					}
-					else if($fileListMode)
-					{
-						$currentFile = $path."/".$nodeName;									
-						$metaData["is_file"] = (is_file($currentFile)?"1":"0");
+					if(is_dir($currentFile) || Utils::isBrowsableArchive($nodeName)){
+						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?dir=".$dir."/".$nodeName);
+						$link = urlencode($link);						
+						$metaData["src"] = $link;
+					}
+					if($lsOptions["l"]){
 						$metaData["is_image"] = Utils::is_image($currentFile);
 						$metaData["file_group"] = @filegroup($currentFile) || "unknown";
 						$metaData["file_owner"] = @fileowner($currentFile) || "unknown";
@@ -593,35 +582,17 @@ class fsAccessDriver extends AbstractAccessDriver
 						if($bytesize < 0) $bytesize = sprintf("%u", $bytesize);
 						$metaData["filesize"] = Utils::roundSize($bytesize);
 						$metaData["bytesize"] = $bytesize;
-						$metaData["filename"] = Utils::xmlEntities( SystemTextEncoding::toUTF8($dir."/".$nodeName));
-						$metaData["icon"] = (is_file($currentFile)?SystemTextEncoding::toUTF8(Utils::mimetype($nodeName, "image", false)):(is_dir($currentFile) ? "folder.png" : "mime-empty.png"));
-						
-					}
-					else 
-					{
-						$folderBaseName = Utils::xmlEntities($nodeName);
-						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?dir=".$dir."/".$folderBaseName);
-						$link = urlencode($link);						
-						$folderFullName = Utils::xmlEntities($dir)."/".$folderBaseName;
-						$parentFolderName = $dir;
-						if(!$completeMode){
-							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
-							$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
-							if(preg_match("/\.zip$/",$nodeName)){
-								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
-							}
-							$metaData["icon"] = $icon;
-							$metaData["openicon"] = $openicon;
-							$metaData["filename"] = SystemTextEncoding::toUTF8($folderFullName);
-							$metaData["src"] = $link;
-						}
-					}
+					}						
 					$attributes = "";
 					foreach ($metaData as $key => $value){
 						$attributes .= "$key=\"$value\" ";
 					}
-					print("<tree text=\"".Utils::xmlEntities(SystemTextEncoding::toUTF8($nodeName))."\" $attributes>");
-					print("</tree>");
+					AJXP_XMLWriter::renderNode(
+						Utils::xmlEntities($dir."/".$nodeName, true),
+						Utils::xmlEntities($nodeName, true),
+						is_file($currentFile),
+						$metaData
+					);
 				}
 				// ADD RECYCLE BIN TO THE LIST
 				if($path == $this->repository->getOption("PATH") && RecycleBinManager::recycleEnabled() && !$completeMode && !$skipZip)
@@ -629,14 +600,18 @@ class fsAccessDriver extends AbstractAccessDriver
 					$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
 					if(is_dir($this->repository->getOption("PATH")."/".$recycleBinOption)){
 						$recycleIcon = ($this->countFiles($this->repository->getOption("PATH")."/".$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
-						if($fileListMode)
-						{
-							print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"".$this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption)."\" filename=\"/".$recycleBinOption."\" icon=\"$recycleIcon\"></tree>");
-						}
-						else 
-						{						
-							print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/$recycleIcon\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/$recycleIcon\" filename=\"/".$recycleBinOption."\"/>");
-						}
+						
+						AJXP_XMLWriter::renderNode(
+							"/".$recycleBinOption,
+							Utils::xmlEntities(Utils::xmlEntities($mess[122])),
+							false, 
+							array("ajxp_modiftime" 	=> $this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption),
+								  "mimestring" 		=> "Trashcan",
+								  "icon"			=> "$recycleIcon", 
+								  "is_recycle" 		=> "true", 
+								  "filesize"		=> "-", 
+								  "ajxp_mime"		=> "recycle")
+						);
 					}
 				}
 				AJXP_XMLWriter::close();
@@ -737,11 +712,11 @@ class fsAccessDriver extends AbstractAccessDriver
 		}		
 		if(!$lsOptions[$nodeType]) return false;
 		if($nodeType == "d"){			
-			return !$this->filterFolder($nodeName);
 			if(RecycleBinManager::recycleEnabled() 
 				&& $nodePath."/".$nodeName == RecycleBinManager::getRecyclePath()){
 					return false;
 				}
+			return !$this->filterFolder($nodeName);
 		}else{
 			if($nodeName == "." || $nodeName == "..") return false;
 			if(RecycleBinManager::recycleEnabled() 
@@ -1003,7 +978,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				$cursor ++;
 				continue;
 			}
-			if($limit > 0 && ($cursor - $offset) >= $limit) {
+			if($limit > 0 && ($cursor - $offset) >= $limit) {				
 				break;
 			}
 			$cursor ++;

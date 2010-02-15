@@ -311,8 +311,13 @@ class Utils
 	    }
 	}
 
-	function xmlEntities($string){
-		return str_replace(array("&", "<",">"), array("&amp;", "&lt;","&gt;"), $string);
+	function xmlEntities($string, $toUtf8=false){
+		$xmlSafe = str_replace(array("&", "<",">"), array("&amp;", "&lt;","&gt;"), $string);
+		if($toUtf8){
+			return SystemTextEncoding::toUTF8($xmlSafe);
+		}else{
+			return $xmlSafe;
+		}
 	}
 
 	function updateI18nFiles(){
