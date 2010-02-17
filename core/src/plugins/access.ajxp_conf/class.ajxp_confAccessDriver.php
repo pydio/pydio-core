@@ -88,7 +88,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					foreach ($rootNodes as $key => $data){
 						$src = '';
 						if($key == "logs"){
-							$src = 'src="content.php?dir='.$key.'"';
+							$src = 'src="content.php?get_action=ls&amp;dir='.$key.'"';
 						}
 						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" '.$src.' />';
 					}
@@ -500,7 +500,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				openicon="folder_red.png" 
 				filename="/users/'.$name.'" 
 				parentname="/users" 
-				src="content.php?dir=%2Fusers%2F'.$name.'" 
+				src="content.php?get_action=ls&amp;dir=%2Fusers%2F'.$name.'" 
 				ajxp_mime="repository'.($repoObject->isWriteable()?"_editable":"").'"
 				/>';
 		}
