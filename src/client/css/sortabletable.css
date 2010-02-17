@@ -67,6 +67,15 @@
 	background-position : right center;
 }
 
+.column_resize_grabber {
+	display:block;
+	width: 3px;
+	float:right;
+	height: 19px;
+	font-size: 0px;
+	cursor:e-resize;
+}
+
 div.tipsandtricks
 {
    color: buttonShadow;

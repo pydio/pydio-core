@@ -135,6 +135,10 @@ SortableTable = Class.create({
 			this.initHeader( this.sortTypes );
 	},
 	
+	setHeaderResize : function(fCallback){
+		this.onHeaderResize = fCallback;
+	},
+	
 	// adds arrow containers and events
 	// also binds sort type to the header cells so that reordering columns does
 	// not break the sort types
@@ -166,30 +170,52 @@ SortableTable = Class.create({
 				c.setAttribute( "_sortType", oSortTypes[i] );
 				c._sortType = "None";
 			}
-			/*
-			var resizeDiv = document.createElement("div");
-			resizeDiv.innerHtml = "t";
-			resizeDiv.setAttribute("style", "float:right; height:20px; width:3px; background-color:black;");
-			resizeDiv.setAttribute("id", "header_resize_"+i);
-			c.appendChild(resizeDiv);
-			new Draggable("header_resize_"+i, {constraint:'horizontal', snap: function(x,y,draggable) { 
-				var parent_dimensions = Element.getDimensions(draggable.element.parentNode); 
-				var element_dimensions = Element.getDimensions(draggable.element);
-				var xMin = 0
-				var xMax = parent_dimensions.width - element_dimensions.width;
-				var yMin = 0;
-				var yMax = parent_dimensions.height - element_dimensions.height;
-				xMin = -xMax;
-				xMax = 0;
-				
-				x = x<xMin ? xMin : x;
-				x = x>xMax ? xMax : x;
-				y = y<yMin ? yMin : y;
-				y = y>yMax ? yMax : y;
-				
-				return [x,y];
-				}});
-			*/
+			if(!c.id || c.id!='last_header' && !Prototype.Browser.IE){
+				var resizeDiv = new Element("span", {id:"header_resize_"+i,className:'column_resize_grabber'}).update('&nbsp;');			
+				resizeDiv.headerCell = c;
+				resizeDiv.columnIndex = i;
+				$(c).insert({top:resizeDiv});
+				var tableElement = $('selectable_div_header');
+				new Draggable("header_resize_"+i, {
+					constraint:'horizontal', 
+					snap: function(x,y,draggable) { 
+						// Limit to table size on max
+						var tablePos = Element.cumulativeOffset(tableElement);
+						var tableRightLimit = tablePos.left + tableElement.getWidth();
+						var xMax = tableRightLimit - draggable.originalLeft - Element.getWidth(draggable.element);
+						// Limit to cell size on min
+						var xMin = -(Element.getWidth(draggable.element.headerCell) - Element.getWidth(draggable.element));
+						x = x<xMin ? xMin : x;
+						x = x>xMax ? xMax : x;
+						
+						return [x,y];
+					},
+					onDrag : function(draggable){
+						var newPosition = Element.cumulativeOffset(draggable.element).left;
+						var delta = newPosition - draggable.originalLeft;
+						var newWidth = draggable.originalCellWidth + delta - 8;
+						draggable.element.setStyle({left:0});						
+						draggable.element.headerCell.setStyle({width:newWidth+'px'});
+					}.bind(this),
+					onStart : function(draggable){
+						draggable.element.setStyle({backgroundColor:'grey'});
+						draggable.originalLeft = Element.cumulativeOffset(draggable.element).left;
+						draggable.originalCellWidth = Element.getWidth(draggable.element.headerCell);
+					}.bind(this),
+					onEnd : function(draggable){
+						draggable.element.setStyle({backgroundColor:'transparent'});
+						var newPosition = Element.cumulativeOffset(draggable.element).left;
+						var delta = newPosition - draggable.originalLeft;
+						var newWidth = draggable.originalCellWidth + delta - 8 ;
+						draggable.element.headerCell.setStyle({width:newWidth+'px'});
+						draggable.element.setStyle({left:0});
+						if(this.onHeaderResize){
+							this.onHeaderResize(draggable.element.columnIndex, newWidth);
+						}
+					}.bind(this)
+					});
+				$("header_resize_"+i).observe("click", function(e){Event.stop(e)});
+			}
 		}
 		this.updateHeaderArrows();
 	},
@@ -225,7 +251,7 @@ SortableTable = Class.create({
 		var img;
 		for (var i = 0; i < l; i++) {
 			if (cells[i]._sortType != null && cells[i]._sortType != "None") {
-				img = cells[i].firstChild;
+				img = $(cells[i]).select('div')[0];
 				if (i == this.sortColumn)
 				{
 					img.className = "sort-arrow " + (this.descending ? "descending" : "ascending");					
