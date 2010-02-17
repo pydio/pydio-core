@@ -71,7 +71,7 @@ InfoPanel = Class.create({
 			var folderNumber = 0;
 			var filesNumber = 0;
 			for(var i=0;i<items.length;i++){
-				if(items[i].getAttribute("is_file")=="0") folderNumber++;
+				if(items[i].getAttribute("is_file")=="0" || items[i].getAttribute("is_file")=="true") folderNumber++;
 				else filesNumber++;
 				if(items[i].getAttribute("bytesize") && items[i].getAttribute("bytesize")!=""){
 					size += parseInt(items[i].getAttribute("bytesize"));
@@ -109,9 +109,9 @@ InfoPanel = Class.create({
 		if(extension != "" && this.registeredMimes.get(extension)){
 			this.evalTemplateForMime(extension, uniqItem);
 		}
-		else{
-			var isFile = parseInt(uniqItem.getAttribute('is_file'));
-			this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqItem);
+		else{			
+			var isFile =uniqItem.getAttribute('is_file');
+			this.evalTemplateForMime(((isFile=='0'||isFile=='true')?'generic_file':'generic_dir'), uniqItem);
 		}			
 	},
 	

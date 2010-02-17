@@ -173,6 +173,7 @@ class AJXP_XMLWriter
 			print("<pref name=\"history_last_repository\" value=\"".$loggedUser->getPref("history_last_repository")."\"/>");
 			print("<pref name=\"history_last_listing\" value=\"".$loggedUser->getPref("history_last_listing")."\"/>");
 			print("<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>");
+			print("<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>");
 			print("</preferences>");
 			print("<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>");
 			print("</user>");

@@ -207,7 +207,7 @@ class AJXP_ClientDriver extends AbstractDriver
 				while(isSet($_GET["pref_name_".$i]) && isSet($_GET["pref_value_".$i]))
 				{
 					$prefName = $_GET["pref_name_".$i];
-					$prefValue = $_GET["pref_value_".$i];
+					$prefValue = stripslashes($_GET["pref_value_".$i]);
 					if($prefName != "password")
 					{
 						$userObject->setPref($prefName, $prefValue);
