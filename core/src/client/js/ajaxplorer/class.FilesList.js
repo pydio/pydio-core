@@ -101,11 +101,18 @@ FilesList = Class.create(SelectableElements, {
 			buffer = buffer + '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
 			this.columnsDef.each(function(column){buffer = buffer + '<col\>';});
 			buffer = buffer + '<thead><tr>';
+			var userPref;
+			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_size", true)){
+				var data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
+				if(data.get(ajaxplorer.user.getActiveRepository())){
+					userPref = new Hash(data.get(ajaxplorer.user.getActiveRepository()));
+				}
+			}
 			for(var i=0; i<this.columnsDef.length;i++){
 				var column = this.columnsDef[i];
-				var last = '';
-				if(i==this.columnsDef.length-1) last = ' id="last_header"';
-				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
+				var last = ((i==this.columnsDef.length-1)?' id="last_header"':'');
+				var stringWidth =((userPref && userPref.get(i))?' style="width:'+userPref.get(i)+'px;"':'');
+				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+stringWidth+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
 			}
 			buffer = buffer + '</tr></thead></table>';
 			if(this.gridStyle == "grid"){
@@ -120,7 +127,7 @@ FilesList = Class.create(SelectableElements, {
 			}
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
-			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));
+			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));			
 			this._sortableTable.onsort = this.redistributeBackgrounds.bind(this);
 			if(this.paginationData && this.paginationData.get('remote_order') && parseInt(this.paginationData.get('total')) > 1){
 				this._sortableTable.setPaginationBehaviour(function(params){
@@ -284,10 +291,19 @@ FilesList = Class.create(SelectableElements, {
 			var index = 0;
 			headerCells.each(function(cell){				
 				cell.setStyle({padding:0});
-				var divs = cell.select('div.header_width_resizor');
-				var div = (divs.length?divs[0]:new Element('div', {className:'header_width_resizor'}).update('&nbsp;'+new String(cell.innerHTML).stripTags()));
+				var divs = cell.select('div.header_width_resizor');				
+				var div;
+				if(divs.length){
+					div = divs[0];
+				}else{
+					div = new Element('div', {className:'header_width_resizor'}).update(new String(cell.innerHTML).stripTags());
+					// insert also the resize grabber
+					if(cell.select('span.column_resize_grabber').length){
+						div.insert({top:cell.select('span.column_resize_grabber')[0]});
+					}
+				}
 				div.setStyle({overflow: 'hidden'});
-				div.setStyle({width:tds[index].getWidth()-4+'px'});
+				/*div.setStyle({width:tds[index].getWidth()-4+'px'});*/
 				div.setAttribute("title", new String(cell.innerHTML).stripTags());
 				cell.update(div);
 				cell.setStyle({width:tds[index].getWidth()+'px'});
@@ -677,7 +693,7 @@ FilesList = Class.create(SelectableElements, {
 							this.allDraggables.push(newDrag);
 							if(this.protoMenu) this.protoMenu.addElements(innerSpan);						
 					}
-					if(xmlNode.getAttribute("is_file") == "0")
+					if(xmlNode.getAttribute("is_file") == "0" || xmlNode.getAttribute("is_file") == "true")
 					{
 						AjxpDroppables.add(innerSpan);
 						this.allDroppables.push(innerSpan);
@@ -803,7 +819,7 @@ FilesList = Class.create(SelectableElements, {
 				this.allDraggables.push(newDrag);						
 			}.bind(this), 500);
 		}
-		if(xmlNode.getAttribute("is_file") == "0")
+		if(xmlNode.getAttribute("is_file") == "0" || xmlNode.getAttribute("is_file") == "true")
 		{
 			AjxpDroppables.add(newRow);
 			this.allDroppables.push(newRow);

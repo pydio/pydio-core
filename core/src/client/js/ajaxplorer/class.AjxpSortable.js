@@ -40,6 +40,21 @@ AjxpSortable = Class.create(SortableTable, {
 		this.addSortType( "NumberKo", this.replace8oa8 );
 		this.addSortType( "MyDate", null, false, this.sortTimes);
 		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
+		this.setHeaderResize(function(columnIndex, newSize){
+			$(this.tBody).select('tr').each(function(row){
+				var cells = row.select('td');
+				if(cells[columnIndex]) cells[columnIndex].setStyle({width:newSize+'px'});				
+			});
+			if(!ajaxplorer || !ajaxplorer.user) return;
+			var data = ajaxplorer.user.getPreference("columns_size", true);
+			data = (data?new Hash(data):new Hash());
+			var repoData = data.get(ajaxplorer.user.getActiveRepository());
+			repoData = (repoData?new Hash(repoData):new Hash());
+			repoData.set(columnIndex, newSize);
+			data.set(ajaxplorer.user.getActiveRepository(), repoData);
+			ajaxplorer.user.setPreference("columns_size", data, true);
+			ajaxplorer.user.savePreference("columns_size");
+		}.bind(this));
 	},
 
 	setPaginationBehaviour : function(loaderFunc, columnsDefs, crtOrderName, crtOrderDir){
@@ -156,7 +171,7 @@ AjxpSortable = Class.create(SortableTable, {
 		else
 			s = this.getInnerText(c);
 		if(s[0] == ' ') s = s.substr(1, (s.length-1));	
-		if(oRow.getAttribute('is_file') == '0'){		
+		if(oRow.getAttribute('is_file') == '0' || oRow.getAttribute('is_file') == 'true'){		
 			s = '000'+s;
 		}
 		return s.toUpperCase();

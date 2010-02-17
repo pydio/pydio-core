@@ -71,15 +71,22 @@ User = Class.create({
 		return this.write;
 	},
 	
-	getPreference : function(prefName){
-	    return this.preferences.get(prefName);	
+	getPreference : function(prefName, fromJSON){
+	    var value = this.preferences.get(prefName);	
+	    if(fromJSON && value){
+	    	return value.evalJSON();
+	    }
+	    return value;
 	},
 	
 	getRepositoriesList : function(){
 		return this.repositories;
 	},
 	
-	setPreference : function(prefName, prefValue){
+	setPreference : function(prefName, prefValue, toJSON){
+		if(toJSON){
+			prefValue = prefValue.toJSON();
+		}
 		this.preferences.set(prefName, prefValue);
 	},
 	
@@ -93,6 +100,15 @@ User = Class.create({
 	
 	getRepoSearchEngine : function(repoId){
 		return this.repoSearchEngines.get(repoId);
+	},
+	
+	savePreference : function(prefName){
+		if(!this.preferences.get(prefName)) return;
+		var conn = new Connexion();
+		conn.addParameter("get_action", "save_user_pref");
+		conn.addParameter("pref_name_" + 0, prefName);
+		conn.addParameter("pref_value_" + 0, this.preferences.get(prefName));
+		conn.sendAsync();
 	},
 	
 	savePreferences : function(oldPass, newPass, seed, onCompleteFunc){
