@@ -140,7 +140,7 @@ function WebFXTreeAbstractNode(sText, sAction) {
 	this.childNodes  = [];
 	this.id     = webFXTreeHandler.getId();
 	this.text   = sText || webFXTreeConfig.defaultText;
-	this.action = sAction || webFXTreeConfig.defaultAction;
+	this.action = sAction || null;
 	this.url 	= "/";
 	this._last  = false;
 	webFXTreeHandler.all[this.id] = this;
@@ -167,7 +167,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			node.inZip = true;
 		}
 	}
-	if(node.parentNode.action){
+	if(!node.action && node.parentNode.action){
 		node.action = node.parentNode.action;
 	}
 	this.childNodes[this.childNodes.length] = node;

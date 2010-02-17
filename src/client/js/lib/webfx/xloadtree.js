@@ -165,18 +165,10 @@ function _startLoadXmlTree(sSrc, jsNode) {
 function _xmlTreeToJsTree(oNode, parentNode) {
 	// retreive attributes
 	var text = oNode.getAttribute("text");
-	var action = oNode.getAttribute("action");
-	if(!action){
-		/*
-		action = function(e){
-			if(!ajaxplorer) return;
-			ajaxplorer.focusOn(ajaxplorer.foldersTree);
-			ajaxplorer.foldersTree.clickNode(this.id);
-		};
-		*/
-	}
+	var action = null;
 	if(oNode.tagName == "pagination"){
 		text = MessageHash[oNode.getAttribute("overflowMessage")] + ' ('+oNode.getAttribute("count")+')';
+		action = function(e){};
 	}
 	var parent = null;
 	var icon = oNode.getAttribute("icon");
