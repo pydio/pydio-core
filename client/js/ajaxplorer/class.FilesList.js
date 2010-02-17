@@ -284,8 +284,9 @@ FilesList = Class.create(SelectableElements, {
 			var index = 0;
 			headerCells.each(function(cell){				
 				cell.setStyle({padding:0});
-				var div = new Element('div').update('&nbsp;'+cell.innerHTML);
-				div.setStyle({height: cell.getHeight(), overflow: 'hidden'});
+				var divs = cell.select('div.header_width_resizor');
+				var div = (divs.length?divs[0]:new Element('div', {className:'header_width_resizor'}).update('&nbsp;'+new String(cell.innerHTML).stripTags()));
+				div.setStyle({overflow: 'hidden'});
 				div.setStyle({width:tds[index].getWidth()-4+'px'});
 				div.setAttribute("title", new String(cell.innerHTML).stripTags());
 				cell.update(div);
