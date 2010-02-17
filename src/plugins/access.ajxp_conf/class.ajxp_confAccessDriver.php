@@ -285,6 +285,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						exit(1);
 					}
 				}
+                if ($this->repositoryExists($newRep->getDisplay()))
+                {
+					AJXP_XMLWriter::header();
+					AJXP_XMLWriter::sendMessage(null, "Error: a repository with the same name already exists");
+					AJXP_XMLWriter::close();
+					exit(1);
+                }
 				$res = ConfService::addRepository($newRep);
 				AJXP_XMLWriter::header();
 				if($res == -1){
@@ -348,6 +355,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$res = 0;
 				if(isSet($_GET["newLabel"])){
 					$repo->setDisplay(SystemTextEncoding::fromPostedFileName($_GET["newLabel"]));
+                    if ($this->repositoryExists($newRep->getDisplay()))
+                    {
+		     			AJXP_XMLWriter::header();
+			    		AJXP_XMLWriter::sendMessage(null, "Error: a repository with the same name already exists");
+				    	AJXP_XMLWriter::close();
+					    exit(1);
+                    }
+                    
 					$res = ConfService::replaceRepository($repId, $repo);
 				}else{
 					$options = array();
@@ -454,6 +469,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		}
 	}
 	
+    function repositoryExists($name)
+    {
+		$repos = ConfService::getRepositoriesList();
+        foreach ($repos as $obj)
+            if ($obj->getDisplay() == $name) return true;
+
+        return false;
+    }
+
 	function listRepositories(){
 		print '<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>';		
 		$repos = ConfService::getRepositoriesList();
