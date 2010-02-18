@@ -8,6 +8,7 @@
 	<param name="FTP_PASS" type="password" label="Password" description="Ftp User password - Can be overriden on a per-user basis." mandatory="false"/>
 	<param name="CHARSET" type="string" label="Character encoding" description="When not advertized by server, use this encoding" mandatory="true" default="ISO-8859-1"/>
 	<param name="RECYCLE_BIN" type="string" label="Recycle folder" description="Buffer before real suppression of files on the server."/>
+    <param name="TMP_UPLOAD" type="string" label="Temporary Folder" description="Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." default="/tmp" mandatory="true"/>
 	<user_param name="FTP_USER" type="string" label="User" description="Ftp User name" mandatory="false"/>
 	<user_param name="FTP_PASS" type="password" label="Password" description="Ftp User password" mandatory="false"/>
 </ajxpdriver>
