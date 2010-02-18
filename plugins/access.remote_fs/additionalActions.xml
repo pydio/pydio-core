@@ -20,7 +20,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-				if(ajaxplorer.actionBar.getFlashVersion() >= 8 && document.location.href.substring(0,5)!='https')
+				if(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && flashUploaderEnabled)
 				{
 					modal.setCloseAction(function(){
 						$('closeFlashUploadBox').disabled=false;
