@@ -107,11 +107,21 @@ if(AuthService::usersEnabled())
 	// Check that current user can access current repository, try to switch otherwise.
 	$loggedUser = AuthService::getLoggedUser();
 	if($loggedUser != null)
-	{		
-		$currentRepo = ConfService::getRepositoryById(ConfService::getCurrentRootDirIndex());
-		if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) || ($currentRepo->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()))
-		{
-			ConfService::switchRootDir(AuthService::getDefaultRootId());
+	{
+		if(isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])){
+			$loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
+			$loggedUser->setArrayPref("history", $_SESSION["PENDING_REPOSITORY_ID"], $_SESSION["PENDING_FOLDER"]);
+			$loggedUser->save();
+			unset($_SESSION["PENDING_REPOSITORY_ID"]);
+			unset($_SESSION["PENDING_FOLDER"]);
+		}
+		$currentRepoId = ConfService::getCurrentRootDirIndex();
+		$lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
+		$defaultRepoId = AuthService::getDefaultRootId();
+		if($lastRepoId != "" && $lastRepoId!=$currentRepoId && $loggedUser->canSwitchTo($lastRepoId)){
+			ConfService::switchRootDir($lastRepoId);
+		}else if(!$loggedUser->canSwitchTo($currentRepoId)){
+			ConfService::switchRootDir($defaultRepoId);
 		}
 	}
 	if($loggedUser == null)

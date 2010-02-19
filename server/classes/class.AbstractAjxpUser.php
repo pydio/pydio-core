@@ -105,6 +105,19 @@ class AbstractAjxpUser
 		return false;
 	}
 	
+	/**
+	 * Test if user can switch to this repository
+	 *
+	 * @param integer $repositoryId
+	 * @return boolean
+	 */
+	function canSwitchTo($repositoryId){
+		$repositoryObject = ConfService::getRepositoryById($repositoryId);
+		if($repositoryObject == null) return false;
+		if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
+		return ($this->canRead($repositoryId)) ;
+	}
+	
 	function getRight($rootDirId){
 		if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
 		return "";
@@ -125,6 +138,16 @@ class AbstractAjxpUser
 	
 	function setPref($prefName, $prefValue){
 		$this->prefs[$prefName] = $prefValue;
+	}
+	
+	function setArrayPref($prefName, $prefPath, $prefValue){
+		if(!isSet($this->prefs[$prefName])) $this->prefs[$prefName] = array();
+		$this->prefs[$prefName][$prefPath] = $prefValue;
+	}
+	
+	function getArrayPref($prefName, $prefPath){
+		if(!isSet($this->prefs[$prefName]) || !isSet($this->prefs[$prefName][$prefPath])) return "";
+		return $this->prefs[$prefName][$prefPath];
 	}
 		
 	function addBookmark($path, $title="", $repId = -1){
