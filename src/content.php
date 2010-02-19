@@ -118,7 +118,7 @@ if(AuthService::usersEnabled())
 		$currentRepoId = ConfService::getCurrentRootDirIndex();
 		$lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
 		$defaultRepoId = AuthService::getDefaultRootId();
-		if($lastRepoId != "" && $lastRepoId!=$currentRepoId && $loggedUser->canSwitchTo($lastRepoId)){
+		if($lastRepoId != "" && $lastRepoId!=$currentRepoId && !isSet($_GET["tmp_repository_id"]) && $loggedUser->canSwitchTo($lastRepoId)){
 			ConfService::switchRootDir($lastRepoId);
 		}else if(!$loggedUser->canSwitchTo($currentRepoId)){
 			ConfService::switchRootDir($defaultRepoId);
