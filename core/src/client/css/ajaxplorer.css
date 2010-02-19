@@ -265,23 +265,25 @@ textarea#myCode
 {
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial;
     font-size: 11px;
-    color:#666;    
+    color:#fff;    
     padding: 10px;
 }
 
 .errorMessage
 {
-    border: 1px solid #EEAAAA;
-    background-color: #EEAAAA;
-    border-bottom-color: red;
+    background-color: #960000;
     cursor: pointer;
+	filter:alpha(opacity=90);
+	opacity: 0.90;
+	-moz-opacity:0.90;    
 }
 
 .logMessage
 {
-    border-color: #AAFFAA;
-    border-bottom-color: green;
-    background-color: #AAEEAA;
+    background-color: #009600;
+	filter:alpha(opacity=90);
+	opacity: 0.90;
+	-moz-opacity:0.90;    
 }
 
 
