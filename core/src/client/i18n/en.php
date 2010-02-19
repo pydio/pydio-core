@@ -360,5 +360,6 @@ $mess=array(
 "320" => "WYSIWYG editor for HTML",
 "321" => "Select",
 "322" => "Select the current file",
+"323" => "E-mail this URL",
 );
 ?>

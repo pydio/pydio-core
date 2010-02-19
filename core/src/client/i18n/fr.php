@@ -351,14 +351,15 @@ $mess=array(
 "313" => "Compresser...",
 "314" => "Compresser la sélection en zip...",
 "315" => "Compresser la sélection en",
-"316" => "Open with...",
+"316" => "Ouvrir avec...",
 "open_with_access" => "O",
-"317" => "Source viewer",
-"318" => "CodePress source code viewer",
-"319" => "HTML Editor",
-"320" => "WYSIWYG editor for HTML",
-"321" => "Select",
-"322" => "Select the current file",
+"317" => "Visionneuse de source",
+"318" => "Visionneuse CodePress",
+"319" => "Editeur HTML",
+"320" => "Editeur visuel HTML",
+"321" => "Selectionner",
+"322" => "Selectionner le fichier",
+"323" => "Envoyer le lien par e-mail",
 /* END SENTENCE */
 );
 ?>
