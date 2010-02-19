@@ -87,6 +87,12 @@ class AJXP_ClientDriver extends AbstractDriver
 					break;
 				}
 				ConfService::switchRootDir($root_dir_index);
+				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
+					$user = AuthService::getLoggedUser();
+					$activeRepId = ConfService::getCurrentRootDirIndex();
+					$user->setArrayPref("history", "last_repository", $activeRepId);
+					$user->save();
+				}
 				$logMessage = "Successfully Switched!";
 				AJXP_Logger::logAction("Switch Repository", array("rep. id"=>$root_dir_index));
 				

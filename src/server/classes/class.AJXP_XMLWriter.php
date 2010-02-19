@@ -170,8 +170,8 @@ class AJXP_XMLWriter
 			print("<pref name=\"diapo_autofit\" value=\"".$loggedUser->getPref("diapo_autofit")."\"/>");
 			print("<pref name=\"sidebar_splitter_size\" value=\"".$loggedUser->getPref("sidebar_splitter_size")."\"/>");
 			print("<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>");
-			print("<pref name=\"history_last_repository\" value=\"".$loggedUser->getPref("history_last_repository")."\"/>");
-			print("<pref name=\"history_last_listing\" value=\"".$loggedUser->getPref("history_last_listing")."\"/>");
+			print("<pref name=\"history_last_repository\" value=\"".$loggedUser->getArrayPref("history", "last_repository")."\"/>");
+			print("<pref name=\"history_last_listing\" value=\"".stripslashes($loggedUser->getArrayPref("history", ConfService::getCurrentRootDirIndex()))."\"/>");
 			print("<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>");
 			print("<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>");
 			print("</preferences>");

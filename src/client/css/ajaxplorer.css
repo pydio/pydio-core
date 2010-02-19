@@ -490,7 +490,7 @@ ACTION BAR
 	border:1px solid #BBBBBB;
 	float:left;
 	height:20px;
-	padding:2px 0 0 5px;
+	padding:2px 0 0 4px;
 	width:350px;    
 }
 
@@ -531,12 +531,40 @@ ACTION BAR
     border-left: 0px;
 }
 
+#parent_button
+{
+    border: 1px solid #bbb;
+    float: left;
+    height: 22px;  
+    width:16px;      
+    padding-left: 0px;
+    border-right: 0px;
+}
+
 #location_goto:hover,
 #repository_goto:hover,
-#bookmarks_goto:hover{
+#bookmarks_goto:hover,
+#parent_button:hover
+{
 	background-image:url(../images/header_bg_on.png);
 	background-position:top;
 	background-repeat: repeat-x;
+}
+
+#reload_button{
+	border: 0px; 
+	display: inline;
+	margin-top: -1px;
+	cursor:pointer;
+	filter:alpha(opacity=30);
+	opacity: 0.3;
+	-moz-opacity:0.3;
+}
+
+#reload_button:hover{
+	filter:alpha(opacity=100);
+	opacity: 1;
+	-moz-opacity:1;
 }
 
 #goto_repo_button.disabled,
@@ -605,6 +633,10 @@ ACTION BAR
     padding-left:3px;
     padding-top:0px;
     font-size: 11px;
+}
+
+#current_path{
+    padding-left:0px;
 }
 
 .even

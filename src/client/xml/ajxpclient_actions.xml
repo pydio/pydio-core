@@ -40,7 +40,7 @@
 			<gui text="148" title="24" src="up.png" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="false" recycle="false"
-					actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="default">
+					actionBar="false" contextMenu="false" infoPanel="false" actionBarGroup="default">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>			
@@ -62,7 +62,7 @@
 			<gui text="149" title="149" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="true" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false">
+					actionBar="false" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>

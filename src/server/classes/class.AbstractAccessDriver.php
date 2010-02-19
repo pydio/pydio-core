@@ -74,6 +74,12 @@ class AbstractAccessDriver extends AbstractDriver {
 				else if($httpVars["options"] == "d") $httpVars["skipZip"] = "true";
 				// skip "complete" mode that was in fact quite the same as standard tree listing (dz)
 			}
+			if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
+				$user = AuthService::getLoggedUser();
+				$activeRepId = ConfService::getCurrentRootDirIndex();
+				$user->setArrayPref("history", $activeRepId, (isSet($httpVars["dir"])?$httpVars["dir"]:""));
+				$user->save();
+			}
 		}
 		return parent::applyAction($actionName, $httpVars, $filesVar);
 	}
