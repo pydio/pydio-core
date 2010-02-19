@@ -492,39 +492,39 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	function uploadActions($action, $httpVars, $filesVars){
                 switch ($action){
                         case "trigger_remote_copy":
-				if(!$this->hasFilesToCopy()) break;
+				                if(!$this->hasFilesToCopy()) break;
                                 $toCopy = $this->getFileNameToCopy();
-				AJXP_XMLWriter::header();
+				                AJXP_XMLWriter::header();
                                 AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$toCopy." to ftp server");
                                 AJXP_XMLWriter::close();
                                 exit(1);
                         break;
                         case "next_to_remote":             
                                 if(!$this->hasFilesToCopy()) break;
-				$fData = $this->getNextFileToCopy();
+				                $fData = $this->getNextFileToCopy();
                                 $nextFile = '';
                                 if($this->hasFilesToCopy()){
-                                        $nextFile = $this->getFileNameToCopy();
-				}
-				@ftp_put($this->connect,$this->secureFtpPath($this->path.base64_decode($fData['destination'])."/".$fData['name']),$fData['tmp_name'], FTP_BINARY);
+                                    $nextFile = $this->getFileNameToCopy();
+				                }
+				                @ftp_put($this->connect,$this->secureFtpPath($this->path.base64_decode($fData['destination'])."/".$fData['name']),$fData['tmp_name'], FTP_BINARY);
                                 unlink($fData["tmp_name"]);
-                               AJXP_XMLWriter::header();
-                                        if($nextFile!=''){
-                                                AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
-					}else{
-						AJXP_XMLWriter::sendMessage("Done", null);
-                                        }
-				AJXP_XMLWriter::close();
-				exit(1);
+                                AJXP_XMLWriter::header();
+                                if($nextFile!=''){
+                                    AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
+					            }else{
+						            AJXP_XMLWriter::sendMessage("Done", null);
+                                }
+				                AJXP_XMLWriter::close();
+				                exit(1);
                         break;
                         case "upload":
                                 $fancyLoader = false;
+                                $rep_source = "/";
                                 if(isSet($fileVars["Filedata"])){
                                         $fancyLoader = true;
-                                        if($httpVars['dir']!="") $httpVars['dir'] = "/".base64_decode($httpVars['dir']);
-                                }
-                                if(isSet($httpVars['dir']) && $httpVars['dir']!=""){$rep_source=$httpVars['dir'];}
-                                else $rep_source = "/";
+                                } 
+                                if($httpVars['dir']!="") $rep_source = $this->normalizePath("/".base64_decode($httpVars['dir']));
+
                                 $logMessage = "";
                                 //$fancyLoader = false;                         
                                 foreach ($filesVars as $boxName => $boxData)
@@ -537,8 +537,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
                                                 $errorMessage = $err;
                                                 break;
                                         }
-                                        $boxData["destination"] = $rep_source;
-                                        $destCopy = INSTALL_PATH."/tmp";
+                                        $boxData["destination"] = base64_encode($rep_source);
+                                        $destCopy = substr($this->repository->getOption("TMP_UPLOAD"), 0, 1) == '/' ? $this->repository->getOption("TMP_UPLOAD") : INSTALL_PATH."/".$this->repository->getOption("TMP_UPLOAD");
                                         if(!is_dir($destCopy)){
                                                 if(! @mkdir($destCopy)){
                                                         $errorMessage = "Warning, cannot create folder for temporary copy.";
@@ -550,7 +550,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
                                                 break;
                                         }
                                         $destName = $destCopy."/".basename($boxData["tmp_name"]);
-					if(move_uploaded_file($boxData["tmp_name"], $destName)){
+                                        if ($destName == $boxData["tmp_name"]) $destName .= "1";
+					                    if(move_uploaded_file($boxData["tmp_name"], $destName)){
                                                 $boxData["tmp_name"] = $destName;
                                                 $this->storeFileToCopy($boxData);
                                         }else{
