@@ -880,7 +880,7 @@ AJXP_MESSAGE[174]<br/>
 				</div>
 			]]></html>
 		</infoPanel>
-		<infoPanel mime="flv,mov" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
+		<infoPanel mime="flv,mov,mp4,m4a,aac" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
 			<html><![CDATA[
 				<div style="padding:10px;">
 					<center style="border:1px solid #676965; margin-bottom: 5px;">
