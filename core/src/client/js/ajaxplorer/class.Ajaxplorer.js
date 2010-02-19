@@ -288,9 +288,9 @@ Ajaxplorer = Class.create({
 			if(!repositoryObject){
 				alert("Empty repository object!");
 			}
-			//if(this.user.getPreference("history_last_listing")){
-			//	this._initLoadRep = this.user.getPreference("history_last_listing");
-			//}
+			if(this.user.getPreference("history_last_listing")){
+				this._initLoadRep = this.user.getPreference("history_last_listing");
+			}
 		}
 		this.actionBar.setUser(this.user);
 		this.refreshRepositoriesMenu(repList, repId);

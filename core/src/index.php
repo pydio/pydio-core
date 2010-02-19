@@ -38,6 +38,7 @@ require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.AJXP_Logger.php");
 require_once("server/classes/class.AbstractDriver.php");
+require_once("server/classes/class.AbstractAccessDriver.php");
 ConfService::init("server/conf/conf.php");
 $confStorageDriver = ConfService::getConfStorageImpl();
 include_once($confStorageDriver->getUserClassFileName());
@@ -104,8 +105,8 @@ else
 	$ROOT_DIR_ID = ConfService::getCurrentRootDirIndex();
 	$ROOT_DIR_XML = HTMLWriter::repositoryDataAsJS();
 }
+
 $EXT_REP = "/";
-if(isSet($_GET["folder"])) $EXT_REP = urldecode($_GET["folder"]);
 $CRT_USER = "shared_bookmarks";
 if(isSet($_GET["user"])) $CRT_USER = $_GET["user"];
 
@@ -124,6 +125,25 @@ else
 	if(isSet($_COOKIE["AJXP_display"]) 
 	&& ($_COOKIE["AJXP_display"]=="list" || $_COOKIE["AJXP_display"]=="thumb")) $DEFAULT_DISPLAY = $_COOKIE["AJXP_display"];
 }
+if(isSet($_GET["repository_id"]) && isSet($_GET["folder"])){
+	require_once("server/classes/class.SystemTextEncoding.php");
+	if(AuthService::usersEnabled()){
+		if($loggedUser!= null && $loggedUser->canSwitchTo($_GET["repository_id"])){			
+			$EXT_REP = SystemTextEncoding::toUTF8(urldecode($_GET["folder"]));
+			$loggedUser->setArrayPref("history", "last_repository", $_GET["repository_id"]);
+			$loggedUser->setArrayPref("history", $_GET["repository_id"], $_GET["folder"]);
+			$loggedUser->save();
+		}else{
+			$_SESSION["PENDING_REPOSITORY_ID"] = $_GET["repository_id"];
+			$_SESSION["PENDING_FOLDER"] = $_GET["folder"];
+		}
+	}else{
+		ConfService::switchRootDir($_GET["repository_id"]);
+		$ROOT_DIR_ID = $_GET["repository_id"];
+		$EXT_REP = SystemTextEncoding::toUTF8(urldecode($_GET["folder"]));
+	}
+}
+
 
 $JS_DEBUG = false;
 if($JS_DEBUG && isSet($_GET["compile"])){
