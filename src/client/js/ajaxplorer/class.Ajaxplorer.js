@@ -517,7 +517,7 @@ Ajaxplorer = Class.create({
 		this.messageBox.style.top = topPosition+'px';
 		this.messageBox.style.left = leftPosition+'px';
 		this.messageBox.style.width = boxWidth+'px';
-		new Effect.Corner(this.messageBox,"round");
+		new Effect.Corner(this.messageBox,"5px");
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
 	},

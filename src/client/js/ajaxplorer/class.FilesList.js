@@ -693,7 +693,7 @@ FilesList = Class.create(SelectableElements, {
 							this.allDraggables.push(newDrag);
 							if(this.protoMenu) this.protoMenu.addElements(innerSpan);						
 					}
-					if(xmlNode.getAttribute("is_file") == "0" || xmlNode.getAttribute("is_file") == "true")
+					if(xmlNode.getAttribute("is_file") == "0" || xmlNode.getAttribute("is_file") == "false")
 					{
 						AjxpDroppables.add(innerSpan);
 						this.allDroppables.push(innerSpan);
