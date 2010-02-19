@@ -342,6 +342,10 @@ AJXP_MESSAGE[174]<br/>
 	                        		cont.value = transport.responseText;
 	                        		cont.select();
 	                        	}
+                                var email = oForm.select('a[id="email"]')[0];
+                                if (email){ 
+                                    email.setAttribute('href', 'mailto:unknown@unknown.com?Subject=UPLOAD&Body='+transport.responseText); 
+                                }
 	                        	modal.refreshDialogAppearance();
 	                        };
 	                        conn.sendSync();
@@ -373,7 +377,8 @@ AJXP_MESSAGE[174]<br/>
 						</fieldset>
 						<fieldset>
 							<legend>3 : AJXP_MESSAGE[296]</legend>
-							<input type="text" style="width:230px;" id="public_url_container"/>
+							<input type="text" style="width:230px;" id="public_url_container"/><br/>
+                            <a id="email"> AJXP_MESSAGE[323] </a>
 						</fieldset>
 					</div>
 					]]>
