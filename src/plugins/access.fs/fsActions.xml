@@ -584,8 +584,8 @@ AJXP_MESSAGE[174]<br/>
 							$('external_repository').selectedIndex = 0;
 							$('external_repository').observe("change", function(e){
 								externalRepo = $('external_repository').getValue();								
-								this.treeCopy.src += '&tmp_repository_id='+externalRepo;
-								this.treeCopy.queryParameters += '&tmp_repository_id='+externalRepo;
+								this.treeCopy.src = ajxpServerAccessPath+'?get_action=ls&options=d&tmp_repository_id='+externalRepo;
+								this.treeCopy.queryParameters = '&tmp_repository_id='+externalRepo;
 								this.treeCopy.reload();
 							}.bind(this));
 						}
