@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.ckeditor" text="319" title="320" icon="ckeditor_images/html_edit.png" className="AjxpCkEditor" mimes="html,htm" formId="edit_box">
+<editor id="editor.ckeditor" text="319" title="320" icon="ckeditor_images/html_edit.png" className="AjxpCkEditor" mimes="html,htm" formId="edit_box" write="true">
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>
 	</dependencies>
