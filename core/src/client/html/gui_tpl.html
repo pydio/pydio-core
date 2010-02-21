@@ -13,26 +13,22 @@
 		</div>
 	</div>
 	<div id="hidden_frames" style="display:none;"></div>
-	<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
+	<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
 </div>
 
 <div id="browser">
-<div id="verticalSplitter" style="background-color: #fff;">
-	<div id="sidebarSplitter" style="float:left; overflow:hidden;">
-		<div style="" id="topPane"  style="overflow: hidden;">
-			<div style="border: 1px solid #676965;border-bottom: 0px;">
-			    <div id="dir_chooser" class="panelHeader"><ajxp:message ajxp_message_id="130"><?php print $mess[130] ?></ajxp:message></div>
-		    	<div id="tree_container" style="overflow:auto;height:100%;width:100%;"></div>
-		    </div>
-		</div>		
-    	<div id="bottomSplitPane" style="border: 1px solid #676965;">    	
-	    	<div id="search_container"></div>
-	    	<div id="info_panel"></div>
-    	</div>    	
-    </div>
-	<div id="content_pane" style="border: 1px solid #676965; background-color: #fff;"></div>	
+	<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal,initB:200,minB:24,maxB:500}">
+		<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:50}">
+			<div id="topPane" ajxpClass="FoldersTree" ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>		
+	    	<div id="bottomSplitPane" ajxpClass="AjxpTabulator" style="border: 1px solid #676965;">
+		    	<div id="search_container" ajxpClass="SearchEngine"></div>
+		    	<div id="info_panel" ajxpClass="InfoPanel"></div>
+	    	</div>    	
+	    </div>
+		<div id="content_pane" ajxpClass="FilesList" style="border: 1px solid #676965; background-color: #fff;"></div>	
+	</div>
 </div>
-</div>
+
 <div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
 <script type="text/javascript">
 try{
@@ -40,80 +36,23 @@ try{
 	if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
 		marginBottom = $('optional_bottom_div').getHeight();
 	}
-	fitHeightToBottom($("verticalSplitter"), window, marginBottom);	
+	fitHeightToBottom($("vertical_splitter"), window, marginBottom);	
 	if(Prototype.Browser.IE){
-		fitHeightToBottom($("content_pane"), $('verticalSplitter'));
+		fitHeightToBottom($("content_pane"), $('vertical_splitter'));
 	}
-	if($('bottomSplitPane')){
-		var sideSplit = new Splitter('sidebarSplitter',{
-				direction: "horizontal",
-				initB: parseInt($('verticalSplitter').getHeight()*2/5),
-				minB: 24,
-				maxB: 500,
-				onDrag:function(){
-						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:1), true);
-						if(ajaxplorer){
-							ajaxplorer.infoPanel.resize();
-							ajaxplorer.sEngine.resize();
-						}
-				},
-				endDrag : function(paneSize){
-					if(ajaxplorer && ajaxplorer.user){
-						ajaxplorer.user.setPreference('sidebar_splitter_size', paneSize);
-						ajaxplorer.user.savePreferences();
-					}
-				}
-			});				
-	}else{
-		fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:1), true);
-	}
-	var splitter = new Splitter('verticalSplitter', {
-			direction: "vertical",
-			initA: 200, maxA:600, minA:50, 
-			onDrag: function(){
-				if(sideSplit) {
-					sideSplit.resizeGroup(null, null, true);
-				}
-				else{
-					fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:4), true);					
-				}
-				if(ajaxplorer && ajaxplorer.filesList)ajaxplorer.filesList.applyHeadersWidth();					
-			},
-			endDrag : function(paneSize){
-				if(ajaxplorer && ajaxplorer.user){
-					ajaxplorer.user.setPreference('vertical_splitter_size', paneSize);
-					ajaxplorer.user.savePreferences();
-				}
-			}
-	});
-	
-	disableTextSelection($('tree_container'));
-	disableTextSelection($('info_panel'));
-	disableTextSelection($('dir_chooser'));
-
-	Event.observe(document, "ajaxplorer:user_logged", function(){		
-		if(!ajaxplorer || !ajaxplorer.user) return;
-		var sidebar = ajaxplorer.user.getPreference("sidebar_splitter_size");
-		var vertical = ajaxplorer.user.getPreference("vertical_splitter_size");
-		if(sidebar){
-			sideSplit.moveSplitter(parseInt(sidebar));
-		}
-		if(vertical){
-			splitter.moveSplitter(parseInt(vertical));
-		}
-	});
+	var sideSplit = new Splitter('sidebar_splitter',{direction: "horizontal",initB: 200, minB:24, maxB:500});				
+	var splitter = new Splitter('vertical_splitter', {direction: "vertical", initA: 200, maxA:600, minA:50});
+		
+	var tabulatorData = {
+		defaultTabId : 'info',
+		tabInfos : [
+			{id:'info',label:'131',icon:'file_info.png',element:'info_panel'},
+			{id:'search',label:'87',icon:'search.png',element:'search_container'}]	
+	};
+	var tabu = new AjxpTabulator($('bottomSplitPane'), tabulatorData);	
 	
 }catch(e){
 	alert('Error on loading (gui_tpl l.128)' + e);
 }
 
-Event.observe(document, "ajaxplorer:loaded", function(){
-	ajaxplorer.registerSimpleTabulator('details', [
-		{id:'info',label:'131',icon:'file_info.png',element:ajaxplorer.infoPanel},
-		{id:'search',label:'87',icon:'search.png',element:ajaxplorer.sEngine}
-	], $('bottomSplitPane'), 'info');
-	$(ajaxplorer.actionBar._htmlElement).getElementsBySelector('a', 'input[type="image"]').each(function(element){
-		disableTextSelection(element);
-	});
-});
 </script>

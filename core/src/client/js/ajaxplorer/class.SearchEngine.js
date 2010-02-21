@@ -32,7 +32,7 @@
  * 
  * Description : The Search Engine abstraction.
  */
-SearchEngine = Class.create({
+SearchEngine = Class.create(AjxpPane, {
 
 	htmlElement:undefined,
 	_inputBox:undefined,
@@ -42,9 +42,9 @@ SearchEngine = Class.create({
 	_runningQueries:undefined,
 	_queriesIndex:0,
 
-	initialize: function(mainElementName)
+	initialize: function($super, mainElementName)
 	{
-		this.htmlElement = $(mainElementName);
+		$super($(mainElementName));
 		this.initGUI();
 	},
 	

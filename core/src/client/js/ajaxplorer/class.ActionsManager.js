@@ -32,11 +32,11 @@
  * 
  * Description : Singleton that manages all actions, but also the action bar display.
  */
-ActionsManager = Class.create({
+ActionsManager = Class.create(AjxpPane, {
 
-	initialize: function(oElement, bUsersEnabled, oUser, oAjaxplorer)
+	initialize: function($super, oElement, bUsersEnabled, oUser, oAjaxplorer)
 	{
-		this._htmlElement = oElement;
+		$super(oElement);
 		this._registeredKeys = new Hash();
 		this._actions = new Hash();
 		this._ajaxplorer = oAjaxplorer;
@@ -45,7 +45,9 @@ ActionsManager = Class.create({
 		if(oUser != null){
 			this._currentUser = oUser.id;
 		}
-		else this._currentUser = 'shared';
+		else {
+			this._currentUser = 'shared';
+		}
 		this.oUser = oUser;
 		this.bookmarksBar = new BookmarksBar();
 		this.bgManager = new BackgroundManager(this);
@@ -59,14 +61,14 @@ ActionsManager = Class.create({
 	
 	init: function()
 	{		
-		this._items = this._htmlElement.select('[action]');
+		this._items = this.htmlElement.select('[action]');
 		$('current_path').onfocus = function(e)	{
 			ajaxplorer.disableShortcuts();
 			this.hasFocus = true;
 			$('current_path').select();
 			return false;
 		}.bind(this);
-		var buttons = this._htmlElement.getElementsBySelector("input");
+		var buttons = this.htmlElement.getElementsBySelector("input");
 		buttons.each(function(object){
 			$(object).onkeydown = function(e){
 				if(e == null) e = window.event;		
@@ -568,6 +570,7 @@ ActionsManager = Class.create({
 				crtCount ++;
 			}
 		}.bind(this));
+		$('buttons_bar').select('a').each(disableTextSelection);
 	},
 	
 	refreshToolbarsSeparator: function(){

@@ -33,7 +33,7 @@
  * @author Dave Methvin (dave.methvin@gmail.com)
  */
 
-Splitter = Class.create({
+Splitter = Class.create(AjxpPane, {
 	
 	initialize: function(container, options){				
 		this.options = Object.extend({
@@ -80,6 +80,9 @@ Splitter = Class.create({
 		if(this.options.direction == 'vertical') Object.extend(this.options, verticalOpts);
 		else Object.extend(this.options, horizontalOpts);
 		
+		this.htmlElement = $(container);
+		this.htmlElement.ajxpPaneObject = this;
+		
 		this.group = $(container).setStyle({position:'relative'});
 		var divs = this.group.childElements();
 		divs.each(function(div){
@@ -90,6 +93,7 @@ Splitter = Class.create({
 		});
 		this.paneA = divs[0];
 		this.paneB = divs[1];
+		this.initBorderA = parseInt(this.paneA.getStyle('borderWidth')) || 0;
 		this.initBorderB = parseInt(this.paneB.getStyle('borderWidth')) || 0;
 		
 		this.splitbar = new Element('div', {unselectable:'on'});
@@ -111,11 +115,18 @@ Splitter = Class.create({
 		}
 		Event.observe(window,"resize", function(e){this.resizeGroup(e, null, true);}.bind(this));
 		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
-		//this.resizeGroup();
+
+		Event.observe(document, "ajaxplorer:user_logged", function(){		
+			if(!ajaxplorer || !ajaxplorer.user) return;
+			var sizePref = ajaxplorer.user.getPreference(this.htmlElement.id + "_size");
+			if(sizePref){
+				this.moveSplitter(parseInt(sizePref));
+			}
+		}.bind(this));
 	},
 	
 	resizeGroup: function(event, size, keepPercents){	
-		//console.log("Resize", this.options.direction, size);
+		// console.log("Resize", this.options.direction, size);
 		var groupInitAdjust = this.group._adjust;
 		this.group._fixed = this.options.getFixed(this.group) - this.group._borderFixed;
 		this.group._adjust = this.group[this.options.offsetAdjust] - this.group._borderAdjust;
@@ -124,7 +135,8 @@ Splitter = Class.create({
 		
 		// Recompute fixed
 		var optName = this.options.fixed;
-		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed+'px')); 
+		var borderAdj = (!Prototype.Browser.IE?(this.initBorderA*2):0);		
+		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed-borderAdj+'px')); 
 		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);		
 		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdj+'px')); 
 		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
@@ -174,6 +186,16 @@ Splitter = Class.create({
 		if(this.options.endDrag){
 			this.options.endDrag(this.getCurrentSize());
 		}
+		if($(this.paneA).ajxpPaneObject){
+			$(this.paneA).ajxpPaneObject.resize();
+		}
+		if($(this.paneB).ajxpPaneObject){
+			$(this.paneB).ajxpPaneObject.resize();
+		}
+		if(ajaxplorer && ajaxplorer.user){
+			ajaxplorer.user.setPreference(this.htmlElement.id+'_size', this.getCurrentSize());
+			ajaxplorer.user.savePreference(this.htmlElement.id+'_size');
+		}
 	}, 
 	
 	moveSplitter:function(np){		
@@ -183,9 +205,12 @@ Splitter = Class.create({
 		var optNameSet = this.options.set;				
 		var optNameAdjust = this.options.adjust;				
 		this.splitbar.setStyle(this.makeStyleObject(this.options.set, np+'px'));
-		this.paneA.setStyle(this.makeStyleObject(this.options.adjust, np-this.paneA._padAdjust+'px'));
-		this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
 		var borderAdj = 0;
+		if(!Prototype.Browser.IE && this.initBorderA){
+			borderAdj = this.initBorderA*2;
+		}		
+		this.paneA.setStyle(this.makeStyleObject(this.options.adjust, np-this.paneA._padAdjust-borderAdj+'px'));
+		this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
 		if(!Prototype.Browser.IE && this.initBorderB){
 			borderAdj = this.initBorderB*2;
 		}		
@@ -195,6 +220,12 @@ Splitter = Class.create({
 			this.paneB.fire("resize");
 		}
 		if(this.options.onDrag) this.options.onDrag();
+		if($(this.paneA).ajxpPaneObject){
+			$(this.paneA).ajxpPaneObject.resize();
+		}
+		if($(this.paneB).ajxpPaneObject){
+			$(this.paneB).ajxpPaneObject.resize();
+		}		
 	}, 
 	
 	cssCache:function(jq,n,pf,m1,m2){
@@ -244,6 +275,12 @@ Splitter = Class.create({
     
     getCurrentSize : function(){
     	return this.options.getAdjust(this.paneA);
-    }
+    },
+    
+    resize : function(){
+    	this.resizeGroup(null, null, true);
+    },
+    
+    showElement : function(show){}
 
 });
