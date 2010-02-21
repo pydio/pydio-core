@@ -352,7 +352,7 @@ $mess=array(
 "314" => "Compresser la sélection en zip...",
 "315" => "Compresser la sélection en",
 "316" => "Ouvrir avec...",
-"open_with_access" => "O",
+"open_with_access" => "e",
 "317" => "Visionneuse de source",
 "318" => "Visionneuse CodePress",
 "319" => "Editeur HTML",
@@ -360,6 +360,7 @@ $mess=array(
 "321" => "Selectionner",
 "322" => "Selectionner le fichier",
 "323" => "Envoyer le lien par e-mail",
+"324" => "Pas d'éditeur associé",
 /* END SENTENCE */
 );
 ?>

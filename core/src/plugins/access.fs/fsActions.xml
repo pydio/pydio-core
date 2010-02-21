@@ -400,21 +400,44 @@ AJXP_MESSAGE[174]<br/>
 					context.builderMenuItems = $A([]);					
 					var selectedMime = getAjxpMimeType(ajaxplorer.filesList.getUserSelection().getUniqueItem());
 					var editors = ajaxplorer.findEditorsForMime(selectedMime);
-					editors.each(function(el){
+					if(editors.length){
+						var index = 0;
+						editors.each(function(el){
+							context.builderMenuItems.push({
+								name:el.text,
+								alt:el.title,
+								isDefault : (index == 0),
+								image:resolveImageSource(el.icon, '/images/crystal/actions/ICON_SIZE', 22),
+								callback:function(e){this.apply([el]);}.bind(context)
+							} );
+							index++;
+						} );					
+					}else{
 						context.builderMenuItems.push({
-							name:el.text,
-							alt:el.title,
-							image:resolveImageSource(el.icon, '/images/crystal/actions/ICON_SIZE', 22),
-							callback:function(e){this.apply([el]);}.bind(context)
-						} );
-					} );					
+							name:MessageHash[324],
+							alt:MessageHash[324],
+							image:resolveImageSource('button_cancel.png', '/images/crystal/actions/ICON_SIZE', 22),
+							callback:function(e){}
+						} );					
+					}
 				]]></dynamicBuilder>
 			</subMenu>			
 			<processing>			
 				<clientCallback prepareModal="false"><![CDATA[		
 					var editorData = window.actionArguments[0];
-					ajaxplorer.loadEditorResources(editorData.resourcesManager);
-					modal.openEditorDialog(editorData);
+					if(!editorData){
+						var selectedMime = getAjxpMimeType(ajaxplorer.filesList.getUserSelection().getUniqueItem());
+						var editors = ajaxplorer.findEditorsForMime(selectedMime);
+						if(editors.length){
+							editorData = editors[0];							
+						}					
+					}
+					if(editorData){
+						ajaxplorer.loadEditorResources(editorData.resourcesManager);
+						modal.openEditorDialog(editorData);
+					}else{
+						console.log('no data');
+					}
 				]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>

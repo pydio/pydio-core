@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.codepress" text="317" title="318" icon="codepress_images/source_edit.png" className="CodePressEditor" mimes="php,php3,php4,php4,phtml,js,java,pl,sql,html,htm,xml,css" formId="edit_box">
+<editor id="editor.codepress" text="317" title="318" icon="codepress_images/source_edit.png" className="CodePressEditor" mimes="php,php3,php4,php4,phtml,js,java,pl,sql,html,htm,xml,css" formId="edit_box" write="true">
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>
 	</dependencies>
