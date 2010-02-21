@@ -51,6 +51,7 @@ Ajaxplorer = Class.create({
 			}
 		}
 		this._initRepositoryId = repositoryId;
+		this._focusables = [];
 		this._resourcesRegistry = {};
 		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
 		this.histCount=0;
@@ -157,48 +158,13 @@ Ajaxplorer = Class.create({
 				tag.innerHTML = MessageHash[messageId];
 			}catch(e){}
 		});
-		/*
-		$$('[ajxp_message_title_id]').each(function(tag){
-			tag.setAttribute('title', MessageHash[tag.getAttribute("ajxp_message_title_id")]);
-		});
-		*/
 	},
 		
 	initObjects: function(){
-		loadRep = this._initLoadRep;
-		crtUser = this._initCrtUser;
-		rootDirName = this._initRootDir;
-		this.infoPanel = new InfoPanel("info_panel");
-		//modal.updateLoadingProgress('Libraries loaded');
-		if(!this.usersEnabled)
-		{
-			var fakeUser = new User("shared");
-			fakeUser.setActiveRepository(this._initRepositoryId, 1, 1);
-			fakeUser.setRepositoriesList(this._initRepositoriesList);
-			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, fakeUser, this);
-			var repoObject = this._initRepositoriesList.get(this._initRepositoryId);
-			this.foldersTree = new FoldersTree('tree_container', repoObject.getLabel(), ajxpServerAccessPath+'?get_action=ls&options=dz', this);
-			this.refreshRepositoriesMenu(this._initRepositoriesList, this._initRepositoryId);
-			this.actionBar.loadActions();
-			this.infoPanel.load();
-			this.foldersTree.changeRootLabel(repoObject.getLabel(), repoObject.getIcon());
-		}
-		else
-		{
-			this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, null, this);
-			this.foldersTree = new FoldersTree('tree_container', 'No Repository', ajxpServerAccessPath+'?get_action=ls&options=dz', this);
-			if(this._initLoggedUser)
-			{
-				this.getLoggedUserFromServer();
-			}else{
-				this.tryLogUserFromCookie();
-			}
-		}
-		
-		this.actionBar.init();
-		modal.updateLoadingProgress('ActionBar Initialized');
-		
-	
+
+		/*********************
+		/* STANDARD MECHANISMS
+		/*********************/
 		this.contextMenu = new Proto.Menu({
 		  selector: '', // context menu will be shown when element with class name of "contextmenu" is clicked
 		  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
@@ -211,36 +177,66 @@ Ajaxplorer = Class.create({
 		  	this.options.menuItems = ajaxplorer.actionBar.getContextActions(Event.element(e));
 		  	this.refreshList();
 		  }.bind(protoMenu),0);};
-	
-		this.foldersTree.setContextualMenu(this.contextMenu);
-		this.actionBar.setContextualMenu(this.contextMenu);
-		  
-		this.sEngine = new SearchEngine("search_container");
-		//this.messageBox = $('message_div');
-		this.filesList = new FilesList($("selectable_div"), 
-										true, 
-										["StringDirFile", "NumberKo", "String", "MyDate"], 
-										null, 
-										this, 
-										this._initDefaultDisp) ;
-		this.filesList.setContextualMenu(this.contextMenu);
-		modal.updateLoadingProgress('GUI Initialized');
-		this.initFocusBehaviours();
-		this.initTabNavigation();
-		modal.updateLoadingProgress('Navigation loaded');
-		this.focusOn(this.foldersTree);
-		this.blockShortcuts = false;
-		this.blockNavigation = false;
-		
+
+		this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, null, this);
+		this.actionBar.init();
+		this.actionBar.setContextualMenu(this.contextMenu);		  
+		this.actionBar.setFocusBehaviour();
+		this._focusables.push(this.actionBar);
 		new AjxpAutocompleter("current_path", "autocomplete_choices");
 		if(!Prototype.Browser.WebKit && !Prototype.Browser.IE){
 			this.history = new Proto.History(function(hash){
 				this.goTo(this.historyHashToPath(hash));
 			}.bind(this));
 		}
-		if(!this.usersEnabled){
-			this.goTo(loadRep);	
+		modal.updateLoadingProgress('ActionBar Initialized');
+		  
+		  
+		/*********************
+		/* USER GUI
+		/*********************/
+		this.infoPanel = new InfoPanel("info_panel");		
+		this.foldersTree = new FoldersTree($('topPane'), 'No Repository', ajxpServerAccessPath+'?get_action=ls&options=dz', this);
+		this.sEngine = new SearchEngine("search_container");
+		this.filesList = new FilesList($("content_pane"),this._initDefaultDisp);
+		
+		this.foldersTree.setContextualMenu(this.contextMenu);
+		this.filesList.setContextualMenu(this.contextMenu);				
+		
+		this.foldersTree.setFocusBehaviour();
+		this.filesList.setFocusBehaviour();
+		this._focusables.push(this.foldersTree);
+		this._focusables.push(this.filesList);
+
+		modal.updateLoadingProgress('GUI Initialized');				
+		this.initTabNavigation();
+		this.focusOn(this.foldersTree);
+		this.blockShortcuts = false;
+		this.blockNavigation = false;
+		modal.updateLoadingProgress('Navigation loaded');
+		
+
+		/*******************************
+		/* NOW LAUNCH USER MANAGEMENT
+		/*****************************/
+		if(this._initLoggedUser)
+		{
+			this.getLoggedUserFromServer();
+		}else{
+			this.tryLogUserFromCookie();
 		}
+		
+		if(!this.usersEnabled){
+			Event.observe(document, "ajaxplorer:loaded", function(){
+				var fakeUser = new User("shared");			
+				fakeUser.setActiveRepository(this._initRepositoryId, 1, 1);
+				fakeUser.setRepositoriesList(this._initRepositoriesList);
+				var repoObject = this._initRepositoriesList.get(this._initRepositoryId);
+				this.refreshRepositoriesMenu(this._initRepositoriesList, this._initRepositoryId);
+				this.actionBar.setUser(fakeUser);
+				this.loadRepository(repoObject);						
+			}.bind(this) );
+		}		
 	},
 
 	
@@ -262,7 +258,6 @@ Ajaxplorer = Class.create({
 	
 	getLoggedUserFromServer: function(){
 		var connexion = new Connexion();
-		//var rememberData = retrieveRememberData();
 		connexion.addParameter('get_action', 'logged_user');
 		connexion.onComplete = function(transport){this.logXmlUser(transport.responseXML);}.bind(this);
 		connexion.sendAsync();	
@@ -359,14 +354,12 @@ Ajaxplorer = Class.create({
 
 	goTo: function(rep, selectFile){
 		this.actionBar.updateLocationBar(rep);
-		//this.actionBar.update(true);
 		this.foldersTree.goToDeepPath(rep);	
 		this.filesList.loadXmlList(rep, selectFile);	
 	},
 	
 	refreshRepositoriesMenu: function(rootDirsList, repositoryId){
 		$('goto_repo_button').addClassName('disabled');
-		//if(!rootDirsList || rootDirsList.size() <= 1) return;
 		var actions = new Array();
 		if(rootDirsList && rootDirsList.size() > 1){
 			rootDirsList.each(function(pair){
@@ -392,7 +385,6 @@ Ajaxplorer = Class.create({
 			this.rootMenu = new Proto.Menu({			
 				className: 'menu rootDirChooser',
 				mouseClick:'left',
-				//anchor:'root_dir_button',
 				anchor:'goto_repo_button',
 				createAnchor:false,
 				anchorContainer:$('dir_chooser'),
@@ -495,66 +487,12 @@ Ajaxplorer = Class.create({
 		return this.foldersTree;
 	},
 	
-	closeMessageDiv: function(){
-		if(this.messageDivOpen)
-		{
-			new Effect.Fade(this.messageBox);
-			this.messageDivOpen = false;
-		}
-	},
-	
-	tempoMessageDivClosing: function(){
-		this.messageDivOpen = true;
-		setTimeout('ajaxplorer.closeMessageDiv()', 6000);
-	},
-	
-	displayMessage: function(messageType, message){
-		if(!this.messageBox){
-			this.messageBox = new Element("div", {title:MessageHash[98],id:"message_div",className:"messageBox"});
-			$(document.body).insert(this.messageBox);
-			this.messageContent = new Element("div", {id:"message_content"});
-			this.messageBox.update(this.messageContent);
-			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
-		}
-		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
-		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
-		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
-		this.messageContent.update(message);
-		var containerOffset = Position.cumulativeOffset($('content_pane'));
-		var containerDimensions = $('content_pane').getDimensions();
-		var boxHeight = $(this.messageBox).getHeight();
-		var topPosition = containerOffset[1] + containerDimensions.height - boxHeight - 20;
-		var boxWidth = parseInt(containerDimensions.width * 90/100);
-		var leftPosition = containerOffset[0] + parseInt(containerDimensions.width*5/100);
-		this.messageBox.setStyle({
-			top:topPosition+'px',
-			left:leftPosition+'px',
-			width:boxWidth+'px'
-		});
-		new Effect.Corner(this.messageBox,"5px");
-		new Effect.Appear(this.messageBox);
-		this.tempoMessageDivClosing();
-	},
-	
-	initFocusBehaviours: function(){
-		$('topPane').observe("click", function(){
-			ajaxplorer.focusOn(ajaxplorer.foldersTree);
-		});
-		$('content_pane').observe("click", function(){
-			ajaxplorer.focusOn(ajaxplorer.filesList);
-		});	
-		$('action_bar').observe("click", function(){
-			ajaxplorer.focusOn(ajaxplorer.actionBar);
-		});
-		$('bottomSplitPane').observe("click", function(){
-			ajaxplorer.focusOn(ajaxplorer.sEngine);
-		});
-		
+	displayMessage: function(messageType, message){		
+		modal.displayMessage(messageType, message);
 	},
 	
 	focusOn : function(object){
-		var objects = [this.foldersTree, this.sEngine, this.filesList, this.actionBar];
-		objects.each(function(obj){
+		this._focusables.each(function(obj){
 			if(obj != object) obj.blur();
 		});
 		object.focus();
@@ -562,7 +500,7 @@ Ajaxplorer = Class.create({
 	
 	
 	initTabNavigation: function(){
-		var objects = [this.foldersTree, this.filesList, this.actionBar];		
+		var objects = this._focusables;
 		// ASSIGN OBSERVER
 		Event.observe(document, "keydown", function(e)
 		{			
@@ -596,53 +534,6 @@ Ajaxplorer = Class.create({
 			if(e.keyCode > 90 || e.keyCode < 65) return;
 			else return this.actionBar.fireActionByKey(e, String.fromCharCode(e.keyCode).toLowerCase());
 		}.bind(this));
-	},
-	
-	registerSimpleTabulator : function(tabulatorId, tabulatorData, headerContainer, defaultTabId){
-		if(!this.tabulators) {
-			this.tabulators = new Hash();
-		}
-		this.tabulators.set(tabulatorId, tabulatorData);
-		// Tabulator Data : array of tabs infos
-		// { id , label, icon and element : tabElement }.
-		// tab Element must implement : showElement() and resize() methods.
-		var table = new Element('table', {cellpadding:0,cellspacing:0,border:0,width:'100%',style:'height:24px;'});		
-		$(headerContainer).insert({top:table});
-		var tBody = new Element('tBody');
-		var tr = new Element('tr');
-		table.update(tBody);
-		tBody.update(tr);
-		tabulatorData.each(function(tabInfo){
-			var td = new Element('td').addClassName('toggleHeader');
-			td.addClassName('panelHeader');
-			td.update('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/crystal/actions/ICON_SIZE', 16)+'"><span ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</a>');
-			td.observe('click', function(){
-				this.switchTabulator(tabulatorId, tabInfo.id);
-			}.bind(this) );
-			tr.insert(td);
-			tabInfo.headerElement = td;
-			disableTextSelection(td);
-		}.bind(this));
-		if(defaultTabId){
-			this.switchTabulator(tabulatorId, defaultTabId);
-		}
-	},
-	
-	switchTabulator:function(tabulatorId, tabId){
-		var toShow ;
-		this.tabulators.get(tabulatorId).each(function(tabInfo){
-			if(tabInfo.id == tabId){
-				tabInfo.headerElement.removeClassName("toggleInactive");
-				tabInfo.headerElement.select('img')[0].show();
-				toShow = tabInfo.element;
-			}else{
-				tabInfo.headerElement.addClassName("toggleInactive");
-				tabInfo.headerElement.select('img')[0].hide();
-				tabInfo.element.showElement(false);
-			}
-		});
-		toShow.showElement(true);
-		toShow.resize();
 	}
-	
+		
 });

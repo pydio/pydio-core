@@ -302,6 +302,48 @@ Modal = Class.create({
 		oForm.hasButtons = true;
 	},
 	
+	
+	closeMessageDiv: function(){
+		if(this.messageDivOpen)
+		{
+			new Effect.Fade(this.messageBox);
+			this.messageDivOpen = false;
+		}
+	},
+	
+	tempoMessageDivClosing: function(){
+		this.messageDivOpen = true;
+		setTimeout('modal.closeMessageDiv()', 6000);
+	},
+	
+	displayMessage: function(messageType, message){
+		if(!this.messageBox){
+			this.messageBox = new Element("div", {title:MessageHash[98],id:"message_div",className:"messageBox"});
+			$(document.body).insert(this.messageBox);
+			this.messageContent = new Element("div", {id:"message_content"});
+			this.messageBox.update(this.messageContent);
+			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
+		}
+		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
+		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
+		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
+		this.messageContent.update(message);
+		var containerOffset = Position.cumulativeOffset($('content_pane'));
+		var containerDimensions = $('content_pane').getDimensions();
+		var boxHeight = $(this.messageBox).getHeight();
+		var topPosition = containerOffset[1] + containerDimensions.height - boxHeight - 20;
+		var boxWidth = parseInt(containerDimensions.width * 90/100);
+		var leftPosition = containerOffset[0] + parseInt(containerDimensions.width*5/100);
+		this.messageBox.setStyle({
+			top:topPosition+'px',
+			left:leftPosition+'px',
+			width:boxWidth+'px'
+		});
+		new Effect.Corner(this.messageBox,"5px");
+		new Effect.Appear(this.messageBox);
+		this.tempoMessageDivClosing();
+	},
+	
 	setLoadingStepCounts: function(count){
 		this.loadingStepsCount = count;
 		this.loadingStep = count;

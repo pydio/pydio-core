@@ -34,10 +34,12 @@
  */
 FilesList = Class.create(SelectableElements, {
 
-	initialize: function($super, oElement, bSelectMultiple, oSortTypes, sCurrentRep, oAjaxplorer, sDefaultDisplay)
+	initialize: function($super, oElement, initDefaultDisp)
 	{
-		$super(oElement, bSelectMultiple);
-		this._displayMode = sDefaultDisplay;		
+		$super(null, true);
+		$(oElement).ajxpPaneObject = this;
+		this.htmlElement = $(oElement);
+		this._displayMode = initDefaultDisp;
 		
 		Event.observe(document, "ajaxplorer:user_logged", function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
@@ -56,10 +58,8 @@ FilesList = Class.create(SelectableElements, {
 		this._bFile = false;
 		this._bDir = false;
 		this._bEditable = false;
-		this._oSortTypes = oSortTypes;
-		this._ajaxplorer = oAjaxplorer;
 		this._pendingFile = null;
-		this._currentRep = sCurrentRep;	
+		this._currentRep = null;	
 		this.allDraggables = new Array();
 		this.allDroppables = new Array();		
 		
@@ -134,7 +134,6 @@ FilesList = Class.create(SelectableElements, {
 					this.reload(null, null, params);
 				}.bind(this), this.columnsDef, this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
-			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
 			this.disableTextSelection($('selectable_div_header'));
 			this.disableTextSelection($('table_rows_container'));
 			fitHeightToBottom($('table_rows_container'), $('content_pane'), (!Prototype.Browser.IE?2:0));
@@ -234,6 +233,20 @@ FilesList = Class.create(SelectableElements, {
 	
 	setContextualMenu: function(protoMenu){
 		this.protoMenu = protoMenu;	
+	},
+	
+	resize : function(){
+		this.applyHeadersWidth();
+	},
+	
+	setFocusBehaviour : function(){
+		this.htmlElement.observe("click", function(){
+			if(ajaxplorer) ajaxplorer.focusOn(this);
+		}.bind(this) );
+	},
+	
+	showElement : function(show){
+		
 	},
 	
 	switchDisplayMode: function(mode){
@@ -557,15 +570,15 @@ FilesList = Class.create(SelectableElements, {
 			this._pendingFile = null;
 		}	
 		if(this.hasFocus){
-			this._ajaxplorer.foldersTree.blur();
-			this._ajaxplorer.sEngine.blur();
-			this._ajaxplorer.actionBar.blur();
+			ajaxplorer.foldersTree.blur();
+			ajaxplorer.sEngine.blur();
+			ajaxplorer.actionBar.blur();
 			this.focus();
 		}
 		else{
-			this._ajaxplorer.sEngine.blur();
-			this._ajaxplorer.actionBar.blur();
-			this._ajaxplorer.foldersTree.focus();
+			ajaxplorer.sEngine.blur();
+			ajaxplorer.actionBar.blur();
+			ajaxplorer.foldersTree.focus();
 		}
 		ajaxplorer.getActionBar().fireContextChange();
 		ajaxplorer.getActionBar().fireSelectionChange();
@@ -932,7 +945,7 @@ FilesList = Class.create(SelectableElements, {
 		//this._ajaxplorer.getActionBar().update();
 		if(this._fireChange){
 			ajaxplorer.actionBar.fireSelectionChange();
-			this._ajaxplorer.infoPanel.update();
+			ajaxplorer.infoPanel.update();
 		}
 	},
 	

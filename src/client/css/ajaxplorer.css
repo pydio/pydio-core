@@ -348,15 +348,8 @@ ACTION BAR
     color: #ddd;
 }
 
-#topPane{
-    /*background-color: #aaa;*/
-}
-
 #tree_container{
     background-color: #fff;
-    /*padding-top: 3px;
-    padding-left: 2px;*/
-    border-bottom: 1px solid #676965;
 }
 
 .panelHeader{
@@ -1189,14 +1182,18 @@ UPLOAD MULTIFILE FORM
    background-image: url('../images/strip.png');
 }
 
-#verticalSplitter{
+#vertical_splitter{
     overflow: hidden; 
     background-color: #fff;
 }
 
-#sidebarSplitter{
+#sidebar_splitter{
     overflow: auto;
     width: 200px;
+}
+
+.splitterContentPane{
+	border: 1px solid #676965;
 }
 
 .vsplitbar

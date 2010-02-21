@@ -32,10 +32,11 @@
  * 
  * Description : A dynamic panel displaying details on the current selection. Works with Templates.
  */
-InfoPanel = Class.create({
+InfoPanel = Class.create(AjxpPane, {
 
-	initialize: function(htmlElement){
-		this.htmlElement = $(htmlElement);
+	initialize: function($super, htmlElement){
+		$super(htmlElement);
+		disableTextSelection(htmlElement);
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();		
