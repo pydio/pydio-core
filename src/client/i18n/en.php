@@ -353,7 +353,7 @@ $mess=array(
 "314" => "Compress selection to zip...",
 "315" => "Compress selection to",
 "316" => "Open with...",
-"open_with_access" => "O",
+"open_with_access" => "e",
 "317" => "Source viewer",
 "318" => "CodePress source code viewer",
 "319" => "HTML Editor",
@@ -361,5 +361,6 @@ $mess=array(
 "321" => "Select",
 "322" => "Select the current file",
 "323" => "E-mail this URL",
+"324" => "No editor available",
 );
 ?>

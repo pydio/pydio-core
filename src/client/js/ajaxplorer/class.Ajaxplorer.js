@@ -81,6 +81,7 @@ Ajaxplorer = Class.create({
 						editorClass : editors[i].getAttribute("className"),
 						mimes : $A(editors[i].getAttribute("mimes").split(",")),
 						formId : editors[i].getAttribute("formId") || null,
+						write : (editors[i].getAttribute("write") && editors[i].getAttribute("write")=="true"?true:false),
 						resourcesManager : new ResourcesManager()
 					};
 					this._resourcesRegistry[editorDefinition.id] = editorDefinition.resourcesManager;
@@ -99,8 +100,14 @@ Ajaxplorer = Class.create({
 	
 	findEditorsForMime : function(mime){
 		var editors = $A([]);
+		var checkWrite = false;
+		if(this.user != null && !this.user.canWrite()){
+			checkWrite = true;
+		}
 		this.editorsRegistry.each(function(el){
-			if(el.mimes.include(mime)) editors.push(el);
+			if(el.mimes.include(mime)) {
+				if(!checkWrite || !el.write) editors.push(el);
+			}
 		});
 		return editors;
 	},

@@ -37,10 +37,16 @@ TextEditor = Class.create(AbstractEditor, {
 	initialize: function($super, oFormObject)
 	{
 		$super(oFormObject);
-		this.actions.get("saveButton").observe('click', function(){
-			this.saveFile();
-			return false;
-		}.bind(this));
+		if(!ajaxplorer.user || ajaxplorer.user.canWrite()){
+			this.canWrite = true;
+			this.actions.get("saveButton").observe('click', function(){
+				this.saveFile();
+				return false;
+			}.bind(this));		
+		}else{
+			this.canWrite = false;
+			this.actions.get("saveButton").hide();
+		}
 		this.actions.get("downloadFileButton").observe('click', function(){
 			if(!this.currentFile) return;		
 			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
@@ -63,6 +69,9 @@ TextEditor = Class.create(AbstractEditor, {
 		this.contentMainContainer = this.textarea;
 		this.textarea.setStyle({width:'100%'});	
 		this.textarea.setAttribute('wrap', 'off');	
+		if(!this.canWrite){
+			this.textarea.readOnly = true;
+		}
 		this.element.appendChild(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
 		fitHeightToBottom($(this.textarea), $(modal.elementName), 0, true);
@@ -115,10 +124,12 @@ TextEditor = Class.create(AbstractEditor, {
 	
 	parseTxt : function(transport){	
 		this.textarea.value = transport.responseText;
-		var contentObserver = function(el, value){
-			this.setModified(true);
-		}.bind(this);
-		new Form.Element.Observer(this.textarea, 0.2, contentObserver);
+		if(this.canWrite){
+			var contentObserver = function(el, value){
+				this.setModified(true);
+			}.bind(this);
+			new Form.Element.Observer(this.textarea, 0.2, contentObserver);
+		}
 		this.removeOnLoad(this.textareaContainer);
 		
 	}
