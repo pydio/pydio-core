@@ -640,6 +640,73 @@ ACTION BAR
 #current_path{
     padding-left:0px;
 }
+/*********************************/
+/* FILE LIST SKINNING
+/********************************/
+.sort-table {
+	font-family:Trebuchet MS, sans-serif;
+	font-size: 11px;
+}
+
+.sort-table thead {
+	background-color:	#aaa;
+}
+
+.sort-table td {
+	padding:	2px 5px;
+}
+
+.sort-table thead td {
+    background-color: #ddd;
+	border-bottom:	none;
+	cursor:			pointer;
+	border-right: 	1px solid buttonhighlight;
+	font-size:12px;
+	color: #676965;
+	padding: 0px;
+	background-color: #f1f1ef;
+	border-bottom : 1px solid #676965;
+}
+
+.sort-table thead td div {
+	padding-left: 7px;
+	padding-top: 3px;
+	height: 20px;	
+}
+
+.sort-table thead td.descending {
+	background-color: #daddd7;
+	background-image: url("../images/crystal/arrow_up_margin.png");
+	background-repeat : no-repeat;
+	background-position : right center;
+}
+
+.sort-table thead td.ascending {
+	background-color: #daddd7;
+	background-image: url("../images/crystal/arrow_down_margin.png");
+	background-repeat : no-repeat;
+	background-position : right center;
+}
+
+#last_header{
+   border-right: 	0px solid #ddd;
+}
+
+#last_header:active{
+}
+
+.sort-table thead td:active {
+	background-color: #c4c7c1;
+}
+
+.column_resize_grabber {
+	display:block;
+	width: 3px;
+	float:right;
+	height: 23px;
+	font-size: 0px;
+	cursor:e-resize;
+}
 
 .even
 {

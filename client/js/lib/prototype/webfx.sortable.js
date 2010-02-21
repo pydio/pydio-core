@@ -152,25 +152,16 @@ SortableTable = Class.create({
 		for (var i = 0; i < l; i++) {
 			c = cells[i];
 			if (this.sortTypes[i] != null && this.sortTypes[i] != "None") {
-				img = doc.createElement("div");
-				$(img).setStyle({cssFloat:'right', marginRight:'5px', width:'16px', height:'16px'});				
-				$(c).insert({"top":img});
-				$(img).addClassName("sort-arrow");
-				if (this.sortTypes[i] != null)
-					c._sortType = this.sortTypes[i];
-				if (typeof c.addEventListener != "undefined")
-					c.addEventListener("click", this._headerOnclick, false);
-				else if (typeof c.attachEvent != "undefined")
-					c.attachEvent("onclick", this._headerOnclick);
-				else
-					c.onclick = this._headerOnclick;
+				if (this.sortTypes[i] != null) c._sortType = this.sortTypes[i];
+				$(c).observe('click', this._headerOnclick.bind(this));
 			}
 			else
 			{
 				c.setAttribute( "_sortType", oSortTypes[i] );
 				c._sortType = "None";
 			}
-			if(!c.id || c.id!='last_header' && !Prototype.Browser.IE){
+			$(c).update(new Element('div').update(c.innerHTML));
+			if(!c.id || c.id!='last_header'){
 				var resizeDiv = new Element("span", {id:"header_resize_"+i,className:'column_resize_grabber'}).update('&nbsp;');			
 				resizeDiv.headerCell = c;
 				resizeDiv.columnIndex = i;
@@ -193,7 +184,7 @@ SortableTable = Class.create({
 					onDrag : function(draggable){
 						var newPosition = Element.cumulativeOffset(draggable.element).left;
 						var delta = newPosition - draggable.originalLeft;
-						var newWidth = draggable.originalCellWidth + delta - 8;
+						var newWidth = draggable.originalCellWidth + delta;
 						draggable.element.setStyle({left:0});						
 						draggable.element.headerCell.setStyle({width:newWidth+'px'});
 					}.bind(this),
@@ -206,11 +197,11 @@ SortableTable = Class.create({
 						draggable.element.setStyle({backgroundColor:'transparent'});
 						var newPosition = Element.cumulativeOffset(draggable.element).left;
 						var delta = newPosition - draggable.originalLeft;
-						var newWidth = draggable.originalCellWidth + delta - 8 ;
+						var newWidth = draggable.originalCellWidth + delta;
 						draggable.element.headerCell.setStyle({width:newWidth+'px'});
 						draggable.element.setStyle({left:0});
 						if(this.onHeaderResize){
-							this.onHeaderResize(draggable.element.columnIndex, newWidth);
+							this.onHeaderResize(draggable.element.columnIndex, newWidth-7);
 						}
 					}.bind(this)
 					});
@@ -248,18 +239,14 @@ SortableTable = Class.create({
 		if (!this.tHead) return;
 		var cells = this.tHead.rows[0].cells;
 		var l = cells.length;
-		var img;
 		for (var i = 0; i < l; i++) {
 			if (cells[i]._sortType != null && cells[i]._sortType != "None") {
-				img = $(cells[i]).select('div')[0];
 				if (i == this.sortColumn)
 				{
-					img.className = "sort-arrow " + (this.descending ? "descending" : "ascending");					
-					$(cells[i]).className = (this.descending ? "desc" : "asc");
+					$(cells[i]).className = (this.descending ? "descending" : "ascending");
 				}
 				else
 				{
-					img.className = "sort-arrow";
 					$(cells[i]).className = "";
 				}
 			}
