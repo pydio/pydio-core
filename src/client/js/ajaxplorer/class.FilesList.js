@@ -144,10 +144,10 @@ FilesList = Class.create(SelectableElements, {
 		}
 		else if(this._displayMode == "thumb")
 		{
-			var buffer = '<TABLE width="100%" cellspacing="0" cellpadding="0" class="sort-table">';
+			var buffer = '<TABLE width="100%" cellspacing="0" cellpadding="0" style="font-family:Trebuchet MS,sans-serif;font-size:11px;">';
 			buffer = buffer + '<thead><tr>';
-			buffer = buffer + '<td style="border-right:0px;" ajxp_message_id="126">'+MessageHash[126]+'</td>';
-			buffer = buffer + '<td align="right" id="last_header"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
+			buffer = buffer + '<td style="border-right:0px;" ajxp_message_id="126" class="panelHeader">'+MessageHash[126]+'</td>';
+			buffer = buffer + '<td align="right" id="last_header"  class="panelHeader" style="padding-top:2px"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></td>';
 			buffer = buffer + '</tr></thead><tbody><tr><td colspan="2" style="padding:0px;"><div id="selectable_div" style="overflow:auto; padding:2px 5px;"></div></td></tr></tbody></table>';
 			$('content_pane').innerHTML  = buffer;
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
