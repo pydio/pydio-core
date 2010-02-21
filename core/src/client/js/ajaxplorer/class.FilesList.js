@@ -111,7 +111,7 @@ FilesList = Class.create(SelectableElements, {
 			for(var i=0; i<this.columnsDef.length;i++){
 				var column = this.columnsDef[i];
 				var last = ((i==this.columnsDef.length-1)?' id="last_header"':'');
-				var stringWidth =((userPref && userPref.get(i))?' style="width:'+userPref.get(i)+'px;"':'');
+				var stringWidth =((userPref && userPref.get(i))?' style="width:'+userPref.get(i)+(userPref.get('type')?'%':'px')+'"':'');
 				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+stringWidth+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
 			}
 			buffer = buffer + '</tr></thead></table>';
@@ -277,38 +277,24 @@ FilesList = Class.create(SelectableElements, {
 		if(this._displayMode == "thumb") return; // Sometimes happens in IE...
 		if(this.gridStyle == "grid"){
 			window.setTimeout(function(){
-			
 				// Reverse!
-			var allItems = this.getItems();
-			if(!allItems.length) return;
-			var tds = $(allItems[0]).getElementsBySelector('td');
-			var headerCells = $('selectable_div_header').getElementsBySelector('td');
-			var divDim = $('selectable_div').getDimensions();
-			var contDim = $('table_rows_container').getDimensions();
-			if(divDim.height > contDim.height && !(divDim.width > contDim.width) ){
-				$('selectable_div_header').setStyle({width:($('selectable_div_header').getWidth()-17)+'px'});
-			}
-			var index = 0;
-			headerCells.each(function(cell){				
-				cell.setStyle({padding:0});
-				var divs = cell.select('div.header_width_resizor');				
-				var div;
-				if(divs.length){
-					div = divs[0];
-				}else{
-					div = new Element('div', {className:'header_width_resizor'}).update(new String(cell.innerHTML).stripTags());
-					// insert also the resize grabber
-					if(cell.select('span.column_resize_grabber').length){
-						div.insert({top:cell.select('span.column_resize_grabber')[0]});
-					}
+				var allItems = this.getItems();
+				if(!allItems.length) return;
+				var tds = $(allItems[0]).getElementsBySelector('td');
+				var headerCells = $('selectable_div_header').getElementsBySelector('td');
+				var divDim = $('selectable_div').getDimensions();
+				var contDim = $('table_rows_container').getDimensions();
+				if(divDim.height > contDim.height && !(divDim.width > contDim.width) ){
+					$('selectable_div_header').setStyle({width:($('selectable_div_header').getWidth()-17)+'px'});
 				}
-				div.setStyle({overflow: 'hidden'});
-				/*div.setStyle({width:tds[index].getWidth()-4+'px'});*/
-				div.setAttribute("title", new String(cell.innerHTML).stripTags());
-				cell.update(div);
-				cell.setStyle({width:tds[index].getWidth()+'px'});
-				index++;
-			});
+				var index = 0;
+				headerCells.each(function(cell){				
+					cell.setStyle({padding:0});
+					var div = cell.select('div')[0];
+					div.setAttribute("title", new String(cell.innerHTML).stripTags().replace("&nbsp;", ""));
+					cell.setStyle({width:tds[index].getWidth()+'px'});
+					index++;
+				});
 			}.bind(this), 10);
 			return;
 		}
