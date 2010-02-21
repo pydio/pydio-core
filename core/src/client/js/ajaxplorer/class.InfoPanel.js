@@ -126,6 +126,10 @@ InfoPanel = Class.create({
 		else this.htmlElement.hide();
 	},
 	
+	resize : function(){
+		fitHeightToBottom(this.htmlElement, null, (Prototype.Browser.IE?2:1), true,200);	
+	},
+	
 	evalTemplateForMime: function(mimeType, fileData, tArgs){
 		if(!this.htmlElement) return;
 		if(!this.registeredMimes.get(mimeType)) return;		

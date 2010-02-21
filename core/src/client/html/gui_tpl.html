@@ -1,76 +1,36 @@
-<div title="<?php print($mess[98]); ?>"  id="message_div" onclick="ajaxplorer.closeMessageDiv();" class="messageBox" title="<?php print($mess[98]); ?>"><div id="message_content"></div></div>
 <div id="toolbars">
-<div id="action_bar">
-	<div id="buttons_bar">
-	</div>
-	<div id="locationbar_cont">
-		<div style="height: 33px;" class="separator"></div>
-		<div style="padding-top : 5px;">
-			<div id="repository_form"><img id="repo_icon" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/network-wired.png" width="16" height="16" align="absmiddle"><input type="text" name="repo_path" value="Default Files" id="repo_path"></div>
-			<div id="repository_goto"><img  align="absmiddle" title="<?php print($mess[200]); ?>" ajxp_message_title_id="200" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/lower.png" id="goto_repo_button" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;"></div>
-			<div id="parent_button"><img align="" title="<?php print($mess[24]); ?>" ajxp_message_title_id="24" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/goto_parent.png" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;cursor:pointer;" onclick="ajaxplorer.actionBar.fireAction('up_dir');return false;"></div><form style="display:inline;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><div id="location_form"><input type="text" name="current_path" value="/" id="current_path"><img align="absmiddle" title="<?php print($mess[149]); ?>" ajxp_message_title_id="149" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/reload.png" height="16" width="16" id="reload_button" onclick="ajaxplorer.actionBar.fireAction('refresh');return false;"></div><div id="location_goto"><input  align="" title="<?php print($mess[104]); ?>" ajxp_message_title_id="104" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/media-playback-start.png" id="goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div></form><div id="bookmarks_goto"><input  align="" title="<?php print($mess[145]); ?>" ajxp_message_title_id="145" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/bookmark.png" id="bm_goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div>
-			<div id="logging_string"></div>
+	<div id="action_bar">
+		<div id="buttons_bar">
+		</div>
+		<div id="locationbar_cont">
+			<div style="height: 33px;" class="separator"></div>
+			<div style="padding-top : 5px;">
+				<div id="repository_form"><img id="repo_icon" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/network-wired.png" width="16" height="16" align="absmiddle"><input type="text" name="repo_path" value="Default Files" id="repo_path"></div>
+				<div id="repository_goto"><img  align="absmiddle" title="<?php print($mess[200]); ?>" ajxp_message_title_id="200" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/lower.png" id="goto_repo_button" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;"></div>
+				<div id="parent_button"><img align="" title="<?php print($mess[24]); ?>" ajxp_message_title_id="24" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/goto_parent.png" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;cursor:pointer;" onclick="ajaxplorer.actionBar.fireAction('up_dir');return false;"></div><form style="display:inline;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><div id="location_form"><input type="text" name="current_path" value="/" id="current_path"><img align="absmiddle" title="<?php print($mess[149]); ?>" ajxp_message_title_id="149" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/reload.png" height="16" width="16" id="reload_button" onclick="ajaxplorer.actionBar.fireAction('refresh');return false;"></div><div id="location_goto"><input  align="" title="<?php print($mess[104]); ?>" ajxp_message_title_id="104" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/media-playback-start.png" id="goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div></form><div id="bookmarks_goto"><input  align="" title="<?php print($mess[145]); ?>" ajxp_message_title_id="145" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/bookmark.png" id="bm_goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div>
+				<div id="logging_string"></div>
+			</div>
 		</div>
 	</div>
+	<div id="hidden_frames" style="display:none;"></div>
+	<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
 </div>
 
-<div id="hidden_frames" style="display:none;"></div>
-<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
-</div>
-<!--
-<div id="bm_bar_cont" style="">
-	<div id="bookmarks_bar"><div id="bmbar_title"><ajxp:message ajxp_message_id="145"><?php print($mess[145]); ?></ajxp:message>&nbsp;&nbsp;<span id="bmbar_extension"></span></div><div style="display:inline;" id="bmbar_content"></div></div>
-</div>
--->
-<div id="browser_round">
 <div id="browser">
 <div id="verticalSplitter" style="background-color: #fff;">
 	<div id="sidebarSplitter" style="float:left; overflow:hidden;">
 		<div style="" id="topPane"  style="overflow: hidden;">
-		<div style="border: 1px solid #676965;border-bottom: 0px;">
-		    <div id="dir_chooser" class="panelHeader"><ajxp:message ajxp_message_id="130"><?php print $mess[130] ?></ajxp:message></div>
-	    	<div id="tree_container" style="overflow:auto;height:100%;width:100%;">
-	    	
-	    	</div>
-	    </div>
-		</div>
-		
-    	<div id="search_div" style="background-color: #fff;">
-    	
+			<div style="border: 1px solid #676965;border-bottom: 0px;">
+			    <div id="dir_chooser" class="panelHeader"><ajxp:message ajxp_message_id="130"><?php print $mess[130] ?></ajxp:message></div>
+		    	<div id="tree_container" style="overflow:auto;height:100%;width:100%;"></div>
+		    </div>
+		</div>		
     	<div id="bottomSplitPane" style="border: 1px solid #676965;">    	
-    		<table cellpadding="0" cellspacing="0" border="0" width="100%" id="panelsToggle">
-    		<tr>
-    		
-		    	<td id="info_panel_header" onclick="ajaxplorer.toggleSidePanel('info'); return false;" class="toggleHeader panelHeader">
-		    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/file_info.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;" ajxp_message_id="131"><?php print $mess[131] ?></a>
-		    	</td>		    
-		    	<td id="search_header" onclick="ajaxplorer.toggleSidePanel('search'); return false;" class="toggleHeader panelHeader">
-		    		<img width="16" height="16" align="absmiddle" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/search.png"><a href="" onclick="ajaxplorer.toggleSidePanel('info'); return false;" ajxp_message_id="87"><?php print $mess[87] ?></a>
-		    	</td>
-		    </tr>
-	    	</table>
 	    	<div id="search_container"></div>
 	    	<div id="info_panel"></div>
     	</div>    	
-    	</div>     	    	
     </div>
-	<div id="content_pane" style="border: 1px solid #676965; background-color: #fff;">	
-	<TABLE width="100%" cellspacing="0"  id="selectable_div" class="sort-table">
-		<col\><col\><col\><col\>
-		<thead>	
-		<tr>
-			<td ajxp_message_id="1"><?php print($mess[1]); ?></td>
-			<td ajxp_message_id="2"><?php print($mess[2]); ?></td>
-			<td ajxp_message_id="3"><?php print($mess[3]); ?></td>
-			<td id="last_header" ajxp_message_id="4"><?php print($mess[4]); ?></td>
-		</tr>
-		</thead>
-	
-		<tbody>
-		</tbody>
-	</table>
-	</div>	
-</div>
+	<div id="content_pane" style="border: 1px solid #676965; background-color: #fff;"></div>	
 </div>
 </div>
 <div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
@@ -80,22 +40,22 @@ try{
 	if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
 		marginBottom = $('optional_bottom_div').getHeight();
 	}
-	fitHeightToBottom($("browser"), window, marginBottom);
-	fitHeightToBottom($("verticalSplitter"), $('browser'));	
+	fitHeightToBottom($("verticalSplitter"), window, marginBottom);	
 	if(Prototype.Browser.IE){
 		fitHeightToBottom($("content_pane"), $('verticalSplitter'));
 	}
 	if($('bottomSplitPane')){
 		var sideSplit = new Splitter('sidebarSplitter',{
 				direction: "horizontal",
-				initB: parseInt($('browser').getHeight()*2/5),
+				initB: parseInt($('verticalSplitter').getHeight()*2/5),
 				minB: 24,
 				maxB: 500,
 				onDrag:function(){
 						fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:1), true);
-						fitHeightToBottom($('bottomSplitPane'), null, (Prototype.Browser.IE?1:1), true);
-						fitHeightToBottom($('info_panel'), null, (Prototype.Browser.IE?2:1), true, 100);
-						if(ajaxplorer)ajaxplorer.sEngine.resize();
+						if(ajaxplorer){
+							ajaxplorer.infoPanel.resize();
+							ajaxplorer.sEngine.resize();
+						}
 				},
 				endDrag : function(paneSize){
 					if(ajaxplorer && ajaxplorer.user){
@@ -103,11 +63,7 @@ try{
 						ajaxplorer.user.savePreferences();
 					}
 				}
-			});		
-		window.setTimeout(function(){
-			fitHeightToBottom($('info_panel'), null, (Prototype.Browser.IE?2:1), true);	
-		}, 500);
-		
+			});				
 	}else{
 		fitHeightToBottom($('tree_container'), null, (Prototype.Browser.IE?0:1), true);
 	}
@@ -132,8 +88,6 @@ try{
 	});
 	
 	disableTextSelection($('tree_container'));
-	disableTextSelection($('bookmarks_bar'));
-	disableTextSelection($('panelsToggle'));
 	disableTextSelection($('info_panel'));
 	disableTextSelection($('dir_chooser'));
 
@@ -154,8 +108,10 @@ try{
 }
 
 Event.observe(document, "ajaxplorer:loaded", function(){
-	ajaxplorer.currentSideToggle = 'search';
-	ajaxplorer.toggleSidePanel('info');	
+	ajaxplorer.registerSimpleTabulator('details', [
+		{id:'info',label:'131',icon:'file_info.png',element:ajaxplorer.infoPanel},
+		{id:'search',label:'87',icon:'search.png',element:ajaxplorer.sEngine}
+	], $('bottomSplitPane'), 'info');
 	$(ajaxplorer.actionBar._htmlElement).getElementsBySelector('a', 'input[type="image"]').each(function(element){
 		disableTextSelection(element);
 	});

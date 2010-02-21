@@ -154,7 +154,6 @@ Ajaxplorer = Class.create({
 		messageTags.each(function(tag){	
 			var messageId = tag.getAttribute("ajxp_message_id");
 			try{
-				//console.log(MessageHash[messageId]);
 				tag.innerHTML = MessageHash[messageId];
 			}catch(e){}
 		});
@@ -217,7 +216,7 @@ Ajaxplorer = Class.create({
 		this.actionBar.setContextualMenu(this.contextMenu);
 		  
 		this.sEngine = new SearchEngine("search_container");
-		this.messageBox = $('message_div');
+		//this.messageBox = $('message_div');
 		this.filesList = new FilesList($("selectable_div"), 
 										true, 
 										["StringDirFile", "NumberKo", "String", "MyDate"], 
@@ -510,20 +509,28 @@ Ajaxplorer = Class.create({
 	},
 	
 	displayMessage: function(messageType, message){
+		if(!this.messageBox){
+			this.messageBox = new Element("div", {title:MessageHash[98],id:"message_div",className:"messageBox"});
+			$(document.body).insert(this.messageBox);
+			this.messageContent = new Element("div", {id:"message_content"});
+			this.messageBox.update(this.messageContent);
+			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
+		}
 		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
-		$('message_content').innerHTML = message;
-		// appear at bottom of content panel
+		this.messageContent.update(message);
 		var containerOffset = Position.cumulativeOffset($('content_pane'));
 		var containerDimensions = $('content_pane').getDimensions();
 		var boxHeight = $(this.messageBox).getHeight();
 		var topPosition = containerOffset[1] + containerDimensions.height - boxHeight - 20;
 		var boxWidth = parseInt(containerDimensions.width * 90/100);
 		var leftPosition = containerOffset[0] + parseInt(containerDimensions.width*5/100);
-		this.messageBox.style.top = topPosition+'px';
-		this.messageBox.style.left = leftPosition+'px';
-		this.messageBox.style.width = boxWidth+'px';
+		this.messageBox.setStyle({
+			top:topPosition+'px',
+			left:leftPosition+'px',
+			width:boxWidth+'px'
+		});
 		new Effect.Corner(this.messageBox,"5px");
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
@@ -539,7 +546,7 @@ Ajaxplorer = Class.create({
 		$('action_bar').observe("click", function(){
 			ajaxplorer.focusOn(ajaxplorer.actionBar);
 		});
-		$('search_div').observe("click", function(){
+		$('bottomSplitPane').observe("click", function(){
 			ajaxplorer.focusOn(ajaxplorer.sEngine);
 		});
 		
@@ -590,33 +597,52 @@ Ajaxplorer = Class.create({
 			else return this.actionBar.fireActionByKey(e, String.fromCharCode(e.keyCode).toLowerCase());
 		}.bind(this));
 	},
-			
-	toggleSidePanel: function(srcName){			
-		if(srcName == 'info' && this.currentSideToggle != 'info'){
-			this.sEngine.showElement(false);
-			if($('search_header')){
-				$('search_header').addClassName("toggleInactive");
-				$('search_header').getElementsBySelector("img")[0].hide();
-			}
-			this.infoPanel.showElement(true);
-			if($('info_panel_header')){
-				$('info_panel_header').removeClassName("toggleInactive");
-				$('info_panel_header').getElementsBySelector("img")[0].show();
-			}
+	
+	registerSimpleTabulator : function(tabulatorId, tabulatorData, headerContainer, defaultTabId){
+		if(!this.tabulators) {
+			this.tabulators = new Hash();
 		}
-		else if(srcName == 'search' && this.currentSideToggle != 'search'){
-			this.sEngine.showElement(true);
-			if($('search_header')){
-				$('search_header').removeClassName("toggleInactive");
-				$('search_header').getElementsBySelector("img")[0].show();
-			}
-			this.infoPanel.showElement(false);
-			if($('info_panel_header')){
-				$('info_panel_header').addClassName("toggleInactive");
-				$('info_panel_header').getElementsBySelector("img")[0].hide();			
-			}
-			this.sEngine.resize();
+		this.tabulators.set(tabulatorId, tabulatorData);
+		// Tabulator Data : array of tabs infos
+		// { id , label, icon and element : tabElement }.
+		// tab Element must implement : showElement() and resize() methods.
+		var table = new Element('table', {cellpadding:0,cellspacing:0,border:0,width:'100%',style:'height:24px;'});		
+		$(headerContainer).insert({top:table});
+		var tBody = new Element('tBody');
+		var tr = new Element('tr');
+		table.update(tBody);
+		tBody.update(tr);
+		tabulatorData.each(function(tabInfo){
+			var td = new Element('td').addClassName('toggleHeader');
+			td.addClassName('panelHeader');
+			td.update('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/crystal/actions/ICON_SIZE', 16)+'"><span ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</a>');
+			td.observe('click', function(){
+				this.switchTabulator(tabulatorId, tabInfo.id);
+			}.bind(this) );
+			tr.insert(td);
+			tabInfo.headerElement = td;
+			disableTextSelection(td);
+		}.bind(this));
+		if(defaultTabId){
+			this.switchTabulator(tabulatorId, defaultTabId);
 		}
-		this.currentSideToggle = srcName;
+	},
+	
+	switchTabulator:function(tabulatorId, tabId){
+		var toShow ;
+		this.tabulators.get(tabulatorId).each(function(tabInfo){
+			if(tabInfo.id == tabId){
+				tabInfo.headerElement.removeClassName("toggleInactive");
+				tabInfo.headerElement.select('img')[0].show();
+				toShow = tabInfo.element;
+			}else{
+				tabInfo.headerElement.addClassName("toggleInactive");
+				tabInfo.headerElement.select('img')[0].hide();
+				tabInfo.element.showElement(false);
+			}
+		});
+		toShow.showElement(true);
+		toShow.resize();
 	}
+	
 });
