@@ -32,11 +32,14 @@
  * 
  * Description : The tree object. Encapsulate the webfx tree.
  */
-FoldersTree = Class.create({
+FoldersTree = Class.create(AjxpPane, {
 
-	initialize: function (oElement, rootFolderName, rootFolderSrc, oAjaxplorer, dontLoad)
+	initialize: function ($super, oElement, rootFolderName, rootFolderSrc, oAjaxplorer, dontLoad)
 	{
-		this._htmlElement = $(oElement);
+		$super(oElement);
+		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:auto;height:100%;'});
+		oElement.insert(this.treeContainer);
+		disableTextSelection(this.treeContainer);
 		var action = function(e){
 			if(!ajaxplorer) return;
 			ajaxplorer.focusOn(ajaxplorer.foldersTree);
@@ -44,14 +47,14 @@ FoldersTree = Class.create({
 		};
 		
 		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, action, 'explorer');
-		this._htmlElement.innerHTML = this.tree.toString();	
+		this.treeContainer.update(this.tree.toString());	
 		$(this.tree.id).observe("click", function(e){
 			this.action(e);
 			Event.stop(e);
 		}.bind(this.tree));
 		AjxpDroppables.add(this.tree.id);
 		if(!this.tree.open && !this.tree.loading && !dontLoad) this.tree.toggle();		
-		this._htmlElement.observe("click", function(){			
+		this.treeContainer.observe("click", function(){			
 			ajaxplorer.focusOn(this);
 		}.bind(this));
 		this.setCurrentNodeName(this.tree.id);
@@ -84,6 +87,15 @@ FoldersTree = Class.create({
 		}
 		webFXTreeHandler.setFocus(false);
 		this.hasFocus = false;
+	},
+	
+	resize : function(){
+		fitHeightToBottom(this.treeContainer, null, (Prototype.Browser.IE?0:2), true);
+	},
+	
+	showElement : function(show){
+		if (show) this.treeContainer.show();
+		else this.treeContainer.hide();
 	},
 	
 	setContextualMenu: function(protoMenu){

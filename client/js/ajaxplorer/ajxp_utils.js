@@ -168,7 +168,7 @@ function disableTextSelection(target)
 	{ //IE route
 		target.onselectstart=function(){return false;}
 	}
-	else if (typeof target.style.MozUserSelect!="undefined")
+	else if (target.style && typeof target.style.MozUserSelect!="undefined")
 	{ //Firefox route
 		var defaultValue = target.style.MozUserSelect;
 		target.style.MozUserSelect="none";
