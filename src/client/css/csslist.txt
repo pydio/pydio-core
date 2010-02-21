@@ -1,4 +1,3 @@
-css/sortabletable.css
 js/lib/webfx/xtree.css
 js/lib/leightbox/screen.css
 css/ajaxplorer.css
