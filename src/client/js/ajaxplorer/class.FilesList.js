@@ -216,9 +216,8 @@ FilesList = Class.create(SelectableElements, {
 				path = path.substring(0, path.indexOf("#"));
 			}
 			path  = path + "#" + page;
-			ajaxplorer.actionBar.updateLocationBar(path);
 			ajaxplorer.foldersTree.setCurrentNodeProperty("pagination_anchor", page);
-			this.loadXmlList(path);
+			ajaxplorer.updateContextData(new AjxpNode(path));
 			Event.stop(e);
 		}.bind(this));		
 	},
@@ -920,15 +919,15 @@ FilesList = Class.create(SelectableElements, {
 				if(rows[i].IMAGE_ELEMENT){
 					rows[i].IMAGE_ELEMENT = null;
 					// Does not work on IE, silently catch exception
-					delete rows[i].IMAGE_ELEMENT;
+					delete(rows[i].IMAGE_ELEMENT);
 				}
 			}catch(e){
 			}			
-			//if(this.isItem(rows[i])) rows[i].remove();i
 			if(rows[i].parentNode){
 				rows[i].remove();
 			}
 		}
+		this.fireChange();
 	},
 	
 	setOnLoad: function()	{
@@ -1057,12 +1056,7 @@ FilesList = Class.create(SelectableElements, {
 	{
 		return ajaxplorer.getContextNode().getPath();
 	},
-	
-	getUserSelection: function()
-	{
-		return new UserSelection(this.getSelectedItems(), this.getCurrentRep());
-	},
-	
+		
 	enableTextSelection : function(target){
 		if (target.origOnSelectStart)
 		{ //IE route

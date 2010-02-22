@@ -170,6 +170,11 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	if(!node.action && node.parentNode.action){
 		node.action = node.parentNode.action;
 	}
+	if(this.ajxpNode){
+		node.ajxpNode = new AjxpNode(node.url, false, node.text, node.icon);		
+		this.ajxpNode.addChild(node.ajxpNode);
+	}
+	
 	this.childNodes[this.childNodes.length] = node;
 	var root = this;
 	if (this.childNodes.length >= 2) {
@@ -452,6 +457,9 @@ WebFXTreeItem.prototype.remove = function() {
 	if(!document.getElementById(this.id+'-plus')) return;
 	var iconSrc = document.getElementById(this.id + '-plus').src;
 	var parentNode = this.parentNode;
+	if(parentNode.ajxpNode && this.ajxpNode){
+		parentNode.ajxpNode.removeChild(this.ajxpNode);
+	}
 	var prevSibling = this.getPreviousSibling(true);
 	var nextSibling = this.getNextSibling(true);
 	var folder = this.parentNode.folder;

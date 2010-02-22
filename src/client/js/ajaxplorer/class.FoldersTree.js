@@ -80,6 +80,8 @@ FoldersTree = Class.create(AjxpPane, {
 			this.reloadCurrentNode();
 		}.bind(this) );
 		
+		document.observe("ajaxplorer:root_node_changed", this.reloadFullTree.bind(this));
+		
 	},
 	
 	focus: function(){
@@ -229,10 +231,12 @@ FoldersTree = Class.create(AjxpPane, {
 		return;
 	},
 	
-	reloadFullTree: function(repositoryLabel, newIcon){		
+	reloadFullTree: function(event){		
+		var ajxpRootNode = event.memo;
 		webFXTreeHandler.recycleNode = null;
+		this.tree.ajxpNode = ajxpRootNode;
 		this.setCurrentToRoot();
-		this.changeRootLabel(repositoryLabel, newIcon);		
+		this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());		
 		this.reloadCurrentNode();
 	},
 	
