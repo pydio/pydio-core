@@ -51,6 +51,13 @@ AjxpNode = Class.create({
 		this._children.push(ajxpNode);
 		ajxpNode.setParent(this);
 	},
+	removeChild : function(ajxpNode){
+		for(i=0;i<this._children.length;i++){
+			if(ajxpNode == this._children[i]){
+				this._children.splice(i, 1);
+			}
+		}
+	},
 	setMetadata : function(data){
 		this._metadata = data;
 	},

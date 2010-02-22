@@ -40,7 +40,6 @@ InfoPanel = Class.create(AjxpPane, {
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();		
-		document.observe("ajaxplorer:context_refresh", this.update.bind(this) );
 		document.observe("ajaxplorer:selection_changed", this.update.bind(this) );
 		document.observe("ajaxplorer:context_changed", this.update.bind(this) );
 		document.observe("ajaxplorer:actions_loaded", this.load.bind(this) );

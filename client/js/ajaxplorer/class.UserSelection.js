@@ -45,25 +45,23 @@ UserSelection = Class.create({
 	_pendingContextPath:null, 
 	_pendingSelection:null,
 	_selectionSource : {}, // fake object
+	
+	_rootNode : null,
 
 
-	initialize: function(aSelectedItems, sCurrentRep){
-		this._currentRep = sCurrentRep;
-		this._selectedItems = aSelectedItems;
-		this._bEmpty = ((aSelectedItems && aSelectedItems.length)?false:true);
-		if(!this._bEmpty)
-		{
-			this._bUnique = ((aSelectedItems.length == 1)?true:false);
-			for(var i=0; i<aSelectedItems.length; i++)
-			{
-				var selectedObj = aSelectedItems[i];
-				
-				if(selectedObj.getAttribute('is_file') && (selectedObj.getAttribute('is_file') == '1' || selectedObj.getAttribute('is_file') == 'true')) this._bFile = true;
-				else this._bDir = true;
-				
-				if(selectedObj.getAttribute('is_recycle') && selectedObj.getAttribute('is_recycle') == '1') this._isRecycle = true;
-			}
-		}		
+	initialize: function(){
+		this._currentRep = '/';
+		this._selectedItems = $A([]);
+		this._bEmpty = true;
+	},
+	
+	setRootNode : function(ajxpRootNode){
+		this._rootNode = ajxpRootNode;
+		document.fire("ajaxplorer:root_node_changed", this._rootNode);
+	},
+	
+	getRootNode : function(ajxpRootNode){
+		return this._rootNode;
 	},
 	
 	setContextNode : function(ajxpDataNode){
@@ -136,7 +134,7 @@ UserSelection = Class.create({
 	},
 	
 	isEmpty : function (){
-		return this._bEmpty;
+		return (this._selectedNodes?(this._selectedNodes.length==0):true);
 	},
 	
 	isUnique : function (){

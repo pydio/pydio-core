@@ -360,7 +360,9 @@ Ajaxplorer = Class.create({
 		var	newIcon = repository.getIcon(); 
 		var sEngineName = repository.getSearchEngine();
 		
-		this.foldersTree.reloadFullTree(repository.getLabel(), newIcon);
+		var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
+		this._contextHolder.setRootNode(rootNode);
+				
 		if(!this._initObj) { 
 			this.goTo('/');
 			this.repositoryId = repositoryId;
