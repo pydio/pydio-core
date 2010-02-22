@@ -57,14 +57,14 @@ function triggerFlashEvent(){
 	var eventType = arguments[0];
 	switch(eventType){
 		case "currentFiles":
-			return parent.ajaxplorer.filesList.getFileNames("__AJXP_SEP__");
+			return parent.ajaxplorer.getUserSelection().getContextFileNames("__AJXP_SEP__");
 		break;
 		case "currentFolder":
-			var folder = parent.base64_encode(parent.ajaxplorer.filesList.getCurrentRep());
+			var folder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
 			return folder;
 		break;	
 		case "uploadComplete":
-			parent.ajaxplorer.filesList.reload();
+			parent.ajaxplorer.fireContextRefresh();
 		break;
 		case "getMessage":
 			var messageId = arguments[1];
@@ -94,11 +94,6 @@ function triggerFlashEvent(){
 
 
 var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&ajxp_sessid=<?php echo session_id(); ?>';
-/*
-if(parent.ajaxplorer){
-	url = url+'&dir='+escape(parent.ajaxplorer.filesList.getCurrentRep());
-}
-*/
 
 var FlashObject = "<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf";
 var FlashVarValue = "<?php echo $FlashVar; ?>" + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";

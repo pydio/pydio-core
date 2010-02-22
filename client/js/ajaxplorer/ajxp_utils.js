@@ -48,6 +48,7 @@ function getRepName(fileName)
 }
 
 function getAjxpMimeType(item){
+	if(!item) return "";
 	return (item.getAttribute('ajxp_mime') || getFileExtension(item.getAttribute('filename')));
 }
 

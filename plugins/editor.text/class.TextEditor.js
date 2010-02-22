@@ -55,9 +55,8 @@ TextEditor = Class.create(AbstractEditor, {
 	},
 	
 	
-	open : function(userSelection, filesList){
-		this.userSelection = userSelection;
-		this.listItems = filesList.getItems();
+	open : function($super, userSelection){
+		$super(userSelection);
 		var fileName = userSelection.getUniqueFileName();
 		var textarea;
 		this.textareaContainer = document.createElement('div');

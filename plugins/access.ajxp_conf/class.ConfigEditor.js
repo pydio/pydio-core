@@ -622,7 +622,9 @@ ConfigEditor = Class.create({
 				else if(obName == 'list')
 				{
 					var file = childs[i].getAttribute('file');
-					ajaxplorer.filesList.reload(file);				
+					ajaxplorer.getContextHolder().setPendingSelection(file);
+					ajaxplorer.fireContextRefresh();
+					ajaxplorer.getContextHolder().clearPendingSelection();
 				}else if(obName == "repository_list"){
 					ajaxplorer.reloadRepositoriesList();
 				}

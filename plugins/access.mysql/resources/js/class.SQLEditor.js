@@ -43,17 +43,23 @@ SQLEditor = Class.create({
 	
 	createEditor : function(){
 	
-		var userSelection = ajaxplorer.filesList.getUserSelection();
+		var userSelection = ajaxplorer.getUserSelection();
 		if(userSelection.hasFile()){
 			this.createRecordEditor(userSelection);
 		}else{
 			this.createTableEditor(userSelection);
-		}		
+		}
 	},
 	
 	createRecordEditor: function(userSelection){
-		var columns = ajaxplorer.filesList.getColumnsDef();
-		var crtTableName = getBaseName(ajaxplorer.filesList.getCurrentRep());
+		var userSelection = ajaxplorer.getUserSelection();
+		if(userSelection.getSelectionSource()){
+			this.currentColumns = userSelection.getSelectionSource().getColumnsDef();
+		}else{
+			this.currentColumns = [];
+		}
+		var columns = this.currentColumns;
+		var crtTableName = getBaseName(ajaxplorer.getContextNode().getPath());
 		this.oForm.insert(new Element('input', {type:'hidden',name:'table_name', value:crtTableName}));
 		var table = new Element('table', {width:'96%', className:'sqlRecordForm'});
 		var tBody = new Element('tbody');
@@ -155,7 +161,13 @@ SQLEditor = Class.create({
 		if(!tableName){
 			this.displayReplicationChooser();			
 		}else{
-			var columns = ajaxplorer.filesList.getColumnsDef();
+			var userSelection = ajaxplorer.getUserSelection();
+			if(userSelection.getSelectionSource()){
+				this.currentColumns = userSelection.getSelectionSource().getColumnsDef();
+			}else{
+				this.currentColumns = [];
+			}		
+			var columns = this.currentColumns;
 			var fields = $A(["field_name", "field_origname", "field_type", "field_size", "field_flags", "field_default", "field_pk", "field_null"]);
 			columns.each(function(col){
 				col['field_origname'] = col['field_name'];
