@@ -47,22 +47,22 @@ Event.observe(window, "load", function(){
 		}
 	}});	
 });
+var AllAjxpDraggables = $A([]);
+var AllAjxpDroppables = $A([]);
 Event.observe(window, "unload", function(){
 	Draggables.removeObserver(timerClearObserver);
-	if(ajaxplorer){
-		ajaxplorer.filesList.allDraggables.each(function(el){
-			el.destroy();
-		});
-		ajaxplorer.filesList.allDroppables.each(function(el){
-			Droppables.remove(el);
-		});
-	}
+	AllAjxpDraggables.each(function(el){
+		el.destroy();
+	});
+	AllAjxpDroppables.each(function(el){
+		Droppables.remove(el);
+	});
 });
 
 
 var AjxpDraggable = Class.create(Draggable, {
 	
-	initialize: function($super, element, options){		
+	initialize: function($super, element, options, component, componentType){		
 		$(element).addClassName('ajxp_draggable');
 		$super(element, options);
 		this.options.reverteffect =  function(element, top_offset, left_offset) {
@@ -70,7 +70,9 @@ var AjxpDraggable = Class.create(Draggable, {
 			queue: {scope:'_draggable', position:'end'}
 			});
 		};
-		
+		this.component = component;
+		this.componentType = componentType;
+		AllAjxpDraggables.push(this);
 	},
 	
 	destroy : function(){
@@ -94,7 +96,7 @@ var AjxpDraggable = Class.create(Draggable, {
 		}
 	
 		if(this.options.ghosting) {
-			var selection = ajaxplorer.filesList.getUserSelection();
+			var selection = ajaxplorer.getUserSelection();
 			//console.log(selection);
 			if(selection.isMultiple()){
 				// Move all selection
@@ -102,7 +104,7 @@ var AjxpDraggable = Class.create(Draggable, {
 				this._draggingMultiple = true;
 				this._clone = document.createElement('div');
 				$(this._clone).addClassName("ajxp_draggable");
-				if(ajaxplorer.filesList._displayMode == 'thumb'){
+				if(this.component._displayMode && this.component._displayMode == 'thumb'){
 					$(this._clone).addClassName('multiple_thumbnails_draggable');
 				}else{
 					$(this._clone).addClassName('multiple_selection_draggable');
@@ -116,11 +118,11 @@ var AjxpDraggable = Class.create(Draggable, {
 				}
 				this.original = this.element;
 				this.element = this._clone;
-				var selectedItems = ajaxplorer.filesList.getSelectedItems();			
+				var selectedItems = this.component.getSelectedItems();			
 				for(var i=0; i<selectedItems.length;i++)
 				{	
 					var objectToClone;
-					if(ajaxplorer.filesList._displayMode == 'thumb'){
+					if(this.component._displayMode == 'thumb'){
 						 objectToClone = $(selectedItems[i]);
 					}
 					else {
@@ -128,14 +130,14 @@ var AjxpDraggable = Class.create(Draggable, {
 					}
 					var newObj = refreshPNGImages(objectToClone.cloneNode(true));				
 					this.element.appendChild(newObj);
-					if(ajaxplorer.filesList._displayMode == 'thumb'){
+					if(this.component._displayMode == 'thumb'){
 						$(newObj).addClassName('simple_selection_draggable');
 					}
 				}
 				Position.absolutize(this.element);
 			}else{
-				if(selection.isEmpty()){
-					ajaxplorer.getFilesList().findSelectableParent(this.element, true);
+				if(selection.isEmpty() && this.component.findSelectableParent){
+					this.component.findSelectableParent(this.element, true);
 				}
 				this._clone = this.element.cloneNode(true);
 				refreshPNGImages(this._clone);
@@ -250,7 +252,7 @@ var AjxpDraggable = Class.create(Draggable, {
 
 	addCopyClass : function()
 	{
-		if(this._draggingMultiple && ajaxplorer.filesList._displayMode == 'thumb')
+		if(this._draggingMultiple && this.component._displayMode == 'thumb')
 		{
 			$(this.element).select('div.thumbnail_selectable_cell').each(function(el){
 				el.addClassName('selection_ctrl_key');
@@ -262,7 +264,7 @@ var AjxpDraggable = Class.create(Draggable, {
 	
 	removeCopyClass : function()
 	{
-		if(this._draggingMultiple && ajaxplorer.filesList._displayMode == 'thumb')
+		if(this._draggingMultiple && this.component._displayMode == 'thumb')
 		{
 			$(this.element).select('div.thumbnail_selectable_cell').each(function(el){
 				el.removeClassName('selection_ctrl_key');
@@ -311,5 +313,6 @@ var AjxpDroppables = {
 
 	add: function(element){
 		Droppables.add(element, this.options);
+		AllAjxpDroppables.push($(element));
 	}	
 };

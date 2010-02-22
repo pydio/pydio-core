@@ -100,9 +100,8 @@ AbstractEditor = Class.create({
 		
 	},
 	
-	open : function(userSelection, filesList){
+	open : function(userSelection){
 		this.userSelection = userSelection;
-		this.listItems = filesList.getItems();
 	},
 	updateTitle : function(title){
 		if(title != ""){

@@ -27,10 +27,8 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[					
 					if(window.actionArguments && window.actionArguments.length>0){
-						var path = window.actionArguments[0];						
-						ajaxplorer.getFoldersTree().goToDeepPath(path);
-						ajaxplorer.getActionBar().updateLocationBar(path);
-						ajaxplorer.filesList.loadXmlList(path);
+						var path = window.actionArguments[0];
+						ajaxplorer.updateContextData(path);
 					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -46,7 +44,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+					var userSelection =  ajaxplorer.getUserSelection();
 						var loadFunc = function(oForm){
 							ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
 							var crtRep = userSelection.getCurrentRep();

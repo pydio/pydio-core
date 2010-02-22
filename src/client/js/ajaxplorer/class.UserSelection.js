@@ -41,6 +41,10 @@ UserSelection = Class.create({
 	_bFile: false,
 	_bDir: false,
 	_isRecycle: false,
+	
+	_pendingContextPath:null, 
+	_pendingSelection:null,
+	_selectionSource : {}, // fake object
 
 
 	initialize: function(aSelectedItems, sCurrentRep){
@@ -60,6 +64,75 @@ UserSelection = Class.create({
 				if(selectedObj.getAttribute('is_recycle') && selectedObj.getAttribute('is_recycle') == '1') this._isRecycle = true;
 			}
 		}		
+	},
+	
+	setContextNode : function(ajxpDataNode){
+		this._contextNode = ajxpDataNode;
+		this._currentRep = ajxpDataNode.getPath();
+		document.fire("ajaxplorer:context_changed", this);
+	},
+	
+	getContextNode : function(){
+		return this._contextNode;
+	},
+	
+	setPendingSelection : function(selection){
+		this._pendingSelection = selection;
+	},
+	
+	getPendingSelection : function(){
+		return this._pendingSelection;
+	},
+	
+	clearPendingSelection : function(){
+		this._pendingSelection = null;
+	},
+	
+	setSelectedNodes : function(ajxpDataNodes, source){
+		if(!source){
+			this._selectionSource = {};
+		}else{
+			this._selectionSource = source;
+		}
+		this._selectedNodes = ajxpDataNodes;
+		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
+		this._selectedItems = $A([]);
+		this._bFile = this._bDir = false;
+		if(!this._bEmpty)
+		{
+			this._bUnique = ((ajxpDataNodes.length == 1)?true:false);
+			for(var i=0; i<ajxpDataNodes.length; i++)
+			{
+				var selectedNode = ajxpDataNodes[i];
+				if(selectedNode.isLeaf()){
+					this._bFile = true;
+				}
+				else{
+					this._bDir = true;
+				}
+				
+				var meta = selectedNode.getMetadata();
+				this._selectedItems.push(meta); // Backward compat
+				if(meta.getAttribute('is_recycle') && meta.getAttribute('is_recycle') == '1') this._isRecycle = true;
+			}
+		}
+		document.fire("ajaxplorer:selection_changed", this);	
+	},
+	
+	getSelectedNodes : function(){
+		return this._selectedNodes;
+	},
+	
+	getSelectionSource : function(){
+		return this._selectionSource;
+	},
+	
+	getSelectedItems : function(){
+		return this._selectedItems;
+	},
+	
+	selectAll : function(){
+		this.setSelectedNodes(this._contextNode.getChildren());
 	},
 	
 	isEmpty : function (){
@@ -104,7 +177,7 @@ UserSelection = Class.create({
 		return has;
 	},
 	
-	getFileNames : function(){
+	getFileNames : function(separator){
 		if(!this._selectedItems.length)
 		{
 			alert('Please select a file!');
@@ -115,12 +188,60 @@ UserSelection = Class.create({
 		{
 			tmp[i] = this._selectedItems[i].getAttribute('filename');
 		}
-		return tmp;
+		if(separator){
+			return tmp.join(separator);
+		}else{
+			return tmp;
+		}
 	},
+	
+	getContextFileNames : function(separator){
+		var allItems = this._contextNode.getChildren();
+		if(!allItems.length)
+		{		
+			return false;
+		}
+		var names = $A([]);
+		for(i=0;i<allItems.length;i++)
+		{
+			var meta = allItems[i].getMetadata();
+			var crtFileName = getBaseName(meta.getAttribute('filename'));
+			names.push(crtFileName);
+		}
+		if(separator){
+			return names.join(separator);
+		}else{
+			return names;
+		}
+	},
+	
+	fileNameExists: function(newFileName) 
+	{	
+		var allItems = this._contextNode.getChildren();
+		if(!allItems.length)
+		{		
+			return false;
+		}
+		for(i=0;i<allItems.length;i++)
+		{
+			var meta = allItems[i].getMetadata();
+			var crtFileName = getBaseName(meta.getAttribute('filename'));
+			if(crtFileName && crtFileName.toLowerCase() == getBaseName(newFileName).toLowerCase()) 
+				return true;
+		}
+		return false;
+	},	
 	
 	getUniqueFileName : function(){	
 		if(this.getFileNames().length) return this.getFileNames()[0];
 		return null;	
+	},
+	
+	getUniqueNode : function(){
+		if(this._selectedNodes.length){
+			return this._selectedNodes[0];
+		}
+		return null;
 	},
 	
 	getUniqueItem : function(){

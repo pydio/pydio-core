@@ -133,15 +133,19 @@ Diaporama = Class.create(AbstractEditor, {
 		}.bind(this) );
 	},
 	
-	open : function($super, userSelection, aFilesList)
+	open : function($super, userSelection)
 	{
-		$super(userSelection, aFilesList);
+		$super(userSelection);
 		var allItems, sCurrentFile;
 		if(userSelection.isUnique()){
-			allItems = aFilesList.getItems();
+			var currentItems = userSelection.getContextNode().getChildren();
+			allItems = $A([]);
+			currentItems.each(function(item){
+				allItems.push(item.getMetadata());
+			});						
 			sCurrentFile = userSelection.getUniqueFileName();
 		}else{
-			allItems = aFilesList.getSelectedItems();
+			allItems = userSelection.getSelectedItems();
 		}		
 		this.items = new Array();
 		this.sizes = new Hash();

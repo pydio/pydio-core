@@ -430,6 +430,15 @@ SelectableElements = Class.create({
 		return tmp;
 	},
 	
+	getSelectedNodes : function(){
+		var items = this._selectedItems;
+		var nodes = $A([]);
+		for(var i=0;i<items.length;i++){
+			if(items[i].ajxpNode) nodes.push(items[i].ajxpNode);
+		}
+		return nodes;
+	},
+	
 	isItem: function (node) {
 		return node != null && node.nodeType == 1 && node.parentNode == this._htmlElement;
 	},

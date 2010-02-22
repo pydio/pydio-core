@@ -56,7 +56,16 @@ ActionsManager = Class.create(AjxpPane, {
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
 		this.toolbars = new Hash();		
-		this.loadActions('ajxp');
+		this.loadActions('ajxp');		
+		document.observe("ajaxplorer:context_changed", function(event){
+			var path = event.memo.getContextNode().getPath();
+			this.fireContextChange();
+			this.updateLocationBar(path);
+		}.bind(this) );
+		document.observe("ajaxplorer:selection_changed", function(event){
+			this.fireSelectionChange();
+		}.bind(this) );
+		
 	},	
 	
 	init: function()
@@ -89,6 +98,7 @@ ActionsManager = Class.create(AjxpPane, {
 				this.hasFocus = false;
 			}
 		}.bind(this);
+		
 	},
 	
 	setContextualMenu: function(contextualMenu)
@@ -120,14 +130,6 @@ ActionsManager = Class.create(AjxpPane, {
 			logging_string = '<ajxp:message ajxp_message_id="142">'+MessageHash[144]+'</ajxp:message>';
 		}
 		$('logging_string').innerHTML = logging_string;
-		if(oUser != null)
-		{
-			disp = oUser.getPreference("display");
-			if(disp && (disp == 'thumb' || disp == 'list'))
-			{
-				if(disp != ajaxplorer.filesList._displayMode) ajaxplorer.filesList.switchDisplayMode(disp);
-			}
-		}		
 		this.loadBookmarks();
 	},
 	
@@ -248,7 +250,7 @@ ActionsManager = Class.create(AjxpPane, {
 			var isDefault = false;
 			if(actionsSelectorAtt == 'selectionContext'){
 				// set default in bold
-				var userSelection = ajaxplorer.getFilesList().getUserSelection();
+				var userSelection = ajaxplorer.getUserSelection();
 				if(!userSelection.isEmpty()){
 					var defaultAction = 'file';
 					if(userSelection.isUnique() && userSelection.hasDir()){
@@ -346,7 +348,7 @@ ActionsManager = Class.create(AjxpPane, {
 			(copy && (!this.defaultActions.get('ctrldragndrop')||this.getDefaultAction('ctrldragndrop').deny))){
 			return;
 		}
-		if(fileName == null) fileNames = ajaxplorer.filesList.getUserSelection().getFileNames();
+		if(fileName == null) fileNames = ajaxplorer.getUserSelection().getFileNames();
 		else fileNames = [fileName];
 		if(destNodeName != null)
 		{
@@ -364,7 +366,7 @@ ActionsManager = Class.create(AjxpPane, {
 				}
 			}
 			// Check that dest is not the direct parent of source, ie current rep!
-			if(destDir == ajaxplorer.filesList.getCurrentRep()){
+			if(destDir == ajaxplorer.getContextNode().getPath()){
 				ajaxplorer.displayMessage('ERROR', MessageHash[203]);
 				 return;
 			}
@@ -384,7 +386,7 @@ ActionsManager = Class.create(AjxpPane, {
 		}
 		connexion.addParameter('dest', destDir);
 		if(destNodeName) connexion.addParameter('dest_node', destNodeName);
-		connexion.addParameter('dir', ajaxplorer.getFilesList().getCurrentRep());
+		connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());
 		oThis = this;
 		connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
@@ -429,7 +431,9 @@ ActionsManager = Class.create(AjxpPane, {
 			if(fElement.type == 'radio' && !fElement.checked) return;
 			connexion.addParameter(fElement.name, fValue);
 		});
-		connexion.addParameter('dir', ajaxplorer.getFilesList().getCurrentRep());
+		if(ajaxplorer.getContextNode()){
+			connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());
+		}
 		oThis = this;
 		connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
 		connexion.sendAsync();
@@ -461,7 +465,9 @@ ActionsManager = Class.create(AjxpPane, {
 				else if(obName == 'list')
 				{
 					var file = childs[i].getAttribute('file');
-					ajaxplorer.filesList.reload(file);				
+					ajaxplorer.getContextHolder().setPendingSelection(file);
+					ajaxplorer.fireContextRefresh();
+					ajaxplorer.getContextHolder().clearPendingSelection();
 				}else if(obName == 'repository_list'){
 					ajaxplorer.reloadRepositoriesList();
 				}
@@ -521,8 +527,9 @@ ActionsManager = Class.create(AjxpPane, {
 	
 	fireSelectionChange: function(){
 		var userSelection = null;
-		if (ajaxplorer && ajaxplorer.getFilesList() && ajaxplorer.getFilesList().getUserSelection()){
-			userSelection = ajaxplorer.getFilesList().getUserSelection();
+		if (ajaxplorer && ajaxplorer.getUserSelection()){
+			userSelection = ajaxplorer.getUserSelection();
+			if(userSelection.isEmpty()) userSelection = null;
 		} 
 		this.actions.each(function(pair){
 			pair.value.fireSelectionChange(userSelection);
@@ -535,19 +542,17 @@ ActionsManager = Class.create(AjxpPane, {
 		var crtInZip = false;
 		var crtIsRoot = false;
 		var crtMime;
+		
 		if(ajaxplorer && ajaxplorer.foldersTree){ 
 			crtRecycle = ajaxplorer.foldersTree.currentIsRecycle();
 			crtInZip = ajaxplorer.foldersTree.currentInZip();
 			crtIsRoot = ajaxplorer.foldersTree.currentIsRoot();
 			crtMime = ajaxplorer.foldersTree.getCurrentNodeMime();
 		}	
-		var displayMode = '';
-		if(ajaxplorer && ajaxplorer.filesList) displayMode = ajaxplorer.filesList.getDisplayMode();
 		this.actions.each(function(pair){			
 			pair.value.fireContextChange(this.usersEnabled, 
 									 this.oUser, 									 
 									 crtRecycle, 
-									 displayMode, 
 									 crtInZip, 
 									 crtIsRoot,
 									 crtMime);
@@ -639,7 +644,7 @@ ActionsManager = Class.create(AjxpPane, {
 			connexion.sendSync();
 		}
 		this.initToolbars();
-		if(ajaxplorer && ajaxplorer.infoPanel) ajaxplorer.infoPanel.load();
+		document.fire("ajaxplorer:actions_loaded");
 		this.fireContextChange();
 		this.fireSelectionChange();			
 	},
@@ -674,7 +679,7 @@ ActionsManager = Class.create(AjxpPane, {
 			if(newAction.options.hasAccessKey){
 				this.registerKey(newAction.options.accessKey, newAction.options.name);
 			}
-			if(ajaxplorer && ajaxplorer.filesList && newAction.options.name == "ls"){
+			if(ajaxplorer && newAction.options.name == "ls"){
 				for(var j=0;j<actions[i].childNodes.length;j++){
 					if(actions[i].childNodes[j].nodeName == 'displayDefinitions'){
 						var displayDef = actions[i].childNodes[j];
@@ -697,7 +702,7 @@ ActionsManager = Class.create(AjxpPane, {
 						});
 					}
 				});
-				ajaxplorer.filesList.setColumnsDef(columns);						
+				ajaxplorer.changeDataColumnsDefinition(columns);
 			}
 			if(newAction.options.listeners['init']){				
 				try{
@@ -724,7 +729,8 @@ ActionsManager = Class.create(AjxpPane, {
 	locationBarSubmit: function (url)
 	{
 		if(url == '') return false;	
-		this._ajaxplorer.goTo(url);
+		var path = new AjxpNode(url, false);
+		this.fireDefaultAction("dir", path);
 		return false;
 	},
 	

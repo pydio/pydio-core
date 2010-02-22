@@ -65,10 +65,8 @@ AjxpCkEditor = Class.create(TextEditor, {
 	},
 	
 	
-	open : function(userSelection, filesList){
-
+	open : function($super, userSelection){
 		this.userSelection = userSelection;
-		this.listItems = filesList.getItems();
 		var fileName = userSelection.getUniqueFileName();
 		var textarea;
 		this.textareaContainer = new Element('div');

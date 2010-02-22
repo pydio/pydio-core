@@ -77,9 +77,7 @@ SQLSearchEngine = Class.create(SearchEngine, {
 		connexion.setParameters(params);
 		var res = connexion.sendSync();
 		var path = "/ajxpmysqldriver_searchresults";
-		ajaxplorer.getFoldersTree().goToDeepPath(path);
-		ajaxplorer.filesList.loadXmlList(path);
-		ajaxplorer.getActionBar().updateLocationBar(path);
+		ajaxplorer.updateContextData(new AjxpNode(path));
 	},
 	
 	resize:function(){

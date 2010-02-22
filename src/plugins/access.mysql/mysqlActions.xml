@@ -19,17 +19,16 @@
 					var path;					
 					if(window.actionArguments && window.actionArguments.length>0){
 						path = window.actionArguments[0];
+						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
 					}else{
-						userSelection = ajaxplorer.getFilesList().getUserSelection();
+						userSelection = ajaxplorer.getUserSelection();
 						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
-							path = userSelection.getUniqueFileName();
+							path = userSelection.getUniqueNode();
 						}
 					}
 					if(path){
-						ajaxplorer.getFoldersTree().goToDeepPath(path);
-						ajaxplorer.filesList.loadXmlList(path);
-						ajaxplorer.getActionBar().updateLocationBar(path);
-					}
+						ajaxplorer.updateContextData(path);
+					}						
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -100,7 +99,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var currentTable = ajaxplorer.filesList.getCurrentRep();
+					var currentTable = ajaxplorer.getContextNode().getPath();
 					var sTitle = MessageHash[187]+currentTable;
 					var loadFunc = function(oForm){
 						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
@@ -209,7 +208,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getFilesList().getUserSelection();					
+					var userSelection =  ajaxplorer.getUserSelection();					
 					var loadFunc = function(oForm){
 						ajaxplorer.actionBar.sqlEditor = new SQLEditor(oForm);
 						ajaxplorer.actionBar.sqlEditor.createRecordEditor(userSelection);
@@ -243,7 +242,7 @@
 					};
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						ajaxplorer.actionBar.submitForm(oForm);
 						hideLightBox(true);
 						return false;
@@ -272,7 +271,7 @@
 					};
 					modal.showDialogForm('Delete', 'delete_record_form', onLoad, function(){
 						var oForm = modal.getForm();
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						ajaxplorer.actionBar.submitForm(oForm);
 						hideLightBox(true);
 						return false;

@@ -41,6 +41,8 @@ Ajaxplorer = Class.create({
 		this.usersEnabled = usersEnabled;
 		this._initLoggedUser = loggedUser;
 		this._initRepositoriesList = $H({});
+		this._contextHolder = new UserSelection();
+		this._displayMode = 'list';
 		if(repoListXML && repoListXML.childNodes.length){
 			for(j=0;j<repoListXML.documentElement.childNodes.length;j++)
 			{
@@ -62,6 +64,31 @@ Ajaxplorer = Class.create({
 		modal.initForms();
 		this.initObjects();
 		window.setTimeout(function(){document.fire('ajaxplorer:loaded');}, 500);
+	},
+	
+	updateContextData : function(ajxpContextNode, ajxpSelectedNodes, selectionSource){
+		if(ajxpContextNode){
+			this._contextHolder.setContextNode(ajxpContextNode);
+		}
+		if(ajxpSelectedNodes){
+			this._contextHolder.setSelectedNodes(ajxpSelectedNodes, selectionSource);
+		}
+	},
+	
+	getContextHolder : function(){
+		return this._contextHolder;
+	},
+	
+	getContextNode : function(){
+		return this._contextHolder.getContextNode();
+	},
+	
+	getUserSelection : function(){
+		return this._contextHolder;
+	},		
+	
+	fireContextRefresh : function(){
+		document.fire("ajaxplorer:context_refresh");
 	},
 	
 	initEditorsRegistry : function(){
@@ -141,9 +168,8 @@ Ajaxplorer = Class.create({
 				var result = transport.responseText.evalScripts();
 				MessageHash = result[0];
 				this.updateI18nTags();
-				if(this.infoPanel) this.infoPanel.update();
 				if(this.actionBar) this.actionBar.loadActions();
-				if(this.filesList) this.filesList.reload();
+				this.fireContextRefresh();
 				this.currentLanguage = newLanguage;
 			}
 		}.bind(this);
@@ -336,7 +362,7 @@ Ajaxplorer = Class.create({
 		
 		this.foldersTree.reloadFullTree(repository.getLabel(), newIcon);
 		if(!this._initObj) { 
-			this.filesList.loadXmlList('/') ;
+			this.goTo('/');
 			this.repositoryId = repositoryId;
 			this.actionBar.loadBookmarks();
 		} else { this._initObj = null ;}
@@ -353,9 +379,8 @@ Ajaxplorer = Class.create({
 	},
 
 	goTo: function(rep, selectFile){
-		this.actionBar.updateLocationBar(rep);
-		this.foldersTree.goToDeepPath(rep);	
-		this.filesList.loadXmlList(rep, selectFile);	
+		if(selectFile) this._contextHolder.setPendingFile(selectFile);
+		this._contextHolder.setContextNode(new AjxpNode(rep));
 	},
 	
 	refreshRepositoriesMenu: function(rootDirsList, repositoryId){
@@ -459,6 +484,20 @@ Ajaxplorer = Class.create({
 		return false;
 	},
 	
+	switchDisplayMode : function(displayMode){
+		if(displayMode == this._displayMode) return;
+		this._displayMode = displayMode;
+		document.fire("ajaxplorer:display_switched", this._displayMode);
+	},
+	
+	getDisplayMode : function(){
+		return this._displayMode;
+	},
+	
+	changeDataColumnsDefinition : function(columnsDef){
+		document.fire("ajaxplorer:data_columns_def_changed", columnsDef);
+	},
+	
 	disableShortcuts: function(){
 		this.blockShortcuts = true;
 	},
@@ -478,11 +517,7 @@ Ajaxplorer = Class.create({
 	getActionBar: function(){
 		return this.actionBar;
 	},
-	
-	getFilesList: function(){
-		return this.filesList;
-	},
-	
+		
 	getFoldersTree: function(){
 		return this.foldersTree;
 	},
@@ -498,6 +533,16 @@ Ajaxplorer = Class.create({
 		object.focus();
 	},
 	
+	blurAll : function(){
+		this._focusables.each(function(f){
+			if(f.hasFocus) this._lastFocused = f;
+			f.blur();
+		}.bind(this) );
+	},	
+	
+	focusLast : function(){
+		if(this._lastFocused) this.focusOn(this._lastFocused);
+	},
 	
 	initTabNavigation: function(){
 		var objects = this._focusables;

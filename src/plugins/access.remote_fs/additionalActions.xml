@@ -50,7 +50,7 @@
 										true, true);					
 					
 					modal.setCloseAction(function(){						
-						ajaxplorer.filesList.reload();
+						ajaxplorer.fireContextRefresh();
 						var bgManager = ajaxplorer.actionBar.bgManager;
 						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
 						bgManager.next();
