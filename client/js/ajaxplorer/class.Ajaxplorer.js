@@ -477,7 +477,6 @@ Ajaxplorer = Class.create({
 	},	
 			
 	cancelCopyOrMove: function(){
-		this.foldersTree.setTreeInNormalMode();
 		this.foldersTree.selectCurrentNodeName();
 		this.actionBar.treeCopyActive = false;
 		hideLightBox();
@@ -485,7 +484,7 @@ Ajaxplorer = Class.create({
 	},
 	
 	switchDisplayMode : function(displayMode){
-		if(displayMode == this._displayMode) return;
+		if(this._displayMode && displayMode == this._displayMode) return;
 		this._displayMode = displayMode;
 		document.fire("ajaxplorer:display_switched", this._displayMode);
 	},

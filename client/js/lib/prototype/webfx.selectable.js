@@ -225,10 +225,14 @@ SelectableElements = Class.create({
 			if($('table_rows_container')) parent = $('table_rows_container');		
 			var scrollOffset = oEl.offsetTop;
 			
-			if(scrollOffset+$(oEl).getHeight() > (parent.getHeight()+parent.scrollTop)){			
-				parent.scrollTop = scrollOffset-parent.getHeight()+$(oEl).getHeight();
-			}else if(scrollOffset < (parent.scrollTop)){
-				parent.scrollTop = scrollOffset-$(oEl).getHeight();
+			var parentHeight = parent.getHeight();
+			var parentScrollTop = parent.scrollTop;
+			var elHeight = $(oEl).getHeight(); 
+			
+			if(scrollOffset+elHeight > (parentHeight+parentScrollTop)){			
+				parent.scrollTop = scrollOffset-parentHeight+elHeight;
+			}else if(scrollOffset < (parentScrollTop)){
+				parent.scrollTop = scrollOffset-elHeight;
 			}
 			
 		}
