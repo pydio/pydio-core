@@ -27,17 +27,16 @@
 					var path;					
 					if(window.actionArguments && window.actionArguments.length>0){
 						path = window.actionArguments[0];
+						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
 					}else{
-						userSelection = ajaxplorer.getFilesList().getUserSelection();
+						userSelection = ajaxplorer.getUserSelection();
 						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
-							path = userSelection.getUniqueFileName();
+							path = userSelection.getUniqueNode();
 						}
 					}
 					if(path){
-						ajaxplorer.getFoldersTree().goToDeepPath(path);
-						ajaxplorer.filesList.loadXmlList(path);
-						ajaxplorer.getActionBar().updateLocationBar(path);
-					}
+						ajaxplorer.updateContextData(path);
+					}						
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -85,7 +84,7 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var loadFunc = function(oForm){
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						if(!ajaxplorer.actionBar.configEditor){
 							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 						}
@@ -139,7 +138,8 @@
 						};
 						conn.sendSync();
 					};
-					ajaxplorer.filesList.switchCurrentLabelToEdition(callback);
+
+					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
@@ -154,11 +154,11 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+					var userSelection =  ajaxplorer.getUserSelection();
 					var item = userSelection.getUniqueItem();
 					if(item.getAttribute("ajxp_mime") == "user" || item.getAttribute("ajxp_mime") == "user_editable"){
 						var loadFunc = function(oForm){
-							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 							if(!ajaxplorer.actionBar.configEditor){
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
@@ -168,7 +168,7 @@
 						modal.showDialogForm('Edit Online', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
 					}else{
 						var loadFunc = function(oForm){
-							ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 							if(!ajaxplorer.actionBar.configEditor){
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
@@ -237,7 +237,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+					var userSelection =  ajaxplorer.getUserSelection();
 					var item = userSelection.getUniqueItem();
 					var deleteMessage, fieldName, fieldValue;
 					if(item.getAttribute("ajxp_mime") == "user_editable"){
@@ -297,13 +297,14 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){
-						var userSelection =  ajaxplorer.getFilesList().getUserSelection();
+						if(!ajaxplorer.filesList) return;
+						var userSelection =  ajaxplorer.getUserSelection();
 						var items = userSelection._selectedItems;
 						var firstItem = userSelection.getUniqueItem();
 						var mime = firstItem.getAttribute("ajxp_mime");
 		   		    	var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
 		   		    	var attributes = [];
-		   		    	columnsDef = ajaxplorer.getFilesList().columnsDef;
+		   		    	columnsDef = ajaxplorer.filesList.columnsDef;
 		   		    	columnsDef.each(function(def){attributes.push(def.attributeName);});
 			   		    var message = attributes.join("\t") + "\n\n";
 		   		    	items.each(function(item){		   		    		

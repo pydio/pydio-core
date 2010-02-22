@@ -40,9 +40,8 @@ CodePressEditor = Class.create(TextEditor, {
 	},
 	
 	
-	open : function(userSelection, filesList){
+	open : function($super, userSelection){
 		this.userSelection = userSelection;
-		this.listItems = filesList.getItems();
 		var fileName = userSelection.getUniqueFileName();
 		// CREATE GUI
 		var cpStyle = this.codePressStyle(getBaseName(fileName));

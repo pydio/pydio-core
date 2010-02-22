@@ -48,7 +48,6 @@ Action = Class.create({
 			subMenu:false,
 			callbackCode:'',
 			callback:Prototype.emptyFunction,
-			displayAction:false,
 			prepareModal:false, 
 			listeners : [],
 			formId:undefined, 
@@ -124,14 +123,13 @@ Action = Class.create({
 	},
 	
 	fireContextChange: function(){
-		if(arguments.length < 5) return;
+		if(arguments.length < 4) return;
 		var usersEnabled = arguments[0];
 		var crtUser = arguments[1];
 		var crtIsRecycle = arguments[2];
-		var crtDisplayMode = arguments[3];
-		var crtInZip = arguments[4];
-		var crtIsRoot = arguments[5];
-		var crtAjxpMime = arguments[6] || '';
+		var crtInZip = arguments[3];
+		var crtIsRoot = arguments[4];
+		var crtAjxpMime = arguments[5] || '';
 		if(this.options.listeners["contextChange"]){
 			window.listenerContext = this;
 			this.options.listeners["contextChange"].evalScripts();			
@@ -173,9 +171,6 @@ Action = Class.create({
 			return this.hideForContext();
 		}
 		if(!this.context.root && crtIsRoot){
-			return this.hideForContext();
-		}
-		if(this.options.displayAction && this.options.displayAction == crtDisplayMode){
 			return this.hideForContext();
 		}
 		this.showForContext();				
@@ -246,9 +241,6 @@ Action = Class.create({
 						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
 							this.options.prepareModal = true;						
 						}
-						if(processNode.getAttribute('displayModeButton') && processNode.getAttribute('displayModeButton') != ''){
-							this.options.displayAction = processNode.getAttribute('displayModeButton');
-						}						
 					}else if(processNode.nodeName == "clientListener" && processNode.firstChild){						
 						this.options.listeners[processNode.getAttribute('name')] = '<script>'+processNode.firstChild.nodeValue+'</script>';
 					}

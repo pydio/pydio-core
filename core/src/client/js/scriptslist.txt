@@ -1,5 +1,6 @@
 js/lib/prototype/prototype.js
 js/ajaxplorer/class.AjxpPane.js
+js/ajaxplorer/class.AjxpNode.js
 js/lib/ufo/ufo.js
 js/lib/md5/md5.js
 js/lib/webfx/slider/js/timer.js

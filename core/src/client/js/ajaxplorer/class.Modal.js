@@ -123,12 +123,12 @@ Modal = Class.create({
 		if($(newForm).getElementsBySelector(".replace_rep").length)
 		{
 			repDisplay = $(newForm).getElementsBySelector(".replace_rep")[0];
-			repDisplay.innerHTML = ajaxplorer.filesList.getCurrentRep();
+			repDisplay.innerHTML = ajaxplorer.getContextHolder().getContextNode().getPath();
 		}
 		if($(newForm).getElementsBySelector(".replace_file").length)
 		{
 			repDisplay = $(newForm).getElementsBySelector(".replace_file")[0];
-			repDisplay.innerHTML = getBaseName(ajaxplorer.filesList.getUserSelection().getUniqueFileName());
+			repDisplay.innerHTML = getBaseName(ajaxplorer.getUserSelection().getUniqueFileName());
 		}
 		this.currentForm = newForm;
 		if(fOnLoad != null)
@@ -144,7 +144,7 @@ Modal = Class.create({
 	showContent: function(elementName, boxWidth, boxHeight, skipShadow){
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
-		ajaxplorer.filesList.blur();
+		ajaxplorer.blurAll();
 		var winWidth = $(document.body).getWidth();
 		var winHeight = $(document.body).getHeight();
 	
@@ -202,14 +202,13 @@ Modal = Class.create({
 	openEditorDialog : function(editorData){
 		var editorKlass = editorData.editorClass;
 		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/crystal/actions/ICON_SIZE', 16));
-		var loadFunc = function(oForm){
-			var fList =  ajaxplorer.getFilesList();
+		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
 				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm)');
 			}else{
 				ajaxplorer.actionBar.editor = new editorKlass(oForm);
 			}
-			ajaxplorer.actionBar.editor.open(fList.getUserSelection(),fList);
+			ajaxplorer.actionBar.editor.open(ajaxplorer.getUserSelection());
 		};
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);		
 	},

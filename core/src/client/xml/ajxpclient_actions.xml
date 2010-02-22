@@ -52,8 +52,7 @@
 					ajaxplorer.getFoldersTree().goToParentNode();
 					var anchor = ajaxplorer.getFoldersTree().getCurrentNodeProperty("pagination_anchor");
 					if(anchor) currentParentUrl = currentParentUrl + "#" + anchor;
-					ajaxplorer.getFilesList().loadXmlList(currentParentUrl);
-					ajaxplorer.actionBar.updateLocationBar(currentParentUrl);
+					ajaxplorer.updateContextData(new AjxpNode(currentParentUrl));
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -68,8 +67,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-					ajaxplorer.getFilesList().reload();
-					ajaxplorer.getFoldersTree().reloadCurrentNode();					
+					ajaxplorer.fireContextRefresh();
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -88,22 +86,20 @@
 					<item text="226" title="227" src="view_text.png" command="list"  
 						hasAccessKey="true" accessKey="list_access_key"/>
 				</staticItems>
-				<!--
-				<dynamicItems>
-					<item actionId="download" command="down"/>
-					<item actionId="edit" command="edit"/>
-				</dynamicItems>				
-				-->
 			</subMenu>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 					if(window.actionArguments){
-						ajaxplorer.filesList.switchDisplayMode(window.actionArguments[0].command);
+						if(Object.isString(window.actionArguments[0])){
+							ajaxplorer.switchDisplayMode(window.actionArguments[0]);
+						}else{
+							ajaxplorer.switchDisplayMode(window.actionArguments[0].command);
+						}
 					}
 					]]></clientCallback>
 				<clientListener name="init"><![CDATA[
 					window.setTimeout(function(){					
-						var displayMode = ajaxplorer.filesList.getDisplayMode();
+						var displayMode = ajaxplorer.getDisplayMode();
 						var item = this.subMenuItems.staticItems.detect(function(item){return item.command == displayMode;});
 						this.setActiveSubMenu(item);
 					}.bind(window.listenerContext), 500);					
@@ -121,7 +117,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-					var userSelection = ajaxplorer.getFilesList().getUserSelection();
+					var userSelection = ajaxplorer.getUserSelection();
 					if((userSelection.isUnique() && !userSelection.hasDir()))
 					{
 						var fileName = userSelection.getUniqueFileName();

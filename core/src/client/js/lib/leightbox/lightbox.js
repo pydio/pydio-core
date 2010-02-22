@@ -231,12 +231,10 @@ function hideLightBox(onFormSubmit)
 		{
 			currentLightBox = null;
 		}
-		ajaxplorer.getActionBar().fireContextChange();
-		ajaxplorer.getActionBar().fireSelectionChange();
-		ajaxplorer.getFilesList().focus();
 		ajaxplorer.enableNavigation();
-		ajaxplorer.focusOn(ajaxplorer.filesList);
+		ajaxplorer.focusLast();
 		ajaxplorer.enableShortcuts();
+		document.fire("ajaxplorer:selection_changed");
 	}
 	if(currentDraggable) currentDraggable.destroy();
 	if(modal.closeFunction){

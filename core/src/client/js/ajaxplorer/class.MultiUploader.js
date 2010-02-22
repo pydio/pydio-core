@@ -67,12 +67,12 @@ MultiUploader = Class.create({
 			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
 		}
 		
-		this.crtList = ajaxplorer.getFilesList();		
+		this.crtContext = ajaxplorer.getUserSelection();
 		this.addElement(formObject.select('.dialogFocus')[0]);
 		var rep = new Element('input', {
 			type:'hidden', 
 			name:'dir', 
-			value:this.crtList.getCurrentRep()
+			value:this.crtContext.getContextNode().getPath()
 		});
 		formObject.insert(rep);		
 		
@@ -331,7 +331,7 @@ MultiUploader = Class.create({
 			this.currentFileUploading = nextToSubmit.multi_index;
 			this.updateRowByIndex(this.currentFileUploading, 'loading');
 			var crtValue = $(nextToSubmit).getElementsBySelector('input[type="file"]')[0].value;
-			if(this.crtList.fileNameExists(crtValue))
+			if(this.crtContext.fileNameExists(crtValue))
 			{
 				overwrite = confirm(MessageHash[124]);
 				if(!overwrite){
@@ -343,9 +343,7 @@ MultiUploader = Class.create({
 		}
 		else
 		{
-			//modal.close();
-			//hideLightBox();
-			this.crtList.reload();
+			ajaxplorer.fireContextRefresh();
 		}
 		
 	}

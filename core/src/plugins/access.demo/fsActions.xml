@@ -27,17 +27,18 @@
 					var path;					
 					if(window.actionArguments && window.actionArguments.length>0){
 						path = window.actionArguments[0];
+						if(Object.isString(path)){
+							path = new AjxpNode(path, getBaseName(path));
+						}
 					}else{
-						userSelection = ajaxplorer.getFilesList().getUserSelection();
+						userSelection = ajaxplorer.getUserSelection();
 						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
-							path = userSelection.getUniqueFileName();
+							path = userSelection.getUniqueNode();
 						}
 					}
 					if(path){
-						ajaxplorer.getFoldersTree().goToDeepPath(path);
-						ajaxplorer.filesList.loadXmlList(path);
-						ajaxplorer.getActionBar().updateLocationBar(path);
-					}
+						ajaxplorer.updateContextData(path);
+					}						
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -55,7 +56,7 @@
 				{
 					modal.setCloseAction(function(){
 						$('closeFlashUploadBox').disabled=false;
-						ajaxplorer.filesList.reload();
+						ajaxplorer.fireContextRefresh();
 					});
 					modal.showDialogForm('Upload', 
 										'flash_upload_form', 
@@ -76,12 +77,12 @@
 						var rep = document.createElement('input');
 						rep.setAttribute('type', 'hidden');
 						rep.setAttribute('name', 'dir');
-						rep.setAttribute('value', ajaxplorer.getFilesList().getCurrentRep());
+						rep.setAttribute('value', ajaxplorer.getContextHolder().getContextNode().getCurrentPath());
 						oForm.appendChild(rep);
 					}.bind(ajaxplorer.actionBar);
 					
 					modal.setCloseAction(function(){						
-						ajaxplorer.filesList.reload();
+						ajaxplorer.fireContextRefresh();
 					});
 					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
 					
@@ -139,7 +140,7 @@
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-				    ajaxplorer.getFilesList().selectAll();
+				    ajaxplorer.getContextHolder().selectAll();
 				    ajaxplorer.actionBar.fireAction('delete');
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -155,7 +156,7 @@
 					modal.showDialogForm('Create', 'mkdir_form', null, function(){
 						var oForm = $(modal.getForm());	
 						var elementToCheck=(oForm['dirname']);
-						if(ajaxplorer.getFilesList().fileNameExists($(elementToCheck).getValue()))
+						if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
 						{
 							alert(MessageHash[125]);
 							return false;
@@ -186,7 +187,7 @@
 					modal.showDialogForm('Create', 'mkfile_form', null, function(){
 						var oForm = $(modal.getForm());	
 						var elementToCheck=(oForm['filename']);
-						if(ajaxplorer.getFilesList().fileNameExists($(elementToCheck).getValue()))
+						if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
 						{
 							alert(MessageHash[125]);
 							return false;
@@ -214,7 +215,7 @@ AJXP_MESSAGE[174]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection = ajaxplorer.getFilesList().getUserSelection();
+					var userSelection = ajaxplorer.getUserSelection();
 					if(userSelection.isUnique() && !userSelection.hasDir())
 					{
 						var downloadUrl = ajxpServerAccessPath+'?action=download';
@@ -255,7 +256,7 @@ AJXP_MESSAGE[174]<br/>
 					</clientForm>
 					<clientListener name="selectionChange"><![CDATA[
 					if(ajaxplorer){
-						var userSelection = ajaxplorer.getFilesList().getUserSelection();
+						var userSelection = ajaxplorer.getUserSelection();
 						var action = ajaxplorer.getActionBar().getActionByName("download");
 						if(zipEnabled){
 							if(action){
@@ -361,7 +362,7 @@ AJXP_MESSAGE[174]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-				   var userSelection = ajaxplorer.getFilesList().getUserSelection();
+				   var userSelection = ajaxplorer.getUserSelection();
 				   var fileNames = $A(userSelection.getFileNames());
 				   var connexion = new Connexion();
 				   connexion.addParameter('get_action', 'restore');
@@ -388,7 +389,7 @@ AJXP_MESSAGE[174]<br/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(newForm){		 		
-						var userSelection = ajaxplorer.getFilesList().getUserSelection();
+						var userSelection = ajaxplorer.getUserSelection();
 						userSelection.updateFormOrUrl(newForm, '');
 						var crtFileName = userSelection.getUniqueFileName();
 						newForm.filename_new.value = getBaseName(crtFileName);
@@ -454,12 +455,12 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					var onSubmit = function(){
 						var oForm = modal.getForm();
 						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						if(eDestLabel.value == ajaxplorer.filesList.getCurrentRep())
+						if(eDestLabel.value == ajaxplorer.getContextNode().getPath())
 						{
 							alert(MessageHash[183]);
 							return false;
 						}
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);				
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);				
 						this.treeCopyActive = false;
 						this.submitForm(oForm);
 						hideLightBox(true);
@@ -545,12 +546,12 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					var onSubmit = function(){
 						var oForm = modal.getForm();
 						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						if(eDestLabel.value == ajaxplorer.filesList.getCurrentRep())
+						if(eDestLabel.value == ajaxplorer.getContextNode().getPath())
 						{
 							alert(MessageHash[183]);
 							return false;
 						}
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);				
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);				
 						this.treeCopyActive = false;
 						this.submitForm(oForm);
 						hideLightBox(true);
@@ -580,7 +581,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					};
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
-						ajaxplorer.filesList.getUserSelection().updateFormOrUrl(oForm);
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						ajaxplorer.actionBar.submitForm(oForm);
 						hideLightBox(true);
 						return false;
@@ -601,7 +602,8 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
 					
 					var mp3Items = new Array();
-					$A(ajaxplorer.getFilesList().getItems()).each(function(rowItem){
+					$A(ajaxplorer.getContextHolder().getContextNode().getChildren()).each(function(nodeItem){
+						var rowItem = nodeItem.getMetadata();
 						var filename = rowItem.getAttribute('filename');
 						if(getFileExtension(filename) == 'mp3') mp3Items.push(filename);
 					});						
@@ -611,7 +613,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 						if(url != mp3Items.last()) mp3_url += '|';
 					});
 					newWin = window.open('', 'mp3_multi_player', 'width=260,height=30,directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no');
-					newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getFilesList().getCurrentRep()}));
+					newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getContextHolder().getContextNode().getPath()}));
 					newWin.document.close();
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>

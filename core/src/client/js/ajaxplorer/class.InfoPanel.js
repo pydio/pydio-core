@@ -40,6 +40,10 @@ InfoPanel = Class.create(AjxpPane, {
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();		
+		document.observe("ajaxplorer:context_refresh", this.update.bind(this) );
+		document.observe("ajaxplorer:selection_changed", this.update.bind(this) );
+		document.observe("ajaxplorer:context_changed", this.update.bind(this) );
+		document.observe("ajaxplorer:actions_loaded", this.load.bind(this) );
 	},
 	
 	setTemplateForMime: function(mimeType, templateString, attributes, messages){
@@ -59,23 +63,29 @@ InfoPanel = Class.create(AjxpPane, {
 	
 	update : function(){
 		if(!this.htmlElement) return;
-		var filesList = ajaxplorer.getFilesList();
-		var userSelection = filesList.getUserSelection();
+		var userSelection = ajaxplorer.getUserSelection();
 		if(userSelection.isEmpty())
 		{
-			var currentRep = getBaseName(filesList.getCurrentRep());
+			var currentRep;
+			if(userSelection.getContextNode()){
+				currentRep = getBaseName(userSelection.getContextNode().getPath());
+			}
 			if(currentRep == ""){
 				currentRep = $('repo_path').value;
 			}
-			var items = filesList.getItems();
+			var items = userSelection.getContextNode().getChildren();
 			var size = 0;
 			var folderNumber = 0;
 			var filesNumber = 0;
-			for(var i=0;i<items.length;i++){
-				if(items[i].getAttribute("is_file")=="0" || items[i].getAttribute("is_file")=="true") folderNumber++;
-				else filesNumber++;
-				if(items[i].getAttribute("bytesize") && items[i].getAttribute("bytesize")!=""){
-					size += parseInt(items[i].getAttribute("bytesize"));
+			for(var i=0;i<items.length;i++){				
+				if(!items[i].isLeaf()){
+					folderNumber++;
+				}else {
+					filesNumber++;
+				}
+				var itemData = items[i].getMetadata();
+				if(itemData.getAttribute("bytesize") && itemData.getAttribute("bytesize")!=""){
+					size += parseInt(itemData.getAttribute("bytesize"));
 				}
 			}
 			

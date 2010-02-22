@@ -40,10 +40,11 @@ FoldersTree = Class.create(AjxpPane, {
 		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:auto;height:100%;'});
 		oElement.insert(this.treeContainer);
 		disableTextSelection(this.treeContainer);
+		var thisObject = this;
 		var action = function(e){
 			if(!ajaxplorer) return;
-			ajaxplorer.focusOn(ajaxplorer.foldersTree);
-			ajaxplorer.foldersTree.clickNode(this.id);
+			ajaxplorer.focusOn(thisObject);
+			thisObject.clickNode(this.id);
 		};
 		
 		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, action, 'explorer');
@@ -69,6 +70,16 @@ FoldersTree = Class.create(AjxpPane, {
 		this.treeInDestMode = false;	
 		this._ajaxplorer = oAjaxplorer;	
 		this.hasFocus;
+		
+		document.observe("ajaxplorer:context_changed", function(event){
+			var path = event.memo.getContextNode().getPath();
+			this.goToDeepPath(path);
+		}.bind(this) );
+		
+		document.observe("ajaxplorer:context_refresh", function(event){
+			this.reloadCurrentNode();
+		}.bind(this) );
+		
 	},
 	
 	focus: function(){
@@ -108,10 +119,12 @@ FoldersTree = Class.create(AjxpPane, {
 		var path = webFXTreeHandler.all[nodeId].url;
 		if(path){
 			this.setCurrentNodeName(nodeId);
+			var label = getBaseName(path);
 			if(this.getCurrentNodeProperty("pagination_anchor")){
 				path = path + "#" + this.getCurrentNodeProperty("pagination_anchor");
 			}
-			ajaxplorer.actionBar.fireDefaultAction("dir", path);
+			var node = new AjxpNode(path, !webFXTreeHandler.all[nodeId].folder, label, webFXTreeHandler.all[nodeId].icon);
+			ajaxplorer.actionBar.fireDefaultAction("dir", node);
 		}
 	},
 		
@@ -144,15 +157,7 @@ FoldersTree = Class.create(AjxpPane, {
 		}
 		return null;
 	},
-	
-	setTreeInDestMode: function(){
-		this.treeInDestMode = true;
-	},
-	
-	setTreeInNormalMode: function(){
-		this.treeInDestMode = false;
-	},
-	
+		
 	openCurrentAndGoToNext: function(url){		
 		if(this.currentNodeName == null) return;
 		webFXTreeHandler.all[this.currentNodeName].expand();
@@ -238,6 +243,7 @@ FoldersTree = Class.create(AjxpPane, {
 		}
 		if(nodeName == this.getRootNodeId())
 		{
+			this.tree.doCollapse();
 			this.tree.reload();
 		}
 		else
