@@ -3,7 +3,7 @@
 //
 //	AjaXplorer
 //
-//	Copyright 2007-2008 Charles du Jeu - LGPL
+//	Copyright 2007-2010 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
 //	german translation: Philip Schädler <philip.schaedler@gmail.com>
@@ -351,16 +351,16 @@ $mess=array(
 "313" => "Komprimiere...",
 "314" => "Auswahl als zip komprimieren...",
 "315" => "Auswahl komprimieren nach",
-"316" => "Open with...",
-"open_with_access" => "O",
-"317" => "Source viewer",
-"318" => "CodePress source code viewer",
+"316" => "Öffnen mit...",
+"open_with_access" => "f",
+"317" => "Quelltextbetrachter",
+"318" => "CodePress Quelltextbetrachter",
 "319" => "HTML Editor",
-"320" => "WYSIWYG editor for HTML",
-"321" => "Select",
-"322" => "Select the current file",
-"323" => "E-mail this URL",
-"324" => "No editor available",
+"320" => "WYSIWYG Editor für HTML",
+"321" => "Auswählen",
+"322" => "Die aktuelle Datei auswählen",
+"323" => "URL per E-Mail",
+"324" => "Kein Editor verfügbar",
 /* END SENTENCE */
 );
 ?>
