@@ -32,7 +32,9 @@
  * 
  * Description : The grid displaying either a table of rows or a grid of thumbnail.
  */
-FilesList = Class.create(SelectableElements, {
+Class.create("FilesList", SelectableElements, {
+	
+	__implements : "IAjxpPane",
 
 	initialize: function($super, oElement, initDefaultDisp)
 	{
@@ -43,7 +45,7 @@ FilesList = Class.create(SelectableElements, {
 		
 		Event.observe(document, "ajaxplorer:user_logged", function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
-			disp = oUser.getPreference("display");
+			disp = ajaxplorer.user.getPreference("display");
 			if(disp && (disp == 'thumb' || disp == 'list'))
 			{
 				if(disp != this._displayMode) ajaxplorer.switchDisplayMode(disp);
@@ -95,6 +97,8 @@ FilesList = Class.create(SelectableElements, {
 		this.initGUI();			
 		Event.observe(document, "keydown", this.keydown.bind(this));		
 	},
+	
+	addPaneHeader : function(){},
 	
 	initGUI: function()
 	{
