@@ -1,4 +1,6 @@
 js/lib/prototype/prototype.js
+js/lib/prototype/prototype.oo.js
+js/ajaxplorer/interfaces/class.IAjxpPane.js
 js/ajaxplorer/class.AjxpPane.js
 js/ajaxplorer/class.AjxpNode.js
 js/lib/ufo/ufo.js
