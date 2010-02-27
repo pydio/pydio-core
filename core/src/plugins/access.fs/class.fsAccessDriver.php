@@ -454,7 +454,9 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($test = UserSelection::detectZip($dir)){
 					$liste = array();
 					$zip = $this->zipListing($test[0], $test[1], $liste);
-					AJXP_XMLWriter::header();
+					//AJXP_XMLWriter::header();
+					$metaData = array("ajxp_mime" => "ajxp_browsable_archive");
+					AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, $metaData);
 					$tmpDir = $this->getPath().dirname($test[0]).".tmpZipExtract";					
 					foreach ($liste as $zipEntry){
 						$metaData = array();
@@ -514,7 +516,12 @@ class fsAccessDriver extends AbstractAccessDriver
 				}					
 				$reps = $this->lsListing($path, $lsOptions, $offset, $limitPerPage);
 								
-				AJXP_XMLWriter::header();
+				//AJXP_XMLWriter::header();
+				$metaData = array();
+				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
+					$metaData["ajxp_mime"] = "ajxp_recycle";
+				}
+				AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, $metaData);
 				if(isSet($totalPages) && isSet($crtPage)){
 					AJXP_XMLWriter::renderPaginationData($countFiles, $crtPage, $totalPages);
 					if(!$lsOptions["f"]){
