@@ -32,7 +32,7 @@
  *
  * Description : Class for simple Ajax/HTML multiple download
  */
-MultiDownloader = Class.create({
+ Class.create("MultiDownloader", {
 	
 	initialize : function( list_target, downloadUrl ){
 

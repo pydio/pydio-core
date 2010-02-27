@@ -32,7 +32,7 @@
  * 
  * Description : Encapsulation of the Sortable Table
  */
-AjxpSortable = Class.create(SortableTable, {
+Class.create("AjxpSortable", SortableTable, {
 
 	initialize: function($super, oTable, oSortTypes, oTHead) {
 		$super(oTable, oSortTypes, oTHead);

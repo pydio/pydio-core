@@ -32,7 +32,7 @@
  * 
  * Description : Simple tab switcher
  */
-AjxpTabulator = Class.create(AjxpPane, {
+Class.create("AjxpTabulator", AjxpPane, {
 	initialize : function($super, htmlElement, tabulatorOptions){
 		$super(htmlElement);
 		this.tabulatorData = tabulatorOptions.tabInfos;		

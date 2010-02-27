@@ -32,7 +32,7 @@
  * 
  * Description : The main JavaScript class instantiated at startup.
  */
-Ajaxplorer = Class.create({
+Class.create("Ajaxplorer", {
 
 	initialize: function(loadRep, usersEnabled, loggedUser, repositoryId, repoListXML, defaultDisplay)
 	{	

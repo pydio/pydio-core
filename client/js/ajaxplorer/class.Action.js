@@ -32,7 +32,7 @@
  * 
  * Description : A "Command" object, encapsulating its callbacks, display attributes, etc.
  */
-Action = Class.create({
+Class.create("Action", {
 
 	__DEFAULT_ICON_PATH : "/images/crystal/actions/ICON_SIZE",
 	

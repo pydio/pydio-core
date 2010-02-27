@@ -32,7 +32,7 @@
  * 
  * Description : The Search Engine abstraction.
  */
-SearchEngine = Class.create(AjxpPane, {
+Class.create("SearchEngine", AjxpPane, {
 
 	htmlElement:undefined,
 	_inputBox:undefined,
