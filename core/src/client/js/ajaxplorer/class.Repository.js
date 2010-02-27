@@ -32,7 +32,7 @@
  * 
  * Description : Abstraction of a Repository.
  */
-Repository = Class.create({
+Class.create("Repository", {
 
 	id:undefined,
 	label:'No Repository',

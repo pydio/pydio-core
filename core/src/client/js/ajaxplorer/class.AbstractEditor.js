@@ -32,7 +32,7 @@
  * 
  * Description : Abstract container for editors.
  */
-AbstractEditor = Class.create({
+Class.create("AbstractEditor" , {
 	
 	defaultActions : new Hash({
 		'close':'<a id="closeButton"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>',

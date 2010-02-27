@@ -32,7 +32,7 @@
  * 
  * Description : The tree object. Encapsulate the webfx tree.
  */
-FoldersTree = Class.create(AjxpPane, {
+Class.create("FoldersTree", AjxpPane, {
 
 	initialize: function ($super, oElement, rootFolderName, rootFolderSrc, oAjaxplorer, dontLoad)
 	{

@@ -32,7 +32,7 @@
  * 
  * Description : AjaXplorer encapsulation of Ajax.Request
  */
-Connexion = Class.create({
+Class.create("Connexion", {
 
 	initialize: function(baseUrl)
 	{

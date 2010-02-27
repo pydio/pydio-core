@@ -32,7 +32,7 @@
  * 
  * Description : A dynamic panel displaying details on the current selection. Works with Templates.
  */
-InfoPanel = Class.create(AjxpPane, {
+Class.create("InfoPanel", AjxpPane, {
 
 	initialize: function($super, htmlElement){
 		$super(htmlElement);

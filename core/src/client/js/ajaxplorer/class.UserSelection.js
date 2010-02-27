@@ -32,7 +32,7 @@
  * 
  * Description : Selection Model.
  */
-UserSelection = Class.create({
+Class.create("UserSelection", {
 
 	_currentRep: undefined, 
 	_selectedItems: undefined,

@@ -32,7 +32,7 @@
  * 
  * Description : Manage background tasks and display their state.
  */
-BackgroundManager = Class.create({
+Class.create("BackgroundManager", {
 	queue: $A([]),
 	initialize:function(actionManager){
 		this.actionManager = actionManager;

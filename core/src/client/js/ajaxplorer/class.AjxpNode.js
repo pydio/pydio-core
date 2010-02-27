@@ -32,7 +32,7 @@
  * 
  * Description : Abstract container for data
  */
-AjxpNode = Class.create({
+Class.create("AjxpNode", {
 	initialize : function(path, isLeaf, label, icon){
 		this._path = path;
 		this._isLeaf = isLeaf || false;

@@ -32,7 +32,7 @@
  * 
  * Description : Abstraction of the currently logged user.
  */
-User = Class.create({
+Class.create("User", {
 
 	id : undefined,
 	activeRepository:undefined,

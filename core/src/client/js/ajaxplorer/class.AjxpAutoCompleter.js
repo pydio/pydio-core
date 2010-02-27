@@ -32,7 +32,7 @@
  * 
  * Description : Encapsulation of the Autocompleter for AjaXplorer purposes.
  */
-AjxpAutocompleter = Class.create(Autocompleter.Base, {
+Class.create("AjxpAutocompleter", Autocompleter.Base, {
   initialize: function(element, update, url, options) {
     this.baseInitialize(element, update, options);
     this.options.asynchronous  = true;

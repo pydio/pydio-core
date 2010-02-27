@@ -32,7 +32,7 @@
  * 
  * Description : Singleton that manages all actions, but also the action bar display.
  */
-ActionsManager = Class.create(AjxpPane, {
+Class.create("ActionsManager", AjxpPane, {
 
 	initialize: function($super, oElement, bUsersEnabled, oUser, oAjaxplorer)
 	{

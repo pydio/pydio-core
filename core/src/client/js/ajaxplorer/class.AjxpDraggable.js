@@ -60,7 +60,7 @@ Event.observe(window, "unload", function(){
 });
 
 
-var AjxpDraggable = Class.create(Draggable, {
+Class.create("AjxpDraggable", Draggable, {
 	
 	initialize: function($super, element, options, component, componentType){		
 		$(element).addClassName('ajxp_draggable');
