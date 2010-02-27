@@ -82,6 +82,16 @@ Class.create("AjxpNode", {
 	inZip : function(){
 		
 	},
+	hasAjxpMimeInBranch: function(ajxpMime){
+		if(this.getAjxpMime() == ajxpMime) return true;
+		var parent;
+		while(parent = this._parentNode){
+			if(parent.getAjxpMime() == ajxpMime){
+				return true;
+			}
+		}
+		return false;
+	},	
 	setParent : function(parentNode){
 		this._parentNode = parentNode;
 	},
@@ -89,8 +99,8 @@ Class.create("AjxpNode", {
 		return (this._parentNode?false:true);
 	},
 	getAjxpMime : function(){
-		if(this.isRoot()) return "ajxp_root";
-		if(this._metadata && this._metadata["ajxp_mime"]) return this._metadata["ajxp_mime"];		
+		//if(this.isRoot()) return "ajxp_root";
+		if(this._metadata && this._metadata.get("ajxp_mime")) return this._metadata.get("ajxp_mime");		
 		if(this._metadata && this.isLeaf()) return getAjxpMimeType(this._metadata);
 		return "";
 	}

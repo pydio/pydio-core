@@ -1,6 +1,7 @@
 js/lib/prototype/prototype.js
 js/lib/prototype/prototype.oo.js
 js/ajaxplorer/interfaces/class.IAjxpPane.js
+js/ajaxplorer/interfaces/class.IAjxpNodeProvider.js
 js/ajaxplorer/class.AjxpPane.js
 js/ajaxplorer/class.AjxpNode.js
 js/lib/ufo/ufo.js
@@ -27,6 +28,7 @@ js/ajaxplorer/class.Connexion.js
 js/ajaxplorer/ajxp_utils.js
 js/ajaxplorer/class.User.js
 js/ajaxplorer/class.ResourcesManager.js
+js/ajaxplorer/class.RemoteNodeProvider.js
 js/ajaxplorer/class.Repository.js
 js/ajaxplorer/class.AjxpDraggable.js
 js/ajaxplorer/class.AjxpSortable.js

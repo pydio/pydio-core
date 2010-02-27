@@ -21,6 +21,9 @@ Class.create = function () {
 
 	function klass() {
 		this.initialize.apply(this, arguments);
+		if(toImplement.length){
+			this.__implements = toImplement;
+		}
 	}
 
 	Object.extend(klass, Class.Methods);
@@ -32,6 +35,10 @@ Class.create = function () {
 		subclass.prototype = parent.prototype;
 		klass.prototype = new subclass;
 		parent.subclasses.push(klass);
+		if(parent.__implements){
+			if(!klass.__implements) klass.__implements = [];
+			klass.__implements = klass.__implements.concat(parent.__implements);
+		}
 	}
 	for (var i = 0; i < properties.length; i++)
 	klass.addMethods(properties[i]);
@@ -79,6 +86,12 @@ Class.getByInterface = function(interfaceName){
 		}
 	}	
 	return found;
+};
+Class.objectImplements = function(objectOrClass, interfaceName){
+	if(objectOrClass.__implements && $A(objectOrClass.__implements).find(function(value){return (value == interfaceName);})){
+		return true;
+	}
+	return false;
 };
 
 var Interface = (function() {
