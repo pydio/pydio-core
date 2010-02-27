@@ -1,4 +1,4 @@
-ResourcesManager = Class.create({
+Class.create("ResourcesManager", {
 	initialize : function(){
 		this.mainFormContainerId = 'all_forms';
 		this.resources = {};

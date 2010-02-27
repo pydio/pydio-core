@@ -42,7 +42,7 @@
  * 
  * Description : Class for simple Ajax/HTML multiple upload
  */
-MultiUploader = Class.create({
+Class.create("MultiUploader", {
 	
 	
 	initialize : function( formObject, max ){

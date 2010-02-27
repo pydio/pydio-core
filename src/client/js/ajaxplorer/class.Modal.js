@@ -32,7 +32,7 @@
  * 
  * Description : Encapsulation of the lightbox script for modal windows.
  */
-Modal = Class.create({
+Class.create("Modal", {
 
 	pageLoading: true,
 	initialize: function(){

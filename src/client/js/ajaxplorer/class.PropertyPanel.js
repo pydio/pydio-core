@@ -32,7 +32,7 @@
  * 
  * Description : A dynamic panel displaying details on the current file.
  */
-PropertyPanel = Class.create({
+Class.create("PropertyPanel", {
 
 	initialize: function(userSelection, htmlElement){
 		this.rights = ['4', '2', '1'];

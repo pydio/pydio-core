@@ -32,7 +32,7 @@
  * 
  * Description : A simple form generator (for the MySql plugin)
  */
-FormManager = Class.create({
+Class.create("FormManager", {
 		
 	initialize: function(){
 		

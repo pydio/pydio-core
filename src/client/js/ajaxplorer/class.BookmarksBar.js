@@ -32,7 +32,7 @@
  * 
  * Description : Manages the display of the bookmarks menus.
  */
-var BookmarksBar = Class.create({
+ Class.create("BookmarksBar", {
 	
 	initialize: function($super){
 		this.oElement = $('bmbar_content');
