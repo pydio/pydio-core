@@ -543,11 +543,12 @@ Class.create("ActionsManager", AjxpPane, {
 		var crtIsRoot = false;
 		var crtMime;
 		
-		if(ajaxplorer && ajaxplorer.foldersTree){ 
-			crtRecycle = ajaxplorer.foldersTree.currentIsRecycle();
-			crtInZip = ajaxplorer.foldersTree.currentInZip();
-			crtIsRoot = ajaxplorer.foldersTree.currentIsRoot();
-			crtMime = ajaxplorer.foldersTree.getCurrentNodeMime();
+		if(ajaxplorer && ajaxplorer.getContextNode()){ 
+			var crtNode = ajaxplorer.getContextNode();
+			crtRecycle = (crtNode.getAjxpMime() == "ajxp_recycle");
+			crtInZip = crtNode.hasAjxpMimeInBranch("ajxp_browsable_archive");
+			crtIsRoot = crtNode.isRoot();
+			crtMime = crtNode.getAjxpMime();			
 		}	
 		this.actions.each(function(pair){			
 			pair.value.fireContextChange(this.usersEnabled, 
@@ -741,6 +742,9 @@ Class.create("ActionsManager", AjxpPane, {
 	
 	updateLocationBar: function (newPath)
 	{
+		if(newPath == ""){
+			newPath = "/";
+		}
 		$('current_path').value = newPath;
 	},
 	
