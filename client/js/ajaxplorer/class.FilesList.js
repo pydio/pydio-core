@@ -62,8 +62,11 @@ Class.create("FilesList", SelectableElements, {
 		}.bind(this)  );
 		document.observe("ajaxplorer:context_changed", function(event){
 			var path = event.memo.getContextNode().getPath();
-			this.loadXmlList(path);
+			this.fill(event.memo.getContextNode());
+			//this.loadXmlList(path);
 		}.bind(this) );
+		document.observe("ajaxplorer:context_loading", this.setOnLoad.bind(this));
+		document.observe("ajaxplorer:context_loaded", this.removeOnLoad.bind(this));
 		document.observe("ajaxplorer:display_switched", function(event){
 			this.switchDisplayMode(event.memo);
 		}.bind(this) );
@@ -576,6 +579,71 @@ Class.create("FilesList", SelectableElements, {
 		}
 		*/
 		ajaxplorer.updateHistory(contextNode.getPath());
+		if(this._displayMode == "list" && (!this.paginationData || !this.paginationData.get('remote_order')))
+		{
+			this._sortableTable.sortColumn = -1;
+			this._sortableTable.updateHeaderArrows();
+		}
+		if(this._pendingFile)
+		{
+			if(typeof this._pendingFile == 'string')
+			{
+				this.selectFile(this._pendingFile);
+			}else if(this._pendingFile.length){
+				for(var f=0;f<this._pendingFile.length; f++){
+					this.selectFile(this._pendingFile[f], true);
+				}
+			}
+			this.hasFocus = true;
+			this._pendingFile = null;
+		}	
+		if(this.hasFocus){
+			ajaxplorer.focusOn(this);
+		}
+		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
+	},
+	
+	fill: function(contextNode){
+		this.imagesHash = new Hash();
+		if(this.protoMenu){
+			this.protoMenu.removeElements('.ajxp_draggable');
+			this.protoMenu.removeElements('#selectable_div');
+		}
+		for(var i = 0; i< AllAjxpDroppables.length;i++){
+			var el = AllAjxpDroppables[i];
+			if(this.isItem(el)){
+				Droppables.remove(AllAjxpDroppables[i]);
+				delete(AllAjxpDroppables[i]);
+			}
+		}
+		for(i = 0;i< AllAjxpDraggables.length;i++){
+			if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
+				Element.remove(AllAjxpDraggables[i].element);
+			}			
+		}
+		AllAjxpDraggables = $A([]);
+				
+		var items = this.getSelectedItems();
+		var setItemSelected = this.setItemSelected.bind(this);
+		for(var i=0; i<items.length; i++)
+		{
+			setItemSelected(items[i], false);
+		}
+		this.removeCurrentLines();
+		var parseXmlNodeFunc;
+		if(this._displayMode == "list") parseXmlNodeFunc = this.xmlNodeToTableRow.bind(this);
+		else parseXmlNodeFunc = this.xmlNodeToDiv.bind(this);
+		// NOW PARSE LINES
+		this.parsingCache = new Hash();		
+		var children = contextNode.getChildren();
+		for (var i = 0; i < children.length ; i++) 
+		{
+			var child = children[i];
+			var newItem = parseXmlNodeFunc(child.getMetadata().get("XML_NODE"));
+			newItem.ajxpNode = child;
+		}	
+		this.initRows();
+		
 		if(this._displayMode == "list" && (!this.paginationData || !this.paginationData.get('remote_order')))
 		{
 			this._sortableTable.sortColumn = -1;

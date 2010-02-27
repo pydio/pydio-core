@@ -83,8 +83,8 @@ Class.create("InfoPanel", AjxpPane, {
 					filesNumber++;
 				}
 				var itemData = items[i].getMetadata();
-				if(itemData.getAttribute("bytesize") && itemData.getAttribute("bytesize")!=""){
-					size += parseInt(itemData.getAttribute("bytesize"));
+				if(itemData.get("bytesize") && itemData.get("bytesize")!=""){
+					size += parseInt(itemData.get("bytesize"));
 				}
 			}
 			

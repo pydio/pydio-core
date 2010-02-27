@@ -55,6 +55,22 @@ Class.create("UserSelection", {
 		this._bEmpty = true;
 	},
 	
+	setAjxpNodeProvider : function(iAjxpNodeProvider){
+		this._iAjxpNodeProvider = iAjxpNodeProvider;
+	},
+	
+	requireContextChange : function(ajxpNodeOrPath){
+		var path;
+		if(Object.isString(ajxpNodeOrPath)){
+			path = ajxpNodeOrPath;
+		}else{
+			path = ajxpNodeOrPath.getPath();
+		}
+		this._iAjxpNodeProvider.loadNode(path, function(node){
+			this.setContextNode(node);
+		}.bind(this) );
+	},
+	
 	setRootNode : function(ajxpRootNode){
 		this._rootNode = ajxpRootNode;
 		document.fire("ajaxplorer:root_node_changed", this._rootNode);
@@ -111,7 +127,7 @@ Class.create("UserSelection", {
 				
 				var meta = selectedNode.getMetadata();
 				this._selectedItems.push(meta); // Backward compat
-				if(meta.getAttribute('is_recycle') && meta.getAttribute('is_recycle') == '1') this._isRecycle = true;
+				if(meta.get('is_recycle') && meta.get('is_recycle') == '1') this._isRecycle = true;
 			}
 		}
 		document.fire("ajaxplorer:selection_changed", this);	
@@ -169,7 +185,7 @@ Class.create("UserSelection", {
 		mimeTypes.each(function(mime){
 			if(has) return;
 			has = selectedItems.any(function(item){
-				return (getAjxpMimeType(item) == mime);
+				return (getAjxpMimeType(item.get("XML_NODE")) == mime);
 			});
 		});
 		return has;
@@ -223,7 +239,7 @@ Class.create("UserSelection", {
 		for(i=0;i<allItems.length;i++)
 		{
 			var meta = allItems[i].getMetadata();
-			var crtFileName = getBaseName(meta.getAttribute('filename'));
+			var crtFileName = getBaseName(meta.get('filename'));
 			if(crtFileName && crtFileName.toLowerCase() == getBaseName(newFileName).toLowerCase()) 
 				return true;
 		}

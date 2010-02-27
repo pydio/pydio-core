@@ -42,6 +42,7 @@ Class.create("Ajaxplorer", {
 		this._initLoggedUser = loggedUser;
 		this._initRepositoriesList = $H({});
 		this._contextHolder = new UserSelection();
+		this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		this._displayMode = 'list';
 		if(repoListXML && repoListXML.childNodes.length){
 			for(j=0;j<repoListXML.documentElement.childNodes.length;j++)
@@ -68,7 +69,8 @@ Class.create("Ajaxplorer", {
 	
 	updateContextData : function(ajxpContextNode, ajxpSelectedNodes, selectionSource){
 		if(ajxpContextNode){
-			this._contextHolder.setContextNode(ajxpContextNode);
+			//this._contextHolder.setContextNode(ajxpContextNode);
+			this._contextHolder.requireContextChange(ajxpContextNode);
 		}
 		if(ajxpSelectedNodes){
 			this._contextHolder.setSelectedNodes(ajxpSelectedNodes, selectionSource);
@@ -213,6 +215,9 @@ Class.create("Ajaxplorer", {
 		if(!Prototype.Browser.WebKit && !Prototype.Browser.IE){
 			this.history = new Proto.History(function(hash){
 				this.goTo(this.historyHashToPath(hash));
+			}.bind(this));
+			document.observe("ajaxplorer:context_changed", function(event){
+				this.updateHistory(this.getContextNode().getPath());
 			}.bind(this));
 		}
 		modal.updateLoadingProgress('ActionBar Initialized');
