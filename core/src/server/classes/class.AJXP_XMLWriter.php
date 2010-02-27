@@ -64,7 +64,14 @@ class AJXP_XMLWriter
 		AJXP_XMLWriter::write($string, true);
 	}
 	
-	function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array()){
+	function renderHeaderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array()){
+		header('Content-Type: text/xml; charset=UTF-8');
+		header('Cache-Control: no-cache');
+		print('<?xml version="1.0" encoding="UTF-8"?>');
+		AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData, false);
+	}
+	
+	function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true){
 		$string = "<tree";
 		$metaData["filename"] = $nodeName;
 		$metaData["text"] = $nodeLabel;
@@ -72,7 +79,11 @@ class AJXP_XMLWriter
 		foreach ($metaData as $key => $value){
 			$string .= " $key=\"$value\"";
 		}
-		$string .= "/>";
+		if($close){
+			$string .= "/>";
+		}else{
+			$string .= ">";
+		}
 		AJXP_XMLWriter::write($string, true);
 	}
 	
