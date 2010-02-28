@@ -17,42 +17,34 @@
 </div>
 
 <div id="browser">
-	<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal,initB:200,minB:24,maxB:500}">
-		<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:50}">
-			<div id="topPane" ajxpClass="FoldersTree" ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>		
-	    	<div id="bottomSplitPane" ajxpClass="AjxpTabulator" style="border: 1px solid #676965;">
-		    	<div id="search_container" ajxpClass="SearchEngine"></div>
-		    	<div id="info_panel" ajxpClass="InfoPanel"></div>
+	<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:50}">
+		<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initB:200,minB:24,maxB:500}">
+			<div id="topPane" ajxpClass="FoldersTree" ajxpOptions="{}" ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>		
+	    	<div id="bottomSplitPane" ajxpClass="AjxpTabulator" style="border: 1px solid #676965;" ajxpOptions="{defaultTabId : 'info',tabInfos : [{id:'info',label:'131',icon:'file_info.png',element:'info_panel'},{id:'search',label:'87',icon:'search.png',element:'search_container'}]}">
+		    	<div id="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"></div>
+		    	<div id="info_panel" ajxpClass="InfoPanel" ajxpOptions="{}"></div>
 	    	</div>    	
 	    </div>
-		<div id="content_pane" ajxpClass="FilesList" style="border: 1px solid #676965; background-color: #fff;"></div>	
+		<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965; background-color: #fff;"></div>	
 	</div>
 </div>
 
 <div id="autocomplete_choices" class="autocomplete" style="position:absolute; display:none;"></div>
 <script type="text/javascript">
-try{
-	var marginBottom = (Prototype.Browser.IE?4:3);
-	if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
-		marginBottom = $('optional_bottom_div').getHeight();
+document.observe("ajaxplorer:before_gui_load", function(e){
+	try{
+		var marginBottom = (Prototype.Browser.IE?4:3);
+		if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
+			marginBottom = $('optional_bottom_div').getHeight();
+		}
+		if($("vertical_splitter")){
+			fitHeightToBottom($("vertical_splitter"), window, marginBottom);
+			if(Prototype.Browser.IE){
+				fitHeightToBottom($("content_pane"), $('vertical_splitter'));
+			}			
+		}
+	}catch(e){
+		alert('Error on loading (gui_tpl l.128)' + e);
 	}
-	fitHeightToBottom($("vertical_splitter"), window, marginBottom);	
-	if(Prototype.Browser.IE){
-		fitHeightToBottom($("content_pane"), $('vertical_splitter'));
-	}
-	var sideSplit = new Splitter('sidebar_splitter',{direction: "horizontal",initB: 200, minB:24, maxB:500});				
-	var splitter = new Splitter('vertical_splitter', {direction: "vertical", initA: 200, maxA:600, minA:50});
-		
-	var tabulatorData = {
-		defaultTabId : 'info',
-		tabInfos : [
-			{id:'info',label:'131',icon:'file_info.png',element:'info_panel'},
-			{id:'search',label:'87',icon:'search.png',element:'search_container'}]	
-	};
-	var tabu = new AjxpTabulator($('bottomSplitPane'), tabulatorData);	
-	
-}catch(e){
-	alert('Error on loading (gui_tpl l.128)' + e);
-}
-
+});
 </script>

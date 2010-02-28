@@ -69,7 +69,6 @@ Class.create("Ajaxplorer", {
 	
 	updateContextData : function(ajxpContextNode, ajxpSelectedNodes, selectionSource){
 		if(ajxpContextNode){
-			//this._contextHolder.setContextNode(ajxpContextNode);
 			this._contextHolder.requireContextChange(ajxpContextNode);
 		}
 		if(ajxpSelectedNodes){
@@ -82,7 +81,7 @@ Class.create("Ajaxplorer", {
 	},
 	
 	getContextNode : function(){
-		return this._contextHolder.getContextNode();
+		return this._contextHolder.getContextNode() || new AjxpNode("");
 	},
 	
 	getUserSelection : function(){
@@ -90,7 +89,12 @@ Class.create("Ajaxplorer", {
 	},		
 	
 	fireContextRefresh : function(){
-		document.fire("ajaxplorer:context_refresh");
+		this.getContextHolder().requireContextChange(this.getContextNode(), true);
+	},
+	
+	fireContextUp : function(){
+		if(this.getContextNode().isRoot()) return;
+		this.updateContextData(this.getContextNode().getParent());
 	},
 	
 	initEditorsRegistry : function(){
@@ -151,6 +155,7 @@ Class.create("Ajaxplorer", {
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_template');
 		connexion.onComplete = function(transport){
+			transport.responseText.evalScripts();
 			$(document.body).insert({top:transport.responseText});
 		};
 		connexion.addParameter('template_name', 'gui_tpl.html');
@@ -226,22 +231,42 @@ Class.create("Ajaxplorer", {
 		/*********************
 		/* USER GUI
 		/*********************/
-		this.infoPanel = new InfoPanel("info_panel");		
+		this.buildGUI($('browser'));
+		document.fire("ajaxplorer:before_gui_load");
+		// Rewind components creation!
+		var lastInst;
+		if(this.guiCompRegistry && this.guiCompRegistry.length){
+			for(var i=this.guiCompRegistry.length;i>0;i--){
+				var el = this.guiCompRegistry[i-1];
+				var ajxpId = el.ajxpId;
+				this.guiCompRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
+				window[ajxpId] = this.guiCompRegistry[i-1];
+				lastInst = this.guiCompRegistry[i-1];
+			}
+			if(lastInst){
+				lastInst.resize();
+			}
+			for(var j=0;j<this.guiCompRegistry.length;j++){
+				var obj = this.guiCompRegistry[j];
+				if(Class.objectImplements(obj, "IFocusable")){
+					obj.setFocusBehaviour();
+					this._focusables.push(obj);
+				}
+				if(Class.objectImplements(obj, "IContextMenuable")){
+					obj.setContextualMenu(this.contextMenu);
+				}
+			}
+		}
+		document.fire("ajaxplorer:gui_loaded");
+		modal.updateLoadingProgress('GUI Initialized');
+		/*
 		this.foldersTree = new FoldersTree($('topPane'), 'No Repository', ajxpServerAccessPath+'?get_action=ls&options=dz', this);
-		this.sEngine = new SearchEngine("search_container");
-		this.filesList = new FilesList($("content_pane"),this._initDefaultDisp);
-		
-		this.foldersTree.setContextualMenu(this.contextMenu);
-		this.filesList.setContextualMenu(this.contextMenu);				
-		
-		this.foldersTree.setFocusBehaviour();
-		this.filesList.setFocusBehaviour();
-		this._focusables.push(this.foldersTree);
-		this._focusables.push(this.filesList);
+		this.filesList = new FilesList($("content_pane"),this._initDefaultDisp);		
+		*/
 
 		modal.updateLoadingProgress('GUI Initialized');				
 		this.initTabNavigation();
-		this.focusOn(this.foldersTree);
+		//this.focusOn(this.foldersTree);
 		this.blockShortcuts = false;
 		this.blockNavigation = false;
 		modal.updateLoadingProgress('Navigation loaded');
@@ -270,6 +295,24 @@ Class.create("Ajaxplorer", {
 		}		
 	},
 
+	buildGUI : function(domNode){
+		if(domNode.nodeType != 1) return;
+		if(!this.guiCompRegistry) this.guiCompRegistry = $A([]);
+		var ajxpClassName = domNode.readAttribute("ajxpClass") || "";
+		var ajxpClass = Class.getByName(ajxpClassName);
+		var ajxpId = domNode.readAttribute("id") || "";
+		if(domNode.readAttribute("ajxpOptions")){
+			var ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
+		}		
+		if(ajxpClass && ajxpOptions && ajxpId){
+			//window[ajxpId] = new ajxpClass(domNode, ajxpOptions);			
+			this.guiCompRegistry.push({ajxpId:ajxpId, ajxpNode:domNode, ajxpClass:ajxpClass, ajxpOptions:ajxpOptions});
+		}		
+		$A(domNode.childNodes).each(function(node){
+			this.buildGUI(node);
+		}.bind(this) );
+	},
+	
 	
 	tryLogUserFromCookie : function(){
 		var connexion = new Connexion();
@@ -366,6 +409,7 @@ Class.create("Ajaxplorer", {
 		var sEngineName = repository.getSearchEngine();
 		
 		var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
+		rootNode.setRoot();
 		this._contextHolder.setRootNode(rootNode);
 				
 		if(!this._initObj) { 
@@ -484,7 +528,6 @@ Class.create("Ajaxplorer", {
 	},	
 			
 	cancelCopyOrMove: function(){
-		this.foldersTree.selectCurrentNodeName();
 		this.actionBar.treeCopyActive = false;
 		hideLightBox();
 		return false;
@@ -523,11 +566,7 @@ Class.create("Ajaxplorer", {
 	getActionBar: function(){
 		return this.actionBar;
 	},
-		
-	getFoldersTree: function(){
-		return this.foldersTree;
-	},
-	
+			
 	displayMessage: function(messageType, message){		
 		modal.displayMessage(messageType, message);
 	},

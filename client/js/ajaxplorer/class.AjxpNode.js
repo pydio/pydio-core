@@ -35,28 +35,94 @@
 Class.create("AjxpNode", {
 	initialize : function(path, isLeaf, label, icon){
 		this._path = path;
+		if(this._path && this._path.length){
+			if(this._path[this._path.length-1] == "/"){
+				this._path = this._path.substring(0, this._path.length-1);
+			}
+		}
+		this._metadata = $H();
 		this._isLeaf = isLeaf || false;
 		this._label = label || '';
 		this._icon = icon || '';
 		this._children = $A([]);
+		this._isRoot = false;
+		
+		this._isLoaded = false;
+		this.fake = false;
+		
+	},
+	isLoaded : function(){
+		return this._isLoaded;
+	},
+	setLoaded : function(bool){
+		this._isLoaded = bool;
+	},
+	load : function(iAjxpNodeProvider){		
+		if(!iAjxpNodeProvider){
+			iAjxpNodeProvider = new RemoteNodeProvider();
+		}
+		if(this._isLoaded){
+			this.notify("loaded");
+			return;
+		}
+		iAjxpNodeProvider.loadNode(this, function(node){
+			this._isLoaded = true;			
+			this.notify("loaded");
+		}.bind(this));
+	},
+	reload : function(iAjxpNodeProvider){
+		this._children.each(function(child){
+			this.removeChild(child);
+		}.bind(this));
+		this._isLoaded = false;
+		this.load(iAjxpNodeProvider);
+	},
+	setRoot : function(){
+		this._isRoot = true;
 	},
 	setChildren : function(ajxpNodes){
-		this._children = $A(ajxpDataNodes);
-		this._children.each.invoke('setParent', this);
+		this._children = $A(ajxpNodes);
+		this._children.invoke('setParent', this);
 	},
 	getChildren : function(){
 		return this._children;
 	},
 	addChild : function(ajxpNode){
-		this._children.push(ajxpNode);
 		ajxpNode.setParent(this);
+		if(existingNode = this.findChildByPath(ajxpNode.getPath())){
+			existingNode.replaceBy(ajxpNode);
+		}else{
+			this._children.push(ajxpNode);
+			this.notify("node_added", ajxpNode.getPath());
+		}
 	},
 	removeChild : function(ajxpNode){
+		var removePath = ajxpNode.getPath();
 		for(i=0;i<this._children.length;i++){
 			if(ajxpNode == this._children[i]){
 				this._children.splice(i, 1);
 			}
 		}
+		this.notify("node_removed", removePath);
+	},
+	replaceBy : function(ajxpNode){
+		this._isLeaf = ajxpNode._isLeaf;
+		this._label = ajxpNode._label;
+		this._icon = ajxpNode._icon;
+		this._isRoot = ajxpNode._isRoot;
+		this._isLoaded = ajxpNode._isLoaded;
+		this.fake = ajxpNode.fake;
+		this.setChildren(ajxpNode.getChildren());
+		var meta = ajxpNode.getMetadata();		
+		meta.each(function(pair){
+			this._metadata.set(pair.key, pair.value);
+		}.bind(this) );
+		this.notify("node_replaced", this.getPath());		
+	},
+	findChildByPath : function(path){
+		return $A(this._children).find(function(child){
+			return (child.getPath() == path);
+		});
 	},
 	setMetadata : function(data){
 		this._metadata = data;
@@ -84,24 +150,48 @@ Class.create("AjxpNode", {
 	},
 	hasAjxpMimeInBranch: function(ajxpMime){
 		if(this.getAjxpMime() == ajxpMime) return true;
-		var parent;
-		while(parent = this._parentNode){
-			if(parent.getAjxpMime() == ajxpMime){
-				return true;
-			}
+		var parent, crt = this;
+		while(parent =crt._parentNode){
+			if(parent.getAjxpMime() == ajxpMime){return true;}
+			crt = parent;
 		}
 		return false;
 	},	
 	setParent : function(parentNode){
 		this._parentNode = parentNode;
 	},
+	getParent : function(){
+		return this._parentNode;
+	},
+	findInArbo : function(rootNode, fakeNodes){
+		if(!this.getPath()) return;
+		var pathParts = this.getPath().split("/");
+		var parentNodes = $A();
+		var crtPath = "";
+		var crtNode, crtParentNode = rootNode;
+		for(var i=0;i<pathParts.length;i++){
+			if(pathParts[i] == "") continue;
+			crtPath = crtPath + "/" + pathParts[i];
+			if(node = crtParentNode.findChildByPath(crtPath)){
+				crtNode = node;
+			}else{
+				crtNode = new AjxpNode(crtPath, false, getBaseName(crtPath));
+				crtNode.fake = true;
+				fakeNodes.push(crtNode);
+				crtParentNode.addChild(crtNode);
+			}
+			crtParentNode = crtNode;
+		}
+		return crtNode;
+	},
 	isRoot : function(){
-		return (this._parentNode?false:true);
+		return this._isRoot;
 	},
 	getAjxpMime : function(){
-		//if(this.isRoot()) return "ajxp_root";
 		if(this._metadata && this._metadata.get("ajxp_mime")) return this._metadata.get("ajxp_mime");		
 		if(this._metadata && this.isLeaf()) return getAjxpMimeType(this._metadata);
 		return "";
 	}
 });
+
+Object.Event.extend(AjxpNode);

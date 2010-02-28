@@ -71,7 +71,7 @@ var webFXTreeConfig = {
 	defaultAction   : function(e){},
 	defaultBehavior : 'classic',
 	zipRegexp		: new RegExp(/\.zip$/),
-	usePersistence	: true
+	usePersistence	: false
 };
 
 var webFXTreeHandler = {
@@ -170,9 +170,14 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	if(!node.action && node.parentNode.action){
 		node.action = node.parentNode.action;
 	}
-	if(this.ajxpNode){
-		node.ajxpNode = new AjxpNode(node.url, false, node.text, node.icon);		
-		this.ajxpNode.addChild(node.ajxpNode);
+	if(this.ajxpNode){		
+		/*
+		this.ajxpNode.observe("node_added", function(path){
+			var treeNode = new WebFXTreeItem(getBaseName(path));
+			treeNode.ajxpNode = this.ajxpNode.findChildByPath(path);
+			//this.add(treeNode);
+		}.bind(this));
+		*/
 	}
 	
 	this.childNodes[this.childNodes.length] = node;
