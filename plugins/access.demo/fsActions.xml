@@ -482,8 +482,8 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<clientListener name="contextChange"><![CDATA[
 				if(ajaxplorer){
 					var action = ajaxplorer.getActionBar().getActionByName("copy");
-					if(action && ajaxplorer.foldersTree){
-						if(ajaxplorer.foldersTree.currentInZip()){
+					if(action){
+						if(ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive");){
 							action.setLabel(247, 248);
 							action.setIconSrc('ark_extract.png');
 						}else{
@@ -574,7 +574,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){
 				    	var message = MessageHash[177];
-				    	if(ajaxplorer.foldersTree.recycleEnabled() && !ajaxplorer.foldersTree.currentIsRecycle()){
+				    	if(ajaxplorer.getContextNode().getAjxpMime() == "ajxp_recycle"){
 				    		message = MessageHash[176];
 				    	}
 		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
