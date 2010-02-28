@@ -33,6 +33,10 @@
  * 
  * Description : The most used and standard plugin : FileSystem access
  */
+
+// This is used to catch exception while downloading
+function download_exception_handler($exception){}
+
 class fsAccessDriver extends AbstractAccessDriver 
 {
 	/**
@@ -800,10 +804,11 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		session_write_close();
         global $G_PROBE_REAL_SIZE;
-		if(!$data){
-			$test = fopen($filePathOrData, "r");
-			if($test) fclose($test);
-		}
+
+        set_exception_handler(download_exception_handler);
+        set_error_handler(download_exception_handler);
+        // required for IE, otherwise Content-disposition is ignored
+        if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off'); }
 
 		$isFile = !$data && !$gzip; 
         if (!$G_PROBE_REAL_SIZE || ini_get('safe_mode'))
@@ -894,6 +899,16 @@ class fsAccessDriver extends AbstractAccessDriver
 					header("Cache-Control: max_age=0");
 					header("Pragma: public");
 				}
+
+                // IE8 is dumb
+				if (preg_match('/ MSIE 8/',$_SERVER['HTTP_USER_AGENT']))
+                {
+                    header("Pragma: public");
+                    header("Expires: 0");
+                    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+                    header("Cache-Control: private",false);
+//                    header("Content-Type: application/octet-stream");
+                }
 
 				// For SSL websites there is a bug with IE see article KB 323308
 				// therefore we must reset the Cache-Control and Pragma Header
