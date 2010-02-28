@@ -59,21 +59,59 @@ Class.create("UserSelection", {
 		this._iAjxpNodeProvider = iAjxpNodeProvider;
 	},
 	
-	requireContextChange : function(ajxpNodeOrPath){
-		var path;
-		if(Object.isString(ajxpNodeOrPath)){
-			path = ajxpNodeOrPath;
-		}else{
-			path = ajxpNodeOrPath.getPath();
+	requireContextChange : function(ajxpNode, forceReload){
+		var path = ajxpNode.getPath();
+		if((path == "" || path == "/") && ajxpNode != this._rootNode){
+			ajxpNode = this._rootNode;
 		}
-		this._iAjxpNodeProvider.loadNode(path, function(node){
-			this.setContextNode(node);
-		}.bind(this) );
+		if(ajxpNode != this._rootNode && (!ajxpNode.getParent() || ajxpNode.fake)){
+			// Find in arbo or build fake arbo
+			var fakeNodes = [];
+			ajxpNode = ajxpNode.findInArbo(this._rootNode, fakeNodes);
+			if(fakeNodes.length){
+				var firstFake = fakeNodes.shift();
+				firstFake.observeOnce("loaded", function(e){
+					this.requireContextChange(ajxpNode);
+				}.bind(this) );
+				firstFake.observeOnce("error", function(message){
+					ajaxplorer.displayMessage("ERROR", message);
+					var parent = firstFake.getParent();
+					parent.removeChild(firstFake);
+					delete(firstFake);
+					this.requireContextChange(parent);
+				}.bind(this) );
+				document.fire("ajaxplorer:context_loading");
+				firstFake.load(this._iAjxpNodeProvider);
+				return;
+			}
+		}		
+		ajxpNode.observeOnce("loaded", function(){
+			this.setContextNode(ajxpNode);
+			document.fire("ajaxplorer:context_loaded");
+		}.bind(this));
+		ajxpNode.observeOnce("error", function(message){
+			ajaxplorer.displayMessage("ERROR", message);
+			document.fire("ajaxplorer:context_loaded");
+		}.bind(this));
+		document.fire("ajaxplorer:context_loading");
+		try{
+			if(forceReload){
+				ajxpNode.reload(this._iAjxpNodeProvider);
+			}else{
+				ajxpNode.load(this._iAjxpNodeProvider);
+			}
+		}catch(e){
+			document.fire("ajaxplorer:context_loaded");
+		}
 	},
 	
 	setRootNode : function(ajxpRootNode){
 		this._rootNode = ajxpRootNode;
+		this._rootNode.observe("child_added", function(c){
+				console.log(c);
+		});
 		document.fire("ajaxplorer:root_node_changed", this._rootNode);
+		this.setContextNode(this._rootNode);
 	},
 	
 	getRootNode : function(ajxpRootNode){
@@ -85,7 +123,7 @@ Class.create("UserSelection", {
 		this._currentRep = ajxpDataNode.getPath();
 		document.fire("ajaxplorer:context_changed", this);
 	},
-	
+		
 	getContextNode : function(){
 		return this._contextNode;
 	},

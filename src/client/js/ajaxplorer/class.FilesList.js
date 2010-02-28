@@ -34,7 +34,7 @@
  */
 Class.create("FilesList", SelectableElements, {
 	
-	__implements : "IAjxpPane",
+	__implements : ["IAjxpPane", "IFocusable", "IContextMenuable"],
 
 	initialize: function($super, oElement, initDefaultDisp)
 	{
@@ -61,9 +61,7 @@ Class.create("FilesList", SelectableElements, {
 			this.reload();
 		}.bind(this)  );
 		document.observe("ajaxplorer:context_changed", function(event){
-			var path = event.memo.getContextNode().getPath();
 			this.fill(event.memo.getContextNode());
-			//this.loadXmlList(path);
 		}.bind(this) );
 		document.observe("ajaxplorer:context_loading", this.setOnLoad.bind(this));
 		document.observe("ajaxplorer:context_loaded", this.removeOnLoad.bind(this));
@@ -83,7 +81,7 @@ Class.create("FilesList", SelectableElements, {
 		this.allDroppables = new Array();		
 		
 		// List mode style : file list or tableur mode ?
-		this.gridStyle = "grid";
+		this.gridStyle = "file";
 		this.paginationData = null;
 		this.even = true;
 		
@@ -223,7 +221,10 @@ Class.create("FilesList", SelectableElements, {
 				path = path.substring(0, path.indexOf("#"));
 			}
 			path  = path + "#" + page;
-			ajaxplorer.foldersTree.setCurrentNodeProperty("pagination_anchor", page);
+			document.observeOnce("ajaxplorer:context_changed", function(event){
+				var node = ajaxplorer.getContextNode();
+				node.getMetadata().set("pagination_anchor", page);
+			});
 			ajaxplorer.updateContextData(new AjxpNode(path));
 			Event.stop(e);
 		}.bind(this));		
@@ -382,7 +383,8 @@ Class.create("FilesList", SelectableElements, {
 	
 	reload: function(additionnalParameters){
 		if(ajaxplorer.getContextNode()){
-			this.loadXmlList(ajaxplorer.getContextNode().getPath(), null, null, additionnalParameters);
+			//this.loadXmlList(ajaxplorer.getContextNode().getPath(), null, null, additionnalParameters);
+			this.fill(ajaxplorer.getContextNode());
 		}
 	},
 	
@@ -631,15 +633,18 @@ Class.create("FilesList", SelectableElements, {
 		}
 		this.removeCurrentLines();
 		var parseXmlNodeFunc;
-		if(this._displayMode == "list") parseXmlNodeFunc = this.xmlNodeToTableRow.bind(this);
-		else parseXmlNodeFunc = this.xmlNodeToDiv.bind(this);
 		// NOW PARSE LINES
 		this.parsingCache = new Hash();		
 		var children = contextNode.getChildren();
 		for (var i = 0; i < children.length ; i++) 
 		{
 			var child = children[i];
-			var newItem = parseXmlNodeFunc(child.getMetadata().get("XML_NODE"));
+			var newItem;
+			if(this._displayMode == "list") {
+				newItem = this.ajxpNodeToTableRow(child);
+			}else {
+				newItem = this.xmlNodeToDiv(child.getMetadata().get("XML_NODE"));
+			}
 			newItem.ajxpNode = child;
 		}	
 		this.initRows();
@@ -733,17 +738,17 @@ Class.create("FilesList", SelectableElements, {
 		}.bind(this));
 	},
 	
-	xmlNodeToTableRow: function(xmlNode){		
+	ajxpNodeToTableRow: function(ajxpNode){		
+		var metaData = ajxpNode.getMetadata();
 		var newRow = document.createElement("tr");		
 		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
 		this.parsingCache.set('tBody', tBody);
-		for(var i=0;i<xmlNode.attributes.length;i++)
-		{
-			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
-			if(Prototype.Browser.IE && xmlNode.attributes[i].nodeName == "ID"){
-				newRow.setAttribute("ajxp_sql_"+xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
-			}
-		}
+		metaData.each(function(pair){
+			newRow.setAttribute(pair.key, pair.value);
+			if(Prototype.Browser.IE && pair.key == "ID"){
+				newRow.setAttribute("ajxp_sql_"+pair.key, pair.value);
+			}			
+		});
 		var attributeList;
 		if(!this.parsingCache.get('attributeList')){
 			attributeList = $A([]);
@@ -754,7 +759,6 @@ Class.create("FilesList", SelectableElements, {
 		}else{
 			attributeList = this.parsingCache.get('attributeList');
 		}
-		//var getNodeAttribute = xmlNode.getAttribute.bind();
 		for(i = 0; i<attributeList.length;i++ ){
 			var s = attributeList[i];			
 			var tableCell = new Element("td");			
@@ -763,17 +767,17 @@ Class.create("FilesList", SelectableElements, {
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
-				}).update("<img src=\""+resolveImageSource(xmlNode.getAttribute('icon'), "/images/crystal/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + xmlNode.getAttribute('text')+"</span>");
-				innerSpan.setAttribute('filename', newRow.getAttribute('filename'));
+				}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/crystal/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + metaData.get('text')+"</span>");
+				innerSpan.setAttribute('filename', metaData.get('filename'));
 				tableCell.insert(innerSpan);
 				
 				// Defer Drag'n'drop assignation for performances
 				window.setTimeout(function(){
-					if(!xmlNode.getAttribute("is_recycle") || xmlNode.getAttribute("is_recycle") != "1"){
+					if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
 							var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'},this,'filesList');							
 							if(this.protoMenu) this.protoMenu.addElements(innerSpan);						
 					}
-					if(xmlNode.getAttribute("is_file") == "0" || xmlNode.getAttribute("is_file") == "false")
+					if(!ajxpNode.isLeaf())
 					{
 						AjxpDroppables.add(innerSpan);
 					}
@@ -781,13 +785,13 @@ Class.create("FilesList", SelectableElements, {
 				
 			}else if(s=="ajxp_modiftime"){
 				var date = new Date();
-				date.setTime(parseInt(xmlNode.getAttribute(s))*1000);
+				date.setTime(parseInt(metaData.get(s))*1000);
 				newRow.ajxp_modiftime = date;
 				tableCell.innerHTML = formatDate(date);
 			}
 			else
 			{
-				tableCell.innerHTML = xmlNode.getAttribute(s);
+				tableCell.innerHTML = metaData.get(s);
 			}
 			if(this.gridStyle == "grid"){
 				tableCell.setAttribute('valign', 'top');				
@@ -804,7 +808,6 @@ Class.create("FilesList", SelectableElements, {
 		}
 		tBody.appendChild(newRow);
 		if(this.even){
-			//$(newRow).setStyle({backgroundColor: '#eee'});					
 			$(newRow).addClassName('even');
 		}
 		this.even = !this.even;
@@ -1031,7 +1034,7 @@ Class.create("FilesList", SelectableElements, {
 	// 
 	fireDblClick: function (e) 
 	{
-		if(ajaxplorer.foldersTree.currentIsRecycle())
+		if(ajaxplorer.getContextNode().getAjxpMime() == "ajxp_recycle")
 		{
 			return; // DO NOTHING IN RECYCLE BIN
 		}

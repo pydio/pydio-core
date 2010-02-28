@@ -46,13 +46,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>			
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-					url = ajaxplorer.actionBar.getLocationBarValue();
-					currentParentUrl = url.substr(0, url.lastIndexOf('/'));
-					if(currentParentUrl == "") currentParentUrl = "/";
-					ajaxplorer.getFoldersTree().goToParentNode();
-					var anchor = ajaxplorer.getFoldersTree().getCurrentNodeProperty("pagination_anchor");
-					if(anchor) currentParentUrl = currentParentUrl + "#" + anchor;
-					ajaxplorer.updateContextData(new AjxpNode(currentParentUrl));
+					ajaxplorer.fireContextUp();
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
