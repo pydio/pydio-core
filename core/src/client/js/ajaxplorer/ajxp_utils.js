@@ -49,7 +49,11 @@ function getRepName(fileName)
 
 function getAjxpMimeType(item){
 	if(!item) return "";
-	return (item.getAttribute('ajxp_mime') || getFileExtension(item.getAttribute('filename')));
+	if(Object.isHash(item)){
+		return (item.get('ajxp_mime') || getFileExtension(item.get('filename')));
+	}else{
+		return (item.getAttribute('ajxp_mime') || getFileExtension(item.getAttribute('filename')));
+	}	
 }
 
 function getFileExtension(fileName)
@@ -66,6 +70,7 @@ function addImageLibrary(aliasName, aliasPath){
 }
 
 function resolveImageSource(src, defaultPath, size){
+	if(!src) return "";
 	if(!window.AjxpImageLibraries || src.indexOf("/")==-1){
 		return ajxpResourcesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
 	}

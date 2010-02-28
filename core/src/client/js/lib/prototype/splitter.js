@@ -33,7 +33,7 @@
  * @author Dave Methvin (dave.methvin@gmail.com)
  */
 
-Splitter = Class.create(AjxpPane, {
+Class.create("Splitter", AjxpPane, {
 	
 	initialize: function(container, options){				
 		this.options = Object.extend({

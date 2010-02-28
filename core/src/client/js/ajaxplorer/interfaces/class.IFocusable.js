@@ -30,42 +30,10 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : Abstract container any type of pane that can resize
+ * Description : focusable component / Tab navigation
  */
-Class.create("AjxpPane", {	
-	
-	__implements : "IAjxpPane",
-	
-	initialize : function(htmlElement){
-		this.htmlElement = $(htmlElement);
-		this.htmlElement.ajxpPaneObject = this;
-		if(this.htmlElement.getAttribute('ajxpPaneHeader')){
-			this.addPaneHeader(
-				this.htmlElement.getAttribute('ajxpPaneHeader'), 
-				this.htmlElement.getAttribute('ajxpPaneIcon'));
-		}
-	},
-	
-	resize : function(){
-		
-	},
-	showElement : function(show){
-		if(show){
-			this.htmlElement.show();
-		}else{
-			this.htmlElement.hide();
-		}
-	},
-	addPaneHeader : function(headerLabel, headerIcon){
-		this.htmlElement.insert({top : new Element('div', {className:'panelHeader',ajxp_message_id:headerLabel}).update(MessageHash[headerLabel])});
-		disableTextSelection(this.htmlElement.select('div')[0]);
-	},
-	setFocusBehaviour : function(){
-		this.htmlElement.observe("click", function(){
-			if(ajaxplorer) ajaxplorer.focusOn(this);
-		}.bind(this));
-	}
-	
+Interface.create("IFocusable", {		
+	setFocusBehaviour : function(){},
+	focus : function(){},
+	blur : function(){}
 });
-
-Object.Event.extend(AjxpPane);

@@ -33,6 +33,8 @@
  * Description : The tree object. Encapsulate the webfx tree.
  */
 Class.create("FoldersTree", AjxpPane, {
+	
+	__implements : ["IFocusable", "IContextMenuable"],
 
 	initialize: function ($super, oElement, rootFolderName, rootFolderSrc, oAjaxplorer, dontLoad)
 	{
@@ -47,7 +49,10 @@ Class.create("FoldersTree", AjxpPane, {
 			thisObject.clickNode(this.id);
 		};
 		
-		this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, action, 'explorer');
+		// this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, action, 'explorer');
+		this.tree = new AJXPTree(new AjxpNode("/", true, "No Repository", "folder.png"),  action);
+		// DISABLE LOADING
+		this.tree.loaded = true;		
 		this.treeContainer.update(this.tree.toString());	
 		$(this.tree.id).observe("click", function(e){
 			this.action(e);
@@ -77,7 +82,7 @@ Class.create("FoldersTree", AjxpPane, {
 		}.bind(this) );
 		
 		document.observe("ajaxplorer:context_refresh", function(event){
-			this.reloadCurrentNode();
+			//this.reloadCurrentNode();
 		}.bind(this) );
 		
 		document.observe("ajaxplorer:root_node_changed", this.reloadFullTree.bind(this));
@@ -117,7 +122,11 @@ Class.create("FoldersTree", AjxpPane, {
 		webFXTreeHandler.contextMenu = protoMenu;
 	},
 	
-	clickNode: function(nodeId){		
+	clickNode: function(nodeId){
+		if(webFXTreeHandler.all[nodeId].ajxpNode){
+			ajaxplorer.actionBar.fireDefaultAction("dir", webFXTreeHandler.all[nodeId].ajxpNode);
+		}
+		/*
 		var path = webFXTreeHandler.all[nodeId].url;
 		if(path){
 			this.setCurrentNodeName(nodeId);
@@ -128,6 +137,7 @@ Class.create("FoldersTree", AjxpPane, {
 			var node = new AjxpNode(path, !webFXTreeHandler.all[nodeId].folder, label, webFXTreeHandler.all[nodeId].icon);
 			ajaxplorer.actionBar.fireDefaultAction("dir", node);
 		}
+		*/
 	},
 		
 	setCurrentNodeName: function(newId, skipSelect){
@@ -234,10 +244,22 @@ Class.create("FoldersTree", AjxpPane, {
 	reloadFullTree: function(event){		
 		var ajxpRootNode = event.memo;
 		webFXTreeHandler.recycleNode = null;
-		this.tree.ajxpNode = ajxpRootNode;
 		this.setCurrentToRoot();
+		this.tree.setAjxpRootNode(ajxpRootNode);
 		this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());		
-		this.reloadCurrentNode();
+		
+		/*
+		ajxpRootNode.observe("node_added", function(childPath){
+			var newTreeNode = new WebFXTreeItem(getBaseName(childPath));
+			newTreeNode.ajxpNode = ajxpRootNode.findChildByPath(childPath);
+			newTreeNode.ajxpNode.observe("node_added", function(subPath){
+				newTreeNode.add(new WebFXTreeItem(getBaseName(subPath)));
+			}.bind(this) );
+			this.tree.add(newTreeNode);
+		}.bind(this) );
+		*/
+		// DISABLE LOADING (TMP)
+		//this.reloadCurrentNode();
 	},
 	
 	reloadNode: function(nodeName){

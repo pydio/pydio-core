@@ -34,6 +34,8 @@
  */
 Class.create("ActionsManager", AjxpPane, {
 
+	__implements : "IFocusable",
+	
 	initialize: function($super, oElement, bUsersEnabled, oUser, oAjaxplorer)
 	{
 		$super(oElement);
@@ -56,12 +58,13 @@ Class.create("ActionsManager", AjxpPane, {
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
 		this.toolbars = new Hash();		
-		this.loadActions('ajxp');		
+		this.loadActions('ajxp');	
 		document.observe("ajaxplorer:context_changed", function(event){
 			var path = event.memo.getContextNode().getPath();
 			this.fireContextChange();
 			this.updateLocationBar(path);
 		}.bind(this) );
+		
 		document.observe("ajaxplorer:selection_changed", function(event){
 			this.fireSelectionChange();
 		}.bind(this) );

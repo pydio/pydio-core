@@ -40,10 +40,11 @@ Class.create("RemoteNodeProvider", {
 	initProvider : function(properties){
 		
 	},
-	loadNode : function(nodePath, nodeCallback, childCallback, options){
+	loadNode : function(node, nodeCallback, childCallback, options){
 		var conn = new Connexion();
 		conn.addParameter("get_action", "ls");
-		conn.addParameter("dir", nodePath);
+		conn.addParameter("options", "al");
+		conn.addParameter("dir", node.getPath());
 		if(options){
 			$H(options).each(function(pair){
 				conn.addParameter(pair.key, pair.value);
@@ -51,35 +52,42 @@ Class.create("RemoteNodeProvider", {
 		}
 		conn.onComplete = function (transport){
 			try{				
-				this.parseNodes(transport, nodeCallback, childCallback);
+				this.parseNodes(node, transport, nodeCallback, childCallback);
 			}catch(e){
-				if(ajaxplorer) ajaxplorer.displayMessage('Loading error :'+e.message);
-				else alert('Loading error :'+ e.message);				
-			}finally{
-				document.fire("ajaxplorer:context_loaded");
+				if(ajaxplorer) ajaxplorer.displayMessage('ERROR', 'Loading error :'+e.message);
+				else alert('Loading error :'+ e.message);
 			}
 		}.bind(this);	
-		document.fire("ajaxplorer:context_loading");
 		conn.sendAsync();
 	},
-	parseNodes : function(transport, nodeCallback, childCallback){
+	parseNodes : function(origNode, transport, nodeCallback, childCallback){
 		if(!transport.responseXML || !transport.responseXML.documentElement) return;
 		var rootNode = transport.responseXML.documentElement;
 		var children = rootNode.childNodes;
 		var contextNode = this.parseAjxpNode(rootNode);
+		origNode.replaceBy(contextNode);
 		for (var i = 0; i < children.length; i++) 
 		{
-			if (children[i].nodeName == "tree") 
+			if(children[i].nodeName == "error" || children[i].nodeName == "message")
+			{
+				var type = "ERROR";
+				if(children[i].nodeName == "message") type = children[i].getAttribute('type');
+				if(type == "ERROR"){
+					origNode.notify("error", children[i].firstChild.nodeValue + '(Source:'+origNode.getPath()+')');
+					return;
+				}					 
+			}			
+			else if (children[i].nodeName == "tree") 
 			{
 				var child = this.parseAjxpNode(children[i]);
-				contextNode.addChild(child);
+				origNode.addChild(child);
 				if(childCallback){
 					childCallback(child);
 				}
 			}
 		}			
 		if(nodeCallback){
-			nodeCallback(contextNode);
+			nodeCallback(origNode);
 		}
 	},
 	parseAjxpNode : function(xmlNode){

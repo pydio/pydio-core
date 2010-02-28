@@ -292,7 +292,7 @@ function _xmlFileLoaded(oXmlDoc, jsParentNode) {
 		window.status = jsParentNode.errorText;
 	}
 
-	if(ajaxplorer) ajaxplorer.foldersTree.asyncExpandAndSelect();
+	if(ajaxplorer && ajaxplorer.foldersTree) ajaxplorer.foldersTree.asyncExpandAndSelect();
 	if(modal.pageLoading) modal.updateLoadingProgress('Tree Loaded');
 }
 
