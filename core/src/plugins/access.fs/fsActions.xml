@@ -750,7 +750,7 @@ AJXP_MESSAGE[174]<br/>
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){
 				    	var message = MessageHash[177];
-				    	if(ajaxplorer.getContextNode().getAjxpMime() == "ajxp_recycle"){
+				    	if(ajaxplorer.getContextNode().getAjxpMime() != "ajxp_recycle"){
 				    		message = MessageHash[176];
 				    	}
 		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
