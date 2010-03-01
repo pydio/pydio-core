@@ -87,6 +87,17 @@ Class.create("Connexion", {
 			alert("Unknown Parsing Error!");
 			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
 		}
+		if(transport.responseXML){
+			var node = XPathSelectSingleNode(transport.responseXML.documentElement, "require_auth");
+			if(node && ajaxplorer){
+				var root = ajaxplorer._contextHolder.getRootNode();
+				if(root){
+					ajaxplorer._contextHolder.setContextNode(root);
+					root.clear();
+				}
+				ajaxplorer.actionBar.fireAction('login');
+			}
+		}
 		if(this.onComplete){
 			this.onComplete(transport);
 		}

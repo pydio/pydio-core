@@ -76,8 +76,7 @@ Class.create("RemoteNodeProvider", {
 		if(errorNode){
 			if(errorNode.nodeName == "message") type = errorNode.getAttribute('type');
 			if(type == "ERROR"){
-				origNode.notify("error", errorNode.firstChild.nodeValue + '(Source:'+origNode.getPath()+')');
-				return;
+				origNode.notify("error", errorNode.firstChild.nodeValue + '(Source:'+origNode.getPath()+')');				
 			}			
 		}
 		

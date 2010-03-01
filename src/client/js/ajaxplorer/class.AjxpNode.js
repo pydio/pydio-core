@@ -75,7 +75,10 @@ Class.create("AjxpNode", {
 		}.bind(this));		
 	},
 	reload : function(iAjxpNodeProvider){
-		this.clear();
+		this._children.each(function(child){
+			this.removeChild(child);
+		}.bind(this));
+		this._isLoaded = false;		
 		this.load(iAjxpNodeProvider);
 	},
 	clear : function(){
@@ -83,6 +86,7 @@ Class.create("AjxpNode", {
 			this.removeChild(child);
 		}.bind(this));
 		this._isLoaded = false;		
+		this.notify("force_clear");
 	},
 	setRoot : function(){
 		this._isRoot = true;
