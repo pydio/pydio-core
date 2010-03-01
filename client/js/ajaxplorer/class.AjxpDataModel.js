@@ -115,6 +115,7 @@ Class.create("AjxpDataModel", {
 	
 	setRootNode : function(ajxpRootNode){
 		this._rootNode = ajxpRootNode;
+		this._rootNode.setRoot();
 		this._rootNode.observe("child_added", function(c){
 				//console.log(c);
 		});
