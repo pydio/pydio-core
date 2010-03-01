@@ -407,9 +407,8 @@ Class.create("Ajaxplorer", {
 		
 		var	newIcon = repository.getIcon(); 
 		var sEngineName = repository.getSearchEngine();
-		
+				
 		var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
-		rootNode.setRoot();
 		this._contextHolder.setRootNode(rootNode);
 				
 		if(!this._initObj) { 			
@@ -453,8 +452,8 @@ Class.create("Ajaxplorer", {
 					className:"edit",
 					disabled:selected,
 					callback:function(e){
-						ajaxplorer.triggerRootDirChange(''+key);
-					}
+						this.triggerRepositoryChange(''+key);
+					}.bind(this)
 				}
 			}.bind(this));		
 		}
@@ -483,8 +482,7 @@ Class.create("Ajaxplorer", {
 	},
 	
 
-	triggerRootDirChange: function(repositoryId){
-		this.actionBar.updateLocationBar('/');
+	triggerRepositoryChange: function(repositoryId){		
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'switch_root_dir');
 		connexion.addParameter('root_dir_index', repositoryId);
@@ -500,6 +498,11 @@ Class.create("Ajaxplorer", {
 				this.loadRepository(this._initRepositoriesList.get(repositoryId));
 			}
 		}.bind(this);
+		var root = this._contextHolder.getRootNode();
+		if(root){
+			this._contextHolder.setContextNode(root);
+			root.clear();
+		}
 		connexion.sendAsync();
 	},
 	
