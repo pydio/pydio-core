@@ -32,10 +32,9 @@
  * 
  * Description : Selection Model.
  */
-Class.create("UserSelection", {
+Class.create("AjxpDataModel", {
 
 	_currentRep: undefined, 
-	_selectedItems: undefined,
 	_bEmpty: undefined,
 	_bUnique: false,
 	_bFile: false,
@@ -51,7 +50,7 @@ Class.create("UserSelection", {
 
 	initialize: function(){
 		this._currentRep = '/';
-		this._selectedItems = $A([]);
+		this._selectedNodes = $A([]);
 		this._bEmpty = true;
 	},
 	
@@ -147,9 +146,8 @@ Class.create("UserSelection", {
 		}else{
 			this._selectionSource = source;
 		}
-		this._selectedNodes = ajxpDataNodes;
+		this._selectedNodes = $A(ajxpDataNodes);
 		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
-		this._selectedItems = $A([]);
 		this._bFile = this._bDir = false;
 		if(!this._bEmpty)
 		{
@@ -165,7 +163,6 @@ Class.create("UserSelection", {
 				}
 				
 				var meta = selectedNode.getMetadata();
-				this._selectedItems.push(meta); // Backward compat
 				if(meta.get('is_recycle') && meta.get('is_recycle') == '1') this._isRecycle = true;
 			}
 		}
@@ -181,7 +178,7 @@ Class.create("UserSelection", {
 	},
 	
 	getSelectedItems : function(){
-		return this._selectedItems;
+		throw new Error("Deprecated : use getSelectedNodes() instead");
 	},
 	
 	selectAll : function(){
@@ -213,33 +210,32 @@ Class.create("UserSelection", {
 	},
 	
 	isMultiple : function(){
-		if(this._selectedItems.length > 1) return true;
+		if(this._selectedNodes && this._selectedNodes.length > 1) return true;
 		return false;
 	},
 	
 	hasMime : function(mimeTypes){
 		if(mimeTypes.length==1 && mimeTypes[0] == "*") return true;
 		var has = false;
-		var selectedItems = $A(this._selectedItems);
 		mimeTypes.each(function(mime){
 			if(has) return;
-			has = selectedItems.any(function(item){
-				return (getAjxpMimeType(item.get("XML_NODE")) == mime);
+			has = this._selectedNodes.any(function(node){
+				return (getAjxpMimeType(node) == mime);
 			});
-		});
+		}.bind(this) );
 		return has;
 	},
 	
 	getFileNames : function(separator){
-		if(!this._selectedItems.length)
+		if(!this._selectedNodes.length)
 		{
 			alert('Please select a file!');
 			return;
 		}
-		var tmp = new Array(this._selectedItems.length);
-		for(i=0;i<this._selectedItems.length;i++)
+		var tmp = new Array(this._selectedNodes.length);
+		for(i=0;i<this._selectedNodes.length;i++)
 		{
-			tmp[i] = this._selectedItems[i].getAttribute('filename');
+			tmp[i] = this._selectedNodes[i].getPath();
 		}
 		if(separator){
 			return tmp.join(separator);
@@ -298,11 +294,15 @@ Class.create("UserSelection", {
 	},
 	
 	getUniqueItem : function(){
-		return this._selectedItems[0];
+		throw new Error("getUniqueItem is deprecated, use getUniqueNode instead!");
 	},
 
     getItem : function(i) {
-        return this._selectedItems[i];
+        throw new Error("getItem is deprecated, use getNode instead!");
+    },
+	
+    getNode : function(i) {
+        return this._selectedNodes[i];
     },
 	
 	updateFormOrUrl : function (oFormElement, sUrl){

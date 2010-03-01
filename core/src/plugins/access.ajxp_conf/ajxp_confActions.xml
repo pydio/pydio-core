@@ -155,15 +155,16 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getUserSelection();
-					var item = userSelection.getUniqueItem();
-					if(item.getAttribute("ajxp_mime") == "user" || item.getAttribute("ajxp_mime") == "user_editable"){
+					var node = userSelection.getUniqueNode();
+					var meta = node.getMetadata();
+					if(meta.get("ajxp_mime") == "user" || meta.get("ajxp_mime") == "user_editable"){
 						var loadFunc = function(oForm){
 							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 							if(!ajaxplorer.actionBar.configEditor){
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
-							ajaxplorer.actionBar.configEditor.loadUser(item.getAttribute("text"));
+							ajaxplorer.actionBar.configEditor.loadUser(meta.get("text"));
 						};
 						modal.showDialogForm('Edit Online', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
 					}else{
@@ -173,7 +174,7 @@
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
-							ajaxplorer.actionBar.configEditor.loadRepository(item.getAttribute("repository_id"));
+							ajaxplorer.actionBar.configEditor.loadRepository(meta.get("repository_id"));
 						};
 						var closeFunc = function(){
 							var toSubmit = new Hash();
@@ -238,16 +239,17 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getUserSelection();
-					var item = userSelection.getUniqueItem();
+					var node = userSelection.getUniqueNode();
+					var meta = node.getMetadata();
 					var deleteMessage, fieldName, fieldValue;
-					if(item.getAttribute("ajxp_mime") == "user_editable"){
+					if(meta.get("ajxp_mime") == "user_editable"){
 						deleteMessage = "Are you sure you want to delete this user? This operation is not reversible!";
 						fieldName = "user_id";
-						fieldValue = item.getAttribute("text");
+						fieldValue = meta.get("text");
 					}else{
 						deleteMessage = "Are you sure you want to delete this repository? This operation is not reversible!";
 						fieldName = "repository_id";
-						fieldValue = item.getAttribute("repository_id");
+						fieldValue = meta.get("repository_id");
 					}
 					var onLoad = function(oForm){
 		   		    	$(oForm).select('span[id="delete_message"]')[0].update(deleteMessage);
@@ -263,8 +265,9 @@
 	   		    	       var hidden = $(oForm).select('input[type="hidden"]')[0];
                            while (true) {
                               try {
-                                  item = userSelection.getItem(i);
-                                  hidden.setAttribute("value", item.getAttribute("ajxp_mime") == "user_editable" ? item.getAttribute("text") : item.getAttribute("repository_id"));
+                                  var node = userSelection.getNode(i);
+                                  var meta = node.getMetadata();
+                                  hidden.setAttribute("value", meta.get("ajxp_mime") == "user_editable" ? meta.get("text") : meta.get("repository_id"));
             					  ajaxplorer.actionBar.submitForm(oForm);
                                   i++;
                               } catch (e) 
@@ -299,19 +302,19 @@
 					var onLoad = function(oForm){
 						if(!ajaxplorer.filesList) return;
 						var userSelection =  ajaxplorer.getUserSelection();
-						var items = userSelection._selectedItems;
-						var firstItem = userSelection.getUniqueItem();
-						var mime = firstItem.getAttribute("ajxp_mime");
+						var nodes = userSelection.getSelectedNodes();
+						var firstNode = userSelection.getUniqueNode();						
 		   		    	var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
 		   		    	var attributes = [];
 		   		    	columnsDef = ajaxplorer.filesList.columnsDef;
 		   		    	columnsDef.each(function(def){attributes.push(def.attributeName);});
 			   		    var message = attributes.join("\t") + "\n\n";
-		   		    	items.each(function(item){		   		    		
+		   		    	nodes.each(function(node){	
+		   		    		var meta = node.getMetadata();	   		    		
 		   		    		for(var i=0;i<attributes.length;i++){
 		   		    			var attName = attributes[i];
 		   		    			if(attName == "ajxp_label") attName = "text";
-		   		    			message += item.getAttribute(attName) + '\t';
+		   		    			message += meta.get(attName) + '\t';
 		   		    		}
 			   		    	message += '\n';
 		   		    	});

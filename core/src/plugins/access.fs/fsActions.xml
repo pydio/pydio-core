@@ -395,7 +395,7 @@ AJXP_MESSAGE[174]<br/>
 				<dynamicBuilder><![CDATA[
 					var context = window.builderContext;
 					context.builderMenuItems = $A([]);					
-					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueItem());
+					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
 					var editors = ajaxplorer.findEditorsForMime(selectedMime);
 					if(editors.length){
 						var index = 0;
@@ -423,7 +423,7 @@ AJXP_MESSAGE[174]<br/>
 				<clientCallback prepareModal="false"><![CDATA[		
 					var editorData = window.actionArguments[0];
 					if(!editorData){
-						var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueItem());
+						var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
 						var editors = ajaxplorer.findEditorsForMime(selectedMime);
 						if(editors.length){
 							editorData = editors[0];							
@@ -449,7 +449,7 @@ AJXP_MESSAGE[174]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[					
-					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueItem());
+					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
 					var editors = ajaxplorer.findEditorsForMime(selectedMime);
 					var editorData;
 					if(editors.length){
