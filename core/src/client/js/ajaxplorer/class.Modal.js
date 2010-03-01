@@ -356,19 +356,12 @@ Class.create("Modal", {
 	updateLoadingProgress: function(state){	
 		this.loadingStep --;
 		var percent = (1 - (this.loadingStep / this.loadingStepsCount));
-		var width = parseInt(parseInt($('progressBarBorder').getWidth()) * percent);
-		/*
-		var command = "if($('progressBar')) $('progressBar').style.width = '"+width+"px';";
-		setTimeout(command, 0);
-		*/
+		var width = parseInt( (parseInt($('progressBarBorder').getWidth())-2) * percent);
 		if(state){
 			$('progressState').update(state);
 		}
 		if($('progressBar')){
-			 /*
-			 $('progressBar').style.width = width+'px';
-			 */
-			 var afterFinishFunc;
+			var afterFinishFunc;
 			if(parseInt(percent)==1){
 				afterFinishFunc = function(effect){
 						new Effect.Opacity('loading_overlay', {
@@ -377,7 +370,6 @@ Class.create("Modal", {
 							duration:0.3,
 							afterFinish:function(effect){
 								$('loading_overlay').remove();
-								//if(ajaxplorer) ajaxplorer.actionBar.update();
 							}
 						});
 				}
@@ -390,7 +382,6 @@ Class.create("Modal", {
 			});
 		}
 		if(this.loadingStep == 0){
-			//$('loading_overlay').remove();
 			this.pageLoading = false;
 		}
 	},
