@@ -91,7 +91,41 @@ Class.create("RemoteNodeProvider", {
 		}else if(origNode.getMetadata().get('paginationData')){
 			origNode.getMetadata().unset('paginationData');
 		}
-				
+
+		// CHECK FOR COLUMNS DEFINITION DATA
+		var columnsNode = XPathSelectSingleNode(rootNode, "columns");
+		if(columnsNode){
+			// DISPLAY INFO
+			var displayData = new Hash();
+			if(columnsNode.getAttribute('switchGridMode')){
+				displayData.set('gridMode', columnsNode.getAttribute('switchGridMode'));
+			}
+			if(columnsNode.getAttribute('switchDisplayMode')){
+				displayData.set('displayMode', columnsNode.getAttribute('switchDisplayMode'));
+			}
+			origNode.getMetadata().set('displayData', displayData);
+						
+			// COLUMNS INFO
+			var newCols = $A([]);
+			var sortTypes = $A([]);
+			XPathSelectNodes(columnsNode, "column").each(function(col){
+				var obj = {};
+				$A(col.attributes).each(function(att){
+					obj[att.nodeName]=att.nodeValue;
+					if(att.nodeName == "sortType"){
+						sortTypes.push(att.nodeValue);
+					}
+				});
+				newCols.push(obj);					
+			});
+			if(newCols.size()){
+				var columnsData = new Hash();
+				columnsData.set('columnsDef', newCols);
+				columnsData.set('sortTypes', sortTypes);				
+				origNode.getMetadata().set('columnsData', columnsData);
+			}
+		}		
+
 		// NOW PARSE CHILDREN
 		var children = XPathSelectNodes(rootNode, "tree");
 		children.each(function(childNode){

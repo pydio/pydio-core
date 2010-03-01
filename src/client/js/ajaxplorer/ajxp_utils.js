@@ -311,7 +311,7 @@ function XPathSelectSingleNode(element, query){
  */
 function XPathSelectNodes(element, query){
 	if(Prototype.Browser.IE){
-		return element.selectNodes(query);
+		return $A(element.selectNodes(query));
 	}
 
     var xpe = window.__xpe;
@@ -331,7 +331,7 @@ function XPathSelectNodes(element, query){
       nodes[i] = result.snapshotItem(i);
     }
 
-    return nodes;
+    return $A(nodes);
 }
 
 

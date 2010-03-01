@@ -469,7 +469,6 @@ Class.create("ActionsManager", AjxpPane, {
 					var file = childs[i].getAttribute('file');
 					ajaxplorer.getContextHolder().setPendingSelection(file);
 					ajaxplorer.fireContextRefresh();
-					ajaxplorer.getContextHolder().clearPendingSelection();
 				}else if(obName == 'repository_list'){
 					ajaxplorer.reloadRepositoriesList();
 				}
