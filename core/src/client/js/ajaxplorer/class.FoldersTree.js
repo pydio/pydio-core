@@ -36,12 +36,16 @@ Class.create("FoldersTree", AjxpPane, {
 	
 	__implements : ["IFocusable", "IContextMenuable"],
 
-	initialize: function ($super, oElement, rootFolderName, rootFolderSrc, oAjaxplorer, dontLoad)
+	initialize: function ($super, oElement, options)
 	{
 		$super(oElement);
 		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:auto;height:100%;'});
 		oElement.insert(this.treeContainer);
 		disableTextSelection(this.treeContainer);
+		this.options = {};
+		if(options){
+			this.options = options;
+		}
 		var thisObject = this;
 		var action = function(e){
 			if(!ajaxplorer) return;
@@ -50,10 +54,19 @@ Class.create("FoldersTree", AjxpPane, {
 				ajaxplorer.actionBar.fireDefaultAction("dir", this.ajxpNode);
 			}
 		};
-		
-		this.tree = new AJXPTree(new AjxpNode("/", true, "No Repository", "folder.png"),  action);
-		// DISABLE LOADING
-		this.tree.loaded = true;		
+		var displayOptions = this.options.display || "dz";
+		if(displayOptions.indexOf("a") > -1) displayOptions = "dzf";
+		if(displayOptions.indexOf("z") > -1 && window.zipEnabled === false) displayOptions = displayOptions.split("z").join("");
+		this.options.display  = displayOptions;
+
+		var d = (displayOptions.indexOf("d") > -1);
+		var z = (displayOptions.indexOf("z") > -1);
+		var f = (displayOptions.indexOf("f") > -1);
+		var filter = function(ajxpNode){
+			return ((d && !ajxpNode.isLeaf()) || (f && ajxpNode.isLeaf()) || (z && ajxpNode.getAjxpMime()=="zip"));
+		};
+		this.tree = new AJXPTree(new AjxpNode("/", true, "No Repository", "folder.png"),  action, filter);		
+				
 		this.treeContainer.update(this.tree.toString());
 		$(this.tree.id).ajxpNode = this.tree.ajxpNode;	
 		$(this.tree.id).observe("click", function(e){
@@ -61,13 +74,14 @@ Class.create("FoldersTree", AjxpPane, {
 			Event.stop(e);
 		}.bind(this.tree));
 		AjxpDroppables.add(this.tree.id);
-		if(!this.tree.open && !this.tree.loading && !dontLoad) this.tree.toggle();		
+		if(!this.tree.open && !this.tree.loading) {
+			this.tree.toggle();		
+		}
 		this.treeContainer.observe("click", function(){			
 			ajaxplorer.focusOn(this);
 		}.bind(this));
 	
 		this.rootNodeId = this.tree.id;
-				
 		this.hasFocus;
 		
 		document.observe("ajaxplorer:context_changed", function(event){
@@ -76,12 +90,12 @@ Class.create("FoldersTree", AjxpPane, {
 				this.setSelectedPath(path);
 			}.bind(this), 100);			
 		}.bind(this) );
-		
-		document.observe("ajaxplorer:context_refresh", function(event){
-			//this.reloadCurrentNode();
-		}.bind(this) );
-		
-		document.observe("ajaxplorer:root_node_changed", this.reloadFullTree.bind(this));
+				
+		document.observe("ajaxplorer:root_node_changed", function(event){
+			var ajxpRootNode = event.memo;
+			this.tree.setAjxpRootNode(ajxpRootNode);
+			this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());		
+		}.bind(this));
 		
 	},
 	
@@ -144,60 +158,7 @@ Class.create("FoldersTree", AjxpPane, {
 			node.select();
 		}
 	},
-	
-	clickNode: function(nodeId){
-		/*
-		var path = webFXTreeHandler.all[nodeId].url;
-		if(path){
-			this.setCurrentNodeName(nodeId);
-			var label = getBaseName(path);
-			if(this.getCurrentNodeProperty("pagination_anchor")){
-				path = path + "#" + this.getCurrentNodeProperty("pagination_anchor");
-			}
-			var node = new AjxpNode(path, !webFXTreeHandler.all[nodeId].folder, label, webFXTreeHandler.all[nodeId].icon);
-			ajaxplorer.actionBar.fireDefaultAction("dir", node);
-		}
-		*/
-	},
-	
-	reloadCurrentNode: function(){
-		//this.reloadNode(this.currentNodeName);
-		return;
-	},
-	
-	reloadFullTree: function(event){		
-		var ajxpRootNode = event.memo;
-		webFXTreeHandler.recycleNode = null;
-		this.tree.setAjxpRootNode(ajxpRootNode);
-		this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());		
 		
-		// DISABLE LOADING (TMP)
-		//this.reloadCurrentNode();
-	},
-	
-	reloadNode: function(nodeName){
-		if (nodeName == null)
-		{		
-			return;
-		}
-		if(nodeName == this.rootNodeId)
-		{
-			this.tree.doCollapse();
-			this.tree.reload();
-		}
-		else
-		{
-			if(nodeName == 'AJAXPLORER_RECYCLE_NODE' && webFXTreeHandler.recycleNode){
-				nodeName = webFXTreeHandler.recycleNode;
-			}
-			else if(webFXTreeHandler.ajxpNodes.nodeName){
-				nodeName = webFXTreeHandler.ajxpNodes.nodeName;
-			}
-			if(webFXTreeHandler.all[nodeName] && webFXTreeHandler.all[nodeName].reload) webFXTreeHandler.all[nodeName].reload();
-		}	
-	},
-	
-	
 	cleanPathToArray: function(url){
 		var splitPath = url.split("/");
 		var path = new Array();

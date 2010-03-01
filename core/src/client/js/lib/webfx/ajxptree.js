@@ -3,8 +3,9 @@ TODO : I18N THIS STRING
  */
 webFXTreeConfig.loadingText = "Loading...";
 
-function AJXPTree(rootNode, sAction) {
+function AJXPTree(rootNode, sAction, filter) {
 	this.WebFXTree = WebFXTree;
+	this.loaded = true;
 	this.ajxpNode = rootNode;
 	var icon = rootNode.getIcon();
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
@@ -24,6 +25,9 @@ function AJXPTree(rootNode, sAction) {
 	this.loading = false;
 	this.loaded = false;
 	this.errorText = "";
+	if(filter){
+		this.filter = filter;
+ 	}
 
 	this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);		
 	if(this.open) this.ajxpNode.load();
@@ -75,7 +79,6 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 		}
 	}.bind(jsNode));
 	ajxpNode.observe("node_replaced", function(newNode){
-		//console.log(this, newNode);
 		// Should refresh label / icon
 	}.bind(jsNode));
 	ajxpNode.observeOnce("node_removed", function(e){
@@ -130,31 +133,6 @@ AJXPTreeItem.prototype.expand = function() {
 	this._webfxtree_expand();
 };
 
-// reloads the src file if already loaded
-/*
-AJXPTree.prototype.reload =
-AJXPTreeItem.prototype.reload = function () {
-	// if loading do nothing
-	if (this.loaded) {
-		var open = this.open;
-		// remove
-		while (this.childNodes.length > 0)
-			this.childNodes[this.childNodes.length - 1].remove();
-
-		this.loaded = false;
-
-		this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);
-		this.add(this._loadingItem);
-
-		if (open)
-			this.expand();
-	}
-	else if (this.open && !this.loading)	
-		this.ajxpNode.load();
-		
-	if(!this.open && !this.loading) this.toggle();
-};
-*/
 AJXPTreeItem.prototype.attachListeners = AJXPTree.prototype.attachListeners;
 
 
@@ -163,20 +141,7 @@ AJXPTreeItem.prototype.attachListeners = AJXPTree.prototype.attachListeners;
  */
 // Converts an xml tree to a js tree. See article about xml tree format
 function _ajxpNodeToTree(ajxpNode, parentNode) {
-	/*
-	TODO : PAGINATION
-	if(oNode.tagName == "pagination"){
-		text = MessageHash[oNode.getAttribute("overflowMessage")] + ' ('+oNode.getAttribute("count")+')';
-		action = function(e){};
-	}
-	TODO : AJXPNODES IN TREEHANDLER?
-	webFXTreeHandler.ajxpNodes[getBaseName(folderFullName)] = jsNode.id;
-	TODO : ajxpmime attribute?
-	if(oNode.getAttribute('ajxp_mime')){
-		jsNode.ajxpMime = oNode.getAttribute('ajxp_mime');
-	}
-	*/
-	if(ajxpNode.isLeaf()){
+	if(parentNode.filter && !parentNode.filter(ajxpNode)){
 		return false;
 	}
 	var jsNode = new AJXPTreeItem(ajxpNode, null, parentNode);	
@@ -185,12 +150,18 @@ function _ajxpNodeToTree(ajxpNode, parentNode) {
 		jsNode.loaded = true;
 	}
 	jsNode.filename = ajxpNode.getPath();	
+	if(parentNode.filter){
+		jsNode.filter = parentNode.filter;
+	}
 	
 	ajxpNode.getChildren().each(function(child){
 		var newNode = _ajxpNodeToTree(child, jsNode);
 		if(newNode){
+			if(jsNode.filter){
+				newNode.filter = jsNode.filter;
+			}
 			jsNode.add( newNode , true );
 		}
-	}.bind(this) );	
+	});	
 	return jsNode;	
 };
