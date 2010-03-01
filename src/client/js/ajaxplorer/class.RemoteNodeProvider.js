@@ -44,7 +44,11 @@ Class.create("RemoteNodeProvider", {
 		var conn = new Connexion();
 		conn.addParameter("get_action", "ls");
 		conn.addParameter("options", "al");
-		conn.addParameter("dir", node.getPath());
+		var path = node.getPath();
+		if(node.getMetadata().get("paginationData")){
+			path += "#" + node.getMetadata().get("paginationData").get("current");
+		}
+		conn.addParameter("dir", path);
 		if(options){
 			$H(options).each(function(pair){
 				conn.addParameter(pair.key, pair.value);
@@ -66,30 +70,44 @@ Class.create("RemoteNodeProvider", {
 		var children = rootNode.childNodes;
 		var contextNode = this.parseAjxpNode(rootNode);
 		origNode.replaceBy(contextNode);
-		for (var i = 0; i < children.length; i++) 
-		{
-			if(children[i].nodeName == "error" || children[i].nodeName == "message")
-			{
-				var type = "ERROR";
-				if(children[i].nodeName == "message") type = children[i].getAttribute('type');
-				if(type == "ERROR"){
-					origNode.notify("error", children[i].firstChild.nodeValue + '(Source:'+origNode.getPath()+')');
-					return;
-				}					 
+		
+		// CHECK FOR MESSAGE OR ERRORS
+		var errorNode = XPathSelectSingleNode(rootNode, "error|message");
+		if(errorNode){
+			if(errorNode.nodeName == "message") type = errorNode.getAttribute('type');
+			if(type == "ERROR"){
+				origNode.notify("error", errorNode.firstChild.nodeValue + '(Source:'+origNode.getPath()+')');
+				return;
 			}			
-			else if (children[i].nodeName == "tree") 
-			{
-				var child = this.parseAjxpNode(children[i]);
-				origNode.addChild(child);
-				if(childCallback){
-					childCallback(child);
-				}
+		}
+		
+		// CHECK FOR PAGINATION DATA
+		var paginationNode = XPathSelectSingleNode(rootNode, "pagination");
+		if(paginationNode){
+			var paginationData = new Hash();
+			$A(paginationNode.attributes).each(function(att){
+				paginationData.set(att.nodeName, att.nodeValue);
+			}.bind(this));
+			origNode.getMetadata().set('paginationData', paginationData);
+		}else if(origNode.getMetadata().get('paginationData')){
+			origNode.getMetadata().unset('paginationData');
+		}
+				
+		// NOW PARSE CHILDREN
+		var children = XPathSelectNodes(rootNode, "tree");
+		children.each(function(childNode){
+			var child = this.parseAjxpNode(childNode);
+			origNode.addChild(child);
+			if(childCallback){
+				childCallback(child);
 			}
-		}			
+		}.bind(this) );
+
 		if(nodeCallback){
 			nodeCallback(origNode);
 		}
 	},
+	
 	parseAjxpNode : function(xmlNode){
 		var node = new AjxpNode(
 			xmlNode.getAttribute('filename'), 
@@ -106,7 +124,7 @@ Class.create("RemoteNodeProvider", {
 			}
 		}
 		// BACKWARD COMPATIBILIY
-		metadata.set("XML_NODE", xmlNode);
+		//metadata.set("XML_NODE", xmlNode);
 		node.setMetadata(metadata);
 		return node;
 	}

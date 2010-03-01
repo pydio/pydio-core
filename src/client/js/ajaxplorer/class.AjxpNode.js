@@ -102,11 +102,8 @@ Class.create("AjxpNode", {
 	},
 	removeChild : function(ajxpNode){
 		var removePath = ajxpNode.getPath();
-		for(i=0;i<this._children.length;i++){
-			if(ajxpNode == this._children[i]){				
-				this._children.splice(i, 1);
-			}
-		}
+		ajxpNode.notify("node_removed");
+		this._children = this._children.without(ajxpNode);
 		this.notify("child_removed", removePath);
 	},
 	replaceBy : function(ajxpNode){
