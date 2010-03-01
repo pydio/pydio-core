@@ -146,6 +146,7 @@ if(isSet($_GET["repository_id"]) && isSet($_GET["folder"])){
 
 
 $JS_DEBUG = false;
+if(isSet($_GET["skipDebug"])) $JS_DEBUG = false;
 if($JS_DEBUG && isSet($_GET["compile"])){
 	require_once(SERVER_RESOURCES_FOLDER."/class.AJXP_JSPacker.php");
 	AJXP_JSPacker::pack();
