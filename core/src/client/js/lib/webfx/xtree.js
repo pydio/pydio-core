@@ -170,15 +170,6 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	if(!node.action && node.parentNode.action){
 		node.action = node.parentNode.action;
 	}
-	if(this.ajxpNode){		
-		/*
-		this.ajxpNode.observe("node_added", function(path){
-			var treeNode = new WebFXTreeItem(getBaseName(path));
-			treeNode.ajxpNode = this.ajxpNode.findChildByPath(path);
-			//this.add(treeNode);
-		}.bind(this));
-		*/
-	}
 	
 	this.childNodes[this.childNodes.length] = node;
 	var root = this;
@@ -225,6 +216,12 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		}
 		if (!this.folder) { this.folder = true; this.collapse(true); }
 		if (!bNoIdent) { this.indent(); }
+		if (this.ajxpNode && this.ajxpNode.fake){
+			if(this.parentNode){
+				this.parentNode.expand();
+			}
+			this.expand();
+		}
 	}
 	return node;
 };
@@ -462,9 +459,11 @@ WebFXTreeItem.prototype.remove = function() {
 	if(!document.getElementById(this.id+'-plus')) return;
 	var iconSrc = document.getElementById(this.id + '-plus').src;
 	var parentNode = this.parentNode;
+	/*
 	if(parentNode.ajxpNode && this.ajxpNode){
 		parentNode.ajxpNode.removeChild(this.ajxpNode);
 	}
+	*/
 	var prevSibling = this.getPreviousSibling(true);
 	var nextSibling = this.getNextSibling(true);
 	var folder = this.parentNode.folder;

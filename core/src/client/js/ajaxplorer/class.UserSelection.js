@@ -75,6 +75,7 @@ Class.create("UserSelection", {
 				}.bind(this) );
 				firstFake.observeOnce("error", function(message){
 					ajaxplorer.displayMessage("ERROR", message);
+					firstFake.notify("node_removed");
 					var parent = firstFake.getParent();
 					parent.removeChild(firstFake);
 					delete(firstFake);
@@ -108,7 +109,7 @@ Class.create("UserSelection", {
 	setRootNode : function(ajxpRootNode){
 		this._rootNode = ajxpRootNode;
 		this._rootNode.observe("child_added", function(c){
-				console.log(c);
+				//console.log(c);
 		});
 		document.fire("ajaxplorer:root_node_changed", this._rootNode);
 		this.setContextNode(this._rootNode);
