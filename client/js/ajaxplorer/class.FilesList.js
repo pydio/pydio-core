@@ -376,7 +376,6 @@ Class.create("FilesList", SelectableElements, {
 	
 	reload: function(additionnalParameters){
 		if(ajaxplorer.getContextNode()){
-			//this.loadXmlList(ajaxplorer.getContextNode().getPath(), null, null, additionnalParameters);
 			this.fill(ajaxplorer.getContextNode());
 		}
 	},
@@ -384,220 +383,7 @@ Class.create("FilesList", SelectableElements, {
 	setPendingSelection: function(pendingFilesToSelect){
 		this._pendingFile = pendingFilesToSelect;
 	},
-	
-	loadXmlList: function(repToLoad, pendingFileToSelect, url, additionnalParameters){	
-		var pendingFileToSelect;
 		
-		if(this.pendingSelection){
-			pendingFileToSelect = this.pendingSelection;
-		}else if(ajaxplorer.getContextHolder().getPendingSelection()){
-			pendingFileToSelect = ajaxplorer.getContextHolder().getPendingSelection();
-		}
-		
-		var connexion = new Connexion(url);
-		connexion.addParameter('get_action', 'ls');
-		connexion.addParameter('options', 'al');
-		connexion.addParameter('dir', repToLoad);
-		if(additionnalParameters){
-			additionnalParameters.each(function(pair){
-				connexion.addParameter(pair.key,pair.value);
-			});
-		}
-		this._pendingFile = pendingFileToSelect;
-		this.setOnLoad();
-		connexion.onComplete = function (transport){
-			try{				
-				contextNode = ajaxplorer.getContextNode();
-				this.parseXmlAndLoad(transport.responseXML, contextNode);
-				document.fire("ajaxplorer:selection_changed");
-			}catch(e){
-				if(ajaxplorer) ajaxplorer.displayMessage('Loading error :'+e.message);
-				else alert('Loading error :'+ e.message);
-			}finally{
-				this.removeOnLoad();
-			}
-		}.bind(this);	
-		connexion.sendAsync();
-	},
-	
-	parseXmlAndLoad: function(oXmlDoc, contextNode){	
-		if( oXmlDoc == null || oXmlDoc.documentElement == null) 
-		{
-			return;
-		}
-		this.loading = false;
-		this.imagesHash = new Hash();
-		if(this.protoMenu){
-			this.protoMenu.removeElements('.ajxp_draggable');
-			this.protoMenu.removeElements('#selectable_div');
-		}
-		
-		for(var i = 0; i< AllAjxpDroppables.length;i++){
-			var el = AllAjxpDroppables[i];
-			if(this.isItem(el)){
-				Droppables.remove(AllAjxpDroppables[i]);
-				delete(AllAjxpDroppables[i]);
-			}
-		}
-		for(i = 0;i< AllAjxpDraggables.length;i++){
-			if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
-				Element.remove(AllAjxpDraggables[i].element);
-			}			
-		}
-		AllAjxpDraggables = $A([]);
-		var root = oXmlDoc.documentElement;
-		// loop through all tree children
-		var cs = root.childNodes;
-		var l = cs.length;
-		// FIRST PASS FOR REQUIRE AUTH
-		for (var i = 0; i < l; i++) 
-		{
-			if(cs[i].tagName == "require_auth")
-			{
-				if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
-				ajaxplorer.actionBar.fireAction('login');
-				this.removeCurrentLines();
-				this.fireChange();
-				return;
-			}
-		}
-		// SECOND PASS FOR ERRORS CHECK AND COLUMNS DECLARATION
-		var refreshGUI = false;
-		this.gridStyle = 'file';
-		this.even = false;
-		this._oSortTypes = this.defaultSortTypes;
-		if(this.paginationData){
-			this.paginationData = null;
-			refreshGUI = true;
-		}
-		for (var i = 0; i < l; i++) 
-		{
-			if(cs[i].nodeName == "error" || cs[i].nodeName == "message")
-			{
-				var type = "ERROR";
-				if(cs[i].nodeName == "message") type = cs[i].getAttribute('type');
-				if(modal.pageLoading){
-					alert(type+':'+cs[i].firstChild.nodeValue);
-					this.fireChange();
-				}else{
-					ajaxplorer.displayMessage(type, cs[i].firstChild.nodeValue);
-					this.fireChange();
-					return;
-				}
-			}
-			else if(cs[i].nodeName == "columns")
-			{
-				//Dynamically redefine columns!
-				if(cs[i].getAttribute('switchGridMode')){
-					this.gridStyle = cs[i].getAttribute('switchGridMode');
-				}
-				if(cs[i].getAttribute('switchDisplayMode')){
-					var dispMode = cs[i].getAttribute('switchDisplayMode');
-					if(dispMode != this._displayMode){
-						ajaxplorer.switchDisplayMode(dispMode);
-					}
-				}
-				var newCols = $A([]);
-				var sortTypes = $A([]);
-				for(var j=0;j<cs[i].childNodes.length;j++){
-					var col = cs[i].childNodes[j];
-					if(col.nodeName == "column"){
-						var obj = {};
-						$A(col.attributes).each(function(att){
-							obj[att.nodeName]=att.nodeValue;
-							if(att.nodeName == "sortType"){
-								sortTypes.push(att.nodeValue);
-							}
-						});
-						newCols.push(obj);
-					}
-				}
-				if(newCols.size()){
-					this.columnsDef = newCols;
-					this._oSortTypes = sortTypes;
-					if(this._displayMode == "list") refreshGUI = true;
-				}
-			}
-			else if(cs[i].nodeName == "pagination")
-			{
-				this.paginationData = new Hash();
-				$A(cs[i].attributes).each(function(att){
-					this.paginationData.set(att.nodeName, att.nodeValue);
-				}.bind(this));
-				refreshGUI = true;
-			}
-		}
-		if(refreshGUI)
-		{
-			this.initGUI();
-		}
-		
-		var items = this.getSelectedItems();
-		var setItemSelected = this.setItemSelected.bind(this);
-		for(var i=0; i<items.length; i++)
-		{
-			setItemSelected(items[i], false);
-		}
-		this.removeCurrentLines();
-		var parseXmlNodeFunc;
-		if(this._displayMode == "list") parseXmlNodeFunc = this.xmlNodeToTableRow.bind(this);
-		else parseXmlNodeFunc = this.xmlNodeToDiv.bind(this);
-		// NOW PARSE LINES
-		this.parsingCache = new Hash();		
-		for (var i = 0; i < l; i++) 
-		{
-			if (cs[i].nodeName == "tree") 
-			{
-				var newItem = parseXmlNodeFunc(cs[i]);
-				newItem.ajxpNode = new AjxpNode(
-					newItem.getAttribute('filename'), 
-					(newItem.getAttribute('is_file')=="1"||newItem.getAttribute('is_file')=="true"),
-					newItem.getAttribute('text'),
-					newItem.getAttribute('icon'));
-				newItem.ajxpNode.setMetadata(newItem);
-				contextNode.addChild(newItem.ajxpNode);
-			}
-		}	
-		this.initRows();
-		/*
-		if(this.paginationData && this.paginationData.get('count') && l < parseInt(this.paginationData.get('count'))){
-			for(var p=0;p<(parseInt(this.paginationData.get('count'))-l);p++){
-				var newRow = new Element("div", {id:"fake_row_"+(p+l-2)});		
-				var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
-				newRow.setStyle({height:'24px'});
-				tBody.insert(newRow);
-				
-			}
-			$('table_rows_container').observe('scroll', function(e){
-				this.scrollDelayer(e);
-			}.bind(this) );
-		}
-		*/
-		ajaxplorer.updateHistory(contextNode.getPath());
-		if(this._displayMode == "list" && (!this.paginationData || !this.paginationData.get('remote_order')))
-		{
-			this._sortableTable.sortColumn = -1;
-			this._sortableTable.updateHeaderArrows();
-		}
-		if(this._pendingFile)
-		{
-			if(typeof this._pendingFile == 'string')
-			{
-				this.selectFile(this._pendingFile);
-			}else if(this._pendingFile.length){
-				for(var f=0;f<this._pendingFile.length; f++){
-					this.selectFile(this._pendingFile[f], true);
-				}
-			}
-			this.hasFocus = true;
-			this._pendingFile = null;
-		}	
-		if(this.hasFocus){
-			ajaxplorer.focusOn(this);
-		}
-		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
-	},
-	
 	fill: function(contextNode){
 		this.imagesHash = new Hash();
 		if(this.protoMenu){
@@ -626,15 +412,46 @@ Class.create("FilesList", SelectableElements, {
 		}
 		this.removeCurrentLines();
 		
+		var refreshGUI = false;
+		this.gridStyle = 'file';
+		this.even = false;
+		this._oSortTypes = this.defaultSortTypes;
+		
 		var hasPagination = (this.paginationData?true:false);
 		if(contextNode.getMetadata().get("paginationData")){
 			this.paginationData = contextNode.getMetadata().get("paginationData");
-			this.initGUI();
+			refreshGUI = true;
 		}else{
 			this.paginationData = null;
 			if(hasPagination){
-				this.initGUI();
+				refreshGUI = true;
 			}
+		}
+		var displayData = contextNode.getMetadata().get("displayData");
+		if(displayData){
+			//Dynamically redefine columns!
+			if(displayData.get('gridMode')){
+				this.gridStyle = displayData.get('gridMode');
+				refreshGUI = true;
+			}
+			if(displayData.get('displayMode')){
+				var dispMode = displayData.get('displayMode');
+				if(dispMode != this._displayMode){
+					ajaxplorer.switchDisplayMode(dispMode);
+				}
+			}
+		}
+		var columnsData = contextNode.getMetadata().get("columnsData");
+		if(columnsData){
+			this.columnsDef = columnsData.get("columnsDef");
+			this._oSortTypes = columnsData.get("sortTypes");
+			if(this._displayMode == "list"){
+				refreshGUI = true;
+			}
+		}
+		
+		if(refreshGUI){
+			this.initGUI();
 		}
 		
 		// NOW PARSE LINES
@@ -658,47 +475,26 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-		if(this._pendingFile)
+		if(ajaxplorer.getContextHolder().getPendingSelection())
 		{
-			if(typeof this._pendingFile == 'string')
+			var pendingFile = ajaxplorer.getContextHolder().getPendingSelection();
+			if(Object.isString(pendingFile))
 			{
-				this.selectFile(this._pendingFile);
-			}else if(this._pendingFile.length){
-				for(var f=0;f<this._pendingFile.length; f++){
-					this.selectFile(this._pendingFile[f], true);
+				this.selectFile(pendingFile);
+			}else if(pendingFile.length){
+				for(var f=0;f<pendingFile.length; f++){
+					this.selectFile(pendingFile[f], true);
 				}
 			}
 			this.hasFocus = true;
-			this._pendingFile = null;
+			ajaxplorer.getContextHolder().clearPendingSelection();
 		}	
 		if(this.hasFocus){
 			ajaxplorer.focusOn(this);
 		}
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
-	
-	scrollDelayer : function(event){		
-		if(this.scrollTimer){
-			window.clearTimeout(this.scrollTimer);
-		}
-		this.scrollTimer = window.setTimeout(function(){
-			this.scrollObserver(event);
-		}.bind(this), 500);
-	},
-	
-	scrollObserver : function(event){
-		var target = event.target;
-		var scrollHeight = target.scrollHeight;
-		var scrollTop = target.scrollTop;
-		//console.log(scrollTop);		
-		var rank = Math.floor(scrollTop / 24);
-		//$('fake_row_'+rank).insert(new Element('td', {colspan:4,style:'background-color:blue;'}));
-		if($('fake_row_'+rank)){
-			$('fake_row_'+rank).setStyle({backgroundColor:"blue"});
-		}
-		//Lazy load a given set of data, remove the "far ones"
-	},
-	
+		
 	switchCurrentLabelToEdition : function(callback){
 		var sel = this.getSelectedItems();
 		var item = sel[0]; // We assume this action was triggered with a single-selection active.
@@ -1004,15 +800,16 @@ Class.create("FilesList", SelectableElements, {
 		if(one_element) elList = [one_element]; 
 		else elList = this._htmlElement.getElementsBySelector('.thumbnail_selectable_cell');
 		elList.each(function(element){
-			var is_image = (element.getAttribute('is_image')=='1'?true:false);			
+			var node = element.ajxpNode;
+			var is_image = (node.getMetadata().get('is_image') == "1");
 			var image_element = element.IMAGE_ELEMENT || element.getElementsBySelector('img')[0];		
 			var label_element = element.LABEL_ELEMENT || element.getElementsBySelector('.thumbLabel')[0];
 			var tSize = this._thumbSize;
 			var tW, tH, mT, mB;
 			if(is_image && image_element.getAttribute("is_loaded") == "true")
 			{
-				imgW = parseInt(element.getAttribute("image_width"));
-				imgH = parseInt(element.getAttribute("image_height"));
+				imgW = parseInt(node.getMetadata().get("image_width"));
+				imgH = parseInt(node.getMetadata().get("image_height"));
 				if(imgW > imgH)
 				{				
 					tW = tSize;
