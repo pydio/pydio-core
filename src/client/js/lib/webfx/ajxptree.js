@@ -88,7 +88,7 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
 	}
 	
 	this.folder = true;
-	this.WebFXTreeItem(ajxpNode.getLabel(), sAction, eParent, icon, (openIcon?openIcon:"foder_open.png"));
+	this.WebFXTreeItem(ajxpNode.getLabel(), sAction, eParent, icon, (openIcon?openIcon:resolveImageSource("folder_open.png", "/images/crystal/mimes/ICON_SIZE", 16)));
 
 	this.loading = false;
 	this.loaded = false;

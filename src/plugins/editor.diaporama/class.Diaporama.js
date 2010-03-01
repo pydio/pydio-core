@@ -136,24 +136,21 @@ Diaporama = Class.create(AbstractEditor, {
 	open : function($super, userSelection)
 	{
 		$super(userSelection);
-		var allItems, sCurrentFile;
+		var allNodes, sCurrentFile;
 		if(userSelection.isUnique()){
-			var currentItems = userSelection.getContextNode().getChildren();
-			allItems = $A([]);
-			currentItems.each(function(item){
-				allItems.push(item.getMetadata());
-			});						
+			allItems = userSelection.getContextNode().getChildren();
 			sCurrentFile = userSelection.getUniqueFileName();
 		}else{
-			allItems = userSelection.getSelectedItems();
+			allItems = userSelection.getSelectedNodes();
 		}		
 		this.items = new Array();
 		this.sizes = new Hash();
-		$A(allItems).each(function(rowItem){
-			if(rowItem.getAttribute('is_image')=='1'){
-				this.items.push(rowItem.getAttribute('filename'));
-				this.sizes.set(rowItem.getAttribute('filename'),  {height:rowItem.getAttribute('image_height')||'n/a', 
-															   width:rowItem.getAttribute('image_width')||'n/a'});
+		$A(allItems).each(function(node){
+			var meta = node.getMetadata();
+			if(meta.get('is_image')=='1'){
+				this.items.push(node.getPath());
+				this.sizes.set(node.getPath(),  {height:meta.get('image_height')||'n/a', 
+												 width:meta.get('image_width')||'n/a'});
 			}
 		}.bind(this));	
 		

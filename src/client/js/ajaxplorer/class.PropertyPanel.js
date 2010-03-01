@@ -42,7 +42,7 @@ Class.create("PropertyPanel", {
 
 		this.htmlElement = $(htmlElement).select("[id='properties_box']")[0];
 		if(userSelection.isUnique()){
-			this.origValue = userSelection.getUniqueItem().getAttribute('file_perms');
+			this.origValue = userSelection.getUniqueNode().getMetadata().get('file_perms');
 		}else{
 			this.origValue = '';
 		}

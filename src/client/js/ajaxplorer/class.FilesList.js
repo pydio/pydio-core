@@ -643,7 +643,7 @@ Class.create("FilesList", SelectableElements, {
 			if(this._displayMode == "list") {
 				newItem = this.ajxpNodeToTableRow(child);
 			}else {
-				newItem = this.xmlNodeToDiv(child.getMetadata().get("XML_NODE"));
+				newItem = this.ajxpNodeToDiv(child);
 			}
 			newItem.ajxpNode = child;
 		}	
@@ -768,7 +768,7 @@ Class.create("FilesList", SelectableElements, {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
 				}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/crystal/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + metaData.get('text')+"</span>");
-				innerSpan.setAttribute('filename', metaData.get('filename'));
+				innerSpan.ajxpNode = ajxpNode; // For draggable
 				tableCell.insert(innerSpan);
 				
 				// Defer Drag'n'drop assignation for performances
@@ -811,6 +811,91 @@ Class.create("FilesList", SelectableElements, {
 			$(newRow).addClassName('even');
 		}
 		this.even = !this.even;
+		return newRow;
+	},
+	
+	ajxpNodeToDiv: function(ajxpNode){
+		var newRow = new Element('div', {className:"thumbnail_selectable_cell"});
+		var metadata = ajxpNode.getMetadata();
+				
+		var innerSpan = new Element('span', {style:"cursor:default;"});
+		if(metadata.get("is_image") == "1")
+		{
+			this._crtImageIndex ++;
+			var imgIndex = this._crtImageIndex;
+			var textNode = ajxpNode.getLabel();
+			var img = new Element('img', {
+				id:"ajxp_image_"+imgIndex,
+				src:ajxpResourcesFolder+"/images/crystal/mimes/64/image.png",
+				width:"64",
+				height:"64",
+				style:"margin:5px",
+				align:"ABSMIDDLE",
+				border:"0",
+				is_loaded:"false"
+			});
+			var label = new Element('div', {
+				className:"thumbLabel",
+				title:textNode
+			});
+			label.innerHTML = textNode;
+			var width = metadata.get("image_width");
+			var height = metadata.get("image_height");		
+			var marginTop, marginHeight, newHeight, newWidth;
+			if(width >= height){
+				newWidth = 64;
+				newHeight = parseInt(height / width * 64);
+				marginTop = parseInt((64 - newHeight)/2) + 5;
+				marginBottom = 64+10-newHeight-marginTop-1;
+			}
+			else
+			{
+				newHeight = 64;
+				newWidth = parseInt(width / height * 64);
+				marginTop = 5;
+				marginBottom = 5;
+			}
+			var crtIndex = this._crtImageIndex;
+			innerSpan.insert({"bottom":img});
+			innerSpan.insert({"bottom":label});
+			newRow.insert({"bottom": innerSpan});
+			newRow.IMAGE_ELEMENT = img;
+			newRow.LABEL_ELEMENT = label;
+			this._htmlElement.appendChild(newRow);
+			
+			var fileName = ajxpNode.getPath();
+			var oImageToLoad = {
+				index:"ajxp_image_"+crtIndex,
+				filename:fileName, 
+				rowObject:newRow, 
+				height: newHeight, 
+				width: newWidth, 
+				marginTop: marginTop, 
+				marginBottom: marginBottom
+			};
+			this.imagesHash.set(oImageToLoad.index, oImageToLoad);
+			
+		}
+		else
+		{
+			src = resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE/", 64);
+			var imgString = "<img src=\""+src+"\" ";
+			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + ajxpNode.getLabel() +"\">" + ajxpNode.getLabel() +"</div>";
+			innerSpan.innerHTML = imgString;		
+			newRow.appendChild(innerSpan);
+			this._htmlElement.appendChild(newRow);
+		}
+		
+		// Defer Drag'n'drop assignation for performances
+		if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
+			window.setTimeout(function(){
+				var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true,scroll:'tree_container'}, this, 'filesList');
+			}.bind(this), 500);
+		}
+		if(!ajxpNode.isLeaf())
+		{
+			AjxpDroppables.add(newRow);
+		}		
 		return newRow;
 	},
 	
@@ -884,9 +969,6 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else
 		{
-			// Add icon
-			//if(xmlNode.getAttribute("is_file") == "0") src = "images/crystal/mimes/64/folder.png";
-			//else 
 			src = resolveImageSource(tmpAtts.get('icon'), "/images/crystal/mimes/ICON_SIZE/", 64);//ajxpResourcesFolder+'/images/crystal/mimes/64/'+tmpAtts.get('icon');
 			var imgString = "<img src=\""+src+"\" ";
 			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + tmpAtts.get("text")+"\">" + tmpAtts.get("text")+"</div>";
@@ -1043,15 +1125,14 @@ Class.create("FilesList", SelectableElements, {
 		{
 			return; // Prevent from double clicking header!
 		}
-		isFile = selRaw[0].getAttribute('is_file');
-		fileName = selRaw[0].getAttribute('filename');
-		if(isFile == '1' || isFile=='true')
+		var selNode = selRaw[0].ajxpNode;
+		if(selNode.isLeaf())
 		{
 			ajaxplorer.getActionBar().fireDefaultAction("file");
 		}
 		else
 		{
-			ajaxplorer.getActionBar().fireDefaultAction("dir", selRaw[0].getAttribute('filename'));
+			ajaxplorer.getActionBar().fireDefaultAction("dir", selNode);
 		}
 	},
 	

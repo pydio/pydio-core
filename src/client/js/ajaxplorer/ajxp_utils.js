@@ -51,6 +51,8 @@ function getAjxpMimeType(item){
 	if(!item) return "";
 	if(Object.isHash(item)){
 		return (item.get('ajxp_mime') || getFileExtension(item.get('filename')));
+	}else if(Object.isFunction(item.getMetadata)){
+		return (item.getMetadata().get('ajxp_mime') || getFileExtension(item.getPath()));
 	}else{
 		return (item.getAttribute('ajxp_mime') || getFileExtension(item.getAttribute('filename')));
 	}	

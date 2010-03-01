@@ -131,13 +131,14 @@ SQLEditor = Class.create({
 		this.oForm.insert(newRec);
 		if(userSelection && !userSelection.isEmpty()){
 			newRec.value = 'false';
-			var item = userSelection.getUniqueItem();
+			var item = userSelection.getUniqueNode();
+			var meta = item.getMetadata();
 			var value = new Hash();
 			this.fields.each(function(fName){
 				if(Prototype.Browser.IE && fName == "ID"){
-					value.set(fName, item.getAttribute("ajxp_sql_"+fName));
+					value.set(fName, meta.get("ajxp_sql_"+fName));
 				}else{
-					value.set(fName, item.getAttribute(fName));
+					value.set(fName, meta.get(fName));
 				}
 			});
 			var formManager = new FormManager();
