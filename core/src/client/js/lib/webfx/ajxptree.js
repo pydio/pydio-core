@@ -50,17 +50,29 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 
 AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	ajxpNode.observe("child_added", function(childPath){
+		if(ajxpNode.getMetadata().get('paginationData')){
+			if(!this.paginated){
+				this.paginated = true;
+				this.updateLabel(this.text + " (" + MessageHash[ajxpNode.getMetadata().get('paginationData').get('overflowMessage')]+ ")");
+			}
+			return;
+		}else if(this.paginated){
+			this.paginated = false;
+			this.updateLabel(this.text);
+		}
 		var child = ajxpNode.findChildByPath(childPath);
 		if(child){
 			var jsChild = _ajxpNodeToTree(child, this);
-			this.attachListeners(jsChild, child);
+			if(jsChild){
+				this.attachListeners(jsChild, child);
+			}
 		}
 	}.bind(jsNode));
 	ajxpNode.observe("node_replaced", function(newNode){
 		//console.log(this, newNode);
 		// Should refresh label / icon
 	}.bind(jsNode));
-	ajxpNode.observe("node_removed", function(e){
+	ajxpNode.observeOnce("node_removed", function(e){
 		jsNode.remove();
 	});
 	ajxpNode.observe("loading", function(){		
@@ -68,6 +80,7 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	}.bind(jsNode) );
 	ajxpNode.observe("loaded", function(){
 		this._loadingItem.remove();
+		this._webfxtree_expand();
 	}.bind(jsNode) );
 };
 
@@ -112,6 +125,7 @@ AJXPTreeItem.prototype.expand = function() {
 };
 
 // reloads the src file if already loaded
+/*
 AJXPTree.prototype.reload =
 AJXPTreeItem.prototype.reload = function () {
 	// if loading do nothing
@@ -134,7 +148,7 @@ AJXPTreeItem.prototype.reload = function () {
 		
 	if(!this.open && !this.loading) this.toggle();
 };
-
+*/
 AJXPTreeItem.prototype.attachListeners = AJXPTree.prototype.attachListeners;
 
 
@@ -157,7 +171,7 @@ function _ajxpNodeToTree(ajxpNode, parentNode) {
 	}
 	*/
 	if(ajxpNode.isLeaf()){
-		return;
+		return false;
 	}
 	var jsNode = new AJXPTreeItem(ajxpNode, null, parentNode);	
 	if(ajxpNode.isLoaded())
@@ -167,7 +181,10 @@ function _ajxpNodeToTree(ajxpNode, parentNode) {
 	jsNode.filename = ajxpNode.getPath();	
 	
 	ajxpNode.getChildren().each(function(child){
-		jsNode.add( _ajxpNodeToTree(child, jsNode), true );
+		var newNode = _ajxpNodeToTree(child, jsNode);
+		if(newNode){
+			jsNode.add( newNode , true );
+		}
 	}.bind(this) );	
 	return jsNode;	
 };

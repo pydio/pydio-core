@@ -60,9 +60,8 @@ Class.create("ActionsManager", AjxpPane, {
 		this.toolbars = new Hash();		
 		this.loadActions('ajxp');	
 		document.observe("ajaxplorer:context_changed", function(event){
-			var path = event.memo.getContextNode().getPath();
 			this.fireContextChange();
-			this.updateLocationBar(path);
+			this.updateLocationBar(event.memo.getContextNode());
 		}.bind(this) );
 		
 		document.observe("ajaxplorer:selection_changed", function(event){
@@ -733,8 +732,16 @@ Class.create("ActionsManager", AjxpPane, {
 	locationBarSubmit: function (url)
 	{
 		if(url == '') return false;	
-		var path = new AjxpNode(url, false);
-		this.fireDefaultAction("dir", path);
+		var node = new AjxpNode(url, false);
+		var parts = url.split("#");
+		if(parts.length == 2){
+			var data = new Hash();
+			data.set("new_page", parts[1]);
+			url = parts[0];
+			node = new AjxpNode(url);
+			node.getMetadata().set("paginationData", data);
+		}
+		this.fireDefaultAction("dir", node);
 		return false;
 	},
 	
@@ -743,10 +750,14 @@ Class.create("ActionsManager", AjxpPane, {
 		$('current_path').activate();
 	},
 	
-	updateLocationBar: function (newPath)
+	updateLocationBar: function (newNode)
 	{
+		var newPath = newNode.getPath();
 		if(newPath == ""){
 			newPath = "/";
+		}
+		if(newNode.getMetadata().get('paginationData')){
+			newPath += "#" + newNode.getMetadata().get('paginationData').get('current');
 		}
 		$('current_path').value = newPath;
 	},
