@@ -752,6 +752,9 @@ Class.create("ActionsManager", AjxpPane, {
 	
 	updateLocationBar: function (newNode)
 	{
+		if(Object.isString(newNode)){
+			newNode = new AjxpNode(newNode);
+		}
 		var newPath = newNode.getPath();
 		if(newPath == ""){
 			newPath = "/";
