@@ -284,8 +284,9 @@ var AjxpDroppables = {
 		accept:'ajxp_draggable',		
 		onDrop:function(draggable, droppable, event)
 				{
-					var targetName = droppable.getAttribute('filename');
-					var srcName = draggable.getAttribute('filename');
+					if(!draggable.ajxpNode || !droppable.ajxpNode) return;
+					var targetName = droppable.ajxpNode.getPath();
+					var srcName = draggable.ajxpNode.getPath();
 					if(WebFXtimer) clearTimeout(WebFXtimer);
 					var nodeId = null;
 					if(droppable.id && webFXTreeHandler.all[droppable.id]){

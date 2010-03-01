@@ -111,8 +111,12 @@ Class.create("AjxpNode", {
 	},
 	replaceBy : function(ajxpNode){
 		this._isLeaf = ajxpNode._isLeaf;
-		this._label = ajxpNode._label;
-		this._icon = ajxpNode._icon;
+		if(ajxpNode._label){
+			this._label = ajxpNode._label;
+		}
+		if(ajxpNode._icon){
+			this._icon = ajxpNode._icon;
+		}
 		this._isRoot = ajxpNode._isRoot;
 		this._isLoaded = ajxpNode._isLoaded;
 		this.fake = ajxpNode.fake;

@@ -316,7 +316,7 @@ AJXP_MESSAGE[174]<br/>
 				<dynamicBuilder><![CDATA[
 					var context = window.builderContext;
 					context.builderMenuItems = $A([]);					
-					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueItem());
+					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
 					var editors = ajaxplorer.findEditorsForMime(selectedMime);
 					editors.each(function(el){
 						context.builderMenuItems.push({

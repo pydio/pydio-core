@@ -92,7 +92,6 @@ var webFXTreeHandler = {
 	keydown   : function (oItem, e) { return this.all[oItem.id].keydown(e.keyCode); },
 	linkKeyPress : function(oItem, e){if(!this.hasFocus || e.keyCode == 9) return false;return true;},
 	cookies   : new WebFXCookie(),
-	ajxpNodes : {},
 	insertHTMLBeforeEnd	:	function (oElement, sHTML) {
 		if (oElement.insertAdjacentHTML != null) {
 			oElement.insertAdjacentHTML("BeforeEnd", sHTML) ;
@@ -155,12 +154,6 @@ function WebFXTreeAbstractNode(sText, sAction) {
 WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	node.parentNode = this;	
 	var url = node.parentNode.url;
-	if(url == "/") url = "";
-	if(node.isRecycle || node.ajxpNode){
-		node.url = url + "/" + getBaseName(node.filename);
-	}else{
-		node.url = url + "/" + node.text;
-	}
 	if(node.parentNode.inZip) node.inZip = true;
 	else{		
 		if(webFXTreeConfig.zipRegexp.test(node.text) !== false){
@@ -195,9 +188,10 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			foo = foo.parentNode;
 		}
 		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());		
+		$(node.id).ajxpNode = node.ajxpNode;
 		if(!node.inZip){
 			AjxpDroppables.add(node.id);
-		}
+		}		
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){
 			Event.observe(node.id+'-anchor','contextmenu', function(event){
@@ -417,13 +411,8 @@ WebFXTree.prototype.keydown = function(key) {
 } ;
 
 WebFXTree.prototype.toString = function() {
-	
-	if(this.ajxpNode)
-	{
-		webFXTreeHandler.ajxpNodes[this.folderFullName]=this.id;
-	}
-	
-	var str = "<div style=\"padding-top:2px; padding-left:2px;\"  id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\" filename=\"/\">" +
+		
+	var str = "<div style=\"padding-top:2px; padding-left:2px;\"  id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
 		"<img id=\"" + this.id + "-icon\" class=\"webfx-tree-icon\" src=\"" + ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) + "\" onclick=\"webFXTreeHandler.select(this);\">" +
 		"<a href=\"/\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\"  onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +
 		(this.target ? " target=\"" + this.target + "\"" : "") +
@@ -621,7 +610,7 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 	else if (!this.icon) { this.icon = webFXTreeConfig.fileIcon; }
 	
 	var label = this.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\" filename=\""+this.filename+"\">" +
+	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
 		indent +
 		"<img  width=\"19\" height=\"20\" id=\"" + this.id + "-plus\" src=\"" + ((this.folder)?((this.open)?((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon):((this.parentNode._last)?webFXTreeConfig.lPlusIcon:webFXTreeConfig.tPlusIcon)):((this.parentNode._last)?webFXTreeConfig.lIcon:webFXTreeConfig.tIcon)) + "\" onclick=\"webFXTreeHandler.toggle(this);\">" +
 		"<a href=\"" + this.url + "\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\" onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +

@@ -54,7 +54,8 @@ Class.create("FoldersTree", AjxpPane, {
 		this.tree = new AJXPTree(new AjxpNode("/", true, "No Repository", "folder.png"),  action);
 		// DISABLE LOADING
 		this.tree.loaded = true;		
-		this.treeContainer.update(this.tree.toString());	
+		this.treeContainer.update(this.tree.toString());
+		$(this.tree.id).ajxpNode = this.tree.ajxpNode;	
 		$(this.tree.id).observe("click", function(e){
 			this.action(e);
 			Event.stop(e);

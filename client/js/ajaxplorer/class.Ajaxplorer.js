@@ -41,7 +41,7 @@ Class.create("Ajaxplorer", {
 		this.usersEnabled = usersEnabled;
 		this._initLoggedUser = loggedUser;
 		this._initRepositoriesList = $H({});
-		this._contextHolder = new UserSelection();
+		this._contextHolder = new AjxpDataModel();
 		this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		this._displayMode = 'list';
 		if(repoListXML && repoListXML.childNodes.length){

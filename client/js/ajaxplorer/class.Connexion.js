@@ -87,7 +87,9 @@ Class.create("Connexion", {
 			alert("Unknown Parsing Error!");
 			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
 		}
-		this.onComplete(transport);
+		if(this.onComplete){
+			this.onComplete(transport);
+		}
 	},
 	
 	loadLibrary : function(fileName, onLoadedCode){
