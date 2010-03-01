@@ -58,17 +58,21 @@ Class.create("AjxpNode", {
 		this._isLoaded = bool;
 	},
 	load : function(iAjxpNodeProvider){		
+		if(this.isLoading) return;
 		if(!iAjxpNodeProvider){
 			iAjxpNodeProvider = new RemoteNodeProvider();
 		}
+		this.isLoading = true;
 		if(this._isLoaded){
+			this.isLoading = false;
 			this.notify("loaded");
 			return;
 		}
 		iAjxpNodeProvider.loadNode(this, function(node){
-			this._isLoaded = true;			
+			this._isLoaded = true;
+			this.isLoading = false;
 			this.notify("loaded");
-		}.bind(this));
+		}.bind(this));		
 	},
 	reload : function(iAjxpNodeProvider){
 		this._children.each(function(child){
@@ -93,17 +97,17 @@ Class.create("AjxpNode", {
 			existingNode.replaceBy(ajxpNode);
 		}else{
 			this._children.push(ajxpNode);
-			this.notify("node_added", ajxpNode.getPath());
+			this.notify("child_added", ajxpNode.getPath());
 		}
 	},
 	removeChild : function(ajxpNode){
 		var removePath = ajxpNode.getPath();
 		for(i=0;i<this._children.length;i++){
-			if(ajxpNode == this._children[i]){
+			if(ajxpNode == this._children[i]){				
 				this._children.splice(i, 1);
 			}
 		}
-		this.notify("node_removed", removePath);
+		this.notify("child_removed", removePath);
 	},
 	replaceBy : function(ajxpNode){
 		this._isLeaf = ajxpNode._isLeaf;
@@ -112,12 +116,17 @@ Class.create("AjxpNode", {
 		this._isRoot = ajxpNode._isRoot;
 		this._isLoaded = ajxpNode._isLoaded;
 		this.fake = ajxpNode.fake;
-		this.setChildren(ajxpNode.getChildren());
+		ajxpNode.getChildren().each(function(child){
+			this.addChild(child);
+		}.bind(this) );		
 		var meta = ajxpNode.getMetadata();		
 		meta.each(function(pair){
+			if(this._metadata.get(pair.key) && pair.value === ""){
+				return;
+			}
 			this._metadata.set(pair.key, pair.value);
 		}.bind(this) );
-		this.notify("node_replaced", this.getPath());		
+		this.notify("node_replaced", this);		
 	},
 	findChildByPath : function(path){
 		return $A(this._children).find(function(child){
@@ -176,7 +185,7 @@ Class.create("AjxpNode", {
 				crtNode = node;
 			}else{
 				crtNode = new AjxpNode(crtPath, false, getBaseName(crtPath));
-				crtNode.fake = true;
+				crtNode.fake = true;				
 				fakeNodes.push(crtNode);
 				crtParentNode.addChild(crtNode);
 			}

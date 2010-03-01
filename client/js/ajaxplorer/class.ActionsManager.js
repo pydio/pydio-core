@@ -462,8 +462,8 @@ Class.create("ActionsManager", AjxpPane, {
 				if(obName == 'tree')
 				{
 					var node = childs[i].getAttribute('node');				
-					if(node == null) ajaxplorer.foldersTree.reloadCurrentNode();
-					else ajaxplorer.foldersTree.reloadNode(node);
+					//if(node == null) ajaxplorer.foldersTree.reloadCurrentNode();
+					//else ajaxplorer.foldersTree.reloadNode(node);
 				}
 				else if(obName == 'list')
 				{

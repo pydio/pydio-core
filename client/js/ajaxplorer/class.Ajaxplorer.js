@@ -413,12 +413,12 @@ Class.create("Ajaxplorer", {
 		this._contextHolder.setRootNode(rootNode);
 				
 		if(!this._initObj) { 
-			this.goTo('/');
+			this.goTo(rootNode);
 			this.repositoryId = repositoryId;
 			this.actionBar.loadBookmarks();
 		} else { this._initObj = null ;}
 		if(this._initLoadRep){
-			this.goTo(this._initLoadRep);
+			//this.goTo(this._initLoadRep);
 			this._initLoadRep = null;
 		}
 		$('repo_path').value = repository.getLabel();
@@ -429,9 +429,14 @@ Class.create("Ajaxplorer", {
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 
-	goTo: function(rep, selectFile){
+	goTo: function(nodeOrPath){
 		if(selectFile) this._contextHolder.setPendingFile(selectFile);
-		this._contextHolder.setContextNode(new AjxpNode(rep));
+		if(Object.isString(nodeOrPath)){
+			node = new AjxpNode(nodeOrPath);
+		}else{
+			node = nodeOrPath;
+		}
+		this._contextHolder.requireContextChange(node);
 	},
 	
 	refreshRepositoriesMenu: function(rootDirsList, repositoryId){
