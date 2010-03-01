@@ -493,7 +493,7 @@ class fsAccessDriver extends AbstractAccessDriver
 								unlink($currentFile);
 							}
 						}					
-						AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $zipEntry["folder"], $metaData);
+						AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, !$zipEntry["folder"], $metaData);
 					}
 					AJXP_XMLWriter::close();
 					exit(0);
@@ -601,7 +601,7 @@ class fsAccessDriver extends AbstractAccessDriver
 								  "icon"			=> "$recycleIcon", 
 								  "is_recycle" 		=> "true", 
 								  "filesize"		=> "-", 
-								  "ajxp_mime"		=> "recycle")
+								  "ajxp_mime"		=> "ajxp_recycle")
 						);
 					}
 				}
