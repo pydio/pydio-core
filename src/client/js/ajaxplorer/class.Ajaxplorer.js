@@ -412,11 +412,11 @@ Class.create("Ajaxplorer", {
 		rootNode.setRoot();
 		this._contextHolder.setRootNode(rootNode);
 				
-		if(!this._initObj) { 
-			this.goTo(rootNode);
+		if(!this._initObj) { 			
 			this.repositoryId = repositoryId;
 			this.actionBar.loadBookmarks();
 		} else { this._initObj = null ;}
+		this.goTo(rootNode);
 		if(this._initLoadRep){
 			//this.goTo(this._initLoadRep);
 			this._initLoadRep = null;
@@ -429,8 +429,7 @@ Class.create("Ajaxplorer", {
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 
-	goTo: function(nodeOrPath){
-		if(selectFile) this._contextHolder.setPendingFile(selectFile);
+	goTo: function(nodeOrPath){		
 		if(Object.isString(nodeOrPath)){
 			node = new AjxpNode(nodeOrPath);
 		}else{
