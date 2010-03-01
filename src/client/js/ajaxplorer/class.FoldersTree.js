@@ -46,10 +46,11 @@ Class.create("FoldersTree", AjxpPane, {
 		var action = function(e){
 			if(!ajaxplorer) return;
 			ajaxplorer.focusOn(thisObject);
-			thisObject.clickNode(this.id);
+			if(this.ajxpNode){
+				ajaxplorer.actionBar.fireDefaultAction("dir", this.ajxpNode);
+			}
 		};
 		
-		// this.tree = new WebFXLoadTree(rootFolderName, rootFolderSrc, action, 'explorer');
 		this.tree = new AJXPTree(new AjxpNode("/", true, "No Repository", "folder.png"),  action);
 		// DISABLE LOADING
 		this.tree.loaded = true;		
@@ -63,22 +64,16 @@ Class.create("FoldersTree", AjxpPane, {
 		this.treeContainer.observe("click", function(){			
 			ajaxplorer.focusOn(this);
 		}.bind(this));
-		this.setCurrentNodeName(this.tree.id);
 	
 		this.rootNodeId = this.tree.id;
-		this.currentNodeName;
-		this.goToNextWhenLoaded;
-		
-		this.currentDeepPath;
-		this.currentDeepIndex;
-		
-		this.treeInDestMode = false;	
-		this._ajaxplorer = oAjaxplorer;	
+				
 		this.hasFocus;
 		
 		document.observe("ajaxplorer:context_changed", function(event){
 			var path = event.memo.getContextNode().getPath();
-			this.goToDeepPath(path);
+			window.setTimeout(function(e){
+				this.setSelectedPath(path);
+			}.bind(this), 100);			
 		}.bind(this) );
 		
 		document.observe("ajaxplorer:context_refresh", function(event){
@@ -106,7 +101,7 @@ Class.create("FoldersTree", AjxpPane, {
 		webFXTreeHandler.setFocus(false);
 		this.hasFocus = false;
 	},
-	
+		
 	resize : function(){
 		fitHeightToBottom(this.treeContainer, null, (Prototype.Browser.IE?0:2), true);
 	},
@@ -122,10 +117,34 @@ Class.create("FoldersTree", AjxpPane, {
 		webFXTreeHandler.contextMenu = protoMenu;
 	},
 	
-	clickNode: function(nodeId){
-		if(webFXTreeHandler.all[nodeId].ajxpNode){
-			ajaxplorer.actionBar.fireDefaultAction("dir", webFXTreeHandler.all[nodeId].ajxpNode);
+	getNodeByPath : function(path){
+		for(var key in webFXTreeHandler.all){
+			if(webFXTreeHandler.all[key] && webFXTreeHandler.all[key].ajxpNode && webFXTreeHandler.all[key].ajxpNode.getPath() == path){
+				return webFXTreeHandler.all[key];
+			}
 		}
+	},
+	
+	setSelectedPath : function(path){
+		if(path == "" || path == "/"){
+			this.tree.select();
+			return;
+		}
+		var parts = this.cleanPathToArray(path);
+		var crtPath = "";
+		for(var i=0;i<parts.length;i++){
+			crtPath += "/" + parts[i];
+			var node = this.getNodeByPath(crtPath);
+			if(node){
+				node._webfxtree_expand();
+			}			
+		}
+		if(node){
+			node.select();
+		}
+	},
+	
+	clickNode: function(nodeId){
 		/*
 		var path = webFXTreeHandler.all[nodeId].url;
 		if(path){
@@ -139,125 +158,18 @@ Class.create("FoldersTree", AjxpPane, {
 		}
 		*/
 	},
-		
-	setCurrentNodeName: function(newId, skipSelect){
-		this.currentNodeName = newId;
-		if(!skipSelect) this.selectCurrentNodeName();
-		if(this.goToNextWhenLoaded != null)
-		{
-			this.goToNextWhenLoaded = null;
-		}
-	},
-	
-	selectCurrentNodeName: function(){
-		for(var i=0; i<webFXTreeHandler.all.length;i++)
-		{
-			webFXTreeHandler.all[i].deSelect();
-		}
-		webFXTreeHandler.all[this.currentNodeName].select();	
-	},
-	
-	setCurrentNodeProperty : function(key, value){
-		if(webFXTreeHandler.all[this.currentNodeName]){
-			webFXTreeHandler.all[this.currentNodeName].key = value;
-		}
-	},
-	
-	getCurrentNodeProperty : function(key){
-		if(webFXTreeHandler.all[this.currentNodeName]){
-			return webFXTreeHandler.all[this.currentNodeName].key;
-		}
-		return null;
-	},
-		
-	openCurrentAndGoToNext: function(url){		
-		if(this.currentNodeName == null) return;
-		webFXTreeHandler.all[this.currentNodeName].expand();
-		this.goToNextWhenLoaded = url;
-		firstTry = this.getTreeChildNodeByName(url);	
-		if(firstTry)
-		{
-			this.setCurrentNodeName(firstTry, true);
-			this.goToNextWhenLoaded = null;
-			if(this.currentDeepPath != null && this.currentDeepIndex != null)
-			{
-				if(this.currentDeepIndex < this.currentDeepPath.length-1)
-				{
-					this.currentDeepIndex ++;
-					//alert(currentDeepPath[currentDeepIndex]);				
-					this.openCurrentAndGoToNext(this.currentDeepPath[this.currentDeepIndex]);
-				}
-				else
-				{
-					this.currentDeepPath = null;
-					this.currentDeepIndex = null;
-					this.selectCurrentNodeName();
-				}
-			}
-			else
-			{
-				this.selectCurrentNodeName();
-			}
-			
-		}
-	},	
-	
-	asyncExpandAndSelect: function(){
-		if(this.goToNextWhenLoaded != null)
-		{		
-			secondTry = this.getTreeChildNodeByName(this.goToNextWhenLoaded);
-			if(secondTry) this.setCurrentNodeName(secondTry, true);
-			//
-			if(this.currentDeepPath != null && this.currentDeepIndex != null)
-			{
-				if(this.currentDeepIndex < this.currentDeepPath.length-1)
-				{
-					this.currentDeepIndex ++;
-					this.openCurrentAndGoToNext(this.currentDeepPath[this.currentDeepIndex]);
-				}
-				else
-				{
-					this.currentDeepPath = null;
-					this.currentDeepIndex = null;
-					//goToNextWhenLoaded = null;
-					this.selectCurrentNodeName();
-				}
-			}
-			else
-			{
-				this.goToNextWhenLoaded = null;
-				this.selectCurrentNodeName();
-			}
-		}	
-	},
-	
-	goToParentNode: function(){
-		if(this.currentNodeName == null || this.currentNodeName == this.getRootNodeId()) return;
-		this.setCurrentNodeName(webFXTreeHandler.all[this.currentNodeName].parentNode.id);		
-	},
 	
 	reloadCurrentNode: function(){
-		this.reloadNode(this.currentNodeName);
+		//this.reloadNode(this.currentNodeName);
 		return;
 	},
 	
 	reloadFullTree: function(event){		
 		var ajxpRootNode = event.memo;
 		webFXTreeHandler.recycleNode = null;
-		this.setCurrentToRoot();
 		this.tree.setAjxpRootNode(ajxpRootNode);
 		this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());		
 		
-		/*
-		ajxpRootNode.observe("node_added", function(childPath){
-			var newTreeNode = new WebFXTreeItem(getBaseName(childPath));
-			newTreeNode.ajxpNode = ajxpRootNode.findChildByPath(childPath);
-			newTreeNode.ajxpNode.observe("node_added", function(subPath){
-				newTreeNode.add(new WebFXTreeItem(getBaseName(subPath)));
-			}.bind(this) );
-			this.tree.add(newTreeNode);
-		}.bind(this) );
-		*/
 		// DISABLE LOADING (TMP)
 		//this.reloadCurrentNode();
 	},
@@ -267,7 +179,7 @@ Class.create("FoldersTree", AjxpPane, {
 		{		
 			return;
 		}
-		if(nodeName == this.getRootNodeId())
+		if(nodeName == this.rootNodeId)
 		{
 			this.tree.doCollapse();
 			this.tree.reload();
@@ -284,63 +196,6 @@ Class.create("FoldersTree", AjxpPane, {
 		}	
 	},
 	
-	getTreeChildNodeByName: function(childName){
-		if (this.currentNodeName == null)
-		{
-			return;		
-		}
-		if(webFXTreeHandler.recycleNode){
-			rec = webFXTreeHandler.all[webFXTreeHandler.recycleNode];
-			if(getBaseName(childName) == getBaseName(rec.filename))
-			{
-				return webFXTreeHandler.recycleNode;
-			}
-		}		
-		if(webFXTreeHandler.ajxpNodes[getBaseName(childName)]){
-			return webFXTreeHandler.ajxpNodes[getBaseName(childName)];
-		}
-		if(childName.lastIndexOf("/") != -1)
-		{
-			childName = childName.substr(childName.lastIndexOf("/")+1, childName.length);
-		}
-		var currentNodeObject = webFXTreeHandler.all[this.currentNodeName];
-		for(i=0; i<currentNodeObject.childNodes.length ; i++)
-		{
-			if(currentNodeObject.childNodes[i].text && currentNodeObject.childNodes[i].text == childName)
-			{
-				return currentNodeObject.childNodes[i].id;
-			}
-		}	
-	},
-		
-	goToDeepPath: function(url){
-		var currentPath = "/";
-		if(!this.currentNodeName) this.setCurrentToRoot(true);
-		if(this.currentNodeName && webFXTreeHandler.all[this.currentNodeName] && webFXTreeHandler.all[this.currentNodeName].url){
-			currentPath = webFXTreeHandler.all[this.currentNodeName].url;		
-		}
-		var currentSplit = currentPath.split("/");
-		currentSplit.shift();
-		var isChild = false;
-		var path = this.cleanPathToArray(url);
-				
-		if(currentPath!= "/" && url.substring(0, currentPath.length) == currentPath){
-			isChild = true;			
-			for(var i=0;i<currentSplit.length; i++){				
-				path.shift();				
-			}
-		}
-
-		this.currentDeepPath = path;
-		this.currentDeepIndex = 0;
-		if(!isChild){
-			this.setCurrentNodeName(this.getRootNodeId(), true);
-		}
-		if(this.currentDeepPath.length > 0){
-			this.openCurrentAndGoToNext(this.currentDeepPath[0]);
-		}
-		return false;	
-	},
 	
 	cleanPathToArray: function(url){
 		var splitPath = url.split("/");
@@ -356,54 +211,9 @@ Class.create("FoldersTree", AjxpPane, {
 		}
 		return path;		
 	},
-	
-	getRootNodeId: function(){
-		return this.rootNodeId;
-	},
-	
-	currentIsRoot: function(){
-		return (this.rootNodeId == this.currentNodeName);
-	},
-	
-	recycleEnabled: function(){
-		if(webFXTreeHandler.recycleNode) return true;
-		return false;
-	},
-	
-	currentIsRecycle: function(){
-		if(webFXTreeHandler.recycleNode && this.currentNodeName == webFXTreeHandler.recycleNode)
-		{
-			return true;
-		}
 		
-		return false;
-	},
-	
-	currentInZip : function(){
-		if(this.currentNodeName 
-		&& webFXTreeHandler.all[this.currentNodeName] 
-		&& webFXTreeHandler.all[this.currentNodeName].inZip){
-			return true;
-		}
-		return false;		
-	},
-	
-	getCurrentNodeMime : function(){
-		if((this.rootNodeId == this.currentNodeName)){
-			return "ajxp_root";
-		}
-		if(this.currentNodeName && webFXTreeHandler.all[this.currentNodeName]){
-			return webFXTreeHandler.all[this.currentNodeName].ajxpMime;
-		}
-		return null;
-	},
-	
-	setCurrentToRoot: function(skipSelect){
-		this.setCurrentNodeName(this.getRootNodeId(), skipSelect);
-	},
-	
 	changeRootLabel: function(newLabel, newIcon){
-		this.changeNodeLabel(this.getRootNodeId(), newLabel, newIcon);	
+		this.changeNodeLabel(this.tree.id, newLabel, newIcon);	
 	},
 	
 	changeNodeLabel: function(nodeId, newLabel, newIcon){	

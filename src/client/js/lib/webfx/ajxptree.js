@@ -5,6 +5,7 @@ webFXTreeConfig.loadingText = "Loading...";
 
 function AJXPTree(rootNode, sAction) {
 	this.WebFXTree = WebFXTree;
+	this.ajxpNode = rootNode;
 	var icon = rootNode.getIcon();
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
 		icon = resolveImageSource(icon, "/images/crystal/mimes/ICON_SIZE", 16);
@@ -19,7 +20,6 @@ function AJXPTree(rootNode, sAction) {
 	}
 	
 	this.WebFXTree(rootNode.getLabel(), sAction, 'explorer', icon, openIcon);
-	this.ajxpNode = rootNode;
 	// setup default property values
 	this.loading = false;
 	this.loaded = false;
@@ -36,7 +36,9 @@ AJXPTree.prototype = new WebFXTree;
 
 AJXPTree.prototype._webfxtree_expand = WebFXTree.prototype.expand;
 AJXPTree.prototype.expand = function() {
-	this.ajxpNode.load();
+	if(!this.ajxpNode.fake){
+		this.ajxpNode.load();
+	}
 	this._webfxtree_expand();
 };
 
@@ -47,13 +49,20 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 };
 
 AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
-	ajxpNode.observe("node_added", function(childPath){
+	ajxpNode.observe("child_added", function(childPath){
 		var child = ajxpNode.findChildByPath(childPath);
 		if(child){
 			var jsChild = _ajxpNodeToTree(child, this);
 			this.attachListeners(jsChild, child);
 		}
 	}.bind(jsNode));
+	ajxpNode.observe("node_replaced", function(newNode){
+		//console.log(this, newNode);
+		// Should refresh label / icon
+	}.bind(jsNode));
+	ajxpNode.observe("node_removed", function(e){
+		jsNode.remove();
+	});
 	ajxpNode.observe("loading", function(){		
 		this.add(this._loadingItem);
 	}.bind(jsNode) );
@@ -78,27 +87,28 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
 		openIcon = icon;
 	}
 	
-	this.WebFXTreeItem(ajxpNode.getLabel(), sAction, eParent, icon, openIcon);
-
 	this.folder = true;
+	this.WebFXTreeItem(ajxpNode.getLabel(), sAction, eParent, icon, (openIcon?openIcon:"foder_open.png"));
+
 	this.loading = false;
 	this.loaded = false;
 	this.errorText = "";
 
 	this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);
-	if (this.open) this.ajxpNode.load();
-	else{
+	if (this.open) {
+		this.ajxpNode.load();
+	}else{
 		this.add(this._loadingItem);
 	}
-	
+	webFXTreeHandler.all[this.id] = this;
 };
 
 AJXPTreeItem.prototype = new WebFXTreeItem;
 
-AJXPTreeItem.prototype._webfxtreeitem_expand = WebFXTreeItem.prototype.expand;
+AJXPTreeItem.prototype._webfxtree_expand = WebFXTreeItem.prototype.expand;
 AJXPTreeItem.prototype.expand = function() {
 	this.ajxpNode.load();
-	this._webfxtreeitem_expand();
+	this._webfxtree_expand();
 };
 
 // reloads the src file if already loaded
