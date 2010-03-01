@@ -220,6 +220,11 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	return node;
 };
 
+
+WebFXTreeAbstractNode.prototype.updateLabel = function(label){
+	$(this.id+'-label').update(label);	
+};
+
 WebFXTreeAbstractNode.prototype.toggle = function() {
 	if (this.folder) {
 		if (this.open) { this.collapse() ; }
@@ -416,7 +421,7 @@ WebFXTree.prototype.toString = function() {
 		"<img id=\"" + this.id + "-icon\" class=\"webfx-tree-icon\" src=\"" + ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) + "\" onclick=\"webFXTreeHandler.select(this);\">" +
 		"<a href=\"/\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\"  onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +
 		(this.target ? " target=\"" + this.target + "\"" : "") +
-		">" + this.text + "</a></div>" +
+		">" + '<span id=\"' +this.id+ '-label\">' + this.text + "</span>" + "</a></div>" +
 		"<div id=\"" + this.id + "-cont\" class=\"webfx-tree-container\" style=\"display: " + ((this.open)?'block':'none') + ";\">";
 	var sb = [];
 	for (var i = 0; i < this.childNodes.length; i++) {
@@ -617,7 +622,7 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 		(this.target ? " target=\"" + this.target + "\"" : "") +
 		">" +
 		"<img id=\"" + this.id + "-icon\" class=\"webfx-tree-icon\" src=\"" + ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) + "\">" +
-		label + "</a></div>" +
+		'<span id=\"' +this.id+ '-label\">' + label + "</span></a></div>" +
 		"<div id=\"" + this.id + "-cont\" class=\"webfx-tree-container\" style=\"display: " + ((this.open)?'block':'none') + ";\">";
 	var sb = [];
 	for (var i = 0; i < this.childNodes.length; i++) {

@@ -98,6 +98,17 @@ Object.Event = {
 };
 /* Begin Core Extensions */
  
+(function(){
+	function observeOnce(document,event_name,outer_callback){
+        var inner_callback = function(){
+            outer_callback.apply(this,arguments);
+            Element.stopObserving(document, event_name,inner_callback);
+        };
+        Element.observe(document, event_name,inner_callback);
+	}
+	Object.extend(document, {observeOnce:observeOnce.methodize()});
+})();
+
 //Element.observeOnce
 Element.addMethods({
     observeOnce: function(element,event_name,outer_callback){

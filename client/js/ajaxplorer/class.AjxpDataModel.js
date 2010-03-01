@@ -63,6 +63,11 @@ Class.create("AjxpDataModel", {
 		if((path == "" || path == "/") && ajxpNode != this._rootNode){
 			ajxpNode = this._rootNode;
 		}
+		if(ajxpNode.getMetadata().get('paginationData') && ajxpNode.getMetadata().get('paginationData').get('new_page') 
+			&& ajxpNode.getMetadata().get('paginationData').get('new_page') != ajxpNode.getMetadata().get('paginationData').get('current')){
+				var paginationPage = ajxpNode.getMetadata().get('paginationData').get('new_page');
+				forceReload = true;			
+		}
 		if(ajxpNode != this._rootNode && (!ajxpNode.getParent() || ajxpNode.fake)){
 			// Find in arbo or build fake arbo
 			var fakeNodes = [];
@@ -96,6 +101,9 @@ Class.create("AjxpDataModel", {
 		document.fire("ajaxplorer:context_loading");
 		try{
 			if(forceReload){
+				if(paginationPage){
+					ajxpNode.getMetadata().get('paginationData').set('current', paginationPage);
+				}
 				ajxpNode.reload(this._iAjxpNodeProvider);
 			}else{
 				ajxpNode.load(this._iAjxpNodeProvider);

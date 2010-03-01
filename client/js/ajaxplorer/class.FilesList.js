@@ -215,17 +215,10 @@ Class.create("FilesList", SelectableElements, {
 	},
 	
 	createPaginatorLink:function(page, text, title){
+		var node = ajaxplorer.getContextNode();
 		return new Element('a', {href:'#', style:'font-size:12px;', title:title}).update(text).observe('click', function(e){
-			var path = ajaxplorer.getContextNode().getPath();
-			if(path.indexOf("#") > -1){
-				path = path.substring(0, path.indexOf("#"));
-			}
-			path  = path + "#" + page;
-			document.observeOnce("ajaxplorer:context_changed", function(event){
-				var node = ajaxplorer.getContextNode();
-				node.getMetadata().set("pagination_anchor", page);
-			});
-			ajaxplorer.updateContextData(new AjxpNode(path));
+			node.getMetadata().get("paginationData").set("new_page", page);
+			ajaxplorer.updateContextData(node);
 			Event.stop(e);
 		}.bind(this));		
 	},
@@ -632,7 +625,18 @@ Class.create("FilesList", SelectableElements, {
 			setItemSelected(items[i], false);
 		}
 		this.removeCurrentLines();
-		var parseXmlNodeFunc;
+		
+		var hasPagination = (this.paginationData?true:false);
+		if(contextNode.getMetadata().get("paginationData")){
+			this.paginationData = contextNode.getMetadata().get("paginationData");
+			this.initGUI();
+		}else{
+			this.paginationData = null;
+			if(hasPagination){
+				this.initGUI();
+			}
+		}
+		
 		// NOW PARSE LINES
 		this.parsingCache = new Hash();		
 		var children = contextNode.getChildren();
