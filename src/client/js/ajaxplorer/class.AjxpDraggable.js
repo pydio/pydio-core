@@ -126,7 +126,10 @@ Class.create("AjxpDraggable", Draggable, {
 						 objectToClone = $(selectedItems[i]);
 					}
 					else {
-						objectToClone = $(selectedItems[i]).getElementsBySelector('span.list_selectable_span')[0];
+						var spans = $(selectedItems[i]).select('span.list_selectable_span');
+						if(spans.length){
+							objectToClone = spans[0];
+						}
 					}
 					var newObj = refreshPNGImages(objectToClone.cloneNode(true));				
 					this.element.appendChild(newObj);
@@ -284,9 +287,12 @@ var AjxpDroppables = {
 		accept:'ajxp_draggable',		
 		onDrop:function(draggable, droppable, event)
 				{
-					if(!draggable.ajxpNode || !droppable.ajxpNode) return;
+					if(!(draggable.ajxpNode || draggable.getAttribute('user_selection')) || !droppable.ajxpNode) return;
 					var targetName = droppable.ajxpNode.getPath();
-					var srcName = draggable.ajxpNode.getPath();
+					var srcName;
+					if(draggable.ajxpNode){
+						var srcName = draggable.ajxpNode.getPath();
+					}
 					if(WebFXtimer) clearTimeout(WebFXtimer);
 					var nodeId = null;
 					if(droppable.id && webFXTreeHandler.all[droppable.id]){
