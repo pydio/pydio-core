@@ -422,7 +422,11 @@ class sshAccessDriver extends AbstractAccessDriver
 				$nom_rep = $dir;
 				AJXP_Exception::errorToXml($nom_rep);
 				$result = $this->SSHOperation->listFilesIn($nom_rep);
-				AJXP_XMLWriter::header();
+				$metaData = array();
+				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
+					$metaData["ajxp_mime"] = "ajxp_recycle";
+				}
+				AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, $metaData);
                 foreach ($result as $file)
                 {
                     $attributes = "";

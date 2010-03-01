@@ -563,40 +563,30 @@ AJXP_MESSAGE[174]<br/>
 						var activeRepository = ajaxplorer.user.getActiveRepository();
 					}
 					var onLoad = function(oForm){
-						var getAction = oForm.getElementsBySelector('input[name="get_action"]')[0];
+						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'copy';
-						var container = oForm.getElementsBySelector(".treeCopyContainer")[0];
-						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
+						var container = oForm.select(".treeCopyContainer")[0];
+						var eDestLabel = oForm.select('input[name="dest"]')[0];
+						var eDestNodeHidden = oForm.select('input[name="dest_node"]')[0];
 						$('external_repository').hide();
 						
-						if(!this.treeCopy){
-							var action = function(e){
-								if(ajaxplorer.actionBar.treeCopyActive){
-						  			if(ajaxplorer.actionBar.treeCopyActionDest) 
-						  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = this.url}.bind(this));
-					 				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
-					 					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = this.id}.bind(this));
-					 			}
-					 			this.select();
-							};						
-							this.treeCopy = new WebFXLoadTree('/', 
-																ajxpServerAccessPath+'?get_action=ls', 
-																action, 
-																'explorer', null, null, '&options=d');
-						}
-						else{
-							window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
-						}				
-						this.treeCopyActive = true;
-						this.treeCopyActionDest = $A([eDestLabel]);
-						this.treeCopyActionDestNode = $A([eDestNodeHidden]);
+						var action = function(e){
+							eDestLabel.value = this.ajxpNode.getPath();
+							eDestNodeHidden.value = this.ajxpNode.getPath();
+				 			this.select();
+						};
+						var filter = function(ajxpNode){
+							return (!ajxpNode.isLeaf());
+						};
+						var node = new AjxpNode("/", false, "Destination", "folder.png");
+						this.treeCopy = new AJXPTree(node, action, filter);							
 						container.innerHTML = this.treeCopy.toString();
 						$(this.treeCopy.id).observe("click", function(e){
 							this.action();
 							Event.stop(e);
 						}.bind(this.treeCopy));
 						this.treeCopy.focus();
+						this.treeCopy.setAjxpRootNode(new AjxpNode("/", false, "Destination", "folder.png"));
 						
 						if(ajaxplorer.user && !ajaxplorer.getUserSelection().hasDir()){
 							var repoList = ajaxplorer.user.getRepositoriesList();	

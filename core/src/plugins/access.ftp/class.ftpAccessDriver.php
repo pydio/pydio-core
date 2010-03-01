@@ -334,8 +334,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				}
 				if($test = UserSelection::detectZip($dir)){
 					$liste = array();
-					$zip = $this->zipListing($test[0], $test[1], $liste);
-					AJXP_XMLWriter::header();
+					$zip = $this->zipListing($test[0], $test[1], $liste);					
+					AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, array("ajxp_mime" => "ajxp_browsable_archive"));
 					$tmpDir = $this->getPath().dirname($test[0]).".tmpZipExtract";					
 					foreach ($liste as $zipEntry){
 						$atts = array();
@@ -379,7 +379,11 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				$result = $this->listing($nom_rep, !($searchMode || $fileListMode));
 				$this->fileListData = $result[0];
 				$reps = $result[0];
-				AJXP_XMLWriter::header();
+				$metaData = array();
+				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
+					$metaData["ajxp_mime"] = "ajxp_recycle";
+				}
+				AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, $metaData);
                 if (!is_array($reps))
                 {
        				AJXP_XMLWriter::close();
