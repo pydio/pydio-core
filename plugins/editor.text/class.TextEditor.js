@@ -73,7 +73,7 @@ TextEditor = Class.create(AbstractEditor, {
 		}
 		this.element.appendChild(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
-		fitHeightToBottom($(this.textarea), $(modal.elementName), 0, true);
+		fitHeightToBottom($(this.textarea), $(modal.elementName));
 		// LOAD FILE NOW
 		this.loadFileContent(fileName);
 	},

@@ -77,7 +77,7 @@ AjxpCkEditor = Class.create(TextEditor, {
 		this.textarea.setAttribute('wrap', 'off');	
 		this.element.insert(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
-		fitHeightToBottom(this.textareaContainer, $(modal.elementName), 0, true);
+		fitHeightToBottom(this.textareaContainer, $(modal.elementName));
 		this.reloadEditor('code');
 		this.element.observe("editor:close", function(){
 			CKEDITOR.instances.code.destroy();

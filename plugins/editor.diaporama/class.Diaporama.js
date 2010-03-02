@@ -50,7 +50,6 @@ Diaporama = Class.create(AbstractEditor, {
 		this.fitToScreenButton = this.element.select('img[id="fitToScreenButton"]')[0];
 		this.imgTag = this.element.select('img[id="mainImage"]')[0];
 		this.imgContainer = this.element.select('div[id="imageContainer"]')[0];
-		fitHeightToBottom(this.imgContainer);
 		this.zoomInput = this.element.select('input[id="zoomValue"]')[0];
 		this.timeInput = this.element.select('input[id="time"]')[0];
 		this.baseUrl = 'content.php?action=image_proxy&file=';
@@ -124,13 +123,28 @@ Diaporama = Class.create(AbstractEditor, {
 			}
 		}
 		this.contentMainContainer = this.imgContainer ;
-		this.element.observe("editor:resize", this.resizeImage.bind(this));
 		this.element.observe("editor:close", function(){
 			this.currentFile = null;
 			this.items = null;
 			this.imgTag.src = '';
 			this.stop();
 		}.bind(this) );
+		
+		this.element.observe("editor:enterFSend", function(e){this.resize();}.bind(this));
+	},
+	
+	resize : function(size){
+		if(size){
+			this.imgContainer.setStyle({height:size});
+		}else{
+			if(this.fullScreenMode){
+				fitHeightToBottom(this.imgContainer, this.element);
+			}else{
+				fitHeightToBottom(this.imgContainer, $(modal.elementName));
+			}
+		}
+		this.resizeImage();
+		this.element.fire("editor:resize", size);
 	},
 	
 	open : function($super, userSelection)

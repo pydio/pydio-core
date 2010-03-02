@@ -65,7 +65,7 @@ CodePressEditor = Class.create(TextEditor, {
 				cpIframe.setStyle({height:event.memo});
 			}else{
 				cpIframe.setStyle({width:'100%'});
-				fitHeightToBottom(cpIframe, this.element, 0, true);
+				fitHeightToBottom(cpIframe, this.element);
 			}
 		}.bind(this));
 		this.element.observe("editor:enterFS", function(e){this.textarea.value = this.element.select('iframe')[0].getCode();}.bind(this) );
@@ -74,7 +74,7 @@ CodePressEditor = Class.create(TextEditor, {
 		this.textarea.setAttribute('wrap', 'off');	
 		this.element.appendChild(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
-		fitHeightToBottom($(this.textarea), $(modal.elementName), 0, true);
+		fitHeightToBottom($(this.textarea), $(modal.elementName));
 		// LOAD FILE NOW
 		this.loadFileContent(fileName);
 	},

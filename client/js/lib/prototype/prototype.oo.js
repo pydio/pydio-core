@@ -20,6 +20,7 @@ Class.create = function () {
 	}
 
 	function klass() {
+		this.__className = $$className;
 		this.initialize.apply(this, arguments);
 		if(toImplement.length){
 			this.__implements = toImplement;
@@ -27,6 +28,7 @@ Class.create = function () {
 	}
 
 	Object.extend(klass, Class.Methods);
+	Object.Event.extend(klass);
 	klass.superclass = parent;
 	klass.subclasses = [];
 
