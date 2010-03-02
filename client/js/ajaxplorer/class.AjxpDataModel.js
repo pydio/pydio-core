@@ -256,9 +256,7 @@ Class.create("AjxpDataModel", {
 		var names = $A([]);
 		for(i=0;i<allItems.length;i++)
 		{
-			var meta = allItems[i].getMetadata();
-			var crtFileName = getBaseName(meta.getAttribute('filename'));
-			names.push(crtFileName);
+			names.push(getBaseName(allItems[i].getPath()));
 		}
 		if(separator){
 			return names.join(separator);
