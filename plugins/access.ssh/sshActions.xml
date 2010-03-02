@@ -612,8 +612,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					
 					var mp3Items = new Array();
 					$A(ajaxplorer.getContextNode().getChildren()).each(function(nodeItem){
-						var rowItem = nodeItem.getMetadata();
-						var filename = rowItem.getAttribute('filename');
+						var filename = nodeItem.getPath();
 						if(getFileExtension(filename) == 'mp3') mp3Items.push(filename);
 					});						
 					var mp3_url = '';
