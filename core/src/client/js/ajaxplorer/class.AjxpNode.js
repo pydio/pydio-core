@@ -169,7 +169,7 @@ Class.create("AjxpNode", {
 		return this._icon;
 	},
 	isRecycle : function(){
-		return (this._metadata && this._metadata.getAttribute("is_recycle") && this._metadata.getAttribute("is_recycle") == "true");
+		return (this.getAjxpMime() == 'ajxp_recycle');
 	},
 	inZip : function(){
 		

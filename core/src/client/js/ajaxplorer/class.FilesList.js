@@ -687,7 +687,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		
 		// Defer Drag'n'drop assignation for performances
-		if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
+		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
 				var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true,scroll:'tree_container'}, this, 'filesList');
 			}.bind(this), 500);
@@ -698,100 +698,7 @@ Class.create("FilesList", SelectableElements, {
 		}		
 		return newRow;
 	},
-	
-	
-	xmlNodeToDiv: function(xmlNode){
-		var newRow = new Element('div', {className:"thumbnail_selectable_cell"});
-		var tmpAtts = new Hash();
-		for(i=0;i<xmlNode.attributes.length;i++)
-		{
-			newRow.setAttribute(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
-			tmpAtts.set(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].nodeValue);
-		}
 		
-		var innerSpan = new Element('span', {style:"cursor:default;"});
-		if(tmpAtts.get("is_image") == "1")
-		{
-			this._crtImageIndex ++;
-			var imgIndex = this._crtImageIndex;
-			var textNode = tmpAtts.get("text");			
-			var img = new Element('img', {
-				id:"ajxp_image_"+imgIndex,
-				src:ajxpResourcesFolder+"/images/crystal/mimes/64/image.png",
-				width:"64",
-				height:"64",
-				style:"margin:5px",
-				align:"ABSMIDDLE",
-				border:"0",
-				is_loaded:"false"
-			});
-			var label = new Element('div', {
-				className:"thumbLabel",
-				title:textNode
-			});
-			label.innerHTML = textNode;
-			var width = tmpAtts.get("image_width");
-			var height = tmpAtts.get("image_height");		
-			var marginTop, marginHeight, newHeight, newWidth;
-			if(width >= height){
-				newWidth = 64;
-				newHeight = parseInt(height / width * 64);
-				marginTop = parseInt((64 - newHeight)/2) + 5;
-				marginBottom = 64+10-newHeight-marginTop-1;
-			}
-			else
-			{
-				newHeight = 64;
-				newWidth = parseInt(width / height * 64);
-				marginTop = 5;
-				marginBottom = 5;
-			}
-			var crtIndex = this._crtImageIndex;
-			innerSpan.insert({"bottom":img});
-			innerSpan.insert({"bottom":label});
-			newRow.insert({"bottom": innerSpan});
-			newRow.IMAGE_ELEMENT = img;
-			newRow.LABEL_ELEMENT = label;
-			this._htmlElement.appendChild(newRow);
-			
-			var fileName = tmpAtts.get('filename');			
-			var oImageToLoad = {
-				index:"ajxp_image_"+crtIndex,
-				filename:fileName, 
-				rowObject:newRow, 
-				height: newHeight, 
-				width: newWidth, 
-				marginTop: marginTop, 
-				marginBottom: marginBottom
-			};
-			this.imagesHash.set(oImageToLoad.index, oImageToLoad);
-			
-		}
-		else
-		{
-			src = resolveImageSource(tmpAtts.get('icon'), "/images/crystal/mimes/ICON_SIZE/", 64);//ajxpResourcesFolder+'/images/crystal/mimes/64/'+tmpAtts.get('icon');
-			var imgString = "<img src=\""+src+"\" ";
-			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + tmpAtts.get("text")+"\">" + tmpAtts.get("text")+"</div>";
-			innerSpan.innerHTML = imgString;		
-			newRow.appendChild(innerSpan);
-			this._htmlElement.appendChild(newRow);
-		}
-		
-		// Defer Drag'n'drop assignation for performances
-		if(!tmpAtts.get("is_recycle") || tmpAtts.get("is_recycle") != "1"){
-			window.setTimeout(function(){
-				var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true,scroll:'tree_container'}, this, 'filesList');
-			}.bind(this), 500);
-		}
-		if(xmlNode.getAttribute("is_file") == "0" || xmlNode.getAttribute("is_file") == "false")
-		{
-			AjxpDroppables.add(newRow);
-		}
-		
-		delete(tmpAtts);
-		delete(xmlNode);
-		return newRow;
-	},
 	
 	resizeThumbnails: function(one_element){
 			
