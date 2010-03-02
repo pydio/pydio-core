@@ -118,7 +118,7 @@ Class.create("FoldersTree", AjxpPane, {
 	},
 		
 	resize : function(){
-		fitHeightToBottom(this.treeContainer, null, (Prototype.Browser.IE?0:2), true);
+		fitHeightToBottom(this.treeContainer, null);
 	},
 	
 	showElement : function(show){

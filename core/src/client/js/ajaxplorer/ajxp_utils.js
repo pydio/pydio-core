@@ -197,7 +197,7 @@ function disableTextSelection(target)
 	}
 }
 
-function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener, delay)
+function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 {	
 	element = $(element);
 	if(!element) return;
@@ -232,20 +232,22 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, skipListener
 		}
 		var mrg = parseInt(element.getStyle('marginBottom')) ||0;		
 		var brd = parseInt(element.getStyle('borderWidth'))||0;
-		var pad = parseInt((parentElement!=window?parentElement.getStyle('paddingBottom'):0))||0;			
-		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-addMarginBottom))+'px'});
+		var pad = parseInt((parentElement!=window?parentElement.getStyle('paddingBottom'):0))||0;		
+		var margin=0;
+		if(parentElement!=window){
+			margin = parseInt(parentElement.getStyle('borderBottomWidth')||0) + parseInt(parentElement.getStyle('borderTopWidth')||0);
+		}
+		if(!Prototype.Browser.IE){
+			var childPadding = parseInt(element.getStyle('paddingBottom')||0) + parseInt(element.getStyle('paddingTop')||0);
+			margin += childPadding;
+		}
+		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-margin-addMarginBottom))+'px'});
 		element.fire("resize");
 	};
 	
 	observer();
-	if(!skipListener){
-		if(delay){
-			Event.observe(window, 'resize', function(){
-				window.setTimeout(function(){observer();}, delay);
-			});
-		}else{
-			Event.observe(window, 'resize', observer);
-		}
+	if(listen){
+		Event.observe(window, 'resize', observer);
 	}
 	return observer;
 }

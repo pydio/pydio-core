@@ -87,7 +87,7 @@ Class.create("Connexion", {
 			alert("Unknown Parsing Error!");
 			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
 		}
-		if(transport.responseXML){
+		if(transport.responseXML && transport.responseXML.documentElement){
 			var node = XPathSelectSingleNode(transport.responseXML.documentElement, "require_auth");
 			if(node && ajaxplorer){
 				var root = ajaxplorer._contextHolder.getRootNode();

@@ -176,7 +176,7 @@ Class.create("AbstractEditor" , {
 		if(size){
 			this.contentMainContainer.setStyle({height:size});
 		}else{
-			fitHeightToBottom(this.contentMainContainer, this.element, 0, true);
+			fitHeightToBottom(this.contentMainContainer, this.element);
 		}
 		this.element.fire("editor:resize", size);
 	},
