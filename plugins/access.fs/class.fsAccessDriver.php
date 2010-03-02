@@ -599,7 +599,6 @@ class fsAccessDriver extends AbstractAccessDriver
 							array("ajxp_modiftime" 	=> $this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption),
 								  "mimestring" 		=> "Trashcan",
 								  "icon"			=> "$recycleIcon", 
-								  "is_recycle" 		=> "true", 
 								  "filesize"		=> "-", 
 								  "ajxp_mime"		=> "ajxp_recycle")
 						);

@@ -157,22 +157,16 @@ Class.create("AjxpDataModel", {
 		}
 		this._selectedNodes = $A(ajxpDataNodes);
 		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
-		this._bFile = this._bDir = false;
+		this._bFile = this._bDir = this._isRecycle = false;
 		if(!this._bEmpty)
 		{
 			this._bUnique = ((ajxpDataNodes.length == 1)?true:false);
 			for(var i=0; i<ajxpDataNodes.length; i++)
 			{
 				var selectedNode = ajxpDataNodes[i];
-				if(selectedNode.isLeaf()){
-					this._bFile = true;
-				}
-				else{
-					this._bDir = true;
-				}
-				
-				var meta = selectedNode.getMetadata();
-				if(meta.get('is_recycle') && meta.get('is_recycle') == '1') this._isRecycle = true;
+				if(selectedNode.isLeaf()) this._bFile = true;
+				else this._bDir = true;
+				if(selectedNode.isRecycle()) this._isRecycle = true;
 			}
 		}
 		document.fire("ajaxplorer:selection_changed", this);	

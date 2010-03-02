@@ -452,11 +452,11 @@ class ftpAccessDriver extends  AbstractAccessDriver
 					$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
 					if($fileListMode)
 					{
-						print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" is_recycle=\"1\" mimestring=\"Trashcan\" ajxp_modiftime=\"\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
+						print("<tree text=\"".Utils::xmlEntities($mess[122])."\" filesize=\"-\" is_file=\"0\" ajxp_mime=\"ajxp_recycle\" mimestring=\"Trashcan\" ajxp_modiftime=\"\" filename=\"/".$recycleBinOption."\" icon=\"trashcan.png\"></tree>");
 					}
 					else 
 					{						
-						print("<tree text=\"$mess[122]\" is_recycle=\"true\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".$recycleBinOption."\"/>");
+						print("<tree text=\"$mess[122]\" ajxp_mime=\"ajxp_recycle\" icon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\"  openIcon=\"".CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/trashcan.png\" filename=\"/".$recycleBinOption."\"/>");
 					}
 				}				
 				AJXP_XMLWriter::close();
