@@ -34,5 +34,5 @@
  */
 Interface.create("IAjxpNodeProvider", {
 	initProvider : function(properties){},
-	loadNode : function(nodePath, nodeCallback, childCallback, options){}
+	loadNode : function(nodePath, nodeCallback, childCallback){}
 });

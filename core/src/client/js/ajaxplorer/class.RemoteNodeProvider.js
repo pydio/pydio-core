@@ -38,9 +38,9 @@ Class.create("RemoteNodeProvider", {
 		
 	},
 	initProvider : function(properties){
-		
+		this.properties = properties;
 	},
-	loadNode : function(node, nodeCallback, childCallback, options){
+	loadNode : function(node, nodeCallback, childCallback){
 		var conn = new Connexion();
 		conn.addParameter("get_action", "ls");
 		conn.addParameter("options", "al");
@@ -49,8 +49,8 @@ Class.create("RemoteNodeProvider", {
 			path += "#" + node.getMetadata().get("paginationData").get("current");
 		}
 		conn.addParameter("dir", path);
-		if(options){
-			$H(options).each(function(pair){
+		if(this.properties){
+			$H(this.properties).each(function(pair){
 				conn.addParameter(pair.key, pair.value);
 			});
 		}
