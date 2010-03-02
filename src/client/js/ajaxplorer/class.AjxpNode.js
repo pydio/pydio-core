@@ -33,7 +33,7 @@
  * Description : Abstract container for data
  */
 Class.create("AjxpNode", {
-	initialize : function(path, isLeaf, label, icon){
+	initialize : function(path, isLeaf, label, icon, iNodeProvider){
 		this._path = path;
 		if(this._path && this._path.length){
 			if(this._path[this._path.length-1] == "/"){
@@ -49,6 +49,7 @@ Class.create("AjxpNode", {
 		
 		this._isLoaded = false;
 		this.fake = false;
+		this._iNodeProvider = iNodeProvider;
 		
 	},
 	isLoaded : function(){
@@ -58,9 +59,13 @@ Class.create("AjxpNode", {
 		this._isLoaded = bool;
 	},
 	load : function(iAjxpNodeProvider){		
-		if(this.isLoading) return;
+		if(this.isLoading) return;		
 		if(!iAjxpNodeProvider){
-			iAjxpNodeProvider = new RemoteNodeProvider();
+			if(this._iNodeProvider){
+				iAjxpNodeProvider = this._iNodeProvider;
+			}else{
+				iAjxpNodeProvider = new RemoteNodeProvider();
+			}
 		}
 		this.isLoading = true;
 		if(this._isLoaded){
@@ -100,9 +105,10 @@ Class.create("AjxpNode", {
 	},
 	addChild : function(ajxpNode){
 		ajxpNode.setParent(this);
+		if(this._iNodeProvider) ajxpNode._iNodeProvider = this._iNodeProvider;
 		if(existingNode = this.findChildByPath(ajxpNode.getPath())){
 			existingNode.replaceBy(ajxpNode);
-		}else{
+		}else{			
 			this._children.push(ajxpNode);
 			this.notify("child_added", ajxpNode.getPath());
 		}
@@ -120,6 +126,9 @@ Class.create("AjxpNode", {
 		}
 		if(ajxpNode._icon){
 			this._icon = ajxpNode._icon;
+		}
+		if(ajxpNode._iNodeProvider){
+			this._iNodeProvider = ajxpNode._iNodeProvider;
 		}
 		this._isRoot = ajxpNode._isRoot;
 		this._isLoaded = ajxpNode._isLoaded;
