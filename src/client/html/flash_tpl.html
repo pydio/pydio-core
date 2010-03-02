@@ -55,40 +55,44 @@ var messages =
 function triggerFlashEvent(){
 	if(arguments.length < 1) return;
 	var eventType = arguments[0];
-	switch(eventType){
-		case "currentFiles":
-			return parent.ajaxplorer.getUserSelection().getContextFileNames("__AJXP_SEP__");
-		break;
-		case "currentFolder":
-			var folder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
-			return folder;
-		break;	
-		case "uploadComplete":
-			parent.ajaxplorer.fireContextRefresh();
-		break;
-		case "getMessage":
-			var messageId = arguments[1];
-			if(parent && parent.window.MessageHash && messages){
-				return parent.window.MessageHash[messages[messageId]];
-			}
-			return messageId;			
-		break;
-		case "closeModal":
-			parent.hideLightBox(true);
-		break;
-		case "getProperty":
-			var pName = arguments[1];
-			var value = parent.getAjxpCookie(pName);
-			if(!value) return null;
-			return (value == "true"?true:false);
-		break;
-		case "storeProperty":
-			var pName = arguments[1];
-			var pValue = arguments[2];
-			return parent.setAjxpCookie(pName, pValue);
-		break;
-		default: 
-		break;
+	try{
+		switch(eventType){
+			case "currentFiles":
+				return parent.ajaxplorer.getUserSelection().getContextFileNames("__AJXP_SEP__");
+			break;
+			case "currentFolder":
+				var folder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
+				return folder;
+			break;	
+			case "uploadComplete":
+				parent.ajaxplorer.fireContextRefresh();
+			break;
+			case "getMessage":
+				var messageId = arguments[1];
+				if(parent && parent.window.MessageHash && messages){
+					return parent.window.MessageHash[messages[messageId]];
+				}
+				return messageId;			
+			break;
+			case "closeModal":
+				parent.hideLightBox(true);
+			break;
+			case "getProperty":
+				var pName = arguments[1];
+				var value = parent.getAjxpCookie(pName);
+				if(!value) return null;
+				return (value == "true"?true:false);
+			break;
+			case "storeProperty":
+				var pName = arguments[1];
+				var pValue = arguments[2];
+				return parent.setAjxpCookie(pName, pValue);
+			break;
+			default: 
+			break;
+		}
+	}catch(e){
+		alert('Error during communication with flash : call ('+eventType+'):'+ e.message);
 	}
 }
 
