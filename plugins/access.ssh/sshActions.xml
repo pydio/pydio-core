@@ -447,57 +447,60 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var onLoad = function(oForm){
-						var getAction = oForm.getElementsBySelector('input[name="get_action"]')[0];
-						getAction.value = 'copy';
-						var container = oForm.getElementsBySelector(".treeCopyContainer")[0];
-						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
-						if(!this.treeCopy){
-							var action = function(e){
-								if(ajaxplorer.actionBar.treeCopyActive){
-						  			if(ajaxplorer.actionBar.treeCopyActionDest) 
-						  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = this.url}.bind(this));
-					 				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
-					 					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = this.id}.bind(this));
-					 			}
-					 			this.select();
-							};						
-							this.treeCopy = new WebFXLoadTree('/', 
-																ajxpServerAccessPath+'?get_action=ls', 
-																action, 
-																'explorer', null, null, '&options=d');
+					if(ajaxplorer.user){
+						var activeRepository = ajaxplorer.user.getActiveRepository();
+						var repoList = ajaxplorer.user.getRepositoriesList();
+						if(!repoList.get(activeRepository).allowCrossRepositoryCopy){
+							activeRepository = null;
 						}
-						else{
-							window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
-						}				
-						this.treeCopyActive = true;
-						this.treeCopyActionDest = $A([eDestLabel]);
-						this.treeCopyActionDestNode = $A([eDestNodeHidden]);
-						container.innerHTML = this.treeCopy.toString();
-						$(this.treeCopy.id).observe("click", function(e){
-							this.action();
-							Event.stop(e);
-						}.bind(this.treeCopy));
-						this.treeCopy.focus();
-					}.bind(ajaxplorer.actionBar);
-					var onCancel = function(){				
-						ajaxplorer.cancelCopyOrMove();
-					};
+					}
+					var context = ajaxplorer.actionBar;
+					var onLoad = function(oForm){
+						var getAction = oForm.select('input[name="get_action"]')[0];
+						getAction.value = 'copy';					
+						this.treeSelector = new TreeSelector(oForm);
+						this.treeSelector.load();
+						if(activeRepository && !ajaxplorer.getUserSelection().hasDir()){
+							var filterOptions = $A([]);
+							var repoList = ajaxplorer.user.getRepositoriesList();	
+							repoList.each(function(pair){
+								var repoObject = pair.value;
+								if(repoObject.allowCrossRepositoryCopy){
+									if(repoObject.getId() == activeRepository) return;
+									filterOptions.push({key:repoObject.getId(),value:repoObject.getLabel()});
+								}
+							});							
+							if(!filterOptions.length) return;
+							this.treeSelector.setFilterShow(true);
+							filterOptions.each(function(pair){
+								this.treeSelector.appendFilterValue(pair.key, pair.value);
+							}.bind(this) );
+							this.treeSelector.appendFilterValue(activeRepository, "&lt;Current Repository&gt;", 'top');
+							this.treeSelector.setFilterSelectedIndex(0);
+							this.treeSelector.setFilterChangeCallback(function(e){
+								externalRepo = this.filterSelector.getValue();
+								var nodeProvider = new RemoteNodeProvider();
+								nodeProvider.initProvider({tmp_repository_id:externalRepo});
+								this.resetAjxpRootNode(new AjxpNode("/", false, "Destination", "folder.png", nodeProvider));
+							});
+						}						
+					}.bind(context);
+					var onCancel = function(){
+						this.treeSelector.unload();
+						hideLightBox();
+					}.bind(context);
 					var onSubmit = function(){
 						var oForm = modal.getForm();
-						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						if(eDestLabel.value == ajaxplorer.getContextNode().getPath())
-						{
-							alert(MessageHash[183]);
-							return false;
+						var getAction = oForm.select('input[name="get_action"]')[0];
+						var selectedNode = this.treeSelector.getSelectedNode();
+						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
+							getAction.value = "cross_copy" ;
 						}
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);				
-						this.treeCopyActive = false;
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						this.submitForm(oForm);
-						hideLightBox(true);
-						return false;
-					}.bind(ajaxplorer.actionBar);
+						this.treeSelector.unload();
+						hideLightBox();
+					}.bind(context);
 					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);				
 					]]></clientCallback>
 				<clientForm id="copymove_form"><![CDATA[
@@ -505,9 +508,10 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 					<input type="hidden" name="dest_node" value="">
 					<span id="copymove_text_span"></span>
 					<div class="dialogLegend">AJXP_MESSAGE[175]</div>
+					<select id="external_repository" name="dest_repository_id" style="width: 248px; font-size: 12px; height: 21px; margin-bottom: 0px; border: 1px solid #ccc;"></select>
 					<div style="height:250px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
-					<input type="text" name="dest" value="/" readonly  style="width:100%; border: none; border-bottom: 1px solid #ccc;"/>
-					<div id="treeCopy" style="height:222px; padding: 3px 2px; overflow:auto; text-align:left;" class="treeCopyContainer"></div>
+					<input type="text" name="dest" value="/" readonly  style="width:100%; border: none; border-bottom: 1px solid #ccc; background-image:none;"/>
+					<div id="treeCopy" style="height:222px; padding: 3px 2px; overflow:auto; text-align:left;background-image:none;background-color:white;" class="treeCopyContainer"></div>
 					</div>
 					</div>
 				]]></clientForm>
@@ -538,58 +542,31 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
+					var context = ajaxplorer.actionBar;
 					var onLoad = function(oForm){
-						var getAction = oForm.getElementsBySelector('input[name="get_action"]')[0];
-						getAction.value = 'move';
-						var container = oForm.getElementsBySelector(".treeCopyContainer")[0];
-						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						var eDestNodeHidden = oForm.getElementsBySelector('input[name="dest_node"]')[0];
-						if(!this.treeCopy){
-							var action = function(e){
-								if(ajaxplorer.actionBar.treeCopyActive){
-						  			if(ajaxplorer.actionBar.treeCopyActionDest) 
-						  				ajaxplorer.actionBar.treeCopyActionDest.each(function(element){element.value = this.url}.bind(this));
-					 				if(ajaxplorer.actionBar.treeCopyActionDestNode) 
-					 					ajaxplorer.actionBar.treeCopyActionDestNode.each(function(element){element.value = this.id}.bind(this));
-					 			}
-					 			this.select();
-							};						
-							this.treeCopy = new WebFXLoadTree('/', 
-																ajxpServerAccessPath+'?get_action=ls', 
-																action, 
-																'explorer', null, null, '&options=d');
-						}
-						else{
-							window.setTimeout('ajaxplorer.actionBar.treeCopy.reload()', 100);
-						}				
-						this.treeCopyActive = true;
-						this.treeCopyActionDest = $A([eDestLabel]);
-						this.treeCopyActionDestNode = $A([eDestNodeHidden]);
-						container.innerHTML = this.treeCopy.toString();
-						$(this.treeCopy.id).observe("click", function(e){
-							this.action();
-							Event.stop(e);
-						}.bind(this.treeCopy));
-						this.treeCopy.focus();
-					}.bind(ajaxplorer.actionBar);
-					var onCancel = function(){				
-						ajaxplorer.cancelCopyOrMove();
-					};
+						var getAction = oForm.select('input[name="get_action"]')[0];
+						getAction.value = 'move';					
+						this.treeSelector = new TreeSelector(oForm);
+						this.treeSelector.load();
+					}.bind(context);
+					var onCancel = function(){
+						this.treeSelector.unload();
+						hideLightBox();
+					}.bind(context);
 					var onSubmit = function(){
 						var oForm = modal.getForm();
-						var eDestLabel = oForm.getElementsBySelector('input[name="dest"]')[0];
-						if(eDestLabel.value == ajaxplorer.getContextNode().getPath())
-						{
+						var getAction = oForm.select('input[name="get_action"]')[0];
+						var selectedNode = this.treeSelector.getSelectedNode();
+						if(selectedNode == ajaxplorer.getContextNode().getPath()){
 							alert(MessageHash[183]);
 							return false;
 						}
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);				
-						this.treeCopyActive = false;
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 						this.submitForm(oForm);
-						hideLightBox(true);
-						return false;
-					}.bind(ajaxplorer.actionBar);
-					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);					
+						this.treeSelector.unload();
+						hideLightBox();
+					}.bind(context);
+					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);				
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>

@@ -37,6 +37,7 @@ js/ajaxplorer/class.AjxpDraggable.js
 js/ajaxplorer/class.AjxpSortable.js
 js/ajaxplorer/class.AjxpTabulator.js
 js/ajaxplorer/class.AjxpAutoCompleter.js
+js/ajaxplorer/class.TreeSelector.js
 js/ajaxplorer/class.Action.js
 js/ajaxplorer/class.ActionsManager.js
 js/ajaxplorer/class.BackgroundManager.js
