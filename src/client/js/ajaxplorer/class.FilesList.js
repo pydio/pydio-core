@@ -103,6 +103,9 @@ Class.create("FilesList", SelectableElements, {
 	
 	initGUI: function()
 	{
+		if(this.observer){
+			this.stopObserving("resize", this.observer);
+		}
 		if(this._displayMode == "list")
 		{
 			var buffer = '';
@@ -147,10 +150,10 @@ Class.create("FilesList", SelectableElements, {
 			}
 			this.disableTextSelection($('selectable_div_header'));
 			this.disableTextSelection($('table_rows_container'));
-			fitHeightToBottom($('table_rows_container'), this.htmlElement, (!Prototype.Browser.IE?2:0));
-			document.observe("ajaxplorer:loaded", function(){
-				fitHeightToBottom($('table_rows_container'), this.htmlElement, (!Prototype.Browser.IE?2:0), true);
-			});			
+			this.observer = function(e){
+				fitHeightToBottom($('table_rows_container'), this.htmlElement);
+			}.bind(this);
+			this.observe("resize", this.observer);
 		}
 		else if(this._displayMode == "thumb")
 		{			
@@ -160,10 +163,10 @@ Class.create("FilesList", SelectableElements, {
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
 				$('selectable_div').insert({before:this.createPaginator()});
 			}
-			fitHeightToBottom($('selectable_div'), this.htmlElement, (!Prototype.Browser.IE?6:0), false, 100);
-			document.observe("ajaxplorer:loaded", function(){
-				fitHeightToBottom($('selectable_div'), this.htmlElement, (!Prototype.Browser.IE?6:0), false, 100);
-			});			
+			this.observer = function(e){
+				fitHeightToBottom($('selectable_div'), this.htmlElement);
+			}.bind(this);
+			this.observe("resize", this.observer);
 			
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("thumb_size")){
 				this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
@@ -191,7 +194,7 @@ Class.create("FilesList", SelectableElements, {
 			this.disableTextSelection($('selectable_div'));
 			this.initSelectableItems($('selectable_div'), true);
 		}	
-		
+		this.notify("resize");
 	},
 	
 	createPaginator: function(){
@@ -239,6 +242,7 @@ Class.create("FilesList", SelectableElements, {
 	},
 	
 	resize : function(){
+		this.notify("resize");
 		this.applyHeadersWidth();
 	},
 	

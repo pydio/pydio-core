@@ -138,7 +138,7 @@ Class.create("InfoPanel", AjxpPane, {
 	},
 	
 	resize : function(){
-		fitHeightToBottom(this.htmlElement, null, (Prototype.Browser.IE?2:1), true,200);	
+		fitHeightToBottom(this.htmlElement, null);	
 	},
 	
 	evalTemplateForMime: function(mimeType, fileNode, tArgs){

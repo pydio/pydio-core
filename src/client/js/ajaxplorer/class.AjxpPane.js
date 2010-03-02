@@ -38,6 +38,9 @@ Class.create("AjxpPane", {
 	
 	initialize : function(htmlElement){
 		this.htmlElement = $(htmlElement);
+		if(!this.htmlElement){
+			throw new Error('Cannot find element for AjxpPane : ' + this.__className);
+		}
 		this.htmlElement.ajxpPaneObject = this;
 		if(this.htmlElement.getAttribute('ajxpPaneHeader')){
 			this.addPaneHeader(
@@ -67,5 +70,3 @@ Class.create("AjxpPane", {
 	}
 	
 });
-
-Object.Event.extend(AjxpPane);

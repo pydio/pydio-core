@@ -110,7 +110,7 @@ Class.create("SearchEngine", AjxpPane, {
 	},
 	
 	resize: function(){
-		fitHeightToBottom(this._resultsBox, null, (Prototype.Browser.IE?1:2), true);
+		fitHeightToBottom(this._resultsBox, null);
 	},
 	
 	focus : function(){

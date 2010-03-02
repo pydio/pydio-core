@@ -219,5 +219,3 @@ Class.create("AjxpNode", {
 		return "";
 	}
 });
-
-Object.Event.extend(AjxpNode);

@@ -400,7 +400,7 @@ SQLEditor = Class.create({
 		this.actionBar.setStyle({marginTop: 0});
 		if(!this.currentUseCp){
 			this.origContainerHeight = this.textarea.getHeight();
-			this.heightObserver = fitHeightToBottom(this.textarea, this.oForm, 0, true);
+			this.heightObserver = fitHeightToBottom(this.textarea, this.oForm);
 		}else{
 			
 		}		
@@ -431,7 +431,7 @@ SQLEditor = Class.create({
 		this.oForm.setStyle({
 			height:document.viewport.getHeight()
 		});
-		if(!this.currentUseCp) {fitHeightToBottom(this.textarea, this.oForm, 0, true);}
+		if(!this.currentUseCp) {fitHeightToBottom(this.textarea, this.oForm);}
 	}
 	
 });
