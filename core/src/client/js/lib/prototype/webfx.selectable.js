@@ -219,22 +219,23 @@ SelectableElements = Class.create({
 		if (bSelected){
 			$(oEl).addClassName("selected");
 			$(oEl).addClassName("selected-focus");
-			// CHECK THAT SCROLLING IS OK
 			
-			var parent = $('selectable_div');
-			if($('table_rows_container')) parent = $('table_rows_container');		
-			var scrollOffset = oEl.offsetTop;
-			
-			var parentHeight = parent.getHeight();
-			var parentScrollTop = parent.scrollTop;
-			var elHeight = $(oEl).getHeight(); 
-			
-			if(scrollOffset+elHeight > (parentHeight+parentScrollTop)){			
-				parent.scrollTop = scrollOffset-parentHeight+elHeight;
-			}else if(scrollOffset < (parentScrollTop)){
-				parent.scrollTop = scrollOffset-elHeight;
-			}
-			
+			if(!this.skipScroll){
+				// CHECK THAT SCROLLING IS OK
+				var parent = $('selectable_div');
+				if($('table_rows_container')) parent = $('table_rows_container');		
+				var scrollOffset = oEl.offsetTop;
+				
+				var parentHeight = parent.getHeight();
+				var parentScrollTop = parent.scrollTop;
+				var elHeight = $(oEl).getHeight(); 
+				
+				if(scrollOffset+elHeight > (parentHeight+parentScrollTop)){			
+					parent.scrollTop = scrollOffset-parentHeight+elHeight;
+				}else if(scrollOffset < (parentScrollTop)){
+					parent.scrollTop = scrollOffset-elHeight;
+				}
+			}			
 		}
 		else{		
 			$(oEl).removeClassName("selected");
@@ -392,12 +393,17 @@ SelectableElements = Class.create({
 	
 			// select items in range
 			var item = aIndex;
+			this.skipScroll=true;
 			while (item != null) {
 				this.setItemSelected(item, true);
+				if (item == rIndex -1){
+					this.skipScroll = false;
+				}
 				if (item == rIndex)
 					break;
 				item = dirUp ? this.getPrevious(item) : this.getNext(item);
 			}
+			this.skipScroll = false;
 		}
 	
 		// find change!!!
