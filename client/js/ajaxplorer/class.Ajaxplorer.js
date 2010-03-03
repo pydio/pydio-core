@@ -92,6 +92,10 @@ Class.create("Ajaxplorer", {
 		this.getContextHolder().requireContextChange(this.getContextNode(), true);
 	},
 	
+	fireNodeRefresh : function(nodePathOrNode){
+		this.getContextHolder().requireNodeReload(nodePathOrNode);
+	},
+	
 	fireContextUp : function(){
 		if(this.getContextNode().isRoot()) return;
 		this.updateContextData(this.getContextNode().getParent());

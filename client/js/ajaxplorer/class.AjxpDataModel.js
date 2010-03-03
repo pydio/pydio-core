@@ -74,9 +74,9 @@ Class.create("AjxpDataModel", {
 			ajxpNode = ajxpNode.findInArbo(this._rootNode, fakeNodes);
 			if(fakeNodes.length){
 				var firstFake = fakeNodes.shift();
-				firstFake.observeOnce("loaded", function(e){
+				firstFake.observeOnce("first_load", function(e){					
 					this.requireContextChange(ajxpNode);
-				}.bind(this) );
+				}.bind(this));
 				firstFake.observeOnce("error", function(message){
 					ajaxplorer.displayMessage("ERROR", message);
 					firstFake.notify("node_removed");
@@ -135,6 +135,61 @@ Class.create("AjxpDataModel", {
 		
 	getContextNode : function(){
 		return this._contextNode;
+	},
+	
+	multipleNodesReload : function(nodes){
+		nodes = $A(nodes);
+		for(var i=0;i<nodes.length;i++){
+			var nodePathOrNode = nodes[i];
+			var node;
+			if(Object.isString(nodePathOrNode)){
+				node = new AjxpNode(nodePathOrNode);	
+				if(node.getPath() == this._rootNode.getPath()) node = this._rootNode;
+				else node = node.findInArbo(this._rootNode, []);
+			}else{
+				node = nodePathOrNode;
+			}
+			nodes[i] = node;		
+		}
+		var children = $A([]);
+		nodes.sort(function(a,b){
+			if(a.isParentOf(b)){
+				children.push(b);
+				return -1;
+			}
+			if(a.isChildOf(b)){
+				children.push(a);
+				return +1;
+			}
+			return 0;
+		});
+		children.each(function(c){
+			nodes = nodes.without(c);
+		});
+		nodes.each(this.requireNodeReload.bind(this));
+	},
+	
+	requireNodeReload : function(node){
+		if(this._reloading){
+			this.observeOnce("end_reloading", function(e){
+				window.setTimeout(function(){this.requireNodeReload(node);}.bind(this),500);
+			}.bind(this) );
+			return;
+		}
+		this._reloading = true;
+		var observer = function(e){
+			this._reloading = false;
+			this.notify("end_reloading");
+		}.bind(this);
+		if(node == this._contextNode || node.isParentOf(this._contextNode)){
+			node.observeOnce("loaded", observer);
+			node.observeOnce("error", observer);
+			this.requireContextChange(node, true);
+		}else{
+			node.observeOnce("loaded", observer );
+			node.observeOnce("error", observer );
+			node.reload(this._iAjxpNodeProvider);				
+		}
 	},
 	
 	setPendingSelection : function(selection){

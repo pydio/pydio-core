@@ -113,6 +113,12 @@ class AJXP_XMLWriter
 		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	
+	function reloadDataNode($nodePath="", $pendingSelection="", $print = true){
+		$nodePath = Utils::xmlEntities($nodePath, true);
+		$pendingSelection = Utils::xmlEntities($pendingSelection, true);
+		return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
+	}
+	
 	function reloadRepositoryList($print = true){
 		return AJXP_XMLWriter::write("<reload_instruction object=\"repository_list\"/>", $print);
 	}

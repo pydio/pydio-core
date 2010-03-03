@@ -147,9 +147,10 @@ class fsAccessDriver extends AbstractAccessDriver
 					$file = $this->getPath()."/".$dir."/".$localName;
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing file $localName");
-					$reload_current_node = true;
-					$reload_file_list = $localName;
-					
+					//$reload_current_node = true;
+					//$reload_file_list = $localName;
+					$reloadContextNode = true;
+					$pendingSelection = $localName;					
 			break;
 			
 			case "image_proxy":
@@ -254,9 +255,11 @@ class fsAccessDriver extends AbstractAccessDriver
 					$logMessage = join("\n", $success);
 					AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
 				}
-				$reload_current_node = true;
-				if(isSet($dest_node)) $reload_dest_node = $dest_node;
-				$reload_file_list = true;
+				//$reload_current_node = true;
+				//if(isSet($dest_node)) $reload_dest_node = $dest_node;
+				//$reload_file_list = true;
+				$reloadContextNode = true;
+				$reloadDataNode = SystemTextEncoding::fromUTF8($dest);
 				
 			break;
 			
@@ -277,8 +280,9 @@ class fsAccessDriver extends AbstractAccessDriver
 					$logMessage = join("\n", $logMessages);
 				}
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
-				$reload_current_node = true;
-				$reload_file_list = true;
+				//$reload_current_node = true;
+				//$reload_file_list = true;
+				$reloadContextNode = true;
 				
 			break;
 		
@@ -295,8 +299,10 @@ class fsAccessDriver extends AbstractAccessDriver
 					break;
 				}
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
-				$reload_current_node = true;
-				$reload_file_list = basename($filename_new);
+				//$reload_current_node = true;
+				//$reload_file_list = basename($filename_new);
+				$reloadContextNode = true;
+				$pendingSelection = $filename_new;
 				AJXP_Logger::logAction("Rename", array("original"=>$file, "new"=>$filename_new));
 				
 			break;
@@ -316,7 +322,8 @@ class fsAccessDriver extends AbstractAccessDriver
 				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$reload_current_node = true;
+				//$reload_current_node = true;
+				$reloadContextNode = true;
 				AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
 				
 			break;
@@ -618,6 +625,14 @@ class fsAccessDriver extends AbstractAccessDriver
 		if(isset($requireAuth))
 		{
 			$xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
+		}
+		
+		if(isSet($reloadContextNode)){
+			if(!isSet($pendingSelection)) $pendingSelection = "";
+			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode("", $pendingSelection, false);
+		}
+		if(isSet($reloadDataNode)){
+			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode($reloadDataNode, "", false);
 		}
 		
 		if(isset($reload_current_node) && $reload_current_node == "true")
