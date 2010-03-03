@@ -166,29 +166,27 @@ Class.create("AjxpDataModel", {
 		children.each(function(c){
 			nodes = nodes.without(c);
 		});
-		nodes.each(this.requireNodeReload.bind(this));
+		nodes.each(this.queueNodeReload.bind(this));
+		this.nextNodeReloader();
 	},
 	
-	requireNodeReload : function(node){
-		if(this._reloading){
-			this.observeOnce("end_reloading", function(e){
-				window.setTimeout(function(){this.requireNodeReload(node);}.bind(this),500);
-			}.bind(this) );
-			return;
+	queueNodeReload : function(node){
+		if(!this.queue) this.queue = [];
+		if(node){
+			this.queue.push(node);
 		}
-		this._reloading = true;
-		var observer = function(e){
-			this._reloading = false;
-			this.notify("end_reloading");
-		}.bind(this);
-		if(node == this._contextNode || node.isParentOf(this._contextNode)){
-			node.observeOnce("loaded", observer);
-			node.observeOnce("error", observer);
-			this.requireContextChange(node, true);
+	},
+	
+	nextNodeReloader : function(){
+		if(!this.queue.length) return;
+		var next = this.queue.shift();
+		var observer = this.nextNodeReloader.bind(this);
+		next.observeOnce("loaded", observer);
+		next.observeOnce("error", observer);
+		if(next == this._contextNode || next.isParentOf(this._contextNode)){
+			this.requireContextChange(next, true);
 		}else{
-			node.observeOnce("loaded", observer );
-			node.observeOnce("error", observer );
-			node.reload(this._iAjxpNodeProvider);				
+			next.reload(this._iAjxpNodeProvider);
 		}
 	},
 	

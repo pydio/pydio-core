@@ -57,23 +57,24 @@ Class.create("FilesList", SelectableElements, {
 			}
 		}.bind(this));		
 		
-		var observer = this.contextObserver.bind(this);
+		
+		var loadObserver = this.contextObserver.bind(this);
+		var loadingObs = this.setOnLoad.bind(this);
 		document.observe("ajaxplorer:context_changed", function(event){
 			if(this.crtContext && this.crtContext == ajaxplorer.getContextNode()){
 				return;
-			}
-			if(this.crtContext){
-				this.crtContext.stopObserving("loaded", observer);
+			}			
+			var previous = this.crtContext;
+			if(previous){
+				previous.stopObserving("loaded", loadObserver);
+				previous.stopObserving("loading", loadingObs);
 			}
 			this.crtContext = ajaxplorer.getContextNode();
 			if(this.crtContext.isLoaded()) this.contextObserver();
-			this.crtContext.observe("loaded",observer);
+			this.crtContext.observe("loaded",loadObserver);
+			this.crtContext.observe("loading",loadingObs);
 		}.bind(this) );
-		document.observe("ajaxplorer:context_loading", function(){
-			//if(this.crtContext) this.crtContext.observeOnce("loaded",this.contextObserver.bind(this));
-			this.setOnLoad();
-		}.bind(this));
-		//document.observe("ajaxplorer:context_loaded", this.removeOnLoad.bind(this));
+		document.observe("ajaxplorer:context_loading", this.setOnLoad.bind(this));
 		document.observe("ajaxplorer:display_switched", function(event){
 			this.switchDisplayMode(event.memo);
 		}.bind(this) );
