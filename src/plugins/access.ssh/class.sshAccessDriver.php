@@ -217,9 +217,8 @@ class sshAccessDriver extends AbstractAccessDriver
 					    AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
 				     }
 				}
-				$reload_current_node = true;
-				if(isSet($dest_node)) $reload_dest_node = $dest_node;
-				$reload_file_list = true;
+				$reloadContextNode = true;
+				$reloadDataNode = SystemTextEncoding::fromUTF8($dest);
 				
 			break;
 			
@@ -242,7 +241,7 @@ class sshAccessDriver extends AbstractAccessDriver
 				    {
                         $logMessage="Successfully changed permission to ".$chmod_value." for ".count($selection->getFiles())." files or folders";
                         AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "filesCount"=>count($selection->getFiles())));
-                        $reload_file_list = $dir;
+                        $reloadContextNode = true;
 				     }
 				}
 
@@ -272,8 +271,7 @@ class sshAccessDriver extends AbstractAccessDriver
 					$logMessage = join("\n", $logMessages);
 				}
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
-				$reload_current_node = true;
-				$reload_file_list = true;
+				$reloadContextNode = true;
 				
 			break;
 		
@@ -289,8 +287,8 @@ class sshAccessDriver extends AbstractAccessDriver
 					break;
 				}
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
-				$reload_current_node = true;
-				$reload_file_list = basename($filename_new);
+				$reloadContextNode = true;
+				$pendingSelection = SystemTextEncoding::fromUTF8($filename_new);
 				AJXP_Logger::logAction("Rename", array("original"=>$file, "new"=>$filename_new));
 				
 			break;
@@ -306,11 +304,11 @@ class sshAccessDriver extends AbstractAccessDriver
 				if(isSet($error)){
 					$errorMessage = $error; break;
 				}
-				$reload_file_list = $dirname;
+				$pendingSelection = $dir."/".$dirname;
 				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$reload_current_node = true;
+				$reloadContextNode = true;
 				AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
 				
 			break;
@@ -329,7 +327,8 @@ class sshAccessDriver extends AbstractAccessDriver
 				$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.=SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$reload_file_list = $filename;
+				$pendingSelection = $filename;
+				$reloadContextNode = true;
 				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
 		
 			break;
@@ -485,6 +484,16 @@ class sshAccessDriver extends AbstractAccessDriver
 		{
 			$xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
 		}
+		
+		if(isSet($reloadContextNode)){
+			if(!isSet($pendingSelection)) $pendingSelection = "";
+			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode("", $pendingSelection, false);
+		}
+		
+		if(isSet($reloadDataNode)){
+			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode($reloadDataNode, "", false);
+		}
+		
 		
 		if(isset($reload_current_node) && $reload_current_node == "true")
 		{
