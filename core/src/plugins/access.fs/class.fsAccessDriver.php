@@ -894,13 +894,13 @@ class fsAccessDriver extends AbstractAccessDriver
 				header("Expires: 0");
 				header("Cache-Control: no-cache, must-revalidate");
 				header("Pragma: no-cache");
-				if (preg_match('/ MSIE 6/',$_SERVER['HTTP_USER_AGENT'])){
+				if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])){
 					header("Cache-Control: max_age=0");
 					header("Pragma: public");
 				}
 
                 // IE8 is dumb
-				if (preg_match('/ MSIE 8/',$_SERVER['HTTP_USER_AGENT']))
+				if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
                 {
                     header("Pragma: public");
                     header("Expires: 0");
