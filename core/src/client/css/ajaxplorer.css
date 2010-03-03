@@ -664,6 +664,7 @@ ACTION BAR
 	padding-left: 7px;
 	padding-top: 3px;
 	height: 20px;	
+	overflow:hidden;
 }
 
 .sort-table thead td.descending {
