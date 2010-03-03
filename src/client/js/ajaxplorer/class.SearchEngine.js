@@ -110,7 +110,7 @@ Class.create("SearchEngine", AjxpPane, {
 	},
 	
 	resize: function(){
-		fitHeightToBottom(this._resultsBox, null);
+		fitHeightToBottom(this._resultsBox);
 	},
 	
 	focus : function(){
@@ -205,11 +205,16 @@ Class.create("SearchEngine", AjxpPane, {
 		divElement.title = MessageHash[224]+' '+ folderName;
 		if(isFolder)
 		{
-			divElement.onclick = function(e){ajaxplorer.goTo(folderName);}
+			divElement.observe("click", function(e){
+				ajaxplorer.goTo(folderName);
+			});
 		}
 		else
 		{
-			divElement.onclick = function(e){ajaxplorer.goTo(folderName, fileName);}
+			divElement.observe("click", function(e){
+				ajaxplorer.getContextHolder().setPendingSelection(fileName);
+				ajaxplorer.goTo(folderName);
+			});
 		}
 		this._resultsBox.appendChild(divElement);
 	},
