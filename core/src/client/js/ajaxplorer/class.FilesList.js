@@ -57,15 +57,23 @@ Class.create("FilesList", SelectableElements, {
 			}
 		}.bind(this));		
 		
+		var observer = this.contextObserver.bind(this);
 		document.observe("ajaxplorer:context_changed", function(event){
-			this.fill(event.memo.getContextNode());
-			event.memo.getContextNode().observe("loaded", function(){ 
-				this.fill(ajaxplorer.getContextNode());
-				this.removeOnLoad();
-			}.bind(this));
+			if(this.crtContext && this.crtContext == ajaxplorer.getContextNode()){
+				return;
+			}
+			if(this.crtContext){
+				this.crtContext.stopObserving("loaded", observer);
+			}
+			this.crtContext = ajaxplorer.getContextNode();
+			if(this.crtContext.isLoaded()) this.contextObserver();
+			this.crtContext.observe("loaded",observer);
 		}.bind(this) );
-		document.observe("ajaxplorer:context_loading", this.setOnLoad.bind(this));
-		document.observe("ajaxplorer:context_loaded", this.removeOnLoad.bind(this));
+		document.observe("ajaxplorer:context_loading", function(){
+			//if(this.crtContext) this.crtContext.observeOnce("loaded",this.contextObserver.bind(this));
+			this.setOnLoad();
+		}.bind(this));
+		//document.observe("ajaxplorer:context_loaded", this.removeOnLoad.bind(this));
 		document.observe("ajaxplorer:display_switched", function(event){
 			this.switchDisplayMode(event.memo);
 		}.bind(this) );
@@ -101,6 +109,12 @@ Class.create("FilesList", SelectableElements, {
 	},
 	
 	addPaneHeader : function(){},
+	
+	contextObserver : function(){
+		if(!this.crtContext) return;
+		this.fill(this.crtContext);
+		this.removeOnLoad();
+	},	
 	
 	initGUI: function()
 	{
@@ -495,7 +509,7 @@ Class.create("FilesList", SelectableElements, {
 			ajaxplorer.getContextHolder().clearPendingSelection();
 		}	
 		if(this.hasFocus){
-			ajaxplorer.focusOn(this);
+			window.setTimeout(function(){ajaxplorer.focusOn(this);}.bind(this),200);
 		}
 		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
@@ -902,6 +916,7 @@ Class.create("FilesList", SelectableElements, {
 
 	selectFile: function(fileName, multiple)
 	{
+		fileName = getBaseName(fileName);
 		if(!this.fileNameExists(fileName)) 
 		{
 			return;
