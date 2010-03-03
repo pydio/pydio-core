@@ -391,7 +391,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					}
 					
 					print '</columns>';
-					print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
+					//print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
+					if($result["TOTAL_PAGES"] > 1){
+						AJXP_XMLWriter::renderPaginationData($count, $currentPage,$result["TOTAL_PAGES"]);
+					}
 					foreach ($result["ROWS"] as $row){
 						print '<tree ';
 						$pkString = "";
@@ -438,20 +441,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
 			$xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
 		}
 		
-		if(isset($reload_current_node) && $reload_current_node == "true")
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadCurrentNode(false);
-		}
-		
-		if(isset($reload_dest_node) && $reload_dest_node != "")
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadNode($reload_dest_node, false);
-		}
-		
-		if(isset($reload_file_list))
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadFileList($reload_file_list, false);
-		}
+		if(( isset($reload_current_node) && $reload_current_node == "true") || (isset($reload_file_list)) )
+		{			
+			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode("", "", false);
+		}		
 		
 		return $xmlBuffer;
 	}
