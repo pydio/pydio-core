@@ -165,8 +165,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
 					echo $mess[115];
 					ftp_put($this->connect,$this->secureFtpPath($this->getPath().$file),"files/".SystemTextEncoding::fromUTF8($file_name), FTP_BINARY);
 					$this->ftpRemoveFileTmp("files/".SystemTextEncoding::fromUTF8("$file_name"));
-				 $reload_current_node = true;
-
+				 	//$reload_current_node = true;
+				 	$reloadContextNode = true;
 				}
 				else 
 				{
@@ -192,9 +192,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			}else{
 				$logMessage = join("\n", $success);
 			}			
-			$reload_current_node = true;
-			if(isSet($dest_node)) $reload_dest_node = $dest_node;
-			$reload_file_list = true;
+			$reloadContextNode = true;
+			$reloadDataNode = SystemTextEncoding::fromUTF8($dest);
 			                       
 
 			break;
@@ -216,8 +215,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 					$logMessage = join("\n", $logMessages);
 				}
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
-				$reload_current_node = true;
-				$reload_file_list = true;
+				$reloadContextNode = true;
 				
 			break;
 		
@@ -234,8 +232,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
 					break;
 				}
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
-				$reload_current_node = true;
-				$reload_file_list = basename($filename_new);
+				$reloadContextNode = true;
+				$pendingSelection = $filename_new;
 				AJXP_Logger::logAction("Rename", array("original"=>$file, "new"=>$filename_new));
 				
 			break;
@@ -251,11 +249,11 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				if(isSet($error)){
 					$errorMessage = $error; break;
 				}
-				$reload_file_list = $dirname;
 				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$reload_current_node = true;
+				$reloadContextNode = true;
+				$pendingSelection = $dir."/".$dirname;
 				AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
 				
 			break;
@@ -274,7 +272,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.=SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$reload_file_list = $filename;
+				$reloadContextNode = true;
+				$pendingSelection = $filename;
 				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
 		
 			break;
@@ -285,16 +284,16 @@ class ftpAccessDriver extends  AbstractAccessDriver
 			case "chmod";
 			
 				$files = $selection->getFiles();
-                	        if(@ftp_chmod($this->connect,$chmod_value, $this->getPath().$files[0])===false)
-                        	{
-                                	$error = "Error chmod";
-                        	}
-                        	if(isSet($error)){
-                                	$errorMessage = $error; break;
-                        	}
-                        	$logMessage="Successfully changed permission to ".$chmod_value." for ".$files[0];
-                        	$reload_file_list = $dir;
-                        	AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "file"=>$files[0]));
+    	        if(@ftp_chmod($this->connect,$chmod_value, $this->getPath().$files[0])===false)
+            	{
+                    	$error = "Error chmod";
+            	}
+            	if(isSet($error)){
+                    	$errorMessage = $error; break;
+            	}
+            	$logMessage="Successfully changed permission to ".$chmod_value." for ".$files[0];
+            	$reloadContextNode = true;
+            	AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "file"=>$files[0]));
 	
 
 			break;
@@ -474,6 +473,15 @@ class ftpAccessDriver extends  AbstractAccessDriver
 		{
 			$xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
 		}
+		
+		if(isSet($reloadContextNode)){
+			if(!isSet($pendingSelection)) $pendingSelection = "";
+			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode("", $pendingSelection, false);
+		}
+		if(isSet($reloadDataNode)){
+			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode($reloadDataNode, "", false);
+		}		
+		
 		
 		if(isset($reload_current_node) && $reload_current_node == "true")
 		{
