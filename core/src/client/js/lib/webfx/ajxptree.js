@@ -85,7 +85,7 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 		jsNode.remove();
 	});
 	ajxpNode.observe("loading", function(){		
-		this.add(this._loadingItem);
+		//this.add(this._loadingItem);
 	}.bind(jsNode) );
 	ajxpNode.observe("loaded", function(){
 		this._loadingItem.remove();

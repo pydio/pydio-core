@@ -68,6 +68,7 @@ Class.create("AjxpNode", {
 			}
 		}
 		this.isLoading = true;
+		this.notify("loading");
 		if(this._isLoaded){
 			this.isLoading = false;
 			this.notify("loaded");
