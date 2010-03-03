@@ -57,11 +57,12 @@ Class.create("FilesList", SelectableElements, {
 			}
 		}.bind(this));		
 		
-		document.observe("ajaxplorer:context_refresh", function(){ 
-			this.reload();
-		}.bind(this)  );
 		document.observe("ajaxplorer:context_changed", function(event){
 			this.fill(event.memo.getContextNode());
+			event.memo.getContextNode().observe("loaded", function(){ 
+				this.fill(ajaxplorer.getContextNode());
+				this.removeOnLoad();
+			}.bind(this));
 		}.bind(this) );
 		document.observe("ajaxplorer:context_loading", this.setOnLoad.bind(this));
 		document.observe("ajaxplorer:context_loaded", this.removeOnLoad.bind(this));

@@ -447,6 +447,8 @@ Class.create("ActionsManager", AjxpPane, {
 		if(xmlResponse == null || xmlResponse.documentElement == null) return;
 		var childs = xmlResponse.documentElement.childNodes;	
 		
+		var reloadNodes = [];
+		
 		for(var i=0; i<childs.length;i++)
 		{
 			if(childs[i].tagName == "message")
@@ -458,18 +460,21 @@ Class.create("ActionsManager", AjxpPane, {
 			else if(childs[i].tagName == "reload_instruction")
 			{
 				var obName = childs[i].getAttribute('object');
-				if(obName == 'tree')
+				if(obName == 'data')
 				{
 					var node = childs[i].getAttribute('node');				
-					//if(node == null) ajaxplorer.foldersTree.reloadCurrentNode();
-					//else ajaxplorer.foldersTree.reloadNode(node);
+					if(node){
+						reloadNodes.push(node);
+					}else{
+						var file = childs[i].getAttribute('file');
+						if(file){
+							ajaxplorer.getContextHolder().setPendingSelection(file);
+						}
+						reloadNodes.push(ajaxplorer.getContextNode());
+					}
 				}
-				else if(obName == 'list')
+				else if(obName == 'repository_list')
 				{
-					var file = childs[i].getAttribute('file');
-					ajaxplorer.getContextHolder().setPendingSelection(file);
-					ajaxplorer.fireContextRefresh();
-				}else if(obName == 'repository_list'){
 					ajaxplorer.reloadRepositoriesList();
 				}
 			}
@@ -513,6 +518,9 @@ Class.create("ActionsManager", AjxpPane, {
 				this.bgManager.next();
 			}
 
+		}
+		if(reloadNodes.length){
+			ajaxplorer.getContextHolder().multipleNodesReload(reloadNodes);
 		}
 	},
 		

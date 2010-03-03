@@ -35,7 +35,7 @@
 Class.create("AjxpNode", {
 	initialize : function(path, isLeaf, label, icon, iNodeProvider){
 		this._path = path;
-		if(this._path && this._path.length){
+		if(this._path && this._path.length && this._path.length > 1){
 			if(this._path[this._path.length-1] == "/"){
 				this._path = this._path.substring(0, this._path.length-1);
 			}
@@ -77,6 +77,7 @@ Class.create("AjxpNode", {
 			this._isLoaded = true;
 			this.isLoading = false;
 			this.notify("loaded");
+			this.notify("first_load");
 		}.bind(this));		
 	},
 	reload : function(iAjxpNodeProvider){
@@ -213,6 +214,16 @@ Class.create("AjxpNode", {
 	isRoot : function(){
 		return this._isRoot;
 	},
+	isParentOf : function(node){
+		var childPath = node.getPath();
+		var parentPath = this.getPath();
+		return (childPath.substring(0,parentPath.length) == parentPath);
+	},
+	isChildOf : function(node){
+		var childPath = this.getPath();
+		var parentPath = node.getPath();
+		return (childPath.substring(0,parentPath.length) == parentPath);
+	},	
 	getAjxpMime : function(){
 		if(this._metadata && this._metadata.get("ajxp_mime")) return this._metadata.get("ajxp_mime");		
 		if(this._metadata && this.isLeaf()) return getAjxpMimeType(this._metadata);
