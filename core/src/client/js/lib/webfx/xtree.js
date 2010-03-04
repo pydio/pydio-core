@@ -453,11 +453,6 @@ WebFXTreeItem.prototype.remove = function() {
 	if(!document.getElementById(this.id+'-plus')) return;
 	var iconSrc = document.getElementById(this.id + '-plus').src;
 	var parentNode = this.parentNode;
-	/*
-	if(parentNode.ajxpNode && this.ajxpNode){
-		parentNode.ajxpNode.removeChild(this.ajxpNode);
-	}
-	*/
 	var prevSibling = this.getPreviousSibling(true);
 	var nextSibling = this.getNextSibling(true);
 	var folder = this.parentNode.folder;
@@ -505,7 +500,8 @@ WebFXTreeItem.prototype._remove = function() {
 			if (i + 1 == this.parentNode.childNodes.length) { this.parentNode._last = true; }
 			break;
 	}	}
-	webFXTreeHandler.all[this.id] = null;
+	//webFXTreeHandler.all[this.id] = null;
+	delete(webFXTreeHandler.all[this.id]);
 	var tmp = document.getElementById(this.id);
 	if (tmp) { tmp.parentNode.removeChild(tmp); }
 	tmp = document.getElementById(this.id + '-cont');

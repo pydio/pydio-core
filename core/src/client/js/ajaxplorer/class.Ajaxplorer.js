@@ -419,11 +419,16 @@ Class.create("Ajaxplorer", {
 			this.repositoryId = repositoryId;
 			this.actionBar.loadBookmarks();
 		} else { this._initObj = null ;}
-		this.goTo(rootNode);
+		
 		if(this._initLoadRep){
-			//this.goTo(this._initLoadRep);
-			this._initLoadRep = null;
+			rootNode.observeOnce("loaded", function(){
+				if(this._initLoadRep != "" && this._initLoadRep != "/"){
+					this.goTo(this._initLoadRep);
+				}
+				this._initLoadRep = null;
+			}.bind(this));
 		}
+		//this.goTo(rootNode);
 		$('repo_path').value = repository.getLabel();
 		$('repo_icon').src = newIcon;
 		if(!(this.usersEnabled && this.user) && this._initRepositoriesList){
