@@ -127,11 +127,11 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-					var callback = function(item, newValue){						
+					var callback = function(node, newValue){						
 						var conn = new Connexion();
 						conn.addParameter('get_action', 'edit');
 						conn.addParameter('sub_action', 'edit_repository_label');
-						conn.addParameter('repository_id', item.getAttribute('repository_id'));
+						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
 						conn.addParameter('newLabel', newValue);
 						conn.onComplete = function(transport){
 							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);

@@ -533,8 +533,8 @@ AJXP_MESSAGE[174]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var callback = function(item, newValue){						
-						var filename = item.getAttribute('filename');
+					var callback = function(node, newValue){
+						var filename = node.getPath();
 						var conn = new Connexion();
 						conn.addParameter('get_action', 'rename');
 						conn.addParameter('file', filename);
