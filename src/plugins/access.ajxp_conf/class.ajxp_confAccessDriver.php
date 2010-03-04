@@ -520,7 +520,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				<column messageString="Params" attributeName="params" sortType="String"/>
 			</columns>';				
 			$date = $parts[count($parts)-1];
-			$logger->xmlLogs($date, "tree");
+			$logger->xmlLogs($dir, $date, "tree");
 		}else{
 			print '<columns switchGridMode="filelist"><column messageString="File Date" attributeName="ajxp_label" sortType="String"/></columns>';				
 			$logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null));
