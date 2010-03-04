@@ -43,7 +43,8 @@ Class.create("ActionsManager", AjxpPane, {
 		this._actions = new Hash();
 		this._ajaxplorer = oAjaxplorer;
 		this.usersEnabled = bUsersEnabled;
-		//this._currentUser = sCrtUserName;
+		this.locationBarElement = $('current_path');
+		
 		if(oUser != null){
 			this._currentUser = oUser.id;
 		}
@@ -61,7 +62,9 @@ Class.create("ActionsManager", AjxpPane, {
 		this.loadActions('ajxp');	
 		document.observe("ajaxplorer:context_changed", function(event){
 			this.fireContextChange();
-			this.updateLocationBar(event.memo.getContextNode());
+			window.setTimeout(function(){
+				this.updateLocationBar(event.memo);
+			}.bind(this), 10);			
 		}.bind(this) );
 		
 		document.observe("ajaxplorer:selection_changed", function(event){
@@ -73,10 +76,10 @@ Class.create("ActionsManager", AjxpPane, {
 	init: function()
 	{		
 		this._items = this.htmlElement.select('[action]');
-		$('current_path').onfocus = function(e)	{
+		this.locationBarElement.onfocus = function(e)	{
 			ajaxplorer.disableShortcuts();
 			this.hasFocus = true;
-			$('current_path').select();
+			this.locationBarElement.select();
 			return false;
 		}.bind(this);
 		var buttons = this.htmlElement.getElementsBySelector("input");
@@ -89,12 +92,12 @@ Class.create("ActionsManager", AjxpPane, {
 			if($(object) == $('goto_button'))
 			{
 				$(object).onfocus = function(){
-					$('current_path').focus();
+					this.locationBarElement.focus();
 				};
 			}
 		});
 		
-		$('current_path').onblur = function(e)	{
+		this.locationBarElement.onblur = function(e)	{
 			if(!currentLightBox){
 				ajaxplorer.enableShortcuts();
 				this.hasFocus = false;
@@ -754,7 +757,7 @@ Class.create("ActionsManager", AjxpPane, {
 	
 	locationBarFocus: function()
 	{
-		$('current_path').activate();
+		this.locationBarElement.activate();
 	},
 	
 	updateLocationBar: function (newNode)
@@ -763,29 +766,26 @@ Class.create("ActionsManager", AjxpPane, {
 			newNode = new AjxpNode(newNode);
 		}
 		var newPath = newNode.getPath();
-		if(newPath == ""){
-			newPath = "/";
-		}
 		if(newNode.getMetadata().get('paginationData')){
 			newPath += "#" + newNode.getMetadata().get('paginationData').get('current');
 		}
-		$('current_path').value = newPath;
+		this.locationBarElement.value = newPath;
 	},
 	
 	getLocationBarValue: function ()
 	{
-		return $('current_path').getValue();
+		return this.locationBarElement.getValue();
 	},
 	
 	focus: function()
 	{
-		$('current_path').focus();
+		this.locationBarElement.focus();
 		this.hasFocus = true;
 	},
 	
 	blur: function()
 	{
-		$('current_path').blur();
+		this.locationBarElement.blur();
 		this.hasFocus = false;
 	},
 	

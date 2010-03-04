@@ -60,21 +60,25 @@ Class.create("FilesList", SelectableElements, {
 		
 		var loadObserver = this.contextObserver.bind(this);
 		var loadingObs = this.setOnLoad.bind(this);
+		var loadEndObs = this.removeOnLoad.bind(this);
 		document.observe("ajaxplorer:context_changed", function(event){
-			if(this.crtContext && this.crtContext == ajaxplorer.getContextNode()){
-				return;
-			}			
+			var newContext = event.memo;
 			var previous = this.crtContext;
 			if(previous){
-				previous.stopObserving("loaded", loadObserver);
+				previous.stopObserving("loaded", loadEndObs);
 				previous.stopObserving("loading", loadingObs);
+			}			
+			this.crtContext = newContext;
+			if(this.crtContext.isLoaded()) {
+				this.contextObserver();			
+			}else{
+				this.crtContext.observeOnce("loaded", loadObserver);
 			}
-			this.crtContext = ajaxplorer.getContextNode();
-			if(this.crtContext.isLoaded()) this.contextObserver();
-			this.crtContext.observe("loaded",loadObserver);
-			this.crtContext.observe("loading",loadingObs);
+			this.crtContext.observe("loaded",loadEndObs);
+			this.crtContext.observe("loading",loadingObs);				
+			
 		}.bind(this) );
-		document.observe("ajaxplorer:context_loading", this.setOnLoad.bind(this));
+		document.observe("ajaxplorer:context_loading", loadingObs);
 		document.observe("ajaxplorer:display_switched", function(event){
 			this.switchDisplayMode(event.memo);
 		}.bind(this) );
@@ -113,6 +117,7 @@ Class.create("FilesList", SelectableElements, {
 	
 	contextObserver : function(){
 		if(!this.crtContext) return;
+		//console.log('FILES LIST : FILL');
 		this.fill(this.crtContext);
 		this.removeOnLoad();
 	},	

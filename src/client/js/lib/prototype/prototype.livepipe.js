@@ -71,6 +71,7 @@ Object.Event = {
             object.prototype.stopObserving = object.stopObserving;
             object.prototype.observeOnce = object.observeOnce;
             object.prototype.notify = function(event_name){
+            	//console.log(event_name);
                 if(object.notify){
                     var args = $A(arguments).slice(1);
                     args.unshift(this);

@@ -85,7 +85,7 @@ Class.create("FoldersTree", AjxpPane, {
 		this.hasFocus;
 		
 		document.observe("ajaxplorer:context_changed", function(event){
-			var path = event.memo.getContextNode().getPath();
+			var path = event.memo.getPath();
 			window.setTimeout(function(e){
 				this.setSelectedPath(path);
 			}.bind(this), 100);			
