@@ -48,12 +48,14 @@ AJXPTree.prototype.expand = function() {
 
 AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 	this.ajxpNode = rootNode;	
-	this.ajxpNode.observe("force_clear", function(){
+	var clear = function(){
 		this.open = false;
 		while (this.childNodes.length > 0)
 			this.childNodes[this.childNodes.length - 1].remove();
 		this.loaded = false;
-	}.bind(this) );
+	};
+	this.ajxpNode.observe("force_clear",  clear.bind(this));
+	this.ajxpNode.observe("node_replaced",  clear.bind(this));
 	this.attachListeners(this, rootNode);
 	this.ajxpNode.load();
 };
