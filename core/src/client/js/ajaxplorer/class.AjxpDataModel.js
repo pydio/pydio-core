@@ -130,7 +130,7 @@ Class.create("AjxpDataModel", {
 	setContextNode : function(ajxpDataNode){
 		this._contextNode = ajxpDataNode;
 		this._currentRep = ajxpDataNode.getPath();
-		document.fire("ajaxplorer:context_changed", this);
+		document.fire("ajaxplorer:context_changed", ajxpDataNode);
 	},
 		
 	getContextNode : function(){
@@ -178,7 +178,12 @@ Class.create("AjxpDataModel", {
 	},
 	
 	nextNodeReloader : function(){
-		if(!this.queue.length) return;
+		if(!this.queue.length) {
+			window.setTimeout(function(){
+				document.fire("ajaxplorer:context_changed", this._contextNode);
+			}.bind(this), 200);
+			return;
+		}
 		var next = this.queue.shift();
 		var observer = this.nextNodeReloader.bind(this);
 		next.observeOnce("loaded", observer);
