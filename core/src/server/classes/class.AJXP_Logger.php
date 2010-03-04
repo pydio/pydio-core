@@ -260,7 +260,7 @@ class AJXP_Logger {
 		return ;		
 	}
 	
-	function xmlLogs($date, $nodeName = "log"){
+	function xmlLogs($parentDir, $date, $nodeName = "log"){
 				
 		$fName = $this->storageDir."log_".$date.".txt";
 		if(!is_file($fName) || !is_readable($fName)) return;		
@@ -270,7 +270,8 @@ class AJXP_Logger {
 			$line = Utils::xmlEntities($line);
 			$matches = array();
 			if(preg_match("/(.*)\t(.*)\t(.*)\t(.*)\t(.*)\t(.*)$/", $line, $matches)!==false){
-				print(utf8_encode("<$nodeName is_file=\"1\" ajxp_mime=\"log\" date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\"/>"));
+				$fileName = $parentDir."/".$matches[1];
+				print(utf8_encode("<$nodeName is_file=\"1\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\"/>"));
 			}
 		}
 		return ;
