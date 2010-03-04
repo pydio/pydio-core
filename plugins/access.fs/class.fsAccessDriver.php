@@ -342,7 +342,8 @@ class fsAccessDriver extends AbstractAccessDriver
 				$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.=SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				$reload_file_list = $filename;
+				$reloadContextNode = true;
+				$pendingSelection = $dir."/".$filename;
 				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
 		
 			break;
