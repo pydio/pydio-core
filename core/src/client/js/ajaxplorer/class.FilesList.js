@@ -535,7 +535,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		var pos = posSpan.cumulativeOffset();
 		var text = span.innerHTML;
-		var edit = new Element('input', {value:item.getAttribute('text'), id:'editbox'}).setStyle({
+		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
 			zIndex:5000, 
 			position:'absolute',
 			marginLeft:0,
@@ -551,7 +551,7 @@ Class.create("FilesList", SelectableElements, {
 			if(event.keyCode == Event.KEY_RETURN){				
 				Event.stop(event);
 				var newValue = edit.getValue();
-				callback(item, newValue);
+				callback(item.ajxpNode, newValue);
 				hideLightBox();
 				modal.close();
 			}

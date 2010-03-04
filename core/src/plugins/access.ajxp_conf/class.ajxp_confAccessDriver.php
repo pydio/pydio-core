@@ -354,15 +354,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repo = ConfService::getRepositoryById($repId);
 				$res = 0;
 				if(isSet($_GET["newLabel"])){
-					$repo->setDisplay(SystemTextEncoding::fromPostedFileName($_GET["newLabel"]));
-                    if ($this->repositoryExists($newRep->getDisplay()))
+					$newLabel = SystemTextEncoding::fromPostedFileName($_GET["newLabel"]);
+                    if ($this->repositoryExists($newLabel))
                     {
 		     			AJXP_XMLWriter::header();
 			    		AJXP_XMLWriter::sendMessage(null, "Error: a repository with the same name already exists");
 				    	AJXP_XMLWriter::close();
 					    exit(1);
                     }
-                    
+					$repo->setDisplay($newLabel);                    
 					$res = ConfService::replaceRepository($repId, $repo);
 				}else{
 					$options = array();
@@ -391,7 +391,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, "Error while trying to edit repository");
 				}else{
 					AJXP_XMLWriter::sendMessage("Successfully edited repository", null);					
-					AJXP_XMLWriter::reloadFileList((isSet($_GET["newLabel"])?SystemTextEncoding::fromPostedFileName($_GET["newLabel"]):false));
+					AJXP_XMLWriter::reloadDataNode("", (isSet($_GET["newLabel"])?SystemTextEncoding::fromPostedFileName($_GET["newLabel"]):false));
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();		
