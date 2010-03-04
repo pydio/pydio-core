@@ -91,7 +91,9 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	}.bind(jsNode) );
 	ajxpNode.observe("loaded", function(){
 		this._loadingItem.remove();
-		this._webfxtree_expand();
+		if(this.childNodes.length){
+			this._webfxtree_expand();
+		}
 	}.bind(jsNode) );
 };
 
@@ -162,7 +164,7 @@ function _ajxpNodeToTree(ajxpNode, parentNode) {
 			if(jsNode.filter){
 				newNode.filter = jsNode.filter;
 			}
-			jsNode.add( newNode , true );
+			jsNode.add( newNode , false );
 		}
 	});	
 	return jsNode;	

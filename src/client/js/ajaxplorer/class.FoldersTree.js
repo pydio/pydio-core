@@ -150,7 +150,7 @@ Class.create("FoldersTree", AjxpPane, {
 		for(var i=0;i<parts.length;i++){
 			crtPath += "/" + parts[i];
 			var node = this.getNodeByPath(crtPath);
-			if(node){
+			if(node && node.childNodes.length){
 				node._webfxtree_expand();
 			}			
 		}
