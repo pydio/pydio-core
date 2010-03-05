@@ -19,6 +19,10 @@ Class.create = function () {
 		}
 	}
 
+	if(parent && parent.__implements){
+		toImplement = toImplement.concat(parent.__implements);
+	}	
+	
 	function klass() {
 		this.__className = $$className;
 		this.initialize.apply(this, arguments);
@@ -37,10 +41,6 @@ Class.create = function () {
 		subclass.prototype = parent.prototype;
 		klass.prototype = new subclass;
 		parent.subclasses.push(klass);
-		if(parent.__implements){
-			if(!klass.__implements) klass.__implements = [];
-			klass.__implements = klass.__implements.concat(parent.__implements);
-		}
 	}
 	for (var i = 0; i < properties.length; i++)
 	klass.addMethods(properties[i]);

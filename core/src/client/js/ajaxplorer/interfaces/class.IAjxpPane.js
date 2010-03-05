@@ -32,9 +32,7 @@
  * 
  * Description : AjxpPane interface
  */
-Interface.create("IAjxpPane", {		
+Interface.create("IAjxpWidget", {		
 	resize : function(){},
-	showElement : function(show){},
-	addPaneHeader : function(headerLabel, headerIcon){},
-	setFocusBehaviour : function(){}
+	showElement : function(show){}
 });

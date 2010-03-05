@@ -371,6 +371,7 @@ Class.create("Modal", {
 							duration:0.3,
 							afterFinish:function(effect){
 								$('loading_overlay').remove();
+								$('progressBox').remove();
 							}
 						});
 				}
