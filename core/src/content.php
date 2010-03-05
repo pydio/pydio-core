@@ -136,6 +136,17 @@ if(AuthService::usersEnabled())
 		AJXP_XMLWriter::close();
 		exit(1);
 	}
+}else{
+	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "logged_user")
+	{
+		AJXP_XMLWriter::header();
+		print("<user id=\"shared\">");
+		print("<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"1\" read=\"1\"/>");
+		print(AJXP_XMLWriter::writeRepositoriesData(null));
+		print("</user>");
+		AJXP_XMLWriter::close();
+		exit(1);
+	}	
 }
 
 $loggedUser = AuthService::getLoggedUser();

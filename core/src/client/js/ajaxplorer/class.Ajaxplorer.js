@@ -34,32 +34,20 @@
  */
 Class.create("Ajaxplorer", {
 
-	initialize: function(loadRep, usersEnabled, loggedUser, repositoryId, repoListXML, defaultDisplay)
+	initialize: function(loadRep, usersEnabled, loggedUser)
 	{	
 		this._initLoadRep = loadRep;
 		this._initObj = true ;
 		this.usersEnabled = usersEnabled;
 		this._initLoggedUser = loggedUser;
-		this._initRepositoriesList = $H({});
 		this._contextHolder = new AjxpDataModel();
 		this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		this._displayMode = 'list';
-		if(repoListXML && repoListXML.childNodes.length){
-			for(j=0;j<repoListXML.documentElement.childNodes.length;j++)
-			{
-				var repoChild = repoListXML.documentElement.childNodes[j];
-				if(repoChild.nodeName != "repo") continue;				
-				var repository = new Repository(repoChild.getAttribute("id"), repoChild);
-				this._initRepositoriesList.set(repoChild.getAttribute("id"), repository);
-			}
-		}
-		this._initRepositoryId = repositoryId;
 		this._focusables = [];
 		this._resourcesRegistry = {};
-		this._initDefaultDisp = ((defaultDisplay && defaultDisplay!='')?defaultDisplay:'list');
+		this._initDefaultDisp = 'list';
 		this.histCount=0;
-		if(!this.usersEnabled) this.repositoryId = repositoryId;
-		modal.setLoadingStepCounts(this.usersEnabled?7:6);
+		modal.setLoadingStepCounts(5);
 		this.initTemplates();
 		this.initEditorsRegistry();		
 		modal.initForms();
@@ -263,14 +251,7 @@ Class.create("Ajaxplorer", {
 		}
 		document.fire("ajaxplorer:gui_loaded");
 		modal.updateLoadingProgress('GUI Initialized');
-		/*
-		this.foldersTree = new FoldersTree($('topPane'), 'No Repository', ajxpServerAccessPath+'?get_action=ls&options=dz', this);
-		this.filesList = new FilesList($("content_pane"),this._initDefaultDisp);		
-		*/
-
-		modal.updateLoadingProgress('GUI Initialized');				
 		this.initTabNavigation();
-		//this.focusOn(this.foldersTree);
 		this.blockShortcuts = false;
 		this.blockNavigation = false;
 		modal.updateLoadingProgress('Navigation loaded');
@@ -285,18 +266,6 @@ Class.create("Ajaxplorer", {
 		}else{
 			this.tryLogUserFromCookie();
 		}
-		
-		if(!this.usersEnabled){
-			Event.observe(document, "ajaxplorer:loaded", function(){
-				var fakeUser = new User("shared");			
-				fakeUser.setActiveRepository(this._initRepositoryId, 1, 1);
-				fakeUser.setRepositoriesList(this._initRepositoriesList);
-				var repoObject = this._initRepositoriesList.get(this._initRepositoryId);
-				this.refreshRepositoriesMenu(this._initRepositoriesList, this._initRepositoryId);
-				this.actionBar.setUser(fakeUser);
-				this.loadRepository(repoObject);						
-			}.bind(this) );
-		}		
 	},
 
 	buildGUI : function(domNode){
@@ -431,9 +400,6 @@ Class.create("Ajaxplorer", {
 		//this.goTo(rootNode);
 		$('repo_path').value = repository.getLabel();
 		$('repo_icon').src = newIcon;
-		if(!(this.usersEnabled && this.user) && this._initRepositoriesList){
-			this.refreshRepositoriesMenu(this._initRepositoriesList, repositoryId);			
-		}
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 
@@ -497,15 +463,7 @@ Class.create("Ajaxplorer", {
 		connexion.addParameter('root_dir_index', repositoryId);
 		oThis = this;
 		connexion.onComplete = function(transport){
-			if(this.usersEnabled)
-			{
-				this.getLoggedUserFromServer();
-			}
-			else
-			{
-				this.actionBar.parseXmlMessage(transport.responseXML);
-				this.loadRepository(this._initRepositoriesList.get(repositoryId));
-			}
+			this.getLoggedUserFromServer();
 		}.bind(this);
 		var root = this._contextHolder.getRootNode();
 		if(root){
