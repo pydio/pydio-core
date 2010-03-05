@@ -4,6 +4,7 @@
 		<pluginResources pluginName="editor.text"/>
 	</dependencies>
 	<resources>
+		<js file="plugins/editor.codepress/codepress/codepress.js" className="CodePress"/>
 		<js file="plugins/editor.codepress/class.CodePressEditor.js" className="CodePressEditor"/>
 		<img_library alias="codepress_images" path="plugins/editor.codepress"/>
 	</resources>
