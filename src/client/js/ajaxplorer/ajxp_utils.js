@@ -241,6 +241,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 			var childPadding = parseInt(element.getStyle('paddingBottom')||0) + parseInt(element.getStyle('paddingTop')||0);
 			margin += childPadding;
 		}
+		margin = margin || 0; // avoid NaN in IE
 		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-margin-addMarginBottom))+'px'});
 		element.fire("resize");
 	};
