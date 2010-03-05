@@ -39,6 +39,7 @@ require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.AJXP_Logger.php");
 require_once("server/classes/class.AbstractDriver.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
+HTMLWriter::charsetHeader();
 ConfService::init("server/conf/conf.php");
 $confStorageDriver = ConfService::getConfStorageImpl();
 include_once($confStorageDriver->getUserClassFileName());
