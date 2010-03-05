@@ -64,7 +64,7 @@ Class.create("AjxpDraggable", Draggable, {
 	
 	initialize: function($super, element, options, component, componentType){		
 		$(element).addClassName('ajxp_draggable');
-		$super(element, options);
+		$super($(element), options);
 		this.options.reverteffect =  function(element, top_offset, left_offset) {
 			new Effect.Move(element, { x: -left_offset, y: -top_offset, duration: 0,
 			queue: {scope:'_draggable', position:'end'}
@@ -83,7 +83,7 @@ Class.create("AjxpDraggable", Draggable, {
 	},
 	
     startDrag : function(event){
-	
+	    	
 	    if(!this.delta)
 	    this.delta = this.currentDelta();
 	
