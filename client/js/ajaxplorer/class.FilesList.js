@@ -517,7 +517,7 @@ Class.create("FilesList", SelectableElements, {
 		if(this.hasFocus){
 			window.setTimeout(function(){ajaxplorer.focusOn(this);}.bind(this),200);
 		}
-		if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
+		//if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
 		
 	switchCurrentLabelToEdition : function(callback){
