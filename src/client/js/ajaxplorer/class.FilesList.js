@@ -34,7 +34,7 @@
  */
 Class.create("FilesList", SelectableElements, {
 	
-	__implements : ["IAjxpPane", "IFocusable", "IContextMenuable"],
+	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable"],
 
 	initialize: function($super, oElement, initDefaultDisp)
 	{
@@ -112,9 +112,7 @@ Class.create("FilesList", SelectableElements, {
 		this.initGUI();			
 		Event.observe(document, "keydown", this.keydown.bind(this));		
 	},
-	
-	addPaneHeader : function(){},
-	
+		
 	contextObserver : function(){
 		if(!this.crtContext) return;
 		//console.log('FILES LIST : FILL');
@@ -599,8 +597,8 @@ Class.create("FilesList", SelectableElements, {
 				// Defer Drag'n'drop assignation for performances
 				window.setTimeout(function(){
 					if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
-							var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:'tree_container'},this,'filesList');							
-							if(this.protoMenu) this.protoMenu.addElements(innerSpan);						
+						var newDrag = new AjxpDraggable(innerSpan, {revert:true,ghosting:true,scroll:($('tree_container')?'tree_container':null)},this,'filesList');							
+						if(this.protoMenu) this.protoMenu.addElements(innerSpan);						
 					}
 					if(!ajxpNode.isLeaf())
 					{
@@ -714,7 +712,7 @@ Class.create("FilesList", SelectableElements, {
 		// Defer Drag'n'drop assignation for performances
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
-				var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true,scroll:'tree_container'}, this, 'filesList');
+				var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true,scroll:($('tree_container')?'tree_container':null)}, this, 'filesList');
 			}.bind(this), 500);
 		}
 		if(!ajxpNode.isLeaf())

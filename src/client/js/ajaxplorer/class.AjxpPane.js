@@ -34,7 +34,7 @@
  */
 Class.create("AjxpPane", {	
 	
-	__implements : "IAjxpPane",
+	__implements : "IAjxpWidget",
 	
 	initialize : function(htmlElement){
 		this.htmlElement = $(htmlElement);
