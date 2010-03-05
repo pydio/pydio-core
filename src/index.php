@@ -96,35 +96,19 @@ if(AuthService::usersEnabled())
 			ConfService::switchRootDir(AuthService::getDefaultRootId());
 		}
 	}
-	$ROOT_DIR_NAME = "null";
-	$ROOT_DIR_ID = "null";
-	$ROOT_DIR_XML = "";
-}
-else 
-{
-	$ROOT_DIR_NAME = ConfService::getCurrentRootDirDisplay();
-	$ROOT_DIR_ID = ConfService::getCurrentRootDirIndex();
-	$ROOT_DIR_XML = HTMLWriter::repositoryDataAsJS();
 }
 
 $EXT_REP = "/";
-$CRT_USER = "shared_bookmarks";
-if(isSet($_GET["user"])) $CRT_USER = $_GET["user"];
-
 $ZIP_ENABLED = (ConfService::zipEnabled()?"true":"false");
 
 $loggedUser = AuthService::getLoggedUser();
-$DEFAULT_DISPLAY = "list";
 if($loggedUser != null && $loggedUser->getId() != "guest")
 {
 	if($loggedUser->getPref("lang") != "") ConfService::setLanguage($loggedUser->getPref("lang"));
-	if($loggedUser->getPref("display") != "") $DEFAULT_DISPLAY = $loggedUser->getPref("display");
 }
 else
 {	
 	if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_lang"]);
-	if(isSet($_COOKIE["AJXP_display"]) 
-	&& ($_COOKIE["AJXP_display"]=="list" || $_COOKIE["AJXP_display"]=="thumb")) $DEFAULT_DISPLAY = $_COOKIE["AJXP_display"];
 }
 if(isSet($_GET["repository_id"]) && isSet($_GET["folder"])){
 	require_once("server/classes/class.SystemTextEncoding.php");

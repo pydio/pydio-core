@@ -33,7 +33,7 @@
  * 
  * Description : configuration file
  */
-define("AJXP_VERSION", "2.5.5");
+define("AJXP_VERSION", "2.5.6");
 define("AJXP_VERSION_DATE", "2010/01/30");
 
 define("ENABLE_USERS", 1);
