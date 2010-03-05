@@ -61,14 +61,16 @@ Class.create("ActionsManager", AjxpPane, {
 		this.toolbars = new Hash();		
 		this.loadActions('ajxp');	
 		document.observe("ajaxplorer:context_changed", function(event){
-			this.fireContextChange();
 			window.setTimeout(function(){
+				this.fireContextChange();
 				this.updateLocationBar(event.memo);
-			}.bind(this), 10);			
+			}.bind(this), 0);			
 		}.bind(this) );
 		
 		document.observe("ajaxplorer:selection_changed", function(event){
-			this.fireSelectionChange();
+			window.setTimeout(function(){
+				this.fireSelectionChange();
+			}.bind(this), 0);
 		}.bind(this) );
 		
 	},	
@@ -93,9 +95,9 @@ Class.create("ActionsManager", AjxpPane, {
 			{
 				$(object).onfocus = function(){
 					this.locationBarElement.focus();
-				};
+				}.bind(this);
 			}
-		});
+		}.bind(this) );
 		
 		this.locationBarElement.onblur = function(e)	{
 			if(!currentLightBox){
@@ -391,9 +393,8 @@ Class.create("ActionsManager", AjxpPane, {
 		}
 		connexion.addParameter('dest', destDir);
 		if(destNodeName) connexion.addParameter('dest_node', destNodeName);
-		connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());
-		oThis = this;
-		connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
+		connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());		
+		connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this);
 		connexion.sendAsync();
 	},
 	

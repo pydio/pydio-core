@@ -277,8 +277,7 @@ Class.create("Ajaxplorer", {
 		if(domNode.readAttribute("ajxpOptions")){
 			var ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
 		}		
-		if(ajxpClass && ajxpOptions && ajxpId){
-			//window[ajxpId] = new ajxpClass(domNode, ajxpOptions);			
+		if(ajxpClass && ajxpOptions && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
 			this.guiCompRegistry.push({ajxpId:ajxpId, ajxpNode:domNode, ajxpClass:ajxpClass, ajxpOptions:ajxpOptions});
 		}		
 		$A(domNode.childNodes).each(function(node){
