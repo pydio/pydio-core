@@ -355,9 +355,6 @@ Class.create("Modal", {
 	},
 	
 	updateLoadingProgress: function(state){	
-		if(console){
-			//console.log(state);
-		}
 		this.loadingStep --;
 		var percent = (1 - (this.loadingStep / this.loadingStepsCount));
 		var width = parseInt( (parseInt($('progressBarBorder').getWidth())-2) * percent);
