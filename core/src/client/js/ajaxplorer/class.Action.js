@@ -46,6 +46,8 @@ Class.create("Action", {
 			hasAccessKey:false,
 			accessKey:'',
 			subMenu:false,
+			subMenuUpdateImage:false,
+			subMenuUpdateTitle:false,
 			callbackCode:'',
 			callback:Prototype.emptyFunction,
 			prepareModal:false, 
@@ -84,13 +86,26 @@ Class.create("Action", {
 			write:false,
 			adminOnly:false
 			}, arguments[4] || { });
-		this.subMenuItems = {};
+		this.subMenuItems = Object.extend({
+			staticItems:null,
+			dynamicItems:null,
+			dynamicBuilderCode:null
+		}, arguments[5] || {});
 		this.elements = new Array();
 		this.contextHidden = false;
 		this.deny = false;
-		if(this.options.subMenu && !this.actionBar){
-			alert('Warning, wrong action definition. Cannot use a subMenu if not displayed in the actionBar!');
+		if(this.options.subMenu){
+			if(!this.actionBar){
+				alert('Warning, wrong action definition. Cannot use a subMenu if not displayed in the actionBar!');			
+			}
+			if(this.subMenuItems.staticItems){
+				this.buildSubmenuStaticItems();
+			}
+			if(this.subMenuItems.dynamicItems || this.subMenuItems.dynamicBuilderCode){
+				this.prepareSubmenuDynamicBuilder();
+			}
 		}
+		
 	}, 
 	
 	apply: function(){
@@ -111,7 +126,7 @@ Class.create("Action", {
 	},
 	
 	setActiveSubMenu : function(submenuItem){
-		if(this.subMenuUpdateImage && submenuItem.src){
+		if(this.options.subMenuUpdateImage && submenuItem.src){
 			var src = submenuItem.src;
 			this.elements.each(function(el){
 				var images = el.select('img[id="'+this.options.name +'_button_icon"]');
@@ -267,10 +282,10 @@ Class.create("Action", {
 			}else if(node.nodeName == "subMenu"){
 				this.options.subMenu = true;
 				if(node.getAttribute("updateImageOnSelect") && node.getAttribute("updateImageOnSelect") == "true"){
-					this.subMenuUpdateImage = true;
+					this.options.subMenuUpdateImage = true;
 				}
 				if(node.getAttribute("updateTitleOnSelect") && node.getAttribute("updateTitleOnSelect") == "true"){
-					this.subMenuUpdateTitle = true;
+					this.options.subMenuUpdateTitle = true;
 				}
 				for(var j=0;j<node.childNodes.length;j++){
 					if(node.childNodes[j].nodeName == "staticItems" || node.childNodes[j].nodeName == "dynamicItems"){
