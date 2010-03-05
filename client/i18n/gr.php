@@ -352,5 +352,15 @@ $mess=array(
 "313" => "Συμπίεση...",
 "314" => "Συμπίεση επιλογή σε zip...",
 "315" => "Συμπίεση επιλογή σε",
+"316" => "Open with...",
+"open_with_access" => "e",
+"317" => "Source viewer",
+"318" => "CodePress source code viewer",
+"319" => "HTML Editor",
+"320" => "WYSIWYG editor for HTML",
+"321" => "Select",
+"322" => "Select the current file",
+"323" => "E-mail this URL",
+"324" => "No editor available",
 );
 ?>
