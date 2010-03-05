@@ -122,7 +122,8 @@ CodePress.languages = {
 	sql : 'SQL'
 };
 
-
+CodePress.path = 'plugins/editor.codepress/codepress/';
+/*
 CodePress.run = function() {
 	s = document.getElementsByTagName('script');
 	for(var i=0,n=s.length;i<n;i++) {
@@ -143,3 +144,4 @@ CodePress.run = function() {
 
 if(window.attachEvent) window.attachEvent('onload',CodePress.run);
 else window.addEventListener('DOMContentLoaded',CodePress.run,false);
+*/
