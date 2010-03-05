@@ -395,7 +395,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					if($result["TOTAL_PAGES"] > 1){
 						AJXP_XMLWriter::renderPaginationData($count, $currentPage,$result["TOTAL_PAGES"]);
 					}
-					foreach ($result["ROWS"] as $row){
+					foreach ($result["ROWS"] as $arbitIndex => $row){
 						print '<tree ';
 						$pkString = "";
 						foreach ($row as $key=>$value){
@@ -418,7 +418,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 							print 'filename="record.'.$pkString.'pk" ';
 							print 'is_file="1" ajxp_mime="pk"/>';
 						}else{
-							print 'filename="record.no_pk" ';
+							print 'filename="record_'.$arbitIndex.'.no_pk" ';
 							print 'is_file="1" ajxp_mime="row"/>';
 						}
 						
