@@ -34,7 +34,7 @@
  */
 Class.create("FilesList", SelectableElements, {
 	
-	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable"],
+	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable", "IActionProvider"],
 
 	initialize: function($super, oElement, initDefaultDisp)
 	{
@@ -118,7 +118,48 @@ Class.create("FilesList", SelectableElements, {
 		//console.log('FILES LIST : FILL');
 		this.fill(this.crtContext);
 		this.removeOnLoad();
-	},	
+	},
+
+	getActions : function(){
+		return $H();
+		var showInActionBar = true;
+		var options = {
+			name:'',
+			src:'',
+			text:'',
+			title:'',
+			hasAccessKey:false,
+			accessKey:'',
+			subMenu:false,
+			subMenuUpdateImage:false,
+			subMenuUpdateTitle:false,
+			callbackCode:'',
+			callback:Prototype.emptyFunction,
+			prepareModal:false, 
+			listeners : [],
+			formId:undefined, 
+			formCode:undefined
+			};
+		var context = {
+			selection:true,
+			dir:false,
+			allowedMimes:$A([]),
+			root:true,
+			inZip:true,
+			recycle:false,
+			behaviour:'hidden',
+			actionBar:false,
+			actionBarGroup:'default',
+			contextMenu:false,
+			infoPanel:false			
+			};
+		var subMenuItems = {
+			staticItems:null,
+			dynamicItems:null,
+			dynamicBuilderCode:null
+		};
+		// Create an action from these options!
+	},
 	
 	initGUI: function()
 	{
