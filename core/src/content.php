@@ -71,7 +71,7 @@ if(AuthService::usersEnabled())
 	$rememberLogin = "";
 	$rememberPass = "";
 	if(isset($_GET["get_action"]) && $_GET["get_action"] == "get_seed"){
-		header("Content-type:text/plain; charset:UTF-8");
+		HTMLWriter::charsetHeader("text/plain");
 		print AuthService::generateSeed();				
 		exit(0);
 	}	

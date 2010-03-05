@@ -103,7 +103,7 @@ class AJXP_ClientDriver extends AbstractDriver
 			//------------------------------------
 			case "get_template":
 			
-				header("Content-type:text/html; charset:UTF-8");
+				HTMLWriter::charsetHeader();
 				if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
 				{
 					if($template_name == "gui_tpl.html"){
@@ -123,7 +123,7 @@ class AJXP_ClientDriver extends AbstractDriver
 			//------------------------------------
 			case "get_i18n_messages":
 			
-				header("Content-type:text/javascript");				
+				HTMLWriter::charsetHeader('text/javascript');
 				HTMLWriter::writeI18nMessagesClass(ConfService::getMessages());
 				exit(0);	
 				
@@ -131,7 +131,7 @@ class AJXP_ClientDriver extends AbstractDriver
 			
 			case "get_editors_registry":
 				
-				header("Content-type:application/xml;charset:UTF-8");
+				header("Content-type:application/xml;charset=UTF-8");
 				$pluginDir = INSTALL_PATH."/plugins";
 				$handler = opendir($pluginDir);
 				AJXP_XMLWriter::header("editors");
@@ -245,7 +245,7 @@ class AJXP_ClientDriver extends AbstractDriver
 			//------------------------------------
 			case "display_doc":
 			
-				header("Content-type:text/html; charset:UTF-8");
+				HTMLWriter::charsetHeader();
 				echo HTMLWriter::getDocFile($_GET["doc_file"]);
 				exit(1);
 				
