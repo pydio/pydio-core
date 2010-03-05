@@ -115,6 +115,10 @@ class HTMLWriter
     	</script>';
     }
     
+    function charsetHeader($type = 'text/html', $charset='UTF-8'){
+    	header("Content-type:$type; charset=$charset");
+    }
+    
     function closeBodyAndPage(){
     	print("</body></html>");
     }
