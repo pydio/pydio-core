@@ -247,6 +247,10 @@ Class.create("Ajaxplorer", {
 				if(Class.objectImplements(obj, "IContextMenuable")){
 					obj.setContextualMenu(this.contextMenu);
 				}
+				if(Class.objectImplements(obj, "IActionProvider")){
+					if(!this.guiActions) this.guiActions = new Hash();
+					this.guiActions.update(obj.getActions());
+				}
 			}
 		}
 		document.fire("ajaxplorer:gui_loaded");
