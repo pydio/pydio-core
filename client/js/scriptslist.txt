@@ -1,7 +1,7 @@
 js/lib/prototype/prototype.js
 js/lib/prototype/prototype.livepipe.js
 js/lib/prototype/prototype.oo.js
-js/ajaxplorer/interfaces/class.IAjxpPane.js
+js/ajaxplorer/interfaces/class.IAjxpWidget.js
 js/ajaxplorer/interfaces/class.IAjxpNodeProvider.js
 js/ajaxplorer/interfaces/class.IFocusable.js
 js/ajaxplorer/interfaces/class.IContextMenuable.js
