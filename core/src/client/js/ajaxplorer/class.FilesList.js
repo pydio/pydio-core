@@ -121,44 +121,52 @@ Class.create("FilesList", SelectableElements, {
 	},
 
 	getActions : function(){
-		return $H();
-		var showInActionBar = true;
+		// function may be bound to another context
+		var oThis = this;
 		var options = {
-			name:'',
-			src:'',
-			text:'',
-			title:'',
+			name:'multi_display',
+			src:'view_icon.png',
+			text:MessageHash[150],
+			title:MessageHash[151],
 			hasAccessKey:false,
-			accessKey:'',
-			subMenu:false,
-			subMenuUpdateImage:false,
-			subMenuUpdateTitle:false,
-			callbackCode:'',
-			callback:Prototype.emptyFunction,
-			prepareModal:false, 
-			listeners : [],
-			formId:undefined, 
-			formCode:undefined
+			subMenu:true,
+			subMenuUpdateImage:true,
+			callback: function(){
+				if(window.actionArguments){
+					if(Object.isString(window.actionArguments[0])){
+						oThis.switchDisplayMode(window.actionArguments[0]);
+					}else{
+						oThis.switchDisplayMode(window.actionArguments[0].command);
+					}
+				}			
+			},
+			listeners : {
+				init:function(){
+					window.setTimeout(function(){					
+						var displayMode = oThis.getDisplayMode();
+						var item = this.subMenuItems.staticItems.detect(function(item){return item.command == displayMode;});
+						this.setActiveSubMenu(item);
+					}.bind(window.listenerContext), 500);								
+				}
+			}
 			};
 		var context = {
-			selection:true,
-			dir:false,
-			allowedMimes:$A([]),
-			root:true,
-			inZip:true,
-			recycle:false,
-			behaviour:'hidden',
-			actionBar:false,
+			selection:false,
+			dir:true,
+			actionBar:true,
 			actionBarGroup:'default',
-			contextMenu:false,
+			contextMenu:true,
 			infoPanel:false			
 			};
 		var subMenuItems = {
-			staticItems:null,
-			dynamicItems:null,
-			dynamicBuilderCode:null
+			staticItems:[
+				{text:228,title:229,src:'view_icon.png',command:'thumb',hasAccessKey:true,accessKey:'thumbs_access_key'},
+				{text:226,title:227,src:'view_text.png',command:'list',hasAccessKey:true,accessKey:'list_access_key'}
+				]
 		};
 		// Create an action from these options!
+		var multiAction = new Action(options, context, {}, {}, subMenuItems);		
+		return $H({multi_display:multiAction});
 	},
 	
 	initGUI: function()
