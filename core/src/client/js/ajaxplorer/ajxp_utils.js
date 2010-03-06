@@ -85,6 +85,27 @@ function resolveImageSource(src, defaultPath, size){
 	}
 }
 
+function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, hoverClass, callback){
+	var button = new Element("div", {id:id, className:cssClass});
+	var img = new Element("img", {
+		src:resolveImageSource(iconSrc, '/images/crystal/actions/ICON_SIZE', iconSize), 
+		width:iconSize,
+		height:iconSize,
+		title:MessageHash[messageTitle],
+		ajxp_message_title:MessageHash[messageTitle]
+	});
+	button.update(img);
+	if(hoverClass){
+		button.observe("mouseover", function(){button.addClassName(hoverClass);});
+		button.observe("mouseout", function(){button.removeClassName(hoverClass);});
+	}
+	if(callback){
+		button.observe("click", callback);
+	}
+	button.setSrc = function(src){img.src=src;};
+	return button;
+}
+
 function roundSize(filesize, size_unit){
 	if (filesize >= 1073741824) {filesize = Math.round(filesize / 1073741824 * 100) / 100 + " G"+size_unit;}
 	else if (filesize >= 1048576) {filesize = Math.round(filesize / 1048576 * 100) / 100 + " M"+size_unit;}

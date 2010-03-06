@@ -34,11 +34,14 @@
  */
  Class.create("BookmarksBar", {
 	
-	initialize: function($super){
-		this.oElement = $('bmbar_content');
+	initialize: function(oElement){
+		this.element = $(oElement);
 		this.currentCount = 0;	
 		this.bookmarks = $A([]);
 		this.createMenu();
+		document.observe("ajaxplorer:user_logged", function(){
+			this.load();
+		}.bind(this) );
 	},
 	
 	parseXml: function(transport){
@@ -60,7 +63,7 @@
 		}
 		this.bmMenu.options.menuItems = this.bookmarks;
 		this.bmMenu.refreshList();
-		if(this.bookmarks.length) $('bm_goto_button').removeClassName('disabled');
+		if(this.bookmarks.length) this.element.removeClassName('inline_disabled');
 		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
 	},
 	
@@ -68,7 +71,7 @@
 		this.bmMenu = new Proto.Menu({			
 			className: 'menu bookmarksMenu',
 			mouseClick:'left',
-			anchor:'bm_goto_button',
+			anchor:this.element,
 			createAnchor:false,
 			topOffset:4,
 			leftOffset:-2,
@@ -77,31 +80,13 @@
 			zIndex:2000
 		});
 	},
-	
-	displayBookmark: function(path, title){
-		this.oElement.innerHTML += '<div id="bookmark_'+this.currentCount+'" bm_path="'+path+'" class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';" title="'+path+'"><img width="16" height="16" src="'+ajxpResourcesFolder+'/images/crystal/mimes/16/folder.png" border="0" align="ABSMIDDLE"  hspace="5" style="float:left;"><!--<a href="#" class="disabled" title="'+MessageHash[146]+'" onclick="ajaxplorer.actionBar.removeBookmark(\''+path+'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'+MessageHash[146]+'"></a>--> <a href="#" onclick="ajaxplorer.goTo(\''+path+'\'); return false;" class="bookmark_button">'+title+'</a></div>';			
-		this.currentCount++;
-	},
-	
+		
 	clear: function(){
 		this.currentCount = 0;
 		this.bookmarks = $A([]);
-		$('bm_goto_button').addClassName('disabled');
-	},
-	
-	setContextualMenu:function(oMenu){
-		this.contextMenu = oMenu;
-	},
-	
-	findBookmarkEventSource:function(srcElement){
-		
-		for(var i=0; i<this.currentCount; i++)
-		{
-			var bookmark = $('bookmark_'+i);
-			if(!bookmark) continue;
-			if(srcElement == bookmark) return bookmark;
-			if(srcElement.descendantOf(bookmark)) return bookmark;
-		}
+		this.element.addClassName('inline_disabled');
+		this.bmMenu.options.menuItems = this.bookmarks;
+		this.bmMenu.refreshList();
 	},
 	
 	getContextActions: function(bmPath, bmTitle){
@@ -115,17 +100,6 @@
 				callback:function(e){
 					this.removeBookmark(bmPath);
 				}.bind(this)
-			};
-		
-		var goToAction = {
-				name:MessageHash[224],
-				alt:MessageHash[104],
-				image:ajxpResourcesFolder+'/images/crystal/actions/16/forward.png',
-				disabled:false,
-				className:"edit",
-				callback:function(e){
-					ajaxplorer.goTo(bmPath);
-				}
 			};
 		
 		var renameAction = {

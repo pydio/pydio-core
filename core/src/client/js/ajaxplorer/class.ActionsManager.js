@@ -33,8 +33,6 @@
  * Description : Singleton that manages all actions, but also the action bar display.
  */
 Class.create("ActionsManager", AjxpPane, {
-
-	__implements : "IFocusable",
 	
 	initialize: function($super, oElement, bUsersEnabled, oUser, oAjaxplorer)
 	{
@@ -52,9 +50,7 @@ Class.create("ActionsManager", AjxpPane, {
 			this._currentUser = 'shared';
 		}
 		this.oUser = oUser;
-		this.bookmarksBar = new BookmarksBar();
-		this.bgManager = new BackgroundManager(this);
-		
+		this.bgManager = new BackgroundManager(this);		
 		this.subMenus = [];				
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
@@ -63,7 +59,6 @@ Class.create("ActionsManager", AjxpPane, {
 		document.observe("ajaxplorer:context_changed", function(event){
 			window.setTimeout(function(){
 				this.fireContextChange();
-				this.updateLocationBar(event.memo);
 			}.bind(this), 0);			
 		}.bind(this) );
 		
@@ -75,154 +70,15 @@ Class.create("ActionsManager", AjxpPane, {
 		
 	},	
 	
-	init: function()
-	{		
-		this._items = this.htmlElement.select('[action]');
-		this.locationBarElement.onfocus = function(e)	{
-			ajaxplorer.disableShortcuts();
-			this.hasFocus = true;
-			this.locationBarElement.select();
-			return false;
-		}.bind(this);
-		var buttons = this.htmlElement.getElementsBySelector("input");
-		buttons.each(function(object){
-			$(object).onkeydown = function(e){
-				if(e == null) e = window.event;		
-				if(e.keyCode == 9) return false;
-				return true;
-			};
-			if($(object) == $('goto_button'))
-			{
-				$(object).onfocus = function(){
-					this.locationBarElement.focus();
-				}.bind(this);
-			}
-		}.bind(this) );
-		
-		this.locationBarElement.onblur = function(e)	{
-			if(!currentLightBox){
-				ajaxplorer.enableShortcuts();
-				this.hasFocus = false;
-			}
-		}.bind(this);
-		
-	},
-	
-	setContextualMenu: function(contextualMenu)
-	{
-		this.bookmarksBar.setContextualMenu(contextualMenu);
-	},
-	
 	setUser: function(oUser)
 	{	
 		this.oUser = oUser;
-		var logging_string = "";
-		if(oUser != null) 
+		if(oUser != null  && oUser.id != 'guest' && oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage) 
 		{
-			if(oUser.id != 'guest') 
-			{
-				logging_string = '<ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'" onclick="ajaxplorer.actionBar.displayUserPrefs();">'+ oUser.id+' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></i>';
-				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
-				{
-					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
-				}
-			}
-			else 
-			{
-				logging_string = '<ajxp:message ajxp_message_id="143">'+MessageHash[143]+'</ajxp:message>';
-			}
+			ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
 		}
-		else 
-		{
-			logging_string = '<ajxp:message ajxp_message_id="142">'+MessageHash[144]+'</ajxp:message>';
-		}
-		$('logging_string').innerHTML = logging_string;
-		this.loadBookmarks();
 	},
-	
-	displayUserPrefs: function()
-	{
-		if(ajaxplorer.user == null) return;
-		var userLang = ajaxplorer.user.getPreference("lang");
-		var userDisp = ajaxplorer.user.getPreference("display");	
-		var onLoad = function(){		
-			var elements = $('user_pref_form').getElementsBySelector('input[type="radio"]');		
-			elements.each(function(elem){
-				elem.checked = false;			
-				if(elem.id == 'display_'+userDisp || elem.id == 'lang_'+userLang) {
-					elem.checked = true;
-				}
-			});
-			if($('user_change_ownpass_old')){
-				$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
-				// Update pass_seed
-				var connexion = new Connexion();
-				connexion.addParameter("get_action", "get_seed");
-				connexion.onComplete = function(transport){
-					$('pass_seed').value = transport.responseText;
-				};
-				connexion.sendSync();			
-			}
-		};
-		
-		var onComplete = function(){
-			var elements = $('user_pref_form').getElementsBySelector('input[type="radio"]');
-			elements.each(function(elem){			
-				if(elem.checked){
-					 ajaxplorer.user.setPreference(elem.name, elem.value);
-				}
-			});
-			var userOldPass = null;
-			var userPass = null;
-			var passSeed = null;
-			if($('user_change_ownpass1') && $('user_change_ownpass1').value != "" && $('user_change_ownpass2').value != "")
-			{
-				if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
-					alert(MessageHash[238]);
-					return false;
-				}
-				if($('user_change_ownpass_old').value == ''){
-					alert(MessageHash[239]);
-					return false;					
-				}
-				passSeed = $('pass_seed').value;
-				if(passSeed == '-1'){
-					userPass = $('user_change_ownpass1').value;
-					userOldPass = $('user_change_ownpass_old').value;
-				}else{
-					userPass = hex_md5($('user_change_ownpass1').value);
-					userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
-				}				
-			}
-			var onComplete = function(transport){
-				var oUser = ajaxplorer.user;
-				if(oUser.getPreference('lang') != null 
-					&& oUser.getPreference('lang') != "" 
-					&& oUser.getPreference('lang') != ajaxplorer.currentLanguage)
-				{
-					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
-				}
-					
-				if(userPass != null){
-					if(transport.responseText == 'PASS_ERROR'){
-						alert(MessageHash[240]);
-					}else if(transport.responseText == 'SUCCESS'){
-						ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
-						hideLightBox(true);
-					}
-				}else{
-					ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
-					hideLightBox(true);
-				}
-			};
-			ajaxplorer.user.savePreferences(userOldPass, userPass, passSeed, onComplete);
-			return false;		
-		};
-		
-		modal.prepareHeader(MessageHash[195], ajxpResourcesFolder+'/images/crystal/actions/16/configure.png');
-		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
-	},
-		
+			
 	getContextActions: function(srcElement)
 	{		
 		var actionsSelectorAtt = 'selectionContext';
@@ -234,14 +90,6 @@ Class.create("ActionsManager", AjxpPane, {
 		{
 			actionsSelectorAtt = 'directoryContext';
 		}
-		else
-		{
-			// find the bookmark origin
-			var bm = this.bookmarksBar.findBookmarkEventSource(srcElement);
-			if(bm != null){
-				return this.bookmarksBar.getContextActions(bm);
-			}
-		};
 		var contextActions = new Array();
 		var crtGroup;
 		this.actions.each(function(pair){
@@ -527,17 +375,7 @@ Class.create("ActionsManager", AjxpPane, {
 			ajaxplorer.getContextHolder().multipleNodesReload(reloadNodes);
 		}
 	},
-		
-	removeBookmark: function (path)
-	{
-		this.bookmarksBar.removeBookmark(path);
-	},
-	
-	loadBookmarks: function ()
-	{
-		this.bookmarksBar.load();
-	},
-	
+			
 	fireSelectionChange: function(){
 		var userSelection = null;
 		if (ajaxplorer && ajaxplorer.getUserSelection()){
@@ -733,56 +571,6 @@ Class.create("ActionsManager", AjxpPane, {
 	
 	getActionByName : function(actionName){
 		return this.actions.get(actionName);		
-	},
-	
-	locationBarSubmit: function (url)
-	{
-		if(url == '') return false;	
-		var node = new AjxpNode(url, false);
-		var parts = url.split("#");
-		if(parts.length == 2){
-			var data = new Hash();
-			data.set("new_page", parts[1]);
-			url = parts[0];
-			node = new AjxpNode(url);
-			node.getMetadata().set("paginationData", data);
-		}
-		this.fireDefaultAction("dir", node);
-		return false;
-	},
-	
-	locationBarFocus: function()
-	{
-		this.locationBarElement.activate();
-	},
-	
-	updateLocationBar: function (newNode)
-	{
-		if(Object.isString(newNode)){
-			newNode = new AjxpNode(newNode);
-		}
-		var newPath = newNode.getPath();
-		if(newNode.getMetadata().get('paginationData')){
-			newPath += "#" + newNode.getMetadata().get('paginationData').get('current');
-		}
-		this.locationBarElement.value = newPath;
-	},
-	
-	getLocationBarValue: function ()
-	{
-		return this.locationBarElement.getValue();
-	},
-	
-	focus: function()
-	{
-		this.locationBarElement.focus();
-		this.hasFocus = true;
-	},
-	
-	blur: function()
-	{
-		this.locationBarElement.blur();
-		this.hasFocus = false;
 	},
 	
 	getFlashVersion: function()
