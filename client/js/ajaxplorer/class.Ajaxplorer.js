@@ -42,7 +42,6 @@ Class.create("Ajaxplorer", {
 		this._initLoggedUser = loggedUser;
 		this._contextHolder = new AjxpDataModel();
 		this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
-		this._displayMode = 'list';
 		this._focusables = [];
 		this._resourcesRegistry = {};
 		this._initDefaultDisp = 'list';
@@ -204,11 +203,7 @@ Class.create("Ajaxplorer", {
 		  }.bind(protoMenu),0);};
 
 		this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, null, this);
-		this.actionBar.init();
-		this.actionBar.setContextualMenu(this.contextMenu);		  
-		this.actionBar.setFocusBehaviour();
-		this._focusables.push(this.actionBar);
-		new AjxpAutocompleter("current_path", "autocomplete_choices");
+		
 		if(!Prototype.Browser.WebKit && !Prototype.Browser.IE){
 			this.history = new Proto.History(function(hash){
 				this.goTo(this.historyHashToPath(hash));
@@ -223,7 +218,14 @@ Class.create("Ajaxplorer", {
 		/*********************
 		/* USER GUI
 		/*********************/
+		// Build repoChooser
+		//var chooser = new RepositorySelect($('repo_chooser'));
+		//var locationBar = new LocationBar($('locationBar'));
+		//var userWidget = new UserWidget($('logging_string'));
+		//this._focusables.push(locationBar);	
+		
 		this.buildGUI($('browser'));
+		this.buildGUI($('toolbars'));
 		document.fire("ajaxplorer:before_gui_load");
 		// Rewind components creation!
 		var lastInst;
@@ -328,13 +330,11 @@ Class.create("Ajaxplorer", {
 			}
 		}catch(e){alert('Error parsing XML for user : '+e);}
 		
-		var repList = null;
-		var repId = null;
 		var repositoryObject = new Repository(null);
 		if(this.user != null)
 		{
-			repId = this.user.getActiveRepository();
-			repList = this.user.getRepositoriesList();			
+			var repId = this.user.getActiveRepository();
+			var repList = this.user.getRepositoriesList();			
 			repositoryObject = repList.get(repId);
 			if(!repositoryObject){
 				alert("Empty repository object!");
@@ -344,8 +344,12 @@ Class.create("Ajaxplorer", {
 			}
 		}
 		this.actionBar.setUser(this.user);
-		this.refreshRepositoriesMenu(repList, repId);
 		this.loadRepository(repositoryObject);
+		if(repList && repId){
+			document.fire("ajaxplorer:repository_list_refreshed", {list:repList,active:repId});
+		}else{
+			document.fire("ajaxplorer:repository_list_refreshed", {list:false,active:false});
+		}
 		document.fire("ajaxplorer:user_logged");
 	},
 		
@@ -370,8 +374,7 @@ Class.create("Ajaxplorer", {
 			
 			repId = this.user.getActiveRepository();
 			repList = this.user.getRepositoriesList();
-			this.refreshRepositoriesMenu(repList, repId);
-			
+			document.fire("ajaxplorer:repository_list_refreshed", {list:repList,active:repId});			
 		}.bind(this);
 		connexion.sendAsync();			
 	},
@@ -389,7 +392,6 @@ Class.create("Ajaxplorer", {
 				
 		if(!this._initObj) { 			
 			this.repositoryId = repositoryId;
-			this.actionBar.loadBookmarks();
 		} else { this._initObj = null ;}
 		
 		if(this._initLoadRep){
@@ -400,9 +402,6 @@ Class.create("Ajaxplorer", {
 				this._initLoadRep = null;
 			}.bind(this));
 		}
-		//this.goTo(rootNode);
-		$('repo_path').value = repository.getLabel();
-		$('repo_icon').src = newIcon;
 		this.sEngine = eval('new '+sEngineName+'("search_container");');
 	},
 
@@ -415,51 +414,6 @@ Class.create("Ajaxplorer", {
 		this._contextHolder.requireContextChange(node);
 	},
 	
-	refreshRepositoriesMenu: function(rootDirsList, repositoryId){
-		$('goto_repo_button').addClassName('disabled');
-		var actions = new Array();
-		if(rootDirsList && rootDirsList.size() > 1){
-			rootDirsList.each(function(pair){
-				var repoObject = pair.value;
-				var key = pair.key;
-				var selected = (key == repositoryId ? true:false);
-				actions[actions.length] = {
-					name:repoObject.getLabel(),
-					alt:repoObject.getLabel(),				
-					image:repoObject.getIcon(),
-					className:"edit",
-					disabled:selected,
-					callback:function(e){
-						this.triggerRepositoryChange(''+key);
-					}.bind(this)
-				}
-			}.bind(this));		
-		}
-		if(this.rootMenu){
-			this.rootMenu.options.menuItems = actions;
-			this.rootMenu.refreshList();
-		}else{
-			this.rootMenu = new Proto.Menu({			
-				className: 'menu rootDirChooser',
-				mouseClick:'left',
-				anchor:'goto_repo_button',
-				createAnchor:false,
-				anchorContainer:$('dir_chooser'),
-				anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
-				anchorTitle:MessageHash[200],
-				topOffset:6,
-				leftOffset:-127,
-				menuTitle:MessageHash[200],
-				menuItems: actions,
-				fade:true,
-				zIndex:1500
-			});		
-		}
-		if(actions.length) $('goto_repo_button').removeClassName('disabled');
-        actions.sort(function(a,b) { return a.name > b.name; });
-	},
-	
-
 	triggerRepositoryChange: function(repositoryId){		
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'switch_root_dir');
@@ -508,16 +462,6 @@ Class.create("Ajaxplorer", {
 		this.actionBar.treeCopyActive = false;
 		hideLightBox();
 		return false;
-	},
-	
-	switchDisplayMode : function(displayMode){
-		if(this._displayMode && displayMode == this._displayMode) return;
-		this._displayMode = displayMode;
-		document.fire("ajaxplorer:display_switched", this._displayMode);
-	},
-	
-	getDisplayMode : function(){
-		return this._displayMode;
 	},
 	
 	changeDataColumnsDefinition : function(columnsDef){

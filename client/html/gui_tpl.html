@@ -1,16 +1,15 @@
 <div id="toolbars">
 	<div id="action_bar">
-		<div id="buttons_bar">
-		</div>
+		<div id="buttons_bar"></div>
 		<div id="locationbar_cont">
 			<div style="height: 33px;" class="separator"></div>
 			<div style="padding-top : 5px;">
 				<!--RepoChooser-->
-				<div id="repository_form"><img id="repo_icon" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/network-wired.png" width="16" height="16" align="absmiddle"><input type="text" name="repo_path" value="Default Files" id="repo_path"></div><div id="repository_goto"><img  align="absmiddle" title="<?php print($mess[200]); ?>" ajxp_message_title_id="200" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/lower.png" id="goto_repo_button" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;"></div>
+				<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions="{}"></div>
 				<!--LocationBar-->
-				<div id="parent_button"><img align="" title="<?php print($mess[24]); ?>" ajxp_message_title_id="24" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/goto_parent.png" height="16" width="16" style="border: 0px; display: inline;margin-top:3px;cursor:pointer;" onclick="ajaxplorer.actionBar.fireAction('up_dir');return false;"></div><form style="display:inline;" name="action_form" onsubmit="ajaxplorer.getActionBar().locationBarSubmit(this.current_path.value);return false;"><div id="location_form"><input type="text" name="current_path" value="/" id="current_path"><img align="absmiddle" title="<?php print($mess[149]); ?>" ajxp_message_title_id="149" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/reload.png" height="16" width="16" id="reload_button" onclick="ajaxplorer.actionBar.fireAction('refresh');return false;"></div><div id="location_goto"><input  align="" title="<?php print($mess[104]); ?>" ajxp_message_title_id="104" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/media-playback-start.png" id="goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div></form><div id="bookmarks_goto"><input  align="" title="<?php print($mess[145]); ?>" ajxp_message_title_id="145" type="image" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/actions/16/bookmark.png" id="bm_goto_button" height="16" width="16" style="border: 0px; display: inline;margin-left:2px;"></div>
-				<!--LoggingString-->
-				<div id="logging_string"></div>
+				<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{}"></div>
+				<!--LoggingString-->				
+				<div id="logging_string" ajxpClass="UserWidget" ajxpOptions="{}"></div>
 			</div>
 		</div>
 	</div>
