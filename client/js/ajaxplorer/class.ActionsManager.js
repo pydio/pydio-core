@@ -657,10 +657,41 @@ Class.create("ActionsManager", AjxpPane, {
 			connexion.addParameter('get_action', 'get_driver_actions');
 			connexion.sendSync();
 		}
+		if(ajaxplorer && ajaxplorer.guiActions){
+			ajaxplorer.guiActions.each(function(pair){
+				var act = pair.value;
+				this.registerAction(act);
+			}.bind(this));
+		}
+		if(this.defaultActions.get("select")){
+			this.defaultActions.set("file", this.defaultActions.get("select"));
+		}else{
+			if(this.actions.get("ext_select")){
+				this.actions.unset("ext_select");
+			}
+		}		
 		this.initToolbars();
 		document.fire("ajaxplorer:actions_loaded");
 		this.fireContextChange();
 		this.fireSelectionChange();			
+	},
+	
+	registerAction : function(action){
+		var actionName = action.options.name;
+		this.actions.set(actionName, action);
+		if(action.defaults){
+			for(var key in action.defaults) this.defaultActions.set(key, actionName);
+		}
+		if(action.context.actionBar){
+			if(this.toolbars.get(action.context.actionBarGroup) == null){
+				this.toolbars.set(action.context.actionBarGroup, new Array());
+			}
+			this.toolbars.get(action.context.actionBarGroup).push(actionName);
+		}
+		if(action.options.hasAccessKey){
+			this.registerKey(action.options.accessKey, actionName);
+		}
+		action.setManager(this);
 	},
 	
 	parseActions: function(xmlResponse){		
@@ -669,30 +700,9 @@ Class.create("ActionsManager", AjxpPane, {
 		for(var i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
             if(actions[i].getAttribute('enabled') == 'false') continue;
-			var newAction = new Action(this);			
+			var newAction = new Action();
 			newAction.createFromXML(actions[i]);
-			this.actions.set(actions[i].getAttribute('name'), newAction);
-			if(actions[i].getAttribute('dirDefault') && actions[i].getAttribute('dirDefault') == "true"){
-				this.defaultActions.set('dir', actions[i].getAttribute('name'));
-			} 
-			else if(actions[i].getAttribute('fileDefault') && actions[i].getAttribute('fileDefault') == "true"){
-				this.defaultActions.set('file', actions[i].getAttribute('name'));
-			} 
-			else if(actions[i].getAttribute('dragndropDefault') && actions[i].getAttribute('dragndropDefault') == "true"){
-				this.defaultActions.set('dragndrop', actions[i].getAttribute('name'));
-			}			
-			else if(actions[i].getAttribute('ctrlDragndropDefault') && actions[i].getAttribute('ctrlDragndropDefault') == "true"){
-				this.defaultActions.set('ctrldragndrop', actions[i].getAttribute('name'));
-			}			
-			if(newAction.context.actionBar){				
-				if(this.toolbars.get(newAction.context.actionBarGroup) == null){
-					this.toolbars.set(newAction.context.actionBarGroup, new Array());
-				}
-				this.toolbars.get(newAction.context.actionBarGroup).push(newAction.options.name);
-			}
-			if(newAction.options.hasAccessKey){
-				this.registerKey(newAction.options.accessKey, newAction.options.name);
-			}
+			this.registerAction(newAction);
 			if(ajaxplorer && newAction.options.name == "ls"){
 				for(var j=0;j<actions[i].childNodes.length;j++){
 					if(actions[i].childNodes[j].nodeName == 'displayDefinitions'){
@@ -717,22 +727,7 @@ Class.create("ActionsManager", AjxpPane, {
 					}
 				});
 				ajaxplorer.changeDataColumnsDefinition(columns);
-			}
-			if(newAction.options.listeners['init']){				
-				try{
-					window.listenerContext = newAction;
-					newAction.options.listeners['init'].evalScripts();
-				}catch(e){
-					alert(e);
-				}
-			}
-		}
-		if(this.defaultActions.get("select")){
-			this.defaultActions.set("file", this.defaultActions.get("select"));
-		}else{
-			if(this.actions.get("ext_select")){
-				this.actions.unset("ext_select");
-			}
+			}			
 		}
 	},
 	

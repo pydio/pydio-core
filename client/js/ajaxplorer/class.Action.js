@@ -37,7 +37,6 @@ Class.create("Action", {
 	__DEFAULT_ICON_PATH : "/images/crystal/actions/ICON_SIZE",
 	
 	initialize:function(){
-		this.actionBar = arguments[0];
 		this.options = Object.extend({
 			name:'',
 			src:'',
@@ -54,7 +53,7 @@ Class.create("Action", {
 			listeners : [],
 			formId:undefined, 
 			formCode:undefined
-			}, arguments[1] || { });
+			}, arguments[0] || { });
 		this.context = Object.extend({
 			selection:true,
 			dir:false,
@@ -67,7 +66,7 @@ Class.create("Action", {
 			actionBarGroup:'default',
 			contextMenu:false,
 			infoPanel:false			
-			}, arguments[2] || { });
+			}, arguments[1] || { });
 			
 		this.selectionContext = Object.extend({			
 			dir:false,
@@ -77,7 +76,7 @@ Class.create("Action", {
 			allowedMimes:$A([]),			
 			unique:true,
 			multipleOnly:false
-			}, arguments[3] || { });
+			}, arguments[2] || { });
 		this.rightsContext = Object.extend({			
 			noUser:true,
 			userLogged:true,
@@ -85,19 +84,26 @@ Class.create("Action", {
 			read:true,
 			write:false,
 			adminOnly:false
-			}, arguments[4] || { });
+			}, arguments[3] || { });
 		this.subMenuItems = Object.extend({
 			staticItems:null,
 			dynamicItems:null,
 			dynamicBuilderCode:null
-		}, arguments[5] || {});
+		}, arguments[4] || {});
 		this.elements = new Array();
 		this.contextHidden = false;
 		this.deny = false;
-		if(this.options.subMenu){
-			if(!this.actionBar){
+		if(this.context.subMenu){
+			if(!this.options.actionBar){
 				alert('Warning, wrong action definition. Cannot use a subMenu if not displayed in the actionBar!');			
 			}
+		}
+		
+	}, 
+	
+	setManager : function(manager){
+		this.actionBar = manager;
+		if(this.options.subMenu){
 			if(this.subMenuItems.staticItems){
 				this.buildSubmenuStaticItems();
 			}
@@ -105,8 +111,20 @@ Class.create("Action", {
 				this.prepareSubmenuDynamicBuilder();
 			}
 		}
+		if(this.options.listeners['init']){				
+			try{
+				window.listenerContext = this;
+				if(Object.isString(this.options.listeners['init'])){
+					this.options.listeners['init'].evalScripts();
+				}else{
+					this.options.listeners['init']();
+				}
+			}catch(e){
+				alert(e);
+			}
+		}
 		
-	}, 
+	},
 	
 	apply: function(){
 		if(this.deny) return;
@@ -118,7 +136,11 @@ Class.create("Action", {
 		}
 		window.actionArguments = $A([]);
 		if(arguments[0]) window.actionArguments = $A(arguments[0]);
-		if(this.options.callbackCode) this.options.callbackCode.evalScripts();
+		if(this.options.callbackCode) {
+			this.options.callbackCode.evalScripts();
+		}else if(this.options.callback){
+			this.options.callback();
+		}
 		if(this.subMenu && arguments[0] && arguments[0][0]){
 			this.setActiveSubMenu(arguments[0][0]);
 		}
@@ -243,7 +265,19 @@ Class.create("Action", {
 	createFromXML:function(xmlNode){
 		this.options.name = xmlNode.getAttribute('name');
 		for(var i=0; i<xmlNode.childNodes.length;i++){
-			var node = xmlNode.childNodes[i];			
+			var node = xmlNode.childNodes[i];
+			var defaultAttributes = $H({
+				dir:"dirDefault", 
+				file:"fileDefault", 
+				dragndrop:"dragndropDefault",
+				ctrldragndrop:"ctrlDragndropDefault"
+			});
+			defaultAttributes.each(function(att){
+				if(xmlNode.getAttribute(att.value) && xmlNode.getAttribute(att.value) == "true"){
+					if(!this.defaults) this.defaults = {};
+					this.defaults[att.key] = true;
+				}
+			}.bind(this));
 			if(node.nodeName == "processing"){
 				for(var j=0; j<node.childNodes.length; j++){
 					var processNode = node.childNodes[j];
@@ -303,12 +337,6 @@ Class.create("Action", {
 					}else if(node.childNodes[j].nodeName == "dynamicBuilder"){
 						this.subMenuItems.dynamicBuilderCode = '<script>'+node.childNodes[j].firstChild.nodeValue+'</script>';
 					}
-				}
-				if(this.subMenuItems.staticItems){
-					this.buildSubmenuStaticItems();
-				}
-				if(this.subMenuItems.dynamicItems || this.subMenuItems.dynamicBuilderCode){
-					this.prepareSubmenuDynamicBuilder();
 				}
 			}
 		}
