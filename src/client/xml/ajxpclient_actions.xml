@@ -65,44 +65,7 @@
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
-		</action>		
-		<!--
-		<action name="multi_display">
-			<gui text="150" title="151" src="view_icon.png" hasAccessKey="false">
-				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="default">
-				</context>				
-			</gui>
-			<subMenu updateImageOnSelect="true" updateTitleOnSelect="false">
-				<staticItems>
-					<item text="228" title="229" src="view_icon.png" command="thumb" 
-						hasAccessKey="true" accessKey="thumbs_access_key"/>
-					<item text="226" title="227" src="view_text.png" command="list"  
-						hasAccessKey="true" accessKey="list_access_key"/>
-				</staticItems>
-			</subMenu>
-			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					if(window.actionArguments){
-						if(Object.isString(window.actionArguments[0])){
-							ajaxplorer.switchDisplayMode(window.actionArguments[0]);
-						}else{
-							ajaxplorer.switchDisplayMode(window.actionArguments[0].command);
-						}
-					}
-					]]></clientCallback>
-				<clientListener name="init"><![CDATA[
-					window.setTimeout(function(){					
-						var displayMode = ajaxplorer.getDisplayMode();
-						var item = this.subMenuItems.staticItems.detect(function(item){return item.command == displayMode;});
-						this.setActiveSubMenu(item);
-					}.bind(window.listenerContext), 500);					
-				]]></clientListener>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
 		</action>
-		-->
 		<action name="ext_select">
 			<gui text="321" title="322" src="download_manager.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"

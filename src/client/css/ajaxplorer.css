@@ -514,67 +514,49 @@ ACTION BAR
     margin-left: 3px;
 }
 
-#location_goto, 
-#repository_goto, 
-#bookmarks_goto
+.inlineBarButton,
+.inlineBarButtonLeft,
+.inlineBarButtonRight
 {
-    border: 1px solid #bbb;
-    float: left;
+	display:inline;
+	border: 1px solid #bbb;
     height: 22px;
-    padding-right: 2px;
-    border-left: 0px;
+    float:left;
+    padding:0 1px;
+    cursor:pointer;
 }
 
-#parent_button
+.inlineBarButtonLeft{
+	border-left-width:0px;
+}
+.inlineBarButtonRight{
+	border-right-width:0px;
+}
+
+.inlineBarButton img,
+.inlineBarButtonLeft img,
+.inlineBarButtonRight img
 {
-    border: 1px solid #bbb;
-    float: left;
-    height: 22px;  
-    width:16px;      
-    padding-left: 0px;
-    border-right: 0px;
+	margin-top:3px;
+	display:inline;
+	border:0px;
 }
 
-#location_goto:hover,
-#repository_goto:hover,
-#bookmarks_goto:hover,
-#parent_button:hover
+.inline_hover
 {
 	background-image:url(../images/header_bg_on.png);
 	background-position:top;
 	background-repeat: repeat-x;
 }
 
-#reload_button{
-	border: 0px; 
-	display: inline;
-	margin-top: -1px;
-	cursor:pointer;
-	filter:alpha(opacity=30);
-	opacity: 0.3;
-	-moz-opacity:0.3;
-}
-
-#reload_button:hover{
-	filter:alpha(opacity=100);
-	opacity: 1;
-	-moz-opacity:1;
-}
-
-#goto_repo_button.disabled,
-#bm_goto_button.disabled
+.inline_disabled img
 {
 	filter:alpha(opacity=30);
 	opacity: 0.3;
 	-moz-opacity:0.3;
+	cursor:default;
 }
 
-#repository_goto
-{
-   padding: 0px;
-   cursor: pointer;
-   margin-right : 7px;
-}
 /*
 #logging_string
 {

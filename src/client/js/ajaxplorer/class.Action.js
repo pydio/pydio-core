@@ -428,7 +428,7 @@ Class.create("Action", {
 		if(this.subMenuItems.staticItems){
 			this.subMenuItems.staticItems.each(function(item){
 				var itemText = MessageHash[item.text];
-				if(item.hasAccessKey && item.hasAccessKey=='true' && MessageHash[item.accessKey]){
+				if(item.hasAccessKey && (item.hasAccessKey=='true' || item.hasAccessKey===true) && MessageHash[item.accessKey]){
 					itemText = this.getKeyedText(MessageHash[item.text],true,MessageHash[item.accessKey]);
 					if(!this.subMenuItems.accessKeys) this.subMenuItems.accessKeys = [];
 					this.actionBar.registerKey(MessageHash[item.accessKey],this.options.name, item.command);					
@@ -578,7 +578,8 @@ Class.create("Action", {
 		// Remove all elements and forms from html
 		this.elements.each(function(el){
 			$(el).remove();
-		});
+		}.bind(this));		
+		this.elements = new Array();
 		if(this.options.formId && $('all_forms').select('[id="'+this.options.formId+'"]').length){
 			$('all_forms').select('[id="'+this.options.formId+'"]')[0].remove();
 		}

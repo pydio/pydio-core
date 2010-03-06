@@ -46,10 +46,9 @@ Class.create("FilesList", SelectableElements, {
 		Event.observe(document, "ajaxplorer:user_logged", function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
 			disp = ajaxplorer.user.getPreference("display");
-			if(disp && (disp == 'thumb' || disp == 'list'))
-			{
-				if(disp != this._displayMode) ajaxplorer.switchDisplayMode(disp);
-			}			
+			if(disp && (disp == 'thumb' || disp == 'list')){
+				if(disp != this._displayMode) this.switchDisplayMode(disp);
+			}
 			this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));	
 			if(this.slider){
 				this.slider.setValue(this._thumbSize);
@@ -79,9 +78,6 @@ Class.create("FilesList", SelectableElements, {
 			
 		}.bind(this) );
 		document.observe("ajaxplorer:context_loading", loadingObs);
-		document.observe("ajaxplorer:display_switched", function(event){
-			this.switchDisplayMode(event.memo);
-		}.bind(this) );
 		document.observe("ajaxplorer:data_columns_def_changed", function(event){
 			this.setColumnsDef(event.memo);
 		}.bind(this) );
@@ -325,12 +321,10 @@ Class.create("FilesList", SelectableElements, {
 	},
 	
 	switchDisplayMode: function(mode){
-		if(mode)
-		{
+		if(mode){
 			this._displayMode = mode;
 		}
-		else
-		{
+		else{
 			if(this._displayMode == "thumb") this._displayMode = "list";
 			else this._displayMode = "thumb";
 		}
@@ -341,7 +335,7 @@ Class.create("FilesList", SelectableElements, {
 		this.fireChange();
 		if(ajaxplorer && ajaxplorer.user){
 			ajaxplorer.user.setPreference("display", this._displayMode);
-			ajaxplorer.user.savePreferences();
+			ajaxplorer.user.savePreference("display");
 		}
 		return this._displayMode;
 	},
@@ -509,7 +503,7 @@ Class.create("FilesList", SelectableElements, {
 			if(displayData.get('displayMode')){
 				var dispMode = displayData.get('displayMode');
 				if(dispMode != this._displayMode){
-					ajaxplorer.switchDisplayMode(dispMode);
+					this.switchDisplayMode(dispMode);
 				}
 			}
 		}

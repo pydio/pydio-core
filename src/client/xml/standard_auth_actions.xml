@@ -16,12 +16,6 @@
 					if(loginRedirect){
 						document.location.href=loginRedirect;
 					}else{
-						if(ajaxplorer && ajaxplorer.actionBar){
-							ajaxplorer.actionBar.updateLocationBar('/');
-						}
-						if(ajaxplorer && ajaxplorer.infoPanel){
-							ajaxplorer.infoPanel.empty();
-						}
 						modal.showDialogForm('Log In', 'login_form', 
 						function(){
 							var oForm = modal.getForm();

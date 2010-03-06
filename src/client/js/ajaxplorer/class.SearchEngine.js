@@ -132,7 +132,7 @@ Class.create("SearchEngine", AjxpPane, {
 		if(text == '') return;
 		this.updateStateSearching();
 		this.clearResults();
-		var folder = ajaxplorer.getActionBar().getLocationBarValue();
+		var folder = ajaxplorer.getContextNode().getPath();
 		if(folder == "/") folder = "";
 		this.searchFolderContent(text, folder);
 	},
