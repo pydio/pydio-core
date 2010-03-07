@@ -264,6 +264,9 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 		}
 		margin = margin || 0; // avoid NaN in IE
 		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-margin-addMarginBottom))+'px'});
+		if(element.ajxpPaneObject && listen){
+			element.ajxpPaneObject.resize();
+		}
 		element.fire("resize");
 	};
 	
