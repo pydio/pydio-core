@@ -141,7 +141,7 @@ Class.create("FilesList", SelectableElements, {
 					window.setTimeout(function(){					
 						var displayMode = oThis.getDisplayMode();
 						var item = this.subMenuItems.staticItems.detect(function(item){return item.command == displayMode;});
-						this.setActiveSubMenu(item);
+						this.notify("submenu_active", item);
 					}.bind(window.listenerContext), 500);								
 				}
 			}

@@ -202,7 +202,7 @@ Class.create("Ajaxplorer", {
 		  	this.refreshList();
 		  }.bind(protoMenu),0);};
 
-		this.actionBar = new ActionsManager($("action_bar"), this.usersEnabled, null, this);
+		this.actionBar = new ActionsManager(this.usersEnabled);		
 		
 		if(!Prototype.Browser.WebKit && !Prototype.Browser.IE){
 			this.history = new Proto.History(function(hash){
@@ -212,18 +212,12 @@ Class.create("Ajaxplorer", {
 				this.updateHistory(this.getContextNode().getPath());
 			}.bind(this));
 		}
-		modal.updateLoadingProgress('ActionBar Initialized');
+		modal.updateLoadingProgress('Actions Initialized');
 		  
 		  
 		/*********************
 		/* USER GUI
 		/*********************/
-		// Build repoChooser
-		//var chooser = new RepositorySelect($('repo_chooser'));
-		//var locationBar = new LocationBar($('locationBar'));
-		//var userWidget = new UserWidget($('logging_string'));
-		//this._focusables.push(locationBar);	
-		
 		this.buildGUI($('browser'));
 		this.buildGUI($('toolbars'));
 		document.fire("ajaxplorer:before_gui_load");

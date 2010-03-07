@@ -102,7 +102,7 @@ Class.create("Action", {
 	}, 
 	
 	setManager : function(manager){
-		this.actionBar = manager;
+		this.manager = manager;
 		if(this.options.subMenu){
 			if(this.subMenuItems.staticItems){
 				this.buildSubmenuStaticItems();
@@ -122,8 +122,7 @@ Class.create("Action", {
 			}catch(e){
 				alert(e);
 			}
-		}
-		
+		}		
 	},
 	
 	apply: function(){
@@ -142,23 +141,11 @@ Class.create("Action", {
 			this.options.callback();
 		}
 		if(this.subMenu && arguments[0] && arguments[0][0]){
-			this.setActiveSubMenu(arguments[0][0]);
+			this.notify("submenu_active", arguments[0][0]);
 		}
 		window.actionArguments = null;
 	},
-	
-	setActiveSubMenu : function(submenuItem){
-		if(this.options.subMenuUpdateImage && submenuItem.src){
-			var src = submenuItem.src;
-			this.elements.each(function(el){
-				var images = el.select('img[id="'+this.options.name +'_button_icon"]');
-				if(!images.length) return;
-				images[0].src = resolveImageSource(src, this.__DEFAULT_ICON_PATH,22);
-				this.options.src = src;
-			}.bind(this) );
-		}		
-	},
-	
+		
 	fireContextChange: function(){
 		if(arguments.length < 4) return;
 		var usersEnabled = arguments[0];
@@ -351,78 +338,6 @@ Class.create("Action", {
 		}		
 	}, 
 	
-	toActionBar:function(){
-		this.button = new Element('a', {
-			href:this.options.name,
-			id:this.options.name +'_button'
-		}).observe('click', function(e){
-			Event.stop(e);
-			if(this.options.subMenu){
-				this.subMenu.show(e);
-			}else{
-				this.apply();
-			}
-		}.bind(this));
-		var imgPath = resolveImageSource(this.options.src,this.__DEFAULT_ICON_PATH, 22);
-		var img = new Element('img', {
-			id:this.options.name +'_button_icon',
-			src:imgPath,
-			width:18,
-			height:18,
-			border:0,
-			align:'absmiddle',
-			alt:this.options.title,
-			title:this.options.title
-		});
-		var titleSpan = new Element('span', {id:this.options.name+'_button_label'}).setStyle({paddingLeft:6,paddingRight:6, cursor:'pointer'});
-		this.button.insert(img).insert(new Element('br')).insert(titleSpan.update(this.getKeyedText()));
-		this.elements.push(this.button);
-		if(this.options.subMenu){
-			this.buildActionBarSubMenu(this.button);
-			this.arrowDiv = new Element('div');
-			this.arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/crystal/arrow_down.png',height:6,width:10,border:0}));
-			this.arrowDiv.imgRef = img;
-			this.button.insert(this.arrowDiv);
-		}else{
-			this.button.observe("mouseover", this.buttonStateHover.bind(this) );
-			this.button.observe("mouseout", this.buttonStateOut.bind(this) );
-		}
-		this.button.hide();
-		return this.button;
-	},
-	
-	placeArrowDiv : function(){
-		if(this.arrowDiv){
-			var imgPos = Position.cumulativeOffset(this.arrowDiv.imgRef)[0] + 11;
-			this.arrowDiv.setStyle({position:'absolute',top:18,left:imgPos});		
-		}
-	},
-	
-	buttonStateHover : function(){
-		if(!this.button) return;
-		if(this.button.hasClassName('disabled')) return;
-		if(this.hideTimeout) clearTimeout(this.hideTimeout);
-		new Effect.Morph(this.button.select('img[id="'+this.options.name +'_button_icon"]')[0], {
-			style:'width:22px; height:22px;margin-top:3px;',
-			duration:0.08,
-			transition:Effect.Transitions.sinoidal,
-			afterFinish: function(){this.updateTitleSpan(this.button.select('span')[0], 'big');}.bind(this)
-		});		
-	},
-	
-	buttonStateOut : function(){
-		if(!this.button) return;
-		if(this.button.hasClassName('disabled')) return;
-		this.hideTimeout = setTimeout(function(){				
-			new Effect.Morph(this.button.select('img[id="'+this.options.name +'_button_icon"]')[0], {
-				style:'width:18px; height:18px;margin-top:8px;',
-				duration:0.2,
-				transition:Effect.Transitions.sinoidal,
-				afterFinish: function(){this.updateTitleSpan(this.button.select('span')[0], 'small');}.bind(this)
-			});	
-		}.bind(this), 10);		
-	},
-	
 	buildSubmenuStaticItems : function(){
 		var menuItems = [];
 		if(this.subMenuItems.staticItems){
@@ -431,7 +346,7 @@ Class.create("Action", {
 				if(item.hasAccessKey && (item.hasAccessKey=='true' || item.hasAccessKey===true) && MessageHash[item.accessKey]){
 					itemText = this.getKeyedText(MessageHash[item.text],true,MessageHash[item.accessKey]);
 					if(!this.subMenuItems.accessKeys) this.subMenuItems.accessKeys = [];
-					this.actionBar.registerKey(MessageHash[item.accessKey],this.options.name, item.command);					
+					this.manager.registerKey(MessageHash[item.accessKey],this.options.name, item.command);					
 				}
 				menuItems.push({
 					name:itemText,
@@ -455,7 +370,7 @@ Class.create("Action", {
 				}else{
 			  		var menuItems = [];
 			  		this.subMenuItems.dynamicItems.each(function(item){
-			  			var action = this.actionBar.actions.get(item['actionId']);
+			  			var action = this.manager.actions.get(item['actionId']);
 			  			if(action.deny) return;
 						menuItems.push({
 							name:action.getKeyedText(),
@@ -469,42 +384,6 @@ Class.create("Action", {
 			  	protoMenu.refreshList();
 			}.bind(this),0);
 		}.bind(this);		
-	},
-	
-	buildActionBarSubMenu : function(button){
-		this.subMenu = new Proto.Menu({
-		  mouseClick:"over",
-		  anchor: button, // context menu will be shown when element with class name of "contextmenu" is clicked
-		  className: 'menu desktop toolbarmenu', // this is a class which will be attached to menu container (used for css styling)
-		  topOffset : 0,
-		  leftOffset : 0,	
-		  parent : this.actionBar,	 
-		  menuItems: this.subMenuItems.staticOptions || [],
-		  fade:true,
-		  zIndex:2000		  
-		});	
-		var titleSpan = button.select('span')[0];	
-		this.subMenu.options.beforeShow = function(e){
-			button.addClassName("menuAnchorSelected");
-			this.buttonStateHover();
-		  	if(this.subMenuItems.dynamicBuilder){
-		  		this.subMenuItems.dynamicBuilder(this.subMenu);
-		  	}
-		}.bind(this);		
-		this.subMenu.options.beforeHide = function(e){
-			button.removeClassName("menuAnchorSelected");
-			this.buttonStateOut();
-		}.bind(this);
-		this.actionBar.subMenus.push(this.subMenu);
-	},
-	
-	updateTitleSpan : function(span, state){		
-		if(!span.orig_width && state == 'big'){
-			var origWidth = span.getWidth();
-			span.setStyle({display:'block',width:origWidth, overflow:'visible', padding:0});
-			span.orig_width = origWidth;
-		}
-		span.setStyle({fontSize:(state=='big'?'11px':'9px')});
 	},
 	
 	setIconSrc : function(newSrc){
@@ -546,32 +425,22 @@ Class.create("Action", {
 	
 	hide: function(){		
 		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = true;
-		this.elements.each(function(elem){
-			elem.hide();
-		});
+		this.notify('hide');
 	},
 	
 	show: function(){
 		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = false;
-		this.elements.each(function(elem){
-			elem.show();
-		});
-		this.placeArrowDiv();
+		this.notify('show');
 	},
 	
 	disable: function(){
 		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = true;
-		this.elements.each(function(elem){
-			elem.addClassName('disabled');
-		});	
+		this.notify('disable');
 	},
 	
 	enable: function(){
 		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = false;
-		this.elements.each(function(elem){
-			elem.removeClassName('disabled');
-		});	
-		this.placeArrowDiv();
+		this.notify('enable');
 	},
 	
 	remove: function(){

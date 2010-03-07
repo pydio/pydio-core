@@ -32,17 +32,14 @@
  * 
  * Description : Singleton that manages all actions, but also the action bar display.
  */
-Class.create("ActionsManager", AjxpPane, {
+Class.create("ActionsManager", {
 	
-	initialize: function($super, oElement, bUsersEnabled, oUser, oAjaxplorer)
+	initialize: function(bUsersEnabled)
 	{
-		$super(oElement);
 		this._registeredKeys = new Hash();
 		this._actions = new Hash();
-		this._ajaxplorer = oAjaxplorer;
 		this.usersEnabled = bUsersEnabled;
 		
-		this.oUser = oUser;
 		this.bgManager = new BackgroundManager(this);		
 		this.subMenus = [];				
 		this.actions = new Hash();
@@ -66,7 +63,9 @@ Class.create("ActionsManager", AjxpPane, {
 	setUser: function(oUser)
 	{	
 		this.oUser = oUser;
-		if(oUser != null  && oUser.id != 'guest' && oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage) 
+		if(oUser != null  && oUser.id != 'guest' && oUser.getPreference('lang') != null 
+			&& oUser.getPreference('lang') != "" 
+			&& oUser.getPreference('lang') != ajaxplorer.currentLanguage) 
 		{
 			ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
 		}
@@ -378,7 +377,7 @@ Class.create("ActionsManager", AjxpPane, {
 		this.actions.each(function(pair){
 			pair.value.fireSelectionChange(userSelection);
 		});
-		this.refreshToolbarsSeparator();
+		document.fire("ajaxplorer:actions_refreshed");
 	},
 	
 	fireContextChange: function(){
@@ -402,77 +401,14 @@ Class.create("ActionsManager", AjxpPane, {
 									 crtIsRoot,
 									 crtMime);
 		}.bind(this));
-		this.refreshToolbarsSeparator();
+		document.fire("ajaxplorer:actions_refreshed");
 	},
-	
-	initToolbars: function () {
-		var crtCount = 0;
-		var toolbarsList = $A(['default', 'put', 'get', 'change', 'user', 'remote']);
-		toolbarsList.each(function(toolbar){			
-			var tBar = this.initToolbar(toolbar);			
-			if(tBar && tBar.actionsCount){				
-				if(crtCount < toolbarsList.size()-1) {
-					var separator = new Element('div');
-					separator.addClassName('separator');
-					tBar.insert({top:separator});
-				}
-				$('buttons_bar').insert(tBar);
-				crtCount ++;
-			}
-		}.bind(this));
-		$('buttons_bar').select('a').each(disableTextSelection);
-	},
-	
-	refreshToolbarsSeparator: function(){
-		this.toolbars.each(function(pair){
-			var toolbar = $('buttons_bar').select('[id="'+pair.key+'_toolbar"]')[0];
-			if(!toolbar) return;
-			var sep = toolbar.select('div.separator')[0];
-			if(!sep) return;
-			var hasVisibleActions = false;
-			toolbar.select('a').each(function(action){
-				if(action.visible()) hasVisibleActions = true;
-			});
-			if(hasVisibleActions) sep.show();
-			else sep.hide();
-		});
-	},
-	
-	initToolbar: function(toolbar){
-		if(!this.toolbars.get(toolbar)) {
-			return;
-		}
-		var toolEl = $(toolbar+'_toolbar');		
-		if(!toolEl){ 
-			var bgColor = $('action_bar').getStyle('backgroundColor');
-			var toolEl = new Element('div', {
-				id: toolbar+'_toolbar',
-				style: 'display:inline;background-color:'+bgColor
-			});
-		}
-		toolEl.actionsCount = 0;
-		this.toolbars.get(toolbar).each(function(actionName){
-			var action = this.actions.get(actionName);		
-			if(!action) return;	
-			toolEl.insert(action.toActionBar());
-			toolEl.actionsCount ++;			
-		}.bind(this));
-		return toolEl;
-	},
-	
-	emptyToolbars: function(){
-		$('buttons_bar').select('div').each(function(divElement){			
-			divElement.remove();
-		}.bind(this));
-		this.toolbars = new Hash();
-	},
-		
+			
 	removeActions: function(){
 		this.actions.each(function(pair){
 			pair.value.remove();
 		});
 		this.actions = new Hash();
-		this.emptyToolbars();
 		this.clearRegisteredKeys();
 	},
 	
@@ -501,7 +437,6 @@ Class.create("ActionsManager", AjxpPane, {
 				this.actions.unset("ext_select");
 			}
 		}		
-		this.initToolbars();
 		document.fire("ajaxplorer:actions_loaded");
 		this.fireContextChange();
 		this.fireSelectionChange();			
@@ -512,12 +447,6 @@ Class.create("ActionsManager", AjxpPane, {
 		this.actions.set(actionName, action);
 		if(action.defaults){
 			for(var key in action.defaults) this.defaultActions.set(key, actionName);
-		}
-		if(action.context.actionBar){
-			if(this.toolbars.get(action.context.actionBarGroup) == null){
-				this.toolbars.set(action.context.actionBarGroup, new Array());
-			}
-			this.toolbars.get(action.context.actionBarGroup).push(actionName);
 		}
 		if(action.options.hasAccessKey){
 			this.registerKey(action.options.accessKey, actionName);
