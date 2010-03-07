@@ -1,14 +1,11 @@
 <div id="toolbars">
 	<div id="action_bar">
-		<div id="buttons_bar"></div>
+		<div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions="{}"></div>
 		<div id="locationbar_cont">
 			<div style="height: 33px;" class="separator"></div>
 			<div style="padding-top : 5px;">
-				<!--RepoChooser-->
 				<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions="{}"></div>
-				<!--LocationBar-->
 				<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{}"></div>
-				<!--LoggingString-->				
 				<div id="logging_string" ajxpClass="UserWidget" ajxpOptions="{}"></div>
 			</div>
 		</div>
@@ -16,7 +13,6 @@
 	<div id="hidden_frames" style="display:none;"></div>
 	<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
 </div>
-
 <div id="browser">
 	<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:50}">
 		<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initB:200,minB:24,maxB:500}">
@@ -42,7 +38,7 @@ document.observe("ajaxplorer:before_gui_load", function(e){
 			fitHeightToBottom($("vertical_splitter"), window, marginBottom, true);
 		}
 	}catch(e){
-		alert('Error on loading (gui_tpl l.128)' + e);
+		alert('Error on loading template' + e);
 	}
 });
 </script>

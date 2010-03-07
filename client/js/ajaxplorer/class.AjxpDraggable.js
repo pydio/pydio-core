@@ -102,7 +102,7 @@ Class.create("AjxpDraggable", Draggable, {
 				// Move all selection
 				// Make new div for element, clone all others.			
 				this._draggingMultiple = true;
-				this._clone = document.createElement('div');
+				this._clone = new Element('div');
 				$(this._clone).addClassName("ajxp_draggable");
 				if(this.component._displayMode && this.component._displayMode == 'thumb'){
 					$(this._clone).addClassName('multiple_thumbnails_draggable');
@@ -142,14 +142,14 @@ Class.create("AjxpDraggable", Draggable, {
 				if(selection.isEmpty() && this.component.findSelectableParent){
 					this.component.findSelectableParent(this.element, true);
 				}
-				this._clone = this.element.cloneNode(true);
+				this._clone = $(this.element.cloneNode(true));
 				refreshPNGImages(this._clone);
 				Position.absolutize(this.element);
 				this.element.parentNode.insertBefore(this._clone, this.element);
 				$(this.element).addClassName('simple_selection_draggable');
 				if(Prototype.Browser.IE || Prototype.Browser.Opera) // MOVE ELEMENT TO $('browser')
 				{
-					var newclone = this.element.cloneNode(true);
+					var newclone = $(this.element.cloneNode(true));
 					refreshPNGImages(newclone);
 					$('browser').appendChild(newclone);
 					$(newclone).setStyle({width:$(this._clone).getWidth()+'px'});
