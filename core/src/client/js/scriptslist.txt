@@ -44,6 +44,7 @@ js/ajaxplorer/class.AjxpAutoCompleter.js
 js/ajaxplorer/class.TreeSelector.js
 js/ajaxplorer/class.Action.js
 js/ajaxplorer/class.ActionsManager.js
+js/ajaxplorer/class.ActionsToolbar.js
 js/ajaxplorer/class.BackgroundManager.js
 js/ajaxplorer/class.AjxpDataModel.js
 js/ajaxplorer/class.FilesList.js
