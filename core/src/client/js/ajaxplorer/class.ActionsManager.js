@@ -41,14 +41,7 @@ Class.create("ActionsManager", AjxpPane, {
 		this._actions = new Hash();
 		this._ajaxplorer = oAjaxplorer;
 		this.usersEnabled = bUsersEnabled;
-		this.locationBarElement = $('current_path');
 		
-		if(oUser != null){
-			this._currentUser = oUser.id;
-		}
-		else {
-			this._currentUser = 'shared';
-		}
 		this.oUser = oUser;
 		this.bgManager = new BackgroundManager(this);		
 		this.subMenus = [];				
