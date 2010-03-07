@@ -113,7 +113,7 @@ Class.create("Splitter", AjxpPane, {
 		if(this.paneA._init){
 			this.paneA.setStyle(this.makeStyleObject(this.options.adjust, this.paneA._init));
 		}
-		Event.observe(window,"resize", function(e){this.resizeGroup(e, null, true);}.bind(this));
+		//Event.observe(window,"resize", function(e){this.resizeGroup(e, null, true);}.bind(this));
 		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 
 		Event.observe(document, "ajaxplorer:user_logged", function(){		
