@@ -277,6 +277,7 @@ Class.create("Ajaxplorer", {
 	buildGUI : function(domNode){
 		if(domNode.nodeType != 1) return;
 		if(!this.guiCompRegistry) this.guiCompRegistry = $A([]);
+		domNode = $(domNode);
 		var ajxpClassName = domNode.readAttribute("ajxpClass") || "";
 		var ajxpClass = Class.getByName(ajxpClassName);
 		var ajxpId = domNode.readAttribute("id") || "";
