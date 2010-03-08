@@ -39,6 +39,8 @@ Class.create("RepositorySelect", {
 	
 	initialize : function(oElement){
 		this.element = oElement;
+		this.element.ajxpPaneObject = this;
+		this.show = true;
 		this.createGui();
 		document.observe("ajaxplorer:repository_list_refreshed", function(e){
 			this.refreshRepositoriesMenu(e.memo.list,e.memo.active);
@@ -59,14 +61,13 @@ Class.create("RepositorySelect", {
 			 value:this._defaultString, 
 			 id:"repo_path"
 		});
-		var div = new Element('div', {id:'repository_form'});
-		div.insert(this.icon);
-		div.insert(this.label);
-		this.element.insert(div);
-		var callback = function(e){alert('toto!')};
+		this.currentRepositoryLabel = new Element('div', {id:'repository_form'});
+		this.currentRepositoryLabel.insert(this.icon);
+		this.currentRepositoryLabel.insert(this.label);
+		this.element.insert(this.currentRepositoryLabel);
 		this.button = simpleButton(
 			'repository_goto', 
-			'inlineBarButtonLeft', 
+			'inlineBarButton', 
 			200, 
 			200, 
 			'arrow_down_margin.png', 
@@ -131,7 +132,24 @@ Class.create("RepositorySelect", {
 		ajaxplorer.triggerRepositoryChange(key);
 	},
 	
-	resize : function(){},
-	showElement : function(show){}
+	resize : function(){
+		var parent = this.element.getOffsetParent();
+		if(parent.getWidth() < this.currentRepositoryLabel.getWidth()*2.5){
+			this.showElement(false);
+		}else{
+			this.showElement(true);
+		}
+	},
+	showElement : function(show){
+		this.show = show;
+		if(show){
+			this.currentRepositoryLabel.show();
+			if(this.repoMenu) this.repoMenu.options.leftOffset = -127;
+		}
+		else{
+			this.currentRepositoryLabel.hide();
+			if(this.repoMenu) this.repoMenu.options.leftOffset = 0;
+		}
+	}
 	
 });
