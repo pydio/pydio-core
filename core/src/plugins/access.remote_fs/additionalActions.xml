@@ -55,7 +55,7 @@
 						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
 						bgManager.next();
 					});
-					modal.showDialogForm('Upload', 'originalUploadForm', onLoadFunction, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
+					modal.showDialogForm('Upload', 'originalUploadForm', null, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
 				}				
 					]]></clientCallback>
 				<clientForm id="flash_upload_form"><![CDATA[
