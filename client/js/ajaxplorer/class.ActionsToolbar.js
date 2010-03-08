@@ -36,6 +36,7 @@ Class.create("ActionsToolbar", {
 	__implements : "IAjxpWidget",
 	initialize : function(oElement, options){
 		this.element = oElement;
+		this.element.ajxpPaneObject = this;
 		this.options = Object.extend({
 			buttonRenderer : 'this',
 			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote'])
@@ -47,6 +48,7 @@ Class.create("ActionsToolbar", {
 			this.options.buttonRenderer = new renderer();
 		}
 		this.toolbars = $H();
+		this.initCarousel();
 		document.observe("ajaxplorer:actions_loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarsSeparator.bind(this));
 	},
@@ -82,7 +84,7 @@ Class.create("ActionsToolbar", {
 				crtCount ++;
 			}
 		}.bind(this));
-		this.element.select('a').each(disableTextSelection);
+		this.element.select('a').each(disableTextSelection);		
 	},
 	
 	refreshToolbarsSeparator: function(){
@@ -98,6 +100,7 @@ Class.create("ActionsToolbar", {
 			if(hasVisibleActions) sep.show();
 			else sep.hide();
 		}.bind(this) );
+		this.refreshSlides();
 	},
 	
 	initToolbar: function(toolbar){
@@ -117,7 +120,6 @@ Class.create("ActionsToolbar", {
 			if(!action) return;
 			var button = this.renderToolbarAction(action);	
 			toolEl.insert(button);
-			//toolEl.insert(action.toActionBar());
 			toolEl.actionsCount ++;			
 		}.bind(this));
 		return toolEl;
@@ -128,6 +130,46 @@ Class.create("ActionsToolbar", {
 			divElement.remove();
 		}.bind(this));
 		this.toolbars = new Hash();
+	},
+	
+	initCarousel : function(){
+		this.outer = this.element;
+		this.prev = new Element("a", {className:'carousel-control', rel:'prev'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/crystal/arrow_left.png'}));
+		this.next = new Element("a", {className:'carousel-control', rel:'next', style:'float:right;'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/crystal/arrow_right.png'}));
+		this.inner = new Element("div", {id:'buttons_inner', style:'width:1000px;'});
+		this.outer.insert({before:this.prev});
+		this.outer.insert({before:this.next});
+		this.outer.insert(this.inner);		
+		this.outer.setStyle({cssFloat:'left'});
+		this.element = this.inner;
+		
+		this.carousel = new Carousel(this.outer, [], $A([this.prev,this.next]), {
+			duration:0.1,
+			afterMove : function(){
+				this.carousel.slides.each(function(button){
+					if(button.arrowDiv){
+						button.arrowDiv.show();
+						this.placeArrowDiv(button);
+					}
+				}.bind(this));
+			}.bind(this),
+			beforeMove : function(){
+				this.carousel.slides.each(function(button){
+					if(button.arrowDiv){
+						button.arrowDiv.hide();
+					}
+				}.bind(this));
+			}.bind(this)
+		});
+	},
+	
+	refreshSlides : function(){
+		var allSlides = $A();
+		this.inner.select('a').each(function(a){
+			if(a.visible()) allSlides.push(a);
+		});
+		this.carousel.refreshSlides(allSlides);
+		this.resize();		
 	},
 	
 	renderToolbarAction : function(action){
@@ -230,7 +272,13 @@ Class.create("ActionsToolbar", {
 	
 	placeArrowDiv : function(button){
 		if(button.arrowDiv){
-			var imgPos = Position.cumulativeOffset(button.arrowDiv.imgRef)[0] + 11;
+			if(!button.visible()){
+				button.arrowDiv.hide();
+			}else{
+				button.arrowDiv.show();
+			}
+			var scroll = this.outer.scrollLeft || 0;
+			var imgPos = Position.cumulativeOffset(button.arrowDiv.imgRef)[0] + 11 - scroll;
 			button.arrowDiv.setStyle({position:'absolute',top:18,left:imgPos});		
 		}
 	},
@@ -267,7 +315,31 @@ Class.create("ActionsToolbar", {
 		span.setStyle({fontSize:(state=='big'?'11px':'9px')});
 	},	
 	
-	resize : function(){},
+	resize : function(){
+		var innerSize = 0;
+		var parentWidth = $(this.outer).getOffsetParent().getWidth();
+		if(Prototype.Browser.IE){
+			parentWidth = document.viewport.getWidth();
+		}
+		var visibles = [];
+		this.inner.select('a').each(function(a){
+			if(a.visible()) visibles.push(a);
+		});
+		if(visibles.length){
+			var last = visibles[visibles.length-1];
+			var innerSize = last.cumulativeOffset()[0] + last.getWidth();
+		}
+		if(innerSize > parentWidth){
+			this.prev.show();
+			this.next.show();
+			this.outer.setStyle({width:(parentWidth-this.prev.getWidth()-this.next.getWidth()) + 'px'})
+		}else{
+			this.prev.hide();
+			this.next.hide();
+			this.carousel.first();
+			this.outer.setStyle({width:parentWidth + 'px'});
+		}
+	},
 	showElement : function(show){}	
 	
 });
