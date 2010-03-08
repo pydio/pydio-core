@@ -143,15 +143,22 @@ Class.create("Ajaxplorer", {
 	},
 	
 	initTemplates:function(){
+		this.loadTemplate("usertemplate_top.html", $(document.body), 'top');
+		this.loadTemplate("gui_tpl.html", $('ajxp_desktop'), 'top');
+		this.loadTemplate("usertemplate_bottom.html", $(document.body), 'bottom');
+		modal.updateLoadingProgress('Html templates loaded');	
+	},
+	
+	loadTemplate : function(templateName, target, targetPosition){
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_template');
 		connexion.onComplete = function(transport){
 			transport.responseText.evalScripts();
-			$(document.body).insert({top:transport.responseText});
+			var obj = {}; obj[targetPosition] = transport.responseText;
+			target.insert(obj);
 		};
-		connexion.addParameter('template_name', 'gui_tpl.html');
-		connexion.sendSync();
-		modal.updateLoadingProgress('Main template loaded');	
+		connexion.addParameter('template_name', templateName);
+		connexion.sendSync();		
 	},
 	
     triggerDownload: function(url){
@@ -218,8 +225,7 @@ Class.create("Ajaxplorer", {
 		/*********************
 		/* USER GUI
 		/*********************/
-		this.buildGUI($('browser'));
-		this.buildGUI($('toolbars'));
+		this.buildGUI($('ajxp_desktop'));
 		document.fire("ajaxplorer:before_gui_load");
 		// Rewind components creation!
 		var lastInst;

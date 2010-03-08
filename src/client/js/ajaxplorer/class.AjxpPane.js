@@ -36,10 +36,13 @@ Class.create("AjxpPane", {
 	
 	__implements : "IAjxpWidget",
 	
-	initialize : function(htmlElement){
+	initialize : function(htmlElement, options){
 		this.htmlElement = $(htmlElement);
 		if(!this.htmlElement){
 			throw new Error('Cannot find element for AjxpPane : ' + this.__className);
+		}
+		if(options){
+			this.options = options;
 		}
 		this.htmlElement.ajxpPaneObject = this;
 		if(this.htmlElement.getAttribute('ajxpPaneHeader')){
@@ -49,8 +52,16 @@ Class.create("AjxpPane", {
 		}
 	},
 	
-	resize : function(){
-		
+	resize : function(){		
+		// Default behaviour : resize children
+    	if(this.options.fit && this.options.fit == 'height'){
+    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null));
+    	}		
+		$A(this.htmlElement.childNodes).each(function(c){
+			if(c.ajxpPaneObject && c.ajxpPaneObject.resize){
+				c.ajxpPaneObject.resize();
+			}
+		});
 	},
 	showElement : function(show){
 		if(show){
