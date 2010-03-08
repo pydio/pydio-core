@@ -140,7 +140,7 @@ Class.create("Action", {
 		}else if(this.options.callback){
 			this.options.callback();
 		}
-		if(this.subMenu && arguments[0] && arguments[0][0]){
+		if(this.options.subMenu && arguments[0] && arguments[0][0]){
 			this.notify("submenu_active", arguments[0][0]);
 		}
 		window.actionArguments = null;
