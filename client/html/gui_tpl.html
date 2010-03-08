@@ -10,11 +10,9 @@
 			</div>
 		</div>
 	</div>
-	<div id="hidden_frames" style="display:none;"></div>
-	<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
 </div>
-<div id="browser">
-	<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:50}">
+<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
+	<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:50,fit:'height',fitParent:'browser'}">
 		<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initB:200,minB:24,maxB:500}">
 			<div id="topPane" ajxpClass="FoldersTree" ajxpOptions="{display:'dz'}" ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>		
 	    	<div id="bottomSplitPane" ajxpClass="AjxpTabulator" style="border: 1px solid #676965;" ajxpOptions="{defaultTabId : 'info',tabInfos : [{id:'info',label:'131',icon:'file_info.png',element:'info_panel'},{id:'search',label:'87',icon:'search.png',element:'search_container'}]}">
@@ -25,19 +23,3 @@
 		<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965; background-color: #fff;"></div>	
 	</div>
 </div>
-
-<script type="text/javascript">
-document.observe("ajaxplorer:before_gui_load", function(e){
-	try{
-		var marginBottom = (Prototype.Browser.IE?4:3);
-		if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
-			marginBottom = $('optional_bottom_div').getHeight();
-		}
-		if($("vertical_splitter")){
-			fitHeightToBottom($("vertical_splitter"), window, marginBottom, true);
-		}
-	}catch(e){
-		alert('Error on loading template' + e);
-	}
-});
-</script>
