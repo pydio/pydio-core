@@ -299,16 +299,17 @@ Proto.Menu = Class.create({
 	},
 	
 	computeAnchorOffset: function(){
-		if(this.anchorOffset) return this.anchorOffset;
+		//if(this.anchorOffset) return this.anchorOffset;
 		var anchorPosition = Position.cumulativeOffset($(this.options.anchor));
+		var anchorScroll = this.options.anchor.cumulativeScrollOffset();
 		
 		if(this.options.position == 'bottom'){
-			var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset;
-			var leftPos = anchorPosition[0] + this.options.leftOffset;
+			var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset - anchorScroll[1];
+			var leftPos = anchorPosition[0] + this.options.leftOffset - anchorScroll[0];
 		}else if(this.options.position == 'right'){
 			var vpDim = document.viewport.getDimensions();
-			var topPos = anchorPosition[1] + this.options.topOffset;
-			var leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset;
+			var topPos = anchorPosition[1] + this.options.topOffset - anchorScroll[1];
+			var leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset - anchorScroll[0];
 			if(leftPos + this.container.getDimensions().width > vpDim.width){
 				leftPos = anchorPosition[0] - (this.container.getDimensions().width);
 			}
