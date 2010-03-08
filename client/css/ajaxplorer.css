@@ -1702,6 +1702,13 @@ div.menu a {
 	margin: 1px 1px 0 1px;
 	line-height: 1px !important;
 }
+.bookmarksMenu li.separator {
+	border-bottom: 1px solid #fff;
+	margin: 1px 1px 0 1px;
+	line-height: 1px !important;
+	padding: 0px;
+	height: 1px !important;	
+}
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
 	background-color: #73a2d7;
@@ -1742,6 +1749,11 @@ div.menu a {
    padding-top: 4px;
 }
 
+.rootDirChooser a img, 
+.bookmarksMenu a img
+{
+   margin-right:5px;
+}
 .rootDirChooser a.disabled IMG{
 	filter: alpha(opacity=30);
 	opacity: 0.3;
@@ -1763,7 +1775,9 @@ div.menu a {
 }
 
 .rootDirChooser a:hover,
-.bookmarksMenu a:hover
+.bookmarksMenu a:hover,
+.bookmarksMenu a.hovered,
+.rootDirChooser a.hovered
 {
    background-color: #73a2d7;
    color: #fff;
@@ -1777,7 +1791,7 @@ div.menu a {
    z-index: 1500;
    background-color:#f1f1ef;  
    border: 1px solid #676965;
-   width: 250px;
+   width: 200px;
    padding: 2px;
 }
 
@@ -1796,7 +1810,7 @@ div.menu a {
 	filter:alpha(opacity=30);
 	opacity: 0.3;
 	-moz-opacity:0.3;	
-	cursor: pointer;
+	cursor: pointer !important;
 }
 
 .menuActions a:hover
@@ -1804,7 +1818,6 @@ div.menu a {
    filter:alpha(opacity=100);
    opacity: 1.0;
    -moz-opacity:1.0;
-   background-color: #fff;
 }
 
 .backgroundPanel{

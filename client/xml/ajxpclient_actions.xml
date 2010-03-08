@@ -96,14 +96,14 @@
 			<gui text="152" title="153" src="bookmark.png" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
 				<context selection="false" dir="true" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
+					actionBar="false" contextMenu="true" infoPanel="false"
 					actionBarGroup="default">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-					ajaxplorer.actionBar.bookmarksBar.addBookmark(ajaxplorer.actionBar.getLocationBarValue());						
+					document.fire("ajaxplorer:add_bookmark");
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
