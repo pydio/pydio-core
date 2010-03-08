@@ -524,7 +524,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
                                 if($nextFile!=''){
                                     AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
 					            }else{
-						            AJXP_XMLWriter::sendMessage("Done", null);
+					            	AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Upload done, reloading client.");
+						            //AJXP_XMLWriter::sendMessage("Done", null);
                                 }
 				                AJXP_XMLWriter::close();
 				                exit(1);
