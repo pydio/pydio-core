@@ -324,11 +324,6 @@ textarea#myCode
 ACTION BAR
 */
 .centeredWidth{
-	position: relative;
-    width: 99%;   
-    left:4px;
-    min-width: 950px;
-    width:expression(document.body.clientWidth < 950? "950px" : "99%" ); 
 }
 
 #toolbars
@@ -375,16 +370,12 @@ ACTION BAR
     padding: 0px;
 }
 
-#action_bar{
-    min-width: 950px;
-    width:expression(document.body.clientWidth < 950? "950px" : "100%" ); 
-}
-
 .action_bar
 {
 	height: 51px;
     background-color: transparent;
     background-image:url(../images/ToolbarBg.gif);
+	overflow:hidden;
 }
 
 #buttons_bar, #locationbar_cont
@@ -399,6 +390,7 @@ ACTION BAR
 	height:51px;
 	padding-left:0px;
 	padding-top:0;
+	overflow:hidden;
 }
 
 #action_bar a, 
@@ -445,6 +437,7 @@ ACTION BAR
 
 
 #action_bar div.separator,
+#action_bar a.separator,
 .action_bar div.separator
 {    
 	border-left:1px solid #c4c7c1;
@@ -460,6 +453,29 @@ ACTION BAR
 	width:3px;
 }
 
+a.carousel-control{
+	border-left:1px solid #c4c7c1;
+	border-right:1px solid #c4c7c1;
+	border-bottom:1px solid #c4c7c1;
+	display:block;
+	float:left;
+	font-size:10px;
+	height:51px !important;
+	padding-top:0;
+	text-align:center;
+	width:8px!important;
+	margin:0px !important;
+	cursor:pointer;
+	background-color: #fff;
+}
+a.carousel-disabled{
+	background-color: transparent;
+}
+
+a.carousel-control img{
+	margin-top:20px !important;
+}
+
 .action_bar div.separator
 {
     /*border-right: 1px solid #79f;*/    
@@ -472,6 +488,8 @@ ACTION BAR
 	background-repeat:repeat-x;
 	float:left;
 	width:100%;
+    min-width: 950px;
+    width:expression(document.body.clientWidth < 950? "950px" : "100%" );	
 }
 
 #location_form,
