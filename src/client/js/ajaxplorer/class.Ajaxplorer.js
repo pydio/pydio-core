@@ -281,10 +281,11 @@ Class.create("Ajaxplorer", {
 		var ajxpClassName = domNode.readAttribute("ajxpClass") || "";
 		var ajxpClass = Class.getByName(ajxpClassName);
 		var ajxpId = domNode.readAttribute("id") || "";
+		var ajxpOptions = {};
 		if(domNode.readAttribute("ajxpOptions")){
-			var ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
+			ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
 		}		
-		if(ajxpClass && ajxpOptions && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
+		if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
 			this.guiCompRegistry.push({ajxpId:ajxpId, ajxpNode:domNode, ajxpClass:ajxpClass, ajxpOptions:ajxpOptions});
 		}		
 		$A(domNode.childNodes).each(function(node){

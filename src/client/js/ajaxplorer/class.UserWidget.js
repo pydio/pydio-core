@@ -36,6 +36,7 @@ Class.create("UserWidget", {
 	__implements : ["IAjxpWidget"],
 	initialize: function(element){
 		this.element = element;
+		this.element.ajxpPaneObject = this;
 		document.observe("ajaxplorer:user_logged", this.updateGui.bind(this));
 	},
 	updateGui : function(){
@@ -46,7 +47,7 @@ Class.create("UserWidget", {
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = '<ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></i>';
+				logging_string = '<span style="cursor:pointer;"><span class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></span><img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></span>';
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
 					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
@@ -71,14 +72,8 @@ Class.create("UserWidget", {
 		if(ajaxplorer.user == null) return;
 		var userLang = ajaxplorer.user.getPreference("lang");
 		var userDisp = ajaxplorer.user.getPreference("display");	
-		var onLoad = function(){		
-			var elements = $('user_pref_form').getElementsBySelector('input[type="radio"]');		
-			elements.each(function(elem){
-				elem.checked = false;			
-				if(elem.id == 'display_'+userDisp || elem.id == 'lang_'+userLang) {
-					elem.checked = true;
-				}
-			});
+		var onLoad = function(oForm){
+			$(oForm).select('select[id="language_selector"]')[0].setValue(userLang);
 			if($('user_change_ownpass_old')){
 				$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
 				// Update pass_seed
@@ -91,13 +86,8 @@ Class.create("UserWidget", {
 			}
 		};
 		
-		var onComplete = function(){
-			var elements = $('user_pref_form').getElementsBySelector('input[type="radio"]');
-			elements.each(function(elem){			
-				if(elem.checked){
-					 ajaxplorer.user.setPreference(elem.name, elem.value);
-				}
-			});
+		var onComplete = function(oForm){
+			ajaxplorer.user.setPreference("lang", $('user_pref_form').select('select[id="language_selector"]')[0].getValue());
 			var userOldPass = null;
 			var userPass = null;
 			var passSeed = null;
@@ -149,6 +139,9 @@ Class.create("UserWidget", {
 		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
 	},
 	
-	resize : function(){},
-	showElement : function(show){}	
+	resize : function(){
+	},
+	showElement : function(show){
+		this.element.select(".user_widget_label").invoke((show?'show':'hide'));
+	}	
 });
