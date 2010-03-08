@@ -160,6 +160,8 @@ Proto.Menu = Class.create({
 					);
 				});
 				newItem.insert(actionsContainer);
+				actionsContainer.observe("mouseover", function(){newItem.select('a.enabled')[0].addClassName("hovered")});
+				actionsContainer.observe("mouseout", function(){newItem.select('a.enabled')[0].removeClassName("hovered")});
 			}
 			if(item.subMenu){
 				var arrowContainer = new Element('div', {className:'menuActions',style:'padding-top:7px;padding-right:5px'});

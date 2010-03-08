@@ -115,7 +115,7 @@ Class.create("RepositorySelect", {
 				anchorContainer:$('dir_chooser'),
 				anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
 				anchorTitle:MessageHash[200],
-				topOffset:6,
+				topOffset:2,
 				leftOffset:-127,
 				menuTitle:MessageHash[200],
 				menuItems: actions,
