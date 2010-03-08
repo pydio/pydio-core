@@ -424,22 +424,22 @@ Class.create("Action", {
 	},
 	
 	hide: function(){		
-		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = true;
+		this.deny = true;
 		this.notify('hide');
 	},
 	
 	show: function(){
-		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = false;
+		this.deny = false;
 		this.notify('show');
 	},
 	
 	disable: function(){
-		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = true;
+		this.deny = true;
 		this.notify('disable');
 	},
 	
 	enable: function(){
-		if(this.elements.size() > 0 || (!this.context.actionBar && this.context.infoPanel)) this.deny = false;
+		this.deny = false;
 		this.notify('enable');
 	},
 	

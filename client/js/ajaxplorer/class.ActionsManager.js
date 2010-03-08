@@ -376,7 +376,7 @@ Class.create("ActionsManager", {
 		} 
 		this.actions.each(function(pair){
 			pair.value.fireSelectionChange(userSelection);
-		});
+		});		
 		document.fire("ajaxplorer:actions_refreshed");
 	},
 	
