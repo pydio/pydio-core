@@ -253,7 +253,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 		}
 		var mrg = parseInt(element.getStyle('marginBottom')) ||0;		
 		var brd = parseInt(element.getStyle('borderWidth'))||0;
-		var pad = parseInt((parentElement!=window?parentElement.getStyle('paddingBottom'):0))||0;		
+		var pad = (parseInt((parentElement!=window?parentElement.getStyle('paddingBottom'):0))||0);		
 		var margin=0;
 		if(parentElement!=window){
 			margin = parseInt(parentElement.getStyle('borderBottomWidth')||0) + parseInt(parentElement.getStyle('borderTopWidth')||0);
@@ -263,7 +263,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 			margin += childPadding;
 		}
 		margin = margin || 0; // avoid NaN in IE
-		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-margin-addMarginBottom))+'px'});
+		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-pad-margin-addMarginBottom))+'px'});
 		if(element.ajxpPaneObject && listen){
 			element.ajxpPaneObject.resize();
 		}

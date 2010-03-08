@@ -39,6 +39,7 @@ Class.create("Splitter", AjxpPane, {
 		this.options = Object.extend({
 			direction	: 	'vertical',
 			activeClass	:	'active',
+			fit			:	null,
 			onDrag 		:	Prototype.EmptyFunction,
 			endDrag 	:	Prototype.EmptyFunction,
 			startDrag 	:	Prototype.EmptyFunction
@@ -278,6 +279,9 @@ Class.create("Splitter", AjxpPane, {
     },
     
     resize : function(){
+    	if(this.options.fit && this.options.fit == 'height'){
+    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null));
+    	}
     	this.resizeGroup(null, null, true);
     },
     

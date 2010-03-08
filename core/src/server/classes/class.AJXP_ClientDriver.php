@@ -106,13 +106,7 @@ class AJXP_ClientDriver extends AbstractDriver
 				HTMLWriter::charsetHeader();
 				if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
 				{
-					if($template_name == "gui_tpl.html"){
-						include(CLIENT_RESOURCES_FOLDER."/html/usertemplate_top.html");
-					}
 					include(CLIENT_RESOURCES_FOLDER."/html/".$template_name);
-					if($template_name == "gui_tpl.html"){
-						include(CLIENT_RESOURCES_FOLDER."/html/usertemplate_bottom.html");
-					}
 				}
 				exit(0);	
 				
