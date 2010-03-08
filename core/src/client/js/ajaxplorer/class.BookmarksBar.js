@@ -42,6 +42,22 @@
 		document.observe("ajaxplorer:user_logged", function(){
 			this.load();
 		}.bind(this) );
+		document.observeOnce("ajaxplorer:actions_loaded", function(){
+			var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
+			this.addBookmarkObject = {
+				name:bmAction.getKeyedText(),
+				alt:bmAction.options.title,
+				image:ajxpResourcesFolder+'/images/crystal/actions/16/bookmark_add.png',
+				callback:function(e){
+					var node = ajaxplorer.getContextNode();
+					this.addBookmark(node.getPath(), node.getLabel());
+				}.bind(this)
+			};		
+		}.bind(this));
+		document.observe("ajaxplorer:add_bookmark", function(){
+			var node = ajaxplorer.getContextNode();
+			this.addBookmark(node.getPath(), node.getLabel());			
+		}.bind(this) );
 	},
 	
 	parseXml: function(transport){
@@ -55,7 +71,7 @@
 			var bookmark = {
 				name:root.childNodes[i].getAttribute('title'),
 				alt:root.childNodes[i].getAttribute('path'),
-				image:ajxpResourcesFolder+'/images/crystal/actions/16/favorite-folder.png'
+				image:ajxpResourcesFolder+'/images/crystal/mimes/16/folder.png'
 			};
 			bookmark.callback = function(e){ajaxplorer.goTo(this.alt)}.bind(bookmark);
 			bookmark.moreActions = this.getContextActions(bookmark.alt, bookmark.name);
@@ -73,8 +89,8 @@
 			mouseClick:'left',
 			anchor:this.element,
 			createAnchor:false,
-			topOffset:4,
-			leftOffset:-2,
+			topOffset:2,
+			leftOffset:0,
 			menuItems: this.bookmarks,
 			fade:true,
 			zIndex:2000
@@ -83,10 +99,14 @@
 		
 	clear: function(){
 		this.currentCount = 0;
-		this.bookmarks = $A([]);
+		if(this.addBookmarkObject){
+			this.bookmarks = $A([this.addBookmarkObject,{separator:true}]);
+		}else{
+			this.bookmarks = $A();
+		}
 		this.element.addClassName('inline_disabled');
 		this.bmMenu.options.menuItems = this.bookmarks;
-		this.bmMenu.refreshList();
+		this.bmMenu.refreshList();		
 	},
 	
 	getContextActions: function(bmPath, bmTitle){

@@ -74,7 +74,7 @@ Class.create("LocationBar", {
 			'bookmarks_goto', 
 			'inlineBarButtonLeft', 
 			145, 145, 
-			'bookmark.png', 
+			'bookmark_menu.png', 
 			16, 
 			'inline_hover');
 		this.element.insert(this.bmButton);
