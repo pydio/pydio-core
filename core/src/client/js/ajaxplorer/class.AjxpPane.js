@@ -50,18 +50,26 @@ Class.create("AjxpPane", {
 				this.htmlElement.getAttribute('ajxpPaneHeader'), 
 				this.htmlElement.getAttribute('ajxpPaneIcon'));
 		}
+		this.childrenPanes = $A([]);
+		this.scanChildrenPanes(this.htmlElement);
 	},
 	
 	resize : function(){		
 		// Default behaviour : resize children
     	if(this.options.fit && this.options.fit == 'height'){
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null));
-    	}		
-		$A(this.htmlElement.childNodes).each(function(c){
-			if(c.ajxpPaneObject && c.ajxpPaneObject.resize){
-				c.ajxpPaneObject.resize();
+    	}
+    	this.childrenPanes.invoke('resize');
+	},
+	scanChildrenPanes : function(element){
+		if(!element.childNodes) return;
+		$A(element.childNodes).each(function(c){
+			if(c.ajxpPaneObject) {
+				this.childrenPanes.push(c.ajxpPaneObject);
+			}else{
+				this.scanChildrenPanes(c);
 			}
-		});
+		}.bind(this));
 	},
 	showElement : function(show){
 		if(show){

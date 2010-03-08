@@ -39,9 +39,12 @@ Class.create("LocationBar", {
 	_modified : false,
 	_beforeModified : '',
 	
-	initialize : function(oElement){
+	initialize : function(oElement, options){
 		this.element = oElement;
+		this.element.ajxpPaneObject = this;
 		this.createGui();
+		this.options = options || {};
+		document.observe("ajaxplorer:user_logged", this.resize.bind(this));
 	},
 	createGui : function(){
 		this.parentButton = simpleButton(
@@ -60,7 +63,7 @@ Class.create("LocationBar", {
 		
 		this.gotoButton = simpleButton(
 			'location_goto', 
-			'inlineBarButtonLeft', 
+			'inlineBarButton', 
 			104, 
 			104, 
 			this._reloadGotoIcon, 
@@ -155,7 +158,25 @@ Class.create("LocationBar", {
 		this.gotoButton.setSrc(resolveImageSource((bool?this._defaultGotoIcon:this._reloadGotoIcon), '/images/crystal/actions/ICON_SIZE', 16));
 		this._beforeModified = this.currentPath.getValue();
 	},
-	resize : function(){},
+	resize : function(){
+		if(this.options.flexTo){
+			var parentWidth = $(this.options.flexTo).getWidth();
+			var siblingWidth = 0;
+			this.element.siblings().each(function(s){
+				siblingWidth+=s.getWidth();
+			});
+			if(!this.buttonsWidth){
+				this.buttonsWidth = this.gotoButton.getWidth() + this.parentButton.getWidth() + this.bmButton.getWidth() + 20;
+			}
+			var newWidth = Math.min((parentWidth-siblingWidth-this.buttonsWidth),320);
+			if(newWidth < 5){
+				this.element.hide();
+			}else{
+				this.element.show();
+				this.currentPath.setStyle({width:newWidth + 'px'});
+			}
+		}
+	},
 	showElement : function(show){},
 	setFocusBehaviour : function(){},
 	focus : function(){

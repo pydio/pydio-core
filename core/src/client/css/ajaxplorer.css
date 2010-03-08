@@ -488,8 +488,10 @@ a.carousel-control img{
 	background-repeat:repeat-x;
 	float:left;
 	width:100%;
-    min-width: 950px;
-    width:expression(document.body.clientWidth < 950? "950px" : "100%" );	
+}
+
+#locationBar{
+
 }
 
 #location_form,
@@ -500,10 +502,10 @@ a.carousel-control img{
 	background-position:left top;
 	background-repeat:no-repeat;
 	border:1px solid #BBBBBB;
+	border-right-width:0px;
 	float:left;
 	height:20px;
 	padding:2px 0 0 4px;
-	width:350px;    
 }
 
 #location_form
@@ -530,6 +532,10 @@ a.carousel-control img{
 {
     width: 90px;
     margin-left: 3px;
+}
+
+#repo_chooser{
+	max-width:170px;
 }
 
 .inlineBarButton,
