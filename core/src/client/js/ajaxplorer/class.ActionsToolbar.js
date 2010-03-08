@@ -137,7 +137,7 @@ Class.create("ActionsToolbar", {
 		}).observe('click', function(e){
 			Event.stop(e);
 			if(this.options.subMenu){
-				this.subMenu.show(e);
+				//this.subMenu.show(e);
 			}else{
 				this.apply();
 			}

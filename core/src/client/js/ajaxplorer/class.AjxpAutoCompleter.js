@@ -34,6 +34,13 @@
  */
 Class.create("AjxpAutocompleter", Autocompleter.Base, {
   initialize: function(element, update, url, options) {
+  	if(Object.isString(update) && !$(update)){
+  		document.getElementsByTagName('body')[0].appendChild(new Element('div', {
+  			id:update,
+  			className:"autocomplete",
+  			style:"position:absolute; display:none;"
+  		}));
+  	}
     this.baseInitialize(element, update, options);
     this.options.asynchronous  = true;
     this.options.onComplete    = this.onComplete.bind(this);
