@@ -96,7 +96,7 @@ Class.create("BackgroundManager", {
 					return this.interruptOnError(childs[i].firstChild.nodeValue);
 				}
 			}
-			else if(childs[i].nodeName == "trigger_bg_action"){
+			else if(childs[i].nodeName == "trigger_bg_action"){				
 				var name = childs[i].getAttribute("name");
 				var messageId = childs[i].getAttribute("messageId");
 				var parameters = new Hash();
@@ -106,7 +106,12 @@ Class.create("BackgroundManager", {
 						parameters.set(paramChild.getAttribute("name"), paramChild.getAttribute("value"));
 					}
 				}
-				this.queueAction(name, parameters, messageId);
+				if(name == "reload_node"){
+					 var dm = ajaxplorer.fireContextRefresh();
+					 this.finished();
+				}else{
+					this.queueAction(name, parameters, messageId);
+				}
 			}
 		}
 		this.working = false;
