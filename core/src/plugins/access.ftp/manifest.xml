@@ -16,4 +16,8 @@
 	<actions_definition filename="plugins/access.fs/fsActions.xml" include="*" exclude="upload"/>
 	<actions_definition filename="plugins/access.remote_fs/additionalActions.xml" include="*"/>
 	<class_definition filename="plugins/access.ftp/class.ftpAccessDriver.php" classname="ftpAccessDriver"/>
+	<dependencies>
+		<pluginActions pluginName="access.fs"/>
+		<pluginActions pluginName="access.remote_fs"/>
+	</dependencies>
 </ajxpdriver>

@@ -26,4 +26,7 @@ $AUTH_DRIVER = array(
 	</server_settings>
 	<class_definition filename="plugins/auth.remote_ajxp/class.phpbbAuthDriver.php" classname="phpbbAuthDriver"/>
 	<actions_definition filename="client/xml/standard_auth_actions.xml" />
+	<dependencies>
+		<pluginClass pluginName="auth.serial"/>
+	</dependencies>			
 </authdriver>

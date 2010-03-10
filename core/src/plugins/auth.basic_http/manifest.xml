@@ -2,4 +2,7 @@
 <authdriver name="basic_http" label="Basic HTTP" description="Use the standard http authentication.">	
 	<class_definition filename="plugins/auth.ldap/class.basic_httpAuthDriver.php" classname="basic_httpAuthDriver"/>
 	<actions_definition filename="client/xml/standard_auth_actions.xml" />
+	<dependencies>
+		<pluginClass pluginName="auth.serial"/>
+	</dependencies>		
 </authdriver>

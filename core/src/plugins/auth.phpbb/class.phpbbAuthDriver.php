@@ -1,6 +1,5 @@
 <?php
 
-require_once(INSTALL_PATH."/plugins/auth.serial/class.serialAuthDriver.php");
 class phpbbAuthDriver extends serialAuthDriver  {
 	
 	var $usersSerFile;
