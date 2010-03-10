@@ -34,15 +34,13 @@
  * Description : A manager for the various recycle bin actions.
  */
 
-global $RBM_RECYCLE;
-global $RBM_RELATIVE_RECYCLE;
-
 class RecycleBinManager
 {
+	private static $rbmRecycle;
+	private static $rbmRelativeRecycle;    
 	
-	function recycleEnabled(){
-		global $RBM_RECYCLE;
-		return (isSet($RBM_RECYCLE) && $RBM_RECYCLE != null && is_string($RBM_RECYCLE));
+	public static function recycleEnabled(){
+		return (isSet(self::$rbmRecycle) && self::$rbmRecycle != null && is_string(self::$rbmRecycle));
 	}
 	
 	/**
@@ -50,39 +48,35 @@ class RecycleBinManager
 	 *
 	 * @param String $recyclePath Full path to the recycle folder, INCLUDED optional wrapper data (ajxp.fs://repoId/path/to/recycle).
 	 */
-	function init($repositoryWrapperURL, $recyclePath)
+	public static function init($repositoryWrapperURL, $recyclePath)
 	{
-		global $RBM_RECYCLE, $RBM_RELATIVE_RECYCLE;
-		$RBM_RECYCLE = $repositoryWrapperURL.$recyclePath;
-		$RBM_RELATIVE_RECYCLE = $recyclePath;
+		self::$rbmRecycle = $repositoryWrapperURL.$recyclePath;
+		self::$rbmRelativeRecycle = $recyclePath;
 	}
 	
-	function getRecyclePath(){
-		global $RBM_RECYCLE;
-		return $RBM_RECYCLE;
+	public static function getRecyclePath(){
+		return self::$rbmRecycle ;
 	}
 	
-	function currentLocationIsRecycle($currentLocation){
-		global $RBM_RELATIVE_RECYCLE;
-		return ($currentLocation == $RBM_RELATIVE_RECYCLE);
+	public static function currentLocationIsRecycle($currentLocation){
+		return ($currentLocation == self::$rbmRelativeRecycle);
 	}
 	
-	function filterActions($action, $selection, $currentLocation){
-		if(!RecycleBinManager::recycleEnabled()) return array();
-		global $RBM_RELATIVE_RECYCLE;
+	public static function filterActions($action, $selection, $currentLocation){
+		if(!self::recycleEnabled()) return array();
 		$newArgs = array();
 
 		// FILTER ACTION FOR DELETE
-		if($action == "delete" && !RecycleBinManager::currentLocationIsRecycle($currentLocation))
+		if($action == "delete" && !self::currentLocationIsRecycle($currentLocation))
 		{
 			$newArgs["action"] = "move";
-			$newArgs["dest"] = $RBM_RELATIVE_RECYCLE;
+			$newArgs["dest"] = self::$rbmRelativeRecycle;
 			$newArgs["dest_node"] = "AJAXPLORER_RECYCLE_NODE";
 		}
 		// FILTER ACTION FOR RESTORE
-		if($action == "restore" && RecycleBinManager::currentLocationIsRecycle($currentLocation))
+		if($action == "restore" && self::currentLocationIsRecycle($currentLocation))
 		{
-			$originalRep = RecycleBinManager::getFileOrigin($selection->getUniqueFile());
+			$originalRep = self::getFileOrigin($selection->getUniqueFile());
 			if($originalRep != "")
 			{
 				$newArgs["action"] = "move";
@@ -93,31 +87,31 @@ class RecycleBinManager
 		
 	}
 	
-	function getCacheFileName()
+	public static function getCacheFileName()
 	{
 		return ".ajxp_recycle_cache.ser";
 	}
 	
-	function fileToRecycle($originalFilePath)
+	public static function fileToRecycle($originalFilePath)
 	{
-		$cache = RecycleBinManager::loadCache();
+		$cache = self::loadCache();
 		$cache[basename($originalFilePath)] = str_replace("\\", "/", dirname($originalFilePath));
-		RecycleBinManager::saveCache($cache);
+		self::saveCache($cache);
 	}
 
-	function deleteFromRecycle($filePath)
+	public static function deleteFromRecycle($filePath)
 	{
-		$cache = RecycleBinManager::loadCache();
+		$cache = self::loadCache();
 		if(array_key_exists(basename($filePath), $cache))
 		{
 			unset($cache[basename($filePath)]);
 		}
-		RecycleBinManager::saveCache($cache);		
+		self::saveCache($cache);		
 	}
 	
-	function getFileOrigin($filePath)
+	public static function getFileOrigin($filePath)
 	{
-		$cache = RecycleBinManager::loadCache();
+		$cache = self::loadCache();
 		if(is_array($cache) && array_key_exists(basename($filePath), $cache))
 		{
 			return $cache[basename($filePath)];
@@ -125,10 +119,10 @@ class RecycleBinManager
 		return "";
 	}
 	
-	function loadCache(){
+	public static function loadCache(){
 		$result = array();
-		if(!RecycleBinManager::recycleEnabled()) return null;
-		$cachePath = RecycleBinManager::getRecyclePath()."/".RecycleBinManager::getCacheFileName();
+		if(!self::recycleEnabled()) return null;
+		$cachePath = self::getRecyclePath()."/".self::getCacheFileName();
 		$fp = @fopen($cachePath, "r");
 		if($fp){
 			$s = "";
@@ -141,9 +135,9 @@ class RecycleBinManager
 		return $result;
 	}
 	
-	function saveCache($value){
-		if(!RecycleBinManager::recycleEnabled()) return null;
-		$cachePath = RecycleBinManager::getRecyclePath()."/".RecycleBinManager::getCacheFileName();
+	public static function saveCache($value){
+		if(!self::recycleEnabled()) return null;
+		$cachePath = self::getRecyclePath()."/".self::getCacheFileName();
 		$fp = fopen($cachePath, "w");
 		if($fp){
 			fwrite($fp, serialize($value));
