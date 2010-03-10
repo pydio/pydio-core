@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="ajxpclient">
 	<actions>
+		<action name="get_boot_conf">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="get_template">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>

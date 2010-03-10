@@ -1,0 +1,5 @@
+js/lib/prototype/prototype.js
+js/lib/prototype/prototype.livepipe.js
+js/lib/prototype/prototype.oo.js
+js/ajaxplorer/class.Connexion.js
+js/ajaxplorer/class.AjxpBootstrap.js
