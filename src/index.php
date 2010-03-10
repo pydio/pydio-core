@@ -64,14 +64,12 @@ if(!is_file(TESTS_RESULT_FILE)){
 	}
 }
 
-$USERS_ENABLED = "false";
-$LOGGED_USER = "false";
-$BEGIN_MESSAGE = "";
+$START_PARAMETERS = array("ALERT"=>"");
 if(AuthService::usersEnabled())
 {
 	AuthService::preLogUser((isSet($_GET["remote_session"])?$_GET["remote_session"]:""));
-	if(!is_readable(USERS_DIR)) $BEGIN_MESSAGE = "Warning, the users directory is not readable!";
-	else if(!is_writeable(USERS_DIR)) $BEGIN_MESSAGE = "Warning, the users directory is not writeable!";
+	if(!is_readable(USERS_DIR)) $START_PARAMETERS["ALERT"] = "Warning, the users directory is not readable!";
+	else if(!is_writeable(USERS_DIR)) $START_PARAMETERS["ALERT"] = "Warning, the users directory is not writeable!";
 	if(AuthService::countAdminUsers() == 0){
 		$authDriver = ConfService::getAuthDriverImpl();
 		$adminPass = ADMIN_PASSWORD;
@@ -81,7 +79,7 @@ if(AuthService::usersEnabled())
 		 AuthService::createUser("admin", $adminPass, true);
 		 if(ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD)
 		 {
-			 $BEGIN_MESSAGE .= "Warning! User 'admin' was created with the initial common password 'admin'. \\nPlease log in as admin and change the password now!";
+			 $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial common password 'admin'. \\nPlease log in as admin and change the password now!";
 		 }
 	}else if(AuthService::countAdminUsers() == -1){
 		// Here we may come from a previous version! Check the "admin" user and set its right as admin.
@@ -89,12 +87,10 @@ if(AuthService::usersEnabled())
 		$adminUser = $confStorage->createUserObject("admin"); 
 		$adminUser->setAdmin(true);
 		$adminUser->save();
-		$BEGIN_MESSAGE .= "You may come from a previous version. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
+		$START_PARAMETERS["ALERT"] .= "You may come from a previous version. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
 	}
-	$USERS_ENABLED = "true";	
 	if(AuthService::getLoggedUser() != null || AuthService::logUser(null, null) == 1)
 	{
-		$LOGGED_USER = "true";
 		$loggedUser = AuthService::getLoggedUser();
 		if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) 
 				&& AuthService::getDefaultRootId() != ConfService::getCurrentRootDirIndex())
@@ -104,8 +100,7 @@ if(AuthService::usersEnabled())
 	}
 }
 
-$EXT_REP = "/";
-$ZIP_ENABLED = (ConfService::zipEnabled()?"true":"false");
+$START_PARAMETERS["EXT_REP"] = "/";
 
 $loggedUser = AuthService::getLoggedUser();
 if($loggedUser != null && $loggedUser->getId() != "guest")
@@ -120,7 +115,7 @@ if(isSet($_GET["repository_id"]) && isSet($_GET["folder"])){
 	require_once("server/classes/class.SystemTextEncoding.php");
 	if(AuthService::usersEnabled()){
 		if($loggedUser!= null && $loggedUser->canSwitchTo($_GET["repository_id"])){			
-			$EXT_REP = SystemTextEncoding::toUTF8(urldecode($_GET["folder"]));
+			$START_PARAMETERS["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($_GET["folder"]));
 			$loggedUser->setArrayPref("history", "last_repository", $_GET["repository_id"]);
 			$loggedUser->setArrayPref("history", $_GET["repository_id"], $_GET["folder"]);
 			$loggedUser->save();
@@ -130,8 +125,7 @@ if(isSet($_GET["repository_id"]) && isSet($_GET["folder"])){
 		}
 	}else{
 		ConfService::switchRootDir($_GET["repository_id"]);
-		$ROOT_DIR_ID = $_GET["repository_id"];
-		$EXT_REP = SystemTextEncoding::toUTF8(urldecode($_GET["folder"]));
+		$START_PARAMETERS["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($_GET["folder"]));
 	}
 }
 
@@ -147,12 +141,16 @@ if($JS_DEBUG && isSet($_GET["update_i18n"])){
 	AJXP_Utils::updateI18nFiles();
 }
 
-$mess = ConfService::getMessages();
-include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
-HTMLWriter::writeI18nMessagesClass($mess);
-
 if(isSet($_GET["external_selector_type"])){
-	HTMLWriter::writeExternalSelectorData($_GET["external_selector_type"], $_GET);
+	$START_PARAMETERS["SELECTOR_DATA"] = array("type" => $type, "data" => $data);
+}
+
+$mess = ConfService::getMessages();
+$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
+if($JS_DEBUG){
+	include_once(CLIENT_RESOURCES_FOLDER."/html/gui_debug.html");
+}else{
+	include_once(CLIENT_RESOURCES_FOLDER."/html/gui.html");
 }
 
 HTMLWriter::closeBodyAndPage();

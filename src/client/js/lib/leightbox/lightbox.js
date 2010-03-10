@@ -125,6 +125,9 @@ lightbox.prototype = {
 	},
 	
 	displayLightbox: function(display){		
+		if(!$('overlay')){
+			addLightboxMarkup();
+		}
 		if(display == 'none'){
 			$('overlay').fade({duration:0.5});
 		}else{

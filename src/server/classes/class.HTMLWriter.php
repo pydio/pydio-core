@@ -42,18 +42,7 @@ class HTMLWriter
 		echo "<div title=\"".$mess[98]."\" id=\"message_div\" onclick=\"closeMessageDiv();\" class=\"messageBox ".(isset($logMessage)?"logMessage":"errorMessage")."\"><table width=\"100%\"><tr><td style=\"width: 66%;\">".(isset($logMessage)?$logMessage:$errorMessage)."</td><td style=\"color: #999; text-align: right;padding-right: 10px; width: 30%;\"><i>".$mess[98]."</i></tr></table></div>";
 		echo "<script>tempoMessageDivClosing();</script>";
 	}
-	
-    function bookmarkBar($allBookmarks)
-    {
-    	//echo '<div id="bmbar_title">MyBookmarks&nbsp;&nbsp;</div>';
-    	$mess = ConfService::getMessages();
-		foreach (array_reverse($allBookmarks) as $path)
-		{
-			if(is_array($path)) $path = $path["PATH"];
-			echo '<div class="bm" onmouseover="this.className=\'bm_hover\';" onmouseout="this.className=\'bm\';"><img width="16" height="16" src="'.CLIENT_RESOURCES_FOLDER.'/images/crystal/mimes/16/folder.png" border="0" align="ABSMIDDLE" style="float:left;"><a href="#" class="disabled" title="'.$mess[146].'" onclick="ajaxplorer.actionBar.removeBookmark(\''.$path.'\'); return false;" onmouseover="$(this).addClassName(\'enabled\');" onmouseout="$(this).removeClassName(\'enabled\');"><img width="16" height="16" src="'.CLIENT_RESOURCES_FOLDER.'/images/crystal/actions/16/delete_bookmark.png" border="0" align="ABSMIDDLE" alt="'.$mess[146].'"></a> <a href="#" onclick="ajaxplorer.goTo(\''.$path.'\'); return false;" class="bookmark_button">'.$path.'</a></div>';
-		}
-    }	
-    
+	    
     function getDocFile($docFileName)
     {
     	$realName = INSTALL_PATH."/".DOCS_FOLDER."/".$docFileName.".txt";
@@ -78,43 +67,7 @@ class HTMLWriter
     	require_once(INSTALL_PATH."/server/classes/class.AJXP_XMLWriter.php");
     	return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
     }
-            
-    function writeI18nMessagesClass($mess)
-    {
-    	echo "<script language=\"javascript\">\n";
-    	echo "if(!MessageHash) var MessageHash = new Hash();\n";
-    	foreach ($mess as $index => $message)
-    	{
-    		if(is_numeric($index))
-    		{
-			echo "MessageHash[$index]='".str_replace("'", "\'", $message)."';\n";
-    		}
-    		else 
-    		{
-    			echo "MessageHash['$index']='".str_replace("'", "\'", $message)."';\n";
-    		}
-    			
-    	}
-    	echo "MessageHash;";
-    	echo "</script>\n";
-    }
-    
-    function writeExternalSelectorData($type, $data){
-    	echo "<script language=\"javascript\">\n";
-    	echo 'document.observe("ajaxplorer:loaded", function(){    		
-    		ajaxplorer.actionBar.defaultActions.set("select", "ext_select");
-    		ajaxplorer.actionBar.selectorData = new Hash();
-    		ajaxplorer.actionBar.selectorData.set("type", "'.$type.'");
-    		var ajxpSelData = {};';
-    	foreach ($data as $key => $value){
-    		echo 'ajxpSelData["'.$key.'"] = ["'.$value.'"];';
-    	}
-    	echo '
-    		ajaxplorer.actionBar.selectorData.set("data", ajxpSelData);    		
-    	});
-    	</script>';
-    }
-    
+                      
     function charsetHeader($type = 'text/html', $charset='UTF-8'){
     	header("Content-type:$type; charset=$charset");
     }

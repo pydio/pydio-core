@@ -73,8 +73,16 @@ Class.create("UserWidget", {
 		var userLang = ajaxplorer.user.getPreference("lang");
 		var userDisp = ajaxplorer.user.getPreference("display");	
 		var onLoad = function(oForm){
-			$(oForm).select('select[id="language_selector"]')[0].setValue(userLang);
-			if($('user_change_ownpass_old')){
+			var selector = $(oForm).select('select[id="language_selector"]')[0];
+			var languages = $H(window.ajxpBootstrap.parameters.get("availableLanguages"));
+			languages.each(function(pair){
+				var option = new Element('option', {value:pair.key,id:'lang_'+pair.key});
+				option.update(pair.value);
+				selector.insert(option);
+			});
+			selector.setValue(userLang);
+			if(window.ajxpBootstrap.parameters.get("userChangePassword")){
+				$('user_pref_change_password').show();
 				$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
 				// Update pass_seed
 				var connexion = new Connexion();
@@ -83,7 +91,10 @@ Class.create("UserWidget", {
 					$('pass_seed').value = transport.responseText;
 				};
 				connexion.sendSync();			
+			}else{
+				$('user_pref_change_password').hide();
 			}
+			if($('display_'+userDisp))$('display_'+userDisp).checked = true;
 		};
 		
 		var onComplete = function(oForm){
@@ -91,7 +102,7 @@ Class.create("UserWidget", {
 			var userOldPass = null;
 			var userPass = null;
 			var passSeed = null;
-			if($('user_change_ownpass1') && $('user_change_ownpass1').value != "" && $('user_change_ownpass2').value != "")
+			if($('user_pref_change_password').visible() && $('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
 			{
 				if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
 					alert(MessageHash[238]);

@@ -121,6 +121,47 @@ class AJXP_ClientDriver extends AbstractDriver
 				
 			break;
 			
+			//------------------------------------
+			//	GET CONFIG FOR BOOT
+			//------------------------------------
+			case "get_boot_conf":
+				
+				$config = array();
+				$config["ajxpResourcesFolder"] = CLIENT_RESOURCES_FOLDER;
+				$config["ajxpServerAccess"] = SERVER_ACCESS;
+				$config["zipEnabled"] = ConfService::zipEnabled();
+				$config["multipleFilesDownloadEnabled"] = DISABLE_ZIP_CREATION;
+				$config["flashUploaderEnabled"] = ConfService::getConf("UPLOAD_ENABLE_FLASH");
+				if(!ConfService::getConf("UPLOAD_ENABLE_FLASH")){
+				    $UploadMaxSize = Utils::convertBytes(ini_get('upload_max_filesize'));
+				    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
+				    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
+				    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");				
+					$config["htmlMultiUploaderOptions"] = array("282"=>$UploadMaxSize,"284"=>$confTotalNumber);
+				}
+				$config["usersEnabled"] = AuthService::usersEnabled();
+				$config["loggedUser"] = (AuthService::getLoggedUser()!=null);
+				$config["currentLanguage"] = ConfService::getLanguage();
+				$config["userChangePassword"] = AuthService::changePasswordEnabled();
+				$config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
+				$config["ajxpVersion"] = AJXP_VERSION;
+				$config["ajxpVersionDate"] = AJXP_VERSION_DATE;
+				$config["cssResources"] = array("js/lib/webfx/slider/css/bluecurve/bluecurve.css");
+				if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
+					$config["cssResources"][] = "css/pngHack/pngHack.css";
+				}
+				if(defined("GOOGLE_ANALYTICS_ID") && GOOGLE_ANALYTICS_ID != "") {
+					$config["googleAnalyticsData"] = array(
+						"id"=>GOOGLE_ANALYTICS_ID,
+						"domain" => GOOGLE_ANALYTICS_DOMAIN,
+						"event" => GOOGLE_ANALYTICS_EVENT);
+				}
+				$config["i18nMessages"] = ConfService::getMessages();
+				header("Content-type:application/json;charset=UTF-8");
+				print(json_encode($config));
+				exit(1);
+				
+			break;
 					
 			default;
 			break;

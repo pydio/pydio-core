@@ -114,14 +114,11 @@ Class.create("Connexion", {
 				{
 					try
 					{
-						var script = transport.responseText;					
+						var script = transport.responseText;				
 					    if (window.execScript){	
-					    	//alert('execScript for'+fileName);
 					        window.execScript( script );
 					    }
 					    else{
-					    	//alert('eval for'+fileName);
-							//window.eval( script );
 							// TO TEST, THIS SEEM TO WORK ON SAFARI
 							window.my_code = script;
 							var script_tag = document.createElement('script');
@@ -134,8 +131,6 @@ Class.create("Connexion", {
 					catch(e)
 					{
 						alert('error loading '+fileName+':'+e);
-						//errorWindow=window.open("", "", "height=500, width=600,toolbar=no,scrollbars=yes,menubar=no,resizable=yes");
-						//errorWindow.document.write(transport.responseText);
 					}
 				}
 			}

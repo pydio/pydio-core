@@ -208,7 +208,7 @@ define("DISABLE_ZIP_CREATION", false);
 /**********************************************/
 // Set this is to you GA id : something like UE-XXXXX-Y
 // This will append the Async Loading code to ajaxplorer.
-define("GOOGLE_ANALYTICS_ID", "");
+define("GOOGLE_ANALYTICS_ID", "XXXXX");
 // Add this if you want to set the domain artificially.
 // If you don't know what it's about, you should probably
 // leave it empty!
