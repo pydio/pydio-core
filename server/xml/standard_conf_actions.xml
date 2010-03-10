@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<driver name="ajxpclient">
+	<actions>
+		<action name="switch_root_dir">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="get_bookmarks">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="save_user_pref">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+	</actions>
+</driver>
