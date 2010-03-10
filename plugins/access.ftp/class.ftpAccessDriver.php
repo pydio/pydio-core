@@ -17,19 +17,11 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	var $password;
 	var $path;
 
-        function  ftpAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
-        	$this->user = $optOptions ? $optOptions["user"] : $this->getUserName($repository);
-        	$this->password = $optOptions ? $optOptions["password"] : $this->getPassword($repository);
-			parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);
-			unset($this->actions["upload"]);
-			// DISABLE NON-IMPLEMENTED FUNCTIONS FOR THE MOMENT
-			//unset($this->actions["copy"]);			
-			$this->initXmlActionsFile(INSTALL_PATH."/plugins/access.remote_fs/additionalActions.xml");
-			$this->xmlFilePath = INSTALL_PATH."/plugins/access.fs/fsActions.xml";
-		}
 
-
-        function initRepository(){
+        function initRepository(){        	
+        	$this->user = $this->options? $this->options["user"]:$this->getUserName($this->repository);
+        	$this->password = $this->options? $this->options["password"]:$this->getPassword($this->repository);
+        	
             $this->connect = $this->createFTPLink();
             // Try to detect the charset encoding
             global $_SESSION;

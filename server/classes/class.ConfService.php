@@ -59,7 +59,7 @@ class ConfService
 {
 	function init($confFile)
 	{
-		include_once($confFile);
+		include($confFile);
 		// INIT AS GLOBAL
 		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS, 
                $G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, 
@@ -90,13 +90,7 @@ class ConfService
 	
 	function initConfStorageImpl($name, $options){
 		global $G_CONF_STORAGE_DRIVER;
-		$filePath = INSTALL_PATH."/plugins/conf.".$name."/class.".$name."ConfDriver.php";
-		if(!is_file($filePath)){
-			die("Warning, cannot find driver for conf storage! ($name, $filePath)");
-		}
-		require_once($filePath);
-		$className = $name."ConfDriver";
-		$G_CONF_STORAGE_DRIVER = new $className($name);
+		$G_CONF_STORAGE_DRIVER = AJXP_PluginsService::findPlugin("conf", $name);		
 		$G_CONF_STORAGE_DRIVER->init($options);
 	}
 	
@@ -113,13 +107,7 @@ class ConfService
 		global $G_AUTH_DRIVER_DEF, $G_AUTH_DRIVER;
 		$name = $G_AUTH_DRIVER_DEF["NAME"];
 		$options = $G_AUTH_DRIVER_DEF["OPTIONS"];
-		$filePath = INSTALL_PATH."/plugins/auth.".$name."/class.".$name."AuthDriver.php";
-		if(!is_file($filePath)){
-			die("Warning, cannot find driver for Authentication method! ($name, $filePath)");
-		}
-		require_once($filePath);
-		$className = $name."AuthDriver";
-		$G_AUTH_DRIVER = new $className($name);
+		$G_AUTH_DRIVER = AJXP_PluginsService::findPlugin("auth", $name);
 		$G_AUTH_DRIVER->init($options);
 	}
 	
@@ -459,23 +447,15 @@ class ConfService
         ConfService::switchRootDir();
 		$crtRepository = ConfService::getRepository();
 		$accessType = $crtRepository->getAccessType();
-		$driverName = $accessType."AccessDriver";
-		$path = INSTALL_PATH."/plugins/access.".$accessType;
-		$filePath = $path."/class.".$driverName.".php";
-		$xmlPath = $path."/".$accessType."Actions.xml";
-		if(is_file($filePath)){
-			include_once($filePath);
-			if(class_exists($driverName)){
-				$G_ACCESS_DRIVER = new $driverName($accessType, $xmlPath, $crtRepository);
-				$res = $G_ACCESS_DRIVER->initRepository();
-				if($res!=null && is_a($res, "AJXP_Exception")){
-					$G_ACCESS_DRIVER = null;
-					return $res;
-				}				
-				return $G_ACCESS_DRIVER;
-			}
-		}
-		
+		$pServ = AJXP_PluginsService::getInstance();
+		$G_ACCESS_DRIVER = $pServ->getPluginByTypeName("access", $accessType);
+		$G_ACCESS_DRIVER->init($crtRepository);
+		$res = $G_ACCESS_DRIVER->initRepository();
+		if($res!=null && is_a($res, "AJXP_Exception")){
+			$G_ACCESS_DRIVER = null;
+			return $res;
+		}				
+		return $G_ACCESS_DRIVER;
 	}
 	
 	function availableDriversToXML($filterByTagName = "", $filterByDriverName=""){

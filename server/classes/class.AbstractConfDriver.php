@@ -45,7 +45,7 @@ class AbstractConfDriver extends AbstractDriver {
 	 */
 	function init($options){		
 		$this->options = $options;
-		$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/standard_conf_actions.xml");
+		$this->loadActionsFromManifest();
 		unset($this->actions["get_driver_actions"]);		
 	}
 	

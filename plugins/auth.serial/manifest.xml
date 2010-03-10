@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="serial" label="Serialized Storage" description="Stores the Authentication data as serialized PHP values on the filesystem.">
-	<param name="USERS_FILEPATH" type="string" label="Users" description="The users list" mandatory="true"/>
+	<server_settings>
+		<param name="USERS_FILEPATH" type="string" label="Users" description="The users list" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.serial/class.serialAuthDriver.php" classname="serialAuthDriver"/>
+	<actions_definition filename="client/xml/standard_auth_actions.xml" />
 </authdriver>

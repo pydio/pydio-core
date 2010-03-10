@@ -35,9 +35,6 @@
  */
 class ajxp_confAccessDriver extends AbstractAccessDriver 
 {	
-	function ajxp_confAccessDriver($driverName){
-		parent::AbstractAccessDriver($driverName, INSTALL_PATH."/plugins/access.ajxp_conf/ajxp_confActions.xml", null);
-	}
 	
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;

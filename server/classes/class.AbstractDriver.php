@@ -33,7 +33,7 @@
  * 
  * Description : Abstract representation of an action driver. Must be implemented.
  */
-class AbstractDriver {
+class AbstractDriver extends AJXP_Plugin {
 	
 	/**
 	 * @var String
@@ -54,12 +54,9 @@ class AbstractDriver {
 	 * @var array
 	 */
 	var $actions;
-	var $xml_parser;
-	var $xml_data;
-	var $crtAction;
 	var $driverConf = array();
-	
-	function AbstractDriver($driverName) {
+	/*
+	function AbstractDriver($driverName){
 		// Load config file if there is one
 		if(is_file(INSTALL_PATH."/server/conf/conf.".$this->driverType.".".$driverName.".inc")){
 			include_once(INSTALL_PATH."/server/conf/conf.".$this->driverType.".".$driverName.".inc");
@@ -68,12 +65,14 @@ class AbstractDriver {
 			}
 		}
 		$this->driverName = $driverName;
-		$this->actions = array();
+		$id = $this->driverType.".".$driverName;
+		parent::__construct($id, INSTALL_PATH."/plugins/$id");
 	}
+	*/	
 	
-	function initXmlActionsFile($filePath){
+	function initXmlActionsFile($filePath){		
 		$this->xmlFilePath = $filePath;
-		$this->parseXMLActions();
+		parent::initXmlActionsFile($filePath);
 		$this->actions["get_driver_actions"] = array();
 	}
 		
@@ -86,6 +85,9 @@ class AbstractDriver {
 		else $rString = "WRITE";
 		$action = $this->actions[$actionName];
 		if(isSet($action["rights"]) && isSet($action["rights"][$rString]) && $action["rights"][$rString] == "true"){
+			return true;
+		}
+		if(isSet($action["rights"]) && isSet($action["rights"][strtolower($rString)]) && $action["rights"][strtolower($rString)] == "true"){
 			return true;
 		}
 		return false;
@@ -130,7 +132,6 @@ class AbstractDriver {
 	 * @param User $user
 	 */
 	function sendActionsToClient($filterByRight, $user, $repository){
-		//AJXP_XMLWriter::header();
 		foreach($this->actions as $name => $action){
 			if($name == "get_driver_actions" || $name == "get_ajxp_actions") continue;
 			if($filterByRight && $this->actionNeedsRight($name, "r")){
@@ -141,82 +142,12 @@ class AbstractDriver {
 			}
 			if(isSet($action["XML"])){
 				$xml = $action["XML"];
-				$xml = $this->replaceAjxpXmlKeywords($xml);
-				$xml = preg_replace("/[\n\r]?/", "", $xml);
-				$xml = preg_replace("/\t/", " ", $xml);
+				$xml = AJXP_XMLWriter::replaceAjxpXmlKeywords($xml, true);
 				AJXP_XMLWriter::write($xml, true);
 			}
 		}
-		//AJXP_XMLWriter::close();
 	}
-	
-	function replaceAjxpXmlKeywords($xml){
-		$messages = ConfService::getMessages();			
-		$matches = array();
-		$xml = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $xml);
-		$xml = str_replace("AJXP_SERVER_ACCESS", SERVER_ACCESS, $xml);
-		$xml = str_replace("AJXP_MIMES_EDITABLE", Utils::getAjxpMimes("editable"), $xml);
-		$xml = str_replace("AJXP_MIMES_IMAGE", Utils::getAjxpMimes("image"), $xml);
-		$xml = str_replace("AJXP_MIMES_AUDIO", Utils::getAjxpMimes("audio"), $xml);
-		$xml = str_replace("AJXP_MIMES_ZIP", Utils::getAjxpMimes("zip"), $xml);
-		if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
-			foreach($matches as $match){
-				$messId = str_replace("]", "", str_replace("[", "", $match[1]));
-				$xml = str_replace("AJXP_MESSAGE[$messId]", $messages[$messId], $xml);
-			}
-		}
-		return $xml;		
-	}
-	
-	function fillActionsWithXML(){
-		$fileData = file_get_contents($this->xmlFilePath);
-		$matches = array();
-		foreach ($this->actions as $actionName => $actionData){
-			preg_match_all('/(<action name=\"'.$actionName.'\".*?>.*?<\/action>)/', str_replace("\n", "", $fileData), $matches);
-			if(count($matches) && count($matches[0])){
-				$actionXML = $matches[0][0];
-				$this->actions[$actionName]["XML"] = $actionXML;
-			}
-		}
-	}
-		
-	function parseXMLActions()
-	{
-		if(!is_file($this->xmlFilePath)){
-			return ;
-		}
-		$this->xml_data = file_get_contents($this->xmlFilePath);
-	    $this->xml_parser = xml_parser_create( "UTF-8" );
-	
-	    //xml_parser_set_option( $this->xml_parser, XML_OPTION_CASE_FOLDING, false );
-	    xml_set_object( $this->xml_parser, $this );
-	    xml_set_element_handler( $this->xml_parser, "_startElement", "_endElement");
-	    xml_set_character_data_handler( $this->xml_parser, "_cData" );
-	    xml_parse( $this->xml_parser, $this->xml_data, true );
-	    xml_parser_free( $this->xml_parser );
-
-	    $this->fillActionsWithXML();
-	    //print_r($this->actions);	
-	}
-	
-	function _startElement($parser, $tag, $attributeList){
-		if($tag == 'ACTION'){
-			$this->crtAction = array();
-			$this->crtAction["name"] = $attributeList["NAME"];
-		}else if($tag == 'SERVERCALLBACK'){
-			$this->crtAction["callback"] = $attributeList["METHODNAME"];
-		}else if($tag == "RIGHTSCONTEXT"){
-			$this->crtAction["rights"] = $attributeList;
-		}
-	}
-	
-	function _endElement($parser, $tag){		
-		if($tag == "ACTION"){
-			$this->actions[$this->crtAction["name"]] = $this->crtAction;
-		}
-	}
-
-	function _cData($parser, $data){}
+			
 	
 }
 

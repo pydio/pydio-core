@@ -97,6 +97,33 @@ class AJXP_XMLWriter
 		exit(1);
 	}
 	
+	static function replaceAjxpXmlKeywords($xml, $stripSpaces = false){
+		$messages = ConfService::getMessages();			
+		$matches = array();
+		$xml = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $xml);
+		$xml = str_replace("AJXP_SERVER_ACCESS", SERVER_ACCESS, $xml);
+		$xml = str_replace("AJXP_MIMES_EDITABLE", Utils::getAjxpMimes("editable"), $xml);
+		$xml = str_replace("AJXP_MIMES_IMAGE", Utils::getAjxpMimes("image"), $xml);
+		$xml = str_replace("AJXP_MIMES_AUDIO", Utils::getAjxpMimes("audio"), $xml);
+		$xml = str_replace("AJXP_MIMES_ZIP", Utils::getAjxpMimes("zip"), $xml);
+		$loginRedirect = ConfService::getAuthDriverImpl()->getLoginRedirect();
+		$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
+        $xml = str_replace("AJXP_REMOTE_AUTH", "false", $xml);
+        $xml = str_replace("AJXP_NOT_REMOTE_AUTH", "true", $xml);
+		
+		if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
+			foreach($matches as $match){
+				$messId = str_replace("]", "", str_replace("[", "", $match[1]));
+				$xml = str_replace("AJXP_MESSAGE[$messId]", $messages[$messId], $xml);
+			}
+		}
+		if($stripSpaces){
+			$xml = preg_replace("/[\n\r]?/", "", $xml);
+			$xml = preg_replace("/\t/", " ", $xml);
+		}
+		return $xml;		
+	}	
+	
 	function reloadCurrentNode($print = true)
 	{
 		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\"/>", $print);

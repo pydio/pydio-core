@@ -37,7 +37,7 @@ class AJXP_ClientDriver extends AbstractDriver
 {
 	
 	function AJXP_ClientDriver($repository) {
-		parent::AbstractDriver("ajxp_actions");
+		//parent::AbstractDriver("ajxp_actions");
 		$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/ajxpclient_actions.xml");
 		unset($this->actions["get_driver_actions"]);
 		unset($this->actions["get_driver_info_panels"]);
@@ -125,22 +125,12 @@ class AJXP_ClientDriver extends AbstractDriver
 			
 			case "get_editors_registry":
 				
-				header("Content-type:application/xml;charset=UTF-8");
-				$pluginDir = INSTALL_PATH."/plugins";
-				$handler = opendir($pluginDir);
+				$plugService = AJXP_PluginsService::getInstance();
+				$plugins = $plugService->getPluginsByType("editor");
 				AJXP_XMLWriter::header("editors");
-				while ($plug = readdir($handler)) {
-					$parts = explode(".", $plug);
-					if(count($parts) > 1 && $parts[0] == "editor"){
-						$manifest = INSTALL_PATH."/plugins/".$plug."/manifest.xml";
-						if(!is_file($manifest)) continue;
-						$lines = file($manifest);
-						$lines = array_map(array($this, "replaceAjxpXmlKeywords"), $lines);
-						array_shift($lines);						
-						print(join("", $lines));
-					}
+				foreach ($plugins as $plugin){
+					print(AJXP_XMLWriter::replaceAjxpXmlKeywords($plugin->getManifestRawContent()));
 				}
-				closedir($handler);
 				AJXP_XMLWriter::close("editors");
 				exit(0);
 					

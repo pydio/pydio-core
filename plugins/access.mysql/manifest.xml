@@ -9,9 +9,13 @@
 			<i18n namespace="sql" path="plugins/access.mysql/resources/i18n" />
 		</resources>
 	</client_settings>
-	<param name="DB_HOST" type="string" label="Host" description="Host to the MySQL Server" mandatory="true"/>
-	<param name="DB_NAME" type="string" label="Database" description="Database name" mandatory="true"/>
-	<param name="DB_USER" type="string" label="User" description="User name (must have privileges to access this db)" mandatory="true"/>
-	<param name="DB_PASS" type="string" label="Password" description="User password" mandatory="false"/>
-	<param name="DB_PTRN" type="string" label="Pattern" description="If not empty, only tables beginning with such a prefix will be displayed." mandatory="false"/>
+	<server_settings>
+		<param name="DB_HOST" type="string" label="Host" description="Host to the MySQL Server" mandatory="true"/>
+		<param name="DB_NAME" type="string" label="Database" description="Database name" mandatory="true"/>
+		<param name="DB_USER" type="string" label="User" description="User name (must have privileges to access this db)" mandatory="true"/>
+		<param name="DB_PASS" type="string" label="Password" description="User password" mandatory="false"/>
+		<param name="DB_PTRN" type="string" label="Pattern" description="If not empty, only tables beginning with such a prefix will be displayed." mandatory="false"/>
+	</server_settings>
+	<actions_definition filename="plugins/access.mysql/mysqlActions.xml" include="*"/>
+	<class_definition filename="plugins/access.mysql/class.mysqlAccessDriver.php" classname="mysqlAccessDriver"/>	
 </ajxpdriver>
