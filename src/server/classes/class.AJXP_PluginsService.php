@@ -37,8 +37,12 @@
  	private static $instance;
  	private $registry = array();
  	private $tmpDependencies = array();
+ 	private $pluginFolder;
+ 	private $confFolder;
  	
- 	public function loadPluginsRegistry($pluginFolder){
+ 	public function loadPluginsRegistry($pluginFolder, $confFolder){
+ 		$this->pluginFolder = $pluginFolder;
+ 		$this->confFolder = $confFolder;
  		$handler = opendir($pluginFolder);
  		$beforeSort = array();
  		if($handler){
@@ -61,6 +65,9 @@
 					$this->registry[$plugType] = array();
 				}
 				$plugin = $this->instanciatePluginClass($plugin);
+				if(is_file($this->confFolder."/conf.".$plugin->getId().".inc")){
+					$plugin->loadConfig($this->confFolder."/conf.".$plugin->getId().".inc", "inc");
+				}
 				$this->registry[$plugType][$plugin->getName()] = $plugin;
  			}
  		}
