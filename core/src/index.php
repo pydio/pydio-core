@@ -31,7 +31,7 @@
  * 
  * Description : main script called at initialisation.
  */
-require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.AJXP_Utils.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.ConfService.php");

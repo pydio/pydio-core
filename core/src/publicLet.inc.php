@@ -4,7 +4,7 @@ require_once("server/classes/class.AJXP_Plugin.php");
 require_once("server/conf/conf.php"); 
 require_once("server/classes/class.AbstractDriver.php"); 
 require_once("server/classes/class.Repository.php"); 
-require_once("server/classes/class.Utils.php"); 
+require_once("server/classes/class.AJXP_Utils.php"); 
 require_once("server/classes/class.SystemTextEncoding.php"); 
 require_once("server/classes/class.UserSelection.php"); 
 require_once("server/classes/class.AbstractAccessDriver.php"); 
