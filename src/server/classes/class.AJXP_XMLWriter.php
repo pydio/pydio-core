@@ -102,10 +102,10 @@ class AJXP_XMLWriter
 		$matches = array();
 		$xml = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $xml);
 		$xml = str_replace("AJXP_SERVER_ACCESS", SERVER_ACCESS, $xml);
-		$xml = str_replace("AJXP_MIMES_EDITABLE", Utils::getAjxpMimes("editable"), $xml);
-		$xml = str_replace("AJXP_MIMES_IMAGE", Utils::getAjxpMimes("image"), $xml);
-		$xml = str_replace("AJXP_MIMES_AUDIO", Utils::getAjxpMimes("audio"), $xml);
-		$xml = str_replace("AJXP_MIMES_ZIP", Utils::getAjxpMimes("zip"), $xml);
+		$xml = str_replace("AJXP_MIMES_EDITABLE", AJXP_Utils::getAjxpMimes("editable"), $xml);
+		$xml = str_replace("AJXP_MIMES_IMAGE", AJXP_Utils::getAjxpMimes("image"), $xml);
+		$xml = str_replace("AJXP_MIMES_AUDIO", AJXP_Utils::getAjxpMimes("audio"), $xml);
+		$xml = str_replace("AJXP_MIMES_ZIP", AJXP_Utils::getAjxpMimes("zip"), $xml);
 		$loginRedirect = ConfService::getAuthDriverImpl()->getLoginRedirect();
 		$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
         $xml = str_replace("AJXP_REMOTE_AUTH", "false", $xml);
@@ -136,13 +136,13 @@ class AJXP_XMLWriter
 		
 	function reloadFileList($fileOrBool, $print = true)
 	{
-		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".Utils::xmlEntities(SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
+		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
 		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	
 	function reloadDataNode($nodePath="", $pendingSelection="", $print = true){
-		$nodePath = Utils::xmlEntities($nodePath, true);
-		$pendingSelection = Utils::xmlEntities($pendingSelection, true);
+		$nodePath = AJXP_Utils::xmlEntities($nodePath, true);
+		$pendingSelection = AJXP_Utils::xmlEntities($pendingSelection, true);
 		return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
 	}
 	
@@ -187,12 +187,12 @@ class AJXP_XMLWriter
 		if($errorMessage == null)
 		{
 			$messageType = "SUCCESS";
-			$message = Utils::xmlEntities($logMessage);
+			$message = AJXP_Utils::xmlEntities($logMessage);
 		}
 		else
 		{
 			$messageType = "ERROR";
-			$message = Utils::xmlEntities($errorMessage);
+			$message = AJXP_Utils::xmlEntities($errorMessage);
 		}
 		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}
@@ -248,9 +248,9 @@ class AJXP_XMLWriter
 					$streamString = "allowCrossRepositoryCopy=\"true\"";
 				}
 				if($toLast){
-					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				}else{
-					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				}
 			}
 		}

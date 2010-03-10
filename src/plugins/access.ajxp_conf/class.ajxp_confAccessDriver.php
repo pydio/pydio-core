@@ -321,7 +321,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						if(is_bool($option)){
 							$option = ($option?"true":"false");
 						}
-						print(" $name=\"".SystemTextEncoding::toUTF8(Utils::xmlEntities($option))."\" ");
+						print(" $name=\"".SystemTextEncoding::toUTF8(AJXP_AJXP_Utils::xmlEntities($option))."\" ");
 					}else if(is_array($option)){
 						$nested[] = $option;
 					}
@@ -446,12 +446,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$loggedUser = AuthService::getLoggedUser();		
         $userArray = array();
 		foreach ($users as $userObject){
-            $userArray[Utils::xmlEntities($userObject->getId())] = $userObject;
+            $userArray[AJXP_Utils::xmlEntities($userObject->getId())] = $userObject;
         }
         ksort($userArray);
         foreach($userArray as $userObject) {
 			$isAdmin = $userObject->isAdmin();
-			$userId = Utils::xmlEntities($userObject->getId());
+			$userId = AJXP_Utils::xmlEntities($userObject->getId());
 			$icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
 			print '<tree 
 				text="'.$userId.'"
@@ -481,7 +481,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $repoArray = array();
 		foreach ($repos as $repoIndex => $repoObject){
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
-            $name = Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
+            $name = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
             $repoArray[$name] = $repoIndex;
         }
         // Sort the list now by name
@@ -527,8 +527,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	function printDiagnostic(){
 		$outputArray = array();
 		$testedParams = array();
-		$passed = Utils::runTests($outputArray, $testedParams);
-		Utils::testResultsToFile($outputArray, $testedParams);		
+		$passed = AJXP_Utils::runTests($outputArray, $testedParams);
+		AJXP_Utils::testResultsToFile($outputArray, $testedParams);		
 		print '<columns switchDisplayMode="list" switchGridMode="fileList"><column messageString="Test Name" attributeName="ajxp_label" sortType="String"/><column messageString="Test Data" attributeName="data" sortType="String"/></columns>';		
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			

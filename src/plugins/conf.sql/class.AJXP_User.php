@@ -462,7 +462,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * @return Requested value
 	 */
 	function getTemporaryData($key){
-		return Utils::loadSerialFile(INSTALL_PATH."/server/users/".$this->getId()."-temp-".$key.".ser");
+		return AJXP_Utils::loadSerialFile(INSTALL_PATH."/server/users/".$this->getId()."-temp-".$key.".ser");
 	}
 	
 	/**
@@ -471,10 +471,10 @@ class AJXP_User extends AbstractAjxpUser
 	 * 
 	 * @param $key String key of data to save.
 	 * @param $value Value to save
-	 * @return null (Utils::saveSerialFile() returns nothing)
+	 * @return null (AJXP_Utils::saveSerialFile() returns nothing)
 	 */
 	function saveTemporaryData($key, $value){
-		return Utils::saveSerialFile(INSTALL_PATH."/server/users/".$this->getId()."-temp-".$key.".ser", $value);
+		return AJXP_Utils::saveSerialFile(INSTALL_PATH."/server/users/".$this->getId()."-temp-".$key.".ser", $value);
 	}
 	
 	/**

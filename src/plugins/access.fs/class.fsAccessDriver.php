@@ -73,7 +73,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
-			$$getName = Utils::securePath(SystemTextEncoding::magicDequote($getValue));
+			$$getName = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($getValue));
 		}
 		$selection = new UserSelection();
 
@@ -154,7 +154,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					require_once("server/classes/pclzip.lib.php");
 					$zip = new PclZip($this->getPath().$split[0]);
 					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);
-					header("Content-Type: ".Utils::getImageMimeType(basename($split[1]))."; name=\"".basename($split[1])."\"");
+					header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($split[1]))."; name=\"".basename($split[1])."\"");
 					header("Content-Length: ".strlen($data[0]["content"]));
 					header('Cache-Control: public');
 					print($data[0]["content"]);
@@ -309,7 +309,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "mkdir";
 			        
 				$messtmp="";
-				$dirname=Utils::processFileName(SystemTextEncoding::fromUTF8($dirname));
+				$dirname=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($dirname));
 				$error = $this->mkDir($dir, $dirname);
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -330,7 +330,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "mkfile";
 			
 				$messtmp="";
-				$filename=Utils::processFileName(SystemTextEncoding::fromUTF8($filename));	
+				$filename=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($filename));	
 				$error = $this->createEmptyFile($dir, $filename);
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -395,7 +395,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				{
 					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
 					if($boxName == "Filedata") $fancyLoader = true;
-					$err = Utils::parseFileDataErrors($boxData, $fancyLoader);
+					$err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
 					if($err != null)
 					{
 						$errorMessage = $err;
@@ -403,7 +403,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					}
 					$userfile_name = $boxData["name"];
 					if($fancyLoader) $userfile_name = SystemTextEncoding::fromUTF8($userfile_name);
-					$userfile_name=Utils::processFileName($userfile_name);
+					$userfile_name=AJXP_Utils::processFileName($userfile_name);
 					if(isSet($auto_rename)){
 						$userfile_name = fsDriver::autoRenameForDest($destination, $userfile_name);
 					}
@@ -464,24 +464,24 @@ class fsAccessDriver extends AbstractAccessDriver
 					$zip = $this->zipListing($test[0], $test[1], $liste);
 					//AJXP_XMLWriter::header();
 					$metaData = array("ajxp_mime" => "ajxp_browsable_archive");
-					AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, $metaData);
+					AJXP_XMLWriter::renderHeaderNode(AJXP_Utils::xmlEntities($dir, true), AJXP_Utils::xmlEntities(basename($dir), true), false, $metaData);
 					$tmpDir = $this->getPath().dirname($test[0]).".tmpZipExtract";					
 					foreach ($liste as $zipEntry){
 						$metaData = array();
 						if(!$lsOptions["f"] && !$zipEntry["folder"]) continue;
-						$nodeLabel = Utils::xmlEntities( basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])));
-						$nodeName = Utils::xmlEntities( SystemTextEncoding::toUTF8($zipEntry["filename"]));
-						$metaData["icon"] = Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"]);
+						$nodeLabel = AJXP_Utils::xmlEntities( basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])));
+						$nodeName = AJXP_Utils::xmlEntities( SystemTextEncoding::toUTF8($zipEntry["filename"]));
+						$metaData["icon"] = AJXP_Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"]);
 						if($zipEntry["folder"]){
 							$metaData["src"] = urlencode("content.php?get_action=ls&options=dz&dir=".SystemTextEncoding::toUTF8($zipEntry["filename"]));
 							$metaData["openicon"] = "folder_open.png";
 						}
 						if($lsOptions["l"]){
-							$metaData["filesize"] = Utils::roundSize($zipEntry["size"]);
+							$metaData["filesize"] = AJXP_Utils::roundSize($zipEntry["size"]);
 							$metaData["bytesize"] = $zipEntry["size"];
 							$metaData["ajxp_modiftime"] = $zipEntry["mtime"];
-							$metaData["mimestring"] = Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"]);
-							$is_image = Utils::is_image(basename($zipEntry["stored_filename"]));
+							$metaData["mimestring"] = AJXP_Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"]);
+							$is_image = AJXP_Utils::is_image(basename($zipEntry["stored_filename"]));
 							$metaData["is_image"] = $is_image;
 							if($is_image){
 								if(!is_dir($tmpDir)) {
@@ -529,7 +529,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
 					$metaData["ajxp_mime"] = "ajxp_recycle";
 				}
-				AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, $metaData);
+				AJXP_XMLWriter::renderHeaderNode(AJXP_Utils::xmlEntities($dir, true), AJXP_Utils::xmlEntities(basename($dir), true), false, $metaData);
 				if(isSet($totalPages) && isSet($crtPage)){
 					AJXP_XMLWriter::renderPaginationData($countFiles, $crtPage, $totalPages);
 					if(!$lsOptions["f"]){
@@ -542,18 +542,18 @@ class fsAccessDriver extends AbstractAccessDriver
 					$metaData = array();
 					$currentFile = $path."/".$nodeName;									
 					$metaData["is_file"] = (is_file($currentFile)?"1":"0");
-					$metaData["filename"] = Utils::xmlEntities(SystemTextEncoding::toUTF8($dir."/".$nodeName));
-					$metaData["icon"] = Utils::mimetype($nodeName, "image", is_dir($currentFile));
+					$metaData["filename"] = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($dir."/".$nodeName));
+					$metaData["icon"] = AJXP_Utils::mimetype($nodeName, "image", is_dir($currentFile));
 					if($metaData["icon"] == "folder.png"){
 						$metaData["openicon"] = "folder_open.png";
 					}
-					if(is_dir($currentFile) || Utils::isBrowsableArchive($nodeName)){
+					if(is_dir($currentFile) || AJXP_Utils::isBrowsableArchive($nodeName)){
 						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?get_action=ls&options=dz&dir=".$dir."/".$nodeName);
 						$link = urlencode($link);						
 						$metaData["src"] = $link;
 					}
 					if($lsOptions["l"]){
-						$metaData["is_image"] = Utils::is_image($currentFile);
+						$metaData["is_image"] = AJXP_Utils::is_image($currentFile);
 						$metaData["file_group"] = @filegroup($currentFile) || "unknown";
 						$metaData["file_owner"] = @fileowner($currentFile) || "unknown";
 						$fPerms = @fileperms($currentFile);
@@ -563,19 +563,19 @@ class fsAccessDriver extends AbstractAccessDriver
 							$fPerms = '0000';
 						}
 						$metaData["file_perms"] = $fPerms;
-						if(Utils::is_image($currentFile))
+						if(AJXP_Utils::is_image($currentFile))
 						{
 							list($width, $height, $type, $attr) = @getimagesize($currentFile);
 							$metaData["image_type"] = image_type_to_mime_type($type);
 							$metaData["image_width"] = $width;
 							$metaData["image_height"] = $height;
 						}
-						$metaData["mimestring"] = Utils::mimetype($currentFile, "type", is_dir($currentFile));
+						$metaData["mimestring"] = AJXP_Utils::mimetype($currentFile, "type", is_dir($currentFile));
 						$datemodif = $this->date_modif($currentFile);
 						$metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
 						$bytesize = @filesize($currentFile) or 0;
 						if($bytesize < 0) $bytesize = sprintf("%u", $bytesize);
-						$metaData["filesize"] = Utils::roundSize($bytesize);
+						$metaData["filesize"] = AJXP_Utils::roundSize($bytesize);
 						$metaData["bytesize"] = $bytesize;
 					}						
 					$attributes = "";
@@ -583,8 +583,8 @@ class fsAccessDriver extends AbstractAccessDriver
 						$attributes .= "$key=\"$value\" ";
 					}
 					AJXP_XMLWriter::renderNode(
-						Utils::xmlEntities($dir."/".$nodeName, true),
-						Utils::xmlEntities($nodeName, true),
+						AJXP_Utils::xmlEntities($dir."/".$nodeName, true),
+						AJXP_Utils::xmlEntities($nodeName, true),
 						is_file($currentFile),
 						$metaData
 					);
@@ -598,7 +598,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						
 						AJXP_XMLWriter::renderNode(
 							"/".$recycleBinOption,
-							Utils::xmlEntities(Utils::xmlEntities($mess[122])),
+							AJXP_Utils::xmlEntities(AJXP_Utils::xmlEntities($mess[122])),
 							false, 
 							array("ajxp_modiftime" 	=> $this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption),
 								  "mimestring" 		=> "Trashcan",
@@ -704,12 +704,12 @@ class fsAccessDriver extends AbstractAccessDriver
 	}
 	
 	function filterNodeName($nodePath, $nodeName, $isLeaf, $lsOptions){
-		if(Utils::isHidden($nodeName) && !$this->driverConf["SHOW_HIDDEN_FILES"]){
+		if(AJXP_Utils::isHidden($nodeName) && !$this->driverConf["SHOW_HIDDEN_FILES"]){
 			return false;
 		}
 		$nodeType = "d";
 		if($isLeaf){
-			if(Utils::isBrowsableArchive($nodeName)) $nodeType = "z";
+			if(AJXP_Utils::isBrowsableArchive($nodeName)) $nodeType = "z";
 			else $nodeType = "f";
 		}		
 		if(!$lsOptions[$nodeType]) return false;
@@ -837,7 +837,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		else if($headerType == "image")
 		{
-			header("Content-Type: ".Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
+			header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
 			header("Content-Length: ".$size);
 			header('Cache-Control: public');
 		}
@@ -953,7 +953,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		while (strlen($file = readdir($handle)) > 0)
 		{
 			if($file != "." && $file !=".." 
-				&& !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])
+				&& !(AJXP_Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])
 				&& !($foldersOnly && is_file($dirName."/".$file)) ){
 				$count++;
 				if($nonEmptyCheckOnly) return 1;
@@ -977,7 +977,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			}
 			$nodeType = "d";
 			if($isLeaf){
-				if(Utils::isBrowsableArchive($nodeName)) {
+				if(AJXP_Utils::isBrowsableArchive($nodeName)) {
 					if($lsOptions["f"] && $lsOptions["z"]){
 						// See archives as files
 						$nodeType = "f";
@@ -1015,7 +1015,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$cursor = 0;
 		while (strlen($file = readdir($handle)) > 0)
 		{
-			if($file!="." && $file!=".." && !(Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"]))
+			if($file!="." && $file!=".." && !(AJXP_Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"]))
 			{
 				if($offset > 0 && $cursor < $offset){
 					$cursor ++;
@@ -1046,11 +1046,11 @@ class fsAccessDriver extends AbstractAccessDriver
 					if($this->filterFile($file)) continue;
 					if(!$dir_only)
 					{
-						if($orderBy=="filename") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
+						if($orderBy=="filename") {$liste_fic[$file]=AJXP_Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 						else if($orderBy=="filesize") {$liste_fic[$file]=$poidsfic;}
 						else if($orderBy=="mod") {$liste_fic[$file]=filemtime("$nom_rep/$file");}
-						else if($orderBy=="filetype") {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
-						else {$liste_fic[$file]=Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
+						else if($orderBy=="filetype") {$liste_fic[$file]=AJXP_Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
+						else {$liste_fic[$file]=AJXP_Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
 					}
 					else if(preg_match("/\.zip$/",$file) && ConfService::zipEnabled()){
 						if(!isSet($liste_zip)) $liste_zip = array();
@@ -1063,14 +1063,14 @@ class fsAccessDriver extends AbstractAccessDriver
 	
 		if(isset($liste_fic) && is_array($liste_fic))
 		{
-			if($orderBy=="filename") {if($orderDir==0){Utils::natksort($liste_fic);}else{Utils::natkrsort($liste_fic);}}
+			if($orderBy=="filename") {if($orderDir==0){AJXP_Utils::natksort($liste_fic);}else{AJXP_Utils::natkrsort($liste_fic);}}
 			else if($orderBy=="mod") {if($orderDir==0){arsort($liste_fic);}else{asort($liste_fic);}}
 			else if($orderBy=="filesize"||$orderBy=="filetype") {if($orderDir==0){asort($liste_fic);}else{arsort($liste_fic);}}
-			else {if($orderDir==0){Utils::natksort($liste_fic);}else{Utils::natkrsort($liste_fic);}}
+			else {if($orderDir==0){AJXP_Utils::natksort($liste_fic);}else{AJXP_Utils::natkrsort($liste_fic);}}
 
 			if($orderBy != "filename"){
 				foreach ($liste_fic as $index=>$value){
-					$liste_fic[$index] = Utils::mimetype($index, "image", false);
+					$liste_fic[$index] = AJXP_Utils::mimetype($index, "image", false);
 				}
 			}
 		}
@@ -1081,7 +1081,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		if(isset($liste_rep) && is_array($liste_rep))
 		{
 			if($orderBy=="mod") {if($orderDir==0){arsort($liste_rep);}else{asort($liste_rep);}}
-			else {if($orderDir==0){Utils::natksort($liste_rep);}else{Utils::natkrsort($liste_rep);}}
+			else {if($orderDir==0){AJXP_Utils::natksort($liste_rep);}else{AJXP_Utils::natkrsort($liste_rep);}}
 			if($orderBy != "filename"){
 				foreach ($liste_rep as $index=>$value){
 					$liste_rep[$index] = $index;
@@ -1090,9 +1090,9 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		else ($liste_rep = array());
 
-		$liste = Utils::mergeArrays($liste_rep,$liste_fic);
+		$liste = AJXP_Utils::mergeArrays($liste_rep,$liste_fic);
 		if(isSet($liste_zip)){
-			$liste = Utils::mergeArrays($liste,$liste_zip);
+			$liste = AJXP_Utils::mergeArrays($liste,$liste_zip);
 		}
 	
 		return $liste;
@@ -1144,7 +1144,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		$nom_fic=basename($filePath);
 		$mess = ConfService::getMessages();
-		$filename_new=Utils::processFileName($filename_new);
+		$filename_new=AJXP_Utils::processFileName($filename_new);
 		$old=$this->getPath()."/$filePath";
 		if(!is_writable($old))
 		{

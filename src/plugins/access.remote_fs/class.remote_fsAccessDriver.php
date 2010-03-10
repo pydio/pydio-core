@@ -147,7 +147,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				{					
 					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
 					if($boxName == "Filedata") $fancyLoader = true;
-					$err = Utils::parseFileDataErrors($boxData, $fancyLoader);
+					$err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
 					if($err != null)
 					{
 						$errorMessage = $err;

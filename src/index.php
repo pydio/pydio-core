@@ -56,11 +56,11 @@ $outputArray = array();
 $testedParams = array();
 $passed = true;
 if(!is_file(TESTS_RESULT_FILE)){
-	$passed = Utils::runTests($outputArray, $testedParams);
+	$passed = AJXP_Utils::runTests($outputArray, $testedParams);
 	if(!$passed && !isset($_GET["ignore_tests"])){
-		die(Utils::testResultsToTable($outputArray, $testedParams));
+		die(AJXP_Utils::testResultsToTable($outputArray, $testedParams));
 	}else{
-		Utils::testResultsToFile($outputArray, $testedParams);
+		AJXP_Utils::testResultsToFile($outputArray, $testedParams);
 	}
 }
 
@@ -144,7 +144,7 @@ if($JS_DEBUG && isSet($_GET["compile"])){
 }
 
 if($JS_DEBUG && isSet($_GET["update_i18n"])){
-	Utils::updateI18nFiles();
+	AJXP_Utils::updateI18nFiles();
 }
 
 $mess = ConfService::getMessages();

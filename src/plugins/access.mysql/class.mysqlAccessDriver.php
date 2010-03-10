@@ -78,7 +78,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
-			$$getName = Utils::securePath($getValue);
+			$$getName = AJXP_Utils::securePath($getValue);
 		}
 		$selection = new UserSelection();
 		$selection->initFromHttpVars($httpVars);
@@ -395,11 +395,11 @@ class mysqlAccessDriver extends AbstractAccessDriver
 						foreach ($row as $key=>$value){
 							if(in_array($key, $blobCols)){
 								$sizeStr = "-NULL";
-								if(strlen($value)) $sizeStr = "-".Utils::roundSize(strlen($sizeStr));
+								if(strlen($value)) $sizeStr = "-".AJXP_Utils::roundSize(strlen($sizeStr));
 								print "$key=\"BLOB$sizeStr\" ";
 							}else{
 								$value = str_replace("\"", "", $value);
-								$value = Utils::xmlEntities($value);
+								$value = AJXP_Utils::xmlEntities($value);
 								print $key.'="'.SystemTextEncoding::toUTF8($value).'" ';
 								if($result["HAS_PK"]>0){
 									if(in_array($key, $result["PK_FIELDS"])){
@@ -459,7 +459,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 			while($rec = mysql_fetch_array($result)){
 				$t+=($rec['Data_length'] + $rec['Index_length']);
 			}
-			$total = Utils::roundSize($t);
+			$total = AJXP_Utils::roundSize($t);
 		}else{
 			$total="Unknown";
 		}

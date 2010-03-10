@@ -40,7 +40,6 @@ require_once("server/classes/class.AJXP_Plugin.php");
 require_once("server/classes/class.AJXP_PluginsService.php");
 require_once("server/classes/class.AbstractDriver.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
-require_once("server/classes/class.AJXP_ClientDriver.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.UserSelection.php");
@@ -164,11 +163,11 @@ $mess = ConfService::getMessages();
 
 foreach($_GET as $getName=>$getValue)
 {
-	$$getName = Utils::securePath($getValue);
+	$$getName = AJXP_Utils::securePath($getValue);
 }
 foreach($_POST as $getName=>$getValue)
 {
-	$$getName = Utils::securePath($getValue);
+	$$getName = AJXP_Utils::securePath($getValue);
 }
 
 $selection = new UserSelection();
@@ -193,16 +192,13 @@ if(AuthService::usersEnabled())
 	}
 }
 
-// Look for the action in the "fixed" drivers : AjxpClient, Auth & Conf
-$ajxpDriver = new AJXP_ClientDriver(ConfService::getRepository());
+// THIS FIRST DRIVERS DO NOT NEED ID CHECK
+$ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
+$ajxpDriver->init(ConfService::getRepository());
 $ajxpDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
 
 $authDriver = ConfService::getAuthDriverImpl();
 $authDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
-
-$confDriver = ConfService::getConfStorageImpl();
-$confDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
-
 
 // TRYING TO GET A DRIVER WHEN NO USER IS LOGGED
 if(AuthService::usersEnabled() && AuthService::getLoggedUser()==null && !ALLOW_GUEST_BROWSING){
@@ -211,6 +207,10 @@ if(AuthService::usersEnabled() && AuthService::getLoggedUser()==null && !ALLOW_G
 	AJXP_XMLWriter::close();
 	exit(1);
 }
+
+// DRIVERS BELOW NEED IDENTIFICATION CHECK
+$confDriver = ConfService::getConfStorageImpl();
+$confDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
 
 // INIT DRIVER
 $Driver = ConfService::getRepositoryDriver();
@@ -255,30 +255,12 @@ if($Driver->hasAction($action)){
 	}
 }
 
-
-AJXP_XMLWriter::header();
-if(isset($logMessage) || isset($errorMessage))
-{
-	AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null));
-}
 if(isset($requireAuth))
 {
+	AJXP_XMLWriter::header();
 	AJXP_XMLWriter::requireAuth();
-}
-if(isset($reload_current_node) && $reload_current_node == "true")
-{
-	AJXP_XMLWriter::reloadCurrentNode();
-}
-if(isset($reload_dest_node) && $reload_dest_node != "")
-{
-	AJXP_XMLWriter::reloadNode($reload_dest_node);
-}
-if(isset($reload_file_list))
-{
-	AJXP_XMLWriter::reloadFileList($reload_file_list);
-}
-AJXP_XMLWriter::close();
-
-
+	AJXP_XMLWriter::close();
+	exit(1);
+}	
 session_write_close();
 ?>
