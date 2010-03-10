@@ -45,7 +45,7 @@ require_once("server/classes/class.Utils.php");
 $outputArray = array();
 $testedParams = array();
 $passed = true;
-$passed = Utils::runTests($outputArray, $testedParams);
-print(Utils::testResultsToTable($outputArray, $testedParams, false));
-Utils::testResultsToFile($outputArray, $testedParams);
+$passed = AJXP_Utils::runTests($outputArray, $testedParams);
+print(AJXP_Utils::testResultsToTable($outputArray, $testedParams, false));
+AJXP_Utils::testResultsToFile($outputArray, $testedParams);
 ?>

@@ -133,8 +133,8 @@ class svnAccessDriver extends AbstractAccessDriver {
 				if(!$this->crtElement["is_file"]){
 					$this->crtElement["filesize"] = "-";
 				}
-				$this->crtElement["mimestring"] = Utils::mimetype($this->crtElement["filename"],"text",!$this->crtElement["is_file"]);
-				$this->crtElement["icon"] = Utils::mimetype($this->crtElement["filename"], "image",!$this->crtElement["is_file"]);
+				$this->crtElement["mimestring"] = AJXP_Utils::mimetype($this->crtElement["filename"],"text",!$this->crtElement["is_file"]);
+				$this->crtElement["icon"] = AJXP_Utils::mimetype($this->crtElement["filename"], "image",!$this->crtElement["is_file"]);
 				$this->crtElement["is_file"] = $this->crtElement["is_file"]?"1":"0";
 				$this->listElements[] = $this->crtElement;
 			}else {
@@ -154,7 +154,7 @@ class svnAccessDriver extends AbstractAccessDriver {
 		}else if($tag == "AUTHOR" && $this->crtListingMode == "file_list"){
 			$this->crtElement["author"] = $this->cdataBuffer;
 		}else if($tag == "SIZE" && $this->crtListingMode == "file_list"){
-			$this->crtElement["filesize"] = Utils::roundSize(intval($this->cdataBuffer));
+			$this->crtElement["filesize"] = AJXP_Utils::roundSize(intval($this->cdataBuffer));
 		}else if($tag == "DATE" && $this->crtListingMode == "file_list"){
 			$date = $this->cdataBuffer;
 			$split = explode("T",$date);
