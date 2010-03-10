@@ -814,7 +814,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
 		session_write_close();
-        global $G_PROBE_REAL_SIZE;
+        $G_PROBE_REAL_SIZE = ConfService::getConf("PROBE_REAL_SIZE");
 
         set_exception_handler(download_exception_handler);
         set_error_handler(download_exception_handler);

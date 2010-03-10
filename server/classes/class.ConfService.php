@@ -33,108 +33,103 @@
  * 
  * Description : Main configurations parsing.
  */
-global $G_DEFAULT_REPOSITORIES;
-
-global $G_LANGUE;
-global $G_AVAILABLE_LANG;
-global $G_MESSAGES;
-global $G_REPOSITORIES;
-global $G_REPOSITORY;
-global $G_USE_HTTPS;
-global $G_WM_EMAIL;
-global $G_MAX_CHAR;
-global $G_UPLOAD_MAX_NUMBER;
-global $G_UPLOAD_MAX_FILE;
-global $G_UPLOAD_MAX_TOTAL;
-global $G_UPLOAD_ENABLE_FLASH;
-
-global $G_ACCESS_DRIVER;
-global $G_CONF_DRIVER;
-global $G_CONF_PLUGINNAME;
-global $G_AUTH_DRIVER;
-global $G_AUTH_DRIVER_DEF;
-global $G_PROBE_REAL_SIZE;
-
 class ConfService
-{
-	function init($confFile)
+{	
+	private static $instance;
+	private $configs = array();
+ 	
+	public static function init($confFile){
+		$inst = self::getInstance();
+		$inst->initInst($confFile);
+	}
+	
+	public function initInst($confFile)
 	{
 		include($confFile);
 		// INIT AS GLOBAL
-		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS, 
-               $G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, 
-               $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_ENABLE_FLASH,
-               $G_DEFAULT_REPOSITORIES, $G_AUTH_DRIVER_DEF, $G_CONF_PLUGINNAME, $G_PROBE_REAL_SIZE;
 		if(!isset($langue) || $langue=="") {$langue=$default_language;}
-		$G_LANGUE = $langue;
+		$this->configs["LANGUE"] = $langue;
 		if(isSet($available_languages)){
-			$G_AVAILABLE_LANG = $available_languages;
+			$this->configs["AVAILABLE_LANG"] = $available_languages;
 		}else{
-			$G_AVAILABLE_LANG = ConfService::listAvailableLanguages();
+			$this->configs["AVAILABLE_LANG"] = self::listAvailableLanguages();
 		}
-		$G_USE_HTTPS = $use_https;
-		$G_WM_EMAIL = $webmaster_email;
-		$G_MAX_CHAR = $max_caracteres;
-		$G_UPLOAD_MAX_NUMBER = $upload_max_number;
-		$G_UPLOAD_ENABLE_FLASH = $upload_enable_flash;
-		$G_UPLOAD_MAX_FILE = Utils::convertBytes($upload_max_size_per_file);
-		$G_UPLOAD_MAX_TOTAL = Utils::convertBytes($upload_max_size_total);
-		$G_DEFAULT_REPOSITORIES = $REPOSITORIES;
-		$G_AUTH_DRIVER_DEF = $AUTH_DRIVER;
-        $G_CONF_PLUGINNAME = $CONF_STORAGE["NAME"];
-        $G_PROBE_REAL_SIZE = $allowRealSizeProbing;
-		ConfService::initConfStorageImpl($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
-		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
-		ConfService::switchRootDir();
+		$this->configs["USE_HTTPS"] = $use_https;
+		$this->configs["WM_EMAIL"] = $webmaster_email;
+		$this->configs["MAX_CHAR"] = $max_caracteres;
+		$this->configs["UPLOAD_MAX_NUMBER"] = $upload_max_number;
+		$this->configs["UPLOAD_ENABLE_FLASH"] = $upload_enable_flash;
+		$this->configs["UPLOAD_MAX_FILE"] = Utils::convertBytes($upload_max_size_per_file);
+		$this->configs["UPLOAD_MAX_TOTAL"] = Utils::convertBytes($upload_max_size_total);
+		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
+		$this->configs["AUTH_DRIVER_DEF"] = $AUTH_DRIVER;
+        $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];
+        $this->configs["PROBE_REAL_SIZE"] = $allowRealSizeProbing;
+		$this->initConfStorageImplInst($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
+		$this->configs["REPOSITORIES"] = $this->initRepositoriesListInst($this->configs["DEFAULT_REPOSITORIES"]);
+		$this->switchRootDirInst();
 	}
 	
-	function initConfStorageImpl($name, $options){
-		global $G_CONF_STORAGE_DRIVER;
-		$G_CONF_STORAGE_DRIVER = AJXP_PluginsService::findPlugin("conf", $name);		
-		$G_CONF_STORAGE_DRIVER->init($options);
+	public static function initConfStorageImpl($name, $options){
+		$inst = self::getInstance();
+		$inst->initConfStorageImplInst($name, $options);
+	}
+	public function initConfStorageImplInst($name, $options){
+		$this->configs["CONF_STORAGE_DRIVER"] = AJXP_PluginsService::findPlugin("conf", $name);		
+		$this->configs["CONF_STORAGE_DRIVER"]->init($options);
 	}
 	
+
+	public static function getConfStorageImpl(){
+		$inst = self::getInstance();
+		return $inst->getConfStorageImplInst();
+	}
 	/**
 	 * Returns the current conf storage driver
 	 * @return AbstractConfDriver
 	 */
-	function getConfStorageImpl(){
-		global $G_CONF_STORAGE_DRIVER;
-		return $G_CONF_STORAGE_DRIVER;
+	public function getConfStorageImplInst(){
+		return $this->configs["CONF_STORAGE_DRIVER"];
 	}
 
-	function initAuthDriverImpl(){		
-		global $G_AUTH_DRIVER_DEF, $G_AUTH_DRIVER;
-		$name = $G_AUTH_DRIVER_DEF["NAME"];
-		$options = $G_AUTH_DRIVER_DEF["OPTIONS"];
-		$G_AUTH_DRIVER = AJXP_PluginsService::findPlugin("auth", $name);
-		$G_AUTH_DRIVER->init($options);
+	public static function initAuthDriverImpl(){
+		self::getInstance()->initAuthDriverImplInst();
+	}
+	public function initAuthDriverImplInst(){		
+		$options = $this->configs["AUTH_DRIVER_DEF"];
+		$this->configs["AUTH_DRIVER"] = AJXP_PluginsService::findPlugin("auth", $options["NAME"]);
+		$this->configs["AUTH_DRIVER"]->init($options["OPTIONS"]);
 	}
 	
+	public static function getAuthDriverImpl(){
+		return self::getInstance()->getAuthDriverImplInst();
+	}
 	/**
 	 * Returns the current Aithentication driver
 	 * @return AbstractAuthDriver
 	 */
-	function getAuthDriverImpl(){
-		global $G_AUTH_DRIVER;
-		if($G_AUTH_DRIVER == null){			
-			ConfService::initAuthDriverImpl();
+	public function getAuthDriverImplInst(){
+		if(!isSet($this->configs["AUTH_DRIVER"])){			
+			$this->initAuthDriverImplInst();
 		}
-		return $G_AUTH_DRIVER;
+		return $this->configs["AUTH_DRIVER"];
 	}
 
-	function switchRootDir($rootDirIndex=-1, $temporary=false)
+	public static function switchRootDir($rootDirIndex = -1, $temporary = false){
+		self::getInstance()->switchRootDirInst($rootDirIndex, $temporary);
+	}
+	
+	public function switchRootDirInst($rootDirIndex=-1, $temporary=false)
 	{
-		global $G_REPOSITORY, $G_REPOSITORIES, $G_ACCESS_DRIVER;
 		if($rootDirIndex == -1){
-			if(isSet($_SESSION['REPO_ID']) && array_key_exists($_SESSION['REPO_ID'], $G_REPOSITORIES))
+			if(isSet($_SESSION['REPO_ID']) && array_key_exists($_SESSION['REPO_ID'], $this->configs["REPOSITORIES"]))
 			{			
-				$G_REPOSITORY = $G_REPOSITORIES[$_SESSION['REPO_ID']];
+				$this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']];
 			}
 			else 
 			{
-				$keys = array_keys($G_REPOSITORIES);
-				$G_REPOSITORY = $G_REPOSITORIES[$keys[0]];
+				$keys = array_keys($this->configs["REPOSITORIES"]);
+				$this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$keys[0]];
 				$_SESSION['REPO_ID'] = $keys[0];
 			}
 		}
@@ -144,13 +139,13 @@ class ConfService
 				$crtId = $_SESSION['REPO_ID'];
 				register_shutdown_function(array("ConfService","switchRootDir"), $crtId);
 			}
-			$G_REPOSITORY = $G_REPOSITORIES[$rootDirIndex];			
+			$this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$rootDirIndex];			
 			$_SESSION['REPO_ID'] = $rootDirIndex;
-			if(isSet($G_ACCESS_DRIVER)) unset($G_ACCESS_DRIVER);
+			if(isSet($this->configs["ACCESS_DRIVER"])) unset($this->configs["ACCESS_DRIVER"]);
 		}
 		
-		if(isSet($G_REPOSITORY) && $G_REPOSITORY->getOption("CHARSET")!=""){
-			$_SESSION["AJXP_CHARSET"] = $G_REPOSITORY->getOption("CHARSET");
+		if(isSet($this->configs["REPOSITORY"]) && $this->configs["REPOSITORY"]->getOption("CHARSET")!=""){
+			$_SESSION["AJXP_CHARSET"] = $this->configs["REPOSITORY"]->getOption("CHARSET");
 		}else{
 			if(isSet($_SESSION["AJXP_CHARSET"])){
 				unset($_SESSION["AJXP_CHARSET"]);
@@ -166,40 +161,43 @@ class ConfService
 		
 	}
 		
-	function getRepositoriesList()
+	public static function getRepositoriesList(){
+		return self::getInstance()->getRepositoriesListInst();
+	}
+	
+	public function getRepositoriesListInst()
 	{
-		global $G_REPOSITORIES;
-        
-		return $G_REPOSITORIES;
+		return $this->configs["REPOSITORIES"];
 	}
 	
 	/**
 	 * Deprecated, use getRepositoriesList instead.
-	 *
 	 * @return Array
 	 */
-	function getRootDirsList()
-	{
-		global $G_REPOSITORIES;
-		return $G_REPOSITORIES;
+	public static function getRootDirsList(){
+		return self::getInstance()->getRepositoriesListInst();
 	}
 	
-	function getCurrentRootDirIndex()
+	public static function getCurrentRootDirIndex(){
+		return self::getInstance()->getCurrentRootDirIndexInst();
+	}
+	public function getCurrentRootDirIndexInst()
 	{
-		global $G_REPOSITORIES;
-		if(isSet($_SESSION['REPO_ID']) &&  isSet($G_REPOSITORIES[$_SESSION['REPO_ID']]))
+		if(isSet($_SESSION['REPO_ID']) &&  isSet($this->configs["REPOSITORIES"][$_SESSION['REPO_ID']]))
 		{
 			return $_SESSION['REPO_ID'];
 		}
-		$keys = array_keys($G_REPOSITORIES);
+		$keys = array_keys($this->configs["REPOSITORIES"]);
 		return $keys[0];
 	}
 	
-	function getCurrentRootDirDisplay()
+	public static function getCurrentRootDirDisplay(){
+		return self::getInstance()->getCurrentRootDirDisplayInst();
+	}
+	public function getCurrentRootDirDisplayInst()
 	{
-		global $G_REPOSITORIES;
-		if(isSet($G_REPOSITORIES[$_SESSION['REPO_ID']])){
-			$repo = $G_REPOSITORIES[$_SESSION['REPO_ID']];
+		if(isSet($this->configs["REPOSITORIES"][$_SESSION['REPO_ID']])){
+			$repo = $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']];
 			return $repo->getDisplay();
 		}
 		return "";
@@ -209,18 +207,21 @@ class ConfService
 	 * @param array $repositories
 	 * @return array
 	 */
-	function initRepositoriesList($defaultRepositories)
+	public static function initRepositoriesList($defaultRepositories){
+		return self::getInstance()->initRepositoriesListInst($defaultRepositories);
+	}
+	public function initRepositoriesListInst($defaultRepositories)
 	{
 		// APPEND CONF FILE REPOSITORIES
 		$objList = array();
 		foreach($defaultRepositories as $index=>$repository)
 		{
-			$repo = ConfService::createRepositoryFromArray($index, $repository);
+			$repo = self::createRepositoryFromArray($index, $repository);
 			$repo->setWriteable(false);
 			$objList[$repo->getId()] = $repo;
 		}
 		// LOAD FROM DRIVER
-		$confDriver = ConfService::getConfStorageImpl();
+		$confDriver = self::getConfStorageImpl();
 		$drvList = $confDriver->listRepositories();
 		if(is_array($drvList)){
 			foreach ($drvList as $repoId=>$repoObject){
@@ -232,10 +233,12 @@ class ConfService
 		return $objList;
 	}
 	
-	function detectRepositoryStreams($register = false){
-		global $G_REPOSITORIES;
+	public static function detectRepositoryStreams($register = false){
+		return self::getInstance()->detectRepositoryStreamsInst($register);
+	}
+	public function detectRepositoryStreamsInst($register = false){
 		$streams = array();
-		foreach ($G_REPOSITORIES as $repository) {
+		foreach ($this->configs["REPOSITORIES"] as $repository) {
 			$repository->detectStreamWrapper($register, $streams);
 		}
 		return $streams;
@@ -248,7 +251,10 @@ class ConfService
 	 * @param Array $repository
 	 * @return Repository
 	 */
-	function createRepositoryFromArray($index, $repository){
+	public static function createRepositoryFromArray($index, $repository){
+		return self::getInstance()->createRepositoryFromArrayInst($index, $repository);
+	}
+	public function createRepositoryFromArrayInst($index, $repository){
 		$repo = new Repository($index, $repository["DISPLAY"], $repository["DRIVER"]);
 		if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
 			foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
@@ -270,15 +276,17 @@ class ConfService
 	 * @param Repository $oRepository
 	 * @return -1 if error
 	 */
-	function addRepository($oRepository){
-		$confStorage = ConfService::getConfStorageImpl();
+	public static function addRepository($oRepository){
+		return self::getInstance()->addRepositoryInst($oRepository);
+	}
+	public function addRepositoryInst($oRepository){
+		$confStorage = $this->getConfStorageImplInst();
 		$res = $confStorage->saveRepository($oRepository);		
 		if($res == -1){
 			return $res;
 		}
 		AJXP_Logger::logAction("Create Repository", array("repo_name"=>$oRepository->getDisplay()));
-		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
-		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);
+		$this->configs["REPOSITORIES"] = self::initRepositoriesList($this->configs["DEFAULT_REPOSITORIES"]);
 	}
 	
 	/**
@@ -287,10 +295,12 @@ class ConfService
 	 * @param String $repoId
 	 * @return Repository
 	 */
-	function getRepositoryById($repoId){
-		global $G_REPOSITORIES;
-		if(isSet($G_REPOSITORIES[$repoId])){ 
-			return $G_REPOSITORIES[$repoId];
+	public static function getRepositoryById($repoId){
+		return self::getInstance()->getRepositoryByIdInst($repoId);
+	}
+	public function getRepositoryByIdInst($repoId){
+		if(isSet($this->configs["REPOSITORIES"][$repoId])){ 
+			return $this->configs["REPOSITORIES"][$repoId];
 		}
 	}
 	
@@ -301,41 +311,47 @@ class ConfService
 	 * @param Repository $oRepositoryObject
 	 * @return mixed
 	 */
-	function replaceRepository($oldId, $oRepositoryObject){
-		$confStorage = ConfService::getConfStorageImpl();
+	public static function replaceRepository($oldId, $oRepositoryObject){
+		return self::getInstance()->replaceRepositoryInst($oldId, $oRepositoryObject);
+	}
+	public function replaceRepositoryInst($oldId, $oRepositoryObject){
+		$confStorage = self::getConfStorageImpl();
 		$res = $confStorage->saveRepository($oRepositoryObject, true);
 		if($res == -1){
 			return $res;
 		}
-		AJXP_Logger::logAction("Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
-		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
-		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);				
+		AJXP_Logger::logAction("Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));		
+		$this->configs["REPOSITORIES"] = self::initRepositoriesList($this->configs["DEFAULT_REPOSITORIES"]);				
 	}
 	
-	function deleteRepository($repoId){
-		$confStorage = ConfService::getConfStorageImpl();
+	public static function deleteRepository($repoId){
+		return self::getInstance()->deleteRepositoryInst($repoId);
+	}
+	public function deleteRepositoryInst($repoId){
+		$confStorage = self::getConfStorageImpl();
 		$res = $confStorage->deleteRepository($repoId);
 		if($res == -1){
 			return $res;
 		}				
-		global $G_DEFAULT_REPOSITORIES, $G_REPOSITORIES;
 		AJXP_Logger::logAction("Delete Repository", array("repo_id"=>$repoId));
-		$G_REPOSITORIES = ConfService::initRepositoriesList($G_DEFAULT_REPOSITORIES);		
+		$this->configs["REPOSITORIES"] = self::initRepositoriesList($this->configs["DEFAULT_REPOSITORIES"]);				
 	}
 		
-	function zipEnabled()
+	public function zipEnabled()
 	{
 		return (function_exists("gzopen")?true:false);		
 	}
 	
-	function getMessages()
+	public static function getMessages(){
+		return self::getInstance()->getMessagesInst();
+	}
+	public function getMessagesInst()
 	{
-		global $G_MESSAGES, $G_LANGUE;		
-		if(!isset($G_MESSAGES))
+		if(!isset($this->configs["MESSAGES"]))
 		{			
-			require(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/${G_LANGUE}.php");
-			$G_MESSAGES = $mess;
-			$xml = ConfService::availableDriversToXML("i18n");
+			require(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/".$this->configs["LANGUE"].".php");
+			$this->configs["MESSAGES"] = $mess;
+			$xml = self::availableDriversToXML("i18n");
 			$results = array();
 			preg_match_all("<i18n [^\>]*\/>", $xml, $results);			
 			$libs = array();
@@ -358,23 +374,23 @@ class ConfService
 			}
 			//print_r($libs);
 			foreach ($libs as $nameSpace => $path){
-				$lang = $G_LANGUE;
-				if(!is_file($path."/".$G_LANGUE.".php")){
+				$lang = $this->configs["LANGUE"];
+				if(!is_file($path."/".$this->configs["LANGUE"].".php")){
 					$lang = "en"; // Default language, minimum required.
 				}
 				if(is_file($path."/".$lang.".php")){
 					require($path."/".$lang.".php");					
 					foreach ($mess as $key => $message){
-						$G_MESSAGES[$nameSpace.".".$key] = $message;
+						$this->configs["MESSAGES"][$nameSpace.".".$key] = $message;
 					}
 				}
 			}
 		}
 		
-		return $G_MESSAGES;
+		return $this->configs["MESSAGES"];
 	}
 	
-	function listAvailableLanguages(){
+	public static function listAvailableLanguages(){
 		// Cache in session!
 		if(isSet($_SESSION["AJXP_LANGUAGES"]) && !isSet($_GET["refresh_langs"])){
 			return $_SESSION["AJXP_LANGUAGES"];
@@ -399,38 +415,45 @@ class ConfService
 		return $languages;
 	}
 
-	function getConf($varName)	
+	public static function getConf($varName){
+		return self::getInstance()->getConfInst($varName);
+	}
+	public function getConfInst($varName)	
 	{
-		global $G_LANGUE,$G_AVAILABLE_LANG,$G_MESSAGES,$G_USE_HTTPS,$G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_TOTAL, $G_UPLOAD_MAX_FILE, $G_UPLOAD_ENABLE_FLASH;
-		$globVarName = "G_".$varName;
-		return $$globVarName;
+		if(isSet($this->configs[$varName])){
+			return $this->configs[$varName];
+		}
+		return null;
 	}
 	
-	function setLanguage($lang)
+	public static function setLanguage($lang){
+		return self::getInstance()->setLanguageInst($lang);
+	}
+	public function setLanguageInst($lang)
 	{
-		global $G_LANGUE, $G_AVAILABLE_LANG;
-		if(array_key_exists($lang, $G_AVAILABLE_LANG))
+		if(array_key_exists($lang, $this->configs["AVAILABLE_LANG"]))
 		{
-			$G_LANGUE = $lang;
+			$this->configs["LANGUE"] = $lang;
 		}
 	}
 	
-	function getLanguage()
-	{
-		global $G_LANGUE;
-		return $G_LANGUE;
+	public static function getLanguage()
+	{		
+		return self::getInstance()->getConfInst("LANGUE");
 	}
 		
 	/**
 	 * @return Repository
 	 */
-	function getRepository()
+	public static function getRepository(){
+		return self::getInstance()->getRepositoryInst();
+	}
+	public function getRepositoryInst()
 	{
-		global $G_REPOSITORY, $G_REPOSITORIES;
-		if(isSet($_SESSION['REPO_ID']) && isSet($G_REPOSITORIES[$_SESSION['REPO_ID']])){
-			return $G_REPOSITORIES[$_SESSION['REPO_ID']];
+		if(isSet($_SESSION['REPO_ID']) && isSet($this->configs["REPOSITORIES"][$_SESSION['REPO_ID']])){
+			return $this->configs["REPOSITORIES"][$_SESSION['REPO_ID']];
 		}
-		return $G_REPOSITORY;
+		return $this->configs["REPOSITORY"];
 	}
 	
 	/**
@@ -438,27 +461,29 @@ class ConfService
 	 *
 	 * @return AbstractDriver
 	 */
-	function getRepositoryDriver()
+	public static function getRepositoryDriver(){
+		return self::getInstance()->getRepositoryDriverInst();
+	}
+	public function getRepositoryDriverInst()
 	{
-		global $G_ACCESS_DRIVER;
-		if(isSet($G_ACCESS_DRIVER) && is_a($G_ACCESS_DRIVER, "AbstractDriver")){			
-			return $G_ACCESS_DRIVER;
+		if(isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractDriver")){			
+			return $this->configs["ACCESS_DRIVER"];
 		}
-        ConfService::switchRootDir();
-		$crtRepository = ConfService::getRepository();
+        $this->switchRootDirInst();
+		$crtRepository = $this->getRepositoryInst();
 		$accessType = $crtRepository->getAccessType();
 		$pServ = AJXP_PluginsService::getInstance();
-		$G_ACCESS_DRIVER = $pServ->getPluginByTypeName("access", $accessType);
-		$G_ACCESS_DRIVER->init($crtRepository);
-		$res = $G_ACCESS_DRIVER->initRepository();
+		$this->configs["ACCESS_DRIVER"] = $pServ->getPluginByTypeName("access", $accessType);
+		$this->configs["ACCESS_DRIVER"]->init($crtRepository);
+		$res = $this->configs["ACCESS_DRIVER"]->initRepository();
 		if($res!=null && is_a($res, "AJXP_Exception")){
-			$G_ACCESS_DRIVER = null;
+			unset($this->configs["ACCESS_DRIVER"]);
 			return $res;
 		}				
-		return $G_ACCESS_DRIVER;
+		return $this->configs["ACCESS_DRIVER"];
 	}
 	
-	function availableDriversToXML($filterByTagName = "", $filterByDriverName=""){
+	public static function availableDriversToXML($filterByTagName = "", $filterByDriverName=""){
 		$manifests = array();
 		$base = INSTALL_PATH."/plugins";
 		$xmlString = "";
@@ -490,8 +515,24 @@ class ConfService
 		}
 		return str_replace("\t", "", str_replace("\n", "", $xmlString));
 	}
-		
+
+ 	/**
+ 	 * Singleton method
+ 	 *
+ 	 * @return ConfService the service instance
+ 	 */
+ 	public static function getInstance()
+ 	{
+ 		if(!isSet(self::$instance)){
+ 			$c = __CLASS__;
+ 			self::$instance = new $c;
+ 		}
+ 		return self::$instance;
+ 	}
+ 	private function __construct(){}
+	public function __clone(){
+        trigger_error("Cannot clone me, i'm a singleton!", E_USER_ERROR);
+    } 	
+	
 }
-
-
 ?>
