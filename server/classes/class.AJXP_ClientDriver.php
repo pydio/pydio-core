@@ -72,33 +72,6 @@ class AJXP_ClientDriver extends AbstractDriver
 		
 		switch ($action){			
 			//------------------------------------
-			//	SWITCH THE ROOT REPOSITORY
-			//------------------------------------	
-			case "switch_root_dir":
-			
-				if(!isSet($root_dir_index))
-				{
-					break;
-				}
-				$dirList = ConfService::getRootDirsList();
-				if(!isSet($dirList[$root_dir_index]))
-				{
-					$errorMessage = "Trying to switch to an unkown folder!";
-					break;
-				}
-				ConfService::switchRootDir($root_dir_index);
-				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
-					$user = AuthService::getLoggedUser();
-					$activeRepId = ConfService::getCurrentRootDirIndex();
-					$user->setArrayPref("history", "last_repository", $activeRepId);
-					$user->save();
-				}
-				$logMessage = "Successfully Switched!";
-				AJXP_Logger::logAction("Switch Repository", array("rep. id"=>$root_dir_index));
-				
-			break;	
-						
-			//------------------------------------
 			//	GET AN HTML TEMPLATE
 			//------------------------------------
 			case "get_template":
@@ -135,95 +108,7 @@ class AJXP_ClientDriver extends AbstractDriver
 				exit(0);
 					
 			break;
-			
-			//------------------------------------
-			//	BOOKMARK BAR
-			//------------------------------------
-			case "get_bookmarks":
-				
-				$bmUser = null;
-				if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-				{
-					$bmUser = AuthService::getLoggedUser();
-				}
-				else if(!AuthService::usersEnabled())
-				{
-					$confStorage = ConfService::getConfStorageImpl();
-					$bmUser = $confStorage->createUserObject("shared");
-				}
-				if($bmUser == null) exit(1);
-				if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
-				{
-					if($_GET["bm_action"] == "add_bookmark")
-					{
-						$title = "";
-						if(isSet($_GET["title"])) $title = $_GET["title"];
-						if($title == "" && $_GET["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
-						$bmUser->addBookMark($_GET["bm_path"], $title);
-					}
-					else if($_GET["bm_action"] == "delete_bookmark")
-					{
-						$bmUser->removeBookmark($_GET["bm_path"]);
-					}
-					else if($_GET["bm_action"] == "rename_bookmark" && isset($_GET["bm_title"]))
-					{
-						$bmUser->renameBookmark($_GET["bm_path"], $_GET["bm_title"]);
-					}
-				}
-				if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
-				{
-					$bmUser->save();
-					AuthService::updateUser($bmUser);
-				}
-				else if(!AuthService::usersEnabled())
-				{
-					$bmUser->save();
-				}		
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks());
-				AJXP_XMLWriter::close();
-				exit(1);
-			
-			break;
-					
-			//------------------------------------
-			//	SAVE USER PREFERENCE
-			//------------------------------------
-			case "save_user_pref":
-				
-				$userObject = AuthService::getLoggedUser();
-				if($userObject == null) exit(1);
-				$i = 0;
-				while(isSet($_GET["pref_name_".$i]) && isSet($_GET["pref_value_".$i]))
-				{
-					$prefName = $_GET["pref_name_".$i];
-					$prefValue = stripslashes($_GET["pref_value_".$i]);
-					if($prefName != "password")
-					{
-						$userObject->setPref($prefName, $prefValue);
-						$userObject->save();
-						AuthService::updateUser($userObject);
-						setcookie("AJXP_$prefName", $prefValue);
-					}
-					else
-					{
-						if(isSet($_GET["crt"]) && AuthService::checkPassword($userObject->getId(), $_GET["crt"], false, $_GET["pass_seed"])){
-							AuthService::updatePassword($userObject->getId(), $prefValue);
-						}else{
-							//$errorMessage = "Wrong password!";
-							header("Content-Type:text/plain");
-							print "PASS_ERROR";
-							exit(1);
-						}
-					}
-					$i++;
-				}
-				header("Content-Type:text/plain");
-				print "SUCCESS";
-				exit(1);
-				
-			break;
-			
+						
 			//------------------------------------
 			//	DISPLAY DOC
 			//------------------------------------
