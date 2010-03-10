@@ -33,7 +33,7 @@
  * 
  * Description : various utils methods.
  */
-class Utils
+class AJXP_Utils
 {
 	
 	/**

@@ -131,7 +131,7 @@ class AbstractConfDriver extends AbstractDriver {
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
-			$$getName = Utils::securePath($getValue);
+			$$getName = AJXP_Utils::securePath($getValue);
 		}
 		if(isSet($dir) && $action != "upload") $dir = SystemTextEncoding::fromUTF8($dir);
 		$mess = ConfService::getMessages();

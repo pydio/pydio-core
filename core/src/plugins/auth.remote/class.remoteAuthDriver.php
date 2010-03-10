@@ -75,7 +75,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	}
 			
 	function listUsers(){
-		return Utils::loadSerialFile($this->usersSerFile);
+		return AJXP_Utils::loadSerialFile($this->usersSerFile);
 	}
 	
 	function userExists($login){
@@ -115,7 +115,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		}else{
 			$users[$login] = md5($passwd);
 		}
-		Utils::saveSerialFile($this->usersSerFile, $users);		
+		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);		
 	}	
 	function changePassword($login, $newPass){
 		$users = $this->listUsers();
@@ -125,14 +125,14 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		}else{
 			$users[$login] = md5($newPass);
 		}
-		Utils::saveSerialFile($this->usersSerFile, $users);
+		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
 	}	
 	function deleteUser($login){
 		$users = $this->listUsers();
 		if(is_array($users) && array_key_exists($login, $users))
 		{
 			unset($users[$login]);
-			Utils::saveSerialFile($this->usersSerFile, $users);
+			AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
 		}		
 	}
 

@@ -59,8 +59,8 @@ class ConfService
 		$this->configs["MAX_CHAR"] = $max_caracteres;
 		$this->configs["UPLOAD_MAX_NUMBER"] = $upload_max_number;
 		$this->configs["UPLOAD_ENABLE_FLASH"] = $upload_enable_flash;
-		$this->configs["UPLOAD_MAX_FILE"] = Utils::convertBytes($upload_max_size_per_file);
-		$this->configs["UPLOAD_MAX_TOTAL"] = Utils::convertBytes($upload_max_size_total);
+		$this->configs["UPLOAD_MAX_FILE"] = AJXP_Utils::convertBytes($upload_max_size_per_file);
+		$this->configs["UPLOAD_MAX_TOTAL"] = AJXP_Utils::convertBytes($upload_max_size_total);
 		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
 		$this->configs["AUTH_DRIVER_DEF"] = $AUTH_DRIVER;
         $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];

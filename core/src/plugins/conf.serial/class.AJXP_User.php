@@ -140,9 +140,9 @@ class AJXP_User extends AbstractAjxpUser
 	
 	function load(){
 		$serialDir = $this->storage->getOption("USERS_DIRPATH");
-		$this->rights = Utils::loadSerialFile($serialDir."/".$this->getId()."/rights.ser");
-		$this->prefs = Utils::loadSerialFile($serialDir."/".$this->getId()."/prefs.ser");
-		$this->bookmarks = Utils::loadSerialFile($serialDir."/".$this->getId()."/bookmarks.ser");
+		$this->rights = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/rights.ser");
+		$this->prefs = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/prefs.ser");
+		$this->bookmarks = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/bookmarks.ser");
 		if(isSet($this->rights["ajxp.admin"]) && $this->rights["ajxp.admin"] === true){
 			$this->setAdmin(true);
 		}
@@ -155,17 +155,17 @@ class AJXP_User extends AbstractAjxpUser
 		}else{
 			$this->rights["ajxp.admin"] = false;
 		}
-		Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights);
-		Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs);
-		Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks);		
+		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights);
+		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs);
+		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks);		
 	}	
 	
 	function getTemporaryData($key){
-		return Utils::loadSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser");
+		return AJXP_Utils::loadSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser");
 	}
 	
 	function saveTemporaryData($key, $value){
-		return Utils::saveSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser", $value);
+		return AJXP_Utils::saveSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser", $value);
 	}
 	
 	/**

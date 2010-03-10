@@ -104,7 +104,7 @@ class sshAccessDriver extends AbstractAccessDriver
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
-			$$getName = Utils::securePath(SystemTextEncoding::magicDequote($getValue));
+			$$getName = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($getValue));
 		}
 		$selection = new UserSelection();
 		$selection->initFromHttpVars($httpVars);
@@ -298,7 +298,7 @@ class sshAccessDriver extends AbstractAccessDriver
 			case "mkdir";
 			        
 				$messtmp="";
-				$dirname=Utils::processFileName($dirname);
+				$dirname=AJXP_Utils::processFileName($dirname);
 				$error = $this->SSHOperation->createRemoteDirectory($this->makeName($dir."/".$dirname));
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -318,7 +318,7 @@ class sshAccessDriver extends AbstractAccessDriver
 			case "mkfile";
 			
 				$messtmp="";
-				$filename=Utils::processFileName($filename);	
+				$filename=AJXP_Utils::processFileName($filename);	
 				$error = $this->SSHOperation->setRemoteContent($this->makeName($dir."/".$filename), "");
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -352,14 +352,14 @@ class sshAccessDriver extends AbstractAccessDriver
                 {
                     if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_") continue;
                     if($boxName == "Filedata") $fancyLoader = true;
-                    $err = Utils::parseFileDataErrors($boxData, $fancyLoader);
+                    $err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
                     if($err != null)
                     {
                         $errorMessage = $err;
                         break;
                     }
                     $userfile_name = $boxData["name"];
-                    $userfile_name=Utils::processFileName($userfile_name);
+                    $userfile_name=AJXP_Utils::processFileName($userfile_name);
                     if (!$this->SSHOperation->uploadFile($boxData["tmp_name"], $this->makeName($destination."/".$userfile_name)))
                     {
                         $errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
@@ -424,12 +424,12 @@ class sshAccessDriver extends AbstractAccessDriver
 				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
 					$metaData["ajxp_mime"] = "ajxp_recycle";
 				}
-				AJXP_XMLWriter::renderHeaderNode(Utils::xmlEntities($dir, true), Utils::xmlEntities(basename($dir), true), false, $metaData);
+				AJXP_XMLWriter::renderHeaderNode(AJXP_Utils::xmlEntities($dir, true), AJXP_Utils::xmlEntities(basename($dir), true), false, $metaData);
                 foreach ($result as $file)
                 {
                     $attributes = "";
                     $fileName = SystemTextEncoding::toUTF8($file["name"]);
-                    $icon = Utils::mimetype($fileName, "image", $file["isDir"]==1);
+                    $icon = AJXP_Utils::mimetype($fileName, "image", $file["isDir"]==1);
                     if ($searchMode)
                     {
                         if($file["isDir"] == 0) { $attributes = "is_file=\"true\" icon=\"".SystemTextEncoding::toUTF8($icon)."\""; }
@@ -437,10 +437,10 @@ class sshAccessDriver extends AbstractAccessDriver
                     {
                         $atts = array();
                         $atts[] = "is_file=\"".(1 - $file["isDir"])."\"";
-                        $atts[] = "is_image=\"".Utils::is_image($fileName)."\"";
-                        $atts[] = "mimestring=\"".Utils::mimetype($fileName, "type", $file["isDir"]==1)."\"";
+                        $atts[] = "is_image=\"".AJXP_Utils::is_image($fileName)."\"";
+                        $atts[] = "mimestring=\"".AJXP_Utils::mimetype($fileName, "type", $file["isDir"]==1)."\"";
                         $atts[] = "ajxp_modiftime=\"".$this->dateModif($file["time"])."\"";
-                        $atts[] = "filesize=\"".Utils::roundSize($file["size"])."\"";
+                        $atts[] = "filesize=\"".AJXP_Utils::roundSize($file["size"])."\"";
                         $atts[] = "bytesize=\"".$file["size"]."\"";
                         $atts[] = "filename=\"".str_replace("&", "&amp;", $dir."/".$fileName)."\"";
                         $atts[] = "icon=\"".($file["isDir"]==1 ? "folder.png" : SystemTextEncoding::toUTF8($icon))."\"";
@@ -603,7 +603,7 @@ class sshAccessDriver extends AbstractAccessDriver
 		}
 		else if($headerType == "image")
 		{
-			header("Content-Type: ".Utils::getImageMimeType(basename($fileName))."; name=\"".basename($fileName)."\"");
+			header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($fileName))."; name=\"".basename($fileName)."\"");
 			header("Content-Length: ".$size);
 			header('Cache-Control: public');			
 		}
@@ -645,7 +645,7 @@ class sshAccessDriver extends AbstractAccessDriver
 		}
 		else if($headerType == "image")
 		{
-			header("Content-Type: ".Utils::getImageMimeType(basename($fileName))."; name=\"".basename($fileName)."\"");
+			header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($fileName))."; name=\"".basename($fileName)."\"");
 			header('Cache-Control: public');			
 		}
 		else if($headerType == "mp3")

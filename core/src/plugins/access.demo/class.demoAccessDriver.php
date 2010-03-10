@@ -55,7 +55,7 @@ class demoAccessDriver extends fsAccessDriver
 				}
 				else 
 				{
-					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8(Utils::securePath($_GET["file"])), "plain");
+					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($_GET["file"])), "plain");
 				}
 				exit(0);
 			break;

@@ -36,9 +36,10 @@
 class AJXP_ClientDriver extends AbstractDriver 
 {
 	
-	function AJXP_ClientDriver($repository) {
+	function init($repository) {
 		//parent::AbstractDriver("ajxp_actions");
-		$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/ajxpclient_actions.xml");
+		//$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/ajxpclient_actions.xml");
+		$this->loadActionsFromManifest();
 		unset($this->actions["get_driver_actions"]);
 		unset($this->actions["get_driver_info_panels"]);
 		$this->actions["get_ajxp_actions"] = array();
@@ -65,7 +66,7 @@ class AJXP_ClientDriver extends AbstractDriver
 		if(!isSet($this->actions[$action])) return;
 		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
-			$$getName = Utils::securePath($getValue);
+			$$getName = AJXP_Utils::securePath($getValue);
 		}
 		if(isSet($dir) && $action != "upload") $dir = SystemTextEncoding::fromUTF8($dir);
 		$mess = ConfService::getMessages();

@@ -272,7 +272,7 @@ class AJXP_Logger {
 		$res = "";
 		$lines = file($fName);
 		foreach ($lines as $line){
-			$line = Utils::xmlEntities($line);
+			$line = AJXP_Utils::xmlEntities($line);
 			$matches = array();
 			if(preg_match("/(.*)\t(.*)\t(.*)\t(.*)\t(.*)\t(.*)$/", $line, $matches)!==false){
 				$fileName = $parentDir."/".$matches[1];

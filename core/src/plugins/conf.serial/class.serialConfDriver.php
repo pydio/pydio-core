@@ -47,7 +47,7 @@ class serialConfDriver extends AbstractConfDriver {
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	function listRepositories(){
-		return Utils::loadSerialFile($this->repoSerialFile);
+		return AJXP_Utils::loadSerialFile($this->repoSerialFile);
 		
 	}
 	/**
@@ -57,7 +57,7 @@ class serialConfDriver extends AbstractConfDriver {
 	 * @return Repository
 	 */
 	function getRepositoryById($repositoryId){
-		$repositories = Utils::loadSerialFile($this->repoSerialFile);
+		$repositories = AJXP_Utils::loadSerialFile($this->repoSerialFile);
 		if(isSet($repositories[$repositoryId])){
 			return $repositories[$repositoryId];		
 		}
@@ -71,7 +71,7 @@ class serialConfDriver extends AbstractConfDriver {
 	 * @return -1 if failed
 	 */
 	function saveRepository($repositoryObject, $update = false){
-		$repositories = Utils::loadSerialFile($this->repoSerialFile);
+		$repositories = AJXP_Utils::loadSerialFile($this->repoSerialFile);
 		if(!$update){
 			$repositoryObject->writeable = true;
 			$repositories[$repositoryObject->getUniqueId()] = $repositoryObject;
@@ -83,7 +83,7 @@ class serialConfDriver extends AbstractConfDriver {
 				}
 			}
 		}
-		$res = Utils::saveSerialFile($this->repoSerialFile, $repositories);
+		$res = AJXP_Utils::saveSerialFile($this->repoSerialFile, $repositories);
 		if($res == -1){
 			return $res;
 		}		
@@ -94,14 +94,14 @@ class serialConfDriver extends AbstractConfDriver {
 	 * @param String $repositoryId
 	 */	
 	function deleteRepository($repositoryId){
-		$repositories = Utils::loadSerialFile($this->repoSerialFile);
+		$repositories = AJXP_Utils::loadSerialFile($this->repoSerialFile);
 		$newList = array();
 		foreach ($repositories as $repo){
 			if($repo->getUniqueId() != $repositoryId){
 				$newList[$repo->getUniqueId()] = $repo;
 			}
 		}
-		Utils::saveSerialFile($this->repoSerialFile, $newList);
+		AJXP_Utils::saveSerialFile($this->repoSerialFile, $newList);
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
