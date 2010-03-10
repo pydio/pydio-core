@@ -4,5 +4,5 @@
 		<param name="SQL_DRIVER" type="array" label="Connexion" description="The Database Connexion" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.sql/class.sqlAuthDriver.php" classname="sqlAuthDriver"/>
-	<actions_definition filename="client/xml/standard_auth_actions.xml" />	
+	<actions_definition filename="server/xml/standard_auth_actions.xml" />	
 </authdriver>

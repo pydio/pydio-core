@@ -5,5 +5,5 @@
 		<param name="USERS_DIRPATH" type="string" label="Users" description="The folder in which all users files will be stored" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/conf.serial/class.serialConfDriver.php" classname="serialConfDriver"/>
-	<actions_definition filename="client/xml/standard_conf_actions.xml" />
+	<actions_definition filename="server/xml/standard_conf_actions.xml" />
 </confdriver>
