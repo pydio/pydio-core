@@ -46,7 +46,8 @@ class AJXP_Plugin{
 	protected $xPath;
 	protected $manifestLoaded = false;
 	protected $actions;
-	protected $options;
+	protected $options; // can be passed at init time
+	protected $pluginConf; // can be passed at load time
 	protected $dependencies;
 	/**
 	 * The manifest.xml loaded
@@ -148,7 +149,14 @@ class AJXP_Plugin{
 	public function dependsOn($pluginName){
 		return in_array($pluginName, $this->dependencies);
 	}
-	
+	public function loadConfig($configFile, $format){
+		if($format == "inc"){
+			if(is_file($configFile)){
+				include_once($configFile);
+				if(isSet($DRIVER_CONF)) $this->pluginConf = $DRIVER_CONF;
+			}
+		}
+	}
 	public function getClassFile(){
 		$files = $this->xPath->query("class_definition");
 		if(!$files->length) return false;
