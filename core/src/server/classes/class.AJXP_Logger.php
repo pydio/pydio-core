@@ -40,7 +40,6 @@ define("LOG_LEVEL_INFO", "Info");
 define("LOG_LEVEL_NOTICE", "Notice");
 define("LOG_LEVEL_WARNING", "Warning");
 define("LOG_LEVEL_ERROR", "Error");
-global $AJXP_LOGGER;
 	/**
 	 * This class is very helpful to write a Log in PHP
 	 * just define the severity and the message
@@ -53,10 +52,11 @@ global $AJXP_LOGGER;
 	 * In case of any errors please report to singhgurdeep@gmail.com
 	 */
 class AJXP_Logger {
-	var $USER_GROUP_RIGHTS = 0770;
-	var $fileHandle;
-	var $stack;
-	var $storageDir = "";
+	private static $instance;
+	public $USER_GROUP_RIGHTS = 0770;
+	public $fileHandle;
+	public $stack;
+	public $storageDir = "";
 	/*
 	var $severityDescription = Array(
 			DEBUG => "Debug", 
@@ -99,7 +99,7 @@ class AJXP_Logger {
 		}		
 	}
 
-	function logAction($action, $params=array()){
+	public static function logAction($action, $params=array()){
 		$logger = AJXP_Logger::getInstance();		
 		$message = "$action\t";		
 		if(count($params)){
@@ -146,15 +146,20 @@ class AJXP_Logger {
 	 *
 	 * @return AJXP_Logger an instance of the AJXP_Logger object
 	 */
-	function getInstance() {
-		global $AJXP_LOGGER;
-		if (!isset($AJXP_LOGGER)) {
-			$AJXP_LOGGER = new AJXP_Logger();
-		}
-		return $AJXP_LOGGER;
-	}
+ 	public static function getInstance()
+ 	{
+ 		if(!isSet(self::$instance)){
+ 			$c = __CLASS__;
+ 			self::$instance = new $c;
+ 		}
+ 		return self::$instance;
+ 	}
+ 	private function __construct(){}
+	public function __clone(){
+        trigger_error("Cannot clone me, i'm a singleton!", E_USER_ERROR);
+    } 	
 
-	function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG) {
+    function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG) {
 		$textMessage = $this->formatMessage($textMessage, $severityLevel);
 
 		if ($this->fileHandle !== false) {

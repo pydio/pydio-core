@@ -64,11 +64,10 @@ require_once("$CURRENTPATH/../../server/classes/class.ConfService.php");
 require_once("$CURRENTPATH/../../server/classes/class.AuthService.php");    
 define ("CLIENT_RESOURCES_FOLDER", "client");
 ConfService::init("$CURRENTPATH/../../server/conf/conf.php"); 
-global $G_CONF_PLUGINNAME;
-require_once("$CURRENTPATH/../../plugins/conf.$G_CONF_PLUGINNAME/class.AJXP_User.php");
+require_once("$CURRENTPATH/../../plugins/conf.".ConfService::getConf("CONF_PLUGINNAME")."/class.AJXP_User.php");
 
 global $plugInAction;
-global $G_AUTH_DRIVER_DEF;
+$G_AUTH_DRIVER_DEF = ConfService::getConf("AUTH_DRIVER_DEF");
 if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"] == "")
 {
     if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])){
