@@ -32,7 +32,7 @@
  * Description : main script called by any Ajax query. Will dispatch the actions on the plugins.
  */
 
-require_once("server/classes/class.Utils.php");
+require_once("server/classes/class.AJXP_Utils.php");
 require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.AJXP_Exception.php");
