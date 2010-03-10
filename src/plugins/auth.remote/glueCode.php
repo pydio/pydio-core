@@ -57,7 +57,7 @@ global $secret, $result;
 if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
 require_once("$CURRENTPATH/../../server/classes/class.AbstractDriver.php");
-require_once("$CURRENTPATH/../../server/classes/class.Utils.php");
+require_once("$CURRENTPATH/../../server/classes/class.AJXP_Utils.php");
 require_once("$CURRENTPATH/../../server/classes/class.Repository.php");
 if (!class_exists("SessionSwitcher")) require_once("$CURRENTPATH/sessionSwitcher.php");
 require_once("$CURRENTPATH/../../server/classes/class.ConfService.php");
