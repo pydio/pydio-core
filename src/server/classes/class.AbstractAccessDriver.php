@@ -40,15 +40,16 @@ class AbstractAccessDriver extends AbstractDriver {
 	*/
 	var $repository;
 	var $driverType = "access";
-	
-	function AbstractAccessDriver($driverName, $filePath, $repository) {
 		
-		parent::AbstractDriver($driverName);
+	public function init($repository, $options = null){
+		$this->loadActionsFromManifest();
 		$this->repository = $repository;
-		$this->initXmlActionsFile($filePath);		
 		$this->actions["get_driver_info_panels"] = array();
-		if(is_object($repository) && $repository->detectStreamWrapper()){
+		if($repository!=null && is_object($repository) && $repository->detectStreamWrapper()){
 			$this->actions["cross_copy"] = array();
+		}
+		if($options != null){
+			$this->options = $options;
 		}
 	}
 	
@@ -107,7 +108,7 @@ class AbstractAccessDriver extends AbstractDriver {
 		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
 		if(count($matches)){
 			AJXP_XMLWriter::header();
-			AJXP_XMLWriter::write($this->replaceAjxpXmlKeywords(str_replace("\n", "",$matches[0])), true);
+			AJXP_XMLWriter::write(AJXP_XMLWriter::replaceAjxpXmlKeywords($matches[0], true), true);
 			AJXP_XMLWriter::close();
 			exit(1);
 		}		
@@ -134,8 +135,8 @@ class AbstractAccessDriver extends AbstractDriver {
     		@copy(INSTALL_PATH."/client/images/GradientBg.gif", PUBLIC_DOWNLOAD_FOLDER."/GradientBg.gif");
     		@copy(INSTALL_PATH."/client/images/locationBg.gif", PUBLIC_DOWNLOAD_FOLDER."/locationBg.gif");
     	}
-        $data["DRIVER_NAME"] = $this->driverName;
-        $data["XML_FILE_PATH"] = $this->xmlFilePath;
+        $data["PLUGIN_ID"] = $this->id;
+        $data["BASE_DIR"] = $this->baseDir;
         $data["REPOSITORY"] = $this->repository;
         // Force expanded path in publiclet
         $data["REPOSITORY"]->addOption("PATH", $this->repository->getOption("PATH"));
@@ -201,7 +202,9 @@ class AbstractAccessDriver extends AbstractDriver {
                 die("Warning, cannot find driver for conf storage! ($name, $filePath)");
         }
         require_once($filePath);
-        $driver = new $className( $data["DRIVER_NAME"], $data["XML_FILE_PATH"], $data["REPOSITORY"], $data["OPTIONS"]);
+        $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
+        $driver->loadManifest();
+        $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
         $driver->initRepository();
         $driver->switchAction($data["ACTION"], array("file"=>$data["FILE_PATH"]), "");
     }

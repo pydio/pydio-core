@@ -41,7 +41,7 @@ class AbstractAuthDriver extends AbstractDriver {
 	
 	function init($options){
 		$this->options = $options;
-		$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/standard_auth_actions.xml");
+		$this->loadActionsFromManifest();
 		unset($this->actions["get_driver_actions"]);
 	}
 				
@@ -71,15 +71,6 @@ class AbstractAuthDriver extends AbstractDriver {
 	function getLogoutRedirect(){
         return false;
     }
-	
-	function replaceAjxpXmlKeywords($xml){	
-		$xml = parent::replaceAjxpXmlKeywords($xml);
-		$loginRedirect = $this->getLoginRedirect();		
-		$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
-        $xml = str_replace("AJXP_REMOTE_AUTH", "false", $xml);
-        $xml = str_replace("AJXP_NOT_REMOTE_AUTH", "true", $xml);
-		return $xml;
-	}
 	
 	function getOption($optionName){	
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	

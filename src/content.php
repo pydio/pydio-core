@@ -36,6 +36,8 @@ require_once("server/classes/class.Utils.php");
 require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.AJXP_Exception.php");
+require_once("server/classes/class.AJXP_Plugin.php");
+require_once("server/classes/class.AJXP_PluginsService.php");
 require_once("server/classes/class.AbstractDriver.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
 require_once("server/classes/class.AJXP_ClientDriver.php");
@@ -54,13 +56,17 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 require_once("server/classes/class.AJXP_Logger.php");
-ConfService::init("server/conf/conf.php");
+set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
+$confFile = "server/conf/conf.php";
+include_once($confFile);
+$pServ = AJXP_PluginsService::getInstance();
+$pServ->loadPluginsRegistry(INSTALL_PATH."/plugins");
+ConfService::init($confFile);
+
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 session_name("AjaXplorer");
 session_start();
-
-set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 
 if(isSet($_GET["tmp_repository_id"])){
 	ConfService::switchRootDir($_GET["tmp_repository_id"], true);

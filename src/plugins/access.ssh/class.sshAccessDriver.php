@@ -51,9 +51,9 @@ class sshAccessDriver extends AbstractAccessDriver
      * @var charset
      */
     var $charset;
-    
-	
-	function  sshAccessDriver($driverName, $filePath, $repository, $optOption = NULL){	
+    	
+	function init($repository, $optOption = null){
+		parent::init($repository, $optOption);
         $repositoryPath = $repository->getOption("PATH");
         $accountLimit = strpos($repositoryPath, "@");
         if ($accountLimit !== false) 
@@ -61,12 +61,11 @@ class sshAccessDriver extends AbstractAccessDriver
             $account = substr($repositoryPath, 0, $accountLimit);
             $repositoryPath = substr($repositoryPath, $accountLimit+1);
             $repository->setOption("PATH", $repositoryPath);            
-        }
+        }        
         // Set the password from a per user specific config
         $account = $optOption ? $optOption["account"] : $this->getUserName($repository); 
         $password = $optOption ? $optOption["password"] : $this->getPassword($repository);
-        $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);
-		parent::AbstractAccessDriver($driverName, $filePath, $repository);
+        $this->SSHOperation = new SSHOperations($repositoryPath, $account, $password);		
 	}
 
     function getUserName($repository){

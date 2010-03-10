@@ -43,11 +43,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	* @var Repository
 	*/
 	var $repository;
-	
-	function  fsAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
-		parent::AbstractAccessDriver($driverName, $filePath, $repository);
-	}
-	
+		
 	function initRepository(){
 		$create = $this->repository->getOption("CREATE");
 		$path = $this->repository->getOption("PATH");
