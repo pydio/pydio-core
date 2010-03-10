@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="ssh" label="FileSystem over SSH Server" description="Standard access to the filesystem on another server">
 	<client_settings icon="plugins/access.ssh/icon.png" search_engine="SearchEngine"/>
-	<param name="PATH" type="string" label="Path" description="Real path to the root folder and the server like bob.myserver.com:/home/" mandatory="true"/>
-	<user_param name="remote_username" type="string" label="Remote login" description="User login" mandatory="true"/>
-	<user_param name="remote_password" type="password" label="Remote pass" description="User password" mandatory="true"/>
-	<param name="CHARSET" type="string" label="Charset" description="The remote charset (leave empty to autodetect)" mandatory="false" default=""/>
+	<server_settings>
+		<param name="PATH" type="string" label="Path" description="Real path to the root folder and the server like bob.myserver.com:/home/" mandatory="true"/>
+		<user_param name="remote_username" type="string" label="Remote login" description="User login" mandatory="true"/>
+		<user_param name="remote_password" type="password" label="Remote pass" description="User password" mandatory="true"/>
+		<param name="CHARSET" type="string" label="Charset" description="The remote charset (leave empty to autodetect)" mandatory="false" default=""/>
+	</server_settings>
+	<actions_definition filename="plugins/access.ssh/sshActions.xml" include="*"/>
+	<class_definition filename="plugins/access.ssh/class.sshAccessDriver.php" classname="sshAccessDriver"/>
 </ajxpdriver>

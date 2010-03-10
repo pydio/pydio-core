@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <confdriver name="serial" label="Serialized Storage" description="Stores the conf data as serialized PHP values on the filesystem.">
-	<param name="REPOSITORIES_FILEPATH" type="string" label="Repositories" description="The file in which the repositories are stored" mandatory="true"/>
-	<param name="USERS_DIRPATH" type="string" label="Users" description="The folder in which all users files will be stored" mandatory="true"/>
+	<server_settings>
+		<param name="REPOSITORIES_FILEPATH" type="string" label="Repositories" description="The file in which the repositories are stored" mandatory="true"/>
+		<param name="USERS_DIRPATH" type="string" label="Users" description="The folder in which all users files will be stored" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/conf.serial/class.serialConfDriver.php" classname="serialConfDriver"/>
+	<actions_definition filename="client/xml/standard_conf_actions.xml" />
 </confdriver>

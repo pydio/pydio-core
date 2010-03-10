@@ -41,11 +41,7 @@ class demoAccessDriver extends fsAccessDriver
 	* @var Repository
 	*/
 	var $repository;
-	
-	function demoAccessDriver($driverName, $filePath, $repository, $optOptions = NULL){
-		parent::fsAccessDriver($driverName, INSTALL_PATH."/plugins/access.fs/fsActions.xml", $repository);		
-	}
-	
+		
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		$errorMessage = "This is a demo, all 'write' actions are disabled!";

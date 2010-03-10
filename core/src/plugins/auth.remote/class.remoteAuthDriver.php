@@ -67,7 +67,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
     var $urls;
 	
 	function init($options){
-		parent::init($options);
+		parent::init($options);		
 		$this->usersSerFile = $options["USERS_FILEPATH"];
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
         $this->secret = $options["SECRET"];
@@ -157,12 +157,5 @@ class remoteAuthDriver extends AbstractAuthDriver {
         return false;
     }
     
-    function replaceAjxpXmlKeywords($xml){	
-        $xml = str_replace("AJXP_REMOTE_AUTH", "true", $xml);
-        $xml = str_replace("AJXP_NOT_REMOTE_AUTH", "false", $xml);
-		$xml = parent::replaceAjxpXmlKeywords($xml);
-		return $xml;
-	}    
-
 }
 ?>

@@ -42,15 +42,9 @@ class mysqlAccessDriver extends AbstractAccessDriver
     /** The user password */
     var $password;
 	
-	function  mysqlAccessDriver($driverName, $filePath, $repository, $optOptions = NULL)
-    {
-        $this->user = $optOptions ? $optOptions["user"] : $repository->getOption("DB_USER");
-        $this->password = $optOptions ? $optOptions["password"] : $repository->getOption("DB_PASS");
-    
-		parent::AbstractAccessDriver($driverName, $filePath, $repository);		
-	}
-	
 	function initRepository(){
+		$this->user = $this->repository->getOption("DB_USER");
+		$this->password = $this->repository->getOption("DB_PASS");
 		$link = $this->createDbLink();
 		$this->closeDbLink($link);
 	}

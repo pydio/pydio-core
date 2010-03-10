@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="basic_http" label="Basic HTTP" description="Use the standard http authentication.">	
-	<param name="REMOTE_SERVER" type="string" label="Server" description="The host URL" mandatory="true"/>
-	<param name="REMOTE_PORT" type="string" label="Port" description="The host port" mandatory="true"/>
-	<param name="REMOTE_USER" type="string" label="User name" description="User on the remote host" mandatory="false"/>
-	<param name="REMOTE_PASSWORD" type="string" label="Password" description="Password on the remote host" mandatory="false"/>
-	<param name="REMOTE_SESSION_NAME" type="string" label="Session Name" description="Parameter name to pass the session id" mandatory="false"/>
-	<param name="REMOTE_URL" type="string" label="URI" description="Script URI on the remote server" mandatory="true"/>
+<authdriver name="basic_http" label="Basic HTTP" description="Use the standard http authentication.">
+	<server_settings>
+		<param name="REMOTE_SERVER" type="string" label="Server" description="The host URL" mandatory="true"/>
+		<param name="REMOTE_PORT" type="string" label="Port" description="The host port" mandatory="true"/>
+		<param name="REMOTE_USER" type="string" label="User name" description="User on the remote host" mandatory="false"/>
+		<param name="REMOTE_PASSWORD" type="string" label="Password" description="Password on the remote host" mandatory="false"/>
+		<param name="REMOTE_SESSION_NAME" type="string" label="Session Name" description="Parameter name to pass the session id" mandatory="false"/>
+		<param name="REMOTE_URL" type="string" label="URI" description="Script URI on the remote server" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.remote_ajxp/class.remote_ajxpAuthDriver.php" classname="remote_ajxpAuthDriver"/>
+	<actions_definition filename="client/xml/standard_auth_actions.xml" />	
 </authdriver>
