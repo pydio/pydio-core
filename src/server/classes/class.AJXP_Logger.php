@@ -108,7 +108,7 @@ class AJXP_Logger {
 		$logger->write($message, LOG_LEVEL_INFO);		
 	}
 	
-	function arrayToString($params){
+	public function arrayToString($params){
 		$st = "";	
 		$index=0;	
 		foreach ($params as $key=>$value){
@@ -159,7 +159,7 @@ class AJXP_Logger {
         trigger_error("Cannot clone me, i'm a singleton!", E_USER_ERROR);
     } 	
 
-    function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG) {
+    public function write($textMessage, $severityLevel = LOG_LEVEL_DEBUG) {
 		$textMessage = $this->formatMessage($textMessage, $severityLevel);
 
 		if ($this->fileHandle !== false) {
@@ -173,7 +173,7 @@ class AJXP_Logger {
 		
 	}
 	
-	function stackFlush(){
+	public function stackFlush(){
 		// Flush stack for messages that could have been written before the file opening.
 		foreach ($this->stack as $message){
 			@fwrite($this->fileHandle, $message);
@@ -186,7 +186,7 @@ class AJXP_Logger {
 	 *
 	 * @access public
 	 */
-	function close() {
+	public function close() {
 		$success = @fclose($this->fileHandle);
 		if ($success === false) {
 			// Failure to close the log file

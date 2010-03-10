@@ -40,27 +40,30 @@
  	
  	public function loadPluginsRegistry($pluginFolder){
  		$handler = opendir($pluginFolder);
+ 		$beforeSort = array();
  		if($handler){
  			while ( ($item = readdir($handler)) !==false) {
  				if($item == "." || $item == ".." || !is_dir($pluginFolder."/".$item) || strstr($item,".")===false) continue ;
  				$plugin = new AJXP_Plugin($item, $pluginFolder."/".$item);				
 				$plugin->loadManifest();
 				if($plugin->manifestLoaded()){
-					$plugType = $plugin->getType();
-					if(!isSet($this->registry[$plugType])){
-						$this->registry[$plugType] = array();
-					}
-					$plugin = $this->instanciatePluginClass($plugin);
-					$this->registry[$plugType][$plugin->getName()] = $plugin;
-					$deps = $plugin->findDependencies();
-					if(count($deps)) {
-						$this->tmpDependencies[$plugin->getId()] = $deps;
-					}
+					$beforeSort[$plugin->getId()] = $plugin;					
 				}
  			}
  			closedir($handler);
  		}
- 		$this->checkDependencies();
+ 		if(count($beforeSort)){
+ 			$this->checkDependencies($beforeSort);
+			usort($beforeSort, array($this, "sortByDependency"));				
+ 			foreach ($beforeSort as $plugin){
+				$plugType = $plugin->getType();
+				if(!isSet($this->registry[$plugType])){
+					$this->registry[$plugType] = array();
+				}
+				$plugin = $this->instanciatePluginClass($plugin);
+				$this->registry[$plugType][$plugin->getName()] = $plugin;
+ 			}
+ 		}
  	}
  	
  	/**
@@ -84,17 +87,27 @@
  		}
  	}
  	
- 	private function checkDependencies(){
- 		foreach ($this->tmpDependencies as $plugId => $deps){
- 			foreach ($deps as $requiredPlugId){
- 				$req = $this->getPluginById($requiredPlugId);
- 				if(!$req){
- 					$this->removePluginById($plugId);
+ 	private function checkDependencies(&$arrayToSort){
+ 		// First make sure that the given dependencies are present
+ 		foreach ($arrayToSort as $plugId => $plugObject){
+ 			foreach ($plugObject->getDependencies() as $requiredPlugId){
+ 				if(!isSet($arrayToSort[$requiredPlugId])){
+ 					unset($arrayToSort[$plugId]);
  					break;
  				}
  			}
  		}
- 		$this->tmpDependencies = array();
+ 	}
+ 	/**
+ 	 * User function for sorting
+ 	 *
+ 	 * @param AJXP_Plugin $pluginA
+ 	 * @param AJXP_Plugin $pluginB
+ 	 */
+ 	private function sortByDependency($pluginA, $pluginB){
+ 		if($pluginA->dependsOn($pluginB->getId())) return 1;
+ 		if($pluginB->dependsOn($pluginA->getId())) return -1;
+ 		return 0;
  	}
  	
  	public function getPluginsByType($type){

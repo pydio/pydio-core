@@ -11,5 +11,8 @@
 	</server_settings>
 	<actions_definition filename="plugins/access.fs/fsActions.xml" include="*" exclude="upload"/>
 	<actions_definition filename="plugins/access.remote_fs/additionalActions.xml" include="*"/>
-	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="remote_fsAccessDriver"/>	
+	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="remote_fsAccessDriver"/>
+	<dependencies>
+		<pluginActions pluginName="access.fs"/>
+	</dependencies>	
 </ajxpdriver>
