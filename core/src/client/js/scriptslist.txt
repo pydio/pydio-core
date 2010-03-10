@@ -1,6 +1,3 @@
-js/lib/prototype/prototype.js
-js/lib/prototype/prototype.livepipe.js
-js/lib/prototype/prototype.oo.js
 js/ajaxplorer/interfaces/class.IAjxpWidget.js
 js/ajaxplorer/interfaces/class.IAjxpNodeProvider.js
 js/ajaxplorer/interfaces/class.IActionProvider.js
@@ -29,7 +26,6 @@ js/lib/prototype/carousel.js
 js/lib/webfx/xtree.js
 js/lib/webfx/ajxptree.js
 js/lib/webfx/slider/js/slider.js
-js/ajaxplorer/class.Connexion.js
 js/ajaxplorer/ajxp_utils.js
 js/ajaxplorer/class.User.js
 js/ajaxplorer/class.ResourcesManager.js

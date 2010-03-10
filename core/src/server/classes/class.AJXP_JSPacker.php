@@ -39,6 +39,9 @@ class AJXP_JSPacker{
 	 * Static function for packing all js into two big files
 	 */
 	function pack(){
+		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/js/bootlist.txt", 
+										CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_boot.js", 
+										"Normal");
 		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/js/scriptslist.txt", 
 										CLIENT_RESOURCES_FOLDER."/js/ajaxplorer.js", 
 										"Normal");
