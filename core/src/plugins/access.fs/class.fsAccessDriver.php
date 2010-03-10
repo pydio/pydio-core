@@ -43,8 +43,10 @@ class fsAccessDriver extends AbstractAccessDriver
 	* @var Repository
 	*/
 	var $repository;
+	var $driverConf;
 		
 	function initRepository(){
+		$this->driverConf = $this->pluginConf;
 		$create = $this->repository->getOption("CREATE");
 		$path = $this->repository->getOption("PATH");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");

@@ -54,21 +54,6 @@ class AbstractDriver extends AJXP_Plugin {
 	 * @var array
 	 */
 	var $actions;
-	var $driverConf = array();
-	/*
-	function AbstractDriver($driverName){
-		// Load config file if there is one
-		if(is_file(INSTALL_PATH."/server/conf/conf.".$this->driverType.".".$driverName.".inc")){
-			include_once(INSTALL_PATH."/server/conf/conf.".$this->driverType.".".$driverName.".inc");
-			if(isSet($DRIVER_CONF)){
-				$this->driverConf = $DRIVER_CONF;
-			}
-		}
-		$this->driverName = $driverName;
-		$id = $this->driverType.".".$driverName;
-		parent::__construct($id, INSTALL_PATH."/plugins/$id");
-	}
-	*/	
 	
 	function initXmlActionsFile($filePath){		
 		$this->xmlFilePath = $filePath;

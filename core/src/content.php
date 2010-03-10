@@ -59,7 +59,7 @@ set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 $confFile = "server/conf/conf.php";
 include_once($confFile);
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry(INSTALL_PATH."/plugins");
+$pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
 ConfService::init($confFile);
 
 $confStorageDriver = ConfService::getConfStorageImpl();
