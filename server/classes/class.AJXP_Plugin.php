@@ -47,6 +47,7 @@ class AJXP_Plugin{
 	protected $manifestLoaded = false;
 	protected $actions;
 	protected $options;
+	protected $dependencies;
 	/**
 	 * The manifest.xml loaded
 	 *
@@ -60,6 +61,7 @@ class AJXP_Plugin{
 		$this->type = $split[0];
 		$this->name = $split[1];
 		$this->actions = array();
+		$this->dependencies = array();
 	}
 	public function init($options){
 		$this->options = $options;
@@ -122,6 +124,7 @@ class AJXP_Plugin{
 		}
 		$this->xPath = new DOMXPath($this->manifestDoc);
 		$this->manifestLoaded = true;
+		$this->loadDependencies();
 	}
 	public function getManifestRawContent($xmlNodeName = ""){
 		if($xmlNodeName == ""){
@@ -135,15 +138,17 @@ class AJXP_Plugin{
 			return $buffer;
 		}
 	}
-	public function findDependencies(){
-		$depPaths = "dependencies/pluginResources/@pluginName";
+	protected function loadDependencies(){
+		$depPaths = "dependencies/*/@pluginName";
 		$nodes = $this->xPath->query($depPaths);
-		$deps = array();
 		foreach ($nodes as $attr){
-			$deps[] = $attr->value;
+			$this->dependencies[] = $attr->value;
 		}
-		return $deps;
 	}
+	public function dependsOn($pluginName){
+		return in_array($pluginName, $this->dependencies);
+	}
+	
 	public function getClassFile(){
 		$files = $this->xPath->query("class_definition");
 		if(!$files->length) return false;
@@ -163,6 +168,9 @@ class AJXP_Plugin{
 	}
 	public function getBaseDir(){
 		return $this->baseDir;
+	}
+	public function getDependencies(){
+		return $this->dependencies;
 	}
 	/**
 	 * Transform a simple node and its attributes to a hash

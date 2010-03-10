@@ -33,7 +33,6 @@
  * 
  * Description : Abstract representation of an access to an authentication system (ajxp, ldap, etc).
  */
-require_once(INSTALL_PATH."/plugins/auth.serial/class.serialAuthDriver.php");
 class basic_httpAuthDriver extends serialAuthDriver  {
 	
 	function usersEditable(){

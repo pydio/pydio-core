@@ -8,4 +8,7 @@
 	</server_settings>
 	<actions_definition filename="plugins/access.fs/fsActions.xml" include="*" exclude=""/>
 	<class_definition filename="plugins/access.demo/class.demoAccessDriver.php" classname="demoAccessDriver"/>	
+	<dependencies>
+		<pluginClass pluginName="access.fs"/>
+	</dependencies>
 </ajxpdriver>

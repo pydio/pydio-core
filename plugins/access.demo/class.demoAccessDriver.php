@@ -33,8 +33,6 @@
  * 
  * Description : The copy of FS driver but with no "write" access
  */
-require_once(INSTALL_PATH."/plugins/access.fs/class.fsAccessDriver.php");
-
 class demoAccessDriver extends fsAccessDriver 
 {
 	/**
