@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="ajxp_client" label="Client Plugin" description="Basic GUI actions">
+	<actions_definition filename="plugins/gui.ajax/ajxpclient_actions.xml" include="*"/>
+	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
+</ajxpdriver>
