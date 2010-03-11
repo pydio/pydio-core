@@ -35,12 +35,11 @@
  */
 Class.create("AjxpBootstrap", {
 	parameters : $H({}),
-	initialize : function(startParameters, booterUrl){
+	initialize : function(startParameters){
 		this.parameters = $H(startParameters);
 		if(this.parameters.get("ALERT")){
 			window.setTimeout(function(){alert(this.parameters.get("ALERT"));}.bind(this),0);
-		}
-		this.parameters.set("booterUrl",booterUrl);
+		}		
 		this.detectBaseParameters();
 		this.insertLoaderProgress();
 		Event.observe(window, 'load', function(){
@@ -62,7 +61,7 @@ Class.create("AjxpBootstrap", {
 		}.bind(this));
 	},
 	loadBootConfig : function(){
-		var connexion = new Connexion(this.parameters.get('booterUrl')+(this.parameters.get("debugMode")?'&debug=true':''));
+		var connexion = new Connexion(this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':''));
 		connexion.onComplete = function(transport){
 			var data = transport.responseText.evalJSON();
 			this.parameters.update(data);
@@ -103,7 +102,7 @@ Class.create("AjxpBootstrap", {
 		}else{
 			alert("Cannot find resource folder");
 		}
-		var booterUrl = this.parameters.get("booterUrl");
+		var booterUrl = this.parameters.get("BOOTER_URL");
 		if(booterUrl.indexOf("?") > -1){
 			booterUrl = booterUrl.substring(0, booterUrl.indexOf("?"));
 		}

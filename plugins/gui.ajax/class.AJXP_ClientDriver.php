@@ -157,7 +157,7 @@ class AJXP_ClientDriver extends AbstractDriver
 						"event" => GOOGLE_ANALYTICS_EVENT);
 				}
 				$config["i18nMessages"] = ConfService::getMessages();
-				header("Content-type:application/json;charset=UTF-8");
+				header("Content-type:text/javascript;charset=UTF-8");
 				print(json_encode($config));
 				exit(1);
 				

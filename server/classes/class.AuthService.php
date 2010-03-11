@@ -195,6 +195,30 @@ class AuthService
 			unset($_SESSION["AJXP_USER"]);
 		}
 	}
+	
+	public static function bootSequence(&$START_PARAMETERS){
+		if(!is_readable(USERS_DIR)) $START_PARAMETERS["ALERT"] = "Warning, the users directory is not readable!";
+		else if(!is_writeable(USERS_DIR)) $START_PARAMETERS["ALERT"] = "Warning, the users directory is not writeable!";
+		if(AuthService::countAdminUsers() == 0){
+			$authDriver = ConfService::getAuthDriverImpl();
+			$adminPass = ADMIN_PASSWORD;
+			if($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true){
+				$adminPass = md5(ADMIN_PASSWORD);
+			}
+			 AuthService::createUser("admin", $adminPass, true);
+			 if(ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD)
+			 {
+				 $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial common password 'admin'. \\nPlease log in as admin and change the password now!";
+			 }
+		}else if(AuthService::countAdminUsers() == -1){
+			// Here we may come from a previous version! Check the "admin" user and set its right as admin.
+			$confStorage = ConfService::getConfStorageImpl();
+			$adminUser = $confStorage->createUserObject("admin"); 
+			$adminUser->setAdmin(true);
+			$adminUser->save();
+			$START_PARAMETERS["ALERT"] .= "You may come from a previous version. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
+		}
+	}
     
     function getLogoutAddress($logUserOut = true)
     {

@@ -163,6 +163,14 @@ $REPOSITORIES[1] = array(
 /*********************************************/
 $default_language="en";
 
+/*********************************************/
+/* JS_DEBUG
+/* Warning : this has to be set to true
+/* to be able to both make modifications to 
+/* the css or the js files, and to compile 
+/* these into bundled file.
+/*********************************************/
+$AJXP_JS_DEBUG = false;
 
 /*********************************************/
 /*	GLOBAL UPLOAD CONFIG
@@ -257,7 +265,6 @@ define("CLIENT_RESOURCES_FOLDER", "client");
 define("SERVER_RESOURCES_FOLDER", "server/classes");
 define("DOCS_FOLDER", "client/doc");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
-
 
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");

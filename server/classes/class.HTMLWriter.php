@@ -67,7 +67,27 @@ class HTMLWriter
     	require_once(INSTALL_PATH."/server/classes/class.AJXP_XMLWriter.php");
     	return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
     }
-                      
+              
+    function writeI18nMessagesClass($mess)
+    {
+    	echo "<script language=\"javascript\">\n";
+    	echo "if(!MessageHash) window.MessageHash = new Hash();\n";
+    	foreach ($mess as $index => $message)
+    	{
+    		if(is_numeric($index))
+    		{
+    			echo "MessageHash[$index]='".str_replace("'", "\'", $message)."';\n";
+    		}
+    		else
+    		{
+    			echo "MessageHash['$index']='".str_replace("'", "\'", $message)."';\n";
+    		}
+
+    	}
+    	echo "MessageHash;";
+    	echo "</script>\n";
+    }
+       
     function charsetHeader($type = 'text/html', $charset='UTF-8'){
     	header("Content-type:$type; charset=$charset");
     }
