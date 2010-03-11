@@ -300,14 +300,11 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){
-						if(!ajaxplorer.filesList) return;
 						var userSelection =  ajaxplorer.getUserSelection();
 						var nodes = userSelection.getSelectedNodes();
 						var firstNode = userSelection.getUniqueNode();						
 		   		    	var copyDiv = $(oForm).select('textarea[id="text_copy"]')[0];
-		   		    	var attributes = [];
-		   		    	columnsDef = ajaxplorer.filesList.columnsDef;
-		   		    	columnsDef.each(function(def){attributes.push(def.attributeName);});
+		   		    	var attributes = ['date','ip','level','user','action','params'];
 			   		    var message = attributes.join("\t") + "\n\n";
 		   		    	nodes.each(function(node){	
 		   		    		var meta = node.getMetadata();	   		    		
@@ -319,6 +316,7 @@
 			   		    	message += '\n';
 		   		    	});
 		   		    	copyDiv.setValue(message);
+		   		    	copyDiv.select();
 					};
 					modal.showDialogForm('Delete', 'copy_as_text', onLoad, function(){
 						hideLightBox(true);
@@ -326,8 +324,8 @@
 					},null,true);
 					]]></clientCallback>
 				<clientForm id="copy_as_text"><![CDATA[
-				<div id="copy_as_text" action="copy" box_width="600">
-					<textarea id="text_copy" style="width:580px; height: 400px;"></textarea>
+				<div id="copy_as_text" action="copy" box_width="650">
+					<textarea id="text_copy" style="width:630px; height: 350px;"></textarea>
 				</div>
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
