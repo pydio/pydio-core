@@ -1092,6 +1092,10 @@ UPLOAD MULTIFILE FORM
      text-align: center;    
      height: 30px;
 }
+#search_form
+{
+    border-bottom: 1px solid #676965;
+}
 #search_form a
 {
     display:block;    
@@ -1117,7 +1121,6 @@ UPLOAD MULTIFILE FORM
 #search_results
 {    
     margin-left:0px;
-    border-top: 1px solid #676965;
     width: 100%;
 }
 
