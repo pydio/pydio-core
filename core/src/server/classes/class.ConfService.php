@@ -57,6 +57,7 @@ class ConfService
 		$this->configs["USE_HTTPS"] = $use_https;
 		$this->configs["WM_EMAIL"] = $webmaster_email;
 		$this->configs["MAX_CHAR"] = $max_caracteres;
+		$this->configs["JS_DEBUG"] = $AJXP_JS_DEBUG;
 		$this->configs["UPLOAD_MAX_NUMBER"] = $upload_max_number;
 		$this->configs["UPLOAD_ENABLE_FLASH"] = $upload_enable_flash;
 		$this->configs["UPLOAD_MAX_FILE"] = AJXP_Utils::convertBytes($upload_max_size_per_file);
@@ -418,12 +419,19 @@ class ConfService
 	public static function getConf($varName){
 		return self::getInstance()->getConfInst($varName);
 	}
+	public static function setConf($varName, $varValue){
+		return self::getInstance()->setConfInst($varName, $varValue);
+	}
 	public function getConfInst($varName)	
 	{
 		if(isSet($this->configs[$varName])){
 			return $this->configs[$varName];
 		}
 		return null;
+	}
+	public function setConfInst($varName, $varValue)	
+	{
+		$this->configs[$varName] = $varValue;
 	}
 	
 	public static function setLanguage($lang){

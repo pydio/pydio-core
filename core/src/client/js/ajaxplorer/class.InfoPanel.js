@@ -99,7 +99,7 @@ Class.create("InfoPanel", AjxpPane, {
 			this.evalTemplateForMime("no_selection", null, {
 				filelist_folders_count:folderNumber,
 				filelist_files_count:filesNumber,
-				filelist_totalsize:roundSize(size, MessageHash[266]),
+				filelist_totalsize:roundSize(size, (MessageHash?MessageHash[266]:'B')),
 				current_folder:currentRep
 			});
 				try{

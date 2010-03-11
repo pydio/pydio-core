@@ -119,6 +119,46 @@ class AJXP_Utils
 		return null;
 	}
 	
+	public static function parseApplicationGetParameters($parameters, &$output, &$session){
+		$output["EXT_REP"] = "/";
+		
+		if(isSet($parameters["repository_id"]) && isSet($parameters["folder"])){
+			$loggedUser = AuthService::getLoggedUser();
+			require_once("server/classes/class.SystemTextEncoding.php");
+			if(AuthService::usersEnabled()){
+				if($loggedUser!= null && $loggedUser->canSwitchTo($parameters["repository_id"])){			
+					$output["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($parameters["folder"]));
+					$loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
+					$loggedUser->setArrayPref("history", $parameters["repository_id"], $parameters["folder"]);
+					$loggedUser->save();
+				}else{
+					$session["PENDING_REPOSITORY_ID"] = $parameters["repository_id"];
+					$session["PENDING_FOLDER"] = $parameters["folder"];
+				}
+			}else{
+				ConfService::switchRootDir($parameters["repository_id"]);
+				$output["EXT_REP"] = SystemTextEncoding::toUTF8(urldecode($parameters["folder"]));
+			}
+		}
+		
+		
+		if(isSet($parameters["skipDebug"])) {
+			ConfService::setConf("JS_DEBUG", false);
+		}
+		if(ConfService::getConf("JS_DEBUG") && isSet($parameters["compile"])){
+			require_once(SERVER_RESOURCES_FOLDER."/class.AJXP_JSPacker.php");
+			AJXP_JSPacker::pack();
+		}		
+		if(ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])){
+			AJXP_Utils::updateI18nFiles();
+		}
+		
+		if(isSet($parameters["external_selector_type"])){
+			$output["SELECTOR_DATA"] = array("type" => $type, "data" => $data);
+		}
+		
+	}
+	
 	function mergeArrays($t1,$t2)
 	{
 		$liste = array();

@@ -25,7 +25,7 @@ foreach ($lines as $line){
 <script type="text/javascript">
 var ajaxplorer, startParameters = {};
 <?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
-window.ajxpBootstrap = new AjxpBootstrap(startParameters, 'content.php?get_action=get_boot_conf');
+window.ajxpBootstrap = new AjxpBootstrap(startParameters);
 </script>
 <?php
 $list = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/scriptslist.txt";
@@ -52,3 +52,5 @@ foreach ($lines as $line){
 	</table>
 	</form>
 </div>
+</body>
+</html>
