@@ -133,7 +133,7 @@ class AJXP_ClientDriver extends AbstractDriver
 				$config["multipleFilesDownloadEnabled"] = DISABLE_ZIP_CREATION;
 				$config["flashUploaderEnabled"] = ConfService::getConf("UPLOAD_ENABLE_FLASH");
 				if(!ConfService::getConf("UPLOAD_ENABLE_FLASH")){
-				    $UploadMaxSize = Utils::convertBytes(ini_get('upload_max_filesize'));
+				    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
 				    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
 				    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
 				    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");				
