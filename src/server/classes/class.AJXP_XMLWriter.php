@@ -110,6 +110,7 @@ class AJXP_XMLWriter
 		$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
         $xml = str_replace("AJXP_REMOTE_AUTH", "false", $xml);
         $xml = str_replace("AJXP_NOT_REMOTE_AUTH", "true", $xml);
+        $xml = str_replace("AJXP_ALL_MESSAGES", "MessageHash=".json_encode(ConfService::getMessages()).";", $xml);
 		
 		if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
 			foreach($matches as $match){

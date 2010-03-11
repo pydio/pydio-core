@@ -1,35 +1,37 @@
 <html xmlns:ajxp>
-<head>
-<title>AjaXplorer</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="icon" type="image/x-png" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/images/crystal/html-folder.png">
-<link rel="stylesheet" type="text/css" href="<?php print(CLIENT_RESOURCES_FOLDER);?>/css/allz.css">
-<script language="javascript" type="text/javascript" src="<?php print(CLIENT_RESOURCES_FOLDER);?>/js/ajaxplorer_boot.js"></script>
-</head>
-<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0">
-<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions="{}"></div>
-
-<script type="text/javascript">
-var ajaxplorer, startParameters = {};
-<?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
-window.ajxpBootstrap = new AjxpBootstrap(startParameters, 'content.php?get_action=get_boot_conf');
-</script>
-
-<style>.dialogBox[id]{position:fixed;}</style>
-<div id="all_forms">
-	<div id="generic_dialog_box" class="dialogBox"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
-	<div id="hidden_frames" style="display:none;"></div>
-	<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
-	
-	<!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
-	<form id="login_form" action="login" style="display:none;" box_width="210">
-	<input type="hidden" name="get_action" value="login">
-	<input type="hidden" name="login_seed" id="login_seed" value="">
-	<div class="dialogLegend" style="margin-bottom: 7px;" ajxp_message_id="180"><?php print($mess[180]);?></div>
-	<table cellpadding="3" border="0" cellspacing="0" style="font-size:11px;">
-	<tr><td align="right"><ajxp:message ajxp_message_id="181"><?php print($mess[181]);?></ajxp:message> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
-	<tr><td align="right"><ajxp:message ajxp_message_id="182"><?php print($mess[182]);?></ajxp:message> :</td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td></tr>
-	<tr><td align="left" colspan="2"><input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261"><?php print($mess[261]);?></ajxp:message></td></tr>
-	</table>
-	</form>
-</div>
+	<head>
+		<title>AjaXplorer</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="icon" type="image/x-png" href="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/html-folder.png">
+		<link rel="stylesheet" type="text/css" href="AJXP_CLIENT_RESOURCES_FOLDER/css/allz.css">
+		<script language="javascript" type="text/javascript" src="AJXP_CLIENT_RESOURCES_FOLDER/js/ajaxplorer_boot.js"></script>
+	</head>
+	<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0">		
+		<script type="text/javascript">
+		// Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is 
+		// dynamically replaced by the application!
+		var ajaxplorer, startParameters = {}, MessageHash={};
+		//AJXP_JSON_START_PARAMETERS
+		window.ajxpBootstrap = new AjxpBootstrap(startParameters);
+		</script>
+		<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions="{}"></div>		
+		<style>.dialogBox[id]{position:fixed;}</style>
+		<div id="all_forms">
+			<div id="generic_dialog_box" class="dialogBox"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
+			<div id="hidden_frames" style="display:none;"></div>
+			<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>	
+			
+			<!-- LOGIN SCREEN MUST BE ALREADY IN PAGE TO ENABLE PASSWORD REMEMBERING -->
+			<form id="login_form" action="login" style="display:none;" box_width="210">
+			<input type="hidden" name="get_action" value="login">
+			<input type="hidden" name="login_seed" id="login_seed" value="">
+			<div class="dialogLegend" style="margin-bottom: 7px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
+			<table cellpadding="3" border="0" cellspacing="0" style="font-size:11px;">
+			<tr><td align="right"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
+			<tr><td align="right"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message> :</td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td></tr>
+			<tr><td align="left" colspan="2"><input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message></td></tr>
+			</table>
+			</form>
+		</div>
+	</body>
+</html>
