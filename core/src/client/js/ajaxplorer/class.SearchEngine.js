@@ -55,7 +55,7 @@ Class.create("SearchEngine", AjxpPane, {
 		this.htmlElement.update('<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>');
 		
 		this._inputBox = $("search_txt");
-		this._resultsBox = $("search_results");
+		this._resultsBoxId = 'search_results';
 		this._searchButtonName = "search_button";
 		this._runningQueries = new Array();
 		
@@ -110,7 +110,7 @@ Class.create("SearchEngine", AjxpPane, {
 	},
 	
 	resize: function(){
-		fitHeightToBottom(this._resultsBox);
+		fitHeightToBottom($(this._resultsBoxId));
 	},
 	
 	focus : function(){
@@ -180,9 +180,9 @@ Class.create("SearchEngine", AjxpPane, {
 	
 	clearResults : function(){
 		// Clear the results	
-		while(this._resultsBox.childNodes.length)
+		while($(this._resultsBoxId).childNodes.length)
 		{
-			this._resultsBox.removeChild(this._resultsBox.childNodes[0]);
+			$(this._resultsBoxId).removeChild($(this._resultsBoxId).childNodes[0]);
 		}
 	},
 	
@@ -216,7 +216,7 @@ Class.create("SearchEngine", AjxpPane, {
 				ajaxplorer.goTo(folderName);
 			});
 		}
-		this._resultsBox.appendChild(divElement);
+		$(this._resultsBoxId).appendChild(divElement);
 	},
 	
 	searchFolderContent : function(text, currentFolder){
