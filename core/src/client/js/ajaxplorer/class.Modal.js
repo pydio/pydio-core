@@ -328,8 +328,12 @@ Class.create("Modal", {
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
 		this.messageContent.update(message);
-		var containerOffset = Position.cumulativeOffset($('content_pane'));
-		var containerDimensions = $('content_pane').getDimensions();
+		var container = $('content_pane');
+		if(!container){
+			container = $('ajxp_desktop');
+		}
+		var containerOffset = Position.cumulativeOffset(container);
+		var containerDimensions = container.getDimensions();
 		var boxHeight = $(this.messageBox).getHeight();
 		var topPosition = containerOffset[1] + containerDimensions.height - boxHeight - 20;
 		var boxWidth = parseInt(containerDimensions.width * 90/100);
