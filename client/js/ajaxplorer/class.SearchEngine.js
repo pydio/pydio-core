@@ -189,7 +189,6 @@ Class.create("SearchEngine", AjxpPane, {
 	addResult : function(folderName, fileName, icon){
 		// Display the result in the results box.
 		if(folderName == "") folderName = "/";
-		var divElement = document.createElement('div');	
 		var isFolder = false;
 		if(icon == null) // FOLDER CASE
 		{
@@ -201,8 +200,8 @@ Class.create("SearchEngine", AjxpPane, {
 		var imageString = '<img align="absmiddle" width="16" height="16" src="'+ajxpResourcesFolder+'/images/crystal/mimes/16/'+icon+'"> ';
 		var stringToDisplay = fileName;	
 		
-		divElement.innerHTML = imageString+stringToDisplay;
-		divElement.title = MessageHash[224]+' '+ folderName;
+		var divElement = new Element('div', {title:MessageHash[224]+' '+ folderName}).update(imageString+stringToDisplay);	
+		$(this._resultsBoxId).insert(divElement);
 		if(isFolder)
 		{
 			divElement.observe("click", function(e){
@@ -216,7 +215,6 @@ Class.create("SearchEngine", AjxpPane, {
 				ajaxplorer.goTo(folderName);
 			});
 		}
-		$(this._resultsBoxId).appendChild(divElement);
 	},
 	
 	searchFolderContent : function(text, currentFolder){
