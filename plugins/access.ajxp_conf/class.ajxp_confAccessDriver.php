@@ -321,7 +321,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						if(is_bool($option)){
 							$option = ($option?"true":"false");
 						}
-						print(" $name=\"".SystemTextEncoding::toUTF8(AJXP_AJXP_Utils::xmlEntities($option))."\" ");
+						print(" $name=\"".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($option))."\" ");
 					}else if(is_array($option)){
 						$nested[] = $option;
 					}
