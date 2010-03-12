@@ -103,15 +103,29 @@ class AbstractAccessDriver extends AbstractDriver {
 	}
 		
 	function sendInfoPanelsDef(){
-		$fileData = file_get_contents($this->xmlFilePath);
-		$matches = array();
-		preg_match('/<infoPanels>.*<\/infoPanels>/', str_replace("\n", "",$fileData), $matches);
-		if(count($matches)){
-			AJXP_XMLWriter::header();
-			AJXP_XMLWriter::write(AJXP_XMLWriter::replaceAjxpXmlKeywords($matches[0], true), true);
-			AJXP_XMLWriter::close();
-			exit(1);
-		}		
+		$actionFiles = $this->xPath->query("actions_definition");		
+		$allNodes = array();
+		foreach ($actionFiles as $actionFileNode){
+			$data = $this->nodeAttrToHash($actionFileNode);
+			$filename = $data["filename"] OR "";
+			if(!is_file(INSTALL_PATH."/".$filename)) continue;
+			$actionDoc = new DOMDocument();
+			$actionDoc->load(INSTALL_PATH."/".$filename);
+			$actionXpath = new DOMXPath($actionDoc);
+			$panes = $actionXpath->query("infoPanels/infoPanel");
+			if(!$panes->length) continue;
+			foreach ($panes as $panelDefNode){
+				$mimes = $actionXpath->query("@mime", $panelDefNode);
+				$mime = $mimes->item(0)->value;
+				$allNodes[$mime] = AJXP_XMLWriter::replaceAjxpXmlKeywords($actionDoc->saveXML($panelDefNode), true);
+			}
+		}
+		AJXP_XMLWriter::header();
+		print("<infoPanels>");
+		print(join("", $allNodes));
+		print("</infoPanels>");
+		AJXP_XMLWriter::close();
+		exit(1);
 	}
     
     /** Cypher the publiclet object data and write to disk.
