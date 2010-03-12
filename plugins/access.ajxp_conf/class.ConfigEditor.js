@@ -577,7 +577,6 @@ ConfigEditor = Class.create({
 	
 	
 	parseXmlMessage: function(xmlResponse){
-		//var messageBox = ajaxplorer.messageBox;
 		if(xmlResponse == null || xmlResponse.documentElement == null) return;
 		var childs = xmlResponse.documentElement.childNodes;	
 		var driversList = false;
@@ -591,7 +590,6 @@ ConfigEditor = Class.create({
 			if(childs[i].nodeName == "message")
 			{
 				this.displayMessage(childs[i].getAttribute('type'), childs[i].firstChild.nodeValue);
-				//alert(childs[i].firstChild.nodeValue);
 			}
 			else if(childs[i].nodeName == "update_checkboxes")
 			{
@@ -613,13 +611,7 @@ ConfigEditor = Class.create({
 			else if(childs[i].tagName == "reload_instruction")
 			{
 				var obName = childs[i].getAttribute('object');
-				if(obName == 'tree')
-				{
-					var node = childs[i].getAttribute('node');				
-					if(node == null) ajaxplorer.foldersTree.reloadCurrentNode();
-					else ajaxplorer.foldersTree.reloadNode(node);
-				}
-				else if(obName == 'list')
+				if(obName == 'list')
 				{
 					var file = childs[i].getAttribute('file');
 					ajaxplorer.getContextHolder().setPendingSelection(file);
@@ -647,6 +639,13 @@ ConfigEditor = Class.create({
 	
 	displayMessage: function(messageType, message){
 		this.messageBox = $('message_div');
+		if(!this.messageBox){
+			this.messageBox = new Element("div", {title:MessageHash[98],id:"message_div",className:"messageBox"});
+			$(document.body).insert(this.messageBox);
+			this.messageContent = new Element("div", {id:"message_content"});
+			this.messageBox.update(this.messageContent);
+			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
+		}		
 		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
