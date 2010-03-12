@@ -185,7 +185,7 @@ class AJXP_Plugin{
 	 *
 	 * @param DOMNode $node
 	 */
-	private function nodeAttrToHash($node){
+	protected function nodeAttrToHash($node){
 		$hash = array();
 		$attributes  = $node->attributes;
 		if($attributes!=null){
