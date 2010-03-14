@@ -46,6 +46,7 @@ Class.create("Ajaxplorer", {
 		this._resourcesRegistry = {};
 		this._initDefaultDisp = 'list';
 		this.histCount=0;
+		this._guiComponentsConfigs = new Hash();
 		modal.setLoadingStepCounts(5);
 		this.initTemplates();
 		this.initEditorsRegistry();		
@@ -293,6 +294,18 @@ Class.create("Ajaxplorer", {
 		}.bind(this) );
 	},
 	
+	setGuiComponentConfig(domNode){
+		var className = domNode.getAttribute("className");
+		var classId = domNode.getAttribute("classId") || null;
+		var classConfig = this._guiComponentsConfigs.get(className) || new Hash();		
+		if(classId){
+			classConfig.set(classId, domNode);
+		}else{
+			classConfig.set('all', domNode);
+		}
+		this._guiComponents.set(className,classConfig);
+		document.fire("ajaxplorer:component_config_changed", {className:className, classConfig:classConfig});
+	},
 	
 	tryLogUserFromCookie : function(){
 		var connexion = new Connexion();
