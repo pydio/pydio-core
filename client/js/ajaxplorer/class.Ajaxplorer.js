@@ -294,7 +294,7 @@ Class.create("Ajaxplorer", {
 		}.bind(this) );
 	},
 	
-	setGuiComponentConfig(domNode){
+	setGuiComponentConfig : function(domNode){
 		var className = domNode.getAttribute("className");
 		var classId = domNode.getAttribute("classId") || null;
 		var classConfig = this._guiComponentsConfigs.get(className) || new Hash();		
