@@ -121,14 +121,17 @@ DIALOG BOXES
 
 .dialogBox, .editBox
 {
+	/*background-image: url('../images/strip.png');*/
+	background-color: #f1f1ef;
     display: none;
     position: absolute;
     top: 30%;
     left: 30%;
     z-index: 1002;
-    background-color: #fff;
     font-family: Trebuchet MS, sans-serif;
-    font-size: 12px;
+    font-size: 11px;
+    padding:5px;
+    border: 1px solid #989A95;
 }
 
 .editBox
@@ -141,20 +144,16 @@ DIALOG BOXES
 
 .dialogTitle
 {
-	background-color:#DADDD7;
-	border:1px solid #989A95;
-	color:#333333;
+	color:#333333;	
 	cursor:move;
-	height:22px;
-	padding:3px 4px 0;
+	padding:0px 4px 4px;
 }
 
 .dialogContent
 {
+    background-color: #fff;
     padding: 10px 10px;
-    border: 1px solid #989A95;    
-    border-top: 0px;
-    background-image: url('../images/strip.png');
+    border: 1px solid #989A95;
 }
 
 .dialogContent input,
@@ -163,7 +162,7 @@ DIALOG BOXES
 .dialogContent select
 {
     margin-left:0px;
-    width: 250px;
+    width: 180px;
     border: 1px solid #aaa;
     background-image:url('../images/locationBg.gif');
     background-repeat: no-repeat;
@@ -177,17 +176,17 @@ DIALOG BOXES
 
 .dialogButtons
 {
-    text-align: center;
+    text-align: right;
 }
 
 .dialogButtons input,
 fieldSet input.dialogButton
 {
-    margin-left: 10px;
-    width: 65px;    
-    background-image: url('../images/ButtonBg.png');
-    color: white;
-    font-weight: bold;
+    margin-left: 6px;
+    width: 22px;    
+    padding:0px;
+    background-image: none;
+    background-color: #f1f1ef;
 }
 
 .editContent, .editContent div

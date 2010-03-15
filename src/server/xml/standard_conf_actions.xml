@@ -15,15 +15,10 @@
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 				<clientForm id="user_pref_form"><![CDATA[
-					<div id="user_pref_form" action="user_pref" box_width="300">
+					<div id="user_pref_form" action="user_pref" box_width="230">
 						<fieldset><legend><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/flag.png" align="absmiddle" border="0" width="16" height="16"> <ajxp:message ajxp_message_id="190">AJXP_MESSAGE[190]</ajxp:message></legend>
 							<select id="language_selector"></select>
 						</fieldset>
-						
-						<fieldset><legend><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/view_choose.png" align="absmiddle" border="0" width="16" height="16"> <ajxp:message ajxp_message_id="191">AJXP_MESSAGE[191]</ajxp:message></legend>
-							<input type="radio" name="display" id="display_list" value="list" class="radio"><ajxp:message ajxp_message_id="192">AJXP_MESSAGE[192]</ajxp:message>
-							<input type="radio" name="display" id="display_thumb" value="thumb" class="radio"><ajxp:message ajxp_message_id="193">AJXP_MESSAGE[193]</ajxp:message>
-						</fieldset>						
 						<fieldset id="user_pref_change_password"><legend><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/16/yast_security.png" align="absmiddle" border="0" width="16" height="16"> <ajxp:message ajxp_message_id="194">AJXP_MESSAGE[194]</ajxp:message></legend>
 						<input type="hidden" name="pass_seed" id="pass_seed" value="">
 						<table cellpadding="2" cellspacing="0" border="0" style="font-size:11px;">

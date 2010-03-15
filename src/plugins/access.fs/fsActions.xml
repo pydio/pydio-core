@@ -143,7 +143,7 @@
 					});
 					]]></clientCallback>
 				<clientForm id="mkdir_form"><![CDATA[
-				<div id="mkdir_form" action="mkdir" box_width="280">
+				<div id="mkdir_form" action="mkdir" box_width="200">
 				AJXP_MESSAGE[173]<br/>
 				<input type="text" name="dirname" size="30" class="dialogFocus">
 				</div>
@@ -174,10 +174,11 @@
 					});
 					]]></clientCallback>
 				<clientForm id="mkfile_form"><![CDATA[
-<div id="mkfile_form" action="mkfile" box_width="280">
-AJXP_MESSAGE[174]<br/>
-<input type="text" name="filename" size="30" class="dialogFocus">
-</div>				]]></clientForm>
+				<div id="mkfile_form" action="mkfile" box_width="200">
+				AJXP_MESSAGE[174]<br/>
+				<input type="text" name="filename" size="30" class="dialogFocus">
+				</div>
+				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
@@ -293,7 +294,7 @@ AJXP_MESSAGE[174]<br/>
 					}
 				]]></clientCallback>
 				<clientForm id="compress_form"><![CDATA[
-				<div id="compress_form" action="compress" box_width="280">
+				<div id="compress_form" action="compress" box_width="200">
 					AJXP_MESSAGE[315]<br/>
 					<input type="text" name="archive_name" value="" id="archive_name" class="dialogFocus initFicName">
 				</div>
@@ -459,7 +460,7 @@ AJXP_MESSAGE[174]<br/>
 						ajaxplorer.loadEditorResources(editorData.resourcesManager);
 						modal.openEditorDialog(editorData);
 					}else{
-						console.log('no data');
+						alert('no data found!');
 					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -708,9 +709,9 @@ AJXP_MESSAGE[174]<br/>
 					});
 					]]></clientCallback>
 				<clientForm id="delete_form"><![CDATA[
-				<div id="delete_form" action="delete" box_width="280">
-<span id="delete_message"></span>
-</div>				]]></clientForm>
+				<div id="delete_form" action="delete" box_width="200">
+				<span id="delete_message"></span>
+				</div>				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>

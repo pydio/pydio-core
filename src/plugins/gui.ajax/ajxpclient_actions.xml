@@ -138,8 +138,9 @@
 				modal.showDialogForm(
 					'Ajaxplorer', 
 					'splash_form', 
-					function(){
+					function(oForm){
 						modal.dialogContent.setStyle({paddingBottom:'10px'});
+						$(oForm).select('iframe')[0].src = window.ajxpServerAccessPath + '?get_action=display_doc&doc_file=CREDITS';
 					}, 
 					function(){hideLightBox();return false;}, 
 					null, 
@@ -147,7 +148,7 @@
 					]]></clientCallback>
 				<clientForm id="splash_form"><![CDATA[
 					<div id="splash_form" box_width="455" box_padding="0">
-						<iframe frameborder="0" src="AJXP_SERVER_ACCESS?get_action=display_doc&doc_file=CREDITS" id="docFileIframe"></iframe>
+						<iframe frameborder="0" id="docFileIframe"></iframe>
 					</div>				
 				]]></clientForm>
 			</processing>
