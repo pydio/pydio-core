@@ -134,13 +134,14 @@ Class.create("ActionsToolbar", {
 	
 	initCarousel : function(){
 		this.outer = this.element;
-		this.prev = new Element("a", {className:'carousel-control', rel:'prev'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/crystal/arrow_left.png'}));
-		this.next = new Element("a", {className:'carousel-control', rel:'next', style:'float:right;'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/crystal/arrow_right.png'}));
+		var origHeight = this.outer.getHeight()-1;
+		this.prev = new Element("a", {className:'carousel-control', rel:'prev', style:'height:'+origHeight+'px;'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/crystal/arrow_left.png'}));
+		this.next = new Element("a", {className:'carousel-control', rel:'next', style:'float:right;height:'+origHeight+'px;'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/crystal/arrow_right.png'}));
 		this.inner = new Element("div", {id:'buttons_inner', style:'width:1000px;'});
 		this.outer.insert({before:this.prev});
 		this.outer.insert({before:this.next});
 		this.outer.insert(this.inner);		
-		this.outer.setStyle({cssFloat:'left'});
+		if(Prototype.Browser.IE) this.outer.setStyle({cssFloat:'left'});
 		this.element = this.inner;
 		
 		this.carousel = new Carousel(this.outer, [], $A([this.prev,this.next]), {
