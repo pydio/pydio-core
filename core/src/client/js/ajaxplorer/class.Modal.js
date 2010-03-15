@@ -361,35 +361,16 @@ Class.create("Modal", {
 	updateLoadingProgress: function(state){	
 		this.loadingStep --;
 		var percent = (1 - (this.loadingStep / this.loadingStepsCount));
-		var width = parseInt( (parseInt($('progressBarBorder').getWidth())-2) * percent);
-		if(state){
-			$('progressState').update(state);
+		if(window.loaderProgress){
+			window.loaderProgress.setPercentage(parseInt(percent)*100, false);
 		}
-		if($('progressBar')){
-			var afterFinishFunc;
-			if(parseInt(percent)==1){
-				afterFinishFunc = function(effect){
-						new Effect.Opacity('loading_overlay', {
-							from:1.0,
-							to:0,
-							duration:0.3,
-							afterFinish:function(effect){
-								$('loading_overlay').remove();
-								$('progressBox').remove();
-							}
-						});
-				}
-			}
-			 
-			new Effect.Morph('progressBar',{
-				style:'width:'+width + 'px',
-				duration:0.8,
-				afterFinish:afterFinishFunc
-			});
+		if(state && $('progressState')){
+			$('progressState').update(state);
 		}
 		if(this.loadingStep == 0){
 			this.pageLoading = false;
 		}
+		return;
 	},
 	
 	setCloseAction: function(func){
