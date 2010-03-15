@@ -131,7 +131,8 @@ Proto.Menu = Class.create({
 	},
 	
 	refreshList: function() {
-		if(this.container.select('ul').length) this.container.select('ul')[0].remove();
+		//if(this.container.select('ul').length) this.container.select('ul')[0].remove();
+		this.container.childElements().invoke('remove');
 		var list = new Element('ul');
 		if(this.options.menuTitle != ''){
 			var text = this.options.menuTitle;
