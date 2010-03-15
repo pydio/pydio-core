@@ -39,7 +39,7 @@ Class.create("FoldersTree", AjxpPane, {
 	initialize: function ($super, oElement, options)
 	{
 		$super(oElement);
-		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:auto;height:100%;'});
+		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:auto;height:100%;width:100%;'});
 		oElement.insert(this.treeContainer);
 		disableTextSelection(this.treeContainer);
 		this.options = {};
