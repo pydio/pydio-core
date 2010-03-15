@@ -37,10 +37,10 @@ Class.create("AjxpBootstrap", {
 	parameters : $H({}),
 	initialize : function(startParameters){
 		this.parameters = $H(startParameters);
+		this.detectBaseParameters();
 		if(this.parameters.get("ALERT")){
 			window.setTimeout(function(){alert(this.parameters.get("ALERT"));}.bind(this),0);
 		}		
-		this.detectBaseParameters();
 		Event.observe(window, 'load', function(){
 			this.insertLoaderProgress();
 			this.loadBootConfig();		
