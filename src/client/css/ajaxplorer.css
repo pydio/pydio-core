@@ -119,7 +119,7 @@ DIALOG BOXES
 #all_forms div.shadow_class
 {display:block;}
 
-.dialogBox, .editBox, #progressBox
+.dialogBox, .editBox
 {
     display: none;
     position: absolute;
@@ -293,30 +293,7 @@ textarea#myCode
 {
     display: block;
     z-index: 2002;
-    width: 400px;
-    height: 300px;
     top: 20%;
-}
-
-#progressBarBorder
-{
-    border:1px solid black;
-    width: 380px;
-    background-color: #fff;
-    height: 10px;
-    margin-top: 5px;
-}
-
-#progressBar
-{
-	background-color: #73a2d7;
-	height: 10px;
-	width: 0%;
-}
-
-#progressState
-{
-    color:#f1f1ef;
 }
 
 
@@ -366,7 +343,6 @@ ACTION BAR
     background-color: #f1f1ef;
     font-family: Arial;
     font-size: 12px;
-    height: 85px;
     padding: 0px;
 }
 
@@ -486,7 +462,7 @@ a.carousel-control img{
 	background-image:url(../images/ToolbarBg.gif);
 	background-position:center center;
 	background-repeat:repeat-x;
-	float:left;
+	height:33px;
 	width:100%;
 }
 
@@ -1184,6 +1160,7 @@ UPLOAD MULTIFILE FORM
 {
 	border : 1px solid #676965;
     padding:3px;
+    clear:left;
 }
 
 #selectable_div, #table_rows_container, #tree_container, #bottomSplitPane{

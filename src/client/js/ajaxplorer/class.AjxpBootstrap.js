@@ -41,10 +41,10 @@ Class.create("AjxpBootstrap", {
 			window.setTimeout(function(){alert(this.parameters.get("ALERT"));}.bind(this),0);
 		}		
 		this.detectBaseParameters();
-		this.insertLoaderProgress();
 		Event.observe(window, 'load', function(){
+			this.insertLoaderProgress();
 			this.loadBootConfig();		
-		}.bind(this));
+		}.bind(this));		
 		document.observe("ajaxplorer:before_gui_load", function(e){
 			var marginBottom = 0;
 			if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
@@ -72,7 +72,7 @@ Class.create("AjxpBootstrap", {
 			window.MessageHash = this.parameters.get("i18nMessages");
 			window.zipEnabled = this.parameters.get("zipEnabled");
 			window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
-			window.flashUploaderEnabled = this.parameters.get("flashUploaderEnabled");
+			window.flashUploaderEnabled = this.parameters.get("flashUploaderEnabled");			
 			window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
 			if(this.parameters.get("currentLanguage")){
 				window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
@@ -111,18 +111,40 @@ Class.create("AjxpBootstrap", {
 	},
 	insertLoaderProgress : function(){
 		var html = '<div id="loading_overlay" style="background-color:#b1cae8;"></div>';
-		html+='	<div id="progressBox" style="background-color:#b1cae8;">';
-		html+='		<div id="loaderContent" style="text-align:left; width:416px; height: 321px; background-image:url(\''+this.parameters.get('ajxpResourcesFolder')+'/images/SplashGradBG.png\');background-repeat:no-repeat; padding:0px;">';
-		html+='				<div style="padding:5px;">';
-		html+='					<div align="left" style="font-size:12px;font-family:Trebuchet MS, sans-serif; font-weight:normal;color:#f1f1ef;position: relative;top:210px; left: 10px;">';
-		html+='					Written by Charles du Jeu - LGPL License. <br>';
-		html+='					AjaXplorer web browser <span id="version_span"></span>';
-		html+='					<div style="margin-top: 10px;" id="progressState">Booting...</div>';
-		html+='					<div id="progressBarBorder" style="font-size: 0.5em;" align="left"><div id="progressBar" style="width:0px;"></div></div>';
-		html+='				</div>';
-		html+='		</div>';
+		html+='	<div id="progressBox" style="border:1px solid #676965;width:305px;padding:3px;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
+		html+='	<div align="left" style="background-color:#F1F1EF;border:1px solid #0077b3;color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:5px;">';
+		html+=' <div style="margin-bottom:10px; font-size:35px;font-weight:bold; background-image:url(\'client/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:32px;color:#0077b3;">AjaXplorer</div>';
+		html+='	<div>The web data-browser<span id="version_span"></span></div>';
+		html+='	Written by Charles du Jeu - LGPL License. <br>';
+		html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
 		html+='	</div>';
 		$$('body')[0].insert({top:html});
+		viewPort = document.viewport.getDimensions();
+		$('progressBox').setStyle({left:Math.max((viewPort.width-305)/2,0)});
+		var options = {
+			animate		: true,										// Animate the progress? - default: true
+			showText	: false,									// show text with percentage in next to the progressbar? - default : true
+			width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
+			boxImage	: this.parameters.get("ajxpResourcesFolder")+'/images/bramus/custom1_box.gif',			// boxImage : image around the progress bar
+			barImage	: this.parameters.get("ajxpResourcesFolder")+'/images/bramus/custom1_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
+			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
+			onTick		: function(pbObj) { 
+				if(pbObj.getPercentage() == 100){
+					new Effect.Opacity('loading_overlay', {
+						from:0.9,
+						to:0,
+						duration:0.2,
+						afterFinish:function(effect){
+							$('loading_overlay').remove();
+							$('progressBox').remove();
+						}
+					});					
+					return false;
+				}
+				return true ;
+			}
+		};
+		window.loaderProgress = new JS_BRAMUS.jsProgressBar($('loaderProgress'), 0, options); 
 	},
 	insertAnalytics : function(){	
 		if(!this.parameters.get("googleAnalyticsData")) return;
