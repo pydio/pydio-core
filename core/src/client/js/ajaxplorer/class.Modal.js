@@ -189,14 +189,14 @@ Class.create("Modal", {
 		if(skipShadow) return;
 		Shadower.shadow($(elementName), 
 			{
-				distance: 4,
+				distance: 3,
 				angle: 130,
 				opacity: 0.5,
 				nestedShadows: 3,
 				color: '#000000',
 				shadowStyle:{display:'block'}
 			}, true);
-		
+				
 	},
 	
 	openEditorDialog : function(editorData){
@@ -274,31 +274,32 @@ Class.create("Modal", {
 	},
 	
 	addSubmitCancel: function(oForm, fOnCancel, bOkButtonOnly){
-		var contDiv = document.createElement('div');
-		contDiv.className = 'dialogButtons';
-		var okButton = document.createElement('input');
-		okButton.setAttribute('type', 'submit');
-		okButton.setAttribute('name', 'sub');
-		okButton.setAttribute('value', MessageHash[48]);	
-		$(okButton).addClassName('dialogButton');
-		$(okButton).addClassName('dialogFocus');
-		contDiv.appendChild(okButton);
+		var contDiv = new Element('div', {className:'dialogButtons'});
+		var okButton = new Element('input', {
+			type:'image',
+			src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_ok_apply.png',
+			title:MessageHash[48]});
+		okButton.addClassName('dialogButton');
+		okButton.addClassName('dialogFocus');
+		contDiv.insert(okButton);
 		if(!bOkButtonOnly)
 		{
-			var caButton = document.createElement('input');
-			caButton.setAttribute('type', 'button');
-			caButton.setAttribute('name', 'can');
-			caButton.setAttribute('value', MessageHash[49]);
-			$(caButton).addClassName('dialogButton');
+			var caButton = new Element('input', {
+				type:"image",
+				name:"can",
+				src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_close.png',
+				title:MessageHash[49],
+				className:"dialogButton"
+			});
 			if(fOnCancel){
-				caButton.onclick = function(){fOnCancel();hideLightBox();return false;};
+				caButton.observe("click",function(e){fOnCancel();hideLightBox();Event.stop(e);return false;});
 			}
 			else{
-				caButton.onclick = function(){hideLightBox();return false;};
+				caButton.observe("click",function(e){hideLightBox();Event.stop(e);return false;});
 			}
-			contDiv.appendChild(caButton);
+			contDiv.insert(caButton);
 		}	
-		oForm.appendChild(contDiv);
+		$(oForm).insert(contDiv);
 		oForm.hasButtons = true;
 	},
 	
