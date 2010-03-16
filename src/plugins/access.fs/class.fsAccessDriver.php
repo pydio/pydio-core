@@ -106,8 +106,8 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "download":
 				AJXP_Logger::logAction("Download", array("files"=>$selection));
-				set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
-				register_shutdown_function("restore_error_handler");				
+				@set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
+				@register_shutdown_function("restore_error_handler");				
 				if($selection->inZip){
 					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
  			        $delDir = $this->getPath()."/".$tmpDir;
