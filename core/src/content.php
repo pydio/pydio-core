@@ -48,7 +48,9 @@ require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.RecycleBinManager.php");
 if(isSet($_GET["ajxp_sessid"]))
 {
-	$_COOKIE["AjaXplorer"] = $_GET["ajxp_sessid"];
+    // Don't overwrite cookie
+    if (!isSet($_COOKIE["AjaXplorer"]))
+    	$_COOKIE["AjaXplorer"] = $_GET["ajxp_sessid"];
 }
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -160,6 +162,7 @@ if($loggedUser != null && $loggedUser->getPref("lang") != "") ConfService::setLa
 else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_lang"]);
 $mess = ConfService::getMessages();
 
+// Charles, this is quite dangerous. Probably the plugin should declare the variable they want
 foreach($_GET as $getName=>$getValue)
 {
 	$$getName = AJXP_Utils::securePath($getValue);

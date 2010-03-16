@@ -56,12 +56,14 @@ pclose($handle);
 
 // Check if the destination server host key is accessible
 echo "<h1>Checking if we can connect to destination SSH server</h1>";
-if ($_GET["destServer"] == "")
+$host = parse_url($_GET["destServer"], PHP_URL_HOST);
+if ($host == "")
 {
    echo "<form method=GET>Please enter SSH server address to test:<input type=text name='destServer' value=''><input type='submit' value='Ok'></form>";
 } else
 { 
-   $handle = popen("export DISPLAY=xxx && export SSH_ASKPASS=/bin/sh && ssh -T -t -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/etc/ssh/ssh_known_hosts -o LogLevel=QUIET ".$_GET["destServer"]." 2>&1", "r");
+   
+   $handle = popen("export DISPLAY=xxx && export SSH_ASKPASS=/bin/sh && ssh -T -t -o StrictHostKeyChecking=yes -o UserKnownHostsFile=/etc/ssh/ssh_known_hosts -o LogLevel=QUIET $host 2>&1", "r");
    $key = fread($handle, 320);
    if (strpos($key, "/bin/sh") === FALSE)
    {
