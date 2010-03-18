@@ -81,6 +81,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 			this.numPreloaded	= 0;							// Set to 0 initially
 			this.running		= false;						// Set to false initially
 			this.queue			= Array();						// Set to empty Array initially
+			this.visualsInitialized = false;
 
 			// datamembers which are calculatef
 			this.imgWidth		= this.options.width * 2;		// define the width of the image (twice the width of the progressbar)
@@ -184,6 +185,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 				'<img id="' + this.id + '_percentImage" src="' + this.options.boxImage + '" alt="0%" style="width: ' + this.options.width + 'px; height: ' + this.options.height + 'px; background-position: ' + this.initialPos + 'px 50%; background-image: url(' + this.options.barImage[this.backIndex] + '); padding: 0; margin: 0;" class="percentImage" />' + 
 				((this.options.showText == true)?'<span id="' + this.id + '_percentText" class="percentText">0%</span>':''));
 		
+			this.visualsInitialized = true;
 			// set the percentage
 			this.setPercentage(this.initialPerc);
 		},
@@ -199,6 +201,11 @@ JS_BRAMUS.jsProgressBar = Class.create({
 	 */
 		setPercentage	: function(targetPercentage, clearQueue) {
 			
+			if(!this.visualsInitialized){
+				this.initialPerc = targetPercentage;
+				this.initVisuals();
+				return;
+			}
 			// if clearQueue is set, empty the queue and then set the percentage
 			if (clearQueue) {
 				
@@ -382,7 +389,6 @@ JS_BRAMUS.jsProgressBar = Class.create({
 				if (this.options.showText == true) {
 					$(this.id + "_percentText").update("" + percentage + "%");
 				}
-				
 			// adjust datamember to stock the percentage
 				this.percentage	= percentage;
 		}
