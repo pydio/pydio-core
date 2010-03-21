@@ -129,19 +129,19 @@ class AbstractConfDriver extends AJXP_Plugin {
 			//------------------------------------
 			//	SWITCH THE ROOT REPOSITORY
 			//------------------------------------	
-			case "switch_root_dir":
+			case "switch_repository":
 			
-				if(!isSet($root_dir_index))
+				if(!isSet($repository_id))
 				{
 					break;
 				}
 				$dirList = ConfService::getRootDirsList();
-				if(!isSet($dirList[$root_dir_index]))
+				if(!isSet($dirList[$repository_id]))
 				{
-					$errorMessage = "Trying to switch to an unkown folder!";
+					$errorMessage = "Trying to switch to an unkown repository!";
 					break;
 				}
-				ConfService::switchRootDir($root_dir_index);
+				ConfService::switchRootDir($repository_id);
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 					$user = AuthService::getLoggedUser();
 					$activeRepId = ConfService::getCurrentRootDirIndex();
@@ -149,7 +149,7 @@ class AbstractConfDriver extends AJXP_Plugin {
 					$user->save();
 				}
 				$logMessage = "Successfully Switched!";
-				AJXP_Logger::logAction("Switch Repository", array("rep. id"=>$root_dir_index));
+				AJXP_Logger::logAction("Switch Repository", array("rep. id"=>$repository_id));
 				
 			break;	
 									

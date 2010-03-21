@@ -37,12 +37,13 @@ Class.create("UserWidget", {
 	initialize: function(element){
 		this.element = element;
 		this.element.ajxpPaneObject = this;
+		this.element.observe("click", this.displayUserPrefs.bind(this));
 		document.observe("ajaxplorer:user_logged", this.updateGui.bind(this));
 	},
 	updateGui : function(){
 		var logging_string = "";
 		var oUser = ajaxplorer.user;
-		this.element.stopObserving("click", this.displayUserPrefs.bind(this));
+		var observer = this.displayUserPrefs.bind(this);
 		if(oUser != null) 
 		{
 			if(oUser.id != 'guest') 
@@ -52,7 +53,6 @@ Class.create("UserWidget", {
 				{
 					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
 				}
-				this.element.observe("click", this.displayUserPrefs.bind(this));
 			}
 			else 
 			{
@@ -70,6 +70,7 @@ Class.create("UserWidget", {
 	displayUserPrefs: function()
 	{
 		if(ajaxplorer.user == null) return;
+		if(ajaxplorer.user.id == 'guest') return;
 		var userLang = ajaxplorer.user.getPreference("lang");
 		var userDisp = ajaxplorer.user.getPreference("display");	
 		var onLoad = function(oForm){

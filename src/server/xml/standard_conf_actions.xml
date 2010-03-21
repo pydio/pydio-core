@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="ajxpclient">
 	<actions>
-		<action name="switch_root_dir">
+		<action name="switch_repository">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
