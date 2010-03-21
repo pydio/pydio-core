@@ -65,7 +65,9 @@ Class.create("FoldersTree", AjxpPane, {
 		var filter = function(ajxpNode){
 			return (((d && !ajxpNode.isLeaf()) || (f && ajxpNode.isLeaf()) || (z && (ajxpNode.getAjxpMime()=="zip" || ajxpNode.getAjxpMime()=="ajxp_browsable_archive"))) && (ajxpNode.getParent().getAjxpMime() != "ajxp_recycle"));
 		};
-		this.tree = new AJXPTree(new AjxpNode("/", true, "No Repository", "folder.png"),  action, filter);		
+		var fakeRootNode = new AjxpNode("/", true, "No Repository", "folder.png");
+		fakeRootNode._isLoaded = true;
+		this.tree = new AJXPTree(fakeRootNode,  action, filter);		
 				
 		this.treeContainer.update(this.tree.toString());
 		$(this.tree.id).ajxpNode = this.tree.ajxpNode;	

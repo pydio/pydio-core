@@ -2,14 +2,6 @@
 <driver name="fs" className="class.fsDriver.php">
 	<actions>
 		<action name="ls" dirDefault="true">			
-			<displayDefinitions>
-				<display mode="list">
-					<column messageId="1" attributeName="text"/>
-					<column messageId="2" attributeName="filesize"/>
-					<column messageId="3" attributeName="mimestring"/>
-					<column messageId="4" attributeName="modiftime"/>
-				</display>
-			</displayDefinitions>
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
