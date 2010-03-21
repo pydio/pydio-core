@@ -57,11 +57,10 @@ header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 require_once("server/classes/class.AJXP_Logger.php");
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
-$confFile = "server/conf/conf.php";
-include_once($confFile);
+include_once("server/conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
-ConfService::init($confFile);
+ConfService::init("server/conf/conf.php");
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
@@ -189,27 +188,12 @@ if(!AuthService::usersEnabled() || ALLOW_GUEST_BROWSING || AuthService::getLogge
 }
 require_once(INSTALL_PATH."/server/classes/class.AJXP_Controller.php");
 $xmlResult = AJXP_Controller::findActionAndApply($action, array_merge($_GET, $_POST), $_FILES);
-if($res !== false){
-	if($xmlResult != ""){
-		AJXP_XMLWriter::header();
-		print($xmlResult);
-		AJXP_XMLWriter::close();
-		exit(1);
-	}
-}
-/*
-if($Driver == null || !is_a($Driver, "AbstractDriver")){
+if($xmlResult !== false && $xmlResult != ""){
 	AJXP_XMLWriter::header();
-	if(is_a($Driver, "AJXP_Exception")){
-		AJXP_XMLWriter::sendMessage(null, "Cannot initialize driver : ".$Driver->getMessage());
-	}else{
-		AJXP_XMLWriter::sendMessage(null, "Cannot find driver!");
-	}
+	print($xmlResult);
 	AJXP_XMLWriter::close();
 	exit(1);
 }
-*/
-
 if(isset($requireAuth))
 {
 	AJXP_XMLWriter::header();
