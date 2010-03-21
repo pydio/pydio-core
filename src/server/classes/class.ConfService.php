@@ -90,6 +90,7 @@ class ConfService
 				}
 			}else{
 				$pObject = $pServ->getPluginByTypeName($ex[0], $ex[1]);
+				if(!is_object($pObject)) throw new Exception("Cannot find plugin $plugs");
 				$pObject->init(array());
 				$pServ->setPluginActiveInst($ex[0], $ex[1], true);
 			}
