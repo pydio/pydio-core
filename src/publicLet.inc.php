@@ -1,7 +1,7 @@
 <?php
 require_once("server/classes/class.AJXP_Logger.php"); 
 require_once("server/classes/class.AJXP_Plugin.php"); 
-require_once("server/conf/conf.php"); 
+require_once("server/conf/base.conf.php"); 
 require_once("server/classes/class.Repository.php"); 
 require_once("server/classes/class.AJXP_Utils.php"); 
 require_once("server/classes/class.SystemTextEncoding.php"); 

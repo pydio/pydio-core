@@ -596,7 +596,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					);
 				}
 				// ADD RECYCLE BIN TO THE LIST
-				if($path == $this->repository->getOption("PATH") && RecycleBinManager::recycleEnabled() && !$completeMode && !$skipZip)
+				if($path == $this->repository->getOption("PATH") && RecycleBinManager::recycleEnabled())
 				{
 					$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
 					if(is_dir($this->repository->getOption("PATH")."/".$recycleBinOption)){
@@ -983,7 +983,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			}
 			$nodeType = "d";
 			if($isLeaf){
-				if(AJXP_Utils::isBrowsableArchive($nodeName)) {
+				if(AJXP_Utils::isBrowsableArchive($file)) {
 					if($lsOptions["f"] && $lsOptions["z"]){
 						// See archives as files
 						$nodeType = "f";
