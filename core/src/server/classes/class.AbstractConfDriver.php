@@ -33,21 +33,10 @@
  * 
  * Description : Abstract representation of Ajaxplorer Data Access
  */
-class AbstractConfDriver extends AbstractDriver {
+class AbstractConfDriver extends AJXP_Plugin {
 		
 	var $options;
 	var $driverType = "conf";
-
-	/**
-	 * Initialize the driver with a given set of options
-	 *
-	 * @param Array $options Array of options as defined by the manifest.xml file
-	 */
-	function init($options){		
-		$this->options = $options;
-		$this->loadActionsFromManifest();
-		unset($this->actions["get_driver_actions"]);		
-	}
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	/**

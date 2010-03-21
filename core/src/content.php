@@ -38,7 +38,6 @@ require_once("server/classes/class.Repository.php");
 require_once("server/classes/class.AJXP_Exception.php");
 require_once("server/classes/class.AJXP_Plugin.php");
 require_once("server/classes/class.AJXP_PluginsService.php");
-require_once("server/classes/class.AbstractDriver.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
@@ -84,9 +83,9 @@ if(AuthService::usersEnabled())
 	}	
 	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "logout")
 	{
-		AuthService::disconnect();
+		AuthService::disconnect();		
 		$loggingResult = 2;
-	}	//AuthService::disconnect();
+	}
     if(isSet($_GET["get_action"]) && $_GET["get_action"] == "back")
     {
 		AJXP_XMLWriter::header("url");
@@ -135,11 +134,10 @@ if(AuthService::usersEnabled())
 	{
 		$requireAuth = true;
 	}
-	if(isset($loggingResult) || (isSet($_GET["get_action"]) && $_GET["get_action"] == "logged_user"))
+	if(isset($loggingResult))
 	{
 		AJXP_XMLWriter::header();
-		if(isSet($loggingResult)) AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass);
-		AJXP_XMLWriter::sendUserData();
+		AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass);
 		AJXP_XMLWriter::close();
 		exit(1);
 	}
@@ -162,24 +160,9 @@ if($loggedUser != null && $loggedUser->getPref("lang") != "") ConfService::setLa
 else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_lang"]);
 $mess = ConfService::getMessages();
 
-// Charles, this is quite dangerous. Probably the plugin should declare the variable they want
-foreach($_GET as $getName=>$getValue)
-{
-	$$getName = AJXP_Utils::securePath($getValue);
-}
-foreach($_POST as $getName=>$getValue)
-{
-	$$getName = AJXP_Utils::securePath($getValue);
-}
-
-$selection = new UserSelection();
-$selection->initFromHttpVars();
-
-if(isSet($action) || isSet($get_action)) $action = (isset($get_action)?$get_action:$action);
-else $action = "";
-
-if(isSet($dir) && $action != "upload") $dir = SystemTextEncoding::fromUTF8($dir);
-if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
+$action = "";
+if(isSet($_GET["action"]) || isSet($_GET["get_action"])) $action = (isset($_GET["get_action"])?$_GET["get_action"]:$_GET["action"]);
+else if(isSet($_POST["action"]) || isSet($_POST["get_action"])) $action = (isset($_POST["get_action"])?$_POST["get_action"]:$_POST["action"]);
 
 //------------------------------------------------------------
 // SPECIAL HANDLING FOR FANCY UPLOADER RIGHTS FOR THIS ACTION
@@ -197,25 +180,24 @@ if(AuthService::usersEnabled())
 // THIS FIRST DRIVERS DO NOT NEED ID CHECK
 $ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $ajxpDriver->init(ConfService::getRepository());
-$ajxpDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
-
 $authDriver = ConfService::getAuthDriverImpl();
-$authDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
-
-// TRYING TO GET A DRIVER WHEN NO USER IS LOGGED
-if(AuthService::usersEnabled() && AuthService::getLoggedUser()==null && !ALLOW_GUEST_BROWSING){
-	AJXP_XMLWriter::header();
-	AJXP_XMLWriter::requireAuth(true);
-	AJXP_XMLWriter::close();
-	exit(1);
-}
-
+ConfService::initActivePlugins();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
-$confDriver = ConfService::getConfStorageImpl();
-$confDriver->applyIfExistsAndExit($action, array_merge($_GET, $_POST), $_FILES);
-
-// INIT DRIVER
-$Driver = ConfService::getRepositoryDriver();
+if(!AuthService::usersEnabled() || ALLOW_GUEST_BROWSING || AuthService::getLoggedUser()!=null){
+	$confDriver = ConfService::getConfStorageImpl();
+	$Driver = ConfService::loadRepositoryDriver();
+}
+require_once(INSTALL_PATH."/server/classes/class.AJXP_Controller.php");
+$xmlResult = AJXP_Controller::findActionAndApply($action, array_merge($_GET, $_POST), $_FILES);
+if($res !== false){
+	if($xmlResult != ""){
+		AJXP_XMLWriter::header();
+		print($xmlResult);
+		AJXP_XMLWriter::close();
+		exit(1);
+	}
+}
+/*
 if($Driver == null || !is_a($Driver, "AbstractDriver")){
 	AJXP_XMLWriter::header();
 	if(is_a($Driver, "AJXP_Exception")){
@@ -226,36 +208,7 @@ if($Driver == null || !is_a($Driver, "AbstractDriver")){
 	AJXP_XMLWriter::close();
 	exit(1);
 }
-if($Driver->hasAction($action)){
-	// CHECK RIGHTS
-	if(AuthService::usersEnabled()){
-		$loggedUser = AuthService::getLoggedUser();
-		if( $Driver->actionNeedsRight($action, "r") && 
-			($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))){
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage(null, $mess[208]);
-				AJXP_XMLWriter::requireAuth();
-				AJXP_XMLWriter::close();
-				exit(1);
-			}
-		if( $Driver->actionNeedsRight($action, "w") && 
-			($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))){
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage(null, $mess[207]);
-				AJXP_XMLWriter::requireAuth();
-				AJXP_XMLWriter::close();
-				exit(1);
-			}
-	}
-	
-	$xmlResult = $Driver->applyAction($action, array_merge($_GET, $_POST), $_FILES);
-	if($xmlResult != ""){
-		AJXP_XMLWriter::header();
-		print($xmlResult);
-		AJXP_XMLWriter::close();
-		exit(1);
-	}
-}
+*/
 
 if(isset($requireAuth))
 {

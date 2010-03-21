@@ -37,6 +37,8 @@
  	private static $instance;
  	private $registry = array();
  	private $tmpDependencies = array();
+ 	private $activePlugins = array();
+ 	private $xmlRegistry;
  	private $pluginFolder;
  	private $confFolder;
  	
@@ -85,7 +87,7 @@
  		$filename = INSTALL_PATH."/".$definition["filename"];
  		$className = $definition["classname"];
  		if(is_file($filename)){
- 			include_once($filename);
+ 			require_once($filename);
  			$newPlugin = new $className($plugin->getId(), $plugin->getBaseDir());
  			$newPlugin->loadManifest();
 	 		return $newPlugin;
@@ -134,6 +136,117 @@
  		}
  	}
  	
+ 	public static function setPluginActive($type, $name, $active=true){
+ 		self::getInstance()->setPluginActiveInst($type, $name, $active);
+ 	}
+ 	
+ 	public function setPluginActiveInst($type, $name, $active=true){
+ 		$this->activePlugins[$type.".".$name] = $active;
+ 		if(isSet($this->xmlRegistry)){
+ 			$this->buildXmlRegistry();
+ 		}
+ 	}
+ 	
+ 	public function setPluginUniqueActiveForType($type, $name){
+ 		$typePlugs = $this->getPluginsByType($type);
+ 		foreach($typePlugs as $plugName => $plugObject){
+ 			$this->setPluginActiveInst($type, $plugName, false);
+ 		}
+ 		$this->setPluginActiveInst($type, $name, true);
+ 	}
+ 	
+ 	public function getActivePlugins(){
+ 		return $this->activePlugins;	
+ 	}
+ 	
+ 	public function buildXmlRegistry(){
+ 		$actives = $this->getActivePlugins();
+ 		$reg = DOMDocument::loadXML("<ajxp_registry></ajxp_registry>");
+ 		foreach($actives as $activeName=>$status){
+ 			if($status === false) continue; 			
+ 			$plug = $this->getPluginById($activeName);
+ 			$contribs = $plug->getRegistryContributions();
+ 			foreach($contribs as $contrib){
+ 				$parent = $contrib->nodeName;
+ 				$nodes = $contrib->childNodes;
+ 				if(!$nodes->length) continue;
+ 				//$uuidAttr = $contrib->attributes["uuidAttr"] OR "name";
+ 				$uuidAttr = "name";
+ 				$this->mergeNodes($reg, $parent, $uuidAttr, $nodes);
+	 		}
+ 		}
+ 		$this->xmlRegistry = $reg;
+ 	}
+ 	
+ 	public static function getXmlRegistry(){
+ 		$self = self::getInstance();
+ 		if(!isSet($self->xmlRegistry)){
+ 			$self->buildXmlRegistry();
+ 		}
+ 		return $self->xmlRegistry;
+ 	}
+ 	
+ 	protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes){
+ 		// find or create parent
+ 		$parentSelection = $original->getElementsByTagName($parentName);
+ 		if($parentSelection->length){
+ 			$parentNode = $parentSelection->item(0);
+ 			$xPath = new DOMXPath($original);
+ 			foreach($childrenNodes as $child){
+ 				if($child->nodeType != XML_ELEMENT_NODE) continue;
+ 				$child = $original->importNode($child, true);
+ 				$query = $parentName.'/'.$child->nodeName.'[@'.$uuidAttr.' = "'.$child->getAttribute($uuidAttr).'"]';
+ 				$childrenSel = $xPath->query($query);
+ 				if($childrenSel->length){
+ 					$existingNode = $childrenSel->item(0);
+ 					$this->mergeChildByTagName($child, $existingNode);
+ 				}else{
+ 					$parentNode->appendChild($child);
+ 				}
+ 			} 			
+ 		}else{
+ 			//create parentNode and append children
+ 			if($childrenNodes->length){
+ 				$parentNode = $original->importNode($childrenNodes->item(0)->parentNode, true);
+ 				$original->documentElement->appendChild($parentNode);
+ 			}else{
+	 			$parentNode = $original->createElement($parentName);
+	 			$original->documentElement->appendChild($parentNode);
+ 			}
+ 		}
+ 	}
+ 	
+ 	protected function mergeChildByTagName(&$new, &$old){
+ 		if(!$this->hasElementChild($new) || !$this->hasElementChild($old)){
+ 			$old->parentNode->replaceChild($new, $old);
+ 			return;
+ 		}
+ 		foreach($new->childNodes as $newChild){
+ 			if($newChild->nodeType != XML_ELEMENT_NODE) continue;
+ 			$found = null;
+ 			foreach($old->childNodes as $oldChild){
+ 				if($oldChild->nodeType != XML_ELEMENT_NODE) continue;
+ 				if($oldChild->nodeName == $newChild->nodeName){
+ 					$found = $oldChild;
+ 				}
+ 			}
+ 			if($found != null){
+ 				$this->mergeChildByTagName($newChild, $found);
+ 			}else{
+ 				$import = $old->ownerDocument->importNode($newChild);
+ 				$old->appendChild($import);
+ 			}
+ 		}
+ 	}
+ 	
+ 	private function hasElementChild($node){
+ 		if(!$node->hasChildNodes()) return false;
+ 		foreach($node->childNodes as $child){
+ 			if($child->nodeType == XML_ELEMENT_NODE) return true;
+ 		}
+ 		return false;
+ 	}
+ 	
  	public function getPluginByTypeName($plugType, $plugName){
  		if(isSet($this->registry[$plugType]) && isSet($this->registry[$plugType][$plugName])){
  			return $this->registry[$plugType][$plugName];
@@ -145,6 +258,10 @@
  	public static function findPlugin($type, $name){
  		$instance = self::getInstance();
  		return $instance->getPluginByTypeName($type, $name);
+ 	}
+ 	
+ 	public static function findPluginById($id){
+ 		return self::getInstance()->getPluginById($id);
  	}
  	
  	private function __construct(){ 		

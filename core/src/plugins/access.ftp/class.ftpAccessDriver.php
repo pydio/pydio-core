@@ -353,8 +353,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
 								unlink($currentFile);
 							}
 						}else{							
-							$atts[] = "icon=\"client/images/foldericon.png\"";
-							$atts[] = "openicon=\"client/images/foldericon.png\"";
+							$atts[] = "icon=\"folder.png\"";
+							$atts[] = "openicon=\"folder.png\"";
 							$atts[] = "src=\"content.php?dir=".urlencode(SystemTextEncoding::toUTF8($zipEntry["filename"]))."\"";
 						}	
 						print("<tree ".join(" ", $atts)."/>");
@@ -426,8 +426,8 @@ class ftpAccessDriver extends  AbstractAccessDriver
 						$parentFolderName = $dir;
 						$repName = $repIndex;
 						if(!$completeMode){
-							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
-							$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
+							$icon = "folder.png";
+							$openicon = "folder_open.png";
 							if(preg_match("/\.zip$/",$repName)){
 								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
 							}

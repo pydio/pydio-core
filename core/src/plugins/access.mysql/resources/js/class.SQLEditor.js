@@ -32,7 +32,7 @@
  * 
  * Description : The online editor for SQL rows.
  */
-SQLEditor = Class.create({
+Class.create("SQLEditor", {
 
 	initialize: function(oFormObject)
 	{

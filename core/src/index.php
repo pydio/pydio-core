@@ -40,7 +40,6 @@ require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.AJXP_Logger.php");
 require_once("server/classes/class.AJXP_Plugin.php");
 require_once("server/classes/class.AJXP_PluginsService.php");
-require_once("server/classes/class.AbstractDriver.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
 HTMLWriter::charsetHeader();
 $confFile = "server/conf/conf.php";
@@ -86,9 +85,9 @@ AJXP_Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
 $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
 if(ConfService::getConf("JS_DEBUG")){
 	$mess = ConfService::getMessages();
-	include_once(CLIENT_RESOURCES_FOLDER."/html/gui_debug.html");
+	include_once(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/html/gui_debug.html");
 }else{
-	$content = file_get_contents(CLIENT_RESOURCES_FOLDER."/html/gui.html");	
+	$content = file_get_contents(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/html/gui.html");	
 	$content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
 	if($JSON_START_PARAMETERS){
 		$content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);
