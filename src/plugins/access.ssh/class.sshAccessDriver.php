@@ -454,8 +454,8 @@ class sshAccessDriver extends AbstractAccessDriver
 						$folderFullName = "$dir/".$folderBaseName;
 						$parentFolderName = $dir;
 						if(!$completeMode){
-							$icon = CLIENT_RESOURCES_FOLDER."/images/foldericon.png";
-							$openicon = CLIENT_RESOURCES_FOLDER."/images/openfoldericon.png";
+							$icon = "folder.png";
+							$openicon = "folder_open.png";
 							if(preg_match("/\.zip$/",$file["name"])){
 								$icon = $openicon = CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/accessories-archiver.png";
 							}

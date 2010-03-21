@@ -39,13 +39,15 @@ Class.create("InfoPanel", AjxpPane, {
 		disableTextSelection(htmlElement);
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
 		this.mimesTemplates = new Hash();
-		this.registeredMimes = new Hash();		
-		/*
-		document.observe("ajaxplorer:selection_changed", this.update.bind(this) );
-		document.observe("ajaxplorer:context_changed", this.update.bind(this) );
-		*/
+		this.registeredMimes = new Hash();
 		document.observe("ajaxplorer:actions_refreshed", this.update.bind(this) );
-		document.observe("ajaxplorer:actions_loaded", this.load.bind(this) );
+		document.observe("ajaxplorer:component_config_changed", function(event){
+			if(event.memo.className == "InfoPanel"){
+				this.parseComponentConfig(event.memo.classConfig.get('all'));
+			}
+		}.bind(this) );
+		
+		//document.observe("ajaxplorer:actions_loaded", this.parseRegistry.bind(this) );
 	},
 	
 	setTemplateForMime: function(mimeType, templateString, attributes, messages){
@@ -233,32 +235,17 @@ Class.create("InfoPanel", AjxpPane, {
 			if(selectionType == 'empty' && action.context.selection) return;
 			if(selectionType == 'multiple' && action.selectionContext.unique) return; 
 			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;			
-			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/'+action.options.src+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
+			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
 			count++;
 		}.bind(this));
 		actionString += '</div>';
 		if(!count) return;
 		this.htmlElement.insert(actionString);
 	},
-	
-	load: function(){
-		if(!this.htmlElement) return;
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'get_driver_info_panels');
-		connexion.onComplete = function(transport){
-			this.parseXML(transport.responseXML);
-		}.bind(this);
-		this.clearPanels();
-		connexion.sendSync();
-	},
-	
-	parseXML: function(xmlResponse){
-		if(xmlResponse == null || xmlResponse.documentElement == null) return;		
-		var childs = xmlResponse.documentElement.childNodes;
-		if(!childs.length) return;
-		var panels = childs[0].childNodes;
+		
+	parseComponentConfig: function(configNode){
+		var panels = XPathSelectNodes(configNode, "infoPanel");
 		for(var i = 0; i<panels.length; i++){
-			if(panels[i].nodeName != 'infoPanel') continue;
 			var panelMimes = panels[i].getAttribute('mime');
 			var attributes = $A(panels[i].getAttribute('attributes').split(","));
 			var messages = new Hash();

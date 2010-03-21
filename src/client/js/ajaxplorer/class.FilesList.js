@@ -78,8 +78,13 @@ Class.create("FilesList", SelectableElements, {
 			
 		}.bind(this) );
 		document.observe("ajaxplorer:context_loading", loadingObs);
-		document.observe("ajaxplorer:data_columns_def_changed", function(event){
-			this.setColumnsDef(event.memo);
+		document.observe("ajaxplorer:component_config_changed", function(event){
+			if(event.memo.className == "FilesList"){
+				var refresh = this.parseComponentConfig(event.memo.classConfig.get('all'));
+				if(refresh){
+					this.initGUI();
+				}
+			}
 		}.bind(this) );
 		
 		
@@ -114,6 +119,46 @@ Class.create("FilesList", SelectableElements, {
 		//console.log('FILES LIST : FILL');
 		this.fill(this.crtContext);
 		this.removeOnLoad();
+	},
+	
+	parseComponentConfig : function(domNode){
+		refreshGUI = false;
+		// CHECK FOR COLUMNS DEFINITION DATA
+		var columnsNode = XPathSelectSingleNode(domNode, "columns");
+		if(columnsNode){
+			// DISPLAY INFO
+			if(columnsNode.getAttribute('switchGridMode')){
+				this.gridStyle = columnsNode.getAttribute('switchGridMode');
+				refreshGUI = true;
+			}
+			if(columnsNode.getAttribute('switchDisplayMode')){
+				var dispMode = columnsNode.getAttribute('switchDisplayMode');
+				if(dispMode != this._displayMode){
+					this.switchDisplayMode(dispMode);
+				}				
+			}						
+			// COLUMNS INFO
+			var newCols = $A([]);
+			var sortTypes = $A([]);
+			XPathSelectNodes(columnsNode, "column").each(function(col){
+				var obj = {};
+				$A(col.attributes).each(function(att){
+					obj[att.nodeName]=att.nodeValue;
+					if(att.nodeName == "sortType"){
+						sortTypes.push(att.nodeValue);
+					}
+				});
+				newCols.push(obj);					
+			});
+			if(newCols.size()){
+				this.columnsDef=newCols;
+				this._oSortTypes=sortTypes;
+				if(this._displayMode == "list"){
+					refreshGUI = true;
+				}			
+			}
+		}
+		return refreshGUI;
 	},
 
 	getActions : function(){
@@ -493,26 +538,11 @@ Class.create("FilesList", SelectableElements, {
 				refreshGUI = true;
 			}
 		}
-		var displayData = contextNode.getMetadata().get("displayData");
-		if(displayData){
-			//Dynamically redefine columns!
-			if(displayData.get('gridMode')){
-				this.gridStyle = displayData.get('gridMode');
-				refreshGUI = true;
-			}
-			if(displayData.get('displayMode')){
-				var dispMode = displayData.get('displayMode');
-				if(dispMode != this._displayMode){
-					this.switchDisplayMode(dispMode);
-				}
-			}
-		}
-		var columnsData = contextNode.getMetadata().get("columnsData");
-		if(columnsData){
-			this.columnsDef = columnsData.get("columnsDef");
-			this._oSortTypes = columnsData.get("sortTypes");
-			if(this._displayMode == "list"){
-				refreshGUI = true;
+		var clientConfigs = contextNode.getMetadata().get("client_configs");
+		if(clientConfigs){
+			var componentData = XPathSelectSingleNode(clientConfigs, 'component_config[@className="FilesList"]');
+			if(componentData){
+				refreshGUI = this.parseComponentConfig(componentData);
 			}
 		}
 		

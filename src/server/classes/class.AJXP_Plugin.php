@@ -46,6 +46,7 @@ class AJXP_Plugin{
 	protected $xPath;
 	protected $manifestLoaded = false;
 	protected $actions;
+	protected $registryContributions = array();
 	protected $options; // can be passed at init time
 	protected $pluginConf; // can be passed at load time
 	protected $dependencies;
@@ -66,50 +67,125 @@ class AJXP_Plugin{
 	}
 	public function init($options){
 		$this->options = $options;
+		$this->loadRegistryContributions();
 	}
-	protected function loadActionsFromManifest(){
-		$actionFiles = $this->xPath->query("actions_definition");		
-		foreach ($actionFiles as $actionFileNode){
-			$data = $this->nodeAttrToHash($actionFileNode);
-			$filename = $data["filename"] OR "";
-			$include = $data["include"] OR "*";
-			$exclude = $data["exclude"] OR "";			
-			if(!is_file(INSTALL_PATH."/".$filename)) continue;			
-			if($include != "*") $include = explode(",", $include);
-			if($exclude != "") $exclude = explode(",", $exclude);			
-			$this->initXmlActionsFile(INSTALL_PATH."/".$filename, $include, $exclude);
-		}
-	}
-	public function initXmlActionsFile($xmlFile, $include="*", $exclude=""){		
-		$actionDoc = new DOMDocument();
-		$actionDoc->load($xmlFile);
-		$actionXpath = new DOMXPath($actionDoc);
-		$actionNodes = $actionXpath->query("actions/action");				
-		foreach ($actionNodes as $actionNode){
-			$actionData = array();			
-			$actionData["XML"] = $actionDoc->saveXML($actionNode);			
-			$names = $actionXpath->query("@name", $actionNode);
-			if($names->length){
-				$name = $names->item(0)->value;
+	protected function loadRegistryContributions(){		
+		$regNodes = $this->xPath->query("registry_contributions/*");
+		for($i=0;$i<$regNodes->length;$i++){
+			$regNode = $regNodes->item($i);
+			if($regNode->nodeType != XML_ELEMENT_NODE) continue;
+			if($regNode->nodeName == "external_file"){
+				$data = $this->nodeAttrToHash($regNode);
+				$filename = $data["filename"] OR "";
+				$include = $data["include"] OR "*";
+				$exclude = $data["exclude"] OR "";			
+				if(!is_file(INSTALL_PATH."/".$filename)) continue;			
+				if($include != "*") {
+					$include = explode(",", $include);
+				}else{
+					$include = array("*");
+				}
+				if($exclude != "") {
+					$exclude = explode(",", $exclude);			
+				}else{
+					$exclude = array();
+				}
+				$this->initXmlContributionFile($filename, $include, $exclude);
 			}else{
-				continue;
+				$this->registryContributions[]=$regNode;
+				$this->parseSpecificContributions($regNode);
 			}
-			if(is_array($include)){
-				if(!in_array($name, $include)) continue;
+		}
+		// add manifest as a "plugins" (remove parsed contrib)
+		$pluginContrib = new DOMDocument();
+		$pluginContrib->loadXML("<plugins uuidAttr='name'></plugins>");
+		$manifestNode = $pluginContrib->importNode($this->manifestDoc->documentElement, true);
+		$pluginContrib->documentElement->appendChild($manifestNode);
+		$xP=new DOMXPath($pluginContrib);
+		$regNodeParent = $xP->query("registry_contributions", $manifestNode);
+		if($regNodeParent->length){
+			$manifestNode->removeChild($regNodeParent->item(0));
+		}
+		$this->registryContributions[]=$pluginContrib->documentElement;
+		$this->parseSpecificContributions($pluginContrib->documentElement);
+	}
+	protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array()){
+		$contribDoc = new DOMDocument();
+		$contribDoc->load($xmlFile);
+		if(!is_array($include) && !is_array($exclude)){
+			$this->registryContributions[] = $contribDoc->documentElement;
+			$this->parseSpecificContributions($contribDoc->documentElement);
+			return;
+		}
+		$xPath = new DOMXPath($contribDoc);
+		$excluded = array();
+		foreach($exclude as $excludePath){
+			$children = $xPath->query($excludePath);
+			foreach($children as $child){
+				$excluded[] = $child;
 			}
-			if(is_array($exclude)){
-				if(in_array($name, $exclude)) continue;
+		}
+		$selected = array();
+		foreach($include as $includePath){
+			$incChildren = $xPath->query($includePath);
+			if(!$incChildren->length) continue;
+			$parentNode = $incChildren->item(0)->parentNode;
+			if(!isSet($selected[$parentNode->nodeName])){
+				$selected[$parentNode->nodeName]=array("parent"=>$parentNode, "nodes"=>array());
 			}
-			$callbacks = $actionXpath->query("processing/serverCallback/@methodName", $actionNode);
-			if($callbacks->length){
-				$actionData["callback"] = $callbacks->item(0)->value;
+			foreach($incChildren as $incChild){
+				$foundEx = false;
+				foreach($excluded as $exChild){
+					if($this->nodesEqual($exChild, $incChild)) {
+						$foundEx = true;break;
+					}
+				}
+				if($foundEx) continue;
+				$selected[$parentNode->nodeName]["nodes"][] = $incChild;
 			}
-			$rightContextNodes = $actionXpath->query("rightsContext",$actionNode);
-			if($rightContextNodes->length){
-				$rightContext = $rightContextNodes->item(0);
-				$actionData["rights"] = $this->nodeAttrToHash($rightContext);
+			if(!count($selected[$parentNode->nodeName]["nodes"])){
+				unset($selected[$parentNode->nodeName]);
 			}
-			$this->actions[$name] = $actionData;
+		}
+		if(!count($selected)) return;
+		foreach($selected as $parentNodeName => $data){
+			$node = $data["parent"]->cloneNode(false);
+			foreach($data["nodes"] as $childNode){
+				$node->appendChild($childNode);
+			}
+			$this->registryContributions[] = $node;
+			$this->parseSpecificContributions($node);			
+		}		
+	}
+	protected function parseSpecificContributions(&$contribNode){
+		//Append plugin id to callback tags
+		$callbacks = $contribNode->getElementsByTagName("serverCallback");
+		foreach($callbacks as $callback){
+			$attr = $callback->ownerDocument->createAttribute("pluginId");
+			$attr->value = $this->id;
+			$callback->appendChild($attr);
+		}
+		if($contribNode->nodeName == "actions"){
+			$actionXpath=new DOMXPath($contribNode->ownerDocument);
+			foreach($contribNode->childNodes as $actionNode){
+				if($actionNode->nodeType!=XML_ELEMENT_NODE) continue;
+				$actionData=array();
+				$actionData["XML"] = $contribNode->ownerDocument->saveXML($actionNode);			
+				$names = $actionXpath->query("@name", $actionNode);
+				$callbacks = $actionXpath->query("processing/serverCallback/@methodName", $actionNode);
+				if($callbacks->length){
+					$actionData["callback"] = $callbacks->item(0)->value;
+				}
+				$rightContextNodes = $actionXpath->query("rightsContext",$actionNode);
+				if($rightContextNodes->length){
+					$rightContext = $rightContextNodes->item(0);
+					$actionData["rights"] = $this->nodeAttrToHash($rightContext);
+				}
+				$actionData["node"] = $actionNode;
+				$names = $actionXpath->query("@name", $actionNode);
+				$name = $names->item(0)->value;
+				$this->actions[$name] = $actionData;
+			}
 		}
 	}
 	public function loadManifest(){
@@ -138,6 +214,9 @@ class AJXP_Plugin{
 			}
 			return $buffer;
 		}
+	}
+	public function getRegistryContributions(){
+		return $this->registryContributions;
 	}
 	protected function loadDependencies(){
 		$depPaths = "dependencies/*/@pluginName";
@@ -194,6 +273,20 @@ class AJXP_Plugin{
 			}
 		}
 		return $hash;
+	}
+	/**
+	 * Compare two nodes at first level (nodename and attributes)
+	 *
+	 * @param DOMNode $node
+	 */
+	protected function nodesEqual($node1, $node2){
+		if($node1->nodeName != $node2->nodeName) return false;
+		$hash1 = $this->nodeAttrToHash($node1);
+		$hash2 = $this->nodeAttrToHash($node2);
+		foreach($hash1 as $name=>$value){
+			if(!isSet($hash2[$name]) || $hash2[$name] != $value) return false;
+		}
+		return true;
 	}
 }
 ?>

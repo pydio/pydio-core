@@ -49,12 +49,13 @@ Class.create("ActionsToolbar", {
 		}
 		this.toolbars = $H();
 		this.initCarousel();
+		//document.observe("ajaxplorer:loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarsSeparator.bind(this));
 	},
 	
-	actionsLoaded : function() {
-		this.actions = ajaxplorer.actionBar.actions;
+	actionsLoaded : function(event) {
+		this.actions = event.memo;
 		this.emptyToolbars();
 		this.initToolbars();
 	},

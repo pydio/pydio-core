@@ -65,10 +65,35 @@ class ConfService
 		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
 		$this->configs["AUTH_DRIVER_DEF"] = $AUTH_DRIVER;
         $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];
+        $this->configs["ACTIVE_PLUGINS"] = $ACTIVE_PLUGINS;
         $this->configs["PROBE_REAL_SIZE"] = $allowRealSizeProbing;
 		$this->initConfStorageImplInst($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
+		$this->initAuthDriverImplInst();
 		$this->configs["REPOSITORIES"] = $this->initRepositoriesListInst($this->configs["DEFAULT_REPOSITORIES"]);
 		$this->switchRootDirInst();
+	}
+	
+	public static function initActivePlugins(){
+		$inst = self::getInstance();
+		$inst->initActivePluginsInst();
+	}
+	
+	public function initActivePluginsInst(){
+		$pServ = AJXP_PluginsService::getInstance();
+		foreach($this->configs["ACTIVE_PLUGINS"] as $plugs){
+			$ex = explode(".", $plugs);
+			if($ex[1] == "*"){
+				$all = $pServ->getPluginsByType($ex[0]);
+				foreach($all as $pName => $pObject){
+					$pObject->init(array());
+					$pServ->setPluginActiveInst($ex[0], $pName, true);
+				}
+			}else{
+				$pObject = $pServ->getPluginByTypeName($ex[0], $ex[1]);
+				$pObject->init(array());
+				$pServ->setPluginActiveInst($ex[0], $ex[1], true);
+			}
+		}
 	}
 	
 	public static function initConfStorageImpl($name, $options){
@@ -78,8 +103,9 @@ class ConfService
 	public function initConfStorageImplInst($name, $options){
 		$this->configs["CONF_STORAGE_DRIVER"] = AJXP_PluginsService::findPlugin("conf", $name);		
 		$this->configs["CONF_STORAGE_DRIVER"]->init($options);
+		$inst = AJXP_PluginsService::getInstance();
+		$inst->setPluginUniqueActiveForType("conf", $name);
 	}
-	
 
 	public static function getConfStorageImpl(){
 		$inst = self::getInstance();
@@ -100,6 +126,8 @@ class ConfService
 		$options = $this->configs["AUTH_DRIVER_DEF"];
 		$this->configs["AUTH_DRIVER"] = AJXP_PluginsService::findPlugin("auth", $options["NAME"]);
 		$this->configs["AUTH_DRIVER"]->init($options["OPTIONS"]);
+		$inst = AJXP_PluginsService::getInstance();
+		$inst->setPluginUniqueActiveForType("auth", $options["NAME"]);
 	}
 	
 	public static function getAuthDriverImpl(){
@@ -467,27 +495,28 @@ class ConfService
 	/**
 	 * Returns the repository access driver
 	 *
-	 * @return AbstractDriver
+	 * @return AJXP_Plugin
 	 */
-	public static function getRepositoryDriver(){
-		return self::getInstance()->getRepositoryDriverInst();
+	public static function loadRepositoryDriver(){
+		return self::getInstance()->loadRepositoryDriverInst();
 	}
-	public function getRepositoryDriverInst()
+	public function loadRepositoryDriverInst()
 	{
-		if(isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractDriver")){			
+		if(isSet($this->configs["ACCESS_DRIVER"]) && is_a($this->configs["ACCESS_DRIVER"], "AbstractAccessDriver")){			
 			return $this->configs["ACCESS_DRIVER"];
 		}
         $this->switchRootDirInst();
 		$crtRepository = $this->getRepositoryInst();
 		$accessType = $crtRepository->getAccessType();
 		$pServ = AJXP_PluginsService::getInstance();
-		$this->configs["ACCESS_DRIVER"] = $pServ->getPluginByTypeName("access", $accessType);
-		$this->configs["ACCESS_DRIVER"]->init($crtRepository);
-		$res = $this->configs["ACCESS_DRIVER"]->initRepository();
+		$plugInstance = $pServ->getPluginByTypeName("access", $accessType);
+		$plugInstance->init($crtRepository);
+		$res = $plugInstance->initRepository();
 		if($res!=null && is_a($res, "AJXP_Exception")){
-			unset($this->configs["ACCESS_DRIVER"]);
 			return $res;
-		}				
+		}
+		$pServ->setPluginUniqueActiveForType("access", $accessType);			
+		$this->configs["ACCESS_DRIVER"] = $plugInstance;	
 		return $this->configs["ACCESS_DRIVER"];
 	}
 	

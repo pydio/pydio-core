@@ -26,7 +26,6 @@ js/lib/prototype/carousel.js
 js/lib/webfx/xtree.js
 js/lib/webfx/ajxptree.js
 js/lib/webfx/slider/js/slider.js
-js/ajaxplorer/ajxp_utils.js
 js/ajaxplorer/class.User.js
 js/ajaxplorer/class.ResourcesManager.js
 js/ajaxplorer/class.RemoteNodeProvider.js

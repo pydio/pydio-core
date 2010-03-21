@@ -63,6 +63,11 @@ Class.create("AjxpBootstrap", {
 	loadBootConfig : function(){
 		var connexion = new Connexion(this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':''));
 		connexion.onComplete = function(transport){
+			if(transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName == "tree"){
+				var alert = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
+				window.alert(alert.firstChild.nodeValue);
+				return;
+			}
 			var data = transport.responseText.evalJSON();
 			this.parameters.update(data);
 			this.parameters.get("cssResources").each(this.loadCSSResource.bind(this));
@@ -81,6 +86,7 @@ Class.create("AjxpBootstrap", {
 				window.htmlMultiUploaderOptions = this.parameters.get("htmlMultiUploaderOptions");
 			}
 			$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
+			window.ajaxplorer.init();
 		}.bind(this);
 		connexion.sendSync();
 		

@@ -45,7 +45,6 @@ Class.create("ActionsManager", {
 		this.actions = new Hash();
 		this.defaultActions = new Hash();
 		this.toolbars = new Hash();		
-		this.loadActions('ajxp');	
 		document.observe("ajaxplorer:context_changed", function(event){
 			window.setTimeout(function(){
 				this.fireContextChange();
@@ -58,12 +57,20 @@ Class.create("ActionsManager", {
 			}.bind(this), 0);
 		}.bind(this) );
 		
+		document.observe("ajaxplorer:user_logged", function(event){
+			if(event.memo && event.memo.getPreference){
+				this.setUser(event.memo);
+			}else{
+				this.setUser(null);
+			}
+		}.bind(this));
+		
 	},	
 	
 	setUser: function(oUser)
 	{	
 		this.oUser = oUser;
-		if(oUser != null  && oUser.id != 'guest' && oUser.getPreference('lang') != null 
+		if(oUser != null && ajaxplorer  && oUser.id != 'guest' && oUser.getPreference('lang') != null 
 			&& oUser.getPreference('lang') != "" 
 			&& oUser.getPreference('lang') != ajaxplorer.currentLanguage) 
 		{
@@ -280,8 +287,7 @@ Class.create("ActionsManager", {
 		if(ajaxplorer.getContextNode()){
 			connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());
 		}
-		oThis = this;
-		connexion.onComplete = function(transport){oThis.parseXmlMessage(transport.responseXML);};
+		connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this) ;
 		connexion.sendAsync();
 	},
 	
@@ -333,7 +339,7 @@ Class.create("ActionsManager", {
 						var pass = childs[i].getAttribute('remember_pass');
 						storeRememberData(login, pass);
 					}
-					ajaxplorer.getLoggedUserFromServer();
+					ajaxplorer.loadXmlRegistry();
 				}
 				else if(result == '0' || result == '-1')
 				{
@@ -342,7 +348,7 @@ Class.create("ActionsManager", {
 				}
 				else if(result == '2')
 				{					
-					ajaxplorer.getLoggedUserFromServer();
+					ajaxplorer.loadXmlRegistry();
 				}
 				else if(result == '-2')
 				{
@@ -412,18 +418,9 @@ Class.create("ActionsManager", {
 		this.clearRegisteredKeys();
 	},
 	
-	loadActions: function(type){
+	loadActionsFromRegistry : function(registry){
 		this.removeActions();		
-		var connexion = new Connexion();
-		connexion.onComplete = function(transport){
-			this.parseActions(transport.responseXML);
-		}.bind(this);
-		connexion.addParameter('get_action', 'get_ajxp_actions');
-		connexion.sendSync();
-		if(!type){
-			connexion.addParameter('get_action', 'get_driver_actions');
-			connexion.sendSync();
-		}
+		this.parseActions(registry);
 		if(ajaxplorer && ajaxplorer.guiActions){
 			ajaxplorer.guiActions.each(function(pair){
 				var act = pair.value;
@@ -437,9 +434,9 @@ Class.create("ActionsManager", {
 				this.actions.unset("ext_select");
 			}
 		}		
-		document.fire("ajaxplorer:actions_loaded");
+		document.fire("ajaxplorer:actions_loaded", this.actions);
 		this.fireContextChange();
-		this.fireSelectionChange();			
+		this.fireSelectionChange();		
 	},
 	
 	registerAction : function(action){
@@ -454,40 +451,14 @@ Class.create("ActionsManager", {
 		action.setManager(this);
 	},
 	
-	parseActions: function(xmlResponse){		
-		if(xmlResponse == null || xmlResponse.documentElement == null) return;
-		var actions = xmlResponse.documentElement.childNodes;		
+	parseActions: function(documentElement){		
+		actions = XPathSelectNodes(documentElement, "actions/action");
 		for(var i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
             if(actions[i].getAttribute('enabled') == 'false') continue;
 			var newAction = new Action();
 			newAction.createFromXML(actions[i]);
 			this.registerAction(newAction);
-			if(ajaxplorer && newAction.options.name == "ls"){
-				for(var j=0;j<actions[i].childNodes.length;j++){
-					if(actions[i].childNodes[j].nodeName == 'displayDefinitions'){
-						var displayDef = actions[i].childNodes[j];
-						break;
-					}					
-				}
-				if(!displayDef) continue;
-				for(var j=0; j<displayDef.childNodes.length;j++){
-					if(displayDef.childNodes[j].nodeName == 'display' && displayDef.childNodes[j].getAttribute('mode') == 'list'){
-						var columnsDef = displayDef.childNodes[j];
-					}
-				}
-				if(!columnsDef) continue;
-				var columns = $A([]);
-				$A(columnsDef.childNodes).each(function(column){
-					if(column.nodeName == "column"){
-						columns.push({
-							messageId:column.getAttribute("messageId"),
-							attributeName:column.getAttribute("attributeName")
-						});
-					}
-				});
-				ajaxplorer.changeDataColumnsDefinition(columns);
-			}			
 		}
 	},
 	

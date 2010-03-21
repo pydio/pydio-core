@@ -33,18 +33,24 @@
  * 
  * Description : Abstract representation of an access to an authentication system (ajxp, ldap, etc).
  */
-class AbstractAuthDriver extends AbstractDriver {
+class AbstractAuthDriver extends AJXP_Plugin {
 	
 	var $options;
 	var $driverName = "abstract";
 	var $driverType = "auth";
-	
-	function init($options){
-		$this->options = $options;
-		$this->loadActionsFromManifest();
-		unset($this->actions["get_driver_actions"]);
+					
+	public function getRegistryContributions(){
+		$logged = AuthService::getLoggedUser();
+		if($logged == null) {
+			return $this->registryContributions;
+		}
+		$xmlString = AJXP_XMLWriter::getUserXml($logged, false);
+		$dom = new DOMDocument();
+		$dom->loadXML($xmlString);
+		$this->registryContributions[]=$dom->documentElement;		
+		return $this->registryContributions;
 	}
-				
+	
 	function preLogUser($sessionId){}	
 
 	function listUsers(){}

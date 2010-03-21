@@ -11,6 +11,20 @@
 		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
 		<param name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
 	</server_settings>
-	<actions_definition filename="plugins/access.fs/fsActions.xml" include="*" exclude=""/>
 	<class_definition filename="plugins/access.fs/class.fsAccessDriver.php" classname="fsAccessDriver"/>
+	<registry_contributions>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<client_configs>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label"/>
+					<column messageId="2" attributeName="filesize"/>
+					<column messageId="3" attributeName="mimestring"/>
+					<column messageId="4" attributeName="ajxp_modiftime"/>
+				</columns>
+			</component_config>
+		</client_configs>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+	</registry_contributions>
 </ajxpdriver>

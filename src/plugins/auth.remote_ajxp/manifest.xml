@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="basic_http" label="Basic HTTP" description="Use the standard http authentication.">
+<authdriver name="remote_ajxp" label="Remote AJXP" description="Use another AJXP intall to log in.">
 	<server_settings>
 		<param name="REMOTE_SERVER" type="string" label="Server" description="The host URL" mandatory="true"/>
 		<param name="REMOTE_PORT" type="string" label="Port" description="The host port" mandatory="true"/>
@@ -9,7 +9,9 @@
 		<param name="REMOTE_URL" type="string" label="URI" description="Script URI on the remote server" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.remote_ajxp/class.remote_ajxpAuthDriver.php" classname="remote_ajxpAuthDriver"/>
-	<actions_definition filename="server/xml/standard_auth_actions.xml" />	
+	<registry_contributions>
+		<external_file filename="server/xml/standard_auth_actions.xml" include="actions/*" exclude=""/>
+	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="auth.serial"/>
 	</dependencies>	
