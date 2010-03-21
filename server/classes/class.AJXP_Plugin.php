@@ -228,6 +228,13 @@ class AJXP_Plugin{
 	public function dependsOn($pluginName){
 		return in_array($pluginName, $this->dependencies);
 	}
+	public function getActiveDependencies(){
+		if(!$this->manifestLoaded) return array();
+		$deps = array();
+		$nodes = $this->xPath->query("dependencies/activePlugin/@pluginName");
+		foreach ($nodes as $attr) $deps[] = $attr->value;
+		return $deps;
+	}
 	public function loadConfig($configFile, $format){
 		if($format == "inc"){
 			if(is_file($configFile)){

@@ -61,20 +61,22 @@ class AJXP_Controller{
 				}
 		}				
 		
+		self::applyCallback($xPath, "pre_processing/serverCallback", $action, $actionName, $httpVars, $fileVars);
+		$result = self::applyCallback($xPath, "processing/serverCallback", $action, $actionName, $httpVars, $fileVars);
+		self::applyCallback($xPath, "post_processing/serverCallback", $action, $actionName, $httpVars, $fileVars);
+		
+		return $result;
+	}
+	
+	private function applyCallback($xPath, $query, $action, $actionName, $httpVars, $fileVars){
 		//Processing
-		$callbacks = $xPath->query("processing/serverCallback", $action);
+		$callbacks = $xPath->query($query, $action);
 		if(!$callbacks->length) return false;
 		$callback=$callbacks->item(0);
 		$plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
-		$methodName = $xPath->query("@methodName", $callback)->item(0)->value;
-		
+		$methodName = $xPath->query("@methodName", $callback)->item(0)->value;		
 		$plugInstance = AJXP_PluginsService::findPluginById($plugId);
-		try{
-			return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);
-		}catch (Exception $e){
-			return AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($e->getMessage())." (".basename($e->getFile())." - L.".$e->getLine().")", false);
-		}		
-		
+		return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);		
 	}
 	
 	public static function actionNeedsRight($actionNode, $xPath, $right){

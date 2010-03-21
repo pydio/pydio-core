@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hook id="hook.demo">
+	<registry_contributions>
+		<external_file filename="plugins/hook.demo/testActions.xml" include="actions/*"/>
+		<!--
+		<client_configs uuidAttr="name">
+			<template name="bottom" element="ajxp_desktop" position="after"><![CDATA[
+				<div id="optional_bottom_div">Your custom footer content</div>
+			]]></template>
+			<template name="head" element="ajxp_desktop" position="top"><![CDATA[
+				<div id="optional_header_div" style="border: 1px solid black;">Your custom header content</div>
+			]]></template>
+		</client_configs>
+		-->		
+	</registry_contributions>
+	<dependencies>
+		<activePlugin pluginName="access.fs"/>
+	</dependencies>			
+	<class_definition filename="plugins/hook.demo/class.HookDemo.php" classname="HookDemo"/>
+</hook>

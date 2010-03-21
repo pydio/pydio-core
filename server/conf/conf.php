@@ -77,7 +77,7 @@ $AUTH_DRIVER = array(
 		"AUTOCREATE_AJXPUSER" 	=> false, 
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
-$ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.test");
+$ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*");
 /*
 // Sample auth.sql usage 
 $AUTH_DRIVER = array(

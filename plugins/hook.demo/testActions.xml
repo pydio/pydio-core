@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<driver name="demo">
+	<actions>
+	<!-- Override a simple action -->
+		<action name="rename">
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					alert("I'm an overriden action");
+				]]></clientCallback>
+			</processing>
+			<post_processing>
+				<serverCallback methodName="postProcess"/>
+			</post_processing>
+		</action>					
+	<!-- Override all actions at once -->
+		<action name="*">
+			<pre_processing>
+				<serverCallback methodName="preProcess"/>
+			</pre_processing>
+		</action>
+		<action name="*">
+			<post_processing>
+				<serverCallback methodName="postProcess"/>
+			</post_processing>		
+		</action>
+	</actions>
+</driver>

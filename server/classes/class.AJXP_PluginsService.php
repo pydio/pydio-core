@@ -141,6 +141,17 @@
  	}
  	
  	public function setPluginActiveInst($type, $name, $active=true){
+ 		if($active){
+	 		// Check active plugin dependencies
+	 		$plug = $this->getPluginById($type.".".$name);
+	 		$deps = $plug->getActiveDependencies();
+	 		foreach ($deps as $dep){
+	 			if(!isSet($this->activePlugins[$dep]) || $this->activePlugins[$dep] === false){
+	 				$this->activePlugins[$type.".".$name] = false;
+	 				return ;
+	 			}
+	 		}
+ 		}
  		$this->activePlugins[$type.".".$name] = $active;
  		if(isSet($this->xmlRegistry)){
  			$this->buildXmlRegistry();
@@ -170,7 +181,7 @@
  				$parent = $contrib->nodeName;
  				$nodes = $contrib->childNodes;
  				if(!$nodes->length) continue;
- 				//$uuidAttr = $contrib->attributes["uuidAttr"] OR "name";
+ 				$uuidAttr = $contrib->getAttribute["uuidAttr"] OR "name";
  				$uuidAttr = "name";
  				$this->mergeNodes($reg, $parent, $uuidAttr, $nodes);
 	 		}
@@ -194,14 +205,21 @@
  			$xPath = new DOMXPath($original);
  			foreach($childrenNodes as $child){
  				if($child->nodeType != XML_ELEMENT_NODE) continue;
- 				$child = $original->importNode($child, true);
- 				$query = $parentName.'/'.$child->nodeName.'[@'.$uuidAttr.' = "'.$child->getAttribute($uuidAttr).'"]';
+ 				if($child->getAttribute($uuidAttr) == "*"){
+ 					$query = $parentName.'/'.$child->nodeName;
+ 				}else{
+	 				$query = $parentName.'/'.$child->nodeName.'[@'.$uuidAttr.' = "'.$child->getAttribute($uuidAttr).'"]';
+ 				}
  				$childrenSel = $xPath->query($query);
  				if($childrenSel->length){
- 					$existingNode = $childrenSel->item(0);
- 					$this->mergeChildByTagName($child, $existingNode);
+ 					foreach ($childrenSel as $existingNode){
+	 					// Clone as many as needed	 					
+	 					$clone = $original->importNode($child, true);
+	 					$this->mergeChildByTagName($clone, $existingNode);
+ 					}
  				}else{
- 					$parentNode->appendChild($child);
+ 					$clone = $original->importNode($child, true);
+ 					$parentNode->appendChild($clone);
  				}
  			} 			
  		}else{
@@ -216,12 +234,12 @@
  		}
  	}
  	
- 	protected function mergeChildByTagName(&$new, &$old){
+ 	protected function mergeChildByTagName($new, &$old){
  		if(!$this->hasElementChild($new) || !$this->hasElementChild($old)){
- 			$old->parentNode->replaceChild($new, $old);
+ 			$old->parentNode->replaceChild($new, $old); 			
  			return;
- 		}
- 		foreach($new->childNodes as $newChild){
+ 		} 		
+ 		foreach($new->childNodes as $newChild){ 			 			
  			if($newChild->nodeType != XML_ELEMENT_NODE) continue;
  			$found = null;
  			foreach($old->childNodes as $oldChild){
@@ -233,8 +251,7 @@
  			if($found != null){
  				$this->mergeChildByTagName($newChild, $found);
  			}else{
- 				$import = $old->ownerDocument->importNode($newChild);
- 				$old->appendChild($import);
+ 				$old->appendChild($newChild);
  			}
  		}
  	}

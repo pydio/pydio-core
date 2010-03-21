@@ -57,6 +57,7 @@ header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 require_once("server/classes/class.AJXP_Logger.php");
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
+set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 include_once("server/conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
@@ -180,12 +181,12 @@ if(AuthService::usersEnabled())
 $ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $ajxpDriver->init(ConfService::getRepository());
 $authDriver = ConfService::getAuthDriverImpl();
-ConfService::initActivePlugins();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
 if(!AuthService::usersEnabled() || ALLOW_GUEST_BROWSING || AuthService::getLoggedUser()!=null){
 	$confDriver = ConfService::getConfStorageImpl();
 	$Driver = ConfService::loadRepositoryDriver();
 }
+ConfService::initActivePlugins();
 require_once(INSTALL_PATH."/server/classes/class.AJXP_Controller.php");
 $xmlResult = AJXP_Controller::findActionAndApply($action, array_merge($_GET, $_POST), $_FILES);
 if($xmlResult !== false && $xmlResult != ""){
