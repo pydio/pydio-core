@@ -381,8 +381,8 @@ Class.create("Ajaxplorer", {
 	
 	triggerRepositoryChange: function(repositoryId){		
 		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'switch_root_dir');
-		connexion.addParameter('root_dir_index', repositoryId);
+		connexion.addParameter('get_action', 'switch_repository');
+		connexion.addParameter('repository_id', repositoryId);
 		oThis = this;
 		connexion.onComplete = function(transport){
 			this.loadXmlRegistry();
@@ -462,7 +462,7 @@ Class.create("Ajaxplorer", {
 				var result = transport.responseText.evalScripts();
 				MessageHash = result[0];
 				this.updateI18nTags();
-				if(this.actionBar) this.actionBar.loadActions();
+				this.loadXmlRegistry();
 				this.fireContextRefresh();
 				this.currentLanguage = newLanguage;
 			}

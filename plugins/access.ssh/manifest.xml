@@ -10,6 +10,14 @@
 	<registry_contributions>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>	
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label"/>
+					<column messageId="2" attributeName="filesize"/>
+					<column messageId="3" attributeName="mimestring"/>
+					<column messageId="4" attributeName="ajxp_modiftime"/>
+				</columns>
+			</component_config>			
 		</client_configs>
 		<external_file filename="plugins/access.ssh/sshActions.xml" include="actions/*"/>
 		<external_file filename="plugins/access.ssh/sshActions.xml" include="client_configs/*"/>

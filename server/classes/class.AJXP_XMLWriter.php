@@ -180,8 +180,9 @@ class AJXP_XMLWriter
 		return $data;		
 	}
 	
-	function writeBookmarks($allBookmarks)
+	function writeBookmarks($allBookmarks, $print = true)
 	{
+		$buffer = "";
 		foreach ($allBookmarks as $bookmark)
 		{
 			$path = ""; $title = "";
@@ -192,8 +193,10 @@ class AJXP_XMLWriter
 				$path = $bookmark;
 				$title = basename($bookmark);
 			}
-			print("<bookmark path=\"".$path."\" title=\"".$title."\"/>");
+			$buffer .= "<bookmark path=\"".$path."\" title=\"".$title."\"/>";
 		}
+		if($print) print $buffer;
+		else return $buffer;
 	}
 	
 	function sendFilesListComponentConfig($config){
@@ -247,6 +250,10 @@ class AJXP_XMLWriter
 			$buffer.="<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>";
 			$buffer.="</preferences>";
 			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>";
+			$bMarks = $loggedUser->getBookmarks();
+			if(count($bMarks)){
+				$buffer.= "<bookmarks>".AJXP_XMLWriter::writeBookmarks($bMarks, false)."</bookmarks>";
+			}
 			$buffer.="</user>";
 		}
 		return $buffer;		

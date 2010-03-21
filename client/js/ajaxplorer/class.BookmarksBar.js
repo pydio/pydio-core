@@ -39,8 +39,8 @@
 		this.currentCount = 0;	
 		this.bookmarks = $A([]);
 		this.createMenu();
-		document.observe("ajaxplorer:user_logged", function(){
-			this.load();
+		document.observe("ajaxplorer:registry_loaded", function(event){
+			this.parseXml(event.memo);
 		}.bind(this) );
 		document.observeOnce("ajaxplorer:actions_loaded", function(){
 			var bmAction = ajaxplorer.actionBar.actions.get('bookmark');
@@ -60,17 +60,14 @@
 		}.bind(this) );
 	},
 	
-	parseXml: function(transport){
+	parseXml: function(registry){
 		this.clear();
-		var oXmlDoc = transport.responseXML;
-		if(oXmlDoc == null || oXmlDoc.documentElement == null) return;		
-		var root = oXmlDoc.documentElement;
-		for (var i=0; i < root.childNodes.length;i++)
+		var childNodes = XPathSelectNodes(registry, "user/bookmarks/bookmark");
+		for (var i=0; i < childNodes.length;i++)
 		{
-			if(root.childNodes[i].tagName != 'bookmark') continue;			
 			var bookmark = {
-				name:root.childNodes[i].getAttribute('title'),
-				alt:root.childNodes[i].getAttribute('path'),
+				name:childNodes[i].getAttribute('title'),
+				alt:childNodes[i].getAttribute('path'),
 				image:ajxpResourcesFolder+'/images/crystal/mimes/16/folder.png'
 			};
 			bookmark.callback = function(e){ajaxplorer.goTo(this.alt)}.bind(bookmark);
@@ -153,13 +150,16 @@
 	},
 	
 	load: function(actionsParameters){
-		this.clear();
 		var connexion = new Connexion();
 		if(!actionsParameters) actionsParameters = new Hash();
 		actionsParameters.set('get_action', 'get_bookmarks');
 		connexion.setParameters(actionsParameters);
 		connexion.onComplete = function(transport){
-			this.parseXml(transport);
+			document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
+				if(event.memo != "user/bookmarks") return;
+				this.parseXml(ajaxplorer.getXmlRegistry());
+			}.bind(this) );			
+			ajaxplorer.loadXmlRegistry(false, "user/bookmarks");
 		}.bind(this);
 		connexion.sendAsync();
 	},
