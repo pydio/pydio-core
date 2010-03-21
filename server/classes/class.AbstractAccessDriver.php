@@ -33,7 +33,7 @@
  * 
  * Description : Abstract representation of an action driver. Must be implemented.
  */
-class AbstractAccessDriver extends AbstractDriver {
+class AbstractAccessDriver extends AJXP_Plugin {
 	
 	/**
 	* @var Repository
@@ -42,15 +42,9 @@ class AbstractAccessDriver extends AbstractDriver {
 	var $driverType = "access";
 		
 	public function init($repository, $options = null){
-		$this->loadActionsFromManifest();
+		//$this->loadActionsFromManifest();
+		parent::init($options);
 		$this->repository = $repository;
-		$this->actions["get_driver_info_panels"] = array();
-		if($repository!=null && is_object($repository) && $repository->detectStreamWrapper()){
-			$this->actions["cross_copy"] = array();
-		}
-		if($options != null){
-			$this->options = $options;
-		}
 	}
 	
 	function initRepository(){
@@ -60,10 +54,7 @@ class AbstractAccessDriver extends AbstractDriver {
 	
 	function applyAction($actionName, $httpVars, $filesVar)
 	{
-		if($actionName == "get_ajxp_info_panels" || $actionName == "get_driver_info_panels"){
-			$this->sendInfoPanelsDef();
-			return;
-		}else if($actionName == "cross_copy"){
+		if($actionName == "cross_copy"){
 			$this->crossRepositoryCopy($httpVars);
 			return ;
 		}
@@ -84,50 +75,17 @@ class AbstractAccessDriver extends AbstractDriver {
 		}
 		return parent::applyAction($actionName, $httpVars, $filesVar);
 	}
-	
-	function initXmlActionsFile($filePath){
-		parent::initXmlActionsFile($filePath);
+
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
 		if(isSet($this->actions["public_url"]) && !defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER)){
 			unset($this->actions["public_url"]);
 		}		
-	}
-	
-	/**
-	 * Print the XML for actions
-	 *
-	 * @param boolean $filterByRight
-	 * @param User $user
-	 */
-	function sendActionsToClient($filterByRight, $user){
-		parent::sendActionsToClient($filterByRight, $user, $this->repository);
-	}
-		
-	function sendInfoPanelsDef(){
-		$actionFiles = $this->xPath->query("actions_definition");		
-		$allNodes = array();
-		foreach ($actionFiles as $actionFileNode){
-			$data = $this->nodeAttrToHash($actionFileNode);
-			$filename = $data["filename"] OR "";
-			if(!is_file(INSTALL_PATH."/".$filename)) continue;
-			$actionDoc = new DOMDocument();
-			$actionDoc->load(INSTALL_PATH."/".$filename);
-			$actionXpath = new DOMXPath($actionDoc);
-			$panes = $actionXpath->query("infoPanels/infoPanel");
-			if(!$panes->length) continue;
-			foreach ($panes as $panelDefNode){
-				$mimes = $actionXpath->query("@mime", $panelDefNode);
-				$mime = $mimes->item(0)->value;
-				$allNodes[$mime] = AJXP_XMLWriter::replaceAjxpXmlKeywords($actionDoc->saveXML($panelDefNode), true);
-			}
+		if($this->repository!=null && is_object($this->repository) && $this->repository->detectStreamWrapper()){
+			$this->actions["cross_copy"] = array();
 		}
-		AJXP_XMLWriter::header();
-		print("<infoPanels>");
-		print(join("", $allNodes));
-		print("</infoPanels>");
-		AJXP_XMLWriter::close();
-		exit(1);
 	}
-    
+	    
     /** Cypher the publiclet object data and write to disk.
         @param $data The publiclet data array to write 
                      The data array must have the following keys:

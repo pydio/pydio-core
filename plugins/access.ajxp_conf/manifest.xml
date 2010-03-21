@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="ajxp_conf" label="Admin Driver" description="Access AjaXplorer configuration data.">
-	<client_settings icon="client/images/crystal/mimes/16/admin.png" search_engine="SearchEngine">
+	<client_settings icon="client/images/crystal/mimes/16/admin.png">
 		<resources>
 			<js file="plugins/access.ajxp_conf/class.ConfigEditor.js" className="ConfigEditor"/>			
 		</resources>
 	</client_settings>
-	<actions_definition filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="*"/>
+	<registry_contributions>
+		<client_configs>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
+		</client_configs>	
+		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
+		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="client_configs/*"/>
+	</registry_contributions>	
 	<class_definition filename="plugins/access.ajxp_conf/class.ajxp_confAccessDriver.php" classname="ajxp_confAccessDriver"/>
 </ajxpdriver>

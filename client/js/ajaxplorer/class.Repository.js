@@ -37,7 +37,6 @@ Class.create("Repository", {
 	id:undefined,
 	label:'No Repository',
 	icon:ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png',
-	searchEngine:'SearchEngine',
 	resourcesManager:undefined,
 	allowCrossRepositoryCopy:false,
 
@@ -64,14 +63,7 @@ Class.create("Repository", {
 	setIcon : function(icon){
 		this.icon = icon;
 	},
-	
-	getSearchEngine : function(){
-		return this.searchEngine;
-	},
-	setSearchEngine : function(searchEngine){
-		this.searchEngine = searchEngine;
-	},
-	
+		
 	loadResources : function(){
 		this.resourcesManager.load();
 	},
@@ -86,7 +78,6 @@ Class.create("Repository", {
 				this.setLabel(childNode.firstChild.nodeValue);
 			}else if(childNode.nodeName == "client_settings"){
 				this.setIcon(childNode.getAttribute('icon'));
-				this.setSearchEngine(childNode.getAttribute('search_engine'));
 				for(var j=0; j<childNode.childNodes.length;j++){
 					var subCh = childNode.childNodes[j];
 					if(subCh.nodeName == 'resources'){

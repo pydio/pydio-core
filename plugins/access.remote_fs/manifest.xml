@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="remote_fs" label="Remote Server (via API)" description="Access a remote server implementing the AjaXplorer API (remote server with an ajaxplorer installed for example)">
-	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png" search_engine="SearchEngine"/>
+	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png"/>
 	<server_settings>
 		<param name="HOST" type="string" label="Host" description="Domain name or IP to the remote server, without http" mandatory="true"/>
 		<param name="URI" type="string" label="Uri" description="Path of the API implementor on the remote server." default="ajaxplorer/content.php" mandatory="true"/>
@@ -9,8 +9,14 @@
 		<param name="AUTH_PASS" type="string" label="Password" description="Password for http authentification" mandatory="false"/>
 		<param name="TMP_UPLOAD" type="string" label="Temporary Folder" description="Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." default="tmp" mandatory="true"/>
 	</server_settings>
-	<actions_definition filename="plugins/access.fs/fsActions.xml" include="*" exclude="upload"/>
-	<actions_definition filename="plugins/access.remote_fs/additionalActions.xml" include="*"/>
+	<registry_contributions>
+		<client_configs>
+			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>	
+		</client_configs>	
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='upload']"/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
+		<external_file filename="plugins/access.remote_fs/additionalActions.xml" include="actions/*"/>
+	</registry_contributions>
 	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="remote_fsAccessDriver"/>
 	<dependencies>
 		<pluginActions pluginName="access.fs"/>

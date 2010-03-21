@@ -81,7 +81,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					exit(1);
 				}else{
 					AJXP_XMLWriter::header();
-					print('<columns switchGridMode="filelist"><column messageString="Configuration Data" attributeName="ajxp_label" sortType="String"/></columns>');
+					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="Configuration Data" attributeName="ajxp_label" sortType="String"/></columns>');
 					foreach ($rootNodes as $key => $data){
 						$src = '';
 						if($key == "logs"){
@@ -440,7 +440,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	
 	function listUsers(){
-		print '<columns switchGridMode="filelist"><column messageString="User Name" attributeName="ajxp_label" sortType="String"/><column messageString="Is Admin" attributeName="isAdmin" sortType="String"/></columns>';		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="User Name" attributeName="ajxp_label" sortType="String"/><column messageString="Is Admin" attributeName="isAdmin" sortType="String"/></columns>');		
 		if(!ENABLE_USERS) return ;
 		$users = AuthService::listUsers();
 		$loggedUser = AuthService::getLoggedUser();		
@@ -476,7 +476,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     }
 
 	function listRepositories(){
-		print '<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>';		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>');		
 		$repos = ConfService::getRepositoriesList();
         $repoArray = array();
 		foreach ($repos as $repoIndex => $repoObject){
@@ -508,7 +508,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$logger = AJXP_Logger::getInstance();
 		$parts = explode("/", $dir);
 		if(count($parts)>4){
-			print '<columns switchDisplayMode="list" switchGridMode="grid">
+			$config = '<columns switchDisplayMode="list" switchGridMode="grid">
 				<column messageString="Date" attributeName="date" sortType="Date" width="10%"/>
 				<column messageString="I.P." attributeName="ip" sortType="String"/>
 				<column messageString="Level" attributeName="level" sortType="String"/>
@@ -516,10 +516,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				<column messageString="Action" attributeName="action" sortType="String"/>
 				<column messageString="Params" attributeName="params" sortType="String"/>
 			</columns>';				
+			AJXP_XMLWriter::sendFilesListComponentConfig($config);
 			$date = $parts[count($parts)-1];
 			$logger->xmlLogs($dir, $date, "tree");
 		}else{
-			print '<columns switchGridMode="filelist"><column messageString="File Date" attributeName="ajxp_label" sortType="String"/></columns>';				
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="File Date" attributeName="ajxp_label" sortType="String"/></columns>');
 			$logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null));
 		}
 	}
@@ -529,7 +530,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$testedParams = array();
 		$passed = AJXP_Utils::runTests($outputArray, $testedParams);
 		AJXP_Utils::testResultsToFile($outputArray, $testedParams);		
-		print '<columns switchDisplayMode="list" switchGridMode="fileList"><column messageString="Test Name" attributeName="ajxp_label" sortType="String"/><column messageString="Test Data" attributeName="data" sortType="String"/></columns>';		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList"><column messageString="Test Name" attributeName="ajxp_label" sortType="String"/><column messageString="Test Data" attributeName="data" sortType="String"/></columns>');		
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			
 			foreach ($diagResults as $id => $value){

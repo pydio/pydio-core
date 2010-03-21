@@ -333,48 +333,50 @@
 		</action>					
 					
 	</actions>
-	<infoPanels>
-		<infoPanel mime="generic_file" attributes="basename,icon">
-			<messages>
-				<message key="name_string" id="133"/>
-				<message key="size_string" id="127"/>
-				<message key="type_string" id="134"/>
-				<message key="modif_string" id="138"/>
-			</messages>
-			<html><![CDATA[
-			<div style="padding:10px;">
-				<div class="folderImage">
-					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
-				</div>
-				<b>#{name_string}</b> : #{basename}
-			</div>
-			]]></html>
-		</infoPanel>
-		<infoPanel mime="generic_dir" attributes="basename,icon">
-			<messages>
-				<message key="name_string" id="133"/>
-				<message key="modif_string" id="138"/>
-			</messages>
-			<html><![CDATA[
+	<client_configs>
+		<component_config className="InfoPanel">
+			<infoPanel mime="generic_file" attributes="basename,icon">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="size_string" id="127"/>
+					<message key="type_string" id="134"/>
+					<message key="modif_string" id="138"/>
+				</messages>
+				<html><![CDATA[
 				<div style="padding:10px;">
 					<div class="folderImage">
 						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{basename}
 				</div>
-			]]></html>
-		</infoPanel>
-		<infoPanel mime="no_selection" attributes="">
-			<messages>
-				<message key="files_string" id="265"/>
-			</messages>
-			<html><![CDATA[
-				<div style="padding:10px;">
-					<div class="folderImage">
-						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/admin.png" height="64" width="64">
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_dir" attributes="basename,icon">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="modif_string" id="138"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<div class="folderImage">
+							<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+						</div>
+						<b>#{name_string}</b> : #{basename}
 					</div>
-				</div>
-			]]></html>
-		</infoPanel>		
-	</infoPanels>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="no_selection" attributes="">
+				<messages>
+					<message key="files_string" id="265"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<div class="folderImage">
+							<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/admin.png" height="64" width="64">
+						</div>
+					</div>
+				]]></html>
+			</infoPanel>		
+		</component_config>
+	</client_configs>
 </driver>

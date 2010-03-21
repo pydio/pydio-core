@@ -6,6 +6,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="get_xml_registry">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="get_template">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>

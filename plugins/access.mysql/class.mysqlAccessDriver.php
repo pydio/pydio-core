@@ -88,7 +88,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		}
 		// FILTER DIR PAGINATION ANCHOR
 		if(isSet($dir) && strstr($dir, "#")!==false){
-			$parts = split("#", $dir);
+			$parts = explode("#", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
 		}				
@@ -197,7 +197,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 				$fields = array("origname","name", "default", "null", "size", "type", "flags", "pk", "index", "uniq");
 				$rows = array();
 				foreach ($httpVars as $k=>$val){
-					$split = split("_", $k);
+					$split = explode("_", $k);
 					if(count($split) == 3 && $split[0]=="field" && is_numeric($split[2]) && in_array($split[1], $fields)){
 						if(!isSet($rows[intval($split[2])])) $rows[intval($split[2])] = array();
 						$rows[intval($split[2])][$split[1]] = $val;
@@ -280,7 +280,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					$tableName = $dir;
 					$pks = $selection->getFiles();
 					foreach ($pks as $key => $pkString){
-						$parts = split("\.", $pkString);
+						$parts = explode(".", $pkString);
 						array_pop($parts); // remove .pk extension
 						array_shift($parts); // remove record prefix
 						foreach ($parts as $index => $pkPart){
@@ -327,14 +327,14 @@ class mysqlAccessDriver extends AbstractAccessDriver
 				if($dir == ""){
 					AJXP_XMLWriter::header();
 					$tables = $this->listTables();					
-					print '<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>';
+					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
 					$icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
 					foreach ($tables as $tableName){
 						$size = $this->getSize($tableName);
 						$count = $this->getCount($tableName);
 						print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
 					}
-					print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"".($mode == "file_list"?"search.png":CLIENT_RESOURCES_FOLDER."/images/crystal/mimes/16/search.png")."\"/>";
+					print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"search.png\"/>";
 					AJXP_XMLWriter::close();
 				}else{
 					$tableName = basename($dir);
@@ -376,15 +376,16 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					AJXP_Exception::errorToXml($result);
 					AJXP_XMLWriter::header();
 					$blobCols = array();
-					print '<columns switchDisplayMode="list" switchGridMode="grid">';
+					$columnsString = '<columns switchDisplayMode="list" switchGridMode="grid">';
 					foreach ($result["COLUMNS"] as $col){
-						print "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(preg_match("/primary/", $col["FLAGS"])?"1":"0")."\" field_null=\"".(preg_match("/not_null/", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
+						$columnsString .= "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(preg_match("/primary/", $col["FLAGS"])?"1":"0")."\" field_null=\"".(preg_match("/not_null/", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
 						if(stristr($col["TYPE"],"blob")!==false && ($col["FLAGS"]!="" && stristr($col["FLAGS"], "binary"))){
 							$blobCols[]=$col["NAME"];
 						}
 					}
 					
-					print '</columns>';
+					$columnsString .= '</columns>';
+					AJXP_XMLWriter::sendFilesListComponentConfig($columnsString);
 					//print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
 					if($result["TOTAL_PAGES"] > 1){
 						AJXP_XMLWriter::renderPaginationData($count, $currentPage,$result["TOTAL_PAGES"]);
@@ -498,7 +499,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 	}
 	
 	function cleanFlagString($flagString){
-		$arr = split(" ", $flagString);
+		$arr = explode(" ", $flagString);
 		$newFlags = array();
 		foreach ($arr as $flag){
 			if($flag == "primary_key" || $flag == "null" || $flag == "not_null"){

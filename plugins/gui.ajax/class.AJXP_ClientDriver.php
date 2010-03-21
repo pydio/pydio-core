@@ -33,34 +33,8 @@
  * 
  * Description : Basic implementation of the AbstractDriver, handle low level actions (docs, templates, etc).
  */
-class AJXP_ClientDriver extends AbstractDriver 
-{
-	
-	function init($repository) {
-		//parent::AbstractDriver("ajxp_actions");
-		//$this->initXmlActionsFile(CLIENT_RESOURCES_FOLDER."/xml/ajxpclient_actions.xml");
-		$this->loadActionsFromManifest();
-		unset($this->actions["get_driver_actions"]);
-		unset($this->actions["get_driver_info_panels"]);
-		$this->actions["get_ajxp_actions"] = array();
-		$this->actions["get_ajxp_info_panels"] = array();
-	}
-	
-	function applyAction($actionName, $httpVars, $filesVar){
-		if($actionName == "get_ajxp_actions"){
-			AJXP_XMLWriter::header();
-			$this->sendActionsToClient(false, null, null);
-			$authDriver = ConfService::getAuthDriverImpl();
-			$authDriver->sendActionsToClient(false, null, null);
-			$confDriver = ConfService::getConfStorageImpl();
-			$confDriver->sendActionsToClient(false, null, null);
-			AJXP_XMLWriter::close();
-			exit(1);
-		}else{
-			parent::applyAction($actionName, $httpVars, $filesVar);
-		}
-	}
-	
+class AJXP_ClientDriver extends AJXP_Plugin 
+{	
 	function switchAction($action, $httpVars, $fileVars)
 	{
 		if(!isSet($this->actions[$action])) return;
@@ -97,19 +71,28 @@ class AJXP_ClientDriver extends AbstractDriver
 				
 			break;
 			
-			case "get_editors_registry":
+			//------------------------------------
+			//	SEND XML REGISTRY
+			//------------------------------------
+			case "get_xml_registry" :
 				
-				$plugService = AJXP_PluginsService::getInstance();
-				$plugins = $plugService->getPluginsByType("editor");
-				AJXP_XMLWriter::header("editors");
-				foreach ($plugins as $plugin){
-					print(AJXP_XMLWriter::replaceAjxpXmlKeywords($plugin->getManifestRawContent()));
+				$regDoc = AJXP_PluginsService::getXmlRegistry();
+				if(isSet($_GET["xPath"])){
+					$regPath = new DOMXPath($regDoc);
+					$nodes = $regPath->query($_GET["xPath"]);
+					AJXP_XMLWriter::header("ajxp_registry_part", array("xPath"=>$_GET["xPath"]));
+					if($nodes->length){
+						print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML($nodes->item(0))));
+					}
+					AJXP_XMLWriter::close("ajxp_registry_part");
+				}else{
+					header('Content-Type: text/xml; charset=UTF-8');
+					print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML()));
 				}
-				AJXP_XMLWriter::close("editors");
 				exit(0);
-					
+				
 			break;
-						
+									
 			//------------------------------------
 			//	DISPLAY DOC
 			//------------------------------------

@@ -2,14 +2,6 @@
 <driver name="fs" className="class.fsDriver.php">
 	<actions>
 		<action name="ls" dirDefault="true">			
-			<displayDefinitions>
-				<display mode="list">
-					<column messageId="1" attributeName="ajxp_label"/>
-					<column messageId="2" attributeName="filesize"/>
-					<column messageId="3" attributeName="mimestring"/>
-					<column messageId="4" attributeName="ajxp_modiftime"/>
-				</display>
-			</displayDefinitions>
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
@@ -769,111 +761,113 @@
 				</processing>
 		</action>						
 	</actions>
-	<infoPanels>
-		<infoPanel mime="no_selection" attributes="">
-			<messages>
-				<message key="folders_string" id="130"/>
-				<message key="files_string" id="265"/>
-				<message key="totalsize_string" id="259"/>
-			</messages>
-			<html><![CDATA[
-				<div style="padding:10px;">
-					<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">
-						<img width="16" hspace="5" height="16" border="0" align="absmiddle" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/16/folder.png"/>#{current_folder}
-					</big>
-					<b>#{folders_string}</b> : #{filelist_folders_count}
-					<br><b>#{files_string}</b> : #{filelist_files_count}
-					<br><b>#{totalsize_string}</b> #{filelist_totalsize}
-				</div>
-			]]></html>
-		</infoPanel>
-		<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,formated_date">
-			<messages>
-				<message key="name_string" id="133"/>
-				<message key="size_string" id="127"/>
-				<message key="type_string" id="134"/>
-				<message key="modif_string" id="138"/>
-			</messages>
-			<html><![CDATA[
-			<div style="padding:10px;">
-				<div class="folderImage">
-					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
-				</div>
-				<b>#{name_string}</b> : #{basename}
-				<br><b>#{size_string}</b> : #{filesize}
-				<br><b>#{type_string}</b> : #{mimestring}
-				<br><b>#{modif_string}</b> : #{formated_date}
-			</div>
-			]]></html>
-		</infoPanel>
-		<infoPanel mime="generic_dir" attributes="basename,icon,formated_date">
-			<messages>
-				<message key="name_string" id="133"/>
-				<message key="modif_string" id="138"/>
-			</messages>
-			<html><![CDATA[
+	<client_configs>
+		<component_config className="InfoPanel">
+			<infoPanel mime="no_selection" attributes="">
+				<messages>
+					<message key="folders_string" id="130"/>
+					<message key="files_string" id="265"/>
+					<message key="totalsize_string" id="259"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">
+							<img width="16" hspace="5" height="16" border="0" align="absmiddle" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/16/folder.png"/>#{current_folder}
+						</big>
+						<b>#{folders_string}</b> : #{filelist_folders_count}
+						<br><b>#{files_string}</b> : #{filelist_files_count}
+						<br><b>#{totalsize_string}</b> #{filelist_totalsize}
+					</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,formated_date">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="size_string" id="127"/>
+					<message key="type_string" id="134"/>
+					<message key="modif_string" id="138"/>
+				</messages>
+				<html><![CDATA[
 				<div style="padding:10px;">
 					<div class="folderImage">
 						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
-					</div>
-					<b>#{name_string}</b> : #{basename}
-					<br><b>#{modif_string}</b> : #{formated_date}
-				</div>
-			]]></html>
-		</infoPanel>
-		<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,formated_date">
-			<messages>
-				<message key="name_string" id="133"/>
-				<message key="size_string" id="127"/>
-				<message key="type_string" id="134"/>				
-				<message key="modif_string" id="138"/>
-				<message key="dim_string" id="135"/>
-			</messages>
-			<html><![CDATA[
-				<div style="padding:10px;">
-					<center style="border:1px solid #aaa; margin-bottom: 5px;">
-						<img src="content.php?action=image_proxy&get_thumb=true&file=#{encoded_filename}" #{compute_image_dimensions}>
-					</center>
-					<b>#{name_string}</b> : #{basename}
-					<br><b>#{dim_string}</b> : #{image_width}px X #{image_height}px
-					<br><b>#{size_string}</b> : #{filesize}
-					<br><b>#{type_string}</b> : #{image_type}
-					<br><b>#{modif_string}</b> : #{formated_date}
-				</div>
-			]]></html>
-		</infoPanel>
-		<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date">
-			<messages>
-				<message key="name_string" id="133"/>
-				<message key="size_string" id="127"/>
-				<message key="type_string" id="134"/>				
-				<message key="modif_string" id="138"/>
-			</messages>
-			<html><![CDATA[
-				<div style="padding:10px;">
-					<div id="mp3_container" style="text-align:center; padding:5px; width:160px;margin-bottom: 5px;">
-						<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
 					</div>
 					<b>#{name_string}</b> : #{basename}
 					<br><b>#{size_string}</b> : #{filesize}
 					<br><b>#{type_string}</b> : #{mimestring}
 					<br><b>#{modif_string}</b> : #{formated_date}
 				</div>
-			]]></html>
-		</infoPanel>
-		<infoPanel mime="flv,mov,mp4,m4a,aac" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
-			<html><![CDATA[
-				<div style="padding:10px;">
-					<center style="border:1px solid #676965; margin-bottom: 5px;">
-					<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" width="100%" height="200">
-						<param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" />
-						<param name="quality" value="high">
-						<param name="allowFullScreen" value="true" />
-						<param name="FlashVars" value="flv=#{uri}/content.php?action=download%26file=#{escaped_filename}&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />
-					</object>
-					</center>
-				</div>
-			]]></html>
-		</infoPanel>
-	</infoPanels>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_dir" attributes="basename,icon,formated_date">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="modif_string" id="138"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<div class="folderImage">
+							<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+						</div>
+						<b>#{name_string}</b> : #{basename}
+						<br><b>#{modif_string}</b> : #{formated_date}
+					</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,formated_date">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="size_string" id="127"/>
+					<message key="type_string" id="134"/>				
+					<message key="modif_string" id="138"/>
+					<message key="dim_string" id="135"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<center style="border:1px solid #aaa; margin-bottom: 5px;">
+							<img src="content.php?action=image_proxy&get_thumb=true&file=#{encoded_filename}" #{compute_image_dimensions}>
+						</center>
+						<b>#{name_string}</b> : #{basename}
+						<br><b>#{dim_string}</b> : #{image_width}px X #{image_height}px
+						<br><b>#{size_string}</b> : #{filesize}
+						<br><b>#{type_string}</b> : #{image_type}
+						<br><b>#{modif_string}</b> : #{formated_date}
+					</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="size_string" id="127"/>
+					<message key="type_string" id="134"/>				
+					<message key="modif_string" id="138"/>
+				</messages>
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<div id="mp3_container" style="text-align:center; padding:5px; width:160px;margin-bottom: 5px;">
+							<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
+						</div>
+						<b>#{name_string}</b> : #{basename}
+						<br><b>#{size_string}</b> : #{filesize}
+						<br><b>#{type_string}</b> : #{mimestring}
+						<br><b>#{modif_string}</b> : #{formated_date}
+					</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="flv,mov,mp4,m4a,aac" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
+				<html><![CDATA[
+					<div style="padding:10px;">
+						<center style="border:1px solid #676965; margin-bottom: 5px;">
+						<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" width="100%" height="200">
+							<param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" />
+							<param name="quality" value="high">
+							<param name="allowFullScreen" value="true" />
+							<param name="FlashVars" value="flv=#{uri}/content.php?action=download%26file=#{escaped_filename}&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />
+						</object>
+						</center>
+					</div>
+				]]></html>
+			</infoPanel>
+		</component_config>
+	</client_configs>
 </driver>

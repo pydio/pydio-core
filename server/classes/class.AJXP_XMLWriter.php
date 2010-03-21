@@ -36,12 +36,18 @@
 class AJXP_XMLWriter
 {
 	
-	function header($docNode="tree")
+	function header($docNode="tree", $attributes=array())
 	{
 		header('Content-Type: text/xml; charset=UTF-8');
 		header('Cache-Control: no-cache');
 		print('<?xml version="1.0" encoding="UTF-8"?>');
-		print("<$docNode>");
+		$attString = "";
+		if(count($attributes)){
+			foreach ($attributes as $name=>$value){
+				$attString.="$name=\"$value\" ";
+			}
+		}
+		print("<$docNode $attString>");
 		
 	}
 	
@@ -181,6 +187,12 @@ class AJXP_XMLWriter
 		}
 	}
 	
+	function sendFilesListComponentConfig($config){
+		if(is_string($config)){
+			print("<client_configs><component_config className=\"FilesList\">$config</component_config></client_configs>");
+		}
+	}
+	
 	function sendMessage($logMessage, $errorMessage, $print = true)
 	{
 		$messageType = ""; 
@@ -197,32 +209,38 @@ class AJXP_XMLWriter
 		}
 		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}
+
+	function sendUserData($userObject = null, $details=false){
+		print(AJXP_XMLWriter::getUserXML($userObject, $details));
+	}
 	
-	function sendUserData($userObject = null, $details=false)
+	function getUserXML($userObject = null, $details=false)
 	{
+		$buffer = "";
 		$loggedUser = AuthService::getLoggedUser();
 		if($userObject != null) $loggedUser = $userObject;
 		if($loggedUser != null)
 		{
-			print("<user id=\"".$loggedUser->id."\">");
+			$buffer.="<user id=\"".$loggedUser->id."\">";
 			if(!$details){
-				print("<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>");
+				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>";
 			}
-			print(AJXP_XMLWriter::writeRepositoriesData($loggedUser, $details));
-			print("<preferences>");
-			print("<pref name=\"display\" value=\"".$loggedUser->getPref("display")."\"/>");
-			print("<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>");
-			print("<pref name=\"diapo_autofit\" value=\"".$loggedUser->getPref("diapo_autofit")."\"/>");
-			print("<pref name=\"sidebar_splitter_size\" value=\"".$loggedUser->getPref("sidebar_splitter_size")."\"/>");
-			print("<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>");
-			print("<pref name=\"history_last_repository\" value=\"".$loggedUser->getArrayPref("history", "last_repository")."\"/>");
-			print("<pref name=\"history_last_listing\" value=\"".AJXP_Utils::xmlEntities(stripslashes($loggedUser->getArrayPref("history", ConfService::getCurrentRootDirIndex())))."\"/>");
-			print("<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>");
-			print("<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>");
-			print("</preferences>");
-			print("<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>");
-			print("</user>");
-		}		
+			$buffer.= AJXP_XMLWriter::writeRepositoriesData($loggedUser, $details);
+			$buffer.="<preferences>";
+			$buffer.="<pref name=\"display\" value=\"".$loggedUser->getPref("display")."\"/>";
+			$buffer.="<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>";
+			$buffer.="<pref name=\"diapo_autofit\" value=\"".$loggedUser->getPref("diapo_autofit")."\"/>";
+			$buffer.="<pref name=\"sidebar_splitter_size\" value=\"".$loggedUser->getPref("sidebar_splitter_size")."\"/>";
+			$buffer.="<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>";
+			$buffer.="<pref name=\"history_last_repository\" value=\"".$loggedUser->getArrayPref("history", "last_repository")."\"/>";
+			$buffer.="<pref name=\"history_last_listing\" value=\"".AJXP_Utils::xmlEntities(stripslashes($loggedUser->getArrayPref("history", ConfService::getCurrentRootDirIndex())))."\"/>";
+			$buffer.="<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>";
+			$buffer.="<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>";
+			$buffer.="</preferences>";
+			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>";
+			$buffer.="</user>";
+		}
+		return $buffer;		
 	}
 	
 	function writeRepositoriesData($loggedUser, $details=false){

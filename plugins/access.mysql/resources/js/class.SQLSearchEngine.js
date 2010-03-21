@@ -32,7 +32,7 @@
  * 
  * Description : Extension of the SearchEngine class for SQL search.
  */
-SQLSearchEngine = Class.create(SearchEngine, {
+Class.create("SQLSearchEngine", SearchEngine, {
 	
 	initGUI:function(){
 		this.htmlElement.update('<div style="font-style:italic;color:#999;">Type your SQL query here :</div><textarea id="sql_query" style="width:100%; overflow:auto;"></textarea><div class="dialogButtons"><input type="button" id="search_button" value="Search" class="dialogButton" style="margin-top:5px;"/> <input type="button" id="clear_button" value="Clear" class="dialogButton" style="margin-top:5px;"/></div>');
