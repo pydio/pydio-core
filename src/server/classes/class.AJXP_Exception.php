@@ -33,33 +33,26 @@
  * 
  * Description : Handmade Exception System for PHP4
  */
-class AJXP_Exception {
-	var $messageId;
-	function AJXP_Exception($messageId = -1){
-		$this->messageId = $messageId;
-	}
+class AJXP_Exception extends Exception {
 	
-	function getMessage(){
-		return $this->messageId;
+	function AJXP_Exception($messageString, $messageId = false){
+		if($messageId !== false && class_exists("ConfService")){
+			$messages = ConfService::getMessages();
+			if(array_key_exists($messageId, $messages)){
+				$messageString = $messages[$messageId];
+			}else{
+				$messageString = $messageId;
+			}
+		}
+		parent::__construct($messageString);
 	}
-	
+		
 	function errorToXml($mixed)
 	{
-		if(is_a($mixed, "AJXP_Exception"))
-		{			
-			$messages = ConfService::getMessages();
-			$error = "Unkown Error";			
-			if(isSet($mixed->messageId) && array_key_exists($mixed->messageId, $messages))
-			{
-				$error = $messages[$mixed->messageId];
-			}else{
-				$error = $mixed->messageId;
-			}
-
-			AJXP_XMLWriter::header();
-			AJXP_XMLWriter::sendMessage(null, $error);
-			AJXP_XMLWriter::close();
-			exit(1);
+		if(is_a($mixed, "Exception")){
+			throw $this;
+		}else{
+			throw new AJXP_Exception($mixed);
 		}
 	}
 }

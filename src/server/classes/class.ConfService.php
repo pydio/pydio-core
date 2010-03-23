@@ -58,6 +58,7 @@ class ConfService
 		$this->configs["WM_EMAIL"] = $webmaster_email;
 		$this->configs["MAX_CHAR"] = $max_caracteres;
 		$this->configs["JS_DEBUG"] = $AJXP_JS_DEBUG;
+		$this->configs["SERVER_DEBUG"] = $AJXP_SERVER_DEBUG OR false;
 		$this->configs["UPLOAD_MAX_NUMBER"] = $upload_max_number;
 		$this->configs["UPLOAD_ENABLE_FLASH"] = $upload_enable_flash;
 		$this->configs["UPLOAD_MAX_FILE"] = AJXP_Utils::convertBytes($upload_max_size_per_file);
@@ -512,9 +513,13 @@ class ConfService
 		$pServ = AJXP_PluginsService::getInstance();
 		$plugInstance = $pServ->getPluginByTypeName("access", $accessType);
 		$plugInstance->init($crtRepository);
-		$res = $plugInstance->initRepository();
-		if($res!=null && is_a($res, "AJXP_Exception")){
-			return $res;
+		try{
+			$plugInstance->initRepository();
+		}catch (Exception $e){
+			// Remove repositories from the lists
+			unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
+			$this->switchRootDir();
+			throw $e;
 		}
 		$pServ->setPluginUniqueActiveForType("access", $accessType);			
 		$this->configs["ACCESS_DRIVER"] = $plugInstance;	

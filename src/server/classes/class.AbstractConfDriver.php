@@ -142,13 +142,16 @@ class AbstractConfDriver extends AJXP_Plugin {
 					break;
 				}
 				ConfService::switchRootDir($repository_id);
+				// Load try to init the driver now, to trigger an exception
+				// if it's not loading right.
+				ConfService::loadRepositoryDriver();
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 					$user = AuthService::getLoggedUser();
 					$activeRepId = ConfService::getCurrentRootDirIndex();
 					$user->setArrayPref("history", "last_repository", $activeRepId);
 					$user->save();
 				}
-				$logMessage = "Successfully Switched!";
+				//$logMessage = "Successfully Switched!";
 				AJXP_Logger::logAction("Switch Repository", array("rep. id"=>$repository_id));
 				
 			break;	
