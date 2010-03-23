@@ -204,6 +204,12 @@ Class.create("AbstractEditor" , {
 	removeOnLoad : function(element){
 		removeLightboxFromElement(element);
 		this.loading = false;	
-	}		
+	},
+
+	getPreview : function(ajxpNode, mainDimension){
+		// Return icon if not overriden by derived classes
+		src = resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE/", 64);
+		return imgString = "<img src=\""+src+"\" width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\">";
+	}
 	
 });
