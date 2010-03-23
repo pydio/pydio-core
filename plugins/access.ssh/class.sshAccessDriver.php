@@ -89,7 +89,7 @@ class sshAccessDriver extends AbstractAccessDriver
  		    $param = $this->SSHOperation->checkConnection();
 		    if (count($param)==0 || strlen($param[0])==0)
 		    {
-		        return new AJXP_Exception("Cannot connect to remote server. Please check repository configuration and install.txt!");
+		        throw new AJXP_Exception("Cannot connect to remote server. Please check repository configuration and install.txt!");
 		    }
 		    $_SESSION["cwd"] = trim($param[0]);
 		    $fullCharset = explode('.', trim($param[1]));
@@ -418,7 +418,7 @@ class sshAccessDriver extends AbstractAccessDriver
 
 
 				$nom_rep = $dir;
-				AJXP_Exception::errorToXml($nom_rep);
+				//AJXP_Exception::errorToXml($nom_rep);
 				$result = $this->SSHOperation->listFilesIn($nom_rep);
 				$metaData = array();
 				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
@@ -585,11 +585,11 @@ class sshAccessDriver extends AbstractAccessDriver
 		}
 		if(!file_exists($racine))
 		{
-			return new AJXP_Exception(72);
+			throw new AJXP_Exception(72);
 		}
 		if(!is_dir($nom_rep))
 		{
-			return new AJXP_Exception(100);
+			throw new AJXP_Exception(100);
 		}
 		return $nom_rep;
 	}

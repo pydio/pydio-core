@@ -31,7 +31,7 @@ class AuthService
 }
 
 // Non working exception class
-class AJXP_Exception
+class AJXP_Exception extends Exception 
 {
     public function AJXP_Exception($msg) { echo "$msg"; exit(); }
 }

@@ -57,19 +57,17 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		$dbname = $this->repository->getOption("DB_NAME");
 		$link = @mysql_connect($host, $this->user, $this->password);
 		if(!$link) {
-			$ajxpExp = new AJXP_Exception("Cannot connect to server!");
-			AJXP_Exception::errorToXml($ajxpExp);
+			throw new AJXP_Exception("Cannot connect to server!");
 		}
 		if(!@mysql_select_db($dbname, $link)){
-			$ajxpExp = new AJXP_Exception("Cannot find database!");
-			AJXP_Exception::errorToXml($ajxpExp);
+			throw new AJXP_Exception("Cannot find database!");
 		}
 		return $link;
 	}
 	
 	function closeDbLink($link){
 		if(!mysql_close($link)){
-			return new AJXP_Exception("Cannot close connection!");
+			throw new AJXP_Exception("Cannot close connection!");
 		}
 	}
 	
@@ -291,7 +289,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					$query = "DELETE FROM $tableName WHERE ". implode(" OR ", $pks);
 					$res = $this->execQuery($query);
 				}
-				AJXP_Exception::errorToXml($res);
+				//AJXP_Exception::errorToXml($res);
 				if(is_a($res, "AJXP_Exception")){
 					$errorMessage = $res->messageId;
 				}else{
@@ -323,7 +321,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 					else if($mode == "complete") $completeMode = true;
 				}	
 				$link = $this->createDbLink();
-				AJXP_Exception::errorToXml($link);
+				//AJXP_Exception::errorToXml($link);
 				if($dir == ""){
 					AJXP_XMLWriter::header();
 					$tables = $this->listTables();					
@@ -369,11 +367,12 @@ class mysqlAccessDriver extends AbstractAccessDriver
 							$query .= " ORDER BY $order_column ".strtoupper($order_direction);
 						}
 					}
-					$result = $this->showRecords($query, $tableName, $currentPage);					
-					if($searchQuery && is_a($result, "AJXP_Exception")){
-						unset($_SESSION["LAST_SQL_QUERY"]); // Do not store wrong query!
+					try {
+						$result = $this->showRecords($query, $tableName, $currentPage);					
+					}catch (AJXP_Exception $ex){
+						unset($_SESSION["LAST_SQL_QUERY"]);
+						throw $ex;
 					}
-					AJXP_Exception::errorToXml($result);
 					AJXP_XMLWriter::header();
 					$blobCols = array();
 					$columnsString = '<columns switchDisplayMode="list" switchGridMode="grid">';
@@ -557,7 +556,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		$columns = array();
 		$rows = array();
 		
-		if(is_a($result, "AJXP_Exception")) return $result;
+		//if(is_a($result, "AJXP_Exception")) return $result;
 		
 		$num_rows = mysql_num_rows($result);
 		$pg=$currentPage-1;
@@ -583,7 +582,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		$flds = mysql_num_fields($result);
 		$fields = @mysql_list_fields( $dbname, $tablename);
 		if(!$fields){
-			return new AJXP_Exception("Non matching fields for table '$tablename'");
+			throw new AJXP_Exception("Non matching fields for table '$tablename'");
 		}
 		$z=0;
 		$x=0;
@@ -653,10 +652,10 @@ class mysqlAccessDriver extends AbstractAccessDriver
 				AJXP_Logger::logAction("exec", array($sql));
 				return $result;
 			}else{
-				return new AJXP_Exception($sql.":".mysql_error());
+				throw new AJXP_Exception($sql.":".mysql_error());
 			}
 		}else{
-			return new AJXP_Exception('Empty Query');
+			throw new AJXP_Exception('Empty Query');
 		}
 	}
  	

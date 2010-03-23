@@ -60,17 +60,17 @@ class fsAccessDriver extends AbstractAccessDriver
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
 			if(!is_dir($path)){
-				return new AJXP_Exception("Cannot create root path for repository. Please check repository configuration or that your folder is writeable!");
+				throw new AJXP_Exception("Cannot create root path for repository. Please check repository configuration or that your folder is writeable!");
 			}
 			if($recycle!= "" && !is_dir($path."/".$recycle)){
 				@mkdir($path."/".$recycle);
 				if(!is_dir($path."/".$recycle)){
-					return new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
+					throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
 				}
 			}
 		}else{
 			if(!is_dir($path)){
-				return new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
+				throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
 			}
 		}
 	}
@@ -129,7 +129,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$loggedUser = AuthService::getLoggedUser();
 					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpDownload.zip";
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
-					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing");
+					if(!$zipFile) throw new AJXP_Exception("Error while compressing");
 					register_shutdown_function("unlink", $file);
 					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					$this->readFile($file, "force-download", $localName, false, false);
@@ -148,7 +148,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					}
 					$file = $this->getPath()."/".$dir."/".$localName;
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
-					if(!$zipFile) AJXP_Exception::errorToXml("Error while compressing file $localName");
+					if(!$zipFile) throw new AJXP_Exception("Error while compressing file $localName");
 					//$reload_current_node = true;
 					//$reload_file_list = $localName;
 					$reloadContextNode = true;
@@ -508,9 +508,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::close();
 					exit(0);
 				}
-				$path = $this->initName($dir);
-				AJXP_Exception::errorToXml($path);
-				
+				$path = $this->initName($dir);				
 				$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
 				if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
 				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
@@ -774,11 +772,11 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		if(!file_exists($racine))
 		{
-			return new AJXP_Exception(72);
+			throw new AJXP_Exception(72);
 		}
 		if(!is_dir($nom_rep))
 		{
-			return new AJXP_Exception(100);
+			throw new AJXP_Exception(100);
 		}
 		return $nom_rep;
 	}

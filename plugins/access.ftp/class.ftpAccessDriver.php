@@ -86,17 +86,14 @@ class ftpAccessDriver extends  AbstractAccessDriver
 	        $this->path = $this->repository->getOption("PATH");
 	        $link = @ftp_connect($host);
 	        if(!$link) {
-	            $ajxpExp = new AJXP_Exception("Cannot connect to FTP server!");
-	            AJXP_Exception::errorToXml($ajxpExp);
-	               
+	            throw new AJXP_Exception("Cannot connect to FTP server!");	               
 	 	    }
 	 	    if($registerClose){
 	            register_shutdown_function('ftp_close', $link);
 	 	    }
             @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
 		    if(!@ftp_login($link,$this->user,$this->password)){
-	            $ajxpExp = new AJXP_Exception("Cannot login to FTP server with user $this->user");
-	            AJXP_Exception::errorToXml($ajxpExp);
+	            throw new AJXP_Exception("Cannot login to FTP server with user $this->user");
 	        }
             if ($this->repository->getOption("FTP_DIRECT") != "TRUE")
             {
@@ -365,8 +362,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
 					AJXP_XMLWriter::close();
 					exit(0);
 				}
-				$nom_rep = $this->initName($dir);
-				AJXP_Exception::errorToXml($nom_rep);
+				$nom_rep = $this->initName($dir);				
 				$result = $this->listing($nom_rep, !($searchMode || $fileListMode));
 				$this->fileListData = $result[0];
 				$reps = $result[0];
