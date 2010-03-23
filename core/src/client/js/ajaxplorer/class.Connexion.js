@@ -88,14 +88,24 @@ Class.create("Connexion", {
 			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
 		}
 		if(transport.responseXML && transport.responseXML.documentElement){
-			var node = XPathSelectSingleNode(transport.responseXML.documentElement, "require_auth");
-			if(node && ajaxplorer){
+			var authNode = XPathSelectSingleNode(transport.responseXML.documentElement, "require_auth");
+			if(authNode && ajaxplorer){
 				var root = ajaxplorer._contextHolder.getRootNode();
 				if(root){
 					ajaxplorer._contextHolder.setContextNode(root);
 					root.clear();
 				}
 				ajaxplorer.actionBar.fireAction('login');
+			}
+			var messageNode = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
+			if(messageNode){
+				messageType = messageNode.getAttribute("type").toUpperCase();
+				messageContent = getDomNodeText(messageNode);
+				if(ajaxplorer){
+					ajaxplorer.displayMessage(messageType, messageContent);
+				}else{
+					alert(messageType+":"+messageContent);
+				}
 			}
 		}
 		if(this.onComplete){
