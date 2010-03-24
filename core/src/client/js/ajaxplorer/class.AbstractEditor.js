@@ -210,6 +210,10 @@ Class.create("AbstractEditor" , {
 		// Return icon if not overriden by derived classes
 		src = resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE/", 64);
 		return imgString = "<img src=\""+src+"\" width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\">";
+	},
+	
+	getThumbnailSource : function(ajxpNode, mainDimension){
+		return resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE/", 64);
 	}
 	
 });
