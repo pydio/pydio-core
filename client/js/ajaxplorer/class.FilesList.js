@@ -468,15 +468,15 @@ Class.create("FilesList", SelectableElements, {
 			if(this.loading) return;
 			var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
 			window.loader = new Image();
-			loader.src = "content.php?action=image_proxy&get_thumb=true&file="+encodeURIComponent(oImageToLoad.filename);
+			var editorClass = oImageToLoad.editorClass;
+			loader.src = editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
 			loader.onload = function(){
 				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);
 				if(img == null) return;
-				img.src = "content.php?action=image_proxy&get_thumb=true&file="+encodeURIComponent(oImageToLoad.filename);
-				img.height = oImageToLoad.height;
-				img.width = oImageToLoad.width;
-				img.setStyle({marginTop: oImageToLoad.marginTop+'px',marginBottom: oImageToLoad.marginBottom+'px'});
-				img.setAttribute("is_loaded", "true");
+				var newImg = editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
+				newImg.setAttribute("is_loaded", "true");
+				img.parentNode.replaceChild(newImg, img);
+				oImageToLoad.rowObject.IMAGE_ELEMENT = newImg;
 				this.resizeThumbnails(oImageToLoad.rowObject);
 				this.loadNextImage();				
 			}.bind(this);
@@ -715,14 +715,15 @@ Class.create("FilesList", SelectableElements, {
 		var metadata = ajxpNode.getMetadata();
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
-		if(metadata.get("is_image") == "1")
+		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime());
+		if(editors && editors.length)
 		{
 			this._crtImageIndex ++;
 			var imgIndex = this._crtImageIndex;
 			var textNode = ajxpNode.getLabel();
 			var img = new Element('img', {
 				id:"ajxp_image_"+imgIndex,
-				src:ajxpResourcesFolder+"/images/crystal/mimes/64/image.png",
+				src:resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE", 64),
 				width:"64",
 				height:"64",
 				style:"margin:5px",
@@ -735,22 +736,8 @@ Class.create("FilesList", SelectableElements, {
 				title:textNode
 			});
 			label.innerHTML = textNode;
-			var width = metadata.get("image_width");
-			var height = metadata.get("image_height");		
-			var marginTop, marginHeight, newHeight, newWidth;
-			if(width >= height){
-				newWidth = 64;
-				newHeight = parseInt(height / width * 64);
-				marginTop = parseInt((64 - newHeight)/2) + 5;
-				marginBottom = 64+10-newHeight-marginTop-1;
-			}
-			else
-			{
-				newHeight = 64;
-				newWidth = parseInt(width / height * 64);
-				marginTop = 5;
-				marginBottom = 5;
-			}
+						
+			
 			var crtIndex = this._crtImageIndex;
 			innerSpan.insert({"bottom":img});
 			innerSpan.insert({"bottom":label});
@@ -759,22 +746,21 @@ Class.create("FilesList", SelectableElements, {
 			newRow.LABEL_ELEMENT = label;
 			this._htmlElement.appendChild(newRow);
 			
-			var fileName = ajxpNode.getPath();
-			var oImageToLoad = {
-				index:"ajxp_image_"+crtIndex,
-				filename:fileName, 
-				rowObject:newRow, 
-				height: newHeight, 
-				width: newWidth, 
-				marginTop: marginTop, 
-				marginBottom: marginBottom
-			};
-			this.imagesHash.set(oImageToLoad.index, oImageToLoad);
-			
+			ajaxplorer.loadEditorResources(editors[0].resourcesManager);
+			var editorClass = Class.getByName(editors[0].editorClass);
+			if(editorClass){
+				var oImageToLoad = {
+					index:"ajxp_image_"+crtIndex,
+					ajxpNode:ajxpNode,
+					editorClass:editorClass, 
+					rowObject:newRow
+				};
+				this.imagesHash.set(oImageToLoad.index, oImageToLoad);
+			}
 		}
 		else
 		{
-			src = resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE/", 64);
+			src = resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE", 64);
 			var imgString = "<img src=\""+src+"\" ";
 			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + ajxpNode.getLabel() +"\">" + ajxpNode.getLabel() +"</div>";
 			innerSpan.innerHTML = imgString;		
@@ -804,28 +790,13 @@ Class.create("FilesList", SelectableElements, {
 		else elList = this._htmlElement.getElementsBySelector('.thumbnail_selectable_cell');
 		elList.each(function(element){
 			var node = element.ajxpNode;
-			var is_image = (node.getMetadata().get('is_image') == "1");
 			var image_element = element.IMAGE_ELEMENT || element.getElementsBySelector('img')[0];		
 			var label_element = element.LABEL_ELEMENT || element.getElementsBySelector('.thumbLabel')[0];
 			var tSize = this._thumbSize;
 			var tW, tH, mT, mB;
-			if(is_image && image_element.getAttribute("is_loaded") == "true")
+			if(image_element.resizePreviewElement && image_element.getAttribute("is_loaded") == "true")
 			{
-				imgW = parseInt(node.getMetadata().get("image_width"));
-				imgH = parseInt(node.getMetadata().get("image_height"));
-				if(imgW > imgH)
-				{				
-					tW = tSize;
-					tH = parseInt(imgH / imgW * tW);
-					mT = parseInt((tW - tH)/2) + defaultMargin;
-					mB = tW+(defaultMargin*2)-tH-mT-1;				
-				}
-				else
-				{
-					tH = tSize;
-					tW = parseInt(imgW / imgH * tH);
-					mT = mB = defaultMargin;
-				}
+				image_element.resizePreviewElement(tSize, defaultMargin);
 			}
 			else
 			{
@@ -840,8 +811,8 @@ Class.create("FilesList", SelectableElements, {
 					tW = tH = tSize;
 					mT = mB = defaultMargin;
 				}
+				image_element.setStyle({width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'});
 			}
-			image_element.setStyle({width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'});
 			element.setStyle({width:tSize+25+'px', height:tSize+30+'px'});
 			
 			//var el_width = element.getWidth();

@@ -208,8 +208,10 @@ Class.create("AbstractEditor" , {
 
 	getPreview : function(ajxpNode, mainDimension){
 		// Return icon if not overriden by derived classes
-		src = resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE/", 64);
-		return imgString = "<img src=\""+src+"\" width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\">";
+		src = AbstractEditor.prototype.getThumbnailSource(ajxpNode, mainDimension);
+		imgObject = new Element("img", {src:src, width:64, height:64, align:'absmiddle', border:0});
+		imgObject.resizePreviewElement = function(dimension, defaultMargin){};
+		return imgObject;
 	},
 	
 	getThumbnailSource : function(ajxpNode, mainDimension){
