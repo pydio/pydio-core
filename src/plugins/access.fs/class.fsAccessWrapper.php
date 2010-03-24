@@ -21,15 +21,37 @@ class fsAccessWrapper implements AjxpWrapper {
     	$repoId = $url["host"];
     	$repoObject = ConfService::getRepositoryById($repoId);
     	if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
-    	$filePath = $repoObject->getOption("PATH")."/".$url["path"];
-    	try{
-	        $this->fp = @fopen($filePath, $mode, $options);
-            return ($this->fp !== false);
-    	}catch (Exception $e){
-    		return false;
-    	}
-    }
 
+		if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($url["path"]))){
+			// split[0] : path to zip , split[1] : inside path 
+			require_once("server/classes/pclzip.lib.php");
+			$zip = new PclZip($repoObject->getOption("PATH").$split[0]);
+			$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);
+			$this->fp = tmpfile();
+			fwrite($this->fp, $data[0]["content"]);
+			rewind($this->fp);
+			return true;
+		}else{    	
+	    	$filePath = $repoObject->getOption("PATH")."/".$url["path"];
+	    	try{
+		        $this->fp = @fopen($filePath, $mode, $options);
+	            return ($this->fp !== false);
+	    	}catch (Exception $e){
+	    		return false;
+	    	}
+		}
+    }
+    
+    function stream_seek($offset, $option){
+    	if(!isSet($this->fp)) return ;
+    	fseek($this->fp, $offset, SEEK_SET);
+    }
+    
+    function stream_tell(){
+    	if(!isSet($this->fp)) return false;    	
+    	return ftell($this->fp);
+    }
+    
     function stream_read($count)
     {
     	if(!isSet($this->fp)) return ;
