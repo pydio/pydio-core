@@ -32,7 +32,7 @@
  * 
  * Description : The "online edition" manager, encapsulate the CodePress highlighter for some extensions.
  */
-CodePressEditor = Class.create(TextEditor, {
+Class.create("CodePressEditor", TextEditor, {
 
 	initialize: function($super, oFormObject)
 	{
