@@ -226,7 +226,11 @@ class AJXP_Plugin{
 		}
 	}
 	public function dependsOn($pluginName){
-		return in_array($pluginName, $this->dependencies);
+		foreach ($this->dependencies as $deps){
+			if($pluginName == $deps) return true;
+			if(strstr($deps, "|")!==false && in_array($pluginName, explode("|", $deps))) return true;
+		}
+		return false;
 	}
 	public function getActiveDependencies(){
 		if(!$this->manifestLoaded) return array();
