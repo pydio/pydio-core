@@ -60,7 +60,7 @@
  		}
  		if(count($beforeSort)){
  			$this->checkDependencies($beforeSort);
-			usort($beforeSort, array($this, "sortByDependency"));				
+			$this->usort($beforeSort);
  			foreach ($beforeSort as $plugin){
 				$plugType = $plugin->getType();
 				if(!isSet($this->registry[$plugType])){
@@ -100,7 +100,19 @@
  		// First make sure that the given dependencies are present
  		foreach ($arrayToSort as $plugId => $plugObject){
  			foreach ($plugObject->getDependencies() as $requiredPlugId){
- 				if(!isSet($arrayToSort[$requiredPlugId])){
+	 			if(strstr($requiredPlugId, "|")!==false){
+	 				$orParts = explode("|", $requiredPlugId);
+	 				$found = false;	 				
+	 				foreach ($orParts as $part){
+	 					if(isSet($arrayToSort[$part])){
+	 						$found=true;break;
+	 					}
+	 				}
+					if(!$found){
+		 				unset($arrayToSort[$plugId]);
+		 				break;
+					}
+	 			}else if(!isSet($arrayToSort[$requiredPlugId])){
  					unset($arrayToSort[$plugId]);
  					break;
  				}
@@ -114,11 +126,30 @@
  	 * @param AJXP_Plugin $pluginB
  	 */
  	private function sortByDependency($pluginA, $pluginB){
- 		if($pluginA->dependsOn($pluginB->getId())) return 1;
- 		if($pluginB->dependsOn($pluginA->getId())) return -1;
+ 		if($pluginA->dependsOn($pluginB->getId())) {
+ 			return 1;
+ 		}
+ 		if($pluginB->dependsOn($pluginA->getId())) {
+ 			return -1;
+ 		}
  		return 0;
  	}
- 	
+
+	private function usort(&$tableau){
+        while(count($tableau)>0){
+            reset($tableau);
+            $pluspetit = key($tableau);
+            foreach($tableau as $c=>$v){
+            	if($this->sortByDependency($tableau[$pluspetit], $v) > 0){
+            		$pluspetit = $c;
+            	}
+            }
+            $result[]=$tableau[$pluspetit];
+            unset($tableau[$pluspetit]);
+        }
+        $tableau = $result;   
+    }
+	
  	public function getPluginsByType($type){
  		if(isSet($this->registry[$type])) return $this->registry[$type];
  		else return array();
@@ -144,9 +175,21 @@
  		if($active){
 	 		// Check active plugin dependencies
 	 		$plug = $this->getPluginById($type.".".$name);
-	 		$deps = $plug->getActiveDependencies();
+	 		$deps = $plug->getActiveDependencies();	 		
 	 		foreach ($deps as $dep){
-	 			if(!isSet($this->activePlugins[$dep]) || $this->activePlugins[$dep] === false){
+	 			if(strstr($dep, "|")!==false){	 				
+	 				$orParts = explode("|", $dep);
+	 				$found = false;
+	 				foreach ($orParts as $part){
+	 					if(isSet($this->activePlugins[$part]) && $this->activePlugins[$part] === true) {
+	 						$found=true;break;
+	 					}
+	 				}
+					if(!$found){
+		 				$this->activePlugins[$type.".".$name] = false;
+		 				return ;					
+					}
+	 			}else if(!isSet($this->activePlugins[$dep]) || $this->activePlugins[$dep] === false){
 	 				$this->activePlugins[$type.".".$name] = false;
 	 				return ;
 	 			}

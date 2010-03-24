@@ -99,8 +99,19 @@ class AJXP_Logger {
 		}		
 	}
 
+	public static function debug($message, $params = array()){
+		if(!class_exists("ConfService")) return ;
+		if(!ConfService::getConf("SERVER_DEBUG")) return ;
+		$logger = self::getInstance();
+		$message .= "\t";
+		if(count($params)){
+			$message.=$logger->arrayToString($params);
+		}		
+		$logger->write($message, LOG_LEVEL_DEBUG);				
+	}
+	
 	public static function logAction($action, $params=array()){
-		$logger = AJXP_Logger::getInstance();		
+		$logger = self::getInstance();		
 		$message = "$action\t";		
 		if(count($params)){
 			$message.=$logger->arrayToString($params);
