@@ -42,7 +42,6 @@ Class.create("SQLEditor", {
 	
 	
 	createEditor : function(){
-	
 		var userSelection = ajaxplorer.getUserSelection();
 		if(userSelection.hasFile()){
 			this.createRecordEditor(userSelection);
@@ -52,9 +51,9 @@ Class.create("SQLEditor", {
 	},
 	
 	createRecordEditor: function(userSelection){
-		var userSelection = ajaxplorer.getUserSelection();
-		if(userSelection.getSelectionSource()){
-			this.currentColumns = userSelection.getSelectionSource().getColumnsDef();
+		var tmpSelection = ajaxplorer.getUserSelection();
+		if(tmpSelection.getSelectionSource()){
+			this.currentColumns = tmpSelection.getSelectionSource().getColumnsDef();
 		}else{
 			this.currentColumns = [];
 		}
@@ -84,6 +83,7 @@ Class.create("SQLEditor", {
 			var typeTD = new Element('td', {className:'sqlTypeTd'}).update('('+col.field_type+(auto_inc?',auto':'')+')');
 			var inputTD = new Element('td', {className:'sqlInputTd'});
 			var input;
+			if(!col.field_type)return;
 			var type = col.field_type.toLowerCase();			
 			switch(type){
 				case "enum":
