@@ -273,10 +273,11 @@ Class.create("Modal", {
 		}	
 	},
 	
-	addSubmitCancel: function(oForm, fOnCancel, bOkButtonOnly){
+	addSubmitCancel: function(oForm, fOnCancel, bOkButtonOnly, position){
 		var contDiv = new Element('div', {className:'dialogButtons'});
 		var okButton = new Element('input', {
 			type:'image',
+			name:'ok',
 			src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_ok_apply.png',
 			title:MessageHash[48]});
 		okButton.addClassName('dialogButton');
@@ -299,8 +300,14 @@ Class.create("Modal", {
 			}
 			contDiv.insert(caButton);
 		}	
-		$(oForm).insert(contDiv);
+		if(!position){
+			position = 'bottom';
+		}
+		var obj = {}; 
+		obj[position] = contDiv;
+		$(oForm).insert(obj);
 		oForm.hasButtons = true;
+		return contDiv;
 	},
 	
 	

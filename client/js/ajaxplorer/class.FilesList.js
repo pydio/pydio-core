@@ -158,6 +158,16 @@ Class.create("FilesList", SelectableElements, {
 				}			
 			}
 		}
+		var properties = XPathSelectNodes(domNode, "property");
+		if(properties.length){
+			for( var i=0; i<properties.length;i++){
+				var property = properties[i];
+				if(property.getAttribute("name") == "thumbSize"){
+					this._thumbSize = parseInt(property.getAttribute("value"));
+					refreshGUI = true;
+				}
+			}
+		}
 		return refreshGUI;
 	},
 
@@ -606,7 +616,7 @@ Class.create("FilesList", SelectableElements, {
 			var span = item.select('div.thumbLabel')[0];
 			var posSpan = span;
 			offset.top=2;
-			offset.left=2;
+			offset.left=3;
 			scrollTop = $('selectable_div').scrollTop;
 		}
 		var pos = posSpan.cumulativeOffset();
@@ -615,23 +625,50 @@ Class.create("FilesList", SelectableElements, {
 			zIndex:5000, 
 			position:'absolute',
 			marginLeft:0,
-			marginTop:0
+			marginTop:0,
+			height:24
 		});
 		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
-		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);
+		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);		
 		edit.setStyle({left:pos.left+offset.left, top:(pos.top+offset.top-scrollTop)});
-		window.setTimeout(function(){edit.focus();}, 1000);
-		var closeFunc = function(){edit.remove();};
-		modal.setCloseAction(closeFunc);
+		window.setTimeout(function(){edit.focus();edit.select()}, 500);
+		var onOkAction = function(){
+			var newValue = edit.getValue();
+			hideLightBox();
+			modal.close();			
+			callback(item.ajxpNode, newValue);
+		};
 		edit.observe("keydown", function(event){
 			if(event.keyCode == Event.KEY_RETURN){				
 				Event.stop(event);
-				var newValue = edit.getValue();
-				callback(item.ajxpNode, newValue);
-				hideLightBox();
-				modal.close();
+				onOkAction();
 			}
 		}.bind(this));
+		// Add ok / cancel button, for mobile devices among others
+		var buttons = modal.addSubmitCancel(edit, null, false, "after");
+		var ok = buttons.select('input[name="ok"]')[0];
+		ok.observe("click", onOkAction);
+		edit.setStyle({width:edit.getWidth()-44});
+		buttons.select('input').invoke('setStyle', {
+			margin:0,
+			width:22,
+			border:0,
+			backgroundColor:'transparent'
+		});
+		buttons.setStyle({
+			position:'absolute',
+			width:46,
+			zIndex:2500,
+			left:pos.left+offset.left+edit.getWidth(),
+			top:(pos.top+offset.top-scrollTop)-1
+		});
+		var closeFunc = function(){
+			span.show();
+			edit.remove();
+			buttons.remove();
+		};
+		span.hide();
+		modal.setCloseAction(closeFunc);
 	},
 	
 	ajxpNodeToTableRow: function(ajxpNode){		
