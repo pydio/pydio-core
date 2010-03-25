@@ -42,8 +42,8 @@ class fsAccessDriver extends AbstractAccessDriver
 	/**
 	* @var Repository
 	*/
-	var $repository;
-	var $driverConf;
+	public $repository;
+	public $driverConf;
 		
 	function initRepository(){
 		if(is_array($this->pluginConf)){
@@ -77,27 +77,29 @@ class fsAccessDriver extends AbstractAccessDriver
 	
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
-		$xmlBuffer = "";
-		foreach($httpVars as $getName=>$getValue){
-			$$getName = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($getValue));
-		}
 		$selection = new UserSelection();
-
+		$dir = $httpVars["dir"] OR "";
+		$dir = AJXP_Utils::securePath($dir);
+		if($action != "upload"){
+			$dir = SystemTextEncoding::fromPostedFileName($dir);
+		}
 		$selection->initFromHttpVars($httpVars);
-		if(isSet($dir) && $action != "upload") { $safeDir = $dir; $dir = SystemTextEncoding::fromUTF8($dir); }
-		if(isSet($dest)) $dest = SystemTextEncoding::fromUTF8($dest);
 		$mess = ConfService::getMessages();
 		
 		$newArgs = RecycleBinManager::filterActions($action, $selection, $dir);
-		foreach ($newArgs as $argName => $argValue){
-			$$argName = $argValue;
-		}
-		// FILTER DIR PAGINATION ANCHOR
+		if(isSet($newArgs["action"])) $action = $newArgs["action"];
+		if(isSet($newArgs["dest"])) $httpVars["dest"] = SystemTextEncoding::toUTF8($newArgs["dest"]);//Re-encode!
+ 		// FILTER DIR PAGINATION ANCHOR
+		$page = null;
 		if(isSet($dir) && strstr($dir, "#")!==false){
 			$parts = explode("#", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
-		}					
+		}
+		
+		$pendingSelection = "";
+		$logMessage = null;
+		$reloadContextNode = false;
 		
 		switch($action)
 		{			
@@ -109,7 +111,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				@set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
 				@register_shutdown_function("restore_error_handler");				
 				if($selection->inZip){
-					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
+					$tmpDir = dirname($selection->getZipPath(true))."/.tmpExtractDownload";
  			        $delDir = $this->getPath()."/".$tmpDir;
 					@mkdir($delDir);
 				    register_shutdown_function(array($this, "deldir"), $delDir);
@@ -141,52 +143,21 @@ class fsAccessDriver extends AbstractAccessDriver
 		
 			case "compress" : 					
 					// Make a temp zip and send it as download					
-					if(isSet($archive_name)){
-						$localName = SystemTextEncoding::fromUTF8($archive_name);
+					if(isSet($httpVars["archive_name"])){
+						$localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
 					}else{
 						$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					}
 					$file = $this->getPath()."/".$dir."/".$localName;
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) throw new AJXP_Exception("Error while compressing file $localName");
-					//$reload_current_node = true;
-					//$reload_file_list = $localName;
 					$reloadContextNode = true;
 					$pendingSelection = $localName;					
 			break;
-			
-			case "image_proxy":
-				if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($file))){
-					require_once("server/classes/pclzip.lib.php");
-					$zip = new PclZip($this->getPath().$split[0]);
-					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);
-					header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($split[1]))."; name=\"".basename($split[1])."\"");
-					header("Content-Length: ".strlen($data[0]["content"]));
-					header('Cache-Control: public');
-					print($data[0]["content"]);
-				}else{
-					
-					if(isSet($get_thumb) && $get_thumb == "true" && $this->driverConf["GENERATE_THUMBNAIL"]){
-						require_once("server/classes/PThumb.lib.php");
-						$pThumb = new PThumb($this->driverConf["THUMBNAIL_QUALITY"]);						
-						if(!$pThumb->isError()){							
-							$pThumb->use_cache = $this->driverConf["USE_THUMBNAIL_CACHE"];
-							$pThumb->cache_dir = $this->driverConf["THUMBNAIL_CACHE_DIR"];	
-							$pThumb->fit_thumbnail($this->getPath()."/".SystemTextEncoding::fromUTF8($file), 200);
-							if($pThumb->isError()){
-								print_r($pThumb->error_array);
-							}
-							exit(0);
-						}
-					}
-					
-					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "image");
-				}
-				exit(0);
-			break;
-			
+						
 			case "mp3_proxy":
-				if($split = UserSelection::detectZip(SystemTextEncoding::fromUTF8($file))){
+				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+				if($split = UserSelection::detectZip($file)){
 					require_once("server/classes/pclzip.lib.php");
 					$zip = new PclZip($this->getPath().$split[0]);
 					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);					
@@ -194,7 +165,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					header("Content-Length: ".strlen($data[0]["content"]));
 					print($data[0]["content"]);
 				}else{
-					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "mp3");
+					$this->readFile($this->getPath()."/".$file, "mp3");
 				}
 				exit(0);
 			break;
@@ -203,14 +174,15 @@ class fsAccessDriver extends AbstractAccessDriver
 			//	ONLINE EDIT
 			//------------------------------------
 			case "open_with";	
-				if(isset($save) && $save==1 && isSet($code))
+				if(isset($httpVars["save"]) && $httpVars["save"]==1 && isSet($httpVars["code"]))
 				{
 					// Reload "code" variable directly from POST array, do not "securePath"...
-					$code = $_POST["code"];
-					AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
+					$code = $httpVars["code"];
+					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+					AJXP_Logger::logAction("Online Edition", array("file"=>$file));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
-					$fileName = $this->getPath().SystemTextEncoding::fromUTF8("/$file");
+					$fileName = $this->getPath()."/".$file;
 					if(!is_file($fileName) || !is_writable($fileName)){
 						header("Content-Type:text/plain");
 						print((!is_writable($fileName)?"1001":"1002"));
@@ -224,7 +196,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				else 
 				{
-					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8($file), "plain");
+					$this->readFile($this->getPath()."/".AJXP_Utils::decodeSecureMagic($file), "plain");
 				}
 				exit(0);
 			break;
@@ -237,31 +209,26 @@ class fsAccessDriver extends AbstractAccessDriver
 				
 				if($selection->isEmpty())
 				{
-					$errorMessage = $mess[113];
-					break;
+					throw new AJXP_Exception("", 113);
 				}
 				if($selection->inZip()){
-					$tmpDir = dirname($selection->getZipPath())."/.tmpExtractDownload";
+					$tmpDir = dirname($selection->getZipPath(true))."/.tmpExtractDownload";
 					@mkdir($this->getPath()."/".$tmpDir);					
+					register_shutdown_function(array($this, "deldir"), $this->getPath()."/".$tmpDir);
 					$this->convertSelectionToTmpFiles($tmpDir, $selection);
-					if(is_dir($tmpDir))	$this->deldir($this->getPath()."/".$tmpDir);					
 				}
 				$success = $error = array();
-				
+				$dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
 				$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
 				
 				if(count($error)){
-					$errorMessage = join("\n", $error);
-				}
-				else {
+					throw new AJXP_Exception(join("\n", $error));
+				}else {
 					$logMessage = join("\n", $success);
 					AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
 				}
-				//$reload_current_node = true;
-				//if(isSet($dest_node)) $reload_dest_node = $dest_node;
-				//$reload_file_list = true;
 				$reloadContextNode = true;
-				$reloadDataNode = SystemTextEncoding::fromUTF8($dest);
+				$reloadDataNode = $dest;
 				
 			break;
 			
@@ -272,8 +239,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			
 				if($selection->isEmpty())
 				{
-					$errorMessage = $mess[113];
-					break;
+					throw new AJXP_Exception("", 113);
 				}
 				$logMessages = array();
 				$errorMessage = $this->delete($selection->getFiles(), $logMessages);
@@ -281,9 +247,8 @@ class fsAccessDriver extends AbstractAccessDriver
 				{
 					$logMessage = join("\n", $logMessages);
 				}
+				if($errorMessage) throw new AJXP_Exception($errorMessage);
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
-				//$reload_current_node = true;
-				//$reload_file_list = true;
 				$reloadContextNode = true;
 				
 			break;
@@ -293,16 +258,13 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "rename";
 			
-				$file = SystemTextEncoding::fromUTF8($file);
-				$filename_new = SystemTextEncoding::fromUTF8($filename_new);
+				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+				$filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
 				$error = $this->rename($file, $filename_new);
 				if($error != null) {
-					$errorMessage  = $error;
-					break;
+					throw new AJXP_Exception($error);
 				}
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
-				//$reload_current_node = true;
-				//$reload_file_list = basename($filename_new);
 				$reloadContextNode = true;
 				$pendingSelection = $filename_new;
 				AJXP_Logger::logAction("Rename", array("original"=>$file, "new"=>$filename_new));
@@ -315,16 +277,15 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "mkdir";
 			        
 				$messtmp="";
-				$dirname=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($dirname));
+				$dirname=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($httpVars["dirname"]));
 				$error = $this->mkDir($dir, $dirname);
 				if(isSet($error)){
-					$errorMessage = $error; break;
+					throw new AJXP_Exception($error);
 				}
-				$reload_file_list = $dirname;
 				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
-				//$reload_current_node = true;
+				$pendingSelection = $dirname;
 				$reloadContextNode = true;
 				AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
 				
@@ -336,10 +297,10 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "mkfile";
 			
 				$messtmp="";
-				$filename=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($filename));	
+				$filename=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($httpVars["filename"]));	
 				$error = $this->createEmptyFile($dir, $filename);
 				if(isSet($error)){
-					$errorMessage = $error; break;
+					throw new AJXP_Exception($error);
 				}
 				$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.=SystemTextEncoding::toUTF8($dir);}
@@ -358,15 +319,18 @@ class fsAccessDriver extends AbstractAccessDriver
 				$messtmp="";
 				$files = $selection->getFiles();
 				$changedFiles = array();
+				$chmod_value = $httpVars["chmod_value"];
+				$recursive = $httpVars["recursive"];
+				$recur_apply_to = $httpVars["recur_apply_to"];
 				foreach ($files as $fileName){
 					$error = $this->chmod($this->getPath().$fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
 				}
 				if(isSet($error)){
-					$errorMessage = $error; break;
+					throw new AJXP_Exception($error);
 				}
 				//$messtmp.="$mess[34] ".SystemTextEncoding::toUTF8($filename)." $mess[39] ";
 				$logMessage="Successfully changed permission to ".$chmod_value." for ".count($changedFiles)." files or folders";
-				$reload_file_list = $dir;
+				$reloadContextNode = true;
 				AJXP_Logger::logAction("Chmod", array("dir"=>$dir, "filesCount"=>count($changedFiles)));
 		
 			break;
@@ -377,26 +341,28 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "upload":
 
 				$fancyLoader = false;
+				AJXP_Logger::debug("Upload Filedata", $fileVars["Filedata"]);
 				if(isSet($fileVars["Filedata"])){
 					$fancyLoader = true;
 					if($dir!="") $dir = "/".base64_decode($dir);
 				}
 				if($dir!=""){$rep_source="/$dir";}
 				else $rep_source = "";
-				$destination=SystemTextEncoding::fromUTF8($this->getPath().$rep_source);
+				$destination=$this->getPath().SystemTextEncoding::fromPostedFileName($rep_source);
+				AJXP_Logger::debug("Upload inside", array("destination"=>$destination));
 				if(!$this->isWriteable($destination))
 				{
-                    global $_GET;
 					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
-					if($fancyLoader || isset($_GET["ajxp_sessid"])){
+					if($fancyLoader || isset($httpVars["ajxp_sessid"])){
+						AJXP_Logger::debug("Upload error 412", array("destination"=>$destination));
 						header('HTTP/1.0 412 '.$errorMessage);
 						die('Error 412 '.$errorMessage);
 					}else{
+						AJXP_Logger::debug("Upload error 412", array("destination"=>$destination));
 						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
 						break;
 					}
 				}	
-				$logMessage = "";
 				foreach ($fileVars as $boxName => $boxData)
 				{
 					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
@@ -410,7 +376,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$userfile_name = $boxData["name"];
 					if($fancyLoader) $userfile_name = SystemTextEncoding::fromUTF8($userfile_name);
 					$userfile_name=AJXP_Utils::processFileName($userfile_name);
-					if(isSet($auto_rename)){
+					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = fsDriver::autoRenameForDest($destination, $userfile_name);
 					}
 					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
@@ -450,8 +416,8 @@ class fsAccessDriver extends AbstractAccessDriver
             // Public URL
             //------------------------------------
             case "public_url":
-				$file = SystemTextEncoding::fromUTF8($file);
-                $url = $this->makePubliclet($file, $password, $expiration);
+				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $url = $this->makePubliclet($file, $$httpVars["password"], $$httpVars["expiration"]);
                 header("Content-type:text/plain");
                 echo $url;
                 exit(1);                
@@ -463,7 +429,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "ls":
 			
 				if(!isSet($dir) || $dir == "/") $dir = "";
-				$lsOptions = $this->parseLsOptions((isSet($options)?$options:"a"));
+				$lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 				
 				if($test = UserSelection::detectZip($dir)){
 					$liste = array();
@@ -618,39 +584,20 @@ class fsAccessDriver extends AbstractAccessDriver
 			break;		
 		}
 
+		
+		$xmlBuffer = "";
 		if(isset($logMessage) || isset($errorMessage))
 		{
 			$xmlBuffer .= AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);			
-		}
-		
-		if(isset($requireAuth))
-		{
-			$xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
-		}
-		
-		if(isSet($reloadContextNode)){
+		}				
+		if($reloadContextNode){
 			if(!isSet($pendingSelection)) $pendingSelection = "";
 			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode("", $pendingSelection, false);
 		}
 		if(isSet($reloadDataNode)){
 			$xmlBuffer .= AJXP_XMLWriter::reloadDataNode($reloadDataNode, "", false);
 		}
-		
-		if(isset($reload_current_node) && $reload_current_node == "true")
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadCurrentNode(false);
-		}
-		
-		if(isset($reload_dest_node) && $reload_dest_node != "")
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadNode($reload_dest_node, false);
-		}
-		
-		if(isset($reload_file_list))
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadFileList($reload_file_list, false);
-		}
-		
+					
 		return $xmlBuffer;
 	}
 	
@@ -761,7 +708,6 @@ class fsAccessDriver extends AbstractAccessDriver
 	function initName($dir)
 	{
 		$racine = $this->getPath();		
-		$mess = ConfService::getMessages();
 		if(!isset($dir) || $dir=="" || $dir == "/")
 		{
 			$nom_rep=$racine;
@@ -772,11 +718,11 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		if(!file_exists($racine))
 		{
-			throw new AJXP_Exception(72);
+			throw new AJXP_Exception("",72);
 		}
 		if(!is_dir($nom_rep))
 		{
-			throw new AJXP_Exception(100);
+			throw new AJXP_Exception("", 100);
 		}
 		return $nom_rep;
 	}
@@ -968,8 +914,6 @@ class fsAccessDriver extends AbstractAccessDriver
 	}
 	
 	function lsListing($path, $lsOptions=array("a"=>true), $offset=0, $limit=0){
-		$mess = ConfService::getMessages();
-		$size_unit = $mess["byte_unit_symbol"];
 		$cursor = 0;
 		$handle = opendir($path);
 		if(!$handle) throw new Exception("Cannot open dir ".$path);
@@ -1007,101 +951,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		return array_merge($fullList["d"], $fullList["z"], $fullList["f"]);
 	}
-	
-	function listing($nom_rep, $dir_only = false, $offset=0, $limit=0)
-	{
-		$mess = ConfService::getMessages();
-		$size_unit = $mess["byte_unit_symbol"];
-		$orderDir = 0;
-		$orderBy = "filename";
-		$handle=opendir($nom_rep);
-		$recycle = $this->repository->getOption("RECYCLE_BIN");
-		$cursor = 0;
-		while (strlen($file = readdir($handle)) > 0)
-		{
-			if($file!="." && $file!=".." && !(AJXP_Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"]))
-			{
-				if($offset > 0 && $cursor < $offset){
-					$cursor ++;
-					continue;
-				}
-				if($limit > 0 && ($cursor - $offset) >= $limit) {
-					break;
-				}
-				$cursor ++;
-				if($recycle != "" 
-					&& $nom_rep == $this->repository->getOption("PATH")."/".$recycle 
-					&& $file == RecycleBinManager::getCacheFileName()){
-					continue;
-				}
-				$poidsfic=@filesize("$nom_rep/$file") or 0;
-				if(is_dir("$nom_rep/$file"))
-				{	
-					if($this->filterFolder($file)) continue;				
-					if($recycle != "" && $this->getPath()."/".$recycle == "$nom_rep/$file")
-					{
-						continue;
-					}
-					if($orderBy=="mod") {$liste_rep[$file]=filemtime("$nom_rep/$file");}
-					else {$liste_rep[$file]=$file;}
-				}
-				else
-				{
-					if($this->filterFile($file)) continue;
-					if(!$dir_only)
-					{
-						if($orderBy=="filename") {$liste_fic[$file]=AJXP_Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
-						else if($orderBy=="filesize") {$liste_fic[$file]=$poidsfic;}
-						else if($orderBy=="mod") {$liste_fic[$file]=filemtime("$nom_rep/$file");}
-						else if($orderBy=="filetype") {$liste_fic[$file]=AJXP_Utils::mimetype("$nom_rep/$file","type",is_dir("$nom_rep/$file"));}
-						else {$liste_fic[$file]=AJXP_Utils::mimetype("$nom_rep/$file","image", is_dir("$nom_rep/$file"));}
-					}
-					else if(preg_match("/\.zip$/",$file) && ConfService::zipEnabled()){
-						if(!isSet($liste_zip)) $liste_zip = array();
-						$liste_zip[$file] = $file;
-					}
-				}
-			}
-		}
-		closedir($handle);
-	
-		if(isset($liste_fic) && is_array($liste_fic))
-		{
-			if($orderBy=="filename") {if($orderDir==0){AJXP_Utils::natksort($liste_fic);}else{AJXP_Utils::natkrsort($liste_fic);}}
-			else if($orderBy=="mod") {if($orderDir==0){arsort($liste_fic);}else{asort($liste_fic);}}
-			else if($orderBy=="filesize"||$orderBy=="filetype") {if($orderDir==0){asort($liste_fic);}else{arsort($liste_fic);}}
-			else {if($orderDir==0){AJXP_Utils::natksort($liste_fic);}else{AJXP_Utils::natkrsort($liste_fic);}}
-
-			if($orderBy != "filename"){
-				foreach ($liste_fic as $index=>$value){
-					$liste_fic[$index] = AJXP_Utils::mimetype($index, "image", false);
-				}
-			}
-		}
-		else
-		{
-			$liste_fic = array();
-		}
-		if(isset($liste_rep) && is_array($liste_rep))
-		{
-			if($orderBy=="mod") {if($orderDir==0){arsort($liste_rep);}else{asort($liste_rep);}}
-			else {if($orderDir==0){AJXP_Utils::natksort($liste_rep);}else{AJXP_Utils::natkrsort($liste_rep);}}
-			if($orderBy != "filename"){
-				foreach ($liste_rep as $index=>$value){
-					$liste_rep[$index] = $index;
-				}
-			}
-		}
-		else ($liste_rep = array());
-
-		$liste = AJXP_Utils::mergeArrays($liste_rep,$liste_fic);
-		if(isSet($liste_zip)){
-			$liste = AJXP_Utils::mergeArrays($liste,$liste_zip);
-		}
-	
-		return $liste;
-	}
-	
+		
 	function date_modif($file)
 	{
 		$tmp = @filemtime($file) or 0;
@@ -1527,14 +1377,13 @@ class fsAccessDriver extends AbstractAccessDriver
     	}
     	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
-    	$totalSize = 0;
     	foreach ($src as $item){
     		$filePaths[] = array(PCLZIP_ATT_FILE_NAME => $this->getPath().$item, 
     							 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
     	}
     	$archive = new PclZip($dest);
     	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
-    	if($vList == 0) return false;
+    	//if($vList == 0) return false;
     }
     
     
@@ -1542,8 +1391,7 @@ class fsAccessDriver extends AbstractAccessDriver
      * @param $selection UserSelection
      */
     function convertSelectionToTmpFiles($tmpDir, &$selection){
-    	$zipPath = $selection->getZipPath();
-    	$localDir = $selection->getZipLocalPath();
+    	$zipPath = $selection->getZipPath(true);
     	$files = $selection->getFiles();
     	foreach ($files as $key => $item){// Remove path
     		$item = substr($item, strlen($zipPath));

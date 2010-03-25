@@ -71,7 +71,6 @@ class RecycleBinManager
 		{
 			$newArgs["action"] = "move";
 			$newArgs["dest"] = self::$rbmRelativeRecycle;
-			$newArgs["dest_node"] = "AJAXPLORER_RECYCLE_NODE";
 		}
 		// FILTER ACTION FOR RESTORE
 		if($action == "restore" && self::currentLocationIsRecycle($currentLocation))
@@ -80,7 +79,7 @@ class RecycleBinManager
 			if($originalRep != "")
 			{
 				$newArgs["action"] = "move";
-				$newArgs["dest"] = $originalRep;
+				$newArgs["dest"] = $originalRep; // CHECK UTF8 HANDLING HERE
 			}
 		}
 		return $newArgs;
