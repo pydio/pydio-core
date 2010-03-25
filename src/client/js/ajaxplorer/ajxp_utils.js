@@ -218,6 +218,31 @@ function disableTextSelection(target)
 	}
 }
 
+function fitRectangleToDimension(rectDim, targetDim){
+	var defaultMargin = targetDim.margin || 0;	
+	if(rectDim.width >= rectDim.height)
+	{				
+		tW = targetDim.width;
+		tH = parseInt(rectDim.height / rectDim.width * tW);
+		if(targetDim.maxHeight && tH > targetDim.maxHeight){
+			tH = targetDim.maxHeight;
+			tW = parseInt(rectDim.width / rectDim.height * tH);
+			mT = mB = defaultMargin;
+		}else{
+			mT = parseInt((tW - tH)/2) + defaultMargin;
+			mB = tW+(defaultMargin*2)-tH-mT-1;				
+		}
+	}
+	else
+	{
+		tH = targetDim.height;
+		if(targetDim.maxHeight) tH = Math.min(targetDim.maxHeight, tH);
+		tW = parseInt(rectDim.width / rectDim.height * tH);
+		mT = mB = defaultMargin;
+	}
+	return styleObj = {width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'};	
+}
+
 function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 {	
 	element = $(element);

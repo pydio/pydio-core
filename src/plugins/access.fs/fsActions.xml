@@ -392,7 +392,8 @@
 					var editors = ajaxplorer.findEditorsForMime(selectedMime);
 					if(editors.length){
 						var index = 0;
-						editors.each(function(el){
+						editors.each(function(el){							
+							if(!el.openable) return;
 							context.builderMenuItems.push({
 								name:el.text,
 								alt:el.title,
@@ -402,7 +403,8 @@
 							} );
 							index++;
 						} );					
-					}else{
+					}
+					if(!index){
 						context.builderMenuItems.push({
 							name:MessageHash[324],
 							alt:MessageHash[324],
@@ -740,16 +742,6 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="image_proxy">
-			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key"><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"></context><selectionContext dir="true" file="true" recycle="false" unique="true" image="" mp3="" editable=""></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback><![CDATA[
-					// PUT HERE CODE TO EXECUTE IN JAVASCRIPT
-					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
 		<action name="mp3_proxy">
 			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key"><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"></context><selectionContext dir="true" file="true" recycle="false" unique="true" image="" mp3="" editable=""></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
@@ -780,7 +772,7 @@
 					</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_file" attributes="basename,icon,filesize,mimestring,formated_date">
+			<infoPanel mime="generic_file" attributes="basename,icon,preview_rich,filesize,mimestring,formated_date">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="size_string" id="127"/>
@@ -789,13 +781,13 @@
 				</messages>
 				<html><![CDATA[
 				<div style="padding:10px;">
-					<div class="folderImage">
-						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
-					</div>
+					<div style="text-align:center">
+						#{preview_rich}
+					</div><div style="text-align:left;">
 					<b>#{name_string}</b> : #{basename}
 					<br><b>#{size_string}</b> : #{filesize}
 					<br><b>#{type_string}</b> : #{mimestring}
-					<br><b>#{modif_string}</b> : #{formated_date}
+					<br><b>#{modif_string}</b> : #{formated_date}</div>
 				</div>
 				]]></html>
 			</infoPanel>
@@ -814,7 +806,7 @@
 					</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,compute_image_dimensions,image_width,image_height,image_type,filesize,mimestring,formated_date">
+			<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,preview_rich,image_width,image_height,image_type,filesize,mimestring,formated_date">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="size_string" id="127"/>
@@ -825,7 +817,7 @@
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<center style="border:1px solid #aaa; margin-bottom: 5px;">
-							<img src="content.php?action=image_proxy&get_thumb=true&file=#{encoded_filename}" #{compute_image_dimensions}>
+							#{preview_rich}
 						</center>
 						<b>#{name_string}</b> : #{basename}
 						<br><b>#{dim_string}</b> : #{image_width}px X #{image_height}px
