@@ -123,6 +123,7 @@ Class.create("RepositorySelect", {
 				fade:true,
 				zIndex:1500
 			});		
+			this.notify("createMenu");
 		}
 		if(actions.length) this.button.removeClassName('disabled');
         actions.sort(function(a,b) { return a.name > b.name; });
@@ -134,7 +135,7 @@ Class.create("RepositorySelect", {
 	
 	resize : function(){
 		var parent = this.element.getOffsetParent();
-		if(parent.getWidth() < this.currentRepositoryLabel.getWidth()*2.5){
+		if(parent.getWidth() < this.currentRepositoryLabel.getWidth()*3.5){
 			this.showElement(false);
 		}else{
 			this.showElement(true);
@@ -150,6 +151,13 @@ Class.create("RepositorySelect", {
 			this.currentRepositoryLabel.hide();
 			if(this.repoMenu) this.repoMenu.options.leftOffset = 0;
 		}
+		if(!this.repoMenu){
+			this.observeOnce("createMenu", function(){this.showElement(this.show);}.bind(this));
+		}
+	},
+	getActualWidth : function(){
+		if(this.currentRepositoryLabel.visible()) return this.element.getWidth();
+		else return this.button.getWidth() + 10;
 	}
 	
 });

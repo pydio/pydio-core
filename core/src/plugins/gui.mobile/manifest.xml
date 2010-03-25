@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="ajxp_mobile" label="Mobile" description="Simple Template for Mobile">
+	<registry_contributions>
+		<client_configs uuidAttr="name">
+			<template name="main" element="ajxp_desktop" position="top"><![CDATA[
+				<div id="toolbars">
+					<div id="action_bar">
+						<div id="buttons_bar" ajxpClass="ActionsToolbar"></div>
+						<div id="locationbar_cont">
+							<div style="height: 33px;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont'}"></div>
+								<div id="logging_string" ajxpClass="UserWidget"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
+					<div id="horizontal_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'horizontal', initA: 200, maxA:600, minA:50,fit:'height',fitParent:'browser'}">
+						<div id="topPane" ajxpClass="FoldersTree" ajxpOptions="{display:'dz'}" ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>		
+						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965; background-color: #fff;"></div>	
+					</div>
+				</div>				
+			]]></template>
+			<component_config className="FilesList">
+				<property name="thumbSize" value="32"/>
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label"/>
+				</columns>				
+			</component_config>			
+		</client_configs>
+	</registry_contributions>
+</ajxpdriver>
