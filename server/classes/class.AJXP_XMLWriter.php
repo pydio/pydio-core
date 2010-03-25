@@ -188,7 +188,7 @@ class AJXP_XMLWriter
 			$path = ""; $title = "";
 			if(is_array($bookmark)){
 				$path = $bookmark["PATH"];
-				$title = SystemTextEncoding::toUTF8($bookmark["TITLE"]);
+				$title = $bookmark["TITLE"];
 			}else if(is_string($bookmark)){
 				$path = $bookmark;
 				$title = basename($bookmark);
