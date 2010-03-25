@@ -260,7 +260,8 @@ Class.create("SearchEngine", AjxpPane, {
 					}
 					if(cs[i].getAttribute('is_file') == "false")
 					{
-						this.searchFolderContent(text, currentFolder+"/"+cs[i].getAttribute('text'));
+						//this.searchFolderContent(text, currentFolder+"/"+cs[i].getAttribute('text'));
+						this.searchFolderContent(text, cs[i].getAttribute('filename'));
 					}
 				}
 			}		
