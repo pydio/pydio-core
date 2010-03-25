@@ -468,12 +468,12 @@ Class.create("FilesList", SelectableElements, {
 			if(this.loading) return;
 			var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
 			window.loader = new Image();
-			var editorClass = oImageToLoad.editorClass;
-			loader.src = editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
-			loader.onload = function(){
+			window.loader.editorClass = oImageToLoad.editorClass;
+			window.loader.src = window.loader.editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
+			window.loader.onload = function(){
 				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);
-				if(img == null) return;
-				var newImg = editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
+				if(img == null || window.loader == null) return;
+				var newImg = window.loader.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
 				newImg.setAttribute("is_loaded", "true");
 				img.parentNode.replaceChild(newImg, img);
 				oImageToLoad.rowObject.IMAGE_ELEMENT = newImg;
@@ -716,35 +716,27 @@ Class.create("FilesList", SelectableElements, {
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
 		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime());
+		var textNode = ajxpNode.getLabel();
+		var img = AbstractEditor.prototype.getPreview(ajxpNode);
+		var label = new Element('div', {
+			className:"thumbLabel",
+			title:textNode
+		}).update(textNode);
+		
+		innerSpan.insert({"bottom":img});
+		innerSpan.insert({"bottom":label});
+		newRow.insert({"bottom": innerSpan});
+		newRow.IMAGE_ELEMENT = img;
+		newRow.LABEL_ELEMENT = label;
+		this._htmlElement.insert(newRow);
+			
 		if(editors && editors.length)
 		{
 			this._crtImageIndex ++;
 			var imgIndex = this._crtImageIndex;
-			var textNode = ajxpNode.getLabel();
-			var img = new Element('img', {
-				id:"ajxp_image_"+imgIndex,
-				src:resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE", 64),
-				width:"64",
-				height:"64",
-				style:"margin:5px",
-				align:"ABSMIDDLE",
-				border:"0",
-				is_loaded:"false"
-			});
-			var label = new Element('div', {
-				className:"thumbLabel",
-				title:textNode
-			});
-			label.innerHTML = textNode;
-						
-			
+			img.writeAttribute("is_loaded", "false");
+			img.writeAttribute("id", "ajxp_image_"+imgIndex);
 			var crtIndex = this._crtImageIndex;
-			innerSpan.insert({"bottom":img});
-			innerSpan.insert({"bottom":label});
-			newRow.insert({"bottom": innerSpan});
-			newRow.IMAGE_ELEMENT = img;
-			newRow.LABEL_ELEMENT = label;
-			this._htmlElement.appendChild(newRow);
 			
 			ajaxplorer.loadEditorResources(editors[0].resourcesManager);
 			var editorClass = Class.getByName(editors[0].editorClass);
@@ -757,16 +749,7 @@ Class.create("FilesList", SelectableElements, {
 				};
 				this.imagesHash.set(oImageToLoad.index, oImageToLoad);
 			}
-		}
-		else
-		{
-			src = resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE", 64);
-			var imgString = "<img src=\""+src+"\" ";
-			imgString =  imgString + "width=\"64\" height=\"64\" align=\"ABSMIDDLE\" border=\"0\"><div class=\"thumbLabel\" title=\"" + ajxpNode.getLabel() +"\">" + ajxpNode.getLabel() +"</div>";
-			innerSpan.innerHTML = imgString;		
-			newRow.appendChild(innerSpan);
-			this._htmlElement.appendChild(newRow);
-		}
+		}			
 		
 		// Defer Drag'n'drop assignation for performances
 		if(!ajxpNode.isRecycle()){
@@ -790,13 +773,13 @@ Class.create("FilesList", SelectableElements, {
 		else elList = this._htmlElement.getElementsBySelector('.thumbnail_selectable_cell');
 		elList.each(function(element){
 			var node = element.ajxpNode;
-			var image_element = element.IMAGE_ELEMENT || element.getElementsBySelector('img')[0];		
-			var label_element = element.LABEL_ELEMENT || element.getElementsBySelector('.thumbLabel')[0];
+			var image_element = element.IMAGE_ELEMENT || element.select('img')[0];		
+			var label_element = element.LABEL_ELEMENT || element.select('.thumbLabel')[0];
 			var tSize = this._thumbSize;
 			var tW, tH, mT, mB;
 			if(image_element.resizePreviewElement && image_element.getAttribute("is_loaded") == "true")
 			{
-				image_element.resizePreviewElement(tSize, defaultMargin);
+				image_element.resizePreviewElement({width:tSize, height:tSize, margin:defaultMargin});
 			}
 			else
 			{

@@ -49,7 +49,7 @@ Class.create("AbstractEditor" , {
 		this.initActions();
 		modal.setCloseAction(function(){this.close();}.bind(this));
 	},
-		
+	
 	initActions : function(){
 		this.actions = new Hash();
 		var actionBarSel = this.element.select('.action_bar');		
@@ -206,16 +206,27 @@ Class.create("AbstractEditor" , {
 		this.loading = false;	
 	},
 
-	getPreview : function(ajxpNode, mainDimension){
+	getPreview : function(ajxpNode, rich){
 		// Return icon if not overriden by derived classes
-		src = AbstractEditor.prototype.getThumbnailSource(ajxpNode, mainDimension);
+		src = AbstractEditor.prototype.getThumbnailSource(ajxpNode);
 		imgObject = new Element("img", {src:src, width:64, height:64, align:'absmiddle', border:0});
-		imgObject.resizePreviewElement = function(dimension, defaultMargin){};
+		imgObject.resizePreviewElement = function(dimensionObject){
+			dimensionObject.maxWidth = dimensionObject.maxHeight = 64;
+			var styleObject = fitRectangleToDimension({width:64,height:64},dimensionObject);
+			if(dimensionObject.width >= 64){
+				var newHeight = parseInt(styleObject.height);
+				var mT = parseInt((dimensionObject.width - 64)/2) + dimensionObject.margin;
+				var mB = dimensionObject.width+(dimensionObject.margin*2)-newHeight-mT-1;
+				styleObject.marginTop = mT + "px"; 
+				styleObject.marginBottom = mB + "px"; 
+			}
+			this.setStyle(styleObject);
+		}.bind(imgObject);
 		return imgObject;
 	},
 	
-	getThumbnailSource : function(ajxpNode, mainDimension){
-		return resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE/", 64);
+	getThumbnailSource : function(ajxpNode){
+		return resolveImageSource(ajxpNode.getIcon(), "/images/crystal/mimes/ICON_SIZE", 64);
 	}
 	
 });

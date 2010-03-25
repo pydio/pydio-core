@@ -401,6 +401,7 @@ Class.create("Ajaxplorer", {
 		for(var i=0;i<editors.length;i++){
 			var editorDefinition = {
 				id : editors[i].getAttribute("id"),
+				openable : (editors[i].getAttribute("openable") == "true"?true:false),
 				text : MessageHash[editors[i].getAttribute("text")],
 				title : MessageHash[editors[i].getAttribute("title")],
 				icon : editors[i].getAttribute("icon"),
