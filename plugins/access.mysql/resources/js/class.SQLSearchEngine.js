@@ -81,7 +81,7 @@ Class.create("SQLSearchEngine", SearchEngine, {
 	},
 	
 	resize:function(){
-		fitHeightToBottom(this.sqlQuery, null, 43);
+		fitHeightToBottom(this.sqlQuery, null, 27);
 	},
 	
 	focus:function(){

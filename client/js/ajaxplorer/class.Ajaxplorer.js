@@ -263,6 +263,7 @@ Class.create("Ajaxplorer", {
 
 		window[ajxpId] = obj;
 		obj.resize();
+		delete(oldObj);
 	},
 	
 	refreshGuiComponentConfigs : function(){
