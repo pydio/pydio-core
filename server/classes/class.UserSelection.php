@@ -105,13 +105,24 @@ class UserSelection
 	function inZip(){
 		return $this->inZip;
 	}
-	
-	function getZipPath(){
-		return $this->zipFile;
+	/**
+	 * Warning, returns UTF8 encoded path
+	 *
+	 * @return String
+	 */
+	function getZipPath($decode = false){
+		if($decode) return SystemTextEncoding::fromPostedFileName($this->zipFile);
+		else return $this->zipFile;
 	}
 	
-	function getZipLocalPath(){
-		return $this->localZipPath;
+	/**
+	 * Warning, returns UTF8 encoded path
+	 *
+	 * @return String
+	 */
+	function getZipLocalPath($decode = false){
+		if($decode) return SystemTextEncoding::fromPostedFileName($this->localZipPath);
+		else return $this->localZipPath;
 	}
 	
 	function getCount()

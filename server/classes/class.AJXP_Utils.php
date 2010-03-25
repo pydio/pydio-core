@@ -86,6 +86,10 @@ class AJXP_Utils
 		return $path;
 	}
 	
+	public static function decodeSecureMagic($data){
+		return SystemTextEncoding::fromUTF8(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)));
+	}
+	
 	function parseFileDataErrors($boxData, $errorCodes)
 	{
 		$mess = ConfService::getMessages();
