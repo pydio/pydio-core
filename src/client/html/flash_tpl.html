@@ -1,5 +1,7 @@
 <?php 
     $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
+    $UploadMaxPostSize = AJXP_Utils::convertBytes(ini_get('post_max_size'));
+    if($UploadMaxPostSize > 0 && $UploadMaxPostSize < $UploadMaxSize) $UploadMaxSize = $UploadMaxPostSize;
     $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
     if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
     $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
