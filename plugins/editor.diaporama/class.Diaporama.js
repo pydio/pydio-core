@@ -52,7 +52,7 @@ Class.create("Diaporama", AbstractEditor, {
 		this.imgContainer = this.element.select('div[id="imageContainer"]')[0];
 		this.zoomInput = this.element.select('input[id="zoomValue"]')[0];
 		this.timeInput = this.element.select('input[id="time"]')[0];
-		this.baseUrl = 'content.php?action=image_proxy&file=';
+		this.baseUrl = 'content.php?action=preview_data_proxy&file=';
 		this.nextButton.onclick = function(){
 			this.next();
 			this.updateButtons();

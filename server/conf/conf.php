@@ -78,6 +78,9 @@ $AUTH_DRIVER = array(
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
 $ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*");
+if(AJXP_Utils::userAgentIsMobile()){
+	$ACTIVE_PLUGINS[] = "gui.mobile";
+}
 /*
 // Sample auth.sql usage 
 $AUTH_DRIVER = array(
