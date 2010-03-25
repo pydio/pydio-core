@@ -163,7 +163,11 @@ Class.create("LocationBar", {
 			var parentWidth = $(this.options.flexTo).getWidth();
 			var siblingWidth = 0;
 			this.element.siblings().each(function(s){
-				siblingWidth+=s.getWidth();
+				if(s.ajxpPaneObject && s.ajxpPaneObject.getActualWidth){
+					siblingWidth+=s.ajxpPaneObject.getActualWidth();
+				}else{
+					siblingWidth+=s.getWidth();
+				}
 			});
 			if(!this.buttonsWidth){
 				this.buttonsWidth = this.gotoButton.getWidth() + this.parentButton.getWidth() + this.bmButton.getWidth() + 20;
