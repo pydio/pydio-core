@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.diaporama" text="186" title="136" icon="frame_image.png" className="Diaporama" mimes="AJXP_MIMES_IMAGE" formId="diaporama_box">
+<editor id="editor.diaporama" openable="true" text="186" title="136" icon="frame_image.png" className="Diaporama" mimes="AJXP_MIMES_IMAGE" formId="diaporama_box">
 	<class_definition filename="plugins/editor.diaporama/class.ImagePreviewer.php" classname="ImagePreviewer"/>
 	<resources>
 		<js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>

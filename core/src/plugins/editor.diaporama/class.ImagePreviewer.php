@@ -43,6 +43,9 @@ class ImagePreviewer extends AJXP_Plugin {
 		if(!$repository->detectStreamWrapper(true)){
 			return false;
 		}
+		if(!isSet($this->pluginConf)){
+			$this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
+		}
 		
     	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
 		    	
@@ -50,17 +53,20 @@ class ImagePreviewer extends AJXP_Plugin {
 			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
 			$fp = fopen($destStreamURL."/".$file, "r");
 			
-			if($this->options["GENERATE_THUMBNAIL"]){
+			if($this->pluginConf["GENERATE_THUMBNAIL"]){
 				$tmpFileName = tempnam(sys_get_temp_dir(), "img_");
 				$tmpFile = fopen($tmpFileName, "w");
 				register_shutdown_function("unlink", $tmpFileName);
-				copy($fp, $tmpFile);
+				while (!feof($fp)) {
+					fwrite($tmpFile, fread($fp, 4096));
+				}
 				fclose($tmpFile);
+				fclose($fp);
 				require_once("server/classes/PThumb.lib.php");
-				$pThumb = new PThumb($this->options["THUMBNAIL_QUALITY"]);
+				$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
 				if(!$pThumb->isError()){							
-					$pThumb->use_cache = $this->options["USE_THUMBNAIL_CACHE"];
-					$pThumb->cache_dir = $this->options["THUMBNAIL_CACHE_DIR"];	
+					$pThumb->use_cache = $this->pluginConf["USE_THUMBNAIL_CACHE"];
+					$pThumb->cache_dir = $this->pluginConf["THUMBNAIL_CACHE_DIR"];	
 					$pThumb->fit_thumbnail($tmpFileName, 200);
 					if($pThumb->isError()){
 						print_r($pThumb->error_array);

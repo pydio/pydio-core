@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.text" text="51" title="162" icon="edit.png" className="TextEditor" mimes="AJXP_MIMES_EDITABLE" formId="edit_box">
+<editor id="editor.text" openable="true" text="51" title="162" icon="edit.png" className="TextEditor" mimes="AJXP_MIMES_EDITABLE" formId="edit_box">
 	<resources>
 		<js file="plugins/editor.text/class.TextEditor.js" className="TextEditor"/>
 	</resources>

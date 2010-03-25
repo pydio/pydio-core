@@ -14,7 +14,7 @@
 		-->		
 	</registry_contributions>
 	<dependencies>
-		<activePlugin pluginName="access.fs"/>
+		<activePlugin pluginName="access.fs|access.ftp"/>
 	</dependencies>			
 	<class_definition filename="plugins/hook.demo/class.HookDemo.php" classname="HookDemo"/>
 </hook>

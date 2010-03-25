@@ -300,32 +300,20 @@ Class.create("Diaporama", AbstractEditor, {
 		}
 	},
 	
-	getPreview : function(ajxpNode, mainDimension){
-		var img = new Element('img', {src:Diaporama.prototype.getThumbnailSource(ajxpNode, mainDimension), border:0});
-		img.resizePreviewElement = function(dimension, defaultMargin){			
-			if(!defaultMargin) defaultMargin = 0;
-			var imgW = parseInt(ajxpNode.getMetadata().get("image_width"));
-			var imgH = parseInt(ajxpNode.getMetadata().get("image_height"));
-			if(imgW > imgH)
-			{				
-				tW = dimension;
-				tH = parseInt(imgH / imgW * tW);
-				mT = parseInt((tW - tH)/2) + defaultMargin;
-				mB = tW+(defaultMargin*2)-tH-mT-1;				
-			}
-			else
-			{
-				tH = dimension;
-				tW = parseInt(imgW / imgH * tH);
-				mT = mB = defaultMargin;
-			}
-			var styleObj = {width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'};
+	getPreview : function(ajxpNode){
+		var img = new Element('img', {src:Diaporama.prototype.getThumbnailSource(ajxpNode), border:0});
+		img.resizePreviewElement = function(dimensionObject){			
+			var imgDim = {
+				width:parseInt(ajxpNode.getMetadata().get("image_width")), 
+				height:parseInt(ajxpNode.getMetadata().get("image_height"))
+			};
+			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
 			img.setStyle(styleObj);
 		}
 		return img;
 	},
 	
-	getThumbnailSource : function(ajxpNode, mainDimension){
+	getThumbnailSource : function(ajxpNode){
 		return ajxpServerAccessPath+"?get_action=preview_data_proxy&file="+encodeURIComponent(ajxpNode.getPath());
 	}
 	

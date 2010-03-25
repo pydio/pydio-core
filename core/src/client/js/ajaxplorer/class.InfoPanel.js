@@ -149,6 +149,10 @@ Class.create("InfoPanel", AjxpPane, {
 	
 	resize : function(){
 		fitHeightToBottom(this.htmlElement, null);	
+		if(this.currentPreviewElement && this.currentPreviewElement.visible()){
+			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));
+			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:150});
+		}
 	},
 	
 	evalTemplateForMime: function(mimeType, fileNode, tArgs){
@@ -162,6 +166,7 @@ Class.create("InfoPanel", AjxpPane, {
 			tArgs = new Object();
 		}
 		var panelWidth = this.htmlElement.getWidth();
+		var oThis = this;
 		if(fileNode){
 			var metadata = fileNode.getMetadata();
 			tAttributes.each(function(attName){
@@ -181,6 +186,9 @@ Class.create("InfoPanel", AjxpPane, {
 						dimAttr = 'height="64" width="64"';
 					}
 					this[attName] = dimAttr;
+				}
+				else if(attName == 'preview_rich'){
+					this[attName] = oThis.getPreviewElement(fileNode, true);
 				}
 				else if(attName == 'encoded_filename' && metadata.get('filename')){
 					this[attName] = encodeURIComponent(metadata.get('filename'));					
@@ -224,6 +232,12 @@ Class.create("InfoPanel", AjxpPane, {
 		}else{
 			this.addActions('unique');
 		}
+		var fakes = this.htmlElement.select('div[id="preview_rich_fake_element"]');
+		if(fakes && fakes.length){
+			this.currentPreviewElement = this.getPreviewElement(fileNode, false);
+			fakes[0].parentNode.replaceChild(this.currentPreviewElement, fakes[0]);
+			this.resize();
+		}
 	},
 		
 	addActions: function(selectionType){
@@ -242,7 +256,25 @@ Class.create("InfoPanel", AjxpPane, {
 		if(!count) return;
 		this.htmlElement.insert(actionString);
 	},
-		
+	
+	getPreviewElement : function(ajxpNode, getTemplateElement){
+		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime());
+		if(editors && editors.length)
+		{
+			ajaxplorer.loadEditorResources(editors[0].resourcesManager);
+			var editorClass = Class.getByName(editors[0].editorClass);
+			if(editorClass){
+				if(getTemplateElement){
+					return '<div id="preview_rich_fake_element"/>'
+				}else{
+					var element = editorClass.prototype.getPreview(ajxpNode, true);
+					return element;	
+				}
+			}
+		}
+		return '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/crystal/mimes/ICON_SIZE',64) + '" height="64" width="64">';
+	},
+	
 	parseComponentConfig: function(configNode){
 		var panels = XPathSelectNodes(configNode, "infoPanel");
 		for(var i = 0; i<panels.length; i++){
