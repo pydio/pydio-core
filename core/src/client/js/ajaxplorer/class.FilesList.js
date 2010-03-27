@@ -87,7 +87,10 @@ Class.create("FilesList", SelectableElements, {
 			}
 		}.bind(this) );
 		
-		
+		document.observe("ajaxplorer:selection_changed", function(event){
+			if(event.memo._selectionSource == null || event.memo._selectionSource == this) return;
+			this.setSelectedNodes(ajaxplorer.getContextHolder().getSelectedNodes());
+		}.bind(this));
 		this._thumbSize = 64;
 		this._crtImageIndex = 0;
 	

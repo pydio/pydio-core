@@ -449,6 +449,17 @@ SelectableElements = Class.create({
 		return nodes;
 	},
 	
+	setSelectedNodes : function(ajxpNodes){
+		var items = this.getItems();
+		for(var i=0;i<items.length;i++){
+			if(items[i].ajxpNode && ajxpNodes.detect(function(el){return (el.getPath() == items[i].ajxpNode.getPath()); })){
+				this.setItemSelected(items[i], true);
+			}else{
+				this.setItemSelected(items[i], false);
+			}
+		}
+	},
+	
 	isItem: function (node) {
 		return node != null && node.nodeType == 1 && node.parentNode == this._htmlElement;
 	},
