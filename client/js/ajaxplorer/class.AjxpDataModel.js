@@ -243,7 +243,7 @@ Class.create("AjxpDataModel", {
 	},
 	
 	selectAll : function(){
-		this.setSelectedNodes(this._contextNode.getChildren());
+		this.setSelectedNodes(this._contextNode.getChildren(), "dataModel");
 	},
 	
 	isEmpty : function (){
