@@ -65,6 +65,9 @@ class PdfPreviewer extends AJXP_Plugin {
 			chdir(sys_get_temp_dir());
 			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName)."[0] ".basename($tmpFileThumb);
 			exec($cmd, $out, $return);
+			if($return){
+				throw new AJXP_Exception(implode("\n", $out));
+			}
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
 			header("Content-Length: ".filesize($tmpFileThumb));
 			header('Cache-Control: public');
