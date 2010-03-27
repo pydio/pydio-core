@@ -108,8 +108,10 @@
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
-				    ajaxplorer.getContextHolder().selectAll();
-				    ajaxplorer.actionBar.fireAction('delete');
+				    ajaxplorer.getContextHolder().selectAll();				    
+					window.setTimeout(function(){
+						ajaxplorer.actionBar.fireAction('delete');
+					}, 200);
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
