@@ -408,6 +408,14 @@ class sshAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 			
+				// BACKWARD COMPATIBILTY
+				if(isSet($httpVars["options"])){
+					if($httpVars["options"] == "al") $mode = "file_list";
+					else if($httpVars["options"] == "a") $mode = "search";
+					else if($httpVars["options"] == "d") $skipZip = "true";
+					// skip "complete" mode that was in fact quite the same as standard tree listing (dz)
+				}
+				
 				if(!isSet($dir) || $dir == "/") $dir = "";
 				$searchMode = $fileListMode = $completeMode = false;
 				if(isSet($mode)){
