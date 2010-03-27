@@ -196,7 +196,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				else 
 				{
-					$this->readFile($this->getPath()."/".AJXP_Utils::decodeSecureMagic($file), "plain");
+					$this->readFile($this->getPath()."/".AJXP_Utils::decodeSecureMagic($httpVars["file"]), "plain");
 				}
 				exit(0);
 			break;
