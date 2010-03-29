@@ -93,6 +93,10 @@ class AJXP_XMLWriter
 		AJXP_XMLWriter::write($string, true);
 	}
 	
+	function renderNodeArray($array){
+		self::renderNode($array[0],$array[1],$array[2],$array[3]);
+	}
+	
 	function catchError($code, $message, $fichier, $ligne, $context){
 		if(error_reporting() == 0) return ;
 		$message = "$message in $fichier (l.$ligne)";
