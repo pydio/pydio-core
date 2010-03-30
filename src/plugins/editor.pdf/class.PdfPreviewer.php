@@ -54,8 +54,8 @@ class PdfPreviewer extends AJXP_Plugin {
 			$tmpFileName = tempnam(sys_get_temp_dir(), "img_");
 			$tmpFile = fopen($tmpFileName, "w");
 			register_shutdown_function("unlink", $tmpFileName);
-			while(!feof($fp)){
-				fwrite($tmpFile, fread($fp, 4096));
+			while(!feof($fp)) {
+				stream_copy_to_stream($fp, $tmpFile, 4096);
 			}
 			fclose($tmpFile);
 			fclose($fp);
@@ -64,6 +64,7 @@ class PdfPreviewer extends AJXP_Plugin {
 			$tmpFileThumb = str_replace(".tmp", ".jpg", $tmpFileName);			
 			chdir(sys_get_temp_dir());
 			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName)."[0] ".basename($tmpFileThumb);
+			session_write_close(); // Be sure to give the hand back
 			exec($cmd, $out, $return);
 			if($return){
 				throw new AJXP_Exception(implode("\n", $out));

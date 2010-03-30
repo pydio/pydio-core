@@ -44,6 +44,8 @@ class fsAccessDriver extends AbstractAccessDriver
 	*/
 	public $repository;
 	public $driverConf;
+	protected $wrapperClassName;
+	protected $urlBase;
 		
 	function initRepository(){
 		if(is_array($this->pluginConf)){
@@ -53,10 +55,6 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		$create = $this->repository->getOption("CREATE");
 		$path = $this->repository->getOption("PATH");
-		$recycle = $this->repository->getOption("RECYCLE_BIN");
-		if($recycle != ""){
-			RecycleBinManager::init($path, "/".$recycle);
-		}
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
 			if(!is_dir($path)){
@@ -72,6 +70,13 @@ class fsAccessDriver extends AbstractAccessDriver
 			if(!is_dir($path)){
 				throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
 			}
+		}
+		$this->repository->detectStreamWrapper(true);
+		$this->wrapperClassName = "fsAccessWrapper";
+		$this->urlBase = "ajxp.fs://".$this->repository->getId();
+		$recycle = $this->repository->getOption("RECYCLE_BIN");
+		if($recycle != ""){
+			RecycleBinManager::init($this->urlBase, "/".$recycle);
 		}
 	}
 	
@@ -109,17 +114,10 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "download":
 				AJXP_Logger::logAction("Download", array("files"=>$selection));
 				@set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
-				@register_shutdown_function("restore_error_handler");				
-				if($selection->inZip){
-					$tmpDir = dirname($selection->getZipPath(true))."/.tmpExtractDownload";
- 			        $delDir = $this->getPath()."/".$tmpDir;
-					@mkdir($delDir);
-				    register_shutdown_function(array($this, "deldir"), $delDir);
-					$this->convertSelectionToTmpFiles($tmpDir, $selection);
-				}
+				@register_shutdown_function("restore_error_handler");
 				$zip = false;
 				if($selection->isUnique()){
-					if(is_dir($this->getPath()."/".$selection->getUniqueFile())) {
+					if(is_dir($this->urlBase.$selection->getUniqueFile())) {
 						$zip = true;
 						$dir .= "/".basename($selection->getUniqueFile());
 					}
@@ -136,7 +134,8 @@ class fsAccessDriver extends AbstractAccessDriver
 					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					$this->readFile($file, "force-download", $localName, false, false);
 				}else{
-					$this->readFile($this->getPath()."/".$selection->getUniqueFile(), "force-download");
+					$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$selection->getUniqueFile());
+					$this->readFile($realFile, "force-download");
 				}
 				exit(0);
 			break;
@@ -148,25 +147,20 @@ class fsAccessDriver extends AbstractAccessDriver
 					}else{
 						$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					}
-					$file = $this->getPath()."/".$dir."/".$localName;
+					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpCompression.zip";
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) throw new AJXP_Exception("Error while compressing file $localName");
+					register_shutdown_function("unlink", $file);					
+					copy($file, $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName));
+					@rename($this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName), $this->urlBase.$dir."/".$localName);
 					$reloadContextNode = true;
 					$pendingSelection = $localName;					
 			break;
 						
 			case "mp3_proxy":
 				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-				if($split = UserSelection::detectZip($file)){
-					require_once("server/classes/pclzip.lib.php");
-					$zip = new PclZip($this->getPath().$split[0]);
-					$data = $zip->extract(PCLZIP_OPT_BY_NAME, substr($split[1], 1), PCLZIP_OPT_EXTRACT_AS_STRING);					
-					header("Content-Type: audio/mp3; name=\"".basename($split[1])."\"");
-					header("Content-Length: ".strlen($data[0]["content"]));
-					print($data[0]["content"]);
-				}else{
-					$this->readFile($this->getPath()."/".$file, "mp3");
-				}
+				$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
+				$this->readFile($realFile, "mp3");
 				exit(0);
 			break;
 			
@@ -182,7 +176,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					AJXP_Logger::logAction("Online Edition", array("file"=>$file));
 					$code=stripslashes($code);
 					$code=str_replace("&lt;","<",$code);
-					$fileName = $this->getPath()."/".$file;
+					$fileName = $this->urlBase.$file;
 					if(!is_file($fileName) || !is_writable($fileName)){
 						header("Content-Type:text/plain");
 						print((!is_writable($fileName)?"1001":"1002"));
@@ -196,7 +190,8 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				else 
 				{
-					$this->readFile($this->getPath()."/".AJXP_Utils::decodeSecureMagic($httpVars["file"]), "plain");
+					$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
+					$this->readFile($realFile, "plain");
 				}
 				exit(0);
 			break;
@@ -210,12 +205,6 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($selection->isEmpty())
 				{
 					throw new AJXP_Exception("", 113);
-				}
-				if($selection->inZip()){
-					$tmpDir = dirname($selection->getZipPath(true))."/.tmpExtractDownload";
-					@mkdir($this->getPath()."/".$tmpDir);					
-					register_shutdown_function(array($this, "deldir"), $this->getPath()."/".$tmpDir);
-					$this->convertSelectionToTmpFiles($tmpDir, $selection);
 				}
 				$success = $error = array();
 				$dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
@@ -323,7 +312,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				$recursive = $httpVars["recursive"];
 				$recur_apply_to = $httpVars["recur_apply_to"];
 				foreach ($files as $fileName){
-					$error = $this->chmod($this->getPath().$fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
+					$error = $this->chmod($fileName, $chmod_value, ($recursive=="on"), ($recursive=="on"?$recur_apply_to:"both"), $changedFiles);
 				}
 				if(isSet($error)){
 					throw new AJXP_Exception($error);
@@ -348,7 +337,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				if($dir!=""){$rep_source="/$dir";}
 				else $rep_source = "";
-				$destination=$this->getPath().SystemTextEncoding::fromPostedFileName($rep_source);
+				$destination=$this->urlBase.SystemTextEncoding::fromPostedFileName($rep_source);
 				AJXP_Logger::debug("Upload inside", array("destination"=>$destination));
 				if(!$this->isWriteable($destination))
 				{
@@ -431,50 +420,8 @@ class fsAccessDriver extends AbstractAccessDriver
 				if(!isSet($dir) || $dir == "/") $dir = "";
 				$lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 				
-				if($test = UserSelection::detectZip($dir)){
-					$liste = array();
-					$zip = $this->zipListing($test[0], $test[1], $liste);
-					//AJXP_XMLWriter::header();
-					$metaData = array("ajxp_mime" => "ajxp_browsable_archive");
-					AJXP_XMLWriter::renderHeaderNode(AJXP_Utils::xmlEntities($dir, true), AJXP_Utils::xmlEntities(basename($dir), true), false, $metaData);
-					$tmpDir = $this->getPath().dirname($test[0]).".tmpZipExtract";					
-					foreach ($liste as $zipEntry){
-						$metaData = array();
-						if(!$lsOptions["f"] && !$zipEntry["folder"]) continue;
-						$nodeLabel = AJXP_Utils::xmlEntities( basename(SystemTextEncoding::toUTF8($zipEntry["stored_filename"])));
-						$nodeName = AJXP_Utils::xmlEntities( SystemTextEncoding::toUTF8($zipEntry["filename"]));
-						$metaData["icon"] = AJXP_Utils::mimetype($zipEntry["stored_filename"], "image", $zipEntry["folder"]);
-						if($zipEntry["folder"]){
-							$metaData["src"] = urlencode("content.php?get_action=ls&options=dz&dir=".SystemTextEncoding::toUTF8($zipEntry["filename"]));
-							$metaData["openicon"] = "folder_open.png";
-						}
-						if($lsOptions["l"]){
-							$metaData["filesize"] = AJXP_Utils::roundSize($zipEntry["size"]);
-							$metaData["bytesize"] = $zipEntry["size"];
-							$metaData["ajxp_modiftime"] = $zipEntry["mtime"];
-							$metaData["mimestring"] = AJXP_Utils::mimetype($zipEntry["stored_filename"], "mime", $zipEntry["folder"]);
-							$is_image = AJXP_Utils::is_image(basename($zipEntry["stored_filename"]));
-							$metaData["is_image"] = $is_image;
-							if($is_image){
-								if(!is_dir($tmpDir)) {
-									mkdir($tmpDir);
-									register_shutdown_function("rmdir", $tmpDir);
-								}
-								$currentFile = $tmpDir."/".basename($zipEntry["stored_filename"]);								
-								$data = $zip->extract(PCLZIP_OPT_BY_NAME, $zipEntry["stored_filename"], PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_PATH, $tmpDir);
-								list($width, $height, $type, $attr) = @getimagesize($currentFile);
-								$metaData["image_type"] = image_type_to_mime_type($type);
-								$metaData["image_width"] = $width;
-								$metaData["image_height"] = $height;
-								unlink($currentFile);
-							}
-						}					
-						AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, !$zipEntry["folder"], $metaData);
-					}
-					AJXP_XMLWriter::close();
-					exit(0);
-				}
-				$path = $this->initName($dir);				
+				$dir = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($dir));
+				$path = $this->urlBase.($dir!= ""?"/".$dir:"");	
 				$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
 				if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
 				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
@@ -488,18 +435,20 @@ class fsAccessDriver extends AbstractAccessDriver
 						$offset = (intval($page)-1)*$limitPerPage; 
 						$crtPage = $page;
 					}
-					$totalPages = floor($countFiles / $limitPerPage) + 1;						
+					$totalPages = floor($countFiles / $limitPerPage) + 1;
 				}else{
 					$offset = $limitPerPage = 0;
 				}					
-				$reps = $this->lsListing($path, $lsOptions, $offset, $limitPerPage);
-								
-				//AJXP_XMLWriter::header();
+												
 				$metaData = array();
 				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
 					$metaData["ajxp_mime"] = "ajxp_recycle";
 				}
-				AJXP_XMLWriter::renderHeaderNode(AJXP_Utils::xmlEntities($dir, true), AJXP_Utils::xmlEntities(basename($dir), true), false, $metaData);
+				AJXP_XMLWriter::renderHeaderNode(
+					AJXP_Utils::xmlEntities($dir, true), 
+					AJXP_Utils::xmlEntities(basename($dir), true), 
+					false, 
+					$metaData);
 				if(isSet($totalPages) && isSet($crtPage)){
 					AJXP_XMLWriter::renderPaginationData($countFiles, $crtPage, $totalPages);
 					if(!$lsOptions["f"]){
@@ -507,17 +456,49 @@ class fsAccessDriver extends AbstractAccessDriver
 						exit(1);
 					}
 				}
-				foreach ($reps as $nodeName)
-				{
+				
+				$cursor = 0;
+				$handle = opendir($path);
+				if(!$handle) throw new AJXP_Exception("Cannot open dir ".$path);
+				$fullList = array("d" => array(), "z" => array(), "f" => array());
+				while(strlen($nodeName = readdir($handle)) > 0){
+					if($nodeName == "." || $nodeName == "..") continue;
+					$isLeaf = (is_file($path."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+					if(!$this->filterNodeName($path, $nodeName, $isLeaf, $lsOptions)){
+						continue;
+					}
+					if(RecycleBinManager::recycleEnabled() && $dir == "" && "/".$nodeName == RecycleBinManager::getRecyclePath()){
+						continue;
+					}					
+					$nodeType = "d";
+					if($isLeaf){
+						if(AJXP_Utils::isBrowsableArchive($nodeName)) {
+							if($lsOptions["f"] && $lsOptions["z"]){
+								// See archives as files
+								$nodeType = "f";
+							}else{
+								$nodeType = "z";
+							}
+						}
+						else $nodeType = "f";
+					}			
+					if($offset > 0 && $cursor < $offset){
+						$cursor ++;
+						continue;
+					}
+					if($limitPerPage > 0 && ($cursor - $offset) >= $limitPerPage) {				
+						break;
+					}
+					
 					$metaData = array();
-					$currentFile = $path."/".$nodeName;									
-					$metaData["is_file"] = (is_file($currentFile)?"1":"0");
+					$currentFile = $path."/".$nodeName;	
+					$metaData["is_file"] = ($isLeaf?"1":"0");
 					$metaData["filename"] = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($dir."/".$nodeName));
-					$metaData["icon"] = AJXP_Utils::mimetype($nodeName, "image", is_dir($currentFile));
+					$metaData["icon"] = AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
 					if($metaData["icon"] == "folder.png"){
 						$metaData["openicon"] = "folder_open.png";
 					}
-					if(is_dir($currentFile) || AJXP_Utils::isBrowsableArchive($nodeName)){
+					if(!is_file($currentFile) || AJXP_Utils::isBrowsableArchive($nodeName)){
 						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?get_action=ls&options=dz&dir=".$dir."/".$nodeName);
 						$link = urlencode($link);						
 						$metaData["src"] = $link;
@@ -528,52 +509,69 @@ class fsAccessDriver extends AbstractAccessDriver
 						$metaData["file_owner"] = @fileowner($currentFile) || "unknown";
 						$fPerms = @fileperms($currentFile);
 						if($fPerms !== false){
-							$fPerms = substr(decoct( $fPerms ), (is_file($currentFile)?2:1));
+							$fPerms = substr(decoct( $fPerms ), ($isLeaf?2:1));
 						}else{
 							$fPerms = '0000';
 						}
 						$metaData["file_perms"] = $fPerms;
 						if(AJXP_Utils::is_image($currentFile))
 						{
-							list($width, $height, $type, $attr) = @getimagesize($currentFile);
+							$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $currentFile);
+							list($width, $height, $type, $attr) = @getimagesize($realFile);
 							$metaData["image_type"] = image_type_to_mime_type($type);
 							$metaData["image_width"] = $width;
 							$metaData["image_height"] = $height;
 						}
-						$metaData["mimestring"] = AJXP_Utils::mimetype($currentFile, "type", is_dir($currentFile));
+						$metaData["mimestring"] = AJXP_Utils::mimetype($currentFile, "type", !$isLeaf);
 						$datemodif = $this->date_modif($currentFile);
 						$metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
-						$bytesize = @filesize($currentFile) or 0;
-						if($bytesize < 0) $bytesize = sprintf("%u", $bytesize);
-						$metaData["filesize"] = AJXP_Utils::roundSize($bytesize);
-						$metaData["bytesize"] = $bytesize;
+						$metaData["bytesize"] = 0;
+						if($isLeaf){
+							$metaData["bytesize"] = filesize($currentFile);							
+						}
+						$metaData["filesize"] = AJXP_Utils::roundSize($metaData["bytesize"]);
+						if(AJXP_Utils::isBrowsableArchive($nodeName)){
+							$metaData["ajxp_mime"] = "ajxp_browsable_archive";
+						}
 					}						
 					$attributes = "";
 					foreach ($metaData as $key => $value){
 						$attributes .= "$key=\"$value\" ";
 					}
-					AJXP_XMLWriter::renderNode(
-						AJXP_Utils::xmlEntities($dir."/".$nodeName, true),
-						AJXP_Utils::xmlEntities($nodeName, true),
-						is_file($currentFile),
+					
+					$renderNodeData = array(
+						AJXP_Utils::xmlEntities($dir."/".$nodeName,true), 
+						AJXP_Utils::xmlEntities($nodeName, true), 
+						$isLeaf, 
 						$metaData
 					);
+					$fullList[$nodeType][$nodeName] = $renderNodeData;
+					$cursor ++;
 				}
+				foreach ($fullList as $key => $list){
+					uksort($list, 'strnatcasecmp');
+					$fullList[$key] = $list;
+				}
+				$allNodes = array_merge($fullList["d"], $fullList["z"], $fullList["f"]);				
+				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["d"]);
+				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["z"]);
+				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["f"]);
+				
 				// ADD RECYCLE BIN TO THE LIST
-				if($path == $this->repository->getOption("PATH") && RecycleBinManager::recycleEnabled())
+				if($dir == "" && RecycleBinManager::recycleEnabled())
 				{
-					$recycleBinOption = $this->repository->getOption("RECYCLE_BIN");
-					if(is_dir($this->repository->getOption("PATH")."/".$recycleBinOption)){
-						$recycleIcon = ($this->countFiles($this->repository->getOption("PATH")."/".$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
+					$recycleBinOption = RecycleBinManager::getRelativeRecycle();										
+					if(file_exists($this->urlBase.$recycleBinOption)){
+						$recycleIcon = ($this->countFiles($this->urlBase.$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
 						
 						AJXP_XMLWriter::renderNode(
-							"/".$recycleBinOption,
+							$recycleBinOption,
 							AJXP_Utils::xmlEntities(AJXP_Utils::xmlEntities($mess[122])),
 							false, 
-							array("ajxp_modiftime" 	=> $this->date_modif($this->repository->getOption("PATH")."/".$recycleBinOption),
+							array("ajxp_modiftime" 	=> $this->date_modif($this->urlBase.$recycleBinOption),
 								  "mimestring" 		=> "Trashcan",
 								  "icon"			=> "$recycleIcon", 
-								  "filesize"		=> "-", 
+								  "filesize"		=> "-",
 								  "ajxp_mime"		=> "ajxp_recycle")
 						);
 					}
@@ -600,38 +598,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					
 		return $xmlBuffer;
 	}
-	
-	function getPath(){
-		return $this->repository->getOption("PATH");
-	}
-	
-	function zipListing($zipPath, $localPath, &$filteredList){
-		require_once("server/classes/pclzip.lib.php");
-		$crtZip = new PclZip($this->getPath()."/".$zipPath);
-		$liste = $crtZip->listContent();
-		$files = array();
-		if($localPath[strlen($localPath)-1] != "/") $localPath.="/";
-		foreach ($liste as $item){
-			$stored = $item["stored_filename"];			
-			if($stored[0] != "/") $stored = "/".$stored;						
-			$pathPos = strpos($stored, $localPath);
-			if($pathPos !== false){
-				$afterPath = substr($stored, $pathPos+strlen($localPath));
-				if($afterPath != "" && strpos($afterPath, "/")=== false || strpos($afterPath, "/") == strlen($afterPath)-1){
-					$item["filename"] = $zipPath.$localPath.$afterPath;
-					if($item["folder"]){
-						$filteredList[] = $item;
-					}else{
-						$files[] = $item;
-					}
-				}
-				
-			}
-		}
-		$filteredList = array_merge($filteredList, $files);
-		return $crtZip;		
-	}
-	
+			
 	function parseLsOptions($optionString){
 		// LS OPTIONS : dz , a, d, z, all of these with or without l
 		// d : directories
@@ -705,66 +672,9 @@ class fsAccessDriver extends AbstractAccessDriver
 		return false;		
 	}
 	
-	function initName($dir)
-	{
-		$racine = $this->getPath();		
-		if(!isset($dir) || $dir=="" || $dir == "/")
-		{
-			$nom_rep=$racine;
-		}
-		else
-		{
-			$nom_rep="$racine/$dir";
-		}
-		if(!file_exists($racine))
-		{
-			throw new AJXP_Exception("",72);
-		}
-		if(!is_dir($nom_rep))
-		{
-			throw new AJXP_Exception("", 100);
-		}
-		return $nom_rep;
-	}
-
-	function getTrueSize($file) {
-		if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')){
-			$cmd = "stat -L -c%s \"".$file."\"";
-			$val = trim(`$cmd`);
-			if (strlen($val) == 0 || floatval($val) == 0)
-			{
-				// No stat on system
-				$cmd = "ls -1s --block-size=1 \"".$file."\"";
-				$val = trim(`$cmd`);
-			}
-			if (strlen($val) == 0 || floatval($val) == 0)
-			{
-				// No block-size on system (probably busybox), try long output
-				$cmd = "ls -l \"".$file."\"";
-
-				$arr = explode("/[\s]+/", `$cmd`);
-				$val = trim($arr[4]);
-			}
-			if (strlen($val) == 0 || floatval($val) == 0){
-				// Still not working, get a value at least, not 0...
-				$val = sprintf("%u", filesize($file));
-			}
-			return floatval($val);
-		}else if (class_exists("COM")){
-			$fsobj = new COM("Scripting.FileSystemObject");
-			$f = $fsobj->GetFile($file);
-			return floatval($f->Size);
-		}
-		else if (is_file($file)){
-			return exec('FOR %A IN ("'.$file.'") DO @ECHO %~zA');
-		}
-		else return sprintf("%u", filesize($file));
-	}
-
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
 	{
 		session_write_close();
-        $G_PROBE_REAL_SIZE = ConfService::getConf("PROBE_REAL_SIZE");
 
         set_exception_handler(download_exception_handler);
         set_error_handler(download_exception_handler);
@@ -772,10 +682,14 @@ class fsAccessDriver extends AbstractAccessDriver
         if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off'); }
 
 		$isFile = !$data && !$gzip; 
+		/* switch done in the wrapper
+        $G_PROBE_REAL_SIZE = ConfService::getConf("PROBE_REAL_SIZE");
         if (!$G_PROBE_REAL_SIZE || ini_get('safe_mode'))
             $size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
 	    else
             $size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
+        */
+		$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
 
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
@@ -912,46 +826,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		closedir($handle);
 		return $count;
 	}
-	
-	function lsListing($path, $lsOptions=array("a"=>true), $offset=0, $limit=0){
-		$cursor = 0;
-		$handle = opendir($path);
-		if(!$handle) throw new Exception("Cannot open dir ".$path);
-		$fullList = array("d" => array(), "z" => array(), "f" => array());
-		while(strlen($file = readdir($handle)) > 0){
-			$isLeaf = is_file($path."/".$file);
-			if(!$this->filterNodeName($path, $file, $isLeaf, $lsOptions)){
-				continue;
-			}
-			$nodeType = "d";
-			if($isLeaf){
-				if(AJXP_Utils::isBrowsableArchive($file)) {
-					if($lsOptions["f"] && $lsOptions["z"]){
-						// See archives as files
-						$nodeType = "f";
-					}else{
-						$nodeType = "z";
-					}
-				}
-				else $nodeType = "f";
-			}			
-			if($offset > 0 && $cursor < $offset){
-				$cursor ++;
-				continue;
-			}
-			if($limit > 0 && ($cursor - $offset) >= $limit) {				
-				break;
-			}
-			$cursor ++;
-			$fullList[$nodeType][] = $file;			
-		}
-		foreach ($fullList as $key => $list){
-			usort($list, 'strnatcasecmp');
-			$fullList[$key] = $list;
-		}
-		return array_merge($fullList["d"], $fullList["z"], $fullList["f"]);
-	}
-		
+			
 	function date_modif($file)
 	{
 		$tmp = @filemtime($file) or 0;
@@ -963,14 +838,14 @@ class fsAccessDriver extends AbstractAccessDriver
 		$chmodValue = $this->repository->getOption("CHMOD_VALUE");
 		if(isSet($chmodValue) && $chmodValue != "")
 		{
-			chmod($filePath, octdec(ltrim($chmodValue, "0")));
+			call_user_func(array($this->wrapperClassName, "changeMode"), $filePath, $chmodValue);
 		}		
 	}
 	
 	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
 	{
 		$mess = ConfService::getMessages();
-		if(!is_writable($this->getPath()."/".$destDir))
+		if(!is_writable($this->urlBase.$destDir))
 		{
 			$error[] = $mess[38]." ".$destDir." ".$mess[99];
 			return ;
@@ -978,7 +853,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				
 		foreach ($selectedFiles as $selectedFile)
 		{
-			if($move && !is_writable(dirname($this->getPath()."/".$selectedFile)))
+			if($move && !is_writable(dirname($this->urlBase.$selectedFile)))
 			{
 				$error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
 				continue;
@@ -999,7 +874,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$nom_fic=basename($filePath);
 		$mess = ConfService::getMessages();
 		$filename_new=AJXP_Utils::processFileName($filename_new);
-		$old=$this->getPath()."/$filePath";
+		$old=$this->urlBase."/$filePath";
 		if(!is_writable($old))
 		{
 			return $mess[34]." ".$nom_fic." ".$mess[99];
@@ -1047,11 +922,11 @@ class fsAccessDriver extends AbstractAccessDriver
 		{
 			return "$mess[37]";
 		}
-		if(file_exists($this->getPath()."/$crtDir/$newDirName"))
+		if(file_exists($this->urlBase."$crtDir/$newDirName"))
 		{
 			return "$mess[40]"; 
 		}
-		if(!is_writable($this->getPath()."/$crtDir"))
+		if(!is_writable($this->urlBase."$crtDir"))
 		{
 			return $mess[38]." $crtDir ".$mess[99];
 		}
@@ -1065,7 +940,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
 			if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory			
 		}
-		mkdir($this->getPath()."/$crtDir/$newDirName", $dirMode);
+		mkdir($this->urlBase."$crtDir/$newDirName", $dirMode);
 		return null;		
 	}
 	
@@ -1076,16 +951,16 @@ class fsAccessDriver extends AbstractAccessDriver
 		{
 			return "$mess[37]";
 		}
-		if(file_exists($this->getPath()."/$crtDir/$newFileName"))
+		if(file_exists($this->urlBase."$crtDir/$newFileName"))
 		{
 			return "$mess[71]";
 		}
-		if(!is_writable($this->getPath()."/$crtDir"))
+		if(!is_writable($this->urlBase."$crtDir"))
 		{
 			return "$mess[38] $crtDir $mess[99]";
 		}
 		
-		$fp=fopen($this->getPath()."/$crtDir/$newFileName","w");
+		$fp=fopen($this->urlBase."$crtDir/$newFileName","w");
 		if($fp)
 		{
 			if(preg_match("/\.html$/",$newFileName)||preg_match("/\.htm$/",$newFileName))
@@ -1093,7 +968,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
 			}
 			fclose($fp);
-			$this->changeMode($this->getPath()."/$crtDir/$newFileName");
+			$this->changeMode($this->urlBase."/$crtDir/$newFileName");
 			return null;
 		}
 		else
@@ -1112,7 +987,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			{
 				return $mess[120];
 			}
-			$fileToDelete=$this->getPath().$selectedFile;
+			$fileToDelete=$this->urlBase.$selectedFile;
 			if(!file_exists($fileToDelete))
 			{
 				$logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
@@ -1136,14 +1011,13 @@ class fsAccessDriver extends AbstractAccessDriver
 	function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
 	{
 		$mess = ConfService::getMessages();		
-		$destFile = $this->repository->getOption("PATH").$destDir."/".basename($srcFile);
-		$realSrcFile = $this->repository->getOption("PATH")."$srcFile";
-		$recycle = $this->repository->getOption("RECYCLE_BIN");		
+		$destFile = $this->urlBase.$destDir."/".basename($srcFile);
+		$realSrcFile = $this->urlBase.$srcFile;
 		if(!file_exists($realSrcFile))
 		{
 			$error[] = $mess[100].$srcFile;
 			return ;
-		}
+		}		
 		if(dirname($realSrcFile)==dirname($destFile))
 		{
 			if($move){
@@ -1162,25 +1036,25 @@ class fsAccessDriver extends AbstractAccessDriver
 				// auto rename file
 				$i = 1;
 				$newName = $base;
-				while (file_exists($this->repository->getOption("PATH").$destDir."/".$newName)) {
+				while (file_exists($this->urlBase.$destDir."/".$newName)) {
 					$suffix = "-$i";
 					if(isSet($radic)) $newName = $radic . $suffix . $ext;
 					else $newName = $base.$suffix;
 					$i++;
 				}
-				$destFile = $this->repository->getOption("PATH").$destDir."/".$newName;
+				$destFile = $this->urlBase.$destDir."/".$newName;
 			}
 		}
-		if(is_dir($realSrcFile))
-		{
+		if(!is_file($realSrcFile))
+		{			
 			$errors = array();
 			$succFiles = array();
-			if($move){
-				if(is_file($destFile)) unlink($destFile);
+			if($move){				
+				if(file_exists($destFile)) $this->deldir($destFile);
 				$res = rename($realSrcFile, $destFile);
-			}else{
+			}else{				
 				$dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
-			}
+			}			
 			if(count($errors) || (isSet($res) && $res!==true))
 			{
 				$error[] = $mess[114];
@@ -1188,17 +1062,17 @@ class fsAccessDriver extends AbstractAccessDriver
 			}			
 		}
 		else 
-		{
-			if($move){
-				if(is_file($destFile)) unlink($destFile);
+		{			
+			if($move){	
+				if(file_exists($destFile)) unlink($destFile);				
 				$res = rename($realSrcFile, $destFile);
 			}else{
-				$res = copy($realSrcFile,$destFile);
-			}
-			if($res != 1)
-			{
-				$error[] = $mess[114];
-				return ;
+				try{
+					copy($realSrcFile, $destFile);
+				}catch (Exception $e){
+					$error[] = $e->getMessage();
+					return ;					
+				}
 			}
 		}
 		
@@ -1207,7 +1081,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			// Now delete original
 			// $this->deldir($realSrcFile); // both file and dir
 			$messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
-			if(RecycleBinManager::recycleEnabled() && $destDir == "/".$recycle)
+			if(RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle())
 			{
 				RecycleBinManager::fileToRecycle($srcFile);
 				$messagePart = $mess[123]." ".$mess[122];
@@ -1248,6 +1122,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false) 
 	{
 		$num = 0;
+		//$verbose = true;
 		if(!is_dir($dstdir)) mkdir($dstdir);
 		if($curdir = opendir($srcdir)) 
 		{
@@ -1255,28 +1130,27 @@ class fsAccessDriver extends AbstractAccessDriver
 			{
 				if($file != '.' && $file != '..') 
 				{
-					$srcfile = $srcdir . DIRECTORY_SEPARATOR . $file;
-					$dstfile = $dstdir . DIRECTORY_SEPARATOR . $file;
+					$srcfile = $srcdir . "/" . $file;
+					$dstfile = $dstdir . "/" . $file;
 					if(is_file($srcfile)) 
 					{
 						if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
 						if($ow > 0) 
 						{
-							if($verbose) echo "Copying '$srcfile' to '$dstfile'...";
-							if(copy($srcfile, $dstfile)) 
-							{
-								touch($dstfile, filemtime($srcfile)); $num++;
-								if($verbose) echo "OK\n";
+							try { 
+								$tmpPath = fsAccessWrapper::getRealFSReference($srcfile);
+								if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
+								copy($tmpPath, $dstfile);
 								$success[] = $srcfile;
-							}
-							else 
-							{
+								$num ++;
+							}catch (Exception $e){
 								$errors[] = $srcfile;
 							}
 						}
 					}
-					else if(is_dir($srcfile)) 
+					else
 					{
+						if($verbose) echo "Dircopy $srcfile";
 						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose);
 					}
 				}
@@ -1347,16 +1221,16 @@ class fsAccessDriver extends AbstractAccessDriver
 	function chmod($path, $chmodValue, $recursive=false, $nodeType="both", &$changedFiles)
 	{
 	    $chmodValue = octdec(ltrim($chmodValue, "0"));
-		if(is_file($path) && ($nodeType=="both" || $nodeType=="file")){
-			chmod($path, $chmodValue);
+		if(is_file($this->urlBase.$path) && ($nodeType=="both" || $nodeType=="file")){
+			call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $chmodValue);
 			$changedFiles[] = $path;
-		}else if(is_dir($path)){
+		}else{
 			if($nodeType=="both" || $nodeType=="dir"){
-				chmod($path, $chmodValue);				
+				call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $chmodValue);				
 				$changedFiles[] = $path;
 			}
 			if($recursive){
-				$handler = opendir($path);
+				$handler = opendir($this->urlBase.$path);
 				while ($child=readdir($handler)) {
 					if($child == "." || $child == "..") continue;
 					$this->chmod($path."/".$child, $chmodValue, $recursive, $nodeType, $changedFiles);
@@ -1378,35 +1252,17 @@ class fsAccessDriver extends AbstractAccessDriver
     	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	foreach ($src as $item){
-    		$filePaths[] = array(PCLZIP_ATT_FILE_NAME => $this->getPath().$item, 
+    		$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".$item);    		
+    		$basedir = trim(dirname($realFile));
+    		$filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile, 
     							 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
-    	}
+    	}   		
     	$archive = new PclZip($dest);
-    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $this->getPath().$basedir, PCLZIP_OPT_NO_COMPRESSION);
-    	//if($vList == 0) return false;
+    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION);
+    	return $vList;
     }
     
     
-    /**
-     * @param $selection UserSelection
-     */
-    function convertSelectionToTmpFiles($tmpDir, &$selection){
-    	$zipPath = $selection->getZipPath(true);
-    	$files = $selection->getFiles();
-    	foreach ($files as $key => $item){// Remove path
-    		$item = substr($item, strlen($zipPath));
-    		if($item[0] == "/") $item = substr($item, 1);
-    		$files[$key] = $item;
-    	}
-    	require_once("server/classes/pclzip.lib.php");
-    	$zip = new PclZip($this->getPath().$zipPath);
-    	$err = $zip->extract(PCLZIP_OPT_BY_NAME, $files, 
-    				  PCLZIP_OPT_PATH, $this->getPath()."/".$tmpDir);
-    	foreach ($files as $key => $item){// Remove path
-    		$files[$key] = $tmpDir."/".$item;
-    	}
-    	$selection->setFiles($files);
-    }
     
     /** The publiclet URL making */
     function makePubliclet($filePath, $password, $expire)
