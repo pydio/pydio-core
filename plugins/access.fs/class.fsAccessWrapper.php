@@ -87,7 +87,7 @@ class fsAccessWrapper implements AjxpWrapper {
 						$afterPath = substr($stored, $pathPos+strlen($localPath));
 						if($afterPath != "" && (strpos($afterPath, "/")=== false || strpos($afterPath, "/") == strlen($afterPath)-1)){
 							$statValue = array();
-							$statValue[2] = $statValue["mode"] = ($item["folder"]?0:32768);
+							$statValue[2] = $statValue["mode"] = ($item["folder"]?"00040000":"0100000");
 							$statValue[7] = $statValue["size"] = $item["size"];
 							$statValue[8] = $statValue["atime"] = $item["mtime"];
 							$statValue[9] = $statValue["mtime"] = $item["mtime"];
