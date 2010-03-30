@@ -58,6 +58,10 @@ class RecycleBinManager
 		return self::$rbmRecycle ;
 	}
 	
+	public static function getRelativeRecycle(){
+		return self::$rbmRelativeRecycle;
+	}
+	
 	public static function currentLocationIsRecycle($currentLocation){
 		return ($currentLocation == self::$rbmRelativeRecycle);
 	}
