@@ -10,11 +10,15 @@ require_once("server/classes/class.AbstractAccessDriver.php");
 require_once("server/classes/class.HTMLWriter.php"); 
 require_once("server/classes/class.RecycleBinManager.php"); 
 
+$fakes = '
 // Non working conf service 
 class ConfService
 {
-   public function getMessages() { return array(); }
-   public function getConf($str) { if ($str == "USE_HTTPS") return (!empty($_SERVER['HTTPS'])) ? 1 : 0; return NULL; }
+	private static $repository;
+	public function getMessages() { return array(); }
+	public function getConf($str) { if ($str == "USE_HTTPS") return (!empty($_SERVER["HTTPS"])) ? 1 : 0; return NULL; }
+	public function getRepositoryById($id) {return self::$repository;}
+	public function setRepository($repo) {self::$repository = $repo;}
 };
 
 /**
@@ -34,6 +38,8 @@ class AuthService
 class AJXP_Exception extends Exception 
 {
     public function AJXP_Exception($msg) { echo "$msg"; exit(); }
-}
+}';
+
+eval($fakes);
 
 ?>

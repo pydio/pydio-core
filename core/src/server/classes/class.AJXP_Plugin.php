@@ -111,7 +111,7 @@ class AJXP_Plugin{
 	}
 	protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array()){
 		$contribDoc = new DOMDocument();
-		$contribDoc->load($xmlFile);
+		$contribDoc->load(INSTALL_PATH."/".$xmlFile);
 		if(!is_array($include) && !is_array($exclude)){
 			$this->registryContributions[] = $contribDoc->documentElement;
 			$this->parseSpecificContributions($contribDoc->documentElement);
