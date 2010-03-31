@@ -1258,7 +1258,7 @@ class fsAccessDriver extends AbstractAccessDriver
     /** The publiclet URL making */
     function makePubliclet($filePath, $password, $expire)
     {
-        $data = array("DRIVER"=>"fs", "OPTIONS"=>NULL, "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
+        $data = array("DRIVER"=>$this->repository->getAccessType(), "OPTIONS"=>NULL, "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
         return $this->writePubliclet($data);
      }
     
