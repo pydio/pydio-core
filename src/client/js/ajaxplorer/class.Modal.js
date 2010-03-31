@@ -130,6 +130,17 @@ Class.create("Modal", {
 			repDisplay = $(newForm).getElementsBySelector(".replace_file")[0];
 			repDisplay.innerHTML = getBaseName(ajaxplorer.getUserSelection().getUniqueFileName());
 		}
+		if($(newForm).select('.dialogEnterKey').length && Prototype.Browser.IE){
+			$(newForm).select('.dialogEnterKey').each(function(el){
+				if(el.enterObserver) return;
+				el.observe("keypress", function(event){
+					if(event.keyCode == Event.KEY_RETURN){
+						newForm.onsubmit();						
+					}
+				});
+				el.enterObserver = true;
+			});
+		}
 		this.currentForm = newForm;
 		if(fOnLoad != null)
 		{
