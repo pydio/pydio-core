@@ -306,7 +306,7 @@ class PThumb{
                         return $this -> set_error("Method print_thumbnail: Error. The file '$image' you specified does not exists or cannot be accessed.");
                     }   
                 }
-                $image_data = $this -> retrieve_remote_file($image,true);
+                $image_data = $this -> retrieve_remote_file($image,true, false, 1);
         }
         elseif ($this -> is_remote($image) == 0){
             $is_remote = false;
@@ -582,9 +582,9 @@ class PThumb{
 	         */
         function is_remote($address){
             //Validate that the address is of correct format
-            if (!preg_match("/^(http|https|ftp)\:\/\/([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4})(\:[0-9]+)*(\/[^\/][a-zA-Z0-9\.\,\?\'\\/\+&%\$#\=~_\-]*)*[\/]{0,1}$/",$address)){
-                return 0;
-            }
+            //if (!preg_match("/^(http|https|ftp|(ajxp\.[a-z]*))\:\/\/([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.[a-zA-Z]{2,4})(\:[0-9]+)*(\/[^\/][a-zA-Z0-9\.\,\?\'\\/\+&%\$#\=~_\-]*)*[\/]{0,1}$/",$address)){
+                //return 0;
+            //}
             /*
             //Test for connectivity
             $connected = $this -> validate_connectivity($address);
@@ -805,11 +805,19 @@ class PThumb{
         @ini_set("allow_url_fopen","1");
         
         if (ini_get("allow_url_fopen") == "1" && ($force_method == null || $force_method == 1)){
-            //METHOD 1: file()
-            $data = @join(file($url));
-            if ($data != false){
+            
+            $data = "";
+            $fp = fopen($url, "r");
+            while (!feof($fp)) {
+            	$data .= fread($fp, 4096);
+            }
+            fclose($fp);
+            //$data = @join(file($url));
+            if (strlen($data) > 0){
                 $this -> data_cache[sha1($url)] = $data;
                 return $data;
+            }else{
+            	$data = false;
             }
         }
         //METHOD 2: HTTP_RETRIEVE + CURL (by class)
