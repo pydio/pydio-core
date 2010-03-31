@@ -15,10 +15,6 @@
 	 >
 	<mx:Style>
 		Application {    
-		    background-image:   Embed("components/strip.png");
-		    background-repeat:   repeat;
-		    background-position: center;
-		    background-blend:    multiply;
 		    background-color: #ffffff;
 		    border-style : none;
 		    borderSkin: ClassReference("com.degrafa.skins.CSSSkin");

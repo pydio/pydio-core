@@ -3,6 +3,8 @@ package components
 	import flash.events.*;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
+	import flash.net.URLVariables;
 	
 	import mx.containers.*;
 	import mx.controls.*;
@@ -20,6 +22,8 @@ package components
 		private var button:Button;
 		private var _alreadyExists:Boolean;
 		private var _renameFlag:Boolean;
+        
+        public var dir:String = '';
 		
 		// constructor
 		public function FileUpload(file:FileReference,uploadUrl:String,uploaded:String,remove:String,byteText:String,removeIcon:Class)
@@ -177,7 +181,12 @@ package components
 			if(this._renameFlag){
 				_uploadUrl += '&auto_rename=true';
 			}
-			_file.upload(new URLRequest(_uploadUrl), "Filedata", true);
+            var request:URLRequest = new URLRequest(_uploadUrl);
+            request.method = URLRequestMethod.POST;
+            var data:URLVariables = new URLVariables();
+            data.dir = dir;
+            request.data = data;
+			_file.upload(request, "Filedata", true);
 		}
 		
 		// cancels the upload of a file
