@@ -97,6 +97,8 @@ class HTMLWriter
     }
     
     function javascriptErrorHandler($errorType, $errorMessage){    	
+    	// Handle "@" case!
+    	if(error_reporting() == 0) return ;
     	restore_error_handler();    	
     	die("<script language='javascript'>parent.ajaxplorer.displayMessage('ERROR', '".str_replace("'", "\'", $errorMessage)."');</script>");
     }

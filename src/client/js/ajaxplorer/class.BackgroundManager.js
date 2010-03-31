@@ -66,7 +66,7 @@ Class.create("BackgroundManager", {
 		connexion.onComplete = function(transport){
 			var xmlResponse = transport.responseXML;
 			if(xmlResponse == null || xmlResponse.documentElement == null) {
-				alert(transport.responseText);
+				//alert(transport.responseText);
 				this.working = false;
 				this.next();
 				return;
