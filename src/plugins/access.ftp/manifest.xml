@@ -25,6 +25,9 @@
 					<column messageId="4" attributeName="ajxp_modiftime"/>
 				</columns>
 			</component_config>			
+			<component_config className="FoldersTree">
+				<property name="display" value="d"/>
+			</component_config>
 		</client_configs>	
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='upload']"/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
