@@ -35,6 +35,20 @@
  */
 class AJXP_Controller{
 	public static function findActionAndApply($actionName, $httpVars, $fileVars){
+		if($actionName == "cross_copy"){
+			$pService = AJXP_PluginsService::getInstance();
+			$actives = $pService->getActivePlugins();
+			$accessPlug = $pService->getPluginsByType("access");
+			if(count($accessPlug)){
+				foreach($accessPlug as $key=>$objbect){
+					if($actives[$objbect->getId()] === true){
+						call_user_func(array($pService->getPluginById($objbect->getId()), "crossRepositoryCopy"), $httpVars);
+						break;
+					}
+				}
+			}
+			return ;
+		}
 		$registry = AJXP_PluginsService::getXmlRegistry();
 		$xPath = new DOMXPath($registry);
 		$actions = $xPath->query("actions/action[@name='$actionName']");		
