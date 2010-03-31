@@ -38,6 +38,6 @@
 	</registry_contributions>
 	<dependencies>
 		<!-- Image proxy must be implemented -->
-		<activePlugin pluginName="access.fs|access.ftp"/>
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
 	</dependencies>				
 </editor>

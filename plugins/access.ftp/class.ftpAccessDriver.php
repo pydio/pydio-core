@@ -42,9 +42,9 @@ class ftpAccessDriver extends fsAccessDriver {
 			$this->driverConf = array();
 		}
 		$create = $this->repository->getOption("CREATE");
-		$this->repository->detectStreamWrapper(true);
-		$this->wrapperClassName = "ftpAccessWrapper";
-		$this->urlBase = "ajxp.ftp://".$this->repository->getId();
+		$wrapperData = $this->detectStreamWrapper(true);
+		$this->wrapperClassName = $wrapperData["classname"];
+		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($recycle != ""){
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
