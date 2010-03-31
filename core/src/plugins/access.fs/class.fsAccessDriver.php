@@ -134,8 +134,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					$this->readFile($file, "force-download", $localName, false, false);
 				}else{
-					$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$selection->getUniqueFile());
-					$this->readFile($realFile, "force-download");
+					$this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download");
 				}
 				exit(0);
 			break;
@@ -159,8 +158,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						
 			case "mp3_proxy":
 				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-				$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
-				$this->readFile($realFile, "mp3");
+				$this->readFile($this->urlBase.$file, "mp3");
 				exit(0);
 			break;
 			
@@ -190,8 +188,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				else 
 				{
-					$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
-					$this->readFile($realFile, "plain");
+					$this->readFile($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]), "plain");
 				}
 				exit(0);
 			break;
@@ -681,19 +678,13 @@ class fsAccessDriver extends AbstractAccessDriver
         // required for IE, otherwise Content-disposition is ignored
         if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off'); }
 
-		$isFile = !$data && !$gzip; 
-		/* switch done in the wrapper
-        $G_PROBE_REAL_SIZE = ConfService::getConf("PROBE_REAL_SIZE");
-        if (!$G_PROBE_REAL_SIZE || ini_get('safe_mode'))
-            $size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
-	    else
-            $size = ($data ? strlen($filePathOrData) : floatval(trim($this->getTrueSize($filePathOrData))));
-        */
+		$isFile = !$data && !$gzip; 		
 		$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
-
+		
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
 		}
+		
 		$localName = ($localName=="" ? basename($filePathOrData) : $localName);
 		if($headerType == "plain")
 		{
@@ -802,12 +793,10 @@ class fsAccessDriver extends AbstractAccessDriver
 		if($data){
 			print($filePathOrData);
 		}else{
-            $file = fopen($filePathOrData, "rb");
-            if ($file !== FALSE) 
-            {
-                fpassthru($file);
-                fclose($file);
-            }
+			$stream = fopen("php://output", "a");
+			call_user_func(array($this->wrapperClassName, "copyFileInStream"), $filePathOrData, $stream);
+			fflush($stream);
+			fclose($stream);
 		}
 	}
 
@@ -1138,7 +1127,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						if($ow > 0) 
 						{
 							try { 
-								$tmpPath = fsAccessWrapper::getRealFSReference($srcfile);
+								$tmpPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $srcfile);
 								if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
 								copy($tmpPath, $dstfile);
 								$success[] = $srcfile;

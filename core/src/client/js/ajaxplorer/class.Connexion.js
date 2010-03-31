@@ -104,7 +104,9 @@ Class.create("Connexion", {
 				if(ajaxplorer){
 					ajaxplorer.displayMessage(messageType, messageContent);
 				}else{
-					alert(messageType+":"+messageContent);
+					if(messageType == "ERROR"){
+						alert(messageType+":"+messageContent);
+					}
 				}
 			}
 		}
