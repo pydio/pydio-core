@@ -31,6 +31,7 @@
 		<external_file filename="plugins/access.remote_fs/additionalActions.xml" include="actions/*"/>
 	</registry_contributions>
 	<class_definition filename="plugins/access.ftp/class.ftpAccessDriver.php" classname="ftpAccessDriver"/>
+	<class_stream_wrapper filename="plugins/access.ftp/class.ftpAccessWrapper.php" classname="ftpAccessWrapper" protocol="ajxp.ftp"/>
 	<dependencies>
 		<pluginActions pluginName="access.fs"/>
 		<pluginActions pluginName="access.remote_fs"/>

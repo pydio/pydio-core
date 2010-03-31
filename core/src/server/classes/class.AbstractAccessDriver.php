@@ -52,7 +52,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 	}
 	
 	
-	function applyAction($actionName, $httpVars, $filesVar)
+	function accessPreprocess($actionName, &$httpVars, &$filesVar)
 	{
 		if($actionName == "cross_copy"){
 			$this->crossRepositoryCopy($httpVars);
@@ -68,12 +68,10 @@ class AbstractAccessDriver extends AJXP_Plugin {
 			}
 			if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 				$user = AuthService::getLoggedUser();
-				$activeRepId = ConfService::getCurrentRootDirIndex();
-				$user->setArrayPref("history", $activeRepId, (isSet($httpVars["dir"])?$httpVars["dir"]:""));
+				$user->setArrayPref("history", $this->repository->getId(), (isSet($httpVars["dir"])?$httpVars["dir"]:""));
 				$user->save();
 			}
 		}
-		return parent::applyAction($actionName, $httpVars, $filesVar);
 	}
 
 	protected function parseSpecificContributions(&$contribNode){
@@ -81,9 +79,28 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		if(isSet($this->actions["public_url"]) && !defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER)){
 			unset($this->actions["public_url"]);
 		}		
-		if($this->repository!=null && is_object($this->repository) && $this->repository->detectStreamWrapper()){
+		if($this->detectStreamWrapper() !== false){
 			$this->actions["cross_copy"] = array();
 		}
+	}
+	
+	public function detectStreamWrapper($register = false){
+		$files = $this->xPath->query("class_stream_wrapper");
+		if(!$files->length) return false;
+		$streamData = $this->nodeAttrToHash($files->item(0));
+		if(!is_file(INSTALL_PATH."/".$streamData["filename"])){
+			return false;
+		}
+		include_once(INSTALL_PATH."/".$streamData["filename"]);
+		if(!class_exists($streamData["classname"])){
+			return false;
+		}
+		if($register){
+			if(!in_array($streamData["protocol"], stream_get_wrappers())){
+				stream_wrapper_register($streamData["protocol"], $streamData["classname"]);
+			}
+		}
+		return $streamData;
 	}
 	    
     /** Cypher the publiclet object data and write to disk.

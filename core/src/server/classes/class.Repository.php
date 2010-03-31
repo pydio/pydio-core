@@ -93,6 +93,13 @@ class Repository {
 	}
 	
 	function detectStreamWrapper($register = false, &$streams=null){
+		$plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
+		$streamData = $plugin->detectStreamWrapper($register);
+		if(!$register && $streamData !== false){
+			$streams[$this->accessType] = $this->accessType;
+		}
+		return ($streamData !== false);
+		/*
 		if($register && in_array("ajxp.".$this->accessType, stream_get_wrappers())){
 			// Already registered
 			return true;
@@ -113,6 +120,7 @@ class Repository {
 			}
 		}		
 		return false;
+		*/
 	}
 	
 

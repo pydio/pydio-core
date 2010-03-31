@@ -71,9 +71,9 @@ class fsAccessDriver extends AbstractAccessDriver
 				throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
 			}
 		}
-		$this->repository->detectStreamWrapper(true);
-		$this->wrapperClassName = "fsAccessWrapper";
-		$this->urlBase = "ajxp.fs://".$this->repository->getId();
+		$wrapperData = $this->detectStreamWrapper(true);
+		$this->wrapperClassName = $wrapperData["classname"];
+		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($recycle != ""){
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
@@ -82,6 +82,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
+		parent::accessPreprocess($action, $httpVars, $fileVars);
 		$selection = new UserSelection();
 		$dir = $httpVars["dir"] OR "";
 		$dir = AJXP_Utils::securePath($dir);
@@ -416,7 +417,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			
 				if(!isSet($dir) || $dir == "/") $dir = "";
 				$lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
-				
+								
 				$dir = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($dir));
 				$path = $this->urlBase.($dir!= ""?"/".$dir:"");	
 				$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
@@ -441,6 +442,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
 					$metaData["ajxp_mime"] = "ajxp_recycle";
 				}
+								
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
 					AJXP_Utils::xmlEntities(basename($dir), true), 

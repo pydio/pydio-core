@@ -269,9 +269,9 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$loggedUser = AuthService::getLoggedUser();
 			if($logged != null){
 				$wallet = $loggedUser->getPref("AJXP_WALLET");
-				if(is_array($wallet) && isSet($wallet[$repository->getUniqueId()]["FTP_USER"])){
-					$this->user = $wallet[$repository->getUniqueId()]["FTP_USER"];
-					$this->password = $wallet[$repository->getUniqueId()]["FTP_PASS"];
+				if(is_array($wallet) && isSet($wallet[$repository->getId()]["FTP_USER"])){
+					$this->user = $wallet[$repository->getId()]["FTP_USER"];
+					$this->password = $wallet[$repository->getId()]["FTP_PASS"];
 				}
 			}
 		}
@@ -292,7 +292,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 				
 		// Test Connexion and server features
         global $_SESSION;
-        $cacheKey = $repository->getUniqueId()."_ftpCharset";
+        $cacheKey = $repository->getId()."_ftpCharset";
         if (!isset($_SESSION[$cacheKey]) || !strlen($_SESSION[$cacheKey]))
         {
             $features = $this->getServerFeatures();
