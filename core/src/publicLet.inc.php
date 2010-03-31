@@ -1,6 +1,7 @@
 <?php
 require_once("server/classes/class.AJXP_Logger.php"); 
 require_once("server/classes/class.AJXP_Plugin.php"); 
+require_once("server/classes/class.AJXP_PluginsService.php"); 
 require_once("server/conf/base.conf.php"); 
 require_once("server/classes/class.Repository.php"); 
 require_once("server/classes/class.AJXP_Utils.php"); 
@@ -9,6 +10,10 @@ require_once("server/classes/class.UserSelection.php");
 require_once("server/classes/class.AbstractAccessDriver.php"); 
 require_once("server/classes/class.HTMLWriter.php"); 
 require_once("server/classes/class.RecycleBinManager.php"); 
+
+$pServ = AJXP_PluginsService::getInstance();
+$pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
+
 
 $fakes = '
 // Non working conf service 
