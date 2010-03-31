@@ -439,7 +439,9 @@ Slider.prototype.recalculate = function() {
 		this.line.style.left = hw / 2 + "px";
 		//this.line.style.right = hw / 2 + "px";
 		this.line.style.width = Math.max(0, w - hw - 2)+ "px";
+		try{
 		this.line.firstChild.style.width = Math.max(0, w - hw - 4)+ "px";
+		}catch(e){}
 	}
 	else {
 		this.handle.style.left = (w - hw) / 2 + "px";
