@@ -194,6 +194,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
         $driver->loadManifest();
         $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
+        ConfService::setRepository($data["REPOSITORY"]);
         $driver->initRepository();
         $driver->switchAction($data["ACTION"], array("file"=>$data["FILE_PATH"]), "");
     }
