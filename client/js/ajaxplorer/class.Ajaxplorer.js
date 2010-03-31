@@ -162,6 +162,11 @@ Class.create("Ajaxplorer", {
 			document.observe("ajaxplorer:context_changed", function(event){
 				this.updateHistory(this.getContextNode().getPath());
 			}.bind(this));
+		}else{
+			document.observe("ajaxplorer:context_changed", function(event){
+				var path = this.getContextNode().getPath();
+				document.title = 'AjaXplorer - '+(getBaseName(path)?getBaseName(path):'/');
+			}.bind(this));
 		}
 		modal.updateLoadingProgress('Actions Initialized');
 		  
