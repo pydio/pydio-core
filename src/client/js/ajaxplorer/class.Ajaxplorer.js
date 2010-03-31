@@ -103,9 +103,18 @@ Class.create("Ajaxplorer", {
 		if(existingNode && existingNode.parentNode){
 			var parentNode = existingNode.parentNode;
 			parentNode.removeChild(existingNode);
-			parentNode.appendChild(documentElement.firstChild);
+			if(documentElement.firstChild){
+				parentNode.appendChild(documentElement.firstChild);
+			}
+		}else if(xPath.indexOf("/") > -1){
+			// try selecting parentNode
+			var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
+			var parentNode = XPathSelectSingleNode(this._registry, parentPath);
+			if(parentNode && documentElement.firstChild){
+				parentNode.appendChild(documentElement.firstChild);
+			}			
 		}else{
-			this._registry.appendChild(documentElement.firstChild);
+			if(documentElement.firstChild) this._registry.appendChild(documentElement.firstChild);
 		}
 		document.fire("ajaxplorer:registry_part_loaded", xPath);		
 	},
