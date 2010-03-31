@@ -19,12 +19,15 @@
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
 			<component_config className="FilesList">
 				<columns switchGridMode="filelist">
-					<column messageId="1" attributeName="ajxp_label"/>
-					<column messageId="2" attributeName="filesize"/>
-					<column messageId="3" attributeName="mimestring"/>
-					<column messageId="4" attributeName="ajxp_modiftime"/>
+					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
+					<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
+					<column messageId="3" attributeName="mimestring" sortType="String"/>
+					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate"/>
 				</columns>
 			</component_config>
+			<component_config className="FoldersTree">
+				<property name="display" value="dz"/>
+			</component_config>			
 		</client_configs>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 	</registry_contributions>

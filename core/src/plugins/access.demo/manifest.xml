@@ -7,21 +7,11 @@
 		<param name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>	
 	</server_settings>
 	<class_definition filename="plugins/access.demo/class.demoAccessDriver.php" classname="demoAccessDriver"/>	
-	<class_stream_wrapper filename="plugins/access.fs/class.fsAccessWrapper.php" classname="fsAccessWrapper" protocol="ajxp.fs"/>	
+	<class_stream_wrapper filename="plugins/access.fs/class.fsAccessWrapper.php" classname="fsAccessWrapper" protocol="ajxp.demo"/>	
 	<registry_contributions>
-		<client_configs>
-			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>	
-			<component_config className="FilesList">
-				<columns switchGridMode="filelist">
-					<column messageId="1" attributeName="ajxp_label"/>
-					<column messageId="2" attributeName="filesize"/>
-					<column messageId="3" attributeName="mimestring"/>
-					<column messageId="4" attributeName="ajxp_modiftime"/>
-				</columns>
-			</component_config>
-		</client_configs>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
