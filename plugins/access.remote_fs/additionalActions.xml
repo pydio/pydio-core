@@ -22,8 +22,7 @@
 				<clientCallback prepareModal="true"><![CDATA[
 				if(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && flashUploaderEnabled)
 				{
-					modal.setCloseAction(function(){
-						$('closeFlashUploadBox').disabled=false;
+					modal.setCloseAction(function(){						
 						var bgManager = ajaxplorer.actionBar.bgManager;
 						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
 						bgManager.next();
@@ -87,7 +86,6 @@
 					<div id="flashscreen">
 					<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>
 					</div>
-					<div class="dialogButtons"><input type="button" class="dialogButton" onclick="hideLightBox(true);" value="AJXP_MESSAGE[86]" id="closeFlashUploadBox"></div>
 					</div>
 					<script language="javascript">$('originalUploadForm').hide();</script>
 				]]></clientForm>

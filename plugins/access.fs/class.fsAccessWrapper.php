@@ -145,6 +145,15 @@ class fsAccessWrapper implements AjxpWrapper {
     	return $realPath;
     }
     
+    public static function copyFileInStream($path, $stream){
+    	$fp = fopen(self::getRealFSReference($path), "rb");
+    	while (!feof($fp)) {
+ 			$data = fread($fp, 4096);
+ 			fwrite($stream, $data, strlen($data));
+    	}
+    	fclose($fp);
+    }    
+    
     public static function changeMode($path, $chmodValue){
     	$realPath = self::initPath($path, "file");
     	chmod($realPath, $chmodValue);
