@@ -51,29 +51,22 @@ class ImagePreviewer extends AJXP_Plugin {
 		    	
 		if($action == "preview_data_proxy"){
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-			$fp = fopen($destStreamURL.$file, "r");
 			
 			if($this->pluginConf["GENERATE_THUMBNAIL"]){
-				$tmpFileName = tempnam(sys_get_temp_dir(), "img_");
-				$tmpFile = fopen($tmpFileName, "w");
-				register_shutdown_function("unlink", $tmpFileName);
-				while (!feof($fp)) {
-					fwrite($tmpFile, fread($fp, 4096));
-				}
-				fclose($tmpFile);
-				fclose($fp);
 				require_once("server/classes/PThumb.lib.php");
 				$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
 				if(!$pThumb->isError()){							
 					$pThumb->use_cache = $this->pluginConf["USE_THUMBNAIL_CACHE"];
 					$pThumb->cache_dir = $this->pluginConf["THUMBNAIL_CACHE_DIR"];	
-					$pThumb->fit_thumbnail($tmpFileName, 200);
+					$pThumb->fit_thumbnail($destStreamURL.$file, 200);
 					if($pThumb->isError()){
 						print_r($pThumb->error_array);
+						AJXP_Logger::logAction("error", $pThumb->error_array);
 					}
 					exit(0);
 				}
 			}else{
+				$fp = fopen($destStreamURL.$file, "r");
 				$filesize = 0;
 				while(!feof($fp)){
 					$filesize += strlen(fread($fp, 4096));
