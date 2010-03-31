@@ -54,17 +54,8 @@ Class.create("FoldersTree", AjxpPane, {
 				ajaxplorer.actionBar.fireDefaultAction("dir", this.ajxpNode);
 			}
 		};
-		var displayOptions = this.options.display || "dz";
-		if(displayOptions.indexOf("a") > -1) displayOptions = "dzf";
-		if(displayOptions.indexOf("z") > -1 && window.zipEnabled === false) displayOptions = displayOptions.split("z").join("");
-		this.options.display  = displayOptions;
-
-		var d = (displayOptions.indexOf("d") > -1);
-		var z = (displayOptions.indexOf("z") > -1);
-		var f = (displayOptions.indexOf("f") > -1);
-		var filter = function(ajxpNode){
-			return (((d && !ajxpNode.isLeaf()) || (f && ajxpNode.isLeaf()) || (z && (ajxpNode.getAjxpMime()=="zip" || ajxpNode.getAjxpMime()=="ajxp_browsable_archive"))) && (ajxpNode.getParent().getAjxpMime() != "ajxp_recycle"));
-		};
+		
+		var filter = this.createFilter();
 		var fakeRootNode = new AjxpNode("/", true, "No Repository", "folder.png");
 		fakeRootNode._isLoaded = true;
 		this.tree = new AJXPTree(fakeRootNode,  action, filter);		
@@ -99,6 +90,34 @@ Class.create("FoldersTree", AjxpPane, {
 			this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());		
 		}.bind(this));
 		
+		document.observe("ajaxplorer:component_config_changed", function(event){
+			if(event.memo.className == "FoldersTree"){
+				var config = event.memo.classConfig.get('all');
+				var options = XPathSelectNodes(config, 'property');
+				for(var i=0;i<options.length;i++){
+					this.options[options[i].getAttribute('name')] = options[i].getAttribute('value');
+				}
+				if(this.tree){
+					this.tree.filter = this.createFilter();
+				}
+			}
+		}.bind(this) );		
+		
+	},
+	
+	createFilter : function(){
+		var displayOptions = this.options.display || "dz";
+		if(displayOptions.indexOf("a") > -1) displayOptions = "dzf";
+		if(displayOptions.indexOf("z") > -1 && window.zipEnabled === false) displayOptions = displayOptions.split("z").join("");
+		this.options.display  = displayOptions;
+
+		var d = (displayOptions.indexOf("d") > -1);
+		var z = (displayOptions.indexOf("z") > -1);
+		var f = (displayOptions.indexOf("f") > -1);
+		var filter = function(ajxpNode){
+			return (((d && !ajxpNode.isLeaf()) || (f && ajxpNode.isLeaf()) || (z && (ajxpNode.getAjxpMime()=="zip" || ajxpNode.getAjxpMime()=="ajxp_browsable_archive"))) && (ajxpNode.getParent().getAjxpMime() != "ajxp_recycle"));
+		};
+		return filter;		
 	},
 	
 	focus: function(){
