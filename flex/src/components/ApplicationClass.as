@@ -277,7 +277,8 @@ package components
 		private function OnSelect(event:Event):void{
 			// get the page to upload to, set in flashvars
 			var uploadPage:String = Application.application.parameters.uploadPage;
-			uploadPage += "&dir="+ triggerJSEvent("currentFolder");
+			//uploadPage += "&dir="+ triggerJSEvent("currentFolder");
+            var dir:String = triggerJSEvent("currentFolder");
 			
 			var tempSize:Number = _totalSize;
 			
@@ -338,6 +339,7 @@ package components
 				{
 				    var fu:FileUpload = new FileUpload(fileRefList.fileList[i],uploadPage, GetTextFor("Uploaded"), GetTextFor("Remove"), GetTextFor("Byte"), this['RemoveIcon']);					
 				    fu.percentWidth = 100;				
+                    fu.dir = dir;
 				    fu.addEventListener("FileRemoved",OnFileRemoved);	
 				    fu.addEventListener("UploadComplete",OnFileUploadComplete);
 				    fu.addEventListener("UploadProgressChanged",OnFileUploadProgressChanged);
