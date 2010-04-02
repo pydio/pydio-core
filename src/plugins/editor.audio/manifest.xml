@@ -42,8 +42,14 @@
 						newWin.document.close();
 						]]></clientCallback>
 					<serverCallback methodName="switchAction"></serverCallback>
-					</processing>
-			</action>			
+				</processing>
+			</action>
+			<!-- This one will happen a post-processing filter when ls is called with parameter playlist=true -->
+			<action name="ls">
+				<post_processing>					
+					<serverCallback methodName="switchAction" applyCondition="$apply=isSet($httpVars['playlist']);"/>
+				</post_processing>
+			</action>
 		</actions>
 	</registry_contributions>
 	<dependencies>

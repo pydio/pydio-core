@@ -570,7 +570,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					}
 				}
 				AJXP_XMLWriter::close();
-				exit(1);
+				return ;
 				
 			break;		
 		}

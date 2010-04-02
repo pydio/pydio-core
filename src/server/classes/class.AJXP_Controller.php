@@ -75,18 +75,51 @@ class AJXP_Controller{
 				}
 		}				
 		
-		self::applyCallback($xPath, "pre_processing/serverCallback", $action, $actionName, $httpVars, $fileVars);
-		$result = self::applyCallback($xPath, "processing/serverCallback", $action, $actionName, $httpVars, $fileVars);
-		self::applyCallback($xPath, "post_processing/serverCallback", $action, $actionName, $httpVars, $fileVars);
-		
-		return $result;
+		$preCall = self::getCallbackNode($xPath, $action, "pre", $actionName, $httpVars, $fileVars);
+		$postCall = self::getCallbackNode($xPath, $action, "post", $actionName, $httpVars, $fileVars);
+		$mainCall = self::getCallbackNode($xPath, $action, "",$actionName, $httpVars, $fileVars);
+
+		if($postCall !== false){
+			ob_start();
+			$params = array();
+		}
+		if($preCall !== false){
+			// A Preprocessing callback can modify its input arguments (passed by ref)
+			$preResult = self::applyCallback($xPath, $preCall, $actionName, $httpVars, $fileVars);
+			if(isSet($params)){
+				$params["pre_processor_result"] = $preResult;
+			}
+		}		
+		if($mainCall){
+			$result = self::applyCallback($xPath, $mainCall, $actionName, $httpVars, $fileVars);
+			if(isSet($params)){
+				$params["processor_result"] = $preResult;
+			}			
+		}		
+		if($postCall !==false){
+			$params["ob_output"] = ob_get_contents();
+			ob_end_clean();
+			self::applyCallback($xPath, $postCall, $actionName, $httpVars, $params);
+		}else{
+			if(isSet($result)) return $result;
+		}
 	}
 	
-	private function applyCallback($xPath, $query, $action, $actionName, $httpVars, $fileVars){
-		//Processing
-		$callbacks = $xPath->query($query, $action);
+	private function getCallbackNode($xPath, $actionNode, $callbackType = "",$actionName, $httpVars, $fileVars){
+		$query = ($callbackType!=""?$callbackType."_":"")."processing/serverCallback";
+		$callbacks = $xPath->query($query, $actionNode);
 		if(!$callbacks->length) return false;
 		$callback=$callbacks->item(0);
+		if($callback->getAttribute("applyCondition")!=""){
+			$apply = false;
+			eval($callback->getAttribute("applyCondition"));
+			if(!$apply) return false;
+		}
+		return $callback;
+	}
+	
+	private function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars){
+		//Processing
 		$plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
 		$methodName = $xPath->query("@methodName", $callback)->item(0)->value;		
 		$plugInstance = AJXP_PluginsService::findPluginById($plugId);
@@ -102,6 +135,16 @@ class AJXP_Controller{
 			return true;
 		}
 		return false;
+	}
+	
+	public static function passProcessDataThrough($postProcessData){
+		if(isSet($postProcessData["pre_processor_result"])){
+			print($postProcessData["pre_processor_result"]);
+		}
+		if(isSet($postProcessData["processor_result"])){
+			print($postProcessData["processor_result"]);
+		}
+		print($postProcessData["ob_output"]);
 	}
 }
 ?>
