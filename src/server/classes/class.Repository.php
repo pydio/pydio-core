@@ -95,32 +95,10 @@ class Repository {
 	function detectStreamWrapper($register = false, &$streams=null){
 		$plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
 		$streamData = $plugin->detectStreamWrapper($register);
-		if(!$register && $streamData !== false){
+		if(!$register && $streamData !== false && $streams!=null){
 			$streams[$this->accessType] = $this->accessType;
 		}
 		return ($streamData !== false);
-		/*
-		if($register && in_array("ajxp.".$this->accessType, stream_get_wrappers())){
-			// Already registered
-			return true;
-		}else if(!$register && is_array($streams) && in_array($this->accessType, $streams)){
-			return true;
-		}
-		$className = $this->accessType."AccessWrapper";
-		$fileName = INSTALL_PATH."/plugins/access.".$this->accessType."/class.".$className.".php";		
-		if(is_file($fileName)){
-			include_once($fileName);
-			if(class_exists($className) && in_array("AjxpWrapper", class_implements($className))){
-				if($register){
-					stream_wrapper_register("ajxp.".$this->accessType, $className);
-				}else if(is_array($streams)){
-					$streams[$this->accessType] = $this->accessType;
-				}
-				return true;
-			}
-		}		
-		return false;
-		*/
 	}
 	
 

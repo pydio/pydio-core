@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.video" openable="false" mimes="flv,mov,mp4,m4a,aac" text="186" title="136" icon="frame_image.png" className="VideoPreviewer">
+	<resources>
+		<js file="plugins/editor.video/class.VideoPreviewer.js" className="VideoPreviewer"/>
+	</resources>
+	<registry_contributions>
+		<actions>
+			<action name="video_proxy">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper must be implemented -->
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+	</dependencies>				
+</editor>

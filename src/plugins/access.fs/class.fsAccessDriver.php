@@ -110,7 +110,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		switch($action)
 		{			
 			//------------------------------------
-			//	DOWNLOAD, IMAGE & MP3 PROXYS
+			//	DOWNLOAD
 			//------------------------------------
 			case "download":
 				AJXP_Logger::logAction("Download", array("files"=>$selection));
@@ -155,12 +155,6 @@ class fsAccessDriver extends AbstractAccessDriver
 					@rename($this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName), $this->urlBase.$dir."/".$localName);
 					$reloadContextNode = true;
 					$pendingSelection = $localName;					
-			break;
-						
-			case "mp3_proxy":
-				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-				$this->readFile($this->urlBase.$file, "mp3");
-				exit(0);
 			break;
 			
 			//------------------------------------
@@ -697,11 +691,6 @@ class fsAccessDriver extends AbstractAccessDriver
 			header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
 			header("Content-Length: ".$size);
 			header('Cache-Control: public');
-		}
-		else if($headerType == "mp3")
-		{
-			header("Content-Type: audio/mp3; name=\"".$localName."\"");
-			header("Content-Length: ".$size);
 		}
 		else
 		{
