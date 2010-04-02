@@ -1,6 +1,5 @@
-<?php
 /**
- * @package info.ajaxplorer
+ * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
  * This file is part of AjaXplorer.
@@ -31,51 +30,44 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : Class for handling pdf preview, etc... Rely on the StreamWrappers, ImageMagick and GhostScript
+ * Description : The Audio previewer : mp3 player only for the moment.
  */
-class PdfPreviewer extends AJXP_Plugin {
+Class.create("VideoPreviewer", AbstractEditor, {
 
-	public function switchAction($action, $httpVars, $filesVars){
+	fullscreenMode: false,
+	
+	initialize: function($super, oFormObject){
+	},
 		
-		if(!isSet($this->actions[$action])) return false;
-    	
-		$repository = ConfService::getRepository();
-		if(!$repository->detectStreamWrapper(true)){
-			return false;
-		}
-		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["IMAGE_MAGICK_CONVERT"])){
-			return false;
-		}
-    	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
-		    	
-		if($action == "pdf_data_proxy"){
-			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
-			$fp = fopen($destStreamURL."/".$file, "r");
-			$tmpFileName = tempnam(sys_get_temp_dir(), "img_");
-			$tmpFile = fopen($tmpFileName, "w");
-			register_shutdown_function("unlink", $tmpFileName);
-			while(!feof($fp)) {
-				stream_copy_to_stream($fp, $tmpFile, 4096);
+	getPreview : function(ajxpNode, rich){
+		if(rich){
+			var escapedFilename = escape(encodeURIComponent(ajxpNode.getPath()));
+			var url = document.location.href;
+			if(url[(url.length-1)] == '/'){
+				url = url.substr(0, url.length-1);
+			}else if(url.lastIndexOf('/') > -1){
+				url = url.substr(0, url.lastIndexOf('/'));
 			}
-			fclose($tmpFile);
-			fclose($fp);
-			$out = array();
-			$return = 0;
-			$tmpFileThumb = str_replace(".tmp", ".jpg", $tmpFileName);			
-			chdir(sys_get_temp_dir());
-			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName)."[0] ".basename($tmpFileThumb);
-			session_write_close(); // Be sure to give the hand back
-			exec($cmd, $out, $return);
-			if($return){
-				throw new AJXP_Exception(implode("\n", $out));
-			}
-			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
-			header("Content-Length: ".filesize($tmpFileThumb));
-			header('Cache-Control: public');
-			readfile($tmpFileThumb);
-			exit(1);
 			
+			var div = new Element('div', {id:"video_container", style:"text-align:center; margin-bottom: 5px;"});
+			var content = '<object type="application/x-shockwave-flash" data="'+ajxpResourcesFolder+'/flash/player_flv_maxi.swf" width="100%" height="200">';
+			content += '	<param name="movie" value="'+ajxpResourcesFolder+'/flash/player_flv_maxi.swf" />';
+			content += '	<param name="quality" value="high">';
+			content += '	<param name="allowFullScreen" value="true" />';
+			content += '	<param name="FlashVars" value="flv='+url+'/content.php?action=download%26file='+escapedFilename+'&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />';
+			content += '</object>';
+			div.update(content);
+			div.resizePreviewElement = function(dimensionObject){
+				// do nothing;
+			}
+			return div;
+		}else{
+			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/crystal/mimes/ICON_SIZE',64)});
 		}
+	},
+	
+	getThumbnailSource : function(ajxpNode){
+		return resolveImageSource(ajxpNode.getIcon(),'/images/crystal/mimes/ICON_SIZE',64);
 	}
-}
-?>
+	
+});

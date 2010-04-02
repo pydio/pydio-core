@@ -500,7 +500,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -526,7 +526,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -552,7 +552,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -646,7 +646,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -685,7 +685,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" mp3="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -711,49 +711,6 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="play_whole_folder">
-			<gui text="140" title="140" src="player_play.png" accessKey=""><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="true"></context><selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_AUDIO"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback><![CDATA[
-					var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS, sans-serif; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS, sans-serif; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
-					
-					var mp3Items = new Array();
-					$A(ajaxplorer.getContextNode().getChildren()).each(function(nodeItem){
-						var filename = nodeItem.getPath();
-						if(getFileExtension(filename) == 'mp3') mp3Items.push(escape(encodeURIComponent(filename)));
-					});						
-					var mp3_url = '';
-					var tmp_url = '';
-					var limited = false;
-					mp3Items.each(function(url){
-						tmp_url += 'content.php?action=mp3_proxy%26file='+url;
-						if(url != mp3Items.last()) tmp_url += '|';
-						if(Prototype.Browser.IE && tmp_url.length > 2000){
-							limited = true; return;
-						}
-						mp3_url=tmp_url;
-					});
-					if(limited){
-						alert('Due to the flash player and an Internet Explorer restriction on URL length,\n only a part of the folder can be read.');
-					}
-					newWin = window.open('', 'mp3_multi_player', 'width=260,height=30,directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no');
-					newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getContextNode().getPath()}));
-					newWin.document.close();
-					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
-		<action name="mp3_proxy">
-			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key"><context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"></context><selectionContext dir="true" file="true" recycle="false" unique="true" image="" mp3="" editable=""></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback><![CDATA[
-					// PUT HERE CODE TO EXECUTE IN JAVASCRIPT
-					]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>						
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">
@@ -826,39 +783,6 @@
 						<br><b>#{size_string}</b> : #{filesize}
 						<br><b>#{type_string}</b> : #{image_type}
 						<br><b>#{modif_string}</b> : #{formated_date}
-					</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="AJXP_MIMES_AUDIO" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="size_string" id="127"/>
-					<message key="type_string" id="134"/>				
-					<message key="modif_string" id="138"/>
-				</messages>
-				<html><![CDATA[
-					<div style="padding:10px;">
-						<div id="mp3_container" style="text-align:center; padding:5px; width:160px;margin-bottom: 5px;">
-							<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{escaped_filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
-						</div>
-						<b>#{name_string}</b> : #{basename}
-						<br><b>#{size_string}</b> : #{filesize}
-						<br><b>#{type_string}</b> : #{mimestring}
-						<br><b>#{modif_string}</b> : #{formated_date}
-					</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="flv,mov,mp4,m4a,aac" attributes="basename,escaped_filename,icon,filesize,mimestring,formated_date,uri">
-				<html><![CDATA[
-					<div style="padding:10px;">
-						<center style="border:1px solid #676965; margin-bottom: 5px;">
-						<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" width="100%" height="200">
-							<param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/player_flv_maxi.swf" />
-							<param name="quality" value="high">
-							<param name="allowFullScreen" value="true" />
-							<param name="FlashVars" value="flv=#{uri}/content.php?action=download%26file=#{escaped_filename}&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />
-						</object>
-						</center>
 					</div>
 				]]></html>
 			</infoPanel>
