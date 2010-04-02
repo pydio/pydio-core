@@ -228,7 +228,6 @@ class AbstractAjxpUser
     function decodeUserPassword($password){
         if (function_exists('mcrypt_decrypt'))
         {
-             $users = AuthService::listUsers();
              // The initialisation vector is only required to avoid a warning, as ECB ignore IV
              $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
              // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
