@@ -31,48 +31,31 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : Class for handling pdf preview, etc... Rely on the StreamWrappers, ImageMagick and GhostScript
+ * Description : Class for handling image_proxy, mp3 proxy, etc... Will rely on the StreamWrappers.
  */
-class PdfPreviewer extends AJXP_Plugin {
+class AudioPreviewer extends AJXP_Plugin {
 
 	public function switchAction($action, $httpVars, $filesVars){
 		
 		if(!isSet($this->actions[$action])) return false;
     	
 		$repository = ConfService::getRepository();
-		if(!$repository->detectStreamWrapper(true)){
+		if(!$repository->detectStreamWrapper(false)){
 			return false;
 		}
-		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["IMAGE_MAGICK_CONVERT"])){
-			return false;
-		}
-    	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
+		$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+		$streamData = $plugin->detectStreamWrapper(true);		
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
 		    	
-		if($action == "pdf_data_proxy"){
-			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
-			$fp = fopen($destStreamURL."/".$file, "r");
-			$tmpFileName = tempnam(sys_get_temp_dir(), "img_");
-			$tmpFile = fopen($tmpFileName, "w");
-			register_shutdown_function("unlink", $tmpFileName);
-			while(!feof($fp)) {
-				stream_copy_to_stream($fp, $tmpFile, 4096);
-			}
-			fclose($tmpFile);
-			fclose($fp);
-			$out = array();
-			$return = 0;
-			$tmpFileThumb = str_replace(".tmp", ".jpg", $tmpFileName);			
-			chdir(sys_get_temp_dir());
-			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName)."[0] ".basename($tmpFileThumb);
-			session_write_close(); // Be sure to give the hand back
-			exec($cmd, $out, $return);
-			if($return){
-				throw new AJXP_Exception(implode("\n", $out));
-			}
-			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
-			header("Content-Length: ".filesize($tmpFileThumb));
-			header('Cache-Control: public');
-			readfile($tmpFileThumb);
+		if($action == "audio_proxy"){			
+			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+			header("Content-Type: audio/mp3; name=\"".$localName."\"");
+			header("Content-Length: ".$size);
+			
+			$stream = fopen("php://output", "a");
+			call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+			fflush($stream);
+			fclose($stream);
 			exit(1);
 			
 		}

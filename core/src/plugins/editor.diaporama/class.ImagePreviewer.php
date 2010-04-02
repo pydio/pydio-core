@@ -31,7 +31,7 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : Class for handling image_proxy, mp3 proxy, etc... Will rely on the StreamWrappers.
+ * Description : Class for handling image_proxy, etc... Will rely on the StreamWrappers.
  */
 class ImagePreviewer extends AJXP_Plugin {
 
