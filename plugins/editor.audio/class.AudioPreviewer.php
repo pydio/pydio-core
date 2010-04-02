@@ -35,7 +35,7 @@
  */
 class AudioPreviewer extends AJXP_Plugin {
 
-	public function switchAction($action, $httpVars, $filesVars){
+	public function switchAction($action, $httpVars, $postProcessData){
 		
 		if(!isSet($this->actions[$action])) return false;
     	
@@ -58,7 +58,22 @@ class AudioPreviewer extends AJXP_Plugin {
 			fclose($stream);
 			exit(1);
 			
+		}else if($action == "ls"){
+			if(!isSet($httpVars["playlist"])){
+				// This should not happen anyway, because of the applyCondition.				
+				AJXP_Controller::passDataThrough($postProcessData);
+				return ;
+			}
+			// We transform the XML into XSPF
+			$xmlString = $postProcessData["ob_output"];
+			$xmlDoc = DOMDocument::loadXML($xmlString);
+			$xElement = $xmlDoc->documentElement;
+			AJXP_XMLWriter::header("playlist");
+			foreach ($xElement->childNodes as $child){
+				print("<xspf name=\"".$child->getAttribute("filename")."\"/>");
+			}
+			AJXP_XMLWriter::close("playlist");
 		}
-	}
+	}	
 }
 ?>
