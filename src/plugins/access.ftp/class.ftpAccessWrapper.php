@@ -56,60 +56,60 @@ class ftpAccessWrapper implements AjxpWrapper {
 		return ($this->fp !== false);
 	}
 	
-    function stream_stat(){
+    public function stream_stat(){
     	return fstat($this->fp);
     }	
     
-    function stream_seek($offset, $option){
+    public function stream_seek($offset , $whence = SEEK_SET){
     	fseek($this->fp, $offset, SEEK_SET);
     }
     
-    function stream_tell(){
+    public function stream_tell(){
     	return ftell($this->fp);
     }	
     
-    function stream_read($count){
+    public function stream_read($count){
     	return fread($this->fp, $count);
     }
 
-    function stream_write($data){
+    public function stream_write($data){
     	fwrite($this->fp, $data, strlen($data));
         return strlen($data);
     }
 
-    function stream_eof(){
+    public function stream_eof(){
     	return feof($this->fp);
     }
    
-    function stream_close(){
+    public function stream_close(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
     		fclose($this->fp);
     	}
     }
     
-    function stream_flush(){
+    public function stream_flush(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
 	    	fflush($this->fp);
     	}
     }
-    
-    function unlink($url){
+        
+    public function unlink($url){
     	return unlink($this->buildRealUrl($url));
     }
     
-    function rmdir($url){
+    public function rmdir($url, $options){
     	return rmdir($this->buildRealUrl($url));
     }
     
-    function mkdir($url){
-    	return mkdir($this->buildRealUrl($url));
+    public function mkdir($url, $mode, $options){
+    	return mkdir($this->buildRealUrl($url), $mode);
     }
     
-    function rename($from, $to){
+    public function rename($from, $to){
     	return rename($this->buildRealUrl($from), $this->buildRealUrl($to));
     }
     
-    function url_stat($path, $flags){
+    public function url_stat($path, $flags){
     	// We are in an opendir loop
     	if(self::$dirContent != null){
     		$search = basename($path);
@@ -317,7 +317,7 @@ class ftpAccessWrapper implements AjxpWrapper {
      *	A decent FTP server support MLST command to list file using UTF-8 encoding
      *  @return an array of features (see code)
      */ 
-    function getServerFeatures(){
+    protected function getServerFeatures(){
     	$link = $this->createFTPLink();
         $features = @ftp_raw($link, "FEAT");        
         // Check the answer code
@@ -341,8 +341,7 @@ class ftpAccessWrapper implements AjxpWrapper {
         return $retArray;
     }
 
-
-    function createFTPLink(){
+    protected function createFTPLink(){
     	
     	// If connexion exist and is still connected
     	if(is_array(self::$repositoryConnexions) 
@@ -378,7 +377,7 @@ class ftpAccessWrapper implements AjxpWrapper {
         return $link;
     }	
     
-	function convertingChmod($permissions, $filterForStat = false)
+	protected function convertingChmod($permissions, $filterForStat = false)
 	{
 		$mode = 0;
 		

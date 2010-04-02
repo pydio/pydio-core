@@ -168,7 +168,7 @@ class fsAccessWrapper implements AjxpWrapper {
      * @param unknown_type $opened_path
      * @return unknown
      */
-    function stream_open($path, $mode, $options, &$context)
+    public function stream_open($path, $mode, $options, &$context)
     {
     	try{
 	    	$this->realPath = AJXP_Utils::securePath(self::initPath($path, "file"));
@@ -185,15 +185,15 @@ class fsAccessWrapper implements AjxpWrapper {
     	}		
     }
     
-    function stream_seek($offset, $option){
+    public function stream_seek($offset , $whence = SEEK_SET){
     	fseek($this->fp, $offset, SEEK_SET);
     }
     
-    function stream_tell(){
+    public function stream_tell(){
     	return ftell($this->fp);
     }
     
-    function stream_stat(){
+    public function stream_stat(){
         $PROBE_REAL_SIZE = ConfService::getConf("PROBE_REAL_SIZE");    	
     	if(is_resource($this->fp)){
     		$statValue = fstat($this->fp);
@@ -211,7 +211,7 @@ class fsAccessWrapper implements AjxpWrapper {
     	return null;
     }
     
-    function url_stat($path, $flags){    
+    public function url_stat($path, $flags){    
     	// File and zip case	
     	if($fp = @fopen($path, "r")){    		
 	    	$stat = fstat($fp);
@@ -237,47 +237,47 @@ class fsAccessWrapper implements AjxpWrapper {
    		return null;
     }
     
-    function rename($from, $to){
+    public function rename($from, $to){
     	return rename($this->initPath($from, "file", false, true), $this->initPath($to, "file", false, true));
     }
     
-    function stream_read($count){
+    public function stream_read($count){
     	return fread($this->fp, $count);
     }
 
-    function stream_write($data){
+    public function stream_write($data){
     	fwrite($this->fp, $data, strlen($data));
         return strlen($data);
     }
 
-    function stream_eof(){
+    public function stream_eof(){
     	return feof($this->fp);
     }
    
-    function stream_close(){
+    public function stream_close(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
     		fclose($this->fp);
     	}
     }
     
-    function stream_flush(){
+    public function stream_flush(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
 	    	fflush($this->fp);
     	}
     }
     
-    function unlink($path){
+    public function unlink($path){
     	$this->realPath = self::initPath($path, "file", false, true);
     	return unlink($this->realPath);
     }
     
-    function rmdir($path){
+    public function rmdir($path, $options){
     	$this->realPath = self::initPath($path, "file", false, true);
     	return rmdir($this->realPath);
     }
     
-    function mkdir($path){
-    	return mkdir(self::initPath($path, "file"));
+    public function mkdir($path, $mode, $options){
+    	return mkdir(self::initPath($path, "file"), $mode);
     }
     
     /**
@@ -323,7 +323,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		}
 	}
 	
-	function getTrueSizeOnFileSystem($file) {
+	protected function getTrueSizeOnFileSystem($file) {
 		if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')){
 			$cmd = "stat -L -c%s \"".$file."\"";
 			$val = trim(`$cmd`);
