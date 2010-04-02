@@ -267,11 +267,11 @@ class ftpAccessWrapper implements AjxpWrapper {
 		// 2. Try from user wallet
 		if(!isSet($this->user) || $this->user==""){
 			$loggedUser = AuthService::getLoggedUser();
-			if($logged != null){
+			if($loggedUser != null){
 				$wallet = $loggedUser->getPref("AJXP_WALLET");
-				if(is_array($wallet) && isSet($wallet[$repository->getId()]["FTP_USER"])){
-					$this->user = $wallet[$repository->getId()]["FTP_USER"];
-					$this->password = $wallet[$repository->getId()]["FTP_PASS"];
+				if(is_array($wallet) && isSet($wallet[$this->repositoryId]["FTP_USER"])){
+					$this->user = $wallet[$this->repositoryId]["FTP_USER"];
+					$this->password = $loggedUser->decodeUserPassword($wallet[$this->repositoryId]["FTP_PASS"]);
 				}
 			}
 		}
