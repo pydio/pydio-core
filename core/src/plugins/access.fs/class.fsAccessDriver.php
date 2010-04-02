@@ -829,6 +829,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$chmodValue = $this->repository->getOption("CHMOD_VALUE");
 		if(isSet($chmodValue) && $chmodValue != "")
 		{
+			$chmodValue = octdec(ltrim($chmodValue, "0"));
 			call_user_func(array($this->wrapperClassName, "changeMode"), $filePath, $chmodValue);
 		}		
 	}
