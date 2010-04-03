@@ -16,36 +16,23 @@
 				<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 				<processing>
 					<clientCallback><![CDATA[
-						var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS, sans-serif; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS, sans-serif; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
-						
-						var mp3Items = new Array();
-						$A(ajaxplorer.getContextNode().getChildren()).each(function(nodeItem){
-							var filename = nodeItem.getPath();
-							if(getFileExtension(filename) == 'mp3') mp3Items.push(escape(encodeURIComponent(filename)));
-						});						
-						var mp3_url = '';
-						var tmp_url = '';
-						var limited = false;
-						mp3Items.each(function(url){
-							tmp_url += 'content.php?action=audio_proxy%26file='+url;
-							if(url != mp3Items.last()) tmp_url += '|';
-							if(Prototype.Browser.IE && tmp_url.length > 2000){
-								limited = true; return;
-							}
-							mp3_url=tmp_url;
-						});
-						if(limited){
-							alert('Due to the flash player and an Internet Explorer restriction on URL length,\n only a part of the folder can be read.');
-						}
-						newWin = window.open('', 'mp3_multi_player', 'width=260,height=30,directories=no,location=no,menubar=no,resizable=no,scrollbars=no,status=no,toolbar=no');
-						newWin.document.write(template.evaluate({mp3_url:mp3_url, current_folder:ajaxplorer.getContextNode().getPath()}));
-						newWin.document.close();
-						]]></clientCallback>
+					var editor = ajaxplorer.findEditorById('editor.audio');
+					if(editor){
+						ajaxplorer.loadEditorResources(editor.resourcesManager);
+						var editorClass = Class.getByName(editor.editorClass);
+						if(editorClass){
+							editorClass.prototype.createFolderPlayer(ajaxplorer.getContextNode());
+						}					
+					}
+					]]></clientCallback>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
 			<!-- This one will happen a post-processing filter when ls is called with parameter playlist=true -->
 			<action name="ls">
+				<pre_processing>					
+					<serverCallback methodName="preProcessAction" applyCondition="$apply=isSet($httpVars['playlist']);"/>
+				</pre_processing>
 				<post_processing>					
 					<serverCallback methodName="switchAction" applyCondition="$apply=isSet($httpVars['playlist']);"/>
 				</post_processing>
