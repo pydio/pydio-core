@@ -282,8 +282,9 @@
  			$old->parentNode->replaceChild($new, $old); 			
  			return;
  		} 		
- 		foreach($new->childNodes as $newChild){ 			 			
+ 		foreach($new->childNodes as $newChild){ 			
  			if($newChild->nodeType != XML_ELEMENT_NODE) continue;
+ 			
  			$found = null;
  			foreach($old->childNodes as $oldChild){
  				if($oldChild->nodeType != XML_ELEMENT_NODE) continue;
@@ -294,7 +295,8 @@
  			if($found != null){
  				$this->mergeChildByTagName($newChild, $found);
  			}else{
- 				$old->appendChild($newChild);
+ 				// CloneNode or it's messing with the current foreach loop.
+ 				$old->appendChild($newChild->cloneNode(true));
  			}
  		}
  	}

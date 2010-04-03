@@ -123,7 +123,13 @@ class AJXP_Controller{
 		$plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
 		$methodName = $xPath->query("@methodName", $callback)->item(0)->value;		
 		$plugInstance = AJXP_PluginsService::findPluginById($plugId);
-		return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);		
+		//return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);	
+		// Do not use call_user_func, it cannot pass parameters by reference.	
+		if(method_exists($plugInstance, $methodName)){
+			$plugInstance->$methodName($actionName, $httpVars, $fileVars);
+		}else{
+			throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
+		}
 	}
 	
 	public static function actionNeedsRight($actionNode, $xPath, $right){
