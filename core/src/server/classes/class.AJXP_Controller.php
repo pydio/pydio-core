@@ -93,7 +93,7 @@ class AJXP_Controller{
 		if($mainCall){
 			$result = self::applyCallback($xPath, $mainCall, $actionName, $httpVars, $fileVars);
 			if(isSet($params)){
-				$params["processor_result"] = $preResult;
+				$params["processor_result"] = $result;
 			}			
 		}		
 		if($postCall !==false){
@@ -126,7 +126,7 @@ class AJXP_Controller{
 		//return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);	
 		// Do not use call_user_func, it cannot pass parameters by reference.	
 		if(method_exists($plugInstance, $methodName)){
-			$plugInstance->$methodName($actionName, $httpVars, $fileVars);
+			return $plugInstance->$methodName($actionName, $httpVars, $fileVars);
 		}else{
 			throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
 		}
