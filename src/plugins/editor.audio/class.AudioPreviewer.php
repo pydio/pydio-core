@@ -55,9 +55,10 @@ class AudioPreviewer extends AJXP_Plugin {
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
 		    	
 		if($action == "audio_proxy"){			
-			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+			$file = AJXP_Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+			$localName = basename($file);
 			header("Content-Type: audio/mp3; name=\"".$localName."\"");
-			header("Content-Length: ".$size);
+			header("Content-Length: ".filesize($destStreamURL.$file));
 			
 			$stream = fopen("php://output", "a");
 			call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
@@ -84,7 +85,7 @@ class AudioPreviewer extends AJXP_Plugin {
 				$label = $child->getAttribute("text");
 				$ext = strtolower(end(explode(".", $label)));
 				if(!$isFile || $ext != "mp3") continue;
-				print("<track><location>content.php?get_action=audio_proxy&file=".urlencode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
+				print("<track><location>content.php?get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
 			}
 			print("</trackList>");
 			AJXP_XMLWriter::close("playlist");
