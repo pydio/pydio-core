@@ -35,6 +35,13 @@
  */
 class AudioPreviewer extends AJXP_Plugin {
 
+	public function preProcessAction($action, &$httpVars, &$fileVars){
+		if($action != "ls" || !isset($httpVars["playlist"])){
+			return ;
+		}
+		$httpVars["dir"] = base64_decode($httpVars["dir"]);
+	}	
+	
 	public function switchAction($action, $httpVars, $postProcessData){
 		
 		if(!isSet($this->actions[$action])) return false;
@@ -68,10 +75,18 @@ class AudioPreviewer extends AJXP_Plugin {
 			$xmlString = $postProcessData["ob_output"];
 			$xmlDoc = DOMDocument::loadXML($xmlString);
 			$xElement = $xmlDoc->documentElement;
-			AJXP_XMLWriter::header("playlist");
+			header("Content-Type:application/xspf+xml;charset=UTF-8");
+			print('<?xml version="1.0" encoding="UTF-8"?>');
+			print('<playlist version="1" xmlns="http://xspf.org/ns/0/">');
+			print("<trackList>");
 			foreach ($xElement->childNodes as $child){
-				print("<xspf name=\"".$child->getAttribute("filename")."\"/>");
+				$isFile = ($child->getAttribute("is_file") == "true");
+				$label = $child->getAttribute("text");
+				$ext = strtolower(end(explode(".", $label)));
+				if(!$isFile || $ext != "mp3") continue;
+				print("<track><location>content.php?get_action=audio_proxy&file=".urlencode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
 			}
+			print("</trackList>");
 			AJXP_XMLWriter::close("playlist");
 		}
 	}	

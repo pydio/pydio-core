@@ -435,6 +435,10 @@ Class.create("Ajaxplorer", {
 		}
 	},
 	
+	findEditorById : function(editorId){
+		return this.editorsRegistry.detect(function(el){return(el.id == editorId);});
+	},
+	
 	findEditorsForMime : function(mime){
 		var editors = $A([]);
 		var checkWrite = false;
