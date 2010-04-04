@@ -217,7 +217,7 @@ class AJXP_ClientDriver extends AbstractDriver
 			case "display_doc":
 			
 				header("Content-type:text/html; charset:UTF-8");
-				echo HTMLWriter::getDocFile($_GET["doc_file"]);
+				echo HTMLWriter::getDocFile(htmlentities($_GET["doc_file"]));
 				exit(1);
 				
 			break;

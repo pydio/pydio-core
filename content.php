@@ -45,7 +45,7 @@ require_once("server/classes/class.UserSelection.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.RecycleBinManager.php");
-if(isSet($_GET["ajxp_sessid"]))
+if(isSet($_GET["ajxp_sessid"]) && !isSet($_COOKIE["AjaXplorer"]))
 {
 	$_COOKIE["AjaXplorer"] = $_GET["ajxp_sessid"];
 }
