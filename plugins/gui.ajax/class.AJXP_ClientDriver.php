@@ -99,7 +99,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			case "display_doc":
 			
 				HTMLWriter::charsetHeader();
-				echo HTMLWriter::getDocFile($_GET["doc_file"]);
+				echo HTMLWriter::getDocFile(htmlentities($_GET["doc_file"]));
 				exit(1);
 				
 			break;
