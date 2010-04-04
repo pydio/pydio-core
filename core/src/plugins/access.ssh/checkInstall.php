@@ -56,7 +56,8 @@ pclose($handle);
 
 // Check if the destination server host key is accessible
 echo "<h1>Checking if we can connect to destination SSH server</h1>";
-if ($_GET["destServer"] == "")
+$host = parse_url($_GET["destServer"], PHP_URL_HOST);
+if ($host == "")
 {
    echo "<form method=GET>Please enter SSH server address to test:<input type=text name='destServer' value=''><input type='submit' value='Ok'></form>";
 } else

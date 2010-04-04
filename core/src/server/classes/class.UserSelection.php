@@ -68,7 +68,7 @@ class UserSelection
 		}
 		if(isSet($array[$this->varPrefix]) && $array[$this->varPrefix] != "")
 		{
-			$this->files[] = SystemTextEncoding::fromPostedFileName($array[$this->varPrefix]);
+			$this->files[] = Utils::securePath(SystemTextEncoding::fromPostedFileName($array[$this->varPrefix]));
 			$this->isUnique = true;
 			//return ;
 		}
@@ -77,7 +77,7 @@ class UserSelection
 			$index = 0;			
 			while(isSet($array[$this->varPrefix."_".$index]))
 			{
-				$this->files[] = SystemTextEncoding::fromPostedFileName($array[$this->varPrefix."_".$index]);
+				$this->files[] = Utils::securePath(SystemTextEncoding::fromPostedFileName($array[$this->varPrefix."_".$index]));
 				$index ++;
 			}
 			$this->isUnique = false;
@@ -88,7 +88,7 @@ class UserSelection
 			//return ;
 		}
 		if(isSet($array[$this->dirPrefix])){
-			$this->dir = $array[$this->dirPrefix];
+			$this->dir = Utils::securePath($array[$this->dirPrefix]);
 			if($test = $this->detectZip($this->dir)){
 				$this->inZip = true;
 				$this->zipFile = $test[0];
