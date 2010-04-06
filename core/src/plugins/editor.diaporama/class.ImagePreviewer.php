@@ -54,7 +54,7 @@ class ImagePreviewer extends AJXP_Plugin {
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			
 			if(isSet($httpVars["get_thumb"]) && $this->pluginConf["GENERATE_THUMBNAIL"]){
-				require_once("server/classes/PThumb.lib.php");
+				require_once(INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
 				$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
 				if(!$pThumb->isError()){
 					$pThumb->remote_wrapper = $streamData["classname"];
