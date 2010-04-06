@@ -90,6 +90,7 @@ class PThumb{
 	 * @var boolean
 	 */
     var $remote_check = true;
+    public $remote_wrapper = "";
 	
     /**
 	     * END Configuration Section
@@ -879,8 +880,9 @@ class PThumb{
         }
         //Try via the direct method first.
         @ini_set("allow_url_fopen","1");
-        if (ini_get("allow_url_fopen") == "1" && $this -> remote_check == true){
-            $array = getimagesize($file);
+        if (ini_get("allow_url_fopen") == "1" && $this -> remote_check == true){        	
+        	$realFile = call_user_func(array($this->remote_wrapper, "getRealFSReference"), $file);
+            $array = getimagesize($realFile);
             if ($array != false && $this -> remote_check == true){
                 return $array;
             }

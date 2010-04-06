@@ -46,6 +46,8 @@ class Repository {
 	var $enabled = true;
 	var $options = array();
 	
+	public $streamData;
+	
 	function Repository($id, $display, $driver){
 		$this->setAccessType($driver);
 		$this->setDisplay($display);
@@ -98,6 +100,7 @@ class Repository {
 		if(!$register && $streamData !== false && $streams!=null){
 			$streams[$this->accessType] = $this->accessType;
 		}
+		if($streamData !== false) $this->streamData = $streamData;
 		return ($streamData !== false);
 	}
 	
