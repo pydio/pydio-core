@@ -126,7 +126,12 @@ Class.create("RepositorySelect", {
 			this.notify("createMenu");
 		}
 		if(actions.length) this.button.removeClassName('disabled');
-        actions.sort(function(a,b) { return a.name > b.name; });
+		var fonc = function(a,b){
+		    var x = a.name.toLowerCase();
+		    var y = b.name.toLowerCase();
+		    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+		};
+        actions.sort(fonc);
 	},
 	
 	onRepoSelect : function(key){
