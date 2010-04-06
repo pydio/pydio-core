@@ -48,14 +48,16 @@ class ImagePreviewer extends AJXP_Plugin {
 		}
 		
     	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
+		$streamData = $repository->streamData;
 		    	
 		if($action == "preview_data_proxy"){
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			
-			if($this->pluginConf["GENERATE_THUMBNAIL"]){
+			if(isSet($httpVars["get_thumb"]) && $this->pluginConf["GENERATE_THUMBNAIL"]){
 				require_once("server/classes/PThumb.lib.php");
 				$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
-				if(!$pThumb->isError()){							
+				if(!$pThumb->isError()){
+					$pThumb->remote_wrapper = $streamData["classname"];
 					$pThumb->use_cache = $this->pluginConf["USE_THUMBNAIL_CACHE"];
 					$pThumb->cache_dir = $this->pluginConf["THUMBNAIL_CACHE_DIR"];	
 					$pThumb->fit_thumbnail($destStreamURL.$file, 200);
@@ -66,22 +68,18 @@ class ImagePreviewer extends AJXP_Plugin {
 					exit(0);
 				}
 			}else{
-				$fp = fopen($destStreamURL.$file, "r");
-				$filesize = 0;
-				while(!feof($fp)){
-					$filesize += strlen(fread($fp, 4096));
-				}			
-	 			// fseek is not working, don't know why...
-	 			fclose($fp);
-	 			$fp = fopen($destStreamURL."/".$file, "r");
-	 			// end
+	 			$filesize = filesize($destStreamURL.$file);
+	 			
+	 			$fp = fopen($destStreamURL.$file, "r");
 				header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
 				header("Content-Length: ".$filesize);
 				header('Cache-Control: public');
-				while (!feof($fp)) {
-					print fread($fp, 4096);
-				}
-	 			fclose($fp);
+				
+				$class = $streamData["classname"];
+				$stream = fopen("php://output", "a");
+				call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+				fflush($stream);
+				fclose($stream);
 				exit(1);
 			}
 		}

@@ -314,7 +314,7 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return ajxpServerAccessPath+"?get_action=preview_data_proxy&file="+encodeURIComponent(ajxpNode.getPath());
+		return ajxpServerAccessPath+"?get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
 	}
 	
 });
