@@ -290,6 +290,8 @@ Class.create("Modal", {
 			type:'image',
 			name:'ok',
 			src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_ok_apply.png',
+			height:22,
+			width:22,
 			title:MessageHash[48]});
 		okButton.addClassName('dialogButton');
 		okButton.addClassName('dialogFocus');
@@ -299,6 +301,8 @@ Class.create("Modal", {
 			var caButton = new Element('input', {
 				type:"image",
 				name:"can",
+				height:22,
+				width:22,
 				src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_close.png',
 				title:MessageHash[49],
 				className:"dialogButton"
