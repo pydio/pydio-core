@@ -49,9 +49,9 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$context = stream_context_create(array("ftp" => array("overwrite" => true)));
 		}
 		if($context){
-			$this->fp = fopen($this->buildRealUrl($url), $mode, $options, $context);
+			$this->fp = @fopen($this->buildRealUrl($url), $mode, $options, $context);
 		}else{
-			$this->fp = fopen($this->buildRealUrl($url), $mode, $options);
+			$this->fp = @fopen($this->buildRealUrl($url), $mode);
 		}
 		return ($this->fp !== false);
 	}
@@ -137,10 +137,8 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$contents = $this->rawList($link, $serverPath);		
 	    	if(count($contents) == 1){
 	    		$res = $this->rawListEntryToStat($contents[0]);
-	    		if($res["name"] == $serverPath){
-	    			$statValue = $res["stat"];
-		    		return $statValue;
-	    		}
+    			$statValue = $res["stat"];
+	    		return $statValue;
 	    	}
 		}
     	return null;
