@@ -51,7 +51,7 @@ class PdfPreviewer extends AJXP_Plugin {
 		if($action == "pdf_data_proxy"){
 			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
 			$fp = fopen($destStreamURL."/".$file, "r");
-			$tmpFileName = tempnam(sys_get_temp_dir(), "img_");
+			$tmpFileName = sys_get_temp_dir()."/ajxp_tmp_".md5(time()).".pdf";
 			$tmpFile = fopen($tmpFileName, "w");
 			register_shutdown_function("unlink", $tmpFileName);
 			while(!feof($fp)) {
@@ -61,12 +61,13 @@ class PdfPreviewer extends AJXP_Plugin {
 			fclose($fp);
 			$out = array();
 			$return = 0;
-			$tmpFileThumb = str_replace(".tmp", ".jpg", $tmpFileName);			
+			$tmpFileThumb = str_replace(".pdf", ".jpg", $tmpFileName);
+			register_shutdown_function("unlink", $tmpFileThumb);
 			chdir(sys_get_temp_dir());
 			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName)."[0] ".basename($tmpFileThumb);
 			session_write_close(); // Be sure to give the hand back
 			exec($cmd, $out, $return);
-			if($return){
+			if(is_array($out) && count($out)){
 				throw new AJXP_Exception(implode("\n", $out));
 			}
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
