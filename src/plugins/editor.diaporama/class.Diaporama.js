@@ -131,6 +131,7 @@ Class.create("Diaporama", AbstractEditor, {
 		}.bind(this) );
 		
 		this.element.observe("editor:enterFSend", function(e){this.resize();}.bind(this));
+		fitHeightToBottom(this.imgContainer, $(modal.elementName));
 	},
 	
 	resize : function(size){
