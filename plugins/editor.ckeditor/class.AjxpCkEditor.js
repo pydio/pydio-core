@@ -44,6 +44,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 			filebrowserImageBrowseUrl : 'index.php?external_selector_type=ckeditor',
 			filebrowserFlashBrowseUrl : 'index.php?external_selector_type=ckeditor',
 			language : ajaxplorer.currentLanguage,
+			fullPage : true,
 			toolbar_Ajxp : [
 				['Source','Preview','Templates'],
 			    ['Undo','Redo','-', 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Print', 'SpellChecker', 'Scayt'],
@@ -115,13 +116,20 @@ Class.create("AjxpCkEditor", TextEditor, {
 		// OBSERVE CHANGES
 		this.observerInterval = window.setInterval(function(){
 			if(this.isModified || !CKEDITOR.instances.code) return;
-			this.prevData = this.textarea.value;
-			if(this.prevData != CKEDITOR.instances.code.getData()){
+			var currentData =  CKEDITOR.instances.code.getData();
+			if(!this.prevData) {
+				this.prevData = currentData;
+				return;
+			}
+			if(this.prevData != currentData){
 				this.setModified(true);
 				window.clearInterval(this.observerInterval);
 			}
+			this.prevData = currentData;
 		}.bind(this), 500);
-		
+		this.element.observe("editor:close", function(){
+			window.clearInterval(this.observerInterval);
+		});
 	},
 	
 	reloadEditor : function(instanceId){
