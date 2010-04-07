@@ -220,7 +220,7 @@ Class.create("Modal", {
 				ajaxplorer.actionBar.editor = new editorKlass(oForm);
 			}
 			ajaxplorer.actionBar.editor.open(ajaxplorer.getUserSelection());
-			ajaxplorer.actionBar.editor.resize();
+			//ajaxplorer.actionBar.editor.resize();
 		};
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},
