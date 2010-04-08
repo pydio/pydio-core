@@ -56,10 +56,16 @@
 					modal.showDialogForm('Create User', 'create_user_box', null, completeFunc);
 					]]></clientCallback>
 				<clientForm id="create_user_box"><![CDATA[
-					<div id="create_user_box" action="create_user" box_width="280">
-						Login : <input name="new_user_login" type="text" size="30" class="dialogFocus"/>
-						Password : <input name="new_user_pwd" type="password" size="30" class="dialogFocus"/>
-						Confirm : <input name="new_user_pwd_conf" type="password" size="30" class="dialogFocus"/>
+					<div id="create_user_box" action="create_user" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="94">AJXP_MESSAGE[94] : </div><input name="new_user_login" type="text" class="dialogFocus SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] : </div><input name="new_user_pwd" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element">						
+							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input name="new_user_pwd_conf" type="password" class="SF_input"/>
+						</div>
 					</div>				
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -86,23 +92,19 @@
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
 				<clientForm id="create_repository_box"><![CDATA[
-					<div id="create_repository_box" action="create_repository" box_width="430" style="overflow:auto;">
-						<div style="padding: 2px; clear: left;">
-							<div style="float: left; width: 30%; text-align: right;"><b>Repository Label*</b> : </div>
-							<div style="float: left; width: 65%;">
-								<input name="new_user_login" type="text" size="30" class="dialogFocus"/>
-							</div>
+					<div id="create_repository_box" action="create_repository" box_width="320">
+						<div class="SF_element">
+							<div class="SF_label">Repository Label* : </div>							
+							<input name="new_user_login" type="text" class="SF_input dialogFocus"/>
 						</div>
-						<div style="padding: 2px; clear: left;">
-							<div style="float: left; width: 30%; text-align: right;"><b>Repository Driver*</b> : </div>
-							<div style="float: left; width: 65%;">
-								<select><option>Loading...</option></select>
-							</div>
+						<div class="SF_element">
+							<div class="SF_label">Repository Driver* : </div>							
+							<select class="SF_input"><option>Loading...</option></select>
 						</div>
 						<div id="driver_form"></div>
 						<div class="dialogButtons">
-							<input type="button" class="dialogButton" id="submit_create_repo" value="Save" class="button" onclick="return false;">
-							<input type="button" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
+							<input type="image" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/dialog_ok_apply.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
+							<input type="image" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
 						</div>
 					</div>				
 				]]></clientForm>
@@ -187,31 +189,34 @@
 					}					
 					]]></clientCallback>
 				<clientForm id="edit_config_box"><![CDATA[
-					<div id="edit_config_box" action="edit_user" box_width="440" style="overflow:auto;height:370px;">
+					<div id="edit_config_box" action="edit_user" box_width="350">
 						<fieldset id="rights_pane">
 							<legend>Repositories Access</legend>
-							<table class="repository" width="100%">
+							<div style="max-height:140px;overflow:auto;_height:140px;">
+							<table class="repository" width="100%" cellspacing="0">
 								<tbody>
 								<tr id="loading_row"><td>Loading...</td></tr>
 								</tbody>
 							</table>
+							</div>
 						</fieldset>
-						<fieldset id="password_pane">
+						<fieldset id="password_pane" style="float:left;margin-right:6px;width:198px;height:70px;">
 							<legend>Modify password</legend>
-							<table class="password">
-								<tr>
-									<td valign="bottom" style="vertical-align:bottom;">New Password <input type="password" id="new_pass" style="width:100px;"/></td>
-									<td valign="bottom" style="vertical-align:bottom;">Confirm Password <input type="password" id="new_pass_confirm" style="width:100px;"/></td>
-									<td valign="bottom" style="vertical-align:bottom;"><input type="submit" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;"/></td>
-								</tr>
-							</table>							
+							<input style="float:right;margin-top:18px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/dialog_ok_apply.png"/>
+							<div style="width:168px;">
+								<div class="SF_element">
+									<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] :</div><input type="password" id="new_pass" class="SF_input"/>
+								</div>
+								<div class="SF_element">
+									<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] :</div><input type="password" id="new_pass_confirm"  class="SF_input"/>
+								</div>
+							</div>
 						</fieldset>
-						<fieldset id="admin_right_pane"><legend>Admin Right</legend>
-						User has admin rights :
-							<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:30px;" />
+						<fieldset id="admin_right_pane" style="height:70px;"><legend>Admin Right</legend>
+						User has admin rights? <input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;" />
 						</fieldset>
 					</div>
-					<div id="edit_repo_box" action="edit_repository" box_width="450">
+					<div id="edit_repo_box" action="edit_repository" box_width="320">
 						<fieldset id="options_pane">
 							Loading...
 						</fieldset>

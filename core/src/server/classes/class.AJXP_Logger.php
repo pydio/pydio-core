@@ -287,7 +287,7 @@ class AJXP_Logger {
 			$matches = array();
 			if(preg_match("/(.*)\t(.*)\t(.*)\t(.*)\t(.*)\t(.*)$/", $line, $matches)!==false){
 				$fileName = $parentDir."/".$matches[1];
-				print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\"/>"));
+				print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />"));
 			}
 		}
 		return ;
