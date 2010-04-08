@@ -177,6 +177,7 @@ DIALOG BOXES
 .dialogButtons
 {
     text-align: right;
+    clear:both;
 }
 
 .dialogButtons input,
@@ -184,6 +185,7 @@ fieldSet input.dialogButton
 {
     margin-left: 6px;
     width: 22px;    
+    height: 22px;    
     padding:0px;
     background-image: none;
     background-color: #f1f1ef;
@@ -225,7 +227,7 @@ textarea#myCode
 	padding-right: 8px;
 	padding-top: 1px;
 	padding-bottom: 1px;
-	margin-top: 15px;
+	margin-top: 5px;
 }
 
 .dialogArrow
@@ -284,6 +286,21 @@ textarea#myCode
 	-moz-opacity:0.90;    
 }
 
+.simple_tooltip
+{
+	position:absolute;
+	width:100;
+	z-index:10000;
+	border:1px solid #696765;
+	color : #696765;
+	background-color: #fff;
+	filter:alpha(opacity=90);
+	opacity: 0.90;
+	-moz-opacity:0.90;    
+	font-family: Trebuchet MS, Helvetica, Sans-serif;
+	font-size: 10px;
+}
+
 
 /********************/
 /* PROGRESS BAR     */
@@ -295,10 +312,40 @@ textarea#myCode
     top: 20%;
 }
 
+/*************************/
+/* SF like "Standard Form" DATA : try to make a "standard"...
+/*************************/
+div.SF_element{
+	padding-top:5px;
+	clear:left;
+}
 
-/*
-ACTION BAR
-*/
+div.SF_label{
+	float: left; 
+	width: 39%; 
+	text-align: right; 
+	padding: 3px;
+	padding-right:1%;
+	padding-left:0;
+	white-space: nowrap; /* css-3 */
+	word-wrap: no break-word; /* Internet Explorer 5.5+ */	
+}
+
+.SF_input{
+	float:left;
+	padding:1px !important;
+	width: 59% !important;
+	_width:54% !important; /*IE*/
+}
+
+.SF_box{
+   width: 20px !important;
+}
+
+
+/***************/
+/*ACTION BAR   */
+/***************/
 .centeredWidth{
 }
 
@@ -1310,7 +1357,22 @@ ADMIN STYLES
 .user_id, .user_data, .repository, .password
 {
     font-family: Trebuchet MS, sans-serif;
-    font-size: 13px;
+    font-size: 11px;
+}
+
+.wallet_pane{
+	background-color:#EFEFEF;
+	border-left:1px solid;
+	margin-left:2px;
+	margin-right:13px;
+	padding:0 10px 0 0;
+}
+.wallet_pane div.driver_form{
+	width:215px;
+}
+.wallet_pane input.dialogButton{
+	float:right;
+	border: 1px solid #676965;
 }
 
 .user_data
@@ -1322,6 +1384,7 @@ fieldset
 {
     border: 1px solid #ccc;
     padding: 10px;
+    padding-top: 5px;
     margin-bottom: 5px;
 }
 
@@ -1333,7 +1396,7 @@ legend
 
 .repository, .repository td, .password td
 {
-   padding: 0px;
+   padding: 1px;
 }
 
 .repository td
@@ -1418,85 +1481,6 @@ legend
    border: 1px solid #79f;
    height: 20px;
    width: 160px;
-}
-
-.helpImage{
-	cursor: help;
-	margin-bottom: 1px;
-}
-
-#driver_form input.text,
-.driver_form input.text
-{
-	margin-left: 0px;
-	border:1px solid #999999;
-	height:21px;
-	margin-bottom:9px;
-	padding:1px 3px;
-	width:185px;
-}
-
-#driver_form input.radio,
-.driver_form input.radio, 
- input.radio
-{
-   border : none;
-   margin-left: 0px;
-   width: 20px;
-}
-
-#driver_form input.button,
-.driver_form input.button
-{
-	background-color:#bbb;
-	border:1px solid #999;
-	color:white;
-	font-weight:bold;
-	margin-left:10px;
-	width:50px;
-	height: 20px;
-	padding: 0px;
-}
-
-#driver_form b,
-.driver_form b
-{
-   font-size:12px;
-}
-
-.logs_table{
-   font-size:12px;
-   width:'100%';
-}
-.logs_table td{
-   width:'10%';
-   vertical-align:top;
-   padding: 2px;
-}
-.logs_table td.header{
-   font-weight:bold;
-   background-color: #ccc;
-   color: white;
-   padding: 2px;
-}
-.logs_table td.odd{
-   background-color:#eee;
-}
-
-#install_log{
-	padding: 10px;
-	overflow: auto;
-}
-
-#install_log div{
-	border-bottom : 1px solid #bbb;
-}
-
-#install_log span{
-   font-weight: bold;
-   display: block;
-   float: left;
-   width: 150px;
 }
 
 

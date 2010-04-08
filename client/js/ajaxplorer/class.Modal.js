@@ -288,8 +288,8 @@ Class.create("Modal", {
 		var contDiv = new Element('div', {className:'dialogButtons'});
 		var okButton = new Element('input', {
 			type:'image',
-			name:'ok',
-			src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_ok_apply.png',
+			name:(bOkButtonOnly?'close':'ok'),
+			src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_'+(bOkButtonOnly?'close':'ok_apply')+'.png',
 			height:22,
 			width:22,
 			title:MessageHash[48]});
@@ -325,6 +325,28 @@ Class.create("Modal", {
 		return contDiv;
 	},
 	
+	simpleTooltip : function(element, title){
+		element.observe("mouseover", function(event){
+			var x = Event.pointerX(event)+10;
+			var y = Event.pointerY(event)+10;
+			if(!this.tooltip){
+				this.tooltip = new Element("div", {className:"simple_tooltip"});
+				$$('body')[0].insert(this.tooltip);
+			}
+			this.tooltip.update(title);
+			this.tooltip.setStyle({top:y,left:x});
+			if(this.tipTimer){
+				window.clearTimeout(this.tipTimer);
+			}
+			this.tooltip.show();
+		}.bind(this) );
+		element.observe("mouseout", function(event){
+			if(!this.tooltip) return;
+			this.tipTimer = window.setTimeout(function(){
+				this.tooltip.hide();
+			}.bind(this), 300);
+		}.bind(this) );
+	},
 	
 	closeMessageDiv: function(){
 		if(this.messageDivOpen)

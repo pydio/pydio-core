@@ -106,7 +106,7 @@ ConfigEditor = Class.create({
 				var newRow = new Element("tr");
 				newRow.insert(walletCell);
 				rightsTable.insert({bottom:newRow});				
-				var walletPane = new Element('div', {style:"border:1px solid #ccc; margin-left:12px;padding:4px 0px; background-color: white;", id:"wallet_pane_"+repoId});
+				var walletPane = new Element('div', {className:"wallet_pane", id:"wallet_pane_"+repoId});
 				walletCell.insert({bottom:walletPane});				
 				this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
 				walletPane.hide();
@@ -134,7 +134,7 @@ ConfigEditor = Class.create({
 		if(!editPass){
 			passwordPane.hide();
 		}else{
-			var passButton = passwordPane.select('input[type="submit"]')[0];
+			var passButton = passwordPane.select('input.dialogButton')[0];
 			passButton.observe('click', this.changePassword.bind(this));
 		}
 		
@@ -165,11 +165,15 @@ ConfigEditor = Class.create({
 			repoValues.set(tag.getAttribute('option_name'), tag.getAttribute('option_value'));
 		}
 		this.createParametersInputs(newTd, repoParams, false, repoValues);
-		var submitButton = new Element('input', {type:'submit', value:'SAVE', className:'dialogButton', onClick:'return false;'});
+		var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/crystal/actions/22")});
 		submitButton.observe("click", function(){
 			this.submitUserParamsForm(userId, repoId);
 		}.bind(this));
-		newTd.insert({bottom: new Element('div', {align:"right",style:"padding-top:23px; padding-right:5px; text-align:right;"}).update(submitButton)});
+		newTd.insert({before: submitButton});
+		// recompute heights
+		var newHeight  = 28*(walletParams.length);
+		newTd.setStyle({height:newHeight});
+		submitButton.setStyle({marginTop:(parseInt(newHeight/2)-10)});		
 	},
 	
 	submitUserParamsForm : function(userId, repositoryId){
@@ -500,20 +504,24 @@ ConfigEditor = Class.create({
 			var element;
 			var disabledString = (disabled?' disabled="true" ':'');
 			if(type == 'string' || type == 'integer'){
-				element = '<input type="text" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'"'+disabledString+'>';
+				element = '<input type="text" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
 		    }else if(type == 'password'){
-				element = '<input type="password" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" class="text" value="'+defaultValue+'"'+disabledString+'>';
+				element = '<input type="password" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
 			}else if(type == 'boolean'){
 				var selectTrue, selectFalse;
 				if(defaultValue){
 					if(defaultValue == "true" || defaultValue == "1") selectTrue = true;
 					if(defaultValue == "false" || defaultValue == "0") selectFalse = true;
 				}
-				element = '<input type="radio" ajxp_type="'+type+'" class="radio" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
-				element = element + '<input type="radio" ajxp_type="'+type+'" class="radio" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
+				element = '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
+				element = element + '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
+				element = '<div class="SF_input">'+element+'</div>';
 			}
-			var div = new Element('div', {style:"padding:2px; clear:left"}).update('<div style="float:left; width:30%;text-align:right;"><b>'+label+(mandatory?'*':'')+'</b>&nbsp;:&nbsp;</div><div style="float:left;width:'+(Prototype.Browser.IE?'65%':'70%')+'">'+element+(showTip?' &nbsp;<small style="color:#AAA;">'+desc+'</small>':' <img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/help-about.png" alt="'+desc+'"  title="'+desc+'" width="16" height="16" align="absmiddle" class="helpImage"/>')+'</div>');
+			var div = new Element('div', {className:"SF_element"}).update('<div class="SF_label">'+label+(mandatory?'*':'')+' :</div>'+element);
 			form.insert({'bottom':div});
+			if(desc){
+				modal.simpleTooltip(div.select('.SF_label')[0], desc);
+			}
 		});
 	},
 	
