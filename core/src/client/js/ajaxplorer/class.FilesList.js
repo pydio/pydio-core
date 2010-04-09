@@ -636,7 +636,27 @@ Class.create("FilesList", SelectableElements, {
 		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
 		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);		
 		edit.setStyle({left:pos.left+offset.left, top:(pos.top+offset.top-scrollTop)});
-		window.setTimeout(function(){edit.focus();edit.select()}, 500);
+		window.setTimeout(function(){
+			edit.focus();
+			var end = edit.getValue().lastIndexOf("\.");
+			if(end == -1){
+				edit.select();
+			}else{
+				var start = 0;  
+				if(edit.setSelectionRange)
+				{				
+					edit.setSelectionRange(start,end);
+				}
+				else if (edit.createTextRange) {
+					var range = edit.createTextRange();
+					range.collapse(true);
+					range.moveStart('character', start);
+					range.moveEnd('character', end);
+					range.select();
+				}
+			}
+			
+		}, 300);
 		var onOkAction = function(){
 			var newValue = edit.getValue();
 			hideLightBox();
