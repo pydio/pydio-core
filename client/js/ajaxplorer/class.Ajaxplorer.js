@@ -482,6 +482,11 @@ Class.create("Ajaxplorer", {
 				var result = transport.responseText.evalScripts();
 				MessageHash = result[0];
 				this.updateI18nTags();
+				if(this.guiActions){
+					this.guiActions.each(function(pair){
+						pair.value.refreshFromI18NHash();
+					});
+				}
 				this.loadXmlRegistry();
 				this.fireContextRefresh();
 				this.currentLanguage = newLanguage;
@@ -495,7 +500,7 @@ Class.create("Ajaxplorer", {
 		messageTags.each(function(tag){	
 			var messageId = tag.getAttribute("ajxp_message_id");
 			try{
-				tag.innerHTML = MessageHash[messageId];
+				tag.update(MessageHash[messageId]);
 			}catch(e){}
 		});
 	},

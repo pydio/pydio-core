@@ -42,6 +42,8 @@ Class.create("Action", {
 			src:'',
 			text:'',
 			title:'',
+			text_id:'',
+			title_id:'',
 			hasAccessKey:false,
 			accessKey:'',
 			subMenu:false,
@@ -282,6 +284,8 @@ Class.create("Action", {
 					}
 				}
 			}else if(node.nodeName == "gui"){
+				this.options.text_id = node.getAttribute('text');
+				this.options.title_id = node.getAttribute('title');
 				this.options.text = MessageHash[node.getAttribute('text')];
 				this.options.title = MessageHash[node.getAttribute('title')];
 				this.options.src = node.getAttribute('src');								
@@ -403,6 +407,11 @@ Class.create("Action", {
 		if($(this.options.name+'_button_icon')){
 			$(this.options.name+'_button_icon').title = this.options.title;
 		}
+	},
+	
+	refreshFromI18NHash : function(){
+		var text; var title;
+		this.setLabel(this.options.text_id, this.options.title_id);
 	},
 	
 	toInfoPanel:function(){
