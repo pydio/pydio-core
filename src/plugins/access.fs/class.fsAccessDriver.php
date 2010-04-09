@@ -133,7 +133,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					if(!$zipFile) throw new AJXP_Exception("Error while compressing");
 					register_shutdown_function("unlink", $file);
 					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
-					$this->readFile($file, "force-download", $localName, false, false);
+					$this->readFile($file, "force-download", $localName, false, false, true);
 				}else{
 					$this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download");
 				}
@@ -665,7 +665,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		return false;		
 	}
 	
-	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD)
+	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD, $realfileSystem=false)
 	{
 		session_write_close();
 
@@ -785,7 +785,17 @@ class fsAccessDriver extends AbstractAccessDriver
 			print($filePathOrData);
 		}else{
 			$stream = fopen("php://output", "a");
-			call_user_func(array($this->wrapperClassName, "copyFileInStream"), $filePathOrData, $stream);
+			if($realfileSystem){
+				AJXP_Logger::debug("realFS!", array("file"=>$filePathOrData));
+		    	$fp = fopen($filePathOrData, "rb");
+		    	while (!feof($fp)) {
+		 			$data = fread($fp, 4096);
+		 			fwrite($stream, $data, strlen($data));
+		    	}
+		    	fclose($fp);
+			}else{
+				call_user_func(array($this->wrapperClassName, "copyFileInStream"), $filePathOrData, $stream);
+			}
 			fflush($stream);
 			fclose($stream);
 		}
