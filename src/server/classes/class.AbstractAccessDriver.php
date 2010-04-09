@@ -69,7 +69,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 			if(!isSet($httpVars["skip_history"])){
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 					$user = AuthService::getLoggedUser();
-					$user->setArrayPref("history", $this->repository->getId(), (isSet($httpVars["dir"])?$httpVars["dir"]:""));
+					$user->setArrayPref("history", $this->repository->getId(), (isSet($httpVars["dir"])?$httpVars["dir"]:"/"));
 					$user->save();
 				}
 			}
