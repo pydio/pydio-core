@@ -122,9 +122,10 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	if(!defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER)){
     		return "Public URL folder does not exist!";
     	}
-    	if($data["PASSWORD"] && !is_file(PUBLIC_DOWNLOAD_FOLDER."/GradientBg.gif")){
-    		@copy(INSTALL_PATH."/client/images/GradientBg.gif", PUBLIC_DOWNLOAD_FOLDER."/GradientBg.gif");
-    		@copy(INSTALL_PATH."/client/images/locationBg.gif", PUBLIC_DOWNLOAD_FOLDER."/locationBg.gif");
+    	if($data["PASSWORD"] && !is_file(PUBLIC_DOWNLOAD_FOLDER."/allz.css")){    		
+    		@copy(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/css/allz.css", PUBLIC_DOWNLOAD_FOLDER."/allz.css");
+    		@copy(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/images/crystal/actions/22/dialog_ok_apply.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
+    		@copy(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/images/crystal/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
     	}
         $data["PLUGIN_ID"] = $this->id;
         $data["BASE_DIR"] = $this->baseDir;
@@ -182,10 +183,9 @@ class AbstractAccessDriver extends AJXP_Plugin {
         if (strlen($data["PASSWORD"]))
         {
             if ($_POST['password'] != $data["PASSWORD"])
-            {
-                echo "<html><body style=\"background-image:url('GradientBg.gif');background-repeat:repeat-x;background-color: #e0ecff; padding:15px;text-align:center;\" align=\"center\"><form method='post' style=\"color:white;font-family:Trebuchet MS, Sans-serif; font-weight:bold;\"><div style=\"font-size:26px;\">AjaXplorer Public Download</div><div style=\"padding:10px 0px;color:#666;\">A password is required for this download :<br><input type='password' name='password' style=\"width: 200px; height:40px; font-size:30px; border: 1px solid #aaa; background-image:url('locationBg.gif');margin-top: 10px;  background-repeat: no-repeat; background-position: top left;\"><br>
-<input type='submit'  style=\"margin-top: 10px; border: 1px solid #aaa;width: 200px; height:40px; font-size:30px;  background-color:#ddd;color:#666;\"  value='Download'></div></form></body></html>";
-                exit();
+            {            	
+                echo "<html><head><link rel='stylesheet' type='text/css' href='allz.css'/></head><body><form action='' method='post'><div class='dialogBox' style='display:block;width:20%;left:40%;'><div class='dialogTitle'><img width='16' height='16' align='top' src='public_url.png'>&nbsp;AjaXplorer Public Download</div><div class='dialogContent'>A password is required for this download :<br><input type='password' name='password' style='width:100%;'><br><div class='dialogButtons'><input width='22' height='22' type='image' name='ok' src='dialog_ok_apply.png' title='Download' class='dialogButton'></div></div></div></form></body></html>";
+                exit(1);
             }
         }
         $filePath = INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
