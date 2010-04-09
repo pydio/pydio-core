@@ -123,7 +123,7 @@
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[]]></clientCallback>
 				<clientForm id="rename_bookmark"><![CDATA[
-				<div id="rename_bookmark" action="get_bookmarks" box_width="280">
+				<div id="rename_bookmark" action="get_bookmarks" box_width="200">
 				<input type="text" name="bm_title" value="" id="bm_title" class="dialogFocus">
 				<input type="hidden" name="bm_path" value="">
 				</div>				
