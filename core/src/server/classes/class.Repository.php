@@ -97,7 +97,7 @@ class Repository {
 	function detectStreamWrapper($register = false, &$streams=null){
 		$plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
 		$streamData = $plugin->detectStreamWrapper($register);
-		if(!$register && $streamData !== false && $streams!=null){
+		if(!$register && $streamData !== false && is_array($streams)){
 			$streams[$this->accessType] = $this->accessType;
 		}
 		if($streamData !== false) $this->streamData = $streamData;
