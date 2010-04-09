@@ -180,6 +180,8 @@ Class.create("FilesList", SelectableElements, {
 		var options = {
 			name:'multi_display',
 			src:'view_icon.png',
+			text_id:150,
+			title_id:151,
 			text:MessageHash[150],
 			title:MessageHash[151],
 			hasAccessKey:false,
