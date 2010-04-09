@@ -398,7 +398,7 @@ class fsAccessDriver extends AbstractAccessDriver
             //------------------------------------
             case "public_url":
 				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                $url = $this->makePubliclet($file, $$httpVars["password"], $$httpVars["expiration"]);
+                $url = $this->makePubliclet($file, $httpVars["password"], $httpVars["expiration"]);
                 header("Content-type:text/plain");
                 echo $url;
                 exit(1);                
