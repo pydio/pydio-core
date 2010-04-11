@@ -7,9 +7,11 @@ class SessionSwitcher
     
     /** Construction. This kills the current session if any started, and restart the given session */
     public function __construct($name, $cleanPreviousSession = false)
-    {
+    {    	
         if (session_id() == "")
         {
+			// Mysterious fix, necessary for joomla.
+			ini_set('session.save_handler', 'files');
             // Start a default session and save on the handler
             session_start();
             SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name());
@@ -31,6 +33,9 @@ class SessionSwitcher
             $_SESSION = array();
             // Need to generate a new session id
         }
+		// Mysterious fix, necessary for joomla.
+		ini_set('session.save_handler', 'files');
+                
         session_id(md5(SessionSwitcher::$sessionArray[0]['id'].$name));
         session_name($name);
         session_start();

@@ -56,11 +56,18 @@ global $secret, $result;
 
 if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
+require_once("$CURRENTPATH/../../server/classes/class.AJXP_Plugin.php");
+require_once("$CURRENTPATH/../../server/classes/class.AJXP_PluginsService.php");
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Utils.php");
 require_once("$CURRENTPATH/../../server/classes/class.Repository.php");
+require_once("$CURRENTPATH/../../server/classes/class.AbstractAccessDriver.php");
 if (!class_exists("SessionSwitcher")) require_once("$CURRENTPATH/sessionSwitcher.php");
 require_once("$CURRENTPATH/../../server/classes/class.ConfService.php");
 require_once("$CURRENTPATH/../../server/classes/class.AuthService.php");    
+include_once("$CURRENTPATH/../../server/conf/base.conf.php");
+$pServ = AJXP_PluginsService::getInstance();
+$pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", "$CURRENTPATH/../../server/conf");
+
 define ("CLIENT_RESOURCES_FOLDER", "client");
 ConfService::init("$CURRENTPATH/../../server/conf/conf.php"); 
 require_once("$CURRENTPATH/../../plugins/conf.".ConfService::getConf("CONF_PLUGINNAME")."/class.AJXP_User.php");
@@ -84,10 +91,14 @@ if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIO
 switch($plugInAction)
 {
 	case 'login':
-	    global $login;
+	    global $login, $autoCreate;
 	    if (is_array($login))
 	    {
 	        $newSession = new SessionSwitcher("AjaXplorer");
+	        if($autoCreate && !AuthService::userExists($login["name"])){
+		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
+	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
+	        }
 	        $result = AuthService::logUser($login["name"], $login["password"], true) == 1;
 	    }
 	    break;
@@ -102,7 +113,8 @@ switch($plugInAction)
 	    if (is_array($user))
 	    {
 	        $newSession = new SessionSwitcher("AjaXplorer");
-	        AuthService::createUser($user["name"], $user["password"], false);
+	        $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
+	        AuthService::createUser($user["name"], $user["password"], $isAdmin);
 	        $result = TRUE;
 	    }
 	    break;
@@ -122,6 +134,12 @@ switch($plugInAction)
 	        $newSession = new SessionSwitcher("AjaXplorer");
 	        if (AuthService::updatePassword($user["name"], $user["password"]))
 	        {
+	        	$isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
+				$confDriver = ConfService::getConfStorageImpl();
+				$user = $confDriver->createUserObject($user["name"]);
+				$user->setAdmin($isAdmin);
+				$user->save();	        	
+	        	/*
 	            //@TODO Change this to match your CMS code
 	            if ($user["right"] == "admin")
 	            {
@@ -129,6 +147,7 @@ switch($plugInAction)
 	                if ($user["name"] == $userObj->getId())
 	                    AuthService::updateAdminRights($userObj);
 	            }
+	            */
 	            $result = TRUE;
 	        }
 	        else $result = FALSE;
