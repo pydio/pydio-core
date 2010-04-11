@@ -86,10 +86,14 @@ if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIO
 switch($plugInAction)
 {
 	case 'login':
-	    global $login;
+	    global $login, $autoCreate;
 	    if (is_array($login))
 	    {
 	        $newSession = new SessionSwitcher("AjaXplorer");
+	        if($autoCreate && !AuthService::userExists($login["name"])){
+		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
+	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
+	        }
 	        $result = AuthService::logUser($login["name"], $login["password"], true) == 1;
 	    }
 	    break;
@@ -104,7 +108,8 @@ switch($plugInAction)
 	    if (is_array($user))
 	    {
 	        $newSession = new SessionSwitcher("AjaXplorer");
-	        AuthService::createUser($user["name"], $user["password"], false);
+	        $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
+	        AuthService::createUser($user["name"], $user["password"], $isAdmin);
 	        $result = TRUE;
 	    }
 	    break;
@@ -124,6 +129,12 @@ switch($plugInAction)
 	        $newSession = new SessionSwitcher("AjaXplorer");
 	        if (AuthService::updatePassword($user["name"], $user["password"]))
 	        {
+	        	$isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
+				$confDriver = ConfService::getConfStorageImpl();
+				$user = $confDriver->createUserObject($user["name"]);
+				$user->setAdmin($isAdmin);
+				$user->save();	        	
+	        	/*
 	            //@TODO Change this to match your CMS code
 	            if ($user["right"] == "admin")
 	            {
@@ -131,6 +142,7 @@ switch($plugInAction)
 	                if ($user["name"] == $userObj->getId())
 	                    AuthService::updateAdminRights($userObj);
 	            }
+	            */
 	            $result = TRUE;
 	        }
 	        else $result = FALSE;
