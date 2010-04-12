@@ -116,8 +116,7 @@ switch($plugInAction)
 	case 'delUser':
 	    global $userName;
 	    if (strlen($userName))
-	    {
-	        $newSession = new SessionSwitcher("AjaXplorer");
+	    {	        
 	        AuthService::deleteUser($userName);
 	        $result = TRUE;
 	    }

@@ -59,7 +59,8 @@ class ConfService
 {
 	function init($confFile)
 	{
-		include_once($confFile);
+		//print(realpath($confFile)."-".is_file($confFile)."<br>");
+		include($confFile);
 		// INIT AS GLOBAL
 		global $G_LANGUE, $G_AVAILABLE_LANG, $G_REPOSITORIES, $G_REPOSITORY, $G_USE_HTTPS, 
                $G_WM_EMAIL,$G_MAX_CHAR, $G_UPLOAD_MAX_NUMBER, $G_UPLOAD_MAX_FILE, 
