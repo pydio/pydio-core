@@ -33,7 +33,7 @@
  * 
  * Description : A simple logger class
  */
-define("LOG_FILE_NAME", 'log_' . date('m-d-y') . '.txt');		// The name of the log file
+define("LOG_FILE_NAME", 'log_' . @date('m-d-y') . '.txt');		// The name of the log file
 define("LOG_GROUP_RIGHTS", 0770);
 define("LOG_LEVEL_DEBUG", "Debug");
 define("LOG_LEVEL_INFO", "Info");
