@@ -70,7 +70,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		parent::init($options);		
 		$this->usersSerFile = $options["USERS_FILEPATH"];
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
-        if($this->slaveMode){
+        if($this->slaveMode && ALLOW_GUEST_BROWSING){
         	// Make sure "login" is disabled, or it will re-appear if GUEST browsing is enabled!
         	unset($this->actions["login"]);
         }
