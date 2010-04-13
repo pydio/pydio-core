@@ -67,12 +67,23 @@ class remoteAuthDriver extends AbstractAuthDriver {
     var $urls;
 	
 	function init($options){
+        $this->slaveMode = $options["SLAVE_MODE"] == "true";
+        if($this->slaveMode && ALLOW_GUEST_BROWSING){
+        	// Make sure "login" is disabled, or it will re-appear if GUEST browsing is enabled!
+        	// OLD WAY : unset($this->actions["login"]);
+        	// NEW WAY : Modify manifest dynamically (more coplicated...)
+        	$contribs = $this->xPath->query("registry_contributions/external_file");
+        	foreach ($contribs as $contribNode){        		
+        		if($contribNode->getAttribute('filename') == 'server/xml/standard_auth_actions.xml'){
+        			$contribNode->parentNode->removeChild($contribNode);
+        		}
+        	}
+        }
 		parent::init($options);		
 		$this->usersSerFile = $options["USERS_FILEPATH"];
-        $this->slaveMode = $options["SLAVE_MODE"] == "true";
         $this->secret = $options["SECRET"];
         $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
-	}
+	}	
 			
 	function listUsers(){
 		return AJXP_Utils::loadSerialFile($this->usersSerFile);
