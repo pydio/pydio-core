@@ -1,4 +1,14 @@
 <?php
+
+// Please detete this file once the tests of your SSH installation is 
+// verified by this file 
+/* Remove the line below to test your SSH installation
+/**/
+echo "<html><body><h1>Access restricted</h1>
+      Please edit the source code if you want to enable this test</body></html>";
+exit();
+/**/
+
 // Testing the SSH installation
 header("Content-Type: text/html; charset=UTF-8");
 
