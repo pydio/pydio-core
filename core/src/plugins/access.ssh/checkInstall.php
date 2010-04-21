@@ -7,6 +7,8 @@
 echo "<html><body><h1>Access restricted</h1>
       Please edit the source code if you want to enable this test</body></html>";
 exit();
+// WARNING: Don't forget to delete this file once the test passed, as it can be 
+// used by for malicious actions 
 /**/
 
 // Testing the SSH installation
