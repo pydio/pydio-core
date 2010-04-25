@@ -110,7 +110,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			case "get_boot_conf":
 				
 				$config = array();
-				$config["ajxpResourcesFolder"] = CLIENT_RESOURCES_FOLDER;
+				$config["ajxpResourcesFolder"] = AJXP_THEME_FOLDER;
 				$config["ajxpServerAccess"] = SERVER_ACCESS;
 				$config["zipEnabled"] = ConfService::zipEnabled();
 				$config["multipleFilesDownloadEnabled"] = !DISABLE_ZIP_CREATION;

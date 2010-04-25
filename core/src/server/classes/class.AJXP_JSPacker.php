@@ -45,8 +45,8 @@ class AJXP_JSPacker{
 		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/js/scriptslist.txt", 
 										CLIENT_RESOURCES_FOLDER."/js/ajaxplorer.js", 
 										"Normal");
-		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/css/csslist.txt", 
-										CLIENT_RESOURCES_FOLDER."/css/allz.css",
+		AJXP_JSPacker::concatListAndPack(AJXP_THEME_FOLDER."/css/csslist.txt", 
+										AJXP_THEME_FOLDER."/css/allz.css",
 										"None");
 	}
 	
