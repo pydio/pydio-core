@@ -50,8 +50,8 @@ Class.create("VideoPreviewer", AbstractEditor, {
 			}
 			
 			var div = new Element('div', {id:"video_container", style:"text-align:center; margin-bottom: 5px;"});
-			var content = '<object type="application/x-shockwave-flash" data="'+ajxpResourcesFolder+'/flash/player_flv_maxi.swf" width="100%" height="200">';
-			content += '	<param name="movie" value="'+ajxpResourcesFolder+'/flash/player_flv_maxi.swf" />';
+			var content = '<object type="application/x-shockwave-flash" data="plugins/editor.video/player_flv_maxi.swf" width="100%" height="200">';
+			content += '	<param name="movie" value="plugins/editor.video/player_flv_maxi.swf" />';
 			content += '	<param name="quality" value="high">';
 			content += '	<param name="allowFullScreen" value="true" />';
 			content += '	<param name="FlashVars" value="flv='+url+'/content.php?action=download%26file='+escapedFilename+'&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />';
