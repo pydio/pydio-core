@@ -85,6 +85,9 @@ Class.create("AjxpBootstrap", {
 			if(this.parameters.get("htmlMultiUploaderOptions")){
 				window.htmlMultiUploaderOptions = this.parameters.get("htmlMultiUploaderOptions");
 			}
+			if(this.parameters.get('ajxpResourcesFolder')){
+				window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
+			}
 			$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
 			window.ajaxplorer.init();
 		}.bind(this);
