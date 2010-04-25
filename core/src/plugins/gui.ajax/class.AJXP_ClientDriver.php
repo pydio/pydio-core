@@ -129,7 +129,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
 				$config["ajxpVersion"] = AJXP_VERSION;
 				$config["ajxpVersionDate"] = AJXP_VERSION_DATE;
-				$config["cssResources"] = array("js/lib/webfx/slider/css/bluecurve/bluecurve.css");
+				$config["cssResources"] = array("css/bluecurve/bluecurve.css");
 				if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
 					$config["cssResources"][] = "css/pngHack/pngHack.css";
 				}
