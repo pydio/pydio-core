@@ -23,7 +23,6 @@ body, html
     margin: 0px;
     padding: 0px;    
     overflow: hidden;
-    background-color: #c4c7c1;
 }
 
 input, textarea
@@ -731,7 +730,7 @@ a.carousel-control img{
 
 .even
 {
-    background-color: #eee;
+    background-color: #f4f4f4;
 }
 
 .odd
@@ -1207,12 +1206,13 @@ UPLOAD MULTIFILE FORM
 	border : 1px solid #676965;
     padding:3px;
     clear:left;
+    background-color:#c4c7c1;
 }
 
-#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane{
+div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane{
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial, Sans-serif;
     font-size: 11px;
-   background-image: url('../images/strip.png');
+   	background-image: url('../images/strip.png');
 }
 
 #vertical_splitter{
