@@ -117,13 +117,13 @@ Class.create("AjxpBootstrap", {
 	},
 	insertLoaderProgress : function(){
 		var html = '<div id="loading_overlay" style="background-color:#555555;"></div>';
-		html+='	<div id="progressBox" style="background-color:#f1f1ef;border:1px solid #676965;width:305px;padding:3px;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
-		html+='	<div align="left" style="background-color:#fff;border:1px solid #676965;color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:5px;">';
-		html+=' <div style="margin-bottom:10px; font-size:35px;font-weight:bold; background-image:url(\'client/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:32px;color:#0077b3;">AjaXplorer</div>';
-		html+='	<div>The web data-browser<span id="version_span"></span></div>';
+		html+='	<div id="progressBox" style="background-color:#fff;border:2px solid #676965;width:305px;padding:1px;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
+		html+='	<div align="left" style="background-color:#fff;border:1px solid #676965;color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
+		html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\'client/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
+		html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';
 		html+='	Written by Charles du Jeu - LGPL License. <br>';
 		html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
-		html+='	</div>';
+		html+='	</div></div>';
 		$$('body')[0].insert({top:html});
 		viewPort = document.viewport.getDimensions();
 		$('progressBox').setStyle({left:Math.max((viewPort.width-305)/2,0)});
@@ -137,9 +137,9 @@ Class.create("AjxpBootstrap", {
 			onTick		: function(pbObj) { 
 				if(pbObj.getPercentage() == 100){
 					new Effect.Opacity('loading_overlay', {
-						from:0.9,
+						from:0.1,
 						to:0,
-						duration:0.2,
+						duration:0.5,
 						afterFinish:function(effect){
 							$('loading_overlay').remove();
 							$('progressBox').remove();

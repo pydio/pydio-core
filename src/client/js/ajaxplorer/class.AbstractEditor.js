@@ -35,9 +35,9 @@
 Class.create("AbstractEditor" , {
 	
 	defaultActions : new Hash({
-		'close':'<a id="closeButton"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>',
 		'fs' : '<a id="fsButton"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
-		'nofs' : '<a id="nofsButton" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>'
+		'nofs' : '<a id="nofsButton" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
+		'close':'<a id="closeButton"><img src="'+ajxpResourcesFolder+'/images/crystal/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
 	}),
 	toolbarSeparator : '<div class="separator"></div>',
 	fullScreenMode : false,
@@ -63,9 +63,9 @@ Class.create("AbstractEditor" , {
 			this.defaultActions.unset("fs");
 			this.defaultActions.unset("nofs");
 		}
-		this.actionBar.insert({top:this.toolbarSeparator});
-		this.actionBar.insert({top:this.defaultActions.values().join('\n')});
 		this.actionBar.insert({top:this.toolbarSeparator});	
+		this.actionBar.insert({bottom:this.toolbarSeparator});
+		this.actionBar.insert({bottom:this.defaultActions.values().join('\n')});
 		this.actionBar.select('a').each(function(link){
 			link.onclick = function(){return false;};
 			link.href = "#";

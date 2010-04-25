@@ -628,6 +628,7 @@ Class.create("Ajaxplorer", {
 			{
 				if(this.blockNavigation) return;
 				var shiftKey = e['shiftKey'];
+				var foundFocus = false;
 				for(i=0; i<objects.length;i++)
 				{
 					if(objects[i].hasFocus)
@@ -645,8 +646,12 @@ Class.create("Ajaxplorer", {
 							else nextIndex = 0;
 						}
 						objects[nextIndex].focus();
+						foundFocus = true;
 						break;
 					}
+				}
+				if(!foundFocus && objects[0]){
+					this.focusOn(objects[0]);
 				}
 				Event.stop(e);
 			}
