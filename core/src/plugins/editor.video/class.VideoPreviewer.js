@@ -62,12 +62,12 @@ Class.create("VideoPreviewer", AbstractEditor, {
 			}
 			return div;
 		}else{
-			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/crystal/mimes/ICON_SIZE',64)});
+			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64)});
 		}
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return resolveImageSource(ajxpNode.getIcon(),'/images/crystal/mimes/ICON_SIZE',64);
+		return resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
 	}
 	
 });

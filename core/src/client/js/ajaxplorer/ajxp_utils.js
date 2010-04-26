@@ -85,10 +85,10 @@ function resolveImageSource(src, defaultPath, size){
 	}
 }
 
-function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, hoverClass, callback){
+function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, hoverClass, callback, skipIconResolution){
 	var button = new Element("div", {id:id, className:cssClass});
 	var img = new Element("img", {
-		src:resolveImageSource(iconSrc, '/images/crystal/actions/ICON_SIZE', iconSize), 
+		src:(skipIconResolution?iconSrc:resolveImageSource(iconSrc, '/images/actions/ICON_SIZE', iconSize)), 
 		width:iconSize,
 		height:iconSize,
 		title:MessageHash[messageTitle],

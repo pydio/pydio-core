@@ -76,8 +76,8 @@
 						<tr>	
 							<td id="fileInputContainer" valign="top" align="right">
 								<input type="file" name="userfile_1" class="dialogFocus">
-								<div id="uploadBrowseButton" class="fakeUploadButton" align="center"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/view_list_details.png"><br/>AJXP_MESSAGE[171]</div>
-								<div id="uploadSendButton" class="fakeUploadButton" align="center"><img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/yast_backup.png"><br/>AJXP_MESSAGE[77]</div>
+								<div id="uploadBrowseButton" class="fakeUploadButton" align="center"><img src="AJXP_THEME_FOLDER/images/actions/22/view_list_details.png"><br/>AJXP_MESSAGE[171]</div>
+								<div id="uploadSendButton" class="fakeUploadButton" align="center"><img src="AJXP_THEME_FOLDER/images/actions/22/yast_backup.png"><br/>AJXP_MESSAGE[77]</div>
 							</td>
 							<td rowspan="2" id="uploadFilesListContainer" valign="top">
 								<div id="upload_files_list" class="uploadFilesList"></div>
@@ -314,7 +314,7 @@ AJXP_MESSAGE[174]<br/>
 						context.builderMenuItems.push({
 							name:el.text,
 							alt:el.title,
-							image:resolveImageSource(el.icon, '/images/crystal/actions/ICON_SIZE', 22),
+							image:resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
 							callback:function(e){this.apply([el]);}.bind(context)
 						} );
 					} );					
@@ -600,7 +600,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback><![CDATA[
-					var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
+					var template = new Template('<head><title>AjaXplorer MP3 Player</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS; color:#79f; font-size:15px; font-weight:bold;\">AjaXplorer Player</div><div style="font-family:Trebuchet MS; color:#666; font-size:10px; padding-bottom: 10px;">'+MessageHash[141]+': #{current_folder}</div><object type="application/x-shockwave-flash" data="AJXP_THEME_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" width="240" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_THEME_FOLDER/flash/dewplayer-multi.swf?mp3=#{mp3_url}&amp;bgcolor=FFFFFF&amp;showtime=1&amp;autoplay=1" /></object></body>');
 					
 					var mp3Items = new Array();
 					$A(ajaxplorer.getContextNode().getChildren()).each(function(nodeItem){
@@ -651,7 +651,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">
-							<img width="16" hspace="5" height="16" border="0" align="absmiddle" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/16/folder.png"/>#{current_folder}
+							<img width="16" hspace="5" height="16" border="0" align="absmiddle" src="AJXP_THEME_FOLDER/images/mimes/16/folder.png"/>#{current_folder}
 						</big>
 						<b>#{folders_string}</b> : #{filelist_folders_count}
 						<br><b>#{files_string}</b> : #{filelist_files_count}
@@ -669,7 +669,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<html><![CDATA[
 				<div style="padding:10px;">
 					<div class="folderImage">
-						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+						<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{basename}
 					<br><b>#{size_string}</b> : #{filesize}
@@ -686,7 +686,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<div class="folderImage">
-							<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 						</div>
 						<b>#{name_string}</b> : #{basename}
 						<br><b>#{modif_string}</b> : #{modiftime}
@@ -724,7 +724,7 @@ AJXP_MESSAGE[6] <b class="replace_file"></b> &nbsp;AJXP_MESSAGE[42]<br/>
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<div id="mp3_container" style="text-align:center; padding:5px; width:160px;margin-bottom: 5px;">
-							<object type="application/x-shockwave-flash" data="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_CLIENT_RESOURCES_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
+							<object type="application/x-shockwave-flash" data="AJXP_THEME_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" width="150" height="20"><param name="wmode" value="transparent"><param name="movie" value="AJXP_THEME_FOLDER/flash/dewplayer-mini.swf?mp3=content.php?action=mp3_proxy%26file=#{filename}&amp;bgcolor=FFFFFF&amp;showtime=1" /></object>
 						</div>
 						<b>#{name_string}</b> : #{basename}
 						<br><b>#{size_string}</b> : #{filesize}

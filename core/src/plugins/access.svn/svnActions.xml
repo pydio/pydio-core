@@ -81,7 +81,7 @@
 			<html><![CDATA[
 			<div style="padding:10px;">
 				<div class="folderImage">
-					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+					<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 				</div>
 				<b>#{name_string}</b> : #{basename}
 				<br><b>Author:</b> : #{author}
@@ -102,7 +102,7 @@
 			<html><![CDATA[
 				<div style="padding:10px;">
 					<div class="folderImage">
-						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{basename}
 					<br><b>#{author_string}</b> : #{author}

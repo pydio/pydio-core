@@ -20,7 +20,7 @@ Proto.Menu = Class.create({
 			pageOffset: 25,
 			topOffset:0,
 			leftOffset:0,
-			submenuArrow:'client/images/crystal/arrow_right.png',
+			submenuArrow:ajxpResourcesFolder+'/images/arrow_right.png',
 			position:'bottom',
 			menuTitle:'',
 			fade: false,

@@ -696,14 +696,14 @@ a.carousel-control img{
 
 .sort-table thead td.descending {
 	background-color: #daddd7;
-	background-image: url("../images/crystal/arrow_up_margin.png");
+	background-image: url("../images/arrow_up_margin.png");
 	background-repeat : no-repeat;
 	background-position : right center;
 }
 
 .sort-table thead td.ascending {
 	background-color: #daddd7;
-	background-image: url("../images/crystal/arrow_down_margin.png");
+	background-image: url("../images/arrow_down_margin.png");
 	background-repeat : no-repeat;
 	background-position : right center;
 }
@@ -815,7 +815,7 @@ div.multiple_thumbnails_draggable
 
 .selection_ctrl_key
 {
-    background-image:url('../images/plusCopy.gif');
+    background-image:url('../images/0.gif');
     background-repeat: no-repeat;
     background-position: bottom right;
 }

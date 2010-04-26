@@ -155,7 +155,7 @@ Class.create("LocationBar", {
 	},	
 	setModified:function(bool){
 		this._modified = bool;
-		this.gotoButton.setSrc(resolveImageSource((bool?this._defaultGotoIcon:this._reloadGotoIcon), '/images/crystal/actions/ICON_SIZE', 16));
+		this.gotoButton.setSrc(resolveImageSource((bool?this._defaultGotoIcon:this._reloadGotoIcon), '/images/actions/ICON_SIZE', 16));
 		this._beforeModified = this.currentPath.getValue();
 	},
 	resize : function(){

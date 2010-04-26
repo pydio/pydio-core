@@ -165,7 +165,7 @@ ConfigEditor = Class.create({
 			repoValues.set(tag.getAttribute('option_name'), tag.getAttribute('option_value'));
 		}
 		this.createParametersInputs(newTd, repoParams, false, repoValues);
-		var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/crystal/actions/22")});
+		var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/actions/22")});
 		submitButton.observe("click", function(){
 			this.submitUserParamsForm(userId, repoId);
 		}.bind(this));
