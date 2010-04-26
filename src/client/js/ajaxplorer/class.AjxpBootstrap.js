@@ -135,8 +135,8 @@ Class.create("AjxpBootstrap", {
 			animate		: true,										// Animate the progress? - default: true
 			showText	: false,									// show text with percentage in next to the progressbar? - default : true
 			width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: this.parameters.get("ajxpResourcesFolder")+'/images/bramus/custom1_box.gif',			// boxImage : image around the progress bar
-			barImage	: this.parameters.get("ajxpResourcesFolder")+'/images/bramus/custom1_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
+			boxImage	: this.parameters.get("ajxpResourcesFolder")+'/images/progress_box.gif',			// boxImage : image around the progress bar
+			barImage	: this.parameters.get("ajxpResourcesFolder")+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
 			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
 			onTick		: function(pbObj) { 
 				if(pbObj.getPercentage() == 100){
