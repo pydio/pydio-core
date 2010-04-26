@@ -70,10 +70,11 @@ Class.create("RepositorySelect", {
 			'inlineBarButton', 
 			200, 
 			200, 
-			ajxpResourcesFolder + '/images/arrow_down_margin.png', 
+			ajxpResourcesFolder + '/images/arrow_down.png', 
 			16,
 			'inline_hover', null, true);
 		this.button.setStyle({marginRight:'7px'});		
+		this.button.select('img')[0].setStyle({height:6, width:10, marginLeft:1, marginRight:1, marginTop:8});
 		this.element.insert(this.button);
 	},
 	
