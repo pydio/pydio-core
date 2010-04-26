@@ -16,16 +16,21 @@ class ftpAccessWrapper implements AjxpWrapper {
 	protected $repositoryId;
 	protected $fp;
 	
+	protected $crtMode;
+	protected $crtLink;
+	protected $crtTarget;
+	
 	// Shared vars self::
 	private static $dirContent;
 	private static $dirContentKeys;
-	private static $dirContentIndex;
-	protected static $repositoryConnexions; 
-	
+	private static $dirContentIndex;	
 	
     public static function getRealFSReference($path){
     	$fake = new ftpAccessWrapper();
-    	return $fake->buildRealUrl($path);
+    	$tmpFile = sys_get_temp_dir()."/".md5(time());
+    	$tmpHandle = fopen($tmpFile, "wb");
+    	$fake->copyFileInStream($path, $tmpHandle);
+    	return $tmpFile;
     }	
     
     public static function copyFileInStream($path, $stream){
@@ -45,14 +50,25 @@ class ftpAccessWrapper implements AjxpWrapper {
     }
     
 	public function stream_open($url, $mode, $options, &$context){		
-		if($mode == "w" || $mode == "rw"){
-			$context = stream_context_create(array("ftp" => array("overwrite" => true)));
+		if($mode == "w" || $mode == "rw"){			
+			$this->crtMode = 'write';
+			$parts = $this->parseUrl($url);
+			$this->crtTarget = AJXP_Utils::securePath($this->path."/".$parts["path"]);
+			$this->crtLink = $this->createFTPLink();
+			$this->fp = tmpfile();
+		}else{
+			$this->crtMode = 'read';			
+			$this->fp = tmpfile();
+			$this->copyFileInStream($url, $this->fp);			
+			rewind($this->fp);
 		}
+		/*
 		if($context){
 			$this->fp = @fopen($this->buildRealUrl($url), $mode, $options, $context);
 		}else{
 			$this->fp = @fopen($this->buildRealUrl($url), $mode);
 		}
+		*/
 		return ($this->fp !== false);
 	}
 	
@@ -68,7 +84,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     	return ftell($this->fp);
     }	
     
-    public function stream_read($count){
+    public function stream_read($count){    	
     	return fread($this->fp, $count);
     }
 
@@ -89,7 +105,12 @@ class ftpAccessWrapper implements AjxpWrapper {
     
     public function stream_flush(){
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
-	    	fflush($this->fp);
+    		if($this->crtMode == 'write'){
+    			rewind($this->fp);
+    			ftp_fput($this->crtLink, $this->crtTarget, $this->fp, FTP_BINARY);
+    		}else{
+		    	fflush($this->fp);
+    		}
     	}
     }
         
@@ -155,17 +176,20 @@ class ftpAccessWrapper implements AjxpWrapper {
        		$result = $this->rawListEntryToStat($entry);
        		$isDir = $result["dir"];
        		$statValue = $result["stat"];
-       		$file = $result["name"];
+       		$file = $result["name"];       		
 			if($isDir){
 				$folders[$file] = $statValue;
 			}else{
 				$files[$file] = $statValue;
 			}
        	}
-		self::$dirContent = array_merge($folders, $files);
+       	// Append all files keys to folders. Do not use array_merge.
+       	foreach ($files as $key => $value){
+       		$folders[$key] = $value;
+       	}
+		self::$dirContent = $folders;//array_merge($folders, $files);
 		self::$dirContentKeys = array_keys(self::$dirContent);
-		self::$dirContentIndex = 0;			
-		//print_r(self::$dirContent);
+		self::$dirContentIndex = 0;	
        	return true;
 	}
 	
@@ -208,7 +232,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 	}
 	
 	protected function rawListEntryToStat($entry){
-        $info = array();                              
+        $info = array();    
 		$vinfo = preg_split("/[\s]+/", $entry, 9);
 		$statValue = array();
 		if ($vinfo[0] !== "total")
@@ -320,7 +344,7 @@ class ftpAccessWrapper implements AjxpWrapper {
         $features = @ftp_raw($link, "FEAT");        
         // Check the answer code
         if (isSet($features[0]) && $features[0][0] != "2"){
-        	ftp_close($link);
+        	//ftp_close($link);
         	return array("list"=>"LIST", "charset"=>$this->repoCharset);
         }
         $retArray = array("list"=>"LIST", "charset"=>$this->repoCharset);
@@ -331,7 +355,7 @@ class ftpAccessWrapper implements AjxpWrapper {
             {   // See http://wiki.filezilla-project.org/Character_Set for an explaination
                 @ftp_raw($link, "OPTS UTF-8 ON");
                 $retArray['charset'] = "UTF-8"; 
-                ftp_close($link);
+                //ftp_close($link);
                 return $retArray;
             }
         }
@@ -342,11 +366,13 @@ class ftpAccessWrapper implements AjxpWrapper {
     protected function createFTPLink(){
     	
     	// If connexion exist and is still connected
-    	if(is_array(self::$repositoryConnexions) 
-    		&& array_key_exists($this->repositoryId, self::$repositoryConnexions)
-    		&& @ftp_systype(self::$repositoryConnexions[$this->repositoryId])){
-    			return self::$repositoryConnexions[$this->repositoryId];
+    	if(is_array($_SESSION["FTP_CONNEXIONS"]) 
+    		&& array_key_exists($this->repositoryId, $_SESSION["FTP_CONNEXIONS"])
+    		&& @ftp_systype($_SESSION["FTP_CONNEXIONS"][$this->repositoryId])){
+    			AJXP_Logger::debug("Using stored FTP Session");    			
+    			return $_SESSION["FTP_CONNEXIONS"][$this->repositoryId];
     		}
+    	AJXP_Logger::debug("Creating new FTP Session");
     	$link = FALSE;
    		//Connects to the FTP.          
    		if($this->secure){
@@ -357,7 +383,7 @@ class ftpAccessWrapper implements AjxpWrapper {
         if(!$link) {
             throw new AJXP_Exception("Cannot connect to FTP server!");	               
  	    }
-		register_shutdown_function('ftp_close', $link);
+		//register_shutdown_function('ftp_close', $link);
         @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
 	    if(!@ftp_login($link,$this->user,$this->password)){
             throw new AJXP_Exception("Cannot login to FTP server with user $this->user");
@@ -368,10 +394,10 @@ class ftpAccessWrapper implements AjxpWrapper {
             global $_SESSION;
             $_SESSION["ftpPasv"]="true";
         }
-        if(!is_array(self::$repositoryConnexions)){
-        	self::$repositoryConnexions = array();
+        if(!is_array($_SESSION["FTP_CONNEXIONS"])){
+        	$_SESSION["FTP_CONNEXIONS"] = array();
         }
-        self::$repositoryConnexions[$this->repositoryId] = $link;
+        $_SESSION["FTP_CONNEXIONS"][$this->repositoryId] = $link;
         return $link;
     }	
     
