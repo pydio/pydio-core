@@ -725,7 +725,7 @@ Class.create("FilesList", SelectableElements, {
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
-				}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/crystal/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + metaData.get('text')+"</span>");
+				}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + metaData.get('text')+"</span>");
 				innerSpan.ajxpNode = ajxpNode; // For draggable
 				tableCell.insert(innerSpan);
 				

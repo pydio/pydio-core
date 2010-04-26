@@ -48,7 +48,7 @@ Class.create("UserWidget", {
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = '<span style="cursor:pointer;"><span class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></span><img src="'+ajxpResourcesFolder+'/images/crystal/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></span>';
+				logging_string = '<span style="cursor:pointer;"><span class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></span><img src="'+ajxpResourcesFolder+'/images/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></span>';
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
 					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
@@ -147,7 +147,7 @@ Class.create("UserWidget", {
 			return false;		
 		};
 		
-		modal.prepareHeader(MessageHash[195], ajxpResourcesFolder+'/images/crystal/actions/16/configure.png');
+		modal.prepareHeader(MessageHash[195], ajxpResourcesFolder+'/images/actions/16/configure.png');
 		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
 	},
 	

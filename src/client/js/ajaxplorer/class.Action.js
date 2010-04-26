@@ -34,7 +34,7 @@
  */
 Class.create("Action", {
 
-	__DEFAULT_ICON_PATH : "/images/crystal/actions/ICON_SIZE",
+	__DEFAULT_ICON_PATH : "/images/actions/ICON_SIZE",
 	
 	initialize:function(){
 		this.options = Object.extend({
@@ -355,7 +355,7 @@ Class.create("Action", {
 				menuItems.push({
 					name:itemText,
 					alt:MessageHash[item.title],
-					image:resolveImageSource(item.src, '/images/crystal/actions/ICON_SIZE', 22),
+					image:resolveImageSource(item.src, '/images/actions/ICON_SIZE', 22),
 					isDefault:(item.isDefault?true:false),
 					callback:function(e){this.apply([item]);}.bind(this)
 				});
@@ -379,7 +379,7 @@ Class.create("Action", {
 						menuItems.push({
 							name:action.getKeyedText(),
 							alt:action.options.title,
-							image:resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16),						
+							image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),						
 							callback:function(e){this.apply();}.bind(action)
 						});
 			  		}, this);

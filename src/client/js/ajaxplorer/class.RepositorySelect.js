@@ -50,7 +50,7 @@ Class.create("RepositorySelect", {
 	createGui : function(){
 		this.icon = new Element('img', {
 			id:'repo_icon',
-			src:resolveImageSource(this._defaultIcon,'/images/crystal/actions/ICON_SIZE', 16),
+			src:resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16),
 			width:16,
 			height:16,
 			align:'absmiddle'
@@ -70,10 +70,10 @@ Class.create("RepositorySelect", {
 			'inlineBarButton', 
 			200, 
 			200, 
-			'arrow_down_margin.png', 
-			16, 
-			'inline_hover');
-		this.button.setStyle({marginRight:'7px'});
+			ajxpResourcesFolder + '/images/arrow_down_margin.png', 
+			16,
+			'inline_hover', null, true);
+		this.button.setStyle({marginRight:'7px'});		
 		this.element.insert(this.button);
 	},
 	
@@ -102,7 +102,7 @@ Class.create("RepositorySelect", {
 			}.bind(this));
 		}else{
 			this.label.setValue(this._defaultString);
-			this.icon.src = resolveImageSource(this._defaultIcon,'/images/crystal/actions/ICON_SIZE', 16);
+			this.icon.src = resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16);
 		}
 		if(this.repoMenu){
 			this.repoMenu.options.menuItems = actions;
@@ -114,7 +114,7 @@ Class.create("RepositorySelect", {
 				anchor:this.button,
 				createAnchor:false,
 				anchorContainer:$('dir_chooser'),
-				anchorSrc:ajxpResourcesFolder+'/images/crystal/lower.png',
+				anchorSrc:ajxpResourcesFolder+'/images/arrow_down.png',
 				anchorTitle:MessageHash[200],
 				topOffset:2,
 				leftOffset:-127,

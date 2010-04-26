@@ -36,7 +36,7 @@ Class.create("Repository", {
 
 	id:undefined,
 	label:'No Repository',
-	icon:ajxpResourcesFolder+'/images/crystal/actions/16/network-wired.png',
+	icon:ajxpResourcesFolder+'/images/actions/16/network-wired.png',
 	resourcesManager:undefined,
 	allowCrossRepositoryCopy:false,
 

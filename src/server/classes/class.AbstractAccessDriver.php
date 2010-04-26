@@ -124,8 +124,8 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	}
     	if($data["PASSWORD"] && !is_file(PUBLIC_DOWNLOAD_FOLDER."/allz.css")){    		
     		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", PUBLIC_DOWNLOAD_FOLDER."/allz.css");
-    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/crystal/actions/22/dialog_ok_apply.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
-    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/crystal/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
+    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/22/dialog_ok_apply.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
+    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
     	}
         $data["PLUGIN_ID"] = $this->id;
         $data["BASE_DIR"] = $this->baseDir;
