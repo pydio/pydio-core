@@ -118,7 +118,7 @@ Class.create("ActionsManager", {
 			var menuItem = {
 				name:action.getKeyedText(),
 				alt:action.options.title,
-				image:resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16),
+				image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),
 				isDefault:isDefault,
 				callback:function(e){this.apply()}.bind(action)
 			};

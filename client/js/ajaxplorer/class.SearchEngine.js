@@ -52,7 +52,7 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		if(!this.htmlElement) return;
 		
-		this.htmlElement.update('<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/crystal/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>');
+		this.htmlElement.update('<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>');
 		
 		this._inputBox = $("search_txt");
 		this._resultsBoxId = 'search_results';
@@ -197,7 +197,7 @@ Class.create("SearchEngine", AjxpPane, {
 			if(folderName != "/") folderName += "/";
 			folderName += fileName;
 		}	
-		var imageString = '<img align="absmiddle" width="16" height="16" src="'+ajxpResourcesFolder+'/images/crystal/mimes/16/'+icon+'"> ';
+		var imageString = '<img align="absmiddle" width="16" height="16" src="'+ajxpResourcesFolder+'/images/mimes/16/'+icon+'"> ';
 		var stringToDisplay = fileName;	
 		
 		var divElement = new Element('div', {title:MessageHash[224]+' '+ folderName}).update(imageString+stringToDisplay);	

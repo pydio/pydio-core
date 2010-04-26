@@ -48,7 +48,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 		this.tabulatorData.each(function(tabInfo){
 			var td = new Element('td').addClassName('toggleHeader');
 			td.addClassName('panelHeader');
-			td.update('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/crystal/actions/ICON_SIZE', 16)+'"><span ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</a>');
+			td.update('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'"><span ajxp_message_id="'+tabInfo.label+'">'+MessageHash[tabInfo.label]+'</a>');
 			td.observe('click', function(){
 				this.switchTabulator(tabInfo.id);
 			}.bind(this) );

@@ -212,7 +212,7 @@ Class.create("Modal", {
 	
 	openEditorDialog : function(editorData){
 		var editorKlass = editorData.editorClass;
-		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/crystal/actions/ICON_SIZE', 16));
+		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16));
 		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
 				ajaxplorer.actionBar.editor = eval('new '+editorKlass+'(oForm)');
@@ -289,7 +289,7 @@ Class.create("Modal", {
 		var okButton = new Element('input', {
 			type:'image',
 			name:(bOkButtonOnly?'close':'ok'),
-			src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_'+(bOkButtonOnly?'close':'ok_apply')+'.png',
+			src:ajxpResourcesFolder+'/images/actions/22/dialog_'+(bOkButtonOnly?'close':'ok_apply')+'.png',
 			height:22,
 			width:22,
 			title:MessageHash[48]});
@@ -303,7 +303,7 @@ Class.create("Modal", {
 				name:"can",
 				height:22,
 				width:22,
-				src:ajxpResourcesFolder+'/images/crystal/actions/22/dialog_close.png',
+				src:ajxpResourcesFolder+'/images/actions/22/dialog_close.png',
 				title:MessageHash[49],
 				className:"dialogButton"
 			});

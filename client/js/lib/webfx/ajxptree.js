@@ -9,12 +9,12 @@ function AJXPTree(rootNode, sAction, filter) {
 	this.ajxpNode = rootNode;
 	var icon = rootNode.getIcon();
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
-		icon = resolveImageSource(icon, "/images/crystal/mimes/ICON_SIZE", 16);
+		icon = resolveImageSource(icon, "/images/mimes/ICON_SIZE", 16);
 	}
 	var openIcon = rootNode.getMetadata().get("openicon");
 	if(openIcon){
 		if(openIcon.indexOf(ajxpResourcesFolder+"/") != 0){
-			openIcon = resolveImageSource(openIcon, "/images/crystal/mimes/ICON_SIZE", 16);
+			openIcon = resolveImageSource(openIcon, "/images/mimes/ICON_SIZE", 16);
 		}
 	}else{
 		openIcon = icon;
@@ -102,19 +102,19 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
 	this.ajxpNode = ajxpNode;
 	var icon = ajxpNode.getIcon();
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
-		icon = resolveImageSource(icon, "/images/crystal/mimes/ICON_SIZE", 16);
+		icon = resolveImageSource(icon, "/images/mimes/ICON_SIZE", 16);
 	}
 	var openIcon = ajxpNode.getMetadata().get("openicon");
 	if(openIcon){
 		if(openIcon.indexOf(ajxpResourcesFolder+"/") != 0){
-			openIcon = resolveImageSource(openIcon, "/images/crystal/mimes/ICON_SIZE", 16);
+			openIcon = resolveImageSource(openIcon, "/images/mimes/ICON_SIZE", 16);
 		}
 	}else{
 		openIcon = icon;
 	}
 	
 	this.folder = true;
-	this.WebFXTreeItem(ajxpNode.getLabel(), sAction, eParent, icon, (openIcon?openIcon:resolveImageSource("folder_open.png", "/images/crystal/mimes/ICON_SIZE", 16)));
+	this.WebFXTreeItem(ajxpNode.getLabel(), sAction, eParent, icon, (openIcon?openIcon:resolveImageSource("folder_open.png", "/images/mimes/ICON_SIZE", 16)));
 
 	this.loading = false;
 	this.loaded = false;

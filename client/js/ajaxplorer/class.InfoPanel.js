@@ -249,7 +249,7 @@ Class.create("InfoPanel", AjxpPane, {
 			if(selectionType == 'empty' && action.context.selection) return;
 			if(selectionType == 'multiple' && action.selectionContext.unique) return; 
 			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;			
-			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/crystal/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
+			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
 			count++;
 		}.bind(this));
 		actionString += '</div>';
@@ -272,7 +272,7 @@ Class.create("InfoPanel", AjxpPane, {
 				}
 			}
 		}
-		return '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/crystal/mimes/ICON_SIZE',64) + '" height="64" width="64">';
+		return '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
 	},
 	
 	parseComponentConfig: function(configNode){

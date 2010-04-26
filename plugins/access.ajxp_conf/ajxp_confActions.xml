@@ -103,8 +103,8 @@
 						</div>
 						<div id="driver_form"></div>
 						<div class="dialogButtons">
-							<input type="image" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/dialog_ok_apply.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
-							<input type="image" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
+							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
+							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
 						</div>
 					</div>				
 				]]></clientForm>
@@ -202,7 +202,7 @@
 						</fieldset>
 						<fieldset id="password_pane" style="float:left;margin-right:6px;width:198px;height:70px;">
 							<legend>Modify password</legend>
-							<input style="float:right;margin-top:18px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/actions/22/dialog_ok_apply.png"/>
+							<input style="float:right;margin-top:18px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png"/>
 							<div style="width:168px;">
 								<div class="SF_element">
 									<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] :</div><input type="password" id="new_pass" class="SF_input"/>
@@ -342,7 +342,7 @@
 				<html><![CDATA[
 				<div style="padding:10px;">
 					<div class="folderImage">
-						<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+						<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{basename}
 				</div>
@@ -356,7 +356,7 @@
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<div class="folderImage">
-							<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/#{icon}" height="64" width="64">
+							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 						</div>
 						<b>#{name_string}</b> : #{basename}
 					</div>
@@ -369,7 +369,7 @@
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<div class="folderImage">
-							<img src="AJXP_CLIENT_RESOURCES_FOLDER/images/crystal/mimes/64/admin.png" height="64" width="64">
+							<img src="AJXP_THEME_FOLDER/images/mimes/64/admin.png" height="64" width="64">
 						</div>
 					</div>
 				]]></html>
