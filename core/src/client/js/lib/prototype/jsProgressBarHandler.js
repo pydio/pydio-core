@@ -67,8 +67,8 @@ JS_BRAMUS.jsProgressBar = Class.create({
 				animate		: true,										
 				showText	: true,										
 				width		: 120,
-				boxImage	: 'images/bramus/percentImage.png',	
-				barImage	: 'images/bramus/percentImage_back.png',
+				boxImage	: 'images/progress_box.gif',	
+				barImage	: 'images/progress_bar.gif',
 				height		: 12,
 				onTick		: function(pbObj) { return true; }
 			}, options || {});
