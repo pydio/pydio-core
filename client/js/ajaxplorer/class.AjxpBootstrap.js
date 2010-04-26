@@ -42,7 +42,6 @@ Class.create("AjxpBootstrap", {
 			window.setTimeout(function(){alert(this.parameters.get("ALERT"));}.bind(this),0);
 		}		
 		Event.observe(window, 'load', function(){
-			this.insertLoaderProgress();
 			this.loadBootConfig();		
 		}.bind(this));		
 		document.observe("ajaxplorer:before_gui_load", function(e){
@@ -71,6 +70,10 @@ Class.create("AjxpBootstrap", {
 			var data = transport.responseText.evalJSON();
 			this.parameters.update(data);
 			this.parameters.get("cssResources").each(this.loadCSSResource.bind(this));
+			if(this.parameters.get('ajxpResourcesFolder')){
+				window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
+			}
+			this.insertLoaderProgress();
 			if(!this.parameters.get("debugMode")){
 				connexion.loadLibrary("ajaxplorer.js");
 			}
@@ -78,15 +81,13 @@ Class.create("AjxpBootstrap", {
 			window.zipEnabled = this.parameters.get("zipEnabled");
 			window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
 			window.flashUploaderEnabled = this.parameters.get("flashUploaderEnabled");			
+			document.fire("ajaxplorer:boot_loaded");
 			window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
 			if(this.parameters.get("currentLanguage")){
 				window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
 			}
 			if(this.parameters.get("htmlMultiUploaderOptions")){
 				window.htmlMultiUploaderOptions = this.parameters.get("htmlMultiUploaderOptions");
-			}
-			if(this.parameters.get('ajxpResourcesFolder')){
-				window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
 			}
 			$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
 			window.ajaxplorer.init();
@@ -122,7 +123,7 @@ Class.create("AjxpBootstrap", {
 		var html = '<div id="loading_overlay" style="background-color:#555555;"></div>';
 		html+='	<div id="progressBox" style="background-color:#fff;border:2px solid #676965;width:305px;padding:1px;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
 		html+='	<div align="left" style="background-color:#fff;border:1px solid #676965;color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
-		html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\'client/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
+		html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\''+ajxpResourcesFolder+'/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
 		html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';
 		html+='	Written by Charles du Jeu - LGPL License. <br>';
 		html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
