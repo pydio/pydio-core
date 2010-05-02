@@ -111,6 +111,9 @@ Class.create("SearchEngine", AjxpPane, {
 	
 	resize: function(){
 		fitHeightToBottom($(this._resultsBoxId));
+		if(this.htmlElement && this.htmlElement.visible()){
+			this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth()-70),70) + "px"});
+		}
 	},
 	
 	focus : function(){
