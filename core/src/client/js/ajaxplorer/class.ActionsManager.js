@@ -239,7 +239,6 @@ Class.create("ActionsManager", {
 			}
 		}
 		connexion.addParameter('dest', destDir);
-		if(destNodeName) connexion.addParameter('dest_node', destNodeName);
 		connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());		
 		connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this);
 		connexion.sendAsync();

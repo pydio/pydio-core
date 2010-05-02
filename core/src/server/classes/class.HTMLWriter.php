@@ -48,15 +48,13 @@ class HTMLWriter
     	$realName = INSTALL_PATH."/".DOCS_FOLDER."/".$docFileName.".txt";
     	if(is_file($realName))
     	{
-    		$string = "<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"".AJXP_THEME_FOLDER."/css/docs.css\"></head><body>";
     		$content = implode("<br>", file($realName));
     		$content = preg_replace("(http:\/\/[a-z|.|\/|\-|0-9]*)", "<a target=\"_blank\" href=\"$0\">$0</a>", $content);
     		$content = preg_replace("(\[(.*)\])", "<div class=\"title\">$1</div>", $content);
     		$content = preg_replace("(\+\+ (.*) \+\+)", "<div class=\"subtitle\">$1</div>", $content);
     		$content = str_replace("__AJXP_VERSION__", AJXP_VERSION, $content);
     		$content = str_replace("__AJXP_VERSION_DATE__", AJXP_VERSION_DATE, $content);
-    		$string .=  $content."</body></html>";
-    		return $string;
+    		return $content;
     	}
     	return "File not found : ".$docFileName;
     }
