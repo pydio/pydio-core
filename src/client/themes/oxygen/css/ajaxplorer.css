@@ -735,7 +735,6 @@ a.carousel-control img{
 
 .odd
 {
-    background-color: #fff;
 }
 
 .selected
@@ -1802,4 +1801,20 @@ div.menu a {
    filter:alpha(opacity=80);
    opacity: 0.8;
    -moz-opacity:0.8;
+}
+
+/*******************************/
+/* CREDIT SPLASH SCREEN
+/******************************/
+#docDiv div.title
+{
+    font-size:13px;
+    font-weight: bold;
+}
+
+#docDiv div.subtitle
+{
+    color: #79f;
+    font-size:12px;
+    font-weight: bold;
 }

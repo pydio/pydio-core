@@ -428,14 +428,18 @@ Class.create("FilesList", SelectableElements, {
 				var divDim = $('selectable_div').getDimensions();
 				var contDim = $('table_rows_container').getDimensions();
 				if(divDim.height > contDim.height && !(divDim.width > contDim.width) ){
-					$('selectable_div_header').setStyle({width:($('selectable_div_header').getWidth()-17)+'px'});
+					$('selectable_div_header').setStyle({width:($('table_rows_container').getWidth()-17)+'px'});
+				}else{
+					$('selectable_div_header').setStyle({width:($('table_rows_container').getWidth())+'px'});
 				}
 				var index = 0;
 				headerCells.each(function(cell){				
 					cell.setStyle({padding:0});
 					var div = cell.select('div')[0];
 					div.setAttribute("title", new String(cell.innerHTML).stripTags().replace("&nbsp;", ""));
-					cell.setStyle({width:tds[index].getWidth()+'px'});
+						var td = tds[index];					
+						var tdWidth = td.getWidth();					
+						cell.setStyle({width:tdWidth+'px'});
 					index++;
 				});
 			}.bind(this), 10);

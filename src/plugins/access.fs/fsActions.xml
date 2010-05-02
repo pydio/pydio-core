@@ -613,14 +613,13 @@
 					]]></clientCallback>
 				<clientForm id="copymove_form"><![CDATA[
 					<div id="copymove_form" action="copy" box_width="272">
-					<input type="hidden" name="dest_node" value="">
-					<span id="copymove_text_span"></span>
-					<div class="dialogLegend">AJXP_MESSAGE[175]</div>
-					<select id="external_repository" name="dest_repository_id" style="width: 248px; font-size: 12px; height: 21px; margin-bottom: 0px; border: 1px solid #ccc;"></select>
-					<div style="height:250px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
-					<input type="text" name="dest" value="/" readonly  style="width:100%; border: none; border-bottom: 1px solid #ccc; background-image:none;"/>
-					<div id="treeCopy" style="height:222px; padding: 3px 2px; overflow:auto; text-align:left;background-image:none;background-color:white;" class="treeCopyContainer"></div>
-					</div>
+						<input type="hidden" name="dest_node" value=""/>
+						<div class="dialogLegend">AJXP_MESSAGE[175]</div>					
+						<select id="external_repository" name="dest_repository_id" style="width: 248px; font-size: 12px; height: 21px; margin-top:5px; margin-bottom:7px; border: 1px solid #ccc;"></select>
+						<div style="height:200px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
+							<div id="treeCopy" style="height:194px; padding: 3px 2px; overflow:auto; text-align:left;background-image:url('../images/strip.png');" class="treeCopyContainer"></div>							
+						</div>
+						<input type="text" name="dest" value="/" readonly  style="width:248px; border: 1px solid #ccc; margin-top:7px; margin-bottom:2px;background-image:none;"/>
 					</div>
 				]]></clientForm>
 				<clientListener name="contextChange"><![CDATA[

@@ -143,17 +143,26 @@
 				modal.showDialogForm(
 					'Ajaxplorer', 
 					'splash_form', 
-					function(oForm){
-						modal.dialogContent.setStyle({paddingBottom:'10px'});
-						$(oForm).select('iframe')[0].src = window.ajxpServerAccessPath + '?get_action=display_doc&doc_file=CREDITS';
+					function(oForm){						
+						var docDiv = $(oForm).select('[id="docDiv"]')[0];
+						if(!docDiv.isLoaded){
+							var conn = new Connexion(window.ajxpServerAccessPath + '?get_action=display_doc&doc_file=CREDITS');
+							conn.onComplete = function(transport){
+								docDiv.insert(transport.responseText);
+								docDiv.isLoaded = true;								
+							};
+							conn.sendAsync();													
+						}
 					}, 
 					function(){hideLightBox();return false;}, 
 					null, 
-					true);		
+					true, true);		
 					]]></clientCallback>
 				<clientForm id="splash_form"><![CDATA[
-					<div id="splash_form" box_width="455" box_padding="0">
-						<iframe frameborder="0" id="docFileIframe"></iframe>
+					<div id="splash_form" box_width="455" box_padding="0">						
+						<div id="docDiv" style="padding:5px;overflow:auto;height:300px;">
+							<div class="dialogButtons" style="float:right;padding-right:6px;"><input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" width="16" height="16" class="dialogButton dialogFocus"/></div>
+						</div>
 					</div>				
 				]]></clientForm>
 			</processing>
