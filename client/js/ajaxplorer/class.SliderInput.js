@@ -33,13 +33,23 @@ Class.create("SliderInput", {
 		this.holder.hide();
 		$$("body")[0].insert(this.holder);
 		this.slider = new Control.Slider(this.cursor, this.tracker, this.options);		
-		this.input.observe("focus", this.show.bind(this) );		
+		if(this.input.getAttribute("type") && this.input.getAttribute("type") == "image"){
+			this.input.observe("click", this.show.bind(this) );
+		}else{
+			this.input.observe("focus", this.show.bind(this) );
+		}
 		document.observe("click", function(event){
 			var element = Event.findElement(event);
 			if(!element.descendantOf(this.holder) && element != this.input){
 				this.hide();
 			}
 		}.bind(this));
+	},
+	
+	setValue : function(value){
+		if(this.slider){
+			this.slider.setValue(value);
+		}
 	},
 	
 	show : function(){
@@ -55,7 +65,7 @@ Class.create("SliderInput", {
 		if(this.timer) {
 			window.clearTimeout(this.timer);
 		}
-		this.input.blur();
+		if(this.input.blur) this.input.blur();
 	},
 	
 	delay : function(){
