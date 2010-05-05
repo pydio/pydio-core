@@ -69,7 +69,8 @@ Class.create("AjxpBootstrap", {
 			}
 			var data = transport.responseText.evalJSON();
 			this.parameters.update(data);
-			this.parameters.get("cssResources").each(this.loadCSSResource.bind(this));
+			var cssRes = this.parameters.get("cssResources");
+			if(cssRes) cssRes.each(this.loadCSSResource.bind(this));
 			if(this.parameters.get('ajxpResourcesFolder')){
 				window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
 			}

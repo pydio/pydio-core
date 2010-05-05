@@ -128,10 +128,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["userChangePassword"] = AuthService::changePasswordEnabled();
 				$config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
 				$config["ajxpVersion"] = AJXP_VERSION;
-				$config["ajxpVersionDate"] = AJXP_VERSION_DATE;
-				$config["cssResources"] = array("css/bluecurve/bluecurve.css");
+				$config["ajxpVersionDate"] = AJXP_VERSION_DATE;				
 				if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
-					$config["cssResources"][] = "css/pngHack/pngHack.css";
+					$config["cssResources"] = array("css/pngHack/pngHack.css");
 				}
 				if(defined("GOOGLE_ANALYTICS_ID") && GOOGLE_ANALYTICS_ID != "") {
 					$config["googleAnalyticsData"] = array(

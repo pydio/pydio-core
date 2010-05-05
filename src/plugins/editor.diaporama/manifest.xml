@@ -6,24 +6,23 @@
 	</resources>
 	<clientForm id="diaporama_box"><![CDATA[
 		<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_padding="0">
-			<div class="action_bar" style="width: 100%;">
+			<div class="action_bar" style="width: 100%;">			
+				<div align="right" style="float:right; padding-top: 1px; padding-right: 5px; height: 21px;margin-top:28px;">
+					<input id="zoomValue" type="text" style="text-align: center; width: 34px;height: 16px;padding:0px;border: 1px solid #ccc; padding-right: 1px;"/><input id="time" type="text" value="3 s" style="text-align: center; width: 26px;height: 16px;padding:0px;border: 1px solid #ccc; padding-right: 1px;margin-left:10px;"/>
+				</div>
+			
 				<a href="#" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/back_22.png" alt="" border="0"><br><span message_id="178">AJXP_MESSAGE[178]</span></a>
-				<a href="#" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/forward_22.png" alt="" border="0"><br><span message_id="179">AJXP_MESSAGE[179]</span></a>
-				<div class="separator"></div>
 				<a href="#" id="stopButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_stop.png" alt="AJXP_MESSAGE[233]" border="0"><br><span message_id="232">AJXP_MESSAGE[232]</span></a>
 				<a href="#" id="playButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_play.png" alt="AJXP_MESSAGE[231]" border="0"><br><span message_id="230">AJXP_MESSAGE[230]</span></a>
+				<a href="#" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/forward_22.png" alt="" border="0"><br><span message_id="179">AJXP_MESSAGE[179]</span></a>	
+				<div class="separator"></div>
+				<a href="#" id="actualSizeButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-original.png" alt="" border="0"><br><span message_id="327">AJXP_MESSAGE[327]</span></a>
+				<a href="#" id="fitToScreenButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-fit-best.png" alt="AJXP_MESSAGE[325]" border="0"><br><span message_id="325">AJXP_MESSAGE[325]</span></a>
 				<div class="separator"></div>
 				<a href="#" id="downloadDiapoButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/download_manager.png" alt="" border="0"><br><span message_id="88">AJXP_MESSAGE[88]</span></a>
 			</div>
-			<div align="right" style="background-image: url(AJXP_THEME_FOLDER/images/ToolbarBg.gif); background-position:center center; padding-top: 1px; padding-right: 5px; border:1px solid #333; border-bottom:none; height: 21px;">
-			<table cellpadding="0" cellspacing="0" style="font-size:11px;"><tr>
-			<td><img class="diaporamaButton" width="16" height="16" src="AJXP_THEME_FOLDER/images/actions/16/viewmag1.png" id="actualSizeButton" hspace="5" alt="Actual Size(100%)" title="Actual Size(100%)" style="cursor:pointer;"><img class="diaporamaButton" src="AJXP_THEME_FOLDER/images/actions/16/window_nofullscreen.png" width="16" height="16" hspace="5" id="fitToScreenButton" alt="Fit To Screen" title="Fit To Screen" style="cursor:pointer;"></td>
-			<td><div class="slider" id="slider-2"><input class="slider-input" id="slider-input-2" name="slider-input-2"/></div></td>
-			<td><input id="zoomValue" type="text" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> %</td>
-			<td style="padding-left: 10px;"><input id="time" type="text" value="3" style="text-align: right; width: 25px;height: 16px;padding:0px;border: none; padding-right: 1px;"/> s</td></tr></table>
-			</div>
-			<div style="text-align:center; vertical-align:center;overflow:auto; background-color:#676965; border:1px solid black;" id="imageContainer">
-			<img id="mainImage" src="" style="border: 4px solid white;">
+			<div style="text-align:center; vertical-align:center;overflow:auto; background-color:#333333; border:1px solid black;" id="imageContainer">
+				<div id="imageBorder" style="border: 1px solid white;background-color:#676965;"><img id="mainImage" src=""></div>
 			</div>
 		</div>				
 	]]></clientForm>
