@@ -11,8 +11,13 @@ Class.create("SliderInput", {
 			range : $R(0, 1),
 			alignY : 6
 		}, options || { });
-				
-		
+
+		var original = this.options.onSlide;
+		this.options.onSlide = function(value){
+			original(value);
+			this.delay();
+		}.bind(this);
+			
 		this.buildGui();
 	},
 	
@@ -32,7 +37,7 @@ Class.create("SliderInput", {
 		document.observe("click", function(event){
 			var element = Event.findElement(event);
 			if(!element.descendantOf(this.holder) && element != this.input){
-				this.holder.hide();
+				this.hide();
 			}
 		}.bind(this));
 	},
@@ -42,8 +47,23 @@ Class.create("SliderInput", {
 		this.holder.setStyle(pos);
 		this.slider.setValue(parseFloat(this.input.value));
 		this.holder.show();
+		this.delay();
 	},
 	
+	hide : function(){
+		this.holder.hide();
+		if(this.timer) {
+			window.clearTimeout(this.timer);
+		}
+		this.input.blur();
+	},
+	
+	delay : function(){
+		if(this.timer) {
+			window.clearTimeout(this.timer);
+		}
+		this.timer = window.setTimeout(this.hide.bind(this), 3000);
+	},
 	
 	computeAnchorPosition : function(anchor){
 		var anchorPosition = Position.cumulativeOffset($(anchor));
