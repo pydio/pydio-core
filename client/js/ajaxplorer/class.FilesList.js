@@ -266,7 +266,12 @@ Class.create("FilesList", SelectableElements, {
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));			
-			this._sortableTable.onsort = this.redistributeBackgrounds.bind(this);
+			this._sortableTable.onsort = function(){
+				this.redistributeBackgrounds();
+				var ctxt = ajaxplorer.getContextNode();
+				ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
+				ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
+			}.bind(this);
 			if(this.paginationData && this.paginationData.get('remote_order') && parseInt(this.paginationData.get('total')) > 1){
 				this._sortableTable.setPaginationBehaviour(function(params){
 					this.reload(params);
@@ -586,6 +591,12 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "list" && (!this.paginationData || !this.paginationData.get('remote_order')))
 		{
 			this._sortableTable.sortColumn = -1;
+			this._sortableTable.updateHeaderArrows();
+		}
+		if(this._displayMode == "list" && contextNode.getMetadata().get("filesList.sortColumn")){
+			var sortColumn = parseInt(contextNode.getMetadata().get("filesList.sortColumn"));
+			var descending = contextNode.getMetadata().get("filesList.descending");
+			this._sortableTable.sort(sortColumn, descending);
 			this._sortableTable.updateHeaderArrows();
 		}
 		if(ajaxplorer.getContextHolder().getPendingSelection())
