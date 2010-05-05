@@ -659,6 +659,44 @@ a.carousel-control img{
 #current_path{
     padding-left:0px;
 }
+
+/********************************/
+/* SLIDER*/
+/*********************************/
+
+.slider-pane{
+	background-color:#f1f1ef;
+	border:1px solid #CCCCCC;
+	padding:5px 2px;
+	position:absolute;
+	width:11px;
+	z-index:10000;
+}
+
+.slider-handle,
+.slider-pane div.selected
+{
+	background-image:url("../images/slider-handle-vert.png");
+	background-position:top center;
+	background-repeat:no-repeat;
+	background-color: transparent !important;
+	height:15px;
+	width:10px;
+}
+
+.slider-tracker {
+	background-image : url("../images/slider-track-bottom.png");
+	background-position:bottom center;
+	background-repeat:no-repeat;
+}
+
+.slider-tracker-top {
+	background-image : url("../images/slider-track-top.png");
+	background-position:top center;
+	background-repeat:no-repeat;
+}
+
+
 /*********************************/
 /* FILE LIST SKINNING
 /********************************/

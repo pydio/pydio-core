@@ -37,6 +37,7 @@ Class.create("AbstractEditor" , {
 	defaultActions : new Hash(),
 	toolbarSeparator : '<div class="separator"></div>',
 	fullScreenMode : false,
+	editorOptions : new Hash({"fullscreen":true, "closable":true, "floatingToolbar":false}),
 	
 	initialize : function(oContainer){
 		this.element =  $(oContainer);
@@ -44,8 +45,7 @@ Class.create("AbstractEditor" , {
 			'fs' : '<a id="fsButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
 			'nofs' : '<a id="nofsButton" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
 			'close':'<a id="closeButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
-		});
-		this.editorOptions = new Hash({"fullscreen":true, "closable":true});
+		});		
 		this.createTitleSpans();
 		this.initActions();
 		modal.setCloseAction(function(){this.close();}.bind(this));
@@ -71,7 +71,7 @@ Class.create("AbstractEditor" , {
 			link.onclick = function(){return false;};
 			link.href = "#";
 			var span = link.select('span[message_id]')[0];			
-			span.update(MessageHash[span.readAttribute("message_id")]);
+			if(span) span.update(MessageHash[span.readAttribute("message_id")]);
 			this.actions.set(link.id, link);
 		}, this);
 		
@@ -89,6 +89,22 @@ Class.create("AbstractEditor" , {
 			this.actions.get("fsButton").show();
 			this.actions.get("nofsButton").hide();
 		}
+		
+		if(this.editorOptions.floatingToolbar){
+			this.makeToolbarFloatable();
+		}
+		
+	},
+	
+	makeToolbarFloatable : function(){
+		this.actionBar.absolutize();
+		this.actionBar.setStyle({
+			zIndex:(parseInt(this.element.getStyle("zIndex")) + 1000),
+			width : '',
+			top: '',
+			bottom : 20,
+			left : '30%'
+		});
 	},
 	
 	createTitleSpans : function(){

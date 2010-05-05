@@ -35,23 +35,59 @@
 Class.create("Diaporama", AbstractEditor, {
 
 	fullscreenMode: false,
+	_minZoom : 10,
+	_maxZoom : 500,
 	
 	initialize: function($super, oFormObject)
 	{
+		//this.editorOptions.floatingToolbar = true;
 		$super(oFormObject);
-		
 		this.nextButton = this.actions.get("nextButton");
 		this.previousButton = this.actions.get("prevButton");
 		this.downloadButton = this.actions.get("downloadDiapoButton");
 		this.playButton = this.actions.get("playButton");
-		this.stopButton = this.actions.get("stopButton");
+		this.stopButton = this.actions.get("stopButton");		
+		this.actualSizeButton = this.actions.get('actualSizeButton');
+		this.fitToScreenButton = this.actions.get('fitToScreenButton');
 		
-		this.actualSizeButton = this.element.select('img[id="actualSizeButton"]')[0];
-		this.fitToScreenButton = this.element.select('img[id="fitToScreenButton"]')[0];
 		this.imgTag = this.element.select('img[id="mainImage"]')[0];
+		this.imgBorder = this.element.select('div[id="imageBorder"]')[0];
 		this.imgContainer = this.element.select('div[id="imageContainer"]')[0];
-		this.zoomInput = this.element.select('input[id="zoomValue"]')[0];
+		this.zoomInput = this.element.select('input[id="zoomValue"]')[0];	
 		this.timeInput = this.element.select('input[id="time"]')[0];
+		
+		new SliderInput(this.zoomInput, {
+			onSlide:function(value){
+				this.setZoomValue(parseInt(value));
+				this.zoomInput.value = value + ' %';
+				this.resizeImage(false);				
+			}.bind(this),
+			range : $R(this._minZoom, this._maxZoom),
+			increment : 1
+		});
+		new SliderInput(this.timeInput, {
+			onSlide:function(value){				
+				this.timeInput.value = parseInt(value) + ' s';
+			}.bind(this),
+			onChange:function(value){
+				if(this.slideShowPlaying && this.pe){
+					this.stop();
+					this.play();
+				}
+			}.bind(this),
+			range : $R(1, 15),
+			increment : 1
+		});
+		
+		var inputStyle = {
+			backgroundImage:'url("'+ajxpResourcesFolder+'/images/locationBg.gif")',
+			backgroundPosition:'left top',
+			backgroundRepeat:'no-repeat'
+		};
+		this.zoomInput.setStyle(inputStyle);
+		this.timeInput.setStyle(inputStyle);
+		
+		
 		this.baseUrl = 'content.php?action=preview_data_proxy&file=';
 		this.nextButton.onclick = function(){
 			this.next();
@@ -69,11 +105,13 @@ Class.create("Diaporama", AbstractEditor, {
 			return false;
 		}.bind(this);
 		this.actualSizeButton.onclick = function(){
-			this.slider.setValue(100);
+			this.setZoomValue(100);
 			this.resizeImage(true);
+			return false;
 		}.bind(this);
 		this.fitToScreenButton.onclick = function(){
 			this.toggleFitToScreen();
+			return false;
 		}.bind(this);
 		this.playButton.onclick = function(){
 			this.play();
@@ -86,7 +124,11 @@ Class.create("Diaporama", AbstractEditor, {
 			return false;
 		}.bind(this);
 		
-		this.imgTag.onload = function(){
+		this.jsImage = new Image();
+		this.imgBorder.hide();
+		
+		this.jsImage.onload = function(){
+			this.imgTag.src = this.jsImage.src;
 			this.resizeImage(true);
 			this.downloadButton.removeClassName("disabled");
 			var text = getBaseName(this.currentFile) + ' ('+this.sizes.get(this.currentFile).width+' X '+this.sizes.get(this.currentFile).height+')';
@@ -99,9 +141,12 @@ Class.create("Diaporama", AbstractEditor, {
 				{
 					var crtValue = parseInt(this.zoomInput.value);
 					var value = (e.keyCode == Event.KEY_UP?(e.shiftKey?crtValue+10:crtValue+1):(e.shiftKey?crtValue-10:crtValue-1));
-					this.zoomInput.value = value;
+					this.zoomInput.value = value + ' %';
 				}
-				this.slider.setValue(this.zoomInput.value);
+				var newValue = parseInt(this.zoomInput.value);
+				newValue = Math.max(this._minZoom, newValue);
+				newValue = Math.min(this._maxZoom, newValue);
+				this.setZoomValue(newValue);
 				this.resizeImage(false);
 				Event.stop(e);
 			}
@@ -113,13 +158,13 @@ Class.create("Diaporama", AbstractEditor, {
 				this.play();
 			}
 		}.bind(this));
-		this.containerDim = $(this.imgContainer).getDimensions();
 		// Init preferences
 		if(ajaxplorer && ajaxplorer.user){
 			var autoFit = ajaxplorer.user.getPreference('diapo_autofit');
 			if(autoFit && autoFit == "true"){
 				this.autoFit = true;
-				this.fitToScreenButton.addClassName('diaporamaButtonActive');
+				this.fitToScreenButton.select('img')[0].src = ajxpResourcesFolder + '/images/actions/22/zoom-fit-restore.png';
+				this.fitToScreenButton.select('span')[0].update(MessageHash[326]);
 			}
 		}
 		this.contentMainContainer = this.imgContainer ;
@@ -127,11 +172,13 @@ Class.create("Diaporama", AbstractEditor, {
 			this.currentFile = null;
 			this.items = null;
 			this.imgTag.src = '';
-			this.stop();
+			if(this.slideShowPlaying){
+				this.stop();
+			}
 		}.bind(this) );
 		
 		this.element.observe("editor:enterFSend", function(e){this.resize();}.bind(this));
-		fitHeightToBottom(this.imgContainer, $(modal.elementName));
+		fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
 	},
 	
 	resize : function(size){
@@ -141,7 +188,7 @@ Class.create("Diaporama", AbstractEditor, {
 			if(this.fullScreenMode){
 				fitHeightToBottom(this.imgContainer, this.element);
 			}else{
-				fitHeightToBottom(this.imgContainer, $(modal.elementName));
+				fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
 			}
 		}
 		this.resizeImage();
@@ -172,42 +219,46 @@ Class.create("Diaporama", AbstractEditor, {
 		if(!sCurrentFile && this.items.length) sCurrentFile = this.items[0];		
 		this.currentFile = sCurrentFile;
 		
-		var sliderDiv = this.element.select('div[id="slider-2"]')[0];
-		var sliderInput = this.element.select('input[id="slider-input-2"]')[0];
-		this.slider = new Slider(sliderDiv, sliderInput);
-		this.slider.setMaximum(200);
-		this.slider.setMinimum(10);	
-		this.slider.setValue(100);
-		this.zoomInput.value = '100';
-		this.slider.recalculate();
-		this.slider.onchange = function(){
-			this.resizeImage(false);
-		}.bind(this);
-	
+		this.setZoomValue(100);
+		this.zoomInput.value = '100 %';	
 		this.updateImage();
 		this.updateButtons();
 	},
 		
 	resizeImage : function(morph){	
-		if(this.autoFit){
+		if(this.autoFit && morph){
 			this.computeFitToScreenFactor();
 		}
-		var nPercent = this.slider.getValue();
-		this.zoomInput.value = nPercent;
+		var nPercent = this.getZoomValue();
+		this.zoomInput.value = nPercent + ' %';
 		var height = parseInt(nPercent*this.crtHeight / 100);	
 		var width = parseInt(nPercent*this.crtWidth / 100);
 		// Center vertically
-		var margin=0;
+		var marginTop=0;
+		var marginLeft=0;
+		this.containerDim = $(this.imgContainer).getDimensions();		
 		if (height < this.containerDim.height){
-			var margin = parseInt((this.containerDim.height - height) / 2)-5;
+			marginTop = parseInt((this.containerDim.height - height) / 2);
 		}
-		if(morph){
-			new Effect.Morph(this.imgTag,{
-				style:{height:height+'px', width:width+'px',margin:margin+'px'}, 
-				duration:0.5
-				});
+		if (width < this.containerDim.width){
+			marginLeft = parseInt((this.containerDim.width - width) / 2);
+		}
+		if(morph && this.imgBorder.visible()){
+			new Effect.Morph(this.imgBorder,{
+				style:{height:height+'px', width:width+'px',marginTop:marginTop+'px',marginLeft:marginLeft+'px'}, 
+				duration:0.5,
+				afterFinish : function(){
+					this.imgTag.setStyle({height:height+'px', width:width+'px'});
+					new Effect.Opacity(this.imgTag, {from:0,to:1.0, duration:0.3});
+				}.bind(this)
+			});
 		}else{
-			this.imgTag.setStyle({height:height+'px', width:width+'px',margin:margin+'px'});
+			this.imgBorder.setStyle({height:height+'px', width:width+'px',marginTop:marginTop+'px',marginLeft:marginLeft+'px'});
+			this.imgTag.setStyle({height:height+'px', width:width+'px'});
+			if(!this.imgBorder.visible()){
+				this.imgBorder.show();
+				new Effect.Opacity(this.imgTag, {from:0,to:1.0, duration:0.3});
+			}
 		}
 	},
 	
@@ -220,14 +271,24 @@ Class.create("Diaporama", AbstractEditor, {
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
 		this.downloadButton.addClassName("disabled");
-		this.imgTag.src  = this.baseUrl + encodeURIComponent(this.currentFile);
-		if(!this.crtWidth && !this.crtHeight){
-			this.crtWidth = this.imgTag.getWidth();
-			this.crtHeight = this.imgTag.getHeight();
-			this.crtRatio = this.crtHeight / this.crtWidth;
-		}
+		new Effect.Opacity(this.imgTag, {afterFinish : function(){
+			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile);
+			if(!this.crtWidth && !this.crtHeight){
+				this.crtWidth = this.imgTag.getWidth();
+				this.crtHeight = this.imgTag.getHeight();
+				this.crtRatio = this.crtHeight / this.crtWidth;
+			}
+		}.bind(this), from:1.0,to:0, duration:0.3});	
 	},
 
+	setZoomValue : function(value){
+		this.zoomValue = value;
+	},
+	
+	getZoomValue : function(value){
+		return this.zoomValue;
+	},
+	
 	fitToScreen : function(){
 		this.computeFitToScreenFactor();
 		this.resizeImage(true);
@@ -236,19 +297,28 @@ Class.create("Diaporama", AbstractEditor, {
 	computeFitToScreenFactor: function(){
 		zoomFactor1 = parseInt(this.imgContainer.getHeight() / this.crtHeight * 100);
 		zoomFactor2 = parseInt(this.imgContainer.getWidth() / this.crtWidth * 100);
-		this.slider.setValue(Math.min(zoomFactor1, zoomFactor2)-1);		
+		var zoomFactor = Math.min(zoomFactor1, zoomFactor2)-1;
+		zoomFactor = Math.max(this._minZoom, zoomFactor);
+		zoomFactor = Math.min(this._maxZoom, zoomFactor);		
+		this.setZoomValue(zoomFactor);		
 	},
 	
-	toggleFitToScreen:function(){
+	toggleFitToScreen:function(skipSave){
+		var src = '';
+		var id;
 		if(this.autoFit){
 			this.autoFit = false;
-			this.fitToScreenButton.removeClassName('diaporamaButtonActive');
+			src = 'zoom-fit-best';
+			id = 325;
 		}else{
 			this.autoFit = true;
-			this.fitToScreenButton.addClassName('diaporamaButtonActive');
+			src = 'zoom-fit-restore';
+			id = 326;
 			this.fitToScreen();
 		}
-		if(ajaxplorer && ajaxplorer.user){
+		this.fitToScreenButton.select('img')[0].src = ajxpResourcesFolder + '/images/actions/22/'+src+'.png';
+		this.fitToScreenButton.select('span')[0].update(MessageHash[id]);
+		if(ajaxplorer && ajaxplorer.user && !skipSave){
 			ajaxplorer.user.setPreference("diapo_autofit", (this.autoFit?'true':'false'));
 			ajaxplorer.user.savePreferences();
 		}
