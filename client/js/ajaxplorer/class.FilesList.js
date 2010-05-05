@@ -281,7 +281,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else if(this._displayMode == "thumb")
 		{			
-			var buffer = '<div class="panelHeader"><div style="float:right;"><div class="slider" id="slider-1"><input class="slider-input" id="slider-input-1" name="slider-input-1"/></div></div>'+MessageHash[126]+'</div>';
+			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div" style="overflow:auto; padding:2px 5px;">';
 			this.htmlElement.update(buffer);
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
@@ -297,24 +297,22 @@ Class.create("FilesList", SelectableElements, {
 			}
 
 			
-			this.slider = new Slider($("slider-1"), $("slider-input-1"));		
-			this.slider.setMaximum(250);
-			this.slider.setMinimum(30);		
-			this.slider.recalculate();
-			this.slider.setValue(this._thumbSize);		
-			this.slider.onchange = function()
-			{
-				this._thumbSize = this.slider.getValue();
-				this.resizeThumbnails();
-				if(!ajaxplorer || !ajaxplorer.user) return;
-				
-				if(this.sliderTimer) clearTimeout(this.sliderTimer);
-				this.sliderTimer = setTimeout(function(){
+			this.slider = new SliderInput($("slider-input-1"), {
+				range : $R(30, 250),
+				sliderValue : this._thumbSize,
+				leftOffset:0,
+				onSlide : function(value)
+				{
+					this._thumbSize = value;
+					this.resizeThumbnails();
+				}.bind(this),
+				onChange : function(value){
+					if(!ajaxplorer || !ajaxplorer.user) return;
 					ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
-					ajaxplorer.user.savePreferences();
-				}.bind(this), 100);
-				
-			}.bind(this);
+					ajaxplorer.user.savePreferences();								
+				}.bind(this)
+			});
+
 			this.disableTextSelection($('selectable_div'));
 			this.initSelectableItems($('selectable_div'), true);
 		}	
