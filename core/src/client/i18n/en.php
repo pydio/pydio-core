@@ -362,5 +362,8 @@ $mess=array(
 "322" => "Select the current file",
 "323" => "E-mail this URL",
 "324" => "No editor available",
+"325" => "Fit Best",
+"326" => "No Fit",
+"327" => "100%"
 );
 ?>

@@ -7,8 +7,6 @@ js/ajaxplorer/class.AjxpPane.js
 js/ajaxplorer/class.AjxpNode.js
 js/lib/ufo/ufo.js
 js/lib/md5/md5.js
-js/lib/webfx/slider/js/timer.js
-js/lib/webfx/slider/js/range.js
 js/lib/prototype/webfx.selectable.js
 js/lib/prototype/webfx.sortable.js
 js/lib/prototype/proto.menu.js
@@ -20,6 +18,7 @@ js/lib/scriptaculous/src/builder.js
 js/lib/scriptaculous/src/effects.js
 js/lib/scriptaculous/src/dragdrop.js
 js/lib/scriptaculous/src/controls.js
+js/lib/scriptaculous/src/slider.js
 js/lib/prototype/shadower.js
 js/lib/prototype/corners.js
 js/lib/prototype/carousel.js
@@ -38,6 +37,7 @@ js/ajaxplorer/class.LocationBar.js
 js/ajaxplorer/class.UserWidget.js
 js/ajaxplorer/class.AjxpAutoCompleter.js
 js/ajaxplorer/class.TreeSelector.js
+js/ajaxplorer/class.SliderInput.js
 js/ajaxplorer/class.Action.js
 js/ajaxplorer/class.ActionsManager.js
 js/ajaxplorer/class.ActionsToolbar.js
