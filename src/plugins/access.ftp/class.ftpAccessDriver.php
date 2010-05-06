@@ -69,6 +69,7 @@ class ftpAccessDriver extends fsAccessDriver {
 					$nextFile = $this->getFileNameToCopy();
 				}
 				$destPath = $this->urlBase.base64_decode($fData['destination'])."/".$fData['name'];
+				$destPath = SystemTextEncoding::fromPostedFileName($destPath);
 				AJXP_Logger::debug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath));
 				try {
 					$fp = fopen($destPath, "w");
