@@ -236,8 +236,14 @@ class AJXP_XMLWriter
 		$buffer = "";
 		$loggedUser = AuthService::getLoggedUser();
 		if($userObject != null) $loggedUser = $userObject;
-		if($loggedUser != null)
-		{
+		if(!AuthService::usersEnabled()){
+			$buffer.="<user id=\"shared\">";
+			if(!$details){
+				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"1\" read=\"1\"/>";
+			}
+			$buffer.= AJXP_XMLWriter::writeRepositoriesData(null, $details);
+			$buffer.="</user>";	
+		}else if($loggedUser != null){
 			$buffer.="<user id=\"".$loggedUser->id."\">";
 			if(!$details){
 				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>";
@@ -272,7 +278,7 @@ class AJXP_XMLWriter
 		{		
 			$toLast = false;
 			if($rootDirObject->getAccessType()=="ajxp_conf"){
-				if(ENABLE_USERS && !$loggedUser->isAdmin()){
+				if(AuthService::usersEnabled() && !$loggedUser->isAdmin()){
 					continue;
 				}else{
 					$toLast = true;
