@@ -41,10 +41,15 @@ class AbstractAuthDriver extends AJXP_Plugin {
 					
 	public function getRegistryContributions(){
 		$logged = AuthService::getLoggedUser();
-		if($logged == null) {
-			return $this->registryContributions;
-		}
-		$xmlString = AJXP_XMLWriter::getUserXml($logged, false);
+		if(AuthService::usersEnabled()) {
+			if($logged == null){
+				return $this->registryContributions;
+			}else{
+				$xmlString = AJXP_XMLWriter::getUserXml($logged, false);
+			}
+		}else{
+			$xmlString = AJXP_XMLWriter::getUserXml(null, false);
+		}		
 		$dom = new DOMDocument();
 		$dom->loadXML($xmlString);
 		$this->registryContributions[]=$dom->documentElement;		

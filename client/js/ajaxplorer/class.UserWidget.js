@@ -82,7 +82,7 @@ Class.create("UserWidget", {
 				selector.insert(option);
 			});
 			selector.setValue(userLang);
-			if(window.ajxpBootstrap.parameters.get("userChangePassword")){
+			if(ajaxplorer.usersEnabled && window.ajxpBootstrap.parameters.get("userChangePassword")){
 				$('user_pref_change_password').show();
 				$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
 				// Update pass_seed
