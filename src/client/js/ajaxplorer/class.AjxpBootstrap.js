@@ -127,6 +127,9 @@ Class.create("AjxpBootstrap", {
 		html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\''+ajxpResourcesFolder+'/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
 		html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';
 		html+='	Written by Charles du Jeu - LGPL License. <br>';
+		if(this.parameters.get('customWelcomeMessage')){
+			html+= this.parameters.get('customWelcomeMessage') + '<br>';
+		}
 		html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
 		html+='	</div></div>';
 		$$('body')[0].insert({top:html});
