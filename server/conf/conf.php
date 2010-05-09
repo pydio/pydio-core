@@ -229,6 +229,11 @@ define("GOOGLE_ANALYTICS_DOMAIN", "");
 // at the moment.
 define("GOOGLE_ANALYTICS_EVENT", false);
 
+/***********************************************/
+/* CUSTOM MESSAGE IN START UP SCREEN
+/***********************************************/
+$welcomeCustomMessage = "";
+
 /*********************************************/
 /* WEBMASTER EMAIL / NOT USED AT THE MOMENT!!
 /*********************************************/
