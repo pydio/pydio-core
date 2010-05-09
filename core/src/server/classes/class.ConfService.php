@@ -68,6 +68,7 @@ class ConfService
         $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];
         $this->configs["ACTIVE_PLUGINS"] = $ACTIVE_PLUGINS;
         $this->configs["PROBE_REAL_SIZE"] = $allowRealSizeProbing;
+        $this->configs["WELCOME_CUSTOM_MSG"] = $welcomeCustomMessage;
 		$this->initConfStorageImplInst($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
 		$this->initAuthDriverImplInst();
 		$this->configs["REPOSITORIES"] = $this->initRepositoriesListInst($this->configs["DEFAULT_REPOSITORIES"]);
