@@ -98,7 +98,7 @@ class ftpAccessDriver extends fsAccessDriver {
 					$fancyLoader = true;
 				}
 				if($httpVars['dir']!="") {
-					$rep_source = AJXP_Utils::securePath("/".base64_decode($httpVars['dir']));
+					$rep_source = AJXP_Utils::securePath("/".($fancyLoader?base64_decode($httpVars['dir']):$httpVars['dir']));
 				}
 				AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
 
