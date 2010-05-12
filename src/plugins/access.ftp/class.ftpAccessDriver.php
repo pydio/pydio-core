@@ -68,9 +68,10 @@ class ftpAccessDriver extends fsAccessDriver {
 				if($this->hasFilesToCopy()){
 					$nextFile = $this->getFileNameToCopy();
 				}
+				AJXP_Logger::debug("Base64 : ", array("from"=>$fData["destination"], "to"=>base64_decode($fData['destination'])));
 				$destPath = $this->urlBase.base64_decode($fData['destination'])."/".$fData['name'];
 				$destPath = SystemTextEncoding::fromPostedFileName($destPath);
-				AJXP_Logger::debug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath));
+				AJXP_Logger::debug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
 				try {
 					$fp = fopen($destPath, "w");
 					$fSource = fopen($fData["tmp_name"], "r");
@@ -94,13 +95,13 @@ class ftpAccessDriver extends fsAccessDriver {
 			case "upload":
 				$fancyLoader = false;
 				$rep_source = "/";
-				if(isSet($fileVars["Filedata"])){
+				if(isSet($filesVars["Filedata"])){
 					$fancyLoader = true;
 				}
 				if($httpVars['dir']!="") {
 					$rep_source = AJXP_Utils::securePath("/".($fancyLoader?base64_decode($httpVars['dir']):$httpVars['dir']));
 				}
-				AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
+				AJXP_Logger::debug("Upload : rep_source ", array($rep_source, "fancy?"=>$fancyLoader));
 
 				$logMessage = "";
 				//$fancyLoader = false;
@@ -108,6 +109,7 @@ class ftpAccessDriver extends fsAccessDriver {
 				{
 					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")     continue;
 					if($boxName == "Filedata") $fancyLoader = true;
+					AJXP_Logger::debug("Upload : rep_source ", array($rep_source, "fancy?"=>$fancyLoader));
 					$err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
 					if($err != null)
 					{
