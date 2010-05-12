@@ -107,6 +107,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     	if(isSet($this->fp) && $this->fp!=-1 && $this->fp!==false){
     		if($this->crtMode == 'write'){
     			rewind($this->fp);
+    			AJXP_Logger::debug("Ftp_fput", array("target"=>$this->crtTarget));
     			ftp_fput($this->crtLink, $this->crtTarget, $this->fp, FTP_BINARY);
     		}else{
 		    	fflush($this->fp);
