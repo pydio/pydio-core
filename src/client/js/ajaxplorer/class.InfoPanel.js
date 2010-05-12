@@ -168,8 +168,8 @@ Class.create("InfoPanel", AjxpPane, {
 		var panelWidth = this.htmlElement.getWidth();
 		var oThis = this;
 		if(fileNode){
-			var metadata = fileNode.getMetadata();
-			tAttributes.each(function(attName){
+			var metadata = fileNode.getMetadata();			
+			tAttributes.each(function(attName){				
 				if(attName == 'basename' && metadata.get('filename')){
 					this[attName] = getBaseName(metadata.get('filename'));						
 				}
@@ -234,8 +234,8 @@ Class.create("InfoPanel", AjxpPane, {
 		}
 		var fakes = this.htmlElement.select('div[id="preview_rich_fake_element"]');
 		if(fakes && fakes.length){
-			this.currentPreviewElement = this.getPreviewElement(fileNode, false);
-			fakes[0].parentNode.replaceChild(this.currentPreviewElement, fakes[0]);
+			this.currentPreviewElement = this.getPreviewElement(fileNode, false);			
+			$(fakes[0]).replace(this.currentPreviewElement);			
 			this.resize();
 		}
 	},
@@ -265,7 +265,7 @@ Class.create("InfoPanel", AjxpPane, {
 			var editorClass = Class.getByName(editors[0].editorClass);
 			if(editorClass){
 				if(getTemplateElement){
-					return '<div id="preview_rich_fake_element"/>'
+					return '<div id="preview_rich_fake_element"></div>'
 				}else{
 					var element = editorClass.prototype.getPreview(ajxpNode, true);
 					return element;	
