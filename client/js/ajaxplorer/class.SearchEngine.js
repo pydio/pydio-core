@@ -41,6 +41,8 @@ Class.create("SearchEngine", AjxpPane, {
 	state: 'idle',
 	_runningQueries:undefined,
 	_queriesIndex:0,
+	
+	_queue : undefined,
 
 	initialize: function($super, mainElementName)
 	{
@@ -58,6 +60,7 @@ Class.create("SearchEngine", AjxpPane, {
 		this._resultsBoxId = 'search_results';
 		this._searchButtonName = "search_button";
 		this._runningQueries = new Array();
+		this._queue = $A([]);
 		
 		$('stop_'+this._searchButtonName).addClassName("disabled");
 		
@@ -133,17 +136,21 @@ Class.create("SearchEngine", AjxpPane, {
 	search : function(){
 		var text = this._inputBox.value;
 		if(text == '') return;
+		this.crtText = text.toLowerCase();
 		this.updateStateSearching();
 		this.clearResults();
 		var folder = ajaxplorer.getContextNode().getPath();
 		if(folder == "/") folder = "";
-		this.searchFolderContent(text, folder);
+		window.setTimeout(function(){
+			this.searchFolderContent(folder);
+		}.bind(this), 0);		
 	},
 	
 	interrupt : function(){
 		// Interrupt current search
 		if(this._state == 'idle') return;
 		this._state = 'interrupt';
+		this._queue = $A();
 	},
 	
 	updateStateSearching : function (){
@@ -159,21 +166,7 @@ Class.create("SearchEngine", AjxpPane, {
 		$(this._searchButtonName).removeClassName("disabled");
 		$('stop_'+this._searchButtonName).addClassName("disabled");
 	},
-	
-	registerQuery : function(queryId){
-		this._runningQueries.push(''+queryId);
-	},
-	
-	unregisterQuery : function(queryId){
-		// USES PROTOTYPE WITHOUT() FUNCTION
-		this._runningQueries = this._runningQueries.without(''+queryId);
-		if(this._runningQueries.length == 0)
-		{
-			if(this._state == 'searching') this.updateStateFinished(false);
-			else if(this._state == 'interrupt') this.updateStateFinished(true);
-		}
-	},
-	
+		
 	clear: function(){
 		this.clearResults();
 		if(this._inputBox){
@@ -220,25 +213,40 @@ Class.create("SearchEngine", AjxpPane, {
 		}
 	},
 	
-	searchFolderContent : function(text, currentFolder){
-		if(this._state == 'interrupt') return;
-		this._queriesIndex ++;
-		var queryIndex = this._queriesIndex;
-		this.registerQuery(this._queriesIndex);
+	appendFolderToQueue : function(path){
+		this._queue.push(path);
+	},
+	
+	searchNext : function(){
+		if(this._queue.length){
+			var path = this._queue.first();
+			this._queue.shift();
+			this.searchFolderContent(path);
+		}else{
+			this.updateStateFinished();
+		}
+	},
+	
+	searchFolderContent : function(currentFolder){
+		if(this._state == 'interrupt') {
+			this.updateStateFinished();
+			return;
+		}
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'ls');
 		connexion.addParameter('options', 'a');
 		connexion.addParameter('dir', currentFolder);
 		connexion.onComplete = function(transport){
-			this._parseXmlAndSearchString(transport.responseXML, text, currentFolder, queryIndex);
+			this._parseXmlAndSearchString(transport.responseXML, currentFolder);
+			this.searchNext();
 		}.bind(this);
 		connexion.sendAsync();
 	},
 	
-	_parseXmlAndSearchString : function(oXmlDoc, text, currentFolder, queryIndex){
+	_parseXmlAndSearchString : function(oXmlDoc, currentFolder){
 		if(this._state == 'interrupt')
 		{
-			this.unregisterQuery(queryIndex);
+			this.updateStateFinished();
 			return;
 		}
 		if( oXmlDoc == null || oXmlDoc.documentElement == null) 
@@ -257,18 +265,18 @@ Class.create("SearchEngine", AjxpPane, {
 				{
 					
 					var icon = cs[i].getAttribute('icon');
-					if(cs[i].getAttribute('text').toLowerCase().indexOf(text.toLowerCase()) != -1)
+					if(cs[i].getAttribute('text').toLowerCase().indexOf(this.crtText) != -1)
 					{
 						this.addResult(currentFolder, cs[i].getAttribute('text'), icon);
 					}
 					if(cs[i].getAttribute('is_file') == "false")
 					{
-						//this.searchFolderContent(text, currentFolder+"/"+cs[i].getAttribute('text'));
-						this.searchFolderContent(text, cs[i].getAttribute('filename'));
+						var newPath = cs[i].getAttribute('filename');
+						//this.searchFolderContent(newPath);
+						this.appendFolderToQueue(newPath);
 					}
 				}
 			}		
 		}
-		this.unregisterQuery(queryIndex);
 	}
 });
