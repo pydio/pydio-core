@@ -2,8 +2,8 @@
 /**************************************************/
 /*	ADVANCED : DO NOT CHANGE THESE VARIABLES BELOW
 /**************************************************/
-define("AJXP_VERSION", "2.7.1");
-define("AJXP_VERSION_DATE", "2010/04/04");
+define("AJXP_VERSION", "2.7.2");
+define("AJXP_VERSION_DATE", "2010/05/15");
 
 $installPath = realpath(dirname(__FILE__)."/../..");
 define("INSTALL_PATH", $installPath);
