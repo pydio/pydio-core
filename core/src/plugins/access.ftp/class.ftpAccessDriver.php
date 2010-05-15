@@ -518,13 +518,14 @@ class ftpAccessDriver extends  AbstractAccessDriver
 				exit(1);
                         break;
                         case "upload":
-                                $fancyLoader = false;
-                                if(isSet($fileVars["Filedata"])){
-                                        $fancyLoader = true;
-                                        if($httpVars['dir']!="") $httpVars['dir'] = "/".base64_decode($httpVars['dir']);
-                                }
-                                if(isSet($httpVars['dir']) && $httpVars['dir']!=""){$rep_source=$httpVars['dir'];}
-                                else $rep_source = "/";
+								$fancyLoader = false;
+								$rep_source = "/";
+								if(isSet($filesVars["Filedata"])){
+									$fancyLoader = true;
+								}
+								if($httpVars['dir']!="") {
+									$rep_source = Utils::securePath("/".($fancyLoader?base64_decode($httpVars['dir']):$httpVars['dir']));
+								}
                                 $logMessage = "";
                                 //$fancyLoader = false;                         
                                 foreach ($filesVars as $boxName => $boxData)
@@ -537,7 +538,7 @@ class ftpAccessDriver extends  AbstractAccessDriver
                                                 $errorMessage = $err;
                                                 break;
                                         }
-                                        $boxData["destination"] = $rep_source;
+                                        $boxData["destination"] = base64_encode($rep_source);
                                         $destCopy = INSTALL_PATH."/tmp";
                                         if(!is_dir($destCopy)){
                                                 if(! @mkdir($destCopy)){
