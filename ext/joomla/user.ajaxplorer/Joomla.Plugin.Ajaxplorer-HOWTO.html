@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<title>AjaXplorer Joomla Bridge</title>
+		<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type" />
+	</head>
+	<body bgcolor="#FFFFFF" text="#000000">
+		<p>
+			This is the bridge between a Joomla installation and an AjaXplorer. The aim is to provide a single-signon mechanism based on the Joomla users system : users logged in joomla must have access to repositories of AjaXplorer. <strong><em>It&#39;s never totally evident to interface two different softwares, so don&#39;t expect it to be magical, and please follow the steps carefully and in this order.</em></strong></p>
+		<h3>
+			1/ Base Installation</h3>
+		<p>
+			<strong>1.1 Install AjaXplorer and Joomla</strong><br />
+			First of all, make sure you have AjaXplorer 2.6 installed and Joomla 1.5. If you are reading this file, you may also have already unpacked the bridge distribution and you have two zips,&nbsp;ajxp-2.6-joomla-path.zip and&nbsp;joomla.user.ajaxplorer.zip.</p>
+		<p>
+			<strong>1.2 Patch AjaXplorer distribution</strong><br />
+			Unpack and patch the AjaXplorer distribution with the content of ajxp-2.6-joomla-path.zip. You can safely overwrite your installation, no configuration file will be erased.</p>
+		<p>
+			<strong>1.3 Install Joomla plugin</strong><br />
+			Unpack the joomla.user.ajaxplorer.zip inside the &quot;<em>tmp</em>&quot; folder of your Joomla installation.</p>
+		<h3>
+			2/ AjaXplorer configuration</h3>
+		<p>
+			<strong>2.1 Create administrator</strong><br />
+			If it&#39;s not already done, with the standard ajaxplorer authentication mechanism, be sure that at least an &quot;admin&quot; user is created.</p>
+		<p>
+			<strong>2.2 Guest Browsing</strong><br />
+			If you intend to allow guest browsing, in <em>conf.php</em>, set &quot;ALLOW_GUEST_BROWSING&quot; to 1 and if you are logged, log out. This should create the &quot;guest&quot; user. As admin, log back to the interface and create a &quot;Guest&quot; Repository. Go to the users section and grant access (read only may be better) to this repository to the &quot;guest&quot; user. Now, when you log out, you should have access to this repository.</p>
+		<p>
+			<strong>2.3 Repositories</strong><br />
+			Now create one or many repositories that you will want your joomla logged users to access. You can use the AJXP_USER keyword inside the repository PATH if you want to create automatically &quot;personnal&quot; folders for each users. Considering the acces rights, the trick here would be to set a DEFAULT_RIGHT value to &quot;rw&quot;, so that you don&#39;t have to manually edit the users rights each time you add them.</p>
+		<h4>
+			2.4 Log out&nbsp;<span class="Apple-style-span" style="font-weight: normal; ">of AjaXplorer</span></h4>
+		<p>
+			<strong>2.5 Auth.remote configuration</strong><br />
+			<span class="Apple-style-span" style="font-weight: normal; ">Now go back to your conf.php and set the Authentification driver to be the <strong>auth.remote</strong>. There is a commented sample in the conf.php aimed at wordpress user, you should use the following values :</span></p>
+		<pre>
+		$AUTH_DRIVER = array(&nbsp;
+&quot;NAME&quot; =&gt; &quot;remote&quot;,
+&quot;OPTIONS&quot; =&gt; array(
+&quot;SLAVE_MODE&quot; =&gt; true,
+&quot;USERS_FILEPATH&quot; =&gt; &quot;AJXP_INSTALL_PATH/server/users/users.ser&quot;,
+&quot;LOGIN_URL&quot; =&gt; &quot;/joomla/&quot;,
+&quot;LOGOUT_URL&quot; =&gt; &quot;/joomla/&quot;,
+&quot;SECRET&quot; =&gt; &quot;my_own_private_joomla_key&quot;,
+&quot;TRANSMIT_CLEAR_PASS&quot; =&gt; false)
+);</pre>
+		<p>
+			What you should edit here are only LOGIN_URL, LOGOUT_URL and SECRET. LOGIN&amp;LOGOUT should point to your joomla installation URL on the server (URL, not the folder path from the server root). For example, here we consider joomla to be found at http://www.mydomain.com/joomla/. The SECRET key is what will assure AjaXplorer that the authentification operations called programmatically are indeed called by a trustee. You may put whatever you want, it will be a configuration of the Joomla Ajaxplorer plugin.&nbsp;</p>
+		<p>
+			<strong>2.6 Checks</strong><br />
+			<span class="Apple-style-span" style="font-weight: normal; ">Now if you are logged out, when you go to AjaXplorer URL, if you have enabled guest browsing you should have access to the Guest repository and clicking on the &quot;Back&quot; button should send you to Joomla. If &quot;guest&quot; is not enabled, you should be automatically redirected to Joomla.</span></p>
+		<h3>
+			3/ Joomla Configuration</h3>
+		<p>
+			<strong>3.1 Install Extension</strong><br />
+			Login to Joomla adminstration front-end and go to &quot;Extensions &gt; Install/Uninstall&quot;. Normally, the &quot;Install from a folder&quot; section should be already filled with your &quot;tmp&quot; folder path. Click &quot;Install&quot; beside this field. It should install successfully the User - AjaXplorer plugin.</p>
+		<p>
+			<strong>3.2 Activate and Configure the new plugin</strong><br />
+			Go to &quot;Extension &gt; Manage Plugins&quot; and find the User - AjaXplorer plugin module in the list. You can select the plugin type &quot;user&quot; to filter the list. Click in the &quot;Active&quot; column to activate this plugin, then enter the plugin configuration. There are three parameters to configure for this plugin :&nbsp;</p>
+		<ul>
+			<li>
+				<strong>AjaXplorer Install Path</strong> : here you have to enter the full path to the AjaXplorer installation. &quot;Full path&quot; in the sense of the server filesystem. On Windows, it could be C:/Programs/ApacheData/html/ajaxplorer, or Linux more probably /var/www/html/AjaXplorer. In any cases, use &quot;slashes&quot; and not backslashes, and take care that names are case sensitive.</li>
+			<li>
+				<strong>Secret Key</strong> : here you&#39;ll have to enter the &quot;SECRET&quot; you entered in the AjaXplorer conf.php configuration file. If it&#39;s not the same, it will (silently) not work.</li>
+			<li>
+				<strong>Auto Create Users</strong> : This option is useful specially if you are installing this &quot;bridge&quot; when already managing many users in a Joomla installation. By default (&quot;no&quot;), Users will be created in AjaXplorer only by a joomla administrator action of creating a Joomla users. Existing users will not be recognized by AjaXplorer. If you set to &quot;Auto create&quot;, existing users will be automatically created when a user logs in to Joomla.</li>
+		</ul>
+		<p>
+			Save the module configuration.</p>
+		<p>
+			<strong>3.3 Use!</strong><br />
+			Now everything should be connected, and you can try the following : create an Administrator user and a simple user in Joomla. Log in to Joomla as these user and check that you are recognized in AjaXplorer, and further more, that the administrator has AjaXplorer administration rights. If you want to enable the guest mechanism in AjaXplorer, log out from Joomla and check that you are recognized as &quot;guest&quot; in AjaXplorer.</p>
+	</body>
+</html>
