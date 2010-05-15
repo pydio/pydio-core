@@ -397,7 +397,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					if($fancyLoader) $userfile_name = SystemTextEncoding::fromUTF8($userfile_name);
 					$userfile_name=Utils::processFileName($userfile_name);
 					if(isSet($auto_rename)){
-						$userfile_name = fsDriver::autoRenameForDest($destination, $userfile_name);
+						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
 					}
 					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
 					{
