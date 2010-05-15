@@ -44,12 +44,18 @@ class PHPSession extends AbstractTest
     	include("../conf/conf.php");
     	$tmpDir = session_save_path();    	
     	$this->testedParams["Session Save Path"] = $tmpDir;
-    	$this->testedParams["Session Save Path Writeable"] = is_writable($tmpDir);
-    	if(!$this->testedParams["Session Save Path Writeable"]){
-    		$this->failedLevel = "error";
-    		$this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
-    		return FALSE;
-    	}    	
+    	if($tmpDir != ""){
+	    	$this->testedParams["Session Save Path Writeable"] = is_writable($tmpDir);
+	    	if(!$this->testedParams["Session Save Path Writeable"]){
+	    		$this->failedLevel = "error";
+	    		$this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
+	    		return FALSE;
+	    	}    	
+    	}else{
+    		$this->failedLevel = "warning";
+    		$this->failedInfo = "Warning, it seems that your temporary folder used to save session data is not set. If you are encountering troubles with logging and sessions, please check session.save_path in your php.ini. Otherwise you can ignore this.";
+    		return FALSE;    		
+    	}
         $this->failedLevel = "info";
         return FALSE;
     }
