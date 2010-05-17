@@ -41,6 +41,8 @@ $DRIVER_CONF = array(
 	 * working syntax : backslashes, no spaces in dirs, full path.
 	 * Will be more straightforward for linux.
 	 */
-	"IMAGE_MAGICK_CONVERT" => "C:\PROGRA~1\ImageMagick-6.6.0-Q16\convert.exe"
+	"IMAGE_MAGICK_CONVERT"	=> "C:\PROGRA~1\ImageMagick-6.6.0-Q16\convert.exe",
+	"IM_THUMB_QUALITY"		=> 65,
+	"IM_VIEWER_QUALITY"		=> 90
 );
 ?>

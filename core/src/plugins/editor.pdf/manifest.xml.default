@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.pdf" openable="false" text="186" title="136" icon="frame_image.png" className="PdfPreviewer" mimes="pdf">
+<editor id="editor.pdf" openable="true"  formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="PdfPreviewer" mimes="pdf">
 	<class_definition filename="plugins/editor.pdf/class.PdfPreviewer.php" classname="PdfPreviewer"/>
 	<resources>
 		<js file="plugins/editor.pdf/class.PdfPreviewer.js" className="PdfPreviewer"/>
@@ -11,10 +11,21 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
+			<action name="delete_pdf_data">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="get_extracted_page">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
 		</actions>
 	</registry_contributions>
 	<dependencies>
+		<pluginResources pluginName="editor.diaporama"/>
 		<!-- Stream Wrapper must be implemented -->
-		<activePlugin pluginName="access.fs|access.ftp"/>
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
 	</dependencies>				
 </editor>

@@ -384,7 +384,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="get" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,AJXP_MIMES_IMAGE" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,AJXP_MIMES_IMAGE,pdf" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<subMenu>
 				<dynamicBuilder><![CDATA[
