@@ -49,6 +49,9 @@ class PdfPreviewer extends AJXP_Plugin {
     	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
 		    	
 		if($action == "pdf_data_proxy"){
+			$extractAll = false;
+			if(isSet($httpVars["all"])) $extractAll = true;			
+			
 			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
 			$fp = fopen($destStreamURL."/".$file, "r");
 			$tmpFileName = sys_get_temp_dir()."/ajxp_tmp_".md5(time()).".pdf";
@@ -62,21 +65,61 @@ class PdfPreviewer extends AJXP_Plugin {
 			$out = array();
 			$return = 0;
 			$tmpFileThumb = str_replace(".pdf", ".jpg", $tmpFileName);
-			register_shutdown_function("unlink", $tmpFileThumb);
+			if(!$extractAll)register_shutdown_function("unlink", $tmpFileThumb);
 			chdir(sys_get_temp_dir());
-			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName)."[0] ".basename($tmpFileThumb);
+			$pageLimit = ($extractAll?"":"[0]");
+			$params = ($extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
+			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName).$pageLimit." ".$params." ".basename($tmpFileThumb);
 			session_write_close(); // Be sure to give the hand back
 			exec($cmd, $out, $return);
 			if(is_array($out) && count($out)){
 				throw new AJXP_Exception(implode("\n", $out));
 			}
+			if($extractAll){
+				$prefix = str_replace(".pdf", "", $tmpFileName);
+				$files = $this->listExtractedJpg($prefix);
+				header("Content-Type: application/json");
+				print(json_encode($files));
+				exit(1);
+			}else{
+				header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
+				header("Content-Length: ".filesize($tmpFileThumb));
+				header('Cache-Control: public');
+				readfile($tmpFileThumb);
+				exit(1);
+			}			
+		}else if($action == "get_extracted_page" && isSet($httpVars["file"])){
+			$file = sys_get_temp_dir()."/".$httpVars["file"];
+			if(!is_file($file)) return ;
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
-			header("Content-Length: ".filesize($tmpFileThumb));
+			header("Content-Length: ".filesize($file));
 			header('Cache-Control: public');
-			readfile($tmpFileThumb);
-			exit(1);
-			
+			readfile($file);
+			exit(1);			
+		}else if($action == "delete_pdf_data" && isSet($httpVars["file"])){
+			$files = $this->listExtractedJpg(sys_get_temp_dir()."/".$httpVars["file"]);
+			foreach ($files as $file){
+				if(is_file(sys_get_temp_dir()."/".$file["file"])) unlink(sys_get_temp_dir()."/".$file["file"]);
+			}
 		}
 	}
+	
+	protected function listExtractedJpg($prefix){
+		$files = array();
+		$index = 0;
+		while(is_file($prefix."-".$index.".jpg")){
+			$extract = $prefix."-".$index.".jpg";
+			list($width, $height, $type, $attr) = @getimagesize($extract);
+			$files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+			$index ++;
+		}
+		if(is_file($prefix.".jpg")){
+			$extract = $prefix.".jpg";
+			list($width, $height, $type, $attr) = @getimagesize($extract);
+			$files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+		}
+		return $files;
+	}
+	
 }
 ?>
