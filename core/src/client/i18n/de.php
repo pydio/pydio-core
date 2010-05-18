@@ -361,6 +361,15 @@ $mess=array(
 "322" => "Die aktuelle Datei auswählen",
 "323" => "URL per E-Mail",
 "324" => "Kein Editor verfügbar",
+"325" => "Fit Best",
+"326" => "No Fit",
+"327" => "100%",
+"328" => "PDF Viewer",
+"329" => "View PDF online",
+"330" => "Please wait while pages are being rendered...",
+"331" => "Page",
+"332" => "of",
+"333" => "Pixlr image editor",
 /* END SENTENCE */
 );
 ?>
