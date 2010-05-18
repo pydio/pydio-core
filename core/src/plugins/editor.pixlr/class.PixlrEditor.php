@@ -60,7 +60,7 @@ class PixlrEditor extends AJXP_Plugin {
 			//$httpClient->setDebug(true);
 			$postData = array();							
 			$httpClient->setHandleRedirects(false);
-			$httpClient->postFile("/editor/?referrer=AjaXplorer&method=get&target=http://127.0.0.1/fake.php&exit=close.php", array(), "image", $fData);
+			$httpClient->postFile("/editor/?referrer=AjaXplorer&method=get&target=http://127.0.0.1/ajaxplorer/plugins/editor.pixlr/fake_save_pixlr.php&exit=http://127.0.0.1/ajaxplorer/plugins/editor.pixlr/fake_close_pixlr.php", array(), "image", $fData);
 			$loc = $httpClient->getHeader("location");
 			header("Location:http://www.pixlr.com".$loc);
 			
