@@ -35,51 +35,78 @@
 Class.create("PixlrEditor", AbstractEditor, {
 
 	fullscreenMode: false,
-	_minZoom : 10,
-	_maxZoom : 500,
 	
 	initialize: function($super, oFormObject)
 	{
-		//this.editorOptions.floatingToolbar = true;
-		$super(oFormObject);
+		this.element =  $(oFormObject);
+		this.defaultActions = new Hash();		
+		this.createTitleSpans();
+		modal.setCloseAction(function(){this.close();}.bind(this));
 		this.container = $(oFormObject).select('div[id="pixlrContainer"]')[0];
+		fitHeightToBottom($(this.container), $(modal.elementName));
+		this.contentMainContainer = new Element("iframe", {style:"border:none;width:"+this.container.getWidth()+"px;"});						
+		this.container.update(this.contentMainContainer);
 	},
-	
-	resize : function(size){
-		this.element.fire("editor:resize", size);
-	},
-	
-	save : function(origFName, pixlrUrl){
+		
+	save : function(pixlrUrl){
+		this.setOnLoad();
 		var conn = new Connexion();
 		conn.addParameter("get_action", "retrieve_pixlr_image");
-		conn.addParameter("original_file", origFName);
+		conn.addParameter("original_file", this.currentNode.getPath());
 		conn.addParameter("new_url", pixlrUrl);
 		conn.onComplete = function(transp){
-			hideLightBox(true);
-		};
+			var date = new Date();
+			this.currentNode.getParent().getMetadata().set('preview_seed', Math.round(date.getTime()*Math.random()));
+			this.removeOnLoad();
+			hideLightBox(true);			
+			ajaxplorer.actionBar.fireAction('refresh');
+		}.bind(this);
 		conn.sendAsync();
 	},
 	
 	open : function($super, userSelection)
 	{
 		$super(userSelection);		
-		var fName = userSelection.getUniqueFileName();
+		this.setOnLoad();
+		this.currentNode = userSelection.getUniqueNode();
+		var fName = this.currentNode.getPath();
 		var src = "content.php?get_action=post_to_server&file=" + fName;
-		var iFrame = new Element("iframe", {src:src, style:"width:"+this.container.getWidth()+"px;height:500px"});
-		this.container.update(iFrame);
+		this.contentMainContainer.src = src;
 		var pe = new PeriodicalExecuter(function(){
 			var href;
 			try{
-				href = iFrame.contentDocument.location.href;
+				href = this.contentMainContainer.contentDocument.location.href;
 			}catch(e){}
-			if(href && href.indexOf('image=') > -1){
+			if(href && href.indexOf('image=') > -1){				
 	        	pe.stop();
-	        	this.save(fName, href);
+	        	this.save(href);
+			}else if(href && href.indexOf('close_pixlr')>-1){
+				pe.stop();
+				hideLightBox(true);
 			}
-		}.bind(this) , 0.7);
-
+		}.bind(this) , 0.5);
+		
+		setTimeout(function(){			
+			this.resize();
+			this.removeOnLoad();
+		}.bind(this), 2000);
+		
 		return;		
 	},
+	
+	setOnLoad: function()	{
+		if(this.loading) return;
+		addLightboxMarkupToElement(this.container);
+		var img = document.createElement("img");
+		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
+		$(this.container).getElementsBySelector("#element_overlay")[0].appendChild(img);
+		this.loading = true;
+	},
+	
+	removeOnLoad: function(){
+		removeLightboxFromElement(this.container);
+		this.loading = false;
+	},	
 	
 	getPreview : function(ajxpNode){
 		var img = new Element('img', {src:Diaporama.prototype.getThumbnailSource(ajxpNode), border:0});
