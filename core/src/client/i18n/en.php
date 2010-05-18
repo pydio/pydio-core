@@ -370,5 +370,6 @@ $mess=array(
 "330" => "Please wait while pages are being rendered...",
 "331" => "Page",
 "332" => "of",
+"333" => "Pixlr image editor",
 );
 ?>

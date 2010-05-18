@@ -385,7 +385,12 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return ajxpServerAccessPath+"?get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
+		var source = ajxpServerAccessPath+"?get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
+		var preview_seed = ajxpNode.getParent().getMetadata().get('preview_seed');
+		if(preview_seed){
+			source += "&rand="+preview_seed;
+		}
+		return source;
 	}
 	
 });
