@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.pixlr" openable="true" text="186" title="136" icon="frame_image.png" className="PixlrEditor" mimes="AJXP_MIMES_IMAGE" formId="pixlr_box">
+	<class_definition filename="plugins/editor.pixlr/class.PixlrEditor.php" classname="PixlrEditor"/>
+	<resources>
+		<js file="plugins/editor.pixlr/class.PixlrEditor.js" className="PixlrEditor"/>
+	</resources>
+	<clientForm id="pixlr_box"><![CDATA[
+		<div id="pixlr_box" action="edit_image" box_width="90%" box_height="90%" box_padding="0">
+			<div class="action_bar" style="width: 100%;"></div>
+			<div id="pixlrContainer"></div>
+		</div>				
+	]]></clientForm>
+	<registry_contributions>
+		<actions>
+			<action name="post_to_server">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="retrieve_pixlr_image">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Image proxy must be implemented -->
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+	</dependencies>				
+</editor>
