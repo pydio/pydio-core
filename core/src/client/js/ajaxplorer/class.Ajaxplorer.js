@@ -343,7 +343,7 @@ Class.create("Ajaxplorer", {
 				this._initLoadRep = this.user.getPreference("history_last_listing");
 			}
 		}
-		this.loadRepository(repositoryObject);
+		this.loadRepository(repositoryObject);		
 		if(repList && repId){
 			document.fire("ajaxplorer:repository_list_refreshed", {list:repList,active:repId});
 		}else{
@@ -376,12 +376,15 @@ Class.create("Ajaxplorer", {
 		} else { this._initObj = null ;}
 		
 		if(this._initLoadRep){
-			rootNode.observeOnce("loaded", function(){
-				if(this._initLoadRep != "" && this._initLoadRep != "/"){
-					this.goTo(this._initLoadRep);
-				}
+			if(this._initLoadRep != "" && this._initLoadRep != "/"){
+				var copy = this._initLoadRep.valueOf();
 				this._initLoadRep = null;
-			}.bind(this));
+				rootNode.observeOnce("loaded", function(){
+						setTimeout(function(){
+							this.goTo(new AjxpNode(copy));					
+						}.bind(this), 1000);
+				}.bind(this));
+			}				
 		}
 	},
 
