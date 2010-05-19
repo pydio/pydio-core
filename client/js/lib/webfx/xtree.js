@@ -112,7 +112,8 @@ var webFXTreeHandler = {
 	linkKeyPress : function(oItem, e){if(!this.hasFocus || e.keyCode == 9) return false;return true;},
 	cookies   : new WebFXCookie(),
 	insertHTMLBeforeEnd	:	function (oElement, sHTML) {
-		if (oElement.insertAdjacentHTML != null) {
+		if(!oElement) return;
+		if (oElement && oElement.insertAdjacentHTML) {
 			oElement.insertAdjacentHTML("BeforeEnd", sHTML) ;
 			return;
 		}
@@ -206,7 +207,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			else { foo.parentNode._last = false; }
 			foo = foo.parentNode;
 		}
-		webFXTreeHandler.insertHTMLBeforeEnd(document.getElementById(this.id + '-cont'), node.toString());		
+		$(this.id + '-cont').insert(node.toString());
 		$(node.id).ajxpNode = node.ajxpNode;
 		if(!node.inZip){
 			AjxpDroppables.add(node.id);
