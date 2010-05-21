@@ -106,8 +106,8 @@ Class.create("MultiUploader", {
 		var closeButton = formObject.select('div[id="uploadCloseButton"]')[0];
 		sendButton.observerSet = true;
 		sendButton.observe("click", function(){
-			this.submitMainForm();
-		}.bind(this));
+			ajaxplorer.actionBar.multi_selector.submitMainForm();
+		});
 		optionsButton.observe("click", function(){
 			if(window.htmlMultiUploaderOptions){
 				var message = MessageHash[281] + '\n';
