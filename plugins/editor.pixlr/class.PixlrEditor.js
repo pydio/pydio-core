@@ -44,7 +44,9 @@ Class.create("PixlrEditor", AbstractEditor, {
 		modal.setCloseAction(function(){this.close();}.bind(this));
 		this.container = $(oFormObject).select('div[id="pixlrContainer"]')[0];
 		fitHeightToBottom($(this.container), $(modal.elementName));
-		this.contentMainContainer = new Element("iframe", {style:"border:none;width:"+this.container.getWidth()+"px;"});						
+		this.contentMainContainer = new Element("iframe", {			
+			style:"border:none;width:"+this.container.getWidth()+"px;"
+		});						
 		this.container.update(this.contentMainContainer);
 	},
 		
@@ -70,13 +72,18 @@ Class.create("PixlrEditor", AbstractEditor, {
 		this.setOnLoad();
 		this.currentNode = userSelection.getUniqueNode();
 		var fName = this.currentNode.getPath();
-		var src = "content.php?get_action=post_to_server&file=" + fName;
+		var src = "content.php?get_action=post_to_server&file=" + fName + "&parent_url=" + getRepName(document.location.href);
 		this.contentMainContainer.src = src;
 		var pe = new PeriodicalExecuter(function(){
 			var href;
 			try{
 				href = this.contentMainContainer.contentDocument.location.href;
-			}catch(e){}
+			}catch(e){
+				if(this.loading){
+					this.resize();
+					this.removeOnLoad();			
+				}
+			}
 			if(href && href.indexOf('image=') > -1){				
 	        	pe.stop();
 	        	this.save(href);
@@ -85,21 +92,16 @@ Class.create("PixlrEditor", AbstractEditor, {
 				hideLightBox(true);
 			}
 		}.bind(this) , 0.5);
-		
-		setTimeout(function(){			
-			this.resize();
-			this.removeOnLoad();
-		}.bind(this), 2000);
-		
 		return;		
 	},
 	
 	setOnLoad: function()	{
 		if(this.loading) return;
 		addLightboxMarkupToElement(this.container);
-		var img = document.createElement("img");
-		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
 		$(this.container).getElementsBySelector("#element_overlay")[0].appendChild(img);
+		var waiter = new Element("div", {align:"center", style:"font-family:Arial, Helvetica, Sans-serif;font-size:25px;color:#AAA;font-weight:bold;"}).update('<br><br><br>Please wait while opening Pixlr editor...<br>');		
+		waiter.insert(new Element("img", {src:ajxpResourcesFolder+'/images/loadingImage.gif'}));
+		$(this.container).select("#element_overlay")[0].insert(waiter);
 		this.loading = true;
 	},
 	
