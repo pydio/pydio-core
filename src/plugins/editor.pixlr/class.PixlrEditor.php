@@ -52,16 +52,26 @@ class PixlrEditor extends AJXP_Plugin {
 		    	
 		if($action == "post_to_server"){	
 					
-			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-
+			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);			
+			$target = $httpVars["parent_url"]."/plugins/editor.pixlr";
 			$tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
 			$fData = array("tmp_name" => $tmp, "name" => urlencode(basename($file)), "type" => "image/jpg");
 			$httpClient = new HttpClient("pixlr.com");
 			//$httpClient->setDebug(true);
 			$postData = array();							
 			$httpClient->setHandleRedirects(false);
-			$lang = ConfService::getLanguage();
-			$httpClient->postFile("/editor/?referrer=AjaXplorer&method=get&loc=$lang&target=http://127.0.0.1/ajaxplorer/plugins/editor.pixlr/fake_save_pixlr.php&exit=http://127.0.0.1/ajaxplorer/plugins/editor.pixlr/fake_close_pixlr.php", array(), "image", $fData);
+			$params = array(
+				"referrer"	=> "AjaXplorer",
+				"method"	=> "get",
+				"loc"		=> ConfService::getLanguage(),
+				"target"	=> $target."/fake_save_pixlr.php",
+				"exit"		=> $target."/fake_close_pixlr.php",
+				"title"		=> basename($file),
+				"locktarget"=> "false",
+				"locktitle" => "true",
+				"locktype"	=> "source"
+			);
+			$httpClient->postFile("/editor/", $params, "image", $fData);
 			$loc = $httpClient->getHeader("location");
 			header("Location:http://www.pixlr.com".$loc);
 			
