@@ -48,15 +48,8 @@ class demoAccessDriver extends fsAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "open_with":	
-				if(isset($save) && $save==1)
-				{
-					$xmlBuffer .= AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
-				}
-				else 
-				{
-					$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($_GET["file"])), "plain");
-				}
+			case "get_content":	
+				$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($_GET["file"])), "plain");
 				exit(0);
 			break;
 			case "public_url":
@@ -64,8 +57,9 @@ class demoAccessDriver extends fsAccessDriver
 				exit(0);
 			break;
 			//------------------------------------
-			//	COPY / MOVE
+			//	WRITE ACTIONS
 			//------------------------------------
+			case "put_content":
 			case "copy":
 			case "move":
 			case "rename":

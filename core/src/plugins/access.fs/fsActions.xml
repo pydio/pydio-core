@@ -429,39 +429,21 @@
 					if(editorData){
 						ajaxplorer.loadEditorResources(editorData.resourcesManager);
 						modal.openEditorDialog(editorData);
-					}else{
-						console.log('no data');
 					}
 				]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="slideshow_sel">
-			<gui text="234" title="234" src="frame_image.png" accessKey="" hasAccessKey="false">
-				<context selection="true" dir="" recycle="hidden"
-					actionBar="false" contextMenu="false" infoPanel="true"
-					actionBarGroup="get">
-				</context>
-				<selectionContext dir="true" file="true" recycle="true" unique="false" multipleOnly="true" allowedMimes="AJXP_MIMES_IMAGE" behaviour="hidden"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+		<action name="get_content">
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[					
-					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-					var editors = ajaxplorer.findEditorsForMime(selectedMime);
-					var editorData;
-					if(editors.length){
-						editorData = editors[0];							
-					}					
-					if(editorData){
-						ajaxplorer.loadEditorResources(editorData.resourcesManager);
-						modal.openEditorDialog(editorData);
-					}else{
-						alert('no data found!');
-					}
-					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
+			</processing>
+		</action>		
+		<action name="put_content">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
 		<action name="chmod">
 			<gui text="287" title="287" src="ksysv.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="true" recycle="hidden"  behaviour="hidden"

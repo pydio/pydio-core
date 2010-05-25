@@ -72,28 +72,28 @@ Class.create("AjxpCkEditor", TextEditor, {
 		var textarea;
 		this.textareaContainer = new Element('div');
 		this.textarea = new Element('textarea');
-		this.textarea.name =  this.textarea.id = 'code';
+		this.textarea.name =  this.textarea.id = 'content';
 		this.contentMainContainer = this.textareaContainer;
 		this.textarea.setStyle({width:'100%'});	
 		this.textarea.setAttribute('wrap', 'off');	
 		this.element.insert(this.textareaContainer);
 		this.textareaContainer.appendChild(this.textarea);
 		fitHeightToBottom(this.textareaContainer, $(modal.elementName));
-		this.reloadEditor('code');
+		this.reloadEditor('content');
 		this.element.observe("editor:close", function(){
-			CKEDITOR.instances.code.destroy();
+			CKEDITOR.instances.content.destroy();
 		});		
 		this.element.observe("editor:resize", function(event){
 			this.resizeEditor();
 		}.bind(this));
 		var destroy = function(){
-			if(CKEDITOR.instances.code){
-				this.textarea.value = CKEDITOR.instances.code.getData();
-				CKEDITOR.instances.code.destroy();			
+			if(CKEDITOR.instances.content){
+				this.textarea.value = CKEDITOR.instances.content.getData();
+				CKEDITOR.instances.content.destroy();			
 			}				
 		};
 		var reInit  = function(){
-			CKEDITOR.replace('code', this.editorConfig);
+			CKEDITOR.replace('content', this.editorConfig);
 			this.resizeEditor();				
 		}
 		this.element.observe("editor:enterFS", destroy.bind(this));
@@ -115,8 +115,8 @@ Class.create("AjxpCkEditor", TextEditor, {
 	launchModifiedObserver : function(){
 		// OBSERVE CHANGES
 		this.observerInterval = window.setInterval(function(){
-			if(this.isModified || !CKEDITOR.instances.code) return;
-			var currentData =  CKEDITOR.instances.code.getData();
+			if(this.isModified || !CKEDITOR.instances.content) return;
+			var currentData =  CKEDITOR.instances.content.getData();
 			if(!this.prevData) {
 				this.prevData = currentData;
 				return;
@@ -144,20 +144,20 @@ Class.create("AjxpCkEditor", TextEditor, {
 	resizeEditor : function(){
 		var width = this.contentMainContainer.getWidth()-(Prototype.Browser.IE?0:12);		
 		var height = this.contentMainContainer.getHeight();
-		CKEDITOR.instances.code.resize(width,height);
+		CKEDITOR.instances.content.resize(width,height);
 	},
 			
 	saveFile : function(){
 		var connexion = this.prepareSaveConnexion();
-		var value = CKEDITOR.instances.code.getData();
+		var value = CKEDITOR.instances.content.getData();
 		this.textarea.value = value;		
-		connexion.addParameter('code', value);
+		connexion.addParameter('content', value);
 		connexion.sendAsync();
 	},
 		
 	parseTxt : function(transport){	
 		this.textarea.value = transport.responseText;
-		CKEDITOR.instances.code.setData(transport.responseText);
+		CKEDITOR.instances.content.setData(transport.responseText);
 		this.removeOnLoad(this.textareaContainer);
 		this.setModified(false);
 	}
