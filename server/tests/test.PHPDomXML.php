@@ -31,25 +31,22 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * Description : Abstract representation of an action driver. Must be implemented.
+ * Description : Test presence of lib-xml library
  */
                                  
 require_once('../classes/class.AbstractTest.php');
 
-class PHPVersion extends AbstractTest
+class PHPDomXML extends AbstractTest
 {
-    function PHPVersion() { parent::AbstractTest("PHP version", "Minimum required version is PHP 5.1.0, PHP 5.2 or higher recommended when using foreign language"); }
+    function PHPDomXML() { parent::AbstractTest("DOM Xml enabled", "Dom XML is required, you may have to install the php-xml extension."); }
     function doTest() 
     { 
-        $version = phpversion(); 
-    	$this->testedParams["PHP Version"] = $version;
-    	//return false;
-        if (floatval($version) < 5.1) return FALSE; 
-        $locale = setlocale(LC_CTYPE, 0);
-        $dirSep = DIRECTORY_SEPARATOR;
-        $this->testedParams["Locale"] = $locale;
-        $this->testedParams["Directory Separator"] = $dirSep;
-        if (floatval($version) < 5.1 && $locale != "C" && $dirSep != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
+        $this->failedLevel = "error";
+        if (!class_exists("DOMDocument")){
+        	$this->testedParams["DOM Enabled"] = "No";
+        	return FALSE;
+        }
+        $this->testedParams["DOM Enabled"] = "Yes";
         return TRUE;
     }
 };
