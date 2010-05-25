@@ -30,6 +30,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     	$tmpFile = sys_get_temp_dir()."/".md5(time());
     	$tmpHandle = fopen($tmpFile, "wb");
     	$fake->copyFileInStream($path, $tmpHandle);
+    	fclose($tmpHandle);
     	return $tmpFile;
     }	
     

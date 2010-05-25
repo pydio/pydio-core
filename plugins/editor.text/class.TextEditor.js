@@ -61,7 +61,7 @@ Class.create("TextEditor", AbstractEditor, {
 		var textarea;
 		this.textareaContainer = document.createElement('div');
 		this.textarea = $(document.createElement('textarea'));
-		this.textarea.name =  this.textarea.id = 'code';
+		this.textarea.name =  this.textarea.id = 'content';
 		this.textarea.addClassName('dialogFocus');
 		this.textarea.addClassName('editor');
 		this.currentUseCp = false;
@@ -81,7 +81,7 @@ Class.create("TextEditor", AbstractEditor, {
 	loadFileContent : function(fileName){
 		this.currentFile = fileName;
 		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'open_with');
+		connexion.addParameter('get_action', 'get_content');
 		connexion.addParameter('file', fileName);	
 		connexion.onComplete = function(transp){
 			this.parseTxt(transp);
@@ -94,8 +94,7 @@ Class.create("TextEditor", AbstractEditor, {
 	
 	prepareSaveConnexion : function(){
 		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'open_with');
-		connexion.addParameter('save', '1');
+		connexion.addParameter('get_action', 'put_content');
 		connexion.addParameter('file', this.userSelection.getUniqueFileName());
 		connexion.addParameter('dir', this.userSelection.getCurrentRep());	
 		connexion.onComplete = function(transp){
@@ -108,7 +107,7 @@ Class.create("TextEditor", AbstractEditor, {
 	
 	saveFile : function(){
 		var connexion = this.prepareSaveConnexion();
-		connexion.addParameter('code', this.textarea.value);		
+		connexion.addParameter('content', this.textarea.value);		
 		connexion.sendAsync();
 	},
 	

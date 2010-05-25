@@ -41,7 +41,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$httpClient = $this->getRemoteConnexion($sessionId);
 		$httpVars["ajxp_sessid"] = $sessionId;
 		$method = "get";
-		if($action == "open_with" && isSet($httpVars["save"])) $method = "post";
+		if($action == "put_content") $method = "post";
 		if($method == "get"){
 			if($action == "download" || $action=="image_proxy" || $action=="mp3_proxy"){
 				$httpClient->directForwarding = true;
@@ -72,7 +72,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				session_write_close();
 				exit();
 			break;
-			case "open_with":
+			case "get_content":
 				header("Content-type:text/plain");
 			break;			
 			default:

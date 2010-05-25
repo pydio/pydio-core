@@ -169,19 +169,17 @@ class sshAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "open_with";	
-				if(isset($save) && $save==1)
-				{
-					AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
-					$code=stripslashes($code);
-					$code=str_replace("&lt;","<",$code);
-					$this->SSHOperation->setRemoteContent($this->makeName($file), $code);
-					echo $mess[115];
-				}
-				else 
-				{
-					$this->sendFile($this->SSHOperation->getRemoteContent($this->makeName($file)), "plain", $file);
-				}
+			
+			case "put_content":
+				AJXP_Logger::logAction("Online Edition", array("file"=>SystemTextEncoding::fromUTF8($file)));
+				$code=stripslashes($code);
+				$code=str_replace("&lt;","<",$content);
+				$this->SSHOperation->setRemoteContent($this->makeName($file), $code);
+				echo $mess[115];
+				exit(0);
+			break;
+			case "get_content":
+				$this->sendFile($this->SSHOperation->getRemoteContent($this->makeName($file)), "plain", $file);
 				exit(0);
 			break;
 		
