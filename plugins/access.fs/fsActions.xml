@@ -434,6 +434,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="stat">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
 		<action name="get_content">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
