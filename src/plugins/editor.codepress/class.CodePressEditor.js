@@ -50,7 +50,7 @@ Class.create("CodePressEditor", TextEditor, {
 		this.textarea = $(document.createElement('textarea'));
 		var hidden = document.createElement('input');
 		hidden.type = 'hidden';
-		hidden.name = hidden.id = 'code';		
+		hidden.name = hidden.id = 'content';		
 		this.element.appendChild(hidden);
 		this.textarea.name = this.textarea.id = 'cpCode';
 		$(this.textarea).addClassName('codepress');
@@ -84,7 +84,7 @@ Class.create("CodePressEditor", TextEditor, {
 		var value;
 		value = this.element.select('iframe')[0].getCode();
 		this.textarea.value = value;		
-		connexion.addParameter('code', value);
+		connexion.addParameter('content', value);
 		connexion.sendAsync();
 	},
 		

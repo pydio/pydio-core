@@ -160,31 +160,31 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "open_with";	
-				if(isset($httpVars["save"]) && $httpVars["save"]==1 && isSet($httpVars["code"]))
-				{
-					// Reload "code" variable directly from POST array, do not "securePath"...
-					$code = $httpVars["code"];
-					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-					AJXP_Logger::logAction("Online Edition", array("file"=>$file));
-					$code=stripslashes($code);
-					$code=str_replace("&lt;","<",$code);
-					$fileName = $this->urlBase.$file;
-					if(!is_file($fileName) || !is_writable($fileName)){
-						header("Content-Type:text/plain");
-						print((!is_writable($fileName)?"1001":"1002"));
-						exit(1);
-					}
-					$fp=fopen($fileName,"w");
-					fputs ($fp,$code);
-					fclose($fp);
+			case "get_content":
+					
+				$this->readFile($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]), "plain");
+				exit(0);
+			break;
+			
+			case "put_content":	
+				if(!isset($httpVars["content"])) break;
+				// Reload "code" variable directly from POST array, do not "securePath"...
+				$code = $httpVars["content"];
+				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+				AJXP_Logger::logAction("Online Edition", array("file"=>$file));
+				$code=stripslashes($code);
+				$code=str_replace("&lt;","<",$code);
+				$fileName = $this->urlBase.$file;
+				if(!is_file($fileName) || !is_writable($fileName)){
 					header("Content-Type:text/plain");
-					print($mess[115]);
+					print((!is_writable($fileName)?"1001":"1002"));
+					exit(1);
 				}
-				else 
-				{
-					$this->readFile($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]), "plain");
-				}
+				$fp=fopen($fileName,"w");
+				fputs ($fp,$code);
+				fclose($fp);
+				header("Content-Type:text/plain");
+				print($mess[115]);
 				exit(0);
 			break;
 		
