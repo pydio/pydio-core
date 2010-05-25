@@ -5,6 +5,9 @@
 define("AJXP_VERSION", "2.7.2");
 define("AJXP_VERSION_DATE", "2010/05/15");
 
+
+require("compat.php");
+
 $installPath = realpath(dirname(__FILE__)."/../..");
 define("INSTALL_PATH", $installPath);
 define("USERS_DIR", $installPath."/server/users");
