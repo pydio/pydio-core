@@ -35,20 +35,6 @@
  */
                                  
 require_once('../classes/class.AbstractTest.php');
-if ( !function_exists('sys_get_temp_dir')) 
-{
-    function sys_get_temp_dir() 
-    {
-        if (!empty($_ENV['TMP'])) { return realpath($_ENV['TMP']); }
-        if (!empty($_ENV['TMPDIR'])) { return realpath( $_ENV['TMPDIR']); }
-        if (!empty($_ENV['TEMP'])) { return realpath( $_ENV['TEMP']); }
-        $tempfile=tempnam(uniqid(rand(),TRUE),'');
-        if (file_exists($tempfile)) {
-            unlink($tempfile);
-            return realpath(dirname($tempfile));
-        }
-    }
-}
 
 class Upload extends AbstractTest
 {
@@ -57,7 +43,7 @@ class Upload extends AbstractTest
     { 
     	include("../conf/conf.php");
     	$tmpDir = ini_get("upload_tmp_dir");
-    	if (!$tmpDir) $tmpDir = sys_get_temp_dir();
+    	if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
     	$this->testedParams["Upload Tmp Dir Writeable"] = is_writable($tmpDir);
     	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
     	$this->testedParams["PHP Post Max Size"] = $this->returnBytes(ini_get("post_max_size"));
