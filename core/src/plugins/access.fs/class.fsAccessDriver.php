@@ -157,6 +157,16 @@ class fsAccessDriver extends AbstractAccessDriver
 					$pendingSelection = $localName;					
 			break;
 			
+			case "stat" :
+				
+				$stat = stat($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
+				header("Content-type:application/json");
+				print json_encode($stat);
+				exit(1);
+				
+			break;
+			
+			
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
