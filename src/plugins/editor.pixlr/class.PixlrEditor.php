@@ -47,8 +47,8 @@ class PixlrEditor extends AJXP_Plugin {
 			return false;
 		}
 		
-    	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
 		$streamData = $repository->streamData;
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		    	
 		if($action == "post_to_server"){	
 					

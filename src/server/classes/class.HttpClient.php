@@ -44,6 +44,8 @@ class HttpClient {
     var $postDataArray = array();
     var $directForwarding = false;
     
+    var $contentDestStream = false;
+    
     function HttpClient($host, $port=80) {
         $this->host = $host;
         $this->port = $port;
@@ -70,6 +72,14 @@ class HttpClient {
     	$this->postFileName = $fileVarName;
     	$this->postdata = $this->buildQueryString($postData);
     	return $this->doRequest();
+    }
+    
+    function writeContentToStream($destStream){
+    	$this->contentDestStream = $destStream;
+    }
+    
+    function clearContentDestStream(){
+    	$this->contentDestStream = false;
     }
     
     function buildQueryString($data) {
@@ -174,7 +184,11 @@ class HttpClient {
     	    	print $line;
     	    	continue;
     	    }
-    	    $this->content .= $line;
+    	    if($this->contentDestStream===false){
+	    	    $this->content .= $line;
+    	    }else{
+    	    	fwrite($this->contentDestStream, $line);
+    	    }
         }
         fclose($fp);
    	    if($this->directForwarding){

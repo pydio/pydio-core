@@ -69,7 +69,7 @@ Class.create("PixlrEditor", AbstractEditor, {
 	open : function($super, userSelection)
 	{
 		$super(userSelection);		
-		this.setOnLoad();
+		this.setOnLoad(true);
 		this.currentNode = userSelection.getUniqueNode();
 		var fName = this.currentNode.getPath();
 		var src = "content.php?get_action=post_to_server&file=" + fName + "&parent_url=" + getRepName(document.location.href);
@@ -95,11 +95,13 @@ Class.create("PixlrEditor", AbstractEditor, {
 		return;		
 	},
 	
-	setOnLoad: function()	{
+	setOnLoad: function(openMessage){
 		if(this.loading) return;
 		addLightboxMarkupToElement(this.container);
-		$(this.container).getElementsBySelector("#element_overlay")[0].appendChild(img);
-		var waiter = new Element("div", {align:"center", style:"font-family:Arial, Helvetica, Sans-serif;font-size:25px;color:#AAA;font-weight:bold;"}).update('<br><br><br>Please wait while opening Pixlr editor...<br>');		
+		var waiter = new Element("div", {align:"center", style:"font-family:Arial, Helvetica, Sans-serif;font-size:25px;color:#AAA;font-weight:bold;"});
+		if(openMessage){
+			waiter.update('<br><br><br>Please wait while opening Pixlr editor...<br>');
+		}
 		waiter.insert(new Element("img", {src:ajxpResourcesFolder+'/images/loadingImage.gif'}));
 		$(this.container).select("#element_overlay")[0].insert(waiter);
 		this.loading = true;

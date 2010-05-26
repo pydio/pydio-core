@@ -46,7 +46,8 @@ class PdfPreviewer extends AJXP_Plugin {
 		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["IMAGE_MAGICK_CONVERT"])){
 			return false;
 		}
-    	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
+		$streamData = $repository->streamData;		
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		    	
 		if($action == "pdf_data_proxy"){
 			$extractAll = false;
@@ -65,7 +66,11 @@ class PdfPreviewer extends AJXP_Plugin {
 			$out = array();
 			$return = 0;
 			$tmpFileThumb = str_replace(".pdf", ".jpg", $tmpFileName);
-			if(!$extractAll)register_shutdown_function("unlink", $tmpFileThumb);
+			if(!$extractAll){
+				register_shutdown_function("unlink", $tmpFileThumb);
+			}else{
+				@set_time_limit(90);
+			}
 			chdir(sys_get_temp_dir());
 			$pageLimit = ($extractAll?"":"[0]");
 			$params = ($extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
