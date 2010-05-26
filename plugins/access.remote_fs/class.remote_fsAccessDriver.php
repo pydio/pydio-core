@@ -39,6 +39,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$sessionId = "";
 		$crtRep = ConfService::getRepository();
 		$httpClient = $this->getRemoteConnexion($sessionId);
+		//$httpClient->setDebug(true);
 		$httpVars["ajxp_sessid"] = $sessionId;
 		$method = "get";
 		if($action == "put_content") $method = "post";
@@ -215,21 +216,32 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$httpClient->cookie_host = $crtRep->getOption("HOST");
 		$httpClient->timeout = 50;
 		//$httpClient->setDebug(true);
+		$uri = "";
 		if($crtRep->getOption("AUTH_URI") != ""){
-			$httpClient->setAuthorization($crtRep->getOption("AUTH_NAME"), $crtRep->getOption("AUTH_PASS"));
+			$httpClient->setAuthorization($crtRep->getOption("AUTH_NAME"), $crtRep->getOption("AUTH_PASS"));			
+			$uri = $crtRep->getOption("AUTH_URI");
 		}
-		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"]) || $refreshSessId){			
+		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"]) || $refreshSessId){		
+			if($uri == ""){
+				// Retrieve a seed!
+				$httpClient->get($crtRep->getOption("URI")."?get_action=get_seed");
+				$seed = $httpClient->getContent();
+				$user = $crtRep->getOption("AUTH_NAME");
+				$pass = $crtRep->getOption("AUTH_PASS");
+				$pass = md5(md5($pass).$seed);
+				$uri = $crtRep->getOption("URI")."?get_action=login&userid=".$user."&password=".$pass."&login_seed=$seed";
+			}
 			$httpClient->setHeadersOnly(true);
-			$httpClient->get($crtRep->getOption("AUTH_URI"));
+			$httpClient->get($uri);
 			$httpClient->setHeadersOnly(false);
 			$cookies = $httpClient->getCookies();		
-			if(isSet($cookies["PHPSESSID"])){
-				$_SESSION["AJXP_REMOTE_SESSION"] = $cookies["PHPSESSID"];
-				$remoteSessionId = $cookies["PHPSESSID"];
+			if(isSet($cookies["AjaXplorer"])){
+				$_SESSION["AJXP_REMOTE_SESSION"] = $cookies["AjaXplorer"];
+				$remoteSessionId = $cookies["AjaXplorer"];
 			}
 		}else{
 			$remoteSessionId = $_SESSION["AJXP_REMOTE_SESSION"];
-			$httpClient->setCookies(array("PHPSESSID"=>$remoteSessionId));
+			$httpClient->setCookies(array("AjaXplorer"=>$remoteSessionId));
 		}
 		return $httpClient;
 	}

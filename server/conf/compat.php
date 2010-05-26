@@ -54,7 +54,7 @@ if( !function_exists('json_encode')){
 
 
 if ( !function_exists('json_decode') ){
-	function json_decode($json)
+	function json_decode($json, $opt)
 	{
 		// Author: walidator.info 2009
 		$comment = false;

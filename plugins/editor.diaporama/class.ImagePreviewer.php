@@ -47,8 +47,8 @@ class ImagePreviewer extends AJXP_Plugin {
 			$this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
 		}
 		
-    	$destStreamURL = "ajxp.".$repository->getAccessType()."://".$repository->getId();
 		$streamData = $repository->streamData;
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		    	
 		if($action == "preview_data_proxy"){
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
