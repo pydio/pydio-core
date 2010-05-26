@@ -182,8 +182,12 @@ class fsAccessDriver extends AbstractAccessDriver
 				$code = $httpVars["content"];
 				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 				AJXP_Logger::logAction("Online Edition", array("file"=>$file));
-				$code=stripslashes($code);
-				$code=str_replace("&lt;","<",$code);
+				if(isSet($httpVars["encode"]) && $httpVars["encode"] == "base64"){
+				    $code = base64_decode($code);
+				}else{
+					$code=stripslashes($code);
+					$code=str_replace("&lt;","<",$code);
+				}
 				$fileName = $this->urlBase.$file;
 				if(!is_file($fileName) || !is_writable($fileName)){
 					header("Content-Type:text/plain");
@@ -251,10 +255,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			
 				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 				$filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
-				$error = $this->rename($file, $filename_new);
-				if($error != null) {
-					throw new AJXP_Exception($error);
-				}
+				$this->rename($file, $filename_new);
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
 				$reloadContextNode = true;
 				$pendingSelection = $filename_new;
@@ -845,6 +846,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	
 	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
 	{
+		AJXP_Logger::debug("CopyMove", array("dest"=>$destDir));
 		$mess = ConfService::getMessages();
 		if(!is_writable($this->urlBase.$destDir))
 		{
@@ -878,23 +880,22 @@ class fsAccessDriver extends AbstractAccessDriver
 		$old=$this->urlBase."/$filePath";
 		if(!is_writable($old))
 		{
-			return $mess[34]." ".$nom_fic." ".$mess[99];
+			throw new AJXP_Exception($mess[34]." ".$nom_fic." ".$mess[99]);
 		}
 		$new=dirname($old)."/".$filename_new;
 		if($filename_new=="")
 		{
-			return "$mess[37]";
+			throw new AJXP_Exception("$mess[37]");
 		}
 		if(file_exists($new))
 		{
-			return "$filename_new $mess[43]"; 
+			throw new AJXP_Exception("$filename_new $mess[43]"); 
 		}
 		if(!file_exists($old))
 		{
-			return $mess[100]." $nom_fic";
+			throw new AJXP_Exception($mess[100]." $nom_fic");
 		}
 		rename($old,$new);
-		return null;		
 	}
 	
 	function autoRenameForDest($destination, $fileName){
