@@ -177,6 +177,7 @@ class remote_fsAccessWrapper implements AjxpWrapper {
 		$this->host = $repository->getOption("HOST");
 		$this->path = $repository->getOption("URI");
 		$this->auth_path = $repository->getOption("AUTH_URI");
+		$this->use_auth = $repository->getOption("USE_AUTH");
 		
 		$urlParts["path"] = urlencode($urlParts["path"]);
 		
@@ -194,8 +195,12 @@ class remote_fsAccessWrapper implements AjxpWrapper {
 		$httpClient = new HttpClient($this->host);
 		$httpClient->cookie_host = $this->host;
 		$httpClient->timeout = 50;
-		AJXP_Logger::debug("Creating client", array());
+		AJXP_Logger::debug("Creating Http client", array());
 		//$httpClient->setDebug(true);
+		if(!$this->use_auth){
+			return $httpClient;
+		}
+		
 		$uri = "";
 		if($this->auth_path != ""){
 			$httpClient->setAuthorization($this->user, $this->password);			
@@ -223,7 +228,7 @@ class remote_fsAccessWrapper implements AjxpWrapper {
 			$remoteSessionId = $_SESSION["AJXP_REMOTE_SESSION"];
 			$httpClient->setCookies(array("AjaXplorer"=>$remoteSessionId));
 		}
-		AJXP_Logger::debug("Client created", array());
+		AJXP_Logger::debug("Http Client created", array());
 		return $httpClient;    	
     }	
     

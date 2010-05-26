@@ -40,7 +40,9 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$crtRep = ConfService::getRepository();
 		$httpClient = $this->getRemoteConnexion($sessionId);
 		//$httpClient->setDebug(true);
-		$httpVars["ajxp_sessid"] = $sessionId;
+		if($crtRep->getOption("USE_AUTH")){
+			$httpVars["ajxp_sessid"] = $sessionId;
+		}
 		$method = "get";
 		if($action == "put_content") $method = "post";
 		if($method == "get"){
@@ -216,9 +218,12 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$httpClient->cookie_host = $crtRep->getOption("HOST");
 		$httpClient->timeout = 50;
 		//$httpClient->setDebug(true);
+		if(!$crtRep->getOption("USE_AUTH")){
+			return $httpClient;
+		}
 		$uri = "";
 		if($crtRep->getOption("AUTH_URI") != ""){
-			$httpClient->setAuthorization($crtRep->getOption("AUTH_NAME"), $crtRep->getOption("AUTH_PASS"));			
+			$httpClient->setAuthorization($crtRep->getOption("AUTH_USER"), $crtRep->getOption("AUTH_PASS"));			
 			$uri = $crtRep->getOption("AUTH_URI");
 		}
 		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"]) || $refreshSessId){		
@@ -226,7 +231,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				// Retrieve a seed!
 				$httpClient->get($crtRep->getOption("URI")."?get_action=get_seed");
 				$seed = $httpClient->getContent();
-				$user = $crtRep->getOption("AUTH_NAME");
+				$user = $crtRep->getOption("AUTH_USER");
 				$pass = $crtRep->getOption("AUTH_PASS");
 				$pass = md5(md5($pass).$seed);
 				$uri = $crtRep->getOption("URI")."?get_action=login&userid=".$user."&password=".$pass."&login_seed=$seed";
