@@ -48,7 +48,7 @@ Class.create("PropertyPanel", {
 		}
 		this.createChmodForm();
 		
-		this.valueInput = new Element('input', {value:this.origValue, name:'chmod_value'}).setStyle({width:'76px', marginLeft:'55px'});
+		this.valueInput = new Element('input', {value:this.origValue, name:'chmod_value'}).setStyle({width:'70px', marginLeft:'45px'});
 		this.valueInput.observe((Prototype.Browser.IE?'change':'input'), function(e){
 			this.updateBoxesFromValue(this.valueInput.value);
 		}.bind(this));
@@ -66,29 +66,39 @@ Class.create("PropertyPanel", {
 	
 	createChmodForm : function(){
 		this.checks = $H({});
-		var chmodDiv = new Element('div').setStyle({width: '142px'});
+		var chmodTable = new Element('table', {style:"font-size:11px;"});
+
+        var tHead = new Element('thead');
+        var tBody = new Element('tbody');
+        chmodTable.insert(tHead);
+        chmodTable.insert(tBody);
+
 		// Header Line
-		var emptyLabel = new Element('div').setStyle({cssFloat:'left',width:'52px', height:'16px'});
-		chmodDiv.insert(emptyLabel);
+        var headerRow = new Element('tr');
+        var emptyLabel = new Element('td');
+        headerRow.insert(emptyLabel);
+		tHead.insert(headerRow);
 		for(var j=0;j<3;j++){
-			chmodDiv.insert(new Element('div').update(this.rightsLabels[j]+'&nbsp;&nbsp;').setStyle({cssFloat:'left',width:'30px', textAlign:'center'}));
+			headerRow.insert(new Element('td').update(this.rightsLabels[j]+'&nbsp;&nbsp;').setStyle({textAlign:'center'}));
 		}
 		// Boxes lines
 		for(var i=0;i<3;i++){
-			var label = new Element('div').setStyle({cssFloat:'left',width:'50px', height:'16px', textAlign:'right',paddingRight:'2px'});
+            var permRow = new Element('tr');
+			var label = new Element('td').setStyle({textAlign:'right',paddingRight:'2px', width:'35px'});
 			label.insert(this.accessLabels[i]);
-			chmodDiv.insert(label);
+			tBody.insert(permRow);
+            permRow.insert(label);
 			for(var j=0;j<3;j++){
 				var check = this.createCheckBox(this.accessors[i], this.rights[j]);
-				chmodDiv.insert(check);
+				permRow.insert(check);
 			}
 		}		
-		this.htmlElement.insert(chmodDiv);
+		this.htmlElement.insert(chmodTable);
 	},
 	
 	createCheckBox : function(accessor, right){
 		var box = new Element('input', {type:'checkbox', id:accessor+'_'+right}).setStyle({width:'14px',height:'14px',borderWidth:'0'});
-		var div = new Element('div', {align:"center"}).insert(box).setStyle({cssFloat:'left',width:'30px',height:'25px'});
+		var div = new Element('td', {align:"center"}).insert(box).setStyle({width:'25px'});
 		box.observe('click', function(e){
 			this.updateValueFromBoxes();
 		}.bind(this));
