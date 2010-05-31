@@ -81,6 +81,8 @@ Class.create("PixlrEditor", AbstractEditor, {
 			}catch(e){
 				if(this.loading){
 					this.resize();
+					// Force here for WebKit
+					this.contentMainContainer.setStyle({height:this.container.getHeight() + 'px'});
 					this.removeOnLoad();			
 				}
 			}
