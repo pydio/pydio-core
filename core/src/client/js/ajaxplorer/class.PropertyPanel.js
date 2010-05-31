@@ -47,13 +47,11 @@ Class.create("PropertyPanel", {
 			this.origValue = '';
 		}
 		this.createChmodForm();
-		
-		this.valueInput = new Element('input', {value:this.origValue, name:'chmod_value'}).setStyle({width:'70px', marginLeft:'45px'});
+				
 		this.valueInput.observe((Prototype.Browser.IE?'change':'input'), function(e){
 			this.updateBoxesFromValue(this.valueInput.value);
 		}.bind(this));
 		this.updateBoxesFromValue(this.valueInput.value);		
-		this.htmlElement.insert(this.valueInput);
 
 		if(userSelection.hasDir()){
 			this.createRecursiveBox();
@@ -93,6 +91,13 @@ Class.create("PropertyPanel", {
 				permRow.insert(check);
 			}
 		}		
+		
+		this.valueInput = new Element('input', {value:this.origValue, name:'chmod_value'}).setStyle({width:'95%'});
+		var valueRow = new Element('tr');
+		tBody.insert(valueRow);
+		valueRow.insert(new Element('td'));
+		valueRow.insert(new Element('td', {colspan:3}).update(this.valueInput));
+				
 		this.htmlElement.insert(chmodTable);
 	},
 	

@@ -476,7 +476,7 @@
 					modal.showDialogForm('Edit Online', 'properties_box', loadFunc, completeFunc);
 					]]></clientCallback>
 				<clientForm id="properties_box"><![CDATA[
-					<div id="properties_box" action="chmod" box_width="160"></div>				
+					<div id="properties_box" action="chmod" box_width="180"></div>				
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
