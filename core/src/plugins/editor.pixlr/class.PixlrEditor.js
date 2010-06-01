@@ -72,7 +72,7 @@ Class.create("PixlrEditor", AbstractEditor, {
 		this.setOnLoad(true);
 		this.currentNode = userSelection.getUniqueNode();
 		var fName = this.currentNode.getPath();
-		var src = "content.php?get_action=post_to_server&file=" + fName + "&parent_url=" + getRepName(document.location.href);
+		var src = "content.php?get_action=post_to_server&file=" + base64_encode(fName) + "&parent_url=" + base64_encode(getRepName(document.location.href));
 		this.contentMainContainer.src = src;
 		var pe = new PeriodicalExecuter(function(){
 			var href;
