@@ -2337,13 +2337,15 @@ Element.Methods = {
 
   cumulativeOffset: function(element) {
     var valueT = 0, valueL = 0;
-    do {
-      valueT += element.offsetTop  || 0;
-      valueL += element.offsetLeft || 0;
-      try{element.offsetParent}
-      catch(e){return Element._returnOffset(0,0);}
-      element = element.offsetParent;
-    } while (element);
+    if(element.parentNode && element.offsetParent && element.nodeName != 'HTML' && element != document.body){
+	    do {
+	      valueT += element.offsetTop  || 0;
+	      valueL += element.offsetLeft || 0;
+	      try{element.offsetParent}
+	      catch(e){return Element._returnOffset(0,0);}
+	      element = element.offsetParent;
+	    } while (element);
+    }
     return Element._returnOffset(valueL, valueT);
   },
 
@@ -2402,11 +2404,13 @@ Element.Methods = {
 
   cumulativeScrollOffset: function(element) {
     var valueT = 0, valueL = 0;
-    do {
-      valueT += element.scrollTop  || 0;
-      valueL += element.scrollLeft || 0;
-      element = element.parentNode;
-    } while (element);
+    if(element.parentNode){
+	    do {
+	      valueT += element.scrollTop  || 0;
+	      valueL += element.scrollLeft || 0;
+	      element = element.parentNode;
+	    } while (element);
+    }
     return Element._returnOffset(valueL, valueT);
   },
 
@@ -2807,15 +2811,16 @@ else if (Prototype.Browser.WebKit) {
 
   Element.Methods.cumulativeOffset = function(element) {
     var valueT = 0, valueL = 0;
-    do {
-      valueT += element.offsetTop  || 0;
-      valueL += element.offsetLeft || 0;
-      if (element.offsetParent == document.body)
-        if (Element.getStyle(element, 'position') == 'absolute') break;
-
-      element = element.offsetParent;
-    } while (element);
-
+    if(element.parentNode){
+	    do {
+	      valueT += element.offsetTop  || 0;
+	      valueL += element.offsetLeft || 0;
+	      if (element.offsetParent == document.body)
+	        if (Element.getStyle(element, 'position') == 'absolute') break;
+	
+	      element = element.offsetParent;
+	    } while (element);
+    }
     return Element._returnOffset(valueL, valueT);
   };
 }
@@ -4790,7 +4795,7 @@ var Position = {
   },
 
   withinIncludingScrolloffsets: function(element, x, y) {
-    var offsetcache = Element.cumulativeScrollOffset(element);
+  	var offsetcache = Element.cumulativeScrollOffset(element);
 
     this.xcomp = x + offsetcache[0] - this.deltaX;
     this.ycomp = y + offsetcache[1] - this.deltaY;
@@ -4799,7 +4804,7 @@ var Position = {
     return (this.ycomp >= this.offset[1] &&
             this.ycomp <  this.offset[1] + element.offsetHeight &&
             this.xcomp >= this.offset[0] &&
-            this.xcomp <  this.offset[0] + element.offsetWidth);
+            this.xcomp <  this.offset[0] + element.offsetWidth);    
   },
 
   overlap: function(mode, element) {

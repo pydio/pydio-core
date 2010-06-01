@@ -63,8 +63,9 @@ var Droppables = {
     return drop._containers.detect(function(c) { return containmentNode == c });
   },
   
-  isAffected: function(point, element, drop) {
+  isAffected: function(point, element, drop) {  	 
     return (
+   	 	drop.element && 
       (drop.element!=element) &&
       ((!drop._containers) ||
         this.isContained(element, drop)) &&
@@ -95,16 +96,16 @@ var Droppables = {
   show: function(point, element) {
     if(!this.drops.length) return;
     var drop, affected = [];
-    
-    this.drops.each( function(drop) {
+    $A(this.drops).each( function(drop) {
       if(Droppables.isAffected(point, element, drop))
         affected.push(drop);
     });
         
     if(affected.length>0)
       drop = Droppables.findDeepestChild(affected);
-
+      
     if(this.last_active && this.last_active != drop) this.deactivate(this.last_active);
+
     if (drop) {
       Position.within(drop.element, point[0], point[1]);
       if(drop.onHover)
@@ -112,6 +113,7 @@ var Droppables = {
       
       if (drop != this.last_active) Droppables.activate(drop);
     }
+    
   },
 
   fire: function(event, element) {
@@ -364,7 +366,6 @@ var Draggable = Class.create({
   
   updateDrag: function(event, pointer) {
     if(!this.dragging) this.startDrag(event);
-    
     if(!this.options.quiet){
       Position.prepare();
       Position.includeScrollOffsets = true;
