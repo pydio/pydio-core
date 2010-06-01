@@ -92,9 +92,9 @@ Class.create("AjxpDraggable", Draggable, {
 		
 		if(this.options.zindex) {
 			this.originalZ = parseInt(Element.getStyle(this.element,'z-index') || 0);
-			this.element.style.zIndex = this.options.zindex;
+			this.element.setStyle({zIndex:this.options.zindex});
 		}
-	
+
 		if(this.options.ghosting) {
 			var selection = ajaxplorer.getUserSelection();
 			//console.log(selection);
@@ -175,10 +175,9 @@ Class.create("AjxpDraggable", Draggable, {
 		if(this.options.starteffect){
 			this.options.starteffect(this.element);
 		}
-		
 		this.dndAction = ajaxplorer.getActionBar().getDefaultAction('dragndrop');
 		this.ctrlDndAction = ajaxplorer.getActionBar().getDefaultAction('ctrldragndrop');			
-	},
+    },
 
 	finishDrag : function(event, success) {
 		this.dragging = false;
@@ -224,7 +223,7 @@ Class.create("AjxpDraggable", Draggable, {
 		}
 	
 		if(this.options.zindex){
-			this.element.style.zIndex = this.originalZ;
+			this.element.setStyle({zIndex:this.originalZ});
 		}
 	
 		if(this.options.endeffect){
