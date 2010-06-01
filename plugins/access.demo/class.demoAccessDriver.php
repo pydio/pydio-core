@@ -48,10 +48,6 @@ class demoAccessDriver extends fsAccessDriver
 			//------------------------------------
 			//	ONLINE EDIT
 			//------------------------------------
-			case "get_content":	
-				$this->readFile($this->getPath()."/".SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($_GET["file"])), "plain");
-				exit(0);
-			break;
 			case "public_url":
 				print($errorMessage);
 				exit(0);
@@ -67,6 +63,7 @@ class demoAccessDriver extends fsAccessDriver
 			case "mkdir":
 			case "mkfile":
 			case "chmod":
+			case "compress":
 				return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
 			break;
 			

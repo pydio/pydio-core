@@ -52,8 +52,8 @@ class PixlrEditor extends AJXP_Plugin {
 		    	
 		if($action == "post_to_server"){	
 					
-			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);			
-			$target = $httpVars["parent_url"]."/plugins/editor.pixlr";
+			$file = base64_decode(AJXP_Utils::decodeSecureMagic($httpVars["file"]));
+			$target = base64_decode($httpVars["parent_url"])."/plugins/editor.pixlr";
 			$tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
 			$fData = array("tmp_name" => $tmp, "name" => urlencode(basename($file)), "type" => "image/jpg");
 			$httpClient = new HttpClient("pixlr.com");
@@ -66,7 +66,7 @@ class PixlrEditor extends AJXP_Plugin {
 				"loc"		=> ConfService::getLanguage(),
 				"target"	=> $target."/fake_save_pixlr.php",
 				"exit"		=> $target."/fake_close_pixlr.php",
-				"title"		=> basename($file),
+				"title"		=> urlencode(basename($file)),
 				"locktarget"=> "false",
 				"locktitle" => "true",
 				"locktype"	=> "source"
