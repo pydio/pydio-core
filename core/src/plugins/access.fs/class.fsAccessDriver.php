@@ -508,7 +508,6 @@ class fsAccessDriver extends AbstractAccessDriver
 						$metaData["src"] = $link;
 					}
 					if($lsOptions["l"]){
-						$metaData["is_image"] = AJXP_Utils::is_image($currentFile);
 						$metaData["file_group"] = @filegroup($currentFile) || "unknown";
 						$metaData["file_owner"] = @fileowner($currentFile) || "unknown";
 						$fPerms = @fileperms($currentFile);
@@ -518,14 +517,6 @@ class fsAccessDriver extends AbstractAccessDriver
 							$fPerms = '0000';
 						}
 						$metaData["file_perms"] = $fPerms;
-						if(AJXP_Utils::is_image($currentFile))
-						{
-							$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $currentFile);
-							list($width, $height, $type, $attr) = @getimagesize($realFile);
-							$metaData["image_type"] = image_type_to_mime_type($type);
-							$metaData["image_width"] = $width;
-							$metaData["image_height"] = $height;
-						}
 						$metaData["mimestring"] = AJXP_Utils::mimetype($currentFile, "type", !$isLeaf);
 						$datemodif = $this->date_modif($currentFile);
 						$metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
@@ -537,7 +528,10 @@ class fsAccessDriver extends AbstractAccessDriver
 						if(AJXP_Utils::isBrowsableArchive($nodeName)){
 							$metaData["ajxp_mime"] = "ajxp_browsable_archive";
 						}
-					}						
+						$realFile; // A reference to the real file.
+						AJXP_Controller::applyHook("ls.metadata", array($currentFile, &$metaData, $this->wrapperClassName, &$realFile));						
+					}
+									
 					$attributes = "";
 					foreach ($metaData as $key => $value){
 						$attributes .= "$key=\"$value\" ";
@@ -1004,6 +998,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			{
 				$logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
 			}
+			AJXP_Controller::applyHook("move.metadata", array($fileToDelete));
 		}
 		return null;
 	}
@@ -1068,9 +1063,11 @@ class fsAccessDriver extends AbstractAccessDriver
 			if($move){	
 				if(file_exists($destFile)) unlink($destFile);				
 				$res = rename($realSrcFile, $destFile);
+				AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, false));
 			}else{
 				try{
 					copy($realSrcFile, $destFile);
+					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
 				}catch (Exception $e){
 					$error[] = $e->getMessage();
 					return ;					
