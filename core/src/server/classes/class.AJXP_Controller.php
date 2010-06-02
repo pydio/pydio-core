@@ -34,6 +34,17 @@
  * Description : Controller
  */
 class AJXP_Controller{
+	
+	static $xPath;
+	
+	private static function initXPath(){
+		if(!isSet(self::$xPath)){
+			$registry = AJXP_PluginsService::getXmlRegistry();
+			self::$xPath = new DOMXPath($registry);		
+		}
+		return self::$xPath;
+	}
+	
 	public static function findActionAndApply($actionName, $httpVars, $fileVars){
 		if($actionName == "cross_copy"){
 			$pService = AJXP_PluginsService::getInstance();
@@ -49,8 +60,7 @@ class AJXP_Controller{
 			}
 			return ;
 		}
-		$registry = AJXP_PluginsService::getXmlRegistry();
-		$xPath = new DOMXPath($registry);
+		$xPath = self::initXPath();
 		$actions = $xPath->query("actions/action[@name='$actionName']");		
 		if(!$actions->length) return false;
 		$action = $actions->item(0);
@@ -118,7 +128,7 @@ class AJXP_Controller{
 		return $callback;
 	}
 	
-	private function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars){
+	private function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null){
 		//Processing
 		$plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
 		$methodName = $xPath->query("@methodName", $callback)->item(0)->value;		
@@ -126,9 +136,23 @@ class AJXP_Controller{
 		//return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);	
 		// Do not use call_user_func, it cannot pass parameters by reference.	
 		if(method_exists($plugInstance, $methodName)){
-			return $plugInstance->$methodName($actionName, $httpVars, $fileVars);
+			if($variableArgs == null){
+				return $plugInstance->$methodName($actionName, $httpVars, $fileVars);
+			}else{
+				call_user_func_array(array($plugInstance, $methodName), $variableArgs);
+			}
 		}else{
 			throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
+		}
+	}
+	
+	public static function applyHook($hookName, $args){
+		$xPath = self::initXPath();
+		$callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
+		if(!$callbacks->length) return ;		
+		foreach ($callbacks as $callback){
+			$fake1; $fake2; $fake3;
+			self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args);
 		}
 	}
 	
