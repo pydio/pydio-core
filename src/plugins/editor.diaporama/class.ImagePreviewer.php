@@ -85,5 +85,20 @@ class ImagePreviewer extends AJXP_Plugin {
 		}
 	}
 	
+	public function extractImageMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
+		$isImage = AJXP_Utils::is_image($currentNode);
+		$metadata["is_image"] = $isImage;
+		if($isImage)
+		{
+			if(!isSet($realFile)){
+				$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
+			}
+			list($width, $height, $type, $attr) = @getimagesize($realFile);
+			$metadata["image_type"] = image_type_to_mime_type($type);
+			$metadata["image_width"] = $width;
+			$metadata["image_height"] = $height;
+		}
+	}
+	
 }
 ?>
