@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="meta.serial" className="SerialMetaManager">
+	<class_definition filename="plugins/meta.serial/class.SerialMetaManager.php" classname="SerialMetaManager"/>
+	<registry_contributions>
+		<client_configs>
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
+					<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
+					<column messageId="3" attributeName="mimestring" sortType="String"/>
+					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate"/>
+					<column messageId="testKey" attributeName="testKey1" sortType="String"/>
+				</columns>
+			</component_config>
+		</client_configs>	
+		<hooks>
+			<serverCallback hookName="ls.metadata" methodName="extractMeta"></serverCallback>
+			<serverCallback hookName="move.metadata" methodName="updateMetaLocation"></serverCallback>
+		</hooks>
+	</registry_contributions>
+	<dependencies>
+		<!-- Image proxy must be implemented -->
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+	</dependencies>				
+</meta>

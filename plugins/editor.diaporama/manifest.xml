@@ -60,6 +60,9 @@
 				</processing>
 			</action>
 		</actions>
+		<hooks>
+			<serverCallback hookName="ls.metadata" methodName="extractImageMetaData"></serverCallback>
+		</hooks>
 	</registry_contributions>
 	<dependencies>
 		<!-- Image proxy must be implemented -->
