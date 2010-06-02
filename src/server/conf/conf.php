@@ -77,7 +77,7 @@ $AUTH_DRIVER = array(
 		"AUTOCREATE_AJXPUSER" 	=> false, 
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
-$ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*");
+$ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*", "meta.*");
 if(AJXP_Utils::userAgentIsMobile()){
 	$ACTIVE_PLUGINS[] = "gui.mobile";
 }
