@@ -55,7 +55,7 @@ class AJXP_Plugin{
 	 *
 	 * @var DOMDocument
 	 */
-	private $manifestDoc;
+	protected $manifestDoc;
 	public function __construct($id, $baseDir){
 		$this->baseDir = $baseDir;
 		$this->id = $id;

@@ -528,7 +528,7 @@ class fsAccessDriver extends AbstractAccessDriver
 						if(AJXP_Utils::isBrowsableArchive($nodeName)){
 							$metaData["ajxp_mime"] = "ajxp_browsable_archive";
 						}
-						$realFile; // A reference to the real file.
+						$realFile = null; // A reference to the real file.
 						AJXP_Controller::applyHook("ls.metadata", array($currentFile, &$metaData, $this->wrapperClassName, &$realFile));						
 					}
 									

@@ -63,6 +63,13 @@
 		<hooks>
 			<serverCallback hookName="ls.metadata" methodName="extractImageMetaData"></serverCallback>
 		</hooks>
+		<client_configs>
+			<component_config className="FilesList">
+				<columns>
+					<additional_column messageString="Image Dimension" attributeName="readable_dimension" sortType="String"/>
+				</columns>
+			</component_config>
+		</client_configs>			
 	</registry_contributions>
 	<dependencies>
 		<!-- Image proxy must be implemented -->

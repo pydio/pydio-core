@@ -3,19 +3,10 @@
 	<class_definition filename="plugins/meta.serial/class.SerialMetaManager.php" classname="SerialMetaManager"/>
 	<server_settings>
 		<param name="meta_file_name" type="string" label="Meta File" description="Hidden file used inside folders to save meta data" mandatory="true" default=".ajxp_meta"/>
+		<param name="meta_fields" type="string" label="Meta Fields" description="Comma separated list of fields, use standard characters here." mandatory="true" default="comment_field"/>
+		<param name="meta_labels" type="string" label="Meta Labels" description="Comma separated list of labels, be sure to define as many as fields!" mandatory="true" default="My Comments"/>
 	</server_settings>	
 	<registry_contributions>
-		<client_configs>
-			<component_config className="FilesList">
-				<columns switchGridMode="filelist">
-					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
-					<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
-					<column messageId="3" attributeName="mimestring" sortType="String"/>
-					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate"/>
-					<column messageId="testKey" attributeName="testKey1" sortType="String"/>
-				</columns>
-			</component_config>
-		</client_configs>	
 		<hooks>
 			<serverCallback hookName="ls.metadata" methodName="extractMeta"></serverCallback>
 			<serverCallback hookName="move.metadata" methodName="updateMetaLocation"></serverCallback>
@@ -34,9 +25,14 @@
 					<clientCallback prepareModal="true"><![CDATA[
 						var userSelection = ajaxplorer.getUserSelection();
 						var loadFunc = function(oForm){
-							var metaField = $(oForm).select('input[name="meta_value"]')[0];
-							var metaValue = userSelection.getUniqueNode().getMetadata().get('testKey1');
-							metaField.setValue(metaValue);
+							var form = $(oForm).select('div[id="serial_meta_form"]')[0];
+							var nodeMeta = userSelection.getUniqueNode().getMetadata();
+							var metaFields = nodeMeta.get('meta_fields').split(',');
+							var metaLabels = nodeMeta.get('meta_labels').split(',');
+							for(var i=0;i<metaFields.length;i++){
+								var value = nodeMeta.get(metaFields[i]) || '';
+								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+'</div><input class="SF_input" name="'+metaFields[i]+'" value="'+value+'"/></div>');
+							}
 						}
 						var closeFunc = function(){
 							var oForm = $(modal.getForm());
@@ -48,10 +44,7 @@
 						modal.showDialogForm('Meta Edit', 'serial_meta_form', loadFunc, closeFunc);
 						]]></clientCallback>
 					<clientForm id="serial_meta_form"><![CDATA[
-					<div id="serial_meta_form" action="edit_serial_meta" box_width="200">
-					AJXP_MESSAGE[174]<br/>
-					<input type="text" name="meta_value" size="30" class="dialogFocus">
-					</div>
+					<div id="serial_meta_form" action="edit_serial_meta" box_width="250"></div>
 					]]></clientForm>
 					<serverCallback methodName="editMeta"></serverCallback>
 					</processing>
