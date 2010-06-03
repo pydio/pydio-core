@@ -17,9 +17,46 @@
 			<serverCallback hookName="ls.metadata" methodName="extractMeta"></serverCallback>
 			<serverCallback hookName="move.metadata" methodName="updateMetaLocation"></serverCallback>
 		</hooks>
+		<actions>
+			<action name="edit_serial_meta">
+				<gui text="156" title="157" src="filenew.png" hasAccessKey="false">
+					<context selection="true" dir="" recycle="hidden"
+						actionBar="false" contextMenu="true" infoPanel="false"
+						actionBarGroup="put" inZip="false">
+					</context>
+					<selectionContext dir="true" file="file" recycle="false" unique="true"></selectionContext>
+					</gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var userSelection = ajaxplorer.getUserSelection();
+						var loadFunc = function(oForm){
+							var metaField = $(oForm).select('input[name="meta_value"]')[0];
+							var metaValue = userSelection.getUniqueNode().getMetadata().get('testKey1');
+							metaField.setValue(metaValue);
+						}
+						var closeFunc = function(){
+							var oForm = $(modal.getForm());
+							userSelection.updateFormOrUrl(modal.getForm());	
+							ajaxplorer.actionBar.submitForm(oForm);				
+							hideLightBox(true);
+							return false;
+						};
+						modal.showDialogForm('Meta Edit', 'serial_meta_form', loadFunc, closeFunc);
+						]]></clientCallback>
+					<clientForm id="serial_meta_form"><![CDATA[
+					<div id="serial_meta_form" action="edit_serial_meta" box_width="200">
+					AJXP_MESSAGE[174]<br/>
+					<input type="text" name="meta_value" size="30" class="dialogFocus">
+					</div>
+					]]></clientForm>
+					<serverCallback methodName="editMeta"></serverCallback>
+					</processing>
+			</action>			
+		</actions>
 	</registry_contributions>
 	<dependencies>
-		<!-- Image proxy must be implemented -->
-		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+		<!-- Wrapper type plugins only -->
+		<pluginClass pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
 	</dependencies>				
 </meta>

@@ -4,14 +4,37 @@ class SerialMetaManager extends AJXP_Plugin {
 	
 	private static $currentMetaName;
 	private static $metaCache;
+	
+	protected $accessDriver;
+	
+	public function init($options, $accessDriver){
+		parent::init($options);
+		if(!isSet($this->options["meta_file_name"])){
+			$this->options["meta_file_name"] = ".ajxp_meta";
+		}
+		$this->accessDriver = $accessDriver;		
+	}
+	
+	public function editMeta($actionName, $httpVars, $fileVars){
+		if(!isSet($this->actions[$actionName])) return;
+		$selection = new UserSelection();
+		$selection->initFromHttpVars();
+		$currentFile = $selection->getUniqueFile();
+		$newMetaValue = $httpVars["meta_value"];
 		
+		$wrapperData = $this->accessDriver->detectStreamWrapper(false);
+		$urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();
+		$this->addMeta($urlBase.$currentFile, array("testKey1"=>$newMetaValue));	
+		AJXP_XMLWriter::header();
+		AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);	
+		AJXP_XMLWriter::close();
+	}
+	
 	public function extractMeta($currentFile, &$metadata, $wrapperClassName, &$realFile){
 		$base = basename($currentFile);
 		$this->loadMetaFileData($currentFile);		
 		if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
 			$metadata = array_merge($metadata, self::$metaCache[$base]);
-		}else{
-			//$this->addMeta($currentFile, array("testKey1"=>"value1"));
 		}
 	}
 	
@@ -40,7 +63,7 @@ class SerialMetaManager extends AJXP_Plugin {
 	}
 	
 	protected function loadMetaFileData($currentFile){
-		$metaFile = dirname($currentFile)."/.ajxp_meta";
+		$metaFile = dirname($currentFile)."/".$this->options["meta_file_name"];
 		if(self::$currentMetaName == $metaFile && is_array(self::$metaCache)){
 			return;
 		}
@@ -53,7 +76,7 @@ class SerialMetaManager extends AJXP_Plugin {
 	}
 	
 	protected function saveMetaFileData($currentFile){
-		$metaFile = dirname($currentFile)."/.ajxp_meta";
+		$metaFile = dirname($currentFile)."/".$this->options["meta_file_name"];
 		if((is_file($metaFile) && is_writable($metaFile)) || is_writable(dirname($metaFile))){
 			$fp = fopen($metaFile, "w");
 			fwrite($fp, serialize(self::$metaCache), strlen(serialize(self::$metaCache)));
