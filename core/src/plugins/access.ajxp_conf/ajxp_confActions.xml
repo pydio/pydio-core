@@ -224,7 +224,22 @@
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-		</action>	
+		</action>			
+		<action name="edit_meta_source">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="add_meta_source">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="delete_meta_source">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="delete">			
 			<gui text="7" title="161" src="editdelete.png" accessKey="delete_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
