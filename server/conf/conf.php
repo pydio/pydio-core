@@ -129,7 +129,13 @@ $REPOSITORIES[0] = array(
 		"PAGINATION_THRESHOLD" => 500,
 		"PAGINATION_NUMBER" => 200,
 		"META_SOURCES"		=> array(
-			/* "meta.serial"=> array("meta_file_name" => ".ajxp_meta")*/
+		/*
+			"meta.serial"=> array(
+				"meta_file_name"	=> ".ajxp_meta",
+				"meta_fields"		=> "testKey1",
+				"meta_labels"		=> "Test Key"
+			)		*/
+
 		)
 	),
 	

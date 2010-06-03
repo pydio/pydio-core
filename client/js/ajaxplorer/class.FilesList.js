@@ -141,9 +141,18 @@ Class.create("FilesList", SelectableElements, {
 				}				
 			}						
 			// COLUMNS INFO
-			var newCols = $A([]);
-			var sortTypes = $A([]);
-			XPathSelectNodes(columnsNode, "column").each(function(col){
+			var columns = XPathSelectNodes(columnsNode, "column");
+			var addColumns = XPathSelectNodes(columnsNode, "additional_column");
+			if(columns.length){
+				var newCols = $A([]);
+				var sortTypes = $A([]);
+				columns.concat(addColumns);
+			}else{
+				var newCols = this.columnsDef;
+				var sortTypes = this._oSortTypes;
+				columns = addColumns;
+			}
+			columns.each(function(col){
 				var obj = {};
 				$A(col.attributes).each(function(att){
 					obj[att.nodeName]=att.nodeValue;
@@ -758,11 +767,11 @@ Class.create("FilesList", SelectableElements, {
 				var date = new Date();
 				date.setTime(parseInt(metaData.get(s))*1000);
 				newRow.ajxp_modiftime = date;
-				tableCell.innerHTML = formatDate(date);
+				tableCell.update(formatDate(date));
 			}
 			else
 			{
-				tableCell.innerHTML = metaData.get(s);
+				tableCell.update(metaData.get(s) || "");
 			}
 			if(this.gridStyle == "grid"){
 				tableCell.setAttribute('valign', 'top');				
