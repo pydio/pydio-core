@@ -331,17 +331,33 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					print(">");
 					foreach ($nested as $option){
 						foreach ($option as $key => $optValue){
-							if(is_bool($optValue)){
-								$optValue = ($optValue?"true":"false");
+							if(is_array($optValue) && count($optValue)){
+								print("<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>");
+							}else{
+								if(is_bool($optValue)){
+									$optValue = ($optValue?"true":"false");
+								}
+								print("<param name=\"$key\" value=\"$optValue\"/>");
 							}
-							print("<param name=\"$key\" value=\"$optValue\"/>");
 						}
 					}
 					print("</repository>");
 				}else{
 					print("/>");
 				}
-				print(ConfService::availableDriversToXML("param", $repository->accessType));
+				$pServ = AJXP_PluginsService::getInstance();
+				$plug = $pServ->getPluginById("access.".$repository->accessType);
+				$manifest = $plug->getManifestRawContent("server_settings/param");
+				print("<ajxpdriver name=\"".$repository->accessType."\">$manifest</ajxpdriver>");
+				print("<metasources>");
+				$metas = $pServ->getPluginsByType("meta");
+				foreach ($metas as $metaPlug){
+					print("<meta id=\"".$metaPlug->getId()."\">");
+					$manifest = $metaPlug->getManifestRawContent("server_settings/param");
+					print($manifest);
+					print("</meta>");
+				}
+				print("</metasources>");
 				AJXP_XMLWriter::close("admin_data");
 				exit(1);
 			break;
@@ -395,6 +411,60 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::close();		
 				exit(1);
 			
+			case "add_meta_source" : 
+				$repId = $httpVars["repository_id"];
+				$repo = ConfService::getRepositoryById($repId);
+				$metaSourceType = $httpVars["new_meta_source"];
+				$options = array();
+				$this->parseParameters($httpVars, $options);
+				$repoOptions = $repo->getOption("META_SOURCES");
+				if(!is_array($repoOptions)){
+					$repoOptions = array();
+				}
+				$repoOptions[$metaSourceType] = $options;
+				$repo->addOption("META_SOURCES", $repoOptions);
+				ConfService::replaceRepository($repId, $repo);
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage("Success",null);
+				AJXP_XMLWriter::close();
+			break;
+						
+			case "delete_meta_source" : 
+			
+				$repId = $httpVars["repository_id"];
+				$repo = ConfService::getRepositoryById($repId);
+				$metaSourceId = $httpVars["plugId"];
+				$repoOptions = $repo->getOption("META_SOURCES");
+				if(is_array($repoOptions) && array_key_exists($metaSourceId, $repoOptions)){
+					unset($repoOptions[$metaSourceId]);
+					$repo->addOption("META_SOURCES", $repoOptions);
+					ConfService::replaceRepository($repId, $repo);
+				}
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage("Success",null);
+				AJXP_XMLWriter::close();
+
+			break;
+			
+			case "edit_meta_source" : 
+				$repId = $httpVars["repository_id"];
+				$repo = ConfService::getRepositoryById($repId);
+				$metaSourceId = $httpVars["plugId"];
+				$options = array();
+				$this->parseParameters($httpVars, $options);
+				$repoOptions = $repo->getOption("META_SOURCES");
+				if(!is_array($repoOptions)){
+					$repoOptions = array();
+				}
+				$repoOptions[$metaSourceId] = $options;
+				$repo->addOption("META_SOURCES", $repoOptions);
+				ConfService::replaceRepository($repId, $repo);
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage("Success",null);
+				AJXP_XMLWriter::close();
+			break;
+									
+				
 			case "delete" :
 				if(isSet($httpVars["repository_id"])){
 					$repId = $httpVars["repository_id"];
@@ -477,8 +547,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     }
 
 	function listRepositories(){
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>');		
 		$repos = ConfService::getRepositoriesList();
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>');		
         $repoArray = array();
 		foreach ($repos as $repoIndex => $repoObject){
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
@@ -489,20 +559,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         ksort($repoArray);
         foreach ($repoArray as $name => $repoIndex) {
             $repoObject =& $repos[$repoIndex];
-			print '<tree 				
-				text="'.$name.'" 
-				is_file="1" 
-				repository_id="'.$repoIndex.'" 
-				accessType="'.$repoObject->getAccessType().'" 
-				icon="folder_red.png" 
-				openicon="folder_red.png" 
-				filename="/users/'.$name.'" 
-				parentname="/users" 
-				src="content.php?get_action=ls&amp;dir=%2Fusers%2F'.$name.'" 
-				ajxp_mime="repository'.($repoObject->isWriteable()?"_editable":"").'"
-				/>';
+            $metaData = array(
+            	"repository_id" => $repoIndex,
+            	"accessType"	=> $repoObject->getAccessType(),
+            	"icon"			=> "folder_red.png",
+            	"openicon"		=> "folder_red.png",
+            	"parentname"	=> "/repositories",
+				"ajxp_mime" 	=> "repository".($repoObject->isWriteable()?"_editable":"")
+            );
+            AJXP_XMLWriter::renderNode("/repositories/$repoIndex", $name, true, $metaData);
 		}
-		
 	}
 	
 	function listLogFiles($dir){	
