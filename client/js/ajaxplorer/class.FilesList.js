@@ -104,6 +104,7 @@ Class.create("FilesList", SelectableElements, {
 		this.even = true;
 		
 		// Default headersDef
+		this.hiddenColumns = $A([]);
 		this.columnsDef = $A([]);
 		this.columnsDef.push({messageId:1,attributeName:'ajxp_label'});
 		this.columnsDef.push({messageId:2,attributeName:'filesize'});
@@ -117,6 +118,31 @@ Class.create("FilesList", SelectableElements, {
 		Event.observe(document, "keydown", this.keydown.bind(this));		
 	},
 		
+	getVisibleColumns : function(){
+		var visible = $A([]);
+		this.columnsDef.each(function(el){
+			if(!this.hiddenColumns.include(el.attributeName)) visible.push(el);
+		}.bind(this) );		
+		return visible;
+	},
+	
+	setColumnVisible : function (attName, visible){
+		var change = false;
+		if(visible && this.hiddenColumns.include(attName)){			
+			this.hiddenColumns = this.hiddenColumns.without(attName);
+			change = true;
+		}
+		if(!visible && !this.hiddenColumns.include(attName)){
+			this.hiddenColumns.push(attName);
+			change = true;
+		}
+		if(change){
+			this.initGUI();
+			this.fill(this.crtContext);
+		}
+		
+	},
+	
 	contextObserver : function(){
 		if(!this.crtContext) return;
 		//console.log('FILES LIST : FILL');
@@ -246,7 +272,8 @@ Class.create("FilesList", SelectableElements, {
 				buffer = buffer + '<div style="overflow:hidden;background-color: #aaa;">';
 			}
 			buffer = buffer + '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
-			this.columnsDef.each(function(column){buffer = buffer + '<col\>';});
+			var visibleColumns = this.getVisibleColumns();
+			visibleColumns.each(function(column){buffer = buffer + '<col\>';});
 			buffer = buffer + '<thead><tr>';
 			var userPref;
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_size", true)){
@@ -255,9 +282,9 @@ Class.create("FilesList", SelectableElements, {
 					userPref = new Hash(data.get(ajaxplorer.user.getActiveRepository()));
 				}
 			}
-			for(var i=0; i<this.columnsDef.length;i++){
-				var column = this.columnsDef[i];
-				var last = ((i==this.columnsDef.length-1)?' id="last_header"':'');
+			for(var i=0; i<visibleColumns.length;i++){
+				var column = visibleColumns[i];
+				var last = ((i==visibleColumns.length-1)?' id="last_header"':'');
 				var stringWidth =((userPref && userPref.get(i))?' style="width:'+userPref.get(i)+(userPref.get('type')?'%':'px')+'"':'');
 				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+stringWidth+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
 			}
@@ -732,7 +759,8 @@ Class.create("FilesList", SelectableElements, {
 		var attributeList;
 		if(!this.parsingCache.get('attributeList')){
 			attributeList = $A([]);
-			this.columnsDef.each(function(column){
+			var visibleColumns = this.getVisibleColumns();
+			visibleColumns.each(function(column){
 				attributeList.push(column.attributeName);
 			});
 			this.parsingCache.set('attributeList', attributeList);
