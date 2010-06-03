@@ -97,6 +97,7 @@ class ImagePreviewer extends AJXP_Plugin {
 			$metadata["image_type"] = image_type_to_mime_type($type);
 			$metadata["image_width"] = $width;
 			$metadata["image_height"] = $height;
+			$metadata["readable_dimension"] = $width."px X ".$height."px";
 		}
 	}
 	
