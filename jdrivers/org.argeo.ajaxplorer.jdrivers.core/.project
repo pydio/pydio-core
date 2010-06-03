@@ -1,6 +1,6 @@
 <projectDescription>
   <name>org.argeo.ajaxplorer.jdrivers.core</name>
-  <comment>Sparta Web Application</comment>
+  <comment>Sparta Web Application. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects/>
   <buildSpec>
     <buildCommand>

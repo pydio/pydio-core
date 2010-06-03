@@ -105,6 +105,7 @@ public class FileLsAction<T extends FileDriver, F extends AjxpFile> extends File
 				writer = new OutputStreamWriter(out, encoding);
 				writer.write("<?xml version=\"1.0\" encoding=\"" + encoding
 						+ "\"?>");
+				// TODO add current path
 				writer.write("<tree>");
 				for (AjxpFile file : files) {
 					writer.write(file.toXml(mode, encoding));
