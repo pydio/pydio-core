@@ -427,22 +427,22 @@ ConfigEditor = Class.create({
 		return false;		
 	},
 	
-	loadRepository : function(repId){
-		var params = new Hash();
+	loadRepository : function(repId, metaTab){
+		var params = new Hash();		
 		params.set("get_action", "edit");
 		params.set("sub_action", "edit_repository");
 		params.set("repository_id", repId);
 		var connexion = new Connexion();
 		connexion.setParameters(params);
 		connexion.onComplete = function(transport){
-			this.feedRepositoryForm(transport.responseXML);			
+			this.feedRepositoryForm(transport.responseXML, metaTab);			
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
 		}.bind(this);
 		connexion.sendAsync();		
 	},
 
-	feedRepositoryForm: function(xmlData){
+	feedRepositoryForm: function(xmlData, metaTab){
 		
 		var repo = XPathSelectSingleNode(xmlData, "admin_data/repository");
 		var driverParams = XPathSelectNodes(xmlData, "admin_data/ajxpdriver/param");
@@ -454,9 +454,32 @@ ConfigEditor = Class.create({
 		}
 				
 		var form = new Element('div', {className:'driver_form'});
-		optionsPane.update(new Element('legend').update(XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' Driver Options'));
-		optionsPane.insert({bottom:form});
+		var metaForm = new Element('div', {className:'driver_form', style:'display:none;'});
 		
+		var optLegend = new Element('a', {className:"active"}).update(XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' Driver Options');
+		var metaLegend = new Element('a').update('Meta Sources');
+		var legend = new Element('legend');
+		legend.insert(optLegend);
+		legend.insert(" | ");
+		legend.insert(metaLegend);
+		
+		optionsPane.update(legend);
+		optionsPane.insert({bottom:form});
+		optionsPane.insert({bottom:metaForm});
+		
+		optLegend.observe("click", function(){
+			metaForm.hide();form.show();
+			optLegend.addClassName('active');
+			metaLegend.removeClassName('active');
+			modal.refreshDialogAppearance();
+		});
+		metaLegend.observe("click", function(){
+			form.hide();metaForm.show();
+			metaLegend.addClassName('active');
+			optLegend.removeClassName('active');
+			modal.refreshDialogAppearance();
+		});
+				
 		var paramsValues = new Hash();
 		$A(repo.childNodes).each(function(child){
 			if(child.nodeName != 'param') return;
@@ -467,8 +490,111 @@ ConfigEditor = Class.create({
 		this.currentRepoId = repo.getAttribute("index");
 		this.currentRepoWriteable = writeable;
 		this.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable);
+		
+		this.feedMetaSourceForm(xmlData, metaForm);		
+		if(metaTab){
+			form.hide();metaForm.show();
+			metaLegend.addClassName('active');
+			optLegend.removeClassName('active');
+			modal.refreshDialogAppearance();			
+		}
+		
 	},
 	
+	feedMetaSourceForm : function(xmlData, metaPane){
+		var data = XPathSelectSingleNode(xmlData, 'admin_data/repository/param[@name="META_SOURCES"]');
+		if(data && data.firstChild && data.firstChild.nodeValue){
+			metaSourcesData = data.firstChild.nodeValue.evalJSON();
+			for(var plugId in metaSourcesData){
+				var form = new Element("div", {className:"metaPane"}).update("<img name=\"delete_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\"><img name=\"edit_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">Plugin '"+plugId+"'</span>");
+				form._plugId = plugId;
+				var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
+				var driverParamsHash = $A([]);
+				for(var i=0;i<metaDefNodes.length;i++){
+					driverParamsHash.push(this.driverParamNodeToHash(metaDefNodes[i]));
+				}
+				paramsValues = new Hash(metaSourcesData[plugId]);
+				this.createParametersInputs(form, driverParamsHash, true, paramsValues, false);
+				metaPane.insert(form);
+			}
+		}
+		var addForm = new Element("div", {className:"metaPane"}).update("<div style='clear:both;'><img name=\"add_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">Add a source</span></div>");
+		var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>Meta Plugin :</div>");
+		this.metaSelector = new Element("select", {name:'new_meta_source', className:'SF_input'});
+		var choices = XPathSelectNodes(xmlData, 'admin_data/metasources/meta');
+		this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
+		for(var i=0;i<choices.length;i++){
+			var id = choices[i].getAttribute("id");
+			this.metaSelector.insert(new Element("option",{value:id}).update(id));
+		}		
+		addForm.insert(formEl);
+		formEl.insert(this.metaSelector);
+		metaPane.insert(addForm);
+		var addFormDetail = new Element("div");
+		addForm.insert(addFormDetail);
+		addForm.select('img')[0]._form = addForm;
+		
+		this.metaSelector.observe("change", function(){
+			var plugId = this.metaSelector.getValue();
+			if(!plugId){
+				addFormDetail.update("");
+			}else{
+				var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
+				var driverParamsHash = $A([]);
+				for(var i=0;i<metaDefNodes.length;i++){
+					driverParamsHash.push(this.driverParamNodeToHash(metaDefNodes[i]));
+				}				
+				this.createParametersInputs(addFormDetail, driverParamsHash, true);				
+			}
+			modal.refreshDialogAppearance();
+		}.bind(this));
+
+		metaPane.select('img').each(function(img){
+			img.observe("click", this.metaActionClick.bind(this));
+		}.bind(this));
+		
+	},
+	
+	metaActionClick : function(event){
+		var img = Event.findElement(event, 'img');
+		if(img._form){
+			var form = img._form;
+		}else{
+			var form = Event.findElement(event, 'div');
+		}
+		//var params = target._parameters;
+		var params = new Hash();
+		if(form._plugId){
+			params.set('plugId', form._plugId);
+		}
+		if(img.getAttribute('name')){
+			params.set('get_action', img.getAttribute('name'));
+		}
+		params.set('repository_id', this.currentRepoId);
+		this.submitParametersInputs(form, params, "DRIVER_OPTION_");
+		if(params.get('get_action') == 'add_meta_source' && params.get('DRIVER_OPTION_new_meta_source') == ''){
+			alert('Please choose a driver!');
+			return;
+		}
+		if(params.get('DRIVER_OPTION_new_meta_source')){
+			params.set('new_meta_source', params.get('DRIVER_OPTION_new_meta_source'));
+			params.unset('DRIVER_OPTION_new_meta_source');
+		}
+		if(params.get('get_action') == 'delete_meta_source'){
+			var res = confirm('Are you sure you want to delete this source?');
+			if(!res) return;
+		}
+		
+		var conn = new Connexion();
+		conn.setParameters(params);
+		conn.onComplete = function(transport){
+			this.parseXmlMessage(transport.responseXML);
+			this.loadRepository(this.currentRepoId, true);
+		}.bind(this);
+		conn.sendAsync();
+		
+	},
+		
 	deleteRepository : function(repId){
 		var params = new Hash();
 		params.set('repository_id', repId);
@@ -542,6 +668,12 @@ ConfigEditor = Class.create({
 				parametersHash.set(prefix+el.name+'_ajxptype', el.getAttribute('ajxp_type'));
 			}
 		});		
+		form.select('select').each(function(el){
+			if(el.getAttribute("ajxp_mandatory") == 'true' && el.getValue() == ''){
+				missingMandatory = true;
+			}
+			parametersHash.set(prefix+el.name, el.getValue());
+		});
 		return missingMandatory;
 	},	
 	

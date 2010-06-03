@@ -526,9 +526,10 @@ class ConfService
 		
 		$metaSources = $crtRepository->getOption("META_SOURCES");
 		if(isSet($metaSources) && is_array($metaSources) && count($metaSources)){
-			$keys = array_keys($metaSources);
+			$keys = array_keys($metaSources);			
 			foreach ($keys as $plugId){
-				$split = explode(".", $plugId);
+				if($plugId == "") continue;
+				$split = explode(".", $plugId);				
 				$instance = $pServ->getPluginById($plugId);
 				$instance->init($metaSources[$plugId], $plugInstance);
 				$pServ->setPluginActive($split[0], $split[1]);

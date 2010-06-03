@@ -1367,6 +1367,27 @@ ADMIN STYLES
     font-size: 13px;	
 }
 
+.metaPane{
+	border-bottom:1px solid #eee;
+	border-top:1px solid #ccc;
+	background-color: #f6f6f6;
+	margin-bottom:5px;
+	margin-top:2px;
+	float:left;
+	padding:6px 5px 8px;
+	width:96%;
+}
+
+.metaPane img{
+	float:right;
+	cursor:pointer;
+	margin-left: 3px;
+}
+
+.metaPane span.title{
+	font-weight: bold;
+}
+
 .users_list_title
 {
     font-family: Trebuchet MS, Nimbus Sans L, sans-serif;
@@ -1429,6 +1450,16 @@ legend
 {
     color: #79f;
     font-weight: bold;
+}
+
+legend a{
+	cursor: pointer;
+}
+
+legend a.active {
+	color: #676965;
+	text-decoration:underline;
+	cursor: default;
 }
 
 .repository, .repository td, .password td
