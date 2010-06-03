@@ -77,7 +77,7 @@ $AUTH_DRIVER = array(
 		"AUTOCREATE_AJXPUSER" 	=> false, 
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
-$ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*", "meta.*");
+$ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*");
 if(AJXP_Utils::userAgentIsMobile()){
 	$ACTIVE_PLUGINS[] = "gui.mobile";
 }
@@ -127,7 +127,10 @@ $REPOSITORIES[0] = array(
 		"CHMOD_VALUE"   =>  '0600',
 		"DEFAULT_RIGHTS"=>  "",
 		"PAGINATION_THRESHOLD" => 500,
-		"PAGINATION_NUMBER" => 200
+		"PAGINATION_NUMBER" => 200,
+		"META_SOURCES"		=> array(
+			/* "meta.serial"=> array("meta_file_name" => ".ajxp_meta")*/
+		)
 	),
 	
 );
