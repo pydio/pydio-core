@@ -32,6 +32,7 @@
  * Description : main script called at initialisation.
  */
 require_once("server/classes/class.AJXP_Utils.php");
+require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.Repository.php");

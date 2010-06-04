@@ -383,29 +383,10 @@ class ConfService
 		{			
 			require(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/".$this->configs["LANGUE"].".php");
 			$this->configs["MESSAGES"] = $mess;
-			$xml = self::availableDriversToXML("i18n");
-			$results = array();
-			preg_match_all("<i18n [^\>]*\/>", $xml, $results);			
-			$libs = array();
-			//print_r($xml);
-			if(isSet($results[0]) && count($results[0])){
-				foreach ($results[0] as $found){
-					$parts = explode(" ", $found);
-					$nameSpace = "";
-					$path = "";
-					foreach($parts as $attPart){
-						if(strstr($attPart, "=") === false) continue;
-						$split = explode("=", $attPart);
-						$attName = $split[0];						
-						$attValue = substr($split[1], 1, strlen($split[1])-2);
-						if($attName == "namespace") $nameSpace = $attValue;
-						else if($attName == "path") $path = $attValue;						
-					}
-					$libs[$nameSpace] = $path;
-				}
-			}
-			//print_r($libs);
-			foreach ($libs as $nameSpace => $path){
+			$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
+			foreach ($nodes as $node){
+				$nameSpace = $node->getAttribute("namespace");
+				$path = $node->getAttribute("path");
 				$lang = $this->configs["LANGUE"];
 				if(!is_file($path."/".$this->configs["LANGUE"].".php")){
 					$lang = "en"; // Default language, minimum required.
