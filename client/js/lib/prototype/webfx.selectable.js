@@ -53,7 +53,7 @@ SelectableElements = Class.create({
 		}.bind(this);
 	
 		$(this._htmlElement).observe('contextmenu', function(e){		
-			Event.stop(e);		
+			//Event.stop(e);		
 			if(this._selectedItems.length > 1) return;
 			if(Prototype.Browser.WebKit) return;
 			this.click(e);

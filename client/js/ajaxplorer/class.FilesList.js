@@ -319,6 +319,35 @@ Class.create("FilesList", SelectableElements, {
 				fitHeightToBottom($('table_rows_container'), this.htmlElement);
 			}.bind(this);
 			this.observe("resize", this.observer);
+		
+			this.headerMenu = new Proto.Menu({
+			  selector: '#selectable_div_header', 
+			  className: 'menu desktop',
+			  menuItems: [{
+					name:"tete",
+					alt:"ttt",
+					image:resolveImageSource("file_save.png", '/images/actions/ICON_SIZE', 16),
+					isDefault:false,
+					callback:function(e){alert("coucou");}
+			  }],
+			  fade:true,
+			  zIndex:2000,
+			  beforeShow : function(){
+			  	var items = $A([]);
+			  	this.columnsDef.each(function(column){
+					var isVisible = !this.hiddenColumns.include(column.attributeName);
+					items.push({
+						name:(column.messageId?MessageHash[column.messageId]:column.messageString),
+						alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
+						image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+						isDefault:false,
+						callback:function(e){this.setColumnVisible(column.attributeName, !isVisible)}.bind(this)
+					});
+				}.bind(this) );		
+				this.headerMenu.options.menuItems = items;
+				this.headerMenu.refreshList();
+			  }.bind(this)
+			});
 		}
 		else if(this._displayMode == "thumb")
 		{			
