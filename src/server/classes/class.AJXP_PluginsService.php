@@ -224,7 +224,7 @@
  				$parent = $contrib->nodeName;
  				$nodes = $contrib->childNodes;
  				if(!$nodes->length) continue;
- 				$uuidAttr = $contrib->getAttribute["uuidAttr"] OR "name";
+ 				$uuidAttr = $contrib->getAttribute("uuidAttr") OR "name";
  				$uuidAttr = "name";
  				$this->mergeNodes($reg, $parent, $uuidAttr, $nodes);
 	 		}
@@ -238,6 +238,26 @@
  			$self->buildXmlRegistry();
  		}
  		return $self->xmlRegistry;
+ 	}
+ 	
+ 	public static function searchAllManifests($query, $stringOrNodeFormat = "string"){
+ 		$buffer = "";
+ 		$nodes = array();
+ 		$self = self::getInstance();
+ 		foreach ($self->registry as $plugType){ 			
+ 			foreach ($plugType as $plugName => $plugObject){
+ 				$res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat);
+ 				if($stringOrNodeFormat == "string"){
+	 				$buffer .= $res;
+ 				}else{
+ 					foreach ($res as $node){
+ 						$nodes[] = $node;
+ 					}
+ 				}
+ 			}
+ 		}
+ 		if($stringOrNodeFormat == "string") return $buffer;
+ 		else return $nodes;
  	}
  	
  	protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes){
