@@ -203,16 +203,24 @@ class AJXP_Plugin{
 		$this->manifestLoaded = true;
 		$this->loadDependencies();
 	}
-	public function getManifestRawContent($xmlNodeName = ""){
+	public function getManifestRawContent($xmlNodeName = "", $format = "string"){
 		if($xmlNodeName == ""){
-			return $this->manifestDoc->saveXML($this->manifestDoc->documentElement);
-		}else{
-			$buffer = "";
-			$nodes = $this->xPath->query($xmlNodeName);
-			foreach ($nodes as $node){
-				$buffer .= $this->manifestDoc->saveXML($node);
+			if($format == "string"){
+				return $this->manifestDoc->saveXML($this->manifestDoc->documentElement);
+			}else{
+				return $this->manifestDoc->documentElement;
 			}
-			return $buffer;
+		}else{
+			$nodes = $this->xPath->query($xmlNodeName);
+			if($format == "string"){
+				$buffer = "";
+				foreach ($nodes as $node){
+					$buffer .= $this->manifestDoc->saveXML($node);
+				}
+				return $buffer;
+			}else{
+				return $nodes;
+			}
 		}
 	}
 	public function getRegistryContributions(){

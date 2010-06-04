@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.serial" className="SerialMetaManager">
 	<class_definition filename="plugins/meta.serial/class.SerialMetaManager.php" classname="SerialMetaManager"/>
+	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png" search_engine="SQLSearchEngine">
+		<resources>
+			<i18n namespace="meta.serial" path="plugins/meta.serial/i18n" />
+		</resources>
+	</client_settings>	
 	<server_settings>
 		<param name="meta_file_name" type="string" label="Meta File" description="Hidden file used inside folders to save meta data" mandatory="true" default=".ajxp_meta"/>
 		<param name="meta_fields" type="string" label="Meta Fields" description="Comma separated list of fields, use standard characters here." mandatory="true" default="comment_field"/>
@@ -13,7 +18,7 @@
 		</hooks>
 		<actions>
 			<action name="edit_serial_meta">
-				<gui text="156" title="157" src="filenew.png" hasAccessKey="false">
+				<gui text="meta.serial.1" title="meta.serial.1" src="documentinfo_koffice.png" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
 						actionBar="false" contextMenu="true" infoPanel="false"
 						actionBarGroup="put" inZip="false">
