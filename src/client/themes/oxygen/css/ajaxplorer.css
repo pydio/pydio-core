@@ -1197,11 +1197,6 @@ UPLOAD MULTIFILE FORM
 
 .infoPanelActions
 {
-	background-color:#F1F1EF;
-	border:1px solid #676965;
-	margin-bottom:10px;
-	margin-left:10px;
-	margin-right:10px;
 	padding:5px;
 }
 
@@ -1214,12 +1209,11 @@ UPLOAD MULTIFILE FORM
 {
     color:#676965;
     display: block;
-    padding: 5px 3px;
+    padding: 3px 2px;
 }
 
 #info_panel a:hover
 {
-	color : #000;
 	font-weight : bold;
 }
 
@@ -1237,6 +1231,49 @@ UPLOAD MULTIFILE FORM
    text-align:center;
    padding-bottom: 10px;
 }
+
+.infoPanelTable
+{
+	font-size: 11px;
+	width: 100%;
+}
+
+td.infoPanelValue
+{
+	padding:3px;
+}
+
+td.infoPanelLabel
+{
+	padding:3px 5px;
+	font-weight:bold;
+	width:35%;
+}
+
+.infoPanelGroup
+{
+	border-top: 1px dotted #676965;
+	border-bottom: 1px dotted #676965;
+}
+
+tr.even td.infoPanelLabel
+{
+	border-right:1px solid white;
+}
+
+tr td.infoPanelLabel
+{
+	border-right:1px solid #f4f4f4;
+}
+
+.infoPanelImagePreview 
+{
+	width: 100%;
+	background-color: #f4f4f4;
+	text-align:center;
+	padding: 10 0;
+}
+
 
 #browser
 {

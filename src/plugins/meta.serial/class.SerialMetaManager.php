@@ -12,23 +12,35 @@ class SerialMetaManager extends AJXP_Plugin {
 		$this->options = $options;
 		
 		$def = $this->getMetaDefinition();
-		$dynaContrib = '<client_configs>
-			<component_config className="FilesList">
-				<columns>';
-		foreach ($def as $key=>$label){
-			$dynaContrib .= '<additional_column messageString="'.$label.'" attributeName="'.$key.'" sortType="String"/>';
-		}
-		$dynaContrib .=	'</columns>
-			</component_config>
-		</client_configs>	
-		';
-		$dom = new DOMDocument();
-		$dom->loadXML($dynaContrib);
-		$imported = $this->manifestDoc->importNode($dom->documentElement, true);
-		$selection = $this->xPath->query("registry_contributions");
+		$cdataHead = '<div>
+						<div class="panelHeader infoPanelGroup" colspan="2">Meta Data</div>
+						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
+		$cdataFoot = '</table></div>';
+		$cdataParts = "";
+		
+		$selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
 		$contrib = $selection->item(0);		
-		$contrib->appendChild($imported);
-
+		$even = false;
+		foreach ($def as $key=>$label){
+			$col = $this->manifestDoc->createElement("additional_column");			
+			$col->setAttribute("messageString", $label);
+			$col->setAttribute("attributeName", $key);
+			$col->setAttribute("sortType", "String");
+			$contrib->appendChild($col);
+			
+			$trClass = ($even?" class=\"even\"":"");
+			$even = !$even;
+			$cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue">#{'.$key.'}</td></tr>';
+		}
+		
+		$selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
+		$contrib = $selection->item(0);
+		$contrib->setAttribute("attributes", implode(",", array_keys($def)));		
+		$htmlSel = $this->xPath->query('html', $contrib);
+		$html = $htmlSel->item(0);
+		$cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
+		$html->appendChild($cdata);
+		
 		parent::init($options);
 	
 	}

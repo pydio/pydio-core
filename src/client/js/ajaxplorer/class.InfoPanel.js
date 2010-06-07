@@ -47,15 +47,9 @@ Class.create("InfoPanel", AjxpPane, {
 			}
 		}.bind(this) );
 		
-		//document.observe("ajaxplorer:actions_loaded", this.parseRegistry.bind(this) );
+		document.observe("ajaxplorer:user_logged", this.clearPanels.bind(this) );
 	},
-	
-	setTemplateForMime: function(mimeType, templateString, attributes, messages){
-		var tId = this.mimesTemplate.size();
-		this.registeredMimes.set(mimeType, tId);
-		this.mimesTemplates.push($A([templateString,attributes, messages]));
-	},
-	
+		
 	clearPanels:function(){
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();
@@ -69,6 +63,8 @@ Class.create("InfoPanel", AjxpPane, {
 		if(!this.htmlElement) return;
 		var userSelection = ajaxplorer.getUserSelection();
 		var contextNode = userSelection.getContextNode();
+		this.empty();
+
 		if(!contextNode) {
 			return;
 		}
@@ -115,6 +111,7 @@ Class.create("InfoPanel", AjxpPane, {
 					$(this.htmlElement).select('[id="filelist_totalsize"]')[0].hide();
 				}
 			}catch(e){}
+			this.addActions('empty');
 			return;
 		}
 		if(!userSelection.isUnique())
@@ -125,15 +122,23 @@ Class.create("InfoPanel", AjxpPane, {
 		}
 		
 		var uniqNode = userSelection.getUniqueNode();
+		var isFile = false;
+		if(uniqNode) isFile = uniqNode.isLeaf();
+		this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqNode);
+		
 		var extension = getAjxpMimeType(uniqNode);
 		if(extension != "" && this.registeredMimes.get(extension)){
 			this.evalTemplateForMime(extension, uniqNode);
 		}
-		else{
-			var isFile = false;
-			if(uniqNode) isFile = uniqNode.isLeaf();
-			this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqNode);
-		}			
+		
+		this.addActions('unique');
+		var fakes = this.htmlElement.select('div[id="preview_rich_fake_element"]');
+		if(fakes && fakes.length){
+			this.currentPreviewElement = this.getPreviewElement(uniqNode, false);			
+			$(fakes[0]).replace(this.currentPreviewElement);			
+			this.resize();
+		}
+		
 	},
 	
 	setContent : function(sHtml){
@@ -158,92 +163,84 @@ Class.create("InfoPanel", AjxpPane, {
 	evalTemplateForMime: function(mimeType, fileNode, tArgs){
 		if(!this.htmlElement) return;
 		if(!this.registeredMimes.get(mimeType)) return;		
-		var templateData = this.mimesTemplates.get(this.registeredMimes.get(mimeType));
-		var tString = templateData[0];
-		var tAttributes = templateData[1];
-		var tMessages = templateData[2];
-		if(!tArgs){
-			tArgs = new Object();
-		}
-		var panelWidth = this.htmlElement.getWidth();
-		var oThis = this;
-		if(fileNode){
-			var metadata = fileNode.getMetadata();			
-			tAttributes.each(function(attName){				
-				if(attName == 'basename' && metadata.get('filename')){
-					this[attName] = getBaseName(metadata.get('filename'));						
-				}
-				else if(attName == 'compute_image_dimensions'){
-					if(metadata.get('image_width') && metadata.get('image_height')){
-						var width = metadata.get('image_width');
-						var height = metadata.get('image_height');
-						var newHeight = 150;
-						if(height < newHeight) newHeight = height;
-						var newWidth = newHeight*width/height;
-						var dimAttr = 'height="'+newHeight+'"';
-						if(newWidth > panelWidth - 16) dimAttr = 'width="100%"';
-					}else{
-						dimAttr = 'height="64" width="64"';
+		var registeredTemplates = this.registeredMimes.get(mimeType);
+		for(var i=0;i<registeredTemplates.length;i++){		
+			var templateData = this.mimesTemplates.get(registeredTemplates[i]);
+			var tString = templateData[0];
+			var tAttributes = templateData[1];
+			var tMessages = templateData[2];
+			if(!tArgs){
+				tArgs = new Object();
+			}
+			var panelWidth = this.htmlElement.getWidth();
+			var oThis = this;
+			if(fileNode){
+				var metadata = fileNode.getMetadata();			
+				tAttributes.each(function(attName){				
+					if(attName == 'basename' && metadata.get('filename')){
+						this[attName] = getBaseName(metadata.get('filename'));						
 					}
-					this[attName] = dimAttr;
-				}
-				else if(attName == 'preview_rich'){
-					this[attName] = oThis.getPreviewElement(fileNode, true);
-				}
-				else if(attName == 'encoded_filename' && metadata.get('filename')){
-					this[attName] = encodeURIComponent(metadata.get('filename'));					
-				}
-				else if(attName == 'escaped_filename' && metadata.get('filename')){
-					this[attName] = escape(encodeURIComponent(metadata.get('filename')));					
-				}else if(attName == 'formated_date' && metadata.get('ajxp_modiftime')){
-					var modiftime = metadata.get('ajxp_modiftime');
-					if(modiftime instanceof Object){
-						this[attName] = formatDate(modiftime);
-					}else{
-						var date = new Date();
-						date.setTime(parseInt(metadata.get('ajxp_modiftime'))*1000);
-						this[attName] = formatDate(date);
+					else if(attName == 'compute_image_dimensions'){
+						if(metadata.get('image_width') && metadata.get('image_height')){
+							var width = metadata.get('image_width');
+							var height = metadata.get('image_height');
+							var newHeight = 150;
+							if(height < newHeight) newHeight = height;
+							var newWidth = newHeight*width/height;
+							var dimAttr = 'height="'+newHeight+'"';
+							if(newWidth > panelWidth - 16) dimAttr = 'width="100%"';
+						}else{
+							dimAttr = 'height="64" width="64"';
+						}
+						this[attName] = dimAttr;
 					}
-				}
-				else if(attName == 'uri'){
-					var url = document.location.href;
-					if(url[(url.length-1)] == '/'){
-						url = url.substr(0, url.length-1);
-					}else if(url.lastIndexOf('/') > -1){
-						url = url.substr(0, url.lastIndexOf('/'));
+					else if(attName == 'preview_rich'){
+						this[attName] = oThis.getPreviewElement(fileNode, true);
 					}
-					this[attName] = url;
-				}
-				else if(metadata.get(attName)){
-					this[attName] = metadata.get(attName);
-				}
-				else{ 
-					this[attName] = '';
-				}
+					else if(attName == 'encoded_filename' && metadata.get('filename')){
+						this[attName] = encodeURIComponent(metadata.get('filename'));					
+					}
+					else if(attName == 'escaped_filename' && metadata.get('filename')){
+						this[attName] = escape(encodeURIComponent(metadata.get('filename')));					
+					}else if(attName == 'formated_date' && metadata.get('ajxp_modiftime')){
+						var modiftime = metadata.get('ajxp_modiftime');
+						if(modiftime instanceof Object){
+							this[attName] = formatDate(modiftime);
+						}else{
+							var date = new Date();
+							date.setTime(parseInt(metadata.get('ajxp_modiftime'))*1000);
+							this[attName] = formatDate(date);
+						}
+					}
+					else if(attName == 'uri'){
+						var url = document.location.href;
+						if(url[(url.length-1)] == '/'){
+							url = url.substr(0, url.length-1);
+						}else if(url.lastIndexOf('/') > -1){
+							url = url.substr(0, url.lastIndexOf('/'));
+						}
+						this[attName] = url;
+					}
+					else if(metadata.get(attName)){
+						this[attName] = metadata.get(attName);
+					}
+					else{ 
+						this[attName] = '';
+					}
+				}.bind(tArgs));
+			}
+			tMessages.each(function(pair){
+				this[pair.key] = MessageHash[pair.value];
 			}.bind(tArgs));
-		}
-		tMessages.each(function(pair){
-			this[pair.key] = MessageHash[pair.value];
-		}.bind(tArgs));
-		var template = new Template(tString);
-		this.setContent(template.evaluate(tArgs));
-		if(mimeType == "no_selection"){
-			this.addActions('empty');
-		}else{
-			this.addActions('unique');
-		}
-		var fakes = this.htmlElement.select('div[id="preview_rich_fake_element"]');
-		if(fakes && fakes.length){
-			this.currentPreviewElement = this.getPreviewElement(fileNode, false);			
-			$(fakes[0]).replace(this.currentPreviewElement);			
-			this.resize();
+			var template = new Template(tString);
+			this.htmlElement.insert(template.evaluate(tArgs));
 		}
 	},
 		
 	addActions: function(selectionType){
 		var actions = ajaxplorer.actionBar.getInfoPanelActions();
 		if(!actions.length) return;
-		var actionString = '<div class="infoPanelActions">';
+		var actionString = '<div class="panelHeader infoPanelGroup">Actions</div><div class="infoPanelActions">';
 		var count = 0;
 		actions.each(function(action){
 			if(selectionType == 'empty' && action.context.selection) return;
@@ -276,7 +273,7 @@ Class.create("InfoPanel", AjxpPane, {
 	},
 	
 	parseComponentConfig: function(configNode){
-		var panels = XPathSelectNodes(configNode, "infoPanel");
+		var panels = XPathSelectNodes(configNode, "infoPanel|infoPanelExtension");
 		for(var i = 0; i<panels.length; i++){
 			var panelMimes = panels[i].getAttribute('mime');
 			var attributes = $A(panels[i].getAttribute('attributes').split(","));
@@ -295,10 +292,16 @@ Class.create("InfoPanel", AjxpPane, {
 					htmlContent = panelChilds[j].firstChild.nodeValue;
 				}
 			}
-			var tId = 't_'+this.mimesTemplates.size();
+			var tId = hex_md5(htmlContent);
+			if(this.mimesTemplates.get(tId)){
+				continue;
+			}
 			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages]));				
+			
 			$A(panelMimes.split(",")).each(function(mime){
-				this.registeredMimes.set(mime, tId);				
+				var registered = this.registeredMimes.get(mime) || $A([]);
+				registered.push(tId);
+				this.registeredMimes.set(mime, registered);
 			}.bind(this));
 		}
 	}
