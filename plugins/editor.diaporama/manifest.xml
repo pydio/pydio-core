@@ -69,6 +69,29 @@
 					<additional_column messageString="Image Dimension" attributeName="readable_dimension" sortType="String"/>
 				</columns>
 			</component_config>
+			<component_config className="InfoPanel">			
+				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="image_width,image_height,image_type">
+					<messages>
+						<message key="type_string" id="134"/>				
+						<message key="dim_string" id="135"/>
+					</messages>
+					<html><![CDATA[
+						<div style="">
+							<div class="panelHeader infoPanelGroup" colspan="2">Image Info</div>
+							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+								<tr>
+									<td class="infoPanelLabel">#{dim_string}</td>
+									<td class="infoPanelValue">#{image_width}px X #{image_height}px</td>
+								</tr>
+								<tr class="even">
+									<td class="infoPanelLabel">#{type_string}</td>
+									<td class="infoPanelValue">#{image_type}</td>
+								</tr>
+							</table>
+						</div>
+					]]></html>
+				</infoPanelExtension>
+			</component_config>
 		</client_configs>			
 	</registry_contributions>
 	<dependencies>
