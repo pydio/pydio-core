@@ -707,17 +707,25 @@
 					<message key="totalsize_string" id="259"/>
 				</messages>
 				<html><![CDATA[
-					<div style="padding:10px;">
-						<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">
-							<img width="16" hspace="5" height="16" border="0" align="absmiddle" src="AJXP_THEME_FOLDER/images/mimes/16/folder.png"/>#{current_folder}
-						</big>
-						<b>#{folders_string}</b> : #{filelist_folders_count}
-						<br><b>#{files_string}</b> : #{filelist_files_count}
-						<br><b>#{totalsize_string}</b> #{filelist_totalsize}
-					</div>
+					<div>
+						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+							<tr>
+								<td class="infoPanelLabel">#{folders_string}</td>
+								<td class="infoPanelValue">#{filelist_folders_count}</td>
+							</tr>
+							<tr class="even">
+								<td class="infoPanelLabel">#{files_string}</td>
+								<td class="infoPanelValue">#{filelist_files_count}</td>
+							</tr>
+							<tr>
+								<td class="infoPanelLabel">#{totalsize_string}</td>
+								<td class="infoPanelValue">#{filelist_totalsize}</td>
+							</tr>
+						</table>
+					</div>					
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_file" attributes="basename,icon,preview_rich,filesize,mimestring,formated_date">
+			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="size_string" id="127"/>
@@ -725,14 +733,30 @@
 					<message key="modif_string" id="138"/>
 				</messages>
 				<html><![CDATA[
-				<div style="padding:10px;">
-					<div style="text-align:center">
+				<div>
+					<!--<div class="panelHeader infoPanelGroup" style="border-top:0px;">File Preview</div>-->
+					<div class="infoPanelImagePreview">
 						#{preview_rich}
-					</div><div style="text-align:left;">
-					<b>#{name_string}</b> : #{basename}
-					<br><b>#{size_string}</b> : #{filesize}
-					<br><b>#{type_string}</b> : #{mimestring}
-					<br><b>#{modif_string}</b> : #{formated_date}</div>
+					</div>
+					<div class="panelHeader infoPanelGroup">File Info</div>
+					<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+						<tr>
+							<td class="infoPanelLabel">#{name_string}</td>
+							<td class="infoPanelValue">#{basename}</td>
+						</tr>
+						<tr class="even">
+							<td class="infoPanelLabel">#{size_string}</td>
+							<td class="infoPanelValue">#{filesize}</td>
+						</tr>
+						<tr>
+							<td class="infoPanelLabel">#{modif_string}</td>
+							<td class="infoPanelValue">#{formated_date}</td>
+						</tr>
+						<tr class="even">
+							<td class="infoPanelLabel">#{type_string}</td>
+							<td class="infoPanelValue">#{mimestring}</td>
+						</tr>
+					</table>					
 				</div>
 				]]></html>
 			</infoPanel>
@@ -742,33 +766,21 @@
 					<message key="modif_string" id="138"/>
 				</messages>
 				<html><![CDATA[
-					<div style="padding:10px;">
-						<div class="folderImage">
+					<div>
+						<div class="folderImage infoPanelImagePreview">
 							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 						</div>
-						<b>#{name_string}</b> : #{basename}
-						<br><b>#{modif_string}</b> : #{formated_date}
-					</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="AJXP_MIMES_IMAGE" attributes="basename,encoded_filename,preview_rich,image_width,image_height,image_type,filesize,mimestring,formated_date">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="size_string" id="127"/>
-					<message key="type_string" id="134"/>				
-					<message key="modif_string" id="138"/>
-					<message key="dim_string" id="135"/>
-				</messages>
-				<html><![CDATA[
-					<div style="padding:10px;">
-						<center style="border:1px solid #aaa; margin-bottom: 5px;">
-							#{preview_rich}
-						</center>
-						<b>#{name_string}</b> : #{basename}
-						<br><b>#{dim_string}</b> : #{image_width}px X #{image_height}px
-						<br><b>#{size_string}</b> : #{filesize}
-						<br><b>#{type_string}</b> : #{image_type}
-						<br><b>#{modif_string}</b> : #{formated_date}
+						<div class="panelHeader infoPanelGroup">Folder Info</div>
+						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+							<tr>
+								<td class="infoPanelLabel">#{name_string}</td>
+								<td class="infoPanelValue">#{basename}</td>
+							</tr>
+							<tr class="even">
+								<td class="infoPanelLabel">#{modif_string}</td>
+								<td class="infoPanelValue">#{formated_date}</td>
+							</tr>
+						</table>						
 					</div>
 				]]></html>
 			</infoPanel>
