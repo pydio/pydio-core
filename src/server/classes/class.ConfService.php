@@ -65,6 +65,7 @@ class ConfService
 		$this->configs["UPLOAD_MAX_TOTAL"] = AJXP_Utils::convertBytes($upload_max_size_total);
 		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
 		$this->configs["AUTH_DRIVER_DEF"] = $AUTH_DRIVER;
+		$this->configs["LOG_DRIVER_DEF"] = $LOG_DRIVER;
         $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];
         $this->configs["ACTIVE_PLUGINS"] = $ACTIVE_PLUGINS;
         $this->configs["PROBE_REAL_SIZE"] = $allowRealSizeProbing;
@@ -99,6 +100,7 @@ class ConfService
 		}
 	}
 	
+	// CONF
 	public static function initConfStorageImpl($name, $options){
 		$inst = self::getInstance();
 		$inst->initConfStorageImplInst($name, $options);
@@ -122,6 +124,8 @@ class ConfService
 		return $this->configs["CONF_STORAGE_DRIVER"];
 	}
 
+	
+	// AUTH
 	public static function initAuthDriverImpl(){
 		self::getInstance()->initAuthDriverImplInst();
 	}
@@ -146,6 +150,30 @@ class ConfService
 		}
 		return $this->configs["AUTH_DRIVER"];
 	}
+	
+	
+	// LOGS	
+	public function initLogDriverImplInst(){		
+		$options = $this->configs["LOG_DRIVER_DEF"];
+		$logger = AJXP_PluginsService::findPlugin("log", $options["NAME"]);		
+		$this->configs["LOG_DRIVER"] = $logger;
+		$this->configs["LOG_DRIVER"]->init($options["OPTIONS"]);
+		$inst = AJXP_PluginsService::getInstance();
+		$inst->setPluginUniqueActiveForType("log", $options["NAME"]);
+	}
+	
+	public static function getLogDriverImpl(){
+		return self::getInstance()->getLogDriverImplInst();
+	}
+
+	public function getLogDriverImplInst(){
+		if(!isSet($this->configs["LOG_DRIVER"])){			
+			$this->initLogDriverImplInst();
+		}
+		return $this->configs["LOG_DRIVER"];
+	}
+	
+	
 
 	public static function switchRootDir($rootDirIndex = -1, $temporary = false){
 		self::getInstance()->switchRootDirInst($rootDirIndex, $temporary);
