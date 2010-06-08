@@ -84,7 +84,8 @@ class SerialMetaManager extends AJXP_Plugin {
 		$base = basename($currentFile);
 		$this->loadMetaFileData($currentFile);		
 		if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
-			$metadata = array_merge($metadata, self::$metaCache[$base]);
+			$encodedMeta = array_map(array("SystemTextEncoding", "toUTF8"), self::$metaCache[$base]);
+			$metadata = array_merge($metadata, $encodedMeta);
 		}
 		// NOT OPTIMAL AT ALL 
 		$metadata["meta_fields"] = $this->options["meta_fields"];
