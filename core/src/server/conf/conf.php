@@ -77,6 +77,20 @@ $AUTH_DRIVER = array(
 		"AUTOCREATE_AJXPUSER" 	=> false, 
 		"TRANSMIT_CLEAR_PASS"	=> false)
 );
+ /**
+  * LOGGER CONFIGURATION
+  * 
+  * Logger configuration. the options will depend on the logging plugin used, the default driver is text
+  * which will write logfiles as readable text in tab delimited format.
+  */
+$LOG_DRIVER = array(
+ 	"NAME" => "text",
+ 	"OPTIONS" => array( 
+ 		"LOG_PATH" => realpath(dirname(__FILE__)."/../..")."/server/logs/",
+ 		"LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
+ 		"LOG_CHMOD" => 0770
+ 	)
+);
 $ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*");
 if(AJXP_Utils::userAgentIsMobile()){
 	$ACTIVE_PLUGINS[] = "gui.mobile";

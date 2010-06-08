@@ -22,7 +22,4 @@ define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
 
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
-
-$logger = AJXP_Logger::getInstance();
-$logger->initStorage(INSTALL_PATH."/server/logs/");
 ?>
