@@ -55,76 +55,48 @@ define("PUBLIC_DOWNLOAD_URL", "");
 define("HTTPS_POLICY_FILE", "");
 
 /*********************************************************/
-/* CONFIGURATION STORAGE DRIVER
-/* This is how the repositories and users data are stored
-/* by AjaXplorer. By default, you don't need to change this.
-/* Possible drivers can be found in the folder /plugins/ under
-/* each folders beginning with "conf.".
-/* At the moment, only conf.serial is implemented, that stores 
-/* users and repository data inside files on the server.
+/* PLUGINS DEFINITIONS
+/* Drivers will define how the application will work. For 
+/* each type of operation, there are multiple implementation
+/* possible. Check the content of the plugins folder.
+/* CONF = users and repositories definition, 
+/* AUTH = users authentification mechanism,
+/* LOG = logs of the application.
+/*
+/* By default, the three are all based on files.
+/*
+/* ACTIVE_PLUGINS adds other type of plugins to the application.
+/* If you are developping your own plugin, do not forget to declare
+/* it here.
 /*********************************************************/
-$CONF_STORAGE = array(
-	"NAME"		=> "serial",
-	"OPTIONS"	=> array(
-		"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/server/conf/repo.ser",
-		"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users")
+$PLUGINS = array(
+	"CONF_DRIVER" => array(
+		"NAME"		=> "serial",
+		"OPTIONS"	=> array(
+			"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/server/conf/repo.ser",
+			"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users")
+	),
+	"AUTH_DRIVER" => array(
+		"NAME"		=> "serial",
+		"OPTIONS"	=> array(
+			"LOGIN_REDIRECT"		=> false,
+			"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser",
+			"AUTOCREATE_AJXPUSER" 	=> false, 
+			"TRANSMIT_CLEAR_PASS"	=> false)
+	),
+	"LOG_DRIVER" => array(
+	 	"NAME" => "text",
+	 	"OPTIONS" => array( 
+	 		"LOG_PATH" => "AJXP_INSTALL_PATH/server/logs/",
+	 		"LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
+	 		"LOG_CHMOD" => 0770
+	 	)
+	),
+	"ACTIVE_PLUGINS" => array("editor.*", "gui.ajax", "hook.*")
 );
-$AUTH_DRIVER = array(
-	"NAME"		=> "serial",
-	"OPTIONS"	=> array(
-		"LOGIN_REDIRECT"		=> false,
-		"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser",
-		"AUTOCREATE_AJXPUSER" 	=> false, 
-		"TRANSMIT_CLEAR_PASS"	=> false)
-);
- /**
-  * LOGGER CONFIGURATION
-  * 
-  * Logger configuration. the options will depend on the logging plugin used, the default driver is text
-  * which will write logfiles as readable text in tab delimited format.
-  */
-$LOG_DRIVER = array(
- 	"NAME" => "text",
- 	"OPTIONS" => array( 
- 		"LOG_PATH" => realpath(dirname(__FILE__)."/../..")."/server/logs/",
- 		"LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
- 		"LOG_CHMOD" => 0770
- 	)
-);
-$ACTIVE_PLUGINS = array("editor.*", "gui.ajax", "hook.*");
 if(AJXP_Utils::userAgentIsMobile()){
-	$ACTIVE_PLUGINS[] = "gui.mobile";
+	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
 }
-/*
-// Sample auth.sql usage 
-$AUTH_DRIVER = array(
-	"NAME"	=> "sql",
-	"OPTIONS" 	=> array(
-		"SQL_DRIVER" => array(
-			"driver" => "mysql",
-			"host"	=> "localhost",
-			"database" => "ajxp",
-			"user"	=> "root",
-			"password" => ""
-			),
-		"TRANSMIT_CLEAR_PASS" => false
-	)
-);
-*/
-/*
-// Sample auth.remote usage for use with the wp_ajaxplorer Wordpress plugin 
-$AUTH_DRIVER = array(
-        "NAME"          => "remote",
-        "OPTIONS"       => array(
-                "SLAVE_MODE" 		=> true, // true for hook based CMS (like Wordpress and likely yours too), false for url based CMS
-                "USERS_FILEPATH"	=> "AJXP_INSTALL_PATH/server/users/users.ser", // Required to get public links to work
-                "LOGIN_URL"			=> "/wordpress/wp-login.php",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
-        		"LOGOUT_URL"		=> "/wordpress/",  // The URL to redirect upon login out (see above)
-        		"SECRET"			=> "myprivatesecret", // This is a security measure. The remote end MUST know the secret too for us to act.
-                "TRANSMIT_CLEAR_PASS"   => false) // Don't touch this. It's unsafe (and useless here) to transmit clear password.
-);
-*/
-/**/
 
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.
@@ -163,23 +135,6 @@ $REPOSITORIES[1] = array(
 	"DRIVER_OPTIONS"=> array()	
 );
 
-/**
- * Specific config for wordpress plugin, still experimental, do not touch if you are not sure!
- * If you add this and create an "admin" user in ajaxplorer, 
- * you should be able to access your files in the wordpress "admin" section, 
- * in the "Manage" chapter, new tab "Ajaxplorer File Management". Tested on WP 2.1
- */
-/*
-	$REPOSITORIES[0] = array(
-		"DISPLAY"		=>	"Wordpress", 
-		"DRIVER"		=>	"fs", 
-		"DRIVER_OPTIONS"=> array(
-			"PATH"			=>	realpath(dirname(__FILE__)."/../../../../../wp-content"), 
-			"CREATE"		=>	false,
-			"RECYCLE_BIN" 	=> 	'recycle_bin'
-		)
-	);
-*/
 /*********************************************/
 /*	DEFAULT LANGUAGE
 /*  Check i18n folder for available values.
