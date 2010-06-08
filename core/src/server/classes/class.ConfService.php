@@ -63,15 +63,29 @@ class ConfService
 		$this->configs["UPLOAD_ENABLE_FLASH"] = $upload_enable_flash;
 		$this->configs["UPLOAD_MAX_FILE"] = AJXP_Utils::convertBytes($upload_max_size_per_file);
 		$this->configs["UPLOAD_MAX_TOTAL"] = AJXP_Utils::convertBytes($upload_max_size_total);
-		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
-		$this->configs["AUTH_DRIVER_DEF"] = $AUTH_DRIVER;
-		$this->configs["LOG_DRIVER_DEF"] = $LOG_DRIVER;
-        $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];
-        $this->configs["ACTIVE_PLUGINS"] = $ACTIVE_PLUGINS;
         $this->configs["PROBE_REAL_SIZE"] = $allowRealSizeProbing;
         $this->configs["WELCOME_CUSTOM_MSG"] = $welcomeCustomMessage;
-		$this->initConfStorageImplInst($CONF_STORAGE["NAME"], $CONF_STORAGE["OPTIONS"]);
-		$this->initAuthDriverImplInst();
+
+		if(isSet($PLUGINS)){
+			$this->configs["PLUGINS"] = $PLUGINS;
+		}else{
+			/* OLD SYNTAX */
+			$this->configs["AUTH_DRIVER_DEF"] = $AUTH_DRIVER;
+			$this->configs["LOG_DRIVER_DEF"] = $LOG_DRIVER;
+	        $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];
+	        $this->configs["ACTIVE_PLUGINS"] = $ACTIVE_PLUGINS;
+	        
+	        $this->configs["PLUGINS"] = array(
+	        	"CONF_DRIVER" => $CONF_STORAGE,
+	        	"AUTH_DRIVER" => $AUTH_DRIVER, 
+	        	"LOG_DRIVER"  => $LOG_DRIVER,
+	        	"ACTIVE_PLUGINS" => $ACTIVE_PLUGINS
+	        );
+		}        
+		$this->initUniquePluginImplInst("CONF_DRIVER", "conf");
+		$this->initUniquePluginImplInst("AUTH_DRIVER", "auth");
+		        
+		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
 		$this->configs["REPOSITORIES"] = $this->initRepositoriesListInst($this->configs["DEFAULT_REPOSITORIES"]);
 		$this->switchRootDirInst();
 	}
@@ -83,7 +97,7 @@ class ConfService
 	
 	public function initActivePluginsInst(){
 		$pServ = AJXP_PluginsService::getInstance();
-		foreach($this->configs["ACTIVE_PLUGINS"] as $plugs){
+		foreach($this->configs["PLUGINS"]["ACTIVE_PLUGINS"] as $plugs){
 			$ex = explode(".", $plugs);
 			if($ex[1] == "*"){
 				$all = $pServ->getPluginsByType($ex[0]);
@@ -100,79 +114,35 @@ class ConfService
 		}
 	}
 	
-	// CONF
-	public static function initConfStorageImpl($name, $options){
-		$inst = self::getInstance();
-		$inst->initConfStorageImplInst($name, $options);
-	}
-	public function initConfStorageImplInst($name, $options){
-		$this->configs["CONF_STORAGE_DRIVER"] = AJXP_PluginsService::findPlugin("conf", $name);		
-		$this->configs["CONF_STORAGE_DRIVER"]->init($options);
-		$inst = AJXP_PluginsService::getInstance();
-		$inst->setPluginUniqueActiveForType("conf", $name);
-	}
-
-	public static function getConfStorageImpl(){
-		$inst = self::getInstance();
-		return $inst->getConfStorageImplInst();
-	}
-	/**
-	 * Returns the current conf storage driver
-	 * @return AbstractConfDriver
-	 */
-	public function getConfStorageImplInst(){
-		return $this->configs["CONF_STORAGE_DRIVER"];
-	}
-
-	
-	// AUTH
-	public static function initAuthDriverImpl(){
-		self::getInstance()->initAuthDriverImplInst();
-	}
-	public function initAuthDriverImplInst(){		
-		$options = $this->configs["AUTH_DRIVER_DEF"];
-		$this->configs["AUTH_DRIVER"] = AJXP_PluginsService::findPlugin("auth", $options["NAME"]);
-		$this->configs["AUTH_DRIVER"]->init($options["OPTIONS"]);
-		$inst = AJXP_PluginsService::getInstance();
-		$inst->setPluginUniqueActiveForType("auth", $options["NAME"]);
+	public function initUniquePluginImplInst($key, $plugType){
+		$name = $this->configs["PLUGINS"][$key]["NAME"];
+		$options = $this->configs["PLUGINS"][$key]["OPTIONS"];
+		$instance = AJXP_PluginsService::findPlugin($plugType, $name);
+		$instance->init($options);
+		$this->configs[$key] = $instance;
+		$pServ = AJXP_PluginsService::getInstance();
+		$pServ->setPluginUniqueActiveForType($plugType, $name);
 	}
 	
-	public static function getAuthDriverImpl(){
-		return self::getInstance()->getAuthDriverImplInst();
-	}
-	/**
-	 * Returns the current Aithentication driver
-	 * @return AbstractAuthDriver
-	 */
-	public function getAuthDriverImplInst(){
-		if(!isSet($this->configs["AUTH_DRIVER"])){			
-			$this->initAuthDriverImplInst();
+	public function getUniquePluginImplInst($key, $plugType = null){
+		if(!isSet($this->configs[$key]) && $plugType != null){
+			$this->initUniquePluginImplInst($key, $plugType);
 		}
-		return $this->configs["AUTH_DRIVER"];
+		return $this->configs[$key];
 	}
 	
-	
-	// LOGS	
-	public function initLogDriverImplInst(){		
-		$options = $this->configs["LOG_DRIVER_DEF"];
-		$logger = AJXP_PluginsService::findPlugin("log", $options["NAME"]);		
-		$this->configs["LOG_DRIVER"] = $logger;
-		$this->configs["LOG_DRIVER"]->init($options["OPTIONS"]);
-		$inst = AJXP_PluginsService::getInstance();
-		$inst->setPluginUniqueActiveForType("log", $options["NAME"]);
+	public static function getConfStorageImpl(){
+		return self::getInstance()->getUniquePluginImplInst("CONF_DRIVER");
+	}
+
+	public static function getAuthDriverImpl(){
+		return self::getInstance()->getUniquePluginImplInst("AUTH_DRIVER");
 	}
 	
 	public static function getLogDriverImpl(){
-		return self::getInstance()->getLogDriverImplInst();
+		return self::getInstance()->getUniquePluginImplInst("LOG_DRIVER", "log");
 	}
 
-	public function getLogDriverImplInst(){
-		if(!isSet($this->configs["LOG_DRIVER"])){			
-			$this->initLogDriverImplInst();
-		}
-		return $this->configs["LOG_DRIVER"];
-	}
-	
 	
 
 	public static function switchRootDir($rootDirIndex = -1, $temporary = false){
