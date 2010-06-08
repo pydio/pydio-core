@@ -112,6 +112,7 @@ class textLogDriver extends AbstractLogDriver {
 		
 		
 		$this->storageDir = isset($options['LOG_PATH']) ? $options['LOG_PATH'] : "";
+		$this->storageDir = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $this->storageDir);
 		$this->logFileName = isset($options['LOG_FILE_NAME']) ? $options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
 		$this->USER_GROUP_RIGHTS = isset($options['LOG_CHMOD']) ? $options['LOG_CHMOD'] : 0770;
 		
