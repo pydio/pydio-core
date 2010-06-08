@@ -734,7 +734,6 @@
 				</messages>
 				<html><![CDATA[
 				<div>
-					<!--<div class="panelHeader infoPanelGroup" style="border-top:0px;">File Preview</div>-->
 					<div class="infoPanelImagePreview">
 						#{preview_rich}
 					</div>
