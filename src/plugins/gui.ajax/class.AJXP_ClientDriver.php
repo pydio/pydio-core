@@ -52,9 +52,16 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			case "get_template":
 			
 				HTMLWriter::charsetHeader();
-				if(isset($template_name) && is_file(CLIENT_RESOURCES_FOLDER."/html/".$template_name))
+				$folder = CLIENT_RESOURCES_FOLDER."/html";
+				if(isSet($httpVars["pluginName"])){
+					$folder = "plugins/".$httpVars["pluginName"];
+					if(isSet($httpVars["pluginPath"])){
+						$folder.= "/".$httpVars["pluginPath"];
+					}
+				}
+				if(isset($template_name) && is_file($folder."/".$template_name))
 				{
-					include(CLIENT_RESOURCES_FOLDER."/html/".$template_name);
+					include($folder."/".$template_name);
 				}
 				exit(0);	
 				
