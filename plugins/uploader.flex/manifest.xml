@@ -5,7 +5,7 @@
 			<!-- FLEX UPLOAD FORM -->
 			<div id="flash_upload_form" box_width="470">
 			<div id="flashscreen">
-			<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>
+			<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&pluginName=uploader.flex&encode=false"></iframe>
 			</div>
 			</div>	
 		]]></clientForm>
