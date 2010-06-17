@@ -92,7 +92,7 @@ $PLUGINS = array(
 	 		"LOG_CHMOD" => 0770
 	 	)
 	),
-	"ACTIVE_PLUGINS" => array("editor.*", "gui.ajax", "hook.*")
+	"ACTIVE_PLUGINS" => array("editor.*", "uploader.*", "gui.ajax", "hook.*")
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
