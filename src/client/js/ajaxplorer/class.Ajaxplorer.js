@@ -452,7 +452,7 @@ Class.create("Ajaxplorer", {
 				id : extensions[i].getAttribute("id"),
 				xmlNode : extensions[i],
 				resourcesManager : new ResourcesManager()				
-			}
+			};
 			this.initExtension(extensions[i], extensionDefinition);
 			this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
 			this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);					
