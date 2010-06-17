@@ -2,6 +2,8 @@
 <editor id="editor.ckeditor" openable="true" text="319" title="320" icon="ckeditor_images/html_edit.png" className="AjxpCkEditor" mimes="html,htm" formId="edit_box" write="true">
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>		
 	</dependencies>
 	<resources>
 		<js file="plugins/editor.ckeditor/ckeditor/ckeditor.js" className="CKEDITOR"/>
