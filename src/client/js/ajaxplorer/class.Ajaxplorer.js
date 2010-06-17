@@ -52,7 +52,7 @@ Class.create("Ajaxplorer", {
 	
 	init:function(){
 		document.observe("ajaxplorer:registry_loaded", function(){
-			this.refreshEditorsRegistry();
+			this.refreshExtensionsRegistry();
 			this.logXmlUser(this._registry);	
 			this.loadActiveRepository();	
 			if(this.guiLoaded) {
@@ -413,33 +413,74 @@ Class.create("Ajaxplorer", {
 		connexion.sendAsync();
 	},
 
-	refreshEditorsRegistry : function(){
-		this.editorsRegistry = $A([]);
-		var editors = XPathSelectNodes(this._registry, "plugins/editor");
-		for(var i=0;i<editors.length;i++){
-			var editorDefinition = {
-				id : editors[i].getAttribute("id"),
-				openable : (editors[i].getAttribute("openable") == "true"?true:false),
-				text : MessageHash[editors[i].getAttribute("text")],
-				title : MessageHash[editors[i].getAttribute("title")],
-				icon : editors[i].getAttribute("icon"),
-				editorClass : editors[i].getAttribute("className"),
-				mimes : $A(editors[i].getAttribute("mimes").split(",")),
-				formId : editors[i].getAttribute("formId") || null,
-				write : (editors[i].getAttribute("write") && editors[i].getAttribute("write")=="true"?true:false),
-				resourcesManager : new ResourcesManager()
-			};
-			this._resourcesRegistry[editorDefinition.id] = editorDefinition.resourcesManager;
-			this.editorsRegistry.push(editorDefinition);					
-			for(var j=0;j<editors[i].childNodes.length;j++){
-				var child = editors[i].childNodes[j];
-				editorDefinition.resourcesManager.loadFromXmlNode(child);
+	initExtension : function(xmlNode, extensionDefinition){
+		if(xmlNode.nodeName == 'editor'){
+			Object.extend(extensionDefinition, {
+				openable : (xmlNode.getAttribute("openable") == "true"?true:false),
+				formId : xmlNode.getAttribute("formId") || null,				
+				text : MessageHash[xmlNode.getAttribute("text")],
+				title : MessageHash[xmlNode.getAttribute("title")],
+				icon : xmlNode.getAttribute("icon"),
+				editorClass : xmlNode.getAttribute("className"),
+				mimes : $A(xmlNode.getAttribute("mimes").split(",")),
+				write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false)
+			});
+		}else if(xmlNode.nodeName == 'uploader'){
+			var clientForm = XPathSelectSingleNode(xmlNode, 'processing/clientForm');
+			if(clientForm && clientForm.firstChild && clientForm.getAttribute('id'))
+			{
+				extensionDefinition.formId = clientForm.getAttribute('id');
+				if(!$('all_forms').select('[id="'+clientForm.getAttribute('id')+'"]').length){
+					$('all_forms').insert(clientForm.firstChild.nodeValue);
+				}
+			}
+			var dialogOnOpen = XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
+			if(dialogOnOpen && dialogOnOpen.firstChild){
+				eval(dialogOnOpen.firstChild.nodeValue); 
+				if(tmpFunction){
+					extensionDefinition.dialogOnOpen = tmpFunction;
+				}
+			}
+		}		
+	},
+	
+	refreshExtensionsRegistry : function(){
+		this._extensionsRegistry = {"editor":$A([]), "uploader":$A([])};
+		var extensions = XPathSelectNodes(this._registry, "plugins/editor|plugins/uploader");
+		for(var i=0;i<extensions.length;i++){
+			var extensionDefinition = {
+				id : extensions[i].getAttribute("id"),
+				xmlNode : extensions[i],
+				resourcesManager : new ResourcesManager()				
+			}
+			this.initExtension(extensions[i], extensionDefinition);
+			this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
+			this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);					
+			for(var j=0;j<extensions[i].childNodes.length;j++){
+				var child = extensions[i].childNodes[j];
+				extensionDefinition.resourcesManager.loadFromXmlNode(child);
 			}
 		}
 	},
 	
+	getActiveExtensionByType : function(extensionType){
+		var exts = $A();
+		this._extensionsRegistry[extensionType].each(function(el){
+			var activeNode = XPathSelectSingleNode(el.xmlNode, 'processing/activeCondition');
+			if(activeNode && activeNode.firstChild && activeNode.firstChild.nodeValue){
+				var result = eval(activeNode.firstChild.nodeValue.strip());
+				if(result){
+					exts.push(el);
+				}
+			}else{
+				exts.push(el);
+			}
+		}.bind(this));
+		return exts;
+	},
+	
 	findEditorById : function(editorId){
-		return this.editorsRegistry.detect(function(el){return(el.id == editorId);});
+		return this._extensionsRegistry.editor.detect(function(el){return(el.id == editorId);});
 	},
 	
 	findEditorsForMime : function(mime){
@@ -448,7 +489,7 @@ Class.create("Ajaxplorer", {
 		if(this.user != null && !this.user.canWrite()){
 			checkWrite = true;
 		}
-		this.editorsRegistry.each(function(el){
+		this._extensionsRegistry.editor.each(function(el){
 			if(el.mimes.include(mime)) {
 				if(!checkWrite || !el.write) editors.push(el);
 			}
