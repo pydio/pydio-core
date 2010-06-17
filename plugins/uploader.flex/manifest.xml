@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uploader id="uploader.flex" text="51" title="162">
+	<processing>
+		<clientForm id="flash_upload_form"><![CDATA[
+			<!-- FLEX UPLOAD FORM -->
+			<div id="flash_upload_form" box_width="470">
+			<div id="flashscreen">
+			<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&encode=false"></iframe>
+			</div>
+			</div>	
+		]]></clientForm>
+		<activeCondition><![CDATA[		
+			(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && flashUploaderEnabled)
+		]]></activeCondition>
+	</processing>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+	</dependencies>					
+</uploader>
