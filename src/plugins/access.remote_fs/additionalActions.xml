@@ -39,22 +39,22 @@
 				}
 				else
 				{
-					modal.showDialogForm('Upload', 
-										'originalUploadForm', 
-										function(oForm){
-											ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm, '6' );
-										}, 
-										null, 
-										null, 
-										true, true);					
-					
 					modal.setCloseAction(function(){						
 						ajaxplorer.fireContextRefresh();
 						var bgManager = ajaxplorer.actionBar.bgManager;
 						bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
 						bgManager.next();
 					});
-					modal.showDialogForm('Upload', 'originalUploadForm', null, function(){ajaxplorer.actionBar.multi_selector.submitMainForm();return false;});
+					modal.showDialogForm('Upload', 
+										'originalUploadForm', 
+										function(oForm){
+											ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm, '6' );
+										}, 
+										function(){
+											ajaxplorer.actionBar.multi_selector.submitMainForm();return false;
+											},
+										null, 
+										true, true);
 				}				
 					]]></clientCallback>
 				<clientForm id="flash_upload_form"><![CDATA[
