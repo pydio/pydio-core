@@ -1148,7 +1148,7 @@ UPLOAD MULTIFILE FORM
      padding-left: 10px;
      margin-top:10px;
      text-align: center;    
-     height: 30px;
+     /*height: 30px;*/
 }
 #search_form
 {
@@ -1176,10 +1176,31 @@ UPLOAD MULTIFILE FORM
 	background-repeat:no-repeat;    
 }
 
+#search_meta {
+	clear:left;
+	text-align:left;
+	padding-left: 2px;
+	padding-right:52px;
+}
+
+meta_opt {
+	cursor: pointer;
+}
+
+meta_opt.checked {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
 #search_results
 {    
     margin-left:0px;
     width: 100%;
+}
+
+#search_results em {
+	color: red;
+	font-style:normal;
 }
 
 #search_results div
