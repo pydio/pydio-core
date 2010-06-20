@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="mysql" label="Mysql Database" description="Browse and update records in a MySQL database">
-	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png" search_engine="SQLSearchEngine">
+	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
 			<js file="plugins/access.mysql/resources/js/class.SQLEditor.js" className="SQLEditor"/>
 			<js file="plugins/access.mysql/resources/js/class.SQLSearchEngine.js" className="SQLSearchEngine"/>
