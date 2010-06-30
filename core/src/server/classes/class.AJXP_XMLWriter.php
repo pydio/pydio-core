@@ -259,6 +259,8 @@ class AJXP_XMLWriter
 			$buffer.="<pref name=\"history_last_listing\" value=\"".AJXP_Utils::xmlEntities(stripslashes($loggedUser->getArrayPref("history", ConfService::getCurrentRootDirIndex())))."\"/>";
 			$buffer.="<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>";
 			$buffer.="<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>";
+			$buffer.="<pref name=\"columns_visibility\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_visibility")))."\"/>";
+			$buffer.="<pref name=\"ls_history\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("ls_history")))."\"/>";
 			$buffer.="</preferences>";
 			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>";
 			$bMarks = $loggedUser->getBookmarks();
