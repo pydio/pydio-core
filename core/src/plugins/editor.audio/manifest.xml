@@ -34,7 +34,7 @@
 					<serverCallback methodName="preProcessAction" applyCondition="$apply=isSet($httpVars['playlist']);"/>
 				</pre_processing>
 				<post_processing>					
-					<serverCallback methodName="switchAction" applyCondition="$apply=isSet($httpVars['playlist']);"/>
+					<serverCallback methodName="switchAction" applyCondition="$apply=isSet($httpVars['playlist']);" capture="true"/>
 				</post_processing>
 			</action>
 		</actions>

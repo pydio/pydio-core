@@ -394,13 +394,13 @@ class fsAccessDriver extends AbstractAccessDriver
 				{
 					print("<html><script language=\"javascript\">\n");
 					if(isSet($errorMessage)){
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
+						print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
 					}else{		
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+						print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
 					}
 					print("</script></html>");
 				}
-				exit;
+				return ;
 				
 			break;
             
