@@ -42,7 +42,8 @@ Class.create("LocationBar", {
 	initialize : function(oElement, options){
 		this.element = oElement;
 		this.element.ajxpPaneObject = this;
-		this.createGui();
+		this.realPath = '/';
+		this.createGui();		
 		this.options = options || {};
 		document.observe("ajaxplorer:user_logged", this.resize.bind(this));
 	},
@@ -60,6 +61,23 @@ Class.create("LocationBar", {
 		this.initCurrentPath();
 		this.element.insert(locDiv);
 		locDiv.insert(this.currentPath);
+		var inputDims = this.currentPath.getDimensions();
+		this.currentPath.hide();
+		this.label = new Element('div').update("/test");
+		this.label.setStyle({
+			marginTop: 1,
+			fontSize:'11px',
+			height: (Prototype.Browser.IE?'18px':'15px'),
+			fontFamily : 'Trebuchet MS,sans-serif,Nimbus Sans L',
+			zIndex : 10000,
+			backgroundColor: 'white'
+		});
+		locDiv.insert(this.label);
+		this.label.observe("click", function(){
+			this.label.hide();
+			this.currentPath.show();
+			this.currentPath.focus();
+		}.bind(this) );
 		
 		this.gotoButton = simpleButton(
 			'location_goto', 
@@ -89,13 +107,14 @@ Class.create("LocationBar", {
 			type:'text',
 			value:'/'
 		});		
-		new AjxpAutocompleter(this.currentPath, "autocomplete_choices");
+		this.autoComp = new AjxpAutocompleter(this.currentPath, "autocomplete_choices");
 		this.currentPath.observe("keydown", function(event){
 			if(event.keyCode == 9) return false;
 			if(!this._modified && (this._beforeModified != this.currentPath.getValue())){
 				this.setModified(true);
 			}
 			if(event.keyCode == 13){
+				if(this.autoComp.active) return;
 				this.submitPath();
 				Event.stop(event);
 			}
@@ -107,6 +126,8 @@ Class.create("LocationBar", {
 			return false;
 		}.bind(this) );		
 		this.currentPath.observe("blur",function(e)	{
+			this.currentPath.hide();
+			this.label.show();
 			if(!currentLightBox){
 				ajaxplorer.enableShortcuts();
 				this.hasFocus = false;
@@ -150,7 +171,13 @@ Class.create("LocationBar", {
 		if(newNode.getMetadata().get('paginationData')){
 			newPath += "#" + newNode.getMetadata().get('paginationData').get('current');
 		}
-		this.currentPath.value = newPath;
+		this.realPath = newPath;
+		this.currentLabel = this.realPath;
+		if(getBaseName(newPath) != newNode.getLabel()){
+			this.currentLabel = getRepName(newPath) + '/' + newNode.getLabel();
+		}
+		this.label.update(this.currentLabel);
+		this.currentPath.value = this.realPath;
 		this.setModified(false);
 	},	
 	setModified:function(bool){
@@ -178,17 +205,22 @@ Class.create("LocationBar", {
 			}else{
 				this.element.show();
 				this.currentPath.setStyle({width:newWidth + 'px'});
+				this.label.setStyle({width : newWidth + 'px'});
 			}
 		}
 	},
 	showElement : function(show){},
 	setFocusBehaviour : function(){},
 	focus : function(){
+		this.label.hide();
+		this.currentPath.show();
 		this.currentPath.focus();
 		this.hasFocus = true;
 	},
 	blur : function(){
 		this.currentPath.blur();
+		this.currentPath.hide();
+		this.label.show();
 		this.hasFocus = false;
 	}	
 });

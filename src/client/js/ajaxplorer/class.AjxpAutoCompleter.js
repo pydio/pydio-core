@@ -84,7 +84,7 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
 	{
 		if (cs[i].tagName == "tree") 
 		{
-			var text = cs[i].getAttribute("text");
+			var text = getBaseName(cs[i].getAttribute("filename"));
 			
 			var hasCharAfterSlash = (token.lastIndexOf("/")<token.length-1);
 			if(!hasCharAfterSlash){
