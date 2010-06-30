@@ -285,7 +285,12 @@ Class.create("FilesList", SelectableElements, {
 			for(var i=0; i<visibleColumns.length;i++){
 				var column = visibleColumns[i];
 				var last = ((i==visibleColumns.length-1)?' id="last_header"':'');
-				var stringWidth =((userPref && userPref.get(i))?' style="width:'+userPref.get(i)+(userPref.get('type')?'%':'px')+'"':'');
+				var userWidth = 0;
+				if(userPref && userPref.get(i) && i<(visibleColumns.length-1)){
+					if(userPref.get('type')) userWidth = parseInt(this.htmlElement.getWidth() * userPref.get(i) /  100);
+					else userWidth = userPref.get(i);
+				}
+				var stringWidth = (userWidth?' style="width:'+userWidth+'px"':'');
 				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+stringWidth+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
 			}
 			buffer = buffer + '</tr></thead></table>';
@@ -505,9 +510,10 @@ Class.create("FilesList", SelectableElements, {
 					cell.setStyle({padding:0});
 					var div = cell.select('div')[0];
 					div.setAttribute("title", new String(cell.innerHTML).stripTags().replace("&nbsp;", ""));
-						var td = tds[index];					
-						var tdWidth = td.getWidth();					
-						cell.setStyle({width:tdWidth+'px'});
+					if(cell.id == "last_header") return;
+					var td = tds[index];					
+					var tdWidth = td.getWidth();
+					cell.setStyle({width:tdWidth+'px'});
 					index++;
 				});
 			}.bind(this), 10);

@@ -748,6 +748,7 @@ a.carousel-control img{
 
 #last_header{
    border-right: 	0px solid #ddd;
+   widht: auto !important;
 }
 
 #last_header:active{
