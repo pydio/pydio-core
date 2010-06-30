@@ -35,12 +35,20 @@
  */
 class HookDemo extends AJXP_Plugin {
 		
-	public function preProcess($action, $httpVars, $fileVars){
+	public function preProcess($action, $httpVars, $fileVars){		
 		AJXP_Logger::logAction("pre_".$action, $httpVars);
+		return true;
 	}
 	
-	public function postProcess($action, $httpVars, $fileVars){
+	public function postProcess($action, $httpVars, $params){		
 		AJXP_Logger::logAction("post_".$action, $httpVars);
+		return "postProc1";
+	}
+
+	public function postProcess2($action, $httpVars, $params){
+		AJXP_Logger::logAction("2post_".$action, $httpVars);		
+		print($params["ob_output"]);
+		return "postProc2";
 	}
 }
 

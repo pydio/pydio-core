@@ -85,19 +85,21 @@ class AJXP_Controller{
 				}
 		}				
 		
-		$preCall = self::getCallbackNode($xPath, $action, "pre", $actionName, $httpVars, $fileVars);
-		$postCall = self::getCallbackNode($xPath, $action, "post", $actionName, $httpVars, $fileVars);
-		$mainCall = self::getCallbackNode($xPath, $action, "",$actionName, $httpVars, $fileVars);
-
-		if($postCall !== false){
+		$preCalls = self::getCallbackNode($xPath, $action, "pre", $actionName, $httpVars, $fileVars, true);
+		$postCalls = self::getCallbackNode($xPath, $action, "post", $actionName, $httpVars, $fileVars, true);
+		$mainCall = self::getCallbackNode($xPath, $action, "",$actionName, $httpVars, $fileVars, false);
+		
+		if($postCalls !== false){
 			ob_start();
-			$params = array();
+			$params = array("pre_processor_results" => array(), "post_processor_results" => array());
 		}
-		if($preCall !== false){
-			// A Preprocessing callback can modify its input arguments (passed by ref)
-			$preResult = self::applyCallback($xPath, $preCall, $actionName, $httpVars, $fileVars);
-			if(isSet($params)){
-				$params["pre_processor_result"] = $preResult;
+		if($preCalls !== false){
+			foreach ($preCalls as $preCall){
+				// A Preprocessing callback can modify its input arguments (passed by ref)
+				$preResult = self::applyCallback($xPath, $preCall, $actionName, $httpVars, $fileVars);
+				if(isSet($params)){
+					$params["pre_processor_results"][$preCall->getAttribute("pluginId")] = $preResult;
+				}
 			}
 		}		
 		if($mainCall){
@@ -106,26 +108,47 @@ class AJXP_Controller{
 				$params["processor_result"] = $result;
 			}			
 		}		
-		if($postCall !==false){
+		if($postCalls !==false){
 			$params["ob_output"] = ob_get_contents();
 			ob_end_clean();
-			self::applyCallback($xPath, $postCall, $actionName, $httpVars, $params);
+			foreach ($postCalls as $postCall){
+				$postResult = self::applyCallback($xPath, $postCall, $actionName, $httpVars, $params);
+				if($postResult){
+					$params["post_processor_results"][$postCall->getAttribute("pluginId")] = $postResult;
+				}
+			}
 		}else{
 			if(isSet($result)) return $result;
 		}
 	}
 	
-	private function getCallbackNode($xPath, $actionNode, $callbackType = "",$actionName, $httpVars, $fileVars){
+	private function getCallbackNode($xPath, $actionNode, $callbackType = "",$actionName, $httpVars, $fileVars, $multiple = true){
 		$query = ($callbackType!=""?$callbackType."_":"")."processing/serverCallback";
 		$callbacks = $xPath->query($query, $actionNode);
 		if(!$callbacks->length) return false;
-		$callback=$callbacks->item(0);
+		if($multiple){
+			$cbArray = array();
+			foreach ($callbacks as $callback) {
+				if(self::appliesCondition($callback, $actionName, $httpVars, $fileVars)){
+					$cbArray[] = $callback;
+				}
+			}
+			if(!count($cbArray)) return  false;
+			return $cbArray;
+		}else{
+			$callback=$callbacks->item(0);
+			if(!self::appliesCondition($callback, $actionName, $httpVars, $fileVars)) return false;
+			return $callback;
+		}
+	}
+	
+	private function appliesCondition($callback, $actionName, $httpVars, $fileVars){
 		if($callback->getAttribute("applyCondition")!=""){
 			$apply = false;
 			eval($callback->getAttribute("applyCondition"));
-			if(!$apply) return false;
+			if(!$apply) return false;			
 		}
-		return $callback;
+		return true;
 	}
 	
 	private function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null){
@@ -168,8 +191,8 @@ class AJXP_Controller{
 	}
 	
 	public static function passProcessDataThrough($postProcessData){
-		if(isSet($postProcessData["pre_processor_result"])){
-			print($postProcessData["pre_processor_result"]);
+		if(isSet($postProcessData["pre_processor_results"]) && is_array($postProcessData["pre_processor_results"])){
+			print(implode("", $postProcessData["pre_processor_results"]));
 		}
 		if(isSet($postProcessData["processor_result"])){
 			print($postProcessData["processor_result"]);
