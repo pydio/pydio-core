@@ -69,7 +69,7 @@ class AudioPreviewer extends AJXP_Plugin {
 		}else if($action == "ls"){
 			if(!isSet($httpVars["playlist"])){
 				// This should not happen anyway, because of the applyCondition.				
-				AJXP_Controller::passDataThrough($postProcessData);
+				AJXP_Controller::passProcessDataThrough($postProcessData);
 				return ;
 			}
 			// We transform the XML into XSPF

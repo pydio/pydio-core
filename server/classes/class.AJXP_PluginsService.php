@@ -313,7 +313,11 @@
  				}
  			}
  			if($found != null){
- 				$this->mergeChildByTagName($newChild, $found);
+ 				if($newChild->nodeName == "post_processing" || $newChild->nodeName == "pre_processing"){
+ 					$old->appendChild($newChild->cloneNode(true));
+ 				}else{
+	 				$this->mergeChildByTagName($newChild, $found);
+ 				}
  			}else{
  				// CloneNode or it's messing with the current foreach loop.
  				$old->appendChild($newChild->cloneNode(true));
