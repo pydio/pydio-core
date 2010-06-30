@@ -183,15 +183,15 @@ SortableTable = Class.create({
 					},
 					onDrag : function(draggable){
 						var newPosition = Element.cumulativeOffset(draggable.element).left;
-						var delta = newPosition - draggable.originalLeft;
+						var delta = newPosition - draggable.originalLeft;						
 						var newWidth = draggable.originalCellWidth + delta;
 						draggable.element.setStyle({left:0});						
 						draggable.element.headerCell.setStyle({width:newWidth+'px'});
 					}.bind(this),
 					onStart : function(draggable){
 						draggable.element.setStyle({backgroundColor:'grey'});
-						draggable.originalLeft = Element.cumulativeOffset(draggable.element).left;
-						draggable.originalCellWidth = Element.getWidth(draggable.element.headerCell);
+						draggable.originalLeft = Element.cumulativeOffset(draggable.element).left;						
+						draggable.originalCellWidth =  parseInt(draggable.element.headerCell.getStyle('width')); //Element.getWidth(draggable.element.headerCell);
 					}.bind(this),
 					onEnd : function(draggable){
 						draggable.element.setStyle({backgroundColor:'transparent'});
@@ -199,9 +199,10 @@ SortableTable = Class.create({
 						var delta = newPosition - draggable.originalLeft;
 						var newWidth = draggable.originalCellWidth + delta;
 						draggable.element.headerCell.setStyle({width:newWidth+'px'});
+						newWidth = draggable.element.headerCell.getWidth();
 						draggable.element.setStyle({left:0});
 						if(this.onHeaderResize){
-							this.onHeaderResize(draggable.element.columnIndex, newWidth-7);
+							this.onHeaderResize($A(cells));
 						}
 					}.bind(this)
 					});

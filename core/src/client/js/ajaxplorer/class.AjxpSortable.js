@@ -40,23 +40,31 @@ Class.create("AjxpSortable", SortableTable, {
 		this.addSortType( "NumberKo", this.replace8oa8 );
 		this.addSortType( "MyDate", null, false, this.sortTimes);
 		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
-		this.setHeaderResize(function(columnIndex, newSize){
+		this.setHeaderResize(function(headerCells){
+			var headerCellsWidth = headerCells.collect(function(cell){
+				return cell.getWidth() - 10;
+			});
 			$(this.tBody).select('tr').each(function(row){
 				var cells = row.select('td');
-				if(cells[columnIndex]) cells[columnIndex].setStyle({width:newSize+'px'});				
+				for(var i=0;i<cells.length-1;i++){
+					cells[i].setStyle({width:headerCellsWidth[i] + 'px'});
+				}
 			});
 			if(!ajaxplorer || !ajaxplorer.user) return;
-			var percentSize = Math.round(newSize/$(oTable).getWidth()*100);
 			var data = ajaxplorer.user.getPreference("columns_size", true);
 			data = (data?new Hash(data):new Hash());
 			var repoData = data.get(ajaxplorer.user.getActiveRepository());
 			repoData = (repoData?new Hash(repoData):new Hash());
-			repoData.set(columnIndex, percentSize);
 			repoData.set('type', 'percent');
-			data.set(ajaxplorer.user.getActiveRepository(), repoData);			
+			
+			var tableWidth = $(oTable).getWidth();
+			for(var k=0;k<headerCellsWidth.length;k++){
+				repoData.set(k, Math.round(headerCellsWidth[k]/tableWidth*100));				
+			}
+			data.set(ajaxplorer.user.getActiveRepository(), repoData);
 			ajaxplorer.user.setPreference("columns_size", data, true);
-			ajaxplorer.user.savePreference("columns_size");
-		}.bind(this));
+			ajaxplorer.user.savePreference("columns_size");			
+		}.bind(this) );	
 	},
 
 	setPaginationBehaviour : function(loaderFunc, columnsDefs, crtOrderName, crtOrderDir){
