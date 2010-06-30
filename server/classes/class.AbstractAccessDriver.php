@@ -66,13 +66,15 @@ class AbstractAccessDriver extends AJXP_Plugin {
 				else if($httpVars["options"] == "d") $httpVars["skipZip"] = "true";
 				// skip "complete" mode that was in fact quite the same as standard tree listing (dz)
 			}
+			/*
 			if(!isSet($httpVars["skip_history"])){
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 					$user = AuthService::getLoggedUser();
-					$user->setArrayPref("history", $this->repository->getId(), (isSet($httpVars["dir"])?$httpVars["dir"]:"/"));
+					$user->setArrayPref("history", $this->repository->getId(), ((isSet($httpVars["dir"])&&trim($httpVars["dir"])!="")?$httpVars["dir"]:"/"));
 					$user->save();
 				}
 			}
+			*/
 		}
 	}
 

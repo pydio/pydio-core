@@ -137,8 +137,17 @@ Class.create("FilesList", SelectableElements, {
 			change = true;
 		}
 		if(change){
+			if(ajaxplorer && ajaxplorer.user){
+				var data = ajaxplorer.user.getPreference("columns_visibility", true) || {};
+				data = new Hash(data);
+				data.set(ajaxplorer.user.getActiveRepository(), this.hiddenColumns);
+				ajaxplorer.user.setPreference("columns_visibility", data, true);				
+			}			
 			this.initGUI();
 			this.fill(this.crtContext);
+			if(ajaxplorer && ajaxplorer.user){
+				ajaxplorer.user.savePreference("columns_visibility");
+			}
 		}
 		
 	},
@@ -272,6 +281,14 @@ Class.create("FilesList", SelectableElements, {
 				buffer = buffer + '<div style="overflow:hidden;background-color: #aaa;">';
 			}
 			buffer = buffer + '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
+			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_visibility", true)){
+				var data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
+				if(data.get(ajaxplorer.user.getActiveRepository())){
+					this.hiddenColumns = $A(data.get(ajaxplorer.user.getActiveRepository()));
+				}else{
+					this.hiddenColumns = $A();
+				}
+			}
 			var visibleColumns = this.getVisibleColumns();
 			visibleColumns.each(function(column){buffer = buffer + '<col\>';});
 			buffer = buffer + '<thead><tr>';

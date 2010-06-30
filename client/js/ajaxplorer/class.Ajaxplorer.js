@@ -168,6 +168,16 @@ Class.create("Ajaxplorer", {
 				document.title = 'AjaXplorer - '+(getBaseName(path)?getBaseName(path):'/');
 			}.bind(this));
 		}
+		document.observe("ajaxplorer:context_changed", function(event){
+			if(this.skipLsHistory || !this.user || !this.user.getActiveRepository()) return;			
+			window.setTimeout(function(){
+				var data = this.user.getPreference("ls_history", true) || {};
+				data = new Hash(data);
+				data.set(this.user.getActiveRepository(), this.getContextNode().getPath());
+				this.user.setPreference("ls_history", data, true);
+				this.user.savePreference("ls_history");
+			}.bind(this), 100 );
+		}.bind(this) );
 		modal.updateLoadingProgress('Actions Initialized');
 		  
 		  
@@ -339,8 +349,9 @@ Class.create("Ajaxplorer", {
 			if(!repositoryObject){
 				alert("No active repository found for user!");
 			}
-			if(this.user.getPreference("history_last_listing")){
-				this._initLoadRep = this.user.getPreference("history_last_listing");
+			if(this.user.getPreference("ls_history", true)){
+				var data = new Hash(this.user.getPreference("ls_history", true));
+				this._initLoadRep = data.get(repId);
 			}
 		}
 		this.loadRepository(repositoryObject);		
@@ -368,6 +379,8 @@ Class.create("Ajaxplorer", {
 		var repositoryId = repository.getId();		
 		var	newIcon = repository.getIcon(); 
 				
+		this.skipLsHistory = true;
+		
 		var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
 		this._contextHolder.setRootNode(rootNode);
 				
@@ -381,10 +394,15 @@ Class.create("Ajaxplorer", {
 				this._initLoadRep = null;
 				rootNode.observeOnce("loaded", function(){
 						setTimeout(function(){
-							this.goTo(new AjxpNode(copy));					
-						}.bind(this), 1000);
+							this.goTo(new AjxpNode(copy));
+							this.skipLsHistory = false;
+						}.bind(this), 1000);						
 				}.bind(this));
-			}				
+			}else{
+				this.skipLsHistory = false;
+			}
+		}else{
+			this.skipLsHistory = false;
 		}
 	},
 
@@ -407,8 +425,9 @@ Class.create("Ajaxplorer", {
 		}.bind(this);
 		var root = this._contextHolder.getRootNode();
 		if(root){
+			this.skipLsHistory = true;
 			this._contextHolder.setContextNode(root);
-			root.clear();
+			root.clear();			
 		}
 		connexion.sendAsync();
 	},
