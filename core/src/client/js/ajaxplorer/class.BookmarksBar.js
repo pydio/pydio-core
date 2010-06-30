@@ -160,6 +160,8 @@
 				this.parseXml(ajaxplorer.getXmlRegistry());
 			}.bind(this) );			
 			ajaxplorer.loadXmlRegistry(false, "user/bookmarks");
+			this.bmMenu.refreshList();
+			this.bmMenu.show();
 		}.bind(this);
 		connexion.sendAsync();
 	},
