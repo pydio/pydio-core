@@ -379,6 +379,6 @@ Class.create("SearchEngine", AjxpPane, {
 		}
 		var highlight = haystack.substring(0, start)+'<em>'+haystack.substring(start, end)+'</em>'+haystack.substring(end);
 		return highlight;
-	},
-	
+	}
+		
 });
