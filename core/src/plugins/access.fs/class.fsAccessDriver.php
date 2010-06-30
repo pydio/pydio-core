@@ -444,13 +444,14 @@ class fsAccessDriver extends AbstractAccessDriver
 				}					
 												
 				$metaData = array();
+				$crtLabel = AJXP_Utils::xmlEntities(basename($dir), true);
 				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
 					$metaData["ajxp_mime"] = "ajxp_recycle";
+					$crtLabel = AJXP_Utils::xmlEntities($mess[122]);
 				}
-								
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
-					AJXP_Utils::xmlEntities(basename($dir), true), 
+					$crtLabel, 
 					false, 
 					$metaData);
 				if(isSet($totalPages) && isSet($crtPage)){
@@ -564,10 +565,10 @@ class fsAccessDriver extends AbstractAccessDriver
 						
 						AJXP_XMLWriter::renderNode(
 							$recycleBinOption,
-							AJXP_Utils::xmlEntities(AJXP_Utils::xmlEntities($mess[122])),
+							AJXP_Utils::xmlEntities($mess[122]),
 							false, 
 							array("ajxp_modiftime" 	=> $this->date_modif($this->urlBase.$recycleBinOption),
-								  "mimestring" 		=> "Trashcan",
+								  "mimestring" 		=> AJXP_Utils::xmlEntities($mess[122]),
 								  "icon"			=> "$recycleIcon", 
 								  "filesize"		=> "-",
 								  "ajxp_mime"		=> "ajxp_recycle")
