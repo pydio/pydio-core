@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notify id="notify.phpmail-lite">
+	<registry_contributions>
+		<actions>
+			<!-- Notify Upload Action -->
+			<action name="upload">
+				<pre_processing>
+					<serverCallback methodName="preProcess"/>
+				</pre_processing>
+			</action>					
+		</actions>	
+	</registry_contributions>
+	<dependencies>
+		<activePlugin pluginName="access.fs|access.ftp"/>
+	</dependencies>			
+	<class_definition filename="plugins/notify.phpmail-lite/class.PhpMailLiteNotifier.php" classname="PhpMailLiteNotifier"/>
+</notify>
