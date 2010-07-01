@@ -72,23 +72,7 @@ class demoAccessDriver extends fsAccessDriver
 			//------------------------------------	
 			case "upload":
 				
-				$fancyLoader = false;
-				foreach ($fileVars as $boxName => $boxData)
-				{
-					if($boxName == "Filedata") $fancyLoader = true;
-				}
-				if($fancyLoader)
-				{
-					header('HTTP/1.0 '.$errorMessage);
-					die('Error '.$errorMessage);
-				}
-				else
-				{
-					print("<html><script language=\"javascript\">\n");
-					print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-					print("</script></html>");
-				}
-				exit;
+				return array("ERROR" => array("CODE" => "", "MESSAGE" => $errorMessage));				
 				
 			break;			
 			
