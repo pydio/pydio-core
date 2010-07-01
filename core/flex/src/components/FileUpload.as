@@ -48,6 +48,7 @@ package components
 			
 			// set event listeners
 			_file.addEventListener(Event.COMPLETE,OnUploadComplete);
+			_file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,OnUploadDataComplete);
 			_file.addEventListener(ProgressEvent.PROGRESS,OnUploadProgressChanged);
 			_file.addEventListener(HTTPStatusEvent.HTTP_STATUS,OnHttpError);
 			_file.addEventListener(IOErrorEvent.IO_ERROR,OnIOError);
@@ -92,6 +93,10 @@ package components
 			_uploading = false;
 			_uploaded = true;
 			this.dispatchEvent(new FileUploadEvent(this,"UploadComplete"));
+		}
+		
+		private function OnUploadDataComplete(event:DataEvent):void{
+			this.dispatchEvent(event);
 		}
 		
 		private function OnHttpError(event:HTTPStatusEvent):void{
