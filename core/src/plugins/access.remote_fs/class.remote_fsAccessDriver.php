@@ -49,9 +49,9 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 			if($action == "download" || $action=="image_proxy" || $action=="mp3_proxy"){
 				$httpClient->directForwarding = true;
 			}
-			$httpClient->get($crtRep->getOption("URI"), $httpVars);
+			$result = $httpClient->get($crtRep->getOption("URI"), $httpVars);
 		}else{			
-			$httpClient->post($crtRep->getOption("URI"), $httpVars);
+			$result = $httpClient->post($crtRep->getOption("URI"), $httpVars);
 		}
 		// check if session is expired
 		if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
@@ -62,12 +62,16 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				if($action == "download"){
 					$httpClient->directForwarding = true;
 				}
-				$httpClient->get($crtRep->getOption("URI"), $httpVars);				
+				$result = $httpClient->get($crtRep->getOption("URI"), $httpVars);				
 			}else{			
-				$httpClient->post($crtRep->getOption("URI"), $httpVars);
+				$result = $httpClient->post($crtRep->getOption("URI"), $httpVars);
 			}
 		}
 
+		if($result === false && isSet($httpClient->errormsg)){
+			throw new Exception(SystemTextEncoding::toUTF8($httpClient->errormsg));
+		}
+		
 		switch ($action){			
 			case "image_proxy":
 			case "download":
@@ -92,6 +96,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 			case "trigger_remote_copy":
 				if(!$this->hasFilesToCopy()) break;
 				$toCopy = $this->getFileNameToCopy();
+				AJXP_Logger::debug("trigger_remote", $toCopy);
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$toCopy." to remote server");
 				AJXP_XMLWriter::close();
@@ -123,13 +128,14 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				unlink($fData["tmp_name"]);
 				$response = $httpClient->getContent();				
 				AJXP_XMLWriter::header();
+				AJXP_Logger::debug("next_to_remote", $nextFile);
 				if(intval($response)>=400){
 					AJXP_XMLWriter::sendMessage(null, "Error : ".intval($response));
 				}else{
 					if($nextFile!=''){
 						AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
 					}else{					
-						AJXP_XMLWriter::sendMessage("Done", null);
+						AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Upload done, reloading client.");
 					}
 				}
 				AJXP_XMLWriter::close();
@@ -137,70 +143,58 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 			break;
 			case "upload":
 				
-				$fancyLoader = false;
-				if(isSet($fileVars["Filedata"])){
-					$fancyLoader = true;
-					if($httpVars['dir']!="") $httpVars['dir'] = "/".base64_decode($httpVars['dir']);
-				}				
-				if(isSet($httpVars['dir']) && $httpVars['dir']!=""){$rep_source=$httpVars['dir'];}
-				else $rep_source = "/";
+				$rep_source = AJXP_Utils::securePath("/".$httpVars['dir']);
+				AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
 				$logMessage = "";
-				//$fancyLoader = false;				
 				foreach ($filesVars as $boxName => $boxData)
-				{					
-					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
-					if($boxName == "Filedata") $fancyLoader = true;
+				{
+					if(substr($boxName, 0, 9) != "userfile_")     continue;
+					AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
 					$err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
 					if($err != null)
 					{
-						$errorMessage = $err;
+						$errorCode = $err[0];
+						$errorMessage = $err[1];
 						break;
 					}
 					$boxData["destination"] = $rep_source;
-					$destCopy = INSTALL_PATH."/".$this->repository->getOption("TMP_UPLOAD");
+					$destCopy = AJXP_XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
+					AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
 					if(!is_dir($destCopy)){
 						if(! @mkdir($destCopy)){
+							AJXP_Logger::debug("Upload error : cannot create temporary folder", array($destCopy));
+							$errorCode = 413;
 							$errorMessage = "Warning, cannot create folder for temporary copy.";
 							break;
-						}						
+						}
 					}
 					if(!is_writeable($destCopy)){
+						AJXP_Logger::debug("Upload error: cannot write into temporary folder");
+						$errorCode = 414;
 						$errorMessage = "Warning, cannot write into temporary folder.";
 						break;
 					}
+					AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
 					$destName = $destCopy."/".basename($boxData["tmp_name"]);
+					if ($destName == $boxData["tmp_name"]) $destName .= "1";
 					if(move_uploaded_file($boxData["tmp_name"], $destName)){
 						$boxData["tmp_name"] = $destName;
 						$this->storeFileToCopy($boxData);
 					}else{
 						$mess = ConfService::getMessages();
-						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$boxData["name"];
+						$errorCode = 411;
+						$errorMessage="$mess[33] ".$boxData["name"];
 					}
 				}
-				if($fancyLoader)
-				{
-					session_write_close();
-					if(isSet($errorMessage)){
-						header('HTTP/1.0 '.$errorMessage);
-						die('Error '.$errorMessage);
-					}else{
-						header('HTTP/1.0 200 OK');
-						die("200 OK");
-					}
+				if(isSet($errorMessage)){
+					AJXP_Logger::debug("Return error $errorCode $errorMessage");
+					return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
+				}else{
+					AJXP_Logger::debug("Return success");
+					return array("SUCCESS" => true);
 				}
-				else
-				{
-					print("<html><script language=\"javascript\">\n");
-					if(isSet($errorMessage)){
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-					}else{		
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
-					}
-					print("</script></html>");
-				}
-				session_write_close();
-				exit;
-				
+
+				session_write_close();				
 			break;
 			default:
 			break;			
@@ -216,7 +210,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$crtRep = ConfService::getRepository();
 		$httpClient = new HttpClient($crtRep->getOption("HOST"));
 		$httpClient->cookie_host = $crtRep->getOption("HOST");
-		$httpClient->timeout = 50;
+		$httpClient->timeout = 10;
 		//$httpClient->setDebug(true);
 		if(!$crtRep->getOption("USE_AUTH")){
 			return $httpClient;
@@ -255,6 +249,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$user = AuthService::getLoggedUser();
 		$files = $user->getTemporaryData("tmp_upload");
 		$files[] = $fileData;
+		AJXP_Logger::debug("Storing data", $fileData);
 		$user->saveTemporaryData("tmp_upload", $files);
 	}
 	
