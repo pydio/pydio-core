@@ -344,6 +344,7 @@ package components
 				    fu.addEventListener("UploadComplete",OnFileUploadComplete);
 				    fu.addEventListener("UploadProgressChanged",OnFileUploadProgressChanged);
 				    fu.addEventListener(HTTPStatusEvent.HTTP_STATUS,OnHttpError);
+				    fu.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,OnUploadDataComplete);
 				    fu.addEventListener(IOErrorEvent.IO_ERROR,OnIOError);
 				    fu.addEventListener(SecurityErrorEvent.SECURITY_ERROR,OnSecurityError);
 				    if(localFoundExisting){
@@ -464,6 +465,10 @@ package components
 			spacer.height = (autoUpload?102+32:102);		
 		}
 		
+		//  error handlers
+		private function OnUploadDataComplete(event:DataEvent):void{
+			Alert.show(GetTextFor("IOError") + " " + event.data);
+		}
 		//  error handlers
 		private function OnHttpError(event:HTTPStatusEvent):void{
 			Alert.show(GetTextFor("HTTPError") + event.status);
