@@ -455,11 +455,11 @@ Class.create("Ajaxplorer", {
 			}
 			var dialogOnOpen = XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
 			if(dialogOnOpen && dialogOnOpen.firstChild){
-				eval(dialogOnOpen.firstChild.nodeValue); 
-				if(tmpFunction){
-					extensionDefinition.resourcesManager.load();
-					extensionDefinition.dialogOnOpen = tmpFunction;
-				}
+				extensionDefinition.dialogOnOpen = dialogOnOpen.firstChild.nodeValue;
+			}
+			var dialogOnComplete = XPathSelectSingleNode(xmlNode, 'processing/dialogOnComplete');
+			if(dialogOnComplete && dialogOnComplete.firstChild){
+				extensionDefinition.dialogOnComplete = dialogOnComplete.firstChild.nodeValue;
 			}
 		}		
 	},
