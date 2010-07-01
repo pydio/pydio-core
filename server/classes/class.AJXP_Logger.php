@@ -46,7 +46,10 @@ class AJXP_Logger {
 		if(!ConfService::getConf("SERVER_DEBUG")) return ;
 		$logger = self::getInstance();
 		$message .= "\t";
-		if(count($params)){
+		if(is_string($params)){
+			$message .= $params;
+		}
+		else if(is_array($params) && count($params)){
 			$message.=$logger->arrayToString($params);
 		}		
 		$logger->write($message, LOG_LEVEL_DEBUG);				
