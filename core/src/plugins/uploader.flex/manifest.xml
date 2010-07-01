@@ -11,7 +11,7 @@
 			</div>	
 		]]></clientForm>
 		<activeCondition><![CDATA[		
-			(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && flashUploaderEnabled)
+			(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE))
 		]]></activeCondition>
 	</processing>
 	<registry_contributions>
