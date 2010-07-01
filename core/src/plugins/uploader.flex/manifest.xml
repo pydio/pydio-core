@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.flex" text="51" title="162">
+	<class_definition filename="plugins/uploader.flex/class.FlexUploadProcessor.php" classname="FlexUploadProcessor"/>
 	<processing>
 		<clientForm id="flash_upload_form"><![CDATA[
 			<!-- FLEX UPLOAD FORM -->
@@ -13,6 +14,18 @@
 			(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && flashUploaderEnabled)
 		]]></activeCondition>
 	</processing>
+	<registry_contributions>
+		<actions>
+			<action name="upload">
+				<pre_processing>					
+					<serverCallback methodName="preProcess"/>
+				</pre_processing>
+				<post_processing>					
+					<serverCallback methodName="postProcess" capture="true"/>
+				</post_processing>
+			</action>
+		</actions>
+	</registry_contributions>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>

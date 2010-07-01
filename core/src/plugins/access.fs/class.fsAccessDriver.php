@@ -332,73 +332,48 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------	
 			case "upload":
 
-				$fancyLoader = false;
-				AJXP_Logger::debug("Upload Filedata", $fileVars["Filedata"]);
-				if(isSet($fileVars["Filedata"])){
-					$fancyLoader = true;
-					if($dir!="") $dir = "/".base64_decode($dir);
-				}
-				if($dir!=""){$rep_source="/$dir";}
-				else $rep_source = "";
-				$destination=$this->urlBase.SystemTextEncoding::fromPostedFileName($rep_source);
+				AJXP_Logger::debug("Upload Files Data", $fileVars);
+				$destination=$this->urlBase.SystemTextEncoding::fromPostedFileName($dir);
 				AJXP_Logger::debug("Upload inside", array("destination"=>$destination));
 				if(!$this->isWriteable($destination))
 				{
+					$errorCode = 412;
 					$errorMessage = "$mess[38] ".SystemTextEncoding::toUTF8($dir)." $mess[99].";
-					if($fancyLoader || isset($httpVars["ajxp_sessid"])){
-						AJXP_Logger::debug("Upload error 412", array("destination"=>$destination));
-						header('HTTP/1.0 412 '.$errorMessage);
-						die('Error 412 '.$errorMessage);
-					}else{
-						AJXP_Logger::debug("Upload error 412", array("destination"=>$destination));
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-						break;
-					}
+					AJXP_Logger::debug("Upload error 412", array("destination"=>$destination));
+					return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
 				}	
 				foreach ($fileVars as $boxName => $boxData)
 				{
-					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")	continue;
-					if($boxName == "Filedata") $fancyLoader = true;
-					$err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
+					if(substr($boxName, 0, 9) != "userfile_") continue;
+					$err = AJXP_Utils::parseFileDataErrors($boxData);
 					if($err != null)
 					{
-						$errorMessage = $err;
+						$errorCode = $err[0];
+						$errorMessage = $err[1];
 						break;
 					}
 					$userfile_name = $boxData["name"];
-					if($fancyLoader) $userfile_name = SystemTextEncoding::fromUTF8($userfile_name);
 					$userfile_name=AJXP_Utils::processFileName($userfile_name);
 					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
 					}
 					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
 					{
-						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;
+						$errorCode=411;
+						$errorMessage="$mess[33] ".$userfile_name;
 						break;
 					}
 					$this->changeMode($destination."/".$userfile_name);
 					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
 					AJXP_Logger::logAction("Upload File", array("file"=>SystemTextEncoding::fromUTF8($dir)."/".$userfile_name));
 				}
-				if($fancyLoader)
-				{
-					if(isSet($errorMessage)){
-						header('HTTP/1.0 '.$errorMessage);
-						die('Error '.$errorMessage);
-					}else{
-						header('HTTP/1.0 200 OK');
-						die("200 OK");
-					}
-				}
-				else
-				{
-					print("<html><script language=\"javascript\">\n");
-					if(isSet($errorMessage)){
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");		
-					}else{		
-						print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
-					}
-					print("</script></html>");
+				
+				if(isSet($errorMessage)){
+					AJXP_Logger::debug("Return error $errorCode $errorMessage");
+					return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
+				}else{
+					AJXP_Logger::debug("Return success");
+					return array("SUCCESS" => true);
 				}
 				return ;
 				
