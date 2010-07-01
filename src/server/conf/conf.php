@@ -92,7 +92,8 @@ $PLUGINS = array(
 	 		"LOG_CHMOD" => 0770
 	 	)
 	),
-	"ACTIVE_PLUGINS" => array("editor.*", "uploader.*", "gui.ajax", "hook.*")
+	// Do not use wildcard for uploader, to keep them in a given order
+	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.simple", "gui.ajax", "hook.*")
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
@@ -155,13 +156,6 @@ $AJXP_SERVER_DEBUG = false;
 /*********************************************/
 /*	GLOBAL UPLOAD CONFIG
 /*********************************************/
-// Whether the flash upload is enabled or not.
-// In most case, it will work ok and greatly enhance the upload
-// feature, by providing multiple file selection and progress bar.
-// But in somecase it may conflict with the server config. In that case
-// you can switch to the old simple HTML+JavaScript version.
-$upload_enable_flash = true;
-
 // Maximum number of files for each upload. Leave to 0 for no limit.
 $upload_max_number = 16;
 
