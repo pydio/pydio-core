@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.simple" text="51" title="162" className="MultiUploader">
+	<class_definition filename="plugins/uploader.simple/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
 	<resources>
 		<js file="plugins/uploader.simple/class.MultiUploader.js" className="MultiUploader"/>
 	</resources>
+	<registry_contributions>
+		<actions>
+			<action name="upload">
+				<post_processing>					
+					<serverCallback methodName="postProcess" capture="true"/>
+				</post_processing>
+			</action>
+		</actions>
+	</registry_contributions>	
 	<processing>	
 		<clientForm id="originalUploadForm"><![CDATA[
 			<!-- UPLOAD FORM -->
@@ -26,6 +36,7 @@
 				</tr>
 			</table>
 			<input type="hidden" name="get_action" value="upload">	
+			<input type="hidden" name="simple_uploader" value="true">	
 			</form>
 			<script language="javascript">$('originalUploadForm').hide();</script>
 		]]></clientForm>
