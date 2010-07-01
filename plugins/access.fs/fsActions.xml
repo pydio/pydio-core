@@ -45,7 +45,23 @@
 					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
 					if(uploaders.length){
 						var uploader = uploaders[0];
-						modal.showDialogForm('Upload', uploader.formId, uploader.dialogOnOpen, null, null, true, true);
+						if(uploader.dialogOnOpen){							
+							eval(uploader.dialogOnOpen); 
+							if(tmpFunction){
+								uploader.resourcesManager.load();
+								var dialogOnOpen = tmpFunction;
+							}
+						}
+						if(uploader.dialogOnComplete){							
+							var tmpFunction = null;
+							eval(uploader.dialogOnComplete); 
+							if(tmpFunction){
+								uploader.resourcesManager.load();
+								var dialogOnComplete = tmpFunction;
+							}
+						}
+						
+						modal.showDialogForm('Upload', uploader.formId, dialogOnOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>

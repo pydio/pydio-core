@@ -36,7 +36,6 @@
 class SimpleUploadProcessor extends AJXP_Plugin {
 	
 	public function postProcess($action, $httpVars, $postProcessData){
-		AJXP_Logger::debug("SimpleUploadProc test", $httpVars);
 		if(!isSet($httpVars["simple_uploader"])){
 			return false;
 		}
