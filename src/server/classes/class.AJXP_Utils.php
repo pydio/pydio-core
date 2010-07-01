@@ -90,7 +90,7 @@ class AJXP_Utils
 		return SystemTextEncoding::fromUTF8(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)));
 	}
 	
-	function parseFileDataErrors($boxData, $errorCodes)
+	function parseFileDataErrors($boxData)
 	{
 		$mess = ConfService::getMessages();
 		$userfile_error = $boxData["error"];		
@@ -99,10 +99,10 @@ class AJXP_Utils
 		if ($userfile_error != UPLOAD_ERR_OK)
 		{
 			$errorsArray = array();
-			$errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = ($errorCodes?"409 ":"")."File is too big! Max is".ini_get("upload_max_filesize");
-			$errorsArray[UPLOAD_ERR_NO_FILE] = ($errorCodes?"410 ":"")."No file found on server!";
-			$errorsArray[UPLOAD_ERR_PARTIAL] = ($errorCodes?"410 ":"")."File is partial";
-			$errorsArray[UPLOAD_ERR_INI_SIZE] = ($errorCodes?"410 ":"")."No file found on server!";
+			$errorsArray[UPLOAD_ERR_FORM_SIZE] = $errorsArray[UPLOAD_ERR_INI_SIZE] = array(409,"File is too big! Max is".ini_get("upload_max_filesize"));
+			$errorsArray[UPLOAD_ERR_NO_FILE] = array(410,"No file found on server!");
+			$errorsArray[UPLOAD_ERR_PARTIAL] = array(410,"File is partial");
+			$errorsArray[UPLOAD_ERR_INI_SIZE] = array(410,"No file found on server!");
 			if($userfile_error == UPLOAD_ERR_NO_FILE)
 			{
 				// OPERA HACK, do not display "no file found error"
@@ -118,7 +118,7 @@ class AJXP_Utils
 		}
 		if ($userfile_tmp_name=="none" || $userfile_size == 0)
 		{
-			return ($errorCodes?"410 ":"").$mess[31];
+			return array(410,$mess[31]);
 		}
 		return null;
 	}

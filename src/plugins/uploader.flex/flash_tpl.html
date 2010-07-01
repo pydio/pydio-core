@@ -101,7 +101,7 @@ function triggerFlashEvent(){
 
 var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&ajxp_sessid=<?php echo session_id(); ?>';
 
-var FlashObject = "<?php print(CLIENT_RESOURCES_FOLDER);?>/flash/FlashFileUpload.swf";
+var FlashObject = "plugins/uploader.flex/FlashFileUpload.swf";
 var FlashVarValue = "<?php echo $FlashVar; ?>" + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
 
 document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + window.location.protocol + '//fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="450" height="310" id="fileUpload" align="middle">\
