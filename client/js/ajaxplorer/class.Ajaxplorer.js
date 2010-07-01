@@ -457,6 +457,7 @@ Class.create("Ajaxplorer", {
 			if(dialogOnOpen && dialogOnOpen.firstChild){
 				eval(dialogOnOpen.firstChild.nodeValue); 
 				if(tmpFunction){
+					extensionDefinition.resourcesManager.load();
 					extensionDefinition.dialogOnOpen = tmpFunction;
 				}
 			}
@@ -472,13 +473,13 @@ Class.create("Ajaxplorer", {
 				xmlNode : extensions[i],
 				resourcesManager : new ResourcesManager()				
 			};
-			this.initExtension(extensions[i], extensionDefinition);
 			this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
-			this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);					
 			for(var j=0;j<extensions[i].childNodes.length;j++){
 				var child = extensions[i].childNodes[j];
 				extensionDefinition.resourcesManager.loadFromXmlNode(child);
 			}
+			this.initExtension(extensions[i], extensionDefinition);
+			this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);					
 		}
 	},
 	
