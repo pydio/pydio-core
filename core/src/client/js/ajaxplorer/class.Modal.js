@@ -41,8 +41,8 @@ Class.create("Modal", {
 	initForms: function(){
 		this.elementName = 'generic_dialog_box';
 		this.htmlElement = $(this.elementName);
-		this.dialogTitle = this.htmlElement.getElementsBySelector(".dialogTitle")[0];
-		this.dialogContent = this.htmlElement.getElementsBySelector(".dialogContent")[0];
+		this.dialogTitle = this.htmlElement.select(".dialogTitle")[0];
+		this.dialogContent = this.htmlElement.select(".dialogContent")[0];
 		this.currentForm;
 		this.cachedForms = new Hash();
 		this.iframeIndex = 0;	
@@ -51,8 +51,9 @@ Class.create("Modal", {
 	prepareHeader: function(sTitle, sIconSrc){
 		var hString = "<span class=\"titleString\">";
 		if(sIconSrc != "") hString = "<span class=\"titleString\"><img src=\""+sIconSrc.replace('22', '16')+"\" width=\"16\" height=\"16\" align=\"top\"/>&nbsp;";
+		var closeBtn = '<img id="modalCloseBtn" style="cursor:pointer;float:right;margin-top:2px;" src="'+ajxpResourcesFolder+'/images/actions/16/window_close.png" />';  
 		hString += sTitle + '</span>';
-		this.dialogTitle.innerHTML = hString;
+		this.dialogTitle.update(closeBtn + hString);
 	},
 	
 	showDialogForm: function(sTitle, sFormId, fOnLoad, fOnComplete, fOnCancel, bOkButtonOnly, skipButtons){
@@ -96,6 +97,13 @@ Class.create("Modal", {
 		if(!boxPadding) boxPadding = 10;
 		this.dialogContent.setStyle({padding:boxPadding});
 
+		
+		if(fOnCancel){
+			this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){fOnCancel();hideLightBox();});
+		}
+		else{
+			this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){hideLightBox();});
+		}			
 		
 		if(fOnComplete)	{
 			newForm.onsubmit = function(){
