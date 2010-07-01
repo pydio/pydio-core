@@ -93,28 +93,18 @@ class ftpAccessDriver extends fsAccessDriver {
 				exit(1);
 			break;
 			case "upload":
-				$fancyLoader = false;
-				$rep_source = "/";
-				if(isSet($filesVars["Filedata"])){
-					$fancyLoader = true;
-				}
-				if($httpVars['dir']!="") {
-					$rep_source = AJXP_Utils::securePath("/".($fancyLoader?base64_decode($httpVars['dir']):$httpVars['dir']));
-				}
-				AJXP_Logger::debug("Upload : rep_source ", array($rep_source, "fancy?"=>$fancyLoader));
-
+				$rep_source = AJXP_Utils::securePath("/".$httpVars['dir']);
+				AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
 				$logMessage = "";
-				//$fancyLoader = false;
 				foreach ($filesVars as $boxName => $boxData)
 				{
-					if($boxName != "Filedata" && substr($boxName, 0, 9) != "userfile_")     continue;
-					if($boxName == "Filedata") $fancyLoader = true;
-					AJXP_Logger::debug("Upload : rep_source ", array($rep_source, "fancy?"=>$fancyLoader));
+					if(substr($boxName, 0, 9) != "userfile_")     continue;
+					AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
 					$err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
 					if($err != null)
 					{
-						AJXP_Logger::debug("File data errors");
-						$errorMessage = '412 '.$err;
+						$errorCode = $err[0];
+						$errorMessage = $err[1];
 						break;
 					}
 					$boxData["destination"] = base64_encode($rep_source);
@@ -123,13 +113,15 @@ class ftpAccessDriver extends fsAccessDriver {
 					if(!is_dir($destCopy)){
 						if(! @mkdir($destCopy)){
 							AJXP_Logger::debug("Upload error : cannot create temporary folder", array($destCopy));
-							$errorMessage = "413 Warning, cannot create folder for temporary copy.";
+							$errorCode = 413;
+							$errorMessage = "Warning, cannot create folder for temporary copy.";
 							break;
 						}
 					}
 					if(!is_writeable($destCopy)){
 						AJXP_Logger::debug("Upload error: cannot write into temporary folder");
-						$errorMessage = "414 Warning, cannot write into temporary folder.";
+						$errorCode = 414;
+						$errorMessage = "Warning, cannot write into temporary folder.";
 						break;
 					}
 					AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
@@ -140,34 +132,22 @@ class ftpAccessDriver extends fsAccessDriver {
 						$this->storeFileToCopy($boxData);
 					}else{
 						$mess = ConfService::getMessages();
-						$errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$boxData["name"];
+						$errorCode = 411;
+						$errorMessage="$mess[33] ".$boxData["name"];
 					}
 				}
+				if(isSet($errorMessage)){
+					AJXP_Logger::debug("Return error $errorCode $errorMessage");
+					return array("ERROR" => array("CODE" => $errorCode, "MESSAGE" => $errorMessage));
+				}else{
+					AJXP_Logger::debug("Return success");
+					return array("SUCCESS" => true);
+				}
+				
 			break;
 			default:
 			break;
-		}
-		if($fancyLoader)
-		{
-			session_write_close();
-			if(isSet($errorMessage)){
-				header('HTTP/1.0 '.$errorMessage);
-				die('Error '.$errorMessage);
-			}else{
-				header('HTTP/1.0 200 OK');
-				die("200 OK");
-			}
-		}
-		else
-		{
-			print("<html><script language=\"javascript\">\n");
-			if(isSet($errorMessage)){
-				print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $errorMessage)."');");
-			}else{
-				print("\n if(parent.ajaxplorer.actionBar.multi_selector)parent.ajaxplorer.actionBar.multi_selector.submitNext();");
-			}
-			print("</script></html>");
-		}
+		}		
 		session_write_close();
 		exit;
 

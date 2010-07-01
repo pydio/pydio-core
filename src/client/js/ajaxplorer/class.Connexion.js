@@ -77,15 +77,17 @@ Class.create("Connexion", {
 	},
 	
 	applyComplete : function(transport){
+		var message;
 		if(Prototype.Browser.Gecko && transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName=="parsererror"){
-			alert("Parsing error : \n" + transport.responseXML.documentElement.firstChild.textContent);					
-			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
+			message = "Parsing error : \n" + transport.responseXML.documentElement.firstChild.textContent;					
 		}else if(Prototype.Browser.IE && transport.responseXML.parseError && transport.responseXML.parseError.errorCode != 0){
-			alert("Parsing Error : \n" + transport.responseXML.parseError.reason);
-			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
+			message = "Parsing Error : \n" + transport.responseXML.parseError.reason;
 		}else if(transport.getAllResponseHeaders().indexOf("text/xml")>-1 && transport.responseXML == null){
-			alert("Unknown Parsing Error!");
-			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", transport.responseText);
+			message = "Unknown Parsing Error!";
+		}
+		if(message){
+			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", message);
+			else alert(message);
 		}
 		if(transport.responseXML && transport.responseXML.documentElement){
 			var authNode = XPathSelectSingleNode(transport.responseXML.documentElement, "require_auth");
