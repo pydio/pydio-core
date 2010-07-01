@@ -12,15 +12,19 @@
 				<serverCallback methodName="postProcess"/>
 			</post_processing>
 		</action>					
-	<!-- Override all actions at once -->
 		<action name="*">
 			<pre_processing>
 				<serverCallback methodName="preProcess"/>
 			</pre_processing>
 		</action>
-		<action name="*">
+		<action name="ls">
 			<post_processing>
 				<serverCallback methodName="postProcess"/>
+			</post_processing>		
+		</action>
+		<action name="ls">
+			<post_processing>
+				<serverCallback methodName="postProcess2"/>
 			</post_processing>		
 		</action>
 	</actions>
