@@ -33,10 +33,8 @@
  * 
  * Description : Class for handling flex upload
  */
-class FlexUploadProcessor extends AJXP_Plugin {
+class JumploaderProcessor extends AJXP_Plugin {
 
-	private static $active = false;
-	
 	public function preProcess($action, &$httpVars, &$fileVars){
 		$repository = ConfService::getRepository();
 		$skipDecoding = false;
@@ -48,35 +46,12 @@ class FlexUploadProcessor extends AJXP_Plugin {
 	    		$skipDecoding = true;
 	    	}
 		}
+		if(!$skipDecoding) $httpVars["dir"] = base64_decode($httpVars["dir"]);		
+		AJXP_Logger::debug("Pre Processing Jumploader", $httpVars);
 		
-		if(isSet($fileVars["Filedata"])){
-			self::$active = true;
-			$httpVars["dir"] = base64_decode($httpVars["dir"]);
-			if(!$skipDecoding) {
-				$fileVars["Filedata"]["name"] = SystemTextEncoding::fromUTF8($fileVars["Filedata"]["name"]);
-			}
-			$fileVars["userfile_0"] = $fileVars["Filedata"];
-			unset($fileVars["Filedata"]);
-			AJXP_Logger::debug("Setting FlexProc active");
-		}
 	}	
 	
 	public function postProcess($action, $httpVars, $postProcessData){
-		if(!self::$active){
-			return false;
-		}
-		AJXP_Logger::debug("FlexProc is active=".self::$active, $postProcessData);
-		$result = $postProcessData["processor_result"];
-		if(isSet($result["SUCCESS"]) && $result["SUCCESS"] === true){
-			header('HTTP/1.0 200 OK');
-			//die("200 OK");
-		}else if(isSet($result["ERROR"]) && is_array($result["ERROR"])){
-			$code = $result["ERROR"]["CODE"];
-			$message = $result["ERROR"]["MESSAGE"];
-			
-			//header("HTTP/1.0 $code $message");
-			die("Error $code $message");
-		}
 	}	
 }
 ?>

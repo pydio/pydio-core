@@ -40,9 +40,6 @@
 			</form>
 			<script language="javascript">$('originalUploadForm').hide();</script>
 		]]></clientForm>
-		<activeCondition><![CDATA[		
-			!(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && flashUploaderEnabled)
-		]]></activeCondition>
 		<dialogOnOpen><![CDATA[ 
 		var tmpFunction = function(oForm){
 			ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm);
