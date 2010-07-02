@@ -3,33 +3,13 @@
 	<class_definition filename="plugins/uploader.jumploader/class.JumploaderProcessor.php" classname="JumploaderProcessor"/>
 	<processing>
 		<clientForm id="jumploader_form"><![CDATA[
+			<!-- FLEX UPLOAD FORM -->
 			<div id="jumploader_form" box_width="600" box_padding="0">
 			<div id="jumpscreen">
-				<applet name="jumpLoaderApplet"
-						code="jmaster.jumploader.app.JumpLoaderApplet.class"
-						archive="plugins/uploader.jumploader/jumploader_z.jar"
-						width="600"
-						height="400" 
-						mayscript>
-					<param name="uc_uploadUrl" value="content.php?get_action=upload"/>
-					<param name="uc_fileParameterName" value="userfile_0"/>
-					<param name="ac_fireUploaderStatusChanged" value="true"/>
-				</applet>			
+			<iframe id="jumpframe" style="width:600px;height:400px;border:0px none;" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=jumploader_tpl.html&pluginName=uploader.jumploader&encode=false"></iframe>
 			</div>
 			</div>	
 		]]></clientForm>
-		<dialogOnOpen><![CDATA[ 
-		var tmpFunction = function(oForm){
-			var applet = $$('applet')[0];			
-			var origUrl = applet.getUploaderConfig().getUploadUrl();
-			applet.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + base64_encode(ajaxplorer.getUserSelection().getContextNode().getPath()));
-		};
-		]]></dialogOnOpen>
-		<dialogOnComplete><![CDATA[ 
-		var tmpFunction = function(){
-			ajaxplorer.getContextNode().reload();
-		};
-		]]></dialogOnComplete>
 	</processing>
 	<registry_contributions>
 		<actions>
