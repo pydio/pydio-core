@@ -33,6 +33,8 @@
  * 
  * Description : static methods for handling charset conversions.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class SystemTextEncoding
 {
 	function changeCharset($inputCharset, $outputCharset, $text)

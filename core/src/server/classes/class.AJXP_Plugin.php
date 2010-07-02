@@ -33,6 +33,8 @@
  * 
  * Description : Basic plugin, defined by it's manifest.xml
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AJXP_Plugin{
 	protected $baseDir;
 	protected $id;

@@ -33,6 +33,8 @@
  * 
  * Description : various utils methods.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AJXP_Utils
 {
 	

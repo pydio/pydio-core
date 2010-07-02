@@ -33,6 +33,8 @@
  * 
  * Description : Config file for the editor.pdf plugin.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 $DRIVER_CONF = array(
 	/************************************/
 	/* THUMBNAIL MANAGEMENT				*/
