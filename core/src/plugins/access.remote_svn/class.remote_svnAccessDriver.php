@@ -33,6 +33,8 @@
  * 
  * Description : Still experimental, browse an SVN repository.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 include_once(INSTALL_PATH."/plugins/access.remote_fs/class.remote_fsAccessDriver.php");
 
 class remote_svnAccessDriver extends remote_fsAccessDriver 

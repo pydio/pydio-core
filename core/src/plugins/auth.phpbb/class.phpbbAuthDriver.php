@@ -1,5 +1,7 @@
 <?php
 
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class phpbbAuthDriver extends serialAuthDriver  {
 	
 	var $usersSerFile;

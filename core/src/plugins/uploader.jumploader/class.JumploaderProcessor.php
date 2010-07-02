@@ -33,6 +33,8 @@
  * 
  * Description : Class for handling flex upload
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class JumploaderProcessor extends AJXP_Plugin {
 
 	public function preProcess($action, &$httpVars, &$fileVars){

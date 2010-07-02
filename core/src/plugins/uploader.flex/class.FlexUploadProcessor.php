@@ -33,6 +33,8 @@
  * 
  * Description : Class for handling flex upload
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class FlexUploadProcessor extends AJXP_Plugin {
 
 	private static $active = false;

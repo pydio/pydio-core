@@ -33,6 +33,8 @@
  * 
  * Description : Serialized Files implementation of AbstractConfDriver
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 require_once(INSTALL_PATH."/server/classes/class.AbstractConfDriver.php");
 class serialConfDriver extends AbstractConfDriver {
 		

@@ -32,9 +32,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
  * Description : Interface between AjaXplorer and external software. Handle with care!
- */
- 
-/** Take care when using this file. It can't be included anywhere, as it's doing global scope pollution.
+  * Take care when using this file. It can't be included anywhere, as it's doing global scope pollution.
   *    Typically, this is used as glue code from your CMS frontend and AJXP code. 
   *    This example file switches sessions (close CMS session, open AJXP session, modify AJXP's 
   *    session value so the users actions are performed as if they were done locally by AJXP, and then 
@@ -42,15 +40,8 @@
   *    This is typically used by Wordpress as the plugin mechanism is hook based.
   *
   *    The idea is: this script is require()'d by the CMS script. 
-  *
-  *
-  *
-  *
-  *
-  *
-  *
-  *
-  */
+ */
+ 
   
 global $secret, $result;
 

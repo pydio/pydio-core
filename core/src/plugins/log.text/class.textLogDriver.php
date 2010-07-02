@@ -33,6 +33,8 @@
  * 
  * Description : Standard text logging plugin.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 require_once(INSTALL_PATH. "/server/classes/class.AbstractLogDriver.php");
 
 class textLogDriver extends AbstractLogDriver {

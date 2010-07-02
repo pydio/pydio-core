@@ -33,6 +33,8 @@
  * 
  * Description : Class for handling image_proxy, mp3 proxy, etc... Will rely on the StreamWrappers.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AudioPreviewer extends AJXP_Plugin {
 
 	public function preProcessAction($action, &$httpVars, &$fileVars){

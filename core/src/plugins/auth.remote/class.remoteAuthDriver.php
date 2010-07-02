@@ -33,6 +33,8 @@
  * 
  * Description : Abstract representation of an access to an authentication system (ajxp, ldap, etc).
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
 
 /** This class works in 2 modes (master / slave)

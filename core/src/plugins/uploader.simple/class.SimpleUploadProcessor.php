@@ -33,6 +33,8 @@
  * 
  * Description : Class for handling flex upload
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class SimpleUploadProcessor extends AJXP_Plugin {
 	
 	public function postProcess($action, $httpVars, $postProcessData){
