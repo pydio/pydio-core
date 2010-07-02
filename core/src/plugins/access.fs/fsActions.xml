@@ -330,7 +330,7 @@
 						<fieldset>
 							<legend ajxp_message_id="308">2 : AJXP_MESSAGE[308]</legend>
 							<div align="center" style="color: white; margin-top:5px; font-size:10px;">
-								<div align="center" style="text-align:center; cursor: pointer; width:50px; border: 1px solid #aaa;background-color: #bbb;padding:5 10 3 10;" onclick="window.ajxpPublicUrlCallback(); return false;"><img src="client/images/actions/22/public_url.png" height="22" width="22"/><br/>AJXP_MESSAGE[309]</div>
+								<div align="center" style="text-align:center; cursor: pointer; width:50px; border: 1px solid #aaa;background-color: #bbb;padding:5 10 3 10;" onclick="window.ajxpPublicUrlCallback(); return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/public_url.png" height="22" width="22"/><br/>AJXP_MESSAGE[309]</div>
 							</div>
 						</fieldset>
 						<fieldset>
