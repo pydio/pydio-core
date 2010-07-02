@@ -78,13 +78,19 @@ class ftpAccessDriver extends fsAccessDriver {
 					$fp = fopen($destPath, "w");
 					$fSource = fopen($fData["tmp_name"], "r");
 					while(!feof($fSource)){
-						fwrite($fp, fread($fSource, 4096));
+						fwrite($fp, fread($fSource, 4096));						
 					}
+					fclose($fSource);
+					AJXP_Logger::debug("Closing target : begin ftp copy");
+					// Make sur the script does not time out!
+					set_time_limit(240); 
 					fclose($fp);
+					AJXP_Logger::debug("FTP Upload : end of ftp copy");
 					@unlink($fData["tmp_name"]);
 				}catch (Exception $e){
 					AJXP_Logger::debug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
 				}
+				AJXP_Logger::debug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
 				AJXP_XMLWriter::header();
 				if($nextFile!=''){
 					AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
