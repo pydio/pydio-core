@@ -37,23 +37,71 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class JumploaderProcessor extends AJXP_Plugin {
 
+	/**
+	 * Handle UTF8 Decoding
+	 *
+	 * @var unknown_type
+	 */
+	private static $skipDecoding = false;
+	
 	public function preProcess($action, &$httpVars, &$fileVars){
 		$repository = ConfService::getRepository();
-		$skipDecoding = false;
 		if($repository->detectStreamWrapper(false)){
 			$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
 			$streamData = $plugin->detectStreamWrapper(true);		
 	    	if($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"]=="ajxp.remotefs"){
 	    		AJXP_Logger::debug("Skip decoding");
-	    		$skipDecoding = true;
+	    		self::$skipDecoding = true;
 	    	}
+		}		
+		AJXP_Logger::debug("Jumploader HttpVars", $httpVars);
+		AJXP_Logger::debug("Jumploader FileVars", $fileVars);
+		
+		$httpVars["dir"] = base64_decode($httpVars["dir"]);
+		if(isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1){
+			$index = $httpVars["partitionIndex"];
+			$realName = $fileVars["userfile_0"]["name"];
+			$fileId = $httpVars["fileId"];
+			$clientId = $httpVars["clientId"];
+			$fileVars["userfile_0"]["name"] = "$clientId.$fileId.$index";
+			if(intval($index) == intval($httpVars["partitionCount"])-1){
+				$httpVars["partitionRealName"] = $realName;
+			}
 		}
-		if(!$skipDecoding) $httpVars["dir"] = base64_decode($httpVars["dir"]);		
-		AJXP_Logger::debug("Pre Processing Jumploader", $httpVars);
+		
 		
 	}	
 	
 	public function postProcess($action, $httpVars, $postProcessData){
+		if(self::$skipDecoding){
+			
+		}
+		if(!isSet($httpVars["partitionRealName"])) return ;
+
+		$repository = ConfService::getRepository();
+		if(!$repository->detectStreamWrapper(false)){
+			return false;
+		}
+		$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+		$streamData = $plugin->detectStreamWrapper(true);		
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId().$httpVars["dir"]."/";    	
+		
+		$count = intval($httpVars["partitionCount"]);
+		$index = intval($httpVars["partitionIndex"]);
+		$fileId = $httpVars["fileId"];
+		$clientId = $httpVars["clientId"];
+		AJXP_Logger::debug("Should now rebuild file!", $httpVars);
+		
+		$newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
+		for ($i = 0; $i < $count ; $i++){
+			$part = fopen($destStreamURL."$clientId.$fileId.$i", "r");
+			while(!feof($part)){
+				fwrite($newDest, fread($part, 4096));
+			}
+			fclose($part);
+			unlink($destStreamURL."$clientId.$fileId.$i");
+		}
+		fclose($newDest);
 	}	
 }
 ?>
