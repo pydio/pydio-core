@@ -1,0 +1,104 @@
+<?php 
+    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
+    $UploadMaxPostSize = AJXP_Utils::convertBytes(ini_get('post_max_size'));
+    if($UploadMaxPostSize > 0 && $UploadMaxPostSize < $UploadMaxSize) $UploadMaxSize = $UploadMaxPostSize;
+    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
+    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
+    $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
+    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");    
+    
+	$repository = ConfService::getRepository();
+	$accessType = $repository->getAccessType();
+	if($accessType == "fs"){
+		$partitionLength = $UploadMaxSize - 1000;	
+	}else if($accessType == "remotefs"){
+		$maxFileLength = $UploadMaxSize;
+	}else if($accessType == "ftp"){
+		// Switch to FTP 
+		$maxFileLength = $UploadMaxSize;
+	}
+	
+
+?>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
+</head>
+<body bgcolor="ffffff" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
+<script language="javascript" type="text/javascript">
+
+var clientId = '<?php echo session_id(); ?>';
+
+var partitionLength = <?php echo ($partitionLength?$partitionLength:-1); ?>;
+var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
+
+function appletInitialized(uploader){	
+	var applet = document.getElementById('jumpLoaderApplet');
+	var origUrl = applet.getUploaderConfig().getUploadUrl();
+	var currentFolder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
+	applet.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&clientId=" + clientId);
+	applet.getUploaderConfig().setPartitionLength(partitionLength);
+	applet.getUploaderConfig().setMaxFileLength(maxFileLength);
+}
+
+function uploaderStatusChanged(uploader){
+	var applet = document.getElementById('jumpLoaderApplet');
+	// 1 = uploading, 0 is back to normal => we assume "uploaded"
+	if(uploader.getStatus() == 0){
+		parent.ajaxplorer.fireContextRefresh();
+	}
+}
+
+
+var messages = 
+{
+	MaxFileSizeLimit:252, 
+	MaxFileSize:211, 
+	HTTPError:253, 
+	IOError:254, 
+	SecurityError:255,
+	Uploaded:256,
+	Remove:257,
+	Add:214,
+	Clear:216,
+	Upload:77,
+	Cancel:232,
+	TotalFile:258,
+	SizeText:259,
+	Byte:260, 
+	existingFilesFound:262, 
+	overwrite:263, 
+	skip:264, 
+	rename:6, 
+	UploadLimitsTitle:281, 
+	UploadLimitsSizePerFile:282, 
+	UploadLimitsTotalSize:283, 
+	UploadLimitsFilesNumber:284,
+	
+	UploaderOptionsLabel:312,
+	UploaderLimitLabel:281,
+	AutoUploadLabel:311,
+	CloseText:86,
+	OptionsText:310
+};
+
+
+var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&clientId=<?php echo session_id(); ?>';
+
+var FlashObject = "plugins/uploader.flex/FlashFileUpload.swf";
+var FlashVarValue = "<?php echo $FlashVar; ?>" + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
+
+document.write('<applet name="jumpLoaderApplet" id="jumpLoaderApplet" \
+						code="jmaster.jumploader.app.JumpLoaderApplet.class" \
+						archive="plugins/uploader.jumploader/jumploader_z.jar" \
+						width="600" \
+						height="400" \
+						mayscript> \
+					<param name="uc_uploadUrl" value="content.php?get_action=upload"/> \
+					<param name="uc_fileParameterName" value="userfile_0"/> \
+					<param name="ac_fireUploaderStatusChanged" value="true"/> \
+					<param name="ac_fireAppletInitialized" value="true"/> \
+				</applet>');
+</script>
+</body>
+</html>
