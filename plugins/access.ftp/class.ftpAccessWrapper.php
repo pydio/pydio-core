@@ -145,6 +145,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     			rewind($this->fp);
     			AJXP_Logger::debug("Ftp_fput", array("target"=>$this->crtTarget));
     			ftp_fput($this->crtLink, $this->crtTarget, $this->fp, FTP_BINARY);
+    			AJXP_Logger::debug("Ftp_fput end", array("target"=>$this->crtTarget));
     		}else{
 		    	fflush($this->fp);
     		}
