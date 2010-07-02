@@ -14,8 +14,19 @@
 	}else if($accessType == "remotefs"){
 		$maxFileLength = $UploadMaxSize;
 	}else if($accessType == "ftp"){
-		// Switch to FTP 
 		$maxFileLength = $UploadMaxSize;
+		/*
+		// Here we could switch to FTP, but that would mean, by a way or another,
+		// to display in clear the ftp credentials... 
+		// Also, beware the ftp_z.jar is needed for this to work.
+		$ftpWrapper = new ftpAccessWrapper();
+		$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+		$streamData = $plugin->detectStreamWrapper(true);		
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId()."/";
+    	// Not working now, as ftpAccessWrapper::buildRealUrl is in fact protected
+    	$ftpURL = $ftpWrapper->buildRealUrl($destStreamURL);
+    	// Then pass this URL to the javascript uploadUrl => to the applet.
+    	*/
 	}
 	
 
@@ -31,6 +42,7 @@ var clientId = '<?php echo session_id(); ?>';
 
 var partitionLength = <?php echo ($partitionLength?$partitionLength:-1); ?>;
 var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
+var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
 function appletInitialized(uploader){	
 	var applet = document.getElementById('jumpLoaderApplet');
