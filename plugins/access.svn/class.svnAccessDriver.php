@@ -33,6 +33,8 @@
  * 
  * Description : Still experimental, browse a local SVN repository.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 require_once("svn_lib.inc.php");
 
 class svnAccessDriver extends AbstractAccessDriver {

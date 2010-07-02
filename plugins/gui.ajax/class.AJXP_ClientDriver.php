@@ -33,6 +33,8 @@
  * 
  * Description : Basic implementation of the AbstractDriver, handle low level actions (docs, templates, etc).
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AJXP_ClientDriver extends AJXP_Plugin 
 {	
 	function switchAction($action, $httpVars, $fileVars)

@@ -33,6 +33,8 @@
  * 
  * Description : Class for handling image_proxy, etc... Will rely on the StreamWrappers.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class ImagePreviewer extends AJXP_Plugin {
 
 	public function switchAction($action, $httpVars, $filesVars){

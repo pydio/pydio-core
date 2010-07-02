@@ -33,6 +33,8 @@
  * 
  * Description : Sample implementation of a hook that notifies user by email
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class PhpMailLiteNotifier extends AJXP_Plugin {
 		
 	public function preProcess($action, $httpVars, $fileVars){

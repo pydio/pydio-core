@@ -33,6 +33,8 @@
  * 
  * Description : Class for handling pdf preview, etc... Rely on the StreamWrappers, ImageMagick and GhostScript
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class PdfPreviewer extends AJXP_Plugin {
 
 	public function switchAction($action, $httpVars, $filesVars){

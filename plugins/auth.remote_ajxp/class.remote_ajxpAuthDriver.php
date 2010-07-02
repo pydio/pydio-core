@@ -33,6 +33,8 @@
  * 
  * Description : Abstract representation of an access to an authentication system (ajxp, ldap, etc).
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class remote_ajxpAuthDriver extends serialAuthDriver  {
 	
 	function usersEditable(){

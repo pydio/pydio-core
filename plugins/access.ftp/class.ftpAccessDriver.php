@@ -33,6 +33,8 @@
  * 
  * Description : FTP access
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class ftpAccessDriver extends fsAccessDriver {
 	
 	function initRepository(){

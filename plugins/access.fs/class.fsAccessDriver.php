@@ -34,6 +34,8 @@
  * Description : The most used and standard plugin : FileSystem access
  */
 
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 // This is used to catch exception while downloading
 function download_exception_handler($exception){}
 

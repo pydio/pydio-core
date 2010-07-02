@@ -35,6 +35,8 @@
  * @todo Put the DB content encoding as a driver option, then manually for current encoding 
  *       in SystemTextEncoding.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class mysqlAccessDriver extends AbstractAccessDriver 
 {
     /** The user name */

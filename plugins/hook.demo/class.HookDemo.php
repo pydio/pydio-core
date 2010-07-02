@@ -31,8 +31,10 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : Basic implementation of the AbstractDriver, handle low level actions (docs, templates, etc).
+ * Description : Simple non-fonctionnal plugin for adding hooks in various parts of the code.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class HookDemo extends AJXP_Plugin {
 		
 	public function preProcess($action, $httpVars, $fileVars){		
