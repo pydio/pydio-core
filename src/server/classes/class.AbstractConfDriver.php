@@ -33,6 +33,8 @@
  * 
  * Description : Abstract representation of Ajaxplorer Data Access
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AbstractConfDriver extends AJXP_Plugin {
 		
 	var $options;

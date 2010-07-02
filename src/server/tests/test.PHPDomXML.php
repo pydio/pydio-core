@@ -33,6 +33,7 @@
  *
  * Description : Test presence of lib-xml library
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
                                  
 require_once('../classes/class.AbstractTest.php');
 

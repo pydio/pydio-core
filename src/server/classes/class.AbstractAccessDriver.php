@@ -33,6 +33,8 @@
  * 
  * Description : Abstract representation of an action driver. Must be implemented.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AbstractAccessDriver extends AJXP_Plugin {
 	
 	/**

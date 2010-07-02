@@ -1,5 +1,7 @@
 <?php
 
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 if ( !function_exists('sys_get_temp_dir')) {
 	function sys_get_temp_dir() {
 		if( $temp=getenv('TMP') )        return $temp;

@@ -33,6 +33,8 @@
  * 
  * Description : Repository abstraction.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class Repository {
 
 	var $uuid;

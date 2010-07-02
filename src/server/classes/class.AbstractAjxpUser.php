@@ -33,6 +33,8 @@
  * 
  * Description : User abstraction
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AbstractAjxpUser
 {
 	var $id;

@@ -33,6 +33,8 @@
  * 
  * Description : Static functions for generation HTML.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class HTMLWriter
 {
 

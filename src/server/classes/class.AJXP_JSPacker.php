@@ -33,6 +33,8 @@
  * 
  * Description : Encapsulation of the JSPacker class.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AJXP_JSPacker{
 	
 	/**

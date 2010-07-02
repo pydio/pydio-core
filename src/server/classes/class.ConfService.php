@@ -33,6 +33,8 @@
  * 
  * Description : Main configurations parsing.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class ConfService
 {	
 	private static $instance;

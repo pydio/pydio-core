@@ -33,7 +33,8 @@
  *
  * Description : Abstract representation of an action driver. Must be implemented.
  */
-                                 
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 require_once(INSTALL_PATH.'/server/classes/class.AbstractTest.php');
 
 class sshAccessTest extends AbstractTest
