@@ -232,5 +232,5 @@ $max_caracteres=50;
 /* windows. Under Windows, it's faster to install 
 /* COM PHP Extension.
 /*************************************************/
-$allowRealSizeProbing=true;
+$allowRealSizeProbing=false;
 ?>
