@@ -31,6 +31,7 @@
  * 
  * Description : main script called by any Ajax query. Will dispatch the actions on the plugins.
  */
+include_once("server/conf/base.conf.php");
 
 require_once("server/classes/class.AJXP_Utils.php");
 require_once("server/classes/class.SystemTextEncoding.php");
@@ -58,7 +59,6 @@ header("Pragma: no-cache");
 require_once("server/classes/class.AJXP_Logger.php");
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 set_exception_handler(array("AJXP_XMLWriter", "catchException"));
-include_once("server/conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
 ConfService::init("server/conf/conf.php");

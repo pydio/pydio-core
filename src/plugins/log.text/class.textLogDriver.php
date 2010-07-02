@@ -216,7 +216,8 @@ class textLogDriver extends AbstractLogDriver {
 		$years = array();
 		$months = array();
 		if(($handle = opendir($this->storageDir))!==false){
-			while($file = readdir($handle)){				
+			while($file = readdir($handle)){
+				if($file == "index.html") continue;
 				$split = explode(".", $file);
 				if(!count($split) || $split[0] == "") continue;
 				$split2 = explode("_", $split[0]);
