@@ -31,6 +31,7 @@
  * 
  * Description : main script called at initialisation.
  */
+include_once("server/conf/base.conf.php");
 require_once("server/classes/class.AJXP_Utils.php");
 require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.HTMLWriter.php");
@@ -43,7 +44,6 @@ require_once("server/classes/class.AJXP_Plugin.php");
 require_once("server/classes/class.AJXP_PluginsService.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
 HTMLWriter::charsetHeader();
-include_once("server/conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
 ConfService::init("server/conf/conf.php");
