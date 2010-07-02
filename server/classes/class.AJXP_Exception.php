@@ -33,6 +33,8 @@
  * 
  * Description : Handmade Exception System for PHP4
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AJXP_Exception extends Exception {
 	
 	function AJXP_Exception($messageString, $messageId = false){

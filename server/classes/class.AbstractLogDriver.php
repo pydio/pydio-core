@@ -32,14 +32,6 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
  * Description : Abstract representation of Ajaxplorer Logger
- */
-define("LOG_LEVEL_DEBUG", "Debug");
-define("LOG_LEVEL_INFO", "Info");
-define("LOG_LEVEL_NOTICE", "Notice");
-define("LOG_LEVEL_WARNING", "Warning");
-define("LOG_LEVEL_ERROR", "Error");
-
-/**
  * Abstract log driver provides an abstract class for the logging facility.
  *
  * The output stream/file/device will be implemented by the plugin which extends this class.
@@ -49,6 +41,14 @@ define("LOG_LEVEL_ERROR", "Error");
  * @author mosen
  * @abstract
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
+define("LOG_LEVEL_DEBUG", "Debug");
+define("LOG_LEVEL_INFO", "Info");
+define("LOG_LEVEL_NOTICE", "Notice");
+define("LOG_LEVEL_WARNING", "Warning");
+define("LOG_LEVEL_ERROR", "Error");
+
 class AbstractLogDriver extends AJXP_Plugin {
 
 	/**

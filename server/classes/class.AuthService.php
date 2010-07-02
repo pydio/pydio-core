@@ -33,6 +33,8 @@
  * 
  * Description : Users management for authentification.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AuthService
 {
 	function usersEnabled()

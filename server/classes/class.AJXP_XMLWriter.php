@@ -33,6 +33,8 @@
  * 
  * Description : Util methods for generating XML outputs.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AJXP_XMLWriter
 {
 	

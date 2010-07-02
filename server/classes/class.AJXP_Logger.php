@@ -33,6 +33,8 @@
  * 
  * Description : Simple interface to the underlaying Logger mechanism.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 define("LOG_LEVEL_DEBUG", "Debug");
 define("LOG_LEVEL_INFO", "Info");
 define("LOG_LEVEL_NOTICE", "Notice");
@@ -45,6 +47,7 @@ class AJXP_Logger {
 		if(!class_exists("ConfService")) return ;
 		if(!ConfService::getConf("SERVER_DEBUG")) return ;
 		$logger = self::getInstance();
+		if($logger == null) return ;
 		$message .= "\t";
 		if(is_string($params)){
 			$message .= $params;
@@ -57,6 +60,7 @@ class AJXP_Logger {
 	
 	public static function logAction($action, $params=array()){
 		$logger = self::getInstance();		
+		if($logger == null) return ;
 		$message = "$action\t";		
 		if(count($params)){
 			$message.=$logger->arrayToString($params);

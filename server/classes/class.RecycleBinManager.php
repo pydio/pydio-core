@@ -33,6 +33,7 @@
  * 
  * Description : A manager for the various recycle bin actions.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class RecycleBinManager
 {

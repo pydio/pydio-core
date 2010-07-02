@@ -31,8 +31,9 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
- * Description : Abstract representation of an action driver. Must be implemented.
+ * Description : Abstract representation of an driver test. Must be implemented.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
                                  
 global $MAIN_testsArray;
 /** The abstract test interface */

@@ -31,8 +31,10 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : A manager for the various recycle bin actions.
+ * Description : Core parser for handling plugins.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
  class AJXP_PluginsService{
  	private static $instance;
  	private $registry = array();

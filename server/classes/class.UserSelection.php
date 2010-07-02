@@ -33,6 +33,8 @@
  * 
  * Description : Abstraction of a user selection passed via http parameters.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class UserSelection
 {
 	var $files;

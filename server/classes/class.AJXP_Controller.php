@@ -33,6 +33,8 @@
  * 
  * Description : Controller
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class AJXP_Controller{
 	
 	static $xPath;
