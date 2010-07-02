@@ -1,5 +1,7 @@
 <?php
 /** A useful class for session switching */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class SessionSwitcher
 {
     /** The current session stack */

@@ -33,6 +33,8 @@
  * 
  * Description : The "admin" driver, to make use of the GUI to manage AjaXplorer settings.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class ajxp_confAccessDriver extends AbstractAccessDriver 
 {	
 	

@@ -33,6 +33,8 @@
  * 
  * Description : This driver will access another installation of AjaXplorer on a remote machine, thus acting as a proxy.
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 class remote_fsAccessDriver extends AbstractAccessDriver 
 {	
 	function switchAction($action, $httpVars, $filesVars){		

@@ -33,6 +33,8 @@
  * 
  * Description : User abstraction
  */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 require_once(INSTALL_PATH."/server/classes/class.AbstractAjxpUser.php");
 require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
 
