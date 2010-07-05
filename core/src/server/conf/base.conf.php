@@ -3,7 +3,7 @@
 /*	ADVANCED : DO NOT CHANGE THESE VARIABLES BELOW
 /**************************************************/
 define("AJXP_VERSION", "2.7.3");
-define("AJXP_VERSION_DATE", "2010/05/15");
+define("AJXP_VERSION_DATE", "2010/07/05");
 
 define("AJXP_EXEC", true);
 require("compat.php");
