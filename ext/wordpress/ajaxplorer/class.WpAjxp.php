@@ -8,6 +8,7 @@ Version: 0.3
 Author: Charles du Jeu
 Author URI: http://www.ajaxplorer.info/
 */
+define("AJXP_EXEC", true);
 
 class Ajxp {
     var $options;
