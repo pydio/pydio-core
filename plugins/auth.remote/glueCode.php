@@ -61,10 +61,11 @@ $pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", "$CURRENTPATH/../../se
 
 define ("CLIENT_RESOURCES_FOLDER", "client");
 ConfService::init("$CURRENTPATH/../../server/conf/conf.php"); 
-require_once("$CURRENTPATH/../../plugins/conf.".ConfService::getConf("CONF_PLUGINNAME")."/class.AJXP_User.php");
+$plugins = ConfService::getConf("PLUGINS");
+require_once("$CURRENTPATH/../../plugins/conf.".$plugins["CONF_DRIVER"]["NAME"]."/class.AJXP_User.php");
 
 global $plugInAction;
-$G_AUTH_DRIVER_DEF = ConfService::getConf("AUTH_DRIVER_DEF");
+$G_AUTH_DRIVER_DEF = $plugins["AUTH_DRIVER"];
 if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"] == "")
 {
     if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])){

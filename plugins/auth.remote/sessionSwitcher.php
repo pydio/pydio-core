@@ -17,7 +17,10 @@ class SessionSwitcher
             // Start a default session and save on the handler
             session_start();
             SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name());
+            AJXP_Logger::debug("Session switching 1: ", SessionSwitcher::$sessionArray);
             session_write_close();
+        }else{
+        	SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name());
         }
         // Please note that there is no start here, session might be already started
         if (session_id() != "")
@@ -26,7 +29,7 @@ class SessionSwitcher
             if ($cleanPreviousSession)
             {
                 if (isset($_COOKIE[session_name()]))
-                    setcookie(session_name(), '', time() - 42000, '/');
+				setcookie(session_name(), '', time() - 42000, '/');
                 session_destroy();
             }
             // Close the session
@@ -37,8 +40,10 @@ class SessionSwitcher
         }
 		// Mysterious fix, necessary for joomla.
 		ini_set('session.save_handler', 'files');
-                
-        session_id(md5(SessionSwitcher::$sessionArray[0]['id'].$name));
+
+		$newId = md5(SessionSwitcher::$sessionArray[0]['id'].$name);
+        AJXP_Logger::debug("Session switching  new id: ", $newId);
+		session_id($newId);
         session_name($name);
         session_start();
     }
