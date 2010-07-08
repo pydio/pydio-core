@@ -315,7 +315,7 @@ class ConfService
 		return self::getInstance()->addRepositoryInst($oRepository);
 	}
 	public function addRepositoryInst($oRepository){
-		$confStorage = $this->getConfStorageImplInst();
+		$confStorage = self::getConfStorageImpl();
 		$res = $confStorage->saveRepository($oRepository);		
 		if($res == -1){
 			return $res;
