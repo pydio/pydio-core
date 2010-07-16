@@ -530,9 +530,10 @@ Class.create("FilesList", SelectableElements, {
 					if(cell.id == "last_header") return;
 					var td = tds[index];					
 					var tdWidth = td.getWidth();
-					cell.setStyle({width:tdWidth+'px'});
+					//cell.setStyle({width:tdWidth+'px'});
+					this._sortableTable.setGridCellWidth(cell, tdWidth);
 					index++;
-				});
+				}.bind(this));
 			}.bind(this), 10);
 			return;
 		}
@@ -545,12 +546,13 @@ Class.create("FilesList", SelectableElements, {
 			var widthes = this.headersWidth;
 			tds.each(function(cell){		
 				if(index == (tds.size()-1)) return;
-				cell.setStyle({width:widthes.get(index)+'px'});
+				//cell.setStyle({width:widthes.get(index)+'px'});
+				this._sortableTable.setGridCellWidth(cell, widthes.get(index));
 				index++;
-			});	
+			}.bind(this) );	
 		}
 	},
-	
+		
 	initRows: function(){
 		// Disable text select on elements
 		if(this._displayMode == "thumb")
@@ -713,7 +715,7 @@ Class.create("FilesList", SelectableElements, {
 		var offset = {top:0,left:0};
 		var scrollTop = 0;
 		if(this._displayMode == "list"){
-			var span = item.select('span.ajxp_label')[0];
+			var span = item.select('span#ajxp_label')[0];
 			var posSpan = item.select('span.list_selectable_span')[0];
 			offset.top=1;
 			offset.left=20;
@@ -774,7 +776,15 @@ Class.create("FilesList", SelectableElements, {
 		var buttons = modal.addSubmitCancel(edit, null, false, "after");
 		var ok = buttons.select('input[name="ok"]')[0];
 		ok.observe("click", onOkAction);
-		edit.setStyle({width:edit.getWidth()-44});
+		var origWidth = edit.getWidth()-44;
+		var newWidth = origWidth;
+		if(origWidth < 70){
+			// Offset edit box to be sure it's always big enough.
+			edit.setStyle({left:pos.left+offset.left - 70 + origWidth});
+			newWidth = 70;
+		}
+		edit.setStyle({width:newWidth});
+		
 		buttons.select('input').invoke('setStyle', {
 			margin:0,
 			width:22,
@@ -785,7 +795,7 @@ Class.create("FilesList", SelectableElements, {
 			position:'absolute',
 			width:46,
 			zIndex:2500,
-			left:pos.left+offset.left+edit.getWidth(),
+			left:pos.left+offset.left+origWidth,
 			top:(pos.top+offset.top-scrollTop)-1
 		});
 		var closeFunc = function(){
@@ -827,7 +837,7 @@ Class.create("FilesList", SelectableElements, {
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
-				}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span class=\"ajxp_label\">" + metaData.get('text')+"</span>");
+				}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span id=\"ajxp_label\" class=\"text_label\">" + metaData.get('text')+"</span>");
 				innerSpan.ajxpNode = ajxpNode; // For draggable
 				tableCell.insert(innerSpan);
 				
@@ -847,11 +857,12 @@ Class.create("FilesList", SelectableElements, {
 				var date = new Date();
 				date.setTime(parseInt(metaData.get(s))*1000);
 				newRow.ajxp_modiftime = date;
-				tableCell.update(formatDate(date));
+				tableCell.update('<span class="text_label">' + formatDate(date) + '</span>');
 			}
 			else
 			{
-				tableCell.update(metaData.get(s) || "");
+				var metaValue = metaData.get(s) || "";
+				tableCell.update('<span class="text_label">' + metaValue  + "</span>");
 			}
 			if(this.gridStyle == "grid"){
 				tableCell.setAttribute('valign', 'top');				
