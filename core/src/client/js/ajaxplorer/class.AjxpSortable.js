@@ -47,9 +47,10 @@ Class.create("AjxpSortable", SortableTable, {
 			$(this.tBody).select('tr').each(function(row){
 				var cells = row.select('td');
 				for(var i=0;i<cells.length-1;i++){
-					cells[i].setStyle({width:headerCellsWidth[i] + 'px'});
+					//cells[i].setStyle({width:headerCellsWidth[i] + 'px'});
+					this.setGridCellWidth(cells[i], headerCellsWidth[i]);
 				}
-			});
+			}.bind(this) );
 			if(!ajaxplorer || !ajaxplorer.user) return;
 			var data = ajaxplorer.user.getPreference("columns_size", true);
 			data = (data?new Hash(data):new Hash());
@@ -66,6 +67,24 @@ Class.create("AjxpSortable", SortableTable, {
 			ajaxplorer.user.savePreference("columns_size");			
 		}.bind(this) );	
 	},
+	
+	setGridCellWidth : function(cell, width){
+		var labels = cell.select('.text_label');
+		if(!labels.length) {
+			cell.setStyle({width:width + 'px'});
+			return;
+		}
+		var label = labels[0];
+		var cellPaddLeft = cell.getStyle('paddingLeft') || 0;
+		var cellPaddRight = cell.getStyle('paddingRight') || 0;
+		var siblingWidth = 0;
+		label.siblings().each(function(sib){
+			siblingWidth += sib.getWidth();
+		});
+		label.setStyle({width:(width - siblingWidth - parseInt(cellPaddLeft) - parseInt(cellPaddRight)) + 'px'});
+		cell.setStyle({width:width + 'px'});	
+	},
+	
 
 	setPaginationBehaviour : function(loaderFunc, columnsDefs, crtOrderName, crtOrderDir){
 		this.paginationLoaderFunc = loaderFunc;
