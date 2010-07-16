@@ -104,6 +104,20 @@ textarea{
    vertical-align: middle;   
 }
 
+.text_label{
+	display:block;
+	float:left;
+	overflow:hidden;
+	padding-left:2px;
+	padding-top:2px;
+	height: 18px;
+	white-space : nowrap;
+}
+
+.list_selectable_span img {
+	float: left;
+}
+
 /*
 DIALOG BOXES
 */
@@ -730,6 +744,7 @@ a.carousel-control img{
 	padding-top: 3px;
 	height: 20px;	
 	overflow:hidden;
+	white-space:nowrap;
 }
 
 .sort-table thead td.descending {
