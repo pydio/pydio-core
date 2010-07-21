@@ -2,6 +2,7 @@
 <editor id="editor.pixlr" openable="true" text="333" title="333" icon="frame_image.png" className="PixlrEditor" mimes="jpg,jpeg,png,bmp,pxd" formId="pixlr_box">
 	<class_definition filename="plugins/editor.pixlr/class.PixlrEditor.php" classname="PixlrEditor"/>
 	<resources>
+		<js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>
 		<js file="plugins/editor.pixlr/class.PixlrEditor.js" className="PixlrEditor"/>
 	</resources>
 	<clientForm id="pixlr_box"><![CDATA[
