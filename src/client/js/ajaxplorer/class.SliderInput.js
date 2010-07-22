@@ -1,6 +1,6 @@
 Class.create("SliderInput", {
 	initialize : function(inputElement, options){
-		this.input = inputElement;
+		this.input = $(inputElement);
 		this.options = Object.extend({
 			format : '',
 			axis : 'vertical',
@@ -65,7 +65,8 @@ Class.create("SliderInput", {
 		if(this.timer) {
 			window.clearTimeout(this.timer);
 		}
-		if(this.input.blur) this.input.blur();
+		try{this.input.blur();}
+		catch(e){}
 	},
 	
 	delay : function(){
