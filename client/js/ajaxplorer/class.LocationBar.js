@@ -158,7 +158,13 @@ Class.create("LocationBar", {
 				node = new AjxpNode(url);
 				node.getMetadata().set("paginationData", data);
 			}
-			ajaxplorer.actionBar.fireDefaultAction("dir", node);
+			// Manually entered, stat path before calling
+			if(!ajaxplorer.pathExists(url)){
+				modal.displayMessage('ERROR','Cannot find : ' + url);
+				this.currentPath.setValue(this._beforeModified);
+			}else{
+				ajaxplorer.actionBar.fireDefaultAction("dir", node);
+			}
 		}
 		return false;
 	},
