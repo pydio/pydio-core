@@ -71,6 +71,7 @@ Class.create("AjxpDraggable", Draggable, {
 			queue: {scope:'_draggable', position:'end'}
 			});
 		};
+		this.options.delay = 200;
 		this.component = component;
 		this.componentType = componentType;
 		AllAjxpDraggables.push(this);
@@ -194,7 +195,7 @@ Class.create("AjxpDraggable", Draggable, {
 			{
 				this._clone.parentNode.insertBefore(this.element, this._clone);
 			}
-			this.element.removeClassName('simple_selection_draggable');
+			this.element.removeClassName('simple_selection_draggable');			
 			Position.relativize(this.element);
 			Element.remove(this._clone);
 			this._clone = null;
