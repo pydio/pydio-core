@@ -582,7 +582,7 @@ Class.create("FilesList", SelectableElements, {
 			window.loader = new Image();
 			window.loader.editorClass = oImageToLoad.editorClass;
 			window.loader.src = window.loader.editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
-			window.loader.onload = function(){
+			var loader = function(){
 				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);
 				if(img == null || window.loader == null) return;
 				var newImg = window.loader.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
@@ -592,6 +592,11 @@ Class.create("FilesList", SelectableElements, {
 				this.resizeThumbnails(oImageToLoad.rowObject);
 				this.loadNextImage();				
 			}.bind(this);
+			if(window.loader.readyState && window.loader.readyState == "complete"){
+				loader();
+			}else{
+				window.loader.onload = loader;
+			}
 		}else{
 			if(window.loader) window.loader = null;
 		}	
@@ -715,7 +720,7 @@ Class.create("FilesList", SelectableElements, {
 		var offset = {top:0,left:0};
 		var scrollTop = 0;
 		if(this._displayMode == "list"){
-			var span = item.select('span#ajxp_label')[0];
+			var span = item.select('span.text_label')[0];
 			var posSpan = item.select('span.list_selectable_span')[0];
 			offset.top=1;
 			offset.left=20;
