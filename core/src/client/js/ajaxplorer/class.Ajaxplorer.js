@@ -394,7 +394,9 @@ Class.create("Ajaxplorer", {
 				this._initLoadRep = null;
 				rootNode.observeOnce("loaded", function(){
 						setTimeout(function(){
-							this.goTo(new AjxpNode(copy));
+							if(this.pathExists(copy)){
+								this.goTo(new AjxpNode(copy));
+							}
 							this.skipLsHistory = false;
 						}.bind(this), 1000);						
 				}.bind(this));
@@ -406,6 +408,18 @@ Class.create("Ajaxplorer", {
 		}
 	},
 
+	pathExists : function(dirName){
+		var connexion = new Connexion();
+		connexion.addParameter("get_action", "stat");
+		connexion.addParameter("file", dirName);
+		this.tmpResTest = false;
+		connexion.onComplete = function(transport){
+			if(transport.responseJSON && transport.responseJSON.mode) this.tmpResTest = true;
+		}.bind(this);
+		connexion.sendSync();		
+		return this.tmpResTest;
+	},
+	
 	goTo: function(nodeOrPath){		
 		if(Object.isString(nodeOrPath)){
 			node = new AjxpNode(nodeOrPath);
