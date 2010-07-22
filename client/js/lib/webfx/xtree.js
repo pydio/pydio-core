@@ -291,7 +291,7 @@ WebFXTreeAbstractNode.prototype.blur = function() {
 } ;
 
 WebFXTreeAbstractNode.prototype.doExpand = function() {
-	if (webFXTreeHandler.behavior == 'classic') { document.getElementById(this.id + '-icon').src = this.openIcon; }
+	if (webFXTreeHandler.behavior == 'classic' && document.getElementById(this.id + '-icon')) { document.getElementById(this.id + '-icon').src = this.openIcon; }
 	if (this.childNodes.length) {  document.getElementById(this.id + '-cont').style.display = 'block'; }
 	this.open = true;
 	if (webFXTreeConfig.usePersistence) {
