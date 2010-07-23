@@ -373,7 +373,7 @@ Class.create("FilesList", SelectableElements, {
 		}
 		else if(this._displayMode == "thumb")
 		{			
-			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
+			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div" style="overflow:auto; padding:2px 5px;">';
 			this.htmlElement.update(buffer);
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				

@@ -15,16 +15,20 @@ Class.create("SliderInput", {
 		var original = this.options.onSlide;
 		this.options.onSlide = function(value){
 			original(value);
+			this.input.value = value;
 			this.delay();
 		}.bind(this);
 			
+		if(this.options.sliderValue){
+			this.input.value = this.options.sliderValue;
+		}
 		this.buildGui();
 	},
 	
 	buildGui : function(){
 		// Create holder and slider, add them but set them hidden
 		this.holder = new Element("div", {className : "slider-pane"});
-		this.trackerTop = new Element("div", {className : "slider-tracker-top", style:"width:10px;height:2px;"});
+		this.trackerTop = new Element("div", {className : "slider-tracker-top", style:"width:10px;height:2px;font-size:1px;"}).update("");
 		this.tracker = new Element("div", {className : "slider-tracker", style:"width:10px;height:90px;"});
 		this.cursor = new Element("div", {className : "slider-handle"});
 		this.holder.insert(this.trackerTop);
@@ -49,6 +53,9 @@ Class.create("SliderInput", {
 	setValue : function(value){
 		if(this.slider){
 			this.slider.setValue(value);
+		}
+		if(this.input){
+			this.input.value = value;
 		}
 	},
 	
