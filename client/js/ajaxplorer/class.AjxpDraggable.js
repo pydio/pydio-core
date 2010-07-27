@@ -84,6 +84,31 @@ Class.create("AjxpDraggable", Draggable, {
 	    Draggables.unregister(this);
 	},
 	
+	initDrag: function(event) {
+		if(!Object.isUndefined(Draggable._dragging[this.element]) &&
+		Draggable._dragging[this.element]) return;
+		if(Event.isLeftClick(event)) {
+			// abort on form elements, fixes a Firefox issue
+			var src = Event.element(event);
+			if((tag_name = src.tagName.toUpperCase()) && (
+			tag_name=='INPUT' ||
+			tag_name=='SELECT' ||
+			tag_name=='OPTION' ||
+			tag_name=='BUTTON' ||
+			tag_name=='TEXTAREA')) return;
+
+			var pointer = [Event.pointerX(event), Event.pointerY(event)];
+			var pos     = Position.cumulativeOffset(this.element);
+			// CORRECT OFFSET HERE AS OUR DRAGGED ELEMENT IS NOT
+			// NECESSARY THE ORIGINAL ELEMENT CLONE.
+			this.offset = [0,1].map( function(i) { return Math.min(15, (pointer[i] - pos[i])) });
+			
+			Draggables.activate(this);
+			Event.stop(event);
+		}
+	},
+
+	
     startDrag : function(event){
 	    if(!this.delta)
 	    this.delta = this.currentDelta();
@@ -98,66 +123,36 @@ Class.create("AjxpDraggable", Draggable, {
 
 		if(this.options.ghosting) {
 			var selection = ajaxplorer.getUserSelection();
-			//console.log(selection);
-			if(selection.isMultiple()){
-				// Move all selection
-				// Make new div for element, clone all others.			
-				this._draggingMultiple = true;
-				this._clone = new Element('div');
-				$(this._clone).addClassName("ajxp_draggable");
-				if(this.component._displayMode && this.component._displayMode == 'thumb'){
-					$(this._clone).addClassName('multiple_thumbnails_draggable');
-				}else{
-					$(this._clone).addClassName('multiple_selection_draggable');
-				}
-				this._clone.setAttribute('user_selection', 'true');
-				if (Prototype.Browser.IE || Prototype.Browser.Opera){
-					$('browser').appendChild(this._clone);
-					$(this._clone).setStyle({width:$(this.element).getWidth()+'px'});
-				}else{
-					this.element.parentNode.appendChild(this._clone);
-				}
-				this.original = this.element;
-				this.element = this._clone;
-				var selectedItems = this.component.getSelectedItems();			
-				for(var i=0; i<selectedItems.length;i++)
-				{	
-					var objectToClone;
-					if(this.component._displayMode == 'thumb'){
-						 objectToClone = $(selectedItems[i]);
-					}
-					else {
-						var spans = $(selectedItems[i]).select('span.list_selectable_span');
-						if(spans.length){
-							objectToClone = spans[0];
-						}
-					}
-					var newObj = refreshPNGImages(objectToClone.cloneNode(true));				
-					this.element.appendChild(newObj);
-					if(this.component._displayMode == 'thumb'){
-						$(newObj).addClassName('simple_selection_draggable');
-					}
-				}
-				Position.absolutize(this.element);
-			}else{
-				if(selection.isEmpty() && this.component.findSelectableParent){
-					this.component.findSelectableParent(this.element, true);
-				}
-				this._clone = $(this.element.cloneNode(true));
-				refreshPNGImages(this._clone);
-				Position.absolutize(this.element);
-				this.element.parentNode.insertBefore(this._clone, this.element);
-				$(this.element).addClassName('simple_selection_draggable');
-				if(Prototype.Browser.IE || Prototype.Browser.Opera) // MOVE ELEMENT TO $('browser')
-				{
-					var newclone = $(this.element.cloneNode(true));
-					refreshPNGImages(newclone);
-					$('browser').appendChild(newclone);
-					$(newclone).setStyle({width:$(this._clone).getWidth()+'px'});
-					Element.remove(this.element);
-					this.element = newclone;				
-				}
+			if(selection.isEmpty() && this.component.findSelectableParent){
+				this.component.findSelectableParent(this.element, true);
 			}
+			var nodes = selection.getSelectedNodes();
+			
+			this._draggingMultiple = true;
+			this._clone = new Element('div');
+			$(this._clone).addClassName("ajxp_draggable");
+			$(this._clone).addClassName('multiple_selection_draggable');
+			this._clone.setAttribute('user_selection', 'true');
+			$('ajxp_desktop').insert(this._clone);
+			this.original = this.element;
+			this.element = this._clone;			
+			var max = Math.min(nodes.length,5);
+			var maxWidth = 0;
+			for(var i=0;i<max;i++){
+				var text = nodes[i].getLabel() + (i<max-1?",<br>":"");
+				maxWidth = Math.max(maxWidth, testStringWidth(text));
+				this._clone.insert(text);
+			}
+			if(max < nodes.length){
+				this._clone.insert(',<br> ' + (nodes.length-max) + ' '+MessageHash[334]+'...');
+			}
+			this.element.setStyle({height:'auto', width:maxWidth + 'px'});			
+			Position.absolutize(this._clone);
+			var zIndex = 10000;
+			if(this.element.getStyle('zIndex')){
+				zIndex = this.element.getStyle('zIndex') + 100;
+			}
+			this.element.setStyle({zIndex:zIndex});
 		}
 	
 		if(this.options.scroll) {
@@ -187,18 +182,6 @@ Class.create("AjxpDraggable", Draggable, {
 			Position.prepare();
 			var pointer = [Event.pointerX(event), Event.pointerY(event)];
 			Droppables.show(pointer, this.element);
-		}
-	
-		if(this.options.ghosting && !this._draggingMultiple) {
-			this.removeCopyClass();
-			if(Prototype.Browser.IE || Prototype.Browser.Opera) // MOVE ELEMENT TO $('browser')
-			{
-				this._clone.parentNode.insertBefore(this.element, this._clone);
-			}
-			this.element.removeClassName('simple_selection_draggable');			
-			Position.relativize(this.element);
-			Element.remove(this._clone);
-			this._clone = null;
 		}
 	
 		var dropped = false;
@@ -254,26 +237,12 @@ Class.create("AjxpDraggable", Draggable, {
 
 	addCopyClass : function()
 	{
-		if(this._draggingMultiple && this.component._displayMode == 'thumb')
-		{
-			$(this.element).select('div.thumbnail_selectable_cell').each(function(el){
-				el.addClassName('selection_ctrl_key');
-			});
-		}else{
-			$(this.element).addClassName('selection_ctrl_key');
-		}
+		$(this.element).addClassName('selection_ctrl_key');
 	},
 	
 	removeCopyClass : function()
 	{
-		if(this._draggingMultiple && this.component._displayMode == 'thumb')
-		{
-			$(this.element).select('div.thumbnail_selectable_cell').each(function(el){
-				el.removeClassName('selection_ctrl_key');
-			});
-		}else{
-			$(this.element).removeClassName('selection_ctrl_key');
-		}
+		$(this.element).removeClassName('selection_ctrl_key');
 	}
 			
 });

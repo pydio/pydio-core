@@ -201,7 +201,9 @@ function disableTextSelection(target)
 	{ //Firefox route
 		var defaultValue = target.style.MozUserSelect;
 		target.style.MozUserSelect="none";
+		$(target).addClassName("no_select_bg");
 	}
+	$(target).addClassName("no_select_bg");
 	if($(target).getElementsBySelector('input[type="text"]').length)
 	{
 		$(target).getElementsBySelector('input[type="text"]').each(function(element)
@@ -216,6 +218,15 @@ function disableTextSelection(target)
 			}
 		});
 	}
+}
+
+function testStringWidth(text){
+	if(!$('string_tester')){
+		$$('body')[0].insert(new Element('div',{id:'string_tester'}));
+		$('string_tester').setStyle({fontFamily:'Trebuchet MS',fontSize:'11px',position:'absolute',visibility:'hidden',height:'auto',width:'auto',whiteSpace:'nowrap'});
+	}
+	$('string_tester').update(text);
+	return $('string_tester').getWidth() + (Prototype.Browser.IE?20:0);
 }
 
 function fitRectangleToDimension(rectDim, targetDim){
