@@ -95,7 +95,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					}
 					AJXP_XMLWriter::close("ajxp_registry_part");
 				}else{
-					header('Content-Type: text/xml; charset=UTF-8');
+					header('Content-Type: application/xml; charset=UTF-8');
 					print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML()));
 				}
 				exit(0);
@@ -152,7 +152,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 						"event" => GOOGLE_ANALYTICS_EVENT);
 				}
 				$config["i18nMessages"] = ConfService::getMessages();
-				header("Content-type:text/javascript;charset=UTF-8");
+				header("Content-type:application/json;charset=UTF-8");
 				print(json_encode($config));
 				exit(1);
 				

@@ -824,46 +824,17 @@ a.carousel-control img{
 }
 
 
-div.simple_selection_draggable
-{
-    color: #000;
-    background-color: #ddd;
-    border: 1px dotted #333;
-    font-family: Trebuchet MS, sans-serif;
-    font-size: 11px;    
-}
-
-span.simple_selection_draggable
-{
-    color: #000;
-    background-color: #ddd;
-    padding: 2px;
-    border: 1px dotted #333;
-    font-family: Trebuchet MS, sans-serif;
-    font-size: 11px;
-    display:block;
-}
-.simple_selection_draggable img
-{
-    display: inline;
-}
-
 div.multiple_selection_draggable
 {
     display: block;
     color: #000;
-    background-color: #ddd;
-    padding: 2px;
-    border: 1px dotted #333;
+    background-color: #fff;
+    padding: 5px;
+    border: 1px dashed #999;
     font-family: Trebuchet MS, sans-serif;
     font-size: 11px;    
-}
-
-div.multiple_thumbnails_draggable
-{
-    background-color: transparent;
-    border: none;
-    width: 50%;
+	cursor:default;
+	overflow:hidden;
 }
 
 .selection_ctrl_key
@@ -1324,6 +1295,14 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane{
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial, Sans-serif;
     font-size: 11px;
    	background-image: url('../images/strip.png');
+}
+
+.no_select_bg::selection {
+	background:transparent;
+}
+
+.no_select_bg::-moz-selection {
+	background:transparent;
 }
 
 #vertical_splitter{

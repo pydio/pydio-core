@@ -401,7 +401,7 @@ Class.create("FilesList", SelectableElements, {
 				onChange : function(value){
 					if(!ajaxplorer || !ajaxplorer.user) return;
 					ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
-					ajaxplorer.user.savePreferences();								
+					ajaxplorer.user.savePreference("thumb_size");								
 				}.bind(this)
 			});
 
@@ -570,7 +570,7 @@ Class.create("FilesList", SelectableElements, {
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length;i++)
 		{
-			this.disableTextSelection(allItems[i]);
+			this.disableTextSelection(allItems[i], true);
 		}
 	},
 	
@@ -934,7 +934,11 @@ Class.create("FilesList", SelectableElements, {
 		// Defer Drag'n'drop assignation for performances
 		if(!ajxpNode.isRecycle()){
 			window.setTimeout(function(){
-				var newDrag = new AjxpDraggable(newRow, {revert:true,ghosting:true,scroll:($('tree_container')?'tree_container':null)}, this, 'filesList');
+				var newDrag = new AjxpDraggable(newRow, {
+					revert:true,
+					ghosting:true,
+					scroll:($('tree_container')?'tree_container':null)
+				}, this, 'filesList');
 			}.bind(this), 500);
 		}
 		if(!ajxpNode.isLeaf())
@@ -1161,7 +1165,7 @@ Class.create("FilesList", SelectableElements, {
 		target.style.MozUserSelect = "text";
 	},
 	
-	disableTextSelection: function(target)
+	disableTextSelection: function(target, deep)
 	{
 		if (target.onselectstart)
 		{ //IE route
@@ -1170,7 +1174,12 @@ Class.create("FilesList", SelectableElements, {
 		}
 		target.unselectable = "on";
 		target.style.MozUserSelect="none";
-		
+		$(target).addClassName("no_select_bg");
+		if(deep){
+			$(target).select("td,img,div,span").each(function(td){
+				this.disableTextSelection(td);
+			}.bind(this));
+		}
 	},
 	
 	keydown: function (event)

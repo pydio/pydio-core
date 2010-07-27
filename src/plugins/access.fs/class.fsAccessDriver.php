@@ -161,9 +161,14 @@ class fsAccessDriver extends AbstractAccessDriver
 			
 			case "stat" :
 				
-				$stat = stat($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
+				clearstatcache();
+				$stat = @stat($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
 				header("Content-type:application/json");
-				print json_encode($stat);
+				if(!$stat){
+					print '{}';
+				}else{
+					print json_encode($stat);
+				}
 				exit(1);
 				
 			break;

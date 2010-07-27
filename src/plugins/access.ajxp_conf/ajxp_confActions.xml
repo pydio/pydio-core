@@ -347,7 +347,7 @@
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">
-			<infoPanel mime="generic_file" attributes="basename,icon">
+			<infoPanel mime="generic_file" attributes="icon,text">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="size_string" id="127"/>
@@ -359,11 +359,11 @@
 					<div class="folderImage">
 						<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 					</div>
-					<b>#{name_string}</b> : #{basename}
+					<b>#{name_string}</b> : #{text}
 				</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_dir" attributes="basename,icon">
+			<infoPanel mime="generic_dir" attributes="icon,text">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="modif_string" id="138"/>
@@ -373,7 +373,7 @@
 						<div class="folderImage">
 							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 						</div>
-						<b>#{name_string}</b> : #{basename}
+						<b>#{name_string}</b> : #{text}
 					</div>
 				]]></html>
 			</infoPanel>
