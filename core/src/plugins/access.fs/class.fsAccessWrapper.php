@@ -255,8 +255,8 @@ class fsAccessWrapper implements AjxpWrapper {
     	}
     	// Folder case
     	$real = self::initPath($path, "dir", false, true);
-    	if($real!=-1 && $fp = @opendir($real)){
-    		closedir($fp);
+    	//print($real);
+    	if($real!=-1 && is_dir($real)){
     		$stat = stat($real);
     		return $stat;
     	}
