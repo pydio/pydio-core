@@ -361,15 +361,16 @@ $mess=array(
 "322" => "Selectionner le fichier",
 "323" => "Envoyer le lien par e-mail",
 "324" => "Pas d'éditeur associé",
-"325" => "Fit Best",
-"326" => "No Fit",
+"325" => "Ajuster",
+"326" => "Restaurer",
 "327" => "100%",
 "328" => "PDF Viewer",
-"329" => "View PDF online",
-"330" => "Please wait while pages are being rendered...",
+"329" => "Voir les PDF en ligne",
+"330" => "Veuillez patienter durant la génération des pages...",
 "331" => "Page",
-"332" => "of",
-"333" => "Pixlr image editor",
+"332" => "sur",
+"333" => "Pixlr Editeur",
+"334" => "de plus",
 /* END SENTENCE */
 );
 ?>
