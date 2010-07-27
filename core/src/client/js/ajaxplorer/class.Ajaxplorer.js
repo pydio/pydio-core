@@ -104,17 +104,18 @@ Class.create("Ajaxplorer", {
 			var parentNode = existingNode.parentNode;
 			parentNode.removeChild(existingNode);
 			if(documentElement.firstChild){
-				parentNode.appendChild(documentElement.firstChild);
+				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
 			}
 		}else if(xPath.indexOf("/") > -1){
 			// try selecting parentNode
 			var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
 			var parentNode = XPathSelectSingleNode(this._registry, parentPath);
 			if(parentNode && documentElement.firstChild){
-				parentNode.appendChild(documentElement.firstChild);
+				//parentNode.ownerDocument.importNode(documentElement.firstChild);
+				parentNode.appendChild(documentElement.firstChild.cloneNode(true));
 			}			
 		}else{
-			if(documentElement.firstChild) this._registry.appendChild(documentElement.firstChild);
+			if(documentElement.firstChild) this._registry.appendChild(documentElement.firstChild.cloneNode(true));
 		}
 		document.fire("ajaxplorer:registry_part_loaded", xPath);		
 	},
