@@ -59,7 +59,7 @@ Class.create("Diaporama", AbstractEditor, {
 		new SliderInput(this.zoomInput, {
 			onSlide:function(value){
 				this.setZoomValue(parseInt(value));
-				this.zoomInput.value = value + ' %';
+				this.zoomInput.value = parseInt(value) + ' %';
 				this.resizeImage(false);				
 			}.bind(this),
 			range : $R(this._minZoom, this._maxZoom),
@@ -179,16 +179,24 @@ Class.create("Diaporama", AbstractEditor, {
 		
 		this.element.observe("editor:enterFSend", function(e){this.resize();}.bind(this));
 		fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
+		// Fix imgContainer
+		if(Prototype.Browser.IE){
+			this.IEorigWidth = this.element.getWidth();
+			this.imgContainer.setStyle({width:this.IEorigWidth});
+		}
 	},
 	
 	resize : function(size){
 		if(size){
 			this.imgContainer.setStyle({height:size});
+			if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 		}else{
 			if(this.fullScreenMode){
 				fitHeightToBottom(this.imgContainer, this.element);
+				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.element.getWidth()});
 			}else{
 				fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
+				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 			}
 		}
 		this.resizeImage();
