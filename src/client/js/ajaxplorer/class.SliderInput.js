@@ -14,8 +14,8 @@ Class.create("SliderInput", {
 
 		var original = this.options.onSlide;
 		this.options.onSlide = function(value){
+			this.input.value = value;			
 			original(value);
-			this.input.value = value;
 			this.delay();
 		}.bind(this);
 			
