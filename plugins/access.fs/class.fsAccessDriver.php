@@ -221,6 +221,10 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				$success = $error = array();
 				$dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
+				if($selection->inZip()){
+					// Set action to copy anycase (cannot move from the zip).
+					$action = "copy";
+				}
 				$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
 				
 				if(count($error)){
