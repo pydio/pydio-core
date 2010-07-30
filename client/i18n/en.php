@@ -372,5 +372,6 @@ $mess=array(
 "332" => "of",
 "333" => "Pixlr image editor",
 "334" => "more",
+"335" => "Please enter a page number between 1 and ",
 );
 ?>

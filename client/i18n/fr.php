@@ -371,6 +371,7 @@ $mess=array(
 "332" => "sur",
 "333" => "Pixlr Editeur",
 "334" => "de plus",
+"335" => "Please enter a page number between 1 and ",
 /* END SENTENCE */
 );
 ?>
