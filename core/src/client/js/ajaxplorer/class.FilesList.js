@@ -415,25 +415,45 @@ Class.create("FilesList", SelectableElements, {
 		var current = parseInt(this.paginationData.get('current'));
 		var total = parseInt(this.paginationData.get('total'));
 		var div = new Element('div').addClassName("paginator");
-		div.update('Page '+current+'/'+total);
+		var currentInput = new Element('input', {value:current, className:'paginatorInput'});
+		div.update(MessageHash[331]);
+		div.insert(currentInput);
+		div.insert('/'+total);
 		if(current>1){
-			div.insert({top:this.createPaginatorLink(current-1, '<b>&lt;</b>&nbsp;&nbsp;&nbsp;', 'Previous')});
+			div.insert({top:this.createPaginatorLink(current-1, '<b>&lt;</b>', 'Previous')});
 			if(current > 2){
-				div.insert({top:this.createPaginatorLink(1, '<b>&lt;&lt;</b>&nbsp;&nbsp;&nbsp;', 'First')});
+				div.insert({top:this.createPaginatorLink(1, '<b>&lt;&lt;</b>', 'First')});
 			}
 		}
 		if(total > 1 && current < total){
-			div.insert({bottom:this.createPaginatorLink(current+1, '&nbsp;&nbsp;&nbsp;<b>&gt;</b>', 'Next')});
+			div.insert({bottom:this.createPaginatorLink(current+1, '<b>&gt;</b>', 'Next')});
 			if(current < (total-1)){
-				div.insert({bottom:this.createPaginatorLink(total, '&nbsp;&nbsp;&nbsp;<b>&gt;&gt;</b>', 'Last')});
+				div.insert({bottom:this.createPaginatorLink(total, '<b>&gt;&gt;</b>', 'Last')});
 			}
 		}
+		currentInput.observe("focus", function(){this.blockNavigation = true}.bind(this));
+		currentInput.observe("blur", function(){this.blockNavigation = false}.bind(this));
+		currentInput.observe("keydown", function(event){
+			if(event.keyCode == Event.KEY_RETURN){
+				Event.stop(event);
+				var new_page = parseInt(currentInput.getValue());
+				if(new_page == current) return; 
+				if(new_page < 1 || new_page > total){
+					ajaxplorer.displayMessage('ERROR', MessageHash[335] +' '+ total);
+					currentInput.setValue(current);
+					return;
+				}
+				var node = ajaxplorer.getContextNode();
+				node.getMetadata().get("paginationData").set("new_page", new_page);
+				ajaxplorer.updateContextData(node);
+			}
+		}.bind(this) );
 		return div;
 	},
 	
 	createPaginatorLink:function(page, text, title){
 		var node = ajaxplorer.getContextNode();
-		return new Element('a', {href:'#', style:'font-size:12px;', title:title}).update(text).observe('click', function(e){
+		return new Element('a', {href:'#', style:'font-size:12px;padding:0 7px;', title:title}).update(text).observe('click', function(e){
 			node.getMetadata().get("paginationData").set("new_page", page);
 			ajaxplorer.updateContextData(node);
 			Event.stop(e);
