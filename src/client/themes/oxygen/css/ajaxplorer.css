@@ -823,6 +823,16 @@ a.carousel-control img{
 	text-align:center;
 }
 
+.paginatorInput
+{
+	width:26px;
+	padding: 0 2;
+	height: 16px;
+	text-align: right;
+	border: 1px solid #CCCCCC;
+	margin-right: 2px;
+	margin-left: 5px;
+}
 
 div.multiple_selection_draggable
 {
