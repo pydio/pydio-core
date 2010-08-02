@@ -109,7 +109,7 @@ class SerialMetaManager extends AJXP_Plugin {
 		$newValues = array();
 		$def = $this->getMetaDefinition();
 		foreach ($def as $key => $label){
-			$newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
+			$newValues[$key] = str_replace('"', '', AJXP_Utils::decodeSecureMagic($httpVars[$key]));
 		}		
 		$wrapperData = $this->accessDriver->detectStreamWrapper(false);
 		$urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();
