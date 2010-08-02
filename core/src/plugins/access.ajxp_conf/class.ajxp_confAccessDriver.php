@@ -420,6 +420,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$options = array();
 				$this->parseParameters($httpVars, $options);
 				$repoOptions = $repo->getOption("META_SOURCES");
+				if(is_array($repoOptions) && isSet($repoOptions[$metaSourceType])){
+					throw new Exception("Warning, at the moment, you can only add one instance of each meta plugin.");
+				}
 				if(!is_array($repoOptions)){
 					$repoOptions = array();
 				}
