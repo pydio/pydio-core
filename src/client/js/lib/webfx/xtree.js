@@ -215,12 +215,14 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){
 			Event.observe(node.id+'-anchor','contextmenu', function(event){
+				this.select();
 				this.action();
 				Event.stop(event);
 			}.bind(node));
 			 webFXTreeHandler.contextMenu.addElements('#'+node.id+'-anchor');
 		}
 		Event.observe(node.id+'-anchor','click', function(event){
+			this.select();
 			this.action();
 			Event.stop(event);
 		}.bind(node));
