@@ -358,7 +358,7 @@ class AJXP_Utils
 	}
 
 	function xmlEntities($string, $toUtf8=false){
-		$xmlSafe = str_replace(array("&", "<",">"), array("&amp;", "&lt;","&gt;"), $string);
+		$xmlSafe = str_replace(array("&", "<",">", "\""), array("&amp;", "&lt;","&gt;", "&quot;"), $string);
 		if($toUtf8){
 			return SystemTextEncoding::toUTF8($xmlSafe);
 		}else{
