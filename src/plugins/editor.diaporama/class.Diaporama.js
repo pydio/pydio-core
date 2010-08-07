@@ -128,6 +128,7 @@ Class.create("Diaporama", AbstractEditor, {
 		this.imgBorder.hide();
 		
 		this.jsImage.onload = function(){
+			this.jsImageLoading = false;
 			this.imgTag.src = this.jsImage.src;
 			this.resizeImage(true);
 			this.downloadButton.removeClassName("disabled");
@@ -279,7 +280,8 @@ Class.create("Diaporama", AbstractEditor, {
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
 		this.downloadButton.addClassName("disabled");
-		new Effect.Opacity(this.imgTag, {afterFinish : function(){
+		new Effect.Opacity(this.imgTag, {afterFinish : function(){			
+			this.jsImageLoading = true;
 			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile);
 			if(!this.crtWidth && !this.crtHeight){
 				this.crtWidth = this.imgTag.getWidth();
@@ -344,6 +346,9 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 	
 	next : function(){
+		if(this.jsImageLoading){
+			return;
+		}
 		if(this.currentFile != this.items.last())
 		{
 			this.currentFile = this.items[this.items.indexOf(this.currentFile)+1];
