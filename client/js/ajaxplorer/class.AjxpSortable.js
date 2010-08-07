@@ -39,6 +39,7 @@ Class.create("AjxpSortable", SortableTable, {
 		this.addSortType( "NumberK", this.replace8a8 );
 		this.addSortType( "NumberKo", this.replace8oa8 );
 		this.addSortType( "MyDate", null, false, this.sortTimes);
+		this.addSortType( "CellSorterValue", null, false, this.cellSorterValue);
 		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
 		this.setHeaderResize(function(headerCells){
 			var headerCellsWidth = headerCells.collect(function(cell){
@@ -191,7 +192,7 @@ Class.create("AjxpSortable", SortableTable, {
 		d.setMinutes(hours[1]);	
 		return d.getTime();
 	},
-	
+		
 	splitDirsAndFiles: function(oRow, nColumn) {
 		var s;
 		var c = oRow.cells[nColumn];
@@ -206,6 +207,13 @@ Class.create("AjxpSortable", SortableTable, {
 		return s.toUpperCase();
 	},
 
+	cellSorterValue : function(oRow, nColumn){
+		var tds = oRow.select('td');
+		if(tds[nColumn] && tds[nColumn].readAttribute('sorter_value')){
+			return tds[nColumn].readAttribute('sorter_value');
+		}
+	},
+	
 	sortTimes : function(oRow, nColumn){
 		if(oRow.ajxp_modiftime){
 			return oRow.ajxp_modiftime;
