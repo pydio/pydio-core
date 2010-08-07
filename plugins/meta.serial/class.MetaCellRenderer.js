@@ -75,10 +75,10 @@ Class.create("MetaCellRenderer", {
 				conn.setParameters(new Hash({
 					get_action : 'edit_serial_meta',
 					stars_rate : note,
-					file	   : selectedNode.getPath(),
-					dir		   : getRepName(selectedNode.getPath())
+					file	   : selectedNode.getPath()
 				}));
 				conn.onComplete = function(){
+					ajaxplorer.getContextHolder().setPendingSelection(selectedNode.getPath());
 					ajaxplorer.fireContextRefresh();
 				};
 				conn.sendAsync();
