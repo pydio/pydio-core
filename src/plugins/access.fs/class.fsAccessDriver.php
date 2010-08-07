@@ -57,6 +57,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		}
 		$create = $this->repository->getOption("CREATE");
 		$path = $this->repository->getOption("PATH");
+		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
 			if(!is_dir($path)){
@@ -76,7 +77,6 @@ class fsAccessDriver extends AbstractAccessDriver
 		$wrapperData = $this->detectStreamWrapper(true);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
-		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($recycle != ""){
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
 		}
