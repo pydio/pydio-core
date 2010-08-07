@@ -169,6 +169,7 @@ Class.create("InfoPanel", AjxpPane, {
 			var tString = templateData[0];
 			var tAttributes = templateData[1];
 			var tMessages = templateData[2];
+			var tModifier = templateData[3];
 			if(!tArgs){
 				tArgs = new Object();
 			}
@@ -234,6 +235,10 @@ Class.create("InfoPanel", AjxpPane, {
 			}.bind(tArgs));
 			var template = new Template(tString);
 			this.htmlElement.insert(template.evaluate(tArgs));
+			if(tModifier){
+				var modifierFunc = eval(tModifier);
+				modifierFunc(this.htmlElement);
+			}
 		}
 	},
 		
@@ -278,6 +283,7 @@ Class.create("InfoPanel", AjxpPane, {
 			var panelMimes = panels[i].getAttribute('mime');
 			var attributes = $A(panels[i].getAttribute('attributes').split(","));
 			var messages = new Hash();
+			var modifier = panels[i].getAttribute('modifier') || '';
 			var htmlContent = '';
 			var panelChilds = panels[i].childNodes;
 			for(j=0;j<panelChilds.length;j++){
@@ -296,7 +302,7 @@ Class.create("InfoPanel", AjxpPane, {
 			if(this.mimesTemplates.get(tId)){
 				continue;
 			}
-			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages]));				
+			this.mimesTemplates.set(tId, $A([htmlContent,attributes, messages, modifier]));				
 			
 			$A(panelMimes.split(",")).each(function(mime){
 				var registered = this.registeredMimes.get(mime) || $A([]);

@@ -845,17 +845,18 @@ Class.create("FilesList", SelectableElements, {
 		});
 		var attributeList;
 		if(!this.parsingCache.get('attributeList')){
-			attributeList = $A([]);
+			attributeList = $H();
 			var visibleColumns = this.getVisibleColumns();
 			visibleColumns.each(function(column){
-				attributeList.push(column.attributeName);
+				attributeList.set(column.attributeName, column);
 			});
 			this.parsingCache.set('attributeList', attributeList);
 		}else{
 			attributeList = this.parsingCache.get('attributeList');
 		}
-		for(i = 0; i<attributeList.length;i++ ){
-			var s = attributeList[i];			
+		var attKeys = attributeList.keys();
+		for(i = 0; i<attKeys.length;i++ ){
+			var s = attKeys[i];			
 			var tableCell = new Element("td");			
 			if(s == "ajxp_label")
 			{
@@ -901,6 +902,10 @@ Class.create("FilesList", SelectableElements, {
 				if (tableCell.innerHTML == '') tableCell.innerHTML = '&nbsp;';
 			}
 			newRow.appendChild(tableCell);
+			if(attributeList.get(s).modifier){
+				var modifier = eval(attributeList.get(s).modifier);
+				modifier(tableCell, 'td');
+			}
 		}
 		tBody.appendChild(newRow);
 		if(this.even){

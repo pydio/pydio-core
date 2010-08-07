@@ -496,6 +496,7 @@ Class.create("Ajaxplorer", {
 			this.initExtension(extensions[i], extensionDefinition);
 			this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);					
 		}
+		ResourcesManager.prototype.loadAutoLoadResources(this._registry);
 	},
 	
 	getActiveExtensionByType : function(extensionType){
