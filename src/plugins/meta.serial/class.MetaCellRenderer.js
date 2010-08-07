@@ -44,14 +44,16 @@ Class.create("MetaCellRenderer", {
 		}
 		if(content) value = parseInt(content);
 		var obj = new MetaCellRenderer();
-		tableCell.update(obj.createStars(value));		
+		tableCell.update(obj.createStars(value));	
+		tableCell.writeAttribute("sorter_value", value);	
 	},
 	
 	infoPanelStars : function(htmlElement){
 		var td = htmlElement.select('#ip_stars_rate')[0];
 		if(td){
 			var obj = new MetaCellRenderer();
-			td.update(obj.createStars(parseInt(td.innerHTML)));
+			var value = parseInt(td.innerHTML);
+			td.update(obj.createStars(value));
 		}
 	},
 		
