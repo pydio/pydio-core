@@ -63,6 +63,7 @@ class SerialMetaManager extends AJXP_Plugin {
 			$col->setAttribute("sortType", "String");
 			if($key == "stars_rate"){
 				$col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
+				$col->setAttribute("sortType", "CellSorterValue");
 			}
 			$contrib->appendChild($col);
 			
