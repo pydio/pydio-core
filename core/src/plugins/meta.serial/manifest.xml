@@ -4,6 +4,7 @@
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
 			<i18n namespace="meta.serial" path="plugins/meta.serial/i18n" />
+			<js file="plugins/meta.serial/class.MetaCellRenderer.js" className="MetaCellRenderer" autoload="true"/>		
 		</resources>
 	</client_settings>	
 	<server_settings>

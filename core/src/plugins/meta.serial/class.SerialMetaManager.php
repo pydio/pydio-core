@@ -61,16 +61,22 @@ class SerialMetaManager extends AJXP_Plugin {
 			$col->setAttribute("messageString", $label);
 			$col->setAttribute("attributeName", $key);
 			$col->setAttribute("sortType", "String");
+			if($key == "stars_rate"){
+				$col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
+			}
 			$contrib->appendChild($col);
 			
 			$trClass = ($even?" class=\"even\"":"");
 			$even = !$even;
-			$cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue">#{'.$key.'}</td></tr>';
+			$cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</td></tr>';
 		}
 		
 		$selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
 		$contrib = $selection->item(0);
 		$contrib->setAttribute("attributes", implode(",", array_keys($def)));		
+		if(isset($def["stars_rate"])){
+			$contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelStars");
+		}
 		$htmlSel = $this->xPath->query('html', $contrib);
 		$html = $htmlSel->item(0);
 		$cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
@@ -105,14 +111,29 @@ class SerialMetaManager extends AJXP_Plugin {
 		$selection = new UserSelection();
 		$selection->initFromHttpVars();
 		$currentFile = $selection->getUniqueFile();
+		$wrapperData = $this->accessDriver->detectStreamWrapper(false);
+		$urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();
+
 		
 		$newValues = array();
 		$def = $this->getMetaDefinition();
 		foreach ($def as $key => $label){
-			$newValues[$key] = AJXP_Utils::xmlEntities(AJXP_Utils::decodeSecureMagic($httpVars[$key]));
+			if(isSet($httpVars[$key])){
+				$newValues[$key] = AJXP_Utils::xmlEntities(AJXP_Utils::decodeSecureMagic($httpVars[$key]));
+			}else{
+				if(!isset($original)){
+					$original = array();
+					$this->loadMetaFileData($urlBase.$currentFile);
+					$base = basename($currentFile);
+					if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
+						$original = self::$metaCache[$base];
+					}					
+				}
+				if(isSet($original) && isset($original[$key])){
+					$newValues[$key] = $original[$key];
+				}
+			}
 		}		
-		$wrapperData = $this->accessDriver->detectStreamWrapper(false);
-		$urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();
 		$this->addMeta($urlBase.$currentFile, $newValues);	
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);	
