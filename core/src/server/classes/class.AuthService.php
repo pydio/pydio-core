@@ -72,14 +72,9 @@ class AuthService
 		return ;
 	}
 
-    function getTempDir()
-    {
-        return realpath(sys_get_temp_dir());
-    }
-
     function getBruteForceLoginArray()
     {
-        $failedLog = AuthService::getTempDir()."/failedAJXP.log";
+        $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
         $loginAttempt = @file_get_contents($failedLog);
         // Filter the array (all old time are removed)
         $loginArray = unserialize($loginAttempt);
@@ -94,7 +89,7 @@ class AuthService
     }
     function setBruteForceLoginArray($loginArray)
     {
-        $failedLog = AuthService::getTempDir()."/failedAJXP.log";
+        $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
         @file_put_contents($failedLog, serialize($loginArray));
     }
 

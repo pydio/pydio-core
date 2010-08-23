@@ -55,7 +55,7 @@ class remote_fsAccessWrapper implements AjxpWrapper {
 	
     public static function getRealFSReference($path){
     	$fake = new remote_fsAccessWrapper();
-    	$tmpFile = sys_get_temp_dir()."/".md5(time());
+    	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
     	$tmpHandle = fopen($tmpFile, "wb");
     	$fake->copyFileInStream($path, $tmpHandle);
     	fclose($tmpHandle);
@@ -80,7 +80,7 @@ class remote_fsAccessWrapper implements AjxpWrapper {
 				"encode"	=> "base64",
 				"file" => urldecode(AJXP_Utils::securePath($parts["path"]))
 			);
-			$tmpFileBuffer = realpath(sys_get_temp_dir()).md5(time());
+			$tmpFileBuffer = realpath(AJXP_Utils::getAjxpTmpDir()).md5(time());
 			$this->postFileData = $tmpFileBuffer;
 			$this->fp = fopen($tmpFileBuffer, "w");
 		}else{
