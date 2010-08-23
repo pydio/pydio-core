@@ -57,7 +57,7 @@ class PdfPreviewer extends AJXP_Plugin {
 			
 			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
 			$fp = fopen($destStreamURL."/".$file, "r");
-			$tmpFileName = sys_get_temp_dir()."/ajxp_tmp_".md5(time()).".pdf";
+			$tmpFileName = AJXP_Utils::getAjxpTmpDir()."/ajxp_tmp_".md5(time()).".pdf";
 			$tmpFile = fopen($tmpFileName, "w");
 			register_shutdown_function("unlink", $tmpFileName);
 			while(!feof($fp)) {
@@ -73,7 +73,7 @@ class PdfPreviewer extends AJXP_Plugin {
 			}else{
 				@set_time_limit(90);
 			}
-			chdir(sys_get_temp_dir());
+			chdir(AJXP_Utils::getAjxpTmpDir());
 			$pageLimit = ($extractAll?"":"[0]");
 			$params = ($extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
 			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName).$pageLimit." ".$params." ".basename($tmpFileThumb);
@@ -96,7 +96,7 @@ class PdfPreviewer extends AJXP_Plugin {
 				exit(1);
 			}			
 		}else if($action == "get_extracted_page" && isSet($httpVars["file"])){
-			$file = sys_get_temp_dir()."/".$httpVars["file"];
+			$file = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["file"];
 			if(!is_file($file)) return ;
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
 			header("Content-Length: ".filesize($file));
@@ -104,9 +104,9 @@ class PdfPreviewer extends AJXP_Plugin {
 			readfile($file);
 			exit(1);			
 		}else if($action == "delete_pdf_data" && isSet($httpVars["file"])){
-			$files = $this->listExtractedJpg(sys_get_temp_dir()."/".$httpVars["file"]);
+			$files = $this->listExtractedJpg(AJXP_Utils::getAjxpTmpDir()."/".$httpVars["file"]);
 			foreach ($files as $file){
-				if(is_file(sys_get_temp_dir()."/".$file["file"])) unlink(sys_get_temp_dir()."/".$file["file"]);
+				if(is_file(AJXP_Utils::getAjxpTmpDir()."/".$file["file"])) unlink(AJXP_Utils::getAjxpTmpDir()."/".$file["file"]);
 			}
 		}
 	}

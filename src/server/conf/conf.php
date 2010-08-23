@@ -57,6 +57,21 @@ define("PUBLIC_DOWNLOAD_URL", "");
 
 define("HTTPS_POLICY_FILE", "");
 
+/************************************************
+ * TEMPORARY DIR : NOT NECESSARY IN MOST CASES
+ ************************************************/
+/**
+ * This is necessary only if you have errors concerning
+ * the tmp dir access or writeability : most probably, 
+ * they are due to PHP SAFE MODE (should disappear in php6) or
+ * various OPEN_BASEDIR restrictions.
+ * In that case, create and set writeable a tmp folder somewhere
+ * at the root of your hosting (but above the web/ or www/ or http/ 
+ * if possible!!) and enter here the full path to this folder.
+ * For example : define("AJXP_TMP_DIR", "/server/root/path/to/user/ajxp_tmp"));
+ */
+define("AJXP_TMP_DIR", "");
+
 /*********************************************************/
 /* PLUGINS DEFINITIONS
 /* Drivers will define how the application will work. For 
