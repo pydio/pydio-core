@@ -92,6 +92,13 @@ class AJXP_Utils
 		return SystemTextEncoding::fromUTF8(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)));
 	}
 	
+	public static function getAjxpTmpDir(){
+		if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR != ""){
+			return AJXP_TMP_DIR;
+		}
+		return realpath(sys_get_temp_dir());
+	}
+	
 	function parseFileDataErrors($boxData)
 	{
 		$mess = ConfService::getMessages();

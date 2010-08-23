@@ -91,7 +91,7 @@ class fsAccessWrapper implements AjxpWrapper {
 			//print($streamType.$path);
 		   	if($streamType == "file"){	
 		   		if(self::$crtZip == null ||  !is_array(self::$currentListingKeys)){
-		   			$tmpDir = sys_get_temp_dir() . "/" . md5(time()-rand());
+		   			$tmpDir = AJXP_Utils::getAjxpTmpDir() . "/" . md5(time()-rand());
 		   			mkdir($tmpDir);
 		   			$tmpFileName = $tmpDir."/".basename($localPath);
 		   			register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);

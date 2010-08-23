@@ -62,7 +62,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 	
     public static function getRealFSReference($path){
     	$fake = new ftpAccessWrapper();
-    	$tmpFile = sys_get_temp_dir()."/".md5(time());
+    	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
     	$tmpHandle = fopen($tmpFile, "wb");
     	$fake->copyFileInStream($path, $tmpHandle);
     	fclose($tmpHandle);
