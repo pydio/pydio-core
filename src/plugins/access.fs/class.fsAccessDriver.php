@@ -122,7 +122,8 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($selection->isUnique()){
 					if(is_dir($this->urlBase.$selection->getUniqueFile())) {
 						$zip = true;
-						$dir .= "/".basename($selection->getUniqueFile());
+						$base = basename($selection->getUniqueFile());
+						$dir .= "/".dirname($selection->getUniqueFile());
 					}
 				}else{
 					$zip = true;
@@ -134,7 +135,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) throw new AJXP_Exception("Error while compressing");
 					register_shutdown_function("unlink", $file);
-					$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
+					$localName = ($base==""?"Files":$base).".zip";
 					$this->readFile($file, "force-download", $localName, false, false, true);
 				}else{
 					$this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download");
@@ -1241,8 +1242,10 @@ class fsAccessDriver extends AbstractAccessDriver
     		$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".$item);    		
     		$basedir = trim(dirname($realFile));
     		$filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile, 
-    							 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
-    	}   		
+    							 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));    				
+    	}
+    	AJXP_Logger::debug("Pathes", $filePaths);
+    	AJXP_Logger::debug("Basedir", array($basedir));
     	$archive = new PclZip($dest);
     	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION);
     	return $vList;

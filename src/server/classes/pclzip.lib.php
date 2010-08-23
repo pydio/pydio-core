@@ -3265,7 +3265,7 @@
           else {
             //--(MAGIC-PclTrace)--//PclTraceFctMessage(__FILE__, __LINE__, 4, "Remove path '$p_remove_dir' in file '$v_stored_filename'");
             $v_stored_filename = substr($v_stored_filename,
-                                        strlen($p_remove_dir));
+                                        strlen($p_remove_dir)-1);
             //--(MAGIC-PclTrace)--//PclTraceFctMessage(__FILE__, __LINE__, 4, "Result is '$v_stored_filename'");
           }
         }
