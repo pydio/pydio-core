@@ -83,7 +83,7 @@ class ftpAccessDriver extends fsAccessDriver {
 					fclose($fSource);
 					AJXP_Logger::debug("Closing target : begin ftp copy");
 					// Make sur the script does not time out!
-					set_time_limit(240); 
+					@set_time_limit(240); 
 					fclose($fp);
 					AJXP_Logger::debug("FTP Upload : end of ftp copy");
 					@unlink($fData["tmp_name"]);

@@ -90,16 +90,33 @@ class ImagePreviewer extends AJXP_Plugin {
 	public function extractImageMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
 		$isImage = AJXP_Utils::is_image($currentNode);
 		$metadata["is_image"] = $isImage;
+		$setRemote = false;
+		$remoteWrappers = $this->pluginConf["META_EXTRACTION_REMOTEWRAPPERS"];
+		$remoteThreshold = $this->pluginConf["META_EXTRACTION_THRESHOLD"];		
+		if(in_array($wrapperClassName, $remoteWrappers)){
+			if($remoteThreshold != 0 && isSet($metadata["bytesize"])){
+				$setRemote = ($metadata["bytesize"] > $remoteThreshold);
+			}else{
+				$setRemote = true;
+			}
+		}
 		if($isImage)
 		{
-			if(!isSet($realFile)){
-				$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
+			if($setRemote){
+				$metadata["image_type"] = "N/A";
+				$metadata["image_width"] = "N/A";
+				$metadata["image_height"] = "N/A";
+				$metadata["readable_dimension"] = "";
+			}else{
+				if(!isSet($realFile)){
+					$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
+				}
+				list($width, $height, $type, $attr) = @getimagesize($realFile);
+				$metadata["image_type"] = image_type_to_mime_type($type);
+				$metadata["image_width"] = $width;
+				$metadata["image_height"] = $height;
+				$metadata["readable_dimension"] = $width."px X ".$height."px";
 			}
-			list($width, $height, $type, $attr) = @getimagesize($realFile);
-			$metadata["image_type"] = image_type_to_mime_type($type);
-			$metadata["image_width"] = $width;
-			$metadata["image_height"] = $height;
-			$metadata["readable_dimension"] = $width."px X ".$height."px";
 		}
 	}
 	

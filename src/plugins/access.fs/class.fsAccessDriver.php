@@ -410,6 +410,8 @@ class fsAccessDriver extends AbstractAccessDriver
 				if(!isSet($dir) || $dir == "/") $dir = "";
 				$lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 								
+				$startTime = microtime();
+				
 				$dir = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($dir));
 				$path = $this->urlBase.($dir!= ""?"/".$dir:"");	
 				$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
@@ -562,6 +564,9 @@ class fsAccessDriver extends AbstractAccessDriver
 						);
 					}
 				}
+				
+				AJXP_Logger::debug("LS Time : ".intval((microtime()-$startTime)*1000)."ms");
+				
 				AJXP_XMLWriter::close();
 				return ;
 				
@@ -1232,10 +1237,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	 */ 
     function makeZip ($src, $dest, $basedir)
     {
-    	$safeMode =  (@ini_get("safe_mode") == 'On' || @ini_get("safe_mode") === 1) ? TRUE : FALSE;
-    	if(!$safeMode){
-	    	set_time_limit(60);
-    	}
+    	@set_time_limit(60);
     	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	foreach ($src as $item){

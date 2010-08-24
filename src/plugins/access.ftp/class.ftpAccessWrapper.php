@@ -66,6 +66,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     	$tmpHandle = fopen($tmpFile, "wb");
     	$fake->copyFileInStream($path, $tmpHandle);
     	fclose($tmpHandle);
+    	//register_shutdown_function("unlink", $tmpFile);
     	return $tmpFile;
     }	
     
