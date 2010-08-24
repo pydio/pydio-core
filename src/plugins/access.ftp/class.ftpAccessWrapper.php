@@ -341,6 +341,11 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$this->user = $repository->getOption("FTP_USER");
 			$this->password = $repository->getOption("FTP_PASS");
 		}
+		// 4. Try from session
+		if((!isSet($this->user) || $this->user=="") && isSet($_SESSION["AJXP_SESSION_REMOTE_USER"])){
+			$this->user = $_SESSION["AJXP_SESSION_REMOTE_USER"];
+			$this->password = $_SESSION["AJXP_SESSION_REMOTE_PASS"];
+		}
 		if(!isSet($this->user) || $this->user==""){
 			throw new AJXP_Exception("Cannot find user/pass for FTP access!");
 		}
