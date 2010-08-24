@@ -31,11 +31,11 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : Class for handling pdf preview, etc... Rely on the StreamWrappers, ImageMagick and GhostScript
+ * Description : Class for handling IMagick formats preview, etc... Rely on the StreamWrappers, ImageMagick and GhostScript
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class PdfPreviewer extends AJXP_Plugin {
+class IMagickPreviewer extends AJXP_Plugin {
 
 	public function switchAction($action, $httpVars, $filesVars){
 		
@@ -51,7 +51,7 @@ class PdfPreviewer extends AJXP_Plugin {
 		$streamData = $repository->streamData;		
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		    	
-		if($action == "pdf_data_proxy"){
+		if($action == "imagick_data_proxy"){
 			$extractAll = false;
 			if(isSet($httpVars["all"])) $extractAll = true;		
 			
@@ -107,7 +107,7 @@ class PdfPreviewer extends AJXP_Plugin {
 			header('Cache-Control: public');
 			readfile($file);
 			exit(1);			
-		}else if($action == "delete_pdf_data" && isSet($httpVars["file"])){
+		}else if($action == "delete_imagick_data" && isSet($httpVars["file"])){
 			$files = $this->listExtractedJpg(AJXP_Utils::getAjxpTmpDir()."/".$httpVars["file"]);
 			foreach ($files as $file){
 				if(is_file(AJXP_Utils::getAjxpTmpDir()."/".$file["file"])) unlink(AJXP_Utils::getAjxpTmpDir()."/".$file["file"]);
