@@ -30,9 +30,9 @@
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
- * Description : The Pdf previewer.
+ * Description : The IMagick previewer.
  */
-Class.create("PdfPreviewer", Diaporama, {
+Class.create("IMagickPreviewer", Diaporama, {
 
 	fullscreenMode: false,
 
@@ -52,7 +52,7 @@ Class.create("PdfPreviewer", Diaporama, {
 				}
 			}
 			i++;
-			var text = this.currentPDF + ' ('+MessageHash[331]+' '+i+' '+MessageHash[332]+' '+this.items.length+')';
+			var text = this.currentIM + ' ('+MessageHash[331]+' '+i+' '+MessageHash[332]+' '+this.items.length+')';
 			this.updateTitle(text);
 		}.bind(this);
 		
@@ -66,10 +66,10 @@ Class.create("PdfPreviewer", Diaporama, {
 			return false;
 		}.bind(this);
 				
-		this.currentPDF = getBaseName(userSelection.getUniqueFileName());
+		this.currentIM = getBaseName(userSelection.getUniqueFileName());
 		// Extract the pages and load result!
 		var connexion = new Connexion();
-		connexion.addParameter("get_action", "pdf_data_proxy");
+		connexion.addParameter("get_action", "imagick_data_proxy");
 		connexion.addParameter("all", "true");
 		connexion.addParameter("file", userSelection.getUniqueFileName());
 		connexion.onComplete = function(transport){
@@ -91,7 +91,7 @@ Class.create("PdfPreviewer", Diaporama, {
 				var tItems = this.items;
 				this.element.observe("editor:close", function(){					
 					var connexion = new Connexion();
-					connexion.addParameter("get_action", "delete_pdf_data");
+					connexion.addParameter("get_action", "delete_imagick_data");
 					var prefix = tItems[0].replace("-0.jpg", "").replace(".jpg", "");
 					connexion.addParameter("file", prefix);
 					connexion.sendAsync();
@@ -106,7 +106,7 @@ Class.create("PdfPreviewer", Diaporama, {
 						
 	getPreview : function(ajxpNode){
 		var img = new Element('img', {
-			src:PdfPreviewer.prototype.getThumbnailSource(ajxpNode), 
+			src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode), 
 			style:'border:1px solid #676965;'
 		});
 		img.resizePreviewElement = function(dimensionObject){			
@@ -121,7 +121,7 @@ Class.create("PdfPreviewer", Diaporama, {
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return ajxpServerAccessPath+"?get_action=pdf_data_proxy&file="+encodeURIComponent(ajxpNode.getPath());
+		return ajxpServerAccessPath+"?get_action=imagick_data_proxy&file="+encodeURIComponent(ajxpNode.getPath());
 	},
 	
 	setOnLoad: function()	{

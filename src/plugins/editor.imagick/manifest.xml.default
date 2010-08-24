@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.pdf" openable="true"  formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="PdfPreviewer" mimes="pdf,svg,tif,tiff">
-	<class_definition filename="plugins/editor.pdf/class.PdfPreviewer.php" classname="PdfPreviewer"/>
+<editor id="editor.imagick" openable="true"  formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer" mimes="pdf,svg,tif,tiff">
+	<class_definition filename="plugins/editor.imagick/class.IMagickPreviewer.php" classname="IMagickPreviewer"/>
 	<resources>
-		<js file="plugins/editor.pdf/class.PdfPreviewer.js" className="PdfPreviewer"/>
+		<js file="plugins/editor.imagick/class.ImagickPreviewer.js" className="IMagickPreviewer"/>
 	</resources>
 	<registry_contributions>
 		<actions>
-			<action name="pdf_data_proxy">
+			<action name="imagick_data_proxy">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
-			<action name="delete_pdf_data">
+			<action name="delete_imagick_data">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
