@@ -882,6 +882,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		{
 			throw new AJXP_Exception($mess[100]." $nom_fic");
 		}
+		AJXP_Controller::applyHook("move.metadata", array($old, $new, false));
 		rename($old,$new);
 	}
 	

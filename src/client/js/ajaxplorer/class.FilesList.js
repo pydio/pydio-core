@@ -126,6 +126,15 @@ Class.create("FilesList", SelectableElements, {
 		return visible;
 	},
 	
+	getVisibleSortTypes : function(){
+		var visible = $A([]);
+		var index = 0;
+		for(var i=0;i<this.columnsDef.length;i++){			
+			if(!this.hiddenColumns.include(this.columnsDef[i].attributeName)) visible.push(this.columnsDef[i].sortType);
+		}
+		return visible;		
+	},
+	
 	setColumnVisible : function (attName, visible){
 		var change = false;
 		if(visible && this.hiddenColumns.include(attName)){			
@@ -323,7 +332,7 @@ Class.create("FilesList", SelectableElements, {
 			}
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
-			this._sortableTable = new AjxpSortable(oElement, this._oSortTypes, $('selectable_div_header'));			
+			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), $('selectable_div_header'));
 			this._sortableTable.onsort = function(){
 				this.redistributeBackgrounds();
 				var ctxt = ajaxplorer.getContextNode();
