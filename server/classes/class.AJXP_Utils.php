@@ -229,45 +229,23 @@ class AJXP_Utils
 	{
 		$mess = ConfService::getMessages();
 		$fileName = strtolower($fileName);
-		if($isDir){$image="folder.png";$typeName=$mess[8];}
-		else if(preg_match("/\.mid$/",$fileName)){$image="midi.png";$typeName=$mess[9];}
-		else if(preg_match("/\.txt$/",$fileName)){$image="txt2.png";$typeName=$mess[10];}
-		else if(preg_match("/\.sql$/",$fileName)){$image="txt2.png";$typeName=$mess[10];}
-		else if(preg_match("/\.js$/",$fileName)){$image="javascript.png";$typeName=$mess[11];}
-		else if(preg_match("/\.gif$/",$fileName)){$image="image.png";$typeName=$mess[12];}
-		else if(preg_match("/\.jpg$/",$fileName)){$image="image.png";$typeName=$mess[13];}
-		else if(preg_match("/\.html$/",$fileName)){$image="html.png";$typeName=$mess[14];}
-		else if(preg_match("/\.htm$/",$fileName)){$image="html.png";$typeName=$mess[15];}
-		else if(preg_match("/\.rar$/",$fileName)){$image="archive.png";$typeName=$mess[60];}
-		else if(preg_match("/\.gz$/",$fileName)){$image="zip.png";$typeName=$mess[61];}
-		else if(preg_match("/\.tgz$/",$fileName)){$image="archive.png";$typeName=$mess[61];}
-		else if(preg_match("/\.z$/",$fileName)){$image="archive.png";$typeName=$mess[61];}
-		else if(preg_match("/\.ra$/",$fileName)){$image="video.png";$typeName=$mess[16];}
-		else if(preg_match("/\.ram$/",$fileName)){$image="video.png";$typeName=$mess[17];}
-		else if(preg_match("/\.rm$/",$fileName)){$image="video.png";$typeName=$mess[17];}
-		else if(preg_match("/\.pl$/",$fileName)){$image="source_pl.png";$typeName=$mess[18];}
-		else if(preg_match("/\.zip$/",$fileName)){$image="zip.png";$typeName=$mess[19];}
-		else if(preg_match("/\.wav$/",$fileName)){$image="sound.png";$typeName=$mess[20];}
-		else if(preg_match("/\.php$/",$fileName)){$image="php.png";$typeName=$mess[21];}
-		else if(preg_match("/\.php3$/",$fileName)){$image="php.png";$typeName=$mess[22];}
-		else if(preg_match("/\.phtml$/",$fileName)){$image="php.png";$typeName=$mess[22];}
-		else if(preg_match("/\.exe$/",$fileName)){$image="exe.png";$typeName=$mess[50];}
-		else if(preg_match("/\.bmp$/",$fileName)){$image="image.png";$typeName=$mess[56];}
-		else if(preg_match("/\.png$/",$fileName)){$image="image.png";$typeName=$mess[57];}
-		else if(preg_match("/\.css$/",$fileName)){$image="css.png";$typeName=$mess[58];}
-		else if(preg_match("/\.mp3$/",$fileName)){$image="sound.png";$typeName=$mess[59];}
-		else if(preg_match("/\.xls$/",$fileName)){$image="spreadsheet.png";$typeName=$mess[64];}
-		else if(preg_match("/\.doc$/",$fileName)){$image="document.png";$typeName=$mess[65];}
-		else if(preg_match("/\.pdf$/",$fileName)){$image="pdf.png";$typeName=$mess[79];}
-		else if(preg_match("/\.mov$/",$fileName)){$image="video.png";$typeName=$mess[80];}
-		else if(preg_match("/\.avi$/",$fileName)){$image="video.png";$typeName=$mess[81];}
-		else if(preg_match("/\.mpg$/",$fileName)){$image="video.png";$typeName=$mess[82];}
-		else if(preg_match("/\.mpeg$/",$fileName)){$image="video.png";$typeName=$mess[83];}
-		else if(preg_match("/\.wmv$/",$fileName)){$image="video.png";$typeName=$mess[81];}
-		else if(preg_match("/\.swf$/",$fileName)){$image="flash.png";$typeName=$mess[91];}
-		else if(preg_match("/\.flv$/",$fileName)){$image="flash.png";$typeName=$mess[91];}
-		else {$image="mime_empty.png";$typeName=$mess[23];}
-		if($mode=="image"){return $image;} else {return $typeName;}
+		include(INSTALL_PATH."/server/conf/extensions.conf.php");
+		if($isDir){
+			$mime = $RESERVED_EXTENSIONS["folder"];
+		}else{
+			foreach ($EXTENSIONS as $ext){
+				if(preg_match("/\.$ext[0]$/", $fileName)){
+					$mime = $ext;
+				}
+			}
+		}
+		if(!isSet($mime)){
+			$mime = $RESERVED_EXTENSIONS["unkown"];
+		}
+		if(is_numeric($mime[2])){
+			$mime[2] = $mess[$mime[2]];
+		}
+		return (($mode == "image"? $mime[1]:$mime[2]));
 	}
 		
 	function getAjxpMimes($keyword){
