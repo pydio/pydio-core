@@ -272,7 +272,23 @@ class AJXP_Utils
 		
 	function getAjxpMimes($keyword){
 		if($keyword == "editable"){
-			return "txt,sql,php,php3,phtml,htm,html,cgi,pl,js,css,inc,xml,xsl,java";
+			// Gather editors!
+			$pServ = AJXP_PluginsService::getInstance();
+			$plugs = $pServ->getPluginsByType("editor");
+			//$plugin = new AJXP_Plugin();
+			$mimes = array();
+			foreach ($plugs as $plugin){
+				$node = $plugin->getManifestRawContent("/editor/@mimes", "node");
+				$openable = $plugin->getManifestRawContent("/editor/@openable", "node");
+				if($openable->item(0) && $openable->item(0)->value == "true" && $node->item(0)) {
+					$mimestring = $node->item(0)->value;
+					$mimesplit = explode(",",$mimestring);
+					foreach ($mimesplit as $value){
+						$mimes[$value] = $value;
+					}
+				}
+			}
+			return implode(",", array_values($mimes));
 		}else if($keyword == "image"){
 			return "png,bmp,jpg,jpeg,gif";
 		}else if($keyword == "audio"){

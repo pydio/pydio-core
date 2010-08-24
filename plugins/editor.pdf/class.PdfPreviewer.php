@@ -53,11 +53,15 @@ class PdfPreviewer extends AJXP_Plugin {
 		    	
 		if($action == "pdf_data_proxy"){
 			$extractAll = false;
-			if(isSet($httpVars["all"])) $extractAll = true;			
+			if(isSet($httpVars["all"])) $extractAll = true;		
 			
 			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
+			$fileInfo = pathinfo($file, PATHINFO_EXTENSION);
+			$extension = $fileInfo["extension"];
+			if(in_array(strtolower($extension), array("svg","tif","tiff"))) $extractAll = true;
+			
 			$fp = fopen($destStreamURL."/".$file, "r");
-			$tmpFileName = AJXP_Utils::getAjxpTmpDir()."/ajxp_tmp_".md5(time()).".pdf";
+			$tmpFileName = AJXP_Utils::getAjxpTmpDir()."/ajxp_tmp_".md5(time()).".$extension";
 			$tmpFile = fopen($tmpFileName, "w");
 			register_shutdown_function("unlink", $tmpFileName);
 			while(!feof($fp)) {
@@ -67,7 +71,7 @@ class PdfPreviewer extends AJXP_Plugin {
 			fclose($fp);
 			$out = array();
 			$return = 0;
-			$tmpFileThumb = str_replace(".pdf", ".jpg", $tmpFileName);
+			$tmpFileThumb = str_replace(".$extension", ".jpg", $tmpFileName);
 			if(!$extractAll){
 				register_shutdown_function("unlink", $tmpFileThumb);
 			}else{
@@ -83,7 +87,7 @@ class PdfPreviewer extends AJXP_Plugin {
 				throw new AJXP_Exception(implode("\n", $out));
 			}
 			if($extractAll){
-				$prefix = str_replace(".pdf", "", $tmpFileName);
+				$prefix = str_replace(".$extension", "", $tmpFileName);
 				$files = $this->listExtractedJpg($prefix);
 				header("Content-Type: application/json");
 				print(json_encode($files));
