@@ -643,7 +643,8 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){
 				    	var message = MessageHash[177];
-				    	if(ajaxplorer.getContextNode().getAjxpMime() != "ajxp_recycle"){
+				    	var repoHasRecycle = ajaxplorer.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
+				    	if(repoHasRecycle && repoHasRecycle == "true" && ajaxplorer.getContextNode().getAjxpMime() != "ajxp_recycle"){
 				    		message = MessageHash[176];
 				    	}
 		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
