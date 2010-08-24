@@ -530,6 +530,7 @@ class ConfService
 		$xmlString = "";
 		if($fp = opendir($base)){
 			while (($subdir = readdir($fp))!==false) {
+				if($subdir == "index.html") continue;
 				$manifName = $base."/".$subdir."/manifest.xml";
 				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("access."))=="access."){
 					$dName = substr($subdir, strlen("access."));
