@@ -434,9 +434,13 @@ class fsAccessDriver extends AbstractAccessDriver
 												
 				$metaData = array();
 				$crtLabel = AJXP_Utils::xmlEntities(basename($dir), true);
-				if(RecycleBinManager::recycleEnabled() && RecycleBinManager::currentLocationIsRecycle($dir)){
-					$metaData["ajxp_mime"] = "ajxp_recycle";
-					$crtLabel = AJXP_Utils::xmlEntities($mess[122]);
+				if(RecycleBinManager::recycleEnabled()){
+					if(RecycleBinManager::currentLocationIsRecycle($dir)){
+						$metaData["ajxp_mime"] = "ajxp_recycle";
+						$crtLabel = AJXP_Utils::xmlEntities($mess[122]);
+					}else if($dir == ""){
+						$metaData["repo_has_recycle"] = "true";
+					}
 				}
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
