@@ -33,6 +33,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="stat">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>				
 		<action name="create_user">
 			<gui text="297" title="298" src="yast_user_add.png" accessKey="create_user_accesskey" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
@@ -168,7 +173,7 @@
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
-							ajaxplorer.actionBar.configEditor.loadRepository(meta.get("repository_id"));
+							ajaxplorer.actionBar.configEditor.loadRepository(meta.get("repository_id"));							
 						};
 						var closeFunc = function(){
 							var toSubmit = new Hash();

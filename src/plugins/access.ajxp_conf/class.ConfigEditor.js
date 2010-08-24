@@ -58,6 +58,7 @@ ConfigEditor = Class.create({
 			this.feedUserForm(transport.responseXML);			
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
+			ajaxplorer.blurAll();
 		}.bind(this);
 		connexion.sendAsync();		
 	},	
@@ -438,6 +439,7 @@ ConfigEditor = Class.create({
 			this.feedRepositoryForm(transport.responseXML, metaTab);			
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
+			ajaxplorer.blurAll();
 		}.bind(this);
 		connexion.sendAsync();		
 	},

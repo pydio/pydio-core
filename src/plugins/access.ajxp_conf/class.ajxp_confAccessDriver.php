@@ -97,6 +97,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 			break;
 			
+			case "stat" :
+				
+				header("Content-type:application/json");
+				print '{"mode":true}';
+				exit(1);
+				
+			break;			
+			
 			case "edit_user" : 
 				$confStorage = ConfService::getConfStorageImpl();	
 				$userId = $httpVars["user_id"];	
@@ -480,7 +488,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
 					}else{
 						AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);						
-						AJXP_XMLWriter::reloadFileList(false);
+						AJXP_XMLWriter::reloadDataNode();
 						AJXP_XMLWriter::reloadRepositoryList();
 					}
 					AJXP_XMLWriter::close();		
@@ -499,7 +507,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$res = AuthService::deleteUser($httpVars["user_id"]);
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage("User successfully erased", null);
-					AJXP_XMLWriter::reloadFileList($httpVars["user_id"]);
+					AJXP_XMLWriter::reloadDataNode();
 					AJXP_XMLWriter::close();
 					exit(1);
 					
