@@ -178,6 +178,10 @@ class SerialMetaManager extends AJXP_Plugin {
 	}
 	
 	protected function loadMetaFileData($currentFile){
+		if(preg_match("/\.zip\//",$currentFile)){
+			self::$metaCache = array();
+			return ;
+		}
 		$metaFile = dirname($currentFile)."/".$this->options["meta_file_name"];
 		if(self::$currentMetaName == $metaFile && is_array(self::$metaCache)){
 			return;
