@@ -689,7 +689,7 @@ class sshAccessDriver extends AbstractAccessDriver
 	 */ 
     function makeZip ($src, $dest, $basedir)
     {
-    	set_time_limit(60);
+    	@set_time_limit(60);
     	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	$totalSize = 0;

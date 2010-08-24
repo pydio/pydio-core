@@ -36,6 +36,18 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $DRIVER_CONF = array(
+
+	/********************************/
+	/* META EXTRACTION THRESHOLD
+	/*******************************/
+	// When connected to a remote server, metadata extraction
+	// can make the "listing" action very long, as it must first
+	// copy each file locally. For plugins using the defined wrappers
+	// and files whose size is greater than this threshold, 
+	// the image type and dimension will be skipped.
+	"META_EXTRACTION_REMOTEWRAPPERS" => array("ftpAccessWrapper"),
+	"META_EXTRACTION_THRESHOLD" => 2000,
+	
 	/************************************/
 	/* THUMBNAIL MANAGEMENT				*/
 	/************************************/	

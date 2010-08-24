@@ -95,7 +95,7 @@ class AbstractLogDriver extends AJXP_Plugin {
 			if(!is_numeric($key)){
 				$st.="$key=";
 			}
-			if(is_string($value)){				
+			if(is_string($value) || is_numeric($value)){				
 				$st.=$value;
 			}else if(is_array($value)){
 				$st.=$this->arrayToString($value);
