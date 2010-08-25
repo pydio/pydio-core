@@ -82,8 +82,13 @@ class AbstractAccessDriver extends AJXP_Plugin {
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
-		if(isSet($this->actions["public_url"]) && !defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER)){
+		if(isSet($this->actions["public_url"]) && (!is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER))){
+			AJXP_Logger::logAction("Disabling Public links, PUBLIC_DOWNLOAD_FOLDER is not writeable!", array("folder" => PUBLIC_DOWNLOAD_FOLDER, "is_dir" => is_dir(PUBLIC_DOWNLOAD_FOLDER),"is_writeable" => is_writable(PUBLIC_DOWNLOAD_FOLDER)));
 			unset($this->actions["public_url"]);
+			$actionXpath=new DOMXPath($contribNode->ownerDocument);
+			$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
+			$publicUrlNode = $publicUrlNodeList->item(0);
+			$contribNode->removeChild($publicUrlNode);
 		}		
 		if($this->detectStreamWrapper() !== false){
 			$this->actions["cross_copy"] = array();
