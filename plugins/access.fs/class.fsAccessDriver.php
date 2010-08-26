@@ -369,11 +369,32 @@ class fsAccessDriver extends AbstractAccessDriver
 					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
 					}
-					if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
-					{
-						$errorCode=411;
-						$errorMessage="$mess[33] ".$userfile_name;
-						break;
+					if(isSet($boxData["input_upload"])){
+						try{
+							AJXP_Logger::debug("Begining reading INPUT stream");
+							$input = fopen("php://input", "r");
+							$output = fopen("$destination/".$userfile_name, "w");
+							$sizeRead = 0;
+							while($sizeRead < intval($boxData["size"])){
+								$chunk = fread($input, 4096);
+								$sizeRead += strlen($chunk);
+								fwrite($output, $chunk, strlen($chunk));
+							}
+							fclose($input);
+							fclose($output);
+							AJXP_Logger::debug("End reading INPUT stream");
+						}catch (Exception $e){
+							$errorCode=411;
+							$errorMessage = $e->getMessage();
+							break;
+						}
+					}else{
+						if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
+						{
+							$errorCode=411;
+							$errorMessage="$mess[33] ".$userfile_name;
+							break;
+						}
 					}
 					$this->changeMode($destination."/".$userfile_name);
 					$logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
