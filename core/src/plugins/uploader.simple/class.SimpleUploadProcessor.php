@@ -37,21 +37,58 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class SimpleUploadProcessor extends AJXP_Plugin {
 	
+	public function preProcess($action, &$httpVars, &$fileVars){
+		if(!isSet($httpVars["xhr_uploader"])){
+			return false;
+		}
+		AJXP_Logger::debug("SimpleUpload::preProcess", $httpVars);
+		
+	    $headers = getallheaders();
+	    $headersCheck = (
+	        // basic checks
+	        isset(
+	            $headers['Content-Type'],
+	            $headers['Content-Length'],
+	            $headers['X-File-Size'],
+	            $headers['X-File-Name']
+	        ) &&
+	        $headers['Content-Type'] === 'multipart/form-data' &&
+	        $headers['Content-Length'] === $headers['X-File-Size']
+	    );
+	    if($headersCheck){
+	        // create the object and assign property
+        	$fileVars["userfile_0"] = array(
+        		"input_upload" => true,
+        		"name"		   => SystemTextEncoding::fromUTF8(basename($headers['X-File-Name'])),
+        		"size"		   => $headers['X-File-Size']
+        	);
+	    }		
+	}
+	
 	public function postProcess($action, $httpVars, $postProcessData){
-		if(!isSet($httpVars["simple_uploader"])){
+		if(!isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"])){
 			return false;
 		}
 		AJXP_Logger::debug("SimpleUploadProc is active");
 		$result = $postProcessData["processor_result"];
-
-		print("<html><script language=\"javascript\">\n");
-		if(isSet($result["ERROR"])){
-			$message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
-			print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $message)."');");		
-		}else{		
-			print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+		
+		if(isSet($httpVars["simple_uploader"])){	
+			print("<html><script language=\"javascript\">\n");
+			if(isSet($result["ERROR"])){
+				$message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
+				print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext('".str_replace("'", "\'", $message)."');");		
+			}else{		
+				print("\n if(parent.ajaxplorer.actionBar.multi_selector) parent.ajaxplorer.actionBar.multi_selector.submitNext();");
+			}
+			print("</script></html>");
+		}else{
+			if(isSet($result["ERROR"])){
+				$message = $result["ERROR"]["MESSAGE"]." (".$result["ERROR"]["CODE"].")";
+				exit($message);
+			}else{
+				exit("OK");
+			}
 		}
-		print("</script></html>");
 		
 	}	
 }
