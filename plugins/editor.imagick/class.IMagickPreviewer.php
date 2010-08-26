@@ -54,16 +54,15 @@ class IMagickPreviewer extends AJXP_Plugin {
 		if($action == "imagick_data_proxy"){
 			$extractAll = false;
 			if(isSet($httpVars["all"])) $extractAll = true;		
-			
 			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
-			$fileInfo = pathinfo($file, PATHINFO_EXTENSION);
-			$extension = $fileInfo["extension"];
+			$extension = pathinfo($file, PATHINFO_EXTENSION);
 			if(in_array(strtolower($extension), array("svg","tif","tiff"))) $extractAll = true;
 			
+			if(!filesize($destStreamURL."/".$file)) return ;
 			$fp = fopen($destStreamURL."/".$file, "r");
 			$tmpFileName = AJXP_Utils::getAjxpTmpDir()."/ajxp_tmp_".md5(time()).".$extension";
 			$tmpFile = fopen($tmpFileName, "w");
-			register_shutdown_function("unlink", $tmpFileName);
+			register_shutdown_function("unlink", $tmpFileName);			
 			while(!feof($fp)) {
 				stream_copy_to_stream($fp, $tmpFile, 4096);
 			}
@@ -81,12 +80,13 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$pageLimit = ($extractAll?"":"[0]");
 			$params = ($extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
 			$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName).$pageLimit." ".$params." ".basename($tmpFileThumb);
-			session_write_close(); // Be sure to give the hand back
+			AJXP_Logger::debug("IMagick Command : $cmd");
+			session_write_close(); // Be sure to give the hand back			
 			exec($cmd, $out, $return);
 			if(is_array($out) && count($out)){
 				throw new AJXP_Exception(implode("\n", $out));
 			}
-			if($extractAll){
+			if(isSet($httpVars["all"])){
 				$prefix = str_replace(".$extension", "", $tmpFileName);
 				$files = $this->listExtractedJpg($prefix);
 				header("Content-Type: application/json");
