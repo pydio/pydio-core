@@ -11,7 +11,7 @@
 			</div>	
 		]]></clientForm>
 		<activeCondition><![CDATA[		
-			(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE))
+			(ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE)) && !(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span'))
 		]]></activeCondition>
 	</processing>
 	<registry_contributions>

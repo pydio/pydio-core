@@ -64,7 +64,7 @@ function triggerFlashEvent(){
 			break;
 			case "currentFolder":
 				var folder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
-				return folder;
+				return folder.replace("+", "%2B");
 			break;	
 			case "uploadComplete":
 				parent.ajaxplorer.fireContextRefresh();
