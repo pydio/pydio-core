@@ -3,10 +3,14 @@
 	<class_definition filename="plugins/uploader.simple/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
 	<resources>
 		<js file="plugins/uploader.simple/class.MultiUploader.js" className="MultiUploader"/>
+		<js file="plugins/uploader.simple/class.XHRUploader.js" className="XHRUploader"/>
 	</resources>
 	<registry_contributions>
 		<actions>
 			<action name="upload">
+				<pre_processing>					
+					<serverCallback methodName="preProcess"/>
+				</pre_processing>
 				<post_processing>					
 					<serverCallback methodName="postProcess" capture="true"/>
 				</post_processing>
@@ -29,7 +33,7 @@
 					</td>
 				</tr>
 				<tr>	
-					<td valign="bottom" align="right">
+					<td valign="bottom" align="right" id="optClosButtonsContainer">
 						<div class="fakeUploadButton fakeOptionButton" id="uploadOptionsButton" align="center">AJXP_MESSAGE[310]</div>
 						<div class="fakeUploadButton fakeOptionButton" id="uploadCloseButton" align="center">AJXP_MESSAGE[86]</div>
 					</td>
@@ -42,9 +46,30 @@
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[ 
 		var tmpFunction = function(oForm){
-			ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm);
+			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
+				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
+			}else{
+				ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm);
+			}
 		};
 		]]></dialogOnOpen>
+		<extensionOnInit><![CDATA[		
+		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
+			var dropzone = $('content_pane');
+			dropzone.addClassName('droparea');
+			dropzone.addEventListener("dragover", function(event) {
+  				event.preventDefault();
+			}, true);
+			dropzone.addEventListener("drop", function(event) {
+  				event.preventDefault();
+  				// Ready to do something with the dropped object
+  				if(event.dataTransfer.files.length){
+	  				window.UploaderDroppedFiles = event.dataTransfer.files;
+	  				ajaxplorer.actionBar.fireAction('upload');
+	  			}
+			}, true);
+		}
+		]]></extensionOnInit>		
 	</processing>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
