@@ -448,6 +448,11 @@ Class.create("Ajaxplorer", {
 	},
 
 	initExtension : function(xmlNode, extensionDefinition){
+		var activeCondition = XPathSelectSingleNode(xmlNode, 'processing/activeCondition');
+		if(activeCondition && activeCondition.firstChild){
+			var active = eval(activeCondition.firstChild.nodeValue.strip());
+			if(!active) return false;
+		}
 		if(xmlNode.nodeName == 'editor'){
 			Object.extend(extensionDefinition, {
 				openable : (xmlNode.getAttribute("openable") == "true"?true:false),
@@ -468,6 +473,10 @@ Class.create("Ajaxplorer", {
 					$('all_forms').insert(clientForm.firstChild.nodeValue);
 				}
 			}
+			var extensionOnInit = XPathSelectSingleNode(xmlNode, 'processing/extensionOnInit');
+			if(extensionOnInit && extensionOnInit.firstChild){
+				eval(extensionOnInit.firstChild.nodeValue);
+			}
 			var dialogOnOpen = XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
 			if(dialogOnOpen && dialogOnOpen.firstChild){
 				extensionDefinition.dialogOnOpen = dialogOnOpen.firstChild.nodeValue;
@@ -476,7 +485,8 @@ Class.create("Ajaxplorer", {
 			if(dialogOnComplete && dialogOnComplete.firstChild){
 				extensionDefinition.dialogOnComplete = dialogOnComplete.firstChild.nodeValue;
 			}
-		}		
+		}
+		return true;
 	},
 	
 	refreshExtensionsRegistry : function(){
@@ -493,14 +503,18 @@ Class.create("Ajaxplorer", {
 				var child = extensions[i].childNodes[j];
 				extensionDefinition.resourcesManager.loadFromXmlNode(child);
 			}
-			this.initExtension(extensions[i], extensionDefinition);
-			this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);					
+			if(this.initExtension(extensions[i], extensionDefinition)){
+				this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);
+			}
 		}
 		ResourcesManager.prototype.loadAutoLoadResources(this._registry);
 	},
 	
 	getActiveExtensionByType : function(extensionType){
 		var exts = $A();
+		return this._extensionsRegistry[extensionType];
+		/*
+		// ALREADY FILTERED AT INITIALISATION
 		this._extensionsRegistry[extensionType].each(function(el){
 			var activeNode = XPathSelectSingleNode(el.xmlNode, 'processing/activeCondition');
 			if(activeNode && activeNode.firstChild && activeNode.firstChild.nodeValue){
@@ -513,6 +527,7 @@ Class.create("Ajaxplorer", {
 			}
 		}.bind(this));
 		return exts;
+		*/
 	},
 	
 	findEditorById : function(editorId){
