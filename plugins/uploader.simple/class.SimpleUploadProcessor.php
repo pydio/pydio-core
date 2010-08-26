@@ -42,27 +42,31 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 			return false;
 		}
 		AJXP_Logger::debug("SimpleUpload::preProcess", $httpVars);
-		
-	    $headers = getallheaders();
+				
 	    $headersCheck = (
 	        // basic checks
 	        isset(
-	            $headers['Content-Type'],
-	            $headers['Content-Length'],
-	            $headers['X-File-Size'],
-	            $headers['X-File-Name']
+	            $_SERVER['CONTENT_TYPE'],
+	            $_SERVER['CONTENT_LENGTH'],
+	            $_SERVER['HTTP_X_FILE_SIZE'],
+	            $_SERVER['HTTP_X_FILE_NAME']
 	        ) &&
-	        $headers['Content-Type'] === 'multipart/form-data' &&
-	        $headers['Content-Length'] === $headers['X-File-Size']
+	        $_SERVER['CONTENT_TYPE'] === 'multipart/form-data' &&
+	        $_SERVER['CONTENT_LENGTH'] === $_SERVER['HTTP_X_FILE_SIZE']
 	    );
+	    $fileNameH = $_SERVER['HTTP_X_FILE_NAME'];
+	    $fileSizeH = $_SERVER['HTTP_X_FILE_SIZE'];		
+	       
 	    if($headersCheck){
 	        // create the object and assign property
         	$fileVars["userfile_0"] = array(
         		"input_upload" => true,
-        		"name"		   => SystemTextEncoding::fromUTF8(basename($headers['X-File-Name'])),
-        		"size"		   => $headers['X-File-Size']
+        		"name"		   => SystemTextEncoding::fromUTF8(basename($fileNameH)),
+        		"size"		   => $fileSizeH
         	);
-	    }		
+	    }else{
+	    	exit("Warning, missing headers!");
+	    }
 	}
 	
 	public function postProcess($action, $httpVars, $postProcessData){
