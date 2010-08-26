@@ -133,15 +133,40 @@ class ftpAccessDriver extends fsAccessDriver {
 						break;
 					}
 					AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
-					$destName = $destCopy."/".basename($boxData["tmp_name"]);
-					if ($destName == $boxData["tmp_name"]) $destName .= "1";
-					if(move_uploaded_file($boxData["tmp_name"], $destName)){
-						$boxData["tmp_name"] = $destName;
-						$this->storeFileToCopy($boxData);
-					}else{
-						$mess = ConfService::getMessages();
-						$errorCode = 411;
-						$errorMessage="$mess[33] ".$boxData["name"];
+					if(isSet($boxData["input_upload"])){
+						try{
+							$destName .= tempnam($destCopy, "");
+							AJXP_Logger::debug("Begining reading INPUT stream");
+							$input = fopen("php://input", "r");
+							$output = fopen($destName, "w");
+							$sizeRead = 0;
+							while($sizeRead < intval($boxData["size"])){
+								$chunk = fread($input, 4096);
+								$sizeRead += strlen($chunk);
+								fwrite($output, $chunk, strlen($chunk));
+							}
+							fclose($input);
+							fclose($output);
+							$boxData["tmp_name"] = $destName;
+							$this->storeFileToCopy($boxData);
+							AJXP_Logger::debug("End reading INPUT stream");
+						}catch (Exception $e){
+							$errorCode=411;
+							$errorMessage = $e->getMessage();
+							break;
+						}
+					}else{					
+						$destName = $destCopy."/".basename($boxData["tmp_name"]);
+						if ($destName == $boxData["tmp_name"]) $destName .= "1";
+						if(move_uploaded_file($boxData["tmp_name"], $destName)){
+							$boxData["tmp_name"] = $destName;
+							$this->storeFileToCopy($boxData);
+						}else{
+							$mess = ConfService::getMessages();
+							$errorCode = 411;
+							$errorMessage="$mess[33] ".$boxData["name"];
+							break;
+						}
 					}
 				}
 				if(isSet($errorMessage)){
