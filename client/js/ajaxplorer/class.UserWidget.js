@@ -72,6 +72,7 @@ Class.create("UserWidget", {
 		if(ajaxplorer.user == null) return;
 		if(ajaxplorer.user.id == 'guest') return;
 		var userLang = ajaxplorer.user.getPreference("lang");
+		if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
 		var userDisp = ajaxplorer.user.getPreference("display");	
 		var onLoad = function(oForm){
 			var selector = $(oForm).select('select[id="language_selector"]')[0];
