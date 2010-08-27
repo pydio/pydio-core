@@ -42,9 +42,13 @@ class SerialMetaManager extends AJXP_Plugin {
 	
 	protected $accessDriver;
 	
-	public function init($options, $accessDriver){
-		$this->accessDriver = $accessDriver;		
+	public function init($options){
 		$this->options = $options;
+		// Do nothing
+	}
+	
+	public function initMeta($accessDriver){
+		$this->accessDriver = $accessDriver;		
 		
 		$def = $this->getMetaDefinition();
 		$cdataHead = '<div>
@@ -87,7 +91,7 @@ class SerialMetaManager extends AJXP_Plugin {
 		$tag = $selection->item(0);
 		$tag->setAttribute("ajxpOptions", json_encode(array("metaColumns"=>$def)));
 		
-		parent::init($options);
+		parent::init($this->options);
 	
 	}
 		

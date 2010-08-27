@@ -35,8 +35,8 @@
  */
 @error_reporting(E_ALL & ~E_NOTICE);
 
-define("AJXP_VERSION", "2.7.3");
-define("AJXP_VERSION_DATE", "2010/07/05");
+define("AJXP_VERSION", "3.0");
+define("AJXP_VERSION_DATE", "2010/09/01");
 
 define("AJXP_EXEC", true);
 require("compat.php");
