@@ -1018,7 +1018,7 @@ div.bm_hover
 /*
 UPLOAD MULTIFILE FORM
 */
-#upload_files_list, #multiple_download_container
+div#upload_files_list, div#multiple_download_container
 {
    background-color: white;
    overflow: auto;
@@ -1034,9 +1034,10 @@ UPLOAD MULTIFILE FORM
 	background:url("../../../../content.php?get_action=get_drop_bg") no-repeat scroll right bottom transparent;
 }
 
-#total_files_list, #uploader_options_pane
+div#total_files_list, div#uploader_options_pane
 {
 -moz-border-radius:5px 5px 5px 5px;
+border-radius:5px 5px 5px 5px;
 background-color:white;
 border:1px solid #CCCCCC;
 font-size:11px;
@@ -1047,7 +1048,7 @@ text-align:left;
 width:301px;
 }
 
-#upload_files_list div, #multiple_download_container div
+div#upload_files_list div, div#multiple_download_container div
 {
    overflow: hidden;
    border-bottom: 1px solid #fff;
