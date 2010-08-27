@@ -372,6 +372,9 @@ $mess=array(
 "333" => "Pixlr Editeur",
 "334" => "de plus",
 "335" => "Please enter a page number between 1 and ",
+"336" => "Attention vous ne pouvez glisser que des fichiers, pas des dossiers!",
+"337" => "Démarrage auto.",
+"338" => "Fermeture auto.",
 /* END SENTENCE */
 );
 ?>

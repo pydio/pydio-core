@@ -128,11 +128,11 @@ Class.create("XHRUploader", {
 		var totalDiv = new Element('div', {id:'total_files_list'});
 		this.mainForm.down('#optClosButtonsContainer').insert({after:new Element('td', {style:'vertical-align:bottom'}).update(totalDiv)});
 		totalDiv.insert('<img src="'+ajxpResourcesFolder+'/images/actions/22/trashcan_empty.png" class="fakeUploadButton fakeOptionButton" id="clear_list_button"\
-			width="22" height="22" style="float:right;margin-top:3px;padding:4px;width:22px;" title="Clear"/>\
-			<span id="totalStrings">File Count : 0 Total Size : 0Kb</span>\
+			width="22" height="22" style="float:right;margin-top:3px;padding:4px;width:22px;" title="'+MessageHash[216]+'"/>\
+			<span id="totalStrings">'+MessageHash[258]+' : 0 '+MessageHash[259]+' : 0Kb</span>\
 			<div style="padding-top:3px;">\
 			<div id="pgBar_total" style="width:154px; height: 4px;border: 1px solid #ccc;float:left;margin-top: 6px;"></div>\
-			<span style="float:left;margin-left:10px;" id="uploadedString">Uploaded : 0%</span>\
+			<span style="float:left;margin-left:10px;" id="uploadedString">'+MessageHash[256]+' : 0%</span>\
 			</div>');
 		var options = {
 			animate		: false,									// Animate the progress? - default: true
@@ -170,7 +170,7 @@ Class.create("XHRUploader", {
 	createOptionsPane : function(){
 		var optionPane = new Element('div', {id:'uploader_options_pane'});
 		optionPane.update('<div id="uploader_options_strings"></div>');
-		optionPane.insert('<div id="uploader_options_checks"><input type="checkbox" style="width:20px;" id="uploader_auto_send"> Auto start upload&nbsp; &nbsp; <input type="checkbox" style="width:20px;" id="uploader_auto_close"> Auto close after upload</div>');
+		optionPane.insert('<div id="uploader_options_checks"><input type="checkbox" style="width:20px;" id="uploader_auto_send"> '+MessageHash[337]+'&nbsp; &nbsp; <input type="checkbox" style="width:20px;" id="uploader_auto_close"> '+MessageHash[338]+'</div>');
 		optionPane.hide();
 		optionPane.autoSendCheck = optionPane.down('#uploader_auto_send');
 		optionPane.autoCloseCheck = optionPane.down('#uploader_auto_close');
@@ -267,7 +267,7 @@ Class.create("XHRUploader", {
 
 		if(file.size==0 && file.type == ""){
 			// FOLDER!
-			alert('Sorry, you cannot drop folders, drop only files!');
+			alert(MessageHash[336]);
 			return;
 		}
 		// GET VALUE FROM FILE OBJECT
@@ -284,7 +284,7 @@ Class.create("XHRUploader", {
 			className : 'fakeUploadButton',
 			align : 'absmiddle',
 			style : '-moz-border-radius:3px;border-radius:3px;float:left;margin:1px 7px 2px 0px;padding:3px;width:16px;background-position:center top;',
-			title : 'Remove'
+			title : MessageHash[257]
 		});
 		delButton.observe("click", function(e){
 			if(item.xhr){
@@ -384,8 +384,8 @@ Class.create("XHRUploader", {
 			var percentage = Math.round(100*uploaded/size);
 		}
 		this.totalProgressBar.setPercentage(percentage, true);
-		this.totalStrings.update('File Count : ' + count + ' Total Size : ' +roundSize(size, 'b'));
-		this.uploadedString.update('Uploaded : ' + percentage + '%');
+		this.totalStrings.update(MessageHash[258]+' : ' + count + ' '+MessageHash[259]+' : ' +roundSize(size, 'b'));
+		this.uploadedString.update(MessageHash[256]+' : ' + percentage + '%');
 		
 	},
 	
