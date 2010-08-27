@@ -377,6 +377,9 @@ $mess=array(
 "333" => "Pixlr image editor",
 "334" => "more",
 "335" => "Please enter a page number between 1 and ",
+"336" => "Sorry you cannot drop folders, drop only files!",
+"337" => "Auto start upload",
+"338" => "Auto close after upload",
 /* END SENTENCE */
 );
 ?>
