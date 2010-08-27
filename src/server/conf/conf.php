@@ -111,7 +111,7 @@ $PLUGINS = array(
 	 	)
 	),
 	// Do not use wildcard for uploader, to keep them in a given order
-	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.simple", "gui.ajax", "hook.*")
+	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*")
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
