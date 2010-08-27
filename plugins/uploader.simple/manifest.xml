@@ -39,7 +39,7 @@
 				</tr>
 				<tr>	
 					<td valign="bottom" align="right" id="optClosButtonsContainer">
-						<div class="fakeUploadButton fakeOptionButton" id="uploadOptionsButton" align="center">AJXP_MESSAGE[310]</div>
+						<div class="fakeUploadButton fakeOptionButton" id="uploadOptionsButton" align="center">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></div>
 						<div class="fakeUploadButton fakeOptionButton" id="uploadCloseButton" align="center">AJXP_MESSAGE[86]</div>
 					</td>
 				</tr>

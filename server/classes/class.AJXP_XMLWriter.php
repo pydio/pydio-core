@@ -263,6 +263,8 @@ class AJXP_XMLWriter
 			$buffer.="<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>";
 			$buffer.="<pref name=\"columns_visibility\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_visibility")))."\"/>";
 			$buffer.="<pref name=\"ls_history\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("ls_history")))."\"/>";
+			$buffer.="<pref name=\"upload_auto_send\" value=\"".$loggedUser->getPref("upload_auto_send")."\"/>";
+			$buffer.="<pref name=\"upload_auto_close\" value=\"".$loggedUser->getPref("upload_auto_close")."\"/>";
 			$buffer.="</preferences>";
 			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>";
 			$bMarks = $loggedUser->getBookmarks();
