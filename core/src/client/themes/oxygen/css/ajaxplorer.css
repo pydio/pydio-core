@@ -1034,7 +1034,7 @@ UPLOAD MULTIFILE FORM
 	background:url("../../../../content.php?get_action=get_drop_bg") no-repeat scroll right bottom transparent;
 }
 
-#total_files_list
+#total_files_list, #uploader_options_pane
 {
 -moz-border-radius:5px 5px 5px 5px;
 background-color:white;
