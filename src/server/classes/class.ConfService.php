@@ -515,7 +515,8 @@ class ConfService
 				if($plugId == "") continue;
 				$split = explode(".", $plugId);				
 				$instance = $pServ->getPluginById($plugId);
-				$instance->init($metaSources[$plugId], $plugInstance);
+				$instance->init($metaSources[$plugId]);
+				$instance->initMeta($plugInstance);
 				$pServ->setPluginActive($split[0], $split[1]);
 			}
 		}
