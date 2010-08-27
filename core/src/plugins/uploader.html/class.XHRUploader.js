@@ -170,7 +170,7 @@ Class.create("XHRUploader", {
 	createOptionsPane : function(){
 		var optionPane = new Element('div', {id:'uploader_options_pane'});
 		optionPane.update('<div id="uploader_options_strings"></div>');
-		optionPane.insert('<div id="uploader_options_checks"><input type="checkbox" style="width:20px;" id="uploader_auto_send"> '+MessageHash[337]+'&nbsp; &nbsp; <input type="checkbox" style="width:20px;" id="uploader_auto_close"> '+MessageHash[338]+'</div>');
+		optionPane.insert('<div id="uploader_options_checks" style="margin-top:4px;"><input type="checkbox" style="width:20px;" id="uploader_auto_send"> '+MessageHash[337]+'&nbsp; &nbsp; <input type="checkbox" style="width:20px;" id="uploader_auto_close"> '+MessageHash[338]+'</div>');
 		optionPane.hide();
 		optionPane.autoSendCheck = optionPane.down('#uploader_auto_send');
 		optionPane.autoCloseCheck = optionPane.down('#uploader_auto_close');
@@ -306,7 +306,6 @@ Class.create("XHRUploader", {
 		this.createProgressBar(item, id);
 		item.file = file;
 		item.status = 'new';
-		//item.pgBar.setPercentage(50);
 		item.statusText.update('[new]');
 		this.updateTotalData();
 	},
@@ -328,21 +327,14 @@ Class.create("XHRUploader", {
 		container.insert(percentText);		
 		container.insert(div);
 		item.insert(container);
-		
+		item.percentText = percentText;
 		var options = {
-			animate		: false,									// Animate the progress? - default: true
-			showText	: false,									// show text with percentage in next to the progressbar? - default : true
-			width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
-			barImage	: ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 4,										// Height of the progressbar - don't forget to adjust your image too!!!
-			onTick		: function(pbObj) { 
-				percentText.update(pbObj.getPercentage() + '%');
-				if(pbObj.getPercentage() == 100){
-					return false;
-				}
-				return true ;
-			}
+			animate		: false,
+			showText	: false,
+			width		: 154,
+			boxImage	: ajxpResourcesFolder+'/images/progress_box.gif',
+			barImage	: ajxpResourcesFolder+'/images/progress_bar.gif',
+			height		: 4
 		};
 		item.pgBar = new JS_BRAMUS.jsProgressBar(div, 0, options);
 		item.statusText = statusText;
@@ -384,7 +376,7 @@ Class.create("XHRUploader", {
 			var percentage = Math.round(100*uploaded/size);
 		}
 		this.totalProgressBar.setPercentage(percentage, true);
-		this.totalStrings.update(MessageHash[258]+' : ' + count + ' '+MessageHash[259]+' : ' +roundSize(size, 'b'));
+		this.totalStrings.update(MessageHash[258]+' ' + count + ' '+MessageHash[259]+' ' +roundSize(size, 'b'));
 		this.uploadedString.update(MessageHash[256]+' : ' + percentage + '%');
 		
 	},
@@ -440,6 +432,7 @@ Class.create("XHRUploader", {
 		upload.addEventListener("progress", function(e){
 			if (e.lengthComputable) {  
 				var percentage = Math.round((e.loaded * 100) / e.total);  
+				item.percentText.innerHTML = percentage + '%';
 	        	item.pgBar.setPercentage(percentage);
 	        	item.bytesLoaded = e.loaded;
 	        	this.updateTotalData();
