@@ -15,6 +15,11 @@
 					<serverCallback methodName="postProcess" capture="true"/>
 				</post_processing>
 			</action>
+			<action name="get_drop_bg">
+				<processing>					
+					<serverCallback methodName="getDropBg"/>
+				</processing>
+			</action>
 		</actions>
 	</registry_contributions>	
 	<processing>	
