@@ -375,6 +375,8 @@ $mess=array(
 "336" => "Attention vous ne pouvez glisser que des fichiers, pas des dossiers!",
 "337" => "Démarrage auto.",
 "338" => "Fermeture auto.",
+"339" => "Fichiers existants",
+"340" => "Alerte",
 /* END SENTENCE */
 );
 ?>

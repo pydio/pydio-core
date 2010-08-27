@@ -916,7 +916,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$i = 1;
 		$ext = "";
 		$name = "";
-		$split = explode("\.", $fileName);
+		$split = explode(".", $fileName);
 		if(count($split) > 1){
 			$ext = ".".$split[count($split)-1];
 			array_pop($split);

@@ -377,6 +377,8 @@ $mess=array(
 "336" => "Sorry you cannot drop folders, drop only files!",
 "337" => "Auto start upload",
 "338" => "Auto close after upload",
+"339" => "Existing Files",
+"340" => "Alert",
 /* END SENTENCE */
 );
 ?>
