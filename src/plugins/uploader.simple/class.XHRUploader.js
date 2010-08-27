@@ -67,11 +67,16 @@ Class.create("XHRUploader", {
 			this.totalProgressBar = this.mainForm.PROGRESSBAR;
 			this.totalStrings = $('totalStrings');
 			this.uploadedString = $('uploadedString');			
+			this.optionPane = this.mainForm.down('#uploader_options_pane');
+			this.optionPane.loadData();
 			this.updateTotalData();
 			if(window.UploaderDroppedFiles){
 				var files = window.UploaderDroppedFiles;
 				for(var i=0;i<files.length;i++){
 					this.addListRow(files[i]);
+				}
+				if(this.optionPane.autoSendCheck.checked){
+					this.submit();
 				}
 				window.UploaderDroppedFiles = null;
 			}
@@ -85,12 +90,15 @@ Class.create("XHRUploader", {
 			ajaxplorer.actionBar.multi_selector.submit();
 		});
 		optionsButton.observe("click", function(){
-			if(window.htmlMultiUploaderOptions){
-				var message = MessageHash[281] + '\n';
-				for(var key in window.htmlMultiUploaderOptions){
-					message += '. '+ MessageHash[key] + ' : ' + window.htmlMultiUploaderOptions[key] + '\n';
-				}
-				alert(message);
+			var optionPane = this.mainForm.down('#uploader_options_pane');
+			var closeSpan = optionsButton.down('span');
+			if(optionPane.visible()) {
+				optionPane.hidePane();
+				closeSpan.hide();
+			}
+			else {
+				optionPane.showPane();
+				closeSpan.show();
 			}
 		}.bind(this));
 		closeButton.observe("click", function(){
@@ -109,6 +117,9 @@ Class.create("XHRUploader", {
 			var files = event.dataTransfer.files;
 			for(var i=0;i<files.length;i++){
 				this.addListRow(files[i]);
+			}
+			if(this.optionPane.autoSendCheck.checked){
+				this.submit();
 			}
 		}.bind(this) , true);
 		
@@ -135,6 +146,9 @@ Class.create("XHRUploader", {
 			ajaxplorer.actionBar.multi_selector.clearList();
 			ajaxplorer.actionBar.multi_selector.updateTotalData();			
 		});
+		this.optionPane = this.createOptionsPane();
+		this.optionPane.loadData();
+		
 		this.totalProgressBar = new JS_BRAMUS.jsProgressBar($('pgBar_total'), 0, options);
 		this.mainForm.PROGRESSBAR = this.totalProgressBar;
 		this.totalStrings = $('totalStrings');
@@ -145,9 +159,77 @@ Class.create("XHRUploader", {
 			for(var i=0;i<files.length;i++){
 				this.addListRow(files[i]);
 			}
+			if(this.optionPane.autoSendCheck.checked){
+				this.submit();
+			}
 			window.UploaderDroppedFiles = null;
 		}
 		
+	},
+	
+	createOptionsPane : function(){
+		var optionPane = new Element('div', {id:'uploader_options_pane'});
+		optionPane.update('<div id="uploader_options_strings"></div>');
+		optionPane.insert('<div id="uploader_options_checks"><input type="checkbox" style="width:20px;" id="uploader_auto_send"> Auto start upload&nbsp; &nbsp; <input type="checkbox" style="width:20px;" id="uploader_auto_close"> Auto close after upload</div>');
+		optionPane.hide();
+		optionPane.autoSendCheck = optionPane.down('#uploader_auto_send');
+		optionPane.autoCloseCheck = optionPane.down('#uploader_auto_close');
+		optionPane.optionsStrings = optionPane.down('#uploader_options_strings');
+		var totalPane = this.mainForm.down('#total_files_list');
+		totalPane.insert({after:optionPane});
+		optionPane.showPane = function(){
+			totalPane.hide();optionPane.show();
+		}
+		optionPane.autoSendCheck.observe("click", function(e){				
+			var autoSendOpt = optionPane.autoSendCheck.checked;
+			if(ajaxplorer.user){
+				ajaxplorer.user.setPreference('upload_auto_send', (autoSendOpt?'true':'false'));
+				ajaxplorer.user.savePreference('upload_auto_send');
+			}else{
+				 parent.setAjxpCookie('upload_auto_send', (autoSendOpt?'true':'false'));
+			}			
+		});
+		optionPane.autoCloseCheck.observe("click", function(e){				
+			var autoCloseOpt = optionPane.autoCloseCheck.checked;
+			if(ajaxplorer.user){
+				ajaxplorer.user.setPreference('upload_auto_close', (autoCloseOpt?'true':'false'));
+				ajaxplorer.user.savePreference('upload_auto_close');
+			}else{
+				 parent.setAjxpCookie('upload_auto_close', (autoCloseOpt?'true':'false'));
+			}			
+		});
+		optionPane.hidePane = function(){
+			totalPane.show();optionPane.hide();
+		}
+		optionPane.loadData = function(){
+			if(window.htmlMultiUploaderOptions){
+				var message = '<b>' + MessageHash[281] + '</b> ';
+				for(var key in window.htmlMultiUploaderOptions){
+					message += '&nbsp;&nbsp;'+ MessageHash[key] + ':' + roundSize(window.htmlMultiUploaderOptions[key], '');
+				}
+				optionPane.optionsStrings.update(message);
+			}	
+			var autoSendValue = false;			
+			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_send')){
+				autoSendValue = ajaxplorer.user.getPreference('upload_auto_send');
+				autoSendValue = (autoSendValue =="true" ? true:false);
+			}else{
+				var value = parent.getAjxpCookie('upload_auto_send');
+				autoSendValue = ((value && value == "true")?true:false);				
+			}
+			optionPane.autoSendCheck.checked = autoSendValue;
+			
+			var autoCloseValue = false;			
+			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_close')){
+				autoCloseValue = ajaxplorer.user.getPreference('upload_auto_close');
+				autoCloseValue = (autoCloseValue =="true" ? true:false);
+			}else{
+				var value = parent.getAjxpCookie('upload_auto_close');
+				autoCloseValue = ((value && value == "true")?true:false);				
+			}
+			optionPane.autoCloseCheck.checked = autoCloseValue;
+		}
+		return optionPane;
 	},
 	
 	/**
@@ -317,6 +399,9 @@ Class.create("XHRUploader", {
 			this.sendFile(item);
 		}else{
 			ajaxplorer.fireContextRefresh();
+			if(this.optionPane.autoCloseCheck.checked){
+				hideLightBox(true);
+			}
 		}
 
 	},
