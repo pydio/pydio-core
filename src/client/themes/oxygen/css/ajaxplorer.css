@@ -74,10 +74,6 @@ textarea{
    vertical-align: top;   
 }
 
-.droparea:-moz-drag-over {
-  border: 1px solid blue;
-}
-
 #sidebar_searchform_td
 {
    vertical-align: bottom;
@@ -1032,6 +1028,10 @@ UPLOAD MULTIFILE FORM
    text-align: left;   
 	-moz-border-radius : 5px;
 	border-radius : 5px;
+}
+
+.droparea {
+	background:url("../../../../content.php?get_action=get_drop_bg") no-repeat scroll right bottom transparent;
 }
 
 #total_files_list
