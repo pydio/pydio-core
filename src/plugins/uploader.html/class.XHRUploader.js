@@ -170,15 +170,27 @@ Class.create("XHRUploader", {
 	createOptionsPane : function(){
 		var optionPane = new Element('div', {id:'uploader_options_pane'});
 		optionPane.update('<div id="uploader_options_strings"></div>');
-		optionPane.insert('<div id="uploader_options_checks" style="margin-top:4px;"><input type="checkbox" style="width:20px;" id="uploader_auto_send"> '+MessageHash[337]+'&nbsp; &nbsp; <input type="checkbox" style="width:20px;" id="uploader_auto_close"> '+MessageHash[338]+'</div>');
+		optionPane.insert('<div id="uploader_options_checks">\
+			<b>'+MessageHash[339]+'</b> <input type="radio" name="uploader_existing" id="uploader_existing_overwrite" value="overwrite"> '+MessageHash[263]+' \
+			<input type="radio" name="uploader_existing" id="uploader_existing_rename" value="rename"> '+MessageHash[6]+' \
+			<input type="radio" name="uploader_existing" id="uploader_existing_alert" value="alert"> '+MessageHash[340]+' <br>\
+			<b>Options</b> <input type="checkbox" style="width:20px;" id="uploader_auto_send"> '+MessageHash[337]+'&nbsp; &nbsp; \
+			<input type="checkbox" style="width:20px;" id="uploader_auto_close"> '+MessageHash[338]+'\
+			</div>');
 		optionPane.hide();
 		optionPane.autoSendCheck = optionPane.down('#uploader_auto_send');
 		optionPane.autoCloseCheck = optionPane.down('#uploader_auto_close');
 		optionPane.optionsStrings = optionPane.down('#uploader_options_strings');
+		optionPane.existingRadio = optionPane.select('input[name="uploader_existing"]');
 		var totalPane = this.mainForm.down('#total_files_list');
 		totalPane.insert({after:optionPane});
 		optionPane.showPane = function(){
 			totalPane.hide();optionPane.show();
+			modal.refreshDialogAppearance();
+		}
+		optionPane.hidePane = function(){
+			totalPane.show();optionPane.hide();
+			modal.refreshDialogAppearance();
 		}
 		optionPane.autoSendCheck.observe("click", function(e){				
 			var autoSendOpt = optionPane.autoSendCheck.checked;
@@ -198,9 +210,24 @@ Class.create("XHRUploader", {
 				 parent.setAjxpCookie('upload_auto_close', (autoCloseOpt?'true':'false'));
 			}			
 		});
-		optionPane.hidePane = function(){
-			totalPane.show();optionPane.hide();
-		}
+		optionPane.existingRadio.each(function(el){
+			el.observe("click", function(e){
+				var value = el.value;
+				if(ajaxplorer.user){
+					ajaxplorer.user.setPreference('upload_existing', value);
+					ajaxplorer.user.savePreference('upload_existing');
+				}else{
+					 parent.setAjxpCookie('upload_existing', value);
+				}							
+			});
+		});
+		optionPane.getExistingBehaviour = function(){
+			var value;
+			optionPane.existingRadio.each(function(el){
+				if(el.checked) value = el.value;
+			});
+			return value;
+		};
 		optionPane.loadData = function(){
 			if(window.htmlMultiUploaderOptions){
 				var message = '<b>' + MessageHash[281] + '</b> ';
@@ -228,6 +255,15 @@ Class.create("XHRUploader", {
 				autoCloseValue = ((value && value == "true")?true:false);				
 			}
 			optionPane.autoCloseCheck.checked = autoCloseValue;
+			
+			var existingValue = 'overwrite';
+			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_existing')){
+				existingValue = ajaxplorer.user.getPreference('upload_existing');
+			}else if(parent.getAjxpCookie('upload_existing')){
+				var value = parent.getAjxpCookie('upload_existing');				
+			}
+			optionPane.down('#uploader_existing_' + existingValue).checked = true;
+			
 		}
 		return optionPane;
 	},
@@ -340,17 +376,6 @@ Class.create("XHRUploader", {
 		item.statusText = statusText;
 	},
 	
-	getFileNames : function(){
-		
-		var fileNames = new Array();
-		for(var i=0; i<this.listTarget.childNodes.length;i++)
-		{
-			fileNames.push(this.listTarget.childNodes[i].element.value);
-		}
-		return fileNames;
-		
-	},	
-	
 	updateTotalData : function(){
 		var count = 0;
 		var size = 0;
@@ -412,23 +437,24 @@ Class.create("XHRUploader", {
     	item.status = 'loading';
     	item.statusText.update('[loading]');
 		
+    	var auto_rename = false;
+		if(this.crtContext.fileNameExists(item.file.fileName))
+		{
+			var behaviour = this.optionPane.getExistingBehaviour();
+			if(behaviour == 'rename'){
+				auto_rename = true;
+			}else if(behaviour == 'alert'){
+				if(!confirm(MessageHash[124])){
+					item.remove();
+					return;
+				}
+			}else{
+				// 'overwrite' : do nothing!
+			}
+		}
+
         var xhr = new XMLHttpRequest;
 		var upload = xhr.upload;
-		/*
-        for(var
-            xhr = new XMLHttpRequest,
-            upload = xhr.upload,
-            i = 0;
-            i < length;
-            i++
-        )
-            upload[split[i]] = (function(event){
-                return  function(rpe){
-                    if(isFunction(handler[event]))
-                        handler[event].call(handler, rpe, xhr);
-                };
-            })(split[i]);
-        */		
 		upload.addEventListener("progress", function(e){
 			if (e.lengthComputable) {  
 				var percentage = Math.round((e.loaded * 100) / e.total);  
@@ -461,7 +487,12 @@ Class.create("XHRUploader", {
         	item.statusText.update('[error]');        	
         };
         
-        xhr.open("post", "content.php?get_action=upload&xhr_uploader=true&dir="+this.crtContext.getContextNode().getPath(), true);
+        var url = "content.php?get_action=upload&xhr_uploader=true&dir="+this.crtContext.getContextNode().getPath();
+        if(auto_rename){
+        	url += '&auto_rename=true';
+        }
+        
+        xhr.open("post", url, true);
         xhr.setRequestHeader("If-Modified-Since", "Mon, 26 Jul 1997 05:00:00 GMT");
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");

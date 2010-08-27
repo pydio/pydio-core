@@ -1048,6 +1048,17 @@ text-align:left;
 width:301px;
 }
 
+div#uploader_options_pane {
+	height: 59px;
+}
+
+div#uploader_options_pane input {
+	width: 15px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-top: 5px;
+}
+
 div#upload_files_list div, div#multiple_download_container div
 {
    overflow: hidden;
