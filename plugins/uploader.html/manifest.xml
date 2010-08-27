@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uploader id="uploader.simple" text="51" title="162" className="MultiUploader">
-	<class_definition filename="plugins/uploader.simple/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
+<uploader id="uploader.html" text="51" title="162" className="MultiUploader">
+	<class_definition filename="plugins/uploader.html/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
 	<resources>
-		<js file="plugins/uploader.simple/class.MultiUploader.js" className="MultiUploader"/>
-		<js file="plugins/uploader.simple/class.XHRUploader.js" className="XHRUploader"/>
+		<js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
+		<js file="plugins/uploader.html/class.XHRUploader.js" className="XHRUploader"/>
 	</resources>
 	<registry_contributions>
 		<actions>
