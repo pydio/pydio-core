@@ -111,6 +111,8 @@ $PLUGINS = array(
 	 	)
 	),
 	// Do not use wildcard for uploader, to keep them in a given order
+	// Warning, do not add the "meta." plugins, they are automatically
+	// detected and activated by the application.
 	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*")
 );
 if(AJXP_Utils::userAgentIsMobile()){
