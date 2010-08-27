@@ -39,8 +39,8 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 	
 	public function getDropBg($action, $httpVars, $fileVars){
 		$lang = ConfService::getLanguage();
-		$img = INSTALL_PATH."/plugins/uploader.simple/i18n/$lang-dropzone.png";
-		if(!is_file($img)) $img = INSTALL_PATH."/plugins/uploader.simple/i18n/en-dropzone.png";
+		$img = INSTALL_PATH."/plugins/uploader.html/i18n/$lang-dropzone.png";
+		if(!is_file($img)) $img = INSTALL_PATH."/plugins/uploader.html/i18n/en-dropzone.png";
 		header("Content-Type: image/png; name=\"dropzone.png\"");
 		header("Content-Length: ".filesize($img));
 		header('Cache-Control: public');
