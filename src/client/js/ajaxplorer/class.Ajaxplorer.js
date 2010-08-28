@@ -431,6 +431,7 @@ Class.create("Ajaxplorer", {
 	},
 	
 	triggerRepositoryChange: function(repositoryId){		
+		document.fire("ajaxplorer:trigger_repository_switch");
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'switch_repository');
 		connexion.addParameter('repository_id', repositoryId);

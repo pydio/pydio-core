@@ -62,17 +62,23 @@
 		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
 			var dropzone = $('content_pane');
 			dropzone.addClassName('droparea');
-			dropzone.addEventListener("dragover", function(event) {
+			var dragOverFunc = function(event) {
   				event.preventDefault();
-			}, true);
-			dropzone.addEventListener("drop", function(event) {
+			};
+			var dropFunc = function(event) {
   				event.preventDefault();
-  				// Ready to do something with the dropped object
   				if(event.dataTransfer.files.length){
 	  				window.UploaderDroppedFiles = event.dataTransfer.files;
 	  				ajaxplorer.actionBar.fireAction('upload');
 	  			}
-			}, true);
+			};
+			dropzone.addEventListener("dragover", dragOverFunc, true);
+			dropzone.addEventListener("drop", dropFunc, true);
+			document.observeOnce("ajaxplorer:trigger_repository_switch", function(){				
+				dropzone.removeClassName('droparea');
+				dropzone.removeEventListener("dragover", dragOverFunc, true);
+				dropzone.removeEventListener("drop", dropFunc, true);
+			});
 		}
 		]]></extensionOnInit>		
 	</processing>
