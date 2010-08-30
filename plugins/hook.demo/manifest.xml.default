@@ -2,7 +2,6 @@
 <hook id="hook.demo">
 	<registry_contributions>
 		<external_file filename="plugins/hook.demo/testActions.xml" include="actions/*"/>
-		<!--
 		<client_configs uuidAttr="name">
 			<template name="bottom" element="ajxp_desktop" position="after"><![CDATA[
 				<div id="optional_bottom_div">Your custom footer content</div>
@@ -11,7 +10,6 @@
 				<div id="optional_header_div" style="border: 1px solid black;">Your custom header content</div>
 			]]></template>
 		</client_configs>
-		-->		
 	</registry_contributions>
 	<dependencies>
 		<activePlugin pluginName="access.fs|access.ftp"/>
