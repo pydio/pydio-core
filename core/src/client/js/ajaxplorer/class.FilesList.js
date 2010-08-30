@@ -913,7 +913,7 @@ Class.create("FilesList", SelectableElements, {
 			newRow.appendChild(tableCell);
 			if(attributeList.get(s).modifier){
 				var modifier = eval(attributeList.get(s).modifier);
-				modifier(tableCell, 'td');
+				modifier(tableCell, ajxpNode, 'row');
 			}
 		}
 		tBody.appendChild(newRow);
@@ -944,6 +944,24 @@ Class.create("FilesList", SelectableElements, {
 		newRow.LABEL_ELEMENT = label;
 		this._htmlElement.insert(newRow);
 			
+		var modifiers ;
+		if(!this.parsingCache.get('modifiers')){
+			modifiers = $A();
+			this.columnsDef.each(function(column){
+				if(column.modifier){
+					try{
+						modifiers.push(eval(column.modifier));
+					}catch(e){}
+				}
+			});
+			this.parsingCache.set('modifiers', modifiers);			
+		}else{
+			modifiers = this.parsingCache.get('modifiers');
+		}
+		modifiers.each(function(el){
+			el(newRow, ajxpNode, 'thumb');
+		});
+
 		if(editors && editors.length)
 		{
 			this._crtImageIndex ++;
