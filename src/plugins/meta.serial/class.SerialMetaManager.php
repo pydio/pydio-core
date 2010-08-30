@@ -43,7 +43,7 @@ class SerialMetaManager extends AJXP_Plugin {
 	protected $accessDriver;
 	
 	public function init($options){
-		$this->options = $options;
+		$this->options = $options;		
 		// Do nothing
 	}
 	
@@ -68,6 +68,9 @@ class SerialMetaManager extends AJXP_Plugin {
 			if($key == "stars_rate"){
 				$col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
 				$col->setAttribute("sortType", "CellSorterValue");
+			}else if($key == "css_label"){
+				$col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
+				$col->setAttribute("sortType", "CellSorterValue");				
 			}
 			$contrib->appendChild($col);
 			
@@ -79,8 +82,8 @@ class SerialMetaManager extends AJXP_Plugin {
 		$selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
 		$contrib = $selection->item(0);
 		$contrib->setAttribute("attributes", implode(",", array_keys($def)));		
-		if(isset($def["stars_rate"])){
-			$contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelStars");
+		if(isset($def["stars_rate"]) || isSet($def["css_label"])){
+			$contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelModifier");
 		}
 		$htmlSel = $this->xPath->query('html', $contrib);
 		$html = $htmlSel->item(0);
