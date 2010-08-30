@@ -34,30 +34,129 @@
  */
 Class.create("MetaCellRenderer", {	
 	initialize: function(){
+		this.cssList = new Hash({
+			'low': {cssClass:'meta_low', label:'Low', sortValue:'5'},
+			'todo' : {cssClass:'meta_todo', label:'Todo', sortValue:'4'},
+			'personal' : {cssClass:'meta_personal', label:'Personal', sortValue:'3'},
+			'work' : {cssClass:'meta_work', label:'Work', sortValue:'2'},
+			'important' : {cssClass:'meta_important', label:'Important', sortValue:'1'}
+		});
+		var head = $$('head')[0];
+		var href = "plugins/meta.serial/css/labelsClasses.css";
+		if(!head.down('link[href="'+href+'"]')){
+			var cssNode = new Element('link', {
+				type : 'text/css',
+				rel  : 'stylesheet',
+				href : href,
+				media : 'screen'
+			});
+			head.insert(cssNode);
+		}
 	},
 	
-	starsRateFilter: function(tableCell){
+	/* LABELS SYSTEM */
+	cssLabelsFilter : function(element, ajxpNode, type){
+		if(type == 'row'){
+			try{
+				var span = element.down('span');
+				var content = span.innerHTML;
+			}catch(e){
+			}
+			if(content){
+				var obj = new MetaCellRenderer();
+				var rule = obj.findCssRule(content.strip());
+				if(rule){
+					element.up().addClassName(rule.cssClass);					
+					span.update(rule.label);
+					element.writeAttribute("sorter_value", rule.sortValue);
+				}
+			}
+		}else if(type =='thumb'){
+			var content = ajxpNode.getMetadata().get('css_label');
+			if(content){
+				var obj = new MetaCellRenderer();
+				var rule = obj.findCssRule(content.strip());
+				if(rule){
+					element.addClassName(rule.cssClass);
+				}
+			}			
+		}
+	},
+	
+	formPanelCssLabels: function(formElement, form){
+		var value = formElement.value;
+		var obj = new MetaCellRenderer();
+		var hidden = new Element('input', {type:'hidden', name:formElement.name, value:formElement.value});
+		form.insert(hidden);
+		var cssList = obj.cssList;
+		var selector = new Element('select', {style:"width:120px;height:20px;"});
+		selector.insert(new Element('option', {
+			name:'',
+			value:'', 
+			selected:(!value)
+		}).update('No label'));
+		cssList.each(function(pair){
+			var option = new Element('option', {
+				name:pair.key,
+				value:pair.key, 
+				selected:(value == pair.key),
+				className:pair.value.cssClass				
+			}).update(pair.value.label);
+			selector.insert(option);
+		});
+		formElement.replace(selector);
+		selector.observe("change", function(){
+			hidden.value = selector.getValue();
+		});
+	},
+	
+	findCssRule : function(value){
+		return this.cssList.get(value);
+	},
+	
+	/* STARS RATE SYSTEM */
+	starsRateFilter: function(element, ajxpNode, type){
+		if(type == 'thumb') return;
 		var value = 0;
 		try{
-			var content = tableCell.select('span')[0].innerHTML;
+			var content = element.select('span')[0].innerHTML;
 		}catch(e){
 		}
 		if(content) value = parseInt(content);
 		var obj = new MetaCellRenderer();
-		tableCell.update(obj.createStars(value));	
-		tableCell.writeAttribute("sorter_value", value);	
+		element.update(obj.createStars(value));	
+		element.writeAttribute("sorter_value", value);	
 	},
 	
-	infoPanelStars : function(htmlElement){
+	infoPanelModifier : function(htmlElement){
 		var td = htmlElement.select('#ip_stars_rate')[0];
 		if(td){
 			var obj = new MetaCellRenderer();
 			var value = parseInt(td.innerHTML);
 			td.update(obj.createStars(value));
 		}
+		td = htmlElement.select('#ip_css_label')[0];
+		if(td){
+			var obj = new MetaCellRenderer();
+			var value = td.innerHTML.strip();
+			var rule = obj.findCssRule(value);
+			if(rule){
+				td.addClassName(rule.cssClass);
+				td.update(rule.label);
+			}
+		}				
+	},
+	
+	formPanelStars: function(formElement, form){
+		var value = formElement.value;
+		var obj = new MetaCellRenderer();
+		var div = obj.createStars(value, form);
+		div.setStyle({paddingTop:3});
+		formElement.replace(div);
+		form.insert(new Element('input', {type:'hidden',name:'stars_rate',value:value}));
 	},
 		
-	createStars : function(value){
+	createStars : function(value, containingForm){
 		var imgOff = 'plugins/meta.serial/rating_off.png';
 		var imgOn = 'plugins/meta.serial/rating.png';
 		var cont = new Element('div');
@@ -79,9 +178,19 @@ Class.create("MetaCellRenderer", {
 					stars_rate : note,
 					file	   : selectedNode.getPath()
 				}));
+				if(containingForm){
+					containingForm.select('input').each(function(el){						
+						if(el.name != 'stars_rate'){
+							conn.addParameter(el.name, el.value);
+						}
+					});
+				}
 				conn.onComplete = function(){
 					ajaxplorer.getContextHolder().setPendingSelection(selectedNode.getPath());
 					ajaxplorer.fireContextRefresh();
+					if(containingForm){
+						hideLightBox(true);
+					}
 				};
 				conn.sendAsync();
 			}, 500);
