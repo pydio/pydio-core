@@ -48,7 +48,14 @@
 							var metaLabels = nodeMeta.get('meta_labels').split(',');
 							for(var i=0;i<metaFields.length;i++){
 								var value = nodeMeta.get(metaFields[i]) || '';
-								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+'</div><input class="SF_input" name="'+metaFields[i]+'" value="'+value+'"/></div>');
+								form.insert('<div class="SF_element"><div class="SF_label">'+metaLabels[i]+' : </div><input class="SF_input" name="'+metaFields[i]+'" value="'+value+'"/></div>');
+								if(metaFields[i] == 'stars_rate'){
+									var element = form.down('input[name="stars_rate"]');
+									MetaCellRenderer.prototype.formPanelStars(element, form);
+								}else if(metaFields[i] == 'css_label'){
+									var element = form.down('input[name="css_label"]');
+									MetaCellRenderer.prototype.formPanelCssLabels(element, form);
+								}
 							}
 						}
 						var closeFunc = function(){
