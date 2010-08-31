@@ -291,6 +291,9 @@ class ConfService
 	}
 	public function createRepositoryFromArrayInst($index, $repository){
 		$repo = new Repository($index, $repository["DISPLAY"], $repository["DRIVER"]);
+		if(isSet($repository["DISPLAY_ID"])){
+				$repo->setDisplayStringId($repository["DISPLAY_ID"]);
+		}
 		if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
 			foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
 				$repo->addOption($oName, $oValue);

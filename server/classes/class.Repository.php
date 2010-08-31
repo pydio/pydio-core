@@ -41,6 +41,7 @@ class Repository {
 	var $id;
 	var $path;
 	var $display;
+	var $displayStringId;
 	var $accessType = "fs";
 	var $recycle = "";
 	var $create = true;
@@ -155,6 +156,12 @@ class Repository {
 	 * @return String
 	 */
 	function getDisplay() {
+		if(isSet($this->displayStringId)){
+			$mess = ConfService::getMessages();
+			if(isSet($mess[$this->displayStringId])){
+				return SystemTextEncoding::fromUTF8($mess[$this->displayStringId]);
+			}
+		}
 		return $this->display;
 	}
 	
@@ -215,6 +222,10 @@ class Repository {
 	
 	function setEnabled($e){
 		$this->enabled = $e;
+	}
+	
+	function setDisplayStringId($id){
+		$this->displayStringId = $id;
 	}
 		
 }

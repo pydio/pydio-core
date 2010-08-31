@@ -152,6 +152,7 @@ $REPOSITORIES[0] = array(
 // ADMIN REPOSITORY
 $REPOSITORIES[1] = array(
 	"DISPLAY"		=>	"Settings", 
+	"DISPLAY_ID"		=>	"165", 
 	"DRIVER"		=>	"ajxp_conf", 
 	"DRIVER_OPTIONS"=> array()	
 );
