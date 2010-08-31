@@ -33,6 +33,7 @@
 			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>
+				<property name="displayMode" value="list"/>
 			</component_config>			
 		</client_configs>
 	</registry_contributions>
