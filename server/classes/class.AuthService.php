@@ -345,7 +345,7 @@ class AuthService
 		$users = $authDriver->listUsers();
 		foreach (array_keys($users) as $userId)
 		{
-			if(($userId == "guest" && !ALLOW_GUEST_BROWSING) || $userId == "ajxp.admin.users") continue;
+			if(($userId == "guest" && !ALLOW_GUEST_BROWSING) || $userId == "ajxp.admin.users" || $userId == "") continue;
 			$allUsers[$userId] = $confDriver->createUserObject($userId);
 		}
 		return $allUsers;

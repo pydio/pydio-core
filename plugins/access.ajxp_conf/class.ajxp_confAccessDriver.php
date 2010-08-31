@@ -305,6 +305,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if($res == -1){
 					AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
 				}else{
+					$confStorage = ConfService::getConfStorageImpl();		
+					$loggedUser = AuthService::getLoggedUser();
+					$loggedUser->setRight($newRep->getUniqueId(), "rw");
+					$loggedUser->save();
+					AuthService::updateUser($loggedUser);
+					
 					AJXP_XMLWriter::sendMessage("Successfully created repository", null);
 					AJXP_XMLWriter::reloadFileList($newRep->getDisplay());
 					AJXP_XMLWriter::reloadRepositoryList();
