@@ -159,7 +159,17 @@ Class.create("MetaCellRenderer", {
 	createStars : function(value, containingForm){
 		var imgOff = 'plugins/meta.serial/rating_off.png';
 		var imgOn = 'plugins/meta.serial/rating.png';
+		var imgRemove = 'plugins/meta.serial/rating_remove.png';
 		var cont = new Element('div');
+		if(containingForm){
+			var img = new Element('img',{
+				src:imgRemove,
+				style:'float:left;cursor:pointer;margin-right:2px;padding-right:3px;border-right:1px solid #ccc;',
+				note:0,
+				title:'Remove rating'
+			});
+			cont.insert(img);			
+		}
 		for(var i=1;i<6;i++){
 			var img = new Element('img',{
 				src:(value>=i?imgOn:imgOff),
