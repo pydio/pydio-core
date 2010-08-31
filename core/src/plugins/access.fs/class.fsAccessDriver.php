@@ -145,6 +145,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		
 			case "compress" : 					
 					// Make a temp zip and send it as download					
+					$loggedUser = AuthService::getLoggedUser();
 					if(isSet($httpVars["archive_name"])){
 						$localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
 					}else{
@@ -1276,6 +1277,9 @@ class fsAccessDriver extends AbstractAccessDriver
     	AJXP_Logger::debug("Basedir", array($basedir));
     	$archive = new PclZip($dest);
     	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION);
+    	if(!$vList){
+    		throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
+    	}
     	return $vList;
     }
     
