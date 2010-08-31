@@ -50,9 +50,10 @@ class SerialMetaManager extends AJXP_Plugin {
 	public function initMeta($accessDriver){
 		$this->accessDriver = $accessDriver;		
 		
+		$messages = ConfService::getMessages();
 		$def = $this->getMetaDefinition();
 		$cdataHead = '<div>
-						<div class="panelHeader infoPanelGroup" colspan="2">Meta Data</div>
+						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.serial.1"].'</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
 		$cdataFoot = '</table></div>';
 		$cdataParts = "";
@@ -60,6 +61,7 @@ class SerialMetaManager extends AJXP_Plugin {
 		$selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
 		$contrib = $selection->item(0);		
 		$even = false;
+		$searchables = array();
 		foreach ($def as $key=>$label){
 			$col = $this->manifestDoc->createElement("additional_column");			
 			$col->setAttribute("messageString", $label);
@@ -71,6 +73,8 @@ class SerialMetaManager extends AJXP_Plugin {
 			}else if($key == "css_label"){
 				$col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
 				$col->setAttribute("sortType", "CellSorterValue");				
+			}else{
+				$searchables[$key] = $label;
 			}
 			$contrib->appendChild($col);
 			
@@ -92,7 +96,7 @@ class SerialMetaManager extends AJXP_Plugin {
 		
 		$selection = $this->xPath->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
 		$tag = $selection->item(0);
-		$tag->setAttribute("ajxpOptions", json_encode(array("metaColumns"=>$def)));
+		$tag->setAttribute("ajxpOptions", json_encode(array("metaColumns"=>$searchables)));
 		
 		parent::init($this->options);
 	

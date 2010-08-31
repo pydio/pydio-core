@@ -49,6 +49,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$action = $httpVars["sub_action"];
 			}
 		}
+		$mess = ConfService::getMessages();
 		
 		switch($action)
 		{			
@@ -57,10 +58,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 				$rootNodes = array(
-					"users" => array("LABEL" => "Users", "ICON" => "yast_kuser.png"),
-					"repositories" => array("LABEL" => "Repositories", "ICON" => "folder_red.png"),
-					"logs" => array("LABEL" => "Logs", "ICON" => "toggle_log.png"),
-					"diagnostic" => array("LABEL" => "Diagnostic", "ICON" => "susehelpcenter.png")
+					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
+					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
+					"logs" => array("LABEL" => $mess["ajxp_conf.4"], "ICON" => "toggle_log.png"),
+					"diagnostic" => array("LABEL" => $mess["ajxp_conf.5"], "ICON" => "susehelpcenter.png")
 				);
 				$dir = (isset($httpVars["dir"])?$httpVars["dir"]:"");
 				$splits = explode("/", $dir);
@@ -84,7 +85,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					exit(1);
 				}else{
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="Configuration Data" attributeName="ajxp_label" sortType="String"/></columns>');
+					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/></columns>');
 					foreach ($rootNodes as $key => $data){
 						$src = '';
 						if($key == "logs"){
@@ -138,10 +139,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			break;
 			
 			case "create_user" :
+				
 				if(!isset($_GET["new_user_login"]) || $_GET["new_user_login"] == "" ||!isset($_GET["new_user_pwd"]) || $_GET["new_user_pwd"] == "")
 				{
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, "Wrong Arguments!");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					AJXP_XMLWriter::close();
 					exit(1);						
 				}
@@ -149,7 +151,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(AuthService::userExists($_GET["new_user_login"]) || in_array($_GET["new_user_login"], $forbidden))
 				{
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, "User already exists, please choose another login!");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
 					AJXP_XMLWriter::close();
 					exit(1);									
 				}
@@ -161,7 +163,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$newUser->save();
 				AuthService::createUser($_GET["new_user_login"], $_GET["new_user_pwd"]);
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("User created successfully", null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
 				AJXP_XMLWriter::reloadFileList($_GET["new_user_login"]);
 				AJXP_XMLWriter::close();
 				exit(1);										
@@ -174,7 +176,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$user->setAdmin(($_GET["right_value"]=="1"?true:false));
 				$user->save();
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("Changed admin right for user ".$_GET["user_id"], null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.45"].$_GET["user_id"], null);
 				AJXP_XMLWriter::reloadFileList(false);
 				AJXP_XMLWriter::close();
 				exit(1);
@@ -187,7 +189,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					|| !AuthService::userExists($_GET["user_id"]))
 				{
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, "Wrong arguments");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					print("<update_checkboxes user_id=\"".$_GET["user_id"]."\" repository_id=\"".$_GET["repository_id"]."\" read=\"old\" write=\"old\"/>");
 					AJXP_XMLWriter::close();
 					exit(1);
@@ -201,7 +203,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AuthService::updateUser($user);
 				}
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("Changed right for user ".$_GET["user_id"], null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.46"].$_GET["user_id"], null);
 				print("<update_checkboxes user_id=\"".$_GET["user_id"]."\" repository_id=\"".$_GET["repository_id"]."\" read=\"".$user->canRead($_GET["repository_id"])."\" write=\"".$user->canWrite($_GET["repository_id"])."\"/>");
 				AJXP_XMLWriter::reloadRepositoryList();
 				AJXP_XMLWriter::close();
@@ -232,7 +234,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AuthService::updateUser($user);
 				}
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("Saved data for user ".$_GET["user_id"], null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.47"].$_GET["user_id"], null);
 				AJXP_XMLWriter::close();
 				exit(1);	
 			break;
@@ -241,7 +243,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(!isSet($_GET["user_id"]) || !isSet($_GET["user_pwd"]) || !AuthService::userExists($_GET["user_id"]) || trim($_GET["user_pwd"]) == "")
 				{
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, "Wrong Arguments!");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					AJXP_XMLWriter::close();
 					exit(1);			
 				}
@@ -249,11 +251,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header();
 				if($res === true)
 				{
-					AJXP_XMLWriter::sendMessage("Password changed successfully for user ".$_GET["user_id"], null);
+					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.48"].$_GET["user_id"], null);
 				}
 				else 
 				{
-					AJXP_XMLWriter::sendMessage(null, "Cannot update password : $res");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.49"]." : $res");
 				}
 				AJXP_XMLWriter::close();
 				exit(1);						
@@ -296,14 +298,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if ($this->repositoryExists($newRep->getDisplay()))
                 {
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, "Error: a repository with the same name already exists");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
 					AJXP_XMLWriter::close();
 					exit(1);
                 }
 				$res = ConfService::addRepository($newRep);
 				AJXP_XMLWriter::header();
 				if($res == -1){
-					AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
 				}else{
 					$confStorage = ConfService::getConfStorageImpl();		
 					$loggedUser = AuthService::getLoggedUser();
@@ -311,7 +313,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$loggedUser->save();
 					AuthService::updateUser($loggedUser);
 					
-					AJXP_XMLWriter::sendMessage("Successfully created repository", null);
+					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.52"], null);
 					AJXP_XMLWriter::reloadFileList($newRep->getDisplay());
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
@@ -388,7 +390,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if ($this->repositoryExists($newLabel))
                     {
 		     			AJXP_XMLWriter::header();
-			    		AJXP_XMLWriter::sendMessage(null, "Error: a repository with the same name already exists");
+			    		AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
 				    	AJXP_XMLWriter::close();
 					    exit(1);
                     }
@@ -418,9 +420,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				AJXP_XMLWriter::header();
 				if($res == -1){
-					AJXP_XMLWriter::sendMessage(null, "Error while trying to edit repository");
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.53"]);
 				}else{
-					AJXP_XMLWriter::sendMessage("Successfully edited repository", null);					
+					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.54"], null);					
 					AJXP_XMLWriter::reloadDataNode("", (isSet($_GET["newLabel"])?SystemTextEncoding::fromPostedFileName($_GET["newLabel"]):false));
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
@@ -435,7 +437,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$this->parseParameters($httpVars, $options);
 				$repoOptions = $repo->getOption("META_SOURCES");
 				if(is_array($repoOptions) && isSet($repoOptions[$metaSourceType])){
-					throw new Exception("Warning, at the moment, you can only add one instance of each meta plugin.");
+					throw new Exception($mess["ajxp_conf.55"]);
 				}
 				if(!is_array($repoOptions)){
 					$repoOptions = array();
@@ -444,7 +446,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repo->addOption("META_SOURCES", $repoOptions);
 				ConfService::replaceRepository($repId, $repo);
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("Success",null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.56"],null);
 				AJXP_XMLWriter::close();
 			break;
 						
@@ -460,7 +462,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					ConfService::replaceRepository($repId, $repo);
 				}
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("Success",null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.57"],null);
 				AJXP_XMLWriter::close();
 
 			break;
@@ -479,7 +481,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repo->addOption("META_SOURCES", $repoOptions);
 				ConfService::replaceRepository($repId, $repo);
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage("Success",null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.58"],null);
 				AJXP_XMLWriter::close();
 			break;
 									
@@ -491,9 +493,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$res = ConfService::deleteRepository($repId);
 					AJXP_XMLWriter::header();
 					if($res == -1){
-						AJXP_XMLWriter::sendMessage(null, "The conf directory is not writeable");
+						AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
 					}else{
-						AJXP_XMLWriter::sendMessage("Successfully deleted repository", null);						
+						AJXP_XMLWriter::sendMessage($mess["ajxp_conf.59"], null);						
 						AJXP_XMLWriter::reloadDataNode();
 						AJXP_XMLWriter::reloadRepositoryList();
 					}
@@ -506,13 +508,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						|| $loggedUser->getId() == $httpVars["user_id"])
 					{
 						AJXP_XMLWriter::header();
-						AJXP_XMLWriter::sendMessage(null, "Wrong Arguments!");
+						AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 						AJXP_XMLWriter::close();
 						exit(1);									
 					}
 					$res = AuthService::deleteUser($httpVars["user_id"]);
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage("User successfully erased", null);
+					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.60"], null);
 					AJXP_XMLWriter::reloadDataNode();
 					AJXP_XMLWriter::close();
 					exit(1);
@@ -530,14 +532,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	
 	function listUsers(){
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="User Name" attributeName="ajxp_label" sortType="String"/><column messageString="Is Admin" attributeName="isAdmin" sortType="String"/></columns>');		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String"/></columns>');		
 		if(!ENABLE_USERS) return ;
 		$users = AuthService::listUsers();
+		$mess = ConfService::getMessages();
 		$loggedUser = AuthService::getLoggedUser();		
         $userArray = array();
 		foreach ($users as $userObject){
             $userArray[AJXP_Utils::xmlEntities($userObject->getId())] = $userObject;
-        }
+        }        
         ksort($userArray);
         foreach($userArray as $userObject) {
 			$isAdmin = $userObject->isAdmin();
@@ -545,7 +548,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			$icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
 			print '<tree 
 				text="'.$userId.'"
-				isAdmin="'.($isAdmin?"True":"False").'" 
+				isAdmin="'.$mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")].'" 
 				icon="'.$icon.'.png" 
 				openicon="'.$icon.'.png" 
 				filename="/users/'.$userId.'" 
@@ -567,7 +570,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
 	function listRepositories(){
 		$repos = ConfService::getRepositoriesList();
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="Repository Label" attributeName="ajxp_label" sortType="String"/><column messageString="Access Type" attributeName="accessType" sortType="String"/></columns>');		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/></columns>');		
         $repoArray = array();
 		foreach ($repos as $repoIndex => $repoObject){
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
@@ -595,18 +598,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$parts = explode("/", $dir);
 		if(count($parts)>4){
 			$config = '<columns switchDisplayMode="list" switchGridMode="grid">
-				<column messageString="Date" attributeName="date" sortType="Date" width="10%"/>
-				<column messageString="I.P." attributeName="ip" sortType="String"/>
-				<column messageString="Level" attributeName="level" sortType="String"/>
-				<column messageString="User" attributeName="user" sortType="String"/>
-				<column messageString="Action" attributeName="action" sortType="String"/>
-				<column messageString="Params" attributeName="params" sortType="String"/>
+				<column messageId="ajxp_conf.17" attributeName="date" sortType="Date" width="10%"/>
+				<column messageId="ajxp_conf.18" attributeName="ip" sortType="String"/>
+				<column messageId="ajxp_conf.19" attributeName="level" sortType="String"/>
+				<column messageId="ajxp_conf.20" attributeName="user" sortType="String"/>
+				<column messageId="ajxp_conf.21" attributeName="action" sortType="String"/>
+				<column messageId="ajxp_conf.22" attributeName="params" sortType="String"/>
 			</columns>';				
 			AJXP_XMLWriter::sendFilesListComponentConfig($config);
 			$date = $parts[count($parts)-1];
 			$logger->xmlLogs($dir, $date, "tree");
 		}else{
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageString="File Date" attributeName="ajxp_label" sortType="String"/></columns>');
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.16" attributeName="ajxp_label" sortType="String"/></columns>');
 			$logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null));
 		}
 	}
@@ -616,7 +619,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$testedParams = array();
 		$passed = AJXP_Utils::runTests($outputArray, $testedParams);
 		AJXP_Utils::testResultsToFile($outputArray, $testedParams);		
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList"><column messageString="Test Name" attributeName="ajxp_label" sortType="String"/><column messageString="Test Data" attributeName="data" sortType="String"/></columns>');		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList"><column messageId="ajxp_conf.23" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.24" attributeName="data" sortType="String"/></columns>');		
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			
 			foreach ($diagResults as $id => $value){

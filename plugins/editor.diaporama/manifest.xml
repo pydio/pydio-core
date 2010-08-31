@@ -66,7 +66,7 @@
 		<client_configs>
 			<component_config className="FilesList">
 				<columns>
-					<additional_column messageString="Image Dimension" attributeName="readable_dimension" sortType="String"/>
+					<additional_column messageId="135" attributeName="readable_dimension" sortType="String"/>
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">			
@@ -74,10 +74,11 @@
 					<messages>
 						<message key="type_string" id="134"/>				
 						<message key="dim_string" id="135"/>
+						<message key="header_string" id="343"/>
 					</messages>
 					<html><![CDATA[
 						<div style="">
-							<div class="panelHeader infoPanelGroup" colspan="2">Image Info</div>
+							<div class="panelHeader infoPanelGroup" colspan="2">#{header_string}</div>
 							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
 								<tr>
 									<td class="infoPanelLabel">#{dim_string}</td>

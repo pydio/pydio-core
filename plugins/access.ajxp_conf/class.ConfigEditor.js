@@ -86,9 +86,9 @@ ConfigEditor = Class.create({
 			writeBox.observe('click', this.changeUserRight.bind(this));
 			
 			var rightsCell = new Element('td', {width:'55%', align:'right'});
-			rightsCell.insert("Read ");
+			rightsCell.insert(MessageHash['ajxp_conf.29'] + ' ');
 			rightsCell.insert(readBox);
-			rightsCell.insert("Write ");
+			rightsCell.insert(MessageHash['ajxp_conf.30'] + ' ');
 			rightsCell.insert(writeBox);
 			var tr = new Element('tr');
 			var titleCell = new Element('td', {width:'45%'}).update(repoLabel);
@@ -182,7 +182,7 @@ ConfigEditor = Class.create({
 		parameters.set('user_id', userId);
 		parameters.set('repository_id', repositoryId);
 		if(this.submitParametersInputs($('repo_user_params_'+userId+'_'+repositoryId), parameters, "DRIVER_OPTION_")){
-			this.displayMessage("ERROR", "Mandatory fields are missing!");
+			this.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
 			return false;
 		}
 		this.submitForm("edit_user", 'save_repository_user_params', parameters, null);
@@ -251,7 +251,7 @@ ConfigEditor = Class.create({
 		var newPassConf = $('new_pass_confirm');
 		if(newPass.value == '') return;
 		if(newPass.value != newPassConf.value){
-			 this.displayMessage('ERROR', 'Warning, password and confirmation differ!');
+			 this.displayMessage('ERROR', MessageHash['ajxp_conf.37']);
 			 return;
 		}
 		// First get a seed to check whether the pass should be encoded or not.
@@ -268,15 +268,15 @@ ConfigEditor = Class.create({
 		var pass = this.form.select('[name="new_user_pwd"]')[0];
 		var passConf = this.form.select('[name="new_user_pwd_conf"]')[0];
 		if(login.value == ''){
-			ajaxplorer.displayMessage("ERROR", "Please fill the login field!");
+			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.38']);
 			return;
 		}
 		if(pass.value == '' || passConf.value == ''){
-			ajaxplorer.displayMessage("ERROR", "Please fill both password fields!");
+			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.39']);
 			return;
 		}
 		if(pass.value != passConf.value){
-			ajaxplorer.displayMessage("ERROR", "Password and confirmation differ!");
+			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.37']);
 			return;
 		}
 		parameters = new Hash();
@@ -288,7 +288,7 @@ ConfigEditor = Class.create({
 	deleteUser: function(){
 		var chck = this.form.select('[id="delete_confirm"]')[0];
 		if(!chck.checked){
-			this.displayMessage("ERROR", "Please check the box to confirm!");
+			this.displayMessage("ERROR", MessageHash['ajxp_conf.40']);
 			return;
 		}
 		parameters = new Hash();
@@ -303,15 +303,15 @@ ConfigEditor = Class.create({
 		var pass = $('new_user_pwd');
 		var passConf = $('new_user_pwd_conf');
 		if(login.value == ''){
-			this.displayMessage("ERROR", "Please fill the login field!");
+			this.displayMessage("ERROR", MessageHash['ajxp_conf.38']);
 			return;
 		}
 		if(pass.value == '' || passConf.value == ''){
-			this.displayMessage("ERROR", "Please fill both password fields!");
+			this.displayMessage("ERROR", MessageHash['ajxp_conf.39']);
 			return;
 		}
 		if(pass.value != passConf.value){
-			this.displayMessage("ERROR", "Password and confirmation differ!");
+			this.displayMessage("ERROR", MessageHash['ajxp_conf.37']);
 			return;
 		}
 		
@@ -419,7 +419,7 @@ ConfigEditor = Class.create({
 		toSubmit.set('DRIVER', this.driverSelector.options[this.driverSelector.selectedIndex].value);
 		
 		if(missingMandatory || this.submitParametersInputs(this.driverForm, toSubmit, 'DRIVER_OPTION_')){
-			this.displayMessage("ERROR", "Mandatory fields are missing!");
+			this.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
 			return false;
 		}		
 		this.submitForm('edit_repository', 'create_repository', toSubmit, null, function(){
@@ -458,8 +458,8 @@ ConfigEditor = Class.create({
 		var form = new Element('div', {className:'driver_form'});
 		var metaForm = new Element('div', {className:'driver_form', style:'display:none;'});
 		
-		var optLegend = new Element('a', {className:"active"}).update(XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' Driver Options');
-		var metaLegend = new Element('a').update('Meta Sources');
+		var optLegend = new Element('a', {className:"active"}).update(XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' '+ MessageHash['ajxp_conf.41']);
+		var metaLegend = new Element('a').update(MessageHash['ajxp_conf.10']);
 		var legend = new Element('legend');
 		legend.insert(optLegend);
 		legend.insert(" | ");
@@ -520,8 +520,8 @@ ConfigEditor = Class.create({
 				metaPane.insert(form);
 			}
 		}
-		var addForm = new Element("div", {className:"metaPane"}).update("<div style='clear:both;'><img name=\"add_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">Add a source</span></div>");
-		var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>Meta Plugin :</div>");
+		var addForm = new Element("div", {className:"metaPane"}).update("<div style='clear:both;'><img name=\"add_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">"+MessageHash['ajxp_conf.11']+"</span></div>");
+		var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>"+MessageHash['ajxp_conf.12']+" :</div>");
 		this.metaSelector = new Element("select", {name:'new_meta_source', className:'SF_input'});
 		var choices = XPathSelectNodes(xmlData, 'admin_data/metasources/meta');
 		this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
@@ -575,7 +575,7 @@ ConfigEditor = Class.create({
 		params.set('repository_id', this.currentRepoId);
 		this.submitParametersInputs(form, params, "DRIVER_OPTION_");
 		if(params.get('get_action') == 'add_meta_source' && params.get('DRIVER_OPTION_new_meta_source') == ''){
-			alert('Please choose a driver!');
+			alert(MessageHash['ajxp_conf.42']);
 			return;
 		}
 		if(params.get('DRIVER_OPTION_new_meta_source')){
@@ -583,7 +583,7 @@ ConfigEditor = Class.create({
 			params.unset('DRIVER_OPTION_new_meta_source');
 		}
 		if(params.get('get_action') == 'delete_meta_source'){
-			var res = confirm('Are you sure you want to delete this source?');
+			var res = confirm(MessageHash['ajxp_conf.13']);
 			if(!res) return;
 		}
 		
@@ -620,9 +620,15 @@ ConfigEditor = Class.create({
 	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled){
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
+			if(param.get('labelId')){
+				label = MessageHash[param.get('labelId')];
+			}
 			var name = param.get('name');
 			var type = param.get('type');
 			var desc = param.get('description');
+			if(param.get('descriptionId')){
+				desc = MessageHash[param.get('descriptionId')];
+			}
 			var mandatory = false;
 			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
 			var defaultValue = (values?'':(param.get('default') || ""));

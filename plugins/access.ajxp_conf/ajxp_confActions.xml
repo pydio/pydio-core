@@ -196,17 +196,17 @@
 				<clientForm id="edit_config_box"><![CDATA[
 					<div id="edit_config_box" action="edit_user" box_width="350">
 						<fieldset id="rights_pane">
-							<legend>Repositories Access</legend>
+							<legend ajxp_message_id="ajxp_conf.25">AJXP_MESSAGE[ajxp_conf.25]</legend>
 							<div style="max-height:140px;overflow:auto;_height:140px;">
 							<table class="repository" width="100%" cellspacing="0">
 								<tbody>
-								<tr id="loading_row"><td>Loading...</td></tr>
+								<tr id="loading_row"><td><span ajxp_message_id="ajxp_conf.33">AJXP_MESSAGE[ajxp_conf.33]</span></td></tr>
 								</tbody>
 							</table>
 							</div>
 						</fieldset>
 						<fieldset id="password_pane" style="float:left;margin-right:6px;width:198px;height:70px;">
-							<legend>Modify password</legend>
+							<legend ajxp_message_id="ajxp_conf.26">AJXP_MESSAGE[ajxp_conf.26]</legend>
 							<input style="float:right;margin-top:18px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png"/>
 							<div style="width:168px;">
 								<div class="SF_element">
@@ -217,13 +217,13 @@
 								</div>
 							</div>
 						</fieldset>
-						<fieldset id="admin_right_pane" style="height:70px;"><legend>Admin Right</legend>
-						User has admin rights? <input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;" />
+						<fieldset id="admin_right_pane" style="height:70px;"><legend ajxp_message_id="ajxp_conf.27">AJXP_MESSAGE[ajxp_conf.27]</legend>
+						<span ajxp_message_id="ajpx_conf.28">AJXP_MESSAGE[ajxp_conf.28]</span> <input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;" />
 						</fieldset>
 					</div>
 					<div id="edit_repo_box" action="edit_repository" box_width="320">
 						<fieldset id="options_pane">
-							Loading...
+							<span ajxp_message_id="ajxp_conf.33">AJXP_MESSAGE[ajxp_conf.33]</span>
 						</fieldset>
 					</div>													
 				]]></clientForm>
@@ -260,11 +260,11 @@
 					var meta = node.getMetadata();
 					var deleteMessage, fieldName, fieldValue;
 					if(meta.get("ajxp_mime") == "user_editable"){
-						deleteMessage = "Are you sure you want to delete this user? This operation is not reversible!";
+						deleteMessage = MessageHash['ajxp_conf.34'];
 						fieldName = "user_id";
 						fieldValue = meta.get("text");
 					}else{
-						deleteMessage = "Are you sure you want to delete this repository? This operation is not reversible!";
+						deleteMessage = MessageHash['ajxp_conf.35'];
 						fieldName = "repository_id";
 						fieldValue = meta.get("repository_id");
 					}

@@ -2,6 +2,7 @@
 <ajxpdriver name="ajxp_conf" label="Admin Driver" description="Access AjaXplorer configuration data.">
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
 		<resources>
+			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/i18n" />		
 			<js file="plugins/access.ajxp_conf/class.ConfigEditor.js" className="ConfigEditor"/>			
 		</resources>
 	</client_settings>
