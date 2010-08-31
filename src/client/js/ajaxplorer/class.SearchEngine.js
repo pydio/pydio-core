@@ -63,7 +63,7 @@ Class.create("SearchEngine", AjxpPane, {
 		this.metaOptions = [];
 		if(this._ajxpOptions && this._ajxpOptions.metaColumns){
 			var cols = this._ajxpOptions.metaColumns;
-			$('search_form').insert({bottom:'<div id="search_meta">Search on : <span id="search_meta_options"></span></div>'});			
+			$('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});			
 			this.initMetaOption($('search_meta_options'), 'filename', 'Filename', true);
 			for(var key in cols){
 				this.initMetaOption($('search_meta_options'), key, cols[key]);

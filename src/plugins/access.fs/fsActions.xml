@@ -698,13 +698,14 @@
 					<message key="size_string" id="127"/>
 					<message key="type_string" id="134"/>
 					<message key="modif_string" id="138"/>
+					<message key="header_string" id="341"/>
 				</messages>
 				<html><![CDATA[
 				<div>
 					<div class="infoPanelImagePreview">
 						#{preview_rich}
 					</div>
-					<div class="panelHeader infoPanelGroup">File Info</div>
+					<div class="panelHeader infoPanelGroup">#{header_string}</div>
 					<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
 						<tr>
 							<td class="infoPanelLabel">#{name_string}</td>
@@ -730,13 +731,14 @@
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="modif_string" id="138"/>
+					<message key="header_string" id="342"/>
 				</messages>
 				<html><![CDATA[
 					<div>
 						<div class="folderImage infoPanelImagePreview">
 							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
 						</div>
-						<div class="panelHeader infoPanelGroup">Folder Info</div>
+						<div class="panelHeader infoPanelGroup">#{header_string}</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
 							<tr>
 								<td class="infoPanelLabel">#{name_string}</td>

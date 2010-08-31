@@ -35,11 +35,11 @@
 Class.create("MetaCellRenderer", {	
 	initialize: function(){
 		this.cssList = new Hash({
-			'low': {cssClass:'meta_low', label:'Low', sortValue:'5'},
-			'todo' : {cssClass:'meta_todo', label:'Todo', sortValue:'4'},
-			'personal' : {cssClass:'meta_personal', label:'Personal', sortValue:'3'},
-			'work' : {cssClass:'meta_work', label:'Work', sortValue:'2'},
-			'important' : {cssClass:'meta_important', label:'Important', sortValue:'1'}
+			'low': {cssClass:'meta_low', label:MessageHash['meta.serial.4'], sortValue:'5'},
+			'todo' : {cssClass:'meta_todo', label:MessageHash['meta.serial.5'], sortValue:'4'},
+			'personal' : {cssClass:'meta_personal', label:MessageHash['meta.serial.6'], sortValue:'3'},
+			'work' : {cssClass:'meta_work', label:MessageHash['meta.serial.7'], sortValue:'2'},
+			'important' : {cssClass:'meta_important', label:MessageHash['meta.serial.8'], sortValue:'1'}
 		});
 		var head = $$('head')[0];
 		var href = "plugins/meta.serial/css/labelsClasses.css";
@@ -94,7 +94,7 @@ Class.create("MetaCellRenderer", {
 			name:'',
 			value:'', 
 			selected:(!value)
-		}).update('No label'));
+		}).update(MessageHash['meta.serial.2']));
 		cssList.each(function(pair){
 			var option = new Element('option', {
 				name:pair.key,
@@ -166,7 +166,7 @@ Class.create("MetaCellRenderer", {
 				src:imgRemove,
 				style:'float:left;cursor:pointer;margin-right:2px;padding-right:3px;border-right:1px solid #ccc;',
 				note:0,
-				title:'Remove rating'
+				title:MessageHash['meta.serial.3']
 			});
 			cont.insert(img);			
 		}
@@ -174,7 +174,8 @@ Class.create("MetaCellRenderer", {
 			var img = new Element('img',{
 				src:(value>=i?imgOn:imgOff),
 				style:'float:left;cursor:pointer;margin-right:2px;',
-				note:i
+				note:i,
+				title:i
 			});
 			cont.insert(img);
 		}
