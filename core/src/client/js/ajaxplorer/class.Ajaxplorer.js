@@ -451,8 +451,10 @@ Class.create("Ajaxplorer", {
 	initExtension : function(xmlNode, extensionDefinition){
 		var activeCondition = XPathSelectSingleNode(xmlNode, 'processing/activeCondition');
 		if(activeCondition && activeCondition.firstChild){
+			try{
 			var active = eval(activeCondition.firstChild.nodeValue.strip());
 			if(!active) return false;
+			}catch(e){}
 		}
 		if(xmlNode.nodeName == 'editor'){
 			Object.extend(extensionDefinition, {
@@ -476,7 +478,7 @@ Class.create("Ajaxplorer", {
 			}
 			var extensionOnInit = XPathSelectSingleNode(xmlNode, 'processing/extensionOnInit');
 			if(extensionOnInit && extensionOnInit.firstChild){
-				eval(extensionOnInit.firstChild.nodeValue);
+				try{eval(extensionOnInit.firstChild.nodeValue);}catch(e){}
 			}
 			var dialogOnOpen = XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
 			if(dialogOnOpen && dialogOnOpen.firstChild){
@@ -514,21 +516,6 @@ Class.create("Ajaxplorer", {
 	getActiveExtensionByType : function(extensionType){
 		var exts = $A();
 		return this._extensionsRegistry[extensionType];
-		/*
-		// ALREADY FILTERED AT INITIALISATION
-		this._extensionsRegistry[extensionType].each(function(el){
-			var activeNode = XPathSelectSingleNode(el.xmlNode, 'processing/activeCondition');
-			if(activeNode && activeNode.firstChild && activeNode.firstChild.nodeValue){
-				var result = eval(activeNode.firstChild.nodeValue.strip());
-				if(result){
-					exts.push(el);
-				}
-			}else{
-				exts.push(el);
-			}
-		}.bind(this));
-		return exts;
-		*/
 	},
 	
 	findEditorById : function(editorId){
