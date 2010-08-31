@@ -221,6 +221,12 @@ Class.create("FilesList", SelectableElements, {
 				if(property.getAttribute("name") == "thumbSize"){
 					this._thumbSize = parseInt(property.getAttribute("value"));
 					refreshGUI = true;
+				}else if(property.getAttribute("name") == "displayMode"){
+					var displayMode = property.getAttribute("value");
+					if(!(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("display"))){
+						this._displayMode = displayMode;
+						refreshGUI = true;
+					}
 				}
 			}
 		}
