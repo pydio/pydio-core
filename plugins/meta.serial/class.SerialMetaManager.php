@@ -116,6 +116,14 @@ class SerialMetaManager extends AJXP_Plugin {
 	
 	public function editMeta($actionName, $httpVars, $fileVars){
 		if(!isSet($this->actions[$actionName])) return;
+		if(is_a($this->accessDriver, "demoAccessDriver")){
+			throw new Exception("Write actions are disabled in demo mode!");
+		}
+		$repo = $this->accessDriver->repository;
+		$user = AuthService::getLoggedUser();
+		if(!$user->canWrite($repo->getId())){
+			throw new Exception("You have no right on this action.");
+		}
 		$selection = new UserSelection();
 		$selection->initFromHttpVars();
 		$currentFile = $selection->getUniqueFile();
