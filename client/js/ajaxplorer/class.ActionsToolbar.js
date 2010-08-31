@@ -280,8 +280,10 @@ Class.create("ActionsToolbar", {
 				button.arrowDiv.show();
 			}
 			var scroll = this.outer.scrollLeft || 0;
-			var imgPos = Position.cumulativeOffset(button.arrowDiv.imgRef)[0] + 11 - scroll;
-			button.arrowDiv.setStyle({position:'absolute',top:18,left:imgPos});		
+			var cumul = Position.cumulativeOffset(button.arrowDiv.imgRef);
+			var imgPos = cumul[0] + 11 - scroll;
+			var imgTop = cumul[1] + 5;
+			button.arrowDiv.setStyle({position:'absolute',top:imgTop,left:imgPos});		
 		}
 	},
 	
