@@ -378,5 +378,9 @@ $mess=array(
 "338" => "Auto close after upload",
 "339" => "Existing Files",
 "340" => "Alert",
+"341" => "File Info",
+"342" => "Folder Info",
+"343" => "Image Info",
+"343" => "Search on",
 );
 ?>

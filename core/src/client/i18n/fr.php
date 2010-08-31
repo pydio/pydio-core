@@ -377,6 +377,10 @@ $mess=array(
 "338" => "Fermeture auto.",
 "339" => "Fichiers existants",
 "340" => "Alerte",
+"341" => "Info fichier",
+"342" => "Info répertoire",
+"343" => "Données Image",
+"344" => "Chercher sur",
 /* END SENTENCE */
 );
 ?>
