@@ -381,6 +381,6 @@ $mess=array(
 "341" => "File Info",
 "342" => "Folder Info",
 "343" => "Image Info",
-"343" => "Search on",
+"344" => "Search on",
 );
 ?>
