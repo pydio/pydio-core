@@ -96,7 +96,7 @@ class SerialMetaManager extends AJXP_Plugin {
 		
 		$selection = $this->xPath->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
 		$tag = $selection->item(0);
-		$tag->setAttribute("ajxpOptions", json_encode(array("metaColumns"=>$searchables)));
+		$tag->setAttribute("ajxpOptions", json_encode((count($searchables)?array("metaColumns"=>$searchables):array())));
 		
 		parent::init($this->options);
 	
