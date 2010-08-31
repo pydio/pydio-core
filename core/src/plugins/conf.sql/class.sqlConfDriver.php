@@ -38,6 +38,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once(INSTALL_PATH."/server/classes/class.AbstractConfDriver.php");
 require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
 
+
 class sqlConfDriver extends AbstractConfDriver {
 		
 	
@@ -197,14 +198,12 @@ class sqlConfDriver extends AbstractConfDriver {
 	 */
 	function saveRepository($repositoryObject, $update = false){
 		try {
-			if (!$update) {
 				$repository_array = $this->repoToArray($repositoryObject);
 				$options = $repository_array['options'];
 				unset($repository_array['options']);
-			
-				
+			if (!$update) {
 				dibi::query('INSERT INTO [ajxp_repo]', $repository_array);
-				
+
 				foreach ($options as $k => $v ) {
 					dibi::query('INSERT INTO [ajxp_repo_options]', 
 						Array(
@@ -214,28 +213,37 @@ class sqlConfDriver extends AbstractConfDriver {
 						)
 					);
 				}
+				/*
+				//set maximum rights to the repositorie's creator jcg
+				$user_right['login'] = $_SESSION["AJXP_USER"]->id;
+				$user_right['repo_uuid'] = $repository_array['uuid'];
+				$user_right['rights'] = 'rw';
+				dibi::query('INSERT INTO [ajxp_user_rights]', $user_right);
+				$userid=$_SESSION["AJXP_USER"]->id;
+				*/
 				
 			} else {
-				$repository_array = $this->repoToArray($repositoryObject);
-				$options = $repository_array['options'];
-				unset($repository_array['options']);
-				
-				dibi::query('UPDATE [ajxp_repo] SET ', $repository_array);
-				
+				dibi::query('DELETE FROM [ajxp_repo] WHERE [uuid] = %s',$repositoryObject->getUniqueId());
+				dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s',$repositoryObject->getUniqueId());
+				dibi::query('INSERT INTO [ajxp_repo]', $repository_array);
 				foreach ($options as $k => $v ) {
-					dibi::query('UPDATE [ajxp_repo_options] SET [val] = %s WHERE [uuid] = %s AND [name] = %s', 
-						$v, $repositoryObject->getUniqueId(), $k);
-						
+					dibi::query('INSERT INTO [ajxp_repo_options]', 
+						Array(
+							'uuid' => $repositoryObject->getUniqueId(),
+							'name' => $k,
+							'val' => $v
+						)
+					);
 				}
 			}
 		
 		} catch (DibiException $e) {
-			/*
+			
 			echo get_class($e), ': ', $e->getMessage(), "\n";
 			exit(1);
-			*/
+			
 			return -1;
-		}		
+		}
 	}
 	/**
 	 * Delete a repository, given its unique ID.
@@ -246,15 +254,19 @@ class sqlConfDriver extends AbstractConfDriver {
 		try {
 			$result = dibi::query('DELETE FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
 			$result_opts = dibi::query('DELETE FROM [ajxp_repo_options] WHERE [uuid] = %s', $repositoryId);
+			$result_opts_rights = dibi::query('DELETE FROM [ajxp_user_rights] WHERE [repo_uuid] = %s',$repositoryId); //jcg
+
 			
 		} catch (DibiException $e) {
 			return -1;
 		}
 		
-		// Deleting a non-existent repository also qualifies as an error
+		// Deleting a non-existent repository also qualifies as an error jcg Call to a member function getAffectedRows() on a non-object 
+		/*
 		if (false === $result->getAffectedRows()) {
 			return -1;
 		}
+		*/
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
