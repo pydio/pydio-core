@@ -39,7 +39,7 @@ var timerClearObserver = {
 		if(WebFXtimer) clearTimeout(WebFXtimer);
 	}
 } ;
-Event.observe(window, "load", function(){
+document.observe("ajaxplorer:loaded", function(){
 	Draggables.addObserver(timerClearObserver);
 	Draggables.addObserver({onDrag:function(eventName,element,event){
 		if(element.updateCtrlKey){
@@ -227,7 +227,7 @@ Class.create("AjxpDraggable", Draggable, {
 	updateCtrlKey: function(event)
 	{
 		if(!event) return;
-		var ctrl = event['ctrlKey'];		
+		var ctrl = event['ctrlKey'];	
 		if(this.ctrlDndAction && (ctrl || (this.dndAction.deny))){
 			this.addCopyClass();
 		}else{
