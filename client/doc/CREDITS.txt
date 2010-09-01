@@ -1,6 +1,8 @@
 AjaXplorer Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
 Please read /doc/INSTALL.txt to find help with configuration.
 
+Check for software update online : <span id='software_update' style="color:#79F;">Check Now</span>.
+
 [MAIN DEVELOPER]
 AjaXplorer is developed and maintained by Charles du Jeu, from Paris France.
 Project Page : http://www.ajaxplorer.info/

@@ -54,4 +54,6 @@ define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
 
 define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
+
+define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
 ?>
