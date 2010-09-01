@@ -382,5 +382,8 @@ $mess=array(
 "342" => "Folder Info",
 "343" => "Image Info",
 "344" => "Search on",
+"345" => "No version information could be retrieven",
+"346" => "Your version is up to date",
+"347" => "A new version (%s) is available! Visit %s",
 );
 ?>
