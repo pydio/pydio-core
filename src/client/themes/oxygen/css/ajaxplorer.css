@@ -876,6 +876,7 @@ div.multiple_selection_draggable
     color: #000;
     background-color: #fff;
     padding: 5px;
+    padding-bottom:0px;
     border: 1px dashed #999;
     font-family: Trebuchet MS, sans-serif;
     font-size: 11px;    
@@ -883,7 +884,7 @@ div.multiple_selection_draggable
 	overflow:hidden;
 }
 
-.selection_ctrl_key
+div.selection_ctrl_key
 {
     background-image:url('../images/0.gif');
     background-repeat: no-repeat;
