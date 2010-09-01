@@ -381,6 +381,9 @@ $mess=array(
 "342" => "Info répertoire",
 "343" => "Données Image",
 "344" => "Chercher sur",
+"345" => "Pas d'informations sur la version",
+"346" => "Votre version est à jour",
+"347" => "Une nouvelle version (%s) est disponible! Visitez %s",
 /* END SENTENCE */
 );
 ?>
