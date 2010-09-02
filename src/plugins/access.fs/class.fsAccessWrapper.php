@@ -97,8 +97,16 @@ class fsAccessWrapper implements AjxpWrapper {
 		   			AJXP_Logger::debug("Tmp file $tmpFileName");
 		   			register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
 					$crtZip = new PclZip(AJXP_Utils::securePath($repoObject->getOption("PATH").$zipPath));
+					$content = $crtZip->listContent();
+					foreach ($content as $item){
+						$fName = AJXP_Utils::securePath($item["stored_filename"]);
+						if($fName == $localPath || "/".$fName == $localPath){
+							$localPath = $fName;
+							break;
+						}
+					}
 					$res = $crtZip->extract(PCLZIP_OPT_BY_NAME, $localPath, PCLZIP_OPT_PATH, $tmpDir, PCLZIP_OPT_REMOVE_ALL_PATH);
-					AJXP_Logger::debug("Result: ".$localPath." ".dirname($localPath), array_keys($res));
+					AJXP_Logger::debug("Result: ".$localPath." ".dirname($localPath), $content);
 					if($storeOpenContext) self::$crtZip = $crtZip;
 					return $tmpFileName;
 		   		}else{
