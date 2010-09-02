@@ -208,8 +208,8 @@ Class.create("ActionsToolbar", {
 			button.arrowDiv = new Element('div');
 			button.arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
 			button.arrowDiv.imgRef = img;
-			button.arrowDiv.setStyle({display:'none'});// hide by default
 			$$('body')[0].insert(button.arrowDiv);			
+			button.arrowDiv.setStyle({display:'none'});// hide by default
 		}else{
 			button.observe("mouseover", function(){
 				this.buttonStateHover(button, action);
@@ -277,7 +277,8 @@ Class.create("ActionsToolbar", {
 	},
 	
 	placeArrowDiv : function(button){
-		if(button.arrowDiv){
+		if(!button.arrowDiv) return;
+		try{
 			if(!button.visible()){
 				button.arrowDiv.hide();
 				return;
@@ -295,7 +296,7 @@ Class.create("ActionsToolbar", {
 				button.arrowDiv.hide();
 				return;
 			}
-		}
+		}catch(e){};
 	},
 	
 	buttonStateHover : function(button, action){		
