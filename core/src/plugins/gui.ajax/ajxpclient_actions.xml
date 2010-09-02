@@ -82,7 +82,7 @@
 						if(selectorData.get('type') == "ckeditor"){
 							var ckData = selectorData.get('data');
 							if (ckData['CKEditorFuncNum']) {
-								window.opener.CKEDITOR.tools.callFunction(ckData['CKEditorFuncNum'], 'content.php?get_action=image_proxy&file=' + fileName);
+								window.opener.CKEDITOR.tools.callFunction(ckData['CKEditorFuncNum'], ajxpBootstrap.parameters.get('ajxpServerAccess')+'?get_action=image_proxy&file=' + fileName);
 								window.close();
 							}
 						}

@@ -39,7 +39,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	initialize: function($super, oFormObject)
 	{
 		$super(oFormObject);
-		this.baseUrl = "content.php?get_action=get_extracted_page&file=";
+		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"?get_action=get_extracted_page&file=";
 		// Override onload for the text
 		this.jsImage.onload = function(){
 			this.imgTag.src = this.jsImage.src;
@@ -62,7 +62,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	{
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload('content.php?action=download&file='+userSelection.getUniqueFileName());
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download&file='+userSelection.getUniqueFileName());
 			return false;
 		}.bind(this);
 				
