@@ -205,7 +205,8 @@ Class.create("ActionsToolbar", {
 			button.arrowDiv = new Element('div');
 			button.arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
 			button.arrowDiv.imgRef = img;
-			button.insert(button.arrowDiv);
+			button.arrowDiv.setStyle({display:'none'});// hide by default
+			$$('body')[0].insert(button.arrowDiv);
 		}else{
 			button.observe("mouseover", function(){
 				this.buttonStateHover(button, action);
@@ -276,14 +277,21 @@ Class.create("ActionsToolbar", {
 		if(button.arrowDiv){
 			if(!button.visible()){
 				button.arrowDiv.hide();
-			}else{
-				button.arrowDiv.show();
+				return;
 			}
 			var scroll = this.outer.scrollLeft || 0;
-			var cumul = Position.cumulativeOffset(button.arrowDiv.imgRef);
-			var imgPos = cumul[0] + 11 - scroll;
-			var imgTop = cumul[1] + 5;
-			button.arrowDiv.setStyle({position:'absolute',top:imgTop,left:imgPos});		
+			var pos = button.positionedOffset()[0];
+			var barWidth = this.outer.getWidth();
+			if((scroll <= pos) && (pos < scroll + barWidth)){
+				button.arrowDiv.show();
+				var cumul = Position.cumulativeOffset(button.arrowDiv.imgRef);
+				var imgPos = cumul[0] + 11 - scroll;
+				var imgTop = cumul[1] + 17;
+				button.arrowDiv.setStyle({position:'absolute',top:imgTop,left:imgPos});		
+			}else{
+				button.arrowDiv.hide();
+				return;
+			}
 		}
 	},
 	
@@ -321,12 +329,13 @@ Class.create("ActionsToolbar", {
 	
 	resize : function(){
 		var innerSize = 0;
-		var parentWidth = $(this.outer).getOffsetParent().getWidth();
+		var parentWidth = $(this.outer).parentNode.getWidth();
 		if(Prototype.Browser.IE){
-			parentWidth = document.viewport.getWidth();
+			parentWidth = $(this.outer).getOffsetParent().getWidth()-4;//document.viewport.getWidth();
 		}
 		var visibles = [];
-		this.inner.select('a').each(function(a){
+		var buttons = this.inner.select('a');
+		buttons.each(function(a){
 			if(a.visible()) visibles.push(a);
 		});
 		if(visibles.length){
@@ -343,6 +352,12 @@ Class.create("ActionsToolbar", {
 			this.carousel.first();
 			this.outer.setStyle({width:parentWidth + 'px'});
 		}
+		
+		buttons.each(function(button){
+			if(button.arrowDiv){
+				this.placeArrowDiv(button);
+			}			
+		}.bind(this) );
 	},
 	showElement : function(show){}	
 	

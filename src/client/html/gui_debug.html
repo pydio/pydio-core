@@ -19,8 +19,8 @@ foreach ($lines as $line){
 }
 ?>
 </head>
-<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0">
-<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions="{}"></div>
+<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0" style="overflow:hidden;">
+<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'window',fitMarginBottom:'$(\'optional_bottom_div\').getHeight()'}"></div>
 
 <script type="text/javascript">
 var ajaxplorer, startParameters = {};
@@ -34,7 +34,6 @@ foreach ($lines as $line){
 	print("<script language=\"javascript\" type=\"text/javascript\" src=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\"></script>\n");
 }
 ?>
-<style>.dialogBox[id]{position:fixed;}</style>
 <div id="all_forms">
 	<div id="generic_dialog_box" class="dialogBox"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
 	<div id="hidden_frames" style="display:none;"></div>

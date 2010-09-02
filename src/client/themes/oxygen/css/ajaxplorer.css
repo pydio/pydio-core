@@ -21,8 +21,7 @@ a:active {
 body, html
 {
     margin: 0px;
-    padding: 0px;    
-    overflow: hidden;
+    padding: 0px;
 }
 
 input, textarea
@@ -129,6 +128,7 @@ DIALOG BOXES
     background-color: #eee;
 }
 #all_forms div{display:none;}
+#all_forms form{display:inline;}
 
 #all_forms div div, 
 #all_forms div.shadow_class
