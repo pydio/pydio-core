@@ -91,12 +91,14 @@ class fsAccessWrapper implements AjxpWrapper {
 			//print($streamType.$path);
 		   	if($streamType == "file"){	
 		   		if(self::$crtZip == null ||  !is_array(self::$currentListingKeys)){
-		   			$tmpDir = AJXP_Utils::getAjxpTmpDir() . "/" . md5(time()-rand());
+		   			$tmpDir = AJXP_Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . md5(time()-rand());
 		   			mkdir($tmpDir);
-		   			$tmpFileName = $tmpDir."/".basename($localPath);
+		   			$tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
+		   			AJXP_Logger::debug("Tmp file $tmpFileName");
 		   			register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
 					$crtZip = new PclZip(AJXP_Utils::securePath($repoObject->getOption("PATH").$zipPath));
-					$crtZip->extract(PCLZIP_OPT_BY_NAME, substr($localPath, 1), PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_PATH, $tmpDir);
+					$res = $crtZip->extract(PCLZIP_OPT_BY_NAME, $localPath, PCLZIP_OPT_PATH, $tmpDir, PCLZIP_OPT_REMOVE_PATH, dirname($localPath));
+					AJXP_Logger::debug("Result : ".substr($localPath, 1)." $tmpDir", $res);
 					if($storeOpenContext) self::$crtZip = $crtZip;
 					return $tmpFileName;
 		   		}else{
