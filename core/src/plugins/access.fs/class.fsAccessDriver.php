@@ -1269,6 +1269,7 @@ class fsAccessDriver extends AbstractAccessDriver
     	$filePaths = array();
     	foreach ($src as $item){
     		$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".$item);    		
+    		$realFile = AJXP_Utils::securePath($realFile);
     		$basedir = trim(dirname($realFile));
     		$filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile, 
     							 PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));    				
