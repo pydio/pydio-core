@@ -36,12 +36,13 @@ Class.create("Repository", {
 
 	id:undefined,
 	label:'No Repository',
-	icon:ajxpResourcesFolder+'/images/actions/16/network-wired.png',
+	icon:'',
 	resourcesManager:undefined,
 	allowCrossRepositoryCopy:false,
 
 	initialize:function(id, xmlDef){
 		this.id = id;
+		this.icon = ajxpResourcesFolder+'/images/actions/16/network-wired.png';
 		this.resourcesManager = new ResourcesManager();
 		if(xmlDef) this.loadFromXml(xmlDef);
 	},
