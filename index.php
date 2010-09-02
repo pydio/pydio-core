@@ -64,7 +64,7 @@ if(!is_file(TESTS_RESULT_FILE)){
 	}
 }
 
-$START_PARAMETERS = array("BOOTER_URL"=>"content.php?get_action=get_boot_conf");
+$START_PARAMETERS = array("BOOTER_URL"=>"content.php?get_action=get_boot_conf", "MAIN_ELEMENT" => "ajxp_desktop");
 if(AuthService::usersEnabled())
 {
 	AuthService::preLogUser((isSet($_GET["remote_session"])?$_GET["remote_session"]:""));

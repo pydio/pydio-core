@@ -72,6 +72,9 @@ Class.create("ResourcesManager", {
 			if(typeof(className)!='function' || typeof(className.prototype)!='object'){
 				var conn = new Connexion();
 				conn._libUrl = false;
+				if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
+					conn._libUrl = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI');
+				}
 				conn.loadLibrary(fileName);
 			}
 		}

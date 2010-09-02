@@ -186,7 +186,7 @@ Class.create("Ajaxplorer", {
 		/* USER GUI
 		/*********************/
 		this.guiLoaded = false;
-		this.buildGUI($('ajxp_desktop'));
+		this.buildGUI($(ajxpBootstrap.parameters.get('MAIN_ELEMENT')));
 		document.fire("ajaxplorer:before_gui_load");
 		// Rewind components creation!
 		var lastInst;
@@ -546,10 +546,12 @@ Class.create("Ajaxplorer", {
 		var tNodes = XPathSelectNodes(this._registry, "client_configs/template");
 		for(var i=0;i<tNodes.length;i++){
 			var target = tNodes[i].getAttribute("element");
-			var position = tNodes[i].getAttribute("position");
-			var obj = {}; obj[position] = tNodes[i].firstChild.nodeValue;
-			$(target).insert(obj);
-		}
+			if($(target)){
+				var position = tNodes[i].getAttribute("position");
+				var obj = {}; obj[position] = tNodes[i].firstChild.nodeValue;
+				$(target).insert(obj);
+			}
+		}		
 		modal.updateLoadingProgress('Html templates loaded');	
 	},
 		

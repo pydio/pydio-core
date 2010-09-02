@@ -41,16 +41,23 @@ Class.create("AjxpBootstrap", {
 		if(this.parameters.get("ALERT")){
 			window.setTimeout(function(){alert(this.parameters.get("ALERT"));}.bind(this),0);
 		}		
-		Event.observe(window, 'load', function(){
+		Event.observe(document, 'dom:loaded', function(){
+			this.insertBasicSkeleton(this.parameters.get('MAIN_ELEMENT'));
 			this.loadBootConfig();		
 		}.bind(this));		
 		document.observe("ajaxplorer:before_gui_load", function(e){
-			var marginBottom = 0;
-			if($('optional_bottom_div') && $('optional_bottom_div').getHeight()>15 ){
-				marginBottom = $('optional_bottom_div').getHeight();
+			var desktop = $(this.parameters.get('MAIN_ELEMENT'));
+			var options = desktop.getAttribute("ajxpOptions").evalJSON(false);
+			if(options.fit && options.fit == 'height'){
+				var marginBottom = 0;
+				if(options.fitMarginBottom){
+					try{marginBottom = parseInt(eval(options.fitMarginBottom));}catch(e){}
+				}
+				if(options.fitParent == 'window') options.fitParent = window;
+				else options.fitParent = $(options.fitParent);
+				fitHeightToBottom($(this.parameters.get('MAIN_ELEMENT')), options.fitParent, marginBottom, true);
 			}
-			fitHeightToBottom($("ajxp_desktop"), window, marginBottom, true);
-		});
+		}.bind(this));
 		document.observe("ajaxplorer:loaded", function(e){
 			this.insertAnalytics();
 			if(this.parameters.get("SELECTOR_DATA")){
@@ -69,6 +76,10 @@ Class.create("AjxpBootstrap", {
 			}
 			var data = transport.responseText.evalJSON();
 			this.parameters.update(data);
+			if(this.parameters.get('SERVER_PREFIX_URI')){
+				this.parameters.set('ajxpResourcesFolder', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpResourcesFolder'));
+				this.parameters.set('ajxpServerAccess', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpServerAccess'));
+			}
 			var cssRes = this.parameters.get("cssResources");
 			if(cssRes) cssRes.each(this.loadCSSResource.bind(this));
 			if(this.parameters.get('ajxpResourcesFolder')){
@@ -183,5 +194,14 @@ Class.create("AjxpBootstrap", {
 			media : 'screen'
 		});
 		head.insert(cssNode);
-	}	
+	},
+	insertBasicSkeleton : function(desktopNode){
+		if($('all_forms')) return;
+		$(desktopNode).insert({after:
+			'<div id="all_forms">\
+				<div id="generic_dialog_box" class="dialogBox"><div class="dialogTitle"></div><div class="dialogContent"></div></div>\
+				<div id="hidden_frames" style="display:none;"></div>\
+				<div id="hidden_forms" style="position:absolute;left:-1000px;"></div>\
+			</div>'});
+	}
 });

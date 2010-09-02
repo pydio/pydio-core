@@ -31,6 +31,22 @@
 					</div>
 				</div>				
 			]]></template>
+			<template name="widget" element="ajxp_widget" position="top"><![CDATA[
+				<div id="toolbars">
+					<div id="action_bar">
+						<div id="buttons_bar" ajxpClass="ActionsToolbar"></div>
+						<div id="locationbar_cont">
+							<div style="height: 33px;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont'}"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
+					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions="{fit:'height',fitParent:'browser'}" style="border: 1px solid #676965; background-color: #fff;"></div>	
+				</div>				
+			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>
 				<property name="displayMode" value="list"/>

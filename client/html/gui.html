@@ -6,7 +6,7 @@
 		<link rel="stylesheet" type="text/css" href="AJXP_THEME_FOLDER/css/allz.css">
 		<script language="javascript" type="text/javascript" src="AJXP_CLIENT_RESOURCES_FOLDER/js/ajaxplorer_boot.js"></script>
 	</head>
-	<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0">		
+	<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0"  style="overflow:hidden;">		
 		<script type="text/javascript">
 		// Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is 
 		// dynamically replaced by the application!
@@ -14,8 +14,7 @@
 		//AJXP_JSON_START_PARAMETERS
 		window.ajxpBootstrap = new AjxpBootstrap(startParameters);
 		</script>
-		<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions="{}"></div>		
-		<style>.dialogBox[id]{position:fixed;}</style>
+		<div id="ajxp_desktop" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'window',fitMarginBottom:'$(\'optional_bottom_div\').getHeight()'}"></div>
 		<div id="all_forms">
 			<div id="generic_dialog_box" class="dialogBox"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
 			<div id="hidden_frames" style="display:none;"></div>
