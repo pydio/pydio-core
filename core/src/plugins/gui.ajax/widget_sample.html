@@ -1,0 +1,52 @@
+<html xmlns:ajxp>
+	<head>
+		<title>AjaXplorer</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="icon" type="image/x-png" href="client/themes/oxygen/images/html-folder.png">
+		<link rel="stylesheet" type="text/css" href="client/themes/oxygen/css/allz.css">
+		<style type="text/css">
+			.widget_title{
+				font-family: "Trebuchet MS", Arial, Helvetica;
+				font-size: 20px;
+				font-weight: bold;
+				color: white;
+				padding: 5px;
+			}
+			#ajxp_widget{
+				width:400px;
+				height:500px;
+				border:1px solid #999;
+				-moz-box-shadow: 3px 4px 4px #666;
+				-webkit-box-shadow: 3px 4px 4px #666;
+				box-shadow: 3px 4px 4px #666;
+				text-align:left;
+				/* THESE ONE ARE IMPORTANT */
+				overflow:hidden;
+				position:relative;
+			}
+		</style>
+		<script language="javascript" type="text/javascript" src="client/js/ajaxplorer_boot.js"></script>
+		<script type="text/javascript">
+			// Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is 
+			// dynamically replaced by the application!
+			var ajaxplorer, startParameters = {}, MessageHash={};
+			startParameters = {
+				"BOOTER_URL":"content.php?get_action=get_boot_conf",
+				"EXT_REP":"\/", 
+				"MAIN_ELEMENT":"ajxp_widget",
+				"SERVER_PREFIX_URI": ""
+			};
+			window.ajxpBootstrap = new AjxpBootstrap(startParameters);
+			document.observe("ajaxplorer:loaded", function(){
+				ajaxplorer.fireContextRefresh();
+			});			
+		</script>
+	</head>
+
+	<body bgcolor="#cccccc" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0">
+	<div align="center">
+		<div class="widget_title">AjaXplorer Widget Sample</div>
+		<div id="ajxp_widget" ajxpClass="AjxpPane" ajxpOptions="{}"></div>
+	</div>		
+	</body>
+</html>

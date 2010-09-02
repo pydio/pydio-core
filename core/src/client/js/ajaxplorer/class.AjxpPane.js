@@ -57,7 +57,12 @@ Class.create("AjxpPane", {
 	resize : function(){		
 		// Default behaviour : resize children
     	if(this.options.fit && this.options.fit == 'height'){
-    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null));
+    		var marginBottom = 0;
+    		if(this.options.fitMarginBottom){
+    			var expr = this.options.fitMarginBottom;
+    			try{marginBottom = parseInt(eval(expr));}catch(e){}
+    		}
+    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
     	}
     	this.childrenPanes.invoke('resize');
 	},

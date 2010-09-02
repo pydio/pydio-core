@@ -36,12 +36,18 @@ Class.create("FilesList", SelectableElements, {
 	
 	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable", "IActionProvider"],
 
-	initialize: function($super, oElement, initDefaultDisp)
+	initialize: function($super, oElement, initDefaultDispOrOptions)
 	{
 		$super(null, true);
 		$(oElement).ajxpPaneObject = this;
 		this.htmlElement = $(oElement);
-		this._displayMode = initDefaultDisp;		
+		if(typeof initDefaultDispOrOptions == "string"){
+			this.options = {};
+			this._displayMode = initDefaultDispOrOptions;		
+		}else{
+			this.options = initDefaultDispOrOptions;
+			this._displayMode = 'list';
+		}
 		
 		Event.observe(document, "ajaxplorer:user_logged", function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
@@ -492,6 +498,14 @@ Class.create("FilesList", SelectableElements, {
 	
 	resize : function(){
 		this.notify("resize");
+    	if(this.options.fit && this.options.fit == 'height'){
+    		var marginBottom = 0;
+    		if(this.options.fitMarginBottom){
+    			var expr = this.options.fitMarginBottom;
+    			try{marginBottom = parseInt(eval(expr));}catch(e){}
+    		}
+    		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
+    	}		
 		this.applyHeadersWidth();
 	},
 	
