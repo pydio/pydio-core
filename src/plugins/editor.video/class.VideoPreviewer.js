@@ -54,7 +54,7 @@ Class.create("VideoPreviewer", AbstractEditor, {
 			content += '	<param name="movie" value="plugins/editor.video/player_flv_maxi.swf" />';
 			content += '	<param name="quality" value="high">';
 			content += '	<param name="allowFullScreen" value="true" />';
-			content += '	<param name="FlashVars" value="flv='+url+'/content.php?action=download%26file='+escapedFilename+'&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />';
+			content += '	<param name="FlashVars" value="flv='+url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download%26file='+escapedFilename+'&showstop=1&showvolume=1&showtime=1&showfullscreen=1&playercolor=676965&bgcolor1=f1f1ef&bgcolor2=f1f1ef&buttonovercolor=000000&sliderovercolor=000000" />';
 			content += '</object>';
 			div.update(content);
 			div.resizePreviewElement = function(dimensionObject){

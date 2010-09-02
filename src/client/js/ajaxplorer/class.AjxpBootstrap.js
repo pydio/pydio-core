@@ -67,7 +67,11 @@ Class.create("AjxpBootstrap", {
 		}.bind(this));
 	},
 	loadBootConfig : function(){
-		var connexion = new Connexion(this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':''));
+		var url = this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':'');
+		if(this.parameters.get('SERVER_PREFIX_URI')){
+			url += '&server_prefix_uri=' + this.parameters.get('SERVER_PREFIX_URI');
+		}
+		var connexion = new Connexion(url);
 		connexion.onComplete = function(transport){
 			if(transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName == "tree"){
 				var alert = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
