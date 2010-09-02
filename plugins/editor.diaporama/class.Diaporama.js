@@ -88,7 +88,7 @@ Class.create("Diaporama", AbstractEditor, {
 		this.timeInput.setStyle(inputStyle);
 		
 		
-		this.baseUrl = 'content.php?action=preview_data_proxy&file=';
+		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=preview_data_proxy&file=';
 		this.nextButton.onclick = function(){
 			this.next();
 			this.updateButtons();
@@ -101,7 +101,7 @@ Class.create("Diaporama", AbstractEditor, {
 		}.bind(this);
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download&file='+this.currentFile);
 			return false;
 		}.bind(this);
 		this.actualSizeButton.onclick = function(){

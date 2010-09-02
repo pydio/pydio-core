@@ -49,7 +49,7 @@ Class.create("TextEditor", AbstractEditor, {
 		}
 		this.actions.get("downloadFileButton").observe('click', function(){
 			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload('content.php?action=download&file='+this.currentFile);
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download&file='+this.currentFile);
 			return false;
 		}.bind(this));
 	},

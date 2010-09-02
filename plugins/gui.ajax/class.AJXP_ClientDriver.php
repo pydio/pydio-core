@@ -140,6 +140,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//------------------------------------
 			case "get_boot_conf":
 				
+				if(isSet($_GET["server_prefix_uri"])){
+					$_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
+				}
 				$config = array();
 				$config["ajxpResourcesFolder"] = AJXP_THEME_FOLDER;
 				$config["ajxpServerAccess"] = SERVER_ACCESS;
