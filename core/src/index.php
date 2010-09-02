@@ -43,6 +43,11 @@ require_once("server/classes/class.AJXP_Logger.php");
 require_once("server/classes/class.AJXP_Plugin.php");
 require_once("server/classes/class.AJXP_PluginsService.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
+
+if(!class_exists("DOMDocument")){
+        die("Tou must have libxml PHP extension enabled on your server.");
+}
+
 HTMLWriter::charsetHeader();
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
