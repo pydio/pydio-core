@@ -128,6 +128,9 @@ Class.create("ActionsToolbar", {
 	
 	emptyToolbars: function(){
 		this.element.select('div').each(function(divElement){			
+			divElement.select('a').each(function(button){
+				if(button.arrowDiv) button.arrowDiv.remove();
+			});
 			divElement.remove();
 		}.bind(this));
 		this.toolbars = new Hash();
@@ -206,7 +209,7 @@ Class.create("ActionsToolbar", {
 			button.arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
 			button.arrowDiv.imgRef = img;
 			button.arrowDiv.setStyle({display:'none'});// hide by default
-			$$('body')[0].insert(button.arrowDiv);
+			$$('body')[0].insert(button.arrowDiv);			
 		}else{
 			button.observe("mouseover", function(){
 				this.buttonStateHover(button, action);
