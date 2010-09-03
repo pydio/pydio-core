@@ -81,7 +81,7 @@ Class.create("RepositorySelect", {
 	refreshRepositoriesMenu: function(repositoryList, repositoryId){
 		this.button.addClassName('disabled');
 		var actions = new Array();
-		if(repositoryList && repositoryList.size() > 1){
+		if(repositoryList && repositoryList.size()){
 			repositoryList.each(function(pair){
 				var repoObject = pair.value;
 				var key = pair.key;
