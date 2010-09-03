@@ -37,7 +37,7 @@
 					</context>
 					<selectionContext dir="true" file="file" recycle="false" unique="true"></selectionContext>
 					</gui>
-				<rightsContext noUser="false" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
 						var userSelection = ajaxplorer.getUserSelection();
