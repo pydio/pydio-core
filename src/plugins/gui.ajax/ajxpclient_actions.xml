@@ -35,6 +35,7 @@
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>			
 		</action>
 		<action name="up_dir">
 			<gui text="148" title="24" src="up.png" hasAccessKey="true"

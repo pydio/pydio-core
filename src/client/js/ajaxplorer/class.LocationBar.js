@@ -70,7 +70,9 @@ Class.create("LocationBar", {
 			height: (Prototype.Browser.IE?'18px':'15px'),
 			fontFamily : 'Trebuchet MS,sans-serif,Nimbus Sans L',
 			zIndex : 10000,
-			backgroundColor: 'white'
+			backgroundColor: 'white',
+			whiteSpace:'nowrap',
+			overflow:'hidden'
 		});
 		locDiv.insert(this.label);
 		this.label.observe("click", function(){

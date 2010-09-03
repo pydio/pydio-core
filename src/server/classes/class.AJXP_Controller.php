@@ -67,8 +67,17 @@ class AJXP_Controller{
 		if(!$actions->length) return false;
 		$action = $actions->item(0);
 		//Check Rights
+		$mess = ConfService::getMessages();
 		if(AuthService::usersEnabled()){
 			$loggedUser = AuthService::getLoggedUser();
+			if( AJXP_Controller::actionNeedsRight($action, $xPath, "adminOnly") && 
+				($loggedUser == null || !$loggedUser->isAdmin())){
+					AJXP_XMLWriter::header();
+					AJXP_XMLWriter::sendMessage(null, $mess[207]);
+					AJXP_XMLWriter::requireAuth();
+					AJXP_XMLWriter::close();
+					exit(1);
+				}			
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "read") && 
 				($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))){
 					AJXP_XMLWriter::header();
@@ -188,10 +197,10 @@ class AJXP_Controller{
 	}
 	
 	public static function actionNeedsRight($actionNode, $xPath, $right){
-		$rights = $xPath->query("rights", $actionNode);
+		$rights = $xPath->query("rightsContext", $actionNode);
 		if(!$rights->length) return false;
 		$rightNode =  $rights->item(0);
-		$rightAttr = $xPath->query("@".$right);
+		$rightAttr = $xPath->query("@".$right, $rightNode);
 		if($rightAttr->length && $rightAttr->item(0)->value == "true"){
 			return true;
 		}
