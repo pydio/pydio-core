@@ -223,7 +223,7 @@
 					actionBarGroup="get" inZip="false">
 				</context>
 				<selectionContext dir="true" file="file" recycle="false" unique="false"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection = ajaxplorer.getUserSelection();					
