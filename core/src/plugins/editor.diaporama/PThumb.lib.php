@@ -302,7 +302,7 @@ class PThumb{
         if ($this -> is_remote($image) == 1){
                 $is_remote = true;
                 //Check that file exists (Check only enabled in PHP 5 because only PHP 5 supports for checking remote files
-                if (phpversion() >= 5 && ini_get("allow_url_fopen") == "1"){
+                if (phpversion() >= 5){
                     if (!file_exists($image)){
                         return $this -> set_error("Method print_thumbnail: Error. The file '$image' you specified does not exists or cannot be accessed.");
                     }   
@@ -789,7 +789,7 @@ class PThumb{
         if ($skip_checks == false){
             if ($this -> is_remote($url) == 1){
                     //Check that file exists (Check only enabled in PHP 5 because only PHP 5 supports for checking remote files
-                    if (phpversion() >= 5 && ini_get("allow_url_fopen") == "1"){
+                    if (phpversion() >= 5){
                         if (!file_exists($url)){
 							$this -> set_error("Method retrieve_remote_file: '$url' does not exists.", false);
                             return 3;
@@ -803,9 +803,9 @@ class PThumb{
                 }
             }
         }
-        @ini_set("allow_url_fopen","1");
         
-        if (ini_get("allow_url_fopen") == "1" && ($force_method == null || $force_method == 1)){
+        
+        if (($force_method == null || $force_method == 1)){
             
             $data = "";
             $fp = fopen($url, "r");
@@ -879,8 +879,8 @@ class PThumb{
             return getimagesize($file);
         }
         //Try via the direct method first.
-        @ini_set("allow_url_fopen","1");
-        if (ini_get("allow_url_fopen") == "1" && $this -> remote_check == true){        	
+        
+        if ($this -> remote_check == true){        	
         	$realFile = call_user_func(array($this->remote_wrapper, "getRealFSReference"), $file);
             $array = getimagesize($realFile);
             if ($array != false && $this -> remote_check == true){
