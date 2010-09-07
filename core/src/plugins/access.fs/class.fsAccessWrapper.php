@@ -155,7 +155,7 @@ class fsAccessWrapper implements AjxpWrapper {
 				return -1;
 		   	}
 		}else{
-			return $repoObject->getOption("PATH").$url["path"];
+			return realpath($repoObject->getOption("PATH")).$url["path"];
 		}    	
     }
     
