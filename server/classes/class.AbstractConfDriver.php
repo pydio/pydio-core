@@ -222,6 +222,9 @@ class AbstractConfDriver extends AJXP_Plugin {
 					$prefValue = stripslashes($_GET["pref_value_".$i]);
 					if($prefName != "password")
 					{
+						if($prefName == "ls_history"){
+							$prefValue = str_replace("'", "\\\'", $prefValue);
+						}
 						$userObject->setPref($prefName, $prefValue);
 						$userObject->save();
 						AuthService::updateUser($userObject);
