@@ -56,7 +56,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			$this->driverConf = array();
 		}
 		$create = $this->repository->getOption("CREATE");
-		$path = $this->repository->getOption("PATH");
+		$path = realpath($this->repository->getOption("PATH"));
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
