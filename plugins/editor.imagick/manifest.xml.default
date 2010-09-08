@@ -2,7 +2,7 @@
 <editor id="editor.imagick" openable="true"  formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer" mimes="pdf,svg,tif,tiff">
 	<class_definition filename="plugins/editor.imagick/class.IMagickPreviewer.php" classname="IMagickPreviewer"/>
 	<resources>
-		<js file="plugins/editor.imagick/class.ImagickPreviewer.js" className="IMagickPreviewer"/>
+		<js file="plugins/editor.imagick/class.IMagickPreviewer.js" className="IMagickPreviewer"/>
 	</resources>
 	<registry_contributions>
 		<actions>
