@@ -576,7 +576,7 @@ class AJXP_Utils
 		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
 		if($createDir && !is_dir(dirname($filePath))) {			
 			if(!is_writeable(dirname(dirname($filePath)))){
-				die("Cannot write into ".dirname(dirname($filePath)));
+				throw new Exception("[AJXP_Utils::saveSerialFile] Cannot write into ".dirname(dirname($filePath)));
 			}
 			mkdir(dirname($filePath));
 		}
