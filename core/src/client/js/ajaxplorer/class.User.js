@@ -74,7 +74,11 @@ Class.create("User", {
 	getPreference : function(prefName, fromJSON){
 	    var value = this.preferences.get(prefName);	
 	    if(fromJSON && value){
-	    	return value.evalJSON();
+	    	try{
+		    	return value.evalJSON();
+	    	}catch(e){
+	    		alert("Error parsing JSON in preferences. You should contact system admin and clear user preferences.");
+	    	}
 	    }
 	    return value;
 	},
@@ -160,8 +164,12 @@ Class.create("User", {
 				{
 					var prefChild = userNodes[i].childNodes[j];
 					if(prefChild.nodeName == "pref") {
-						this.setPreference(prefChild.getAttribute("name"), 
-							 				prefChild.getAttribute("value"));
+						var value = prefChild.getAttribute("value");
+						if(!value && prefChild.firstChild){
+							// Retrieve value from CDATA
+							value = prefChild.firstChild.nodeValue;
+						}
+						this.setPreference(prefChild.getAttribute("name"), value);
 					}
 				}					
 			}
