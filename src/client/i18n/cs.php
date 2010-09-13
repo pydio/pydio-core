@@ -384,6 +384,11 @@ $mess=array(
 "345" => "No version information could be retrieven",
 "346" => "Your version is up to date",
 "347" => "A new version (%s) is available! Visit %s",
+"348" => "A new repository has been shared.",
+"349" => "Warning, missing arguments",
+"350" => "A user that does not belong to you already exists with this name, please choose another name.",
+"351" => "You are not allowed to share elements to the public.",
+"352" => "A repository with the same name already exists, please choose another name.",
 /* END SENTENCE */
 );
 ?>
