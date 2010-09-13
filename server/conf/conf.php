@@ -149,6 +149,13 @@ $REPOSITORIES[0] = array(
 );
 
 // DO NOT REMOVE THIS!
+// SHARE ELEMENTS
+$REPOSITORIES["ajxp_shared"] = array(
+	"DISPLAY"		=>	"Shared Elements", 
+	"DRIVER"		=>	"ajxp_shared", 
+	"DRIVER_OPTIONS"=> array()	
+);
+
 // ADMIN REPOSITORY
 $REPOSITORIES[1] = array(
 	"DISPLAY"		=>	"Settings", 
@@ -211,7 +218,7 @@ define("DISABLE_ZIP_CREATION", false);
 /**********************************************/
 // Set this is to you GA id : something like UE-XXXXX-Y
 // This will append the Async Loading code to ajaxplorer.
-define("GOOGLE_ANALYTICS_ID", "XXXXX");
+define("GOOGLE_ANALYTICS_ID", "");
 // Add this if you want to set the domain artificially.
 // If you don't know what it's about, you should probably
 // leave it empty!

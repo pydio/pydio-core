@@ -43,6 +43,7 @@ class AbstractAjxpUser
 	var $prefs;
 	var $bookmarks;
 	var $version;
+	var $parentUser;
 	
 	/**
 	 * Conf Storage implementation
@@ -95,6 +96,18 @@ class AbstractAjxpUser
 		$this->hasAdmin = $boolean;
 	}
 	
+	function hasParent(){
+		return isSet($this->parentUser);
+	}
+	
+	function setParent($user){
+		$this->parentUser = $user;
+	}
+	
+	function getParent(){
+		return $this->parentUser;
+	}
+	
 	function canRead($rootDirId){
 		$right = $this->getRight($rootDirId);
 		if($right == "rw" || $right == "r") return true;
@@ -105,6 +118,19 @@ class AbstractAjxpUser
 		$right = $this->getRight($rootDirId);
 		if($right == "rw") return true;
 		return false;
+	}
+	
+	function getSpecificActionsRights($rootDirId){
+		if(isSet($this->rights["ajxp.actions"]) && isSet($this->rights["ajxp.actions"][$rootDirId])){
+			return $this->rights["ajxp.actions"][$rootDirId];
+		}
+		return array();
+	}
+	
+	function setSpecificActionRight($rootDirId, $actionName, $allowed){		
+		if(!isSet($this->rights["ajxp.actions"])) $this->rights["ajxp.actions"] = array();
+		if(!isset($this->rights["ajxp.actions"][$rootDirId])) $this->rights["ajxp.actions"][$rootDirId] = array();
+		$this->rights["ajxp.actions"][$rootDirId][$actionName] = $allowed;
 	}
 	
 	/**
@@ -131,6 +157,10 @@ class AbstractAjxpUser
 	
 	function removeRights($rootDirId){
 		if(isSet($this->rights[$rootDirId])) unset($this->rights[$rootDirId]);
+	}
+	
+	function clearRights(){
+		$this->rights = array();
 	}
 		
 	function getPref($prefName){

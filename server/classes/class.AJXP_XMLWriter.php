@@ -297,6 +297,11 @@ class AJXP_XMLWriter
 				}				
 			}
 			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $details) {
+				// Do not display standard repositories even in details mode for "sub"users
+				if($loggedUser->hasParent() && !$loggedUser->canRead($rootDirIndex)) continue;
+				// Do not display shared repositories otherwise.
+				if($rootDirObject->hasOwner() && !$loggedUser->hasParent())continue;
+				
 				$rightString = "";
 				if($details){
 					$rightString = " r=\"".($loggedUser->canRead($rootDirIndex)?"1":"0")."\" w=\"".($loggedUser->canWrite($rootDirIndex)?"1":"0")."\"";
