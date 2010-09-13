@@ -60,6 +60,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$rootNodes = array(
 					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
 					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
+					"files" => array("LABEL" => $mess["ajxp_shared.3"], "ICON" => "html.png"),
 					"logs" => array("LABEL" => $mess["ajxp_conf.4"], "ICON" => "toggle_log.png"),
 					"diagnostic" => array("LABEL" => $mess["ajxp_conf.5"], "ICON" => "susehelpcenter.png")
 				);
@@ -80,6 +81,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$this->listLogFiles($dir);
 					}else if($strippedDir == "diagnostic"){
 						$this->printDiagnostic();
+					}else if($strippedDir == "files"){
+						$this->listSharedFiles();
 					}
 					AJXP_XMLWriter::close();
 					exit(1);
@@ -501,6 +504,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					}
 					AJXP_XMLWriter::close();		
 					exit(1);
+				}else if(isSet($httpVars["shared_file"])){
+					AJXP_XMLWriter::header();
+					$element = basename($httpVars["shared_file"]);
+					$publicletData = $this->loadPublicletData(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
+					unlink(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
+					AJXP_XMLWriter::sendMessage($mess["ajxp_shared.13"], null);
+					AJXP_XMLWriter::reloadDataNode();
+					AJXP_XMLWriter::close();					
 				}else{
 					$forbidden = array("guest", "share");
 					if(!isset($httpVars["user_id"]) || $httpVars["user_id"]=="" 
@@ -522,6 +533,19 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 			break;
 			
+			case "clear_expired" :
+				
+				$deleted = $this->clearExpiredFiles();
+				AJXP_XMLWriter::header();
+				if(count($deleted)){
+					AJXP_XMLWriter::sendMessage(sprintf($mess["ajxp_shared.23"], count($deleted).""), null);
+					AJXP_XMLWriter::reloadDataNode();					
+				}else{
+					AJXP_XMLWriter::sendMessage($mess["ajxp_shared.24"], null);
+				}
+				AJXP_XMLWriter::close();
+				
+			break;			
 			
 			default:
 			break;
@@ -538,14 +562,21 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$mess = ConfService::getMessages();
 		$loggedUser = AuthService::getLoggedUser();		
         $userArray = array();
-		foreach ($users as $userObject){
-            $userArray[AJXP_Utils::xmlEntities($userObject->getId())] = $userObject;
+		foreach ($users as $userIndex => $userObject){
+			$label = $userObject->getId();
+			if($userObject->hasParent()){
+				$label = $userObject->getParent()."000".$label;
+			}
+            $userArray[$label] = $userObject;
         }        
         ksort($userArray);
         foreach($userArray as $userObject) {
 			$isAdmin = $userObject->isAdmin();
 			$userId = AJXP_Utils::xmlEntities($userObject->getId());
 			$icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
+			if($userObject->hasParent()){
+				$icon = "user_child";
+			}
 			print '<tree 
 				text="'.$userId.'"
 				isAdmin="'.$mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")].'" 
@@ -572,19 +603,37 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$repos = ConfService::getRepositoriesList();
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/></columns>');		
         $repoArray = array();
+        $childRepos = array();
 		foreach ($repos as $repoIndex => $repoObject){
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
+			if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
             $name = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
+			if($repoObject->hasOwner()) {
+				$parentId = $repoObject->getParentId();	        	
+				if(!isSet($childRepos[$parentId])) $childRepos[$parentId] = array();
+				$childRepos[$parentId][] = array("name" => $name, "index" => $repoIndex);
+				continue;
+			}
             $repoArray[$name] = $repoIndex;
         }
-        // Sort the list now by name
+        // Sort the list now by name        
         ksort($repoArray);
+        // Append child repositories
+        $sortedArray = array();
         foreach ($repoArray as $name => $repoIndex) {
+        	$sortedArray[$name] = $repoIndex;
+        	if(isSet($childRepos[$repoIndex]) && is_array($childRepos[$repoIndex])){
+        		foreach ($childRepos[$repoIndex] as $childData){
+        			$sortedArray[$childData["name"]] = $childData["index"];
+        		}
+        	}
+        }
+        foreach ($sortedArray as $name => $repoIndex) {
             $repoObject =& $repos[$repoIndex];
             $metaData = array(
             	"repository_id" => $repoIndex,
             	"accessType"	=> $repoObject->getAccessType(),
-            	"icon"			=> "folder_red.png",
+            	"icon"			=> ($repoObject->hasOwner()?"repo_child.png":"folder_red.png"),
             	"openicon"		=> "folder_red.png",
             	"parentname"	=> "/repositories",
 				"ajxp_mime" 	=> "repository".($repoObject->isWriteable()?"_editable":"")
@@ -627,6 +676,71 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			}
 		}		
 	}
+	
+	function listSharedFiles(){
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
+				<column messageId="ajxp_shared.4" attributeName="ajxp_label" sortType="String" width="20%"/>
+				<column messageId="ajxp_shared.27" attributeName="owner" sortType="String" width="20%"/>
+				<column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" width="20%"/>
+				<column messageId="ajxp_shared.6" attributeName="password" sortType="String" width="5%"/>
+				<column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" width="5%"/>
+				<column messageId="ajxp_shared.20" attributeName="expired" sortType="String" width="5%"/>
+				<column messageId="ajxp_shared.14" attributeName="integrity" sortType="String" width="5%" hidden="true"/>
+			</columns>');
+		if(!is_dir(PUBLIC_DOWNLOAD_FOLDER)) return ;		
+		$files = glob(PUBLIC_DOWNLOAD_FOLDER."/*.php");
+		$mess = ConfService::getMessages();
+		$loggedUser = AuthService::getLoggedUser();
+		$userId = $loggedUser->getId();
+        if(defined('PUBLIC_DOWNLOAD_URL') && PUBLIC_DOWNLOAD_URL != ""){
+        	$downloadBase = rtrim(PUBLIC_DOWNLOAD_URL, "/");
+        }else{
+	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
+	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
+	        $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/"));
+        }
+		
+		foreach ($files as $file){
+			$publicletData = $this->loadPublicletData($file);			
+			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".$publicletData["REPOSITORY"]->getDisplay().":/".$publicletData["FILE_PATH"], true, array(
+				"icon"		=> "html.png",
+				"password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"), 
+				"expiration" => ($publicletData["EXPIRE_TIME"]!=0?date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"), 
+				"expired" => ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?$mess["ajxp_shared.21"]:$mess["ajxp_shared.22"]):"-"), 
+				"integrity"  => (!$publicletData["SECURITY_MODIFIED"]?$mess["ajxp_shared.15"]:$mess["ajxp_shared.16"]),
+				"download_url" => $downloadBase . "/".basename($file),
+				"owner" => (isset($publicletData["OWNER_ID"])?$publicletData["OWNER_ID"]:"-"),
+				"ajxp_mime" => "shared_file")
+			);			
+		}
+	}
+	
+	function clearExpiredFiles(){
+		$files = glob(PUBLIC_DOWNLOAD_FOLDER."/*.php");
+		$loggedUser = AuthService::getLoggedUser();
+		$userId = $loggedUser->getId();
+		$deleted = array();
+		foreach ($files as $file){
+			$publicletData = $this->loadPublicletData($file);			
+			if(isSet($publicletData["EXPIRATION_TIME"]) && is_numeric($publicletData["EXPIRATION_TIME"]) && $publicletData["EXPIRATION_TIME"] > 0 && $publicletData["EXPIRATION_TIME"] < time()){
+				unlink($file);
+				$deleted[] = basename($file);
+			}
+		}
+		return $deleted;
+	}
+	
+	protected function loadPublicletData($file){
+		$lines = file($file);
+		$id = str_replace(".php", "", basename($file));
+		$code = $lines[3] . $lines[4] . $lines[5];
+		eval($code);
+		$dataModified = (md5($inputData) != $id);
+		$publicletData = unserialize($inputData);
+		$publicletData["SECURITY_MODIFIED"] = $dataModified;		
+		return $publicletData;
+	}
+		
 	
 	function parseParameters(&$repDef, &$options, $userId = null){
 		

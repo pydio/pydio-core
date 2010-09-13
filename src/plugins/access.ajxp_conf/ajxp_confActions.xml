@@ -251,7 +251,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable" image="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -263,6 +263,10 @@
 						deleteMessage = MessageHash['ajxp_conf.34'];
 						fieldName = "user_id";
 						fieldValue = meta.get("text");
+					}else if(meta.get("ajxp_mime") == "shared_file"){
+						deleteMessage = MessageHash['ajxp_shared.11'];
+						fieldName = "shared_file";
+						fieldValue = meta.get("filename");
 					}else{
 						deleteMessage = MessageHash['ajxp_conf.35'];
 						fieldName = "repository_id";

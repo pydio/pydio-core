@@ -3,6 +3,7 @@
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
 		<resources>
 			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/i18n" />		
+			<i18n namespace="ajxp_shared" path="plugins/access.ajxp_shared/i18n" />
 			<js file="plugins/access.ajxp_conf/class.ConfigEditor.js" className="ConfigEditor"/>			
 		</resources>
 	</client_settings>
@@ -11,6 +12,7 @@
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
 		</client_configs>	
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
+		<external_file filename="plugins/access.ajxp_shared/manifest.xml" include='registry_contributions/actions/action[@name="clear_expired"]'/>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="client_configs/*"/>
 	</registry_contributions>	
 	<class_definition filename="plugins/access.ajxp_conf/class.ajxp_confAccessDriver.php" classname="ajxp_confAccessDriver"/>
