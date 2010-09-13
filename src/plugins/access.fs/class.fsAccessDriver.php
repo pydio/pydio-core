@@ -1315,9 +1315,9 @@ class fsAccessDriver extends AbstractAccessDriver
     	return $this->writePubliclet($data);
     }
 
-    function makeSharedRepositoryOptions($parentOptions, $httpVars){
+    function makeSharedRepositoryOptions($httpVars){
 		$newOptions = array(
-			"PATH" => $parentOptions["PATH"].AJXP_Utils::decodeSecureMagic($httpVars["file"]), 
+			"PATH" => $this->repository->getOption("PATH").AJXP_Utils::decodeSecureMagic($httpVars["file"]), 
 			"CREATE" => false, 
 			"RECYCLE_BIN" => "", 
 			"DEFAULT_RIGHTS" => "");

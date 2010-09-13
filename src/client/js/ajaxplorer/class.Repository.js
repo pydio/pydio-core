@@ -37,6 +37,7 @@ Class.create("Repository", {
 	id:undefined,
 	label:'No Repository',
 	icon:'',
+	accessType:'',
 	resourcesManager:undefined,
 	allowCrossRepositoryCopy:false,
 
@@ -65,6 +66,13 @@ Class.create("Repository", {
 		this.icon = icon;
 	},
 		
+	getAccessType : function(){
+		return this.accessType;
+	},
+	setAccessType : function(access){
+		this.accessType = access;
+	},
+	
 	loadResources : function(){
 		this.resourcesManager.load();
 	},
@@ -72,6 +80,9 @@ Class.create("Repository", {
 	loadFromXml: function(repoNode){
 		if(repoNode.getAttribute('allowCrossRepositoryCopy') && repoNode.getAttribute('allowCrossRepositoryCopy') == "true"){
 			this.allowCrossRepositoryCopy = true;
+		}
+		if(repoNode.getAttribute('access_type')){
+			this.setAccessType(repoNode.getAttribute('access_type'));
 		}
 		for(var i=0;i<repoNode.childNodes.length;i++){
 			var childNode = repoNode.childNodes[i];
