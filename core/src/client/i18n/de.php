@@ -384,6 +384,11 @@ $mess=array(
 "345" => "Es wurden keine Versionsinformationen gefunden",
 "346" => "Die Version ist auf dem aktuellen Stand",
 "347" => "Eine neue Version (%s) ist verfügbar! Besuchen Sie %s",
+"348" => "A new repository has been shared.",
+"349" => "Warning, missing arguments",
+"350" => "A user that does not belong to you already exists with this name, please choose another name.",
+"351" => "You are not allowed to share elements to the public.",
+"352" => "A repository with the same name already exists, please choose another name.",
 /* END SENTENCE */
 );
 ?>
