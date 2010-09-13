@@ -237,7 +237,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
     */
     function makePubliclet($filePath) {}
     
-    function makeSharedRepositoryOptions($parentOptions, $httpVars){}
+    function makeSharedRepositoryOptions($httpVars){}
 
     function createSharedRepository($httpVars){
 		// ERRORS
@@ -287,7 +287,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		// CREATE SHARED OPTIONS		
 		$newRepo = $this->repository->createSharedChild(
 			$label, 
-			$this->makeSharedRepositoryOptions($this->repository->options, $httpVars), 
+			$this->makeSharedRepositoryOptions($httpVars), 
 			$this->repository->id, 
 			$loggedUser->id, 
 			$userName

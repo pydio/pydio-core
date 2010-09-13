@@ -81,12 +81,14 @@ Class.create("RepositorySelect", {
 	refreshRepositoriesMenu: function(repositoryList, repositoryId){
 		this.button.addClassName('disabled');
 		var actions = new Array();
+		var lastActions = new Array();
 		if(repositoryList && repositoryList.size()){
 			repositoryList.each(function(pair){
 				var repoObject = pair.value;
 				var key = pair.key;
 				var selected = (key == repositoryId ? true:false);
-				actions[actions.length] = {
+				
+				var actionData = {
 					name:repoObject.getLabel(),
 					alt:repoObject.getLabel(),				
 					image:repoObject.getIcon(),
@@ -96,6 +98,11 @@ Class.create("RepositorySelect", {
 						this.onRepoSelect(''+key);
 					}.bind(this)
 				};
+				if(repoObject.getAccessType() == "ajxp_shared" || repoObject.getAccessType() == "ajxp_conf"){
+					lastActions[actions.length] = actionData;
+				}else{
+					actions[actions.length] = actionData;
+				}				
 				if(key == repositoryId){
 					this.label.setValue(repoObject.getLabel());
 					this.icon.src = repoObject.getIcon();
@@ -105,6 +112,19 @@ Class.create("RepositorySelect", {
 			this.label.setValue(this._defaultString);
 			this.icon.src = resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16);
 		}
+		
+		var fonc = function(a,b){
+		    var x = a.name.toLowerCase();
+		    var y = b.name.toLowerCase();
+		    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+		};
+        actions.sort(fonc);
+        if(lastActions.length){
+	        lastActions.sort(fonc);
+	        actions.push({separator:true});
+	        actions = actions.concat(lastActions);
+        }
+		
 		if(this.repoMenu){
 			this.repoMenu.options.menuItems = actions;
 			this.repoMenu.refreshList();
@@ -127,12 +147,6 @@ Class.create("RepositorySelect", {
 			this.notify("createMenu");
 		}
 		if(actions.length) this.button.removeClassName('disabled');
-		var fonc = function(a,b){
-		    var x = a.name.toLowerCase();
-		    var y = b.name.toLowerCase();
-		    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-		};
-        actions.sort(fonc);
 	},
 	
 	onRepoSelect : function(key){
