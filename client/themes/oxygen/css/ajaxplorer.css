@@ -355,6 +355,11 @@ div.SF_element{
 	clear:left;
 }
 
+div.SF_disabled{
+	color: #ccc;
+	font-style:italic;
+}
+
 div.SF_label{
 	float: left; 
 	width: 39%; 
