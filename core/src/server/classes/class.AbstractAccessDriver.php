@@ -82,14 +82,31 @@ class AbstractAccessDriver extends AJXP_Plugin {
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
-		if(isSet($this->actions["public_url"]) && (!is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER))){
-			AJXP_Logger::logAction("Disabling Public links, PUBLIC_DOWNLOAD_FOLDER is not writeable!", array("folder" => PUBLIC_DOWNLOAD_FOLDER, "is_dir" => is_dir(PUBLIC_DOWNLOAD_FOLDER),"is_writeable" => is_writable(PUBLIC_DOWNLOAD_FOLDER)));
-			unset($this->actions["public_url"]);
-			$actionXpath=new DOMXPath($contribNode->ownerDocument);
-			$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
-			$publicUrlNode = $publicUrlNodeList->item(0);
-			$contribNode->removeChild($publicUrlNode);
-		}		
+		if(isSet($this->actions["public_url"])){
+			if((!is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER))){
+				AJXP_Logger::logAction("Disabling Public links, PUBLIC_DOWNLOAD_FOLDER is not writeable!", array("folder" => PUBLIC_DOWNLOAD_FOLDER, "is_dir" => is_dir(PUBLIC_DOWNLOAD_FOLDER),"is_writeable" => is_writable(PUBLIC_DOWNLOAD_FOLDER)));
+				unset($this->actions["public_url"]);
+				$actionXpath=new DOMXPath($contribNode->ownerDocument);
+				$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
+				$publicUrlNode = $publicUrlNodeList->item(0);
+				$contribNode->removeChild($publicUrlNode);
+			}else{
+				if(AuthService::usersEnabled()){
+					$loggedUser = AuthService::getLoggedUser();
+					$currentRepo = ConfService::getRepository();
+					if($currentRepo != null){
+						$rights = $loggedUser->getSpecificActionsRights($currentRepo->getId());
+						if(isSet($rights["public_url"]) && $rights["public_url"] === false){
+							unset($this->actions["public_url"]);
+							$actionXpath=new DOMXPath($contribNode->ownerDocument);
+							$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
+							$publicUrlNode = $publicUrlNodeList->item(0);
+							$contribNode->removeChild($publicUrlNode);
+						}
+					}
+				}
+			}
+		}
 		if($this->detectStreamWrapper() !== false){
 			$this->actions["cross_copy"] = array();
 		}
@@ -139,6 +156,9 @@ class AbstractAccessDriver extends AJXP_Plugin {
         $data["PLUGIN_ID"] = $this->id;
         $data["BASE_DIR"] = $this->baseDir;
         $data["REPOSITORY"] = $this->repository;
+        if(AuthService::usersEnabled()){
+        	$data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
+        }
         // Force expanded path in publiclet
         $data["REPOSITORY"]->addOption("PATH", $this->repository->getOption("PATH"));
         if ($data["ACTION"] == "") $data["ACTION"] = "download";
@@ -217,6 +237,71 @@ class AbstractAccessDriver extends AJXP_Plugin {
     */
     function makePubliclet($filePath) {}
     
+    function makeSharedRepositoryOptions($parentOptions, $httpVars){}
+
+    function createSharedRepository($httpVars){
+		// ERRORS
+		// 100 : missing args
+		// 101 : repository label already exists
+		// 102 : user already exists
+		// 103 : current user is not allowed to share
+		// SUCCESS
+		// 200
+    	
+		if(!isSet($httpVars["repo_label"]) ||  !isSet($httpVars["repo_rights"]) 
+			||  !isSet($httpVars["shared_user"])){
+			return 100;
+		}
+		$loggedUser = AuthService::getLoggedUser();
+		$actRights = $loggedUser->getSpecificActionsRights($this->repository->id);
+		if(isSet($actRights["public_url"]) && $actRights["public_url"] === false){
+			return 103;
+		}
+		$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+		$userName = $httpVars["shared_user"];
+		$label = $httpVars["repo_label"];
+		$rights = $httpVars["repo_rights"];
+		if($rights != "r" && $rights != "rw") return 100;
+		// CHECK USER & REPO DOES NOT ALREADY EXISTS
+		$repos = ConfService::getRepositoriesList();
+		foreach ($repos as $obj){
+			if($obj->getDisplay() == $label){
+				return 101;
+			}
+		}		
+		$confDriver = ConfService::getConfStorageImpl();
+		if(AuthService::userExists($userName)){
+			// check that it's a child user
+			$userObject = $confDriver->createUserObject($userName);
+			if(!$userObject->hasParent() || $userObject->getParent() != $loggedUser->id){
+				return 102;
+			}
+		}else{
+			if(!isSet($httpVars["shared_pass"])) return 100;
+			AuthService::createUser($userName, md5($httpVars["shared_pass"]));
+			$userObject = $confDriver->createUserObject($userName);
+			$userObject->clearRights();
+			$userObject->setParent($loggedUser->id);			
+		}
+		
+		// CREATE SHARED OPTIONS		
+		$newRepo = $this->repository->createSharedChild(
+			$label, 
+			$this->makeSharedRepositoryOptions($this->repository->options, $httpVars), 
+			$this->repository->id, 
+			$loggedUser->id, 
+			$userName
+		);
+		ConfService::addRepository($newRepo);
+						
+		// CREATE USER WITH NEW REPO RIGHTS
+		$userObject->setRight($newRepo->getUniqueId(), $rights);
+		$userObject->setSpecificActionRight($newRepo->getUniqueId(), "public_url", false);
+		$userObject->save();
+		
+    	return 200;
+    }
+       
     function crossRepositoryCopy($httpVars){
     	
     	ConfService::detectRepositoryStreams(true);
