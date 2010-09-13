@@ -148,6 +148,9 @@ class AJXP_User extends AbstractAjxpUser
 		if(isSet($this->rights["ajxp.admin"]) && $this->rights["ajxp.admin"] === true){
 			$this->setAdmin(true);
 		}
+		if(isSet($this->rights["ajxp.parent_user"])){
+			$this->setParent($this->rights["ajxp.parent_user"]);
+		}
 	}
 	
 	function save(){
@@ -156,6 +159,9 @@ class AJXP_User extends AbstractAjxpUser
 			$this->rights["ajxp.admin"] = true;
 		}else{
 			$this->rights["ajxp.admin"] = false;
+		}
+		if($this->hasParent()){
+			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
 		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights);
 		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs);

@@ -274,13 +274,13 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="public_url" fileDefault="false">
+		<action name="public_url">
 			<gui text="292" title="292" src="public_url.png" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -309,12 +309,61 @@
 	                        conn.sendSync();
 	                    };
                     }
-                    modal.showDialogForm('Get', 'public_url_form', null, function(){
-                        hideLightBox(true);
-                        return false;
-                    }, null, true);
+                    var userSelection = ajaxplorer.getUserSelection();
+                    if(userSelection.hasDir()){
+                    	var loadFunc = function(oForm){
+                    		if(!$('share_folder_form').autocompleter){
+	                    		$('share_folder_form').autocompleter = new Ajax.Autocompleter(
+	                    			"shared_user", 
+	                    			"shared_users_autocomplete_choices", 
+	                    			ajxpServerAccessPath + "?get_action=public_url&sub_action=list_shared_users", 
+	                    			{minChars:0, paramName:'value'}
+	                    		);
+	                    		$('shared_user').observeOnce("focus", function(){
+		                    		$('share_folder_form').autocompleter.activate();
+		                    	});
+		                    	$('shared_user').observe("blur", function(){
+		                    		var existing = $('shared_users_autocomplete_choices').select('li').detect(function(li){
+		                    			return (li.innerHTML == $('shared_user').getValue());
+		                    		});
+		                    		if(existing) {
+		                    			$('shared_pass_div').addClassName('SF_disabled');
+		                    			$('shared_pass').disable();
+		                    		}else {
+		                    			$('shared_pass_div').removeClassName('SF_disabled');
+		                    			$('shared_pass').enable();
+		                    		}
+		                    	});
+	                    	}
+                    	};
+                    	var submitFunc = function(){
+	                    	var userSelection = ajaxplorer.getUserSelection();	                    	
+							var publicUrl = ajxpServerAccessPath+'?get_action=public_url&sub_action=delegate_repo';
+							publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
+	                        var conn = new Connexion(publicUrl);
+	                        conn.setParameters(modal.getForm().serialize(true));	                        
+	                        conn.onComplete = function(transport){
+	                        	var response = parseInt(transport.responseText);
+	                        	if(response == 200){
+	                        		ajaxplorer.displayMessage('SUCCESS', MessageHash[348]);
+	                        		hideLightBox(true);
+	                        	}else{
+	                        		messages = {100:349, 101:352, 102:350, 103:351};
+	                        		ajaxplorer.displayMessage('ERROR', MessageHash[messages[response]]); 
+	                        	}
+	                        };
+	                        conn.sendAsync();
+	                        return false;
+	                    };
+	                    modal.showDialogForm('Get', 'share_folder_form', loadFunc, submitFunc, null);                	
+                    }else{
+	                    modal.showDialogForm('Get', 'public_url_form', null, function(){
+	                        hideLightBox(true);
+	                        return false;
+	                    }, null, true);
+                    }
 					]]></clientCallback>
-					<clientForm id="public_url"><![CDATA[
+					<clientForm id="public_url_form"><![CDATA[
 					<div id="public_url_form" title="AJXP_MESSAGE[293]"  box_width="280" action="public_url">
 						<fieldset>
 							<legend ajxp_message_id="307">1 : AJXP_MESSAGE[307]</legend>
@@ -323,7 +372,7 @@
 								<span ajxp_message_id="294">AJXP_MESSAGE[294]</span> 
 							</div>
 							<div class="dialogLegend" style="clear: both; margin-top: 10px;">
-								<input type="password" value="" name="password" style="float: right; width: 100px;"/>
+								<input type="password"  autocomplete="off" value="" name="password" style="float: right; width: 100px;"/>
 								<span ajxp_message_id="295">AJXP_MESSAGE[295]</span>
 							</div>
 						</fieldset>
@@ -339,6 +388,34 @@
                             <a id="email" ajxp_message_id="323"> AJXP_MESSAGE[323] </a>
 						</fieldset>
 					</div>
+					<div id="share_folder_form" title="Share Folder"  box_width="280" action="public_url">
+						<fieldset>
+							<legend ajxp_message_id="307">Target User</legend>
+							<div class="SF_element">
+								<div ajxp_message_id="294" class="SF_label">User Name : </div> 
+								<input type="text" class="SF_input dialogFocus" value="" name="shared_user" id="shared_user"/>	
+								<div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;"></div>
+							</div>
+							<div class="SF_element" id="shared_pass_div">
+								<div class="SF_label" ajxp_message_id="295">User Pass : </div>
+								<input type="password" autocomplete="off" value="" name="shared_pass" id="shared_pass" class="SF_input"/>
+							</div>
+						</fieldset>
+						<fieldset>
+							<legend ajxp_message_id="307">Target Repository</legend>
+							<div class="SF_element">
+								<div class="SF_label" ajxp_message_id="295">Label : </div>
+								<input type="text" value="" name="repo_label" class="SF_input"/>
+							</div>
+							<div class="SF_element">
+								<div class="SF_label" ajxp_message_id="295">Rights : </div>
+								<div class="SF_input">
+									<input type="radio" value="r" name="repo_rights" class="SF_box"/>Read
+									<input type="radio" value="rw" name="repo_rights" class="SF_box" checked/>Write
+								</div>
+							</div>
+						</fieldset>
+					</div>					
 					]]>
 					</clientForm>					
 				<serverCallback methodName="switchAction"></serverCallback>

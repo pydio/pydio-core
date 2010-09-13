@@ -56,12 +56,12 @@ class fsAccessDriver extends AbstractAccessDriver
 			$this->driverConf = array();
 		}
 		$create = $this->repository->getOption("CREATE");
-		$path = realpath($this->repository->getOption("PATH"));
+		$path = $this->repository->getOption("PATH");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
 			if(!is_dir($path)){
-				throw new AJXP_Exception("Cannot create root path for repository. Please check repository configuration or that your folder is writeable!");
+				throw new AJXP_Exception("Cannot create root path for repository (".$this->repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
 			}
 			if($recycle!= "" && !is_dir($path."/".$recycle)){
 				@mkdir($path."/".$recycle);
@@ -414,16 +414,38 @@ class fsAccessDriver extends AbstractAccessDriver
 			break;
             
             //------------------------------------
-            // Public URL
+            // SHARING FILE OR FOLDER
             //------------------------------------
             case "public_url":
-				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                $url = $this->makePubliclet($file, $httpVars["password"], $httpVars["expiration"]);
-                header("Content-type:text/plain");
-                echo $url;
+            	$subAction = (isSet($httpVars["sub_action"])?$httpVars["sub_action"]:"");
+            	if($subAction == "delegate_repo"){
+					header("Content-type:text/plain");				
+					$result = $this->createSharedRepository($httpVars);				
+					print($result);        		
+            	}else if($subAction == "list_shared_users"){
+            		header("Content-type:text/html");
+            		$loggedUser = AuthService::getLoggedUser();
+            		$allUsers = AuthService::listUsers();
+            		$crtValue = $httpVars["value"];
+            		$users = "";
+            		foreach ($allUsers as $userId => $userObject){            			
+            			if($crtValue != "" && (strstr($userId, $crtValue) === false || strstr($userId, $crtValue) != 0)) continue;
+            			if($userObject->hasParent() && $userObject->getParent() == $loggedUser->getId()){
+            				$users .= "<li>".$userId."</li>";
+            			}
+            		}
+            		if(strlen($users)) {
+            			print("<ul>".$users."</ul>");
+            		}
+            	}else{
+					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+	                $url = $this->makePubliclet($file, $httpVars["password"], $httpVars["expiration"]);
+	                header("Content-type:text/plain");
+	                echo $url;
+            	}
                 exit(1);                
             break;
-			
+						
 			//------------------------------------
 			//	XML LISTING
 			//------------------------------------
@@ -1289,9 +1311,19 @@ class fsAccessDriver extends AbstractAccessDriver
     /** The publiclet URL making */
     function makePubliclet($filePath, $password, $expire)
     {
-        $data = array("DRIVER"=>$this->repository->getAccessType(), "OPTIONS"=>NULL, "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
-        return $this->writePubliclet($data);
-     }
+    	$data = array("DRIVER"=>$this->repository->getAccessType(), "OPTIONS"=>NULL, "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
+    	return $this->writePubliclet($data);
+    }
+
+    function makeSharedRepositoryOptions($parentOptions, $httpVars){
+		$newOptions = array(
+			"PATH" => $parentOptions["PATH"].AJXP_Utils::decodeSecureMagic($httpVars["file"]), 
+			"CREATE" => false, 
+			"RECYCLE_BIN" => "", 
+			"DEFAULT_RIGHTS" => "");
+    	return $newOptions;			
+    }
+
     
 }
 
