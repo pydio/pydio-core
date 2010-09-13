@@ -42,7 +42,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		if(!isSet($this->actions[$action])) return;
 		parent::accessPreprocess($action, $httpVars, $fileVars);
 		$loggedUser = AuthService::getLoggedUser();
-		if(ENABLE_USERS && !$loggedUser->isAdmin()) return ;
+		if(!ENABLE_USERS) return ;
 		
 		if($action == "edit"){
 			if(isSet($httpVars["sub_action"])){

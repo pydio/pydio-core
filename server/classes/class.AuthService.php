@@ -162,6 +162,11 @@ class AuthService
 		{
 			$user = AuthService::updateAdminRights($user);
 		}
+		else{
+			if(!$user->hasParent()){
+				$user->setRight("ajxp_shared", "rw");
+			}
+		}
 		$_SESSION["AJXP_USER"] = $user;
 		if($authDriver->autoCreateUser() && !$user->storageExists()){
 			$user->save();
