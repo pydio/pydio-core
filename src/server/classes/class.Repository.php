@@ -49,6 +49,10 @@ class Repository {
 	var $enabled = true;
 	var $options = array();
 	
+	private $owner;
+	private $parentId;
+	private $uniqueUser;
+	
 	public $streamData;
 	
 	function Repository($id, $display, $driver){
@@ -56,6 +60,14 @@ class Repository {
 		$this->setDisplay($display);
 		$this->setId($id);
 		$this->uuid = md5(time());
+	}
+	
+	function createSharedChild($newLabel, $newOptions, $parentId, $owner, $uniqueUser){
+		$repo = new Repository(0, $newLabel, $this->accessType);
+		$newOptions = array_merge($this->options, $newOptions);
+		$repo->options = $newOptions;
+		$repo->setOwnerData($parentId, $owner, $uniqueUser);
+		return $repo;
 	}
 	
 	function upgradeId(){
@@ -226,6 +238,28 @@ class Repository {
 	
 	function setDisplayStringId($id){
 		$this->displayStringId = $id;
+	}
+	
+	function setOwnerData($repoParentId, $ownerUserId, $childUserId){
+		$this->owner = $ownerUserId;
+		$this->uniqueUser = $childUserId;
+		$this->parentId = $repoParentId;
+	}
+	
+	function getOwner(){
+		return $this->owner;
+	}
+	
+	function getParentId(){
+		return $this->parentId;
+	}
+	
+	function getUniqueUser(){
+		return $this->uniqueUser;
+	}
+	
+	function hasOwner(){
+		return isSet($this->owner);
 	}
 		
 }
