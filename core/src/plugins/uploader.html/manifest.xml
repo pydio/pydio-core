@@ -72,12 +72,22 @@
 	  				ajaxplorer.actionBar.fireAction('upload');
 	  			}
 			};
+			var enterFunc = function(){
+				dropzone.addClassName("dropareaHover");
+			};
+			var leaveFunc = function(){
+				dropzone.removeClassName("dropareaHover");
+			};
 			dropzone.addEventListener("dragover", dragOverFunc, true);
 			dropzone.addEventListener("drop", dropFunc, true);
+			dropzone.addEventListener("dragenter", enterFunc, true);
+			dropzone.addEventListener("dragleave", leaveFunc, true);
 			document.observeOnce("ajaxplorer:trigger_repository_switch", function(){				
 				dropzone.removeClassName('droparea');
 				dropzone.removeEventListener("dragover", dragOverFunc, true);
 				dropzone.removeEventListener("drop", dropFunc, true);
+				dropzone.removeEventListener("dragenter", enterFunc, true);
+				dropzone.removeEventListener("dragleave", leaveFunc, true);
 			});
 		}
 		]]></extensionOnInit>		
