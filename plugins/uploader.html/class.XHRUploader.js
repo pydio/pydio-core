@@ -48,13 +48,11 @@ Class.create("XHRUploader", {
 		// Current index
 		this.id = 0;
 		// Is there a maximum?
-		if( max ){
-			this.max = max;
-		} else {
-			this.max = -1;
-		};
 		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['284']){
 			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
+		}
+		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['282']){
+			this.maxUploadSize = parseInt(window.htmlMultiUploaderOptions['282']);
 		}
 		
 		this.crtContext = ajaxplorer.getUserSelection();
@@ -112,6 +110,13 @@ Class.create("XHRUploader", {
 		dropzone.addEventListener("dragover", function(event) {
 				event.preventDefault();
 		}, true);
+		dropzone.addEventListener("dragenter", function(){
+			dropzone.addClassName("dropareaHover");
+		}, true);
+		dropzone.addEventListener("dragleave", function(){
+			dropzone.removeClassName("dropareaHover");
+		}, true);
+		
 		dropzone.addEventListener("drop", function(event) {
 			event.preventDefault();
 			var files = event.dataTransfer.files;
@@ -304,6 +309,13 @@ Class.create("XHRUploader", {
 		if(file.size==0 && file.type == ""){
 			// FOLDER!
 			alert(MessageHash[336]);
+			return;
+		}
+		if(this.maxUploadSize && file.fileSize > this.maxUploadSize){
+			alert(MessageHash[211]);
+			return;
+		}
+		if(this.max && this.listTarget.childNodes.length == this.max){
 			return;
 		}
 		// GET VALUE FROM FILE OBJECT
