@@ -296,11 +296,14 @@ class AJXP_XMLWriter
 					$toLast = true;
 				}				
 			}
+			if($rootDirObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
+				continue;
+			}
 			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $details) {
 				// Do not display standard repositories even in details mode for "sub"users
-				if($loggedUser->hasParent() && !$loggedUser->canRead($rootDirIndex)) continue;
+				if($loggedUser != null && $loggedUser->hasParent() && !$loggedUser->canRead($rootDirIndex)) continue;
 				// Do not display shared repositories otherwise.
-				if($rootDirObject->hasOwner() && !$loggedUser->hasParent())continue;
+				if($loggedUser != null && $rootDirObject->hasOwner() && !$loggedUser->hasParent())continue;
 				
 				$rightString = "";
 				if($details){
