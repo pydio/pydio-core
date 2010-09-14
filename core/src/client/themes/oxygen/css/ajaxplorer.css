@@ -198,7 +198,8 @@ div.shadow_class
 
 .dialogLegend
 {
-    color:#666;
+    color:#aaa;
+    font-size:0.9em;
 }
 
 .dialogButtons

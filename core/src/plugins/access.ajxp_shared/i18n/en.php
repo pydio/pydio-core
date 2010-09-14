@@ -38,5 +38,9 @@ $mess=array(
 "25"=> "Clear Expired",
 "26"=> "Delete expired shared files.",
 "27"=> "Owner",
+"28"=> "Files shared for direct download, either protected by a password or not.",
+"29"=> "Delegates repositories created by users.",
+"30"=> "Users created to access the delegated repositories.",
+"31"=> "Description"
 ); 
 ?>
