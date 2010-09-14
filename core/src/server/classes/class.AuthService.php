@@ -163,7 +163,7 @@ class AuthService
 			$user = AuthService::updateAdminRights($user);
 		}
 		else{
-			if(!$user->hasParent()){
+			if(!$user->hasParent() && $user_id != "guest"){
 				$user->setRight("ajxp_shared", "rw");
 			}
 		}

@@ -105,47 +105,57 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 						
 			case "delete" : 
 				$mime = $httpVars["ajxp_mime"];
-				$element = basename($httpVars["file"]);
-				if($mime == "shared_repository"){
-					$repo = ConfService::getRepositoryById($element);
-					AJXP_XMLWriter::header();
-					if(!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()){
-						AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
-					}else{
-						$res = ConfService::deleteRepository($element);
-						if($res == -1){
-							AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
+				$selection = new UserSelection();
+				$selection->initFromHttpVars();
+				$files = $selection->getFiles();
+				AJXP_XMLWriter::header();
+				foreach ($files as $index => $element){
+					$element = basename($element);
+					if($mime == "shared_repository"){
+						$repo = ConfService::getRepositoryById($element);
+						if(!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()){
+							AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
+							break;
 						}else{
-							AJXP_XMLWriter::sendMessage($mess["ajxp_conf.59"], null);						
-							AJXP_XMLWriter::reloadDataNode();
+							$res = ConfService::deleteRepository($element);
+							if($res == -1){
+								AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
+								break;
+							}else{
+								if($index == count($files)-1){
+									AJXP_XMLWriter::sendMessage($mess["ajxp_conf.59"], null);						
+									AJXP_XMLWriter::reloadDataNode();
+								}
+							}
+						}
+					}else if( $mime == "shared_user" ){
+						$confDriver = ConfService::getConfStorageImpl();
+						$object = $confDriver->createUserObject($element);
+						if(!$object->hasParent() || $object->getParent() != $loggedUser->getId()){
+							AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
+							break;
+						}else{
+							$res = AuthService::deleteUser($element);
+							if($index == count($files)-1){				
+								AJXP_XMLWriter::sendMessage($mess["ajxp_conf.60"], null);
+								AJXP_XMLWriter::reloadDataNode();
+							}
+						}
+					}else if( $mime == "shared_file" ){					
+						$publicletData = $this->loadPublicletData(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
+						if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
+							unlink(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
+							if($index == count($files)-1){
+								AJXP_XMLWriter::sendMessage($mess["ajxp_shared.13"], null);
+								AJXP_XMLWriter::reloadDataNode();
+							}
+						}else{
+							AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
+							break;
 						}
 					}
-					AJXP_XMLWriter::close();
-				}else if( $mime == "shared_user" ){
-					$confDriver = ConfService::getConfStorageImpl();
-					$object = $confDriver->createUserObject($element);
-					AJXP_XMLWriter::header();
-					if(!$object->hasParent() || $object->getParent() != $loggedUser->getId()){
-						AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
-					}else{
-						$res = AuthService::deleteUser($element);
-						AJXP_XMLWriter::sendMessage($mess["ajxp_conf.60"], null);
-						AJXP_XMLWriter::reloadDataNode();
-					}
-					AJXP_XMLWriter::close();					
-				}else if( $mime == "shared_file" ){					
-					AJXP_XMLWriter::header();
-					$publicletData = $this->loadPublicletData(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
-					if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
-						unlink(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
-						AJXP_XMLWriter::sendMessage($mess["ajxp_shared.13"], null);
-						AJXP_XMLWriter::reloadDataNode();
-					}else{
-						AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
-					}
-					AJXP_XMLWriter::close();
 				}
-			
+				AJXP_XMLWriter::close();			
 			break;
 			
 			case "clear_expired" :
