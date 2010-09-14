@@ -556,10 +556,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	
 	function listUsers(){
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String"/></columns>');		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
+			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
+			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String"/>
+			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
+			</columns>');		
 		if(!ENABLE_USERS) return ;
 		$users = AuthService::listUsers();
 		$mess = ConfService::getMessages();
+		$repos = ConfService::getRepositoriesList();
 		$loggedUser = AuthService::getLoggedUser();		
         $userArray = array();
 		foreach ($users as $userIndex => $userObject){
@@ -577,16 +582,24 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			if($userObject->hasParent()){
 				$icon = "user_child";
 			}
-			print '<tree 
-				text="'.$userId.'"
-				isAdmin="'.$mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")].'" 
-				icon="'.$icon.'.png" 
-				openicon="'.$icon.'.png" 
-				filename="/users/'.$userId.'" 
-				parentname="/users" 
-				is_file="1" 
-				ajxp_mime="user'.(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"").'"
-				/>';
+			$rightsString = "";
+			if($isAdmin) {
+				$rightsString = $mess["ajxp_conf.63"];
+			}else{
+				$r = array();
+				foreach ($repos as $repoId => $repository){
+					if($repository->getAccessType() == "ajxp_shared") continue;
+					if($userObject->canWrite($repoId)) $r[] = $repository->getDisplay()." (rw)";
+					else if($userObject->canRead($repoId)) $r[] = $repository->getDisplay()." (r)";
+				}
+				$rightsString = implode(", ", $r);
+			}
+			AJXP_XMLWriter::renderNode("/users/".$userId, $userId, true, array(
+				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")], 
+				"icon" => $icon.".png",				
+				"rights_summary" => AJXP_Utils::xmlEntities($rightsString, true),				
+				"ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
+			));
 		}
 	}
 	
@@ -601,11 +614,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
 	function listRepositories(){
 		$repos = ConfService::getRepositoriesList();
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/></columns>');		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
+			<column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
+			<column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
+			<column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
+			</columns>');		
         $repoArray = array();
-        $childRepos = array();
+        $childRepos = array();        
 		foreach ($repos as $repoIndex => $repoObject){
-			if($repoObject->getAccessType() == "ajxp_conf") continue;
+			if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
 			if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
             $name = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
 			if($repoObject->hasOwner()) {
@@ -634,6 +651,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             	"repository_id" => $repoIndex,
             	"accessType"	=> $repoObject->getAccessType(),
             	"icon"			=> ($repoObject->hasOwner()?"repo_child.png":"folder_red.png"),
+            	"owner"			=> ($repoObject->hasOwner()?$repoObject->getOwner():""),
             	"openicon"		=> "folder_red.png",
             	"parentname"	=> "/repositories",
 				"ajxp_mime" 	=> "repository".($repoObject->isWriteable()?"_editable":"")

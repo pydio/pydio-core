@@ -388,6 +388,17 @@ $mess=array(
 "350" => "A user that does not belong to you already exists with this name, please choose another name.",
 "351" => "You are not allowed to share elements to the public.",
 "352" => "A repository with the same name already exists, please choose another name.",
+"353" => "Target User",
+"354" => "Create a new user or choose one of your existing ones from the list.",
+"355" => "User Name",
+"356" => "User Pass",
+"357" => "Target Repository",
+"358" => "Choose a name for the shared element and assign access rights for your user.",
+"359" => "Label",
+"360" => "Rights",
+"361" => "Read",
+"362" => "Write",
+"363" => "Shared Elements",
 /* END SENTENCE */
 );
 ?>

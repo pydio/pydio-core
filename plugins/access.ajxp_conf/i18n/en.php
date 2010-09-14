@@ -71,5 +71,7 @@ $mess=array(
 "59" => "Successfully deleted repository",
 "60" => "User successfully erased",
 "61" => "Wrong arguments!",
+"62" => "Rights Summary",
+"63" => "All",
 ); 
 ?>
