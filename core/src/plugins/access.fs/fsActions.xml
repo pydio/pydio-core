@@ -155,15 +155,24 @@
 					var userSelection = ajaxplorer.getUserSelection();
 					if((userSelection.isUnique() && !userSelection.hasDir()) || (zipEnabled && multipleFilesDownloadEnabled))
 					{
-						$('download_form').select("input").each(function(input){
-							if(input.name!='get_action') input.remove();
-						});
-						userSelection.updateFormOrUrl($('download_form'));
-						$('download_form').submit();
-						fileNames = userSelection.getFileNames();						
-						for(var i=0; i<fileNames.length;i++){
-							gaTrackEvent("Data", "Download", fileNames[i]);
-						}												
+						if(gaTrackEvent){
+							fileNames = userSelection.getFileNames();
+							for(var i=0; i<fileNames.length;i++){
+								gaTrackEvent("Data", "Download", fileNames[i]);
+							}												
+						}
+						var agent = navigator.userAgent;
+						if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1)){
+							var downloadUrl = ajxpServerAccessPath+'?get_action=download';
+							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
+							document.location.href=downloadUrl;
+						}else{
+							$('download_form').select("input").each(function(input){
+								if(input.name!='get_action') input.remove();
+							});
+							userSelection.updateFormOrUrl($('download_form'));
+							$('download_form').submit();
+						}
 					}
 					else
 					{
