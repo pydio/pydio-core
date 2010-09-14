@@ -58,9 +58,9 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 				$rootNodes = array(
-					"files" => array("LABEL" => $mess["ajxp_shared.3"], "ICON" => "html.png"),
-					"repositories" => array("LABEL" => $mess["ajxp_shared.2"], "ICON" => "document_open_remote.png"),
-					"users" => array("LABEL" => $mess["ajxp_shared.1"], "ICON" => "user_shared.png")
+					"files" => array("LABEL" => $mess["ajxp_shared.3"], "ICON" => "html.png", "DESCRIPTION" => $mess["ajxp_shared.28"]),
+					"repositories" => array("LABEL" => $mess["ajxp_shared.2"], "ICON" => "document_open_remote.png", "DESCRIPTION" => $mess["ajxp_shared.29"]),
+					"users" => array("LABEL" => $mess["ajxp_shared.1"], "ICON" => "user_shared.png", "DESCRIPTION" => $mess["ajxp_shared.30"])
 				);
 				$dir = (isset($httpVars["dir"])?$httpVars["dir"]:"");
 				$splits = explode("/", $dir);
@@ -82,13 +82,13 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 					exit(1);
 				}else{
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_shared.8" attributeName="ajxp_label" sortType="String"/></columns>');
+					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_shared.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_shared.31" attributeName="description" sortType="String"/></columns>');
 					foreach ($rootNodes as $key => $data){
 						$src = '';
 						if($key == "logs"){
 							$src = 'src="content.php?get_action=ls&amp;dir='.$key.'"';
 						}
-						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" '.$src.' />';
+						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" '.$src.' description="'.$data["DESCRIPTION"].'" />';
 					}
 					AJXP_XMLWriter::close();
 					exit(1);

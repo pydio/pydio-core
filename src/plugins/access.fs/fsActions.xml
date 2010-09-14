@@ -284,31 +284,6 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					if(!window.ajxpPublicUrlCallback){
-						window.ajxpPublicUrlCallback = function(){
-							var userSelection = ajaxplorer.getUserSelection();
-							if(!userSelection.isUnique() || userSelection.hasDir()) return;
-							var publicUrl = ajxpServerAccessPath+'?get_action=public_url';
-							publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
-	                        var oForm = $(modal.getForm());	                        
-	                        var conn = new Connexion(publicUrl);
-	                        conn.setParameters(oForm.serialize(true));
-	                        conn.addParameter('get_action','public_url');
-	                        conn.onComplete = function(transport){
-	                        	var cont = oForm.select('input[id="public_url_container"]')[0];
-	                        	if(cont){
-	                        		cont.value = transport.responseText;
-	                        		cont.select();
-	                        	}
-                                var email = oForm.select('a[id="email"]')[0];
-                                if (email){ 
-                                    email.setAttribute('href', 'mailto:unknown@unknown.com?Subject=UPLOAD&Body='+transport.responseText); 
-                                }
-	                        	modal.refreshDialogAppearance();
-	                        };
-	                        conn.sendSync();
-	                    };
-                    }
                     var userSelection = ajaxplorer.getUserSelection();
                     if(userSelection.hasDir()){
                     	var loadFunc = function(oForm){
@@ -357,7 +332,52 @@
 	                    };
 	                    modal.showDialogForm('Get', 'share_folder_form', loadFunc, submitFunc, null);                	
                     }else{
-	                    modal.showDialogForm('Get', 'public_url_form', null, function(){
+
+						if(!window.ajxpPublicUrlCallback){							
+							window.ajxpPublicUrlCallback = function(){
+								var userSelection = ajaxplorer.getUserSelection();
+								if(!userSelection.isUnique() || userSelection.hasDir()) return;
+								var publicUrl = ajxpServerAccessPath+'?get_action=public_url';
+								publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
+		                        var oForm = $(modal.getForm());	                        
+		                        var conn = new Connexion(publicUrl);
+		                        conn.setParameters(oForm.serialize(true));
+		                        conn.addParameter('get_action','public_url');
+		                        conn.onComplete = function(transport){
+		                        	var cont = oForm.down('input[id="public_url_container"]');
+		                        	if(cont){
+		                        		cont.value = transport.responseText;
+		                        		cont.select();
+		                        	}
+	                                var email = oForm.down('a[id="email"]');
+	                                if (email){ 
+	                                    email.setAttribute('href', 'mailto:unknown@unknown.com?Subject=UPLOAD&Body='+transport.responseText); 
+	                                }
+	                                new Effect.Fade(oForm.down('fieldset[id="public_url_generate"]'), {
+	                                	duration:0.5,
+	                                	afterFinish : function(){
+	                                		modal.refreshDialogAppearance();
+	                                		new Effect.Appear(oForm.down('fieldset[id="public_url_result"]'), {
+	                                			duration:0.5,
+	                                			afterFinish : function(){
+	                                				cont.select();
+	                                				modal.refreshDialogAppearance();
+	                                			}
+	                                		});
+	                                	}
+	                                });
+		                        };
+		                        conn.sendSync();
+		                    };
+	                    }
+                    	var loadFunc = function(oForm){
+                    		var button = $(oForm).down('div.fakeUploadButton');
+                    		if(!button.listenerAttached){                    			
+                    			button.listenerAttached = true;
+                    			button.observe("click", window.ajxpPublicUrlCallback);
+                    		}
+                    	};
+	                    modal.showDialogForm('Get', 'public_url_form', loadFunc, function(){
 	                        hideLightBox(true);
 	                        return false;
 	                    }, null, true);
@@ -366,52 +386,54 @@
 					<clientForm id="public_url_form"><![CDATA[
 					<div id="public_url_form" title="AJXP_MESSAGE[293]"  box_width="280" action="public_url">
 						<fieldset>
-							<legend ajxp_message_id="307">1 : AJXP_MESSAGE[307]</legend>
-							<div class="dialogLegend">
-								<input type="text" style="width: 25px; float: right;" value="0" name="expiration"/>
-								<span ajxp_message_id="294">AJXP_MESSAGE[294]</span> 
-							</div>
-							<div class="dialogLegend" style="clear: both; margin-top: 10px;">
-								<input type="password"  autocomplete="off" value="" name="password" style="float: right; width: 100px;"/>
-								<span ajxp_message_id="295">AJXP_MESSAGE[295]</span>
+							<legend ajxp_message_id="307">AJXP_MESSAGE[307]</legend>
+							<div ajxp_message_id="294" class="dialogLegend">AJXP_MESSAGE[294]</div>
+							<div style="padding:10px 5px 0 5;">
+								<span ajxp_message_id="295">AJXP_MESSAGE[295]</span> 
+								<input type="text" name="expiration" value="0" style="width: 20px ! important;margin-right:10px;">
+								
+								<span ajxp_message_id="182">AJXP_MESSAGE[182]</span> 
+								<input type="password" style="width:60px;" name="password" value="" autocomplete="off">
+							</div>							
+						</fieldset>
+						<fieldset id="public_url_generate">
+							<legend ajxp_message_id="308">AJXP_MESSAGE[308]</legend>
+							<div align="center" style="color: #999; margin-top:5px; font-size:10px;">
+								<div align="center" class="fakeUploadButton"><img src="AJXP_THEME_FOLDER/images/actions/22/public_url.png" height="22" width="22"/><br/>AJXP_MESSAGE[309]</div>
 							</div>
 						</fieldset>
-						<fieldset>
-							<legend ajxp_message_id="308">2 : AJXP_MESSAGE[308]</legend>
-							<div align="center" style="color: white; margin-top:5px; font-size:10px;">
-								<div align="center" style="text-align:center; cursor: pointer; width:50px; border: 1px solid #aaa;background-color: #bbb;padding:5 10 3 10;" onclick="window.ajxpPublicUrlCallback(); return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/public_url.png" height="22" width="22"/><br/>AJXP_MESSAGE[309]</div>
-							</div>
-						</fieldset>
-						<fieldset>
-							<legend ajxp_message_id="296">3 : AJXP_MESSAGE[296]</legend>
-							<input type="text" style="width:230px;" id="public_url_container"/><br/>
-                            <a id="email" ajxp_message_id="323"> AJXP_MESSAGE[323] </a>
+						<fieldset style="display:none;" id="public_url_result">
+							<legend ajxp_message_id="296">AJXP_MESSAGE[296]</legend>
+							<input type="text" style="width:200px;margin-right:5px;" id="public_url_container"/>
+                            <a id="email" title="AJXP_MESSAGE[323]"><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>
 						</fieldset>
 					</div>
 					<div id="share_folder_form" title="Share Folder"  box_width="280" action="public_url">
 						<fieldset>
-							<legend ajxp_message_id="307">Target User</legend>
+							<legend ajxp_message_id="353">AJXP_MESSAGE[353]</legend>
+							<div class="dialogLegend" ajxp_message_id="354">AJXP_MESSAGE[354]</div>
 							<div class="SF_element">
-								<div ajxp_message_id="294" class="SF_label">User Name : </div> 
+								<div ajxp_message_id="355" class="SF_label">AJXP_MESSAGE[355] : </div> 
 								<input type="text" class="SF_input dialogFocus" value="" name="shared_user" id="shared_user"/>	
 								<div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;"></div>
 							</div>
 							<div class="SF_element" id="shared_pass_div">
-								<div class="SF_label" ajxp_message_id="295">User Pass : </div>
+								<div class="SF_label" ajxp_message_id="356">AJXP_MESSAGE[356] : </div>
 								<input type="password" autocomplete="off" value="" name="shared_pass" id="shared_pass" class="SF_input"/>
 							</div>
 						</fieldset>
 						<fieldset>
-							<legend ajxp_message_id="307">Target Repository</legend>
+							<legend ajxp_message_id="357">AJXP_MESSAGE[357]</legend>
+							<div class="dialogLegend" ajxp_message_id="358">AJXP_MESSAGE[358]</div>
 							<div class="SF_element">
-								<div class="SF_label" ajxp_message_id="295">Label : </div>
+								<div class="SF_label" ajxp_message_id="359">AJXP_MESSAGE[359] : </div>
 								<input type="text" value="" name="repo_label" class="SF_input"/>
 							</div>
 							<div class="SF_element">
-								<div class="SF_label" ajxp_message_id="295">Rights : </div>
+								<div class="SF_label" ajxp_message_id="360">AJXP_MESSAGE[360] : </div>
 								<div class="SF_input">
-									<input type="radio" value="r" name="repo_rights" class="SF_box"/>Read
-									<input type="radio" value="rw" name="repo_rights" class="SF_box" checked/>Write
+									<input type="radio" value="r" name="repo_rights" class="SF_box"/>AJXP_MESSAGE[361]
+									<input type="radio" value="rw" name="repo_rights" class="SF_box" checked/>AJXP_MESSAGE[362]
 								</div>
 							</div>
 						</fieldset>
