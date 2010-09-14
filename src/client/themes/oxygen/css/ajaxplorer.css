@@ -1041,6 +1041,10 @@ div#upload_files_list, div#multiple_download_container
 	background:url("../../../../content.php?get_action=get_drop_bg") no-repeat scroll right bottom transparent;
 }
 
+.dropareaHover {
+	border-color:#D96252 !important;
+}
+
 div#total_files_list, div#uploader_options_pane
 {
 -moz-border-radius:5px 5px 5px 5px;
