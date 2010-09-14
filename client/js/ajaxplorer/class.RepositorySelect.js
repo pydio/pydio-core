@@ -80,8 +80,8 @@ Class.create("RepositorySelect", {
 	
 	refreshRepositoriesMenu: function(repositoryList, repositoryId){
 		this.button.addClassName('disabled');
-		var actions = new Array();
-		var lastActions = new Array();
+		var actions = $A([]);
+		var lastActions = $A([]);
 		if(repositoryList && repositoryList.size()){
 			repositoryList.each(function(pair){
 				var repoObject = pair.value;
@@ -99,9 +99,9 @@ Class.create("RepositorySelect", {
 					}.bind(this)
 				};
 				if(repoObject.getAccessType() == "ajxp_shared" || repoObject.getAccessType() == "ajxp_conf"){
-					lastActions[actions.length] = actionData;
+					lastActions.push(actionData);
 				}else{
-					actions[actions.length] = actionData;
+					actions.push(actionData);
 				}				
 				if(key == repositoryId){
 					this.label.setValue(repoObject.getLabel());
@@ -121,7 +121,7 @@ Class.create("RepositorySelect", {
         actions.sort(fonc);
         if(lastActions.length){
 	        lastActions.sort(fonc);
-	        actions.push({separator:true});
+	        actions.push({separator:true});	        
 	        actions = actions.concat(lastActions);
         }
 		
