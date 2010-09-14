@@ -83,13 +83,10 @@ class AbstractAccessDriver extends AJXP_Plugin {
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
 		if(isSet($this->actions["public_url"])){
+			$disableSharing = false;
 			if((!is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER))){
 				AJXP_Logger::logAction("Disabling Public links, PUBLIC_DOWNLOAD_FOLDER is not writeable!", array("folder" => PUBLIC_DOWNLOAD_FOLDER, "is_dir" => is_dir(PUBLIC_DOWNLOAD_FOLDER),"is_writeable" => is_writable(PUBLIC_DOWNLOAD_FOLDER)));
-				unset($this->actions["public_url"]);
-				$actionXpath=new DOMXPath($contribNode->ownerDocument);
-				$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
-				$publicUrlNode = $publicUrlNodeList->item(0);
-				$contribNode->removeChild($publicUrlNode);
+				$disableSharing = true;
 			}else{
 				if(AuthService::usersEnabled()){
 					$loggedUser = AuthService::getLoggedUser();
@@ -97,14 +94,22 @@ class AbstractAccessDriver extends AJXP_Plugin {
 					if($currentRepo != null){
 						$rights = $loggedUser->getSpecificActionsRights($currentRepo->getId());
 						if(isSet($rights["public_url"]) && $rights["public_url"] === false){
-							unset($this->actions["public_url"]);
-							$actionXpath=new DOMXPath($contribNode->ownerDocument);
-							$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
-							$publicUrlNode = $publicUrlNodeList->item(0);
-							$contribNode->removeChild($publicUrlNode);
+							$disableSharing = true;
 						}
 					}
+					if($loggedUser->getId() == "guest" || $loggedUser == "shared"){
+						$disableSharing = true;
+					}
+				}else{
+					$disableSharing = true;
 				}
+			}
+			if($disableSharing){
+				unset($this->actions["public_url"]);
+				$actionXpath=new DOMXPath($contribNode->ownerDocument);
+				$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
+				$publicUrlNode = $publicUrlNodeList->item(0);
+				$contribNode->removeChild($publicUrlNode);
 			}
 		}
 		if($this->detectStreamWrapper() !== false){
