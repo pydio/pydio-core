@@ -144,6 +144,8 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 					}else if( $mime == "shared_file" ){					
 						$publicletData = $this->loadPublicletData(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
 						if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
+					        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+			        		PublicletCounter::delete($element);
 							unlink(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
 							if($index == count($files)-1){
 								AJXP_XMLWriter::sendMessage($mess["ajxp_shared.13"], null);
@@ -172,6 +174,20 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				
 			break;
 			
+			case "reset_download_counter" : 
+				
+				$selection = new UserSelection();
+				$selection->initFromHttpVars();
+				$elements = $selection->getFiles();
+		        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+				foreach ($elements as $element){
+					PublicletCounter::reset(str_replace(".php", "", basename($element)));
+				}
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::reloadDataNode();
+				AJXP_XMLWriter::close();
+			
+			break;
 			
 			default:
 			break;
@@ -184,9 +200,9 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
 				<column messageId="ajxp_shared.4" attributeName="ajxp_label" sortType="String" width="20%"/>
 				<column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" width="20%"/>
+				<column messageId="ajxp_shared.20" attributeName="download_count" sortType="String" width="5%"/>
 				<column messageId="ajxp_shared.6" attributeName="password" sortType="String" width="5%"/>
 				<column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" width="5%"/>
-				<column messageId="ajxp_shared.20" attributeName="expired" sortType="String" width="5%"/>
 				<column messageId="ajxp_shared.14" attributeName="integrity" sortType="String" width="5%" hidden="true"/>
 			</columns>');
 		if(!is_dir(PUBLIC_DOWNLOAD_FOLDER)) return ;		
@@ -207,11 +223,12 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 			if(isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
+			$expired = ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?true:false):false);
 			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".$publicletData["REPOSITORY"]->getDisplay().":/".$publicletData["FILE_PATH"], true, array(
 				"icon"		=> "html.png",
 				"password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"), 
-				"expiration" => ($publicletData["EXPIRE_TIME"]!=0?date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"), 
-				"expired" => ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?$mess["ajxp_shared.21"]:$mess["ajxp_shared.22"]):"-"), 
+				"expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?"[!]":"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"), 				
+				"download_count" => $publicletData["DOWNLOAD_COUNT"],
 				"integrity"  => (!$publicletData["SECURITY_MODIFIED"]?$mess["ajxp_shared.15"]:$mess["ajxp_shared.16"]),
 				"download_url" => $downloadBase . "/".basename($file),
 				"ajxp_mime" => "shared_file")
@@ -229,15 +246,17 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 			if(!isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
-			if(isSet($publicletData["EXPIRATION_TIME"]) && is_numeric($publicletData["EXPIRATION_TIME"]) && $publicletData["EXPIRATION_TIME"] > 0 && $publicletData["EXPIRATION_TIME"] < time()){
+			if(isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()){
 				unlink($file);
 				$deleted[] = basename($file);
+		        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+        		PublicletCounter::delete(str_replace(".php", "", basename($file)));
 			}
 		}
 		return $deleted;
 	}
 	
-	protected function loadPublicletData($file){
+	protected function loadPublicletData($file){		
 		$lines = file($file);
 		$id = str_replace(".php", "", basename($file));
 		$code = $lines[3] . $lines[4] . $lines[5];
@@ -245,6 +264,8 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		$dataModified = (md5($inputData) != $id);
 		$publicletData = unserialize($inputData);
 		$publicletData["SECURITY_MODIFIED"] = $dataModified;		
+        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+        $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);		
 		return $publicletData;
 	}
 	
