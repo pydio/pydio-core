@@ -120,6 +120,28 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 					</processing>
 			</action>
+			<action name="reset_download_counter">
+				<gui text="ajxp_shared.32" title="ajxp_shared.33" src="eraser.png" accessKey="" hasAccessKey="false">
+					<context selection="true" dir="" recycle="false"
+						actionBar="true" contextMenu="true" infoPanel="true"
+						actionBarGroup="change" inZip="false">
+					</context>
+					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="shared_file"></selectionContext></gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var baseUrl = ajxpServerAccessPath + "?get_action=reset_download_counter";
+						baseUrl = ajaxplorer.getUserSelection().updateFormOrUrl(null, baseUrl);
+						var conn = new Connexion(baseUrl);
+						conn.addParameter("get_action", "reset_download_counter");
+						conn.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+						};
+						conn.sendAsync();						
+						]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+					</processing>
+			</action>
 			<action name="clear_expired">
 				<gui text="ajxp_shared.25" title="ajxp_shared.26" src="edit_clear_history.png" accessKey="" hasAccessKey="false">
 					<context selection="true" dir="true" recycle="false"  behaviour="hidden"
