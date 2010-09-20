@@ -190,6 +190,8 @@ class AbstractAccessDriver extends AJXP_Plugin {
         if (@file_put_contents(PUBLIC_DOWNLOAD_FOLDER."/".$hash.".php", $fileData) === FALSE){
             return "Can't write to PUBLIC URL";
         }
+        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+        PublicletCounter::reset($hash);
         if(defined('PUBLIC_DOWNLOAD_URL') && PUBLIC_DOWNLOAD_URL != ""){
         	return rtrim(PUBLIC_DOWNLOAD_URL, "/")."/".$hash.".php";
         }else{
@@ -207,8 +209,12 @@ class AbstractAccessDriver extends AJXP_Plugin {
         if ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"])
         {
             // Remove the publiclet, it's done
-            if (strstr(PUBLIC_DOWNLOAD_FOLDER, $_SERVER["SCRIPT_FILENAME"]) !== FALSE)
+            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(PUBLIC_DOWNLOAD_FOLDER)) !== FALSE){
+		        $hash = md5(serialize($data));
+		        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+		        PublicletCounter::delete($hash);
                 unlink($_SERVER["SCRIPT_FILENAME"]);
+            }
             
             echo "Link is expired, sorry.";
             exit();
@@ -232,6 +238,12 @@ class AbstractAccessDriver extends AJXP_Plugin {
         $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
         ConfService::setRepository($data["REPOSITORY"]);
         $driver->initRepository();
+        // Increment counter
+        $hash = md5(serialize($data));
+        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+        PublicletCounter::increment($hash);       
+        // Now call switchAction 
+        //@todo : switchAction should not be hard coded here!!!
         $driver->switchAction($data["ACTION"], array("file"=>$data["FILE_PATH"]), "");
     }
 
