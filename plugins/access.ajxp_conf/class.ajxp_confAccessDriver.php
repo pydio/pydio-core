@@ -720,7 +720,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		
 		foreach ($files as $file){
 			$publicletData = $this->loadPublicletData($file);			
-			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".$publicletData["REPOSITORY"]->getDisplay().":/".$publicletData["FILE_PATH"], true, array(
+			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
 				"icon"		=> "html.png",
 				"password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"), 
 				"expiration" => ($publicletData["EXPIRE_TIME"]!=0?date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"), 
