@@ -89,6 +89,9 @@ Class.create("AjxpBootstrap", {
 			if(this.parameters.get('ajxpResourcesFolder')){
 				window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
 			}
+			if(this.parameters.get('additional_js_resource')){
+				connexion.loadLibrary(this.parameters.get('additional_js_resource'));
+			}
 			this.insertLoaderProgress();
 			if(!this.parameters.get("debugMode")){
 				connexion.loadLibrary("ajaxplorer.js");
@@ -137,16 +140,26 @@ Class.create("AjxpBootstrap", {
 	},
 	insertLoaderProgress : function(){
 		var html = '<div id="loading_overlay" style="background-color:#555555;"></div>';
-		html+='	<div id="progressBox" style="background-color:#fff;border:2px solid #676965;width:305px;padding:1px;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
-		html+='	<div align="left" style="background-color:#fff;border:1px solid #676965;color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
-		html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\''+ajxpResourcesFolder+'/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
-		html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';
-		html+='	Written by Charles du Jeu - LGPL License. <br>';
-		if(this.parameters.get('customWelcomeMessage')){
-			html+= this.parameters.get('customWelcomeMessage') + '<br>';
+		if(this.parameters.get('customWelcomeScreen')){
+			try { this.parameters.set('customWelcomeScreen', customFuncDecode(this.parameters.get('customWelcomeScreen')));
+			}catch(e){
+				this.parameters.set('customWelcomeScreen','');
+			}
 		}
-		html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
-		html+='	</div></div>';
+		if(this.parameters.get('customWelcomeScreen')){
+			html += this.parameters.get('customWelcomeScreen');
+		}else{
+			html+='	<div id="progressBox" style="background-color:#fff;border:2px solid #676965;width:305px;padding:1px;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
+			html+='	<div align="left" style="background-color:#fff;border:1px solid #676965;color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
+			html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\''+ajxpResourcesFolder+'/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
+			html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';
+			html+='	Written by Charles du Jeu - LGPL License. <br>';
+			if(this.parameters.get('customWelcomeMessage')){
+				html+= this.parameters.get('customWelcomeMessage') + '<br>';
+			}
+			html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
+			html+='	</div></div>';
+		}
 		$$('body')[0].insert({top:html});
 		viewPort = document.viewport.getDimensions();
 		$('progressBox').setStyle({left:Math.max((viewPort.width-305)/2,0)});
