@@ -2,7 +2,7 @@
 /**
  * @package info.ajaxplorer
  * 
- * Copyright 2007-2009 Charles du Jeu
+ * Copyright 2007-2010 Jean-Christophe Ghio (jissey)
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -32,6 +32,31 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
  * Description : Abstract representation of an access to FEU athentification module(CMS Made Simple).
+ * like auth.remote:
+ *   In slave mode, the login dialog is not displayed in AJXP. 
+ *   If the user directly go to the main page, (s)he's redirected to the LOGIN_URL.
+ *   The logout button link to LOGOUT_URL.
+ *   The user will log in on FEU, and the remote script will call us, as 
+ *   ajxpPath/content.php?get_action=login_cmsms&uid=usernam&sessionid=sessionid in FEU loggedin table
+
+ * You must modify conf.php like this:
+ * 	"AUTH_DRIVER" => array(
+		"NAME"		=> "cmsms",
+		"OPTIONS"	=> array(
+            "SQL_DRIVER" => Array(
+									'driver' => 'mysql',
+									'host' => 'localhost',
+									'username' => 'root',
+									'password' => '',
+									'database' => 'your_cmsms_db'
+									),
+			"PREFIX_TABLE"          => 'your_prefix',
+			"LOGIN_URL"				=> 'http://url of FEU login form',
+			"LOGOUT_URL"			=> 'http://url you want with the logout button ',
+			"SECRET"				=> '1234' //the common secret code between the two application (store in cmsms database on the other side)
+			)
+
+	),
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
@@ -39,7 +64,14 @@ require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
 class cmsmsAuthDriver extends AbstractAuthDriver {
 	
 	var $sqlDriver;
-	var $driverName = "cmsms";	
+	var $driverName = "cmsms";
+	var $slaveMode;
+    var $secret;
+    var $secret_cmsms;
+    var $urls;
+	var $prefix;
+	var $groupid;
+
 	
 	function init($options){
 		parent::init($options);
@@ -50,9 +82,16 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 			echo get_class($e), ': ', $e->getMessage(), "\n";
 			exit(1);
 		}
+		$this->secret = $options["SECRET"];
 		$this->prefix = $options["PREFIX_TABLE"];
-		$this->groupid = $options["FEU_GROUPID"];
-		$this->usersSerFile = $options["USERS_FILEPATH"];
+        $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
+		$this->slaveMode = true;
+	$res = dibi::query("SELECT sitepref_value FROM [".$this->prefix."siteprefs] WHERE sitepref_name = 'FEUajaxplorer_mapi_pref_ajxp_auth_group'");
+	$grp = $res->fetchSingle();
+		$this->groupid = $grp;
+	$res2 = dibi::query("SELECT sitepref_value FROM [".$this->prefix."siteprefs] WHERE sitepref_name = 'FEUajaxplorer_mapi_pref_ajxp_secret'");
+	$sec = $res2->fetchSingle();
+		$this->secret_cmsms = trim($sec);
 
 	}
 			
@@ -67,11 +106,17 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 		return($res->getRowCount());
 	}	
 	
+	function userIsConnected($username, $sessionid){
+		$userid = $this->getUserId($username);
+		$res = dibi::query("SELECT * FROM [".$this->prefix."module_feusers_loggedin] WHERE [userid]=%s AND sessionid=%s", $userid, $sessionid);
+		return($res->getRowCount());
+	}	
+	
+	// Never call if used with the initial cmsms ajxp module.
+	// We don't check the password because we use sessionid and userid from FEU loggedin table.
 	function checkPassword($login, $pass, $seed){
 		$userStoredPass = $this->getUserPass($login);
 		if(!$userStoredPass) return false;		
-		// jcg on ne check le password uniquement pour se connecter.
-		// donc je fais la maj de la bdd feuusers_loggedin ici.
 		if(md5($pass) == $userStoredPass) {
 		$loggedinData['sessionid']=session_id();
 		$loggedinData['lastused']=time;
@@ -79,11 +124,7 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 		dibi::query('INSERT INTO ['.$this->prefix.'module_feusers_loggedin]', $loggedinData);
 		}
 
-		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){ // Seed = -1 means that password is not encoded.
 			return ($userStoredPass == md5($pass));
-		}else{
-			return (md5($userStoredPass.$seed) == $pass);
-		}
 	}
 	
 	function usersEditable(){
@@ -98,17 +139,11 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		$userData = array("username" => $login);
-		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = md5($passwd);
-		}else{
-			$userData["password"] = $passwd;
-		}
+		$userData["password"] = md5($passwd);
 		$userData["id"]=$this->getUserSeq()+1;
 		$userData["createdate"]=date("Y-m-d H:i:s");
-		//maj table users
 		dibi::query('INSERT INTO ['.$this->prefix.'module_feusers_users]', $userData);
 		$this->setUserSeq($userData["id"]);
-		//maj table appartenance au groupe
 		$belongsData["userid"]=$userData["id"];
 		$belongsData["groupid"]=$this->groupid;
 		dibi::query('INSERT INTO ['.$this->prefix.'module_feusers_belongs]', $belongsData);
@@ -117,16 +152,12 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		$userData = array("username" => $login);
-		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
-			$userData["password"] = md5($newPass);
-		}else{
-			$userData["password"] = $newPass;
-		}
+		$userData["password"] = md5($newPass);
 		dibi::query("UPDATE [".$this->prefix."module_feusers_users] SET ", $userData, "WHERE `username`=%s", $login);
 	}	
 	function deleteUser($login){
 		$uid=$this->getUserId($login);
-		//suppress all reference in CMSMS FEU tables
+		//suppress all references in CMSMS FEU tables
 		dibi::query("DELETE FROM [".$this->prefix."module_feusers_users] WHERE `username`=%s", $login);
 		dibi::query("DELETE FROM [".$this->prefix."module_feusers_belongs] WHERE `userid`=%s", $uid);
 		dibi::query("DELETE FROM [".$this->prefix."module_feusers_properties] WHERE `userid`=%s", $uid);
@@ -156,6 +187,34 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 	function listUsersSerial(){
 		return AJXP_Utils::loadSerialFile($this->usersSerFile);
 	}
+	function getLoginRedirect(){
+	if ($this->slaveMode) {
+		if (isset($_SESSION["AJXP_USER"])) return false;
+		return $this->urls[0];
+	} 
+	return false;
+}
 
+	function getLogoutRedirect(){
+		if ($this->slaveMode) {
+			return $this->urls[1];
+		} 
+		return false;
+		}
+// call by CMS Made Simple with the followings arguments:
+// username : username of the FEU user
+// sessionid : num. of session in the loggedin table for matching the logging the user here.	
+	function login_cmsms(){
+	$username=strip_tags($_GET['username']);
+	$sessionid=strip_tags($_GET['sessionid']);
+	//verifying the CIA secret code...
+	if($this->secret != $this->secret_cmsms) exit( "secret");//return header("Location: ".$this->getLoginRedirect());
+	//verifying that the user exists (in the right group)
+	if(!$this->userExists($username)) exit( "exists");//return header("Location: ".$this->getLoginRedirect());
+	//verifying that the user is connected
+	if(!$this->userIsConnected($username, $sessionid)) exit( "connect");//return header("Location: ".$this->getLoginRedirect());
+	//all tests passed...we connect the user
+	if($log=AuthService::logUser($username,"",true)==1) return header("Location: index.php");
+	}
 }
 ?>
