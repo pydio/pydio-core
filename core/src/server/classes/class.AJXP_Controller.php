@@ -37,7 +37,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class AJXP_Controller{
 	
-	static $xPath;
+	private static $xPath;
+	public static $lastActionNeedsAuth = false;
 	
 	private static function initXPath(){
 		if(!isSet(self::$xPath)){
@@ -60,11 +61,15 @@ class AJXP_Controller{
 					}
 				}
 			}
+			self::$lastActionNeedsAuth = true;
 			return ;
 		}
 		$xPath = self::initXPath();
 		$actions = $xPath->query("actions/action[@name='$actionName']");		
-		if(!$actions->length) return false;
+		if(!$actions->length){
+			self::$lastActionNeedsAuth = true;
+			return false;
+		}
 		$action = $actions->item(0);
 		//Check Rights
 		$mess = ConfService::getMessages();
@@ -94,7 +99,7 @@ class AJXP_Controller{
 					AJXP_XMLWriter::close();
 					exit(1);
 				}
-		}				
+		}			
 		
 		$preCalls = self::getCallbackNode($xPath, $action, 'pre_processing/serverCallback', $actionName, $httpVars, $fileVars, true);
 		$postCalls = self::getCallbackNode($xPath, $action, 'post_processing/serverCallback[not(@capture="true")]', $actionName, $httpVars, $fileVars, true);
@@ -202,6 +207,7 @@ class AJXP_Controller{
 		$rightNode =  $rights->item(0);
 		$rightAttr = $xPath->query("@".$right, $rightNode);
 		if($rightAttr->length && $rightAttr->item(0)->value == "true"){
+			self::$lastActionNeedsAuth = true;
 			return true;
 		}
 		return false;
