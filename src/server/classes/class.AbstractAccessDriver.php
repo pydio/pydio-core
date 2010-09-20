@@ -280,7 +280,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		}
 		$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
 		$userName = $httpVars["shared_user"];
-		$label = $httpVars["repo_label"];
+		$label = SystemTextEncoding::fromUTF8($httpVars["repo_label"]);
 		$rights = $httpVars["repo_rights"];
 		if($rights != "r" && $rights != "rw") return 100;
 		// CHECK USER & REPO DOES NOT ALREADY EXISTS
