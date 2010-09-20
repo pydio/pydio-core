@@ -156,7 +156,10 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	if($data["PASSWORD"] && !is_file(PUBLIC_DOWNLOAD_FOLDER."/allz.css")){    		
     		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", PUBLIC_DOWNLOAD_FOLDER."/allz.css");
     		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/22/dialog_ok_apply.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
-    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/public_url.png");
+    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/public_url.png");    		
+    	}
+    	if(!is_file(PUBLIC_DOWNLOAD_FOLDER."/index.html")){
+    		@copy(INSTALL_PATH."/server/index.html", PUBLIC_DOWNLOAD_FOLDER."/index.html");
     	}
         $data["PLUGIN_ID"] = $this->id;
         $data["BASE_DIR"] = $this->baseDir;
@@ -244,7 +247,8 @@ class AbstractAccessDriver extends AJXP_Plugin {
         PublicletCounter::increment($hash);       
         // Now call switchAction 
         //@todo : switchAction should not be hard coded here!!!
-        $driver->switchAction($data["ACTION"], array("file"=>$data["FILE_PATH"]), "");
+        // Re-encode file-path as it will be decoded by the action.
+        $driver->switchAction($data["ACTION"], array("file"=>SystemTextEncoding::toUTF8($data["FILE_PATH"])), "");
     }
 
     /** Create a publiclet object, that will be saved in PUBLIC_DOWNLOAD_FOLDER
