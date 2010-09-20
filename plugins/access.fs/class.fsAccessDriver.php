@@ -1108,7 +1108,13 @@ class fsAccessDriver extends AbstractAccessDriver
 				AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, false));
 			}else{
 				try{
-					copy($realSrcFile, $destFile);
+					$src = fopen($realSrcFile, "r");
+					$dest = fopen($destFile, "w");
+					while (!feof($src)) {
+						stream_copy_to_stream($src, $dest, 4096);
+					}					
+					fclose($src);
+					fclose($dest);
 					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
 				}catch (Exception $e){
 					$error[] = $e->getMessage();
