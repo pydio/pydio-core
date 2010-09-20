@@ -30,7 +30,7 @@ $mess=array(
 "17"=> "Download URL",
 "18"=> "Copy URL",
 "19"=> "Copy url to send by email.",
-"20"=> "Expired",
+"20"=> "Downloads",
 "21"=> "Yes",
 "22"=> "No",
 "23"=> "Successfully deleted %s files.",
@@ -41,6 +41,8 @@ $mess=array(
 "28"=> "Files shared for direct download, either protected by a password or not.",
 "29"=> "Delegates repositories created by users.",
 "30"=> "Users created to access the delegated repositories.",
-"31"=> "Description"
+"31"=> "Description",
+"32"=> "Reset",
+"33"=> "Reset download counter",
 ); 
 ?>
