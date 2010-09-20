@@ -109,7 +109,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			
 				HTMLWriter::charsetHeader();
 				echo HTMLWriter::getDocFile(htmlentities($_GET["doc_file"]));
-				exit(1);
 				
 			break;
 			
@@ -179,7 +178,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["i18nMessages"] = ConfService::getMessages();
 				header("Content-type:application/json;charset=UTF-8");
 				print(json_encode($config));
-				exit(1);
 				
 			break;
 					
