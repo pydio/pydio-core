@@ -40,7 +40,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 	function switchAction($action, $httpVars, $fileVars)
 	{
 		if(!isSet($this->actions[$action])) return;
-		$xmlBuffer = "";
 		foreach($httpVars as $getName=>$getValue){
 			$$getName = AJXP_Utils::securePath($getValue);
 		}
@@ -65,7 +64,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				{
 					include($folder."/".$template_name);
 				}
-				exit(0);	
 				
 			break;
 						
@@ -76,7 +74,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			
 				HTMLWriter::charsetHeader('text/javascript');
 				HTMLWriter::writeI18nMessagesClass(ConfService::getMessages());
-				exit(0);	
 				
 			break;
 			
@@ -98,7 +95,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					header('Content-Type: application/xml; charset=UTF-8');
 					print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML()));
 				}
-				exit(0);
 				
 			break;
 									
@@ -130,7 +126,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				}
 				HTMLWriter::charsetHeader("text/plain");
 				print($message);
-				exit(1);
 				
 			break;
 			
@@ -184,32 +179,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			default;
 			break;
 		}
-		if(isset($logMessage) || isset($errorMessage))
-		{
-			$xmlBuffer .= AJXP_XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);			
-		}
 		
-		if(isset($requireAuth))
-		{
-			$xmlBuffer .= AJXP_XMLWriter::requireAuth(false);
-		}
-		
-		if(isset($reload_current_node) && $reload_current_node == "true")
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadCurrentNode(false);
-		}
-		
-		if(isset($reload_dest_node) && $reload_dest_node != "")
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadNode($reload_dest_node, false);
-		}
-		
-		if(isset($reload_file_list))
-		{
-			$xmlBuffer .= AJXP_XMLWriter::reloadFileList($reload_file_list, false);
-		}
-		
-		return $xmlBuffer;		
+		return false;		
 	}
 }
 

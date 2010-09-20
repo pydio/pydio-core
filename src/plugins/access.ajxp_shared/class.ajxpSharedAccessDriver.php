@@ -202,8 +202,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				<column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" width="20%"/>
 				<column messageId="ajxp_shared.20" attributeName="download_count" sortType="String" width="5%"/>
 				<column messageId="ajxp_shared.6" attributeName="password" sortType="String" width="5%"/>
-				<column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" width="5%"/>
-				<column messageId="ajxp_shared.14" attributeName="integrity" sortType="String" width="5%" hidden="true"/>
+				<column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" width="5%"/>				
 			</columns>');
 		if(!is_dir(PUBLIC_DOWNLOAD_FOLDER)) return ;		
 		$files = glob(PUBLIC_DOWNLOAD_FOLDER."/*.php");
@@ -224,7 +223,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				continue;
 			}
 			$expired = ($publicletData["EXPIRE_TIME"]!=0?($publicletData["EXPIRE_TIME"]<time()?true:false):false);
-			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".$publicletData["REPOSITORY"]->getDisplay().":/".$publicletData["FILE_PATH"], true, array(
+			AJXP_XMLWriter::renderNode(str_replace(".php", "", basename($file)), "".SystemTextEncoding::toUTF8($publicletData["REPOSITORY"]->getDisplay()).":/".SystemTextEncoding::toUTF8($publicletData["FILE_PATH"]), true, array(
 				"icon"		=> "html.png",
 				"password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"), 
 				"expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?"[!]":"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"), 				

@@ -193,14 +193,10 @@ if($xmlResult !== false && $xmlResult != ""){
 	AJXP_XMLWriter::header();
 	print($xmlResult);
 	AJXP_XMLWriter::close();
-	exit(1);
-}
-if(isset($requireAuth))
-{
+}else if(isset($requireAuth) && AJXP_Controller::$lastActionNeedsAuth){
 	AJXP_XMLWriter::header();
 	AJXP_XMLWriter::requireAuth();
 	AJXP_XMLWriter::close();
-	exit(1);
-}	
+}
 session_write_close();
 ?>
