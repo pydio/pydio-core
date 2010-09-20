@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="cmsms" label="DB Storage" description="Stores the Authentication data in CMSMS FEU.">
 	<server_settings>
+		<param name="LOGIN_URL" type="string" label="Login URL" description="if direct access, redirect to the given URL" mandatory="true" />
+		<param name="LOGOUT_URL" type="string" label="Logout URL" description="Redirect to the given URL on loggin out" mandatory="true" />
+		<param name="SECRET" type="string" label="Secret key" description="This key must only be known by remote end" mandatory="true" />
 		<param name="SQL_DRIVER" type="array" label="Connexion" description="The Database Connexion" mandatory="true"/>
 		<param name="PREFIX_TABLE" type="string" label="Prefix tables" description="Prefix of CMSMS tables " mandatory="true"/>
-		<param name="FEU_GROUPID" type="string" label="Groupe FEU" description="The number of the authorized group in FEU" mandatory="true"/>
-		<param name="TRANSMIT_CLEAR_PASS" type="string" label="crypt password" description="wether or not encrypt(MD5) parameters" mandatory="false"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.cmsms/class.cmsmsAuthDriver.php" classname="cmsmsAuthDriver"/>
 	<registry_contributions>
 		<external_file filename="server/xml/standard_auth_actions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/auth.cmsms/action.xml" include="actions/*"/>		
 	</registry_contributions>
 </authdriver>
