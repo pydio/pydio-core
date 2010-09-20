@@ -1,0 +1,21 @@
+http://www.ajaxplorer.info
+Made by jissey under GPL licence
+
+This CMS Made Simple module will make a bridge between your FEU users and the AjaXplorer users.
+That means that users created/deleted in your CMSMS installation will be recognized in your ajaxplorer installation (because ajaxplorer accesses to the FEU users table),
+and that you will use the FEU login page instead of the "popup" to log on to AjaXplorer.
+
+This is still an experimental release and has been tested only on a few CMSMS & ajxp versions.
+
+So what do you need to make it work?
+
+ * You must use at least the 3.0 version of AjaXplorer.
+
+ * Extract the FEUajaxplorer folder inside your cmsms/modules/ folder.
+or
+ * Extract the ajaxplorer xml file and import it in the module manager.
+
+ * Read the help of the module.
+ * Activate auth.cmsms in ajaxplorer (see class.cmsmsAuthDriver.php in /plugin/auth.cmsms)
+
+For support, post on the forum.
