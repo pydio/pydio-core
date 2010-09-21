@@ -227,7 +227,7 @@
 		</action>
 		<action name="compress">
 			<gui text="313" title="314" src="archive_insert.png" accessKey="" hasAccessKey="false">
-				<context selection="true" dir="" recycle="false"
+				<context selection="true" dir="" recycle="hidden"
 					actionBar="false" contextMenu="true" infoPanel="true"
 					actionBarGroup="get" inZip="false">
 				</context>
@@ -285,7 +285,7 @@
 		</action>
 		<action name="public_url">
 			<gui text="292" title="292" src="public_url.png" hasAccessKey="false">
-				<context selection="true" dir="" recycle="false"
+				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get">
 				</context>
