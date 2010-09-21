@@ -43,7 +43,10 @@
  */
  
   
-global $secret, $result;
+global $AJXP_GLUE_GLOBALS;
+if(!isSet($AJXP_GLUE_GLOBALS)){
+	$AJXP_GLUE_GLOBALS = array();
+}
 
 if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
@@ -64,7 +67,8 @@ ConfService::init("$CURRENTPATH/../../server/conf/conf.php");
 $plugins = ConfService::getConf("PLUGINS");
 require_once("$CURRENTPATH/../../plugins/conf.".$plugins["CONF_DRIVER"]["NAME"]."/class.AJXP_User.php");
 
-global $plugInAction;
+$plugInAction = $AJXP_GLUE_GLOBALS["plugInAction"];
+$secret = $AJXP_GLUE_GLOBALS["secret"];
 $G_AUTH_DRIVER_DEF = $plugins["AUTH_DRIVER"];
 if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"] == "")
 {
@@ -72,10 +76,10 @@ if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIO
        die("This file must be included and can't be called directly");
     }
     if ($_SERVER['PHP_SELF'] != $G_AUTH_DRIVER_DEF["OPTIONS"]["LOGIN_URL"]){
-       $plugInAction = "zoooorg"; // Used to debug the whole shit in the main file
+       $plugInAction = "zoooorg";
     }
 } else if ($secret != $G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]){    	
-    $plugInAction = "zuuuuup"; // Used to debug the whole shit in the main file
+    $plugInAction = "zuuuuup";
 }
 
 //die($plugInAction);
@@ -83,7 +87,7 @@ if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIO
 switch($plugInAction)
 {
 	case 'login':
-	    global $login, $autoCreate;
+	    $login = $AJXP_GLUE_GLOBALS["login"]; $autoCreate = $AJXP_GLUE_GLOBALS["autoCreate"];
 	    if (is_array($login))
 	    {
 	        $newSession = new SessionSwitcher("AjaXplorer");
@@ -91,7 +95,22 @@ switch($plugInAction)
 		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
 	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
 	        }
-	        $result = AuthService::logUser($login["name"], $login["password"], true) == 1;
+	        $result = AuthService::logUser($login["name"], $login["password"], true);
+		   	// Update default rights (this could go in the trunk...)
+		   	if($result == 1){
+			   	$userObject = AuthService::getLoggedUser();
+			   	if($userObject->isAdmin()){
+			   		AuthService::updateAdminRights($userObject);
+			   	}else{
+					foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
+					{			
+						if($repoObject->getDefaultRight() != ""){
+							$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
+						}
+					}
+			   	}
+				$userObject->save();		   	
+		   	}	        
 	    }
 	    break;
 	case 'logout':
@@ -101,17 +120,16 @@ switch($plugInAction)
 	    $result = TRUE;
 	    break;
 	case 'addUser':
-	    global $user;
+	    $user = $AJXP_GLUE_GLOBALS["user"];
 	    if (is_array($user))
 	    {
-	        $newSession = new SessionSwitcher("AjaXplorer");
 	        $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
 	        AuthService::createUser($user["name"], $user["password"], $isAdmin);
 	        $result = TRUE;
 	    }
 	    break;
 	case 'delUser':
-	    global $userName;
+	    $userName = $AJXP_GLUE_GLOBALS["userName"];
 	    if (strlen($userName))
 	    {	        
 	        AuthService::deleteUser($userName);
@@ -119,37 +137,29 @@ switch($plugInAction)
 	    }
 	    break;
 	case 'updateUser':
-	    global $user;
+	    $user = $AJXP_GLUE_GLOBALS["user"];
 	    if (is_array($user))
 	    {
-	        $newSession = new SessionSwitcher("AjaXplorer");
 	        if (AuthService::updatePassword($user["name"], $user["password"]))
 	        {
 	        	$isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
 				$confDriver = ConfService::getConfStorageImpl();
 				$user = $confDriver->createUserObject($user["name"]);
 				$user->setAdmin($isAdmin);
-				$user->save();	        	
-	        	/*
-	            //@TODO Change this to match your CMS code
-	            if ($user["right"] == "admin")
-	            {
-	                $userObj = getLoggedUser();
-	                if ($user["name"] == $userObj->getId())
-	                    AuthService::updateAdminRights($userObj);
-	            }
-	            */
+				$user->save();
 	            $result = TRUE;
 	        }
 	        else $result = FALSE;
 	    }
 	    break;
 	case 'installDB':
-	    global $user, $reset;
+	    $user = $AJXP_GLUE_GLOBALS["user"]; $reset = $AJXP_GLUE_GLOBALS["reset"];
 	    $result = TRUE;
 	    break;            
 	default:
 	    $result = FALSE;
 }
+
+$AJXP_GLUE_GLOBALS["result"] = $result;
     
 ?>
