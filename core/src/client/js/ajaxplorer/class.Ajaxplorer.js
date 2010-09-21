@@ -682,7 +682,15 @@ Class.create("Ajaxplorer", {
 		return this.actionBar;
 	},
 			
-	displayMessage: function(messageType, message){		
+	displayMessage: function(messageType, message){
+		var urls = parseUrl(message);
+		if(urls.length && this.user && this.user.repositories){
+			urls.each(function(match){
+				var repo = this.user.repositories.get(match.host);
+				if(!repo) return;
+				message = message.replace(match.url, repo.label+":" + match.path + match.file);
+			}.bind(this));
+		}
 		modal.displayMessage(messageType, message);
 	},
 	
