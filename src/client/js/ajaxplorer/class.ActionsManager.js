@@ -268,7 +268,7 @@ Class.create("ActionsManager", {
 		return false;
 	},
 		
-	submitForm: function(formName, post)
+	submitForm: function(formName, post, completeCallback)
 	{
 		var connexion = new Connexion();
 		if(post){
@@ -286,7 +286,11 @@ Class.create("ActionsManager", {
 		if(ajaxplorer.getContextNode()){
 			connexion.addParameter('dir', ajaxplorer.getContextNode().getPath());
 		}
-		connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this) ;
+		if(completeCallback){
+			connexion.onComplete = completeCallback;
+		}else{
+			connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this) ;
+		}
 		connexion.sendAsync();
 	},
 	

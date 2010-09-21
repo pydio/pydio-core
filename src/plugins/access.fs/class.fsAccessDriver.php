@@ -94,7 +94,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$selection->initFromHttpVars($httpVars);
 		$mess = ConfService::getMessages();
 		
-		$newArgs = RecycleBinManager::filterActions($action, $selection, $dir);
+		$newArgs = RecycleBinManager::filterActions($action, $selection, $dir, $httpVars);
 		if(isSet($newArgs["action"])) $action = $newArgs["action"];
 		if(isSet($newArgs["dest"])) $httpVars["dest"] = SystemTextEncoding::toUTF8($newArgs["dest"]);//Re-encode!
  		// FILTER DIR PAGINATION ANCHOR

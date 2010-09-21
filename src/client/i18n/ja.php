@@ -400,6 +400,7 @@ $mess=array(
 "361" => "Read",
 "362" => "Write",
 "363" => "Shared Elements",
+"364" => "You do not have the rights to perform this operation",
 /* 文章終了 */
 );
 ?>
