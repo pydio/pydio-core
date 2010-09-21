@@ -561,6 +561,9 @@ class fsAccessDriver extends AbstractAccessDriver
 						$metaData["bytesize"] = 0;
 						if($isLeaf){
 							$metaData["bytesize"] = filesize($currentFile);							
+							if($metaData["bytesize"] < 0){
+								$metaData["bytesize"] = sprintf("%u", $metaData["bytesize"]);
+							}
 						}
 						$metaData["filesize"] = AJXP_Utils::roundSize($metaData["bytesize"]);
 						if(AJXP_Utils::isBrowsableArchive($nodeName)){
