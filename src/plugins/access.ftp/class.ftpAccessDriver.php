@@ -186,6 +186,47 @@ class ftpAccessDriver extends fsAccessDriver {
 
 	}
 
+	function deldir($location)
+	{
+		if(is_dir($location))
+		{
+			$dirsToRecurse = array();
+			$all=opendir($location);
+			while ($file=readdir($all))
+			{
+				if (is_dir("$location/$file") && $file !=".." && $file!=".")
+				{
+					$dirsToRecurse[] = "$location/$file";
+				}
+				elseif (!is_dir("$location/$file"))
+				{
+					if(file_exists("$location/$file")){						
+						unlink("$location/$file"); 
+					}
+					unset($file);
+				}
+			}
+			closedir($all);
+			foreach ($dirsToRecurse as $recurse){
+				$this->deldir($recurse);
+			}
+			rmdir($location);
+		}
+		else
+		{
+			if(file_exists("$location")) {
+				$test = @unlink("$location");
+				if(!$test) throw new Exception("Cannot delete file ".$location);
+			}
+		}
+		if(basename(dirname($location)) == $this->repository->getOption("RECYCLE_BIN"))
+		{
+			// DELETING FROM RECYCLE
+			RecycleBinManager::deleteFromRecycle($location);
+		}
+	}
+	
+	
     function storeFileToCopy($fileData){
             $user = AuthService::getLoggedUser();
             $files = $user->getTemporaryData("tmp_upload");
