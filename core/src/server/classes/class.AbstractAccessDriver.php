@@ -343,9 +343,11 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	// Check rights
     	if(AuthService::usersEnabled()){
 	    	$loggedUser = AuthService::getLoggedUser();
-	    	if(!$loggedUser->canRead($repositoryId) || !$loggedUser->canWrite($destRepoId)){
+	    	if(!$loggedUser->canRead($repositoryId) || !$loggedUser->canWrite($destRepoId)
+	    		|| (isSet($httpVars["moving_files"]) && !$loggedUser->canWrite($repositoryId))
+	    	){
 	    		AJXP_XMLWriter::header();
-	    		AJXP_XMLWriter::sendMessage(null, "You do not have the right to access one of the repositories!");
+	    		AJXP_XMLWriter::sendMessage(null, $mess[364]);
 	    		AJXP_XMLWriter::close();
 	    		exit(1);
 	    	}
@@ -354,7 +356,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	$messages = array();
     	foreach ($files as $file){
     		$origFile = $origStreamURL.$file;
-    		$destFile = $destStreamURL.$httpVars["dest"]."/".basename($file);    		
+    		$destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".basename($file);    		
 			$origHandler = fopen($origFile, "r");
 			$destHandler = fopen($destFile, "w");
 			if($origHandler === false || $destHandler === false) {
@@ -367,7 +369,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 			fflush($destHandler);
 			fclose($origHandler); 
 			fclose($destHandler);			
-			$messages[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($origFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destFile);
+			$messages[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($origFile))." ".(isSet($httpVars["moving_files"])?$mess[74]:$mess[73])." ".SystemTextEncoding::toUTF8($destFile);
     	}
     	AJXP_XMLWriter::header();    	
     	if(count($errorMessages)){

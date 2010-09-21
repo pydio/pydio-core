@@ -67,12 +67,12 @@ class RecycleBinManager
 		return ($currentLocation == self::$rbmRelativeRecycle);
 	}
 	
-	public static function filterActions($action, $selection, $currentLocation){
+	public static function filterActions($action, $selection, $currentLocation, $httpVars = array()){
 		if(!self::recycleEnabled()) return array();
 		$newArgs = array();
 
 		// FILTER ACTION FOR DELETE
-		if($action == "delete" && !self::currentLocationIsRecycle($currentLocation))
+		if($action == "delete" && !self::currentLocationIsRecycle($currentLocation) && !isSet($httpVars["force_deletion"]))
 		{
 			$newArgs["action"] = "move";
 			$newArgs["dest"] = self::$rbmRelativeRecycle;
