@@ -711,11 +711,42 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var context = ajaxplorer.actionBar;
+					if(ajaxplorer.user){
+						var activeRepository = ajaxplorer.user.getActiveRepository();
+						var repoList = ajaxplorer.user.getRepositoriesList();
+						if(!repoList.get(activeRepository).allowCrossRepositoryCopy){
+							activeRepository = null;
+						}
+					}
+					
 					var onLoad = function(oForm){
-						var getAction = oForm.select('input[name="get_action"]')[0];
+						var getAction = oForm.down('input[name="get_action"]');
 						getAction.value = 'move';					
 						this.treeSelector = new TreeSelector(oForm);
 						this.treeSelector.load();
+						if(activeRepository && !ajaxplorer.getUserSelection().hasDir()){
+							var filterOptions = $A([]);
+							repoList.each(function(pair){
+								var repoObject = pair.value;
+								if(repoObject.allowCrossRepositoryCopy){
+									if(repoObject.getId() == activeRepository) return;
+									filterOptions.push({key:repoObject.getId(),value:repoObject.getLabel()});
+								}
+							});							
+							if(!filterOptions.length) return;
+							this.treeSelector.setFilterShow(true);
+							filterOptions.each(function(pair){
+								this.treeSelector.appendFilterValue(pair.key, pair.value);
+							}.bind(this) );
+							this.treeSelector.appendFilterValue(activeRepository, "&lt;Current Repository&gt;", 'top');
+							this.treeSelector.setFilterSelectedIndex(0);
+							this.treeSelector.setFilterChangeCallback(function(e){
+								externalRepo = this.filterSelector.getValue();
+								var nodeProvider = new RemoteNodeProvider();
+								nodeProvider.initProvider({tmp_repository_id:externalRepo});
+								this.resetAjxpRootNode(new AjxpNode("/", false, "Destination", "folder.png", nodeProvider));
+							});
+						}												
 					}.bind(context);
 					var onCancel = function(){
 						this.treeSelector.unload();
@@ -723,14 +754,39 @@
 					}.bind(context);
 					var onSubmit = function(){
 						var oForm = modal.getForm();
-						var getAction = oForm.select('input[name="get_action"]')[0];
+						var getAction = oForm.down('input[name="get_action"]');
 						var selectedNode = this.treeSelector.getSelectedNode();
 						if(selectedNode == ajaxplorer.getContextNode().getPath()){
 							alert(MessageHash[183]);
 							return false;
 						}
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						this.submitForm(oForm);
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);						
+						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
+							getAction.value = "cross_copy" ;
+							var subAction = new Element('input', {type:'hidden',name:'moving_files',value:'true'});
+							oForm.insert(subAction);
+							this.submitForm(oForm, false, function(transport){
+								var message = XPathSelectSingleNode(transport.responseXML, "//message");
+								if(message.getAttribute("type") == "ERROR"){
+									ajaxplorer.displayMessage("ERROR", message.firstChild.nodeValue);
+									return;
+								}
+								getAction.value = "delete";
+								subAction.name = "force_deletion"; 								
+								this.submitForm(oForm, false, function(transport2){
+									var deleteMessage = XPathSelectSingleNode(transport2.responseXML, "//message");
+									if(deleteMessage.getAttribute("type") == "ERROR"){
+										ajaxplorer.displayMessage("ERROR", message.firstChild.nodeValue + '\n\n' + deleteMessage.firstChild.nodeValue);
+										return;								
+									}else{
+										ajaxplorer.displayMessage("SUCCESS", message.firstChild.nodeValue);
+										ajaxplorer.fireContextRefresh();
+									}
+								}.bind(this));
+							}.bind(this));
+						}else{
+							this.submitForm(oForm);
+						}
 						this.treeSelector.unload();
 						hideLightBox();
 					}.bind(context);

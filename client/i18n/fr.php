@@ -400,6 +400,7 @@ $mess=array(
 "361" => "Lecture",
 "362" => "Ecriture",
 "363" => "Elements Partagés",
+"364" => "You do not have the rights to perform this operation",
 /* END SENTENCE */
 );
 ?>
