@@ -64,24 +64,23 @@ class plgUserAjaxplorer extends JPlugin {
 		// to a format the external application
 		if(!$this->glueCodeFound) return false;
 		if(!$success) return true;
-		global $plugInAction, $result, $secret, $user;
-		$secret = $this->secret;
-
-		$user = array();
-		$user['name']	= $joomlaUser['username'];
-		$user['password']	= $joomlaUser['password'];
-		$user['right'] = '';
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
 		
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+		$AJXP_GLUE_GLOBALS["user"] = array();
+		$AJXP_GLUE_GLOBALS["user"]['name']	= $joomlaUser['username'];
+		$AJXP_GLUE_GLOBALS["user"]['password']	= $joomlaUser['password'];
 		if($joomlaUser['usertype'] == "Super Administrator" || $joomlaUser['usertype'] == "Administrator"){
-			$user['right'] = 'admin';
+			$AJXP_GLUE_GLOBALS["user"]['right'] = 'admin';
 		}else{
-			$user['right'] = '';
+			$AJXP_GLUE_GLOBALS["user"]['right'] = '';
 		}
-
-		$plugInAction = ($isnew?"addUser":"updateUser");
-
+		$AJXP_GLUE_GLOBALS["plugInAction"] = ($isnew?"addUser":"updateUser");
+		
+		
 	   	include($this->glueCode);
-		return $result;		
+		return $AJXP_GLUE_GLOBALS["result"];
 		
 	}
 
@@ -104,11 +103,12 @@ class plgUserAjaxplorer extends JPlugin {
 		// ThirdPartyApp::deleteUser($user['id']);
 		if(!$this->glueCodeFound) return false;
 		if(!$succes) return true;
-		global $plugInAction, $result, $secret, $userName;
-		$secret = $this->secret;
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
 		
-		$userName = $joomlaUser['username'];
-		$plugInAction = "delUser";
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;		
+		$AJXP_GLUE_GLOBALS["userName"] = $joomlaUser['username'];
+		$AJXP_GLUE_GLOBALS["plugInAction"] = "delUser";
 	   	include($this->glueCode);
 
 		return true;
@@ -128,28 +128,15 @@ class plgUserAjaxplorer extends JPlugin {
 		// Initialize variables
 		$success = false;
 		if(!$this->glueCodeFound) return false;
-		global $plugInAction, $login, $result, $secret, $autoCreate;
-		$secret = $this->secret;
-		$autoCreate = $this->autoCreate;
-		$plugInAction = "login";
-		$login = array("name"=>$user["username"], "password"=>$user["password"]);  
+
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
+		//$plugInAction, $login, $result, $secret, $autoCreate;
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+		$AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
+		$AJXP_GLUE_GLOBALS["plugInAction"] = "login";
+		$AJXP_GLUE_GLOBALS["login"] = array("name"=>$user["username"], "password"=>$user["password"]); 
 	   	include($this->glueCode);
-	   	// Update default rights (this could go in the trunk...)
-	   	if($result == 1){
-		   	$userObject = AuthService::getLoggedUser();
-		   	if($userObject->isAdmin()){
-		   		AuthService::updateAdminRights($userObject);
-		   	}else{
-				foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
-				{			
-					if($repoObject->getDefaultRight() != ""){
-						$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
-					}
-				}
-		   	}
-			$userObject->save();		   	
-	   	}
-		
 		return true;
 	}
 
@@ -167,13 +154,13 @@ class plgUserAjaxplorer extends JPlugin {
 		$success = false;
 
 		if(!$this->glueCodeFound) return false;
-		global $plugInAction, $result, $secret;
-		$secret = $this->secret;
-		
-		$plugInAction = "logout";
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;		
+		$AJXP_GLUE_GLOBALS["plugInAction"] = "logout";
 	   	include($this->glueCode);
 
-		return $result;
+		return $AJXP_GLUE_GLOBALS["result"];
 	}
 			
 }

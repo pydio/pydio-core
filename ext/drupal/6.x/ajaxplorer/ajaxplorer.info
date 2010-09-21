@@ -1,0 +1,4 @@
+; $Id$
+name = AjaXplorer Bridge
+description = A bridge for using drupal users inside AjaXplorer
+core = 6.x

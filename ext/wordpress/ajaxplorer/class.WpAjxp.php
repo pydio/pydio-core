@@ -4,7 +4,7 @@
 Plugin Name: Ajaxplorer
 Plugin URI: http://www.ajaxplorer.info/wp_ajaxplorer
 Description: This plugin allow to associate directly AjaXplorer users to wordpress ones (using WP as the master). Warning, it will not work until you open the "Settings > AjaXplorer" panel (here on the left) to edit your AjaXplorer installation path. Tested with WP 2.8 & AjaXplorer 2.5.4
-Version: 0.3
+Version: 0.6
 Author: Charles du Jeu
 Author URI: http://www.ajaxplorer.info/
 */
@@ -45,35 +45,23 @@ class Ajxp {
 	function authenticate($username, $password = "")
 	{
 		if(!$this->glueCodeFound) return ;
-		global $plugInAction, $login, $result, $secret, $autoCreate;	
-		$secret = $this->secret;
-		$plugInAction = "login";
-		$autoCreate = $this->autoCreate;
-		$login = array("name"=>$username, "password"=>$password);  
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
+		//$plugInAction, $login, $result, $secret, $autoCreate;
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+		$AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
+		$AJXP_GLUE_GLOBALS["plugInAction"] = "login";
+		$AJXP_GLUE_GLOBALS["login"] = array("name"=>$username, "password"=>$password);  		
 	   	include($this->glueCode);
-	   	// Update default rights (this could go in the trunk...)
-	   	if($result == 1){
-		   	$userObject = AuthService::getLoggedUser();
-		   	if($userObject->isAdmin()){
-		   		AuthService::updateAdminRights($userObject);
-		   	}else{
-				foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
-				{			
-					if($repoObject->getDefaultRight() != ""){
-						$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
-					}
-				}
-		   	}
-			$userObject->save();		   	
-	   	}	   	
 	}
 	
 	function logout(){
 		global $plugInAction;
 		if(!$this->glueCodeFound) return ;
-		global $plugInAction, $secret;	
-		$secret = $this->secret;
-		$plugInAction = "logout";
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;		
+		$AJXP_GLUE_GLOBALS["plugInAction"] = "logout";
 	   	include($this->glueCode);
 	}
 	
@@ -83,21 +71,30 @@ class Ajxp {
 	
 	function createUser($userId, $isNew=true){
 		if(!$this->glueCodeFound) return ;
-		global $plugInAction, $secret, $user;	
-		$secret = $this->secret;
-		$plugInAction = ($isNew?"addUser":"updateUser");
 		$userData = get_userdata($userId);
-		$user = array("name" => $userData->user_login, "password" => $userData->user_pass, "right" => ($userData->user_level == 10?'admin':''));		
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
+		//global $plugInAction, $result, $secret, $user;
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
+
+		$AJXP_GLUE_GLOBALS["user"] = array();
+		$AJXP_GLUE_GLOBALS["user"]['name']	= $userData->user_login;
+		$AJXP_GLUE_GLOBALS["user"]['password']	= $userData->user_pass;
+		$AJXP_GLUE_GLOBALS["user"]['right'] = ($userData->user_level == 10?'admin':'');	
+		$AJXP_GLUE_GLOBALS["plugInAction"] = ($isNew?"addUser":"updateUser");
+		
 		include($this->glueCode);
 	}
 
 	function deleteUser($userId){
 		if(!$this->glueCodeFound) return ;
-		global $plugInAction, $secret, $userName;	
-		$secret = $this->secret;
-		$plugInAction = "delUser";
 		$userData = get_userdata($userId);
-		$userName = $userData->user_login;
+		global $AJXP_GLUE_GLOBALS;
+		$AJXP_GLUE_GLOBALS = array();
+		//global $plugInAction, $result, $secret, $userName;
+		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;		
+		$AJXP_GLUE_GLOBALS["userName"] = $userData->user_login;
+		$AJXP_GLUE_GLOBALS["plugInAction"] = "delUser";		
 		include($this->glueCode);
 	}
 	

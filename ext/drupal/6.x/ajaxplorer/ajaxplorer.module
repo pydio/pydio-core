@@ -1,0 +1,99 @@
+<?php
+// $Id$
+define('AJXP_EXEC', true);
+
+function ajaxplorer_help($path, $arg){
+  $output = '';  //declare your output variable
+  switch ($path) {
+    case "admin/help#ajaxplorer":
+      $output = '<p>'.  t("Will create a bridge between drupal and AjaXplorer users.") .'</p>';
+      break;
+  }
+  return $output;
+}
+
+function ajaxplorer_perm(){
+	return array("administrate ajaxplorer repositories");
+}
+
+function ajaxplorer_user($op, &$edit, $account, $category = null){
+	require_once("class.DrupalAjxp.php");
+ 	$params = array(
+        	"ajxp_install_path" => variable_get('ajaxplorer_install_path', ""),
+        	"ajxp_secret_key" => variable_get('ajaxplorer_secret_key', ""),
+        	"ajxp_auto_create" => (variable_get('ajaxplorer_auto_create', "true") == "true"?true:false)
+    );	    
+	$drupHandler = new DrupalAjxp($params);	
+	if(!$drupHandler->glueCodeFound) return ;
+	switch ($op) {
+		case "login":
+			$drupHandler->onLoginUser($edit["name"], $edit["pass"]);
+			break;
+	
+		case "logout":
+			$drupHandler->onLogout();
+			break;
+			
+		case "insert":
+		case "after_update":
+			$result = $drupHandler->onAfterStoreUser($edit['name'], $edit['pass'], user_access("administrate ajaxplorer repositories", $account), ($op == "insert"));
+			break;
+	
+		case "delete":
+			$drupHandler->onAfterDeleteUser($account->name);
+			break;
+	
+		default:
+			break;
+	}
+	
+}
+
+function ajaxplorer_menu() {
+
+  $items = array();
+
+  $items['admin/settings/ajaxplorer'] = array(
+    'title' => 'AjaXplorer Settings',
+    'description' => 'AjaXplorer bridge settings, it is necessary to fill them to make this module work.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ajaxplorer_admin'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  return $items;
+}
+
+function ajaxplorer_admin() {
+  $form = array();
+
+  $form['ajaxplorer_install_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('AjaXplorer Install Path'),
+    '#default_value' => variable_get('ajaxplorer_install_path', ""),
+    '#size' => 50,
+    '#description' => t("Absolute path to the root folder of your AjaXplorer installation, the one containing the index.php file. <b>No trailing slash at the end.</b>"),
+    '#required' => TRUE,
+  );
+
+  $form['ajaxplorer_secret_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret Key'),
+    '#default_value' => variable_get('ajaxplorer_secret_key', ""),
+    '#size' => 50,
+    '#description' => t("Must be the same string as the one found in your AUTH_DRIVER configuration of AjaXplorer."),
+    '#required' => TRUE,
+  );
+
+  $form['ajaxplorer_auto_create'] = array(
+    '#type' => 'radios',
+    '#title' => t('Auto Create'),
+    '#default_value' => variable_get('ajaxplorer_auto_create', 0),
+    '#options' => array("True", "False"),
+    '#description' => t("Whether the user will be created automatically at login time (true), or if they must be created before (false)"),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
