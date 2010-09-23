@@ -401,6 +401,7 @@ $mess=array(
 "362" => "Ecriture",
 "363" => "Elements Partagés",
 "364" => "You do not have the rights to perform this operation",
+"365" => "You are not allowed to upload more than %s files at once.",
 /* END SENTENCE */
 );
 ?>
