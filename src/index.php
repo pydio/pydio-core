@@ -45,7 +45,7 @@ require_once("server/classes/class.AJXP_PluginsService.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
 
 if(!class_exists("DOMDocument")){
-        die("Tou must have libxml PHP extension enabled on your server.");
+        die("You must have libxml PHP extension enabled on your server.");
 }
 
 HTMLWriter::charsetHeader();

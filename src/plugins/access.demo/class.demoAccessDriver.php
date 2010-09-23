@@ -40,6 +40,20 @@ class demoAccessDriver extends fsAccessDriver
 	*/
 	var $repository;
 		
+	function filterUsersPref($action, $httpVars, $fileVars){
+		if($action != "save_user_pref") return ;
+		$i = 0;
+		while(isSet($_GET["pref_name_".$i]) && isSet($_GET["pref_value_".$i]))
+		{
+			$prefName = $_GET["pref_name_".$i];
+			$prefValue = stripslashes($_GET["pref_value_".$i]);
+			if($prefName == "password"){
+				throw new Exception("You are not allowed to change the password");
+			}
+			$i++;			
+		}
+	}
+	
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		$errorMessage = "This is a demo, all 'write' actions are disabled!";
@@ -49,7 +63,11 @@ class demoAccessDriver extends fsAccessDriver
 			//	ONLINE EDIT
 			//------------------------------------
 			case "public_url":
-				print($errorMessage);
+				if($httpVars["sub_action"] == "delegate_repo"){
+					return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
+				}else{
+					print($errorMessage);
+				}
 				exit(0);
 			break;
 			//------------------------------------
