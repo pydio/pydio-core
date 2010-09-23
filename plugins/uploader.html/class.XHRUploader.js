@@ -316,6 +316,7 @@ Class.create("XHRUploader", {
 			return;
 		}
 		if(this.max && this.listTarget.childNodes.length == this.max){
+			alert(MessageHash[365].replace("%s", this.max));
 			return;
 		}
 		// GET VALUE FROM FILE OBJECT
