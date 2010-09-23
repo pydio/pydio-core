@@ -10,12 +10,9 @@
 			1/ Base Installation</h3>
 		<p>
 			<strong>1.1 Install AjaXplorer and Joomla</strong><br />
-			First of all, make sure you have AjaXplorer 2.6 installed and Joomla 1.5. If you are reading this file, you may also have already unpacked the bridge distribution and you have two zips,&nbsp;ajxp-2.6-joomla-path.zip and&nbsp;joomla.user.ajaxplorer.zip.</p>
+			First of all, make sure you have AjaXplorer 3.0 installed and Joomla 1.5.</p>
 		<p>
-			<strong>1.2 Patch AjaXplorer distribution</strong><br />
-			Unpack and patch the AjaXplorer distribution with the content of ajxp-2.6-joomla-path.zip. You can safely overwrite your installation, no configuration file will be erased.</p>
-		<p>
-			<strong>1.3 Install Joomla plugin</strong><br />
+			<strong>1.2 Install Joomla plugin</strong><br />
 			Unpack the joomla.user.ajaxplorer.zip inside the &quot;<em>tmp</em>&quot; folder of your Joomla installation.</p>
 		<h3>
 			2/ AjaXplorer configuration</h3>
@@ -34,16 +31,16 @@
 			<strong>2.5 Auth.remote configuration</strong><br />
 			<span class="Apple-style-span" style="font-weight: normal; ">Now go back to your conf.php and set the Authentification driver to be the <strong>auth.remote</strong>. There is a commented sample in the conf.php aimed at wordpress user, you should use the following values :</span></p>
 		<pre>
-		$AUTH_DRIVER = array(&nbsp;
-&quot;NAME&quot; =&gt; &quot;remote&quot;,
-&quot;OPTIONS&quot; =&gt; array(
-&quot;SLAVE_MODE&quot; =&gt; true,
-&quot;USERS_FILEPATH&quot; =&gt; &quot;AJXP_INSTALL_PATH/server/users/users.ser&quot;,
-&quot;LOGIN_URL&quot; =&gt; &quot;/joomla/&quot;,
-&quot;LOGOUT_URL&quot; =&gt; &quot;/joomla/&quot;,
-&quot;SECRET&quot; =&gt; &quot;my_own_private_joomla_key&quot;,
-&quot;TRANSMIT_CLEAR_PASS&quot; =&gt; false)
-);</pre>
+	$AUTH_DRIVER = array(&nbsp;
+		&quot;NAME&quot; =&gt; &quot;remote&quot;,
+		&quot;OPTIONS&quot; =&gt; array(
+		&quot;SLAVE_MODE&quot; =&gt; true,
+		&quot;USERS_FILEPATH&quot; =&gt; &quot;AJXP_INSTALL_PATH/server/users/users.ser&quot;,
+		&quot;LOGIN_URL&quot; =&gt; &quot;/joomla/&quot;,
+		&quot;LOGOUT_URL&quot; =&gt; &quot;/joomla/&quot;,
+		&quot;SECRET&quot; =&gt; &quot;my_own_private_joomla_key&quot;,
+		&quot;TRANSMIT_CLEAR_PASS&quot; =&gt; false)
+	);</pre>
 		<p>
 			What you should edit here are only LOGIN_URL, LOGOUT_URL and SECRET. LOGIN&amp;LOGOUT should point to your joomla installation URL on the server (URL, not the folder path from the server root). For example, here we consider joomla to be found at http://www.mydomain.com/joomla/. The SECRET key is what will assure AjaXplorer that the authentification operations called programmatically are indeed called by a trustee. You may put whatever you want, it will be a configuration of the Joomla Ajaxplorer plugin.&nbsp;</p>
 		<p>
