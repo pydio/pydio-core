@@ -92,6 +92,9 @@ class fsAccessDriver extends AbstractAccessDriver
 			$dir = SystemTextEncoding::fromPostedFileName($dir);
 		}
 		$selection->initFromHttpVars($httpVars);
+		if(!$selection->isEmpty()){
+			$this->filterUserSelectionToHidden($selection->getFiles());			
+		}
 		$mess = ConfService::getMessages();
 		
 		$newArgs = RecycleBinManager::filterActions($action, $selection, $dir, $httpVars);
@@ -146,8 +149,9 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "compress" : 					
 					// Make a temp zip and send it as download					
 					$loggedUser = AuthService::getLoggedUser();
-					if(isSet($httpVars["archive_name"])){
+					if(isSet($httpVars["archive_name"])){						
 						$localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
+						$this->filterUserSelectionToHidden(array($httpVars["archive_name"]));
 					}else{
 						$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					}
@@ -164,7 +168,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "stat" :
 				
 				clearstatcache();
-				$stat = @stat($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]));
+				$stat = @stat($this->urlBase.$selection->getUniqueFile());
 				header("Content-type:application/json");
 				if(!$stat){
 					print '{}';
@@ -181,7 +185,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "get_content":
 					
-				$this->readFile($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["file"]), "plain");
+				$this->readFile($this->urlBase.$selection->getUniqueFile(), "plain");
 				exit(0);
 			break;
 			
@@ -189,7 +193,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				if(!isset($httpVars["content"])) break;
 				// Reload "code" variable directly from POST array, do not "securePath"...
 				$code = $httpVars["content"];
-				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+				$file = $selection->getUniqueFile($httpVars["file"]);
 				AJXP_Logger::logAction("Online Edition", array("file"=>$file));
 				if(isSet($httpVars["encode"]) && $httpVars["encode"] == "base64"){
 				    $code = base64_decode($code);
@@ -223,14 +227,15 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				$success = $error = array();
 				$dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
+				$this->filterUserSelectionToHidden(array($httpVars["dest"]));
 				if($selection->inZip()){
 					// Set action to copy anycase (cannot move from the zip).
 					$action = "copy";
 				}
 				$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
 				
-				if(count($error)){
-					throw new AJXP_Exception(join("\n", $error));
+				if(count($error)){					
+					throw new AJXP_Exception(SystemTextEncoding::toUTF8(join("\n", $error)));
 				}else {
 					$logMessage = join("\n", $success);
 					AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
@@ -255,7 +260,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				{
 					$logMessage = join("\n", $logMessages);
 				}
-				if($errorMessage) throw new AJXP_Exception($errorMessage);
+				if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
 				AJXP_Logger::logAction("Delete", array("files"=>$selection));
 				$reloadContextNode = true;
 				
@@ -268,6 +273,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			
 				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 				$filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
+				$this->filterUserSelectionToHidden(array($filename_new));
 				$this->rename($file, $filename_new);
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
 				$reloadContextNode = true;
@@ -283,6 +289,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			        
 				$messtmp="";
 				$dirname=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($httpVars["dirname"]));
+				$this->filterUserSelectionToHidden(array($dirname));
 				$error = $this->mkDir($dir, $dirname);
 				if(isSet($error)){
 					throw new AJXP_Exception($error);
@@ -303,6 +310,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			
 				$messtmp="";
 				$filename=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($httpVars["filename"]));	
+				$this->filterUserSelectionToHidden(array($filename));
 				$error = $this->createEmptyFile($dir, $filename);
 				if(isSet($error)){
 					throw new AJXP_Exception($error);
@@ -366,6 +374,11 @@ class fsAccessDriver extends AbstractAccessDriver
 						break;
 					}
 					$userfile_name = $boxData["name"];
+					try{
+						$this->filterUserSelectionToHidden(array($userfile_name));					
+					}catch (Exception $e){
+						return array("ERROR" => array("CODE" => 411, "MESSAGE" => "Forbidden"));
+					}
 					$userfile_name=AJXP_Utils::processFileName($userfile_name);
 					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
@@ -661,6 +674,23 @@ class fsAccessDriver extends AbstractAccessDriver
 			$lsOptions["d"] = $lsOptions["z"] = $lsOptions["f"] = true;
 		}
 		return $lsOptions;
+	}
+	
+	/**
+	 * Test if userSelection is containing a hidden file, which should not be the case!
+	 *
+	 * @param UserSelection $userSelection
+	 */
+	function filterUserSelectionToHidden($files){
+		foreach ($files as $file){
+			$file = basename($file);
+			if(AJXP_Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"]){
+				throw new Exception("Forbidden");
+			}
+			if($this->filterFile($file) || $this->filterFolder($file)){
+				throw new Exception("Forbidden");
+			}
+		}
 	}
 	
 	function filterNodeName($nodePath, $nodeName, $isLeaf, $lsOptions){

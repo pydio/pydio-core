@@ -262,11 +262,9 @@ class AJXP_XMLWriter
 			$buffer.="<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>";
 			$buffer.="<pref name=\"diapo_autofit\" value=\"".$loggedUser->getPref("diapo_autofit")."\"/>";
 			$buffer.="<pref name=\"sidebar_splitter_size\" value=\"".$loggedUser->getPref("sidebar_splitter_size")."\"/>";
-			$buffer.="<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>";
-			if($loggedUser->getId() != "guest"){
-				$buffer.="<pref name=\"history_last_repository\" value=\"".$loggedUser->getArrayPref("history", "last_repository")."\"/>";
-				$buffer.="<pref name=\"ls_history\"><![CDATA[".$loggedUser->getPref("ls_history")."]]></pref>";
-			}
+			$buffer.="<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>";			
+			$buffer.="<pref name=\"history_last_repository\" value=\"".$loggedUser->getArrayPref("history", "last_repository")."\"/>";
+			$buffer.="<pref name=\"ls_history\"><![CDATA[".$loggedUser->getPref("ls_history")."]]></pref>";			
 			$buffer.="<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>";
 			$buffer.="<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>";
 			$buffer.="<pref name=\"columns_visibility\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_visibility")))."\"/>";

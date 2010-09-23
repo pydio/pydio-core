@@ -83,7 +83,10 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 			break;
 			case "get_content":
 				header("Content-type:text/plain");
-			break;			
+			break;	
+			case "stat": 
+				header("Content-type:application/json");
+			break;		
 			default:
 				header("Content-type: text/xml");
 			break;
@@ -260,7 +263,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 			$httpClient->setHeadersOnly(true);
 			$httpClient->get($uri);
 			$httpClient->setHeadersOnly(false);
-			$cookies = $httpClient->getCookies();		
+			$cookies = $httpClient->getCookies();
 			if(isSet($cookies["AjaXplorer"])){
 				$_SESSION["AJXP_REMOTE_SESSION"] = $cookies["AjaXplorer"];
 				$remoteSessionId = $cookies["AjaXplorer"];

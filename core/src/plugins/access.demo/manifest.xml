@@ -12,6 +12,13 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<actions>
+			<action name="save_user_pref">
+				<pre_processing>
+					<serverCallback methodName="filterUsersPref"></serverCallback>
+				</pre_processing>
+			</action>			
+		</actions>
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>

@@ -214,7 +214,11 @@ class AbstractConfDriver extends AJXP_Plugin {
 			case "save_user_pref":
 				
 				$userObject = AuthService::getLoggedUser();
-				if($userObject == null) exit(1);
+				if($userObject == null || $userObject->getId() == "guest"){
+					header("Content-Type:text/plain");
+					print "SUCCESS";
+					exit(1);								
+				}
 				$i = 0;
 				while(isSet($_GET["pref_name_".$i]) && isSet($_GET["pref_value_".$i]))
 				{
