@@ -54,7 +54,7 @@ class FlexUploadProcessor extends AJXP_Plugin {
 		if(isSet($fileVars["Filedata"])){
 			self::$active = true;
 			AJXP_Logger::debug("Dir before base64", $httpVars);
-			$httpVars["dir"] = base64_decode($httpVars["dir"]);
+			$httpVars["dir"] = base64_decode(urldecode($httpVars["dir"]));
 			if(!$skipDecoding) {
 				$fileVars["Filedata"]["name"] = SystemTextEncoding::fromUTF8($fileVars["Filedata"]["name"]);
 			}
