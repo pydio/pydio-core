@@ -1,0 +1,27 @@
+http://www.ajaxplorer.info
+
+This wordpress plugin will make a bridge between your Wordpress users (wp is the "master") and the AjaXplorer users. That means that users created/deleted in your wordpress installation will be created/deleted in your ajaxplorer installation, and that you will use the Wordpress login page instead of the "popup" to log on to AjaXplorer.
+
+So what do you need to make it work?
+
+ * You must use at least the 3.0.1 version of AjaXplorer.
+
+ * Download and extract the WP-AjaXplorer plugin inside your WP/wp-content/plugins/ folder.
+
+ * Make sure that basically your ajaxplorer install has already an "admin" user (you will still need it to edit the repositories). The simplest is to use the same login for ajxp admin and wp admin.
+
+ * Inside you WP admin panel : Activate the ajaxplorer plugin, and go to "Settings > Ajaxplorer" to init the plugin options. This is mandatory, or the plugin wont work. Choose a secret key.
+
+ * Inside AjaXplorer config file : comment the $AUTH_DRIVER array and replace it with the following :
+	$AUTH_DRIVER = array(
+		"NAME"          => "remote",
+		"OPTIONS"       => array(
+			"SLAVE_MODE"  => true,
+			"USERS_FILEPATH" => "AJXP_INSTALL_PATH/server/users/users.ser",
+			"LOGIN_URL" => "/wordpress/wp-login.php",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
+			"LOGOUT_URL" => "/wordpress/",  // The URL to redirect upon login out (see above)
+			"SECRET" => "myprivatesecret",// the same as the one you put in the WP plugin option.
+			"TRANSMIT_CLEAR_PASS"   => false) // Don't touch this. It's unsafe (and useless here) to transmit clear password.
+	);
+
+ * Warning, if you use "$" in your secret key (on the wordpress side), add a \ symbol before it in the conf.php.
