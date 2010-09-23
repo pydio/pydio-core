@@ -10,7 +10,7 @@
 			1/ Base Installation</h3>
 		<p>
 			<strong>1.1 Install AjaXplorer and Joomla</strong><br />
-			First of all, make sure you have AjaXplorer 3.0 installed and Joomla 1.5.</p>
+			First of all, make sure you have AjaXplorer 3.0.1 installed and Joomla 1.5.</p>
 		<p>
 			<strong>1.2 Install Joomla plugin</strong><br />
 			Unpack the joomla.user.ajaxplorer.zip inside the &quot;<em>tmp</em>&quot; folder of your Joomla installation.</p>
@@ -42,7 +42,7 @@
 		&quot;TRANSMIT_CLEAR_PASS&quot; =&gt; false)
 	);</pre>
 		<p>
-			What you should edit here are only LOGIN_URL, LOGOUT_URL and SECRET. LOGIN&amp;LOGOUT should point to your joomla installation URL on the server (URL, not the folder path from the server root). For example, here we consider joomla to be found at http://www.mydomain.com/joomla/. The SECRET key is what will assure AjaXplorer that the authentification operations called programmatically are indeed called by a trustee. You may put whatever you want, it will be a configuration of the Joomla Ajaxplorer plugin.&nbsp;</p>
+			What you should edit here are only LOGIN_URL, LOGOUT_URL and SECRET. LOGIN&amp;LOGOUT should point to your joomla installation URL on the server (URL, not the folder path from the server root). For example, here we consider joomla to be found at http://www.mydomain.com/joomla/. The SECRET key is what will assure AjaXplorer that the authentification operations called programmatically are indeed called by a trustee. You may put whatever you want, it will be a configuration of the Joomla Ajaxplorer plugin.&nbsp; Warning, if you want to use a "$" sign in your key, you have to put a \ before.</p>
 		<p>
 			<strong>2.6 Checks</strong><br />
 			<span class="Apple-style-span" style="font-weight: normal; ">Now if you are logged out, when you go to AjaXplorer URL, if you have enabled guest browsing you should have access to the Guest repository and clicking on the &quot;Back&quot; button should send you to Joomla. If &quot;guest&quot; is not enabled, you should be automatically redirected to Joomla.</span></p>
