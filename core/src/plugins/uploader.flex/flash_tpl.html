@@ -26,6 +26,7 @@ var messages =
 {
 	MaxFileSizeLimit:252, 
 	MaxFileSize:211, 
+	MaxFilesNumber:365,
 	HTTPError:253, 
 	IOError:254, 
 	SecurityError:255,
@@ -72,7 +73,11 @@ function triggerFlashEvent(){
 			case "getMessage":
 				var messageId = arguments[1];
 				if(parent && parent.window.MessageHash && messages){
-					return parent.window.MessageHash[messages[messageId]];
+					var message = parent.window.MessageHash[messages[messageId]];
+					if(messages[messageId] == 365){
+						message = message.replace("%s","<?php print($confTotalNumber)?>");
+					}
+					return message;
 				}
 				return messageId;			
 			break;
