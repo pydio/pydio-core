@@ -37,6 +37,36 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class ftpAccessDriver extends fsAccessDriver {
 	
+	/**
+	 * Parse 
+	 *
+	 * @param DOMNode $contribNode
+	 */
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
+		if($contribNode->nodeName != "actions") return ;
+		// Cannot use zip features on FTP !
+		// Remove "compress" action
+		$actionXpath=new DOMXPath($contribNode->ownerDocument);
+		$compressNodeList = $actionXpath->query('action[@name="compress"]', $contribNode);
+		if(!$compressNodeList->length) return ;
+		unset($this->actions["compress"]);
+		$compressNode = $compressNodeList->item(0);
+		$contribNode->removeChild($compressNode);		
+		// Disable "download" if selection is multiple
+		$nodeList = $actionXpath->query('action[@name="download"]/gui/selectionContext', $contribNode);
+		$selectionNode = $nodeList->item(0);
+		$values = array("dir" => "false", "unique" => "true");
+		foreach ($selectionNode->attributes as $attribute){
+			if(isSet($values[$attribute->name])){
+				$attribute->value = $values[$attribute->name];
+			}
+		}
+		$nodeList = $actionXpath->query('action[@name="download"]/processing/clientListener[@name="selectionChange"]', $contribNode);
+		$listener = $nodeList->item(0);
+		$listener->parentNode->removeChild($listener);
+	}	
+	
 	function initRepository(){
 		if(is_array($this->pluginConf)){
 			$this->driverConf = $this->pluginConf;
