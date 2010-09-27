@@ -359,6 +359,16 @@ function gaTrackEvent(eventCateg, eventName, eventData, eventValue){
 	}
 }
 
+function loadXPathReplacer(){
+	if(document.createExpression) return;
+	var conn = new Connexion();
+	conn._libUrl = false;
+	if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
+		conn._libUrl = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI');
+	}
+	conn.loadLibrary('client/js/lib/xpath/javascript-xpath-cmp.js');	
+}
+
 /**
  * Selects the first XmlNode that matches the XPath expression.
  *
@@ -373,7 +383,16 @@ function XPathSelectSingleNode(element, query){
 	}
 
 	if(!window.__xpe) {
-	  window.__xpe = new XPathEvaluator();
+		try{
+		  window.__xpe = new XPathEvaluator();
+		}catch(e){}
+	}
+	
+	if(!window.__xpe){
+		if(!document.createExpression) loadXPathReplacer();
+		query = document.createExpression(query, null);
+		var result = query.evaluate(element, 7, null);
+		return (result.snapshotLength?result.snapshotItem(0):null);
 	}
 	
 	var xpe = window.__xpe;
@@ -402,8 +421,21 @@ function XPathSelectNodes(element, query){
     var xpe = window.__xpe;
 
     if(!xpe) {
-      window.__xpe = xpe = new XPathEvaluator();
+    	try {
+	      window.__xpe = xpe = new XPathEvaluator();
+    	}catch(e){}
     }
+    
+	if(!window.__xpe){	
+		if(!document.createExpression) loadXPathReplacer();	
+		query = document.createExpression(query, null);
+		var result = query.evaluate(element, 7, null);
+	    var nodes = [];
+	    for (var i=0; i<result.snapshotLength; i++) {
+	      nodes[i] = Element.extend(result.snapshotItem(i));
+	    }
+	    return nodes;
+	}
 
     try {
       var result = xpe.evaluate(query, element, xpe.createNSResolver(element), XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
