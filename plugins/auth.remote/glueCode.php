@@ -47,6 +47,7 @@ global $AJXP_GLUE_GLOBALS;
 if(!isSet($AJXP_GLUE_GLOBALS)){
 	$AJXP_GLUE_GLOBALS = array();
 }
+$originalSessionData = $_SESSION;
 
 if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
@@ -90,6 +91,7 @@ switch($plugInAction)
 	    $login = $AJXP_GLUE_GLOBALS["login"]; $autoCreate = $AJXP_GLUE_GLOBALS["autoCreate"];
 	    if (is_array($login))
 	    {
+	    	$_SESSION = $originalSessionData;
 	        $newSession = new SessionSwitcher("AjaXplorer");
 	        if($autoCreate && !AuthService::userExists($login["name"])){
 		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
@@ -115,8 +117,7 @@ switch($plugInAction)
 	    break;
 	case 'logout':
 	    $newSession = new SessionSwitcher("AjaXplorer");
-	    global $_SESSION;
-	    $_SESSION = array();
+	    AuthService::disconnect();
 	    $result = TRUE;
 	    break;
 	case 'addUser':
@@ -127,6 +128,7 @@ switch($plugInAction)
 	        AuthService::createUser($user["name"], $user["password"], $isAdmin);
 	        $result = TRUE;
 	    }
+	    $_SESSION = $originalSessionData;
 	    break;
 	case 'delUser':
 	    $userName = $AJXP_GLUE_GLOBALS["userName"];
@@ -135,6 +137,7 @@ switch($plugInAction)
 	        AuthService::deleteUser($userName);
 	        $result = TRUE;
 	    }
+	    $_SESSION = $originalSessionData;
 	    break;
 	case 'updateUser':
 	    $user = $AJXP_GLUE_GLOBALS["user"];
@@ -151,6 +154,7 @@ switch($plugInAction)
 	        }
 	        else $result = FALSE;
 	    }
+	    $_SESSION = $originalSessionData;
 	    break;
 	case 'installDB':
 	    $user = $AJXP_GLUE_GLOBALS["user"]; $reset = $AJXP_GLUE_GLOBALS["reset"];
