@@ -8,16 +8,26 @@ class SessionSwitcher
     public static $sessionArray;
     
     /** Construction. This kills the current session if any started, and restart the given session */
-    public function __construct($name, $cleanPreviousSession = false)
-    {    	
+    public function __construct($name, $killPreviousSession = false, $loadPreviousSession = false, $saveHandlerType = "files", $saveHandlerData = null)
+    {   
+    	AJXP_Logger::debug("Switching to session ".$name); 	
         if (session_id() == "")
         {
-			// Mysterious fix, necessary for joomla.
-			ini_set('session.save_handler', 'files');
+			if(isSet($saveHandlerData)){
+				session_set_save_handler(
+					$saveHandlerData["open"], 
+					$saveHandlerData["close"], 
+					$saveHandlerData["read"], 
+					$saveHandlerData["write"], 
+					$saveHandlerData["destroy"], 
+					$saveHandlerData["gc"]					
+				);
+			}else{
+				ini_set('session.save_handler', $saveHandlerType);
+			}
             // Start a default session and save on the handler
             session_start();
             SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name());
-            AJXP_Logger::debug("Session switching 1: ", SessionSwitcher::$sessionArray);
             session_write_close();
         }else{
         	SessionSwitcher::$sessionArray[] = array('id'=>session_id(), 'name'=>session_name());
@@ -26,26 +36,41 @@ class SessionSwitcher
         if (session_id() != "")
         {
             // There was a previous session
-            if ($cleanPreviousSession)
+            if ($killPreviousSession)
             {
                 if (isset($_COOKIE[session_name()]))
 				setcookie(session_name(), '', time() - 42000, '/');
                 session_destroy();
             }
-            // Close the session
+            AJXP_Logger::debug("Closing previous session ".session_name()." / ".session_id());
             session_write_close();
             session_regenerate_id(false);
             $_SESSION = array();
-            // Need to generate a new session id
         }
-		// Mysterious fix, necessary for joomla.
-		ini_set('session.save_handler', 'files');
 
-		$newId = md5(SessionSwitcher::$sessionArray[0]['id'].$name);
-        AJXP_Logger::debug("Session switching  new id: ", $newId);
-		session_id($newId);
+		if(isSet($saveHandlerData)){
+			session_set_save_handler(
+				$saveHandlerData["open"], 
+				$saveHandlerData["close"], 
+				$saveHandlerData["read"], 
+				$saveHandlerData["write"], 
+				$saveHandlerData["destroy"], 
+				$saveHandlerData["gc"]					
+			);
+		}else{
+			ini_set('session.save_handler', $saveHandlerType);
+		}
+
+        if($loadPreviousSession){
+	        AJXP_Logger::debug("Restoring previous session".SessionSwitcher::$sessionArray[0]['id']);
+			session_id(SessionSwitcher::$sessionArray[0]['id']);
+        }else{
+        	$newId = md5(SessionSwitcher::$sessionArray[0]['id'].$name);        
+        	session_id($newId);
+        }
         session_name($name);
         session_start();
+        AJXP_Logger::debug("Restarted session ".session_name()." / ".session_id(), $_SESSION);
     }
 };
 ?>
