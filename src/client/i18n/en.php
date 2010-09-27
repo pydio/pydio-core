@@ -6,7 +6,7 @@
 //	Copyright 2007-2008 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
-//  Reference dictionnary for translations
+//  Reference dictionary for translations
 // 
 //---------------------------------------------------------------------------------------------------
 
@@ -113,7 +113,7 @@ $mess=array(
 "96" => "Please select the destination folder in the tree : ",
 "97" => "Upload File",
 "98" => "Click anywhere on this box to close it.",
-"99" => "is not writeable. There might be a permission problem, please check your administrator.", 
+"99" => "is not writeable. There might be a permission problem, please check with your administrator.", 
 "100"=> "Cannot find file ",
 "101"=> "The origin and destination folders are the same!",
 "102"=> "Error while creating file :", 
@@ -209,7 +209,7 @@ $mess=array(
 "174" => "New file name",
 "175" => "Select destination folder",
 "176" => "The selected files will be moved to the Recycle Bin.",
-"177" => "Are you sure you want to delete permanently the selected files?",
+"177" => "Are you sure you want to permanently delete the selected files?",
 "178" => "Previous",
 "179" => "Next", 
 "180" => "Enter login/password",
@@ -228,11 +228,11 @@ $mess=array(
 "194" => "Change Password",
 "195" => "User Preferences", 
 "196" => "Your language differs from the current language!\\n Do you want to reload the page to switch language?", 
-"197" => "Your password change will take effect after your deconnexion.", 
+"197" => "Your password change will take effect after you logout.", 
 "198" => "New",
 "199" => "Confirm",
 "200" => "Switch Repository to...", 
-"201" => "Warning, some changes are unsaved!\\n Are you sure you want to close?",
+"201" => "Warning, some of your changes are not saved!\\n Are you sure you want to close?",
 "202" => "Warning, recursive copy!",
 "203" => "Destintation folder is the same as original folder!",
 /* GROUPED SENTENCE : 'the file "filename.ext" exceeds size limit (1Mb)\nIt will not be uploaded.*/
@@ -274,7 +274,7 @@ $mess=array(
 "238" => "Passwords differ!",
 "239" => "Please fill you current password",
 "240" => "Wrong password!",
-"241" => "Your preferences has been saved successfully",
+"241" => "Your preferences have been saved successfully!",
 "242" => "Svn Log",
 "svn_log_access_key" => "L",
 "243" => "Revision",
@@ -367,7 +367,7 @@ $mess=array(
 "327" => "100%",
 "328" => "IMagick Viewer",
 "329" => "View pdf,svg and tif online",
-"330" => "Please wait while pages are being rendered...",
+"330" => "Please wait while the pages are being rendered...",
 "331" => "Page",
 "332" => "of",
 "333" => "Pixlr image editor",
@@ -382,7 +382,7 @@ $mess=array(
 "342" => "Folder Info",
 "343" => "Image Info",
 "344" => "Search on",
-"345" => "No version information could be retrieven",
+"345" => "No version information could be retrieved",
 "346" => "Your version is up to date",
 "347" => "A new version (%s) is available! Visit %s",
 "348" => "A new repository has been shared.",
