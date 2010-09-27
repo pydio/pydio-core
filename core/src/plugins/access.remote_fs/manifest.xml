@@ -25,6 +25,13 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude="actions/action[@name='upload']"/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
 		<external_file filename="plugins/access.remote_fs/additionalActions.xml" include="actions/*"/>
+		<actions>
+			<action name="switch_repository">
+				<post_processing>
+					<serverCallback methodName="resetConnexionRepository"></serverCallback>
+				</post_processing>
+			</action>			
+		</actions>		
 	</registry_contributions>
 	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="remote_fsAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.remote_fs/class.remote_fsAccessWrapper.php" classname="remote_fsAccessWrapper" protocol="ajxp.remotefs"/>

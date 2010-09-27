@@ -96,6 +96,14 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		exit();
 	}
 	
+	function resetConnexionRepository($action, $httpVars, $params){
+		if($action == "switch_repository"){
+			if(isSet($_SESSION["AJXP_REMOTE_SESSION"])){
+				unset($_SESSION["AJXP_REMOTE_SESSION"]);
+			}
+		}
+	}
+	
 	function uploadActions($action, $httpVars, $filesVars){
 		switch ($action){
 			case "trigger_remote_copy":
