@@ -5,7 +5,6 @@ js/ajaxplorer/interfaces/class.IFocusable.js
 js/ajaxplorer/interfaces/class.IContextMenuable.js
 js/ajaxplorer/class.AjxpPane.js
 js/ajaxplorer/class.AjxpNode.js
-js/lib/ufo/ufo.js
 js/lib/prototype/webfx.selectable.js
 js/lib/prototype/webfx.sortable.js
 js/lib/prototype/proto.menu.js
