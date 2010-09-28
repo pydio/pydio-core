@@ -357,6 +357,10 @@ Class.create("ActionsManager", {
 				{
 					alert(MessageHash[286]);
 				}
+				else if(result == '-3')
+				{
+					alert(MessageHash[366]);
+				}
 			}else if(childs[i].tagName == "trigger_bg_action"){
 				var name = childs[i].getAttribute("name");
 				var messageId = childs[i].getAttribute("messageId");

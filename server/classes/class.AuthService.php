@@ -226,8 +226,8 @@ class AuthService
 	function getDefaultRootId()
 	{
 		$loggedUser = AuthService::getLoggedUser();
-		if($loggedUser == null) return 0;
-		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
+		if($loggedUser == null) return -1;
+		foreach (ConfService::getRepositoriesList() as $rootDirIndex => $rootDirObject)
 		{			
 			if($loggedUser->canRead($rootDirIndex."")) {
 				// Warning : do not grant access to admin repository to a non admin, or there will be 
@@ -235,10 +235,14 @@ class AuthService
 				if($rootDirObject->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()){
 					continue;
 				}
+				// Don't use shared elements as default root id.
+				if($rootDirObject->getAccessType() == "ajxp_shared"){
+					continue;
+				}
 				return $rootDirIndex;
 			}
 		}
-		return 0;
+		return -1;
 	}
 	
 	/**
