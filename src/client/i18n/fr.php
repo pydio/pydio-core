@@ -400,8 +400,9 @@ $mess=array(
 "361" => "Lecture",
 "362" => "Ecriture",
 "363" => "Elements Partagés",
-"364" => "You do not have the rights to perform this operation",
-"365" => "You are not allowed to upload more than %s files at once.",
+"364" => "Vous n'avez pas les droits pour cette opération",
+"365" => "Vous ne pouvez uploader plus de %s fichiers à la fois.",
+"366" => "Cet utilisateur n'a aucun dépôt actif.",
 /* END SENTENCE */
 );
 ?>
