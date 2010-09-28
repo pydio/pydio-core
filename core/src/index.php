@@ -76,11 +76,15 @@ if(AuthService::usersEnabled())
 	AuthService::bootSequence($START_PARAMETERS);
 	if(AuthService::getLoggedUser() != null || AuthService::logUser(null, null) == 1)
 	{
-		$loggedUser = AuthService::getLoggedUser();
-		if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) 
-				&& AuthService::getDefaultRootId() != ConfService::getCurrentRootDirIndex())
-		{
-			ConfService::switchRootDir(AuthService::getDefaultRootId());
+		if(AuthService::getDefaultRootId() == -1){
+			AuthService::disconnect();
+		}else{
+			$loggedUser = AuthService::getLoggedUser();
+			if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) 
+					&& AuthService::getDefaultRootId() != ConfService::getCurrentRootDirIndex())
+			{
+				ConfService::switchRootDir(AuthService::getDefaultRootId());
+			}
 		}
 	}
 }
