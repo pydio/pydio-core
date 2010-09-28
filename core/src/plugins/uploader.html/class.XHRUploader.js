@@ -203,7 +203,7 @@ Class.create("XHRUploader", {
 				ajaxplorer.user.setPreference('upload_auto_send', (autoSendOpt?'true':'false'));
 				ajaxplorer.user.savePreference('upload_auto_send');
 			}else{
-				 parent.setAjxpCookie('upload_auto_send', (autoSendOpt?'true':'false'));
+				 setAjxpCookie('upload_auto_send', (autoSendOpt?'true':'false'));
 			}			
 		});
 		optionPane.autoCloseCheck.observe("click", function(e){				
@@ -212,7 +212,7 @@ Class.create("XHRUploader", {
 				ajaxplorer.user.setPreference('upload_auto_close', (autoCloseOpt?'true':'false'));
 				ajaxplorer.user.savePreference('upload_auto_close');
 			}else{
-				 parent.setAjxpCookie('upload_auto_close', (autoCloseOpt?'true':'false'));
+				 setAjxpCookie('upload_auto_close', (autoCloseOpt?'true':'false'));
 			}			
 		});
 		optionPane.existingRadio.each(function(el){
@@ -222,7 +222,7 @@ Class.create("XHRUploader", {
 					ajaxplorer.user.setPreference('upload_existing', value);
 					ajaxplorer.user.savePreference('upload_existing');
 				}else{
-					 parent.setAjxpCookie('upload_existing', value);
+					 setAjxpCookie('upload_existing', value);
 				}							
 			});
 		});
@@ -246,7 +246,7 @@ Class.create("XHRUploader", {
 				autoSendValue = ajaxplorer.user.getPreference('upload_auto_send');
 				autoSendValue = (autoSendValue =="true" ? true:false);
 			}else{
-				var value = parent.getAjxpCookie('upload_auto_send');
+				var value = getAjxpCookie('upload_auto_send');
 				autoSendValue = ((value && value == "true")?true:false);				
 			}
 			optionPane.autoSendCheck.checked = autoSendValue;
@@ -256,7 +256,7 @@ Class.create("XHRUploader", {
 				autoCloseValue = ajaxplorer.user.getPreference('upload_auto_close');
 				autoCloseValue = (autoCloseValue =="true" ? true:false);
 			}else{
-				var value = parent.getAjxpCookie('upload_auto_close');
+				var value = getAjxpCookie('upload_auto_close');
 				autoCloseValue = ((value && value == "true")?true:false);				
 			}
 			optionPane.autoCloseCheck.checked = autoCloseValue;
@@ -264,8 +264,8 @@ Class.create("XHRUploader", {
 			var existingValue = 'overwrite';
 			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_existing')){
 				existingValue = ajaxplorer.user.getPreference('upload_existing');
-			}else if(parent.getAjxpCookie('upload_existing')){
-				var value = parent.getAjxpCookie('upload_existing');				
+			}else if(getAjxpCookie('upload_existing')){
+				var value = getAjxpCookie('upload_existing');				
 			}
 			optionPane.down('#uploader_existing_' + existingValue).checked = true;
 			
