@@ -707,6 +707,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			</columns>');
 		if(!is_dir(PUBLIC_DOWNLOAD_FOLDER)) return ;		
 		$files = glob(PUBLIC_DOWNLOAD_FOLDER."/*.php");
+		if($files === false) return ;
 		$mess = ConfService::getMessages();
 		$loggedUser = AuthService::getLoggedUser();
 		$userId = $loggedUser->getId();
