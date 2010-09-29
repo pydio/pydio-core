@@ -599,6 +599,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$fullList[$nodeType][$nodeName] = $renderNodeData;
 					$cursor ++;
 				}
+				closedir($handle);
 				foreach ($fullList as $key => $list){
 					uksort($list, 'strnatcasecmp');
 					$fullList[$key] = $list;
