@@ -456,7 +456,6 @@ class fsAccessDriver extends AbstractAccessDriver
 	                header("Content-type:text/plain");
 	                echo $url;
             	}
-                exit(1);                
             break;
 						
 			//------------------------------------
