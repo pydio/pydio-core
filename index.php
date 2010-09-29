@@ -47,7 +47,7 @@ require_once("server/classes/class.AbstractAccessDriver.php");
 if(!class_exists("DOMDocument")){
         die("You must have libxml PHP extension enabled on your server.");
 }
-
+header("X-UA-Compatible: chrome=1");
 HTMLWriter::charsetHeader();
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
