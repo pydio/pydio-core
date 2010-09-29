@@ -298,7 +298,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 				return 102;
 			}
 		}else{
-			if(!isSet($httpVars["shared_pass"])) return 100;
+			if(!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") return 100;
 			AuthService::createUser($userName, md5($httpVars["shared_pass"]));
 			$userObject = $confDriver->createUserObject($userName);
 			$userObject->clearRights();

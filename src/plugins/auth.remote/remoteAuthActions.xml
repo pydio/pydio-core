@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="remoteAuth">
 	<actions>
-        <action name="back">
+        <action name="logout">
 			<gui text="304" title="305" src="go_back.png" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
