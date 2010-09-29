@@ -97,6 +97,7 @@ Class.create("Connexion", {
 					ajaxplorer._contextHolder.setContextNode(root);
 					root.clear();
 				}
+				ajaxplorer.actionBar.fireAction('logout');
 				ajaxplorer.actionBar.fireAction('login');
 			}
 			var messageNode = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
