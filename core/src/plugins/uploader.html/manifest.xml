@@ -59,7 +59,7 @@
 		};
 		]]></dialogOnOpen>
 		<extensionOnInit><![CDATA[		
-		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
+		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (Prototype.Browser.Gecko?(parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf('Firefox/')+8, navigator.userAgent.indexOf('Firefox/')+11)) >= 3.6?true:false):true) ){
 			var dropzone = $('content_pane');
 			dropzone.addClassName('droparea');
 			var dragOverFunc = function(event) {
