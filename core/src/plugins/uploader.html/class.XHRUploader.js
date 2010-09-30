@@ -509,7 +509,7 @@ Class.create("XHRUploader", {
         	item.statusText.update('[error]');        	
         };
         
-        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+"?get_action=upload&xhr_uploader=true&dir="+this.crtContext.getContextNode().getPath();
+        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+"?get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
         if(auto_rename){
         	url += '&auto_rename=true';
         }
@@ -542,7 +542,7 @@ Class.create("XHRUploader", {
 			var fileData = reader.result;
 
 			var boundary = "xxxxxxxxx";  
-			var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"?get_action=upload&dir="+this.crtContext.getContextNode().getPath();
+			var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"?get_action=upload&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
 			  
 			var xhr = new XMLHttpRequest();  
 			  
