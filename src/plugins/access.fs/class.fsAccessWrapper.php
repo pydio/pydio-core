@@ -96,7 +96,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		   			$tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
 		   			AJXP_Logger::debug("Tmp file $tmpFileName");
 		   			register_shutdown_function(array("fsAccessWrapper", "removeTmpFile"), $tmpDir, $tmpFileName);
-					$crtZip = new PclZip(AJXP_Utils::securePath($repoObject->getOption("PATH").$zipPath));
+					$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$zipPath));
 					$content = $crtZip->listContent();
 					foreach ($content as $item){
 						$fName = AJXP_Utils::securePath($item["stored_filename"]);
@@ -104,9 +104,9 @@ class fsAccessWrapper implements AjxpWrapper {
 							$localPath = $fName;
 							break;
 						}
-					}
+					}					
 					$res = $crtZip->extract(PCLZIP_OPT_BY_NAME, $localPath, PCLZIP_OPT_PATH, $tmpDir, PCLZIP_OPT_REMOVE_ALL_PATH);
-					AJXP_Logger::debug("Result: ".$localPath." ".dirname($localPath), $content);
+					AJXP_Logger::debug("Extracted ".$path." to ".dirname($localPath));
 					if($storeOpenContext) self::$crtZip = $crtZip;
 					return $tmpFileName;
 		   		}else{
@@ -119,7 +119,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		   			}
 		   		}
 		   	}else{
-				$crtZip = new PclZip(AJXP_Utils::securePath($repoObject->getOption("PATH").$zipPath));
+				$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$zipPath));
 				$liste = $crtZip->listContent();				
 				if($storeOpenContext) self::$crtZip = $crtZip;
 				$folders = array(); $files = array();
