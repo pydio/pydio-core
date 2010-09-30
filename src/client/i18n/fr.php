@@ -403,6 +403,7 @@ $mess=array(
 "364" => "Vous n'avez pas les droits pour cette opération",
 "365" => "Vous ne pouvez uploader plus de %s fichiers à la fois.",
 "366" => "Cet utilisateur n'a aucun dépôt actif.",
+"367" => "Vous n'êtes pas autorisé à uploader ce type de fichier. Veuillez choisir parmi les extensions suivantes : ",
 /* END SENTENCE */
 );
 ?>

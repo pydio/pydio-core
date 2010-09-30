@@ -35,7 +35,7 @@
 Class.create("XHRUploader", {
 	
 	
-	initialize : function( formObject, max ){
+	initialize : function( formObject, mask ){
 
 		formObject = $(formObject);
 		// Main form
@@ -54,7 +54,9 @@ Class.create("XHRUploader", {
 		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['282']){
 			this.maxUploadSize = parseInt(window.htmlMultiUploaderOptions['282']);
 		}
-		
+		if(mask){
+			this.mask = $A(mask);
+		}
 		this.crtContext = ajaxplorer.getUserSelection();
 		
 		this.clearList();
@@ -318,6 +320,13 @@ Class.create("XHRUploader", {
 		if(this.max && this.listTarget.childNodes.length == this.max){
 			alert(MessageHash[365].replace("%s", this.max));
 			return;
+		}
+		if(this.mask){
+			var ext = getFileExtension(file.fileName);
+			if(!this.mask.include(ext)){
+				alert(MessageHash[367] + this.mask.join(', '));
+				return;
+			}
 		}
 		// GET VALUE FROM FILE OBJECT
 		var label = file.fileName;		
