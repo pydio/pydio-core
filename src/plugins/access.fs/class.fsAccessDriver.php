@@ -231,8 +231,10 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($selection->inZip()){
 					// Set action to copy anycase (cannot move from the zip).
 					$action = "copy";
+					$this->extractArchive($dest, $selection, $error, $success);
+				}else{
+					$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
 				}
-				$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
 				
 				if(count($error)){					
 					throw new AJXP_Exception(SystemTextEncoding::toUTF8(join("\n", $error)));
@@ -910,6 +912,50 @@ class fsAccessDriver extends AbstractAccessDriver
 			$chmodValue = octdec(ltrim($chmodValue, "0"));
 			call_user_func(array($this->wrapperClassName, "changeMode"), $filePath, $chmodValue);
 		}		
+	}
+	
+	/**
+	 * Extract an archive directly inside the dest directory.
+	 *
+	 * @param string $destDir
+	 * @param UserSelection $selection
+	 * @param array $error
+	 * @param array $success
+	 */
+	function extractArchive($destDir, $selection, &$error, &$success){
+		require_once("server/classes/pclzip.lib.php");
+		$zipPath = $selection->getZipPath(true);
+		$zipLocalPath = $selection->getZipLocalPath(true);
+		if(strlen($zipLocalPath)>1 && $zipLocalPath[0] == "/") $zipLocalPath = substr($zipLocalPath, 1)."/";
+		$files = $selection->getFiles();
+
+		$realZipFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$zipPath);
+		$archive = new PclZip($realZipFile);
+		$content = $archive->listContent();		
+		foreach ($files as $key => $item){// Remove path
+			$item = substr($item, strlen($zipPath));
+			if($item[0] == "/") $item = substr($item, 1);			
+			foreach ($content as $zipItem){
+				if($zipItem["stored_filename"] == $item || $zipItem["stored_filename"] == $item."/"){
+					$files[$key] = $zipItem["stored_filename"];
+					break;
+				}else{
+					unset($files[$key]);
+				}
+			}
+		}
+		AJXP_Logger::debug("Archive", $files);
+		$realDestination = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase.$destDir);
+		AJXP_Logger::debug("Extract", array($realDestination, $realZipFile, $files, $zipLocalPath));
+		$result = $archive->extract(PCLZIP_OPT_BY_NAME, $files, 
+									PCLZIP_OPT_PATH, $realDestination, 
+									PCLZIP_OPT_REMOVE_PATH, $zipLocalPath);
+		if($result <= 0){
+			$error[] = $archive->errorInfo(true);
+		}else{
+			$mess = ConfService::getMessages();
+			$success[] = sprintf($mess[368], basename($zipPath), $destDir);
+		}
 	}
 	
 	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)

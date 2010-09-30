@@ -174,7 +174,7 @@ $mess=array(
 "158"=> "Renommer le fichier sélectionné",
 "159"=> "Copier la sélection dans...",
 "160"=> "Déplacer la sélection dans...",
-"161"=> "Supprimer les fichiers sélectionnés",
+"161"=> "Supprimer la sélection",
 "162"=> "Editer le fichier directement en ligne",
 "163"=> "Connex.",
 "164"=> "Déconn.",
@@ -404,6 +404,7 @@ $mess=array(
 "365" => "Vous ne pouvez uploader plus de %s fichiers à la fois.",
 "366" => "Cet utilisateur n'a aucun dépôt actif.",
 "367" => "Vous n'êtes pas autorisé à uploader ce type de fichier. Veuillez choisir parmi les extensions suivantes : ",
+"368" => "La sélection a été extraite de l'archive %s dans le répertoire %s",
 /* END SENTENCE */
 );
 ?>
