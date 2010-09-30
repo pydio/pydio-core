@@ -95,6 +95,7 @@ class AuthService
 
     function checkBruteForceLogin(&$loginArray)
     {
+    	return true;
     	$serverAddress = "";
     	if(isSet($_SERVER['REMOTE_ADDR'])){
     		$serverAddress = $_SERVER['REMOTE_ADDR'];
@@ -114,7 +115,7 @@ class AuthService
     }
 
 	function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
-	{
+	{		
 		$confDriver = ConfService::getConfStorageImpl();
 		if($user_id == null)
 		{
@@ -226,8 +227,8 @@ class AuthService
 	function getDefaultRootId()
 	{
 		$loggedUser = AuthService::getLoggedUser();
-		if($loggedUser == null) return -1;
-		foreach (ConfService::getRepositoriesList() as $rootDirIndex => $rootDirObject)
+		if($loggedUser == null) return 0;
+		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
 		{			
 			if($loggedUser->canRead($rootDirIndex."")) {
 				// Warning : do not grant access to admin repository to a non admin, or there will be 
@@ -235,14 +236,10 @@ class AuthService
 				if($rootDirObject->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()){
 					continue;
 				}
-				// Don't use shared elements as default root id.
-				if($rootDirObject->getAccessType() == "ajxp_shared"){
-					continue;
-				}
 				return $rootDirIndex;
 			}
 		}
-		return -1;
+		return 0;
 	}
 	
 	/**
@@ -264,10 +261,12 @@ class AuthService
 	 * @param AbstractAjxpUser $userObject
 	 */
 	function updateDefaultRights(&$userObject){
-		foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
-		{			
-			if($repoObject->getDefaultRight() != ""){
-				$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
+		if($userObject->hasParent()){
+			foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
+			{			
+				if($repoObject->getDefaultRight() != ""){
+					$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
+				}
 			}
 		}
 	}
@@ -342,7 +341,18 @@ class AuthService
 		$authDriver->deleteUser($userId);
 		AJXP_User::deleteUser($userId);
 		
-		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId));
+		$users = $authDriver->listUsers();
+		$subUsers = "";
+		foreach (array_keys($users) as $id){
+			$object = $confDriver->createUserObject($id);
+			if($object->hasParent() && $object->getParent() == $userId){
+				$subUsers .= $id.",";
+				$authDriver->deleteUser($id);
+				AJXP_User::deleteUser($id);
+			}
+		}
+		
+		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => $subUsers));
 		return true;
 	}
 	
