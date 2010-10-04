@@ -206,7 +206,7 @@ class AJXP_XMLWriter
 				$path = $bookmark;
 				$title = basename($bookmark);
 			}
-			$buffer .= "<bookmark path=\"".$path."\" title=\"".$title."\"/>";
+			$buffer .= "<bookmark path=\"".AJXP_Utils::xmlEntities($path)."\" title=\"".AJXP_Utils::xmlEntities($title)."\"/>";
 		}
 		if($print) print $buffer;
 		else return $buffer;
@@ -265,6 +265,7 @@ class AJXP_XMLWriter
 			$buffer.="<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>";			
 			$buffer.="<pref name=\"history_last_repository\" value=\"".$loggedUser->getArrayPref("history", "last_repository")."\"/>";
 			$buffer.="<pref name=\"ls_history\"><![CDATA[".$loggedUser->getPref("ls_history")."]]></pref>";			
+			$buffer.="<pref name=\"pending_folder\" value=\"".$loggedUser->getPref("pending_folder")."\"/>";
 			$buffer.="<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>";
 			$buffer.="<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>";
 			$buffer.="<pref name=\"columns_visibility\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_visibility")))."\"/>";

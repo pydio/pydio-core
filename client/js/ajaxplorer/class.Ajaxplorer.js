@@ -350,7 +350,11 @@ Class.create("Ajaxplorer", {
 			if(!repositoryObject){
 				alert("No active repository found for user!");
 			}
-			if(this.user.getPreference("ls_history", true)){
+			if(this.user.getPreference("pending_folder") && this.user.getPreference("pending_folder") != "-1"){
+				this._initLoadRep = this.user.getPreference("pending_folder");
+				this.user.setPreference("pending_folder", "-1");
+				this.user.savePreference("pending_folder");
+			}else if(this.user.getPreference("ls_history", true)){
 				var data = new Hash(this.user.getPreference("ls_history", true));
 				this._initLoadRep = data.get(repId);
 			}
@@ -387,7 +391,10 @@ Class.create("Ajaxplorer", {
 				
 		if(!this._initObj) { 			
 			this.repositoryId = repositoryId;
-		} else { this._initObj = null ;}
+		} else { 
+			this._initObj = null ;
+			if(!ajxpBootstrap.parameters.get('usersEnabled')) return;
+		}
 		
 		if(this._initLoadRep){
 			if(this._initLoadRep != "" && this._initLoadRep != "/"){

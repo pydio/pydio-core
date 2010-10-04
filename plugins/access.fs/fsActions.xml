@@ -448,10 +448,54 @@
 						</fieldset>
 					</div>					
 					]]>
-					</clientForm>					
+					</clientForm>				
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="ajxp_link">
+			<gui text="369" title="369" src="ajxp-link.png" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false" actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true"/>
+				<selectionContext dir="true" file="false" recycle="false" unique="true"/>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var loadFunc = function (oForm){
+						var link;
+						var input = oForm.down('input[type="text"]');
+						var url = document.location.href;
+						if(url.indexOf('#') > 0){
+							url = url.substring(0, url.indexOf('#'));
+						}
+						if(url.indexOf('?') > 0){
+							url = url.substring(0, url.indexOf('?'));
+						}						
+						var repo = ajaxplorer.repositoryId;
+						link = url + '?repository_id=' + repo + '&folder=' + encodeURIComponent(ajaxplorer.getUserSelection().getUniqueFileName());
+						input.value = link;
+                        var email = oForm.down('a[id="email"]');
+                        if (email){ 
+                            email.setAttribute('href', 'mailto:unknown@unknown.com?Subject=UPLOAD&Body='+encodeURIComponent(link)); 
+                        }
+						input.select();
+					};
+                    modal.showDialogForm('Get', 'ajxp_link_form', loadFunc, function(){
+                        hideLightBox(true);
+                        return false;
+                    }, null, true);
+				]]></clientCallback>
+				<clientForm id="ajxp_link_form"><![CDATA[
+				<div id="ajxp_link_form" title="AJXP_MESSAGE[369]"  box_width="280" action="public_url">
+				<fieldset>
+					<legend ajxp_message_id="296">AJXP_MESSAGE[296]</legend>
+					<input type="text" style="width:200px;margin-right:5px;" id="ajxp_link_container" class="dialogFocus"/>
+                    <a id="email" title="AJXP_MESSAGE[323]"><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>
+                  </fieldset>
+				</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>		
 		<action name="open_with">
 			<gui text="316" title="316" src="fileopen.png" accessKey="open_with_access" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
