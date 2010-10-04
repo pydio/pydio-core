@@ -1,0 +1,9 @@
+Builder for AjaXplorer core under windows (tested on XP).
+Following Structure must be found 
+
++ EXECUTION FOLDER
+	+ bin
+		+ build.bat		=> the present script
+		+ 7za.exe		=> 7zip command line version
+	+ logs
+	+ tmp
