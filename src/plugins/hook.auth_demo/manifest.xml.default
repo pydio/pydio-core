@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hook name="auth_demo" label="Demo (no write actions)" description="Disable pass chnage">
+	<class_definition filename="plugins/hook.auth_demo/class.demoAuthHook.php" classname="demoAuthHook"/>	
+	<registry_contributions>
+		<actions>
+			<action name="save_user_pref">
+				<pre_processing>
+					<serverCallback methodName="filterUsersPref"></serverCallback>
+				</pre_processing>
+			</action>			
+		</actions>
+	</registry_contributions>
+</hook>
