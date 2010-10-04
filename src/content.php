@@ -116,8 +116,9 @@ if(AuthService::usersEnabled())
 	{
 		if(isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])){
 			$loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
-			$loggedUser->setArrayPref("history", $_SESSION["PENDING_REPOSITORY_ID"], $_SESSION["PENDING_FOLDER"]);
+			$loggedUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
 			$loggedUser->save();
+			AuthService::updateUser($loggedUser);
 			unset($_SESSION["PENDING_REPOSITORY_ID"]);
 			unset($_SESSION["PENDING_FOLDER"]);
 		}
