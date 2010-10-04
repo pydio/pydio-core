@@ -117,7 +117,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$message = $mess["345"];
 				if(isSet($content) && $content != ""){
 					if(strstr($content, "::URL::")!== false){
-						list($version, $downloadUrl) = split("::URL::", $content);
+						list($version, $downloadUrl) = explode("::URL::", $content);
 					}else{
 						$version = $content;
 						$downloadUrl = "http://www.ajaxplorer.info/";
