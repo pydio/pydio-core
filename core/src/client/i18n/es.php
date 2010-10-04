@@ -405,6 +405,7 @@ $mess=array(
 "366" => "This user does not have any active repository.",
 "367" => "You are not allowed to upload this type of file. Please choose among the following extensions : ",
 "368" => "Selection successfully extracted from archive %s to folder %s",
+"369" => "AjaXplorer Link",
 /* END SENTENCE */
 );
 ?>

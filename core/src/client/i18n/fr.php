@@ -405,6 +405,7 @@ $mess=array(
 "366" => "Cet utilisateur n'a aucun dépôt actif.",
 "367" => "Vous n'êtes pas autorisé à uploader ce type de fichier. Veuillez choisir parmi les extensions suivantes : ",
 "368" => "La sélection a été extraite de l'archive %s dans le répertoire %s",
+"369" => "AjaXplorer Link",
 /* END SENTENCE */
 );
 ?>
