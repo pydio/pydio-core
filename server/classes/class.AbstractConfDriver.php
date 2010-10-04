@@ -179,9 +179,9 @@ class AbstractConfDriver extends AJXP_Plugin {
 					if($_GET["bm_action"] == "add_bookmark")
 					{
 						$title = "";
-						if(isSet($_GET["title"])) $title = $_GET["title"];
+						if(isSet($_GET["bm_title"])) $title = $_GET["bm_title"];
 						if($title == "" && $_GET["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
-						$bmUser->addBookMark($_GET["bm_path"], $title);
+						$bmUser->addBookMark(SystemTextEncoding::magicDequote($_GET["bm_path"]), SystemTextEncoding::magicDequote($title));
 					}
 					else if($_GET["bm_action"] == "delete_bookmark")
 					{
