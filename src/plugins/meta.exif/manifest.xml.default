@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="meta.exif" className="ExifMetaManager">
+	<class_definition filename="plugins/meta.exif/class.ExifMetaManager.php" classname="ExifMetaManager"/>
+	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+		<resources>
+			<i18n namespace="meta.exif" path="plugins/meta.exif/i18n" />
+			<js file="plugins/meta.exif/class.ExifCellRenderer.js" className="ExifCellRenderer" autoload="true"/>
+		</resources>
+	</client_settings>	
+	<server_settings>
+		<param name="meta_fields" type="string" label="Meta Fields" description="Comma separated list of fields, use standard characters here." mandatory="true" default="comment_field"/>
+		<param name="meta_labels" type="string" label="Meta Labels" description="Comma separated list of labels, be sure to define as many as fields!" mandatory="true" default="My Comments"/>
+	</server_settings>	
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="ls.metadata" methodName="extractMeta"></serverCallback>
+		</hooks>
+		<client_configs>
+			<component_config className="InfoPanel">			
+				<infoPanelExtension mime="generic_file,generic_dir" attributes="">		
+					<html></html>
+				</infoPanelExtension>
+			</component_config>			
+		</client_configs>
+	</registry_contributions>
+	<dependencies>
+		<!-- Wrapper type plugins only -->
+		<pluginClass pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+	</dependencies>				
+</meta>
