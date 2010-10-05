@@ -54,7 +54,8 @@ Class.create("OLViewer", AbstractEditor, {
 		
 	            map = new OpenLayers.Map( 'ol_map' );
 	            layer = new OpenLayers.Layer.WMS( "Argeo",
-	                    "https://gis.argeo.org/geoserver/wms", {layers: mapName} );
+	                    ajxpNode.getMetadata().get('wms_url'), 
+	                    {layers: ajxpNode.getMetadata().get('name')} );
 	            map.addLayer(layer);
 	
 	            map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
