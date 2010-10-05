@@ -1,4 +1,4 @@
-<?
+<?php
 //*************************English Description***************************//
 // Class to convert Latitude/Longitude Coordinates                       //
 // Developed by: Diêgo Garrido de Almeida (diego@brflog.net)             //
