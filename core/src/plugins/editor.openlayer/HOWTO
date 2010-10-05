@@ -1,0 +1,6 @@
+By default, this editor will recognize "layer" ajxp mime type.
+
+Drop the OpenLayer distribution inside the openlayer folder like this : 
++ openlayer/OpenLayers.js [ single-file distrib ]
++ openlayer/img
++ openlayer/themes
