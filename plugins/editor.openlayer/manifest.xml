@@ -4,14 +4,14 @@
 		<js file="plugins/editor.openlayer/class.OLViewer.js" className="OLViewer"/>
 		<css file="plugins/editor.openlayer/openlayer/theme/default/style.css"/>
 	</resources>
-	<registry_contributions>
-		<client_configs uuidAttr="name">
-			<template name="script" element="ajxp_desktop" position="top"><![CDATA[
-			<!-- Insert via template instead of resource to make sure the path to the script is the right one -->
-			<script type="text/javascript" src="plugins/editor.openlayer/openlayer/OpenLayers.js"/>
-			]]></template>
-		</client_configs>
-	</registry_contributions>
+	<processing>
+		<!-- Hack : use activeCondition as an extension starter, we should enable extensionOnInit instead
+			Cannot use the standard library mechanism for OpenLayer otherwise it cannot find the images and styles.
+		 -->
+		<activeCondition><![CDATA[
+		((!window.OpenLayers?$(document.body).insert(new Element('script', {src:"plugins/editor.openlayer/openlayer/OpenLayers.js", type:"text/javascript"})):true) || true)
+		]]></activeCondition>
+	</processing>	
 	<dependencies>
 		<!-- Stream Wrapper must be implemented -->
 		<activePlugin pluginName="access.wms"/>
