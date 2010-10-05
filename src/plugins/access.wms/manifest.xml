@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="wms" label="WMS Server" description="Browse layers of a WMS Server.">
+	<server_settings>
+		<param name="HOST" type="string" label="Wms Server" description="Wms server url" mandatory="true"/>
+	</server_settings>
 	<client_settings icon="plugins/access.wms/images/world.png">
 		<resources>
 			<i18n namespace="wms" path="plugins/access.wms/i18n" />		

@@ -43,7 +43,7 @@ class WmsBrowser extends AbstractAccessDriver
 		
 		switch ($action){
 			case "ls":
-				$doc = DOMDocument::load("https://gis.argeo.org/geoserver/wms?request=getCapabilities");
+				$doc = DOMDocument::load($this->repository->getOption("HOST") . "?request=getCapabilities");
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="wms.2" attributeName="ajxp_label" sortType="String"/><column messageId="wms.1" attributeName="name" sortType="String"/><column messageId="wms.3" attributeName="queryable" sortType="String"/><column messageId="wms.4" attributeName="style" sortType="String"/><column messageId="wms.5" attributeName="keywords" sortType="String"/></columns>');		
 				$xPath = new DOMXPath($doc);
@@ -56,7 +56,8 @@ class WmsBrowser extends AbstractAccessDriver
 		            	"parentname"	=> "/",
 		            	"name"			=> $name,
 		            	"title"			=> $title,
-						"ajxp_mime" 	=> "layer"
+						"ajxp_mime" 	=> "layer",
+						"wms_url"		=> $this->repository->getOption("HOST")
 		            );
 					$style = $xPath->query("Style/Name", $node)->item(0)->nodeValue;
 					$metaData["style"] = $style;
