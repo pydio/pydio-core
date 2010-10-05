@@ -41,25 +41,55 @@ Class.create("OLViewer", AbstractEditor, {
 		
 	getPreview : function(ajxpNode, rich){		
 		if(rich){
-			mapName = ajxpNode.getMetadata().get('name');
+			
+			var metadata = ajxpNode.getMetadata();
 			
 			var div = new Element('div', {id:"ol_map", style:"width:100%;height:200px;"});
 			div.resizePreviewElement = function(dimensionObject){
 				// do nothing;
+				div.setStyle({height:'200px'});
 				if(div.initialized) return;
 		        var lon = 5;
 		        var lat = 40;
 		        var zoom = 5;
 		        var map, layer;
-		
-	            map = new OpenLayers.Map( 'ol_map' );
+				
+		        var bound, srs;
+	            if(metadata.get('bbox_minx') && metadata.get('bbox_miny') && metadata.get('bbox_maxx') && metadata.get('bbox_maxy')){
+	            	bound = new OpenLayers.Bounds(
+	            		metadata.get('bbox_minx'), 
+	            		metadata.get('bbox_miny'), 
+	            		metadata.get('bbox_maxx'), 
+	            		metadata.get('bbox_maxy')
+	            	);
+	            	if(metadata.get('bbox_SRS')){
+	            		srs = metadata.get('bbox_SRS');
+	            	}
+	            }
+	            //console.log(bound);
+	            //console.log(srs);
+	            map = new OpenLayers.Map( 'ol_map', {
+	            	maxExtent : bound,
+	            	projection: srs,
+	            	maxResolution: 1245.650390625	            	
+	            });
 	            layer = new OpenLayers.Layer.WMS( "Argeo",
-	                    ajxpNode.getMetadata().get('wms_url'), 
-	                    {layers: ajxpNode.getMetadata().get('name')} );
+	                    metadata.get('wms_url'), 
+	                    {
+	                    	layers: metadata.get('name'), 
+	                    	styles: metadata.get('style'),
+	                    	tiled:'true', 
+	                    	tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+	                    }, 
+	                    {
+	                    	buffer:0,
+	                    	displayOutsideMaxExtent:true
+	                    }
+					);
 	            map.addLayer(layer);
-	
-	            map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
-	            map.addControl( new OpenLayers.Control.LayerSwitcher() );
+				map.zoomToExtent(bound);
+				
+	            //map.addControl( new OpenLayers.Control.LayerSwitcher() );
 				div.initialized = true;
 			}
 			return div;
