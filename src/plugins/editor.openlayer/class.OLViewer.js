@@ -34,8 +34,6 @@
  */
 Class.create("OLViewer", AbstractEditor, {
 
-	fullscreenMode: false,
-	
 	initialize: function($super, oFormObject)
 	{
 		$super(oFormObject);
@@ -44,6 +42,7 @@ Class.create("OLViewer", AbstractEditor, {
 			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download&file='+this.currentFile);
 			return false;
 		}.bind(this));
+		this.element.observe('editor:enterFS', function(){this.fullScreenMode = true;}.bind(this) );
 	},
 	
 	
@@ -68,6 +67,9 @@ Class.create("OLViewer", AbstractEditor, {
 			
 	resize : function ($super, size){
 		$super(size);
+		if(!this.fullScreenMode){
+			fitHeightToBottom($(this.mapDiv), $(modal.elementName));
+		}
 		if(this.olMap){
 			this.olMap.updateSize();
 		}
