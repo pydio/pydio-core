@@ -69,6 +69,27 @@ Class.create("ExifCellRenderer", {
 	},
 	
 	openLocator : function(latitude, longitude){
-		console.log(latitude, longitude);
+		// console.log(latitude, longitude);
+		// Call openLayer editor!
+		// TEST : WestHausen : longitude=10.2;latitude = 48.9;
+		var editors = ajaxplorer.findEditorsForMime("layer");
+		if(editors.length){
+			editorData = editors[0];							
+		}					
+		if(editorData){
+			// Update ajxpNode with Google Layer!
+			var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
+			var metadata = ajxpNode.getMetadata();
+			ajxpNode.setMetadata(metadata.merge({
+				'layer_type':'Google',
+				'google_type':'hybrid',
+				'center_srs':'EPSG:900913',
+				'center_lat':latitude,
+				'center_long':longitude
+			}));
+			ajaxplorer.loadEditorResources(editorData.resourcesManager);
+			modal.openEditorDialog(editorData);
+		}
+		
 	}
 });

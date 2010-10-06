@@ -54,6 +54,13 @@ Class.create("OLViewer", AbstractEditor, {
 		this.initFilterBar();
 		this.element.insert(this.mapDiv);
 		fitHeightToBottom($(this.mapDiv), $(modal.elementName));
+
+		if(ajxpNode.getMetadata().get('layer_type') == 'Google' && (!google || !google.maps)){
+			alert('Warning, you must add the line \n<script src="http://maps.google.com/maps/api/js?sensor=false"/> \n inside the main application template (client/gui.html) to enable Google Maps.');
+			hideLightBox(true);
+			return;
+		}
+		
 		var result = this.createOLMap(ajxpNode, 'openlayer_map', false, true);
 		this.olMap = result.MAP;
 		this.layers = result.LAYERS;
@@ -163,6 +170,7 @@ Class.create("OLViewer", AbstractEditor, {
 	createOLMap : function(ajxpNode, targetId, useDefaultControls, dualTileMode){
 		var metadata = ajxpNode.getMetadata();
         var map, bound, srs;
+        var options;
         if(metadata.get('bbox_minx') && metadata.get('bbox_miny') && metadata.get('bbox_maxx') && metadata.get('bbox_maxy')){
         	bound = new OpenLayers.Bounds(
         		metadata.get('bbox_minx'), 
@@ -173,50 +181,118 @@ Class.create("OLViewer", AbstractEditor, {
         	if(metadata.get('bbox_SRS')){
         		srs = metadata.get('bbox_SRS');
         	}
+        	options = {
+	        	maxExtent : bound,
+	        	projection: srs,
+	        	maxResolution: 1245.650390625	
+        	};
+        }else if(metadata.get('center_lat') && metadata.get('center_long')){        	
+        	var center = new OpenLayers.LonLat(parseFloat(metadata.get('center_long')), parseFloat(metadata.get('center_lat')));
+        	console.log(center, metadata);
+        	if(metadata.get('center_srs')){
+        		srs = metadata.get('center_SRS');
+        	}
+        	options = {
+        		projection:srs
+        	}
         }
         
+        /*
         var options = {
         	maxExtent : bound,
         	projection: srs,
         	maxResolution: 1245.650390625	            	
         };
+        */
         if(!useDefaultControls){
         	options.controls = [];
         }
         map = new OpenLayers.Map( targetId, options);
         var layers = $A();
-        var layer = new OpenLayers.Layer.WMS( "AjaXplorer (tiled)",
-                metadata.get('wms_url'), 
-                {
-                	layers: metadata.get('name'), 
-                	styles: metadata.get('style'),
-                	tiled:'true', 
-                	tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-                }, 
-                {
-                	buffer:0,
-                	displayOutsideMaxExtent:true
-                }
-			);
-		layers.push(layer);
-		map.addLayer(layer);
-		if(dualTileMode){
-			var untiled = new OpenLayers.Layer.WMS( "AjaXplorer (untiled)", 
-				metadata.get('wms_url'), 
-				{
-                	layers: metadata.get('name'), 
-                	styles: metadata.get('style')
-				},
-				{
-					singleTile:true, ratio:1
-				}
-			);
-			layers.push(untiled);
-			map.addLayer(untiled);
-			untiled.setVisibility(false);
-		}       
+        if(!metadata.get('layer_type') || metadata.get('layer_type') == 'WMS'){
+	        var layer = new OpenLayers.Layer.WMS( "AjaXplorer (tiled)",
+	                metadata.get('wms_url'), 
+	                {
+	                	layers: metadata.get('name'), 
+	                	styles: metadata.get('style'),
+	                	tiled:'true', 
+	                	tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+	                }, 
+	                {
+	                	buffer:0,
+	                	displayOutsideMaxExtent:true
+	                }
+				);
+			layers.push(layer);
+			map.addLayer(layer);
+			if(dualTileMode){
+				var untiled = new OpenLayers.Layer.WMS( "AjaXplorer (untiled)", 
+					metadata.get('wms_url'), 
+					{
+	                	layers: metadata.get('name'), 
+	                	styles: metadata.get('style')
+					},
+					{
+						singleTile:true, ratio:1
+					}
+				);
+				layers.push(untiled);
+				map.addLayer(untiled);
+				untiled.setVisibility(false);
+			}       
+        }else if(metadata.get('layer_type') == 'Google'){
+        	switch(metadata.get('google_type')){
+        		case 'physical':
+		            var layer = new OpenLayers.Layer.Google(
+	                	"Google Physical",
+	                	{type: google.maps.MapTypeId.TERRAIN}
+		            );
+				break;
+
+        		case 'streets':
+		            var layer = new OpenLayers.Layer.Google(
+		                "Google Streets", // the default
+		                {numZoomLevels: 20}
+		            );
+				break;
+
+        		case 'hybrid':
+		            var layer = new OpenLayers.Layer.Google(
+		                "Google Hybrid",
+		                {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+		            );
+				break;
+
+        		case 'satellite':
+        		default:
+		            var layer = new OpenLayers.Layer.Google(
+		                "Google Satellite",
+		                {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
+		            );
+				break;			
+        	}
+        	if(layer){
+				layers.push(layer);
+				map.addLayer(layer);
+        	}
+        }
         
-		map.zoomToExtent(bound);	        
+		if(bound){
+			map.zoomToExtent(bound);	        
+		}
+		else if(center){
+			
+			var projectedCenter = center.transform(new OpenLayers.Projection("EPSG:4326"),map.getProjectionObject());
+			// Add Marker for center!
+            var markers = new OpenLayers.Layer.Markers( "Markers" );
+            map.addLayer(markers);
+            var size = new OpenLayers.Size(22,22);
+            var offset = new OpenLayers.Pixel(0, -size.h);
+            var icon = new OpenLayers.Icon('plugins/editor.openlayer/services.png',size,offset);
+            markers.addMarker(new OpenLayers.Marker(projectedCenter,icon));
+			
+			map.setCenter(projectedCenter, 10);
+		}
 		//map.addControl( new OpenLayers.Control.LayerSwitcher() );
 		return {MAP: map, LAYERS:layers};
 	},		
