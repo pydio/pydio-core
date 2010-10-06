@@ -9,13 +9,23 @@
 			Cannot use the standard library mechanism for OpenLayer otherwise it cannot find the images and styles.
 		 -->
 		<activeCondition><![CDATA[
-		if(Prototype.Browser.IE){var originalEvent = window.Event;}
-		((!window.OpenLayers?$(document.body).insert(new Element('script', {src:"plugins/editor.openlayer/openlayer/OpenLayers.js", type:"text/javascript"})):true) || true)
-		if(Prototype.Browser.IE){
-				setTimeout(function(){
-					window.Event = originalEvent;
-				}, 500);
+		(function(){
+			if(Prototype.Browser.IE){
+				var originalEvent = window.Event;
 			}
+			if(!window.OpenLayers && !window.OpenLayersLoading){
+				window.OpenLayersLoading = true;
+				$(document.body).insert(new Element('script', {
+					src:"plugins/editor.openlayer/openlayer/OpenLayers.js", 
+					type:"text/javascript"}
+				));
+			}
+			if(Prototype.Browser.IE){
+					setTimeout(function(){
+						window.Event = originalEvent;
+					}, 500);
+				}
+		})() || true;
 		]]></activeCondition>
 	</processing>	
 	<clientForm id="openlayer_box"><![CDATA[
@@ -65,6 +75,6 @@
 	]]></clientForm>	
 	<dependencies>
 		<!-- Stream Wrapper must be implemented -->
-		<activePlugin pluginName="access.wms"/>
+		<activePlugin pluginName="access.wms|access.fs"/>
 	</dependencies>				
 </editor>
