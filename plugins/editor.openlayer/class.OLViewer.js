@@ -36,60 +36,199 @@ Class.create("OLViewer", AbstractEditor, {
 
 	fullscreenMode: false,
 	
-	initialize: function($super, oFormObject){		
+	initialize: function($super, oFormObject)
+	{
+		$super(oFormObject);
+		this.actions.get("downloadFileButton").observe('click', function(){
+			if(!this.currentFile) return;		
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download&file='+this.currentFile);
+			return false;
+		}.bind(this));
+	},
+	
+	
+	open : function($super, userSelection){
+		$super(userSelection);
+		var ajxpNode = userSelection.getUniqueNode();
+		this.mapDiv = new Element('div', {id:'openlayer_map', style:'width:100%'});
+		this.contentMainContainer = this.mapDiv;
+		this.initFilterBar();
+		this.element.insert(this.mapDiv);
+		fitHeightToBottom($(this.mapDiv), $(modal.elementName));
+		var result = this.createOLMap(ajxpNode, 'openlayer_map', false, true);
+		this.olMap = result.MAP;
+		this.layers = result.LAYERS;
+        this.olMap.addControl(new OpenLayers.Control.PanZoomBar({
+            position: new OpenLayers.Pixel(5, 5)
+        }));		
+		this.olMap.addControl(new OpenLayers.Control.Navigation());
+		this.olMap.addControl(new OpenLayers.Control.ScaleLine());
+		this.olMap.addControl(new OpenLayers.Control.MousePosition({element:this.element.down('span[id="location"]'), numDigits:4}));
+	},
+			
+	resize : function ($super, size){
+		$super(size);
+		if(this.olMap){
+			this.olMap.updateSize();
+		}
+	},
+	
+	initFilterBar : function(){
+		var bar = this.element.down('div.filter');
+		var button = this.element.down('div#filterButton');
+		bar.select('select').invoke('setStyle', {width:'80px',height:'18px',fontSize:'11px',marginRight:'5px',border:'1px solid #AAAAAA'});
+		bar.select('input').invoke('setStyle', {height:'18px',fontSize:'11px',border:'1px solid #AAAAAA',backgroundImage:'url('+ajxpResourcesFolder+'"/images/locationBg.gif")', backgroundPosition:'left top', backgroundRepeat:'no-repeat'});
+		bar.hide();
+		this.filterBar = bar;
+		button.observe("click", function(e){
+			this.toggleFilterBar();
+		}.bind(this));
+		bar.down('select#tilingModeSelector').observe('change', function(e){
+			var tilingMode = e.findElement().getValue();
+			var tiled = this.layers[0];
+			var untiled = this.layers[1];
+	        if (tilingMode == 'tiled') {
+	            untiled.setVisibility(false);
+	            tiled.setVisibility(true);
+	            this.olMap.setBaseLayer(tiled);
+	        }
+	        else {
+	            untiled.setVisibility(true);
+	            tiled.setVisibility(false);
+	            this.olMap.setBaseLayer(untiled);
+	        }
+		}.bind(this) );
+		bar.down('select#antialiasSelector').observe('change', function(e){
+			this.layers.invoke('mergeNewParams', {format_options:'antialias:' + e.findElement().getValue()});
+		}.bind(this) );
+		bar.down('select#imageFormatSelector').observe('change', function(e){
+			this.layers.invoke('mergeNewParams', {format:e.findElement().getValue()});
+		}.bind(this) );
+		bar.down('select#imageStyleSelector').observe('change', function(e){
+			this.layers.invoke('mergeNewParams', {format:e.findElement().getValue()});
+		}.bind(this) );
+		
+		bar.down('img#submitFilter').observe('click', function(e){
+			this.updateFilter(bar);
+		}.bind(this));
+		
+		bar.down('img#resetFilter').observe('click', function(e){
+			bar.down('input#filter').setValue('');
+			this.updateFilter(bar);
+		}.bind(this));
+		
+	},
+	
+	toggleFilterBar : function(){
+		if(this.filterBarShown){
+			new Effect.BlindUp(this.filterBar, {duration:0.1,scaleMode:'contents',afterFinish : function(){
+				fitHeightToBottom($(this.mapDiv), $(modal.elementName));
+				this.resize();			
+			}.bind(this) });
+			this.filterBarShown = false;
+		}else{
+			new Effect.BlindDown(this.filterBar, {duration:0.1,scaleMode:'contents',afterFinish : function(){
+				fitHeightToBottom($(this.mapDiv), $(modal.elementName));
+				this.resize();			
+			}.bind(this) });
+			this.filterBarShown = true;
+		}
 	},
 		
+	updateFilter : function(bar){
+
+		var filterType = bar.down('select#filterType').getValue();
+		var filter = bar.down('input#filter').getValue();
+
+		// by default, reset all filters
+		var filterParams = {
+			filter: null,
+			cql_filter: null,
+			featureId: null
+		};
+		if (OpenLayers.String.trim(filter) != "") {
+			if (filterType == "cql")
+			filterParams["cql_filter"] = filter;
+			if (filterType == "ogc")
+			filterParams["filter"] = filter;
+			if (filterType == "fid")
+			filterParams["featureId"] = filter;
+		}
+		// merge the new filter definitions
+		this.layers.invoke('mergeNewParams', filterParams);
+	},
+	
+	createOLMap : function(ajxpNode, targetId, useDefaultControls, dualTileMode){
+		var metadata = ajxpNode.getMetadata();
+        var map, bound, srs;
+        if(metadata.get('bbox_minx') && metadata.get('bbox_miny') && metadata.get('bbox_maxx') && metadata.get('bbox_maxy')){
+        	bound = new OpenLayers.Bounds(
+        		metadata.get('bbox_minx'), 
+        		metadata.get('bbox_miny'), 
+        		metadata.get('bbox_maxx'), 
+        		metadata.get('bbox_maxy')
+        	);
+        	if(metadata.get('bbox_SRS')){
+        		srs = metadata.get('bbox_SRS');
+        	}
+        }
+        
+        var options = {
+        	maxExtent : bound,
+        	projection: srs,
+        	maxResolution: 1245.650390625	            	
+        };
+        if(!useDefaultControls){
+        	options.controls = [];
+        }
+        map = new OpenLayers.Map( targetId, options);
+        var layers = $A();
+        var layer = new OpenLayers.Layer.WMS( "AjaXplorer (tiled)",
+                metadata.get('wms_url'), 
+                {
+                	layers: metadata.get('name'), 
+                	styles: metadata.get('style'),
+                	tiled:'true', 
+                	tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
+                }, 
+                {
+                	buffer:0,
+                	displayOutsideMaxExtent:true
+                }
+			);
+		layers.push(layer);
+		map.addLayer(layer);
+		if(dualTileMode){
+			var untiled = new OpenLayers.Layer.WMS( "AjaXplorer (untiled)", 
+				metadata.get('wms_url'), 
+				{
+                	layers: metadata.get('name'), 
+                	styles: metadata.get('style')
+				},
+				{
+					singleTile:true, ratio:1
+				}
+			);
+			layers.push(untiled);
+			map.addLayer(untiled);
+			untiled.setVisibility(false);
+		}       
+        
+		map.zoomToExtent(bound);	        
+		//map.addControl( new OpenLayers.Control.LayerSwitcher() );
+		return {MAP: map, LAYERS:layers};
+	},		
+	
 	getPreview : function(ajxpNode, rich){		
 		if(rich){
 			
-			var metadata = ajxpNode.getMetadata();
-			
+			var metadata = ajxpNode.getMetadata();			
 			var div = new Element('div', {id:"ol_map", style:"width:100%;height:200px;"});
 			div.resizePreviewElement = function(dimensionObject){
 				// do nothing;
 				div.setStyle({height:'200px'});
-				if(div.initialized) return;
-		        var lon = 5;
-		        var lat = 40;
-		        var zoom = 5;
-		        var map, layer;
-				
-		        var bound, srs;
-	            if(metadata.get('bbox_minx') && metadata.get('bbox_miny') && metadata.get('bbox_maxx') && metadata.get('bbox_maxy')){
-	            	bound = new OpenLayers.Bounds(
-	            		metadata.get('bbox_minx'), 
-	            		metadata.get('bbox_miny'), 
-	            		metadata.get('bbox_maxx'), 
-	            		metadata.get('bbox_maxy')
-	            	);
-	            	if(metadata.get('bbox_SRS')){
-	            		srs = metadata.get('bbox_SRS');
-	            	}
-	            }
-	            //console.log(bound);
-	            //console.log(srs);
-	            map = new OpenLayers.Map( 'ol_map', {
-	            	maxExtent : bound,
-	            	projection: srs,
-	            	maxResolution: 1245.650390625	            	
-	            });
-	            layer = new OpenLayers.Layer.WMS( "Argeo",
-	                    metadata.get('wms_url'), 
-	                    {
-	                    	layers: metadata.get('name'), 
-	                    	styles: metadata.get('style'),
-	                    	tiled:'true', 
-	                    	tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-	                    }, 
-	                    {
-	                    	buffer:0,
-	                    	displayOutsideMaxExtent:true
-	                    }
-					);
-	            map.addLayer(layer);
-				map.zoomToExtent(bound);
-				
-	            //map.addControl( new OpenLayers.Control.LayerSwitcher() );
+				if(div.initialized) return;				
+				OLViewer.prototype.createOLMap(ajxpNode, 'ol_map', true);
 				div.initialized = true;
 			}
 			return div;
