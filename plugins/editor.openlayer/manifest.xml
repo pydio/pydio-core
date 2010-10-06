@@ -9,7 +9,13 @@
 			Cannot use the standard library mechanism for OpenLayer otherwise it cannot find the images and styles.
 		 -->
 		<activeCondition><![CDATA[
+		if(Prototype.Browser.IE){var originalEvent = window.Event;}
 		((!window.OpenLayers?$(document.body).insert(new Element('script', {src:"plugins/editor.openlayer/openlayer/OpenLayers.js", type:"text/javascript"})):true) || true)
+		if(Prototype.Browser.IE){
+				setTimeout(function(){
+					window.Event = originalEvent;
+				}, 500);
+			}
 		]]></activeCondition>
 	</processing>	
 	<clientForm id="openlayer_box"><![CDATA[
