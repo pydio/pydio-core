@@ -219,6 +219,10 @@ Class.create("Modal", {
 	},
 	
 	openEditorDialog : function(editorData){
+		if(!editorData.formId){
+			ajaxplorer.displayMessage('ERROR', 'Error, you must define a formId attribute in your &lt;editor&gt; manifest (or set it as openable="false")');
+			return;
+		}
 		var editorKlass = editorData.editorClass;
 		modal.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16));
 		var loadFunc = function(oForm){			
