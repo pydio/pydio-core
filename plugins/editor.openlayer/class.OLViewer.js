@@ -55,10 +55,11 @@ Class.create("OLViewer", AbstractEditor, {
 		this.element.insert(this.mapDiv);
 		fitHeightToBottom($(this.mapDiv), $(modal.elementName));
 
-		if(ajxpNode.getMetadata().get('layer_type') == 'Google' && (!google || !google.maps)){
-			alert('Warning, you must add the line \n<script src="http://maps.google.com/maps/api/js?sensor=false"/> \n inside the main application template (client/gui.html) to enable Google Maps.');
-			hideLightBox(true);
-			return;
+		var metadata = ajxpNode.getMetadata();
+		if(metadata.get('layer_type') == 'Google' && (!google || !google.maps)){
+			alert('Warning, you must add the line \n<script src="http://maps.google.com/maps/api/js?sensor=false"/> \n inside the main application template (client/gui.html) to enable Google Maps.\nSwitching to Open Street Map');
+			metadata.set('layer_type', 'OSM');
+			metadata.set('center_SRS', 'EPSG:4326');
 		}
 		
 		var result = this.createOLMap(ajxpNode, 'openlayer_map', false, true);
@@ -275,13 +276,16 @@ Class.create("OLViewer", AbstractEditor, {
 				layers.push(layer);
 				map.addLayer(layer);
         	}
+        }else if(metadata.get('layer_type') == 'OSM'){
+        	var layer = new OpenLayers.Layer.OSM();
+			layers.push(layer);
+			map.addLayer(layer);
         }
         
 		if(bound){
 			map.zoomToExtent(bound);	        
 		}
-		else if(center){
-			
+		else if(center){			
 			var projectedCenter = center.transform(new OpenLayers.Projection("EPSG:4326"),map.getProjectionObject());
 			// Add Marker for center!
             var markers = new OpenLayers.Layer.Markers( "Markers" );
