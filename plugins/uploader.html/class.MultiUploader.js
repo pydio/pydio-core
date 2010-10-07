@@ -100,10 +100,21 @@ Class.create("MultiUploader", {
 		}
 		
 		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
-		var sendButton = formObject.select('div[id="uploadSendButton"]')[0];
+		// FIX IE DISPLAY BUG
+		if(Prototype.Browser.IE){
+			$('fileInputContainerDiv').insert($('uploadBrowseButton'));
+			$('fileInputContainerDiv').insert($('uploadSendButton'));			
+		}
+		modal.setCloseAction(function(){
+			if(Prototype.Browser.IE){
+				$(document.body).insert($('uploadBrowseButton'));
+				$(document.body).insert($('uploadSendButton'));
+			}
+		});
+		var sendButton = formObject.down('div[id="uploadSendButton"]');
 		if(sendButton.observerSet) return;		
-		var optionsButton = formObject.select('div[id="uploadOptionsButton"]')[0];
-		var closeButton = formObject.select('div[id="uploadCloseButton"]')[0];
+		var optionsButton = formObject.down('div[id="uploadOptionsButton"]');
+		var closeButton = formObject.down('div[id="uploadCloseButton"]');
 		sendButton.observerSet = true;
 		sendButton.observe("click", function(){
 			ajaxplorer.actionBar.multi_selector.submitMainForm();
@@ -117,7 +128,7 @@ Class.create("MultiUploader", {
 				alert(message);
 			}
 		}.bind(this));
-		closeButton.observe("click", function(){
+		closeButton.observe("click", function(){			
 			hideLightBox();
 		}.bind(this));
 		
