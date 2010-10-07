@@ -99,18 +99,22 @@ Class.create("MultiUploader", {
 			});
 		}
 		
-		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
 		// FIX IE DISPLAY BUG
 		if(Prototype.Browser.IE){
 			$('fileInputContainerDiv').insert($('uploadBrowseButton'));
-			$('fileInputContainerDiv').insert($('uploadSendButton'));			
+			$('fileInputContainerDiv').insert($('uploadSendButton'));
+			$('uploadBrowseButton').show();
+			$('uploadSendButton').show();
 		}
 		modal.setCloseAction(function(){
 			if(Prototype.Browser.IE){
 				$(document.body).insert($('uploadBrowseButton'));
 				$(document.body).insert($('uploadSendButton'));
+				$('uploadBrowseButton').hide();
+				$('uploadSendButton').hide();
 			}
 		});
+		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
 		var sendButton = formObject.down('div[id="uploadSendButton"]');
 		if(sendButton.observerSet) return;		
 		var optionsButton = formObject.down('div[id="uploadOptionsButton"]');
