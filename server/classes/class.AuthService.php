@@ -261,7 +261,7 @@ class AuthService
 	 * @param AbstractAjxpUser $userObject
 	 */
 	function updateDefaultRights(&$userObject){
-		if($userObject->hasParent()){
+		if(!$userObject->hasParent()){
 			foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
 			{			
 				if($repoObject->getDefaultRight() != ""){
