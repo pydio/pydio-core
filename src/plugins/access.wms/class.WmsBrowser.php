@@ -118,7 +118,7 @@ class WmsBrowser extends AbstractAccessDriver
             	"parentname"	=> "/",
             	"name"			=> $name,
             	"title"			=> $title,
-				"ajxp_mime" 	=> "layer",
+				"ajxp_mime" 	=> "wms_layer",
 				"srs"			=> $srs,
 				"wms_url"		=> $this->repository->getOption("HOST")
             );
