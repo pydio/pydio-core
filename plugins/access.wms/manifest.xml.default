@@ -99,7 +99,7 @@
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="get" inZip="false">
 					</context>
-					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="layer" behaviour="hidden"></selectionContext></gui>
+					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="wms_layer" behaviour="hidden"></selectionContext></gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 				<subMenu>
 					<dynamicBuilder><![CDATA[						
