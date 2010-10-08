@@ -232,21 +232,21 @@ class AJXP_Plugin{
 		$depPaths = "dependencies/*/@pluginName";
 		$nodes = $this->xPath->query($depPaths);
 		foreach ($nodes as $attr){
-			$this->dependencies[] = $attr->value;
+			$value = $attr->value;
+			$this->dependencies = array_merge($this->dependencies, explode("|", $value));
 		}
 	}
 	public function dependsOn($pluginName){
-		foreach ($this->dependencies as $deps){
-			if($pluginName == $deps) return true;
-			if(strstr($deps, "|")!==false && in_array($pluginName, explode("|", $deps))) return true;
-		}
-		return false;
+		return in_array($pluginName, $this->dependencies);
 	}
 	public function getActiveDependencies(){
 		if(!$this->manifestLoaded) return array();
 		$deps = array();
 		$nodes = $this->xPath->query("dependencies/activePlugin/@pluginName");
-		foreach ($nodes as $attr) $deps[] = $attr->value;
+		foreach ($nodes as $attr) {
+			$value = $attr->value;
+			$deps = array_merge($deps, explode("|", $value));
+		}
 		return $deps;
 	}
 	public function loadConfig($configFile, $format){

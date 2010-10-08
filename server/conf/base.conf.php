@@ -43,6 +43,7 @@ require("compat.php");
 $installPath = realpath(dirname(__FILE__)."/../..");
 define("INSTALL_PATH", $installPath);
 define("USERS_DIR", $installPath."/server/users");
+define("AJXP_PLUGINS_CACHE_FILE", INSTALL_PATH."/server/conf/plugins_cache.ser");
 define("SERVER_ACCESS", "content.php");
 define("ADMIN_ACCESS", "admin.php");
 define("IMAGES_FOLDER", "client/themes/oxygen/images");
