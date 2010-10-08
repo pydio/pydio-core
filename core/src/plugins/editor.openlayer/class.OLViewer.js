@@ -49,22 +49,17 @@ Class.create("OLViewer", AbstractEditor, {
 	open : function($super, userSelection){
 		$super(userSelection);
 		var ajxpNode = userSelection.getUniqueNode();
+		this.updateTitle(getBaseName(ajxpNode.getPath()));
 		this.mapDiv = new Element('div', {id:'openlayer_map', style:'width:100%'});
 		this.contentMainContainer = this.mapDiv;
-		this.initFilterBar();
+		this.initFilterBar((ajxpNode.getAjxpMime()=='wms_layer'?true:false));
 		this.element.insert(this.mapDiv);
 		fitHeightToBottom($(this.mapDiv), $(modal.elementName));
-
-		var metadata = ajxpNode.getMetadata();
-		if(metadata.get('layer_type') == 'Google' && (!google || !google.maps)){
-			alert('Warning, you must add the line \n<script src="http://maps.google.com/maps/api/js?sensor=false"/> \n inside the main application template (client/gui.html) to enable Google Maps.\nSwitching to Open Street Map');
-			metadata.set('layer_type', 'OSM');
-			metadata.set('center_SRS', 'EPSG:4326');
-		}
-		
+        
 		var result = this.createOLMap(ajxpNode, 'openlayer_map', false, true);
 		this.olMap = result.MAP;
 		this.layers = result.LAYERS;
+		this.refreshLayersSwitcher();
         this.olMap.addControl(new OpenLayers.Control.PanZoomBar({
             position: new OpenLayers.Pixel(5, 5)
         }));		
@@ -83,7 +78,7 @@ Class.create("OLViewer", AbstractEditor, {
 		}
 	},
 	
-	initFilterBar : function(){
+	initFilterBar : function(wmsFiltersActive){
 		var bar = this.element.down('div.filter');
 		var button = this.element.down('div#filterButton');
 		bar.select('select').invoke('setStyle', {width:'80px',height:'18px',fontSize:'11px',marginRight:'5px',border:'1px solid #AAAAAA'});
@@ -93,21 +88,24 @@ Class.create("OLViewer", AbstractEditor, {
 		button.observe("click", function(e){
 			this.toggleFilterBar();
 		}.bind(this));
-		bar.down('select#tilingModeSelector').observe('change', function(e){
-			var tilingMode = e.findElement().getValue();
-			var tiled = this.layers[0];
-			var untiled = this.layers[1];
-	        if (tilingMode == 'tiled') {
-	            untiled.setVisibility(false);
-	            tiled.setVisibility(true);
-	            this.olMap.setBaseLayer(tiled);
-	        }
-	        else {
-	            untiled.setVisibility(true);
-	            tiled.setVisibility(false);
-	            this.olMap.setBaseLayer(untiled);
-	        }
+		bar.down('select#layerSelector').observe('change', function(e){
+			var selected = e.findElement().getValue();
+			var baseLayer;
+			this.layers.each(function(layer){
+				if(layer.name == selected){
+					baseLayer = layer;
+					layer.setVisibility(true);
+				}else{
+					layer.setVisibility(false);
+				}
+			});
+			this.olMap.setBaseLayer(baseLayer);
 		}.bind(this) );
+		if(!wmsFiltersActive){
+			bar.down('#wms_filters').hide();
+			bar.setStyle({textAlign:'right'});
+			return;
+		}
 		bar.down('select#antialiasSelector').observe('change', function(e){
 			this.layers.invoke('mergeNewParams', {format_options:'antialias:' + e.findElement().getValue()});
 		}.bind(this) );
@@ -127,6 +125,17 @@ Class.create("OLViewer", AbstractEditor, {
 			this.updateFilter(bar);
 		}.bind(this));
 		
+	},
+	
+	refreshLayersSwitcher : function(){
+		var selector = this.filterBar.down('select#layerSelector');
+		if(this.layers.length < 2){
+			selector.disabled = true;
+			return;
+		}
+		this.layers.each(function(layer){
+			selector.insert(new Element('option', {value:layer.name}).update(layer.name));
+		});
 	},
 	
 	toggleFilterBar : function(){
@@ -169,124 +178,140 @@ Class.create("OLViewer", AbstractEditor, {
 	},
 	
 	createOLMap : function(ajxpNode, targetId, useDefaultControls, dualTileMode){
+		
+		// PARSE METADATA
 		var metadata = ajxpNode.getMetadata();
-        var map, bound, srs;
-        var options;
+		var layersDefinitions;
+		if(metadata.get('ajxp_mime') == 'wms_layer'){			
+			layersDefinitions = $A([
+				{type:'WMS',tile:true,wms_url:metadata.get('wms_url'),name:metadata.get('name'),style:metadata.get('style')},				
+			]);
+			if(dualTileMode){
+				layersDefinitions.push(
+					{type:'WMS',tile:false,wms_url:metadata.get('wms_url'),name:metadata.get('name'),style:metadata.get('style')}
+				);
+			}
+		}else{
+			layersDefinitions = $A(metadata.get('ol_layers'));
+		}
+		var meta_srs,meta_bound,meta_center;
         if(metadata.get('bbox_minx') && metadata.get('bbox_miny') && metadata.get('bbox_maxx') && metadata.get('bbox_maxy')){
-        	bound = new OpenLayers.Bounds(
+        	meta_bound = new OpenLayers.Bounds(
         		metadata.get('bbox_minx'), 
         		metadata.get('bbox_miny'), 
         		metadata.get('bbox_maxx'), 
         		metadata.get('bbox_maxy')
         	);
         	if(metadata.get('bbox_SRS')){
-        		srs = metadata.get('bbox_SRS');
+        		meta_srs = metadata.get('bbox_SRS');
         	}
-        	options = {
-	        	maxExtent : bound,
-	        	projection: srs,
-	        	maxResolution: 1245.650390625	
-        	};
-        }else if(metadata.get('center_lat') && metadata.get('center_long')){        	
-        	var center = new OpenLayers.LonLat(parseFloat(metadata.get('center_long')), parseFloat(metadata.get('center_lat')));
-        	console.log(center, metadata);
+        }else if(metadata.get('ol_center')){
+        	var ol_center = metadata.get('ol_center');
+        	meta_center = new OpenLayers.LonLat(ol_center.longitude, ol_center.latitude);
         	if(metadata.get('center_srs')){
-        		srs = metadata.get('center_SRS');
-        	}
-        	options = {
-        		projection:srs
+        		meta_srs = metadata.get('center_SRS');
+        	}else{
+        		meta_srs = 'EPSG:4326'; // Default SRS
         	}
         }
-        
-        /*
-        var options = {
-        	maxExtent : bound,
-        	projection: srs,
-        	maxResolution: 1245.650390625	            	
-        };
-        */
+        	
+        // Check Google layer
+        var mapsFound = (google && google.maps?true:false);
+        var googleRejected = false;
+        layersDefinitions.each(function(definition){
+        	if(definition.type=='Google'){
+        		if(!mapsFound){        		
+        			layersDefinitions = layersDefinitions.without(definition);
+        			googleRejected = true;
+        			return;
+        		}
+        		meta_srs = 'EPSG:900913';
+        	}
+        });                
+		if(googleRejected){
+			var remainingLength = layersDefinitions.size();
+			alert('Warning, you must add the line \n<script src="http://maps.google.com/maps/api/js?sensor=false"></script> \n inside the main application template (client/gui.html) to enable Google Maps.\n' + (!remainingLength?'Switching to Open Street Map':''));
+			if(!remainingLength){ // Switch to OSM by default.
+				layersDefinitions.push({type:'OSM'});
+				meta_srs = 'EPSG:4326';
+			}
+		}
+		
+		
+        var options = {projection:meta_srs}
+        if(meta_bound){
+        	options.maxExtent = meta_bound;
+        	options.maxResolution =  1245.650390625;
+        }
         if(!useDefaultControls){
         	options.controls = [];
         }
-        map = new OpenLayers.Map( targetId, options);
+        var map = new OpenLayers.Map(targetId, options);
         var layers = $A();
-        if(!metadata.get('layer_type') || metadata.get('layer_type') == 'WMS'){
-	        var layer = new OpenLayers.Layer.WMS( "AjaXplorer (tiled)",
-	                metadata.get('wms_url'), 
-	                {
-	                	layers: metadata.get('name'), 
-	                	styles: metadata.get('style'),
-	                	tiled:'true', 
-	                	tilesOrigin : map.maxExtent.left + ',' + map.maxExtent.bottom
-	                }, 
-	                {
-	                	buffer:0,
-	                	displayOutsideMaxExtent:true
-	                }
-				);
-			layers.push(layer);
-			map.addLayer(layer);
-			if(dualTileMode){
-				var untiled = new OpenLayers.Layer.WMS( "AjaXplorer (untiled)", 
-					metadata.get('wms_url'), 
-					{
-	                	layers: metadata.get('name'), 
-	                	styles: metadata.get('style')
-					},
-					{
-						singleTile:true, ratio:1
-					}
-				);
-				layers.push(untiled);
-				map.addLayer(untiled);
-				untiled.setVisibility(false);
-			}       
-        }else if(metadata.get('layer_type') == 'Google'){
-        	switch(metadata.get('google_type')){
-        		case 'physical':
-		            var layer = new OpenLayers.Layer.Google(
-	                	"Google Physical",
-	                	{type: google.maps.MapTypeId.TERRAIN}
-		            );
-				break;
-
-        		case 'streets':
-		            var layer = new OpenLayers.Layer.Google(
-		                "Google Streets", // the default
-		                {numZoomLevels: 20}
-		            );
-				break;
-
-        		case 'hybrid':
-		            var layer = new OpenLayers.Layer.Google(
-		                "Google Hybrid",
-		                {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
-		            );
-				break;
-
-        		case 'satellite':
-        		default:
-		            var layer = new OpenLayers.Layer.Google(
-		                "Google Satellite",
-		                {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
-		            );
-				break;			
+        layersDefinitions.each(function(definition){
+        	var layer;
+        	if(definition.type == 'WMS'){
+        		var layerOpt, title;
+        		var layerDef = {
+        			layers : definition.name,
+        			styles : definition.style
+        		};
+        		var layerUrl = definition.wms_url;
+        		if(definition.tile){
+	        		title = "Tiled";
+	        		layerDef.tiled = true;
+	        		if(meta_bound) layerDef.tilesOrigin = map.maxExtent.left + ',' + map.maxExtent.bottom;
+	                options = {buffer:0,displayOutsideMaxExtent:true};	        		
+        		}else{
+        			title = "Single Tile";
+        			options = {singleTile:true, ratio:1};
+        		}
+        		layer = new OpenLayers.Layer.WMS(title, layerUrl, layerDef, layerOpt);
+        	}else if(definition.type == 'OSM'){
+	        	layer = new OpenLayers.Layer.OSM();
+        	}else if(definition.type == 'Google'){
+	        	switch(definition.google_type){
+	        		case 'physical':
+			            layer = new OpenLayers.Layer.Google(
+		                	"Google Physical",
+		                	{type: google.maps.MapTypeId.TERRAIN}
+			            );
+					break;
+	
+	        		case 'streets':
+			            layer = new OpenLayers.Layer.Google(
+			                "Google Streets", // the default
+			                {numZoomLevels: 20}
+			            );
+					break;
+	
+	        		case 'hybrid':
+			            layer = new OpenLayers.Layer.Google(
+			                "Google Hybrid",
+			                {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+			            );
+					break;
+	
+	        		case 'satellite':
+	        		default:
+			            layer = new OpenLayers.Layer.Google(
+			                "Google Satellite",
+			                {type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 22}
+			            );
+					break;			
+	        	}
         	}
         	if(layer){
-				layers.push(layer);
-				map.addLayer(layer);
+	        	map.addLayer(layer);
+	        	layers.push(layer);
         	}
-        }else if(metadata.get('layer_type') == 'OSM'){
-        	var layer = new OpenLayers.Layer.OSM();
-			layers.push(layer);
-			map.addLayer(layer);
-        }
+        });
         
-		if(bound){
-			map.zoomToExtent(bound);	        
+		if(meta_bound){
+			map.zoomToExtent(meta_bound);	        
 		}
-		else if(center){			
-			var projectedCenter = center.transform(new OpenLayers.Projection("EPSG:4326"),map.getProjectionObject());
+		else if(meta_center){			
+			var projectedCenter = meta_center.transform(new OpenLayers.Projection("EPSG:4326"),map.getProjectionObject());
 			// Add Marker for center!
             var markers = new OpenLayers.Layer.Markers( "Markers" );
             map.addLayer(markers);
@@ -296,8 +321,7 @@ Class.create("OLViewer", AbstractEditor, {
             markers.addMarker(new OpenLayers.Marker(projectedCenter,icon));
 			
 			map.setCenter(projectedCenter, 10);
-		}
-		//map.addControl( new OpenLayers.Control.LayerSwitcher() );
+		}		
 		return {MAP: map, LAYERS:layers};
 	},		
 	
