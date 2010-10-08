@@ -573,17 +573,23 @@ class AJXP_Utils
 	 * @param Array $value The value to store
 	 * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
 	 */
-	function saveSerialFile($filePath, $value, $createDir=true){
+	function saveSerialFile($filePath, $value, $createDir=true, $silent=false){
 		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
 		if($createDir && !is_dir(dirname($filePath))) {			
 			if(!is_writeable(dirname(dirname($filePath)))){
-				throw new Exception("[AJXP_Utils::saveSerialFile] Cannot write into ".dirname(dirname($filePath)));
+				if($silent) return ;
+				else throw new Exception("[AJXP_Utils::saveSerialFile] Cannot write into ".dirname(dirname($filePath)));
 			}
 			mkdir(dirname($filePath));
 		}
-		$fp = fopen($filePath, "w");
-		fwrite($fp, serialize($value));
-		fclose($fp);
+		try {
+			$fp = fopen($filePath, "w");
+			fwrite($fp, serialize($value));
+			fclose($fp);
+		}catch (Exception $e){
+			if($silent) return ;
+			else throw $e;
+		}
 	}
 	
 	public static function userAgentIsMobile(){
