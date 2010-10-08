@@ -62,7 +62,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		}
  		if(count($beforeSort)){
  			$this->checkDependencies($beforeSort);
-			$this->usort($beforeSort);
+ 			$sorted = $this->loadPlugCache($beforeSort);
+ 			if($sorted !== false){
+ 				$beforeSort = $sorted;
+ 			}else{
+				$this->usort($beforeSort);
+				$this->cachePlugSort($beforeSort);
+ 			}
  			foreach ($beforeSort as $plugin){
 				$plugType = $plugin->getType();
 				if(!isSet($this->registry[$plugType])){
@@ -75,6 +81,47 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 				$this->registry[$plugType][$plugin->getName()] = $plugin;
  			}
  		}
+ 	}
+ 	
+ 	/**
+ 	 * Save the plugins order in a cache
+ 	 *
+ 	 * @param array $sortedPlugins
+ 	 */
+ 	private function cachePlugSort($sortedPlugins){
+ 		if(!AJXP_PLUGINS_CACHE_FILE) return false;
+ 		$indexes = array();
+ 		$i = 0;
+ 		foreach ($sortedPlugins as $plugin){
+ 			$indexes[$i] = $plugin->getId();
+ 			$i++;
+ 		}
+ 		AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $indexes, false, true);
+ 	}
+ 	
+ 	/**
+ 	 * Load the cache, check that all registered plugins
+ 	 * are known by the cache, and in that case sort the array.
+ 	 *
+ 	 * @param array $sortedPlugins
+ 	 * @return mixed
+ 	 */
+ 	private function loadPlugCache($sortedPlugins){
+ 		if(!AJXP_PLUGINS_CACHE_FILE) return false;
+ 		$cache = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+ 		if(!count($cache)) return false;
+ 		// Break if one plugin is not present in cache
+ 		foreach ($sortedPlugins as $index => $plugin){
+ 			if(!in_array($plugin->getId(), $cache)){return false;}
+ 		}
+ 		$sorted = array();
+ 		foreach ($cache as $id => $plugId){
+ 			// Walk the cache and add the plugins in right order.
+ 			if(isSet($sortedPlugins[$plugId])){
+ 				$sorted[] = $sortedPlugins[$plugId];
+ 			}
+ 		} 		
+ 		return $sorted;
  	}
  	
  	/**
@@ -101,23 +148,16 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private function checkDependencies(&$arrayToSort){
  		// First make sure that the given dependencies are present
  		foreach ($arrayToSort as $plugId => $plugObject){
- 			foreach ($plugObject->getDependencies() as $requiredPlugId){
-	 			if(strstr($requiredPlugId, "|")!==false){
-	 				$orParts = explode("|", $requiredPlugId);
-	 				$found = false;	 				
-	 				foreach ($orParts as $part){
-	 					if(isSet($arrayToSort[$part])){
-	 						$found=true;break;
-	 					}
-	 				}
-					if(!$found){
-		 				unset($arrayToSort[$plugId]);
-		 				break;
-					}
-	 			}else if(!isSet($arrayToSort[$requiredPlugId])){
- 					unset($arrayToSort[$plugId]);
- 					break;
+ 			$dependencies = $plugObject->getDependencies();
+ 			if(!count($dependencies)) return ;
+ 			$found = false;
+ 			foreach ($dependencies as $requiredPlugId){
+ 				if(isSet($arrayToSort[$requiredPlugId])){
+ 					$found = true; break;
  				}
+ 			}
+ 			if(!$found){
+ 				unset($arrayToSort[$plugId]);
  			}
  		}
  	}
@@ -131,9 +171,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		if($pluginA->dependsOn($pluginB->getId())) {
  			return 1;
  		}
+ 		/*
+ 		I think it's useless as we only check for positive value!
  		if($pluginB->dependsOn($pluginA->getId())) {
  			return -1;
  		}
+ 		*/
  		return 0;
  	}
 
@@ -178,23 +221,17 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 	 		// Check active plugin dependencies
 	 		$plug = $this->getPluginById($type.".".$name);
 	 		$deps = $plug->getActiveDependencies();	 		
-	 		foreach ($deps as $dep){
-	 			if(strstr($dep, "|")!==false){	 				
-	 				$orParts = explode("|", $dep);
-	 				$found = false;
-	 				foreach ($orParts as $part){
-	 					if(isSet($this->activePlugins[$part]) && $this->activePlugins[$part] === true) {
-	 						$found=true;break;
-	 					}
-	 				}
-					if(!$found){
-		 				$this->activePlugins[$type.".".$name] = false;
-		 				return ;					
-					}
-	 			}else if(!isSet($this->activePlugins[$dep]) || $this->activePlugins[$dep] === false){
+	 		if(count($deps)){
+	 			$found = false;
+		 		foreach ($deps as $dep){
+					if(isSet($this->activePlugins[$dep]) && $this->activePlugins[$dep] !== false){
+						$found = true; break;
+		 			}
+		 		}
+		 		if(!$found){
 	 				$this->activePlugins[$type.".".$name] = false;
 	 				return ;
-	 			}
+		 		}
 	 		}
  		}
  		$this->activePlugins[$type.".".$name] = $active;
