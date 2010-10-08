@@ -177,10 +177,10 @@ Class.create("AjxpNode", {
 		
 	},
 	hasAjxpMimeInBranch: function(ajxpMime){
-		if(this.getAjxpMime() == ajxpMime) return true;
+		if(this.getAjxpMime() == ajxpMime.toLowerCase()) return true;
 		var parent, crt = this;
 		while(parent =crt._parentNode){
-			if(parent.getAjxpMime() == ajxpMime){return true;}
+			if(parent.getAjxpMime() == ajxpMime.toLowerCase()){return true;}
 			crt = parent;
 		}
 		return false;
@@ -226,8 +226,8 @@ Class.create("AjxpNode", {
 		return (childPath.substring(0,parentPath.length) == parentPath);
 	},	
 	getAjxpMime : function(){
-		if(this._metadata && this._metadata.get("ajxp_mime")) return this._metadata.get("ajxp_mime");		
-		if(this._metadata && this.isLeaf()) return getAjxpMimeType(this._metadata);
+		if(this._metadata && this._metadata.get("ajxp_mime")) return this._metadata.get("ajxp_mime").toLowerCase();
+		if(this._metadata && this.isLeaf()) return getAjxpMimeType(this._metadata).toLowerCase();
 		return "";
 	}
 });

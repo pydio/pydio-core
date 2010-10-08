@@ -324,7 +324,7 @@ class AJXP_Utils
 	}
 	
 	function isBrowsableArchive($fileName){
-		return preg_match("/\.zip$/",$fileName);
+		return preg_match("/\.zip$/",strtolower($fileName));
 	}
 	
 	/**
