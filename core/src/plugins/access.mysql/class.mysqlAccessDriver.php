@@ -455,7 +455,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
 		if($tablename !=""){
 			$like=" like '$tablename'";
 		}
-		$sql= "SHOW TABLE STATUS FROM $dbname $like";
+		$sql= "SHOW TABLE STATUS FROM `$dbname` $like";
 		$result=$this->execQuery($sql);
 		if($result){
 
