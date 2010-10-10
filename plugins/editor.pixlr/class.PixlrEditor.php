@@ -74,7 +74,7 @@ class PixlrEditor extends AJXP_Plugin {
 			);
 			$httpClient->postFile("/editor/", $params, "image", $fData);
 			$loc = $httpClient->getHeader("location");
-			header("Location:http://www.pixlr.com".$loc);
+			header("Location:$loc");
 			
 		}else if($action == "retrieve_pixlr_image"){
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
