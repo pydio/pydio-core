@@ -212,7 +212,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				fclose($fp);
 				header("Content-Type:text/plain");
 				print($mess[115]);
-				exit(0);
+				//exit(0);
 			break;
 		
 			//------------------------------------
