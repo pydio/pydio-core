@@ -40,8 +40,8 @@ require_once("svn_lib.inc.php");
 class SvnManager extends AJXP_Plugin {
 	
 	private static $svnListDir;
-	private static $svnListCache;
-	private static $svnCommandRunning = false;
+	private static $svnListCache;	
+	private $commitMessageParams;
 	
 	protected $accessDriver;
 	
@@ -56,7 +56,7 @@ class SvnManager extends AJXP_Plugin {
 	
 	}
 	
-	protected function initDirAndSelection($httpVars, $additionnalPathes = array()){
+	protected function initDirAndSelection($httpVars, $additionnalPathes = array(), $testRecycle = false){
 		$userSelection = new UserSelection();
 		$userSelection->initFromHttpVars($httpVars);
 		$repo = ConfService::getRepository();
@@ -64,7 +64,25 @@ class SvnManager extends AJXP_Plugin {
 		$wrapperData = $repo->streamData;
 		$urlBase = $wrapperData["protocol"]."://".$repo->getId();		
 		$result = array();
-		$result["DIR"] = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.AJXP_Utils::decodeSecureMagic($httpVars["dir"]));
+
+		if($testRecycle){
+			$recycle = $repo->getOption("RECYCLE_BIN");		
+			if($recycle != ""){
+				RecycleBinManager::init($urlBase, "/".$recycle);
+				$result["RECYCLE"] = RecycleBinManager::filterActions($httpVars["get_action"], $userSelection, $httpVars["dir"], $httpVars);
+				// if necessary, check recycle was checked.
+				$sessionKey = "AJXP_SVN_".$repo->getId()."_RECYCLE_CHECKED";
+				if(isSet($_SESSION[$sessionKey])){
+					$file = RecycleBinManager::getRelativeRecycle()."/".RecycleBinManager::getCacheFileName();
+					$realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$file);
+					$this->addIfNotVersionned($file, $realFile);
+					$_SESSION[$sessionKey] = true;
+				}
+			}
+		}
+		
+		$result["DIR"] = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.AJXP_Utils::decodeSecureMagic($httpVars["dir"]));		
+		$result["ORIGINAL_SELECTION"] = $userSelection;
 		$result["SELECTION"] = array();
 		if(!$userSelection->isEmpty()){
 			$files = $userSelection->getFiles();
@@ -78,9 +96,23 @@ class SvnManager extends AJXP_Plugin {
 		return $result;
 	}
 		
+	protected function addIfNotVersionned($repoFile, $realFile){
+		$res = ExecSvnCmd("svnversion", $realFile, "");
+		if(!is_numeric($res[IDX_STDOUT])){
+			$res2 = ExecSvnCmd("svn add", "$realFile");
+			$this->commitMessageParams = "Recycle cache file";
+			$this->commitChanges("ADD", array("dir" => dirname($repoFile)), array());
+		}
+	}
+	
 	public function switchAction($actionName, $httpVars, $filesVars){
 		$init = $this->initDirAndSelection($httpVars);
 		if($actionName == "svnlog"){
+			$res1 = ExecSvnCmd("svnversion ", $init["DIR"]);
+			$test = trim(implode("", $res1[IDX_STDOUT]));
+			if(is_numeric($test)){
+				$currentRev = $test;
+			}
 			$command = 'svn log';
 			$switches = '--xml -rHEAD:0';
 			$arg = $init["SELECTION"][0];
@@ -88,7 +120,10 @@ class SvnManager extends AJXP_Plugin {
 			AJXP_XMLWriter::header();	
 			$lines = explode("\r\n", $res[IDX_STDOUT]);
 			array_shift($lines);
-			print_r(implode("", $lines));
+			if(isSet($currentRev)){
+				print("<current_revision>$currentRev</current_revision>");
+			}
+			print_r(SystemTextEncoding::toUTF8(implode("", $lines)));
 			AJXP_XMLWriter::close();
 		}else if($actionName == "svndownload"){
 			$revision = $httpVars["revision"];
@@ -125,16 +160,20 @@ class SvnManager extends AJXP_Plugin {
 		switch ($actionName){
 			case "mkdir":
 				$init = $this->initDirAndSelection($httpVars, array("NEW_DIR" => AJXP_Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["dirname"])));
-				$res = ExecSvnCmd("svn add", $init["NEW_DIR"]);
-				//print_r($res);
+				$res = ExecSvnCmd("svn add", $init["NEW_DIR"]);				
+				$this->commitMessageParams = $httpVars["dirname"];
 			break;
 			case "mkfile":
 				$init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => AJXP_Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["filename"])));
 				$res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
-				//print_r($res);
+				$this->commitMessageParams = $httpVars["filename"];
 			break;
 			case "upload":
-				
+				if(isSet($filesVars) && isSet($filesVars["userfile_0"]) && isSet($filesVars["userfile_0"]["name"])){
+					$init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => SystemTextEncoding::fromUTF8($httpVars["dir"])."/".$filesVars["userfile_0"]["name"]));
+					$res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
+					$this->commitMessageParams = $filesVars["userfile_0"]["name"];
+				}
 			break;
 		}
 		if(isSet($res)){
@@ -145,22 +184,30 @@ class SvnManager extends AJXP_Plugin {
 	public function copyOrMoveSelection($actionName, &$httpVars, $filesVars){
 		if($actionName != "rename"){
 			$init = $this->initDirAndSelection($httpVars, array("DEST_DIR" => AJXP_Utils::decodeSecureMagic($httpVars["dest"])));
+			$this->commitMessageParams = "To:".$httpVars["dest"].";items:";
 		}else{
-			$init = $this->initDirAndSelection($httpVars);
+			$init = $this->initDirAndSelection($httpVars, array(), true);
 		}
 		$action = 'copy';
 		if($actionName == "move" || $actionName == "rename"){
 			$action = 'move';
-		}
+		}		
 		foreach ($init["SELECTION"] as $selectedFile){
 			if($actionName == "rename"){
 				$destFile = dirname($selectedFile)."/".AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
+				$this->commitMessageParams = "To:".$httpVars["filename_new"].";item:".$httpVars["file"];
 			}else{
 				$destFile = $init["DEST_DIR"]."/".basename($selectedFile);			
 			}
 			$res = ExecSvnCmd("svn $action", "$selectedFile $destFile", '');
 		}
-		$this->commitChanges($actionName, $httpVars, $filesVars);		
+		if($actionName != "rename"){
+			$this->commitMessageParams .= "[".implode(",",$init["SELECTION"])."]";
+		}
+		$this->commitChanges($actionName, $httpVars, $filesVars);
+		if($action != "rename"){
+			$this->commitChanges($actionName, array("dir" => $httpVars["dest"]), $filesVars);
+		}
 		AJXP_Logger::logAction("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::sendMessage("The selected files/folders have been copied/moved (by SVN)", null);
@@ -168,11 +215,29 @@ class SvnManager extends AJXP_Plugin {
 		AJXP_XMLWriter::close();		
 	}
 	
-	public function deleteSelection($actionName, &$httpVars, $filesVars){
-		$init = $this->initDirAndSelection($httpVars);
+	public function deleteSelection($actionName, &$httpVars, $filesVars){		
+		$init = $this->initDirAndSelection($httpVars, array(), true);
+		if(isSet($init["RECYCLE"]) && isSet($init["RECYCLE"]["action"]) && $init["RECYCLE"]["action"] != "delete"){
+			$httpVars["dest"] = SystemTextEncoding::fromUTF8($init["RECYCLE"]["dest"]);
+			$this->copyOrMoveSelection("move", $httpVars, $filesVars);
+			$userSelection = $init["ORIGINAL_SELECTION"];
+			$files = $userSelection->getFiles();
+			if($actionName == "delete"){
+				foreach ($files as $file){
+					RecycleBinManager::fileToRecycle($file);
+				}
+			}else if($actionName == "restore"){
+				foreach ($files as $file){
+					RecycleBinManager::deleteFromRecycle($file);
+				}				
+			}
+			$this->commitChanges($actionName, array("dir" => RecycleBinManager::getRelativeRecycle()), $filesVars);
+			return ;
+		}
 		foreach ($init["SELECTION"] as $selectedFile){
 			$res = ExecSvnCmd('svn delete', $selectedFile, '--force');
 		}
+		$this->commitMessageParams = "[".implode(",",$init["SELECTION"])."]";
 		$this->commitChanges($actionName, $httpVars, $filesVars);
 		AJXP_Logger::logAction("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
 		AJXP_XMLWriter::header();
@@ -186,7 +251,7 @@ class SvnManager extends AJXP_Plugin {
 		$command = "svn commit";
 		$user = AuthService::getLoggedUser()->getId();
 		$args = $init["DIR"];
-		$switches = "-m \"AjaXplorer Auto Commit - $user\"";
+		$switches = "-m \"AjaXplorer||$user||$actionName".(isSet($this->commitMessageParams)?"||".$this->commitMessageParams:"")."\"";
 		$res = ExecSvnCmd($command, $args, $switches);		
 		$res2 = ExecSvnCmd('svn update', dirname($args), '');
 	}		
