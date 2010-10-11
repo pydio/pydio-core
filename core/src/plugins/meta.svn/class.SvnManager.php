@@ -123,10 +123,12 @@ class SvnManager extends AJXP_Plugin {
 	public function switchAction($actionName, $httpVars, $filesVars){
 		$init = $this->initDirAndSelection($httpVars);
 		if($actionName == "svnlog"){
-			$res1 = ExecSvnCmd("svnversion ", $init["DIR"]);
+			$res1 = ExecSvnCmd("svnversion", $init["DIR"]);
 			$test = trim(implode("", $res1[IDX_STDOUT]));
 			if(is_numeric($test)){
 				$currentRev = $test;
+			}else if(strstr($test, ":")!==false && count(explode(":", $test))){
+				$revRange = explode(":", $test);
 			}
 			$command = 'svn log';
 			$switches = '--xml -rHEAD:0';
@@ -137,6 +139,8 @@ class SvnManager extends AJXP_Plugin {
 			array_shift($lines);
 			if(isSet($currentRev)){
 				print("<current_revision>$currentRev</current_revision>");
+			}else if(isSet($revRange)){
+				print("<revision_range start='$revRange[0]' end='$revRange[1]'/>");
 			}
 			print_r(SystemTextEncoding::toUTF8(implode("", $lines)));
 			AJXP_XMLWriter::close();
