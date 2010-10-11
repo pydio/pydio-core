@@ -122,11 +122,15 @@ Class.create("ResourcesManager", {
 	},
 	
 	loadAutoLoadResources : function(registry){
-		var nodes = XPathSelectNodes(registry, '//client_settings/resources/js[@autoload="true"]');
-		if(nodes.length){
-			nodes.each(function(node){
+		var jsNodes = XPathSelectNodes(registry, '//client_settings/resources/js[@autoload="true"]');
+		if(jsNodes.length){
+			jsNodes.each(function(node){
 				this.loadJSResource(node.getAttribute('file'), node.getAttribute('className'));
 			}.bind(this));
 		}
+		var imgNodes = XPathSelectNodes(registry, '//client_settings/resources/img_library');
+		imgNodes.each(function(node){
+			addImageLibrary(node.getAttribute('alias'), node.getAttribute('path'));
+		}.bind(this));		
 	}
 });
