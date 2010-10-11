@@ -219,6 +219,7 @@ class SerialMetaManager extends AJXP_Plugin {
 			$fp = fopen($metaFile, "w");
 			fwrite($fp, serialize(self::$metaCache), strlen(serialize(self::$metaCache)));
 			fclose($fp);
+			AJXP_Controller::applyHook("version.commit_file", $metaFile);
 		}
 	}
 	

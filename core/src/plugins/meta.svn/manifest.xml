@@ -8,6 +8,9 @@
 		</resources>
 	</client_settings>		
 	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="version.commit_file" methodName="commitFile"></serverCallback>
+		</hooks>
 		<client_configs>
 			<component_config className="FilesList">
 				<columns>
