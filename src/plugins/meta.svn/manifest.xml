@@ -5,6 +5,7 @@
 		<resources>
 			<i18n namespace="meta.svn" path="plugins/meta.svn/i18n" />
 			<js file="plugins/meta.svn/class.SVNLogger.js" className="SVNLogger" autoload="true"/>
+			<img_library alias="svn_images" path="plugins/meta.svn/images"/>			
 		</resources>
 	</client_settings>		
 	<registry_contributions>
@@ -48,7 +49,7 @@
 		</client_configs>					
 		<actions>
 			<action name="svnlog">
-				<gui text="meta.svn.2" title="meta.svn.21" src="applix.png" hasAccessKey="false">
+				<gui text="meta.svn.2" title="meta.svn.21" src="svn_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
 					<context selection="true" dir="false" recycle="false" behaviour="hidden"
 						actionBar="false" contextMenu="true" infoPanel="false"
 						actionBarGroup="change">
@@ -75,7 +76,7 @@
 					</processing>
 			</action>			
 			<action name="svnlog2">
-				<gui text="meta.svn.1" title="meta.svn.11" src="applix.png" hasAccessKey="false">
+				<gui text="meta.svn.1" title="meta.svn.11" src="svn_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
 					<context selection="false" dir="true" recycle="true" actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"></context>
 				</gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>

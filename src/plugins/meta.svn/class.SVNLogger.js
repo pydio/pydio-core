@@ -68,7 +68,7 @@ Class.create("SVNLogger", {
 		connexion.sendAsync();
 	},
 	
-	addEntry:function(revision,author,date,message, isCurrentRev){
+	addEntry:function(revision,author,date,message){
 		var separator = '||';
 		if(message.indexOf(separator)>-1){
 			var split = message.split(separator);			
@@ -82,11 +82,27 @@ Class.create("SVNLogger", {
 		var dateParts = date.split('\.');
 		date = dateParts[0].replace("T", " ");
 		
+		var skipSwitch = false;
+		var cssStyle = '';
+		if(this.currentRev){
+			if(this.currentRev.firstChild.nodeValue == revision){
+				skipSwitch = true;
+				cssStyle = "background-color:#efe;";
+			}
+		}else if(this.revisionRange){
+			var start = parseInt(this.revisionRange.getAttribute('start'));
+			var end = parseInt(this.revisionRange.getAttribute('end'));
+			var rev = parseInt(revision);
+			if(start <= rev && rev <= end){
+				cssStyle = "background-color:#fee;";
+			}
+		}
+		
 		var dLink = (this.isFile?this.downloadTemplate.evaluate({
 			fileName:this.fileName, 
 			revision:revision,
 			downloadString:this.downMessage
-		}):(!isCurrentRev?this.switchTemplate.evaluate({
+		}):(!skipSwitch?this.switchTemplate.evaluate({
 			revision:revision,
 			switchString:this.switchMessage
 		}):''));
@@ -96,7 +112,7 @@ Class.create("SVNLogger", {
 			date:date,
 			message:message,
 			downloadLink:dLink,			
-			cssStyle:(isCurrentRev?"background-color:#fee;":""),
+			cssStyle:cssStyle,
 			revString:this.revMessage,
 			authString:this.authorMessage,
 			dateString:this.dateMessage,
@@ -112,7 +128,8 @@ Class.create("SVNLogger", {
 		var root = oXmlDoc.childNodes[0];
 		if(!root.childNodes.length) return;
 		var logEntries = XPathSelectNodes(root, "log/logentry");
-		var currentRev = XPathSelectSingleNode(root, "current_revision");
+		this.currentRev = XPathSelectSingleNode(root, "current_revision");
+		this.revisionRange = XPathSelectSingleNode(root, "revision_range");
 		for(var i=0; i<logEntries.length;i++){
 			var entry = logEntries[i];
 			var revision = entry.getAttribute("revision");
@@ -126,7 +143,7 @@ Class.create("SVNLogger", {
 					message = entry.childNodes[j].firstChild.nodeValue;
 				}
 			}			
-			this.addEntry(revision,author,date,message, (currentRev?(revision==currentRev.firstChild.nodeValue):false));
+			this.addEntry(revision,author,date,message);
 		}
 		this.container.select("a[@ajxp_url]").invoke("observe", "click", function(e){
 				var conn = new Connexion(e.findElement().getAttribute("ajxp_url"));
