@@ -3,6 +3,7 @@
 	<class_definition filename="plugins/meta.svn/class.SvnManager.php" classname="SvnManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
+			<i18n namespace="meta.svn" path="plugins/meta.svn/i18n" />
 			<js file="plugins/meta.svn/class.SVNLogger.js" className="SVNLogger" autoload="true"/>
 		</resources>
 	</client_settings>		
@@ -44,16 +45,15 @@
 		</client_configs>					
 		<actions>
 			<action name="svnlog">
-				<gui text="242" title="242" src="applix.png" accessKey="svn_log_access_key" hasAccessKey="true">
-					<context selection="true" dir="" recycle="hidden"
-						actionBar="true" contextMenu="true" infoPanel="false"
+				<gui text="meta.svn.2" title="meta.svn.21" src="applix.png" hasAccessKey="false">
+					<context selection="true" dir="false" recycle="false" behaviour="hidden"
+						actionBar="false" contextMenu="true" infoPanel="false"
 						actionBarGroup="change">
 					</context>
-					<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" mp3="false" editable="false"></selectionContext></gui>
+					<selectionContext dir="true" file="true" recycle="true" unique="true" behaviour="hidden"></selectionContext></gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 				<processing>
 					<clientCallback prepareModal="true"><![CDATA[
-						var userSelection =  ajaxplorer.getUserSelection();
 							var loadFunc = function(oForm){
 								ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
 								ajaxplorer.actionBar.svnLogger.open();
@@ -66,11 +66,31 @@
 							modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
 						]]></clientCallback>
 					<clientForm id="svnlog_box"><![CDATA[
-					<div id="svnlog_box" action="svnlog" box_width="400" box_height="300" style="overflow:auto"></div>
+					<div id="svnlog_box" action="svnlog" box_width="450" box_height="340"></div>
 					]]></clientForm>
 					<serverCallback methodName="switchAction"></serverCallback>
 					</processing>
-			</action>		
+			</action>			
+			<action name="svnlog2">
+				<gui text="meta.svn.1" title="meta.svn.11" src="applix.png" hasAccessKey="false">
+					<context selection="false" dir="true" recycle="true" actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"></context>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var loadFunc = function(oForm){
+							ajaxplorer.actionBar.svnLogger = new SVNLogger($(oForm));
+							ajaxplorer.actionBar.svnLogger.open(true);
+						};
+						var closeFunc = function(){
+							ajaxplorer.actionBar.svnLogger.close();
+							hideLightBox();
+							return false;
+						};
+						modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
+					]]></clientCallback>
+					</processing>
+			</action>			
 			<action name="svndownload">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
@@ -83,6 +103,11 @@
 			</action>		
 			<!-- Totally override delete action (svn performs the real deletion) -->
 			<action name="delete">
+				<processing>
+					<serverCallback methodName="deleteSelection"></serverCallback>
+				</processing>			
+			</action>
+			<action name="restore">
 				<processing>
 					<serverCallback methodName="deleteSelection"></serverCallback>
 				</processing>			
@@ -115,6 +140,11 @@
 				</post_processing>			
 			</action>
 			<action name="mkfile">
+				<post_processing>
+					<serverCallback methodName="addSelection"></serverCallback>
+				</post_processing>			
+			</action>
+			<action name="upload">
 				<post_processing>
 					<serverCallback methodName="addSelection"></serverCallback>
 				</post_processing>			

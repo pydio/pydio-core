@@ -36,22 +36,28 @@ Class.create("SVNLogger", {
 	initialize:function(form){
 		this.element = form.select('[id="svnlog_box"]')[0];
 		this.container = new Element('div', {
-			style:"height:250px;overflow:auto;border:1px solid #ddd;"
+			style:"height:310px;overflow:auto;"
 		});
-		this.element.insert(this.container);
-		this.template = new Template('<div style="#{cssStyle}"><b>#{revString} :</b> #{revision} #{downloadLink}<br><b>#{authString} :</b> #{author}<br><b>#{dateString} :</b> #{date}<br><b>#{messString} :</b> #{message}</div>');
-		this.downloadTemplate = new Template('(<a href="content.php?get_action=svndownload&file=#{fileName}&revision=#{revision}">#{downloadString}</a>)');
-		this.switchTemplate = new Template('(<a ajxp_url="content.php?get_action=svnswitch&revision=#{revision}" href="#">#{switchString}</a>)');
+		this.element.up('div.dialogContent').setStyle({padding:0});
+		this.element.insert(this.container);	
+		this.template = new Template('<div style="padding: 0px; border: 1px solid rgb(204, 204, 204); margin: 5px 8px 8px 4px;box-shadow:2px 2px 3px #999999;-moz-box-shadow:2px 2px 3px #999999;-webkit-box-shadow:2px 2px 3px #999999;"><div style="padding: 3px; background-color: rgb(238, 238, 238);#{cssStyle}"><b>#{dateString} :</b> #{date} &nbsp;&nbsp;&nbsp;&nbsp;<b>#{revString} :</b> #{revision} &nbsp;&nbsp;&nbsp;&nbsp;<b>#{authString} :</b> #{author}<br></div><div style="padding: 3px;color:#aaa;">#{message}</div><div style="text-align: right; padding: 3px;">#{downloadLink}</div></div>');
+		this.downloadTemplate = new Template('<a style="color:#79f;font-weight:bold;" href="content.php?get_action=svndownload&file=#{fileName}&revision=#{revision}">#{downloadString}</a>');
+		this.switchTemplate = new Template('<a style="color:#79f;font-weight:bold;" ajxp_url="content.php?get_action=svnswitch&revision=#{revision}" href="#">#{switchString}</a>');
 		this.revMessage = MessageHash[243];
 		this.authorMessage = MessageHash[244];
 		this.dateMessage = MessageHash[245];
 		this.messMessage = MessageHash[246];
 		this.downMessage = MessageHash[88];
-		this.switchMessage = 'Switch...';
+		this.switchMessage = MessageHash['meta.svn.3'];
 	},
 	
-	open: function(){
-		var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
+	open: function(currentRep){
+		var selection = ajaxplorer.getUserSelection();
+		if(currentRep || selection.isEmpty()){
+			var ajxpNode = ajaxplorer.getContextNode();
+		}else{
+			var ajxpNode = selection.getUniqueNode();
+		}
 		this.fileName = ajxpNode.getPath();
 		this.isFile = ajxpNode.isLeaf();
 		var connexion = new Connexion();
@@ -62,22 +68,35 @@ Class.create("SVNLogger", {
 		connexion.sendAsync();
 	},
 	
-	addEntry:function(revision,author,date,message, isLast){
+	addEntry:function(revision,author,date,message, isCurrentRev){
+		var separator = '||';
+		if(message.indexOf(separator)>-1){
+			var split = message.split(separator);			
+			author = split[1];
+			message = "<b>"+split[2].toUpperCase()+"</b>";
+			if(split[3]){
+				message += " : "+split[3];
+			}
+		}
+		
+		var dateParts = date.split('\.');
+		date = dateParts[0].replace("T", " ");
+		
 		var dLink = (this.isFile?this.downloadTemplate.evaluate({
 			fileName:this.fileName, 
 			revision:revision,
 			downloadString:this.downMessage
-		}):this.switchTemplate.evaluate({
+		}):(!isCurrentRev?this.switchTemplate.evaluate({
 			revision:revision,
 			switchString:this.switchMessage
-		}));
+		}):''));
 		this.container.insert(this.template.evaluate({
 			revision:revision,
 			author:author,
 			date:date,
 			message:message,
 			downloadLink:dLink,			
-			cssStyle:(isLast?"padding:5px":"padding:5px;border-bottom:1px solid #79f"),
+			cssStyle:(isCurrentRev?"background-color:#fee;":""),
 			revString:this.revMessage,
 			authString:this.authorMessage,
 			dateString:this.dateMessage,
@@ -92,9 +111,10 @@ Class.create("SVNLogger", {
 		if(!oXmlDoc.childNodes.length)return;
 		var root = oXmlDoc.childNodes[0];
 		if(!root.childNodes.length) return;
-		var log = root.childNodes[0];
-		for(var i=0; i<log.childNodes.length;i++){
-			var entry = log.childNodes[i];
+		var logEntries = XPathSelectNodes(root, "log/logentry");
+		var currentRev = XPathSelectSingleNode(root, "current_revision");
+		for(var i=0; i<logEntries.length;i++){
+			var entry = logEntries[i];
 			var revision = entry.getAttribute("revision");
 			var author;var date;var message;
 			for(var j=0;j<entry.childNodes.length;j++){
@@ -105,12 +125,15 @@ Class.create("SVNLogger", {
 				}else if(entry.childNodes[j].nodeName == 'msg'){
 					message = entry.childNodes[j].firstChild.nodeValue;
 				}
-			}
-			this.addEntry(revision,author,date,message, (i==log.childNodes.length-1));
+			}			
+			this.addEntry(revision,author,date,message, (currentRev?(revision==currentRev.firstChild.nodeValue):false));
 		}
 		this.container.select("a[@ajxp_url]").invoke("observe", "click", function(e){
 				var conn = new Connexion(e.findElement().getAttribute("ajxp_url"));
-				conn.onComplete = function(){ajaxplorer.fireContextRefresh()};
+				conn.onComplete = function(){
+					ajaxplorer.fireContextRefresh()
+					hideLightBox();
+				};
 				conn.sendAsync();
 			});		
 		this.removeOnLoad();
