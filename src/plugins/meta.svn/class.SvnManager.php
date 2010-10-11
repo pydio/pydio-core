@@ -71,6 +71,8 @@ class SvnManager extends AJXP_Plugin {
 				RecycleBinManager::init($urlBase, "/".$recycle);
 				$result["RECYCLE"] = RecycleBinManager::filterActions($httpVars["get_action"], $userSelection, $httpVars["dir"], $httpVars);
 				// if necessary, check recycle was checked.
+				// We could use a hook instead here? Maybe the full recycle system
+				// could be turned into a plugin
 				$sessionKey = "AJXP_SVN_".$repo->getId()."_RECYCLE_CHECKED";
 				if(isSet($_SESSION[$sessionKey])){
 					$file = RecycleBinManager::getRelativeRecycle()."/".RecycleBinManager::getCacheFileName();
@@ -98,11 +100,24 @@ class SvnManager extends AJXP_Plugin {
 		
 	protected function addIfNotVersionned($repoFile, $realFile){
 		$res = ExecSvnCmd("svnversion", $realFile, "");
-		if(!is_numeric($res[IDX_STDOUT])){
+		if(!is_numeric(implode("", $res[IDX_STDOUT]))){
 			$res2 = ExecSvnCmd("svn add", "$realFile");
 			$this->commitMessageParams = "Recycle cache file";
 			$this->commitChanges("ADD", array("dir" => dirname($repoFile)), array());
 		}
+	}
+	
+	public function commitFile($file){
+		$repo = ConfService::getRepository();
+		$repo->detectStreamWrapper();
+		$wrapperData = $repo->streamData;
+		$realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $file);
+		
+		$res = ExecSvnCmd("svn status ", $realFile);
+		if(count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?"){
+			$res2 = ExecSvnCmd("svn add", "$realFile");
+		}
+		$this->commitChanges("COMMIT_META", $realFile, array());
 	}
 	
 	public function switchAction($actionName, $httpVars, $filesVars){
@@ -247,10 +262,14 @@ class SvnManager extends AJXP_Plugin {
 	}
 		
 	public function commitChanges($actionName, $httpVars, $filesVars){
-		$init = $this->initDirAndSelection($httpVars);
+		if(is_array($httpVars)){
+			$init = $this->initDirAndSelection($httpVars);
+			$args = $init["DIR"];
+		}else{
+			$args = $httpVars;
+		}
 		$command = "svn commit";
-		$user = AuthService::getLoggedUser()->getId();
-		$args = $init["DIR"];
+		$user = AuthService::getLoggedUser()->getId();		
 		$switches = "-m \"AjaXplorer||$user||$actionName".(isSet($this->commitMessageParams)?"||".$this->commitMessageParams:"")."\"";
 		$res = ExecSvnCmd($command, $args, $switches);		
 		$res2 = ExecSvnCmd('svn update', dirname($args), '');
