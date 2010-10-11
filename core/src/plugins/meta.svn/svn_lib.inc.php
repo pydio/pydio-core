@@ -661,6 +661,14 @@ define('IDX_VALUE', 1);
 //		echo "CMD: $cmdline<br/>";
 //		PrintDebugArray($result, "Result");
 		}
+		
+		if(is_array($result[IDX_ERROUT]) && count($result[IDX_ERROUT])){
+			$join = trim(implode("", $result[IDX_ERROUT]));
+			if($join != ""){
+				throw new Exception($join);
+			}
+		}
+		
 		return $result;
 	}
 		
