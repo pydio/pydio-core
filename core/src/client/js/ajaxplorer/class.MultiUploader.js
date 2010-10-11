@@ -99,6 +99,21 @@ MultiUploader = Class.create({
 			});
 		}
 		
+	// FIX IE DISPLAY BUG
+		if(Prototype.Browser.IE){
+			$('fileInputContainer').insert($('uploadBrowseButton'));
+			$('fileInputContainer').insert($('uploadSendButton'));
+			$('uploadBrowseButton').show();
+			$('uploadSendButton').show();
+		}
+		modal.setCloseAction(function(){
+			if(Prototype.Browser.IE){
+				$(document.body).insert($('uploadBrowseButton'));
+				$(document.body).insert($('uploadSendButton'));
+				$('uploadBrowseButton').hide();
+				$('uploadSendButton').hide();
+			}
+		});		
 		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
 		var sendButton = formObject.select('div[id="uploadSendButton"]')[0];
 		if(sendButton.observerSet) return;		
@@ -106,8 +121,8 @@ MultiUploader = Class.create({
 		var closeButton = formObject.select('div[id="uploadCloseButton"]')[0];
 		sendButton.observerSet = true;
 		sendButton.observe("click", function(){
-			this.submitMainForm();
-		}.bind(this));
+			ajaxplorer.actionBar.multi_selector.submitMainForm();
+		});
 		optionsButton.observe("click", function(){
 			if(window.htmlMultiUploaderOptions){
 				var message = MessageHash[281] + '\n';
