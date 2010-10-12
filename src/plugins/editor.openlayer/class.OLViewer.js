@@ -216,7 +216,7 @@ Class.create("OLViewer", AbstractEditor, {
         }
         	
         // Check Google layer
-        var mapsFound = (google && google.maps?true:false);
+        var mapsFound = (window.google && window.google.maps?true:false);
         var googleRejected = false;
         layersDefinitions.each(function(definition){
         	if(definition.type=='Google'){
