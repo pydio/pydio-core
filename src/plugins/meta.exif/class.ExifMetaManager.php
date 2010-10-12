@@ -37,23 +37,23 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class ExifMetaManager extends AJXP_Plugin {
 	
-	private static $currentMetaName;
-	private static $metaCache;
-	
 	protected $accessDriver;
+	protected $metaDefinitions;
 	
 	public function init($options){
 		$this->options = $options;		
-		// Do nothing
 	}
 	
-	public function initMeta($accessDriver){
-		$this->accessDriver = $accessDriver;		
-		
-		$messages = ConfService::getMessages();
+	public function initMeta($accessDriver){		
+		$this->accessDriver = $accessDriver;	
+		if(!function_exists("exif_read_data")) return ;		
+		$messages = ConfService::getMessages();		
 		$def = $this->getMetaDefinition();
+		if(!count($def)){
+			return ;
+		}
 		$cdataHead = '<div>
-						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.serial.1"].'</div>
+						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.exif.1"].'</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
 		$cdataFoot = '</table></div>';
 		$cdataParts = "";
@@ -76,32 +76,93 @@ class ExifMetaManager extends AJXP_Plugin {
 		parent::init($this->options);
 	
 	}
-		
+	
 	protected function getMetaDefinition(){
+		if(isSet($this->metaDefinitions)){
+			return $this->metaDefinitions;
+		}
 		$fields = $this->options["meta_fields"];
-		$arrF = explode(",", $fields);
+		$arrF = explode(",", $fields);		
 		$labels = $this->options["meta_labels"];
 		$arrL = explode(",", $labels);
 		$result = array();
 		foreach ($arrF as $index => $value){
+			$value = str_replace(".", "-", $value);
 			if(isSet($arrL[$index])){
 				$result[$value] = $arrL[$index];
 			}else{
 				$result[$value] = $value;
 			}
 		}
+		$this->metaDefinitions = $result;		
 		return $result;		
+	}	
+	
+	public function extractExif($actionName, $httpVars, $fileVars){
+		$userSelection = new UserSelection();
+		$userSelection->initFromHttpVars($httpVars);
+		$repo = ConfService::getRepository();
+		$repo->detectStreamWrapper();
+		$wrapperData = $repo->streamData;
+		$urlBase = $wrapperData["protocol"]."://".$repo->getId();		
+		$realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.SystemTextEncoding::fromUTF8($httpVars["file"]));
+		ini_set('exif.encode_unicode', 'UTF-8');
+		$exifData = exif_read_data($realFile, 0, TRUE);
+		if($exifData !== false && isSet($exifData["GPS"])){
+			$exifData["COMPUTED_GPS"] = $this->convertGPSData($exifData);
+		}
+		$excludeTags = array("componentsconfiguration", "filesource", "scenetype", "makernote");
+		AJXP_XMLWriter::header("metadata", array("file" => $httpVars["file"], "type" => "EXIF"));		
+		foreach ($exifData as $section => $data){
+			print("<exifSection name='$section'>");			
+			foreach ($data as $key => $value){
+				if(in_array(strtolower($key), $excludeTags)) continue;
+				if(!is_numeric($value)) $value = $this->string_format($value);
+				print("<exifTag name=\"$key\">".$value."</exifTag>");
+			}
+			print("</exifSection>");
+		}
+		AJXP_XMLWriter::close("metadata");
 	}
-		
+
+	function string_format($str) {
+		$tmpStr = "";
+
+		for($i=0;$i<strlen($str);$i++) {
+			if(ord($str[$i]) !=0) {
+				$tmpStr .= $str[$i];
+			}
+		}
+		return $tmpStr;
+	}
+	
 	public function extractMeta($currentFile, &$metadata, $wrapperClassName, &$realFile){
-		//$metadata["passed_file"] = $currentFile;
+		$definitions = $this->getMetaDefinition();
+		if(!count($definitions)) return ;
+		if(!function_exists("exif_read_data")) return ;
 		if(is_dir($currentFile) || preg_match("/\.zip\//",$currentFile)) return ;
+		if(!preg_match("/\.jpg$|\.jpeg$|\.tif$|\.tiff$/i",$currentFile)) return ;
 		if(!exif_imagetype($currentFile)) return ;
 		if(!isset($realFile)){
 			$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentFile);
 		}
 		$exif = exif_read_data($realFile, 0, TRUE);
-		if($exif === false || !isSet($exif['GPS'])) return ;
+		if($exif === false) return ;
+		$additionalMeta = array();
+		foreach ($definitions as $def => $label){
+			list($exifSection, $exifName) = explode("-", $def);
+			if($exifSection == "COMPUTED_GPS" && !isSet($exif["COMPUTED_GPS"])){
+				$exif['COMPUTED_GPS'] = $this->convertGPSData($exif);
+			}
+			if(isSet($exif[$exifSection]) && isSet($exif[$exifSection][$exifName])){						
+				$additionalMeta[$def] = $exif[$exifSection][$exifName];
+			}
+		}
+		$metadata = array_merge($metadata, $additionalMeta);
+	}
+
+	private function convertGPSData($exif){
+		if(!isSet($exif["GPS"])) return array();
 		require_once(INSTALL_PATH."/plugins/meta.exif/class.GeoConversion.php");
 		$converter = new GeoConversion();
 		$latDeg=$this->parseGPSValue($exif["GPS"]["GPSLatitude"][0]);
@@ -117,10 +178,7 @@ class ExifMetaManager extends AJXP_Plugin {
 			"GPS_Longitude"=>"$longDeg deg $longMin' $longSec $longRef--".$converter->DMS2Dd($longDeg."o$longMin'$longSec"),
 			"GPS_Altitude"=> $exif["GPS"]["GPSAltitude"][0]
 		);
-		$metadata = array_merge($metadata, $gpsData);
-		// NOT OPTIMAL AT ALL 
-		$metadata["meta_fields"] = $this->options["meta_fields"];
-		$metadata["meta_labels"] = $this->options["meta_labels"];
+		return $gpsData;
 	}
 	
 	private function parseGPSValue($value){

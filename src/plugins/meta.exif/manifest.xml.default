@@ -8,8 +8,8 @@
 		</resources>
 	</client_settings>	
 	<server_settings>
-		<param name="meta_fields" type="string" label="Meta Fields" description="Comma separated list of fields, use standard characters here." mandatory="true" default="comment_field"/>
-		<param name="meta_labels" type="string" label="Meta Labels" description="Comma separated list of labels, be sure to define as many as fields!" mandatory="true" default="My Comments"/>
+		<param name="meta_fields" type="string" label="Info Panel Fields" description="Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." mandatory="false" default="COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude"/>
+		<param name="meta_labels" type="string" label="Info Panel Labels" description="Associated list of labels, be sure to define as many as fields!" mandatory="false" default="Latitude,Longitude"/>
 	</server_settings>	
 	<registry_contributions>
 		<hooks>
@@ -22,6 +22,13 @@
 				</infoPanelExtension>
 			</component_config>			
 		</client_configs>
+		<actions>
+			<action name="extract_exif">
+				<processing>
+					<serverCallback methodName="extractExif"/>
+				</processing>
+			</action>
+		</actions>
 	</registry_contributions>
 	<dependencies>
 		<!-- Wrapper type plugins only -->
