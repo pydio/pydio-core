@@ -37,8 +37,8 @@ Class.create("ExifCellRenderer", {
 	},
 	
 	infoPanelModifier : function(htmlElement){
-		var latiCell = htmlElement.down('#ip_GPS_Latitude');
-		var longiCell = htmlElement.down('#ip_GPS_Longitude');
+		var latiCell = htmlElement.down('#ip_COMPUTED_GPS-GPS_Latitude');
+		var longiCell = htmlElement.down('#ip_COMPUTED_GPS-GPS_Longitude');
 		if(latiCell && longiCell && latiCell.innerHTML && longiCell.innerHTML){
 			var object = new ExifCellRenderer();
 			object.transformGeoCells(latiCell, longiCell);
@@ -55,7 +55,7 @@ Class.create("ExifCellRenderer", {
 		var button = new Element('div', {
 			className:'fakeUploadButton',
 			style:'padding-top:3px;width:50px;margin-bottom:0px;padding-bottom:3px;'
-		}).update('<img src="plugins/meta.exif/world.png"><br>Locate');
+		}).update('<img src="plugins/meta.exif/world.png"><br>'+MessageHash['meta.exif.2']);
 		var buttonCell = new Element('td', {
 			rowspan:2,
 			align:'center',
@@ -63,6 +63,10 @@ Class.create("ExifCellRenderer", {
 			style:'padding:2px;width:60px;'
 		}).update(button);
 		latiCell.insert({after:buttonCell});		
+		// Set all other cells colspan to 2.
+		latiCell.up().nextSiblings().each(function(tr){
+			tr.down('td.infoPanelValue').setAttribute('colspan', 2);
+		});
 		button.observe("click", function(){
 			this.openLocator(latiCell.getAttribute('latiDegree'), longiCell.getAttribute("longiDegree"));
 		}.bind(this) );		

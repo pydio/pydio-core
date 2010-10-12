@@ -44,7 +44,13 @@ Class.create("ExifEditor", AbstractEditor, {
 		}.bind(this));
 		this.element.observe("editor:resize", function(){
 			this.columnsLayout(true);
-		}.bind(this));
+		}.bind(this));				
+		this.actions.get("gpsLocateButton").hide();
+		this.actions.get("gpsLocateButton").observe("click", function(){
+			if(!this.gpsData) return;
+			hideLightBox();
+			ExifCellRenderer.prototype.openLocator(this.gpsData.GPS_Latitude,this.gpsData.GPS_Longitude);			
+		}.bind(this) );
 	},
 	
 	
@@ -70,6 +76,11 @@ Class.create("ExifEditor", AbstractEditor, {
 		connexion.sendAsync();
 	},
 	
+	
+	refreshGPSData : function(){
+		if(!this.gpsData) return;
+		this.actions.get("gpsLocateButton").show();		
+	},
 		
 	columnsLayout : function(reset){		
 		var container = this.contentMainContainer;
@@ -109,7 +120,8 @@ Class.create("ExifEditor", AbstractEditor, {
 			var tags = XPathSelectNodes(sections[i], "exifTag");
 			var div = new Element("div", {className:'exifSection',style:'border:1px solid #ccc;margin:3px;border-top:0px;'});
 			this.contentMainContainer.insert(div);
-			div.insert('<div class="panelHeader infoPanelGroup">'+sections[i].getAttribute("name")+'</div>');
+			var sectionName = sections[i].getAttribute("name");
+			div.insert('<div class="panelHeader infoPanelGroup">'+sectionName+'</div>');
 			div.insert('<table class="infoPanelTable"><tbody></tbody></table>');
 			var tBody = div.down('tbody');
 			var even = false;
@@ -118,6 +130,12 @@ Class.create("ExifEditor", AbstractEditor, {
 				try{
 					var tagName = tags[j].getAttribute("name");
 					var tagValue = tags[j].firstChild.nodeValue;
+					if(sectionName == "COMPUTED_GPS"){
+						var split = tagValue.split('--');
+						if(!this.gpsData) this.gpsData = {};
+						this.gpsData[tagName] = split[1];
+						tagValue = split[0];
+					}
 					tBody.insert('<tr'+(even?' class="even"':'')+'><td class="infoPanelLabel">'+tagName+'</td><td class="infoPanelValue">'+tagValue+'</td></tr>');
 					even = !even;
 					this.itemsCount ++;
@@ -125,6 +143,7 @@ Class.create("ExifEditor", AbstractEditor, {
 			}			
 		}
 		this.columnsLayout();
-	},
+		this.refreshGPSData();
+	}
 	
 });

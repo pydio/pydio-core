@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.pixlr" openable="true" text="333" title="333" icon="frame_image.png" className="PixlrEditor" mimes="jpg,jpeg,png,bmp,pxd" formId="pixlr_box" write="true">
+<editor id="editor.pixlr" openable="true" text="333" title="333" icon="pixlr_images/actions/ICON_SIZE/color_fill.png" className="PixlrEditor" mimes="jpg,jpeg,png,bmp,pxd" formId="pixlr_box" write="true">
 	<class_definition filename="plugins/editor.pixlr/class.PixlrEditor.php" classname="PixlrEditor"/>
 	<resources>
 		<js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>
 		<js file="plugins/editor.pixlr/class.PixlrEditor.js" className="PixlrEditor"/>
+		<img_library alias="pixlr_images" path="plugins/editor.pixlr/images"/>		
 	</resources>
 	<clientForm id="pixlr_box"><![CDATA[
 		<div id="pixlr_box" action="edit_image" box_width="90%" box_height="90%" box_padding="0">			
