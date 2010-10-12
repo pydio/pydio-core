@@ -42,6 +42,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"?get_action=get_extracted_page&file=";
 		// Override onload for the text
 		this.jsImage.onload = function(){
+			this.jsImageLoading = false;
 			this.imgTag.src = this.jsImage.src;
 			this.resizeImage(true);
 			this.downloadButton.removeClassName("disabled");

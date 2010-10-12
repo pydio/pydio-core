@@ -81,5 +81,6 @@ $EXTENSIONS = array(
 	array("tiff","image.png", "TIFF"),
 	array("tif","image.png", "TIFF"),
 	array("svg","image.png", "SVG"),
+	array("psd","image.png", "Photoshop"),
 );
 ?>
