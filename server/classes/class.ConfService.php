@@ -518,12 +518,14 @@ class ConfService
 				if($plugId == "") continue;
 				$split = explode(".", $plugId);				
 				$instance = $pServ->getPluginById($plugId);
+				if(!is_object($instance)) {
+					continue;
+				}
 				$instance->init($metaSources[$plugId]);
 				$instance->initMeta($plugInstance);
 				$pServ->setPluginActive($split[0], $split[1]);
 			}
 		}
-		
 		$this->configs["ACCESS_DRIVER"] = $plugInstance;	
 		return $this->configs["ACCESS_DRIVER"];
 	}
