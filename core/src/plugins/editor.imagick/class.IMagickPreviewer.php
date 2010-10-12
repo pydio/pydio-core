@@ -54,9 +54,9 @@ class IMagickPreviewer extends AJXP_Plugin {
 		if($action == "imagick_data_proxy"){
 			$extractAll = false;
 			if(isSet($httpVars["all"])) $extractAll = true;		
-			$file = AJXP_Utils::securePath(SystemTextEncoding::fromUTF8($httpVars["file"]));
+			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
-			if(in_array(strtolower($extension), array("svg","tif","tiff"))) $extractAll = true;
+			if(in_array(strtolower($extension), array("svg"))) $extractAll = true;
 			
 			if(!filesize($destStreamURL."/".$file)) return ;
 			$fp = fopen($destStreamURL."/".$file, "r");
