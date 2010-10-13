@@ -36,7 +36,24 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class remote_fsAccessDriver extends AbstractAccessDriver 
-{	
+{
+	private $plugCapabilities = array();
+	
+	function init($repository, $options = null){
+		$repoCapabilities = $repository->getOption("API_CAPABILITIES");
+		if($repoCapabilities != ""){
+			$this->plugCapabilities = explode(",", $repoCapabilities);
+			// Register one preprocessor per capability. 		
+			foreach ($this->plugCapabilities as $capability){
+				$xml = '<action name="'.$capability.'"><pre_processing><serverCallback methodName="switchAction"/></pre_processing></action>';
+				$tmpDoc = DOMDocument::loadXML($xml);
+				$newNode = $this->manifestDoc->importNode($tmpDoc->documentElement, true);
+				$this->xPath->query("registry_contributions/actions")->item(0)->appendChild($newNode);
+			}
+		}
+		parent::init($repository, $options);
+	}
+	
 	function switchAction($action, $httpVars, $filesVars){		
 		$sessionId = "";
 		$crtRep = ConfService::getRepository();
@@ -48,7 +65,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		$method = "get";
 		if($action == "put_content") $method = "post";
 		if($method == "get"){
-			if($action == "download" || $action=="image_proxy" || $action=="mp3_proxy"){
+			if($action == "download"){
 				$httpClient->directForwarding = true;
 			}
 			$result = $httpClient->get($crtRep->getOption("URI"), $httpVars);
@@ -75,9 +92,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		}
 		
 		switch ($action){			
-			case "image_proxy":
 			case "download":
-			case "mp3_proxy":
 				session_write_close();
 				exit();
 			break;
@@ -88,7 +103,11 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				header("Content-type:application/json");
 			break;		
 			default:
-				header("Content-type: text/xml");
+				$contentType = $httpClient->getHeader("content-type");
+				if(!isSet($contentType) || strlen($contentType) == 0){
+					$contentType = "text/xml";
+				}
+				header("Content-type: ".$contentType);
 			break;
 		}
 		print $httpClient->getContent();

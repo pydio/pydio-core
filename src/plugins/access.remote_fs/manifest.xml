@@ -9,6 +9,7 @@
 		<param name="AUTH_PASS" type="string" label="Password" description="Password for http authentification" mandatory="false"/>
 		<param name="AUTH_URI" type="string" label="Http Auth URI" description="Path to the authentication script, e.g. /ajaxplorer/index.php (only if you are using basic http auth)" default="" mandatory="false"/>		
 		<param name="TMP_UPLOAD" type="string" label="Temporary Folder" description="Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." default="tmp" mandatory="true"/>
+		<param name="API_CAPABILITIES" type="string" label="Api Capabilities" description="AjaXplorer plugins actions supported by remote server, thus forwarded directly instead of executed locally." default="" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
 		<client_configs>

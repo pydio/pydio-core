@@ -75,6 +75,6 @@
 	]]></clientForm>	
 	<dependencies>
 		<!-- Stream Wrapper must be implemented -->
-		<activePlugin pluginName="access.wms|access.fs"/>
+		<activePlugin pluginName="access.wms|access.fs|meta.exif"/>
 	</dependencies>				
 </editor>
