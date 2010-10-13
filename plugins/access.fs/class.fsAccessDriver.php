@@ -617,16 +617,17 @@ class fsAccessDriver extends AbstractAccessDriver
 					$recycleBinOption = RecycleBinManager::getRelativeRecycle();										
 					if(file_exists($this->urlBase.$recycleBinOption)){
 						$recycleIcon = ($this->countFiles($this->urlBase.$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
-						
+						$recycleMetaData = array("ajxp_modiftime" 	=> $this->date_modif($this->urlBase.$recycleBinOption),
+						  "mimestring" 		=> AJXP_Utils::xmlEntities($mess[122]),
+						  "icon"			=> "$recycleIcon", 
+						  "filesize"		=> "-",
+						  "ajxp_mime"		=> "ajxp_recycle");
+						AJXP_Controller::applyHook("ls.metadata", array($this->urlBase.$recycleBinOption, &$recycleMetaData, $this->wrapperClassName, null));
 						AJXP_XMLWriter::renderNode(
 							$recycleBinOption,
 							AJXP_Utils::xmlEntities($mess[122]),
 							false, 
-							array("ajxp_modiftime" 	=> $this->date_modif($this->urlBase.$recycleBinOption),
-								  "mimestring" 		=> AJXP_Utils::xmlEntities($mess[122]),
-								  "icon"			=> "$recycleIcon", 
-								  "filesize"		=> "-",
-								  "ajxp_mime"		=> "ajxp_recycle")
+							$recycleMetaData
 						);
 					}
 				}
