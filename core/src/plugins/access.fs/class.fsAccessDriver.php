@@ -622,7 +622,8 @@ class fsAccessDriver extends AbstractAccessDriver
 						  "icon"			=> "$recycleIcon", 
 						  "filesize"		=> "-",
 						  "ajxp_mime"		=> "ajxp_recycle");
-						AJXP_Controller::applyHook("ls.metadata", array($this->urlBase.$recycleBinOption, &$recycleMetaData, $this->wrapperClassName, null));
+						$nullFile = null;
+						AJXP_Controller::applyHook("ls.metadata", array($this->urlBase.$recycleBinOption, &$recycleMetaData, $this->wrapperClassName, &$nullFile));
 						AJXP_XMLWriter::renderNode(
 							$recycleBinOption,
 							AJXP_Utils::xmlEntities($mess[122]),
