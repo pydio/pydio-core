@@ -91,10 +91,14 @@ SelectableElements = Class.create({
 		this.dSEPosition = Position.cumulativeOffset(this.dragSelectionElement);
 		this.dSEDimension = Element.getDimensions(this.dragSelectionElement);
 		
-		var h = parseInt(this.dragSelectionElement.getStyle('height'));
+		var h = this.dSEDimension.height;
 		if(this.dragSelectionElement.scrollHeight > h){
 			// there is a scroll bar 
 			if(this.originalX > (this.dSEPosition[0]+this.dSEDimension.width) - 18) return;
+		}
+		if(this.dragSelectionElement.scrollWidth > this.dSEDimension.width){
+			// there is a scroll bar 
+			if(this.originalY > (this.dSEPosition[1]+this.dSEDimension.height) - 18) return;
 		}
 		Event.observe(document, "mousemove", this.eventMouseMove);
 		Event.observe(document, "mouseup", this.eventMouseUp);
