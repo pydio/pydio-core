@@ -44,13 +44,13 @@ class fsAccessWrapper implements AjxpWrapper {
 	 *
 	 * @var resource
 	 */
-    private $fp;
+    protected $fp;
 	/**
 	 * DirHandle resource
 	 *
 	 * @var resource
 	 */
-    private $dH;
+	protected $dH;
     
     /**
      * If dH is not used but an array containing the listing 
@@ -58,12 +58,12 @@ class fsAccessWrapper implements AjxpWrapper {
      *
      * @var array()
      */
-    private static $currentListing;
-    private static $currentListingKeys;
-    private static $currentListingIndex;
-    private static $currentFileKey;
-	private static $crtZip;
-	private $realPath;
+    protected static $currentListing;
+    protected static $currentListingKeys;
+    protected static $currentListingIndex;
+    protected static $currentFileKey;
+	protected static $crtZip;
+	protected $realPath;
 
     /**
      * Initialize the stream from the given path. 
@@ -264,7 +264,7 @@ class fsAccessWrapper implements AjxpWrapper {
     		return $stat;
     	}
     	// Folder case
-    	$real = self::initPath($path, "dir", false, true);
+    	$real = $this->initPath($path, "dir", false, true);
     	//print($real);
     	if($real!=-1 && is_dir($real)){
     		$stat = stat($real);
@@ -272,7 +272,7 @@ class fsAccessWrapper implements AjxpWrapper {
     	}
     	// Zip Folder case
     	$search = basename($path);
-    	$real = self::initPath(dirname($path), "dir");
+    	$real = $this->initPath(dirname($path), "dir");
     	if($real == -1){
     		if(array_key_exists($search, self::$currentListing)){	    		
     			return self::$currentListing[$search];
@@ -312,17 +312,17 @@ class fsAccessWrapper implements AjxpWrapper {
     }
     
     public function unlink($path){
-    	$this->realPath = self::initPath($path, "file", false, true);
+    	$this->realPath = $this->initPath($path, "file", false, true);
     	return unlink($this->realPath);
     }
     
     public function rmdir($path, $options){
-    	$this->realPath = self::initPath($path, "file", false, true);
+    	$this->realPath = $this->initPath($path, "file", false, true);
     	return rmdir($this->realPath);
     }
     
     public function mkdir($path, $mode, $options){
-    	return mkdir(self::initPath($path, "file"), $mode);
+    	return mkdir($this->initPath($path, "file"), $mode);
     }
     
     /**
@@ -332,7 +332,7 @@ class fsAccessWrapper implements AjxpWrapper {
      * @param int $options
      */
 	public function dir_opendir ($path , $options ){
-		$this->realPath = self::initPath($path, "dir", true);	
+		$this->realPath = $this->initPath($path, "dir", true);	
 		if(is_string($this->realPath)){			
 			$this->dH = @opendir($this->realPath);
 		}else if($this->realPath == -1){
@@ -341,7 +341,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		return $this->dH !== false;
 	}
 	public function dir_closedir  (){
-		self::closeWrapper();
+		$this->closeWrapper();
 		if($this->dH == -1){			
 			return true;
 		}else{
