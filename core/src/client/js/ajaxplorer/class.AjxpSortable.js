@@ -41,51 +41,8 @@ Class.create("AjxpSortable", SortableTable, {
 		this.addSortType( "MyDate", null, false, this.sortTimes);
 		this.addSortType( "CellSorterValue", null, false, this.cellSorterValue);
 		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
-		this.setHeaderResize(function(headerCells){
-			var headerCellsWidth = headerCells.collect(function(cell){
-				return cell.getWidth() - 10;
-			});
-			$(this.tBody).select('tr').each(function(row){
-				var cells = row.select('td');
-				for(var i=0;i<cells.length-1;i++){
-					//cells[i].setStyle({width:headerCellsWidth[i] + 'px'});
-					this.setGridCellWidth(cells[i], headerCellsWidth[i]);
-				}
-			}.bind(this) );
-			if(!ajaxplorer || !ajaxplorer.user) return;
-			var data = ajaxplorer.user.getPreference("columns_size", true);
-			data = (data?new Hash(data):new Hash());
-			var repoData = data.get(ajaxplorer.user.getActiveRepository());
-			repoData = (repoData?new Hash(repoData):new Hash());
-			repoData.set('type', 'percent');
-			
-			var tableWidth = $(oTable).getWidth();
-			for(var k=0;k<headerCellsWidth.length;k++){
-				repoData.set(k, Math.round(headerCellsWidth[k]/tableWidth*100));				
-			}
-			data.set(ajaxplorer.user.getActiveRepository(), repoData);
-			ajaxplorer.user.setPreference("columns_size", data, true);
-			ajaxplorer.user.savePreference("columns_size");			
-		}.bind(this) );	
 	},
-	
-	setGridCellWidth : function(cell, width){
-		var labels = cell.select('.text_label');
-		if(!labels.length) {
-			cell.setStyle({width:width + 'px'});
-			return;
-		}
-		var label = labels[0];
-		var cellPaddLeft = cell.getStyle('paddingLeft') || 0;
-		var cellPaddRight = cell.getStyle('paddingRight') || 0;
-		var siblingWidth = 0;
-		label.siblings().each(function(sib){
-			siblingWidth += sib.getWidth();
-		});
-		label.setStyle({width:(width - siblingWidth - parseInt(cellPaddLeft) - parseInt(cellPaddRight)) + 'px'});
-		cell.setStyle({width:width + 'px'});	
-	},
-	
+		
 
 	setPaginationBehaviour : function(loaderFunc, columnsDefs, crtOrderName, crtOrderDir){
 		this.paginationLoaderFunc = loaderFunc;
@@ -105,12 +62,8 @@ Class.create("AjxpSortable", SortableTable, {
 	
 	headerOnclick: function (e) {
 
-		// find TD element
-		var el = e.target || e.srcElement;
-		while (el.tagName != "TD"){
-			el = el.parentNode;
-		}		
-		var cellColumn = (this.msie ? this.getCellIndex(el) : el.cellIndex);
+		var el = Event.findElement(e, 'div.header_cell');
+		var cellColumn = el.cellIndex;
 		
 		if(this.paginationLoaderFunc){
 			var params = $H({});

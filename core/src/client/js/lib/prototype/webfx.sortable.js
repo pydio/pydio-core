@@ -119,12 +119,12 @@ SortableTable = Class.create({
 	setTHead: function (oTHead) {
 		if (this.tHead && this.tHead != oTHead )
 			this.uninitHeader();
-		this.tHead = oTHead;
+		this.tHead = $(oTHead);
 		this.initHeader( this.sortTypes );
 	},
 
 	setTBody: function (oTBody) {
-		this.tBody = oTBody;
+		this.tBody = $(oTBody);
 	},
 	
 	setSortTypes: function ( oSortTypes ) {
@@ -135,88 +135,88 @@ SortableTable = Class.create({
 			this.initHeader( this.sortTypes );
 	},
 	
-	setHeaderResize : function(fCallback){
-		this.onHeaderResize = fCallback;
+	getHeaderCells : function(){
+		if(!this.headerCells){
+			this.headerCells = this.tHead.select('div.header_cell');
+		}
+		return this.headerCells;
 	},
-	
+		
 	// adds arrow containers and events
 	// also binds sort type to the header cells so that reordering columns does
 	// not break the sort types
 	initHeader: function (oSortTypes) {
 		if (!this.tHead) return;
-		var cells = this.tHead.rows[0].cells;
-		var doc = this.tHead.ownerDocument || this.tHead.document;
+		var cells = this.getHeaderCells();
 		this.sortTypes = oSortTypes || [];
 		var l = cells.length;
-		var img, c;
+		var c;
 		for (var i = 0; i < l; i++) {
 			c = cells[i];
+			c.cellIndex = i;
 			if (this.sortTypes[i] != null && this.sortTypes[i] != "None") {
 				if (this.sortTypes[i] != null) c._sortType = this.sortTypes[i];
-				$(c).observe('click', this._headerOnclick.bind(this));
+				c.observe('click', this._headerOnclick.bind(this));
 			}
 			else
 			{
 				c.setAttribute( "_sortType", oSortTypes[i] );
 				c._sortType = "None";
 			}
-			$(c).update(new Element('div').update(c.innerHTML));
-			if(!c.id || c.id!='last_header'){
-				var resizeDiv = new Element("span", {id:"header_resize_"+i,className:'column_resize_grabber'}).update('&nbsp;');			
-				resizeDiv.headerCell = c;
-				resizeDiv.columnIndex = i;
-				$(c).insert({top:resizeDiv});
-				var tableElement = $('selectable_div_header');
-				new Draggable("header_resize_"+i, {
-					constraint:'horizontal', 
-					snap: function(x,y,draggable) { 
-						// Limit to table size on max
-						var tablePos = Element.cumulativeOffset(tableElement);
-						var tableRightLimit = tablePos.left + tableElement.getWidth();
-						var xMax = tableRightLimit - draggable.originalLeft - Element.getWidth(draggable.element);
-						// Limit to cell size on min
-						var xMin = -(Element.getWidth(draggable.element.headerCell) - Element.getWidth(draggable.element));
-						x = x<xMin ? xMin : x;
-						x = x>xMax ? xMax : x;
-						
-						return [x,y];
-					},
-					onDrag : function(draggable){
-						var newPosition = Element.cumulativeOffset(draggable.element).left;
-						var delta = newPosition - draggable.originalLeft;						
-						var newWidth = draggable.originalCellWidth + delta;
-						draggable.element.setStyle({left:0});						
-						draggable.element.headerCell.setStyle({width:newWidth+'px'});
-					}.bind(this),
-					onStart : function(draggable){
-						draggable.element.setStyle({backgroundColor:'grey'});
-						draggable.originalLeft = Element.cumulativeOffset(draggable.element).left;						
-						draggable.originalCellWidth =  parseInt(draggable.element.headerCell.getStyle('width')); //Element.getWidth(draggable.element.headerCell);
-					}.bind(this),
-					onEnd : function(draggable){
-						draggable.element.setStyle({backgroundColor:'transparent'});
-						var newPosition = Element.cumulativeOffset(draggable.element).left;
-						var delta = newPosition - draggable.originalLeft;
-						var newWidth = draggable.originalCellWidth + delta;
-						draggable.element.headerCell.setStyle({width:newWidth+'px'});
-						newWidth = draggable.element.headerCell.getWidth();
-						draggable.element.setStyle({left:0});
-						if(this.onHeaderResize){
-							this.onHeaderResize($A(cells));
-						}
-					}.bind(this)
-					});
-				$("header_resize_"+i).observe("click", function(e){Event.stop(e)});
-			}
 		}
 		this.updateHeaderArrows();
 	},
 	
+	
+	
+	onHeaderResize : function(headerCells){
+		/*
+		var data = ajaxplorer.user.getPreference("columns_size", true);
+		data = (data?new Hash(data):new Hash());
+		var repoData = data.get(ajaxplorer.user.getActiveRepository());
+		repoData = (repoData?new Hash(repoData):new Hash());
+		repoData.set('type', 'percent');
+
+		var tableWidth = this.element.getWidth();
+		for(var k=0;k<headerCellsWidth.length;k++){
+			repoData.set(k, Math.round((headerCellsWidth[k]-10)/tableWidth*100));
+		}
+		data.set(ajaxplorer.user.getActiveRepository(), repoData);
+		ajaxplorer.user.setPreference("columns_size", data, true);
+		ajaxplorer.user.savePreference("columns_size");
+		*/
+	},
+
+	
+	setGridCellWidth : function(cell, width){
+		var label = cell.down('.text_label');		
+		if(!label) {			
+			if(width) cell.setStyle({width:width + 'px'});
+			return;
+		}
+		var computedWidth;
+		if(width) computedWidth = parseInt(width);
+		else {
+			computedWidth = cell.getWidth() - 3;
+		}
+		
+		var cellPaddLeft = cell.getStyle('paddingLeft') || 0;
+		var cellPaddRight = cell.getStyle('paddingRight') || 0;
+		var labelPaddLeft = label.getStyle('paddingLeft') || 0;
+		var labelPaddRight = label.getStyle('paddingRight') || 0;
+		var siblingWidth = 1;
+		label.siblings().each(function(sib){
+			siblingWidth += sib.getWidth();
+		});
+		//if(cell.getAttribute("ajxp_message_id"))console.log(computedWidth + ' // ' + (computedWidth - siblingWidth - parseInt(cellPaddLeft) - parseInt(cellPaddRight) - parseInt(labelPaddLeft) - parseInt(labelPaddRight)));
+		label.setStyle({width:(computedWidth - siblingWidth - parseInt(cellPaddLeft) - parseInt(cellPaddRight) - parseInt(labelPaddLeft) - parseInt(labelPaddRight)) + 'px'});
+		if(width) cell.setStyle({width:computedWidth + 'px'});	
+	},
+	
 	// remove arrows and events
 	uninitHeader: function () {
-		if (!this.tHead || !this.tHead.rows || !this.tHead.rows[0]) return;
 		try{
-			var cells = this.tHead.rows[0].cells;
+			var cells = this.getHeaderCells();
 		}catch(e){
 			return;
 		}
@@ -238,29 +238,23 @@ SortableTable = Class.create({
 	
 	updateHeaderArrows: function () {
 		if (!this.tHead) return;
-		var cells = this.tHead.rows[0].cells;
+		var cells = this.getHeaderCells();
 		var l = cells.length;
 		for (var i = 0; i < l; i++) {
 			if (cells[i]._sortType != null && cells[i]._sortType != "None") {
+				$(cells[i]).removeClassName("descending");
+				$(cells[i]).removeClassName("ascending");
 				if (i == this.sortColumn)
 				{
-					$(cells[i]).className = (this.descending ? "descending" : "ascending");
-				}
-				else
-				{
-					$(cells[i]).className = "";
+					$(cells[i]).addClassName(this.descending ? "descending" : "ascending");
 				}
 			}
 		}
 	},
 	
 	headerOnclick: function (e) {
-		// find TD element
-		var el = e.target || e.srcElement;
-		while (el.tagName != "TD")
-			el = el.parentNode;
-	
-		this.sort(this.msie ? this.getCellIndex(el) : el.cellIndex);
+		var el = Event.findElement(e);	
+		this.sort(el.cellIndex);
 	},
 	
 	// IE returns wrong cellIndex when columns are hidden
@@ -441,6 +435,7 @@ SortableTable = Class.create({
 		this.element = null;
 		this.tHead = null;
 		this.tBody = null;
+		this.headerCells = null;
 		this.document = null;
 		this._headerOnclick = null;
 		this.sortTypes = null;
