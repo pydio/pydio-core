@@ -298,10 +298,12 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "list")
 		{
 			var buffer = '';
+			/*
 			if(this.gridStyle == "grid"){
-				buffer = buffer + '<div style="overflow:hidden;background-color: #aaa;">';
+				//buffer = buffer + '<div style="overflow:hidden;background-color: #aaa;">';
 			}
 			buffer = buffer + '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
+			*/
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_visibility", true)){
 				var data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
 				if(data.get(ajaxplorer.user.getActiveRepository())){
@@ -310,9 +312,7 @@ Class.create("FilesList", SelectableElements, {
 					this.hiddenColumns = $A();
 				}
 			}
-			var visibleColumns = this.getVisibleColumns();
-			visibleColumns.each(function(column){buffer = buffer + '<col\>';});
-			buffer = buffer + '<thead><tr>';
+			var visibleColumns = this.getVisibleColumns();			
 			var userPref;
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_size", true)){
 				var data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
@@ -320,21 +320,17 @@ Class.create("FilesList", SelectableElements, {
 					userPref = new Hash(data.get(ajaxplorer.user.getActiveRepository()));
 				}
 			}
+			var headerData = $A();
 			for(var i=0; i<visibleColumns.length;i++){
 				var column = visibleColumns[i];
-				var last = ((i==visibleColumns.length-1)?' id="last_header"':'');
 				var userWidth = 0;
 				if(userPref && userPref.get(i) && i<(visibleColumns.length-1)){
-					if(userPref.get('type')) userWidth = parseInt(this.htmlElement.getWidth() * userPref.get(i) /  100);
-					else userWidth = userPref.get(i);
+					userWidth = userPref.get(i);
 				}
-				var stringWidth = (userWidth?' style="width:'+userWidth+'px"':'');
-				buffer = buffer + '<td column_id="'+i+'" ajxp_message_id="'+(column.messageId || '')+'"'+last+stringWidth+'>'+(column.messageId?MessageHash[column.messageId]:column.messageString)+'</td>';
+				var label = (column.messageId?MessageHash[column.messageId]:column.messageString);
+				headerData.push({label:label, size:userWidth});
 			}
-			buffer = buffer + '</tr></thead></table>';
-			if(this.gridStyle == "grid"){
-				buffer = buffer + '</div>';
-			}			
+			buffer = '<div id="selectable_div_header" class="sort-table"></div>';
 			buffer = buffer + '<div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			this.htmlElement.update(buffer);
 			oElement = $('selectable_div');
@@ -344,6 +340,11 @@ Class.create("FilesList", SelectableElements, {
 			}
 			
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
+			this._headerResizer = new HeaderResizer($('selectable_div_header'), {
+				headerData : headerData,
+				body : $('table_rows_container'),
+				initSizesType : (userPref && userPref.get('type')?'percent':'')
+			});
 			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), $('selectable_div_header'));
 			this._sortableTable.onsort = function(){
 				this.redistributeBackgrounds();
@@ -360,6 +361,7 @@ Class.create("FilesList", SelectableElements, {
 			this.disableTextSelection($('table_rows_container'));
 			this.observer = function(e){
 				fitHeightToBottom($('table_rows_container'), this.htmlElement);
+				this._headerResizer.resize(this.htmlElement.getWidth()-2);
 			}.bind(this);
 			this.observe("resize", this.observer);
 		
@@ -506,7 +508,6 @@ Class.create("FilesList", SelectableElements, {
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
     	}		
-		this.applyHeadersWidth();
 	},
 	
 	setFocusBehaviour : function(){
@@ -543,64 +544,6 @@ Class.create("FilesList", SelectableElements, {
 		return this._displayMode;
 	},
 	
-	getHeadersWidth: function(){	
-		if(this._displayMode == 'thumb') return;
-		var tds = $('selectable_div_header').getElementsBySelector('td');
-		this.headersWidth = new Hash();
-		var index = 0;	
-		tds.each(function(cell){		
-			this.headersWidth.set(index, cell.getWidth() - 8);
-			index++;
-		}.bind(this));
-		//alert(this.headersWidth[0]);
-	},
-	
-	applyHeadersWidth: function(){
-		if(this._displayMode == "thumb") return; // Sometimes happens in IE...
-		if(this.gridStyle == "grid"){
-			window.setTimeout(function(){
-				// Reverse!
-				var allItems = this.getItems();
-				if(!allItems.length) return;
-				var tds = $(allItems[0]).getElementsBySelector('td');
-				var headerCells = $('selectable_div_header').getElementsBySelector('td');
-				var divDim = $('selectable_div').getDimensions();
-				var contDim = $('table_rows_container').getDimensions();
-				if(divDim.height > contDim.height && !(divDim.width > contDim.width) ){
-					$('selectable_div_header').setStyle({width:($('table_rows_container').getWidth()-17)+'px'});
-				}else{
-					$('selectable_div_header').setStyle({width:($('table_rows_container').getWidth())+'px'});
-				}
-				var index = 0;
-				headerCells.each(function(cell){				
-					cell.setStyle({padding:0});
-					var div = cell.select('div')[0];
-					div.setAttribute("title", new String(cell.innerHTML).stripTags().replace("&nbsp;", ""));
-					if(cell.id == "last_header") return;
-					var td = tds[index];					
-					var tdWidth = td.getWidth();
-					//cell.setStyle({width:tdWidth+'px'});
-					this._sortableTable.setGridCellWidth(cell, tdWidth);
-					index++;
-				}.bind(this));
-			}.bind(this), 10);
-			return;
-		}
-		this.getHeadersWidth();
-		var allItems = this.getItems();
-		for(var i=0; i<allItems.length;i++)
-		{
-			var tds = $(allItems[i]).getElementsBySelector('td');
-			var index = 0;
-			var widthes = this.headersWidth;
-			tds.each(function(cell){		
-				if(index == (tds.size()-1)) return;
-				//cell.setStyle({width:widthes.get(index)+'px'});
-				this._sortableTable.setGridCellWidth(cell, widthes.get(index));
-				index++;
-			}.bind(this) );	
-		}
-	},
 		
 	initRows: function(){
 		// Disable text select on elements
@@ -613,7 +556,9 @@ Class.create("FilesList", SelectableElements, {
 		else
 		{
 			if(this.protoMenu) this.protoMenu.addElements('#table_rows_container');
-			this.applyHeadersWidth();
+			if(this._headerResizer){
+				this._headerResizer.resize(this.htmlElement.getWidth()-2);
+			}
 		}
 		if(this.protoMenu)this.protoMenu.addElements('.ajxp_draggable');
 		var allItems = this.getItems();
