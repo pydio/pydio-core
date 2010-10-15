@@ -43,7 +43,7 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 		}
 		require("lib/class.phpmailer-lite.php");
 		
-		$mail = new PHPMailerLite();
+		$mail = new PHPMailerLite(true);
 		$mail->Mailer = $this->pluginConf["MAILER"];		
 		$mail->SetFrom($this->pluginConf["FROM"]["address"], $this->pluginConf["FROM"]["name"]);
 		
