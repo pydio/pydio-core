@@ -13,6 +13,6 @@
 	]]></clientForm>	
 	<dependencies>
 		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs|access.webdav"/>
 	</dependencies>					
 </editor>
