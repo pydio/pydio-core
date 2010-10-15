@@ -107,7 +107,7 @@ textarea{
 
 .text_label{
 	display:block;
-	float:left;
+	/*float:left;*/
 	overflow:hidden;
 	padding-left:2px;
 	padding-top:2px;
@@ -752,6 +752,69 @@ a.carousel-control img{
 	background-repeat:no-repeat;
 }
 
+/********************************/
+/* HEADER RESIZER WIDGET
+/******************************/
+div.header_resizer{
+	border-bottom: 1px solid black;
+	height:23px;
+	background-color: #eee;
+	overflow:hidden;
+}
+
+div.header_resizer div.header_cell{
+	float:left;
+	overflow:hidden;
+	width:90px;
+	background-color: #eee;
+	white-space:nowrap;
+	height: 23px;
+	border: 0px !important;
+	cursor: pointer;	
+}
+
+div.header_resizer div.header_label{
+	font-family: Trebuchet MS;
+	font-size: 12px;
+	padding:3px 3px;
+}
+div.header_resizer div.resizer{
+	float:left;
+	width:2px;
+	background-color: #eee;
+	height: 23px;
+	cursor:e-resize;	
+	border: 0px;
+	border-left: 1px solid #fff;
+}
+
+div.header_resizer div.dragging{
+	background-color : #bbb;
+	border-left: 1px solid #bbb;
+}
+div.resizeGhost{
+	width: 1px; 
+	border-right: 1px solid grey;
+	position:absolute;
+	z-index:1000;
+	opacity:0.7;
+}
+
+div.header_resizer div.descending {
+	background-color: #daddd7;
+	background-image: url("../images/arrow_up_margin.png");
+	background-repeat : no-repeat;
+	background-position : right center;
+}
+
+div.header_resizer div.ascending {
+	background-color: #daddd7;
+	background-image: url("../images/arrow_down_margin.png");
+	background-repeat : no-repeat;
+	background-position : right center;
+}
+
+
 
 /*********************************/
 /* FILE LIST SKINNING
@@ -770,6 +833,12 @@ a.carousel-control img{
 }
 
 .sort-table thead td {
+	/*
+	display: block;
+	float: left;
+	overflow:hidden;
+	height: 23px;
+	*/
     background-color: #ddd;
 	border-bottom:	none;
 	cursor:			pointer;
@@ -1407,6 +1476,7 @@ tr td.infoPanelLabel
 div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane{
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial, Sans-serif;
     font-size: 11px;
+    background-color: #fff;
    	background-image: url('../images/strip.png');
 }
 
