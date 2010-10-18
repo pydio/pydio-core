@@ -225,7 +225,7 @@ SortableTable = Class.create({
 		for (var i = 0; i < l; i++) {
 			c = cells[i];
 			if (c._sortType != null && c._sortType != "None") {
-				c.removeChild(c.firstChild);
+				if(c.firstChild) c.removeChild(c.firstChild);
 				if (typeof c.removeEventListener != "undefined")
 					c.removeEventListener("click", this._headerOnclick, false);
 				else if (typeof c.detachEvent != "undefined")
