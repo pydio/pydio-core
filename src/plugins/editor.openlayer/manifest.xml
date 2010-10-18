@@ -11,21 +11,22 @@
 		 -->
 		<activeCondition><![CDATA[
 		(function(){
-			if(Prototype.Browser.IE){
-				var originalEvent = window.Event;
-			}
 			if(!window.OpenLayers && !window.OpenLayersLoading){
+				if(Prototype.Browser.IE){
+					window.originalEvent = window.Event;
+					window.originalEvent.tmpCopy = true;
+				}
 				window.OpenLayersLoading = true;
 				$(document.body).insert(new Element('script', {
 					src:"plugins/editor.openlayer/openlayer/OpenLayers.js", 
 					type:"text/javascript"}
 				));
-			}
-			if(Prototype.Browser.IE){
+				if(Prototype.Browser.IE){
 					setTimeout(function(){
-						window.Event = originalEvent;
-					}, 500);
+						window.Event = window.originalEvent;
+					}, 600);
 				}
+			}
 		})() || true;
 		]]></activeCondition>
 	</processing>	
