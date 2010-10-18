@@ -302,7 +302,6 @@ Class.create("FilesList", SelectableElements, {
 			if(this.gridStyle == "grid"){
 				//buffer = buffer + '<div style="overflow:hidden;background-color: #aaa;">';
 			}
-			buffer = buffer + '<TABLE width="100%" cellspacing="0"  id="selectable_div_header" class="sort-table">';
 			*/
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_visibility", true)){
 				var data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
@@ -328,7 +327,11 @@ Class.create("FilesList", SelectableElements, {
 					userWidth = userPref.get(i);
 				}
 				var label = (column.messageId?MessageHash[column.messageId]:column.messageString);
-				headerData.push({label:label, size:userWidth});
+				var leftPadding = 0;
+				if(column.attributeName == "ajxp_label"){// Will contain an icon
+					leftPadding = 24;
+				}
+				headerData.push({label:label, size:userWidth, leftPadding:leftPadding});				
 			}
 			buffer = '<div id="selectable_div_header" class="sort-table"></div>';
 			buffer = buffer + '<div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
@@ -343,8 +346,22 @@ Class.create("FilesList", SelectableElements, {
 			this._headerResizer = new HeaderResizer($('selectable_div_header'), {
 				headerData : headerData,
 				body : $('table_rows_container'),
-				initSizesType : (userPref && userPref.get('type')?'percent':'')
+				initSizesType : 'percent',
+				bodyIsMaster : (this.gridStyle == 'grid')
 			});
+			this._headerResizer.observe("drag_resize", function(){
+				if(this.prefSaver) window.clearTimeout(this.prefSaver);
+				this.prefSaver = window.setTimeout(function(){
+					if(!ajaxplorer.user) return;
+					var sizes = this._headerResizer.getCurrentSizes('percent');
+					var data = ajaxplorer.user.getPreference("columns_size", true);
+					data = (data?new Hash(data):new Hash());
+					sizes['type'] = 'percent';
+					data.set(ajaxplorer.user.getActiveRepository(), sizes);
+					ajaxplorer.user.setPreference("columns_size", data, true);
+					ajaxplorer.user.savePreference("columns_size");
+				}.bind(this), 2000);				
+			}.bind(this) );
 			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), $('selectable_div_header'));
 			this._sortableTable.onsort = function(){
 				this.redistributeBackgrounds();
@@ -361,7 +378,11 @@ Class.create("FilesList", SelectableElements, {
 			this.disableTextSelection($('table_rows_container'));
 			this.observer = function(e){
 				fitHeightToBottom($('table_rows_container'), this.htmlElement);
-				this._headerResizer.resize(this.htmlElement.getWidth()-2);
+				//if(this.gridStyle == "grid"){
+					//this._headerResizer.resize($('table_rows_container').scrollWidth);
+				//}else{
+					this._headerResizer.resize($('content_pane').getWidth());
+				//}
 			}.bind(this);
 			this.observe("resize", this.observer);
 		
@@ -499,7 +520,6 @@ Class.create("FilesList", SelectableElements, {
 	},
 	
 	resize : function(){
-		this.notify("resize");
     	if(this.options.fit && this.options.fit == 'height'){
     		var marginBottom = 0;
     		if(this.options.fitMarginBottom){
@@ -508,6 +528,7 @@ Class.create("FilesList", SelectableElements, {
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
     	}		
+		this.notify("resize");
 	},
 	
 	setFocusBehaviour : function(){
@@ -798,11 +819,11 @@ Class.create("FilesList", SelectableElements, {
 			top:(pos.top+offset.top-scrollTop)-1
 		});
 		var closeFunc = function(){
-			span.show();
+			span.setStyle({color:''});
 			edit.remove();
 			buttons.remove();
 		};
-		span.hide();
+		span.setStyle({color:'#ddd'});
 		modal.setCloseAction(closeFunc);
 	},
 	
@@ -837,7 +858,8 @@ Class.create("FilesList", SelectableElements, {
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
-				}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span id=\"ajxp_label\" class=\"text_label\">" + metaData.get('text')+"</span>");
+				//}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span id=\"ajxp_label\" class=\"text_label\">" + metaData.get('text')+"</span>");
+				}).update("<span id=\"ajxp_label\" class=\"text_label\" style=\"padding-left:24px; background-repeat:no-repeat;background-position:4 2px;background-image:url('"+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"')\">" + metaData.get('text')+"</span>");
 				innerSpan.ajxpNode = ajxpNode; // For draggable
 				tableCell.insert(innerSpan);
 				
@@ -874,6 +896,9 @@ Class.create("FilesList", SelectableElements, {
 					tableCell.setStyle({borderRightColor: '#fff'});					
 				}
 				if (tableCell.innerHTML == '') tableCell.innerHTML = '&nbsp;';
+			}
+			if(this._headerResizer && !this._headerResizer.options.useCSS3){
+				tableCell.addClassName("resizer_"+i);
 			}
 			newRow.appendChild(tableCell);
 			if(attributeList.get(s).modifier){

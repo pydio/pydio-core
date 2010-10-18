@@ -756,9 +756,9 @@ a.carousel-control img{
 /* HEADER RESIZER WIDGET
 /******************************/
 div.header_resizer{
-	border-bottom: 1px solid black;
-	height:23px;
-	background-color: #eee;
+	border-bottom: 1px solid #676965;
+	color: #676965;	
+	background-color: #F1F1EF;
 	overflow:hidden;
 }
 
@@ -766,9 +766,8 @@ div.header_resizer div.header_cell{
 	float:left;
 	overflow:hidden;
 	width:90px;
-	background-color: #eee;
-	white-space:nowrap;
-	height: 23px;
+	background-color: #F1F1EF;
+	white-space:nowrap;	
 	border: 0px !important;
 	cursor: pointer;	
 }
@@ -776,7 +775,7 @@ div.header_resizer div.header_cell{
 div.header_resizer div.header_label{
 	font-family: Trebuchet MS;
 	font-size: 12px;
-	padding:3px 3px;
+	padding:3px 3px 2px;
 }
 div.header_resizer div.resizer{
 	float:left;
@@ -829,7 +828,7 @@ div.header_resizer div.ascending {
 }
 
 .sort-table td {
-	padding:	2px 5px;
+	padding:	2px 0px;
 }
 
 .sort-table thead td {
