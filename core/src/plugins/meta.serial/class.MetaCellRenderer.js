@@ -124,7 +124,13 @@ Class.create("MetaCellRenderer", {
 		}
 		if(content) value = parseInt(content);
 		var obj = new MetaCellRenderer();
-		element.update(obj.createStars(value));	
+		if(element.down('span.text_label')){
+			var div = obj.createStars(value);
+			div.setStyle({width:'70px'});
+			element.down('span.text_label').update(div);
+		}else{
+			element.update(obj.createStars(value));	
+		}
 		element.writeAttribute("sorter_value", value);	
 	},
 	
