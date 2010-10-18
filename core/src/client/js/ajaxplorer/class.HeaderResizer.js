@@ -9,12 +9,15 @@ Class.create("HeaderResizer", {
 			body : $('tBody'), 
 			bodyRowSelector : 'tr',
 			bodyCellSelector : 'td',
+			bodyIsMaster : false,
 			handleWidth : 3,
-			headerData : null
+			headerData : null,			
+			useCSS3 : false
 		}, options || { });
 		if(this.options.headerData){
 			this.generateHeader();
 		}
+		this.options.useCSS3 = this.detectCSS3();
 		this.mainSize = this.element.getWidth();
 		this.cells = this.element.select(this.options.cellSelector);		
 		this.cells.each(function(el){disableTextSelection(el);});
@@ -34,11 +37,6 @@ Class.create("HeaderResizer", {
 		
 		this.resizeHeaders(sizes);
 		
-		Event.observe(window, 'resize', function(e){
-			this.checkBodyScroll();
-			this.resizeHeaders();
-			this.refreshBody();
-		}.bind(this));
 		this.observe("drag_resize", function(e){
 			this.refreshBody();
 		}.bind(this));
@@ -84,14 +82,23 @@ Class.create("HeaderResizer", {
 		return sizes;
 	},
 		
-	getCurrentSizes : function(){
-		return this.currentSizes;
+	getCurrentSizes : function(percent){
+		if(!percent) return this.currentSizes;
+		var innerWidth = this.getInnerWidth();
+		var percentSizes = $A();
+		for(var i=0;i<this.currentSizes.length;i++){
+			percentSizes[i] = Math.floor(this.currentSizes[i]/innerWidth*100);
+		}
+		return percentSizes;
 	},
 	
 	resize : function(size){
+		
 		this.mainSize = size;
+		this.element.setStyle({width:this.mainSize});
 		this.checkBodyScroll();
 		this.resizeHeaders();
+		this.log("Resize:"+size);
 		if(this.timer){
 			window.clearTimeout(this.timer);
 		}
@@ -102,13 +109,14 @@ Class.create("HeaderResizer", {
 		
 		//this.checkBodyScroll();
 		
-		var innerWidth = this.getInnerWidth();		
+		var innerWidth = this.getInnerWidth();	
+		if(!innerWidth) return;	
 		if(!sizes && this.currentInner && innerWidth != this.currentInner){
 			sizes = this.computePercentSizes(this.currentSizes, this.currentInner);						
 		}
 		//console.log("return");
 		if(!sizes) return;
-		this.log(innerWidth);
+		this.log("Inner Width:"+innerWidth+'/'+this.element.offsetWidth);
 		var total = 0;
 		for(var i=0;i<this.cells.length;i++){
 			total += sizes[i] + this.options.handleWidth;
@@ -118,11 +126,11 @@ Class.create("HeaderResizer", {
 				//this.log(innerWidth +':' + total + ':' + sizes[i]);
 				// go back to previous total
 				total -= sizes[i] + this.options.handleWidth;
-				sizes[i] = Math.floor((innerWidth - total) / (this.cells.length - i));
+				sizes[i] = Math.floor((innerWidth - (this.verticalScrollerMargin||0) - total) / (this.cells.length - i));
 				this.cells[i].setStyle({width:sizes[i] + 'px'});
 				// Make sure it did not go to the line
 				if(Position.cumulativeOffset(this.cells[i])[1] > Position.cumulativeOffset(this.element)[1] + 10){					
-					sizes[i] = innerWidth - total - 1;
+					sizes[i] = innerWidth - total - 1  - (this.verticalScrollerMargin||0);
 					this.cells[i].setStyle({width:sizes[i] + 'px'});
 				}
 				total += sizes[i] + this.options.handleWidth;
@@ -131,6 +139,8 @@ Class.create("HeaderResizer", {
 		this.currentSizes = sizes;
 		this.log(this.currentSizes.join(','));
 		this.currentInner = innerWidth;
+		
+		this.notify('headers_resize');
 		
 		//this.refreshBody();
 		
@@ -186,6 +196,7 @@ Class.create("HeaderResizer", {
 					if(this.cells[i] == draggable.previous) this.currentSizes[i] = draggable.previous.getWidth();
 					if(this.cells[i] == draggable.next) this.currentSizes[i] = draggable.next.getWidth();
 				}
+				draggable.element.left = 0;
 				this.notify("drag_resize");
 			}.bind(this)
 			
@@ -202,16 +213,116 @@ Class.create("HeaderResizer", {
 	
 	refreshBody : function(){
 		var newSizes = this.getCurrentSizes();
-		this.options.body.select(this.options.bodyRowSelector).each(function(row){
-			var cells = row.select(this.options.bodyCellSelector);
-			for(var i=0; i<cells.length;i++){
-				if(newSizes[i]) this.setGridCellWidth(cells[i], newSizes[i]);
+		var useCSS3  = this.options.useCSS3;
+		var sheet = this.createStyleSheet();
+		
+		if(Prototype.Browser.IE){
+			this.options.body.select(this.options.bodyRowSelector).each(function(row){
+				var cells = row.select(this.options.bodyCellSelector);
+				for(var i=0; i<cells.length;i++){
+					if(newSizes[i]) this.setGridCellWidth(cells[i], newSizes[i], this.options.headerData[i].leftPadding);
+				}
+			}.bind(this) );					
+			this.checkBodyScroll();
+			return;
+		}
+		
+		// ADD CSS3 RULE
+		for(var i=0;i<newSizes.length;i++){
+			if(useCSS3){
+				var selector = "td:nth-child("+(i+1)+")";
+			}else{
+				var selector = "td.resizer_"+ (i);
 			}
-		}.bind(this) );		
+			var rule = "width:"+(newSizes[i] + (Prototype.Browser.IE?10:-6))+" !important;";
+			
+			this.addStyleRule(sheet, selector, rule);
+			
+			if(useCSS3){
+				selector = "td:nth-child("+(i+1)+") .text_label";
+			}else{
+				selector = "td.resizer_"+ (i) + " .text_label";
+			}
+			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:this.options.headerData[i].leftPadding))+" !important;";
+			this.addStyleRule(sheet, selector, rule);
+		}
+
 		this.checkBodyScroll();
 	},
 	
-	setGridCellWidth : function(cell, width){
+	addStyleRule : function(sheet, selector, rule){
+		if(Prototype.Browser.IE){
+			sheet.addRule(selector, rule);
+		}else{
+			sheet.insertRule(selector+"{"+rule+"}", sheet.length);
+		}		
+	},
+	
+	createStyleSheet : function(){
+		if(Prototype.Browser.IE){
+			return;
+			if(!window.ajxp_resizer_sheet){
+		        window.ajxp_resizer_sheet = document.createStyleSheet();		    
+			}
+			var sheet = window.ajxp_resizer_sheet;
+	        // Remove previous rules
+	        var rules = sheet.rules;
+	        var len = rules.length;	
+	        for (var i=len-1; i>=0; i--) {
+	          sheet.removeRule(i);
+	        }			
+			
+		}else{
+			var cssTag = $('resizer_css');
+			// Remove previous rules
+			if(cssTag) cssTag.remove();
+	        cssTag = new Element("style", {type:"text/css", id:"resizer_css"});
+	        $$("head")[0].insert(cssTag);
+	        var sheet = cssTag.sheet;		        
+		}
+		return sheet;		
+	},
+	
+	removeStyleSheet : function(){
+		if(Prototype.Browser.IE){
+			return;
+			if(window.ajxp_resizer_sheet){
+		        // Remove previous rules
+		        var sheet = window.ajxp_resizer_sheet;
+		        var rules = sheet.rules;
+		        var len = rules.length;	
+		        for (var i=len-1; i>=0; i--) {
+		          sheet.removeRule(i);
+		        }			
+			}			
+		}else{
+			var cssTag = $('resizer_css');
+			if(cssTag) cssTag.remove();
+		}		
+	},
+	
+	detectCSS3 : function(){
+		if(Prototype.Browser.IE){
+			return false;
+		}
+		if(window.ajxp_resizer_csstest != undefined){
+			return window.ajxp_resizer_csstest;
+		}
+		var sheet = this.createStyleSheet();
+		var detected = false;
+		try{
+			this.addStyleRule(sheet, this.options.cellSelector + ":nth-child(1)", "color:rgb(0, 0, 15);");
+			var test = this.element.down(this.options.cellSelector);
+			if(test && test.getStyle('color') == "rgb(0, 0, 15)"){
+				detected = true;
+			}
+			this.removeStyleSheet();
+		}catch(e){}
+		window.ajxp_resizer_csstest = detected;
+		return detected;
+	},
+	
+	setGridCellWidth : function(cell, width, labelPadding){
 		var label = cell.down('.text_label');		
 		if(!label) {			
 			if(width) cell.setStyle({width:width + 'px'});
@@ -227,7 +338,7 @@ Class.create("HeaderResizer", {
 		var cellPaddRight = cell.getStyle('paddingRight') || 0;
 		var labelPaddLeft = label.getStyle('paddingLeft') || 0;
 		var labelPaddRight = label.getStyle('paddingRight') || 0;
-		var siblingWidth = 1;
+		var siblingWidth = 1 + (labelPadding || 0);
 		label.siblings().each(function(sib){
 			siblingWidth += sib.getWidth();
 		});
@@ -240,24 +351,28 @@ Class.create("HeaderResizer", {
 	checkBodyScroll : function(){
 		var body = this.options.body;		
 		if( body.scrollHeight>body.getHeight()){
-			this.element.setStyle({width:this.mainSize-20});
-			this.element.reduced = true;
+			this.verticalScrollerMargin=18;
 		}else if( body.scrollHeight <= body.getHeight()){
-			this.element.setStyle({width:this.mainSize});
-			this.element.reduced = null;
+			this.verticalScrollerMargin=0;
 		}
-		if(body.scrollWidth > body.getWidth() && !this.scroller){
-			this.element._origWidth = this.element.getWidth();
-			this.scroller = new Element('div', {style:"overflow:hidden;"});
-			this.scroller.setStyle({width:this.element._origWidth});
-			$(this.element.parentNode).insert({top:this.scroller});
-			this.scroller.insert(this.element);
+		if(!this.options.bodyIsMaster) return;
+		if(body.scrollWidth > body.getWidth()){			
+			if(!this.scroller){
+				this.element._origWidth = this.element.getWidth();
+				this.scroller = new Element('div', {style:"overflow:hidden;"});
+				this.scroller.setStyle({width:this.element._origWidth});
+				$(this.element.parentNode).insert({top:this.scroller});
+				this.scroller.insert(this.element);
+				this.scroller.observer = function(){
+					this.log(body.scrollWidth);
+					this.scroller.scrollLeft = body.scrollLeft;				
+				}.bind(this);
+				body.observe("scroll", this.scroller.observer);
+			}else{
+				this.scroller.setStyle({width: this.mainSize});
+			}
 			this.element.setStyle({width:body.scrollWidth});
-			this.scroller.observer = function(){
-				//this.log(this.scroller.getWidth());
-				this.scroller.scrollLeft = body.scrollLeft;				
-			}.bind(this);
-			body.observe("scroll", this.scroller.observer);
+			this.verticalScrollerMargin=0;
 			this.resizeHeaders();
 		}else if(body.scrollWidth <= body.getWidth() && this.scroller){
 			this.element.setStyle({width:this.element._origWidth});
@@ -271,20 +386,22 @@ Class.create("HeaderResizer", {
 		
 	
 	getInnerWidth : function(){
-		return innerWidth = this.element.getWidth() - parseInt(this.element.getStyle('borderLeftWidth')) - parseInt(this.element.getStyle('borderRightWidth'));
+		var leftWidth = parseInt(this.element.getStyle('borderLeftWidth')) || 0;
+		var rightWidth = parseInt(this.element.getStyle('borderRightWidth')) || 0;
+		return innerWidth = this.element.getWidth() - leftWidth - rightWidth ;
 	},
 	
 	getInnerHeight : function(element){
-		return innerWidth = element.getHeight() - parseInt(element.getStyle('borderTopWidth')) - parseInt(element.getStyle('borderBottomWidth'));
+		return innerWidth = element.getHeight() - (parseInt(element.getStyle('borderTopWidth')) || 0) - (parseInt(element.getStyle('borderBottomWidth')) || 0);
 	},		
 	
 	log : function(message){
 		return;
 		if(window.console){
 			console.log(message);
-		}else if($('mylogger')){			
-			$('mylogger').insert('<div>'+message+'</div>');
-			$('mylogger').scrollTop = $('mylogger').scrollHeight;
+		}else if($('info_panel')){			
+			$('info_panel').insert('<div>'+message+'</div>');
+			$('info_panel').scrollTop = $('info_panel').scrollHeight;
 		}
 	}	
 
