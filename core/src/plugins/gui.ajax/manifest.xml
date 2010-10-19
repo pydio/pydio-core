@@ -27,7 +27,7 @@
 						    	<div id="info_panel" ajxpClass="InfoPanel"></div>
 					    	</div>    	
 					    </div>
-						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965; background-color: #eee;"></div>	
+						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965;"></div>	
 					</div>
 				</div>				
 			]]></template>
