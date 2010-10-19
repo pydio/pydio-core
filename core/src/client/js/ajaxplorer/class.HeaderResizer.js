@@ -59,8 +59,7 @@ Class.create("HeaderResizer", {
 			index++;
 		}.bind(this) );
 		if(initSizes && initSizes.length){
-			this.options.initSizes = initSizes;
-			console.log("INIT", initSizes);
+			this.options.initSizes = initSizes;			
 		}
 	},
 	
