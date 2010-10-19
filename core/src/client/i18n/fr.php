@@ -406,6 +406,8 @@ $mess=array(
 "367" => "Vous n'êtes pas autorisé à uploader ce type de fichier. Veuillez choisir parmi les extensions suivantes : ",
 "368" => "La sélection a été extraite de l'archive %s dans le répertoire %s",
 "369" => "AjaXplorer Link",
+"370" => "Téléchargement public AjaXplorer",
+"371" => "Un mot de passe est nécessaire pour ce téléchargement",
 /* END SENTENCE */
 );
 ?>

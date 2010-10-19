@@ -406,6 +406,8 @@ $mess=array(
 "367" => "You are not allowed to upload this type of file. Please choose among the following extensions : ",
 "368" => "Selection successfully extracted from archive %s to folder %s",
 "369" => "AjaXplorer Link",
+"370" => "AjaXplorer Public Download",
+"371" => "A password is required for this download",
 /* END SENTENCE */
 /* END SENTENCE */
 );

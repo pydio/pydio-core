@@ -8,7 +8,7 @@
 //
 //	spanish translation: Mikel Pascual Aldabaldetreku <mikel.paskual@gmail.com>, 2008
 //	spanish translation: Mikel Pascual Aldabaldetreku <mikel.paskual@gmail.com>, 2009
-//      spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010      
+//      spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
@@ -407,6 +407,8 @@ $mess=array(
 "367" => "No estas autorizado a subir este tipo de archivos. Elige entre estas extensiones: ",
 "368" => "Se ha extraido lo seleccionado del archivo %s a la carpeta %s",
 "369" => "AjaXplorer Link",
+"370" => "AjaXplorer Public Download",
+"371" => "A password is required for this download",
 /* END SENTENCE */
 );
 ?>

@@ -406,6 +406,8 @@ $mess=array(
 "367" => "Dieser Dateityp ist beim Hochladen nicht erlaubt. Bitte nur folgende Typen verwenden: ",
 "368" => "Die Auswahl wurde erfolgreich aus dem Archive %s in das Verzeichnis %s extrahiert.",
 "369" => "AjaXplorer Link",
+"370" => "AjaXplorer Public Download",
+"371" => "A password is required for this download",
 /* END SENTENCE */
 );
 ?>
