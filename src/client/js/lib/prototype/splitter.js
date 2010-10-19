@@ -124,6 +124,11 @@ Class.create("Splitter", AjxpPane, {
 				this.moveSplitter(parseInt(sizePref));
 			}
 		}.bind(this));
+		
+		Event.observe(this.group, "mousemove", this.doSplitMouse.bind(this));
+		Event.observe(this.group, "mouseup", this.endSplit.bind(this));
+		// NEW HTML5!
+		this.splitbar.draggable = true;
 	},
 	
 	resizeGroup: function(event, size, keepPercents){	
@@ -156,12 +161,14 @@ Class.create("Splitter", AjxpPane, {
 	startSplit: function(event){
 		this.splitbar.addClassName(this.options.activeClass);
 		this.paneA._posAdjust = this.paneA[this.options.offsetAdjust] - this.options.eventPointer(event);
+		/*
 		if(!this.moveObserver){
 			this.moveObserver = this.doSplitMouse.bind(this);
 			this.upObserver = this.endSplit.bind(this);
 		}
-		Event.observe(this.group, "mousemove", this.moveObserver);
-		Event.observe(this.group, "mouseup", this.upObserver);
+		*/
+		//Event.observe(this.group, "mousemove", this.moveObserver);
+		//Event.observe(this.group, "mouseup", this.upObserver);
 		if(this.options.startDrag){
 			this.options.startDrag(this.getCurrentSize());
 		}
@@ -170,7 +177,7 @@ Class.create("Splitter", AjxpPane, {
 	doSplitMouse: function(event){
         if (!this.splitbar.hasClassName(this.options.activeClass)){        	
         	return this.endSplit(event);
-        }
+        }        
 		this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
 	}, 
 	
@@ -179,11 +186,13 @@ Class.create("Splitter", AjxpPane, {
 			return;
 		}
 		this.splitbar.removeClassName(this.options.activeClass);
+		/*
 		if(this.moveObserver){
-			Event.stopObserving(this.group, "mousemove", this.moveObserver);
-			Event.stopObserving(this.group, "mouseup", this.upObserver);
+			//Event.stopObserving(this.group, "mousemove", this.moveObserver);
+			//Event.stopObserving(this.group, "mouseup", this.upObserver);
         	this.moveObserver = 0; this.upObserver = 0;
 		}
+		*/
 		if(this.options.endDrag){
 			this.options.endDrag(this.getCurrentSize());
 		}
