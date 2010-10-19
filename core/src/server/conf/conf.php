@@ -154,7 +154,9 @@ $REPOSITORIES["ajxp_shared"] = array(
 	"DISPLAY"		=>	"Shared Elements", 
 	"DISPLAY_ID"		=>	"363", 
 	"DRIVER"		=>	"ajxp_shared", 
-	"DRIVER_OPTIONS"=> array()	
+	"DRIVER_OPTIONS"=> array(
+		"DEFAULT_RIGHTS" => "rw"
+	)	
 );
 
 // ADMIN REPOSITORY

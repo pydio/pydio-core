@@ -79,7 +79,7 @@ ConfigEditor = Class.create({
 			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
 			var repoId = XPathGetSingleNodeText(repoNode, "@id");
 			var accessType = XPathGetSingleNodeText(repoNode, "@access_type");
-			if(accessType == "ajxp_shared") continue;
+			//if(accessType == "ajxp_shared") continue;
 			
 			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'}).setStyle({width:'25px'});
 			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'}).setStyle({width:'25px'});						
