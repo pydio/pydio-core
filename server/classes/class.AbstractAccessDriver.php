@@ -225,9 +225,25 @@ class AbstractAccessDriver extends AJXP_Plugin {
         // Check password
         if (strlen($data["PASSWORD"]))
         {
-            if ($_POST['password'] != $data["PASSWORD"])
-            {            	
-                echo "<html><head><link rel='stylesheet' type='text/css' href='allz.css'/></head><body><form action='' method='post'><div class='dialogBox' style='display:block;width:20%;left:40%;'><div class='dialogTitle'><img width='16' height='16' align='top' src='public_url.png'>&nbsp;AjaXplorer Public Download</div><div class='dialogContent'>A password is required for this download :<br><input type='password' name='password' style='width:100%;'><br><div class='dialogButtons'><input width='22' height='22' type='image' name='ok' src='dialog_ok_apply.png' title='Download' class='dialogButton'></div></div></div></form></body></html>";
+            if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"]))
+            {   
+            	$content = file_get_contents(INSTALL_PATH."/client/html/public_links.html");
+            	$language = "en";
+            	if(isSet($_GET["lang"])){
+            		$language = $_GET["lang"];
+            	}
+            	$messages = array();
+            	if(is_file(INSTALL_PATH."/client/i18n/$language.php")){
+            		include(INSTALL_PATH."/client/i18n/$language.php");
+            		$messages = $mess;
+            	}            	
+				if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $content, $matches, PREG_SET_ORDER)){
+					foreach($matches as $match){
+						$messId = str_replace("]", "", str_replace("[", "", $match[1]));
+						if(isSet($messages[$messId])) $content = str_replace("AJXP_MESSAGE[$messId]", $messages[$messId], $content);
+					}
+				}
+				echo $content;
                 exit(1);
             }
         }
