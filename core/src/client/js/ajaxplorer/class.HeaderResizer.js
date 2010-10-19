@@ -118,6 +118,7 @@ Class.create("HeaderResizer", {
 		this.log("Inner Width:"+innerWidth+'/'+this.element.offsetWidth);
 		var total = 0;
 		for(var i=0;i<this.cells.length;i++){
+			if(!sizes[i]) sizes[i] = Math.floor((innerWidth - (this.verticalScrollerMargin||0) - total) / (this.cells.length - i));
 			total += sizes[i] + this.options.handleWidth;
 			if(i < this.cells.length -1 && total < innerWidth) {				
 				this.cells[i].setStyle({width:(sizes[i] - (Prototype.Browser.IE?1:0)) + 'px'});
@@ -133,6 +134,10 @@ Class.create("HeaderResizer", {
 					this.cells[i].setStyle({width:sizes[i] + 'px'});
 				}
 				total += sizes[i] + this.options.handleWidth;
+				if(i == this.cells.length - 1 && total < innerWidth - (this.verticalScrollerMargin||0)){
+					sizes[i] = (innerWidth - (this.verticalScrollerMargin||0) - total);
+					this.cells[i].setStyle({width:sizes[i] + 'px'});
+				}
 			}
 		}
 		this.currentSizes = sizes;
@@ -219,7 +224,7 @@ Class.create("HeaderResizer", {
 			this.options.body.select(this.options.bodyRowSelector).each(function(row){
 				var cells = row.select(this.options.bodyCellSelector);
 				for(var i=0; i<cells.length;i++){
-					if(newSizes[i]) this.setGridCellWidth(cells[i], newSizes[i], this.options.headerData[i].leftPadding);
+					if(newSizes[i]) this.setGridCellWidth(cells[i], newSizes[i]);
 				}
 			}.bind(this) );					
 			this.checkBodyScroll();
@@ -229,18 +234,18 @@ Class.create("HeaderResizer", {
 		// ADD CSS3 RULE
 		for(var i=0;i<newSizes.length;i++){
 			if(useCSS3){
-				var selector = "td:nth-child("+(i+1)+")";
+				var selector = "#"+this.options.body.id+" td:nth-child("+(i+1)+")";
 			}else{
-				var selector = "td.resizer_"+ (i);
+				var selector = "#"+this.options.body.id+" td.resizer_"+ (i);
 			}
 			var rule = "width:"+(newSizes[i] + (Prototype.Browser.IE?10:-6))+" !important;";
 			
 			this.addStyleRule(sheet, selector, rule);
 			
 			if(useCSS3){
-				selector = "td:nth-child("+(i+1)+") .text_label";
+				selector = "#"+this.options.body.id+" td:nth-child("+(i+1)+") .text_label";
 			}else{
-				selector = "td.resizer_"+ (i) + " .text_label";
+				selector = "#"+this.options.body.id+" td.resizer_"+ (i) + " .text_label";
 			}
 			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:this.options.headerData[i].leftPadding))+" !important;";
 			this.addStyleRule(sheet, selector, rule);
@@ -333,16 +338,19 @@ Class.create("HeaderResizer", {
 			computedWidth = cell.getWidth() - 3;
 		}
 		
+		/*
+		Useless, we only pass in this function in IE
 		var cellPaddLeft = cell.getStyle('paddingLeft') || 0;
 		var cellPaddRight = cell.getStyle('paddingRight') || 0;
 		var labelPaddLeft = label.getStyle('paddingLeft') || 0;
 		var labelPaddRight = label.getStyle('paddingRight') || 0;
+		*/
 		var siblingWidth = 1 + (labelPadding || 0);
 		label.siblings().each(function(sib){
 			siblingWidth += sib.getWidth();
 		});
 		//if(cell.getAttribute("ajxp_message_id"))console.log(computedWidth + ' // ' + (computedWidth - siblingWidth - parseInt(cellPaddLeft) - parseInt(cellPaddRight) - parseInt(labelPaddLeft) - parseInt(labelPaddRight)));
-		label.setStyle({width:(computedWidth - siblingWidth - parseInt(cellPaddLeft) - parseInt(cellPaddRight) - parseInt(labelPaddLeft) - parseInt(labelPaddRight)) + 'px'});
+		label.setStyle({width:(computedWidth - siblingWidth) + 'px'});
 		//console.log(width + " :: " + computedWidth +" :: "+ (computedWidth - siblingWidth - parseInt(cellPaddLeft) - parseInt(cellPaddRight) - parseInt(labelPaddLeft) - parseInt(labelPaddRight)));
 		if(width) cell.setStyle({width:computedWidth + 'px'});	
 	},	
