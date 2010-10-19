@@ -75,6 +75,8 @@ $EXTENSIONS = array(
 	array("avi","video.png", 81),
 	array("mpg","video.png", 82),
 	array("mpeg","video.png", 83),
+	array("mp4","video.png", 83),
+	array("m4v","video.png", 83),
 	array("wmv","video.png", 81),
 	array("swf","flash.png", 91),
 	array("flv","flash.png", 91),

@@ -893,7 +893,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				&& !(AJXP_Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])
 				&& !($foldersOnly && is_file($dirName."/".$file)) ){
 				$count++;
-				if($nonEmptyCheckOnly) return 1;
+				if($nonEmptyCheckOnly) break;
 			}			
 		}
 		closedir($handle);

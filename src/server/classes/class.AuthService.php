@@ -165,7 +165,7 @@ class AuthService
 		}
 		else{
 			if(!$user->hasParent() && $user_id != "guest"){
-				$user->setRight("ajxp_shared", "rw");
+				//$user->setRight("ajxp_shared", "rw");
 			}
 		}
 		$_SESSION["AJXP_USER"] = $user;
@@ -228,12 +228,16 @@ class AuthService
 	{
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return 0;
-		foreach (ConfService::getRootDirsList() as $rootDirIndex => $rootDirObject)
+		$repoList = ConfService::getRootDirsList();
+		foreach ($repoList as $rootDirIndex => $rootDirObject)
 		{			
 			if($loggedUser->canRead($rootDirIndex."")) {
 				// Warning : do not grant access to admin repository to a non admin, or there will be 
 				// an "Empty Repository Object" error.
 				if($rootDirObject->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()){
+					continue;
+				}
+				if($rootDirObject->getAccessType() == "ajxp_shared" && count($repoList) > 1){
 					continue;
 				}
 				return $rootDirIndex;
