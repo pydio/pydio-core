@@ -44,13 +44,13 @@ class Zlib extends AbstractTest
     { 
     	$this->testedParams["Zlib Enabled"] = (function_exists('gzopen')?"Yes":"No");
     	$os = PHP_OS;
-    	if(stristr($os, "win")!==false && $this->testedParams["Zlib Enabled"]){
+    	/*if(stristr($os, "win")!==false && $this->testedParams["Zlib Enabled"]){
     		$this->failedLevel = "warning";
     		$this->failedInfo = "Warning, the zip functions are erraticaly working on Windows, please don't rely too much on them!";
     		return FALSE;
-    	}
+    	}*/
         $this->failedLevel = "info";
-        return FALSE;
+        return false;
     }
 };
 
