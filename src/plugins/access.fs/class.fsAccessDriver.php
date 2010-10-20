@@ -500,6 +500,9 @@ class fsAccessDriver extends AbstractAccessDriver
 						$metaData["repo_has_recycle"] = "true";
 					}
 				}
+				if(AJXP_Utils::isBrowsableArchive($dir)){
+					$metaData["ajxp_mime"] = "ajxp_browsable_archive";
+				}
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
 					$crtLabel, 
