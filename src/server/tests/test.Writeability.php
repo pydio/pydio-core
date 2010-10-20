@@ -42,16 +42,47 @@ class Writeability extends AbstractTest
     function Writeability() { parent::AbstractTest("Required writeable folder", "One of the following folder should be writeable and is not : "); }
     function doTest() 
     { 
-        $server = is_writable("../");
-        $logs = is_writable("../logs");
-        $conf = is_writable("../conf");
-        $this->testedParams["[Server, logs, conf]"] = "[$server,$logs,$conf]";
-        if(!$server || !$logs || !$conf){
-        	$this->failedInfo .= "INSTALL_PATH/server, INSTALL_PATH/server/conf, INSTALL_PATH/server/logs";
+    	include(INSTALL_PATH."/server/conf/conf.php");
+    	$checks = array();
+    	if(isSet($PLUGINS["CONF_DRIVER"])){
+    		$confDriver = $PLUGINS["CONF_DRIVER"];
+    		if(isSet($confDriver["OPTIONS"]) && isSet($confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"])){
+    			$checks[] =  dirname($confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"]);
+    		}
+    		if(isSet($confDriver["OPTIONS"]) && isSet($confDriver["OPTIONS"]["USERS_DIRPATH"])){
+    			$checks[] = $confDriver["OPTIONS"]["REPOSITORIES_FILEPATH"];
+    		}
+    	}
+    	if(isset($PLUGINS["AUTH_DRIVER"])){
+    		$authDriver = $PLUGINS["AUTH_DRIVER"];
+    		if(isset($authDriver["OPTIONS"]) && isSet($authDriver["OPTIONS"]["USERS_FILEPATH"])){
+    			$checks[] = dirname($authDriver["OPTIONS"]["USERS_FILEPATH"]);
+    		}
+    	}
+    	if(isset($PLUGINS["LOG_DRIVER"])){    		
+    		if(isset($PLUGINS["LOG_DRIVER"]["OPTIONS"]) && isSet($PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"])){
+    			$checks[] = $PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"];
+    		}
+    	}    	
+    	$checked = array();
+    	$success = true;
+    	foreach ($checks as $check){
+    		$w = false;
+    		$check = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $check);
+    		if(!is_dir($check)){// Check parent
+    			$check = dirname($check);
+    		}    		    		
+			$w = is_writable($check);
+			$checked[basename($check)] = "<b>".basename($check)."</b>:".($w?'true':'false');
+    		$success = $success & $w;    		
+    	}    	
+        $this->testedParams["Writeable Folders"] = "[".implode(',<br> ', array_values($checked))."]";
+        if(!$success){
+        	$this->failedInfo .= implode(",", $checks);
         	return FALSE;
         }
         $this->failedLevel = "info";
-        $this->failedInfo = "[$server,$logs,$conf]";
+        $this->failedInfo = "[".implode(',<br>', array_values($checked))."]";
         return FALSE;
     }
 };
