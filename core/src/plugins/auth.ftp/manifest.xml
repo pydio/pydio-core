@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<authdriver name="ftp" label="FTP Authentification" description="Authenticate user directly to an FTP server, and connect him to this server.">
+	<server_settings>
+		<param name="REPOSITORY_ID" type="string" label="Repository" description="Id of the repository to use for testing connexion" mandatory="true"/>
+		<param name="ADMIN_USER" type="string" label="Admin user" description="The ID of an existing admin for Ajaxplorer (using conf.serial)" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/auth.ftp/class.ftpAuthDriver.php" classname="ftpAuthDriver"/>
+	<registry_contributions>
+		<external_file filename="server/xml/standard_auth_actions.xml" include="actions/action[@name='login']" exclude=""/>
+		<actions>
+			<!-- OVERRIDE LOGOUT -->
+			<action name="ftp_logout">
+				<gui text="164" title="169" src="decrypted.png"
+					accessKey="" hasAccessKey="false">
+					<context selection="false" dir="" recycle="false"
+						actionBar="true" contextMenu="false" infoPanel="false"
+						actionBarGroup="user">
+					</context>
+				</gui>
+				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
+				<processing>
+					<clientCallback prepareModal="false"><![CDATA[
+						clearRememberData();
+						var connexion = new Connexion();
+						connexion.addParameter('get_action', 'ftp_logout');
+						connexion.onComplete = function(transport){
+							ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+							};
+						connexion.sendAsync();
+						]]></clientCallback>
+					<serverCallback methodName="logout"></serverCallback>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<plugin pluginName="access.ftp"/>
+	</dependencies>	
+</authdriver>
