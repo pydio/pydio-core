@@ -122,7 +122,7 @@ Class.create("ExifEditor", AbstractEditor, {
 			this.contentMainContainer.insert(div);
 			var sectionName = sections[i].getAttribute("name");
 			div.insert('<div class="panelHeader infoPanelGroup">'+sectionName+'</div>');
-			div.insert('<table class="infoPanelTable"><tbody></tbody></table>');
+			div.insert('<table class="infoPanelTable" '+(Prototype.Browser.IE?'style="width:97%;"':'')+'><tbody></tbody></table>');
 			var tBody = div.down('tbody');
 			var even = false;
 			this.itemsCount ++;
