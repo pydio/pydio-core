@@ -349,12 +349,22 @@ class ftpAccessWrapper implements AjxpWrapper {
 		if(!isSet($this->user) || $this->user==""){
 			throw new AJXP_Exception("Cannot find user/pass for FTP access!");
 		}
-		$this->host = $repository->getOption("FTP_HOST");
-		$this->path = $repository->getOption("PATH");
-		$this->secure = ($repository->getOption("FTP_SECURE") == "TRUE"?true:false);
-		$this->port = ($repository->getOption("FTP_PORT")!=""?intval($repository->getOption("FTP_PORT")):($this->secure?22:21));
-		$this->ftpActive = ($repository->getOption("FTP_DIRECT") == "TRUE"?true:false);
-		$this->repoCharset = $repository->getOption("CHARSET");
+		if($repository->getOption("DYNAMIC_FTP") == "TRUE" && isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])){
+			$data = $_SESSION["AJXP_DYNAMIC_FTP_DATA"];
+			$this->host = $data["FTP_HOST"];
+			$this->path = $data["PATH"];
+			$this->secure = ($data["FTP_SECURE"] == "TRUE"?true:false);
+			$this->port = ($data["FTP_PORT"]!=""?intval($data["FTP_PORT"]):($this->secure?22:21));
+			$this->ftpActive = ($data["FTP_DIRECT"] == "TRUE"?true:false);
+			$this->repoCharset = $data["CHARSET"];
+		}else{
+			$this->host = $repository->getOption("FTP_HOST");
+			$this->path = $repository->getOption("PATH");
+			$this->secure = ($repository->getOption("FTP_SECURE") == "TRUE"?true:false);
+			$this->port = ($repository->getOption("FTP_PORT")!=""?intval($repository->getOption("FTP_PORT")):($this->secure?22:21));
+			$this->ftpActive = ($repository->getOption("FTP_DIRECT") == "TRUE"?true:false);
+			$this->repoCharset = $repository->getOption("CHARSET");
+		}
 				
 		// Test Connexion and server features
         global $_SESSION;
