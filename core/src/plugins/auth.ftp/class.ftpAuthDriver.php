@@ -48,10 +48,37 @@ class ftpAuthDriver extends AbstractAuthDriver {
 	
 	var $driverName = "ftp";
 	
-	function init($options){
-		parent::init($options);
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
+		if($contribNode->nodeName != "actions") return ;
+		$actionXpath=new DOMXPath($contribNode->ownerDocument);
+		if(!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE"){
+			// Remove "ftp_login" && "ftp_set_data" actions
+			$nodeList = $actionXpath->query('action[@name="dynamic_login"]', $contribNode);
+			if(!$nodeList->length) return ;
+			unset($this->actions["dynamic_login"]);
+			$contribNode->removeChild($nodeList->item(0));
+					
+			$nodeList = $actionXpath->query('action[@name="ftp_set_data"]', $contribNode);
+			if(!$nodeList->length) return ;
+			unset($this->actions["ftp_set_data"]);			
+			$contribNode->removeChild($node = $nodeList->item(0));
+		}else{
+			// Replace "login" by "dynamic_login"
+			$loginList = $actionXpath->query('action[@name="login"]', $contribNode);			
+			if($loginList->length){
+				unset($this->actions["login"]);
+				$contribNode->removeChild($loginList->item(0));									
+			}
+			$dynaLoginList = $actionXpath->query('action[@name="dynamic_login"]', $contribNode);
+			if($dynaLoginList->length){
+				$dynaLoginList->item(0)->setAttribute("name", "login");
+				$this->actions["login"] = $this->actions["dynamic_login"];
+			}
+		}
 	}
-			
+
+	
 	function listUsers(){
 		$adminUser = $this->options["ADMIN_USER"];
 		return array($adminUser => $adminUser);
@@ -61,7 +88,12 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		return true;
 	}	
 	
-	function logout($actionName, $httpVars, $fileVars){		
+	function logoutCallback($actionName, $httpVars, $fileVars){		
+		if(isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])){
+			unset($_SESSION["AJXP_DYNAMIC_FTP_DATA"]);
+			if(isSet($_SESSION["AJXP_SESSION_REMOTE_USER"])) unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
+			if(isSet($_SESSION["AJXP_SESSION_REMOTE_PASS"])) unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);
+		}
 		$adminUser = $this->options["ADMIN_USER"];
 		$crtUser = $_SESSION["AJXP_SESSION_REMOTE_USER"];
 		if($login != $adminUser){
@@ -72,17 +104,24 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		AJXP_XMLWriter::loggingResult(2);
 		AJXP_XMLWriter::close();
 	}
+	
+	function setFtpDataCallback($actionName, $httpVars, $fileVars){
+		$options = array("CHARSET", "FTP_DIRECT", "FTP_HOST", "FTP_PORT", "FTP_SECURE", "PATH");
+		$ftpOptions = array();
+		foreach ($options as $option){
+			if(isSet($httpVars[$option])){
+				$ftpOptions[$option] = $httpVars[$option];
+			}
+		}
+		$_SESSION["AJXP_DYNAMIC_FTP_DATA"] = $ftpOptions;
+	}
 		
 	function checkPassword($login, $pass, $seed){
 		$adminUser = $this->options["ADMIN_USER"];
-		if($login == $adminUser){
-			
-		}
-
 		$wrapper = new ftpSonWrapper();
 		$repoId = $this->options["REPOSITORY_ID"];
 		try{
-			$wrapper->initUrl("ajxp.ftp://$login:$pass@dynamic_ftp/");
+			$wrapper->initUrl("ajxp.ftp://$login:$pass@$repoId/");
 			$_SESSION["AJXP_SESSION_REMOTE_USER"] = $login;
 			$_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pass;
 		}catch(Exception $e){
