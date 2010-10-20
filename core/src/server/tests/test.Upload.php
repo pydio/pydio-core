@@ -45,6 +45,9 @@ class Upload extends AbstractTest
     	include("../conf/conf.php");
     	$tmpDir = ini_get("upload_tmp_dir");
     	if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
+    	if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !=""){
+    		$tmpDir = AJXP_TMP_DIR;
+    	}
     	$this->testedParams["Upload Tmp Dir Writeable"] = is_writable($tmpDir);
     	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
     	$this->testedParams["PHP Post Max Size"] = $this->returnBytes(ini_get("post_max_size"));
