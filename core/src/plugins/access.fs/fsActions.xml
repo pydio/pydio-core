@@ -294,7 +294,7 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
                     var userSelection = ajaxplorer.getUserSelection();
-                    if(userSelection.hasDir()){
+                    if(userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))){
                     	var loadFunc = function(oForm){
                     		if(!$('share_folder_form').autocompleter){
 	                    		$('share_folder_form').autocompleter = new Ajax.Autocompleter(

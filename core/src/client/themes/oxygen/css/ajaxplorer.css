@@ -552,6 +552,7 @@ a.carousel-control img{
 	background-position:center center;
 	background-repeat:repeat-x;
 	height:33px;
+	_height:32px;
 	width:100%;
 }
 
