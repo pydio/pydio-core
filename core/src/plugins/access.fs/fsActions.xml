@@ -345,7 +345,7 @@
 						if(!window.ajxpPublicUrlCallback){							
 							window.ajxpPublicUrlCallback = function(){
 								var userSelection = ajaxplorer.getUserSelection();
-								if(!userSelection.isUnique() || userSelection.hasDir()) return;
+								if(!userSelection.isUnique() || (userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))) return;
 								var publicUrl = ajxpServerAccessPath+'?get_action=public_url';
 								publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
 		                        var oForm = $(modal.getForm());	                        
