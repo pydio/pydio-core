@@ -54,6 +54,8 @@ class SystemTextEncoding
 	
 	function parseCharset($locale)
 	{
+		$test = explode("@", $locale);
+		$locale = $test[0];		
 		$encoding = substr(strrchr($locale, "."), 1);
 		if (is_numeric($encoding))
 		{
