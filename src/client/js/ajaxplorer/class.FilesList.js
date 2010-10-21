@@ -323,7 +323,7 @@ Class.create("FilesList", SelectableElements, {
 			for(var i=0; i<visibleColumns.length;i++){
 				var column = visibleColumns[i];
 				var userWidth = 0;
-				if(userPref && userPref.get(i) && i<(visibleColumns.length-1)){
+				if(this.gridStyle != "grid" && userPref && userPref.get(i) && i<(visibleColumns.length-1)){
 					userWidth = userPref.get(i);
 				}
 				var label = (column.messageId?MessageHash[column.messageId]:column.messageString);
@@ -352,7 +352,7 @@ Class.create("FilesList", SelectableElements, {
 			this._headerResizer.observe("drag_resize", function(){
 				if(this.prefSaver) window.clearTimeout(this.prefSaver);
 				this.prefSaver = window.setTimeout(function(){
-					if(!ajaxplorer.user) return;
+					if(!ajaxplorer.user || this.gridStyle == "grid") return;
 					var sizes = this._headerResizer.getCurrentSizes('percent');
 					var data = ajaxplorer.user.getPreference("columns_size", true);
 					data = (data?new Hash(data):new Hash());
@@ -378,11 +378,11 @@ Class.create("FilesList", SelectableElements, {
 			this.disableTextSelection($('table_rows_container'));
 			this.observer = function(e){
 				fitHeightToBottom($('table_rows_container'), this.htmlElement);
-				//if(this.gridStyle == "grid"){
-					//this._headerResizer.resize($('table_rows_container').scrollWidth);
-				//}else{
+				if(Prototype.Browser.IE){
+					this._headerResizer.resize($('table_rows_container').getWidth());
+				}else{
 					this._headerResizer.resize($('content_pane').getWidth());
-				//}
+				}
 			}.bind(this);
 			this.observe("resize", this.observer);
 		
@@ -528,6 +528,9 @@ Class.create("FilesList", SelectableElements, {
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
     	}		
+    	if($('table_rows_container') && Prototype.Browser.IE && this.gridStyle == "file"){
+    		$('table_rows_container').setStyle({width:'100%'});
+    	}
 		this.notify("resize");
 	},
 	
