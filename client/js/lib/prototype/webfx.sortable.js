@@ -138,6 +138,12 @@ SortableTable = Class.create({
 	getHeaderCells : function(){
 		if(!this.headerCells){
 			this.headerCells = this.tHead.select('div.header_cell');
+			this.headerCells.each(function(cell){
+				var prev = cell.previous('div');
+				if( prev && prev.hasClassName('resizer')){
+					cell.resizer = prev;
+				}
+			});
 		}
 		return this.headerCells;
 	},
@@ -242,11 +248,17 @@ SortableTable = Class.create({
 		var l = cells.length;
 		for (var i = 0; i < l; i++) {
 			if (cells[i]._sortType != null && cells[i]._sortType != "None") {
-				$(cells[i]).removeClassName("descending");
-				$(cells[i]).removeClassName("ascending");
+				cells[i].removeClassName("descending");
+				cells[i].removeClassName("ascending");
+				if(cells[i].resizer){
+					cells[i].resizer.removeClassName("resizer_sortable");
+				}
 				if (i == this.sortColumn)
 				{
-					$(cells[i]).addClassName(this.descending ? "descending" : "ascending");
+					cells[i].addClassName(this.descending ? "descending" : "ascending");
+					if(cells[i].resizer){
+						cells[i].resizer.addClassName("resizer_sortable");
+					}
 				}
 			}
 		}
