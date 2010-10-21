@@ -152,8 +152,8 @@ class UserSelection
 	}
 	
 	function detectZip($dirPath){
-		$contExt = strpos(strtolower($dirPath), ".zip");
-		if($contExt !== false){
+		if(preg_match("/\.zip\//i", $dirPath) || preg_match("/\.zip$/i", $dirPath)){
+			$contExt = strpos(strtolower($dirPath), ".zip");
 			$zipPath = substr($dirPath, 0, $contExt+4);
 			$localPath = substr($dirPath, $contExt+4);
 			if($localPath == "") $localPath = "/";
