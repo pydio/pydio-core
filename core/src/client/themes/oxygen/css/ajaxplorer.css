@@ -788,6 +788,10 @@ div.header_resizer div.resizer{
 	border-left: 1px solid #fff;
 }
 
+div.header_resizer div.resizer_sortable{
+	background-color: #daddd7;
+}
+
 div.header_resizer div.dragging{
 	background-color : #bbb;
 	border-left: 1px solid #bbb;

@@ -172,8 +172,17 @@ Class.create("HeaderResizer", {
 			onDrag : function(draggable){
 				var newPosition = Element.cumulativeOffset(draggable.element).left;
 				var delta = newPosition - draggable.originalLeft;
-				draggable.previous.setStyle({width:draggable._initLeftCell + delta});
-				draggable.next.setStyle({width:draggable._initRightCell - delta});
+				var newSizes = $A();
+				for(var i=0;i<this.cells.length;i++){
+					if(this.cells[i] == draggable.previous) {
+						newSizes[i] = draggable._initLeftCell + delta;
+					}else{
+						newSizes[i] = this.currentSizes[i]  - (i==(this.cells.length-1)?delta:0);
+					}
+				}
+				this.log(newSizes);
+				draggable.element.setStyle({left:0});
+				this.resizeHeaders(newSizes);
 				if(draggable._ghost){
 					if(draggable._ghost.getOffsetParent()){
 						newPosition -= draggable._ghost.getOffsetParent().positionedOffset()[0] + 2;
@@ -194,13 +203,13 @@ Class.create("HeaderResizer", {
 				}
 			}.bind(this),
 			onEnd : function(draggable){
+				draggable.element.setStyle({left:0});
 				draggable.element.removeClassName('dragging');
 				if(draggable._ghost) draggable._ghost.remove();
 				for(var i=0;i<this.cells.length;i++){
 					if(this.cells[i] == draggable.previous) this.currentSizes[i] = draggable.previous.getWidth();
 					if(this.cells[i] == draggable.next) this.currentSizes[i] = draggable.next.getWidth();
 				}
-				draggable.element.left = 0;
 				this.notify("drag_resize");
 			}.bind(this)
 			
