@@ -184,12 +184,12 @@ Class.create("OLViewer", AbstractEditor, {
 		var layersDefinitions;
 		if(metadata.get('ajxp_mime') == 'wms_layer'){			
 			layersDefinitions = $A([
-				{type:'WMS',tile:true,wms_url:metadata.get('wms_url'),name:metadata.get('name'),style:metadata.get('style')},				
-			]);
+				{type:'WMS',tile:true,wms_url:metadata.get('wms_url'),name:metadata.get('name'),style:metadata.get('style')}
+				]);
 			if(dualTileMode){
-				layersDefinitions.push(
-					{type:'WMS',tile:false,wms_url:metadata.get('wms_url'),name:metadata.get('name'),style:metadata.get('style')}
-				);
+				layersDefinitions.push({
+					type:'WMS',tile:false,wms_url:metadata.get('wms_url'),name:metadata.get('name'),style:metadata.get('style')
+				});
 			}
 		}else{
 			layersDefinitions = $A(metadata.get('ol_layers'));
@@ -218,7 +218,7 @@ Class.create("OLViewer", AbstractEditor, {
         // Check Google layer
         var mapsFound = (window.google && window.google.maps?true:false);
         var googleRejected = false;
-        layersDefinitions.each(function(definition){
+        layersDefinitions.each(function(definition){        	
         	if(definition.type=='Google'){
         		if(!mapsFound){        		
         			layersDefinitions = layersDefinitions.without(definition);

@@ -12,20 +12,20 @@
 		<activeCondition><![CDATA[
 		(function(){
 			if(!window.OpenLayers && !window.OpenLayersLoading){
-				if(Prototype.Browser.IE){
-					window.originalEvent = window.Event;
-					window.originalEvent.tmpCopy = true;
-				}
 				window.OpenLayersLoading = true;
-				$(document.body).insert(new Element('script', {
+				if(Prototype.Browser.IE) window.originalEvent = window.Event;
+				var script = new Element('script', {
 					src:"plugins/editor.openlayer/openlayer/OpenLayers.js", 
 					type:"text/javascript"}
-				));
+				);
 				if(Prototype.Browser.IE){
-					setTimeout(function(){
-						window.Event = window.originalEvent;
-					}, 600);
+					script.attachEvent("onreadystatechange", function(){
+						 if(script.readyState == "loaded"){
+						  window.Event = window.originalEvent;
+						 }
+					}, false);
 				}
+				$(document.body).insert(script);
 			}
 		})() || true;
 		]]></activeCondition>
