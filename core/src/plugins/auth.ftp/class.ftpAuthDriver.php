@@ -89,17 +89,18 @@ class ftpAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function logoutCallback($actionName, $httpVars, $fileVars){		
+		$crtUser = $_SESSION["AJXP_SESSION_REMOTE_USER"];
 		if(isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])){
 			unset($_SESSION["AJXP_DYNAMIC_FTP_DATA"]);
-			if(isSet($_SESSION["AJXP_SESSION_REMOTE_USER"])) unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
-			if(isSet($_SESSION["AJXP_SESSION_REMOTE_PASS"])) unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);
 		}
+		unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
+		unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);
 		$adminUser = $this->options["ADMIN_USER"];
-		$crtUser = $_SESSION["AJXP_SESSION_REMOTE_USER"];
-		if($login != $adminUser){
+		if($login != $adminUser && $crtUser!=""){
 			AJXP_User::deleteUser($crtUser);
 		}
 		AuthService::disconnect();
+		session_write_close();
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::loggingResult(2);
 		AJXP_XMLWriter::close();
