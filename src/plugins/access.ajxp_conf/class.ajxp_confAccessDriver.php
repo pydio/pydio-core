@@ -690,6 +690,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			
 			foreach ($diagResults as $id => $value){
+				$value = AJXP_Utils::xmlEntities($value);
 				print "<tree icon=\"susehelpcenter.png\" is_file=\"1\" filename=\"$id\" text=\"$id\" data=\"$value\" ajxp_mime=\"testResult\"/>";
 			}
 		}		
