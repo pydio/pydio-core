@@ -186,7 +186,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$serverParent = dirname($serverPath);
 			$contents = $this->rawList($link, $serverParent);			
 			foreach ($contents as $entry){
-				$res = $this->rawListEntryToStat($entry);
+				$res = $this->rawListEntryToStat($entry, true);
 				if($res["name"] == basename($serverPath)){
 					$statValue = $res["stat"];
 					return $statValue;
@@ -196,7 +196,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 			// FILE
 			$contents = $this->rawList($link, $serverPath);		
 	    	if(count($contents) == 1){
-	    		$res = $this->rawListEntryToStat($contents[0]);
+	    		$res = $this->rawListEntryToStat($contents[0], true);
     			$statValue = $res["stat"];
 	    		return $statValue;
 	    	}
@@ -270,7 +270,7 @@ class ftpAccessWrapper implements AjxpWrapper {
         return $contents;		
 	}
 	
-	protected function rawListEntryToStat($entry){
+	protected function rawListEntryToStat($entry, $filterStatPerms = false){
         $info = array();    
 		$vinfo = preg_split("/[\s]+/", $entry, 9);
 		$statValue = array();
@@ -309,7 +309,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		 	 $isDir = true;
 		}
 		$boolIsDir = $isDir;
-		$statValue[2] = $statValue["mode"] = $this->convertingChmod($fileperms);
+		$statValue[2] = $statValue["mode"] = $this->convertingChmod($fileperms, $filterStatPerms);
 		$statValue["ftp_perms"] = $fileperms;
 		return array("name"=>$file, "stat"=>$statValue, "dir"=>$isDir);
 	}
