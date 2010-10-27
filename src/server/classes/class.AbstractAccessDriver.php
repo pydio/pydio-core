@@ -151,7 +151,10 @@ class AbstractAccessDriver extends AJXP_Plugin {
     function writePubliclet($data)
     {
     	if(!defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER)){
-    		return "Public URL folder does not exist!";
+    		return "ERROR : Public URL folder does not exist!";
+    	}
+    	if(!function_exists("mcrypt_create_iv")){
+    		return "ERROR : MCrypt must be installed to use publiclets!";
     	}
     	if($data["PASSWORD"] && !is_file(PUBLIC_DOWNLOAD_FOLDER."/allz.css")){    		
     		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", PUBLIC_DOWNLOAD_FOLDER."/allz.css");
