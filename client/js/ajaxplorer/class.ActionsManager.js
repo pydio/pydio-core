@@ -434,13 +434,6 @@ Class.create("ActionsManager", {
 				this.registerAction(act);
 			}.bind(this));
 		}
-		if(this.defaultActions.get("select")){
-			this.defaultActions.set("file", this.defaultActions.get("select"));
-		}else{
-			if(this.actions.get("ext_select")){
-				this.actions.unset("ext_select");
-			}
-		}		
 		document.fire("ajaxplorer:actions_loaded", this.actions);
 		this.fireContextChange();
 		this.fireSelectionChange();		

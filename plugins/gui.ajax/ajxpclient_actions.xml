@@ -83,7 +83,11 @@
 						if(selectorData.get('type') == "ckeditor"){
 							var ckData = selectorData.get('data');
 							if (ckData['CKEditorFuncNum']) {
-								window.opener.CKEDITOR.tools.callFunction(ckData['CKEditorFuncNum'], ajxpBootstrap.parameters.get('ajxpServerAccess')+'?get_action=image_proxy&file=' + fileName);
+								var imagePath = fileName;
+								if(ckData['relative_path']){
+									imagePath = ckData['relative_path'] + fileName;
+								}
+								window.opener.CKEDITOR.tools.callFunction(ckData['CKEditorFuncNum'], imagePath);
 								window.close();
 							}
 						}
