@@ -41,6 +41,9 @@ Class.create("AjxpCkEditor", TextEditor, {
 			resize_enabled:false,
 			toolbar : "Ajxp",
 			filebrowserBrowseUrl : 'index.php?external_selector_type=ckeditor',
+			// IF YOU KNOW THE RELATIVE PATH OF THE IMAGES (BETWEEN REPOSITORY ROOT AND REAL FILE)
+			// YOU CAN PASS IT WITH THE relative_path PARAMETER. FOR EXAMPLE : 
+			//filebrowserBrowseUrl : 'index.php?external_selector_type=ckeditor&relative_path=files',
 			filebrowserImageBrowseUrl : 'index.php?external_selector_type=ckeditor',
 			filebrowserFlashBrowseUrl : 'index.php?external_selector_type=ckeditor',
 			language : ajaxplorer.currentLanguage,
