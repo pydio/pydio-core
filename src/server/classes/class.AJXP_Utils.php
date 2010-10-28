@@ -168,7 +168,7 @@ class AJXP_Utils
 		}
 		
 		if(isSet($parameters["external_selector_type"])){
-			$output["SELECTOR_DATA"] = array("type" => $type, "data" => $data);
+			$output["SELECTOR_DATA"] = array("type" => $parameters["external_selector_type"], "data" => $parameters);
 		}
 		
 	}

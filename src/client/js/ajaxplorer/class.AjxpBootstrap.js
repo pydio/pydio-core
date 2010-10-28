@@ -58,11 +58,18 @@ Class.create("AjxpBootstrap", {
 				fitHeightToBottom($(this.parameters.get('MAIN_ELEMENT')), options.fitParent, marginBottom, true);
 			}
 		}.bind(this));
+		document.observe("ajaxplorer:actions_loaded", function(){
+			if(!this.parameters.get("SELECTOR_DATA") && ajaxplorer.actionBar.actions.get("ext_select")){
+				ajaxplorer.actionBar.actions.unset("ext_select");
+				ajaxplorer.actionBar.fireContextChange();
+				ajaxplorer.actionBar.fireSelectionChange();	
+			}
+		}.bind(this));					
 		document.observe("ajaxplorer:loaded", function(e){
 			this.insertAnalytics();
 			if(this.parameters.get("SELECTOR_DATA")){
-	    		ajaxplorer.actionBar.defaultActions.set("select", "ext_select");
-	    		ajaxplorer.actionBar.selectorData = new Hash(this.parameters.get("SELECTOR_DATA"));
+	    		ajaxplorer.actionBar.defaultActions.set("file", "ext_select");
+	    		ajaxplorer.actionBar.selectorData = new Hash(this.parameters.get("SELECTOR_DATA"));	    		
 			}
 		}.bind(this));
 	},
