@@ -268,19 +268,21 @@ class fsAccessWrapper implements AjxpWrapper {
     	}
     	// Folder case
     	$real = $this->initPath($path, "dir", false, true);
-    	//print($real);
     	if($real!=-1 && is_dir($real)){
-    		$stat = stat($real);
-    		return $stat;
+    		return stat($real);
     	}
     	// Zip Folder case
     	$search = basename($path);
-    	$real = $this->initPath(dirname($path), "dir");
-    	if($real == -1){
+    	$realBase = $this->initPath(dirname($path), "dir");
+    	if($realBase == -1){
     		if(array_key_exists($search, self::$currentListing)){	    		
     			return self::$currentListing[$search];
     		}
-    	}    	
+    	}
+    	// 000 permission file
+    	if($real != -1 && is_file($real)){
+    		return stat($real);
+    	}
     	// Non existing file
    		return null;
     }
