@@ -10,7 +10,6 @@
 			Cannot use the standard library mechanism for OpenLayer otherwise it cannot find the images and styles.
 		 -->
 		<activeCondition><![CDATA[
-		(function(){
 			if(!window.OpenLayers && !window.OpenLayersLoading){
 				window.OpenLayersLoading = true;
 				if(Prototype.Browser.IE) window.originalEvent = window.Event;
@@ -27,7 +26,7 @@
 				}
 				$(document.body).insert(script);
 			}
-		})() || true;
+			return true;
 		]]></activeCondition>
 	</processing>	
 	<clientForm id="openlayer_box"><![CDATA[
