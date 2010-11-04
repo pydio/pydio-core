@@ -644,10 +644,17 @@ a.carousel-control img{
 	border:0px;
 }
 
+.inline_hover_light
+{
+	background-image:url(../images/ToolbarBgReverse.gif);
+	background-position:center center;
+	background-repeat: repeat-x;
+}
+
 .inline_hover
 {
 	background-image:url(../images/header_bg_on.png);
-	background-position:top;
+	background-position:center center;
 	background-repeat: repeat-x;
 }
 
@@ -670,12 +677,11 @@ a.carousel-control img{
 }
 */
 #logging_string {
-   float: right;
+	float: right;
 	color:#666666;
 	font-family:Trebuchet MS,sans-serif;
-	font-size:12px;
-   padding-top: 3px;
-   padding-right: 4px;
+	font-size:11px;
+	padding-right: 5px;
 }
 #logging_string i
 {
@@ -688,6 +694,16 @@ a.carousel-control img{
 	margin-left:3px;
 	margin-right:7px;
 	margin-top:-4px;
+}
+.user_widget_label{
+	float: left; 
+	border-width: 1px 0px 1px 1px;
+	border-style: solid none solid solid; 
+	border-color: #ddd; 
+	-moz-border-radius: 5px 0pt 0pt 5px; 
+	border-radius: 5px 0pt 0pt 5px; 
+	padding: 3px 0px 3px 7px; 
+	cursor: pointer;
 }
 
 
@@ -2082,6 +2098,18 @@ div.menu a {
    border: 1px solid #676965;
    width: 200px;
    padding: 2px;
+}
+
+.rightAlignMenu a{
+	padding: 4 5 2 20px;
+	text-align:right;
+	height: 16px;
+}
+
+.rightAlignMenu a img{
+	margin-right:0px;
+	margin-left:5px;
+	float: right;
 }
 
 .menuActions {
