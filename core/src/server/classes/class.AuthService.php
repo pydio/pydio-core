@@ -155,7 +155,13 @@ class AuthService
         unset($loginAttempt[$_SERVER["REMOTE_ADDR"]]);
         AuthService::setBruteForceLoginArray($loginAttempt);
 
-		$user = $confDriver->createUserObject($user_id);
+        // Setting session credentials if asked in config
+        if(ConfService::getConf("SESSION_SET_CREDENTIALS")) {
+        	$_SESSION["AJXP_SESSION_REMOTE_USER"] = $user_id;
+        	$_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pwd;
+        }
+
+        $user = $confDriver->createUserObject($user_id);
 		if($authDriver->isAjxpAdmin($user_id)){
 			$user->setAdmin(true);
 		}
@@ -186,6 +192,10 @@ class AuthService
 		if(isSet($_SESSION["AJXP_USER"])){
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
+			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
+				unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
+				unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);			
+			}
 		}
 	}
 	
@@ -220,6 +230,10 @@ class AuthService
         if($logUserOut && isSet($_SESSION["AJXP_USER"])){
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
+			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
+				unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
+				unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);			
+			}			
 		}
         return $logout;
     }
