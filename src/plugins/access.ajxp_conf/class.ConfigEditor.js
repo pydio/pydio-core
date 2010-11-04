@@ -193,8 +193,12 @@ ConfigEditor = Class.create({
 	changeUserRight: function(event){	
 		var oChckBox = Event.element(event);
 		var parts = oChckBox.id.split('_');		
-		var repositoryId = parts[1];
-		var rightName = parts[2];
+		// Remove "chck" prefix (first part)
+		parts.shift();
+		// Get and remove right name (last part)
+		var rightName = parts.pop();
+		// Rebuild repository id (can contain underscore!)
+		var repositoryId = parts.join("_");
 		var userId = this.userId;
 		
 		var newState = oChckBox.checked;
@@ -539,9 +543,8 @@ ConfigEditor = Class.create({
 		
 		this.metaSelector.observe("change", function(){
 			var plugId = this.metaSelector.getValue();
-			if(!plugId){
-				addFormDetail.update("");
-			}else{
+			addFormDetail.update("");
+			if(plugId){
 				var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
 				var driverParamsHash = $A([]);
 				for(var i=0;i<metaDefNodes.length;i++){
