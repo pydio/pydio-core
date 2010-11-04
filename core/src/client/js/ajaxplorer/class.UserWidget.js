@@ -37,18 +37,28 @@ Class.create("UserWidget", {
 	initialize: function(element){
 		this.element = element;
 		this.element.ajxpPaneObject = this;
-		this.element.observe("click", this.displayUserPrefs.bind(this));
+		this.element.observe("mouseover", function(){
+			this.element.select('div').invoke('setStyle', {borderColor:'#bbbbbb'});			
+		}.bind(this));
+		this.element.observe("mouseout", function(){
+			var divs = this.element.select('div');
+			if(!divs.length) return;
+			if(divs[0].hasClassName('inline_hover_light')) return
+			divs.invoke('setStyle', {borderColor:'#dddddd'});	
+		}.bind(this));		
 		document.observe("ajaxplorer:user_logged", this.updateGui.bind(this));
+		document.observe("ajaxplorer:actions_loaded", this.updateActions.bind(this));
 	},
+	
 	updateGui : function(){
 		var logging_string = "";
-		var oUser = ajaxplorer.user;
-		var observer = this.displayUserPrefs.bind(this);
+		var oUser = ajaxplorer.user;		
 		if(oUser != null) 
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = '<span style="cursor:pointer;"><span class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></span><img src="'+ajxpResourcesFolder+'/images/actions/16/configure.png" height="16" width="16" border="0" align="absmiddle"></span>';
+				logging_string = '<div class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px; border-color:#ddd;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
+				this.element.removeClassName('disabled');
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
 					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
@@ -56,100 +66,61 @@ Class.create("UserWidget", {
 			}
 			else 
 			{
-				logging_string = '<ajxp:message ajxp_message_id="143">'+MessageHash[143]+'</ajxp:message>';
+				logging_string = '<div style="padding:3px 0 3px 7px;"><ajxp:message ajxp_message_id="143">'+MessageHash[143]+'</ajxp:message></div>';
+				this.element.addClassName('disabled');
 			}
 		}
 		else 
 		{
-			logging_string = '<ajxp:message ajxp_message_id="142">'+MessageHash[144]+'</ajxp:message>';
+			logging_string = '<div style="padding:3px 0 3px 7px;"><ajxp:message ajxp_message_id="142">'+MessageHash[144]+'</ajxp:message></div>';
+			this.element.addClassName('disabled');
 		}
 		this.element.update(logging_string);
-		
 	},
 	
-	displayUserPrefs: function()
-	{
-		if(ajaxplorer.user == null) return;
-		if(ajaxplorer.user.id == 'guest') return;
-		var userLang = ajaxplorer.user.getPreference("lang");
-		if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
-		var userDisp = ajaxplorer.user.getPreference("display");	
-		var onLoad = function(oForm){
-			var selector = $(oForm).select('select[id="language_selector"]')[0];
-			var languages = $H(window.ajxpBootstrap.parameters.get("availableLanguages"));
-			languages.each(function(pair){
-				var option = new Element('option', {value:pair.key,id:'lang_'+pair.key});
-				option.update(pair.value);
-				selector.insert(option);
-			});
-			selector.setValue(userLang);
-			if(ajaxplorer.usersEnabled && window.ajxpBootstrap.parameters.get("userChangePassword")){
-				$('user_pref_change_password').show();
-				$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
-				// Update pass_seed
-				var connexion = new Connexion();
-				connexion.addParameter("get_action", "get_seed");
-				connexion.onComplete = function(transport){
-					$('pass_seed').value = transport.responseText;
-				};
-				connexion.sendSync();			
-			}else{
-				$('user_pref_change_password').hide();
-			}
-			if($('display_'+userDisp))$('display_'+userDisp).checked = true;
-		};
+	updateActions : function(){
+		var menuItems = $A();
+		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("UserWidget", this.element.id).each(function(action){
+			menuItems.push({
+				name:action.getKeyedText(),
+				alt:action.options.title,
+				image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),						
+				callback:function(e){this.apply();}.bind(action)
+			});			
+		});
 		
-		var onComplete = function(oForm){
-			ajaxplorer.user.setPreference("lang", $('user_pref_form').select('select[id="language_selector"]')[0].getValue());
-			var userOldPass = null;
-			var userPass = null;
-			var passSeed = null;
-			if($('user_pref_change_password').visible() && $('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
-			{
-				if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
-					alert(MessageHash[238]);
-					return false;
-				}
-				if($('user_change_ownpass_old').value == ''){
-					alert(MessageHash[239]);
-					return false;					
-				}
-				passSeed = $('pass_seed').value;
-				if(passSeed == '-1'){
-					userPass = $('user_change_ownpass1').value;
-					userOldPass = $('user_change_ownpass_old').value;
-				}else{
-					userPass = hex_md5($('user_change_ownpass1').value);
-					userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
-				}				
-			}
-			var onComplete = function(transport){
-				var oUser = ajaxplorer.user;
-				if(oUser.getPreference('lang') != null 
-					&& oUser.getPreference('lang') != "" 
-					&& oUser.getPreference('lang') != ajaxplorer.currentLanguage)
-				{
-					ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
-				}
-					
-				if(userPass != null){
-					if(transport.responseText == 'PASS_ERROR'){
-						alert(MessageHash[240]);
-					}else if(transport.responseText == 'SUCCESS'){
-						ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
-						hideLightBox(true);
-					}
-				}else{
-					ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
-					hideLightBox(true);
-				}
-			};
-			ajaxplorer.user.savePreferences(userOldPass, userPass, passSeed, onComplete);
-			return false;		
-		};
+		if(this.menu){
+			this.menu.options.menuItems = menuItems;
+			this.menu.refreshList();
+		}else{			
+			this.menu = new Proto.Menu({			
+				className: 'menu rootDirChooser rightAlignMenu',
+				mouseClick:'left',
+				position: 'bottom right',
+				anchor:this.element,
+				createAnchor:false,
+				topOffset:2,
+				leftOffset:-5,
+				menuTitle:MessageHash[200],
+				menuItems: menuItems,
+				fade:true,
+				zIndex:1500,
+				beforeShow : function(e){
+					this.element.select('div').invoke('addClassName', 'inline_hover_light');		
+					this.element.select('div').invoke('setStyle', {borderColor:'#bbbbbb'});											
+				}.bind(this),
+				beforeHide : function(e){
+					this.element.select('div').invoke('removeClassName', 'inline_hover_light');
+					this.element.select('div').invoke('setStyle', {borderColor:'#dddddd'});	
+				}.bind(this),
+				beforeSelect : function(e){
+					this.element.select('div').invoke('removeClassName', 'inline_hover_light');
+					this.element.select('div').invoke('setStyle', {borderColor:'#dddddd'});	
+				}.bind(this)
+			});		
+			this.notify("createMenu");
+		}
 		
-		modal.prepareHeader(MessageHash[195], ajxpResourcesFolder+'/images/actions/16/configure.png');
-		modal.showDialogForm('Preferences', 'user_pref_form', onLoad, onComplete);
 	},
 	
 	resize : function(){
