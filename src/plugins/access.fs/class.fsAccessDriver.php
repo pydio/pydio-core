@@ -102,8 +102,8 @@ class fsAccessDriver extends AbstractAccessDriver
 		if(isSet($newArgs["dest"])) $httpVars["dest"] = SystemTextEncoding::toUTF8($newArgs["dest"]);//Re-encode!
  		// FILTER DIR PAGINATION ANCHOR
 		$page = null;
-		if(isSet($dir) && strstr($dir, "#")!==false){
-			$parts = explode("#", $dir);
+		if(isSet($dir) && strstr($dir, "%23")!==false){
+			$parts = explode("%23", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
 		}

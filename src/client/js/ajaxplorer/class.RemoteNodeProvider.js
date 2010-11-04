@@ -45,8 +45,9 @@ Class.create("RemoteNodeProvider", {
 		conn.addParameter("get_action", "ls");
 		conn.addParameter("options", "al");
 		var path = node.getPath();
+		// Double encode # character
 		if(node.getMetadata().get("paginationData")){
-			path += "#" + node.getMetadata().get("paginationData").get("current");
+			path += "%23" + node.getMetadata().get("paginationData").get("current");
 		}
 		conn.addParameter("dir", path);
 		if(this.properties){
