@@ -55,12 +55,86 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>		
+		<action name="pass_change">
+			<gui text="194" title="194" src="yast_security.png" accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="true" ajxpWidgets="UserWidget::logging_string"></context>
+			</gui>
+			<processing>				
+				<clientCallback prepareModal="true" dialogOpenForm="pass_change_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+						$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
+						// Update pass_seed
+						var connexion = new Connexion();
+						connexion.addParameter("get_action", "get_seed");
+						connexion.onComplete = function(transport){
+							$('pass_seed').value = transport.responseText;
+						};
+						connexion.sendSync();			
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="false"><![CDATA[
+						var userOldPass = null;
+						var userPass = null;
+						var passSeed = null;
+						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
+						{
+							if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
+								alert(MessageHash[238]);
+								return false;
+							}
+							if($('user_change_ownpass_old').value == ''){
+								alert(MessageHash[239]);
+								return false;					
+							}
+							passSeed = $('pass_seed').value;
+							if(passSeed == '-1'){
+								userPass = $('user_change_ownpass1').value;
+								userOldPass = $('user_change_ownpass_old').value;
+							}else{
+								userPass = hex_md5($('user_change_ownpass1').value);
+								userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
+							}				
+							var onComplete = function(transport){								
+								if(userPass != null){
+									if(transport.responseText == 'PASS_ERROR'){
+										alert(MessageHash[240]);
+									}else if(transport.responseText == 'SUCCESS'){
+										ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
+										hideLightBox(true);
+									}
+								}else{
+									ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+									hideLightBox(true);
+								}
+							};
+							ajaxplorer.user.savePreferences(userOldPass, userPass, passSeed, onComplete);			
+						}
+					]]></dialogOnComplete>
+					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+				</clientCallback>
+				<clientForm id="pass_change_form"><![CDATA[
+					<div id="pass_change_form" action="pass_change_form" box_width="270">
+						<input type="hidden" name="pass_seed" id="pass_seed" value="">
+						<table cellpadding="2" cellspacing="0" border="0" style="font-size:11px;">
+							<tr>
+								<td align="right" style="width:100px; text-align:right;"><ajxp:message ajxp_message_id="237">AJXP_MESSAGE[237]</ajxp:message></td><td><input type="password" id="user_change_ownpass_old" value="" style="width:140px;"></td>
+							</tr>
+							<tr>
+								<td align="right" style="text-align:right;"><ajxp:message ajxp_message_id="198">AJXP_MESSAGE[198]</ajxp:message></td><td><input type="password" id="user_change_ownpass1" value="" style="width:140px;"></td>
+							</tr>
+							<tr>
+								<td align="right" style="text-align:right;"><ajxp:message ajxp_message_id="199">AJXP_MESSAGE[199]</ajxp:message></td><td><input type="password" id="user_change_ownpass2" value="" style="width:140px;"></td>
+							</tr>
+						</table>
+					</div>
+				]]></clientForm>				
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>				
+		</action>		
 		<action name="logout">
 			<gui text="164" title="169" src="decrypted.png"
 				accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="user">
+					contextMenu="false" actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
 				</context>
 			</gui>
 			<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>			
@@ -76,6 +150,6 @@
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
-		</action>
+		</action>		
 	</actions>
 </driver>
