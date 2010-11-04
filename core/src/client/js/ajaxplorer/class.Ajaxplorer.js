@@ -459,8 +459,8 @@ Class.create("Ajaxplorer", {
 		var activeCondition = XPathSelectSingleNode(xmlNode, 'processing/activeCondition');
 		if(activeCondition && activeCondition.firstChild){
 			try{
-			var active = eval(activeCondition.firstChild.nodeValue.strip());
-			if(!active) return false;
+				var func = new Function(activeCondition.firstChild.nodeValue.strip());
+				if(func() === false) return false;
 			}catch(e){}
 		}
 		if(xmlNode.nodeName == 'editor'){

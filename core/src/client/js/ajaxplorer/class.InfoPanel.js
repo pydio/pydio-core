@@ -243,7 +243,9 @@ Class.create("InfoPanel", AjxpPane, {
 	},
 		
 	addActions: function(selectionType){
-		var actions = ajaxplorer.actionBar.getInfoPanelActions();
+		//DEPRECATED
+		//var actions = ajaxplorer.actionBar.getInfoPanelActions();
+		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("InfoPanel", this.htmlElement.id);
 		if(!actions.length) return;
 		var actionString = '<div class="panelHeader infoPanelGroup">Actions</div><div class="infoPanelActions">';
 		var count = 0;

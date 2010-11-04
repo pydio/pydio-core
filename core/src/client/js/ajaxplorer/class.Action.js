@@ -50,6 +50,7 @@ Class.create("Action", {
 			subMenuUpdateImage:false,
 			subMenuUpdateTitle:false,
 			callbackCode:'',
+			callbackDialogNode:null,
 			callback:Prototype.emptyFunction,
 			prepareModal:false, 
 			listeners : [],
@@ -67,6 +68,7 @@ Class.create("Action", {
 			actionBar:false,
 			actionBarGroup:'default',
 			contextMenu:false,
+			ajxpWidgets:null,
 			infoPanel:false			
 			}, arguments[1] || { });
 			
@@ -139,6 +141,31 @@ Class.create("Action", {
 		if(arguments[0]) window.actionArguments = $A(arguments[0]);
 		if(this.options.callbackCode) {
 			this.options.callbackCode.evalScripts();
+		}else if(this.options.callbackDialogNode){
+			var node = this.options.callbackDialogNode;
+			var dialogFormId = node.getAttribute("dialogOpenForm");
+			var okButtonOnly = (node.getAttribute("dialogOkButtonOnly") === "true")?true:false ;
+			var skipButtons = (node.getAttribute("dialogSkipButtons") === "true")?true:false ;
+			
+			var onOpenFunc = null; var onCompleteFunc = null; var onCancelFunc = null;
+			var onOpenNode = XPathSelectSingleNode(node, "dialogOnOpen");
+			if(onOpenNode && onOpenNode.firstChild) var onOpenFunc = new Function("oForm", onOpenNode.firstChild.nodeValue);
+			var onCompleteNode = XPathSelectSingleNode(node, "dialogOnComplete");
+			if(onCompleteNode && onCompleteNode.firstChild) {
+				var completeCode = onCompleteNode.firstChild.nodeValue;
+				if(onCompleteNode.getAttribute("hideDialog") === "true"){
+					completeCode += "hideLightBox(true);";
+				}
+				var onCompleteFunc = new Function("oForm", completeCode);
+			}
+			var onCancelNode = XPathSelectSingleNode(node, "dialogOnCancel");
+			if(onCancelNode && onCancelNode.firstChild) var onCancelFunc = new Function("oForm", onCompleteNode.firstChild.nodeValue);
+			
+			this.options.callback = function(){
+				modal.showDialogForm('Dialog', dialogFormId, onOpenFunc, onCompleteFunc, onCancelFunc, okButtonOnly, skipButtons);
+			};
+			this.options.callback();
+			this.options.callbackDialogNode = null;
 		}else if(this.options.callback){
 			this.options.callback();
 		}
@@ -274,10 +301,14 @@ Class.create("Action", {
 						this.options.formId = processNode.getAttribute("id");
 						this.options.formCode = processNode.firstChild.nodeValue;
 						this.insertForm();
-					}else if(processNode.nodeName == "clientCallback" && processNode.firstChild){
-						this.options.callbackCode = '<script>'+processNode.firstChild.nodeValue+'</script>';
+					}else if(processNode.nodeName == "clientCallback"){						
 						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
 							this.options.prepareModal = true;						
+						}
+						if(processNode.getAttribute('dialogOpenForm')){
+							this.options.callbackDialogNode = processNode;
+						}else if(processNode.firstChild){
+							this.options.callbackCode = '<script>'+processNode.firstChild.nodeValue+'</script>';
 						}
 					}else if(processNode.nodeName == "clientListener" && processNode.firstChild){						
 						this.options.listeners[processNode.getAttribute('name')] = '<script>'+processNode.firstChild.nodeValue+'</script>';
@@ -296,6 +327,14 @@ Class.create("Action", {
 				for(var j=0; j<node.childNodes.length;j++){
 					if(node.childNodes[j].nodeName == "context"){
 						this.attributesToObject(this.context, node.childNodes[j]);
+						if(this.context.ajxpWidgets){
+							this.context.ajxpWidgets = $A(this.context.ajxpWidgets.split(','));
+						}else{
+							this.context.ajxpWidgets = $A();
+						}
+						// Backward compatibility
+						if(this.context.infoPanel) this.context.ajxpWidgets.push('InfoPanel');
+						if(this.context.actionBar) this.context.ajxpWidgets.push('ActionsToolbar');
 					}
 					else if(node.childNodes[j].nodeName == "selectionContext"){
 						this.attributesToObject(this.selectionContext, node.childNodes[j]);
