@@ -152,7 +152,7 @@ Class.create("LocationBar", {
 			var url = this.currentPath.value;
 			if(url == '') return false;	
 			var node = new AjxpNode(url, false);
-			var parts = url.split("#");
+			var parts = url.split("##");
 			if(parts.length == 2){
 				var data = new Hash();
 				data.set("new_page", parts[1]);
@@ -177,7 +177,7 @@ Class.create("LocationBar", {
 		}
 		var newPath = newNode.getPath();
 		if(newNode.getMetadata().get('paginationData')){
-			newPath += "#" + newNode.getMetadata().get('paginationData').get('current');
+			newPath += "##" + newNode.getMetadata().get('paginationData').get('current');
 		}
 		this.realPath = newPath;
 		this.currentLabel = this.realPath;
