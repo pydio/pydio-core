@@ -33,6 +33,10 @@
  * 
  *	ADVANCED : DO NOT CHANGE THESE VARIABLES BELOW
  */
+if(function_exists("date_default_timezone_set") and function_exists("date_default_timezone_get")){
+	@date_default_timezone_set(@date_default_timezone_get());
+}
+
 @error_reporting(E_ALL & ~E_NOTICE);
 
 define("AJXP_VERSION", "3.0.3");
