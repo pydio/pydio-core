@@ -517,10 +517,12 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				
 				$cursor = 0;
-				//$handle = opendir($path);
-				//if(!$handle) throw new AJXP_Exception("Cannot open dir ".$path);
-				if(!is_dir($path)) throw new AJXP_Exception("Cannot open dir ".$path);
-				$fullList = array("d" => array(), "z" => array(), "f" => array());
+				$handle = opendir($path);
+				if(!$handle) {
+					throw new AJXP_Exception("Cannot open dir ".$path);
+				}
+				closedir($handle);				
+				$fullList = array("d" => array(), "z" => array(), "f" => array());				
 				$nodes = scandir($path);
 				//while(strlen($nodeName = readdir($handle)) > 0){
 				foreach ($nodes as $nodeName){
