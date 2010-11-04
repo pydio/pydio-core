@@ -37,9 +37,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class AJXP_XMLWriter
 {
+	static $headerSent = false;
 	
 	function header($docNode="tree", $attributes=array())
 	{
+		if(self::$headerSent !== false && self::$headerSent == $docNode) return ;
 		header('Content-Type: text/xml; charset=UTF-8');
 		header('Cache-Control: no-cache');
 		print('<?xml version="1.0" encoding="UTF-8"?>');
@@ -49,6 +51,7 @@ class AJXP_XMLWriter
 				$attString.="$name=\"$value\" ";
 			}
 		}
+		self::$headerSent = $docNode;
 		print("<$docNode $attString>");
 		
 	}
@@ -76,6 +79,7 @@ class AJXP_XMLWriter
 		header('Content-Type: text/xml; charset=UTF-8');
 		header('Cache-Control: no-cache');
 		print('<?xml version="1.0" encoding="UTF-8"?>');
+		self::$headerSent = "tree";
 		AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData, false);
 	}
 	
@@ -104,7 +108,7 @@ class AJXP_XMLWriter
 		$message = "$message in $fichier (l.$ligne)";
 		AJXP_Logger::logAction("error", array("message" => $message));
 		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::sendMessage(null, $message, true);
+		AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
 		AJXP_XMLWriter::close();
 		exit(1);
 	}
