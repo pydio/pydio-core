@@ -99,7 +99,7 @@ Class.create("Modal", {
 
 		
 		if(fOnCancel){
-			this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){fOnCancel();hideLightBox();});
+			this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){fOnCancel(modal.getForm());hideLightBox();});
 		}
 		else{
 			this.dialogTitle.select('#modalCloseBtn')[0].observe("click", function(){hideLightBox();});
@@ -108,7 +108,7 @@ Class.create("Modal", {
 		if(fOnComplete)	{
 			newForm.onsubmit = function(){
 				try{
-					fOnComplete();
+					fOnComplete(modal.getForm());
 				}catch(e){
 					alert('Unexpected Error : please report!\n'+e);				
 				}
@@ -320,7 +320,7 @@ Class.create("Modal", {
 				className:"dialogButton"
 			});
 			if(fOnCancel){
-				caButton.observe("click",function(e){fOnCancel();hideLightBox();Event.stop(e);return false;});
+				caButton.observe("click",function(e){fOnCancel(modal.getForm());hideLightBox();Event.stop(e);return false;});
 			}
 			else{
 				caButton.observe("click",function(e){hideLightBox();Event.stop(e);return false;});
