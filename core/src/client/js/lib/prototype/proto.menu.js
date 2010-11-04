@@ -88,6 +88,9 @@ Proto.Menu = Class.create({
 	
 	observerFunction:function(e){
 		if (this.options.mouseClick == 'right' && Prototype.Browser.Opera && !e.ctrlKey) return;
+		if (this.options.mouseClick == 'left' && Event.findElement(e, '.protomenu_selector') && Event.findElement(e, '.protomenu_selector').hasClassName('disabled')){
+			return;
+		}
 		this.show(e);
 	},
 	
@@ -106,10 +109,12 @@ Proto.Menu = Class.create({
 	
 	removeElements:function(selectorOrObject){
 		if(typeof(selectorOrObject) == "string"){
+			$$(selectorOrObject).invoke('removeClassName', 'protomenu_selector');
 			$$(selectorOrObject).invoke('stopObserving', 
 								this.eventToObserve,
 								this.observerFunction.bind(this));		
 		}else{
+			$(selectorOrObject).removeClassName('protomenu_selector');
 			$(selectorOrObject).stopObserving(this.eventToObserve, this.observerFunction.bind(this));
 		}
 	},
@@ -117,12 +122,14 @@ Proto.Menu = Class.create({
 	addElements:function(selectorOrObject){
 		if(typeof(selectorOrObject) == "string"){
 			$$(selectorOrObject).invoke('observe', this.eventToObserve, this.observerFunction.bind(this));		
+			$$(selectorOrObject).invoke('addClassName', 'protomenu_selector');
 			if(this.eventToObserve == "mouseover"){
 					$$(selectorOrObject).invoke('observe', 'mouseover', this.mouseoverFunction.bind(this));
 					$$(selectorOrObject).invoke('observe', 'mouseout', this.mouseoutFunction.bind(this));
 			}			
 		}else{
 			$(selectorOrObject).observe(this.eventToObserve, this.observerFunction.bind(this));
+			$(selectorOrObject).addClassName('protomenu_selector');
 			if(this.eventToObserve == "mouseover"){
 				$(selectorOrObject).observe("mouseover", this.mouseoverFunction.bind(this) );
 				$(selectorOrObject).observe("mouseout", this.mouseoutFunction.bind(this));
@@ -306,9 +313,13 @@ Proto.Menu = Class.create({
 		var anchorPosition = Position.cumulativeOffset($(this.options.anchor));
 		var anchorScroll = this.options.anchor.cumulativeScrollOffset();
 		
-		if(this.options.position == 'bottom'){
+		if(this.options.position == 'bottom' || this.options.position == 'bottom right'){
 			var topPos = anchorPosition[1] + $(this.options.anchor).getHeight() + this.options.topOffset - anchorScroll[1];
 			var leftPos = anchorPosition[0] + this.options.leftOffset - anchorScroll[0];
+			if(this.options.position == 'bottom right'){
+				leftPos = anchorPosition[0] + $(this.options.anchor).getWidth() + this.options.leftOffset - anchorScroll[0];
+				leftPos -= this.container.getWidth();
+			}
 		}else if(this.options.position == 'right'){
 			var vpDim = document.viewport.getDimensions();
 			var topPos = anchorPosition[1] + this.options.topOffset - anchorScroll[1];
