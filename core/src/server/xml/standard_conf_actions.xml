@@ -14,28 +14,50 @@
 		<action name="save_user_pref">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
-				<clientForm id="user_pref_form"><![CDATA[
-					<div id="user_pref_form" action="user_pref" box_width="230">
-						<fieldset><legend><img src="AJXP_THEME_FOLDER/images/actions/16/flag.png" align="absmiddle" border="0" width="16" height="16"> <ajxp:message ajxp_message_id="190">AJXP_MESSAGE[190]</ajxp:message></legend>
-							<select id="language_selector"></select>
-						</fieldset>
-						<fieldset id="user_pref_change_password"><legend><img src="AJXP_THEME_FOLDER/images/actions/16/yast_security.png" align="absmiddle" border="0" width="16" height="16"> <ajxp:message ajxp_message_id="194">AJXP_MESSAGE[194]</ajxp:message></legend>
-						<input type="hidden" name="pass_seed" id="pass_seed" value="">
-						<table cellpadding="2" cellspacing="0" border="0" style="font-size:11px;">
-							<tr>
-								<td align="right" style="width:90px; text-align:right;"><ajxp:message ajxp_message_id="237">AJXP_MESSAGE[237]</ajxp:message></td><td><input type="password" id="user_change_ownpass_old" value=""></td>
-							</tr>
-							<tr>
-								<td align="right" style="text-align:right;"><ajxp:message ajxp_message_id="198">AJXP_MESSAGE[198]</ajxp:message></td><td><input type="password" id="user_change_ownpass1" value=""></td>
-							</tr>
-							<tr>
-								<td align="right" style="text-align:right;"><ajxp:message ajxp_message_id="199">AJXP_MESSAGE[199]</ajxp:message></td><td><input type="password" id="user_change_ownpass2" value=""></td>
-							</tr>
-						</table>
-						</fieldset>
+			</processing>
+		</action>
+		<action name="switch_language">
+			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="default" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+			</gui>
+			<processing>				
+				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+						var userLang = ajaxplorer.user.getPreference("lang");
+						if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
+						var selector = $(oForm).select('select[id="language_selector"]')[0];
+						var languages = $H(window.ajxpBootstrap.parameters.get("availableLanguages"));
+						languages.each(function(pair){
+							var option = new Element('option', {value:pair.key,id:'lang_'+pair.key});
+							option.update(pair.value);
+							selector.insert(option);
+						});
+						selector.setValue(userLang);		
+						selector.observe("change", function(){
+							var value = selector.getValue();
+							ajaxplorer.user.setPreference("lang", selector.getValue());
+							ajaxplorer.user.savePreference("lang");
+						});
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="true"><![CDATA[
+						var oUser = ajaxplorer.user;
+						if(oUser.getPreference('lang') != null 
+							&& oUser.getPreference('lang') != "" 
+							&& oUser.getPreference('lang') != ajaxplorer.currentLanguage)
+						{
+							ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
+							ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+						}								
+					]]></dialogOnComplete>
+					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+				</clientCallback>
+				<clientForm id="switch_language_form"><![CDATA[
+					<div id="switch_language_form" action="switch_language_form" box_width="202">
+						<select id="language_selector"></select>
 					</div>
 				]]></clientForm>				
-			</processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>		
 		</action>
 	</actions>
 </driver>
