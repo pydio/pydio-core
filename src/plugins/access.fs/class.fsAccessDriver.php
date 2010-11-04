@@ -517,10 +517,13 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				
 				$cursor = 0;
-				$handle = opendir($path);
-				if(!$handle) throw new AJXP_Exception("Cannot open dir ".$path);
+				//$handle = opendir($path);
+				//if(!$handle) throw new AJXP_Exception("Cannot open dir ".$path);
+				if(!is_dir($path)) throw new AJXP_Exception("Cannot open dir ".$path);
 				$fullList = array("d" => array(), "z" => array(), "f" => array());
-				while(strlen($nodeName = readdir($handle)) > 0){
+				$nodes = scandir($path);
+				//while(strlen($nodeName = readdir($handle)) > 0){
+				foreach ($nodes as $nodeName){
 					if($nodeName == "." || $nodeName == "..") continue;
 					$isLeaf = (is_file($path."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
 					if(!$this->filterNodeName($path, $nodeName, $isLeaf, $lsOptions)){
@@ -603,12 +606,14 @@ class fsAccessDriver extends AbstractAccessDriver
 					);
 					$fullList[$nodeType][$nodeName] = $renderNodeData;
 					$cursor ++;
-				}
+				}				
+				/*
 				closedir($handle);
 				foreach ($fullList as $key => $list){
 					uksort($list, 'strnatcasecmp');
 					$fullList[$key] = $list;
 				}
+				*/
 				$allNodes = array_merge($fullList["d"], $fullList["z"], $fullList["f"]);				
 				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["d"]);
 				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["z"]);
@@ -1060,9 +1065,11 @@ class fsAccessDriver extends AbstractAccessDriver
 			$dirMode = octdec(ltrim($chmodValue, "0"));
 			if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
 			if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
-			if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory			
+			if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
 		}
+		$old = umask(0);
 		mkdir($this->urlBase."$crtDir/$newDirName", $dirMode);
+		umask($old);
 		return null;		
 	}
 	
