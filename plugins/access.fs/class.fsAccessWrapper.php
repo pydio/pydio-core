@@ -74,6 +74,9 @@ class fsAccessWrapper implements AjxpWrapper {
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false){
     	$url = parse_url($path);
     	$repoId = $url["host"];
+    	if(isSet($url["fragment"]) && strlen($url["fragment"]) > 0){
+    		$url["path"] .= "#".$url["fragment"];
+    	}
     	$repoObject = ConfService::getRepositoryById($repoId);
     	if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
     	$split = UserSelection::detectZip($url["path"]);
@@ -154,7 +157,7 @@ class fsAccessWrapper implements AjxpWrapper {
 				self::$currentListingIndex = 0;
 				return -1;
 		   	}
-		}else{
+		}else{			
 			return realpath($repoObject->getOption("PATH")).$url["path"];
 		}    	
     }
