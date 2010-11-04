@@ -185,6 +185,15 @@ $AJXP_JS_DEBUG = false;
 $AJXP_SERVER_DEBUG = false;
 
 /*********************************************/
+/* SESSION CREDENTIALS
+/* If set to true, user credentials (username and password) are saved in
+/* session to be later used. This can be used by FTP repositories to login
+/* using username and password from axajplorer's login, very helpful when
+/* FTP uses same ldap authentication as ajaxplorer.
+/*********************************************/
+$AJXP_SESSION_SET_CREDENTIALS = false;
+
+/*********************************************/
 /*	GLOBAL UPLOAD CONFIG
 /*********************************************/
 // Maximum number of files for each upload. Leave to 0 for no limit.

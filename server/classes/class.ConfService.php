@@ -61,6 +61,7 @@ class ConfService
 		$this->configs["MAX_CHAR"] = $max_caracteres;
 		$this->configs["JS_DEBUG"] = $AJXP_JS_DEBUG;
 		$this->configs["SERVER_DEBUG"] = $AJXP_SERVER_DEBUG OR false;
+		$this->configs["SESSION_SET_CREDENTIALS"] = $AJXP_SESSION_SET_CREDENTIALS OR false;
 		$this->configs["UPLOAD_MAX_NUMBER"] = $upload_max_number;
 		$this->configs["UPLOAD_ENABLE_FLASH"] = $upload_enable_flash;
 		$this->configs["UPLOAD_MAX_FILE"] = AJXP_Utils::convertBytes($upload_max_size_per_file);
