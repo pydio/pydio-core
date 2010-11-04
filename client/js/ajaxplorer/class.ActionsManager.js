@@ -147,6 +147,15 @@ Class.create("ActionsManager", {
 		return actions;
 	},
 	
+	getActionsForAjxpWidget:function(ajxpClassName, widgetId){
+		var actions = $A([]);
+		this.actions.each(function(pair){
+			var action = pair.value;
+			if(action.context.ajxpWidgets && (action.context.ajxpWidgets.include(ajxpClassName+'::'+widgetId)||action.context.ajxpWidgets.include(ajxpClassName)) && !action.deny) actions.push(action);
+		});
+		return actions;		
+	},
+	
 	fireDefaultAction: function(defaultName){
 		var actionName = this.defaultActions.get(defaultName); 
 		if(actionName != null){
