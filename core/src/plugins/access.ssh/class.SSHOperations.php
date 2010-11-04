@@ -111,7 +111,7 @@ class SSHOperations
    /** Helper function to fetch the content of a stream */
    function streamGetContents($stream, $maxLength = -1, $offset = 0)
    {
-       if (function_exists(stream_get_contents)) return stream_get_contents($stream, $maxLength, $offset);
+       if (function_exists('stream_get_contents')) return stream_get_contents($stream, $maxLength, $offset);
        // Else, first get all the bytes up to the given offset
        @fread($stream, $offset);
        // Then get the content
@@ -126,7 +126,7 @@ class SSHOperations
    /** Helper function to copy the content of a stream to another stream */
    function streamCopyTo($stream, $out, $maxLength = -1, $offset = 0)
    {
-       if (function_exists(stream_copy_to_stream)) return stream_copy_to_stream($stream, $out, $maxLength, $offset);
+       if (function_exists('stream_copy_to_stream')) return stream_copy_to_stream($stream, $out, $maxLength, $offset);
        // Else, first get all the bytes up to the given offset
        @fread($stream, $offset);
        // Then get the content
