@@ -46,21 +46,13 @@
 					if(uploaders.length){
 						var uploader = uploaders[0];
 						if(uploader.dialogOnOpen){							
-							eval(uploader.dialogOnOpen); 
-							if(tmpFunction){
-								uploader.resourcesManager.load();
-								var dialogOnOpen = tmpFunction;
-							}
+							uploader.resourcesManager.load();
+							var dialogOnOpen = new Function("oForm", uploader.dialogOnOpen);
 						}
 						if(uploader.dialogOnComplete){							
-							var tmpFunction = null;
-							eval(uploader.dialogOnComplete); 
-							if(tmpFunction){
-								uploader.resourcesManager.load();
-								var dialogOnComplete = tmpFunction;
-							}
-						}
-						
+							uploader.resourcesManager.load();
+							var dialogOnComplete = new Function("oForm", uploader.dialogOnComplete);
+						}						
 						modal.showDialogForm('Upload', uploader.formId, dialogOnOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
