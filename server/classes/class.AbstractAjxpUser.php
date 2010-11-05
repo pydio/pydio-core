@@ -116,7 +116,7 @@ class AbstractAjxpUser
 	
 	function canWrite($rootDirId){
 		$right = $this->getRight($rootDirId);
-		if($right == "rw") return true;
+		if($right == "rw" || $right == "w") return true;
 		return false;
 	}
 	
@@ -143,7 +143,7 @@ class AbstractAjxpUser
 		$repositoryObject = ConfService::getRepositoryById($repositoryId);
 		if($repositoryObject == null) return false;
 		if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
-		return ($this->canRead($repositoryId)) ;
+		return ($this->canRead($repositoryId) || $this->canWrite($repositoryId)) ;
 	}
 	
 	function getRight($rootDirId){

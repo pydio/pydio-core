@@ -194,7 +194,7 @@
 					}					
 					]]></clientCallback>
 				<clientForm id="edit_config_box"><![CDATA[
-					<div id="edit_config_box" action="edit_user" box_width="350">
+					<div id="edit_config_box" action="edit_user" box_width="420">
 						<fieldset id="rights_pane">
 							<legend ajxp_message_id="ajxp_conf.25">AJXP_MESSAGE[ajxp_conf.25]</legend>
 							<div style="max-height:140px;overflow:auto;_height:140px;">

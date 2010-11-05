@@ -39,7 +39,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put" inZip="false">
 				</context></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");

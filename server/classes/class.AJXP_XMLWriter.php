@@ -304,7 +304,7 @@ class AJXP_XMLWriter
 			if($rootDirObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
 				continue;
 			}
-			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $details) {
+			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $loggedUser->canWrite($rootDirIndex) || $details) {
 				// Do not display standard repositories even in details mode for "sub"users
 				if($loggedUser != null && $loggedUser->hasParent() && !$loggedUser->canRead($rootDirIndex)) continue;
 				// Do not display shared repositories otherwise.
