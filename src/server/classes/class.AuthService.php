@@ -245,7 +245,7 @@ class AuthService
 		$repoList = ConfService::getRootDirsList();
 		foreach ($repoList as $rootDirIndex => $rootDirObject)
 		{			
-			if($loggedUser->canRead($rootDirIndex."")) {
+			if($loggedUser->canRead($rootDirIndex."") || $loggedUser->canWrite($rootDirIndex."")) {
 				// Warning : do not grant access to admin repository to a non admin, or there will be 
 				// an "Empty Repository Object" error.
 				if($rootDirObject->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()){
