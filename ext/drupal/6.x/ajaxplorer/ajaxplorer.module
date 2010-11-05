@@ -21,7 +21,7 @@ function ajaxplorer_user($op, &$edit, $account, $category = null){
  	$params = array(
         	"ajxp_install_path" => variable_get('ajaxplorer_install_path', ""),
         	"ajxp_secret_key" => variable_get('ajaxplorer_secret_key', ""),
-        	"ajxp_auto_create" => (variable_get('ajaxplorer_auto_create', "true") == "true"?true:false)
+			"ajxp_auto_create" => (variable_get('ajaxplorer_auto_create', "0") == "0"?true:false)
     );	    
 	$drupHandler = new DrupalAjxp($params);	
 	if(!$drupHandler->glueCodeFound) return ;
