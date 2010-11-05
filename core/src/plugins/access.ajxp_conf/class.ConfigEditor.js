@@ -82,7 +82,8 @@ ConfigEditor = Class.create({
 			//if(accessType == "ajxp_shared") continue;
 			
 			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'}).setStyle({width:'25px'});
-			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'}).setStyle({width:'25px'});						
+			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'}).setStyle({width:'25px'});
+			
 			readBox.observe('click', this.changeUserRight.bind(this));
 			writeBox.observe('click', this.changeUserRight.bind(this));
 			
@@ -209,7 +210,8 @@ ConfigEditor = Class.create({
 		if(rightName == 'read') 
 		{
 			$('chck_'+repositoryId+'_write').disabled = true;
-			rightString = (newState?'r':'');
+			var wState = $('chck_'+repositoryId+'_write').checked;
+			rightString = (newState?(wState?'rw':'r'):(wState?'w':''));
 		}
 		else 
 		{

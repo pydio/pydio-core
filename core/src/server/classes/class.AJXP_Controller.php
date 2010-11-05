@@ -86,6 +86,12 @@ class AJXP_Controller{
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "read") && 
 				($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRootDirIndex().""))){
 					AJXP_XMLWriter::header();
+					if($actionName == "ls" & $loggedUser!=null 
+						&& $loggedUser->canWrite(ConfService::getCurrentRootDirIndex()."")){
+						// Special case of "write only" right : return empty listing, no auth error.
+						AJXP_XMLWriter::close();
+						exit(1);					
+					}
 					AJXP_XMLWriter::sendMessage(null, $mess[208]);
 					AJXP_XMLWriter::requireAuth();
 					AJXP_XMLWriter::close();
