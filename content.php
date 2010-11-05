@@ -40,6 +40,7 @@ require_once("server/classes/class.AJXP_Exception.php");
 require_once("server/classes/class.AJXP_Plugin.php");
 require_once("server/classes/class.AJXP_PluginsService.php");
 require_once("server/classes/class.AbstractAccessDriver.php");
+require_once("server/classes/class.AjxpRole.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.UserSelection.php");
@@ -85,6 +86,7 @@ if(AuthService::usersEnabled())
 	{
 		AuthService::disconnect();		
 		$loggingResult = 2;
+		session_destroy();
 	}
     if(isSet($_GET["get_action"]) && $_GET["get_action"] == "back")
     {
@@ -104,6 +106,9 @@ if(AuthService::usersEnabled())
 			$rememberLogin = $userId;
 			$loggedUser = AuthService::getLoggedUser();
 			$rememberPass =  $loggedUser->getCookieString();
+		}
+		if($loggingResult == 1){
+			session_regenerate_id(true);
 		}
 	}
 	else 

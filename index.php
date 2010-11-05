@@ -37,6 +37,7 @@ require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.Repository.php");
+require_once("server/classes/class.AjxpRole.php");
 require_once("server/classes/class.ConfService.php");
 require_once("server/classes/class.AuthService.php");
 require_once("server/classes/class.AJXP_Logger.php");

@@ -40,6 +40,7 @@ class AbstractAjxpUser
 	var $id;
 	var $hasAdmin = false;
 	var $rights;
+	var $roles;
 	var $prefs;
 	var $bookmarks;
 	var $version;
@@ -88,6 +89,22 @@ class AbstractAjxpUser
 		$this->version = $v;
 	}
 	
+	function addRole($roleId){
+		if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
+		$this->rights["ajxp.roles"][$roleId] = true;
+	}
+	
+	function removeRole($roleId){
+		if(isSet($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])){
+			unset($this->rights["ajxp.roles"][$roleId]);
+		}
+	}
+	
+	function getRoles(){
+		if(isSet($this->rights["ajxp.roles"])) return $this->rights["ajxp.roles"];
+		else return array();
+	}
+	
 	function isAdmin(){
 		return $this->hasAdmin; 
 	}
@@ -121,10 +138,18 @@ class AbstractAjxpUser
 	}
 	
 	function getSpecificActionsRights($rootDirId){
+		$result = array();
 		if(isSet($this->rights["ajxp.actions"]) && isSet($this->rights["ajxp.actions"][$rootDirId])){
-			return $this->rights["ajxp.actions"][$rootDirId];
+			$result = $this->rights["ajxp.actions"][$rootDirId];
 		}
-		return array();
+		// Check in roles if any
+		if(isSet($this->roles)){
+			foreach ($this->roles as $role){
+				$rights = $role->getSpecificActionsRights($rootDirId);
+				if(is_array($rights) && count($rights)) $result = array_merge($result, $rights);
+			}
+		}		
+		return $result;
 	}
 	
 	function setSpecificActionRight($rootDirId, $actionName, $allowed){		
@@ -147,7 +172,14 @@ class AbstractAjxpUser
 	}
 	
 	function getRight($rootDirId){
-		if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
+		if(isSet($this->rights[$rootDirId]) && $this->rights[$rootDirId] != "") return $this->rights[$rootDirId];
+		// Check in roles if any
+		if(isSet($this->roles)){			
+			foreach ($this->roles as $role){
+				$right = $role->getRight($rootDirId);
+				if($right != "") return $right;
+			}
+		}
 		return "";
 	}
 	

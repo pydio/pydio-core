@@ -149,21 +149,26 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var userSelection =  ajaxplorer.getUserSelection();
 					var node = userSelection.getUniqueNode();
 					var meta = node.getMetadata();
-					if(meta.get("ajxp_mime") == "user" || meta.get("ajxp_mime") == "user_editable"){
+					var mime = meta.get("ajxp_mime");
+					if(mime == "user" || mime == "user_editable" || mime == "role"){
 						var loadFunc = function(oForm){
 							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 							if(!ajaxplorer.actionBar.configEditor){
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
-							ajaxplorer.actionBar.configEditor.loadUser(meta.get("text"));
+							if(mime == "role"){
+								ajaxplorer.actionBar.configEditor.loadRole(meta.get("text"));
+							}else{
+								ajaxplorer.actionBar.configEditor.loadUser(meta.get("text"));
+							}
 						};
 						modal.showDialogForm('Edit Online', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
 					}else{
@@ -195,32 +200,44 @@
 					]]></clientCallback>
 				<clientForm id="edit_config_box"><![CDATA[
 					<div id="edit_config_box" action="edit_user" box_width="420">
-						<fieldset id="rights_pane">
-							<legend ajxp_message_id="ajxp_conf.25">AJXP_MESSAGE[ajxp_conf.25]</legend>
-							<div style="max-height:140px;overflow:auto;_height:140px;">
-							<table class="repository" width="100%" cellspacing="0">
-								<tbody>
-								<tr id="loading_row"><td><span ajxp_message_id="ajxp_conf.33">AJXP_MESSAGE[ajxp_conf.33]</span></td></tr>
-								</tbody>
-							</table>
-							</div>
-						</fieldset>
-						<fieldset id="password_pane" style="float:left;margin-right:6px;width:198px;height:70px;">
-							<legend ajxp_message_id="ajxp_conf.26">AJXP_MESSAGE[ajxp_conf.26]</legend>
-							<input style="float:right;margin-top:18px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png"/>
-							<div style="width:168px;">
-								<div class="SF_element">
-									<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] :</div><input type="password" id="new_pass" class="SF_input"/>
+						<fieldset>							
+							<div id="user_acl">
+								<div id="roles_pane">									
+									<div class="dialogLegend" ajxp_message_id="ajxp_conf.72">AJXP_MESSAGE[ajxp_conf.72]</div>
+									<div>
+										<div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.71">AJXP_MESSAGE[ajxp_conf.71]</span> : <br><div id="available_roles"></div></div>
+										<div style="width:10%;float:left;text-align:center;vertical-align:middle;"><br>&gt;&gt;<br>&lt;&lt;</div>
+										<div style="width:44%;float:right;"><span ajxp_message_id="ajxp_conf.70">AJXP_MESSAGE[ajxp_conf.70]</span> : <br><div id="user_roles"></div></div>
+									</div>
 								</div>
-								<div class="SF_element">
-									<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] :</div><input type="password" id="new_pass_confirm"  class="SF_input"/>
+								<div class="dialogLegend" style="clear:left;padding-top:15px;">Finetune the access for this user</div>
+								<div id="rights_pane">
+									<table class="repository" width="100%" cellspacing="0">
+										<tbody>
+										<tr id="loading_row"><td><span ajxp_message_id="ajxp_conf.33">AJXP_MESSAGE[ajxp_conf.33]</span></td></tr>
+										</tbody>
+									</table>
 								</div>
 							</div>
+							<div id="user_personal" style="display:none;">
+								<fieldset id="password_pane" style="float:left;margin-right:6px;width:198px;height:70px;">
+									<legend ajxp_message_id="ajxp_conf.26">AJXP_MESSAGE[ajxp_conf.26]</legend>
+									<input style="float:right;margin-top:18px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png"/>
+									<div style="width:168px;">
+										<div class="SF_element">
+											<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] :</div><input type="password" id="new_pass" class="SF_input"/>
+										</div>
+										<div class="SF_element">
+											<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] :</div><input type="password" id="new_pass_confirm"  class="SF_input"/>
+										</div>
+									</div>
+								</fieldset>
+								<fieldset id="admin_right_pane" style="height:70px;"><legend ajxp_message_id="ajxp_conf.27">AJXP_MESSAGE[ajxp_conf.27]</legend>
+								<span ajxp_message_id="ajpx_conf.28">AJXP_MESSAGE[ajxp_conf.28]</span> <input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;" />
+								</fieldset>
+							</div>
 						</fieldset>
-						<fieldset id="admin_right_pane" style="height:70px;"><legend ajxp_message_id="ajxp_conf.27">AJXP_MESSAGE[ajxp_conf.27]</legend>
-						<span ajxp_message_id="ajpx_conf.28">AJXP_MESSAGE[ajxp_conf.28]</span> <input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;" />
-						</fieldset>
-					</div>
+					</div>					
 					<div id="edit_repo_box" action="edit_repository" box_width="320">
 						<fieldset id="options_pane">
 							<span ajxp_message_id="ajxp_conf.33">AJXP_MESSAGE[ajxp_conf.33]</span>
@@ -230,6 +247,33 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>			
+		<action name="create_role">
+			<gui text="ajxp_conf.75" title="ajxp_conf.75" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					modal.showDialogForm('Create Role', 'create_role_box');
+					]]></clientCallback>
+				<clientForm id="create_role_box"><![CDATA[
+					<div id="create_role_box" action="create_role" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">AJXP_MESSAGE[ajxp_conf.76] : </div><input name="role_id" type="text" class="dialogFocus SF_input"/>
+						</div>
+					</div>				
+				]]></clientForm>		
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="delete_role">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="edit_meta_source">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -251,7 +295,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file" image="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -262,6 +306,10 @@
 					if(meta.get("ajxp_mime") == "user_editable"){
 						deleteMessage = MessageHash['ajxp_conf.34'];
 						fieldName = "user_id";
+						fieldValue = meta.get("text");
+					}else if(meta.get("ajxp_mime") == "role"){
+						deleteMessage = MessageHash['ajxp_shared.11'];
+						fieldName = "role_id";
 						fieldValue = meta.get("text");
 					}else if(meta.get("ajxp_mime") == "shared_file"){
 						deleteMessage = MessageHash['ajxp_shared.11'];

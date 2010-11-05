@@ -46,7 +46,14 @@ ConfigEditor = Class.create({
 	/*************************************/
 	/*       USERS FUNCTIONS             */
 	/*************************************/			
-	loadUser: function(userId){
+	loadUser: function(userId, reload){
+
+		if(!reload){
+			var fieldset = this.form.down('fieldset');
+			var legend = this.createTabbedFieldset('Access Control', fieldset.down('#user_acl'), 'Personal Data', fieldset.down('#user_personal'));
+			fieldset.insert({top:legend});		
+		}
+		this.roleId = null;
 		this.userId = userId;
 		var params = new Hash();
 		params.set("get_action", "edit");
@@ -55,6 +62,9 @@ ConfigEditor = Class.create({
 		var connexion = new Connexion();
 		connexion.setParameters(params);
 		connexion.onComplete = function(transport){
+			if(reload){
+				this.clearUserForm();
+			}
 			this.feedUserForm(transport.responseXML);			
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
@@ -63,6 +73,22 @@ ConfigEditor = Class.create({
 		connexion.sendAsync();		
 	},	
 	
+	clearUserForm : function(){
+		var rolesPane = this.form.down('[id="roles_pane"]');
+		var availSelect = rolesPane.down('div#available_roles');
+		var userSelect = rolesPane.down('div#user_roles');
+		Droppables.remove(availSelect);
+		Droppables.remove(userSelect);
+		if(this.draggables) this.draggables.invoke('destroy');
+		availSelect.childElements().invoke("remove");
+		userSelect.childElements().invoke("remove");	
+		
+		var rightsPane = this.form.down('#rights_pane');
+		rightsPane.setStyle({height: rightsPane.getHeight() + 'px'});
+		rightsPane.select('tr').invoke("remove");
+		rightsPane.down('tBody').insert('<tr id="loading_row"><td colspan="2">Reloading...</td></tr>');
+	},
+	
 	feedUserForm : function(xmlData){
 				
 		var editPass = XPathGetSingleNodeText(xmlData, "admin_data/edit_options/@edit_pass")=="1";
@@ -70,68 +96,74 @@ ConfigEditor = Class.create({
 		var editDelete = XPathGetSingleNodeText(xmlData, "admin_data/edit_options/@edit_delete")=="1";
 		var adminStatus = (XPathGetSingleNodeText(xmlData, "admin_data/user/special_rights/@is_admin") == "1");		
 						
-		var rightsPane = this.form.select('[id="rights_pane"]')[0];
-		var rightsTable = rightsPane.select('tbody')[0];		
-		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
-        repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
-		for(var i=0;i<repositories.length;i++){
-			var repoNode = repositories[i];
-			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
-			var repoId = XPathGetSingleNodeText(repoNode, "@id");
-			var accessType = XPathGetSingleNodeText(repoNode, "@access_type");
-			//if(accessType == "ajxp_shared") continue;
-			
-			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'}).setStyle({width:'25px'});
-			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'}).setStyle({width:'25px'});
-			
-			readBox.observe('click', this.changeUserRight.bind(this));
-			writeBox.observe('click', this.changeUserRight.bind(this));
-			
-			var rightsCell = new Element('td', {width:'55%', align:'right'});
-			rightsCell.insert(MessageHash['ajxp_conf.29'] + ' ');
-			rightsCell.insert(readBox);
-			rightsCell.insert(MessageHash['ajxp_conf.30'] + ' ');
-			rightsCell.insert(writeBox);
-			var tr = new Element('tr');
-			var titleCell = new Element('td', {width:'45%'}).update(repoLabel);
-			tr.insert(titleCell);
-			tr.insert(rightsCell);
-			rightsTable.insert({bottom:tr});			
-
-			// FOR IE, set checkboxes state AFTER dom insertion.
-			readBox.checked = (XPathGetSingleNodeText(repoNode, "@r")=='1');
-			writeBox.checked = (XPathGetSingleNodeText(repoNode, "@w")=='1');			
-			
-			var walletParams = XPathSelectNodes(xmlData, "admin_data/drivers/ajxpdriver[@name='"+accessType+"']/user_param");				
-			var walletValues = XPathSelectNodes(xmlData, "admin_data/user_wallet/wallet_data[@repo_id='"+repoId+"']");			
-			if(walletParams.length){
-				var walletCell = new Element("td", {colspan:"2"});
-				var newRow = new Element("tr");
-				newRow.insert(walletCell);
-				rightsTable.insert({bottom:newRow});				
-				var walletPane = new Element('div', {className:"wallet_pane", id:"wallet_pane_"+repoId});
-				walletCell.insert({bottom:walletPane});				
-				this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
-				walletPane.hide();
-				var image = new Element("img", {src:ajxpResourcesFolder+"/images/0.gif"}).setStyle({marginRight:3});
-				image.setStyle({cursor:'pointer'});
-				image.setAttribute("pane_id", repoId);
-				image.observe("click", function(event){
-					var img = Event.element(event);
-					var pane = $('wallet_pane_'+img.getAttribute("pane_id"));
-					pane.toggle();
-					img.src = (pane.visible()?ajxpResourcesFolder+"/images/1.gif":ajxpResourcesFolder+"/images/0.gif");
-				});
-				titleCell.insert({top:image});
-			}else{
-				//titleCell.setStyle({paddingLeft:12});
-				var image = new Element("img", {src:ajxpResourcesFolder+"/images/2.gif"}).setStyle({marginRight:3});
-				titleCell.insert({top:image});
+		
+		var rolesPane = this.form.down('[id="roles_pane"]');
+		var availableRoles = XPathSelectNodes(xmlData, "admin_data/ajxp_roles/role");
+		var userRoles = XPathSelectNodes(xmlData, "admin_data/user/ajxp_roles/role");
+		var availSelect = rolesPane.down('div#available_roles');
+		var userSelect = rolesPane.down('div#user_roles');
+		var rolesId = $A();
+		userRoles.each(function(xmlElement){
+			var id = xmlElement.getAttribute('id');
+			var option = new Element('div', {id:id, className:'ajxp_role user_role'}).update(id);			
+			userSelect.insert(option);
+			rolesId.push(id);
+		});
+		availableRoles.each(function(xmlElement){
+			var id = xmlElement.getAttribute('id');
+			if(!rolesId.include(id)){
+				var option = new Element('div', {id:id, className:'ajxp_role available_role'}).update(id);
+				availSelect.insert(option);
 			}
-			
-		}
-			
-		rightsTable.select('[id="loading_row"]')[0].remove();		
+		});
+		this.draggables = $A();
+		rolesPane.select("div.ajxp_role").each(function(item){
+			var container = item.parentNode;
+			this.draggables.push(new Draggable(item, {
+				revert:true, 
+				ghosting:false, 
+				onStart:function(){
+					container.parentNode.insert(item);
+				},
+				onEnd : function(){
+					if(item.ajxp_dropped) return;
+					container.insert(item);
+				},
+				reverteffect:function(element){element.setStyle({top:0,left:0});}
+			}));
+		}.bind(this));
+		var dropFunc = function(dragged, dropped, event){
+			dragged.ajxp_dropped = true;
+			dropped.insert(dragged);
+			dragged.setStyle({top:0,left:0});
+			var action = "edit";
+			var sub_action;
+			if(dragged.hasClassName('user_role')){
+				dragged.removeClassName('user_role');
+				dragged.addClassName('available_role');
+				sub_action = "user_delete_role";
+			}else{
+				dragged.removeClassName('available_role');
+				dragged.addClassName('user_role');
+				sub_action = "user_add_role";
+			}
+			var conn = new Connexion();
+			conn.setParameters($H({get_action:"edit", sub_action:sub_action, user_id:this.userId, role_id:dragged.id}));
+			conn.onComplete = function(transport){
+				this.parseXmlMessage(transport.responseXML);
+				this.loadUser(this.userId, true);
+			}.bind(this);
+			conn.sendAsync();			
+		}.bind(this);
+		Droppables.add(availSelect, {accept:'user_role', onDrop:dropFunc, hoverclass:'roles_hover'});
+		Droppables.add(userSelect, {accept:'available_role', onDrop:dropFunc, hoverclass:'roles_hover'});
+		modal.setCloseAction(function(){
+			Droppables.remove(availSelect);
+			Droppables.remove(userSelect);
+			this.draggables.invoke('destroy');
+		}.bind(this));
+		
+		this.generateRightsTable(xmlData, true);
 				
 		var passwordPane = this.form.select('[id="password_pane"]')[0];
 		if(!editPass){
@@ -152,6 +184,76 @@ ConfigEditor = Class.create({
 		}		
 	},
 	
+	
+	generateRightsTable : function(xmlData, parseWalletData){
+		var rightsPane = this.form.select('[id="rights_pane"]')[0];
+		var rightsTable = rightsPane.select('tbody')[0];		
+		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
+        repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
+		for(var i=0;i<repositories.length;i++){
+			var repoNode = repositories[i];
+			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
+			var repoId = XPathGetSingleNodeText(repoNode, "@id");
+			var accessType = XPathGetSingleNodeText(repoNode, "@access_type");
+			//if(accessType == "ajxp_shared") continue;
+			
+			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'}).setStyle({width:'25px'});
+			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'}).setStyle({width:'25px'});
+			
+			readBox.observe('click', this.changeUserOrRoleRight.bind(this));
+			writeBox.observe('click', this.changeUserOrRoleRight.bind(this));
+			
+			var rightsCell = new Element('td', {width:'55%', align:'right'});
+			rightsCell.insert(MessageHash['ajxp_conf.29'] + ' ');
+			rightsCell.insert(readBox);
+			rightsCell.insert(MessageHash['ajxp_conf.30'] + ' ');
+			rightsCell.insert(writeBox);
+			var tr = new Element('tr');
+			var titleCell = new Element('td', {width:'45%'}).update(repoLabel);
+			tr.insert(titleCell);
+			tr.insert(rightsCell);
+			rightsTable.insert({bottom:tr});			
+
+			// FOR IE, set checkboxes state AFTER dom insertion.
+			readBox.checked = (XPathGetSingleNodeText(repoNode, "@r")=='1');
+			writeBox.checked = (XPathGetSingleNodeText(repoNode, "@w")=='1');			
+			
+			if(parseWalletData){
+				var walletParams = XPathSelectNodes(xmlData, "admin_data/drivers/ajxpdriver[@name='"+accessType+"']/user_param");				
+				var walletValues = XPathSelectNodes(xmlData, "admin_data/user_wallet/wallet_data[@repo_id='"+repoId+"']");			
+				if(walletParams.length){
+					var walletCell = new Element("td", {colspan:"2"});
+					var newRow = new Element("tr");
+					newRow.insert(walletCell);
+					rightsTable.insert({bottom:newRow});				
+					var walletPane = new Element('div', {className:"wallet_pane", id:"wallet_pane_"+repoId});
+					walletCell.insert({bottom:walletPane});				
+					this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
+					walletPane.hide();
+					var image = new Element("img", {src:ajxpResourcesFolder+"/images/0.gif"}).setStyle({marginRight:3});
+					image.setStyle({cursor:'pointer'});
+					image.setAttribute("pane_id", repoId);
+					image.observe("click", function(event){
+						var img = Event.element(event);
+						var pane = $('wallet_pane_'+img.getAttribute("pane_id"));
+						pane.toggle();
+						img.src = (pane.visible()?ajxpResourcesFolder+"/images/1.gif":ajxpResourcesFolder+"/images/0.gif");
+					});
+					titleCell.insert({top:image});
+				}else{
+					//titleCell.setStyle({paddingLeft:12});
+					var image = new Element("img", {src:ajxpResourcesFolder+"/images/2.gif"}).setStyle({marginRight:3});
+					titleCell.insert({top:image});
+				}
+			}else{
+				var image = new Element("img", {src:ajxpResourcesFolder+"/images/2.gif"}).setStyle({marginRight:3});
+				titleCell.insert({top:image});				
+			}
+			
+		}
+			
+		rightsTable.select('[id="loading_row"]')[0].remove();				
+	},
 	
 	addRepositoryUserParams : function(walletPane, repoId, walletParams, walletValues){
 		var repoParams = $A([]);
@@ -191,7 +293,7 @@ ConfigEditor = Class.create({
 	},
 	
 		
-	changeUserRight: function(event){	
+	changeUserOrRoleRight: function(event){	
 		var oChckBox = Event.element(event);
 		var parts = oChckBox.id.split('_');		
 		// Remove "chck" prefix (first part)
@@ -200,7 +302,6 @@ ConfigEditor = Class.create({
 		var rightName = parts.pop();
 		// Rebuild repository id (can contain underscore!)
 		var repositoryId = parts.join("_");
-		var userId = this.userId;
 		
 		var newState = oChckBox.checked;
 		oChckBox.checked = !oChckBox.checked;
@@ -220,10 +321,17 @@ ConfigEditor = Class.create({
 		}
 				
 		var parameters = new Hash();
-		parameters.set('user_id', userId);
+		var sub_action;
+		if(this.userId){
+			parameters.set('user_id', this.userId);
+			sub_action = 'update_user_right';
+		}else{
+			parameters.set('role_id', this.roleId);
+			sub_action = 'update_role_right';
+		}
 		parameters.set('repository_id', repositoryId);
 		parameters.set('right', rightString);
-		this.submitForm("edit_user", 'update_user_right', parameters, null);
+		this.submitForm("edit_user", sub_action, parameters, null);
 	},
 	
 	changeAdminRight: function(oChckBox){
@@ -331,6 +439,29 @@ ConfigEditor = Class.create({
 		
 	},
 		
+	/*************************************/
+	/* 		ROLES FUNCTIONS				 */
+	/*************************************/
+	loadRole : function(roleId){
+		this.userId = null;
+		this.roleId = roleId;
+		this.form.down('fieldset').insert({top:new Element('legend').update('Access Control for this Role')});
+		this.form.down('#roles_pane').hide();
+		var params = new Hash();
+		params.set("get_action", "edit");
+		params.set("sub_action", "edit_role");
+		params.set("role_id", roleId);
+		var connexion = new Connexion();
+		connexion.setParameters(params);
+		connexion.onComplete = function(transport){
+			this.generateRightsTable(transport.responseXML, false);
+			modal.refreshDialogPosition();
+			modal.refreshDialogAppearance();
+			ajaxplorer.blurAll();
+		}.bind(this);
+		connexion.sendAsync();				
+	},
+	
 
 	/*************************************/
 	/*       REPOSITORIES FUNCTIONS      */
@@ -465,17 +596,22 @@ ConfigEditor = Class.create({
 		var form = new Element('div', {className:'driver_form'});
 		var metaForm = new Element('div', {className:'driver_form', style:'display:none;'});
 		
+		var link1 = XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' '+ MessageHash['ajxp_conf.41'];
+		var link2 = MessageHash['ajxp_conf.10'];
+		
+		var legend = this.createTabbedFieldset(link1, form, link2, metaForm);
+		optionsPane.update(legend);
+		optionsPane.insert({bottom:form});
+		optionsPane.insert({bottom:metaForm});
+		
+		/*
 		var optLegend = new Element('a', {className:"active"}).update(XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' '+ MessageHash['ajxp_conf.41']);
 		var metaLegend = new Element('a').update(MessageHash['ajxp_conf.10']);
 		var legend = new Element('legend');
 		legend.insert(optLegend);
 		legend.insert(" | ");
 		legend.insert(metaLegend);
-		
-		optionsPane.update(legend);
-		optionsPane.insert({bottom:form});
-		optionsPane.insert({bottom:metaForm});
-		
+				
 		optLegend.observe("click", function(){
 			metaForm.hide();form.show();
 			optLegend.addClassName('active');
@@ -488,6 +624,7 @@ ConfigEditor = Class.create({
 			optLegend.removeClassName('active');
 			modal.refreshDialogAppearance();
 		});
+		*/
 				
 		var paramsValues = new Hash();
 		$A(repo.childNodes).each(function(child){
@@ -622,6 +759,29 @@ ConfigEditor = Class.create({
 		});
 		return driverHash;
 	},	
+	
+	createTabbedFieldset: function(link1, pane1, link2, pane2){
+		var legend1 = new Element('a', {className:"active"}).update(link1);
+		var legend2 = new Element('a').update(link2);
+		var legend = new Element('legend');
+		legend.insert(legend1);
+		legend.insert(" | ");
+		legend.insert(legend2);		
+		
+		legend1.observe("click", function(){
+			pane2.hide();pane1.show();
+			legend1.addClassName('active');
+			legend2.removeClassName('active');
+			modal.refreshDialogAppearance();
+		});
+		legend2.observe("click", function(){
+			pane1.hide();pane2.show();
+			legend2.addClassName('active');
+			legend1.removeClassName('active');
+			modal.refreshDialogAppearance();
+		});				
+		return legend;
+	},
 	
 	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled){
 		parametersDefinitions.each(function(param){		
