@@ -37,6 +37,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class AuthService
 {
+	static $roles;
+	
 	function usersEnabled()
 	{
 		return ENABLE_USERS;
@@ -386,6 +388,50 @@ class AuthService
 			$allUsers[$userId] = $confDriver->createUserObject($userId);
 		}
 		return $allUsers;
+	}
+		
+	/**
+	 * Get Role by Id
+	 *
+	 * @param string $roleId
+	 * @return AjxpRole
+	 */
+	function getRole($roleId){
+		$roles = self::getRolesList();
+		if(isSet($roles[$roleId])) return $roles[$roleId];
+		return false;
+	}
+	
+	/**
+	 * Create or update role
+	 *
+	 * @param AjxpRole $roleObject
+	 */
+	function updateRole($roleObject){
+		$roles = self::getRolesList();
+		$roles[$roleObject->getId()] = $roleObject;
+		self::saveRolesList($roles);
+	}
+	
+	function deleteRole($roleId){
+		$roles = self::getRolesList();
+		if(isSet($roles[$roleId])){
+			unset($roles[$roleId]);
+			self::saveRolesList($roles);
+		}
+	}
+	
+	function getRolesList(){
+		if(isSet(self::$roles)) return self::$roles;
+		$confDriver = ConfService::getConfStorageImpl();
+		self::$roles = $confDriver->listRoles();
+		return self::$roles;
+	}
+	
+	function saveRolesList($roles){
+		$confDriver = ConfService::getConfStorageImpl();
+		$confDriver->saveRoles($roles);
+		self::$roles = $roles;		
 	}
 	
 }

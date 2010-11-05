@@ -296,5 +296,10 @@ class sqlConfDriver extends AbstractConfDriver {
 	function getUserClassFileName(){
 		return INSTALL_PATH."/plugins/conf.sql/class.AJXP_User.php";
 	}	
+	
+	
+	function listRoles(){}
+	function saveRoles($roles){}
+	
 }
 ?>

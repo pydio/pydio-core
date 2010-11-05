@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class AbstractConfDriver extends AJXP_Plugin {
+abstract class AbstractConfDriver extends AJXP_Plugin {
 		
 	var $options;
 	var $driverType = "conf";
@@ -84,6 +84,13 @@ class AbstractConfDriver extends AJXP_Plugin {
 	function listUsers(){
 		
 	}
+	
+	/**
+	 * Must return an associative array of roleId => AjxpRole objects.
+	 *
+	 */
+	abstract function listRoles();
+	abstract function saveRoles($roles);
 	
 	
 	/**
