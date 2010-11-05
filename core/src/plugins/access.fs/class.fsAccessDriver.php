@@ -119,14 +119,18 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "download":
 				AJXP_Logger::logAction("Download", array("files"=>$selection));
-				@set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
-				@register_shutdown_function("restore_error_handler");
+				//@set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
+				//@register_shutdown_function("restore_error_handler");
 				$zip = false;
 				if($selection->isUnique()){
 					if(is_dir($this->urlBase.$selection->getUniqueFile())) {
 						$zip = true;
 						$base = basename($selection->getUniqueFile());
 						$dir .= "/".dirname($selection->getUniqueFile());
+					}else{
+						if(!file_exists($this->urlBase.$selection->getUniqueFile())){
+							throw new Exception("Cannot find file!");
+						}
 					}
 				}else{
 					$zip = true;
