@@ -40,11 +40,13 @@ class serialConfDriver extends AbstractConfDriver {
 		
 	var $repoSerialFile;
 	var $usersSerialDir;
+	var $rolesSerialFile;
 	
 	function init($options){
 		parent::init($options);
 		$this->repoSerialFile = $options["REPOSITORIES_FILEPATH"];
 		$this->usersSerialDir = $options["USERS_DIRPATH"];
+		$this->rolesSerialFile = $options["ROLES_FILEPATH"];
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
@@ -52,6 +54,15 @@ class serialConfDriver extends AbstractConfDriver {
 		return AJXP_Utils::loadSerialFile($this->repoSerialFile);
 		
 	}
+	
+	function listRoles(){
+		return AJXP_Utils::loadSerialFile($this->rolesSerialFile);
+	}
+	
+	function saveRoles($roles){
+		AJXP_Utils::saveSerialFile($this->rolesSerialFile, $roles);
+	}
+	
 	/**
 	 * Unique ID of the repositor
 	 *

@@ -259,6 +259,12 @@ class AJXP_XMLWriter
 			$buffer.="<user id=\"".$loggedUser->id."\">";
 			if(!$details){
 				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>";
+			}else{
+				$buffer .= "<ajxp_roles>";
+				foreach ($loggedUser->getRoles() as $roleId => $boolean){
+					if($boolean === true) $buffer.= "<role id=\"$roleId\"/>";
+				}
+				$buffer .= "</ajxp_roles>";
 			}
 			$buffer.= AJXP_XMLWriter::writeRepositoriesData($loggedUser, $details);
 			$buffer.="<preferences>";
@@ -323,6 +329,36 @@ class AJXP_XMLWriter
 				}else{
 					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				}
+			}
+		}
+		if(isSet($lastString)){
+			$st.= $lastString;
+		}
+		$st .= "</repositories>";
+		return $st;
+	}
+	
+	/**
+	 * Send repositories access for given role as XML
+	 *
+	 * @param AjxpRole $role
+	 * @return string
+	 */
+	function writeRoleRepositoriesData($role){
+		$st = "<repositories>";
+		foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
+		{		
+			$toLast = false;
+			if($repoObject->getAccessType() == "ajxp_conf") continue;
+			if($repoObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
+				continue;
+			}				
+			$rightString = " r=\"".($role->canRead($repoId)?"1":"0")."\" w=\"".($role->canWrite($repoId)?"1":"0")."\"";
+			$string = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label></repo>";
+			if($toLast){
+				$lastString = $string;
+			}else{
+				$st .= $string;
 			}
 		}
 		if(isSet($lastString)){

@@ -60,85 +60,7 @@ class AJXP_User extends AbstractAjxpUser
 	function storageExists(){		
 		return is_dir(str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $this->storage->getOption("USERS_DIRPATH")."/".$this->getId()));
 	}
-	
-	function getRight($rootDirId){
-		if(isSet($this->rights[$rootDirId])) return $this->rights[$rootDirId];
-		return "";
-	}
-	
-	function setRight($rootDirId, $rightString){
-		$this->rights[$rootDirId] = $rightString;
-	}
-	
-	function removeRights($rootDirId){
-		if(isSet($this->rights[$rootDirId])) unset($this->rights[$rootDirId]);
-	}
-		
-	function getPref($prefName){
-		if(isSet($this->prefs[$prefName])) return $this->prefs[$prefName];
-		return "";
-	}
-	
-	function setPref($prefName, $prefValue){
-		$this->prefs[$prefName] = $prefValue;
-	}
-		
-	function addBookmark($path, $title="", $repId = -1){
-		if(!isSet($this->bookmarks)) $this->bookmarks = array();
-		if($repId == -1) $repId = ConfService::getCurrentRootDirIndex();
-		if($title == "") $title = basename($path);
-		if(!isSet($this->bookmarks[$repId])) $this->bookmarks[$repId] = array();
-		foreach ($this->bookmarks[$repId] as $v)
-		{
-			$toCompare = "";
-			if(is_string($v)) $toCompare = $v;
-			else if(is_array($v)) $toCompare = $v["PATH"];
-			if($toCompare == trim($path)) return ; // RETURN IF ALREADY HERE!
-		}
-		$this->bookmarks[$repId][] = array("PATH"=>trim($path), "TITLE"=>$title);
-	}
-	
-	function removeBookmark($path){
-		$repId = ConfService::getCurrentRootDirIndex();
-		if(isSet($this->bookmarks) 
-			&& isSet($this->bookmarks[$repId])
-			&& is_array($this->bookmarks[$repId]))
-			{
-				foreach ($this->bookmarks[$repId] as $k => $v)
-				{
-					$toCompare = "";
-					if(is_string($v)) $toCompare = $v;
-					else if(is_array($v)) $toCompare = $v["PATH"];					
-					if($toCompare == trim($path)) unset($this->bookmarks[$repId][$k]);
-				}
-			} 		
-	}
-	
-	function renameBookmark($path, $title){
-		$repId = ConfService::getCurrentRootDirIndex();
-		if(isSet($this->bookmarks) 
-			&& isSet($this->bookmarks[$repId])
-			&& is_array($this->bookmarks[$repId]))
-			{
-				foreach ($this->bookmarks[$repId] as $k => $v)
-				{
-					$toCompare = "";
-					if(is_string($v)) $toCompare = $v;
-					else if(is_array($v)) $toCompare = $v["PATH"];					
-					if($toCompare == trim($path)){
-						 $this->bookmarks[$repId][$k] = array("PATH"=>trim($path), "TITLE"=>$title);
-					}
-				}
-			} 		
-	}
-	
-	function getBookmarks()
-	{
-		if(isSet($this->bookmarks) 
-			&& isSet($this->bookmarks[ConfService::getCurrentRootDirIndex()]))
-			return $this->bookmarks[ConfService::getCurrentRootDirIndex()];
-		return array();
-	}
+				
 	
 	function load(){
 		$serialDir = $this->storage->getOption("USERS_DIRPATH");
@@ -150,6 +72,18 @@ class AJXP_User extends AbstractAjxpUser
 		}
 		if(isSet($this->rights["ajxp.parent_user"])){
 			$this->setParent($this->rights["ajxp.parent_user"]);
+		}
+		// Load roles
+		if(isSet($this->rights["ajxp.roles"])){
+			//$allRoles = $this->storage->listRoles();
+			$allRoles = AuthService::getRolesList(); // Maintained as instance variable
+			foreach (array_keys($this->rights["ajxp.roles"]) as $roleId){
+				if(isSet($allRoles[$roleId])){
+					$this->roles[$roleId] = $allRoles[$roleId];
+				}else{
+					unset($this->rights["ajxp.roles"][$roleId]);
+				}
+			}
 		}
 	}
 	
