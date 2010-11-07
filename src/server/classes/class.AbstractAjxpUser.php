@@ -172,7 +172,10 @@ class AbstractAjxpUser
 	}
 	
 	function getRight($rootDirId){
-		if(isSet($this->rights[$rootDirId]) && $this->rights[$rootDirId] != "") return $this->rights[$rootDirId];
+		if(isSet($this->rights[$rootDirId]) && $this->rights[$rootDirId] != "") {
+			if($this->rights[$rootDirId] == "n") return ""; // Force overriding the role
+			return $this->rights[$rootDirId];
+		}
 		// Check in roles if any
 		if(isSet($this->roles)){			
 			foreach ($this->roles as $role){
@@ -184,6 +187,16 @@ class AbstractAjxpUser
 	}
 	
 	function setRight($rootDirId, $rightString){
+		// If a role already has this right, set user's right to ""
+		if(isSet($this->roles)){			
+			foreach ($this->roles as $role){
+				$right = $role->getRight($rootDirId);
+				if($right == $rightString){
+					$rightString = "";
+					break;
+				}
+			}
+		}
 		$this->rights[$rootDirId] = $rightString;
 	}
 	

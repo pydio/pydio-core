@@ -265,50 +265,69 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			break;
 		
 			case "user_add_role" : 
-			
-				if(!isSet($_GET["user_id"]) || !isSet($_GET["role_id"]) || !AuthService::userExists($_GET["user_id"])){
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-					AJXP_XMLWriter::close();
-					return ;
-				}
-				$confStorage = ConfService::getConfStorageImpl();		
-				$user = $confStorage->createUserObject($_GET["user_id"]);
-				$user->addRole($_GET["role_id"]);
-				$user->save();
-				$loggedUser = AuthService::getLoggedUser();
-				if($loggedUser->getId() == $user->getId()){
-					AuthService::updateUser($user);
-				}
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.73"].$_GET["user_id"], null);
-				AJXP_XMLWriter::close();
-				return ;
-				
-			break;
-			
 			case "user_delete_role":
-				
+			
 				if(!isSet($_GET["user_id"]) || !isSet($_GET["role_id"]) || !AuthService::userExists($_GET["user_id"])){
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-					AJXP_XMLWriter::close();
-					return ;
+					throw new Exception($mess["ajxp_conf.61"]);
 				}
-				$confStorage = ConfService::getConfStorageImpl();		
-				$user = $confStorage->createUserObject($_GET["user_id"]);
-				$user->removeRole($_GET["role_id"]);
-				$user->save();
-				$loggedUser = AuthService::getLoggedUser();
-				if($loggedUser->getId() == $user->getId()){
-					AuthService::updateUser($user);
-				}				
+				if($action == "user_add_role"){
+					$act = "add";
+					$messId = "73";
+				}else{
+					$act = "remove";
+					$messId = "74";
+				}
+				$this->updateUserRole($_GET["user_id"], $_GET["role_id"], $act);
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.74"].$_GET["user_id"], null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.".$messId].$_GET["user_id"], null);
 				AJXP_XMLWriter::close();
 				return ;
 				
 			break;
+			
+			case "batch_users_roles" : 
+				
+				$confStorage = ConfService::getConfStorageImpl();	
+				$selection = new UserSelection();
+				$selection->initFromHttpVars($httpVars);
+				$files = $selection->getFiles();
+				$detectedRoles = array();
+				
+				if(isSet($httpVars["role_id"]) && isset($httpVars["update_role_action"])){
+					$update = $httpVars["update_role_action"];
+					$roleId = $httpVars["role_id"];
+				}
+				foreach ($files as $file){
+					$userId = basename($file);
+					if(isSet($update)){
+						$userObject = $this->updateUserRole($userId, $roleId, $update);
+					}else{
+						$userObject = $confStorage->createUserObject($userId);
+					}
+					$userRoles = $userObject->getRoles();
+					foreach ($userRoles as $roleIndex => $bool){
+						if(!isSet($detectedRoles[$roleIndex])) $detectedRoles[$roleIndex] = 0;
+						if($bool === true) $detectedRoles[$roleIndex] ++;
+					}
+				}
+				$count = count($files);
+				AJXP_XMLWriter::header("admin_data");
+				print("<user><ajxp_roles>");
+				foreach ($detectedRoles as $roleId => $roleCount){
+					if($roleCount < $count) continue;
+					print("<role id=\"$roleId\"/>");
+				}				
+				print("</ajxp_roles></user>");
+				print("<ajxp_roles>");
+				foreach (AuthService::getRolesList() as $roleId => $roleObject){
+					print("<role id=\"$roleId\"/>");
+				}
+				print("</ajxp_roles>");				
+				AJXP_XMLWriter::close("admin_data");
+			
+			break;
+			
+			
 			
 			case "save_repository_user_params" : 
 				$userId = $_GET["user_id"];
@@ -666,6 +685,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
 			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String"/>
+			<column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String"/>
 			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
 			</columns>');		
 		if(!ENABLE_USERS) return ;
@@ -705,6 +725,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")], 
 				"icon" => $icon.".png",				
 				"rights_summary" => AJXP_Utils::xmlEntities($rightsString, true),				
+				"ajxp_roles" => implode(", ", array_keys($userObject->getRoles())),
 				"ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
 			));
 		}
@@ -896,6 +917,23 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		return $publicletData;
 	}
 		
+	function updateUserRole($userId, $roleId, $addOrRemove){
+		$confStorage = ConfService::getConfStorageImpl();		
+		$user = $confStorage->createUserObject($userId);
+		if($addOrRemove == "add"){
+			$user->addRole($roleId);
+		}else{
+			$user->removeRole($roleId);
+		}
+		$user->save();
+		$loggedUser = AuthService::getLoggedUser();
+		if($loggedUser->getId() == $user->getId()){
+			AuthService::updateUser($user);
+		}
+		return $user;
+		
+	}
+	
 	
 	function parseParameters(&$repDef, &$options, $userId = null){
 		
