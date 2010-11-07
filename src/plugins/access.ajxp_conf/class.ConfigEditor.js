@@ -50,7 +50,7 @@ ConfigEditor = Class.create({
 
 		if(!reload){
 			var fieldset = this.form.down('fieldset');
-			var legend = this.createTabbedFieldset('Access Control', fieldset.down('#user_acl'), 'Personal Data', fieldset.down('#user_personal'));
+			var legend = this.createTabbedFieldset(MessageHash['ajxp_conf.77'], fieldset.down('#user_acl'), MessageHash['ajxp_conf.78'], fieldset.down('#user_personal'));
 			fieldset.insert({top:legend});		
 		}
 		this.roleId = null;
@@ -78,7 +78,9 @@ ConfigEditor = Class.create({
 		this.userId = null;
 			
 		this.form.down('#rights_pane').remove();
-		this.form.select('.dialogLegend').last().remove();
+		this.form.down('#rights_legend').remove();
+		this.form.down('#roles_pane').select('.dialogLegend')[0].update(MessageHash['ajxp_conf.83']);
+		this.form.down('#roles_pane').select('span')[1].update(MessageHash['ajxp_conf.84']);
 		var url = window.ajxpServerAccessPath + '?get_action=batch_users_roles';
 		this.selectionUrl = selection.updateFormOrUrl(null, url);
 		var connexion = new Connexion(this.selectionUrl);
@@ -91,6 +93,7 @@ ConfigEditor = Class.create({
 	clearUserForm : function(){
 		this.clearRolesForm();
 		this.clearRightsForm();
+		this.clearWallets();
 	},
 	
 	clearRolesForm :function(){
@@ -111,6 +114,10 @@ ConfigEditor = Class.create({
 		rightsPane.down('tBody').insert('<tr id="loading_row"><td colspan="2">Reloading...</td></tr>');
 	},
 	
+	clearWallets : function(){
+		this.form.select('#wallets_pane')[0].childElements().invoke("remove");
+	},
+	
 	feedUserForm : function(xmlData){
 				
 		var editPass = XPathGetSingleNodeText(xmlData, "admin_data/edit_options/@edit_pass")=="1";
@@ -120,7 +127,7 @@ ConfigEditor = Class.create({
 						
 		this.populateRoles(xmlData);
 		
-		this.generateRightsTable(xmlData, true);
+		this.generateRightsTable(xmlData);
 				
 		var passwordPane = this.form.select('[id="password_pane"]')[0];
 		if(!editPass){
@@ -139,6 +146,8 @@ ConfigEditor = Class.create({
 				this.changeAdminRight(adminButton);
 			}.bind(this));			
 		}		
+		
+		this.generateWalletsPane(xmlData);
 	},
 	
 	populateRoles : function(xmlData){
@@ -223,11 +232,12 @@ ConfigEditor = Class.create({
 		
 	},
 	
-	generateRightsTable : function(xmlData, parseWalletData){
+	generateRightsTable : function(xmlData){
 		var rightsPane = this.form.select('[id="rights_pane"]')[0];
 		var rightsTable = rightsPane.select('tbody')[0];		
 		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
         repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
+        var odd = true;
 		for(var i=0;i<repositories.length;i++){
 			var repoNode = repositories[i];
 			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
@@ -246,8 +256,9 @@ ConfigEditor = Class.create({
 			rightsCell.insert(readBox);
 			rightsCell.insert(MessageHash['ajxp_conf.30'] + ' ');
 			rightsCell.insert(writeBox);
-			var tr = new Element('tr');
-			var titleCell = new Element('td', {width:'45%'}).update(repoLabel);
+			var tr = new Element('tr', {className:(odd?'odd':'even')});
+			odd = !odd;
+			var titleCell = new Element('td', {width:'45%'}).update('<img src="'+ajxpResourcesFolder+'/images/mimes/16/folder_red.png" style="float:left;margin-right:5px;">'+repoLabel);
 			tr.insert(titleCell);
 			tr.insert(rightsCell);
 			rightsTable.insert({bottom:tr});			
@@ -255,42 +266,30 @@ ConfigEditor = Class.create({
 			// FOR IE, set checkboxes state AFTER dom insertion.
 			readBox.checked = (XPathGetSingleNodeText(repoNode, "@r")=='1');
 			writeBox.checked = (XPathGetSingleNodeText(repoNode, "@w")=='1');			
-			
-			if(parseWalletData){
-				var walletParams = XPathSelectNodes(xmlData, "admin_data/drivers/ajxpdriver[@name='"+accessType+"']/user_param");				
-				var walletValues = XPathSelectNodes(xmlData, "admin_data/user_wallet/wallet_data[@repo_id='"+repoId+"']");			
-				if(walletParams.length){
-					var walletCell = new Element("td", {colspan:"2"});
-					var newRow = new Element("tr");
-					newRow.insert(walletCell);
-					rightsTable.insert({bottom:newRow});				
-					var walletPane = new Element('div', {className:"wallet_pane", id:"wallet_pane_"+repoId});
-					walletCell.insert({bottom:walletPane});				
-					this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
-					walletPane.hide();
-					var image = new Element("img", {src:ajxpResourcesFolder+"/images/0.gif"}).setStyle({marginRight:3});
-					image.setStyle({cursor:'pointer'});
-					image.setAttribute("pane_id", repoId);
-					image.observe("click", function(event){
-						var img = Event.element(event);
-						var pane = $('wallet_pane_'+img.getAttribute("pane_id"));
-						pane.toggle();
-						img.src = (pane.visible()?ajxpResourcesFolder+"/images/1.gif":ajxpResourcesFolder+"/images/0.gif");
-					});
-					titleCell.insert({top:image});
-				}else{
-					//titleCell.setStyle({paddingLeft:12});
-					var image = new Element("img", {src:ajxpResourcesFolder+"/images/2.gif"}).setStyle({marginRight:3});
-					titleCell.insert({top:image});
-				}
-			}else{
-				var image = new Element("img", {src:ajxpResourcesFolder+"/images/2.gif"}).setStyle({marginRight:3});
-				titleCell.insert({top:image});				
-			}
-			
 		}
 			
 		rightsTable.select('[id="loading_row"]')[0].remove();				
+	},
+	
+	generateWalletsPane : function(xmlData){
+		var wallets = this.form.select("#wallets_pane")[0];
+		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
+        repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
+		for(var i=0;i<repositories.length;i++){
+			var repoNode = repositories[i];
+			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
+			var repoId = XPathGetSingleNodeText(repoNode, "@id");
+			var accessType = XPathGetSingleNodeText(repoNode, "@access_type");
+
+			var walletParams = XPathSelectNodes(xmlData, "admin_data/drivers/ajxpdriver[@name='"+accessType+"']/user_param");				
+			var walletValues = XPathSelectNodes(xmlData, "admin_data/user_wallet/wallet_data[@repo_id='"+repoId+"']");			
+			if(!walletParams.length) continue;			
+			
+			var walletPane = new Element('div', {className:"wallet_pane", id:"wallet_pane_"+repoId});
+			this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
+			wallets.insert(new Element('div').update(MessageHash['ajxp_conf.79']+' "<b>'+ repoLabel + '</b>"'));
+			wallets.insert(walletPane);
+		}			
 	},
 	
 	addRepositoryUserParams : function(walletPane, repoId, walletParams, walletValues){
@@ -488,8 +487,9 @@ ConfigEditor = Class.create({
 	loadRole : function(roleId){
 		this.userId = null;
 		this.roleId = roleId;
-		this.form.down('fieldset').insert({top:new Element('legend').update('Access Control for this Role')});
-		this.form.down('#roles_pane').hide();
+		this.form.down('fieldset').insert({top:new Element('legend').update(MessageHash["ajxp_conf.77"])});
+		this.form.down('#roles_pane').remove();
+		this.form.down('#rights_legend').remove();		
 		var params = new Hash();
 		params.set("get_action", "edit");
 		params.set("sub_action", "edit_role");
@@ -497,7 +497,7 @@ ConfigEditor = Class.create({
 		var connexion = new Connexion();
 		connexion.setParameters(params);
 		connexion.onComplete = function(transport){
-			this.generateRightsTable(transport.responseXML, false);
+			this.generateRightsTable(transport.responseXML);
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
 			ajaxplorer.blurAll();

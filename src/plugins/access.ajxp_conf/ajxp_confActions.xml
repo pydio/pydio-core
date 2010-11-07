@@ -144,7 +144,7 @@
 				</processing>
 		</action>						
 		<action name="batch_users_roles" fileDefault="false">
-			<gui text="51" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+			<gui text="51" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false">
@@ -249,7 +249,7 @@
 										<div style="width:44%;float:right;"><span ajxp_message_id="ajxp_conf.70">AJXP_MESSAGE[ajxp_conf.70]</span> : <br><div id="user_roles"></div></div>
 									</div>
 								</div>
-								<div class="dialogLegend" style="clear:left;padding-top:15px;">Finetune the access for this user</div>
+								<div class="dialogLegend" id="rights_legend" style="clear:left;padding-top:15px;" ajxp_message_id="80">AJXP_MESSAGE[ajxp_conf.80]</div>
 								<div id="rights_pane">
 									<table class="repository" width="100%" cellspacing="0">
 										<tbody>
@@ -259,21 +259,23 @@
 								</div>
 							</div>
 							<div id="user_personal" style="display:none;">
-								<fieldset id="password_pane" style="float:left;margin-right:6px;width:198px;height:70px;">
-									<legend ajxp_message_id="ajxp_conf.26">AJXP_MESSAGE[ajxp_conf.26]</legend>
-									<input style="float:right;margin-top:18px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png"/>
-									<div style="width:168px;">
-										<div class="SF_element">
-											<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] :</div><input type="password" id="new_pass" class="SF_input"/>
-										</div>
-										<div class="SF_element">
-											<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] :</div><input type="password" id="new_pass_confirm"  class="SF_input"/>
-										</div>
+								<div id="password_pane">
+									<div class="dialogLegend" ajxp_message_id="ajxp_conf.26">AJXP_MESSAGE[ajxp_conf.26]</div>
+									<div class="config_subblock">
+										<input style="float:right;margin-top:0px;" type="image" class="dialogButton" value="OK" name="new_pass_button" onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png"/>									
+										<span ajxp_message_id="182">AJXP_MESSAGE[182]</span> <input type="password" id="new_pass" style="width:70px;margin-right:10px;"/><span ajxp_message_id="199">AJXP_MESSAGE[199]</span> <input type="password" id="new_pass_confirm" style="width:70px;"/>
 									</div>
-								</fieldset>
-								<fieldset id="admin_right_pane" style="height:70px;"><legend ajxp_message_id="ajxp_conf.27">AJXP_MESSAGE[ajxp_conf.27]</legend>
-								<span ajxp_message_id="ajpx_conf.28">AJXP_MESSAGE[ajxp_conf.28]</span> <input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;" />
-								</fieldset>
+								</div>
+								<div id="admin_right_pane">
+									<div class="dialogLegend" ajxp_message_id="ajxp_conf.27">AJXP_MESSAGE[ajxp_conf.27]</div>
+									<div class="config_subblock">
+										<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;float:right;" /><span ajxp_message_id="ajpx_conf.28">AJXP_MESSAGE[ajxp_conf.28]</span>
+									</div>
+								</div>
+								<div class="dialogLegend" ajxp_message_id="81">AJXP_MESSAGE[ajxp_conf.81]</div>
+								<div id="wallets_pane" class="config_subblock" style="margin-bottom:0px;">
+									
+								</div>
 							</div>
 						</fieldset>
 					</div>					
