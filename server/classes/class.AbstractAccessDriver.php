@@ -267,7 +267,11 @@ class AbstractAccessDriver extends AJXP_Plugin {
         // Now call switchAction 
         //@todo : switchAction should not be hard coded here!!!
         // Re-encode file-path as it will be decoded by the action.
-        $driver->switchAction($data["ACTION"], array("file"=>SystemTextEncoding::toUTF8($data["FILE_PATH"])), "");
+        try{
+	        $driver->switchAction($data["ACTION"], array("file"=>SystemTextEncoding::toUTF8($data["FILE_PATH"])), "");
+        }catch (Exception $e){
+        	die($e->getMessage());
+        }
     }
 
     /** Create a publiclet object, that will be saved in PUBLIC_DOWNLOAD_FOLDER
