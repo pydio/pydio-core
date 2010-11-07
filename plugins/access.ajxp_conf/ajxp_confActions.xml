@@ -143,6 +143,45 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>						
+		<action name="batch_users_roles" fileDefault="false">
+			<gui text="51" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getUserSelection();
+					var loadFunc = function(oForm){
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}						
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.loadUsers(userSelection);
+					};
+					modal.showDialogForm('Batch Edition', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
+				]]></clientCallback>
+				<clientListener name="selectionChange"><![CDATA[
+				if(ajaxplorer){
+					var userSelection = ajaxplorer.getUserSelection();
+					var action = ajaxplorer.getActionBar().getActionByName("batch_users_roles");
+					if(action){
+						if(userSelection.isUnique()){
+							action.selectionContext.dir = true;
+							action.selectionContext.file = false;
+						}else{
+							action.selectionContext.dir = false;
+							action.selectionContext.file = true;
+						}					
+					}
+				}
+				]]></clientListener>				
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="edit" fileDefault="true">
 			<gui text="51" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
