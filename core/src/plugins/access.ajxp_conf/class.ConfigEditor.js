@@ -73,7 +73,27 @@ ConfigEditor = Class.create({
 		connexion.sendAsync();		
 	},	
 	
+	loadUsers : function(selection){	
+		this.roleId = null;
+		this.userId = null;
+			
+		this.form.down('#rights_pane').remove();
+		this.form.select('.dialogLegend').last().remove();
+		var url = window.ajxpServerAccessPath + '?get_action=batch_users_roles';
+		this.selectionUrl = selection.updateFormOrUrl(null, url);
+		var connexion = new Connexion(this.selectionUrl);
+		connexion.onComplete = function(transport){			
+			this.populateRoles(transport.responseXML);
+		}.bind(this);
+		connexion.sendAsync();
+	},
+	
 	clearUserForm : function(){
+		this.clearRolesForm();
+		this.clearRightsForm();
+	},
+	
+	clearRolesForm :function(){
 		var rolesPane = this.form.down('[id="roles_pane"]');
 		var availSelect = rolesPane.down('div#available_roles');
 		var userSelect = rolesPane.down('div#user_roles');
@@ -82,7 +102,9 @@ ConfigEditor = Class.create({
 		if(this.draggables) this.draggables.invoke('destroy');
 		availSelect.childElements().invoke("remove");
 		userSelect.childElements().invoke("remove");	
-		
+	},
+	
+	clearRightsForm : function(){		
 		var rightsPane = this.form.down('#rights_pane');
 		rightsPane.setStyle({height: rightsPane.getHeight() + 'px'});
 		rightsPane.select('tr').invoke("remove");
@@ -96,7 +118,30 @@ ConfigEditor = Class.create({
 		var editDelete = XPathGetSingleNodeText(xmlData, "admin_data/edit_options/@edit_delete")=="1";
 		var adminStatus = (XPathGetSingleNodeText(xmlData, "admin_data/user/special_rights/@is_admin") == "1");		
 						
+		this.populateRoles(xmlData);
 		
+		this.generateRightsTable(xmlData, true);
+				
+		var passwordPane = this.form.select('[id="password_pane"]')[0];
+		if(!editPass){
+			passwordPane.hide();
+		}else{
+			var passButton = passwordPane.select('input.dialogButton')[0];
+			passButton.observe('click', this.changePassword.bind(this));
+		}
+		
+		if(!editAdminRight){
+			this.form.select('[id="admin_right_pane"]')[0].hide();
+		}else{
+			var adminButton = this.form.select('[id="admin_rights"]')[0];
+			adminButton.checked = adminStatus;
+			adminButton.observe('click', function(){
+				this.changeAdminRight(adminButton);
+			}.bind(this));			
+		}		
+	},
+	
+	populateRoles : function(xmlData){
 		var rolesPane = this.form.down('[id="roles_pane"]');
 		var availableRoles = XPathSelectNodes(xmlData, "admin_data/ajxp_roles/role");
 		var userRoles = XPathSelectNodes(xmlData, "admin_data/user/ajxp_roles/role");
@@ -147,13 +192,26 @@ ConfigEditor = Class.create({
 				dragged.addClassName('user_role');
 				sub_action = "user_add_role";
 			}
-			var conn = new Connexion();
-			conn.setParameters($H({get_action:"edit", sub_action:sub_action, user_id:this.userId, role_id:dragged.id}));
-			conn.onComplete = function(transport){
-				this.parseXmlMessage(transport.responseXML);
-				this.loadUser(this.userId, true);
-			}.bind(this);
-			conn.sendAsync();			
+			if(this.userId){
+				var conn = new Connexion();
+				conn.setParameters($H({get_action:"edit", sub_action:sub_action, user_id:this.userId, role_id:dragged.id}));
+				conn.onComplete = function(transport){
+					this.parseXmlMessage(transport.responseXML);
+					this.loadUser(this.userId, true);
+					ajaxplorer.fireContextRefresh();
+				}.bind(this);
+				conn.sendAsync();			
+			}else if(this.selectionUrl){
+				var connexion = new Connexion(this.selectionUrl);
+				connexion.addParameter("update_role_action", (sub_action=="user_delete_role"?"remove":"add"));
+				connexion.addParameter("role_id", dragged.id);
+				connexion.onComplete = function(transport){			
+					this.clearRolesForm();
+					this.populateRoles(transport.responseXML);
+					ajaxplorer.fireContextRefresh();
+				}.bind(this);
+				connexion.sendAsync();				
+			}
 		}.bind(this);
 		Droppables.add(availSelect, {accept:'user_role', onDrop:dropFunc, hoverclass:'roles_hover'});
 		Droppables.add(userSelect, {accept:'available_role', onDrop:dropFunc, hoverclass:'roles_hover'});
@@ -163,27 +221,7 @@ ConfigEditor = Class.create({
 			this.draggables.invoke('destroy');
 		}.bind(this));
 		
-		this.generateRightsTable(xmlData, true);
-				
-		var passwordPane = this.form.select('[id="password_pane"]')[0];
-		if(!editPass){
-			passwordPane.hide();
-		}else{
-			var passButton = passwordPane.select('input.dialogButton')[0];
-			passButton.observe('click', this.changePassword.bind(this));
-		}
-		
-		if(!editAdminRight){
-			this.form.select('[id="admin_right_pane"]')[0].hide();
-		}else{
-			var adminButton = this.form.select('[id="admin_rights"]')[0];
-			adminButton.checked = adminStatus;
-			adminButton.observe('click', function(){
-				this.changeAdminRight(adminButton);
-			}.bind(this));			
-		}		
 	},
-	
 	
 	generateRightsTable : function(xmlData, parseWalletData){
 		var rightsPane = this.form.select('[id="rights_pane"]')[0];
@@ -308,16 +346,21 @@ ConfigEditor = Class.create({
 		oChckBox.disabled = true;		
 		var rightString;
 		
+		var emptyRight = '';
+		if(this.userId){
+			emptyRight = 'n';
+		}
+		
 		if(rightName == 'read') 
 		{
 			$('chck_'+repositoryId+'_write').disabled = true;
 			var wState = $('chck_'+repositoryId+'_write').checked;
-			rightString = (newState?(wState?'rw':'r'):(wState?'w':''));
+			rightString = (newState?(wState?'rw':'r'):(wState?'w':'n'));
 		}
 		else 
 		{
 			$('chck_'+repositoryId+'_read').disabled = true;
-			rightString = (newState?'rw':($('chck_'+repositoryId+'_read').checked?'r':''));
+			rightString = (newState?'rw':($('chck_'+repositoryId+'_read').checked?'r':'n'));
 		}
 				
 		var parameters = new Hash();
