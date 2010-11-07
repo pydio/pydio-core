@@ -1674,10 +1674,12 @@ ADMIN STYLES
 }
 
 .wallet_pane{
+	/*
 	background-color:#EFEFEF;
 	border-left:1px solid;
+	*/
 	margin-left:2px;
-	margin-right:13px;
+	margin-right:2px;
 	padding:0 10px 0 0;
 }
 .wallet_pane div.driver_form{
@@ -1686,6 +1688,12 @@ ADMIN STYLES
 .wallet_pane input.dialogButton{
 	float:right;
 	border: 1px solid #676965;
+}
+
+.config_subblock{
+	border: 1px dotted #ccc; 
+	padding:5px 10px; 
+	margin-bottom:10px;
 }
 
 .user_data
@@ -1725,6 +1733,7 @@ legend a.active {
 .repository td
 {
    vertical-align: bottom;
+   padding: 4px 0 2px 6px;
 }
 
 .repository input, .user_delete_confirm
@@ -1810,7 +1819,7 @@ div#available_roles, div#user_roles{
 	padding: 0px;
 	border: 1px solid #aaa;
 	width: 100%;
-	height: 70px;
+	height: 80px;
 	background-image:url("../images/strip.png");
 	overflow:auto;
 }
@@ -1818,12 +1827,12 @@ div#available_roles, div#user_roles{
 div#rights_pane{
 	border: 1px solid #aaa;
 	background-image:url("../images/strip.png");
-	_height: 180px;
-	max-height: 180px;
+	_height: 150px;
+	max-height: 150px;
 	overflow:auto;
 	margin-top:5px;	
-	padding: 2px 1%;
-	width: 98%;
+	padding: 2px 0;
+	width: 100%;
 }
 
 div.ajxp_role{
