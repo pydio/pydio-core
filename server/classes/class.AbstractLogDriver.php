@@ -43,11 +43,13 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-define("LOG_LEVEL_DEBUG", "Debug");
-define("LOG_LEVEL_INFO", "Info");
-define("LOG_LEVEL_NOTICE", "Notice");
-define("LOG_LEVEL_WARNING", "Warning");
-define("LOG_LEVEL_ERROR", "Error");
+if(!defined('LOG_LEVEL_DEBUG')){
+	define("LOG_LEVEL_DEBUG", "Debug");
+	define("LOG_LEVEL_INFO", "Info");
+	define("LOG_LEVEL_NOTICE", "Notice");
+	define("LOG_LEVEL_WARNING", "Warning");
+	define("LOG_LEVEL_ERROR", "Error");
+}
 
 class AbstractLogDriver extends AJXP_Plugin {
 

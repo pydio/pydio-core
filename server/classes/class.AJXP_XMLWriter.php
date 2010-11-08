@@ -39,7 +39,7 @@ class AJXP_XMLWriter
 {
 	static $headerSent = false;
 	
-	function header($docNode="tree", $attributes=array())
+	static function header($docNode="tree", $attributes=array())
 	{
 		if(self::$headerSent !== false && self::$headerSent == $docNode) return ;
 		header('Content-Type: text/xml; charset=UTF-8');
@@ -56,12 +56,12 @@ class AJXP_XMLWriter
 		
 	}
 	
-	function close($docNode="tree")
+	static function close($docNode="tree")
 	{
 		print("</$docNode>");
 	}
 	
-	function write($data, $print){
+	static function write($data, $print){
 		if($print) {
 			print($data);
 			return "";		
@@ -70,12 +70,12 @@ class AJXP_XMLWriter
 		}
 	}
 	
-	function renderPaginationData($count, $currentPage, $totalPages){
+	static function renderPaginationData($count, $currentPage, $totalPages){
 		$string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png"/>';		
 		AJXP_XMLWriter::write($string, true);
 	}
 	
-	function renderHeaderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array()){
+	static function renderHeaderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array()){
 		header('Content-Type: text/xml; charset=UTF-8');
 		header('Cache-Control: no-cache');
 		print('<?xml version="1.0" encoding="UTF-8"?>');
@@ -83,7 +83,7 @@ class AJXP_XMLWriter
 		AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData, false);
 	}
 	
-	function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true){
+	static function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true){
 		$string = "<tree";
 		$metaData["filename"] = $nodeName;
 		$metaData["text"] = $nodeLabel;
@@ -99,11 +99,11 @@ class AJXP_XMLWriter
 		AJXP_XMLWriter::write($string, true);
 	}
 	
-	function renderNodeArray($array){
+	static function renderNodeArray($array){
 		self::renderNode($array[0],$array[1],$array[2],$array[3]);
 	}
 	
-	function catchError($code, $message, $fichier, $ligne, $context){
+	static function catchError($code, $message, $fichier, $ligne, $context){
 		if(error_reporting() == 0) return ;
 		$message = "$message in $fichier (l.$ligne)";
 		AJXP_Logger::logAction("error", array("message" => $message));
@@ -118,7 +118,7 @@ class AJXP_XMLWriter
 	 *
 	 * @param Exception $exception
 	 */
-	function catchException($exception){
+	static function catchException($exception){
 		AJXP_XMLWriter::catchError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), null);
 	}
 	
@@ -157,38 +157,38 @@ class AJXP_XMLWriter
 		return $xml;		
 	}	
 	
-	function reloadCurrentNode($print = true)
+	static function reloadCurrentNode($print = true)
 	{
 		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\"/>", $print);
 	}
 	
-	function reloadNode($nodeName, $print = true)
+	static function reloadNode($nodeName, $print = true)
 	{
 		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\" node=\"$nodeName\"/>", $print);
 	}
 		
-	function reloadFileList($fileOrBool, $print = true)
+	static function reloadFileList($fileOrBool, $print = true)
 	{
 		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
 		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	
-	function reloadDataNode($nodePath="", $pendingSelection="", $print = true){
+	static function reloadDataNode($nodePath="", $pendingSelection="", $print = true){
 		$nodePath = AJXP_Utils::xmlEntities($nodePath, true);
 		$pendingSelection = AJXP_Utils::xmlEntities($pendingSelection, true);
 		return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
 	}
 	
-	function reloadRepositoryList($print = true){
+	static function reloadRepositoryList($print = true){
 		return AJXP_XMLWriter::write("<reload_instruction object=\"repository_list\"/>", $print);
 	}
 	
-	function requireAuth($print = true)
+	static function requireAuth($print = true)
 	{
 		return AJXP_XMLWriter::write("<require_auth/>", $print);
 	}
 	
-	function triggerBgAction($actionName, $parameters, $messageId, $print=true){
+	static function triggerBgAction($actionName, $parameters, $messageId, $print=true){
 		$data = AJXP_XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\">", $print);
 		foreach ($parameters as $paramName=>$paramValue){
 			$data .= AJXP_XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
@@ -197,7 +197,7 @@ class AJXP_XMLWriter
 		return $data;		
 	}
 	
-	function writeBookmarks($allBookmarks, $print = true)
+	static function writeBookmarks($allBookmarks, $print = true)
 	{
 		$buffer = "";
 		foreach ($allBookmarks as $bookmark)
@@ -216,13 +216,13 @@ class AJXP_XMLWriter
 		else return $buffer;
 	}
 	
-	function sendFilesListComponentConfig($config){
+	static function sendFilesListComponentConfig($config){
 		if(is_string($config)){
 			print("<client_configs><component_config className=\"FilesList\">$config</component_config></client_configs>");
 		}
 	}
 	
-	function sendMessage($logMessage, $errorMessage, $print = true)
+	static function sendMessage($logMessage, $errorMessage, $print = true)
 	{
 		$messageType = ""; 
 		$message = "";
@@ -239,11 +239,11 @@ class AJXP_XMLWriter
 		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}
 
-	function sendUserData($userObject = null, $details=false){
+	static function sendUserData($userObject = null, $details=false){
 		print(AJXP_XMLWriter::getUserXML($userObject, $details));
 	}
 	
-	function getUserXML($userObject = null, $details=false)
+	static function getUserXML($userObject = null, $details=false)
 	{
 		$buffer = "";
 		$loggedUser = AuthService::getLoggedUser();
@@ -293,7 +293,7 @@ class AJXP_XMLWriter
 		return $buffer;		
 	}
 	
-	function writeRepositoriesData($loggedUser, $details=false){
+	static function writeRepositoriesData($loggedUser, $details=false){
 		$st = "";
 		$st .= "<repositories>";
 		$streams = ConfService::detectRepositoryStreams(false);
@@ -344,7 +344,7 @@ class AJXP_XMLWriter
 	 * @param AjxpRole $role
 	 * @return string
 	 */
-	function writeRoleRepositoriesData($role){
+	static function writeRoleRepositoriesData($role){
 		$st = "<repositories>";
 		foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
 		{		
@@ -368,7 +368,7 @@ class AJXP_XMLWriter
 		return $st;
 	}
 	
-	function loggingResult($result, $rememberLogin="", $rememberPass = "")
+	static function loggingResult($result, $rememberLogin="", $rememberPass = "")
 	{
 		$remString = "";
 		if($rememberPass != "" && $rememberLogin!= ""){

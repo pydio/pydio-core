@@ -83,7 +83,7 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	function passwordsEditable(){}
 	
 	function createUser($login, $passwd){}	
-	function changePassword($login, $oldPass, $newPass){}	
+	function changePassword($login, $newPass){}	
 	function deleteUser($login){}
 	
 	function getLoginRedirect(){

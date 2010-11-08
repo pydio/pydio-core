@@ -275,11 +275,13 @@ class AbstractAccessDriver extends AJXP_Plugin {
     }
 
     /** Create a publiclet object, that will be saved in PUBLIC_DOWNLOAD_FOLDER
-        Typically, the class will simply create a data array, and call return writePubliclet($data)
-        @param $filePath The path to the file to share
-        @return The full public URL to the publiclet.
+	/* Typically, the class will simply create a data array, and call return writePubliclet($data)
+    /* @param String $filePath The path to the file to share
+    /* @param String $password optionnal password
+    /* @param String $expires optional expiration date        
+	/* @return The full public URL to the publiclet.
     */
-    function makePubliclet($filePath) {}
+    function makePubliclet($filePath, $password, $expires) {}
     
     function makeSharedRepositoryOptions($httpVars){}
 

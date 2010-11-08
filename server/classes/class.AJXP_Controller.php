@@ -151,7 +151,7 @@ class AJXP_Controller{
 		}
 	}
 	
-	private function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true){		
+	private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true){		
 		$callbacks = $xPath->query($query, $actionNode);
 		if(!$callbacks->length) return false;
 		if($multiple){
@@ -170,7 +170,7 @@ class AJXP_Controller{
 		}
 	}
 	
-	private function appliesCondition($callback, $actionName, $httpVars, $fileVars){
+	private static function appliesCondition($callback, $actionName, $httpVars, $fileVars){
 		if($callback->getAttribute("applyCondition")!=""){
 			$apply = false;
 			eval($callback->getAttribute("applyCondition"));
@@ -179,7 +179,7 @@ class AJXP_Controller{
 		return true;
 	}
 	
-	private function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null){
+	private static function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null){
 		//Processing
 		$plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
 		$methodName = $xPath->query("@methodName", $callback)->item(0)->value;		
