@@ -298,8 +298,35 @@ class sqlConfDriver extends AbstractConfDriver {
 	}	
 	
 	
-	function listRoles(){}
-	function saveRoles($roles){}
+	function listRoles(){
+		
+		$res = dibi::query('SELECT * FROM [ajxp_roles]');
+		$all = $res->fetchAll();
+		
+		$roles = Array();
+		
+		foreach ($all as $role_row) {
+			$id = $role_row['role_id'];
+			$serialized = $role_row['serial_role'];
+			$object = unserialize($serialized);
+			if(is_a($object, "AjxpRole")){
+				$roles[$id] = $object;
+			}
+		}
+		
+		return $roles;
+		
+	}
+	
+	function saveRoles($roles){
+		dibi::query("DELETE FROM [ajxp_roles]");
+		foreach ($roles as $roleId => $roleObject){
+			dibi::query("INSERT INTO [ajxp_roles]", array(
+				'role_id' => $roleId, 
+				'serial_role' => serialize($roleObject))
+				);
+		}
+	}
 	
 }
 ?>
