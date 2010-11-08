@@ -32,6 +32,11 @@
 			<location>E:/charlie/software/APPS/ajaxplorer/SVN_Sourceforge/core/src/tmp/flash_build</location>
 		</link>
 		<link>
+			<name>bin-release3</name>
+			<type>2</type>
+			<location>E:/charlie/software/APPS/ajaxplorer/SVN_Sourceforge/core/src/plugins/uploader.flex</location>
+		</link>
+		<link>
 			<name>bin-release</name>
 			<type>2</type>
 			<location>E:/charlie/software/APPS/ajaxplorer/SVN_Sourceforge/core/src/client/flash/FlashUploader</location>

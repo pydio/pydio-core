@@ -232,7 +232,7 @@ package components
 			
 			// set the button visibility
 			uploadButton.enabled = false;
-			browseButton.enabled = false;
+			// browseButton.enabled = false;
 			clearButton.enabled = false;
 			cancelButton.enabled = true;
 			// go through the files to check if they have been uploaded and get the first that hasn't
