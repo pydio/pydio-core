@@ -703,6 +703,7 @@ a.carousel-control img{
 	-moz-border-radius: 5px 0pt 0pt 5px; 
 	border-radius: 5px 0pt 0pt 5px; 
 	padding: 3px 0px 3px 7px; 
+	_padding: 3px 0px 1px 7px; 
 	cursor: pointer;
 }
 

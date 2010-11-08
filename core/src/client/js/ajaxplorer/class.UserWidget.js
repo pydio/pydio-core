@@ -47,7 +47,8 @@ Class.create("UserWidget", {
 			divs.invoke('setStyle', {borderColor:'#dddddd'});	
 		}.bind(this));		
 		document.observe("ajaxplorer:user_logged", this.updateGui.bind(this));
-		document.observe("ajaxplorer:actions_loaded", this.updateActions.bind(this));
+		document.observe("ajaxplorer:actions_loaded", this.updateActions.bind(this));		
+		if(Prototype.Browser.IE) document.observe("ajaxplorer:actions_refreshed", this.updateActions.bind(this));
 	},
 	
 	updateGui : function(){
