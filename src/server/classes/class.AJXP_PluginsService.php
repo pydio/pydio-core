@@ -254,7 +254,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	
  	public function buildXmlRegistry(){
  		$actives = $this->getActivePlugins();
- 		$reg = DOMDocument::loadXML("<ajxp_registry></ajxp_registry>");
+ 		$reg = new DOMDocument();
+ 		$reg->loadXML("<ajxp_registry></ajxp_registry>");
  		foreach($actives as $activeName=>$status){
  			if($status === false) continue; 			
  			$plug = $this->getPluginById($activeName);

@@ -38,14 +38,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class HTMLWriter
 {
 
-	function displayMessage($logMessage, $errorMessage)
+	static function displayMessage($logMessage, $errorMessage)
 	{
 		$mess = ConfService::getMessages();
 		echo "<div title=\"".$mess[98]."\" id=\"message_div\" onclick=\"closeMessageDiv();\" class=\"messageBox ".(isset($logMessage)?"logMessage":"errorMessage")."\"><table width=\"100%\"><tr><td style=\"width: 66%;\">".(isset($logMessage)?$logMessage:$errorMessage)."</td><td style=\"color: #999; text-align: right;padding-right: 10px; width: 30%;\"><i>".$mess[98]."</i></tr></table></div>";
 		echo "<script>tempoMessageDivClosing();</script>";
 	}
 	    
-    function getDocFile($docFileName)
+    static function getDocFile($docFileName)
     {
     	$realName = INSTALL_PATH."/".DOCS_FOLDER."/".$docFileName.".txt";
     	if(is_file($realName))
@@ -61,14 +61,14 @@ class HTMLWriter
     	return "File not found : ".$docFileName;
     }
     
-    function repositoryDataAsJS(){
+    static function repositoryDataAsJS(){
     	if(AuthService::usersEnabled()) return "";
     	require_once(INSTALL_PATH."/server/classes/class.SystemTextEncoding.php");
     	require_once(INSTALL_PATH."/server/classes/class.AJXP_XMLWriter.php");
     	return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
     }
               
-    function writeI18nMessagesClass($mess)
+    static function writeI18nMessagesClass($mess)
     {
     	echo "<script language=\"javascript\">\n";
     	echo "if(!MessageHash) window.MessageHash = new Hash();\n";
@@ -88,15 +88,15 @@ class HTMLWriter
     	echo "</script>\n";
     }
        
-    function charsetHeader($type = 'text/html', $charset='UTF-8'){
+    static function charsetHeader($type = 'text/html', $charset='UTF-8'){
     	header("Content-type:$type; charset=$charset");
     }
     
-    function closeBodyAndPage(){
+    static function closeBodyAndPage(){
     	print("</body></html>");
     }
     
-    function javascriptErrorHandler($errorType, $errorMessage){    	
+    static function javascriptErrorHandler($errorType, $errorMessage){    	
     	// Handle "@" case!
     	if(error_reporting() == 0) return ;
     	restore_error_handler();    	

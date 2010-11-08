@@ -44,7 +44,7 @@ class AJXP_Utils
 	* 
 	* @param Array $array The array to sort 
 	*/  
-	function natksort(&$array) {
+	static static function natksort(&$array) {
 		uksort($array, 'strnatcasecmp');
 		return true;
 	}
@@ -55,13 +55,13 @@ class AJXP_Utils
 	* 
 	* @param Array $array The array to sort 
 	*/  
-	function natkrsort(&$array) {
+	static function natkrsort(&$array) {
 		natksort($array);
 		$array = array_reverse($array,TRUE);
 		return true;
 	}
 
-	function securePath($path)
+	static function securePath($path)
 	{
 		if($path == null) $path = ""; 
 		//
@@ -88,18 +88,18 @@ class AJXP_Utils
 		return $path;
 	}
 	
-	public static function decodeSecureMagic($data){
+	public static static function decodeSecureMagic($data){
 		return SystemTextEncoding::fromUTF8(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)));
 	}
 	
-	public static function getAjxpTmpDir(){
+	public static static function getAjxpTmpDir(){
 		if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR != ""){
 			return AJXP_TMP_DIR;
 		}
 		return realpath(sys_get_temp_dir());
 	}
 	
-	function parseFileDataErrors($boxData)
+	static function parseFileDataErrors($boxData)
 	{
 		$mess = ConfService::getMessages();
 		$userfile_error = $boxData["error"];		
@@ -132,7 +132,7 @@ class AJXP_Utils
 		return null;
 	}
 	
-	public static function parseApplicationGetParameters($parameters, &$output, &$session){
+	public static static function parseApplicationGetParameters($parameters, &$output, &$session){
 		$output["EXT_REP"] = "/";
 		
 		if(isSet($parameters["repository_id"]) && isSet($parameters["folder"])){
@@ -173,7 +173,7 @@ class AJXP_Utils
 		
 	}
 	
-	function mergeArrays($t1,$t2)
+	static function mergeArrays($t1,$t2)
 	{
 		$liste = array();
 		$tab1=$t1; $tab2=$t2;
@@ -182,14 +182,14 @@ class AJXP_Utils
 		return $liste;
 	}
 	
-	function removeWinReturn($fileContent)
+	static function removeWinReturn($fileContent)
 	{
 		$fileContent = str_replace(chr(10), "", $fileContent);
 		$fileContent = str_replace(chr(13), "", $fileContent);
 		return $fileContent;
 	}
 	
-	function tipsandtricks()
+	static function tipsandtricks()
 	{
 		$tips = array();
 		$tips[] = "DoubleClick in the list to directly download a file or to open a folder.";
@@ -213,7 +213,7 @@ class AJXP_Utils
 		return $tips[array_rand($tips, 1)];
 	}
 	
-	function processFileName($fileName)
+	static function processFileName($fileName)
 	{
 		$max_caracteres = ConfService::getConf("MAX_CHAR");
 		// Don't allow those chars : ' " & , ; / \ ` < > : * ? | ! + ^ 
@@ -226,7 +226,7 @@ class AJXP_Utils
 		return substr($fileNameTmp, 0, $max_caracteres);
 	}
 	
-	function mimetype($fileName,$mode, $isDir)
+	static function mimetype($fileName,$mode, $isDir)
 	{
 		$mess = ConfService::getMessages();
 		$fileName = strtolower($fileName);
@@ -249,7 +249,7 @@ class AJXP_Utils
 		return (($mode == "image"? $mime[1]:$mime[2]));
 	}
 		
-	function getAjxpMimes($keyword){
+	static function getAjxpMimes($keyword){
 		if($keyword == "editable"){
 			// Gather editors!
 			$pServ = AJXP_PluginsService::getInstance();
@@ -282,7 +282,7 @@ class AJXP_Utils
 		return "";
 	}
 		
-	function is_image($fileName)
+	static function is_image($fileName)
 	{
 		if(preg_match("/\.png$|\.bmp$|\.jpg$|\.jpeg$|\.gif$/i",$fileName)){
 			return 1;
@@ -290,13 +290,13 @@ class AJXP_Utils
 		return 0;
 	}
 	
-	function is_mp3($fileName)
+	static function is_mp3($fileName)
 	{
 		if(preg_match("/\.mp3$/i",$fileName)) return 1;
 		return 0;
 	}
 	
-	function getImageMimeType($fileName)
+	static function getImageMimeType($fileName)
 	{
 		if(preg_match("/\.jpg$|\.jpeg$/i",$fileName)){return "image/jpeg";}
 		else if(preg_match("/\.png$/i",$fileName)){return "image/png";}	
@@ -304,7 +304,7 @@ class AJXP_Utils
 		else if(preg_match("/\.gif$/i",$fileName)){return "image/gif";}	
 	}
 	
-	function roundSize($filesize)
+	static function roundSize($filesize)
 	{
 		$mess = ConfService::getMessages();
 		$size_unit = $mess["byte_unit_symbol"];
@@ -319,11 +319,11 @@ class AJXP_Utils
 		return $filesize;
 	}
 		
-	function isHidden($fileName){
+	static function isHidden($fileName){
 		return (substr($fileName,0,1) == ".");
 	}
 	
-	function isBrowsableArchive($fileName){
+	static function isBrowsableArchive($fileName){
 		return preg_match("/\.zip$/i",$fileName);
 	}
 	
@@ -332,7 +332,7 @@ class AJXP_Utils
 	 * @param    string   $value
 	 * @return   int
 	 */
-	function convertBytes( $value ) 
+	static function convertBytes( $value ) 
 	{
 	    if ( is_numeric( $value ) ) 
 	    {
@@ -359,7 +359,7 @@ class AJXP_Utils
 	    }
 	}
 
-	function xmlEntities($string, $toUtf8=false){
+	static function xmlEntities($string, $toUtf8=false){
 		$xmlSafe = str_replace(array("&", "<",">", "\""), array("&amp;", "&lt;","&gt;", "&quot;"), $string);
 		if($toUtf8){
 			return SystemTextEncoding::toUTF8($xmlSafe);
@@ -368,7 +368,7 @@ class AJXP_Utils
 		}
 	}
 
-	function updateI18nFiles(){
+	static function updateI18nFiles(){
 		include(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/en.php");
 		$reference = $mess;
 		$languages = ConfService::listAvailableLanguages();
@@ -404,7 +404,7 @@ class AJXP_Utils
 		}
 	}
 	
-	function testResultsToTable($outputArray, $testedParams, $showSkipLink = true){
+	static function testResultsToTable($outputArray, $testedParams, $showSkipLink = true){
 		$style = '
 		<style>
 		body {
@@ -465,7 +465,7 @@ class AJXP_Utils
 		return $htmlHead.nl2br($html);
 	}
 	
-	function runTests(&$outputArray, &$testedParams){
+	static function runTests(&$outputArray, &$testedParams){
 		// At first, list folder in the tests subfolder
 		chdir(INSTALL_PATH.'/server/tests');
 		$files = glob('*.php'); 
@@ -535,7 +535,7 @@ class AJXP_Utils
 		return $passed;
 	}	
 	
-	function testResultsToFile($outputArray, $testedParams){
+	static function testResultsToFile($outputArray, $testedParams){
 		ob_start();
 		echo '$diagResults = ';
 		var_export($testedParams);
@@ -555,7 +555,7 @@ class AJXP_Utils
 	 * @param String $filePath Full path to the file
 	 * @return Array
 	 */
-	function loadSerialFile($filePath){
+	static function loadSerialFile($filePath){
 		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
 		$result = array();
 		if(is_file($filePath))
@@ -573,7 +573,7 @@ class AJXP_Utils
 	 * @param Array $value The value to store
 	 * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
 	 */
-	function saveSerialFile($filePath, $value, $createDir=true, $silent=false){
+	static function saveSerialFile($filePath, $value, $createDir=true, $silent=false){
 		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
 		if($createDir && !is_dir(dirname($filePath))) {			
 			if(!is_writeable(dirname(dirname($filePath)))){
@@ -592,7 +592,7 @@ class AJXP_Utils
 		}
 	}
 	
-	public static function userAgentIsMobile(){
+	public static static function userAgentIsMobile(){
 		$isMobile = false;
 		
 		$op = strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE'] OR "");
