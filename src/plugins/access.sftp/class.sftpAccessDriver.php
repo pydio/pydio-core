@@ -69,6 +69,136 @@ class sftpAccessDriver extends fsAccessDriver
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
 		}
 	}
+	
+	
+	/**
+	 * We have to override the standard copyOrMoveFile, as feof() does
+	 * not seem to work with ssh2.ftp stream... 
+	 * Maybe something to search hear http://www.mail-archive.com/php-general@lists.php.net/msg169992.html?
+	 *
+	 * @param string $destDir
+	 * @param string $srcFile
+	 * @param array $error
+	 * @param array $success
+	 * @param boolean $move
+	 */
+	function copyOrMoveFile($destDir, $srcFile, &$error, &$success, $move = false)
+	{
+		$mess = ConfService::getMessages();		
+		$destFile = $this->urlBase.$destDir."/".basename($srcFile);
+		$realSrcFile = $this->urlBase.$srcFile;
+		if(!file_exists($realSrcFile))
+		{
+			$error[] = $mess[100].$srcFile;
+			return ;
+		}		
+		if(dirname($realSrcFile)==dirname($destFile))
+		{
+			if($move){
+				$error[] = $mess[101];
+				return ;
+			}else{
+				$base = basename($srcFile);
+				$i = 1;
+				if(is_file($realSrcFile)){
+					$dotPos = strrpos($base, ".");
+					if($dotPos>-1){
+						$radic = substr($base, 0, $dotPos);
+						$ext = substr($base, $dotPos);
+					}
+				}
+				// auto rename file
+				$i = 1;
+				$newName = $base;
+				while (file_exists($this->urlBase.$destDir."/".$newName)) {
+					$suffix = "-$i";
+					if(isSet($radic)) $newName = $radic . $suffix . $ext;
+					else $newName = $base.$suffix;
+					$i++;
+				}
+				$destFile = $this->urlBase.$destDir."/".$newName;
+			}
+		}
+		if(!is_file($realSrcFile))
+		{			
+			$errors = array();
+			$succFiles = array();
+			if($move){				
+				if(file_exists($destFile)) $this->deldir($destFile);
+				$res = rename($realSrcFile, $destFile);
+			}else{				
+				$dirRes = $this->dircopy($realSrcFile, $destFile, $errors, $succFiles);
+			}			
+			if(count($errors) || (isSet($res) && $res!==true))
+			{
+				$error[] = $mess[114];
+				return ;
+			}			
+		}
+		else 
+		{			
+			if($move){	
+				if(file_exists($destFile)) unlink($destFile);				
+				$res = rename($realSrcFile, $destFile);
+				AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, false));
+			}else{
+				try{
+					// BEGIN OVERRIDING
+					//$src = fopen($realSrcFile, "r");
+					$dest = fopen($destFile, "w");
+					fwrite($dest, file_get_contents($realSrcFile));
+					/*
+					while (!feof($src)) {
+						stream_copy_to_stream($src, $dest, 4096);
+					}
+					*/					
+					//fclose($src);
+					fclose($dest);
+					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
+					// END OVERRIDING
+				}catch (Exception $e){
+					$error[] = $e->getMessage();
+					return ;					
+				}
+			}
+		}
+		
+		if($move)
+		{
+			// Now delete original
+			// $this->deldir($realSrcFile); // both file and dir
+			$messagePart = $mess[74]." ".SystemTextEncoding::toUTF8($destDir);
+			if(RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle())
+			{
+				RecycleBinManager::fileToRecycle($srcFile);
+				$messagePart = $mess[123]." ".$mess[122];
+			}
+			if(isset($dirRes))
+			{
+				$success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].") ";
+			}
+			else 
+			{
+				$success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$messagePart;
+			}
+		}
+		else
+		{			
+			if(RecycleBinManager::recycleEnabled() && $destDir == "/".$this->repository->getOption("RECYCLE_BIN"))
+			{
+				RecycleBinManager::fileToRecycle($srcFile);
+			}
+			if(isSet($dirRes))
+			{
+				$success[] = $mess[117]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir)." (".SystemTextEncoding::toUTF8($dirRes)." ".$mess[116].")";	
+			}
+			else 
+			{
+				$success[] = $mess[34]." ".SystemTextEncoding::toUTF8(basename($srcFile))." ".$mess[73]." ".SystemTextEncoding::toUTF8($destDir);
+			}
+		}
+		
+	}	
 }	
 
 ?>
