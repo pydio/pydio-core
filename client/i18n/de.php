@@ -408,6 +408,9 @@ $mess=array(
 "369" => "AjaXplorer Link",
 "370" => "AjaXplorer Öffentlicher Download",
 "371" => "Für diesen Download wird ein Passwort benötigt",
+"372" => "Current Repository",
+"373" => "Destination",
+"374" => "You cannot copy folders across repositories",
 /* END SENTENCE */
 );
 ?>

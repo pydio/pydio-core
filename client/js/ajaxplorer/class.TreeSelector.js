@@ -8,7 +8,7 @@ Class.create("TreeSelector", {
 			treeContainer : '.treeCopyContainer'
 		}, options || {});
 	},
-	load : function(){
+	load : function(rootNode){
 		if(webFXTreeHandler && webFXTreeHandler.selected){
 			this.__initialWebFXSelection = webFXTreeHandler.selected;
 		}
@@ -26,15 +26,17 @@ Class.create("TreeSelector", {
 		this._nodeFilter = function(ajxpNode){
 			return (!ajxpNode.isLeaf());
 		};
-		var node = new AjxpNode("/", false, "Destination", "folder.png");
-		this.treeCopy = new AJXPTree(node, this._nodeActionCallback, this._nodeFilter);							
+		if(!rootNode){
+			rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png");
+		}
+		this.treeCopy = new AJXPTree(rootNode, this._nodeActionCallback, this._nodeFilter);							
 		this.treeContainer.update(this.treeCopy.toString());
 		$(this.treeCopy.id).observe("click", function(e){
 			this.action();
 			Event.stop(e);
 		}.bind(this.treeCopy));
 		this.treeCopy.focus();
-		this.treeCopy.setAjxpRootNode(new AjxpNode("/", false, "Destination", "folder.png"));
+		this.treeCopy.setAjxpRootNode(rootNode);
 		
 	},
 	unload : function(){
