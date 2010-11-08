@@ -121,13 +121,8 @@ class sftpAccessWrapper extends fsAccessWrapper {
     		AJXP_Logger::logAction("error", array("message" => "Error while opening stream $path"));
     		return false;
     	}
-    	if($this->realPath == -1){
-    		$this->fp = -1;
-    		return true;
-    	}else{
-	        $this->fp = fopen($this->realPath, $mode, $options);
-	        return ($this->fp !== false);
-    	}		
+        $this->fp = fopen($this->realPath, $mode, $options);
+        return ($this->fp !== false);
     }
     
     /**
@@ -153,14 +148,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
      */
 	public function dir_opendir ($path , $options ){
 		$this->realPath = $this->initPath($path, true);	
-		if($this->realPath[strlen($this->realPath)-1] != "/"){
-			$this->realPath.="/";
-		}
-		if(is_string($this->realPath)){			
-			$this->dH = @opendir($this->realPath);
-		}else if($this->realPath == -1){
-			$this->dH = -1;
-		}
+		$this->dH = @opendir($this->realPath);
 		return $this->dH !== false;
 	}
 
@@ -178,16 +166,6 @@ class sftpAccessWrapper extends fsAccessWrapper {
 		if(is_dir($tmpDir)) rmdir($tmpDir);
 	}
 
-	protected static function closeWrapper(){
-		if(self::$crtZip != null) {
-			self::$crtZip = null;
-			self::$currentListing  = null;
-			self::$currentListingKeys = null;
-			self::$currentListingIndex = null;
-			self::$currentFileKey = null;
-		}
-	}
-
 	/**
 	 * Implementation of AjxpStream
 	 *
@@ -195,19 +173,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
 	 * @return string
 	 */
 	public static function getRealFSReference($path){
-		$contextOpened =false;
-		if(self::$crtZip != null){
-			$contextOpened = true;
-			$crtZip = self::$crtZip;
-			self::$crtZip = null;
-		}
-		$realPath = self::initPath($path);
-		if(!$contextOpened) {
-			self::closeWrapper();
-		}else{
-			self::$crtZip = $crtZip;
-		}
-		return $realPath;
+		return self::initPath($path);
 	}
 
 	/**
@@ -220,7 +186,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
 	public static function copyFileInStream($path, $stream){
 		fwrite($stream, file_get_contents(self::initPath($path)));
 	}
-
+	
 	/**
 	 * Specific case for chmod : not supported natively by ssh2.sftp protocole
 	 * we have to recreate an ssh2 connexion.
