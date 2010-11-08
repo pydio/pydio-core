@@ -119,8 +119,8 @@ class fsAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "download":
 				AJXP_Logger::logAction("Download", array("files"=>$selection));
-				//@set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
-				//@register_shutdown_function("restore_error_handler");
+				@set_error_handler(array("HTMLWriter", "javascriptErrorHandler"), E_ALL & ~ E_NOTICE);
+				@register_shutdown_function("restore_error_handler");
 				$zip = false;
 				if($selection->isUnique()){
 					if(is_dir($this->urlBase.$selection->getUniqueFile())) {
@@ -766,8 +766,8 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		session_write_close();
 
-        set_exception_handler(download_exception_handler);
-        set_error_handler(download_exception_handler);
+        set_exception_handler('download_exception_handler');
+        set_error_handler('download_exception_handler');
         // required for IE, otherwise Content-disposition is ignored
         if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off'); }
 
