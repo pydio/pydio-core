@@ -95,7 +95,7 @@ $mess=array(
 "80" => "Fine-tune access for this user",
 "81" => "Specific repositories data",
 "82" => "Batch-edit users",
-"83" => "Drag'n'drop roles to apply them to all selected users",
+"83" => "Drag'n'drop roles to apply them to all selected users (shared users are skipped)",
 "84" => "Users Roles",
 ); 
 ?>
