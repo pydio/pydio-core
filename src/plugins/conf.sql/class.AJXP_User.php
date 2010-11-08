@@ -438,6 +438,23 @@ class AJXP_User extends AbstractAjxpUser
 			$this->bookmarks[$b['repo_uuid']][] = Array('PATH'=>$b['path'], 'TITLE'=>$b['title']);
 		}
 		
+		// Load roles
+		if(isSet($this->rights["ajxp.roles"])){
+			$object = unserialize($this->rights["ajxp.roles"]);
+			if(is_array($object)){
+				$this->rights["ajxp.roles"] = $object;
+				$allRoles = AuthService::getRolesList(); // Maintained as instance variable
+				foreach (array_keys($this->rights["ajxp.roles"]) as $roleId){
+					if(isSet($allRoles[$roleId])){
+						$this->roles[$roleId] = $allRoles[$roleId];
+					}else{
+						unset($this->rights["ajxp.roles"][$roleId]);
+					}
+				}
+			}else{
+				$this->rights["ajxp.roles"] = array();
+			}
+		}		
 
 	}
 	
@@ -453,6 +470,15 @@ class AJXP_User extends AbstractAjxpUser
 			$this->setRight("ajxp.admin", "1");
 		}else{
 			$this->setRight("ajxp.admin", "0");
+		}
+		
+		// update roles
+		dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]='".$this->getId()."' AND [repo_uuid]='ajxp.roles'");
+		if($this->rights["ajxp.roles"] && is_array($this->rights["ajxp.roles"]) && count($this->rights["ajxp.roles"])){
+			dibi::query("INSERT INTO [ajxp_user_rights]", array(
+				'login' => $this->getId(), 
+				'repo_uuid' => 'ajxp.roles', 
+				'rights'	=> serialize($this->rights['ajxp.roles'])));
 		}
 	}	
 	
