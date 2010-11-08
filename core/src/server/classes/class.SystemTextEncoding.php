@@ -37,7 +37,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class SystemTextEncoding
 {
-	function changeCharset($inputCharset, $outputCharset, $text)
+	static function changeCharset($inputCharset, $outputCharset, $text)
 	{
 	    if ($inputCharset == $outputCharset) return $text;
 		// Due to iconv bug when dealing with text with non ASCII encoding for last char, we use this workaround http://fr.php.net/manual/fr/function.iconv.php#81494
@@ -52,7 +52,7 @@ class SystemTextEncoding
 		}
 	}
 	
-	function parseCharset($locale)
+	static function parseCharset($locale)
 	{
 		$test = explode("@", $locale);
 		$locale = $test[0];		
@@ -71,7 +71,7 @@ class SystemTextEncoding
 		return $encoding;
 	}
 	
-	function getEncoding(){
+	static function getEncoding(){
 	       global $_SESSION;
 	       // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
 	       if (isset($_SESSION["AJXP_CHARSET"]) && strlen($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
@@ -79,13 +79,13 @@ class SystemTextEncoding
 	       return SystemTextEncoding::parseCharset(setlocale(LC_CTYPE, 0));
 	}
 	
-	function fromUTF8($filesystemElement){
+	static function fromUTF8($filesystemElement){
 		$enc = SystemTextEncoding::getEncoding();
 	    return SystemTextEncoding::changeCharset("UTF-8", $enc, $filesystemElement);
 	}
   
 	/** This function is used when the server's PHP configuration is using magic quote */
-    function magicDequote($text)
+    static function magicDequote($text)
     {
 	    // If the PHP server enables magic quotes, remove them
 	    if (get_magic_quotes_gpc())
@@ -93,12 +93,12 @@ class SystemTextEncoding
 	    return $text;  
     }
 	                         
-    function fromPostedFileName($filesystemElement)
+    static function fromPostedFileName($filesystemElement)
     {
 	    return SystemTextEncoding::fromUTF8(SystemTextEncoding::magicDequote($filesystemElement));
 	}
 	
-	function toUTF8($filesystemElement){
+	static function toUTF8($filesystemElement){
 		$enc = SystemTextEncoding::getEncoding();
 		return SystemTextEncoding::changeCharset($enc, "UTF-8", $filesystemElement);
 	}

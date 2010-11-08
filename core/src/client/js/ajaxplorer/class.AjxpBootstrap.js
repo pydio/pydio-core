@@ -79,13 +79,28 @@ Class.create("AjxpBootstrap", {
 			url += '&server_prefix_uri=' + this.parameters.get('SERVER_PREFIX_URI');
 		}
 		var connexion = new Connexion(url);
-		connexion.onComplete = function(transport){
+		connexion.onComplete = function(transport){			
 			if(transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName == "tree"){
 				var alert = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
-				window.alert(alert.firstChild.nodeValue);
+				window.alert('Exception caught by application : ' + alert.firstChild.nodeValue);
 				return;
 			}
-			var data = transport.responseText.evalJSON();
+			var phpError;
+			try{
+				var data = transport.responseText.evalJSON();
+			}catch(e){
+				phpError = 'Error while parsing JSON response : ' + e.message;
+			}
+			if(!typeof data == "object"){
+				phpError = 'Exception uncaught by application : ' + transport.responseText;
+			}
+			if(phpError){
+				document.write(phpError);
+				if(phpError.indexOf('<b>Notice</b>')>-1 || phpError.indexOf('<b>Strict Standards</b>')>-1){
+					window.alert('Php errors detected, it seems that Notice or Strict are detected, you may consider changing the PHP Error Reporting level!');
+				}
+				return;
+			}
 			this.parameters.update(data);
 			if(this.parameters.get('SERVER_PREFIX_URI')){
 				this.parameters.set('ajxpResourcesFolder', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpResourcesFolder'));

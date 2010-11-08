@@ -39,18 +39,18 @@ class AuthService
 {
 	static $roles;
 	
-	function usersEnabled()
+	static function usersEnabled()
 	{
 		return ENABLE_USERS;
 	}
 	
-	function changePasswordEnabled()
+	static function changePasswordEnabled()
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->passwordsEditable();
 	}
 	
-	function generateSeed(){
+	static function generateSeed(){
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->getSeed(true);
 	}
@@ -60,13 +60,13 @@ class AuthService
 	 *
 	 * @return AbstractAjxpUser
 	 */
-	function getLoggedUser()
+	static function getLoggedUser()
 	{
 		if(isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
 		return null;
 	}
 	
-	function preLogUser($remoteSessionId = "")
+	static function preLogUser($remoteSessionId = "")
 	{
 		if(AuthService::getLoggedUser() != null) return ;
 		$authDriver = ConfService::getAuthDriverImpl();
@@ -74,7 +74,7 @@ class AuthService
 		return ;
 	}
 
-    function getBruteForceLoginArray()
+    static function getBruteForceLoginArray()
     {
         $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
         $loginAttempt = @file_get_contents($failedLog);
@@ -89,13 +89,13 @@ class AuthService
             }
         return $ret;
     }
-    function setBruteForceLoginArray($loginArray)
+    static function setBruteForceLoginArray($loginArray)
     {
         $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
         @file_put_contents($failedLog, serialize($loginArray));
     }
 
-    function checkBruteForceLogin(&$loginArray)
+    static function checkBruteForceLogin(&$loginArray)
     {
     	return true;
     	$serverAddress = "";
@@ -116,7 +116,7 @@ class AuthService
         return TRUE;
     }
 
-	function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
+	static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{		
 		$confDriver = ConfService::getConfStorageImpl();
 		if($user_id == null)
@@ -184,12 +184,12 @@ class AuthService
 		return 1;
 	}
 	
-	function updateUser($userObject)
+	static function updateUser($userObject)
 	{
 		$_SESSION["AJXP_USER"] = $userObject;
 	}
 	
-	function disconnect()
+	static function disconnect()
 	{
 		if(isSet($_SESSION["AJXP_USER"])){
 			AJXP_Logger::logAction("Log Out");
@@ -225,7 +225,7 @@ class AuthService
 		}
 	}
     
-    function getLogoutAddress($logUserOut = true)
+    static function getLogoutAddress($logUserOut = true)
     {
         $authDriver = ConfService::getAuthDriverImpl();
         $logout = $authDriver->getLogoutRedirect();
@@ -240,7 +240,7 @@ class AuthService
         return $logout;
     }
 	
-	function getDefaultRootId()
+	static function getDefaultRootId()
 	{
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return 0;
@@ -265,7 +265,7 @@ class AuthService
 	/**
 	* @param AJXP_User $adminUser
 	*/
-	function updateAdminRights($adminUser)
+	static function updateAdminRights($adminUser)
 	{
 		foreach (array_keys(ConfService::getRootDirsList()) as $rootDirIndex)
 		{			
@@ -280,7 +280,7 @@ class AuthService
 	 *
 	 * @param AbstractAjxpUser $userObject
 	 */
-	function updateDefaultRights(&$userObject){
+	static function updateDefaultRights(&$userObject){
 		if(!$userObject->hasParent()){
 			foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
 			{			
@@ -291,17 +291,17 @@ class AuthService
 		}
 	}
 	
-	function userExists($userId)
+	static function userExists($userId)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->userExists($userId);
 	}
 	
-	function encodePassword($pass){
+	static function encodePassword($pass){
 		return md5($pass);
 	}
 	
-	function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
+	static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
 	{
 		if($userId == "guest") return true;		
 		$authDriver = ConfService::getAuthDriverImpl();
@@ -316,7 +316,7 @@ class AuthService
 		return $authDriver->checkPassword($userId, $userPass, $returnSeed);
 	}
 	
-	function updatePassword($userId, $userPass)
+	static function updatePassword($userId, $userPass)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		$authDriver->changePassword($userId, $userPass);
@@ -324,7 +324,7 @@ class AuthService
 		return true;
 	}
 	
-	function createUser($userId, $userPass, $isAdmin=false)
+	static function createUser($userId, $userPass, $isAdmin=false)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
@@ -338,7 +338,7 @@ class AuthService
 		return null;
 	}
 	
-	function countAdminUsers(){
+	static function countAdminUsers(){
 		$auth = ConfService::getAuthDriverImpl();	
 		$confDriver = ConfService::getConfStorageImpl();
 		$count = 0;
@@ -354,7 +354,7 @@ class AuthService
 		return $count;
 	}
 		
-	function deleteUser($userId)
+	static function deleteUser($userId)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
@@ -376,7 +376,7 @@ class AuthService
 		return true;
 	}
 	
-	function listUsers()
+	static function listUsers()
 	{
 		$authDriver = ConfService::getAuthDriverImpl();		
 		$confDriver = ConfService::getConfStorageImpl();
@@ -396,7 +396,7 @@ class AuthService
 	 * @param string $roleId
 	 * @return AjxpRole
 	 */
-	function getRole($roleId){
+	static function getRole($roleId){
 		$roles = self::getRolesList();
 		if(isSet($roles[$roleId])) return $roles[$roleId];
 		return false;
@@ -407,13 +407,13 @@ class AuthService
 	 *
 	 * @param AjxpRole $roleObject
 	 */
-	function updateRole($roleObject){
+	static function updateRole($roleObject){
 		$roles = self::getRolesList();
 		$roles[$roleObject->getId()] = $roleObject;
 		self::saveRolesList($roles);
 	}
 	
-	function deleteRole($roleId){
+	static function deleteRole($roleId){
 		$roles = self::getRolesList();
 		if(isSet($roles[$roleId])){
 			unset($roles[$roleId]);
@@ -421,14 +421,14 @@ class AuthService
 		}
 	}
 	
-	function getRolesList(){
+	static function getRolesList(){
 		if(isSet(self::$roles)) return self::$roles;
 		$confDriver = ConfService::getConfStorageImpl();
 		self::$roles = $confDriver->listRoles();
 		return self::$roles;
 	}
 	
-	function saveRolesList($roles){
+	static function saveRolesList($roles){
 		$confDriver = ConfService::getConfStorageImpl();
 		$confDriver->saveRoles($roles);
 		self::$roles = $roles;		

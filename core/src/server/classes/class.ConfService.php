@@ -376,7 +376,7 @@ class ConfService
 		$this->configs["REPOSITORIES"] = self::initRepositoriesList($this->configs["DEFAULT_REPOSITORIES"]);				
 	}
 		
-	public function zipEnabled()
+	public static function zipEnabled()
 	{
 		return (function_exists("gzopen")?true:false);		
 	}
