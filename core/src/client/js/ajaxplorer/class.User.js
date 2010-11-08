@@ -38,8 +38,10 @@ Class.create("User", {
 	activeRepository:undefined,
 	read:false,
 	write:false,
+	crossRepositoryCopy:false,
 	preferences:undefined,
 	repositories: undefined,
+	crossRepositories:undefined,
 	repoIcons:undefined,
 	repoSearchEngines:undefined,
 	isAdmin:false,
@@ -48,6 +50,7 @@ Class.create("User", {
 		this.id = id;
 		this.preferences = new Hash();
 		this.repositories = new Hash();
+		this.crossRepositories = new Hash();
 		this.repoIcon = new Hash();
 		this.repoSearchEngines = new Hash();
 		if(xmlDef) this.loadFromXml(xmlDef);
@@ -56,7 +59,13 @@ Class.create("User", {
 	setActiveRepository : function (id, read, write){
 		this.activeRepository = id;
 		this.read = (read=="1"?true:false);
-		this.write = (write=="1"?true:false);
+		this.write = (write=="1"?true:false);		
+		if(this.repositories.get(id)){
+			this.crossRepositoryCopy = this.repositories.get(id).allowCrossRepositoryCopy;
+		}
+		if(this.crossRepositories.get(id)){
+			this.crossRepositories.unset(id);
+		}
 	},
 	
 	getActiveRepository : function(){
@@ -69,6 +78,10 @@ Class.create("User", {
 	
 	canWrite : function(){
 		return this.write;
+	},
+	
+	canCrossRepositoryCopy : function(){
+		return this.crossRepositoryCopy;
 	},
 	
 	getPreference : function(prefName, fromJSON){
@@ -96,6 +109,21 @@ Class.create("User", {
 	
 	setRepositoriesList : function(repoHash){
 		this.repositories = repoHash;
+		// filter repositories once for all
+		this.crossRepositories = new Hash();
+		this.repositories.each(function(pair){
+			if(pair.value.allowCrossRepositoryCopy){
+				this.crossRepositories.set(pair.key, pair.value);
+			}
+		}.bind(this) );
+	},
+	
+	hasCrossRepositories : function(){
+		return (this.crossRepositories.size());
+	},
+	
+	getCrossRepositories : function(){
+		return this.crossRepositories;
 	},
 	
 	getRepositoryIcon : function(repoId){
@@ -142,9 +170,7 @@ Class.create("User", {
 		{
 			if(userNodes[i].nodeName == "active_repo")
 			{
-				this.setActiveRepository(userNodes[i].getAttribute('id'), 
-										userNodes[i].getAttribute('read'), 
-										userNodes[i].getAttribute('write'));
+				var activeNode = userNodes[i];
 			}
 			else if(userNodes[i].nodeName == "repositories")
 			{
@@ -178,6 +204,13 @@ Class.create("User", {
 				var attr = userNodes[i].getAttribute("is_admin");
 				if(attr && attr == "1") this.isAdmin = true;
 			}
+		}
+		// Make sure it happens at the end
+		if(activeNode){
+			this.setActiveRepository(activeNode.getAttribute('id'), 
+									activeNode.getAttribute('read'), 
+									activeNode.getAttribute('write'));
+			
 		}
 			
 	}

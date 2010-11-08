@@ -140,7 +140,11 @@ Class.create("Action", {
 		window.actionArguments = $A([]);
 		if(arguments[0]) window.actionArguments = $A(arguments[0]);
 		if(this.options.callbackCode) {
-			this.options.callbackCode.evalScripts();
+			try{
+				this.options.callbackCode.evalScripts();
+			}catch(e){
+				ajaxplorer.displayMessage('ERROR', e.message);
+			}
 		}else if(this.options.callbackDialogNode){
 			var node = this.options.callbackDialogNode;
 			var dialogFormId = node.getAttribute("dialogOpenForm");
