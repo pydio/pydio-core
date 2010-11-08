@@ -654,10 +654,10 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					if(ajaxplorer.user){
-						var activeRepository = ajaxplorer.user.getActiveRepository();
-						var repoList = ajaxplorer.user.getRepositoriesList();
-						if(!repoList.get(activeRepository).allowCrossRepositoryCopy){
-							activeRepository = null;
+						var user = ajaxplorer.user;
+						var activeRepository = user.getActiveRepository();
+						if(ajaxplorer.getUserSelection().hasDir() && !user.canWrite()){
+							throw new Error(MessageHash[374]);
 						}
 					}
 					var context = ajaxplorer.actionBar;
@@ -665,30 +665,36 @@
 						var getAction = oForm.select('input[name="get_action"]')[0];
 						getAction.value = 'copy';					
 						this.treeSelector = new TreeSelector(oForm);
-						this.treeSelector.load();
-						if(activeRepository && !ajaxplorer.getUserSelection().hasDir()){
-							var filterOptions = $A([]);
-							repoList.each(function(pair){
-								var repoObject = pair.value;
-								if(repoObject.allowCrossRepositoryCopy){
-									if(repoObject.getId() == activeRepository) return;
-									filterOptions.push({key:repoObject.getId(),value:repoObject.getLabel()});
-								}
-							});							
-							if(!filterOptions.length) return;
-							this.treeSelector.setFilterShow(true);
-							filterOptions.each(function(pair){
+						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
+							var firstKey ;
+							var reposList = new Hash();
+							user.getCrossRepositories().each(function(pair){
+								if(!firstKey) firstKey = pair.key;
+								reposList.set(pair.key, pair.value.getLabel());								
+							}.bind(this));
+							if(!user.canWrite()){
+								var nodeProvider = new RemoteNodeProvider();
+								nodeProvider.initProvider({tmp_repository_id:firstKey});
+								var rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider);								
+								this.treeSelector.load(rootNode);
+							}else{
+								this.treeSelector.load();								
+							}
+							this.treeSelector.setFilterShow(true);							
+							reposList.each(function(pair){
 								this.treeSelector.appendFilterValue(pair.key, pair.value);
-							}.bind(this) );
-							this.treeSelector.appendFilterValue(activeRepository, "&lt;Current Repository&gt;", 'top');
+							}.bind(this)); 
+							if(user.canWrite()) this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
 							this.treeSelector.setFilterSelectedIndex(0);
 							this.treeSelector.setFilterChangeCallback(function(e){
 								externalRepo = this.filterSelector.getValue();
 								var nodeProvider = new RemoteNodeProvider();
 								nodeProvider.initProvider({tmp_repository_id:externalRepo});
-								this.resetAjxpRootNode(new AjxpNode("/", false, "Destination", "folder.png", nodeProvider));
+								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
 							});
-						}						
+						}else{
+							this.treeSelector.load();
+						}
 					}.bind(context);
 					var onCancel = function(){
 						this.treeSelector.unload();
@@ -723,6 +729,14 @@
 				if(ajaxplorer){
 					var action = ajaxplorer.getActionBar().getActionByName("copy");
 					if(action){
+						action.rightsContext.write = true;
+						var ajxpUser = ajaxplorer.user;
+						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
+							action.rightsContext.write = false;
+							action.selectionContext.dir = false;
+							ajaxplorer.actionBar.defaultActions.unset('ctrldragndrop');
+							ajaxplorer.actionBar.defaultActions.unset('dragndrop');
+						}
 						if(ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
 							action.setLabel(247, 248);
 							action.setIconSrc('ark_extract.png');
@@ -748,41 +762,29 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var context = ajaxplorer.actionBar;
 					if(ajaxplorer.user){
-						var activeRepository = ajaxplorer.user.getActiveRepository();
-						var repoList = ajaxplorer.user.getRepositoriesList();
-						if(!repoList.get(activeRepository).allowCrossRepositoryCopy){
-							activeRepository = null;
-						}
+						var user = ajaxplorer.user;
+						var activeRepository = user.getActiveRepository();
 					}
-					
+					var context = ajaxplorer.actionBar;
 					var onLoad = function(oForm){
-						var getAction = oForm.down('input[name="get_action"]');
-						getAction.value = 'move';					
+						var getAction = oForm.select('input[name="get_action"]')[0];
+						getAction.value = 'move';
 						this.treeSelector = new TreeSelector(oForm);
 						this.treeSelector.load();
-						if(activeRepository && !ajaxplorer.getUserSelection().hasDir()){
-							var filterOptions = $A([]);
-							repoList.each(function(pair){
-								var repoObject = pair.value;
-								if(repoObject.allowCrossRepositoryCopy){
-									if(repoObject.getId() == activeRepository) return;
-									filterOptions.push({key:repoObject.getId(),value:repoObject.getLabel()});
-								}
-							});							
-							if(!filterOptions.length) return;
+						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							this.treeSelector.setFilterShow(true);
-							filterOptions.each(function(pair){
-								this.treeSelector.appendFilterValue(pair.key, pair.value);
-							}.bind(this) );
-							this.treeSelector.appendFilterValue(activeRepository, "&lt;Current Repository&gt;", 'top');
+							user.getCrossRepositories().each(function(pair){
+								this.treeSelector.appendFilterValue(pair.key, pair.value.getLabel());
+							}.bind(this));
+							this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
 							this.treeSelector.setFilterSelectedIndex(0);
 							this.treeSelector.setFilterChangeCallback(function(e){
 								externalRepo = this.filterSelector.getValue();
 								var nodeProvider = new RemoteNodeProvider();
 								nodeProvider.initProvider({tmp_repository_id:externalRepo});
-								this.resetAjxpRootNode(new AjxpNode("/", false, "Destination", "folder.png", nodeProvider));
+								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
 							});
-						}												
+						}						
 					}.bind(context);
 					var onCancel = function(){
 						this.treeSelector.unload();

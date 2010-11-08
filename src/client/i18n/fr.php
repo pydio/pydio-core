@@ -408,6 +408,9 @@ $mess=array(
 "369" => "AjaXplorer Link",
 "370" => "Téléchargement public AjaXplorer",
 "371" => "Un mot de passe est nécessaire pour ce téléchargement",
+"372" => "Dépôt Courant",
+"373" => "Destination",
+"374" => "Vous ne pouvez pas copier un répertoire dans un autre dépôt.",
 /* END SENTENCE */
 );
 ?>

@@ -192,7 +192,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 	while (root.parentNode) { root = root.parentNode; }
 	if (root.rendered) {
 		if (this.childNodes.length >= 2) {
-			document.getElementById(this.childNodes[this.childNodes.length - 2].id + '-plus').src = ((this.childNodes[this.childNodes.length -2].folder)?((this.childNodes[this.childNodes.length -2].open)?webFXTreeConfig.tMinusIcon:webFXTreeConfig.tPlusIcon):webFXTreeConfig.tIcon);
+			$(this.childNodes[this.childNodes.length - 2].id + '-plus').src = ((this.childNodes[this.childNodes.length -2].folder)?((this.childNodes[this.childNodes.length -2].open)?webFXTreeConfig.tMinusIcon:webFXTreeConfig.tPlusIcon):webFXTreeConfig.tIcon);
 			this.childNodes[this.childNodes.length - 2].plusIcon = webFXTreeConfig.tPlusIcon;
 			this.childNodes[this.childNodes.length - 2].minusIcon = webFXTreeConfig.tMinusIcon;
 			this.childNodes[this.childNodes.length - 2]._last = false;
@@ -255,21 +255,21 @@ WebFXTreeAbstractNode.prototype.toggle = function() {
 } ;
 
 WebFXTreeAbstractNode.prototype.select = function() {
-	document.getElementById(this.id + '-anchor').focus();
+	$(this.id + '-anchor').focus();
 };
 
 WebFXTreeAbstractNode.prototype.deSelect = function() {
-	if($(this.id)) document.getElementById(this.id + '-anchor').className = '';
+	if($(this.id)) $(this.id + '-anchor').className = '';
 	webFXTreeHandler.selected = null;
-	if($(this.id)) document.getElementById(this.id).className = 'webfx-tree-item';
+	if($(this.id)) $(this.id).className = 'webfx-tree-item';
 } ;
 
 WebFXTreeAbstractNode.prototype.focus = function() {
 	if ((webFXTreeHandler.selected) && (webFXTreeHandler.selected != this)) { webFXTreeHandler.selected.deSelect(); }
 	webFXTreeHandler.selected = this;
-	if ((this.openIcon) && (webFXTreeHandler.behavior != 'classic')) { document.getElementById(this.id + '-icon').src = this.openIcon; }
-	try{document.getElementById(this.id + '-anchor').focus();}catch(e){}
-	document.getElementById(this.id).className = 'webfx-tree-item selected-webfx-tree-item';
+	if ((this.openIcon) && (webFXTreeHandler.behavior != 'classic')) { $(this.id + '-icon').src = this.openIcon; }
+	try{$(this.id + '-anchor').focus();}catch(e){}
+	$(this.id).className = 'webfx-tree-item selected-webfx-tree-item';
 	if (webFXTreeHandler.onSelect) { webFXTreeHandler.onSelect(this); }	
 } ;
 
@@ -280,21 +280,21 @@ WebFXTreeAbstractNode.prototype.blur = function() {
 	}
 	if(webFXTreeHandler.selected == this)
 	{		
-		document.getElementById(this.id).className = 'webfx-tree-item selected-webfx-tree-item-inactive';
+		$(this.id).className = 'webfx-tree-item selected-webfx-tree-item-inactive';
 	}
 	else
 	{
-		document.getElementById(this.id).className = 'webfx-tree-item';
+		$(this.id).className = 'webfx-tree-item';
 	}
 	if(Prototype.Browser.IE)
 	{
-		document.getElementById(this.id + '-anchor').blur();
+		$(this.id + '-anchor').blur();
 	}
 } ;
 
 WebFXTreeAbstractNode.prototype.doExpand = function() {
-	if (webFXTreeHandler.behavior == 'classic' && document.getElementById(this.id + '-icon')) { document.getElementById(this.id + '-icon').src = this.openIcon; }
-	if (this.childNodes.length) {  document.getElementById(this.id + '-cont').style.display = 'block'; }
+	if (webFXTreeHandler.behavior == 'classic' && $(this.id + '-icon')) { $(this.id + '-icon').src = this.openIcon; }
+	if (this.childNodes.length && $(this.id + '-cont')) {  $(this.id + '-cont').style.display = 'block'; }
 	this.open = true;
 	if (webFXTreeConfig.usePersistence) {
 		webFXTreeHandler.cookies.setCookie(this.id.substr(18,this.id.length - 18), '1');
@@ -302,8 +302,8 @@ WebFXTreeAbstractNode.prototype.doExpand = function() {
 } ;
 
 WebFXTreeAbstractNode.prototype.doCollapse = function() {
-	if (webFXTreeHandler.behavior == 'classic') { document.getElementById(this.id + '-icon').src = this.icon; }
-	if (this.childNodes.length) { document.getElementById(this.id + '-cont').style.display = 'none'; }
+	if (webFXTreeHandler.behavior == 'classic') { $(this.id + '-icon').src = this.icon; }
+	if (this.childNodes.length) { $(this.id + '-cont').style.display = 'none'; }
 	this.open = false;
 	if (webFXTreeConfig.usePersistence) {
 		webFXTreeHandler.cookies.setCookie(this.id.substr(18,this.id.length - 18), '0');
@@ -343,16 +343,16 @@ WebFXTreeAbstractNode.prototype.indent = function(lvl, del, last, level, nodesLe
 		if (state) { return; }
 	}
 	if (del) {
-		if ((level >= this._level) && (document.getElementById(this.id + '-plus'))) {
+		if ((level >= this._level) && ($(this.id + '-plus'))) {
 			if (this.folder) {
-				document.getElementById(this.id + '-plus').src = (this.open)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.lPlusIcon;
+				$(this.id + '-plus').src = (this.open)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.lPlusIcon;
 				this.plusIcon = webFXTreeConfig.lPlusIcon;
 				this.minusIcon = webFXTreeConfig.lMinusIcon;
 			}
-			else if (nodesLeft) { document.getElementById(this.id + '-plus').src = webFXTreeConfig.lIcon; }
+			else if (nodesLeft) { $(this.id + '-plus').src = webFXTreeConfig.lIcon; }
 			return 1;
 	}	}
-	var foo = document.getElementById(this.id + '-indent-' + lvl);
+	var foo = $(this.id + '-indent-' + lvl);
 	if (foo) {
 		if ((foo._last) || ((del) && (last))) { foo.src =  webFXTreeConfig.blankIcon; }
 		else { foo.src =  webFXTreeConfig.iIcon; }
@@ -475,8 +475,8 @@ function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon) {
 WebFXTreeItem.prototype = new WebFXTreeAbstractNode;
 
 WebFXTreeItem.prototype.remove = function() {
-	if(!document.getElementById(this.id+'-plus')) return;
-	var iconSrc = document.getElementById(this.id + '-plus').src;
+	if(!$(this.id+'-plus')) return;
+	var iconSrc = $(this.id + '-plus').src;
 	var parentNode = this.parentNode;
 	var prevSibling = this.getPreviousSibling(true);
 	var nextSibling = this.getNextSibling(true);
@@ -487,7 +487,7 @@ WebFXTreeItem.prototype.remove = function() {
 	Droppables.remove($(this.id));
 	if(webFXTreeHandler.contextMenu) webFXTreeHandler.contextMenu.removeElements('#'+this.id);
 	if (parentNode.childNodes.length == 0) {
-		document.getElementById(parentNode.id + '-cont').style.display = 'none';
+		$(parentNode.id + '-cont').style.display = 'none';
 		parentNode.doCollapse();
 		parentNode.folder = false;
 		parentNode.open = false;
@@ -496,18 +496,18 @@ WebFXTreeItem.prototype.remove = function() {
 	if ((prevSibling == parentNode) && !(parentNode.childNodes.length)) {
 		prevSibling.folder = false;
 		prevSibling.open = false;
-		if(document.getElementById(prevSibling.id + '-plus'))
+		if($(prevSibling.id + '-plus'))
 		{
-			iconSrc = document.getElementById(prevSibling.id + '-plus').src;
+			iconSrc = $(prevSibling.id + '-plus').src;
 			iconSrc = iconSrc.replace('minus', '').replace('plus', '');
-			document.getElementById(prevSibling.id + '-plus').src = iconSrc;
-			document.getElementById(prevSibling.id + '-icon').src = (webFXTreeHandler.all[prevSibling.id].icon?webFXTreeHandler.all[prevSibling.id].icon:webFXTreeConfig.fileIcon);
+			$(prevSibling.id + '-plus').src = iconSrc;
+			$(prevSibling.id + '-icon').src = (webFXTreeHandler.all[prevSibling.id].icon?webFXTreeHandler.all[prevSibling.id].icon:webFXTreeConfig.fileIcon);
 		}
 	}
-	if (document.getElementById(prevSibling.id + '-plus')) {
+	if ($(prevSibling.id + '-plus')) {
 		if (parentNode == prevSibling.parentNode) {
 			iconSrc = iconSrc.replace('minus', '').replace('plus', '');
-			document.getElementById(prevSibling.id + '-plus').src = iconSrc;
+			$(prevSibling.id + '-plus').src = iconSrc;
 		}
 	}
 } ;
@@ -527,21 +527,21 @@ WebFXTreeItem.prototype._remove = function() {
 	}	}
 	//webFXTreeHandler.all[this.id] = null;
 	delete(webFXTreeHandler.all[this.id]);
-	var tmp = document.getElementById(this.id);
+	var tmp = $(this.id);
 	if (tmp) { tmp.parentNode.removeChild(tmp); }
-	tmp = document.getElementById(this.id + '-cont');
+	tmp = $(this.id + '-cont');
 	if (tmp) { tmp.parentNode.removeChild(tmp); }
 };
 
 WebFXTreeItem.prototype.expand = function() {
 	this.doExpand();
-	document.getElementById(this.id + '-plus').src = this.minusIcon;
+	if($(this.id + '-plus')) $(this.id + '-plus').src = this.minusIcon;
 };
 
 WebFXTreeItem.prototype.collapse = function(b) {
 	if (!b) { this.focus(); }
 	this.doCollapse();
-	document.getElementById(this.id + '-plus').src = this.plusIcon;
+	if($(this.id + '-plus')) $(this.id + '-plus').src = this.plusIcon;
 };
 
 WebFXTreeItem.prototype.getFirst = function() {
