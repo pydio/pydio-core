@@ -297,12 +297,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$update = $httpVars["update_role_action"];
 					$roleId = $httpVars["role_id"];
 				}
-				foreach ($files as $file){
+				foreach ($files as $index => $file){
 					$userId = basename($file);
 					if(isSet($update)){
 						$userObject = $this->updateUserRole($userId, $roleId, $update);
 					}else{
 						$userObject = $confStorage->createUserObject($userId);
+					}
+					if($userObject->hasParent()){
+						unset($files[$index]);
+						continue;
 					}
 					$userRoles = $userObject->getRoles();
 					foreach ($userRoles as $roleIndex => $bool){
@@ -917,9 +921,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		return $publicletData;
 	}
 		
-	function updateUserRole($userId, $roleId, $addOrRemove){
+	function updateUserRole($userId, $roleId, $addOrRemove, $updateSubUsers = false){
 		$confStorage = ConfService::getConfStorageImpl();		
 		$user = $confStorage->createUserObject($userId);
+		if($user->hasParent()) return $user;
 		if($addOrRemove == "add"){
 			$user->addRole($roleId);
 		}else{

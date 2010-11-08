@@ -93,7 +93,7 @@ $mess=array(
 "80" => "Précisez les droits d'accès pour cet utilisateur",
 "81" => "Données spécifiques aux dépôts",
 "82" => "Edition en groupe des utilisateurs",
-"83" => "Glissez/Déposez les rôles pour les assigner aux utilisateurs sélectionnés",
+"83" => "Glissez/Déposez les rôles pour les assigner aux utilisateurs sélectionnés (les utilisateurs partagés ne seront pas pris en compte)",
 "84" => "Rôles utilisateurs",
 );
 ?>
