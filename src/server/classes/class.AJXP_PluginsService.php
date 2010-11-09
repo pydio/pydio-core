@@ -40,6 +40,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $registry = array();
  	private $tmpDependencies = array();
  	private $activePlugins = array();
+ 	private $streamWrapperPlugins = array();
  	private $xmlRegistry;
  	private $pluginFolder;
  	private $confFolder;
@@ -55,7 +56,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  				$plugin = new AJXP_Plugin($item, $pluginFolder."/".$item);				
 				$plugin->loadManifest();
 				if($plugin->manifestLoaded()){
-					$beforeSort[$plugin->getId()] = $plugin;					
+					$beforeSort[$plugin->getId()] = $plugin;
+					if(method_exists($plugin, "detectStreamWrapper")){
+						if($plugin->detectStreamWrapper(false) !== false) $this->streamWrapperPlugins[] = $plugin->getId();
+					}
 				}
  			}
  			closedir($handler);
@@ -220,7 +224,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		if($active){
 	 		// Check active plugin dependencies
 	 		$plug = $this->getPluginById($type.".".$name);
-	 		$deps = $plug->getActiveDependencies();	 		
+	 		$deps = $plug->getActiveDependencies($this);
 	 		if(count($deps)){
 	 			$found = false;
 		 		foreach ($deps as $dep){
@@ -250,6 +254,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	
  	public function getActivePlugins(){
  		return $this->activePlugins;	
+ 	}
+ 	
+ 	public function getStreamWrapperPlugins(){
+ 		return $this->streamWrapperPlugins;
  	}
  	
  	public function buildXmlRegistry(){

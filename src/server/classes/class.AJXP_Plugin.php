@@ -239,13 +239,23 @@ class AJXP_Plugin{
 	public function dependsOn($pluginName){
 		return in_array($pluginName, $this->dependencies);
 	}
-	public function getActiveDependencies(){
+	/**
+	 * Get dependencies
+	 *
+	 * @param AJXP_PluginsService $pluginService
+	 * @return array
+	 */
+	public function getActiveDependencies($pluginService){
 		if(!$this->manifestLoaded) return array();
 		$deps = array();
 		$nodes = $this->xPath->query("dependencies/activePlugin/@pluginName");
 		foreach ($nodes as $attr) {
 			$value = $attr->value;
-			$deps = array_merge($deps, explode("|", $value));
+			if($value == "access.AJXP_STREAM_PROVIDER"){
+				$deps = array_merge($deps, $pluginService->getStreamWrapperPlugins());
+			}else{
+				$deps = array_merge($deps, explode("|", $value));
+			}
 		}
 		return $deps;
 	}
@@ -280,6 +290,27 @@ class AJXP_Plugin{
 	public function getDependencies(){
 		return $this->dependencies;
 	}
+	
+	public function detectStreamWrapper($register = false){
+		$files = $this->xPath->query("class_stream_wrapper");
+		if(!$files->length) return false;
+		$streamData = $this->nodeAttrToHash($files->item(0));
+		if(!is_file(INSTALL_PATH."/".$streamData["filename"])){
+			return false;
+		}
+		include_once(INSTALL_PATH."/".$streamData["filename"]);
+		if(!class_exists($streamData["classname"])){
+			return false;
+		}
+		if($register){
+			if(!in_array($streamData["protocol"], stream_get_wrappers())){
+				stream_wrapper_register($streamData["protocol"], $streamData["classname"]);
+			}
+		}
+		return $streamData;
+	}
+	    
+	
 	/**
 	 * Transform a simple node and its attributes to a hash
 	 *
