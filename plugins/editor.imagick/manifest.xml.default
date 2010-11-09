@@ -26,6 +26,6 @@
 	<dependencies>
 		<pluginResources pluginName="editor.diaporama"/>
 		<!-- Stream Wrapper must be implemented -->
-		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>				
 </editor>
