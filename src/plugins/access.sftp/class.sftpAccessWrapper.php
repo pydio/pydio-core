@@ -37,6 +37,36 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
+/**
+ * Callback for ssh2_connect in case of disconnexion.
+ *
+ * @param integer $code
+ * @param String $message
+ * @param String $language
+ */
+function disconnectedSftp($code, $message, $language){
+	AJXP_Logger::logAction("SSH2.FTP.disconnected");
+	throw new Exception('SSH2.FTP : disconnected'.$message, $code);
+}
+
+function ignoreSftp($message){
+	AJXP_Logger::logAction("SSH2.FTP.ignore");
+	throw new Exception('SSH2.FTP : ignore'.$message, $code);
+}
+
+function debugSftp($message, $language, $always_display){
+	AJXP_Logger::logAction("SSH2.FTP.debug");
+	throw new Exception('SSH2.FTP : debug'.$message, $code);
+}
+
+function macerrorSftp($packet){
+	AJXP_Logger::logAction("SSH2.FTP.macerror");
+	throw new Exception('SSH2.FTP : macerror'.$message, $code);
+}
+    
+
+
+
 class sftpAccessWrapper extends fsAccessWrapper {		
 
 	static $sftpResource;
@@ -48,7 +78,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
      * @param string $path
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
      */
-    protected static function initPath($path, $storeOpenContext = false, $skipZip = false){    	
+    protected static function initPath($path, $streamType="", $sftpResource = false, $skipZip = false){
     	$url = parse_url($path);
     	$repoId = $url["host"];
     	$repoObject = ConfService::getRepositoryById($repoId);
@@ -80,7 +110,10 @@ class sftpAccessWrapper extends fsAccessWrapper {
     	if(isSet(self::$sftpResource)){
     		return self::$sftpResource;
     	}
-    	$callbacks = array('disconnect' => array("sftpAccessWrapper", "disconnectedSftp"));
+    	$callbacks = array('disconnect' => "disconnectedSftp", 
+    						'ignore' 	=> "ignoreSftp", 
+    						'debug' 	=> "debugSftp",
+    						'macerror'	=> "macerrorSftp");
 		$remote_serv = $repoObject->getOption("SERV");
 		$remote_port = $repoObject->getOption("PORT");
 		$remote_user = $repoObject->getOption("USER");
@@ -90,17 +123,6 @@ class sftpAccessWrapper extends fsAccessWrapper {
 		ssh2_auth_password($connection, $remote_user, $remote_pass);
 		self::$sftpResource = ssh2_sftp($connection);
     	return self::$sftpResource;
-    }
-    
-    /**
-     * Callback for ssh2_connect in case of disconnexion.
-     *
-     * @param integer $code
-     * @param String $message
-     * @param String $language
-     */
-    protected static function disconnectedSftp($code, $message, $language){
-    	throw new Exception($message, $code);
     }
     
     /**
@@ -176,6 +198,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
 		return self::initPath($path);
 	}
 
+	
 	/**
 	 * Override parent function, testing feof() does not seem to work.
 	 * We may have performance problems on big files here.
@@ -184,7 +207,13 @@ class sftpAccessWrapper extends fsAccessWrapper {
 	 * @param Stream $stream
 	 */
 	public static function copyFileInStream($path, $stream){
-		fwrite($stream, file_get_contents(self::initPath($path)));
+		
+		$src = fopen(self::initPath($path), "rb");		
+		while ($content = fread($src, 5120)) {			
+			fputs($stream, $content, strlen($content));
+			if(strlen($content) == 0) break;
+		}					
+		fclose($src);		
 	}
 	
 	/**

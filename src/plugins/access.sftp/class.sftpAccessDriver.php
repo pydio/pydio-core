@@ -144,16 +144,9 @@ class sftpAccessDriver extends fsAccessDriver
 			}else{
 				try{
 					// BEGIN OVERRIDING
-					//$src = fopen($realSrcFile, "r");
 					$dest = fopen($destFile, "w");
 					fwrite($dest, file_get_contents($realSrcFile));
-					/*
-					while (!feof($src)) {
-						stream_copy_to_stream($src, $dest, 4096);
-					}
-					*/					
-					//fclose($src);
-					fclose($dest);
+					fclose($dest);					
 					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
 					// END OVERRIDING
 				}catch (Exception $e){
