@@ -255,11 +255,11 @@ WebFXTreeAbstractNode.prototype.toggle = function() {
 } ;
 
 WebFXTreeAbstractNode.prototype.select = function() {
-	$(this.id + '-anchor').focus();
+	if($(this.id + '-anchor')) $(this.id + '-anchor').focus();
 };
 
 WebFXTreeAbstractNode.prototype.deSelect = function() {
-	if($(this.id)) $(this.id + '-anchor').className = '';
+	if($(this.id + '-anchor')) $(this.id + '-anchor').className = '';
 	webFXTreeHandler.selected = null;
 	if($(this.id)) $(this.id).className = 'webfx-tree-item';
 } ;
@@ -268,7 +268,7 @@ WebFXTreeAbstractNode.prototype.focus = function() {
 	if ((webFXTreeHandler.selected) && (webFXTreeHandler.selected != this)) { webFXTreeHandler.selected.deSelect(); }
 	webFXTreeHandler.selected = this;
 	if ((this.openIcon) && (webFXTreeHandler.behavior != 'classic')) { $(this.id + '-icon').src = this.openIcon; }
-	try{$(this.id + '-anchor').focus();}catch(e){}
+	if($(this.id + '-anchor')) $(this.id + '-anchor').focus();
 	$(this.id).className = 'webfx-tree-item selected-webfx-tree-item';
 	if (webFXTreeHandler.onSelect) { webFXTreeHandler.onSelect(this); }	
 } ;
@@ -288,7 +288,7 @@ WebFXTreeAbstractNode.prototype.blur = function() {
 	}
 	if(Prototype.Browser.IE)
 	{
-		$(this.id + '-anchor').blur();
+		if($(this.id + '-anchor')) $(this.id + '-anchor').blur();
 	}
 } ;
 

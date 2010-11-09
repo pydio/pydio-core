@@ -78,12 +78,15 @@ Class.create("Connexion", {
 	
 	applyComplete : function(transport){
 		var message;
+		var headers = transport.getAllResponseHeaders();
 		if(Prototype.Browser.Gecko && transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName=="parsererror"){
 			message = "Parsing error : \n" + transport.responseXML.documentElement.firstChild.textContent;					
 		}else if(Prototype.Browser.IE && transport.responseXML.parseError && transport.responseXML.parseError.errorCode != 0){
 			message = "Parsing Error : \n" + transport.responseXML.parseError.reason;
-		}else if(transport.getAllResponseHeaders().indexOf("text/xml")>-1 && transport.responseXML == null){
+		}else if(headers.indexOf("text/xml")>-1 && transport.responseXML == null){
 			message = "Unknown Parsing Error!";
+		}else if(headers.indexOf("text/xml") == -1 && headers.indexOf("application/json") == -1 && transport.responseText.indexOf("<b>Fatal error</b>") > -1){
+			message = transport.responseText.replace("<br />", "");
 		}
 		if(message){
 			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", message);
