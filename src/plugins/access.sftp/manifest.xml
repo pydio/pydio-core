@@ -6,7 +6,7 @@
 		<param name="PORT" type="string" label="Port number" description="Port to SSH server" mandatory="true" default="22"/>
 		<param name="PATH" type="string" label="Path" description="Real path to the folder on the server" mandatory="true"/>
 		<param name="USER" type="string" label="SFTP user" description="SFTP user name" mandatory="true"/>
-		<param name="PASS" type="string" label="SFTP password" description="SFTP password" mandatory="true"/>
+		<param name="PASS" type="password" label="SFTP password" description="SFTP password" mandatory="true"/>
 		<param name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>	
 		<param name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
 		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
@@ -26,7 +26,7 @@
 				</columns>
 			</component_config>
 			<component_config className="FoldersTree">
-				<property name="display" value="dz"/>
+				<property name="display" value="d"/>
 			</component_config>			
 		</client_configs>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>

@@ -144,9 +144,11 @@ class sftpAccessDriver extends fsAccessDriver
 			}else{
 				try{
 					// BEGIN OVERRIDING
-					$dest = fopen($destFile, "w");
-					fwrite($dest, file_get_contents($realSrcFile));
-					fclose($dest);					
+					list($connection, $remote_base_path) = sftpAccessWrapper::getSshConnection($realSrcFile);
+					$remoteSrc = $remote_base_path.$srcFile;
+					$remoteDest = $remote_base_path.$destDir;
+					AJXP_Logger::debug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));
+					ssh2_exec($connection, 'cp '.$remoteSrc.' '.$remoteDest);
 					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
 					// END OVERRIDING
 				}catch (Exception $e){
@@ -192,6 +194,81 @@ class sftpAccessDriver extends fsAccessDriver
 		}
 		
 	}	
+	
+	/**
+	 * @return zipfile
+	 */ 
+    function makeZip ($src, $dest, $basedir)
+    {
+    	@set_time_limit(60);
+    	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
+    	$filePaths = array();
+    	
+    	$uniqid = uniqid();
+    	$uniqfolder = '/tmp/ajaxplorer-zip-'.$uniqid;
+    	mkdir($uniqfolder);
+    	
+    	foreach ($src as $item){
+    		$basedir = trim(dirname($item));
+    		$basename = basename($item);
+    		$uniqpath = $uniqfolder.'/'.$basename;
+    		$this->full_copy($this->urlBase.$item, $uniqpath);
+    		$filePaths[] = array(PCLZIP_ATT_FILE_NAME => $uniqpath, 
+    							 PCLZIP_ATT_FILE_NEW_SHORT_NAME => $basename);    				
+    	}
+    	AJXP_Logger::debug("Pathes", $filePaths);
+    	AJXP_Logger::debug("Basedir", array($basedir));
+    	$archive = new PclZip($dest);
+    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $uniqfolder, PCLZIP_OPT_NO_COMPRESSION);
+    	$this->recursiveRmdir($uniqfolder);
+    	if(!$vList){
+    		throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
+    	}
+    	return $vList;
+    }
+
+    function full_copy( $source, $destination ) {
+    	if ( is_dir( $source ) ) {
+    		@mkdir( $destination );
+    		$directory = dir( $source );
+    		while ( FALSE !== ( $readdirectory = $directory->read() ) ) {
+    			if ( $readdirectory == '.' || $readdirectory == '..' ) {
+    				continue;
+    			}
+    			$PathDir = $source . '/' . $readdirectory;
+    			if ( is_dir( $PathDir ) ) {
+    				$this->full_copy( $PathDir, $destination . '/' . $readdirectory );
+    				continue;
+    			}
+    			copy( $PathDir, $destination . '/' . $readdirectory );
+    		}
+
+    		$directory->close();
+    	}else {
+    		copy( $source, $destination );
+    	}
+    }
+
+    function recursiveRmdir($path)
+    {
+    	if (is_dir($path))
+    	{
+    		$path = rtrim($path, '/');
+    		$subdir = dir($path);
+    		while (($file = $subdir->read()) !== false)
+    		{
+    			if ($file != '.' && $file != '..')
+    			{
+    			(!is_link("$path/$file") && is_dir("$path/$file")) ? $this->recursiveRmdir("$path/$file") : unlink("$path/$file");
+    			}
+    		}
+    		$subdir->close();
+    		rmdir($path);
+    		return true;
+    	}
+    	return false;
+    }
+	
 }	
 
 ?>
