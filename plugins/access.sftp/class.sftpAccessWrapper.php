@@ -216,6 +216,18 @@ class sftpAccessWrapper extends fsAccessWrapper {
 		fclose($src);		
 	}
 	
+	
+    public function unlink($path){
+    	// Male sur to return true on success.
+    	$this->realPath = $this->initPath($path, "file", false, true);
+    	@unlink($this->realPath);
+    	if(is_file($this->realPath)){
+    		return false;
+    	}else{
+    		return true;
+    	}
+    }
+	
 	/**
 	 * Specific case for chmod : not supported natively by ssh2.sftp protocole
 	 * we have to recreate an ssh2 connexion.
@@ -225,6 +237,13 @@ class sftpAccessWrapper extends fsAccessWrapper {
 	 */
 	public static function changeMode($path, $chmodValue){		
     	$url = parse_url($path);
+		list($connection, $remote_base_path) = self::getSshConnection($path);
+		var_dump('chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
+		ssh2_exec($connection,'chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
+	}
+	
+	public static function getSshConnection($path){
+    	$url = parse_url($path);
     	$repoId = $url["host"];
     	$repoObject = ConfService::getRepositoryById($repoId);
 		$remote_serv = $repoObject->getOption("SERV");
@@ -233,10 +252,14 @@ class sftpAccessWrapper extends fsAccessWrapper {
 		$remote_pass = $repoObject->getOption("PASS");
 		$remote_base_path = $repoObject->getOption("PATH");
 		
-    	$callbacks = array('disconnect' => array("sftpAccessWrapper", "disconnectedSftp"));
+    	$callbacks = array('disconnect' => "disconnectedSftp", 
+    						'ignore' 	=> "ignoreSftp", 
+    						'debug' 	=> "debugSftp",
+    						'macerror'	=> "macerrorSftp");
 		$connection = ssh2_connect($remote_serv, intval($remote_port), array(), $callbacks);
 		ssh2_auth_password($connection, $remote_user, $remote_pass);    	
-		ssh2_exec($connection,'chmod '.$chmodValue.' '.$remote_base_path.$path);		
+		return array($connection, $remote_base_path);
 	}
+	
 }
 ?>
