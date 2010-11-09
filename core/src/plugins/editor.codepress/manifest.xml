@@ -3,7 +3,7 @@
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>
 		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>
 	<resources>
 		<js file="plugins/editor.codepress/codepress/codepress.js" className="CodePress"/>
