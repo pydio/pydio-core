@@ -51,4 +51,5 @@ js/ajaxplorer/class.Modal.js
 js/ajaxplorer/class.BookmarksBar.js
 js/ajaxplorer/class.FormManager.js
 js/ajaxplorer/class.MultiDownloader.js
+js/ajaxplorer/class.ActivityMonitor.js
 js/ajaxplorer/class.Ajaxplorer.js
