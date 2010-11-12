@@ -71,7 +71,7 @@ Class.create("Ajaxplorer", {
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
-		window.setTimeout(function(){document.fire('ajaxplorer:loaded');}, 500);
+		window.setTimeout(function(){document.fire('ajaxplorer:loaded');}, 500);		
 	},
 	
 	loadXmlRegistry : function(sync, xPath){
@@ -180,7 +180,12 @@ Class.create("Ajaxplorer", {
 			}.bind(this), 100 );
 		}.bind(this) );
 		modal.updateLoadingProgress('Actions Initialized');
-		  
+		
+		this.activityMonitor = new ActivityMonitor(
+			window.ajxpBootstrap.parameters.get('session_timeout'), 
+			window.ajxpBootstrap.parameters.get('client_timeout'), 
+			window.ajxpBootstrap.parameters.get('client_timeout_warning'), 
+			window.ajxpBootstrap.parameters.get('client_timeout_action'));
 		  
 		/*********************
 		/* USER GUI

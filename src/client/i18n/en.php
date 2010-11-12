@@ -412,5 +412,7 @@ $mess=array(
 "372" => "Current Repository",
 "373" => "Destination",
 "374" => "You cannot copy folders across repositories",
+"375" => "Warning, you were inactive since more than __IDLE__, you will be logged out in __LOGOUT__",
+"376" => "Click anywhere to reactivate",
 );
 ?>

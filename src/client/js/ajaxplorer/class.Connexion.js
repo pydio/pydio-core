@@ -119,6 +119,7 @@ Class.create("Connexion", {
 		if(this.onComplete){
 			this.onComplete(transport);
 		}
+		document.fire("ajaxplorer:server_answer");
 	},
 	
 	loadLibrary : function(fileName, onLoadedCode){
@@ -151,6 +152,7 @@ Class.create("Connexion", {
 						alert('error loading '+fileName+':'+e);
 					}
 				}
+				document.fire("ajaxplorer:server_answer");				
 			}
 		});	
 	}
