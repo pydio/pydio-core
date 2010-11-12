@@ -171,8 +171,8 @@ Class.create("AjxpBootstrap", {
 		if(this.parameters.get('customWelcomeScreen')){
 			html += this.parameters.get('customWelcomeScreen');
 		}else{
-			html+='	<div id="progressBox" style="background-color:#fff;border:2px solid #676965;width:305px;padding:1px;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
-			html+='	<div align="left" style="background-color:#fff;border:1px solid #676965;color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
+			html+='	<div id="progressBox" class="dialogBox" style="width:305px;padding:3;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
+			html+='	<div align="left" class="dialogContent" style="color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
 			html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\''+ajxpResourcesFolder+'/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
 			html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';
 			html+='	Written by Charles du Jeu - LGPL License. <br>';
