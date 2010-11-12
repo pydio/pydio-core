@@ -55,7 +55,7 @@ Class.create("CodePressEditor", TextEditor, {
 		this.textarea.name = this.textarea.id = 'cpCode';
 		$(this.textarea).addClassName('codepress');
 		$(this.textarea).addClassName(cpStyle);
-		$(this.textarea).addClassName('linenumbers-on');
+		//$(this.textarea).addClassName('linenumbers-on');
 		this.currentUseCp = true;
 		this.contentMainContainer = this.textarea.parentNode;
 		this.element.observe("editor:resize", function(event){
