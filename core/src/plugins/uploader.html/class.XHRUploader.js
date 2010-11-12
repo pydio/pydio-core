@@ -520,7 +520,7 @@ Class.create("XHRUploader", {
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", item.file.fileName);
         xhr.setRequestHeader("X-File-Size", item.file.fileSize);
-        xhr.setRequestHeader("Content-Type", "multipart/form-data");
+        //xhr.setRequestHeader("Content-Type", "multipart/form-data");
         xhr.send(item.file);		
         
         item.xhr = xhr;

@@ -56,12 +56,12 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 	    $headersCheck = (
 	        // basic checks
 	        isset(
-	            $_SERVER['CONTENT_TYPE'],
+	            //$_SERVER['CONTENT_TYPE'],
 	            $_SERVER['CONTENT_LENGTH'],
 	            $_SERVER['HTTP_X_FILE_SIZE'],
 	            $_SERVER['HTTP_X_FILE_NAME']
 	        ) &&
-	        $_SERVER['CONTENT_TYPE'] === 'multipart/form-data' &&
+	        //$_SERVER['CONTENT_TYPE'] === 'multipart/form-data' &&
 	        $_SERVER['CONTENT_LENGTH'] === $_SERVER['HTTP_X_FILE_SIZE']
 	    );
 	    $fileNameH = $_SERVER['HTTP_X_FILE_NAME'];
