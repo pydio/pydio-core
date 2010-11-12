@@ -226,6 +226,20 @@ define("GZIP_LIMIT", 1*1048576); // Do not Gzip files above 1M
 // will appear instead.
 define("DISABLE_ZIP_CREATION", false);
 
+/***********************************************/
+/* CLIENT SESSION OPTIONS
+/*********************************************/
+// The length of the client session in SECONDS. By default, it's copying
+// the server session length. In most PHP installation, it will be 1440, ie 24minutes.
+define("AJXP_CLIENT_TIMEOUT_TIME", intval(ini_get("session.gc_maxlifetime")));
+// The number of MINUTES before the session expiration
+// where the client issues a warning.
+define("AJXP_CLIENT_TIMEOUT_WARN_BEFORE", 3);
+// The default action to trigger on session expiration. 
+// This should be set by the currently active auth plugin.
+define("AJXP_CLIENT_TIMEOUT_ACTION", "logout");
+
+
 /**********************************************/
 /* GOOGLE ANALYTICS SETUP
 /**********************************************/
