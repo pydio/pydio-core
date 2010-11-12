@@ -143,7 +143,11 @@ if(AuthService::usersEnabled())
 	}
 	if($loggedUser == null)
 	{
-		$requireAuth = true;
+		// Try prelogging user if the session expired but the logging data is in fact still present
+		// For example, for basic_http auth.
+		AuthService::preLogUser((isSet($_GET["remote_session"])?$_GET["remote_session"]:""));
+		$loggedUser = AuthService::getLoggedUser();
+		if($loggedUser == null) $requireAuth = true;
 	}
 	if(isset($loggingResult))
 	{
