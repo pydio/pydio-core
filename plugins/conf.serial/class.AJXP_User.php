@@ -118,14 +118,11 @@ class AJXP_User extends AbstractAjxpUser
 	function deleteUser($userId){
 		$storage = ConfService::getConfStorageImpl();
 		$serialDir = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $storage->getOption("USERS_DIRPATH"));
-		if(is_file($serialDir."/".$userId."/rights.ser")){
-			unlink($serialDir."/".$userId."/rights.ser");
-		}
-		if(is_file($serialDir."/".$userId."/prefs.ser")){
-			unlink($serialDir."/".$userId."/prefs.ser");
-		}
-		if(is_file($serialDir."/".$userId."/bookmarks.ser")){
-			unlink($serialDir."/".$userId."/bookmarks.ser");
+		$files = glob($serialDir."/".$userId."/*.ser");
+		if(is_array($files) && count($files)){
+			foreach ($files as $file){
+				unlink($file);
+			}
 		}
 		if(is_dir($serialDir."/".$userId)) rmdir($serialDir."/".$userId);
 		
