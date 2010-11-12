@@ -163,6 +163,10 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["usersEnabled"] = AuthService::usersEnabled();
 				$config["loggedUser"] = (AuthService::getLoggedUser()!=null);
 				$config["currentLanguage"] = ConfService::getLanguage();
+				$config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
+				$config["client_timeout"] = ConfService::getConf("CLIENT_TIMEOUT_TIME");
+				$config["client_timeout_warning"] = ConfService::getConf("CLIENT_TIMEOUT_WARNING");
+				$config["client_timeout_action"] = ConfService::getConf("CLIENT_TIMEOUT_ACTION");
 				$config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
 				$config["ajxpVersion"] = AJXP_VERSION;
 				$config["ajxpVersionDate"] = AJXP_VERSION_DATE;				
