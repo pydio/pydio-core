@@ -95,5 +95,7 @@ $mess=array(
 "82" => "Edition en groupe des utilisateurs",
 "83" => "Glissez/Déposez les rôles pour les assigner aux utilisateurs sélectionnés (les utilisateurs partagés ne seront pas pris en compte)",
 "84" => "Rôles utilisateurs",
+"85" => "Filtrage manuel des actions",
+"86" => "Liste d'actions qui seront désactivées pour ce rôle, quelque soit le droit d'accès associé.",
 );
 ?>
