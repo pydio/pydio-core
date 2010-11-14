@@ -40,12 +40,40 @@ class AJXP_Controller{
 	private static $xPath;
 	public static $lastActionNeedsAuth = false;
 	
-	private static function initXPath(){
+	private static function initXPath(){		
 		if(!isSet(self::$xPath)){
+			
 			$registry = AJXP_PluginsService::getXmlRegistry();
+			$changes = self::filterActionsRegistry($registry);
+			if($changes) AJXP_PluginsService::updateXmlRegistry($registry);
 			self::$xPath = new DOMXPath($registry);		
 		}
 		return self::$xPath;
+	}
+	
+	private static function filterActionsRegistry(&$registry){
+		if(!AuthService::usersEnabled()) return false ;
+		$loggedUser = AuthService::getLoggedUser();
+		if($loggedUser == null) return false;
+		$crtRepo = ConfService::getRepository();
+		$crtRepoId = "ajxp.all";
+		if($crtRepo != null && is_a($crtRepo, "Repository")){
+			$crtRepoId = $crtRepo->getId();
+		}
+		$actionRights = $loggedUser->getSpecificActionsRights($crtRepoId);
+		$changes = false;
+		$xPath = new DOMXPath($registry);
+		foreach ($actionRights as $actionName => $enabled){
+			if($enabled !== false) continue;
+			$actions = $xPath->query("actions/action[@name='$actionName']");		
+			if(!$actions->length){
+				continue;
+			}
+			$action = $actions->item(0);
+			$action->parentNode->removeChild($action);
+			$changes = true;
+		}
+		return $changes;
 	}
 	
 	public static function findActionAndApply($actionName, $httpVars, $fileVars){

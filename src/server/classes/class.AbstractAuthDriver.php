@@ -41,6 +41,42 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	var $driverName = "abstract";
 	var $driverType = "auth";
 					
+	public function switchAction($action, $httpVars, $fileVars)	{
+		if(!isSet($this->actions[$action])) return;
+		$mess = ConfService::getMessages();
+		
+		switch ($action){			
+			//------------------------------------
+			//	CHANGE USER PASSWORD
+			//------------------------------------	
+			case "pass_change":
+							
+				$userObject = AuthService::getLoggedUser();
+				if($userObject == null || $userObject->getId() == "guest"){
+					header("Content-Type:text/plain");
+					print "SUCCESS";
+				}
+				$oldPass = $httpVars["old_pass"];
+				$newPass = $httpVars["new_pass"];
+				$passSeed = $httpVars["pass_seed"];
+				if(AuthService::checkPassword($userObject->getId(), $oldPass, false, $passSeed)){
+					AuthService::updatePassword($userObject->getId(), $newPass);
+				}else{
+					header("Content-Type:text/plain");
+					print "PASS_ERROR";
+				}
+				header("Content-Type:text/plain");
+				print "SUCCESS";
+				
+			break;					
+					
+			default;
+			break;
+		}				
+		return "";
+	}
+	
+	
 	public function getRegistryContributions(){
 		$logged = AuthService::getLoggedUser();
 		if(AuthService::usersEnabled()) {

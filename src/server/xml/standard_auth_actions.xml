@@ -106,7 +106,13 @@
 									hideLightBox(true);
 								}
 							};
-							ajaxplorer.user.savePreferences(userOldPass, userPass, passSeed, onComplete);			
+							var conn = new Connexion();
+							conn.addParameter("get_action", "pass_change");
+							conn.addParameter("old_pass", userOldPass);
+							conn.addParameter("new_pass", userPass);
+							conn.addParameter("pass_seed", passSeed);
+							conn.onComplete = onComplete;
+							conn.sendAsync();
 						}
 					]]></dialogOnComplete>
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>

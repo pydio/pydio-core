@@ -365,6 +365,11 @@ class AJXP_XMLWriter
 			$st.= $lastString;
 		}
 		$st .= "</repositories>";
+		$st .= "<actions_rights>";
+		foreach ($role->getSpecificActionsRights("ajxp.all") as $actionId => $actionValue){
+			$st.="<action name=\"$actionId\" value=\"".($actionValue?"true":"false")."\"/>";
+		}
+		$st .= "</actions_rights>";
 		return $st;
 	}
 	

@@ -88,8 +88,10 @@ class AbstractAccessDriver extends AJXP_Plugin {
 				AJXP_Logger::logAction("Disabling Public links, PUBLIC_DOWNLOAD_FOLDER is not writeable!", array("folder" => PUBLIC_DOWNLOAD_FOLDER, "is_dir" => is_dir(PUBLIC_DOWNLOAD_FOLDER),"is_writeable" => is_writable(PUBLIC_DOWNLOAD_FOLDER)));
 				$disableSharing = true;
 			}else{
-				if(AuthService::usersEnabled()){
+				if(AuthService::usersEnabled()){					
 					$loggedUser = AuthService::getLoggedUser();
+					/*
+					// Should be disabled by AJXP_Controller directly
 					$currentRepo = ConfService::getRepository();
 					if($currentRepo != null){
 						$rights = $loggedUser->getSpecificActionsRights($currentRepo->getId());
@@ -97,6 +99,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 							$disableSharing = true;
 						}
 					}
+					*/
 					if($loggedUser->getId() == "guest" || $loggedUser == "shared"){
 						$disableSharing = true;
 					}

@@ -82,10 +82,14 @@ class AjxpRole
 	}
 	
 	function getSpecificActionsRights($rootDirId){
-		if(isSet($this->rights["ajxp.actions"]) && isSet($this->rights["ajxp.actions"][$rootDirId])){
-			return $this->rights["ajxp.actions"][$rootDirId];
+		$res = array();
+		if($rootDirId."" != "ajxp.all"){
+			$res = $this->getSpecificActionsRights("ajxp.all");
 		}
-		return array();
+		if(isSet($this->rights["ajxp.actions"]) && isSet($this->rights["ajxp.actions"][$rootDirId])){
+			$res = array_merge($res, $this->rights["ajxp.actions"][$rootDirId]);
+		}
+		return $res;
 	}
 	
 	function setSpecificActionRight($rootDirId, $actionName, $allowed){		
