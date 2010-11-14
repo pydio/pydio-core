@@ -71,7 +71,6 @@ class ConfService
         
         $this->configs["CLIENT_TIMEOUT_TIME"] = (defined('AJXP_CLIENT_TIMEOUT_TIME')?AJXP_CLIENT_TIMEOUT_TIME:ini_get("session.gc_maxlifetime"));
         $this->configs["CLIENT_TIMEOUT_WARNING"] = (defined('AJXP_CLIENT_TIMEOUT_WARN_BEFORE')?AJXP_CLIENT_TIMEOUT_WARN_BEFORE:3);
-        $this->configs["CLIENT_TIMEOUT_ACTION"] = (defined('AJXP_CLIENT_TIMEOUT_ACTION')?AJXP_CLIENT_TIMEOUT_ACTION:"logout");
 
 		if(isSet($PLUGINS)){
 			$this->configs["PLUGINS"] = $PLUGINS;

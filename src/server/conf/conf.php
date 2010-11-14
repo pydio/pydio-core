@@ -235,10 +235,6 @@ define("AJXP_CLIENT_TIMEOUT_TIME", intval(ini_get("session.gc_maxlifetime")));
 // The number of MINUTES before the session expiration
 // where the client issues a warning.
 define("AJXP_CLIENT_TIMEOUT_WARN_BEFORE", 3);
-// The default action to trigger on session expiration. 
-// This should be set by the currently active auth plugin.
-define("AJXP_CLIENT_TIMEOUT_ACTION", "logout");
-
 
 /**********************************************/
 /* GOOGLE ANALYTICS SETUP

@@ -130,7 +130,7 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>				
 		</action>		
-		<action name="logout">
+		<action name="logout" expireDefault="true">
 			<gui text="164" title="169" src="decrypted.png"
 				accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="false"
