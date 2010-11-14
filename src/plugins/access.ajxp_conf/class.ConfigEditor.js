@@ -271,6 +271,32 @@ ConfigEditor = Class.create({
 		rightsTable.select('[id="loading_row"]')[0].remove();				
 	},
 	
+	generateActionRightsPane : function(xmlData, clear){
+		var actionPane = this.form.down('#actions_pane');
+		var textfield = actionPane.down('#disabled_actions');
+		if(!clear){
+			var submitButton = actionPane.down('#submit_actions_pane');
+			submitButton.observe("click", function(e){
+				Event.stop(e);
+				var conn = new Connexion();
+				conn.addParameter("get_action", "edit");
+				conn.addParameter("sub_action", "update_role_actions");
+				conn.addParameter("role_id", this.roleId);
+				conn.addParameter("disabled_actions", textfield.getValue());
+				conn.onComplete = function(transport){
+					this.generateActionRightsPane(transport.responseXML, true);
+				}.bind(this);
+				conn.sendAsync();
+			}.bind(this) );
+		}
+		var actionNodes = XPathSelectNodes(xmlData, 'admin_data/actions_rights/action[@value="false"]');
+		var disabled = [];
+		for(var i=0;i<actionNodes.length;i++){
+			disabled.push(actionNodes[i].getAttribute('name'));
+		}
+		textfield.value = disabled.join(',');
+	},
+	
 	generateWalletsPane : function(xmlData){
 		var wallets = this.form.select("#wallets_pane")[0];
 		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
@@ -490,6 +516,7 @@ ConfigEditor = Class.create({
 		this.form.down('fieldset').insert({top:new Element('legend').update(MessageHash["ajxp_conf.77"])});
 		this.form.down('#roles_pane').remove();
 		this.form.down('#rights_legend').remove();		
+		this.form.down('#actions_pane').show();
 		var params = new Hash();
 		params.set("get_action", "edit");
 		params.set("sub_action", "edit_role");
@@ -498,6 +525,7 @@ ConfigEditor = Class.create({
 		connexion.setParameters(params);
 		connexion.onComplete = function(transport){
 			this.generateRightsTable(transport.responseXML);
+			this.generateActionRightsPane(transport.responseXML);
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
 			ajaxplorer.blurAll();

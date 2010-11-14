@@ -95,5 +95,7 @@ $mess=array(
 "82" => "Batch-edit users",
 "83" => "Drag'n'drop roles to apply them to all selected users (shared users are skipped)",
 "84" => "Users Roles",
+"85" => "Manual actions filtering",
+"86" => "list of comma-separated actions that will be disabled for this role, no matter the access right.",
 ); 
 ?>
