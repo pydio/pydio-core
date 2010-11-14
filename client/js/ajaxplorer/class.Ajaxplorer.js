@@ -184,8 +184,7 @@ Class.create("Ajaxplorer", {
 		this.activityMonitor = new ActivityMonitor(
 			window.ajxpBootstrap.parameters.get('session_timeout'), 
 			window.ajxpBootstrap.parameters.get('client_timeout'), 
-			window.ajxpBootstrap.parameters.get('client_timeout_warning'), 
-			window.ajxpBootstrap.parameters.get('client_timeout_action'));
+			window.ajxpBootstrap.parameters.get('client_timeout_warning'));
 		  
 		/*********************
 		/* USER GUI

@@ -43,13 +43,11 @@ Class.create("ActivityMonitor", {
 	_logoutMinutes:0,
 	_lastActive:0,	
 	_state:'active',
-	_expireAction : 'logout',
 	
-	initialize : function(serverSessionTime, clientSessionTime, warningMinutes, expireAction){
+	initialize : function(serverSessionTime, clientSessionTime, warningMinutes){
 		if(!serverSessionTime) return;
 		this._serverSessionTime = serverSessionTime;
 		if(warningMinutes) this._warningMinutes = warningMinutes;
-		if(expireAction) this._expireAction = expireAction;
 		this._warningTime = clientSessionTime - this._warningMinutes*60;
 		this._logoutTime = clientSessionTime - this._logoutMinutes*60;
 		this._renewTime = serverSessionTime - this._renewMinutes*60;
@@ -106,7 +104,7 @@ Class.create("ActivityMonitor", {
 			this._state = 'active';
 			if(this.interval) window.clearInterval(this.interval);
 			if(this.serverInterval) window.clearInterval(this.serverInterval);
-			ajaxplorer.actionBar.fireAction(this._expireAction);
+			ajaxplorer.actionBar.fireDefaultAction("expire");
 			return;
 		}
 		if( idleTime >= this._warningTime ){
@@ -148,7 +146,7 @@ Class.create("ActivityMonitor", {
 	},
 	
 	updateWarningTimer : function(time){
-		var stringTime = Math.round(time/60)+'mn'+(time%60) + 's';
+		var stringTime = Math.floor(time/60)+'mn'+(time%60) + 's';
 		this.warningPane.down('span.warning_timer').update(stringTime);
 		if(this.warningPane.visible() && time%60%10 == 0){
 			new Effect.Shake(this.warningPane);

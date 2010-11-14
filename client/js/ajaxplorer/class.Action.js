@@ -290,7 +290,8 @@ Class.create("Action", {
 				dir:"dirDefault", 
 				file:"fileDefault", 
 				dragndrop:"dragndropDefault",
-				ctrldragndrop:"ctrlDragndropDefault"
+				ctrldragndrop:"ctrlDragndropDefault",
+				expire:"expireDefault"
 			});
 			defaultAttributes.each(function(att){
 				if(xmlNode.getAttribute(att.value) && xmlNode.getAttribute(att.value) == "true"){

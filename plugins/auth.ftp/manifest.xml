@@ -90,7 +90,7 @@
 				</processing>
 			</action>	
 			<!-- OVERRIDE LOGOUT -->
-			<action name="ftp_logout">
+			<action name="ftp_logout" expireDefault="true">
 				<gui text="164" title="169" src="decrypted.png"
 					accessKey="" hasAccessKey="false">
 					<context selection="false" dir="" recycle="false"
