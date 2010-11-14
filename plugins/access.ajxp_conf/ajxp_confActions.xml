@@ -257,6 +257,11 @@
 										</tbody>
 									</table>
 								</div>
+								<div id="actions_pane" style="display:none;padding-top:15px;">
+									<div class="dialogLegend"><b>AJXP_MESSAGE[ajxp_conf.85]</b> : AJXP_MESSAGE[ajxp_conf.86]</div>
+									<textarea id="disabled_actions" style="width:100%;padding:1px;"></textarea>
+									<input type="image" value="SAVE" class="dialogButton onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" id="submit_actions_pane" style="float:right;"/>
+								</div>
 							</div>
 							<div id="user_personal" style="display:none;">
 								<div id="password_pane">
