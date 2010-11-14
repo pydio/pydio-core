@@ -231,24 +231,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				{
 					$prefName = $_GET["pref_name_".$i];
 					$prefValue = stripslashes($_GET["pref_value_".$i]);
-					if($prefName != "password")
-					{
-						$userObject->setPref($prefName, $prefValue);
-						$userObject->save();
-						AuthService::updateUser($userObject);
-						setcookie("AJXP_$prefName", $prefValue);
-					}
-					else
-					{
-						if(isSet($_GET["crt"]) && AuthService::checkPassword($userObject->getId(), $_GET["crt"], false, $_GET["pass_seed"])){
-							AuthService::updatePassword($userObject->getId(), $prefValue);
-						}else{
-							//$errorMessage = "Wrong password!";
-							header("Content-Type:text/plain");
-							print "PASS_ERROR";
-							exit(1);
-						}
-					}
+					if($prefName == "password") continue;
+					$userObject->setPref($prefName, $prefValue);
+					$userObject->save();
+					AuthService::updateUser($userObject);
+					setcookie("AJXP_$prefName", $prefValue);
 					$i++;
 				}
 				header("Content-Type:text/plain");
