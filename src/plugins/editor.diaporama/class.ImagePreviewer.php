@@ -63,11 +63,15 @@ class ImagePreviewer extends AJXP_Plugin {
 					$pThumb->use_cache = $this->pluginConf["USE_THUMBNAIL_CACHE"];
 					$pThumb->cache_dir = $this->pluginConf["THUMBNAIL_CACHE_DIR"];	
 					$pThumb->fit_thumbnail($destStreamURL.$file, 200);
+					
 					if($pThumb->isError()){
 						print_r($pThumb->error_array);
 						AJXP_Logger::logAction("error", $pThumb->error_array);
 					}
-					exit(0);
+					//exit(0);
+				}else{
+					print_r($pThumb->error_array);
+					AJXP_Logger::logAction("error", $pThumb->error_array);					
 				}
 			}else{
 	 			$filesize = filesize($destStreamURL.$file);
@@ -82,7 +86,7 @@ class ImagePreviewer extends AJXP_Plugin {
 				call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
 				fflush($stream);
 				fclose($stream);
-				exit(1);
+				//exit(1);
 			}
 		}
 	}
