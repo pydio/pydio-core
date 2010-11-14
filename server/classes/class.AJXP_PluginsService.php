@@ -288,6 +288,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		return $self->xmlRegistry;
  	}
  	
+ 	public static function updateXmlRegistry($registry){
+ 		$self = self::getInstance();
+ 		$self->xmlRegistry = $registry;
+ 	}
+ 	
  	public static function searchAllManifests($query, $stringOrNodeFormat = "string"){
  		$buffer = "";
  		$nodes = array();

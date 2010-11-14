@@ -120,7 +120,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AuthService::updateRole(new AjxpRole($roleId));
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.66"], null);
-				AJXP_XMLWriter::reloadDataNode("", $_GET["role_id"]);
+				AJXP_XMLWriter::reloadDataNode("", $httpVars["role_id"]);
 				AJXP_XMLWriter::close();				
 			break;
 			
@@ -133,27 +133,52 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			break;
 			
 			case "update_role_right" :
-				if(!isSet($_GET["role_id"]) 
-					|| !isSet($_GET["repository_id"]) 
-					|| !isSet($_GET["right"]))
+				if(!isSet($httpVars["role_id"]) 
+					|| !isSet($httpVars["repository_id"]) 
+					|| !isSet($httpVars["right"]))
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-					print("<update_checkboxes user_id=\"".$_GET["role_id"]."\" repository_id=\"".$_GET["repository_id"]."\" read=\"old\" write=\"old\"/>");
+					print("<update_checkboxes user_id=\"".$httpVars["role_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
 					AJXP_XMLWriter::close();
-					exit(1);
+					//exit(1);
 				}
-				$role = AuthService::getRole($_GET["role_id"]);
-				$role->setRight($_GET["repository_id"], $_GET["right"]);
+				$role = AuthService::getRole($httpVars["role_id"]);
+				$role->setRight($httpVars["repository_id"], $httpVars["right"]);
 				AuthService::updateRole($role);
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.64"].$_GET["role_id"], null);
-				print("<update_checkboxes user_id=\"".$_GET["role_id"]."\" repository_id=\"".$_GET["repository_id"]."\" read=\"".$role->canRead($_GET["repository_id"])."\" write=\"".$role->canWrite($_GET["repository_id"])."\"/>");
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.64"].$httpVars["role_id"], null);
+				print("<update_checkboxes user_id=\"".$httpVars["role_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"".$role->canRead($httpVars["repository_id"])."\" write=\"".$role->canWrite($httpVars["repository_id"])."\"/>");
 				//AJXP_XMLWriter::reloadRepositoryList();
 				AJXP_XMLWriter::close();
-				exit(1);
+				//exit(1);
 			break;
-		
+
+			case "update_role_actions" : 
+			
+				if(!isSet($httpVars["role_id"])  
+					|| !isSet($httpVars["disabled_actions"]))
+				{
+					AJXP_XMLWriter::header();
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
+					AJXP_XMLWriter::close();
+				}
+				$role = AuthService::getRole($httpVars["role_id"]);
+				$actions = array_map("trim", explode(",", $httpVars["disabled_actions"]));
+				// Clear and reload actions
+				foreach ($role->getSpecificActionsRights("ajxp.all") as $actName => $actValue){
+					$role->setSpecificActionRight("ajxp.all", $actName, true);
+				}
+				foreach ($actions as $action){
+					if($action == "") continue;
+					$role->setSpecificActionRight("ajxp.all", $action, false);
+				}
+				AuthService::updateRole($role);
+				AJXP_XMLWriter::header("admin_data");
+				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
+				AJXP_XMLWriter::close("admin_data");				
+			
+			break;		
 			
 			case "edit_user" : 
 				$confStorage = ConfService::getConfStorageImpl();	
@@ -194,7 +219,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 			case "create_user" :
 				
-				if(!isset($_GET["new_user_login"]) || $_GET["new_user_login"] == "" ||!isset($_GET["new_user_pwd"]) || $_GET["new_user_pwd"] == "")
+				if(!isset($httpVars["new_user_login"]) || $httpVars["new_user_login"] == "" ||!isset($httpVars["new_user_pwd"]) || $httpVars["new_user_pwd"] == "")
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
@@ -202,63 +227,63 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					exit(1);						
 				}
 				$forbidden = array("guest", "share");
-				if(AuthService::userExists($_GET["new_user_login"]) || in_array($_GET["new_user_login"], $forbidden))
+				if(AuthService::userExists($httpVars["new_user_login"]) || in_array($httpVars["new_user_login"], $forbidden))
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
 					AJXP_XMLWriter::close();
 					exit(1);									
 				}
-				if(get_magic_quotes_gpc()) $_GET["new_user_login"] = stripslashes($_GET["new_user_login"]);
-				$_GET["new_user_login"] = str_replace("'", "", $_GET["new_user_login"]);
+				if(get_magic_quotes_gpc()) $httpVars["new_user_login"] = stripslashes($httpVars["new_user_login"]);
+				$httpVars["new_user_login"] = str_replace("'", "", $httpVars["new_user_login"]);
 				
 				$confStorage = ConfService::getConfStorageImpl();		
-				$newUser = $confStorage->createUserObject($_GET["new_user_login"]);
+				$newUser = $confStorage->createUserObject($httpVars["new_user_login"]);
 				$newUser->save();
-				AuthService::createUser($_GET["new_user_login"], $_GET["new_user_pwd"]);
+				AuthService::createUser($httpVars["new_user_login"], $httpVars["new_user_pwd"]);
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
-				AJXP_XMLWriter::reloadFileList($_GET["new_user_login"]);
+				AJXP_XMLWriter::reloadFileList($httpVars["new_user_login"]);
 				AJXP_XMLWriter::close();
 				exit(1);										
 			break;
 								
 			case "change_admin_right" :
-				$userId = $_GET["user_id"];
+				$userId = $httpVars["user_id"];
 				$confStorage = ConfService::getConfStorageImpl();		
 				$user = $confStorage->createUserObject($userId);
-				$user->setAdmin(($_GET["right_value"]=="1"?true:false));
+				$user->setAdmin(($httpVars["right_value"]=="1"?true:false));
 				$user->save();
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.45"].$_GET["user_id"], null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.45"].$httpVars["user_id"], null);
 				AJXP_XMLWriter::reloadFileList(false);
 				AJXP_XMLWriter::close();
 				exit(1);
 			break;
 		
 			case "update_user_right" :
-				if(!isSet($_GET["user_id"]) 
-					|| !isSet($_GET["repository_id"]) 
-					|| !isSet($_GET["right"])
-					|| !AuthService::userExists($_GET["user_id"]))
+				if(!isSet($httpVars["user_id"]) 
+					|| !isSet($httpVars["repository_id"]) 
+					|| !isSet($httpVars["right"])
+					|| !AuthService::userExists($httpVars["user_id"]))
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-					print("<update_checkboxes user_id=\"".$_GET["user_id"]."\" repository_id=\"".$_GET["repository_id"]."\" read=\"old\" write=\"old\"/>");
+					print("<update_checkboxes user_id=\"".$httpVars["user_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
 					AJXP_XMLWriter::close();
 					exit(1);
 				}
 				$confStorage = ConfService::getConfStorageImpl();		
-				$user = $confStorage->createUserObject($_GET["user_id"]);
-				$user->setRight($_GET["repository_id"], $_GET["right"]);
+				$user = $confStorage->createUserObject($httpVars["user_id"]);
+				$user->setRight($httpVars["repository_id"], $httpVars["right"]);
 				$user->save();
 				$loggedUser = AuthService::getLoggedUser();
 				if($loggedUser->getId() == $user->getId()){
 					AuthService::updateUser($user);
 				}
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.46"].$_GET["user_id"], null);
-				print("<update_checkboxes user_id=\"".$_GET["user_id"]."\" repository_id=\"".$_GET["repository_id"]."\" read=\"".$user->canRead($_GET["repository_id"])."\" write=\"".$user->canWrite($_GET["repository_id"])."\"/>");
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.46"].$httpVars["user_id"], null);
+				print("<update_checkboxes user_id=\"".$httpVars["user_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"".$user->canRead($httpVars["repository_id"])."\" write=\"".$user->canWrite($httpVars["repository_id"])."\"/>");
 				AJXP_XMLWriter::reloadRepositoryList();
 				AJXP_XMLWriter::close();
 				return ;
@@ -267,7 +292,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case "user_add_role" : 
 			case "user_delete_role":
 			
-				if(!isSet($_GET["user_id"]) || !isSet($_GET["role_id"]) || !AuthService::userExists($_GET["user_id"])){
+				if(!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !AuthService::userExists($httpVars["user_id"])){
 					throw new Exception($mess["ajxp_conf.61"]);
 				}
 				if($action == "user_add_role"){
@@ -277,9 +302,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$act = "remove";
 					$messId = "74";
 				}
-				$this->updateUserRole($_GET["user_id"], $_GET["role_id"], $act);
+				$this->updateUserRole($httpVars["user_id"], $httpVars["role_id"], $act);
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.".$messId].$_GET["user_id"], null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.".$messId].$httpVars["user_id"], null);
 				AJXP_XMLWriter::close();
 				return ;
 				
@@ -334,7 +359,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 			
 			case "save_repository_user_params" : 
-				$userId = $_GET["user_id"];
+				$userId = $httpVars["user_id"];
 				if($userId == $loggedUser->getId()){
 					$user = $loggedUser;
 				}else{
@@ -343,12 +368,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				$wallet = $user->getPref("AJXP_WALLET");
 				if(!is_array($wallet)) $wallet = array();
-				$repoID = $_GET["repository_id"];
+				$repoID = $httpVars["repository_id"];
 				if(!array_key_exists($repoID, $wallet)){
 					$wallet[$repoID] = array();
 				}
 				$options = $wallet[$repoID];
-				$this->parseParameters($_GET, $options, $userId);
+				$this->parseParameters($httpVars, $options, $userId);
 				$wallet[$repoID] = $options;
 				$user->setPref("AJXP_WALLET", $wallet);
 				$user->save();
@@ -357,24 +382,24 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AuthService::updateUser($user);
 				}
 				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.47"].$_GET["user_id"], null);
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.47"].$httpVars["user_id"], null);
 				AJXP_XMLWriter::close();
 				exit(1);	
 			break;
 			
 			case "update_user_pwd" : 
-				if(!isSet($_GET["user_id"]) || !isSet($_GET["user_pwd"]) || !AuthService::userExists($_GET["user_id"]) || trim($_GET["user_pwd"]) == "")
+				if(!isSet($httpVars["user_id"]) || !isSet($httpVars["user_pwd"]) || !AuthService::userExists($httpVars["user_id"]) || trim($httpVars["user_pwd"]) == "")
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					AJXP_XMLWriter::close();
 					exit(1);			
 				}
-				$res = AuthService::updatePassword($_GET["user_id"], $_GET["user_pwd"]);
+				$res = AuthService::updatePassword($httpVars["user_id"], $httpVars["user_pwd"]);
 				AJXP_XMLWriter::header();
 				if($res === true)
 				{
-					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.48"].$_GET["user_id"], null);
+					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.48"].$httpVars["user_id"], null);
 				}
 				else 
 				{
@@ -396,7 +421,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case "create_repository" : 
 			
 				$options = array();
-				$repDef = $_GET;
+				$repDef = $httpVars;
 				unset($repDef["get_action"]);
 				$this->parseParameters($repDef, $options);
 				if(count($options)){
@@ -505,11 +530,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 			case "edit_repository_label" : 
 			case "edit_repository_data" : 
-				$repId = $_GET["repository_id"];
+				$repId = $httpVars["repository_id"];
 				$repo = ConfService::getRepositoryById($repId);
 				$res = 0;
-				if(isSet($_GET["newLabel"])){
-					$newLabel = SystemTextEncoding::fromPostedFileName($_GET["newLabel"]);
+				if(isSet($httpVars["newLabel"])){
+					$newLabel = SystemTextEncoding::fromPostedFileName($httpVars["newLabel"]);
                     if ($this->repositoryExists($newLabel))
                     {
 		     			AJXP_XMLWriter::header();
@@ -521,7 +546,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$res = ConfService::replaceRepository($repId, $repo);
 				}else{
 					$options = array();
-					$this->parseParameters($_GET, $options);
+					$this->parseParameters($httpVars, $options);
 					if(count($options)){
 						foreach ($options as $key=>$value) $repo->addOption($key, $value);
 					}
@@ -546,7 +571,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.53"]);
 				}else{
 					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.54"], null);					
-					AJXP_XMLWriter::reloadDataNode("", (isSet($_GET["newLabel"])?SystemTextEncoding::fromPostedFileName($_GET["newLabel"]):false));
+					AJXP_XMLWriter::reloadDataNode("", (isSet($httpVars["newLabel"])?SystemTextEncoding::fromPostedFileName($httpVars["newLabel"]):false));
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();		
@@ -645,7 +670,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}else{
 					$forbidden = array("guest", "share");
 					if(!isset($httpVars["user_id"]) || $httpVars["user_id"]=="" 
-						|| in_array($_GET["user_id"], $forbidden)
+						|| in_array($httpVars["user_id"], $forbidden)
 						|| $loggedUser->getId() == $httpVars["user_id"])
 					{
 						AJXP_XMLWriter::header();
