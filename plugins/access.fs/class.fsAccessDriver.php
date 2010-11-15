@@ -206,9 +206,9 @@ class fsAccessDriver extends AbstractAccessDriver
 					$code=str_replace("&lt;","<",$code);
 				}
 				$fileName = $this->urlBase.$file;
-				if(!is_file($fileName) || !is_writable($fileName)){
+				if(!is_file($fileName) || !$this->isWriteable($fileName, "file")){
 					header("Content-Type:text/plain");
-					print((!is_writable($fileName)?"1001":"1002"));
+					print((!$this->isWriteable($fileName, "file")?"1001":"1002"));
 					exit(1);
 				}
 				$fp=fopen($fileName,"w");
@@ -978,7 +978,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		AJXP_Logger::debug("CopyMove", array("dest"=>$destDir));
 		$mess = ConfService::getMessages();
-		if(!is_writable($this->urlBase.$destDir))
+		if(!$this->isWriteable($this->urlBase.$destDir))
 		{
 			$error[] = $mess[38]." ".$destDir." ".$mess[99];
 			return ;
@@ -986,7 +986,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				
 		foreach ($selectedFiles as $selectedFile)
 		{
-			if($move && !is_writable(dirname($this->urlBase.$selectedFile)))
+			if($move && !$this->isWriteable(dirname($this->urlBase.$selectedFile)))
 			{
 				$error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
 				continue;
@@ -1008,7 +1008,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$mess = ConfService::getMessages();
 		$filename_new=AJXP_Utils::processFileName($filename_new);
 		$old=$this->urlBase."/$filePath";
-		if(!is_writable($old))
+		if(!$this->isWriteable($old))
 		{
 			throw new AJXP_Exception($mess[34]." ".$nom_fic." ".$mess[99]);
 		}
@@ -1059,7 +1059,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		{
 			return "$mess[40]"; 
 		}
-		if(!is_writable($this->urlBase."$crtDir"))
+		if(!$this->isWriteable($this->urlBase."$crtDir"))
 		{
 			return $mess[38]." $crtDir ".$mess[99];
 		}
@@ -1090,7 +1090,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		{
 			return "$mess[71]";
 		}
-		if(!is_writable($this->urlBase."$crtDir"))
+		if(!$this->isWriteable($this->urlBase."$crtDir"))
 		{
 			return "$mess[38] $crtDir $mess[99]";
 		}
@@ -1309,7 +1309,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		return copy($origFile, $destFile);
 	}
 	
-	function isWriteable($dir)
+	public static function isWriteable($dir, $type="dir")
 	{
 		return is_writable($dir);
 	}
