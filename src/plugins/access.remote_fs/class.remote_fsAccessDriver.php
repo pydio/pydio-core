@@ -302,6 +302,10 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		return $httpClient;
 	}
 	
+	public static function isWriteable($path, $type="dir"){
+		return is_writable($path);
+	}
+	
 	function storeFileToCopy($fileData){
 		$user = AuthService::getLoggedUser();
 		$files = $user->getTemporaryData("tmp_upload");
