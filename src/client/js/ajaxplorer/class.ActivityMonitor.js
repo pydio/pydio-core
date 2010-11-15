@@ -55,6 +55,7 @@ Class.create("ActivityMonitor", {
 		var activityObserver = this.activityObserver.bind(this);
 		document.observe("ajaxplorer:user_logged", function(){
 			// Be sure not to multiply the setInterval
+			this._lastActive = this.getNow();
 			if(this.interval) window.clearInterval(this.interval);
 			if(this.serverInterval) window.clearInterval(this.serverInterval);
 			$(document.body).stopObserving("keypress", activityObserver);
