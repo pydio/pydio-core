@@ -164,7 +164,7 @@ class AJXP_Utils
 			AJXP_JSPacker::pack();
 		}		
 		if(ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])){
-			AJXP_Utils::updateI18nFiles();
+			AJXP_Utils::updateI18nFiles((isSet($parameters["plugin_path"])?$parameters["plugin_path"]:""));
 		}
 		
 		if(isSet($parameters["external_selector_type"])){
@@ -368,12 +368,22 @@ class AJXP_Utils
 		}
 	}
 
-	static function updateI18nFiles(){
-		include(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/en.php");
+	static function updateI18nFiles($pluginPath = ""){
+		if($pluginPath != ""){
+			$baseDir = INSTALL_PATH."/plugins/".$pluginPath;
+			$filenames = glob($baseDir."/*.php");
+		}else{
+			$baseDir = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n";
+			$languages = ConfService::listAvailableLanguages();
+			$filenames = array();
+			foreach ($languages as $key => $value){
+				$filenames[] = $baseDir."/".$key.".php";
+			}
+		}
+		include($baseDir."/en.php");
 		$reference = $mess;
-		$languages = ConfService::listAvailableLanguages();
-		foreach ($languages as $key=>$value){
-			$filename = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/".$key.".php";
+		foreach ($filenames as $filename){
+			//$filename = $baseDir."/".$key.".php";
 			include($filename);
 			$missing = array();
 			foreach ($reference as $messKey=>$message){
