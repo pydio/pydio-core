@@ -1,13 +1,13 @@
 <?php
 //---------------------------------------------------------------------------------------------------
-//							
+//
 //	AjaXplorer
-//	
+//
 //	Copyright 2007-2010 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
 //  Reference dictionnary for translations
-// spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010 
+// spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
@@ -17,7 +17,7 @@ $mess=array(
 "4" => "Logs",
 "5" => "Diagnostico",
 "6" => "Nombre de usuario",
-"7" => "Es Admin", 
+"7" => "Es Admin",
 "8" => "Nombre de repositorio",
 "9" => "Modo de acceso",
 "10" => "Meta fuentes",
@@ -28,18 +28,18 @@ $mess=array(
 "15" => "Falso",
 "16" => "Fle Date",
 "17" => "Fecha",
-"18" => "I.P.", 
+"18" => "I.P.",
 "19" => "Nivel",
-"20" => "Usuario", 
-"21" => "Accion", 
+"20" => "Usuario",
+"21" => "Accion",
 "22" => "Params",
 "23" => "Test Name",
 "24" => "Test Data",
-"25" => "Repositories Access", 
+"25" => "Repositories Access",
 "26" => "Modificar Password",
 "27" => "Perms. Admin ",
-"28" => "El usuario tiene permisos de admin?", 
-"29" => "Leer", 
+"28" => "El usuario tiene permisos de admin?",
+"29" => "Leer",
 "30" => "Escribir",
 "32" => "Repository Driver",
 "33" => "Cargando...",
@@ -48,7 +48,7 @@ $mess=array(
 "36" => "Falta de rellenar campos obligatoris!",
 "37" => "No coinciden los datos",
 "38" => "Escribe el nombre de usuario!",
-"39" => "Escribe la contraseina dos veces!", 
+"39" => "Escribe la contraseina dos veces!",
 "40" => "Marca la casilla para confirmar!",
 "41" => "Opciones de driver",
 "42" => "Elige un driver!",
@@ -62,10 +62,10 @@ $mess=array(
 "50" => "Error: existe un repositorio con el mismo nombre",
 "51" => "La carpeta de configuracion no es escribible",
 "52" => "Se ha creado el repositorio",
-"53" => "Error al intentar editar el repositorio", 
-"54" => "Se ha editado el repositorio", 
-"55" => "Por ahora, solo se puede configurar una sola instancia de meta fuente", 
-"56" => "Se ha guardado la meta fuente", 
+"53" => "Error al intentar editar el repositorio",
+"54" => "Se ha editado el repositorio",
+"55" => "Por ahora, solo se puede configurar una sola instancia de meta fuente",
+"56" => "Se ha guardado la meta fuente",
 "57" => "Se ha borrado la meta fuente",
 "58" => "Se ha editado la meta fuente",
 "59" => "Se ha borrado el repositorio",
@@ -87,7 +87,7 @@ $mess=array(
 "75" => "New Role",
 "role_access" => "o",
 "76" => "Role Id",
-"77" => "Access Control", 
+"77" => "Access Control",
 "78" => "Personal data",
 "79" => "Repository",
 "80" => "Fine-tune access for this user",
@@ -97,5 +97,7 @@ $mess=array(
 "84" => "Users Roles",
 "85" => "Manual actions filtering",
 "86" => "list of comma-separated actions that will be disabled for this role, no matter the access right.",
-); 
+"87" => "Successfully updated actions for this role",
+/* END SENTENCE */
+);
 ?>
