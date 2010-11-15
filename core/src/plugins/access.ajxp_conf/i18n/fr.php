@@ -1,13 +1,13 @@
 <?php
 //---------------------------------------------------------------------------------------------------
-//							
+//
 //	AjaXplorer
-//	
+//
 //	Copyright 2007-2010 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
 //  Reference dictionnary for translations
-// 
+//
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
@@ -17,7 +17,7 @@ $mess=array(
 "4" => "Journal",
 "5" => "Diagnostique",
 "6" => "Nom",
-"7" => "Administrateur", 
+"7" => "Administrateur",
 "8" => "Nom du dépôt",
 "9" => "Type d'accès",
 "10" => "Métadonnées",
@@ -28,18 +28,18 @@ $mess=array(
 "15" => "Non",
 "16" => "Date du fichier",
 "17" => "Date",
-"18" => "I.P.", 
+"18" => "I.P.",
 "19" => "Niveau",
-"20" => "Utilisateur", 
-"21" => "Action", 
+"20" => "Utilisateur",
+"21" => "Action",
 "22" => "Paramêtres",
 "23" => "Nom du test",
 "24" => "Résultat",
-"25" => "Accès aux dépôts", 
+"25" => "Accès aux dépôts",
 "26" => "Changer le mot de passe",
 "27" => "Droit d'admin",
-"28" => "L'utilisateur est administrateur?", 
-"29" => "Lire", 
+"28" => "L'utilisateur est administrateur?",
+"29" => "Lire",
 "30" => "Ecrire",
 "32" => "Plugin du répository",
 "33" => "Loading...",
@@ -48,7 +48,7 @@ $mess=array(
 "36" => "Des champs obligatoires ne sont pas remplis!",
 "37" => "Attention les deux mots de passe diffèrent!",
 "38" => "Veuillez remplir le champ login!",
-"39" => "Veuillez remplir les deux champs password!", 
+"39" => "Veuillez remplir les deux champs password!",
 "40" => "Veuillez cocher la case pour confirmer!",
 "41" => "Options",
 "42" => "Veuillez choisir un driver!",
@@ -62,10 +62,10 @@ $mess=array(
 "50" => "Erreur : un dépôt avec le même nom existe déjà.",
 "51" => "Le répertoire conf n'est pas accessible en écriture.",
 "52" => "Le dépôt a été créé.",
-"53" => "Erreur lors de la modification du dépôt.", 
-"54" => "Le dépôt a été modifié.", 
-"55" => "Attention, pour l'instant vous ne pouvez ajouter qu'une seule instance de chaque plugin méta.", 
-"56" => "La source de métadonnées a été ajoutée.", 
+"53" => "Erreur lors de la modification du dépôt.",
+"54" => "Le dépôt a été modifié.",
+"55" => "Attention, pour l'instant vous ne pouvez ajouter qu'une seule instance de chaque plugin méta.",
+"56" => "La source de métadonnées a été ajoutée.",
 "57" => "La source de métadonnées a été supprimée.",
 "58" => "La source de métadonnées a été modifiée.",
 "59" => "Le dépôt a été supprimé",
@@ -87,7 +87,7 @@ $mess=array(
 "75" => "Nouveau rôle",
 "role_access" => "ô",
 "76" => "Identifiant",
-"77" => "Contrôle d'accès", 
+"77" => "Contrôle d'accès",
 "78" => "Données Personnelles",
 "79" => "Dépot",
 "80" => "Précisez les droits d'accès pour cet utilisateur",
@@ -97,5 +97,7 @@ $mess=array(
 "84" => "Rôles utilisateurs",
 "85" => "Filtrage manuel des actions",
 "86" => "Liste d'actions qui seront désactivées pour ce rôle, quelque soit le droit d'accès associé.",
+"87" => "Successfully updated actions for this role",
+/* END SENTENCE */
 );
 ?>

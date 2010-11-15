@@ -1,13 +1,13 @@
 <?php
 //---------------------------------------------------------------------------------------------------
-//							
+//
 //	AjaXplorer
-//	
+//
 //	Copyright 2007-2010 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
 //	german translation: Axel Otterstätter <axel.otterstaetter@googlemail.com>
-// 
+//
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
@@ -17,7 +17,7 @@ $mess=array(
 "4" => "Logs",
 "5" => "Diagnose",
 "6" => "Benutzername",
-"7" => "Ist Admin", 
+"7" => "Ist Admin",
 "8" => "Repository Label",
 "9" => "Zugriffstyp",
 "10" => "Meta Quelle",
@@ -28,18 +28,18 @@ $mess=array(
 "15" => "Falsch",
 "16" => "Datei Datum",
 "17" => "Datum",
-"18" => "I.P.", 
+"18" => "I.P.",
 "19" => "Level",
-"20" => "Benutzer", 
-"21" => "Aktion", 
+"20" => "Benutzer",
+"21" => "Aktion",
 "22" => "Param.",
 "23" => "Test Name",
 "24" => "Test Daten",
-"25" => "Repositories Zugriffe", 
+"25" => "Repositories Zugriffe",
 "26" => "Passwort ändern",
 "27" => "Adminrechte",
-"28" => "Benutzer hat Adminrechte?", 
-"29" => "Lesen", 
+"28" => "Benutzer hat Adminrechte?",
+"29" => "Lesen",
 "30" => "Schreiben",
 "32" => "Repository-Treiber",
 "33" => "Lade...",
@@ -48,7 +48,7 @@ $mess=array(
 "36" => "Erforderliche Felder fehlen!",
 "37" => "Achtung, Passwort und die Wiederholung sind unterschiedlich!",
 "38" => "Bitte das Benutzernamefeld ausfüllen!",
-"39" => "Bitte beide Passwortfelder ausfüllen!", 
+"39" => "Bitte beide Passwortfelder ausfüllen!",
 "40" => "Bitte zum Zustimmen einen Haken setzen!",
 "41" => "Treiberoptionen",
 "42" => "Bitte einen Treiber wählen!",
@@ -62,10 +62,10 @@ $mess=array(
 "50" => "Fehler: Ein Repository mit gleichen Namen existiert bereits",
 "51" => "Das conf Verzeichnis ist nicht beschreibbar",
 "52" => "Repository erfolgreich erstellt",
-"53" => "Fehler beim Ändern des Repository", 
-"54" => "Repository erfolgreich geändert", 
-"55" => "Achtung, zur Zeit kann nur eine Instanz von jedem Meta Plugin hinzugefügt werden.", 
-"56" => "Meta Quelle erfolgreich hinzugefügt", 
+"53" => "Fehler beim Ändern des Repository",
+"54" => "Repository erfolgreich geändert",
+"55" => "Achtung, zur Zeit kann nur eine Instanz von jedem Meta Plugin hinzugefügt werden.",
+"56" => "Meta Quelle erfolgreich hinzugefügt",
 "57" => "Meta Quelle erfolgreich gelöscht",
 "58" => "Meta Quelle erfolgreich geändert",
 "59" => "Repository erfolgreich gelöscht",
@@ -87,7 +87,7 @@ $mess=array(
 "75" => "New Role",
 "role_access" => "o",
 "76" => "Role Id",
-"77" => "Access Control", 
+"77" => "Access Control",
 "78" => "Personal data",
 "79" => "Repository",
 "80" => "Fine-tune access for this user",
@@ -97,5 +97,7 @@ $mess=array(
 "84" => "Users Roles",
 "85" => "Manual actions filtering",
 "86" => "list of comma-separated actions that will be disabled for this role, no matter the access right.",
-); 
+"87" => "Successfully updated actions for this role",
+/* END SENTENCE */
+);
 ?>

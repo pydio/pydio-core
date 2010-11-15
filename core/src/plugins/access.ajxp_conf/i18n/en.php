@@ -97,5 +97,6 @@ $mess=array(
 "84" => "Users Roles",
 "85" => "Manual actions filtering",
 "86" => "list of comma-separated actions that will be disabled for this role, no matter the access right.",
+"87" => "Successfully updated actions for this role",
 ); 
 ?>

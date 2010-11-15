@@ -1,15 +1,15 @@
 <?php
 //---------------------------------------------------------------------------------------------------
-//							
+//
 //	AjaXplorer
-//	
+//
 //	Copyright 2007-2010 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
 //	Finnish translation by Aleksi Postari
 //	aleksi (at) postari.net
 //	Last update: 10.09.2010
-// 
+//
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
@@ -19,7 +19,7 @@ $mess=array(
 "4" => "Historia",
 "5" => "Vianmääritys",
 "6" => "Tunnus",
-"7" => "Ylläpitäjä", 
+"7" => "Ylläpitäjä",
 "8" => "Kansion nimi",
 "9" => "Kansion tyyppi",
 "10" => "Metalähteet",
@@ -30,18 +30,18 @@ $mess=array(
 "15" => "Ei",
 "16" => "Tiedoston päiväys",
 "17" => "Päiväys",
-"18" => "IP", 
+"18" => "IP",
 "19" => "Tyyppi",
-"20" => "Käyttäjä", 
-"21" => "Toiminto", 
+"20" => "Käyttäjä",
+"21" => "Toiminto",
 "22" => "Parametrit",
 "23" => "Testin nimi",
 "24" => "Sisältö",
-"25" => "Oikeudet kansioihin", 
+"25" => "Oikeudet kansioihin",
 "26" => "Muuta salasana",
 "27" => "Ylläpitäjä",
-"28" => "Tämä käyttäjä on ylläpitäjä?", 
-"29" => "Luku", 
+"28" => "Tämä käyttäjä on ylläpitäjä?",
+"29" => "Luku",
 "30" => "Kirjoitus",
 "32" => "Kansion tyyppi",
 "33" => "Ladataan...",
@@ -50,7 +50,7 @@ $mess=array(
 "36" => "Täytä kaikki vaaditut kentät!",
 "37" => "Salasana ja varmistus-salasana eivät täsmää!",
 "38" => "Täytä kirjautumisruutu!",
-"39" => "Täytä kummatkin salasanakentät!", 
+"39" => "Täytä kummatkin salasanakentät!",
 "40" => "Rastita ruutu hyväksyäksesi!",
 "41" => "ajurin asetukset",
 "42" => "Valitse ajuri!",
@@ -64,10 +64,10 @@ $mess=array(
 "50" => "Virhe: Tämän niminen kansio on jo olemassa",
 "51" => "Kansio conf ei ole kirjoitettavissa",
 "52" => "Käyttäjien kansio luotu onnistuneesti",
-"53" => "Virhe muutettaessa käyttäjien kansion tietoja", 
-"54" => "Käyttäjien kansion tietojen muuttaminen onnistui", 
-"55" => "Varoitus, Tällä hetkellä voit luoda ainoastaan yhden meta lisäosan kerrallaan.", 
-"56" => "Metalähde lisätty onnistuneesti", 
+"53" => "Virhe muutettaessa käyttäjien kansion tietoja",
+"54" => "Käyttäjien kansion tietojen muuttaminen onnistui",
+"55" => "Varoitus, Tällä hetkellä voit luoda ainoastaan yhden meta lisäosan kerrallaan.",
+"56" => "Metalähde lisätty onnistuneesti",
 "57" => "Metalähde poistettu onnistuneesti",
 "58" => "Metalähteen tiedot muutettu onnistuneesti",
 "59" => "Käyttäjän kansio poistettu onnistuneesti",
@@ -89,7 +89,7 @@ $mess=array(
 "75" => "New Role",
 "role_access" => "o",
 "76" => "Role Id",
-"77" => "Access Control", 
+"77" => "Access Control",
 "78" => "Personal data",
 "79" => "Repository",
 "80" => "Fine-tune access for this user",
@@ -99,5 +99,7 @@ $mess=array(
 "84" => "Users Roles",
 "85" => "Manual actions filtering",
 "86" => "list of comma-separated actions that will be disabled for this role, no matter the access right.",
-); 
+"87" => "Successfully updated actions for this role",
+/* END SENTENCE */
+);
 ?>
