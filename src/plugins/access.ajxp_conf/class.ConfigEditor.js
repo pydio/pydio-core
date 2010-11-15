@@ -295,6 +295,9 @@ ConfigEditor = Class.create({
 			disabled.push(actionNodes[i].getAttribute('name'));
 		}
 		textfield.value = disabled.join(',');
+		if(clear){
+			ajaxplorer.displayMessage('SUCCESS', MessageHash['ajxp_conf.87']);
+		}
 	},
 	
 	generateWalletsPane : function(xmlData){

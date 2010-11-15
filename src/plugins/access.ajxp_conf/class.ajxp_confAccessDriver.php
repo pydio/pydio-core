@@ -141,6 +141,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					print("<update_checkboxes user_id=\"".$httpVars["role_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
 					AJXP_XMLWriter::close();
+					return ;
 					//exit(1);
 				}
 				$role = AuthService::getRole($httpVars["role_id"]);
@@ -162,6 +163,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					AJXP_XMLWriter::close();
+					return ;
 				}
 				$role = AuthService::getRole($httpVars["role_id"]);
 				$actions = array_map("trim", explode(",", $httpVars["disabled_actions"]));
