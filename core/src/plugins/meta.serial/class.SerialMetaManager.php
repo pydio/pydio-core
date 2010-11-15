@@ -215,7 +215,7 @@ class SerialMetaManager extends AJXP_Plugin {
 	
 	protected function saveMetaFileData($currentFile){
 		$metaFile = dirname($currentFile)."/".$this->options["meta_file_name"];
-		if((is_file($metaFile) && is_writable($metaFile)) || is_writable(dirname($metaFile))){
+		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile))){
 			$fp = fopen($metaFile, "w");
 			fwrite($fp, serialize(self::$metaCache), strlen(serialize(self::$metaCache)));
 			fclose($fp);

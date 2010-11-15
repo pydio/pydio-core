@@ -156,7 +156,7 @@ class ftpAccessDriver extends fsAccessDriver {
 							break;
 						}
 					}
-					if(!is_writeable($destCopy)){
+					if(!$this->isWriteable($destCopy)){
 						AJXP_Logger::debug("Upload error: cannot write into temporary folder");
 						$errorCode = 414;
 						$errorMessage = "Warning, cannot write into temporary folder.";
@@ -216,6 +216,18 @@ class ftpAccessDriver extends fsAccessDriver {
 
 	}
 
+	public static function isWriteable($path, $type="dir"){
+		
+		$parts = parse_url($path);
+		$dir = dirname($parts["path"]);
+		if($dir == "" || $dir == "/"){ // ROOT, WE ARE NOT SURE TO BE ABLE TO READ THE PARENT
+			return true;
+		}else{
+			return is_writable($path);
+		}
+		
+	}
+	
 	function deldir($location)
 	{
 		if(is_dir($location))
