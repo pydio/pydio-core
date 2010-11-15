@@ -1309,7 +1309,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		return copy($origFile, $destFile);
 	}
 	
-	public static function isWriteable($dir, $type="dir")
+	public function isWriteable($dir, $type="dir")
 	{
 		return is_writable($dir);
 	}

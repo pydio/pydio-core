@@ -184,6 +184,10 @@ class ftpAccessWrapper implements AjxpWrapper {
 		if($testCd === true){
 			// DIR
 			$serverParent = dirname($serverPath);
+			// dirname may use local dir separator!
+			if(DIRECTORY_SEPARATOR == "\\"){			
+				$serverParent = str_replace(DIRECTORY_SEPARATOR, "/", $serverParent["path"]);
+			}
 			$contents = $this->rawList($link, $serverParent);			
 			foreach ($contents as $entry){
 				$res = $this->rawListEntryToStat($entry, true);

@@ -216,11 +216,11 @@ class ftpAccessDriver extends fsAccessDriver {
 
 	}
 
-	public static function isWriteable($path, $type="dir"){
+	public function isWriteable($path, $type="dir"){
 		
 		$parts = parse_url($path);
-		$dir = dirname($parts["path"]);
-		if($dir == "" || $dir == "/"){ // ROOT, WE ARE NOT SURE TO BE ABLE TO READ THE PARENT
+		$dir = $parts["path"];
+		if($type == "dir" && ($dir == "" || $dir == "/" || $dir == "\\")){ // ROOT, WE ARE NOT SURE TO BE ABLE TO READ THE PARENT
 			return true;
 		}else{
 			return is_writable($path);
