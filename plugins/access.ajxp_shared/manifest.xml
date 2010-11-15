@@ -178,7 +178,7 @@
 			   		    	$(oForm).down('span[id="delete_message"]').update(MessageHash['ajxp_shared.11']);
 			   		    	$(oForm).down('input[name="ajxp_mime"]').value = ajaxplorer.getUserSelection().getUniqueNode().getAjxpMime();
 						};
-						modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
+						modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
 							var oForm = modal.getForm();
 							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 							ajaxplorer.actionBar.submitForm(oForm);
@@ -186,8 +186,8 @@
 							return false;
 						});
 						]]></clientCallback>
-					<clientForm id="delete_form"><![CDATA[
-					<div id="delete_form" action="delete" box_width="200">
+					<clientForm id="delete_shared_form"><![CDATA[
+					<div id="delete_shared_form" action="delete" box_width="200">
 					<span id="delete_message"></span>
 					<input type="hidden" name="ajxp_mime" value="">
 					</div>				]]></clientForm>
