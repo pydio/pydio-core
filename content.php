@@ -75,33 +75,35 @@ if(isSet($_GET["tmp_repository_id"])){
 
 if(AuthService::usersEnabled())
 {
+	$httpVars = array_merge($_GET, $_POST);
+
 	$rememberLogin = "";
 	$rememberPass = "";
-	if(isset($_GET["get_action"]) && $_GET["get_action"] == "get_seed"){
+	if(isset($httpVars["get_action"]) && $httpVars["get_action"] == "get_seed"){
 		HTMLWriter::charsetHeader("text/plain");
 		print AuthService::generateSeed();				
 		exit(0);
 	}	
-	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "logout")
+	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "logout")
 	{
 		AuthService::disconnect();		
 		$loggingResult = 2;
 		session_destroy();
 	}
-    if(isSet($_GET["get_action"]) && $_GET["get_action"] == "back")
+    if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "back")
     {
 		AJXP_XMLWriter::header("url");
         echo AuthService::getLogoutAddress(false);
         AJXP_XMLWriter::close("url");
 		exit(1);
     }
-	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "login")
+	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "login")
 	{
-		$userId = (isSet($_GET["userid"])?$_GET["userid"]:null);
-		$userPass = (isSet($_GET["password"])?$_GET["password"]:null);
-		$rememberMe = ((isSet($_GET["remember_me"]) && $_GET["remember_me"] == "on")?true:false);
-		$cookieLogin = (isSet($_GET["cookie_login"])?true:false); 
-		$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $_GET["login_seed"]);
+		$userId = (isSet($httpVars["userid"])?$httpVars["userid"]:null);
+		$userPass = (isSet($httpVars["password"])?$httpVars["password"]:null);
+		$rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "on")?true:false);
+		$cookieLogin = (isSet($httpVars["cookie_login"])?true:false); 
+		$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
 		if($rememberMe && $loggingResult == 1){
 			$rememberLogin = $userId;
 			$loggedUser = AuthService::getLoggedUser();
@@ -134,7 +136,7 @@ if(AuthService::usersEnabled())
 			AuthService::disconnect();
 			$loggingResult = -3;
 		}else {
-			if($lastRepoId != "" && $lastRepoId!=$currentRepoId && !isSet($_GET["tmp_repository_id"]) && $loggedUser->canSwitchTo($lastRepoId)){
+			if($lastRepoId != "" && $lastRepoId!=$currentRepoId && !isSet($httpVars["tmp_repository_id"]) && $loggedUser->canSwitchTo($lastRepoId)){
 				ConfService::switchRootDir($lastRepoId);
 			}else if(!$loggedUser->canSwitchTo($currentRepoId)){
 				ConfService::switchRootDir($defaultRepoId);
@@ -145,7 +147,7 @@ if(AuthService::usersEnabled())
 	{
 		// Try prelogging user if the session expired but the logging data is in fact still present
 		// For example, for basic_http auth.
-		AuthService::preLogUser((isSet($_GET["remote_session"])?$_GET["remote_session"]:""));
+		AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) $requireAuth = true;
 	}
@@ -156,17 +158,6 @@ if(AuthService::usersEnabled())
 		AJXP_XMLWriter::close();
 		exit(1);
 	}
-}else{
-	if(isSet($_GET["get_action"]) && $_GET["get_action"] == "logged_user")
-	{
-		AJXP_XMLWriter::header();
-		print("<user id=\"shared\">");
-		print("<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"1\" read=\"1\"/>");
-		print(AJXP_XMLWriter::writeRepositoriesData(null));
-		print("</user>");
-		AJXP_XMLWriter::close();
-		exit(1);
-	}	
 }
 
 //Set language
