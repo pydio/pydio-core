@@ -382,7 +382,15 @@
                               try {
                                   var node = userSelection.getNode(i);
                                   var meta = node.getMetadata();
-                                  hidden.setAttribute("value", meta.get("ajxp_mime") == "user_editable" ? meta.get("text") : meta.get("repository_id"));
+                                  var value;
+                                  if(meta.get("ajxp_mime") == "user_editable"){
+                                  	value = meta.get("text");
+                                  }else if(meta.get("ajxp_mime") == "shared_file"){
+                                  	value = meta.get("filename");
+                                  }else{
+                                  	value = meta.get("text");
+                                  }
+                                  hidden.setAttribute("value", value);
             					  ajaxplorer.actionBar.submitForm(oForm);
                                   i++;
                               } catch (e) 
