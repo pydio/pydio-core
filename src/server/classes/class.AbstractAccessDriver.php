@@ -168,14 +168,14 @@ class AbstractAccessDriver extends AJXP_Plugin {
         // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
         $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB, $iv));
         // Okay, write the file:
-        $fileData = "<"."?"."php \n".
-        '   require_once("'.str_replace("\\", "/", INSTALL_PATH).'/publicLet.inc.php"); '."\n".
-        '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
-        '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
-        '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
-        '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv));  '."\n".
-        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
-        '   // Ok extract the data '."\n".
+        $fileData = "<"."?"."php \r\n".
+        '   require_once("'.str_replace("\\", "/", INSTALL_PATH).'/publicLet.inc.php"); '."\r\n".
+        '   $id = str_replace(".php", "", basename(__FILE__)); '."\r\n". // Not using "" as php would replace $ inside
+        '   $cypheredData = base64_decode("'.$outputData.'"); '."\r\n".
+        '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\r\n".
+        '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv));  '."\r\n".
+        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\r\n".
+        '   // Ok extract the data '."\r\n".
         '   $data = unserialize($inputData); AbstractAccessDriver::loadPubliclet($data); ?'.'>';
         if (@file_put_contents(PUBLIC_DOWNLOAD_FOLDER."/".$hash.".php", $fileData) === FALSE){
             return "Can't write to PUBLIC URL";
