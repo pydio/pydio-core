@@ -28,10 +28,18 @@
 						}, 
 						function(){
 							var oForm = modal.getForm();
-							if($('login_seed').value != '-1'){
-								oForm.password.value = hex_md5(hex_md5(oForm.password.value)+$('login_seed').value);
+							var connexion = new Connexion();
+							connexion.addParameter('userid', oForm.userid.value);
+							connexion.addParameter('get_action', 'login');
+							connexion.addParameter('login_seed', oForm.login_seed.value);
+							if(oForm.login_seed.value != '-1'){
+								connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
+							}else{
+								connexion.addParameter('password', oForm.password.value);
 							}
-							ajaxplorer.actionBar.submitForm(oForm);
+							connexion.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+							connexion.setMethod('put');
+							connexion.sendAsync();
 							oForm.userid.value = '';
 							oForm.password.value = '';
 							return false;				
