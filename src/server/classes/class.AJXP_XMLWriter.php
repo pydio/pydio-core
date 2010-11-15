@@ -279,6 +279,7 @@ class AJXP_XMLWriter
 			$buffer.="<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>";
 			$buffer.="<pref name=\"columns_size\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_size")))."\"/>";
 			$buffer.="<pref name=\"columns_visibility\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("columns_visibility")))."\"/>";
+			$buffer.="<pref name=\"plugins_preferences\" value=\"".stripslashes(str_replace("\"", "'", $loggedUser->getPref("plugins_preferences")))."\"/>";
 			$buffer.="<pref name=\"upload_auto_send\" value=\"".$loggedUser->getPref("upload_auto_send")."\"/>";
 			$buffer.="<pref name=\"upload_auto_close\" value=\"".$loggedUser->getPref("upload_auto_close")."\"/>";
 			$buffer.="<pref name=\"upload_existing\" value=\"".$loggedUser->getPref("upload_existing")."\"/>";
