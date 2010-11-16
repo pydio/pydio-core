@@ -44,7 +44,7 @@ class AJXP_Utils
 	* 
 	* @param Array $array The array to sort 
 	*/  
-	static static function natksort(&$array) {
+	static function natksort(&$array) {
 		uksort($array, 'strnatcasecmp');
 		return true;
 	}
@@ -88,11 +88,11 @@ class AJXP_Utils
 		return $path;
 	}
 	
-	public static static function decodeSecureMagic($data){
+	public static function decodeSecureMagic($data){
 		return SystemTextEncoding::fromUTF8(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)));
 	}
 	
-	public static static function getAjxpTmpDir(){
+	public static function getAjxpTmpDir(){
 		if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR != ""){
 			return AJXP_TMP_DIR;
 		}
@@ -132,7 +132,7 @@ class AJXP_Utils
 		return null;
 	}
 	
-	public static static function parseApplicationGetParameters($parameters, &$output, &$session){
+	public static function parseApplicationGetParameters($parameters, &$output, &$session){
 		$output["EXT_REP"] = "/";
 		
 		if(isSet($parameters["repository_id"]) && isSet($parameters["folder"])){
@@ -602,7 +602,7 @@ class AJXP_Utils
 		}
 	}
 	
-	public static static function userAgentIsMobile(){
+	public static function userAgentIsMobile(){
 		$isMobile = false;
 		
 		$op = strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE'] OR "");
