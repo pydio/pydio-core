@@ -152,6 +152,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private function checkDependencies(&$arrayToSort){
  		// First make sure that the given dependencies are present
  		foreach ($arrayToSort as $plugId => $plugObject){
+ 			$plugObject->updateDependencies($this);
  			$dependencies = $plugObject->getDependencies();
  			if(!count($dependencies)) return ;
  			$found = false;
