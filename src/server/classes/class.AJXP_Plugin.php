@@ -236,6 +236,19 @@ class AJXP_Plugin{
 			$this->dependencies = array_merge($this->dependencies, explode("|", $value));
 		}
 	}
+	public function updateDependencies($pluginService){
+		$append = false;
+		foreach ($this->dependencies as $index => $dependency){
+			if($dependency == "access.AJXP_STREAM_PROVIDER"){
+				unset($this->dependencies[$index]);
+				$append = true;
+			}
+		}
+		if($append){
+			$this->dependencies = array_merge($this->dependencies, $pluginService->getStreamWrapperPlugins());
+		}
+	}
+	
 	public function dependsOn($pluginName){
 		return in_array($pluginName, $this->dependencies);
 	}
