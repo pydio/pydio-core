@@ -217,7 +217,7 @@ function disableTextSelection(target)
 	if(!target) return;
 	if (typeof target.onselectstart!="undefined")
 	{ //IE route
-		target.onselectstart=function(){return false;}
+		target.onselectstart=function(){return false;};
 	}
 	else if (target.style && typeof target.style.MozUserSelect!="undefined")
 	{ //Firefox route
@@ -232,7 +232,7 @@ function disableTextSelection(target)
 		{
 			if (typeof element.onselectstart!="undefined")
 			{ //IE route				
-				element.onselectstart=function(){return true;}
+				element.onselectstart=function(){return true;};
 			}
 			else if (typeof element.style.MozUserSelect!="undefined")
 			{ //Firefox route

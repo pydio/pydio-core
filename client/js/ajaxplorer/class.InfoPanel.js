@@ -269,7 +269,7 @@ Class.create("InfoPanel", AjxpPane, {
 			var editorClass = Class.getByName(editors[0].editorClass);
 			if(editorClass){
 				if(getTemplateElement){
-					return '<div id="preview_rich_fake_element"></div>'
+					return '<div id="preview_rich_fake_element"></div>';
 				}else{
 					var element = editorClass.prototype.getPreview(ajxpNode, true);
 					return element;	

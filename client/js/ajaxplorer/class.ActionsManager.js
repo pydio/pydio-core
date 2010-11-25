@@ -120,7 +120,7 @@ Class.create("ActionsManager", {
 				alt:action.options.title,
 				image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),
 				isDefault:isDefault,
-				callback:function(e){this.apply()}.bind(action)
+				callback:function(e){this.apply();}.bind(action)
 			};
 			if(action.options.subMenu){
 				menuItem.subMenu = [];
