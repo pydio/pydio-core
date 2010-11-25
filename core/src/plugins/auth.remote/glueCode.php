@@ -52,6 +52,7 @@ if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Plugin.php");
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_PluginsService.php");
+require_once("$CURRENTPATH/../../server/classes/class.AjxpRole.php");
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Utils.php");
 require_once("$CURRENTPATH/../../server/classes/class.Repository.php");
 require_once("$CURRENTPATH/../../server/classes/class.AbstractAccessDriver.php");
