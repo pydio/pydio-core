@@ -375,7 +375,8 @@ class PThumb{
             }
             //Check that an older version does not exists and if it does, delete it
             else{
-                if ($handle = @opendir($this -> cache_dir)) {
+            	$handle = @opendir($this -> cache_dir);
+                if ($handle !== FALSE) {
                      while (false !== ($file = readdir($handle))) { 
                           if (preg_match("/^".preg_quote(sha1($transformed))."\.[0-9]+\.[0-9]+\.([0-9a-z]{40})\.(.+?)$/i",$file,$matches)) { 
                               //Hash is in [1]
@@ -932,7 +933,8 @@ class PThumb{
 	     */
 	function clear_cache(){
 		if ($this -> clear_cache == true){
-			if ($handle = @opendir($this -> cache_dir)) {
+			$handle = @opendir($this -> cache_dir);
+			if ($handle !== FALSE) {
 			   while (false !== ($file = readdir($handle))) {
 				   if ($file != "." && $file != ".." && $file != ".htaccess" && $file != "error_log") {
 					   @unlink($this -> cache_dir.$file) or $this -> set_error("Method clear_cache: Unable to delete '$file' from cache.",false);
