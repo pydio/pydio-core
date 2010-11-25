@@ -221,17 +221,23 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			case "save_user_pref":
 				
 				$userObject = AuthService::getLoggedUser();
+				/*
 				if($userObject == null || $userObject->getId() == "guest"){
 					header("Content-Type:text/plain");
 					print "SUCCESS";
 					exit(1);								
 				}
+				*/
 				$i = 0;
 				while(isSet($_GET["pref_name_".$i]) && isSet($_GET["pref_value_".$i]))
 				{
 					$prefName = $_GET["pref_name_".$i];
 					$prefValue = stripslashes($_GET["pref_value_".$i]);
 					if($prefName == "password") continue;
+					if($prefName != "pending_folder" && ($userObject == null || $userObject->getId() == "guest")){
+						$i++;
+						continue;
+					}
 					$userObject->setPref($prefName, $prefValue);
 					$userObject->save();
 					AuthService::updateUser($userObject);
