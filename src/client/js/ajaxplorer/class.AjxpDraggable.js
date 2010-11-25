@@ -101,7 +101,7 @@ Class.create("AjxpDraggable", Draggable, {
 			var pos     = Position.cumulativeOffset(this.element);
 			// CORRECT OFFSET HERE AS OUR DRAGGED ELEMENT IS NOT
 			// NECESSARY THE ORIGINAL ELEMENT CLONE.
-			this.offset = [0,1].map( function(i) { return Math.min(15, (pointer[i] - pos[i])) });
+			this.offset = [0,1].map( function(i) { return Math.min(15, (pointer[i] - pos[i])); });
 			
 			Draggables.activate(this);
 			Event.stop(event);

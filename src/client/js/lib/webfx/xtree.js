@@ -572,7 +572,7 @@ WebFXTreeItem.prototype.getPreviousSibling = function(b) {
 } };
 
 WebFXTreeItem.prototype.getCurrentPlusIcon  = function(){
-	return ((this.folder)?((this.open)?((this.parentNode._last)?"lMinusIcon":"tMinusIcon"):((this.parentNode._last)?"lPlusIcon":"tPlusIcon")):((this.parentNode._last)?"lIcon":"tIcon"))	
+	return ((this.folder)?((this.open)?((this.parentNode._last)?"lMinusIcon":"tMinusIcon"):((this.parentNode._last)?"lPlusIcon":"tPlusIcon")):((this.parentNode._last)?"lIcon":"tIcon"));	
 };
 
 var WebFXtimer;

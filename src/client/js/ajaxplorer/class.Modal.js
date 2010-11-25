@@ -113,7 +113,7 @@ Class.create("Modal", {
 					alert('Unexpected Error : please report!\n'+e);				
 				}
 				return false;
-			}
+			};
 		}
 		else {
 			newForm.onsubmit = function(){

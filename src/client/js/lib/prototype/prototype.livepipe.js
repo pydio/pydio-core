@@ -11,7 +11,7 @@ if(typeof(Control) == 'undefined')
     Control = {};
     
 var $proc = function(proc){
-    return typeof(proc) == 'function' ? proc : function(){return proc};
+    return typeof(proc) == 'function' ? proc : function(){return proc;};
 };
  
 var $value = function(value){

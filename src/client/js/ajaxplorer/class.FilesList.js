@@ -407,7 +407,7 @@ Class.create("FilesList", SelectableElements, {
 						alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
 						image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
 						isDefault:false,
-						callback:function(e){this.setColumnVisible(column.attributeName, !isVisible)}.bind(this)
+						callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
 					});
 				}.bind(this) );		
 				this.headerMenu.options.menuItems = items;
@@ -475,8 +475,8 @@ Class.create("FilesList", SelectableElements, {
 				div.insert({bottom:this.createPaginatorLink(total, '<b>&gt;&gt;</b>', 'Last')});
 			}
 		}
-		currentInput.observe("focus", function(){this.blockNavigation = true}.bind(this));
-		currentInput.observe("blur", function(){this.blockNavigation = false}.bind(this));
+		currentInput.observe("focus", function(){this.blockNavigation = true;}.bind(this));
+		currentInput.observe("blur", function(){this.blockNavigation = false;}.bind(this));
 		currentInput.observe("keydown", function(event){
 			if(event.keyCode == Event.KEY_RETURN){
 				Event.stop(event);
@@ -1215,7 +1215,7 @@ Class.create("FilesList", SelectableElements, {
 		if (target.onselectstart)
 		{ //IE route
 			target.origOnSelectStart = target.onselectstart;
-			target.onselectstart=function(){return false;}
+			target.onselectstart=function(){return false;};
 		}
 		target.unselectable = "on";
 		target.style.MozUserSelect="none";
@@ -1428,7 +1428,7 @@ Class.create("FilesList", SelectableElements, {
 			var l = cs.length;
 			for (var i = 0; i < l; i++) {
 				if (cs[i].nodeType == 1)
-					tmp[j++] = cs[i]
+					tmp[j++] = cs[i];
 			}
 			return tmp;
 		}

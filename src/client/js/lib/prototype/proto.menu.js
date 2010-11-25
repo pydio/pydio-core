@@ -6,7 +6,7 @@
  * @requires      prototype.js 1.6
 */
 
-if (Object.isUndefined(Proto)) { var Proto = { } }
+if (Object.isUndefined(Proto)) { var Proto = { }; }
 
 Proto.Menu = Class.create({
 	initialize: function() {
@@ -67,7 +67,7 @@ Proto.Menu = Class.create({
 		}else{
 			$(document.body).insert(this.container);
 		}		
-		if (this.ie) { $(document.body).insert(this.shim) }
+		if (this.ie) { $(document.body).insert(this.shim); }
 		if(this.eventToObserve == 'mouseover'){
 			this.container.observe("mouseover", this.mouseoverFunction.bind(this) );
 			this.container.observe("mouseout",this.mouseoutFunction.bind(this) );
@@ -168,8 +168,8 @@ Proto.Menu = Class.create({
 					);
 				});
 				newItem.insert(actionsContainer);
-				actionsContainer.observe("mouseover", function(){newItem.select('a.enabled')[0].addClassName("hovered")});
-				actionsContainer.observe("mouseout", function(){newItem.select('a.enabled')[0].removeClassName("hovered")});
+				actionsContainer.observe("mouseover", function(){newItem.select('a.enabled')[0].addClassName("hovered");});
+				actionsContainer.observe("mouseout", function(){newItem.select('a.enabled')[0].removeClassName("hovered");});
 			}
 			if(item.subMenu){
 				var arrowContainer = new Element('div', {className:'menuActions',style:'padding-top:7px;padding-right:5px'});
