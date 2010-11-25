@@ -143,7 +143,7 @@ Class.create("Connexion", {
 							var script_tag = document.createElement('script');
 							script_tag.type = 'text/javascript';
 							script_tag.innerHTML = 'eval(window.my_code)';
-							document.getElementsByTagName('head')[0].appendChild(script_tag)
+							document.getElementsByTagName('head')[0].appendChild(script_tag);
 					    }
 						if(onLoadedCode != null) onLoadedCode();
 					}

@@ -349,7 +349,7 @@ Class.create("ActionsToolbar", {
 		if(innerSize > parentWidth){
 			this.prev.show();
 			this.next.show();
-			this.outer.setStyle({width:(parentWidth-this.prev.getWidth()-this.next.getWidth()) + 'px'})
+			this.outer.setStyle({width:(parentWidth-this.prev.getWidth()-this.next.getWidth()) + 'px'});
 		}else{
 			this.prev.hide();
 			this.next.hide();
