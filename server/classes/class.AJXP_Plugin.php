@@ -52,6 +52,7 @@ class AJXP_Plugin{
 	protected $options; // can be passed at init time
 	protected $pluginConf; // can be passed at load time
 	protected $dependencies;
+	public $loadingState = "";
 	/**
 	 * The manifest.xml loaded
 	 *
