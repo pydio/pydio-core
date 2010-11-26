@@ -49,14 +49,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		$this->pluginFolder = $pluginFolder;
  		$this->confFolder = $confFolder;
  		$handler = opendir($pluginFolder);
- 		$beforeSort = array();
+ 		$pluginsPool = array();
  		if($handler){
  			while ( ($item = readdir($handler)) !==false) {
  				if($item == "." || $item == ".." || !is_dir($pluginFolder."/".$item) || strstr($item,".")===false) continue ;
  				$plugin = new AJXP_Plugin($item, $pluginFolder."/".$item);				
 				$plugin->loadManifest();
 				if($plugin->manifestLoaded()){
-					$beforeSort[$plugin->getId()] = $plugin;
+					$pluginsPool[$plugin->getId()] = $plugin;
 					if(method_exists($plugin, "detectStreamWrapper")){
 						if($plugin->detectStreamWrapper(false) !== false) $this->streamWrapperPlugins[] = $plugin->getId();
 					}
@@ -64,27 +64,43 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			}
  			closedir($handler);
  		}
- 		if(count($beforeSort)){
- 			$this->checkDependencies($beforeSort);
- 			$sorted = $this->loadPlugCache($beforeSort);
- 			if($sorted !== false){
- 				$beforeSort = $sorted;
- 			}else{
-				$this->usort($beforeSort);
-				$this->cachePlugSort($beforeSort);
- 			}
- 			foreach ($beforeSort as $plugin){
-				$plugType = $plugin->getType();
-				if(!isSet($this->registry[$plugType])){
-					$this->registry[$plugType] = array();
-				}
-				$plugin = $this->instanciatePluginClass($plugin);
-				if(is_file($this->confFolder."/conf.".$plugin->getId().".inc")){
-					$plugin->loadConfig($this->confFolder."/conf.".$plugin->getId().".inc", "inc");
-				}
-				$this->registry[$plugType][$plugin->getName()] = $plugin;
+ 		if(count($pluginsPool)){
+ 			$this->checkDependencies($pluginsPool);
+ 			foreach ($pluginsPool as $plugin){
+ 				$this->recursiveLoadPlugin($plugin, $pluginsPool);
  			}
  		}
+ 	}
+ 	
+ 	/**
+ 	 * Load plugin class with dependencies first
+ 	 *
+ 	 * @param AJXP_Plugin $plugin
+ 	 */
+ 	private function recursiveLoadPlugin($plugin, $pluginsPool){
+ 		if($plugin->loadingState!=""){
+ 			//print("<div style='padding-left:30px;'>--- Pluging ".$plugin->getId()." already loaded</div>");
+ 			return ;
+ 		}
+ 		//print("<div style='padding-left:30px;'>--- Loading ".$plugin->getId());
+		$dependencies = $plugin->getDependencies();
+		$plugin->loadingState = "lock";
+		foreach ($dependencies as $dependencyId){
+			if(isSet($pluginsPool[$dependencyId])){
+				$this->recursiveLoadPlugin($pluginsPool[$dependencyId], $pluginsPool);
+			}
+		}
+		$plugType = $plugin->getType();
+		if(!isSet($this->registry[$plugType])){
+			$this->registry[$plugType] = array();
+		}
+		$plugin = $this->instanciatePluginClass($plugin);
+		if(is_file($this->confFolder."/conf.".$plugin->getId().".inc")){
+			$plugin->loadConfig($this->confFolder."/conf.".$plugin->getId().".inc", "inc");
+		}
+		$this->registry[$plugType][$plugin->getName()] = $plugin;
+		$plugin->loadingState = "loaded";
+		//print("</div>");
  	}
  	
  	/**
@@ -173,31 +189,23 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 * @param AJXP_Plugin $pluginB
  	 */
  	private function sortByDependency($pluginA, $pluginB){
+ 		//var_dump("Checking " . $pluginA->getId() . " vs " . $pluginB->getId());
+ 		if($pluginA->getId() == $pluginB->getId()){
+ 			//var_dump("should not check");
+ 			return 0;
+ 		}
  		if($pluginA->dependsOn($pluginB->getId())) {
  			return 1;
  		}
- 		/*
- 		I think it's useless as we only check for positive value!
  		if($pluginB->dependsOn($pluginA->getId())) {
  			return -1;
  		}
- 		*/
  		return 0;
  	}
 
 	private function usort(&$tableau){
-        while(count($tableau)>0){
-            reset($tableau);
-            $pluspetit = key($tableau);
-            foreach($tableau as $c=>$v){
-            	if($this->sortByDependency($tableau[$pluspetit], $v) > 0){
-            		$pluspetit = $c;
-            	}
-            }
-            $result[]=$tableau[$pluspetit];
-            unset($tableau[$pluspetit]);
-        }
-        $tableau = $result;   
+		uasort($tableau, array($this, "sortByDependency"));
+		return ;
     }
 	
  	public function getPluginsByType($type){
