@@ -35,7 +35,6 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once(INSTALL_PATH."/plugins/access.fs/class.fsAccessDriver.php");
 
 class sftpAccessDriver extends fsAccessDriver
 {
