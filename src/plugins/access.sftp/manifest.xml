@@ -32,4 +32,7 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 	</registry_contributions>
+	<dependencies>
+		<pluginActions pluginName="access.fs"/>
+	</dependencies>	
 </ajxpdriver>
