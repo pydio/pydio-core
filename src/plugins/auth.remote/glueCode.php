@@ -96,7 +96,11 @@ switch($plugInAction)
 		        $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
 	        	AuthService::createUser($login["name"], $login["password"], $isAdmin);
 	        }
-	        $result = AuthService::logUser($login["name"], $login["password"], true);
+	        if(isSet($AJXP_GLUE_GLOBALS["checkPassord"]) && $AJXP_GLUE_GLOBALS["checkPassord"] === TRUE){
+		        $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
+	        }else{
+	        	$result = AuthService::logUser($login["name"], $login["password"], true);
+	        }
 		   	// Update default rights (this could go in the trunk...)
 		   	if($result == 1){
 			   	$userObject = AuthService::getLoggedUser();
