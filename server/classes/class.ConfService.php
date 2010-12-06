@@ -544,7 +544,7 @@ class ConfService
 				$manifName = $base."/".$subdir."/manifest.xml";
 				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("access."))=="access."){
 					$dName = substr($subdir, strlen("access."));
-					if($dName == "ajxp_conf") continue;
+					if($dName == "ajxp_conf" || $dName == "ajxp_shared") continue;
 					if($filterByDriverName != ""){						
 						if($dName!=$filterByDriverName) continue;
 					}					
