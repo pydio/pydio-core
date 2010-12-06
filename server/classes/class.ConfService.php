@@ -140,14 +140,29 @@ class ConfService
 		return $this->configs[$key];
 	}
 	
+	/**
+	 * Get conf driver implementation
+	 *
+	 * @return AbstractConfDriver
+	 */
 	public static function getConfStorageImpl(){
 		return self::getInstance()->getUniquePluginImplInst("CONF_DRIVER");
 	}
 
+	/**
+	 * Get auth driver implementation
+	 *
+	 * @return AbstractAuthDriver
+	 */
 	public static function getAuthDriverImpl(){
 		return self::getInstance()->getUniquePluginImplInst("AUTH_DRIVER");
 	}
 	
+	/**
+	 * Get log driver implementation
+	 *
+	 * @return AbstractLogDriver
+	 */
 	public static function getLogDriverImpl(){
 		return self::getInstance()->getUniquePluginImplInst("LOG_DRIVER", "log");
 	}
