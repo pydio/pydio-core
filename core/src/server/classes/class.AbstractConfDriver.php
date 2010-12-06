@@ -45,18 +45,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
 	 * @return Array
 	 */
-	function listRepositories(){
-		
-	}
+	abstract function listRepositories();
 	/**
 	 * Retrieve a Repository given its unique ID.
 	 *
 	 * @param String $repositoryId
 	 * @return Repository
 	 */	
-	function getRepositoryById($repositoryId){
-		
-	}
+	abstract function getRepositoryById($repositoryId);
 	/**
 	 * Stores a repository, new or not.
 	 *
@@ -64,27 +60,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * @param Boolean $update 
 	 * @return -1 if failed
 	 */	
-	function saveRepository($repositoryObject, $update = false){
-		
-	}
+	abstract function saveRepository($repositoryObject, $update = false);
 	/**
 	 * Delete a repository, given its unique ID.
 	 *
 	 * @param String $repositoryId
 	 */
-	function deleteRepository($repositoryId){
+	abstract function deleteRepository($repositoryId);
 		
-	}
-	
-	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
-	/**
-	 * Retrieve the list of available users
-	 * @return Array
-	 */
-	function listUsers(){
-		
-	}
-	
 	/**
 	 * Must return an associative array of roleId => AjxpRole objects.
 	 *
@@ -92,6 +75,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	abstract function listRoles();
 	abstract function saveRoles($roles);
 	
+	/**
+	 * Specific queries
+	 */
+	abstract function countAdminUsers();
 	
 	/**
 	 * Instantiate a new AJXP_User
@@ -112,12 +99,9 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 *
 	 * @param AbstractAjxpUser $userId
 	 */
-	function instantiateAbstractUserImpl($userId){
-		
-	}
+	abstract function instantiateAbstractUserImpl($userId);
 	
-	function getUserClassFileName(){		
-	}
+	abstract function getUserClassFileName();
 	
 	function getOption($optionName){	
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	

@@ -103,6 +103,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	{
 		$repo = new Repository($result['id'], $result['display'], $result['accessType']);
 		$repo->uuid = $result['uuid'];
+		$repo->setOwnerData($result['parent_uuid'], $result['owner_user_id'], $result['child_user_id']);
 		$repo->path = $result['path'];
 		$repo->create = $result['bcreate'];
 		$repo->writeable = $result['writeable'];
@@ -131,6 +132,9 @@ class sqlConfDriver extends AbstractConfDriver {
 
 		$repository_row = Array(
 				'uuid' => $repository->getUniqueId(),
+				'parent_uuid' => $repository->getParentId(), 
+				'owner_user_id' => $repository->getOwner(), 
+				'child_user_id' => $repository->getUniqueUser(), 
 				'path' => $repository->options['PATH'],
 				'display' => $repository->getDisplay(),
 				'accessType' => $repository->getAccessType(),
@@ -326,6 +330,11 @@ class sqlConfDriver extends AbstractConfDriver {
 				'serial_role' => serialize($roleObject))
 				);
 		}
+	}
+	
+	function countAdminUsers(){
+		$rows = dibi::query("SELECT [login] FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
+		return count($rows);
 	}
 	
 }

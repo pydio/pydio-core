@@ -204,7 +204,8 @@ class AuthService
 	public static function bootSequence(&$START_PARAMETERS){
 		if(!is_readable(USERS_DIR)) $START_PARAMETERS["ALERT"] = "Warning, the users directory is not readable!";
 		else if(!is_writeable(USERS_DIR)) $START_PARAMETERS["ALERT"] = "Warning, the users directory is not writeable!";
-		if(AuthService::countAdminUsers() == 0){
+		$adminCount = AuthService::countAdminUsers();
+		if($adminCount == 0){
 			$authDriver = ConfService::getAuthDriverImpl();
 			$adminPass = ADMIN_PASSWORD;
 			if($authDriver->getOption("TRANSMIT_CLEAR_PASS") !== true){
@@ -215,7 +216,7 @@ class AuthService
 			 {
 				 $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial common password 'admin'. \\nPlease log in as admin and change the password now!";
 			 }
-		}else if(AuthService::countAdminUsers() == -1){
+		}else if($adminCount == -1){
 			// Here we may come from a previous version! Check the "admin" user and set its right as admin.
 			$confStorage = ConfService::getConfStorageImpl();
 			$adminUser = $confStorage->createUserObject("admin"); 
@@ -339,40 +340,26 @@ class AuthService
 	}
 	
 	static function countAdminUsers(){
-		$auth = ConfService::getAuthDriverImpl();	
 		$confDriver = ConfService::getConfStorageImpl();
-		$count = 0;
-		$users = $auth->listUsers();
-		foreach (array_keys($users) as $userId){
-			$userObject = $confDriver->createUserObject($userId);
-			$userObject->load();			
-			if($userObject->isAdmin()) $count++;
-		}
+		$auth = ConfService::getAuthDriverImpl();	
+		$count = $confDriver->countAdminUsers();
 		if(!$count && $auth->userExists("admin")){
 			return -1;
-		}		
+		}
 		return $count;
 	}
 		
 	static function deleteUser($userId)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
-		$confDriver = ConfService::getConfStorageImpl();
 		$authDriver->deleteUser($userId);
-		AJXP_User::deleteUser($userId);
-		
-		$users = $authDriver->listUsers();
-		$subUsers = "";
-		foreach (array_keys($users) as $id){
-			$object = $confDriver->createUserObject($id);
-			if($object->hasParent() && $object->getParent() == $userId){
-				$subUsers .= $id.",";
-				$authDriver->deleteUser($id);
-				AJXP_User::deleteUser($id);
-			}
+		$subUsers = array();
+		AJXP_User::deleteUser($userId, $subUsers);
+		foreach ($subUsers as $deletedUser){
+			$authDriver->deleteUser($deletedUser);
 		}
-		
-		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => $subUsers));
+
+		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
 		return true;
 	}
 	

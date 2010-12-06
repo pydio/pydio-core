@@ -112,10 +112,11 @@ class AJXP_User extends AbstractAjxpUser
 	
 	/**
 	 * Static function for deleting a user
-	 *
+	 * 
 	 * @param String $userId
+	 * @param Array $deletedSubUsers
 	 */
-	function deleteUser($userId){
+	static function deleteUser($userId, &$deletedSubUsers){
 		$storage = ConfService::getConfStorageImpl();
 		$serialDir = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $storage->getOption("USERS_DIRPATH"));
 		$files = glob($serialDir."/".$userId."/*.ser");
@@ -125,6 +126,17 @@ class AJXP_User extends AbstractAjxpUser
 			}
 		}
 		if(is_dir($serialDir."/".$userId)) rmdir($serialDir."/".$userId);
+		
+		$authDriver = ConfService::getAuthDriverImpl();
+		$confDriver = ConfService::getConfStorageImpl();		
+		$users = $authDriver->listUsers();
+		foreach (array_keys($users) as $id){
+			$object = $confDriver->createUserObject($id);
+			if($object->hasParent() && $object->getParent() == $userId){
+				AJXP_User::deleteUser($id);
+				$deletedSubUsers[] = $id;
+			}
+		}
 		
 	}
 

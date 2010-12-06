@@ -63,6 +63,19 @@ class serialConfDriver extends AbstractConfDriver {
 		AJXP_Utils::saveSerialFile($this->rolesSerialFile, $roles);
 	}
 	
+	function countAdminUsers(){
+		$confDriver = ConfService::getConfStorageImpl();
+		$authDriver = ConfService::getAuthDriverImpl();			
+		$count = 0;
+		$users = $authDriver->listUsers();
+		foreach (array_keys($users) as $userId){
+			$userObject = $confDriver->createUserObject($userId);
+			$userObject->load();			
+			if($userObject->isAdmin()) $count++;
+		}		
+		return $count;
+	}
+	
 	/**
 	 * Unique ID of the repositor
 	 *

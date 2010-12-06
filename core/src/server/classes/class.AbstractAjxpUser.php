@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class AbstractAjxpUser
+abstract class AbstractAjxpUser
 {
 	var $id;
 	var $hasAdmin = false;
@@ -284,22 +284,24 @@ class AbstractAjxpUser
 		return array();
 	}
 	
-	function load(){
-	}
+	abstract function load();
 	
-	function save(){
-	}	
+	abstract function save();
 
-	function deleteUser($userId){
-	}
+	/**
+	 * Static function for deleting a user.
+	 * Also removes associated rights, preferences and bookmarks.
+	 * WARNING : MUST ALSO DELETE THE CHILDREN!
+	 *
+	 * @param String $userId Login to delete.
+	 * @param Array $deletedSubUsers an empty array to be filled by the method
+	 * @return null or -1 on error.
+	 */
+	static abstract function deleteUser($userId, &$deletedSubUsers);
 	
-	function getTemporaryData($key){
-		
-	}
+	abstract function getTemporaryData($key);
 	
-	function saveTemporaryData($key, $value){
-		
-	}
+	abstract function saveTemporaryData($key, $value);
 
     /** Decode a user supplied password before using it */
     function decodeUserPassword($password){

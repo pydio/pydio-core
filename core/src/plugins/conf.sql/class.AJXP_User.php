@@ -420,6 +420,9 @@ class AJXP_User extends AbstractAjxpUser
 		if(isSet($this->rights["ajxp.admin"]) && (bool)$this->rights["ajxp.admin"] === true){
 			$this->setAdmin(true);
 		}
+		if(isSet($this->rights["ajxp.parent_user"])){
+			$this->setParent($this->rights["ajxp.parent_user"]);
+		}		
 		
 		$result_prefs = dibi::query('SELECT [name], [val] FROM [ajxp_user_prefs] WHERE [login] = %s', $this->getId());
 		$this->prefs = $result_prefs->fetchPairs('name', 'val');
@@ -471,7 +474,9 @@ class AJXP_User extends AbstractAjxpUser
 		}else{
 			$this->setRight("ajxp.admin", "0");
 		}
-		
+		if($this->hasParent()){
+			$this->setRight("ajxp.parent_user", $this->parentUser);
+		}
 		// update roles
 		dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]='".$this->getId()."' AND [repo_uuid]='ajxp.roles'");
 		if($this->rights["ajxp.roles"] && is_array($this->rights["ajxp.roles"]) && count($this->rights["ajxp.roles"])){
@@ -508,21 +513,35 @@ class AJXP_User extends AbstractAjxpUser
 	/**
 	 * Static function for deleting a user.
 	 * Also removes associated rights, preferences and bookmarks.
+	 * WARNING : must also delete the children!
 	 *
 	 * @param String $userId Login to delete.
+	 * @param Array $deletedSubUsers
 	 * @return null or -1 on error.
 	 */
-	function deleteUser($userId){
+	static function deleteUser($userId, &$deletedSubUsers){
+		$children = array();
 		try {
+			// FIND ALL CHILDREN FIRST
+			$children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s', "ajxp.parent_user", $userId);
+			$all = $children_results->fetchAll();
+			foreach ($all as $item){
+				$children[] = $item["login"];
+			}
 			dibi::begin();
-			dibi::query('DELETE FROM [ajxp_users] WHERE [login] = %s', $userId);
+			//This one is done by AUTH_DRIVER, not CONF_DRIVER
+			//dibi::query('DELETE FROM [ajxp_users] WHERE [login] = %s', $userId);
 			dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s', $userId);
 			dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
-			dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);		
+			dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);					
 			dibi::commit();
+			foreach ($children as $childId){
+				AJXP_User::deleteUser($childId, $deletedSubUsers);
+				$deletedSubUsers[] = $childId;
+			}
 		} catch (DibiException $e) {
-			$this->log('Failed to delete user, Reason: '.$e->getMessage());
-			return -1;
+			$this->log('Failed to delete user, Reason: '.$e->getMessage());				
+			throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
 		}
 	}
 
