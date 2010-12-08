@@ -413,6 +413,14 @@ $mess=array(
 "374" => "Vous ne pouvez pas copier un répertoire dans un autre dépôt.",
 "375" => "Attention, vous êtes inactif depuis plus de __IDLE__, vous serez déconnecté dans __LOGOUT__",
 "376" => "Cliquez n'importe où!",
+"378" => "Attention le mot de passe est vide ou trop court!",
+"379" => "Mot peu sûr!",
+"380" => "Trop court",
+"381" => "Très faible",
+"382" => "Faible",
+"383" => "Moyen",
+"384" => "Fort",
+"385" => "Très fort",
 /* END SENTENCE */
 );
 ?>

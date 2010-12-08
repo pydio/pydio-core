@@ -413,6 +413,14 @@ $mess=array(
 "374" => "Ordner können nicht zwischen Repositories kopiert werden",
 "375" => "Achtung, inaktivität seit mehr als __IDLE__, ein automatischer logout erfolgt nach __LOGOUT__",
 "376" => "Irgendwo zum Zurücksetzen klicken",
+"378" => "Warning, password is empty or too short!",
+"379" => "Unsafe word!",
+"380" => "Too short",
+"381" => "Very weak",
+"382" => "Weak",
+"383" => "Medium",
+"384" => "Strong",
+"385" => "Very strong",
 /* END SENTENCE */
 );
 ?>

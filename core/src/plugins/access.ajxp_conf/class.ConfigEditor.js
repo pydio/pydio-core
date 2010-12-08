@@ -135,6 +135,16 @@ ConfigEditor = Class.create({
 		}else{
 			var passButton = passwordPane.select('input.dialogButton')[0];
 			passButton.observe('click', this.changePassword.bind(this));
+			var passField = passwordPane.down('input[id="new_pass"]');
+			var strength = new Protopass(passField, {
+				barContainer:passwordPane.down('div[id="strength_container"]'),
+				barPosition:'bottom',
+				labelWidth: 27
+			});
+			strength.observeOnce("strength_change", function(){
+				passwordPane.down('div[id="pass_subblock"]').setStyle({height:'43px'});
+				modal.refreshDialogAppearance();
+			});
 		}
 		
 		if(!editAdminRight){
@@ -435,7 +445,10 @@ ConfigEditor = Class.create({
 	changePassword: function(){
 		var newPass = $('new_pass');
 		var newPassConf = $('new_pass_confirm');
-		if(newPass.value == '') return;
+		if(newPass.value == '' || newPass.value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+			this.displayMessage('ERROR', MessageHash[378]);
+			return;
+		}
 		if(newPass.value != newPassConf.value){
 			 this.displayMessage('ERROR', MessageHash['ajxp_conf.37']);
 			 return;
@@ -455,20 +468,25 @@ ConfigEditor = Class.create({
 		var passConf = this.form.select('[name="new_user_pwd_conf"]')[0];
 		if(login.value == ''){
 			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.38']);
-			return;
+			return false;
 		}
-		if(pass.value == '' || passConf.value == ''){
+		if(pass.value == '' || passConf.value == '' ){
 			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.39']);
-			return;
+			return false;
+		}
+		if(pass.value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+			ajaxplorer.displayMessage("ERROR", MessageHash[378]);
+			return false;
 		}
 		if(pass.value != passConf.value){
 			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.37']);
-			return;
+			return false;
 		}
 		parameters = new Hash();
 		parameters.set('new_user_login', login.value);
 		parameters.set('new_user_pwd', this.encodePassword(pass.value));
 		this.submitForm("create_user", 'create_user', parameters, null);
+		return true;		
 	},
 
 	deleteUser: function(){

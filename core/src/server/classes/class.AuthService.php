@@ -319,6 +319,10 @@ class AuthService
 	
 	static function updatePassword($userId, $userPass)
 	{
+		if(defined('AJXP_PASSWORD_MINLENGTH') && strlen($userPass) < AJXP_PASSWORD_MINLENGTH){
+			$messages = ConfService::getMessages();
+			throw new Exception($messages[378]);
+		}
 		$authDriver = ConfService::getAuthDriverImpl();
 		$authDriver->changePassword($userId, $userPass);
 		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
@@ -327,6 +331,10 @@ class AuthService
 	
 	static function createUser($userId, $userPass, $isAdmin=false)
 	{
+		if(defined('AJXP_PASSWORD_MINLENGTH') && strlen($userPass) < AJXP_PASSWORD_MINLENGTH){
+			$messages = ConfService::getMessages();
+			throw new Exception($messages[378]);
+		}
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
 		$authDriver->createUser($userId, $userPass);

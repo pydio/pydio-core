@@ -36,9 +36,27 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * 
  * Description : configuration file
  */
+/****************************/
+/* USERS MANAGEMENT 
+/****************************/
+// Whether the users system should be active or not.
+// If set to FALSE or 0, all files and settings will be
+// accessible by everybody
 define("ENABLE_USERS", 1);
+
+// Startup admin password (used at first creation). Once
+// The admin password is created and his password is changed, 
+// this config has no more impact.
 define("ADMIN_PASSWORD", "admin");
+
+// Whether a "guest" user should be enabled or not : this guest
+// will appear in the list of the users and you can assign rights to him
+// like a normal user. If no user is logged, the guest user is logged.
 define("ALLOW_GUEST_BROWSING", 0);
+
+// Minimal length required for password. For better security, you 
+// should set this to at least 8 characters.
+define("AJXP_PASSWORD_MINLENGTH", 8);
 
 // If you want to allow public URL to uploaded file please do the following : 
 // + Create this folder.
