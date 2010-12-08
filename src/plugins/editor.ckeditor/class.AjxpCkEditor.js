@@ -97,8 +97,10 @@ Class.create("AjxpCkEditor", TextEditor, {
 		};
 		var reInit  = function(){
 			CKEDITOR.replace('content', this.editorConfig);
-			this.resizeEditor();
-			this.bindCkEditorEvents();				
+			window.setTimeout(function(){
+				this.resizeEditor();
+				this.bindCkEditorEvents();								
+			}.bind(this), 100);
 		}
 		this.element.observe("editor:enterFS", destroy.bind(this));
 		this.element.observe("editor:enterFSend", reInit.bind(this));
@@ -117,21 +119,28 @@ Class.create("AjxpCkEditor", TextEditor, {
 		
 		window.setTimeout(function(){
 			var editor = CKEDITOR.instances.content;
+			if(!editor) {
+				console.log("not found");
+				return;
+			}
 			var setModified = function(){this.setModified(true)}.bind(this);
-				// We'll save snapshots before and after executing a command.
+			var keyDown = function(event){
+	 			if ( !event.data.$.ctrlKey && !event.data.$.metaKey )
+	 					this.setModified(true);
+	 		}.bind(this);
+			// We'll save snapshots before and after executing a command.
 	 		editor.on( 'afterCommandExec', setModified );
-	 			// Save snapshots before doing custom changes.
+	 		// Save snapshots before doing custom changes.
 	 		editor.on( 'saveSnapshot', setModified );
 	 		// Registering keydown on every document recreation.(#3844)
 	 		editor.on( 'contentDom', function(e)
 	 		{
-	 			e.editor.document.on( 'keydown', function( event ){
-	 			// Do not capture CTRL hotkeys.
-	 			if ( !event.data.$.ctrlKey && !event.data.$.metaKey )
-	 					setModified();
-	 			}
-	 			);
-	 		});				
+	 			if(!e.editor.document) return;
+	 			e.editor.document.on( 'keydown', keyDown);
+	 		});
+	 		if(editor.document){
+	 			editor.document.on('keydown', keyDown);
+	 		}
 		}.bind(this), 0);
 	},	
 	
@@ -147,7 +156,9 @@ Class.create("AjxpCkEditor", TextEditor, {
 	resizeEditor : function(){
 		var width = this.contentMainContainer.getWidth()-(Prototype.Browser.IE?0:12);		
 		var height = this.contentMainContainer.getHeight();
-		CKEDITOR.instances.content.resize(width,height);
+		if(CKEDITOR.instances.content){
+			CKEDITOR.instances.content.resize(width,height);
+		}
 	},
 			
 	saveFile : function(){
