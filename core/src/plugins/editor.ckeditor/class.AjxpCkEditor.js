@@ -97,43 +97,43 @@ Class.create("AjxpCkEditor", TextEditor, {
 		};
 		var reInit  = function(){
 			CKEDITOR.replace('content', this.editorConfig);
-			this.resizeEditor();				
+			this.resizeEditor();
+			this.bindCkEditorEvents();				
 		}
 		this.element.observe("editor:enterFS", destroy.bind(this));
 		this.element.observe("editor:enterFSend", reInit.bind(this));
 		this.element.observe("editor:exitFS", destroy.bind(this));
 		this.element.observe("editor:exitFSend", reInit.bind(this));
-		this.element.observe("editor:modified", function(e){
-			if(!this.isModified){
-				this.launchModifiedObserver();
-			}
-		}.bind(this) );
 		// LOAD FILE NOW
-		window.setTimeout(this.resizeEditor.bind(this), 700);
-		this.loadFileContent(fileName);		
+		window.setTimeout(this.resizeEditor.bind(this), 400);
+		this.loadFileContent(fileName);	
+		this.bindCkEditorEvents();		
 		return;
 		
 	},
 	
-	launchModifiedObserver : function(){
-		// OBSERVE CHANGES
-		this.observerInterval = window.setInterval(function(){
-			if(this.isModified || !CKEDITOR.instances.content) return;
-			var currentData =  CKEDITOR.instances.content.getData();
-			if(!this.prevData) {
-				this.prevData = currentData;
-				return;
-			}
-			if(this.prevData != currentData){
-				this.setModified(true);
-				window.clearInterval(this.observerInterval);
-			}
-			this.prevData = currentData;
-		}.bind(this), 500);
-		this.element.observe("editor:close", function(){
-			window.clearInterval(this.observerInterval);
-		});
-	},
+	bindCkEditorEvents : function(){
+		if(this.isModified) return;// useless
+		
+		window.setTimeout(function(){
+			var editor = CKEDITOR.instances.content;
+			var setModified = function(){this.setModified(true)}.bind(this);
+				// We'll save snapshots before and after executing a command.
+	 		editor.on( 'afterCommandExec', setModified );
+	 			// Save snapshots before doing custom changes.
+	 		editor.on( 'saveSnapshot', setModified );
+	 		// Registering keydown on every document recreation.(#3844)
+	 		editor.on( 'contentDom', function(e)
+	 		{
+	 			e.editor.document.on( 'keydown', function( event ){
+	 			// Do not capture CTRL hotkeys.
+	 			if ( !event.data.$.ctrlKey && !event.data.$.metaKey )
+	 					setModified();
+	 			}
+	 			);
+	 		});				
+		}.bind(this), 0);
+	},	
 	
 	reloadEditor : function(instanceId){
 		if(!instanceId) instanceId = "code";
