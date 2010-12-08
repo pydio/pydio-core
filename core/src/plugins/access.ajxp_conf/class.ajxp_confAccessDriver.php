@@ -65,7 +65,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"logs" => array("LABEL" => $mess["ajxp_conf.4"], "ICON" => "toggle_log.png"),
 					"diagnostic" => array("LABEL" => $mess["ajxp_conf.5"], "ICON" => "susehelpcenter.png")
 				);
-				$dir = (isset($httpVars["dir"])?$httpVars["dir"]:"");
+				$dir = AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:""));
 				$splits = explode("/", $dir);
 				if(count($splits)){
 					if($splits[0] == "") array_shift($splits);
@@ -88,7 +88,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$this->listSharedFiles();
 					}
 					AJXP_XMLWriter::close();
-					exit(1);
+					return;
 				}else{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/></columns>');
@@ -100,7 +100,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" '.$src.' />';
 					}
 					AJXP_XMLWriter::close();
-					exit(1);
+					return;
 				}
 			break;
 			
@@ -108,12 +108,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 				header("Content-type:application/json");
 				print '{"mode":true}';
-				exit(1);
+				return;
 				
 			break;			
 			
 			case "create_role":
-				$roleId = $httpVars["role_id"];
+				$roleId = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["role_id"]), AJXP_SANITIZE_HTML_STRICT);
+				if(!strlen($roleId)){
+					throw new Exception($mess[349]);
+				}
 				if(AuthService::getRole($roleId) !== false){
 					throw new Exception($mess["ajxp_conf.65"]);
 				}
@@ -125,8 +128,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			break;
 			
 			case "edit_role" : 				
-				$roleId = $httpVars["role_id"];
+				$roleId = SystemTextEncoding::magicDequote($httpVars["role_id"]);
 				$role = AuthService::getRole($roleId);
+				if($role === false) {
+					throw new Exception("Cant find role! ");
+				}
 				AJXP_XMLWriter::header("admin_data");
 				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
 				AJXP_XMLWriter::close("admin_data");			
@@ -142,9 +148,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					print("<update_checkboxes user_id=\"".$httpVars["role_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
 					AJXP_XMLWriter::close();
 					return ;
-					//exit(1);
 				}
 				$role = AuthService::getRole($httpVars["role_id"]);
+				if($role === false) {
+					throw new Exception("Cant find role!");
+				}
 				$role->setRight($httpVars["repository_id"], $httpVars["right"]);
 				AuthService::updateRole($role);
 				AJXP_XMLWriter::header();
@@ -152,7 +160,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				print("<update_checkboxes user_id=\"".$httpVars["role_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"".$role->canRead($httpVars["repository_id"])."\" write=\"".$role->canWrite($httpVars["repository_id"])."\"/>");
 				//AJXP_XMLWriter::reloadRepositoryList();
 				AJXP_XMLWriter::close();
-				//exit(1);
 			break;
 
 			case "update_role_actions" : 
@@ -166,13 +173,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					return ;
 				}
 				$role = AuthService::getRole($httpVars["role_id"]);
-				$actions = array_map("trim", explode(",", $httpVars["disabled_actions"]));
+				if($role === false) {
+					throw new Exception("Cant find role!");
+				}
+				$actions = explode(",", $httpVars["disabled_actions"]);
 				// Clear and reload actions
 				foreach ($role->getSpecificActionsRights("ajxp.all") as $actName => $actValue){
 					$role->setSpecificActionRight("ajxp.all", $actName, true);
 				}
 				foreach ($actions as $action){
-					if($action == "") continue;
+					if(($action = AJXP_Utils::sanitize($action, AJXP_SANITIZE_ALPHANUM)) == "") continue;
 					$role->setSpecificActionRight("ajxp.all", $action, false);
 				}
 				AuthService::updateRole($role);
@@ -185,6 +195,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case "edit_user" : 
 				$confStorage = ConfService::getConfStorageImpl();	
 				$userId = $httpVars["user_id"];	
+				if(!AuthService::userExists($userId)){
+					throw new Exception("Invalid user id!");
+				}
 				$userObject = $confStorage->createUserObject($userId);		
 				//print_r($userObject);
 				AJXP_XMLWriter::header("admin_data");
@@ -226,32 +239,34 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					AJXP_XMLWriter::close();
-					exit(1);						
+					return;						
 				}
 				$forbidden = array("guest", "share");
-				if(AuthService::userExists($httpVars["new_user_login"]) || in_array($httpVars["new_user_login"], $forbidden))
+				$new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_HTML_STRICT);
+				if(AuthService::userExists($new_user_login) || in_array($new_user_login, $forbidden))
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
 					AJXP_XMLWriter::close();
-					exit(1);									
+					return;									
 				}
-				if(get_magic_quotes_gpc()) $httpVars["new_user_login"] = stripslashes($httpVars["new_user_login"]);
-				$httpVars["new_user_login"] = str_replace("'", "", $httpVars["new_user_login"]);
 				
 				$confStorage = ConfService::getConfStorageImpl();		
-				$newUser = $confStorage->createUserObject($httpVars["new_user_login"]);
+				$newUser = $confStorage->createUserObject($new_user_login);
 				$newUser->save();
-				AuthService::createUser($httpVars["new_user_login"], $httpVars["new_user_pwd"]);
+				AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
-				AJXP_XMLWriter::reloadFileList($httpVars["new_user_login"]);
+				AJXP_XMLWriter::reloadFileList($new_user_login);
 				AJXP_XMLWriter::close();
-				exit(1);										
+														
 			break;
 								
 			case "change_admin_right" :
 				$userId = $httpVars["user_id"];
+				if(!AuthService::userExists($userId)){
+					throw new Exception("Invalid user id!");
+				}				
 				$confStorage = ConfService::getConfStorageImpl();		
 				$user = $confStorage->createUserObject($userId);
 				$user->setAdmin(($httpVars["right_value"]=="1"?true:false));
@@ -260,7 +275,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.45"].$httpVars["user_id"], null);
 				AJXP_XMLWriter::reloadFileList(false);
 				AJXP_XMLWriter::close();
-				exit(1);
+				
 			break;
 		
 			case "update_user_right" :
@@ -273,11 +288,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					print("<update_checkboxes user_id=\"".$httpVars["user_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
 					AJXP_XMLWriter::close();
-					exit(1);
+					return;
 				}
 				$confStorage = ConfService::getConfStorageImpl();		
 				$user = $confStorage->createUserObject($httpVars["user_id"]);
-				$user->setRight($httpVars["repository_id"], $httpVars["right"]);
+				$user->setRight(AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), AJXP_Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
 				$user->save();
 				$loggedUser = AuthService::getLoggedUser();
 				if($loggedUser->getId() == $user->getId()){
@@ -294,7 +309,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case "user_add_role" : 
 			case "user_delete_role":
 			
-				if(!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !AuthService::userExists($httpVars["user_id"])){
+				if(!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !AuthService::userExists($httpVars["user_id"]) || !AuthService::getRole($httpVars["role_id"])){
 					throw new Exception($mess["ajxp_conf.61"]);
 				}
 				if($action == "user_add_role"){
@@ -323,6 +338,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(isSet($httpVars["role_id"]) && isset($httpVars["update_role_action"])){
 					$update = $httpVars["update_role_action"];
 					$roleId = $httpVars["role_id"];
+					if(AuthService::getRole($roleId) === false){
+						throw new Exception("Invalid role id");
+					}
 				}
 				foreach ($files as $index => $file){
 					$userId = basename($file);
@@ -386,7 +404,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.47"].$httpVars["user_id"], null);
 				AJXP_XMLWriter::close();
-				exit(1);	
+					
 			break;
 			
 			case "update_user_pwd" : 
@@ -395,7 +413,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 					AJXP_XMLWriter::close();
-					exit(1);			
+					return;			
 				}
 				$res = AuthService::updatePassword($httpVars["user_id"], $httpVars["user_pwd"]);
 				AJXP_XMLWriter::header();
@@ -408,7 +426,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.49"]." : $res");
 				}
 				AJXP_XMLWriter::close();
-				exit(1);						
+										
 			break;
 	
 			case  "get_drivers_definition":
@@ -416,7 +434,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header("drivers");
 				print(ConfService::availableDriversToXML("param"));
 				AJXP_XMLWriter::close("drivers");
-				exit(1);
+				
 				
 			break;
 			
@@ -442,7 +460,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						AJXP_XMLWriter::header();
 						AJXP_XMLWriter::sendMessage(null, $class->failedInfo);
 						AJXP_XMLWriter::close();
-						exit(1);
+						return;
 					}
 				}
                 if ($this->repositoryExists($newRep->getDisplay()))
@@ -450,7 +468,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
 					AJXP_XMLWriter::close();
-					exit(1);
+					return;
                 }
 				$res = ConfService::addRepository($newRep);
 				AJXP_XMLWriter::header();
@@ -468,7 +486,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();
-				exit(1);
+				
 				
 			
 			break;
@@ -480,7 +498,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header("admin_data");		
 				if(!isSet($repList[$repId])){
 					AJXP_XMLWriter::close("admin_data");
-					exit(1);
+					return ;
 				}
 				$repository = $repList[$repId];				
 				$nested = array();
@@ -527,7 +545,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				print("</metasources>");
 				AJXP_XMLWriter::close("admin_data");
-				exit(1);
+				return ;
 			break;
 			
 			case "edit_repository_label" : 
@@ -536,13 +554,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repo = ConfService::getRepositoryById($repId);
 				$res = 0;
 				if(isSet($httpVars["newLabel"])){
-					$newLabel = SystemTextEncoding::fromPostedFileName($httpVars["newLabel"]);
+					$newLabel = AJXP_Utils::decodeSecureMagic($httpVars["newLabel"]);
                     if ($this->repositoryExists($newLabel))
                     {
 		     			AJXP_XMLWriter::header();
 			    		AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
 				    	AJXP_XMLWriter::close();
-					    exit(1);
+					    return;
                     }
 					$repo->setDisplay($newLabel);                    
 					$res = ConfService::replaceRepository($repId, $repo);
@@ -562,7 +580,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 							AJXP_XMLWriter::header();
 							AJXP_XMLWriter::sendMessage(null, $class->failedInfo);
 							AJXP_XMLWriter::close();
-							exit(1);
+							return;
 						}
 					}
 					
@@ -573,16 +591,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.53"]);
 				}else{
 					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.54"], null);					
-					AJXP_XMLWriter::reloadDataNode("", (isSet($httpVars["newLabel"])?SystemTextEncoding::fromPostedFileName($httpVars["newLabel"]):false));
+					AJXP_XMLWriter::reloadDataNode("", (isSet($httpVars["newLabel"])?AJXP_Utils::decodeSecureMagic($httpVars["newLabel"]):false));
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();		
-				exit(1);
+				
+			break;
 			
 			case "add_meta_source" : 
 				$repId = $httpVars["repository_id"];
 				$repo = ConfService::getRepositoryById($repId);
-				$metaSourceType = $httpVars["new_meta_source"];
+				if(!is_object($repo)){
+					throw new Exception("Invalid repository id! $repId");
+				}
+				$metaSourceType = AJXP_Utils::sanitize($httpVars["new_meta_source"], AJXP_SANITIZE_ALPHANUM);
 				$options = array();
 				$this->parseParameters($httpVars, $options);
 				$repoOptions = $repo->getOption("META_SOURCES");
@@ -604,6 +626,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 				$repId = $httpVars["repository_id"];
 				$repo = ConfService::getRepositoryById($repId);
+				if(!is_object($repo)){
+					throw new Exception("Invalid repository id! $repId");
+				}
 				$metaSourceId = $httpVars["plugId"];
 				$repoOptions = $repo->getOption("META_SOURCES");
 				if(is_array($repoOptions) && array_key_exists($metaSourceId, $repoOptions)){
@@ -620,6 +645,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case "edit_meta_source" : 
 				$repId = $httpVars["repository_id"];
 				$repo = ConfService::getRepositoryById($repId);
+				if(!is_object($repo)){
+					throw new Exception("Invalid repository id! $repId");
+				}				
 				$metaSourceId = $httpVars["plugId"];
 				$options = array();
 				$this->parseParameters($httpVars, $options);
@@ -638,8 +666,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 			case "delete" :
 				if(isSet($httpVars["repository_id"])){
-					$repId = $httpVars["repository_id"];
-					//if(get_magic_quotes_gpc()) $repLabel = stripslashes($repLabel);
+					$repId = $httpVars["repository_id"];					
 					$res = ConfService::deleteRepository($repId);
 					AJXP_XMLWriter::header();
 					if($res == -1){
@@ -650,7 +677,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						AJXP_XMLWriter::reloadRepositoryList();
 					}
 					AJXP_XMLWriter::close();		
-					exit(1);
+					return;
 				}else if(isSet($httpVars["shared_file"])){
 					AJXP_XMLWriter::header();
 					$element = basename($httpVars["shared_file"]);
@@ -678,14 +705,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						AJXP_XMLWriter::header();
 						AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
 						AJXP_XMLWriter::close();
-						exit(1);									
 					}
 					$res = AuthService::deleteUser($httpVars["user_id"]);
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.60"], null);
 					AJXP_XMLWriter::reloadDataNode();
 					AJXP_XMLWriter::close();
-					exit(1);
 					
 				}
 			break;
@@ -971,7 +996,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		
 		foreach ($repDef as $key => $value)
 		{
-			$value = SystemTextEncoding::magicDequote($value);
+			$value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
 			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0 && strpos($key, "ajxptype") === false){
 				if(isSet($repDef[$key."_ajxptype"])){
 					$type = $repDef[$key."_ajxptype"];
@@ -994,7 +1019,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				unset($repDef[$key]);
 			}else{
 				if($key == "DISPLAY"){
-					$value = SystemTextEncoding::fromPostedFileName($value);
+					$value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
 				}
 				$repDef[$key] = $value;		
 			}

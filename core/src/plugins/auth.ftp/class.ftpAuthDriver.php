@@ -96,8 +96,9 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
 		unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);
 		$adminUser = $this->options["ADMIN_USER"];
+		$subUsers = array();
 		if($login != $adminUser && $crtUser!=""){
-			AJXP_User::deleteUser($crtUser);
+			AJXP_User::deleteUser($crtUser, $subUsers);
 		}
 		AuthService::disconnect();
 		session_write_close();
