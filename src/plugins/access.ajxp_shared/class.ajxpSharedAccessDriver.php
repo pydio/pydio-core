@@ -91,7 +91,6 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" '.$src.' description="'.$data["DESCRIPTION"].'" />';
 					}
 					AJXP_XMLWriter::close();
-					exit(1);
 				}
 			break;
 			
@@ -99,7 +98,6 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				
 				header("Content-type:application/json");
 				print '{"mode":true}';
-				exit(1);
 				
 			break;			
 						

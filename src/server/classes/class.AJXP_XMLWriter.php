@@ -105,7 +105,9 @@ class AJXP_XMLWriter
 	
 	static function catchError($code, $message, $fichier, $ligne, $context){
 		if(error_reporting() == 0) return ;
-		$message = "$message in $fichier (l.$ligne)";
+		if(ConfService::getConf("SERVER_DEBUG")){
+			$message = "$message in $fichier (l.$ligne)";
+		}
 		AJXP_Logger::logAction("error", array("message" => $message));
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
@@ -119,7 +121,7 @@ class AJXP_XMLWriter
 	 * @param Exception $exception
 	 */
 	static function catchException($exception){
-		AJXP_XMLWriter::catchError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), null);
+		AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), null);
 	}
 	
 	static function replaceAjxpXmlKeywords($xml, $stripSpaces = false){

@@ -89,7 +89,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		$dir = $httpVars["dir"] OR "";
 		$dir = AJXP_Utils::securePath($dir);
 		if($action != "upload"){
-			$dir = SystemTextEncoding::fromPostedFileName($dir);
+			$dir = AJXP_Utils::decodeSecureMagic($dir);
 		}
 		$selection->initFromHttpVars($httpVars);
 		if(!$selection->isEmpty()){
@@ -147,7 +147,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				}else{
 					$this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download");
 				}
-				exit(0);
+				
 			break;
 		
 			case "compress" : 					
@@ -155,7 +155,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					$loggedUser = AuthService::getLoggedUser();
 					if(isSet($httpVars["archive_name"])){						
 						$localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
-						$this->filterUserSelectionToHidden(array($httpVars["archive_name"]));
+						$this->filterUserSelectionToHidden(array($localName));
 					}else{
 						$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					}
@@ -179,7 +179,6 @@ class fsAccessDriver extends AbstractAccessDriver
 				}else{
 					print json_encode($stat);
 				}
-				exit(1);
 				
 			break;
 			
@@ -190,33 +189,33 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "get_content":
 					
 				$this->readFile($this->urlBase.$selection->getUniqueFile(), "plain");
-				exit(0);
+				
 			break;
 			
 			case "put_content":	
 				if(!isset($httpVars["content"])) break;
-				// Reload "code" variable directly from POST array, do not "securePath"...
+				// Load "code" variable directly from POST array, do not "securePath" or "sanitize"...
 				$code = $httpVars["content"];
 				$file = $selection->getUniqueFile($httpVars["file"]);
 				AJXP_Logger::logAction("Online Edition", array("file"=>$file));
 				if(isSet($httpVars["encode"]) && $httpVars["encode"] == "base64"){
 				    $code = base64_decode($code);
 				}else{
-					$code=stripslashes($code);
+					$code = SystemTextEncoding::magicDequote($code);
 					$code=str_replace("&lt;","<",$code);
 				}
 				$fileName = $this->urlBase.$file;
 				if(!is_file($fileName) || !$this->isWriteable($fileName, "file")){
 					header("Content-Type:text/plain");
 					print((!$this->isWriteable($fileName, "file")?"1001":"1002"));
-					exit(1);
+					return ;
 				}
 				$fp=fopen($fileName,"w");
 				fputs ($fp,$code);
 				fclose($fp);
 				header("Content-Type:text/plain");
 				print($mess[115]);
-				//exit(0);
+				
 			break;
 		
 			//------------------------------------
@@ -294,7 +293,8 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "mkdir";
 			        
 				$messtmp="";
-				$dirname=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($httpVars["dirname"]));
+				$dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_HTML_STRICT);
+				$dirname = substr($dirname, 0, ConfService::getConf("MAX_CHAR"));
 				$this->filterUserSelectionToHidden(array($dirname));
 				$error = $this->mkDir($dir, $dirname);
 				if(isSet($error)){
@@ -315,7 +315,8 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "mkfile";
 			
 				$messtmp="";
-				$filename=AJXP_Utils::processFileName(SystemTextEncoding::fromUTF8($httpVars["filename"]));	
+				$filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_HTML_STRICT);
+				$filename = substr($filename, 0, ConfService::getConf("MAX_CHAR"));
 				$this->filterUserSelectionToHidden(array($filename));
 				$error = $this->createEmptyFile($dir, $filename);
 				if(isSet($error)){
@@ -360,7 +361,7 @@ class fsAccessDriver extends AbstractAccessDriver
 			case "upload":
 
 				AJXP_Logger::debug("Upload Files Data", $fileVars);
-				$destination=$this->urlBase.SystemTextEncoding::fromPostedFileName($dir);
+				$destination=$this->urlBase.AJXP_Utils::decodeSecureMagic($dir);
 				AJXP_Logger::debug("Upload inside", array("destination"=>$destination));
 				if(!$this->isWriteable($destination))
 				{
@@ -385,7 +386,8 @@ class fsAccessDriver extends AbstractAccessDriver
 					}catch (Exception $e){
 						return array("ERROR" => array("CODE" => 411, "MESSAGE" => "Forbidden"));
 					}
-					$userfile_name=AJXP_Utils::processFileName($userfile_name);
+					$userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($userfile_name), AJXP_SANITIZE_HTML_STRICT);
+					$userfile_name = substr($userfile_name, 0, ConfService::getConf("MAX_CHAR"));
 					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
 					}
@@ -1006,7 +1008,8 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		$nom_fic=basename($filePath);
 		$mess = ConfService::getMessages();
-		$filename_new=AJXP_Utils::processFileName($filename_new);
+		$filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_HTML_STRICT);
+		$filename_new = substr($filename_new, 0, ConfService::getConf("MAX_CHAR"));
 		$old=$this->urlBase."/$filePath";
 		if(!$this->isWriteable($old))
 		{

@@ -35,6 +35,10 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+define('AJXP_SANITIZE_HTML', 1);
+define('AJXP_SANITIZE_HTML_STRICT', 2);
+define('AJXP_SANITIZE_ALPHANUM', 3);
+
 class AJXP_Utils
 {
 	
@@ -88,8 +92,49 @@ class AJXP_Utils
 		return $path;
 	}
 	
-	public static function decodeSecureMagic($data){
-		return SystemTextEncoding::fromUTF8(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)));
+    public static function sanitize($s , $level = AJXP_SANITIZE_HTML, $expand = 'script|style|noframes|select|option'){
+        /**///prep the string
+        $s = ' ' . $s;
+        if($level == AJXP_SANITIZE_ALPHANUM){
+        	return preg_replace("/[^a-zA-Z0-9_\-\.]/", "", $s);
+        }
+        
+        //begin removal
+        /**///remove comment blocks
+        while(stripos($s,'<!--') > 0){
+            $pos[1] = stripos($s,'<!--');
+            $pos[2] = stripos($s,'-->', $pos[1]);
+            $len[1] = $pos[2] - $pos[1] + 3;
+            $x = substr($s,$pos[1],$len[1]);
+            $s = str_replace($x,'',$s);
+        }
+        
+        /**///remove tags with content between them
+        if(strlen($expand) > 0){
+            $e = explode('|',$expand);
+            for($i=0;$i<count($e);$i++){
+                while(stripos($s,'<' . $e[$i]) > 0){
+                    $len[1] = strlen('<' . $e[$i]);
+                    $pos[1] = stripos($s,'<' . $e[$i]);
+                    $pos[2] = stripos($s,$e[$i] . '>', $pos[1] + $len[1]);
+                    $len[2] = $pos[2] - $pos[1] + $len[1];
+                    $x = substr($s,$pos[1],$len[2]);
+                    $s = str_replace($x,'',$s);
+                }
+            }
+        }
+        
+        $s = strip_tags($s);
+        if($level == AJXP_SANITIZE_HTML_STRICT){
+        	  $s = preg_replace("/[\",;\/`<>:\*\|\?!\^\\\]/", "", $s);
+        }else{
+	        $s = str_replace(array("<", ">"), array("&lt;", "&gt;"), $s);
+        }
+        return trim($s);
+    }	
+	
+	public static function decodeSecureMagic($data, $sanitizeLevel = AJXP_SANITIZE_HTML){
+		return SystemTextEncoding::fromUTF8(AJXP_Utils::sanitize(AJXP_Utils::securePath(SystemTextEncoding::magicDequote($data)), $sanitizeLevel));
 	}
 	
 	public static function getAjxpTmpDir(){
@@ -173,14 +218,6 @@ class AJXP_Utils
 		
 	}
 	
-	static function mergeArrays($t1,$t2)
-	{
-		$liste = array();
-		$tab1=$t1; $tab2=$t2;
-		if(is_array($tab1)) {while (list($cle,$val) = each($tab1)) {$liste[$cle]=$val;}}
-		if(is_array($tab2)) {while (list($cle,$val) = each($tab2)) {$liste[$cle]=$val;}}
-		return $liste;
-	}
 	
 	static function removeWinReturn($fileContent)
 	{
@@ -188,44 +225,7 @@ class AJXP_Utils
 		$fileContent = str_replace(chr(13), "", $fileContent);
 		return $fileContent;
 	}
-	
-	static function tipsandtricks()
-	{
-		$tips = array();
-		$tips[] = "DoubleClick in the list to directly download a file or to open a folder.";
-		$tips[] = "When the 'Edit' button is enabled (on text files), you can directly edit the selected file online.";
-		$tips[] = "Type directly a folder URL in the location bar then hit 'ENTER' to go to a given folder.";
-		$tips[] = "Use MAJ+Click and CTRL+Click to perform multiple selections in the list.";
-		$tips[] = "Use the Bookmark button to save your frequently accessed locations in the bookmark bar.";
-		$tips[] = "Use the TAB button to navigate through the main panels (tree, list, location bar).";
-		$tips[] = "Use the 'u' key to go to the parent directory.";
-		$tips[] = "Use the 'h' key to refresh current listing.";
-		$tips[] = "Use the 'b' key to bookmark current location to your bookmark bar.";
-		$tips[] = "Use the 'l' key to open Upload Form.";
-		$tips[] = "Use the 'd' key to create a new directory in this folder.";
-		$tips[] = "Use the 'f' key to create a new file in this folder.";
-		$tips[] = "Use the 'r' key to rename a file.";
-		$tips[] = "Use the 'c' key to copy one or more file or folders to a different folder.";
-		$tips[] = "Use the 'm' key to move one or more file or folders to a different folder.";
-		$tips[] = "Use the 's' key to delete one or more file or folders.";
-		$tips[] = "Use the 'e' key to edit a file or view an image.";
-		$tips[] = "Use the 'o' key to download a file to your hard drive.";
-		return $tips[array_rand($tips, 1)];
-	}
-	
-	static function processFileName($fileName)
-	{
-		$max_caracteres = ConfService::getConf("MAX_CHAR");
-		// Don't allow those chars : ' " & , ; / \ ` < > : * ? | ! + ^ 
-		$fileName=SystemTextEncoding::magicDequote($fileName);
-		// Unless I'm mistaken, ' is a valid char for a file name (under both Linux and Windows).
-		// I've found this regular expression for Windows file name validation, not sure how it applies for linux :
-		// ^[^\\\./:\*\?\"<>\|]{1}[^\\/:\*\?\"<>\|]{0,254}$   This reg ex remove ^ \ . / : * ? " < > | as the first char, and (same thing but . for any other char), and it limits to 254 chars (could use max_caracteres instead)
-		// Anyway, here is the corrected version of the big str_replace calls below that doesn't kill UTF8 encoding
-		$fileNameTmp=preg_replace("/[\",;\/`<>:\*\|\?!\^]/", "", $fileName);
-		return substr($fileNameTmp, 0, $max_caracteres);
-	}
-	
+		
 	static function mimetype($fileName,$mode, $isDir)
 	{
 		$mess = ConfService::getMessages();
