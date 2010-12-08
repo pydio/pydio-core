@@ -430,6 +430,10 @@ Class.create("Modal", {
 		return;
 	},
 	
+	setCloseValidation : function(func){
+		this.closeValidation = func;
+	},
+	
 	setCloseAction: function(func){
 		this.closeFunction = func;
 	},

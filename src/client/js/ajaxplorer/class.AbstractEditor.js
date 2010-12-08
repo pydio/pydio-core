@@ -77,11 +77,14 @@ Class.create("AbstractEditor" , {
 		
 		if(this.actions.get("closeButton")){
 			this.actions.get("closeButton").observe("click", function(){
+				hideLightBox(true);
+			}.bind(this) );
+			modal.setCloseValidation(function(){
 				if(this.isModified && !window.confirm(MessageHash[201])){
 					return false;
 				}
-				hideLightBox(true);
-			}.bind(this) );
+				return true;
+			}.bind(this) );			
 		}
 		if(this.actions.get("fsButton")){
 			this.actions.get("fsButton").observe("click", this.setFullScreen.bind(this));
