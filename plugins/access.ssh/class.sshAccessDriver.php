@@ -296,7 +296,7 @@ class sshAccessDriver extends AbstractAccessDriver
 			case "mkdir";
 			        
 				$messtmp="";
-				$dirname=AJXP_Utils::processFileName($dirname);
+				$dirname=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($dirname), AJXP_SANITIZE_HTML_STRICT);
 				$error = $this->SSHOperation->createRemoteDirectory($this->makeName($dir."/".$dirname));
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -316,7 +316,7 @@ class sshAccessDriver extends AbstractAccessDriver
 			case "mkfile";
 			
 				$messtmp="";
-				$filename=AJXP_Utils::processFileName($filename);	
+				$filename=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename), AJXP_SANITIZE_HTML_STRICT);
 				$error = $this->SSHOperation->setRemoteContent($this->makeName($dir."/".$filename), "");
 				if(isSet($error)){
 					$errorMessage = $error; break;
@@ -357,7 +357,7 @@ class sshAccessDriver extends AbstractAccessDriver
                         break;
                     }
                     $userfile_name = $boxData["name"];
-                    $userfile_name=AJXP_Utils::processFileName($userfile_name);
+                    $userfile_name= AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($userfile_name), AJXP_SANITIZE_HTML_STRICT);
                     if (!$this->SSHOperation->uploadFile($boxData["tmp_name"], $this->makeName($destination."/".$userfile_name)))
                     {
                         $errorMessage=($fancyLoader?"411 ":"")."$mess[33] ".$userfile_name;

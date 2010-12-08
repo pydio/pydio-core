@@ -59,6 +59,10 @@ class AbstractAuthDriver extends AJXP_Plugin {
 				$oldPass = $httpVars["old_pass"];
 				$newPass = $httpVars["new_pass"];
 				$passSeed = $httpVars["pass_seed"];
+				if(defined("AJXP_PASSWORD_MINLENGTH") && strlen($newPass) < AJXP_PASSWORD_MINLENGTH){
+					header("Content-Type:text/plain");
+					print "PASS_ERROR";
+				}
 				if(AuthService::checkPassword($userObject->getId(), $oldPass, false, $passSeed)){
 					AuthService::updatePassword($userObject->getId(), $newPass);
 				}else{

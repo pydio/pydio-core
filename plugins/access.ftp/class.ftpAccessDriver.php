@@ -102,7 +102,7 @@ class ftpAccessDriver extends fsAccessDriver {
 				}
 				AJXP_Logger::debug("Base64 : ", array("from"=>$fData["destination"], "to"=>base64_decode($fData['destination'])));
 				$destPath = $this->urlBase.base64_decode($fData['destination'])."/".$fData['name'];
-				$destPath = SystemTextEncoding::fromPostedFileName($destPath);
+				$destPath = AJXP_Utils::decodeSecureMagic($destPath);
 				AJXP_Logger::debug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
 				try {
 					$fp = fopen($destPath, "w");

@@ -70,7 +70,7 @@ class UserSelection
 		}
 		if(isSet($array[$this->varPrefix]) && $array[$this->varPrefix] != "")
 		{
-			$this->files[] = AJXP_Utils::securePath(SystemTextEncoding::fromPostedFileName($array[$this->varPrefix]));
+			$this->files[] = AJXP_Utils::decodeSecureMagic($array[$this->varPrefix]);
 			$this->isUnique = true;
 			//return ;
 		}
@@ -79,7 +79,7 @@ class UserSelection
 			$index = 0;			
 			while(isSet($array[$this->varPrefix."_".$index]))
 			{
-				$this->files[] = AJXP_Utils::securePath(SystemTextEncoding::fromPostedFileName($array[$this->varPrefix."_".$index]));
+				$this->files[] = AJXP_Utils::decodeSecureMagic($array[$this->varPrefix."_".$index]);
 				$index ++;
 			}
 			$this->isUnique = false;
@@ -113,7 +113,7 @@ class UserSelection
 	 * @return String
 	 */
 	function getZipPath($decode = false){
-		if($decode) return SystemTextEncoding::fromPostedFileName($this->zipFile);
+		if($decode) return AJXP_Utils::decodeSecureMagic($this->zipFile);
 		else return $this->zipFile;
 	}
 	
@@ -123,7 +123,7 @@ class UserSelection
 	 * @return String
 	 */
 	function getZipLocalPath($decode = false){
-		if($decode) return SystemTextEncoding::fromPostedFileName($this->localZipPath);
+		if($decode) return AJXP_Utils::decodeSecureMagic($this->localZipPath);
 		else return $this->localZipPath;
 	}
 	

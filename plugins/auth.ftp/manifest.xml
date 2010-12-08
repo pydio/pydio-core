@@ -51,7 +51,7 @@
 						}
 						]]></clientCallback>
 						<clientForm id="ftp_login_form"><![CDATA[						
-							<form id="ftp_login_form" action="login" box_width="330">
+							<form id="ftp_login_form" action="login" box_width="340">
 							<input type="hidden" name="get_action" value="login">
 							<input type="hidden" name="login_seed" id="login_seed" value="-1">
 							<div>
