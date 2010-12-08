@@ -120,7 +120,6 @@ Class.create("AjxpCkEditor", TextEditor, {
 		window.setTimeout(function(){
 			var editor = CKEDITOR.instances.content;
 			if(!editor) {
-				console.log("not found");
 				return;
 			}
 			var setModified = function(){this.setModified(true)}.bind(this);
