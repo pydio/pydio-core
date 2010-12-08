@@ -78,6 +78,10 @@
 							$('pass_seed').value = transport.responseText;
 						};
 						connexion.sendSync();			
+						new Protopass($('user_change_ownpass1'), {
+							barContainer:$('pwd_strength_container'),
+							barPosition:'bottom'
+						});
 					]]></dialogOnOpen>
 					<dialogOnComplete hideDialog="false"><![CDATA[
 						var userOldPass = null;
@@ -85,6 +89,10 @@
 						var passSeed = null;
 						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
 						{
+							if($('user_change_ownpass1').value.length < window.ajxpBootstrap.parameters.get("password_min_length")){
+								alert(MessageHash[378]);
+								return false;
+							}
 							if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
 								alert(MessageHash[238]);
 								return false;
@@ -126,19 +134,18 @@
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="pass_change_form"><![CDATA[
-					<div id="pass_change_form" action="pass_change_form" box_width="270">
+					<div id="pass_change_form" action="pass_change_form" box_width="210">					
 						<input type="hidden" name="pass_seed" id="pass_seed" value="">
-						<table cellpadding="2" cellspacing="0" border="0" style="font-size:11px;">
-							<tr>
-								<td align="right" style="width:100px; text-align:right;"><ajxp:message ajxp_message_id="237">AJXP_MESSAGE[237]</ajxp:message></td><td><input type="password" id="user_change_ownpass_old" value="" style="width:140px;"></td>
-							</tr>
-							<tr>
-								<td align="right" style="text-align:right;"><ajxp:message ajxp_message_id="198">AJXP_MESSAGE[198]</ajxp:message></td><td><input type="password" id="user_change_ownpass1" value="" style="width:140px;"></td>
-							</tr>
-							<tr>
-								<td align="right" style="text-align:right;"><ajxp:message ajxp_message_id="199">AJXP_MESSAGE[199]</ajxp:message></td><td><input type="password" id="user_change_ownpass2" value="" style="width:140px;"></td>
-							</tr>
-						</table>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="237">AJXP_MESSAGE[237] : </div><input id="user_change_ownpass_old" type="password" class="dialogFocus SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input id="user_change_ownpass1" value="" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element">						
+							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input id="user_change_ownpass2" value="" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element" id="pwd_strength_container"></div>						
 					</div>
 				]]></clientForm>				
 				<serverCallback methodName="switchAction"></serverCallback>

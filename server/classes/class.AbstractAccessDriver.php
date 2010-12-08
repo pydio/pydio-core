@@ -278,8 +278,9 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		// SUCCESS
 		// 200
     	
-		if(!isSet($httpVars["repo_label"]) ||  !isSet($httpVars["repo_rights"]) 
-			||  !isSet($httpVars["shared_user"])){
+		if(!isSet($httpVars["repo_label"]) || $httpVars["repo_label"] == "" 
+			||  !isSet($httpVars["repo_rights"]) || $httpVars["repo_rights"] == ""
+			||  !isSet($httpVars["shared_user"]) || $httpVars["shared_user"] == ""){
 			return 100;
 		}
 		$loggedUser = AuthService::getLoggedUser();

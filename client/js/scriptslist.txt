@@ -11,6 +11,7 @@ js/lib/prototype/proto.menu.js
 js/lib/prototype/splitter.js
 js/lib/prototype/proto.history.js
 js/lib/prototype/cookiejar.js
+js/lib/prototype/protopass.js
 js/lib/leightbox/lightbox.js
 js/lib/scriptaculous/src/builder.js
 js/lib/scriptaculous/src/effects.js
