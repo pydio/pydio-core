@@ -288,6 +288,10 @@
                     var userSelection = ajaxplorer.getUserSelection();
                     if(userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))){
                     	var loadFunc = function(oForm){
+                    		new Protopass($('shared_pass'), {
+                    			barContainer : $('pass_strength_container'), 
+                    			barPosition:'bottom'
+                    		});
                     		if(!$('share_folder_form').autocompleter){
 	                    		$('share_folder_form').autocompleter = new Ajax.Autocompleter(
 	                    			"shared_user", 
@@ -309,10 +313,20 @@
 		                    			$('shared_pass_div').removeClassName('SF_disabled');
 		                    			$('shared_pass').enable();
 		                    		}
-		                    	});
+		                    	});		                    	
 	                    	}
                     	};
-                    	var submitFunc = function(){
+                    	var submitFunc = function(oForm){
+                    		if(!$('shared_pass').disabled){
+                    			if( !$('shared_pass').value || $('shared_pass').value.length < ajxpBootstrap.parameters.get('password_min_length')){
+                    				alert(MessageHash[378]);
+                    				return false;
+                    			}
+                    		}
+                    		if(!oForm.down('input[name="repo_label"]').value){
+                    			alert(MessageHash[349]);
+                    			return false;
+                    		}
 	                    	var userSelection = ajaxplorer.getUserSelection();	                    	
 							var publicUrl = ajxpServerAccessPath+'?get_action=public_url&sub_action=delegate_repo';
 							publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
@@ -372,6 +386,11 @@
 		                    };
 	                    }
                     	var loadFunc = function(oForm){
+                    		new Protopass(oForm.down('input[name="password"]'), {
+                    			barContainer : $('public_pass_container'), 
+                    			barPosition:'bottom',
+                    			minchar : 0
+                    		});                    		
                     		var button = $(oForm).down('div.fakeUploadButton');
                     		if(!button.listenerAttached){                    			
                     			button.listenerAttached = true;
@@ -395,7 +414,8 @@
 								
 								<span ajxp_message_id="182">AJXP_MESSAGE[182]</span> 
 								<input type="password" style="width:60px;" name="password" value="" autocomplete="off">
-							</div>							
+							</div>				
+							<div class="SF_element" id="public_pass_container"></div>			
 						</fieldset>
 						<fieldset id="public_url_generate">
 							<legend ajxp_message_id="308">AJXP_MESSAGE[308]</legend>
@@ -422,13 +442,14 @@
 								<div class="SF_label" ajxp_message_id="356">AJXP_MESSAGE[356] : </div>
 								<input type="password" autocomplete="off" value="" name="shared_pass" id="shared_pass" class="SF_input"/>
 							</div>
+							<div class="SF_element" id="pass_strength_container"></div>
 						</fieldset>
 						<fieldset>
 							<legend ajxp_message_id="357">AJXP_MESSAGE[357]</legend>
 							<div class="dialogLegend" ajxp_message_id="358">AJXP_MESSAGE[358]</div>
 							<div class="SF_element">
 								<div class="SF_label" ajxp_message_id="359">AJXP_MESSAGE[359] : </div>
-								<input type="text" value="" name="repo_label" class="SF_input"/>
+								<input type="text" value="" id="repo_label" name="repo_label" class="SF_input"/>
 							</div>
 							<div class="SF_element">
 								<div class="SF_label" ajxp_message_id="360">AJXP_MESSAGE[360] : </div>

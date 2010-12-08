@@ -241,7 +241,6 @@ $mess=array(
 "204" => "El archivo \"",
 "205" => "\" excede el límite de tamaño (",
 "206" => "Mb).\\nNo será enviado.",
-/* END SENTENCE */
 "207" => "No tienes permisos de escritura en esta carpeta",
 "208" => "No tienes permisos de lectura en esta carpeta",
 "209" => "¡Error interno del servidor, contacta con el Administrador!",
@@ -416,6 +415,15 @@ $mess=array(
 "374" => "No puedes copiar carpetas entre repositorios",
 "375" => "Advertencia, has estado inactivo desde hace más de __IDLE__, serás desconectado en __LOGOUT__",
 "376" => "Clickea en cualquier lado para reactivar",
+"378" => "Warning, password is empty or too short!",
+"379" => "Unsafe word!",
+"380" => "Too short",
+"381" => "Very weak",
+"382" => "Weak",
+"383" => "Medium",
+"384" => "Strong",
+"385" => "Very strong",
+/* END SENTENCE */
 /* END SENTENCE */
 );
 ?>

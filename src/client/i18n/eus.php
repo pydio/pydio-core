@@ -413,6 +413,14 @@ $mess=array(
 "374" => "You cannot copy folders across repositories",
 "375" => "Warning, you were inactive since more than __IDLE__, you will be logged out in __LOGOUT__",
 "376" => "Click anywhere to reactivate",
+"378" => "Warning, password is empty or too short!",
+"379" => "Unsafe word!",
+"380" => "Too short",
+"381" => "Very weak",
+"382" => "Weak",
+"383" => "Medium",
+"384" => "Strong",
+"385" => "Very strong",
 /* END SENTENCE */
 /* END SENTENCE */
 );
