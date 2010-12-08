@@ -577,6 +577,9 @@ Class.create("Ajaxplorer", {
 			if(transport.responseText){
 				var result = transport.responseText.evalScripts();
 				MessageHash = result[0];
+				for(var key in MessageHash){
+					MessageHash[key] = MessageHash[key].replace("\\n", "\n");
+				}
 				this.updateI18nTags();
 				if(this.guiActions){
 					this.guiActions.each(function(pair){

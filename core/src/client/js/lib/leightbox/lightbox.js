@@ -226,6 +226,13 @@ function displayLightBoxById(id)
 
 function hideLightBox(onFormSubmit)
 {
+	if(modal.closeValidation){
+		var res = modal.closeValidation();
+		if(res === false){
+			return;
+		}
+		modal.closeValidation = null;
+	}
 	if(currentLightBox)
 	{
 		currentLightBox.deactivate();

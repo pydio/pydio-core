@@ -119,6 +119,9 @@ Class.create("AjxpBootstrap", {
 				connexion.loadLibrary("ajaxplorer.js");
 			}
 			window.MessageHash = this.parameters.get("i18nMessages");
+			for(var key in MessageHash){
+				MessageHash[key] = MessageHash[key].replace("\\n", "\n");
+			}
 			window.zipEnabled = this.parameters.get("zipEnabled");
 			window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
 			window.flashUploaderEnabled = this.parameters.get("flashUploaderEnabled");			
