@@ -57,6 +57,12 @@ class ConfService
 			$this->configs["AVAILABLE_LANG"] = self::listAvailableLanguages();
 		}
 		$this->configs["USE_HTTPS"] = $use_https;
+		if(isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"){
+			$this->configs["USE_HTTPS"] = true;
+		}
+		if($this->configs["USE_HTTPS"]){
+			ini_set("session.cookie_secure", true);
+		}
 		$this->configs["WM_EMAIL"] = $webmaster_email;
 		$this->configs["MAX_CHAR"] = $max_caracteres;
 		$this->configs["JS_DEBUG"] = $AJXP_JS_DEBUG;
