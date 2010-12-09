@@ -218,7 +218,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$userObject->setPref($prefName, $prefValue);
 					$userObject->save();
 					AuthService::updateUser($userObject);
-					setcookie("AJXP_$prefName", $prefValue);
+					//setcookie("AJXP_$prefName", $prefValue);
 					$i++;
 				}
 				header("Content-Type:text/plain");
