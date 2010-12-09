@@ -19,25 +19,28 @@
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
 						function(){
 							var oForm = modal.getForm();
-							var connexion = new Connexion();
-							connexion.addParameter("get_action", "get_seed");
-							connexion.onComplete = function(transport){
-								$('login_seed').value = transport.responseText;
-							};
-							connexion.sendSync();
+							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img'), oForm.down('div.dialogLegend'), 'before');
 						}, 
 						function(){
 							var oForm = modal.getForm();
 							var connexion = new Connexion();
 							connexion.addParameter('userid', oForm.userid.value);
 							connexion.addParameter('get_action', 'login');
+							if(oForm.captcha_code){
+								connexion.addParameter('captcha_code', oForm.captcha_code.value);
+							}
 							connexion.addParameter('login_seed', oForm.login_seed.value);
 							if(oForm.login_seed.value != '-1'){
 								connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
 							}else{
 								connexion.addParameter('password', oForm.password.value);
 							}
-							connexion.onComplete = function(transport){ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);};
+							connexion.onComplete = function(transport){
+								ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+								if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+									ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img'), oForm.down('div.dialogLegend'), 'before');
+								}
+							};
 							connexion.setMethod('put');
 							connexion.sendAsync();
 							oForm.userid.value = '';
@@ -47,16 +50,22 @@
 					}
 					]]></clientCallback>
 					<clientForm id="login_form_dynamic"><![CDATA[						
-						<form id="login_form_dynamic" action="login" box_width="210">
+						<form id="login_form_dynamic" action="login" box_width="230">
 						<input type="hidden" name="get_action" value="login">
 						<input type="hidden" name="login_seed" id="login_seed" value="">
-						<div class="dialogLegend" style="margin-bottom: 7px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
+						<div class="dialogLegend" style="margin-bottom: 2px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
 						<div>
-							<table cellpadding="3" border="0" cellspacing="0" style="font-size:11px;">
-							<tr><td align="right"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message> :</td><td><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></td></tr>
-							<tr><td align="right"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message> :</td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td></tr>
-							<tr><td align="left" colspan="2"><input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message></td></tr>
-							</table>
+							<div class="SF_element">
+								<div class="SF_label"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message></div>
+								<div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></div>
+							</div>
+							<div class="SF_element">
+								<div class="SF_label"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message></div>
+								<div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;"></div>
+							</div>
+							<div class="SF_element">
+								<input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message>
+							</div>
 						</div>
 						</form>					
 					]]></clientForm>

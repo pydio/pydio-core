@@ -603,6 +603,44 @@ Class.create("Ajaxplorer", {
 			}catch(e){}
 		});
 	},
+	
+	loadSeedOrCaptcha : function(seedInputField, existingCaptcha, captchaAnchor, captchaPosition){
+		var connexion = new Connexion();
+		connexion.addParameter("get_action", "get_seed");
+		connexion.onComplete = function(transport){
+			if(transport.responseJSON){
+				seedInputField.value = transport.responseJSON.seed;
+				var src = window.ajxpServerAccessPath + '?get_action=get_captcha&sid='+Math.random();
+				var refreshSrc = ajxpResourcesFolder + '/images/actions/16/reload.png';
+				if(existingCaptcha){
+					existingCaptcha.src = src;
+				}else{
+					var insert = {};
+					var string = '<div class="main_captcha_div"><div class="dialogLegend" ajxp_message_id="389">'+MessageHash[389]+'</div>';
+					string += '<div class="captcha_container"><img id="captcha_image" align="top" src="'+src+'" width="170" height="80"><img align="top" style="cursor:pointer;" id="captcha_refresh" src="'+refreshSrc+'" with="16" height="16"></div>';
+					string += '<div class="SF_element">';
+					string += '		<div class="SF_label" ajxp_message_id="390">'+MessageHash[390]+'</div> <div class="SF_input"><input type="text" class="dialogFocus dialogEnterKey" style="width: 100px; padding: 0px;" name="captcha_code"></div>';
+					string += '</div>';
+					string += '<div style="clear:left;margin-bottom:7px;"></div></div>';
+					insert[captchaPosition] = string;
+					captchaAnchor.insert(insert);
+					modal.refreshDialogPosition();
+					modal.refreshDialogAppearance();
+					$('captcha_refresh').observe('click', function(){
+						$('captcha_image').src = window.ajxpServerAccessPath + '?get_action=get_captcha&sid='+Math.random();
+					});
+				}
+			}else{
+				seedInputField.value = transport.responseText;
+				if(existingCaptcha){
+					existingCaptcha.up('.main_captcha_div').remove();
+					modal.refreshDialogPosition();
+					modal.refreshDialogAppearance();
+				}
+			}
+		};
+		connexion.sendSync();		
+	},
 			
 	updateHistory: function(path){
 		if(this.history) this.history.historyLoad(this.pathToHistoryHash(path));
