@@ -155,7 +155,7 @@
 						}
 						var agent = navigator.userAgent;
 						if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1)){
-							var downloadUrl = ajxpServerAccessPath+'?get_action=download';
+							var downloadUrl = ajxpServerAccessPath+'&get_action=download';
 							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 							document.location.href=downloadUrl;
 						}else{
@@ -168,9 +168,9 @@
 					}
 					else
 					{
-						var loadFunc = function(oForm){
+						var loadFunc = function(oForm){							
 							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
+							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download&file=');
 							downloader.triggerEnd = function(){hideLightBox()};
 							fileNames = userSelection.getFileNames();
 							for(var i=0; i<fileNames.length;i++)
@@ -189,7 +189,7 @@
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="content.php" method="GET" id="download_form" target="download_iframe">
+					<form style="display:inline;" action="" method="GET" id="download_form" target="download_iframe">
 						<input type="hidden" name="get_action" value="download">
 					</form>
 					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>					
@@ -296,7 +296,7 @@
 	                    		$('share_folder_form').autocompleter = new Ajax.Autocompleter(
 	                    			"shared_user", 
 	                    			"shared_users_autocomplete_choices", 
-	                    			ajxpServerAccessPath + "?get_action=public_url&sub_action=list_shared_users", 
+	                    			ajxpServerAccessPath + "&get_action=public_url&sub_action=list_shared_users", 
 	                    			{minChars:0, paramName:'value'}
 	                    		);
 	                    		$('shared_user').observeOnce("focus", function(){
@@ -328,7 +328,7 @@
                     			return false;
                     		}
 	                    	var userSelection = ajaxplorer.getUserSelection();	                    	
-							var publicUrl = ajxpServerAccessPath+'?get_action=public_url&sub_action=delegate_repo';
+							var publicUrl = ajxpServerAccessPath+'&get_action=public_url&sub_action=delegate_repo';
 							publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
 	                        var conn = new Connexion(publicUrl);
 	                        conn.setParameters(modal.getForm().serialize(true));	                        
@@ -352,7 +352,7 @@
 							window.ajxpPublicUrlCallback = function(){
 								var userSelection = ajaxplorer.getUserSelection();
 								if(!userSelection.isUnique() || (userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))) return;
-								var publicUrl = ajxpServerAccessPath+'?get_action=public_url';
+								var publicUrl = ajxpServerAccessPath+'&get_action=public_url';
 								publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
 		                        var oForm = $(modal.getForm());	                        
 		                        var conn = new Connexion(publicUrl);

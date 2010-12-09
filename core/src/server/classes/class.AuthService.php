@@ -55,6 +55,23 @@ class AuthService
 		return $authDriver->getSeed(true);
 	}
 	
+	
+	static function generateSecureToken(){
+		$_SESSION["SECURE_TOKEN"] = md5(time());
+		return $_SESSION["SECURE_TOKEN"];
+	}
+	
+	static function getSecureToken(){
+		return (isSet($_SESSION["SECURE_TOKEN"])?$_SESSION["SECURE_TOKEN"]:FALSE);
+	}
+	
+	static function checkSecureToken($token){
+		if(isSet($_SESSION["SECURE_TOKEN"]) && $_SESSION["SECURE_TOKEN"] == $token){
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Get the currently logged user object
 	 *
