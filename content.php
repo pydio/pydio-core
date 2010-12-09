@@ -93,7 +93,7 @@ if(AuthService::usersEnabled())
 	$rememberLogin = "";
 	$rememberPass = "";
 	$secureToken = "";
-	if(isset($httpVars["get_action"]) && $httpVars["get_action"] == "get_seed"){
+	if($action == "get_seed"){
 		$seed = AuthService::generateSeed();
 		if(AuthService::suspectBruteForceLogin()){
 			HTMLWriter::charsetHeader('application/json');
@@ -103,27 +103,20 @@ if(AuthService::usersEnabled())
 			print $seed;		
 		}
 		exit(0);
-	}	
-	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "get_captcha"){
+	}else if($action == "get_captcha"){
 		include_once(INSTALL_PATH."/server/classes/class.CaptchaProvider.php");
 		CaptchaProvider::sendCaptcha();
 		exit(0) ;
-	}
-	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "logout")
-	{
+	}else if($action == "logout"){
 		AuthService::disconnect();		
 		$loggingResult = 2;
 		session_destroy();
-	}
-    if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "back")
-    {
+	}else if($action == "back"){
 		AJXP_XMLWriter::header("url");
         echo AuthService::getLogoutAddress(false);
         AJXP_XMLWriter::close("url");
 		exit(1);
-    }
-	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "login")
-	{
+    }else if($action == "login"){
 		include_once(INSTALL_PATH."/server/classes/class.CaptchaProvider.php");
 		if(AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))){
 			$loggingResult = -4;
