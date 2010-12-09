@@ -180,6 +180,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				}
 				$config["i18nMessages"] = ConfService::getMessages();
 				$config["password_min_length"] = (defined('AJXP_PASSWORD_MINLENGTH')?AJXP_PASSWORD_MINLENGTH:8);
+				$config["SECURE_TOKEN"] = AuthService::generateSecureToken();
 				header("Content-type:application/json;charset=UTF-8");
 				print(json_encode($config));
 				

@@ -55,8 +55,14 @@ Class.create("Connexion", {
 		this._method = 'put';
 	},
 	
+	addSecureToken : function(){
+		if(Connexion.SECURE_TOKEN && this._baseUrl.indexOf('secure_token') == -1 && !this._parameters.get('secure_token')){
+			this.addParameter('secure_token', Connexion.SECURE_TOKEN);
+		}
+	},
+	
 	sendAsync : function(){	
-		// WARNING, FINALLY PAS PAREMETERS AS AN OBJECT, PROTOTYPE 1.6.0 BUG Hash.toQueryString();
+		this.addSecureToken();
 		new Ajax.Request(this._baseUrl, 
 		{
 			method:this._method,
@@ -66,7 +72,7 @@ Class.create("Connexion", {
 	},
 	
 	sendSync : function(){	
-		// WARNING, FINALLY PAS PAREMETERS AS AN OBJECT, PROTOTYPE 1.6.0 BUG Hash.toQueryString();
+		this.addSecureToken();
 		new Ajax.Request(this._baseUrl, 
 		{
 			method:this._method,

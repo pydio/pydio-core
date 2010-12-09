@@ -72,6 +72,19 @@ session_start();
 if(isSet($_GET["tmp_repository_id"])){
 	ConfService::switchRootDir($_GET["tmp_repository_id"], true);
 }
+$action = "";
+if(isSet($_GET["action"]) || isSet($_GET["get_action"])) $action = (isset($_GET["get_action"])?$_GET["get_action"]:$_GET["action"]);
+else if(isSet($_POST["action"]) || isSet($_POST["get_action"])) $action = (isset($_POST["get_action"])?$_POST["get_action"]:$_POST["action"]);
+
+$unSecureActions = array("get_boot_conf", "get_drop_bg", "get_secure_token");
+if(!in_array($action, $unSecureActions) && AuthService::getSecureToken()){
+	$token = "";
+	if(isSet($_GET["secure_token"])) $token = $_GET["secure_token"];
+	else if(isSet($_POST["secure_token"])) $token = $_POST["secure_token"];
+	if($token == "" || !AuthService::checkSecureToken($token)){
+		throw new Exception("You are not allowed to access this resource.");
+	}
+}
 
 if(AuthService::usersEnabled())
 {
@@ -79,6 +92,7 @@ if(AuthService::usersEnabled())
 
 	$rememberLogin = "";
 	$rememberPass = "";
+	$secureToken = "";
 	if(isset($httpVars["get_action"]) && $httpVars["get_action"] == "get_seed"){
 		$seed = AuthService::generateSeed();
 		if(AuthService::suspectBruteForceLogin()){
@@ -126,6 +140,7 @@ if(AuthService::usersEnabled())
 			}
 			if($loggingResult == 1){
 				session_regenerate_id(true);
+				$secureToken = AuthService::generateSecureToken();
 			}
 			if($loggingResult < 1 && AuthService::suspectBruteForceLogin()){
 				$loggingResult = -4; // Force captcha reload
@@ -173,7 +188,7 @@ if(AuthService::usersEnabled())
 	if(isset($loggingResult))
 	{
 		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass);
+		AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
 		AJXP_XMLWriter::close();
 		exit(1);
 	}
@@ -184,10 +199,6 @@ $loggedUser = AuthService::getLoggedUser();
 if($loggedUser != null && $loggedUser->getPref("lang") != "") ConfService::setLanguage($loggedUser->getPref("lang"));
 else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_lang"]);
 $mess = ConfService::getMessages();
-
-$action = "";
-if(isSet($_GET["action"]) || isSet($_GET["get_action"])) $action = (isset($_GET["get_action"])?$_GET["get_action"]:$_GET["action"]);
-else if(isSet($_POST["action"]) || isSet($_POST["get_action"])) $action = (isset($_POST["get_action"])?$_POST["get_action"]:$_POST["action"]);
 
 //------------------------------------------------------------
 // SPECIAL HANDLING FOR FANCY UPLOADER RIGHTS FOR THIS ACTION

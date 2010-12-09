@@ -39,7 +39,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	initialize: function($super, oFormObject)
 	{
 		$super(oFormObject);
-		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"?get_action=get_extracted_page&file=";
+		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=get_extracted_page&file=";
 		// Override onload for the text
 		this.jsImage.onload = function(){
 			this.jsImageLoading = false;
@@ -63,7 +63,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	{
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download&file='+userSelection.getUniqueFileName());
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+userSelection.getUniqueFileName());
 			return false;
 		}.bind(this);
 				
@@ -122,7 +122,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return ajxpServerAccessPath+"?get_action=imagick_data_proxy&file="+encodeURIComponent(ajxpNode.getPath());
+		return ajxpServerAccessPath+"&get_action=imagick_data_proxy&file="+encodeURIComponent(ajxpNode.getPath());
 	},
 	
 	setOnLoad: function()	{

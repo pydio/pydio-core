@@ -610,7 +610,7 @@ Class.create("Ajaxplorer", {
 		connexion.onComplete = function(transport){
 			if(transport.responseJSON){
 				seedInputField.value = transport.responseJSON.seed;
-				var src = window.ajxpServerAccessPath + '?get_action=get_captcha&sid='+Math.random();
+				var src = window.ajxpServerAccessPath + '&get_action=get_captcha&sid='+Math.random();
 				var refreshSrc = ajxpResourcesFolder + '/images/actions/16/reload.png';
 				if(existingCaptcha){
 					existingCaptcha.src = src;
@@ -627,7 +627,7 @@ Class.create("Ajaxplorer", {
 					modal.refreshDialogPosition();
 					modal.refreshDialogAppearance();
 					$('captcha_refresh').observe('click', function(){
-						$('captcha_image').src = window.ajxpServerAccessPath + '?get_action=get_captcha&sid='+Math.random();
+						$('captcha_image').src = window.ajxpServerAccessPath + '&get_action=get_captcha&sid='+Math.random();
 					});
 				}
 			}else{

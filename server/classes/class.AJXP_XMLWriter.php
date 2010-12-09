@@ -376,11 +376,14 @@ class AJXP_XMLWriter
 		return $st;
 	}
 	
-	static function loggingResult($result, $rememberLogin="", $rememberPass = "")
+	static function loggingResult($result, $rememberLogin="", $rememberPass = "", $secureToken="")
 	{
 		$remString = "";
 		if($rememberPass != "" && $rememberLogin!= ""){
 			$remString = " remember_login=\"$rememberLogin\" remember_pass=\"$rememberPass\"";
+		}
+		if($secureToken != ""){
+			$remString .= " secure_token=\"$secureToken\"";
 		}
 		print("<logging_result value=\"$result\"$remString/>");
 	}

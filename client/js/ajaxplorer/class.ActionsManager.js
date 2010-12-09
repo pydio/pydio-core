@@ -342,6 +342,12 @@ Class.create("ActionsManager", {
 			}
 			else if(childs[i].tagName == "logging_result")
 			{
+				if(childs[i].getAttribute("secure_token")){
+					Connexion.SECURE_TOKEN = childs[i].getAttribute("secure_token");
+					var parts = window.ajxpServerAccessPath.split("?secure_token");
+					window.ajxpServerAccessPath = parts[0] + "?secure_token=" + Connexion.SECURE_TOKEN;
+					ajxpBootstrap.parameters.set('ajxpServerAccess', window.ajxpServerAccessPath);
+				}
 				var result = childs[i].getAttribute('value');
 				if(result == '1')
 				{
