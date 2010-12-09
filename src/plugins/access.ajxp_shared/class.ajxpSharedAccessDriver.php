@@ -84,11 +84,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_shared.8" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_shared.31" attributeName="description" sortType="String"/></columns>');
 					foreach ($rootNodes as $key => $data){
-						$src = '';
-						if($key == "logs"){
-							$src = 'src="content.php?get_action=ls&amp;dir='.$key.'"';
-						}
-						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" '.$src.' description="'.$data["DESCRIPTION"].'" />';
+						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" description="'.$data["DESCRIPTION"].'" />';
 					}
 					AJXP_XMLWriter::close();
 				}

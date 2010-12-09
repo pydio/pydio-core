@@ -88,7 +88,7 @@ Class.create("Diaporama", AbstractEditor, {
 		this.timeInput.setStyle(inputStyle);
 		
 		
-		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=preview_data_proxy&file=';
+		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=preview_data_proxy&file=';
 		this.nextButton.onclick = function(){
 			this.next();
 			this.updateButtons();
@@ -101,7 +101,7 @@ Class.create("Diaporama", AbstractEditor, {
 		}.bind(this);
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'?action=download&file='+this.currentFile);
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
 			return false;
 		}.bind(this);
 		this.actualSizeButton.onclick = function(){
@@ -398,7 +398,7 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		var source = ajxpServerAccessPath+"?get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
+		var source = ajxpServerAccessPath+"&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
 		var preview_seed = ajxpNode.getParent().getMetadata().get('preview_seed');
 		if(preview_seed){
 			source += "&rand="+preview_seed;

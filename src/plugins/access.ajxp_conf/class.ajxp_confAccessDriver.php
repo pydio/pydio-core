@@ -93,11 +93,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/></columns>');
 					foreach ($rootNodes as $key => $data){
-						$src = '';
-						if($key == "logs"){
-							$src = 'src="content.php?get_action=ls&amp;dir='.$key.'"';
-						}
-						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/" '.$src.' />';
+						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/"/>';
 					}
 					AJXP_XMLWriter::close();
 					return;

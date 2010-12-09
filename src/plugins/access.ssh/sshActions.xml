@@ -190,7 +190,7 @@ AJXP_MESSAGE[174]<br/>
 					var userSelection = ajaxplorer.getUserSelection();
 					if(userSelection.isUnique() && !userSelection.hasDir())
 					{
-						var downloadUrl = ajxpServerAccessPath+'?action=download';
+						var downloadUrl = ajxpServerAccessPath+'&action=download';
 						downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 						document.location.href = downloadUrl;
 						
@@ -200,7 +200,7 @@ AJXP_MESSAGE[174]<br/>
 						if(!zipEnabled){
 							var loadFunc = function(oForm){
 								var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-								var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'?action=download&file=');
+								var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download&file=');
 								downloader.triggerEnd = function(){hideLightBox()};
 								fileNames = userSelection.getFileNames();
 								for(var i=0; i<fileNames.length;i++)
@@ -214,7 +214,7 @@ AJXP_MESSAGE[174]<br/>
 							};
 							modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
 						}else{
-							var downloadUrl = ajxpServerAccessPath+'?action=download';
+							var downloadUrl = ajxpServerAccessPath+'&action=download';
 							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 							document.location.href = downloadUrl;							
 						}
@@ -263,7 +263,7 @@ AJXP_MESSAGE[174]<br/>
 							var userSelection = ajaxplorer.getUserSelection();
 							if(!userSelection.isUnique() || userSelection.hasDir()) return;
 							var userSelection = ajaxplorer.getUserSelection();
-							var publicUrl = ajxpServerAccessPath+'?get_action=public_url';
+							var publicUrl = ajxpServerAccessPath+'&get_action=public_url';
 							publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
 	                        var oForm = $(modal.getForm());
 	                        var conn = new Connexion(publicUrl);

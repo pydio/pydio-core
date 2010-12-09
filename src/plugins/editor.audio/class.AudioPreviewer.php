@@ -87,7 +87,7 @@ class AudioPreviewer extends AJXP_Plugin {
 				$label = $child->getAttribute("text");
 				$ext = strtolower(end(explode(".", $label)));
 				if(!$isFile || $ext != "mp3") continue;
-				print("<track><location>content.php?get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
+				print("<track><location>".SERVER_ACCESS."?secure_token=".AuthService::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
 			}
 			print("</trackList>");
 			AJXP_XMLWriter::close("playlist");

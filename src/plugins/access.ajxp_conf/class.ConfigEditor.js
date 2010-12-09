@@ -81,7 +81,7 @@ ConfigEditor = Class.create({
 		this.form.down('#rights_legend').remove();
 		this.form.down('#roles_pane').select('.dialogLegend')[0].update(MessageHash['ajxp_conf.83']);
 		this.form.down('#roles_pane').select('span')[1].update(MessageHash['ajxp_conf.84']);
-		var url = window.ajxpServerAccessPath + '?get_action=batch_users_roles';
+		var url = window.ajxpServerAccessPath + '&get_action=batch_users_roles';
 		this.selectionUrl = selection.updateFormOrUrl(null, url);
 		var connexion = new Connexion(this.selectionUrl);
 		connexion.onComplete = function(transport){			

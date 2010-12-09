@@ -102,10 +102,17 @@ Class.create("AjxpBootstrap", {
 				return;
 			}
 			this.parameters.update(data);
+			if(this.parameters.get('SECURE_TOKEN')){
+				Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');
+			}
 			if(this.parameters.get('SERVER_PREFIX_URI')){
 				this.parameters.set('ajxpResourcesFolder', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpResourcesFolder'));
-				this.parameters.set('ajxpServerAccess', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpServerAccess'));
+				this.parameters.set('ajxpServerAccess', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
+			}else{
+				this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
 			}
+			// Refresh window variable
+			window.ajxpServerAccessPath = this.parameters.get('ajxpServerAccess');
 			var cssRes = this.parameters.get("cssResources");
 			if(cssRes) cssRes.each(this.loadCSSResource.bind(this));
 			if(this.parameters.get('ajxpResourcesFolder')){
