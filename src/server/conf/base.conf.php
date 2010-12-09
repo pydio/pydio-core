@@ -39,6 +39,8 @@ if(function_exists("date_default_timezone_set") and function_exists("date_defaul
 
 @error_reporting(E_ALL & ~E_NOTICE);
 
+ini_set("session.cookie_httponly", 1);
+
 define("AJXP_VERSION", "3.1.1");
 define("AJXP_VERSION_DATE", "2010/11/29");
 
