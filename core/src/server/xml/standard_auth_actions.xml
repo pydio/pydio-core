@@ -24,16 +24,17 @@
 						function(){
 							var oForm = modal.getForm();
 							var connexion = new Connexion();
-							connexion.addParameter('userid', oForm.userid.value);
 							connexion.addParameter('get_action', 'login');
-							if(oForm.captcha_code){
-								connexion.addParameter('captcha_code', oForm.captcha_code.value);
-							}
+							connexion.addParameter('userid', oForm.userid.value);
 							connexion.addParameter('login_seed', oForm.login_seed.value);
+							connexion.addParameter('remember_me', (oForm.remember_me.checked?"true":"false"));
 							if(oForm.login_seed.value != '-1'){
 								connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));
 							}else{
 								connexion.addParameter('password', oForm.password.value);
+							}
+							if(oForm.captcha_code){
+								connexion.addParameter('captcha_code', oForm.captcha_code.value);
 							}
 							connexion.onComplete = function(transport){
 								ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
