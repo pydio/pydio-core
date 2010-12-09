@@ -80,10 +80,21 @@ if(AuthService::usersEnabled())
 	$rememberLogin = "";
 	$rememberPass = "";
 	if(isset($httpVars["get_action"]) && $httpVars["get_action"] == "get_seed"){
-		HTMLWriter::charsetHeader("text/plain");
-		print AuthService::generateSeed();				
+		$seed = AuthService::generateSeed();
+		if(AuthService::suspectBruteForceLogin()){
+			HTMLWriter::charsetHeader('application/json');
+			print json_encode(array("seed" => $seed, "captcha" => true));
+		}else{
+			HTMLWriter::charsetHeader("text/plain");
+			print $seed;		
+		}
 		exit(0);
 	}	
+	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "get_captcha"){
+		include_once(INSTALL_PATH."/server/classes/class.CaptchaProvider.php");
+		CaptchaProvider::sendCaptcha();
+		exit(0) ;
+	}
 	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "logout")
 	{
 		AuthService::disconnect();		
@@ -99,18 +110,26 @@ if(AuthService::usersEnabled())
     }
 	if(isSet($httpVars["get_action"]) && $httpVars["get_action"] == "login")
 	{
-		$userId = (isSet($httpVars["userid"])?$httpVars["userid"]:null);
-		$userPass = (isSet($httpVars["password"])?$httpVars["password"]:null);
-		$rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "on")?true:false);
-		$cookieLogin = (isSet($httpVars["cookie_login"])?true:false); 
-		$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
-		if($rememberMe && $loggingResult == 1){
-			$rememberLogin = $userId;
-			$loggedUser = AuthService::getLoggedUser();
-			$rememberPass =  $loggedUser->getCookieString();
-		}
-		if($loggingResult == 1){
-			session_regenerate_id(true);
+		include_once(INSTALL_PATH."/server/classes/class.CaptchaProvider.php");
+		if(AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))){
+			$loggingResult = -4;
+		}else{
+			$userId = (isSet($httpVars["userid"])?$httpVars["userid"]:null);
+			$userPass = (isSet($httpVars["password"])?$httpVars["password"]:null);
+			$rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "on")?true:false);
+			$cookieLogin = (isSet($httpVars["cookie_login"])?true:false); 
+			$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
+			if($rememberMe && $loggingResult == 1){
+				$rememberLogin = $userId;
+				$loggedUser = AuthService::getLoggedUser();
+				$rememberPass =  $loggedUser->getCookieString();
+			}
+			if($loggingResult == 1){
+				session_regenerate_id(true);
+			}
+			if($loggingResult < 1 && AuthService::suspectBruteForceLogin()){
+				$loggingResult = -4; // Force captcha reload
+			}
 		}
 	}
 	else 

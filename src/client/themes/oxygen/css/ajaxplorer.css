@@ -401,6 +401,16 @@ div.SF_label{
    width: 20px !important;
 }
 
+/****************
+/* LOGIN BOX
+/****************/
+.captcha_container {
+	text-align:center;
+}
+.captcha_container img{
+	margin: 5 0 0 2px;
+	border: 1px solid #ddd;
+}
 
 /***************/
 /*ACTION BAR   */
