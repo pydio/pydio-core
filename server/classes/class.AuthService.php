@@ -78,15 +78,16 @@ class AuthService
     {
         $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
         $loginAttempt = @file_get_contents($failedLog);
-        // Filter the array (all old time are removed)
         $loginArray = unserialize($loginAttempt);
         $ret = array();
         $curTime = time();
-        if (is_array($loginArray))
+        if (is_array($loginArray)){
+	        // Filter the array (all old time are cleaned)
             foreach($loginArray as $key => $login)
             {
-                if (($curTime - $login["time"]) <= 300) $ret[$key] = $login;
+                if (($curTime - $login["time"]) <= 60 * 60 * 24) $ret[$key] = $login;
             }
+        }
         return $ret;
     }
     static function setBruteForceLoginArray($loginArray)
@@ -97,7 +98,6 @@ class AuthService
 
     static function checkBruteForceLogin(&$loginArray)
     {
-    	return true;
     	$serverAddress = "";
     	if(isSet($_SERVER['REMOTE_ADDR'])){
     		$serverAddress = $_SERVER['REMOTE_ADDR'];
@@ -112,8 +112,13 @@ class AuthService
             $login["count"]++;
         } else $login = array("count"=>1, "time"=>time());
         $loginArray[$serverAddress] = $login;
-        if ($login["count"] > 4) return FALSE;
+        if ($login["count"] > 3) return FALSE;
         return TRUE;
+    }
+    
+    static function suspectBruteForceLogin(){
+        $loginAttempt = AuthService::getBruteForceLoginArray();
+        return !AuthService::checkBruteForceLogin($loginAttempt);
     }
 
 	static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
@@ -141,16 +146,21 @@ class AuthService
         $loginAttempt = AuthService::getBruteForceLoginArray();
         $bruteForceLogin = AuthService::checkBruteForceLogin($loginAttempt);
         AuthService::setBruteForceLoginArray($loginAttempt);
-        if ($bruteForceLogin === FALSE){
-            return -1;    
-        }
 
 		if(!$authDriver->userExists($user_id)){
-             return 0;
+	        if ($bruteForceLogin === FALSE){
+	            return -4;    
+	        }else{
+				return 0;
+	        }
         }
 		if(!$bypass_pwd){
 			if(!AuthService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)){
-				return -1;
+		        if ($bruteForceLogin === FALSE){
+		            return -4;    
+		        }else{
+					return -1;
+		        }
 			}
 		}
         // Successful login attempt

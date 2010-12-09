@@ -421,6 +421,9 @@ $mess=array(
 "383" => "Moyen",
 "384" => "Fort",
 "385" => "Très fort",
+"386" => "Vous avez échoué l'authentification trois fois.\\nPour votre sécurité, veuillez lire et recopier le code qui s'affiche.",
+"389" => "Merci de recopier le code ci-dessous :",
+"390" => "Code",
 /* END SENTENCE */
 );
 ?>
