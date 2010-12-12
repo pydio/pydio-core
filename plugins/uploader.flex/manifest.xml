@@ -6,12 +6,16 @@
 			<!-- FLEX UPLOAD FORM -->
 			<div id="flash_upload_form" box_width="470">
 			<div id="flashscreen">
-			<iframe id="flashframe" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=flash_tpl.html&pluginName=uploader.flex&encode=false"></iframe>
+			<iframe id="flashframe" frameborder="0" src=""></iframe>
 			</div>
 			</div>	
 		]]></clientForm>
+		<dialogOnOpen><![CDATA[ 
+        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=flash_tpl.html&pluginName=uploader.flex&encode=false';
+        modal.getForm().down('#flashframe').src = src;
+		]]></dialogOnOpen>        
 		<activeCondition><![CDATA[		
-			return (ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE)) && ! ((typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')) && (Prototype.Browser.Gecko?(parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf('Firefox/')+8, navigator.userAgent.indexOf('Firefox/')+11)) >= 3.6?true:false):true))
+			return (ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE)) && ! ((typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')) && (Prototype.Browser.Gecko?(parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf('Firefox/')+8, navigator.userAgent.indexOf('Firefox/')+11)) >= 3.6?true:false):true));
 		]]></activeCondition>
 	</processing>
 	<registry_contributions>
