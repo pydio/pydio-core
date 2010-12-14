@@ -57,7 +57,7 @@
 	opacity:.50;
 	filter: alpha(opacity=50);	
 	text-align:center;
-	padding-top: 10%;
+	overflow:hidden;
 }
 
 #element_iframe{

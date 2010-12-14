@@ -55,7 +55,7 @@
 						<input type="hidden" name="get_action" value="login">
 						<input type="hidden" name="login_seed" id="login_seed" value="">
 						<div class="dialogLegend" style="margin-bottom: 2px;" ajxp_message_id="180">AJXP_MESSAGE[180]</div>
-						<div>
+						<div style="width:100%;">
 							<div class="SF_element">
 								<div class="SF_label"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message></div>
 								<div class="SF_input"><input type="text" name="userid" style="width: 100px; padding:0px;" class="dialogFocus"></div>
