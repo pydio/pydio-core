@@ -284,27 +284,40 @@ function addLightboxMarkupToElement(element, skipElement)
 {
 	overlay 			= document.createElement('div');
 	overlay.id			= 'element_overlay';
+	var top, left, height, width;
 	if (Prototype.Browser.IE){
 		var position = Position.positionedOffset($(element)); // IE CASE
 		//Position.offsetParent(element);
-		overlay.style.top = position[1];
-		overlay.style.left = 0;
+		top = position[1];
+		left = 0;
 	}
 	else
 	{
 		var position = Position.cumulativeOffset($(element));
-		overlay.style.top = position[1];
-		overlay.style.left = position[0];
+		top = position[1];
+		left = position[0];
 	}
-	overlay.style.width = element.getWidth();
-	overlay.style.height = element.getHeight();
+	width = element.getWidth();
+	height = element.getHeight();	
 	if(skipElement)
 	{
-		var addTop = parseInt(overlay.style.top) + parseInt(skipElement.getHeight());
-		var addHeight = parseInt(overlay.style.height) + parseInt(skipElement.getHeight());
-		overlay.style.top = addTop + 'px';
-		overlay.style.height = addHeight + 'px';
+		var addTop = top + parseInt(skipElement.getHeight());
+		var addHeight = height + parseInt(skipElement.getHeight());
+		top = addTop + 'px';
+		height = addHeight + 'px';
 	}
+	var borders = {
+		top:parseInt(element.getStyle('borderTopWidth')),
+		bottom:parseInt(element.getStyle('borderBottomWidth')),
+		right:parseInt(element.getStyle('borderRightWidth')),
+		left:parseInt(element.getStyle('borderLeftWidth'))
+	};
+	top += borders.top;
+	height -= borders.top + borders.bottom;
+	left += borders.left;
+	width -= borders.left + borders.right;
+	$(overlay).setStyle({top:top,left:left,height:height,width:width});
+	
 	element.appendChild(overlay);
 }
 

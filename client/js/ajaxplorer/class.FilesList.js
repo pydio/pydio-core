@@ -1077,9 +1077,12 @@ Class.create("FilesList", SelectableElements, {
 	setOnLoad: function()	{
 		if(this.loading) return;
 		addLightboxMarkupToElement(this.htmlElement);
-		var img = document.createElement("img");
-		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
-		$(this.htmlElement).getElementsBySelector("#element_overlay")[0].appendChild(img);
+		var img = new Element('img', {
+			src : ajxpResourcesFolder+'/images/loadingImage.gif'
+		});
+		var overlay = $(this.htmlElement).down("#element_overlay");
+		overlay.insert(img);
+		img.setStyle({marginTop : Math.max(0, (overlay.getHeight() - img.getHeight())/2) });
 		this.loading = true;
 	},
 	
