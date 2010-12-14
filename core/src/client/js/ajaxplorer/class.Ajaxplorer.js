@@ -453,7 +453,6 @@ Class.create("Ajaxplorer", {
 		var root = this._contextHolder.getRootNode();
 		if(root){
 			this.skipLsHistory = true;
-			this._contextHolder.setContextNode(root);
 			root.clear();			
 		}
 		connexion.sendAsync();
