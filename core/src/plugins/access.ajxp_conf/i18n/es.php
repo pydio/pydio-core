@@ -99,6 +99,7 @@ $mess=array(
 "85" => "Filtrado de acción manual",
 "86" => "lista de acciones separadas por coma que serán desabilitadas de este rol, sin importar el derecho de acceso.",
 "87" => "Se actualizaron exitósamente las acciones para este rol",
+"88" => "This repository is defined in the config file, you cannot edit its meta sources via the GUI.",
 /* END SENTENCE */
 );
 ?>
