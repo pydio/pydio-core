@@ -202,6 +202,7 @@ class HttpClient {
 	            $this->content = gzinflate($this->content);
             }
         }
+        $this->debug("CONTENT : ".htmlentities($this->content));
         // If $persist_cookies, deal with any cookies
         if ($this->persist_cookies && isset($this->headers['set-cookie']) && $this->host == $this->cookie_host) {
             $cookies = $this->headers['set-cookie'];
@@ -218,7 +219,7 @@ class HttpClient {
         }
         // If $persist_referers, set the referer ready for the next request
         if ($this->persist_referers) {
-            $this->debug('Persisting referer: '.$this->getRequestURL());
+            //$this->debug('Persisting referer: '.$this->getRequestURL());
             $this->referer = $this->getRequestURL();
         }
         // Finally, if handle_redirects and a redirect is sent, do that
