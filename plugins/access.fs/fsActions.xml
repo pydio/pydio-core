@@ -159,10 +159,12 @@
 							downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
 							document.location.href=downloadUrl;
 						}else{
+							$('download_form').secure_token.value = Connexion.SECURE_TOKEN;
 							$('download_form').select("input").each(function(input){
-								if(input.name!='get_action') input.remove();
+								if(input.name!='get_action' && input.name!='secure_token') input.remove();
 							});
 							userSelection.updateFormOrUrl($('download_form'));
+							console.log($('download_form'));
 							$('download_form').submit();
 						}
 					}
@@ -189,8 +191,9 @@
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="" method="GET" id="download_form" target="download_iframe">
+					<form style="display:inline;" action="content.php" method="GET" id="download_form" target="download_iframe">
 						<input type="hidden" name="get_action" value="download">
+						<input type="hidden" name="secure_token" value="">
 					</form>
 					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>					
 					</div>]]>
