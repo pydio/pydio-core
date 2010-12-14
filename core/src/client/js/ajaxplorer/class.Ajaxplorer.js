@@ -71,7 +71,9 @@ Class.create("Ajaxplorer", {
 		this.initTemplates();
 		modal.initForms();
 		this.initObjects();
-		window.setTimeout(function(){document.fire('ajaxplorer:loaded');}, 500);		
+		window.setTimeout(function(){
+			document.fire('ajaxplorer:loaded');
+		}, 500);		
 	},
 	
 	loadXmlRegistry : function(sync, xPath){
@@ -81,7 +83,10 @@ Class.create("Ajaxplorer", {
 			if(transport.responseXML.documentElement.nodeName == "ajxp_registry"){
 				this._registry = transport.responseXML.documentElement;
 				modal.updateLoadingProgress('XML Registry loaded');
-				document.fire("ajaxplorer:registry_loaded", this._registry);
+				if(!sync) {
+					//console.log('firing registry_loaded');
+					document.fire("ajaxplorer:registry_loaded", this._registry);
+				}
 			}else if(transport.responseXML.documentElement.nodeName == "ajxp_registry_part"){
 				this.refreshXmlRegistryPart(transport.responseXML.documentElement);
 			}
@@ -390,8 +395,12 @@ Class.create("Ajaxplorer", {
 				
 		this.skipLsHistory = true;
 		
+		
 		var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
 		this._contextHolder.setRootNode(rootNode);
+		if(this.repositoryId == null || this.repositoryId != repositoryId){
+			rootNode.load();
+		}
 				
 		if(!this._initObj) { 			
 			this.repositoryId = repositoryId;

@@ -128,6 +128,9 @@ Class.create("AjxpDataModel", {
 	},
 	
 	setContextNode : function(ajxpDataNode){
+		if(this._contextNode && this._contextNode == ajxpDataNode){
+			return; // No changes
+		}
 		this._contextNode = ajxpDataNode;
 		this._currentRep = ajxpDataNode.getPath();
 		document.fire("ajaxplorer:context_changed", ajxpDataNode);

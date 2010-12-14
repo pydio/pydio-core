@@ -57,7 +57,7 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 	this.ajxpNode.observe("force_clear",  clear.bind(this));
 	this.ajxpNode.observe("node_replaced",  clear.bind(this));
 	this.attachListeners(this, rootNode);
-	this.ajxpNode.load();
+	//this.ajxpNode.load();
 };
 
 AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){

@@ -1522,7 +1522,7 @@ tr td.infoPanelLabel
     background-color:#c4c7c1;
 }
 
-div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane{
+div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .ajxp_simple_container{
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial, Sans-serif;
     font-size: 11px;
    	background-image: url('../images/strip.png');
