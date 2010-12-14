@@ -55,15 +55,13 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 	}
 	
 	function switchAction($action, $httpVars, $filesVars){		
-		$sessionId = "";
+		$secureToken = "";
 		$crtRep = ConfService::getRepository();
-		$httpClient = $this->getRemoteConnexion($sessionId);
+		$httpClient = $this->getRemoteConnexion($secureToken);
 		//$httpClient->setDebug(true);
-		if($crtRep->getOption("USE_AUTH")){
-			$httpVars["ajxp_sessid"] = $sessionId;
-		}
 		$method = "get";
 		if($action == "put_content") $method = "post";
+		$httpVars["secure_token"] = $secureToken;
 		if($method == "get"){
 			if($action == "download"){
 				$httpClient->directForwarding = true;
@@ -74,13 +72,14 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		}
 		// check if session is expired
 		if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
-			$httpClient = $this->getRemoteConnexion($sessionId, true);
-			$httpVars["ajxp_sessid"] = $sessionId;
+			$httpClient = $this->getRemoteConnexion($secureToken, true);
+			$httpVars["secure_token"] = $secureToken;
 			$method = "get";
 			if($method == "get"){
 				if($action == "download"){
 					$httpClient->directForwarding = true;
 				}
+				$result = $httpClient->get($crtRep->getOption("URI"), $httpVars);				
 				$result = $httpClient->get($crtRep->getOption("URI"), $httpVars);				
 			}else{			
 				$result = $httpClient->post($crtRep->getOption("URI"), $httpVars);
@@ -144,17 +143,19 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				$crtRep = ConfService::getRepository();
 				session_write_close();
 				
-				$sessionId = "";
-				$httpClient = $this->getRemoteConnexion($sessionId);
+				$secureToken = "";
+				$httpClient = $this->getRemoteConnexion($secureToken);
 				//$httpClient->setDebug(true);
 				$postData = array(
 					"get_action"=>"upload", 
-					"dir"=>base64_encode($fData["destination"]));
+					"dir"=>base64_encode($fData["destination"]),
+					"secure_token" => $secureToken
+				);
 					
-				$httpClient->postFile($crtRep->getOption("URI")."?ajxp_sessid=$sessionId", $postData, "Filedata", $fData);
+				$httpClient->postFile($crtRep->getOption("URI")."?", $postData, "Filedata", $fData);
 				if(strpos($httpClient->getHeader("content-type"), "text/xml") !== false && strpos($httpClient->getContent(), "require_auth") != false){
-					$httpClient = $this->getRemoteConnexion($sessionId, true);
-					$postData["ajxp_sessid"] = $sessionId;
+					$httpClient = $this->getRemoteConnexion($secureToken, true);
+					$postData["secure_token"] = $secureToken;
 					$httpClient->postFile($crtRep->getOption("URI"), $postData, "Filedata", $fData);
 				}
 				unlink($fData["tmp_name"]);
@@ -262,43 +263,69 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 	/**
 	* @return HttpClient
 	*/
-	function getRemoteConnexion(&$remoteSessionId, $refreshSessId=false){
+	function getRemoteConnexion(&$remoteSecureToken, $refreshSessId=false, $repository = null){
 		require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
-		$crtRep = ConfService::getRepository();
+		if($repository != null){
+			$crtRep = $repository;
+		}else{
+			$crtRep = ConfService::getRepository();
+		}
 		$httpClient = new HttpClient($crtRep->getOption("HOST"));
 		$httpClient->cookie_host = $crtRep->getOption("HOST");
 		$httpClient->timeout = 10;
+		if(isSet($_SESSION["AJXP_REMOTE_SESSION"]) && is_array($_SESSION["AJXP_REMOTE_SESSION"])){
+			$httpClient->setCookies($_SESSION["AJXP_REMOTE_SESSION"]);
+		}
+		
 		//$httpClient->setDebug(true);
+		if(!isSet($_SESSION["AJXP_REMOTE_SECURE_TOKEN"])){
+			$httpClient->get($crtRep->getOption("URI")."?get_action=get_secure_token");
+			$remoteSecureToken = $httpClient->getContent();
+			$_SESSION["AJXP_REMOTE_SECURE_TOKEN"] = $remoteSecureToken;
+		}else{
+			$remoteSecureToken = $_SESSION["AJXP_REMOTE_SECURE_TOKEN"];
+		}
+		
 		if(!$crtRep->getOption("USE_AUTH")){
 			return $httpClient;
 		}
 		$uri = "";
 		if($crtRep->getOption("AUTH_URI") != ""){
 			$httpClient->setAuthorization($crtRep->getOption("AUTH_USER"), $crtRep->getOption("AUTH_PASS"));			
-			$uri = $crtRep->getOption("AUTH_URI");
+			$uri = $crtRep->getOption("AUTH_URI")."?secure_token=$remoteSecureToken";
 		}
-		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"]) || $refreshSessId){		
+		if(!isSet($_SESSION["AJXP_REMOTE_SESSION"]) || !is_array($_SESSION["AJXP_REMOTE_SESSION"]) || $refreshSessId){		
 			if($uri == ""){
+				AJXP_Logger::debug("Remote_fs : relog necessary");
 				// Retrieve a seed!
-				$httpClient->get($crtRep->getOption("URI")."?get_action=get_seed");
+				$httpClient->get($crtRep->getOption("URI")."?get_action=get_seed&secure_token=$remoteSecureToken");
 				$seed = $httpClient->getContent();
+				$cookies = $httpClient->getCookies();
+				if(isSet($cookies["AjaXplorer"])){
+					$_SESSION["AJXP_REMOTE_SESSION"] = $cookies;
+				}
 				$user = $crtRep->getOption("AUTH_USER");
 				$pass = $crtRep->getOption("AUTH_PASS");
 				$pass = md5(md5($pass).$seed);
-				$uri = $crtRep->getOption("URI")."?get_action=login&userid=".$user."&password=".$pass."&login_seed=$seed";
+				$uri = $crtRep->getOption("URI")."?get_action=login&userid=".$user."&password=".$pass."&login_seed=$seed&secure_token=$remoteSecureToken";
+				$httpClient->get($uri);
+				$content = $httpClient->getContent();
+				$matches = array();
+				if(preg_match_all('#.*?secure_token="(.*?)".*?#s', $content, $matches)){
+					$remoteSecureToken = $matches[1][0];
+					$_SESSION["AJXP_REMOTE_SECURE_TOKEN"] = $remoteSecureToken;
+				}
+				$httpClient->setHeadersOnly(false);				
+			}else{				
+				$httpClient->setHeadersOnly(true);
+				$httpClient->get($uri);
+				$httpClient->setHeadersOnly(false);				
 			}
-			$httpClient->setHeadersOnly(true);
-			$httpClient->get($uri);
-			$httpClient->setHeadersOnly(false);
 			$cookies = $httpClient->getCookies();
-			if(isSet($cookies["AjaXplorer"])){
-				$_SESSION["AJXP_REMOTE_SESSION"] = $cookies["AjaXplorer"];
-				$remoteSessionId = $cookies["AjaXplorer"];
-			}
+			$_SESSION["AJXP_REMOTE_SESSION"] = $httpClient->getCookies();
 		}else{
-			$remoteSessionId = $_SESSION["AJXP_REMOTE_SESSION"];
-			$httpClient->setCookies(array("AjaXplorer"=>$remoteSessionId));
-		}
+			$httpClient->setCookies($_SESSION["AJXP_REMOTE_SESSION"]);
+		}		
 		return $httpClient;
 	}
 	
