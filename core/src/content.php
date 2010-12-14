@@ -103,6 +103,10 @@ if(AuthService::usersEnabled())
 			print $seed;		
 		}
 		exit(0);
+	}else if($action == "get_secure_token"){
+		HTMLWriter::charsetHeader("text/plain");
+		print AuthService::generateSecureToken();
+		exit(0);
 	}else if($action == "get_captcha"){
 		include_once(INSTALL_PATH."/server/classes/class.CaptchaProvider.php");
 		CaptchaProvider::sendCaptcha();
