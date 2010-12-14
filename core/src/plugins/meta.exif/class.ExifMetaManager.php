@@ -118,7 +118,7 @@ class ExifMetaManager extends AJXP_Plugin {
 			foreach ($data as $key => $value){
 				if(in_array(strtolower($key), $excludeTags)) continue;
 				if(!is_numeric($value)) $value = $this->string_format($value);
-				print("<exifTag name=\"$key\">".$value."</exifTag>");
+				print("<exifTag name=\"$key\">".SystemTextEncoding::toUTF8($value)."</exifTag>");
 			}
 			print("</exifSection>");
 		}
