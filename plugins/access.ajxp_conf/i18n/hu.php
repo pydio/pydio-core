@@ -98,6 +98,7 @@ $mess=array(
 "85" => "Manual actions filtering",
 "86" => "list of comma-separated actions that will be disabled for this role, no matter the access right.",
 "87" => "Successfully updated actions for this role",
+"88" => "This repository is defined in the config file, you cannot edit its meta sources via the GUI.",
 /* END SENTENCE */
 );
 ?>

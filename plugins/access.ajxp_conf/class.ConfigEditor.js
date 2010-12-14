@@ -729,12 +729,16 @@ ConfigEditor = Class.create({
 		this.currentRepoWriteable = writeable;
 		this.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable);
 		
-		this.feedMetaSourceForm(xmlData, metaForm);		
-		if(metaTab){
-			form.hide();metaForm.show();
-			metaLegend.addClassName('active');
-			optLegend.removeClassName('active');
-			modal.refreshDialogAppearance();			
+		if(writeable){
+			this.feedMetaSourceForm(xmlData, metaForm);		
+			if(metaTab){
+				form.hide();metaForm.show();
+				metaLegend.addClassName('active');
+				optLegend.removeClassName('active');
+				modal.refreshDialogAppearance();			
+			}
+		}else{
+			metaForm.update(MessageHash['ajxp_conf.88']);
 		}
 		
 	},
