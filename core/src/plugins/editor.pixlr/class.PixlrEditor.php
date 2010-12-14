@@ -53,10 +53,13 @@ class PixlrEditor extends AJXP_Plugin {
 		    	
 		if($action == "post_to_server"){	
 					
-			$file = base64_decode(AJXP_Utils::decodeSecureMagic($httpVars["file"]));
+			$file = base64_decode($httpVars["file"]);
+			$file = SystemTextEncoding::magicDequote(AJXP_Utils::securePath($file));
 			$target = base64_decode($httpVars["parent_url"])."/plugins/editor.pixlr";
-			$tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);
+			$tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);			
+			$tmp = SystemTextEncoding::fromUTF8($tmp);
 			$fData = array("tmp_name" => $tmp, "name" => urlencode(basename($file)), "type" => "image/jpg");
+			//var_dump($fData);
 			$httpClient = new HttpClient("pixlr.com");
 			//$httpClient->setDebug(true);
 			$postData = array();							
