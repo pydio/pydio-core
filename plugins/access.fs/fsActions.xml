@@ -164,7 +164,6 @@
 								if(input.name!='get_action' && input.name!='secure_token') input.remove();
 							});
 							userSelection.updateFormOrUrl($('download_form'));
-							console.log($('download_form'));
 							$('download_form').submit();
 						}
 					}
