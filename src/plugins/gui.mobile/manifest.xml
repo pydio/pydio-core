@@ -18,8 +18,8 @@
 				</div>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
 					<div id="horizontal_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'horizontal', initA: 200, maxA:600, minA:50,fit:'height',fitParent:'browser'}">
-						<div id="topPane" ajxpClass="FoldersTree" ajxpOptions="{display:'dz'}" ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>		
 						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965; background-color: #fff;"></div>	
+						<div id="info_panel" ajxpClass="InfoPanel" class="ajxp_simple_container" style="border: 1px solid #676965;"></div>
 					</div>
 				</div>				
 			]]></template>
@@ -27,6 +27,7 @@
 				<property name="thumbSize" value="32"/>
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label"/>
+					<column messageId="2" attributeName="filesize"/>
 				</columns>				
 			</component_config>			
 		</client_configs>
