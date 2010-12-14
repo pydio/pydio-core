@@ -274,7 +274,7 @@ class AJXP_Utils
 			return "mp3";
 		}else if($keyword == "zip"){
 			if(ConfService::zipEnabled()){
-				return "zip";
+				return "zip,ajxp_browsable_archive";
 			}else{
 				return "none_allowed";
 			}

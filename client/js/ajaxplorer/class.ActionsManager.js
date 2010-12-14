@@ -107,7 +107,7 @@ Class.create("ActionsManager", {
 				var userSelection = ajaxplorer.getUserSelection();
 				if(!userSelection.isEmpty()){
 					var defaultAction = 'file';
-					if(userSelection.isUnique() && userSelection.hasDir()){
+					if(userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(['ajxp_browsable_archive']))){
 						defaultAction = 'dir';
 					}
 					if(this.defaultActions.get(defaultAction) && action.options.name == this.defaultActions.get(defaultAction)){
