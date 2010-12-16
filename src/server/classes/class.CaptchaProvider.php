@@ -32,7 +32,11 @@ class CaptchaProvider{
 		$img->line_color = new Securimage_Color("#eaeaea");
 		$img->signature_color = new Securimage_Color(rand(0, 64), rand(64, 128), rand(128, 255));
 		$img->use_wordlist = true; 
-		
+		if(!function_exists('imagettftext')){
+			$img->use_gd_font = true;	
+			$img->use_transparent_text = false;	
+			$img->use_multi_text = false;
+		}
 		//$img->show($libPath."/backgrounds/bg3.jpg");		
 		$img->show();
 	}
