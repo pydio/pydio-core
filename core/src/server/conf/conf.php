@@ -158,10 +158,10 @@ $REPOSITORIES[0] = array(
 		/*
 			"meta.serial"=> array(
 				"meta_file_name"	=> ".ajxp_meta",
-				"meta_fields"		=> "testKey1",
-				"meta_labels"		=> "Test Key"
-			)		*/
-
+				"meta_fields"		=> "testKey1,stars_rate,css_label",
+				"meta_labels"		=> "Test Key,Rating,Label"
+			)
+		*/
 		)
 	),
 	
