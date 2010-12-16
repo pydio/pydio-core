@@ -67,6 +67,7 @@ Class.create("ExifCellRenderer", {
 		latiCell.up().nextSiblings().each(function(tr){
 			tr.down('td.infoPanelValue').setAttribute('colspan', 2);
 		});
+		longiCell.setAttribute("colspan", "1");
 		button.observe("click", function(){
 			this.openLocator(latiCell.getAttribute('latiDegree'), longiCell.getAttribute("longiDegree"));
 		}.bind(this) );		
