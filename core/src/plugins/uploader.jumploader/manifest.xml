@@ -6,10 +6,14 @@
 			<!-- FLEX UPLOAD FORM -->
 			<div id="jumploader_form" box_width="600" box_padding="0">
 			<div id="jumpscreen">
-			<iframe id="jumpframe" style="width:600px;height:400px;border:0px none;" frameborder="0" src="AJXP_SERVER_ACCESS?get_action=get_template&template_name=jumploader_tpl.html&pluginName=uploader.jumploader&encode=false"></iframe>
+			<iframe id="jumpframe" style="width:600px;height:400px;border:0px none;" frameborder="0" src=""></iframe>
 			</div>
 			</div>	
 		]]></clientForm>
+		<dialogOnOpen><![CDATA[ 
+        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=jumploader_tpl.html&pluginName=uploader.jumploader&encode=false';
+        modal.getForm().down('#jumpframe').src = src;
+		]]></dialogOnOpen>        
 	</processing>
 	<registry_contributions>
 		<actions>
