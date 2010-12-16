@@ -91,7 +91,7 @@ Class.create("AjxpDataModel", {
 			}
 		}		
 		ajxpNode.observeOnce("loaded", function(){
-			this.setContextNode(ajxpNode);
+			this.setContextNode(ajxpNode, true);			
 			document.fire("ajaxplorer:context_loaded");
 		}.bind(this));
 		ajxpNode.observeOnce("error", function(message){
@@ -127,8 +127,8 @@ Class.create("AjxpDataModel", {
 		return this._rootNode;
 	},
 	
-	setContextNode : function(ajxpDataNode){
-		if(this._contextNode && this._contextNode == ajxpDataNode && this._currentRep  == ajxpDataNode.getPath()){
+	setContextNode : function(ajxpDataNode, forceEvent){
+		if(this._contextNode && this._contextNode == ajxpDataNode && this._currentRep  == ajxpDataNode.getPath() && !forceEvent){
 			return; // No changes
 		}
 		this._contextNode = ajxpDataNode;
