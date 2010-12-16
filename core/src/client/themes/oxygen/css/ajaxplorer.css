@@ -459,6 +459,7 @@ div.SF_label{
     font-family: Arial;
     font-size: 12px;
     padding: 0px;
+    line-height: 16px;    
 }
 
 .action_bar
@@ -725,6 +726,7 @@ a.carousel-control img{
 }
 .user_widget_label{
 	float: left; 
+	line-height: 16px;
 	border-width: 1px 0px 1px 1px;
 	border-style: solid none solid solid; 
 	border-color: #ddd; 
@@ -821,7 +823,7 @@ div.header_resizer div.header_cell{
 div.header_resizer div.header_label{
 	font-family: Trebuchet MS;
 	font-size: 12px;
-	padding:3px 3px 2px;
+	padding:3px 5px 2px;
 }
 div.header_resizer div.resizer{
 	float:left;
@@ -1520,6 +1522,7 @@ tr td.infoPanelLabel
     padding:3px;
     clear:left;
     background-color:#c4c7c1;
+    line-height: 18px
 }
 
 div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .ajxp_simple_container{
