@@ -8,6 +8,11 @@ var Shadower =
 {
 	shadow: function(element)
 	{
+		if(Modernizr.boxshadow){
+			element.addClassName("css_boxshadow");
+			return;
+		}
+		
 		element = $(element);
 		var options = Object.extend(
 		{
@@ -129,6 +134,11 @@ var Shadower =
 
 	deshadow: function(element)
 	{
+		if(Modernizr.boxshadow){
+			element.removeClassName("css_boxshadow");
+			return;
+		}
+		
 		element = $(element);
 		if (element.shadows)
 		{
