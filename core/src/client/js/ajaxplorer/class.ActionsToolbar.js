@@ -127,6 +127,9 @@ Class.create("ActionsToolbar", {
 	},
 	
 	emptyToolbars: function(){
+		if(this.element.subMenus){
+			this.element.subMenus.invoke("destroy");
+		}
 		this.element.select('div').each(function(divElement){			
 			divElement.select('a').each(function(button){
 				if(button.arrowDiv) button.arrowDiv.remove();

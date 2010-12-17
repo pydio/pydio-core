@@ -42,7 +42,7 @@ Proto.Menu = Class.create({
 			}
 		}, arguments[0] || { });
 		
-		this.subMenus = [];
+		this.subMenus = $A();
 		this.shim = new Element('iframe', {
 			style: 'position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);display:none',
 			src: 'javascript:false;',
@@ -75,15 +75,22 @@ Proto.Menu = Class.create({
 
 		document.observe('click', function(e) {
 			if (this.container.visible() && !e.isRightClick()) {
-				this.options.beforeHide(e);
-				if (this.ie) this.shim.hide();
-				Shadower.deshadow(this.container);
-				this.container.setStyle({height:'auto', overflowY:'hidden'});
-				this.container.hide();
+				this.hide();
 			}
 		}.bind(this));
 		
 		this.addElements(this.options.selector);
+	},
+	
+	destroy : function(){
+		try{
+			if(this.subMenus.length) this.subMenus.invoke("destroy");
+			if(this.ie) this.shim.remove();
+			this.container.remove();
+			if(this.options.createAnchor && this.options.anchor){
+				this.options.anchor.remove();
+			}
+		}catch(e){}
 	},
 	
 	observerFunction:function(e){
@@ -364,5 +371,10 @@ Proto.Menu = Class.create({
 		Shadower.deshadow(this.container);
 		this.container.setStyle({height:'auto', overflowY:'hidden'});
 		this.container.hide();
+		if(this.subMenus.length){
+			// Re-created always on the fly
+			$A(this.subMenus).invoke("destroy");
+			this.subMenus = $A();
+		}
 	}
 });
