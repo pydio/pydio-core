@@ -86,10 +86,18 @@ textarea{
    border: 1px solid #eee;
    float: left;
    text-align: center;
-   margin: 2px;
+   margin: 4px;
    background-color: #f9f9f9;
    -moz-border-radius : 5px;
    border-radius : 5px;
+	-moz-box-shadow : 1px 2px 3px rgba(100, 100, 100, 0.5);
+	-webkit-box-shadow : 1px 1px 1px rgba(100, 100, 100, 0.5);
+	box-shadow : 1px 1px 1px rgba(100, 100, 100, 0.5);
+}
+
+#selectable_div div.selected{
+   border: 1px solid #73A2D7;
+	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
 }
 
 .thumbLabel
@@ -194,6 +202,20 @@ div.shadow_class
     background-image:url('../images/locationBg.gif');
     background-repeat: no-repeat;
     background-position: top left;    
+
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f3f3f3', endColorstr='#ffffff'); /* for IE */
+	background: -webkit-gradient(linear, left top, left bottom, from(#f3f3f3), to(#fff)); /* for webkit browsers */
+	background: -moz-linear-gradient(top,  #f3f3f3,  #fff); /* for firefox 3.6+ */
+    
+}
+
+.dialogContent input:focus,
+.dialogContent input[type="text"]:focus,
+.dialogContent input[type="password"]:focus,
+.dialogContent select:focus
+{
+	background: white;
+	border: 1px solid #5d83ae;
 }
 
 .dialogLegend
@@ -217,6 +239,8 @@ fieldSet input.dialogButton
     padding:0px;
     background-image: none;
     background-color: #f1f1ef;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
 }
 
 .editContent, .editContent div
@@ -450,6 +474,12 @@ div.SF_label{
 	background-color: #f1f1ef;
 	border-bottom : 1px solid #676965;
 	height: 18px;
+	/*
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F1F1EF', endColorstr='#E6E6E0');
+	background: -webkit-gradient(linear, left top, left bottom, from(#F1F1EF), to(#E6E6E0));
+	background: -moz-linear-gradient(top,  #F1F1EF,  #E6E6E0);
+	*/
+	text-shadow : 1px 1px 1px #FFFFFF;
 }
 
 #action_bar, 
@@ -807,7 +837,7 @@ div.header_resizer{
 	border-bottom: 1px solid #676965;
 	color: #676965;	
 	background-color: #F1F1EF;
-	overflow:hidden;
+	overflow:hidden;	
 }
 
 div.header_resizer div.header_cell{
@@ -815,6 +845,8 @@ div.header_resizer div.header_cell{
 	overflow:hidden;
 	width:90px;
 	background-color: #F1F1EF;
+	text-shadow : 1px 1px 1px #FFFFFF;
+	
 	white-space:nowrap;	
 	border: 0px !important;
 	cursor: pointer;	
@@ -1334,7 +1366,7 @@ div#upload_files_list div, div#multiple_download_container div
 
 .toggleInactive
 {
-    background-color:#DADDD7;
+    background:#DADDD7 !important;
 }
 
 .toggleInactive a, .toggleInactive a:link, .toggleInactive a:visited, .toggleInactive a:hover , .toggleInactive a:active
@@ -2252,4 +2284,14 @@ div.menu a {
     color: #79f;
     font-size:12px;
     font-weight: bold;
+}
+
+/********************************************/
+/* NEW HTML5 / CSS3 STYLES  	            */
+/* Generally applied after a Modernizr test */
+/********************************************/
+.css_boxshadow{
+	-moz-box-shadow : 1px 1px 2px rgba(100, 100, 100, 0.5);
+	-webkit-box-shadow : 1px 1px 2px rgba(100, 100, 100, 0.5);
+	box-shadow : 1px 1px 2px rgba(100, 100, 100, 0.5);
 }
