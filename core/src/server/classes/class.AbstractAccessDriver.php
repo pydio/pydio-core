@@ -356,10 +356,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 	    	if(!$loggedUser->canRead($repositoryId) || !$loggedUser->canWrite($destRepoId)
 	    		|| (isSet($httpVars["moving_files"]) && !$loggedUser->canWrite($repositoryId))
 	    	){
-	    		AJXP_XMLWriter::header();
-	    		AJXP_XMLWriter::sendMessage(null, $mess[364]);
-	    		AJXP_XMLWriter::close();
-	    		exit(1);
+	    		throw new Exception($mess[364]);
 	    	}
     	}
     	
@@ -367,6 +364,9 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	foreach ($files as $file){
     		$origFile = $origStreamURL.$file;
     		$destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".basename($file);    		
+    		if(!is_file($origFile)){
+    			throw new Exception("Cannot find $origFile");
+    		}
 			$origHandler = fopen($origFile, "r");
 			$destHandler = fopen($destFile, "w");
 			if($origHandler === false || $destHandler === false) {
@@ -387,7 +387,6 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	}
     	AJXP_XMLWriter::sendMessage(join("\n", $messages), null, true);
     	AJXP_XMLWriter::close();
-    	exit(0);
     }
 
 }
