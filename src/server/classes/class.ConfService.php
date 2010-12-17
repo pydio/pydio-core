@@ -197,7 +197,11 @@ class ConfService
 		{
 			if($temporary && isSet($_SESSION['REPO_ID'])){
 				$crtId = $_SESSION['REPO_ID'];
-				register_shutdown_function(array("ConfService","switchRootDir"), $crtId);
+				$_SESSION['SWITCH_BACK_REPO_ID'] = $crtId;
+				AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
+				//register_shutdown_function(array("ConfService","switchRootDir"), $crtId);
+			}else{
+				AJXP_Logger::debug("switching back to $rootDirIndex");			
 			}
 			$this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$rootDirIndex];			
 			$_SESSION['REPO_ID'] = $rootDirIndex;
@@ -217,8 +221,8 @@ class ConfService
 			$loggedUser = AuthService::getLoggedUser();
 			$loggedUser->setPref("history_last_repository", $rootDirIndex);
 			$loggedUser->save();
-		}		
-		
+		}	
+				
 	}
 		
 	public static function getRepositoriesList(){
@@ -245,6 +249,7 @@ class ConfService
 	{
 		if(isSet($_SESSION['REPO_ID']) &&  isSet($this->configs["REPOSITORIES"][$_SESSION['REPO_ID']]))
 		{
+			AJXP_Logger::debug("Getting repo_id from session" . $_SESSION['REPO_ID']);
 			return $_SESSION['REPO_ID'];
 		}
 		$keys = array_keys($this->configs["REPOSITORIES"]);

@@ -79,5 +79,6 @@ Class.create("TreeSelector", {
 	resetAjxpRootNode : function(ajxpNode){
 		this.treeCopy.ajxpNode.clear();
 		this.treeCopy.setAjxpRootNode(ajxpNode);		
+		this.treeCopy.ajxpNode.load();
 	}
 });
