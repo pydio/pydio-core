@@ -150,12 +150,14 @@ class SvnManager extends AJXP_Plugin {
 			$entries = $this->svnListNode($realFile, $revision);
 			$keys = array_keys($entries); 
 			$localName = $keys[0];
-			$contentSize = $entries[$localName]["last_revision_size"];
-			
+			$contentSize = 0;
+			if(isSet($entries[$localName]["last_revision_size"])){
+				$contentSize = intval($entries[$localName]["last_revision_size"]);
+			}
 			// output directly the file!
 			header("Content-Type: application/force-download; name=\"".$localName."\"");
 			header("Content-Transfer-Encoding: binary");
-			header("Content-Length: ".$contentSize);
+			if($contentSize > 0) header("Content-Length: ".$contentSize);
 			header("Content-Disposition: attachment; filename=\"".$localName."\"");
 			header("Expires: 0");
 			header("Cache-Control: no-cache, must-revalidate");
