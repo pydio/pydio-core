@@ -135,14 +135,14 @@ class SvnManager extends AJXP_Plugin {
 			$arg = $init["SELECTION"][0];
 			$res = ExecSvnCmd($command, $arg, $switches);
 			AJXP_XMLWriter::header();	
-			$lines = explode("\r\n", $res[IDX_STDOUT]);
+			$lines = explode(PHP_EOL, $res[IDX_STDOUT]);
 			array_shift($lines);
 			if(isSet($currentRev)){
 				print("<current_revision>$currentRev</current_revision>");
 			}else if(isSet($revRange)){
 				print("<revision_range start='$revRange[0]' end='$revRange[1]'/>");
 			}
-			print_r(SystemTextEncoding::toUTF8(implode("", $lines)));
+			print(SystemTextEncoding::toUTF8(implode("", $lines)));
 			AJXP_XMLWriter::close();
 		}else if($actionName == "svndownload"){
 			$revision = $httpVars["revision"];
