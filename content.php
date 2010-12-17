@@ -71,6 +71,9 @@ session_start();
 
 if(isSet($_GET["tmp_repository_id"])){
 	ConfService::switchRootDir($_GET["tmp_repository_id"], true);
+}else if(isSet($_SESSION["SWITCH_BACK_REPO_ID"])){
+	ConfService::switchRootDir($_SESSION["SWITCH_BACK_REPO_ID"]);
+	unset($_SESSION["SWITCH_BACK_REPO_ID"]);
 }
 $action = "";
 if(isSet($_GET["action"]) || isSet($_GET["get_action"])) $action = (isset($_GET["get_action"])?$_GET["get_action"]:$_GET["action"]);
@@ -189,6 +192,8 @@ if(AuthService::usersEnabled())
 		AJXP_XMLWriter::close();
 		exit(1);
 	}
+}else{
+	AJXP_Logger::debug(ConfService::getCurrentRootDirIndex());	
 }
 
 //Set language
