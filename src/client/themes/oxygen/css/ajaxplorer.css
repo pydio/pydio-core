@@ -414,6 +414,10 @@ div.SF_label{
 	word-wrap: no break-word; /* Internet Explorer 5.5+ */	
 }
 
+.no-flexbox div.SF_label{
+	padding-right:3px !important;	
+}
+
 .SF_input{
 	float:left;
 	padding:1px !important;
