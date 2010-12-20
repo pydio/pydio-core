@@ -41,7 +41,7 @@ if(function_exists("date_default_timezone_set") and function_exists("date_defaul
 
 ini_set("session.cookie_httponly", 1);
 
-define("AJXP_VERSION", "3.2");
+define("AJXP_VERSION", "3.2.0");
 define("AJXP_VERSION_DATE", "2010/12/20");
 
 define("AJXP_EXEC", true);
