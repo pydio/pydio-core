@@ -144,6 +144,14 @@ Class.create("ExifEditor", AbstractEditor, {
 		}
 		this.columnsLayout();
 		this.refreshGPSData();
+	},
+	
+	getPreview : function(ajxpNode){
+		return Diaporama.prototype.getPreview(ajxpNode);
+	},
+	
+	getThumbnailSource : function(ajxpNode){
+		return Diaporama.prototype.getThumbnailSource(ajxpNode);
 	}
 	
 });
