@@ -17,9 +17,21 @@
 						document.location.href=loginRedirect;
 					}else{
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
-						function(){
-							var oForm = modal.getForm();
+						function(oForm){
 							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img'), oForm.down('div.dialogLegend'), 'before');
+							if(Prototype.Browser.IE && !oForm.down('input[type="text"]').key_enter_attached){
+								oForm.select('input').invoke("observe", "keydown", function(event){
+									if(event.keyCode == Event.KEY_RETURN){
+										var el = Event.findElement(event);
+										if(el.hasClassName('dialogButton')){
+											el.click();
+										}else{
+											el.form.down('input.dialogButton').click();
+										}
+									}
+								});
+								oForm.down('input[type="text"]').key_enter_attached = true;
+							}
 						}, 
 						function(){
 							var oForm = modal.getForm();
