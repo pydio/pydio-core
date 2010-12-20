@@ -410,8 +410,8 @@ div.SF_label{
 	padding: 3px;
 	padding-right:1%;
 	padding-left:0;
-	white-space: nowrap; /* css-3 */
-	word-wrap: no break-word; /* Internet Explorer 5.5+ */	
+	/*white-space: nowrap; /* css-3 */
+	/*word-wrap: no break-word; /* Internet Explorer 5.5+ */	
 }
 
 .no-flexbox div.SF_label{
