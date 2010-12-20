@@ -1996,7 +1996,7 @@ div.menu {
 	position: absolute;
 	top: 0;
 	left: 0;
-	font-family: verdana;
+	font-family: Trebuchet MS, Helvetica, sans-serif;
 	-moz-border-radius:5px;
 	border-radius:5px;	
 }
