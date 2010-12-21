@@ -88,8 +88,8 @@ class mysqlAccessDriver extends AbstractAccessDriver
 			$dir = SystemTextEncoding::fromUTF8($dir); 
 		}
 		// FILTER DIR PAGINATION ANCHOR
-		if(isSet($dir) && strstr($dir, "#")!==false){
-			$parts = explode("#", $dir);
+		if(isSet($dir) && strstr($dir, "%23")!==false){
+			$parts = explode("%23", $dir);
 			$dir = $parts[0];
 			$page = $parts[1];
 		}				
