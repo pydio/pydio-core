@@ -19,8 +19,8 @@ class VideoReader extends AJXP_Plugin {
 			session_write_close();
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
  			$filesize = filesize($destStreamURL.$file);
- 			
- 			$fp = fopen($destStreamURL.$file, "r");
+ 			$filename = $destStreamURL.$file;
+ 			//$fp = fopen($destStreamURL.$file, "r");
  			if(preg_match("/\.ogv$/", $file)){
 				header("Content-Type: video/ogg; name=\"".basename($file)."\"");
  			}else if(preg_match("/\.mp4$/", $file)){
@@ -29,14 +29,55 @@ class VideoReader extends AJXP_Plugin {
  				header("Content-Type: video/webm; name=\"".basename($file)."\"");
  			}
 
-			header("Content-Length: ".$filesize);
-			header('Cache-Control: public');
-			
-			$class = $streamData["classname"];
-			$stream = fopen("php://output", "a");
-			call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
-			fflush($stream);
-			fclose($stream);
+			if ( isset($_SERVER['HTTP_RANGE']) && $filesize != 0 )
+			{
+				AJXP_Logger::debug("Http range", array($_SERVER['HTTP_RANGE']));
+				// multiple ranges, which can become pretty complex, so ignore it for now
+				$ranges = explode('=', $_SERVER['HTTP_RANGE']);
+				$offsets = explode('-', $ranges[1]);
+				$offset = floatval($offsets[0]);
+
+				$length = floatval($offsets[1]) - $offset;
+				if (!$length) $length = $filesize - $offset;
+				if ($length + $offset > $filesize || $length < 0) $length = $filesize - $offset;
+				header('HTTP/1.1 206 Partial Content');
+
+				header('Content-Range: bytes ' . $offset . '-' . ($offset + $length - 1) . '/' . $filesize);
+				header('Accept-Ranges:bytes');
+				header("Content-Length: ". $length);
+				$file = fopen($filename, 'rb');
+				fseek($file, 0);
+				$relOffset = $offset;
+				while ($relOffset > 2.0E9)
+				{
+					// seek to the requested offset, this is 0 if it's not a partial content request
+					fseek($file, 2000000000, SEEK_CUR);
+					$relOffset -= 2000000000;
+					// This works because we never overcome the PHP 32 bit limit
+				}
+				fseek($file, $relOffset, SEEK_CUR);
+
+                while(ob_get_level()) ob_end_flush();
+				$readSize = 0.0;
+				while (!feof($file) && $readSize < $length && connection_status() == 0)
+				{
+					echo fread($file, 2048);
+					$readSize += 2048.0;
+					flush();
+				}
+				fclose($file);
+			} else {	
+ 				$fp = fopen($filename, "rb");
+				header("Content-Length: ".$filesize);				
+				header("Content-Range: bytes 0-" . ($filesize - 1) . "/" . $filesize. ";");			
+				header('Cache-Control: public');
+				
+				$class = $streamData["classname"];
+				$stream = fopen("php://output", "a");
+				call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);
+				fflush($stream);
+				fclose($stream);
+			}
 			//exit(1);
 		}else if($action == "get_sess_id"){
 			HTMLWriter::charsetHeader("text/plain");
