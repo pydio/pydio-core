@@ -63,6 +63,7 @@ Proto.History = Class.create({
 			if(current_hash != this.historyCurrentHash) {
 			
 				location.hash = current_hash;
+				this.refreshFavicon();
 				this.historyCurrentHash = current_hash;
 				this.historyCallback(current_hash.replace(/^#/, ''));				
 			}			
@@ -115,6 +116,7 @@ Proto.History = Class.create({
 		else {
 			newhash = '#' + hash;
 			location.hash = newhash;
+			this.refreshFavicon();
 		}
 		this.historyCurrentHash = newhash;
 		
@@ -139,10 +141,18 @@ Proto.History = Class.create({
 			//      By explicitly using the "location.hash" command (instead of using a variable set to "location.hash") the
 			//      URL in the browser and the "history" object are both updated correctly.
 			location.hash = newhash;
+			this.refreshFavicon();
 		}
 		else {
 		  //this.historyCallback(hash);
 		}
+	},
+	
+	refreshFavicon : function(){
+		if(!Prototype.Browser.Gecko) return;
+		var link = $$('link[type="image/x-png"]')[0].remove();
+		$$('head')[0].insert('<link href="' + link.href + '" type="image/x-png" rel="icon">');
+		delete link;
 	}
 	
 });
