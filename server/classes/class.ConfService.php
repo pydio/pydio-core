@@ -249,7 +249,6 @@ class ConfService
 	{
 		if(isSet($_SESSION['REPO_ID']) &&  isSet($this->configs["REPOSITORIES"][$_SESSION['REPO_ID']]))
 		{
-			AJXP_Logger::debug("Getting repo_id from session" . $_SESSION['REPO_ID']);
 			return $_SESSION['REPO_ID'];
 		}
 		$keys = array_keys($this->configs["REPOSITORIES"]);
