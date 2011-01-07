@@ -565,10 +565,13 @@ Class.create("Ajaxplorer", {
 		var tNodes = XPathSelectNodes(this._registry, "client_configs/template");
 		for(var i=0;i<tNodes.length;i++){
 			var target = tNodes[i].getAttribute("element");
-			if($(target)){
+			if($(target) || $$(target).length){
+				if($(target)) target = $(target);
+				else target = $$(target)[0];
 				var position = tNodes[i].getAttribute("position");
 				var obj = {}; obj[position] = tNodes[i].firstChild.nodeValue;
-				$(target).insert(obj);
+				target.insert(obj);
+				obj[position].evalScripts();
 			}
 		}		
 		modal.updateLoadingProgress('Html templates loaded');	
