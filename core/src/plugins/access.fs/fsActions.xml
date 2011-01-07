@@ -485,7 +485,7 @@
 						if(url.indexOf('?') > 0){
 							url = url.substring(0, url.indexOf('?'));
 						}						
-						var repo = ajaxplorer.repositoryId;
+						var repo = ajaxplorer.repositoryId || (ajaxplorer.user ? ajaxplorer.user.activeRepository : null);
 						link = url + '?repository_id=' + repo + '&folder=' + encodeURIComponent(ajaxplorer.getUserSelection().getUniqueFileName());
 						input.value = link;
                         var email = oForm.down('a[id="email"]');
