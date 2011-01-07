@@ -48,6 +48,10 @@ Class.create("RepositorySelect", {
 	},
 	
 	createGui : function(){
+		if(MessageHash){
+			this._defaultString = MessageHash[391];
+		}		
+		
 		this.icon = new Element('img', {
 			id:'repo_icon',
 			src:resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16),

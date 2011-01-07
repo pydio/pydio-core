@@ -247,7 +247,7 @@ Class.create("InfoPanel", AjxpPane, {
 		//var actions = ajaxplorer.actionBar.getInfoPanelActions();
 		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("InfoPanel", this.htmlElement.id);
 		if(!actions.length) return;
-		var actionString = '<div class="panelHeader infoPanelGroup">Actions</div><div class="infoPanelActions">';
+		var actionString = '<div class="panelHeader infoPanelGroup">'+MessageHash[5]+'</div><div class="infoPanelActions">';
 		var count = 0;
 		actions.each(function(action){
 			if(selectionType == 'empty' && action.context.selection) return;
