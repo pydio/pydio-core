@@ -56,7 +56,7 @@ Class.create("FoldersTree", AjxpPane, {
 		};
 		
 		var filter = this.createFilter();
-		var fakeRootNode = new AjxpNode("/", true, "No Repository", "folder.png");
+		var fakeRootNode = new AjxpNode("/", true, MessageHash[391], "folder.png");
 		fakeRootNode._isLoaded = true;
 		this.tree = new AJXPTree(fakeRootNode,  action, filter);		
 				

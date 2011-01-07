@@ -42,6 +42,9 @@ Class.create("Repository", {
 	allowCrossRepositoryCopy:false,
 
 	initialize:function(id, xmlDef){
+		if(MessageHash){
+			this.label = MessageHash[391];
+		}
 		this.id = id;
 		this.icon = ajxpResourcesFolder+'/images/actions/16/network-wired.png';
 		this.resourcesManager = new ResourcesManager();
