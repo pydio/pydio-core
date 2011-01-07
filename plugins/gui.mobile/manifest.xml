@@ -16,15 +16,25 @@
 						</div>
 					</div>
 				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
-					<div id="horizontal_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'horizontal', initA: 200, maxA:600, minA:50,fit:'height',fitParent:'browser'}">
-						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965; background-color: #fff;"></div>	
-						<div id="info_panel" ajxpClass="InfoPanel" class="ajxp_simple_container" style="border: 1px solid #676965;"></div>
-					</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">					
+						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}" style="border: 1px solid #676965; background-color: #fff;"></div>												
 				</div>				
+				<div id="info_container" class="css_boxshadow" ajxpClass="AjxpPane" style="position:absolute;top:4%;left:2%;width:95%;height:91%;display:none;z-index:20001; border-radius: 5px 5px 5px 5px; background-color: #F1F1EF; border: 3px solid #2b70c4;">
+					<div id="info_panel_header" class="panelHeader" style="font-weight:bold;color:#2b70c4;font-size:14px;"><a class="m-2" style="float:right;" href="javascript:$('info_container').hide();">Close</a><span class="info_panel_title_span">Title</span></div>
+					<div id="info_panel" ajxpClass="InfoPanel" ajxpOptions="{fit:'height'}" class="ajxp_simple_container"></div>
+				</div>
+				<div id="mobile_actions" style="display:none"><a class="m-2" href="#">Info</a> <a class="m-2" href="#">Explore</a></div>
+			]]></template>
+			<template name="test" element="head" position="bottom"><![CDATA[
+				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
+				<script type="text/javascript">
+					var conn = new Connexion();
+					conn._libUrl = '';
+					conn.loadLibrary('plugins/gui.mobile/ajxp-mobile.js');
+				</script>
 			]]></template>
 			<component_config className="FilesList">
-				<property name="thumbSize" value="32"/>
+				<property name="thumbSize" value="16"/>
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label"/>
 					<column messageId="2" attributeName="filesize"/>
