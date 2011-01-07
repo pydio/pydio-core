@@ -406,7 +406,7 @@ Class.create("Ajaxplorer", {
 			this.repositoryId = repositoryId;
 		} else { 
 			this._initObj = null ;
-			if(!ajxpBootstrap.parameters.get('usersEnabled')) return;
+			//if(!ajxpBootstrap.parameters.get('usersEnabled')) return;
 		}
 		
 		if(this._initLoadRep){
