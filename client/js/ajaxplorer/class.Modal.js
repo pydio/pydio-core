@@ -381,6 +381,7 @@ Class.create("Modal", {
 			this.messageBox.update(this.messageContent);
 			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
 		}
+		message = message.stripScripts();
 		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
