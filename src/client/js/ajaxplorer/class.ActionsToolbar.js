@@ -35,7 +35,7 @@
 Class.create("ActionsToolbar", {
 	__implements : "IAjxpWidget",
 	initialize : function(oElement, options){
-		this.element = oElement;
+		this.element = oElement;		
 		this.element.ajxpPaneObject = this;
 		this.options = Object.extend({
 			buttonRenderer : 'this',
@@ -49,6 +49,7 @@ Class.create("ActionsToolbar", {
 		}
 		this.toolbars = $H();
 		this.initCarousel();
+		attachMobileScroll(oElement.id, "horizontal");
 		//document.observe("ajaxplorer:loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarsSeparator.bind(this));

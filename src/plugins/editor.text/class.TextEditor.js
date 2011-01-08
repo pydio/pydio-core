@@ -76,6 +76,10 @@ Class.create("TextEditor", AbstractEditor, {
 		fitHeightToBottom($(this.textarea), $(modal.elementName));
 		// LOAD FILE NOW
 		this.loadFileContent(fileName);
+		if(window.ajxpMobile){
+			this.setFullScreen();
+			attachMobileScroll(this.textarea, "vertical");
+		}		
 	},
 	
 	loadFileContent : function(fileName){

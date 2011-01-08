@@ -632,3 +632,72 @@ function utf8_encode ( string ) {
  
     return utftext;
 }
+
+function scrollByTouch(event, direction, targetId){
+	var touchData = event.changedTouches[0];
+	var type = event.type;
+	if(!$(touchData.target) || ! $(touchData.target).up ) return;
+	var target = $(touchData.target).up('#'+targetId);
+	if(!target) return;
+	if(direction != "both"){
+		if(direction == "vertical"){
+			var eventPropName = "clientY";
+			var targetPropName = "scrollTop";
+		}else{
+			var eventPropName = "clientX";
+			var targetPropName = "scrollLeft";					
+		}
+		
+		if(type == "touchstart"){
+			target.originalTouchPos = touchData[eventPropName];
+			target.originalScroll = target[targetPropName];
+		}else if(type == "touchend"){
+			if(target.originalTouchPos){
+				event.preventDefault();
+			}
+			target.originalTouchPos = null;
+			target.originalScroll = null;
+		}else if(type == "touchmove"){
+			event.preventDefault();
+			if(!target.originalTouchPos == null) return;
+			var delta = touchData[eventPropName] - target.originalTouchPos;
+			target[targetPropName] = target.originalScroll - delta;
+		}
+	}else{
+		if(type == "touchstart"){
+			target.originalTouchPosY = touchData["clientY"];
+			target.originalScrollTop = target["scrollTop"];
+			target.originalTouchPosX = touchData["clientX"];
+			target.originalScrollLeft = target["scrollLeft"];
+		}else if(type == "touchend"){
+			if(target.originalTouchPosY){
+				event.preventDefault();
+			}
+			target.originalTouchPosY = null;
+			target.originalScrollTop = null;
+			target.originalTouchPosX = null;
+			target.originalScrollLeft = null;
+		}else if(type == "touchmove"){
+			event.preventDefault();
+			if(!target.originalTouchPosY == null) return;
+			var delta = touchData["clientY"] - target.originalTouchPosY;
+			target["scrollTop"] = target.originalScrollTop - delta;
+			var delta = touchData["clientX"] - target.originalTouchPosX;
+			target["scrollLeft"] = target.originalScrollLeft - delta;
+		}
+	}
+}
+
+function attachMobileScroll(targetId, direction){
+	if(!window.ajxpMobile) return;
+	if(typeof (targetId) == "string"){
+		var target = $(targetId);
+	}else{
+		var target = targetId;
+		targetId = target.id;
+	}
+	if(!target) return;
+	target.addEventListener("touchmove", function(event){ scrollByTouch(event, direction, targetId); });
+	target.addEventListener("touchstart", function(event){ scrollByTouch(event, direction, targetId); });
+	target.addEventListener("touchend", function(event){ scrollByTouch(event, direction, targetId); });
+}

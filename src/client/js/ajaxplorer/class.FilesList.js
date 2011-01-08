@@ -341,6 +341,7 @@ Class.create("FilesList", SelectableElements, {
 			buffer = '<div id="selectable_div_header" class="sort-table"></div>';
 			buffer = buffer + '<div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			this.htmlElement.update(buffer);
+			attachMobileScroll("table_rows_container", "vertical");
 			oElement = $('selectable_div');
 			
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
@@ -427,6 +428,7 @@ Class.create("FilesList", SelectableElements, {
 			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
 			buffer += '<div id="selectable_div" style="overflow:auto; padding:2px 5px;">';
 			this.htmlElement.update(buffer);
+			attachMobileScroll("selectable_div", "vertical");
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
 				$('selectable_div').insert({before:this.createPaginator()});
 			}
