@@ -66,7 +66,27 @@ Class.create("AjxpCkEditor", TextEditor, {
 			]
 				
 		};
-	},
+		
+		if(window.ajxpMobile){
+			this.editorConfig = {
+				resize_enabled:false,
+				toolbar : "Ajxp",
+				filebrowserBrowseUrl : 'index.php?external_selector_type=ckeditor',
+				// IF YOU KNOW THE RELATIVE PATH OF THE IMAGES (BETWEEN REPOSITORY ROOT AND REAL FILE)
+				// YOU CAN PASS IT WITH THE relative_path PARAMETER. FOR EXAMPLE : 
+				//filebrowserBrowseUrl : 'index.php?external_selector_type=ckeditor&relative_path=files',
+				filebrowserImageBrowseUrl : 'index.php?external_selector_type=ckeditor',
+				filebrowserFlashBrowseUrl : 'index.php?external_selector_type=ckeditor',
+				language : ajaxplorer.currentLanguage,
+				fullPage : true,
+				toolbar_Ajxp : [
+				    ['Bold','Italic','Underline', '-', 'NumberedList','BulletedList'],
+				    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock']
+				]
+					
+			};			
+		}
+	},	
 	
 	
 	open : function($super, userSelection){
@@ -110,6 +130,9 @@ Class.create("AjxpCkEditor", TextEditor, {
 		window.setTimeout(this.resizeEditor.bind(this), 400);
 		this.loadFileContent(fileName);	
 		this.bindCkEditorEvents();		
+		if(window.ajxpMobile){
+			this.setFullScreen();
+		}
 		return;
 		
 	},
