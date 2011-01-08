@@ -99,5 +99,6 @@ $mess=array(
 "86" => "Eine Liste mit kommagetrennten Aktionen die für diese Rolle deaktiviert sind, ohne Einfluss auf die Zugriffsrechte",
 "87" => "Aktionen für diese Rolle erfolgreich aktualisiert",
 "88" => "Dieses Repository wurde in der Config-Datei angelegt, über das GUI können die Quellen für die Meta-Daten nicht aktualisiert werden.",
+"89" => "User specific data",
 );
 ?>
