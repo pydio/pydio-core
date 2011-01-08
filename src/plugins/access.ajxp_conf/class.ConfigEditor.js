@@ -157,6 +157,7 @@ ConfigEditor = Class.create({
 			}.bind(this));			
 		}		
 		
+		this.generateCustomPane(xmlData);
 		this.generateWalletsPane(xmlData);
 	},
 	
@@ -310,6 +311,60 @@ ConfigEditor = Class.create({
 		}
 	},
 	
+	loadCreateUserForm : function(){
+		var params = new Hash();
+		params.set("get_action", "edit");
+		params.set("sub_action", "get_custom_params");
+		var connexion = new Connexion();
+		connexion.setParameters(params);
+		connexion.onComplete = function(transport){
+			this.generateCustomPane(transport.responseXML, true);			
+			modal.refreshDialogPosition();
+			modal.refreshDialogAppearance();
+			ajaxplorer.blurAll();
+		}.bind(this);
+		connexion.sendAsync();
+	},
+		
+	generateCustomPane : function(xmlData, nosubmit){
+		var customPane = this.form.select("#custom_pane")[0];
+		var customData = XPathSelectNodes(xmlData, "admin_data/custom_data/param");							
+		if(!customData.length) {
+			return;
+		}
+		customPane.show();		
+		customPane.previous().show();
+		var iswallet = (nosubmit) ? '' : "wallet_pane"
+		var customDiv = new Element('div', {className:iswallet, id:"custom_pane"});
+		customPane.insert(customDiv);
+		
+		var customParams = $A([]);
+		for(var i=0;i<customData.length;i++){
+			customParams.push(this.driverParamNodeToHash(customData[i]));
+		}
+		var userId = (this.userId) ? this.userId : 'new';
+		var newTd = new Element('div', {className:'driver_form', id:'custom_params_'+userId});
+		customDiv.insert(newTd);
+		var customValues = $H({});
+		for(i=0;i<customData.length;i++){
+			var tag = customData[i];
+			customValues.set(tag.getAttribute('name'), tag.getAttribute('value'));
+		}
+		this.createParametersInputs(newTd, customParams, false, customValues);
+		if(!nosubmit){
+			var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/actions/22")});
+			submitButton.observe("click", function(){
+				this.submitUserCustomForm(userId);
+			}.bind(this));
+			newTd.insert({before: submitButton});
+		}
+		// recompute heights
+		var newHeight  = 28*(customParams.length);
+		newTd.setStyle({height:newHeight});
+		if(!nosubmit)
+			submitButton.setStyle({marginTop:(parseInt(newHeight/2)-10)});
+	},
+	
 	generateWalletsPane : function(xmlData){
 		var wallets = this.form.select("#wallets_pane")[0];
 		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
@@ -355,6 +410,16 @@ ConfigEditor = Class.create({
 		var newHeight  = 28*(walletParams.length);
 		newTd.setStyle({height:newHeight});
 		submitButton.setStyle({marginTop:(parseInt(newHeight/2)-10)});		
+	},
+	
+	submitUserCustomForm : function(userId){
+		var parameters = new Hash();
+		parameters.set('user_id', userId);
+		if(this.submitParametersInputs($('custom_params_'+userId), parameters, "DRIVER_OPTION_")){
+			this.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
+			return false;
+		}
+		this.submitForm("edit_user", 'save_custom_user_params', parameters, null);
 	},
 	
 	submitUserParamsForm : function(userId, repositoryId){
@@ -466,6 +531,8 @@ ConfigEditor = Class.create({
 		var login = this.form.select('[name="new_user_login"]')[0];
 		var pass = this.form.select('[name="new_user_pwd"]')[0];
 		var passConf = this.form.select('[name="new_user_pwd_conf"]')[0];
+		var extraParams = this.form.select('div#custom_pane input');
+		
 		if(login.value == ''){
 			ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.38']);
 			return false;
@@ -485,6 +552,9 @@ ConfigEditor = Class.create({
 		parameters = new Hash();
 		parameters.set('new_user_login', login.value);
 		parameters.set('new_user_pwd', this.encodePassword(pass.value));
+		extraParams.each( function(input){
+			parameters.set('DRIVER_OPTION_'+input.name, input.value);
+		});
 		this.submitForm("create_user", 'create_user', parameters, null);
 		return true;		
 	},
@@ -1056,7 +1126,6 @@ ConfigEditor = Class.create({
 			this.messageBox.update(this.messageContent);
 			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
 		}		
-		message = message.stripScripts();
 		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}

@@ -59,6 +59,12 @@
 						return false;
 					};
 					var loadFunc = function(oForm){
+						if(!ajaxplorer.actionBar.configEditor){
+							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+						}	
+						ajaxplorer.actionBar.configEditor.setForm(oForm);
+						ajaxplorer.actionBar.configEditor.loadCreateUserForm();
+						
 						new Protopass(oForm.down('input[name="new_user_pwd"]'), {
 							barContainer:$('pwd_strength_container'),
 							barPosition:'bottom'
@@ -78,6 +84,10 @@
 							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input name="new_user_pwd_conf" type="password" class="SF_input"/>
 						</div>
 						<div class="SF_element" id="pwd_strength_container"></div>
+						<div style="clear:both; display:none;" class="dialogLegend" ajxp_message_id="89">AJXP_MESSAGE[ajxp_conf.89]</div>
+						<div id="custom_pane" class="config_subblock" style="display:none;">
+							
+						</div>
 					</div>				
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -284,6 +294,10 @@
 									<div class="config_subblock">
 										<input id="admin_rights" class="user_delete_confirm" type="checkbox" style="width:20px;float:right;" /><span ajxp_message_id="ajpx_conf.28">AJXP_MESSAGE[ajxp_conf.28]</span>
 									</div>
+								</div>
+								<div class="dialogLegend" style="display:none;" ajxp_message_id="89">AJXP_MESSAGE[ajxp_conf.89]</div>
+								<div id="custom_pane" class="config_subblock" style="display:none;">
+									
 								</div>
 								<div class="dialogLegend" ajxp_message_id="81">AJXP_MESSAGE[ajxp_conf.81]</div>
 								<div id="wallets_pane" class="config_subblock" style="margin-bottom:0px;">

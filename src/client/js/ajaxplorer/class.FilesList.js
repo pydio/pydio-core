@@ -186,6 +186,11 @@ Class.create("FilesList", SelectableElements, {
 			}
 			if(columnsNode.getAttribute('switchDisplayMode')){
 				var dispMode = columnsNode.getAttribute('switchDisplayMode');
+				this._fullview = false;
+				if(dispMode == "full"){
+					this._fullview = true;
+					dispMode = "list";
+				}
 				if(dispMode != this._displayMode){
 					this.switchDisplayMode(dispMode);
 				}				
@@ -858,6 +863,10 @@ Class.create("FilesList", SelectableElements, {
 		for(i = 0; i<attKeys.length;i++ ){
 			var s = attKeys[i];			
 			var tableCell = new Element("td");			
+			var fullview = '';
+			if(this._fullview){
+				fullview = ' full';
+			}
 			if(s == "ajxp_label")
 			{
 				var innerSpan = new Element("span", {
@@ -889,7 +898,7 @@ Class.create("FilesList", SelectableElements, {
 			else
 			{
 				var metaValue = metaData.get(s) || "";
-				tableCell.update('<span class="text_label">' + metaValue  + "</span>");
+				tableCell.update('<span class="text_label'+fullview+'">' + metaValue  + "</span>");
 			}
 			if(this.gridStyle == "grid"){
 				tableCell.setAttribute('valign', 'top');				
