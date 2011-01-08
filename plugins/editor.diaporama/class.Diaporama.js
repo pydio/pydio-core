@@ -185,6 +185,10 @@ Class.create("Diaporama", AbstractEditor, {
 			this.IEorigWidth = this.element.getWidth();
 			this.imgContainer.setStyle({width:this.IEorigWidth});
 		}
+		if(window.ajxpMobile){
+			this.setFullScreen();
+			attachMobileScroll(this.imgContainer, "both");
+		}				
 	},
 	
 	resize : function(size){

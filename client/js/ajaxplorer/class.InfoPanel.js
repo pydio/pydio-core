@@ -36,6 +36,7 @@ Class.create("InfoPanel", AjxpPane, {
 
 	initialize: function($super, htmlElement){
 		$super(htmlElement);
+		attachMobileScroll(htmlElement, "vertical");
 		disableTextSelection(htmlElement);
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
 		this.mimesTemplates = new Hash();

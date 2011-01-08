@@ -77,6 +77,10 @@ Class.create("CodePressEditor", TextEditor, {
 		fitHeightToBottom($(this.textarea), $(modal.elementName));
 		// LOAD FILE NOW
 		this.loadFileContent(fileName);
+		if(window.ajxpMobile){
+			this.setFullScreen();
+			attachMobileScroll(this.textarea, "vertical");
+		}				
 	},
 			
 	saveFile : function(){

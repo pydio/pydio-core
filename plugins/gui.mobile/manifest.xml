@@ -2,6 +2,15 @@
 <ajxpdriver name="ajxp_mobile" label="Mobile" description="Simple Template for Mobile">
 	<registry_contributions>
 		<client_configs uuidAttr="name">
+			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
+				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
+				<script type="text/javascript">
+					window.ajxpMobile = true;
+					var conn = new Connexion();
+					conn._libUrl = '';
+					conn.loadLibrary('plugins/gui.mobile/ajxp-mobile.js');
+				</script>
+			]]></template>
 			<template name="main" element="ajxp_desktop" position="top"><![CDATA[
 				<div id="toolbars">
 					<div id="action_bar">
@@ -24,14 +33,6 @@
 					<div id="info_panel" ajxpClass="InfoPanel" ajxpOptions="{fit:'height'}" class="ajxp_simple_container"></div>
 				</div>
 				<div id="mobile_actions" style="display:none"><a class="m-2" href="#">Info</a> <a class="m-2" href="#">Explore</a></div>
-			]]></template>
-			<template name="test" element="head" position="bottom"><![CDATA[
-				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
-				<script type="text/javascript">
-					var conn = new Connexion();
-					conn._libUrl = '';
-					conn.loadLibrary('plugins/gui.mobile/ajxp-mobile.js');
-				</script>
 			]]></template>
 			<component_config className="FilesList">
 				<property name="thumbSize" value="16"/>

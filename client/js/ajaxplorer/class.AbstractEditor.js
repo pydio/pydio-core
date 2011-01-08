@@ -85,6 +85,10 @@ Class.create("AbstractEditor" , {
 				}
 				return true;
 			}.bind(this) );			
+			if(window.ajxpMobile){
+				// Make sure "Close" is the first.
+				this.actionBar.insert({top:this.actions.get("closeButton")});
+			}
 		}
 		if(this.actions.get("fsButton")){
 			this.actions.get("fsButton").observe("click", this.setFullScreen.bind(this));
@@ -96,6 +100,8 @@ Class.create("AbstractEditor" , {
 		if(this.editorOptions.floatingToolbar){
 			this.makeToolbarFloatable();
 		}
+		
+		attachMobileScroll(this.actionBar, "horizontal");
 		
 	},
 	

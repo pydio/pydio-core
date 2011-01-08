@@ -1,49 +1,10 @@
-function scrollByTouch(event, direction, targetId){
-	var touchData = event.changedTouches[0];
-	var type = event.type;
-	if(!$(touchData.target) || ! $(touchData.target).up ) return;
-	var target = $(touchData.target).up('#'+targetId);
-	if(!target) return;
-	if(direction == "vertical"){
-		var eventPropName = "clientY";
-		var targetPropName = "scrollTop";
-	}else{
-		var eventPropName = "clientX";
-		var targetPropName = "scrollLeft";					
+function getAjxpMobileActions(){
+	var mobileActions = $('mobile_actions_copy');
+	if(mobileActions){
+		return mobileActions;
 	}
-	if(type == "touchstart"){
-		target.originalTouchPos = touchData[eventPropName];
-		target.originalScroll = target[targetPropName];
-		if(target.notify){
-			target.notify('ajaxplorer:touch_start');
-		}
-	}else if(type == "touchend"){
-		if(target.originalTouchPos){
-			event.preventDefault();
-		}
-		if(target.notify){
-			target.notify('ajaxplorer:touch_end');
-		}
-		target.originalTouchPos = null;
-		target.originalScroll = null;
-	}else if(type == "touchmove"){
-		event.preventDefault();
-		if(!target.originalTouchPos == null) return;
-		var delta = touchData[eventPropName] - target.originalTouchPos;
-		target[targetPropName] = target.originalScroll - delta;
-	}
-}
-
-function attachSimpleScroll(targetId, direction){
-	var target = $(targetId);
-	if(!target) return;
-	target.addEventListener("touchmove", function(event){ scrollByTouch(event, direction, targetId); });
-	target.addEventListener("touchstart", function(event){ scrollByTouch(event, direction, targetId); });
-	target.addEventListener("touchend", function(event){ scrollByTouch(event, direction, targetId); });
-}
-
-function initMobileActions(){
-	var mobileActions = $('mobile_actions');
+	mobileActions = $('mobile_actions').clone(true);
+	mobileActions.id = "mobile_actions_copy";
 	var act = mobileActions.select('a');
 	act[0].observe('click', function(e){
 		Event.stop(e);
@@ -54,56 +15,70 @@ function initMobileActions(){
 			action.observe("click", function(){$('info_container').hide();});
 		});
 	});
-	act[1].observe('click', function(e){
-		ajaxplorer.actionBar.fireAction('ls');
+	act[1].observe('click', function(e){		
+		ajaxplorer.actionBar.fireAction(act[1]._action);
 		Event.stop(e);
 	});
-	document.observe("ajaxplorer:selection_changed", function(){
-		var mobileActions = $('mobile_actions');
-		mobileActions.hide();
-		var reg = ajaxplorer.guiCompRegistry;
-		var list = ajaxplorer.guiCompRegistry.detect(function(el){return (el.__className == "FilesList");});
+	return mobileActions;
+}
+
+function initAjxpMobileActions(){
+	document.observe("ajaxplorer:selection_changed", function(e){
+		var list = e.memo._selectionSource;
 		if(!list) return;
+		var mobileActions = getAjxpMobileActions();
+		mobileActions.hide();
 		var items = list.getSelectedItems();
 		var node = ajaxplorer.getContextHolder().getUniqueNode();
+		var a = mobileActions.select('a')[1];		
+		
 		if(node && node.isLeaf()){
-			mobileActions.select('a')[1].hide();
+			//mobileActions.select('a')[1].hide();
+			var editors = ajaxplorer.findEditorsForMime(getAjxpMimeType(node));			
+			if(editors.length){
+				a.show();
+				a._action = "open_with";
+				a.update("Open");
+			}else{
+				a.hide();
+			}			
 		}else{
-			mobileActions.select('a')[1].show();
+			a.show();
+			a._action = "ls";			
+			a.update("Explore");
 		}
 		if(items && items.length){
 			var item = items[0];
-			itemPos = item.cumulativeOffset();
+			//itemPos = item.cumulativeOffset();
+			itemPos = item.positionedOffset();
 			itemDim = item.getDimensions();
 			itemScroll = item.cumulativeScrollOffset();
 			var listDisp = list._displayMode;
 			mobileActions.show();
 			var left;
+			var container;
 			if(listDisp == "thumb"){
 				left = itemPos[0] + 2;
+				container = $("selectable_div");
 			}else{
 				left = itemPos[0] + itemDim.width - 90 - 2;
+				container = $("table_rows_container");
 			}
+			container.insert(mobileActions);
+			container.setStyle({position:'relative'});
 			mobileActions.setStyle({
 				zIndex:list.htmlElement.style.zIndex + 1,
 				position:'absolute',
 				left: left + 'px',
-				top:(itemPos[1] - itemScroll[1]) + 1 + 'px'
+				top:(itemPos[1]) + 2 + 'px'
 			});						
 		}
 	});				
 }
 
 document.observe("ajaxplorer:gui_loaded", function(){
-	initMobileActions();
+	initAjxpMobileActions();
 	document.addEventListener("touchmove", function(event){
 		event.preventDefault();
 	});
-	window.setTimeout(function(){
-		attachSimpleScroll('table_rows_container', "vertical");
-		attachSimpleScroll('selectable_div', "vertical");
-		attachSimpleScroll('info_panel', "vertical");
-		attachSimpleScroll('buttons_bar', "horizontal");
-		attachSimpleScroll('div.rootDirChooser', "vertical");
-	}, 5000);				
 });
