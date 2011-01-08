@@ -123,6 +123,11 @@ textarea{
 	white-space : nowrap;
 }
 
+.text_label.full{
+	height: auto;
+	white-space: normal;
+}
+
 .list_selectable_span img {
 	float: left;
 }

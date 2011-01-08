@@ -99,6 +99,7 @@ $mess=array(
 "86" => "Liste d'actions qui seront désactivées pour ce rôle, quelque soit le droit d'accès associé.",
 "87" => "Les actions ont été mises à jour pour ce rôle.",
 "88" => "Ce dépot est défini dans le fichier de configuration, il n'est pas possible de mettre à jour les métadonnées via l'interface.",
+"89" => "Données spécifiques de l'utilisateur",
 /* END SENTENCE */
 );
 ?>

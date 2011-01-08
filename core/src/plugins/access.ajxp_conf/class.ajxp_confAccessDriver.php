@@ -188,6 +188,22 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 			break;		
 			
+			case "get_custom_params" :
+				$confStorage = ConfService::getConfStorageImpl();
+				AJXP_XMLWriter::header("admin_data");
+				$confDriver = ConfService::getConfStorageImpl();
+				$customData = $confDriver->options['CUSTOM_DATA'];
+				if(is_array($customData) && count($customData)>0 ){
+					print("<custom_data>");
+					foreach($customData as $custName=>$custValue){
+						print("<param name=\"$custName\" type=\"string\" label=\"$custValue\" description=\"\" value=\"\"/>");
+					}
+					print("</custom_data>");
+				}
+				AJXP_XMLWriter::close("admin_data");
+				
+			break;
+			
 			case "edit_user" : 
 				$confStorage = ConfService::getConfStorageImpl();	
 				$userId = $httpVars["user_id"];	
@@ -199,6 +215,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header("admin_data");
 				AJXP_XMLWriter::sendUserData($userObject, true);
 				
+				// Add CUSTOM USER DATA
+				$confDriver = ConfService::getConfStorageImpl();
+				$customData = $confDriver->options['CUSTOM_DATA'];
+				if(is_array($customData) && count($customData)>0 ){
+					$userCustom = $userObject->getPref("CUSTOM_PARAMS");
+					print("<custom_data>");
+					foreach($customData as $custName=>$custValue){
+						$value = isset($userCustom[$custName]) ? $userCustom[$custName] : '';
+						print("<param name=\"$custName\" type=\"string\" label=\"$custValue\" description=\"\" value=\"$value\"/>");
+					}
+					print("</custom_data>");
+				}
 				// Add WALLET DATA : DEFINITIONS AND VALUES
 				print("<drivers>");
 				print(ConfService::availableDriversToXML("user_param"));
@@ -225,7 +253,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				print("</ajxp_roles>");
 				AJXP_XMLWriter::close("admin_data");
-				exit(1) ;
+				
 			break;
 			
 			case "create_user" :
@@ -249,6 +277,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 				$confStorage = ConfService::getConfStorageImpl();		
 				$newUser = $confStorage->createUserObject($new_user_login);
+				
+				$customData = array();
+				$this->parseParameters($httpVars, $customData);
+				if(is_array($customData) && count($customData)>0)
+					$newUser->setPref("CUSTOM_PARAMS", $customData);
+				
 				$newUser->save();
 				AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
 				AJXP_XMLWriter::header();
@@ -372,7 +406,31 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 			break;
 			
-			
+			case "save_custom_user_params" : 
+				$userId = $httpVars["user_id"];
+				if($userId == $loggedUser->getId()){
+					$user = $loggedUser;
+				}else{
+					$confStorage = ConfService::getConfStorageImpl();		
+					$user = $confStorage->createUserObject($userId);
+				}
+				$custom = $user->getPref("CUSTOM_PARAMS");
+				if(!is_array($custom)) $custom = array();
+				
+				$options = $custom;
+				$this->parseParameters($httpVars, $options, $userId);
+				$custom = $options;
+				$user->setPref("CUSTOM_PARAMS", $custom);
+				$user->save();
+				
+				if($loggedUser->getId() == $user->getId()){
+					AuthService::updateUser($user);
+				}
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.47"].$httpVars["user_id"], null);
+				AJXP_XMLWriter::close();
+					
+			break;
 			
 			case "save_repository_user_params" : 
 				$userId = $httpVars["user_id"];

@@ -111,7 +111,14 @@ $PLUGINS = array(
 		"OPTIONS"	=> array(
 			"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/server/conf/repo.ser",
 			"ROLES_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/roles.ser",
-			"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users")
+			"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users",
+			/*
+			"CUSTOM_DATA"			=> array(
+				"email"	=> "Email", 
+				"country" => "Country"
+			)
+			*/
+			)
 	),
 	"AUTH_DRIVER" => array(
 		"NAME"		=> "serial",
