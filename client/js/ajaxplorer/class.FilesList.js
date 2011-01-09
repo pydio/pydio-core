@@ -232,6 +232,9 @@ Class.create("FilesList", SelectableElements, {
 				if(property.getAttribute("name") == "thumbSize"){
 					this._thumbSize = parseInt(property.getAttribute("value"));
 					refreshGUI = true;
+				}else if(property.getAttribute("name") == "fixedThumbSize"){
+					this._fixedThumbSize = parseInt(property.getAttribute("value"));
+					refreshGUI = true;
 				}else if(property.getAttribute("name") == "displayMode"){
 					var displayMode = property.getAttribute("value");
 					if(!(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("display"))){
@@ -330,6 +333,9 @@ Class.create("FilesList", SelectableElements, {
 				var userWidth = 0;
 				if(this.gridStyle != "grid" && userPref && userPref.get(i) && i<(visibleColumns.length-1)){
 					userWidth = userPref.get(i);
+				}
+				if(column.fixedWidth){
+					userWidth = column.fixedWidth;
 				}
 				var label = (column.messageId?MessageHash[column.messageId]:column.messageString);
 				var leftPadding = 0;
@@ -439,6 +445,9 @@ Class.create("FilesList", SelectableElements, {
 			
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("thumb_size")){
 				this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
+			}
+			if(this._fixedThumbSize){
+				this._thumbSize = parseInt(this._fixedThumbSize);
 			}
 
 			
