@@ -169,6 +169,9 @@ Class.create("Modal", {
 	
 		// WIDTH / HEIGHT
 		if(boxWidth != null){
+			if(boxWidth.indexOf("%") ==-1 && parseInt(boxWidth) > winWidth){
+				boxWidth = '90%';
+			}
 			if(boxWidth.indexOf('%') > -1){
 				percentWidth = parseInt(boxWidth);
 				boxWidth = parseInt((winWidth * percentWidth) / 100);
