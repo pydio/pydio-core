@@ -35,10 +35,10 @@
 				<div id="mobile_actions" style="display:none"><a class="m-2" href="#">Info</a> <a class="m-2" href="#">Explore</a></div>
 			]]></template>
 			<component_config className="FilesList">
-				<property name="thumbSize" value="16"/>
+				<property name="fixedThumbSize" value="40"/>
 				<columns switchGridMode="filelist">
-					<column messageId="1" attributeName="ajxp_label"/>
-					<column messageId="2" attributeName="filesize"/>
+					<column messageId="1" attributeName="ajxp_label" fixedWidth="60%"/>
+					<column messageId="2" attributeName="filesize" fixedWidth="40%"/>
 				</columns>				
 			</component_config>			
 		</client_configs>
