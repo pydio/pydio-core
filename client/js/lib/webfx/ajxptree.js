@@ -82,6 +82,8 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	}.bind(jsNode));
 	ajxpNode.observe("node_replaced", function(newNode){
 		// Should refresh label / icon
+		if(jsNode.updateIcon) jsNode.updateIcon(resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 16));
+		if(jsNode.updateLabel) jsNode.updateLabel(ajxpNode.getLabel());
 	}.bind(jsNode));
 	ajxpNode.observeOnce("node_removed", function(e){
 		jsNode.remove();

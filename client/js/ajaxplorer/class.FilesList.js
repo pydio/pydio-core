@@ -176,6 +176,7 @@ Class.create("FilesList", SelectableElements, {
 	
 	parseComponentConfig : function(domNode){
 		refreshGUI = false;
+		this.columnsTemplate = false;
 		// CHECK FOR COLUMNS DEFINITION DATA
 		var columnsNode = XPathSelectSingleNode(domNode, "columns");
 		if(columnsNode){
@@ -194,7 +195,10 @@ Class.create("FilesList", SelectableElements, {
 				if(dispMode != this._displayMode){
 					this.switchDisplayMode(dispMode);
 				}				
-			}						
+			}
+			if(columnsNode.getAttribute('template_name')){
+				this.columnsTemplate = columnsNode.getAttribute('template_name');
+			}
 			// COLUMNS INFO
 			var columns = XPathSelectNodes(columnsNode, "column");
 			var addColumns = XPathSelectNodes(columnsNode, "additional_column");
@@ -306,11 +310,6 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "list")
 		{
 			var buffer = '';
-			/*
-			if(this.gridStyle == "grid"){
-				//buffer = buffer + '<div style="overflow:hidden;background-color: #aaa;">';
-			}
-			*/
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_visibility", true)){
 				var data = new Hash(ajaxplorer.user.getPreference("columns_visibility", true));
 				if(data.get(ajaxplorer.user.getActiveRepository())){
@@ -323,7 +322,9 @@ Class.create("FilesList", SelectableElements, {
 			var userPref;
 			if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("columns_size", true)){
 				var data = new Hash(ajaxplorer.user.getPreference("columns_size", true));
-				if(data.get(ajaxplorer.user.getActiveRepository())){
+				if(this.columnsTemplate && data.get(this.columnsTemplate)){
+					userPref = new Hash(data.get(this.columnsTemplate));
+				}else if(data.get(ajaxplorer.user.getActiveRepository())){
 					userPref = new Hash(data.get(ajaxplorer.user.getActiveRepository()));
 				}
 			}
@@ -331,7 +332,7 @@ Class.create("FilesList", SelectableElements, {
 			for(var i=0; i<visibleColumns.length;i++){
 				var column = visibleColumns[i];
 				var userWidth = 0;
-				if(this.gridStyle != "grid" && userPref && userPref.get(i) && i<(visibleColumns.length-1)){
+				if((this.gridStyle != "grid" || this.columnsTemplate) && userPref && userPref.get(i) && i<(visibleColumns.length-1)){
 					userWidth = userPref.get(i);
 				}
 				if(column.fixedWidth){
@@ -364,12 +365,13 @@ Class.create("FilesList", SelectableElements, {
 			this._headerResizer.observe("drag_resize", function(){
 				if(this.prefSaver) window.clearTimeout(this.prefSaver);
 				this.prefSaver = window.setTimeout(function(){
-					if(!ajaxplorer.user || this.gridStyle == "grid") return;
+					if(!ajaxplorer.user || (this.gridStyle == "grid" && !this.columnsTemplate)) return;
 					var sizes = this._headerResizer.getCurrentSizes('percent');
 					var data = ajaxplorer.user.getPreference("columns_size", true);
 					data = (data?new Hash(data):new Hash());
 					sizes['type'] = 'percent';
-					data.set(ajaxplorer.user.getActiveRepository(), sizes);
+					var id = (this.columnsTemplate?this.columnsTemplate:ajaxplorer.user.getActiveRepository());
+					data.set(id, sizes);
 					ajaxplorer.user.setPreference("columns_size", data, true);
 					ajaxplorer.user.savePreference("columns_size");
 				}.bind(this), 2000);				
