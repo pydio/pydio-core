@@ -474,6 +474,14 @@ function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon) {
 
 WebFXTreeItem.prototype = new WebFXTreeAbstractNode;
 
+WebFXTreeItem.prototype.updateIcon = function(icon){
+	this.icon = this.openIcon = icon;
+	if($(this.id+"-icon")){
+		$(this.id+"-icon").src = icon;
+	}
+};
+
+
 WebFXTreeItem.prototype.remove = function() {
 	if(!$(this.id+'-plus')) return;
 	var iconSrc = $(this.id + '-plus').src;

@@ -276,6 +276,7 @@ class textLogDriver extends AbstractLogDriver {
 					$match = str_replace("\"", "'", $match);
 					$matches[$key] = $match;
 				}
+				if(count($matches) < 3) continue;
 				print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />"));
 			}
 		}
