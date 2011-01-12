@@ -113,60 +113,18 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			}			
 		}.bind(this) );
 		
+		// Remove python rule, if any
+		$$('link[href="plugins/editor.codemirror/css/linenumbers-py.css"]').invoke('remove');
+		
 	},
 	
 	
 	open : function($super, userSelection){
 		$super(userSelection);
 		var fileName = userSelection.getUniqueFileName();
-		this.initCodeMirror(false, function(){
-			this.loadFileContent(fileName);
-		}.bind(this));
 		
-		this.element.observe("editor:enterFS", function(e){
-			this.currentCode = this.codeMirror.getCode();
-			this.destroyCodeMirror();
-		}.bind(this) );
-
-		this.element.observe("editor:enterFSend", function(e){
-			this.initCodeMirror(true);
-			this.codeMirror.setLineNumbers(this.codeMirror.lineNumbers);
-		}.bind(this) );
-
-		this.element.observe("editor:exitFS", function(e){
-			this.currentCode = this.codeMirror.getCode();
-			this.destroyCodeMirror();
-		}.bind(this) );
-
-		this.element.observe("editor:exitFSend", function(e){
-			this.initCodeMirror();
-			this.codeMirror.setLineNumbers(this.codeMirror.lineNumbers);
-		}.bind(this) );
-
-		this.updateHistoryButtons();
-
-		if(window.ajxpMobile){
-			this.setFullScreen();
-			//attachMobileScroll(this.textarea, "vertical");
-		}		
-	},
-	
-	updateHistoryButtons: function(){
-		var sizes = $H({undo:0,redo:0});
-		if(this.codeMirror){
-			try{
-				sizes = $H(this.codeMirror.historySize());
-			}catch(e){}
-		}
-		var actions = this.actions;
-		sizes.each(function(pair){
-			actions.get(pair.key+"Button")[(pair.value?'removeClassName':'addClassName')]('disabled');
-		});
-	},
-	
-	initCodeMirror : function(fsMode, onLoad){
 		var path = 'plugins/editor.codemirror/CodeMirror/';
-		var extension = getFileExtension(this.userSelection.getUniqueFileName());
+		var extension = getFileExtension(fileName);
 		var parserFile; var styleSheet;
 		var parserConfig = {};
 		switch(extension){
@@ -228,23 +186,11 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 				styleSheet = path + '../css/dummycolors.css';
 			break;
 		}
-		this.codeMirror = new CodeMirror(function(iFrame){
-				this.contentMainContainer = iFrame;
-				this.element.insert({bottom:iFrame});
-				if(fsMode){
-					fitHeightToBottom($(this.contentMainContainer));
-				}else{
-					fitHeightToBottom($(this.contentMainContainer), $(modal.elementName));
-				}
-			}.bind(this), 
-			{
+		this.options = 	{
 			path:path + 'js/',
 			parserfile:parserFile,
 			stylesheet:styleSheet,
 			parserConfig:parserConfig,
-			indentUnit:this.indentSize,
-			textWrapping: this.textWrapping,
-			lineNumbers : this.lineNumbers,
 			onChange : function(){ 				
 				this.updateHistoryButtons();
 				var sizes = this.codeMirror.historySize();
@@ -253,17 +199,80 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 				}else{
 					this.setModified(false);
 				}
-			}.bind(this), 
-			onLoad : onLoad? onLoad : function(mirror){
-				if(this.currentCode){
-					var mod = this.isModified;
-					mirror.setCode(this.currentCode);
-					if(!mod){
-						this.setModified(false);
-					}
-				}
 			}.bind(this)
-		});			
+		};
+		
+		
+		this.initCodeMirror(false, function(){
+			this.loadFileContent(fileName);
+		}.bind(this));
+		
+		this.element.observe("editor:enterFS", function(e){
+			this.currentCode = this.codeMirror.getCode();
+			this.destroyCodeMirror();
+		}.bind(this) );
+
+		this.element.observe("editor:enterFSend", function(e){
+			this.initCodeMirror(true);
+			this.codeMirror.setLineNumbers(this.codeMirror.lineNumbers);
+		}.bind(this) );
+
+		this.element.observe("editor:exitFS", function(e){
+			this.currentCode = this.codeMirror.getCode();
+			this.destroyCodeMirror();
+		}.bind(this) );
+
+		this.element.observe("editor:exitFSend", function(e){
+			this.initCodeMirror();
+			this.codeMirror.setLineNumbers(this.codeMirror.lineNumbers);
+		}.bind(this) );
+
+		this.updateHistoryButtons();
+		
+		if(window.ajxpMobile){
+			this.setFullScreen();
+			//attachMobileScroll(this.textarea, "vertical");
+		}		
+	},
+	
+	updateHistoryButtons: function(){
+		var sizes = $H({undo:0,redo:0});
+		if(this.codeMirror){
+			try{
+				sizes = $H(this.codeMirror.historySize());
+			}catch(e){}
+		}
+		var actions = this.actions;
+		sizes.each(function(pair){
+			actions.get(pair.key+"Button")[(pair.value?'removeClassName':'addClassName')]('disabled');
+		});
+	},
+	
+	initCodeMirror : function(fsMode, onLoad){
+
+		this.options.indentUnit = this.indentSize;
+		this.options.textWrapping = this.textWrapping;
+		this.options.lineNumbers = this.lineNumbers;
+
+		this.options.onLoad = onLoad? onLoad : function(mirror){
+			if(this.currentCode){
+				var mod = this.isModified;
+				mirror.setCode(this.currentCode);
+				if(!mod){
+					this.setModified(false);
+				}
+			}
+		}.bind(this);		
+		
+		this.codeMirror = new CodeMirror(function(iFrame){
+				this.contentMainContainer = iFrame;
+				this.element.insert({bottom:iFrame});
+				if(fsMode){
+					fitHeightToBottom($(this.contentMainContainer));
+				}else{
+					fitHeightToBottom($(this.contentMainContainer), $(modal.elementName));
+				}
+			}.bind(this), this.options);			
 	},
 		
 	destroyCodeMirror : function(){
