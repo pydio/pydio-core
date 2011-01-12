@@ -4,6 +4,7 @@
 		<i18n namespace="code_mirror" path="plugins/editor.codemirror/i18n" autoload="true"/>			
 		<js file="plugins/editor.codemirror/class.CodeMirrorEditor.js" className="CodeMirrorEditor"/>
 		<js file="plugins/editor.codemirror/CodeMirror/js/codemirror.js" className="CodeMirror"/>
+		<css file="plugins/editor.codemirror/css/linenumbers.css"/>
 		<img_library alias="codemirror_images" path="plugins/editor.codemirror"/>		
 	</resources>
 	<clientForm id="codemirror_box"><![CDATA[
@@ -22,19 +23,6 @@
 				<a href="#" onclick="return false;" id="toggleWrapButton"><img width="22" height="22" src="plugins/editor.codemirror/img/format_wrap.png" title="AJXP_MESSAGE[code_mirror.3b]" border="0"><br><span message_id="code_mirror.3">AJXP_MESSAGE[code_mirror.3]</span></a>
 			</div>
 		</div>
-		<style type="text/css">
-	      .CodeMirror-line-numbers {
-	        width: 2.2em;
-	        color: #aaa;
-	        background-color: #eee;
-	        text-align: right;
-	        padding-right: .3em;
-	        font-size: 10pt;
-	        font-family: monospace;
-	        padding-top: .4em;
-	        line-height: normal;
-	      }	
-		</style>
 	]]></clientForm>	
 	<dependencies>
 		<!-- Stream Wrapper Access -->
