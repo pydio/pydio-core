@@ -194,6 +194,7 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			case 'py':
 				parserFile = "../contrib/python/js/parsepython.js";
 				styleSheet = path+"contrib/python/css/pythoncolors.css";
+				ResourcesManager.prototype.loadCSSResource('plugins/editor.codemirror/css/linenumbers-py.css');
 			break;
 			case 'lua':
 				parserFile = "../contrib/lua/js/parselua.js";
@@ -218,7 +219,7 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			break;
 			default:
 				parserFile = "parsedummy.js";
-				styleSheet = path + '../dummycolors.css';
+				styleSheet = path + '../css/dummycolors.css';
 			break;
 		}
 		this.codeMirror = new CodeMirror(function(iFrame){
