@@ -10,10 +10,10 @@
 			1/ Base Installation</h3>
 		<p>
 			<strong>1.1 Install AjaXplorer and Joomla</strong><br />
-			First of all, make sure you have AjaXplorer 3.0.1 installed and Joomla 1.5.</p>
+			First of all, make sure you have AjaXplorer 3.0.1 installed and Joomla 1.5 or 1.6</p>
 		<p>
 			<strong>1.2 Install Joomla plugin</strong><br />
-			Unpack the joomla.user.ajaxplorer.zip inside the &quot;<em>tmp</em>&quot; folder of your Joomla installation.</p>
+			Drop the right plugin version (1.5 or 1.6) inside your Joomla installation folder (the &quot;<em>tmp</em>&quot; folder of your Joomla installation.)</p>
 		<h3>
 			2/ AjaXplorer configuration</h3>
 		<p>
@@ -53,7 +53,7 @@
 			Login to Joomla adminstration front-end and go to &quot;Extensions &gt; Install/Uninstall&quot;. Normally, the &quot;Install from a folder&quot; section should be already filled with your &quot;tmp&quot; folder path. Click &quot;Install&quot; beside this field. It should install successfully the User - AjaXplorer plugin.</p>
 		<p>
 			<strong>3.2 Activate and Configure the new plugin</strong><br />
-			Go to &quot;Extension &gt; Manage Plugins&quot; and find the User - AjaXplorer plugin module in the list. You can select the plugin type &quot;user&quot; to filter the list. Click in the &quot;Active&quot; column to activate this plugin, then enter the plugin configuration. There are three parameters to configure for this plugin :&nbsp;</p>
+			Go to &quot;Extension &gt; Manage Plugins&quot; and find the User - AjaXplorer plugin module in the list. You can select the plugin type &quot;user&quot; to filter the list. Click in the &quot;Active&quot; column to activate this plugin, then enter the plugin configuration. Change the "Order" parameter to make sure this plugin is called AFTER your master authentication plugin, generally user.joomla. Then there are three ajxp-parameters to configure for this plugin :&nbsp;</p>
 		<ul>
 			<li>
 				<strong>AjaXplorer Install Path</strong> : here you have to enter the full path to the AjaXplorer installation. &quot;Full path&quot; in the sense of the server filesystem. On Windows, it could be C:/Programs/ApacheData/html/ajaxplorer, or Linux more probably /var/www/html/AjaXplorer. In any cases, use &quot;slashes&quot; and not backslashes, and take care that names are case sensitive.</li>
