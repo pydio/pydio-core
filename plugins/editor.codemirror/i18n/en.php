@@ -11,7 +11,7 @@
 //---------------------------------------------------------------------------------------------------
 
 $mess=array(
-"1"	=> "CodeMirror",
+"1"	=> "Source Editor",
 "2"	=> "CodeMirror Syntax Highlighter",
 "3" => "Wrapping",
 "3b"=> "Toggle lines wrapping",

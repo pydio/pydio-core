@@ -37,6 +37,11 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 	initialize: function($super, oFormObject)
 	{
 		$super(oFormObject);
+		
+		this.textWrapping = false;
+		this.lineNumbers = true;
+		this.indentSize = 2;		
+		
 		if(!ajaxplorer.user || ajaxplorer.user.canWrite()){
 			this.canWrite = true;
 			this.actions.get("saveButton").observe('click', function(){
@@ -55,15 +60,16 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 	
 		this.actions.get("toggleLinesButton").observe('click', function(){
 			if(this.codeMirror){
-				this.codeMirror.setLineNumbers(!this.codeMirror.lineNumbers);
+				this.lineNumbers = !this.codeMirror.lineNumbers;
+				this.codeMirror.setLineNumbers(this.lineNumbers);
 			}
 			return false;
 		}.bind(this));		
 		
 		this.actions.get("toggleWrapButton").observe('click', function(){
 			if(this.codeMirror){
-				window.myCode = this.codeMirror;
-				this.codeMirror.setTextWrapping(!this.codeMirror.options.textWrapping);
+				this.textWrapping = !this.codeMirror.options.textWrapping;
+				this.codeMirror.setTextWrapping(this.textWrapping);
 			}
 			return false;
 		}.bind(this));		
@@ -236,9 +242,9 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 			parserfile:parserFile,
 			stylesheet:styleSheet,
 			parserConfig:parserConfig,
-			indentUnit:2,
-			textWrapping:false,
-			lineNumbers : true,
+			indentUnit:this.indentSize,
+			textWrapping: this.textWrapping,
+			lineNumbers : this.lineNumbers,
 			onChange : function(){ 				
 				this.updateHistoryButtons();
 				var sizes = this.codeMirror.historySize();
