@@ -92,9 +92,17 @@ if(AuthService::usersEnabled())
 
 AJXP_Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
 
+if(isSet($_COOKIE["AJXP_LAST_KNOWN_VERSION"]) && $_COOKIE["AJXP_LAST_KNOWN_VERSION"] != AJXP_VERSION){
+	$mess = ConfService::getMessages();
+	$START_PARAMETERS["ALERT"] = sprintf($mess[392], AJXP_VERSION);
+}
+setcookie("AJXP_LAST_KNOWN_VERSION", AJXP_VERSION, time() + 3600*24*365);
+
 $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
 if(ConfService::getConf("JS_DEBUG")){
-	$mess = ConfService::getMessages();
+	if(!isSet($mess)){
+		$mess = ConfService::getMessages();
+	}
 	include_once(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/html/gui_debug.html");
 }else{
 	$content = file_get_contents(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/html/gui.html");	

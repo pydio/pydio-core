@@ -425,6 +425,7 @@ $mess=array(
 "389" => "Bitte den untenstehenden Code lesen:",
 "390" => "Code",
 "391" => "No Repository",
+"392" => "Warning, AjaXplorer version has changed (now %s), please clear your browser cache and refresh the page to be sure that everything is functionnal!",
 /* END SENTENCE */
 );
 ?>
