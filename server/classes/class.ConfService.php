@@ -38,6 +38,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class ConfService
 {	
 	private static $instance;
+	private $errors = array();
 	private $configs = array();
  	
 	public static function init($confFile){
@@ -102,6 +103,10 @@ class ConfService
 		$this->switchRootDirInst();
 	}
 	
+	public static function getErrors(){
+		return self::getInstance()->errors;
+	}
+	
 	public static function initActivePlugins(){
 		$inst = self::getInstance();
 		$inst->initActivePluginsInst();
@@ -134,6 +139,11 @@ class ConfService
 			throw new Exception("Cannot find plugin $key for type $plugType");
 		}
 		$instance->init($options);
+		try{
+			$instance->performChecks();
+		}catch (Exception $e){
+			$this->errors[$key] = "[$key] ".$e->getMessage();
+		}
 		$this->configs[$key] = $instance;
 		$pServ = AJXP_PluginsService::getInstance();
 		$pServ->setPluginUniqueActiveForType($plugType, $name);

@@ -138,7 +138,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($zip){
 					// Make a temp zip and send it as download
 					$loggedUser = AuthService::getLoggedUser();
-					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpDownload.zip";
+					$file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) throw new AJXP_Exception("Error while compressing");
 					register_shutdown_function("unlink", $file);
@@ -159,7 +159,7 @@ class fsAccessDriver extends AbstractAccessDriver
 					}else{
 						$localName = (basename($dir)==""?"Files":basename($dir)).".zip";
 					}
-					$file = USERS_DIR."/".($loggedUser?$loggedUser->getId():"shared")."/".time()."tmpCompression.zip";
+					$file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
 					$zipFile = $this->makeZip($selection->getFiles(), $file, $dir);
 					if(!$zipFile) throw new AJXP_Exception("Error while compressing file $localName");
 					register_shutdown_function("unlink", $file);					

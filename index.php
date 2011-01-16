@@ -92,6 +92,11 @@ if(AuthService::usersEnabled())
 
 AJXP_Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
 
+$confErrors = ConfService::getErrors();
+if(count($confErrors)){
+	$START_PARAMETERS["ALERT"] = implode(", ", array_values($confErrors));
+}
+
 if(isSet($_COOKIE["AJXP_LAST_KNOWN_VERSION"]) && $_COOKIE["AJXP_LAST_KNOWN_VERSION"] != AJXP_VERSION){
 	$mess = ConfService::getMessages();
 	$START_PARAMETERS["ALERT"] = sprintf($mess[392], AJXP_VERSION);
