@@ -1367,19 +1367,22 @@ class fsAccessDriver extends AbstractAccessDriver
 	 */
 	function chmod($path, $chmodValue, $recursive=false, $nodeType="both", &$changedFiles)
 	{
-	    $chmodValue = octdec(ltrim($chmodValue, "0"));
-		if(is_file($this->urlBase.$path) && ($nodeType=="both" || $nodeType=="file")){
-			call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $chmodValue);
-			$changedFiles[] = $path;
+	    $realValue = octdec(ltrim($chmodValue, "0"));
+		if(is_file($this->urlBase.$path)){
+			if($nodeType=="both" || $nodeType=="file"){
+				call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $realValue);
+				$changedFiles[] = $path;
+			}
 		}else{
 			if($nodeType=="both" || $nodeType=="dir"){
-				call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $chmodValue);				
+				call_user_func(array($this->wrapperClassName, "changeMode"), $this->urlBase.$path, $realValue);				
 				$changedFiles[] = $path;
 			}
 			if($recursive){
 				$handler = opendir($this->urlBase.$path);
 				while ($child=readdir($handler)) {
 					if($child == "." || $child == "..") continue;
+					// do not pass realValue or it will be re-decoded.
 					$this->chmod($path."/".$child, $chmodValue, $recursive, $nodeType, $changedFiles);
 				}
 				closedir($handler);
