@@ -44,9 +44,25 @@ class serialConfDriver extends AbstractConfDriver {
 	
 	function init($options){
 		parent::init($options);
-		$this->repoSerialFile = $options["REPOSITORIES_FILEPATH"];
-		$this->usersSerialDir = $options["USERS_DIRPATH"];
-		$this->rolesSerialFile = $options["ROLES_FILEPATH"];
+		$this->repoSerialFile = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $options["REPOSITORIES_FILEPATH"]);
+		$this->usersSerialDir = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $options["USERS_DIRPATH"]);
+		$this->rolesSerialFile = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $options["ROLES_FILEPATH"]);
+	}
+	
+	function performChecks(){
+		$this->performSerialFileCheck($this->repoSerialFile, "repositories file");
+		$this->performSerialFileCheck($this->usersSerialDir, "users file");
+		$this->performSerialFileCheck($this->rolesSerialFile, "roles file");
+	}
+	
+	function performSerialFileCheck($file, $fileLabel){
+		$dir = dirname($file);
+		if(!is_dir($dir) || !is_writable($dir)){
+			throw new Exception("Parent folder for $fileLabel is either inexistent or not writeable.");
+		}
+		if(is_file($file) && !is_writable($file)){
+			throw new Exception(ucfirst($fileLabel)." exists but is not writeable!");
+		}
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY

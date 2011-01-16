@@ -48,7 +48,6 @@ define("AJXP_EXEC", true);
 require("compat.php");
 $installPath = realpath(dirname(__FILE__)."/../..");
 define("INSTALL_PATH", $installPath);
-define("USERS_DIR", $installPath."/server/users");
 define("AJXP_PLUGINS_CACHE_FILE", INSTALL_PATH."/server/conf/plugins_cache.ser");
 define("SERVER_ACCESS", "content.php");
 define("ADMIN_ACCESS", "admin.php");
@@ -59,7 +58,6 @@ define("SERVER_RESOURCES_FOLDER", "server/classes");
 define("DOCS_FOLDER", "client/doc");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
 
-define("OLD_USERS_DIR", $installPath."/bookmarks");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 
 define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");

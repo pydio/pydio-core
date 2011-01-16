@@ -43,9 +43,19 @@ class serialAuthDriver extends AbstractAuthDriver {
 	
 	function init($options){
 		parent::init($options);
-		$this->usersSerFile = $options["USERS_FILEPATH"];
+		$this->usersSerFile = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $options["USERS_FILEPATH"]);
 	}
-			
+
+	function performChecks(){
+		$usersDir = dirname($this->usersSerFile);
+		if(!is_dir($usersDir) || !is_writable($usersDir)){
+			throw new Exception("Parent folder for users file is either inexistent or not writeable.");
+		}
+		if(is_file($this->usersSerFile) && !is_writable($this->usersSerFile)){
+			throw new Exception("Users file exists but is not writeable!");
+		}
+	}
+	
 	function listUsers(){
 		return AJXP_Utils::loadSerialFile($this->usersSerFile);
 	}
