@@ -72,6 +72,13 @@ class AJXP_Plugin{
 		$this->options = $options;
 		$this->loadRegistryContributions();
 	}
+	/**
+	 * Perform initialization checks, and throw exception if problems found.
+	 * @throws Exception
+	 */
+	public function performChecks(){
+		
+	}
 	protected function loadRegistryContributions(){		
 		$regNodes = $this->xPath->query("registry_contributions/*");
 		for($i=0;$i<$regNodes->length;$i++){
