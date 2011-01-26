@@ -424,8 +424,8 @@ $mess=array(
 "386" => "Drei Loginversuche sind fehlgeschlagen.\nZur Sicherheit bitte das Wort im Bild eingeben.",
 "389" => "Bitte den untenstehenden Code lesen:",
 "390" => "Code",
-"391" => "No Repository",
-"392" => "Warning, AjaXplorer version has changed (now %s), please clear your browser cache and refresh the page to be sure that everything is functionnal!",
+"391" => "Kein Repository",
+"392" => "Achtung, die Version des AjaXplorer hat sich geändert (jetzt %s). Bitte den Browser-Cache leeren und die Seite neu laden!",
 /* END SENTENCE */
 );
 ?>
