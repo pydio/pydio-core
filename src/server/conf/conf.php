@@ -295,7 +295,7 @@ $use_https=false;
 /**************************************************/
 /* MAX NUMBER CHARS FOR FILE AND DIRECTORY NAMES
 /**************************************************/
-$max_caracteres=70;
+$max_caracteres=255;
 
 /*************************************************/
 /* WHEN SET, USE SYSTEM CODE TO GET FILESIZE. 

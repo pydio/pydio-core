@@ -6,8 +6,9 @@
     if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
     $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
     $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");
+    $maxLength = ConfService::getConf("MAX_CHAR");
     
-	$FlashVar = '&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber;
+	$FlashVar = '&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
 ?>
 <html>
 <head>
@@ -47,6 +48,7 @@ var messages =
 	UploadLimitsSizePerFile:282, 
 	UploadLimitsTotalSize:283, 
 	UploadLimitsFilesNumber:284,
+	FilenamesMaxLengthWarning:393,
 	
 	UploaderOptionsLabel:312,
 	UploaderLimitLabel:281,
