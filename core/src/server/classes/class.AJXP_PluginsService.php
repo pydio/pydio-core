@@ -38,6 +38,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  class AJXP_PluginsService{
  	private static $instance;
  	private $registry = array();
+ 	private $required_files = array();
  	private $tmpDependencies = array();
  	private $activePlugins = array();
  	private $streamWrapperPlugins = array();
@@ -45,7 +46,26 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $pluginFolder;
  	private $confFolder;
  	
- 	public function loadPluginsRegistry($pluginFolder, $confFolder){
+ 	public function loadPluginsRegistry($pluginFolder, $confFolder){ 		
+ 		if(!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false){
+	 		$reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
+	 		if(count($reqs)){
+	 			foreach ($reqs as $filename){
+	 				require_once($filename);
+	 			}
+	 			$res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+	 			$this->registry = $res;
+	 			// Refresh streamWrapperPlugins
+	 			foreach ($this->registry as $pType => $plugs){
+	 				foreach ($plugs as $plugin){
+	 					if(method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false){
+	 						$this->streamWrapperPlugins[] = $plugin->getId();
+	 					}
+	 				}
+	 			}
+	 			return ;
+	 		}
+ 		}
  		$this->pluginFolder = $pluginFolder;
  		$this->confFolder = $confFolder;
  		$handler = opendir($pluginFolder);
@@ -57,8 +77,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 				$plugin->loadManifest();
 				if($plugin->manifestLoaded()){
 					$pluginsPool[$plugin->getId()] = $plugin;
-					if(method_exists($plugin, "detectStreamWrapper")){
-						if($plugin->detectStreamWrapper(false) !== false) $this->streamWrapperPlugins[] = $plugin->getId();
+					if(method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false){
+						$this->streamWrapperPlugins[] = $plugin->getId();
 					}
 				}
  			}
@@ -69,6 +89,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			foreach ($pluginsPool as $plugin){
  				$this->recursiveLoadPlugin($plugin, $pluginsPool);
  			}
+ 		}
+ 		if(!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false){
+	 		AJXP_Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
+	 		AJXP_Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->registry, false, false);
  		}
  	}
  	
@@ -155,10 +179,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		if(!$definition) return $plugin;
  		$filename = INSTALL_PATH."/".$definition["filename"];
  		$className = $definition["classname"];
- 		if(is_file($filename)){
+ 		if(is_file($filename)){ 			
  			require_once($filename);
  			$newPlugin = new $className($plugin->getId(), $plugin->getBaseDir());
  			$newPlugin->loadManifest();
+ 			$this->required_files[] = $filename;
 	 		return $newPlugin;
  		}else{
  			return $plugin;
@@ -213,6 +238,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		else return array();
  	}
  	
+ 	/**
+ 	 * Get a plugin instance
+ 	 *
+ 	 * @param string $pluginId
+ 	 * @return AJXP_Plugin
+ 	 */
  	public function getPluginById($pluginId){
  		$split = explode(".", $pluginId);
  		return $this->getPluginByTypeName($split[0], $split[1]);

@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class AJXP_Plugin{
+class AJXP_Plugin implements Serializable{
 	protected $baseDir;
 	protected $id;
 	protected $name;
@@ -59,6 +59,30 @@ class AJXP_Plugin{
 	 * @var DOMDocument
 	 */
 	protected $manifestDoc;
+	
+	/**
+	 * Internally store XML during serialization state.
+	 *
+	 * @var string
+	 */
+	private $manifestXML;
+	
+	private $serializableAttributes = array(
+		"baseDir", 
+		"id", 
+		"name", 
+		"type", 
+		"manifestLoaded", 
+		"actions", 
+		"registryContributions", 
+		"options", "pluginConf", "dependencies", "loadingState", "manifestXML");
+	
+	/**
+	 * Construction method
+	 *
+	 * @param string $id
+	 * @param string $baseDir
+	 */	
 	public function __construct($id, $baseDir){
 		$this->baseDir = $baseDir;
 		$this->id = $id;
@@ -213,6 +237,43 @@ class AJXP_Plugin{
 		$this->manifestLoaded = true;
 		$this->loadDependencies();
 	}
+	
+	public function serialize(){
+		if($this->manifestDoc != null){
+			//var_dump("Saving manifest for ".$this->id);
+			$this->manifestXML = base64_encode($this->manifestDoc->saveXML());
+		}
+		
+		/*
+		$keys = array_keys(get_class_vars(get_class($this)));
+		//$keys = array_diff($keys, array("manifestDoc", "xPath"));
+		$reflect = new ReflectionClass($this);
+		$props = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
+	*/
+		$serialArray = array();
+		foreach ($this->serializableAttributes as $attr){
+			$serialArray[$attr] = serialize($this->$attr);
+		}
+		if($this->id == "conf.serial"){
+			//var_dump($this);
+			//var_dump($serialArray);
+		}
+		return serialize($serialArray);
+	}
+	
+	public function unserialize($string){
+		$serialArray = unserialize($string);
+		foreach ($serialArray as $key => $value){
+			$this->$key = unserialize($value);
+		}
+		if($this->manifestXML != NULL){			
+			$this->manifestDoc = DOMDocument::loadXML(base64_decode($this->manifestXML));
+			$this->xPath = new DOMXPath($this->manifestDoc);			
+			unset($this->manifestXML);
+		}
+		//var_dump($this);
+	}
+	
 	public function getManifestRawContent($xmlNodeName = "", $format = "string"){
 		if($xmlNodeName == ""){
 			if($format == "string"){

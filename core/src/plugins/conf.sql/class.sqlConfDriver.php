@@ -36,8 +36,6 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(INSTALL_PATH."/server/classes/class.AbstractConfDriver.php");
-require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
-
 
 class sqlConfDriver extends AbstractConfDriver {
 		
@@ -66,6 +64,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	 */
 	function init($options){
 		parent::init($options);
+		require_once(INSTALL_PATH."/server/classes/dibi.compact.php");		
 		$this->sqlDriver = $options["SQL_DRIVER"];
 		try {
 			dibi::connect($this->sqlDriver);		
