@@ -487,6 +487,7 @@ Class.create("XHRUploader", {
 			}
 		}.bind(this), false);
 		
+		/*
         upload.onload  = function(rpe){
             setTimeout(function(){
                 if(xhr.readyState === 4){
@@ -503,6 +504,24 @@ Class.create("XHRUploader", {
                 this.submitNext();
             }.bind(this), 15);
         }.bind(this);
+        */
+        
+		xhr.onreadystatechange = function() {  
+			if (xhr.readyState == 4) {
+				item.pgBar.setPercentage(100);
+				item.status = 'loaded';
+				item.statusText.update('[loaded]');
+
+				if (xhr.responseText && xhr.responseText != 'OK') {
+					alert(xhr.responseText); // display response.
+		        	item.status = 'error';
+		        	item.statusText.update('[error]');					
+				}
+                this.updateTotalData();
+                this.submitNext();				
+			}
+		}.bind(this);
+        
         
         upload.onerror = function(){
         	item.status = 'error';
