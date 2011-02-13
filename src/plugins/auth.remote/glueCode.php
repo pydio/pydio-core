@@ -48,7 +48,7 @@ if(!isSet($AJXP_GLUE_GLOBALS)){
 	$AJXP_GLUE_GLOBALS = array();
 }
 
-if (!$CURRENTPATH) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
+if (!isSet($CURRENTPATH)) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_Plugin.php");
 require_once("$CURRENTPATH/../../server/classes/class.AJXP_PluginsService.php");
