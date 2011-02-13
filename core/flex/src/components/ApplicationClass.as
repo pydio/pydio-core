@@ -18,6 +18,7 @@ package components
 	{
 		private var fileRefList:FileReferenceList;
 		private var fileRefListener:Object;
+		private var _filenameMaxLength:Number;
 		private var _totalSize:Number;
 		private var _uploadedBytes:Number;
 		private var _currentUpload:FileUpload;
@@ -117,6 +118,13 @@ package components
 			 }else{
 			 	_currentFolderFiles = new Array();
 			 }
+			  
+			temp = Application.application.parameters.maxFilenameLength;
+			if(temp != null && temp != ""){
+			    _filenameMaxLength = new Number(temp);
+			}else
+			    _filenameMaxLength = 0;
+			 
 			    
 			_fileTypeDescription = Application.application.parameters.fileTypeDescription;
 			_fileTypes = Application.application.parameters.fileTypes;
@@ -302,6 +310,9 @@ package components
 				if(foundSame) {
 					continue;
 				}
+				if(fileName.length > _filenameMaxLength){
+					this.OnFilenameMaxLengthReached();
+				}
 				var localFoundExisting:Boolean = false;
 				try{
 					var _crtFilesString:String = triggerJSEvent("currentFiles").toString();
@@ -397,6 +408,10 @@ package components
 		private function OnFileMaxNumberReached():void{
 			Alert.show(GetTextFor("MaxFilesNumber"));
 		}
+		
+		private function OnFilenameMaxLengthReached():void{
+			Alert.show(GetTextFor("FilenamesMaxLengthWarning").replace("%s", _filenameMaxLength));
+		}		
 		
 		private function OnFileSizeLimitReached(fileName:String):void{
 		    Alert.show(GetTextFor("MaxFileSize") + " : " + fileName);
