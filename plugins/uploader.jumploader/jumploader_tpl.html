@@ -48,7 +48,7 @@ function appletInitialized(uploader){
 	var applet = document.getElementById('jumpLoaderApplet');
 	var origUrl = applet.getUploaderConfig().getUploadUrl();
 	var currentFolder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
-	applet.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&clientId=" + clientId);
+	applet.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&ajxp_sessid=" + clientId);
 	applet.getUploaderConfig().setPartitionLength(partitionLength);
 	applet.getUploaderConfig().setMaxFileLength(maxFileLength);
 }
@@ -96,19 +96,13 @@ var messages =
 };
 */
 
-
-var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&clientId=<?php echo session_id(); ?>';
-
-var FlashObject = "plugins/uploader.flex/FlashFileUpload.swf";
-var FlashVarValue = "<?php echo $FlashVar; ?>" + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
-
 document.write('<applet name="jumpLoaderApplet" id="jumpLoaderApplet" \
 						code="jmaster.jumploader.app.JumpLoaderApplet.class" \
 						archive="plugins/uploader.jumploader/jumploader_z.jar" \
 						width="600" \
 						height="400" \
 						mayscript> \
-					<param name="uc_uploadUrl" value="'+window.ajxpServerAccessPath+'&get_action=upload"/> \
+					<param name="uc_uploadUrl" value="'+parent.ajxpServerAccessPath+'&get_action=upload"/> \
 					<param name="uc_fileParameterName" value="userfile_0"/> \
 					<param name="ac_fireUploaderStatusChanged" value="true"/> \
 					<param name="ac_fireAppletInitialized" value="true"/> \
