@@ -426,6 +426,7 @@ $mess=array(
 "390" => "Code",
 "391" => "Kein Repository",
 "392" => "Achtung, die Version des AjaXplorer hat sich geändert (jetzt %s). Bitte den Browser-Cache leeren und die Seite neu laden!",
+"393" => "Warning, the names length must be under %s, this file's name will be truncated!",
 /* END SENTENCE */
 );
 ?>
