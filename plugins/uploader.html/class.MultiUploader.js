@@ -66,6 +66,7 @@ Class.create("MultiUploader", {
 		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['284']){
 			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
 		}
+		this.namesMaxLength = ajxpBootstrap.parameters.get("filenamesMaxLength");
 		
 		this.crtContext = ajaxplorer.getUserSelection();
 		this.addElement(formObject.select('.dialogFocus')[0]);
@@ -244,6 +245,11 @@ Class.create("MultiUploader", {
 
 
 		var value = element.value;
+		var basename = getBaseName(value);
+		if(basename.length > this.namesMaxLength){
+			alert(MessageHash[393].replace("%s", this.namesMaxLength));
+		}
+		
 		var maxLength = 63;
 		if(value.length > maxLength)
 		{

@@ -157,9 +157,10 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
 				    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
 				    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
-				    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");				
+				    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");
 					$config["htmlMultiUploaderOptions"] = array("282"=>$UploadMaxSize,"284"=>$confTotalNumber);
 				}
+				$config["filenamesMaxLength"] = intval(ConfService::getConf("MAX_CHAR"));
 				$config["usersEnabled"] = AuthService::usersEnabled();
 				$config["loggedUser"] = (AuthService::getLoggedUser()!=null);
 				$config["currentLanguage"] = ConfService::getLanguage();

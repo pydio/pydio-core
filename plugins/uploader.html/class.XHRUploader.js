@@ -54,6 +54,7 @@ Class.create("XHRUploader", {
 		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['282']){
 			this.maxUploadSize = parseInt(window.htmlMultiUploaderOptions['282']);
 		}
+		this.namesMaxLength = ajxpBootstrap.parameters.get("filenamesMaxLength");
 		if(mask){
 			this.mask = $A(mask);
 		}
@@ -324,6 +325,13 @@ Class.create("XHRUploader", {
 			alert(MessageHash[365].replace("%s", this.max));
 			return;
 		}
+		
+		var basename = getBaseName(file.fileName);
+		if(basename.length > this.namesMaxLength){
+			alert(MessageHash[393].replace("%s", this.namesMaxLength));
+		}
+		
+		
 		if(this.mask){
 			var ext = getFileExtension(file.fileName);
 			if(!this.mask.include(ext)){
