@@ -136,7 +136,7 @@ class ConfService
 		$options = $this->configs["PLUGINS"][$key]["OPTIONS"];
 		$instance = AJXP_PluginsService::findPlugin($plugType, $name);
 		if(!is_object($instance)){
-			throw new Exception("Cannot find plugin $key for type $plugType");
+			throw new Exception("Cannot find plugin $name for type $plugType");
 		}
 		$instance->init($options);
 		try{
