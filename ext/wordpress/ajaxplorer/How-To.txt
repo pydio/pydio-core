@@ -13,7 +13,7 @@ So what do you need to make it work?
  * Inside you WP admin panel : Activate the ajaxplorer plugin, and go to "Settings > Ajaxplorer" to init the plugin options. This is mandatory, or the plugin wont work. Choose a secret key.
 
  * Inside AjaXplorer config file : comment the $AUTH_DRIVER array and replace it with the following :
-	$AUTH_DRIVER = array(
+	"AUTH_DRIVER" => array(
 		"NAME"          => "remote",
 		"OPTIONS"       => array(
 			"SLAVE_MODE"  => true,

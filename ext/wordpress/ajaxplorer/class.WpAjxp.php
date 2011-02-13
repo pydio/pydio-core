@@ -3,8 +3,8 @@
 /*
 Plugin Name: Ajaxplorer
 Plugin URI: http://www.ajaxplorer.info/wp_ajaxplorer
-Description: This plugin allow to associate directly AjaXplorer users to wordpress ones (using WP as the master). Warning, it will not work until you open the "Settings > AjaXplorer" panel (here on the left) to edit your AjaXplorer installation path. Tested with WP 2.8 & AjaXplorer 2.5.4
-Version: 0.6
+Description: This plugin allow to associate directly AjaXplorer users to wordpress ones (using WP as the master). Warning, it will not work until you open the "Settings > AjaXplorer" panel (here on the left) to edit your AjaXplorer installation path. Tested with WP 3.0.4 & AjaXplorer 3.2.0
+Version: 1.0
 Author: Charles du Jeu
 Author URI: http://www.ajaxplorer.info/
 */
@@ -29,7 +29,7 @@ class Ajxp {
 		$this->autoCreate = ($this->options["ajxp_auto_create"] == 'yes' ? true:false);
     }
  
-function init() {
+	function init() {
 		// Tell wordpress that your plugin hooked the authenticate action
 		add_action('wp_login', array(&$this, 'authenticate'), 10, 2);
 		add_action('wp_logout', array(&$this, 'logout'), 1);
@@ -66,7 +66,7 @@ function init() {
 	   	include($this->glueCode);
 	}
 	
-	function updateUserRole($userId, $userRole){
+	function updateUserRole($userId){
 		$this->createUser($userId, false);
 	}
 	
