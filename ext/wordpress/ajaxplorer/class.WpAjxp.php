@@ -29,9 +29,9 @@ class Ajxp {
 		$this->autoCreate = ($this->options["ajxp_auto_create"] == 'yes' ? true:false);
     }
  
-    function init() {
+function init() {
 		// Tell wordpress that your plugin hooked the authenticate action
-		add_action('wp_authenticate', array(&$this, 'authenticate'), 1);
+		add_action('wp_login', array(&$this, 'authenticate'), 10, 2);
 		add_action('wp_logout', array(&$this, 'logout'), 1);
 		add_action('user_register', array(&$this, 'createUser'), 1, 1);
 		add_action('set_user_role', array(&$this, 'updateUserRole'), 1, 1);
@@ -42,19 +42,20 @@ class Ajxp {
     }
 
 	// AJXP FUNCTIONS	
-	function authenticate($username, $password = "")
+	function authenticate($username)
 	{
-		if(!$this->glueCodeFound) return ;
+		if(!$this->glueCodeFound) return;
+		$userdata = get_userdatabylogin( $username );
+		
 		global $AJXP_GLUE_GLOBALS;
 		$AJXP_GLUE_GLOBALS = array();
 		//$plugInAction, $login, $result, $secret, $autoCreate;
 		$AJXP_GLUE_GLOBALS["secret"] = $this->secret;
 		$AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
 		$AJXP_GLUE_GLOBALS["plugInAction"] = "login";
-		$AJXP_GLUE_GLOBALS["login"] = array("name"=>$username, "password"=>$password);  		
+		$AJXP_GLUE_GLOBALS["login"] = array("name"=>$username, "password"=>$userdata->user_pass);  		
 	   	include($this->glueCode);
-	}
-	
+	}	
 	function logout(){
 		global $plugInAction;
 		if(!$this->glueCodeFound) return ;
@@ -80,12 +81,12 @@ class Ajxp {
 		$AJXP_GLUE_GLOBALS["user"] = array();
 		$AJXP_GLUE_GLOBALS["user"]['name']	= $userData->user_login;
 		$AJXP_GLUE_GLOBALS["user"]['password']	= $userData->user_pass;
-		$AJXP_GLUE_GLOBALS["user"]['right'] = ($userData->user_level == 10?'admin':'');	
+		$AJXP_GLUE_GLOBALS["user"]['right'] = (is_super_admin($userId)?'admin':'');	
 		$AJXP_GLUE_GLOBALS["plugInAction"] = ($isNew?"addUser":"updateUser");
 		
 		include($this->glueCode);
 	}
-
+	
 	function deleteUser($userId){
 		if(!$this->glueCodeFound) return ;
 		$userData = get_userdata($userId);
