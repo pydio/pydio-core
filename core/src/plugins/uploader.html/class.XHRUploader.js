@@ -293,6 +293,9 @@ Class.create("XHRUploader", {
 	
 	clearElement : function (){
 		this.mainForm.reset();
+		if(this.optionPane && this.optionPane.loadData){
+			this.optionPane.loadData();
+		}
 	},
 	
 	clearList : function(){
