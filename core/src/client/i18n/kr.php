@@ -432,6 +432,7 @@ $mess=array(
 "391" => "No Repository",
 "392" => "Warning, AjaXplorer version has changed (now %s), please clear your browser cache and refresh the page to be sure that everything is functionnal!",
 "393" => "Warning, the names length must be under %s, this file's name will be truncated!",
+"394" => "Sorry, at the moment folder sharing is not possible using the current auth driver (users are not editable). File sharing is still possible though.",
 /* END SENTENCE */
 );
 ?>
