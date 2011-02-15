@@ -139,6 +139,12 @@ class AJXP_User extends AbstractAjxpUser
 
 				return false;
 			}
+			
+			$result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM  [ajxp_user_rights] WHERE [login] = %s', $this->getId());    
+			$this->rights = $result_rights->fetchPairs('repo_uuid', 'rights');
+			if(! isSet($this->rights["ajxp.admin"])){
+				return false;
+			}			
 		
 		} catch (DibiException $e) {
 
@@ -487,7 +493,7 @@ class AJXP_User extends AbstractAjxpUser
 		}
 	}	
 	
-	/*
+	/**
 	 * Get Temporary Data.
 	 * Implementation uses serialised files because of the overhead incurred with a full db implementation.
 	 * 
@@ -495,7 +501,12 @@ class AJXP_User extends AbstractAjxpUser
 	 * @return Requested value
 	 */
 	function getTemporaryData($key){
-		return AJXP_Utils::loadSerialFile(INSTALL_PATH."/server/users/".$this->getId()."-temp-".$key.".ser");
+		$dirPath = $this->storage->getOption("USERS_DIRPATH");
+		if($dirPath == ""){
+			$dirPath = INSTALL_PATH."/server/users";
+			AJXP_Logger::logAction("getTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
+		}
+		return AJXP_Utils::loadSerialFile($dirPath."/".$this->getId()."/-temp-".$key.".ser");
 	}
 	
 	/**
@@ -507,7 +518,12 @@ class AJXP_User extends AbstractAjxpUser
 	 * @return null (AJXP_Utils::saveSerialFile() returns nothing)
 	 */
 	function saveTemporaryData($key, $value){
-		return AJXP_Utils::saveSerialFile(INSTALL_PATH."/server/users/".$this->getId()."-temp-".$key.".ser", $value);
+		$dirPath = $this->storage->getOption("USERS_DIRPATH");
+		if($dirPath == ""){
+			$dirPath = INSTALL_PATH."/server/users";
+			AJXP_Logger::logAction("setTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
+		}
+		return AJXP_Utils::saveSerialFile($dirPath.$this->getId()."-temp-".$key.".ser", $value);
 	}
 	
 	/**
