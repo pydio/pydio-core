@@ -360,7 +360,7 @@ class AuthService
 	
 	static function createUser($userId, $userPass, $isAdmin=false)
 	{
-		if(defined('AJXP_PASSWORD_MINLENGTH') && strlen($userPass) < AJXP_PASSWORD_MINLENGTH){
+		if(defined('AJXP_PASSWORD_MINLENGTH') && strlen($userPass) < AJXP_PASSWORD_MINLENGTH && $userId != "guest"){
 			$messages = ConfService::getMessages();
 			throw new Exception($messages[378]);
 		}
