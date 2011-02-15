@@ -347,7 +347,11 @@
 	                        conn.sendAsync();
 	                        return false;
 	                    };
-	                    modal.showDialogForm('Get', 'share_folder_form', loadFunc, submitFunc, null);                	
+                    	if(window.ajxpBootstrap.parameters.get("usersEditable") == false){
+                    		ajaxplorer.displayMessage('ERROR', MessageHash[394]);
+                    	}else{	                    
+	                    	modal.showDialogForm('Get', 'share_folder_form', loadFunc, submitFunc, null);
+	                    }                	
                     }else{
 
 						if(!window.ajxpPublicUrlCallback){							

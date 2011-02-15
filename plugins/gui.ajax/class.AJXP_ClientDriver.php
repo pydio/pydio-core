@@ -168,6 +168,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["client_timeout"] = ConfService::getConf("CLIENT_TIMEOUT_TIME");
 				$config["client_timeout_warning"] = ConfService::getConf("CLIENT_TIMEOUT_WARNING");
 				$config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
+				$config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
 				$config["ajxpVersion"] = AJXP_VERSION;
 				$config["ajxpVersionDate"] = AJXP_VERSION_DATE;				
 				if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
