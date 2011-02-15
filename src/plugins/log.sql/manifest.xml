@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logdriver name="sql" label="DB Storage" description="Stores the logs in an SQL database." className="sqlLogDriver">
+	<server_settings>
+		<param name="SQL_DRIVER" type="array" label="Connexion" description="The Database Connexion" mandatory="true"/>
+	</server_settings>
+	<class_definition filename="plugins/log.sql/class.sqlLogDriver.php" classname="sqlLogDriver"/>	
+</logdriver>
