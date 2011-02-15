@@ -515,7 +515,12 @@ class fsAccessDriver extends AbstractAccessDriver
 					false, 
 					$metaData);
 				if(isSet($totalPages) && isSet($crtPage)){
-					AJXP_XMLWriter::renderPaginationData($countFiles, $crtPage, $totalPages);
+					AJXP_XMLWriter::renderPaginationData(
+						$countFiles, 
+						$crtPage, 
+						$totalPages, 
+						$this->countFiles($path, TRUE)
+					);
 					if(!$lsOptions["f"]){
 						AJXP_XMLWriter::close();
 						exit(1);

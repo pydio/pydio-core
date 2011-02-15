@@ -2,6 +2,13 @@
 <ajxpdriver name="ajxp_client" label="Client Plugin" description="Basic GUI actions">
 	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
 	<registry_contributions>
+		<actions>
+			<action name="get_boot_conf" skipSecureToken="true">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>	
 		<external_file filename="plugins/gui.ajax/ajxpclient_actions.xml" include="actions/*" exclude=""/>
 		<client_configs uuidAttr="name">
 			<template name="main" element="ajxp_desktop" position="top"><![CDATA[
