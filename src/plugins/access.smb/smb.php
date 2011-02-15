@@ -114,7 +114,7 @@ class smb {
         }
         $port = ($purl['port'] <> 139 ? ' -p ' . escapeshellarg ($purl['port']) : '');
         $options = '-O ' . escapeshellarg(SMB4PHP_SMBOPTIONS);
-        //AJXP_Logger::debug("SMBCLIENT", "{$auth} {$options} {$port} {$options} {$params}");
+        AJXP_Logger::debug("SMBCLIENT", "{$options} {$params}");
         $output = popen (SMB4PHP_SMBCLIENT." -N {$auth} {$options} {$port} {$options} {$params} 2>/dev/null", 'r');
         $info = array ();
         while ($line = fgets ($output, 4096)) {
@@ -184,10 +184,10 @@ class smb {
 
     function url_stat ($url, $flags = STREAM_URL_STAT_LINK) {
         if ($s = smb::getstatcache($url)) { 
-        	//AJXP_Logger::debug("Using statcache for $url");
+        	AJXP_Logger::debug("Using statcache for $url");
         	return $s; 
         }
-        //AJXP_Logger::debug("Getting statcache for $url");
+        AJXP_Logger::debug("Getting statcache for $url");
         list ($stat, $pu) = array (array (), smb::parse_url ($url));
         switch ($pu['type']) 
         {
@@ -354,7 +354,7 @@ class smb_stream_wrapper extends smb {
 	                   $this->dir_index = 0;
 	                   $this->adddircache ($url, $this->dir);
 	                   foreach ($o['info'] as $name => $info) {
-	                   		//AJXP_Logger::debug("Adding to statcache ".$url.'/'.$name);
+	                   		AJXP_Logger::debug("Adding to statcache ".$url.'/'.$name);
 	                       //smb::addstatcache($url . '/' . urlencode($name), $info);
 	                       smb::addstatcache($url .'/'. $name, $info);
 	                   }
@@ -383,14 +383,16 @@ class smb_stream_wrapper extends smb {
     # cache
 
     function adddircache ($url, $content) {
-        global $__smb_cache;
+        global $__smb_cache;        
         $url = smb::cleanUrl($url);
+        AJXP_Logger::debug("Adding to dir cache", array("url"=>$url));
         return $__smb_cache['dir'][$url] = $content;
     }
 
     function getdircache ($url) {
         global $__smb_cache;
         $url = smb::cleanUrl($url);
+        AJXP_Logger::debug("Testing dir cache", array("url"=>$url));
         return isset ($__smb_cache['dir'][$url]) ? $__smb_cache['dir'][$url] : FALSE;
     }
 
@@ -484,6 +486,7 @@ class smb_stream_wrapper extends smb {
     	}
     	if(isSet($this->defer_stream_read)){
     		$this->tmpfile = tempnam('/tmp', 'smb.down');
+    		AJXP_Logger::debug("Creating real tmp file now");
     		smb::execute ('get "'.$this->parsed_url['path'].'" "'.$this->tmpfile.'"', $this->parsed_url);
     		$this->stream = fopen($this->tmpfile, $this->mode);
     	}
