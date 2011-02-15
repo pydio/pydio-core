@@ -109,7 +109,13 @@ Class.create("LocationBar", {
 			type:'text',
 			value:'/'
 		});		
-		this.autoComp = new AjxpAutocompleter(this.currentPath, "autocomplete_choices");
+		var autoCompOptions = {	afterUpdateElement: function(element, li){
+			if(this.currentPath.value != this.realPath){
+				this.setModified(true);
+				this.submitPath();
+			}
+		}.bind(this) };
+		this.autoComp = new AjxpAutocompleter(this.currentPath, "autocomplete_choices", null, autoCompOptions);
 		this.currentPath.observe("keydown", function(event){
 			if(event.keyCode == 9) return false;
 			if(!this._modified && (this._beforeModified != this.currentPath.getValue())){
@@ -149,7 +155,7 @@ Class.create("LocationBar", {
 		if(!this._modified){
 			ajaxplorer.actionBar.fireAction("refresh");
 		}else{
-			var url = this.currentPath.value;
+			var url = this.currentPath.value.stripScripts();
 			if(url == '') return false;	
 			var node = new AjxpNode(url, false);
 			var parts = url.split("##");
