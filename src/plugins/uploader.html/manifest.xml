@@ -15,7 +15,7 @@
 					<serverCallback methodName="postProcess" capture="true"/>
 				</post_processing>
 			</action>
-			<action name="get_drop_bg">
+			<action name="get_drop_bg" skipSecureToken="true">
 				<processing>					
 					<serverCallback methodName="getDropBg"/>
 				</processing>

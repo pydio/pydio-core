@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="ajxpclient">
 	<actions>
-		<action name="get_boot_conf">
+	<!-- 
+		<action name="get_boot_conf" skipSecureToken="true">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+	-->
 		<action name="get_xml_registry">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>

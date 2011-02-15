@@ -333,6 +333,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		$self->xmlRegistry = $registry;
  	}
  	
+ 	/**
+ 	 * 
+ 	 * @param unknown_type $query
+ 	 * @param unknown_type $stringOrNodeFormat
+ 	 * @param return DOMNode[]
+ 	 */
  	public static function searchAllManifests($query, $stringOrNodeFormat = "string"){
  		$buffer = "";
  		$nodes = array();

@@ -70,8 +70,8 @@ class AJXP_XMLWriter
 		}
 	}
 	
-	static function renderPaginationData($count, $currentPage, $totalPages){
-		$string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png"/>';		
+	static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1){
+		$string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"/>';		
 		AJXP_XMLWriter::write($string, true);
 	}
 	

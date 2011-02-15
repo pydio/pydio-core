@@ -79,7 +79,8 @@ $action = "";
 if(isSet($_GET["action"]) || isSet($_GET["get_action"])) $action = (isset($_GET["get_action"])?$_GET["get_action"]:$_GET["action"]);
 else if(isSet($_POST["action"]) || isSet($_POST["get_action"])) $action = (isset($_POST["get_action"])?$_POST["get_action"]:$_POST["action"]);
 
-$unSecureActions = array("get_boot_conf", "get_drop_bg", "get_secure_token");
+$pluginsUnSecureActions = ConfService::getDeclaredUnsecureActions();
+$unSecureActions = array_merge($pluginsUnSecureActions, array("get_secure_token"));
 if(!in_array($action, $unSecureActions) && AuthService::getSecureToken()){
 	$token = "";
 	if(isSet($_GET["secure_token"])) $token = $_GET["secure_token"];

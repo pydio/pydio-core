@@ -63,9 +63,12 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	ajxpNode.observe("child_added", function(childPath){
 		if(ajxpNode.getMetadata().get('paginationData')){
+			var pData = ajxpNode.getMetadata().get('paginationData');
 			if(!this.paginated){
 				this.paginated = true;
-				this.updateLabel(this.text + " (" + MessageHash[ajxpNode.getMetadata().get('paginationData').get('overflowMessage')]+ ")");
+				if(pData.get('dirsCount')!="0"){
+					this.updateLabel(this.text + " (" + MessageHash[pData.get('overflowMessage')]+ ")");
+				}
 			}
 			return;
 		}else if(this.paginated){

@@ -448,6 +448,15 @@ class ConfService
 		return $this->configs["MESSAGES"];
 	}
 	
+	public static function getDeclaredUnsecureActions(){
+		$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action[@skipSecureToken]", "nodes");
+		$res = array();
+		foreach($nodes as $node){
+			$res[] = $node->getAttribute("name");
+		}
+		return $res;
+	}
+	
 	public static function listAvailableLanguages(){
 		// Cache in session!
 		if(isSet($_SESSION["AJXP_LANGUAGES"]) && !isSet($_GET["refresh_langs"])){
@@ -455,7 +464,7 @@ class ConfService
 		}
 		$langDir = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n";
 		$languages = array();
-		if($dh = opendir($langDir)){
+		if(($dh = opendir($langDir))!==FALSE){
 			while (($file = readdir($dh)) !== false) {
 				$matches = array();
 				if(preg_match("/(.*)\.php/", $file, $matches) == 1){
