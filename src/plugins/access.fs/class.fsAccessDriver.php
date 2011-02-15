@@ -445,6 +445,9 @@ class fsAccessDriver extends AbstractAccessDriver
 					print($result);        		
             	}else if($subAction == "list_shared_users"){
             		header("Content-type:text/html");
+            		if(!ConfService::getAuthDriverImpl()->usersEditable()){
+            			break;
+            		}
             		$loggedUser = AuthService::getLoggedUser();
             		$allUsers = AuthService::listUsers();
             		$crtValue = $httpVars["value"];
