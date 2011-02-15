@@ -44,6 +44,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapAdminPassword;
     var $ldapDN;
     var $ldapFilter;
+    var $ldapUserAttr;
 
     var $ldapconn = null;
 
@@ -57,6 +58,11 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
         if ($options["LDAP_FILTER"]) $this->ldapFilter = $options["LDAP_FILTER"];
+		if ($options["LDAP_USERATTR"]){ 
+			$this->ldapUserAttr = $options["LDAP_USERATTR"]; 
+		}else{ 
+			$this->ldapUserAttr = 'uid' ; 
+		}        
         $this->ldapconn = $this->LDAP_Connect();
         if ($this->ldapconn == null) AJXP_Logger::logAction('LDAP Server connexion could NOT be established');
     }
@@ -101,43 +107,33 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
 
     function listUsers(){
-		if ($this->ldapFilter === null){
-			$ret = ldap_search($this->ldapconn,$this->ldapDN,"objectClass=person");
+    	if ($this->ldapFilter === null){
+			$ret = ldap_search($this->ldapconn,$this->ldapDN,"objectClass=person", array($this->ldapUserAttr));
 		} else {
-			$ret = ldap_search($this->ldapconn,$this->ldapDN,$this->ldapFilter);
-		}    	
-        //$ret = ldap_search($this->ldapconn,$this->ldapDN,"objectClass=person");
-        $entries = ldap_get_entries($this->ldapconn, $ret);
+			$ret = ldap_search($this->ldapconn,$this->ldapDN,$this->ldapFilter, array($this->ldapUserAttr));
+		}        
+		$entries = ldap_get_entries($this->ldapconn, $ret);
         $persons = array();
-        unset($entries['count']);
+        unset($entries['count']); // remove 'count' entry
         foreach($entries as $id => $person){
-            //if ($id != 'count'){
-            //AJXP_Logger::logAction('auth.ldap:Handling user '.$person['uid'][0]);
-            $persons[$person['uid'][0]] = "XXX";
-            //}
+            $persons[$person[$this->ldapUserAttr][0]] = "XXX";
         }
-
-        //error_log(print_r($persons, true));
         return $persons;
     }
 
-    function userExists($login){        
-        //return true;
-        $users = $this->listUsers();
-        if(!is_array($users) || !array_key_exists($login, $users)) return false;
-        return true;
+	function userExists($login){
+    	$ret = ldap_search($this->ldapconn,$this->ldapDN, $this->ldapUserAttr . "=" . $login, array($this->ldapUserAttr));
+		$entries = ldap_get_entries($this->ldapconn, $ret);
+
+		if(!is_array($entries) || strcmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) return false;
+		return true;
     }
 
     function checkPassword($login, $pass, $seed){
        
-        //AJXP_Logger::logAction('auth.ldap:ldapAuthDriver::checkPassword');
-        $ret = ldap_search($this->ldapconn,$this->ldapDN,"uid=".$login);
+        $ret = ldap_search($this->ldapconn,$this->ldapDN, $this->ldapUserAttr . "=" . $login, array($this->ldapUserAttr));
         $entries = ldap_get_entries($this->ldapconn, $ret);
-        //error_log(print_r($entries, true));
         if ($entries['count']>0) {
-            //AJXP_Logger::logAction('auth.ldap:Found user!');
-
-            //error_log(print_r($entries[0]["dn"], true));
             if (@ldap_bind($this->ldapconn,$entries[0]["dn"],$pass)) {
                 AJXP_Logger::logAction('Ldap Password Check:Got user '.$entries[0]["cn"][0]);
                 return true;
@@ -155,9 +151,6 @@ class ldapAuthDriver extends AbstractAuthDriver {
     function passwordsEditable(){
         return false;
     }
-
-   
-
 
 }
 ?>
