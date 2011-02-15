@@ -74,6 +74,8 @@ class HTMLWriter
     	echo "if(!MessageHash) window.MessageHash = new Hash();\n";
     	foreach ($mess as $index => $message)
     	{
+    		// Make sure \n are double antislashed (\\n).
+    		$message = preg_replace("/\n/", "\\\\n", $message);
     		if(is_numeric($index))
     		{
     			echo "MessageHash[$index]='".str_replace("'", "\'", $message)."';\n";
