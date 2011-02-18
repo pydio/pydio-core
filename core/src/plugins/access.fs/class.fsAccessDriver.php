@@ -776,6 +776,9 @@ class fsAccessDriver extends AbstractAccessDriver
 	{
 		session_write_close();
 
+		restore_error_handler();
+		restore_exception_handler();
+		
         set_exception_handler('download_exception_handler');
         set_error_handler('download_exception_handler');
         // required for IE, otherwise Content-disposition is ignored
