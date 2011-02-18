@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.eml" openable="true" text="186" title="136" icon="frame_image.png" className="EmlViewer" mimes="eml" formId="emlviewer_box">
+<editor id="editor.eml" openable="true" text="editor.eml.name" title="editor.eml.title" icon="mail_generic.png" className="EmlViewer" mimes="eml" formId="emlviewer_box">
 	<class_definition filename="plugins/editor.eml/class.EmlParser.php" classname="EmlParser"/>
 	<resources>
 		<js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer"/>
 		<css file="plugins/editor.eml/emlViewer.css"/>
+		<i18n namespace="editor.eml" path="plugins/editor.eml/i18n" />				
 	</resources>
 	<clientForm id="emlviewer_box"><![CDATA[
 		<div id="emlviewer_box" action="view_eml" box_width="80%" box_height="80%" box_padding="0">
@@ -33,45 +34,15 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
+			<action name="ls">
+				<post_processing>
+					<serverCallback methodName="lsPostProcess" capture="true"></serverCallback>
+				</post_processing>
+			</action>
 		</actions>
-		<!-- 
 		<hooks>
-			<serverCallback hookName="ls.metadata" methodName="extractImageMetaData"></serverCallback>
-		</hooks>
-		-->
-		<!-- 
-		<client_configs>
-			<component_config className="FilesList">
-				<columns>
-					<additional_column messageId="135" attributeName="readable_dimension" sortType="String"/>
-				</columns>
-			</component_config>
-			<component_config className="InfoPanel">			
-				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="image_width,image_height,image_type">
-					<messages>
-						<message key="type_string" id="134"/>				
-						<message key="dim_string" id="135"/>
-						<message key="header_string" id="343"/>
-					</messages>
-					<html><![CDATA[
-						<div style="">
-							<div class="panelHeader infoPanelGroup" colspan="2">#{header_string}</div>
-							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-								<tr>
-									<td class="infoPanelLabel">#{dim_string}</td>
-									<td class="infoPanelValue">#{image_width}px X #{image_height}px</td>
-								</tr>
-								<tr class="even">
-									<td class="infoPanelLabel">#{type_string}</td>
-									<td class="infoPanelValue">#{image_type}</td>
-								</tr>
-							</table>
-						</div>
-					]]></html>
-				</infoPanelExtension>
-			</component_config>
-		</client_configs>	
-		 -->		
+			<serverCallback hookName="ls.metadata" methodName="extractMimeHeaders"></serverCallback>
+		</hooks>	
 	</registry_contributions>
 	<dependencies>
 		<!-- Image proxy must be implemented -->
