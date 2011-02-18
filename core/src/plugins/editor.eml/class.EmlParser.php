@@ -45,10 +45,21 @@ class EmlParser extends AJXP_Plugin{
     			$structure = $decoder->decode($params);
     			$html = $this->_findPartByCType($structure, "text", "html");
     			$text = $this->_findPartByCType($structure, "text", "plain");
-    			AJXP_XMLWriter::header("email_body");
+    			if($html != false && isSet($html->ctype_parameters) && isSet($html->ctype_parameters["charset"])){
+    				$charset = $html->ctype_parameters["charset"];
+    			}
+    			if(isSet($charset)){
+    				header('Content-Type: text/xml; charset='.$charset);
+					header('Cache-Control: no-cache');
+					print('<?xml version="1.0" encoding="'.$charset.'"?>');
+					print('<email_body>');    			    				
+    			}else{
+	    			AJXP_XMLWriter::header("email_body");
+    			}
     			if($html!==false){
     				print('<mimepart type="html"><![CDATA[');
-    				print($html->body);
+    				$text = $html->body;
+    				print($text);
     				print("]]></mimepart>");
     			}
     			if($text!==false){
@@ -58,6 +69,28 @@ class EmlParser extends AJXP_Plugin{
     			}
     			AJXP_XMLWriter::close("email_body");    			
     			
+    		break;
+    		case "eml_dl_attachment":
+    			$attachId = $httpVars["attachment_id"];
+    			if(!isset($attachId)) break;
+    			
+    			require_once("Mail/mimeDecode.php");
+    			$params = array(
+    				'include_bodies' => true,
+    				'decode_bodies' => true,
+    				'decode_headers' => false
+    			);    			
+    			$content = file_get_contents($file);
+    			$decoder = new Mail_mimeDecode($content);
+    			$structure = $decoder->decode($params);
+    			$part = $this->_findAttachmentById($structure, $attachId);
+    			if($part !== false){
+	    			$fake = new fsAccessDriver("fake", "");
+	    			$fake->readFile($part->body, "file", $part->d_parameters['filename'], true);
+	    			exit();
+    			}else{
+    				var_dump($structure);
+    			}
     		break;
     		
     		default: 
@@ -74,6 +107,21 @@ class EmlParser extends AJXP_Plugin{
 		if(empty($structure->parts)) return false;
 		foreach($structure->parts as $part){
 			$res = $this->_findPartByCType($part, $primary, $secondary);
+			if($res !== false){
+				return $res;
+			}
+		}
+		return false;
+	}
+	 
+	protected function _findAttachmentById($structure, $attachId){
+		if(!empty($structure->disposition) &&  $structure->disposition == "attachment" 
+			&& ($structure->headers["x-attachment-id"] == $attachId || $attachId == "0" )){
+			return $structure;
+		}
+		if(empty($structure->parts)) return false;
+		foreach($structure->parts as $part){
+			$res = $this->_findAttachmentById($part, $attachId);
 			if($res !== false){
 				return $res;
 			}

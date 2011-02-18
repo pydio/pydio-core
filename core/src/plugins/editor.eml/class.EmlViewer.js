@@ -46,6 +46,19 @@ Class.create("EmlViewer", AbstractEditor, {
 	
 	
 	open : function($super, userSelection){
+		// Move hidden download form in body, if not already there
+		var original = $("emlDownloadAttachmentForm");
+		if($("emlDownloadForm")){
+			original.remove();
+		}else{
+			$$("body")[0].insert(original);
+			original.id="emlDownloadForm";
+			original.setAttribute("id", "emlDownloadForm");
+			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"get_action", "value":"eml_dl_attachment"}));
+			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"file", "value":""}));
+			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"secure_token", "value":Connexion.SECURE_TOKEN}));
+			$("emlDownloadForm").insert(new Element("input", {"type":"hidden", "name":"attachment_id", "value":""}));
+		}
 		$super(userSelection);
 		var fileName = userSelection.getUniqueFileName();
 		this.textareaContainer = document.createElement('div');
@@ -83,25 +96,40 @@ Class.create("EmlViewer", AbstractEditor, {
 	},
 		
 	
+	dlAttachment : function(event){
+		//console.log(event.target.__ATTACHMENT_ID);
+		var form = $("emlDownloadForm");
+		form.elements["secure_token"].value = Connexion.SECURE_TOKEN;
+		form.elements["file"].value = this.currentFile; 
+		form.elements["attachment_id"].value = event.target.__ATTACHMENT_ID;
+		form.submit();
+	},
+	
 	parseBodies : function (transport){
 		var xmlDoc = transport.responseXML;
 		var html = XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="html"]');
 		if(html){
-			var iFrame = new Element('iframe');
-			this.textareaContainer.insert(iFrame);
-			iFrame.contentDocument.write(html.firstChild.nodeValue);
-			iFrame.setStyle({height: '100%;'});
+			this.iFrame = new Element('iframe');
+			this.textareaContainer.insert(this.iFrame);
+			this.iFrameContent = html.firstChild.nodeValue;
+			this.iFrame.contentDocument.write(this.iFrameContent);
+			this.iFrame.setStyle({width: '100%', height: '100%', border: '0px'});
+			var reloader = function(){
+				this.iFrame.contentDocument.write(this.iFrameContent);
+			}.bind(this);
+			this.element.observe("editor:enterFSend", reloader);
+			this.element.observe("editor:exitFSend", reloader);
 		}else{
 			var pre = new Element("pre");
 			pre.insert(XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="plain"]').firstChild.nodeValue);
 			this.textareaContainer.insert(pre);
-			pre.setStyle({display:'block',height: '100%;'});
+			pre.setStyle({display:'block',height: '100%'});
 		}
 	},
 	
 	parseXmlStructure : function(transport){
 		var xmlDoc = transport.responseXML;
-		var hContainer = this.element.down("#headerContainer");
+		var hContainer = this.element.down("#emlHeaderContainer");
 		// PARSE HEADERS
 		var headers = XPathSelectNodes(xmlDoc, "email/header");
 		var searchedHeaders = {"From":[], "To":[], "Date":[], "Subject":[]};
@@ -116,7 +144,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			if(pair.value.length){
 				var value = pair.value.join(", ");
 				hContainer.insert('\
-					<div>\
+					<div class="emlHeader">\
 						<div class="emlHeaderLabel">'+pair.key+'</div>\
 						<div class="emlHeaderContent">'+value+'</div>\
 					</div>');
@@ -145,19 +173,21 @@ Class.create("EmlViewer", AbstractEditor, {
 				if(h.parentNode != mimepart) return;
 				var siblingName = XPathGetSingleNodeText(h, "headername");
 				var siblingValue = XPathGetSingleNodeText(h, "headervalue");
-				if(siblingName = "X-Attachment-Id"){
+				if(siblingName == "X-Attachment-Id"){
 					id = XPathGetSingleNodeText(h, "headervalue");
 				}
 			});			
 			attachments[id] = filename;
 		});
 		if(Object.keys(attachments).length){
-			var attachCont = new Element('div', {id:"attachments_container", className:"emlAttachCont"});
-			hContainer.insert(attachCont);
+			var attachCont = new Element('div', {id:"attachments_container", className:"emlAttachCont", style:"height:"+($('emlHeaderContainer').getHeight()-14)+"px"});
+			hContainer.insert({top:attachCont});
 			for(var key in attachments){
-				var att = new Element("div", {className:"emlAttachment"});
+				var att = new Element("div", {className:"emlAttachment", title:"Double-click to download"});
+				att.__ATTACHMENT_ID = key;
 				att.insert(attachments[key]);
 				attachCont.insert(att);
+				att.observe("dblclick", this.dlAttachment.bind(this));
 			}		
 		}
 		
