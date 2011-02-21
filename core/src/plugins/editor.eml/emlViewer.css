@@ -6,6 +6,12 @@ div#emlHeaderContainer{
 	font-size: 11px;		
 }
 
+div#emlHeaderContainer #attachments_container{
+	height: 67px;
+	width: 255px;
+	padding: 1px;	
+}
+
 div.emlHeader{
 clear:left;		
 }
@@ -39,11 +45,29 @@ padding: 2px 5px 4px 5px;
 background-image: url('attach.png');
 background-repeat: no-repeat;
 background-position: 2px 2px;
-padding-left: 23px;
-cursor: pointer;
+padding-left: 23px;	
 }
 
+div.emlAttachment.active,
 div.emlAttachment:hover{
 	background-color: #73A2D7;
 	color: white; 
+}
+
+a.emlAttachmentAction{
+	display:block;
+	float:right;
+	cursor: pointer;
+	margin-left: 2px;
+}
+
+div#treeSelectorCpContainer{
+	position: absolute;
+	right: 10px;
+	border: 1px solid #BBB;
+	padding: 5px;
+	background-color: white;
+	top: 156px;
+	box-shadow: 1px 1px 4px #BBB;	
+}
 }
