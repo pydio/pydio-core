@@ -18,6 +18,7 @@ class EmlParser extends AJXP_Plugin{
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		if(empty($httpVars["file"])) return;
     	$file = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+    	$mess = ConfService::getMessages();
     	
     	switch($action){
     		case "eml_get_xml_structure":
@@ -118,12 +119,12 @@ class EmlParser extends AJXP_Plugin{
 	    			if($fp !== false){
 	    				fwrite($fp, $part->body, strlen($part->body));
 	    				fclose($fp);
-	    				AJXP_XMLWriter::sendMessage(sprintf("Attachment %s was successfully copied to %s", $part->d_parameters["filename"], $destRep), NULL);
+	    				AJXP_XMLWriter::sendMessage(sprintf($mess["editor.eml.7"], $part->d_parameters["filename"], $destRep), NULL);
 	    			}else{
-		    			AJXP_XMLWriter::sendMessage(null, "Could not open destination file!");
+		    			AJXP_XMLWriter::sendMessage(null, $mess["editor.eml.8"]);
 	    			}
     			}else{
-    				AJXP_XMLWriter::sendMessage(null, "Could not find attachment!");
+    				AJXP_XMLWriter::sendMessage(null, $mess["editor.eml.9"]);
     			}
     			AJXP_XMLWriter::close();
     		break;
