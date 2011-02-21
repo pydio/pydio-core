@@ -150,7 +150,7 @@ class EmlParser extends AJXP_Plugin{
 		
 		require_once("Mail/mimeDecode.php");
     	$params = array(
-    		'include_bodies' => false,
+    		'include_bodies' => true,
     		'decode_bodies' => false,
     		'decode_headers' => true
     	);    			
@@ -171,6 +171,16 @@ class EmlParser extends AJXP_Plugin{
 			}
 			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities($hValue, true);
 		}
+		$metadata["eml_attachments"] = 0;
+		$parts = $structure->parts;
+		if(!empty($parts)){
+			foreach($parts as $mimePart){
+				if(!empty($mimePart->disposition) && $mimePart->disposition == "attachment"){
+					$metadata["eml_attachments"]++;
+				}
+			}
+		}	
+		$metadata["icon"] = "eml_images/ICON_SIZE/mail_mime.png";	
 	}	
 	
 	public function lsPostProcess($action, $httpVars, $outputVars){
@@ -178,9 +188,10 @@ class EmlParser extends AJXP_Plugin{
 			$config = '<columns template_name="eml.list">
 				<column messageId="editor.eml.1" attributeName="ajxp_label" sortType="String"/>
 				<column messageId="editor.eml.2" attributeName="eml_to" sortType="String"/>
+				<column messageId="editor.eml.3" attributeName="eml_subject" sortType="String"/>
 				<column messageId="editor.eml.4" attributeName="ajxp_modiftime" sortType="MyDate"/>
-				<column messageId="editor.eml.3" attributeName="eml_subject" sortType="String" fixedWidth="50%"/>
 				<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
+				<column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number"/>
 			</columns>';			
 		}else{
 			// Restore standard columns.. 
@@ -231,18 +242,31 @@ class EmlParser extends AJXP_Plugin{
 	}
 	 
 	protected function _findAttachmentById($structure, $attachId){
-		if(!empty($structure->disposition) &&  $structure->disposition == "attachment" 
-			&& ($structure->headers["x-attachment-id"] == $attachId || $attachId == "0" )){
-			return $structure;
-		}
-		if(empty($structure->parts)) return false;
-		foreach($structure->parts as $part){
-			$res = $this->_findAttachmentById($part, $attachId);
-			if($res !== false){
-				return $res;
+		if(is_numeric($attachId)){
+			$attachId = intval($attachId);
+			if(empty($structure->parts)) return false;
+			$index = 0;
+			foreach ($structure->parts as $part){
+				if(!empty($part->disposition) &&  $part->disposition == "attachment"){
+					if($index == $attachId) return $part;
+					$index++;
+				}
 			}
+			return false;
+		}else{
+			if(!empty($structure->disposition) &&  $structure->disposition == "attachment" 
+				&& ($structure->headers["x-attachment-id"] == $attachId || $attachId == "0" )){
+				return $structure;
+			}
+			if(empty($structure->parts)) return false;
+			foreach($structure->parts as $part){
+				$res = $this->_findAttachmentById($part, $attachId);
+				if($res !== false){
+					return $res;
+				}
+			}
+			return false;
 		}
-		return false;
 	}
 	 
 }
