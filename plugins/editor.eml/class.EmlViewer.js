@@ -196,16 +196,17 @@ Class.create("EmlViewer", AbstractEditor, {
 					</div>');
 			}
 		});
+		console.log(xmlDoc);
 		// PARSE ATTACHEMENTS
 		// Go throught headers and find Content-Disposition: attachment ones
 		var allHeaders = XPathSelectNodes(xmlDoc, "//header");
 		var attachments = {};
+		var id = 0;
 		allHeaders.each(function(el){
 			var hName = XPathGetSingleNodeText(el, "headername");
 			var hValue = XPathGetSingleNodeText(el, "headervalue");
 			if(hName != "Content-Disposition" || hValue != "attachment") return;
 			var mimepart = el.parentNode;
-			var id = 0;
 			var filename = "";
 			// Find filename
 			var params = XPathSelectNodes(el, "parameter");
@@ -215,15 +216,20 @@ Class.create("EmlViewer", AbstractEditor, {
 				}
 			});
 			// Find attachment ID - not always
+			var foundId = false;
 			allHeaders.each(function(h){
 				if(h.parentNode != mimepart) return;
 				var siblingName = XPathGetSingleNodeText(h, "headername");
 				var siblingValue = XPathGetSingleNodeText(h, "headervalue");
 				if(siblingName == "X-Attachment-Id"){
 					id = XPathGetSingleNodeText(h, "headervalue");
+					foundId = true;
 				}
-			});			
+			});
 			attachments[id] = filename;
+			if(!foundId){
+				id = id+1;
+			}
 		});
 		if(Object.keys(attachments).length){
 			var attachCont = new Element('div', {id:"attachments_container", className:"emlAttachCont", style:"height:"+($('emlHeaderContainer').getHeight()-14)+"px"});
