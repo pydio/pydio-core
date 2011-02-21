@@ -64,7 +64,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		this.textareaContainer = new Element('div');
 		this.contentMainContainer = this.textareaContainer;
 		this.textareaContainer.setStyle({width:'100%', overflow:'auto'});	
-		this.element.appendChild(this.textareaContainer);
+		this.element.insert(this.textareaContainer);
 		fitHeightToBottom($(this.textareaContainer), $(modal.elementName));
 		// LOAD FILE NOW
 		this.loadFileContent(fileName);
@@ -156,10 +156,10 @@ Class.create("EmlViewer", AbstractEditor, {
 			this.iFrame = new Element('iframe');
 			this.textareaContainer.insert(this.iFrame);
 			this.iFrameContent = html.firstChild.nodeValue;
-			this.iFrame.contentDocument.write(this.iFrameContent);
+			this.iFrame.contentWindow.document.write(this.iFrameContent);
 			this.iFrame.setStyle({width: '100%', height: '100%', border: '0px'});
 			var reloader = function(){
-				this.iFrame.contentDocument.write(this.iFrameContent);
+				this.iFrame.contentWindow.document.write(this.iFrameContent);
 			}.bind(this);
 			this.element.observe("editor:enterFSend", reloader);
 			this.element.observe("editor:exitFSend", reloader);
