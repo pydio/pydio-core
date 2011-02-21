@@ -90,8 +90,42 @@ class EmlParser extends AJXP_Plugin{
 	    			$fake->readFile($part->body, "file", $part->d_parameters['filename'], true);
 	    			exit();
     			}else{
-    				var_dump($structure);
+    				//var_dump($structure);
     			}
+    		break;
+    		case "eml_cp_attachment":
+    			$attachId = $httpVars["attachment_id"];
+    			$destRep = AJXP_Utils::decodeSecureMagic($httpVars["destination"]);
+    			if(!isset($attachId)) {
+    				AJXP_XMLWriter::sendMessage(null, "Wrong Parameters");
+    				break;
+    			}
+    			
+    			require_once("Mail/mimeDecode.php");
+    			$params = array(
+    				'include_bodies' => true,
+    				'decode_bodies' => true,
+    				'decode_headers' => false
+    			);    			
+    			$content = file_get_contents($file);
+    			$decoder = new Mail_mimeDecode($content);
+    			$structure = $decoder->decode($params);
+    			$part = $this->_findAttachmentById($structure, $attachId);
+    			AJXP_XMLWriter::header();
+    			if($part !== false){
+	    			$destFile = $destStreamURL.$destRep."/".$part->d_parameters['filename'];
+	    			$fp = fopen($destFile, "w");
+	    			if($fp !== false){
+	    				fwrite($fp, $part->body, strlen($part->body));
+	    				fclose($fp);
+	    				AJXP_XMLWriter::sendMessage(sprintf("Attachment %s was successfully copied to %s", $part->d_parameters["filename"], $destRep), NULL);
+	    			}else{
+		    			AJXP_XMLWriter::sendMessage(null, "Could not open destination file!");
+	    			}
+    			}else{
+    				AJXP_XMLWriter::sendMessage(null, "Could not find attachment!");
+    			}
+    			AJXP_XMLWriter::close();
     		break;
     		
     		default: 
@@ -131,7 +165,8 @@ class EmlParser extends AJXP_Plugin{
 			}
 			if($hKey == "date"){
 				$date = strtotime($hValue);
-				$hValue = date($mess["date_format"], $date);
+				//$hValue = date($mess["date_format"], $date);
+				$metadata["eml_time"] = $date;
 			}
 			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities($hValue, true);
 		}
@@ -142,7 +177,7 @@ class EmlParser extends AJXP_Plugin{
 			$config = '<columns template_name="eml.list">
 				<column messageId="editor.eml.1" attributeName="ajxp_label" sortType="String"/>
 				<column messageId="editor.eml.2" attributeName="eml_to" sortType="String"/>
-				<column messageId="editor.eml.4" attributeName="eml_date" sortType="Date"/>
+				<column messageId="editor.eml.4" attributeName="ajxp_modiftime" sortType="MyDate"/>
 				<column messageId="editor.eml.3" attributeName="eml_subject" sortType="String" fixedWidth="50%"/>
 				<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
 			</columns>';			
@@ -165,6 +200,7 @@ class EmlParser extends AJXP_Plugin{
 			// Replace all text attributes by the "from" value
 			foreach ($dom->documentElement->childNodes as $child){
 				$child->setAttribute("text", $child->getAttribute("eml_from"));
+				$child->setAttribute("ajxp_modiftime", $child->getAttribute("eml_time"));
 			}
 		}
 		

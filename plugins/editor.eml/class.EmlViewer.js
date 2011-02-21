@@ -101,8 +101,52 @@ Class.create("EmlViewer", AbstractEditor, {
 		var form = $("emlDownloadForm");
 		form.elements["secure_token"].value = Connexion.SECURE_TOKEN;
 		form.elements["file"].value = this.currentFile; 
-		form.elements["attachment_id"].value = event.target.__ATTACHMENT_ID;
+		form.elements["attachment_id"].value = event.target.up("div").__ATTACHMENT_ID;
 		form.submit();
+	},
+	
+	cpAttachment : function(event){
+		var container = this.element.down('#treeSelectorCpContainer');
+		this.treeSelector = new TreeSelector(container);
+		this.treeSelector.load();
+		var currentAtt = event.target.up("div");
+		var attachmentId = currentAtt.__ATTACHMENT_ID;
+		if(this.fullScreenMode){
+			container.setStyle({right: 4, top: ($('emlHeaderContainer').getHeight() + 128) + "px"});	
+		}else{
+			container.setStyle({right: 11, top: ($('emlHeaderContainer').getHeight() + 75) + "px"});
+		}
+		
+		
+		var hideSelector = function(){
+			this.treeSelector.unload();
+			currentAtt.removeClassName("active");
+			currentAtt.select("a.emlAttachmentAction").each(Element.hide);
+			container.hide();			
+		}.bind(this);
+		
+		container.down("#eml_cp_ok").observeOnce("click", function(e){
+			Event.stop(e);
+			var selectedNode = this.treeSelector.getSelectedNode();
+			var connexion = new Connexion();
+			connexion.setParameters({
+				file: this.currentFile,
+				get_action:'eml_cp_attachment',
+				attachment_id:attachmentId,
+				destination:selectedNode
+			});
+			connexion.onComplete = function(transport){
+				ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+			};
+			connexion.sendAsync();
+			hideSelector();
+		}.bind(this));
+		container.down("#eml_cp_can").observeOnce("click", function(e){
+			Event.stop(e);
+			hideSelector();
+		}.bind(this));
+		currentAtt.addClassName("active");
+		container.show();
 	},
 	
 	parseBodies : function (transport){
@@ -183,11 +227,38 @@ Class.create("EmlViewer", AbstractEditor, {
 			var attachCont = new Element('div', {id:"attachments_container", className:"emlAttachCont", style:"height:"+($('emlHeaderContainer').getHeight()-14)+"px"});
 			hContainer.insert({top:attachCont});
 			for(var key in attachments){
-				var att = new Element("div", {className:"emlAttachment", title:"Double-click to download"});
+				var att = new Element("div", {className:"emlAttachment"});
 				att.__ATTACHMENT_ID = key;
 				att.insert(attachments[key]);
 				attachCont.insert(att);
-				att.observe("dblclick", this.dlAttachment.bind(this));
+				
+				var dlBut = new Element("a", {
+								className:"emlAttachmentAction", 
+								title:"Download "+attachments[key]});
+				dlBut.update(new Element("img", {
+								src:window.ajxpResourcesFolder+'/images/actions/16/download_manager.png',
+								height: 16,
+								width: 16}));
+				var cpBut = new Element("a", {className:"emlAttachmentAction", title:"Copy file on server"});
+				cpBut.update(new Element("img", {
+					src:window.ajxpResourcesFolder+'/images/actions/16/editcopy.png',
+					height: 16,
+					width: 16}));				
+				att.insert({top: dlBut});
+				att.insert({top: cpBut});
+				
+				dlBut.observe("click", this.dlAttachment.bind(this));
+				cpBut.observe("click", this.cpAttachment.bind(this));
+				dlBut.hide();cpBut.hide();
+				
+				att.observe("mouseenter", function(e){
+					e.target.select("a.emlAttachmentAction").each(Element.show);
+				});
+				att.observe("mouseleave", function(e){
+					if(e.target.hasClassName("active")) return;
+					e.target.select("a.emlAttachmentAction").each(Element.hide);
+				});
+				
 			}		
 		}
 		
