@@ -176,6 +176,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		var hContainer = this.element.down("#emlHeaderContainer");
 		// PARSE HEADERS
 		var headers = XPathSelectNodes(xmlDoc, "email/header");
+		var labels = {"From":"editor.eml.1", "To":"editor.eml.2", "Date":"editor.eml.4", "Subject":"editor.eml.3"};;
 		var searchedHeaders = {"From":[], "To":[], "Date":[], "Subject":[]};
 		headers.each(function(el){
 			var hName = XPathGetSingleNodeText(el, "headername");
@@ -187,9 +188,10 @@ Class.create("EmlViewer", AbstractEditor, {
 		$H(searchedHeaders).each(function(pair){
 			if(pair.value.length){
 				var value = pair.value.join(", ");
+				var label = MessageHash[labels[pair.key]];
 				hContainer.insert('\
 					<div class="emlHeader">\
-						<div class="emlHeaderLabel">'+pair.key+'</div>\
+						<div class="emlHeaderLabel">'+label+'</div>\
 						<div class="emlHeaderContent">'+value+'</div>\
 					</div>');
 			}
@@ -234,12 +236,12 @@ Class.create("EmlViewer", AbstractEditor, {
 				
 				var dlBut = new Element("a", {
 								className:"emlAttachmentAction", 
-								title:"Download "+attachments[key]});
+								title:MessageHash["editor.eml.10"]+attachments[key]});
 				dlBut.update(new Element("img", {
 								src:window.ajxpResourcesFolder+'/images/actions/16/download_manager.png',
 								height: 16,
 								width: 16}));
-				var cpBut = new Element("a", {className:"emlAttachmentAction", title:"Copy file on server"});
+				var cpBut = new Element("a", {className:"emlAttachmentAction", title:MessageHash["editor.eml.11"]});
 				cpBut.update(new Element("img", {
 					src:window.ajxpResourcesFolder+'/images/actions/16/editcopy.png',
 					height: 16,

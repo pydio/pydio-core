@@ -7,6 +7,11 @@ $mess = array(
 "3" => "Subject",
 "4"	=> "Date",
 "5" => "attachments",
-"6" => "Download EML"
+"6" => "Download EML",
+"7" => "Attachment %s was successfully copied to %s",
+"8" => "Could not open destination file!",
+"9" => "Could not find attachment!",
+"10" => "Download ",
+"11" => "Copy attachment on the server",
 );
 ?>
