@@ -61,7 +61,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		}
 		$super(userSelection);
 		var fileName = userSelection.getUniqueFileName();
-		this.textareaContainer = document.createElement('div');
+		this.textareaContainer = new Element('div');
 		this.contentMainContainer = this.textareaContainer;
 		this.textareaContainer.setStyle({width:'100%', overflow:'auto'});	
 		this.element.appendChild(this.textareaContainer);
@@ -196,7 +196,7 @@ Class.create("EmlViewer", AbstractEditor, {
 					</div>');
 			}
 		});
-		console.log(xmlDoc);
+		
 		// PARSE ATTACHEMENTS
 		// Go throught headers and find Content-Disposition: attachment ones
 		var allHeaders = XPathSelectNodes(xmlDoc, "//header");
