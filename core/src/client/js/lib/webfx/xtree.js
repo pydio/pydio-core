@@ -268,7 +268,9 @@ WebFXTreeAbstractNode.prototype.focus = function() {
 	if ((webFXTreeHandler.selected) && (webFXTreeHandler.selected != this)) { webFXTreeHandler.selected.deSelect(); }
 	webFXTreeHandler.selected = this;
 	if ((this.openIcon) && (webFXTreeHandler.behavior != 'classic')) { $(this.id + '-icon').src = this.openIcon; }
-	if($(this.id + '-anchor')) $(this.id + '-anchor').focus();
+	try{
+		if($(this.id + '-anchor')) $(this.id + '-anchor').focus();
+	}catch(e){}
 	$(this.id).className = 'webfx-tree-item selected-webfx-tree-item';
 	if (webFXTreeHandler.onSelect) { webFXTreeHandler.onSelect(this); }	
 } ;
