@@ -13,5 +13,6 @@ $mess = array(
 "9" => "Impossible de trouver l'attachement",
 "10" => "Télécharger ",
 "11" => "Copier l'attachement sur le serveur",
+"12" => "Cc",
 );
 ?>

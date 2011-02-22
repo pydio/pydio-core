@@ -169,7 +169,7 @@ class EmlParser extends AJXP_Plugin{
 				//$hValue = date($mess["date_format"], $date);
 				$metadata["eml_time"] = $date;
 			}
-			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities($hValue, true);
+			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(htmlentities($hValue), true);
 		}
 		$metadata["eml_attachments"] = 0;
 		$parts = $structure->parts;

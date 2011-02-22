@@ -33,11 +33,11 @@ div.emlBody{
 
 div.emlAttachCont{
 	float: right;
-margin: 5px;
-border: 1px solid #BBB;
-background-color: white;
-overflow: auto;		
-width: 202px;
+	margin: 5px;
+	border: 1px solid #BBB;
+	background-color: white;
+	overflow: auto;		
+	width: 202px;
 }
 
 div.emlAttachment{
@@ -49,6 +49,7 @@ padding-left: 23px;
 }
 
 div.emlAttachment.active,
+div.emlAttachment.ieHover,
 div.emlAttachment:hover{
 	background-color: #73A2D7;
 	color: white; 
