@@ -13,5 +13,6 @@ $mess = array(
 "9" => "Could not find attachment!",
 "10" => "Download ",
 "11" => "Copy attachment on the server",
+"12" => "Cc",
 );
 ?>

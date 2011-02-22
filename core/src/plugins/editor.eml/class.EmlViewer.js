@@ -158,11 +158,19 @@ Class.create("EmlViewer", AbstractEditor, {
 			this.iFrameContent = html.firstChild.nodeValue;
 			this.iFrame.contentWindow.document.write(this.iFrameContent);
 			this.iFrame.setStyle({width: '100%', height: '100%', border: '0px'});
-			var reloader = function(){
-				this.iFrame.contentWindow.document.write(this.iFrameContent);
-			}.bind(this);
-			this.element.observe("editor:enterFSend", reloader);
-			this.element.observe("editor:exitFSend", reloader);
+			if(Prototype.Browser.IE){
+				this.element.observeOnce("editor:exitFSend", function(){
+					// Fix IE disappearing elements in Quirks Mode
+					$('emlHeaderContainer').setStyle({position:"absolute"});
+					this.textareaContainer.setStyle({marginTop:$('emlHeaderContainer').getHeight()});					
+				}.bind(this) );				
+			}else{
+				var reloader = function(){
+					this.iFrame.contentWindow.document.write(this.iFrameContent);
+				}.bind(this);
+				this.element.observe("editor:enterFSend", reloader);
+				this.element.observe("editor:exitFSend", reloader);
+			}
 		}else{
 			var pre = new Element("pre");
 			pre.insert(XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="plain"]').firstChild.nodeValue);
@@ -176,15 +184,18 @@ Class.create("EmlViewer", AbstractEditor, {
 		var hContainer = this.element.down("#emlHeaderContainer");
 		// PARSE HEADERS
 		var headers = XPathSelectNodes(xmlDoc, "email/header");
-		var labels = {"From":"editor.eml.1", "To":"editor.eml.2", "Date":"editor.eml.4", "Subject":"editor.eml.3"};;
-		var searchedHeaders = {"From":[], "To":[], "Date":[], "Subject":[]};
+		var labels = {"From":"editor.eml.1", "To":"editor.eml.2", "Cc":"editor.eml.12", "Date":"editor.eml.4", "Subject":"editor.eml.3"};;
+		var searchedHeaders = {"From":[], "To":[], "Cc":[], "Date":[], "Subject":[]};
 		headers.each(function(el){
 			var hName = XPathGetSingleNodeText(el, "headername");
 			var hValue = XPathGetSingleNodeText(el, "headervalue");
 			if(searchedHeaders[hName]){
-				searchedHeaders[hName].push(hValue);
+				if(hValue.strip() != ''){ 
+					searchedHeaders[hName].push(hValue.strip().escapeHTML());
+				}
 			}
 		});
+		//console.log(searchedHeaders);
 		$H(searchedHeaders).each(function(pair){
 			if(pair.value.length){
 				var value = pair.value.join(", ");
@@ -266,7 +277,14 @@ Class.create("EmlViewer", AbstractEditor, {
 					if(e.target.hasClassName("active")) return;
 					e.target.select("a.emlAttachmentAction").each(Element.hide);
 				});
-				
+				if(Prototype.Browser.IE){
+					att.observe("mouseenter", function(e){
+						e.target.addClassName("ieHover");
+					});
+					att.observe("mouseleave", function(e){
+						e.target.removeClassName("ieHover");
+					});
+				}
 			}		
 		}
 		
