@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="jsapi" label="Javascript Api Browser" description="Browse AjaXplorer Javascript classes and interfaces">
+	<client_settings icon="plugins/access.ajxp_conf/admin.png">
+		<resources>
+			<img_library alias="jsapi_images" path="plugins/access.jsapi/icons"/>
+			<js file="plugins/editor.codemirror/CodeMirror/js/codemirror.js" className="CodeMirror"/>
+			<css file="plugins/editor.codemirror/css/linenumbers.css"/>			
+			<js file="plugins/access.jsapi/class.JsSourceViewer.js" className="JsSourceViewer"/>
+			<js file="plugins/access.jsapi/class.LocalAPINodeProvider.js" className="LocalAPINodeProvider"/>
+		</resources>
+		<node_provider ajxpClass="LocalAPINodeProvider" ajxpOptions="{}"/>
+	</client_settings>
+	<class_definition filename="plugins/access.jsapi/class.jsapiAccessDriver.php" classname="jsapiAccessDriver"/>
+	<registry_contributions>
+		<actions>
+			<action name="ls" dirDefault="true">			
+				<gui text="32" title="32" src="fileopen.png"
+					accessKey="folder_access_key">
+					<context selection="true" dir="" recycle="false"
+						actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true">
+					</context>
+					<selectionContext dir="true" file="true" recycle="false"
+						unique="true" allowedMimes="AJXP_MIMES_ZIP">
+					</selectionContext>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="false" adminOnly="false">
+				</rightsContext>
+				<processing>
+					<clientCallback prepareModal="true"><![CDATA[
+						var path;					
+						if(window.actionArguments && window.actionArguments.length>0){
+							path = window.actionArguments[0];
+							if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
+						}else{
+							userSelection = ajaxplorer.getUserSelection();
+							if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
+								path = userSelection.getUniqueNode();
+							}
+						}
+						if(path){
+							ajaxplorer.updateContextData(path);
+						}						
+						]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>	
+			<action name="get_js_source">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>	
+		</actions>
+		<client_configs>
+			<!-- 
+			<template_part ajxpId="bottomSplitPane" ajxpClass="AjxpPane" ajxpOptions="{}"/>
+			-->
+			<template_part ajxpId="info_panel" ajxpClass="JsSourceViewer" ajxpOptions="{}"/>
+			<component_config className="FilesList">
+				<columns switchGridMode="filelist">
+					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
+				</columns>
+			</component_config>
+		</client_configs>			
+	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<plugin pluginName="editor.codemirror"/>
+	</dependencies>						
+</ajxpdriver>
