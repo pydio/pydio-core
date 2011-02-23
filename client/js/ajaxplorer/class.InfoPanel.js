@@ -41,14 +41,26 @@ Class.create("InfoPanel", AjxpPane, {
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();
-		document.observe("ajaxplorer:actions_refreshed", this.update.bind(this) );
-		document.observe("ajaxplorer:component_config_changed", function(event){
+		
+		this.updateHandler = this.update.bind(this);
+		this.componentConfigHandler = function(event){
 			if(event.memo.className == "InfoPanel"){
 				this.parseComponentConfig(event.memo.classConfig.get('all'));
 			}
-		}.bind(this) );
+		}.bind(this);
+		this.userLogHandler = this.clearPanels.bind(this);
 		
-		document.observe("ajaxplorer:user_logged", this.clearPanels.bind(this) );
+		document.observe("ajaxplorer:actions_refreshed", this.updateHandler );
+		document.observe("ajaxplorer:component_config_changed", this.componentConfigHandler );		
+		document.observe("ajaxplorer:user_logged", this.userLogHandler );
+	},
+	
+	destroy : function(){
+		document.stopObserving("ajaxplorer:actions_refreshed", this.updateHandler );
+		document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );		
+		document.stopObserving("ajaxplorer:user_logged", this.userLogHandler );
+		this.empty();
+		this.htmlElement = null;
 	},
 		
 	clearPanels:function(){
