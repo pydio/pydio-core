@@ -278,8 +278,12 @@ Class.create("Ajaxplorer", {
 		}
 		if(Class.objectImplements(oldObj, "IActionProvider")){
 			oldObj.getActions().each(function(act){
-				this.guiActions = this.guiActions.without(act);
+				this.guiActions.unset(act.key);// = this.guiActions.without(act);
 			}.bind(this) );
+		}
+		
+		if(oldObj.destroy){
+			oldObj.destroy();
 		}
 
 		var obj = new ajxpClass($(ajxpId), ajxpOptions);			
@@ -395,8 +399,17 @@ Class.create("Ajaxplorer", {
 				
 		this.skipLsHistory = true;
 		
-		
-		var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
+		var providerDef = repository.getNodeProviderDef();
+		if(providerDef != null){
+			var provider = eval('new '+providerDef.name+'()');
+			if(providerDef.options){
+				provider.initProvider(providerDef.options);
+			}
+			this._contextHolder.setAjxpNodeProvider(provider);
+			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon, provider);
+		}else{
+			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
+		}
 		this._contextHolder.setRootNode(rootNode);
 		if(this.repositoryId == null || this.repositoryId != repositoryId){
 			rootNode.load();

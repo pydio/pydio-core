@@ -38,6 +38,7 @@ Class.create("Repository", {
 	label:'No Repository',
 	icon:'',
 	accessType:'',
+	nodeProviderDef: null,
 	resourcesManager:undefined,
 	allowCrossRepositoryCopy:false,
 
@@ -80,6 +81,10 @@ Class.create("Repository", {
 		this.resourcesManager.load();
 	},
 	
+	getNodeProviderDef : function(){
+		return this.nodeProviderDef;
+	},
+	
 	loadFromXml: function(repoNode){
 		if(repoNode.getAttribute('allowCrossRepositoryCopy') && repoNode.getAttribute('allowCrossRepositoryCopy') == "true"){
 			this.allowCrossRepositoryCopy = true;
@@ -97,6 +102,10 @@ Class.create("Repository", {
 					var subCh = childNode.childNodes[j];
 					if(subCh.nodeName == 'resources'){
 						this.resourcesManager.loadFromXmlNode(subCh);
+					}else if(subCh.nodeName == 'node_provider'){
+						var nodeProviderName = subCh.getAttribute("ajxpClass");
+						var nodeProviderOptions = subCh.getAttribute("ajxpOptions").evalJSON();
+						this.nodeProviderDef = {name:nodeProviderName, options:nodeProviderOptions};
 					}
 				}
 			}
