@@ -85,7 +85,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 		}
 		var path = contextNode.getPath();
 		var objectNode = contextNode;
-		if(contextNode.isLeaf()){
+		if(contextNode.isLeaf() && !contextNode.getMetadata().get("API_OBJECT_NODE")){
 			var metadata = contextNode.getMetadata();
 			if(metadata.get("memberType") == "parent_method"){
 				var redirect = '/Classes/' + metadata.get("parentClass");
@@ -97,7 +97,12 @@ Class.create("JsSourceViewer", AjxpPane, {
 			this.pendingPointer = currentPointer;
 			this.pendingPointerType = "MemberName";
 		} else {			
-			this.pendingPointer = getBaseName(objectNode.getPath());
+			if(contextNode.getMetadata().get("API_OBJECT_NODE")){
+				objectNode = contextNode.getParent();
+				this.pendingPointer = getBaseName(contextNode.getPath());
+			}else{
+				this.pendingPointer = getBaseName(objectNode.getPath());
+			}				
 			this.pendingPointerType = "ObjectName";
 		}
 		if(objectNode.getMetadata().get("API_CLASS") || objectNode.getMetadata().get("API_INTERFACE")){
