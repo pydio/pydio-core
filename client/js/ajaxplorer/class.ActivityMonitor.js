@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,8 +29,9 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : A monitor for user "idle" state to prevent session timing out.
+ */
+/**
+ * A monitor for user "idle" state to prevent session timing out.
  */
 Class.create("ActivityMonitor", {
 	
@@ -44,6 +45,12 @@ Class.create("ActivityMonitor", {
 	_lastActive:0,	
 	_state:'active',
 	
+	/**
+	 * Constructor
+	 * @param serverSessionTime Integer The server session timeout
+	 * @param clientSessionTime Integer The client session timeout
+	 * @param warningMinutes Integer The number of minutes before timeout where the user is warned.
+	 */
 	initialize : function(serverSessionTime, clientSessionTime, warningMinutes){
 		if(!serverSessionTime) return;
 		this._serverSessionTime = serverSessionTime;
@@ -74,7 +81,9 @@ Class.create("ActivityMonitor", {
 			}
 		}.bind(this));		
 	},
-		
+	/**
+	 * Listener to clear the timer 
+	 */
 	activityObserver : function(){
 		if(this._state == 'warning') return;
 		if(this.timer){
@@ -83,11 +92,17 @@ Class.create("ActivityMonitor", {
 		this.timer = window.setTimeout(this.activityUpdater.bind(this), 1000);
 	},
 	
+	/**
+	 * Set last activity time
+	 */
 	activityUpdater : function(){
 		//console.log('activity!');
 		this._lastActive = this.getNow();
 	},
 	
+	/**
+	 * Pings the server
+	 */
 	serverObserver : function(){
 		new Ajax.Request(window.ajxpServerAccessPath, 
 		{
@@ -96,6 +111,9 @@ Class.create("ActivityMonitor", {
 		});		
 	},
 	
+	/**
+	 * Listener for "idle" state of the user
+	 */
 	idleObserver : function(){
 		if(this._state == 'inactive') return;
 		var idleTime = (this.getNow() - this._lastActive);
@@ -116,6 +134,9 @@ Class.create("ActivityMonitor", {
 		}
 	},
 	
+	/**
+	 * Reactivate window
+	 */
 	exitIdleState : function(){
 		this.removeWarningState();
 		this.activityUpdater();
@@ -124,6 +145,9 @@ Class.create("ActivityMonitor", {
 		this.interval = window.setInterval(this.idleObserver.bind(this), 5000);
 	},
 	
+	/**
+	 * Put the window in "warning" state : overlay, shaking timer, chronometer.
+	 */
 	setWarningState : function(){
 		this._state = 'warning';
 		window.clearInterval(this.interval);
@@ -146,6 +170,10 @@ Class.create("ActivityMonitor", {
 		});
 	},
 	
+	/**
+	 * Chronometer for warning before timeout
+	 * @param time Integer
+	 */
 	updateWarningTimer : function(time){
 		var stringTime = Math.floor(time/60)+'mn'+(time%60) + 's';
 		this.warningPane.down('span.warning_timer').update(stringTime);
@@ -154,6 +182,9 @@ Class.create("ActivityMonitor", {
 		}
 	},
 	
+	/**
+	 * Removes the overlay of warning state
+	 */
 	removeWarningState : function(){
 		if(this.opaFx){
 			this.opaFx.cancel();
@@ -162,6 +193,10 @@ Class.create("ActivityMonitor", {
 		hideLightBox();
 	},
 	
+	/**
+	 * Utility to get the time
+	 * @returns Integer
+	 */
 	getNow : function(){
 		return Math.round((new Date()).getTime() / 1000);
 	}
