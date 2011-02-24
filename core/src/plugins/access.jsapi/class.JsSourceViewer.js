@@ -34,6 +34,9 @@
  */
 Class.create("JsSourceViewer", AjxpPane, {
 
+	/**
+	 * Code Mirror Options
+	 */
 	cmOptions : {
 		path:'plugins/editor.codemirror/CodeMirror/js/',
 		parserfile:["tokenizejavascript.js", "parsejavascript.js"],
@@ -45,11 +48,16 @@ Class.create("JsSourceViewer", AjxpPane, {
 		readOnly : true
 	},
 	
+	/**
+	 * Standard constructor
+	 * @param $super Parent class reference
+	 * @param htmlElement HTMLElement
+	 */
 	initialize: function($super, htmlElement){
 		$super(htmlElement);
 		attachMobileScroll(htmlElement, "vertical");
 		disableTextSelection(htmlElement);
-		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
+		this.setContent(' // SELECT A CLASS TO DISPLAY ITS SOURCE CODE');	
 		document.observe("ajaxplorer:actions_refreshed", this.update.bind(this) );
 		document.observe("ajaxplorer:selection_changed", this.update.bind(this) );
 		document.observe("ajaxplorer:user_logged", this.clearPanels.bind(this) );
@@ -59,6 +67,10 @@ Class.create("JsSourceViewer", AjxpPane, {
 	clearPanels:function(){
 	},
 	
+	/**
+	 * Test
+	 * @return nothing
+	 */
 	empty : function(){
 		this.setContent('');
 	},
@@ -69,7 +81,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 		var contextNode = userSelection.getUniqueNode();
 		this.empty();
 		if(!contextNode) {
-			return;
+			contextNode = userSelection.getContextNode();
 		}
 		var path = contextNode.getPath();
 		var objectNode = contextNode;
@@ -118,6 +130,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 	setContent : function(sHtml){
 		if(sHtml == '') return;
 		if(!this.htmlElement) return;
+		this.parseJavadocs(sHtml);
 		if(!this.codeMirror){
 			this.cmOptions.onLoad = function(mirror){
 				mirror.setCode(sHtml);
@@ -130,7 +143,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 		}else{
 			this.codeMirror.setCode(sHtml);
 			this.applyPointer();
-		}		
+		}
 	},
 	
 	applyPointer : function(){
@@ -159,6 +172,45 @@ Class.create("JsSourceViewer", AjxpPane, {
 			}			
 		}		
 	},
+	
+	parseJavadocs : function(content){
+		var reg = new RegExp(/\/\*\*(([^þ*]|\*(?!\/))*)\*\/([\n\r\s\w]*|[\n\r\s]Class|[\n\r\s]Interface)/gi);
+		var keywords = $A(["param", "return"]);
+		var res = reg.exec(content);
+		var docs = {};
+		while(res != null){
+			var comment = res[1];
+			var key = res[3].strip();
+			var parsedDoc = {main : '', keywords:{}};
+			$A(comment.split("@")).each(function(el){
+				el = el.strip(el);
+				el = el.replace("* ", "");
+				var isKW = false;
+				keywords.each(function(kw){
+					if(el.indexOf(kw+" ") === 0){
+						if(kw == "param"){
+							if(!parsedDoc.keywords[kw]) parsedDoc.keywords[kw] = {};
+							var kwCont = el.substring(kw.length+1);
+							var paramName = kwCont.split(" ")[0];
+							parsedDoc.keywords[kw][paramName] = kwCont.substring(paramName.length+1);													
+						}else if(kw == "return"){
+							parsedDoc.keywords[kw] = el.substring(kw.length+1);
+						}
+						isKW = true;
+					}
+				});
+				if(!isKW){
+					parsedDoc.main += el;
+				}
+			});
+			docs[key] = parsedDoc;
+			//docs.key = res[1];
+			res = reg.exec(content);
+		}
+		//docs.initialize.split("@").invoke("strip")
+		//console.log(docs);
+		//window.jdocs = docs;
+	},	
 	
 	showElement : function(show){
 		if(!this.htmlElement) return;
