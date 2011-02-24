@@ -1,7 +1,5 @@
-/**
- * @package info.ajaxplorer.plugins
- * 
- * Copyright 2007-2009 Charles du Jeu
+/*
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,16 +27,37 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
+/**
+ * Abstract implementation of an Editor. All editors should extend this one, as it provides
+ * standard features for parsing actions, entering/exiting fullscreen, etc.. Events are triggered
+ * at various moments of the editors lifecycle.
  * 
- * Description : Abstract container for editors.
+ * @package info.ajaxplorer.plugins 
  */
 Class.create("AbstractEditor" , {
 	
+	/**
+	 * @var Hash The default actions, initialized with fs, nofs and close
+	 */
 	defaultActions : new Hash(),
+	/**
+	 * @var String
+	 */
 	toolbarSeparator : '<div class="separator"></div>',
+	/**
+	 * @var Boolean Current state of the editor
+	 */
 	fullScreenMode : false,
+	/**
+	 * @var Hash For the moment supported options are "fullscreen", "closable", "floatingToolbar".
+	 */
 	editorOptions : new Hash({"fullscreen":true, "closable":true, "floatingToolbar":false}),
 	
+	/**
+	 * Standard contructor
+	 * @param oContainer Element dom not to attach to
+	 */
 	initialize : function(oContainer){
 		this.element =  $(oContainer);
 		this.defaultActions = new Hash({
@@ -51,6 +70,9 @@ Class.create("AbstractEditor" , {
 		modal.setCloseAction(function(){this.close();}.bind(this));
 	},
 	
+	/**
+	 * Initialize standards editor actions
+	 */
 	initActions : function(){
 		this.actions = new Hash();
 		var actionBarSel = this.element.select('.action_bar');		
@@ -105,6 +127,9 @@ Class.create("AbstractEditor" , {
 		
 	},
 	
+	/**
+	 * Experimental : detach toolbar
+	 */
 	makeToolbarFloatable : function(){
 		this.actionBar.absolutize();
 		this.actionBar.setStyle({
@@ -116,6 +141,9 @@ Class.create("AbstractEditor" , {
 		});
 	},
 	
+	/**
+	 * Creates the title label depending on the "modified" status
+	 */
 	createTitleSpans : function(){
 		var crtTitle = $(modal.dialogTitle).select('span.titleString')[0];
 		this.filenameSpan = new Element("span", {className:"filenameSpan"});
@@ -126,9 +154,17 @@ Class.create("AbstractEditor" , {
 		
 	},
 	
+	/**
+	 * Opens the editor with the current model
+	 * @param userSelection AjxpDataModel the data model
+	 */
 	open : function(userSelection){
 		this.userSelection = userSelection;
 	},
+	/**
+	 * Updates the editor title
+	 * @param title String
+	 */
 	updateTitle : function(title){
 		if(title != ""){
 			title = " - " + title;
@@ -138,6 +174,10 @@ Class.create("AbstractEditor" , {
 			this.refreshFullScreenTitle();
 		}
 	},
+	/**
+	 * Change editor status
+	 * @param isModified Boolean
+	 */
 	setModified : function(isModified){
 		this.isModified = isModified;
 		this.modifSpan.update((isModified?"*":""));
@@ -153,7 +193,9 @@ Class.create("AbstractEditor" , {
 		}
 		this.element.fire("editor:modified", isModified);
 	},
-	
+	/**
+	 * Switch to fullscreen mode
+	 */
 	setFullScreen : function(){
 		this.element.fire("editor:enterFS");
 		if(!this.contentMainContainer){
@@ -184,6 +226,9 @@ Class.create("AbstractEditor" , {
 		this.fullScreenMode = true;
 		this.element.fire("editor:enterFSend");
 	},
+	/**
+	 * Exits fullscreen mode
+	 */
 	exitFullScreen : function(){
 		if(!this.fullScreenMode) return;
 		this.element.fire("editor:exitFS");
@@ -198,6 +243,10 @@ Class.create("AbstractEditor" , {
 		this.fullScreenMode = false;
 		this.element.fire("editor:exitFSend");
 	},
+	/**
+	 * Resizes the main container
+	 * @param size int|null
+	 */
 	resize : function(size){
 		if(size){
 			this.contentMainContainer.setStyle({height:size});
@@ -206,6 +255,10 @@ Class.create("AbstractEditor" , {
 		}
 		this.element.fire("editor:resize", size);
 	},
+	/**
+	 * Closes the editor
+	 * @returns Boolean
+	 */
 	close : function(){		
 		if(this.fullScreenMode){
 			this.exitFullScreen();
@@ -215,10 +268,16 @@ Class.create("AbstractEditor" , {
 		return false;
 	},
 	
+	/**
+	 * Refreshes the title
+	 */
 	refreshFullScreenTitle : function(){
 		document.title = "AjaXplorer - "+$(modal.dialogTitle).innerHTML.stripTags().replace("&nbsp;","");
 	},
-	
+	/**
+	 * Add a loading image to the given element
+	 * @param element Element dom node
+	 */
 	setOnLoad : function(element){	
 		addLightboxMarkupToElement(element);
 		var img = document.createElement("img");
@@ -226,12 +285,21 @@ Class.create("AbstractEditor" , {
 		$(element).select("#element_overlay")[0].appendChild(img);
 		this.loading = true;
 	},
-	
+	/**
+	 * Removes the image from the element 
+	 * @param element Element dom node
+	 */
 	removeOnLoad : function(element){
 		removeLightboxFromElement(element);
 		this.loading = false;	
 	},
 
+	/**
+	 * Called by the other components to create a preview (thumbnail) of a given node
+	 * @param ajxpNode AjxpNode The node to display
+	 * @param rich Boolean whether to display a rich content (flash, video, etc...) or not (image)
+	 * @returns Element
+	 */
 	getPreview : function(ajxpNode, rich){
 		// Return icon if not overriden by derived classes
 		src = AbstractEditor.prototype.getThumbnailSource(ajxpNode);
@@ -251,6 +319,11 @@ Class.create("AbstractEditor" , {
 		return imgObject;
 	},
 	
+	/**
+	 * Gets the standard thumbnail source for previewing the node
+	 * @param ajxpNode AjxpNode
+	 * @returns String
+	 */
 	getThumbnailSource : function(ajxpNode){
 		return resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 64);
 	}
