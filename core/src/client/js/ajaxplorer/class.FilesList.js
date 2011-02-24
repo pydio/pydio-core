@@ -886,7 +886,7 @@ Class.create("FilesList", SelectableElements, {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
 				//}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span id=\"ajxp_label\" class=\"text_label\">" + metaData.get('text')+"</span>");
-				}).update("<span id=\"ajxp_label\" class=\"text_label\" style=\"padding-left:24px; background-repeat:no-repeat;background-position:4 2px;background-image:url('"+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"')\">" + metaData.get('text')+"</span>");
+				}).update("<span id=\"ajxp_label\" class=\"text_label"+fullview+"\" style=\"padding-left:24px; background-repeat:no-repeat;background-position:4 2px;background-image:url('"+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"')\">" + metaData.get('text')+"</span>");
 				innerSpan.ajxpNode = ajxpNode; // For draggable
 				tableCell.insert(innerSpan);
 				
@@ -906,7 +906,7 @@ Class.create("FilesList", SelectableElements, {
 				var date = new Date();
 				date.setTime(parseInt(metaData.get(s))*1000);
 				newRow.ajxp_modiftime = date;
-				tableCell.update('<span class="text_label">' + formatDate(date) + '</span>');
+				tableCell.update('<span class="text_label'+fullview+'">' + formatDate(date) + '</span>');
 			}
 			else
 			{
