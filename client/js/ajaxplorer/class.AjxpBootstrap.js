@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -254,6 +254,10 @@ Class.create("AjxpBootstrap", {
 			($$('head')[0] || $$('body')[0]).insert(ga);
 		}, 200);
 	},
+	/**
+	 * Loads a CSS file
+	 * @param fileName String
+	 */
 	loadCSSResource : function(fileName){
 		var head = $$('head')[0];
 		var cssNode = new Element('link', {
@@ -264,6 +268,10 @@ Class.create("AjxpBootstrap", {
 		});
 		head.insert(cssNode);
 	},
+	/**
+	 * Inserts the all_forms and generic dialog box if not alreay present.
+	 * @param desktopNode String The id of the node to attach
+	 */
 	insertBasicSkeleton : function(desktopNode){
 		if($('all_forms')) return;
 		$(desktopNode).insert({after:

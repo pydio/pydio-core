@@ -1,7 +1,7 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
- * Copyright 2007-2009 Charles du Jeu
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,11 +29,15 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Manages the display of the bookmarks menus.
+ */
+/**
+ * Manages the display of the bookmarks menus. Was a "bookmark bar" but is now a Bookmark button and menu
  */
  Class.create("BookmarksBar", {
-	
+	/**
+	 * Constructor
+	 * @param oElement HTMLElement The main element 
+	 */
 	initialize: function(oElement){
 		this.element = $(oElement);
 		this.currentCount = 0;	
@@ -59,7 +63,10 @@
 			this.addBookmark(node.getPath(), node.getLabel());			
 		}.bind(this) );
 	},
-	
+	/**
+	 * Parses the registry to find the bookmarks definition
+	 * @param registry XMLDocument
+	 */
 	parseXml: function(registry){
 		this.clear();
 		var childNodes = XPathSelectNodes(registry, "user/bookmarks/bookmark");
@@ -79,7 +86,9 @@
 		if(this.bookmarks.length) this.element.removeClassName('inline_disabled');
 		if(modal.pageLoading) modal.updateLoadingProgress('Bookmarks Loaded');
 	},
-	
+	/**
+	 * Creates the sub menu
+	 */
 	createMenu : function(){
 		this.bmMenu = new Proto.Menu({			
 			className: 'menu bookmarksMenu',
@@ -94,6 +103,9 @@
 		});
 	},
 		
+	/**
+	 * Remove all bookmarks and elements
+	 */
 	clear: function(){
 		this.currentCount = 0;
 		if(this.addBookmarkObject){
@@ -106,6 +118,11 @@
 		this.bmMenu.refreshList();		
 	},
 	
+	/**
+	 * Gets the bookmark actions for a bookmark
+	 * @param bmPath String
+	 * @param bmTitle String
+	 */
 	getContextActions: function(bmPath, bmTitle){
 		
 		var removeAction = {
@@ -135,6 +152,11 @@
 		return new Array(renameAction, removeAction);
 	},
 	
+	/**
+	 * Create a rename form for renaming bookmark
+	 * @param bmPath String
+	 * @param bmTitle String
+	 */
 	toggleRenameForm:function(bmPath, bmTitle){
 		
 		modal.prepareHeader(MessageHash[225], ajxpResourcesFolder+'/images/actions/16/bookmark.png');
@@ -149,6 +171,10 @@
 		modal.showDialogForm('Rename', 'rename_bookmark', onLoad, onComplete);
 	},
 	
+	/**
+	 * Reload the bookmarks via the registry loading
+	 * @param actionsParameters Hash
+	 */
 	load: function(actionsParameters){
 		var connexion = new Connexion();
 		if(!actionsParameters) actionsParameters = new Hash();
@@ -166,6 +192,11 @@
 		connexion.sendAsync();
 	},
 	
+	/**
+	 * Add a bookmark
+	 * @param path String
+	 * @param title String
+	 */
 	addBookmark: function(path,title){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'add_bookmark');
@@ -176,6 +207,10 @@
 		this.load(parameters);
 	},
 	
+	/**
+	 * Remove a bookmark
+	 * @param path String
+	 */
 	removeBookmark: function(path){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'delete_bookmark');
@@ -183,6 +218,11 @@
 		this.load(parameters);		
 	},
 	
+	/**
+	 * Rename a bookmark
+	 * @param path String
+	 * @param title String
+	 */
 	renameBookmark: function(path, title){
 		var parameters = new Hash();
 		parameters.set('bm_action', 'rename_bookmark');

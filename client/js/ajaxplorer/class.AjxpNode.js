@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,10 +29,19 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Abstract container for data
+ */
+/**
+ * Abstract container for data
  */
 Class.create("AjxpNode", {
+	/**
+	 * Constructor
+	 * @param path String
+	 * @param isLeaf Boolean
+	 * @param label String
+	 * @param icon String
+	 * @param iNodeProvider IAjxpNodeProvider
+	 */
 	initialize : function(path, isLeaf, label, icon, iNodeProvider){
 		this._path = path;
 		if(this._path && this._path.length && this._path.length > 1){
@@ -52,12 +61,24 @@ Class.create("AjxpNode", {
 		this._iNodeProvider = iNodeProvider;
 		
 	},
+	/**
+	 * The node is loaded or not
+	 * @returns Boolean
+	 */
 	isLoaded : function(){
 		return this._isLoaded;
 	},
+	/**
+	 * Changes loaded status
+	 * @param bool Boolean
+	 */
 	setLoaded : function(bool){
 		this._isLoaded = bool;
 	},
+	/**
+	 * Loads the node using its own provider or the one passed
+	 * @param iAjxpNodeProvider IAjxpNodeProvider Optionnal
+	 */
 	load : function(iAjxpNodeProvider){		
 		if(this.isLoading) return;		
 		if(!iAjxpNodeProvider){
@@ -81,6 +102,10 @@ Class.create("AjxpNode", {
 			this.notify("first_load");
 		}.bind(this));		
 	},
+	/**
+	 * Remove children and reload node
+	 * @param iAjxpNodeProvider IAjxpNodeProvider Optionnal
+	 */
 	reload : function(iAjxpNodeProvider){
 		this._children.each(function(child){
 			this.removeChild(child);
@@ -88,6 +113,9 @@ Class.create("AjxpNode", {
 		this._isLoaded = false;		
 		this.load(iAjxpNodeProvider);
 	},
+	/**
+	 * Unload child and notify "force_clear"
+	 */
 	clear : function(){
 		this._children.each(function(child){
 			this.removeChild(child);
@@ -95,16 +123,31 @@ Class.create("AjxpNode", {
 		this._isLoaded = false;		
 		this.notify("force_clear");
 	},
+	/**
+	 * Sets this AjxpNode as being the root parent
+	 */
 	setRoot : function(){
 		this._isRoot = true;
 	},
+	/**
+	 * Set the node children as a bunch
+	 * @param ajxpNodes AjxpNodes[]
+	 */
 	setChildren : function(ajxpNodes){
 		this._children = $A(ajxpNodes);
 		this._children.invoke('setParent', this);
 	},
+	/**
+	 * Get all children as a bunch
+	 * @returns AjxpNode[]
+	 */
 	getChildren : function(){
 		return this._children;
 	},
+	/**
+	 * Adds a child to children
+	 * @param ajxpNode AjxpNode The child
+	 */
 	addChild : function(ajxpNode){
 		ajxpNode.setParent(this);
 		if(this._iNodeProvider) ajxpNode._iNodeProvider = this._iNodeProvider;
@@ -115,12 +158,20 @@ Class.create("AjxpNode", {
 			this.notify("child_added", ajxpNode.getPath());
 		}
 	},
+	/**
+	 * Removes the child from the children
+	 * @param ajxpNode AjxpNode
+	 */
 	removeChild : function(ajxpNode){
 		var removePath = ajxpNode.getPath();
 		ajxpNode.notify("node_removed");
 		this._children = this._children.without(ajxpNode);
 		this.notify("child_removed", removePath);
 	},
+	/**
+	 * Replaces the current node by a new one. Copy all properties deeply
+	 * @param ajxpNode AjxpNode
+	 */
 	replaceBy : function(ajxpNode){
 		this._isLeaf = ajxpNode._isLeaf;
 		if(ajxpNode._label){
@@ -147,35 +198,72 @@ Class.create("AjxpNode", {
 		}.bind(this) );
 		this.notify("node_replaced", this);		
 	},
+	/**
+	 * Finds a child node by its path
+	 * @param path String
+	 * @returns AjxpNode
+	 */
 	findChildByPath : function(path){
 		return $A(this._children).find(function(child){
 			return (child.getPath() == path);
 		});
 	},
+	/**
+	 * Sets the metadata as a bunch
+	 * @param data $H() A prototype Hash
+	 */
 	setMetadata : function(data){
 		this._metadata = data;
 	},
+	/**
+	 * Gets the metadat
+	 * @returns $H()
+	 */
 	getMetadata : function(data){
 		return this._metadata;
 	},
+	/**
+	 * Is this node a leaf
+	 * @returns Boolean
+	 */
 	isLeaf : function(){
 		return this._isLeaf;
 	},
+	/**
+	 * @returns String
+	 */
 	getPath : function(){
 		return this._path;
 	},
+	/**
+	 * @returns String
+	 */
 	getLabel : function(){
 		return this._label;
 	},
+	/**
+	 * @returns String
+	 */
 	getIcon : function(){
 		return this._icon;
 	},
+	/**
+	 * @returns Boolean
+	 */
 	isRecycle : function(){
 		return (this.getAjxpMime() == 'ajxp_recycle');
 	},
+	/**
+	 * NOT IMPLEMENTED, USE hasAjxpMimeInBranch instead
+	 */	
 	inZip : function(){
 		
 	},
+	/**
+	 * Search the mime type in the parent branch
+	 * @param ajxpMime String
+	 * @returns Boolean
+	 */
 	hasAjxpMimeInBranch: function(ajxpMime){
 		if(this.getAjxpMime() == ajxpMime.toLowerCase()) return true;
 		var parent, crt = this;
@@ -185,12 +273,25 @@ Class.create("AjxpNode", {
 		}
 		return false;
 	},	
+	/**
+	 * Sets a reference to the parent node
+	 * @param parentNode AjxpNode
+	 */
 	setParent : function(parentNode){
 		this._parentNode = parentNode;
 	},
+	/**
+	 * Gets the parent Node
+	 * @returns AjxpNode
+	 */
 	getParent : function(){
 		return this._parentNode;
 	},
+	/**
+	 * Finds this node by path if it already exists in arborescence 
+	 * @param rootNode AjxpNode
+	 * @param fakeNodes AjxpNode[]
+	 */
 	findInArbo : function(rootNode, fakeNodes){
 		if(!this.getPath()) return;
 		var pathParts = this.getPath().split("/");
@@ -212,19 +313,36 @@ Class.create("AjxpNode", {
 		}
 		return crtNode;
 	},
+	/**
+	 * @returns Boolean
+	 */
 	isRoot : function(){
 		return this._isRoot;
 	},
+	/**
+	 * Check if it's the parent of the given node
+	 * @param node AjxpNode
+	 * @returns Boolean
+	 */
 	isParentOf : function(node){
 		var childPath = node.getPath();
 		var parentPath = this.getPath();
 		return (childPath.substring(0,parentPath.length) == parentPath);
 	},
+	/**
+	 * Check if it's a child of the given node
+	 * @param node AjxpNode
+	 * @returns Boolean
+	 */
 	isChildOf : function(node){
 		var childPath = this.getPath();
 		var parentPath = node.getPath();
 		return (childPath.substring(0,parentPath.length) == parentPath);
 	},	
+	/**
+	 * Gets the current's node mime type, either by ajxp_mime or by extension.
+	 * @returns String
+	 */
 	getAjxpMime : function(){
 		if(this._metadata && this._metadata.get("ajxp_mime")) return this._metadata.get("ajxp_mime").toLowerCase();
 		if(this._metadata && this.isLeaf()) return getAjxpMimeType(this._metadata).toLowerCase();

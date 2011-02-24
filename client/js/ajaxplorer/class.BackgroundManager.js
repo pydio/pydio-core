@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,11 +29,19 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Manage background tasks and display their state.
+ */
+/**
+ * Manage background tasks and display their state.
  */
 Class.create("BackgroundManager", {
+	/**
+	 * @var $A() The queue of tasks to process
+	 */
 	queue: $A([]),
+	/**
+	 * Constructor
+	 * @param actionManager ActionManager
+	 */
 	initialize:function(actionManager){
 		this.actionManager = actionManager;
 		this.panel = new Element('div').addClassName('backgroundPanel');
@@ -44,7 +52,12 @@ Class.create("BackgroundManager", {
 		this.working = false;
 		document.body.insert(this.panel);
 	},
-	
+	/**
+	 * Add an action to the queue
+	 * @param actionName String Name of the action
+	 * @param parameters Object Parameters of the action
+	 * @param messageId String An i18n id of the message to be displayed during the action
+	 */
 	queueAction:function(actionName, parameters,messageId){
 		var actionDef = new Hash();
 		actionDef.set('name', actionName);
@@ -53,6 +66,9 @@ Class.create("BackgroundManager", {
 		this.queue.push(actionDef);
 	},
 	
+	/**
+	 * Processes the next action in the queue
+	 */
 	next:function(){
 		if(!this.queue.size()){
 			 this.finished();
@@ -84,6 +100,10 @@ Class.create("BackgroundManager", {
 		this.working = true;
 	},
 	
+	/**
+	 * Parses the response. Should probably use the actionBar parser instead.
+	 * @param xmlResponse XMLDocument
+	 */
 	parseAnswer:function(xmlResponse){
 		var childs = xmlResponse.documentElement.childNodes;	
 		
@@ -117,7 +137,10 @@ Class.create("BackgroundManager", {
 		this.working = false;
 		this.next();
 	},
-	
+	/**
+	 * Interrupt the task on error
+	 * @param errorMessage String
+	 */
 	interruptOnError:function(errorMessage){
 		if(this.queue.size()) this.queue = $A([]);
 		
@@ -125,12 +148,17 @@ Class.create("BackgroundManager", {
 		this.panel.insert(this.makeCloseLink());
 		this.working = false;
 	},
-	
+	/**
+	 * All tasks are processed
+	 */
 	finished:function(){		
 		this.working = false;
 		this.panel.hide();
 	},
 	
+	/**
+	 * Create a "Close" link
+	 */
 	makeCloseLink:function(){
 		var link = new Element('a', {href:'#'}).update('Close').observe('click', function(e){
 			Event.stop(e);
@@ -138,7 +166,9 @@ Class.create("BackgroundManager", {
 		}.bind(this));
 		return link;
 	},
-	
+	/**
+	 * Create a stub action with not parameter.
+	 */
 	addStub: function(){		
 		this.queueAction('local_to_remote', new Hash(), 'Stubing a 10s bg action');
 	}

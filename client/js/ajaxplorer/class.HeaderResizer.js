@@ -1,4 +1,44 @@
+/*
+ * @package info.ajaxplorer.plugins
+ * 
+ * Copyright 2007-2011 Charles du Jeu
+ * This file is part of AjaXplorer.
+ * The latest code can be found at http://www.ajaxplorer.info/
+ * 
+ * This program is published under the LGPL Gnu Lesser General Public License.
+ * You should have received a copy of the license along with AjaXplorer.
+ * 
+ * The main conditions are as follow : 
+ * You must conspicuously and appropriately publish on each copy distributed 
+ * an appropriate copyright notice and disclaimer of warranty and keep intact 
+ * all the notices that refer to this License and to the absence of any warranty; 
+ * and give any other recipients of the Program a copy of the GNU Lesser General 
+ * Public License along with the Program. 
+ * 
+ * If you modify your copy or copies of the library or any portion of it, you may 
+ * distribute the resulting library provided you do so under the GNU Lesser 
+ * General Public License. However, programs that link to the library may be 
+ * licensed under terms of your choice, so long as the library itself can be changed. 
+ * Any translation of the GNU Lesser General Public License must be accompanied by the 
+ * GNU Lesser General Public License.
+ * 
+ * If you copy or distribute the program, you must accompany it with the complete 
+ * corresponding machine-readable source code or with a written offer, valid for at 
+ * least three years, to furnish the complete corresponding machine-readable source code. 
+ * 
+ * Any of the above conditions can be waived if you get permission from the copyright holder.
+ * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
+/**
+ * Dedicated object for resizing columns of a grid
+ */
 Class.create("HeaderResizer", {
+	/**
+	 * Constructor
+	 * @param element HTMLElement
+	 * @param options Object
+	 */
 	initialize:function(element, options){
 		this.element = element;
 		this.options = Object.extend({
@@ -42,6 +82,9 @@ Class.create("HeaderResizer", {
 		}.bind(this));
 	},
 	
+	/**
+	 * Creates the columns header
+	 */
 	generateHeader : function(){
 		var data = this.options.headerData;
 		this.element.addClassName('header_resizer');
@@ -63,6 +106,9 @@ Class.create("HeaderResizer", {
 		}
 	},
 	
+	/**
+	 * Compute same sizes for all columns
+	 */
 	computeEqualSizes : function(){
 		var ratio = 1 / this.cells.length;
 		var sizes = $A();
@@ -72,6 +118,12 @@ Class.create("HeaderResizer", {
 		return sizes;
 	},
 	
+	/**
+	 * Compute sizes based on percent
+	 * @param previousSizes Array
+	 * @param previousInner Array
+	 * @returns Array
+	 */
 	computePercentSizes : function(previousSizes, previousInner){
 		var sizes = $A();
 		var innerWidth = this.getInnerWidth();
@@ -81,6 +133,11 @@ Class.create("HeaderResizer", {
 		return sizes;
 	},
 		
+	/**
+	 * Gets the current sizes as integer
+	 * @param percent Boolean Percent or integer
+	 * @returns Array
+	 */
 	getCurrentSizes : function(percent){
 		if(!percent) return this.currentSizes;
 		var innerWidth = this.getInnerWidth();
@@ -91,6 +148,10 @@ Class.create("HeaderResizer", {
 		return percentSizes;
 	},
 	
+	/**
+	 * Resize the widget
+	 * @param size Integer
+	 */
 	resize : function(size){
 		
 		this.mainSize = size;
@@ -104,6 +165,10 @@ Class.create("HeaderResizer", {
 		this.timer = window.setTimeout(this.refreshBody.bind(this), 50);
 	},
 	
+	/**
+	 * Resize the headers with the passed sizes
+	 * @param sizes Array
+	 */
 	resizeHeaders : function(sizes){
 		
 		//this.checkBodyScroll();
@@ -150,6 +215,10 @@ Class.create("HeaderResizer", {
 		
 	},
 		
+	/**
+	 * Create draggables for resizing the columns
+	 * @param handle HTMLElement The drag handle
+	 */
 	initDraggable : function(handle){
 		new Draggable(handle, {
 			constraint:'horizontal',
@@ -216,6 +285,10 @@ Class.create("HeaderResizer", {
 		});
 	},
 	
+	/**
+	 * Create a ghost during drag resizing
+	 * @returns HTMLElement
+	 */
 	createResizeGhost : function(){
 		if(!this.options.body) return null;
 		var ghost = new Element('div', {className:'resizeGhost'});
@@ -224,6 +297,9 @@ Class.create("HeaderResizer", {
 		return ghost;
 	},
 	
+	/**
+	 * Apply the columns sizes to the body. When possible, uses CSS3 selectors
+	 */
 	refreshBody : function(){
 		var newSizes = this.getCurrentSizes();
 		var useCSS3  = this.options.useCSS3;
@@ -263,6 +339,12 @@ Class.create("HeaderResizer", {
 		this.checkBodyScroll();
 	},
 	
+	/**
+	 * Add a CSS RULE dynamically
+	 * @param sheet CSSSheet
+	 * @param selector String
+	 * @param rule String
+	 */
 	addStyleRule : function(sheet, selector, rule){
 		if(Prototype.Browser.IE){
 			sheet.addRule(selector, rule);
@@ -271,6 +353,9 @@ Class.create("HeaderResizer", {
 		}		
 	},
 	
+	/**
+	 * Creates a style sheet
+	 */
 	createStyleSheet : function(){
 		if(Prototype.Browser.IE){
 			return;
@@ -296,6 +381,9 @@ Class.create("HeaderResizer", {
 		return sheet;		
 	},
 	
+	/**
+	 * Removes a style sheet
+	 */
 	removeStyleSheet : function(){
 		if(Prototype.Browser.IE){
 			return;
@@ -314,6 +402,10 @@ Class.create("HeaderResizer", {
 		}		
 	},
 	
+	/**
+	 * Detect whether css3 is supported or not.
+	 * @returns Boolean
+	 */
 	detectCSS3 : function(){
 		if(Prototype.Browser.IE){
 			return false;
@@ -335,6 +427,12 @@ Class.create("HeaderResizer", {
 		return detected;
 	},
 	
+	/**
+	 * Sets a cell width
+	 * @param cell HTMLElement table cell
+	 * @param width Integer
+	 * @param labelPadding Integer
+	 */
 	setGridCellWidth : function(cell, width, labelPadding){
 		var label = cell.down('.text_label');		
 		if(!label) {			
@@ -364,6 +462,9 @@ Class.create("HeaderResizer", {
 		if(width) cell.setStyle({width:computedWidth + 'px'});	
 	},	
 	
+	/**
+	 * Check if the body needs a scroller, and readapt the header width
+	 */
 	checkBodyScroll : function(){
 		var body = this.options.body;		
 		if( body.scrollHeight>body.getHeight()){
@@ -400,17 +501,26 @@ Class.create("HeaderResizer", {
 		}
 	},
 		
-	
+	/**
+	 * Get the header inner width
+	 */
 	getInnerWidth : function(){
 		var leftWidth = parseInt(this.element.getStyle('borderLeftWidth')) || 0;
 		var rightWidth = parseInt(this.element.getStyle('borderRightWidth')) || 0;
 		return innerWidth = this.element.getWidth() - leftWidth - rightWidth ;
 	},
 	
+	/**
+	 * Get the header inner height
+	 */
 	getInnerHeight : function(element){
 		return innerWidth = element.getHeight() - (parseInt(element.getStyle('borderTopWidth')) || 0) - (parseInt(element.getStyle('borderBottomWidth')) || 0);
 	},		
 	
+	/**
+	 * Log a message to the console or the info panel (DEBUG PURPOSE)
+	 * @param message String
+	 */
 	log : function(message){
 		return;
 		if(window.console){

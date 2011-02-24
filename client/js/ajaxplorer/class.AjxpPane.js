@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,13 +29,19 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Abstract container any type of pane that can resize
+ */
+/**
+ * Abstract container any type of pane that can resize
  */
 Class.create("AjxpPane", {	
 	
 	__implements : "IAjxpWidget",
 	
+	/**
+	 * Constructor
+	 * @param htmlElement HTMLElement The Node anchor
+	 * @param options Object The pane parameters
+	 */
 	initialize : function(htmlElement, options){
 		this.htmlElement = $(htmlElement);
 		if(!this.htmlElement){
@@ -54,6 +60,9 @@ Class.create("AjxpPane", {
 		this.scanChildrenPanes(this.htmlElement);
 	},
 	
+	/**
+	 * Called when the pane is resized
+	 */
 	resize : function(){		
 		// Default behaviour : resize children
     	if(this.options.fit && this.options.fit == 'height'){
@@ -66,6 +75,11 @@ Class.create("AjxpPane", {
     	}
     	this.childrenPanes.invoke('resize');
 	},
+	
+	/**
+	 * Find and reference direct children IAjxpWidget
+	 * @param element HTMLElement
+	 */
 	scanChildrenPanes : function(element){
 		if(!element.childNodes) return;
 		$A(element.childNodes).each(function(c){
@@ -76,6 +90,11 @@ Class.create("AjxpPane", {
 			}
 		}.bind(this));
 	},
+	
+	/**
+	 * Show the main html element
+	 * @param show Boolean
+	 */
 	showElement : function(show){
 		if(show){
 			this.htmlElement.show();
@@ -83,10 +102,20 @@ Class.create("AjxpPane", {
 			this.htmlElement.hide();
 		}
 	},
+	
+	/**
+	 * Adds a simple haeder with a title and icon
+	 * @param headerLabel String The title
+	 * @param headerIcon String Path for the icon image
+	 */
 	addPaneHeader : function(headerLabel, headerIcon){
 		this.htmlElement.insert({top : new Element('div', {className:'panelHeader',ajxp_message_id:headerLabel}).update(MessageHash[headerLabel])});
 		disableTextSelection(this.htmlElement.select('div')[0]);
 	},
+	
+	/**
+	 * Sets a listener when the htmlElement is focused to notify ajaxplorer object
+	 */
 	setFocusBehaviour : function(){
 		this.htmlElement.observe("click", function(){
 			if(ajaxplorer) ajaxplorer.focusOn(this);

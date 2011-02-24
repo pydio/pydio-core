@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,13 +29,20 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : The tree object. Encapsulate the webfx tree.
+ */
+/**
+ * The tree object. Encapsulate the webfx tree.
  */
 Class.create("FoldersTree", AjxpPane, {
 	
 	__implements : ["IFocusable", "IContextMenuable"],
 
+	/**
+	 * Constructor
+	 * @param $super klass Superclass reference
+	 * @param oElement HTMLElement
+	 * @param options Object
+	 */
 	initialize: function ($super, oElement, options)
 	{
 		$super(oElement);
@@ -105,6 +112,10 @@ Class.create("FoldersTree", AjxpPane, {
 		
 	},
 	
+	/**
+	 * Create a filtering function based on the options display
+	 * @returns Function
+	 */
 	createFilter : function(){
 		var displayOptions = this.options.display || "dz";
 		if(displayOptions.indexOf("a") > -1) displayOptions = "dzf";
@@ -120,6 +131,9 @@ Class.create("FoldersTree", AjxpPane, {
 		return filter;		
 	},
 	
+	/**
+	 * Focus implementation of IAjxpWidget
+	 */
 	focus: function(){
 		if(webFXTreeHandler.selected)
 		{
@@ -129,6 +143,9 @@ Class.create("FoldersTree", AjxpPane, {
 		this.hasFocus = true;
 	},
 	
+	/**
+	 * Blur implementation of IAjxpWidget
+	 */
 	blur: function(){
 		if(webFXTreeHandler.selected)
 		{
@@ -138,21 +155,36 @@ Class.create("FoldersTree", AjxpPane, {
 		this.hasFocus = false;
 	},
 		
+	/**
+	 * Resize implementation of IAjxpWidget
+	 */
 	resize : function(){
 		fitHeightToBottom(this.treeContainer, null);
 	},
 	
+	/**
+	 * ShowElement implementation of IAjxpWidget
+	 */
 	showElement : function(show){
 		if (show) this.treeContainer.show();
 		else this.treeContainer.hide();
 	},
 	
+	/**
+	 * Sets the contextual menu
+	 * @param protoMenu Proto.Menu 
+	 */
 	setContextualMenu: function(protoMenu){
 		Event.observe(this.rootNodeId+'-anchor', 'contextmenu', function(e){eval(this.action);}.bind(webFXTreeHandler.all[this.rootNodeId]));
 		protoMenu.addElements('#'+this.rootNodeId+'-anchor');
 		webFXTreeHandler.contextMenu = protoMenu;
 	},
 	
+	/**
+	 * Find a tree node by its path
+	 * @param path String
+	 * @returns WebFXTreeItem
+	 */
 	getNodeByPath : function(path){
 		for(var key in webFXTreeHandler.all){
 			if(webFXTreeHandler.all[key] && webFXTreeHandler.all[key].ajxpNode && webFXTreeHandler.all[key].ajxpNode.getPath() == path){
@@ -161,6 +193,10 @@ Class.create("FoldersTree", AjxpPane, {
 		}
 	},
 	
+	/**
+	 * Finds the node and select it
+	 * @param path String
+	 */
 	setSelectedPath : function(path){
 		if(path == "" || path == "/"){
 			this.tree.select();
@@ -180,6 +216,11 @@ Class.create("FoldersTree", AjxpPane, {
 		}
 	},
 		
+	/**
+	 * Transforms url to a path array
+	 * @param url String
+	 * @returns Array
+	 */
 	cleanPathToArray: function(url){
 		var splitPath = url.split("/");
 		var path = new Array();
@@ -195,10 +236,21 @@ Class.create("FoldersTree", AjxpPane, {
 		return path;		
 	},
 		
+	/**
+	 * Change the root node label
+	 * @param newLabel String
+	 * @param newIcon String
+	 */
 	changeRootLabel: function(newLabel, newIcon){
 		this.changeNodeLabel(this.tree.id, newLabel, newIcon);	
 	},
 	
+	/**
+	 * Change a node label
+	 * @param nodeId String the Id of the node (webFX speaking)
+	 * @param newLabel String
+	 * @param newIcon String
+	 */
 	changeNodeLabel: function(nodeId, newLabel, newIcon){	
 		var node = $(nodeId+'-label').update(newLabel);
 		if(newIcon){
