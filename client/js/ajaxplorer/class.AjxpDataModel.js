@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,8 +29,9 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Selection Model.
+ */
+/**
+ * Full container of the data tree. Contains the SelectionModel as well.
  */
 Class.create("AjxpDataModel", {
 
@@ -47,17 +48,28 @@ Class.create("AjxpDataModel", {
 	
 	_rootNode : null,
 
-
+	/**
+	 * Constructor
+	 */
 	initialize: function(){
 		this._currentRep = '/';
 		this._selectedNodes = $A([]);
 		this._bEmpty = true;
 	},
 	
+	/**
+	 * Sets the data source that will feed the nodes with children.
+	 * @param iAjxpNodeProvider IAjxpNodeProvider 
+	 */
 	setAjxpNodeProvider : function(iAjxpNodeProvider){
 		this._iAjxpNodeProvider = iAjxpNodeProvider;
 	},
 	
+	/**
+	 * Changes the current context node.
+	 * @param ajxpNode AjxpNode Target node, either an existing one or a fake one containing the target part.
+	 * @param forceReload Boolean If set to true, the node will be reloaded even if already loaded.
+	 */
 	requireContextChange : function(ajxpNode, forceReload){
 		var path = ajxpNode.getPath();
 		if((path == "" || path == "/") && ajxpNode != this._rootNode){
@@ -113,6 +125,10 @@ Class.create("AjxpDataModel", {
 		}
 	},
 	
+	/**
+	 * Sets the root of the data store
+	 * @param ajxpRootNode AjxpNode The parent node
+	 */
 	setRootNode : function(ajxpRootNode){
 		this._rootNode = ajxpRootNode;
 		this._rootNode.setRoot();
@@ -123,10 +139,19 @@ Class.create("AjxpDataModel", {
 		this.setContextNode(this._rootNode);
 	},
 	
+	/**
+	 * Gets the current root node
+	 * @returns AjxpNode
+	 */
 	getRootNode : function(ajxpRootNode){
 		return this._rootNode;
 	},
 	
+	/**
+	 * Sets the current context node
+	 * @param ajxpDataNode AjxpNode
+	 * @param forceEvent Boolean If set to true, event will be triggered even if the current node is already the same.
+	 */
 	setContextNode : function(ajxpDataNode, forceEvent){
 		if(this._contextNode && this._contextNode == ajxpDataNode && this._currentRep  == ajxpDataNode.getPath() && !forceEvent){
 			return; // No changes
@@ -135,11 +160,20 @@ Class.create("AjxpDataModel", {
 		this._currentRep = ajxpDataNode.getPath();
 		document.fire("ajaxplorer:context_changed", ajxpDataNode);
 	},
-		
+	
+	/**
+	 * Get the current context node
+	 * @returns AjxpNode
+	 */
 	getContextNode : function(){
 		return this._contextNode;
 	},
 	
+	/**
+	 * After a copy or move operation, many nodes may have to be reloaded
+	 * This function tries to reload them in the right order and if necessary.
+	 * @param nodes AjxpNodes[] An array of nodes
+	 */
 	multipleNodesReload : function(nodes){
 		nodes = $A(nodes);
 		for(var i=0;i<nodes.length;i++){
@@ -173,6 +207,10 @@ Class.create("AjxpDataModel", {
 		this.nextNodeReloader();
 	},
 	
+	/**
+	 * Add a node to the queue of nodes to reload.
+	 * @param node AjxpNode
+	 */
 	queueNodeReload : function(node){
 		if(!this.queue) this.queue = [];
 		if(node){
@@ -180,6 +218,9 @@ Class.create("AjxpDataModel", {
 		}
 	},
 	
+	/**
+	 * Queue processor for the nodes to reload
+	 */
 	nextNodeReloader : function(){
 		if(!this.queue.length) {
 			window.setTimeout(function(){
@@ -198,18 +239,34 @@ Class.create("AjxpDataModel", {
 		}
 	},
 	
+	/**
+	 * Sets an array of nodes to be selected after the context is (re)loaded
+	 * @param selection AjxpNode[]
+	 */
 	setPendingSelection : function(selection){
 		this._pendingSelection = selection;
 	},
 	
+	/**
+	 * Gets the array of nodes to be selected after the context is (re)loaded
+	 * @returns AjxpNode[]
+	 */
 	getPendingSelection : function(){
 		return this._pendingSelection;
 	},
 	
+	/**
+	 * Clears the nodes to be selected
+	 */
 	clearPendingSelection : function(){
 		this._pendingSelection = null;
 	},
 	
+	/**
+	 * Set an array of nodes as the current selection
+	 * @param ajxpDataNodes AjxpNode[] The nodes to select
+	 * @param source String The source of this selection action
+	 */
 	setSelectedNodes : function(ajxpDataNodes, source){
 		if(!source){
 			this._selectionSource = {};
@@ -233,51 +290,99 @@ Class.create("AjxpDataModel", {
 		document.fire("ajaxplorer:selection_changed", this);	
 	},
 	
+	/**
+	 * Gets the currently selected nodes
+	 * @returns AjxpNode[]
+	 */
 	getSelectedNodes : function(){
 		return this._selectedNodes;
 	},
 	
+	/**
+	 * Gets the source of the last selection action
+	 * @returns String
+	 */
 	getSelectionSource : function(){
 		return this._selectionSource;
 	},
 	
+	/**
+	 * DEPRECATED
+	 */
 	getSelectedItems : function(){
 		throw new Error("Deprecated : use getSelectedNodes() instead");
 	},
 	
+	/**
+	 * Select all the children of the current context node
+	 */
 	selectAll : function(){
 		this.setSelectedNodes(this._contextNode.getChildren(), "dataModel");
 	},
 	
+	/**
+	 * Whether the selection is empty
+	 * @returns Boolean
+	 */
 	isEmpty : function (){
 		return (this._selectedNodes?(this._selectedNodes.length==0):true);
 	},
 	
+	/**
+	 * Whether the selection is unique
+	 * @returns Boolean
+	 */
 	isUnique : function (){
 		return this._bUnique;
 	},
 	
+	/**
+	 * Whether the selection has a file selected.
+	 * Should be hasLeaf
+	 * @returns Boolean
+	 */
 	hasFile : function (){
 		return this._bFile;
 	},
 	
+	/**
+	 * Whether the selection has a dir selected
+	 * @returns Boolean
+	 */
 	hasDir : function (){
 		return this._bDir;
 	},
 			
+	/**
+	 * Whether the current context is the recycle bin
+	 * @returns Boolean
+	 */
 	isRecycle : function (){
 		return this._isRecycle;
 	},
 	
+	/**
+	 * DEPRECATED. Should use getCurrentNode().getPath() instead.
+	 * @returns String
+	 */
 	getCurrentRep : function (){
 		return this._currentRep;
 	},
 	
+	/**
+	 * Whether the selection has more than one node selected
+	 * @returns Boolean
+	 */
 	isMultiple : function(){
 		if(this._selectedNodes && this._selectedNodes.length > 1) return true;
 		return false;
 	},
 	
+	/**
+	 * Whether the selection has a file with one of the mimes
+	 * @param mimeTypes Array Array of mime types
+	 * @returns Boolean
+	 */
 	hasMime : function(mimeTypes){
 		if(mimeTypes.length==1 && mimeTypes[0] == "*") return true;
 		var has = false;
@@ -290,6 +395,11 @@ Class.create("AjxpDataModel", {
 		return has;
 	},
 	
+	/**
+	 * Get all selected filenames as an array.
+	 * @param separator String Is a separator, will return a string joined
+	 * @returns Array|String
+	 */
 	getFileNames : function(separator){
 		if(!this._selectedNodes.length)
 		{
@@ -308,6 +418,11 @@ Class.create("AjxpDataModel", {
 		}
 	},
 	
+	/**
+	 * Get all the filenames of the current context node children
+	 * @param separator String If passed, will join the array as a string
+	 * @return Array|String
+	 */
 	getContextFileNames : function(separator){
 		var allItems = this._contextNode.getChildren();
 		if(!allItems.length)
@@ -326,6 +441,11 @@ Class.create("AjxpDataModel", {
 		}
 	},
 	
+	/**
+	 * Whether the context node has a child with this basename
+	 * @param newFileName String The name to check
+	 * @returns Boolean
+	 */
 	fileNameExists: function(newFileName) 
 	{	
 		var allItems = this._contextNode.getChildren();
@@ -343,11 +463,19 @@ Class.create("AjxpDataModel", {
 		return false;
 	},	
 	
+	/**
+	 * Gets the first name of the current selection
+	 * @returns String
+	 */
 	getUniqueFileName : function(){	
 		if(this.getFileNames().length) return this.getFileNames()[0];
 		return null;	
 	},
 	
+	/**
+	 * Gets the first node of the selection, or Null
+	 * @returns AjxpNode
+	 */
 	getUniqueNode : function(){
 		if(this._selectedNodes.length){
 			return this._selectedNodes[0];
@@ -355,18 +483,36 @@ Class.create("AjxpDataModel", {
 		return null;
 	},
 	
+	/**
+	 * DEPRECATED
+	 */
 	getUniqueItem : function(){
 		throw new Error("getUniqueItem is deprecated, use getUniqueNode instead!");
 	},
 
+	/**
+	 * DEPRECATED
+	 */
     getItem : function(i) {
         throw new Error("getItem is deprecated, use getNode instead!");
     },
 	
+    /**
+     * Gets a node from the current selection
+     * @param i Integer the node index
+     * @returns AjxpNode
+     */
     getNode : function(i) {
         return this._selectedNodes[i];
     },
 	
+    /**
+     * Will add the current selection nodes as serializable data to the element passed : 
+     * either as hidden input elements if it's a form, or as query parameters if it's an url
+     * @param oFormElement HTMLForm The form
+     * @param sUrl String An url to complete
+     * @returns String
+     */
 	updateFormOrUrl : function (oFormElement, sUrl){
 		// CLEAR FROM PREVIOUS ACTIONS!
 		if(oFormElement)	

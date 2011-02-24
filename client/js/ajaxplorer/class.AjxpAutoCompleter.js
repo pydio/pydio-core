@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,10 +29,19 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Encapsulation of the Autocompleter for AjaXplorer purposes.
+ */
+/**
+ * Encapsulation of the Prototype Autocompleter for AjaXplorer purposes.
+ * Should be ported for local provides
  */
 Class.create("AjxpAutocompleter", Autocompleter.Base, {
+  /**
+   * Constructor
+   * @param element HTMLElement
+   * @param update String
+   * @param url String
+   * @param options Object
+   */
   initialize: function(element, update, url, options) {
   	if(Object.isString(update) && !$(update)){
   		document.getElementsByTagName('body')[0].appendChild(new Element('div', {
@@ -51,6 +60,9 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
     //this.options.callback	   = this.parseValueBeforeSending.bind(this);
   },
 
+  /**
+   * Gets the choices
+   */
   getUpdatedChoices: function() {
     this.startIndicator();
     var value = this.getToken();
@@ -66,6 +78,10 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
     new Ajax.Request(this.url, this.options);
   },
 
+  /**
+   * On AjaX request completion callback
+   * @param request Ajax.Transport
+   */
   onComplete: function(request) {
   	var oXmlDoc = request.responseXML;
   	var token = this.getToken();

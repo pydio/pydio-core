@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -59,9 +59,18 @@ Event.observe(window, "unload", function(){
 	});
 });
 
-
+/**
+ * AjaXplorer encapsulation of the Prototype Draggable
+ */
 Class.create("AjxpDraggable", Draggable, {
-	
+	/**
+	 * Constructor
+	 * @param $super klass Reference to superclass
+	 * @param element HTMLElement Node anchor
+	 * @param options Object Class options
+	 * @param component Object 
+	 * @param componentType String
+	 */
 	initialize: function($super, element, options, component, componentType){		
 		element = $(element);
 		element.addClassName('ajxp_draggable');
@@ -77,6 +86,9 @@ Class.create("AjxpDraggable", Draggable, {
 		AllAjxpDraggables.push(this);
 	},
 	
+	/**
+	 * Destroy the Draggable object, unregisters it.
+	 */
 	destroy : function(){
 	    Event.stopObserving(this.handle, "mousedown", this.eventMouseDown);
 	    this.element.removeClassName('ajxp_draggable');
@@ -84,6 +96,10 @@ Class.create("AjxpDraggable", Draggable, {
 	    Draggables.unregister(this);
 	},
 	
+	/**
+	 * Called at the start of dragging
+	 * @param event Event Drag event
+	 */
 	initDrag: function(event) {
 		if(!Object.isUndefined(Draggable._dragging[this.element]) &&
 		Draggable._dragging[this.element]) return;
@@ -108,7 +124,9 @@ Class.create("AjxpDraggable", Draggable, {
 		}
 	},
 
-	
+	/**
+	 * @param event Event
+	 */
     startDrag : function(event){
 	    if(!this.delta)
 	    this.delta = this.currentDelta();
@@ -175,6 +193,11 @@ Class.create("AjxpDraggable", Draggable, {
 		this.ctrlDndAction = ajaxplorer.getActionBar().getDefaultAction('ctrldragndrop');			
     },
 
+    /**
+     * End of drag
+     * @param event Event
+     * @param success Boolean
+     */
 	finishDrag : function(event, success) {
 		this.dragging = false;
 	
@@ -224,6 +247,10 @@ Class.create("AjxpDraggable", Draggable, {
 		Droppables.reset();
 	}, 
 
+	/**
+	 * Triggered when the ctrlkey is pressed or released
+	 * @param event Event
+	 */
 	updateCtrlKey: function(event)
 	{
 		if(!event) return;
@@ -235,11 +262,17 @@ Class.create("AjxpDraggable", Draggable, {
 		}
 	},
 
+	/**
+	 * Updates the element class with "selection_ctrl_key"
+	 */
 	addCopyClass : function()
 	{
 		$(this.element).addClassName('selection_ctrl_key');
 	},
 	
+	/**
+	 * Updates the element class with "selection_ctrl_key"
+	 */
 	removeCopyClass : function()
 	{
 		$(this.element).removeClassName('selection_ctrl_key');
