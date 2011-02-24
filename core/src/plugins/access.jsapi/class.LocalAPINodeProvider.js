@@ -305,6 +305,7 @@ Class.create("LocalAPINodeProvider", {
 			metadata.set("API_OBJECT_NODE", true);
 			child.setMetadata(metadata);
 			// ADD MANUALLY AT THE TOP
+			child.setParent(node);
 			node._children.unshift(child);
 			node.notify("child_added", child.getPath());
 
