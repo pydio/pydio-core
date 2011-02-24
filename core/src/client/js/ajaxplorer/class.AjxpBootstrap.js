@@ -29,12 +29,20 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Simple Boot Loader.
+ */
+/**
+ * Main BootLoader.
  * Defaults params for constructor should be {} and content.php?get_action=get_boot_conf
  */
 Class.create("AjxpBootstrap", {
+	/**
+	 * @var $H()
+	 */
 	parameters : $H({}),
+	/**
+	 * Constructor 
+	 * @param startParameters Object The options
+	 */
 	initialize : function(startParameters){
 		this.parameters = $H(startParameters);
 		this.detectBaseParameters();
@@ -73,6 +81,9 @@ Class.create("AjxpBootstrap", {
 			}
 		}.bind(this));
 	},
+	/**
+	 * Real loading action
+	 */
 	loadBootConfig : function(){
 		var url = this.parameters.get('BOOTER_URL')+(this.parameters.get("debugMode")?'&debug=true':'');
 		if(this.parameters.get('SERVER_PREFIX_URI')){
@@ -146,6 +157,9 @@ Class.create("AjxpBootstrap", {
 		connexion.sendSync();
 		
 	},
+	/**
+	 * Detect the base path of the javascripts based on the <script> tags
+	 */
 	detectBaseParameters : function(){
 		$$('script').each(function(scriptTag){
 			if(scriptTag.src.match("/js/ajaxplorer_boot.js") || scriptTag.src.match("/js/ajaxplorer/class.AjxpBootstrap.js")){
@@ -170,6 +184,9 @@ Class.create("AjxpBootstrap", {
 		this.parameters.set('ajxpServerAccessPath', booterUrl);
 		window.ajxpServerAccessPath = booterUrl;
 	},
+	/**
+	 * Inserts a progress bar 
+	 */
 	insertLoaderProgress : function(){
 		var html = '<div id="loading_overlay" style="background-color:#555555;"></div>';
 		if(this.parameters.get('customWelcomeScreen')){
@@ -220,6 +237,9 @@ Class.create("AjxpBootstrap", {
 		};
 		window.loaderProgress = new JS_BRAMUS.jsProgressBar($('loaderProgress'), 0, options); 
 	},
+	/**
+	 * Inserts Google Analytics Code
+	 */
 	insertAnalytics : function(){	
 		if(!this.parameters.get("googleAnalyticsData")) return;
 		var data = this.parameters.get("googleAnalyticsData");
