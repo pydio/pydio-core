@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,11 +29,17 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Toolbar to display actions buttons
+ */
+/**
+ * Toolbar to display actions buttons
  */
 Class.create("ActionsToolbar", {
 	__implements : "IAjxpWidget",
+	/**
+	 * Constructor
+	 * @param oElement Element The dom node
+	 * @param options Object The toolbar options. Contains a buttonRenderer and a toolbarsList array.
+	 */
 	initialize : function(oElement, options){
 		this.element = oElement;		
 		this.element.ajxpPaneObject = this;
@@ -55,12 +61,19 @@ Class.create("ActionsToolbar", {
 		document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarsSeparator.bind(this));
 	},
 	
+	/**
+	 * Handler for actions_loaded event.
+	 * @param event Event ajaxplorer:actions_loaded
+	 */
 	actionsLoaded : function(event) {
 		this.actions = event.memo;
 		this.emptyToolbars();
 		this.initToolbars();
 	},
 	
+	/**
+	 * Initialize all toolbars
+	 */
 	initToolbars: function () {
 		this.actions.each(function(pair){
 			var action = pair.value;
@@ -88,7 +101,9 @@ Class.create("ActionsToolbar", {
 		}.bind(this));
 		this.element.select('a').each(disableTextSelection);		
 	},
-	
+	/**
+	 * Recompute separators if some toolbars are empty due to actions show/hide status.
+	 */
 	refreshToolbarsSeparator: function(){
 		this.toolbars.each(function(pair){
 			var toolbar = this.element.select('[id="'+pair.key+'_toolbar"]')[0];
@@ -105,6 +120,11 @@ Class.create("ActionsToolbar", {
 		this.refreshSlides();
 	},
 	
+	/**
+	 * Initialize a given toolbar
+	 * @param toolbar String The name of the toolbar
+	 * @returns HTMLElement
+	 */
 	initToolbar: function(toolbar){
 		if(!this.toolbars.get(toolbar)) {
 			return;
@@ -127,6 +147,9 @@ Class.create("ActionsToolbar", {
 		return toolEl;
 	},
 	
+	/**
+	 * Remove all toolbars
+	 */
 	emptyToolbars: function(){
 		if(this.element.subMenus){
 			this.element.subMenus.invoke("destroy");
@@ -140,6 +163,9 @@ Class.create("ActionsToolbar", {
 		this.toolbars = new Hash();
 	},
 	
+	/**
+	 * Initialize a caroussel to scroll the buttons on small screens
+	 */
 	initCarousel : function(){
 		this.outer = this.element;
 		var origHeight = this.outer.getHeight()-1;
@@ -172,6 +198,9 @@ Class.create("ActionsToolbar", {
 		});
 	},
 	
+	/**
+	 * Refreshes the caroussel slides 
+	 */
 	refreshSlides : function(){
 		var allSlides = $A();
 		this.inner.select('a').each(function(a){
@@ -181,6 +210,11 @@ Class.create("ActionsToolbar", {
 		this.resize();		
 	},
 	
+	/**
+	 * Render an Action for the toolbar
+	 * @param action Action The action
+	 * @returns HTMLElement
+	 */
 	renderToolbarAction : function(action){
 		var button = new Element('a', {
 			href:action.options.name,
@@ -228,6 +262,11 @@ Class.create("ActionsToolbar", {
 		
 	},
 	
+	/**
+	 * Attach various listeners to an action to reflect its state on the button
+	 * @param button HTMLElement The button
+	 * @param action Action The action to observe.
+	 */
 	attachListeners : function(button, action){
 		action.observe("hide", function(){
 			button.hide();
@@ -252,6 +291,11 @@ Class.create("ActionsToolbar", {
 		}.bind(this));
 	},
 	
+	/**
+	 * Creates a submenu
+	 * @param button HTMLElement The anchor of the submenu
+	 * @param action Action The action
+	 */
 	buildActionBarSubMenu : function(button, action){
 		var subMenu = new Proto.Menu({
 		  mouseClick:"over",
@@ -280,6 +324,10 @@ Class.create("ActionsToolbar", {
 		this.element.subMenus.push(subMenu);
 	},
 	
+	/**
+	 * Place an "drop down" arrow on the button.
+	 * @param button HTMLElement
+	 */
 	placeArrowDiv : function(button){
 		if(!button.arrowDiv) return;
 		try{
@@ -303,6 +351,11 @@ Class.create("ActionsToolbar", {
 		}catch(e){};
 	},
 	
+	/**
+	 * Listener for mouseover on the button
+	 * @param button HTMLElement The button
+	 * @param action Action its associated action
+	 */
 	buttonStateHover : function(button, action){		
 		if(button.hasClassName('disabled')) return;
 		if(button.hideTimeout) clearTimeout(button.hideTimeout);
@@ -314,6 +367,11 @@ Class.create("ActionsToolbar", {
 		});
 	},
 	
+	/**
+	 * Listener for mouseout on the button
+	 * @param button HTMLElement The button
+	 * @param action Action its associated action
+	 */
 	buttonStateOut : function(button, action){
 		if(button.hasClassName('disabled')) return;
 		button.hideTimeout = setTimeout(function(){				
@@ -326,6 +384,11 @@ Class.create("ActionsToolbar", {
 		}.bind(this), 10);
 	},
 	
+	/**
+	 * Updates the button label
+	 * @param span HTMLElement <span>
+	 * @param state String "big", "small"
+	 */
 	updateTitleSpan : function(span, state){		
 		if(!span.orig_width && state == 'big'){
 			var origWidth = span.getWidth();
@@ -335,6 +398,9 @@ Class.create("ActionsToolbar", {
 		span.setStyle({fontSize:(state=='big'?'11px':'9px')});
 	},	
 	
+	/**
+	 * Resize the widget. May trigger the apparition/disparition of the Carousel buttons.
+	 */
 	resize : function(){
 		var innerSize = 0;
 		var parentWidth = $(this.outer).parentNode.getWidth();
@@ -367,6 +433,10 @@ Class.create("ActionsToolbar", {
 			}			
 		}.bind(this) );
 	},
+	/**
+	 * IAjxpWidget Implementation. Empty.
+	 * @param show Boolean
+	 */
 	showElement : function(show){}	
 	
 });

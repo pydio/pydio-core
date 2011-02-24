@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,13 +29,20 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : A "Command" object, encapsulating its callbacks, display attributes, etc.
+ */
+/** 
+ * A "Command" object, encapsulating its callbacks, display attributes, etc.
  */
 Class.create("Action", {
 
+	/**
+	 * @var String Default "/images/actions/ICON_SIZE"
+	 */
 	__DEFAULT_ICON_PATH : "/images/actions/ICON_SIZE",
 	
+	/**
+	 * Standard constructor
+	 */
 	initialize:function(){
 		this.options = Object.extend({
 			name:'',
@@ -105,6 +112,10 @@ Class.create("Action", {
 		
 	}, 
 	
+	/**
+	 * Sets the manager for this action
+	 * @param manager ActionsManager
+	 */
 	setManager : function(manager){
 		this.manager = manager;
 		if(this.options.subMenu){
@@ -129,6 +140,9 @@ Class.create("Action", {
 		}		
 	},
 	
+	/**
+	 * Execute the action code
+	 */
 	apply: function(){
 		if(this.deny) return;
 		if(this.options.prepareModal){
@@ -179,6 +193,10 @@ Class.create("Action", {
 		window.actionArguments = null;
 	},
 		
+	/**
+	 * Updates the action status on context change
+	 * @returns void
+	 */
 	fireContextChange: function(){
 		if(arguments.length < 4) return;
 		var usersEnabled = arguments[0];
@@ -234,6 +252,9 @@ Class.create("Action", {
 		
 	},
 		
+	/**
+	 * Upates the action status on selection change
+	 */
 	fireSelectionChange: function(){
 		if(this.options.listeners["selectionChange"]){
 			window.listenerContext = this;
@@ -282,6 +303,10 @@ Class.create("Action", {
 		
 	},
 		
+	/**
+	 * Parses an XML fragment to configure this action
+	 * @param xmlNode Node XML Fragment describing the action
+	 */
 	createFromXML:function(xmlNode){
 		this.options.name = xmlNode.getAttribute('name');
 		for(var i=0; i<xmlNode.childNodes.length;i++){
@@ -386,6 +411,9 @@ Class.create("Action", {
 		}		
 	}, 
 	
+	/**
+	 * Creates the submenu items
+	 */
 	buildSubmenuStaticItems : function(){
 		var menuItems = [];
 		if(this.subMenuItems.staticItems){
@@ -408,6 +436,9 @@ Class.create("Action", {
 		this.subMenuItems.staticOptions = menuItems;
 	},
 	
+	/**
+	 * Caches some data for dynamically built menus
+	 */
 	prepareSubmenuDynamicBuilder : function(){		
 		this.subMenuItems.dynamicBuilder = function(protoMenu){
 			setTimeout(function(){
@@ -434,6 +465,10 @@ Class.create("Action", {
 		}.bind(this);		
 	},
 	
+	/**
+	 * Refresh icon image source
+	 * @param newSrc String The image source. Can reference an image library
+	 */
 	setIconSrc : function(newSrc){
 		this.options.src = newSrc;
 		if($(this.options.name +'_button_icon')){
@@ -441,6 +476,11 @@ Class.create("Action", {
 		}		
 	},
 	
+	/**
+	 * Refresh the action label
+	 * @param newLabel String the new label
+	 * @param newTitle String the new tooltip
+	 */
 	setLabel : function(newLabel, newTitle){
 		this.options.text = MessageHash[newLabel];
 		if($(this.options.name+'_button_label')){
@@ -453,49 +493,85 @@ Class.create("Action", {
 		}
 	},
 	
+	/**
+	 * Grab its label from the i18n MessageHash
+	 */
 	refreshFromI18NHash : function(){
 		var text; var title;
 		this.setLabel(this.options.text_id, this.options.title_id);
 	},
 	
+	/**
+	 * Return data necessary to build InfoPanel
+	 * @returns Hash
+	 */
 	toInfoPanel:function(){
 		return this.options;
 	},
 	
+	/**
+	 * Return necessary data to buid contextual menu
+	 * @returns Hash
+	 */
 	toContextMenu:function(){
 		return this.options;
 	},
 	
+	/**
+	 * Changes show/hide state
+	 */
 	hideForContext: function(){
 		this.hide();
 		this.contextHidden = true;
 	},
 	
+	/**
+	 * Changes show/hide state
+	 */
 	showForContext: function(){
 		this.show();
 		this.contextHidden = false;
 	},
 	
+	/**
+	 * Changes show/hide state
+	 * Notifies "hide" Event
+	 */
 	hide: function(){		
 		this.deny = true;
 		this.notify('hide');
 	},
 	
+	/**
+	 * Changes show/hide state
+	 * Notifies "show" Event 
+	 */
 	show: function(){
 		this.deny = false;
 		this.notify('show');
 	},
 	
+	/**
+	 * Changes enable/disable state
+	 * Notifies "disable" Event 
+	 */
 	disable: function(){
 		this.deny = true;
 		this.notify('disable');
 	},
 	
+	/**
+	 * Changes enable/disable state
+	 * Notifies "enable" Event 
+	 */
 	enable: function(){
 		this.deny = false;
 		this.notify('enable');
 	},
 	
+	/**
+	 * To be called when removing
+	 */
 	remove: function(){
 		// Remove all elements and forms from html
 		this.elements.each(function(el){
@@ -507,6 +583,13 @@ Class.create("Action", {
 		}
 	},
 	
+	/**
+	 * Create a text label with access-key underlined.
+	 * @param displayString String the label
+	 * @param hasAccessKey Boolean whether there is an accessKey or not
+	 * @param accessKey String The key to underline
+	 * @returns String
+	 */
 	getKeyedText: function(displayString, hasAccessKey, accessKey){
 		if(!displayString){
 			displayString = this.options.text;
@@ -532,12 +615,20 @@ Class.create("Action", {
 		return returnString;
 	},
 	
+	/**
+	 * Inserts Html FORM declared by manifest in the all_forms div.
+	 */
 	insertForm: function(){
 		if(!this.options.formCode || !this.options.formId) return;
 		if($('all_forms').select('[id="'+this.options.formId+'"]').length) return;
 		$('all_forms').insert(this.options.formCode);
 	},
 	
+	/**
+	 * Utilitary function to transform XML Node attributes into Object mapping keys.
+	 * @param object Object The target object
+	 * @param node Node The source node
+	 */
 	attributesToObject: function(object, node){
 		Object.keys(object).each(function(key){
 			if(node.getAttribute(key)){

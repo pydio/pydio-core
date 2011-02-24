@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,11 +29,16 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Singleton that manages all actions, but also the action bar display.
+ */
+/**
+ * Singleton class that manages all actions. Can be called directly using ajaxplorer.actionBar.
  */
 Class.create("ActionsManager", {
 	
+	/**
+	 * Standard constructor
+	 * @param bUsersEnabled Boolen Whether users management is enabled or not
+	 */
 	initialize: function(bUsersEnabled)
 	{
 		this._registeredKeys = new Hash();
@@ -67,6 +72,10 @@ Class.create("ActionsManager", {
 		
 	},	
 	
+	/**
+	 * Stores the currently logged user object
+	 * @param oUser User User instance
+	 */
 	setUser: function(oUser)
 	{	
 		this.oUser = oUser;
@@ -78,6 +87,11 @@ Class.create("ActionsManager", {
 		}
 	},
 			
+	/**
+	 * Filter the actions given the srcElement passed as arguments. 
+	 * @param srcElement String An identifier among selectionContext, genericContext, a webfx object id
+	 * @returns Array
+	 */
 	getContextActions: function(srcElement)
 	{		
 		var actionsSelectorAtt = 'selectionContext';
@@ -138,6 +152,10 @@ Class.create("ActionsManager", {
 		return contextActions;
 	},
 	
+	/**
+	 * DEPRECATED, use getActionsForAjxpWidget instead!
+	 * @returns $A()
+	 */
 	getInfoPanelActions:function(){
 		var actions = $A([]);
 		this.actions.each(function(pair){
@@ -147,6 +165,12 @@ Class.create("ActionsManager", {
 		return actions;
 	},
 	
+	/**
+	 * Generic method to get actions for a given component part.
+	 * @param ajxpClassName String 
+	 * @param widgetId String
+	 * @returns $A()
+	 */
 	getActionsForAjxpWidget:function(ajxpClassName, widgetId){
 		var actions = $A([]);
 		this.actions.each(function(pair){
@@ -156,6 +180,10 @@ Class.create("ActionsManager", {
 		return actions;		
 	},
 	
+	/**
+	 * Finds a default action and fires it.
+	 * @param defaultName String ("file", "dir", "dragndrop", "ctrldragndrop")
+	 */
 	fireDefaultAction: function(defaultName){
 		var actionName = this.defaultActions.get(defaultName); 
 		if(actionName != null){
@@ -168,6 +196,10 @@ Class.create("ActionsManager", {
 		}
 	},
 	
+	/**
+	 * Fire an action based on its name
+	 * @param buttonAction String The name of the action
+	 */
 	fireAction: function (buttonAction)	{		
 		var action = this.actions.get(buttonAction);
 		if(action != null) {
@@ -178,6 +210,13 @@ Class.create("ActionsManager", {
 		}
 	},
 	
+	/**
+	 * Registers an accesskey for a given action. 
+	 * @param key String The access key
+	 * @param actionName String The name of the action
+	 * @param optionnalCommand String An optionnal argument 
+	 * that will be passed to the action when fired.
+	 */
 	registerKey: function(key, actionName, optionnalCommand){		
 		if(optionnalCommand){
 			actionName = actionName + "::" + optionnalCommand;
@@ -185,10 +224,17 @@ Class.create("ActionsManager", {
 		this._registeredKeys.set(key.toLowerCase(), actionName);
 	},
 	
+	/**
+	 * Remove all registered keys.
+	 */
 	clearRegisteredKeys: function(){
 		this._registeredKeys = new Hash();
 	},
-	
+	/**
+	 * Triggers an action by its access key.
+	 * @param event Event The key event (will be stopped)
+	 * @param keyName String A key name
+	 */
 	fireActionByKey: function(event, keyName)
 	{	
 		if(this._registeredKeys.get(keyName) && !ajaxplorer.blockShortcuts)
@@ -204,7 +250,13 @@ Class.create("ActionsManager", {
 		return;
 	},
 	
-	
+	/**
+	 * Complex function called when drag'n'dropping. Basic checks of who is child of who.
+	 * @param fileName String The dragged element 
+	 * @param destDir String The drop target node path
+	 * @param destNodeName String The drop target node name
+	 * @param copy Boolean Copy or Move
+	 */
 	applyDragMove: function(fileName, destDir, destNodeName, copy)
 	{
 		if((!copy && !this.defaultActions.get('dragndrop')) || 
@@ -253,6 +305,11 @@ Class.create("ActionsManager", {
 		connexion.sendAsync();
 	},
 	
+	/**
+	 * Get the action defined as default for a given default string
+	 * @param defaultName String
+	 * @returns Action
+	 */
 	getDefaultAction : function(defaultName){
 		if(this.defaultActions.get(defaultName)){
 			return this.actions.get(this.defaultActions.get(defaultName));
@@ -260,6 +317,12 @@ Class.create("ActionsManager", {
 		return null;
 	},
 	
+	/**
+	 * Detects whether a destination is child of the source 
+	 * @param srcNames String|Array One or many sources pathes
+	 * @param destNodeName String the destination
+	 * @returns Boolean
+	 */
 	checkDestIsChildOfSource: function(srcNames, destNodeName)
 	{
 		if(typeof srcNames == "string"){
@@ -277,6 +340,12 @@ Class.create("ActionsManager", {
 		return false;
 	},
 		
+	/**
+	 * Submits a form using Connexion class.
+	 * @param formName String The id of the form
+	 * @param post Boolean Whether to POST or GET
+	 * @param completeCallback Function Callback to be called on complete
+	 */
 	submitForm: function(formName, post, completeCallback)
 	{
 		var connexion = new Connexion();
@@ -303,6 +372,10 @@ Class.create("ActionsManager", {
 		connexion.sendAsync();
 	},
 	
+	/**
+	 * Standard parser for server XML answers
+	 * @param xmlResponse DOMDocument 
+	 */
 	parseXmlMessage: function(xmlResponse)
 	{
 		var messageBox = ajaxplorer.messageBox;
@@ -399,7 +472,11 @@ Class.create("ActionsManager", {
 			ajaxplorer.getContextHolder().multipleNodesReload(reloadNodes);
 		}
 	},
-			
+	
+	/**
+	 * Spreads a selection change to all actions and to registered components 
+	 * by triggering ajaxplorer:actions_refreshed event.
+	 */
 	fireSelectionChange: function(){
 		var userSelection = null;
 		if (ajaxplorer && ajaxplorer.getUserSelection()){
@@ -412,6 +489,10 @@ Class.create("ActionsManager", {
 		document.fire("ajaxplorer:actions_refreshed");
 	},
 	
+	/**
+	 * Spreads a context change to all actions and to registered components 
+	 * by triggering ajaxplorer:actions_refreshed event.
+	 */
 	fireContextChange: function(){
 		var crtRecycle = false;
 		var crtInZip = false;
@@ -436,6 +517,9 @@ Class.create("ActionsManager", {
 		document.fire("ajaxplorer:actions_refreshed");
 	},
 			
+	/**
+	 * Remove all actions
+	 */
 	removeActions: function(){
 		this.actions.each(function(pair){
 			pair.value.remove();
@@ -444,6 +528,10 @@ Class.create("ActionsManager", {
 		this.clearRegisteredKeys();
 	},
 	
+	/**
+	 * Create actions from XML Registry
+	 * @param registry DOMDocument
+	 */
 	loadActionsFromRegistry : function(registry){
 		this.removeActions();		
 		this.parseActions(registry);
@@ -458,6 +546,10 @@ Class.create("ActionsManager", {
 		this.fireSelectionChange();		
 	},
 	
+	/**
+	 * Registers an action to this manager (default, accesskey).
+	 * @param action Action
+	 */
 	registerAction : function(action){
 		var actionName = action.options.name;
 		this.actions.set(actionName, action);
@@ -470,6 +562,10 @@ Class.create("ActionsManager", {
 		action.setManager(this);
 	},
 	
+	/**
+	 * Parse an XML action node and registers the action
+	 * @param documentElement DOMNode The node to parse
+	 */
 	parseActions: function(documentElement){		
 		actions = XPathSelectNodes(documentElement, "actions/action");
 		for(var i=0;i<actions.length;i++){
@@ -480,11 +576,19 @@ Class.create("ActionsManager", {
 			this.registerAction(newAction);
 		}
 	},
-	
+	/**
+	 * Find an action by its name
+	 * @param actionName String
+	 * @returns Action
+	 */
 	getActionByName : function(actionName){
 		return this.actions.get(actionName);		
 	},
 	
+	/**
+	 * Utilitary to get FlashVersion, should probably be removed from here!
+	 * @returns String
+	 */
 	getFlashVersion: function()
 	{
 		if (!this.pluginVersion) {
