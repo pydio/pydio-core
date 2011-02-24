@@ -50,7 +50,7 @@ Class.create("JsSourceViewer", AjxpPane, {
 	
 	/**
 	 * Standard constructor
-	 * @param $super Parent class reference
+	 * @param $super klass Parent class reference
 	 * @param htmlElement HTMLElement
 	 */
 	initialize: function($super, htmlElement){
@@ -116,7 +116,6 @@ Class.create("JsSourceViewer", AjxpPane, {
 	setContent : function(sHtml){
 		if(sHtml == '') return;
 		if(!this.htmlElement) return;
-		this.parseJavadocs(sHtml);
 		if(!this.codeMirror){
 			this.cmOptions.onLoad = function(mirror){
 				mirror.setCode(sHtml);
@@ -158,45 +157,6 @@ Class.create("JsSourceViewer", AjxpPane, {
 			}			
 		}		
 	},
-	
-	parseJavadocs : function(content){
-		var reg = new RegExp(/\/\*\*(([^þ*]|\*(?!\/))*)\*\/([\n\r\s\w]*|[\n\r\s]Class|[\n\r\s]Interface)/gi);
-		var keywords = $A(["param", "return"]);
-		var res = reg.exec(content);
-		var docs = {};
-		while(res != null){
-			var comment = res[1];
-			var key = res[3].strip();
-			var parsedDoc = {main : '', keywords:{}};
-			$A(comment.split("@")).each(function(el){
-				el = el.strip(el);
-				el = el.replace("* ", "");
-				var isKW = false;
-				keywords.each(function(kw){
-					if(el.indexOf(kw+" ") === 0){
-						if(kw == "param"){
-							if(!parsedDoc.keywords[kw]) parsedDoc.keywords[kw] = {};
-							var kwCont = el.substring(kw.length+1);
-							var paramName = kwCont.split(" ")[0];
-							parsedDoc.keywords[kw][paramName] = kwCont.substring(paramName.length+1);													
-						}else if(kw == "return"){
-							parsedDoc.keywords[kw] = el.substring(kw.length+1);
-						}
-						isKW = true;
-					}
-				});
-				if(!isKW){
-					parsedDoc.main += el;
-				}
-			});
-			docs[key] = parsedDoc;
-			//docs.key = res[1];
-			res = reg.exec(content);
-		}
-		//docs.initialize.split("@").invoke("strip")
-		//console.log(docs);
-		//window.jdocs = docs;
-	},	
 	
 	showElement : function(show){
 		if(!this.htmlElement) return;

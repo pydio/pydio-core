@@ -5,6 +5,7 @@
 			<img_library alias="jsapi_images" path="plugins/access.jsapi/icons"/>
 			<js file="plugins/editor.codemirror/CodeMirror/js/codemirror.js" className="CodeMirror"/>
 			<css file="plugins/editor.codemirror/css/linenumbers.css"/>			
+			<css file="plugins/access.jsapi/jsapi_styles.css"/>			
 			<js file="plugins/access.jsapi/class.JsSourceViewer.js" className="JsSourceViewer"/>
 			<js file="plugins/access.jsapi/class.LocalAPINodeProvider.js" className="LocalAPINodeProvider"/>
 		</resources>
@@ -57,7 +58,7 @@
 			-->
 			<template_part ajxpId="info_panel" ajxpClass="JsSourceViewer" ajxpOptions="{}"/>
 			<component_config className="FilesList">
-				<columns switchGridMode="filelist">
+				<columns switchDisplayMode="full">
 					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
 				</columns>
 			</component_config>
