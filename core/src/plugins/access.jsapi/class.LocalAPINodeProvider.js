@@ -151,6 +151,29 @@ Class.create("LocalAPINodeProvider", {
 			}
 		}
 		this.createAjxpNodes(node, $A(children), nodeCallback, childCallback, levelIcon);
+		if( ( node.getMetadata().get("API_CLASS") || node.getMetadata().get("API_INTERFACE") ) 
+				&& !node.getMetadata().get("API_SOURCE")){
+			if(node.getMetadata().get("api_source_loading")) return;
+			//this.setContent('Loading '+ objectNode.getPath() + (currentPointer?'#'+currentPointer:'') + '...');
+			//this.loading = true;
+			node.getMetadata().set("api_source_loading", true);
+			var conn = new Connexion();
+			conn.setParameters({
+				get_action : 'get_js_source',
+				object_type : (node.getMetadata().get("API_CLASS")?'class':'interface'),
+				object_name : getBaseName(node.getPath())
+			});
+			conn.onComplete = function(transport){
+				node.getMetadata().set("API_SOURCE", transport.responseText);				
+				node.notify("api_source_loaded");
+				node.getMetadata().set("api_source_loading", false);
+			}.bind(this);
+			conn.onError = function(){
+				node.getMetadata().set("api_source_loading", false);
+			};
+			conn.sendAsync();
+		}
+		
 	},
 	
 	createAjxpNodes : function(node, children, nodeCallback, childCallback, levelIcon){

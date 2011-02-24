@@ -103,25 +103,11 @@ Class.create("JsSourceViewer", AjxpPane, {
 		if(objectNode.getMetadata().get("API_CLASS") || objectNode.getMetadata().get("API_INTERFACE")){
 			if(objectNode.getMetadata().get("API_SOURCE")){
 				this.setContent(objectNode.getMetadata().get("API_SOURCE"));
-			}else{				
-				if(this.loading) return;
-				this.setContent('Loading '+ objectNode.getPath() + (currentPointer?'#'+currentPointer:'') + '...');
-				this.loading = true;
-				var conn = new Connexion();
-				conn.setParameters({
-					get_action : 'get_js_source',
-					object_type : (objectNode.getMetadata().get("API_CLASS")?'class':'interface'),
-					object_name : getBaseName(objectNode.getPath())
-				});
-				conn.onComplete = function(transport){
-					objectNode.getMetadata().set("API_SOURCE", transport.responseText);
-					this.setContent(transport.responseText);
-					this.loading = false;
-				}.bind(this);
-				conn.onError = function(){
-					this.loading = false;
-				}
-				conn.sendAsync();
+			}else{
+				this.setContent('Loading source for '+ objectNode.getPath() + (currentPointer?'#'+currentPointer:'') + '...');
+				objectNode.observeOnce("api_source_loaded", function(){
+					this.setContent(objectNode.getMetadata().get("API_SOURCE"));
+				}.bind(this));
 			}
 		}
 		
