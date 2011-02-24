@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,11 +29,19 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Encapsulation of the Sortable Table
+ */
+/**
+ * AjaXplorer Encapsulation of the Sortable Table
  */
 Class.create("AjxpSortable", SortableTable, {
 
+	/**
+	 * Constructor
+	 * @param $super klass Superclass
+	 * @param oTable HTMLElement Table tag
+	 * @param oSortTypes Array The sort types of the defined columns
+	 * @param oTHead HTMLElement The Head of the columns
+	 */
 	initialize: function($super, oTable, oSortTypes, oTHead) {
 		$super(oTable, oSortTypes, oTHead);
 		this.addSortType( "NumberK", this.replace8a8 );
@@ -43,7 +51,13 @@ Class.create("AjxpSortable", SortableTable, {
 		this.addSortType( "StringDirFile", this.toUpperCase, false, this.splitDirsAndFiles.bind(this) );		
 	},
 		
-
+	/**
+	 * How the sorting and the pagination interfere
+	 * @param loaderFunc Function Callback called on sorting
+	 * @param columnsDefs Array All columns definition
+	 * @param crtOrderName String The current column of ordering
+	 * @param crtOrderDir String ASC or DESC
+	 */
 	setPaginationBehaviour : function(loaderFunc, columnsDefs, crtOrderName, crtOrderDir){
 		this.paginationLoaderFunc = loaderFunc;
 		this.columnsDefs = columnsDefs;
@@ -59,7 +73,10 @@ Class.create("AjxpSortable", SortableTable, {
 		this.updateHeaderArrows();
 	},
 	
-	
+	/**
+	 * Listener for header click
+	 * @param e Event The click event
+	 */
 	headerOnclick: function (e) {
 
 		var el = Event.findElement(e, 'div.header_cell');
@@ -81,6 +98,11 @@ Class.create("AjxpSortable", SortableTable, {
 		}
 	},
 	
+	/**
+	 * Function for handling Bytes / Binary
+	 * @param str String
+	 * @returns String
+	 */
 	replace8a8: function(str) {
 		str = str.toUpperCase();
 		var splitstr = "____";
@@ -103,7 +125,10 @@ Class.create("AjxpSortable", SortableTable, {
 		}	
 		return num;
 	},
-	
+	/**
+	 * Handling Bytes
+	 * @param str String
+	 */
 	replace8oa8: function(str) {
 		str = str.toUpperCase();
 		if(str == "-")
@@ -130,7 +155,11 @@ Class.create("AjxpSortable", SortableTable, {
 		}
 		return num;
 	},
-	
+	/**
+	 * Sorting function for dates
+	 * @param s String
+	 * @returns String
+	 */
 	replaceDate: function(s) {
 		var parts1 = s.split(" ");
 		
@@ -145,7 +174,13 @@ Class.create("AjxpSortable", SortableTable, {
 		d.setMinutes(hours[1]);	
 		return d.getTime();
 	},
-		
+	
+	/**
+	 * Sort dirs and files each on their side
+	 * @param oRow HTMLElement Row
+	 * @param nColumn Integer
+	 * @returns String
+	 */
 	splitDirsAndFiles: function(oRow, nColumn) {
 		var s;
 		var c = oRow.cells[nColumn];
@@ -160,6 +195,12 @@ Class.create("AjxpSortable", SortableTable, {
 		return s.toUpperCase();
 	},
 
+	/**
+	 * If the cell has a sorter_value attribute, use this as sorting
+	 * @param oRow HTMLElement Row
+	 * @param nColumn Integer
+	 * @returns String
+	 */
 	cellSorterValue : function(oRow, nColumn){
 		var tds = oRow.select('td');
 		if(tds[nColumn] && tds[nColumn].readAttribute('sorter_value')){
@@ -167,6 +208,12 @@ Class.create("AjxpSortable", SortableTable, {
 		}
 	},
 	
+	/**
+	 * Sort by ajxp_modiftime
+	 * @param oRow HTMLElement Row
+	 * @param nColumn Integer
+	 * @returns String
+	 */
 	sortTimes : function(oRow, nColumn){
 		if(oRow.ajxp_modiftime){
 			return oRow.ajxp_modiftime;

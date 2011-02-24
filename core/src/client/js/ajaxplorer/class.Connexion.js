@@ -1,7 +1,7 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
- * Copyright 2007-2009 Charles du Jeu
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,11 +29,16 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : AjaXplorer encapsulation of Ajax.Request
+ */
+/**
+ * AjaXplorer encapsulation of Ajax.Request
  */
 Class.create("Connexion", {
 
+	/**
+	 * Constructor
+	 * @param baseUrl String The base url for services
+	 */
 	initialize: function(baseUrl)
 	{
 		this._baseUrl = window.ajxpServerAccessPath;
@@ -43,24 +48,43 @@ Class.create("Connexion", {
 		this._method = 'get';
 	},
 	
+	/**
+	 * Add a parameter to the query
+	 * @param paramName String
+	 * @param paramValue String
+	 */
 	addParameter : function (paramName, paramValue){
 		this._parameters.set(paramName, paramValue);	
 	},
 	
+	/**
+	 * Sets the whole parameter as a bunch
+	 * @param hParameters $H()
+	 */
 	setParameters : function(hParameters){
 		this._parameters = $H(hParameters);
 	},
 	
+	/**
+	 * Set the query method (get post)
+	 * @param method String
+	 */
 	setMethod : function(method){
 		this._method = 'put';
 	},
 	
+	/**
+	 * Add the secure token parameter
+	 */
 	addSecureToken : function(){
 		if(Connexion.SECURE_TOKEN && this._baseUrl.indexOf('secure_token') == -1 && !this._parameters.get('secure_token')){
 			this.addParameter('secure_token', Connexion.SECURE_TOKEN);
 		}
 	},
 	
+	/**
+	 * Send Asynchronously
+	 */
 	sendAsync : function(){	
 		this.addSecureToken();
 		new Ajax.Request(this._baseUrl, 
@@ -71,6 +95,9 @@ Class.create("Connexion", {
 		});
 	},
 	
+	/**
+	 * Send synchronously
+	 */
 	sendSync : function(){	
 		this.addSecureToken();
 		new Ajax.Request(this._baseUrl, 
@@ -82,6 +109,10 @@ Class.create("Connexion", {
 		});
 	},
 	
+	/**
+	 * Apply the complete callback, try to grab maximum of errors
+	 * @param transport Transpot
+	 */
 	applyComplete : function(transport){
 		var message;
 		var headers = transport.getAllResponseHeaders();
@@ -128,6 +159,11 @@ Class.create("Connexion", {
 		document.fire("ajaxplorer:server_answer");
 	},
 	
+	/**
+	 * Load a javascript library
+	 * @param fileName String
+	 * @param onLoadedCode Function Callback
+	 */
 	loadLibrary : function(fileName, onLoadedCode){
 		var path = (this._libUrl?this._libUrl+'/'+fileName:fileName);
 		new Ajax.Request(path, 

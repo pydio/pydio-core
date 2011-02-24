@@ -1,7 +1,7 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
- * Copyright 2007-2009 Charles du Jeu
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,15 +29,25 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : A simple form generator (for the MySql plugin)
+ */
+/**
+ * An ultra-simple form generator (for the MySql plugin, should be moved in this plugin?)
  */
 Class.create("FormManager", {
 		
+	/**
+	 * Constructor
+	 */
 	initialize: function(){
 		
 	},
 	
+	/**
+	 * Replicate a template row
+	 * @param templateRow HTMLElement
+	 * @param number Integer
+	 * @param form HTMLForm
+	 */
 	replicateRow : function(templateRow, number, form){		
 		for(var index=0;index < number-1 ;index++){
 			tr = $(templateRow.cloneNode(true));
@@ -57,6 +67,12 @@ Class.create("FormManager", {
 		});
 	},
 	
+	/**
+	 * @param form HTMLForm
+	 * @param fields Array
+	 * @param value Object
+	 * @param suffix String
+	 */
 	fetchValueToForm : function(form, fields, value, suffix){
 		$A(fields).each(function(fieldName){
 			if(!value[fieldName]) return;
@@ -93,6 +109,11 @@ Class.create("FormManager", {
 		});
 	},
 	
+	/**
+	 * @param form HTMLForm
+	 * @param fields Object
+	 * @param values Array
+	 */
 	fetchMultipleValueToForm : function(form, fields, values){
 		var index = 0;
 		$A(values).each(function(value){

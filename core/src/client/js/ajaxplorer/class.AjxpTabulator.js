@@ -33,6 +33,12 @@
  * Description : Simple tab switcher
  */
 Class.create("AjxpTabulator", AjxpPane, {
+	/**
+	 * Constructor
+	 * @param $super klass Superclass reference
+	 * @param htmlElement HTMLElement Anchor of this pane
+	 * @param tabulatorOptions Object Widget options
+	 */
 	initialize : function($super, htmlElement, tabulatorOptions){
 		$super(htmlElement);
 		this.tabulatorData = tabulatorOptions.tabInfos;		
@@ -62,6 +68,10 @@ Class.create("AjxpTabulator", AjxpPane, {
 		}
 	},
 	
+	/**
+	 * Tab change
+	 * @param tabId String The id of the target tab
+	 */
 	switchTabulator:function(tabId){
 		var toShow ;
 		this.tabulatorData.each(function(tabInfo){
@@ -87,6 +97,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 		}
 	},
 	
+	/**
+	 * Resizes the widget
+	 */
 	resize : function(){
 		if(!this.selectedTabInfo) return;
 		var ajxpObject = this.getAndSetAjxpObject(this.selectedTabInfo);
@@ -95,6 +108,11 @@ Class.create("AjxpTabulator", AjxpPane, {
 		}
 	},
 	
+	/**
+	 * Getter/Setter of the Widget that will be attached to each tabInfo
+	 * @param tabInfo Object
+	 * @returns IAjxpWidget
+	 */
 	getAndSetAjxpObject : function(tabInfo){
 		var ajxpObject = tabInfo.ajxpObject || null;
 		if($(tabInfo.element).ajxpPaneObject && (!ajxpObject || ajxpObject != $(tabInfo.element).ajxpPaneObject) ){
