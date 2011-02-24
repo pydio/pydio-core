@@ -1,0 +1,29 @@
+span.jsapi_member{
+	font-weight: bold;
+	color: #5679A1;
+}
+.selected-focus span.jsapi_member{
+	color: #fff;
+}
+
+span.jsapi_jdoc_param{
+	font-style: italic;
+}
+
+span.jsapi_jdoc_return,
+span.jsapi_jdoc_var,
+span.jsapi_maindoc,
+span.jsapi_jdoc_param
+{
+	color: #999;
+}
+
+
+.selected-focus span.jsapi_jdoc_param,
+.selected-focus span.jsapi_jdoc_return,
+.selected-focus span.jsapi_jdoc_var,
+.selected-focus span.jsapi_maindoc
+{
+	color: #ddd;
+}
+
