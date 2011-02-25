@@ -244,6 +244,7 @@ Class.create("LocalAPINodeProvider", {
 		var changes = false;
 		children.each(function(childNode){
 			var memberKey = getBaseName(childNode.getPath());
+			var vDesc = null;
 			if(docs[memberKey]){
 				changes = true;
 				var meta = childNode.getMetadata();
@@ -278,6 +279,10 @@ Class.create("LocalAPINodeProvider", {
 						});
 						crtLabel = crtLabel.replace('('+meta.get("argumentNames").join(', ')+')', '('+newArgs.join(', ')+')');
 					}
+				}
+				if(docs[memberKey].main || vDesc){
+					vDesc = vDesc?vDesc:docs[memberKey].main; 
+					crtLabel = crtLabel + '<span class="jsapi_commentfull">'+vDesc+'</span>';
 				}
 				
 				childNode._label = crtLabel;

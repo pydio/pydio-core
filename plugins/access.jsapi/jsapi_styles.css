@@ -24,6 +24,14 @@ span.jsapi_jdoc_param
 .selected-focus span.jsapi_jdoc_var,
 .selected-focus span.jsapi_maindoc
 {
-	color: #ddd;
+	color: #BDB;
 }
 
+span.jsapi_commentfull{
+	display:none;
+}
+
+.selected-focus span.jsapi_commentfull{
+	display: block;
+	padding: 2px Opx;
+}
