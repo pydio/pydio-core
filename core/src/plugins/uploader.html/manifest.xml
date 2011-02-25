@@ -20,6 +20,11 @@
 					<serverCallback methodName="getDropBg"/>
 				</processing>
 			</action>
+			<action name="upload_chunks_unify">
+				<processing>					
+					<serverCallback methodName="unifyChunks"/>
+				</processing>
+			</action>
 		</actions>
 	</registry_contributions>	
 	<processing>	

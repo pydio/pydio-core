@@ -105,5 +105,35 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 		}
 		
 	}	
+	
+	public function unifyChunks($action, $httpVars, $fileVars){
+		$repository = ConfService::getRepository();
+		if(!$repository->detectStreamWrapper(false)){
+			return false;
+		}
+		$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+		$streamData = $plugin->detectStreamWrapper(true);		
+		$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";    	
+		$filename = AJXP_Utils::decodeSecureMagic($httpVars["file_name"]);
+		$chunks = array();
+		$index = 0;
+		while(isSet($httpVars["chunk_".$index])){
+			$chunks[] = AJXP_Utils::decodeSecureMagic($httpVars["chunk_".$index]);
+			$index++;
+		}
+		
+		$newDest = fopen($destStreamURL.$filename, "w");
+		for ($i = 0; $i < count($chunks) ; $i++){
+			$part = fopen($destStreamURL.$chunks[$i], "r");
+			while(!feof($part)){
+				fwrite($newDest, fread($part, 4096));
+			}
+			fclose($part);
+			unlink($destStreamURL.$chunks[$i]);
+		}
+		fclose($newDest);
+		
+	}
 }
 ?>
