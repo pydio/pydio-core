@@ -73,7 +73,12 @@
 					    </div>
 					    <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="jsapi.3" style="border: 1px solid #676965;"></div>
 					</div>
-				</div>				
+				</div>
+				<script type="text/javascript">
+					if(ajxpBootstrap){
+						$('ajxp_current_version').update('- v'+ajxpBootstrap.parameters.get("ajxpVersion"));
+					}
+				</script>				
 			]]></template>			
 			<template_part ajxpId="info_panel" ajxpClass="JsSourceViewer" ajxpOptions="{}"/>
 			<component_config className="FilesList">
