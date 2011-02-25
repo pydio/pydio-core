@@ -8,10 +8,14 @@ class jsapiAccessDriver extends AbstractAccessDriver{
 				$jsName = AJXP_Utils::decodeSecureMagic($httpVars["object_name"]);
 				$jsType = $httpVars["object_type"]; // class or interface?
 				$fName = "class.".strtolower($jsName).".js";
+				if($jsName == "Splitter"){
+					$fName = "splitter.js";
+				}
 				// Locate the file class.ClassName.js
 				if($jsType == "class"){
 					$searchLocations = array(
 						CLIENT_RESOURCES_FOLDER."/js/ajaxplorer",
+						CLIENT_RESOURCES_FOLDER."/js/lib",
 						INSTALL_PATH."/plugins/"
 					);
 				}else if($jsType == "interface"){
