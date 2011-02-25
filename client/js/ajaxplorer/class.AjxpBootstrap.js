@@ -158,7 +158,7 @@ Class.create("AjxpBootstrap", {
 		
 	},
 	/**
-	 * Detect the base path of the javascripts based on the <script> tags
+	 * Detect the base path of the javascripts based on the script tags
 	 */
 	detectBaseParameters : function(){
 		$$('script').each(function(scriptTag){
