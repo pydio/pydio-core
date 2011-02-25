@@ -2,6 +2,7 @@
 <ajxpdriver name="jsapi" label="Javascript Api Browser" description="Browse AjaXplorer Javascript classes and interfaces">
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
 		<resources>
+			<i18n namespace="jsapi" path="plugins/access.jsapi/i18n" />
 			<img_library alias="jsapi_images" path="plugins/access.jsapi/icons"/>
 			<js file="plugins/editor.codemirror/CodeMirror/js/codemirror.js" className="CodeMirror"/>
 			<css file="plugins/editor.codemirror/css/linenumbers.css"/>			
@@ -53,13 +54,31 @@
 			</action>	
 		</actions>
 		<client_configs>
-			<!-- 
-			<template_part ajxpId="bottomSplitPane" ajxpClass="AjxpPane" ajxpOptions="{}"/>
-			-->
+			<template name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
+				<div id="toolbars">
+					<div id="action_bar">
+						<div id="locationbar_cont">
+							<div style="height: 100%;" class="separator"></div>
+							<div style="padding-top : 5px;">
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont'}"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
+					<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 700, minA:50,fit:'height',fitParent:'browser'}">
+						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'vertical',initA:150,maxA:300}">
+							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions="{display:'dz'}" ajxpPaneHeader="jsapi.1" style="border: 1px solid #676965;"></div>		
+					    	<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965;"></div>
+					    </div>
+					    <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="jsapi.3" style="border: 1px solid #676965;"></div>
+					</div>
+				</div>				
+			]]></template>			
 			<template_part ajxpId="info_panel" ajxpClass="JsSourceViewer" ajxpOptions="{}"/>
 			<component_config className="FilesList">
 				<columns switchDisplayMode="full">
-					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
+					<column messageId="jsapi.2" attributeName="ajxp_label" sortType="StringDirFile"/>
 				</columns>
 			</component_config>
 		</client_configs>			

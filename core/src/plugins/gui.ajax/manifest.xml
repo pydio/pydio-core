@@ -54,30 +54,6 @@
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions="{fit:'height',fitParent:'browser'}" style="border: 1px solid #676965; background-color: #fff;"></div>	
 				</div>				
 			]]></template>
-			<template name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
-				<div id="toolbars">
-					<div id="action_bar">
-						<div id="buttons_bar" ajxpClass="ActionsToolbar"></div>
-						<div id="locationbar_cont">
-							<div style="height: 100%;" class="separator"></div>
-							<div style="padding-top : 5px;">
-								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont'}"></div>
-								<div id="logging_string" ajxpClass="UserWidget"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
-					<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:50,fit:'height',fitParent:'browser'}">
-						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initB:200,minB:24,maxB:500}">
-							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions="{display:'dz'}" ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>		
-					    	<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #676965;"></div>
-					    </div>
-					    <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="317" style="border: 1px solid #676965;"></div>
-					</div>
-				</div>				
-			]]></template>			
 			<component_config className="FilesList">
 				<property name="thumbSize" value="64"/>
 				<property name="displayMode" value="list"/>
