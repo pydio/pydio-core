@@ -1,7 +1,5 @@
-/**
- * @package info.ajaxplorer.plugins
- * 
- * Copyright 2007-2009 Charles du Jeu
+/*
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,11 +27,16 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Container for parent/location/bookmark components.
+ */
+/**
+ * Widget for users action, displayed on the right of the toolbar
  */
 Class.create("UserWidget", {
 	__implements : ["IAjxpWidget"],
+	/**
+	 * Constructor
+	 * @param element HTMLElement
+	 */
 	initialize: function(element){
 		this.element = element;
 		this.element.ajxpPaneObject = this;
@@ -50,7 +53,9 @@ Class.create("UserWidget", {
 		document.observe("ajaxplorer:actions_loaded", this.updateActions.bind(this));		
 		if(Prototype.Browser.IE) document.observe("ajaxplorer:actions_refreshed", this.updateActions.bind(this));
 	},
-	
+	/**
+	 * Updates on user status change
+	 */
 	updateGui : function(){
 		var logging_string = "";
 		var oUser = ajaxplorer.user;		
@@ -79,6 +84,9 @@ Class.create("UserWidget", {
 		this.element.update(logging_string);
 	},
 	
+	/**
+	 * Updates the menu with dedicated actions
+	 */
 	updateActions : function(){
 		var menuItems = $A();
 		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("UserWidget", this.element.id).each(function(action){
@@ -123,9 +131,15 @@ Class.create("UserWidget", {
 		}
 		
 	},
-	
+	/**
+	 * Resize widget
+	 */
 	resize : function(){
 	},
+	/**
+	 * Show/hide widget
+	 * @param show Boolean
+	 */
 	showElement : function(show){
 		this.element.select(".user_widget_label").invoke((show?'show':'hide'));
 	}	

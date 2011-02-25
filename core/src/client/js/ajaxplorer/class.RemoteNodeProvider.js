@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,17 +29,32 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : base for nodes provider
+ */
+/**
+ * Implementation of the IAjxpNodeProvider interface based on a remote server access.
+ * Default for all repositories.
  */
 Class.create("RemoteNodeProvider", {
 	__implements : "IAjxpNodeProvider",
+	/**
+	 * Constructor
+	 */
 	initialize : function(){
 		
 	},
+	/**
+	 * Initialize properties
+	 * @param properties Object
+	 */
 	initProvider : function(properties){
 		this.properties = properties;
 	},
+	/**
+	 * Load a node
+	 * @param node AjxpNode
+	 * @param nodeCallback Function On node loaded
+	 * @param childCallback Function On child added
+	 */
 	loadNode : function(node, nodeCallback, childCallback){
 		var conn = new Connexion();
 		conn.addParameter("get_action", "ls");
@@ -65,6 +80,13 @@ Class.create("RemoteNodeProvider", {
 		}.bind(this);	
 		conn.sendAsync();
 	},
+	/**
+	 * Parse the answer and create AjxpNodes
+	 * @param origNode AjxpNode
+	 * @param transport Ajax.Response
+	 * @param nodeCallback Function
+	 * @param childCallback Function
+	 */
 	parseNodes : function(origNode, transport, nodeCallback, childCallback){
 		if(!transport.responseXML || !transport.responseXML.documentElement) return;
 		var rootNode = transport.responseXML.documentElement;
@@ -113,7 +135,11 @@ Class.create("RemoteNodeProvider", {
 			nodeCallback(origNode);
 		}
 	},
-	
+	/**
+	 * Parses XML Node and create AjxpNode
+	 * @param xmlNode XMLNode
+	 * @returns AjxpNode
+	 */
 	parseAjxpNode : function(xmlNode){
 		var node = new AjxpNode(
 			xmlNode.getAttribute('filename'), 

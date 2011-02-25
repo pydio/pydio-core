@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,8 +29,9 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Container for parent/location/bookmark components.
+ */
+/**
+ * Container for location components, go to parent, refresh.
  */
 Class.create("LocationBar", {
 	__implements : ["IAjxpWidget", "IFocusable"],
@@ -38,7 +39,11 @@ Class.create("LocationBar", {
 	_reloadGotoIcon : 'reload.png',
 	_modified : false,
 	_beforeModified : '',
-	
+	/**
+	 * Constructor
+	 * @param oElement HTMLElement
+	 * @param options Object
+	 */
 	initialize : function(oElement, options){
 		this.element = oElement;
 		this.element.ajxpPaneObject = this;
@@ -47,6 +52,9 @@ Class.create("LocationBar", {
 		this.options = options || {};
 		document.observe("ajaxplorer:user_logged", this.resize.bind(this));
 	},
+	/**
+	 * Creates the GUI
+	 */
 	createGui : function(){
 		this.parentButton = simpleButton(
 			'goto_parent', 
@@ -103,6 +111,9 @@ Class.create("LocationBar", {
 		this.element.insert(this.bmButton);
 		this.initBookmarksBar();
 	},
+	/**
+	 * Initialize the input field with various observers
+	 */
 	initCurrentPath : function(){
 		this.currentPath = new Element('input', {
 			id:'current_path',
@@ -148,9 +159,16 @@ Class.create("LocationBar", {
 		}.bind(this) );
 
 	},
+	/** 
+	 * Insert a BookmarksBar object
+	 */
 	initBookmarksBar : function(){
 		this.bookmarkBar = new BookmarksBar(this.bmButton);
 	},
+	/**
+	 * Called on path submissionon
+	 * @returns Boolean
+	 */
 	submitPath : function(){
 		if(!this._modified){
 			ajaxplorer.actionBar.fireAction("refresh");
@@ -176,6 +194,10 @@ Class.create("LocationBar", {
 		}
 		return false;
 	},
+	/**
+	 * Observer for node change
+	 * @param newNode AjxpNode
+	 */
 	updateLocationBar: function (newNode)
 	{
 		if(Object.isString(newNode)){
@@ -194,11 +216,18 @@ Class.create("LocationBar", {
 		this.currentPath.value = this.realPath;
 		this.setModified(false);
 	},	
+	/**
+	 * Change the state of the bar
+	 * @param bool Boolean
+	 */
 	setModified:function(bool){
 		this._modified = bool;
 		this.gotoButton.setSrc(resolveImageSource((bool?this._defaultGotoIcon:this._reloadGotoIcon), '/images/actions/ICON_SIZE', 16));
 		this._beforeModified = this.currentPath.getValue();
 	},
+	/**
+	 * Resize widget
+	 */
 	resize : function(){
 		if(this.options.flexTo){
 			var parentWidth = $(this.options.flexTo).getWidth();
@@ -223,14 +252,27 @@ Class.create("LocationBar", {
 			}
 		}
 	},
+	/**
+	 * Do nothing
+	 * @param show Boolean
+	 */
 	showElement : function(show){},
+	/**
+	 * Do nothing
+	 */
 	setFocusBehaviour : function(){},
+	/**
+	 * Focus the widget : select the input field
+	 */
 	focus : function(){
 		this.label.hide();
 		this.currentPath.show();
 		this.currentPath.focus();
 		this.hasFocus = true;
 	},
+	/**
+	 * Blur the widget : show the label instead of the input field.
+	 */
 	blur : function(){
 		this.currentPath.blur();
 		this.currentPath.hide();

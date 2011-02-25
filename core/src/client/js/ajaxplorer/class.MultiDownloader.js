@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.js
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,11 +29,17 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * Description : Class for simple Ajax/HTML multiple download
+ */
+/**
+ * Where ZIP is not enabled, this class will create a simple pane for Ajax/HTML multiple downloads
  */
  Class.create("MultiDownloader", {
 	
+	 /**
+	  * Constructor
+	  * @param list_target HTMLElement
+	  * @param downloadUrl String
+	  */
 	initialize : function( list_target, downloadUrl ){
 
 	// Where to write the list
@@ -82,6 +88,9 @@
 		
 	},
 	
+	/**
+	 * Clear list
+	 */
 	emptyList : function()
 	{
 		
