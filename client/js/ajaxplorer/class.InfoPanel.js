@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,11 +29,17 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : A dynamic panel displaying details on the current selection. Works with Templates.
+ */
+/**
+ * A dynamic panel displaying details on the current selection. Works with Templates.
  */
 Class.create("InfoPanel", AjxpPane, {
 
+	/**
+	 * Constructor
+	 * @param $super klass Superclass reference
+	 * @param htmlElement HTMLElement
+	 */
 	initialize: function($super, htmlElement){
 		$super(htmlElement);
 		attachMobileScroll(htmlElement, "vertical");
@@ -54,7 +60,9 @@ Class.create("InfoPanel", AjxpPane, {
 		document.observe("ajaxplorer:component_config_changed", this.componentConfigHandler );		
 		document.observe("ajaxplorer:user_logged", this.userLogHandler );
 	},
-	
+	/**
+	 * Clean destroy of the panel, remove listeners
+	 */
 	destroy : function(){
 		document.stopObserving("ajaxplorer:actions_refreshed", this.updateHandler );
 		document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );		
@@ -62,16 +70,23 @@ Class.create("InfoPanel", AjxpPane, {
 		this.empty();
 		this.htmlElement = null;
 	},
-		
+	/**
+	 * Clear all panels
+	 */
 	clearPanels:function(){
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();
 	},
-	
+	/**
+	 * Sets empty content
+	 */
 	empty : function(){
 		this.setContent('');
 	},
 	
+	/**
+	 * Updates content by finding the right template and applying it.
+	 */
 	update : function(){
 		if(!this.htmlElement) return;
 		var userSelection = ajaxplorer.getUserSelection();
@@ -153,18 +168,26 @@ Class.create("InfoPanel", AjxpPane, {
 		}
 		
 	},
-	
+	/**
+	 * Insert html in content pane
+	 * @param sHtml String
+	 */
 	setContent : function(sHtml){
 		if(!this.htmlElement) return;
 		this.htmlElement.update(sHtml);
 	},
-	
+	/**
+	 * Show/Hide the panel
+	 * @param show Boolean
+	 */
 	showElement : function(show){
 		if(!this.htmlElement) return;
 		if(show) this.htmlElement.show();
 		else this.htmlElement.hide();
 	},
-	
+	/**
+	 * Resize the panel
+	 */
 	resize : function(){
 		fitHeightToBottom(this.htmlElement, null);	
 		if(this.currentPreviewElement && this.currentPreviewElement.visible()){
@@ -172,7 +195,12 @@ Class.create("InfoPanel", AjxpPane, {
 			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:150});
 		}
 	},
-	
+	/**
+	 * Find template and evaluate it
+	 * @param mimeType String
+	 * @param fileNode AjxpNode
+	 * @param tArgs Object
+	 */
 	evalTemplateForMime: function(mimeType, fileNode, tArgs){
 		if(!this.htmlElement) return;
 		if(!this.registeredMimes.get(mimeType)) return;		
@@ -255,6 +283,10 @@ Class.create("InfoPanel", AjxpPane, {
 		}
 	},
 		
+	/**
+	 * Adds an "Action" section below the templates
+	 * @param selectionType String 'empty', 'multiple', 'unique'
+	 */
 	addActions: function(selectionType){
 		//DEPRECATED
 		//var actions = ajaxplorer.actionBar.getInfoPanelActions();
@@ -273,7 +305,12 @@ Class.create("InfoPanel", AjxpPane, {
 		if(!count) return;
 		this.htmlElement.insert(actionString);
 	},
-	
+	/**
+	 * Use editors extensions to find a preview element for the current node
+	 * @param ajxpNode AjxpNode
+	 * @param getTemplateElement Boolean If true, will return a fake div that can be inserted in template and replaced later
+	 * @returns String
+	 */
 	getPreviewElement : function(ajxpNode, getTemplateElement){
 		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime());
 		if(editors && editors.length)
@@ -291,7 +328,10 @@ Class.create("InfoPanel", AjxpPane, {
 		}
 		return '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
 	},
-	
+	/**
+	 * Parses config node
+	 * @param configNode DOMNode
+	 */
 	parseComponentConfig: function(configNode){
 		var panels = XPathSelectNodes(configNode, "infoPanel|infoPanelExtension");
 		for(var i = 0; i<panels.length; i++){

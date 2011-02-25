@@ -1,7 +1,7 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
- * Copyright 2007-2009 Charles du Jeu
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,14 +29,18 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : A selector for displaying repository list. Will hook to ajaxplorer:repository_list_refreshed.
+ */
+/**
+ * A selector for displaying repository list. Will hook to ajaxplorer:repository_list_refreshed.
  */
 Class.create("RepositorySelect", {
 	__implements : "IAjxpWidget",
 	_defaultString:'No Repository',
 	_defaultIcon : 'network-wired.png',
-	
+	/**
+	 * Constructor
+	 * @param oElement HTMLElement Anchor
+	 */
 	initialize : function(oElement){
 		this.element = oElement;
 		this.element.ajxpPaneObject = this;
@@ -47,6 +51,9 @@ Class.create("RepositorySelect", {
 		}.bind(this) );
 	},
 	
+	/**
+	 * Creates the HTML
+	 */
 	createGui : function(){
 		if(MessageHash){
 			this._defaultString = MessageHash[391];
@@ -81,7 +88,11 @@ Class.create("RepositorySelect", {
 		this.button.select('img')[0].setStyle({height:6, width:10, marginLeft:1, marginRight:1, marginTop:8});
 		this.element.insert(this.button);
 	},
-	
+	/**
+	 * Refresh the whole drop-down list
+	 * @param repositoryList $A
+	 * @param repositoryId String
+	 */
 	refreshRepositoriesMenu: function(repositoryList, repositoryId){
 		this.button.addClassName('disabled');
 		var actions = $A([]);
@@ -152,11 +163,16 @@ Class.create("RepositorySelect", {
 		}
 		if(actions.length) this.button.removeClassName('disabled');
 	},
-	
+	/**
+	 * Listener for repository selection 
+	 * @param key String
+	 */
 	onRepoSelect : function(key){
 		ajaxplorer.triggerRepositoryChange(key);
 	},
-	
+	/**
+	 * Resize widget
+	 */
 	resize : function(){
 		var parent = this.element.getOffsetParent();
 		if(parent.getWidth() < this.currentRepositoryLabel.getWidth()*3.5){
@@ -165,6 +181,10 @@ Class.create("RepositorySelect", {
 			this.showElement(true);
 		}
 	},
+	/**
+	 * Show/hide element
+	 * @param show Boolean
+	 */
 	showElement : function(show){
 		this.show = show;
 		if(show){
@@ -179,6 +199,10 @@ Class.create("RepositorySelect", {
 			this.observeOnce("createMenu", function(){this.showElement(this.show);}.bind(this));
 		}
 	},
+	/**
+	 * Utilitary
+	 * @returns Integer
+	 */
 	getActualWidth : function(){
 		if(this.currentRepositoryLabel.visible()) return this.element.getWidth();
 		else return this.button.getWidth() + 10;

@@ -29,15 +29,27 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Encapsulation of the lightbox script for modal windows.
+ */
+/**
+ * Encapsulation of the lightbox script for modal windows. Used for alerting user, but
+ * also for all popup forms (generic_dialog_box)
+ * An instance is automatically created at the end of the file, no very clean, ajaxplorer
+ * should create it instead.
  */
 Class.create("Modal", {
 
+	/**
+	 * @var Boolean Current state of the page. If true, calls the updateLoadingProgress
+	 */
 	pageLoading: true,
+	/**
+	 * Constructor
+	 */
 	initialize: function(){
 	},
-	
+	/**
+	 * Find the forms
+	 */
 	initForms: function(){
 		this.elementName = 'generic_dialog_box';
 		this.htmlElement = $(this.elementName);
@@ -48,6 +60,11 @@ Class.create("Modal", {
 		this.iframeIndex = 0;	
 	},
 	
+	/**
+	 * Compute dialogContent html
+	 * @param sTitle String Title of the popup
+	 * @param sIconSrc String Source icon
+	 */
 	prepareHeader: function(sTitle, sIconSrc){
 		var hString = "<span class=\"titleString\">";
 		if(sIconSrc != "") hString = "<span class=\"titleString\"><img src=\""+sIconSrc.replace('22', '16')+"\" width=\"16\" height=\"16\" align=\"top\"/>&nbsp;";
@@ -56,6 +73,16 @@ Class.create("Modal", {
 		this.dialogTitle.update(closeBtn + hString);
 	},
 	
+	/**
+	 * Shows a dialog box by getting the form from the hidden_forms
+	 * @param sTitle String Title of the box
+	 * @param sFormId String Id of the form to use as content
+	 * @param fOnLoad Function Callback after the popup is shown, passe the form as argument
+	 * @param fOnComplete Function Callback for OK button
+	 * @param fOnCancel Function Callback for Cancel button
+	 * @param bOkButtonOnly Boolean Wether to hide cancel button
+	 * @param skipButtons Boolean Wether to hide all buttons
+	 */
 	showDialogForm: function(sTitle, sFormId, fOnLoad, fOnComplete, fOnCancel, bOkButtonOnly, skipButtons){
 		this.clearContent(this.dialogContent);
 		//this.dialogTitle.innerHTML = sTitle;
@@ -159,7 +186,13 @@ Class.create("Modal", {
 		// SAFARI => FORCE IFRAME RELOADING
 		if(Prototype.Browser.WebKit && reloadIFrame && reloadIFrameSrc) reloadIFrame.src = reloadIFrameSrc;
 	},
-	
+	/**
+	 * Utility for effectively showing the modal
+	 * @param elementName String
+	 * @param boxWidth String Width in pixel or in percent
+	 * @param boxHeight String Height in pixel or in percent
+	 * @param skipShadow Boolean Do not add a shadow
+	 */
 	showContent: function(elementName, boxWidth, boxHeight, skipShadow){
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
@@ -220,7 +253,10 @@ Class.create("Modal", {
 			}, true);
 				
 	},
-	
+	/**
+	 * Find an editor using the editorData and initialize it
+	 * @param editorData Object
+	 */
 	openEditorDialog : function(editorData){
 		if(!editorData.formId){
 			ajaxplorer.displayMessage('ERROR', 'Error, you must define a formId attribute in your &lt;editor&gt; manifest (or set it as openable="false")');
@@ -239,11 +275,18 @@ Class.create("Modal", {
 		};
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},
-	
+	/**
+	 * Returns the current form, the real one.
+	 * @returns HTMLForm
+	 */
 	getForm: function()	{
 		return this.currentForm;
 	},
-	
+	/**
+	 * Refresh position after a window change
+	 * @param checkHeight Boolean
+	 * @param elementToScroll HTMLElement
+	 */
 	refreshDialogPosition: function(checkHeight, elementToScroll){
 		var winWidth = $(document.body).getWidth();
 		var winHeight = $(document.body).getHeight();
@@ -269,7 +312,9 @@ Class.create("Modal", {
 		var offsetTop = parseInt(((winHeight - boxHeight)/3));
 		$(this.elementName).setStyle({top:offsetTop+'px'});		
 	},
-	
+	/**
+	 * Refresh appearance after the dialog box changed (shadow)
+	 */
 	refreshDialogAppearance:function(){
 		Shadower.shadow($(this.elementName), 
 			{
@@ -281,7 +326,10 @@ Class.create("Modal", {
 				shadowStyle:{display:'block'}
 			}, true);		
 	},
-	
+	/**
+	 * Clear all content
+	 * @param object HTMLElement The current form
+	 */
 	clearContent: function(object){
 		// REMOVE CURRENT FORM, IF ANY
 		if(object.getElementsBySelector("form").length)
@@ -298,7 +346,14 @@ Class.create("Modal", {
 			});		
 		}	
 	},
-	
+	/**
+	 * Adds buttons to the content
+	 * @param oForm HTMLElement Current form
+	 * @param fOnCancel Function Callback on cancel
+	 * @param bOkButtonOnly Boolean Hide cancel
+	 * @param position String Position.insert() allowed key.
+	 * @returns HTMLElement
+	 */
 	addSubmitCancel: function(oForm, fOnCancel, bOkButtonOnly, position){
 		var contDiv = new Element('div', {className:'dialogButtons'});
 		var okButton = new Element('input', {
@@ -340,6 +395,11 @@ Class.create("Modal", {
 		return contDiv;
 	},
 	
+	/**
+	 * Create a simple tooltip
+	 * @param element HTMLElement
+	 * @param title String
+	 */
 	simpleTooltip : function(element, title){
 		element.observe("mouseover", function(event){
 			var x = Event.pointerX(event)+10;
@@ -362,7 +422,9 @@ Class.create("Modal", {
 			}.bind(this), 300);
 		}.bind(this) );
 	},
-	
+	/**
+	 * Close the Message
+	 */
 	closeMessageDiv: function(){
 		if(this.messageDivOpen)
 		{
@@ -370,12 +432,18 @@ Class.create("Modal", {
 			this.messageDivOpen = false;
 		}
 	},
-	
+	/**
+	 * Timer for automatically closing the message
+	 */
 	tempoMessageDivClosing: function(){
 		this.messageDivOpen = true;
 		setTimeout('modal.closeMessageDiv()', 6000);
 	},
-	
+	/**
+	 * Display a user message (notice or error)
+	 * @param messageType String ERROR or SUCCESS
+	 * @param message String Content of the message
+	 */
 	displayMessage: function(messageType, message){
 		if(!this.messageBox){
 			this.messageBox = new Element("div", {title:MessageHash[98],id:"message_div",className:"messageBox"});
@@ -408,17 +476,27 @@ Class.create("Modal", {
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
 	},
-	
+	/**
+	 * Bootloader helper. Sets total steps
+	 * @param count Integer
+	 */
 	setLoadingStepCounts: function(count){
 		this.loadingStepsCount = count;
 		this.loadingStep = count;
 	},
 	
+	/**
+	 * Bootload helper. Increment total steps 
+	 * @param add Integer
+	 */
 	incrementStepCounts: function(add){
 		this.loadingStepsCount += add;
 		this.loadingStep += add;
 	},
-	
+	/**
+	 * Bootloader helper
+	 * @param state Integer Current loading step
+	 */
 	updateLoadingProgress: function(state){	
 		this.loadingStep --;
 		var percent = (1 - (this.loadingStep / this.loadingStepsCount));
@@ -433,15 +511,25 @@ Class.create("Modal", {
 		}
 		return;
 	},
-	
+	/**
+	 * Callback to be called on close
+	 * @param func Function
+	 */
 	setCloseValidation : function(func){
 		this.closeValidation = func;
 	},
 	
+	/**
+	 * Callback to be called on close
+	 * @param func Function
+	 */
 	setCloseAction: function(func){
 		this.closeFunction = func;
 	},
 	
+	/**
+	 * Close action. Remove shadow if any, call close callback if any.
+	 */
 	close: function(){	
 		Shadower.deshadow($(this.elementName));
 		if(this.closeFunction){

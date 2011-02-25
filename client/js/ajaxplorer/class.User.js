@@ -1,7 +1,5 @@
-/**
- * @package info.ajaxplorer.plugins
- * 
- * Copyright 2007-2009 Charles du Jeu
+/*
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,23 +27,63 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Abstraction of the currently logged user.
+ */
+/**
+ * Abstraction of the currently logged user. Can be a "fake" user when users management
+ * system is disabled
  */
 Class.create("User", {
 
+	/**
+	 * @var String
+	 */
 	id : undefined,
+	/**
+	 * @var String
+	 */
 	activeRepository:undefined,
+	/**
+	 * @var Boolean
+	 */
 	read:false,
+	/**
+	 * @var Boolean
+	 */
 	write:false,
-	crossRepositoryCopy:false,
+	/**
+	 * @var Boolean
+	 */	
+	crossRepositoryCopy:false,	
+	/**
+	 * @var $H()
+	 */
 	preferences:undefined,
+	/**
+	 * @var $H()
+	 */
 	repositories: undefined,
+	/**
+	 * @var $H()
+	 */
 	crossRepositories:undefined,
+	/**
+	 * @var $H()
+	 */
 	repoIcons:undefined,
+	/**
+	 * @var $H()
+	 */
 	repoSearchEngines:undefined,
+	/**
+	 * @var Boolean
+	 */
 	isAdmin:false,
 
+	/**
+	 * Constructor
+	 * @param id String The user unique id
+	 * @param xmlDef XMLNode Registry Fragment
+	 */
 	initialize:function(id, xmlDef){
 		this.id = id;
 		this.preferences = new Hash();
@@ -56,6 +94,12 @@ Class.create("User", {
 		if(xmlDef) this.loadFromXml(xmlDef);
 	},
 
+	/**
+	 * Set current repository
+	 * @param id String
+	 * @param read Boolean
+	 * @param write Boolean
+	 */
 	setActiveRepository : function (id, read, write){
 		this.activeRepository = id;
 		this.read = (read=="1"?true:false);
@@ -67,23 +111,41 @@ Class.create("User", {
 			this.crossRepositories.unset(id);
 		}
 	},
-	
+	/**
+	 * Gets the current active repository
+	 * @returns String
+	 */
 	getActiveRepository : function(){
 		return this.activeRepository;
 	},
-	
+	/**
+	 * Whether current repo is allowed to be read
+	 * @returns Boolean
+	 */
 	canRead : function(){
 		return this.read;
 	},
 	
+	/**
+	 * Whether current repo is allowed to be written
+	 * @returns Boolean
+	 */
 	canWrite : function(){
 		return this.write;
 	},
 	
+	/**
+	 * Whether current repo is allowed to be cross-copied
+	 * @returns Boolean
+	 */
 	canCrossRepositoryCopy : function(){
 		return this.crossRepositoryCopy;
 	},
 	
+	/**
+	 * Get a user preference by its name
+	 * @returns Mixed
+	 */
 	getPreference : function(prefName, fromJSON){
 	    var value = this.preferences.get(prefName);	
 	    if(fromJSON && value){
@@ -96,10 +158,20 @@ Class.create("User", {
 	    return value;
 	},
 	
+	/**
+	 * Get all repositories 
+	 * @returns {Hash}
+	 */
 	getRepositoriesList : function(){
 		return this.repositories;
 	},
 	
+	/**
+	 * Set a preference value
+	 * @param prefName String
+	 * @param prefValue Mixed
+	 * @param toJSON Boolean Whether to convert the value to JSON representation
+	 */
 	setPreference : function(prefName, prefValue, toJSON){
 		if(toJSON){
 			prefValue = prefValue.toJSON();
@@ -107,6 +179,10 @@ Class.create("User", {
 		this.preferences.set(prefName, prefValue);
 	},
 	
+	/**
+	 * Set the repositories as a bunch
+	 * @param repoHash $H()
+	 */
 	setRepositoriesList : function(repoHash){
 		this.repositories = repoHash;
 		// filter repositories once for all
@@ -117,23 +193,40 @@ Class.create("User", {
 			}
 		}.bind(this) );
 	},
-	
+	/**
+	 * Whether there are any repositories allowing crossCopy
+	 * @returns Boolean
+	 */
 	hasCrossRepositories : function(){
 		return (this.crossRepositories.size());
 	},
-	
+	/**
+	 * Get repositories allowing cross copy
+	 * @returns {Hash}
+	 */
 	getCrossRepositories : function(){
 		return this.crossRepositories;
 	},
-	
+	/**
+	 * Get the current repository Icon
+	 * @param repoId String
+	 * @returns String
+	 */
 	getRepositoryIcon : function(repoId){
 		return this.repoIcon.get(repoId);
 	},
-	
+	/**
+	 * Get the repository search engine
+	 * @param repoId String
+	 * @returns String
+	 */
 	getRepoSearchEngine : function(repoId){
 		return this.repoSearchEngines.get(repoId);
 	},
-	
+	/**
+	 * Send the preference to the server for saving
+	 * @param prefName String
+	 */
 	savePreference : function(prefName){
 		if(!this.preferences.get(prefName)) return;
 		var conn = new Connexion();
@@ -142,7 +235,13 @@ Class.create("User", {
 		conn.addParameter("pref_value_" + 0, this.preferences.get(prefName));
 		conn.sendAsync();
 	},
-	
+	/**
+	 * Send all preferences to the server. If oldPass, newPass and seed are set, also save pass.
+	 * @param oldPass String
+	 * @param newPass String
+	 * @param seed String
+	 * @param onCompleteFunc Function
+	 */
 	savePreferences : function(oldPass, newPass, seed, onCompleteFunc){
 		var conn = new Connexion();
 		conn.addParameter("get_action", "save_user_pref");
@@ -162,7 +261,10 @@ Class.create("User", {
 		conn.onComplete = onCompleteFunc;
 		conn.sendAsync();
 	}, 
-	
+	/**
+	 * Parse the registry fragment to load this user
+	 * @param userNodes DOMNode
+	 */
 	loadFromXml: function(userNodes){
 	
 		var repositories = new Hash();

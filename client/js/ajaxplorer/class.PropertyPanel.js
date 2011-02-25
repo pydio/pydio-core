@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,11 +29,17 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : A dynamic panel displaying details on the current file.
+ */
+/**
+ * A dynamic panel displaying permissions details on the current file.
  */
 Class.create("PropertyPanel", {
 
+	/**
+	 * Constructor
+	 * @param userSelection AjxpDataModel
+	 * @param htmlElement HTMLElement
+	 */
 	initialize: function(userSelection, htmlElement){
 		this.rights = ['4', '2', '1'];
 		this.accessors = ['u', 'g', 'a'];
@@ -58,10 +64,17 @@ Class.create("PropertyPanel", {
 		}		
 	},
 	
+	/**
+	 * Check whether current value has changed or not
+	 * @returns Boolean
+	 */
 	valueChanged : function(){
 		return (this.origValue != this.valueInput.value);
 	},
 	
+	/**
+	 * Creates the permission grid
+	 */
 	createChmodForm : function(){
 		this.checks = $H({});
 		var chmodTable = new Element('table', {style:"font-size:11px;"});
@@ -100,7 +113,12 @@ Class.create("PropertyPanel", {
 				
 		this.htmlElement.insert(chmodTable);
 	},
-	
+	/**
+	 * Create a checkbox and bind it
+	 * @param accessor String 
+	 * @param right String
+	 * @returns HTMLElement
+	 */
 	createCheckBox : function(accessor, right){
 		var box = new Element('input', {type:'checkbox', id:accessor+'_'+right}).setStyle({width:'14px',height:'14px',borderWidth:'0'});
 		var div = new Element('td', {align:"center"}).insert(box).setStyle({width:'25px'});
@@ -111,6 +129,9 @@ Class.create("PropertyPanel", {
 		return div;
 	},
 	
+	/**
+	 * Create form for asking recursive/non recursive operation
+	 */
 	createRecursiveBox : function(){
 		var recuDiv = new Element('div', {style:'padding-top:8px;'});
 		var recurBox = new Element('input', {type:'checkbox', name:'recursive'}).setStyle({width:'14px',height:'14px',borderWidth:'0'});
@@ -145,7 +166,9 @@ Class.create("PropertyPanel", {
 		});
 		
 	},
-	
+	/**
+	 * Updates the current value 
+	 */
 	updateValueFromBoxes : function(){
 		var value = '0';
 		for(var i=0; i<3;i++){
@@ -153,7 +176,11 @@ Class.create("PropertyPanel", {
 		}
 		this.valueInput.value = value;
 	},
-	
+	/**
+	 * Updates the current value
+	 * @param accessor String 
+	 * @returns Integer
+	 */
 	updateValueForAccessor : function(accessor){
 		var value = 0;
 		for(var i=0;i<3;i++){
@@ -161,14 +188,21 @@ Class.create("PropertyPanel", {
 		}
 		return value;
 	},
-	
+	/**
+	 * Updates the boxes from the input value
+	 * @param value Number
+	 */
 	updateBoxesFromValue : function(value){
 		if(value.length != 4 )return;
 		for(var i=0;i<3;i++){
 			this.valueToBoxes(parseInt(value.charAt(i+1)), this.accessors[i]);
 		}
 	},
-	
+	/**
+	 * Parses value into boxes
+	 * @param value Number
+	 * @param accessor String
+	 */
 	valueToBoxes : function(value, accessor){				
 		for(var i=0;i<3;i++){
 			this.checks.get(accessor+'_'+this.rights[i]).checked = false;

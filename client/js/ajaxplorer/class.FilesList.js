@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,13 +29,21 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : The grid displaying either a table of rows or a grid of thumbnail.
+ */
+/**
+ * The godzilla of AjaXplorer, should be split in smaller pieces.. 
+ * This grid displays either a table of rows or a grid of thumbnail.
  */
 Class.create("FilesList", SelectableElements, {
 	
 	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable", "IActionProvider"],
 
+	/**
+	 * Constructor
+	 * @param $super klass Reference to the constructor
+	 * @param oElement HTMLElement
+	 * @param initDefaultDispOrOptions Object Instance parameters
+	 */
 	initialize: function($super, oElement, initDefaultDispOrOptions)
 	{
 		$super(null, true);
@@ -124,6 +132,10 @@ Class.create("FilesList", SelectableElements, {
 		Event.observe(document, "keydown", this.keydown.bind(this));		
 	},
 		
+	/**
+	 * Gets the currently defined columns that are visible
+	 * @returns $A()
+	 */
 	getVisibleColumns : function(){
 		var visible = $A([]);
 		this.columnsDef.each(function(el){
@@ -132,6 +144,10 @@ Class.create("FilesList", SelectableElements, {
 		return visible;
 	},
 	
+	/**
+	 * Gets the current sort types associated to the currently visible columns
+	 * @returns $A()
+	 */
 	getVisibleSortTypes : function(){
 		var visible = $A([]);
 		var index = 0;
@@ -141,6 +157,11 @@ Class.create("FilesList", SelectableElements, {
 		return visible;		
 	},
 	
+	/**
+	 * Sets a column visible/invisible by its name
+	 * @param attName String Column name
+	 * @param visible Boolean Visible or invisible
+	 */
 	setColumnVisible : function (attName, visible){
 		var change = false;
 		if(visible && this.hiddenColumns.include(attName)){			
@@ -167,6 +188,9 @@ Class.create("FilesList", SelectableElements, {
 		
 	},
 	
+	/**
+	 * Handler for contextChange event 
+	 */
 	contextObserver : function(){
 		if(!this.crtContext) return;
 		//console.log('FILES LIST : FILL');
@@ -174,6 +198,12 @@ Class.create("FilesList", SelectableElements, {
 		this.removeOnLoad();
 	},
 	
+	/**
+	 * Apply the config of a component_config node
+	 * Returns true if the GUI needs refreshing
+	 * @param domNode XMLNode
+	 * @returns Boolean
+	 */
 	parseComponentConfig : function(domNode){
 		refreshGUI = false;
 		this.columnsTemplate = false;
@@ -251,6 +281,10 @@ Class.create("FilesList", SelectableElements, {
 		return refreshGUI;
 	},
 
+	/**
+	 * Gets the action of this component
+	 * @returns $H
+	 */
 	getActions : function(){
 		// function may be bound to another context
 		var oThis = this;
@@ -302,6 +336,9 @@ Class.create("FilesList", SelectableElements, {
 		return $H({multi_display:multiAction});
 	},
 	
+	/**
+	 * Creates the base GUI, depending on the displayMode
+	 */
 	initGUI: function()
 	{
 		if(this.observer){
@@ -475,6 +512,10 @@ Class.create("FilesList", SelectableElements, {
 		this.notify("resize");
 	},
 	
+	/**
+	 * Adds a pagination navigator at the top of the current GUI
+	 * @returns HTMLElement
+	 */
 	createPaginator: function(){
 		var current = parseInt(this.paginationData.get('current'));
 		var total = parseInt(this.paginationData.get('total'));
@@ -515,6 +556,13 @@ Class.create("FilesList", SelectableElements, {
 		return div;
 	},
 	
+	/**
+	 * Utility for generating pagination link
+	 * @param page Integer Target page
+	 * @param text String Label of the link
+	 * @param title String Tooltip of the link
+	 * @returns HTMLElement
+	 */
 	createPaginatorLink:function(page, text, title){
 		var node = ajaxplorer.getContextNode();
 		return new Element('a', {href:'#', style:'font-size:12px;padding:0 7px;', title:title}).update(text).observe('click', function(e){
@@ -524,6 +572,10 @@ Class.create("FilesList", SelectableElements, {
 		}.bind(this));		
 	},
 	
+	/**
+	 * Sets the columns definition object
+	 * @param aColumns $H
+	 */
 	setColumnsDef:function(aColumns){
 		this.columnsDef = aColumns;
 		if(this._displayMode == "list"){
@@ -531,14 +583,25 @@ Class.create("FilesList", SelectableElements, {
 		}
 	},
 	
+	/**
+	 * Gets the columns definition object
+	 * @returns $H
+	 */
 	getColumnsDef:function(){
 		return this.columnsDef;
 	},
 	
+	/**
+	 * Sets the contextual menu
+	 * @param protoMenu Proto.Menu
+	 */
 	setContextualMenu: function(protoMenu){
 		this.protoMenu = protoMenu;	
 	},
 	
+	/**
+	 * Resizes the widget
+	 */
 	resize : function(){
     	if(this.options.fit && this.options.fit == 'height'){
     		var marginBottom = 0;
@@ -554,16 +617,29 @@ Class.create("FilesList", SelectableElements, {
 		this.notify("resize");
 	},
 	
+	/**
+	 * Link focusing to ajaxplorer main
+	 */
 	setFocusBehaviour : function(){
 		this.htmlElement.observe("click", function(){
 			if(ajaxplorer) ajaxplorer.focusOn(this);
 		}.bind(this) );
 	},
 	
+	/**
+	 * Do nothing
+	 * @param show Boolean
+	 */
 	showElement : function(show){
 		
 	},
 	
+	/**
+	 * Switch between various display modes. At the moment, thumb and list.
+	 * Should keep the selected nodes after switch
+	 * @param mode String "thumb" or "list
+	 * @returns String
+	 */
 	switchDisplayMode: function(mode){
 		if(mode){
 			this._displayMode = mode;
@@ -584,11 +660,17 @@ Class.create("FilesList", SelectableElements, {
 		return this._displayMode;
 	},
 	
+	/**
+	 * Returns the display mode
+	 * @returns {String}
+	 */
 	getDisplayMode: function(){
 		return this._displayMode;
 	},
 	
-		
+	/**
+	 * Called after the rows/thumbs are populated
+	 */
 	initRows: function(){
 		// Disable text select on elements
 		if(this._displayMode == "thumb")
@@ -611,7 +693,9 @@ Class.create("FilesList", SelectableElements, {
 			this.disableTextSelection(allItems[i], true);
 		}
 	},
-	
+	/**
+	 * Queue processor for thumbnail async loading
+	 */
 	loadNextImage: function(){
 		if(this.imagesHash && this.imagesHash.size())
 		{
@@ -639,17 +723,27 @@ Class.create("FilesList", SelectableElements, {
 			if(window.loader) window.loader = null;
 		}	
 	},
-	
+	/**
+	 * Triggers a reload of the rows/thumbs
+	 * @param additionnalParameters Object
+	 */
 	reload: function(additionnalParameters){
 		if(ajaxplorer.getContextNode()){
 			this.fill(ajaxplorer.getContextNode());
 		}
 	},
-	
+	/**
+	 * Attach a pending selection that will be applied after rows are populated
+	 * @param pendingFilesToSelect $A()
+	 */
 	setPendingSelection: function(pendingFilesToSelect){
 		this._pendingFile = pendingFilesToSelect;
 	},
 		
+	/**
+	 * Populates the list with the children of the passed contextNode
+	 * @param contextNode AjxpNode
+	 */
 	fill: function(contextNode){
 		this.imagesHash = new Hash();
 		if(this.protoMenu){
@@ -752,6 +846,10 @@ Class.create("FilesList", SelectableElements, {
 		//if(modal.pageLoading) modal.updateLoadingProgress('List Loaded');
 	},
 		
+	/**
+	 * Inline Editing of label
+	 * @param callback Function Callback after the label is edited.
+	 */
 	switchCurrentLabelToEdition : function(callback){
 		var sel = this.getSelectedItems();
 		var item = sel[0]; // We assume this action was triggered with a single-selection active.
@@ -850,6 +948,11 @@ Class.create("FilesList", SelectableElements, {
 		modal.setCloseAction(closeFunc);
 	},
 	
+	/**
+	 * Populate a node as a TR element
+	 * @param ajxpNode AjxpNode
+	 * @returns HTMLElement
+	 */
 	ajxpNodeToTableRow: function(ajxpNode){		
 		var metaData = ajxpNode.getMetadata();
 		var newRow = document.createElement("tr");		
@@ -941,6 +1044,11 @@ Class.create("FilesList", SelectableElements, {
 		return newRow;
 	},
 	
+	/**
+	 * Populates a node as a thumbnail div
+	 * @param ajxpNode AjxpNode
+	 * @returns HTMLElement
+	 */
 	ajxpNodeToDiv: function(ajxpNode){
 		var newRow = new Element('div', {className:"thumbnail_selectable_cell"});
 		var metadata = ajxpNode.getMetadata();
@@ -1017,7 +1125,10 @@ Class.create("FilesList", SelectableElements, {
 		return newRow;
 	},
 		
-	
+	/**
+	 * Resize the thumbnails
+	 * @param one_element HTMLElement Optionnal, if empty all thumbnails are resized.
+	 */
 	resizeThumbnails: function(one_element){
 			
 		var defaultMargin = 5;
@@ -1062,7 +1173,10 @@ Class.create("FilesList", SelectableElements, {
 		}.bind(this));
 		
 	},
-	
+	/**
+	 * For list mode, recompute alternate BG distribution
+	 * Should use CSS3 when possible!
+	 */
 	redistributeBackgrounds: function(){
 		var allItems = this.getItems();		
 		this.even = false;
@@ -1075,7 +1189,9 @@ Class.create("FilesList", SelectableElements, {
 			this.even = !this.even;
 		}
 	},
-	
+	/**
+	 * Clear the current lines/thumbs 
+	 */
 	removeCurrentLines: function(){
 		var rows;		
 		if(this._displayMode == "list") rows = $(this._htmlElement).select('tr');
@@ -1097,7 +1213,9 @@ Class.create("FilesList", SelectableElements, {
 		}
 		this.fireChange();
 	},
-	
+	/**
+	 * Add a "loading" image on top of the component
+	 */
 	setOnLoad: function()	{
 		if(this.loading) return;
 		addLightboxMarkupToElement(this.htmlElement);
@@ -1109,15 +1227,17 @@ Class.create("FilesList", SelectableElements, {
 		img.setStyle({marginTop : Math.max(0, (overlay.getHeight() - img.getHeight())/2) });
 		this.loading = true;
 	},
-	
+	/**
+	 * Remove the loading image
+	 */
 	removeOnLoad: function(){
 		removeLightboxFromElement(this.htmlElement);
 		this.loading = false;
 	},
 	
-	//
-	// OVERRIDE CHANGE FUNCTION
-	// 
+	/**
+	 * Overrides base fireChange function
+	 */
 	fireChange: function()
 	{		
 		if(this._fireChange){			
@@ -1125,9 +1245,9 @@ Class.create("FilesList", SelectableElements, {
 		}
 	},
 	
-	//
-	// OVERRIDE DBL CLICK FUNCTION
-	// 
+	/**
+	 * Overrides base fireDblClick function
+	 */
 	fireDblClick: function (e) 
 	{
 		if(ajaxplorer.getContextNode().getAjxpMime() == "ajxp_recycle")
@@ -1150,6 +1270,11 @@ Class.create("FilesList", SelectableElements, {
 		}
 	},
 	
+	/**
+	 * Gets the currently selected names
+	 * Not really used anymore, selection is handled by the datamodel
+	 * @returns Array
+	 */
 	getSelectedFileNames: function() {
 		selRaw = this.getSelectedItems();
 		if(!selRaw.length)
@@ -1164,13 +1289,21 @@ Class.create("FilesList", SelectableElements, {
 		}
 		return tmp;
 	},
-	
+	/**
+	 * Get the number of items
+	 * @returns Integer
+	 */
 	getFilesCount: function() 
 	{	
 		return this.getItems().length;
 	},
 	
-	
+	/**
+	 * Check if a file name exists in the list. 
+	 * DEPRECATED, use AjxpDataModel methods instead.
+	 * @param newFileName String
+	 * @returns Boolean
+	 */
 	fileNameExists: function(newFileName) 
 	{	
 		var allItems = this.getItems();
@@ -1187,6 +1320,11 @@ Class.create("FilesList", SelectableElements, {
 		return false;
 	},
 	
+	/**
+	 * Get all file names 
+	 * DEPRECATED, use AjxpDataModel methods instead.
+	 * @returns Array
+	 */	
 	getFileNames : function(separator){
 		var fNames = $A([]);
 		var allItems = this.getItems();
@@ -1200,7 +1338,11 @@ Class.create("FilesList", SelectableElements, {
 		}
 	},
 
-
+	/**
+	 * Select a row/thum by its name
+	 * @param fileName String
+	 * @param multiple Boolean
+	 */
 	selectFile: function(fileName, multiple)
 	{
 		fileName = getBaseName(fileName);
@@ -1223,11 +1365,19 @@ Class.create("FilesList", SelectableElements, {
 		return;
 	},
 	
+	/**
+	 * DEPRECATED, use AjxpDataModel methods!
+	 * @returns String
+	 */
 	getCurrentRep: function()
 	{
 		return ajaxplorer.getContextNode().getPath();
 	},
 		
+	/**
+	 * Utilitary for selection behaviour
+	 * @param target HTMLElement
+	 */
 	enableTextSelection : function(target){
 		if (target.origOnSelectStart)
 		{ //IE route
@@ -1237,6 +1387,11 @@ Class.create("FilesList", SelectableElements, {
 		target.style.MozUserSelect = "text";
 	},
 	
+	/**
+	 * Utilitary for selection behaviour
+	 * @param target HTMLElement
+	 * @param deep Boolean
+	 */
 	disableTextSelection: function(target, deep)
 	{
 		if (target.onselectstart)
@@ -1254,6 +1409,11 @@ Class.create("FilesList", SelectableElements, {
 		}
 	},
 	
+	/**
+	 * Handler for keyDown event
+	 * @param event Event
+	 * @returns Boolean
+	 */
 	keydown: function (event)
 	{
 		if(this.blockNavigation) return false;
@@ -1394,7 +1554,12 @@ Class.create("FilesList", SelectableElements, {
 		
 		return false;
 	},
-	
+	/**
+	 * Utilitary to find the next item to select, depending on the key (up or down) 
+	 * @param currentItemIndex Integer
+	 * @param bDown Boolean
+	 * @returns Integer
+	 */
 	findOverlappingItem: function(currentItemIndex, bDown)
 	{	
 		if(!bDown && currentItemIndex == 0) return;
@@ -1426,6 +1591,11 @@ Class.create("FilesList", SelectableElements, {
 		}
 	},	
 	
+	/**
+	 * Check if a domnode is indeed an item of the list
+	 * @param node DOMNode
+	 * @returns Boolean
+	 */
 	isItem: function (node) {
 		if(this._displayMode == "list")
 		{
@@ -1441,7 +1611,10 @@ Class.create("FilesList", SelectableElements, {
 	},
 	
 	/* Indexable Collection Interface */
-	
+	/**
+	 * Get all items
+	 * @returns Array
+	 */
 	getItems: function () {
 		if(this._displayMode == "list")
 		{
@@ -1460,7 +1633,11 @@ Class.create("FilesList", SelectableElements, {
 			return tmp;
 		}
 	},
-	
+	/**
+	 * Find an item index
+	 * @param el HTMLElement
+	 * @returns Integer
+	 */
 	getItemIndex: function (el) {
 		if(this._displayMode == "list")
 		{
@@ -1480,7 +1657,11 @@ Class.create("FilesList", SelectableElements, {
 			return -1;		
 		}
 	},
-	
+	/**
+	 * Get an item by its index
+	 * @param nIndex Integer
+	 * @returns HTMLElement
+	 */
 	getItem: function (nIndex) {
 		if(this._displayMode == "list")
 		{

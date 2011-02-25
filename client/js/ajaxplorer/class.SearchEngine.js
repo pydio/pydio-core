@@ -1,7 +1,7 @@
-/**
- * @package info.ajaxplorer.plugins
+/*
+ * @package info.ajaxplorer
  * 
- * Copyright 2007-2009 Charles du Jeu
+ * Copyright 2007-2011 Charles du Jeu
  * This file is part of AjaXplorer.
  * The latest code can be found at http://www.ajaxplorer.info/
  * 
@@ -29,15 +29,22 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : The Search Engine abstraction.
+ */
+/**
+ * The Search Engine abstraction.
  */
 Class.create("SearchEngine", AjxpPane, {
 
+	/**
+	 * @var HTMLElement
+	 */
 	htmlElement:undefined,
 	_inputBox:undefined,
 	_resultsBox:undefined,
 	_searchButtonName:undefined,
+	/**
+	 * @var String Default 'idle'
+	 */
 	state: 'idle',
 	_runningQueries:undefined,
 	_queriesIndex:0,
@@ -45,6 +52,12 @@ Class.create("SearchEngine", AjxpPane, {
 	
 	_queue : undefined,
 
+	/**
+	 * Constructor
+	 * @param $super klass Superclass reference
+	 * @param mainElementName String
+	 * @param ajxpOptions Object
+	 */
 	initialize: function($super, mainElementName, ajxpOptions)
 	{
 		$super($(mainElementName));
@@ -54,6 +67,9 @@ Class.create("SearchEngine", AjxpPane, {
 		this.initGUI();
 	},
 	
+	/**
+	 * Creates the HTML
+	 */
 	initGUI : function(){
 		
 		if(!this.htmlElement) return;
@@ -124,20 +140,31 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		this.resize();
 	},
-	
+	/**
+	 * Show/Hide the widget
+	 * @param show Boolean
+	 */
 	showElement : function(show){
 		if(!this.htmlElement) return;
 		if(show) this.htmlElement.show();
 		else this.htmlElement.hide();
 	},
-	
+	/**
+	 * Resize the widget
+	 */
 	resize: function(){
 		fitHeightToBottom($(this._resultsBoxId));
 		if(this.htmlElement && this.htmlElement.visible()){
 			this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth()-70),70) + "px"});
 		}
 	},
-	
+	/**
+	 * Initialise the options for search Metadata
+	 * @param element HTMLElement
+	 * @param optionValue String
+	 * @param optionLabel String
+	 * @param checked Boolean
+	 */
 	initMetaOption : function(element, optionValue, optionLabel, checked){
 		var option = new Element('meta_opt', {value:optionValue}).update(optionLabel);
 		if(checked) option.addClassName('checked');
@@ -148,7 +175,10 @@ Class.create("SearchEngine", AjxpPane, {
 		});
 		this.metaOptions.push(option);
 	},
-	
+	/**
+	 * Check wether there are metadata search selected
+	 * @returns Boolean
+	 */
 	hasMetaSearch : function(){
 		var found = false;
 		this.metaOptions.each(function(opt){
@@ -156,7 +186,10 @@ Class.create("SearchEngine", AjxpPane, {
 		});
 		return found;
 	},
-	
+	/**
+	 * Get the searchable columns
+	 * @returns $A()
+	 */
 	getSearchColumns : function(){
 		var cols = $A();
 		this.metaOptions.each(function(opt){
@@ -164,21 +197,27 @@ Class.create("SearchEngine", AjxpPane, {
 		});
 		return cols;
 	},
-	
+	/**
+	 * Focus on this widget (focus input)
+	 */
 	focus : function(){
 		if(this.htmlElement && this.htmlElement.visible()){
 			this._inputBox.activate();
 			this.hasFocus = true;
 		}
 	},
-	
+	/**
+	 * Blur this widget
+	 */
 	blur : function(){
 		if(this._inputBox){
 			this._inputBox.blur();
 		}
 		this.hasFocus = false;
 	},
-	
+	/**
+	 * Perform search
+	 */
 	search : function(){
 		var text = this._inputBox.value;
 		if(text == '') return;
@@ -191,35 +230,46 @@ Class.create("SearchEngine", AjxpPane, {
 			this.searchFolderContent(folder);
 		}.bind(this), 0);		
 	},
-	
+	/**
+	 * stop search
+	 */
 	interrupt : function(){
 		// Interrupt current search
 		if(this._state == 'idle') return;
 		this._state = 'interrupt';
 		this._queue = $A();
 	},
-	
+	/**
+	 * Update GUI for indicating state
+	 */
 	updateStateSearching : function (){
 		this._state = 'searching';
 		//try{this._inputBox.disabled = true;}catch(e){}
 		$(this._searchButtonName).addClassName("disabled");
 		$('stop_'+this._searchButtonName).removeClassName("disabled");
 	},
-	
+	/**
+	 * Search is finished
+	 * @param interrupt Boolean
+	 */
 	updateStateFinished : function (interrupt){
 		this._state = 'idle';
 		this._inputBox.disabled = false;
 		$(this._searchButtonName).removeClassName("disabled");
 		$('stop_'+this._searchButtonName).addClassName("disabled");
 	},
-		
+	/**
+	 * Clear all results and input box
+	 */
 	clear: function(){
 		this.clearResults();
 		if(this._inputBox){
 			this._inputBox.value = "";
 		}
 	},
-	
+	/**
+	 * Clear all results
+	 */
 	clearResults : function(){
 		// Clear the results	
 		while($(this._resultsBoxId).childNodes.length)
@@ -227,7 +277,12 @@ Class.create("SearchEngine", AjxpPane, {
 			$(this._resultsBoxId).removeChild($(this._resultsBoxId).childNodes[0]);
 		}
 	},
-	
+	/**
+	 * Add a result to the list - Highlight search term
+	 * @param folderName String
+	 * @param ajxpNode AjxpNode
+	 * @param metaFound String
+	 */
 	addResult : function(folderName, ajxpNode, metaFound){
 		var fileName = ajxpNode.getLabel();
 		var icon = ajxpNode.getIcon();
@@ -265,11 +320,16 @@ Class.create("SearchEngine", AjxpPane, {
 			});
 		}
 	},
-	
+	/**
+	 * Put a folder to search in the queue
+	 * @param path String
+	 */
 	appendFolderToQueue : function(path){
 		this._queue.push(path);
 	},
-	
+	/**
+	 * Process the next element of the queue, or finish
+	 */
 	searchNext : function(){
 		if(this._queue.length){
 			var path = this._queue.first();
@@ -279,7 +339,11 @@ Class.create("SearchEngine", AjxpPane, {
 			this.updateStateFinished();
 		}
 	},
-	
+	/**
+	 * Get a folder content and searches its children 
+	 * Should reference the IAjxpNodeProvider instead!! Still a "ls" here!
+	 * @param currentFolder String
+	 */
 	searchFolderContent : function(currentFolder){
 		if(this._state == 'interrupt') {
 			this.updateStateFinished();
@@ -343,7 +407,11 @@ Class.create("SearchEngine", AjxpPane, {
 			}
 		}
 	},
-	
+	/**
+	 * Parses an XMLNode and create an AjxpNode
+	 * @param xmlNode XMLNode
+	 * @returns AjxpNode
+	 */
 	parseAjxpNode : function(xmlNode){
 		var node = new AjxpNode(
 			xmlNode.getAttribute('filename'), 
@@ -362,7 +430,13 @@ Class.create("SearchEngine", AjxpPane, {
 		node.setMetadata(metadata);
 		return node;
 	},
-	
+	/**
+	 * Highlights a string with the search term
+	 * @param haystack String
+	 * @param needle String
+	 * @param truncate Integer
+	 * @returns String
+	 */
 	highlight : function(haystack, needle, truncate){
 		var start = haystack.toLowerCase().indexOf(needle);
 		var end = start + needle.length;

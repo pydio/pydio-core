@@ -1,4 +1,4 @@
-/**
+/*
  * @package info.ajaxplorer.plugins
  * 
  * Copyright 2007-2009 Charles du Jeu
@@ -29,19 +29,46 @@
  * Any of the above conditions can be waived if you get permission from the copyright holder.
  * AjaXplorer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * Description : Abstraction of a Repository.
+ */
+/** 
+ * Container for a Repository.
  */
 Class.create("Repository", {
 
+	/**
+	 * @var String
+	 */
 	id:undefined,
+	/**
+	 * @var String
+	 */
 	label:'No Repository',
+	/**
+	 * @var String
+	 */
 	icon:'',
+	/**
+	 * @var String
+	 */
 	accessType:'',
+	/**
+	 * @var object
+	 */
 	nodeProviderDef: null,
+	/**
+	 * @var ResourcesManager
+	 */
 	resourcesManager:undefined,
+	/**
+	 * @var Boolean
+	 */
 	allowCrossRepositoryCopy:false,
 
+	/**
+	 * Constructor
+	 * @param id String
+	 * @param xmlDef XMLNode
+	 */
 	initialize:function(id, xmlDef){
 		if(MessageHash){
 			this.label = MessageHash[391];
@@ -52,39 +79,70 @@ Class.create("Repository", {
 		if(xmlDef) this.loadFromXml(xmlDef);
 	},
 	
+	/**
+	 * @returns String
+	 */
 	getId : function(){
 		return this.id;
 	},
 	
+	/**
+	 * @returns String
+	 */
 	getLabel : function(){
 		return this.label;
 	},
+	/**
+	 * @param label String
+	 */
 	setLabel : function(label){
 		this.label = label;
 	},
 	
+	/**
+	 * @returns String
+	 */
 	getIcon : function(){
 		return this.icon;
 	},
+	/**
+	 * @param label String
+	 */
 	setIcon : function(icon){
 		this.icon = icon;
 	},
 		
+	/**
+	 * @returns String
+	 */
 	getAccessType : function(){
 		return this.accessType;
 	},
+	/**
+	 * @param label String
+	 */
 	setAccessType : function(access){
 		this.accessType = access;
 	},
 	
+	/**
+	 * Triggers ResourcesManager.load
+	 */
 	loadResources : function(){
 		this.resourcesManager.load();
 	},
 	
+	/**
+	 * @returns Object
+	 */
 	getNodeProviderDef : function(){
 		return this.nodeProviderDef;
 	},
 	
+	/**
+	 * Parses XML Node
+	 * @param repoNode XMLNode
+	 */
 	loadFromXml: function(repoNode){
 		if(repoNode.getAttribute('allowCrossRepositoryCopy') && repoNode.getAttribute('allowCrossRepositoryCopy') == "true"){
 			this.allowCrossRepositoryCopy = true;
