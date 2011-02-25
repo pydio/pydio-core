@@ -32,9 +32,12 @@
  * @return jQuery
  * @author Dave Methvin (dave.methvin@gmail.com)
  */
-
 Class.create("Splitter", AjxpPane, {
-	
+	/**
+	 * Constructor
+	 * @param container HTMLElement
+	 * @param options Object
+	 */
 	initialize: function(container, options){				
 		this.options = Object.extend({
 			direction	: 	'vertical',
@@ -130,7 +133,12 @@ Class.create("Splitter", AjxpPane, {
 		// NEW HTML5!
 		this.splitbar.draggable = true;
 	},
-	
+	/**
+	 * Resize panes on drag event or manually
+	 * @param event Event
+	 * @param size Integer
+	 * @param keepPercents Boolean
+	 */
 	resizeGroup: function(event, size, keepPercents){	
 		// console.log("Resize", this.options.direction, size);
 		var groupInitAdjust = this.group._adjust;
@@ -157,7 +165,10 @@ Class.create("Splitter", AjxpPane, {
 		}
 		this.moveSplitter(size);
 	},
-	
+	/**
+	 * Start drag event
+	 * @param event Event
+	 */
 	startSplit: function(event){
 		this.splitbar.addClassName(this.options.activeClass);
 		this.paneA._posAdjust = this.paneA[this.options.offsetAdjust] - this.options.eventPointer(event);
@@ -173,14 +184,21 @@ Class.create("Splitter", AjxpPane, {
 			this.options.startDrag(this.getCurrentSize());
 		}
 	},
-	
+	/**
+	 * During drag event
+	 * @param event Event
+	 * @returns Boolean
+	 */
 	doSplitMouse: function(event){
         if (!this.splitbar.hasClassName(this.options.activeClass)){        	
         	return this.endSplit(event);
         }        
 		this.moveSplitter(this.paneA._posAdjust + this.options.eventPointer(event));		
 	}, 
-	
+	/**
+	 * End drag event
+	 * @param event Event
+	 */
 	endSplit: function(event){
 		if (!this.splitbar.hasClassName(this.options.activeClass)){
 			return;
@@ -207,7 +225,10 @@ Class.create("Splitter", AjxpPane, {
 			ajaxplorer.user.savePreference(this.htmlElement.id+'_size');
 		}
 	}, 
-	
+	/**
+	 * Move the splitter object
+	 * @param np Integer
+	 */
 	moveSplitter:function(np){		
 		np = Math.max(this.paneA._min+this.paneA._padAdjust, this.group._adjust - (this.paneB._max||9999), 16,
 				Math.min(np, this.paneA._max||9999, this.group._adjust - this.splitbar._adjust - 
@@ -237,17 +258,30 @@ Class.create("Splitter", AjxpPane, {
 			$(this.paneB).ajxpPaneObject.resize();
 		}		
 	}, 
-	
+	/**
+	 * Cache some CSS properties
+	 * @param jq Object
+	 * @param n Integer
+	 * @param pf Integer
+	 * @param m1 Integer
+	 * @param m2 Integer
+	 */
 	cssCache:function(jq,n,pf,m1,m2){
 		var boxModel = (!Prototype.Browser.IE || document.compatMode == "CSS1Compat");
 		jq[n] = boxModel? (parseInt(jq.getStyle(pf+m1))||0) + (parseInt(jq.getStyle(pf+m2))||0) : 0;
 	},
-	
+	/**
+	 * Cache panes data
+	 * @param jq Object
+	 * @param pane Element
+	 */
 	optCache: function(jq, pane){
 		jq._min = Math.max(0, this.options["min"+pane] || parseInt(jq.getStyle("min-"+this.options.adjust)) || 0);
 		jq._max = Math.max(0, this.options["max"+pane] || parseInt(jq.getStyle("max-"+this.options.adjust)) || 0);		
 	}, 
-	
+	/**
+	 * Initialize css cache
+	 */
 	initCaches: function(){
 		this.splitbar._adjust = this.splitbar[this.options.offsetAdjust];
 		this.cssCache(this.group, "_borderAdjust", "border", this.options.adjSide1, this.options.adjSide2);
@@ -259,11 +293,19 @@ Class.create("Splitter", AjxpPane, {
 		this.optCache(this.paneA, 'A');
 		this.optCache(this.paneB, 'B');		
 	},
-	
+	/**
+	 * Get the width of an element
+	 * @param el HTMLElement
+	 * @returns Integer
+	 */
     getWidth: function(el) {
 	    return el.offsetWidth;
     },
-  
+  /**
+   * Gets the height of an element
+   * @param el HTMLElement
+   * @returns Integer
+   */
     getHeight: function(el) {
         if (el.offsetHeight){
             return parseInt(el.offsetHeight);                                 //ie
@@ -276,24 +318,37 @@ Class.create("Splitter", AjxpPane, {
             return h;
         }
     }, 
-    
+    /**
+     * Create a style object for Prototype setStyle method
+     * @param propStringName String
+     * @param propValue Mixed
+     * @returns {Object}
+     */
     makeStyleObject: function(propStringName, propValue){
     	var sObject = {};
     	sObject[propStringName] = propValue;
     	return sObject;
     },
-    
+    /**
+     * Get the current size of paneA
+     * @returns Integer
+     */
     getCurrentSize : function(){
     	return this.options.getAdjust(this.paneA);
     },
-    
+    /**
+     * Trigger a resize of the widget
+     */
     resize : function(){
     	if(this.options.fit && this.options.fit == 'height'){
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null));
     	}
     	this.resizeGroup(null, null, true);
     },
-    
+    /**
+     * Show/hide widget (do nothing)
+     * @param show Boolean
+     */
     showElement : function(show){}
 
 });
