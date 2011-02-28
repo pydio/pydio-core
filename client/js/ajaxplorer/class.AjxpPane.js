@@ -77,6 +77,20 @@ Class.create("AjxpPane", {
 	},
 	
 	/**
+	 * Implementation of the IAjxpWidget methods
+	 */	
+	getDomNode : function(){
+		return this.htmlElement;
+	},
+	
+	/**
+	 * Implementation of the IAjxpWidget methods
+	 */	
+	destroy : function(){
+		this.htmlElement = null;
+	},
+	
+	/**
 	 * Find and reference direct children IAjxpWidget
 	 * @param element HTMLElement
 	 */

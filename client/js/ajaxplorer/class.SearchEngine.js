@@ -158,6 +158,11 @@ Class.create("SearchEngine", AjxpPane, {
 			this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth()-70),70) + "px"});
 		}
 	},
+	
+	destroy : function(){
+		this.htmlElement.update('');
+		this.htmlElement = null;
+	},
 	/**
 	 * Initialise the options for search Metadata
 	 * @param element HTMLElement
