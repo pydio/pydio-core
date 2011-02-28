@@ -40,18 +40,26 @@ Class.create("UserWidget", {
 	initialize: function(element){
 		this.element = element;
 		this.element.ajxpPaneObject = this;
-		this.element.observe("mouseover", function(){
+		
+		this.mObs1 = function(){
 			this.element.select('div').invoke('setStyle', {borderColor:'#bbbbbb'});			
-		}.bind(this));
-		this.element.observe("mouseout", function(){
+		}.bind(this);
+		this.mObs2 = function(){
 			var divs = this.element.select('div');
 			if(!divs.length) return;
 			if(divs[0].hasClassName('inline_hover_light')) return
 			divs.invoke('setStyle', {borderColor:'#dddddd'});	
-		}.bind(this));		
-		document.observe("ajaxplorer:user_logged", this.updateGui.bind(this));
-		document.observe("ajaxplorer:actions_loaded", this.updateActions.bind(this));		
-		if(Prototype.Browser.IE) document.observe("ajaxplorer:actions_refreshed", this.updateActions.bind(this));
+		}.bind(this);
+		this.uLoggedObs = this.updateGui.bind(this);
+		this.actLoaded = this.updateActions.bind(this);
+		
+		this.element.observe("mouseover", this.mObs1 );
+		this.element.observe("mouseout", this.mObs2 );		
+		document.observe("ajaxplorer:user_logged", this.uLoggedObs );
+		document.observe("ajaxplorer:actions_loaded", this.actLoaded );		
+		if(Prototype.Browser.IE) {
+			document.observe("ajaxplorer:actions_refreshed", this.actLoaded );
+		}
 	},
 	/**
 	 * Updates on user status change
@@ -142,5 +150,26 @@ Class.create("UserWidget", {
 	 */
 	showElement : function(show){
 		this.element.select(".user_widget_label").invoke((show?'show':'hide'));
-	}	
+	},
+	/**
+	 * Implementation of the IAjxpWidget methods
+	 */	
+	getDomNode : function(){
+		return this.element;
+	},
+	
+	/**
+	 * Implementation of the IAjxpWidget methods
+	 */	
+	destroy : function(){
+		this.element.stopObserving("mouseover", this.mObs1 );
+		this.element.stopObserving("mouseout", this.mObs2 );		
+		document.stopObserving("ajaxplorer:user_logged", this.uLoggedObs );
+		document.stopObserving("ajaxplorer:actions_loaded", this.actLoaded );		
+		if(Prototype.Browser.IE) {
+			document.stopObserving("ajaxplorer:actions_refreshed", this.actLoaded );
+		}		
+		this.element = null;
+	}
+	
 });

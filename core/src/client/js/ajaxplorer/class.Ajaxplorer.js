@@ -321,9 +321,7 @@ Class.create("Ajaxplorer", {
 			}.bind(this) );
 		}
 		
-		if(oldObj.destroy){
-			oldObj.destroy();
-		}
+		oldObj.destroy();
 
 		var obj = new ajxpClass($(ajxpId), ajxpOptions);			
 		if(Class.objectImplements(obj, "IFocusable")){
@@ -475,6 +473,8 @@ Class.create("Ajaxplorer", {
 			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon, provider);
 		}else{
 			var rootNode = new AjxpNode("/", false, repository.getLabel(), newIcon);
+			// Default
+			this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		}
 		this._contextHolder.setRootNode(rootNode);
 		if(this.repositoryId == null || this.repositoryId != repositoryId){

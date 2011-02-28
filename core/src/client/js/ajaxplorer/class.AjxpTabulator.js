@@ -109,6 +109,27 @@ Class.create("AjxpTabulator", AjxpPane, {
 	},
 	
 	/**
+	 * Implementation of the IAjxpWidget methods
+	 */
+	getDomNode : function(){
+		return this.htmlElement;
+	},
+	
+	/**
+	 * Implementation of the IAjxpWidget methods
+	 */
+	destroy : function(){
+		this.tabulatorData.each(function(tabInfo){
+			var ajxpObject = this.getAndSetAjxpObject(tabInfo);
+			tabInfo.headerElement.stopObserving("click");
+			ajxpObject.destroy();
+		}.bind(this));
+		this.htmlElement.update("");
+		this.htmlElement = null;
+	},
+	
+	
+	/**
 	 * Getter/Setter of the Widget that will be attached to each tabInfo
 	 * @param tabInfo Object
 	 * @returns IAjxpWidget

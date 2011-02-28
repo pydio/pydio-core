@@ -34,5 +34,7 @@
  */
 Interface.create("IAjxpWidget", {		
 	resize : function(){},
-	showElement : function(show){}
+	showElement : function(show){},
+	getDomNode : function(){},
+	destroy : function(){}
 });

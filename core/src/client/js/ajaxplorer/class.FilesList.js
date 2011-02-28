@@ -133,6 +133,21 @@ Class.create("FilesList", SelectableElements, {
 	},
 		
 	/**
+	 * Implementation of the IAjxpWidget methods
+	 */
+	getDomNode : function(){
+		return this.htmlElement;
+	},
+	
+	/**
+	 * Implementation of the IAjxpWidget methods
+	 */
+	destroy : function(){
+		this.htmlElement = null;
+	},
+	
+	
+	/**
 	 * Gets the currently defined columns that are visible
 	 * @returns $A()
 	 */

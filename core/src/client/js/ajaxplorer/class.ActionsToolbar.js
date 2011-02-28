@@ -61,6 +61,13 @@ Class.create("ActionsToolbar", {
 		document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarsSeparator.bind(this));
 	},
 	
+	getDomNode : function(){
+		return this.element;
+	},
+	destroy : function(){
+		
+	},
+	
 	/**
 	 * Handler for actions_loaded event.
 	 * @param event Event ajaxplorer:actions_loaded

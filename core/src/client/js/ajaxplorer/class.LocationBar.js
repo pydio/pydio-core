@@ -252,6 +252,21 @@ Class.create("LocationBar", {
 			}
 		}
 	},
+	
+	/**
+	 * Implementation of the IAjxpWidget methods
+	 */	
+	getDomNode : function(){
+		return this.element;
+	},
+	
+	/**
+	 * Implementation of the IAjxpWidget methods
+	 */	
+	destroy : function(){
+		this.element = null;
+	},
+
 	/**
 	 * Do nothing
 	 * @param show Boolean
