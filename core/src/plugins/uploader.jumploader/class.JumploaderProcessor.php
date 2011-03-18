@@ -59,16 +59,19 @@ class JumploaderProcessor extends AJXP_Plugin {
 		
 		$httpVars["dir"] = base64_decode($httpVars["dir"]);
 		if(isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1){
+			AJXP_LOGGER::debug("Partitioned upload");
 			$index = $httpVars["partitionIndex"];
 			$realName = $fileVars["userfile_0"]["name"];
+			//$realName = $httpVars["relativePath"];
 			$fileId = $httpVars["fileId"];
-			$clientId = $httpVars["clientId"];
+			$clientId = $httpVars["ajxp_sessid"];
 			$fileVars["userfile_0"]["name"] = "$clientId.$fileId.$index";
 			if(intval($index) == intval($httpVars["partitionCount"])-1){
 				$httpVars["partitionRealName"] = $realName;
 			}
-		}
-		
+		}else if(isSet($httpVars["partitionCount"]) && $httpVars["partitionCount"] == 1){
+			$httpVars["checkRelativePath"] = true;
+		}		
 		
 	}	
 	
@@ -76,32 +79,102 @@ class JumploaderProcessor extends AJXP_Plugin {
 		if(self::$skipDecoding){
 			
 		}
-		if(!isSet($httpVars["partitionRealName"])) return ;
-
+		if(!isSet($httpVars["partitionRealName"]) && !isSet($httpVars["checkRelativePath"])) {
+			return ;
+		}
+		
 		$repository = ConfService::getRepository();
 		if(!$repository->detectStreamWrapper(false)){
 			return false;
 		}
 		$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-		$streamData = $plugin->detectStreamWrapper(true);		
-    	$destStreamURL = $streamData["protocol"]."://".$repository->getId().$httpVars["dir"]."/";    	
+		$streamData = $plugin->detectStreamWrapper(true);
+		$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);		
+    	$destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";    	
 		
-		$count = intval($httpVars["partitionCount"]);
-		$index = intval($httpVars["partitionIndex"]);
-		$fileId = $httpVars["fileId"];
-		$clientId = $httpVars["clientId"];
-		AJXP_Logger::debug("Should now rebuild file!", $httpVars);
-		
-		$newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
-		for ($i = 0; $i < $count ; $i++){
-			$part = fopen($destStreamURL."$clientId.$fileId.$i", "r");
-			while(!feof($part)){
-				fwrite($newDest, fread($part, 4096));
+		if(isSet($httpVars["partitionRealName"])){
+			
+			$count = intval($httpVars["partitionCount"]);
+			$index = intval($httpVars["partitionIndex"]);
+			$fileId = $httpVars["fileId"];
+			$clientId = $httpVars["ajxp_sessid"];
+			AJXP_Logger::debug("Should now rebuild file!", $httpVars);
+			
+			$newDest = fopen($destStreamURL.$httpVars["partitionRealName"], "w");
+			AJXP_LOGGER::debug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
+			for ($i = 0; $i < $count ; $i++){
+				$part = fopen($destStreamURL."$clientId.$fileId.$i", "r");
+				while(!feof($part)){
+					fwrite($newDest, fread($part, 4096));
+				}
+				fclose($part);
+				unlink($destStreamURL."$clientId.$fileId.$i");
 			}
-			fclose($part);
-			unlink($destStreamURL."$clientId.$fileId.$i");
+			fclose($newDest);
 		}
-		fclose($newDest);
+		if (isSet($httpVars["checkRelativePath"])) {
+		    AJXP_LOGGER::debug("Now dispatching relativePath dest:", $httpVars["relativePath"]);
+		    $subs = explode("/", $httpVars["relativePath"]);
+		    $userfile_name = array_pop($subs);
+		    $subpath = "";
+		    $curDir = "";
+		    
+		    // remove trailing slash from current dir if we've got subdirs
+		    if (count($subs) > 0) {
+		    	if(substr($curDir, -1) == "/"){
+					$curDir = substr($curDir, 0, -1);
+		    	} 
+		    	$folderForbidden = false;
+		    	// Create the folder tree as necessary
+				foreach ($subs as $key => $spath) {
+				    $messtmp="";
+				    $dirname=AJXP_Utils::decodeSecureMagic($spath, AJXP_SANITIZE_HTML_STRICT);
+				    $dirname = substr($dirname, 0, ConfService::getConf("MAX_CHAR"));
+				    //$this->filterUserSelectionToHidden(array($dirname));
+				    if(AJXP_Utils::isHidden($dirname)){
+				    	$folderForbidden = true;
+				    	break;
+				    }
+				
+				    if(file_exists($destStreamURL."$curDir/$dirname")) {
+					// if the folder exists, traverse
+				        AJXP_Logger::debug("$curDir/$dirname existing, traversing for $userfile_name out of", $httpVars["relativePath"]);
+						$curDir .= "/".$dirname;
+						continue;
+				    }
+				
+				    AJXP_Logger::debug($destStreamURL.$curDir);
+			        $dirMode = 0775;
+					$chmodValue = $repository->getOption("CHMOD_VALUE");
+					if(isSet($chmodValue) && $chmodValue != "")
+					{
+						$dirMode = octdec(ltrim($chmodValue, "0"));
+						if ($dirMode & 0400) $dirMode |= 0100; // User is allowed to read, allow to list the directory
+						if ($dirMode & 0040) $dirMode |= 0010; // Group is allowed to read, allow to list the directory
+						if ($dirMode & 0004) $dirMode |= 0001; // Other are allowed to read, allow to list the directory
+					}
+					$old = umask(0);				    
+				    mkdir($destStreamURL.$curDir."/".$dirname, $dirMode);
+					umask($old);				    
+				    $curDir .= "/".$dirname;				
+				}
+				// Now move the final file to the right folder
+				// Currently the file is at the base of the current
+				$relPath = AJXP_Utils::decodeSecureMagic($httpVars["relativePath"]); 
+				$current = $destStreamURL.basename($relPath);
+				$target = $destStreamURL.$relPath;
+				if(!$folderForbidden){
+					$err = copy($current, $target);
+					if($err!== false){
+						unlink($current);
+					}
+				}else{
+					// Remove the file, as it should not have been uploaded!
+					unlink($current);
+				}
+		    }
+		}		
+		
 	}	
 }
 ?>
