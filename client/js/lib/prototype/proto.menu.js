@@ -55,7 +55,8 @@ Proto.Menu = Class.create({
 		}else if(typeof(this.options.anchor) != "string"){
 			this.options.selector = this.options.anchor; // OBJECT
 		}
-		this.eventToObserve = ((this.options.mouseClick!='right' || Prototype.Browser.Opera)?'click':'contextmenu');
+		//this.eventToObserve = ((this.options.mouseClick!='right' || Prototype.Browser.Opera)?'click':'contextmenu');
+		this.eventToObserve = ((this.options.mouseClick!='right')?'click':'contextmenu');
 		if(this.options.mouseClick == 'over'){
 			this.eventToObserve = 'mouseover';
 		}
@@ -94,7 +95,7 @@ Proto.Menu = Class.create({
 	},
 	
 	observerFunction:function(e){
-		if (this.options.mouseClick == 'right' && Prototype.Browser.Opera && !e.ctrlKey) return;
+		//if (this.options.mouseClick == 'right' && Prototype.Browser.Opera && !e.ctrlKey) return;
 		if (this.options.mouseClick == 'left' && Event.findElement(e, '.protomenu_selector') && Event.findElement(e, '.protomenu_selector').hasClassName('disabled')){
 			return;
 		}
