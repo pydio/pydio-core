@@ -71,6 +71,8 @@ Class.create("AjxpBootstrap", {
 				ajaxplorer.actionBar.actions.unset("ext_select");
 				ajaxplorer.actionBar.fireContextChange();
 				ajaxplorer.actionBar.fireSelectionChange();	
+			}else if(this.parameters.get("SELECTOR_DATA")){
+				ajaxplorer.actionBar.defaultActions.set("file", "ext_select");
 			}
 		}.bind(this));					
 		document.observe("ajaxplorer:loaded", function(e){
