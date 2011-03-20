@@ -57,10 +57,12 @@ Class.create("JsSourceViewer", AjxpPane, {
 		$super(htmlElement);
 		attachMobileScroll(htmlElement, "vertical");
 		disableTextSelection(htmlElement);
-		this.setContent(' // SELECT A CLASS TO DISPLAY ITS SOURCE CODE');	
-		document.observe("ajaxplorer:actions_refreshed", this.update.bind(this) );
-		document.observe("ajaxplorer:selection_changed", this.update.bind(this) );
-		document.observe("ajaxplorer:user_logged", this.clearPanels.bind(this) );
+		this.setContent(' // SELECT A CLASS TO DISPLAY ITS SOURCE CODE');
+		this.obs1 = this.update.bind(this);
+		this.obs2 = this.clearPanels.bind(this);
+		document.observe("ajaxplorer:actions_refreshed", this.obs1 );
+		document.observe("ajaxplorer:selection_changed", this.obs1 );
+		document.observe("ajaxplorer:user_logged", this.obs2 );
 		
 	},
 		
@@ -73,6 +75,14 @@ Class.create("JsSourceViewer", AjxpPane, {
 	 */
 	empty : function(){
 		this.setContent('');
+	},
+	
+	destroy : function(){
+		document.stopObserving("ajaxplorer:actions_refreshed", this.obs1 );
+		document.stopObserving("ajaxplorer:selection_changed", this.obs1 );
+		document.stopObserving("ajaxplorer:user_logged", this.obs2 );
+		this.empty();
+		this.htmlElement = null;
 	},
 	
 	update : function(){
