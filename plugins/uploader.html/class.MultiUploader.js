@@ -76,10 +76,16 @@ Class.create("MultiUploader", {
 			value:this.crtContext.getContextNode().getPath()
 		});
 		formObject.insert(rep);		
+		var rep = new Element('input', {
+			type:'hidden', 
+			name:'secure_token', 
+			value:window.Connexion.SECURE_TOKEN
+		});
+		formObject.insert(rep);		
 		
 		this.currentFileUploading = null;
 		this.nextToUpload = -1;
-		$('hidden_forms').getElementsBySelector("form").each(function(element){
+		$('hidden_forms').select("form").each(function(element){
 			element.remove();
 		});		
 		$('hidden_frames').innerHTML = '<iframe name="hidden_iframe" id="hidden_iframe"></iframe>';
@@ -290,7 +296,7 @@ Class.create("MultiUploader", {
 			alert('Error : row "' + multiIndex + '" not found!');
 			return;
 		}
-		var stateImg = $(row).getElementsBySelector("img")[0];
+		var stateImg = $(row).select("img")[0];
 		if(state == 'loading') stateImg.src = ajxpResourcesFolder+'/images/yellowled.png';
 		else if(state == 'done') stateImg.src = ajxpResourcesFolder+'/images/greenled.png';
 		else if(state == 'error') stateImg.src = ajxpResourcesFolder+'/images/redled.png';
@@ -310,7 +316,7 @@ Class.create("MultiUploader", {
 			var newForm = this.mainForm.cloneNode(false);
 			newForm.id = 'pendingform_'+formsCount;
 			var addUserFile = false;
-			var inputs = $(this.mainForm).getElementsBySelector("input");
+			var inputs = $(this.mainForm).select("input");
 			for(j=0;j<inputs.length;j++)
 			{
 				element = inputs[j];
