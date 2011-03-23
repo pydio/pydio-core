@@ -84,7 +84,9 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		parent::parseSpecificContributions($contribNode);
 		if(isSet($this->actions["public_url"])){
 			$disableSharing = false;
-			if((!is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER))){
+			if(PUBLIC_DOWNLOAD_FOLDER == ""){
+				$disableSharing = true;
+			}else if((!is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER))){
 				AJXP_Logger::logAction("Disabling Public links, PUBLIC_DOWNLOAD_FOLDER is not writeable!", array("folder" => PUBLIC_DOWNLOAD_FOLDER, "is_dir" => is_dir(PUBLIC_DOWNLOAD_FOLDER),"is_writeable" => is_writable(PUBLIC_DOWNLOAD_FOLDER)));
 				$disableSharing = true;
 			}else{
