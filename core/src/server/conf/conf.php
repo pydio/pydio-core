@@ -256,6 +256,10 @@ define("DISABLE_ZIP_CREATION", false);
 /*********************************************/
 // The length of the client session in SECONDS. By default, it's copying
 // the server session length. In most PHP installation, it will be 1440, ie 24minutes.
+// You can set this value to 0, this will make the client session "infinite" by 
+// pinging the server at regular occasions (thus keeping the PHP session alive). 
+// This is not a recommanded setting for evident security reasons.
+//define("AJXP_CLIENT_TIMEOUT_TIME", intval(ini_get("session.gc_maxlifetime")));
 define("AJXP_CLIENT_TIMEOUT_TIME", intval(ini_get("session.gc_maxlifetime")));
 // The number of MINUTES before the session expiration
 // where the client issues a warning.

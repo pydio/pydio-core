@@ -344,8 +344,20 @@ class AJXP_Plugin implements Serializable{
 	public function loadConfig($configFile, $format){
 		if($format == "inc"){
 			if(is_file($configFile)){
-				include_once($configFile);
-				if(isSet($DRIVER_CONF)) $this->pluginConf = $DRIVER_CONF;
+				include($configFile);
+				if(isSet($DRIVER_CONF)) {
+					if(isSet($this->pluginConf) && is_array($this->pluginConf)){
+						$this->pluginConf = array_merge($this->pluginConf, $DRIVER_CONF);
+					}else{
+						$this->pluginConf = $DRIVER_CONF;
+					}
+				}
+				if(isSet($CLIENT_EXPOSED_CONFIGS)){
+					foreach ($CLIENT_EXPOSED_CONFIGS as $configName){
+						if(!array_key_exists($configName, $this->pluginConf)) continue;
+						$this->exposeConfigInManifest($configName, $this->pluginConf[$configName]);
+					}
+				}
 			}
 		}
 	}
@@ -392,6 +404,25 @@ class AJXP_Plugin implements Serializable{
 		return $streamData;
 	}
 	    
+	protected function exposeConfigInManifest($configName, $configValue){
+		$confBranch = $this->xPath->query("plugin_configs");		
+		if(!$confBranch->length){			
+			$configNode = $this->manifestDoc->importNode(new DOMElement("plugin_configs", ""));
+			$this->manifestDoc->documentElement->appendChild($configNode);			
+		}else{
+			$configNode = $confBranch->item(0);
+		}
+		$prop = $this->manifestDoc->createElement("property");
+		$propValue = $this->manifestDoc->createCDATASection(json_encode($configValue));
+		$prop->appendChild($propValue);
+		$attName = $this->manifestDoc->createAttribute("name");
+		$attValue = $this->manifestDoc->createTextNode($configName);
+		$attName->appendChild($attValue);
+		$prop->appendChild($attName);
+		$configNode->appendChild($prop);
+		// Relaunch xpath
+		$this->xPath = new DOMXPath($this->manifestDoc);
+	}
 	
 	/**
 	 * Transform a simple node and its attributes to a hash

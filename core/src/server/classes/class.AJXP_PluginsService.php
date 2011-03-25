@@ -119,6 +119,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 			$this->registry[$plugType] = array();
 		}
 		$plugin = $this->instanciatePluginClass($plugin);
+		if(is_file($this->confFolder."/conf.".$plugin->getType().".inc")){
+			$plugin->loadConfig($this->confFolder."/conf.".$plugin->getType().".inc", "inc");
+		}
 		if(is_file($this->confFolder."/conf.".$plugin->getId().".inc")){
 			$plugin->loadConfig($this->confFolder."/conf.".$plugin->getId().".inc", "inc");
 		}
