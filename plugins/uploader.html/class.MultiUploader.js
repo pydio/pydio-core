@@ -45,7 +45,7 @@
 Class.create("MultiUploader", {
 	
 	
-	initialize : function( formObject, max ){
+	initialize : function( formObject, mask ){
 
 		formObject = $(formObject);
 		// Main form
@@ -57,12 +57,10 @@ Class.create("MultiUploader", {
 		this.count = 0;
 		// Current index
 		this.id = 0;
-		// Is there a maximum?
-		if( max ){
-			this.max = max;
-		} else {
-			this.max = -1;
-		};
+		if( mask ){
+			this.mask = mask;
+		}
+		
 		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['284']){
 			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
 		}
@@ -210,6 +208,14 @@ Class.create("MultiUploader", {
 	 * Add a new row to the list of files
 	 */
 	addListRow : function( element ){
+		
+		if(this.mask){
+			var ext = getFileExtension(element.value);
+			if(!this.mask.include(ext)){
+				alert(MessageHash[367] + this.mask.join(', '));
+				return;
+			}
+		}		
 
 		// Row div
 		var new_row = document.createElement( 'div' );		
@@ -293,7 +299,7 @@ Class.create("MultiUploader", {
 			}
 		}
 		if(!row){
-			alert('Error : row "' + multiIndex + '" not found!');
+			//alert('Error : row "' + multiIndex + '" not found!');
 			return;
 		}
 		var stateImg = $(row).select("img")[0];

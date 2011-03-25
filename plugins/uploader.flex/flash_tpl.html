@@ -8,7 +8,7 @@
     $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");
     $maxLength = ConfService::getConf("MAX_CHAR");
     
-	$FlashVar = '&fileTypes=*.*&fileTypeDescription=All%20files&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
+	$FlashVar = '&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
 ?>
 <html>
 <head>
@@ -17,6 +17,7 @@
 <body bgcolor="ffffff" onload="setReady();" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
 <script language="javascript" type="text/javascript">
 var jsReady = false;
+
 function isReady(){
 	return jsReady;
 }
@@ -105,11 +106,18 @@ function triggerFlashEvent(){
 	}
 }
 
+var flashVarExt = '&fileTypes=*.*&fileTypeDescription=All%20files';
+var configs = parent.ajaxplorer.getPluginConfigs("uploader");
+if(configs.get("ALLOWED_EXTENSIONS") && configs.get("ALLOWED_EXTENSIONS_READABLE")){
+	var exts = [];
+	configs.get("ALLOWED_EXTENSIONS").each(function(el){exts.push("*."+el); });
+	flashVarExt = '&fileTypes='+exts.join(";")+'&fileTypeDescription='+escape(configs.get("ALLOWED_EXTENSIONS_READABLE"));
+}
 
 var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&secure_token='+parent.Connexion.SECURE_TOKEN+'&ajxp_sessid=<?php echo session_id(); ?>';
 
 var FlashObject = "plugins/uploader.flex/FlashFileUpload.swf";
-var FlashVarValue = "<?php echo $FlashVar; ?>" + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
+var FlashVarValue = "<?php echo $FlashVar; ?>" + flashVarExt + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
 
 document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + window.location.protocol + '//fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="450" height="310" id="fileUpload" align="middle">\
 <param name="allowScriptAccess" value="sameDomain" /> \
