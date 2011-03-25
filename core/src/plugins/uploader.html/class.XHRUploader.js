@@ -316,6 +316,11 @@ Class.create("XHRUploader", {
 			// FOLDER!
 			alert(MessageHash[336]);
 			return;
+		}else if(Prototype.Browser.WebKit && (file.type == ""  || !getBaseName(file.fileName).indexOf("."))){
+			var res = confirm(MessageHash[395]);
+			if(!res){
+				return;
+			}
 		}
 		if(this.maxUploadSize && file.fileSize > this.maxUploadSize){
 			alert(MessageHash[211]);

@@ -14,7 +14,7 @@
         var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=flash_tpl.html&pluginName=uploader.flex&encode=false';
         modal.getForm().down('#flashframe').src = src;
 		]]></dialogOnOpen>        
-		<activeCondition><![CDATA[		
+		<activeCondition><![CDATA[
 			return (ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE)) && ! ((typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')) && (Prototype.Browser.Gecko?(parseFloat(navigator.userAgent.substring(navigator.userAgent.indexOf('Firefox/')+8, navigator.userAgent.indexOf('Firefox/')+11)) >= 3.6?true:false):true));
 		]]></activeCondition>
 	</processing>
