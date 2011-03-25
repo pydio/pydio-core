@@ -428,6 +428,7 @@ $mess=array(
 "392" => "Warning, AjaXplorer version has changed (now %s), please clear your browser cache and refresh the page to be sure that everything is functionnal!",
 "393" => "Attention, les noms de fichiers sont limités à %s caractères, celui-ci sera tronqué!",
 "394" => "Désolé, pour le moment la fonctionnalité de partage des utilisateurs ne fonctionne pour le driver d'authentification utilisé (les utilisateurs ne sont pas éditables). En revanche le partage de fichier fonctionne.",
+"395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
 /* END SENTENCE */
 );
 ?>
