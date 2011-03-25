@@ -636,6 +636,16 @@ Class.create("Ajaxplorer", {
 		ResourcesManager.prototype.loadAutoLoadResources(this._registry);
 	},
 	
+	getPluginConfigs : function(pluginQuery){
+		var properties = XPathSelectNodes(this._registry, "plugins/"+pluginQuery+"/plugin_configs/property");
+		var configs = $H();
+		for(var i = 0; i<properties.length; i++){
+			var propNode = properties[i];
+			configs.set(propNode.getAttribute("name"), propNode.firstChild.nodeValue.evalJSON());
+		}
+		return configs;
+	},
+	
 	/**
 	 * Find the currently active extensions by type
 	 * @param extensionType String "editor" or "uploader"
