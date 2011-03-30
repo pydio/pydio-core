@@ -426,9 +426,9 @@ $mess=array(
 "390" => "Code",
 "391" => "Kein Repository",
 "392" => "Achtung, die Version des AjaXplorer hat sich geändert (jetzt %s). Bitte den Browser-Cache leeren und die Seite neu laden!",
-"393" => "Warning, the names length must be under %s, this file's name will be truncated!",
-"394" => "Sorry, at the moment folder sharing is not possible using the current auth driver (users are not editable). File sharing is still possible though.",
-"395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
+"393" => "Achtung, der Name muss kürzer als %s sein, dieser Dateiname wird abgeschnitten!",
+"394" => "Entschuldigung, aber zur Zeit ist das Teilen der Verzeichnisse (sharing) aufgrund des aktuellen Authentifizierungstreiber nicht möglich (Benutzer können nicht verändert werden). Aber das Datei-Sharing funktioniert.",
+"395" => "Das fallengelassene Element scheint ein Ordner zu sein und Verzeichnisse können nicht zum Server hochgeladen werden! Soll der Upload trotzdem gestartet werden?",
 /* END SENTENCE */
 );
 ?>
