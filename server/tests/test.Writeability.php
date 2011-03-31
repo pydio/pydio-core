@@ -68,7 +68,7 @@ class Writeability extends AbstractTest
     	$success = true;
     	foreach ($checks as $check){
     		$w = false;
-    		$check = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $check);
+    		$check = AJXP_VarsFilter::filter($check);
     		if(!is_dir($check)){// Check parent
     			$check = dirname($check);
     		}    		    		

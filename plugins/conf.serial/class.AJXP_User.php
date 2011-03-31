@@ -58,7 +58,7 @@ class AJXP_User extends AbstractAjxpUser
 	}
 			
 	function storageExists(){		
-		return is_dir(str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $this->storage->getOption("USERS_DIRPATH")."/".$this->getId()));
+		return is_dir( AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".$this->getId() );
 	}
 				
 	
@@ -118,7 +118,7 @@ class AJXP_User extends AbstractAjxpUser
 	 */
 	static function deleteUser($userId, &$deletedSubUsers){
 		$storage = ConfService::getConfStorageImpl();
-		$serialDir = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $storage->getOption("USERS_DIRPATH"));
+		$serialDir = AJXP_VarsFilter::filter($storage->getOption("USERS_DIRPATH"));
 		$files = glob($serialDir."/".$userId."/*.ser");
 		if(is_array($files) && count($files)){
 			foreach ($files as $file){
