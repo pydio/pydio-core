@@ -566,7 +566,7 @@ class AJXP_Utils
 	 * @return Array
 	 */
 	static function loadSerialFile($filePath){
-		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
+		$filePath = AJXP_VarsFilter::filter($filePath);
 		$result = array();
 		if(is_file($filePath))
 		{
@@ -584,7 +584,7 @@ class AJXP_Utils
 	 * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
 	 */
 	static function saveSerialFile($filePath, $value, $createDir=true, $silent=false){
-		$filePath = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $filePath);
+		$filePath = AJXP_VarsFilter::filter($filePath);
 		if($createDir && !is_dir(dirname($filePath))) {			
 			if(!is_writeable(dirname(dirname($filePath)))){
 				if($silent) return ;

@@ -33,6 +33,7 @@
  */
 include_once("server/conf/base.conf.php");
 require_once("server/classes/class.AJXP_Utils.php");
+require_once("server/classes/class.AJXP_VarsFilter.php");
 require_once("server/classes/class.SystemTextEncoding.php");
 require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");

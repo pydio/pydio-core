@@ -43,7 +43,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 	
 	function init($options){
 		parent::init($options);
-		$this->usersSerFile = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $options["USERS_FILEPATH"]);
+		$this->usersSerFile = AJXP_VarsFilter::filter($this->getOption("USERS_FILEPATH"));
 	}
 
 	function performChecks(){
