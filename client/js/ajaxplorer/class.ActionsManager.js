@@ -559,6 +559,9 @@ Class.create("ActionsManager", {
 		if(action.options.hasAccessKey){
 			this.registerKey(action.options.accessKey, actionName);
 		}
+		if(action.options.specialAccessKey){
+			this.registerKey("key_" + action.options.specialAccessKey, actionName);
+		}
 		action.setManager(this);
 	},
 	
