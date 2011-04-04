@@ -227,7 +227,7 @@
 				</processing>
 		</action>
 		<action name="delete_table">
-			<gui text="271" title="272" src="sql_images/actions/ICON_SIZE/table_delete.png" accessKey="delete_access_key" hasAccessKey="false">
+			<gui text="271" title="272" src="sql_images/actions/ICON_SIZE/table_delete.png" accessKey="delete_access_key" hasAccessKey="false" specialAccessKey="delete">
 				<context selection="true" dir="true" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -256,7 +256,7 @@
 				</processing>
 		</action>
 		<action name="delete_record">
-			<gui text="7" title="277" src="sql_images/actions/ICON_SIZE/table_record_delete.png" accessKey="delete_access_key" hasAccessKey="true">
+			<gui text="7" title="277" src="sql_images/actions/ICON_SIZE/table_record_delete.png" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="true" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
