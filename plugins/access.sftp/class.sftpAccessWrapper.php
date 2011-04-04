@@ -116,8 +116,9 @@ class sftpAccessWrapper extends fsAccessWrapper {
     						'macerror'	=> "macerrorSftp");
 		$remote_serv = $repoObject->getOption("SERV");
 		$remote_port = $repoObject->getOption("PORT");
-		$remote_user = $repoObject->getOption("USER");
-		$remote_pass = $repoObject->getOption("PASS");
+		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repoObject, "");
+		$remote_user = $credentials["user"];
+		$remote_pass = $credentials["password"];
 		
 		$connection = ssh2_connect($remote_serv, intval($remote_port), array(), $callbacks);
 		ssh2_auth_password($connection, $remote_user, $remote_pass);
@@ -155,10 +156,44 @@ class sftpAccessWrapper extends fsAccessWrapper {
      * @return array
      */
     public function url_stat($path, $flags){    
-    	$realPath = self::initPath($path);
+    	$realPath = self::initPath($path);    	
     	$stat = @stat($realPath);
+    	$parts = parse_url($path);
+    	$repoObject = ConfService::getRepositoryById($parts["host"]);
+    	
+    	AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));    	
+
     	return $stat;
     }
+    
+    public function detectRemoteUserId($repository){
+    	list($connection, $remote_base_path) = self::getSshConnection("/", $repository);
+    	$stream = ssh2_exec($connection, "id");
+    	if($stream !== false){
+	    	stream_set_blocking($stream, true);
+	    	$output = stream_get_contents($stream);
+	    	fclose($stream);
+	    	
+	    	self::$currentUserId = $output;
+	    	if(trim($output != "")){
+	    		$res = sscanf($output, "uid=%i(%s) gid=%i(%s) groups=%i(%s)");
+	    		preg_match_all("/(\w*)=(\w*)\((\w*)\)/", $output, $matches);
+	    		if(count($matches[0]) == 3){
+	    			$uid = $matches[2][0];
+	    			$gid = $matches[2][1];
+	    			/*
+	    			$groups = $matches[2][2];	    			
+	    			$uName = $matches[3][0];
+	    			$gName = $matches[3][1];
+	    			$groupsName = $matches[3][2];
+	    			*/
+	    			return array($uid, $gid);
+	    		}
+	    	}
+    	}
+    	return array(null,null);
+    }
+    
     /**
      * Opens a handle to the dir
      * Fix PEAR by being sure it ends up with "/", to avoid 
@@ -238,18 +273,23 @@ class sftpAccessWrapper extends fsAccessWrapper {
 	public static function changeMode($path, $chmodValue){		
     	$url = parse_url($path);
 		list($connection, $remote_base_path) = self::getSshConnection($path);
-		var_dump('chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
+		//var_dump('chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
 		ssh2_exec($connection,'chmod '.decoct($chmodValue).' '.$remote_base_path.$url['path']);
 	}
 	
-	public static function getSshConnection($path){
-    	$url = parse_url($path);
-    	$repoId = $url["host"];
-    	$repoObject = ConfService::getRepositoryById($repoId);
+	public static function getSshConnection($path, $repoObject = null){
+		if($repoObject != null){
+			$url = array();
+		}else{
+	    	$url = parse_url($path);
+	    	$repoId = $url["host"];
+	    	$repoObject = ConfService::getRepositoryById($repoId);
+		}
 		$remote_serv = $repoObject->getOption("SERV");
 		$remote_port = $repoObject->getOption("PORT");
-		$remote_user = $repoObject->getOption("USER");
-		$remote_pass = $repoObject->getOption("PASS");
+		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject, "");
+		$remote_user = $credentials["user"];
+		$remote_pass = $credentials["password"];
 		$remote_base_path = $repoObject->getOption("PATH");
 		
     	$callbacks = array('disconnect' => "disconnectedSftp", 

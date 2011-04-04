@@ -37,7 +37,9 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 // This is used to catch exception while downloading
-function download_exception_handler($exception){}
+if(!function_exists('download_exception_handler')){
+	function download_exception_handler($exception){}
+}
 
 class fsAccessDriver extends AbstractAccessDriver 
 {
@@ -80,6 +82,38 @@ class fsAccessDriver extends AbstractAccessDriver
 		if($recycle != ""){
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
 		}
+	}
+	
+	function disableArchiveBrowsingContributions(&$contribNode){
+		// Cannot use zip features on FTP !
+		// Remove "compress" action
+		$actionXpath=new DOMXPath($contribNode->ownerDocument);
+		$compressNodeList = $actionXpath->query('action[@name="compress"]', $contribNode);
+		if(!$compressNodeList->length) return ;
+		unset($this->actions["compress"]);
+		$compressNode = $compressNodeList->item(0);
+		$contribNode->removeChild($compressNode);		
+		// Disable "download" if selection is multiple
+		$nodeList = $actionXpath->query('action[@name="download"]/gui/selectionContext', $contribNode);
+		$selectionNode = $nodeList->item(0);
+		$values = array("dir" => "false", "unique" => "true");
+		foreach ($selectionNode->attributes as $attribute){
+			if(isSet($values[$attribute->name])){
+				$attribute->value = $values[$attribute->name];
+			}
+		}
+		$nodeList = $actionXpath->query('action[@name="download"]/processing/clientListener[@name="selectionChange"]', $contribNode);
+		$listener = $nodeList->item(0);
+		$listener->parentNode->removeChild($listener);
+		// Disable "Explore" action on files
+		$nodeList = $actionXpath->query('action[@name="ls"]/gui/selectionContext', $contribNode);
+		$selectionNode = $nodeList->item(0);
+		$values = array("file" => "false", "allowedMimes" => "");
+		foreach ($selectionNode->attributes as $attribute){
+			if(isSet($values[$attribute->name])){
+				$attribute->value = $values[$attribute->name];
+			}
+		}		
 	}
 	
 	function switchAction($action, $httpVars, $fileVars){
@@ -1406,7 +1440,7 @@ class fsAccessDriver extends AbstractAccessDriver
 	 */ 
     function makeZip ($src, $dest, $basedir)
     {
-    	@set_time_limit(60);
+    	@set_time_limit(0);
     	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	foreach ($src as $item){
@@ -1419,7 +1453,7 @@ class fsAccessDriver extends AbstractAccessDriver
     	AJXP_Logger::debug("Pathes", $filePaths);
     	AJXP_Logger::debug("Basedir", array($basedir));
     	$archive = new PclZip($dest);
-    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION);
+    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON);
     	if(!$vList){
     		throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
     	}
