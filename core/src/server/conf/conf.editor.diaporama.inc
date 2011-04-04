@@ -46,7 +46,7 @@ $DRIVER_CONF = array(
 	// and files whose size is greater than this threshold, 
 	// the image type and dimension will be skipped.
 	"META_EXTRACTION_REMOTEWRAPPERS" => array("ftpAccessWrapper"),
-	"META_EXTRACTION_THRESHOLD" => 2000,
+	"META_EXTRACTION_THRESHOLD" => 50000,
 	
 	/************************************/
 	/* THUMBNAIL MANAGEMENT				*/

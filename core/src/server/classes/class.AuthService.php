@@ -186,8 +186,7 @@ class AuthService
 
         // Setting session credentials if asked in config
         if(ConfService::getConf("SESSION_SET_CREDENTIALS")) {
-        	$_SESSION["AJXP_SESSION_REMOTE_USER"] = $user_id;
-        	$_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pwd;
+        	AJXP_Safe::storeCredentials($user_id, $pwd);
         }
 
         $user = $confDriver->createUserObject($user_id);
@@ -222,8 +221,7 @@ class AuthService
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
 			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
-				unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
-				unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);			
+				AJXP_Safe::clearCredentials();
 			}
 		}
 	}
@@ -263,8 +261,7 @@ class AuthService
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
 			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
-				unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
-				unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);			
+				AJXP_Safe::clearCredentials();
 			}			
 		}
         return $logout;
