@@ -51,8 +51,9 @@ define("AJXP_EXEC", true);
 require("compat.php");
 $installPath = realpath(dirname(__FILE__)."/../..");
 define("INSTALL_PATH", $installPath);
-define("AJXP_PLUGINS_CACHE_FILE", INSTALL_PATH."/server/conf/plugins_cache.ser");
-define("AJXP_PLUGINS_REQUIRES_FILE", INSTALL_PATH."/server/conf/plugins_requires.ser");
+define("AJXP_INSTALL_PATH", $installPath);
+define("AJXP_PLUGINS_CACHE_FILE", AJXP_INSTALL_PATH."/server/conf/plugins_cache.ser");
+define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_INSTALL_PATH."/server/conf/plugins_requires.ser");
 define("SERVER_ACCESS", "content.php");
 define("ADMIN_ACCESS", "admin.php");
 define("IMAGES_FOLDER", "client/themes/oxygen/images");
@@ -67,4 +68,12 @@ define("AJXP_SKIP_CACHE", false);
 define("INITIAL_ADMIN_PASSWORD", "admin");
 
 define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
+
+function __autoload($className){
+	$fileName = AJXP_INSTALL_PATH."/".SERVER_RESOURCES_FOLDER."/"."class.".$className.".php";
+	if(file_exists($fileName)){
+		require_once($fileName);
+	}
+}
+
 ?>

@@ -390,6 +390,75 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	AJXP_XMLWriter::sendMessage(join("\n", $messages), null, true);
     	AJXP_XMLWriter::close();
     }
+    
+    /**
+     * 
+     * Try to reapply correct permissions
+     * @param oct $mode
+     * @param Repository $repoObject
+     * @param Function $remoteDetectionCallback
+     */
+    public static function fixPermissions(&$stat, $repoObject, $remoteDetectionCallback = null){
+    	
+        $fixPermPolicy = $repoObject->getOption("FIX_PERMISSIONS");    	
+    	$loggedUser = AuthService::getLoggedUser();
+    	$sessionKey = md5($repoObject->getId()."-".$loggedUser->getId()."-fixPermData");
+
+    	
+    	if(!isSet($_SESSION[$sessionKey])){			
+    	    if($fixPermPolicy == "detect_remote_user_id" && $remoteDetectionCallback != null){
+    	    	list($uid, $gid) = call_user_func($remoteDetectionCallback, $repoObject);
+    	    	AJXP_Logger::debug("Fix permissions data $uid, $gid");
+    	    	if($uid != null && $gid != null){
+    	    		$_SESSION[$sessionKey] = array("uid" => $uid, "gid" => $gid);
+    	    	} 
+		    	
+	    	}else if(substr($fixPermPolicy, 0, strlen("file:")) == "file:"){
+	    		$filePath = AJXP_VarsFilter::filter(substr($fixPermPolicy, strlen("file:")+1));
+	    		if(file_exists($filePath)){
+	    			// GET A GID/UID FROM FILE
+	    			$fp = fopen($filePath, "r");
+	    			while($res = fscanf($fp, "%s:%s:%s\n")){
+	    				if($res[0] == $loggedUser->getId()){
+	    					$uid = $res[1];
+	    					$gid = $res[2];
+	    					$_SESSION[$sessionKey] = array("uid" => $uid, "gid" => $gid);
+	    					break;
+	    				}
+	    			}
+	    			fclose($fp);
+	    		}
+	    	}
+	    	// If not set, set an empty anyway
+	    	if(!isSet($_SESSION[$sessionKey])){
+	    		$_SESSION[$sessionKey] = array(null, null);
+	    	}
+    		
+    	}else{
+    		$data = $_SESSION[$sessionKey];
+    		if(!empty($data)){
+    			if(isSet($data["uid"])) $uid = $data["uid"];
+    			if(isSet($data["gid"])) $gid = $data["gid"];
+    		}    		
+    	}
+	    	
+    	
+    	$p = $stat["mode"];
+    	if($p != NULL){
+	    	if( ( isSet($uid) && $stat["uid"] == $uid ) || $fixPermPolicy === "u"  ) {
+	    		// AJXP_Logger::debug("Copy U to A");
+	    		if( $p&0x0100 ) $p += 04;
+	    		if( $p&0x0080 ) $p += 02;
+	    		if( $p & 0x0040 ) $p += 01;
+	    	}else if( ( isSet($gid) && $stat["gid"] == $gid )  || $fixPermPolicy === "g"  ) {
+	    		// AJXP_Logger::debug("Copy G to A");
+	    		if( $p&0x0020 ) $p += 04;
+	    		if( $p&0x0010 ) $p += 02;
+	    		if( $p&0x0008 ) $p += 01;
+	    	}	    	
+			$stat["mode"] = $stat[2] = $p;
+    	}
+    }
 
 }
 
