@@ -39,6 +39,7 @@ class AJXP_Controller{
 	
 	private static $xPath;
 	public static $lastActionNeedsAuth = false;
+	private static $includeHooks = array();
 	
 	private static function initXPath(){		
 		if(!isSet(self::$xPath)){
@@ -233,6 +234,20 @@ class AJXP_Controller{
 			$fake1; $fake2; $fake3;
 			self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args);
 		}
+	}	
+	
+	public static function applyIncludeHook($hookName, $args){
+		if(!isSet(self::$includeHooks[$hookName])) return;
+		foreach(self::$includeHooks[$hookName] as $callback){
+			call_user_func_array($callback, $args);			
+		}
+	}
+	
+	public static function registerIncludeHook($hookName, $callback){
+		if(!isSet(self::$includeHooks[$hookName])){
+			self::$includeHooks[$hookName] = array();
+		}
+		self::$includeHooks[$hookName][] = $callback;
 	}
 	
 	public static function actionNeedsRight($actionNode, $xPath, $right){
