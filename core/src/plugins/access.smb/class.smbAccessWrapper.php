@@ -41,7 +41,7 @@ class smbAccessWrapper extends fsAccessWrapper {
 
     /**
      * Initialize the stream from the given path. 
-     * Concretely, transform ajxp.webdav:// into webdav://
+     * Concretely, transform ajxp.smb:// into smb://
      *
      * @param string $path
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
@@ -52,29 +52,18 @@ class smbAccessWrapper extends fsAccessWrapper {
     	$repoObject = ConfService::getRepositoryById($repoId);
     	if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
 		$path = $url["path"];
-		$host = $repoObject->getOption("HOST");
+		// Fix if the host is defined as //MY_HOST/path/to/folder
+		$host = str_replace("//", "", $repoObject->getOption("HOST"));
 		$credentials = "";
-		if(iSset($_SESSION["AJXP_SESSION_REMOTE_USER"]) && isSet($_SESSION["AJXP_SESSION_REMOTE_PASS"])){
-			$login = $_SESSION["AJXP_SESSION_REMOTE_USER"];
-			$pass = $_SESSION["AJXP_SESSION_REMOTE_PASS"];
+		$safeCreds = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject);
+		if($safeCreds["user"] != "" && $safeCreds["password"] != ""){
+			$login = $safeCreds["user"];
+			$pass = $safeCreds["password"];
 			$credentials = "$login:$pass@";
 		}
 		$basePath = $repoObject->getOption("PATH");
 		$fullPath = "smb://".$credentials.$host."/".$basePath."/".$path;		
 		return $fullPath;
-		/*
-		// MAKE SURE THERE ARE NO // OR PROBLEMS LIKE THAT...
-		$basePath = $repoObject->getOption("PATH");		
-		if($basePath[strlen($basePath)-1] == "/"){
-			$basePath = substr($basePath, 0, -1);			
-		}
-		if($basePath[0] != "/"){
-			$basePath = "/$basePath";
-		}
-		$path = AJXP_Utils::securePath($path);
-		if($path[0] == "/"){
-			$path = substr($path, 1);
-		}*/
     }    
     
     /**

@@ -9,6 +9,8 @@
 		<param name="FTP_DIRECT" type="boolean" label="Active" description="Whether to use active or passive" mandatory="true" default="false"/>
 		<param name="FTP_USER" type="string" label="User" description="Ftp User name - Can be overriden on a per-user basis." mandatory="false"/>
 		<param name="FTP_PASS" type="password" label="Password" description="Ftp User password - Can be overriden on a per-user basis." mandatory="false"/>
+		<param name="USE_SESSION_CREDENTIALS" type="boolean" label="Use session credentials" description="Try to use the current AjaXplorer user credentials for connecting" mandatory="false" default="false"/>
+		<param name="FIX_PERMISSIONS" type="string" label="Fix Permissions" description="How to handle remote permissions to be used by PHP as local permissions. See manual." mandatory="false" default="detect_remote_user_id"/>		
 		<param name="CHARSET" type="string" label="Character encoding" description="When not advertized by server, use this encoding" mandatory="true" default="ISO-8859-1"/>
 		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>		
 		<param name="RECYCLE_BIN" type="string" label="Recycle folder" description="Buffer before real suppression of files on the server."/>

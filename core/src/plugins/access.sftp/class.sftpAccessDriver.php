@@ -69,6 +69,16 @@ class sftpAccessDriver extends fsAccessDriver
 		}
 	}
 	
+	/**
+	 * Parse 
+	 * @param DOMNode $contribNode
+	 */
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
+		if($contribNode->nodeName != "actions") return ;
+		$this->disableArchiveBrowsingContributions($contribNode);
+	}	
+	
 	
 	/**
 	 * We have to override the standard copyOrMoveFile, as feof() does

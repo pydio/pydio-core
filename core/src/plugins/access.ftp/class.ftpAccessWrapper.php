@@ -75,6 +75,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     	$parts = $fake->parseUrl($path);
 		$link = $fake->createFTPLink();	
 		$serverPath = AJXP_Utils::securePath($fake->path."/".$parts["path"]);
+		AJXP_Logger::debug($serverPath);
     	ftp_fget($link, $stream, $serverPath, FTP_BINARY);
     }
     
@@ -172,7 +173,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     public function url_stat($path, $flags){
     	// We are in an opendir loop
     	if(self::$dirContent != null){
-    		$search = basename($path);
+    		$search = $this->safeBasename($path);
     		if(array_key_exists($search, self::$dirContent)){
 	    		return self::$dirContent[$search];
     		}
@@ -180,28 +181,32 @@ class ftpAccessWrapper implements AjxpWrapper {
     	$parts = $this->parseUrl($path);
 		$link = $this->createFTPLink();	
 		$serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);		
+		
+		$serverParent = $this->safeDirname($parts["path"]);
+		$serverParent = AJXP_Utils::securePath($this->path."/".$serverParent);
+		
 		$testCd = @ftp_chdir($link, $serverPath);
 		if($testCd === true){
 			// DIR
-			$serverParent = dirname($serverPath);
-			// dirname may use local dir separator!
-			if(DIRECTORY_SEPARATOR == "\\"){			
-				$serverParent = str_replace(DIRECTORY_SEPARATOR, "/", $serverParent["path"]);
-			}
-			$contents = $this->rawList($link, $serverParent);			
+			$contents = $this->rawList($link, $serverParent, 'd');
 			foreach ($contents as $entry){
-				$res = $this->rawListEntryToStat($entry, true);
-				if($res["name"] == basename($serverPath)){
-					$statValue = $res["stat"];
+				$res = $this->rawListEntryToStat($entry);
+				AJXP_Logger::debug("RAWLISTENTRY ".$res["name"], $res["stat"]);
+				AbstractAccessDriver::fixPermissions($res, ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+				
+				if($res["name"] == $this->safeBasename($serverPath)){
+					$statValue = $res["stat"];					
 					return $statValue;
 				}
 			}
 		}else{
 			// FILE
-			$contents = $this->rawList($link, $serverPath);		
+			$contents = $this->rawList($link, $serverPath, 'f');		
 	    	if(count($contents) == 1){
-	    		$res = $this->rawListEntryToStat($contents[0], true);
+	    		$res = $this->rawListEntryToStat($contents[0]);
+	    		AbstractAccessDriver::fixPermissions($res, ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
     			$statValue = $res["stat"];
+    			AJXP_Logger::debug("STAT FILE $serverPath", $statValue);
 	    		return $statValue;
 	    	}
 		}
@@ -230,6 +235,7 @@ class ftpAccessWrapper implements AjxpWrapper {
        	foreach ($files as $key => $value){
        		$folders[$key] = $value;
        	}
+       	AJXP_Logger::debug("OPENDIR ", $folders);
 		self::$dirContent = $folders;//array_merge($folders, $files);
 		self::$dirContentKeys = array_keys(self::$dirContent);
 		self::$dirContentIndex = 0;	
@@ -237,8 +243,9 @@ class ftpAccessWrapper implements AjxpWrapper {
 	}
 	
 	public function dir_closedir  (){
-		self::$dirContent = null;
-		self::$dirContentKeys = null;
+		AJXP_Logger::debug("CLOSEDIR");
+		//self::$dirContent = null;
+		//self::$dirContentKeys = null;
 		self::$dirContentIndex = 0;
 	}	
 	
@@ -255,10 +262,35 @@ class ftpAccessWrapper implements AjxpWrapper {
 		self::$dirContentIndex = 0;
 	}
 	    
-	protected function rawList($link, $serverPath){
-		$contents = @ftp_rawlist($link, $serverPath);
+	protected function rawList($link, $serverPath, $target = 'd', $retry = true){
+
+		if ($target == 'f')
+		{
+			$parentDir = $this->safeDirname($serverPath);
+			$fileName = $this->safeBasename($serverPath);
+			ftp_chdir($link, $parentDir);
+			$rl_dirlist = @ftp_rawlist($link, ".");
+			//AJXP_Logger::debug("FILE RAWLIST FROM ".$parentDir);
+			if (is_array($rl_dirlist)){
+				foreach($rl_dirlist as $rl_index => $rl_entry){
+					if (preg_match("/ $fileName$/" , $rl_entry)){
+						$contents = array($rl_dirlist[$rl_index]);
+					}
+				}
+			} 
+		}
+		else 
+		{			
+			ftp_chdir($link, $serverPath);
+			$contents = ftp_rawlist($link, ".");
+        	//AJXP_Logger::debug("RAW LIST RESULT ".print_r($contents, true));			
+		}
+		
         if (!is_array($contents) && !$this->ftpActive) 
         {
+        	if($retry == false){
+        		return array();
+        	}
             // We might have timed out, so let's go passive if not done yet
             global $_SESSION;
             if ($_SESSION["ftpPasv"] == "true"){
@@ -266,10 +298,11 @@ class ftpAccessWrapper implements AjxpWrapper {
             }
             @ftp_pasv($link, TRUE);
             $_SESSION["ftpPasv"]="true";
-    		$contents = @ftp_rawlist($link, $serverPath);
-            if (!is_array($contents)){
-				return array();
-            }
+           	// RETRY!
+    		return $this->rawList($link, $serverPath, $target, FALSE);
+        }
+        if(!is_array($contents)){
+	        return array();
         }
         return $contents;		
 	}
@@ -313,7 +346,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		 	 $isDir = true;
 		}
 		$boolIsDir = $isDir;
-		$statValue[2] = $statValue["mode"] = $this->convertingChmod($fileperms, $filterStatPerms);
+		$statValue[2] = $statValue["mode"] = $this->convertingChmod($fileperms);
 		$statValue["ftp_perms"] = $fileperms;
 		return array("name"=>$file, "stat"=>$statValue, "dir"=>$isDir);
 	}
@@ -323,34 +356,10 @@ class ftpAccessWrapper implements AjxpWrapper {
 		$urlParts = parse_url($url);
 		$this->repositoryId = $urlParts["host"];
 		$repository = ConfService::getRepositoryById($this->repositoryId);		
-		// Get USER/PASS
-		// 1. Try from URL
-		if(isSet($urlParts["user"]) && isset($urlParts["pass"])){
-			$this->user = $urlParts["user"];
-			$this->password = $urlParts["pass"];			
-		}
-		// 2. Try from user wallet
-		if(!isSet($this->user) || $this->user==""){
-			$loggedUser = AuthService::getLoggedUser();
-			if($loggedUser != null){
-				$wallet = $loggedUser->getPref("AJXP_WALLET");
-				if(is_array($wallet) && isSet($wallet[$this->repositoryId]["FTP_USER"])){
-					$this->user = $wallet[$this->repositoryId]["FTP_USER"];
-					$this->password = $loggedUser->decodeUserPassword($wallet[$this->repositoryId]["FTP_PASS"]);
-				}
-			}
-		}
-		// 3. Try from repository config
-		if(!isSet($this->user) || $this->user==""){
-			$this->user = $repository->getOption("FTP_USER");
-			$this->password = $repository->getOption("FTP_PASS");
-		}
-		// 4. Try from session
-		if((!isSet($this->user) || $this->user=="") && isSet($_SESSION["AJXP_SESSION_REMOTE_USER"])){
-			$this->user = $_SESSION["AJXP_SESSION_REMOTE_USER"];
-			$this->password = $_SESSION["AJXP_SESSION_REMOTE_PASS"];
-		}
-		if(!isSet($this->user) || $this->user==""){
+		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository, "FTP_");
+		$this->user = $credentials["user"];
+		$this->password = $credentials["password"];
+		if($this->user==""){
 			throw new AJXP_Exception("Cannot find user/pass for FTP access!");
 		}
 		if($repository->getOption("DYNAMIC_FTP") == "TRUE" && isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])){
@@ -380,6 +389,10 @@ class ftpAccessWrapper implements AjxpWrapper {
             $_SESSION[$cacheKey] = $_SESSION["AJXP_CHARSET"];
         }
         return $urlParts;
+	}
+	
+	public function getRemoteUserId(){
+		return array($this->user, "-1");
 	}
 	
 	protected function buildRealUrl($url){
@@ -491,5 +504,13 @@ class ftpAccessWrapper implements AjxpWrapper {
 		return  $mode;
 	}
     
+	protected function safeDirname($path){
+		return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", dirname($path)): dirname($path));
+	}
+	
+	protected function safeBasename($path){
+		return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)): basename($path));
+	}
+	
 }
 ?>

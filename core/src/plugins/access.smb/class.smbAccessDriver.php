@@ -73,6 +73,17 @@ class smbAccessDriver extends fsAccessDriver
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
 		}*/
 	}
+	
+	/**
+	 * Parse 
+	 * @param DOMNode $contribNode
+	 */
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
+		if($contribNode->nodeName != "actions") return ;
+		$this->disableArchiveBrowsingContributions($contribNode);
+	}	
+	
 }	
 
 ?>

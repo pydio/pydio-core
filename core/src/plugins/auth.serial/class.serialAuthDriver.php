@@ -70,7 +70,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 		$userStoredPass = $this->getUserPass($login);
 		if(!$userStoredPass) return false;
 		if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-			return ($userStoredPass == $pass);
+			return ($userStoredPass == md5($pass));
 		}else{
 			return (md5($userStoredPass.$seed) == $pass);
 		}
