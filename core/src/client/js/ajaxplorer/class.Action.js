@@ -354,6 +354,9 @@ Class.create("Action", {
 					this.options.accessKey = node.getAttribute('accessKey');
 					this.options.hasAccessKey = true;
 				}
+				if(node.getAttribute('specialAccessKey')){
+					this.options.specialAccessKey = node.getAttribute('specialAccessKey');
+				}
 				for(var j=0; j<node.childNodes.length;j++){
 					if(node.childNodes[j].nodeName == "context"){
 						this.attributesToObject(this.context, node.childNodes[j]);
