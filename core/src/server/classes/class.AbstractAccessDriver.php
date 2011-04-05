@@ -156,6 +156,13 @@ class AbstractAccessDriver extends AJXP_Plugin {
         if(AuthService::usersEnabled()){
         	$data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
         }
+        if($this->hasMixin("credentials_consumer")){
+        	$cred = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $this->repository);
+        	if(isSet($cred["user"]) && isset($cred["password"])){
+        		$data["SAFE_USER"] = $cred["user"];
+        		$data["SAFE_PASS"] = $cred["password"];        		
+        	}
+        }
         // Force expanded path in publiclet
         $data["REPOSITORY"]->addOption("PATH", $this->repository->getOption("PATH"));
         if ($data["ACTION"] == "") $data["ACTION"] = "download";
@@ -240,9 +247,14 @@ class AbstractAccessDriver extends AJXP_Plugin {
         if(!is_file($filePath)){
                 die("Warning, cannot find driver for conf storage! ($name, $filePath)");
         }
-        require_once($filePath);
+        require_once($filePath);        
         $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
-        $driver->loadManifest();
+        $driver->loadManifest();        
+        if($driver->hasMixin("credentials_consumer") && isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])){
+        	// FORCE SESSION MODE
+        	AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
+        	AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
+        }
         $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
         ConfService::setRepository($data["REPOSITORY"]);
         $driver->initRepository();
