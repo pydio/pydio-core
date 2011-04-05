@@ -174,7 +174,6 @@ class sftpAccessWrapper extends fsAccessWrapper {
 	    	$output = stream_get_contents($stream);
 	    	fclose($stream);
 	    	
-	    	self::$currentUserId = $output;
 	    	if(trim($output != "")){
 	    		$res = sscanf($output, "uid=%i(%s) gid=%i(%s) groups=%i(%s)");
 	    		preg_match_all("/(\w*)=(\w*)\((\w*)\)/", $output, $matches);
