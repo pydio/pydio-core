@@ -52,6 +52,7 @@ class AJXP_Plugin implements Serializable{
 	protected $options; // can be passed at init time
 	protected $pluginConf; // can be passed at load time
 	protected $dependencies;
+	protected $mixins = array();
 	public $loadingState = "";
 	/**
 	 * The manifest.xml loaded
@@ -75,6 +76,7 @@ class AJXP_Plugin implements Serializable{
 		"manifestLoaded", 
 		"actions", 
 		"registryContributions", 
+		"mixins",
 		"options", "pluginConf", "dependencies", "loadingState", "manifestXML");
 	
 	/**
@@ -234,6 +236,7 @@ class AJXP_Plugin implements Serializable{
 			throw $e;
 		}
 		$this->xPath = new DOMXPath($this->manifestDoc);
+		$this->loadMixins();
 		$this->manifestLoaded = true;
 		$this->loadDependencies();
 	}
@@ -268,7 +271,7 @@ class AJXP_Plugin implements Serializable{
 		}
 		if($this->manifestXML != NULL){			
 			$this->manifestDoc = DOMDocument::loadXML(base64_decode($this->manifestXML));
-			$this->xPath = new DOMXPath($this->manifestDoc);			
+			$this->reloadXPath();			
 			unset($this->manifestXML);
 		}
 		//var_dump($this);
@@ -420,8 +423,27 @@ class AJXP_Plugin implements Serializable{
 		$attName->appendChild($attValue);
 		$prop->appendChild($attName);
 		$configNode->appendChild($prop);
+		$this->reloadXPath();
+	}
+	
+	public function reloadXPath(){
 		// Relaunch xpath
-		$this->xPath = new DOMXPath($this->manifestDoc);
+		$this->xPath = new DOMXPath($this->manifestDoc);		
+	}
+	
+	public function hasMixin($mixinName){
+		return (in_array($mixinName, $this->mixins));
+	}
+	
+	protected function loadMixins(){
+		
+		$attr = $this->manifestDoc->documentElement->getAttribute("mixins");
+		if($attr != ""){
+			$this->mixins = explode(",", $attr);
+			foreach ($this->mixins as $mixin){
+				AJXP_PluginsService::getInstance()->patchPluginWithMixin($this, $this->manifestDoc, $mixin);
+			}
+		}
 	}
 	
 	/**

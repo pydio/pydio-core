@@ -142,8 +142,7 @@ class AJXP_Safe{
 				$user = $safeCred["user"];
 				$password = $safeCred["password"];
 			}
-		}
-		
+		}		
 		return array("user" => $user, "password" => $password);
 		
 	}

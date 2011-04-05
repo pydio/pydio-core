@@ -600,39 +600,6 @@ class ConfService
 			$xmlBuffer .= "</ajxpdriver>";
 		}
 		return $xmlBuffer;
-		/*
-		$manifests = array();
-		$base = INSTALL_PATH."/plugins";
-		$xmlString = "";
-		if($fp = opendir($base)){
-			while (($subdir = readdir($fp))!==false) {
-				if($subdir == "index.html") continue;
-				$manifName = $base."/".$subdir."/manifest.xml";
-				if(is_file($manifName) && is_readable($manifName) && substr($subdir,0,strlen("access."))=="access."){
-					$dName = substr($subdir, strlen("access."));
-					if($dName == "ajxp_conf" || $dName == "ajxp_shared") continue;
-					if($filterByDriverName != ""){						
-						if($dName!=$filterByDriverName) continue;
-					}					
-					$lines = file($manifName);
-					if($filterByTagName!=""){
-						$filterLines = array();
-						foreach ($lines as $line){
-							if(strstr(trim($line), "<$filterByTagName")!==false || strstr(trim($line), "<ajxpdriver")!==false || strstr(trim($line), "</ajxpdriver>")!==false){
-								$filterLines[] = $line;
-							}
-						}
-						$lines = $filterLines;
-					}else{
-						array_shift($lines);// Remove first line (xml declaration);
-					}
-					$xmlString .= implode("", $lines);
-				}
-			}
-			closedir($fp);
-		}
-		return str_replace("\t", "", str_replace("\n", "", $xmlString));
-		*/
 	}
 
  	/**

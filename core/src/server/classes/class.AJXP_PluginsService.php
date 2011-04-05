@@ -45,6 +45,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $xmlRegistry;
  	private $pluginFolder;
  	private $confFolder;
+ 	private $mixinsDoc;
+ 	private $mixinsXPath;
  	
  	public function loadPluginsRegistry($pluginFolder, $confFolder){ 		
  		if(!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false){
@@ -334,6 +336,34 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	public static function updateXmlRegistry($registry){
  		$self = self::getInstance();
  		$self->xmlRegistry = $registry;
+ 	}
+ 	
+ 	/**
+ 	 * Append some predefined XML to a plugin instance 
+ 	 * @param AJXP_Plugin $plugin
+ 	 * @param DOMDocument $manifestDoc
+ 	 * @param String $behaviourName
+ 	 */
+ 	public function patchPluginWithMixin(&$plugin, &$manifestDoc, $mixinName){
+ 		
+ 		// Load behaviours if not already
+ 		if(!isSet($this->mixinsDoc)){
+ 			$this->mixinsDoc = new DOMDocument();
+ 			$this->mixinsDoc->load(AJXP_INSTALL_PATH."/server/xml/ajxp_mixins.xml");
+ 			$this->mixinsXPath = new DOMXPath($this->mixinsDoc);
+ 		}
+ 		// Merge into manifestDoc
+ 		$nodeList = $this->mixinsXPath->query($mixinName);
+ 		if(!$nodeList->length) return;
+ 		$mixinNode = $nodeList->item(0);
+ 		foreach($mixinNode->childNodes as $child){
+ 			if($child->nodeType != XML_ELEMENT_NODE) continue;
+ 			$uuidAttr = $child->getAttribute("uuidAttr") OR "name";
+ 			$this->mergeNodes($manifestDoc, $child->nodeName, $uuidAttr, $child->childNodes);
+ 		}
+
+ 		// Reload plugin XPath
+ 		$plugin->reloadXPath();
  	}
  	
  	/**

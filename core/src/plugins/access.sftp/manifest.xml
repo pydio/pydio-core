@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="sftp" label="FTP over SSH" description="Access FTP via SSH server">
+<ajxpdriver name="sftp" label="FTP over SSH" description="Access FTP via SSH server" mixins="credentials_consumer">
 	<client_settings icon="plugins/access.sftp/icon.png"/>
 	<server_settings>
 		<param name="SERV" type="string" label="Server URL" description="Path to remote sftp server" mandatory="true"/>
 		<param name="PORT" type="string" label="Port number" description="Port to SSH server" mandatory="true" default="22"/>
 		<param name="PATH" type="string" label="Path" description="Real path to the folder on the server" mandatory="true"/>
-		<param name="USER" type="string" label="SFTP user" description="SFTP user name" mandatory="false"/>
-		<param name="PASS" type="password" label="SFTP password" description="SFTP password" mandatory="false"/>
-		<param name="USE_SESSION_CREDENTIALS" type="boolean" label="Use session credentials" description="Try to use the current AjaXplorer user credentials for connecting" mandatory="false" default="false"/>		
 		<param name="FIX_PERMISSIONS" type="string" label="Fix Permissions" description="How to handle remote permissions to be used by PHP as local permissions. See manual." mandatory="false" default="detect_remote_user_id"/>
 		<param name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>	
 		<param name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
 		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
 		<param name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
-		<user_param name="USER" type="string" label="User" description="SFtp User name" mandatory="false"/>
-		<user_param name="PASS" type="password" label="Password" description="SFtp User password" mandatory="false"/>				
 	</server_settings>
 	<class_definition filename="plugins/access.sftp/class.sftpAccessDriver.php" classname="sftpAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.sftp/class.sftpAccessWrapper.php" classname="sftpAccessWrapper" protocol="ajxp.sftp"/>	
