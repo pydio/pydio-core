@@ -37,6 +37,20 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class ftpAccessDriver extends fsAccessDriver {
 	
+	public function loadManifest(){
+		parent::loadManifest();
+		// BACKWARD COMPATIBILITY!
+		$res = $this->xPath->query('//param[@name="USER"] | //param[@name="PASS"] | //user_param[@name="USER"] | //user_param[@name="PASS"]');
+		foreach($res as $node){
+			if($node->getAttribute("name") == "USER"){
+				$node->setAttribute("name", "FTP_USER");
+			}else if($node->getAttribute("name") == "PASS"){
+				$node->setAttribute("name", "FTP_PASS");
+			}
+		}
+		$this->reloadXPath();
+	}
+	
 	/**
 	 * Parse 
 	 * @param DOMNode $contribNode
