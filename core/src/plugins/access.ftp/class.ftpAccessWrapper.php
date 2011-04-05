@@ -356,7 +356,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		$urlParts = parse_url($url);
 		$this->repositoryId = $urlParts["host"];
 		$repository = ConfService::getRepositoryById($this->repositoryId);		
-		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository, "FTP_");
+		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository);
 		$this->user = $credentials["user"];
 		$this->password = $credentials["password"];
 		if($this->user==""){

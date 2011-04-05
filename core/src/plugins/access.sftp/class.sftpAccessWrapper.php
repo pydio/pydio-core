@@ -116,7 +116,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
     						'macerror'	=> "macerrorSftp");
 		$remote_serv = $repoObject->getOption("SERV");
 		$remote_port = $repoObject->getOption("PORT");
-		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repoObject, "");
+		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $repoObject);
 		$remote_user = $credentials["user"];
 		$remote_pass = $credentials["password"];
 		
@@ -286,7 +286,7 @@ class sftpAccessWrapper extends fsAccessWrapper {
 		}
 		$remote_serv = $repoObject->getOption("SERV");
 		$remote_port = $repoObject->getOption("PORT");
-		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject, "");
+		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($url, $repoObject);
 		$remote_user = $credentials["user"];
 		$remote_pass = $credentials["password"];
 		$remote_base_path = $repoObject->getOption("PATH");
