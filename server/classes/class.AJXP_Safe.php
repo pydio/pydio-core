@@ -7,6 +7,7 @@ class AJXP_Safe{
 	private $encodedPassword;
 	private $secretKey;	
 	private $separator = "__SAFE_SEPARATOR__";
+	private $forceSessionCredentials = false;
 	
 	public function __construct(){
 		if(defined('AJXP_SAFE_SECRET_KEY')){
@@ -74,6 +75,11 @@ class AJXP_Safe{
 		$this->user = null;
 		$this->encodedPassword = null;
 	}
+	
+	public function forceSessionCredentialsUsage(){
+		$this->forceSessionCredentials = true;
+	}
+	
 		
 	
 	/**
@@ -103,15 +109,19 @@ class AJXP_Safe{
 		$inst->load();
 		return $inst->getCredentials();
 	}
-	
+		
 	/**
 	 * 
 	 * @param array $parsedUrl
 	 * @param Repository $repository
 	 * @param string $optionsPrefix
 	 */
-	public static function tryLoadingCredentialsFromSources($parsedUrl, $repository, $optionsPrefix = ""){
+	public static function tryLoadingCredentialsFromSources($parsedUrl, $repository){
 		$user = $password = "";
+		$optionsPrefix = "";
+		if($repository->getAccessType() == "ftp"){
+			$optionsPrefix = "FTP_";
+		}
 		// Get USER/PASS
 		// 1. Try from URL
 		if(isSet($parsedUrl["user"]) && isset($parsedUrl["pass"])){
@@ -135,8 +145,7 @@ class AJXP_Safe{
 			$password = $repository->getOption($optionsPrefix."PASS");
 		}
 		// 4. Try from session		
-		
-		if($user=="" && $repository->getOption("USE_SESSION_CREDENTIALS")){
+		if($user=="" && ( $repository->getOption("USE_SESSION_CREDENTIALS") || self::getInstance()->forceSessionCredentials )){
 			$safeCred = AJXP_Safe::loadCredentials();
 			if($safeCred !== false){			
 				$user = $safeCred["user"];
