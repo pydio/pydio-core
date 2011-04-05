@@ -137,7 +137,7 @@ class EmlParser extends AJXP_Plugin{
 	}
 	
 	public function extractMimeHeaders($currentNode, &$metadata, $wrapperClassName, &$realFile){
-		if(!preg_match("/\.eml$/i",$currentNode)){
+		if(!preg_match("/\.eml$/i",$currentNode) || !$metadata["is_file"]){
 			EmlParser::$currentListingOnlyEmails = FALSE;
 			return;
 		}
