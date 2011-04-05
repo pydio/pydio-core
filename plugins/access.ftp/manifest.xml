@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="ftp" label="FTP Server" description="Connect to a remote FTP server">
+<ajxpdriver name="ftp" label="FTP Server" description="Connect to a remote FTP server" mixins="credentials_consumer">
 	<client_settings icon="plugins/access.ftp/icon.png"/>
 	<server_settings>
 		<param name="FTP_HOST" type="string" label="Host" description="Ftp Host to connect to" mandatory="true"/>
@@ -7,16 +7,11 @@
 		<param name="PATH" type="string" label="Path" description="Real path to the root folder on the server" mandatory="true" default="/"/>
 		<param name="FTP_SECURE" type="boolean" label="Secure" description="Whether to use ftp or ftps protocol" mandatory="true" default="false"/>
 		<param name="FTP_DIRECT" type="boolean" label="Active" description="Whether to use active or passive" mandatory="true" default="false"/>
-		<param name="FTP_USER" type="string" label="User" description="Ftp User name - Can be overriden on a per-user basis." mandatory="false"/>
-		<param name="FTP_PASS" type="password" label="Password" description="Ftp User password - Can be overriden on a per-user basis." mandatory="false"/>
-		<param name="USE_SESSION_CREDENTIALS" type="boolean" label="Use session credentials" description="Try to use the current AjaXplorer user credentials for connecting" mandatory="false" default="false"/>
 		<param name="FIX_PERMISSIONS" type="string" label="Fix Permissions" description="How to handle remote permissions to be used by PHP as local permissions. See manual." mandatory="false" default="detect_remote_user_id"/>		
 		<param name="CHARSET" type="string" label="Character encoding" description="When not advertized by server, use this encoding" mandatory="true" default="ISO-8859-1"/>
 		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>		
 		<param name="RECYCLE_BIN" type="string" label="Recycle folder" description="Buffer before real suppression of files on the server."/>
 	    <param name="TMP_UPLOAD" type="string" label="Temporary Folder" description="Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." default="/tmp" mandatory="true"/>
-		<user_param name="FTP_USER" type="string" label="User" description="Ftp User name" mandatory="false"/>
-		<user_param name="FTP_PASS" type="password" label="Password" description="Ftp User password" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
 		<client_configs>

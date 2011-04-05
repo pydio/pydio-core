@@ -402,6 +402,9 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	
         $fixPermPolicy = $repoObject->getOption("FIX_PERMISSIONS");    	
     	$loggedUser = AuthService::getLoggedUser();
+    	if($loggedUser == null){
+    		return;
+    	}
     	$sessionKey = md5($repoObject->getId()."-".$loggedUser->getId()."-fixPermData");
 
     	
