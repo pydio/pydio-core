@@ -579,6 +579,28 @@ class ConfService
 	}
 	
 	public static function availableDriversToXML($filterByTagName = "", $filterByDriverName=""){
+		$nodeList = AJXP_PluginsService::searchAllManifests("//ajxpdriver", "node");
+		$xmlBuffer = "";
+		foreach($nodeList as $node){
+			$dName = $node->getAttribute("name");
+			if($filterByDriverName != "" && $dName != $filterByDriverName) continue;
+			if($filterByTagName == ""){
+				$xmlBuffer .= $node->ownerDocument->saveXML($node);
+				continue;
+			}
+			$q = new DOMXPath($node->ownerDocument);			
+			$cNodes = $q->query("//".$filterByTagName, $node);
+			$nodeAttr = $node->attributes;
+			$xmlBuffer .= "<ajxpdriver ";
+			foreach($node->attributes as $attr) $xmlBuffer.= " $attr->name=\"$attr->value\" ";
+			$xmlBuffer .=">";
+			foreach($cNodes as $child){
+				$xmlBuffer .= $child->ownerDocument->saveXML($child);
+			}
+			$xmlBuffer .= "</ajxpdriver>";
+		}
+		return $xmlBuffer;
+		/*
 		$manifests = array();
 		$base = INSTALL_PATH."/plugins";
 		$xmlString = "";
@@ -610,6 +632,7 @@ class ConfService
 			closedir($fp);
 		}
 		return str_replace("\t", "", str_replace("\n", "", $xmlString));
+		*/
 	}
 
  	/**
