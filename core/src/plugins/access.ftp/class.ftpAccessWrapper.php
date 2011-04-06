@@ -310,6 +310,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 	protected function rawListEntryToStat($entry, $filterStatPerms = false){
         $info = array();    
 		$vinfo = preg_split("/[\s]+/", $entry, 9);
+		AJXP_Logger::debug("RAW LIST", $entry);
 		$statValue = array();
 		if ($vinfo[0] !== "total")
        	{
@@ -332,6 +333,8 @@ class ftpAccessWrapper implements AjxpWrapper {
 		 	$info["time"] = '09:00';
 		 	$info["year"] = $info["timeOrYear"];
 		 }
+		 $statValue[4] = $statValue["uid"] = $info["owner"];
+		 $statValue[5] = $statValue["gid"] = $info["group"];
     	 $filedate  = trim($info['day'])." ".trim($info['month'])." ".trim($info['year'])." ".trim($info['time']);
     	 $statValue[9] = $statValue["mtime"]  = strtotime($filedate);
     	 
