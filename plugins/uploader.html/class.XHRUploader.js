@@ -451,8 +451,8 @@ Class.create("XHRUploader", {
 	submitNext : function(){
 
 		if(item = this.getNextItem()){
-			this.sendFile(item);
-			//this.sendFileMultipart(item);
+			//this.sendFile(item);
+			this.sendFileMultipart(item);
 		}else{
 			ajaxplorer.fireContextRefresh();
 			if(this.optionPane.autoCloseCheck.checked){
@@ -503,25 +503,6 @@ Class.create("XHRUploader", {
 	        	this.updateTotalData();
 			}
 		}.bind(this), false);
-		
-		/*
-        upload.onload  = function(rpe){
-            setTimeout(function(){
-                if(xhr.readyState === 4){
-                	item.pgBar.setPercentage(100);
-                	item.status = 'loaded';
-                	item.statusText.update('[loaded]');
-                }
-                if(xhr.responseText && xhr.responseText != 'OK'){
-                	alert(xhr.responseText);
-		        	item.status = 'error';
-		        	item.statusText.update('[error]');
-                }
-                this.updateTotalData();
-                this.submitNext();
-            }.bind(this), 15);
-        }.bind(this);
-        */
         
 		xhr.onreadystatechange = function() {  
 			if (xhr.readyState == 4) {
@@ -562,60 +543,115 @@ Class.create("XHRUploader", {
         item.xhr = xhr;
 	},
 	
-	sendFileMultipart : 
-	(window.Blob? 
-	function(item){
-		
+	
+	sendFileMultipart : function(item){
+		var fileReader = new FileReader();
 		var file = item.file;
-		var fileName = file.name;  
-		var fileSize = file.size;  
-		
-		this.cursor = 0;
-		this.fIndex = 0;
-		this.chunkLength = 10 * 1024 * 1024;		
-		this.item = item;		
-		this.fileName = fileName;
-		this.fileSize  = file.size;
-		
-		this.sendNextBlob();
-		
-		return true;  		
-		
-		
-	}:function(item){
-		
-		var file = item.file;
-		var fileName = file.name;  
-		var fileSize = file.size;  
-		var reader = new FileReader();
-		this.item = item;
-		
-		reader.onload = function(){
+		fileReader.onload = function(e){
+			this.xhrSendAsBinary(file.name, e.target.result, e.target.result.length, item)
+		}.bind(this);
+		fileReader.readAsBinaryString(file);
+	},
+	
+	
+	
 
-			item.statusText.update('[building query]');
-			this.fileData = reader.result;
-			this.fileName = fileName;
+	xhrSendAsBinary : function(fileName, fileData, dataLength, item, completeCallback){
+		var boundary = '----MultiPartFormBoundary' + (new Date()).getTime();  
+		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&simple_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
+		  
+		var xhr = new XMLHttpRequest(); 	  
+		xhr.open("POST", uri, true);  
+		xhr.setRequestHeader("Content-Type", "multipart/form-data, boundary="+boundary);  
+		item.pgBar.setPercentage(0);
+		xhr.onprogress = function(e){
+			if (e.lengthComputable) {  
+				var percentage = Math.round((e.loaded * 100) / e.total);  
+	        	item.pgBar.setPercentage(percentage);
+			}
+		};
+		
+		xhr.onreadystatechange = function() {  
+			if (xhr.readyState == 4) {
+				item.pgBar.setPercentage(100);
+				item.status = 'loaded';
+				item.statusText.update('[loaded]');
+
+				if ((xhr.status >= 200 && xhr.status <= 200) || xhr.status == 304) {
+					if (xhr.responseText != "") {
+						item.statusText.update('[done]');
+						//alert(xhr.responseText); // display response.
+					}
+					if(completeCallback){
+						completeCallback();
+					}
+				}
+			}
+		};
+		
+		var body = "--" + boundary + "\r\n";  
+		body += "Content-Disposition: form-data; name='userfile_0'; filename='" + unescape(encodeURIComponent(fileName)) + "'\r\n";  
+		body += "Content-Type: application/octet-stream\r\n\r\n";  
+		body += fileData + "\r\n";  
+		body += "--" + boundary + "--\r\n";  
+		  
+		xhr.sendAsBinary(body);  		
+	},
+	
+	sendFileChunked : 
+		(window.Blob? 
+		function(item){
+			
+			var file = item.file;
+			var fileName = file.name;  
+			var fileSize = file.size;  
+			
 			this.cursor = 0;
 			this.fIndex = 0;
-			this.chunkLength = 5 * 1024 * 1024;
-			this.sendNextChunk();
+			this.chunkLength = 10 * 1024 * 1024;		
+			this.item = item;		
+			this.fileName = fileName;
+			this.fileSize  = file.size;
+			
+			this.sendNextBlob();
+			
+			return true;  		
+			
+			
+		}:function(item){
+			
+			var file = item.file;
+			var fileName = file.name;  
+			var fileSize = file.size;  
+			var reader = new FileReader();
+			this.item = item;
+			
+			reader.onload = function(){
 
-		}.bind(this);
+				item.statusText.update('[building query]');
+				this.fileData = reader.result;
+				this.fileName = fileName;
+				this.cursor = 0;
+				this.fIndex = 0;
+				this.chunkLength = 5 * 1024 * 1024;
+				this.sendNextChunk();
+
+			}.bind(this);
+			
+			reader.onprogress = function(evt){
+			    if (evt.lengthComputable) {
+			      var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+			      this.item.statusText.update('[reading '+percentLoaded+'%]');
+			    }				
+			}.bind(this);
+			
+			item.statusText.update('[reading data]');
+			reader.readAsBinaryString(file);
+			
+			return true;  		
+			
+		}),	
 		
-		reader.onprogress = function(evt){
-		    if (evt.lengthComputable) {
-		      var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
-		      this.item.statusText.update('[reading '+percentLoaded+'%]');
-		    }				
-		}.bind(this);
-		
-		item.statusText.update('[reading data]');
-		reader.readAsBinaryString(file);
-		
-		return true;  		
-		
-	}),	
-	
 	sendNextChunk : function(){
 		if(this.fileData && this.cursor < this.fileData.length){
 			var chunk = this.fileData.substring(this.cursor, this.cursor+this.chunkLength);
@@ -682,60 +718,8 @@ Class.create("XHRUploader", {
 			ajaxplorer.fireContextRefresh();
 		};
 		conn.sendAsync();
-	},
-	
-	xhrSendAsBinary : function(fileName, fileData, dataLength, item, completeCallback){
-		var boundary = "xxxxxxxxx";  
-		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&simple_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
-		  
-		var xhr = new XMLHttpRequest();  
-		  
-		xhr.open("POST", uri, true);  
-		xhr.setRequestHeader("Content-Type", "multipart/form-data, boundary="+boundary); // simulate a file MIME POST request.  
-		//xhr.setRequestHeader("Content-Length", dataLength);  
-		item.pgBar.setPercentage(0);
-		xhr.onprogress = function(e){
-			if (e.lengthComputable) {  
-				var percentage = Math.round((e.loaded * 100) / e.total);  
-	        	item.pgBar.setPercentage(percentage);
-			}
-		};
-
-		/*
-		xhr.upload.addEventListener("progress", function(e){
-			if (e.lengthComputable) {  
-				var percentage = Math.round((e.loaded * 100) / e.total);  
-	        	item.pgBar.setPercentage(percentage);
-			}
-		}, false);
-		*/
-		
-		xhr.onreadystatechange = function() {  
-			if (xhr.readyState == 4) {
-				item.pgBar.setPercentage(100);
-				item.status = 'loaded';
-				item.statusText.update('[loaded]');
-
-				if ((xhr.status >= 200 && xhr.status <= 200) || xhr.status == 304) {
-					if (xhr.responseText != "") {
-						item.statusText.update('[done]');
-						//alert(xhr.responseText); // display response.
-					}
-					if(completeCallback){
-						completeCallback();
-					}
-				}
-			}
-		}
-		  
-		var body = "--" + boundary + "\r\n";  
-		body += "Content-Disposition: form-data; name='userfile_0'; filename='" + fileName + "'\r\n";  
-		body += "Content-Type: application/octet-stream\r\n\r\n";  
-		body += fileData + "\r\n";  
-		body += "--" + boundary + "--";  
-		  
-		xhr.sendAsBinary(body);  		
 	}
+			
 	
 });
 		
@@ -755,5 +739,5 @@ if(!XMLHttpRequest.prototype.sendAsBinary){
 	       }
 	       var blob = bb.getBlob();
 	       this.send(blob);
-	}
+	};
 }
