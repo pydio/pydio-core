@@ -192,7 +192,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 			foreach ($contents as $entry){
 				$res = $this->rawListEntryToStat($entry);
 				AJXP_Logger::debug("RAWLISTENTRY ".$res["name"], $res["stat"]);
-				AbstractAccessDriver::fixPermissions($res, ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+				AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
 				
 				if($res["name"] == $this->safeBasename($serverPath)){
 					$statValue = $res["stat"];					
@@ -204,7 +204,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$contents = $this->rawList($link, $serverPath, 'f');		
 	    	if(count($contents) == 1){
 	    		$res = $this->rawListEntryToStat($contents[0]);
-	    		AbstractAccessDriver::fixPermissions($res, ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
+	    		AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
     			$statValue = $res["stat"];
     			AJXP_Logger::debug("STAT FILE $serverPath", $statValue);
 	    		return $statValue;
@@ -452,7 +452,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 	        $link = @ftp_connect($this->host, $this->port);
    		}
         if(!$link) {
-            throw new AJXP_Exception("Cannot connect to FTP server!");	               
+            throw new AJXP_Exception("Cannot connect to FTP server ($this->host, $this->port)");	               
  	    }
 		//register_shutdown_function('ftp_close', $link);
         @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
