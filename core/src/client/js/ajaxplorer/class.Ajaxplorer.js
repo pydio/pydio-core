@@ -84,7 +84,7 @@ Class.create("Ajaxplorer", {
 		this.initObjects();
 		window.setTimeout(function(){
 			document.fire('ajaxplorer:loaded');
-		}, 500);		
+		}, 200);		
 	},
 	/**
 	 * Loads the XML Registry, an image of the application in its current state
