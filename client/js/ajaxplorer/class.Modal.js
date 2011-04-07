@@ -459,7 +459,7 @@ Class.create("Modal", {
 		this.messageContent.update(message);
 		var container = $('content_pane');
 		if(!container){
-			container = $('ajxp_desktop');
+			container = $(ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
 		}
 		var containerOffset = Position.cumulativeOffset(container);
 		var containerDimensions = container.getDimensions();
