@@ -412,6 +412,21 @@ Class.create("XHRUploader", {
 		};
 		item.pgBar = new JS_BRAMUS.jsProgressBar(div, 0, options);
 		item.statusText = statusText;
+		item.updateProgress = function(computableEvent, percentage){
+			if(percentage == null){
+				percentage = Math.round((computableEvent.loaded * 100) / computableEvent.total);  
+	        	this.bytesLoaded = computableEvent.loaded;				
+			}
+			if(!this.percentValue || this.percentValue != percentage){
+				this.percentText.innerHTML = percentage + '%';
+				this.pgBar.setPercentage(percentage);
+			}
+			this.percentValue = percentage;
+		}.bind(item);
+		item.updateStatus = function(status){
+			this.status = status;
+			this.statusText.innerHTML = "["+status+"]";
+		}.bind(item);
 	},
 	
 	updateTotalData : function(){
@@ -471,10 +486,86 @@ Class.create("XHRUploader", {
 		return false;
 	},
 	
-	sendFile : function(item){
+	
+	initializeXHR : function(item, queryStringParam){
+
+		var xhr = new XMLHttpRequest(); 	  
+		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
+		if(queryStringParam){
+			uri += '&' + queryStringParam;
+		}
 		
-    	item.status = 'loading';
-    	item.statusText.update('[loading]');
+		var upload = xhr.upload;
+		upload.addEventListener("progress", function(e){
+			if (!e.lengthComputable) return;
+			item.updateProgress(e);
+        	this.updateTotalData();
+		}.bind(this), false);
+		xhr.onreadystatechange = function() {  
+			if (xhr.readyState == 4) {
+				item.updateProgress(null, 100);
+				item.updateStatus('loaded');
+
+				if (xhr.responseText && xhr.responseText != 'OK') {
+					alert(xhr.responseText); // display response.
+					item.updateStatus('error');
+				}
+                this.updateTotalData();
+                this.submitNext();				
+			}
+		}.bind(this);        
+        
+        upload.onerror = function(){
+			item.updateStatus('error');
+        };		
+
+		xhr.open("POST", uri, true);   
+        return xhr;
+		
+	},
+	
+	sendFileMultipart : function(item){
+		var xhr = this.initializeXHR(item);
+		var file = item.file;
+        item.updateProgress(null, 0);
+		item.updateStatus('loading');		
+		if(window.FormData){
+			this.sendFileUsingFormData(xhr, file);
+		}else if(window.FileReader){
+			var fileReader = new FileReader();
+			fileReader.onload = function(e){
+				this.xhrSendAsBinary(xhr, file.name, e.target.result, item)
+			}.bind(this);
+			fileReader.readAsBinaryString(file);
+		}else if(file.getAsBinary){
+			window.testFile = file;
+			var data = file.getAsBinary();
+			this.xhrSendAsBinary(xhr, file.name, data, item)
+		}
+	},
+	
+	sendFileUsingFormData : function(xhr, file){
+        var formData = new FormData();
+        formData.append("userfile_0", file);
+        xhr.send(formData);
+	},	
+
+	xhrSendAsBinary : function(xhr, fileName, fileData, item, completeCallback){
+		var boundary = '----MultiPartFormBoundary' + (new Date()).getTime();  
+		xhr.setRequestHeader("Content-Type", "multipart/form-data, boundary="+boundary);  
+
+		var body = "--" + boundary + "\r\n";  
+		body += "Content-Disposition: form-data; name='userfile_0'; filename='" + unescape(encodeURIComponent(fileName)) + "'\r\n";  
+		body += "Content-Type: application/octet-stream\r\n\r\n";  
+		body += fileData + "\r\n";  
+		body += "--" + boundary + "--\r\n";  
+
+		xhr.sendAsBinary(body);  		
+	},
+	
+	sendFileAsInputStream : function(item){
+		
+		item.updateStatus('loading');
 		
     	var auto_rename = false;
 		if(this.crtContext.fileNameExists(item.file.fileName))
@@ -526,7 +617,7 @@ Class.create("XHRUploader", {
         	item.statusText.update('[error]');        	
         };
         
-        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
+        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&input_stream=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
         if(auto_rename){
         	url += '&auto_rename=true';
         }
@@ -537,66 +628,12 @@ Class.create("XHRUploader", {
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.setRequestHeader("X-File-Name", item.file.fileName);
         xhr.setRequestHeader("X-File-Size", item.file.fileSize);
-        //xhr.setRequestHeader("Content-Type", "multipart/form-data");
+        xhr.setRequestHeader("Content-Type", item.file.type);
         xhr.send(item.file);		
         
         item.xhr = xhr;
 	},
 	
-	
-	sendFileMultipart : function(item){
-		var fileReader = new FileReader();
-		var file = item.file;
-		fileReader.onload = function(e){
-			this.xhrSendAsBinary(file.name, e.target.result, e.target.result.length, item)
-		}.bind(this);
-		fileReader.readAsBinaryString(file);
-	},
-	
-	
-	
-
-	xhrSendAsBinary : function(fileName, fileData, dataLength, item, completeCallback){
-		var boundary = '----MultiPartFormBoundary' + (new Date()).getTime();  
-		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&simple_uploader=true&dir="+encodeURIComponent(this.crtContext.getContextNode().getPath());
-		  
-		var xhr = new XMLHttpRequest(); 	  
-		xhr.open("POST", uri, true);  
-		xhr.setRequestHeader("Content-Type", "multipart/form-data, boundary="+boundary);  
-		item.pgBar.setPercentage(0);
-		xhr.onprogress = function(e){
-			if (e.lengthComputable) {  
-				var percentage = Math.round((e.loaded * 100) / e.total);  
-	        	item.pgBar.setPercentage(percentage);
-			}
-		};
-		
-		xhr.onreadystatechange = function() {  
-			if (xhr.readyState == 4) {
-				item.pgBar.setPercentage(100);
-				item.status = 'loaded';
-				item.statusText.update('[loaded]');
-
-				if ((xhr.status >= 200 && xhr.status <= 200) || xhr.status == 304) {
-					if (xhr.responseText != "") {
-						item.statusText.update('[done]');
-						//alert(xhr.responseText); // display response.
-					}
-					if(completeCallback){
-						completeCallback();
-					}
-				}
-			}
-		};
-		
-		var body = "--" + boundary + "\r\n";  
-		body += "Content-Disposition: form-data; name='userfile_0'; filename='" + unescape(encodeURIComponent(fileName)) + "'\r\n";  
-		body += "Content-Type: application/octet-stream\r\n\r\n";  
-		body += fileData + "\r\n";  
-		body += "--" + boundary + "--\r\n";  
-		  
-		xhr.sendAsBinary(body);  		
-	},
 	
 	sendFileChunked : 
 		(window.Blob? 
