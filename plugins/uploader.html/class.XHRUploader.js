@@ -316,7 +316,7 @@ Class.create("XHRUploader", {
 			// FOLDER!
 			alert(MessageHash[336]);
 			return;
-		}else if(Prototype.Browser.WebKit && (file.type == ""  || !getBaseName(file.fileName).indexOf("."))){
+		}else if(Prototype.Browser.WebKit && !getBaseName(file.fileName).indexOf(".")){
 			var res = confirm(MessageHash[395]);
 			if(!res){
 				return;
