@@ -16,7 +16,7 @@
 		]]></dialogOnOpen>        
 		<activeCondition><![CDATA[
 			var xhrUpload = (typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span') && (window.FileReader || window.FormData) );
-			return (ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE)) && ! xhrUpload );
+			return (ajaxplorer.actionBar.getFlashVersion() >= 8 && (document.location.href.substring(0,5)!='https' || Prototype.Browser.IE) && ! xhrUpload );
 		]]></activeCondition>
 	</processing>
 	<registry_contributions>
