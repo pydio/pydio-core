@@ -48,10 +48,10 @@ class SimpleUploadProcessor extends AJXP_Plugin {
 	}
 	
 	public function preProcess($action, &$httpVars, &$fileVars){
-		if(!isSet($httpVars["xhr_uploader"])){
+		if(!isSet($httpVars["input_stream"])){
 			return false;
 		}
-		AJXP_Logger::debug("SimpleUpload::preProcess", $httpVars);
+		//AJXP_Logger::debug("SimpleUpload::preProcess", $httpVars);
 				
 	    $headersCheck = (
 	        // basic checks
