@@ -83,9 +83,13 @@ Class.create("FilesList", SelectableElements, {
 			}			
 			this.crtContext = newContext;
 			if(this.crtContext.isLoaded()) {
-				this.contextObserver();			
+				this.contextObserver(event);			
 			}else{
-				this.crtContext.observeOnce("loaded", loadObserver);
+				var oThis = this;
+				this.crtContext.observeOnce("loaded", function(){
+					oThis.crtContext = this ;
+					loadObserver();
+				});
 			}
 			this.crtContext.observe("loaded",loadEndObs);
 			this.crtContext.observe("loading",loadingObs);				
@@ -206,7 +210,7 @@ Class.create("FilesList", SelectableElements, {
 	/**
 	 * Handler for contextChange event 
 	 */
-	contextObserver : function(){
+	contextObserver : function(e){
 		if(!this.crtContext) return;
 		//console.log('FILES LIST : FILL');
 		this.fill(this.crtContext);

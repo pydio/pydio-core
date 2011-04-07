@@ -90,6 +90,16 @@ define("HTTPS_POLICY_FILE", "");
  */
 define("AJXP_TMP_DIR", "");
 
+/********************************************
+ * CUSTOM VARIABLES HOOK
+ ********************************************/
+/**
+ * This is a sample "hard" hook, directly included. See directly the HookDemo class
+ * for more explanation.
+ */
+//require_once AJXP_INSTALL_PATH."/plugins/hook.demo/class.HookDemo.php";
+//AJXP_Controller::registerIncludeHook("vars.filter", array("HookDemo", "filterVars"));
+
 /*********************************************************/
 /* PLUGINS DEFINITIONS
 /* Drivers will define how the application will work. For 
@@ -126,7 +136,7 @@ $PLUGINS = array(
 			"LOGIN_REDIRECT"		=> false,
 			"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser",
 			"AUTOCREATE_AJXPUSER" 	=> false, 
-			"TRANSMIT_CLEAR_PASS"	=> false)
+			"TRANSMIT_CLEAR_PASS"	=> false )
 	),
 	"LOG_DRIVER" => array(
 	 	"NAME" => "text",

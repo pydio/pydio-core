@@ -244,7 +244,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 
 
 WebFXTreeAbstractNode.prototype.updateLabel = function(label){
-	$(this.id+'-label').update(label);	
+	if($(this.id+'-label')) $(this.id+'-label').update(label);	
 };
 
 WebFXTreeAbstractNode.prototype.toggle = function() {
