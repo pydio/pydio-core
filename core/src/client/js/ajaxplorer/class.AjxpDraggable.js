@@ -151,7 +151,7 @@ Class.create("AjxpDraggable", Draggable, {
 			$(this._clone).addClassName("ajxp_draggable");
 			$(this._clone).addClassName('multiple_selection_draggable');
 			this._clone.setAttribute('user_selection', 'true');
-			$('ajxp_desktop').insert(this._clone);
+			$(ajxpBootstrap.parameters.get("MAIN_ELEMENT")).insert(this._clone);
 			this.original = this.element;
 			this.element = this._clone;			
 			var max = Math.min(nodes.length,5);
