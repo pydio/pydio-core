@@ -429,6 +429,7 @@ $mess=array(
 "393" => "Attention, les noms de fichiers sont limités à %s caractères, celui-ci sera tronqué!",
 "394" => "Désolé, pour le moment la fonctionnalité de partage des utilisateurs ne fonctionne pour le driver d'authentification utilisé (les utilisateurs ne sont pas éditables). En revanche le partage de fichier fonctionne.",
 "395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
+"396" => "Méthode",
 /* END SENTENCE */
 );
 ?>
