@@ -140,8 +140,11 @@ class AJXP_XMLWriter
 		$xml = str_replace("AJXP_MIMES_IMAGE", AJXP_Utils::getAjxpMimes("image"), $xml);
 		$xml = str_replace("AJXP_MIMES_AUDIO", AJXP_Utils::getAjxpMimes("audio"), $xml);
 		$xml = str_replace("AJXP_MIMES_ZIP", AJXP_Utils::getAjxpMimes("zip"), $xml);
-		$loginRedirect = ConfService::getAuthDriverImpl()->getLoginRedirect();
-		$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
+		$authDriver = ConfService::getAuthDriverImpl();
+		if($authDriver != NULL){
+			$loginRedirect = $authDriver->getLoginRedirect();
+			$xml = str_replace("AJXP_LOGIN_REDIRECT", ($loginRedirect!==false?"'".$loginRedirect."'":"false"), $xml);
+		}
         $xml = str_replace("AJXP_REMOTE_AUTH", "false", $xml);
         $xml = str_replace("AJXP_NOT_REMOTE_AUTH", "true", $xml);
         $xml = str_replace("AJXP_ALL_MESSAGES", "MessageHash=".json_encode(ConfService::getMessages()).";", $xml);
