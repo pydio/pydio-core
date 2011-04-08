@@ -47,7 +47,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 	var $drivers =  array();
 	
 	function init($options){
-		parent::init($options);
+		//parent::init($options);
+		$this->options = $options;
 		$this->driversDef = $this->getOption("DRIVERS");
 		foreach($this->driversDef as $def){
 			$name = $def["NAME"];
@@ -59,18 +60,66 @@ class multiAuthDriver extends AbstractAuthDriver {
 			$instance->init($options);
 			$this->drivers[$name] = $instance;
 		}
-		$this->setCurrentDriverName($this->getOption("MASTER_DRIVER"));
+		// THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
+		// WILL BE CALLED LATER, TO BE SURE THAT THE
+		// SESSION IS ALREADY STARTED.
 	}
 	
-	public function getRegistryContributions(){
-		return $this->getCurrentDriver()->getRegistryContributions();
+	function getRegistryContributions(){
+		AJXP_Logger::debug("get contributions NOW");
+		$this->loadRegistryContributions();
+		return parent::getRegistryContributions();
+	}
+		
+	private function detectCurrentDriver(){
+		//if(isSet($this->currentDriver)) return;
+		$authSource = $this->getOption("MASTER_DRIVER");
+		if(isSet($_POST["auth_source"])){
+			$_SESSION["AJXP_MULTIAUTH_SOURCE"] = $_POST["auth_source"];
+			$authSource = $_POST["auth_source"];
+			AJXP_Logger::debug("Auth source from POST");
+		}else if(isSet($_SESSION["AJXP_MULTIAUTH_SOURCE"])){
+			$authSource = $_SESSION["AJXP_MULTIAUTH_SOURCE"];
+			AJXP_Logger::debug("Auth source from SESSION");
+		}else {
+			AJXP_Logger::debug("Auth source from MASTER");
+		}
+		$this->setCurrentDriverName($authSource);		
 	}
 	
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
+		if($contribNode->nodeName != "actions") return ;
+		// Replace callback code
+		$actionXpath=new DOMXPath($contribNode->ownerDocument);
+		$loginCallbackNodeList = $actionXpath->query('action[@name="login"]/processing/clientCallback', $contribNode);
+		if(!$loginCallbackNodeList->length) return ;
+		$xmlContent = file_get_contents(AJXP_INSTALL_PATH."/plugins/auth.multi/login_patch.xml");
+		$sources = array();
+		foreach($this->getOption("DRIVERS") as $driverDef){
+			$dName = $driverDef["NAME"];
+			if(isSet($driverDef["LABEL"])){
+				$dLabel = $driverDef["LABEL"];
+			}else{
+				$dLabel = $driverDef["NAME"];
+			}
+			$sources[$dName] = $dLabel;
+		}
+		$xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
+		$patchDoc = DOMDocument::loadXML($xmlContent);
+		$patchNode = $patchDoc->documentElement;
+		$imported = $contribNode->ownerDocument->importNode($patchNode, true);
+		$loginCallback = $loginCallbackNodeList->item(0);
+		$loginCallback->parentNode->replaceChild($imported, $loginCallback);
+		//var_dump($contribNode->ownerDocument->saveXML($contribNode));
+	}
+		
 	function setCurrentDriverName($name){
 		$this->currentDriver = $name;
 	}
 	
 	function getCurrentDriver(){
+		$this->detectCurrentDriver();
 		if(isSet($this->currentDriver) && isSet($this->drivers[$this->currentDriver])){
 			return $this->drivers[$this->currentDriver];
 		}else{
@@ -111,6 +160,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function checkPassword($login, $pass, $seed){
+		AJXP_Logger::debug("Checking password on ".get_class($this->getCurrentDriver()));
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->checkPassword($login, $pass, $seed);
 		}else{
@@ -131,6 +181,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 			return $this->getCurrentDriver()->passwordsEditable();
 		}else{
 			//throw new Exception("No driver instanciated in multi driver!");
+			AJXP_Logger::debug("passEditable no current driver set??");
 			return false;
 		}		
 	}
