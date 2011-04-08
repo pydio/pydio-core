@@ -91,7 +91,6 @@ class PThumb{
 	 */
     var $remote_check = true;
     public $remote_wrapper = "";
-	
     /**
 	     * END Configuration Section
 	     * There should be no need to touch anything below this line.
@@ -293,7 +292,7 @@ class PThumb{
 	     * 
 	     */
      
-     function print_thumbnail($image,$width,$height,$return_img = false, $display_inline = true){
+     function print_thumbnail($image,$width,$height,$return_img = false, $display_inline = true, $target_file=false){
         //Check parameters
         if (empty($image) || empty($width) ||empty($height)){
             return $this -> set_error("Method print_thumbnail: Missing Parameters");
@@ -345,9 +344,10 @@ class PThumb{
             
             //Check if a version exists
             $cache_file = $this -> cache_dir.sha1($transformed).".".$width.".".$height.".".$hash.".".$this->file_ext[$format];
-            if (file_exists($cache_file)){            	
+            if (file_exists($cache_file)){   
                 if ($return_img == false){
-					//die($cache_file);
+            		AJXP_Logger::debug("Using Cache");         	
+                	//die($cache_file);
 		            header("Expires: " . gmdate("D, d M Y H:i:s") . " GMT");        
 		            header("Cache-Control: no-store, no-cache, must-revalidate");
 		            header("Pragma: no-cache"); 
@@ -458,6 +458,33 @@ class PThumb{
             if (!$cached){
                 return $this -> set_error("Method print_thumbnail: Error in cache generation of image '$image'.");
             }
+        }
+        if ($target_file != false){
+            switch ($format){
+                case 1:
+                    $cached = @imagegif($thumbnail,$target_file);
+                    break;
+                case 2:
+                    $cached = @imageJPEG($thumbnail,$target_file,100);
+                    break;
+                case 3:
+                    $cached = @imagepng($thumbnail,$target_file);
+                    break;
+                case 15:
+                    $cached = @imagewbmp($thumbnail,$target_file);
+                    break;
+                case 16:
+                    $cached = @imagexbm($thumbnail,$target_file);
+                    break;
+                default:
+                    $cached = false;
+            }
+            
+            if (!$cached){
+                return $this -> set_error("Method print_thumbnail: Error in cache generation of image '$image'.");
+            }
+            return true;
+        	
         }
         if ($return_img == false){
             header("Expires: " . gmdate("D, d M Y H:i:s") . " GMT");        
