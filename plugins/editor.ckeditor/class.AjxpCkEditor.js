@@ -163,6 +163,13 @@ Class.create("AjxpCkEditor", TextEditor, {
 	 		if(editor.document){
 	 			editor.document.on('keydown', keyDown);
 	 		}
+	 		// FIX FOR CKEDITORS > 3.4.3, THEY INSERT DOUBLE OVERLAY
+	 		editor.on( 'dialogShow' , function(e) {
+	 			var covers = $$("div.cke_dialog_background_cover");
+	 			if(covers.length > 1){
+	 				covers[0].remove();
+	 			}
+	 		} );
 		}.bind(this), 0);
 	},	
 	
