@@ -429,6 +429,7 @@ $mess=array(
 "393" => "Achtung, der Name muss kürzer als %s sein, dieser Dateiname wird abgeschnitten!",
 "394" => "Entschuldigung, aber zur Zeit ist das Teilen der Verzeichnisse (sharing) aufgrund des aktuellen Authentifizierungstreiber nicht möglich (Benutzer können nicht verändert werden). Aber das Datei-Sharing funktioniert.",
 "395" => "Das fallengelassene Element scheint ein Ordner zu sein und Verzeichnisse können nicht zum Server hochgeladen werden! Soll der Upload trotzdem gestartet werden?",
+"396" => "Auth. Method",
 /* END SENTENCE */
 );
 ?>

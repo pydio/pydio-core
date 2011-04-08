@@ -429,6 +429,7 @@ $mess=array(
 "393" => "Alerta, os nomes devem ter no máximo %s caracteres, este nome arquivo não é permitido!",
 "394" => "Lamento, mas no momento compartilhar pastas não é possível usando esta configuração(Usuário não são editáveis). Compartilhar arquivos ainda é permitido.",
 "395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
+"396" => "Auth. Method",
 /* END SENTENCE */
 );
 ?>

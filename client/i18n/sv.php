@@ -429,6 +429,7 @@ $mess=array(
 "393" => "Varning, längden på namnen måste vara kortare än %s, Namnet på denna fil kommer att avkortas!",
 "394" => "För tillfället är inte katalog delning möjlig för den aktuella auth drivaren (användarna är inte ändringsbara). Men det är fortfarande möjligt att dela filer.",
 "395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
+"396" => "Auth. Method",
 /* END SENTENCE */
 );
 ?>
