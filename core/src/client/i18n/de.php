@@ -430,6 +430,10 @@ $mess=array(
 "394" => "Entschuldigung, aber zur Zeit ist das Teilen der Verzeichnisse (sharing) aufgrund des aktuellen Authentifizierungstreiber nicht möglich (Benutzer können nicht verändert werden). Aber das Datei-Sharing funktioniert.",
 "395" => "Das fallengelassene Element scheint ein Ordner zu sein und Verzeichnisse können nicht zum Server hochgeladen werden! Soll der Upload trotzdem gestartet werden?",
 "396" => "Auth. Method",
+"397" => "Download chunked",
+"398" => "Download selected file by pieces",
+"399" => "Enter the number of pieces you want to download, then click the button and click on each file to download them.",
+"400" => "Number of pieces :",
 /* END SENTENCE */
 );
 ?>

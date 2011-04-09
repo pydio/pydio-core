@@ -431,6 +431,10 @@ $mess=array(
 "394" => "Sorry, at the moment folder sharing is not possible using the current auth driver (users are not editable). File sharing is still possible though.",
 "395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
 "396" => "Auth. Method",
+"397" => "Download chunked",
+"398" => "Download selected file by pieces",
+"399" => "Enter the number of pieces you want to download, then click the button and click on each file to download them.",
+"400" => "Number of pieces :",
 /* END SENTENCE */
 );
 ?>

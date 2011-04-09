@@ -277,6 +277,71 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+		<action name="download_chunk">
+			<gui text="397" title="398" src="download_manager.png" hasAccessKey="false">
+				<context selection="true" dir="" recycle="false"
+					actionBar="false" contextMenu="true" infoPanel="true" actionBarGroup="get">
+				</context>
+				<selectionContext dir="false" file="true" recycle="false" unique="true"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var userSelection = ajaxplorer.getUserSelection();
+
+					var loadFunc = function(oForm){													
+						var dObject = oForm.down('div[id="multiple_download_container"]');
+						var legendDiv = oForm.down('div.dialogLegend');
+						legendDiv.next("br").remove();
+						legendDiv.update(MessageHash[399]);
+						dObject.insert({before:'\
+							<div class="dialogButtons" id="chunk_dl_form" style="height:36px;"> \
+								<span style="display:inline-block;float:left;margin-top: 11px;margin-left: 4px;margin-right: 4px;">'+MessageHash[400]+'</span> <input type="text" style="float:left;margin-top:5px; text-align:right; width:30px;height:24px;" name="chunk_count" id="chunk_count" value="4"> \
+								<input type="image" style="float:left;" id="dl_form_submit" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" class="dialogButton dialogFocus">\
+							</div> \
+						'});
+						$("dl_form_submit").observe("click", function(e){
+							Event.stop(e);
+							var conn = new Connexion();
+							conn.addParameter("get_action", "prepare_chunk_dl"); 
+							conn.addParameter("chunk_count", $("chunk_count").value );
+							conn.addParameter("file", userSelection.getUniqueNode().getPath()); 
+							conn.onComplete = function(transp){
+								var chunkData = transp.responseJSON;
+								var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download_chunk&file_id='+chunkData.file_id);
+								downloader.triggerEnd = function(){hideLightBox();};
+								for(var i=0; i<chunkData.chunk_count;i++){
+									downloader.addListRow("&chunk_index=" + i, chunkData.localname + ".chunk." + i);
+								}
+							};
+							conn.sendAsync();							
+						});
+					};
+					var closeFunc = function(){
+						hideLightBox();
+						return false;
+					};
+					modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);						
+
+					]]></clientCallback>
+					<clientForm id="multi_download_form"><![CDATA[
+					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
+					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
+					<div id="multiple_download_container"></div>
+					<form style="display:inline;" action="content.php" method="GET" id="download_form" target="download_iframe">
+						<input type="hidden" name="get_action" value="download">
+						<input type="hidden" name="secure_token" value="">
+					</form>
+					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>					
+					</div>]]>
+					</clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+		</action>		
+		<action name="prepare_chunk_dl">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>						
 		<action name="public_url">
 			<gui text="292" title="292" src="public_url.png" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
