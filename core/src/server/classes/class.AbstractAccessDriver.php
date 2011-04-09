@@ -457,21 +457,29 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	}
 	    	
     	$p = $stat["mode"];
-    	AJXP_Logger::debug("FIX PERM DATA ($fixPermPolicy)", $data);
+    	$st = sprintf("%07o", ($p & 7777770));
+    	AJXP_Logger::debug("FIX PERM DATA ($fixPermPolicy, $st)".$p,sprintf("%o", ($p & 000777)));
     	if($p != NULL){
 	    	if( ( isSet($uid) && $stat["uid"] == $uid ) || $fixPermPolicy === "u"  ) {
-	    		AJXP_Logger::debug("Copy U to A");
-	    		if( $p&0x0100 ) $p += 04;
+    			AJXP_Logger::debug("upgrading abit to ubit");
+    			$p  = $p&7777770;
+    			if( $p&0x0100 ) $p += 04;
 	    		if( $p&0x0080 ) $p += 02;
-	    		if( $p & 0x0040 ) $p += 01;
+	    		if( $p&0x0040 ) $p += 01;
 	    	}else if( ( isSet($gid) && $stat["gid"] == $gid )  || $fixPermPolicy === "g"  ) {
-	    		// AJXP_Logger::debug("Copy G to A");
+	    		AJXP_Logger::debug("upgrading abit to gbit");
+    			$p  = $p&7777770;
 	    		if( $p&0x0020 ) $p += 04;
 	    		if( $p&0x0010 ) $p += 02;
 	    		if( $p&0x0008 ) $p += 01;
 	    	}	    	
 			$stat["mode"] = $stat[2] = $p;
+    		AJXP_Logger::debug("FIXED PERM DATA ($fixPermPolicy)",sprintf("%o", ($p & 000777)));
     	}
+    }
+    
+    protected function resetAllPermission($value){
+    	
     }
 
 }
