@@ -130,8 +130,8 @@ Class.create("Splitter", AjxpPane, {
 		
 		Event.observe(this.group, "mousemove", this.doSplitMouse.bind(this));
 		Event.observe(this.group, "mouseup", this.endSplit.bind(this));
-		// NEW HTML5!
-		this.splitbar.draggable = true;
+		// NEW HTML5 : set it to false to disable native draggable!
+		this.splitbar.draggable = false;
 	},
 	/**
 	 * Resize panes on drag event or manually
