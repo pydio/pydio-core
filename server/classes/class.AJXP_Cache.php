@@ -7,15 +7,44 @@ class AJXP_Cache {
 	protected $cacheDir;
 	protected $cacheId;
 	protected $masterFile;
+	protected $dataCallback;
 	
-	public static function getItem($pluginId, $filepath){
-		return new AJXP_Cache($pluginId,$filepath);
+	public static function getItem($pluginId, $filepath, $dataCallback){
+		return new AJXP_Cache($pluginId,$filepath, $dataCallback);
 	}
 	
-	public function AJXP_Cache($pluginId, $filepath){
+	public static function clearItem($pluginId, $filepath){
+		$inst = new AJXP_Cache($pluginId,$filepath, false);
+		AJXP_Logger::debug("SHOULD REMOVE ".$inst->getId());
+		if(file_exists($inst->getId())){
+			@unlink($inst->getId());
+		}
+	}
+	
+	
+	
+	public function AJXP_Cache($pluginId, $filepath, $dataCallback){
 		$this->cacheDir = AJXP_INSTALL_PATH."/server/tmp";
 		$this->masterFile = $filepath;
+		$this->dataCallback = $dataCallback;
 		$this->cacheId = $this->buildCacheId($pluginId, $filepath);
+	}
+	
+	public function getData(){
+		if(!$this->hasCachedVersion()){
+			AJXP_Logger::debug("caching data");
+			$result = call_user_func($this->dataCallback, $this->masterFile, $this->cacheId);
+			if($result !== false){
+				$this->touch();
+			}
+		}else{
+			AJXP_Logger::debug("getting from cache");
+		}
+		return file_get_contents($this->cacheId);
+	}
+	
+	public function writeable(){
+		return is_dir($this->cacheDir) && is_writeable($this->cacheDir);
 	}
 	
 	public function getId(){
