@@ -87,14 +87,8 @@ class ImagePreviewer extends AJXP_Plugin {
 	
 	public function removeThumbnail($oldFile, $newFile = null, $copy = false){
 		if($newFile == null || $copy = false){
-			$repository = ConfService::getRepository();
-			if(!$repository->detectStreamWrapper(true)){
-				return false;
-			}
-			$streamData = $repository->streamData;
-	    	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
-			$filePath = $destStreamURL . $oldFile;
-			AJXP_Cache::clearItem("diaporama_200", $filePath);			
+			AJXP_Logger::debug("Should find cache item ".$oldFile);
+			AJXP_Cache::clearItem("diaporama_200", $oldFile);			
 		}
 	}
 	
