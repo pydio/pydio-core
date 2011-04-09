@@ -27,6 +27,9 @@
 		</div>				
 	]]></clientForm>
 	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="move.metadata" methodName="removeThumbnail"></serverCallback>
+		</hooks>		
 		<actions>
 			<action name="slideshow_sel">
 				<gui text="234" title="234" src="frame_image.png" accessKey="" hasAccessKey="false">
