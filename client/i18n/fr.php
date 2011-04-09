@@ -430,6 +430,10 @@ $mess=array(
 "394" => "Désolé, pour le moment la fonctionnalité de partage des utilisateurs ne fonctionne pour le driver d'authentification utilisé (les utilisateurs ne sont pas éditables). En revanche le partage de fichier fonctionne.",
 "395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
 "396" => "Méthode",
+"397" => "Téléch. par morceaux",
+"398" => "Télécharger un fichier par morceaux",
+"399" => "Entrez le nombre de morceaux que vous voulez créer, cliquez sur le bouton OK, puis télécharger les différentes parties du fichiers.",
+"400" => "Nombre de morceaux :",
 /* END SENTENCE */
 );
 ?>

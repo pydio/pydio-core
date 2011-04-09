@@ -430,6 +430,10 @@ $mess=array(
 "394" => "Lamento, mas no momento compartilhar pastas não é possível usando esta configuração(Usuário não são editáveis). Compartilhar arquivos ainda é permitido.",
 "395" => "The item you dropped seem to be a folder, and folders cannot be uploaded to server! Are you sure you want to upload?",
 "396" => "Auth. Method",
+"397" => "Download chunked",
+"398" => "Download selected file by pieces",
+"399" => "Enter the number of pieces you want to download, then click the button and click on each file to download them.",
+"400" => "Number of pieces :",
 /* END SENTENCE */
 );
 ?>

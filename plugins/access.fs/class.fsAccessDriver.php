@@ -183,6 +183,45 @@ class fsAccessDriver extends AbstractAccessDriver
 				}
 				
 			break;
+
+			case "prepare_chunk_dl" : 
+
+				$chunkCount = intval($httpVars["chunk_count"]);
+				$fileId = $this->urlBase.$selection->getUniqueFile();
+				$sessionKey = "chunk_file_".md5($fileId.time());
+				$totalSize = filesize($fileId);
+				$chunkSize = intval ( $totalSize / $chunkCount ); 
+				$realFile  = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $fileId);
+				$chunkData = array(
+					"localname"	  => basename($fileId),
+					"chunk_count" => $chunkCount,
+					"chunk_size"  => $chunkSize,
+					"total_size"  => $totalSize, 
+					"file_id"	  => $sessionKey
+				);
+				
+				$_SESSION[$sessionKey] = array_merge($chunkData, array("file"=>$realFile));
+				HTMLWriter::charsetHeader("application/json");
+				print(json_encode($chunkData));
+
+			break;
+			
+			case "download_chunk" :
+				
+				$chunkIndex = intval($httpVars["chunk_index"]);
+				$chunkKey = $httpVars["file_id"];
+				$sessData = $_SESSION[$chunkKey];
+				$realFile = $sessData["file"];
+				$chunkSize = $sessData["chunk_size"];
+				$offset = $chunkSize * $chunkIndex;
+				if($chunkIndex == $sessData["chunk_count"]-1){
+					// Compute the last chunk real length
+					$chunkSize = $sessData["total_size"] - ($chunkSize * ($sessData["chunk_count"]-1));
+				}
+				$this->readFile($realFile, "force-download", $sessData["localname"].".chunk.".$chunkIndex, false, false, true, $offset, $chunkSize);
+				
+				
+			break;			
 		
 			case "compress" : 					
 					// Make a temp zip and send it as download					
@@ -806,7 +845,7 @@ class fsAccessDriver extends AbstractAccessDriver
 		return false;		
 	}
 	
-	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD, $realfileSystem=false)
+	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD, $realfileSystem=false, $byteOffset=-1, $byteLength=-1)
 	{
 		session_write_close();
 
@@ -819,7 +858,11 @@ class fsAccessDriver extends AbstractAccessDriver
         if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off'); }
 
 		$isFile = !$data && !$gzip; 		
-		$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
+		if($byteLength != -1){
+			$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
+		}else{
+			$size = $byteLength;
+		}
 		
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
@@ -932,9 +975,24 @@ class fsAccessDriver extends AbstractAccessDriver
 			if($realfileSystem){
 				AJXP_Logger::debug("realFS!", array("file"=>$filePathOrData));
 		    	$fp = fopen($filePathOrData, "rb");
+		    	if($byteOffset != -1){
+		    		fseek($fp, $byteOffset);
+		    	}	
+		    	$sentSize = 0;			
+		    	$readChunk = 4096;
 		    	while (!feof($fp)) {
-		 			$data = fread($fp, 4096);
-		 			fwrite($stream, $data, strlen($data));
+		    		if( $byteLength != -1 &&  ($sentSize + $readChunk) >= $byteLength){
+		    			// compute last chunk and break after
+		    			$readChunk = $byteLength - $sentSize;
+		    			$break = true;
+		    		}
+		 			$data = fread($fp, $readChunk);
+		 			$dataSize = strlen($data);
+		 			fwrite($stream, $data, $dataSize);
+		 			$sentSize += $dataSize;
+		 			if(isSet($break)){
+		 				break;
+		 			}
 		    	}
 		    	fclose($fp);
 			}else{
