@@ -162,6 +162,10 @@ class AbstractAuthDriver extends AJXP_Plugin {
 			return (isSet($_SESSION["AJXP_CURRENT_SEED"])?$_SESSION["AJXP_CURRENT_SEED"]:0);
 		}
 	}	
+	
+	function filterCredentials($userId, $pwd){
+		return array($userId, $pwd);
+	}
 		
 }
 ?>

@@ -46,7 +46,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	 */
 	var $drivers =  array();
 	
-	function init($options){
+	public function init($options){
 		//parent::init($options);
 		$this->options = $options;
 		$this->driversDef = $this->getOption("DRIVERS");
@@ -65,7 +65,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 		// SESSION IS ALREADY STARTED.
 	}
 	
-	function getRegistryContributions(){
+	public function getRegistryContributions(){
 		AJXP_Logger::debug("get contributions NOW");
 		$this->loadRegistryContributions();
 		return parent::getRegistryContributions();
@@ -106,6 +106,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 			$sources[$dName] = $dLabel;
 		}
 		$xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
+		$xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->getOption("MASTER_DRIVER"), $xmlContent);
 		$patchDoc = DOMDocument::loadXML($xmlContent);
 		$patchNode = $patchDoc->documentElement;
 		$imported = $contribNode->ownerDocument->importNode($patchNode, true);
@@ -114,11 +115,11 @@ class multiAuthDriver extends AbstractAuthDriver {
 		//var_dump($contribNode->ownerDocument->saveXML($contribNode));
 	}
 		
-	function setCurrentDriverName($name){
+	protected function setCurrentDriverName($name){
 		$this->currentDriver = $name;
 	}
 	
-	function getCurrentDriver(){
+	protected function getCurrentDriver(){
 		$this->detectCurrentDriver();
 		if(isSet($this->currentDriver) && isSet($this->drivers[$this->currentDriver])){
 			return $this->drivers[$this->currentDriver];
@@ -126,8 +127,16 @@ class multiAuthDriver extends AbstractAuthDriver {
 			return false;
 		}
 	}
+	
+	protected function extractRealId($userId){
+		$parts = explode("::", $userId);
+		if(count($parts) == 2){
+			return $parts[1];
+		}
+		return $userId;
+	}
 
-	function performChecks(){
+	public function performChecks(){
 		foreach($this->drivers as $driver){
 			$driver->performChecks();
 		}
@@ -152,6 +161,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function userExists($login){
+		$login = $this->extractRealId($login);
+		AJXP_Logger::debug("user exists ".$login);
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->userExists($login);
 		}else{
@@ -160,7 +171,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function checkPassword($login, $pass, $seed){
-		AJXP_Logger::debug("Checking password on ".get_class($this->getCurrentDriver()));
+		$login = $this->extractRealId($login);
+		AJXP_Logger::debug("check pass ".$login);
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->checkPassword($login, $pass, $seed);
 		}else{
@@ -187,6 +199,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function createUser($login, $passwd){
+		$login = $this->extractRealId($login);		
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->createUser($login, $passwd);
 		}else{
@@ -217,6 +230,10 @@ class multiAuthDriver extends AbstractAuthDriver {
 			throw new Exception("No driver instanciated in multi driver!");
 		}		
 	}
+	
+	function filterCredentials($userId, $pwd){
+		return array($this->extractRealId($userId), $pwd);
+	}	
 
 }
 ?>

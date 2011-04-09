@@ -2,6 +2,7 @@
 <clientCallback prepareModal="true"><![CDATA[
 	var loginRedirect = AJXP_LOGIN_REDIRECT;
 	var authSources = AJXP_MULTIAUTH_SOURCES;
+	var masterAuthSource = 'AJXP_MULTIAUTH_MASTER';
 	if(loginRedirect){
 		document.location.href=loginRedirect;
 	}else{
@@ -36,9 +37,14 @@
 			var oForm = modal.getForm();
 			var connexion = new Connexion();
 			connexion.addParameter('get_action', 'login');
-			connexion.addParameter('userid', oForm.userid.value);
+			var selectedSource = oForm.auth_source.value;
+			if(selectedSource == masterAuthSource){
+				connexion.addParameter('userid', oForm.userid.value);
+			}else{
+				connexion.addParameter('userid', selectedSource+'::'+oForm.userid.value);
+			}
 			connexion.addParameter('login_seed', oForm.login_seed.value);
-			connexion.addParameter('auth_source', oForm.auth_source.value);
+			connexion.addParameter('auth_source', selectedSource);
 			connexion.addParameter('remember_me', (oForm.remember_me.checked?"true":"false"));
 			if(oForm.login_seed.value != '-1'){
 				connexion.addParameter('password', hex_md5(hex_md5(oForm.password.value)+oForm.login_seed.value));

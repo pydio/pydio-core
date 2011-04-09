@@ -186,7 +186,8 @@ class AuthService
 
         // Setting session credentials if asked in config
         if(ConfService::getConf("SESSION_SET_CREDENTIALS")) {
-        	AJXP_Safe::storeCredentials($user_id, $pwd);
+        	list($authId, $authPwd) = $authDriver->filterCredentials($user_id, $pwd);
+        	AJXP_Safe::storeCredentials($authId, $authPwd);
         }
 
         $user = $confDriver->createUserObject($user_id);
