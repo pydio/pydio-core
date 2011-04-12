@@ -291,13 +291,19 @@ Class.create("Ajaxplorer", {
 	 */
 	refreshTemplateParts : function(){
 		var parts = XPathSelectNodes(this._registry, "client_configs/template_part");
+		var toUpdate = {};
 		for(var i=0;i<parts.length;i++){
 			var ajxpId = parts[i].getAttribute("ajxpId");
-			var ajxpClass = Class.getByName(parts[i].getAttribute("ajxpClass"));
-			var ajxpOptions = parts[i].getAttribute("ajxpOptions").evalJSON();
-			if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
-				this.refreshGuiComponent(ajxpId, ajxpClass, ajxpOptions);
+			var ajxpClassName = parts[i].getAttribute("ajxpClass");
+			var ajxpOptionsString = parts[i].getAttribute("ajxpOptions");
+			
+			var ajxpClass = Class.getByName(ajxpClassName);
+			if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){				
+				toUpdate[ajxpId] = [ajxpClass, ajxpClassName, ajxpOptionsString];
 			}
+		}
+		for(var id in toUpdate){
+			this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2]);
 		}
 	},
 	
@@ -308,10 +314,14 @@ Class.create("Ajaxplorer", {
 	 * @param ajxpClass IAjxpWidget A widget class
 	 * @param ajxpOptions Object A set of options that may have been decoded from json.
 	 */
-	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpOptions){
+	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString){
 		if(!window[ajxpId]) return;
 		// First destroy current component, unregister actions, etc.			
 		var oldObj = window[ajxpId];
+		if(oldObj.__className == ajxpClassName && oldObj.__ajxpOptionsString == ajxpOptionsString){
+			return;
+		}
+		var ajxpOptions = ajxpOptionsString.evalJSON();
 		if(Class.objectImplements(oldObj, "IFocusable")){
 			this._focusables = this._focusables.without(oldObj);
 		}
@@ -336,6 +346,8 @@ Class.create("Ajaxplorer", {
 			this.guiActions.update(obj.getActions());
 		}
 
+		obj.__ajxpOptionsString = ajxpOptionsString;
+		
 		window[ajxpId] = obj;
 		obj.resize();
 		delete(oldObj);
@@ -456,7 +468,12 @@ Class.create("Ajaxplorer", {
 	 * Load a Repository instance
 	 * @param repository Repository
 	 */
-	loadRepository: function(repository){		
+	loadRepository: function(repository){
+		
+		if(this.repositoryId != null && this.repositoryId == repository.getId()){
+			return;
+		}
+		
 		repository.loadResources();
 		var repositoryId = repository.getId();		
 		var	newIcon = repository.getIcon(); 
@@ -477,16 +494,14 @@ Class.create("Ajaxplorer", {
 			this._contextHolder.setAjxpNodeProvider(new RemoteNodeProvider());
 		}
 		this._contextHolder.setRootNode(rootNode);
-		if(this.repositoryId == null || this.repositoryId != repositoryId){
+		this.repositoryId = repositoryId;
+		
+		/*
+		if(this._initObj) { 
 			rootNode.load();
-		}
-				
-		if(!this._initObj) { 			
-			this.repositoryId = repositoryId;
-		} else { 
 			this._initObj = null ;
-			//if(!ajxpBootstrap.parameters.get('usersEnabled')) return;
 		}
+		*/
 		
 		if(this._initLoadRep){
 			if(this._initLoadRep != "" && this._initLoadRep != "/"){
@@ -506,6 +521,8 @@ Class.create("Ajaxplorer", {
 		}else{
 			this.skipLsHistory = false;
 		}
+		
+		rootNode.load();
 	},
 
 	/**

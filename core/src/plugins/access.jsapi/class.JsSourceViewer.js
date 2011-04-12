@@ -82,6 +82,9 @@ Class.create("JsSourceViewer", AjxpPane, {
 		document.stopObserving("ajaxplorer:selection_changed", this.obs1 );
 		document.stopObserving("ajaxplorer:user_logged", this.obs2 );
 		this.empty();
+		$A(this.htmlElement.childNodes).each(function(el){
+			if(el.remove)el.remove();
+		});
 		this.htmlElement = null;
 	},
 	

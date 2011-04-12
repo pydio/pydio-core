@@ -317,8 +317,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  				$parent = $contrib->nodeName;
  				$nodes = $contrib->childNodes;
  				if(!$nodes->length) continue;
- 				$uuidAttr = $contrib->getAttribute("uuidAttr") OR "name";
- 				$uuidAttr = "name";
+ 				$uuidAttr = $contrib->getAttribute("uuidAttr");
+ 				if($uuidAttr == "") $uuidAttr = "name";
  				$this->mergeNodes($reg, $parent, $uuidAttr, $nodes);
 	 		}
  		}

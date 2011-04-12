@@ -80,7 +80,7 @@
 					}
 				</script>				
 			]]></template>			
-			<template_part ajxpId="bottomSplitPane" ajxpClass="JsSourceViewer" ajxpOptions="{}" ajxpPaneHeader="jsapi.3"/>
+			<template_part ajxpId="info_panel" ajxpClass="JsSourceViewer" ajxpOptions="{}" ajxpPaneHeader="jsapi.3"/>
 			<component_config className="FilesList">
 				<columns switchDisplayMode="full">
 					<column messageId="jsapi.2" attributeName="ajxp_label" sortType="StringDirFile"/>
