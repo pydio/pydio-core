@@ -436,6 +436,8 @@ $mess=array(
 "398" => "Download selected file by pieces",
 "399" => "Enter the number of pieces you want to download, then click the button and click on each file to download them.",
 "400" => "Number of pieces :",
+"401" => "You can download and install the following software to join the pieces once on your computer : ",
+"402" => "http://www.hjsplit.org/",
 /* END SENTENCE */
 /* END SENTENCE */
 );

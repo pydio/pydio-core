@@ -135,9 +135,13 @@ class ImagePreviewer extends AJXP_Plugin {
 				$metadata["readable_dimension"] = "";
 			}else{
 				if(!isSet($realFile)){
-					$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
+					$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode, true);
+					$isRemote = call_user_func(array($wrapperClassName, "isRemote"));
+					if($isRemote){
+						register_shutdown_function("unlink", $realFile);
+					}
 				}
-				list($width, $height, $type, $attr) = @getimagesize($realFile);
+				list($width, $height, $type, $attr) = getimagesize($realFile);
 				$metadata["image_type"] = image_type_to_mime_type($type);
 				$metadata["image_width"] = $width;
 				$metadata["image_height"] = $height;

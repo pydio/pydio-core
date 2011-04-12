@@ -53,14 +53,20 @@ class remote_fsAccessWrapper implements AjxpWrapper {
 	protected $crtParameters;
 	protected $postFileData;
 	
-    public static function getRealFSReference($path){
-    	$fake = new remote_fsAccessWrapper();
+    public static function getRealFSReference($path, $persistent = FALSE){
     	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
     	$tmpHandle = fopen($tmpFile, "wb");
-    	$fake->copyFileInStream($path, $tmpHandle);
+    	self::copyFileInStream($path, $tmpHandle);
     	fclose($tmpHandle);
+    	if(!$persistent){
+    		register_shutdown_function("unlink", $tmpFile);
+    	}
     	return $tmpFile;
     }	
+    
+    public static function isRemote(){
+    	return true;
+    }
     
     public static function copyFileInStream($path, $stream){
     	$fake = new remote_fsAccessWrapper();

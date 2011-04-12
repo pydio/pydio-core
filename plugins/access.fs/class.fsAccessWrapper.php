@@ -177,7 +177,7 @@ class fsAccessWrapper implements AjxpWrapper {
     	}
     }
     
-    public static function getRealFSReference($path){
+    public static function getRealFSReference($path, $persistent = false){
     	$contextOpened =false;
     	if(self::$crtZip != null){
     		$contextOpened = true;
@@ -191,6 +191,10 @@ class fsAccessWrapper implements AjxpWrapper {
     		self::$crtZip = $crtZip;
     	}
     	return $realPath;
+    }
+    
+    public static function isRemote(){
+    	return false;
     }
     
     public static function copyFileInStream($path, $stream){

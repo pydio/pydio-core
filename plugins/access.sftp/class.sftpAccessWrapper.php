@@ -228,11 +228,22 @@ class sftpAccessWrapper extends fsAccessWrapper {
 	 * @param String $path
 	 * @return string
 	 */
-	public static function getRealFSReference($path){
-		return self::initPath($path);
+	public static function getRealFSReference($path, $persistent = false){
+		if($persistent){
+	    	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+	    	$tmpHandle = fopen($tmpFile, "wb");
+	    	self::copyFileInStream($path, $tmpHandle);
+	    	fclose($tmpHandle);
+			return $tmpFile;
+		}else{
+			return self::initPath($path);
+		}
 	}
 
-	
+    public static function isRemote(){
+    	return true;
+    }
+    
 	/**
 	 * Override parent function, testing feof() does not seem to work.
 	 * We may have performance problems on big files here.

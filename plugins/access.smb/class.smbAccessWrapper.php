@@ -134,22 +134,23 @@ class smbAccessWrapper extends fsAccessWrapper {
 		}
 	}
 
-	public static function getRealFSReference($path){
-		$contextOpened =false;
-		if(self::$crtZip != null){
-			$contextOpened = true;
-			$crtZip = self::$crtZip;
-			self::$crtZip = null;
+	public static function getRealFSReference($path, $persistent = false){
+		if($persistent){
+	    	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
+	    	$tmpHandle = fopen($tmpFile, "wb");
+	    	self::copyFileInStream($path, $tmpHandle);
+	    	fclose($tmpHandle);
+	    	return $tmpFile;
+		}else{		
+			$realPath = self::initPath($path, "file");
+			return $realPath;
 		}
-		$realPath = self::initPath($path, "file");
-		if(!$contextOpened) {
-			self::closeWrapper();
-		}else{
-			self::$crtZip = $crtZip;
-		}
-		return $realPath;
 	}
 
+    public static function isRemote(){
+    	return true;
+    }
+    
 	public static function copyFileInStream($path, $stream){
 		$fp = fopen(self::getRealFSReference($path), "rb");
 		while (!feof($fp)) {
