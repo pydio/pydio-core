@@ -47,6 +47,9 @@ AJXPTree.prototype.expand = function() {
 };
 
 AJXPTree.prototype.setAjxpRootNode = function(rootNode){
+	if(this.ajxpNode){
+		var oldNode = this.ajxpNode;
+	}
 	this.ajxpNode = rootNode;	
 	var clear = function(){
 		this.open = false;
@@ -57,6 +60,9 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 	this.ajxpNode.observe("force_clear",  clear.bind(this));
 	this.ajxpNode.observe("node_replaced",  clear.bind(this));
 	this.attachListeners(this, rootNode);
+	if(oldNode){
+		oldNode.notify("node_replaced");
+	}
 	//this.ajxpNode.load();
 };
 
