@@ -60,15 +60,20 @@ class ftpAccessWrapper implements AjxpWrapper {
 	private static $dirContentKeys;
 	private static $dirContentIndex;	
 	
-    public static function getRealFSReference($path){
-    	$fake = new ftpAccessWrapper();
+    public static function getRealFSReference($path, $persistent = false){
     	$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time());
     	$tmpHandle = fopen($tmpFile, "wb");
-    	$fake->copyFileInStream($path, $tmpHandle);
+    	self::copyFileInStream($path, $tmpHandle);
     	fclose($tmpHandle);
-    	//register_shutdown_function("unlink", $tmpFile);
+    	if(!$persistent){
+    		register_shutdown_function("unlink", $tmpFile);
+    	}
     	return $tmpFile;
     }	
+
+    public static function isRemote(){
+    	return true;
+    }
     
     public static function copyFileInStream($path, $stream){
     	$fake = new ftpAccessWrapper();

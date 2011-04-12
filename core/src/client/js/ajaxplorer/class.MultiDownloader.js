@@ -42,16 +42,21 @@
 	  */
 	initialize : function( list_target, downloadUrl ){
 
-	// Where to write the list
-	this.list_target = list_target;
-	// How many elements?
-	this.count = 0;
-	// How many elements?
-	this.id = 0;
-	// Download Url
-	this.downloadUrl = downloadUrl;
+		this.list_target = list_target;
+		this.count = 0;
+		this.id = 0;
+		this.downloadUrl = downloadUrl;
 
 	},
+	
+	/**
+	 * Sets the dl url base
+	 * @param downloadUrl String
+	 */
+	setDownloadUrl : function(downloadUrl){
+		this.downloadUrl = downloadUrl;
+	},
+	
 	/**
 	 * Add a new row to the list of files
 	 */
@@ -94,6 +99,28 @@
 	emptyList : function()
 	{
 		
-	}
+	},
+	
+	/**
+	 * Add a "loading" image on top of the component
+	 */
+	setOnLoad: function()	{
+		if(this.loading) return;
+		addLightboxMarkupToElement(this.list_target);
+		var img = new Element('img', {
+			src : ajxpResourcesFolder+'/images/loadingImage.gif'
+		});
+		var overlay = $(this.list_target).down("#element_overlay");
+		overlay.insert(img);
+		img.setStyle({marginTop : Math.max(0, (overlay.getHeight() - img.getHeight())/2) });
+		this.loading = true;
+	},
+	/**
+	 * Remove the loading image
+	 */
+	removeOnLoad: function(){
+		removeLightboxFromElement(this.list_target);
+		this.loading = false;
+	}	
 
 });

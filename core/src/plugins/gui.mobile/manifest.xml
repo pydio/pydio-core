@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="ajxp_mobile" label="Mobile" description="Simple Template for Mobile">
+<guidriver name="ajxp_mobile" label="Mobile" description="Simple Template for Mobile">
 	<registry_contributions>
 		<client_configs uuidAttr="name">
 			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
@@ -43,4 +43,4 @@
 			</component_config>			
 		</client_configs>
 	</registry_contributions>
-</ajxpdriver>
+</guidriver>

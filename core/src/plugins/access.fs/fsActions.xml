@@ -292,7 +292,7 @@
 						var dObject = oForm.down('div[id="multiple_download_container"]');
 						var legendDiv = oForm.down('div.dialogLegend');
 						legendDiv.next("br").remove();
-						legendDiv.update(MessageHash[399]);
+						legendDiv.update(MessageHash[399]+'<br>'+MessageHash[401]+'<a href="'+MessageHash[402]+'" target="_blank">'+MessageHash[402]+'</a>');
 						dObject.insert({before:'\
 							<div class="dialogButtons" id="chunk_dl_form" style="height:36px;"> \
 								<span style="display:inline-block;float:left;margin-top: 11px;margin-left: 4px;margin-right: 4px;">'+MessageHash[400]+'</span> <input type="text" style="float:left;margin-top:5px; text-align:right; width:30px;height:24px;" name="chunk_count" id="chunk_count" value="4"> \
@@ -305,14 +305,17 @@
 							conn.addParameter("get_action", "prepare_chunk_dl"); 
 							conn.addParameter("chunk_count", $("chunk_count").value );
 							conn.addParameter("file", userSelection.getUniqueNode().getPath()); 
+							var downloader = new MultiDownloader(dObject, '');
 							conn.onComplete = function(transp){
 								var chunkData = transp.responseJSON;
-								var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download_chunk&file_id='+chunkData.file_id);
+								downloader.setDownloadUrl(ajxpServerAccessPath+'&action=download_chunk&file_id='+chunkData.file_id);
 								downloader.triggerEnd = function(){hideLightBox();};
 								for(var i=0; i<chunkData.chunk_count;i++){
-									downloader.addListRow("&chunk_index=" + i, chunkData.localname + ".chunk." + i);
+									downloader.addListRow("&chunk_index=" + i, chunkData.localname + " (part " + (i + 1) + ")");
 								}
+								downloader.removeOnLoad();
 							};
+							downloader.setOnLoad();
 							conn.sendAsync();							
 						});
 					};

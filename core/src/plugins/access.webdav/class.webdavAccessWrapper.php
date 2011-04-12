@@ -161,7 +161,7 @@ class webdavAccessWrapper extends fsAccessWrapper {
 		}
 	}
 
-	public static function getRealFSReference($path){
+	public static function getRealFSReference($path, $persistent = false){
 		$contextOpened =false;
 		if(self::$crtZip != null){
 			$contextOpened = true;
@@ -177,6 +177,11 @@ class webdavAccessWrapper extends fsAccessWrapper {
 		return $realPath;
 	}
 
+	
+    public static function isRemote(){
+    	return true;
+    }
+    
 	public static function copyFileInStream($path, $stream){
 		$fp = fopen(self::getRealFSReference($path), "rb");
 		while (!feof($fp)) {

@@ -191,7 +191,7 @@ class fsAccessDriver extends AbstractAccessDriver
 				$sessionKey = "chunk_file_".md5($fileId.time());
 				$totalSize = filesize($fileId);
 				$chunkSize = intval ( $totalSize / $chunkCount ); 
-				$realFile  = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $fileId);
+				$realFile  = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $fileId, true);
 				$chunkData = array(
 					"localname"	  => basename($fileId),
 					"chunk_count" => $chunkCount,
@@ -217,8 +217,11 @@ class fsAccessDriver extends AbstractAccessDriver
 				if($chunkIndex == $sessData["chunk_count"]-1){
 					// Compute the last chunk real length
 					$chunkSize = $sessData["total_size"] - ($chunkSize * ($sessData["chunk_count"]-1));
+					if(call_user_func(array($this->wrapperClassName, "isRemote"))){
+						register_shutdown_function("unlink", $realFile);
+					}
 				}
-				$this->readFile($realFile, "force-download", $sessData["localname"].".chunk.".$chunkIndex, false, false, true, $offset, $chunkSize);
+				$this->readFile($realFile, "force-download", $sessData["localname"].".".sprintf("%03d", $chunkIndex+1), false, false, true, $offset, $chunkSize);				
 				
 				
 			break;			
@@ -858,7 +861,7 @@ class fsAccessDriver extends AbstractAccessDriver
         if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off'); }
 
 		$isFile = !$data && !$gzip; 		
-		if($byteLength != -1){
+		if($byteLength == -1){
 			$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
 		}else{
 			$size = $byteLength;

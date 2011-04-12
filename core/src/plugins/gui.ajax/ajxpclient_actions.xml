@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<driver name="ajxpclient">
+<guidriver name="ajxpclient">
 	<actions>
 	<!-- 
 		<action name="get_boot_conf" skipSecureToken="true">
@@ -193,4 +193,4 @@
 			</processing>
 		</action>		
 	</actions>
-</driver>
+</guidriver>

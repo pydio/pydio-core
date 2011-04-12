@@ -434,6 +434,8 @@ $mess=array(
 "398" => "Télécharger un fichier par morceaux",
 "399" => "Entrez le nombre de morceaux que vous voulez créer, cliquez sur le bouton OK, puis télécharger les différentes parties du fichiers.",
 "400" => "Nombre de morceaux :",
+"401" => "You can download and install the following software to join the pieces once on your computer : ",
+"402" => "http://www.hjsplit.org/",
 /* END SENTENCE */
 );
 ?>
