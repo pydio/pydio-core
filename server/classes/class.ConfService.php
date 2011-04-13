@@ -74,7 +74,13 @@ class ConfService
 		$this->configs["UPLOAD_MAX_FILE"] = AJXP_Utils::convertBytes($upload_max_size_per_file);
 		$this->configs["UPLOAD_MAX_TOTAL"] = AJXP_Utils::convertBytes($upload_max_size_total);
         $this->configs["PROBE_REAL_SIZE"] = $allowRealSizeProbing;
-        $this->configs["WELCOME_CUSTOM_MSG"] = $welcomeCustomMessage;
+        $this->configs["CUSTOM_WORDING"] = array(
+        	"welcomeMessage" => $welcomeCustomMessage,
+        	"title"			 => $customTitle,
+        	"icon"			 => $customIcon,
+        	"iconWidth"		 => $customIconWidth,
+        	"titleFontSize"	 => $customTitleFontSize
+        );
         
         $this->configs["CLIENT_TIMEOUT_TIME"] = (defined('AJXP_CLIENT_TIMEOUT_TIME')?AJXP_CLIENT_TIMEOUT_TIME:ini_get("session.gc_maxlifetime"));
         $this->configs["CLIENT_TIMEOUT_WARNING"] = (defined('AJXP_CLIENT_TIMEOUT_WARN_BEFORE')?AJXP_CLIENT_TIMEOUT_WARN_BEFORE:3);
