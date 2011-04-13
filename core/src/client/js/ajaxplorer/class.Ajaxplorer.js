@@ -55,6 +55,7 @@ Class.create("Ajaxplorer", {
 		this._initDefaultDisp = 'list';
 		this.histCount=0;
 		this._guiComponentsConfigs = new Hash();
+		this.appTitle = ajxpBootstrap.parameters.get("customWording").title || "AjaXplorer";
 	},
 	
 	/**
@@ -196,7 +197,7 @@ Class.create("Ajaxplorer", {
 		}else{
 			document.observe("ajaxplorer:context_changed", function(event){
 				var path = this.getContextNode().getPath();
-				document.title = 'AjaXplorer - '+(getBaseName(path)?getBaseName(path):'/');
+				document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
 			}.bind(this));
 		}
 		document.observe("ajaxplorer:context_changed", function(event){
@@ -838,7 +839,7 @@ Class.create("Ajaxplorer", {
 	 * @returns Integer
 	 */
 	pathToHistoryHash: function(path){
-		document.title = 'AjaXplorer - '+(getBaseName(path)?getBaseName(path):'/');
+		document.title = this.appTitle + ' - '+(getBaseName(path)?getBaseName(path):'/');
 		if(!this.pathesHash){
 			this.pathesHash = new Hash();
 			this.histCount = -1;

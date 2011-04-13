@@ -294,6 +294,16 @@ define("GOOGLE_ANALYTICS_EVENT", false);
 /***********************************************/
 /* CUSTOM MESSAGE IN START UP SCREEN
 /***********************************************/
+// Your app title, AjaXplorer by default
+$customTitle = "";
+// Font size for the start up screen title, "35px" by default
+$customTitleFontSize = "";
+// A custom icon, path must be from the root of the ajaxplorer installation
+$customIcon = "";
+// Space to leave for the icon, most probably the real image width plus a couple
+// of pixels. By default, "35px" 
+$customIconWidth = "";
+// An additional welcome message appearing in the start up screen
 $welcomeCustomMessage = "";
 
 /*********************************************/

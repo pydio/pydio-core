@@ -149,10 +149,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["zipEnabled"] = ConfService::zipEnabled();
 				$config["multipleFilesDownloadEnabled"] = !DISABLE_ZIP_CREATION;
 				$config["flashUploaderEnabled"] = ConfService::getConf("UPLOAD_ENABLE_FLASH");
-				$welcomeCustom = ConfService::getConf("WELCOME_CUSTOM_MSG");
-				if($welcomeCustom != ""){
-					$config["customWelcomeMessage"] = $welcomeCustom;
-				}
+				$config["customWording"] = ConfService::getConf("CUSTOM_WORDING");
+				
 				if(!ConfService::getConf("UPLOAD_ENABLE_FLASH")){
 				    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
 				    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");

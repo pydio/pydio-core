@@ -196,17 +196,26 @@ Class.create("AjxpBootstrap", {
 			}catch(e){
 				this.parameters.set('customWelcomeScreen','');
 			}
-		}
+		}		
 		if(this.parameters.get('customWelcomeScreen')){
 			html += this.parameters.get('customWelcomeScreen');
 		}else{
+			var customWording = this.parameters.get("customWording");
 			html+='	<div id="progressBox" class="dialogBox" style="width:305px;padding:3;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
 			html+='	<div align="left" class="dialogContent" style="color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
-			html+=' <div style="margin-bottom:4px; font-size:35px;font-weight:bold; background-image:url(\''+ajxpResourcesFolder+'/images/ICON.png\');background-position:left center;background-repeat:no-repeat;padding-left:35px;color:#0077b3;">AjaXplorer</div>';
-			html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';
+			var icon = customWording.icon || ajxpResourcesFolder+'/images/ICON.png';
+			var title = customWording.title || "AjaXplorer";
+			var iconWidth = customWording.iconWidth || '35px';
+			var fontSize = customWording.titleFontSize || '35px';
+			html+=' <div style="margin-bottom:4px; font-size:'+fontSize+';font-weight:bold; background-image:url(\''+icon+'\');background-position:left center;background-repeat:no-repeat;padding-left:'+iconWidth+';color:#0077b3;">'+title+'</div>';
+			if(customWording.title){
+				html+='	<div style="padding:4 7;"><div>Powered by AjaXplorer<span id="version_span"></span></div>';								
+			}else{
+				html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';				
+			}
 			html+='	Written by Charles du Jeu - LGPL License. <br>';
-			if(this.parameters.get('customWelcomeMessage')){
-				html+= this.parameters.get('customWelcomeMessage') + '<br>';
+			if(customWording.welcomeMessage){
+				html+= customWording.welcomeMessage + '<br>';
 			}
 			html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
 			html+='	</div></div>';
