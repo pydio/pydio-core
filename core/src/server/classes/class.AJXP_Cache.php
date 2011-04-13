@@ -9,6 +9,13 @@ class AJXP_Cache {
 	protected $masterFile;
 	protected $dataCallback;
 	
+	/**
+	 * Create an AJXP_Cache instance
+	 * @param string $pluginId
+	 * @param string $filepath
+	 * @param Function $dataCallback
+	 * @return AJXP_Cache
+	 */
 	public static function getItem($pluginId, $filepath, $dataCallback){
 		return new AJXP_Cache($pluginId,$filepath, $dataCallback);
 	}
@@ -21,10 +28,8 @@ class AJXP_Cache {
 		}
 	}
 	
-	
-	
 	public function AJXP_Cache($pluginId, $filepath, $dataCallback){
-		$this->cacheDir = AJXP_INSTALL_PATH."/server/tmp";
+		$this->cacheDir = AJXP_CACHE_DIR;
 		$this->masterFile = $filepath;
 		$this->dataCallback = $dataCallback;
 		$this->cacheId = $this->buildCacheId($pluginId, $filepath);
