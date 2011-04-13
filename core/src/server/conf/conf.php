@@ -90,6 +90,11 @@ define("HTTPS_POLICY_FILE", "");
  */
 define("AJXP_TMP_DIR", "");
 
+/************************************************
+ * CACHE DIR
+ ***********************************************/
+define("AJXP_CACHE_DIR", AJXP_INSTALL_PATH."/server/cache");
+
 /********************************************
  * CUSTOM VARIABLES HOOK
  ********************************************/
