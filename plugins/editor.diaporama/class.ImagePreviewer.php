@@ -86,7 +86,8 @@ class ImagePreviewer extends AJXP_Plugin {
 	}
 	
 	public function removeThumbnail($oldFile, $newFile = null, $copy = false){
-		if($newFile == null || $copy = false){
+		if(!$this->handleMime($oldFile)) return;
+		if($newFile == null || $copy == false){
 			AJXP_Logger::debug("Should find cache item ".$oldFile);
 			AJXP_Cache::clearItem("diaporama_200", $oldFile);			
 		}
@@ -97,8 +98,6 @@ class ImagePreviewer extends AJXP_Plugin {
 		$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
 		if(!$pThumb->isError()){
 			$pThumb->remote_wrapper = $this->streamData["classname"];
-			//$pThumb->use_cache = $this->pluginConf["USE_THUMBNAIL_CACHE"];
-			//$pThumb->cache_dir = $this->pluginConf["THUMBNAIL_CACHE_DIR"];	
 			$sizes = $pThumb->fit_thumbnail($masterFile, 200, -1, 1, true);		
 			$pThumb->print_thumbnail($masterFile,$sizes[0],$sizes[1],false, false, $targetFile);
 			if($pThumb->isError()){
@@ -149,6 +148,12 @@ class ImagePreviewer extends AJXP_Plugin {
 			}
 		}
 	}
+	
+	protected function handleMime($filename){
+		$mimesAtt = explode(",", $this->xPath->query("@mimes")->item(0)->nodeValue);
+		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+		return in_array($ext, $mimesAtt);
+	}	
 	
 }
 ?>

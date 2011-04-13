@@ -147,7 +147,13 @@ class EmlParser extends AJXP_Plugin{
 		if(!isSet($realFile)){
 			$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
 		}
-		
+		$cacheItem = AJXP_Cache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
+		$data = unserialize($cacheItem->getData());
+		$metadata = array_merge($metadata, $data);
+	}
+
+	public function mimeExtractorCallback($masterFile, $targetFile){
+		$metadata = array();
 		require_once("Mail/mimeDecode.php");
     	$params = array(
     		'include_bodies' => true,
@@ -155,7 +161,7 @@ class EmlParser extends AJXP_Plugin{
     		'decode_headers' => true
     	);    			
 		$mess = ConfService::getMessages();    	
-    	$content = file_get_contents($realFile);
+    	$content = file_get_contents($masterFile);
     	$decoder = new Mail_mimeDecode($content);
 		$structure = $decoder->decode($params);
 		$allowedHeaders = array("to", "from", "subject", "message-id", "mime-version", "date", "return-path");
@@ -180,32 +186,27 @@ class EmlParser extends AJXP_Plugin{
 				}
 			}
 		}	
-		$metadata["icon"] = "eml_images/ICON_SIZE/mail_mime.png";	
-	}	
+		$metadata["icon"] = "eml_images/ICON_SIZE/mail_mime.png";
+		file_put_contents($targetFile, serialize($metadata));			
+	}
 	
 	public function lsPostProcess($action, $httpVars, $outputVars){
-		if(EmlParser::$currentListingOnlyEmails === true){
-			$config = '<columns template_name="eml.list">
-				<column messageId="editor.eml.1" attributeName="ajxp_label" sortType="String"/>
-				<column messageId="editor.eml.2" attributeName="eml_to" sortType="String"/>
-				<column messageId="editor.eml.3" attributeName="eml_subject" sortType="String"/>
-				<column messageId="editor.eml.4" attributeName="ajxp_modiftime" sortType="MyDate"/>
-				<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
-				<column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number"/>
-			</columns>';			
-		}else{
-			// Restore standard columns.. 
-			$xmlRegistry = AJXP_PluginsService::getXmlRegistry();
-			$xPath = new DOMXPath($xmlRegistry);
-			$cols = $xPath->query("client_configs/component_config[@className='FilesList']/columns/*");
-			$config = '<columns switchGridMode="filelist">';
-			foreach($cols as $colNode){
-				$xml = $xmlRegistry->saveXML($colNode);
-				$xml = str_replace("additional_column", "column", $xml);
-				$config.=$xml;
-			}
-			$config.= '</columns>';
-		}			
+		if(!EmlParser::$currentListingOnlyEmails){
+			header('Content-Type: text/xml; charset=UTF-8');
+			header('Cache-Control: no-cache');			
+			print($outputVars["ob_output"]);
+			return;			
+		}
+		
+		$config = '<columns template_name="eml.list">
+			<column messageId="editor.eml.1" attributeName="ajxp_label" sortType="String"/>
+			<column messageId="editor.eml.2" attributeName="eml_to" sortType="String"/>
+			<column messageId="editor.eml.3" attributeName="eml_subject" sortType="String"/>
+			<column messageId="editor.eml.4" attributeName="ajxp_modiftime" sortType="MyDate"/>
+			<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
+			<column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number"/>
+		</columns>';
+					
 		$dom = new DOMDocument("1.0", "UTF-8");
 		$dom->loadXML($outputVars["ob_output"]);
 		if(EmlParser::$currentListingOnlyEmails === true){
@@ -218,7 +219,7 @@ class EmlParser extends AJXP_Plugin{
 		
 		// Add the columns template definition
 		$insert = new DOMDocument("1.0", "UTF-8");		
-		$config = "<client_configs><component_config className=\"FilesList\">$config</component_config></client_configs>";			
+		$config = "<client_configs><component_config className=\"FilesList\" local=\"true\">$config</component_config></client_configs>";			
 		$insert->loadXML($config);
 		$imported = $dom->importNode($insert->documentElement, true);
 		$dom->documentElement->appendChild($imported);

@@ -55,7 +55,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 			$options = $def["OPTIONS"];
 			$instance = AJXP_PluginsService::findPlugin("auth", $name);
 			if(!is_object($instance)){
-				throw new Exception("Cannot find plugin $name for type $plugType");
+				throw new Exception("Cannot find plugin $name for type 'auth'");
 			}
 			$instance->init($options);
 			$this->drivers[$name] = $instance;
@@ -149,7 +149,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 		$allUsers = array();
 		foreach($this->drivers as $driver){
 			$allUsers = array_merge($driver->listUsers());
-		}		
+		}
+		return $allUsers;
 	}
 	
 	function preLogUser($remoteSessionId){
