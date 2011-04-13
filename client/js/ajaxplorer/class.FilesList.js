@@ -217,6 +217,24 @@ Class.create("FilesList", SelectableElements, {
 		this.removeOnLoad();
 	},
 	
+	extractComponentConfig : function(){
+		return {
+			gridStyle : {value:this.gridStyle},
+			_displayMode : {value : this._displayMode },
+			columnsTemplate : {value : this.columnsTemplate},
+			columnsDef : {value : (this.columnsDef?this.columnsDef.clone():this.columnsDef) },
+			oSortTypes : {value : (this._oSortTypes?this._oSortTypes.clone():this._oSortTypes) },
+			_thumbSize : {value : this._thumbSize },
+			_fixedThumbSize : {value : this._fixedThumbSize}
+		};
+	},
+	
+	applyComponentConfig : function(config){
+		for(var key in config){
+			this[key] = config[key].value;
+		}
+	},
+	
 	/**
 	 * Apply the config of a component_config node
 	 * Returns true if the GUI needs refreshing
@@ -224,6 +242,9 @@ Class.create("FilesList", SelectableElements, {
 	 * @returns Boolean
 	 */
 	parseComponentConfig : function(domNode){
+		if(domNode.getAttribute("local") && !this.restoreConfig){			
+			this.restoreConfig = this.extractComponentConfig();
+		}
 		refreshGUI = false;
 		this.columnsTemplate = false;
 		// CHECK FOR COLUMNS DEFINITION DATA
@@ -812,6 +833,10 @@ Class.create("FilesList", SelectableElements, {
 			if(componentData){
 				refreshGUI = this.parseComponentConfig(componentData);
 			}
+		}else if(this.restoreConfig){
+			this.applyComponentConfig(this.restoreConfig);
+			this.restoreConfig = null;
+			refreshGUI = true;
 		}
 		
 		if(refreshGUI){
