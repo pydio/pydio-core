@@ -1,0 +1,28 @@
+--- C:/Program Files/aaaUtils/EasyPHP 2.0b1/php5/PEAR/HTTP/WebDAV/Client/patch/Stream.php	lun. oct. 25 11:24:17 2010
++++ C:/Program Files/aaaUtils/EasyPHP 2.0b1/php5/PEAR/HTTP/WebDAV/Client/patch/Stream_patched.php	jeu. avr. 14 12:14:18 2011
+@@ -494,15 +494,17 @@
+ 
+             // for all returned resource entries
+             foreach (explode("\n", $req->getResponseBody()) as $line) {
+-                // get the href URL
+-                if (preg_match("/href>([^<]*)/", $line, $matches)) {
+-                    // skip the directory itself
+-                    if ($matches[1] == $this->path) {
+-                        continue;
++            	// Preg_match_all if the whole response is one line!
++                if (preg_match_all("/href>([^<]*)/", $line, $matches)) {
++                    // skip the directory itself                    
++                    foreach ($matches[1] as $match){
++                    	// Compare to $this->url too
++	                    if ($match == "" || $match == $this->path || $match == $this->url) {
++	                    	continue;
++	                    }
++	                    // just remember the basenames to return them later with readdir()
++	                    $this->dirfiles[] = basename($match);
+                     }
+-
+-                    // just remember the basenames to return them later with readdir()
+-                    $this->dirfiles[] = basename($matches[1]);
+                 }
+             }
+             return true;
