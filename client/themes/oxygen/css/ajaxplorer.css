@@ -211,7 +211,12 @@ div.shadow_class
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f3f3f3', endColorstr='#ffffff'); /* for IE */
 	background: -webkit-gradient(linear, left top, left bottom, from(#f3f3f3), to(#fff)); /* for webkit browsers */
 	background: -moz-linear-gradient(top,  #f3f3f3,  #fff); /* for firefox 3.6+ */
-    
+
+	height: 20px;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	
 }
 
 .dialogContent input:focus,
@@ -221,6 +226,14 @@ div.shadow_class
 {
 	background: white;
 	border: 1px solid #5d83ae;
+}
+
+.dialogContent input[type="checkbox"],
+.dialogContent input[type="radio"]
+{
+	height: auto;
+	width: auto;
+	border-radius : 0px;
 }
 
 .dialogLegend
@@ -415,6 +428,7 @@ div.SF_label{
 	padding: 3px;
 	padding-right:1%;
 	padding-left:0;
+	line-height: 18px;
 	/*white-space: nowrap; /* css-3 */
 	/*word-wrap: no break-word; /* Internet Explorer 5.5+ */	
 }
@@ -1807,7 +1821,8 @@ legend a.active {
 .repository td
 {
    vertical-align: bottom;
-   padding: 4px 0 2px 6px;
+   line-height: 19px;
+   padding: 6px 0 5px 6px;
 }
 
 .repository input, .user_delete_confirm
