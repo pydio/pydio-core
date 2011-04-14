@@ -381,7 +381,7 @@ ConfigEditor = Class.create({
 			
 			var walletPane = new Element('div', {className:"wallet_pane", id:"wallet_pane_"+repoId});
 			this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
-			wallets.insert(new Element('div').update(MessageHash['ajxp_conf.79']+' "<b>'+ repoLabel + '</b>"'));
+			wallets.insert(new Element('div', {style:'margin-top: 10px;'}).update(MessageHash['ajxp_conf.79']+' "<b>'+ repoLabel + '</b>"'));
 			wallets.insert(walletPane);
 		}			
 	},
