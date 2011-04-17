@@ -429,12 +429,12 @@ $mess=array(
 "393" => "Achtung, der Name muss kürzer als %s sein, dieser Dateiname wird abgeschnitten!",
 "394" => "Entschuldigung, aber zur Zeit ist das Teilen der Verzeichnisse (sharing) aufgrund des aktuellen Authentifizierungstreiber nicht möglich (Benutzer können nicht verändert werden). Aber das Datei-Sharing funktioniert.",
 "395" => "Das fallengelassene Element scheint ein Ordner zu sein und Verzeichnisse können nicht zum Server hochgeladen werden! Soll der Upload trotzdem gestartet werden?",
-"396" => "Auth. Method",
-"397" => "Download chunked",
-"398" => "Download selected file by pieces",
-"399" => "Enter the number of pieces you want to download, then click the button and click on each file to download them.",
-"400" => "Number of pieces :",
-"401" => "You can download and install the following software to join the pieces once on your computer : ",
+"396" => "Auth. Methode",
+"397" => "Download segmentiert",
+"398" => "Download der ausgewählten Dateien in einzelnen Segmenten",
+"399" => "Die Anzahl der Dateisegmente eingeben, den Button klicken und dann jede Datei zum Download auswählen.",
+"400" => "Anzahl der Segmente:",
+"401" => "Die folgenden Software herunterladen und installieren, um die einzelnen Segmente zusammen zufügen: ",
 "402" => "http://www.hjsplit.org/",
 /* END SENTENCE */
 );
