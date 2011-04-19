@@ -69,11 +69,12 @@ define("INITIAL_ADMIN_PASSWORD", "admin");
 
 define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
 
-function __autoload($className){
+function AjaXplorer_autoload($className){
 	$fileName = AJXP_INSTALL_PATH."/".SERVER_RESOURCES_FOLDER."/"."class.".$className.".php";
 	if(file_exists($fileName)){
 		require_once($fileName);
 	}
 }
+spl_autoload_register('AjaXplorer_autoload');
 
 ?>
