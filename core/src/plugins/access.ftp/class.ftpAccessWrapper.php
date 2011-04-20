@@ -177,15 +177,22 @@ class ftpAccessWrapper implements AjxpWrapper {
     
     public function url_stat($path, $flags){
     	// We are in an opendir loop
+    	AJXP_Logger::debug("URL_STAT", $path);
     	if(self::$dirContent != null){
     		$search = $this->safeBasename($path);
+    		//if($search == "") $search = ".";
     		if(array_key_exists($search, self::$dirContent)){
 	    		return self::$dirContent[$search];
     		}
     	}
     	$parts = $this->parseUrl($path);
 		$link = $this->createFTPLink();	
-		$serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);		
+		$serverPath = AJXP_Utils::securePath($this->path."/".$parts["path"]);	
+		if($parts["path"] == "/"){
+			$basename = ".";
+		}else{
+			$basename = $this->safeBasename($serverPath);
+		}	
 		
 		$serverParent = $this->safeDirname($parts["path"]);
 		$serverParent = AJXP_Utils::securePath($this->path."/".$serverParent);
@@ -196,11 +203,13 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$contents = $this->rawList($link, $serverParent, 'd');
 			foreach ($contents as $entry){
 				$res = $this->rawListEntryToStat($entry);
-				AJXP_Logger::debug("RAWLISTENTRY ".$res["name"], $res["stat"]);
-				AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
-				
-				if($res["name"] == $this->safeBasename($serverPath)){
+				AJXP_Logger::debug("RAWLISTENTRY ".$res["name"]. " (searching ".$basename.")", $res["stat"]);				
+				if($res["name"] == $basename){
+					AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));					
 					$statValue = $res["stat"];					
+					// Make sure not to loose the "folder" nature!
+					$statValue["mode"] += 0040000;
+					$statValue[2] = $statValue["mode"];
 					return $statValue;
 				}
 			}

@@ -17,8 +17,8 @@ require_once("server/classes/class.HTMLWriter.php");
 require_once("server/classes/class.AJXP_XMLWriter.php");
 require_once("server/classes/class.RecycleBinManager.php");
 require_once("server/classes/class.AJXP_Logger.php");
-set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
-set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+//set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
+//set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
 ConfService::init("server/conf/conf.php");
@@ -35,8 +35,9 @@ $baseURL = "http://localhost";
 $baseURI = "/ajaxplorer/shares";
 
 $requestUri = $_SERVER["REQUEST_URI"];
-$end = substr($requestUri, strlen($baseURI));
-$repositoryId = str_replace("/", "", $end);
+$end = substr($requestUri, strlen($baseURI."/"));
+$parts = explode("/", $end);
+$repositoryId = $parts[0];
 
 $server = ezcWebdavServer::getInstance();
 $pathFactory = new ezcWebdavBasicPathFactory($baseURL.$baseURI."/$repositoryId");
@@ -47,8 +48,8 @@ if(AuthService::usersEnabled()){
 	$server->auth = new AJXP_WebdavAuth($repositoryId);
 }
 
-//$backend = new AJXP_WebdavBackend($repositoryId);
-$backend  = new ezcWebdavFileBackend(dirname( __FILE__ ) . '/files');
+$backend = new AJXP_WebdavBackend($repositoryId);
+//$backend  = new ezcWebdavFileBackend(dirname( __FILE__ ) . '/files');
 $server->handle( $backend ); 
 
 ?>

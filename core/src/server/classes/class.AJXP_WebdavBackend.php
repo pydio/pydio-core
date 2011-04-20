@@ -7,10 +7,21 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
 	 */
 	protected $repository;
 	/**
-	 * @param AbstractAccessDriver
+	 * @param AjxpWebdavProvider
 	 */
 	protected $accessDriver;
 	
+    protected $handledLiveProperties = array( 
+        'getcontentlength', 
+        'getlastmodified', 
+        'creationdate', 
+        'displayname', 
+        'getetag', 
+        'getcontenttype', 
+        'resourcetype',
+        'supportedlock',
+        'lockdiscovery',
+    );	
 
 	public function __construct($repositoryId){
 		$repoList = ConfService::getRepositoriesList();
@@ -21,9 +32,10 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
 		$this->repository = ConfService::getRepository();
 		
 		$confDriver = ConfService::getConfStorageImpl();
-		$this->accessDriver = ConfService::loadRepositoryDriver();		
-		
-		var_dump($this->accessDriver);		
+		$this->accessDriver = ConfService::loadRepositoryDriver();
+		if(!$this->accessDriver instanceof AjxpWebdavProvider){
+			throw new ezcBaseFileNotFoundException( $repositoryId );
+		}
 	}
 	
 	
@@ -36,7 +48,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return void
      */
      protected function createCollection( $path ){
-     	
+     	$this->accessDriver->mkDir(dirname($path), basename($path));
      }
 
     /**
@@ -50,7 +62,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return void
      */
     protected function createResource( $path, $content = null ){
-    	
+    	$this->accessDriver->createEmptyFile(dirname($path), basename($path));
     }
 
     /**
@@ -76,7 +88,12 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return string
      */
      protected function getResourceContents( $path ){
-     	
+     	$wrapperClassName = $this->accessDriver->getWrapperClassName();
+     	$tmp = call_user_func(array($wrapperClassName, "getRealFSReference"), $this->accessDriver->getRessourceUrl($path));
+     	if(call_user_func(array($wrapperClassName, "isRemote"))){
+     		register_shutdown_function("unlink", $tmp);
+     	}
+     	return file_get_contents($tmp);
      }
 
     /**
@@ -132,9 +149,167 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return ezcWebdavProperty
      */
     public function getProperty( $path, $propertyName, $namespace = 'DAV:' ){
+    	$url = $this->accessDriver->getRessourceUrl($path);
+	    //AJXP_Logger::debug("Getting Property : ".$propertyName." for url ".$url);	
+        $storage = $this->getPropertyStorage( $path );
+
+        // Handle dead propreties
+        if ( $namespace !== 'DAV:' )
+        {
+            $properties = $storage->getAllProperties();
+            return $properties[$namespace][$propertyName];
+        }
+
+        // Handle live properties
+        switch ( $propertyName )
+        {
+            case 'getcontentlength':
+                $property = new ezcWebdavGetContentLengthProperty();
+                $property->length = $this->getContentLength($path);
+                return $property;
+
+            case 'getlastmodified':
+                $property = new ezcWebdavGetLastModifiedProperty();
+                $property->date = new ezcWebdavDateTime( '@' . filemtime( $url ) );
+                return $property;
+
+            case 'creationdate':
+                $property = new ezcWebdavCreationDateProperty();
+                $property->date = new ezcWebdavDateTime( '@' . filectime( $url ) );
+                return $property;
+
+            case 'displayname':
+                $property = new ezcWebdavDisplayNameProperty();
+                $property->displayName = urldecode( basename( $path ) );
+                return $property;
+
+            case 'getcontenttype':
+                $property = new ezcWebdavGetContentTypeProperty(
+                    $this->getMimeType( $path )
+                );
+                return $property;
+
+            case 'getetag':
+                $property = new ezcWebdavGetEtagProperty();
+                $property->etag = $this->getETag( $path );
+                return $property;
+
+            case 'resourcetype':
+                $property = new ezcWebdavResourceTypeProperty();
+                $property->type = $this->isCollection( $path ) ?
+                    ezcWebdavResourceTypeProperty::TYPE_COLLECTION : 
+                    ezcWebdavResourceTypeProperty::TYPE_RESOURCE;
+                return $property;
+
+            case 'supportedlock':
+                $property = new ezcWebdavSupportedLockProperty();
+                return $property;
+
+            case 'lockdiscovery':
+                $property = new ezcWebdavLockDiscoveryProperty();
+                return $property;
+
+            default:
+                // Handle all other live properties like dead properties
+                $properties = $storage->getAllProperties();
+                return $properties[$namespace][$propertyName];
+        }
     	
     }
 
+    /**
+     * Returns the etag representing the current state of $path.
+     * 
+     * Calculates and returns the ETag for the resource represented by $path.
+     * The ETag is calculated from the $path itself and the following
+     * properties, which are concatenated and md5 hashed:
+     *
+     * <ul>
+     *  <li>getcontentlength</li>
+     *  <li>getlastmodified</li>
+     * </ul>
+     *
+     * This method can be overwritten in custom backend implementations to
+     * access the information needed directly without using the way around
+     * properties.
+     *
+     * Custom backend implementations are encouraged to use the same mechanism
+     * (or this method itself) to determine and generate ETags.
+     * 
+     * @param mixed $path 
+     * @return void
+     */
+    protected function getETag( $path )
+    {
+        clearstatcache();
+        return md5(
+            $path
+            . $this->getContentLength( $path )
+            . date( 'c', filemtime( $this->accessDriver->getRessourceUrl($path) ) )
+        );
+    }
+    
+    protected function getContentLength($path){
+        $length = ezcWebdavGetContentLengthProperty::COLLECTION;
+        if ( !$this->isCollection( $path ) )
+        {
+            $length = (string) filesize( $this->accessDriver->getRessourceUrl($path) );
+        }                
+        return $length;    	
+    }
+    
+    
+    /**
+     * Returns the mime type of a resource.
+     *
+     * Return the mime type of the resource identified by $path. If a mime type
+     * extension is available it will be used to read the real mime type,
+     * otherwise the original mime type passed by the client when uploading the
+     * file will be returned. If no mimetype has ever been associated with the
+     * file, the method will just return 'application/octet-stream'.
+     * 
+     * @param string $path 
+     * @return string
+     */
+    protected function getMimeType( $path )
+    {
+    	$url = $this->accessDriver->getRessourceUrl($path);
+        // Check if extension pecl/fileinfo is usable.
+        if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
+        {
+            $fInfo = new fInfo( FILEINFO_MIME );
+            $mimeType = $fInfo->file( $url );
+
+            // The documentation tells to do this, but it does not work with a
+            // current version of pecl/fileinfo
+            // $fInfo->close();
+
+            return $mimeType;
+        }
+
+        // Check if extension ext/mime-magic is usable.
+        if ( $this->options->useMimeExts && 
+             ezcBaseFeatures::hasExtensionSupport( 'mime_magic' ) &&
+             ( $mimeType = mime_content_type( $url ) ) !== false )
+        {
+            return $mimeType;
+        }
+
+        // Check if some browser submitted mime type is available.
+        /*
+        $storage = $this->getPropertyStorage( $path );
+        $properties = $storage->getAllProperties();
+
+        if ( isset( $properties['DAV:']['getcontenttype'] ) )
+        {
+            return $properties['DAV:']['getcontenttype']->mime;
+        }
+        */
+
+        // Default to 'application/octet-stream' if nothing else is available.
+        return 'application/octet-stream';
+    }    
+    
     /**
      * Returns all properties for a resource.
      * 
@@ -145,8 +320,32 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return ezcWebdavPropertyStorage
      */
     public function getAllProperties( $path ){
-    	
+        $storage = $this->getPropertyStorage( $path );
+        
+        // Add all live properties to stored properties
+        foreach ( $this->handledLiveProperties as $property )
+        {
+            $storage->attach(
+                $this->getProperty( $path, $property )
+            );
+        }
+
+        return $storage;    	
     }
+    
+    /**
+     * Returns the property storage for a resource.
+     *
+     * Returns the {@link ezcWebdavPropertyStorage} instance containing the
+     * properties for the resource identified by $path.
+     * 
+     * @param string $path 
+     * @return ezcWebdavBasicPropertyStorage
+     */
+    protected function getPropertyStorage( $path )
+    {
+    	return new ezcWebdavBasicPropertyStorage();
+    }    
 
     /**
      * Copies resources recursively from one path to another.
@@ -195,7 +394,9 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return bool
      */
     protected function nodeExists( $path ){
-    	
+	    $url = $this->accessDriver->getRessourceUrl($path);
+    	$result = file_exists( $url );
+    	return $result;    	
     }
 
     /**
@@ -208,7 +409,9 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return bool
      */
     protected function isCollection( $path ){
-    	
+	    $url = $this->accessDriver->getRessourceUrl($path);
+    	$result = is_dir( $url );
+    	return $result;
     }
 
     /**
@@ -223,7 +426,30 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return array(ezcWebdavResource|ezcWebdavCollection)
      */
     protected function getCollectionMembers( $path ){
-    	
+    	$url = $this->accessDriver->getRessourceUrl($path);
+        $contents = array();
+        $errors = array();
+
+        $nodes = scandir($url);
+		
+        foreach ( $nodes as $file )
+        {
+			if ( isset($this->options->hideDotFiles) && $this->options->hideDotFiles !== false && AJXP_Utils::isHidden($file)){
+				continue;
+			}
+            if ( is_dir( $url . "/" . $file ) )
+            {
+                // Add collection without any children
+                $contents[] = new ezcWebdavCollection( $path."/".$file );
+            }
+            else
+            {
+                // Add files without content
+                $contents[] = new ezcWebdavResource( $path ."/". $file );
+            }
+        }
+        return $contents;
+    	    	
     }
 	
 }
