@@ -31,7 +31,7 @@ session_start();
 require_once "ezc/Base/base.php"; // dependent on installation method, see below
 spl_autoload_register( array( 'ezcBase', 'autoload' ) );
 
-$baseURL = "http://localhost";
+$baseURL = "http://192.168.0.10";
 $baseURI = "/ajaxplorer/shares";
 
 $requestUri = $_SERVER["REQUEST_URI"];

@@ -25,7 +25,6 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 
 	public function __construct($repositoryId){
 		$repoList = ConfService::getRepositoriesList();
-		AJXP_Logger::debug("$repositoryId ", $repoList);
 		if(!array_key_exists($repositoryId, $repoList)){
 			throw new ezcBaseFileNotFoundException( $repositoryId );
 		}
@@ -88,7 +87,8 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return void
      */
      protected function setResourceContents( $path, $content ){
-     	$fp=fopen($this->accessDriver->getRessourceUrl($path),"wb");
+     	AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
+     	$fp=fopen($this->accessDriver->getRessourceUrl($path),"w");
 		fputs ($fp,$content);
 		fclose($fp);     	
      }
@@ -102,6 +102,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return string
      */
      protected function getResourceContents( $path ){
+     	AJXP_Logger::debug("AJXP_WebdavBackend :: getResourceContent ($path)");
      	$wrapperClassName = $this->accessDriver->getWrapperClassName();
      	$tmp = call_user_func(array($wrapperClassName, "getRealFSReference"), $this->accessDriver->getRessourceUrl($path));
      	if(call_user_func(array($wrapperClassName, "isRemote"))){
@@ -147,7 +148,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return bool
      */
     public function resetProperties( $path, ezcWebdavPropertyStorage $properties ){
-    	AJXP_Logger::debug("PAssing properties", $properties);
+
     }
 
     /**
@@ -164,7 +165,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      */
     public function getProperty( $path, $propertyName, $namespace = 'DAV:' ){
     	$url = $this->accessDriver->getRessourceUrl($path);
-	    AJXP_Logger::debug("Getting Property : ".$propertyName." for url ".$url);	
+	    //AJXP_Logger::debug("Getting Property : ".$propertyName." for url ".$url);	
         $storage = $this->getPropertyStorage( $path );
 
         // Handle dead propreties
@@ -384,7 +385,6 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     protected function performCopy( $fromPath, $toPath, $depth = ezcWebdavRequest::DEPTH_INFINITY ){
     	$error = array();
     	$success = array();
-    	AJXP_Logger::debug("COPY $fromPath $toPath");
     	// Handle duplicate
     	if(dirname($toPath) == dirname($fromPath)){
     		rename($this->accessDriver->getRessourceUrl($fromPath), $this->accessDriver->getRessourceUrl($toPath));
