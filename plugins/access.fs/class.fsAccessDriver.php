@@ -41,7 +41,9 @@ if(!function_exists('download_exception_handler')){
 	function download_exception_handler($exception){}
 }
 
-class fsAccessDriver extends AbstractAccessDriver 
+require_once(AJXP_INSTALL_PATH."/".SERVER_RESOURCES_FOLDER."/interface.AjxpWebdavProvider.php");
+
+class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 {
 	/**
 	* @var Repository
@@ -82,6 +84,14 @@ class fsAccessDriver extends AbstractAccessDriver
 		if($recycle != ""){
 			RecycleBinManager::init($this->urlBase, "/".$recycle);
 		}
+	}
+	
+	public function getRessourceUrl($path){
+		return $this->urlBase.$path;
+	}
+	
+	public function getWrapperClassName(){
+		return $this->wrapperClassName;
 	}
 	
 	function disableArchiveBrowsingContributions(&$contribNode){
