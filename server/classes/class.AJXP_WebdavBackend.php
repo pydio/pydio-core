@@ -1,6 +1,6 @@
 <?php 
 
-class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
+class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLockBackend {
 	
 	/**
 	 * @var Repository
@@ -25,6 +25,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
 
 	public function __construct($repositoryId){
 		$repoList = ConfService::getRepositoriesList();
+		AJXP_Logger::debug("$repositoryId ", $repoList);
 		if(!array_key_exists($repositoryId, $repoList)){
 			throw new ezcBaseFileNotFoundException( $repositoryId );
 		}
@@ -36,6 +37,17 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
 		if(!$this->accessDriver instanceof AjxpWebdavProvider){
 			throw new ezcBaseFileNotFoundException( $repositoryId );
 		}
+		$this->options = new ezcWebdavFileBackendOptions();
+        $this->options['noLock']                 = true;
+        $this->options['waitForLock']            = 200000;
+        $this->options['lockTimeout']            = 2;
+        $this->options['lockFileName']           = '.ezc_lock';
+        $this->options['propertyStoragePath']    = '.ezc';
+        $this->options['directoryMode']          = 0755;
+        $this->options['fileMode']               = 0644;
+        $this->options['useMimeExts']            = false;
+        $this->options['hideDotFiles']           = true;
+		
 	}
 	
 	
@@ -76,7 +88,9 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return void
      */
      protected function setResourceContents( $path, $content ){
-     	
+     	$fp=fopen($this->accessDriver->getRessourceUrl($path),"wb");
+		fputs ($fp,$content);
+		fclose($fp);     	
      }
 
     /**
@@ -106,7 +120,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return bool
      */
     public function setProperty( $path, ezcWebdavProperty $property ){
-    	
+
     }
 
     /**
@@ -133,7 +147,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return bool
      */
     public function resetProperties( $path, ezcWebdavPropertyStorage $properties ){
-    	
+    	AJXP_Logger::debug("PAssing properties", $properties);
     }
 
     /**
@@ -150,7 +164,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      */
     public function getProperty( $path, $propertyName, $namespace = 'DAV:' ){
     	$url = $this->accessDriver->getRessourceUrl($path);
-	    //AJXP_Logger::debug("Getting Property : ".$propertyName." for url ".$url);	
+	    AJXP_Logger::debug("Getting Property : ".$propertyName." for url ".$url);	
         $storage = $this->getPropertyStorage( $path );
 
         // Handle dead propreties
@@ -368,7 +382,16 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return array(ezcWebdavErrorResponse)
      */
     protected function performCopy( $fromPath, $toPath, $depth = ezcWebdavRequest::DEPTH_INFINITY ){
-    	
+    	$error = array();
+    	$success = array();
+    	AJXP_Logger::debug("COPY $fromPath $toPath");
+    	// Handle duplicate
+    	if(dirname($toPath) == dirname($fromPath)){
+    		rename($this->accessDriver->getRessourceUrl($fromPath), $this->accessDriver->getRessourceUrl($toPath));
+    	}else{
+			$this->accessDriver->copyOrMoveFile( dirname($toPath), $fromPath, $error, $success, $move = false);
+    	}
+    	return $error;
     }
 
     /**
@@ -382,7 +405,8 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
      * @return ezcWebdavMultitstatusResponse|null
      */
     protected function performDelete( $path ){
-    	
+    	$logs = array();
+    	$this->accessDriver->delete(array($path), $logs);
     }
 
     /**
@@ -452,6 +476,37 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend {
     	    	
     }
 	
+    /**
+     * Acquire a backend lock.
+     *
+     * This method must acquire an exclusive lock of the backend. If the
+     * backend is already locked by a different request, the must must retry to
+     * acquire the lock continously and wait between each retry $waitTime micro
+     * seconds. If $timeout microseconds have passed since the method was
+     * called, it must throw an exception of type {@link
+     * ezcWebdavLockTimeoutException}.
+     * 
+     * @param int $waitTime Microseconds.
+     * @param int $timeout Microseconds.
+     * @return void
+     */
+    public function lock( $waitTime, $timeout ){
+    	
+    }
+
+    /**
+     * Release the backend lock.
+     *
+     * This method is called to unlock the backend. The lock that was acquired
+     * using {@link lock()} must be released, so that the backend can be locked
+     * by another request.
+     * 
+     * @return void
+     */
+    public function unlock(){
+    	
+    } 
+    
 }
 
 

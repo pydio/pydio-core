@@ -45,11 +45,12 @@ foreach ( $server->configurations as $conf ){
     $conf->pathFactory = $pathFactory;
 }
 if(AuthService::usersEnabled()){
+	$server->options->realm = "ajxp_webdav_realm";
 	$server->auth = new AJXP_WebdavAuth($repositoryId);
 }
 
 $backend = new AJXP_WebdavBackend($repositoryId);
-//$backend  = new ezcWebdavFileBackend(dirname( __FILE__ ) . '/files');
+//$backend = new ezcWebdavFileBackend(AJXP_INSTALL_PATH."/files/");
 $server->handle( $backend ); 
 
 ?>
