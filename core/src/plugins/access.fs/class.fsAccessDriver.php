@@ -1326,11 +1326,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				try{
 					$src = fopen($realSrcFile, "r");
 					$dest = fopen($destFile, "w");
-					while (!feof($src)) {
-						stream_copy_to_stream($src, $dest, 4096);
-					}					
+					if($dest !== false){
+						while (!feof($src)) {
+							stream_copy_to_stream($src, $dest, 4096);
+						}					
+						fclose($dest);
+					}
 					fclose($src);
-					fclose($dest);
 					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
 				}catch (Exception $e){
 					$error[] = $e->getMessage();
