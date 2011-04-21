@@ -102,7 +102,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 						}
 					}
 					*/
-					if($loggedUser->getId() == "guest" || $loggedUser == "shared"){
+					if($loggedUser != null && $loggedUser->getId() == "guest" || $loggedUser == "shared"){
 						$disableSharing = true;
 					}
 				}else{

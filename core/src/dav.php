@@ -26,12 +26,12 @@ ConfService::init("server/conf/conf.php");
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 
-session_start();
+//session_start();
 
 require_once "ezc/Base/base.php"; // dependent on installation method, see below
 spl_autoload_register( array( 'ezcBase', 'autoload' ) );
 
-$baseURL = "http://192.168.0.10";
+$baseURL = "http://192.168.0.11";
 $baseURI = "/ajaxplorer/shares";
 
 $requestUri = $_SERVER["REQUEST_URI"];
