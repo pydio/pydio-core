@@ -5,6 +5,8 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
 	
     protected $repositoryId;
     protected $currentUser;
+    protected $currentRead;
+    protected $currentWrite;
     
     public function __construct($repositoryId){
     	$this->repositoryId = $repositoryId;
@@ -68,18 +70,20 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
     
 
     public function authorize( $user, $path, $access = ezcWebdavAuthorizer::ACCESS_READ )
-    {
+    {    	
         if ( $access === ezcWebdavAuthorizer::ACCESS_READ )
-        {
-        	$res = $this->currentUser->canRead($this->repositoryId);
-        	AJXP_Logger::debug("Authorize read ? $res ".$user.$path);
-            return ( $this->currentUser->canRead($this->repositoryId) );
+        {        	
+        	if(!isSet($this->currentRead)){
+	        	$this->currentRead = $this->currentUser->canRead($this->repositoryId);
+        	}
+            return ( $this->currentRead );
         }
         else if( $access === ezcWebdavAuthorizer::ACCESS_WRITE )
         {
-        	$res = $this->currentUser->canWrite($this->repositoryId);
-        	AJXP_Logger::debug("Authorize write ? $res ".$user.$path);
-        	return ( $this->currentUser->canWrite($this->repositoryId) );       	
+        	if(!isSet($this->currentWrite)){
+	        	$this->currentWrite = $this->currentUser->canWrite($this->repositoryId);
+        	}        	
+        	return ( $this->currentWrite );       	
         }
         return false;
     }
