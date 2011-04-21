@@ -58,7 +58,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		foreach($bt as $trace){
 			$calls[] = $trace["file"]."::".$trace["function"];
 		}
-		if(strstr($path, "%")){
+		if(strstr($path, "%") && strstr(PHP_OS, "WIN")){
 			$path = urldecode($path);
 		}
 		$path = SystemTextEncoding::fromUTF8($path, true);
