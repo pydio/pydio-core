@@ -222,8 +222,8 @@ $default_language="en";
 /* the css or the js files, and to compile 
 /* these into bundled file.
 /*********************************************/
-$AJXP_JS_DEBUG = false;
-$AJXP_SERVER_DEBUG = false;
+$AJXP_JS_DEBUG = true;
+$AJXP_SERVER_DEBUG = true;
 
 /*********************************************/
 /* SESSION CREDENTIALS
@@ -310,6 +310,42 @@ $customIcon = "";
 $customIconWidth = "";
 // An additional welcome message appearing in the start up screen
 $welcomeCustomMessage = "";
+
+/***************************************************/
+/*   WEBDAV SERVER CONFIGS
+ * If you enable this configuration, you will be able to mount your repositories as webDAV 
+ * folders. Please read carefully the documentation below.
+ * 
+ * EZCOMPONENT
+ * This feature requires the ezComponent library to work. Please refer to the 
+ * installation guide here : http://ezcomponents.org/docs/install
+ * It's not very hard to install, ultra-simple if you already have PEAR installed, 
+ * and possible on standard shared hostings. 
+ *  
+ * HTACCESS & REWRITE RULE
+ * 
+ * DIGEST AUTHENTICATION / 
+ * TODO : 	. set TRANSMIT CLEAR PASS dynamically to true
+ * 			. add a hook on pass change
+ * 
+ ***************************************************/
+// Put this to true or false
+define("AJXP_WEBDAV_ENABLE", true);
+// Path to the ezComponents library (ezc for PEAR install).
+define("AJXP_WEBDAV_BASEHOST", "http://192.168.0.11");
+// Put here the path to the virtual folder defined in your
+// .htaccess, that will redirect to dav.php, NO TRAILING SLASH. 
+// Clients will then access the shares with the following 
+// combination : BASEHOST/BASEURI/repositoryID. 
+define("AJXP_WEBDAV_BASEURI", "/ajaxplorer/shares");
+// Here is the problematic part : windows recent webdav client only
+// accept HTTP "Digest" Auth, which imply storing the password either clear, 
+// or with an algorithm different of the one currently used in AjaXplorer. 
+// Thus, after you have enabled AJXP_WEBDAV, the users will have to update their
+// password at least once, to make sure to store the new hashed form in their wallet.
+// This will be necessary before they can access the repositories via webDAV, otherwise
+// you'll have to enable GUEST browsing.
+define("AJXP_WEBDAV_DIGESTREALM", "ajxp_webdav_realm");
 
 /*********************************************/
 /* WEBMASTER EMAIL / NOT USED AT THE MOMENT!!

@@ -20,19 +20,23 @@ require_once("server/classes/class.AJXP_Logger.php");
 //set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 //set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
+$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/server/conf");
 ConfService::init("server/conf/conf.php");
+
+if(!AJXP_WEBDAV_ENABLE){
+	die('You are not allowed to access this service');
+}
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
 
 //session_start();
 
-require_once "ezc/Base/base.php"; // dependent on installation method, see below
+require_once AJXP_INSTALL_PATH."/".SERVER_RESOURCES_FOLDER."/ezc/Base/base.php";
 spl_autoload_register( array( 'ezcBase', 'autoload' ) );
 
-$baseURL = "http://192.168.0.11";
-$baseURI = "/ajaxplorer/shares";
+$baseURL = AJXP_WEBDAV_BASEHOST;
+$baseURI = AJXP_WEBDAV_BASEURI;
 
 $requestUri = $_SERVER["REQUEST_URI"];
 $end = substr($requestUri, strlen($baseURI."/"));
@@ -45,7 +49,7 @@ foreach ( $server->configurations as $conf ){
     $conf->pathFactory = $pathFactory;
 }
 if(AuthService::usersEnabled()){
-	$server->options->realm = "ajxp_webdav_realm";
+	$server->options->realm = AJXP_WEBDAV_DIGESTREALM;
 	$server->auth = new AJXP_WebdavAuth($repositoryId);
 }
 
