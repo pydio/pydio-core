@@ -438,6 +438,14 @@ $mess=array(
 "400" => "Number of pieces :",
 "401" => "You can download and install the following software to join the pieces once on your computer : ",
 "402" => "http://www.hjsplit.org/",
+"403" => "WebDAV Preferences",
+"404" => "You can use the WebDAV protocol to mount your AjaXplorer repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
+"405" => "Use the following URLS to access your repositories, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
+"406" => "Activate WebDAV shares",
+"407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",
+"408" => "Activated WebDav shares successfully, do not forget to update your password if it's the first time!",
+"409" => "De-activated WebDav shares successfully",
+"410" => "Updated webDav password successfully",
 /* END SENTENCE */
 );
 ?>

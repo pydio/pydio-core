@@ -1,14 +1,14 @@
 <?php
 //---------------------------------------------------------------------------------------------------
-//							
+//
 //	AjaXplorer
-//	
+//
 //	Copyright 2007-2008 Charles du Jeu - LGPL
 //  www.Ajaxplorer.info
 //
 //  Reference dictionary for translations
 // Slovenian translation: April 21 2011 by Vladimir Bohinc (vladimir.bohinc@gmail.com)
-// 
+//
 //---------------------------------------------------------------------------------------------------
 $mess=array(
 "languageLabel" => "Slovenščina",
@@ -113,7 +113,7 @@ $mess=array(
 "96" => "Prosim izberite ciljno mapo v drevesu: ",
 "97" => "Naloži datoteke",
 "98" => "Kliknite kjerkoli v okviru da ga zaprete.",
-"99" => "ni zapisljiva. Tu gre morda za težavo z dovoljenji, posvetujte se s skrbnikom.", 
+"99" => "ni zapisljiva. Tu gre morda za težavo z dovoljenji, posvetujte se s skrbnikom.",
 "100" => "Ne najdem datoteke ",
 "101" => "Izvorna in ciljna mapa je ista!",
 "102" => "Napaka pri ustvarjanju datotek(e): ",
@@ -220,7 +220,6 @@ $mess=array(
 "204" => "Datoteka \"",
 "205" => "\" presega omejitev velikosti (",
 "206" => "Mb).\\nZato ne bo prenešena na strežnik.",
-/* END SENTENCE */
 "207" => "Nimate pravic zapisovanja v to mapo",
 "208" => "Nimate pravic branja te mape",
 "209" => "Notranja napaka strežnika, prosim obvestite skrbnika!",
@@ -392,7 +391,6 @@ $mess=array(
 "375" => "Opozorilo, seja je neaktivna več kot __IDLE__, samodejno boste odjavljeni čez __LOGOUT__",
 "376" => "Kliknite kjerkoli za reaktivacijo seje",
 "378" => "Opozorilo, geslo je prazno oz. prekratko!",
-/* password strength tester */
 "379" => "Ni varno!",
 "380" => "Prekratko",
 "381" => "Zelo šibko",
@@ -415,7 +413,6 @@ $mess=array(
 "400" => "Število kosov: ",
 "401" => "Za združitev posameznih kosov (na vašem računalniku) lahko uporabite naslednji program : ",
 "402" => "http://www.hjsplit.org/",
-/* quick access keys */
 "parent_access_key" => "w",
 "refresh_access_key" => "e",
 "list_access_key" => "L",
@@ -439,5 +436,16 @@ $mess=array(
 "create_repo_accesskey" => "z",
 "create_user_accesskey" => "u",
 "open_with_access" => "z",
+"403" => "WebDAV Preferences",
+"404" => "You can use the WebDAV protocol to mount your AjaXplorer repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
+"405" => "Use the following URLS to access your repositories, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
+"406" => "Activate WebDAV shares",
+"407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",
+"408" => "Activated WebDav shares successfully, do not forget to update your password if it's the first time!",
+"409" => "De-activated WebDav shares successfully",
+"410" => "Updated webDav password successfully",
+/* END SENTENCE */
+/* password strength tester */
+/* quick access keys */
 );
 ?>

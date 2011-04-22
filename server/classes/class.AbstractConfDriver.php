@@ -40,6 +40,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	var $options;
 	var $driverType = "conf";
 	
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
+		if(!AJXP_WEBDAV_ENABLE && $contribNode->nodeName == "actions"){
+			unset($this->actions["webdav_preferences"]);
+			$actionXpath=new DOMXPath($contribNode->ownerDocument);
+			$publicUrlNodeList = $actionXpath->query('action[@name="webdav_preferences"]', $contribNode);
+			$publicUrlNode = $publicUrlNodeList->item(0);
+			$contribNode->removeChild($publicUrlNode);			
+		}		
+	}
+	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	/**
 	 * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
@@ -235,7 +246,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$userObject = AuthService::getLoggedUser();
 				$webdavActive = false;
 				$passSet = false;
-				$webdavBaseUrl = "http://www.localhost.com/ajaxplorer/shares/";
+				$webdavBaseUrl = AJXP_WEBDAV_BASEHOST.AJXP_WEBDAV_BASEURI."/";
 				if(isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])){
 					$davData = $userObject->getPref("AJXP_WEBDAV_DATA");
 					if(!empty($httpVars["activate"])){
