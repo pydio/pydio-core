@@ -7,9 +7,15 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
     protected $currentUser;
     protected $currentRead;
     protected $currentWrite;
+    private $secretKey;
     
     public function __construct($repositoryId){
     	$this->repositoryId = $repositoryId;
+		if(defined('AJXP_SAFE_SECRET_KEY')){
+			$this->secretKey = AJXP_SAFE_SECRET_KEY;
+		}else{
+			$this->secretKey = "\1CDAFx¨op#";
+		}    	
     }
     
     protected function updateCurrentUserRights($user){
@@ -31,13 +37,7 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
 
     public function authenticateBasic( ezcWebdavBasicAuth $data )
     {
-    	$res = AuthService::logUser($data->username, $data->password, false, false, -1);
-    	if($res != 1) {
-    		return false;
-    	}
-    	else {
-    		return $this->updateCurrentUserRights(AuthService::getLoggedUser());
-    	}
+    	return $this->_performAuthentication($data, "BASIC");
     }
         
     /**
@@ -56,18 +56,47 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
      * @return bool
      */
     public function authenticateDigest( ezcWebdavDigestAuth $data ){
+    	
+    	return $this->_performAuthentication($data, "DIGEST");
+    }
+    
+    protected function _performAuthentication($data, $method = "BASIC"){
     	if(!AuthService::userExists($data->username)){
+    		AJXP_Logger::debug("not exists! ".$data->username);
     		return false;
     	}
-    	$passCheck = $this->checkDigest($data, "admin");
+    	$confDriver = ConfService::getConfStorageImpl();
+    	$user = $confDriver->createUserObject($data->username);
+    	$webdavData = $user->getPref("AJXP_WEBDAV_DATA");
+    	if(empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true || !isSet($webdavData["PASS"])){
+    		return false;
+    	}
+    	//$webdavData = array("PASS" => $this->_encodePassword("admin", "admin"));
+    	
+    	$passCheck = false;
+    	if($method == "BASIC"){
+			if ($this->_decodePassword($webdavData["PASS"], $data->username) == $data->password){
+				$passCheck = true;
+			}
+    	}else if($method == "DIGEST"){
+    		$passCheck = $this->checkDigest($data, $this->_decodePassword($webdavData["PASS"], $data->username));
+    	}
+    	
     	if($passCheck){
     		AuthService::logUser($data->username, null, true);
-    		return $this->updateCurrentUserRights(AuthService::getLoggedUser());
+    		$res = $this->updateCurrentUserRights(AuthService::getLoggedUser());
+    		if($res === false){
+    			return false;
+    		}
+    		if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
+    			AJXP_Safe::storeCredentials($data->username, $this->_decodePassword($webdavData["PASS"], $data->username));
+    		}
+    		return true;
     	}else{
     		return false;
     	}
+    	
     }
-    
 
     public function authorize( $user, $path, $access = ezcWebdavAuthorizer::ACCESS_READ )
     {    	
@@ -133,6 +162,28 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
 
         return $digest === $data->response;
     }
+    
+	private function _encodePassword($password, $user){
+		if (function_exists('mcrypt_encrypt'))
+        {
+	        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+	        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+	        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
+	        $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$this->secretKey), $password, MCRYPT_MODE_ECB, $iv));
+        }
+		return $password;
+	}
+	
+	private function _decodePassword($encoded, $user){
+        if (function_exists('mcrypt_decrypt'))
+        {
+             // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+             $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+             // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
+             $encoded = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($user.$this->secretKey), base64_decode($encoded), MCRYPT_MODE_ECB, $iv));
+        }
+		return $encoded;
+	}    
     
 }
 

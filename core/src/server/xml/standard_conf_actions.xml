@@ -59,5 +59,90 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>		
 		</action>
+		<action name="webdav_preferences">
+			<gui text="403" title="403" src="drive_remote.png" accessKey="" hasAccessKey="false">
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="default" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+			</gui>
+			<processing>				
+				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+					if(!ajaxplorer.user) return;					
+					var cont = $('webdav_repo_list');
+					cont.update('');
+					var even = false;
+					var conn = new Connexion();
+					conn.setParameters(new Hash({get_action:'webdav_preferences'}));
+					conn.onComplete = function(transport){
+						ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
+						$('webdav_activator').checked = ajaxplorer.webdavCurrentPreferences.webdav_active;
+						if($('webdav_activator').checked) $('webdav_password_form').show(); 
+					};
+					conn.sendSync();
+					ajaxplorer.user.getRepositoriesList().each(function(pair){
+						if(pair.value.accessType == 'fs' || pair.value.accessType == 'ftp'){
+							var div = new Element('div', {className:(even?'even':'')});
+							div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_base_url + pair.key+'">' );				
+							cont.insert(div);
+							even = !even;
+						}
+					});	
+					modal.getForm().down('input[name="close"]').observe("click", hideLightBox);
+					if(!$('webdav_activator').hasObserver){
+						$('webdav_activator').observe("change", function(e){
+							var checked = $('webdav_activator').checked;
+							var conn = new Connexion();
+							conn.setParameters(new Hash({
+								get_action:'webdav_preferences',
+								activate:(checked?'true':'false')
+							}));
+							conn.onComplete = function(transport){
+								ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
+								if(ajaxplorer.webdavCurrentPreferences.webdav_active) {
+									$('webdav_password_form').show();
+									ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
+								}else {
+									$('webdav_password_form').hide();
+									ajaxplorer.displayMessage("SUCCESS", MessageHash[409]);									
+								}								
+							};
+							conn.sendAsync();
+						});
+						$('webdav_pass_saver').observe("click", function(){
+							var conn = new Connexion();
+							conn.setMethod('POST');
+							conn.setParameters(new Hash({
+								get_action:'webdav_preferences',
+								webdav_pass: $('webdav_password').value
+							}));
+							conn.onComplete = function(transport){
+								ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
+							};
+							conn.sendAsync();
+						});
+						
+						$('webdav_activator').hasObserver = true;
+					}
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="false"><![CDATA[
+					]]></dialogOnComplete>
+					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+				</clientCallback>
+				<clientForm id="webdav_pref_form"><![CDATA[
+					<div id="webdav_pref_form" action="webdav_pref_form" box_width="450">
+						<div>
+							<input type="checkbox" id="webdav_activator" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label>
+						</div>
+						<div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
+							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="client/themes/oxygen/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
+						</div>						
+						<div class="dialogLegend" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
+						<div class="dialogLegend" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
+						<div id="webdav_repo_list" style="height: 200px; overflow:auto;"></div>
+						<input type="hidden" name="get_action" value="webdav_preferences">									
+					</div>					
+				]]></clientForm>				
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>		
+		</action>		
 	</actions>
 </driver>

@@ -227,6 +227,53 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				
 			break;					
 					
+			//------------------------------------
+			// WEBDAV PREFERENCES
+			//------------------------------------
+			case "webdav_preferences" :
+				
+				$userObject = AuthService::getLoggedUser();
+				$webdavActive = false;
+				$passSet = false;
+				$webdavBaseUrl = "http://www.localhost.com/ajaxplorer/shares/";
+				if(isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])){
+					$davData = $userObject->getPref("AJXP_WEBDAV_DATA");
+					if(!empty($httpVars["activate"])){
+						$activate = ($httpVars["activate"]=="true" ? true:false);
+						if(empty($davData)){
+							$davData = array();						
+						}
+						$davData["ACTIVE"] = $activate;
+					}
+					if(!empty($httpVars["webdav_pass"])){
+						$password = $httpVars["webdav_pass"];
+						if (function_exists('mcrypt_encrypt'))
+				        {
+				        	$user = $userObject->getId();
+				        	$secret = (defined("AJXP_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
+					        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+					        $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$secret), $password, MCRYPT_MODE_ECB, $iv));
+				        }						
+						$davData["PASS"] = $password;
+					}
+					$userObject->setPref("AJXP_WEBDAV_DATA", $davData);
+					$userObject->save();
+				}
+				$davData = $userObject->getPref("AJXP_WEBDAV_DATA");				
+				if(!empty($davData)){
+					$webdavActive = (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true); 
+					$passSet = (isSet($davData["PASS"])); 
+				}				
+				$prefs = array(
+					"webdav_active"  => $webdavActive,
+					"password_set"   => $passSet,
+					"webdav_base_url"  => $webdavBaseUrl				
+				);
+				HTMLWriter::charsetHeader("application/json");
+				print(json_encode($prefs));
+				
+			break;
+			
 			default;
 			break;
 		}
