@@ -330,14 +330,19 @@ $welcomeCustomMessage = "";
  * 
  ***************************************************/
 // Put this to true or false
-define("AJXP_WEBDAV_ENABLE", true);
-// Path to the ezComponents library (ezc for PEAR install).
+define("AJXP_WEBDAV_ENABLE", false);
+
+// WEBDAV_BASEHOST AND WEBDAV_BASEURI must be correctly
+// set in order to make webdav work
+// Warning, you also must ENABLE APACHE REWRITE ENGINE 
+// and edit the .htaccess file at the root of the distribution 
 define("AJXP_WEBDAV_BASEHOST", "http://192.168.0.11");
 // Put here the path to the virtual folder defined in your
 // .htaccess, that will redirect to dav.php, NO TRAILING SLASH. 
 // Clients will then access the shares with the following 
 // combination : BASEHOST/BASEURI/repositoryID. 
 define("AJXP_WEBDAV_BASEURI", "/ajaxplorer/shares");
+
 // Here is the problematic part : windows recent webdav client only
 // accept HTTP "Digest" Auth, which imply storing the password either clear, 
 // or with an algorithm different of the one currently used in AjaXplorer. 
