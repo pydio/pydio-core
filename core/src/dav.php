@@ -54,6 +54,12 @@ if(AuthService::usersEnabled()){
 }
 
 $backend = new AJXP_WebdavBackend($repositoryId);
+
+$lockConf = new ezcWebdavLockPluginConfiguration();
+$server->pluginRegistry->registerPlugin(
+	$lockConf
+);
+
 //$backend = new ezcWebdavFileBackend(AJXP_INSTALL_PATH."/files/");
 $server->handle( $backend ); 
 

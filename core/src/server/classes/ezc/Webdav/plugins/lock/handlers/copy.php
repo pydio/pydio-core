@@ -262,9 +262,9 @@ class ezcWebdavLockCopyRequestResponseHandler extends ezcWebdavLockRequestRespon
 
             if ( !( $propPatchRes instanceof ezcWebdavPropPatchResponse ) )
             {
-                throw new ezcWebdavInconsistencyException(
-                    "Could not set lock on resource {$newPath}."
-                );
+                //throw new ezcWebdavInconsistencyException(
+                //    "Could not set lock on resource {$newPath}."
+                //);
             }
         }
        
