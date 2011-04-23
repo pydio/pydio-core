@@ -222,8 +222,8 @@ $default_language="en";
 /* the css or the js files, and to compile 
 /* these into bundled file.
 /*********************************************/
-$AJXP_JS_DEBUG = true;
-$AJXP_SERVER_DEBUG = true;
+$AJXP_JS_DEBUG = false;
+$AJXP_SERVER_DEBUG = false;
 
 /*********************************************/
 /* SESSION CREDENTIALS
@@ -336,7 +336,7 @@ define("AJXP_WEBDAV_ENABLE", false);
 // set in order to make webdav work
 // Warning, you also must ENABLE APACHE REWRITE ENGINE 
 // and edit the .htaccess file at the root of the distribution 
-define("AJXP_WEBDAV_BASEHOST", "http://192.168.0.11");
+define("AJXP_WEBDAV_BASEHOST", "http://192.168.0.10");
 // Put here the path to the virtual folder defined in your
 // .htaccess, that will redirect to dav.php, NO TRAILING SLASH. 
 // Clients will then access the shares with the following 
