@@ -39,7 +39,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 			throw new ezcBaseFileNotFoundException( $repositoryId );
 		}
 		$this->options = new ezcWebdavFileBackendOptions();
-        $this->options['noLock']                 = true;
+        $this->options['noLock']                 = false;
         $this->options['waitForLock']            = 200000;
         $this->options['lockTimeout']            = 2;
         $this->options['lockFileName']           = '.ezc_lock';
@@ -53,16 +53,19 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 	
 	protected function fixPath($path){
 		if ($path == "\\") $path = "";
+		/*
 		$bt = debug_backtrace();
 		$calls = array();
 		foreach($bt as $trace){
 			$calls[] = $trace["file"]."::".$trace["function"];
 		}
-		if(strstr($path, "%") && !strstr(PHP_OS, "MAC")){
+		AJXP_Logger::debug("fixPath : $path => ".$calls["1"]);
+		*/
+		//AJXP_Logger::debug("fixPath : $path => ".PHP_OS);		
+		if(strstr($path, "%") && !strstr(PHP_OS, "Darwin")){
 			$path = urldecode($path);
 		}
 		$path = SystemTextEncoding::fromUTF8($path, true);
-		//AJXP_Logger::debug("fixPath : $path => ".$calls["1"]);
 		return $path;
 	}
 	
@@ -142,7 +145,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return bool
      */
     public function setProperty( $path, ezcWebdavProperty $property ){
-
+		return true;
     }
 
     /**
@@ -155,7 +158,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return bool
      */
     public function removeProperty( $path, ezcWebdavProperty $property ){
-    	
+    	return true;
     }
 
     /**
@@ -169,7 +172,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return bool
      */
     public function resetProperties( $path, ezcWebdavPropertyStorage $properties ){
-
+		return true;
     }
 
     /**
@@ -281,7 +284,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	$path = $this->fixPath($path);    	
         clearstatcache();
         $mtime = filemtime( $this->accessDriver->getRessourceUrl($path) );
-        AJXP_Logger::debug("Getting etag ".$path);
+        //AJXP_Logger::debug("Getting etag ".$path);
         return md5(
             $path
             . $this->getContentLength( $path )
@@ -476,7 +479,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     		return $this->statCache[$path]["is_collection"];
     	}
 	    $url = $this->accessDriver->getRessourceUrl($path);
-	    AJXP_Logger::debug("isCollection($path, $url)");
+	    //AJXP_Logger::debug("isCollection($path, $url)");
 	    $result = is_dir( $url );
 	    $this->statCache[$path]["is_collection"] = $result;
     	return $result;
