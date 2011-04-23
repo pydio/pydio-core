@@ -316,13 +316,10 @@ $welcomeCustomMessage = "";
  * If you enable this configuration, you will be able to mount your repositories as webDAV 
  * folders. Please read carefully the documentation below.
  * 
- * EZCOMPONENT
- * This feature requires the ezComponent library to work. Please refer to the 
- * installation guide here : http://ezcomponents.org/docs/install
- * It's not very hard to install, ultra-simple if you already have PEAR installed, 
- * and possible on standard shared hostings. 
- *  
  * HTACCESS & REWRITE RULE
+ * Please open and edit the necessary values in the root .htaccess file
+ * of the distribution. The concepts are to redirect automatically all
+ * requests sent on your_install_path/shares to your_install_path/dav.php
  * 
  * DIGEST AUTHENTICATION / 
  * TODO : 	. set TRANSMIT CLEAR PASS dynamically to true
