@@ -516,9 +516,14 @@ class ezcWebdavTransport
      */
     protected function sendResponse( ezcWebdavOutputResult $output )
     {
+    	$AJXP_Headers = array();
         // Sends HTTP headers
         foreach ( $output->headers as $name => $content )
         {
+        	if(strpos($name, "AJXP-") === 0){
+        		$AJXP_Headers[$name] = $content;
+        		continue;
+        	}
             $content   = is_array( $content ) ? $content : array( $content );
             $overwrite = true;
             foreach ( $content as $contentLine )
@@ -531,9 +536,19 @@ class ezcWebdavTransport
 
         // Send HTTP status code
         header( $output->status );
-
-        // Content-Length header automatically send
-        echo $output->body;
+        
+        if(isSet($AJXP_Headers["AJXP-Send-File"])){        	
+	        //AJXP_Logger::debug(print_r($output->headers, true));
+	        $xSendFile = $AJXP_Headers["AJXP-Send-File"];
+	        $wrapperName = $AJXP_Headers["AJXP-Wrapper"];
+	        $stream = fopen("php://output", "a");
+	        call_user_func(array($wrapperName, "copyFileInStream"), $xSendFile, $stream);
+			fflush($stream);
+			fclose($stream);	        
+        }else{        
+	        // Content-Length header automatically send
+	        echo $output->body;
+        }
     }
 
     /*
