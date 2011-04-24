@@ -10,6 +10,10 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 	 * @param AjxpWebdavProvider
 	 */
 	protected $accessDriver;
+	/**
+	 * @var string
+	 */
+	protected $wrapperClassName;
 	
     protected $handledLiveProperties = array( 
         'getcontentlength', 
@@ -38,6 +42,9 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		if(!$this->accessDriver instanceof AjxpWebdavProvider){
 			throw new ezcBaseFileNotFoundException( $repositoryId );
 		}
+		$wrapperData = $this->accessDriver->detectStreamWrapper(true);
+		$this->wrapperClassName = $wrapperData["classname"];
+				
 		$this->options = new ezcWebdavFileBackendOptions();
         $this->options['noLock']                 = false;
         $this->options['waitForLock']            = 200000;
@@ -525,6 +532,83 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
         return $contents;
     	    	
     }    
+    
+    
+    /**
+     * Serves GET requests.
+     *
+     * The method receives a {@link ezcWebdavGetRequest} object containing all
+     * relevant information obout the clients request and will return an {@link
+     * ezcWebdavErrorResponse} instance on error or an instance of {@link
+     * ezcWebdavGetResourceResponse} or {@link ezcWebdavGetCollectionResponse}
+     * on success, depending on the type of resource that is referenced by the
+     * request.
+     *
+     * @param ezcWebdavGetRequest $request
+     * @return ezcWebdavResponse
+     */
+    public function get( ezcWebdavGetRequest $request )
+    {
+        $source = $request->requestUri;
+
+        // Check authorization
+        if ( !ezcWebdavServer::getInstance()->isAuthorized( $source, $request->getHeader( 'Authorization' ) ) )
+        {
+            return $this->createUnauthorizedResponse(
+                $source,
+                $request->getHeader( 'Authorization' )
+            );
+        }
+
+        // Check if resource is available
+        if ( !$this->nodeExists( $source ) )
+        {
+            return new ezcWebdavErrorResponse(
+                ezcWebdavResponse::STATUS_404,
+                $source
+            );
+        }
+
+        // Verify If-[None-]Match headers
+        if ( ( $res = $this->checkIfMatchHeaders( $request, $source ) ) !== null )
+        {
+            return $res;
+        }
+        
+        $res = null; // Init
+        if ( !$this->isCollection( $source ) )
+        {
+            // Just deliver file
+            $res = new ezcWebdavGetResourceResponse(
+                new ezcWebdavResource(
+                    $source,
+                    $this->getAllProperties( $source )/*,
+                    $this->getResourceContents( $source )*/
+                )
+            );
+            $res->setHeader("AJXP-Send-File", $this->accessDriver->getRessourceUrl($this->fixPath($source)));
+            $res->setHeader("AJXP-Wrapper", $this->wrapperClassName);
+        }
+        else
+        {
+            // Return collection with contained children
+            $res = new ezcWebdavGetCollectionResponse(
+                new ezcWebdavCollection(
+                    $source,
+                    $this->getAllProperties( $source ),
+                    $this->getCollectionMembers( $source )
+                )
+            );
+        }
+        
+        // Add ETag header
+        $res->setHeader( 'ETag', $this->getETag( $source ) );
+
+        // Deliver response
+        return $res;
+    }
+    
+    
 	
     /**
      * Acquire a backend lock.
