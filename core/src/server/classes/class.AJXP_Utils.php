@@ -368,6 +368,38 @@ class AJXP_Utils
 		}
 	}
 
+	/**
+	 * Modifies a string to remove all non ASCII characters and spaces.
+	 */
+	static public function slugify($text)
+	{
+		if(empty($text)) return "";
+	    // replace non letter or digits by -
+	    $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+	 
+	    // trim
+	    $text = trim($text, '-');
+	 
+	    // transliterate
+	    if (function_exists('iconv'))
+	    {
+	        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+	    }
+	 
+	    // lowercase
+	    $text = strtolower($text);
+	 
+	    // remove unwanted characters
+	    $text = preg_replace('~[^-\w]+~', '', $text);
+	 
+	    if (empty($text))
+	    {
+	        return 'n-a';
+	    }
+	 
+	    return $text;
+	}	
+	
 	static function updateI18nFiles($pluginPath = ""){
 		if($pluginPath != ""){
 			$baseDir = INSTALL_PATH."/plugins/".$pluginPath;

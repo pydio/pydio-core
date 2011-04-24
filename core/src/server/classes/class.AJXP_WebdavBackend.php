@@ -29,11 +29,8 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     
     protected $statCache = array();
 
-	public function __construct($repositoryId){
-		$repoList = ConfService::getRepositoriesList();
-		if(!array_key_exists($repositoryId, $repoList)){
-			throw new ezcBaseFileNotFoundException( $repositoryId );
-		}
+	public function __construct($repository){
+		$repositoryId = $repository->getId();
 		ConfService::switchRootDir($repositoryId);
 		$this->repository = ConfService::getRepository();
 		

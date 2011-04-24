@@ -554,7 +554,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::close("admin_data");
 					return ;
 				}
-				$repository = $repList[$repId];				
+				$repository = $repList[$repId];			
+				$slug = $repository->getSlug();
+				if($slug == "" && $repository->isWriteable()){
+					$repository->setSlug();
+					ConfService::replaceRepository($repId, $repository);
+				}
 				$nested = array();
 				print("<repository index=\"$repId\"");
 				foreach ($repository as $name => $option){
@@ -581,6 +586,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 							}
 						}
 					}
+					// Add SLUG
+					print("<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>");
 					print("</repository>");
 				}else{
 					print("/>");

@@ -78,10 +78,10 @@
 						if($('webdav_activator').checked) $('webdav_password_form').show(); 
 					};
 					conn.sendSync();
-					ajaxplorer.user.getRepositoriesList().each(function(pair){
-						if(pair.value.accessType == 'fs' || pair.value.accessType == 'ftp'){
+					ajaxplorer.user.getRepositoriesList().each(function(pair){					
+						if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
 							var div = new Element('div', {className:(even?'even':'')});
-							div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_base_url + pair.key+'">' );				
+							div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );				
 							cont.insert(div);
 							even = !even;
 						}

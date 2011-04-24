@@ -42,11 +42,14 @@ class serialConfDriver extends AbstractConfDriver {
 	var $usersSerialDir;
 	var $rolesSerialFile;
 	
+	var $aliasesIndexFile;
+	
 	function init($options){
 		parent::init($options);
 		$this->repoSerialFile = AJXP_VarsFilter::filter($options["REPOSITORIES_FILEPATH"]);
 		$this->usersSerialDir = AJXP_VarsFilter::filter($options["USERS_DIRPATH"]);
 		$this->rolesSerialFile = AJXP_VarsFilter::filter($options["ROLES_FILEPATH"]);
+		$this->aliasesIndexFile = dirname($this->repoSerialFile)."/aliases.ser";
 	}
 	
 	function performChecks(){
@@ -106,6 +109,20 @@ class serialConfDriver extends AbstractConfDriver {
 		return null;
 	}
 	/**
+	 * Retrieve a Repository given its alias.
+	 *
+	 * @param String $repositorySlug
+	 * @return Repository
+	 */	
+	function getRepositoryByAlias($repositorySlug){
+		$data = AJXP_Utils::loadSerialFile($this->aliasesIndexFile);
+		if(isSet($data[$repositorySlug])){
+			return $this->getRepositoryById($data[$repositorySlug]);
+		}
+		return null;
+	}
+	
+	/**
 	 * Store a newly created repository 
 	 *
 	 * @param Repository $repositoryObject
@@ -128,7 +145,9 @@ class serialConfDriver extends AbstractConfDriver {
 		$res = AJXP_Utils::saveSerialFile($this->repoSerialFile, $repositories);
 		if($res == -1){
 			return $res;
-		}		
+		}else{
+			$this->updateAliasesIndex($repositoryObject->getUniqueId(), $repositoryObject->getSlug());
+		}
 	}
 	/**
 	 * Delete a repository, given its unique ID.
@@ -144,6 +163,15 @@ class serialConfDriver extends AbstractConfDriver {
 			}
 		}
 		AJXP_Utils::saveSerialFile($this->repoSerialFile, $newList);
+	}
+	/**
+	 * Serial specific method : indexes repositories by slugs, for better performances
+	 */
+	function updateAliasesIndex($repositoryId, $repositorySlug){
+		$data = AJXP_Utils::loadSerialFile($this->aliasesIndexFile);
+		$byId = array_flip($data);
+		$byId[$repositoryId] = $repositorySlug;
+		AJXP_Utils::saveSerialFile($this->aliasesIndexFile, array_flip($byId));
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)

@@ -48,6 +48,7 @@ class Repository {
 	var $writeable = false;
 	var $enabled = true;
 	var $options = array();
+	var $slug;
 	
 	private $owner;
 	private $parentId;
@@ -60,6 +61,7 @@ class Repository {
 		$this->setDisplay($display);
 		$this->setId($id);
 		$this->uuid = md5(time());
+		$this->slug = AJXP_Utils::slugify($display);
 	}
 	
 	function createSharedChild($newLabel, $newOptions, $parentId, $owner, $uniqueUser){
@@ -84,6 +86,18 @@ class Repository {
 			return md5(serialize($this));
 		}
 		return $this->uuid;
+	}
+	
+	function getSlug(){
+		return $this->slug;
+	}
+	
+	function setSlug($slug = null){
+		if($slug == null){
+			$this->slug = AJXP_Utils::slugify($this->display);
+		}else{
+			$this->slug = $slug;
+		}
 	}
 	
 	function getClientSettings(){

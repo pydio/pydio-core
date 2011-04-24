@@ -337,7 +337,10 @@ class ConfService
 	public function createRepositoryFromArrayInst($index, $repository){
 		$repo = new Repository($index, $repository["DISPLAY"], $repository["DRIVER"]);
 		if(isSet($repository["DISPLAY_ID"])){
-				$repo->setDisplayStringId($repository["DISPLAY_ID"]);
+			$repo->setDisplayStringId($repository["DISPLAY_ID"]);
+		}
+		if(isSet($repository["AJXP_SLUG"])){
+			$repo->setSlug($repository["AJXP_SLUG"]);
 		}
 		if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
 			foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
@@ -386,6 +389,30 @@ class ConfService
 			return $this->configs["REPOSITORIES"][$repoId];
 		}
 	}
+	
+	/**
+	 * Retrieve a repository object
+	 *
+	 * @param String $repoId
+	 * @return Repository
+	 */
+	public static function getRepositoryByAlias($repoAlias){
+		$repo = self::getConfStorageImpl()->getRepositoryByAlias($repoAlias);
+		if($repo !== null) return $repo;
+		// check default repositories
+		return self::getInstance()->getRepositoryByAliasInstDefaults($repoAlias);
+	}
+	
+	public function getRepositoryByAliasInstDefaults($repoAlias){
+		$conf = $this->configs["DEFAULT_REPOSITORIES"];
+		foreach($conf as $repoId => $repoDef){
+			if($repoDef["AJXP_SLUG"] == $repoAlias){
+				return $this->getRepositoryByIdInst($repoId);
+			}
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * Replace a repository by an update one.

@@ -65,6 +65,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 */	
 	abstract function getRepositoryById($repositoryId);
 	/**
+	 * Retrieve a Repository given its alias.
+	 *
+	 * @param String $repositorySlug
+	 * @return Repository
+	 */	
+	abstract function getRepositoryByAlias($repositorySlug);
+	/**
 	 * Stores a repository, new or not.
 	 *
 	 * @param Repository $repositoryObject
@@ -274,11 +281,21 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				if(!empty($davData)){
 					$webdavActive = (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true); 
 					$passSet = (isSet($davData["PASS"])); 
-				}				
+				}
+				$repoList = ConfService::getRepositoriesList();
+				$davRepos = array();
+				$loggedUser = AuthService::getLoggedUser();
+				foreach($repoList as $repoIndex => $repoObject){
+					$accessType = $repoObject->getAccessType();
+					if(in_array($accessType, array("fs", "ftp")) && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))){
+						$davRepos[$repoIndex] = $webdavBaseUrl ."".($repoObject->getSlug()==null?$repoObject->getId():$repoObject->getSlug());
+					}
+				}
 				$prefs = array(
 					"webdav_active"  => $webdavActive,
 					"password_set"   => $passSet,
-					"webdav_base_url"  => $webdavBaseUrl				
+					"webdav_base_url"  => $webdavBaseUrl, 
+					"webdav_repositories" => $davRepos
 				);
 				HTMLWriter::charsetHeader("application/json");
 				print(json_encode($prefs));
