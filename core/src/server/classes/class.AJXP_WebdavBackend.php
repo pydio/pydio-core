@@ -68,7 +68,6 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		}
 		AJXP_Logger::debug("fixPath : $path => ".$calls["1"]);
 		*/
-		//AJXP_Logger::debug("fixPath : $path => ".PHP_OS);		
 		if(strstr($path, "%") && !strstr(PHP_OS, "Darwin")){
 			$path = urldecode($path);
 		}
@@ -518,15 +517,15 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 			if ( isset($this->options->hideDotFiles) && $this->options->hideDotFiles !== false && AJXP_Utils::isHidden($file)){
 				continue;
 			}
-            if ( is_dir( $url . "/" . $file ) )
+			if ( is_dir( $url . "/" . $file ) )
             {
                 // Add collection without any children
-                $contents[] = new ezcWebdavCollection( SystemTextEncoding::toUTF8($path, true) ."/". SystemTextEncoding::toUTF8($file, true) );
+                $contents[] = new ezcWebdavCollection( SystemTextEncoding::toUTF8($path, true) .($path== "/"?"":"/"). SystemTextEncoding::toUTF8($file, true) );
             }
             else
             {
                 // Add files without content
-                $contents[] = new ezcWebdavResource( SystemTextEncoding::toUTF8($path, true) ."/". SystemTextEncoding::toUTF8($file, true) );
+                $contents[] = new ezcWebdavResource( SystemTextEncoding::toUTF8($path, true) .($path== "/"?"":"/"). SystemTextEncoding::toUTF8($file, true) );
             }
         }
         return $contents;
