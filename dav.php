@@ -43,6 +43,16 @@ $end = substr($requestUri, strlen($baseURI."/"));
 $parts = explode("/", $end);
 $repositoryId = $parts[0];
 
+$repository = ConfService::getRepositoryById($repositoryId);
+if($repository == null){
+	AJXP_Logger::debug("Searching by alias $repositoryId");
+	$repository = ConfService::getRepositoryByAlias($repositoryId);
+}
+if($repository == null){
+	AJXP_Logger::debug("not found, dying $repositoryId");
+	die('You are not allowed to access this service');
+}
+
 $server = ezcWebdavServer::getInstance();
 $pathFactory = new ezcWebdavBasicPathFactory($baseURL.$baseURI."/$repositoryId");
 foreach ( $server->configurations as $conf ){
@@ -50,10 +60,10 @@ foreach ( $server->configurations as $conf ){
 }
 if(AuthService::usersEnabled()){
 	$server->options->realm = AJXP_WEBDAV_DIGESTREALM;
-	$server->auth = new AJXP_WebdavAuth($repositoryId);
+	$server->auth = new AJXP_WebdavAuth($repository->getId());
 }
 
-$backend = new AJXP_WebdavBackend($repositoryId);
+$backend = new AJXP_WebdavBackend($repository);
 
 $lockConf = new ezcWebdavLockPluginConfiguration();
 $server->pluginRegistry->registerPlugin(
