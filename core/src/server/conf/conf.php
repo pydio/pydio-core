@@ -167,6 +167,7 @@ if(AJXP_Utils::userAgentIsMobile()){
 /*********************************************************/
 $REPOSITORIES[0] = array(
 	"DISPLAY"		=>	"Default Files", 
+	"AJXP_SLUG"		=>  "default",
 	"DRIVER"		=>	"fs", 
 	"DRIVER_OPTIONS"=> array(
 		"PATH"			=>	realpath(dirname(__FILE__)."/../../files"), 
@@ -321,23 +322,25 @@ $welcomeCustomMessage = "";
  * of the distribution. The concepts are to redirect automatically all
  * requests sent on your_install_path/shares to your_install_path/dav.php
  * 
- * DIGEST AUTHENTICATION / 
- * TODO : 	. set TRANSMIT CLEAR PASS dynamically to true
- * 			. add a hook on pass change
+ * AUTHENTICATION
+ * Many clients can handle basic and digest authentication, but
+ * windows client forces the use of digest authentication. Thus
+ * we have to ask the user to manually re-enter his/her password
+ * to be able to store it in the right form... Not very handy, but 
+ * necessary though. This "Webdav password" is stored encrypted inside 
+ * the user's wallet. 
  * 
  ***************************************************/
 // Put this to true or false
 define("AJXP_WEBDAV_ENABLE", false);
 
-// WEBDAV_BASEHOST AND WEBDAV_BASEURI must be correctly
-// set in order to make webdav work
+// WEBDAV_BASEURI must be correctly set in order to make webdav work
 // Warning, you also must ENABLE APACHE REWRITE ENGINE 
 // and edit the .htaccess file at the root of the distribution 
-define("AJXP_WEBDAV_BASEHOST", "http://192.168.0.10");
 // Put here the path to the virtual folder defined in your
 // .htaccess, that will redirect to dav.php, NO TRAILING SLASH. 
 // Clients will then access the shares with the following 
-// combination : BASEHOST/BASEURI/repositoryID. 
+// combination : http[s]://yourdomain/BASEURI/repositoryID. 
 define("AJXP_WEBDAV_BASEURI", "/ajaxplorer/shares");
 
 // Here is the problematic part : windows recent webdav client only
