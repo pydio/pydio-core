@@ -31,7 +31,8 @@ CREATE TABLE ajxp_repo (
  	recycle VARCHAR(255), 
  	bcreate BOOLEAN,
  	writeable BOOLEAN, 
- 	enabled BOOLEAN 
+ 	enabled BOOLEAN ,
+ 	slug VARCHAR(255)
 );
  
 CREATE TABLE ajxp_repo_options ( 

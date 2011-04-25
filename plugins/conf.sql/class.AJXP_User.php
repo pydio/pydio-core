@@ -140,8 +140,9 @@ class AJXP_User extends AbstractAjxpUser
 				return false;
 			}
 			
-			$result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM  [ajxp_user_rights] WHERE [login] = %s', $this->getId());    
-			$this->rights = $result_rights->fetchPairs('repo_uuid', 'rights');
+			//$result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM  [ajxp_user_rights] WHERE [login] = %s', $this->getId());    
+			//$this->rights = $result_rights->fetchPairs('repo_uuid', 'rights');
+			$this->load();
 			if(! isSet($this->rights["ajxp.admin"])){
 				return false;
 			}			

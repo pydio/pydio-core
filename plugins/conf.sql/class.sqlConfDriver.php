@@ -109,6 +109,7 @@ class sqlConfDriver extends AbstractConfDriver {
 		$repo->writeable = true;
 		$repo->enabled = $result['enabled'];
 		$repo->recycle = "";
+		$repo->setSlug($result['slug']);
 		
 		foreach ($options_result as $k => $v) {
 			if($k == "META_SOURCES"){
@@ -141,7 +142,8 @@ class sqlConfDriver extends AbstractConfDriver {
 				'bcreate' => $repository->getCreate(),
 				'writeable' => $repository->isWriteable(),
 				'enabled' => $repository->isEnabled(),
-				'options' => $repository->options
+				'options' => $repository->options,
+				'slug'		=> $repository->getSlug()
 		);
 		
 		return $repository_row;
@@ -194,6 +196,27 @@ class sqlConfDriver extends AbstractConfDriver {
 		
 		return null;
 	}
+	
+	/**
+	 * Retrieve a Repository given its alias.
+	 *
+	 * @param String $repositorySlug
+	 * @return Repository
+	 */	
+	function getRepositoryByAlias($repositorySlug){
+		$res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [slug] = %s', $repositorySlug);
+		
+		if (count($res) > 0) {
+			$repo_row = $res->fetchSingle();
+			$res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
+			$opts = $res_opts->fetchPairs('name', 'val');
+			$repository = $this->repoFromDb($repo_row, $opts);	
+			return $repository;
+		}
+		
+		return null;		
+	}
+	
 	
 	/**
 	 * Store a newly created repository 
