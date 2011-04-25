@@ -181,6 +181,13 @@ class AJXP_Utils
 		$output["EXT_REP"] = "/";
 		
 		if(isSet($parameters["repository_id"]) && isSet($parameters["folder"])){
+			$repository = ConfService::getRepositoryById($parameters["repository_id"]);
+			if($repository == null){
+				$repository = ConfService::getRepositoryByAlias($parameters["repository_id"]);
+				if($repository != null){
+					$parameters["repository_id"] = $repository->getId();
+				}			
+			}
 			require_once("server/classes/class.SystemTextEncoding.php");
 			if(AuthService::usersEnabled()){
 				$loggedUser = AuthService::getLoggedUser();

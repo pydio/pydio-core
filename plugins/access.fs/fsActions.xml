@@ -556,9 +556,13 @@
 						}
 						if(url.indexOf('?') > 0){
 							url = url.substring(0, url.indexOf('?'));
-						}						
-						var repo = ajaxplorer.repositoryId || (ajaxplorer.user ? ajaxplorer.user.activeRepository : null);
-						link = url + '?repository_id=' + repo + '&folder=' + encodeURIComponent(ajaxplorer.getUserSelection().getUniqueFileName());
+						}
+						var repoId = ajaxplorer.repositoryId || (ajaxplorer.user ? ajaxplorer.user.activeRepository : null);
+						if(ajaxplorer.user){
+							var slug = ajaxplorer.user.repositories.get(repoId).getSlug();
+							if(slug) repoId = slug;
+						}
+						link = url + '?repository_id=' + repoId + '&folder=' + encodeURIComponent(ajaxplorer.getUserSelection().getUniqueFileName());
 						input.value = link;
                         var email = oForm.down('a[id="email"]');
                         if (email){ 
