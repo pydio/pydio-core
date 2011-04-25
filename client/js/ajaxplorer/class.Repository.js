@@ -63,6 +63,10 @@ Class.create("Repository", {
 	 * @var Boolean
 	 */
 	allowCrossRepositoryCopy:false,
+	/**
+	 * @var String
+	 */
+	slug:'',
 
 	/**
 	 * Constructor
@@ -140,6 +144,21 @@ Class.create("Repository", {
 	},
 	
 	/**
+	 * @param slug String
+	 */
+	setSlug : function(slug){
+		this.slug = slug;
+	},
+	
+	/**
+	 * @returns String
+	 */
+	getSlug : function(){
+		return this.slug;
+	},
+	
+	
+	/**
 	 * Parses XML Node
 	 * @param repoNode XMLNode
 	 */
@@ -149,6 +168,9 @@ Class.create("Repository", {
 		}
 		if(repoNode.getAttribute('access_type')){
 			this.setAccessType(repoNode.getAttribute('access_type'));
+		}
+		if(repoNode.getAttribute('repositorySlug')){
+			this.setSlug(repoNode.getAttribute('repositorySlug'));
 		}
 		for(var i=0;i<repoNode.childNodes.length;i++){
 			var childNode = repoNode.childNodes[i];
