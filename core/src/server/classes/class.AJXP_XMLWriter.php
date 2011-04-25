@@ -330,10 +330,15 @@ class AJXP_XMLWriter
 				if(in_array($rootDirObject->accessType, $streams)){
 					$streamString = "allowCrossRepositoryCopy=\"true\"";
 				}
+				$slugString = "";
+				$slug = $rootDirObject->getSlug();
+				if(!empty($slug)){
+					$slugString = "repositorySlug=\"$slug\"";
+				}
 				if($toLast){
-					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString $slugString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				}else{
-					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString $slugString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				}
 			}
 		}
