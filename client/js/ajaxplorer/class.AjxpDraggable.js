@@ -129,8 +129,8 @@ Class.create("AjxpDraggable", Draggable, {
 	 */
     startDrag : function(event){
 	    if(!this.delta)
-	    this.delta = this.currentDelta();
-	    console.log(this.delta);
+	    	this.delta = this.currentDelta();
+	    
 		this.dragging = true;
 		this._draggingMultiple = false;
 		
@@ -207,14 +207,13 @@ Class.create("AjxpDraggable", Draggable, {
           pos[0] -= this.options.scroll.scrollLeft-this.originalScrollLeft;
           pos[1] -= this.options.scroll.scrollTop-this.originalScrollTop;
         }
-        if(this.options.containerScroll && (this.options.containerScroll != window)) {
-        	console.log("should apply container Scroll");
+        if(this.options.containerScroll && (this.options.containerScroll != window)) {        	
             pos[0] += this.options.containerScroll.scrollLeft;
             pos[1] += this.options.containerScroll.scrollTop;
           }
         
         var p = [0,1].map(function(i){ 
-          return (point[i]-pos[i]-this.offset[i]) 
+          return (point[i]-pos[i]-this.offset[i]);
         }.bind(this));
         
         if(this.options.snap) {
@@ -223,10 +222,10 @@ Class.create("AjxpDraggable", Draggable, {
           } else {
           if(Object.isArray(this.options.snap)) {
             p = p.map( function(v, i) {
-              return (v/this.options.snap[i]).round()*this.options.snap[i] }.bind(this))
+              return (v/this.options.snap[i]).round()*this.options.snap[i]; }.bind(this));
           } else {
             p = p.map( function(v) {
-              return (v/this.options.snap).round()*this.options.snap }.bind(this))
+              return (v/this.options.snap).round()*this.options.snap; }.bind(this));
           }
         }}
         
