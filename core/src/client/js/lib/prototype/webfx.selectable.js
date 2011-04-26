@@ -148,6 +148,9 @@ SelectableElements = Class.create({
 		for(var i=0; i<allItems.length;i++){
 			var element = $(allItems[i]);
 			var pos = Position.cumulativeOffset(element);
+			pos[0] -= this.dragSelectionElement.scrollLeft;
+			pos[1] -= this.dragSelectionElement.scrollTop;
+
 			var dims = Element.getDimensions(element);
 			var x1 = pos[0]; var x2 = pos[0]+dims.width;
 			var y1 = pos[1]; var y2 = pos[1]+dims.height;
