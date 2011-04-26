@@ -253,7 +253,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$userObject = AuthService::getLoggedUser();
 				$webdavActive = false;
 				$passSet = false;
-				$webdavBaseUrl = AJXP_WEBDAV_BASEHOST.AJXP_WEBDAV_BASEURI."/";
+				// Detect http/https and host
+				if(defined("AJXP_WEBDAV_BASEHOST")){
+					$baseURL = AJXP_WEBDAV_BASEHOST;
+				}else{
+					$http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
+					$baseURL = $http_mode . $_SERVER['HTTP_HOST'];
+				}				
+				$webdavBaseUrl = $baseURL.AJXP_WEBDAV_BASEURI."/";
 				if(isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])){
 					$davData = $userObject->getPref("AJXP_WEBDAV_DATA");
 					if(!empty($httpVars["activate"])){
