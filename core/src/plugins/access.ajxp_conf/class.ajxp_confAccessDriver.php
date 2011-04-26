@@ -629,7 +629,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$options = array();
 					$this->parseParameters($httpVars, $options);
 					if(count($options)){
-						foreach ($options as $key=>$value) $repo->addOption($key, $value);
+						foreach ($options as $key=>$value) {
+							if($key == "AJXP_SLUG"){
+								$repo->setSlug($value);
+								continue;
+							}
+							$repo->addOption($key, $value);
+						}
 					}
 					if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php")){
 					    chdir(INSTALL_PATH."/server/tests/plugins");
