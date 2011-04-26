@@ -130,7 +130,7 @@ Class.create("AjxpDraggable", Draggable, {
     startDrag : function(event){
 	    if(!this.delta)
 	    this.delta = this.currentDelta();
-	
+	    console.log(this.delta);
 		this.dragging = true;
 		this._draggingMultiple = false;
 		
@@ -183,7 +183,7 @@ Class.create("AjxpDraggable", Draggable, {
 				this.originalScrollTop = this.options.scroll.scrollTop;
 			}
 		}
-	
+		
 		Draggables.notify('onStart', this, event);
 	
 		if(this.options.starteffect){
@@ -192,6 +192,52 @@ Class.create("AjxpDraggable", Draggable, {
 		this.dndAction = ajaxplorer.getActionBar().getDefaultAction('dragndrop');
 		this.ctrlDndAction = ajaxplorer.getActionBar().getDefaultAction('ctrldragndrop');			
     },
+    
+    draw: function(point) {
+        var pos = Position.cumulativeOffset(this.element);
+        if(this.options.ghosting) {
+          var r   = Position.realOffset(this.element);
+          pos[0] += r[0] - Position.deltaX; pos[1] += r[1] - Position.deltaY;
+        }
+        
+        var d = this.currentDelta();
+        pos[0] -= d[0]; pos[1] -= d[1];
+        
+        if(this.options.scroll && (this.options.scroll != window && this._isScrollChild)) {
+          pos[0] -= this.options.scroll.scrollLeft-this.originalScrollLeft;
+          pos[1] -= this.options.scroll.scrollTop-this.originalScrollTop;
+        }
+        if(this.options.containerScroll && (this.options.containerScroll != window)) {
+        	console.log("should apply container Scroll");
+            pos[0] += this.options.containerScroll.scrollLeft;
+            pos[1] += this.options.containerScroll.scrollTop;
+          }
+        
+        var p = [0,1].map(function(i){ 
+          return (point[i]-pos[i]-this.offset[i]) 
+        }.bind(this));
+        
+        if(this.options.snap) {
+          if(Object.isFunction(this.options.snap)) {
+            p = this.options.snap(p[0],p[1],this);
+          } else {
+          if(Object.isArray(this.options.snap)) {
+            p = p.map( function(v, i) {
+              return (v/this.options.snap[i]).round()*this.options.snap[i] }.bind(this))
+          } else {
+            p = p.map( function(v) {
+              return (v/this.options.snap).round()*this.options.snap }.bind(this))
+          }
+        }}
+        
+        var style = this.element.style;
+        if((!this.options.constraint) || (this.options.constraint=='horizontal'))
+          style.left = p[0] + "px";
+        if((!this.options.constraint) || (this.options.constraint=='vertical'))
+          style.top  = p[1] + "px";
+        
+        if(style.visibility=="hidden") style.visibility = ""; // fix gecko rendering
+      },    
 
     /**
      * End of drag
