@@ -340,8 +340,15 @@ define("AJXP_WEBDAV_ENABLE", false);
 // Put here the path to the virtual folder defined in your
 // .htaccess, that will redirect to dav.php, NO TRAILING SLASH. 
 // Clients will then access the shares with the following 
-// combination : http[s]://yourdomain/BASEURI/repositoryID. 
+// combination : http[s]://yourdomain/BASEURI/repositoryID.
 define("AJXP_WEBDAV_BASEURI", "/ajaxplorer/shares");
+
+// By default, the beginning of the url will be automatically detected
+// from the request data (protocol / host), but if you want you can 
+// uncomment this line and set it to force the value. This can be useful
+// for tests, where you can access your server via http://localhost, and 
+// want the webDAV tests to pass through https://your_ip_adress ... 
+// define("AJXP_WEBDAV_BASEHOST", "http://192.168.0.11");
 
 // Here is the problematic part : windows recent webdav client only
 // accept HTTP "Digest" Auth, which imply storing the password either clear, 
