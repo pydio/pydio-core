@@ -35,9 +35,12 @@ require_once($confStorageDriver->getUserClassFileName());
 require_once AJXP_INSTALL_PATH."/".SERVER_RESOURCES_FOLDER."/ezc/Base/base.php";
 spl_autoload_register( array( 'ezcBase', 'autoload' ) );
 
-// Detect http/https and host
-$http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
-$baseURL = $http_mode . $_SERVER['HTTP_HOST'];
+if(defined("AJXP_WEBDAV_BASEHOST")){
+	$baseURL = AJXP_WEBDAV_BASEHOST;
+}else{
+	$http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
+	$baseURL = $http_mode . $_SERVER['HTTP_HOST'];
+}				
 $baseURI = AJXP_WEBDAV_BASEURI;
 
 $requestUri = $_SERVER["REQUEST_URI"];
