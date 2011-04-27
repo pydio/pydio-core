@@ -33,15 +33,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		$repositoryId = $repository->getId();
 		ConfService::switchRootDir($repositoryId);
 		$this->repository = ConfService::getRepository();
-		
-		$confDriver = ConfService::getConfStorageImpl();
-		$this->accessDriver = ConfService::loadRepositoryDriver();
-		if(!$this->accessDriver instanceof AjxpWebdavProvider){
-			throw new ezcBaseFileNotFoundException( $repositoryId );
-		}
-		$wrapperData = $this->accessDriver->detectStreamWrapper(true);
-		$this->wrapperClassName = $wrapperData["classname"];
-				
+						
 		$this->options = new ezcWebdavFileBackendOptions();
         $this->options['noLock']                 = false;
         $this->options['waitForLock']            = 200000;
@@ -55,8 +47,22 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		
 	}
 	
+	protected function getAccessDriver(){
+		if(!isset($this->accessDriver)){
+			$confDriver = ConfService::getConfStorageImpl();
+			$this->accessDriver = ConfService::loadRepositoryDriver();
+			if(!$this->accessDriver instanceof AjxpWebdavProvider){
+				throw new ezcBaseFileNotFoundException( $repositoryId );
+			}
+			$wrapperData = $this->accessDriver->detectStreamWrapper(true);
+			$this->wrapperClassName = $wrapperData["classname"];			
+		}
+		return $this->accessDriver;
+	}
+		
 	protected function fixPath($path){
 		if ($path == "\\") $path = "";
+		//AJXP_Logger::debug("fixPath called");
 		/*
 		$bt = debug_backtrace();
 		$calls = array();
@@ -65,7 +71,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		}
 		AJXP_Logger::debug("fixPath : $path => ".$calls["1"]);
 		*/
-		if(strstr($path, "%") && !strstr(PHP_OS, "Darwin")){
+		if(strstr($path, "%") /* && !strstr(PHP_OS, "Darwin")*/){
 			$path = urldecode($path);
 		}
 		$path = SystemTextEncoding::fromUTF8($path, true);
@@ -82,7 +88,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      */
      protected function createCollection( $path ){
      	$path = $this->fixPath($path);
-     	$this->accessDriver->mkDir($this->safeDirname($path), $this->safeBasename($path));
+     	$this->getAccessDriver()->mkDir($this->safeDirname($path), $this->safeBasename($path));
      }
 
     /**
@@ -98,7 +104,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     protected function createResource( $path, $content = null ){
     	$path = $this->fixPath($path);
     	AJXP_Logger::debug("AJXP_WebdavBackend :: createResource ($path)");
-    	$this->accessDriver->createEmptyFile($this->safeDirname($path), $this->safeBasename($path));
+    	$this->getAccessDriver()->createEmptyFile($this->safeDirname($path), $this->safeBasename($path));
     }
 
     /**
@@ -114,7 +120,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      protected function setResourceContents( $path, $content ){
      	$path = $this->fixPath($path);
      	AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
-     	$fp=fopen($this->accessDriver->getRessourceUrl($path),"w");
+     	$fp=fopen($this->getAccessDriver()->getRessourceUrl($path),"w");
 		fputs ($fp,$content);
 		fclose($fp);     	
      }
@@ -130,8 +136,8 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      protected function getResourceContents( $path ){
      	$path = $this->fixPath($path);
      	AJXP_Logger::debug("AJXP_WebdavBackend :: getResourceContent ($path)");
-     	$wrapperClassName = $this->accessDriver->getWrapperClassName();
-     	$tmp = call_user_func(array($wrapperClassName, "getRealFSReference"), $this->accessDriver->getRessourceUrl($path));
+     	$wrapperClassName = $this->getAccessDriver()->getWrapperClassName();
+     	$tmp = call_user_func(array($wrapperClassName, "getRealFSReference"), $this->getAccessDriver()->getRessourceUrl($path));
      	if(call_user_func(array($wrapperClassName, "isRemote"))){
      		register_shutdown_function("unlink", $tmp);
      	}
@@ -192,7 +198,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      */
     public function getProperty( $path, $propertyName, $namespace = 'DAV:' ){
     	$path = $this->fixPath($path);
-    	$url = $this->accessDriver->getRessourceUrl($path);
+    	$url = $this->getAccessDriver()->getRessourceUrl($path);
 	    //AJXP_Logger::debug("Getting Property : ".$propertyName." for url ".$url);	
         $storage = $this->getPropertyStorage( $path );
 
@@ -286,7 +292,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     {
     	$path = $this->fixPath($path);    	
         clearstatcache();
-        $mtime = filemtime( $this->accessDriver->getRessourceUrl($path) );
+        $mtime = filemtime( $this->getAccessDriver()->getRessourceUrl($path) );
         //AJXP_Logger::debug("Getting etag ".$path);
         return md5(
             $path
@@ -300,7 +306,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
         $length = ezcWebdavGetContentLengthProperty::COLLECTION;
         if ( !$this->isCollection( $path ) )
         {
-            $length = (string) filesize( $this->accessDriver->getRessourceUrl($path) );
+            $length = (string) filesize( $this->getAccessDriver()->getRessourceUrl($path) );
         }                
         return $length;    	
     }
@@ -321,7 +327,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     protected function getMimeType( $path )
     {
     	$path = $this->fixPath($path);
-    	$url = $this->accessDriver->getRessourceUrl($path);
+    	$url = $this->getAccessDriver()->getRessourceUrl($path);
         // Check if extension pecl/fileinfo is usable.
         if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
         {
@@ -424,9 +430,9 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	$success = array();
     	// Handle duplicate
     	if($this->safeDirname($toPath) == $this->safeDirname($fromPath)){
-    		rename($this->accessDriver->getRessourceUrl($fromPath), $this->accessDriver->getRessourceUrl($toPath));
+    		rename($this->getAccessDriver()->getRessourceUrl($fromPath), $this->getAccessDriver()->getRessourceUrl($toPath));
     	}else{
-			$this->accessDriver->copyOrMoveFile( $this->safeDirname($toPath), $fromPath, $error, $success, $move = false);
+			$this->getAccessDriver()->copyOrMoveFile( $this->safeDirname($toPath), $fromPath, $error, $success, $move = false);
     	}
     	return $error;
     }
@@ -444,7 +450,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     protected function performDelete( $path ){
     	$path = $this->fixPath($path);
     	$logs = array();
-    	$this->accessDriver->delete(array($path), $logs);
+    	$this->getAccessDriver()->delete(array($path), $logs);
     }
 
     /**
@@ -460,7 +466,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	if(isset($this->statCache[$path]["node_exists"])){
     		return $this->statCache[$path]["node_exists"];
     	}
-    	$url = $this->accessDriver->getRessourceUrl($path);
+    	$url = $this->getAccessDriver()->getRessourceUrl($path);
     	$result = file_exists( $url );
 	    AJXP_Logger::debug("nodeExists($path, $url): $result");
 	    $this->statCache[$path]["node_exists"] = $result;
@@ -481,7 +487,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	if(isset($this->statCache[$path]["is_collection"])){
     		return $this->statCache[$path]["is_collection"];
     	}
-	    $url = $this->accessDriver->getRessourceUrl($path);
+	    $url = $this->getAccessDriver()->getRessourceUrl($path);
 	    //AJXP_Logger::debug("isCollection($path, $url)");
 	    $result = is_dir( $url );
 	    $this->statCache[$path]["is_collection"] = $result;
@@ -501,7 +507,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      */
     protected function getCollectionMembers( $path ){
     	$path = $this->fixPath($path);
-    	$url = $this->accessDriver->getRessourceUrl($path);
+    	$url = $this->getAccessDriver()->getRessourceUrl($path);
         $contents = array();
         $errors = array();
 
@@ -582,7 +588,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
                     $this->getResourceContents( $source )*/
                 )
             );
-            $res->setHeader("AJXP-Send-File", $this->accessDriver->getRessourceUrl($this->fixPath($source)));
+            $res->setHeader("AJXP-Send-File", $this->getAccessDriver()->getRessourceUrl($this->fixPath($source)));
             $res->setHeader("AJXP-Wrapper", $this->wrapperClassName);
         }
         else
