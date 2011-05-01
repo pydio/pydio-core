@@ -436,14 +436,14 @@ $mess=array(
 "create_repo_accesskey" => "z",
 "create_user_accesskey" => "u",
 "open_with_access" => "z",
-"403" => "WebDAV Preferences",
-"404" => "You can use the WebDAV protocol to mount your AjaXplorer repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
-"405" => "Use the following URLS to access your repositories, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
-"406" => "Activate WebDAV shares",
-"407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",
-"408" => "Activated WebDav shares successfully, do not forget to update your password if it's the first time!",
-"409" => "De-activated WebDav shares successfully",
-"410" => "Updated webDav password successfully",
+"403" => "Nastavitve WebDAV",
+"404" => "Lahko uporabite protokol WebDAV za priklop vaših AjaXplorer zbirk kot &quot;omrežni pogon&quot; na različnih odjemalcih, vključno z Windows, Mac, iPhone, itd",
+"405" => "Uporabite naslednje povezave za dostop do zbirk; s svojim uporabniškim imenom in tu določenim geslom. Opozorilo, te ne bodo delovale, dokler ne omogočite te funkcije in ne vnesete gesla.",
+"406" => "Omogoči WebDAV zmožnost",
+"407" => "Vnesite geslo, če prvič omogočate WebDAV funkcionalnost, oziroma če želite uporabljati drugo geslo :",
+"408" => "WebDAV zmožnost uspešno omogočena, ne pozabite posodobiti gesla če prvič omogočate WebDAV funkcionalnost!",
+"409" => "WebDAV zmožnost uspešno onemogočena",
+"410" => "Posodobitev WebDAV gesla uspešna",
 /* END SENTENCE */
 /* password strength tester */
 /* quick access keys */
