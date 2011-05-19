@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidriver name="ajxp_ios" label="iOS" description="Template for redirecting to iPhone application">
+	<registry_contributions>
+		<client_configs uuidAttr="name">
+			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
+				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
+				<script type="text/javascript">
+					window.ajxpMobile = true;
+					var conn = new Connexion();
+					conn._libUrl = '';
+					conn.loadLibrary('plugins/gui.ios/ajxp-ios.js');
+				</script>
+			]]></template>
+			<template name="main" element="ajxp_desktop" position="top"><![CDATA[
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}" style="text-align:center;font-size:1.2em; line-height:1.3em; font-family:Helvetica; background-color: white;">					
+				
+					<div style="width:80%;padding:10px; margin:0px auto; ">Hey AjaXplorer iOS user, do you know there is a dedicated iPhone application for you?</div>
+					<a id="ajxpserver-redir" class="m-2" style="width:80%; padding:10px; margin:10px auto; font-size:0.8em;" href="#">Yes I have it already, browse this server using AjaXplorer iOS</a><br>
+					<a id="appstore-redir" class="m-2" style="width:80%; padding:10px; margin:10px auto; font-size:0.8em;" href="http://itunes.com/app/ajaxplorer">No I don't have it, send me <br/>to App Store now</a><br>
+					<a id="skipios-redir" class="m-2" style="width:80%; padding:10px; margin:10px auto; font-size:0.8em;" href="#">I don't care, let me use <br/>the web version of AjaXplorer!</a><br>
+				</div>
+			]]></template>
+		</client_configs>
+	<actions>
+	<!-- Override a simple action -->
+		<action name="login">
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[ /* BLOCK LOGIN OPENING */ ]]></clientCallback>
+			</processing>
+		</action>					
+	</actions>
+	</registry_contributions>
+</guidriver>
