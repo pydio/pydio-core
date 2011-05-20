@@ -86,7 +86,7 @@ if(!in_array($action, $unSecureActions) && AuthService::getSecureToken()){
 	$token = "";
 	if(isSet($_GET["secure_token"])) $token = $_GET["secure_token"];
 	else if(isSet($_POST["secure_token"])) $token = $_POST["secure_token"];
-	if($token == "" || !AuthService::checkSecureToken($token)){
+	if(( $token == "" || !AuthService::checkSecureToken($token)) && !AJXP_Utils::userAgentIsIOSClient()){
 		throw new Exception("You are not allowed to access this resource.");
 	}
 }
