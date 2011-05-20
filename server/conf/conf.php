@@ -158,6 +158,9 @@ $PLUGINS = array(
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
+	if(AJXP_Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])){
+		$PLUGINS["ACTIVE_PLUGINS"][] = "gui.ios";
+	}
 }
 
 /*********************************************************/
