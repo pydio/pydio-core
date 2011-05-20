@@ -58,7 +58,11 @@ class ImagePreviewer extends AJXP_Plugin {
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			
 			if(isSet($httpVars["get_thumb"]) && $this->pluginConf["GENERATE_THUMBNAIL"]){
-				$cacheItem = AJXP_Cache::getItem("diaporama_200", $destStreamURL.$file, array($this, "generateThumbnail"));
+				if(AJXP_Utils::userAgentIsIOSClient()){
+						$cacheItem = AJXP_Cache::getItem("diaporama_400", $destStreamURL.$file, array($this, "generateThumbnail400"));
+				}else{
+					$cacheItem = AJXP_Cache::getItem("diaporama_200", $destStreamURL.$file, array($this, "generateThumbnail"));
+				}
 				$data = $cacheItem->getData();
 				$cId = $cacheItem->getId();
 				
@@ -93,12 +97,16 @@ class ImagePreviewer extends AJXP_Plugin {
 		}
 	}
 	
-	public function generateThumbnail($masterFile, $targetFile){
+	public function generateThumbnail400($masterFile, $targetFile){
+		return $this->generateThumbnail($masterFile, $targetFile, 380);
+	}
+	
+	public function generateThumbnail($masterFile, $targetFile, $size = 200){
 		require_once(INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
 		$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
 		if(!$pThumb->isError()){
 			$pThumb->remote_wrapper = $this->streamData["classname"];
-			$sizes = $pThumb->fit_thumbnail($masterFile, 200, -1, 1, true);		
+			$sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);		
 			$pThumb->print_thumbnail($masterFile,$sizes[0],$sizes[1],false, false, $targetFile);
 			if($pThumb->isError()){
 				print_r($pThumb->error_array);

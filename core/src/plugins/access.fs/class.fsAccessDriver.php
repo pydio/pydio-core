@@ -274,7 +274,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			//------------------------------------
 			case "get_content":
 					
-				$this->readFile($this->urlBase.$selection->getUniqueFile(), "plain");
+				$dlFile = $this->urlBase.$selection->getUniqueFile();
+				if(AJXP_Utils::getStreamingMimeType(basename($dlFile))!==false){
+					$this->readFile($this->urlBase.$selection->getUniqueFile(), "stream_content");					
+				}else{
+					$this->readFile($this->urlBase.$selection->getUniqueFile(), "plain");
+				}
 				
 			break;
 			
@@ -310,6 +315,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			case "copy";
 			case "move";
 				
+			//throw new AJXP_Exception("", 113);
 				if($selection->isEmpty())
 				{
 					throw new AJXP_Exception("", 113);
@@ -864,7 +870,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
 		restore_error_handler();
 		restore_exception_handler();
-		
+
         set_exception_handler('download_exception_handler');
         set_error_handler('download_exception_handler');
         // required for IE, otherwise Content-disposition is ignored
@@ -876,7 +882,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}else{
 			$size = $byteLength;
 		}
-		
 		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
 		}
@@ -897,22 +902,25 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			if(preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])){
 				$localName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($localName)));
 			}
-
-			if ($isFile) header("Accept-Ranges: bytes");
+			if ($isFile) header("Accept-Ranges: 0-$size");
 			// Check if we have a range header (we are resuming a transfer)
 			if ( isset($_SERVER['HTTP_RANGE']) && $isFile && $size != 0 )
 			{
+				if($headerType == "stream_content"){
+					header('Content-type: '.AJXP_Utils::getStreamingMimeType(basename($filePathOrData)));
+				}
 				// multiple ranges, which can become pretty complex, so ignore it for now
 				$ranges = explode('=', $_SERVER['HTTP_RANGE']);
 				$offsets = explode('-', $ranges[1]);
 				$offset = floatval($offsets[0]);
-
+				
 				$length = floatval($offsets[1]) - $offset;
 				if (!$length) $length = $size - $offset;
 				if ($length + $offset > $size || $length < 0) $length = $size - $offset;
+				AJXP_Logger::debug('Content-Range: bytes ' . $offset . '-' . $length . '/' . $size);
 				header('HTTP/1.1 206 Partial Content');
-
-				header('Content-Range: bytes ' . $offset . '-' . ($offset + $length - 1) . '/' . $size);
+				header('Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $size);
+				
 				header("Content-Length: ". $length);
 				$file = fopen($filePathOrData, 'rb');
 				fseek($file, 0);
@@ -930,10 +938,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$readSize = 0.0;
 				while (!feof($file) && $readSize < $length && connection_status() == 0)
 				{
+					//AJXP_Logger::debug("dl reading $readSize to $length", $_SERVER["HTTP_RANGE"]);					
 					echo fread($file, 2048);
 					$readSize += 2048.0;
 					flush();
 				}
+				
 				fclose($file);
 				return;
 			} else

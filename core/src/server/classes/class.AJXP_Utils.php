@@ -223,6 +223,9 @@ class AJXP_Utils
 			$output["SELECTOR_DATA"] = array("type" => $parameters["external_selector_type"], "data" => $parameters);
 		}
 		
+		if(isSet($parameters["skipIOS"])){
+			setcookie("SKIP_IOS", "true");
+		}
 	}
 	
 	
@@ -309,6 +312,20 @@ class AJXP_Utils
 		else if(preg_match("/\.png$/i",$fileName)){return "image/png";}	
 		else if(preg_match("/\.bmp$/i",$fileName)){return "image/bmp";}	
 		else if(preg_match("/\.gif$/i",$fileName)){return "image/gif";}	
+	}
+	
+	static function getStreamingMimeType($fileName){
+		if(preg_match("/\.mp3$/i",$fileName)){return "audio/mp3";}
+		else if (preg_match("/\.wav$/i",$fileName)){return "audio/wav";}
+		else if (preg_match("/\.aac$/i",$fileName)){return "audio/aac";}
+		else if (preg_match("/\.m4a$/i",$fileName)){return "audio/m4a";}
+		else if (preg_match("/\.aiff$/i",$fileName)){return "audio/aiff";}
+		else if (preg_match("/\.mp4$/i",$fileName)){return "video/mp4";}
+		else if (preg_match("/\.mov$/i",$fileName)){return "video/quicktime";}
+		else if (preg_match("/\.m4v$/i",$fileName)){return "video/m4v";}
+		else if (preg_match("/\.3gp$/i",$fileName)){return "video/3gpp";}
+		else if (preg_match("/\.3g2$/i",$fileName)){return "video/3gpp2";}
+		else return false;
 	}
 	
 	static function roundSize($filesize)
@@ -641,6 +658,8 @@ class AJXP_Utils
 		}
 	}
 	
+	
+	
 	public static function userAgentIsMobile(){
 		$isMobile = false;
 		
@@ -721,7 +740,21 @@ class AJXP_Utils
 	*/
 		return $isMobile;
 	}	
-		
+
+	public static function userAgentIsIOSClient(){
+		if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false) return true;
+		if(strpos($_SERVER["HTTP_USER_AGENT"], "AppleCoreMedia") !== false) {
+			AJXP_Logger::debug("CoreMedia!");
+			return true;
+		}
+		return false;	
+	}
+	
+	public static function userAgentIsIOS(){
+		if(strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "iphone") !== false) return true;
+		return false;	
+	}
+	
 }
 
 ?>
