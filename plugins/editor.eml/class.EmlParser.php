@@ -192,6 +192,7 @@ class EmlParser extends AJXP_Plugin{
 	
 	public function lsPostProcess($action, $httpVars, $outputVars){
 		if(!EmlParser::$currentListingOnlyEmails){
+			if(isSet($httpVars["playlist"])) return;
 			header('Content-Type: text/xml; charset=UTF-8');
 			header('Cache-Control: no-cache');			
 			print($outputVars["ob_output"]);
