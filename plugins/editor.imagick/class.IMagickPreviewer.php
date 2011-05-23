@@ -128,7 +128,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 	
 	public function generateJpegsCallback($masterFile, $targetFile){
 		$extension = pathinfo($masterFile, PATHINFO_EXTENSION);
-		if(in_array(strtolower($extension), array("svg"))) $this->extractAll = true;
+		//if(in_array(strtolower($extension), array("svg"))) $this->extractAll = true;
 		$workingDir = dirname($targetFile);
 		$fp = fopen($masterFile, "r");
 		$tmpFileName = $workingDir."/ajxp_tmp_".md5(time()).".$extension";
