@@ -740,15 +740,6 @@ class AJXP_Utils
 	*/
 		return $isMobile;
 	}	
-
-	public static function userAgentIsIOSClient(){
-		if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false) return true;
-		if(strpos($_SERVER["HTTP_USER_AGENT"], "AppleCoreMedia") !== false) {
-			AJXP_Logger::debug("CoreMedia!");
-			return true;
-		}
-		return false;	
-	}
 	
 	public static function userAgentIsIOS(){
 		if(strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "iphone") !== false) return true;
