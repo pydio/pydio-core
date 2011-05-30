@@ -58,11 +58,7 @@ class ImagePreviewer extends AJXP_Plugin {
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			
 			if(isSet($httpVars["get_thumb"]) && $this->pluginConf["GENERATE_THUMBNAIL"]){
-				if(AJXP_Utils::userAgentIsIOSClient()){
-						$cacheItem = AJXP_Cache::getItem("diaporama_400", $destStreamURL.$file, array($this, "generateThumbnail400"));
-				}else{
-					$cacheItem = AJXP_Cache::getItem("diaporama_200", $destStreamURL.$file, array($this, "generateThumbnail"));
-				}
+				$cacheItem = AJXP_Cache::getItem("diaporama_200", $destStreamURL.$file, array($this, "generateThumbnail"));
 				$data = $cacheItem->getData();
 				$cId = $cacheItem->getId();
 				
