@@ -130,7 +130,7 @@
 				<clientForm id="webdav_pref_form"><![CDATA[
 					<div id="webdav_pref_form" action="webdav_pref_form" box_width="450">
 						<div>
-							<input type="checkbox" id="webdav_activator" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label>
+							<input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label>
 						</div>
 						<div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
 							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="client/themes/oxygen/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">

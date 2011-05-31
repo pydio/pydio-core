@@ -245,7 +245,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         }
         $filePath = INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
         if(!is_file($filePath)){
-                die("Warning, cannot find driver for conf storage! ($name, $filePath)");
+                die("Warning, cannot find driver for conf storage! ($className, $filePath)");
         }
         require_once($filePath);        
         $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);

@@ -312,7 +312,7 @@ Class.create("InfoPanel", AjxpPane, {
 	 * @returns String
 	 */
 	getPreviewElement : function(ajxpNode, getTemplateElement){
-		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime());
+		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime(), true);
 		if(editors && editors.length)
 		{
 			ajaxplorer.loadEditorResources(editors[0].resourcesManager);

@@ -230,7 +230,7 @@ Class.create("Action", {
 			return this.hideForContext();
 		}
 		if(this.context.allowedMimes.length){
-			if(!this.context.allowedMimes.indexOf(crtAjxpMime)==-1){
+			if( !this.context.allowedMimes.include("*") && !this.context.allowedMimes.include(crtAjxpMime)){
 				return this.hideForContext();
 			}
 		}
@@ -293,7 +293,7 @@ Class.create("Action", {
 		if(!selectionContext.recycle && bRecycle){
 			return this.disable();
 		}
-		if((selectionContext.allowedMimes.size() && userSelection && !userSelection.hasMime(selectionContext.allowedMimes)) 
+		if((selectionContext.allowedMimes.size() && userSelection && !userSelection.hasMime(selectionContext.allowedMimes) && !selectionContext.allowedMimes.include('*')) 
 			&& !(selectionContext.dir && bDir)){
 			if(selectionContext.behaviour == 'hidden') return this.hide();
 			else return this.disable();
