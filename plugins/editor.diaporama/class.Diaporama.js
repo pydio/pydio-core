@@ -388,6 +388,11 @@ Class.create("Diaporama", AbstractEditor, {
 		}
 	},
 	
+	/**
+	 * 
+	 * @param ajxpNode AjxpNode
+	 * @returns {___img1}
+	 */
 	getPreview : function(ajxpNode){
 		var img = new Element('img', {src:Diaporama.prototype.getThumbnailSource(ajxpNode), border:0});
 		img.resizePreviewElement = function(dimensionObject){			
@@ -397,7 +402,7 @@ Class.create("Diaporama", AbstractEditor, {
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
 			img.setStyle(styleObj);
-		}
+		};
 		return img;
 	},
 	
