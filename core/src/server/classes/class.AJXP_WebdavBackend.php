@@ -52,7 +52,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 			$confDriver = ConfService::getConfStorageImpl();
 			$this->accessDriver = ConfService::loadRepositoryDriver();
 			if(!$this->accessDriver instanceof AjxpWebdavProvider){
-				throw new ezcBaseFileNotFoundException( $repositoryId );
+				throw new ezcBaseFileNotFoundException( $this->repository->getId() );
 			}
 			$wrapperData = $this->accessDriver->detectStreamWrapper(true);
 			$this->wrapperClassName = $wrapperData["classname"];			
@@ -62,7 +62,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		
 	protected function fixPath($path){
 		if ($path == "\\") $path = "";
-		//AJXP_Logger::debug("fixPath called");
+		AJXP_Logger::debug("fixPath called ".$path);
 		/*
 		$bt = debug_backtrace();
 		$calls = array();
@@ -71,7 +71,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		}
 		AJXP_Logger::debug("fixPath : $path => ".$calls["1"]);
 		*/
-		if(strstr($path, "%") /* && !strstr(PHP_OS, "Darwin")*/){
+		if(strstr($path, "%")){
 			$path = urldecode($path);
 		}
 		$path = SystemTextEncoding::fromUTF8($path, true);
