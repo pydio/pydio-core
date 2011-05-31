@@ -115,6 +115,10 @@ Class.create("PixlrEditor", AbstractEditor, {
 	},	
 	
 	getPreview : function(ajxpNode){
+		if(ajxpNode.getAjxpMime() == "bmp"  || ajxpNode.getAjxpMime() == "pxd"){
+			return AbstractEditor.prototype.getPreview(ajxpNode);
+		}
+		
 		var img = new Element('img', {src:Diaporama.prototype.getThumbnailSource(ajxpNode), border:0});
 		img.resizePreviewElement = function(dimensionObject){			
 			var imgDim = {
@@ -123,11 +127,14 @@ Class.create("PixlrEditor", AbstractEditor, {
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
 			img.setStyle(styleObj);
-		}
+		};
 		return img;
 	},
 	
 	getThumbnailSource : function(ajxpNode){
+		if(ajxpNode.getAjxpMime() == "bmp" || ajxpNode.getAjxpMime() == "pxd"){
+			return AbstractEditor.prototype.getThumbnailSource(ajxpNode);
+		}		
 		return ajxpServerAccessPath+"&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
 	}
 	
