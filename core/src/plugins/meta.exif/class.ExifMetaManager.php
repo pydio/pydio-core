@@ -178,9 +178,11 @@ class ExifMetaManager extends AJXP_Plugin {
 		$longMin=$this->parseGPSValue($exif["GPS"]["GPSLongitude"][1]);
 		$longSec=$this->parseGPSValue($exif["GPS"]["GPSLongitude"][2]);
 		$longRef=$exif["GPS"]["GPSLongitudeRef"];
+		$latSign = ($latHem == "S" ? "-":"");
+		$longSign = ($longRef == "W" ? "-":"");
 		$gpsData = array(
-			"GPS_Latitude"=>"$latDeg deg $latMin' $latSec $latHem--".$converter->DMS2Dd($latDeg."o$latMin'$latSec"),
-			"GPS_Longitude"=>"$longDeg deg $longMin' $longSec $longRef--".$converter->DMS2Dd($longDeg."o$longMin'$longSec"),
+			"GPS_Latitude"=>"$latDeg deg $latMin' $latSec $latHem--".$converter->DMS2Dd($latSign.$latDeg."o$latMin'$latSec"),
+			"GPS_Longitude"=>"$longDeg deg $longMin' $longSec $longRef--".$converter->DMS2Dd($longSign.$longDeg."o$longMin'$longSec"),
 			"GPS_Altitude"=> $exif["GPS"]["GPSAltitude"][0]
 		);
 		return $gpsData;
