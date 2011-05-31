@@ -57,7 +57,7 @@ class ExifMetaManager extends AJXP_Plugin {
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
 		$cdataFoot = '</table></div>';
 		$cdataParts = "";
-		
+		$even = false;
 		foreach ($def as $key=>$label){
 			$trClass = ($even?" class=\"even\"":"");
 			$even = !$even;
@@ -105,7 +105,8 @@ class ExifMetaManager extends AJXP_Plugin {
 		$repo->detectStreamWrapper();
 		$wrapperData = $repo->streamData;
 		$urlBase = $wrapperData["protocol"]."://".$repo->getId();		
-		$realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.SystemTextEncoding::fromUTF8($httpVars["file"]));
+		$decoded = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+		$realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
 		ini_set('exif.encode_unicode', 'UTF-8');
 		$exifData = exif_read_data($realFile, 0, TRUE);
 		if($exifData !== false && isSet($exifData["GPS"])){
