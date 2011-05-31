@@ -51,7 +51,19 @@ Class.create("AjxpBootstrap", {
 		}		
 		Event.observe(document, 'dom:loaded', function(){
 			this.insertBasicSkeleton(this.parameters.get('MAIN_ELEMENT'));
-			this.loadBootConfig();		
+			if(window.opener && window.opener.ajxpBootstrap){
+				this.parameters = window.opener.ajxpBootstrap.parameters;
+				// Handle queryString case, as it's not passed via get_boot_conf
+				var qParams = document.location.href.toQueryParams();
+				if(qParams['external_selector_type']){
+					this.parameters.set('SELECTOR_DATA', {type:qParams['external_selector_type'], data:qParams});
+				}else{
+					if(this.parameters.get('SELECTOR_DATA')) this.parameters.unset('SELECTOR_DATA');
+				}
+				this.refreshContextVariablesAndInit(new Connexion());
+			}else{
+				this.loadBootConfig();						
+			}
 		}.bind(this));		
 		document.observe("ajaxplorer:before_gui_load", function(e){
 			var desktop = $(this.parameters.get('MAIN_ELEMENT'));
@@ -115,6 +127,7 @@ Class.create("AjxpBootstrap", {
 				return;
 			}
 			this.parameters.update(data);
+			
 			if(this.parameters.get('SECURE_TOKEN')){
 				Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');
 			}
@@ -124,41 +137,52 @@ Class.create("AjxpBootstrap", {
 			}else{
 				this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
 			}
-			// Refresh window variable
-			window.ajxpServerAccessPath = this.parameters.get('ajxpServerAccess');
-			var cssRes = this.parameters.get("cssResources");
-			if(cssRes) cssRes.each(this.loadCSSResource.bind(this));
-			if(this.parameters.get('ajxpResourcesFolder')){
-				window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
-			}
-			if(this.parameters.get('additional_js_resource')){
-				connexion.loadLibrary(this.parameters.get('additional_js_resource'));
-			}
-			this.insertLoaderProgress();
-			if(!this.parameters.get("debugMode")){
-				connexion.loadLibrary("ajaxplorer.js");
-			}
-			window.MessageHash = this.parameters.get("i18nMessages");
-			for(var key in MessageHash){
-				MessageHash[key] = MessageHash[key].replace("\\n", "\n");
-			}
-			window.zipEnabled = this.parameters.get("zipEnabled");
-			window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
-			window.flashUploaderEnabled = this.parameters.get("flashUploaderEnabled");			
-			document.fire("ajaxplorer:boot_loaded");
-			window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
-			if(this.parameters.get("currentLanguage")){
-				window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
-			}
-			if(this.parameters.get("htmlMultiUploaderOptions")){
-				window.htmlMultiUploaderOptions = this.parameters.get("htmlMultiUploaderOptions");
-			}
-			$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
-			window.ajaxplorer.init();
+			
+			this.refreshContextVariablesAndInit(connexion);
+			
 		}.bind(this);
 		connexion.sendSync();
 		
 	},
+	
+	refreshContextVariablesAndInit: function(connexion){
+		if(this.parameters.get('SECURE_TOKEN') && !Connexion.SECURE_TOKEN){
+			Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');
+		}
+
+		// Refresh window variable
+		window.ajxpServerAccessPath = this.parameters.get('ajxpServerAccess');
+		var cssRes = this.parameters.get("cssResources");
+		if(cssRes) cssRes.each(this.loadCSSResource.bind(this));
+		if(this.parameters.get('ajxpResourcesFolder')){
+			window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
+		}
+		if(this.parameters.get('additional_js_resource')){
+			connexion.loadLibrary(this.parameters.get('additional_js_resource'));
+		}
+		this.insertLoaderProgress();
+		if(!this.parameters.get("debugMode")){
+			connexion.loadLibrary("ajaxplorer.js");
+		}
+		window.MessageHash = this.parameters.get("i18nMessages");
+		for(var key in MessageHash){
+			MessageHash[key] = MessageHash[key].replace("\\n", "\n");
+		}
+		window.zipEnabled = this.parameters.get("zipEnabled");
+		window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
+		window.flashUploaderEnabled = this.parameters.get("flashUploaderEnabled");			
+		document.fire("ajaxplorer:boot_loaded");
+		window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
+		if(this.parameters.get("currentLanguage")){
+			window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
+		}
+		if(this.parameters.get("htmlMultiUploaderOptions")){
+			window.htmlMultiUploaderOptions = this.parameters.get("htmlMultiUploaderOptions");
+		}
+		$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
+		window.ajaxplorer.init();		
+	},
+	
 	/**
 	 * Detect the base path of the javascripts based on the script tags
 	 */
