@@ -63,7 +63,8 @@ class Writeability extends AbstractTest
     		if(isset($PLUGINS["LOG_DRIVER"]["OPTIONS"]) && isSet($PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"])){
     			$checks[] = $PLUGINS["LOG_DRIVER"]["OPTIONS"]["LOG_PATH"];
     		}
-    	}    	
+    	}    
+    	$checks[] = AJXP_CACHE_DIR;	
     	$checked = array();
     	$success = true;
     	foreach ($checks as $check){

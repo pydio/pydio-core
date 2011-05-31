@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.video" openable="false" mimes="flv,mov,mp4,m4a,aac,ogv,webm" text="186" title="136" icon="frame_image.png" className="VideoPreviewer">
+<editor id="editor.video" openable="false" mimes="flv,mov,mp4,m4a,aac,ogv,webm" previewProvider="true" text="186" title="136" icon="frame_image.png" className="VideoPreviewer">
 	<class_definition filename="plugins/editor.video/class.VideoReader.php" classname="VideoReader"/>
 	<resources>
 		<js file="plugins/editor.video/class.VideoPreviewer.js" className="VideoPreviewer"/>

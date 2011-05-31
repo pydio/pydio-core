@@ -603,8 +603,15 @@
 					var editors = ajaxplorer.findEditorsForMime(selectedMime);
 					if(editors.length){
 						var index = 0;
+						var sepAdded = false;
 						editors.each(function(el){							
 							if(!el.openable) return;
+							if(el.mimes.include('*')){
+								if(!sepAdded && index > 0){ 	
+									context.builderMenuItems.push({separator:true});
+								}
+								sepAdded = true;
+							}
 							context.builderMenuItems.push({
 								name:el.text,
 								alt:el.title,

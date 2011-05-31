@@ -1108,7 +1108,7 @@ Class.create("FilesList", SelectableElements, {
 		var metadata = ajxpNode.getMetadata();
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
-		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime());
+		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime(), true);
 		var textNode = ajxpNode.getLabel();
 		var img = AbstractEditor.prototype.getPreview(ajxpNode);
 		var label = new Element('div', {

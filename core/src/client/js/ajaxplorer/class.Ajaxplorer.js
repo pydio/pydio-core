@@ -596,6 +596,8 @@ Class.create("Ajaxplorer", {
 		if(xmlNode.nodeName == 'editor'){
 			Object.extend(extensionDefinition, {
 				openable : (xmlNode.getAttribute("openable") == "true"?true:false),
+				previewProvider: (xmlNode.getAttribute("previewProvider")=="true"?true:false),
+				order: (xmlNode.getAttribute("order")?parseInt(xmlNode.getAttribute("order")):0),
 				formId : xmlNode.getAttribute("formId") || null,				
 				text : MessageHash[xmlNode.getAttribute("text")],
 				title : MessageHash[xmlNode.getAttribute("title")],
@@ -688,17 +690,23 @@ Class.create("Ajaxplorer", {
 	 * @param mime String
 	 * @returns AbstractEditor[]
 	 */
-	findEditorsForMime : function(mime){
+	findEditorsForMime : function(mime, restrictToPreviewProviders){
 		var editors = $A([]);
 		var checkWrite = false;
 		if(this.user != null && !this.user.canWrite()){
 			checkWrite = true;
 		}
 		this._extensionsRegistry.editor.each(function(el){
-			if(el.mimes.include(mime)) {
+			if(el.mimes.include(mime) || el.mimes.include('*')) {
+				if(restrictToPreviewProviders && !el.previewProvider) return;
 				if(!checkWrite || !el.write) editors.push(el);
 			}
 		});
+		if(editors.length && editors.length > 1){
+			editors = editors.sortBy(function(ed){
+				return ed.order||0;
+			});
+		}
 		return editors;
 	},
 	

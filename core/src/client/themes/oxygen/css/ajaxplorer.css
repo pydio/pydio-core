@@ -2140,6 +2140,10 @@ div.menu a {
 	margin: 1px 1px 0 1px;
 	line-height: 1px !important;
 }
+.menu.desktop.toolbarmenu li.separator{
+	border-bottom: 1px solid #ddd;
+}
+
 .bookmarksMenu li.separator {
 	border-bottom: 1px solid #fff;
 	margin: 1px 1px 0 1px;
