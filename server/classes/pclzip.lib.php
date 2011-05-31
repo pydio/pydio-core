@@ -63,7 +63,7 @@
   // define( 'PCLZIP_TEMPORARY_DIR', '/temp/' );
   // define( 'PCLZIP_TEMPORARY_DIR', 'C:/Temp/' );
   if (!defined('PCLZIP_TEMPORARY_DIR')) {
-    define( 'PCLZIP_TEMPORARY_DIR', '' );
+    define( 'PCLZIP_TEMPORARY_DIR', AJXP_Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR );
   }
 
 // --------------------------------------------------------------------------------
