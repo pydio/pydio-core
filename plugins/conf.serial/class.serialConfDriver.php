@@ -54,11 +54,17 @@ class serialConfDriver extends AbstractConfDriver {
 	
 	function performChecks(){
 		$this->performSerialFileCheck($this->repoSerialFile, "repositories file");
-		$this->performSerialFileCheck($this->usersSerialDir, "users file");
+		$this->performSerialFileCheck($this->usersSerialDir, "users file", true);
 		$this->performSerialFileCheck($this->rolesSerialFile, "roles file");
 	}
 	
-	function performSerialFileCheck($file, $fileLabel){
+	function performSerialFileCheck($file, $fileLabel, $isDir = false){
+		if($isDir){
+			if(!is_dir($file) || !is_writable($file)){
+				throw new Exception("Folder for storing $fileLabel is either inexistent or not writeable.");
+			}
+			return ;
+		}
 		$dir = dirname($file);
 		if(!is_dir($dir) || !is_writable($dir)){
 			throw new Exception("Parent folder for $fileLabel is either inexistent or not writeable.");
