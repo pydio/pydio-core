@@ -266,7 +266,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					return;						
 				}
 				$forbidden = array("guest", "share");
-				$new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_HTML_STRICT);
+				$new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_ALPHANUM);
 				if(AuthService::userExists($new_user_login) || in_array($new_user_login, $forbidden))
 				{
 					AJXP_XMLWriter::header();
