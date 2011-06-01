@@ -133,7 +133,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 		$fp = fopen($masterFile, "r");
 		$tmpFileName = $workingDir."/ajxp_tmp_".md5(time()).".$extension";
 		$tmpFile = fopen($tmpFileName, "w");
-		register_shutdown_function("unlink", $tmpFileName);			
+		register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFileName);			
 		while(!feof($fp)) {
 			stream_copy_to_stream($fp, $tmpFile, 4096);
 		}

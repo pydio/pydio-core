@@ -141,7 +141,7 @@ class ImagePreviewer extends AJXP_Plugin {
 					$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode, true);
 					$isRemote = call_user_func(array($wrapperClassName, "isRemote"));
 					if($isRemote){
-						register_shutdown_function("unlink", $realFile);
+						register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $realFile);
 					}
 				}
 				list($width, $height, $type, $attr) = getimagesize($realFile);

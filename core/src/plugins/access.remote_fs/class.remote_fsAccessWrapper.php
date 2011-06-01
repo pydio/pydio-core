@@ -59,7 +59,7 @@ class remote_fsAccessWrapper implements AjxpWrapper {
     	self::copyFileInStream($path, $tmpHandle);
     	fclose($tmpHandle);
     	if(!$persistent){
-    		register_shutdown_function("unlink", $tmpFile);
+    		register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
     	}
     	return $tmpFile;
     }	
