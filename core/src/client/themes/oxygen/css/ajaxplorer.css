@@ -1028,30 +1028,30 @@ div.header_resizer div.ascending {
     left top,
     color-stop(0.01, rgb(201,201,201)),
     color-stop(0.54, rgb(221,221,221))
-);
-background-image: -moz-linear-gradient(
-    center bottom,
-    rgb(201,201,201) 0%,
-    rgb(221,221,221) 54%
-) !important;	
+	);
+	background-image: -moz-linear-gradient(
+	    center bottom,
+	    rgb(201,201,201) 0%,
+	    rgb(221,221,221) 54%
+	);	
 }
 
 .selected-focus
 {
     color: #fff !important;
 	background-color:#73a2d7 !important;
-background-image: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-	color-stop(0, rgb(66,128,199)),
-    color-stop(0.54, rgb(115,161,215))
-);
-background-image: -moz-linear-gradient(
-    center bottom,
-    rgb(52,111,179) 0%,
-    rgb(115,161,215) 54%
-);
+	background-image: -webkit-gradient(
+	    linear,
+	    left bottom,
+	    left top,
+		color-stop(0, rgb(66,128,199)),
+	    color-stop(0.54, rgb(115,161,215))
+	);
+	background-image: -moz-linear-gradient(
+	    center bottom,
+	    rgb(52,111,179) 0%,
+	    rgb(115,161,215) 54%
+	);
 	
 }
 
