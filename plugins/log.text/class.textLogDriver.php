@@ -89,10 +89,22 @@ class textLogDriver extends AbstractLogDriver {
 	 */
 	function open(){
 		if($this->storageDir!=""){
+			$create = false;
+			if(!file_exists($this->storageDir . $this->logFileName)){
+				// file creation
+				$create = true; 
+			}
 			$this->fileHandle = @fopen($this->storageDir . $this->logFileName, "at+");
 			if($this->fileHandle !== false && count($this->stack)){
 				$this->stackFlush();
-			}		
+			}
+			if($create && $this->fileHandle !== false){
+				$mainLink = $this->storageDir."ajxp_access.log";
+				if(file_exists($mainLink)){
+					@unlink($mainLink);
+				}
+				@symlink($this->storageDir.$this->logFileName, $mainLink);
+			}
 		}		
 	}
 	
@@ -219,7 +231,7 @@ class textLogDriver extends AbstractLogDriver {
 		$months = array();
 		if(($handle = opendir($this->storageDir))!==false){
 			while($file = readdir($handle)){
-				if($file == "index.html") continue;
+				if($file == "index.html" || $file == "ajxp_access.log") continue;
 				$split = explode(".", $file);
 				if(!count($split) || $split[0] == "") continue;
 				$split2 = explode("_", $split[0]);
