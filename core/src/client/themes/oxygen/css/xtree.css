@@ -1,3 +1,13 @@
+.flexbox div.webfx-tree-container.first_container{
+	background-image:url('../images/tree-even-odd-bg.png');
+}
+
+.no-flexbox div#tree_container{
+	background-image:url('../images/tree-odd-even-bg.png');
+	background-attachment:scroll;
+}
+
+
 .webfx-tree-container {
 	margin: 0px;
 	padding: 0px;
@@ -12,25 +22,53 @@
 	margin: 0px;
 	font-family: Trebuchet MS, sans-serif;
 	font-size: 11px;
-	color: WindowText;
 	white-space: nowrap;
-	height: 20px;
+	height: 25px;
+}
+
+.webfx-tree-item:hover{
+	background-color: #eee;
 }
 
 .selected-webfx-tree-item {
 	background-color : #73a2d7;
 	color : white;
+background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+	color-stop(0, rgb(66,128,199)),
+    color-stop(0.54, rgb(115,161,215))
+);
+background-image: -moz-linear-gradient(
+    center bottom,
+    rgb(52,111,179) 0%,
+    rgb(115,161,215) 54%
+);
 }
 
 .selected-webfx-tree-item-inactive 
 {
 	background: #ddd;
 	text-decoration: none;
+background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0, rgb(201,201,201)),
+    color-stop(0.54, rgb(221,221,221))
+);
+background-image: -moz-linear-gradient(
+    center bottom,
+    rgb(201,201,201) 0%,
+    rgb(221,221,221) 54%
+);		
 }
 
-.webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover {
+.webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover, .webfx-tree-item a:link {
 	margin-left: 0px;
-	padding: 0px 2px 1px 2px;
+	outline:0;
+	cursor: default;
 }
 
 .webfx-tree-item a {	
@@ -41,8 +79,19 @@
 	text-decoration: none;
 }
 
-.webfx-tree-item a:focus {
-	outline:none;
+.webfx-tree-item a {
+	outline:0;
+}
+
+.webfx-tree-item a span{
+	display:inline-block;
+	height: 19px;
+	line-height: 19px;
+	margin-top:4px;
+	
+	padding-left: 24px;
+	background-position: 4px 1px;
+	background-repeat:no-repeat;
 }
 
 *::-moz-focus-inner { 
@@ -62,6 +111,7 @@
 .webfx-tree-item img {
 	vertical-align: middle;
 	border: 0px;
+	float:left;
 }
 
 .webfx-tree-icon {

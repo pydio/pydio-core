@@ -96,7 +96,11 @@ textarea{
 }
 
 #selectable_div div.selected{
-   border: 1px solid #73A2D7;
+   border: 1px solid #ddd;
+	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
+}
+#selectable_div div.selected-focus{
+   border: 1px solid #73A2D7 !important;
 	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
 }
 
@@ -120,6 +124,7 @@ textarea{
 	padding-left:2px;
 	padding-top:2px;
 	height: 18px;
+	line-height: 17px;
 	white-space : nowrap;
 }
 
@@ -938,6 +943,10 @@ div.header_resizer div.ascending {
 	padding:	2px 0px;
 }
 
+.no-flexbox .sort-table td{
+	padding: 3px 0px;
+}
+
 .sort-table thead td {
 	/*
 	display: block;
@@ -1013,12 +1022,37 @@ div.header_resizer div.ascending {
 	background: #ddd;
 	color : #404040;
 	text-decoration: none;
+	background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+    color-stop(0.01, rgb(201,201,201)),
+    color-stop(0.54, rgb(221,221,221))
+);
+background-image: -moz-linear-gradient(
+    center bottom,
+    rgb(201,201,201) 0%,
+    rgb(221,221,221) 54%
+) !important;	
 }
 
 .selected-focus
 {
     color: #fff !important;
 	background-color:#73a2d7 !important;
+background-image: -webkit-gradient(
+    linear,
+    left bottom,
+    left top,
+	color-stop(0, rgb(66,128,199)),
+    color-stop(0.54, rgb(115,161,215))
+);
+background-image: -moz-linear-gradient(
+    center bottom,
+    rgb(52,111,179) 0%,
+    rgb(115,161,215) 54%
+);
+	
 }
 
 .droppableZone
@@ -1583,7 +1617,25 @@ tr td.infoPanelLabel
 div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .ajxp_simple_container{
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial, Sans-serif;
     font-size: 11px;
-   	background-image: url('../images/strip.png');
+}
+
+#table_rows_container td{
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+	border-right: 1px solid #eee;
+}
+#table_rows_container tr.even td{
+	border-top: 0px;
+	border-bottom:0px;
+}
+#table_rows_container tr:first-child td{
+	border-top:0px;
+}
+#table_rows_container tr:last-child td{
+	border-bottom: 1px solid #eee;
+}
+#table_rows_container tr.selected-focus td{
+	border-right: 1px solid #73A2D7;
 }
 
 .no_select_bg::selection {
