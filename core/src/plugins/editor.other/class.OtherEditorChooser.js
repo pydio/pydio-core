@@ -48,16 +48,11 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 		var even = false;
 		allEditors.each(function(el){
 			if(el.editorClass == "OtherEditorChooser") return;
-			var elDiv = new Element('div').update(el.text);
-			elDiv.setStyle({
-				backgroundImage:"url('"+resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22)+"')",
-				backgroundRepeat:"no-repeat",
-				backgroundPosition: "5px",
-				padding: '8 30px',
-				margin: '3 0px',
-				backgroundColor: (even?'#eee':''),
-				cursor: 'pointer'
-			});
+			var elDiv = new Element('a', {
+				href:'#', 
+				className:(even?'even':''),
+				style:"background-image:url('"+resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22)+"')"
+				}).update(el.text + '<span>'+el.title+'</span>');
 			even = !even;
 			elDiv.editorData = el;
 			elDiv.observe('click', this.selectEditor.bind(this));
