@@ -148,7 +148,7 @@ class ExifMetaManager extends AJXP_Plugin {
 			$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentFile, true);
 			$isRemote = call_user_func(array($wrapperClassName, "isRemote"));
 			if($isRemote){
-				register_shutdown_function("unlink", $realFile);
+				register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $realFile);
 			}
 		}
 		$exif = exif_read_data($realFile, 0, TRUE);
