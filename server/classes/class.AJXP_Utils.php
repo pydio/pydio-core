@@ -746,6 +746,10 @@ class AJXP_Utils
 		return false;	
 	}
 	
+	public static function silentUnlink($file){
+		@unlink($file);
+	}
+	
 }
 
 ?>
