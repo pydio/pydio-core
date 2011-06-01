@@ -902,7 +902,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			if(preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])){
 				$localName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($localName)));
 			}
-			if ($isFile) header("Accept-Ranges: 0-$size");
+			if ($isFile) {
+				header("Accept-Ranges: 0-$size");
+				AJXP_Logger::debug("Sending accept range 0-$size");
+			}
+			
 			// Check if we have a range header (we are resuming a transfer)
 			if ( isset($_SERVER['HTTP_RANGE']) && $isFile && $size != 0 )
 			{
@@ -946,11 +950,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
                 while(ob_get_level()) ob_end_flush();
 				$readSize = 0.0;
+				$bufferSize = 1024 * 8;
 				while (!feof($file) && $readSize < $length && connection_status() == 0)
 				{
 					//AJXP_Logger::debug("dl reading $readSize to $length", $_SERVER["HTTP_RANGE"]);					
-					echo fread($file, 2048);
-					$readSize += 2048.0;
+					echo fread($file, $bufferSize);
+					$readSize += $bufferSize;
 					flush();
 				}
 				
