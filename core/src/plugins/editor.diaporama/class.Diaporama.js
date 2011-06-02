@@ -395,15 +395,57 @@ Class.create("Diaporama", AbstractEditor, {
 	 */
 	getPreview : function(ajxpNode){
 		var img = new Element('img', {src:Diaporama.prototype.getThumbnailSource(ajxpNode), border:0});
-		img.resizePreviewElement = function(dimensionObject){			
+		var div = new Element('div');
+		div.insert(img);
+		div.resizePreviewElement = function(dimensionObject){			
 			var imgDim = {
 				width:parseInt(ajxpNode.getMetadata().get("image_width")), 
 				height:parseInt(ajxpNode.getMetadata().get("image_height"))
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
 			img.setStyle(styleObj);
+			div.setStyle({
+				height:styleObj.height, 
+				width:styleObj.width, 
+				position:'relative',
+				display:'inline'
+			});
 		};
-		return img;
+		img.observe("mouseover", function(event){
+			var theImage = event.target;
+			if(theImage.up('.thumbnail_selectable_cell')) return;
+			if(!theImage.openBehaviour){
+				var opener = new Element('div').update(MessageHash[411]);
+				opener.setStyle({
+					width:styleObj.width, 
+					display:'none', 
+					position:'absolute', 
+					bottom:($$('html')[0].hasClassName('boxshadow')?'3px':'0px'), 
+					right:'0px',
+					color: 'white',
+					backgroundColor: 'black',
+					opacity: '0.6',
+					fontWeight: 'bold',
+					fontSize: '12px',
+					textAlign: 'center',
+					cursor: 'pointer'				
+				});
+				img.previewOpener = opener;
+				theImage.insert({before:opener});
+				theImage.setStyle({cursor:'pointer'});
+				theImage.openBehaviour = true;
+				theImage.observe("click", function(event){
+					ajaxplorer.actionBar.fireAction('open_with');
+				});
+			}
+			theImage.previewOpener.setStyle({display:'inline'});
+		});
+		img.observe("mouseout", function(event){
+			var theImage = event.target;
+			if(theImage.up('.thumbnail_selectable_cell')) return;
+			theImage.previewOpener.setStyle({display:'none'});
+		});
+		return div;
 	},
 	
 	getThumbnailSource : function(ajxpNode){
