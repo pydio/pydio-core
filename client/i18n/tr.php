@@ -446,6 +446,7 @@ $mess=array(
 "408" => "Activated WebDav shares successfully, do not forget to update your password if it's the first time!",
 "409" => "De-activated WebDav shares successfully",
 "410" => "Updated webDav password successfully",
+"411" => "Open",
 /* END SENTENCE */
 );
 ?>
