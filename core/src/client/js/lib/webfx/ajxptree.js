@@ -91,7 +91,14 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	}.bind(jsNode));
 	ajxpNode.observe("node_replaced", function(newNode){
 		// Should refresh label / icon
-		if(jsNode.updateIcon) jsNode.updateIcon(resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 16));
+		if(jsNode.updateIcon){ 
+			var ic = resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 16);
+			var oic = ic;
+			if(ajxpNode.getMetadata().get("openicon")){
+				oic = resolveImageSource(ajxpNode.getMetadata().get("openicon"), "/images/mimes/ICON_SIZE", 16);
+			}
+			jsNode.updateIcon(ic, oic);
+		}
 		if(jsNode.updateLabel) jsNode.updateLabel(ajxpNode.getLabel());
 	}.bind(jsNode));
 	ajxpNode.observeOnce("node_removed", function(e){

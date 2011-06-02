@@ -221,9 +221,17 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			}.bind(node));
 			 webFXTreeHandler.contextMenu.addElements('#'+node.id+'');
 		}
-		Event.observe(node.id+'','click', function(event){
+		Event.observe(node.id,'click', function(event){
 			this.select();
 			this.action();
+			Event.stop(event);
+		}.bind(node));
+		Event.observe(node.id,'dblclick', function(event){
+			this.toggle();
+			Event.stop(event);
+		}.bind(node));
+		Event.observe(node.id+'-plus','click' , function(event){
+			this.toggle();
 			Event.stop(event);
 		}.bind(node));
 		if ((!this.folder) && (!this.openIcon)) {
@@ -485,9 +493,11 @@ function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon) {
 
 WebFXTreeItem.prototype = new WebFXTreeAbstractNode;
 
-WebFXTreeItem.prototype.updateIcon = function(icon){
-	this.icon = this.openIcon = icon;
-	this.setLabelIcon(icon);
+WebFXTreeItem.prototype.updateIcon = function(icon, openIcon){
+	if(openIcon) this.openIcon = openIcon;
+	else this.openIcon = icon;
+	this.icon = icon;
+	this.setLabelIcon((this.open && webFXTreeHandler.behavior != 'classic'?this.openIcon:icon));
 };
 
 
@@ -653,9 +663,9 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 	else if (!this.icon) { this.icon = webFXTreeConfig.fileIcon; }
 	
 	var label = this.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
+	var str = "<div id=\"" + this.id + "\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
 		indent +
-		"<img  width=\"19\" height=\"25\" id=\"" + this.id + "-plus\" src=\"" + ((this.folder)?((this.open)?((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon):((this.parentNode._last)?webFXTreeConfig.lPlusIcon:webFXTreeConfig.tPlusIcon)):((this.parentNode._last)?webFXTreeConfig.lIcon:webFXTreeConfig.tIcon)) + "\" onclick=\"webFXTreeHandler.toggle(this);\">" +
+		"<img  width=\"19\" height=\"25\" id=\"" + this.id + "-plus\" src=\"" + ((this.folder)?((this.open)?((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon):((this.parentNode._last)?webFXTreeConfig.lPlusIcon:webFXTreeConfig.tPlusIcon)):((this.parentNode._last)?webFXTreeConfig.lIcon:webFXTreeConfig.tIcon)) + "\">" +
 		"<a href=\"" + this.url + "\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\" onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +
 		(this.target ? " target=\"" + this.target + "\"" : "") +
 		">" +
