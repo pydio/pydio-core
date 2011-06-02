@@ -1404,11 +1404,23 @@ div#upload_files_list div, div#multiple_download_container div
     cursor:pointer;
 }
 
+div.tabulatorContainer{
+	padding: 3px;
+	padding-bottom: 0px;
+	height: 24px;
+	border-bottom: 1px solid #676965;
+}
+
 .toggleHeader
 {
-    width: 50%;
-	cursor:	pointer;
+	width: 50%;
+	cursor: pointer;
 	padding-right: 2px;
+	border: 1px solid #676965;
+	border-bottom: 0px;
+	border-radius: 4px 4px 0px 0px;
+	-moz-border-radius: 4px 4px 0px 0px;
+	-webkit-border-radius: 4px 4px 0px 0px;
 }
 
 .toggleHeader a, .toggleHeader a, .toggleHeader a:link, .toggleHeader a:visited, .toggleHeader a:hover , .toggleHeader a:active
@@ -1423,7 +1435,12 @@ div#upload_files_list div, div#multiple_download_container div
 
 .toggleInactive
 {
-    background:#DADDD7 !important;
+	background: #EEE !important;
+	border-width: 1px;
+	border-bottom: 1px solid #676965;
+  filter:alpha(opacity=60);
+  opacity: 0.6;
+  -moz-opacity:0.6;
 }
 
 .toggleInactive a, .toggleInactive a:link, .toggleInactive a:visited, .toggleInactive a:hover , .toggleInactive a:active
@@ -1455,8 +1472,9 @@ div#upload_files_list div, div#multiple_download_container div
 #search_form, #search_state
 {
      padding-left: 10px;
-     margin-top:10px;
+     padding-top:10px;
      text-align: center;    
+	background-color: #f1f1ef;
      /*height: 30px;*/
 }
 #search_form
@@ -1599,11 +1617,16 @@ tr td.infoPanelLabel
 .infoPanelImagePreview 
 {
 	width: 100%;
-	background-color: #f4f4f4;
+	background-color: #f1f1ef;
 	text-align:center;
 	padding: 10 0;
 }
-
+.infoPanelImagePreview img
+{
+	-webkit-box-shadow: 1px 1px 6px #7a7a7a;
+	-moz-box-shadow: 1px 1px 6px #7a7a7a;
+	box-shadow: 1px 1px 6px #7a7a7a;
+}
 
 #browser
 {
@@ -1619,22 +1642,32 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
     font-size: 11px;
 }
 
-#table_rows_container td{
+#table_rows_container td,
+.infoPanelTable td
+{
 	border-top: 1px solid #eee;
 	border-bottom: 1px solid #eee;
 	border-right: 1px solid #eee;
 }
-#table_rows_container tr.even td{
+#table_rows_container tr.even td, 
+.infoPanelTable tr.even td 
+{
 	border-top: 0px;
 	border-bottom:0px;
 }
-#table_rows_container tr:first-child td{
+#table_rows_container tr:first-child td,
+.infoPanelTable tr:first-child td
+{
 	border-top:0px;
 }
-#table_rows_container tr:last-child td{
+#table_rows_container tr:last-child td,
+.infoPanelTable tr:last-child td
+{
 	border-bottom: 1px solid #eee;
 }
-#table_rows_container tr.selected-focus td{
+#table_rows_container tr.selected-focus td,
+.infoPanelTable tr.selected-focus td
+{
 	border-right: 1px solid #73A2D7;
 }
 

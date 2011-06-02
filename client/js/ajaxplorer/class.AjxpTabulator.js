@@ -41,12 +41,15 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 */
 	initialize : function($super, htmlElement, tabulatorOptions){
 		$super(htmlElement);
-		this.tabulatorData = tabulatorOptions.tabInfos;		
+		this.tabulatorData 	= tabulatorOptions.tabInfos;		
 		// Tabulator Data : array of tabs infos
 		// { id , label, icon and element : tabElement }.
 		// tab Element must implement : showElement() and resize() methods.
+		// Add drop shadow here, otherwise the negative value gets stuck in the CSS compilation...
+		var div = new Element('div', {className:'tabulatorContainer', style:'box-shadow: inset 0px -1px 2px #999999;-webkit-box-shadow: inset 0px -1px 2px #999999;-moz-box-shadow: inset 0px -1px 2px #999999;'});
 		var table = new Element('table', {cellpadding:0,cellspacing:0,border:0,width:'100%',style:'height:24px;'});		
-		$(this.htmlElement).insert({top:table});
+		$(this.htmlElement).insert({top:div});
+		div.update(table);
 		var tBody = new Element('tBody');
 		var tr = new Element('tr');
 		table.update(tBody);
