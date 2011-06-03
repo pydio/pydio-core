@@ -549,12 +549,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repId = $httpVars["repository_id"];
 				$repList = ConfService::getRootDirsList();
 				//print_r($repList);
-				AJXP_XMLWriter::header("admin_data");		
 				if(!isSet($repList[$repId])){
-					AJXP_XMLWriter::close("admin_data");
-					return ;
+					throw new Exception("Cannot find repository with id $repId");
 				}
-				$repository = $repList[$repId];			
+				$repository = $repList[$repId];	
+				$pServ = AJXP_PluginsService::getInstance();
+				$plug = $pServ->getPluginById("access.".$repository->accessType);
+				if($plug == null){
+					throw new Exception("Cannot find access driver (".$repository->accessType.") for repository!");
+				}				
+				AJXP_XMLWriter::header("admin_data");		
 				$slug = $repository->getSlug();
 				if($slug == "" && $repository->isWriteable()){
 					$repository->setSlug();
@@ -563,6 +567,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$nested = array();
 				print("<repository index=\"$repId\"");
 				foreach ($repository as $name => $option){
+					if(strstr($name, " ")>-1) continue;
 					if(!is_array($option)){					
 						if(is_bool($option)){
 							$option = ($option?"true":"false");
@@ -592,8 +597,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}else{
 					print("/>");
 				}
-				$pServ = AJXP_PluginsService::getInstance();
-				$plug = $pServ->getPluginById("access.".$repository->accessType);
 				$manifest = $plug->getManifestRawContent("server_settings/param");
 				print("<ajxpdriver name=\"".$repository->accessType."\">$manifest</ajxpdriver>");
 				print("<metasources>");
