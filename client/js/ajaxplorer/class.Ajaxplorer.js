@@ -568,6 +568,7 @@ Class.create("Ajaxplorer", {
 		connexion.addParameter('repository_id', repositoryId);
 		oThis = this;
 		connexion.onComplete = function(transport){
+			this.repositoryId = null;
 			this.loadXmlRegistry();
 		}.bind(this);
 		var root = this._contextHolder.getRootNode();
