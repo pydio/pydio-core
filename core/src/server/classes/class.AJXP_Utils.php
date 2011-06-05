@@ -478,52 +478,74 @@ class AJXP_Utils
 		$style = '
 		<style>
 		body {
-		background-color:#f1f1ef;
+		background-color:#fff;
 		margin:0;
 		padding:20;
+		text-align:center;
 		}
-		* {font-family:arial, sans-serif;font-size:11px;color:#006}
-		h1 {font-size: 20px; color:black}
+		* {font-family:arial, sans-serif;font-size:11px;color:#000}
+		table{margin:0px auto;}
+		h1 {font-size: 20px; color:#676965;background: url("client/themes/oxygen/images/ICON.png") no-repeat;height: 20px;padding: 8px 36px;text-align: left;margin: 0px auto;width: 300px;}
 		thead tr{background-color: #ccc; font-weight:bold;}
-		tr.dump{background-color: #ee9;}
-		tr.passed{background-color: #ae9;}
-		tr.failed{background-color: #ea9;}
-		tr.warning{background-color: #f90;}
-		td {padding: 3px 6px;}
+		tr:nth-child(even){background-color: #f4f4f4;}
+		td {border:1px solid #eee;padding:5px;}
+		div.titre {width:700px; text-align:left; font-size: 16px;margin:6px auto;padding-top:14px;padding-left:5px; font-weight:bold;}
+		div.passed thead tr{background-color: #ae9;}
+		div.error thead tr{background-color: #ea9;}
+		div.warning thead tr{background-color: #f90;}
+		
+		div.passed div.titre{color: #060;}
+		div.error div.titre{color: #933;}
+		div.warning div.titre{color: #f90;}
+		div.detail,p {width:700px;margin:0px auto;text-align:left;}
+		
 		td.col{font-weight: bold;}
+		td.tdName, td:nth-child(1){width:200px;}
 		</style>
 		';
 		$htmlHead = "<html><head><title>AjaXplorer : Diagnostic Tool</title>$style</head><body><h1>AjaXplorer Diagnostic Tool</h1>";
 		if($showSkipLink){
 			$htmlHead .= "<p>The diagnostic tool detected some errors or warning : you are likely to have problems running AjaXplorer!</p>";
 		}
-		$html = "<table width='700' border='0' cellpadding='0' cellspacing='1'><thead><tr><td>Name</td><td>Result</td><td>Info</td></tr></thead>"; 
+		$tableHeader = "<table width='700' border='0' cellpadding='0' cellspacing='0'><thead><tr><td class='tdName'>Name</td><td class='tdInfo'>Info</td></tr></thead>"; 
+		$tableFooter = "</table>";		
+		$html = "";
 		$dumpRows = "";
-		$passedRows = "";
+		$passedRows = array();
 		$warnRows = "";
+		$errRows = "";
 		$errs = $warns = 0;
 		foreach($outputArray as $item)
 		{
 		    // A test is output only if it hasn't succeeded (doText returned FALSE)
 		    $result = $item["result"] ? "passed" : ($item["level"] == "info" ? "dump" : ($item["level"]=="warning"? "warning":"failed"));
 		    $success = $result == "passed";    
-		    $row = "<tr class='$result'><td class='col'>".$item["name"]."</td><td>".$result."&nbsp;</td><td>".(!$success ? $item["info"] : "")."&nbsp;</td></tr>";
+		    $row = "<tr class='$result'><td class='col'>".$item["name"]."</td><td>".(!$success ? $item["info"] : "")."&nbsp;</td></tr>";
 		    if($result == "dump"){
 		    	$dumpRows .= $row;
 		    }else if($result == "passed"){
-		    	$passedRows .= $row;
+		    	$passedRows []= str_replace("\n", "", $item["name"]);
+		    
 		    }else if($item["level"] == "warning"){
 		    	$warnRows .= $row;
 		    	$warns ++;
 		    }else{
-		    	$html .= $row;
+		    	$errRows .= $row;
 		    	$errs ++;
 		    }
 		}
-		$html .= $warnRows;
-		$html .= $passedRows;
-		$html .= $dumpRows;
-		$html .= "</table>";
+		if(strlen($errRows)){
+			$html .= '<div class="error"><div class="titre">Failed Tests</div>'.$tableHeader.$errRows.$tableFooter.'</div>';
+		}
+		if(strlen($warnRows)){
+			$html .= '<div class="warning"><div class="titre">Warnings</div>'.$tableHeader.$warnRows.$tableFooter.'</div>';
+		}
+		if(strlen($dumpRows)){
+			$html .= '<div class="dumped"><div class="titre">Server Info</div>'.$tableHeader.$dumpRows.$tableFooter.'</div>';
+		}		
+		if(count($passedRows)){
+			$html .= '<div class="passed"><div class="titre">Other Tests Passed</div><div class="detail">'.implode(", ", $passedRows).'</div></div>';
+		}
 		if($showSkipLink){
 			if(!$errs){
 				$htmlHead .= "<p>STATUS : You have some warning, but no fatal error, AjaXplorer should run ok, <a href='index.php?ignore_tests=true'>click here to continue to AjaXplorer!</a> (this test won't be launched anymore)</p>";
