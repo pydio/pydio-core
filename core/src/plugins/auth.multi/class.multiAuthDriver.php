@@ -53,6 +53,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 		foreach($this->driversDef as $def){
 			$name = $def["NAME"];
 			$options = $def["OPTIONS"];
+			$options["TRANSMIT_CLEAR_PASS"] = $this->options["TRANSMIT_CLEAR_PASS"];
+			$options["LOGIN_REDIRECT"] = $this->options["LOGIN_REDIRECT"];			
 			$instance = AJXP_PluginsService::findPlugin("auth", $name);
 			if(!is_object($instance)){
 				throw new Exception("Cannot find plugin $name for type 'auth'");
