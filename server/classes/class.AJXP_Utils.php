@@ -218,6 +218,10 @@ class AJXP_Utils
 		if(ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])){
 			AJXP_Utils::updateI18nFiles((isSet($parameters["plugin_path"])?$parameters["plugin_path"]:""));
 		}
+		if(ConfService::getConf("JS_DEBUG") && isSet($parameters["clear_plugins_cache"])){
+			@unlink(AJXP_PLUGINS_CACHE_FILE);
+			@unlink(AJXP_PLUGINS_REQUIRES_FILE);
+		}
 		
 		if(isSet($parameters["external_selector_type"])){
 			$output["SELECTOR_DATA"] = array("type" => $parameters["external_selector_type"], "data" => $parameters);
