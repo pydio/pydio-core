@@ -30,7 +30,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     protected $statCache = array();
 
 	public function __construct($repository){
-		$repositoryId = $repository->getId();
+		$repositoryId = $repository->getUniqueId();
 		ConfService::switchRootDir($repositoryId);
 		$this->repository = ConfService::getRepository();
 						
@@ -52,7 +52,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 			$confDriver = ConfService::getConfStorageImpl();
 			$this->accessDriver = ConfService::loadRepositoryDriver();
 			if(!$this->accessDriver instanceof AjxpWebdavProvider){
-				throw new ezcBaseFileNotFoundException( $this->repository->getId() );
+				throw new ezcBaseFileNotFoundException( $this->repository->getUniqueId() );
 			}
 			$wrapperData = $this->accessDriver->detectStreamWrapper(true);
 			$this->wrapperClassName = $wrapperData["classname"];			
