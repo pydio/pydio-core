@@ -53,7 +53,15 @@ class webdavAccessWrapper extends fsAccessWrapper {
     	if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
 		$path = $url["path"];
 		$host = $repoObject->getOption("HOST");
-		$host = str_replace(array("http", "https"), array("webdav", "webdavs"), $host);
+		$hostParts = parse_url($host);
+		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($hostParts, $repoObject);
+		$user = $credentials["user"];
+		$password = $credentials["password"];
+		if($user!=null && $password!=null){
+			$host = ($hostParts["protocol"]=="https"?"webdavs":"webdav")."://$user:$password@".$hostParts["host"];
+		}else{	
+			$host = str_replace(array("http", "https"), array("webdav", "webdavs"), $host);
+		}
 		// MAKE SURE THERE ARE NO // OR PROBLEMS LIKE THAT...
 		$basePath = $repoObject->getOption("PATH");		
 		if($basePath[strlen($basePath)-1] == "/"){
