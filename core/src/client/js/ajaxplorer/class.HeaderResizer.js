@@ -323,7 +323,7 @@ Class.create("HeaderResizer", {
 			}else{
 				var selector = "#"+this.options.body.id+" td.resizer_"+ (i);
 			}
-			var rule = "width:"+(newSizes[i] + (Prototype.Browser.IE?10:-6))+" !important;";
+			var rule = "width:"+(newSizes[i] + (Prototype.Browser.IE?10:-7))+" !important;";
 			
 			this.addStyleRule(sheet, selector, rule);
 			
@@ -332,7 +332,7 @@ Class.create("HeaderResizer", {
 			}else{
 				selector = "#"+this.options.body.id+" td.resizer_"+ (i) + " .text_label";
 			}
-			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:this.options.headerData[i].leftPadding))+" !important;";
+			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:this.options.headerData[i].leftPadding+1))+" !important;";
 			this.addStyleRule(sheet, selector, rule);
 		}
 
