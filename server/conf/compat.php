@@ -79,4 +79,30 @@ if ( !function_exists('json_decode') ){
 	}
 }
 
+if (!class_exists('DateTime')) {
+	class DateTime {
+	    public $date;
+	    
+	    public function __construct($date) {
+	        $this->date = strtotime($date);
+	    }
+	    
+	    public function setTimeZone($timezone) {
+	        return;
+	    }
+	    
+	    private function __getDate() {
+	        return date(DATE_ATOM, $this->date);    
+	    }
+	    
+	    public function modify($multiplier) {
+	        $this->date = strtotime($this->__getDate() . ' ' . $multiplier);
+	    }
+	    
+	    public function format($format) {
+	        return date($format, $this->date);
+	    }
+	}
+}
+
 ?>
