@@ -769,6 +769,7 @@ class AJXP_Utils
 	
 	public static function userAgentIsIOS(){
 		if(strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "iphone") !== false) return true;
+		if(strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "ipad") !== false) return true;
 		return false;	
 	}
 	
