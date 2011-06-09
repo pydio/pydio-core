@@ -137,7 +137,11 @@ class EmlParser extends AJXP_Plugin{
 	}
 	
 	public function extractMimeHeaders($currentNode, &$metadata, $wrapperClassName, &$realFile){
-		if(!preg_match("/\.eml$/i",$currentNode) || !$metadata["is_file"]){
+		$noMail = true;
+		if($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))){
+			$noMail = false;
+		}
+		if( $noMail ){
 			EmlParser::$currentListingOnlyEmails = FALSE;
 			return;
 		}
@@ -149,6 +153,7 @@ class EmlParser extends AJXP_Plugin{
 		}
 		$cacheItem = AJXP_Cache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
 		$data = unserialize($cacheItem->getData());
+		$data["ajxp_mime"] = "eml";
 		$metadata = array_merge($metadata, $data);
 	}
 
