@@ -86,7 +86,9 @@ class AJXP_XMLWriter
 	static function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true){
 		$string = "<tree";
 		$metaData["filename"] = $nodeName;
-		$metaData["text"] = $nodeLabel;
+		if(!isSet($metaData["text"])){
+			$metaData["text"] = $nodeLabel;
+		}
 		$metaData["is_file"] = ($isLeaf?"true":"false");
 		foreach ($metaData as $key => $value){
 			$string .= " $key=\"$value\"";
