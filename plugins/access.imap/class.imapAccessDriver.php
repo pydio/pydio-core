@@ -56,6 +56,9 @@ class imapAccessDriver extends fsAccessDriver
 		$wrapperData = $this->detectStreamWrapper(true);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
+		if($this->repository->getOption("MAILBOX") != ""){
+			//$this->urlBase .= "/INBOX";
+		}
 		if(!file_exists($this->urlBase)){
 			throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
 		}
@@ -73,6 +76,7 @@ class imapAccessDriver extends fsAccessDriver
 				$this->repository->addOption("PAGINATION_THRESHOLD", 500);
 			}else{
 				// MAILS LISTING CASE
+				//$httpVars["dir"] = mb_convert_encoding($httpVars["dir"], "UTF7-IMAP", SystemTextEncoding::getEncoding());
 				$this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "inverseSort");				
 			}
 		}
@@ -82,7 +86,7 @@ class imapAccessDriver extends fsAccessDriver
 	public function enrichMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
 		if(strstr($currentNode, "__delim__")!==false){
 			$parts = explode("/", $currentNode);
-			$metadata["text"] = AJXP_Utils::xmlEntities(str_replace("__delim__", "/", array_pop($parts)));
+			$metadata["text"] = AJXP_Utils::xmlEntities(str_replace("__delim__", "/", array_pop($parts)), true);
 		}
 	}
 	
@@ -101,6 +105,7 @@ class imapAccessDriver extends fsAccessDriver
 	}
 	
 	function countFiles($dirName,  $foldersOnly = false, $nonEmptyCheckOnly = false){
+		if($foldersOnly) return 0;
 		// WILL USE IMAP FUNCTIONS TO COUNT;
 		$tmpHandle = opendir($dirName);
 		AJXP_Logger::debug("COUNT : ".imapAccessWrapper::getCurrentDirCount());
