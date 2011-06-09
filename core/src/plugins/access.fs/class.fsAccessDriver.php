@@ -577,7 +577,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
 				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
 				if(!isset($limitPerPage) || intval($limitPerPage) == 0) $limitPerPage = 200;
-				
+								
 				$countFiles = $this->countFiles($path, !$lsOptions["f"]);
 				if($countFiles > $threshold){
 					$offset = 0;
@@ -604,6 +604,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				if(AJXP_Utils::isBrowsableArchive($dir)){
 					$metaData["ajxp_mime"] = "ajxp_browsable_archive";
 				}
+				$realFile = null;
+				AJXP_Controller::applyHook("ls.parent.metadata", array($dir, &$metaData, $this->wrapperClassName, &$realFile));
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
 					$crtLabel, 
@@ -630,17 +632,33 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				closedir($handle);				
 				$fullList = array("d" => array(), "z" => array(), "f" => array());				
 				$nodes = scandir($path);
+				if(!empty($this->driverConf["SCANDIR_RESULT_SORTFONC"])){
+					usort($nodes, $this->driverConf["SCANDIR_RESULT_SORTFONC"]);
+				}
 				//while(strlen($nodeName = readdir($handle)) > 0){
 				foreach ($nodes as $nodeName){
 					if($nodeName == "." || $nodeName == "..") continue;
-					$isLeaf = (is_file($path."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+					
+					$isLeaf = "";
 					if(!$this->filterNodeName($path, $nodeName, $isLeaf, $lsOptions)){
 						continue;
 					}
 					if(RecycleBinManager::recycleEnabled() && $dir == "" && "/".$nodeName == RecycleBinManager::getRecyclePath()){
 						continue;
+					}
+					
+					if($offset > 0 && $cursor < $offset){
+						$cursor ++;
+						continue;
+					}
+					if($limitPerPage > 0 && ($cursor - $offset) >= $limitPerPage) {				
+						break;
 					}					
+					
 					$nodeType = "d";
+					if($isLeaf === ""){
+						$isLeaf = (is_file($path."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
+					}
 					if($isLeaf){
 						if(AJXP_Utils::isBrowsableArchive($nodeName)) {
 							if($lsOptions["f"] && $lsOptions["z"]){
@@ -652,13 +670,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						}
 						else $nodeType = "f";
 					}			
-					if($offset > 0 && $cursor < $offset){
-						$cursor ++;
-						continue;
-					}
-					if($limitPerPage > 0 && ($cursor - $offset) >= $limitPerPage) {				
-						break;
-					}
 					
 					$metaData = array();
 					$currentFile = $path."/".$nodeName;	
@@ -701,10 +712,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						AJXP_Controller::applyHook("ls.metadata", array($currentFile, &$metaData, $this->wrapperClassName, &$realFile));						
 					}
 									
+					/*
 					$attributes = "";
 					foreach ($metaData as $key => $value){
 						$attributes .= "$key=\"$value\" ";
 					}
+					*/
 					
 					$renderNodeData = array(
 						AJXP_Utils::xmlEntities($dir."/".$nodeName,true), 
@@ -813,7 +826,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}
 	}
 	
-	function filterNodeName($nodePath, $nodeName, $isLeaf, $lsOptions){
+	function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions){
+		$isLeaf = (is_file($nodePath."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
 		if(AJXP_Utils::isHidden($nodeName) && !$this->driverConf["SHOW_HIDDEN_FILES"]){
 			return false;
 		}
