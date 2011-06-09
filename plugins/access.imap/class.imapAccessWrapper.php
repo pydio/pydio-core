@@ -84,10 +84,10 @@ class imapAccessWrapper implements AjxpWrapper {
 			$this->port = $repository->getOption("PORT");
 			$this->username = $repository->getOption("USER");
 			$this->password = $repository->getOption("PASS");
-			$server = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"")."}".$this->mailbox;
+			$server = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}".$this->mailbox;
 			self::$currentRef = $server;
 			AJXP_Logger::debug("Opening stream ".$server." with mailbox '".$this->mailbox."'");
-			$this->ih = imap_open ( $server , $this->username, $this->password, (empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
+			$this->ih = imap_open ( $server , $this->username, $this->password, (!$pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
 			self::$currentStream = $this->ih;
 			if(!empty($this->mailbox)){
 				register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
