@@ -8,6 +8,7 @@
 		<param name="BOX_TYPE" type="string" label="Type" description="Imap or Pop?" mandatory="true" default="imap"/>						
 		<param name="USER" type="string" label="User" description="User account" mandatory="true"/>
 		<param name="PASS" type="password" label="Password" description="User Password" mandatory="true"/>						
+		<param name="MAILBOX" type="string" label="Default Mailbox" description="Mailbox to connect by default" mandatory="false"/>						
 		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>
 		<param name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
 		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="20"/>

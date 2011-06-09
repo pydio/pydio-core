@@ -26,6 +26,7 @@ class imapAccessWrapper implements AjxpWrapper {
 	private static $currentStream;
 	private static $currentRef;
 	private static $currentCount;
+	private static $delimiter;
 	
 	public static function closeStreamFunc(){
 		if(self::$currentStream){
@@ -36,10 +37,15 @@ class imapAccessWrapper implements AjxpWrapper {
 	public static function getCurrentDirCount(){
 		return self::$currentCount;
 	}
-		
+			
 	function stream_open($path, $mode, $options, &$opened_path) {
 		// parse URL
 		$parts = parse_url($path);		
+		$this->repositoryId = $parts["host"];
+		if(!isset(self::$delimiter) && file_exists(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId)){
+			self::$delimiter = file_get_contents(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId);
+		}		
+		
 		$this->path = substr($parts["path"], 1);
 		//$this->mailbox = "INBOX";
 		$pathParts = explode("/", $this->path);
@@ -59,7 +65,9 @@ class imapAccessWrapper implements AjxpWrapper {
 			return false;
 		}
 		if (!empty($this->mailbox)){
-			$this->mailbox = str_replace("__delim__", "/", $this->mailbox);
+			AJXP_Logger::debug($this->mailbox);			
+			$this->mailbox = mb_convert_encoding($this->mailbox, "UTF7-IMAP", SystemTextEncoding::getEncoding());
+			$this->mailbox = str_replace("__delim__", (isSet(self::$delimiter)?self::$delimiter:"/"), $this->mailbox);
 		}
 		
 		// open IMAP connection
@@ -69,7 +77,6 @@ class imapAccessWrapper implements AjxpWrapper {
 			$this->dir_rewinddir();
 			$this->stream_seek(0);
 		}else{
-			$this->repositoryId = $parts["host"];
 			$repository = ConfService::getRepositoryById($this->repositoryId);		
 			$ssl = $repository->getOption("SSL") == "true" ? true: false ;
 			$pop3 = $repository->getOption("BOX_TYPE") == "pop3" ? true : false;
@@ -79,7 +86,7 @@ class imapAccessWrapper implements AjxpWrapper {
 			$this->password = $repository->getOption("PASS");
 			$server = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"")."}".$this->mailbox;
 			self::$currentRef = $server;
-			//AJXP_Logger::debug("Opening stream ".$server." with mailbox '".$this->mailbox."'");
+			AJXP_Logger::debug("Opening stream ".$server." with mailbox '".$this->mailbox."'");
 			$this->ih = imap_open ( $server , $this->username, $this->password, (empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
 			self::$currentStream = $this->ih;
 			if(!empty($this->mailbox)){
@@ -178,13 +185,16 @@ class imapAccessWrapper implements AjxpWrapper {
 		if(empty($this->mailbox)){
 			// We are browsing root, we want the list of mailboxes
 			$this->mailboxes = imap_getmailboxes($this->ih, self::$currentRef, "*");
-			$this->dir = count($this->mailboxes)-1;
+			AJXP_Logger::debug("MAILBOXES".print_r($this->mailboxes, true));
+			$this->dir = count($this->mailboxes);
+			self::$currentCount = count($this->mailboxes);
+			$this->pos = $this->dir - 1;
 		}else{
 			// We are in a mailbox, we want the messages number
 			$this->dir = imap_num_msg ( $this->ih );
+			self::$currentCount = $this->dir;
+			$this->pos = $this->dir;			
 		}
-		self::$currentCount = $this->dir;
-		$this->pos = $this->dir;			
 		$this->stream_close ();
 		return true;			
 	}
@@ -194,6 +204,41 @@ class imapAccessWrapper implements AjxpWrapper {
 		// $this->stream_close();
 		$this->mailboxes = null;
 	}
+	
+	function dir_readdir() {
+		if($this->mailboxes){
+			if($this->pos < 0) return false;
+			else{
+				$obj = $this->mailboxes[$this->pos];
+				$this->pos --;
+				$x = $obj->name;
+				$x = mb_convert_encoding( $x, "UTF-8", "UTF7-IMAP" );
+				$x = str_replace(self::$currentRef, "", $x);
+				if(!isSet(self::$delimiter) && !file_exists(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId)){
+					file_put_contents(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId, $obj->delimiter);
+					self::$delimiter = $obj->delimiter;
+				}
+				$x = str_replace($obj->delimiter, "__delim__", $x);
+			}
+		}else{
+			if ($this->pos < 1) {
+				return false;
+			} else {
+				$x = $this->pos;
+				$this->pos --;
+			}			
+		}
+		return $x;
+	}
+	
+	function dir_rewinddir() {
+		if(empty($this->mailbox)){
+			$this->pos = $this->dir;
+		}else{
+			$this->pos = count($this->mailboxes) - 1;
+		}
+	}
+	
 	
 	function url_stat($path, $flags) {
 		$emptyString = '';
@@ -241,32 +286,7 @@ class imapAccessWrapper implements AjxpWrapper {
 			return false;
 		}
 	}
-	
-	function dir_readdir() {
-		if($this->mailboxes){
-			if($this->pos == 0) return false;
-			else{
-				$obj = $this->mailboxes[$this->pos];
-				$this->pos --;
-				$x = $obj->name;
-				$x = str_replace(self::$currentRef, "", $x);
-				$x = str_replace($obj->delimiter, "__delim__", $x);
-			}
-		}else{
-			if ($this->pos <= 1) {
-				return false;
-			} else {
-				$x = $this->pos;
-				$this->pos --;
-			}			
-		}
-		return $x;
-	}
-	
-	function dir_rewinddir() {
-		$this->pos = 1;
-	}
-	
+		
 	/* Delete an email from the mailbox */
 	function unlink($path) {
 		$st='';
