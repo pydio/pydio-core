@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="imap" label="Mailbox (Imap or POP)" description="Access a mailbox attachments" mixins="slug_provider">
+	<client_settings icon="plugins/access.fs/icon.png"/>
+	<server_settings>
+		<param name="HOST" type="string" label="Host" description="Mail server host" mandatory="true"/>
+		<param name="PORT" type="string" label="Port" description="Mail server port" mandatory="true"/>
+		<param name="SSL" type="string" label="Ssl" description="Secure?" mandatory="true"/>
+		<param name="BOX_TYPE" type="string" label="Type" description="Imap or Pop?" mandatory="true" default="imap"/>						
+		<param name="USER" type="string" label="User" description="User account" mandatory="true"/>
+		<param name="PASS" type="password" label="Password" description="User Password" mandatory="true"/>						
+		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>
+		<param name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
+		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
+		<param name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
+	</server_settings>
+	<class_definition filename="plugins/access.imap/class.imapAccessDriver.php" classname="imapAccessDriver"/>
+	<class_stream_wrapper filename="plugins/access.imap/class.imapAccessWrapper.php" classname="imapAccessWrapper" protocol="ajxp.mailbox"/>
+	<registry_contributions> 
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+	</registry_contributions>
+</ajxpdriver>
