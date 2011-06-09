@@ -1,4 +1,5 @@
 <?php
+function rejectEmpty($element){return !empty($element);}
 
 class imapAccessWrapper implements AjxpWrapper {
 	
@@ -18,57 +19,73 @@ class imapAccessWrapper implements AjxpWrapper {
 	var $time;
 	
 	var $fragment;
+	var $mailbox;
 	
+	var $mailboxes;
+	
+	private static $currentStream;
+	private static $currentRef;
+	private static $currentCount;
+	
+	public static function closeStreamFunc(){
+		if(self::$currentStream){
+			imap_close(self::$currentStream);
+		}
+	}
+	
+	public static function getCurrentDirCount(){
+		return self::$currentCount;
+	}
 		
 	function stream_open($path, $mode, $options, &$opened_path) {
 		// parse URL
-		$parts = parse_url($path);
-		$this->repositoryId = $parts["host"];
-		$repository = ConfService::getRepositoryById($this->repositoryId);		
-		$ssl = $repository->getOption("SSL") == "true" ? true: false ;
-		$pop3 = $repository->getOption("BOX_TYPE") == "pop3" ? true : false;
-		$this->host = $repository->getOption("HOST");
-		$this->port = $repository->getOption("PORT");
-		$this->username = $repository->getOption("USER");
-		$this->password = $repository->getOption("PASS");
+		$parts = parse_url($path);		
 		$this->path = substr($parts["path"], 1);
-		$this->fragment = $parts["fragment"];
-		
-		/*
-		$url = parse_url ( $path );
-		$ssl = false;
-		$pop3 = false;
-		if ($url ['scheme'] === 'pop3s' || $url['scheme'] === 'imaps') {
-			$ssl = true;
-		}
-		if ($url ['scheme'] === 'pop3' || $url['scheme'] === 'pop3s') {
-			$pop3 = true;
-		}
-		$this->host = $url ['host'];
-		if (! empty ( $url ['port'] )) {
-			$this->port = $url ['port'];
-		} else {
-			$this->port = 110;
-		}
-		$this->username = $url ['user'];
-		$this->password = $url ['pass'];
-		$this->path = substr ( $url ['path'], 1 );
-		if(!empty($url['fragment'])){
-			$this->fragment = $url['fragment'];
+		//$this->mailbox = "INBOX";
+		$pathParts = explode("/", $this->path);
+		$pathParts = array_filter($pathParts, "rejectEmpty");
+		if(count($pathParts) > 1){
+			$this->path = array_pop($pathParts);
+			$this->mailbox = implode("/", $pathParts);
+		}else if(count($pathParts) == 1){
+			$this->mailbox = implode("/", $pathParts);
+			$this->path = "";
 		}else{
-			$this->fragment = "";
+			$this->mailbox = "";
+			$this->path = "";
 		}
-		*/
-		//print($this->path);
-		// do we have a path?
+		$this->fragment = $parts["fragment"];
 		if (empty ( $this->path ) && $mode !== 'np') {
 			return false;
 		}
+		if (!empty($this->mailbox)){
+			$this->mailbox = str_replace("__delim__", "/", $this->mailbox);
+		}
 		
 		// open IMAP connection
-		$mailbox = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"")."}INBOX";
-		AJXP_Logger::debug($mailbox);
-		$this->ih = imap_open ( $mailbox , $this->username, $this->password, NULL, 1);
+		if(self::$currentStream != null){
+			$this->ih = self::$currentStream;
+			// Rewind everything
+			$this->dir_rewinddir();
+			$this->stream_seek(0);
+		}else{
+			$this->repositoryId = $parts["host"];
+			$repository = ConfService::getRepositoryById($this->repositoryId);		
+			$ssl = $repository->getOption("SSL") == "true" ? true: false ;
+			$pop3 = $repository->getOption("BOX_TYPE") == "pop3" ? true : false;
+			$this->host = $repository->getOption("HOST");
+			$this->port = $repository->getOption("PORT");
+			$this->username = $repository->getOption("USER");
+			$this->password = $repository->getOption("PASS");
+			$server = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"")."}".$this->mailbox;
+			self::$currentRef = $server;
+			//AJXP_Logger::debug("Opening stream ".$server." with mailbox '".$this->mailbox."'");
+			$this->ih = imap_open ( $server , $this->username, $this->password, (empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
+			self::$currentStream = $this->ih;
+			if(!empty($this->mailbox)){
+				register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
+			}
+		}
 		if ($this->ih) {
 			if (! empty ( $this->path )) {
 				list ( $stats, ) = imap_fetch_overview ( $this->ih, $this->path );
@@ -82,7 +99,10 @@ class imapAccessWrapper implements AjxpWrapper {
 	}
 	
 	function stream_close() {
-		imap_close ( $this->ih );
+		if(empty($this->mailbox)){
+			self::$currentStream = null;
+			imap_close ( $this->ih );
+		}
 	}
 	
 	/* Smart reader, at first it only downloads the header to memory, but if a read request is made
@@ -145,25 +165,34 @@ class imapAccessWrapper implements AjxpWrapper {
 	}
 	
 	function stream_stat() {
-		$keys = array ('dev' => 0, 'ino' => 0, 'mode' => 33216, 'nlink' => 0, 'uid' => 0, 'gid' => 0, 'rdev' => 0, 'size' => $this->size, 'atime' => $this->time, 'mtime' => $this->time, 'ctime' => $this->time, 'blksize' => 0, 'blocks' => 0 );
+		$keys = array('dev' => 0, 'ino' => 0, 'mode' => 33216, 'nlink' => 0, 'uid' => 0, 'gid' => 0, 'rdev' => 0, 'size' => $this->size, 'atime' => $this->time, 'mtime' => $this->time, 'ctime' => $this->time, 'blksize' => 0, 'blocks' => 0 );
 		return $keys;
 	}
-	
+		
 	function dir_opendir($path, $options) {
-		// setting mode to 'np' avoids the path check
 		$st = '';
-		if ($this->stream_open ( $path, 'np', $options, $st )) {
-			$this->dir = imap_num_msg ( $this->ih );
-			$this->pos = $this->dir;
-			$this->stream_close ();
-			return true;
-		} else {
+		$stream = $this->stream_open ( $path, 'np', $options, $st ); 
+		if (!$stream) {
 			return false;
 		}
+		if(empty($this->mailbox)){
+			// We are browsing root, we want the list of mailboxes
+			$this->mailboxes = imap_getmailboxes($this->ih, self::$currentRef, "*");
+			$this->dir = count($this->mailboxes)-1;
+		}else{
+			// We are in a mailbox, we want the messages number
+			$this->dir = imap_num_msg ( $this->ih );
+		}
+		self::$currentCount = $this->dir;
+		$this->pos = $this->dir;			
+		$this->stream_close ();
+		return true;			
 	}
 	
 	function dir_closedir() {
 		// do nothing.
+		// $this->stream_close();
+		$this->mailboxes = null;
 	}
 	
 	function url_stat($path, $flags) {
@@ -171,10 +200,10 @@ class imapAccessWrapper implements AjxpWrapper {
 		if ($this->stream_open ( $path, 'np', $flags, $emptyString)) {
 			if(!empty($this->path)){
 				// Mail
-				$stats = array ();
+				$stats = array();
 				list ( $stats, ) = imap_fetch_overview ( $this->ih, $this->path );
 				$time = strtotime ( $stats->date );
-				$keys = array (
+				$keys = array(
 					'dev' => 0, 
 					'ino' => 0, 
 					'mode' => 33216, 
@@ -190,10 +219,10 @@ class imapAccessWrapper implements AjxpWrapper {
 					'blocks' => 0 );
 			}else{
 				// BOX
-				$keys = array (
+				$keys = array(
 					'dev' => 0, 
 					'ino' => 0, 
-					'mode' => 33216, 
+					'mode' => 33216 | 0040000, 
 					'nlink' => 0, 
 					'uid' => 0, 
 					'gid' => 0, 
@@ -214,11 +243,22 @@ class imapAccessWrapper implements AjxpWrapper {
 	}
 	
 	function dir_readdir() {
-		if ($this->pos == 1) {
-			return false;
-		} else {
-			$x = $this->pos;
-			$this->pos --;
+		if($this->mailboxes){
+			if($this->pos == 0) return false;
+			else{
+				$obj = $this->mailboxes[$this->pos];
+				$this->pos --;
+				$x = $obj->name;
+				$x = str_replace(self::$currentRef, "", $x);
+				$x = str_replace($obj->delimiter, "__delim__", $x);
+			}
+		}else{
+			if ($this->pos <= 1) {
+				return false;
+			} else {
+				$x = $this->pos;
+				$this->pos --;
+			}			
 		}
 		return $x;
 	}
@@ -315,10 +355,5 @@ class imapAccessWrapper implements AjxpWrapper {
 	
 	
 }
-
-//stream_register_wrapper("pop3", "imapAccessWrapper");
-//stream_register_wrapper("pop3s", "imapAccessWrapper");
-//stream_register_wrapper("imap", "imapAccessWrapper");
-//stream_register_wrapper("imaps", "imapAccessWrapper");
 
 ?>

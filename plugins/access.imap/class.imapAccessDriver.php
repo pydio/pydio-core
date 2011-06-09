@@ -52,12 +52,37 @@ class imapAccessDriver extends fsAccessDriver
 		}else{
 			$this->driverConf = array();
 		}
-		
+				
 		$wrapperData = $this->detectStreamWrapper(true);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 		if(!file_exists($this->urlBase)){
 			throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
+		}
+	}
+	
+	public static function inverseSort($st1, $st2){
+		return strnatcasecmp($st2, $st1);
+	}
+	
+	function switchAction($action, $httpVars, $fileVars){
+		if($action == "ls"){
+			$dir = $httpVars["dir"];
+			if($dir == "/" || empty($dir)){
+				// MAILBOXES CASE
+				$this->repository->addOption("PAGINATION_THRESHOLD", 500);
+			}else{
+				// MAILS LISTING CASE
+				$this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "inverseSort");				
+			}
+		}
+		parent::switchAction($action, $httpVars, $fileVars);
+	}
+	
+	public function enrichMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
+		if(strstr($currentNode, "__delim__")!==false){
+			$parts = explode("/", $currentNode);
+			$metadata["text"] = AJXP_Utils::xmlEntities(str_replace("__delim__", "/", array_pop($parts)));
 		}
 	}
 	
@@ -71,9 +96,15 @@ class imapAccessDriver extends fsAccessDriver
 		$this->disableArchiveBrowsingContributions($contribNode);
 	}	
 	
+	function filterNodeName($nodePath, $nodeName, &$isLeaf, $lsOptions){
+		return true;
+	}
+	
 	function countFiles($dirName,  $foldersOnly = false, $nonEmptyCheckOnly = false){
 		// WILL USE IMAP FUNCTIONS TO COUNT;
-		return 3000;
+		$tmpHandle = opendir($dirName);
+		AJXP_Logger::debug("COUNT : ".imapAccessWrapper::getCurrentDirCount());
+		return imapAccessWrapper::getCurrentDirCount();
 	}
 	
 }	
