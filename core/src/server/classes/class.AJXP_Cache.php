@@ -16,8 +16,15 @@ class AJXP_Cache {
 	 * @param Function $dataCallback
 	 * @return AJXP_Cache
 	 */
-	public static function getItem($pluginId, $filepath, $dataCallback){
+	public static function getItem($pluginId, $filepath, $dataCallback=null){
+		if($dataCallback == null){
+			$dataCallback = array("AJXP_Cache", "simpleCopy");
+		}
 		return new AJXP_Cache($pluginId,$filepath, $dataCallback);
+	}
+	
+	public static function simpleCopy($master, $target){
+		file_put_contents($target, file_get_contents($master));
 	}
 	
 	public static function clearItem($pluginId, $filepath){
@@ -37,7 +44,7 @@ class AJXP_Cache {
 	
 	public function getData(){
 		if(!$this->hasCachedVersion()){
-			AJXP_Logger::debug("caching data");
+			AJXP_Logger::debug("caching data", $this->dataCallback);
 			$result = call_user_func($this->dataCallback, $this->masterFile, $this->cacheId);
 			if($result !== false){
 				$this->touch();
@@ -71,7 +78,7 @@ class AJXP_Cache {
 	
 	protected function buildCacheId($pluginId, $filePath){
 		$info = pathinfo($filePath);
-		return $this->cacheDir ."/".$pluginId."_".md5($filePath).".".$info["extension"];
+		return $this->cacheDir ."/".$pluginId."_".md5($filePath).(!empty($info["extension"])?".".$info["extension"]:"");
 	}
 	
 	

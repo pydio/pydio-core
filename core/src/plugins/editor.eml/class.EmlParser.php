@@ -16,23 +16,19 @@ class EmlParser extends AJXP_Plugin{
 		
 		$streamData = $repository->streamData;
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
+    	$wrapperClassName = $streamData["classname"];
 		if(empty($httpVars["file"])) return;
     	$file = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
     	$mess = ConfService::getMessages();
     	
     	switch($action){
     		case "eml_get_xml_structure":
-    			require_once("Mail/mimeDecode.php");
     			$params = array(
     				'include_bodies' => false,
     				'decode_bodies' => false,
     				'decode_headers' => true
-    			);    			
-    			$content = file_get_contents($file);
-    			$decoder = new Mail_mimeDecode($content);
-    			
-    			header('Content-Type: text/xml; charset=UTF-8');
-				header('Cache-Control: no-cache');    			
+    			);
+    			$decoder = $this->getStructureDecoder($file, ($wrapperClassName == "imapAccessWrapper"));
     			print($decoder->getXML($decoder->decode(array($params))));    			
     		break;
     		case "eml_get_bodies":
@@ -42,7 +38,13 @@ class EmlParser extends AJXP_Plugin{
     				'decode_bodies' => true,
     				'decode_headers' => false
     			);    			
-    			$content = file_get_contents($file);
+    			if($wrapperClassName == "imapAccessWrapper"){
+    				$cache = AJXP_Cache::getItem("eml_remote", $file);
+    				$content = $cache->getData();
+    			}else{
+	    			$content = file_get_contents($file);
+    			}
+
     			$decoder = new Mail_mimeDecode($content);
     			$structure = $decoder->decode($params);
     			$html = $this->_findPartByCType($structure, "text", "html");
@@ -82,7 +84,12 @@ class EmlParser extends AJXP_Plugin{
     				'decode_bodies' => true,
     				'decode_headers' => false
     			);    			
-    			$content = file_get_contents($file);
+    			if($wrapperClassName == "imapAccessWrapper"){
+    				$cache = AJXP_Cache::getItem("eml_remote", $file);
+    				$content = $cache->getData();
+    			}else{
+	    			$content = file_get_contents($file);
+    			}
     			$decoder = new Mail_mimeDecode($content);
     			$structure = $decoder->decode($params);
     			$part = $this->_findAttachmentById($structure, $attachId);
@@ -108,7 +115,13 @@ class EmlParser extends AJXP_Plugin{
     				'decode_bodies' => true,
     				'decode_headers' => false
     			);    			
-    			$content = file_get_contents($file);
+    			if($wrapperClassName == "imapAccessWrapper"){
+    				$cache = AJXP_Cache::getItem("eml_remote", $file);
+    				$content = $cache->getData();
+    			}else{
+	    			$content = file_get_contents($file);
+    			}
+    			
     			$decoder = new Mail_mimeDecode($content);
     			$structure = $decoder->decode($params);
     			$part = $this->_findAttachmentById($structure, $attachId);
@@ -131,9 +144,7 @@ class EmlParser extends AJXP_Plugin{
     		
     		default: 
     		break;
-    	}
-    	
-    	
+    	}    	    	
 	}
 	
 	public function extractMimeHeaders($currentNode, &$metadata, $wrapperClassName, &$realFile){
@@ -141,7 +152,8 @@ class EmlParser extends AJXP_Plugin{
 		if($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))){
 			$noMail = false;
 		}
-		if( $noMail ){
+		$parsed = parse_url($currentNode);
+		if( $noMail || ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0 ) ){
 			EmlParser::$currentListingOnlyEmails = FALSE;
 			return;
 		}
@@ -149,13 +161,25 @@ class EmlParser extends AJXP_Plugin{
 			EmlParser::$currentListingOnlyEmails = true;
 		}
 		if(!isSet($realFile)){
-			$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
+			if($wrapperClassName == "imapAccessWrapper"){
+				$cachedFile = AJXP_Cache::getItem("eml_remote", $currentNode);
+				$realFile = $cachedFile->getId();
+				if(!is_file($realFile)){
+					$cachedFile->getData();// trigger loading!
+				}
+			}else{
+				$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
+			}
 		}
 		$cacheItem = AJXP_Cache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
 		$data = unserialize($cacheItem->getData());
 		$data["ajxp_mime"] = "eml";
 		$metadata = array_merge($metadata, $data);
-	}
+		if($wrapperClassName == "imapAccessWrapper" && $metadata["eml_attachments"]!= "0"){
+			$metadata["is_file"] = false;
+			$metadata["nodeName"] = basename($currentNode)."#attachments"; 
+		}
+	}	
 
 	public function mimeExtractorCallback($masterFile, $targetFile){
 		$metadata = array();
@@ -194,7 +218,7 @@ class EmlParser extends AJXP_Plugin{
 		$metadata["icon"] = "eml_images/ICON_SIZE/mail_mime.png";
 		file_put_contents($targetFile, serialize($metadata));			
 	}
-	
+		
 	public function lsPostProcess($action, $httpVars, $outputVars){
 		if(!EmlParser::$currentListingOnlyEmails){
 			if(isSet($httpVars["playlist"])) return;
@@ -210,7 +234,7 @@ class EmlParser extends AJXP_Plugin{
 			<column messageId="editor.eml.3" attributeName="eml_subject" sortType="String"/>
 			<column messageId="editor.eml.4" attributeName="ajxp_modiftime" sortType="MyDate"/>
 			<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
-			<column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number"/>
+			<column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number" modifier="EmlViewer.prototype.attachmentCellRenderer"/>
 		</columns>';
 					
 		$dom = new DOMDocument("1.0", "UTF-8");
@@ -232,6 +256,64 @@ class EmlParser extends AJXP_Plugin{
 		header('Content-Type: text/xml; charset=UTF-8');
 		header('Cache-Control: no-cache');			
 		print($dom->saveXML());
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param string $file url
+	 * @param boolean $cacheRemoteContent
+	 * @return Mail_mimeDecode
+	 */
+	public function getStructureDecoder($file, $cacheRemoteContent = false){
+		require_once ("Mail/mimeDecode.php");
+		if ($cacheRemoteContent) {
+			$cache = AJXP_Cache::getItem ( "eml_remote", $file );
+			$content = $cache->getData ();
+		} else {
+			$content = file_get_contents ( $file );
+		}
+		$decoder = new Mail_mimeDecode ( $content );
+		
+		header ( 'Content-Type: text/xml; charset=UTF-8' );
+		header ( 'Cache-Control: no-cache' );    			
+		return $decoder;
+	}
+	
+	public function listAttachments($file, $cacheRemoteContent = false, &$attachments,  $structure = null){
+		if($structure == null){
+			$decoder = $this->getStructureDecoder($file, $cacheRemoteContent);
+	   		$params = array(
+	   			'include_bodies' => false,
+	   			'decode_bodies' => false,
+	   			'decode_headers' => true
+	   		);
+			$structure = $decoder->decode($params);
+		}
+		if(isSet($structure->disposition) && $structure->disposition == "attachment"){
+			$attachments[] = array(
+				"filename" => $structure->d_parameters['filename'],
+				"content-type" => $structure->ctype_primary."/".$structure->ctype_secondary,
+				"x-attachment-id" => (isSet($structure->headers["x-attachment-id"])?$structure->headers["x-attachment-id"]:count($attachments))
+			);
+		}else if(isset($structure->parts)){
+			foreach ($structure->parts as $partObject){
+				$this->listAttachments($file, true, $attachments, $partObject);
+			}
+		}
+	}
+	
+	public function getAttachmentBody($file, $attachmentId, $cacheRemoteContent = false){
+		$decoder = $this->getStructureDecoder($file, $cacheRemoteContent);
+	   	$params = array(
+	   		'include_bodies' => true,
+	   		'decode_bodies' => true,
+	   		'decode_headers' => false
+	   	);
+		$structure = $decoder->decode($params);
+		$part = $this->_findAttachmentById($structure, $attachmentId);
+		if($part == false) return false;
+		return $part->body;
 	}
 	
 	protected function _findPartByCType($structure, $primary, $secondary){

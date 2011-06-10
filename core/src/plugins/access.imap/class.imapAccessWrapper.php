@@ -22,11 +22,14 @@ class imapAccessWrapper implements AjxpWrapper {
 	var $mailbox;
 	
 	var $mailboxes;
+	var $currentAttachmentData;
+	
 	
 	private static $currentStream;
 	private static $currentRef;
 	private static $currentCount;
 	private static $delimiter;
+	private static $attachmentsMetadata;
 	
 	public static function closeStreamFunc(){
 		if(self::$currentStream){
@@ -36,6 +39,10 @@ class imapAccessWrapper implements AjxpWrapper {
 	
 	public static function getCurrentDirCount(){
 		return self::$currentCount;
+	}
+	
+	public static function getCurrentAttachmentsMetadata(){
+		return self::$attachmentsMetadata;
 	}
 			
 	function stream_open($path, $mode, $options, &$opened_path) {
@@ -65,9 +72,26 @@ class imapAccessWrapper implements AjxpWrapper {
 			return false;
 		}
 		if (!empty($this->mailbox)){
-			AJXP_Logger::debug($this->mailbox);			
 			$this->mailbox = mb_convert_encoding($this->mailbox, "UTF7-IMAP", SystemTextEncoding::getEncoding());
 			$this->mailbox = str_replace("__delim__", (isSet(self::$delimiter)?self::$delimiter:"/"), $this->mailbox);
+		}
+		if(!empty($this->fragment) && strpos($this->fragment, "attachments") === 0 && strpos($this->fragment, "/")!== false){
+			// remove fragment
+			$mailPath = array_shift(explode("#", $path));
+			$attachmentId = array_pop(explode("/", $this->fragment));
+			$this->currentAttachmentData = array("realPath" => $mailPath, "attachmentId" => $attachmentId);
+			// EXTRACT ATTACHMENT AND RETURN
+			require_once AJXP_INSTALL_PATH."/plugins/editor.eml/class.EmlParser.php";
+			$emlParser = new EmlParser("", "");			
+			$this->data = $emlParser->getAttachmentBody(
+				$this->currentAttachmentData["realPath"], 
+				$this->currentAttachmentData["attachmentId"], 
+				true
+			);			
+			$this->currentAttachmentData["size"] = strlen($this->data);			
+			$this->pos = 0;
+			$this->size = strlen($this->data);
+			return true; 
 		}
 		
 		// open IMAP connection
@@ -110,22 +134,43 @@ class imapAccessWrapper implements AjxpWrapper {
 			self::$currentStream = null;
 			imap_close ( $this->ih );
 		}
+		if(!empty($this->currentAttachmentData)){
+			$this->currentAttachmentBody = null;
+		}
 	}
 	
 	/* Smart reader, at first it only downloads the header to memory, but if a read request is made
        beyond the header, we download the rest of the body */
 	function stream_read($count) {
-		// smart... only download the header WHEN data is requested
-		if (empty ( $this->data )) {
-			$this->pos = 0;
-			$this->gotbody = false;
-			$this->data = imap_fetchheader ( $this->ih, $this->path );
-		}
-		// only download the body once we read past the header
-		if ($this->gotbody == false && ($this->pos + $count > strlen ( $this->data )) && $this->fragment != "header") {
-			$this->gotbody = true;
-			$this->data .= imap_body ( $this->ih, $this->path );
-			$this->size = strlen ( $this->data );
+		
+		AJXP_Logger::debug("READING $count FROM $this->path", $this->currentAttachmentData);
+		if(!empty($this->currentAttachmentData)){
+			if(empty($this->data)){
+				AJXP_Logger::debug("Attachement", $this->currentAttachmentData);
+				// EXTRACT ATTACHMENT AND RETURN
+				require_once AJXP_INSTALL_PATH."/plugins/editor.eml/class.EmlParser.php";
+				$emlParser = new EmlParser("", "");			
+				$this->data = $emlParser->getAttachmentBody(
+					$this->currentAttachmentData["realPath"], 
+					$this->currentAttachmentData["attachmentId"], 
+					true
+				);
+				$this->pos = 0;
+				$this->size = strlen($this->data);
+			}
+		}else{
+			// smart... only download the header WHEN data is requested
+			if (empty ( $this->data )) {
+				$this->pos = 0;
+				$this->gotbody = false;
+				$this->data = imap_fetchheader ( $this->ih, $this->path );
+			}
+			// only download the body once we read past the header
+			if ($this->gotbody == false && ($this->pos + $count > strlen ( $this->data )) && $this->fragment != "header") {
+				$this->gotbody = true;
+				$this->data .= imap_body ( $this->ih, $this->path );
+				$this->size = strlen ( $this->data );
+			}
 		}
 		if ($this->pos >= $this->size) {
 			return false;
@@ -177,6 +222,9 @@ class imapAccessWrapper implements AjxpWrapper {
 	}
 		
 	function dir_opendir($path, $options) {
+		// Reset
+		self::$attachmentsMetadata = null;
+		
 		$st = '';
 		$stream = $this->stream_open ( $path, 'np', $options, $st ); 
 		if (!$stream) {
@@ -185,10 +233,19 @@ class imapAccessWrapper implements AjxpWrapper {
 		if(empty($this->mailbox)){
 			// We are browsing root, we want the list of mailboxes
 			$this->mailboxes = imap_getmailboxes($this->ih, self::$currentRef, "*");
-			AJXP_Logger::debug("MAILBOXES".print_r($this->mailboxes, true));
 			$this->dir = count($this->mailboxes);
 			self::$currentCount = count($this->mailboxes);
 			$this->pos = $this->dir - 1;
+		}else if($this->fragment == "attachments"){
+			require_once AJXP_INSTALL_PATH.'/plugins/editor.eml/class.EmlParser.php';
+			$parser = new EmlParser("", "");
+			$path = array_shift(explode("#", $path));// remove fragment			
+			self::$attachmentsMetadata = array();
+			$parser->listAttachments($path, true, self::$attachmentsMetadata);
+			$this->dir = count(self::$attachmentsMetadata);
+			$this->pos = $this->dir - 1;
+			self::$currentCount = $this->dir;
+			
 		}else{
 			// We are in a mailbox, we want the messages number
 			$this->dir = imap_num_msg ( $this->ih );
@@ -220,12 +277,17 @@ class imapAccessWrapper implements AjxpWrapper {
 				}
 				$x = str_replace($obj->delimiter, "__delim__", $x);
 			}
+		}else if(self::$attachmentsMetadata != null){
+			if($this->pos < 0) return false;
+			$x = self::$attachmentsMetadata[$this->pos]["x-attachment-id"];
+			$this->pos--;
 		}else{
 			if ($this->pos < 1) {
 				return false;
 			} else {
 				$x = $this->pos;
 				$this->pos --;
+				//$x .= "#header";
 			}			
 		}
 		return $x;
@@ -243,7 +305,7 @@ class imapAccessWrapper implements AjxpWrapper {
 	function url_stat($path, $flags) {
 		$emptyString = '';
 		if ($this->stream_open ( $path, 'np', $flags, $emptyString)) {
-			if(!empty($this->path)){
+			if(!empty($this->path) && empty($this->currentAttachmentData)){
 				// Mail
 				$stats = array();
 				list ( $stats, ) = imap_fetch_overview ( $this->ih, $this->path );
@@ -267,12 +329,12 @@ class imapAccessWrapper implements AjxpWrapper {
 				$keys = array(
 					'dev' => 0, 
 					'ino' => 0, 
-					'mode' => 33216 | 0040000, 
+					'mode' => (empty($this->currentAttachmentData)?(33216 | 0040000):33216), 
 					'nlink' => 0, 
 					'uid' => 0, 
 					'gid' => 0, 
 					'rdev' => 0,
-					'size' => 0, 
+					'size' => (!empty($this->currentAttachmentData)?$this->currentAttachmentData["size"]:0), 
 					'atime' => 0, 
 					'mtime' => 0, 
 					'ctime' => 0, 
@@ -317,6 +379,18 @@ class imapAccessWrapper implements AjxpWrapper {
      */
     public static function copyFileInStream($path, $stream){
     	//return $path;
+    	$fp = fopen($path, 'r');
+    	$bufferSize = 4096 * 8;
+    	if($fp){
+    		while(($data = fread($fp, $bufferSize)) !== false){
+    			fwrite($stream, $data, strlen($data));
+    		}
+    		fclose($fp);
+    	}    	
+    }
+    
+    public static function isRemote(){
+    	return true;
     }
     
     /**
