@@ -718,9 +718,15 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						$attributes .= "$key=\"$value\" ";
 					}
 					*/
-					
+					if($metaData["is_file"] != $isLeaf){
+						$isLeaf = $metaData["is_file"];
+					}
+					$nodeBaseName = $nodeName;
+					if(!empty($metaData["nodeName"]) && $metaData["nodeName"] != $nodeName){
+						$nodeBaseName = $metaData["nodeName"];
+					}
 					$renderNodeData = array(
-						AJXP_Utils::xmlEntities($dir."/".$nodeName,true), 
+						AJXP_Utils::xmlEntities($dir."/".$nodeBaseName,true), 
 						AJXP_Utils::xmlEntities($nodeName, true), 
 						$isLeaf, 
 						$metaData

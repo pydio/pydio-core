@@ -64,8 +64,14 @@ class imapAccessDriver extends fsAccessDriver
 		}
 	}
 	
-	public static function inverseSort($st1, $st2){
+	public static function inverseSort($st1, $st2){		
 		return strnatcasecmp($st2, $st1);
+	}
+	
+	public static function sortInboxFirst($st1, $st2){
+		if($st1 == "INBOX") return -1;
+		if($st2 == "INBOX") return  1;
+		return strcmp($st1, $st2);
 	}
 	
 	function switchAction($action, $httpVars, $fileVars){
@@ -74,6 +80,7 @@ class imapAccessDriver extends fsAccessDriver
 			if($dir == "/" || empty($dir)){
 				// MAILBOXES CASE
 				$this->repository->addOption("PAGINATION_THRESHOLD", 500);
+				$this->driverConf["SCANDIR_RESULT_SORTFONC"] = array("imapAccessDriver", "sortInboxFirst");
 			}else{
 				// MAILS LISTING CASE
 				//$httpVars["dir"] = mb_convert_encoding($httpVars["dir"], "UTF7-IMAP", SystemTextEncoding::getEncoding());
@@ -84,6 +91,24 @@ class imapAccessDriver extends fsAccessDriver
 	}
 	
 	public function enrichMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
+		$parsed = parse_url($currentNode);
+		if( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0){
+			list(, $attachmentId) = explode("/", $parsed["fragment"]);
+			$meta = imapAccessWrapper::getCurrentAttachmentsMetadata();
+			AJXP_Logger::debug("", $meta);
+			foreach ($meta as $attach){
+				if($attach["x-attachment-id"] == $attachmentId){
+					$metadata["text"] = $attach["filename"];
+				}
+			}
+		}
+		
+		if(!$metadata["is_file"] && $currentNode != ""){
+			$metadata["icon"] = "imap_images/ICON_SIZE/mail_folder_sent.png";
+		}
+		if(basename($currentNode) == "INBOX"){
+			$metadata["text"] = "Incoming Mails";
+		}
 		if(strstr($currentNode, "__delim__")!==false){
 			$parts = explode("/", $currentNode);
 			$metadata["text"] = AJXP_Utils::xmlEntities(str_replace("__delim__", "/", array_pop($parts)), true);

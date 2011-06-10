@@ -357,13 +357,16 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	
     	$accessType = $this->repository->getAccessType();    	
     	$repositoryId = $this->repository->getId();
-    	$origStreamURL = "ajxp.$accessType://$repositoryId";    	
+    	$plugin = AJXP_PluginsService::findPlugin("access", $accessType);
+    	$origWrapperData = $plugin->detectStreamWrapper(true);
+    	$origStreamURL = $origWrapperData["protocol"]."://$repositoryId";    	
     	
     	$destRepoId = $httpVars["dest_repository_id"];
     	$destRepoObject = ConfService::getRepositoryById($destRepoId);
     	$destRepoAccess = $destRepoObject->getAccessType();
-    	$destStreamURL = "ajxp.$destRepoAccess://$destRepoId";
-    	
+    	$plugin = AJXP_PluginsService::findPlugin("access", $destRepoAccess);
+    	$destWrapperData = $plugin->detectStreamWrapper(true);
+    	$destStreamURL = $destWrapperData["protocol"]."://$destRepoId";
     	// Check rights
     	if(AuthService::usersEnabled()){
 	    	$loggedUser = AuthService::getLoggedUser();
@@ -378,6 +381,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	foreach ($files as $file){
     		$origFile = $origStreamURL.$file;
     		$destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".basename($file);    		
+    		AJXP_Logger::debug("Copying $origFile to $destFile");    		
     		if(!is_file($origFile)){
     			throw new Exception("Cannot find $origFile");
     		}

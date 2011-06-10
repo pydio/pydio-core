@@ -290,5 +290,21 @@ Class.create("EmlViewer", AbstractEditor, {
 		
 		fitHeightToBottom($(this.textareaContainer), $(modal.elementName));
 		this.removeOnLoad(this.textareaContainer);
-	}	
+	},	
+	
+	attachmentCellRenderer : function(element, ajxpNode, type){
+		if(ajxpNode.getMetadata().get("eml_attachments") == "0") {
+			if(type == "row") element.update(' ');
+			return;
+		}
+		element.setStyle({
+			backgroundImage:'url("plugins/editor.eml/attach.png")',
+			backgroundRepeat: 'no-repeat', 
+			backgroundPosition: (type=="thumb" ? '2px 2px': '5px 4px')
+		});
+		if(type == "row"){
+			element.update(' ');
+		}
+		element.setAttribute("title", ajxpNode.getMetadata().get("eml_attachments")+" attachments");
+	}
 });
