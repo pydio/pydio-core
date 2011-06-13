@@ -301,13 +301,12 @@ class imapAccessWrapper implements AjxpWrapper {
 		}
 	}
 	
-	
 	function url_stat($path, $flags) {
 		$emptyString = '';
 		if ($this->stream_open ( $path, 'np', $flags, $emptyString)) {
 			if(!empty($this->path) && empty($this->currentAttachmentData)){
 				// Mail
-				$stats = array();
+				//$stats = array();
 				list ( $stats, ) = imap_fetch_overview ( $this->ih, $this->path );
 				$time = strtotime ( $stats->date );
 				$keys = array(
@@ -449,7 +448,8 @@ class imapAccessWrapper implements AjxpWrapper {
      */
     public function stream_flush(){
     	
-    }
+    }	
+
 	
 	
 }
