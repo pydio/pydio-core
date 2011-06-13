@@ -8,6 +8,7 @@ class AJXP_Cache {
 	protected $cacheId;
 	protected $masterFile;
 	protected $dataCallback;
+	protected $idComputerCallback;
 	
 	/**
 	 * Create an AJXP_Cache instance
@@ -16,11 +17,11 @@ class AJXP_Cache {
 	 * @param Function $dataCallback
 	 * @return AJXP_Cache
 	 */
-	public static function getItem($pluginId, $filepath, $dataCallback=null){
+	public static function getItem($pluginId, $filepath, $dataCallback=null, $idComputerCallback = null){
 		if($dataCallback == null){
 			$dataCallback = array("AJXP_Cache", "simpleCopy");
 		}
-		return new AJXP_Cache($pluginId,$filepath, $dataCallback);
+		return new AJXP_Cache($pluginId,$filepath, $dataCallback, $idComputerCallback);
 	}
 	
 	public static function simpleCopy($master, $target){
@@ -35,10 +36,13 @@ class AJXP_Cache {
 		}
 	}
 	
-	public function AJXP_Cache($pluginId, $filepath, $dataCallback){
+	public function AJXP_Cache($pluginId, $filepath, $dataCallback, $idComputerCallback = NULL){
 		$this->cacheDir = AJXP_CACHE_DIR;
 		$this->masterFile = $filepath;
 		$this->dataCallback = $dataCallback;
+		if($idComputerCallback != null){
+			$this->idComputerCallback = $idComputerCallback;
+		}
 		$this->cacheId = $this->buildCacheId($pluginId, $filepath);
 	}
 	
@@ -77,8 +81,14 @@ class AJXP_Cache {
 	
 	
 	protected function buildCacheId($pluginId, $filePath){
-		$info = pathinfo($filePath);
-		return $this->cacheDir ."/".$pluginId."_".md5($filePath).(!empty($info["extension"])?".".$info["extension"]:"");
+		$root =  $this->cacheDir ."/".$pluginId."_";
+		if(isSet($this->idComputerCallback)){
+			$hash = call_user_func($this->idComputerCallback, $filePath);
+		}else{
+			$info = pathinfo($filePath);
+			$hash = md5($filePath).(!empty($info["extension"])?".".$info["extension"]:"");
+		}
+		return $root.$hash;
 	}
 	
 	

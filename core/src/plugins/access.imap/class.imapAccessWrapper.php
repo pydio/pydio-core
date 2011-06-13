@@ -143,7 +143,7 @@ class imapAccessWrapper implements AjxpWrapper {
        beyond the header, we download the rest of the body */
 	function stream_read($count) {
 		
-		AJXP_Logger::debug("READING $count FROM $this->path", $this->currentAttachmentData);
+		//AJXP_Logger::debug("READING $count FROM $this->path", $this->currentAttachmentData);
 		if(!empty($this->currentAttachmentData)){
 			if(empty($this->data)){
 				AJXP_Logger::debug("Attachement", $this->currentAttachmentData);
@@ -173,16 +173,13 @@ class imapAccessWrapper implements AjxpWrapper {
 			}
 		}
 		if ($this->pos >= $this->size) {
-			AJXP_Logger::debug("POSITION 1 - returning false ".$this->pos." / ". $this->size);			
 			return false;
 		} else {
 			$d = substr ( $this->data, $this->pos, $count );
 			if ($this->pos + $count > strlen ( $this->data )) {
 				$this->pos = strlen ( $this->data );
-				AJXP_Logger::debug("POSITION 1 ".$this->pos);
 			} else {
 				$this->pos = $this->pos + $count;
-				AJXP_Logger::debug("POSITION 2 ".$this->pos);
 			}
 			return $d;
 		}
