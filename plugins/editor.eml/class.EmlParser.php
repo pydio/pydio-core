@@ -39,7 +39,7 @@ class EmlParser extends AJXP_Plugin{
     				'decode_headers' => false
     			);    			
     			if($wrapperClassName == "imapAccessWrapper"){
-    				$cache = AJXP_Cache::getItem("eml_remote", $file);
+    				$cache = AJXP_Cache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
     				$content = $cache->getData();
     			}else{
 	    			$content = file_get_contents($file);
@@ -85,7 +85,7 @@ class EmlParser extends AJXP_Plugin{
     				'decode_headers' => false
     			);    			
     			if($wrapperClassName == "imapAccessWrapper"){
-    				$cache = AJXP_Cache::getItem("eml_remote", $file);
+    				$cache = AJXP_Cache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
     				$content = $cache->getData();
     			}else{
 	    			$content = file_get_contents($file);
@@ -116,7 +116,7 @@ class EmlParser extends AJXP_Plugin{
     				'decode_headers' => false
     			);    			
     			if($wrapperClassName == "imapAccessWrapper"){
-    				$cache = AJXP_Cache::getItem("eml_remote", $file);
+    				$cache = AJXP_Cache::getItem("eml_remote", $file, null, array("EmlParser", "computeCacheId"));
     				$content = $cache->getData();
     			}else{
 	    			$content = file_get_contents($file);
@@ -162,7 +162,7 @@ class EmlParser extends AJXP_Plugin{
 		}
 		if(!isSet($realFile)){
 			if($wrapperClassName == "imapAccessWrapper"){
-				$cachedFile = AJXP_Cache::getItem("eml_remote", $currentNode);
+				$cachedFile = AJXP_Cache::getItem("eml_remote", $currentNode, null, array("EmlParser", "computeCacheId"));
 				$realFile = $cachedFile->getId();
 				if(!is_file($realFile)){
 					$cachedFile->getData();// trigger loading!
@@ -234,7 +234,7 @@ class EmlParser extends AJXP_Plugin{
 			<column messageId="editor.eml.3" attributeName="eml_subject" sortType="String"/>
 			<column messageId="editor.eml.4" attributeName="ajxp_modiftime" sortType="MyDate"/>
 			<column messageId="2" attributeName="filesize" sortType="NumberKo"/>
-			<column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number" modifier="EmlViewer.prototype.attachmentCellRenderer"/>
+			<column messageId="editor.eml.5" attributeName="eml_attachments" sortType="Number" modifier="EmlViewer.prototype.attachmentCellRenderer" fixedWidth="30"/>
 		</columns>';
 					
 		$dom = new DOMDocument("1.0", "UTF-8");
@@ -268,7 +268,7 @@ class EmlParser extends AJXP_Plugin{
 	public function getStructureDecoder($file, $cacheRemoteContent = false){
 		require_once ("Mail/mimeDecode.php");
 		if ($cacheRemoteContent) {
-			$cache = AJXP_Cache::getItem ( "eml_remote", $file );
+			$cache = AJXP_Cache::getItem ( "eml_remote", $file , null, array("EmlParser", "computeCacheId"));
 			$content = $cache->getData ();
 		} else {
 			$content = file_get_contents ( $file );
@@ -356,6 +356,12 @@ class EmlParser extends AJXP_Plugin{
 			}
 			return false;
 		}
+	}
+	
+	static public function computeCacheId($mailPath){
+		$header = file_get_contents($mailPath."#header");
+		//AJXP_Logger::debug("Headers ", $header);
+		return md5(basename($header));
 	}
 	 
 }
