@@ -173,13 +173,16 @@ class imapAccessWrapper implements AjxpWrapper {
 			}
 		}
 		if ($this->pos >= $this->size) {
+			AJXP_Logger::debug("POSITION 1 - returning false ".$this->pos." / ". $this->size);			
 			return false;
 		} else {
 			$d = substr ( $this->data, $this->pos, $count );
 			if ($this->pos + $count > strlen ( $this->data )) {
 				$this->pos = strlen ( $this->data );
+				AJXP_Logger::debug("POSITION 1 ".$this->pos);
 			} else {
 				$this->pos = $this->pos + $count;
+				AJXP_Logger::debug("POSITION 2 ".$this->pos);
 			}
 			return $d;
 		}
@@ -191,7 +194,7 @@ class imapAccessWrapper implements AjxpWrapper {
 	}
 	
 	function stream_eof() {
-		if ($this->pos == $this->size) {
+		if ($this->pos >= $this->size) {
 			return true;
 		} else {
 			return false;
@@ -382,8 +385,12 @@ class imapAccessWrapper implements AjxpWrapper {
     	$fp = fopen($path, 'r');
     	$bufferSize = 4096 * 8;
     	if($fp){
-    		while(($data = fread($fp, $bufferSize)) !== false){
+    		$i = 0;
+    		while(!feof($fp)){
+    			$data = fread($fp, $bufferSize);    			
     			fwrite($stream, $data, strlen($data));
+    			//if($i > 10) break;
+    			//$i++;
     		}
     		fclose($fp);
     	}    	

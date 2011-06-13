@@ -99,6 +99,8 @@ class imapAccessDriver extends fsAccessDriver
 			foreach ($meta as $attach){
 				if($attach["x-attachment-id"] == $attachmentId){
 					$metadata["text"] = $attach["filename"];
+					$metadata["icon"] = AJXP_Utils::mimetype($attach["filename"], "image", false);
+					$metadata["mimestring"] = AJXP_Utils::mimetype($attach["filename"], "text", false);
 				}
 			}
 		}
