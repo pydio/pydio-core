@@ -57,7 +57,7 @@ class JumploaderProcessor extends AJXP_Plugin {
 		AJXP_Logger::debug("Jumploader HttpVars", $httpVars);
 		AJXP_Logger::debug("Jumploader FileVars", $fileVars);
 		
-		$httpVars["dir"] = base64_decode($httpVars["dir"]);
+		$httpVars["dir"] = base64_decode(urldecode($httpVars["dir"]));		
 		if(isSet($httpVars["partitionCount"]) && intval($httpVars["partitionCount"]) > 1){
 			AJXP_LOGGER::debug("Partitioned upload");
 			$index = $httpVars["partitionIndex"];
