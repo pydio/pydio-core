@@ -97,14 +97,38 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		return true;
 	}	
 	
-	function checkPassword($login, $pass, $seed){
-		$userStoredPass = $this->getUserPass($login);
-		if(!$userStoredPass) return false;
-		if($seed == "-1"){ // Seed = -1 means that password is not encoded.
-			return ($userStoredPass == $pass);
+	function checkPassword($login, $pass, $seed){	
+
+		global $AJXP_GLUE_GLOBALS;
+		if(isSet($AJXP_GLUE_GLOBALS)){
+			$userStoredPass = $this->getUserPass($login);
+			if(!$userStoredPass) return false;
+			if($seed == "-1"){ // Seed = -1 means that password is not encoded.
+				return ($userStoredPass == $pass);
+			}else{
+				return (md5($userStoredPass.$seed) == $pass);
+			}			
 		}else{
-			return (md5($userStoredPass.$seed) == $pass);
-		}
+			session_write_close();
+			$host = "";
+			if(isSet($this->options["MASTER_HOST"])){
+				$host = $this->options["MASTER_HOST"];
+			}else{
+				$host = parse_url($_SERVER["SERVER_ADDR"], PHP_URL_HOST);
+			}
+			$uri = $this->options["MASTER_URI"];
+			$funcName = $this->options["MASTER_AUTH_FUNCTION"];
+			require_once 'cms_auth_functions.php';
+			if(function_exists($funcName)){
+				$sessid = call_user_func($funcName, $host, $uri, $login, $pass);
+				if($sessid != ""){
+					session_id($sessid);
+					session_start();
+					return true;					
+				}
+			}
+			return  false;
+		}		
 	}
 	
 	function createCookieString($login){

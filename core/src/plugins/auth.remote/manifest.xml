@@ -6,6 +6,10 @@
 		<param name="LOGOUT_URL" type="string" label="Logout URL" description="Redirect to the given URL on loggin out" mandatory="false" />
 		<param name="SECRET" type="string" label="Secret key" description="This key must only be known by remote end" mandatory="false" />
 	    <param name="USERS_FILEPATH" type="string" label="Users" description="The users list" mandatory="true"/>
+	    <!-- These will be necessary if you want to use the AjaXplorer iOS client -->
+	    <param name="MASTER_AUTH_FUNCTION" type="string" label="Master Auth Function" description="User-defined function for performing real password check, necessary for REST API (including iOS client)" mandatory="false"/>
+	    <param name="MASTER_HOST" type="string" label="Master Host" description="Host used to negociated the master authentication, if not set will be detected" mandatory="false"/>
+	    <param name="MASTER_URI" type="string" label="Master Base URI" description="URI to access the base of the CMS installation. Used by the master auth function." mandatory="false"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.remote/class.remoteAuthDriver.php" classname="remoteAuthDriver"/>
 	<registry_contributions>
