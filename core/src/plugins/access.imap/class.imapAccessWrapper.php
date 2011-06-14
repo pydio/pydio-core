@@ -83,11 +83,17 @@ class imapAccessWrapper implements AjxpWrapper {
 			// EXTRACT ATTACHMENT AND RETURN
 			require_once AJXP_INSTALL_PATH."/plugins/editor.eml/class.EmlParser.php";
 			$emlParser = new EmlParser("", "");			
+			$attachMeta = array();
 			$this->data = $emlParser->getAttachmentBody(
 				$this->currentAttachmentData["realPath"], 
 				$this->currentAttachmentData["attachmentId"], 
-				true
+				true,
+				$attachMeta
 			);			
+			if(self::$attachmentsMetadata == null){
+				self::$attachmentsMetadata = array($attachMeta);
+			}
+			
 			$this->currentAttachmentData["size"] = strlen($this->data);			
 			$this->pos = 0;
 			$this->size = strlen($this->data);
@@ -149,11 +155,13 @@ class imapAccessWrapper implements AjxpWrapper {
 				AJXP_Logger::debug("Attachement", $this->currentAttachmentData);
 				// EXTRACT ATTACHMENT AND RETURN
 				require_once AJXP_INSTALL_PATH."/plugins/editor.eml/class.EmlParser.php";
-				$emlParser = new EmlParser("", "");			
+				$emlParser = new EmlParser("", "");
+				$attachMeta = array();			
 				$this->data = $emlParser->getAttachmentBody(
 					$this->currentAttachmentData["realPath"], 
 					$this->currentAttachmentData["attachmentId"], 
-					true
+					true,
+					$attachMeta
 				);
 				$this->pos = 0;
 				$this->size = strlen($this->data);

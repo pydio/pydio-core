@@ -380,7 +380,13 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	$messages = array();
     	foreach ($files as $file){
     		$origFile = $origStreamURL.$file;
-    		$destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".basename($file);    		
+    		$localName = "";
+    		AJXP_Controller::applyHook("dl.localname", array($origFile, &$localName, $origWrapperData["classname"]));
+    		$bName = basename($file);
+    		if($localName != ""){
+    			$bName = $localName;
+    		}    		
+    		$destFile = $destStreamURL.SystemTextEncoding::fromUTF8($httpVars["dest"])."/".$bName;    		
     		AJXP_Logger::debug("Copying $origFile to $destFile");    		
     		if(!is_file($origFile)){
     			throw new Exception("Cannot find $origFile");
