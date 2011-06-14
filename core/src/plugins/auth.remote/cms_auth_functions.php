@@ -20,7 +20,7 @@ function extractResponseCookies($client){
 	return $cookies;
 }
 
-function wordpress_remote_auth($host, $uri, $login, $pass){
+function wordpress_remote_auth($host, $uri, $login, $pass, $formId = ""){
 	$client = new HttpClient($host);
 	$client->setHandleRedirects(false);
 	$client->setHeadersOnly(true);		
@@ -37,7 +37,7 @@ function wordpress_remote_auth($host, $uri, $login, $pass){
 	return "";
 }
 
-function joomla_remote_auth($host, $uri, $login, $pass){
+function joomla_remote_auth($host, $uri, $login, $pass, $formId = ""){
 	
 	$client = new HttpClient($host);
 	$client->setHandleRedirects(false);
@@ -45,7 +45,8 @@ function joomla_remote_auth($host, $uri, $login, $pass){
 	$content = $client->getContent();
 	$xmlDoc = DOMDocument::loadHTML($content);
 	$xPath = new DOMXPath($xmlDoc);
-	$nodes = $xPath->query('//form[@id="login-form"]');
+	if($formId == "") $formId = "login-form";
+	$nodes = $xPath->query('//form[@id="'.$formId.'"]');
 	if(!$nodes->length) {
 		return "";
 	}
@@ -73,7 +74,7 @@ function joomla_remote_auth($host, $uri, $login, $pass){
 	return "";
 }
 
-function drupal_remote_auth($host, $uri, $login, $pass){
+function drupal_remote_auth($host, $uri, $login, $pass, $formId = ""){
 	
 	$client = new HttpClient($host);
 	$client->setHandleRedirects(false);
@@ -81,7 +82,8 @@ function drupal_remote_auth($host, $uri, $login, $pass){
 	$content = $client->getContent();
 	$xmlDoc = DOMDocument::loadHTML($content);
 	$xPath = new DOMXPath($xmlDoc);
-	$nodes = $xPath->query('//form[@id="user-login-form"]');
+	if($formId == "") $formId = "user-login-form";
+	$nodes = $xPath->query('//form[@id="'.$formId.'"]');
 	if(!$nodes->length) {
 		return "";
 	}

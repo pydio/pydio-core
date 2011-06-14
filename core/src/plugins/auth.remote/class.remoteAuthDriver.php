@@ -116,11 +116,15 @@ class remoteAuthDriver extends AbstractAuthDriver {
 			}else{
 				$host = parse_url($_SERVER["SERVER_ADDR"], PHP_URL_HOST);
 			}
+			$formId = "";
+			if(isSet($this->options["MASTER_AUTH_FORM_ID"])){
+				$formId = $this->options["MASTER_AUTH_FORM_ID"];
+			}
 			$uri = $this->options["MASTER_URI"];
 			$funcName = $this->options["MASTER_AUTH_FUNCTION"];
 			require_once 'cms_auth_functions.php';
 			if(function_exists($funcName)){
-				$sessid = call_user_func($funcName, $host, $uri, $login, $pass);
+				$sessid = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
 				if($sessid != ""){
 					session_id($sessid);
 					session_start();
