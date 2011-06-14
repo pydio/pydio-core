@@ -153,6 +153,18 @@ class EmlParser extends AJXP_Plugin{
     			$part = $this->_findAttachmentById($structure, $attachId);
     			AJXP_XMLWriter::header();
     			if($part !== false){
+    				if(isSet($httpVars["dest_repository_id"])){
+    					$destRepoId = $httpVars["dest_repository_id"];
+				    	if(AuthService::usersEnabled()){
+					    	$loggedUser = AuthService::getLoggedUser();
+					    	if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
+				    	}
+				    	$destRepoObject = ConfService::getRepositoryById($destRepoId);
+				    	$destRepoAccess = $destRepoObject->getAccessType();
+				    	$plugin = AJXP_PluginsService::findPlugin("access", $destRepoAccess);
+				    	$destWrapperData = $plugin->detectStreamWrapper(true);
+				    	$destStreamURL = $destWrapperData["protocol"]."://$destRepoId";
+    				}
 	    			$destFile = $destStreamURL.$destRep."/".$part->d_parameters['filename'];
 	    			$fp = fopen($destFile, "w");
 	    			if($fp !== false){
@@ -178,6 +190,9 @@ class EmlParser extends AJXP_Plugin{
 		if($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))){
 			$noMail = false;
 		}
+		if($wrapperClassName == "imapAccessWrapper" && !$metadata["is_file"]){
+			$metadata["mimestring"] = "Mailbox";
+		}
 		$parsed = parse_url($currentNode);
 		if( $noMail || ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0 ) ){
 			EmlParser::$currentListingOnlyEmails = FALSE;
@@ -202,7 +217,7 @@ class EmlParser extends AJXP_Plugin{
 		$data["ajxp_mime"] = "eml";
 		$data["mimestring"] = "Email";
 		$metadata = array_merge($metadata, $data);
-		if($wrapperClassName == "imapAccessWrapper" && $metadata["eml_attachments"]!= "0"){
+		if($wrapperClassName == "imapAccessWrapper" && $metadata["eml_attachments"]!= "0" && (strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios") !== false)){			
 			$metadata["is_file"] = false;
 			$metadata["nodeName"] = basename($currentNode)."#attachments"; 
 		}
