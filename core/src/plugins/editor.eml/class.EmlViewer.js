@@ -108,7 +108,39 @@ Class.create("EmlViewer", AbstractEditor, {
 	cpAttachment : function(event){
 		var container = this.element.down('#treeSelectorCpContainer');
 		this.treeSelector = new TreeSelector(container);
-		this.treeSelector.load();
+		var user = ajaxplorer.user;
+		if(user) var activeRepository = user.getActiveRepository();
+		if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
+			var firstKey ;
+			var reposList = new Hash();
+			user.getCrossRepositories().each(function(pair){
+				if(!firstKey) firstKey = pair.key;
+				reposList.set(pair.key, pair.value.getLabel());								
+			}.bind(this));
+			if(!user.canWrite()){
+				var nodeProvider = new RemoteNodeProvider();
+				nodeProvider.initProvider({tmp_repository_id:firstKey});
+				var rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider);								
+				this.treeSelector.load(rootNode);
+			}else{
+				this.treeSelector.load();								
+			}
+			this.treeSelector.setFilterShow(true);							
+			reposList.each(function(pair){
+				this.treeSelector.appendFilterValue(pair.key, pair.value);
+			}.bind(this)); 
+			if(user.canWrite()) this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
+			this.treeSelector.setFilterSelectedIndex(0);
+			this.treeSelector.setFilterChangeCallback(function(e){
+				externalRepo = this.filterSelector.getValue();
+				var nodeProvider = new RemoteNodeProvider();
+				nodeProvider.initProvider({tmp_repository_id:externalRepo});
+				this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
+			});
+		}else{
+			this.treeSelector.load();
+		}				
+		//this.treeSelector.load();
 		var currentAtt = event.target.up("div");
 		var attachmentId = currentAtt.__ATTACHMENT_ID;
 		if(this.fullScreenMode){
@@ -128,13 +160,29 @@ Class.create("EmlViewer", AbstractEditor, {
 		container.down("#eml_cp_ok").observeOnce("click", function(e){
 			Event.stop(e);
 			var selectedNode = this.treeSelector.getSelectedNode();
+			var actionValue = "eml_cp_attachment";
+			var crossCopy = false;
+			var crtRepoType = ajaxplorer.user.repositories.get(ajaxplorer.user.activeRepository).accessType;
+			if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
+				crossCopy = true;
+			}
 			var connexion = new Connexion();
-			connexion.setParameters({
-				file: this.currentFile,
-				get_action:'eml_cp_attachment',
-				attachment_id:attachmentId,
-				destination:selectedNode
-			});
+			if(crtRepoType == "imap"){
+				connexion.setParameters({
+					file: this.currentFile+"#attachments/"+attachmentId,
+					get_action:crossCopy?"cross_copy":"copy",
+					dest:selectedNode,
+					dest_repository_id:crossCopy?this.treeSelector.filterSelector.getValue():""
+				});				
+			}else{
+				connexion.setParameters({
+					file: this.currentFile,
+					get_action:"eml_cp_attachment",
+					attachment_id:attachmentId,
+					destination:selectedNode,
+					dest_repository_id:crossCopy?this.treeSelector.filterSelector.getValue():""
+				});				
+			}
 			connexion.onComplete = function(transport){
 				ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
 			};
