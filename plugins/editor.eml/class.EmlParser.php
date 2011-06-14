@@ -46,7 +46,6 @@ class EmlParser extends AJXP_Plugin{
 				    			$charset = $element->charset;
 			    			}
 			    			if($decoded != $value){					    		
-			    				//AJXP_Logger::debug("$value Decoded ($charset) ".$decoded);
 			    				$value = SystemTextEncoding::changeCharset($charset, "UTF-8", $decoded);
 					    		$node = $doc->createElement("headervalue", $value);
 					    		$res = $headerNode->parentNode->replaceChild($node, $headerValueNode);
@@ -201,6 +200,7 @@ class EmlParser extends AJXP_Plugin{
 		$cacheItem = AJXP_Cache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
 		$data = unserialize($cacheItem->getData());
 		$data["ajxp_mime"] = "eml";
+		$data["mimestring"] = "Email";
 		$metadata = array_merge($metadata, $data);
 		if($wrapperClassName == "imapAccessWrapper" && $metadata["eml_attachments"]!= "0"){
 			$metadata["is_file"] = false;
@@ -221,17 +221,23 @@ class EmlParser extends AJXP_Plugin{
     	$decoder = new Mail_mimeDecode($content);
 		$structure = $decoder->decode($params);
 		$allowedHeaders = array("to", "from", "subject", "message-id", "mime-version", "date", "return-path");
-		foreach ($structure->headers as $hKey => $hValue){
+		foreach ($structure->headers as $hKey => $hValue){			
 			if(!in_array($hKey, $allowedHeaders)) continue;
 			if(is_array($hValue)){
 				$hValue = implode(", ", $hValue);
 			}
 			if($hKey == "date"){
 				$date = strtotime($hValue);
-				//$hValue = date($mess["date_format"], $date);
 				$metadata["eml_time"] = $date;
 			}
-			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(htmlentities($hValue), true);
+			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(htmlentities($hValue, ENT_COMPAT, "UTF-8"));
+			//AJXP_Logger::debug($hKey." - ".$hValue. " - ".$metadata["eml_".$hKey]);
+			if($metadata["eml_".$hKey] == ""){
+				$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(@htmlentities($hValue));
+				if(!SystemTextEncoding::isUtf8($metadata["eml_".$hKey])) {
+					$metadata["eml_".$hKey] = SystemTextEncoding::toUTF8($metadata["eml_".$hKey]);
+				}
+			}
 		}
 		$metadata["eml_attachments"] = 0;
 		$parts = $structure->parts;
@@ -266,16 +272,30 @@ class EmlParser extends AJXP_Plugin{
 					
 		$dom = new DOMDocument("1.0", "UTF-8");
 		$dom->loadXML($outputVars["ob_output"]);
+		$mobileAgent = AJXP_Utils::userAgentIsIOS() || (strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client")!==false);
+		AJXP_Logger::debug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);		
 		if(EmlParser::$currentListingOnlyEmails === true){
 			// Replace all text attributes by the "from" value
-			foreach ($dom->documentElement->childNodes as $child){
-				$child->setAttribute("text", $child->getAttribute("eml_from"));
+			$index = 1;
+			foreach ($dom->documentElement->childNodes as $child){		
+				if($mobileAgent){
+					$from = $child->getAttribute("eml_from");
+					$from = trim(array_shift(explode("&lt;", $from)));
+					$text = ($index < 10?"0":"").$index.". ".$from." &gt; ".$child->getAttribute("eml_subject");
+					if((strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client")!==false)){
+						$text = html_entity_decode($text, ENT_COMPAT, "UTF-8");																
+					}
+					$index ++;
+				}else{
+					$text = $child->getAttribute("eml_from");
+				}
+				$child->setAttribute("text", $text);
 				$child->setAttribute("ajxp_modiftime", $child->getAttribute("eml_time"));
 			}
 		}
 		
 		// Add the columns template definition
-		$insert = new DOMDocument("1.0", "UTF-8");		
+		$insert = new DOMDocument("1.0", "UTF-8");
 		$config = "<client_configs><component_config className=\"FilesList\" local=\"true\">$config</component_config></client_configs>";			
 		$insert->loadXML($config);
 		$imported = $dom->importNode($insert->documentElement, true);
@@ -393,7 +413,7 @@ class EmlParser extends AJXP_Plugin{
 	static public function computeCacheId($mailPath){
 		$header = file_get_contents($mailPath."#header");
 		//AJXP_Logger::debug("Headers ", $header);
-		return md5(basename($header));
+		return md5($header);
 	}
 	 
 }

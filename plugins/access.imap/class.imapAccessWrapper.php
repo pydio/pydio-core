@@ -114,10 +114,10 @@ class imapAccessWrapper implements AjxpWrapper {
 			$this->port = $repository->getOption("PORT");
 			$this->username = $repository->getOption("USER");
 			$this->password = $repository->getOption("PASS");
-			$server = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}".$this->mailbox;
+			$server = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}";
 			self::$currentRef = $server;
 			AJXP_Logger::debug("Opening stream ".$server." with mailbox '".$this->mailbox."'");
-			$this->ih = imap_open ( $server , $this->username, $this->password, (!$pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
+			$this->ih = imap_open ( $server.$this->mailbox , $this->username, $this->password, (!$pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
 			self::$currentStream = $this->ih;
 			if(!empty($this->mailbox)){
 				register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
@@ -315,8 +315,11 @@ class imapAccessWrapper implements AjxpWrapper {
 			if(!empty($this->path) && empty($this->currentAttachmentData)){
 				// Mail
 				//$stats = array();
-				list ( $stats, ) = imap_fetch_overview ( $this->ih, $this->path );
-				$time = strtotime ( $stats->date );
+				if(empty($this->size) && empty($this->time)){
+					list ( $stats, ) = imap_fetch_overview ( $this->ih, $this->path );
+					$this->size = $stats->size;
+					$this->time = strtotime ( $stats->date );					
+				}				
 				$keys = array(
 					'dev' => 0, 
 					'ino' => 0, 
@@ -325,14 +328,23 @@ class imapAccessWrapper implements AjxpWrapper {
 					'uid' => 0, 
 					'gid' => 0, 
 					'rdev' => 0, 
-					'size' => $stats->size, 
-					'atime' => $time, 
-					'mtime' => $time, 
-					'ctime' => $time,
+					'size' => $this->size, 
+					'atime' => $this->time, 
+					'mtime' => $this->time, 
+					'ctime' => $this->time,
 					'blksize' => 0, 
 					'blocks' => 0 );
 			}else{
 				// BOX
+				if(empty($this->currentAttachmentData) && !empty($this->mailbox)){
+					// GET LAST MESSAGE
+					imap_reopen($this->ih, self::$currentRef.$this->mailbox);
+					$last = imap_num_msg($this->ih);
+					//AJXP_Logger::debug("Should get mailbox data ".self::$currentRef.$this->mailbox . $last);
+					list ( $stats, ) = imap_fetch_overview ( $this->ih, $last );
+					$this->size = $stats->size;
+					$this->time = strtotime ( $stats->date );										
+				}
 				$keys = array(
 					'dev' => 0, 
 					'ino' => 0, 
@@ -342,9 +354,9 @@ class imapAccessWrapper implements AjxpWrapper {
 					'gid' => 0, 
 					'rdev' => 0,
 					'size' => (!empty($this->currentAttachmentData)?$this->currentAttachmentData["size"]:0), 
-					'atime' => 0, 
-					'mtime' => 0, 
-					'ctime' => 0, 
+					'atime' => (!empty($this->time)?$this->time:0), 
+					'mtime' => (!empty($this->time)?$this->time:0), 
+					'ctime' => (!empty($this->time)?$this->time:0), 
 					'blksize' => 0, 
 					'blocks' => 0 
 				);
