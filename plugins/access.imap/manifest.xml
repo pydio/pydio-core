@@ -28,6 +28,7 @@
 		<hooks>
 			<serverCallback hookName="ls.metadata" methodName="enrichMetadata"></serverCallback>
 			<serverCallback hookName="ls.parent.metadata" methodName="enrichMetadata"></serverCallback>
+			<serverCallback hookName="dl.localname" methodName="attachmentDLName"></serverCallback>
 		</hooks>			
 	</registry_contributions>
 </ajxpdriver>

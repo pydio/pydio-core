@@ -29,7 +29,34 @@ class EmlParser extends AJXP_Plugin{
     				'decode_headers' => true
     			);
     			$decoder = $this->getStructureDecoder($file, ($wrapperClassName == "imapAccessWrapper"));
-    			print($decoder->getXML($decoder->decode(array($params))));    			
+    			$xml = $decoder->getXML($decoder->decode(array($params)));
+				if(function_exists("imap_mime_header_decode")){
+					$doc = DOMDocument::loadXML($xml);
+					$xPath = new DOMXPath($doc);
+					$headers = $xPath->query("//headername");
+					$changes = false;
+					foreach ($headers as $headerNode){
+						if($headerNode->firstChild->nodeValue == "Subject"){
+							$headerValueNode = $headerNode->nextSibling->nextSibling;							
+							$value = $headerValueNode->nodeValue;
+			    			$elements = imap_mime_header_decode($value);
+			    			$decoded = "";
+			    			foreach($elements as $element){
+				    			$decoded.=$element->text;
+				    			$charset = $element->charset;
+			    			}
+			    			if($decoded != $value){					    		
+			    				//AJXP_Logger::debug("$value Decoded ($charset) ".$decoded);
+			    				$value = SystemTextEncoding::changeCharset($charset, "UTF-8", $decoded);
+					    		$node = $doc->createElement("headervalue", $value);
+					    		$res = $headerNode->parentNode->replaceChild($node, $headerValueNode);
+					    		$changes = true;
+			    			}
+						}
+					}
+					if($changes) $xml = $doc->saveXML();			    							
+				}	
+    			print $xml;
     		break;
     		case "eml_get_bodies":
     			require_once("Mail/mimeDecode.php");
@@ -303,7 +330,7 @@ class EmlParser extends AJXP_Plugin{
 		}
 	}
 	
-	public function getAttachmentBody($file, $attachmentId, $cacheRemoteContent = false){
+	public function getAttachmentBody($file, $attachmentId, $cacheRemoteContent = false, &$metadata = array()){
 		$decoder = $this->getStructureDecoder($file, $cacheRemoteContent);
 	   	$params = array(
 	   		'include_bodies' => true,
@@ -313,6 +340,11 @@ class EmlParser extends AJXP_Plugin{
 		$structure = $decoder->decode($params);
 		$part = $this->_findAttachmentById($structure, $attachmentId);
 		if($part == false) return false;
+		$metadata = array(
+			"filename" => $part->d_parameters['filename'], 
+			"content-type" => $part->ctype_primary."/".$part->ctype_secondary,
+			"x-attachment-id" => $attachmentId
+		);
 		return $part->body;
 	}
 	

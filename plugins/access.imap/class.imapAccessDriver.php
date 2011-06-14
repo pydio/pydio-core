@@ -95,12 +95,13 @@ class imapAccessDriver extends fsAccessDriver
 		if( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0){
 			list(, $attachmentId) = explode("/", $parsed["fragment"]);
 			$meta = imapAccessWrapper::getCurrentAttachmentsMetadata();
-			AJXP_Logger::debug("", $meta);
-			foreach ($meta as $attach){
-				if($attach["x-attachment-id"] == $attachmentId){
-					$metadata["text"] = $attach["filename"];
-					$metadata["icon"] = AJXP_Utils::mimetype($attach["filename"], "image", false);
-					$metadata["mimestring"] = AJXP_Utils::mimetype($attach["filename"], "text", false);
+			if($meta != null){
+				foreach ($meta as $attach){
+					if($attach["x-attachment-id"] == $attachmentId){
+						$metadata["text"] = $attach["filename"];
+						$metadata["icon"] = AJXP_Utils::mimetype($attach["filename"], "image", false);
+						$metadata["mimestring"] = AJXP_Utils::mimetype($attach["filename"], "text", false);
+					}
 				}
 			}
 		}
@@ -115,6 +116,25 @@ class imapAccessDriver extends fsAccessDriver
 			$parts = explode("/", $currentNode);
 			$metadata["text"] = AJXP_Utils::xmlEntities(str_replace("__delim__", "/", array_pop($parts)), true);
 		}
+	}
+	
+	public function attachmentDLName($currentNode, &$localName, $wrapperClassName){
+		$parsed = parse_url($currentNode);
+		if( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0){
+			list(, $attachmentId) = explode("/", $parsed["fragment"]);
+			$meta = imapAccessWrapper::getCurrentAttachmentsMetadata();
+			if($meta == null){
+				stat($currentNode);
+				$meta = imapAccessWrapper::getCurrentAttachmentsMetadata();
+			}
+			if($meta != null){
+				foreach ($meta as $attach){
+					if($attach["x-attachment-id"] == $attachmentId){
+						$localName = $attach["filename"];
+					}
+				}
+			}
+		}		
 	}
 	
 	/**

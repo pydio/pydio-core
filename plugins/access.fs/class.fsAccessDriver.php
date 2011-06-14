@@ -189,7 +189,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					$localName = ($base==""?"Files":$base).".zip";
 					$this->readFile($file, "force-download", $localName, false, false, true);
 				}else{
-					$this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download");
+					$localName = "";
+					AJXP_Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName, $this->wrapperClassName));
+					$this->readFile($this->urlBase.$selection->getUniqueFile(), "force-download", $localName);
 				}
 				
 			break;
@@ -973,7 +975,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$bufferSize = 1024 * 8;
 				while (!feof($file) && $readSize < $length && connection_status() == 0)
 				{
-					//AJXP_Logger::debug("dl reading $readSize to $length", $_SERVER["HTTP_RANGE"]);					
+					AJXP_Logger::debug("dl reading $readSize to $length", $_SERVER["HTTP_RANGE"]);					
 					echo fread($file, $bufferSize);
 					$readSize += $bufferSize;
 					flush();
