@@ -45,6 +45,7 @@ class HttpClient {
     var $directForwarding = false;
     
     var $contentDestStream = false;
+    var $eventListener = false;
     
     function HttpClient($host, $port=80) {
         $this->host = $host;
@@ -82,6 +83,15 @@ class HttpClient {
     	$this->contentDestStream = false;
     }
     
+    function setEventListener($callback){
+    	$this->eventListener = $callback;
+    }
+    
+    function notify($eventName, $data = null){
+    	if($this->eventListener == false) return;
+    	call_user_func($this->eventListener, $eventName, $data);
+    }
+    
     function buildQueryString($data) {
         $querystring = '';
         if (is_array($data)) {
@@ -103,6 +113,7 @@ class HttpClient {
     }
     function doRequest() {
         // Performs the actual HTTP request, returning true or false depending on outcome
+        $this->notify("open");
 		if (!$fp = @fsockopen($this->host, $this->port, $errno, $errstr, $this->timeout)) {
 		    // Set error message
             switch($errno) {
@@ -117,6 +128,8 @@ class HttpClient {
 			    $this->errormsg .= ' '.$errstr;
 			    $this->debug($this->errormsg);
 			}
+			$this->notify("error", $this->errormsg);
+			$this->notify("close");
 			return false;
         }
         socket_set_timeout($fp, $this->timeout);
@@ -130,8 +143,10 @@ class HttpClient {
     	// Set a couple of flags
     	$inHeaders = true;
     	$atStart = true;
+    	$totalReadSize = 0;
     	// Now start reading back the response
     	while (!feof($fp)) {
+    		@set_time_limit(60);
     	    $line = fgets($fp, 4096);
     	    if ($atStart) {
     	        // Deal with first line of returned data
@@ -139,6 +154,8 @@ class HttpClient {
     	        if (!preg_match('/HTTP\/(\\d\\.\\d)\\s*(\\d+)\\s*(.*)/', $line, $m)) {
     	            $this->errormsg = "Status code line invalid: ".htmlentities($line);
     	            $this->debug($this->errormsg);
+					$this->notify("error", $this->errormsg);
+					$this->notify("close");    	            
     	            return false;
     	        }
     	        $http_version = $m[1]; // not used
@@ -189,7 +206,10 @@ class HttpClient {
     	    }else{
     	    	fwrite($this->contentDestStream, $line);
     	    }
-        }
+    	    $totalReadSize += strlen($line);
+    	    $this->notify("data_read", $totalReadSize);    	    
+    	}
+    	$this->notify("close");    	
         fclose($fp);
    	    if($this->directForwarding){
    	    	return ;
