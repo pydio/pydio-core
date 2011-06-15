@@ -18,6 +18,7 @@ class HttpDownloader extends AJXP_Plugin{
     	
 		require_once AJXP_INSTALL_PATH."/server/classes/class.HttpClient.php";
 		$client = new HttpClient($parts["host"]);
+		$mess = ConfService::getMessages();
 		
 		session_write_close();
     	
@@ -26,13 +27,12 @@ class HttpDownloader extends AJXP_Plugin{
 		if($destStream !== false){
 
 			$client->writeContentToStream($destStream);			
-			$client->get($parts["path"]);
-			
+			$client->get($parts["path"]);			
 			fclose($destStream);
-		
-		}
+					
+		}		
 		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::triggerBgAction("reload_node", array(), "File downloaded done, reloading client!");
+		AJXP_XMLWriter::triggerBgAction("reload_node", array(), $mess["httpdownloader.8"]);
 		AJXP_XMLWriter::close();
 		exit();
 		return true;
