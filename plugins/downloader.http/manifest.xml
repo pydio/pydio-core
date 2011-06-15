@@ -53,4 +53,8 @@
 			</action>					
 		</actions>	
 	</registry_contributions>
+	<dependencies>
+		<!-- Stream Wrapper Access -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>						
 </downloader>
