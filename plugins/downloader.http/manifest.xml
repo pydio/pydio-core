@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<downloader id="downloader.http">
+	<class_definition filename="plugins/downloader.http/class.HttpDownloader.php" classname="HttpDownloader"/>
+	<registry_contributions>
+		<actions>
+			<!-- Override a simple action -->
+			<action name="external_download">
+				<gui text="27" title="27" src="yast_backup.png" accessKey="" hasAccessKey="false">
+					<context selection="false" dir="true" recycle="hidden"
+						actionBar="true" contextMenu="true" infoPanel="false"
+						actionBarGroup="put" inZip="false">
+					</context>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true" dialogOpenForm="external_download">
+						<dialogOnOpen></dialogOnOpen>
+						<dialogOnComplete><![CDATA[
+							var dlFile = oForm.down('[name="url"]').getValue();
+							var crtDir = ajaxplorer.getContextNode().getPath();
+							var bgManager = ajaxplorer.actionBar.bgManager;
+							bgManager.queueAction("external_download", new Hash({file:dlFile, dir:crtDir}), "Downloading "+getBaseName(dlFile)+" to server...");
+							for(var i=2;i<6;i++){
+								var file = oForm.down('[name="url'+i+'"]').getValue();
+								if(file){
+									bgManager.queueAction("external_download", new Hash({file:file, dir:crtDir}), "Downloading "+getBaseName(file)+" to server...");
+								}
+							}
+							bgManager.next();
+							hideLightBox(true);
+						]]></dialogOnComplete>
+					</clientCallback>
+					<clientForm id="external_download"><![CDATA[
+					<div id="external_download" action="external_download" box_width="250">
+					<span class="legend">Download one or more files directly from another http server :</span> <br/>
+					<input type="text" name="url" style="width:227px;" class="dialogFocus">
+					<input type="text" name="url2" style="width:227px;margin-top:5px;">
+					<input type="text" name="url3" style="width:227px;margin-top:5px;">
+					<input type="text" name="url4" style="width:227px;margin-top:5px;">
+					<input type="text" name="url5" style="width:227px;margin-top:5px;">
+					</div>
+					]]></clientForm>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>					
+		</actions>	
+	</registry_contributions>
+</downloader>
