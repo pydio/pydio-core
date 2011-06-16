@@ -59,9 +59,11 @@ class imapAccessDriver extends fsAccessDriver
 		if($this->repository->getOption("MAILBOX") != ""){
 			//$this->urlBase .= "/INBOX";
 		}
+		/*
 		if(!file_exists($this->urlBase)){
 			throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
 		}
+		*/
 	}
 	
 	public static function inverseSort($st1, $st2){		
