@@ -134,6 +134,8 @@ class imapAccessDriver extends fsAccessDriver
 					}
 				}
 			}
+		}else{
+			$localName = basename($currentNode).".eml";
 		}		
 	}
 	

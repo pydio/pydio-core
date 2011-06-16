@@ -14,7 +14,7 @@
 		<param name="USER" type="string" label="User" description="User account" mandatory="true"/>
 		<param name="PASS" type="password" label="Password" description="User Password" mandatory="true"/>						
 		<param name="MAILBOX" type="string" label="Default Mailbox" description="Mailbox to connect by default" mandatory="false"/>						
-		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>
+		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default="r"/>
 		<param name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
 		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="20"/>
 		<param name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="20"/>
@@ -22,7 +22,7 @@
 	<class_definition filename="plugins/access.imap/class.imapAccessDriver.php" classname="imapAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.imap/class.imapAccessWrapper.php" classname="imapAccessWrapper" protocol="ajxp.mailbox"/>
 	<registry_contributions> 
-		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/action[@name='ls'] | actions/action[@name='download'] | actions/action[@name='open_with'] | actions/action[@name='stat'] | actions/action[@name='get_content'] | actions/action[@name='copy'] | actions/action[@name='delete']" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/action[@name='ls'] | actions/action[@name='download'] | actions/action[@name='open_with'] | actions/action[@name='stat'] | actions/action[@name='get_content'] | actions/action[@name='copy']" exclude=""/>
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 		<hooks>
