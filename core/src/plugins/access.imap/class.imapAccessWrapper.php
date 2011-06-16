@@ -9,6 +9,7 @@ class imapAccessWrapper implements AjxpWrapper {
 	var $username;
 	var $password;
 	var $path;
+	var $pop3;
 	// stuff for dir reading
 	var $dir;
 	var $pos;
@@ -109,15 +110,19 @@ class imapAccessWrapper implements AjxpWrapper {
 		}else{
 			$repository = ConfService::getRepositoryById($this->repositoryId);		
 			$ssl = $repository->getOption("SSL") == "true" ? true: false ;
-			$pop3 = $repository->getOption("BOX_TYPE") == "pop3" ? true : false;
+			$this->pop3 = $repository->getOption("BOX_TYPE") == "pop3" ? true : false;
 			$this->host = $repository->getOption("HOST");
 			$this->port = $repository->getOption("PORT");
 			$this->username = $repository->getOption("USER");
 			$this->password = $repository->getOption("PASS");
-			$server = "{". $this->host . ":" . $this->port . "/".($pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}";
+			$server = "{". $this->host . ":" . $this->port . "/".($this->pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}";
 			self::$currentRef = $server;
 			AJXP_Logger::debug("Opening stream ".$server." with mailbox '".$this->mailbox."'");
-			$this->ih = imap_open ( $server.$this->mailbox , $this->username, $this->password, (!$pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
+			try{
+				$this->ih = imap_open ( $server.$this->mailbox , $this->username, $this->password, (!$this->pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
+			}catch (Exception $e){
+				throw new Exception($e->getMessage()." - imap errors  : ".print_r(imap_errors(), true), $e->getCode());
+			}
 			self::$currentStream = $this->ih;
 			if(!empty($this->mailbox)){
 				register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
@@ -336,7 +341,7 @@ class imapAccessWrapper implements AjxpWrapper {
 					'blocks' => 0 );
 			}else{
 				// BOX
-				if(empty($this->currentAttachmentData) && !empty($this->mailbox)){
+				if(empty($this->currentAttachmentData) && !empty($this->mailbox) && !$this->pop3){
 					// GET LAST MESSAGE
 					imap_reopen($this->ih, self::$currentRef.$this->mailbox);
 					$last = imap_num_msg($this->ih);
