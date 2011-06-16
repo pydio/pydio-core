@@ -34,6 +34,7 @@ class imapAccessWrapper implements AjxpWrapper {
 	
 	public static function closeStreamFunc(){
 		if(self::$currentStream){
+			AJXP_Logger::debug("Closing stream now!");
 			imap_close(self::$currentStream);
 		}
 	}
@@ -103,6 +104,7 @@ class imapAccessWrapper implements AjxpWrapper {
 		
 		// open IMAP connection
 		if(self::$currentStream != null){
+			AJXP_Logger::debug("Using currently opened stream! ".print_r(self::$currentStream, true));
 			$this->ih = self::$currentStream;
 			// Rewind everything
 			$this->dir_rewinddir();
@@ -117,16 +119,14 @@ class imapAccessWrapper implements AjxpWrapper {
 			$this->password = $repository->getOption("PASS");
 			$server = "{". $this->host . ":" . $this->port . "/".($this->pop3?"pop3/":"").($ssl?"ssl/novalidate-cert":"novalidate-cert")."}";
 			self::$currentRef = $server;
-			AJXP_Logger::debug("Opening stream ".$server." with mailbox '".$this->mailbox."'");
+			AJXP_Logger::debug("Opening a new stream ".$server." with mailbox '".$this->mailbox."'");
 			try{
 				$this->ih = imap_open ( $server.$this->mailbox , $this->username, $this->password, (!$this->pop3 && empty($this->mailbox)?OP_HALFOPEN:NULL), 1);
 			}catch (Exception $e){
 				throw new Exception($e->getMessage()." - imap errors  : ".print_r(imap_errors(), true), $e->getCode());
 			}
 			self::$currentStream = $this->ih;
-			if(!empty($this->mailbox)){
-				register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
-			}
+			register_shutdown_function(array("imapAccessWrapper", "closeStreamFunc"));
 		}
 		if ($this->ih) {
 			if (! empty ( $this->path )) {
@@ -142,8 +142,8 @@ class imapAccessWrapper implements AjxpWrapper {
 	
 	function stream_close() {
 		if(empty($this->mailbox)){
-			self::$currentStream = null;
-			imap_close ( $this->ih );
+			//self::$currentStream = null;
+			//imap_close ( $this->ih );
 		}
 		if(!empty($this->currentAttachmentData)){
 			$this->currentAttachmentBody = null;
