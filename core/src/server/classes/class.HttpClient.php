@@ -42,10 +42,12 @@ class HttpClient {
     var $postFileName = "userfile";
     var $postFileData = array();
     var $postDataArray = array();
-    var $directForwarding = false;
     
+    var $directForwarding = false;    
     var $contentDestStream = false;
     var $eventListener = false;
+    
+    var $collectHeaders;
     
     function HttpClient($host, $port=80) {
         $this->host = $host;
@@ -143,6 +145,7 @@ class HttpClient {
     	// Set a couple of flags
     	$inHeaders = true;
     	$atStart = true;
+    	$parsedHeaders = false;
     	$totalReadSize = 0;
     	// Now start reading back the response
     	while (!feof($fp)) {
@@ -168,6 +171,60 @@ class HttpClient {
     	        if (trim($line) == '') {
     	            $inHeaders = false;
     	            $this->debug('Received Headers', $this->headers);
+    	            if(isSet($this->collectHeaders)){
+    	            	foreach ($this->headers as $hKey => $hValue){
+    	            		if(isSet($this->collectHeaders[$hKey])){
+    	            			if($hKey == "content-length" && $hValue == "0") continue;
+    	            			$this->collectHeaders[$hKey] = $hValue;    	            			
+    	            			AJXP_Logger::debug("Setting $hKey", $this->collectHeaders);
+    	            		}
+    	            	}
+    	            }
+			        if ($this->persist_cookies && isset($this->headers['set-cookie']) && $this->host == $this->cookie_host) {
+			            $cookies = $this->headers['set-cookie'];
+			            if (!is_array($cookies)) {
+			                $cookies = array($cookies);
+			            }
+			            foreach ($cookies as $cookie) {
+			                if (preg_match('/([^=]+)=([^;]+);/', $cookie, $m)) {
+			                    $this->cookies[$m[1]] = $m[2];
+			                }
+			            }
+			            // Record domain of cookies for security reasons
+			            $this->cookie_host = $this->host;
+			        }
+			        // If $persist_referers, set the referer ready for the next request
+			        if ($this->persist_referers) {
+			            //$this->debug('Persisting referer: '.$this->getRequestURL());
+			            $this->referer = $this->getRequestURL();
+			        }
+			        // Finally, if handle_redirects and a redirect is sent, do that
+			        if ($this->handle_redirects) {
+			            if (++$this->redirect_count >= $this->max_redirects) {
+			                $this->errormsg = 'Number of redirects exceeded maximum ('.$this->max_redirects.')';
+			                $this->debug($this->errormsg);
+			                $this->redirect_count = 0;
+			                return false;
+			            }
+			            $location = isset($this->headers['location']) ? $this->headers['location'] : '';
+			            $uri = isset($this->headers['uri']) ? $this->headers['uri'] : '';
+			            if ($location || $uri) {
+			                $url = parse_url($location.$uri);
+			                // This will FAIL if redirect is to a different site
+			                $this->debug("Should redirect! ", $url);
+			                $data = array();
+			                if(isSet($url['query'])){		                	
+			                	parse_str($url["query"], $data);
+			                }
+			                $this->host = $url["host"];
+			                fclose($fp);
+			                if(isSet($this->collectHeaders) && isSet($this->collectHeaders["ajxp-last-redirection"])){
+			                	$this->collectHeaders["ajxp-last-redirection"] = $location.$uri;
+			                }
+			                return $this->get($url['path'], (!empty($data)?$data:false));
+			            }
+			        }    	            
+    	            
     	            if ($this->headers_only) {
     	                break; // Skip the rest of the input
     	            }
@@ -196,6 +253,7 @@ class HttpClient {
     	        }
     	        continue;
     	    }
+    	        	    
     	    // We're not in the headers, so append the line to the contents
     	    if($this->directForwarding){
     	    	print $line;
@@ -222,42 +280,7 @@ class HttpClient {
 	            $this->content = gzinflate($this->content);
             }
         }
-        $this->debug("CONTENT : ".htmlentities($this->content));
-        // If $persist_cookies, deal with any cookies
-        if ($this->persist_cookies && isset($this->headers['set-cookie']) && $this->host == $this->cookie_host) {
-            $cookies = $this->headers['set-cookie'];
-            if (!is_array($cookies)) {
-                $cookies = array($cookies);
-            }
-            foreach ($cookies as $cookie) {
-                if (preg_match('/([^=]+)=([^;]+);/', $cookie, $m)) {
-                    $this->cookies[$m[1]] = $m[2];
-                }
-            }
-            // Record domain of cookies for security reasons
-            $this->cookie_host = $this->host;
-        }
-        // If $persist_referers, set the referer ready for the next request
-        if ($this->persist_referers) {
-            //$this->debug('Persisting referer: '.$this->getRequestURL());
-            $this->referer = $this->getRequestURL();
-        }
-        // Finally, if handle_redirects and a redirect is sent, do that
-        if ($this->handle_redirects) {
-            if (++$this->redirect_count >= $this->max_redirects) {
-                $this->errormsg = 'Number of redirects exceeded maximum ('.$this->max_redirects.')';
-                $this->debug($this->errormsg);
-                $this->redirect_count = 0;
-                return false;
-            }
-            $location = isset($this->headers['location']) ? $this->headers['location'] : '';
-            $uri = isset($this->headers['uri']) ? $this->headers['uri'] : '';
-            if ($location || $uri) {
-                $url = parse_url($location.$uri);
-                // This will FAIL if redirect is to a different site
-                return $this->get($url['path']);
-            }
-        }
+        // $this->debug("CONTENT : ".htmlentities($this->content));
         return true;
     }
     function buildRequest() {
@@ -379,8 +402,11 @@ class HttpClient {
     function setMaxRedirects($num) {
         $this->max_redirects = $num;
     }
-    function setHeadersOnly($boolean) {
+    function setHeadersOnly($boolean, &$collectHeaders = null) {
         $this->headers_only = $boolean;
+        if($collectHeaders != null){
+        	$this->collectHeaders = $collectHeaders;
+        }
     }
     function setDebug($boolean) {
         $this->debug = $boolean;
@@ -415,15 +441,16 @@ class HttpClient {
     }
     function debug($msg, $object = false) {
         if ($this->debug) {
-            print '<div style="border: 1px solid red; padding: 0.5em; margin: 0.5em;"><strong>HttpClient Debug:</strong> '.$msg;
+            $st = '<div style="border: 1px solid red; padding: 0.5em; margin: 0.5em;"><strong>HttpClient Debug:</strong> '.$msg;
             if ($object) {
                 ob_start();
         	    print_r($object);
         	    $content = htmlentities(ob_get_contents());
         	    ob_end_clean();
-        	    print '<pre>'.$content.'</pre>';
+        	    $st .= '<pre>'.$content.'</pre>';
         	}
-        	print '</div>';
+        	$st .= '</div>';
+        	AJXP_Logger::debug($msg . ($object!==false?" - ".print_r($object, true):""));
         }
     }   
 }
