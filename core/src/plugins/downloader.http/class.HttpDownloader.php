@@ -39,7 +39,7 @@ class HttpDownloader extends AJXP_Plugin{
 	
 	public function switchAction($action, $httpVars, $fileVars){		
 		AJXP_Logger::logAction("DL file", $httpVars);
-		
+				
 		$parts = parse_url($httpVars["file"]);
 		
 		$repository = ConfService::getRepository();
@@ -52,17 +52,50 @@ class HttpDownloader extends AJXP_Plugin{
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/";
     	
 		require_once AJXP_INSTALL_PATH."/server/classes/class.HttpClient.php";
-		$client = new HttpClient($parts["host"]);
-		$mess = ConfService::getMessages();
-		
+		$mess = ConfService::getMessages();		
 		session_write_close();
-    	
-		$filename = $destStreamURL.basename($parts["path"]);
+		
+		$client = new HttpClient($parts["host"]);		
+		$collectHeaders = array(
+			"ajxp-last-redirection" => "",
+			"content-disposition"	=> "",
+			"content-length"		=> ""
+		);
+		$client->setHeadersOnly(true, $collectHeaders);
+		$client->setMaxRedirects(8);
+		$client->setDebug(true);
+		$getPath = $parts["path"];
+		$client->get($getPath);
+		
+		AJXP_Logger::debug("COLLECTED HEADERS", $client->collectHeaders);
+		$collectHeaders = $client->collectHeaders;
+		$basename = basename($getPath);
+    	if(!empty($collectHeaders["content-disposition"]) && strstr($collectHeaders["content-disposition"], "filename")!== false){
+    		$basename = trim(array_pop(explode("filename=", $collectHeaders["content-disposition"])));
+    		$basename = str_replace("\"", "", $basename); // Remove quotes
+    	}
+    	if(!empty($collectHeaders["content-length"])){
+    		$totalSize = intval($collectHeaders["content-length"]);
+    		AJXP_Logger::debug("Should download $totalSize bytes!");
+    	}
+		$qData = false;
+		if(!empty($collectHeaders["ajxp-last-redirection"])){
+			$newParsed = parse_url($collectHeaders["ajxp-last-redirection"]);
+			$client->host = $newParsed["host"];
+			$getPath = $newParsed["path"];
+			if(isset($newParsed["query"])){
+				$qData = parse_url($newParsed["query"]);
+			}
+		}
+		
+		$client->redirect_count = 0;
+		$client->setHeadersOnly(false);
+		$filename = $destStreamURL.$basename;
 		$destStream = fopen($filename, "w");
 		if($destStream !== false){
 
 			$client->writeContentToStream($destStream);			
-			$client->get($parts["path"]);			
+			$client->get($getPath, $qData);			
 			fclose($destStream);
 					
 		}		
@@ -72,7 +105,6 @@ class HttpDownloader extends AJXP_Plugin{
 		exit();
 		return true;
 	}
-	
 	
 }
 
