@@ -204,7 +204,7 @@ Class.create("AjxpSortable", SortableTable, {
 	cellSorterValue : function(oRow, nColumn){
 		var tds = oRow.select('td');
 		if(tds[nColumn] && tds[nColumn].readAttribute('sorter_value')){
-			return tds[nColumn].readAttribute('sorter_value');
+			return parseInt(tds[nColumn].readAttribute('sorter_value'));
 		}
 	},
 	
