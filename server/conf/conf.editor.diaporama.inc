@@ -59,6 +59,6 @@ $DRIVER_CONF = array(
 	// 3 = Up to 60 times faster.  Will give high quality smooth results very close to imagecopyresampled, just faster.
 	// 4 = Up to 25 times faster.  Almost identical to imagecopyresampled for most images.
 	// 5 = No speedup. Just uses imagecopyresampled, no advantage over imagecopyresampled.
-	"THUMBNAIL_QUALITY" => 1
+	"THUMBNAIL_QUALITY" => 2
 );
 ?>

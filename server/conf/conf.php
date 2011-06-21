@@ -138,6 +138,43 @@ $PLUGINS = array(
 			"AUTOCREATE_AJXPUSER" 	=> false, 
 			"TRANSMIT_CLEAR_PASS"	=> false )
 	),
+	/*
+	"AUTH_DRIVER" => array(
+		"NAME"		=> "multi",
+		"OPTIONS"	=>	array(
+			"DRIVERS"	=> array(
+				"serial" => array(
+					"NAME"		=> "serial",
+					"OPTIONS"	=> array(
+						"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser",
+						"AUTOCREATE_AJXPUSER" 	=> false
+					)
+				),
+				"ftp" => array(
+					"NAME"		=> "ftp",
+					"OPTIONS"	=> array(
+						"REPOSITORY_ID"			=> "dyna_ftp",
+						"ADMIN_USER"			=> "admin",
+						"FTP_LOGIN_SCREEN" 		=> false
+				 	)
+				)				
+			),
+			"MASTER_DRIVER"			=> "serial",
+			"TRANSMIT_CLEAR_PASS"	=> true,
+			"LOGIN_REDIRECT"		=> false,
+		)
+	),
+	"AUTH_DRIVER" => array(
+		"NAME"		=> "ftp",
+			"OPTIONS"	=> array(
+				"REPOSITORY_ID"			=> "dyna_ftp",
+				"ADMIN_USER"			=> "admin",
+				"FTP_LOGIN_SCREEN" 		=> false,
+				"TRANSMIT_CLEAR_PASS"	=> true,
+				"LOGIN_REDIRECT"		=> false,
+		)
+	),
+	*/
 	"LOG_DRIVER" => array(
 	 	"NAME" => "text",
 	 	"OPTIONS" => array( 
@@ -149,7 +186,7 @@ $PLUGINS = array(
 	// Do not use wildcard for uploader, to keep them in a given order
 	// Warning, do not add the "meta." plugins, they are automatically
 	// detected and activated by the application.
-	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*")
+	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.http")
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
@@ -157,6 +194,10 @@ if(AJXP_Utils::userAgentIsMobile()){
 		$PLUGINS["ACTIVE_PLUGINS"][] = "gui.ios";
 	}
 }
+if(isSet($_COOKIE["AJXP_GUI"])){
+	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.".$_COOKIE["AJXP_GUI"];
+}
+
 
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.
@@ -187,6 +228,32 @@ $REPOSITORIES[0] = array(
 	),
 	
 );
+
+$REPOSITORIES["dyna_ftp"] = array(
+	"DISPLAY"		=>	"FTP", 
+	"AJXP_SLUG"		=>  "ftp",
+	"DRIVER"		=>	"ftp", 
+	"DRIVER_OPTIONS"=> array(
+		"FTP_HOST"		=>	"ftp.ajaxplorer.info", 
+		"FTP_PORT"		=>	"21",
+		"RECYCLE_BIN" 	=> 	'recycle_bin',
+		"CHMOD_VALUE"   =>  '0600',
+		"DEFAULT_RIGHTS"=>  "",
+		"PAGINATION_THRESHOLD" => 500,
+		"PAGINATION_NUMBER" => 200,
+		"META_SOURCES"		=> array(
+		/*
+			"meta.serial"=> array(
+				"meta_file_name"	=> ".ajxp_meta",
+				"meta_fields"		=> "testKey1,stars_rate,css_label",
+				"meta_labels"		=> "Test Key,Rating,Label"
+			)
+		*/
+		)
+	),
+	
+);
+
 
 // DO NOT REMOVE THIS!
 // SHARE ELEMENTS
@@ -221,8 +288,8 @@ $default_language="en";
 /* the css or the js files, and to compile 
 /* these into bundled file.
 /*********************************************/
-$AJXP_JS_DEBUG = false;
-$AJXP_SERVER_DEBUG = false;
+$AJXP_JS_DEBUG = true;
+$AJXP_SERVER_DEBUG = true;
 
 /*********************************************/
 /* SESSION CREDENTIALS
@@ -330,7 +397,7 @@ $welcomeCustomMessage = "";
  * 
  ***************************************************/
 // Put this to true or false
-define("AJXP_WEBDAV_ENABLE", false);
+define("AJXP_WEBDAV_ENABLE", true);
 
 // WEBDAV_BASEURI must be correctly set in order to make webdav work
 // Warning, you also must ENABLE APACHE REWRITE ENGINE 

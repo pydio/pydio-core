@@ -53,29 +53,43 @@ class HttpDownloader extends AJXP_Plugin{
     		$getPath = $parts["path"];
 			$basename = basename($getPath);
     	}		
+    	if(isSet($httpVars["dlfile"])){
+    	    		$dlFile = $streamData["protocol"]."://".$repository->getId().AJXP_Utils::decodeSecureMagic($httpVars["dlfile"]);
+    				$realFile = file_get_contents($dlFile);
+    				if(empty($realFile)) throw new Exception("cannot find file $dlFile for download");
+					$parts = parse_url($realFile);
+		    		$getPath = $parts["path"];
+					$basename = basename($getPath);    				
+    	}
     	
     	switch ($action){
     		case "external_download":
 				if(!defined('STDIN')){
 					$ajxpPath = AJXP_INSTALL_PATH;
-					$token = md5(time());
-					$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-					$user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), AuthService::getLoggedUser()->getId(), MCRYPT_MODE_ECB, $iv));					
-					$cmd = "php ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=external_download -r=".$repository->getId();
+					if(function_exists('mcrypt_create_iv')){
+						$token = md5(time());
+						$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+						$user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), AuthService::getLoggedUser()->getId(), MCRYPT_MODE_ECB, $iv));					
+						$cmd = "php ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=external_download -r=".$repository->getId();
+					}else{
+						$cmd = "php ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=admin -p=admin -a=external_download -r=".$repository->getId();						
+					}
 					if(isSet($httpVars["file"])) $cmd .= " --file=".$httpVars["file"]." --dir=".$httpVars["dir"];
 					else $cmd .= " --dlfile=".$httpVars["dlfile"]." --dir=".$httpVars["dir"];
 					if(isset($httpVars["delete_dlfile"]) && $httpVars["delete_dlfile"] == "true"){
 						$cmd .= " --delete_dlfile=true";
 					}
-					if (strstr(strtolower(PHP_OS), 'win')!==false){
+					if (strstr(strtolower(PHP_OS), 'windows')!==false){
 						$tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "server","tmp", md5(time()).".bat"));
 						$cmd .= "\n DEL $tmpBat";
 						AJXP_Logger::debug("Writing file $cmd to $tmpBat");
 						file_put_contents($tmpBat, $cmd);
 						pclose(popen("start /b ".$tmpBat, 'r'));
 					}else{
-						$process = new UnixProcess($cmd);
+						$tmpOutput = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "server","tmp", md5(time()).".output"));						
+						$process = new UnixProcess($cmd, $tmpOutput);
 						$hiddenFilename = $destStreamURL.".".$basename.".pid";
+						AJXP_Logger::debug(print_r($process, true)."--- ".$basename."---".$hiddenFilename);
 						@file_put_contents($hiddenFilename, $process->getPid());
 					}
 					AJXP_XMLWriter::header();
@@ -83,16 +97,7 @@ class HttpDownloader extends AJXP_Plugin{
 					AJXP_XMLWriter::close();
 					exit();			
 				}
-				
-    	    	if(isSet($httpVars["dlfile"])){
-    	    		$dlFile = $streamData["protocol"]."://".$repository->getId().AJXP_Utils::decodeSecureMagic($httpVars["dlfile"]);
-    				$realFile = @file_get_contents($dlFile);
-    				if(empty($realFile)) throw new Exception("cannot find file $dlFile for download");
-					$parts = parse_url($realFile);
-		    		$getPath = $parts["path"];
-					$basename = basename($getPath);    				
-    			}
-    					    	
+				    					    	
 				require_once AJXP_INSTALL_PATH."/server/classes/class.HttpClient.php";
 				$mess = ConfService::getMessages();		
 				session_write_close();
@@ -160,7 +165,6 @@ class HttpDownloader extends AJXP_Plugin{
 				}
 				rename($tmpFilename, $filename);
 				unlink($hiddenFilename);
-				AJXP_Logger::debug("DLFILE TO DELETE $dlFile is file ? ".is_file($dlFile), $httpVars);	
 				if(isset($dlFile) && isSet($httpVars["delete_dlfile"]) && is_file($dlFile)){
 					unlink($dlFile);
 				}	
@@ -182,12 +186,20 @@ class HttpDownloader extends AJXP_Plugin{
     		case "stop_dl":
 				$newName = ".".str_replace(".dlpart", ".ser", $basename);
     			$hiddenFilename = $destStreamURL.$newName;
-    			$data = unserialize(file_get_contents($hiddenFilename));
+    			$data = @unserialize(@file_get_contents($hiddenFilename));
+    			header("text/plain");
+    			AJXP_Logger::debug("Getting $hiddenFilename",$data);
     			if(isSet($data["pid"])){
     				$process = new UnixProcess();
     				$process->setPid($data["pid"]);
     				$process->stop();
-    			}    			
+    				unlink($hiddenFilename);
+    				unlink($destStreamURL.$basename);
+    				echo 'stop';
+    			}else{
+    				echo 'failed';
+    			}
+    			exit();
     		break;
     		default:
     		break;
