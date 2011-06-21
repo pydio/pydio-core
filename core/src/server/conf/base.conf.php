@@ -63,7 +63,7 @@ define("AJXP_THEME_FOLDER", "client/themes/oxygen");
 define("SERVER_RESOURCES_FOLDER", "server/classes");
 define("DOCS_FOLDER", "client/doc");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
-define("AJXP_SKIP_CACHE", false);
+define("AJXP_SKIP_CACHE", true);
 
 
 define("INITIAL_ADMIN_PASSWORD", "admin");

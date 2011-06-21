@@ -101,6 +101,11 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>					
+			<action name="stop_dl">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>					
 		</actions>	
 		<hooks>
 			<serverCallback hookName="ls.metadata" methodName="detectDLParts"></serverCallback>

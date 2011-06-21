@@ -1199,6 +1199,28 @@ Class.create("FilesList", SelectableElements, {
 		};
 		element.update(div);
 		div.insert({top:span});
+		if(ajxpNode.getMetadata().get("process_stoppable")){
+			var stopButton = new Element('a').update("X");
+			stopButton.observe("click", function(){
+				var conn = new Connexion();
+				conn.setParameters({
+					action: 'stop_dl',
+					file : ajxpNode.getPath(),
+					dir : ajaxplorer.getContextNode().getPath()
+				});
+				conn.onComplete = function(transport){
+					if(transport.responseText == 'stop' && $(uuid).pe) {
+						$(uuid).pe.stop();
+						$(uuid).pgBar.setPercentage(0);
+						window.setTimeout(function(){
+							ajaxplorer.actionBar.fireAction("refresh");
+						}, 2);
+					}
+				};
+				conn.sendAsync();
+			});
+			div.insert({bottom:stopButton});			
+		}
 		span.setAttribute('target_size', ajxpNode.getMetadata().get("target_bytesize"));
 		window.setTimeout(function(){
 			span.pgBar = new JS_BRAMUS.jsProgressBar(span, percent, options);
@@ -1223,7 +1245,8 @@ Class.create("FilesList", SelectableElements, {
 					}
 				};
 				conn.sendAsync();
-			}, 2);			
+			}, 2);
+			$(uuid).pe = pe;
 		}, 2);
 	},
 	

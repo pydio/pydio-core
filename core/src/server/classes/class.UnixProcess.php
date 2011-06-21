@@ -7,17 +7,24 @@
 class UnixProcess{
     private $pid;
     private $command;
+    private $output;
 
-    public function __construct($cl=false){
-        if ($cl != false){
+    public function __construct($cl=false, $output=false){
+        if($output != false) {
+          	$this->output = $output;
+        }else {
+           	$this->output = "/dev/null";
+        }
+    	if ($cl != false){
             $this->command = $cl;
             $this->runCom();
         }
     }
     private function runCom(){
-        $command = 'nohup '.$this->command.' > /dev/null 2>&1 & echo $!';
+        $command = $this->command.' > '.$this->output.' 2>&1 & echo $!';
         exec($command ,$op);
         $this->pid = (int)$op[0];
+        $this->command = $command;
     }
 
     public function setPid($pid){
