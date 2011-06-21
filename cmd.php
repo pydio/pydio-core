@@ -72,7 +72,7 @@ session_start();
 
 $optArgs = array();
 $options = array();
-$regex = '/^-(-?)([a-z]*)=(.*)/';
+$regex = '/^-(-?)([a-zA-z0-9_]*)=(.*)/';
 foreach ($argv as $key => $argument){
 	if(preg_match($regex, $argument, $matches)){
 		if($matches[1] == "-"){
@@ -83,7 +83,15 @@ foreach ($argv as $key => $argument){
 	}
 }
 $optUser = $options["u"];
-$optPass = $options["p"];
+if(isSet($options["p"])){
+	$optPass = $options["p"];
+}else{
+	// Consider "u" is a crypted version of u:p
+	$optToken = $options["t"];
+	$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+    $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken."\1CDAFx¨op#"), base64_decode($optUser), MCRYPT_MODE_ECB, $iv));
+}
+
 $optAction = $options["a"];
 $optRepoId = $options["r"] OR false;
 
@@ -104,7 +112,7 @@ if(AuthService::usersEnabled())
 	if($seed != -1){
 		$optPass = md5(md5($optPass).$seed);
 	}
-	$loggingResult = AuthService::logUser($optUser, $optPass, false, false, $seed);
+	$loggingResult = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
 	// Check that current user can access current repository, try to switch otherwise.
 	$loggedUser = AuthService::getLoggedUser();
 	if($loggedUser != null)
