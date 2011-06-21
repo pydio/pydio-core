@@ -62,22 +62,49 @@
 				<processing>
 					<clientCallback><![CDATA[
 						fileName = ajaxplorer.getUserSelection().getUniqueFileName();
-						var connexion = new Connexion();
-						connexion.addParameter('get_action', 'get_content');
-						connexion.addParameter('file', fileName);	
-						connexion.onComplete = function(transp){
-							var dlFile = transp.responseText;
-							var crtDir = ajaxplorer.getContextNode().getPath();
-							var bgManager = ajaxplorer.actionBar.bgManager;
-							bgManager.queueAction("external_download", new Hash({file:dlFile, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(dlFile)+" " + MessageHash["httpdownloader.7"]);
-							bgManager.next();
-						}.bind(this);
-						connexion.sendSync();		
+						var crtDir = ajaxplorer.getContextNode().getPath();
+						var bgManager = ajaxplorer.actionBar.bgManager;
+						bgManager.queueAction("external_download", new Hash({dlfile:fileName, dir:crtDir}), MessageHash["httpdownloader.6"]+ " " +getBaseName(fileName)+" " + MessageHash["httpdownloader.7"]);
+						bgManager.next();						
 						]]></clientCallback>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+			<action name="generate_dl_bookmarklet">
+				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/external_download.png" accessKey="httpdownloader.3" hasAccessKey="false">
+					<context selection="false" dir="true" recycle="hidden"
+						actionBar="false" contextMenu="true" infoPanel="false"
+						actionBarGroup="put" inZip="false">
+					</context>
+				</gui>
+				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
+				<processing>
+					<clientCallback prepareModal="true" dialogOpenForm="dynamic_bookmarklet">
+						<dialogOnOpen><![CDATA[
+							var root = document.location.href;
+							root = root.substring(0,root.lastIndexOf("/") + 1);
+							var repository = ajaxplorer.user.getActiveRepository();
+							var folder = ajaxplorer.getContextNode().getPath();
+							var bmletValue = "javascript:(function(){window.ajxp_bm_target='"+root+"',window.ajxp_bm_repository_id='"+repository+"', window.ajxp_bm_folder='"+folder+"'; var d=document,s=d.createElement('scr'+'ipt'),b=d.body,l=d.location;s.setAttribute('src','http://localhost/ajaxplorer/client/js/bookmarklet/ajxp.js?t='+(new Date().getTime()));b.appendChild(s)})();";
+							$('bookmarklet_link').setAttribute("href", bmletValue);
+						]]></dialogOnOpen>
+					</clientCallback>
+					<clientForm id="dynamic_bookmarklet"><![CDATA[
+					<div id="dynamic_bookmarklet">
+						<a href="" id="bookmarklet_link" title="Download to AjaXplorer"  alt="Download to AjaXplorer">Drag me to your bookmark bar</a>
+					</div>
+					]]></clientForm>
+				</processing>
+			</action>
+			<action name="update_dl_data">
+				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>					
 		</actions>	
+		<hooks>
+			<serverCallback hookName="ls.metadata" methodName="detectDLParts"></serverCallback>
+		</hooks>			
 	</registry_contributions>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
