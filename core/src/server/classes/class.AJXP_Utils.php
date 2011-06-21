@@ -230,6 +230,15 @@ class AJXP_Utils
 		if(isSet($parameters["skipIOS"])){
 			setcookie("SKIP_IOS", "true");
 		}
+		if(isSet($parameters["gui"])){
+			setcookie("AJXP_GUI", $parameters["gui"]);
+			if($parameters["gui"] == "light") $session["USE_EXISTING_TOKEN_IF_EXISTS"] = true;
+		}else{
+			if(isSet($session["USE_EXISTING_TOKEN_IF_EXISTS"])){
+				unset($session["USE_EXISTING_TOKEN_IF_EXISTS"]);
+			}
+			setcookie("AJXP_GUI", null);			
+		}
 	}
 	
 	
