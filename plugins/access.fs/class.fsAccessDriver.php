@@ -412,7 +412,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_HTML_STRICT);
 				$filename = substr($filename, 0, ConfService::getConf("MAX_CHAR"));
 				$this->filterUserSelectionToHidden(array($filename));
-				$error = $this->createEmptyFile($dir, $filename);
+				$content = "";
+				if(isSet($httpVars["content"])){
+					$content = $httpVars["content"];
+				}
+				$error = $this->createEmptyFile($dir, $filename, $content);
 				if(isSet($error)){
 					throw new AJXP_Exception($error);
 				}
@@ -1245,7 +1249,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		return null;		
 	}
 	
-	function createEmptyFile($crtDir, $newFileName)
+	function createEmptyFile($crtDir, $newFileName, $content = "")
 	{
 		$mess = ConfService::getMessages();
 		if($newFileName=="")
@@ -1260,16 +1264,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		{
 			return "$mess[38] $crtDir $mess[99]";
 		}
-		
 		$fp=fopen($this->urlBase."$crtDir/$newFileName","w");
 		if($fp)
 		{
+			if($content != ""){
+				fputs($fp, $content);
+			}
 			if(preg_match("/\.html$/",$newFileName)||preg_match("/\.htm$/",$newFileName))
 			{
 				fputs($fp,"<html>\n<head>\n<title>New Document - Created By AjaXplorer</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">\n</head>\n<body bgcolor=\"#FFFFFF\" text=\"#000000\">\n\n</body>\n</html>\n");
 			}
+			$this->changeMode($this->urlBase."$crtDir/$newFileName");
 			fclose($fp);
-			$this->changeMode($this->urlBase."/$crtDir/$newFileName");
 			return null;
 		}
 		else
