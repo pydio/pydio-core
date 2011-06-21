@@ -57,6 +57,9 @@ class AuthService
 	
 	
 	static function generateSecureToken(){
+		if(isSet($_SESSION["SECURE_TOKEN"]) && isSet($_SESSION["USE_EXISTING_TOKEN_IF_EXISTS"])){
+			return $_SESSION["SECURE_TOKEN"];
+		}
 		$_SESSION["SECURE_TOKEN"] = md5(time());
 		return $_SESSION["SECURE_TOKEN"];
 	}
