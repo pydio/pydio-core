@@ -58,8 +58,11 @@ class webdavAccessWrapper extends fsAccessWrapper {
 		$user = $credentials["user"];
 		$password = $credentials["password"];
 		if($user!=null && $password!=null){
-			$host = ($hostParts["protocol"]=="https"?"webdavs":"webdav")."://$user:$password@".$hostParts["host"];
-		}else{	
+			$host = ($hostParts["scheme"]=="https"?"webdavs":"webdav")."://$user:$password@".$hostParts["host"];
+            if(isSet($hostParts["port"])){
+                $host .= ":".$hostParts["port"];
+            }
+		}else{
 			$host = str_replace(array("http", "https"), array("webdav", "webdavs"), $host);
 		}
 		// MAKE SURE THERE ARE NO // OR PROBLEMS LIKE THAT...
