@@ -62,6 +62,9 @@ class dropboxAccessDriver extends fsAccessDriver
 		}
 	}
 	
+	function isWriteable($dir, $type){
+		return true;
+	}
 }
 
 ?>
