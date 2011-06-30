@@ -179,7 +179,7 @@ class dropboxWrapper implements AjxpWrapper {
 	
 	
 	public function stream_flush() {
-		return flush(self::$crtHandle);
+		return fflush(self::$crtHandle);
 	}
 	
 	public function stream_read($count) {
@@ -206,7 +206,7 @@ class dropboxWrapper implements AjxpWrapper {
 			}			
 		}
 		unlink(self::$crtTmpFile);
-		return $res;	
+		return $res;
 	}
 	
 	public function stream_tell() {
@@ -233,5 +233,3 @@ class dropboxWrapper implements AjxpWrapper {
 		return true;
 	}	
 }
-
-?>
