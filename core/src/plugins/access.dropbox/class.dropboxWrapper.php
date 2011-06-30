@@ -96,25 +96,38 @@ class dropboxWrapper implements AjxpWrapper {
 	public function rename($path_from, $path_to) {
 		$path1 = $this->initPath($path_from);
 		$path2 = $this->initPath($path_to);
-		AJXP_Logger::debug("FROM > TO ".$path_from."-".$path_to);
-		AJXP_Logger::debug("1 > 2 ".$path1."-".$path2);
 		self::$dropbox->copy($path1, $path2);
 		self::$dropbox->delete($path1);
 	}
 	
 	public function mkdir($path, $mode, $options) {
 		$path = $this->initPath($path);
-		self::$dropbox->createFolder($path);				
+		try{
+			self::$dropbox->createFolder($path);
+		}catch (Dropbox_Exception $e){
+			return false;
+		}
+		return true;
 	}
 	
 	public function rmdir($path, $options) {
 		$path = $this->initPath($path);
-		self::$dropbox->delete($path);		
+		try{
+			self::$dropbox->delete($path);
+		}catch (Dropbox_Exception $e){
+			return false;
+		}
+		return true;
 	}
 	
 	public function unlink($path) {
 		$path = $this->initPath($path);
-		self::$dropbox->delete($path);
+		try{
+			self::$dropbox->delete($path);
+		}catch (Dropbox_Exception $e){
+			return false;
+		}
+		return true;
 	}
 	
 	public function url_stat($path, $flags) {
@@ -187,10 +200,10 @@ class dropboxWrapper implements AjxpWrapper {
 			$path = $this->initPath(self::$crtWritePath);
 			try{
 				$postRes = self::$dropbox->putFile($path, self::$crtTmpFile);
+				AJXP_Logger::debug("Post to $path succeeded:");				
 			}catch(Dropbox_Exception $dE){
-				AJXP_Logger::debug("Post to $path failed :".$dE->getMessage());
-			}
-
+				AJXP_Logger::debug("Post to $path failed :".$dE->getMessage());				
+			}			
 		}
 		unlink(self::$crtTmpFile);
 		return $res;	
