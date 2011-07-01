@@ -2,9 +2,9 @@
 <ajxp_mixins>
 	<credentials_consumer>
 		<server_settings uuidAttr="name">
-			<param group="User Credentials" name="USER" type="string" label="User" description="User name - Can be overriden on a per-user basis." mandatory="false"/>
+			<param group="User Credentials" name="USER" type="string" label="User" description="User name - Can be overriden on a per-user basis (see users 'Personal Data' tab)" mandatory="false"/>
 			<param group="User Credentials" name="PASS" type="password" label="Password" description="User password - Can be overriden on a per-user basis." mandatory="false"/>
-			<param group="User Credentials" name="USE_SESSION_CREDENTIALS" type="boolean" label="Use session credentials" description="Try to use the current AjaXplorer user credentials for connecting" mandatory="false" default="false"/>
+			<param group="User Credentials" name="USE_SESSION_CREDENTIALS" type="boolean" label="Session credentials" description="Try to use the current AjaXplorer user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!" mandatory="false" default="false"/>
 			<user_param name="USER" type="string" label="User" description="User name" mandatory="false"/>
 			<user_param name="PASS" type="password" label="Password" description="User password" mandatory="false"/>
 		</server_settings>
