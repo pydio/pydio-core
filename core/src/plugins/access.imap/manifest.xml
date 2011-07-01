@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="imap" label="Mailbox (Imap or POP)" description="Access a mailbox attachments" mixins="slug_provider">
+<ajxpdriver name="imap" label="Mailbox (Imap or POP)" description="This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension." mixins="slug_provider">
 	<client_settings icon="plugins/access.imap/resources/images/16/mail_folder_inbox.png">
 		<resources>
 			<img_library alias="imap_images" path="plugins/access.imap/resources/images"/>	
@@ -7,17 +7,17 @@
 		</resources>
 	</client_settings>
 	<server_settings>
-		<param name="HOST" type="string" label="Host" description="Mail server host" mandatory="true"/>
-		<param name="PORT" type="string" label="Port" description="Mail server port" mandatory="true"/>
-		<param name="SSL" type="string" label="Ssl" description="Secure?" mandatory="true"/>
-		<param name="BOX_TYPE" type="string" label="Type" description="Imap or Pop?" mandatory="true" default="imap"/>						
-		<param name="USER" type="string" label="User" description="User account" mandatory="true"/>
-		<param name="PASS" type="password" label="Password" description="User Password" mandatory="true"/>						
-		<param name="MAILBOX" type="string" label="Default Mailbox" description="Mailbox to connect by default" mandatory="false"/>						
-		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default="r"/>
-		<param name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
-		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="20"/>
-		<param name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="20"/>
+		<param name="HOST" group="Mail Server" type="string" label="Host" description="Server host" mandatory="true"/>
+		<param name="PORT" group="Mail Server" type="string" label="Port" description="Server port" mandatory="true"/>
+		<param name="SSL" group="Mail Server" type="string" label="Ssl" description="Secure?" mandatory="true"/>
+		<param name="BOX_TYPE" group="Mail Server" type="select" label="Type" choices="imap,pop3" description="Imap or Pop Server?" mandatory="true" default="imap"/>
+		<param name="USER" group="Mailbox Definition" type="string" label="User" description="User account" mandatory="true"/>
+		<param name="PASS" group="Mailbox Definition" type="password" label="Password" description="User Password" mandatory="true"/>
+		<param name="MAILBOX" group="Mailbox Definition" type="string" label="Default Mailbox" description="Mailbox to connect by default" mandatory="false"/>
+        <param name="DEFAULT_RIGHTS" group="Repository Options" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>
+		<!--<param name="CHARSET" group="Repository Options" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>-->
+		<param name="PAGINATION_THRESHOLD" group="Repository Options" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="20"/>
+		<param name="PAGINATION_NUMBER" group="Repository Options" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="20"/>
 	</server_settings>
 	<class_definition filename="plugins/access.imap/class.imapAccessDriver.php" classname="imapAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.imap/class.imapAccessWrapper.php" classname="imapAccessWrapper" protocol="ajxp.mailbox"/>

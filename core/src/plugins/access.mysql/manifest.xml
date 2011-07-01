@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="mysql" label="Mysql Database" description="Browse and update records in a MySQL database">
+<ajxpdriver name="mysql" label="Mysql Database" description="This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin.">
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
 			<js file="plugins/access.mysql/resources/js/class.SQLEditor.js" className="SQLEditor"/>

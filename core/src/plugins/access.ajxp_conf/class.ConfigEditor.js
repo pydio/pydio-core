@@ -350,7 +350,7 @@ ConfigEditor = Class.create({
 			var tag = customData[i];
 			customValues.set(tag.getAttribute('name'), tag.getAttribute('value'));
 		}
-		this.createParametersInputs(newTd, customParams, false, customValues);
+		this.createParametersInputs(newTd, customParams, false, customValues, false, true);
 		if(!nosubmit){
 			var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/actions/22")});
 			submitButton.observe("click", function(){
@@ -400,7 +400,7 @@ ConfigEditor = Class.create({
 			var tag = walletValues[i];
 			repoValues.set(tag.getAttribute('option_name'), tag.getAttribute('option_value'));
 		}
-		this.createParametersInputs(newTd, repoParams, false, repoValues);
+		this.createParametersInputs(newTd, repoParams, false, repoValues, null, true);
 		var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/actions/22")});
 		submitButton.observe("click", function(){
 			this.submitUserParamsForm(userId, repoId);
@@ -833,7 +833,7 @@ ConfigEditor = Class.create({
 					driverParamsHash.push(this.driverParamNodeToHash(metaDefNodes[i]));
 				}
 				paramsValues = new Hash(metaSourcesData[plugId]);
-				this.createParametersInputs(form, driverParamsHash, true, paramsValues, false);
+				this.createParametersInputs(form, driverParamsHash, true, paramsValues, false, true);
 				metaPane.insert(form);
 			}
 		}
@@ -862,7 +862,7 @@ ConfigEditor = Class.create({
 				for(var i=0;i<metaDefNodes.length;i++){
 					driverParamsHash.push(this.driverParamNodeToHash(metaDefNodes[i]));
 				}				
-				this.createParametersInputs(addFormDetail, driverParamsHash, true);				
+				this.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
 			}
 			modal.refreshDialogAppearance();
 		}.bind(this));
@@ -956,7 +956,7 @@ ConfigEditor = Class.create({
 		return legend;
 	},
 	
-	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled){
+	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion){
         var groupDivs = $H({});
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
@@ -1010,13 +1010,16 @@ ConfigEditor = Class.create({
                 element += '</select>';
             }
 			var div = new Element('div', {className:"SF_element"}).update('<div class="SF_label">'+label+(mandatory?'*':'')+' :</div>'+element);
-			//form.insert({'bottom':div});
 			if(desc){
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
-            var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
-            gDiv.insert(div);
-            groupDivs.set(group, gDiv);
+            if(skipAccordion){
+			    form.insert({'bottom':div});
+            }else{
+                var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
+                gDiv.insert(div);
+                groupDivs.set(group, gDiv);
+            }
 		});
         if(!groupDivs.size()) return;
         var firstGroup = true;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="smb" label="Samba" description="Browse a Samba Server" mixins="credentials_consumer,filesystem_commons">
+<ajxpdriver name="smb" label="Samba" description="Access a samba share. Based on a PHP wrapper around the command-line smbclient tool." mixins="credentials_consumer,filesystem_commons">
 	<client_settings icon="plugins/access.fs/icon.png"/>
 	<server_settings>
 		<param name="HOST" type="string" label="Host" description="Full path to the Samba Share without trailing slash. Can contain user:password too." mandatory="true" default="//SERVER_IP/SHARE"/>

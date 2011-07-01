@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="remote_fs" label="Remote Server (via API)" description="Access a remote server implementing the AjaXplorer API (remote server with an ajaxplorer installed for example)">
+<ajxpdriver name="remote_fs" label="Remote Server (via API)" description="Access a remote server implementing the AjaXplorer API (most commonly a remote server with another AjaXplorer installed)">
 	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png"/>
 	<server_settings>
 		<param name="HOST" type="string" label="Host" description="Domain name or IP to the remote server, without http" mandatory="true"/>
