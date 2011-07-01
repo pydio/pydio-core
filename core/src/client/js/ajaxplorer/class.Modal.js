@@ -413,14 +413,17 @@ Class.create("Modal", {
 			if(this.tipTimer){
 				window.clearTimeout(this.tipTimer);
 			}
+            element.addClassName("simple_tooltip_observer_active");
 			this.tooltip.show();
 		}.bind(this) );
 		element.observe("mouseout", function(event){
 			if(!this.tooltip) return;
 			this.tipTimer = window.setTimeout(function(){
 				this.tooltip.hide();
-			}.bind(this), 300);
+			}.bind(this), 200);
+            element.removeClassName("simple_tooltip_observer_active");
 		}.bind(this) );
+        element.addClassName("simple_tooltip_observer");
 	},
 	/**
 	 * Close the Message
