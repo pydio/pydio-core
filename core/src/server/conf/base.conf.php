@@ -36,7 +36,9 @@
 if(function_exists("date_default_timezone_set") and function_exists("date_default_timezone_get")){
 	@date_default_timezone_set(@date_default_timezone_get());
 }
-
+if(function_exists("xdebug_disable")){
+	xdebug_disable();
+}
 @error_reporting(E_ALL & ~E_NOTICE);
 //Windows users may have to uncomment this
 //setlocale(LC_ALL, '');
@@ -63,7 +65,7 @@ define("AJXP_THEME_FOLDER", "client/themes/oxygen");
 define("SERVER_RESOURCES_FOLDER", "server/classes");
 define("DOCS_FOLDER", "client/doc");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
-define("AJXP_SKIP_CACHE", true);
+define("AJXP_SKIP_CACHE", false);
 
 
 define("INITIAL_ADMIN_PASSWORD", "admin");
