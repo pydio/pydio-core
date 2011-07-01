@@ -2,16 +2,25 @@
 <ajxp_mixins>
 	<credentials_consumer>
 		<server_settings uuidAttr="name">
-			<param name="USER" type="string" label="User" description="User name - Can be overriden on a per-user basis." mandatory="false"/>
-			<param name="PASS" type="password" label="Password" description="User password - Can be overriden on a per-user basis." mandatory="false"/>
-			<param name="USE_SESSION_CREDENTIALS" type="boolean" label="Use session credentials" description="Try to use the current AjaXplorer user credentials for connecting" mandatory="false" default="false"/>
+			<param group="User Credentials" name="USER" type="string" label="User" description="User name - Can be overriden on a per-user basis." mandatory="false"/>
+			<param group="User Credentials" name="PASS" type="password" label="Password" description="User password - Can be overriden on a per-user basis." mandatory="false"/>
+			<param group="User Credentials" name="USE_SESSION_CREDENTIALS" type="boolean" label="Use session credentials" description="Try to use the current AjaXplorer user credentials for connecting" mandatory="false" default="false"/>
 			<user_param name="USER" type="string" label="User" description="User name" mandatory="false"/>
 			<user_param name="PASS" type="password" label="Password" description="User password" mandatory="false"/>
 		</server_settings>
 	</credentials_consumer>
 	<slug_provider>
 		<server_settings uuidAttr="name">
-			<param name="AJXP_SLUG" type="string" label="Alias" description="Alias for replacing the generated unique id of the repository" mandatory="false"/>
+			<param group="Repository Slug" name="AJXP_SLUG" type="string" label="Alias" description="Alias for replacing the generated unique id of the repository" mandatory="false"/>
 		</server_settings>
 	</slug_provider>
+    <filesystem_commons>
+        <server_settings uuidAttr="name">
+            <param group="Filesystem Commons" name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>
+            <param group="Filesystem Commons" name="DEFAULT_RIGHTS" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>
+            <param group="Filesystem Commons" name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
+            <param group="Filesystem Commons" name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
+            <param group="Filesystem Commons" name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
+        </server_settings>
+    </filesystem_commons>
 </ajxp_mixins>

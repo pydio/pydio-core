@@ -21,6 +21,7 @@ js/lib/scriptaculous/src/slider.js
 js/lib/prototype/shadower.js
 js/lib/prototype/corners.js
 js/lib/prototype/carousel.js
+js/lib/prototype/accordion.js
 js/lib/webfx/xtree.js
 js/lib/webfx/ajxptree.js
 js/ajaxplorer/class.User.js

@@ -680,10 +680,14 @@ ConfigEditor = Class.create({
 		this.createDriverForm(dName);
 		if(dName != "0"){
 			var height = 130 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
-			if(height > 425) height=425;
+            var addscroll = false;
+			if(height > 425) {
+                height=425;
+                addscroll = true;
+            };
 		}
 		new Effect.Morph(this.driverForm.up('div'),{
-			style:'height:'+height + 'px',
+			style:'height:'+height + 'px' + (addscroll?'overflow-x:scroll':'overflow-x:auto;'),
 			duration:0.3, 
 			afterFinish : function(){
 				modal.refreshDialogPosition();
@@ -693,13 +697,16 @@ ConfigEditor = Class.create({
 	},
 	
 	createDriverForm : function(driverName){
+        this.driverForm.update('');
 		if(driverName == "0"){
-			this.driverForm.update('');
-			return;
+			//return;
 		}
 		var dOpt = this.drivers.get(driverName);
-		this.driverForm.update('<div style="padding-top:2px; padding-left:127px; margin-top: 30px; color:#79f; border-top:1px solid #ccc;">' + dOpt.get('description')+'<br></div>');
 		this.createParametersInputs(this.driverForm, dOpt.get('params'), false);
+        var firstAcc = this.driverForm.down(".accordion_content");
+        if(!firstAcc) firstAcc = this.driverForm;
+		firstAcc.insert({top:'<div class="dialogLegend">' + dOpt.get('description')+'</div>'});
+
 	},
 	
 	repoButtonClick  : function(validate){
@@ -918,7 +925,7 @@ ConfigEditor = Class.create({
 	/*       COMMON FUNCTIONS            */
 	/*************************************/	
 	driverParamNodeToHash : function(driverNode){
-		var driversAtts = $A(['name', 'type', 'label', 'description', 'default', 'mandatory']);
+		var driversAtts = $A(['name', 'group', 'type', 'label', 'description', 'default', 'mandatory', 'choices']);
 		var driverHash = new Hash();
 		driversAtts.each(function(attName){
 			driverHash.set(attName, (XPathGetSingleNodeText(driverNode, '@'+attName) || ''));
@@ -950,6 +957,7 @@ ConfigEditor = Class.create({
 	},
 	
 	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled){
+        var groupDivs = $H({});
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
 			if(param.get('labelId')){
@@ -961,6 +969,10 @@ ConfigEditor = Class.create({
 			if(param.get('descriptionId')){
 				desc = MessageHash[param.get('descriptionId')];
 			}
+            var group = param.get('group') || 'Repository Options';
+            if(param.get('groupId')){
+                group = MessageHash[param.get('groupId')];
+            }
 			var mandatory = false;
 			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
 			var defaultValue = (values?'':(param.get('default') || ""));
@@ -982,13 +994,50 @@ ConfigEditor = Class.create({
 				element = '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
 				element = element + '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
 				element = '<div class="SF_input">'+element+'</div>';
-			}
+			}else if(type == 'select' && param.get('choices')){
+                var choices = param.get('choices').split(",");
+                element = '<select class="SF_input" name="'+name+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" >';
+                if(!mandatory) element += '<option value=""></option>';
+                for(var k=0;k<choices.length;k++){
+                    var cLabel, cValue;
+                    var cSplit = choices[k].split("|");
+                    cValue = cSplit[0];
+                    if(cSplit.length > 1 ) cLabel = cSplit[1];
+                    else cLabel = cValue;
+                    var selectedString = (defaultValue == cValue ? ' selected' : '');
+                    element += '<option value="'+cValue+'"'+selectedString+'>'+cLabel+'</option>';
+                }
+                element += '</select>';
+            }
 			var div = new Element('div', {className:"SF_element"}).update('<div class="SF_label">'+label+(mandatory?'*':'')+' :</div>'+element);
-			form.insert({'bottom':div});
+			//form.insert({'bottom':div});
 			if(desc){
-				modal.simpleTooltip(div.select('.SF_label')[0], desc);
+				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
+            var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
+            gDiv.insert(div);
+            groupDivs.set(group, gDiv);
 		});
+        if(!groupDivs.size()) return;
+        var firstGroup = true;
+        groupDivs.each(function(pair){
+            var title = new Element('div',{className:'accordion_toggle'}).update(pair.key);
+            form.insert(title);
+            form.insert(pair.value);
+        });
+        this.accordion = new accordion(form, {
+            classNames : {
+                toggle : 'accordion_toggle',
+                toggleActive : 'accordion_toggle_active',
+                content : 'accordion_content'
+            },
+            defaultSize : {
+                width : '360px',
+                height: null
+            },
+            direction : 'vertical'
+        });
+        this.accordion.activate(form.down('div.accordion_toggle'));
 	},
 	
 	submitParametersInputs : function(form, parametersHash, prefix){
