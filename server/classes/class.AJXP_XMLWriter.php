@@ -123,7 +123,11 @@ class AJXP_XMLWriter
 	 * @param Exception $exception
 	 */
 	static function catchException($exception){
-		AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), null);
+        try{
+            AJXP_XMLWriter::catchError($exception->getCode(), SystemTextEncoding::fromUTF8($exception->getMessage()), $exception->getFile(), $exception->getLine(), null);
+        }catch(Exception $innerEx){
+            print get_class($innerEx)." thrown within the exception handler! Message was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine();
+        }
 	}
 	
 	static function replaceAjxpXmlKeywords($xml, $stripSpaces = false){

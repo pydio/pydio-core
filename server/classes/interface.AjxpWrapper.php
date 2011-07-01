@@ -24,7 +24,15 @@ interface AjxpWrapper
      * @param unknown_type $chmodValue
      */
     public static function changeMode($path, $chmodValue);	
-	
+
+    /**
+     * Describe whether the current wrapper operates on a remote server or not.
+     * @static
+     * @abstract
+     * @return boolean
+     */
+    public static function isRemote();
+
     /**
      *
      *
