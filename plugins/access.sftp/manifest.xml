@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="sftp" label="FTP over SSH" description="Access FTP via SSH server" mixins="credentials_consumer,filesystem_commons">
+<ajxpdriver name="sftp" label="FTP over SSH" description="Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems." mixins="credentials_consumer,filesystem_commons">
 	<client_settings icon="plugins/access.sftp/icon.png"/>
 	<server_settings>
 		<param name="SERV" type="string" label="Server URL" description="Path to remote sftp server" mandatory="true"/>

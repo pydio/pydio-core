@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="ftp" label="FTP Server" description="Connect to a remote FTP server" mixins="credentials_consumer,filesystem_commons,slug_provider">
+<ajxpdriver name="ftp" label="FTP Server" description="This driver can access a remote FTP server" mixins="credentials_consumer,filesystem_commons,slug_provider">
 	<client_settings icon="plugins/access.ftp/icon.png"/>
 	<server_settings>
 		<param group="Connexion" name="FTP_HOST" type="string" label="Host" description="Ftp Host to connect to" mandatory="true"/>

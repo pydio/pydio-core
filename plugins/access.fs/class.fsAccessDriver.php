@@ -940,10 +940,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					if(extension_loaded('fileinfo')  && $this->wrapperClassName == "fsAccessWrapper"){
             			$fInfo = new fInfo( FILEINFO_MIME );
             			$realfile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $filePathOrData);
-            			$mimeType = $fInfo->file( $realfile);	
+            			$mimeType = $fInfo->file( $realfile);
             			$splitChar = explode(";", $mimeType);
             			$mimeType = trim($splitChar[0]);
-            			AJXP_Logger::debug("Detected mime $mimeType for $realFile");		
+            			AJXP_Logger::debug("Detected mime $mimeType for $realfile");
 					}else{
 						$mimeType = AJXP_Utils::getStreamingMimeType(basename($filePathOrData));
 					}					
