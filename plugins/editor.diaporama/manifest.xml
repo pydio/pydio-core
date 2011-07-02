@@ -28,7 +28,7 @@
 	]]></clientForm>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="move.metadata" methodName="removeThumbnail"></serverCallback>
+			<serverCallback hookName="node.change" methodName="removeThumbnail"></serverCallback>
 		</hooks>		
 		<actions>
 			<action name="slideshow_sel">
@@ -64,7 +64,7 @@
 			</action>
 		</actions>
 		<hooks>
-			<serverCallback hookName="ls.metadata" methodName="extractImageMetaData"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractImageMetaData"></serverCallback>
 		</hooks>
 		<client_configs>
 			<component_config className="FilesList">

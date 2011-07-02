@@ -85,11 +85,18 @@ class ImagePreviewer extends AJXP_Plugin {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param AJXP_Node $oldFile
+	 * @param AJXP_Node $newFile
+	 * @param Boolean $copy
+	 */
 	public function removeThumbnail($oldFile, $newFile = null, $copy = false){
-		if(!$this->handleMime($oldFile)) return;
+		if($oldFile == null) return ;
+		if(!$this->handleMime($oldFile->getUrl())) return;
 		if($newFile == null || $copy == false){
-			AJXP_Logger::debug("Should find cache item ".$oldFile);
-			AJXP_Cache::clearItem("diaporama_200", $oldFile);			
+			AJXP_Logger::debug("Should find cache item ".$oldFile->getUrl());
+			AJXP_Cache::clearItem("diaporama_200", $oldFile->getUrl());			
 		}
 	}
 	
@@ -116,15 +123,23 @@ class ImagePreviewer extends AJXP_Plugin {
 		}		
 	}
 	
-	public function extractImageMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
-		$isImage = AJXP_Utils::is_image($currentNode);
-		$metadata["is_image"] = $isImage;
+	//public function extractImageMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
+	/**
+	 * Enrich node metadata
+	 * @param AJXP_Node $ajxpNode
+	 */
+	public function extractImageMetadata(&$ajxpNode){
+		$currentPath = $ajxpNode->getUrl();
+		$wrapperClassName = $ajxpNode->wrapperClassName;
+		$isImage = AJXP_Utils::is_image($currentPath);
+		$ajxpNode->is_image = $isImage;
+		if(!$isImage) return;
 		$setRemote = false;
 		$remoteWrappers = $this->pluginConf["META_EXTRACTION_REMOTEWRAPPERS"];
 		$remoteThreshold = $this->pluginConf["META_EXTRACTION_THRESHOLD"];		
 		if(in_array($wrapperClassName, $remoteWrappers)){
-			if($remoteThreshold != 0 && isSet($metadata["bytesize"])){
-				$setRemote = ($metadata["bytesize"] > $remoteThreshold);
+			if($remoteThreshold != 0 && isSet($ajxpNode->bytesize)){
+				$setRemote = ($ajxpNode->bytesize > $remoteThreshold);
 			}else{
 				$setRemote = true;
 			}
@@ -132,25 +147,20 @@ class ImagePreviewer extends AJXP_Plugin {
 		if($isImage)
 		{
 			if($setRemote){
-				$metadata["image_type"] = "N/A";
-				$metadata["image_width"] = "N/A";
-				$metadata["image_height"] = "N/A";
-				$metadata["readable_dimension"] = "";
+				$ajxpNode->image_type = "N/A";
+				$ajxpNode->image_width = "N/A";
+				$ajxpNode->image_height = "N/A";
+				$ajxpNode->readable_dimension = "";
 			}else{
-				if(!isSet($realFile)){
-					$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode, true);
-					$isRemote = call_user_func(array($wrapperClassName, "isRemote"));
-					if($isRemote){
-						register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $realFile);
-					}
-				}
+				$realFile = $ajxpNode->getRealFile();
 				list($width, $height, $type, $attr) = getimagesize($realFile);
-				$metadata["image_type"] = image_type_to_mime_type($type);
-				$metadata["image_width"] = $width;
-				$metadata["image_height"] = $height;
-				$metadata["readable_dimension"] = $width."px X ".$height."px";
+				$ajxpNode->image_type = image_type_to_mime_type($type);
+				$ajxpNode->image_width = $width;
+				$ajxpNode->image_height = $height;
+				$ajxpNode->readable_dimension = $width."px X ".$height."px";
 			}
 		}
+		AJXP_Logger::debug("CURRENT NODE IN EXTRACT IMAGE METADATA ", $ajxpNode);
 	}
 	
 	protected function handleMime($filename){

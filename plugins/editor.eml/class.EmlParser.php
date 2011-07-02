@@ -185,7 +185,14 @@ class EmlParser extends AJXP_Plugin{
     	}    	    	
 	}
 	
-	public function extractMimeHeaders($currentNode, &$metadata, $wrapperClassName, &$realFile){
+	/**
+	 * @param AJXP_Node $ajxpNode
+	 */
+	public function extractMimeHeaders(&$ajxpNode){	
+		$currentNode = $ajxpNode->getUrl();
+		$metadata = $ajxpNode->metadata;
+		$wrapperClassName = $ajxpNode->wrapperClassName;
+		
 		$noMail = true;
 		if($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))){
 			$noMail = false;
@@ -201,16 +208,14 @@ class EmlParser extends AJXP_Plugin{
 		if(EmlParser::$currentListingOnlyEmails === NULL){
 			EmlParser::$currentListingOnlyEmails = true;
 		}
-		if(!isSet($realFile)){
-			if($wrapperClassName == "imapAccessWrapper"){
-				$cachedFile = AJXP_Cache::getItem("eml_remote", $currentNode, null, array("EmlParser", "computeCacheId"));
-				$realFile = $cachedFile->getId();
-				if(!is_file($realFile)){
-					$cachedFile->getData();// trigger loading!
-				}
-			}else{
-				$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentNode);
+		if($wrapperClassName == "imapAccessWrapper"){
+			$cachedFile = AJXP_Cache::getItem("eml_remote", $currentNode, null, array("EmlParser", "computeCacheId"));
+			$realFile = $cachedFile->getId();
+			if(!is_file($realFile)){
+				$cachedFile->getData();// trigger loading!
 			}
+		}else{
+			$realFile = $ajxpNode->getRealFile();
 		}
 		$cacheItem = AJXP_Cache::getItem("eml_mimes", $realFile, array($this, "mimeExtractorCallback"));
 		$data = unserialize($cacheItem->getData());
@@ -221,6 +226,7 @@ class EmlParser extends AJXP_Plugin{
 			$metadata["is_file"] = false;
 			$metadata["nodeName"] = basename($currentNode)."#attachments"; 
 		}
+		$ajxpNode->metadata = $metadata;
 	}	
 
 	public function mimeExtractorCallback($masterFile, $targetFile){
@@ -245,7 +251,7 @@ class EmlParser extends AJXP_Plugin{
 				$date = strtotime($hValue);
 				$metadata["eml_time"] = $date;
 			}
-			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(htmlentities($hValue, ENT_COMPAT, "UTF-8"));
+			$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(@htmlentities($hValue, ENT_COMPAT, "UTF-8"));
 			//AJXP_Logger::debug($hKey." - ".$hValue. " - ".$metadata["eml_".$hKey]);
 			if($metadata["eml_".$hKey] == ""){
 				$metadata["eml_".$hKey] = AJXP_Utils::xmlEntities(@htmlentities($hValue));

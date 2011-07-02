@@ -95,10 +95,18 @@ class IMagickPreviewer extends AJXP_Plugin {
 		}
 	}
 	
-	public function deleteImagickCache($oldFile, $newFile = null, $copy = false){
+	/**
+	 * 
+	 * @param AJXP_Node $oldNode
+	 * @param AJXP_Node $newNode
+	 * @param Boolean $copy
+	 */
+	public function deleteImagickCache($oldNode, $newNode = null, $copy = false){
+		if($oldNode == null) return;
+		$oldFile = $oldNode->getUrl();
 		// Should remove imagick cache file
-		if(!$this->handleMime($oldFile)) return;
-		if($newFile == null || $copy == false){
+		if(!$this->handleMime($oldFile)) return;		
+		if($newNode == null || $copy == false){
 			AJXP_Cache::clearItem("imagick_thumb", $oldFile);			
 			$cache = AJXP_Cache::getItem("imagick_full", $oldFile, false);
 			$prefix = str_replace(".".pathinfo($cache->getId(), PATHINFO_EXTENSION), "", $cache->getId());

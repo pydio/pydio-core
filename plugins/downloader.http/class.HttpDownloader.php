@@ -209,19 +209,22 @@ class HttpDownloader extends AJXP_Plugin{
     	
 	}
 	
-	public function detectDLParts($currentNode, &$metadata, $wrapperClassName, &$realFile){
-		if(!preg_match("/\.dlpart$/i",$currentNode)){
+	/**
+	 * @param AJXP_Node $ajxpNode
+	 */
+	public function detectDLParts(&$ajxpNode){
+		if(!preg_match("/\.dlpart$/i",$ajxpNode->getUrl())){
 			return;
 		}
-		$basename = basename($currentNode);
+		$basename = basename($ajxpNode->getUrl());
 		$newName = ".".str_replace(".dlpart", ".ser", $basename);
-		$hidFile = str_replace($basename, $newName, $currentNode);
+		$hidFile = str_replace($basename, $newName, $ajxpNode->getUrl());
 		if(is_file($hidFile)){
 			$data = unserialize(file_get_contents($hidFile));
 			if($data["totalSize"] != -1){
-				$metadata["target_bytesize"] = $data["totalSize"];
-				$metadata["target_filesize"] = AJXP_Utils::roundSize($data["totalSize"]);
-				$metadata["process_stoppable"] = (isSet($data["pid"])?"true":"false");
+				$ajxpNode->target_bytesize = $data["totalSize"];
+				$ajxpNode->target_filesize = AJXP_Utils::roundSize($data["totalSize"]);
+				$ajxpNode->process_stoppable = (isSet($data["pid"])?"true":"false");
 			}
 		}		
 	}

@@ -155,7 +155,7 @@
 			</action>
 		</actions>
 		<hooks>
-			<serverCallback hookName="ls.metadata" methodName="extractMeta"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMeta"></serverCallback>
 		</hooks>		
 	</registry_contributions>
 	<dependencies>

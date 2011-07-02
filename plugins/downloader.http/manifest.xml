@@ -108,7 +108,7 @@
 			</action>					
 		</actions>	
 		<hooks>
-			<serverCallback hookName="ls.metadata" methodName="detectDLParts"></serverCallback>
+			<serverCallback hookName="node.info" methodName="detectDLParts"></serverCallback>
 		</hooks>			
 	</registry_contributions>
 	<dependencies>

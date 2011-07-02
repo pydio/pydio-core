@@ -60,7 +60,7 @@ class HookDemo extends AJXP_Plugin {
 	 * In this example, this variable does exactly what the current AJXP_USER variable do.
 	 * Thus, once hooked, you can use CUSTOM_VARIABLE_USER in e.g. a repository PATH, and
 	 * build this path dynamically depending on the current user logged.
-	 * Contrary to other standards hooks like ls.metadata, this cannot be added via XML manifest
+	 * Contrary to other standards hooks like node.info, this cannot be added via XML manifest
 	 * as it happen too early in the application, so it must be declared directly inside the conf.php
 	 * 
 	 * @param String $value

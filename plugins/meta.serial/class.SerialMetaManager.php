@@ -160,7 +160,13 @@ class SerialMetaManager extends AJXP_Plugin {
 		AJXP_XMLWriter::close();
 	}
 	
-	public function extractMeta($currentFile, &$metadata, $wrapperClassName, &$realFile){
+	/**
+	 * 
+	 * @param AJXP_Node $ajxpNode
+	 */
+	public function extractMeta(&$ajxpNode){
+		$currentFile = $ajxpNode->getUrl();
+		$metadata = $ajxpNode->metadata;
 		$base = basename($currentFile);
 		$this->loadMetaFileData($currentFile);		
 		if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
@@ -170,11 +176,20 @@ class SerialMetaManager extends AJXP_Plugin {
 		// NOT OPTIMAL AT ALL 
 		$metadata["meta_fields"] = $this->options["meta_fields"];
 		$metadata["meta_labels"] = $this->options["meta_labels"];
+		$ajxpNode->metadata = $metadata;
 	}
 	
+	/**
+	 * 
+	 * @param AJXP_Node $oldFile
+	 * @param AJXP_Node $newFile
+	 * @param Boolean $copy
+	 */
 	public function updateMetaLocation($oldFile, $newFile = null, $copy = false){
-		$this->loadMetaFileData($oldFile);
-		$oldKey = basename($oldFile);
+		if($oldFile == null) return;
+		
+		$this->loadMetaFileData($oldFile->getUrl());
+		$oldKey = basename($oldFile->getUrl());
 		if(!array_key_exists($oldKey, self::$metaCache)){
 			return;
 		}
@@ -182,11 +197,11 @@ class SerialMetaManager extends AJXP_Plugin {
 		// If it's a move or a delete, delete old data
 		if(!$copy){
 			unset(self::$metaCache[$oldKey]);
-			$this->saveMetaFileData($oldFile);
+			$this->saveMetaFileData($oldFile->getUrl());
 		}
 		// If copy or move, copy data.
 		if($newFile != null){
-			$this->addMeta($newFile, $oldData);
+			$this->addMeta($newFile->getUrl(), $oldData);
 		}
 	}
 	

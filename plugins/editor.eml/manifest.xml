@@ -60,7 +60,7 @@
 			</action>
 		</actions>
 		<hooks>
-			<serverCallback hookName="ls.metadata" methodName="extractMimeHeaders"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMimeHeaders"></serverCallback>
 		</hooks>	
 	</registry_contributions>
 	<dependencies>

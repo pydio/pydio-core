@@ -6,7 +6,7 @@
 	</resources>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="move.metadata" methodName="deleteImagickCache"></serverCallback>
+			<serverCallback hookName="node.change" methodName="deleteImagickCache"></serverCallback>
 		</hooks>			
 		<actions>
 			<action name="imagick_data_proxy">
