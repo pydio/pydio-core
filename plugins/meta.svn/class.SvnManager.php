@@ -284,7 +284,7 @@ class SvnManager extends AJXP_Plugin {
 	 *
 	 * @param AJXP_Node $ajxpNode
 	 */
-	public function extractMeta($ajxpNode){
+	public function extractMeta(&$ajxpNode){
 		if(isSet($_SESSION["SVN_COMMAND_RUNNING"]) && $_SESSION["SVN_COMMAND_RUNNING"] === true) return ;
 		$realDir = dirname($ajxpNode->getRealFile());
 		if(SvnManager::$svnListDir == $realDir){
