@@ -42,6 +42,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $tmpDependencies = array();
  	private $activePlugins = array();
  	private $streamWrapperPlugins = array();
+ 	private $registeredWrappers = array();
  	private $xmlRegistry;
  	private $pluginFolder;
  	private $confFolder;
@@ -303,6 +304,18 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	
  	public function getStreamWrapperPlugins(){
  		return $this->streamWrapperPlugins;
+ 	}
+ 	
+ 	public function registerWrapperClass($protocol, $wrapperClassName){
+ 		$this->registeredWrappers[$protocol] = $wrapperClassName;
+ 	}
+ 	
+ 	public function getWrapperClassName($protocol){
+ 		return $this->registeredWrappers[$protocol];
+ 	}
+ 	
+ 	public function getRegisteredWrappers(){
+ 		return $this->registeredWrappers;
  	}
  	
  	public function buildXmlRegistry(){
