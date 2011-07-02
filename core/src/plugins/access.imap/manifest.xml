@@ -26,8 +26,8 @@
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 		<hooks>
-			<serverCallback hookName="ls.metadata" methodName="enrichMetadata"></serverCallback>
-			<serverCallback hookName="ls.parent.metadata" methodName="enrichMetadata"></serverCallback>
+			<serverCallback hookName="node.info" methodName="enrichMetadata"></serverCallback>
+			<serverCallback hookName="node.info" methodName="enrichMetadata"></serverCallback>
 			<serverCallback hookName="dl.localname" methodName="attachmentDLName"></serverCallback>
 		</hooks>			
 	</registry_contributions>

@@ -426,6 +426,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$reloadContextNode = true;
 				$pendingSelection = $dir."/".$filename;
 				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
+				$newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
+				AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
 		
 			break;
 			
@@ -611,12 +613,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					$metaData["ajxp_mime"] = "ajxp_browsable_archive";
 				}
 				$realFile = null;
-				AJXP_Controller::applyHook("ls.parent.metadata", array($dir, &$metaData, $this->wrapperClassName, &$realFile));
+				$parentAjxpNode = new AJXP_Node($dir, $metaData);
+				AJXP_Controller::applyHook("node.info", array(&$parentAjxpNode));
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
 					$crtLabel, 
 					false, 
-					$metaData);
+					$parentAjxpNode->metadata);
 				if(isSet($totalPages) && isSet($crtPage)){
 					AJXP_XMLWriter::renderPaginationData(
 						$countFiles, 
@@ -714,8 +717,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						if(AJXP_Utils::isBrowsableArchive($nodeName)){
 							$metaData["ajxp_mime"] = "ajxp_browsable_archive";
 						}
-						$realFile = null; // A reference to the real file.
-						AJXP_Controller::applyHook("ls.metadata", array($currentFile, &$metaData, $this->wrapperClassName, &$realFile));						
+						$node = new AJXP_Node($currentFile, $metaData);
+						AJXP_Controller::applyHook("node.info", array(&$node));		
+						$metaData =  $node->metadata;	
 					}
 									
 					/*
@@ -763,13 +767,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						  "icon"			=> "$recycleIcon", 
 						  "filesize"		=> "-",
 						  "ajxp_mime"		=> "ajxp_recycle");
+						$recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption, $recycleMetaData);
 						$nullFile = null;
-						AJXP_Controller::applyHook("ls.metadata", array($this->urlBase.$recycleBinOption, &$recycleMetaData, $this->wrapperClassName, &$nullFile));
+						AJXP_Controller::applyHook("node.info", array(&$recycleNode));
 						AJXP_XMLWriter::renderNode(
 							$recycleBinOption,
 							AJXP_Utils::xmlEntities($mess[122]),
 							false, 
-							$recycleMetaData
+							$recycleNode->metadata
 						);
 					}
 				}
@@ -1195,7 +1200,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		{
 			throw new AJXP_Exception($mess[100]." $nom_fic");
 		}
-		AJXP_Controller::applyHook("move.metadata", array($old, $new, false));
+		AJXP_Controller::applyHook("node.change", array(new AJXP_Node($old), new AJXP_Node($new), false));
 		rename($old,$new);
 	}
 	
@@ -1309,7 +1314,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			{
 				$logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
 			}
-			AJXP_Controller::applyHook("move.metadata", array($fileToDelete));
+			AJXP_Controller::applyHook("node.change", array(new AJXP_Node($fileToDelete)));
 		}
 		return null;
 	}
@@ -1374,7 +1379,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			if($move){	
 				if(file_exists($destFile)) unlink($destFile);				
 				$res = rename($realSrcFile, $destFile);
-				AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, false));
+				AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
 			}else{
 				try{
 					$src = fopen($realSrcFile, "r");
@@ -1386,7 +1391,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						fclose($dest);
 					}
 					fclose($src);
-					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
+					AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
 				}catch (Exception $e){
 					$error[] = $e->getMessage();
 					return ;					

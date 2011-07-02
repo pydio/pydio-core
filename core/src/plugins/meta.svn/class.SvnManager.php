@@ -280,10 +280,13 @@ class SvnManager extends AJXP_Plugin {
 		$res = ExecSvnCmd($command, $args, $switches);		
 		$res2 = ExecSvnCmd('svn update', dirname($args), '');
 	}		
-	
-	public function extractMeta($currentFile, &$metadata, $wrapperClassName, &$realFile){
+	/**
+	 *
+	 * @param AJXP_Node $ajxpNode
+	 */
+	public function extractMeta($ajxpNode){
 		if(isSet($_SESSION["SVN_COMMAND_RUNNING"]) && $_SESSION["SVN_COMMAND_RUNNING"] === true) return ;
-		$realDir = dirname(call_user_func(array($wrapperClassName, "getRealFSReference"), $currentFile));
+		$realDir = dirname($ajxpNode->getRealFile());
 		if(SvnManager::$svnListDir == $realDir){
 			$entries = SvnManager::$svnListCache;
 		}else{
@@ -291,9 +294,9 @@ class SvnManager extends AJXP_Plugin {
 			$entries = $this->svnListNode($realDir);
 			SvnManager::$svnListCache = $entries;
 		}
-		$fileId = SystemTextEncoding::toUTF8(basename($currentFile));
+		$fileId = SystemTextEncoding::toUTF8(basename($ajxpNode->getUrl()));
 		if(isSet($entries[$fileId])){
-			$metadata = array_merge($metadata, $entries[$fileId]);
+			$ajxpNode->mergeMetadata($entries[$fileId]);
 		}
 	}
 	

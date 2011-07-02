@@ -137,20 +137,18 @@ class ExifMetaManager extends AJXP_Plugin {
 		return $tmpStr;
 	}
 	
-	public function extractMeta($currentFile, &$metadata, $wrapperClassName, &$realFile){
+	/**
+	 * @param AJXP_Node $ajxpNode
+	 */
+	public function extractMeta(&$ajxpNode){
+		$currentFile = $ajxpNode->getUrl();
 		$definitions = $this->getMetaDefinition();
 		if(!count($definitions)) return ;
 		if(!function_exists("exif_read_data")) return ;
 		if(is_dir($currentFile) || preg_match("/\.zip\//",$currentFile)) return ;
 		if(!preg_match("/\.jpg$|\.jpeg$|\.tif$|\.tiff$/i",$currentFile)) return ;
 		if(!exif_imagetype($currentFile)) return ;
-		if(!isset($realFile)){
-			$realFile = call_user_func(array($wrapperClassName, "getRealFSReference"), $currentFile, true);
-			$isRemote = call_user_func(array($wrapperClassName, "isRemote"));
-			if($isRemote){
-				register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $realFile);
-			}
-		}
+		$realFile = $ajxpNode->getRealFile();
 		$exif = exif_read_data($realFile, 0, TRUE);
 		if($exif === false) return ;
 		$additionalMeta = array();
@@ -163,7 +161,7 @@ class ExifMetaManager extends AJXP_Plugin {
 				$additionalMeta[$def] = $exif[$exifSection][$exifName];
 			}
 		}
-		$metadata = array_merge($metadata, $additionalMeta);
+		$ajxpNode->mergeMetadata($additionalMeta);
 	}
 
 	private function convertGPSData($exif){

@@ -13,7 +13,7 @@
 	</server_settings>	
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="ls.metadata" methodName="extractMeta"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMeta"></serverCallback>
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">			

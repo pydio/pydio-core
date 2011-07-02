@@ -92,7 +92,13 @@ class imapAccessDriver extends fsAccessDriver
 		parent::switchAction($action, $httpVars, $fileVars);
 	}
 	
-	public function enrichMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
+	/**
+	 * 
+	 * @param AJXP_Node $currentNode
+	 */
+	public function enrichMetadata(&$ajxpNode){//, &$metadata, $wrapperClassName, &$realFile){
+		$currentNode = $ajxpNode->getUrl();
+		$metadata = $ajxpNode->metadata;
 		$parsed = parse_url($currentNode);
 		if( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0){
 			list(, $attachmentId) = explode("/", $parsed["fragment"]);
@@ -118,6 +124,7 @@ class imapAccessDriver extends fsAccessDriver
 			$parts = explode("/", $currentNode);
 			$metadata["text"] = AJXP_Utils::xmlEntities(str_replace("__delim__", "/", array_pop($parts)), true);
 		}
+		$ajxpNode->metadata = $metadata;
 	}
 	
 	public function attachmentDLName($currentNode, &$localName, $wrapperClassName){

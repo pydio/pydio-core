@@ -149,7 +149,7 @@ class sftpAccessDriver extends fsAccessDriver
 			if($move){	
 				if(file_exists($destFile)) unlink($destFile);				
 				$res = rename($realSrcFile, $destFile);
-				AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, false));
+				AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
 			}else{
 				try{
 					// BEGIN OVERRIDING
@@ -158,7 +158,7 @@ class sftpAccessDriver extends fsAccessDriver
 					$remoteDest = $remote_base_path.$destDir;
 					AJXP_Logger::debug("SSH2 CP", array("cmd" => 'cp '.$remoteSrc.' '.$remoteDest));
 					ssh2_exec($connection, 'cp '.$remoteSrc.' '.$remoteDest);
-					AJXP_Controller::applyHook("move.metadata", array($realSrcFile, $destFile, true));
+					AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
 					// END OVERRIDING
 				}catch (Exception $e){
 					$error[] = $e->getMessage();
