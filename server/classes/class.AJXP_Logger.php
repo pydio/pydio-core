@@ -54,7 +54,7 @@ class AJXP_Logger {
 		}
 		else if(is_array($params) && count($params)){
 			$message.=$logger->arrayToString($params);
-		}else {
+		}else if(!empty($params)) {
 			$message .= print_r($params, true);
 		}		
 		$logger->write($message, LOG_LEVEL_DEBUG);				

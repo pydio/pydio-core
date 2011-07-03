@@ -17,18 +17,24 @@ if(is_dir('./an-index')){
 }
 /*
 $doc = new Zend_Search_Lucene_Document();
-$doc->addField(Zend_Search_Lucene_Field::text("filename", "mon document3.png"));
+$doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", "/path/to/zobi.xls"));
+$doc->addField(Zend_Search_Lucene_Field::Keyword("basename", "zobi.xls"));
 $testIndex->addDocument($doc);
 $testIndex->commit();
 */
-$testIndex->setDefaultSearchField("filename");
-
+$testIndex->setDefaultSearchField("basename");
 print($testIndex->numDocs());
-$testIndex->optimize();
-$hits = $testIndex->find("document3.png");
-foreach($hits as $hit){
-    print($hit->filename."<br>");
+//$testIndex->optimize();
+if(isSet($_GET["q"])){
+	$hits = $testIndex->find($_GET["q"]);
+	print(count($hits)." results for ".$_GET["q"]);
+	print("<ul>");
+	foreach($hits as $hit){
+		print("<li>");
+	    print($hit->basename);
+	    print("<br>".$hit->node_path);
+	    //print("<br>".$hit->id."<br>");
+	    echo "\tScore: ".sprintf('%.2f', $hit->score);
+	    print("</li>");
+	}
 }
-
-print("Everything seems to be ok!");
-
