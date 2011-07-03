@@ -63,6 +63,10 @@ class AJXP_Node{
 		return $this->url;
 	}
 	
+	public function getPath(){
+		return $this->urlParts["path"];
+	}
+	
 	public function mergeMetadata($metadata){
 		$this->metadata = array_merge($this->metadata, $metadata);
 	}

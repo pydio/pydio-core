@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hook id="index.lucene">
+	<class_definition filename="plugins/index.lucene/class.AjxpLuceneIndexer.php" classname="AjxpLuceneIndexer"/>
+	<registry_contributions>
+		<hooks>
+			<serverCallback hookName="node.change" methodName="updateNodeIndex"></serverCallback>			
+		</hooks>
+		<actions>
+			<action name="search">
+				<processing>
+					<serverCallback methodName="applyAction"/>
+				</processing>
+			</action>					
+			<action name="index">
+				<processing>
+					<serverCallback methodName="applyAction"/>
+				</processing>
+			</action>					
+		</actions>		
+	</registry_contributions>
+</hook>

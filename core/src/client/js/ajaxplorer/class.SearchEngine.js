@@ -354,6 +354,19 @@ Class.create("SearchEngine", AjxpPane, {
 			this.updateStateFinished();
 			return;
 		}
+		/* REMOTE INDEXER CASE */
+		/*
+		var connexion = new Connexion();
+		connexion.addParameter('get_action', 'search');
+		connexion.addParameter('query', this.crtText);
+		connexion.onComplete = function(transport){
+			this._parseResults(transport.responseXML, currentFolder);
+			this.updateStateFinished();			
+		}.bind(this);
+		connexion.sendAsync();
+		return;		
+		*/
+		/* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'ls');				
 		connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
@@ -388,6 +401,23 @@ Class.create("SearchEngine", AjxpPane, {
 				}
 			}		
 		}
+	},
+	
+	_parseResults : function(oXmlDoc, currentFolder){
+		if(this._state == 'interrupt' || oXmlDoc == null || oXmlDoc.documentElement == null){
+			this.updateStateFinished();
+			return;
+		}
+		var nodes = XPathSelectNodes(oXmlDoc.documentElement, "tree");
+		for (var i = 0; i < nodes.length; i++) 
+		{
+			if (nodes[i].tagName == "tree") 
+			{
+				var ajxpNode = this.parseAjxpNode(nodes[i]);	
+				this.addResult(currentFolder, ajxpNode);				
+			}
+		}		
+		
 	},
 	
 	_searchNode : function(ajxpNode, currentFolder){
