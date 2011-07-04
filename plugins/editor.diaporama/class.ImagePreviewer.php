@@ -160,7 +160,7 @@ class ImagePreviewer extends AJXP_Plugin {
 				$ajxpNode->readable_dimension = $width."px X ".$height."px";
 			}
 		}
-		AJXP_Logger::debug("CURRENT NODE IN EXTRACT IMAGE METADATA ", $ajxpNode);
+		//AJXP_Logger::debug("CURRENT NODE IN EXTRACT IMAGE METADATA ", $ajxpNode);
 	}
 	
 	protected function handleMime($filename){
