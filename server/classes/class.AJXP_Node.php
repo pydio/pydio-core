@@ -44,6 +44,13 @@ class AJXP_Node{
 	
 	public function __construct($url, $metadata = array()){
 		$this->url = $url;
+        // Clean url
+        $testExp = explode("//", $url);
+        if(count($testExp) > 1){
+            $this->url = array_shift($testExp)."//";
+            $this->url .= implode("/", $testExp);
+        }
+
 		$this->metadata = $metadata;
 		$this->parseUrl();
 	}

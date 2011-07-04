@@ -341,6 +341,7 @@
 				</processing>
 		</action>		
 		<action name="prepare_chunk_dl">
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"></rightsContext>
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
@@ -651,16 +652,19 @@
 				</processing>
 		</action>
 		<action name="stat">
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"></rightsContext>
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>		
 		<action name="get_content">
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"></rightsContext>
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>		
 		<action name="put_content">
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="false"></rightsContext>
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>

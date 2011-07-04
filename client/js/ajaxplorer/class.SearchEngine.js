@@ -52,6 +52,8 @@ Class.create("SearchEngine", AjxpPane, {
 	
 	_queue : undefined,
 
+    _searchMode : "local",
+
 	/**
 	 * Constructor
 	 * @param $super klass Superclass reference
@@ -104,8 +106,8 @@ Class.create("SearchEngine", AjxpPane, {
 		this._inputBox.onkeypress = function(e){
 			if (e==null) e = window.event;
 			if(e.keyCode == 13) {
+                Event.stop(e);
 				this.search();
-				Event.stop(e);
 			}
 			if(e.keyCode == 9) return false;		
 		}.bind(this);
@@ -293,6 +295,9 @@ Class.create("SearchEngine", AjxpPane, {
 		var icon = ajxpNode.getIcon();
 		// Display the result in the results box.
 		if(folderName == "") folderName = "/";
+        if(this._searchMode == "remote"){
+            folderName = getRepName(ajxpNode.getPath());
+        }
 		var isFolder = false;
 		if(icon == null) // FOLDER CASE
 		{
@@ -325,6 +330,9 @@ Class.create("SearchEngine", AjxpPane, {
 			});
 		}
 	},
+    addNoResultString : function(){
+        $(this._resultsBoxId).insert(new Element('div').update("No results found."));
+    },
 	/**
 	 * Put a folder to search in the queue
 	 * @param path String
@@ -354,28 +362,28 @@ Class.create("SearchEngine", AjxpPane, {
 			this.updateStateFinished();
 			return;
 		}
-		/* REMOTE INDEXER CASE */
-		/*
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'search');
-		connexion.addParameter('query', this.crtText);
-		connexion.onComplete = function(transport){
-			this._parseResults(transport.responseXML, currentFolder);
-			this.updateStateFinished();			
-		}.bind(this);
-		connexion.sendAsync();
-		return;		
-		*/
-		/* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'ls');				
-		connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
-		connexion.addParameter('dir', currentFolder);
-		connexion.onComplete = function(transport){
-			this._parseXmlAndSearchString(transport.responseXML, currentFolder);
-			this.searchNext();
-		}.bind(this);
-		connexion.sendAsync();
+        if(this._searchMode == "remote"){
+            /* REMOTE INDEXER CASE */
+            var connexion = new Connexion();
+            connexion.addParameter('get_action', 'search');
+            connexion.addParameter('query', this.crtText);
+            connexion.onComplete = function(transport){
+                this._parseResults(transport.responseXML, currentFolder);
+                this.updateStateFinished();
+            }.bind(this);
+            connexion.sendAsync();
+        }else{
+            /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
+            var connexion = new Connexion();
+            connexion.addParameter('get_action', 'ls');
+            connexion.addParameter('options', 'a' + (this.hasMetaSearch()?'l':''));
+            connexion.addParameter('dir', currentFolder);
+            connexion.onComplete = function(transport){
+                this._parseXmlAndSearchString(transport.responseXML, currentFolder);
+                this.searchNext();
+            }.bind(this);
+            connexion.sendAsync();
+        }
 	},
 	
 	_parseXmlAndSearchString : function(oXmlDoc, currentFolder){
@@ -409,6 +417,9 @@ Class.create("SearchEngine", AjxpPane, {
 			return;
 		}
 		var nodes = XPathSelectNodes(oXmlDoc.documentElement, "tree");
+        if(!nodes.length){
+            this.addNoResultString();
+        }
 		for (var i = 0; i < nodes.length; i++) 
 		{
 			if (nodes[i].tagName == "tree") 
