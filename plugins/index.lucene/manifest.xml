@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<hook id="index.lucene">
+<indexer id="index.lucene" className="AjxpLuceneIndexer">
 	<class_definition filename="plugins/index.lucene/class.AjxpLuceneIndexer.php" classname="AjxpLuceneIndexer"/>
+    <server_settings>
+        <param name="index_meta_fields" type="string" label="Index Meta Fields" description="Which additionnal fields to index and search" mandatory="false" default=""/>
+    </server_settings>
 	<registry_contributions>
 		<hooks>
 			<serverCallback hookName="node.change" methodName="updateNodeIndex"></serverCallback>			
@@ -18,4 +21,8 @@
 			</action>					
 		</actions>		
 	</registry_contributions>
-</hook>
+    <dependencies>
+        <!-- Stream Wrapper Access -->
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+    </dependencies>
+</indexer>

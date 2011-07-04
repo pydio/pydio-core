@@ -3,11 +3,17 @@
 class AjxpLuceneIndexer extends AJXP_Plugin{
 
     private $currentIndex;
+    private $accessDriver;
 
 	public function init($options){
 		parent::init($options);		
 		set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
 	}
+
+    public function initMeta($accessDriver){
+        $this->accessDriver = $accessDriver;
+    }
+
 	
 	public function applyAction($actionName, $httpVars, $fileVars){
 		if($actionName == "search"){
@@ -25,9 +31,6 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 $meta["icon"] = AJXP_Utils::mimetype($hit->node_url, "image", $isDir);
                 $tmpNode = new AJXP_Node($hit->node_url, $meta);
                 $meta["search_score"] = $hit->score;
-                $meta["full_url"] = $hit->node_url;
-                $meta["fake_path"] = $hit->node_path;
-
 				AJXP_XMLWriter::renderNode($tmpNode->getPath(), $hit->basename, $isDir, $meta);
 			}
 			AJXP_XMLWriter::close();

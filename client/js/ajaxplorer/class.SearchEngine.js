@@ -66,9 +66,23 @@ Class.create("SearchEngine", AjxpPane, {
 		if(ajxpOptions){
 			this._ajxpOptions = ajxpOptions;
 		}
+        this.updateSearchModeFromRegistry();
+        document.observe("ajaxplorer:registry_loaded", this.updateSearchModeFromRegistry.bind(this));
 		this.initGUI();
 	},
-	
+
+    updateSearchModeFromRegistry : function(){
+        if($(this._resultsBoxId)){
+            $(this._resultsBoxId).update('');
+        }
+        var reg = ajaxplorer.getXmlRegistry();
+        if(XPathSelectSingleNode(reg, "plugins/indexer") != null){
+            this._searchMode = "remote";
+        }else{
+            this._searchMode = "local";
+        }
+    },
+
 	/**
 	 * Creates the HTML
 	 */
