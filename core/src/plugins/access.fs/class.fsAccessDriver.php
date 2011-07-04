@@ -614,7 +614,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}
 				$realFile = null;
 				$parentAjxpNode = new AJXP_Node($dir, $metaData);
-				AJXP_Controller::applyHook("node.info", array(&$parentAjxpNode));
+				AJXP_Controller::applyHook("node.info", array(&$parentAjxpNode, true));
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
 					$crtLabel, 

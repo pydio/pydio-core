@@ -36,29 +36,29 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class AJXP_Node{
-	private $url;
-	private $metadata = array();
-	private $wrapperClassName;
-	private $urlParts = array();
-	private $realFilePointer;
+	protected $_url;
+	protected $_metadata = array();
+	protected $_wrapperClassName;
+	protected $urlParts = array();
+	protected $realFilePointer;
 	
 	public function __construct($url, $metadata = array()){
-		$this->url = $url;
+		$this->_url = $url;
         // Clean url
         $testExp = explode("//", $url);
         if(count($testExp) > 1){
-            $this->url = array_shift($testExp)."//";
-            $this->url .= implode("/", $testExp);
+            $this->_url = array_shift($testExp)."//";
+            $this->_url .= implode("/", $testExp);
         }
 
-		$this->metadata = $metadata;
+		$this->_metadata = $metadata;
 		$this->parseUrl();
 	}
 	
 	public function getRealFile(){
 		if(!isset($this->realFilePointer)){
-			$this->realFilePointer = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->url, true);
-			$isRemote = call_user_func(array($this->wrapperClassName, "isRemote"));
+			$this->realFilePointer = call_user_func(array($this->_wrapperClassName, "getRealFSReference"), $this->_url, true);
+			$isRemote = call_user_func(array($this->_wrapperClassName, "isRemote"));
 			if($isRemote){
 				register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $this->realFilePointer);
 			}
@@ -67,25 +67,25 @@ class AJXP_Node{
 	}
 	
 	public function getUrl(){
-		return $this->url;
+		return $this->_url;
 	}
 	
 	public function getPath(){
 		return $this->urlParts["path"];
 	}
-	
+
 	public function mergeMetadata($metadata){
-		$this->metadata = array_merge($this->metadata, $metadata);
+		$this->_metadata = array_merge($this->_metadata, $metadata);
 	}
 	
 	public function __get($varName){
 		
-		if(strtolower($varName) == "wrapperclassname") return $this->wrapperClassName;
-		if(strtolower($varName) == "url") return $this->url;
-		if(strtolower($varName) == "metadata") return $this->metadata;
+		if(strtolower($varName) == "wrapperclassname") return $this->_wrapperClassName;
+		if(strtolower($varName) == "url") return $this->_url;
+		if(strtolower($varName) == "metadata") return $this->_metadata;
 		
-		if(isSet($this->metadata[$varName])){
-			return $this->metadata[$varName];
+		if(isSet($this->_metadata[$varName])){
+			return $this->_metadata[$varName];
 		}else{
 			return null;
 		}
@@ -93,17 +93,17 @@ class AJXP_Node{
 	
 	public function __set($metaName, $metaValue){
 		if(strtolower($metaName) == "metadata"){
-			$this->metadata = $metaValue;
+			$this->_metadata = $metaValue;
 			return;
 		}
-		$this->metadata[$metaName] = $metaValue;
+		$this->_metadata[$metaName] = $metaValue;
 	}
 	
 	protected function parseUrl(){
-		$this->urlParts = parse_url($this->url);
+		$this->urlParts = parse_url($this->_url);
 		if(strstr($this->urlParts["scheme"], "ajxp.")!==false){
 			$pServ = AJXP_PluginsService::getInstance();
-			$this->wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
+			$this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
 		}
 	}
 	

@@ -187,8 +187,10 @@ class EmlParser extends AJXP_Plugin{
 	
 	/**
 	 * @param AJXP_Node $ajxpNode
+     * @param Boolean $isParent
 	 */
-	public function extractMimeHeaders(&$ajxpNode){	
+	public function extractMimeHeaders(&$ajxpNode, $isParent = false){
+        if($isParent) return;
 		$currentNode = $ajxpNode->getUrl();
 		$metadata = $ajxpNode->metadata;
 		$wrapperClassName = $ajxpNode->wrapperClassName;
