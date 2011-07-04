@@ -601,6 +601,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				print("<ajxpdriver name=\"".$repository->accessType."\">$manifest</ajxpdriver>");
 				print("<metasources>");
 				$metas = $pServ->getPluginsByType("meta");
+                $metas = array_merge($metas, $pServ->getPluginsByType("index"));
 				foreach ($metas as $metaPlug){
 					print("<meta id=\"".$metaPlug->getId()."\">");
 					$manifest = $metaPlug->getManifestRawContent("server_settings/param");
