@@ -4,10 +4,14 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 
     private $currentIndex;
     private $accessDriver;
+    private $metaFields = array();
 
 	public function init($options){
 		parent::init($options);		
 		set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
+        if(!empty($this->options["index_meta_fields"])){
+        	$this->metaFields = explode(",",$this->options["index_meta_fields"]);
+        }
 	}
 
     public function initMeta($accessDriver){
@@ -18,11 +22,18 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 	public function applyAction($actionName, $httpVars, $fileVars){
 		if($actionName == "search"){
 			require_once("Zend/Search/Lucene.php");
-            Zend_Search_Lucene_Search_QueryParser::dontSuppressQueryParsingExceptions();
-			$index =  $this->loadIndex(0);
-
-			$index->setDefaultSearchField("basename");
-			$hits = $index->find($httpVars["query"]);
+			$index =  $this->loadIndex(ConfService::getRepository()->getId());
+			if(isSet($this->metaFields)){
+				$query = "basename:".$httpVars["query"];
+				foreach($this->metaFields as $field){
+					$query .= " OR ajxp_meta_$field:".$httpVars["query"];
+				}
+				AJXP_Logger::debug("Query : $query");
+			}else{
+				$index->setDefaultSearchField("basename");
+				$query = $httpVars["query"];
+			}
+			$hits = $index->find($query);
 
 			AJXP_XMLWriter::header();
 			foreach ($hits as $hit){
@@ -137,10 +148,17 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
      * @return Zend_Search_Lucene_Document
      */
     public function createIndexedDocument($ajxpNode){
+    	AJXP_Controller::applyHook("node.info", array(&$ajxpNode));	    	
         $doc = new Zend_Search_Lucene_Document();
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()));
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())));
         $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())));
+        	foreach ($this->metaFields as $field){
+        		if($ajxpNode->$field != null){
+					AJXP_Logger::debug("Found value :: ".$ajxpNode->$field);        			
+        			$doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field));
+        		}
+        	}
         return $doc;
     }
 

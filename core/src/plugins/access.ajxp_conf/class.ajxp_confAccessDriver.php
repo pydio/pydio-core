@@ -686,6 +686,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$repoOptions = array();
 				}
 				$repoOptions[$metaSourceType] = $options;
+				uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
 				$repo->addOption("META_SOURCES", $repoOptions);
 				ConfService::replaceRepository($repId, $repo);
 				AJXP_XMLWriter::header();
@@ -704,6 +705,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$repoOptions = $repo->getOption("META_SOURCES");
 				if(is_array($repoOptions) && array_key_exists($metaSourceId, $repoOptions)){
 					unset($repoOptions[$metaSourceId]);
+					uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
 					$repo->addOption("META_SOURCES", $repoOptions);
 					ConfService::replaceRepository($repId, $repo);
 				}
@@ -727,6 +729,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$repoOptions = array();
 				}
 				$repoOptions[$metaSourceId] = $options;
+				uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
 				$repo->addOption("META_SOURCES", $repoOptions);
 				ConfService::replaceRepository($repId, $repo);
 				AJXP_XMLWriter::header();
@@ -1016,6 +1019,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				"ajxp_mime" => "shared_file")
 			);			
 		}
+	}
+	
+	function metaSourceOrderingFunction($key1, $key2){
+		$t1 = array_shift(explode(".", $key1));
+		$t2 = array_shift(explode(".", $key2));
+		if($t1 == "index") return 1;
+		if($t2 == "index") return -1;
+		return 0;
 	}
 	
 	function clearExpiredFiles(){
