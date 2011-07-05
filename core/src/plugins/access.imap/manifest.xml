@@ -27,7 +27,6 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="enrichMetadata"></serverCallback>
-			<serverCallback hookName="node.info" methodName="enrichMetadata"></serverCallback>
 			<serverCallback hookName="dl.localname" methodName="attachmentDLName"></serverCallback>
 		</hooks>			
 	</registry_contributions>

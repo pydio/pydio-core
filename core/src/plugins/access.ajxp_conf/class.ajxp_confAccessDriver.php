@@ -834,7 +834,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         ksort($userArray);
         foreach($userArray as $userObject) {
 			$isAdmin = $userObject->isAdmin();
-			$userId = AJXP_Utils::xmlEntities($userObject->getId());
+			$userId = $userObject->getId();
 			$icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
 			if($userObject->hasParent()){
 				$icon = "user_child";
@@ -854,7 +854,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			AJXP_XMLWriter::renderNode("/users/".$userId, $userId, true, array(
 				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")], 
 				"icon" => $icon.".png",				
-				"rights_summary" => AJXP_Utils::xmlEntities($rightsString, true),				
+				"rights_summary" => $rightsString,
 				"ajxp_roles" => implode(", ", array_keys($userObject->getRoles())),
 				"ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
 			));
@@ -883,7 +883,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			$rightsString = implode(", ", $r);
 			AJXP_XMLWriter::renderNode("/roles/".$roleId, $roleId, true, array(
 				"icon" => "user_group_new.png",				
-				"rights_summary" => AJXP_Utils::xmlEntities($rightsString, true),				
+				"rights_summary" => $rightsString,
 				"ajxp_mime" => "role"
 			));
 		}

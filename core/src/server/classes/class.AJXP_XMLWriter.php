@@ -90,7 +90,9 @@ class AJXP_XMLWriter
 			$metaData["text"] = $nodeLabel;
 		}
 		$metaData["is_file"] = ($isLeaf?"true":"false");
+
 		foreach ($metaData as $key => $value){
+            $value = AJXP_Utils::xmlEntities($value, true);
 			$string .= " $key=\"$value\"";
 		}
 		if($close){
@@ -100,7 +102,22 @@ class AJXP_XMLWriter
 		}
 		AJXP_XMLWriter::write($string, true);
 	}
-	
+
+    /**
+     * @static
+     * @param AJXP_Node $ajxpNode
+     * @param bool $close
+     * @return void
+     */
+    static function renderAjxpNode($ajxpNode, $close = true){
+        AJXP_XMLWriter::renderNode(
+            $ajxpNode->getPath(),
+            $ajxpNode->getLabel(),
+            $ajxpNode->isLeaf(),
+            $ajxpNode->metadata,
+            $close);
+    }
+
 	static function renderNodeArray($array){
 		self::renderNode($array[0],$array[1],$array[2],$array[3]);
 	}
@@ -111,7 +128,7 @@ class AJXP_XMLWriter
 			$message = "$message in $fichier (l.$ligne)";
 		}
 		AJXP_Logger::logAction("error", array("message" => $message));
-		AJXP_XMLWriter::header();
+		if(!headers_sent()) AJXP_XMLWriter::header();
 		AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
 		AJXP_XMLWriter::close();
 		exit(1);

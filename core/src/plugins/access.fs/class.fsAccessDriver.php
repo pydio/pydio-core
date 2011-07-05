@@ -614,7 +614,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}
 				$realFile = null;
 				$parentAjxpNode = new AJXP_Node($dir, $metaData);
-				AJXP_Controller::applyHook("node.info", array(&$parentAjxpNode, true));
+                $parentAjxpNode->loadNodeInfo(false, true);
 				AJXP_XMLWriter::renderHeaderNode(
 					AJXP_Utils::xmlEntities($dir, true), 
 					$crtLabel, 
@@ -680,18 +680,16 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						else $nodeType = "f";
 					}			
 					
-					$metaData = array();
-					$currentFile = $path."/".$nodeName;	
+					$currentFile = $path."/".$nodeName;
+                    $metaData = array();
+                    $node = new AJXP_Node($currentFile);
+                    $node->setLabel($nodeName);
+                    
 					$metaData["is_file"] = ($isLeaf?"1":"0");
-					$metaData["filename"] = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($dir."/".$nodeName));
+					$metaData["filename"] = $dir."/".$nodeName;
 					$metaData["icon"] = AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
 					if($metaData["icon"] == "folder.png"){
 						$metaData["openicon"] = "folder_open.png";
-					}
-					if(!is_file($currentFile) || AJXP_Utils::isBrowsableArchive($nodeName)){
-						$link = SystemTextEncoding::toUTF8(SERVER_ACCESS."?get_action=ls&options=dz&dir=".$dir."/".$nodeName);
-						$link = urlencode($link);						
-						$metaData["src"] = $link;
 					}
 					if($lsOptions["l"]){
 						$metaData["file_group"] = @filegroup($currentFile) || "unknown";
@@ -717,44 +715,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						if(AJXP_Utils::isBrowsableArchive($nodeName)){
 							$metaData["ajxp_mime"] = "ajxp_browsable_archive";
 						}
-						$node = new AJXP_Node($currentFile, $metaData);
-						AJXP_Controller::applyHook("node.info", array(&$node));		
-						$metaData =  $node->metadata;	
 					}
-									
-					/*
-					$attributes = "";
-					foreach ($metaData as $key => $value){
-						$attributes .= "$key=\"$value\" ";
-					}
-					*/
-					if($metaData["is_file"] != $isLeaf){
-						$isLeaf = $metaData["is_file"];
-					}
-					$nodeBaseName = $nodeName;
+                    $node->mergeMetadata($metaData);
+                    $node->loadNodeInfo();
 					if(!empty($metaData["nodeName"]) && $metaData["nodeName"] != $nodeName){
-						$nodeBaseName = $metaData["nodeName"];
+                        $node->setUrl($path."/".$metaData["nodeName"]);
 					}
-					$renderNodeData = array(
-						AJXP_Utils::xmlEntities($dir."/".$nodeBaseName,true), 
-						AJXP_Utils::xmlEntities($nodeName, true), 
-						$isLeaf, 
-						$metaData
-					);
-					$fullList[$nodeType][$nodeName] = $renderNodeData;
+					$fullList[$nodeType][$nodeName] = $node;
 					$cursor ++;
 				}				
-				/*
-				closedir($handle);
-				foreach ($fullList as $key => $list){
-					uksort($list, 'strnatcasecmp');
-					$fullList[$key] = $list;
-				}
-				*/
-				$allNodes = array_merge($fullList["d"], $fullList["z"], $fullList["f"]);				
-				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["d"]);
-				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["z"]);
-				array_map(array("AJXP_XMLWriter", "renderNodeArray"), $fullList["f"]);
+				array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["d"]);
+				array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["z"]);
+				array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
 				
 				// ADD RECYCLE BIN TO THE LIST
 				if($dir == "" && RecycleBinManager::recycleEnabled())
@@ -763,19 +735,15 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					if(file_exists($this->urlBase.$recycleBinOption)){
 						$recycleIcon = ($this->countFiles($this->urlBase.$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
 						$recycleMetaData = array("ajxp_modiftime" 	=> $this->date_modif($this->urlBase.$recycleBinOption),
-						  "mimestring" 		=> AJXP_Utils::xmlEntities($mess[122]),
+						  "mimestring" 		=> $mess[122],
 						  "icon"			=> "$recycleIcon", 
 						  "filesize"		=> "-",
 						  "ajxp_mime"		=> "ajxp_recycle");
 						$recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption, $recycleMetaData);
-						$nullFile = null;
-						AJXP_Controller::applyHook("node.info", array(&$recycleNode));
-						AJXP_XMLWriter::renderNode(
-							$recycleBinOption,
-							AJXP_Utils::xmlEntities($mess[122]),
-							false, 
-							$recycleNode->metadata
-						);
+                        $recycleNode->setLeaf(false);
+                        $recycleNode->setLabel($mess[122]);
+                        $recycleNode->loadNodeInfo();
+                        AJXP_XMLWriter::renderAjxpNode($recycleNode);
 					}
 				}
 				
