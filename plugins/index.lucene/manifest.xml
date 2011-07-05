@@ -3,6 +3,7 @@
 	<class_definition filename="plugins/index.lucene/class.AjxpLuceneIndexer.php" classname="AjxpLuceneIndexer"/>
     <server_settings>
         <param name="index_meta_fields" type="string" label="Index Meta Fields" description="Which additionnal fields to index and search" mandatory="false" default=""/>
+        <param name="repository_specific_keywords" type="string" label="Repository keywords" description="If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here." mandatory="false" default=""/>
     </server_settings>
 	<registry_contributions>
 		<hooks>
