@@ -137,11 +137,10 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             if($newDocId != null){
                 $index->delete($newDocId);
             }
+            $doc = $this->createIndexedDocument($newNode);
+            $index->addDocument($doc);
             if($oldNode == null && is_dir($newNode->getUrl())){
                 $this->recursiveIndexation($newNode->getUrl());
-            }else{
-                $doc = $this->createIndexedDocument($newNode);
-                $index->addDocument($doc);
             }
         }
 
