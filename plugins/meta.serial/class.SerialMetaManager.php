@@ -139,7 +139,7 @@ class SerialMetaManager extends AJXP_Plugin {
 		$def = $this->getMetaDefinition();
 		foreach ($def as $key => $label){
 			if(isSet($httpVars[$key])){
-				$newValues[$key] = AJXP_Utils::xmlEntities(AJXP_Utils::decodeSecureMagic($httpVars[$key]));
+				$newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
 			}else{
 				if(!isset($original)){
 					$original = array();
@@ -154,7 +154,9 @@ class SerialMetaManager extends AJXP_Plugin {
 				}
 			}
 		}		
-		$this->addMeta($urlBase.$currentFile, $newValues);	
+		$this->addMeta($urlBase.$currentFile, $newValues);
+        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
+        AJXP_Controller::applyHook("node.change", array(null, &$ajxpNode));
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);	
 		AJXP_XMLWriter::close();

@@ -115,34 +115,27 @@ Class.create("SearchEngine", AjxpPane, {
 		this.htmlElement.select('a', 'div[id="search_results"]').each(function(element){
 			disableTextSelection(element);
 		});
-
-		
-		this._inputBox.onkeypress = function(e){
-			if (e==null) e = window.event;
-			if(e.keyCode == 13) {
+        
+		this._inputBox.observe("keydown", function(e){
+            if(e.keyCode == Event.KEY_RETURN) {
                 Event.stop(e);
-				this.search();
-			}
-			if(e.keyCode == 9) return false;		
-		}.bind(this);
-		
-		this._inputBox.onkeydown  = function(e){
-			if(e == null) e = window.event;
-			if(e.keyCode == 9) return false;
+                this.search();
+            }
+			if(e.keyCode == Event.KEY_TAB) return false;
 			return true;		
-		};
+		}.bind(this));
 		
-		this._inputBox.onfocus = function(e){
+		this._inputBox.observe("focus", function(e){
 			ajaxplorer.disableShortcuts();
 			this.hasFocus = true;
 			this._inputBox.select();
 			return false;
-		}.bind(this);
+		}.bind(this));
 			
-		this._inputBox.onblur = function(e){
+		this._inputBox.observe("blur", function(e){
 			ajaxplorer.enableShortcuts();
 			this.hasFocus = false;
-		}.bind(this);
+		}.bind(this));
 		
 		$(this._searchButtonName).onclick = function(){
 			this.search();
@@ -381,6 +374,9 @@ Class.create("SearchEngine", AjxpPane, {
             var connexion = new Connexion();
             connexion.addParameter('get_action', 'search');
             connexion.addParameter('query', this.crtText);
+            if(this.hasMetaSearch()){
+                connexion.addParameter('fields', this.getSearchColumns().join(','));
+            }
             connexion.onComplete = function(transport){
                 this._parseResults(transport.responseXML, currentFolder);
                 this.updateStateFinished();
@@ -438,8 +434,18 @@ Class.create("SearchEngine", AjxpPane, {
 		{
 			if (nodes[i].tagName == "tree") 
 			{
-				var ajxpNode = this.parseAjxpNode(nodes[i]);	
-				this.addResult(currentFolder, ajxpNode);				
+				var ajxpNode = this.parseAjxpNode(nodes[i]);
+                if(this.hasMetaSearch()){
+                    var searchCols = this.getSearchColumns();
+                    for(var i=0;i<searchCols.length;i++){
+                        var meta = ajxpNode.getMetadata().get(searchCols[i]);
+                        if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
+                            this.addResult(currentFolder, ajxpNode, meta);
+                        }
+                    }
+                }else{
+				    this.addResult(currentFolder, ajxpNode);
+                }
 			}
 		}		
 		

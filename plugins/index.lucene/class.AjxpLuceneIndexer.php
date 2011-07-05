@@ -23,11 +23,16 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 		if($actionName == "search"){
 			require_once("Zend/Search/Lucene.php");
 			$index =  $this->loadIndex(ConfService::getRepository()->getId());
-			if(isSet($this->metaFields)){
-				$query = "basename:".$httpVars["query"];
-				foreach($this->metaFields as $field){
-					$query .= " OR ajxp_meta_$field:".$httpVars["query"];
-				}
+			if(isSet($this->metaFields) && isSet($httpVars["fields"])){
+                $sParts = array();
+                foreach(explode(",",$httpVars["fields"]) as $searchField){
+                    if($searchField == "basename"){
+                        $sParts[] = $searchField.":".$httpVars["query"];
+                    }else if(in_array($searchField, $this->metaFields)){
+                        $sParts[] = "ajxp_meta_".$searchField.":".$httpVars["query"];
+                    }
+                }
+                $query = implode(" OR ", $sParts);
 				AJXP_Logger::debug("Query : $query");
 			}else{
 				$index->setDefaultSearchField("basename");
@@ -41,8 +46,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 $isDir = false; // TO BE STORED IN INDEX
                 $meta["icon"] = AJXP_Utils::mimetype($hit->node_url, "image", $isDir);
                 $tmpNode = new AJXP_Node($hit->node_url, $meta);
-                $meta["search_score"] = $hit->score;
-				AJXP_XMLWriter::renderNode($tmpNode->getPath(), $hit->basename, $isDir, $meta);
+                $tmpNode->loadNodeInfo();
+                $tmpNode->search_score = $this->score;
+				AJXP_XMLWriter::renderNode($tmpNode->getPath(), $hit->basename, $isDir, $tmpNode->metadata);
 			}
 			AJXP_XMLWriter::close();
 		}else if($actionName == "index"){
@@ -148,14 +154,13 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
      * @return Zend_Search_Lucene_Document
      */
     public function createIndexedDocument($ajxpNode){
-    	AJXP_Controller::applyHook("node.info", array(&$ajxpNode));	    	
+        $ajxpNode->loadNodeInfo();
         $doc = new Zend_Search_Lucene_Document();
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()));
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())));
         $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())));
         	foreach ($this->metaFields as $field){
         		if($ajxpNode->$field != null){
-					AJXP_Logger::debug("Found value :: ".$ajxpNode->$field);        			
         			$doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field));
         		}
         	}

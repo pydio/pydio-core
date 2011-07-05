@@ -41,20 +41,47 @@ class AJXP_Node{
 	protected $_wrapperClassName;
 	protected $urlParts = array();
 	protected $realFilePointer;
+
+    protected $nodeInfoLoaded = false;
 	
 	public function __construct($url, $metadata = array()){
-		$this->_url = $url;
+        $this->setUrl($url);
+		$this->_metadata = $metadata;
+	}
+
+    public function setUrl($url){
+        $this->_url = $url;
         // Clean url
         $testExp = explode("//", $url);
         if(count($testExp) > 1){
             $this->_url = array_shift($testExp)."//";
             $this->_url .= implode("/", $testExp);
         }
+        $this->parseUrl();
+    }
 
-		$this->_metadata = $metadata;
-		$this->parseUrl();
-	}
-	
+    public function setLeaf($boolean){
+        $this->_metadata["is_file"] = $boolean;
+    }
+
+    public function isLeaf(){
+        return isSet($this->_metadata["is_file"])?$this->_metadata["is_file"]:true;
+    }
+
+    public function setLabel($label){
+        $this->_metadata["text"] = $label;
+    }
+
+    public function getLabel(){
+        return isSet($this->_metadata["text"])? $this->_metadata["text"] : basename($this->urlParts["path"]);
+    }
+
+    public function loadNodeInfo($forceRefresh = false, $contextNode = false){
+        if($this->nodeInfoLoaded && !$forceRefresh) return;
+        AJXP_Controller::applyHook("node.info", array(&$this, $contextNode));
+        $this->nodeInfoLoaded = true;
+    }
+
 	public function getRealFile(){
 		if(!isset($this->realFilePointer)){
 			$this->realFilePointer = call_user_func(array($this->_wrapperClassName, "getRealFSReference"), $this->_url, true);
@@ -83,7 +110,7 @@ class AJXP_Node{
 		if(strtolower($varName) == "wrapperclassname") return $this->_wrapperClassName;
 		if(strtolower($varName) == "url") return $this->_url;
 		if(strtolower($varName) == "metadata") return $this->_metadata;
-		
+
 		if(isSet($this->_metadata[$varName])){
 			return $this->_metadata[$varName];
 		}else{

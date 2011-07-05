@@ -94,7 +94,7 @@ class imapAccessDriver extends fsAccessDriver
 	
 	/**
 	 * 
-	 * @param AJXP_Node $currentNode
+	 * @param AJXP_Node $ajxpNode
 	 */
 	public function enrichMetadata(&$ajxpNode){//, &$metadata, $wrapperClassName, &$realFile){
 		$currentNode = $ajxpNode->getUrl();
@@ -122,7 +122,7 @@ class imapAccessDriver extends fsAccessDriver
 		}
 		if(strstr($currentNode, "__delim__")!==false){
 			$parts = explode("/", $currentNode);
-			$metadata["text"] = AJXP_Utils::xmlEntities(str_replace("__delim__", "/", array_pop($parts)), true);
+			$metadata["text"] = str_replace("__delim__", "/", array_pop($parts));
 		}
 		$ajxpNode->metadata = $metadata;
 	}
