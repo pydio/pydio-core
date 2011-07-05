@@ -53,12 +53,16 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 			AJXP_XMLWriter::header();
 			foreach ($hits as $hit){
                 $meta = array();
-                $isDir = false; // TO BE STORED IN INDEX
-                $meta["icon"] = AJXP_Utils::mimetype($hit->node_url, "image", $isDir);
-                $tmpNode = new AJXP_Node($hit->node_url, $meta);
-                $tmpNode->loadNodeInfo();
+                //$isDir = false; // TO BE STORED IN INDEX
+                //$meta["icon"] = AJXP_Utils::mimetype(SystemTextEncoding::fromUTF8($hit->node_url), "image", $isDir);
+                if($hit->serialized_metadata!=null){
+                    $meta = unserialize(base64_decode($hit->serialized_metadata));
+                }else{
+                    $tmpNode->loadNodeInfo();
+                }
+                $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
                 $tmpNode->search_score = $this->score;
-				AJXP_XMLWriter::renderNode($tmpNode->getPath(), $hit->basename, $isDir, $tmpNode->metadata);
+				AJXP_XMLWriter::renderAjxpNode($tmpNode);
 			}
 			AJXP_XMLWriter::close();
 		}else if($actionName == "index"){
@@ -166,14 +170,16 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
     public function createIndexedDocument($ajxpNode){
         $ajxpNode->loadNodeInfo();
         $doc = new Zend_Search_Lucene_Document();
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()));
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())));
-        $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())));
-        	foreach ($this->metaFields as $field){
-        		if($ajxpNode->$field != null){
-        			$doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field));
-        		}
-        	}
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), SystemTextEncoding::getEncoding());
+        foreach ($this->metaFields as $field){
+            if($ajxpNode->$field != null){
+                $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), SystemTextEncoding::getEncoding());
+            }
+        }
+        // Store a cached copy of the metadata
+        $doc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", base64_encode(serialize($ajxpNode->metadata))));
         return $doc;
     }
 

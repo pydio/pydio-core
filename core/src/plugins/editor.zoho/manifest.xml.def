@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor id="editor.zoho" openable="true" text="395" title="395" className="ZohoEditor" mimes="doc,odt,sxw" formId="zoho_box" write="true">
+	<class_definition filename="plugins/editor.zoho/class.ZohoEditor.php" classname="ZohoEditor"/>
+	<resources>
+		<js file="plugins/editor.zoho/class.ZohoEditor.js" className="ZohoEditor"/>
+	</resources>
+	<clientForm id="zoho_box"><![CDATA[
+		<div id="zoho_box" action="edit_image" box_width="90%" box_height="90%" box_padding="0">			
+			<div id="zohoContainer"></div>
+		</div>				
+	]]></clientForm>
+	<registry_contributions>
+		<actions>
+			<action name="post_to_server">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+	<dependencies>
+		<!-- Image proxy must be implemented -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+	</dependencies>				
+</editor>
