@@ -78,21 +78,26 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             session_write_close();
             $this->currentIndex = $this->loadIndex($repoId);
             $this->recursiveIndexation($url);
-            print("Optimizing\n");
+            //print("Optimizing\n");
             $this->currentIndex->optimize();
-            print("Commiting\n");
+            //print("Commiting\n");
             $this->currentIndex->commit();
             $this->currentIndex = null;
-		}
+			AJXP_XMLWriter::header();
+			AJXP_XMLWriter::triggerBgAction("reload_node", array(), "done");
+			AJXP_XMLWriter::close();
+        }
 	}
 
     public function recursiveIndexation($url){
-        print("Indexing $url \n");
+        //print("Indexing $url \n");
+        AJXP_Logger::debug("Indexing content of folder ".$url);
         $handle = opendir($url);
         if($handle !== false){
             while( ($child = readdir($handle)) != false){
                 if($child[0] == ".") continue;
                 $newUrl = $url."/".$child;
+                AJXP_Logger::debug("INDEXING NODE ".$newUrl);
                 $this->updateNodeIndex(null, new AJXP_Node($newUrl));
             }
             closedir($handle);

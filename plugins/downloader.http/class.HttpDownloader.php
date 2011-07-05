@@ -64,34 +64,10 @@ class HttpDownloader extends AJXP_Plugin{
     	
     	switch ($action){
     		case "external_download":
-				if(!defined('STDIN')){
-					$ajxpPath = AJXP_INSTALL_PATH;
-					if(function_exists('mcrypt_create_iv')){
-						$token = md5(time());
-						$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-						$user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), AuthService::getLoggedUser()->getId(), MCRYPT_MODE_ECB, $iv));					
-						$cmd = "php ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=external_download -r=".$repository->getId();
-					}else{
-						$cmd = "php ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=admin -p=admin -a=external_download -r=".$repository->getId();						
-					}
-					if(isSet($httpVars["file"])) $cmd .= " --file=".$httpVars["file"]." --dir=".$httpVars["dir"];
-					else $cmd .= " --dlfile=".$httpVars["dlfile"]." --dir=".$httpVars["dir"];
-					if(isset($httpVars["delete_dlfile"]) && $httpVars["delete_dlfile"] == "true"){
-						$cmd .= " --delete_dlfile=true";
-					}
-					if (strstr(strtolower(PHP_OS), 'windows')!==false){
-						$tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "server","tmp", md5(time()).".bat"));
-						$cmd .= "\n DEL $tmpBat";
-						AJXP_Logger::debug("Writing file $cmd to $tmpBat");
-						file_put_contents($tmpBat, $cmd);
-						pclose(popen("start /b ".$tmpBat, 'r'));
-					}else{
-						$tmpOutput = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "server","tmp", md5(time()).".output"));						
-						$process = new UnixProcess($cmd, $tmpOutput);
-						$hiddenFilename = $destStreamURL.".".$basename.".pid";
-						AJXP_Logger::debug(print_r($process, true)."--- ".$basename."---".$hiddenFilename);
-						@file_put_contents($hiddenFilename, $process->getPid());
-					}
+				if(!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()){
+										
+					AJXP_Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars, $destStreamURL.".".$basename.".pid");
+					
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ");
 					AJXP_XMLWriter::close();

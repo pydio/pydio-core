@@ -162,6 +162,14 @@ class ConfService
 		return $this->configs[$key];
 	}
 	
+	public static function currentContextIsCommandLine(){
+		return defined('STDIN');
+	}
+	
+	public static function backgroundActionsSupported(){
+		return function_exists("mcrypt_create_iv");
+	}
+	
 	/**
 	 * Get conf driver implementation
 	 *

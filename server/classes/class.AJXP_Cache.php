@@ -82,7 +82,7 @@ class AJXP_Cache {
 	
 	protected function buildCacheId($pluginId, $filePath){
         if(!is_dir($this->cacheDir."/".$pluginId)){
-            mkdir($this->cacheDir."/".$pluginId, 0666);
+            mkdir($this->cacheDir."/".$pluginId, 755);
         }
 		$root =  $this->cacheDir ."/".$pluginId."/";
 		if(isSet($this->idComputerCallback)){
