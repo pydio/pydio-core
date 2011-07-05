@@ -600,26 +600,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}					
 												
 				$metaData = array();
-				$crtLabel = AJXP_Utils::xmlEntities(basename($dir), true);
-				if(RecycleBinManager::recycleEnabled()){
-					if(RecycleBinManager::currentLocationIsRecycle($dir)){
-						$metaData["ajxp_mime"] = "ajxp_recycle";
-						$crtLabel = AJXP_Utils::xmlEntities($mess[122]);
-					}else if($dir == ""){
-						$metaData["repo_has_recycle"] = "true";
-					}
+				if(RecycleBinManager::recycleEnabled() && $dir == ""){
+                    $metaData["repo_has_recycle"] = "true";
 				}
-				if(AJXP_Utils::isBrowsableArchive($dir)){
-					$metaData["ajxp_mime"] = "ajxp_browsable_archive";
-				}
-				$realFile = null;
-				$parentAjxpNode = new AJXP_Node($dir, $metaData);
+				$parentAjxpNode = new AJXP_Node($path, $metaData);
                 $parentAjxpNode->loadNodeInfo(false, true);
-				AJXP_XMLWriter::renderHeaderNode(
-					AJXP_Utils::xmlEntities($dir, true), 
-					$crtLabel, 
-					false, 
-					$parentAjxpNode->metadata);
+				AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
 				if(isSet($totalPages) && isSet($crtPage)){
 					AJXP_XMLWriter::renderPaginationData(
 						$countFiles, 
@@ -664,63 +650,28 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						break;
 					}					
 					
-					$nodeType = "d";
-					if($isLeaf === ""){
-						$isLeaf = (is_file($path."/".$nodeName) || AJXP_Utils::isBrowsableArchive($nodeName));
-					}
-					if($isLeaf){
-						if(AJXP_Utils::isBrowsableArchive($nodeName)) {
-							if($lsOptions["f"] && $lsOptions["z"]){
-								// See archives as files
-								$nodeType = "f";
-							}else{
-								$nodeType = "z";
-							}
-						}
-						else $nodeType = "f";
-					}			
-					
 					$currentFile = $path."/".$nodeName;
-                    $metaData = array();
-                    $node = new AJXP_Node($currentFile);
+                    $meta = array();
+                    if($isLeaf != "") $meta = array("is_file" => ($isLeaf?"1":"0"));
+                    $node = new AJXP_Node($currentFile, $meta);
                     $node->setLabel($nodeName);
-                    
-					$metaData["is_file"] = ($isLeaf?"1":"0");
-					$metaData["filename"] = $dir."/".$nodeName;
-					$metaData["icon"] = AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
-					if($metaData["icon"] == "folder.png"){
-						$metaData["openicon"] = "folder_open.png";
-					}
-					if($lsOptions["l"]){
-						$metaData["file_group"] = @filegroup($currentFile) || "unknown";
-						$metaData["file_owner"] = @fileowner($currentFile) || "unknown";
-						$fPerms = @fileperms($currentFile);
-						if($fPerms !== false){
-							$fPerms = substr(decoct( $fPerms ), ($isLeaf?2:1));
-						}else{
-							$fPerms = '0000';
-						}
-						$metaData["file_perms"] = $fPerms;
-						$metaData["mimestring"] = AJXP_Utils::mimetype($currentFile, "type", !$isLeaf);
-						$datemodif = $this->date_modif($currentFile);
-						$metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
-						$metaData["bytesize"] = 0;
-						if($isLeaf){
-							$metaData["bytesize"] = filesize($currentFile);							
-							if($metaData["bytesize"] < 0){
-								$metaData["bytesize"] = sprintf("%u", $metaData["bytesize"]);
-							}
-						}
-						$metaData["filesize"] = AJXP_Utils::roundSize($metaData["bytesize"]);
-						if(AJXP_Utils::isBrowsableArchive($nodeName)){
-							$metaData["ajxp_mime"] = "ajxp_browsable_archive";
-						}
-					}
-                    $node->mergeMetadata($metaData);
                     $node->loadNodeInfo();
 					if(!empty($metaData["nodeName"]) && $metaData["nodeName"] != $nodeName){
                         $node->setUrl($path."/".$metaData["nodeName"]);
 					}
+
+                    $nodeType = "d";
+                    if($node->isLeaf()){
+                        if(AJXP_Utils::isBrowsableArchive($nodeName)) {
+                            if($lsOptions["f"] && $lsOptions["z"]){
+                                $nodeType = "f";
+                            }else{
+                                $nodeType = "z";
+                            }
+                        }
+                        else $nodeType = "f";
+                    }
+
 					$fullList[$nodeType][$nodeName] = $node;
 					$cursor ++;
 				}				
@@ -734,14 +685,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					$recycleBinOption = RecycleBinManager::getRelativeRecycle();										
 					if(file_exists($this->urlBase.$recycleBinOption)){
 						$recycleIcon = ($this->countFiles($this->urlBase.$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
-						$recycleMetaData = array("ajxp_modiftime" 	=> $this->date_modif($this->urlBase.$recycleBinOption),
-						  "mimestring" 		=> $mess[122],
-						  "icon"			=> "$recycleIcon", 
-						  "filesize"		=> "-",
-						  "ajxp_mime"		=> "ajxp_recycle");
-						$recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption, $recycleMetaData);
-                        $recycleNode->setLeaf(false);
-                        $recycleNode->setLabel($mess[122]);
+						$recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption);
                         $recycleNode->loadNodeInfo();
                         AJXP_XMLWriter::renderAjxpNode($recycleNode);
 					}
@@ -793,11 +737,70 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}
 		return $lsOptions;
 	}
-	
+
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @return void
+     */
+    function loadNodeInfo(&$ajxpNode){
+
+        $nodeName = basename($ajxpNode->getPath());
+        $metaData = $ajxpNode->metadata;
+        if(!isSet($metaData["is_file"])){
+            $isLeaf = is_file($ajxpNode->getUrl()) || AJXP_Utils::isBrowsableArchive($nodeName);
+            $metaData["is_file"] = ($isLeaf?"1":"0");
+        }else{
+            $isLeaf = $metaData["is_file"] == "1" ? true : false;
+        }
+        $metaData["filename"] = $ajxpNode->getPath();
+
+        if(RecycleBinManager::recycleEnabled() && $ajxpNode->getPath() == RecycleBinManager::getRelativeRecycle()){
+            $mess = ConfService::getMessages();
+            $recycleIcon = ($this->countFiles($ajxpNode->getUrl(), false, true)>0?"trashcan_full.png":"trashcan.png");
+            $metaData["icon"] = $recycleIcon;
+            $metaData["mimestring"] = $mess[122];
+            $ajxpNode->setLabel($mess[122]);
+            $metaData["ajxp_mime"] = "ajxp_recycle";
+        }else{
+            $metaData["mimestring"] = AJXP_Utils::mimetype($ajxpNode->getUrl(), "type", !$isLeaf);
+            $metaData["icon"] = AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
+            if($metaData["icon"] == "folder.png"){
+                $metaData["openicon"] = "folder_open.png";
+            }
+        }
+        //if($lsOptions["l"]){
+
+        $metaData["file_group"] = @filegroup($ajxpNode->getUrl()) || "unknown";
+        $metaData["file_owner"] = @fileowner($ajxpNode->getUrl()) || "unknown";
+        $fPerms = @fileperms($ajxpNode->getUrl());
+        if($fPerms !== false){
+            $fPerms = substr(decoct( $fPerms ), ($isLeaf?2:1));
+        }else{
+            $fPerms = '0000';
+        }
+        $metaData["file_perms"] = $fPerms;
+        $datemodif = $this->date_modif($ajxpNode->getUrl());
+        $metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
+        $metaData["bytesize"] = 0;
+        if($isLeaf){
+            $metaData["bytesize"] = filesize($ajxpNode->getUrl());
+            if($metaData["bytesize"] < 0){
+                $metaData["bytesize"] = sprintf("%u", $metaData["bytesize"]);
+            }
+        }
+        $metaData["filesize"] = AJXP_Utils::roundSize($metaData["bytesize"]);
+        if(AJXP_Utils::isBrowsableArchive($nodeName)){
+            $metaData["ajxp_mime"] = "ajxp_browsable_archive";
+        }
+
+        //}
+        $ajxpNode->mergeMetadata($metaData);
+
+    }
+
 	/**
 	 * Test if userSelection is containing a hidden file, which should not be the case!
-	 *
-	 * @param UserSelection $userSelection
+	 * @param UserSelection $files
 	 */
 	function filterUserSelectionToHidden($files){
 		foreach ($files as $file){

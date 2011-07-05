@@ -82,6 +82,19 @@ class AJXP_XMLWriter
 		self::$headerSent = "tree";
 		AJXP_XMLWriter::renderNode($nodeName, $nodeLabel, $isLeaf, $metaData, false);
 	}
+
+    /**
+     * @static
+     * @param AJXP_Node $ajxpNode
+     * @return void
+     */
+    static function renderAjxpHeaderNode($ajxpNode){
+        header('Content-Type: text/xml; charset=UTF-8');
+        header('Cache-Control: no-cache');
+        print('<?xml version="1.0" encoding="UTF-8"?>');
+        self::$headerSent = "tree";
+        self::renderAjxpNode($ajxpNode, false);
+    }
 	
 	static function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true){
 		$string = "<tree";
