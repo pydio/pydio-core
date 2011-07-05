@@ -153,7 +153,7 @@ class ImagePreviewer extends AJXP_Plugin {
 				$ajxpNode->readable_dimension = "";
 			}else{
 				$realFile = $ajxpNode->getRealFile();
-				list($width, $height, $type, $attr) = getimagesize($realFile);
+				list($width, $height, $type, $attr) = @getimagesize($realFile);
 				$ajxpNode->image_type = image_type_to_mime_type($type);
 				$ajxpNode->image_width = $width;
 				$ajxpNode->image_height = $height;

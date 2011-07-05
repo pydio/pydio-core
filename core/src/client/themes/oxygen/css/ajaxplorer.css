@@ -457,6 +457,25 @@ div.accordion_content{
 	border-radius : 5px;
 }
 
+.pg_cancel_button{
+	background-color: #C33;
+	display: inline-block;
+	border-radius: 20px;
+	-moz-border-radius: 20px;
+	-webkit-border-radius: 20px;
+	cursor: pointer;
+	float: right;
+	margin-right: 8px;
+	font-weight: bold;
+	color: white !important;
+	height: 12px;
+	width: 8px;
+	padding-left: 4px;
+	line-height: 13px;
+	font-size: 7px;
+	margin-top: 2px;
+}
+
 /*************************/
 /* SF like "Standard Form" DATA : try to make a "standard"...
 /*************************/

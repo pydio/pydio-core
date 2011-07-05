@@ -1200,7 +1200,7 @@ Class.create("FilesList", SelectableElements, {
 		element.update(div);
 		div.insert({top:span});
 		if(ajxpNode.getMetadata().get("process_stoppable")){
-			var stopButton = new Element('a').update("X");
+			var stopButton = new Element('a', {className:'pg_cancel_button'}).update("X");
 			stopButton.observe("click", function(){
 				var conn = new Connexion();
 				conn.setParameters({

@@ -11,12 +11,29 @@
 		</hooks>
 		<actions>
 			<action name="search">
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="false" adminOnly="false">
+				</rightsContext>
 				<processing>
 					<serverCallback methodName="applyAction"/>
 				</processing>
 			</action>					
 			<action name="index">
+				<gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
+					<context selection="false" dir="true" recycle="false"
+						actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false">
+					</context>
+				</gui>			
+				<rightsContext noUser="true" userLogged="only" read="true"
+					write="true" adminOnly="false">
+				</rightsContext>				
 				<processing>
+					<clientCallback prepareModal="false"><![CDATA[
+						var crtDir = ajaxplorer.getContextNode().getPath();
+						var bgManager = ajaxplorer.actionBar.bgManager;
+						bgManager.queueAction("index", new Hash({dir:crtDir}), "Indexing current folder");
+						bgManager.next();
+					]]></clientCallback>				
 					<serverCallback methodName="applyAction"/>
 				</processing>
 			</action>					
