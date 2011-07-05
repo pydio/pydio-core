@@ -40,7 +40,7 @@ Class.create("SearchEngine", AjxpPane, {
 	 */
 	htmlElement:undefined,
 	_inputBox:undefined,
-	_resultsBox:undefined,
+	_resultsBoxId:undefined,
 	_searchButtonName:undefined,
 	/**
 	 * @var String Default 'idle'
@@ -76,7 +76,13 @@ Class.create("SearchEngine", AjxpPane, {
             $(this._resultsBoxId).update('');
         }
         var reg = ajaxplorer.getXmlRegistry();
-        if(XPathSelectSingleNode(reg, "plugins/indexer") != null){
+        var indexerNode = XPathSelectSingleNode(reg, "plugins/indexer");
+        if(indexerNode != null){
+            if(indexerNode.getAttribute("indexed_meta_fields")){
+                this.indexedFields = $A(indexerNode.getAttribute("indexed_meta_fields").evalJSON());
+            }else{
+                this.indexedFields = $A();
+            }
             this._searchMode = "remote";
         }else{
             this._searchMode = "local";
@@ -94,10 +100,11 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		this.metaOptions = [];
 		if(this._ajxpOptions && this._ajxpOptions.metaColumns){
-			var cols = this._ajxpOptions.metaColumns;
-			$('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});			
+            var cols = this._ajxpOptions.metaColumns;
+			$('search_form').insert({bottom:'<div id="search_meta">'+MessageHash[344]+' : <span id="search_meta_options"></span></div>'});
 			this.initMetaOption($('search_meta_options'), 'filename', 'Filename', true);
 			for(var key in cols){
+                if(this.indexedFields && !this.indexedFields.include(key)) continue;
 				this.initMetaOption($('search_meta_options'), key, cols[key]);
 			}
 		}else{
@@ -437,8 +444,8 @@ Class.create("SearchEngine", AjxpPane, {
 				var ajxpNode = this.parseAjxpNode(nodes[i]);
                 if(this.hasMetaSearch()){
                     var searchCols = this.getSearchColumns();
-                    for(var i=0;i<searchCols.length;i++){
-                        var meta = ajxpNode.getMetadata().get(searchCols[i]);
+                    for(var k=0;k<searchCols.length;k++){
+                        var meta = ajxpNode.getMetadata().get(searchCols[k]);
                         if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
                             this.addResult(currentFolder, ajxpNode, meta);
                         }

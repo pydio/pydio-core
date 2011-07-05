@@ -5,29 +5,39 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
     private $currentIndex;
     private $accessDriver;
     private $metaFields = array();
+    private $specificId = "";
 
 	public function init($options){
-		parent::init($options);		
+		//parent::init($options);
+        $this->options = $options;
 		set_include_path(get_include_path().PATH_SEPARATOR.AJXP_INSTALL_PATH."/plugins/index.lucene");
         if(!empty($this->options["index_meta_fields"])){
         	$this->metaFields = explode(",",$this->options["index_meta_fields"]);
+        }
+        if(!empty($this->options["repository_specific_keywords"])){
+            $this->specificId = "-".str_replace(",", "-", AJXP_VarsFilter::filter($this->options["repository_specific_keywords"]));
         }
 	}
 
     public function initMeta($accessDriver){
         $this->accessDriver = $accessDriver;
+        if(!empty($this->options["index_meta_fields"])){
+            $el = $this->xPath->query("/indexer")->item(0);
+            $el->setAttribute("indexed_meta_fields", json_encode($this->metaFields));
+        }
+        parent::init($this->options);
     }
 
 	
 	public function applyAction($actionName, $httpVars, $fileVars){
 		if($actionName == "search"){
 			require_once("Zend/Search/Lucene.php");
-			$index =  $this->loadIndex(ConfService::getRepository()->getId());
+			$index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
 			if(isSet($this->metaFields) && isSet($httpVars["fields"])){
                 $sParts = array();
                 foreach(explode(",",$httpVars["fields"]) as $searchField){
-                    if($searchField == "basename"){
-                        $sParts[] = $searchField.":".$httpVars["query"];
+                    if($searchField == "filename"){
+                        $sParts[] = "basename:".$httpVars["query"];
                     }else if(in_array($searchField, $this->metaFields)){
                         $sParts[] = "ajxp_meta_".$searchField.":".$httpVars["query"];
                     }
@@ -200,13 +210,16 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 	 * @param Integer $repositoryId
 	 * @return Zend_Search_Lucene_Interface the index
 	 */
-	protected function loadIndex($repositoryId){
+	protected function loadIndex($repositoryId, $create = true){
         require_once("Zend/Search/Lucene.php");
-        $iPath = AJXP_CACHE_DIR."/indexes/index-$repositoryId";
+        $iPath = AJXP_CACHE_DIR."/indexes/index-$repositoryId".$this->specificId;
         if(!is_dir(AJXP_CACHE_DIR."/indexes")) mkdir(AJXP_CACHE_DIR."/indexes",0666);
 		if(is_dir($iPath)){
 		    $index = Zend_Search_Lucene::open($iPath);
 		}else{
+            if(!$create){
+                throw new Exception("Cannot find index for current repository! You should trigger the indexation of the data first!");
+            }
 		    $index = Zend_Search_Lucene::create($iPath);
 		}
 		return $index;		
