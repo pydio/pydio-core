@@ -6,6 +6,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
     private $accessDriver;
     private $metaFields = array();
     private $specificId = "";
+    private $verboseIndexation = false;
 
 	public function init($options){
 		//parent::init($options);
@@ -32,6 +33,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 	public function applyAction($actionName, $httpVars, $fileVars){
 		if($actionName == "search"){
 			require_once("Zend/Search/Lucene.php");
+            if($this->isIndexLocked(ConfService::getRepository()->getId())){
+                throw new Exception("Warning, the repository is currently being indexed, please retry later.");
+            }
 			$index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
 			if(isSet($this->metaFields) && isSet($httpVars["fields"])){
                 $sParts = array();
@@ -61,7 +65,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                     $tmpNode->loadNodeInfo();
                 }
                 $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
-                $tmpNode->search_score = $hit->score;
+                $tmpNode->search_score = sprintf("%0.2f", $hit->score);
 				AJXP_XMLWriter::renderAjxpNode($tmpNode);
 			}
 			AJXP_XMLWriter::close();
@@ -69,38 +73,73 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 			$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
             if(empty($dir)) $dir = "/";
             $repo = ConfService::getRepository();
-			$accessType = $repo->getAccessType();
+            if($this->isIndexLocked($repo->getId())){
+                throw new Exception("Warning there seem to be already an indexation running! Please wait!");
+            }
+            $accessType = $repo->getAccessType();
             $accessPlug = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
             $stData = $accessPlug->detectStreamWrapper(true);
-            $url = $stData["protocol"]."://".$repo->getId().$dir;
             $repoId = $repo->getId();
+            $url = $stData["protocol"]."://".$repoId.$dir;
+            if(isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true"){
+                $this->verboseIndexation = true;
+            }
+
+            if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()){
+                $this->lockIndex($repoId);
+                AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::triggerBgAction("check_lock", array(), "Indexing $dir in background", true, 2);
+                AJXP_XMLWriter::close();
+                return;
+            }
+
             // GIVE BACK THE HAND TO USER
-            session_write_close();
+            // session_write_close();
             $this->currentIndex = $this->loadIndex($repoId);
             $this->recursiveIndexation($url);
-            //print("Optimizing\n");
+            if(ConfService::currentContextIsCommandLine() && $this->verboseIndexation){
+                print("Optimizing\n");
+            }
             $this->currentIndex->optimize();
-            //print("Commiting\n");
+            if(ConfService::currentContextIsCommandLine() && $this->verboseIndexation){
+                print("Commiting Index\n");
+            }
             $this->currentIndex->commit();
             $this->currentIndex = null;
-			AJXP_XMLWriter::header();
-			AJXP_XMLWriter::triggerBgAction("reload_node", array(), "done");
-			AJXP_XMLWriter::close();
+            $this->releaseLock($repoId);
+        }else if($actionName == "check_lock"){
+            $repoId = $httpVars["repository_id"];
+            if($this->isIndexLocked($repoId)){
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), "Indexation runnning in background", true, 3);
+                AJXP_XMLWriter::close();
+            }else{
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::triggerBgAction("info_message", array(), "Indexation finished!", true, 5);
+                AJXP_XMLWriter::close();
+            }
         }
+
 	}
 
     public function recursiveIndexation($url){
         //print("Indexing $url \n");
         AJXP_Logger::debug("Indexing content of folder ".$url);
+        if(ConfService::currentContextIsCommandLine() && $this->verboseIndexation){
+            print("Indexing content of ".$url."\n");
+        }
         $handle = opendir($url);
         if($handle !== false){
             while( ($child = readdir($handle)) != false){
                 if($child[0] == ".") continue;
                 $newUrl = $url."/".$child;
-                AJXP_Logger::debug("INDEXING NODE ".$newUrl);
+                AJXP_Logger::debug("Indexing Node ".$newUrl);
                 $this->updateNodeIndex(null, new AJXP_Node($newUrl));
             }
             closedir($handle);
+        }else{
+            AJXP_Logger::debug("Cannot open $url!!");
         }
     }
 
@@ -215,6 +254,20 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         $query = new Zend_Search_Lucene_Search_Query_Wildcard($pattern);
         $hits = $index->find($query);
         return $hits;
+    }
+
+    protected function lockIndex($repositoryId){
+        $iPath = AJXP_CACHE_DIR."/indexes";
+        if(!is_dir($iPath)) mkdir($iPath,0666, true);
+        touch($iPath."/.ajxp_lock-".$repositoryId.$this->specificId);
+    }
+
+    protected function isIndexLocked($repositoryId){
+        return file_exists(AJXP_CACHE_DIR."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
+    }
+
+    protected function releaseLock($repositoryId){
+        @unlink(AJXP_CACHE_DIR."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
     }
 
 	/**

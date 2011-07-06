@@ -335,7 +335,7 @@ Class.create("SearchEngine", AjxpPane, {
 		$(this._resultsBoxId).insert(divElement);
         if(this._searchMode == 'remote' && ajxpNode.getMetadata().get("search_score")){
             /*divElement.insert(new Element('a', {className:"searchUnindex"}).update("X"));*/
-            divElement.insert(new Element('span', {className:"searchScore"}).update(""+ajxpNode.getMetadata().get("search_score")));
+            divElement.insert(new Element('span', {className:"searchScore"}).update("SCORE "+ajxpNode.getMetadata().get("search_score")));
         }
 		if(isFolder)
 		{

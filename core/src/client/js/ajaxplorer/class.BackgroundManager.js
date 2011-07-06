@@ -90,23 +90,27 @@ Class.create("BackgroundManager", {
 			this.parseAnswer(transport.responseXML);
 			this.working = false;
 		}.bind(this);
-		connexion.sendAsync();		
-		var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" height="16" width="16" align="absmiddle">';
-		this.panel.update(imgString+' '+actionDef.get('messageId'));
-		this.panel.show();
-		new Effect.Corner(this.panel, "round 8px bl");
-		new Effect.Corner(this.panel, "round 8px tl");
+		connexion.sendAsync();
+        this.updatePanelMessage(actionDef.get('messageId'));
 		this.queue.shift();
 		this.working = true;
 	},
-	
+
+    updatePanelMessage : function(message){
+        var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" height="16" width="16" align="absmiddle">';
+        this.panel.update(imgString+' '+message);
+        this.panel.show();
+        new Effect.Corner(this.panel, "round 8px bl");
+        new Effect.Corner(this.panel, "round 8px tl");
+    },
+
 	/**
 	 * Parses the response. Should probably use the actionBar parser instead.
 	 * @param xmlResponse XMLDocument
 	 */
 	parseAnswer:function(xmlResponse){
 		var childs = xmlResponse.documentElement.childNodes;	
-		
+		var delay = 0;
 		for(var i=0; i<childs.length;i++)
 		{
 			if(childs[i].tagName == "message")
@@ -119,6 +123,7 @@ Class.create("BackgroundManager", {
 			else if(childs[i].nodeName == "trigger_bg_action"){				
 				var name = childs[i].getAttribute("name");
 				var messageId = childs[i].getAttribute("messageId");
+                delay = parseInt(childs[i].getAttribute("delay"));
 				var parameters = new Hash();
 				for(var j=0;j<childs[i].childNodes.length;j++){
 					var paramChild = childs[i].childNodes[j];
@@ -127,15 +132,27 @@ Class.create("BackgroundManager", {
 					}
 				}
 				if(name == "reload_node"){
+                    if(delay){
+                        window.setTimeout(function(){
+                            ajaxplorer.fireContextRefresh();
+                            this.next();
+                        }.bind(this), delay*1000);
+                        return;
+                    }
 					 var dm = ajaxplorer.fireContextRefresh();
-					 this.finished();
+                }else if(name == "info_message"){
+                    this.updatePanelMessage(messageId);
 				}else{
 					this.queueAction(name, parameters, messageId);
 				}
 			}
 		}
 		this.working = false;
-		this.next();
+        if(delay){
+            window.setTimeout(this.next.bind(this), delay*1000);
+        }else{
+            this.next();
+        }
 	},
 	/**
 	 * Interrupt the task on error
