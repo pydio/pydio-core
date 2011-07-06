@@ -399,8 +399,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$logMessage = $messtmp;
 				$pendingSelection = $dirname;
 				$reloadContextNode = true;
-				AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
-				
+                $newNode = new AJXP_Node($this->urlBase.$dir."/".$dirname);
+                AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
+                AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
+
 			break;
 		
 			//------------------------------------
@@ -1343,7 +1345,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			{
 				$error[] = $mess[114];
 				return ;
-			}			
+			}else{
+                AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), !$move));
+            }
 		}
 		else 
 		{			
