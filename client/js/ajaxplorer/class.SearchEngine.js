@@ -53,6 +53,7 @@ Class.create("SearchEngine", AjxpPane, {
 	_queue : undefined,
 
     _searchMode : "local",
+    _even : false,
 
 	/**
 	 * Constructor
@@ -297,6 +298,7 @@ Class.create("SearchEngine", AjxpPane, {
 		{
 			$(this._resultsBoxId).removeChild($(this._resultsBoxId).childNodes[0]);
 		}
+        this._even = false;
 	},
 	/**
 	 * Add a result to the list - Highlight search term
@@ -328,8 +330,13 @@ Class.create("SearchEngine", AjxpPane, {
 			stringToDisplay = this.highlight(fileName, this.crtText);
 		}
 		
-		var divElement = new Element('div', {title:MessageHash[224]+' '+ folderName}).update(imageString+stringToDisplay);	
+		var divElement = new Element('div', {title:MessageHash[224]+' '+ folderName, className:(this._even?'even':'')}).update(imageString+stringToDisplay);
+        this._even = !this._even;
 		$(this._resultsBoxId).insert(divElement);
+        if(this._searchMode == 'remote' && ajxpNode.getMetadata().get("search_score")){
+            /*divElement.insert(new Element('a', {className:"searchUnindex"}).update("X"));*/
+            divElement.insert(new Element('span', {className:"searchScore"}).update(""+ajxpNode.getMetadata().get("search_score")));
+        }
 		if(isFolder)
 		{
 			divElement.observe("click", function(e){
@@ -387,7 +394,9 @@ Class.create("SearchEngine", AjxpPane, {
             connexion.onComplete = function(transport){
                 this._parseResults(transport.responseXML, currentFolder);
                 this.updateStateFinished();
+                this.removeOnLoad($(this._resultsBoxId));
             }.bind(this);
+            this.setOnLoad($(this._resultsBoxId));
             connexion.sendAsync();
         }else{
             /* LIST CONTENT, SEARCH CLIENT SIDE, AND RECURSE */
@@ -526,6 +535,25 @@ Class.create("SearchEngine", AjxpPane, {
 		}
 		var highlight = haystack.substring(0, start)+'<em>'+haystack.substring(start, end)+'</em>'+haystack.substring(end);
 		return highlight;
-	}
+	},
+
+    /**
+     * Add a loading image to the given element
+     * @param element Element dom node
+     */
+    setOnLoad : function(element){
+        addLightboxMarkupToElement(element);
+        var img = new Element("img", {src : ajxpResourcesFolder+"/images/loadingImage.gif", style:"margin-top: 50px;"});
+        $(element).down("#element_overlay").insert(img);
+        this.loading = true;
+    },
+    /**
+     * Removes the image from the element
+     * @param element Element dom node
+     */
+    removeOnLoad : function(element){
+        removeLightboxFromElement(element);
+        this.loading = false;
+    }
 		
 });

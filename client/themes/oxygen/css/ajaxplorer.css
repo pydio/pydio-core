@@ -161,7 +161,6 @@ div.shadow_class
 
 .dialogBox, .editBox
 {
-	/*background-image: url('../images/strip.png');*/
 	background-color: #f1f1ef;
     display: none;
     position: absolute;
@@ -1573,6 +1572,17 @@ div.tabulatorContainer{
 	padding-right:52px;
 }
 
+.searchScore{
+    float: right;
+    color: #CCC;
+    font-size: 10px;
+    font-style: italic;
+}
+
+.searchUnindex{
+
+}
+
 meta_opt {
 	cursor: pointer;
 }
@@ -1602,8 +1612,20 @@ meta_opt.checked {
 
 #search_results div:hover
 {
-	background-color : #73a2d7;
-	color : white;
+    background-color:#73a2d7 !important;
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, rgb(66,128,199)),
+        color-stop(0.54, rgb(115,161,215))
+    );
+    background-image: -moz-linear-gradient(
+        center bottom,
+        rgb(52,111,179) 0%,
+        rgb(115,161,215) 54%
+    );
+    color: white;
 }
 
 .infoPanelActions

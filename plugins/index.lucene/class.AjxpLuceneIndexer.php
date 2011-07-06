@@ -61,7 +61,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                     $tmpNode->loadNodeInfo();
                 }
                 $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
-                $tmpNode->search_score = $this->score;
+                $tmpNode->search_score = $hit->score;
 				AJXP_XMLWriter::renderAjxpNode($tmpNode);
 			}
 			AJXP_XMLWriter::close();
@@ -157,7 +157,10 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 if($copy == false){
                     $index->delete($hit->id);
                 }
-                $newChildURL = str_replace($oldNode->getUrl(), $newNode->getUrl(), $oldChildURL);
+                $newChildURL = str_replace(SystemTextEncoding::toUTF8($oldNode->getUrl()),
+                                           SystemTextEncoding::toUTF8($newNode->getUrl()),
+                                           $oldChildURL);
+                $newChildURL = SystemTextEncoding::fromUTF8($newChildURL);
                 $index->addDocument($this->createIndexedDocument(new AJXP_Node($newChildURL)));
             }
         }
@@ -193,7 +196,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
      * @return Number
      */
     public function getIndexedDocumentId($index, $ajxpNode){
-        $term = new Zend_Search_Lucene_Index_Term($ajxpNode->getUrl(), "node_url");
+        $term = new Zend_Search_Lucene_Index_Term(SystemTextEncoding::toUTF8($ajxpNode->getUrl()), "node_url");
         $docIds = $index->termDocs($term);
         if(!count($docIds)) return null;
         return $docIds[0];
@@ -207,7 +210,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
      */
     public function getIndexedChildrenDocuments($index, $ajxpNode){
         // Try getting doc by url
-        $testQ = str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath());
+        $testQ = str_replace("/", "AJXPFAKESEP", SystemTextEncoding::toUTF8($ajxpNode->getPath()));
         $pattern = new Zend_Search_Lucene_Index_Term($testQ .'*', 'node_path');
         $query = new Zend_Search_Lucene_Search_Query_Wildcard($pattern);
         $hits = $index->find($query);
@@ -218,6 +221,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 	 * 
 	 * Enter description here ...
 	 * @param Integer $repositoryId
+     * @param bool $create
 	 * @return Zend_Search_Lucene_Interface the index
 	 */
 	protected function loadIndex($repositoryId, $create = true){
