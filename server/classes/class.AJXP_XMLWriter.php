@@ -229,8 +229,8 @@ class AJXP_XMLWriter
 		return AJXP_XMLWriter::write("<require_auth/>", $print);
 	}
 	
-	static function triggerBgAction($actionName, $parameters, $messageId, $print=true){
-		$data = AJXP_XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\">", $print);
+	static function triggerBgAction($actionName, $parameters, $messageId, $print=true, $delay = 0){
+		$data = AJXP_XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\" delay=\"$delay\">", $print);
 		foreach ($parameters as $paramName=>$paramValue){
 			$data .= AJXP_XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
 		}

@@ -66,11 +66,14 @@ class HttpDownloader extends AJXP_Plugin{
     		case "external_download":
 				if(!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()){
 										
-					AJXP_Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars, $destStreamURL.".".$basename.".pid");
-					
+					$unixProcess = AJXP_Controller::applyActionInBackground($repository->getId(), "external_download", $httpVars);
+					if($unixProcess !== null){
+                        @file_put_contents($destStreamURL.".".$basename.".pid", $unixProcess->getPid());
+                    }
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ");
 					AJXP_XMLWriter::close();
+                    session_write_close();
 					exit();			
 				}
 				    					    	

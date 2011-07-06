@@ -18,6 +18,14 @@
 					<serverCallback methodName="applyAction"/>
 				</processing>
 			</action>					
+            <action name="check_lock">
+                <rightsContext noUser="true" userLogged="only" read="true"
+                    write="false" adminOnly="false">
+                </rightsContext>
+                <processing>
+                    <serverCallback methodName="applyAction"/>
+                </processing>
+            </action>
 			<action name="index">
 				<gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
 					<context selection="false" dir="true" recycle="false"
