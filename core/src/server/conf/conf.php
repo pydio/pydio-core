@@ -52,7 +52,9 @@ define("ADMIN_PASSWORD", "admin");
 // Whether a "guest" user should be enabled or not : this guest
 // will appear in the list of the users and you can assign rights to him
 // like a normal user. If no user is logged, the guest user is logged.
-define("ALLOW_GUEST_BROWSING", 0);
+$ALLOW_GUEST_BROWSING = false;
+// Don't touch this one
+define("ALLOW_GUEST_BROWSING", (!isSet($_SERVER["HTTP_AJXP_FORCE_LOGIN"]) && $ALLOW_GUEST_BROWSING));
 
 // Minimal length required for password. For better security, you 
 // should set this to at least 8 characters.
@@ -124,7 +126,7 @@ $PLUGINS = array(
 			"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users",
 			/*
 			"CUSTOM_DATA"			=> array(
-				"email"	=> "Email", 
+				"email"	=> "Email",
 				"country" => "Country"
 			)
 			*/
@@ -140,38 +142,17 @@ $PLUGINS = array(
 	),
 	/*
 	"AUTH_DRIVER" => array(
-		"NAME"		=> "multi",
-		"OPTIONS"	=>	array(
-			"DRIVERS"	=> array(
-				"serial" => array(
-					"NAME"		=> "serial",
-					"OPTIONS"	=> array(
-						"USERS_FILEPATH"		=> "AJXP_INSTALL_PATH/server/users/users.ser",
-						"AUTOCREATE_AJXPUSER" 	=> false
-					)
-				),
-				"ftp" => array(
-					"NAME"		=> "ftp",
-					"OPTIONS"	=> array(
-						"REPOSITORY_ID"			=> "dyna_ftp",
-						"ADMIN_USER"			=> "admin",
-						"FTP_LOGIN_SCREEN" 		=> false
-				 	)
-				)				
-			),
-			"MASTER_DRIVER"			=> "serial",
-			"TRANSMIT_CLEAR_PASS"	=> true,
-			"LOGIN_REDIRECT"		=> false,
-		)
-	),
-	"AUTH_DRIVER" => array(
-		"NAME"		=> "ftp",
-			"OPTIONS"	=> array(
-				"REPOSITORY_ID"			=> "dyna_ftp",
-				"ADMIN_USER"			=> "admin",
-				"FTP_LOGIN_SCREEN" 		=> false,
-				"TRANSMIT_CLEAR_PASS"	=> true,
-				"LOGIN_REDIRECT"		=> false,
+		"NAME"		=> "remote",
+		"OPTIONS"	=> array(
+			"SLAVE_MODE"  => true,
+			"USERS_FILEPATH" => "AJXP_INSTALL_PATH/server/users/users.ser",
+			"MASTER_AUTH_FUNCTION" => "joomla_remote_auth",
+			"MASTER_HOST"		=> "localhost",
+			"MASTER_URI"		=> "/joomla/",
+			"LOGIN_URL" => "/joomla/",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
+			"LOGOUT_URL" => "/joomla/",  // The URL to redirect upon login out (see above)
+			"SECRET" => "myprivatesecret",// the same as the one you put in the WP plugin option.
+			"TRANSMIT_CLEAR_PASS"   => true // Don't touch this. It's unsafe (and useless here) to transmit clear password.
 		)
 	),
 	*/
@@ -186,7 +167,7 @@ $PLUGINS = array(
 	// Do not use wildcard for uploader, to keep them in a given order
 	// Warning, do not add the "meta." plugins, they are automatically
 	// detected and activated by the application.
-	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.http")
+	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.*")
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
@@ -226,32 +207,7 @@ $REPOSITORIES[0] = array(
 		*/
 		)
 	),
-	
-);
 
-$REPOSITORIES["dyna_ftp"] = array(
-	"DISPLAY"		=>	"FTP", 
-	"AJXP_SLUG"		=>  "ftp",
-	"DRIVER"		=>	"ftp", 
-	"DRIVER_OPTIONS"=> array(
-		"FTP_HOST"		=>	"ftp.ajaxplorer.info", 
-		"FTP_PORT"		=>	"21",
-		"RECYCLE_BIN" 	=> 	'recycle_bin',
-		"CHMOD_VALUE"   =>  '0600',
-		"DEFAULT_RIGHTS"=>  "",
-		"PAGINATION_THRESHOLD" => 500,
-		"PAGINATION_NUMBER" => 200,
-		"META_SOURCES"		=> array(
-		/*
-			"meta.serial"=> array(
-				"meta_file_name"	=> ".ajxp_meta",
-				"meta_fields"		=> "testKey1,stars_rate,css_label",
-				"meta_labels"		=> "Test Key,Rating,Label"
-			)
-		*/
-		)
-	),
-	
 );
 
 
@@ -288,8 +244,8 @@ $default_language="en";
 /* the css or the js files, and to compile 
 /* these into bundled file.
 /*********************************************/
-$AJXP_JS_DEBUG = true;
-$AJXP_SERVER_DEBUG = true;
+$AJXP_JS_DEBUG = false;
+$AJXP_SERVER_DEBUG = false;
 
 /*********************************************/
 /* SESSION CREDENTIALS
