@@ -78,7 +78,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 			}			
 			
 		}else if($action == "get_extracted_page" && isSet($httpVars["file"])){
-			$file = AJXP_CACHE_DIR."/".$httpVars["file"];
+			$file = AJXP_CACHE_DIR."/imagick_full/".$httpVars["file"];
 			if(!is_file($file)) return ;
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
 			header("Content-Length: ".filesize($file));
