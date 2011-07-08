@@ -243,23 +243,11 @@ class AJXP_Plugin implements Serializable{
 	
 	public function serialize(){
 		if($this->manifestDoc != null){
-			//var_dump("Saving manifest for ".$this->id);
 			$this->manifestXML = base64_encode($this->manifestDoc->saveXML());
 		}
-		
-		/*
-		$keys = array_keys(get_class_vars(get_class($this)));
-		//$keys = array_diff($keys, array("manifestDoc", "xPath"));
-		$reflect = new ReflectionClass($this);
-		$props = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
-	*/
 		$serialArray = array();
 		foreach ($this->serializableAttributes as $attr){
 			$serialArray[$attr] = serialize($this->$attr);
-		}
-		if($this->id == "conf.serial"){
-			//var_dump($this);
-			//var_dump($serialArray);
 		}
 		return serialize($serialArray);
 	}

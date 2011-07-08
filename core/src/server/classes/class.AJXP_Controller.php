@@ -189,21 +189,25 @@ class AJXP_Controller{
      */
 	public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters){
 		$token = md5(time());
+        $logDir = AJXP_CACHE_DIR."/cmd_outputs";
+        if(!is_dir($logDir)) mkdir($logDir, 755);
+        $logFile = $logDir."/".$token.".out";
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 		$user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), AuthService::getLoggedUser()->getId(), MCRYPT_MODE_ECB, $iv));					
 		$cmd = "php ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
 		foreach($parameters as $key=>$value){
             if($key == "action" || $key == "get_action") continue;
-			$cmd .= " --$key=$value";
+			$cmd .= " --$key=".escapeshellarg($value);
 		}
 		if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
 			$tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "server","tmp", md5(time()).".bat"));
+            $cmd .= " > ".$logFile;
 			$cmd .= "\n DEL $tmpBat";
 			AJXP_Logger::debug("Writing file $cmd to $tmpBat");
 			file_put_contents($tmpBat, $cmd);
 			pclose(popen("start /b ".$tmpBat, 'r'));
 		}else{
-			$process = new UnixProcess($cmd, false);
+			$process = new UnixProcess($cmd, $logFile);
 			AJXP_Logger::debug("Starting process and sending output dev null");
             return $process;
 		}		

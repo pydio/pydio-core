@@ -86,7 +86,6 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             }
 
             if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()){
-                $this->lockIndex($repoId);
                 AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
                 AJXP_XMLWriter::header();
                 AJXP_XMLWriter::triggerBgAction("check_lock", array(), "Indexing $dir in background", true, 2);
@@ -94,8 +93,10 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 return;
             }
 
+            $this->lockIndex($repoId);
+
             // GIVE BACK THE HAND TO USER
-            // session_write_close();
+            session_write_close();
             $this->currentIndex = $this->loadIndex($repoId);
             $this->recursiveIndexation($url);
             if(ConfService::currentContextIsCommandLine() && $this->verboseIndexation){
