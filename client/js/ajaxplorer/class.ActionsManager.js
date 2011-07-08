@@ -104,7 +104,8 @@ Class.create("ActionsManager", {
 			actionsSelectorAtt = 'directoryContext';
 		}
 		var contextActions = new Array();
-		var crtGroup;
+		var defaultGroup;
+        var contextActionsGroup = {};
 		this.actions.each(function(pair){
 			var action = pair.value;
 			if(!action.context.contextMenu) return;
@@ -112,9 +113,14 @@ Class.create("ActionsManager", {
 			if(actionsSelectorAtt == 'directoryContext' && !action.context.dir) return;
 			if(actionsSelectorAtt == 'genericContext' && action.context.selection) return;
 			if(action.contextHidden || action.deny) return;
+            /*
 			if(crtGroup && crtGroup != action.context.actionBarGroup){
 				contextActions.push({separator:true});
 			}
+			*/
+            if(!contextActionsGroup[action.context.actionBarGroup]){
+                contextActionsGroup[action.context.actionBarGroup] = $A();
+            }
 			var isDefault = false;
 			if(actionsSelectorAtt == 'selectionContext'){
 				// set default in bold
@@ -145,10 +151,27 @@ Class.create("ActionsManager", {
 					menuItem.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
 				}
 			}
-			contextActions.push(menuItem);
-			crtGroup = action.context.actionBarGroup;
+			//contextActions.push(menuItem);
+            contextActionsGroup[action.context.actionBarGroup].push(menuItem);
+            if(isDefault){
+    			defaultGroup = action.context.actionBarGroup;
+            }
 		}.bind(this));
-		
+        var first = true;
+        contextActionsGroup = $H(contextActionsGroup);
+        contextActionsGroup = contextActionsGroup.sortBy(function(p){
+            if(defaultGroup && p.key == defaultGroup) return 'aaaa';
+            return p.key;
+        });
+		contextActionsGroup.each(function(pair){
+            if(!first){
+                contextActions.push({separator:true});
+            }
+            first = false;
+            pair.value.each(function(mItem){
+                contextActions.push(mItem);
+            });
+        });
 		return contextActions;
 	},
 	

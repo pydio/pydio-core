@@ -35,7 +35,7 @@
 var currentLink;
 function parseLinks(){	
 	jQuery('body').append('<link rel="stylesheet" type="text/css" href="'+ajxp_bm_target+'client/js/bookmarklet/ajxp.css"></link>');
-	jQuery('body').append('<div id="ajxp_bm_main" class="ajxp_bm_menu" ><div><a id="ajxp_bm_close" style="float:right;font-size:12px;cursor:pointer;border-left:1px solid #fff;padding-left: 10px;">X</a>AjaXplorer direct download active</div><div style="color: #ccc; font-size: 10px;	padding: 5px 0px;">Click on any <u>link</u> or <u>image</u> to download it directly to your AjaXplorer account!</div><div style="display:none" id="ajxp_bm_frame_div"><iframe frameborder="0" id="ajxp_bm_iframe"></iframe></div></div><div style="position:absolute;" class="ajxp_bm_menu" id="ajxp_bm_link_menu"><div id="ajxp_bm_link_title"></div><a id="ajxp_bm_link_dl1">Download to AjaXplorer</a><a id="ajxp_bm_link_dl2">Process link normally</a></div>').click(function(){jQuery('#ajxp_bm_link_menu').slideUp();}) ;
+	jQuery('body').append('<div id="ajxp_bm_main" class="ajxp_bm_menu" ><div><a id="ajxp_bm_close" style="float:right;font-size:12px;cursor:pointer;border-left:1px solid #fff;padding-left: 10px;">X</a>AjaXplorer direct download active</div><div style="color: #ccc; font-size: 10px;	padding: 5px 0px;">Click on any link or image to send the link directly to your AjaXplorer account.<br><input type="checkbox" id="ajxp_dl_now" checked>Trigger download directly</div><div style="display:none" id="ajxp_bm_frame_div"><iframe frameborder="0" id="ajxp_bm_iframe"></iframe></div></div><div style="position:absolute;" class="ajxp_bm_menu" id="ajxp_bm_link_menu"><div id="ajxp_bm_link_title"></div><a id="ajxp_bm_link_dl1">Download to AjaXplorer</a><a id="ajxp_bm_link_dl2">Process link normally</a></div>').click(function(){jQuery('#ajxp_bm_link_menu').slideUp();}) ;
 	jQuery(window).bind('scroll', function(){
 		jQuery('#ajxp_bm_main').css('top', jQuery(window).scrollTop() + 5);		
 	});
@@ -96,7 +96,8 @@ function triggerAjxpDL(){
 		'gui=light',
 		'dl_later='+encodeURIComponent(realHref(href)),
 		'tmp_repository_id='+ajxp_bm_repository_id,
-		'folder='+ajxp_bm_folder
+		'folder='+ajxp_bm_folder,
+        'dl_now='+(jQuery('#ajxp_dl_now')[0].checked ? "true":"false")
 	];
 	jQuery('#ajxp_bm_iframe').attr("src", ajxp_bm_target+"?" + params.join("&"));
 	window.setTimeout(function(){
