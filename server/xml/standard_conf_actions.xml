@@ -18,7 +18,7 @@
 		</action>
 		<action name="switch_language">
 			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="default" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
 			<processing>				
 				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
@@ -61,7 +61,7 @@
 		</action>
 		<action name="webdav_preferences">
 			<gui text="403" title="403" src="drive_remote.png" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="default" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
 			<processing>				
 				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">

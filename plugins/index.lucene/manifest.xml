@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <indexer id="index.lucene" className="AjxpLuceneIndexer">
 	<class_definition filename="plugins/index.lucene/class.AjxpLuceneIndexer.php" classname="AjxpLuceneIndexer"/>
+    <client_settings>
+        <resources>
+            <img_library alias="lucene_images" path="plugins/index.lucene/resources/images"/>
+            <i18n namespace="index.lucene" path="plugins/index.lucene/resources/i18n" />
+        </resources>
+    </client_settings>
     <server_settings>
         <param name="index_meta_fields" type="string" label="Index Meta Fields" description="Which additionnal fields to index and search" mandatory="false" default=""/>
         <param name="repository_specific_keywords" type="string" label="Repository keywords" description="If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here." mandatory="false" default=""/>
@@ -27,7 +33,7 @@
                 </processing>
             </action>
 			<action name="index">
-				<gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
+				<gui text="index.lucene.1" title="index.lucene.2" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
 					<context selection="false" dir="true" recycle="false"
 						actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false">
 					</context>

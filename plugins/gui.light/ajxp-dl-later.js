@@ -37,6 +37,24 @@ function logAjxpBmAction(text){
 	window.logAjxpEven = !window.logAjxpEven;
 	$('actions_log').insert('<div style="border-bottom:1px solid #676965;padding:5px;color:#333;background-color:#'+(window.logAjxpEven?'eee':'fff')+'">' + text + '<div>');
 }
+function string_to_slug(str) {
+  str = str.replace('https://', '').replace('http://', '');
+  str = str.replace(/^\s+|\s+$/g, ''); // trim
+  str = str.toLowerCase();
+
+  // remove accents, swap ñ for n, etc
+  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+  var to   = "aaaaeeeeiiiioooouuuunc------";
+  for (var i=0, l=from.length ; i<l ; i++) {
+    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+  }
+
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+    .replace(/-+/g, '-'); // collapse dashes
+
+  return str;
+}
 window.ajxpActionRegisterd = false;
 document.observe("ajaxplorer:gui_loaded", function(){
 	document.observe("ajaxplorer:user_logged", function(){
@@ -45,7 +63,8 @@ document.observe("ajaxplorer:gui_loaded", function(){
 			var params = document.location.href.toQueryParams();
 			logAjxpBmAction('Handling download link '+params['dl_later']);
 			var conn = new Connexion();
-			var filename = (new Date().getTime()) +".download";
+			//var filename = (new Date().getTime()) +".download";
+            var filename = string_to_slug(params['dl_later']) + ".download";
 			conn.setParameters({
 				action:'mkfile',
 				tmp_repository_id:params['tmp_repository_id'],
@@ -56,18 +75,20 @@ document.observe("ajaxplorer:gui_loaded", function(){
 			logAjxpBmAction('Creating file ' + filename + ' pointing to ' + params['dl_later']);
 			conn.sendSync();
 
-			window.setTimeout(function(){
-				conn.setMethod('GET');
-				conn.setParameters({
-					action:'external_download',
-					tmp_repository_id:params['tmp_repository_id'],
-					dlfile:(params['folder']?params['folder']+'/':'/')+filename,
-					delete_dlfile:'true',
-					dir:params['folder'] || '/'
-				});
-				logAjxpBmAction('Triggering download in background. This window will close automatically.');
-				conn.sendSync();					
-			}, 0);			
+            if(params["dl_now"] && params["dl_now"] == "true"){
+                window.setTimeout(function(){
+                    conn.setMethod('GET');
+                    conn.setParameters({
+                        action:'external_download',
+                        tmp_repository_id:params['tmp_repository_id'],
+                        dlfile:(params['folder']?params['folder']+'/':'/')+filename,
+                        delete_dlfile:'true',
+                        dir:params['folder'] || '/'
+                    });
+                    logAjxpBmAction('Triggering download in background. This window will close automatically.');
+                    conn.sendAsync();
+                }, 10);
+            }
 		}
 	});	
 });
