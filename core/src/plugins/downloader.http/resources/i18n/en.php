@@ -8,4 +8,16 @@ $mess = array(
 	"6" => "Downloading",
 	"7" => "to server",
 	"8" => "File downloaded, reloading the client!",
+    "9" => "Generate Bookmarklet",
+    "10"=> "Download to AjaXplorer",
+    "10a"=> "Download to %s",
+    "10b"=> "DL to %s",
+    "10c"=> "DL to %s",
+    "10d"=> "AjXp Download (%s)",
+    "11"=> "Drag one of the following link to your bookmark bar : ",
+    "12"=> "Trigger remote file download",
+    "13"=> "From computer",
+    "14"=> "From Http",
+    "15"=> "Or create a bookmark manually and use the code below as the link url : ",
+    "16"=> "Drag me to your bookmark bar!"
 );

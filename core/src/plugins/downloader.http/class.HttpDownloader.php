@@ -36,8 +36,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class HttpDownloader extends AJXP_Plugin{
-	
-	public function switchAction($action, $httpVars, $fileVars){		
+
+	public function switchAction($action, $httpVars, $fileVars){
 		//AJXP_Logger::logAction("DL file", $httpVars);
 				
 		$repository = ConfService::getRepository();
@@ -71,7 +71,7 @@ class HttpDownloader extends AJXP_Plugin{
                         @file_put_contents($destStreamURL.".".$basename.".pid", $unixProcess->getPid());
                     }
 					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ");
+					AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ", true, 2);
 					AJXP_XMLWriter::close();
                     session_write_close();
 					exit();			
@@ -119,7 +119,7 @@ class HttpDownloader extends AJXP_Plugin{
 					}
 				}
 				$tmpFilename = $destStreamURL.$basename.".dlpart";
-				$hiddenFilename = $destStreamURL.".".$basename.".ser";		
+				$hiddenFilename = $destStreamURL."__".$basename.".ser";
 				$filename = $destStreamURL.$basename;
 				
 				$dlData = array(
@@ -129,7 +129,11 @@ class HttpDownloader extends AJXP_Plugin{
 				if(isSet($pid)){
 					$dlData["pid"] = $pid;
 				}
-				file_put_contents($hiddenFilename, serialize($dlData));
+				//file_put_contents($hiddenFilename, serialize($dlData));
+                $fpHid=fopen($hiddenFilename,"w");
+                fputs($fpHid,serialize($dlData));
+                fclose($fpHid);
+
 				
 				$client->redirect_count = 0;
 				$client->setHeadersOnly(false);

@@ -5,6 +5,7 @@
 		<resources>
 	        <i18n namespace="httpdownloader" path="plugins/downloader.http/resources/i18n" />
 	        <img_library alias="httpdownloader_images" path="plugins/downloader.http/resources/images" />
+            <css file="plugins/downloader.http/resources/downloader.css" autoload="true"/>
 		</resources>	
 	</client_settings>
 	<registry_contributions>
@@ -12,7 +13,7 @@
 			<action name="external_download">
 				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/external_download.png" accessKey="httpdownloader.3" hasAccessKey="true">
 					<context selection="false" dir="true" recycle="hidden"
-						actionBar="true" contextMenu="false" infoPanel="false"
+						actionBar="false" contextMenu="false" infoPanel="false"
 						actionBarGroup="put" inZip="false">
 					</context>
 				</gui>
@@ -54,7 +55,7 @@
 				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/external_download.png" accessKey="httpdownloader.3" hasAccessKey="false">
 					<context selection="true" dir="true" recycle="hidden"
 						actionBar="true" contextMenu="true" infoPanel="false"
-						actionBarGroup="put" inZip="false">
+						actionBarGroup="get" inZip="false">
 					</context>
 					<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="download" behaviour="hidden" />
 				</gui>
@@ -71,27 +72,63 @@
 				</processing>
 			</action>
 			<action name="generate_dl_bookmarklet">
-				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/external_download.png" accessKey="httpdownloader.3" hasAccessKey="false">
+				<gui text="httpdownloader.9" title="httpdownloader.9" src="httpdownloader_images/ICON_SIZE/add_bookmarklet.png" accessKey="httpdownloader.3" hasAccessKey="false">
 					<context selection="false" dir="true" recycle="hidden"
 						actionBar="false" contextMenu="true" infoPanel="false"
-						actionBarGroup="put" inZip="false">
+						actionBarGroup="utils" inZip="false">
 					</context>
 				</gui>
 				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
 				<processing>
 					<clientCallback prepareModal="true" dialogOpenForm="dynamic_bookmarklet">
 						<dialogOnOpen><![CDATA[
+						    var rm =new ResourcesManager();
+						    rm.loadCSSResource('plugins/downloader.http/resources/downloader.css');
 							var root = document.location.href;
 							root = root.substring(0,root.lastIndexOf("/") + 1);
 							var repository = ajaxplorer.user.getActiveRepository();
 							var folder = ajaxplorer.getContextNode().getPath();
 							var bmletValue = "javascript:(function(){window.ajxp_bm_target='"+root+"',window.ajxp_bm_repository_id='"+repository+"', window.ajxp_bm_folder='"+folder+"'; var d=document,s=d.createElement('scr'+'ipt'),b=d.body,l=d.location;s.setAttribute('src','http://localhost/ajaxplorer/client/js/bookmarklet/ajxp.js?t='+(new Date().getTime()));b.appendChild(s)})();";
 							$('bookmarklet_link').setAttribute("href", bmletValue);
+							var basename = getBaseName(folder);
+							if(basename == ""){
+                                $('bookmarklet_link_a').hide();
+                                $('bookmarklet_link_d').hide();
+                                $('bookmarklet_link_c').hide();
+							}else{
+                                $('bookmarklet_link_a').setAttribute("href", bmletValue);
+                                $('bookmarklet_link_a').insert(MessageHash['httpdownloader.10a'].replace("%s", basename));
+
+                                $('bookmarklet_link_c').setAttribute("href", bmletValue);
+                                $('bookmarklet_link_c').insert(MessageHash['httpdownloader.10c'].replace("%s", basename));
+
+                                $('bookmarklet_link_d').setAttribute("href", bmletValue);
+                                $('bookmarklet_link_d').insert(MessageHash['httpdownloader.10d'].replace("%s", basename));
+                            }
+
+                            $('bookmarklet_link_b').setAttribute("href", bmletValue);
+                            $('bookmarklet_link_b').insert(MessageHash['httpdownloader.10b'].replace("%s", ajaxplorer.user.repositories.get(repository).getLabel()));
+                            $('bookmarklet_links_container').select('a').each(function(link){
+                                link.observe('click', function(e){Event.stop(e);alert(MessageHash['httpdownloader.16']);});
+                            });
+
+							$('bookmarklet_textarea').setValue(bmletValue);
+							$('bookmarklet_textarea').observe("focus", function(){$('bookmarklet_textarea').select();});
+
 						]]></dialogOnOpen>
 					</clientCallback>
 					<clientForm id="dynamic_bookmarklet"><![CDATA[
-					<div id="dynamic_bookmarklet">
-						<a href="" id="bookmarklet_link" title="Download to AjaXplorer"  alt="Download to AjaXplorer">Drag me to your bookmark bar</a>
+					<div id="dynamic_bookmarklet" box_with="350">
+					    <div>AJXP_MESSAGE[httpdownloader.11]</div>
+					    <div id="bookmarklet_links_container" style="width:400px;">
+                            <a href="" id="bookmarklet_link" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]">AJXP_MESSAGE[httpdownloader.10]</a>
+                            <a href="" id="bookmarklet_link_a" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+                            <a href="" id="bookmarklet_link_b" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+                            <a href="" id="bookmarklet_link_c" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+                            <a href="" id="bookmarklet_link_d" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]"></a>
+						</div>
+						<div style="clear:left;">AJXP_MESSAGE[httpdownloader.15]</div>
+						<textarea id="bookmarklet_textarea" style="width: 100%;margin-top: 4px;height: 140px;"></textarea>
 					</div>
 					]]></clientForm>
 				</processing>
@@ -105,7 +142,12 @@
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-			</action>					
+			</action>
+            <action name="get_xml_registry">
+                <post_processing>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </post_processing>
+            </action>
 		</actions>	
 		<hooks>
 			<serverCallback hookName="node.info" methodName="detectDLParts"></serverCallback>
