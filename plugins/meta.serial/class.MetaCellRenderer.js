@@ -213,5 +213,13 @@ Class.create("MetaCellRenderer", {
 			}, 500);
 		});
 		return cont;
+	},
+	
+	// mod for textarea
+	formTextarea: function(formElement, form){
+		var obj = new MetaCellRenderer();
+		var cont = new Element('textarea', {name:formElement.name,style:'float: left;width: 136;border-radius: 3px;padding: 2px;height:100px;'});
+		cont.innerHTML = formElement.value;
+		formElement.replace(cont);
 	}
 });
