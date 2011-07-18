@@ -14,10 +14,10 @@
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
 			<component_config className="FilesList">
 				<columns switchGridMode="filelist">
-					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
-					<column messageId="2" attributeName="filesize" sortType="NumericCellSorterValue" modifier="FilesList.prototype.partSizeCellRenderer"/>
-					<column messageId="3" attributeName="mimestring" sortType="String"/>
-					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate"/>
+					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile" defaultWidth="48%"/>
+					<column messageId="2" attributeName="filesize" sortType="NumericCellSorterValue" modifier="FilesList.prototype.partSizeCellRenderer" defaultWidth="9%"/>
+					<column messageId="3" attributeName="mimestring" sortType="String" defaultWidth="10%"/>
+					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate" defaultWidth="14%"/>
 				</columns>
 			</component_config>
 			<component_config className="FoldersTree">
