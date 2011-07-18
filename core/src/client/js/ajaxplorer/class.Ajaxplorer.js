@@ -755,6 +755,7 @@ Class.create("Ajaxplorer", {
 	loadI18NMessages: function(newLanguage){
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'get_i18n_messages');
+		connexion.addParameter('lang', newLanguage);
 		connexion.onComplete = function(transport){
 			if(transport.responseText){
 				var result = transport.responseText.evalScripts();
