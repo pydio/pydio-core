@@ -809,7 +809,7 @@ Class.create("Ajaxplorer", {
 					existingCaptcha.src = src;
 				}else{
 					var insert = {};
-					var string = '<div class="main_captcha_div"><div class="dialogLegend" ajxp_message_id="389">'+MessageHash[389]+'</div>';
+					var string = '<div class="main_captcha_div" style="padding-top: 4px;"><div class="dialogLegend" ajxp_message_id="389">'+MessageHash[389]+'</div>';
 					string += '<div class="captcha_container"><img id="captcha_image" align="top" src="'+src+'" width="170" height="80"><img align="top" style="cursor:pointer;" id="captcha_refresh" src="'+refreshSrc+'" with="16" height="16"></div>';
 					string += '<div class="SF_element">';
 					string += '		<div class="SF_label" ajxp_message_id="390">'+MessageHash[390]+'</div> <div class="SF_input"><input type="text" class="dialogFocus dialogEnterKey" style="width: 100px; padding: 0px;" name="captcha_code"></div>';
