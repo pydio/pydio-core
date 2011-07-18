@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hook id="shorten.bitly">
+    <server_settings>
+        <param name="BITLY_USERNAME" type="string" mandatory="true"/>
+        <param name="BITLY_API_KEY" type="string" mandatory="true"/>
+    </server_settings>
+	<registry_contributions>
+        <actions>
+        <!-- Override a simple action -->
+            <action name="public_url">
+                <post_processing>
+                    <serverCallback methodName="postProcess" capture="true" applyCondition="$apply=!isSet($httpVars['sub_action']);"/>
+                </post_processing>
+            </action>
+        </actions>
+	</registry_contributions>
+	<class_definition filename="plugins/shorten.bitly/class.BitlyShortener.php" classname="BitlyShortener"/>
+</hook>
