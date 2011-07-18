@@ -54,12 +54,12 @@ class HttpDownloader extends AJXP_Plugin{
 			$basename = basename($getPath);
     	}		
     	if(isSet($httpVars["dlfile"])){
-    	    		$dlFile = $streamData["protocol"]."://".$repository->getId().AJXP_Utils::decodeSecureMagic($httpVars["dlfile"]);
-    				$realFile = file_get_contents($dlFile);
-    				if(empty($realFile)) throw new Exception("cannot find file $dlFile for download");
-					$parts = parse_url($realFile);
-		    		$getPath = $parts["path"];
-					$basename = basename($getPath);    				
+            $dlFile = $streamData["protocol"]."://".$repository->getId().AJXP_Utils::decodeSecureMagic($httpVars["dlfile"]);
+            $realFile = file_get_contents($dlFile);
+            if(empty($realFile)) throw new Exception("cannot find file $dlFile for download");
+            $parts = parse_url($realFile);
+            $getPath = $parts["path"];
+            $basename = basename($getPath);
     	}
     	
     	switch ($action){
@@ -150,6 +150,7 @@ class HttpDownloader extends AJXP_Plugin{
 				unlink($hiddenFilename);
 				if(isset($dlFile) && isSet($httpVars["delete_dlfile"]) && is_file($dlFile)){
 					unlink($dlFile);
+                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
 				}
                 AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($filename), false));
 				AJXP_XMLWriter::header();

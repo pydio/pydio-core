@@ -18,7 +18,7 @@
 					}else{
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
 						function(oForm){
-							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img'), oForm.down('div.dialogLegend'), 'before');
+							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 							if(Prototype.Browser.IE && !oForm.down('input[type="text"]').key_enter_attached){
 								oForm.select('input').invoke("observe", "keydown", function(event){
 									if(event.keyCode == Event.KEY_RETURN){
@@ -51,7 +51,7 @@
 							connexion.onComplete = function(transport){
 								ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
 								if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-									ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img'), oForm.down('div.dialogLegend'), 'before');
+									ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
 								}
 							};
 							connexion.setMethod('put');

@@ -54,7 +54,7 @@
                     context.builderMenuItems.push({
                         name:MessageHash['httpdownloader.14'],
                         alt:MessageHash['httpdownloader.2'],
-                        isDefault : true,
+                        isDefault : false,
                         image:resolveImageSource('httpdownloader_images/ICON_SIZE/external_download.png', '', 22),
                         callback:function(e){ajaxplorer.actionBar.fireAction('external_download');}.bind(context)
                     } );
