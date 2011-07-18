@@ -167,7 +167,7 @@ class ConfService
 	}
 	
 	public static function backgroundActionsSupported(){
-		return function_exists("mcrypt_create_iv");
+		return function_exists("mcrypt_create_iv") && AJXP_CMDLINE_ACTIVE;
 	}
 	
 	/**
@@ -460,12 +460,12 @@ class ConfService
 		return (function_exists("gzopen")?true:false);		
 	}
 	
-	public static function getMessages(){
-		return self::getInstance()->getMessagesInst();
+	public static function getMessages($forceRefresh = false){
+		return self::getInstance()->getMessagesInst($forceRefresh);
 	}
-	public function getMessagesInst()
+	public function getMessagesInst($forceRefresh = false)
 	{
-		if(!isset($this->configs["MESSAGES"]))
+		if(!isset($this->configs["MESSAGES"]) || $forceRefresh)
 		{			
 			require(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/".$this->configs["LANGUE"].".php");
 			$this->configs["MESSAGES"] = $mess;

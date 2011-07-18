@@ -71,9 +71,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			//	GET I18N MESSAGES
 			//------------------------------------
 			case "get_i18n_messages":
-			
+
+                $refresh = false;
+                if(AuthService::getLoggedUser() == null && isSet($httpVars["lang"])){
+                    ConfService::setLanguage($httpVars["lang"]);
+                    $refresh = true;
+                }
 				HTMLWriter::charsetHeader('text/javascript');
-				HTMLWriter::writeI18nMessagesClass(ConfService::getMessages());
+				HTMLWriter::writeI18nMessagesClass(ConfService::getMessages($refresh));
 				
 			break;
 			
