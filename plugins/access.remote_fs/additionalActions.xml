@@ -1,47 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <driver name="remote_fs">
-	<actions>
+	<actions uuidAttr="name">
 		<action name="next_to_remote">
 			<processing>
-				<serverCallback methodName="uploadActions"></serverCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
 		<action name="trigger_remote_copy">
 			<processing>
-				<serverCallback methodName="uploadActions"></serverCallback>
+				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
-		<action name="upload">
-			<gui text="27" title="27" src="yast_backup.png" accessKey="upload_access_key" hasAccessKey="true">
-				<context selection="false" dir="true" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="put">
-				</context></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
-					if(uploaders.length){
-						modal.setCloseAction(function(){
-							ajaxplorer.fireContextRefresh();
-							var bgManager = ajaxplorer.actionBar.bgManager;
-							bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
-							bgManager.next();
-						});
-						var uploader = uploaders[0];
-						if(uploader.dialogOnOpen){							
-							uploader.resourcesManager.load();
-							var dialogOnOpen = new Function("oForm", uploader.dialogOnOpen);
-						}
-						if(uploader.dialogOnComplete){							
-							uploader.resourcesManager.load();
-							var dialogOnComplete = new Function("oForm", uploader.dialogOnComplete);
-						}						
-						modal.showDialogForm('Upload', uploader.formId, dialogOnOpen, null, dialogOnComplete, true, true);
-					}
-				]]></clientCallback>
-				<serverCallback methodName="uploadActions"></serverCallback>
-				</processing>
-		</action>		
 	</actions>
 </driver>

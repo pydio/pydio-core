@@ -53,7 +53,29 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 		}
 		parent::init($repository, $options);
 	}
-	
+
+    function redirectActionsToMethod(&$contribNode, $arrayActions, $targetMethod){
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        foreach($arrayActions as $index => $value){
+            $arrayActions[$index] = 'action[@name="'.$value.'"]/processing/serverCallback';
+        }
+        $procList = $actionXpath->query(implode(" | ", $arrayActions), $contribNode);
+        foreach($procList as $node){
+            $node->setAttribute("methodName", $targetMethod);
+        }
+    }
+
+    /**
+     * Parse
+     * @param DOMNode $contribNode
+     */
+    protected function parseSpecificContributions(&$contribNode){
+        parent::parseSpecificContributions($contribNode);
+        if($contribNode->nodeName != "actions") return ;
+        $this->redirectActionsToMethod($contribNode, array("upload", "next_to_remote", "trigger_remote_copy"), "uploadActions");
+    }
+
+
 	function switchAction($action, $httpVars, $filesVars){		
 		$secureToken = "";
 		$crtRep = ConfService::getRepository();
@@ -183,7 +205,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 				{
 					if(substr($boxName, 0, 9) != "userfile_")     continue;
 					AJXP_Logger::debug("Upload : rep_source ", array($rep_source));
-					$err = AJXP_Utils::parseFileDataErrors($boxData, $fancyLoader);
+					$err = AJXP_Utils::parseFileDataErrors($boxData);
 					if($err != null)
 					{
 						$errorCode = $err[0];
@@ -210,7 +232,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 					AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
 					if(isSet($boxData["input_upload"])){
 						try{
-							$destName .= tempnam($destCopy, "");
+							$destName = tempnam($destCopy, "");
 							AJXP_Logger::debug("Begining reading INPUT stream");
 							$input = fopen("php://input", "r");
 							$output = fopen($destName, "w");

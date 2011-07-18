@@ -211,8 +211,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function changePassword($login, $newPass){
-		if($this->getCurrentDriver()){
-			return $this->getCurrentDriver()->usersEditable();
+		if($this->getCurrentDriver() && $this->getCurrentDriver()->usersEditable()){
+			return $this->getCurrentDriver()->changePassword($login, $newPass);
 		}else{
 			throw new Exception("No driver instanciated in multi driver!");
 		}		

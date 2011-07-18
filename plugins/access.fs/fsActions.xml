@@ -65,6 +65,14 @@
 					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
 					if(uploaders.length){
 						var uploader = uploaders[0];
+						if(ajaxplorer.actionBar.getActionByName("trigger_remote_copy")){
+                            modal.setCloseAction(function(){
+                                ajaxplorer.fireContextRefresh();
+                                var bgManager = ajaxplorer.actionBar.bgManager;
+                                bgManager.queueAction("trigger_remote_copy", new Hash(), "Copying files to server");
+                                bgManager.next();
+                            });
+						}
 						if(uploader.dialogOnOpen){
 							uploader.resourcesManager.load();
 							var dialogOnOpen = new Function("oForm", uploader.dialogOnOpen);
