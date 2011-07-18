@@ -287,10 +287,12 @@ Class.create("FilesList", SelectableElements, {
 					obj[att.nodeName]=att.nodeValue;
 					if(att.nodeName == "sortType"){
 						sortTypes.push(att.nodeValue);
-					}
-				});
+					}else if(att.nodeName == "defaultVisibilty" && att.nodeValue == "hidden"){
+                        this.hiddenColumns.push(col.getAttribute("attributeName"));
+                    }
+				}.bind(this));
 				newCols.push(obj);					
-			});
+			}.bind(this));
 			if(newCols.size()){
 				this.columnsDef=newCols;
 				this._oSortTypes=sortTypes;
@@ -409,6 +411,9 @@ Class.create("FilesList", SelectableElements, {
 			for(var i=0; i<visibleColumns.length;i++){
 				var column = visibleColumns[i];
 				var userWidth = 0;
+                if(column.defaultWidth){
+                    userWidth = column.defaultWidth.replace('%', '');
+                }
 				if((this.gridStyle != "grid" || this.columnsTemplate) && userPref && userPref.get(i) && i<(visibleColumns.length-1)){
 					userWidth = userPref.get(i);
 				}
@@ -1398,14 +1403,12 @@ Class.create("FilesList", SelectableElements, {
 	/**
 	 * Gets the currently selected names
 	 * Not really used anymore, selection is handled by the datamodel
-	 * @returns Array
+	 * @returns Array|null
 	 */
 	getSelectedFileNames: function() {
 		selRaw = this.getSelectedItems();
-		if(!selRaw.length)
-		{
-			//alert('Please select a file!');
-			return;
+		if(!selRaw.length){
+			return null;
 		}
 		var tmp = new Array(selRaw.length);
 		for(i=0;i<selRaw.length;i++)
@@ -1683,13 +1686,13 @@ Class.create("FilesList", SelectableElements, {
 	 * Utilitary to find the next item to select, depending on the key (up or down) 
 	 * @param currentItemIndex Integer
 	 * @param bDown Boolean
-	 * @returns Integer
+	 * @returns Integer|null
 	 */
 	findOverlappingItem: function(currentItemIndex, bDown)
 	{	
-		if(!bDown && currentItemIndex == 0) return;
+		if(!bDown && currentItemIndex == 0) return null;
 		var allItems = this.getItems();
-		if(bDown && currentItemIndex == allItems.length - 1) return;
+		if(bDown && currentItemIndex == allItems.length - 1) return null;
 		
 		var element = $(allItems[currentItemIndex]);	
 		var pos = Position.cumulativeOffset(element);

@@ -52,6 +52,8 @@ class SerialMetaManager extends AJXP_Plugin {
 		
 		$messages = ConfService::getMessages();
 		$def = $this->getMetaDefinition();
+        if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
+        else $visibilities = explode(",", $this->options["meta_visibility"]);
 		$cdataHead = '<div>
 						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.serial.1"].'</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
@@ -62,11 +64,17 @@ class SerialMetaManager extends AJXP_Plugin {
 		$contrib = $selection->item(0);		
 		$even = false;
 		$searchables = array();
+        $index = 0;
 		foreach ($def as $key=>$label){
-			$col = $this->manifestDoc->createElement("additional_column");			
+            if(isSet($visibilities[$index])){
+                $lastVisibility = $visibilities[$index];
+            }
+            $index ++;
+			$col = $this->manifestDoc->createElement("additional_column");
 			$col->setAttribute("messageString", $label);
 			$col->setAttribute("attributeName", $key);
 			$col->setAttribute("sortType", "String");
+            $col->setAttribute("defaultVisibilty", $lastVisibility);
 			if($key == "stars_rate"){
 				$col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
 				$col->setAttribute("sortType", "CellSorterValue");
