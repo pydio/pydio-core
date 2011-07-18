@@ -56,6 +56,11 @@
 									var element = form.down('input[name="css_label"]');
 									MetaCellRenderer.prototype.formPanelCssLabels(element, form);
 								}
+								// mod for textarea
+								else if(metaFields[i].substr(0,5) == 'area_'){
+									var element = form.down('input[name="'+metaFields[i]+'"]');
+									MetaCellRenderer.prototype.formTextarea(element, form);
+								}
 							}
 						}
 						var closeFunc = function(){
