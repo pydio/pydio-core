@@ -167,7 +167,7 @@ class HttpDownloader extends AJXP_Plugin{
     			exit;
     		break;
     		case "stop_dl":
-				$newName = ".".str_replace(".dlpart", ".ser", $basename);
+				$newName = "__".str_replace(".dlpart", ".ser", $basename);
     			$hiddenFilename = $destStreamURL.$newName;
     			$data = @unserialize(@file_get_contents($hiddenFilename));
     			header("text/plain");
@@ -200,7 +200,7 @@ class HttpDownloader extends AJXP_Plugin{
 			return;
 		}
 		$basename = basename($ajxpNode->getUrl());
-		$newName = ".".str_replace(".dlpart", ".ser", $basename);
+		$newName = "__".str_replace(".dlpart", ".ser", $basename);
 		$hidFile = str_replace($basename, $newName, $ajxpNode->getUrl());
 		if(is_file($hidFile)){
 			$data = unserialize(file_get_contents($hidFile));
