@@ -118,7 +118,7 @@
 						]]></dialogOnOpen>
 					</clientCallback>
 					<clientForm id="dynamic_bookmarklet"><![CDATA[
-					<div id="dynamic_bookmarklet" box_with="350">
+					<div id="dynamic_bookmarklet" box_with="400">
 					    <div>AJXP_MESSAGE[httpdownloader.11]</div>
 					    <div id="bookmarklet_links_container" style="width:400px;">
                             <a href="" id="bookmarklet_link" title="AJXP_MESSAGE[httpdownloader.10]"  alt="AJXP_MESSAGE[httpdownloader.10]">AJXP_MESSAGE[httpdownloader.10]</a>
