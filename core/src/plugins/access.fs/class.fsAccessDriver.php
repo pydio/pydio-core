@@ -93,7 +93,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	public function getWrapperClassName(){
 		return $this->wrapperClassName;
 	}
-	
+
+    function redirectActionsToMethod(&$contribNode, $arrayActions, $targetMethod){
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        foreach($arrayActions as $index => $value){
+            $arrayActions[$index] = 'action[@name="'.$value.'"]/processing/serverCallback';
+        }
+        $procList = $actionXpath->query(implode(" | ", $arrayActions), $contribNode);
+        foreach($procList as $node){
+            $node->setAttribute("methodName", $targetMethod);
+        }
+    }
+
 	function disableArchiveBrowsingContributions(&$contribNode){
 		// Cannot use zip features on FTP !
 		// Remove "compress" action

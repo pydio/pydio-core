@@ -93,7 +93,7 @@ class ftpAccessWrapper implements AjxpWrapper {
     }
     
 	public function stream_open($url, $mode, $options, &$context){		
-		if($mode == "w" || $mode == "rw"){			
+		if(stripos($mode, "w") !== false){
 			$this->crtMode = 'write';
 			$parts = $this->parseUrl($url);
 			$this->crtTarget = AJXP_Utils::securePath($this->path."/".$parts["path"]);
