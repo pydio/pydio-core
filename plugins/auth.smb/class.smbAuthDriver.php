@@ -52,14 +52,9 @@ class smbAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function logoutCallback($actionName, $httpVars, $fileVars){		
-		$crtUser = $_SESSION["AJXP_SESSION_REMOTE_USER"];
-		unset($_SESSION["AJXP_SESSION_REMOTE_USER"]);
-		unset($_SESSION["AJXP_SESSION_REMOTE_PASS"]);
+		AJXP_Safe::clearCredentials();
 		$adminUser = $this->options["ADMIN_USER"];
 		$subUsers = array();
-		if($login != $adminUser && $crtUser!=""){
-			//AJXP_User::deleteUser($crtUser, $subUsers);
-		}
 		AuthService::disconnect();
 		session_write_close();
 		AJXP_XMLWriter::header();
@@ -78,8 +73,7 @@ class smbAuthDriver extends AbstractAuthDriver {
 		$url = "smb://$login:$pass@".$host."/".$basePath."/";
 		try{
 			if(!is_dir($url)) return false;
-			$_SESSION["AJXP_SESSION_REMOTE_USER"] = $login;
-			$_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pass;
+			AJXP_Safe::storeCredentials($login, $pass);
 		}catch(Exception $e){
 			return false;
 		}
