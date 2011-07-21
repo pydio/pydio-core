@@ -92,7 +92,29 @@
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-		</action>	
+		</action>
+		<action name="create_role">
+			<gui text="ajxp_conf.75" title="ajxp_conf.75" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					modal.showDialogForm('Create Role', 'create_role_box');
+					]]></clientCallback>
+				<clientForm id="create_role_box"><![CDATA[
+					<div id="create_role_box" action="create_role" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">AJXP_MESSAGE[ajxp_conf.76] : </div><input name="role_id" type="text" class="dialogFocus SF_input"/>
+						</div>
+					</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="create_repository">
 			<gui text="299" title="300" src="folder_red_new.png" accessKey="create_repo_accesskey" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
@@ -317,28 +339,6 @@
 				]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
-		</action>			
-		<action name="create_role">
-			<gui text="ajxp_conf.75" title="ajxp_conf.75" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
-				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					modal.showDialogForm('Create Role', 'create_role_box');
-					]]></clientCallback>
-				<clientForm id="create_role_box"><![CDATA[
-					<div id="create_role_box" action="create_role" box_width="210">
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="ajxp_conf.76">AJXP_MESSAGE[ajxp_conf.76] : </div><input name="role_id" type="text" class="dialogFocus SF_input"/>
-						</div>
-					</div>				
-				]]></clientForm>		
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
 		</action>
 		<action name="delete_role">
 			<processing>
