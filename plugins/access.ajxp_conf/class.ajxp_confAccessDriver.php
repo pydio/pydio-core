@@ -846,8 +846,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$r = array();
 				foreach ($repos as $repoId => $repository){
 					if($repository->getAccessType() == "ajxp_shared") continue;
-					if($userObject->canWrite($repoId)) $r[] = $repository->getDisplay()." (rw)";
-					else if($userObject->canRead($repoId)) $r[] = $repository->getDisplay()." (r)";
+                    if(!$userObject->canRead($repoId) && !$userObject->canWrite($repoId)) continue;
+                    $rs = ($userObject->canRead($repoId) ? "r" : "");
+                    $rs .= ($userObject->canWrite($repoId) ? "w" : "");
+                    $r[] = $repository->getDisplay()." (".$rs.")";
 				}
 				$rightsString = implode(", ", $r);
 			}
@@ -872,13 +874,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$repos = ConfService::getRepositoriesList();
         ksort($roles);
         foreach($roles as $roleId => $roleObject) {
-			$icon = "user";
-			$rightsString = "";
 			$r = array();
 			foreach ($repos as $repoId => $repository){
 				if($repository->getAccessType() == "ajxp_shared") continue;
-				if($roleObject->canWrite($repoId)) $r[] = $repository->getDisplay()." (rw)";
-				else if($roleObject->canRead($repoId)) $r[] = $repository->getDisplay()." (r)";
+                if(!$roleObject->canRead($repoId) && !$roleObject->canWrite($repoId)) continue;
+                $rs = ($roleObject->canRead($repoId) ? "r" : "");
+                $rs .= ($roleObject->canWrite($repoId) ? "w" : "");
+                $r[] = $repository->getDisplay()." (".$rs.")";
 			}
 			$rightsString = implode(", ", $r);
 			AJXP_XMLWriter::renderNode("/roles/".$roleId, $roleId, true, array(
