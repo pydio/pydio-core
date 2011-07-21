@@ -67,6 +67,10 @@ Class.create("Repository", {
 	 * @var String
 	 */
 	slug:'',
+    /**
+     * @var String
+     */
+    owner:'',
 
 	/**
 	 * Constructor
@@ -115,7 +119,14 @@ Class.create("Repository", {
 	setIcon : function(icon){
 		this.icon = icon;
 	},
-		
+
+    /**
+     * @return String
+     */
+    getOwner : function(){
+        return this.owner;
+    },
+
 	/**
 	 * @returns String
 	 */
@@ -171,6 +182,9 @@ Class.create("Repository", {
 		}
 		if(repoNode.getAttribute('repositorySlug')){
 			this.setSlug(repoNode.getAttribute('repositorySlug'));
+		}
+		if(repoNode.getAttribute('owner')){
+			this.owner = repoNode.getAttribute('owner');
 		}
 		for(var i=0;i<repoNode.childNodes.length;i++){
 			var childNode = repoNode.childNodes[i];

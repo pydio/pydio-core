@@ -445,6 +445,8 @@ $mess=array(
 "409" => "WebDAV zmožnost uspešno onemogočena",
 "410" => "Posodobitev WebDAV gesla uspešna",
 "411" => "Open",
+"412" => "Upload only",
+"413" => "Shared by",
 /* END SENTENCE */
 /* password strength tester */
 /* quick access keys */

@@ -326,7 +326,7 @@ $mess=array(
 "289" => "Group",
 "290" => "All",
 "291" => "Apply recursively?",
-"292" => "Share",
+"292" => "Share...",
 "293" => "Create a public link to this file",
 "294" => "Link time expiration (in days) and password (leave empty if no password).",
 "295" => "Expiration",
@@ -447,5 +447,7 @@ $mess=array(
 "409" => "De-activated WebDav shares successfully",
 "410" => "Updated webDav password successfully",
 "411" => "Open",
+"412" => "Upload only",
+"413" => "Shared by",
 );
 ?>
