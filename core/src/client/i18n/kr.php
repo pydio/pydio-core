@@ -450,6 +450,8 @@ $mess=array(
 "409" => "De-activated WebDav shares successfully",
 "410" => "Updated webDav password successfully",
 "411" => "Open",
+"412" => "Upload only",
+"413" => "Shared by",
 /* END SENTENCE */
 );
 ?>

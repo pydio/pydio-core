@@ -354,9 +354,14 @@ class AJXP_XMLWriter
 			}
 			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $loggedUser->canWrite($rootDirIndex) || $details) {
 				// Do not display standard repositories even in details mode for "sub"users
-				if($loggedUser != null && $loggedUser->hasParent() && !$loggedUser->canRead($rootDirIndex)) continue;
+				if($loggedUser != null && $loggedUser->hasParent() && !($loggedUser->canRead($rootDirIndex) || $loggedUser->canWrite($rootDirIndex) )) continue;
 				// Do not display shared repositories otherwise.
-				if($loggedUser != null && $rootDirObject->hasOwner() && !$loggedUser->hasParent())continue;
+				if($loggedUser != null && $rootDirObject->hasOwner() && !$loggedUser->hasParent()){
+                    // Display the repositories if allow_crossusers is ok
+                    if(ConfService::getConf("ALLOW_CROSSUSERS_SHARING") !== true) continue;
+                    // But still do not display its own shared repositories!
+                    if($rootDirObject->getOwner() == $loggedUser->getId()) continue;
+                }
 				
 				$rightString = "";
 				if($details){
@@ -371,10 +376,13 @@ class AJXP_XMLWriter
 				if(!empty($slug)){
 					$slugString = "repositorySlug=\"$slug\"";
 				}
+                $isSharedString = ($rootDirObject->hasOwner() ? "owner='".$rootDirObject->getOwner()."'" : "");
+                
+                $xmlString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString $slugString $isSharedString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
 				if($toLast){
-					$lastString = "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString $slugString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$lastString = $xmlString;
 				}else{
-					$st .= "<repo access_type=\"".$rootDirObject->accessType."\" id=\"".$rootDirIndex."\"$rightString $streamString $slugString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($rootDirObject->getDisplay()))."</label>".$rootDirObject->getClientSettings()."</repo>";
+					$st .= $xmlString;
 				}
 			}
 		}

@@ -445,6 +445,8 @@ $mess=array(
 "409" => "WebDAV-Freigaben erfolgreich deaktiviert",
 "410" => "WebDAV-Passwort erfolgreich aktualisiert",
 "411" => "Öffnen",
+"412" => "Upload only",
+"413" => "Shared by",
 /* END SENTENCE */
 );
 ?>

@@ -84,14 +84,14 @@
 						modal.showDialogForm('Upload', uploader.formId, dialogOnOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 				</processing>
 		</action>
 		<action name="empty_recycle">
 			<gui text="220" title="221" src="trashcan_empty.png" accessKey="empty_recycle_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="only" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default"></context>
 			</gui>
-			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""></rightsContext>
+			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="false"><![CDATA[
 				    ajaxplorer.getContextHolder().selectAll();				    
@@ -391,6 +391,7 @@
                     			barContainer : $('pass_strength_container'), 
                     			barPosition:'bottom'
                     		});
+                    		oForm.down('#repo_label').setValue(getBaseName(userSelection.getUniqueNode().getPath()));
                     		if(!$('share_folder_form').autocompleter){
 	                    		$('share_folder_form').autocompleter = new Ajax.Autocompleter(
 	                    			"shared_user", 
@@ -534,8 +535,26 @@
 					</div>
 					<div id="share_folder_form" title="Share Folder"  box_width="280" action="public_url">
 						<fieldset>
+							<legend ajxp_message_id="357">AJXP_MESSAGE[357]</legend>
+							<div class="dialogLegend" ajxp_message_id="358">AJXP_MESSAGE[358]</div>
+							<div class="SF_element">
+								<div class="SF_label" ajxp_message_id="359">AJXP_MESSAGE[359] : </div>
+								<input type="text" value="" id="repo_label" name="repo_label" class="SF_input"/>
+							</div>
+						</fieldset>
+						<fieldset>
 							<legend ajxp_message_id="353">AJXP_MESSAGE[353]</legend>
 							<div class="dialogLegend" ajxp_message_id="354">AJXP_MESSAGE[354]</div>
+							<div class="SF_element">
+								<div class="SF_label" ajxp_message_id="360">AJXP_MESSAGE[360] : </div>
+								<div class="SF_input">
+								    <select name="repo_rights" style="width:135px;">
+                                        <option value="r">AJXP_MESSAGE[361]</option>
+                                        <option value="rw"/>AJXP_MESSAGE[361] & AJXP_MESSAGE[362]</option>
+                                        <option value="w">AJXP_MESSAGE[412]</option>
+								    </select>
+								</div>
+							</div>
 							<div class="SF_element">
 								<div ajxp_message_id="355" class="SF_label">AJXP_MESSAGE[355] : </div> 
 								<input type="text" class="SF_input dialogFocus" value="" name="shared_user" id="shared_user"/>	
@@ -547,22 +566,7 @@
 							</div>
 							<div class="SF_element" id="pass_strength_container"></div>
 						</fieldset>
-						<fieldset>
-							<legend ajxp_message_id="357">AJXP_MESSAGE[357]</legend>
-							<div class="dialogLegend" ajxp_message_id="358">AJXP_MESSAGE[358]</div>
-							<div class="SF_element">
-								<div class="SF_label" ajxp_message_id="359">AJXP_MESSAGE[359] : </div>
-								<input type="text" value="" id="repo_label" name="repo_label" class="SF_input"/>
-							</div>
-							<div class="SF_element">
-								<div class="SF_label" ajxp_message_id="360">AJXP_MESSAGE[360] : </div>
-								<div class="SF_input">
-									<input type="radio" value="r" name="repo_rights" class="SF_box"/>AJXP_MESSAGE[361]
-									<input type="radio" value="rw" name="repo_rights" class="SF_box" checked/>AJXP_MESSAGE[362]
-								</div>
-							</div>
-						</fieldset>
-					</div>					
+					</div>
 					]]>
 					</clientForm>				
 				<serverCallback methodName="switchAction"></serverCallback>

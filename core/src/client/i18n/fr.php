@@ -445,6 +445,8 @@ $mess=array(
 "409" => "Les partages webDAV ont été désactivés avec succès",
 "410" => "Le mot de passe webDAV a été changé avec succès",
 "411" => "Ouvrir",
+"412" => "Upload seulement",
+"413" => "Partagé par",
 /* END SENTENCE */
 );
 ?>

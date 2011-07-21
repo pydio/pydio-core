@@ -534,6 +534,9 @@ class ConfService
 		if(isSet($this->configs[$varName])){
 			return $this->configs[$varName];
 		}
+        if(defined("AJXP_".$varName)){
+            return eval("return AJXP_".$varName.";");
+        }
 		return null;
 	}
 	public function setConfInst($varName, $varValue)	

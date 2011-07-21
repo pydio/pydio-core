@@ -306,7 +306,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
 		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
 		$rights = $httpVars["repo_rights"];
-		if($rights != "r" && $rights != "rw") return 100;
+		if($rights != "r" && $rights != "w" && $rights != "rw") return 100;
 		// CHECK USER & REPO DOES NOT ALREADY EXISTS
 		$repos = ConfService::getRepositoriesList();
 		foreach ($repos as $obj){
@@ -318,7 +318,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		if(AuthService::userExists($userName)){
 			// check that it's a child user
 			$userObject = $confDriver->createUserObject($userName);
-			if(!$userObject->hasParent() || $userObject->getParent() != $loggedUser->id){
+			if( ConfService::getConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
 				return 102;
 			}
 		}else{
