@@ -116,13 +116,43 @@
 			</processing>
 		</action>
 		<action name="create_repository">
-			<gui text="299" title="300" src="folder_red_new.png" accessKey="create_repo_accesskey" hasAccessKey="true">
+			<gui text="299" title="300" src="folder_red_new.png" accessKey="folder_access_key" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
 				</context>
 			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+			<subMenu>
+				<dynamicBuilder><![CDATA[
+					var context = window.builderContext;
+					context.builderMenuItems = $A([]);
+                    context.builderMenuItems.push({
+                        name:MessageHash[414],
+                        alt:MessageHash[300],
+                        isDefault : true,
+                        image:resolveImageSource('images/actions/22/folder_red_new.png', '',  22),
+                        callback:function(e){
+                            window.createRepoCmd = "repository";
+                            this.options.src = 'folder_red_new.png';
+                            this.options.title = MessageHash[300];
+                            this.apply();
+                        }.bind(context)
+                    } );
+                    context.builderMenuItems.push({
+                        name:MessageHash[415],
+                        alt:MessageHash[416],
+                        isDefault : true,
+                        image:resolveImageSource('images/actions/22/folder_grey.png', '',  22),
+                        callback:function(e){
+                            window.createRepoCmd = "template";
+                            this.options.src = 'folder_grey.png';
+                            this.options.title = MessageHash[416];
+                            this.apply();
+                        }.bind(context)
+                    } );
+				]]></dynamicBuilder>
+			</subMenu>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var loadFunc = function(oForm){
@@ -131,20 +161,23 @@
 							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 						}
 						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						ajaxplorer.actionBar.configEditor.initCreateRepoWizard();
+						ajaxplorer.actionBar.configEditor.initCreateRepoWizard(window.createRepoCmd);
 					};				
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
 				<clientForm id="create_repository_box"><![CDATA[
 					<div id="create_repository_box" action="create_repository" box_width="320">
 					    <div id="creation_form" style="padding:5px;padding-top:0px;">
-                            <div class="dialogLegend">Choose a label and a driver to access the data (check all sections for mandatory fields, you can hover the options labels with your mouse to get more info).</div>
+                            <div class="dialogLegend repoCreationString">Choose a label and a driver to access the data (check all sections for mandatory fields, you can hover the options labels with your mouse to get more info).</div>
+                            <div class="dialogLegend tplCreationString">Once a label and driver selected, enable the fields you want to be prefilled in the template using the checkboxes. The other fields will be left to the user. You can enable some fields and leave them empty, if you still want to hide them from the user.</div>
                             <div class="SF_element">
-                                <div class="SF_label">Repository Label* : </div>
+                                <div class="SF_label repoCreationString">Repository Label* : </div>
+                                <div class="SF_label tplCreationString">Template Label* : </div>
                                 <input name="new_user_login" type="text" class="SF_input dialogFocus"/>
                             </div>
                             <div class="SF_element">
-                                <div class="SF_label">Repository Driver* : </div>
+                                <div class="SF_label repoCreationString">Repository Driver* : </div>
+                                <div class="SF_label tplCreationString">Template Driver* : </div>
                                 <select class="SF_input"><option>Loading...</option></select>
                             </div>
 						</div>
@@ -155,7 +188,7 @@
 						</div>
 					</div>				
 				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
+				<serverCallback methodName="switchAction"/>
 				</processing>
 		</action>	
 		<action name="rename">

@@ -333,7 +333,7 @@ $mess=array(
 "296" => "Copy the URL below:",
 "297" => "New User",
 "298" => "Create a new user",
-"299" => "New Repo.",
+"299" => "New...",
 "300" => "Create a new repository",
 "create_repo_accesskey" => "R",
 "create_user_accesskey" => "U",
@@ -449,5 +449,8 @@ $mess=array(
 "411" => "Open",
 "412" => "Upload only",
 "413" => "Shared by",
+"414" => "Repository",
+"415" => "Repository Template",
+"416" => "Create a new template"
 );
 ?>

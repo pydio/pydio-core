@@ -628,7 +628,15 @@ ConfigEditor = Class.create({
 	/*************************************/
 	/*       REPOSITORIES FUNCTIONS      */
 	/*************************************/
-	initCreateRepoWizard : function(){
+	initCreateRepoWizard : function(repositoryOrTemplate){
+        this.currentCreateRepoType = repositoryOrTemplate;
+        if(this.currentCreateRepoType == "template"){
+            this.form.select('.repoCreationString').invoke("hide");
+            this.form.select('.tplCreationString').invoke("show");
+        }else{
+            this.form.select('.repoCreationString').invoke("show");
+            this.form.select('.tplCreationString').invoke("hide");
+        }
 		this.newRepoLabelInput = this.form.select('input[type="text"]')[0];
 		this.driverSelector = this.form.select('select')[0];
 		this.driverForm = this.form.select('div[id="driver_form"]')[0];
@@ -660,7 +668,7 @@ ConfigEditor = Class.create({
 		}.bind(this) );
 	},
 	
-	updateDriverSelector : function(){				
+	updateDriverSelector : function(){
 		if(!this.drivers || !this.driverSelector) return;
 		if(Prototype.Browser.IE){this.driverSelector.hide();}
 		this.driverSelector.update('<option value="0"></option>');
@@ -677,7 +685,7 @@ ConfigEditor = Class.create({
 	driverSelectorChange : function(){
 		var height = (Prototype.Browser.IE?62:32);
 		var dName = this.driverSelector.getValue();
-		this.createDriverForm(dName);
+		this.createDriverForm(dName, (this.currentCreateRepoType == "template"?true:false) );
 		if(dName != "0"){
 			var height = 130 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
             var addscroll = false;
@@ -696,13 +704,13 @@ ConfigEditor = Class.create({
 		});		
 	},
 	
-	createDriverForm : function(driverName){
+	createDriverForm : function(driverName, addCheckBox){
         this.driverForm.update('');
 		if(driverName == "0"){
 			//return;
 		}
 		var dOpt = this.drivers.get(driverName);
-		this.createParametersInputs(this.driverForm, dOpt.get('params'), false);
+		this.createParametersInputs(this.driverForm, dOpt.get('params'), false, null, false, false, addCheckBox);
         var firstAcc = this.driverForm.down(".accordion_content");
         if(!firstAcc) firstAcc = this.driverForm;
 		firstAcc.insert({top:'<div class="dialogLegend">' + dOpt.get('description')+'</div>'});
@@ -772,28 +780,6 @@ ConfigEditor = Class.create({
 		optionsPane.update(legend);
 		optionsPane.insert({bottom:form});
 		optionsPane.insert({bottom:metaForm});
-		
-		/*
-		var optLegend = new Element('a', {className:"active"}).update(XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' '+ MessageHash['ajxp_conf.41']);
-		var metaLegend = new Element('a').update(MessageHash['ajxp_conf.10']);
-		var legend = new Element('legend');
-		legend.insert(optLegend);
-		legend.insert(" | ");
-		legend.insert(metaLegend);
-				
-		optLegend.observe("click", function(){
-			metaForm.hide();form.show();
-			optLegend.addClassName('active');
-			metaLegend.removeClassName('active');
-			modal.refreshDialogAppearance();
-		});
-		metaLegend.observe("click", function(){
-			form.hide();metaForm.show();
-			metaLegend.addClassName('active');
-			optLegend.removeClassName('active');
-			modal.refreshDialogAppearance();
-		});
-		*/
 				
 		var paramsValues = new Hash();
 		$A(repo.childNodes).each(function(child){
@@ -956,7 +942,7 @@ ConfigEditor = Class.create({
 		return legend;
 	},
 	
-	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion){
+	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox){
         var groupDivs = $H({});
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
@@ -1009,7 +995,11 @@ ConfigEditor = Class.create({
                 }
                 element += '</select>';
             }
-			var div = new Element('div', {className:"SF_element"}).update('<div class="SF_label">'+label+(mandatory?'*':'')+' :</div>'+element);
+            var cBox = '';
+            if(addFieldCheckbox){
+                cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'"/>';
+            }
+			var div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")}).update('<div class="SF_label">'+label+(mandatory?'*':'')+' :</div>'+ cBox + element);
 			if(desc){
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
@@ -1041,14 +1031,35 @@ ConfigEditor = Class.create({
             direction : 'vertical'
         });
         this.accordion.activate(form.down('div.accordion_toggle'));
+        if(addFieldCheckbox){
+            form.select("input.SF_fieldCheckBox").each(function(cb){
+                cb.observe("click", function(event){
+                    var cbox = event.target;
+                    var state = !cbox.checked;
+                    var fElement = cbox.next("input.SF_input,select.SF_input,div.SF_input");
+                    var fElements;
+                    if(fElement && fElement.nodeName.toLowerCase() == "div") {
+                        fElements = fElement.select("input");
+                    }else{
+                        fElements = $A([fElement]);
+                    }
+                    fElements.invoke((state?"disable":"enable"));
+                    if(state) cbox.previous("div.SF_label").addClassName("SF_disabled");
+                    else cbox.previous("div.SF_label").removeClassName("SF_disabled");
+                }.bind(this));
+                cb.checked = true;
+                cb.click();
+            }.bind(this));
+        }
 	},
 	
 	submitParametersInputs : function(form, parametersHash, prefix){
 		prefix = prefix || '';
 		var missingMandatory = false;
+        var checkboxesActive = false;
 		form.select('input').each(function(el){			
 			if(el.type == "text" || el.type == "password"){
-				if(el.getAttribute('ajxp_mandatory') == 'true' && el.value == ''){
+				if(el.getAttribute('ajxp_mandatory') == 'true' && el.value == '' && !el.disabled){
 					missingMandatory = true;
 				}
 				parametersHash.set(prefix+el.name, el.value);				
@@ -1059,13 +1070,24 @@ ConfigEditor = Class.create({
 			if(el.getAttribute('ajxp_type')){
 				parametersHash.set(prefix+el.name+'_ajxptype', el.getAttribute('ajxp_type'));
 			}
+            if(form.down('[name="SFCB_'+el.name+'"]')){
+                checkboxesActive = true;
+                parametersHash.set(prefix+el.name+'_checkbox', form.down('[name="SFCB_'+el.name+'"]').checked?'checked':'unchecked');
+            }
 		});		
 		form.select('select').each(function(el){
-			if(el.getAttribute("ajxp_mandatory") == 'true' && el.getValue() == ''){
+			if(el.getAttribute("ajxp_mandatory") == 'true' && el.getValue() == '' && !el.disabled){
 				missingMandatory = true;
 			}
 			parametersHash.set(prefix+el.name, el.getValue());
+            if(form.down('[name="SFCB_'+el.name+'"]')){
+                checkboxesActive = true;
+                parametersHash.set(prefix+el.name+'_checkbox', form.down('[name="SFCB_'+el.name+'"]').checked?'checked':'unchecked');
+            }
 		});
+        if(checkboxesActive){
+            parametersHash.set("sf_checkboxes_active", "true");
+        }
 		return missingMandatory;
 	},	
 	
