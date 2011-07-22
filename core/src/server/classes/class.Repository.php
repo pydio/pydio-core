@@ -49,6 +49,7 @@ class Repository {
 	var $enabled = true;
 	var $options = array();
 	var $slug;
+    public $isTemplate = false;
 	
 	private $owner;
 	private $parentId;

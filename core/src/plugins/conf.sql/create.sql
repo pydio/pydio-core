@@ -32,6 +32,7 @@ CREATE TABLE ajxp_repo (
  	bcreate BOOLEAN,
  	writeable BOOLEAN, 
  	enabled BOOLEAN ,
+ 	isTemplate BOOLEAN,
  	slug VARCHAR(255)
 );
  

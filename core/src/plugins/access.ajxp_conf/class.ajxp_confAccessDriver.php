@@ -496,14 +496,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 				$options = array();
 				$repDef = $httpVars;
-				unset($repDef["get_action"]);
+                $isTemplate = isSet($httpVars["sf_checkboxes_active"]);
+                unset($repDef["get_action"]);
+                unset($repDef["sf_checkboxes_active"]);
 				$this->parseParameters($repDef, $options);
 				if(count($options)){
 					$repDef["DRIVER_OPTIONS"] = $options;
 				}
 				// NOW SAVE THIS REPOSITORY!
 				$newRep = ConfService::createRepositoryFromArray(0, $repDef);
-				if(is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php"))
+				if(!$isTemplate && is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php"))
 				{
 				    chdir(INSTALL_PATH."/server/tests/plugins");
 					include(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php");
@@ -524,12 +526,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::close();
 					return;
                 }
+                if($isTemplate){
+                    $newRep->isTemplate = true;
+                }
 				$res = ConfService::addRepository($newRep);
 				AJXP_XMLWriter::header();
 				if($res == -1){
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
 				}else{
-					$confStorage = ConfService::getConfStorageImpl();		
 					$loggedUser = AuthService::getLoggedUser();
 					$loggedUser->setRight($newRep->getUniqueId(), "rw");
 					$loggedUser->save();
@@ -935,12 +939,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         foreach ($sortedArray as $name => $repoIndex) {
             $repoObject =& $repos[$repoIndex];
+            $icon = ($repoObject->hasOwner()?"repo_child.png":"folder_red.png");
+            if($repoObject->isTemplate) $icon = "folder_grey.png";
             $metaData = array(
             	"repository_id" => $repoIndex,
-            	"accessType"	=> $repoObject->getAccessType(),
-            	"icon"			=> ($repoObject->hasOwner()?"repo_child.png":"folder_red.png"),
+            	"accessType"	=> ($repoObject->isTemplate?"Template for ":"").$repoObject->getAccessType(),
+            	"icon"			=> $icon,
             	"owner"			=> ($repoObject->hasOwner()?$repoObject->getOwner():""),
-            	"openicon"		=> "folder_red.png",
+            	"openicon"		=> $icon,
             	"parentname"	=> "/repositories",
 				"ajxp_mime" 	=> "repository".($repoObject->isWriteable()?"_editable":"")
             );
@@ -1081,7 +1087,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		foreach ($repDef as $key => $value)
 		{
 			$value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
-			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0 && strpos($key, "ajxptype") === false){
+			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0 && strpos($key, "ajxptype") === false && strpos($key, "_checkbox") === false){
 				if(isSet($repDef[$key."_ajxptype"])){
 					$type = $repDef[$key."_ajxptype"];
 					if($type == "boolean"){
@@ -1099,6 +1105,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					}
 					unset($repDef[$key."_ajxptype"]);
 				}
+                if(isSet($repDef[$key."_checkbox"])){
+                    $checked = $repDef[$key."_checkbox"] == "checked";
+                    unset($repDef[$key."_checkbox"]);
+                    if(!$checked) continue;
+                }
 				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
 				unset($repDef[$key]);
 			}else{

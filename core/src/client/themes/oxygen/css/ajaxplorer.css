@@ -232,6 +232,15 @@ div.shadow_class
 	border: 1px solid #5d83ae;
 }
 
+.dialogContent input:disabled,
+.dialogContent input[type="text"]:disabled,
+.dialogContent input[type="password"]:disabled,
+.dialogContent option:disabled
+.dialogContent textarea:disabled
+{
+	background: #eee;
+}
+
 .dialogContent input[type="checkbox"],
 .dialogContent input[type="radio"]
 {
@@ -513,6 +522,16 @@ div.SF_label{
 
 .SF_box{
    width: 20px !important;
+}
+
+.SF_fieldCheckBox{
+    float:left;
+    margin: 5px;
+}
+
+.SF_elementWithCheckbox .SF_input{
+    width: 52% !important;
+    _width:46% !important; /*IE*/
 }
 
 /****************
