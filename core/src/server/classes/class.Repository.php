@@ -65,10 +65,13 @@ class Repository {
 		$this->slug = AJXP_Utils::slugify($display);
 	}
 	
-	function createSharedChild($newLabel, $newOptions, $parentId, $owner, $uniqueUser){
+	function createSharedChild($newLabel, $newOptions, $parentId = null, $owner = null, $uniqueUser = null){
 		$repo = new Repository(0, $newLabel, $this->accessType);
 		$newOptions = array_merge($this->options, $newOptions);
 		$repo->options = $newOptions;
+		if($parentId == null){
+			$parentId = $this->id;
+		}
 		$repo->setOwnerData($parentId, $owner, $uniqueUser);
 		return $repo;
 	}
@@ -150,6 +153,14 @@ class Repository {
 			return $value;
 		}
 		return "";
+	}
+	
+	function getOptionsDefined(){
+		$keys = array();
+		foreach($this->options as $key => $value){
+			if(!empty($value)) $keys[] = $key;
+		}
+		return $keys;
 	}
 	
 	function getDefaultRight(){
@@ -241,7 +252,7 @@ class Repository {
 		$this->displayStringId = $id;
 	}
 	
-	function setOwnerData($repoParentId, $ownerUserId, $childUserId){
+	function setOwnerData($repoParentId, $ownerUserId = null, $childUserId = null){
 		$this->owner = $ownerUserId;
 		$this->uniqueUser = $childUserId;
 		$this->parentId = $repoParentId;
@@ -261,6 +272,10 @@ class Repository {
 	
 	function hasOwner(){
 		return isSet($this->owner);
+	}
+		
+	function hasParent(){
+		return isSet($this->parentId);
 	}
 		
 }

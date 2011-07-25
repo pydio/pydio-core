@@ -529,9 +529,17 @@ div.SF_label{
     margin: 5px;
 }
 
-.SF_elementWithCheckbox .SF_input{
+.SF_elementWithCheckbox > .SF_input{
     width: 52% !important;
     _width:46% !important; /*IE*/
+}
+
+.SF_failed{
+	border: 1px solid #D8B0B0 !important;
+}
+
+.accordion_toggle_failed {
+	background-color: #D8B0B0 !important;
 }
 
 /****************
