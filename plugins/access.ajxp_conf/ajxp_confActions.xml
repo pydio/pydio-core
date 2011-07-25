@@ -302,12 +302,16 @@
 								return;
 							}
 							toSubmit.set("repository_id", configEditor.currentRepoId);
-							configEditor.submitParametersInputs(configEditor.currentForm, toSubmit, 'DRIVER_OPTION_');
-							configEditor.submitForm('edit_repository', 'edit_repository_data', toSubmit, null, function(){
-								this.loadRepList();
-								this.loadUsers();
-							}.bind(configEditor));							
-							hideLightBox();
+							var missing = configEditor.formManager.serializeParametersInputs(configEditor.currentForm, toSubmit, 'DRIVER_OPTION_', configEditor.currentRepoIsTemplate);
+							if(missing && !configEditor.currentRepoIsTemplate){
+								configEditor.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
+							}else{
+								configEditor.submitForm('edit_repository', 'edit_repository_data', toSubmit, null, function(){
+									this.loadRepList();
+									this.loadUsers();
+								}.bind(configEditor));							
+								hideLightBox();
+							}
 						};
 						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, closeFunc);
 					}					

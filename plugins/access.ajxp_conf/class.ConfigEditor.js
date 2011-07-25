@@ -34,8 +34,11 @@
  */
 ConfigEditor = Class.create({
 
+	formManager:null,
+	
 	initialize: function(oForm){
 		if(oForm) this.form = oForm;
+		this.formManager = new FormManager();
 	},
 	
 	setForm : function(oForm){
@@ -340,7 +343,7 @@ ConfigEditor = Class.create({
 		
 		var customParams = $A([]);
 		for(var i=0;i<customData.length;i++){
-			customParams.push(this.driverParamNodeToHash(customData[i]));
+			customParams.push(this.formManager.parameterNodeToHash(customData[i]));
 		}
 		var userId = (this.userId) ? this.userId : 'new';
 		var newTd = new Element('div', {className:'driver_form', id:'custom_params_'+userId});
@@ -350,7 +353,7 @@ ConfigEditor = Class.create({
 			var tag = customData[i];
 			customValues.set(tag.getAttribute('name'), tag.getAttribute('value'));
 		}
-		this.createParametersInputs(newTd, customParams, false, customValues, false, true);
+		this.formManager.createParametersInputs(newTd, customParams, false, customValues, false, true);
 		if(!nosubmit){
 			var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/actions/22")});
 			submitButton.observe("click", function(){
@@ -389,7 +392,7 @@ ConfigEditor = Class.create({
 	addRepositoryUserParams : function(walletPane, repoId, walletParams, walletValues){
 		var repoParams = $A([]);
 		for(var i=0;i<walletParams.length;i++){
-			repoParams.push(this.driverParamNodeToHash(walletParams[i]));
+			repoParams.push(this.formManager.parameterNodeToHash(walletParams[i]));
 		}
 		
 		var userId = this.userId;		
@@ -400,7 +403,7 @@ ConfigEditor = Class.create({
 			var tag = walletValues[i];
 			repoValues.set(tag.getAttribute('option_name'), tag.getAttribute('option_value'));
 		}
-		this.createParametersInputs(newTd, repoParams, false, repoValues, null, true);
+		this.formManager.createParametersInputs(newTd, repoParams, false, repoValues, null, true);
 		var submitButton = new Element('input', {type:'image', value:'SAVE', className:'dialogButton', onClick:'return false;', src:resolveImageSource("dialog_ok_apply.png", "/images/actions/22")});
 		submitButton.observe("click", function(){
 			this.submitUserParamsForm(userId, repoId);
@@ -415,7 +418,7 @@ ConfigEditor = Class.create({
 	submitUserCustomForm : function(userId){
 		var parameters = new Hash();
 		parameters.set('user_id', userId);
-		if(this.submitParametersInputs($('custom_params_'+userId), parameters, "DRIVER_OPTION_")){
+		if(this.formManager.serializeParametersInputs($('custom_params_'+userId), parameters, "DRIVER_OPTION_")){
 			this.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
 			return false;
 		}
@@ -426,7 +429,7 @@ ConfigEditor = Class.create({
 		var parameters = new Hash();
 		parameters.set('user_id', userId);
 		parameters.set('repository_id', repositoryId);
-		if(this.submitParametersInputs($('repo_user_params_'+userId+'_'+repositoryId), parameters, "DRIVER_OPTION_")){
+		if(this.formManager.serializeParametersInputs($('repo_user_params_'+userId+'_'+repositoryId), parameters, "DRIVER_OPTION_")){
 			this.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
 			return false;
 		}
@@ -495,7 +498,7 @@ ConfigEditor = Class.create({
 		sync.addParameter('get_action', 'get_seed');
 		sync.onComplete = function(transport){
 			seed = transport.responseText;			
-		}		
+		};
 		sync.sendSync();
 		var encoded;
 		if(seed != '-1'){
@@ -645,6 +648,7 @@ ConfigEditor = Class.create({
 			this.repoButtonClick(true);
 		}.bind(this));
 		this.drivers = new Hash();
+		this.templates = new Hash();
 		this.submitForm('create_repository', 'get_drivers_definition', new Hash(), null, function(xmlData){			
 			var driverNodes = XPathSelectNodes(xmlData, "drivers/ajxpdriver");			
 			for(var i=0;i<driverNodes.length;i++){				
@@ -659,25 +663,57 @@ ConfigEditor = Class.create({
 				var driverParamsArray = new Array();
 				for(j=0;j<driverParams.length;j++){
 					var paramNode = driverParams[j];
-					driverParamsArray.push(this.driverParamNodeToHash(paramNode));
+					driverParamsArray.push(this.formManager.parameterNodeToHash(paramNode));
 				}
 				driverDef.set('params', driverParamsArray);
 				this.drivers.set(driverName, driverDef);
 			}
-			this.updateDriverSelector();
+			if(this.currentCreateRepoType == "template"){
+				this.updateDriverSelector();
+			}else{
+				this.submitForm('create_repository', 'get_templates_definition', new Hash(), null, function(xmlData){			
+					var driverNodes = XPathSelectNodes(xmlData, "repository_templates/template");			
+					for(var i=0;i<driverNodes.length;i++){				
+						var driver = driverNodes[i];
+						var driverDef = new Hash();
+						var driverName = XPathGetSingleNodeText(driver, "@repository_id");
+						driverDef.set('label', XPathGetSingleNodeText(driver, "@repository_label"));
+						driverDef.set('type', XPathGetSingleNodeText(driver, "@repository_type"));
+						driverDef.set('name', driverName);
+						var driverParams = XPathSelectNodes(driver, "option");
+						var optionsList = $A();
+						for(var k=0;k<driverParams.length;k++){
+							optionsList.push(driverParams[k].getAttribute("name"));
+						}
+						driverDef.set('options', optionsList);
+						this.templates.set(driverName, driverDef);
+					}
+					this.updateDriverSelector();
+				}.bind(this) );				
+			}
 		}.bind(this) );
 	},
 	
 	updateDriverSelector : function(){
 		if(!this.drivers || !this.driverSelector) return;
 		if(Prototype.Browser.IE){this.driverSelector.hide();}
-		this.driverSelector.update('<option value="0"></option>');
+		this.driverSelector.update('<option value="0" selected></option>');
+		this.driverSelector.insert(new Element('optgroup', {label:"Access Drivers"}));
 		this.drivers.each(function(pair){
 			var option = new Element('option');
 			option.setAttribute('value', pair.key);
 			option.update(pair.value.get('label'));
 			this.driverSelector.insert({'bottom':option});			
 		}.bind(this) );
+		if(this.templates.size()){
+			this.driverSelector.insert(new Element('optgroup', {label:"Repository Templates"}));
+			this.templates.each(function(pair){
+				var option = new Element('option');
+				option.setAttribute('value', 'ajxp_template_'+pair.key);
+				option.update(pair.value.get('label'));
+				this.driverSelector.insert({'bottom':option});			
+			}.bind(this));			
+		}
 		if(Prototype.Browser.IE){this.driverSelector.show();}
 		this.driverSelector.onchange = this.driverSelectorChange.bind(this);
 	},
@@ -685,7 +721,12 @@ ConfigEditor = Class.create({
 	driverSelectorChange : function(){
 		var height = (Prototype.Browser.IE?62:32);
 		var dName = this.driverSelector.getValue();
-		this.createDriverForm(dName, (this.currentCreateRepoType == "template"?true:false) );
+		if(dName.indexOf("ajxp_template_") === 0){
+			var templateName = dName.substring(14);
+			this.createDriverFormFromTemplate(templateName);
+		}else{			
+			this.createDriverForm(dName, (this.currentCreateRepoType == "template"?true:false) );
+		}
 		if(dName != "0"){
 			var height = 130 + this.driverForm.getHeight() + (Prototype.Browser.IE?15:0);
             var addscroll = false;
@@ -703,14 +744,29 @@ ConfigEditor = Class.create({
 			}
 		});		
 	},
+
+	createDriverFormFromTemplate : function(templateName){
+        this.driverForm.update('');
+		var templateData = this.templates.get(templateName);
+		var templateOptions = templateData.get("options");
+		var driver = this.drivers.get(templateData.get("type"));
+		var driverParams = driver.get("params");
+		var prunedParams = driverParams.findAll(function(param){
+			return !(templateOptions.include(param.get('name')));
+		});
+		this.formManager.createParametersInputs(this.driverForm, prunedParams);
+        var firstAcc = this.driverForm.down(".accordion_content");
+        if(!firstAcc) firstAcc = this.driverForm;
+		firstAcc.insert({top:'<div class="dialogLegend">' + driver.get('description')+'</div>'});		
+	},
 	
 	createDriverForm : function(driverName, addCheckBox){
         this.driverForm.update('');
 		if(driverName == "0"){
-			//return;
+			return;
 		}
 		var dOpt = this.drivers.get(driverName);
-		this.createParametersInputs(this.driverForm, dOpt.get('params'), false, null, false, false, addCheckBox);
+		this.formManager.createParametersInputs(this.driverForm, dOpt.get('params'), false, null, false, false, addCheckBox);
         var firstAcc = this.driverForm.down(".accordion_content");
         if(!firstAcc) firstAcc = this.driverForm;
 		firstAcc.insert({top:'<div class="dialogLegend">' + dOpt.get('description')+'</div>'});
@@ -727,13 +783,14 @@ ConfigEditor = Class.create({
 		var toSubmit = new Hash();
 		var missingMandatory = false;
 		if(this.newRepoLabelInput.value == ''){
+			$(this.newRepoLabelInput).addClassName("SF_failed");
 			missingMandatory = true;
 		}else{
 			toSubmit.set('DISPLAY', this.newRepoLabelInput.value);
 		}
 		toSubmit.set('DRIVER', this.driverSelector.options[this.driverSelector.selectedIndex].value);
-		
-		if(missingMandatory || this.submitParametersInputs(this.driverForm, toSubmit, 'DRIVER_OPTION_')){
+		var missingMandFields = this.formManager.serializeParametersInputs(this.driverForm, toSubmit, 'DRIVER_OPTION_');
+		if(missingMandatory || missingMandFields){
 			this.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
 			return false;
 		}		
@@ -767,7 +824,7 @@ ConfigEditor = Class.create({
 			
 		var driverParamsHash = $A([]);
 		for(var i=0;i<driverParams.length;i++){
-			driverParamsHash.push(this.driverParamNodeToHash(driverParams[i]));
+			driverParamsHash.push(this.formManager.parameterNodeToHash(driverParams[i]));
 		}
 				
 		var form = new Element('div', {className:'driver_form'});
@@ -790,7 +847,8 @@ ConfigEditor = Class.create({
 		this.currentForm = form;
 		this.currentRepoId = repo.getAttribute("index");
 		this.currentRepoWriteable = writeable;
-		this.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable);
+		this.currentRepoIsTemplate = (repo.getAttribute("isTemplate") === "true");
+		this.formManager.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable, false, this.currentRepoIsTemplate);
 		
 		if(writeable){
 			this.feedMetaSourceForm(xmlData, metaForm);		
@@ -816,10 +874,10 @@ ConfigEditor = Class.create({
 				var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
 				var driverParamsHash = $A([]);
 				for(var i=0;i<metaDefNodes.length;i++){
-					driverParamsHash.push(this.driverParamNodeToHash(metaDefNodes[i]));
+					driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));
 				}
 				paramsValues = new Hash(metaSourcesData[plugId]);
-				this.createParametersInputs(form, driverParamsHash, true, paramsValues, false, true);
+				this.formManager.createParametersInputs(form, driverParamsHash, true, paramsValues, false, true);
 				metaPane.insert(form);
 			}
 		}
@@ -846,9 +904,9 @@ ConfigEditor = Class.create({
 				var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
 				var driverParamsHash = $A([]);
 				for(var i=0;i<metaDefNodes.length;i++){
-					driverParamsHash.push(this.driverParamNodeToHash(metaDefNodes[i]));
+					driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));
 				}				
-				this.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
+				this.formManager.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
 			}
 			modal.refreshDialogAppearance();
 		}.bind(this));
@@ -875,7 +933,7 @@ ConfigEditor = Class.create({
 			params.set('get_action', img.getAttribute('name'));
 		}
 		params.set('repository_id', this.currentRepoId);
-		this.submitParametersInputs(form, params, "DRIVER_OPTION_");
+		this.formManager.serializeParametersInputs(form, params, "DRIVER_OPTION_");
 		if(params.get('get_action') == 'add_meta_source' && params.get('DRIVER_OPTION_new_meta_source') == ''){
 			alert(MessageHash['ajxp_conf.42']);
 			return;
@@ -909,16 +967,7 @@ ConfigEditor = Class.create({
 		
 	/*************************************/
 	/*       COMMON FUNCTIONS            */
-	/*************************************/	
-	driverParamNodeToHash : function(driverNode){
-		var driversAtts = $A(['name', 'group', 'type', 'label', 'description', 'default', 'mandatory', 'choices']);
-		var driverHash = new Hash();
-		driversAtts.each(function(attName){
-			driverHash.set(attName, (XPathGetSingleNodeText(driverNode, '@'+attName) || ''));
-		});
-		return driverHash;
-	},	
-	
+	/*************************************/		
 	createTabbedFieldset: function(link1, pane1, link2, pane2){
 		var legend1 = new Element('a', {className:"active"}).update(link1);
 		var legend2 = new Element('a').update(link2);
@@ -941,155 +990,6 @@ ConfigEditor = Class.create({
 		});				
 		return legend;
 	},
-	
-	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox){
-        var groupDivs = $H({});
-		parametersDefinitions.each(function(param){		
-			var label = param.get('label');
-			if(param.get('labelId')){
-				label = MessageHash[param.get('labelId')];
-			}
-			var name = param.get('name');
-			var type = param.get('type');
-			var desc = param.get('description');
-			if(param.get('descriptionId')){
-				desc = MessageHash[param.get('descriptionId')];
-			}
-            var group = param.get('group') || 'Repository Options';
-            if(param.get('groupId')){
-                group = MessageHash[param.get('groupId')];
-            }
-			var mandatory = false;
-			if(param.get('mandatory') && param.get('mandatory')=='true') mandatory = true;
-			var defaultValue = (values?'':(param.get('default') || ""));
-			if(values && values.get(name)){
-				defaultValue = values.get(name);
-			}
-			var element;
-			var disabledString = (disabled?' disabled="true" ':'');
-			if(type == 'string' || type == 'integer'){
-				element = '<input type="text" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
-		    }else if(type == 'password'){
-				element = '<input type="password" autocomplete="off" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
-			}else if(type == 'boolean'){
-				var selectTrue, selectFalse;
-				if(defaultValue){
-					if(defaultValue == "true" || defaultValue == "1") selectTrue = true;
-					if(defaultValue == "false" || defaultValue == "0") selectFalse = true;
-				}
-				element = '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
-				element = element + '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
-				element = '<div class="SF_input">'+element+'</div>';
-			}else if(type == 'select' && param.get('choices')){
-                var choices = param.get('choices').split(",");
-                element = '<select class="SF_input" name="'+name+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" >';
-                if(!mandatory) element += '<option value=""></option>';
-                for(var k=0;k<choices.length;k++){
-                    var cLabel, cValue;
-                    var cSplit = choices[k].split("|");
-                    cValue = cSplit[0];
-                    if(cSplit.length > 1 ) cLabel = cSplit[1];
-                    else cLabel = cValue;
-                    var selectedString = (defaultValue == cValue ? ' selected' : '');
-                    element += '<option value="'+cValue+'"'+selectedString+'>'+cLabel+'</option>';
-                }
-                element += '</select>';
-            }
-            var cBox = '';
-            if(addFieldCheckbox){
-                cBox = '<input type="checkbox" class="SF_fieldCheckBox" name="SFCB_'+name+'"/>';
-            }
-			var div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")}).update('<div class="SF_label">'+label+(mandatory?'*':'')+' :</div>'+ cBox + element);
-			if(desc){
-				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
-			}
-            if(skipAccordion){
-			    form.insert({'bottom':div});
-            }else{
-                var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
-                gDiv.insert(div);
-                groupDivs.set(group, gDiv);
-            }
-		});
-        if(!groupDivs.size()) return;
-        var firstGroup = true;
-        groupDivs.each(function(pair){
-            var title = new Element('div',{className:'accordion_toggle'}).update(pair.key);
-            form.insert(title);
-            form.insert(pair.value);
-        });
-        this.accordion = new accordion(form, {
-            classNames : {
-                toggle : 'accordion_toggle',
-                toggleActive : 'accordion_toggle_active',
-                content : 'accordion_content'
-            },
-            defaultSize : {
-                width : '360px',
-                height: null
-            },
-            direction : 'vertical'
-        });
-        this.accordion.activate(form.down('div.accordion_toggle'));
-        if(addFieldCheckbox){
-            form.select("input.SF_fieldCheckBox").each(function(cb){
-                cb.observe("click", function(event){
-                    var cbox = event.target;
-                    var state = !cbox.checked;
-                    var fElement = cbox.next("input.SF_input,select.SF_input,div.SF_input");
-                    var fElements;
-                    if(fElement && fElement.nodeName.toLowerCase() == "div") {
-                        fElements = fElement.select("input");
-                    }else{
-                        fElements = $A([fElement]);
-                    }
-                    fElements.invoke((state?"disable":"enable"));
-                    if(state) cbox.previous("div.SF_label").addClassName("SF_disabled");
-                    else cbox.previous("div.SF_label").removeClassName("SF_disabled");
-                }.bind(this));
-                cb.checked = true;
-                cb.click();
-            }.bind(this));
-        }
-	},
-	
-	submitParametersInputs : function(form, parametersHash, prefix){
-		prefix = prefix || '';
-		var missingMandatory = false;
-        var checkboxesActive = false;
-		form.select('input').each(function(el){			
-			if(el.type == "text" || el.type == "password"){
-				if(el.getAttribute('ajxp_mandatory') == 'true' && el.value == '' && !el.disabled){
-					missingMandatory = true;
-				}
-				parametersHash.set(prefix+el.name, el.value);				
-			}
-			else if(el.type=="radio" && el.checked){
-				parametersHash.set(prefix+el.name, el.value)
-			};
-			if(el.getAttribute('ajxp_type')){
-				parametersHash.set(prefix+el.name+'_ajxptype', el.getAttribute('ajxp_type'));
-			}
-            if(form.down('[name="SFCB_'+el.name+'"]')){
-                checkboxesActive = true;
-                parametersHash.set(prefix+el.name+'_checkbox', form.down('[name="SFCB_'+el.name+'"]').checked?'checked':'unchecked');
-            }
-		});		
-		form.select('select').each(function(el){
-			if(el.getAttribute("ajxp_mandatory") == 'true' && el.getValue() == '' && !el.disabled){
-				missingMandatory = true;
-			}
-			parametersHash.set(prefix+el.name, el.getValue());
-            if(form.down('[name="SFCB_'+el.name+'"]')){
-                checkboxesActive = true;
-                parametersHash.set(prefix+el.name+'_checkbox', form.down('[name="SFCB_'+el.name+'"]').checked?'checked':'unchecked');
-            }
-		});
-        if(checkboxesActive){
-            parametersHash.set("sf_checkboxes_active", "true");
-        }
-		return missingMandatory;
-	},	
 	
 	submitForm: function(mainAction, action, parameters, formName, callback){
 		//var connexion = new Connexion('admin.php');

@@ -341,6 +341,7 @@ class AJXP_XMLWriter
 		$streams = ConfService::detectRepositoryStreams(false);
 		foreach (ConfService::getRepositoriesList() as $rootDirIndex => $rootDirObject)
 		{		
+			if($rootDirObject->isTemplate) continue;
 			$toLast = false;
 			if($rootDirObject->getAccessType()=="ajxp_conf"){
 				if(AuthService::usersEnabled() && !$loggedUser->isAdmin()){

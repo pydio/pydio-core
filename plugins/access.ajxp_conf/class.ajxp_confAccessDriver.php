@@ -492,6 +492,26 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 			break;
 			
+			case  "get_templates_definition":
+				
+				AJXP_XMLWriter::header("repository_templates");
+				$repositories = ConfService::getRepositoriesList();
+				foreach ($repositories as $repo){
+					if(!$repo->isTemplate) continue;
+					$repoId = $repo->getUniqueId();
+					$repoLabel = $repo->getDisplay();
+					$repoType = $repo->getAccessType();
+					print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
+					foreach($repo->getOptionsDefined() as $optionName){
+						print("<option name=\"$optionName\"/>");
+					}
+					print("</template>");
+				}
+				AJXP_XMLWriter::close("repository_templates");
+				
+				
+			break;
+			
 			case "create_repository" : 
 			
 				$options = array();
@@ -503,22 +523,28 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(count($options)){
 					$repDef["DRIVER_OPTIONS"] = $options;
 				}
-				// NOW SAVE THIS REPOSITORY!
-				$newRep = ConfService::createRepositoryFromArray(0, $repDef);
-				if(!$isTemplate && is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php"))
-				{
-				    chdir(INSTALL_PATH."/server/tests/plugins");
-					include(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php");
-					$className = "ajxp_".$newRep->getAccessType();
-					$class = new $className();
-					$result = $class->doRepositoryTest($newRep);
-					if(!$result){
-						AJXP_XMLWriter::header();
-						AJXP_XMLWriter::sendMessage(null, $class->failedInfo);
-						AJXP_XMLWriter::close();
-						return;
-					}
+				if(strstr($repDef["DRIVER"], "ajxp_template_") !== false){
+					$templateId = substr($repDef["DRIVER"], 14);
+					$templateRepo = ConfService::getRepositoryById($templateId);
+					$newRep = $templateRepo->createSharedChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"]);
+				}else{
+					$newRep = ConfService::createRepositoryFromArray(0, $repDef);
+					if(!$isTemplate && is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php"))
+					{
+					    chdir(INSTALL_PATH."/server/tests/plugins");
+						include(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php");
+						$className = "ajxp_".$newRep->getAccessType();
+						$class = new $className();
+						$result = $class->doRepositoryTest($newRep);
+						if(!$result){
+							AJXP_XMLWriter::header();
+							AJXP_XMLWriter::sendMessage(null, $class->failedInfo);
+							AJXP_XMLWriter::close();
+							return;
+						}
+					}					
 				}
+
                 if ($this->repositoryExists($newRep->getDisplay()))
                 {
 					AJXP_XMLWriter::header();
@@ -917,7 +943,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
 			if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
             $name = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
-			if($repoObject->hasOwner()) {
+			if($repoObject->hasOwner() || $repoObject->hasParent()) {
 				$parentId = $repoObject->getParentId();	        	
 				if(!isSet($childRepos[$parentId])) $childRepos[$parentId] = array();
 				$childRepos[$parentId][] = array("name" => $name, "index" => $repoIndex);
@@ -939,7 +965,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         foreach ($sortedArray as $name => $repoIndex) {
             $repoObject =& $repos[$repoIndex];
-            $icon = ($repoObject->hasOwner()?"repo_child.png":"folder_red.png");
+            $icon = (($repoObject->hasOwner()||$repoObject->hasParent())?"repo_child.png":"folder_red.png");
             if($repoObject->isTemplate) $icon = "folder_grey.png";
             $metaData = array(
             	"repository_id" => $repoIndex,
