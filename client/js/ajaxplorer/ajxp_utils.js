@@ -168,20 +168,20 @@ function clearRememberData(){
 
 function setAjxpCookie(name, value){
 	var cookieJar = new CookieJar({
-		expire: 3600*24*10, 
-		path: '',
+		expires: 3600*24*10,
+		path: '/',
 		secure: true
 	});
 	cookieJar.put('ajxp_'+name, value);	
 }
 
 function getAjxpCookie(name){
-	var cookieJar = new CookieJar({});
+	var cookieJar = new CookieJar({path: '/',secure:true});
 	return cookieJar.get('ajxp_'+name);	
 }
 
 function deleteAjxpCookie(name){
-	var cookieJar = new CookieJar({});
+	var cookieJar = new CookieJar({path: '/',secure:true});
 	cookieJar.remove('ajxp_'+name);	
 }
 
