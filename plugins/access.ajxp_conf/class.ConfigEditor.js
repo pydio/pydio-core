@@ -821,10 +821,21 @@ ConfigEditor = Class.create({
 		var repo = XPathSelectSingleNode(xmlData, "admin_data/repository");
 		var driverParams = XPathSelectNodes(xmlData, "admin_data/ajxpdriver/param");
 		var optionsPane = this.form.select('[id="options_pane"]')[0];		
-			
+		var tplParams = XPathSelectNodes(xmlData, "admin_data/template/option");
+		if(tplParams.length){
+			var tplParamNames = $A();
+			for(var k=0;k<tplParams.length;k++) {
+				if(tplParams[k].getAttribute("name")){
+					tplParamNames.push(tplParams[k].getAttribute("name"));					
+				}
+			}
+		}
+		
 		var driverParamsHash = $A([]);
 		for(var i=0;i<driverParams.length;i++){
-			driverParamsHash.push(this.formManager.parameterNodeToHash(driverParams[i]));
+			var hashedParams = this.formManager.parameterNodeToHash(driverParams[i]);
+			if(tplParamNames && tplParamNames.include(hashedParams.get('name'))) continue;
+			driverParamsHash.push(hashedParams);
 		}
 				
 		var form = new Element('div', {className:'driver_form'});
