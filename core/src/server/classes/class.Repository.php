@@ -54,6 +54,11 @@ class Repository {
 	private $owner;
 	private $parentId;
 	private $uniqueUser;
+	private $inferOptionsFromParent = false;
+	/**
+	 * @var Repository
+	 */
+	private $parentTemplateObject;
 	
 	public $streamData;
 	
@@ -73,6 +78,14 @@ class Repository {
 			$parentId = $this->id;
 		}
 		$repo->setOwnerData($parentId, $owner, $uniqueUser);
+		return $repo;
+	}
+	
+	function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null){
+		$repo = new Repository(0, $newLabel, $this->accessType);
+		$repo->options = $newOptions;
+		$repo->setOwnerData($this->id, $owner, $uniqueUser);
+		$repo->inferOptionsFromParent = true;
 		return $repo;
 	}
 	
@@ -146,11 +159,17 @@ class Repository {
 		$this->options[$oName] = $oValue;
 	}
 	
-	function getOption($oName, $safe=false){		
+	function getOption($oName, $safe=false){
 		if(isSet($this->options[$oName])){
-			$value = $this->options[$oName];
-			$value = AJXP_VarsFilter::filter($value);
+			$value = $this->options[$oName];			
+			if(!$safe) $value = AJXP_VarsFilter::filter($value);
 			return $value;
+		}
+		if($this->inferOptionsFromParent){
+			if(!isset($this->parentTemplateObject)){
+				$this->parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+			}
+			return $this->parentTemplateObject->getOption($oName, $safe);
 		}
 		return "";
 	}

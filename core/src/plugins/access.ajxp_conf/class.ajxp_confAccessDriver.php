@@ -526,7 +526,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(strstr($repDef["DRIVER"], "ajxp_template_") !== false){
 					$templateId = substr($repDef["DRIVER"], 14);
 					$templateRepo = ConfService::getRepositoryById($templateId);
-					$newRep = $templateRepo->createSharedChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"]);
+					$newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"]);
 				}else{
 					$newRep = ConfService::createRepositoryFromArray(0, $repDef);
 					if(!$isTemplate && is_file(INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php"))
@@ -626,6 +626,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					print("</repository>");
 				}else{
 					print("/>");
+				}
+				if($repository->hasParent()){
+					$parent = ConfService::getRepositoryById($repository->getParentId());
+					if(isSet($parent) && $parent->isTemplate){
+						$parentLabel = $parent->getDisplay();
+						$parentType = $parent->getAccessType();
+						print("<template repository_id=\"".$repository->getParentId()."\" repository_label=\"$parentLabel\" repository_type=\"$parentType\">");
+						foreach($parent->getOptionsDefined() as $parentOptionName){
+							print("<option name=\"$parentOptionName\"/>");
+						}
+						print("</template>");						
+					}
 				}
 				$manifest = $plug->getManifestRawContent("server_settings/param");
 				print("<ajxpdriver name=\"".$repository->accessType."\">$manifest</ajxpdriver>");
