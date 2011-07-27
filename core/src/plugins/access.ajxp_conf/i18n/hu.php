@@ -100,6 +100,14 @@ $mess=array(
 "87" => "Successfully updated actions for this role",
 "88" => "This repository is defined in the config file, you cannot edit its meta sources via the GUI.",
 "89" => "User specific data",
+"90" => "Repository",
+"91" => "Template",
+"92" => "Create a new template",
+"93" => "Edit",
+"94" => "Batch Edit",
+"95" => "Choose a label and a driver to access the data (check all sections for mandatory fields, you can hover the options labels with your mouse to get more info).",
+"96" => "Once a label and driver selected, enable the fields you want to be prefilled in the template using the checkboxes. The other fields will be left to the user. You can enable some fields and leave them empty, if you still want to hide them from the user.",
+"repository_access_key" => "N",
 /* END SENTENCE */
 );
 ?>

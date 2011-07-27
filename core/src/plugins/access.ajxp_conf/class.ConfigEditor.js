@@ -663,6 +663,9 @@ ConfigEditor = Class.create({
 				var driverParamsArray = new Array();
 				for(j=0;j<driverParams.length;j++){
 					var paramNode = driverParams[j];
+					if(this.currentCreateRepoType == "template" && paramNode.getAttribute('no_templates') == 'true'){
+						continue;
+					}
 					driverParamsArray.push(this.formManager.parameterNodeToHash(paramNode));
 				}
 				driverDef.set('params', driverParamsArray);
@@ -766,7 +769,8 @@ ConfigEditor = Class.create({
 			return;
 		}
 		var dOpt = this.drivers.get(driverName);
-		this.formManager.createParametersInputs(this.driverForm, dOpt.get('params'), false, null, false, false, addCheckBox);
+		var options = dOpt.get('params');
+		this.formManager.createParametersInputs(this.driverForm, options, false, null, false, false, addCheckBox);
         var firstAcc = this.driverForm.down(".accordion_content");
         if(!firstAcc) firstAcc = this.driverForm;
 		firstAcc.insert({top:'<div class="dialogLegend">' + dOpt.get('description')+'</div>'});
