@@ -11,7 +11,7 @@
 	</credentials_consumer>
 	<slug_provider>
 		<server_settings uuidAttr="name">
-			<param group="Repository Slug" name="AJXP_SLUG" type="string" label="Alias" description="Alias for replacing the generated unique id of the repository" mandatory="false"/>
+			<param group="Repository Slug" name="AJXP_SLUG" type="string" label="Alias" description="Alias for replacing the generated unique id of the repository" mandatory="false" no_templates="true"/>
 		</server_settings>
 	</slug_provider>
     <filesystem_commons>

@@ -100,6 +100,14 @@ $mess=array(
 "87" => "Les actions ont été mises à jour pour ce rôle.",
 "88" => "Ce dépot est défini dans le fichier de configuration, il n'est pas possible de mettre à jour les métadonnées via l'interface.",
 "89" => "Données spécifiques de l'utilisateur",
+"90" => "Dépôt",
+"91" => "Modèle",
+"92" => "Créer un nouveau modèle",
+"93" => "Edition",
+"94" => "Edition en masse",
+"95" => "Choisir un libellé et un driver pour accèder aux données (vérifiez les différentes sections qui contiennent des champs obligatoires, vous pouvez passer la souris sur les labels pour avoir plus d'infos).",
+"96" => "Choisir un libellé et un driver, puis choisir les champs que vous voulez pré-remplir pour constituer ce modèle. Vous pouvez cocher des champs et les laisser vide.",
+"repository_access_key" => "D",
 /* END SENTENCE */
 );
 ?>

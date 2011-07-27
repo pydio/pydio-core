@@ -449,8 +449,5 @@ $mess=array(
 "411" => "Open",
 "412" => "Upload only",
 "413" => "Shared by",
-"414" => "Repository",
-"415" => "Repository Template",
-"416" => "Create a new template"
 );
 ?>
