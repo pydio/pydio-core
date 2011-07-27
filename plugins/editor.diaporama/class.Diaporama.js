@@ -40,8 +40,7 @@ Class.create("Diaporama", AbstractEditor, {
 	
 	initialize: function($super, oFormObject)
 	{
-		//this.editorOptions.floatingToolbar = true;
-		$super(oFormObject);
+		$super(oFormObject, {floatingToolbar:true});
 		this.nextButton = this.actions.get("nextButton");
 		this.previousButton = this.actions.get("prevButton");
 		this.downloadButton = this.actions.get("downloadDiapoButton");

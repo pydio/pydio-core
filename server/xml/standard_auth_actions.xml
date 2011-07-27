@@ -63,7 +63,7 @@
 					}
 					]]></clientCallback>
 					<clientForm id="login_form_dynamic"><![CDATA[						
-						<form id="login_form_dynamic" action="login" box_width="230">
+						<div id="login_form_dynamic" action="login" box_width="230">
 						<input type="hidden" name="get_action" value="login">
 						<input type="hidden" name="login_seed" id="login_seed" value="">
 						<a style="float:right;" href="javascript:ajaxplorer.actionBar.fireAction('switch_language');" title="AJXP_MESSAGE[190]" alt="AJXP_MESSAGE[190]"/><img src="client/themes/oxygen/images/actions/16/flag.png" border="0" height="16" width="16"></a>
@@ -81,7 +81,7 @@
 								<input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message>
 							</div>
 						</div>
-						</form>					
+						</div>					
 					]]></clientForm>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
