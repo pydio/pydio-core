@@ -52,13 +52,18 @@ Class.create("AbstractEditor" , {
 	/**
 	 * @var Hash For the moment supported options are "fullscreen", "closable", "floatingToolbar".
 	 */
-	editorOptions : new Hash({"fullscreen":true, "closable":true, "floatingToolbar":false}),
+	editorOptions:null, 
 	
 	/**
 	 * Standard contructor
 	 * @param oContainer Element dom not to attach to
 	 */
-	initialize : function(oContainer){
+	initialize : function(oContainer, options){
+		this.editorOptions = Object.extend({
+			fullscreen:true, 
+			closable:true, 
+			floatingToolbar:false
+		}, options || { });		
 		this.element =  $(oContainer);
 		this.defaultActions = new Hash({
 			'fs' : '<a id="fsButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
@@ -75,6 +80,7 @@ Class.create("AbstractEditor" , {
 	 */
 	initActions : function(){
 		this.actions = new Hash();
+		this.registeredActions = new Hash();
 		var actionBarSel = this.element.select('.action_bar');		
 		if(!actionBarSel.length){
 			this.actionBar = new Element('div', {className:'action_bar'});
@@ -82,7 +88,7 @@ Class.create("AbstractEditor" , {
 		}else{
 			this.actionBar = actionBarSel[0];
 		}
-		if(!this.editorOptions.get("fullscreen")){
+		if(!this.editorOptions.fullscreen){
 			this.defaultActions.unset("fs");
 			this.defaultActions.unset("nofs");
 		}
@@ -95,7 +101,25 @@ Class.create("AbstractEditor" , {
 			var span = link.select('span[message_id]')[0];			
 			if(span) span.update(MessageHash[span.readAttribute("message_id")]);
 			this.actions.set(link.id, link);
+			if(link.getAttribute('access_key')){
+				var aK = link.getAttribute('access_key');
+				if(Event[aK]) aK = Event[aK];
+				this.registeredActions.set(aK, link.id);
+			}
 		}, this);
+		if(this.registeredActions.size()){
+			this.keyObs = function(e){
+				if(this.registeredActions.get(e.keyCode)){
+					this.actions.get(this.registeredActions.get(e.keyCode)).onclick();
+				}else if(this.registeredActions.get(String.fromCharCode(e.keyCode).toLowerCase())){
+					this.actions.get(this.registeredActions.get(String.fromCharCode(e.keyCode).toLowerCase())).onclick();
+				}
+			}.bind(this);
+			Event.observe(document, "keydown", this.keyObs);
+			this.element.observe("editor:close", function(){
+				Event.stopObserving(document, "keydown", this.keyObs);
+			});
+		}
 		
 		if(this.actions.get("closeButton")){
 			this.actions.get("closeButton").observe("click", function(){
@@ -124,6 +148,11 @@ Class.create("AbstractEditor" , {
 		}
 		
 		attachMobileScroll(this.actionBar, "horizontal");
+		var obs = this.resize.bind(this);
+		modal.observe("modal:resize", obs);
+		this.element.observe("editor:close", function(){
+			modal.stopObserving("modal:resize", obs);
+		});
 		
 	},
 	
@@ -136,9 +165,31 @@ Class.create("AbstractEditor" , {
 			zIndex:(parseInt(this.element.getStyle("zIndex")) + 1000),
 			width : '',
 			top: '',
-			bottom : 20,
-			left : '30%'
+			borderRadius:'20px',
+			paddingRight:'10px',
+			paddingLeft:'10px',
+			opacity:'0.9',
+			cursor: 'move',
+			boxShadow:'2px 2px 6px rgba(0, 0, 0, 0.4)'			
 		});
+		this.actionBar.down("div.separator").remove();
+		this.actionBarPlacer = function(){
+			this.actionBar.setStyle({
+				top:'', 		// may have been set during a drag operation
+				bottom:'30px'
+			});
+			if(this.contentMainContainer){
+				var w = this.actionBar.getWidth();
+				var elW = this.contentMainContainer.getWidth();
+				this.actionBar.setStyle({left:(Math.max(0,(elW-w)/2))+'px'});				
+			}
+		}.bind(this);
+		this.element.observe("editor:resize", this.actionBarPlacer);
+		this.element.observe("editor:close", function(){
+			this.element.stopObserving("editor:resize", this.actionBarPlacer);
+		}.bind(this));
+		window.setTimeout(this.actionBarPlacer, 100);
+		new Draggable(this.actionBar);
 	},
 	
 	/**

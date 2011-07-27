@@ -149,20 +149,24 @@ Class.create("Modal", {
 				return false;
 			};
 		}
-		this.showContent(this.elementName, $(sFormId).getAttribute("box_width"), $(sFormId).getAttribute("box_height"));
-		if($(newForm).getElementsBySelector(".dialogFocus").length)
+		this.showContent(this.elementName, 
+				$(sFormId).getAttribute("box_width"), 
+				$(sFormId).getAttribute("box_height"),
+				null,
+				($(sFormId).getAttribute("box_resize") && $(sFormId).getAttribute("box_resize") == "true"));
+		if($(newForm).select(".dialogFocus").length)
 		{
-			objToFocus = $(newForm).getElementsBySelector(".dialogFocus")[0];
+			objToFocus = $(newForm).select(".dialogFocus")[0];
 			setTimeout('objToFocus.focus()', 500);
 		}
-		if($(newForm).getElementsBySelector(".replace_rep").length)
+		if($(newForm).select(".replace_rep").length)
 		{
-			repDisplay = $(newForm).getElementsBySelector(".replace_rep")[0];
+			repDisplay = $(newForm).select(".replace_rep")[0];
 			repDisplay.innerHTML = ajaxplorer.getContextHolder().getContextNode().getPath();
 		}
-		if($(newForm).getElementsBySelector(".replace_file").length)
+		if($(newForm).select(".replace_file").length)
 		{
-			repDisplay = $(newForm).getElementsBySelector(".replace_file")[0];
+			repDisplay = $(newForm).select(".replace_file")[0];
 			repDisplay.innerHTML = getBaseName(ajaxplorer.getUserSelection().getUniqueFileName());
 		}
 		if($(newForm).select('.dialogEnterKey').length && Prototype.Browser.IE){
@@ -193,13 +197,15 @@ Class.create("Modal", {
 	 * @param boxHeight String Height in pixel or in percent
 	 * @param skipShadow Boolean Do not add a shadow
 	 */
-	showContent: function(elementName, boxWidth, boxHeight, skipShadow){
+	showContent: function(elementName, boxWidth, boxHeight, skipShadow, boxAutoResize){
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.blurAll();
 		var winWidth = $(document.body).getWidth();
 		var winHeight = $(document.body).getHeight();
 	
+		this.currentListensToWidth = false;
+		this.currentListensToHeight = false;
 		// WIDTH / HEIGHT
 		if(boxWidth != null){
 			if(boxWidth.indexOf("%") ==-1 && parseInt(boxWidth) > winWidth){
@@ -208,6 +214,7 @@ Class.create("Modal", {
 			if(boxWidth.indexOf('%') > -1){
 				percentWidth = parseInt(boxWidth);
 				boxWidth = parseInt((winWidth * percentWidth) / 100);
+				this.currentListensToWidth = percentWidth;
 			}
 			$(elementName).setStyle({width:boxWidth+'px'});
 		}
@@ -215,6 +222,7 @@ Class.create("Modal", {
 			if(boxHeight.indexOf('%') > -1){
 				percentHeight = parseInt(boxHeight);
 				boxHeight = parseInt((winHeight * percentHeight) / 100);
+				this.currentListensToHeight = percentHeight;
 			}
 			$(elementName).setStyle({height:boxHeight+'px'});
 		}else{
@@ -224,8 +232,23 @@ Class.create("Modal", {
 				$(elementName).setStyle({height:'auto'});
 			}
 		}
-		
 		this.refreshDialogPosition();
+		if(boxAutoResize && (this.currentListensToWidth || this.currentListensToHeight) ){
+			this.currentResizeListener = function(){
+				if(this.currentListensToWidth){
+					var winWidth = $(document.body).getWidth();
+					boxWidth = parseInt((winWidth * this.currentListensToWidth) / 100);
+					$(elementName).setStyle({width:boxWidth+'px'});					
+				}
+				if(this.currentListensToHeight){
+					var winHeight = $(document.body).getHeight();
+					boxH = parseInt((winHeight * this.currentListensToHeight) / 100);
+					$(elementName).setStyle({height:boxH+'px'});
+				}
+				this.notify("modal:resize");
+			}.bind(this);
+			Event.observe(window, "resize", this.currentResizeListener);
+		}
 			
 		displayLightBoxById(elementName);
 		
@@ -332,10 +355,10 @@ Class.create("Modal", {
 	 */
 	clearContent: function(object){
 		// REMOVE CURRENT FORM, IF ANY
-		if(object.getElementsBySelector("form").length)
+		if(object.select("form").length)
 		{
 			var oThis = this;
-			object.getElementsBySelector("form").each(function(currentForm){
+			object.select("form").each(function(currentForm){
 				if(currentForm.target == 'hidden_iframe' || currentForm.id=='login_form' || currentForm.id=='user_pref_form'){
 					currentForm.hide();
 					oThis.cachedForms.set(currentForm.id,true);
@@ -538,6 +561,9 @@ Class.create("Modal", {
 		if(this.closeFunction){
 			 this.closeFunction();
 			 //this.closeFunction = null;
+		}
+		if(this.currentResizeListener){
+			Event.stopObserving(window, "resize", this.currentResizeListener);
 		}
 	}
 });
