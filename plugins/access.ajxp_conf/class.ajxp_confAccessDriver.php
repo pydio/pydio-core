@@ -622,7 +622,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						}
 					}
 					// Add SLUG
-					print("<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>");
+					if(!$repository->isTemplate) print("<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>");
 					print("</repository>");
 				}else{
 					print("/>");
@@ -640,6 +640,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					}
 				}
 				$manifest = $plug->getManifestRawContent("server_settings/param");
+				// Remove Slug if is template, ugly way
+				if($repository->isTemplate){
+					$slugString = '<param group="Repository Slug" name="AJXP_SLUG" type="string" label="Alias" description="Alias for replacing the generated unique id of the repository" mandatory="false"/>';
+					$manifest = str_replace($slugString, "", $manifest);
+				}
 				print("<ajxpdriver name=\"".$repository->accessType."\">$manifest</ajxpdriver>");
 				print("<metasources>");
 				$metas = $pServ->getPluginsByType("meta");
@@ -950,7 +955,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
 			</columns>');		
         $repoArray = array();
-        $childRepos = array();        
+        $childRepos = array();
+        $templateRepos = array();        
 		foreach ($repos as $repoIndex => $repoObject){
 			if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
 			if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
@@ -961,10 +967,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$childRepos[$parentId][] = array("name" => $name, "index" => $repoIndex);
 				continue;
 			}
-            $repoArray[$name] = $repoIndex;
+			if($repoObject->isTemplate){
+				$templateRepos[$name] = $repoIndex;
+			}else{
+	            $repoArray[$name] = $repoIndex;
+			}
         }
-        // Sort the list now by name        
+        // Sort the list now by name
+        ksort($templateRepos);        
         ksort($repoArray);
+        $repoArray = array_merge($templateRepos, $repoArray);
         // Append child repositories
         $sortedArray = array();
         foreach ($repoArray as $name => $repoIndex) {
