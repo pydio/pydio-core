@@ -61,10 +61,11 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 //$meta["icon"] = AJXP_Utils::mimetype(SystemTextEncoding::fromUTF8($hit->node_url), "image", $isDir);
                 if($hit->serialized_metadata!=null){
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
+                	$tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
                 }else{
+                	$tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
                     $tmpNode->loadNodeInfo();
                 }
-                $tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), $meta);
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
 				AJXP_XMLWriter::renderAjxpNode($tmpNode);
 			}
