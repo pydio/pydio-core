@@ -447,6 +447,7 @@ $mess=array(
 "411" => "Open",
 "412" => "Upload only",
 "413" => "Shared by",
+"414" => "Use arrows to navigate and +/- to change zoom",
 /* END SENTENCE */
 /* END SENTENCE */
 );
