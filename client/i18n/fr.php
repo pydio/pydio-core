@@ -447,6 +447,7 @@ $mess=array(
 "411" => "Ouvrir",
 "412" => "Upload seulement",
 "413" => "Partagé par",
+"414" => "Naviguer avec les flèches et zoomer avec +/-",
 /* END SENTENCE */
 );
 ?>

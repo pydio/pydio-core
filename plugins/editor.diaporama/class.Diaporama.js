@@ -158,6 +158,23 @@ Class.create("Diaporama", AbstractEditor, {
 				this.play();
 			}
 		}.bind(this));
+		
+		// Observe +/- for zoom
+		this.zoomObs = function(e){
+			console.log(e.keyCode);
+			if(e.keyCode == 107 || e.keyCode == 109){
+				var newValue = (e.keyCode == 107 ? parseInt(this.zoomInput.value) + 20 : parseInt(this.zoomInput.value) - 20);
+				newValue = Math.max(this._minZoom, newValue);
+				newValue = Math.min(this._maxZoom, newValue);
+				this.setZoomValue(newValue);
+				this.resizeImage(false);				
+			}
+		}.bind(this);
+		Event.observe(document, "keydown", this.zoomObs);
+		this.element.observe("editor:close", function(){
+			Event.stopObserving(document, "keydown", this.zoomObs);
+		});
+		
 		// Init preferences
 		if(ajaxplorer && ajaxplorer.user){
 			var autoFit = ajaxplorer.user.getPreference('diapo_autofit');
