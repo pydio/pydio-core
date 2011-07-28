@@ -7,7 +7,7 @@
 	<clientForm id="diaporama_box"><![CDATA[
 		<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_resize="true" box_padding="0">
 			<div class="action_bar" style="width: 100%;">			
-				<div align="right" style="float: right;padding-top: 1px;padding-right: 5px;height: 21px;margin-top: 4px;margin-left: -135px;width: 112px;font-size: 9px;line-height: 10px;color: #aaa;">
+				<div align="right" style="float: right;padding-top: 1px;padding-right: 5px;height: 21px;margin-top: 4px;margin-left: -111px;width: 112px;font-size: 9px;line-height: 10px;color: #aaa;">
 					AJXP_MESSAGE[414]
 				</div>
 				<div align="right" style="float:right; padding-top: 1px; padding-right: 5px; height: 21px;margin-top:28px;margin-left:30px;">

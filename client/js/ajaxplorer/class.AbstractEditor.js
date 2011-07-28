@@ -174,14 +174,11 @@ Class.create("AbstractEditor" , {
 		});
 		this.actionBar.down("div.separator").remove();
 		this.actionBarPlacer = function(){
-			this.actionBar.setStyle({
-				top:'', 		// may have been set during a drag operation
-				bottom:'30px'
-			});
 			if(this.contentMainContainer){
 				var w = this.actionBar.getWidth();
 				var elW = this.contentMainContainer.getWidth();
 				this.actionBar.setStyle({left:(Math.max(0,(elW-w)/2))+'px'});				
+				this.actionBar.setStyle({top:(this.contentMainContainer.getHeight()-this.actionBar.getHeight() -(this.fullScreenMode?30:0) )+'px'});
 			}
 		}.bind(this);
 		this.element.observe("editor:resize", this.actionBarPlacer);

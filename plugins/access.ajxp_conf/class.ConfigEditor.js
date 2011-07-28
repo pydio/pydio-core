@@ -843,21 +843,25 @@ ConfigEditor = Class.create({
 		}
 				
 		var form = new Element('div', {className:'driver_form'});
-		var metaForm = new Element('div', {className:'driver_form', style:'display:none;'});
 		
-		var link1 = XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' '+ MessageHash['ajxp_conf.41'];
-		var link2 = MessageHash['ajxp_conf.10'];
-		
-		var legend = this.createTabbedFieldset(link1, form, link2, metaForm);
-		optionsPane.update(legend);
-		optionsPane.insert({bottom:form});
-		optionsPane.insert({bottom:metaForm});
+		if(!tplParams.length){
+			var metaForm = new Element('div', {className:'driver_form', style:'display:none;'});		
+			var link1 = XPathGetSingleNodeText(xmlData, "admin_data/ajxpdriver/@name").toUpperCase()+' '+ MessageHash['ajxp_conf.41'];
+			var link2 = MessageHash['ajxp_conf.10'];		
+			var legend = this.createTabbedFieldset(link1, form, link2, metaForm);
+			optionsPane.update(legend);
+			optionsPane.insert({bottom:form});
+			optionsPane.insert({bottom:metaForm});			
+		}else{
+			optionsPane.update("<legend>Repository Options</legend>");
+			optionsPane.insert({bottom:form});			
+		}
 				
 		var paramsValues = new Hash();
 		$A(repo.childNodes).each(function(child){
 			if(child.nodeName != 'param') return;
 			paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
-		});
+		});		
 		var writeable = (repo.getAttribute("writeable")?(repo.getAttribute("writeable")=="true"):false);			
 		this.currentForm = form;
 		this.currentRepoId = repo.getAttribute("index");
@@ -865,16 +869,18 @@ ConfigEditor = Class.create({
 		this.currentRepoIsTemplate = (repo.getAttribute("isTemplate") === "true");
 		this.formManager.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable, false, this.currentRepoIsTemplate);
 		
-		if(writeable){
-			this.feedMetaSourceForm(xmlData, metaForm);		
-			if(metaTab){
-				form.hide();metaForm.show();
-				metaLegend.addClassName('active');
-				optLegend.removeClassName('active');
-				modal.refreshDialogAppearance();			
-			}
-		}else{
-			metaForm.update(MessageHash['ajxp_conf.88']);
+		if(!tplParams.length){
+			if(writeable){
+				this.feedMetaSourceForm(xmlData, metaForm);		
+				if(metaTab){
+					form.hide();metaForm.show();
+					metaLegend.addClassName('active');
+					optLegend.removeClassName('active');
+					modal.refreshDialogAppearance();			
+				}
+			}else{
+				metaForm.update(MessageHash['ajxp_conf.88']);
+			}			
 		}
 		
 	},
