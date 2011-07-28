@@ -1995,19 +1995,21 @@ fieldset
 
 legend
 {
-    color: #79f;
+    color: #A6A8A4;
     font-weight: bold;
 }
 
 legend a{
+	text-decoration:none;
 	cursor: pointer;
 }
 
 legend a.active {
 	background-color: transparent;
-	color: #676965;
-	text-decoration:underline;
+	color: #87A9C4;
+	text-decoration:none;
 	cursor: default;
+	font-size: 1.1em;
 }
 
 .repository, .repository td, .password td
