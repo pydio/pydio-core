@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
+require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
 
 class PixlrEditor extends AJXP_Plugin {
 

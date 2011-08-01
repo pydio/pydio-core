@@ -286,7 +286,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 	* @return HttpClient
 	*/
 	function getRemoteConnexion(&$remoteSecureToken, $refreshSessId=false, $repository = null){
-		require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
+		require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
 		if($repository != null){
 			$crtRep = $repository;
 		}else{

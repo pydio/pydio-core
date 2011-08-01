@@ -1,12 +1,12 @@
 <?php
 
-include_once(INSTALL_PATH."/server/classes/securimage/securimage.php");
+include_once(AJXP_BIN_FOLDER."/securimage/securimage.php");
 
 class CaptchaProvider{	
 	
 	public static function sendCaptcha(){
 		
-		$libPath = INSTALL_PATH."/server/classes/securimage";
+		$libPath = AJXP_BIN_FOLDER."/securimage";
 		
 		$img = new Securimage();
 		$img->wordlist_file = $libPath."/words/words.txt";

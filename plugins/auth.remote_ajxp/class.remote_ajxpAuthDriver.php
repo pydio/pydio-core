@@ -46,7 +46,7 @@ class remote_ajxpAuthDriver extends serialAuthDriver  {
 	
 	function preLogUser($sessionId){
 		
-		require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
+		require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
 		$client = new HttpClient($this->getOption("REMOTE_SERVER"), $this->getOption("REMOTE_PORT"));
 		$client->setDebug(false);
 		if($this->getOption("REMOTE_USER") != ""){

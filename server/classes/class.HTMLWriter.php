@@ -63,8 +63,8 @@ class HTMLWriter
     
     static function repositoryDataAsJS(){
     	if(AuthService::usersEnabled()) return "";
-    	require_once(INSTALL_PATH."/server/classes/class.SystemTextEncoding.php");
-    	require_once(INSTALL_PATH."/server/classes/class.AJXP_XMLWriter.php");
+    	require_once(AJXP_BIN_FOLDER."/class.SystemTextEncoding.php");
+    	require_once(AJXP_BIN_FOLDER."/class.AJXP_XMLWriter.php");
     	return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
     }
               

@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractAuthDriver.php");
 
 /** This class works in 2 modes (master / slave)
     It requires the following arguments:

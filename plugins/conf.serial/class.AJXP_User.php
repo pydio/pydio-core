@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.AbstractAjxpUser.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractAjxpUser.php");
 
 class AJXP_User extends AbstractAjxpUser 
 {

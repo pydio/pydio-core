@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/interface.AjxpWrapper.php");
+require_once(AJXP_BIN_FOLDER."/interface.AjxpWrapper.php");
 
 class remote_fsAccessWrapper implements AjxpWrapper {
 	
@@ -232,7 +232,7 @@ class remote_fsAccessWrapper implements AjxpWrapper {
 	 */
     protected function createHttpClient(){
     	
-		require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
+		require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
 		$httpClient = new HttpClient($this->host);
 		$httpClient->cookie_host = $this->host;
 		$httpClient->timeout = 50;

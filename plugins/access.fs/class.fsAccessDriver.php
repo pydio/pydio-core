@@ -41,7 +41,7 @@ if(!function_exists('download_exception_handler')){
 	function download_exception_handler($exception){}
 }
 
-require_once(AJXP_INSTALL_PATH."/".SERVER_RESOURCES_FOLDER."/interface.AjxpWebdavProvider.php");
+require_once(AJXP_BIN_FOLDER."/interface.AjxpWebdavProvider.php");
 
 class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 {
@@ -1098,7 +1098,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	 * @param array $success
 	 */
 	function extractArchive($destDir, $selection, &$error, &$success){
-		require_once("server/classes/pclzip.lib.php");
+		require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
 		$zipPath = $selection->getZipPath(true);
 		$zipLocalPath = $selection->getZipLocalPath(true);
 		if(strlen($zipLocalPath)>1 && $zipLocalPath[0] == "/") $zipLocalPath = substr($zipLocalPath, 1)."/";
@@ -1559,7 +1559,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
     function makeZip ($src, $dest, $basedir)
     {
     	@set_time_limit(0);
-    	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
+    	require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	foreach ($src as $item){
     		$realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".$item);    		

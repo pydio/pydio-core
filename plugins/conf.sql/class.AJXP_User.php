@@ -35,8 +35,8 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.AbstractAjxpUser.php");
-require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractAjxpUser.php");
+require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 
 /**
  * AJXP_User class for the conf.sql driver.
@@ -123,7 +123,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * Does the configuration storage exist?
 	 * Will return true if all schema objects are available.
 	 * 
-	 * @see server/classes/AbstractAjxpUser#storageExists()
+	 * @see AbstractAjxpUser#storageExists()
 	 * @return boolean false if storage does not exist
 	 */
 	function storageExists(){		
@@ -180,7 +180,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * @param $rightString String String containing access rights, one of '' | 'r' | 'rw'
 	 * @return null or -1 on error
 	 * 
-	 * @see server/classes/AbstractAjxpUser#setRight($rootDirId, $rightString)
+	 * @see AbstractAjxpUser#setRight($rootDirId, $rightString)
 	 */
 	function setRight($rootDirId, $rightString){
 		
@@ -234,7 +234,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * 
 	 * @param $rootDirId String Repository Unique ID
 	 * @return null or -1 on error
-	 * @see server/classes/AbstractAjxpUser#removeRights($rootDirId)
+	 * @see AbstractAjxpUser#removeRights($rootDirId)
 	 */
 	function removeRights($rootDirId){
 		if (array_key_exists($rootDirId, $this->rights)) {
@@ -256,7 +256,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * @param $prefName String Name of the preference.
 	 * @param $prefValue String Value to assign to the preference.
 	 * @return null or -1 on error.
-	 * @see server/classes/AbstractAjxpUser#setPref($prefName, $prefValue)
+	 * @see AbstractAjxpUser#setPref($prefName, $prefValue)
 	 */
 	function setPref($prefName, $prefValue){
 		
@@ -313,7 +313,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * @param $title String Title of the bookmark
 	 * @param $repId String Repository Unique ID
 	 * @return null or -1 on error.
-	 * @see server/classes/AbstractAjxpUser#addBookmark($path, $title, $repId)
+	 * @see AbstractAjxpUser#addBookmark($path, $title, $repId)
 	 */
 	function addBookmark($path, $title="", $repId = -1){
 		if(!isSet($this->bookmarks)) $this->bookmarks = array();
@@ -348,7 +348,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * 
 	 * @param $path String String of the path of the bookmark to remove.
 	 * @return null or -1 on error.
-	 * @see server/classes/AbstractAjxpUser#removeBookmark($path)
+	 * @see AbstractAjxpUser#removeBookmark($path)
 	 */
 	function removeBookmark($path){
 		$repId = ConfService::getCurrentRootDirIndex();
@@ -381,7 +381,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * @param $path String Path of the bookmark to rename.
 	 * @param $title New title to give the bookmark.
 	 * @return null or -1 on error.
-	 * @see server/classes/AbstractAjxpUser#renameBookmark($path, $title)
+	 * @see AbstractAjxpUser#renameBookmark($path, $title)
 	 */
 	function renameBookmark($path, $title){
 		$repId = ConfService::getCurrentRootDirIndex();
@@ -415,7 +415,7 @@ class AJXP_User extends AbstractAjxpUser
 	/**
 	 * Load initial user data (Rights, Preferences and Bookmarks).
 	 * 
-	 * @see server/classes/AbstractAjxpUser#load()
+	 * @see AbstractAjxpUser#load()
 	 */
 	function load(){
 		$this->log('Loading all user data..');
@@ -471,7 +471,7 @@ class AJXP_User extends AbstractAjxpUser
 	/**
 	 * Save user rights, preferences and bookmarks.
 	 * 
-	 * @see server/classes/AbstractAjxpUser#save()
+	 * @see AbstractAjxpUser#save()
 	 */
 	function save(){
 		$this->log('Saving user...');
