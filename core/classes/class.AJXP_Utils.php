@@ -597,13 +597,13 @@ class AJXP_Utils
         $repoList = array();
         require_once("../classes/class.ConfService.php");
         require_once("../classes/class.Repository.php");
-        include("../conf/conf.php");
+        include(AJXP_INSTALL_PATH."/server/conf/conf.php");
         foreach($REPOSITORIES as $index => $repo){
             $repoList[] = ConfService::createRepositoryFromArray($index, $repo);
         }        
         // Try with the serialized repositories
-        if(is_file("../conf/repo.ser")){
-            $fileLines = file("../conf/repo.ser");
+        if(is_file(AJXP_INSTALL_PATH."/server/conf/repo.ser")){
+            $fileLines = file(AJXP_INSTALL_PATH."/server/conf/repo.ser");
             $repos = unserialize($fileLines[0]);
             $repoList = array_merge($repoList, $repos);
         }
@@ -615,7 +615,7 @@ class AJXP_Utils
 		{
 		    require_once($file);
 		    // Then create the test class
-		    $testName = str_replace(".php", "", substr($file, 5))."Test";
+		    $testName = str_replace(".php", "", substr($file, 5));
 		    $class = new $testName();
 		    foreach ($repoList as $repository){
 			    $result = $class->doRepositoryTest($repository);
