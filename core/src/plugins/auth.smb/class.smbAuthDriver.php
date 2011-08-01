@@ -55,6 +55,8 @@ class smbAuthDriver extends AbstractAuthDriver {
 		AJXP_Safe::clearCredentials();
 		$adminUser = $this->options["ADMIN_USER"];
 		$subUsers = array();
+		unset($_SESSION["COUNT"]); 
+		unset($_SESSION["disk"]); 
 		AuthService::disconnect();
 		session_write_close();
 		AJXP_XMLWriter::header();
@@ -63,6 +65,7 @@ class smbAuthDriver extends AbstractAuthDriver {
 	}
 			
 	function checkPassword($login, $pass, $seed){
+		$_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pass;
 		$repoId = $this->options["REPOSITORY_ID"];
     	$repoObject = ConfService::getRepositoryById($repoId);
     	if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
@@ -72,7 +75,13 @@ class smbAuthDriver extends AbstractAuthDriver {
 		$host = $repoObject->getOption("HOST");
 		$url = "smb://$login:$pass@".$host."/".$basePath."/";
 		try{
-			if(!is_dir($url)) return false;
+			if(!is_dir($url)){
+				AJXP_Logger::debug("SMB Login failure"); 
+				$_SESSION["AJXP_SESSION_REMOTE_PASS"] = ''; 
+				unset($_SESSION["COUNT"]); 
+				unset($_SESSION["disk"]); 
+				return false;
+			}
 			AJXP_Safe::storeCredentials($login, $pass);
 		}catch(Exception $e){
 			return false;
