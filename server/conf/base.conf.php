@@ -53,7 +53,6 @@ define("AJXP_VERSION_DATE", "2011/06/08");
 define("AJXP_EXEC", true);
 require("compat.php");
 $installPath = realpath(dirname(__FILE__)."/../..");
-define("INSTALL_PATH", $installPath);
 define("AJXP_INSTALL_PATH", $installPath);
 define("AJXP_CACHE_DIR", AJXP_INSTALL_PATH."/server/cache");
 define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
