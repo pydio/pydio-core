@@ -39,7 +39,7 @@ define("ZOHO_SECRET_KEY", "e008213e43df0b89f59285d319b74a59");
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.HttpClient.php");
+require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
 
 class ZohoEditor extends AJXP_Plugin {
 

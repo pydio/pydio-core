@@ -138,7 +138,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 					}else if( $mime == "shared_file" ){					
 						$publicletData = $this->loadPublicletData(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
 						if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
-					        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+					        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
 			        		PublicletCounter::delete($element);
 							unlink(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
 							if($index == count($files)-1){
@@ -173,7 +173,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				$selection = new UserSelection();
 				$selection->initFromHttpVars();
 				$elements = $selection->getFiles();
-		        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+		        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
 				foreach ($elements as $element){
 					PublicletCounter::reset(str_replace(".php", "", basename($element)));
 				}
@@ -242,7 +242,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 			if(isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()){
 				unlink($file);
 				$deleted[] = basename($file);
-		        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+		        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
         		PublicletCounter::delete(str_replace(".php", "", basename($file)));
 			}
 		}
@@ -257,7 +257,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		$dataModified = (md5($inputData) != $id);
 		$publicletData = unserialize($inputData);
 		$publicletData["SECURITY_MODIFIED"] = $dataModified;		
-        require_once(INSTALL_PATH."/server/classes/class.PublicletCounter.php");
+        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
         $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);		
 		return $publicletData;
 	}

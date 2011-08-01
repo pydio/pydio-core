@@ -58,7 +58,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 				$rootNodes = array(
-					"plugins"	   => array("LABEL" => "Plugins", "ICON" => "folder_red.png"),
+					"plugins"	   => array("LABEL" => "Configs", "ICON" => "folder_red.png"),
 					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
 					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
 					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "user_group_new.png"),
@@ -80,7 +80,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					}else if($strippedDir == "roles"){
 						$this->listRoles();
 					}else if($strippedDir == "plugins"){
-						$this->listPlugins();
+						$this->listPlugins($dir);
 					}else if($strippedDir == "repositories"){
 						$this->listRepositories();
 					}else if($strippedDir == "logs"){
@@ -871,16 +871,43 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	
-	function listPlugins(){
+	function listPlugins($dir){
 		$pServ = AJXP_PluginsService::getInstance();
 		$plugins = $pServ->getActivePlugins();
-		foreach($plugins as $pluginId => $status){
+		if($dir == "/plugins"){
+			// Grab all types
+			$types = array();			
+			foreach($plugins as $pluginId => $status){
+				$type = array_shift(explode(".", $pluginId));
+				if($type == "core") continue;
+				$types[$type] = $type;
+			}
 			$meta = array(
-				"icon" 		=> "folder.png",
-				"ajxp_mime" => "ajxp_plugin",
+				"icon" 		=> "folder.png",					
 				"is_active"	=> $status?"true":"false"
 			);
-			AJXP_XMLWriter::renderNode("/plugins/".$pluginId, $pluginId, true, $meta);
+			AJXP_XMLWriter::renderNode("/plugins/core", "Core", false, $meta);							
+			foreach( $types as $t){
+				$meta = array(
+					"icon" 		=> "folder.png",					
+					"is_active"	=> $status?"true":"false"
+				);
+				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t)." plugins", false, $meta);				
+			}
+		}else{
+			$split = explode("/", $dir);
+			if(empty($split[0])) array_shift($split);
+			$type = $split[1];
+			foreach($plugins as $pluginId => $status){
+				$pType = array_shift(explode(".", $pluginId));
+				if($pType != $type) continue;
+				$meta = array(				
+					"icon" 		=> "folder.png",
+					"ajxp_mime" => "ajxp_plugin",
+					"is_active"	=> $status?"true":"false"
+				);
+				AJXP_XMLWriter::renderNode("/plugins/".$pluginId, $pluginId, true, $meta);
+			}
 		}
 	}
 	

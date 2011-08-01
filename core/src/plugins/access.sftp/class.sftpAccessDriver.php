@@ -210,7 +210,7 @@ class sftpAccessDriver extends fsAccessDriver
     function makeZip ($src, $dest, $basedir)
     {
     	@set_time_limit(60);
-    	require_once(SERVER_RESOURCES_FOLDER."/pclzip.lib.php");
+    	require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
     	$filePaths = array();
     	
     	$uniqid = uniqid();

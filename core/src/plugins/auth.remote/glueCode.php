@@ -49,16 +49,16 @@ if(!isSet($AJXP_GLUE_GLOBALS)){
 }
 
 if (!isSet($CURRENTPATH)) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
-require_once("$CURRENTPATH/../../server/classes/class.AJXP_Logger.php");
-require_once("$CURRENTPATH/../../server/classes/class.AJXP_Plugin.php");
-require_once("$CURRENTPATH/../../server/classes/class.AJXP_PluginsService.php");
-require_once("$CURRENTPATH/../../server/classes/class.AjxpRole.php");
-require_once("$CURRENTPATH/../../server/classes/class.AJXP_Utils.php");
-require_once("$CURRENTPATH/../../server/classes/class.Repository.php");
-require_once("$CURRENTPATH/../../server/classes/class.AbstractAccessDriver.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Logger.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Plugin.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_PluginsService.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AjxpRole.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Utils.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.Repository.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AbstractAccessDriver.php");
 if (!class_exists("SessionSwitcher")) require_once("$CURRENTPATH/sessionSwitcher.php");
-require_once("$CURRENTPATH/../../server/classes/class.ConfService.php");
-require_once("$CURRENTPATH/../../server/classes/class.AuthService.php");    
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.ConfService.php");
+require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AuthService.php");    
 include_once("$CURRENTPATH/../../server/conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", "$CURRENTPATH/../../server/conf");

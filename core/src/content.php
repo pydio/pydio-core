@@ -33,21 +33,21 @@
  */
 include_once("server/conf/base.conf.php");
 
-require_once("server/classes/class.AJXP_Utils.php");
-require_once("server/classes/class.AJXP_VarsFilter.php");
-require_once("server/classes/class.SystemTextEncoding.php");
-require_once("server/classes/class.Repository.php");
-require_once("server/classes/class.AJXP_Exception.php");
-require_once("server/classes/class.AJXP_Plugin.php");
-require_once("server/classes/class.AJXP_PluginsService.php");
-require_once("server/classes/class.AbstractAccessDriver.php");
-require_once("server/classes/class.AjxpRole.php");
-require_once("server/classes/class.ConfService.php");
-require_once("server/classes/class.AuthService.php");
-require_once("server/classes/class.UserSelection.php");
-require_once("server/classes/class.HTMLWriter.php");
-require_once("server/classes/class.AJXP_XMLWriter.php");
-require_once("server/classes/class.RecycleBinManager.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_Utils.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_VarsFilter.php");
+require_once(AJXP_BIN_FOLDER."/class.SystemTextEncoding.php");
+require_once(AJXP_BIN_FOLDER."/class.Repository.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_Exception.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_Plugin.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_PluginsService.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractAccessDriver.php");
+require_once(AJXP_BIN_FOLDER."/class.AjxpRole.php");
+require_once(AJXP_BIN_FOLDER."/class.ConfService.php");
+require_once(AJXP_BIN_FOLDER."/class.AuthService.php");
+require_once(AJXP_BIN_FOLDER."/class.UserSelection.php");
+require_once(AJXP_BIN_FOLDER."/class.HTMLWriter.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_XMLWriter.php");
+require_once(AJXP_BIN_FOLDER."/class.RecycleBinManager.php");
 if(isSet($_GET["ajxp_sessid"]))
 {
     // Don't overwrite cookie
@@ -58,7 +58,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
-require_once("server/classes/class.AJXP_Logger.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 $pServ = AJXP_PluginsService::getInstance();
@@ -113,7 +113,7 @@ if(AuthService::usersEnabled())
 		print AuthService::generateSecureToken();
 		exit(0);
 	}else if($action == "get_captcha"){
-		include_once(INSTALL_PATH."/server/classes/class.CaptchaProvider.php");
+		include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
 		CaptchaProvider::sendCaptcha();
 		exit(0) ;
 	}else if($action == "logout"){
@@ -126,7 +126,7 @@ if(AuthService::usersEnabled())
         AJXP_XMLWriter::close("url");
 		exit(1);
     }else if($action == "login"){
-		include_once(INSTALL_PATH."/server/classes/class.CaptchaProvider.php");
+		include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
 		if(AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))){
 			$loggingResult = -4;
 		}else{
@@ -227,7 +227,7 @@ if(!AuthService::usersEnabled() || ALLOW_GUEST_BROWSING || AuthService::getLogge
 	$Driver = ConfService::loadRepositoryDriver();
 }
 ConfService::initActivePlugins();
-require_once(INSTALL_PATH."/server/classes/class.AJXP_Controller.php");
+require_once(AJXP_BIN_FOLDER."/class.AJXP_Controller.php");
 $xmlResult = AJXP_Controller::findActionAndApply($action, array_merge($_GET, $_POST), $_FILES);
 if($xmlResult !== false && $xmlResult != ""){
 	AJXP_XMLWriter::header();

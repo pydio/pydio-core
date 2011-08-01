@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.AbstractConfDriver.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractConfDriver.php");
 class serialConfDriver extends AbstractConfDriver {
 		
 	var $repoSerialFile;

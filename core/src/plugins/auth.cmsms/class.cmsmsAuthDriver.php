@@ -59,8 +59,8 @@
 	),
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
-require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractAuthDriver.php");
+require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 class cmsmsAuthDriver extends AbstractAuthDriver {
 	
 	var $sqlDriver;

@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.AbstractConfDriver.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractConfDriver.php");
 
 class sqlConfDriver extends AbstractConfDriver {
 		
@@ -60,11 +60,11 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * 		'database' => 'dbname'
 	 * 		)
 	 * 
-	 * @see server/classes/AbstractConfDriver#init($options)
+	 * @see AbstractConfDriver#init($options)
 	 */
 	function init($options){
 		parent::init($options);
-		require_once(INSTALL_PATH."/server/classes/dibi.compact.php");		
+		require_once(AJXP_BIN_FOLDER."/dibi.compact.php");		
 		$this->sqlDriver = $options["SQL_DRIVER"];
 		try {
 			dibi::connect($this->sqlDriver);		
@@ -158,7 +158,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * The list is an associative array of Array( 'uuid' => [Repository Object] );
 	 * 
 	 * @todo Create a repository object that lazy loads options, so that these list queries don't incur the multiple queries of options.
-	 * @see server/classes/AbstractConfDriver#listRepositories()
+	 * @see AbstractConfDriver#listRepositories()
 	 */
 	function listRepositories(){
 
@@ -319,7 +319,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	/**
 	 * Get the full path to the Ajxp user class.
 	 * 
-	 * @see server/classes/AbstractConfDriver#getUserClassFileName()
+	 * @see AbstractConfDriver#getUserClassFileName()
 	 */
 	function getUserClassFileName(){
 		return INSTALL_PATH."/plugins/conf.sql/class.AJXP_User.php";

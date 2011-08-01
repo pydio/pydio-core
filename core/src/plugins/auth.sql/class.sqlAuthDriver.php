@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/class.AbstractAuthDriver.php");
+require_once(AJXP_BIN_FOLDER."/class.AbstractAuthDriver.php");
 
 class sqlAuthDriver extends AbstractAuthDriver {
 	
@@ -44,7 +44,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 	
 	function init($options){
 		parent::init($options);
-		require_once(INSTALL_PATH."/server/classes/dibi.compact.php");
+		require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 		$this->sqlDriver = $options["SQL_DRIVER"];
 		try {
 			dibi::connect($this->sqlDriver);		

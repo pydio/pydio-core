@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/interface.AjxpWrapper.php");
+require_once(AJXP_BIN_FOLDER."/interface.AjxpWrapper.php");
 
 class ftpAccessWrapper implements AjxpWrapper {
 	

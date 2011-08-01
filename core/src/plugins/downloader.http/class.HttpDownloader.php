@@ -77,7 +77,7 @@ class HttpDownloader extends AJXP_Plugin{
 					exit();			
 				}
 				    					    	
-				require_once AJXP_INSTALL_PATH."/server/classes/class.HttpClient.php";
+				require_once AJXP_BIN_FOLDER."/class.HttpClient.php";
 				$mess = ConfService::getMessages();		
 				session_write_close();
 				

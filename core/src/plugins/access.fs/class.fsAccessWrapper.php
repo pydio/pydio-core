@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/server/classes/interface.AjxpWrapper.php");
+require_once(AJXP_BIN_FOLDER."/interface.AjxpWrapper.php");
 
 class fsAccessWrapper implements AjxpWrapper {
 		
@@ -90,7 +90,7 @@ class fsAccessWrapper implements AjxpWrapper {
 		if($insideZip){    	
 			$zipPath = $split[0];
 			$localPath = $split[1];
-			require_once(INSTALL_PATH."/server/classes/pclzip.lib.php");
+			require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
 			//print($streamType.$path);
 		   	if($streamType == "file"){	
 		   		if(self::$crtZip == null ||  !is_array(self::$currentListingKeys)){

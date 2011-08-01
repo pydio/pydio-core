@@ -176,7 +176,7 @@ $PLUGINS = array(
 	// Do not use wildcard for uploader, to keep them in a given order
 	// Warning, do not add the "meta." plugins, they are automatically
 	// detected and activated by the application.
-	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.*", "shorten.*")
+	"ACTIVE_PLUGINS" => array("core.*", "editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.*", "shorten.*")
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
@@ -253,7 +253,7 @@ $default_language="en";
 /* the css or the js files, and to compile 
 /* these into bundled file.
 /*********************************************/
-$AJXP_JS_DEBUG = false;
+$AJXP_JS_DEBUG = true;
 $AJXP_SERVER_DEBUG = false;
 
 /*********************************************/

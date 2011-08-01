@@ -188,7 +188,7 @@ class AJXP_Utils
 					$parameters["repository_id"] = $repository->getId();
 				}			
 			}
-			require_once("server/classes/class.SystemTextEncoding.php");
+			require_once(AJXP_BIN_FOLDER."/class.SystemTextEncoding.php");
 			if(AuthService::usersEnabled()){
 				$loggedUser = AuthService::getLoggedUser();
 				if($loggedUser!= null && $loggedUser->canSwitchTo($parameters["repository_id"])){			
@@ -212,7 +212,7 @@ class AJXP_Utils
 			ConfService::setConf("JS_DEBUG", false);
 		}
 		if(ConfService::getConf("JS_DEBUG") && isSet($parameters["compile"])){
-			require_once(SERVER_RESOURCES_FOLDER."/class.AJXP_JSPacker.php");
+			require_once(AJXP_BIN_FOLDER."/class.AJXP_JSPacker.php");
 			AJXP_JSPacker::pack();
 		}		
 		if(ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])){

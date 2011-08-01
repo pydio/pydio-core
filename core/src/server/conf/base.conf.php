@@ -61,11 +61,12 @@ define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
 define("CLIENT_RESOURCES_FOLDER", "plugins/gui.ajax/res");
 define("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/oxygen");
-define("SERVER_RESOURCES_FOLDER", "server/classes");
+define("AJXP_BIN_FOLDER_REL", "server/classes");
+define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/server/classes");
 define("AJXP_DOCS_FOLDER", "client/doc");
-define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/client/i18n");
+define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
-define("AJXP_SKIP_CACHE", false);
+define("AJXP_SKIP_CACHE", true);
 
 
 define("INITIAL_ADMIN_PASSWORD", "admin");
@@ -73,7 +74,7 @@ define("INITIAL_ADMIN_PASSWORD", "admin");
 define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
 
 function AjaXplorer_autoload($className){
-	$fileName = AJXP_INSTALL_PATH."/".SERVER_RESOURCES_FOLDER."/"."class.".$className.".php";
+	$fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
 	if(file_exists($fileName)){
 		require_once($fileName);
 	}
