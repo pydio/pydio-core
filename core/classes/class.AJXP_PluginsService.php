@@ -362,7 +362,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		// Load behaviours if not already
  		if(!isSet($this->mixinsDoc)){
  			$this->mixinsDoc = new DOMDocument();
- 			$this->mixinsDoc->load(AJXP_INSTALL_PATH."/server/xml/ajxp_mixins.xml");
+ 			$this->mixinsDoc->load(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/ajxp_mixins.xml");
  			$this->mixinsXPath = new DOMXPath($this->mixinsDoc);
  		}
  		// Merge into manifestDoc
