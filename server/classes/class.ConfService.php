@@ -137,7 +137,7 @@ class ConfService
 		}
 	}
 	
-	public function initUniquePluginImplInst($key, $plugType){
+	public function initUniquePluginImplInst($key, $plugType){		
 		$name = $this->configs["PLUGINS"][$key]["NAME"];
 		$options = $this->configs["PLUGINS"][$key]["OPTIONS"];
 		$instance = AJXP_PluginsService::findPlugin($plugType, $name);
@@ -467,7 +467,7 @@ class ConfService
 	{
 		if(!isset($this->configs["MESSAGES"]) || $forceRefresh)
 		{			
-			require(INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n/".$this->configs["LANGUE"].".php");
+			require(AJXP_COREI18N_FOLDER."/".$this->configs["LANGUE"].".php");
 			$this->configs["MESSAGES"] = $mess;
 			$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
 			foreach ($nodes as $node){
@@ -503,7 +503,7 @@ class ConfService
 		if(isSet($_SESSION["AJXP_LANGUAGES"]) && !isSet($_GET["refresh_langs"])){
 			return $_SESSION["AJXP_LANGUAGES"];
 		}
-		$langDir = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n";
+		$langDir = AJXP_COREI18N_FOLDER;
 		$languages = array();
 		if(($dh = opendir($langDir))!==FALSE){
 			while (($file = readdir($dh)) !== false) {

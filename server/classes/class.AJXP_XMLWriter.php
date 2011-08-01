@@ -167,10 +167,10 @@ class AJXP_XMLWriter
 		
 		if(isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])){
 			$xml = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_THEME_FOLDER, $xml);
-			$xml = str_replace("AJXP_SERVER_ACCESS", $_SESSION["AJXP_SERVER_PREFIX_URI"].SERVER_ACCESS, $xml);
+			$xml = str_replace("AJXP_SERVER_ACCESS", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_SERVER_ACCESS, $xml);
 		}else{
 			$xml = str_replace("AJXP_THEME_FOLDER", AJXP_THEME_FOLDER, $xml);
-			$xml = str_replace("AJXP_SERVER_ACCESS", SERVER_ACCESS, $xml);
+			$xml = str_replace("AJXP_SERVER_ACCESS", AJXP_SERVER_ACCESS, $xml);
 		}
 		$xml = str_replace("AJXP_MIMES_EDITABLE", AJXP_Utils::getAjxpMimes("editable"), $xml);
 		$xml = str_replace("AJXP_MIMES_IMAGE", AJXP_Utils::getAjxpMimes("image"), $xml);

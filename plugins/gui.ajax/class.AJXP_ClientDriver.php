@@ -140,6 +140,74 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				
 			break;
 			
+
+			//------------------------------------
+			//	GET BOOT GUI
+			//------------------------------------
+			case "get_boot_gui":
+				
+				header("X-UA-Compatible: chrome=1");			
+				HTMLWriter::charsetHeader();
+				
+				if(!is_file(TESTS_RESULT_FILE)){
+					$outputArray = array();
+					$testedParams = array();
+					$passed = AJXP_Utils::runTests($outputArray, $testedParams);
+					if(!$passed && !isset($_GET["ignore_tests"])){
+						die(AJXP_Utils::testResultsToTable($outputArray, $testedParams));
+					}else{
+						AJXP_Utils::testResultsToFile($outputArray, $testedParams);
+					}
+				}
+				
+				$START_PARAMETERS = array("BOOTER_URL"=>"index.php?get_action=get_boot_conf", "MAIN_ELEMENT" => "ajxp_desktop");
+				if(AuthService::usersEnabled())
+				{
+					AuthService::preLogUser((isSet($httpVars["remote_session"])?$httpVars["remote_session"]:""));
+					AuthService::bootSequence($START_PARAMETERS);
+					if(AuthService::getLoggedUser() != null || AuthService::logUser(null, null) == 1)
+					{
+						if(AuthService::getDefaultRootId() == -1){
+							AuthService::disconnect();
+						}else{
+							$loggedUser = AuthService::getLoggedUser();
+							if(!$loggedUser->canRead(ConfService::getCurrentRootDirIndex()) 
+									&& AuthService::getDefaultRootId() != ConfService::getCurrentRootDirIndex())
+							{
+								ConfService::switchRootDir(AuthService::getDefaultRootId());
+							}
+						}
+					}
+				}
+				
+				AJXP_Utils::parseApplicationGetParameters($_GET, $START_PARAMETERS, $_SESSION);
+				
+				$confErrors = ConfService::getErrors();
+				if(count($confErrors)){
+					$START_PARAMETERS["ALERT"] = implode(", ", array_values($confErrors));
+				}
+				
+				if(isSet($_COOKIE["AJXP_LAST_KNOWN_VERSION"]) && $_COOKIE["AJXP_LAST_KNOWN_VERSION"] != AJXP_VERSION){
+					$mess = ConfService::getMessages();
+					$START_PARAMETERS["ALERT"] = sprintf($mess[392], AJXP_VERSION);
+				}
+				setcookie("AJXP_LAST_KNOWN_VERSION", AJXP_VERSION, time() + 3600*24*365, "/");
+				
+				$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
+				if(ConfService::getConf("JS_DEBUG")){
+					if(!isSet($mess)){
+						$mess = ConfService::getMessages();
+					}
+					include_once(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui_debug.html");
+				}else{
+					$content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");	
+					$content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
+					if($JSON_START_PARAMETERS){
+						$content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);
+					}
+					print($content);
+				}				
+			break;
 			//------------------------------------
 			//	GET CONFIG FOR BOOT
 			//------------------------------------
@@ -150,7 +218,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				}
 				$config = array();
 				$config["ajxpResourcesFolder"] = AJXP_THEME_FOLDER;
-				$config["ajxpServerAccess"] = SERVER_ACCESS;
+				$config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
 				$config["zipEnabled"] = ConfService::zipEnabled();
 				$config["multipleFilesDownloadEnabled"] = !DISABLE_ZIP_CREATION;
 				$config["flashUploaderEnabled"] = ConfService::getConf("UPLOAD_ENABLE_FLASH");

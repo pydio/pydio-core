@@ -439,10 +439,10 @@ class AJXP_Utils
 	
 	static function updateI18nFiles($pluginPath = ""){
 		if($pluginPath != ""){
-			$baseDir = INSTALL_PATH."/plugins/".$pluginPath;
+			$baseDir = AJXP_INSTALL_PATH."/plugins/".$pluginPath;
 			$filenames = glob($baseDir."/*.php");
 		}else{
-			$baseDir = INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/i18n";
+			$baseDir = AJXP_COREI18N_FOLDER;
 			$languages = ConfService::listAvailableLanguages();
 			$filenames = array();
 			foreach ($languages as $key => $value){
@@ -494,7 +494,7 @@ class AJXP_Utils
 		}
 		* {font-family:arial, sans-serif;font-size:11px;color:#000}
 		table{margin:0px auto;}
-		h1 {font-size: 20px; color:#676965;background: url("client/themes/oxygen/images/ICON.png") no-repeat;height: 20px;padding: 8px 36px;text-align: left;margin: 0px auto;width: 300px;}
+		h1 {font-size: 20px; color:#676965;background: url("plugins/gui.ajax/res/themes/oxygen/images/ICON.png") no-repeat;height: 20px;padding: 8px 36px;text-align: left;margin: 0px auto;width: 300px;}
 		thead tr{background-color: #ccc; font-weight:bold;}
 		tr:nth-child(even){background-color: #f4f4f4;}
 		td {border:1px solid #eee;padding:5px;}

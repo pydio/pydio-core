@@ -47,7 +47,7 @@ class HTMLWriter
 	    
     static function getDocFile($docFileName)
     {
-    	$realName = INSTALL_PATH."/".DOCS_FOLDER."/".$docFileName.".txt";
+    	$realName = AJXP_DOCS_FOLDER."/".$docFileName.".txt";
     	if(is_file($realName))
     	{
     		$content = implode("<br>", file($realName));

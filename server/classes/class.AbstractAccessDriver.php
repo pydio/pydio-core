@@ -229,8 +229,8 @@ class AbstractAccessDriver extends AJXP_Plugin {
             		$language = $_GET["lang"];
             	}
             	$messages = array();
-            	if(is_file(INSTALL_PATH."/client/i18n/$language.php")){
-            		include(INSTALL_PATH."/client/i18n/$language.php");
+            	if(is_file(AJXP_COREI18N_FOLDER."/".$language.".php")){
+            		include(AJXP_COREI18N_FOLDER."/".$language.".php");
             		$messages = $mess;
             	}            	
 				if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $content, $matches, PREG_SET_ORDER)){

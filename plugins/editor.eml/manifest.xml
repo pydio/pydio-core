@@ -29,7 +29,7 @@
 					<input type="image" id="eml_cp_can" height="22" width="22" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" title="CANCEL" class="dialogButton">
 				</div>							
 			</div>
-			<form id="emlDownloadAttachmentForm" style="display:none" target="download_iframe" method="GET" action="content.php">			
+			<form id="emlDownloadAttachmentForm" style="display:none" target="download_iframe" method="GET" action="index.php">			
 			</form>
 		</div>				
 	]]></clientForm>
