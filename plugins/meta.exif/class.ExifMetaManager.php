@@ -166,7 +166,7 @@ class ExifMetaManager extends AJXP_Plugin {
 
 	private function convertGPSData($exif){
 		if(!isSet($exif["GPS"])) return array();
-		require_once(INSTALL_PATH."/plugins/meta.exif/class.GeoConversion.php");
+		require_once(AJXP_INSTALL_PATH."/plugins/meta.exif/class.GeoConversion.php");
 		$converter = new GeoConversion();
 		$latDeg=$this->parseGPSValue($exif["GPS"]["GPSLatitude"][0]);
 		$latMin=$this->parseGPSValue($exif["GPS"]["GPSLatitude"][1]);

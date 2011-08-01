@@ -118,7 +118,7 @@ class Repository {
 	}
 	
 	function getClientSettings(){
-		$fileName = INSTALL_PATH."/plugins/access.".$this->accessType."/manifest.xml";
+		$fileName = AJXP_INSTALL_PATH."/plugins/access.".$this->accessType."/manifest.xml";
 		$settingLine = "";
 		if(is_readable($fileName)){
 			$lines = file($fileName);	

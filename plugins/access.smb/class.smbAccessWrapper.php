@@ -35,7 +35,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
+require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
 class smbAccessWrapper extends fsAccessWrapper {		
 
@@ -59,6 +59,7 @@ class smbAccessWrapper extends fsAccessWrapper {
 		if($safeCreds["user"] != "" && $safeCreds["password"] != ""){
 			$login = $safeCreds["user"];
 			$pass = $safeCreds["password"];
+			$_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pass;
 			$credentials = "$login:$pass@";
 		}
 		$basePath = $repoObject->getOption("PATH");
@@ -89,6 +90,7 @@ class smbAccessWrapper extends fsAccessWrapper {
     		return true;
     	}else{
 	        $this->fp = fopen($this->realPath, $mode, $options);
+	        //AJXP_Logger::debug("I opened an smb stream.");
 	        return ($this->fp !== false);
     	}		
     }

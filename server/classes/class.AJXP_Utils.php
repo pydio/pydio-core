@@ -253,7 +253,7 @@ class AJXP_Utils
 	{
 		$mess = ConfService::getMessages();
 		$fileName = strtolower($fileName);
-		include(INSTALL_PATH."/server/conf/extensions.conf.php");
+		include(AJXP_INSTALL_PATH."/server/conf/extensions.conf.php");
 		if($isDir){
 			$mime = $RESERVED_EXTENSIONS["folder"];
 		}else{
@@ -568,7 +568,7 @@ class AJXP_Utils
 	
 	static function runTests(&$outputArray, &$testedParams){
 		// At first, list folder in the tests subfolder
-		chdir(INSTALL_PATH.'/server/tests');
+		chdir(AJXP_INSTALL_PATH.'/server/tests');
 		$files = glob('*.php'); 
 		
 		$outputArray = array();
@@ -609,7 +609,7 @@ class AJXP_Utils
         }
 		
 		// NOW TRY THE PLUGIN TESTS
-		chdir(INSTALL_PATH.'/server/tests/plugins');
+		chdir(AJXP_INSTALL_PATH.'/server/tests/plugins');
 		$files = glob('*.php'); 
 		foreach($files as $file)
 		{

@@ -37,12 +37,16 @@ define ('SMB4PHP_AUTHMODE', 'arg'); # set to 'env' to use USER enviroment variab
 
 $GLOBALS['__smb_cache'] = array ('stat' => array (), 'dir' => array ());
 
+
 class smb {
 
     function parse_url ($url) {
-        $pu = parse_url (trim($url));
-        foreach (array ('domain', 'user', 'pass', 'host', 'port', 'path') as $i)
+		$pu = smb::smbparseUrl(trim($url));
+        //AJXP_Logger::debug("URL: " . print_r($pu,true));
+        foreach (array ('domain', 'user', 'pass', 'host', 'port', 'path') as $i) {
             if (! isset($pu[$i])) $pu[$i] = '';
+            //AJXP_Logger::debug("PUI: " . $pu[$i]);
+        }
         if (count ($userdomain = explode (';', urldecode ($pu['user']))) > 1)
             @list ($pu['domain'], $pu['user']) = $userdomain;
         $path = preg_replace (array ('/^\//', '/\/$/'), '', urldecode ($pu['path']));
@@ -51,6 +55,23 @@ class smb {
           : array ($path, '');
         $pu['type'] = $pu['path'] ? 'path' : ($pu['share'] ? 'share' : ($pu['host'] ? 'host' : '**error**'));
         if (! ($pu['port'] = intval(@$pu['port']))) $pu['port'] = 139;
+       /* $i = 0; $atcount = 0;
+        //AJXP_Logger::debug("COUNT: " . strlen($pu['host']));
+        while ($i < strlen($pu['host'])) {
+			if($pu['host'][$i] == '@'){$atcount++;} 
+			$i++;
+		}
+		//AJXP_Logger::debug("ATCOUNT: " . $atcount);
+        if($atcount > 0){
+			while($pu['host'][$i] != '@'){$i--; continue;}
+			$pu['pass'] = $pu['pass'] . '@' . substr($pu['host'], 0, $i);
+			$pu['host'] = substr($pu['host'], $i + 1);
+			
+		}
+		
+		*/
+		//AJXP_Logger::debug("PU: " . print_r($pu, true));
+		//AJXP_Logger::debug("HOST: " . $pu['host']); 
         return $pu;
     }
 
@@ -107,15 +128,19 @@ class smb {
             putenv("USER={$purl['user']}%{$purl['pass']}");
             $auth = '';
         } else {
+			//$purl['pass'] = preg_replace('/@/', '\@', $purl['pass']);
             $auth = ($purl['user'] <> '' ? (' -U ' . escapeshellarg ($purl['user'] . '%' . $purl['pass'])) : '');
+            //AJXP_Logger::debug($auth);
         }
         if ($purl['domain'] <> '') {
             $auth .= ' -W ' . escapeshellarg ($purl['domain']);
         }
         $port = ($purl['port'] <> 139 ? ' -p ' . escapeshellarg ($purl['port']) : '');
         $options = '-O ' . escapeshellarg(SMB4PHP_SMBOPTIONS);
-        AJXP_Logger::debug("SMBCLIENT", "{$options} {$params}");
-        $output = popen (SMB4PHP_SMBCLIENT." -N {$auth} {$options} {$port} {$options} {$params} 2>/dev/null", 'r');
+        //AJXP_Logger::debug($auth);
+        AJXP_Logger::debug("SMBCLIENT", " -N {$options} {$port} {$options} {$params} 2>/dev/null {$auth}");
+	//AJXP_Logger::debug("I just ran an smbclient call");
+        $output = popen (SMB4PHP_SMBCLIENT." -N {$options} {$port} {$options} {$params} 2>/dev/null {$auth}", 'r'); 
         $info = array ();
         while ($line = fgets ($output, 4096)) {
             list ($tag, $regs, $i) = array ('skip', array (), array ());
@@ -176,34 +201,48 @@ class smb {
             }
         }
         pclose($output);
+        //AJXP_Logger::debug(print_r($info, true));
         return $info;
+		//return;
     }
 
 
     # stats
 
     function url_stat ($url, $flags = STREAM_URL_STAT_LINK) {
+		global $__count;
         if ($s = smb::getstatcache($url)) { 
         	AJXP_Logger::debug("Using statcache for $url");
         	return $s; 
         }
         AJXP_Logger::debug("Getting statcache for $url");
+        //AJXP_Logger::debug("Hey: " $url['user']);
         list ($stat, $pu) = array (array (), smb::parse_url ($url));
         switch ($pu['type']) 
         {
             case 'host':
                 if ($o = smb::look ($pu))
+                //AJXP_Logger::debug($_SESSION["AJXP_SESSION_REMOTE_USER"]);
                    $stat = stat ("/tmp");
                 else
-                   trigger_error ("url_stat(): list failed for host '{$host}'", E_USER_WARNING);
+                  trigger_error ("url_stat(): list failed for host '{$host}'", E_USER_WARNING);
                 break;
             case 'share':
-                if ($o = smb::look ($pu)) {
+				if($_SESSION["COUNT"] == 0) {
+					$_SESSION["COUNT"] = 1;
+					//AJXP_Logger::debug("OH HEY");
+					//$__count++;
+					//AJXP_Logger::debug($__count);
+				if ($o = smb::look ($pu)) {
+					$_SESSION["disk"] = $o['disk'];
+					AJXP_Logger::debug(print_r($_SESSION["disk"], true));
+				 //AJXP_Logger::debug(print_r($_ENV, true));
                    $found = FALSE;
                    $lshare = strtolower ($pu['share']);  # fix by Eric Leung
                    if(is_array($o) && isSet($o['disk']) && is_array($o['disk'])){
 	                   foreach ($o['disk'] as $s) if ($lshare == strtolower($s)) {
 	                       $found = TRUE;
+	                       //AJXP_Logger::debug("DISK: " . $s);
 	                       $stat = stat ("/tmp");
 	                       break;
 	                   }
@@ -211,10 +250,29 @@ class smb {
                    if (! $found)
                       //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
                       return null;
-                }
+                 }
                 break;
-            case 'path':            	
+			} else {
+				//AJXP_Logger::debug($__count);
+				//AJXP_Logger::debug("WORKING");
+				$found = FALSE;
+                   $lshare = strtolower ($pu['share']);  # fix by Eric Leung
+                   if(is_array($_SESSION["disk"]) && isSet($_SESSION["disk"]) && is_array($_SESSION["disk"])){
+	                   foreach ($_SESSION["disk"] as $s) if ($lshare == strtolower($s)) {
+	                       $found = TRUE;
+	                       //AJXP_Logger::debug("oh boy");
+	                       $stat = stat ("/tmp");
+	                       break;
+	                   }
+                   }
+                   if (! $found)
+                      //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
+                      return null;
+                break;
+             }
+            case 'path':          	
             	$o = smb::execute ('dir "'.$pu['path'].'"', $pu);
+            	//AJXP_Logger::debug(print_r($o, true));
                 if ($o != null) {
                 	if($o == "NOT_FOUND"){
                 		return null;
@@ -224,14 +282,17 @@ class smb {
                     if (isset ($o['info'][$name])) {
                        $stat = smb::addstatcache ($url, $o['info'][$name]);
                     } else {
-                       trigger_error ("url_stat(): path '{$pu['path']}' not found", E_USER_WARNING);
+						$stat = stat("/tmp");
+                       //trigger_error ("url_stat(): path '{$pu['path']}' not found", E_USER_WARNING);
                     }
                 } else {
+			//$stat = stat("/tmp");
                     trigger_error ("url_stat(): dir failed for path '{$pu['path']}'", E_USER_WARNING);
                 }
                 break;
             default: trigger_error ('error in URL', E_USER_ERROR);
         }
+	
         return $stat;
     }
 
@@ -261,7 +322,7 @@ class smb {
         if ($url == '') $__smb_cache['stat'] = array (); else unset ($__smb_cache['stat'][$url]);
     }
 
-	static function cleanUrl($url){
+    static function cleanUrl($url){
     	$url = str_replace("smb://", "smb:/__/__", $url);
     	while (strstr($url, "//")!==FALSE) {
     		$url = str_replace("//", "/", $url);
@@ -298,7 +359,9 @@ class smb {
     }
 
     function mkdir ($url, $mode, $options) {
+		//AJXP_Logger::debug("hmmmmm");
         $pu = smb::parse_url($url);
+        //AJXP_Logger::debug("huh");
         if ($pu['type'] <> 'path') trigger_error('mkdir(): error in URL', E_USER_ERROR);
         return smb::execute ('mkdir "'.$pu['path'].'"', $pu);
     }
@@ -309,7 +372,60 @@ class smb {
         smb::clearstatcache ($url);
         return smb::execute ('rmdir "'.$pu['path'].'"', $pu);
     }
+    
+    
+    function smbparseUrl ($url){
+		
+		$pass = $_SESSION["AJXP_SESSION_REMOTE_PASS"];
+		//$pass = $pass["password"];
+		$pu['scheme'] = 'smb';
+		$temp = substr($url, 6);
+		//echo $temp . "\n";
+		$i = 0;
+		while($temp[$i] != ':'){
+			$i++;
+		}
+		$pu['user'] = substr($temp, 0 , $i);
+		//echo $pu['user'] . "\n";
 
+		$temp = substr($temp, $i + 1);
+		//AJXP_Logger::debug($temp);
+		$i = 0;
+		$j = 0;
+		$k = 1;
+		//AJXP_Logger::debug("PASS: " . $pass);
+		$pu['pass'] = '';
+		while($pass != $pu['pass']){
+			$i = 0;
+			$j = 0;
+			while($temp[$i] != '@' || $j <= $k){
+				if($temp[$i] == '@')$j++;
+				if($j == $k) break;
+				if($i >= strlen($temp)) {
+					exit("Parse error: bad password");
+				}
+				$i++;
+			}
+			$k++;
+			$pu['pass'] = substr($temp, 0 , $i);
+			//AJXP_Logger::debug("PASS: " . $pu['pass']);
+			//echo $pu['pass'] . "\n";
+			//echo "J: " . $j . " K: " . $k . "\n";
+
+	
+		}
+		$temp = substr($temp, $i+1);
+		//echo $temp;
+		$i = 0;
+		while($temp[$i] != '/'){
+			$i++;
+		}
+		$pu['host'] = substr($temp, 0 , $i);
+		$pu['path'] = substr($temp, $i);
+
+		//echo $pu['pass'] . "\n";
+		return $pu;
+	}
 }
 
 ###################################################################
@@ -340,6 +456,7 @@ class smb_stream_wrapper extends smb {
             case 'host':
                 if ($o = smb::look ($pu)) {
                    $this->dir = $o['disk'];
+                   //$this->dir = 'test';
                    $this->dir_index = 0;
                 } else {
                    trigger_error ("dir_opendir(): list failed for host '{$pu['host']}'", E_USER_WARNING);

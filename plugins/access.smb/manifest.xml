@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="smb" label="Samba" description="Access a samba share. Based on a PHP wrapper around the command-line smbclient tool." mixins="credentials_consumer,filesystem_commons">
+<ajxpdriver name="smb" label="Samba" description="Browse a Samba Server" mixins="credentials_consumer">
 	<client_settings icon="plugins/access.fs/icon.png"/>
 	<server_settings>
 		<param name="HOST" type="string" label="Host" description="Full path to the Samba Share without trailing slash. Can contain user:password too." mandatory="true" default="//SERVER_IP/SHARE"/>
 		<param name="PATH" type="string" label="Uri" description="Path to the root folder on the server" mandatory="false"/>
-        <param name="CHMOD_VALUE" type="string" label="File Creation Mask" description="Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." default="0666"/>
+		<param name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>	
+		<param name="CHMOD_VALUE" type="string" label="File Creation Mask" description="Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." default="0666"/>	
+		<param name="DEFAULT_RIGHTS" type="string" label="Default Rights" description="This right pattern (empty, r, or rw) will be applied at user creation for this repository." default=""/>
+		<param name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
+		<param name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
+		<param name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
 	</server_settings>
 	<class_definition filename="plugins/access.smb/class.smbAccessDriver.php" classname="smbAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.smb/class.smbAccessWrapper.php" classname="smbAccessWrapper" protocol="ajxp.smb"/>
@@ -12,7 +17,6 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
-        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 	</registry_contributions>
 	<dependencies>
 		<plugin pluginName="access.fs"/>

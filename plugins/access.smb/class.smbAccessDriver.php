@@ -35,7 +35,7 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-include_once(INSTALL_PATH."/plugins/access.smb/smb.php");
+include_once(AJXP_INSTALL_PATH."/plugins/access.smb/smb.php");
 
 class smbAccessDriver extends fsAccessDriver
 {

@@ -208,7 +208,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
         }else{
 	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
 	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
-	        $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/"));
+	        $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/"));
         }
 		
 		foreach ($files as $file){
