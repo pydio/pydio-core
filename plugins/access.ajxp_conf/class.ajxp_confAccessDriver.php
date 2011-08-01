@@ -532,10 +532,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"]);
 				}else{
 					$newRep = ConfService::createRepositoryFromArray(0, $repDef);
-					if(!$isTemplate && is_file(AJXP_INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php"))
+					if(!$isTemplate && is_file(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$newRep->getAccessType().".php"))
 					{
-					    chdir(AJXP_INSTALL_PATH."/server/tests/plugins");
-						include(AJXP_INSTALL_PATH."/server/tests/plugins/test.ajxp_".$newRep->getAccessType().".php");
+					    chdir(AJXP_TESTS_FOLDER."/plugins");
+						include(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$newRep->getAccessType().".php");
 						$className = "ajxp_".$newRep->getAccessType();
 						$class = new $className();
 						$result = $class->doRepositoryTest($newRep);
@@ -691,9 +691,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 							$repo->addOption($key, $value);
 						}
 					}
-					if(is_file(AJXP_INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php")){
-					    chdir(AJXP_INSTALL_PATH."/server/tests/plugins");
-						include(AJXP_INSTALL_PATH."/server/tests/plugins/test.ajxp_".$repo->getAccessType().".php");
+					if(is_file(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php")){
+					    chdir(AJXP_TESTS_FOLDER."/plugins");
+						include(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php");
 						$className = "ajxp_".$repo->getAccessType();
 						$class = new $className();
 						$result = $class->doRepositoryTest($repo);
