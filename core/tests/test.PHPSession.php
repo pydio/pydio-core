@@ -42,7 +42,7 @@ class PHPSession extends AbstractTest
     function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
     function doTest() 
     { 
-    	include("../../server/conf/conf.php");
+    	include("../../conf/conf.php");
     	$tmpDir = session_save_path();    	
     	$this->testedParams["Session Save Path"] = $tmpDir;
     	if($tmpDir != ""){

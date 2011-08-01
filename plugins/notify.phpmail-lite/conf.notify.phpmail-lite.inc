@@ -32,7 +32,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * 
  * Description : Config file for the phpMail notifier
- * DROP ME IN server/conf folder
+ * DROP ME IN conf folder
  */
 $DRIVER_CONF = array(
 	/**

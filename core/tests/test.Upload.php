@@ -42,7 +42,7 @@ class Upload extends AbstractTest
     function Upload() { parent::AbstractTest("Upload particularities", "<b>Testing configs</b>"); }
     function doTest() 
     { 
-    	include("../../server/conf/conf.php");
+    	include("../../conf/conf.php");
     	$tmpDir = ini_get("upload_tmp_dir");
     	if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
     	if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !=""){

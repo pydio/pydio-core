@@ -32,7 +32,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * Description : Config file for the shorten.bitly plugin
- *               Drop it into server/conf/ folder with the right values.
+ *               Drop it into conf/ folder with the right values.
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

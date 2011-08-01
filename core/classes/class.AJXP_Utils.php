@@ -253,7 +253,7 @@ class AJXP_Utils
 	{
 		$mess = ConfService::getMessages();
 		$fileName = strtolower($fileName);
-		include(AJXP_INSTALL_PATH."/server/conf/extensions.conf.php");
+		include(AJXP_INSTALL_PATH."/conf/extensions.conf.php");
 		if($isDir){
 			$mime = $RESERVED_EXTENSIONS["folder"];
 		}else{
@@ -597,13 +597,13 @@ class AJXP_Utils
         $repoList = array();
         require_once("../classes/class.ConfService.php");
         require_once("../classes/class.Repository.php");
-        include(AJXP_INSTALL_PATH."/server/conf/conf.php");
+        include(AJXP_INSTALL_PATH."/conf/conf.php");
         foreach($REPOSITORIES as $index => $repo){
             $repoList[] = ConfService::createRepositoryFromArray($index, $repo);
         }        
         // Try with the serialized repositories
-        if(is_file(AJXP_INSTALL_PATH."/server/conf/repo.ser")){
-            $fileLines = file(AJXP_INSTALL_PATH."/server/conf/repo.ser");
+        if(is_file(AJXP_INSTALL_PATH."/data/conf/repo.ser")){
+            $fileLines = file(AJXP_INSTALL_PATH."/data/conf/repo.ser");
             $repos = unserialize($fileLines[0]);
             $repoList = array_merge($repoList, $repos);
         }
