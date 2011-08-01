@@ -65,7 +65,7 @@ define("AJXP_BIN_FOLDER_REL", "server/classes");
 define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/classes");
 define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
-define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
+define("TESTS_RESULT_FILE", $installPath."/data/conf/diag_result.php");
 define("AJXP_TESTS_FOLDER", AJXP_INSTALL_PATH."/core/tests");
 define("AJXP_SKIP_CACHE", true);
 

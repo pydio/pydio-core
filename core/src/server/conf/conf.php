@@ -130,7 +130,7 @@ $PLUGINS = array(
 	"CONF_DRIVER" => array(
 		"NAME"		=> "serial",
 		"OPTIONS"	=> array(
-			"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/server/conf/repo.ser",
+			"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/data/conf/repo.ser",
 			"ROLES_FILEPATH"		=> "AJXP_INSTALL_PATH/data/users/roles.ser",
 			"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/data/users",
 			/*
