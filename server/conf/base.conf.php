@@ -65,7 +65,7 @@ define("SERVER_RESOURCES_FOLDER", "server/classes");
 define("AJXP_DOCS_FOLDER", "client/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/client/i18n");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
-define("AJXP_SKIP_CACHE", true);
+define("AJXP_SKIP_CACHE", false);
 
 
 define("INITIAL_ADMIN_PASSWORD", "admin");
