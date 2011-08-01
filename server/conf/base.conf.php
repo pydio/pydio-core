@@ -61,7 +61,7 @@ define("AJXP_SERVER_ACCESS", "index.php");
 define("CLIENT_RESOURCES_FOLDER", "plugins/gui.ajax/res");
 define("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/oxygen");
 define("AJXP_BIN_FOLDER_REL", "server/classes");
-define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/server/classes");
+define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/classes");
 define("AJXP_DOCS_FOLDER", "client/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
