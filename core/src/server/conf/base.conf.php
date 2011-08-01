@@ -45,6 +45,7 @@ if(function_exists("xdebug_disable")){
 
 
 ini_set("session.cookie_httponly", 1);
+//ini_set("session.cookie_path", "ajaxplorer");
 
 define("AJXP_VERSION", "3.2.4");
 define("AJXP_VERSION_DATE", "2011/06/08");
@@ -57,15 +58,14 @@ define("AJXP_INSTALL_PATH", $installPath);
 define("AJXP_CACHE_DIR", AJXP_INSTALL_PATH."/server/cache");
 define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
 define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
-define("SERVER_ACCESS", "content.php");
-define("ADMIN_ACCESS", "admin.php");
-define("IMAGES_FOLDER", "client/themes/oxygen/images");
-define("CLIENT_RESOURCES_FOLDER", "client");
-define("AJXP_THEME_FOLDER", "client/themes/oxygen");
+define("AJXP_SERVER_ACCESS", "index.php");
+define("CLIENT_RESOURCES_FOLDER", "plugins/gui.ajax/res");
+define("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/oxygen");
 define("SERVER_RESOURCES_FOLDER", "server/classes");
-define("DOCS_FOLDER", "client/doc");
+define("AJXP_DOCS_FOLDER", "client/doc");
+define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/client/i18n");
 define("TESTS_RESULT_FILE", $installPath."/server/conf/diag_result.php");
-define("AJXP_SKIP_CACHE", false);
+define("AJXP_SKIP_CACHE", true);
 
 
 define("INITIAL_ADMIN_PASSWORD", "admin");

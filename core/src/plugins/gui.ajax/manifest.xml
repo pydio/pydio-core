@@ -3,6 +3,11 @@
 	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
 	<registry_contributions>
 		<actions>
+			<action name="get_boot_gui" skipSecureToken="true">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
 			<action name="get_boot_conf" skipSecureToken="true">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>

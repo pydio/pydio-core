@@ -218,7 +218,7 @@
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="content.php" method="GET" id="download_form" target="download_iframe">
+					<form style="display:inline;" action="index.php" method="GET" id="download_form" target="download_iframe">
 						<input type="hidden" name="get_action" value="download">
 						<input type="hidden" name="secure_token" value="">
 					</form>
@@ -358,7 +358,7 @@
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="content.php" method="GET" id="download_form" target="download_iframe">
+					<form style="display:inline;" action="index.php" method="GET" id="download_form" target="download_iframe">
 						<input type="hidden" name="get_action" value="download">
 						<input type="hidden" name="secure_token" value="">
 					</form>

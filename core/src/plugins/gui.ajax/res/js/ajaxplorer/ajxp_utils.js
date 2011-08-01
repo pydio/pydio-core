@@ -366,7 +366,7 @@ function loadXPathReplacer(){
 	if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
 		conn._libUrl = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI');
 	}
-	conn.loadLibrary('client/js/lib/xpath/javascript-xpath-cmp.js');	
+	conn.loadLibrary('plugins/gui.ajax/res/js/lib/xpath/javascript-xpath-cmp.js');	
 }
 
 /**
