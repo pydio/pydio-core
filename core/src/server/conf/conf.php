@@ -168,7 +168,7 @@ $PLUGINS = array(
 	"LOG_DRIVER" => array(
 	 	"NAME" => "text",
 	 	"OPTIONS" => array( 
-	 		"LOG_PATH" => "AJXP_INSTALL_PATH/server/logs/",
+	 		"LOG_PATH" => "AJXP_INSTALL_PATH/data/logs/",
 	 		"LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
 	 		"LOG_CHMOD" => 0770
 	 	)

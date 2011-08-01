@@ -37,26 +37,40 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
                                  
 require_once('../classes/class.AbstractTest.php');
 
-class PHPSession extends AbstractTest
+class Upload extends AbstractTest
 {
-    function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
+    function Upload() { parent::AbstractTest("Upload particularities", "<b>Testing configs</b>"); }
     function doTest() 
     { 
-    	include("../conf/conf.php");
-    	$tmpDir = session_save_path();    	
-    	$this->testedParams["Session Save Path"] = $tmpDir;
-    	if($tmpDir != ""){
-	    	$this->testedParams["Session Save Path Writeable"] = is_writable($tmpDir);
-	    	if(!$this->testedParams["Session Save Path Writeable"]){
-	    		$this->failedLevel = "error";
-	    		$this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
-	    		return FALSE;
-	    	}    	
-    	}else{
-    		$this->failedLevel = "warning";
-    		$this->failedInfo = "Warning, it seems that your temporary folder used to save session data is not set. If you are encountering troubles with logging and sessions, please check session.save_path in your php.ini. Otherwise you can ignore this.";
-    		return FALSE;    		
+    	include("../../server/conf/conf.php");
+    	$tmpDir = ini_get("upload_tmp_dir");
+    	if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
+    	if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !=""){
+    		$tmpDir = AJXP_TMP_DIR;
     	}
+    	$this->testedParams["Upload Tmp Dir Writeable"] = is_writable($tmpDir);
+    	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
+    	$this->testedParams["PHP Post Max Size"] = $this->returnBytes(ini_get("post_max_size"));
+    	$this->testedParams["AJXP Upload Max Size"] = $this->returnBytes($upload_max_size_per_file);
+    	foreach ($this->testedParams as $paramName => $paramValue){
+    		$this->failedInfo .= "\n$paramName=$paramValue";
+    	}
+    	if(!$this->testedParams["Upload Tmp Dir Writeable"]){
+    		$this->failedLevel = "error";
+    		$this->failedInfo = "The temporary folder used by PHP to upload files is either incorrect or not writeable! Upload will not work. Please check : ".ini_get("upload_tmp_dir");
+    		return FALSE;
+    	}
+    	if($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Upload Max Size"]){
+    		$this->failedLevel = "warning";
+    		$this->failedInfo .= "\nAjaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("upload_max_filesize")." per file.";
+    		return FALSE;
+    	}
+    	if($this->testedParams["AJXP Upload Max Size"] > $this->testedParams["PHP Post Max Size"]){
+    		$this->failedLevel = "warning";
+    		$this->failedInfo .= "\nAjaxplorer cannot override the PHP setting! Unless you edit your php.ini, your upload will be limited to ".ini_get("post_max_size")." per file.";
+    		return FALSE;
+    	}
+        
         $this->failedLevel = "info";
         return FALSE;
     }
