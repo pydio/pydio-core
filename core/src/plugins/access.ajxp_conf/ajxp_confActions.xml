@@ -297,7 +297,7 @@
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
-							ajaxplorer.actionBar.configEditor.loadPluginConfig(node.getLabel());							
+							ajaxplorer.actionBar.configEditor.loadPluginConfig(node.getMetadata().get("plugin_id"));							
 						};
 						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc);
 					}else{

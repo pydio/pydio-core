@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.diaporama" openable="true" previewProvider="true" text="186" title="136" icon="frame_image.png" className="Diaporama" mimes="png,jpg,jpeg,gif" formId="diaporama_box">
+	<server_settings>
+		<global_param/>
+	</server_settings>
 	<class_definition filename="plugins/editor.diaporama/class.ImagePreviewer.php" classname="ImagePreviewer"/>
 	<resources>
 		<js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>

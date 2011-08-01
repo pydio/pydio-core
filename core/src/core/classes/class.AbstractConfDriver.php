@@ -51,6 +51,48 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 		}		
 	}
 	
+	// NEW FUNCTIONS FOR  LOADING/SAVING PLUGINS CONFIGS
+	/**
+	 * Returns an array of options=>values merged from various sources (.inc.php, implementation source)
+	 * @return Array
+	 * @param String $pluginType
+	 * @param String $pluginId
+	 */
+	function loadPluginConfig($pluginType, $pluginId){
+		$options = array();
+		if(is_file(AJXP_CONF_PATH."/conf.$pluginType.inc")){
+			include AJXP_CONF_PATH."/conf.$pluginType.inc";
+			if(!empty($DRIVER_CONF)){
+				foreach($DRIVER_CONF as $key=>$value){
+					$options[$key] = $value;
+				}
+				unset($DRIVER_CONF);
+			}
+		}
+		if(is_file(AJXP_CONF_PATH."/conf.$pluginType.$pluginId.inc")){
+			include AJXP_CONF_PATH."/conf.$pluginType.$pluginId.inc";
+			if(!empty($DRIVER_CONF)){
+				foreach($DRIVER_CONF as $key=>$value){
+					$options[$key] = $value;
+				}
+				unset($DRIVER_CONF);
+			}
+		}
+		$this->_loadPluginConfig($pluginType, $pluginId, $options);
+		return $options;
+	}
+
+	abstract function _loadPluginConfig($pluginType, $pluginId, &$options);
+	
+	/**
+	 * 
+	 * @param String $pluginType
+	 * @param String $pluginId
+	 * @param String $configHash
+	 */
+	abstract function savePluginConfig($pluginType, $pluginId, $configHash);
+	
+	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	/**
 	 * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).

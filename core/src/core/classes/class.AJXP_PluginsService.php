@@ -45,11 +45,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $registeredWrappers = array();
  	private $xmlRegistry;
  	private $pluginFolder;
- 	private $confFolder;
+ 	/**
+ 	 * @var AbstractConfDriver
+ 	 */
+ 	private $confStorage;
  	private $mixinsDoc;
  	private $mixinsXPath;
  	
- 	public function loadPluginsRegistry($pluginFolder, $confFolder){ 		
+ 	/**
+ 	 * Loads the full registry, from the cache or not
+ 	 * @param String $pluginFolder
+ 	 * @param AbstractConfDriver $confStorage
+ 	 */
+ 	public function loadPluginsRegistry($pluginFolder, $confStorage){
  		if(!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false){
 	 		$reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
 	 		if(count($reqs)){
@@ -70,7 +78,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 	 		}
  		}
  		$this->pluginFolder = $pluginFolder;
- 		$this->confFolder = $confFolder;
+ 		$this->confStorage = $confStorage;
  		$handler = opendir($pluginFolder);
  		$pluginsPool = array();
  		if($handler){
@@ -122,12 +130,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 			$this->registry[$plugType] = array();
 		}
 		$plugin = $this->instanciatePluginClass($plugin);
-		if(is_file($this->confFolder."/conf.".$plugin->getType().".inc")){
-			$plugin->loadConfig($this->confFolder."/conf.".$plugin->getType().".inc", "inc");
-		}
-		if(is_file($this->confFolder."/conf.".$plugin->getId().".inc")){
-			$plugin->loadConfig($this->confFolder."/conf.".$plugin->getId().".inc", "inc");
-		}
+		$options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
+		$plugin->loadConfigs($options);
+		$plugin->publishConfigs();
 		$this->registry[$plugType][$plugin->getName()] = $plugin;
 		$plugin->loadingState = "loaded";
 		//print("</div>");
@@ -172,6 +177,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			}
  		} 		
  		return $sorted;
+ 	}
+ 	
+ 	
+ 	public function softLoad($pluginId, $pluginOptions){
+		$plugin = new AJXP_Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
+		$plugin->loadManifest();
+		$plugin = $this->instanciatePluginClass($plugin);
+		$plugin->init($pluginOptions);
+ 		return $plugin;
  	}
  	
  	/**

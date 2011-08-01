@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <hook id="shorten.bitly">
     <server_settings>
-        <param name="BITLY_USERNAME" type="string" mandatory="true"/>
-        <param name="BITLY_API_KEY" type="string" mandatory="true"/>
+        <global_param name="BITLY_USER" type="string" label="User Name" description="Bit.ly account user name" mandatory="true"/>
+        <global_param name="BITLY_APIKEY" type="string" label="API Key" description="Bit.ly account API Key" mandatory="true"/>
     </server_settings>
 	<registry_contributions>
         <actions>

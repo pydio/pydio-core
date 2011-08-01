@@ -41,6 +41,17 @@ class ConfService
 	private $errors = array();
 	private $configs = array();
  	
+	/**
+	 * @param AXJP_PluginsService $ajxpPluginService
+	 * @return AbstractConfDriver 
+	 */
+	public function confPluginSoftLoad($ajxpPluginService){
+		return $ajxpPluginService->softLoad(
+			"conf.".$this->configs["PLUGINS"]["CONF_DRIVER"]["NAME"],
+			$this->configs["PLUGINS"]["CONF_DRIVER"]["OPTIONS"]
+		);
+	}
+		
 	public static function init($confFile){
 		$inst = self::getInstance();
 		$inst->initInst($confFile);
@@ -100,13 +111,21 @@ class ConfService
 	        	"LOG_DRIVER"  => $LOG_DRIVER,
 	        	"ACTIVE_PLUGINS" => $ACTIVE_PLUGINS
 	        );
-		}        
-		$this->initUniquePluginImplInst("CONF_DRIVER", "conf");
-		$this->initUniquePluginImplInst("AUTH_DRIVER", "auth");
+		}        		
 		        
 		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
+	}
+	
+	public static function start(){
+		$inst = self::getInstance();
+		$inst->startInst();
+	}
+	
+	public function startInst(){
+		$this->initUniquePluginImplInst("CONF_DRIVER", "conf");
+		$this->initUniquePluginImplInst("AUTH_DRIVER", "auth");		        
 		$this->configs["REPOSITORIES"] = $this->initRepositoriesListInst($this->configs["DEFAULT_REPOSITORIES"]);
-		$this->switchRootDirInst();
+		$this->switchRootDirInst();		
 	}
 	
 	public static function getErrors(){

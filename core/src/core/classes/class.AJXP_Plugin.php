@@ -332,7 +332,18 @@ class AJXP_Plugin implements Serializable{
 		}
 		return $deps;
 	}
-	public function loadConfig($configFile, $format){
+	public function loadConfigs($configData){
+		if(isSet($this->pluginConf)) $this->pluginConf = array_merge($this->pluginConf, $configData);
+		else $this->pluginConf = $configData;
+	}
+	public function publishConfigs(){
+		// TODO : check manifest, and publish values accordingly
+	}
+	public function getConfigs(){
+		return $this->pluginConf;
+	}
+	/*
+	public function loadConfig($configFile, $format){		
 		if($format == "inc"){
 			if(is_file($configFile)){
 				include($configFile);
@@ -352,6 +363,7 @@ class AJXP_Plugin implements Serializable{
 			}
 		}
 	}
+	*/
 	public function getClassFile(){
 		$files = $this->xPath->query("class_definition");
 		if(!$files->length) return false;
