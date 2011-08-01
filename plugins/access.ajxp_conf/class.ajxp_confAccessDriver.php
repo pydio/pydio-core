@@ -58,7 +58,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 				$rootNodes = array(
-					"plugins"	   => array("LABEL" => "Configs", "ICON" => "folder_red.png"),
+					"plugins"	   => array("LABEL" => "Plugins Configs", "ICON" => "folder_development.png"),
 					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
 					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
 					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "user_group_new.png"),
@@ -858,6 +858,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$ajxpPlugin = AJXP_PluginsService::getInstance()->getPluginById($httpVars["plugin_id"]);
 				AJXP_XMLWriter::header("admin_data");
 				echo($ajxpPlugin->getManifestRawContent());
+				$values = $ajxpPlugin->getConfigs();
+				echo("<plugin_settings_values>");
+				foreach($values as $key => $value){
+					echo("<param name=\"$key\" value=\"$value\"/>");
+				}
+				echo("</plugin_settings_values>");
 				AJXP_XMLWriter::close("admin_data");
 				
 			break;
@@ -883,14 +889,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$types[$type] = $type;
 			}
 			$meta = array(
-				"icon" 		=> "folder.png",					
-				"is_active"	=> $status?"true":"false"
+				"icon" 		=> "preferences_desktop",	
+				"ajxp_mime" => "ajxp_plugin",				
+				"is_active"	=> "true",
+				"plugin_id" => "core.ajaxplorer"
 			);
-			AJXP_XMLWriter::renderNode("/plugins/core", "Core", false, $meta);							
+			AJXP_XMLWriter::renderNode("/plugins/core.ajaxplorer", "AjaXplorer Core", true, $meta);							
 			foreach( $types as $t){
 				$meta = array(
-					"icon" 		=> "folder.png",					
-					"is_active"	=> $status?"true":"false"
+					"icon" 		=> "folder_development.png",					
+					"is_active"	=> $status?"true":"false",
+					"plugin_id" => $t
 				);
 				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t)." plugins", false, $meta);				
 			}
@@ -899,14 +908,22 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			if(empty($split[0])) array_shift($split);
 			$type = $split[1];
 			foreach($plugins as $pluginId => $status){
-				$pType = array_shift(explode(".", $pluginId));
-				if($pType != $type) continue;
+				list($pType, $pId) = (explode(".", $pluginId));				
+				if($pType != $type && !($pType == "core" && $pId == $type)) {
+					continue;
+				}
 				$meta = array(				
-					"icon" 		=> "folder.png",
+					"icon" 		=> ($pType == "core"?"preferences_desktop.png":"preferences_plugin.png"),
 					"ajxp_mime" => "ajxp_plugin",
-					"is_active"	=> $status?"true":"false"
+					"is_active"	=> $status?"true":"false",
+					"plugin_id" => $pluginId
 				);
-				AJXP_XMLWriter::renderNode("/plugins/".$pluginId, $pluginId, true, $meta);
+				if($pType == "core"){
+					$label = "Global options for '$pId' plugins";
+				}else{
+					$label = $pluginId;
+				}
+				AJXP_XMLWriter::renderNode("/plugins/".$pluginId, $label, true, $meta);
 			}
 		}
 	}

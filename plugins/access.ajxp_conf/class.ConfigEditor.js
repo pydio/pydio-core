@@ -830,7 +830,15 @@ ConfigEditor = Class.create({
 		connexion.onComplete = function(transport){
 			var xmlData = transport.responseXML;
 			var params = XPathSelectNodes(xmlData, "//global_param");
+			var values = XPathSelectNodes(xmlData, "//plugin_settings_values/param");
 			var optionsPane = this.form.select('[id="options_pane"]')[0];
+			
+			var paramsValues = new Hash();
+			$A(values).each(function(child){
+				if(child.nodeName != 'param') return;
+				paramsValues.set(child.getAttribute('name'), child.getAttribute('value'));
+			});		
+			
 			
 			var driverParamsHash = $A([]);
 			for(var i=0;i<params.length;i++){
@@ -840,7 +848,7 @@ ConfigEditor = Class.create({
 			var form = new Element('div', {className:'driver_form'});
 			optionsPane.update("<legend>Plugin Configurations</legend>");			
 			optionsPane.insert({bottom:form});
-			this.formManager.createParametersInputs(form, driverParamsHash);
+			this.formManager.createParametersInputs(form, driverParamsHash, true, paramsValues);
 			
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();

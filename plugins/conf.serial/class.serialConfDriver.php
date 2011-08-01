@@ -74,6 +74,15 @@ class serialConfDriver extends AbstractConfDriver {
 		}
 	}
 	
+	// SAVE / LOAD PLUGINS CONF
+	function _loadPluginConfig($pluginType, $pluginId, &$options){
+		
+	}
+	
+	function savePluginConfig($pluginType, $pluginId, $configHash){
+		
+	}
+	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	function listRepositories(){
 		return AJXP_Utils::loadSerialFile($this->repoSerialFile);

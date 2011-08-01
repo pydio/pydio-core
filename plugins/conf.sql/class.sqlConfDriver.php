@@ -35,8 +35,6 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(AJXP_BIN_FOLDER."/class.AbstractConfDriver.php");
-
 class sqlConfDriver extends AbstractConfDriver {
 		
 	
@@ -72,6 +70,20 @@ class sqlConfDriver extends AbstractConfDriver {
 			echo get_class($e), ': ', $e->getMessage(), "\n";
 			exit(1);
 		}
+	}
+	
+	function _loadPluginConfig($pluginType, $pluginId, &$options){
+		
+	}
+	
+	/**
+	 * 
+	 * @param String $pluginType
+	 * @param String $pluginId
+	 * @param String $configHash
+	 */
+	function savePluginConfig($pluginType, $pluginId, $configHash){
+		
 	}
 	
 	/**
