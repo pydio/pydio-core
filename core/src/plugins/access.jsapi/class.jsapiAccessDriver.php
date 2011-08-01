@@ -16,7 +16,7 @@ class jsapiAccessDriver extends AbstractAccessDriver{
 					$searchLocations = array(
 						CLIENT_RESOURCES_FOLDER."/js/ajaxplorer",
 						CLIENT_RESOURCES_FOLDER."/js/lib",
-						INSTALL_PATH."/plugins/"
+						AJXP_INSTALL_PATH."/plugins/"
 					);
 				}else if($jsType == "interface"){
 					$searchLocations = array(

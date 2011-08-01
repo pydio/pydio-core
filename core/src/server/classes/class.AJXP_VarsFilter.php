@@ -16,7 +16,7 @@ class AJXP_VarsFilter {
 			}
 		}
 		if(is_string($value) && strpos($value, "AJXP_INSTALL_PATH") !== false){
-			$value = str_replace("AJXP_INSTALL_PATH", INSTALL_PATH, $value);
+			$value = str_replace("AJXP_INSTALL_PATH", AJXP_INSTALL_PATH, $value);
 		}
 		AJXP_Controller::applyIncludeHook("vars.filter", array(&$value));		 
 		return $value;

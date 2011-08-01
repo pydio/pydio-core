@@ -61,7 +61,7 @@ require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry(INSTALL_PATH."/plugins", INSTALL_PATH."/server/conf");
+$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/server/conf");
 ConfService::init("server/conf/conf.php");
 
 $confStorageDriver = ConfService::getConfStorageImpl();

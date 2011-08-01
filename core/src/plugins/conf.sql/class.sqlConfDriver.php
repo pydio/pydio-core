@@ -322,7 +322,7 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * @see AbstractConfDriver#getUserClassFileName()
 	 */
 	function getUserClassFileName(){
-		return INSTALL_PATH."/plugins/conf.sql/class.AJXP_User.php";
+		return AJXP_INSTALL_PATH."/plugins/conf.sql/class.AJXP_User.php";
 	}	
 	
 	

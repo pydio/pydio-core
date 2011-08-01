@@ -115,7 +115,7 @@ class AJXP_Plugin implements Serializable{
 				$filename = $data["filename"] OR "";
 				$include = $data["include"] OR "*";
 				$exclude = $data["exclude"] OR "";			
-				if(!is_file(INSTALL_PATH."/".$filename)) continue;			
+				if(!is_file(AJXP_INSTALL_PATH."/".$filename)) continue;			
 				if($include != "*") {
 					$include = explode(",", $include);
 				}else{
@@ -147,7 +147,7 @@ class AJXP_Plugin implements Serializable{
 	}
 	protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array()){
 		$contribDoc = new DOMDocument();
-		$contribDoc->load(INSTALL_PATH."/".$xmlFile);
+		$contribDoc->load(AJXP_INSTALL_PATH."/".$xmlFile);
 		if(!is_array($include) && !is_array($exclude)){
 			$this->registryContributions[] = $contribDoc->documentElement;
 			$this->parseSpecificContributions($contribDoc->documentElement);
@@ -380,10 +380,10 @@ class AJXP_Plugin implements Serializable{
 		$files = $this->xPath->query("class_stream_wrapper");
 		if(!$files->length) return false;
 		$streamData = $this->nodeAttrToHash($files->item(0));
-		if(!is_file(INSTALL_PATH."/".$streamData["filename"])){
+		if(!is_file(AJXP_INSTALL_PATH."/".$streamData["filename"])){
 			return false;
 		}
-		include_once(INSTALL_PATH."/".$streamData["filename"]);
+		include_once(AJXP_INSTALL_PATH."/".$streamData["filename"]);
 		if(!class_exists($streamData["classname"])){
 			return false;
 		}

@@ -192,7 +192,7 @@ class serialConfDriver extends AbstractConfDriver {
 	
 	
 	function getUserClassFileName(){
-		return INSTALL_PATH."/plugins/conf.serial/class.AJXP_User.php";
+		return AJXP_INSTALL_PATH."/plugins/conf.serial/class.AJXP_User.php";
 	}	
 }
 ?>

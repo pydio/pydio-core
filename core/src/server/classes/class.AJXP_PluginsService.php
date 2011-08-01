@@ -183,7 +183,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private function instanciatePluginClass($plugin){
  		$definition = $plugin->getClassFile();
  		if(!$definition) return $plugin;
- 		$filename = INSTALL_PATH."/".$definition["filename"];
+ 		$filename = AJXP_INSTALL_PATH."/".$definition["filename"];
  		$className = $definition["classname"];
  		if(is_file($filename)){ 			
  			require_once($filename);

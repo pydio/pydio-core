@@ -143,12 +143,12 @@ class AbstractAccessDriver extends AJXP_Plugin {
     		return "ERROR : MCrypt must be installed to use publiclets!";
     	}
     	if($data["PASSWORD"] && !is_file(PUBLIC_DOWNLOAD_FOLDER."/allz.css")){    		
-    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", PUBLIC_DOWNLOAD_FOLDER."/allz.css");
-    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/22/dialog_ok_apply.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
-    		@copy(INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/public_url.png");    		
+    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", PUBLIC_DOWNLOAD_FOLDER."/allz.css");
+    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/22/dialog_ok_apply.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
+    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/public_url.png");    		
     	}
     	if(!is_file(PUBLIC_DOWNLOAD_FOLDER."/index.html")){
-    		@copy(INSTALL_PATH."/server/index.html", PUBLIC_DOWNLOAD_FOLDER."/index.html");
+    		@copy(AJXP_INSTALL_PATH."/server/index.html", PUBLIC_DOWNLOAD_FOLDER."/index.html");
     	}
         $data["PLUGIN_ID"] = $this->id;
         $data["BASE_DIR"] = $this->baseDir;
@@ -178,7 +178,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB, $iv));
         // Okay, write the file:
         $fileData = "<"."?"."php \n".
-        '   require_once("'.str_replace("\\", "/", INSTALL_PATH).'/publicLet.inc.php"); '."\n".
+        '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
         '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
         '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
         '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
@@ -196,7 +196,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         }else{
 	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
 	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
-	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/")."/".$hash.".php");
+	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/")."/".$hash.".php");
         }
     }
 
@@ -223,7 +223,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         {
             if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"]))
             {   
-            	$content = file_get_contents(INSTALL_PATH."/client/html/public_links.html");
+            	$content = file_get_contents(AJXP_INSTALL_PATH."/client/html/public_links.html");
             	$language = "en";
             	if(isSet($_GET["lang"])){
             		$language = $_GET["lang"];
@@ -243,7 +243,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
                 exit(1);
             }
         }
-        $filePath = INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
+        $filePath = AJXP_INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
         if(!is_file($filePath)){
                 die("Warning, cannot find driver for conf storage! ($className, $filePath)");
         }
