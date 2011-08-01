@@ -568,7 +568,7 @@ class AJXP_Utils
 	
 	static function runTests(&$outputArray, &$testedParams){
 		// At first, list folder in the tests subfolder
-		chdir(AJXP_INSTALL_PATH.'/server/tests');
+		chdir(AJXP_TESTS_FOLDER);
 		$files = glob('*.php'); 
 		
 		$outputArray = array();
@@ -609,7 +609,7 @@ class AJXP_Utils
         }
 		
 		// NOW TRY THE PLUGIN TESTS
-		chdir(AJXP_INSTALL_PATH.'/server/tests/plugins');
+		chdir(AJXP_TESTS_FOLDER);
 		$files = glob('*.php'); 
 		foreach($files as $file)
 		{
