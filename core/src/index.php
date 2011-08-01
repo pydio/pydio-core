@@ -31,7 +31,7 @@
  * 
  * Description : main script called by any Ajax query. Will dispatch the actions on the plugins.
  */
-include_once("server/conf/base.conf.php");
+include_once("conf/base.conf.php");
 
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Utils.php");
 require_once(AJXP_BIN_FOLDER."/class.AJXP_VarsFilter.php");
@@ -48,6 +48,7 @@ require_once(AJXP_BIN_FOLDER."/class.UserSelection.php");
 require_once(AJXP_BIN_FOLDER."/class.HTMLWriter.php");
 require_once(AJXP_BIN_FOLDER."/class.AJXP_XMLWriter.php");
 require_once(AJXP_BIN_FOLDER."/class.RecycleBinManager.php");
+
 if(isSet($_GET["ajxp_sessid"]))
 {
     // Don't overwrite cookie
@@ -62,8 +63,8 @@ require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/server/conf");
-ConfService::init("server/conf/conf.php");
+$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/conf");
+ConfService::init("conf/conf.php");
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());

@@ -59,12 +59,12 @@ require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AbstractAccessDri
 if (!class_exists("SessionSwitcher")) require_once("$CURRENTPATH/sessionSwitcher.php");
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.ConfService.php");
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AuthService.php");    
-include_once("$CURRENTPATH/../../server/conf/base.conf.php");
+include_once("$CURRENTPATH/../../conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", "$CURRENTPATH/../../server/conf");
+$pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", "$CURRENTPATH/../../conf");
 
 define ("CLIENT_RESOURCES_FOLDER", "client");
-ConfService::init("$CURRENTPATH/../../server/conf/conf.php"); 
+ConfService::init("$CURRENTPATH/../../conf/conf.php"); 
 $plugins = ConfService::getConf("PLUGINS");
 require_once("$CURRENTPATH/../../plugins/conf.".$plugins["CONF_DRIVER"]["NAME"]."/class.AJXP_User.php");
 

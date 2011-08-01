@@ -1,5 +1,5 @@
 <?php
-include_once("server/conf/base.conf.php");
+include_once("conf/base.conf.php");
 
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Utils.php");
 require_once(AJXP_BIN_FOLDER."/class.AJXP_VarsFilter.php");
@@ -20,8 +20,8 @@ require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
 //set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 //set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/server/conf");
-ConfService::init("server/conf/conf.php");
+$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/conf");
+ConfService::init("conf/conf.php");
 
 if(!AJXP_WEBDAV_ENABLE){
 	die('You are not allowed to access this service');

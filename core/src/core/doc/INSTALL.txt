@@ -11,7 +11,7 @@
  If you want to use it as fast as possible, just change the ADMIN_PASSWORD in 
  the conf/conf.php file and upload on your server. 
  
- Check that the "server/conf", "server/logs" and "server/users" folders are writeable by apache user.
+ Check that the "data" and its children folders are writeable by apache user.
  
  For further configuration, read below.
  

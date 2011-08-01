@@ -1,5 +1,5 @@
 <?php
-require_once("server/conf/base.conf.php"); 
+require_once("conf/base.conf.php"); 
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php"); 
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Plugin.php"); 
 require_once(AJXP_BIN_FOLDER."/class.AJXP_PluginsService.php"); 
@@ -10,10 +10,10 @@ require_once(AJXP_BIN_FOLDER."/class.UserSelection.php");
 require_once(AJXP_BIN_FOLDER."/class.AbstractAccessDriver.php"); 
 require_once(AJXP_BIN_FOLDER."/class.HTMLWriter.php"); 
 require_once(AJXP_BIN_FOLDER."/class.RecycleBinManager.php"); 
-require_once("server/conf/conf.php"); 
+require_once("conf/conf.php"); 
 
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/server/conf");
+$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/conf");
 
 
 $fakes = '

@@ -200,7 +200,7 @@ class AJXP_Controller{
 			$cmd .= " --$key=".escapeshellarg($value);
 		}
 		if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
-			$tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "server","tmp", md5(time()).".bat"));
+			$tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "data","tmp", md5(time()).".bat"));
             $cmd .= " > ".$logFile;
 			$cmd .= "\n DEL $tmpBat";
 			AJXP_Logger::debug("Writing file $cmd to $tmpBat");

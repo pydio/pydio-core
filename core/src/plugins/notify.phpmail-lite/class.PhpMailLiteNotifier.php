@@ -39,7 +39,7 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 		
 	public function preProcess($action, $httpVars, $fileVars){
 		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["TO"])){
-			throw new Exception("Cannot find configuration for plugin notify.phpmail-lite! Make sur the .inc file was dropped inside the /server/conf/ folder!");
+			throw new Exception("Cannot find configuration for plugin notify.phpmail-lite! Make sur the .inc file was dropped inside the /conf/ folder!");
 		}
 		require("lib/class.phpmailer-lite.php");
 		
