@@ -74,6 +74,10 @@ define("PUBLIC_DOWNLOAD_FOLDER", realpath(dirname(__FILE__)."/../../public")); /
 // Example : http://www.mypublicdomain.com/publicdata [NO TRAILING SLASH!]
 define("PUBLIC_DOWNLOAD_URL", "");
 
+// Allow the sharing of folders accross users : this will "advertise" the list of existing
+// users in the "Share" dialog, so may be seen as a security weakness depending on your politic.
+define("AJXP_ALLOW_CROSSUSERS_SHARING", true);
+
 
 define("HTTPS_POLICY_FILE", "");
 
@@ -102,6 +106,11 @@ define("AJXP_TMP_DIR", "");
 //require_once AJXP_INSTALL_PATH."/plugins/hook.demo/class.HookDemo.php";
 //AJXP_Controller::registerIncludeHook("vars.filter", array("HookDemo", "filterVars"));
 
+/********************************************
+ * USE COMMANDLINE TO TRIGGER ACTIONS IN BACKGROUND
+ ********************************************/
+define("AJXP_CMDLINE_ACTIVE", true);
+
 /*********************************************************/
 /* PLUGINS DEFINITIONS
 /* Drivers will define how the application will work. For 
@@ -126,9 +135,9 @@ $PLUGINS = array(
 			"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/server/users",
 			/*
 			"CUSTOM_DATA"			=> array(
-				"email"	=> "Email",
-				"country" => "Country"
-			)
+					"email"	=> "Email", 
+					"country" => "Country"
+				)
 			*/
 			)
 	),
@@ -167,7 +176,7 @@ $PLUGINS = array(
 	// Do not use wildcard for uploader, to keep them in a given order
 	// Warning, do not add the "meta." plugins, they are automatically
 	// detected and activated by the application.
-	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.*")
+	"ACTIVE_PLUGINS" => array("editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.*", "shorten.*")
 );
 if(AJXP_Utils::userAgentIsMobile()){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
@@ -178,8 +187,6 @@ if(AJXP_Utils::userAgentIsMobile()){
 if(isSet($_COOKIE["AJXP_GUI"])){
 	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.".$_COOKIE["AJXP_GUI"];
 }
-
-
 /*********************************************************/
 /* BASIC REPOSITORY CONFIGURATION.
 /* Use the GUI to add new repositories to explore!
@@ -205,11 +212,13 @@ $REPOSITORIES[0] = array(
 				"meta_labels"		=> "Test Key,Rating,Label"
 			)
 		*/
+            "index.lucene" => array(
+                "index_meta_fields" => ""
+            )
 		)
 	),
-
+	
 );
-
 
 // DO NOT REMOVE THIS!
 // SHARE ELEMENTS
