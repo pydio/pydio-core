@@ -38,6 +38,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>				
+		<action name="get_plugin_manifest">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>				
 		<action name="create_user">
 			<gui text="297" title="298" src="yast_user_add.png" accessKey="create_user_accesskey" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
@@ -263,7 +268,7 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,ajxp_plugin" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -284,7 +289,17 @@
 								ajaxplorer.actionBar.configEditor.loadUser(meta.get("text"));
 							}
 						};
-						modal.showDialogForm('Edit Online', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);					
+						modal.showDialogForm('Edit Online', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);
+					}else if(mime == "ajxp_plugin"){
+						var loadFunc = function(oForm){
+							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+							if(!ajaxplorer.actionBar.configEditor){
+								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+							}						
+							ajaxplorer.actionBar.configEditor.setForm(oForm);
+							ajaxplorer.actionBar.configEditor.loadPluginConfig(node.getLabel());							
+						};
+						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc);
 					}else{
 						var loadFunc = function(oForm){
 							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);

@@ -819,6 +819,35 @@ ConfigEditor = Class.create({
 		}.bind(this);
 		connexion.sendAsync();		
 	},
+	
+	loadPluginConfig : function(pluginId){
+		console.log(pluginId);
+		var params = new Hash();		
+		params.set("get_action", "get_plugin_manifest");
+		params.set("plugin_id", pluginId);
+		var connexion = new Connexion();
+		connexion.setParameters(params);
+		connexion.onComplete = function(transport){
+			var xmlData = transport.responseXML;
+			var params = XPathSelectNodes(xmlData, "//global_param");
+			var optionsPane = this.form.select('[id="options_pane"]')[0];
+			
+			var driverParamsHash = $A([]);
+			for(var i=0;i<params.length;i++){
+				var hashedParams = this.formManager.parameterNodeToHash(params[i]);
+				driverParamsHash.push(hashedParams);
+			}
+			var form = new Element('div', {className:'driver_form'});
+			optionsPane.update("<legend>Plugin Configurations</legend>");			
+			optionsPane.insert({bottom:form});
+			this.formManager.createParametersInputs(form, driverParamsHash);
+			
+			modal.refreshDialogPosition();
+			modal.refreshDialogAppearance();
+			ajaxplorer.blurAll();
+		}.bind(this);
+		connexion.sendAsync();		
+	},
 
 	feedRepositoryForm: function(xmlData, metaTab){
 		

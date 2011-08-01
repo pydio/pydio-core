@@ -58,6 +58,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 				$rootNodes = array(
+					"plugins"	   => array("LABEL" => "Plugins", "ICON" => "folder_red.png"),
 					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
 					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
 					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "user_group_new.png"),
@@ -78,6 +79,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$this->listUsers();
 					}else if($strippedDir == "roles"){
 						$this->listRoles();
+					}else if($strippedDir == "plugins"){
+						$this->listPlugins();
 					}else if($strippedDir == "repositories"){
 						$this->listRepositories();
 					}else if($strippedDir == "logs"){
@@ -850,6 +853,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 			break;			
 			
+			case "get_plugin_manifest" : 
+
+				$ajxpPlugin = AJXP_PluginsService::getInstance()->getPluginById($httpVars["plugin_id"]);
+				AJXP_XMLWriter::header("admin_data");
+				echo($ajxpPlugin->getManifestRawContent());
+				AJXP_XMLWriter::close("admin_data");
+				
+			break;
+			
+			
 			default:
 			break;
 		}
@@ -857,6 +870,19 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		return;
 	}
 	
+	
+	function listPlugins(){
+		$pServ = AJXP_PluginsService::getInstance();
+		$plugins = $pServ->getActivePlugins();
+		foreach($plugins as $pluginId => $status){
+			$meta = array(
+				"icon" 		=> "folder.png",
+				"ajxp_mime" => "ajxp_plugin",
+				"is_active"	=> $status?"true":"false"
+			);
+			AJXP_XMLWriter::renderNode("/plugins/".$pluginId, $pluginId, true, $meta);
+		}
+	}
 	
 	function listUsers(){
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.users">
