@@ -57,9 +57,6 @@ class AuthService
 	
 	
 	static function generateSecureToken(){
-		if(isSet($_SESSION["SECURE_TOKEN"]) && isSet($_SESSION["USE_EXISTING_TOKEN_IF_EXISTS"])){
-			return $_SESSION["SECURE_TOKEN"];
-		}
 		$_SESSION["SECURE_TOKEN"] = md5(time());
 		return $_SESSION["SECURE_TOKEN"];
 	}
@@ -207,7 +204,6 @@ class AuthService
 			}
 		}
 		$_SESSION["AJXP_USER"] = $user;
-		$_SESSION["COUNT"] = 0;
 		if($authDriver->autoCreateUser() && !$user->storageExists()){
 			$user->save();
 		}
@@ -225,7 +221,6 @@ class AuthService
 		if(isSet($_SESSION["AJXP_USER"])){
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
-			unset($_SESSION["COUNT"]);
 			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
 				AJXP_Safe::clearCredentials();
 			}
@@ -266,7 +261,6 @@ class AuthService
         if($logUserOut && isSet($_SESSION["AJXP_USER"])){
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
-			unset($_SESSION["COUNT"]);
 			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
 				AJXP_Safe::clearCredentials();
 			}			
