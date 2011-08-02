@@ -658,7 +658,7 @@ Class.create("Ajaxplorer", {
 	},
 	
 	getPluginConfigs : function(pluginQuery){
-		var properties = XPathSelectNodes(this._registry, "plugins/"+pluginQuery+"/plugin_configs/property");
+		var properties = XPathSelectNodes(this._registry, 'plugins/'+pluginQuery+'/plugin_configs/property | plugins/ajxpcore[@id="core.'+pluginQuery+'"]/plugin_configs/property');
 		var configs = $H();
 		for(var i = 0; i<properties.length; i++){
 			var propNode = properties[i];

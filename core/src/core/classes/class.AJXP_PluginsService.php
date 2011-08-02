@@ -132,7 +132,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 		$plugin = $this->instanciatePluginClass($plugin);
 		$options = $this->confStorage->loadPluginConfig($plugType, $plugin->getName());
 		$plugin->loadConfigs($options);
-		$plugin->publishConfigs();
 		$this->registry[$plugType][$plugin->getName()] = $plugin;
 		$plugin->loadingState = "loaded";
 		//print("</div>");
