@@ -315,6 +315,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		return $this->activePlugins;	
  	}
  	
+ 	public function getDetectedPlugins(){
+ 		return $this->registry;
+ 	}
+ 	
  	public function getStreamWrapperPlugins(){
  		return $this->streamWrapperPlugins;
  	}

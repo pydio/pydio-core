@@ -901,25 +901,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	function listPlugins($dir){
 		$pServ = AJXP_PluginsService::getInstance();
 		$plugins = $pServ->getActivePlugins();
+		$types = $pServ->getDetectedPlugins();
 		if($dir == "/plugins"){
-			// Grab all types
-			$types = array();			
-			foreach($plugins as $pluginId => $status){
-				$type = array_shift(explode(".", $pluginId));
-				if($type == "core") continue;
-				$types[$type] = $type;
-			}
+			unset($types["core"]);
 			$meta = array(
-				"icon" 		=> "preferences_desktop",	
+				"icon" 		=> "preferences_desktop.png",	
 				"ajxp_mime" => "ajxp_plugin",				
 				"is_active"	=> "true",
 				"plugin_id" => "core.ajaxplorer"
 			);
 			AJXP_XMLWriter::renderNode("/plugins/core.ajaxplorer", "AjaXplorer Core", true, $meta);							
-			foreach( $types as $t){
+			foreach( $types as $t => $tPlugs){
 				$meta = array(
 					"icon" 		=> "folder_development.png",					
-					"is_active"	=> $status?"true":"false",
+					//"is_active"	=> $status?"true":"false",
 					"plugin_id" => $t
 				);
 				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t)." plugins", false, $meta);				
@@ -928,25 +923,22 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			$split = explode("/", $dir);
 			if(empty($split[0])) array_shift($split);
 			$type = $split[1];
-			foreach($plugins as $pluginId => $status){
-				list($pType, $pId) = (explode(".", $pluginId));				
-				if($pType != $type && !($pType == "core" && $pId == $type)) {
-					continue;
-				}
-				//$plug = $pServ->findPluginById($pluginId);
-				//if(!count($plug->getConfigsDefinitions())) continue;
+			if(isSet($types["core"][$type])){
+				$types[$type]["__core__"] = $types["core"][$type];
+			}
+			foreach($types[$type] as $pId => $pObject){
 				$meta = array(				
-					"icon" 		=> ($pType == "core"?"preferences_desktop.png":"preferences_plugin.png"),
+					"icon" 		=> ($pId == "__core__"?"preferences_desktop.png":"preferences_plugin.png"),
 					"ajxp_mime" => "ajxp_plugin",
-					"is_active"	=> $status?"true":"false",
-					"plugin_id" => $pluginId
+					//"is_active"	=> $status?"true":"false",
+					"plugin_id" => $pObject->getId()
 				);
-				if($pType == "core"){
-					$label = "Global options for '$pId' plugins";
+				if($pId == "__core__"){
+					$label = "Global options for '$type' plugins";
 				}else{
-					$label = $pluginId;
+					$label = $pObject->getId();
 				}
-				AJXP_XMLWriter::renderNode("/plugins/".$pluginId, $label, true, $meta);
+				AJXP_XMLWriter::renderNode("/plugins/".$label, $label, true, $meta);
 			}
 		}
 	}
