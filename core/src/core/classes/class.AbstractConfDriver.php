@@ -58,7 +58,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * @param String $pluginType
 	 * @param String $pluginId
 	 */
-	function loadPluginConfig($pluginType, $pluginId){
+	function loadPluginConfig($pluginType, $pluginName){
 		$options = array();
 		if(is_file(AJXP_CONF_PATH."/conf.$pluginType.inc")){
 			include AJXP_CONF_PATH."/conf.$pluginType.inc";
@@ -69,8 +69,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				unset($DRIVER_CONF);
 			}
 		}
-		if(is_file(AJXP_CONF_PATH."/conf.$pluginType.$pluginId.inc")){
-			include AJXP_CONF_PATH."/conf.$pluginType.$pluginId.inc";
+		if(is_file(AJXP_CONF_PATH."/conf.$pluginType.$pluginName.inc")){
+			include AJXP_CONF_PATH."/conf.$pluginType.$pluginName.inc";
 			if(!empty($DRIVER_CONF)){
 				foreach($DRIVER_CONF as $key=>$value){
 					$options[$key] = $value;
@@ -78,11 +78,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				unset($DRIVER_CONF);
 			}
 		}
-		$this->_loadPluginConfig($pluginType, $pluginId, $options);
+		$this->_loadPluginConfig($pluginType.".".$pluginName, $options);
 		return $options;
 	}
 
-	abstract function _loadPluginConfig($pluginType, $pluginId, &$options);
+	abstract function _loadPluginConfig($pluginId, &$options);
 	
 	/**
 	 * 
@@ -90,7 +90,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * @param String $pluginId
 	 * @param String $configHash
 	 */
-	abstract function savePluginConfig($pluginType, $pluginId, $configHash);
+	abstract function savePluginConfig($pluginId, $options);
 	
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY

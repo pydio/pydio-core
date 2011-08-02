@@ -72,7 +72,7 @@ class sqlConfDriver extends AbstractConfDriver {
 		}
 	}
 	
-	function _loadPluginConfig($pluginType, $pluginId, &$options){
+	function _loadPluginConfig($pluginId, &$options){
 		
 	}
 	
@@ -80,9 +80,9 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * 
 	 * @param String $pluginType
 	 * @param String $pluginId
-	 * @param String $configHash
+	 * @param String $options
 	 */
-	function savePluginConfig($pluginType, $pluginId, $configHash){
+	function savePluginConfig($pluginId, $options){
 		
 	}
 	
