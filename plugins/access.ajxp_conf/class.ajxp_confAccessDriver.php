@@ -859,15 +859,30 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header("admin_data");
 				echo($ajxpPlugin->getManifestRawContent());
 				$values = $ajxpPlugin->getConfigs();
-				echo("<plugin_settings_values>");
-				foreach($values as $key => $value){
-					echo("<param name=\"$key\" value=\"$value\"/>");
+				if(is_array($values) && count($values)){
+					echo("<plugin_settings_values>");
+					foreach($values as $key => $value){
+						echo("<param name=\"$key\" value=\"$value\"/>");
+					}
+					echo("</plugin_settings_values>");				
 				}
-				echo("</plugin_settings_values>");
 				AJXP_XMLWriter::close("admin_data");
 				
 			break;
 			
+			case "edit_plugin_options":
+				
+				$options = array();
+				$this->parseParameters($httpVars, $options);
+				$confStorage = ConfService::getConfStorageImpl();
+				$confStorage->savePluginConfig($httpVars["plugin_id"], $options);
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
+				AJXP_XMLWriter::reloadDataNode();
+				AJXP_XMLWriter::close();
+				
+				
+			break;
 			
 			default:
 			break;

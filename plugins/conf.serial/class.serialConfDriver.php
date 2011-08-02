@@ -43,6 +43,7 @@ class serialConfDriver extends AbstractConfDriver {
 	var $rolesSerialFile;
 	
 	var $aliasesIndexFile;
+	var $pluginsConfigsFile;
 	
 	function init($options){
 		parent::init($options);
@@ -50,6 +51,7 @@ class serialConfDriver extends AbstractConfDriver {
 		$this->usersSerialDir = AJXP_VarsFilter::filter($options["USERS_DIRPATH"]);
 		$this->rolesSerialFile = AJXP_VarsFilter::filter($options["ROLES_FILEPATH"]);
 		$this->aliasesIndexFile = dirname($this->repoSerialFile)."/aliases.ser";
+		$this->pluginsConfigsFile = dirname($this->repoSerialFile)."/plugins_configs.ser";
 	}
 	
 	function performChecks(){
@@ -75,12 +77,19 @@ class serialConfDriver extends AbstractConfDriver {
 	}
 	
 	// SAVE / LOAD PLUGINS CONF
-	function _loadPluginConfig($pluginType, $pluginId, &$options){
-		
+	function _loadPluginConfig($pluginId, &$options){
+		$data = AJXP_Utils::loadSerialFile($this->pluginsConfigsFile);
+		if(isSet($data[$pluginId]) && is_array($data[$pluginId])){
+			foreach ($data[$pluginId] as $key => $value){
+				$options[$key] = $value;
+			}
+		}
 	}
 	
-	function savePluginConfig($pluginType, $pluginId, $configHash){
-		
+	function savePluginConfig($pluginId, $options){
+		$data = AJXP_Utils::loadSerialFile($this->pluginsConfigsFile);
+		$data[$pluginId] = $options;
+		AJXP_Utils::saveSerialFile($this->pluginsConfigsFile, $data);
 	}
 	
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY

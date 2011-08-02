@@ -299,7 +299,19 @@
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
 							ajaxplorer.actionBar.configEditor.loadPluginConfig(node.getMetadata().get("plugin_id"));							
 						};
-						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc);
+						var closeFunc = function(oForm){
+							var toSubmit = new Hash();
+							var configEditor = ajaxplorer.actionBar.configEditor;
+							toSubmit.set("plugin_id", node.getMetadata().get("plugin_id"));
+							var missing = configEditor.formManager.serializeParametersInputs(oForm, toSubmit, 'DRIVER_OPTION_');
+							if(missing){
+								configEditor.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
+							}else{
+								configEditor.submitForm('edit', 'edit_plugin_options', toSubmit);							
+								hideLightBox();
+							}
+						};
+						modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, closeFunc);
 					}else{
 						var loadFunc = function(oForm){
 							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
