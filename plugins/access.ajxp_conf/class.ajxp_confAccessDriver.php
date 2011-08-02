@@ -858,10 +858,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$ajxpPlugin = AJXP_PluginsService::getInstance()->getPluginById($httpVars["plugin_id"]);
 				AJXP_XMLWriter::header("admin_data");
 				echo($ajxpPlugin->getManifestRawContent());
+				$definitions = $ajxpPlugin->getConfigsDefinitions();
 				$values = $ajxpPlugin->getConfigs();
 				if(is_array($values) && count($values)){
 					echo("<plugin_settings_values>");
 					foreach($values as $key => $value){
+						if($definitions[$key]["type"] == "array"){
+							$value = implode(",", $value);
+						}else if($definitions[$key]["type"] == "boolean"){
+							$value = ($value === true?"true":"false");
+						}
 						echo("<param name=\"$key\" value=\"$value\"/>");
 					}
 					echo("</plugin_settings_values>");				
@@ -927,6 +933,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if($pType != $type && !($pType == "core" && $pId == $type)) {
 					continue;
 				}
+				//$plug = $pServ->findPluginById($pluginId);
+				//if(!count($plug->getConfigsDefinitions())) continue;
 				$meta = array(				
 					"icon" 		=> ($pType == "core"?"preferences_desktop.png":"preferences_plugin.png"),
 					"ajxp_mime" => "ajxp_plugin",
@@ -1229,6 +1237,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$value = ($value == "true"?true:false);
 					}else if($type == "integer"){
 						$value = intval($value);
+					}else if($type == "array"){
+						$value = explode(",", $value);
 					}else if($type == "password" && $userId!=null){						
 	                    if (trim($value != "") && function_exists('mcrypt_encrypt'))
 	                    {

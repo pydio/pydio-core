@@ -51,6 +51,7 @@ class AJXP_Plugin implements Serializable{
 	protected $registryContributions = array();
 	protected $options; // can be passed at init time
 	protected $pluginConf; // can be passed at load time
+	protected $pluginConfDefinition;
 	protected $dependencies;
 	protected $mixins = array();
 	public $loadingState = "";
@@ -77,7 +78,7 @@ class AJXP_Plugin implements Serializable{
 		"actions", 
 		"registryContributions", 
 		"mixins",
-		"options", "pluginConf", "dependencies", "loadingState", "manifestXML");
+		"options", "pluginConf", "pluginConfDefinition", "dependencies", "loadingState", "manifestXML");
 	
 	/**
 	 * Construction method
@@ -145,6 +146,7 @@ class AJXP_Plugin implements Serializable{
 		$this->registryContributions[]=$pluginContrib->documentElement;
 		$this->parseSpecificContributions($pluginContrib->documentElement);
 	}
+	
 	protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array()){
 		$contribDoc = new DOMDocument();
 		$contribDoc->load(AJXP_INSTALL_PATH."/".$xmlFile);
@@ -332,38 +334,49 @@ class AJXP_Plugin implements Serializable{
 		}
 		return $deps;
 	}
+	
+	protected function loadConfigsDefinitions(){
+		$params = $this->xPath->query("//server_settings/global_param");
+		$this->pluginConf = array();
+		foreach ($params as $xmlNode){
+			$paramNode = $this->nodeAttrToHash($xmlNode);
+			$this->pluginConfDefinition[$paramNode["name"]] = $paramNode;
+			if(isset($paramNode["default"])){
+				$this->pluginConf[$paramNode["name"]] = $paramNode["default"];
+			}
+		}					
+	}
+	
+	public function getConfigsDefinitions(){
+		return $this->pluginConfDefinition;
+	}
+	
 	public function loadConfigs($configData){
-		if(isSet($this->pluginConf)) $this->pluginConf = array_merge($this->pluginConf, $configData);
-		else $this->pluginConf = $configData;
-	}
-	public function publishConfigs(){
-		// TODO : check manifest, and publish values accordingly
-	}
-	public function getConfigs(){
-		return $this->pluginConf;
-	}
-	/*
-	public function loadConfig($configFile, $format){		
-		if($format == "inc"){
-			if(is_file($configFile)){
-				include($configFile);
-				if(isSet($DRIVER_CONF)) {
-					if(isSet($this->pluginConf) && is_array($this->pluginConf)){
-						$this->pluginConf = array_merge($this->pluginConf, $DRIVER_CONF);
-					}else{
-						$this->pluginConf = $DRIVER_CONF;
-					}
-				}
-				if(isSet($CLIENT_EXPOSED_CONFIGS)){
-					foreach ($CLIENT_EXPOSED_CONFIGS as $configName){
-						if(!array_key_exists($configName, $this->pluginConf)) continue;
-						$this->exposeConfigInManifest($configName, $this->pluginConf[$configName]);
-					}
-				}
+		// PARSE DEFINITIONS AND LOAD DEFAULT VALUES
+		if(!isSet($this->pluginConf)) {
+			$this->loadConfigsDefinitions();
+		}
+		// MERGE WITH PASSED CONFIGS
+		$this->pluginConf = array_merge($this->pluginConf, $configData);
+		
+		// PUBLISH IF NECESSARY
+		foreach ($this->pluginConf as $key => $value){
+			if(isSet($this->pluginConfDefinition[$key]) && isSet($this->pluginConfDefinition[$key]["expose"]) && $this->pluginConfDefinition[$key]["expose"] == "true"){
+				$this->exposeConfigInManifest($key, $value);
 			}
 		}
 	}
-	*/
+			
+	public function getConfigs(){
+		$core = AJXP_PluginsService::getInstance()->findPlugin("core", $this->type);
+		if(!empty($core)){
+			$coreConfs = $core->getConfigs();
+			return array_merge($coreConfs, $this->pluginConf);
+		}else{
+			return $this->pluginConf;
+		}
+	}
+	
 	public function getClassFile(){
 		$files = $this->xPath->query("class_definition");
 		if(!$files->length) return false;

@@ -821,7 +821,6 @@ ConfigEditor = Class.create({
 	},
 	
 	loadPluginConfig : function(pluginId){
-		console.log(pluginId);
 		var params = new Hash();		
 		params.set("get_action", "get_plugin_manifest");
 		params.set("plugin_id", pluginId);

@@ -76,7 +76,7 @@ Class.create("FormManager", {
 			}
 			var element;
 			var disabledString = (disabled?' disabled="true" ':'');
-			if(type == 'string' || type == 'integer'){
+			if(type == 'string' || type == 'integer' || type == 'array'){
 				element = '<input type="text" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
 		    }else if(type == 'password'){
 				element = '<input type="password" autocomplete="off" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
