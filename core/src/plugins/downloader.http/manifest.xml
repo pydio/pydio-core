@@ -88,7 +88,7 @@
 							root = root.substring(0,root.lastIndexOf("/") + 1);
 							var repository = ajaxplorer.user.getActiveRepository();
 							var folder = ajaxplorer.getContextNode().getPath();
-							var bmletValue = "javascript:(function(){window.ajxp_bm_target='"+root+"',window.ajxp_bm_repository_id='"+repository+"', window.ajxp_bm_folder='"+folder+"'; var d=document,s=d.createElement('scr'+'ipt'),b=d.body,l=d.location;s.setAttribute('src','http://localhost/ajaxplorer/client/js/bookmarklet/ajxp.js?t='+(new Date().getTime()));b.appendChild(s)})();";
+							var bmletValue = "javascript:(function(){window.ajxp_bm_target='"+root+"',window.ajxp_bm_repository_id='"+repository+"', window.ajxp_bm_folder='"+folder+"'; var d=document,s=d.createElement('scr'+'ipt'),b=d.body,l=d.location;s.setAttribute('src','"+root+"plugins/downloader.http/bookmarklet/ajxp.js?t='+(new Date().getTime()));b.appendChild(s)})();";
 							$('bookmarklet_link').setAttribute("href", bmletValue);
 							var basename = getBaseName(folder);
 							if(basename == ""){
