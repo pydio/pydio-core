@@ -70,7 +70,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	
 	function init($options){
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
-        if($this->slaveMode && ALLOW_GUEST_BROWSING){
+        if($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
         	// Make sure "login" is disabled, or it will re-appear if GUEST browsing is enabled!
         	// OLD WAY : unset($this->actions["login"]);
         	// NEW WAY : Modify manifest dynamically (more coplicated...)

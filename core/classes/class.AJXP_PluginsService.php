@@ -503,6 +503,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		} 		
  	}
  	
+ 	/**
+ 	 * 
+ 	 * @param string $type
+ 	 * @param string $name
+ 	 * @return AJXP_Plugin
+ 	 */
  	public static function findPlugin($type, $name){
  		$instance = self::getInstance();
  		return $instance->getPluginByTypeName($type, $name);

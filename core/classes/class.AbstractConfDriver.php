@@ -42,7 +42,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
-		if(!AJXP_WEBDAV_ENABLE && $contribNode->nodeName == "actions"){
+		if(!ConfService::getCoreConf("WEBDAV_ENABLE") && $contribNode->nodeName == "actions"){
 			unset($this->actions["webdav_preferences"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="webdav_preferences"]', $contribNode);
@@ -296,13 +296,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$webdavActive = false;
 				$passSet = false;
 				// Detect http/https and host
-				if(defined("AJXP_WEBDAV_BASEHOST")){
-					$baseURL = AJXP_WEBDAV_BASEHOST;
+				if(ConfService::getCoreConf("WEBDAV_BASEHOST") != ""){
+					$baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
 				}else{
 					$http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
 					$baseURL = $http_mode . $_SERVER['HTTP_HOST'];
 				}				
-				$webdavBaseUrl = $baseURL.AJXP_WEBDAV_BASEURI."/";
+				$webdavBaseUrl = $baseURL.ConfService::getCoreConf("WEBDAV_BASEURI")."/";
 				if(isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])){
 					$davData = $userObject->getPref("AJXP_WEBDAV_DATA");
 					if(!empty($httpVars["activate"])){

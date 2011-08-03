@@ -28,7 +28,7 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
 
     public function authenticateAnonymous( ezcWebdavAnonymousAuth $data )
     {
-    	if(!ALLOW_GUEST_BROWSING){
+    	if(!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
 	        return false;
     	}
     	AuthService::logUser(null, null);
@@ -88,7 +88,7 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
     		if($res === false){
     			return false;
     		}
-    		if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
+    		if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
     			AJXP_Safe::storeCredentials($data->username, $this->_decodePassword($webdavData["PASS"], $data->username));
     		}
     		return true;

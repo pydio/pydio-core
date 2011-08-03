@@ -220,24 +220,33 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["ajxpResourcesFolder"] = AJXP_THEME_FOLDER;
 				$config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
 				$config["zipEnabled"] = ConfService::zipEnabled();
-				$config["multipleFilesDownloadEnabled"] = !DISABLE_ZIP_CREATION;
-				$config["flashUploaderEnabled"] = ConfService::getConf("UPLOAD_ENABLE_FLASH");
-				$config["customWording"] = ConfService::getConf("CUSTOM_WORDING");
+				$config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
+				$config["customWording"] = array(
+		        	"welcomeMessage" => $this->pluginConf["CUSTOM_WELCOME_MESSAGE"],
+		        	"title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
+		        	"icon"			 => $this->pluginConf["CUSTOM_ICON"],
+		        	"iconWidth"		 => $this->pluginConf["CUSTOM_ICON_WIDTH"],
+		        	"titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
+		        );
 				
-				if(!ConfService::getConf("UPLOAD_ENABLE_FLASH")){
-				    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
-				    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
-				    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
-				    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");
-					$config["htmlMultiUploaderOptions"] = array("282"=>$UploadMaxSize,"284"=>$confTotalNumber);
-				}
-				$config["filenamesMaxLength"] = intval(ConfService::getConf("MAX_CHAR"));
+			    $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+		        $UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
+		        if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+			    $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+				$config["htmlMultiUploaderOptions"] = array("282"=>$UploadMaxSize,"284"=>$confTotalNumber);
+					
+				$config["filenamesMaxLength"] = intval(ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 				$config["usersEnabled"] = AuthService::usersEnabled();
 				$config["loggedUser"] = (AuthService::getLoggedUser()!=null);
 				$config["currentLanguage"] = ConfService::getLanguage();
-				$config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
-				$config["client_timeout"] = ConfService::getConf("CLIENT_TIMEOUT_TIME");
-				$config["client_timeout_warning"] = ConfService::getConf("CLIENT_TIMEOUT_WARNING");
+				$config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));				
+				if(!isSet($this->pluginConf["CLIENT_TIMEOUT_TIME"]) || $this->pluginConf["CLIENT_TIMEOUT_TIME"] == ""){
+					$to = $config["session_timeout"]; 
+				}else{
+					$to = $to = $this->pluginConf["CLIENT_TIMEOUT_TIME"];
+				}
+				$config["client_timeout"] = $to;
+				$config["client_timeout_warning"] = $this->pluginConf["CLIENT_TIMEOUT_WARN"];
 				$config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
 				$config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
 				$config["ajxpVersion"] = AJXP_VERSION;
@@ -245,14 +254,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				if(stristr($_SERVER["HTTP_USER_AGENT"], "msie 6")){
 					$config["cssResources"] = array("css/pngHack/pngHack.css");
 				}
-				if(defined("GOOGLE_ANALYTICS_ID") && GOOGLE_ANALYTICS_ID != "") {
+				if(!empty($this->pluginConf['GOOGLE_ANALYTICS_ID'])) {
 					$config["googleAnalyticsData"] = array(
-						"id"=>GOOGLE_ANALYTICS_ID,
-						"domain" => GOOGLE_ANALYTICS_DOMAIN,
-						"event" => GOOGLE_ANALYTICS_EVENT);
+						"id"=> 		$this->pluginConf['GOOGLE_ANALYTICS_ID'],
+						"domain" => $this->pluginConf['GOOGLE_ANALYTICS_DOMAIN'],
+						"event" => 	$this->pluginConf['GOOGLE_ANALYTICS_EVENT']);
 				}
 				$config["i18nMessages"] = ConfService::getMessages();
-				$config["password_min_length"] = (defined('AJXP_PASSWORD_MINLENGTH')?AJXP_PASSWORD_MINLENGTH:8);
+				$config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
 				$config["SECURE_TOKEN"] = AuthService::generateSecureToken();
 				$config["streaming_supported"] = "true";
 				header("Content-type:application/json;charset=UTF-8");

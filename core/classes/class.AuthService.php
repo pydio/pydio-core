@@ -41,7 +41,7 @@ class AuthService
 	
 	static function usersEnabled()
 	{
-		return ENABLE_USERS;
+		return ConfService::getCoreConf("ENABLE_USERS", "auth");
 	}
 	
 	static function changePasswordEnabled()
@@ -144,7 +144,7 @@ class AuthService
 		if($user_id == null)
 		{
 			if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) return 1; 
-			if(ALLOW_GUEST_BROWSING)
+			if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth"))
 			{
 				$authDriver = ConfService::getAuthDriverImpl();
 				if(!$authDriver->userExists("guest"))
@@ -185,7 +185,7 @@ class AuthService
         AuthService::setBruteForceLoginArray($loginAttempt);
 
         // Setting session credentials if asked in config
-        if(ConfService::getConf("SESSION_SET_CREDENTIALS")) {
+        if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
         	list($authId, $authPwd) = $authDriver->filterCredentials($user_id, $pwd);
         	AJXP_Safe::storeCredentials($authId, $authPwd);
         }
@@ -221,7 +221,7 @@ class AuthService
 		if(isSet($_SESSION["AJXP_USER"])){
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
-			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
+			if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
 				AJXP_Safe::clearCredentials();
 			}
 		}
@@ -261,7 +261,7 @@ class AuthService
         if($logUserOut && isSet($_SESSION["AJXP_USER"])){
 			AJXP_Logger::logAction("Log Out");
 			unset($_SESSION["AJXP_USER"]);
-			if(ConfService::getConf("SESSION_SET_CREDENTIALS")){
+			if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
 				AJXP_Safe::clearCredentials();
 			}			
 		}
@@ -278,7 +278,7 @@ class AuthService
 			if($loggedUser->canRead($rootDirIndex."") || $loggedUser->canWrite($rootDirIndex."")) {
 				// Warning : do not grant access to admin repository to a non admin, or there will be 
 				// an "Empty Repository Object" error.
-				if($rootDirObject->getAccessType()=="ajxp_conf" && ENABLE_USERS && !$loggedUser->isAdmin()){
+				if($rootDirObject->getAccessType()=="ajxp_conf" && AuthService::usersEnabled() && !$loggedUser->isAdmin()){
 					continue;
 				}
 				if($rootDirObject->getAccessType() == "ajxp_shared" && count($repoList) > 1){
@@ -346,7 +346,7 @@ class AuthService
 	
 	static function updatePassword($userId, $userPass)
 	{
-		if(defined('AJXP_PASSWORD_MINLENGTH') && strlen($userPass) < AJXP_PASSWORD_MINLENGTH){
+		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")){
 			$messages = ConfService::getMessages();
 			throw new Exception($messages[378]);
 		}
@@ -358,7 +358,7 @@ class AuthService
 	
 	static function createUser($userId, $userPass, $isAdmin=false)
 	{
-		if(defined('AJXP_PASSWORD_MINLENGTH') && strlen($userPass) < AJXP_PASSWORD_MINLENGTH && $userId != "guest"){
+		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest"){
 			$messages = ConfService::getMessages();
 			throw new Exception($messages[378]);
 		}
@@ -406,7 +406,7 @@ class AuthService
 		$users = $authDriver->listUsers();
 		foreach (array_keys($users) as $userId)
 		{
-			if(($userId == "guest" && !ALLOW_GUEST_BROWSING) || $userId == "ajxp.admin.users" || $userId == "") continue;
+			if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
 			$allUsers[$userId] = $confDriver->createUserObject($userId);
 		}
 		return $allUsers;

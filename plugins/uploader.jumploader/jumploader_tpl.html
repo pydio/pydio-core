@@ -1,11 +1,9 @@
 <?php 
-    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
-    $UploadMaxPostSize = AJXP_Utils::convertBytes(ini_get('post_max_size'));
-    if($UploadMaxPostSize > 0 && $UploadMaxPostSize < $UploadMaxSize) $UploadMaxSize = $UploadMaxPostSize;
-    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
-    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
-    $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
-    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");    
+    $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+	$UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
+	if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+    $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
+    $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
     
 	$repository = ConfService::getRepository();
 	$accessType = $repository->getAccessType();

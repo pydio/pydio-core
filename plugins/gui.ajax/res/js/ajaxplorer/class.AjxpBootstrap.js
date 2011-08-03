@@ -170,7 +170,6 @@ Class.create("AjxpBootstrap", {
 		}
 		window.zipEnabled = this.parameters.get("zipEnabled");
 		window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
-		window.flashUploaderEnabled = this.parameters.get("flashUploaderEnabled");			
 		document.fire("ajaxplorer:boot_loaded");
 		window.ajaxplorer = new Ajaxplorer(this.parameters.get("EXT_REP")||"", this.parameters.get("usersEnabled"), this.parameters.get("loggedUser"));
 		if(this.parameters.get("currentLanguage")){

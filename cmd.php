@@ -161,7 +161,7 @@ $ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $ajxpDriver->init(ConfService::getRepository());
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
-if(!AuthService::usersEnabled() || ALLOW_GUEST_BROWSING || AuthService::getLoggedUser()!=null){
+if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null){
 	$confDriver = ConfService::getConfStorageImpl();
 	$Driver = ConfService::loadRepositoryDriver();
 }

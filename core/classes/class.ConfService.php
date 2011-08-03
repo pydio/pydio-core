@@ -61,41 +61,17 @@ class ConfService
 	{
 		include($confFile);
 		// INIT AS GLOBAL
-		if(!isset($langue) || $langue=="") {$langue=$default_language;}
-		$this->configs["LANGUE"] = $langue;
-		if(isSet($available_languages)){
-			$this->configs["AVAILABLE_LANG"] = $available_languages;
-		}else{
-			$this->configs["AVAILABLE_LANG"] = self::listAvailableLanguages();
-		}
-		$this->configs["USE_HTTPS"] = $use_https;
+		$this->configs["LANGUE"] = $default_language;		
+		$this->configs["AVAILABLE_LANG"] = self::listAvailableLanguages();
 		if(isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"){
 			$this->configs["USE_HTTPS"] = true;
 		}
 		if($this->configs["USE_HTTPS"]){
 			ini_set("session.cookie_secure", true);
 		}
-		$this->configs["WM_EMAIL"] = $webmaster_email;
-		$this->configs["MAX_CHAR"] = $max_caracteres;
-		$this->configs["JS_DEBUG"] = $AJXP_JS_DEBUG;
-		$this->configs["SERVER_DEBUG"] = $AJXP_SERVER_DEBUG OR false;
-		$this->configs["SESSION_SET_CREDENTIALS"] = $AJXP_SESSION_SET_CREDENTIALS OR false;
-		$this->configs["UPLOAD_MAX_NUMBER"] = $upload_max_number;
-		$this->configs["UPLOAD_ENABLE_FLASH"] = $upload_enable_flash;
-		$this->configs["UPLOAD_MAX_FILE"] = AJXP_Utils::convertBytes($upload_max_size_per_file);
-		$this->configs["UPLOAD_MAX_TOTAL"] = AJXP_Utils::convertBytes($upload_max_size_total);
-        $this->configs["PROBE_REAL_SIZE"] = $allowRealSizeProbing;
-        $this->configs["CUSTOM_WORDING"] = array(
-        	"welcomeMessage" => $welcomeCustomMessage,
-        	"title"			 => $customTitle,
-        	"icon"			 => $customIcon,
-        	"iconWidth"		 => $customIconWidth,
-        	"titleFontSize"	 => $customTitleFontSize
-        );
+		$this->configs["JS_DEBUG"] = AJXP_CLIENT_DEBUG;
+		$this->configs["SERVER_DEBUG"] = AJXP_SERVER_DEBUG;
         
-        $this->configs["CLIENT_TIMEOUT_TIME"] = (defined('AJXP_CLIENT_TIMEOUT_TIME')?AJXP_CLIENT_TIMEOUT_TIME:ini_get("session.gc_maxlifetime"));
-        $this->configs["CLIENT_TIMEOUT_WARNING"] = (defined('AJXP_CLIENT_TIMEOUT_WARN_BEFORE')?AJXP_CLIENT_TIMEOUT_WARN_BEFORE:3);
-
 		if(isSet($PLUGINS)){
 			$this->configs["PLUGINS"] = $PLUGINS;
 		}else{
@@ -186,7 +162,7 @@ class ConfService
 	}
 	
 	public static function backgroundActionsSupported(){
-		return function_exists("mcrypt_create_iv") && AJXP_CMDLINE_ACTIVE;
+		return function_exists("mcrypt_create_iv") && ConfService::getCoreConf("CMDLINE_ACTIVE");
 	}
 	
 	/**
@@ -562,6 +538,14 @@ class ConfService
 	{
 		$this->configs[$varName] = $varValue;
 	}
+	
+	public static function getCoreConf($varName, $coreType = "ajaxplorer"){
+		$coreP = AJXP_PluginsService::getInstance()->findPlugin("core", $coreType);
+		if($coreP === false) return null;
+		$confs = $coreP->getConfigs();
+		return (isSet($confs[$varName]) ? AJXP_VarsFilter::filter($confs[$varName]) : null);
+	}
+	
 	
 	public static function setLanguage($lang){
 		return self::getInstance()->setLanguageInst($lang);
