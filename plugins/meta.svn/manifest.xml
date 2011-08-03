@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="meta.svn" className="SvnManager">
+<meta id="meta.svn" className="SvnManager" label="Subversion Repository" description="Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline.">
 	<class_definition filename="plugins/meta.svn/class.SvnManager.php" classname="SvnManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>

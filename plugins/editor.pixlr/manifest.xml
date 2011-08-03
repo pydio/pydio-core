@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.pixlr" openable="true" text="333" title="333" icon="pixlr_images/actions/ICON_SIZE/color_fill.png" className="PixlrEditor" mimes="jpg,jpeg,png,bmp,pxd" formId="pixlr_box" write="true">
+<editor id="editor.pixlr" openable="true" text="333" title="333" icon="pixlr_images/actions/ICON_SIZE/color_fill.png" className="PixlrEditor" mimes="jpg,jpeg,png,bmp,pxd" formId="pixlr_box" write="true" label="Pixlr Editor" description="Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI.">
 	<class_definition filename="plugins/editor.pixlr/class.PixlrEditor.php" classname="PixlrEditor"/>
 	<resources>
 		<js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>

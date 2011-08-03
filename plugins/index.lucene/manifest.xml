@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<indexer id="index.lucene" className="AjxpLuceneIndexer">
+<indexer id="index.lucene" className="AjxpLuceneIndexer" label="Lucene Search Engine" description="Zend_Search_Lucene implementation to index all files and search a whole repository quickly.">
 	<class_definition filename="plugins/index.lucene/class.AjxpLuceneIndexer.php" classname="AjxpLuceneIndexer"/>
     <client_settings>
         <resources>

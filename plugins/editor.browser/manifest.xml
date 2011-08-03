@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.browser" openable="true" order="1000" text="openbrowser.1" 
 		title="openbrowser.2" icon="openbrowser_images/actions/ICON_SIZE/project-open.png" 
-		className="BrowserOpener" mimes="*" formId="open_box">
+		className="BrowserOpener" mimes="*" formId="open_box" label="External Window" description="Open file in a new browser window, thus using native browser capabilities.">
 	<resources>
 		<js file="plugins/editor.browser/class.BrowserOpener.js" className="BrowserOpener"/>
         <i18n namespace="openbrowser" path="plugins/editor.browser/resources/i18n" />
