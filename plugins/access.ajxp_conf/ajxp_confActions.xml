@@ -121,7 +121,7 @@
 			</processing>
 		</action>
 		<action name="create_repository">
-			<gui text="299" title="300" src="folder_red_new.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="true">
+			<gui text="299" title="300" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
@@ -136,10 +136,10 @@
                         name:MessageHash['ajxp_conf.90'],
                         alt:MessageHash[300],
                         isDefault : true,
-                        image:resolveImageSource('images/actions/22/folder_red_new.png', '',  22),
+                        image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
                         callback:function(e){
                             window.createRepoCmd = "repository";
-                            this.options.src = 'folder_red_new.png';
+                            this.options.src = 'hdd_external_unmount.png';
                             this.options.title = MessageHash[300];
                             this.apply();
                         }.bind(context)
@@ -148,10 +148,10 @@
                         name:MessageHash['ajxp_conf.91'],
                         alt:MessageHash['ajxp_conf.92'],
                         isDefault : false,
-                        image:resolveImageSource('images/actions/22/folder_grey.png', '',  22),
+                        image:resolveImageSource('images/actions/22/hdd_external_mount.png', '',  22),
                         callback:function(e){
                             window.createRepoCmd = "template";
-                            this.options.src = 'folder_grey.png';
+                            this.options.src = 'hdd_external_mount.png';
                             this.options.title = MessageHash['ajxp_conf.92'];
                             this.apply();
                         }.bind(context)

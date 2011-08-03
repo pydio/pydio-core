@@ -60,7 +60,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$rootNodes = array(
 					"core"	   	   => array("LABEL" => $mess["ajxp_conf.98"], "ICON" => "preferences_desktop.png"),
 					"plugins"	   => array("LABEL" => $mess["ajxp_conf.99"], "ICON" => "folder_development.png"),
-					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
+					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "hdd_external_unmount.png"),
 					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
 					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "user_group_new.png"),
 					"files" => array("LABEL" => $mess["ajxp_shared.3"], "ICON" => "html.png"),
@@ -1097,8 +1097,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         foreach ($sortedArray as $name => $repoIndex) {
             $repoObject =& $repos[$repoIndex];
-            $icon = (($repoObject->hasOwner()||$repoObject->hasParent())?"repo_child.png":"folder_red.png");
-            if($repoObject->isTemplate) $icon = "folder_grey.png";
+            $icon = (($repoObject->hasOwner()||$repoObject->hasParent())?"repo_child.png":"hdd_external_unmount.png");
+            if($repoObject->isTemplate) $icon = "hdd_external_mount.png";
             $metaData = array(
             	"repository_id" => $repoIndex,
             	"accessType"	=> ($repoObject->isTemplate?"Template for ":"").$repoObject->getAccessType(),
