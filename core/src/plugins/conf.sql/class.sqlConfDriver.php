@@ -73,7 +73,14 @@ class sqlConfDriver extends AbstractConfDriver {
 	}
 	
 	function _loadPluginConfig($pluginId, &$options){
-		
+		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
+		if (count($res_opts) > 0) {
+			$config_row = $res_opts->fetchPairs();
+			$confOpt = unserialize($config_row[$pluginId]);
+			if(is_array($confOpt)){
+				foreach($confOpt as $key => $value) $options[$key] = $value;
+			}
+		}
 	}
 	
 	/**
@@ -83,7 +90,12 @@ class sqlConfDriver extends AbstractConfDriver {
 	 * @param String $options
 	 */
 	function savePluginConfig($pluginId, $options){
-		
+		$res_opts = dibi::query('SELECT * FROM [ajxp_plugin_configs] WHERE [id] = %s', $pluginId);
+		if(count($res_opts)){
+			dibi::query('UPDATE [ajxp_plugin_configs] SET [configs] = %s WHERE [id] = %s', serialize($options), $pluginId);
+		}else{
+			dibi::query('INSERT INTO [ajxp_plugin_configs]', array('id' => $pluginId, 'configs' => serialize($options)));
+		}
 	}
 	
 	/**
