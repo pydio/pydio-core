@@ -33,22 +33,6 @@
  */
 include_once("conf/base.conf.php");
 
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Utils.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_VarsFilter.php");
-require_once(AJXP_BIN_FOLDER."/class.SystemTextEncoding.php");
-require_once(AJXP_BIN_FOLDER."/class.Repository.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Exception.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Plugin.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_PluginsService.php");
-require_once(AJXP_BIN_FOLDER."/class.AbstractAccessDriver.php");
-require_once(AJXP_BIN_FOLDER."/class.AjxpRole.php");
-require_once(AJXP_BIN_FOLDER."/class.ConfService.php");
-require_once(AJXP_BIN_FOLDER."/class.AuthService.php");
-require_once(AJXP_BIN_FOLDER."/class.UserSelection.php");
-require_once(AJXP_BIN_FOLDER."/class.HTMLWriter.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_XMLWriter.php");
-require_once(AJXP_BIN_FOLDER."/class.RecycleBinManager.php");
-
 if(isSet($_GET["ajxp_sessid"]))
 {
     // Don't overwrite cookie
@@ -225,7 +209,7 @@ $ajxpDriver = AJXP_PluginsService::findPlugin("gui", "ajax");
 $ajxpDriver->init(ConfService::getRepository());
 $authDriver = ConfService::getAuthDriverImpl();
 // DRIVERS BELOW NEED IDENTIFICATION CHECK
-if(!AuthService::usersEnabled() || ALLOW_GUEST_BROWSING || AuthService::getLoggedUser()!=null){
+if(!AuthService::usersEnabled() || ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") || AuthService::getLoggedUser()!=null){
 	$confDriver = ConfService::getConfStorageImpl();
 	$Driver = ConfService::loadRepositoryDriver();
 }

@@ -108,6 +108,14 @@ $mess=array(
 "95" => "Choisir un libellé et un driver pour accèder aux données (vérifiez les différentes sections qui contiennent des champs obligatoires, vous pouvez passer la souris sur les labels pour avoir plus d'infos).",
 "96" => "Choisir un libellé et un driver, puis choisir les champs que vous voulez pré-remplir pour constituer ce modèle. Vous pouvez cocher des champs et les laisser vide.",
 "repository_access_key" => "D",
+"97" => "Plugin options successfully updated",
+"98" => "Options Principales",
+"99" => "Extensions",
+"100" => "Options communes pour les '%s'",
+"101" => "Nom",
+"102" => "Identifiant",
+"103" => "Description",
+"104" => "Actif",
 /* END SENTENCE */
 );
 ?>

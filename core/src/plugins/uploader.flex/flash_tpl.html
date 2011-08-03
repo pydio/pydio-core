@@ -1,14 +1,14 @@
 <?php 
-    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
-    $UploadMaxPostSize = AJXP_Utils::convertBytes(ini_get('post_max_size'));
-    if($UploadMaxPostSize > 0 && $UploadMaxPostSize < $UploadMaxSize) $UploadMaxSize = $UploadMaxPostSize;
-    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
-    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
-    $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
-    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");
-    $maxLength = ConfService::getConf("MAX_CHAR");
+    $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+	$UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
+	if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+	$confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+    $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
+    $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+    $maxLength = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
     
 	$FlashVar = '&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
+	$pluginConfigs = AJXP_PluginsService::getInstance()->findPlugin("uploader", "flex")->getConfigs();
 ?>
 <html>
 <head>
@@ -117,7 +117,7 @@ if(configs.get("ALLOWED_EXTENSIONS") && configs.get("ALLOWED_EXTENSIONS_READABLE
 var url = '<?php print($_SERVER['SCRIPT_NAME']);?>?get_action=upload&secure_token='+parent.Connexion.SECURE_TOKEN+'&ajxp_sessid=<?php echo session_id(); ?>';
 
 var FlashObject = "plugins/uploader.flex/FlashFileUpload.swf";
-var FlashVarValue = "<?php echo $FlashVar; ?>" + flashVarExt + "&uploadPage=" + escape(url) + "<?php echo (strlen(HTTPS_POLICY_FILE) > 0 ? "&policyFile=".HTTPS_POLICY_FILE : ""); ?>";
+var FlashVarValue = "<?php echo $FlashVar; ?>" + flashVarExt + "&uploadPage=" + escape(url) + "<?php echo (!empty($pluginConfigs['HTTPS_POLICY_FILE']) ? "&policyFile=".$pluginConfigs['HTTPS_POLICY_FILE'] : ""); ?>";
 
 document.write('<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="' + window.location.protocol + '//fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0" width="450" height="310" id="fileUpload" align="middle">\
 <param name="allowScriptAccess" value="sameDomain" /> \

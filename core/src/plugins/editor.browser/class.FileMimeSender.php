@@ -50,7 +50,7 @@ class FileMimeSender extends AJXP_Plugin {
         
         if(AuthService::usersEnabled()){
             $loggedUser = AuthService::getLoggedUser();
-            if($loggedUser === null && ALLOW_GUEST_BROWSING){
+            if($loggedUser === null && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
                 AuthService::logUser("guest", null);
                 $loggedUser = AuthService::getLoggedUser();
             }

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.flex" text="51" title="162" label="Flash uploader" description="Legacy flash uploader, used when the browser does not support HTML5">
 	<class_definition filename="plugins/uploader.flex/class.FlexUploadProcessor.php" classname="FlexUploadProcessor"/>
+	<server_settings>
+		<global_param name="HTTPS_POLICY_FILE" group="Miscalleneous" type="string" label="HTTPS Policy" description="An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root." mandatory="false" default="true"/>
+	</server_settings>
 	<processing>
 		<clientForm id="flash_upload_form"><![CDATA[
 			<!-- FLEX UPLOAD FORM -->

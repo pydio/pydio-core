@@ -59,6 +59,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}else{
 			$this->driverConf = array();
 		}
+		if(isset($this->pluginConf["PROBE_REAL_SIZE"])){
+			// PASS IT TO THE WRAPPER 
+			ConfService::setConf("PROBE_REAL_SIZE", $this->pluginConf["PROBE_REAL_SIZE"]);
+		}
 		$create = $this->repository->getOption("CREATE");
 		$path = $this->repository->getOption("PATH");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
@@ -399,7 +403,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			        
 				$messtmp="";
 				$dirname=AJXP_Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_HTML_STRICT);
-				$dirname = substr($dirname, 0, ConfService::getConf("MAX_CHAR"));
+				$dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 				$this->filterUserSelectionToHidden(array($dirname));
 				$error = $this->mkDir($dir, $dirname);
 				if(isSet($error)){
@@ -423,7 +427,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			
 				$messtmp="";
 				$filename=AJXP_Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_HTML_STRICT);
-				$filename = substr($filename, 0, ConfService::getConf("MAX_CHAR"));
+				$filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 				$this->filterUserSelectionToHidden(array($filename));
 				$content = "";
 				if(isSet($httpVars["content"])){
@@ -500,7 +504,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						return array("ERROR" => array("CODE" => 411, "MESSAGE" => "Forbidden"));
 					}
 					$userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($userfile_name), AJXP_SANITIZE_HTML_STRICT);
-					$userfile_name = substr($userfile_name, 0, ConfService::getConf("MAX_CHAR"));
+					$userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
 					}
@@ -880,8 +884,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		return false;		
 	}
 	
-	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=GZIP_DOWNLOAD, $realfileSystem=false, $byteOffset=-1, $byteLength=-1)
+	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=null, $realfileSystem=false, $byteOffset=-1, $byteLength=-1)
 	{
+		if($gzip === null){
+			$gzip = ConfService::getCoreConf("GZIP_COMPRESSION");
+		}
 		session_write_close();
 
 		restore_error_handler();
@@ -898,7 +905,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}else{
 			$size = $byteLength;
 		}
-		if($gzip && ($size > GZIP_LIMIT || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
+		if($gzip && ($size > ConfService::getCoreConf("GZIP_LIMIT") || !function_exists("gzencode") || @strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)){
 			$gzip = false; // disable gzip
 		}
 		
@@ -1166,7 +1173,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		$nom_fic=basename($filePath);
 		$mess = ConfService::getMessages();
 		$filename_new=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($filename_new), AJXP_SANITIZE_HTML_STRICT);
-		$filename_new = substr($filename_new, 0, ConfService::getConf("MAX_CHAR"));
+		$filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 		$old=$this->urlBase."/$filePath";
 		if(!$this->isWriteable($old))
 		{

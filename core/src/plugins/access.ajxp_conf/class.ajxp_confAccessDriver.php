@@ -42,7 +42,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		if(!isSet($this->actions[$action])) return;
 		parent::accessPreprocess($action, $httpVars, $fileVars);
 		$loggedUser = AuthService::getLoggedUser();
-		if(ENABLE_USERS && !$loggedUser->isAdmin()) return ;
+		if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
 		
 		if($action == "edit"){
 			if(isSet($httpVars["sub_action"])){
@@ -58,8 +58,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 				$rootNodes = array(
-					"core"	   	   => array("LABEL" => "Core Configs", "ICON" => "preferences_desktop.png"),
-					"plugins"	   => array("LABEL" => "Plugins Configs", "ICON" => "folder_development.png"),
+					"core"	   	   => array("LABEL" => $mess["ajxp_conf.98"], "ICON" => "preferences_desktop.png"),
+					"plugins"	   => array("LABEL" => $mess["ajxp_conf.99"], "ICON" => "folder_development.png"),
 					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
 					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
 					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "user_group_new.png"),
@@ -806,8 +806,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}else if(isSet($httpVars["shared_file"])){
 					AJXP_XMLWriter::header();
 					$element = basename($httpVars["shared_file"]);
-					$publicletData = $this->loadPublicletData(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
-					unlink(PUBLIC_DOWNLOAD_FOLDER."/".$element.".php");
+					$dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+					$publicletData = $this->loadPublicletData($dlFolder."/".$element.".php");
+					unlink($dlFolder."/".$element.".php");
 					AJXP_XMLWriter::sendMessage($mess["ajxp_shared.13"], null);
 					AJXP_XMLWriter::reloadDataNode();
 					AJXP_XMLWriter::close();					
@@ -972,7 +973,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String"/>
 			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
 			</columns>');		
-		if(!ENABLE_USERS) return ;
+		if(!AuthService::usersEnabled()) return ;
 		$users = AuthService::listUsers();
 		$mess = ConfService::getMessages();
 		$repos = ConfService::getRepositoriesList();
@@ -1022,7 +1023,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>			
 			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
 			</columns>');		
-		if(!ENABLE_USERS) return ;
+		if(!AuthService::usersEnabled()) return ;
 		$roles = AuthService::getRolesList();
 		$mess = ConfService::getMessages();
 		$repos = ConfService::getRepositoriesList();
@@ -1157,18 +1158,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				<column messageId="ajxp_shared.20" attributeName="expired" sortType="String" width="5%"/>
 				<column messageId="ajxp_shared.14" attributeName="integrity" sortType="String" width="5%" hidden="true"/>
 			</columns>');
-		if(!is_dir(PUBLIC_DOWNLOAD_FOLDER)) return ;		
-		$files = glob(PUBLIC_DOWNLOAD_FOLDER."/*.php");
+		$dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+		if(!is_dir($dlFolder)) return ;		
+		$files = glob($dlFolder."/*.php");
 		if($files === false) return ;
 		$mess = ConfService::getMessages();
 		$loggedUser = AuthService::getLoggedUser();
 		$userId = $loggedUser->getId();
-        if(defined('PUBLIC_DOWNLOAD_URL') && PUBLIC_DOWNLOAD_URL != ""){
-        	$downloadBase = rtrim(PUBLIC_DOWNLOAD_URL, "/");
+		$dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
+        if($dlURL!= ""){
+        	$downloadBase = rtrim($dlURL, "/");
         }else{
 	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
 	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
-	        $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/"));
+	        $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $dlFolder), "/"));
         }
 		
 		foreach ($files as $file){
@@ -1195,7 +1198,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	function clearExpiredFiles(){
-		$files = glob(PUBLIC_DOWNLOAD_FOLDER."/*.php");
+		$files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
 		$loggedUser = AuthService::getLoggedUser();
 		$userId = $loggedUser->getId();
 		$deleted = array();

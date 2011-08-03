@@ -54,6 +54,8 @@ define("AJXP_EXEC", true);
 require("compat.php");
 $installPath = realpath(dirname(__FILE__)."/..");
 $confPath = realpath(dirname(__FILE__));
+
+// APPLICATION PATHES CONFIGURATION
 define("AJXP_INSTALL_PATH", $installPath);
 define("AJXP_CONF_PATH", $confPath);
 define("AJXP_CACHE_DIR", AJXP_INSTALL_PATH."/data/cache");
@@ -69,12 +71,14 @@ define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
 define("TESTS_RESULT_FILE", $installPath."/data/conf/diag_result.php");
 define("AJXP_TESTS_FOLDER", AJXP_INSTALL_PATH."/core/tests");
+define("INITIAL_ADMIN_PASSWORD", "admin");
+define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
+
+// DEBUG OPTIONS
+define("AJXP_CLIENT_DEBUG",	false);
+define("AJXP_SERVER_DEBUG",	false);
 define("AJXP_SKIP_CACHE", true);
 
-
-define("INITIAL_ADMIN_PASSWORD", "admin");
-
-define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
 
 function AjaXplorer_autoload($className){
 	$fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";

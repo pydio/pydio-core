@@ -42,8 +42,8 @@ class UsersConfig extends AbstractTest
     function UsersConfig() { parent::AbstractTest("Users Configuration", "Current config for users"); }
     function doTest() 
     { 
-    	$this->testedParams["Users enabled"] = ENABLE_USERS;
-    	$this->testedParams["Guest enabled"] = ALLOW_GUEST_BROWSING;
+    	$this->testedParams["Users enabled"] = AuthService::usersEnabled();
+    	$this->testedParams["Guest enabled"] = ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth");
         $this->failedLevel = "info";
         return FALSE;
     }

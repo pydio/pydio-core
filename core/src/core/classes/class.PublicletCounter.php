@@ -73,19 +73,19 @@ class PublicletCounter {
 	}
 	
 	static private function isActive(){
-		return (is_dir(PUBLIC_DOWNLOAD_FOLDER) && is_writable(PUBLIC_DOWNLOAD_FOLDER));
+		return (is_dir(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")) && is_writable(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")));
 	}
 	
 	static private function loadCounters(){
 		if(!isSet(self::$counters)){
-			self::$counters = AJXP_Utils::loadSerialFile(PUBLIC_DOWNLOAD_FOLDER."/.ajxp_publiclet_counters.ser");			
+			self::$counters = AJXP_Utils::loadSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser");			
 		}
 		return self::$counters;
 	}
 	
 	static private function saveCounters($counters){
 		self::$counters = $counters;
-		AJXP_Utils::saveSerialFile(PUBLIC_DOWNLOAD_FOLDER."/.ajxp_publiclet_counters.ser", $counters, false);
+		AJXP_Utils::saveSerialFile(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/.ajxp_publiclet_counters.ser", $counters, false);
 	}
 	
 }

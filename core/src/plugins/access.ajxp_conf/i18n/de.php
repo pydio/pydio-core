@@ -108,5 +108,13 @@ $mess=array(
 "95" => "Choose a label and a driver to access the data (check all sections for mandatory fields, you can hover the options labels with your mouse to get more info).",
 "96" => "Once a label and driver selected, enable the fields you want to be prefilled in the template using the checkboxes. The other fields will be left to the user. You can enable some fields and leave them empty, if you still want to hide them from the user.",
 "repository_access_key" => "N",
+"97" => "Plugin options successfully updated",
+"98" => "Core Configs",
+"99" => "Plugins",
+"100" => "Common '%s' plugins options",
+"101" => "Name",
+"102" => "Identifier",
+"103" => "Description",
+"104" => "Active",
 );
 ?>

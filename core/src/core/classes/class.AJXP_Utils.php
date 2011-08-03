@@ -439,7 +439,7 @@ class AJXP_Utils
 	
 	static function updateI18nFiles($pluginPath = ""){
 		if($pluginPath != ""){
-			$baseDir = AJXP_INSTALL_PATH."/plugins/".$pluginPath;
+			$baseDir = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginPath;
 			$filenames = glob($baseDir."/*.php");
 		}else{
 			$baseDir = AJXP_COREI18N_FOLDER;

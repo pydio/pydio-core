@@ -23,7 +23,7 @@ $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/conf");
 ConfService::init("conf/conf.php");
 
-if(!AJXP_WEBDAV_ENABLE){
+if(!ConfService::getCoreConf("WEBDAV_ENABLE")){
 	die('You are not allowed to access this service');
 }
 
@@ -35,13 +35,13 @@ require_once($confStorageDriver->getUserClassFileName());
 require_once AJXP_BIN_FOLDER."/ezc/Base/base.php";
 spl_autoload_register( array( 'ezcBase', 'autoload' ) );
 
-if(defined("AJXP_WEBDAV_BASEHOST")){
-	$baseURL = AJXP_WEBDAV_BASEHOST;
+if(ConfService::getCoreConf("WEBDAV_BASEHOST") != ""){
+	$baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
 }else{
 	$http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
 	$baseURL = $http_mode . $_SERVER['HTTP_HOST'];
 }				
-$baseURI = AJXP_WEBDAV_BASEURI;
+$baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 
 $requestUri = $_SERVER["REQUEST_URI"];
 $end = substr($requestUri, strlen($baseURI."/"));
@@ -64,7 +64,7 @@ foreach ( $server->configurations as $conf ){
     $conf->pathFactory = $pathFactory;
 }
 if(AuthService::usersEnabled()){
-	$server->options->realm = AJXP_WEBDAV_DIGESTREALM;
+	$server->options->realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
 	$server->auth = new AJXP_WebdavAuth($repository->getId());
 }
 

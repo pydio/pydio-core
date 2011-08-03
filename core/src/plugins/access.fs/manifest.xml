@@ -9,6 +9,7 @@
         <global_param name="HIDE_EXTENSIONS" type="string" label="Hide extensions" description="Comma-separated list of extensions to hide"/>
         <global_param name="HIDE_FOLDERS" type="string" label="Hide folders" description="Comma-separated list of specific folders to hide"/>
         <global_param name="HIDE_FILENAMES" type="string" label="Hide files" description="Comma-separated list of specific files to hide"/>
+        <global_param name="PROBE_REAL_SIZE" type="boolean" label="Real Size Probing" description="Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)" default="false"/>
 	</server_settings>
 	<class_definition filename="plugins/access.fs/class.fsAccessDriver.php" classname="fsAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.fs/class.fsAccessWrapper.php" classname="fsAccessWrapper" protocol="ajxp.fs"/>

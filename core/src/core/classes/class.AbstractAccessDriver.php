@@ -84,10 +84,11 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		parent::parseSpecificContributions($contribNode);
 		if(isSet($this->actions["public_url"])){
 			$disableSharing = false;
-			if(PUBLIC_DOWNLOAD_FOLDER == ""){
+			$downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+			if($downloadFolder == ""){
 				$disableSharing = true;
-			}else if((!is_dir(PUBLIC_DOWNLOAD_FOLDER) || !is_writable(PUBLIC_DOWNLOAD_FOLDER))){
-				AJXP_Logger::logAction("Disabling Public links, PUBLIC_DOWNLOAD_FOLDER is not writeable!", array("folder" => PUBLIC_DOWNLOAD_FOLDER, "is_dir" => is_dir(PUBLIC_DOWNLOAD_FOLDER),"is_writeable" => is_writable(PUBLIC_DOWNLOAD_FOLDER)));
+			}else if((!is_dir($downloadFolder) || !is_writable($downloadFolder))){
+				AJXP_Logger::logAction("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
 				$disableSharing = true;
 			}else{
 				if(AuthService::usersEnabled()){					
@@ -136,19 +137,20 @@ class AbstractAccessDriver extends AJXP_Plugin {
     */
     function writePubliclet($data)
     {
-    	if(!defined('PUBLIC_DOWNLOAD_FOLDER') || !is_dir(PUBLIC_DOWNLOAD_FOLDER)){
+    	$downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+    	if(!is_dir($downloadFolder)){
     		return "ERROR : Public URL folder does not exist!";
     	}
     	if(!function_exists("mcrypt_create_iv")){
     		return "ERROR : MCrypt must be installed to use publiclets!";
     	}
-    	if($data["PASSWORD"] && !is_file(PUBLIC_DOWNLOAD_FOLDER."/allz.css")){    		
-    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", PUBLIC_DOWNLOAD_FOLDER."/allz.css");
-    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/22/dialog_ok_apply.png", PUBLIC_DOWNLOAD_FOLDER."/dialog_ok_apply.png");
-    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", PUBLIC_DOWNLOAD_FOLDER."/public_url.png");    		
+    	if($data["PASSWORD"] && !is_file($downloadFolder."/allz.css")){    		
+    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", $downloadFolder."/allz.css");
+    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/22/dialog_ok_apply.png", $downloadFolder."/dialog_ok_apply.png");
+    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", $downloadFolder."/public_url.png");    		
     	}
-    	if(!is_file(PUBLIC_DOWNLOAD_FOLDER."/index.html")){
-    		@copy(AJXP_INSTALL_PATH."/server/index.html", PUBLIC_DOWNLOAD_FOLDER."/index.html");
+    	if(!is_file($downloadFolder."/index.html")){
+    		@copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
     	}
         $data["PLUGIN_ID"] = $this->id;
         $data["BASE_DIR"] = $this->baseDir;
@@ -186,17 +188,18 @@ class AbstractAccessDriver extends AJXP_Plugin {
         '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
         '   // Ok extract the data '."\n".
         '   $data = unserialize($inputData); AbstractAccessDriver::loadPubliclet($data); ?'.'>';
-        if (@file_put_contents(PUBLIC_DOWNLOAD_FOLDER."/".$hash.".php", $fileData) === FALSE){
+        if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE){
             return "Can't write to PUBLIC URL";
         }
         require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
         PublicletCounter::reset($hash);
-        if(defined('PUBLIC_DOWNLOAD_URL') && PUBLIC_DOWNLOAD_URL != ""){
-        	return rtrim(PUBLIC_DOWNLOAD_URL, "/")."/".$hash.".php";
+        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
+        if($dlURL != ""){
+        	return rtrim($dlURL, "/")."/".$hash.".php";
         }else{
 	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
 	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
-	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", PUBLIC_DOWNLOAD_FOLDER), "/")."/".$hash.".php");
+	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/")."/".$hash.".php");
         }
     }
 
@@ -208,7 +211,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         if ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"])
         {
             // Remove the publiclet, it's done
-            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(PUBLIC_DOWNLOAD_FOLDER)) !== FALSE){
+            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE){
 		        $hash = md5(serialize($data));
 		        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
 		        PublicletCounter::delete($hash);
@@ -256,7 +259,6 @@ class AbstractAccessDriver extends AJXP_Plugin {
         	AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
         }
         $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
-        ConfService::setRepository($data["REPOSITORY"]);
         $driver->initRepository();
         // Increment counter
         $hash = md5(serialize($data));

@@ -3,10 +3,7 @@
 	<server_settings>
 		<global_param name="APPLICATION_TITLE" group="Main" type="string" label="App Title" description="Your application title" mandatory="true" default="AjaXplorer"/>
 		<global_param name="DEFAULT_LANGUAGE" group="Main" type="string" label="Default Language" description="Default language when a user does not have set his/her own." mandatory="true" default="en"/>
-		<global_param name="PASSWORD_MINLENGTH" group="Generic Auth Features" type="string" label="Password length" description="Minimum number of characters required for passwords in the application" mandatory="true" default="8"/>
-		<global_param name="ALLOW_GUEST_BROWSING" group="Generic Auth Features"  type="boolean" label="Guest Browsing" description="Enable the 'guest' user, who does not need to log in." mandatory="true" default="false"/>
-		<global_param name="SESSION_SET_CREDENTIALS" group="Generic Auth Features"  type="boolean" label="Session Credentials" description="Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins." mandatory="true" default="false"/>
-		<global_param name="PUBLIC_DOWNLOAD_FOLDER" group="Sharing" type="string" label="Download Folder" description="Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." mandatory="false" default="AJXP_INSTALL_PATH/../../public"/>
+		<global_param name="PUBLIC_DOWNLOAD_FOLDER" group="Sharing" type="string" label="Download Folder" description="Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." mandatory="false" default="AJXP_INSTALL_PATH/data/public"/>
 		<global_param name="PUBLIC_DOWNLOAD_URL" group="Sharing" type="string" label="Download URL" description="If not inferred directly from the current ajaxplorer URI plus the public download folder name, replace the public access URL here." mandatory="false" default=""/>
 		<global_param name="ALLOW_CROSSUSERS_SHARING" group="Sharing" type="boolean" label="Existing users" description="Allow the users to pick an existing user when sharing a folder" mandatory="false" default="true"/>
 		<global_param name="GZIP_COMPRESSION" group="Compression Features" type="boolean" label="Gzip Download" description="Gzip files on-the-fly before downloading. Disabled by default, as it's generally useful only on small files, and decreases performances on big files. This has nothing to see with the Zip Creation feature, it's just a on-the-fly compression applied on a unique file at download." mandatory="false" default="false"/>
@@ -16,5 +13,8 @@
 		<global_param name="WEBDAV_BASEURI" group="WebDAV Server" type="string" label="Shares URI" description="Common URI to access the shares. Please READ THE DOC to safely use this feature." mandatory="false" default="/ajaxplorer/shares"/>				
 		<global_param name="WEBDAV_BASEHOST" group="WebDAV Server" type="string" label="Shares Host" description="Host used in webDAV protocol. Should be detected by default. Please READ THE DOC to safely use this feature." mandatory="false" default=""/>				
 		<global_param name="WEBDAV_DIGESTREALM" group="WebDAV Server" type="string" label="Digest Realm" description="Default realm for authentication. Please READ THE DOC to safely use this feature." mandatory="false" default="ajxp_webdav_realm"/>				
+		<global_param name="CMDLINE_ACTIVE" group="Miscalleneous" type="boolean" label="Command-line Active" description="Use AjaXplorer framework via the command line, allowing CRONTAB jobs or background actions." mandatory="false" default="true"/>				
+		<global_param name="NODENAME_MAX_LENGTH" group="Miscalleneous" type="integer" label="Filename length" description="Maximum characters length of new files or folders" mandatory="false" default="255"/>				
+		<global_param name="WEBMASTER_EMAIL" group="Miscalleneous" type="string" label="Admin email" description="Administrator email, not used for the moment" mandatory="false"/>				
 	</server_settings>
 </ajxpcore>
