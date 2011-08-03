@@ -39,9 +39,6 @@
 //die("You are not allowed to see this page (comment first line of the file to access it!)");
 require_once("conf/base.conf.php");
 
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Utils.php");
-
 $outputArray = array();
 $testedParams = array();
 $passed = true;

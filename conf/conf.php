@@ -90,12 +90,10 @@ $PLUGINS = array(
 			"REPOSITORIES_FILEPATH"	=> "AJXP_INSTALL_PATH/data/conf/repo.ser",
 			"ROLES_FILEPATH"		=> "AJXP_INSTALL_PATH/data/users/roles.ser",
 			"USERS_DIRPATH"			=> "AJXP_INSTALL_PATH/data/users",
-			/*
-			"CUSTOM_DATA"			=> array(
+			/*"CUSTOM_DATA"			=> array(
 					"email"	=> "Email", 
 					"country" => "Country"
-				)
-			*/
+				)*/
 			)
 	),
 	"AUTH_DRIVER" => array(

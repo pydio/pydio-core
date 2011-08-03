@@ -592,7 +592,6 @@ class AJXP_Utils
 			    $testedParams = array_merge($testedParams, $class->testedParams);
 		   	}
 		}
-		
         // PREPARE REPOSITORY LISTS
         $repoList = array();
         require_once("../classes/class.ConfService.php");
@@ -609,13 +608,13 @@ class AJXP_Utils
         }
 		
 		// NOW TRY THE PLUGIN TESTS
-		chdir(AJXP_TESTS_FOLDER);
+		chdir(AJXP_TESTS_FOLDER."/".AJXP_PLUGINS_FOLDER);
 		$files = glob('*.php'); 
 		foreach($files as $file)
 		{
 		    require_once($file);
 		    // Then create the test class
-		    $testName = str_replace(".php", "", substr($file, 5));
+		    $testName = str_replace(".php", "", substr($file, 5)."Test");
 		    $class = new $testName();
 		    foreach ($repoList as $repository){
 			    $result = $class->doRepositoryTest($repository);

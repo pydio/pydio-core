@@ -169,7 +169,9 @@ class Repository {
 			if(!isset($this->parentTemplateObject)){
 				$this->parentTemplateObject = ConfService::getRepositoryById($this->parentId);
 			}
-			return $this->parentTemplateObject->getOption($oName, $safe);
+			if(isSet($this->parentTemplateObject)){
+				return $this->parentTemplateObject->getOption($oName, $safe);
+			}
 		}
 		return "";
 	}
