@@ -37,22 +37,6 @@ if(!defined("STDIN")){
 
 include_once("conf/base.conf.php");
 
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Utils.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_VarsFilter.php");
-require_once(AJXP_BIN_FOLDER."/class.SystemTextEncoding.php");
-require_once(AJXP_BIN_FOLDER."/class.Repository.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Exception.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_Plugin.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_PluginsService.php");
-require_once(AJXP_BIN_FOLDER."/class.AbstractAccessDriver.php");
-require_once(AJXP_BIN_FOLDER."/class.AjxpRole.php");
-require_once(AJXP_BIN_FOLDER."/class.ConfService.php");
-require_once(AJXP_BIN_FOLDER."/class.AuthService.php");
-require_once(AJXP_BIN_FOLDER."/class.UserSelection.php");
-require_once(AJXP_BIN_FOLDER."/class.HTMLWriter.php");
-require_once(AJXP_BIN_FOLDER."/class.AJXP_XMLWriter.php");
-require_once(AJXP_BIN_FOLDER."/class.RecycleBinManager.php");
-
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
@@ -60,9 +44,13 @@ header("Pragma: no-cache");
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
 set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", AJXP_INSTALL_PATH."/conf");
 ConfService::init("conf/conf.php");
+$confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
+$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
+ConfService::start();
+
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
