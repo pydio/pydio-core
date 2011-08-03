@@ -58,6 +58,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			//------------------------------------
 			case "ls":
 				$rootNodes = array(
+					"core"	   	   => array("LABEL" => "Core Configs", "ICON" => "preferences_desktop.png"),
 					"plugins"	   => array("LABEL" => "Plugins Configs", "ICON" => "folder_development.png"),
 					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "folder_red.png"),
 					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
@@ -79,7 +80,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						$this->listUsers();
 					}else if($strippedDir == "roles"){
 						$this->listRoles();
-					}else if($strippedDir == "plugins"){
+					}else if($strippedDir == "plugins" || $strippedDir == "core"){
 						$this->listPlugins($dir);
 					}else if($strippedDir == "repositories"){
 						$this->listRepositories();
@@ -899,46 +900,67 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	
 	function listPlugins($dir){
+		AJXP_Logger::logAction("Listing plugins"); // make sure that the logger is started!
 		$pServ = AJXP_PluginsService::getInstance();
-		$plugins = $pServ->getActivePlugins();
+		$activePlugins = $pServ->getActivePlugins();
 		$types = $pServ->getDetectedPlugins();
+		$uniqTypes = array("core" ,"auth", "conf", "log");
 		if($dir == "/plugins"){
-			unset($types["core"]);
-			$meta = array(
-				"icon" 		=> "preferences_desktop.png",	
-				"ajxp_mime" => "ajxp_plugin",				
-				"is_active"	=> "true",
-				"plugin_id" => "core.ajaxplorer"
-			);
-			AJXP_XMLWriter::renderNode("/plugins/core.ajaxplorer", "AjaXplorer Core", true, $meta);							
 			foreach( $types as $t => $tPlugs){
+				if(in_array($t, $uniqTypes))continue;
 				$meta = array(
 					"icon" 		=> "folder_development.png",					
-					//"is_active"	=> $status?"true":"false",
 					"plugin_id" => $t
 				);
 				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t)." plugins", false, $meta);				
+			}
+		}else if($dir == "/core"){
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins">
+			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
+			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
+			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
+			</columns>');		
+			$mess = ConfService::getMessages();
+			foreach($uniqTypes as $type){
+				if(!isset($types[$type])) continue;				
+				foreach($types[$type] as $pId => $pObject){
+					$meta = array(				
+						"icon" 		=> ($type == "core"?"preferences_desktop.png":"preferences_plugin.png"),
+						"ajxp_mime" => "ajxp_plugin",
+						"plugin_id" => $pObject->getId(),						
+						"plugin_description" => $pObject->getManifestDescription()
+					);
+					if($type == "core"){
+						if($pObject->getId() == "core.ajaxplorer"){
+							$label = "AjaXplorer Core";
+						}else{
+							$label =  sprintf($mess["ajxp_conf.100"], $pObject->getName());
+						}
+					}else{
+						if($activePlugins[$pObject->getId()] !== true) continue;
+						$label = $pObject->getManifestLabel();
+					}
+					AJXP_XMLWriter::renderNode("/plugins/".$pObject->getId(), $label, true, $meta);
+				}				
 			}
 		}else{
 			$split = explode("/", $dir);
 			if(empty($split[0])) array_shift($split);
 			$type = $split[1];
-			if(isSet($types["core"][$type])){
-				$types[$type]["__core__"] = $types["core"][$type];
-			}
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins">
+			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
+			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
+			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
+			</columns>');					
 			foreach($types[$type] as $pId => $pObject){
 				$meta = array(				
-					"icon" 		=> ($pId == "__core__"?"preferences_desktop.png":"preferences_plugin.png"),
+					"icon" 		=> "preferences_plugin.png",
 					"ajxp_mime" => "ajxp_plugin",
-					//"is_active"	=> $status?"true":"false",
-					"plugin_id" => $pObject->getId()
+					"is_active"	=> ($activePlugins[$pId] === true)?"true":"false",
+					"plugin_id" => $pObject->getId(),
+					"plugin_description" => $pObject->getManifestDescription()
 				);
-				if($pId == "__core__"){
-					$label = "Global options for '$type' plugins";
-				}else{
-					$label = $pObject->getId();
-				}
-				AJXP_XMLWriter::renderNode("/plugins/".$label, $label, true, $meta);
+				AJXP_XMLWriter::renderNode("/plugins/".$pObject->getId(), $pObject->getManifestLabel(), true, $meta);
 			}
 		}
 	}

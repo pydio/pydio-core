@@ -243,6 +243,18 @@ class AJXP_Plugin implements Serializable{
 		$this->loadDependencies();
 	}
 	
+	public function getManifestLabel(){
+		$l = $this->xPath->query("@label", $this->manifestDoc->documentElement);
+		if($l->length) return $l->item(0)->nodeValue;
+		else return $this->id;
+	}
+	
+	public function getManifestDescription(){
+		$l = $this->xPath->query("@description", $this->manifestDoc->documentElement);
+		if($l->length) return $l->item(0)->nodeValue;
+		else return "";
+	}
+	
 	public function serialize(){
 		if($this->manifestDoc != null){
 			$this->manifestXML = base64_encode($this->manifestDoc->saveXML());
