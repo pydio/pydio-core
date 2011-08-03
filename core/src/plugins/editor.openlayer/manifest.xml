@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.openlayer" openable="true" mimes="wms_layer,ol_layer" text="openlayer.1" title="openlayer.1" icon="frame_image.png" className="OLViewer" formId="openlayer_box">
+<editor id="editor.openlayer" openable="true" mimes="wms_layer,ol_layer" text="openlayer.1" title="openlayer.1" icon="frame_image.png" className="OLViewer" formId="openlayer_box" label="Map viewer" description="Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers">
 	<resources>
 		<js file="plugins/editor.openlayer/class.OLViewer.js" className="OLViewer"/>
 		<css file="plugins/editor.openlayer/openlayer/theme/default/style.css"/>

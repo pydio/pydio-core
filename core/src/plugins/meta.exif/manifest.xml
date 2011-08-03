@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="meta.exif" className="ExifMetaManager">
+<meta id="meta.exif" className="ExifMetaManager" label="Exif Metadata" description="Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif">
 	<class_definition filename="plugins/meta.exif/class.ExifMetaManager.php" classname="ExifMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>

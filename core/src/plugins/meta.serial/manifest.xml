@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="meta.serial" className="SerialMetaManager">
+<meta id="meta.serial" className="SerialMetaManager" label="Text Metadata" description="Simple metadata implementation stored in a hidden file.">
 	<class_definition filename="plugins/meta.serial/class.SerialMetaManager.php" classname="SerialMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>

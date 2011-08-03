@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<downloader id="downloader.http">
+<downloader id="downloader.http" label="Remote Download" description="Async downloader to load a file from another source">
 	<class_definition filename="plugins/downloader.http/class.HttpDownloader.php" classname="HttpDownloader"/>
 	<client_settings>
 		<resources>

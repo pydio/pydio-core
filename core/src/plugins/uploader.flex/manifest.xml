@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uploader id="uploader.flex" text="51" title="162">
+<uploader id="uploader.flex" text="51" title="162" label="Flash uploader" description="Legacy flash uploader, used when the browser does not support HTML5">
 	<class_definition filename="plugins/uploader.flex/class.FlexUploadProcessor.php" classname="FlexUploadProcessor"/>
 	<processing>
 		<clientForm id="flash_upload_form"><![CDATA[

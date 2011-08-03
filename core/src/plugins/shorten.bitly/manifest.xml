@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<hook id="shorten.bitly">
+<hook id="shorten.bitly" label="Bit.ly URL Shortener" description="Shorten Download Links before sending them back to the user. Requires a Bit.ly account.">
     <server_settings>
         <global_param name="BITLY_USER" type="string" label="User Name" description="Bit.ly account user name" mandatory="true"/>
         <global_param name="BITLY_APIKEY" type="string" label="API Key" description="Bit.ly account API Key" mandatory="true"/>
