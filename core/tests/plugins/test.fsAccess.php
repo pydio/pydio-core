@@ -50,7 +50,8 @@ class fsAccessTest extends AbstractTest
     function doRepositoryTest($repo){
         if ($repo->accessType != 'fs' ) return -1;
         // Check the destination path
-        $path = $repo->getOption("PATH", true);
+        $this->failedInfo = "";
+        $path = $repo->getOption("PATH", false);
         $createOpt = $repo->getOption("CREATE");
         $create = (($createOpt=="true"||$createOpt===true)?true:false);
         if(strstr($path, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!        
