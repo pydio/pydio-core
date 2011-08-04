@@ -200,15 +200,4 @@ $REPOSITORIES[1] = array(
 /*********************************************/
 $default_language="en";
 
-/*********************************************/
-/* DEBUG MODES, for client (JS_DEBUG) 
-/* and server (SERVER_DEBUG).
-/* Warning : this has to be set to true
-/* to be able to both make modifications to 
-/* the css or the js files, and to compile 
-/* these into bundled file.
-/*********************************************/
-$AJXP_JS_DEBUG = true;
-$AJXP_SERVER_DEBUG = false;
-
 ?>
