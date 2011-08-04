@@ -868,7 +868,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						if($definitions[$key]["type"] == "array"){
 							$value = implode(",", $value);
 						}else if($definitions[$key]["type"] == "boolean"){
-							$value = ($value === true?"true":"false");
+							$value = ($value === true || $value === "true"?"true":"false");
 						}
 						echo("<param name=\"$key\" value=\"$value\"/>");
 					}
