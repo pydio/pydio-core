@@ -404,6 +404,16 @@ class AJXP_Utils
 			return $xmlSafe;
 		}
 	}
+	
+	static public function searchIncludePath($file){
+		$ps = explode(PATH_SEPARATOR, ini_get('include_path'));
+		foreach($ps as $path)
+		{
+			if(file_exists($path.DIRECTORY_SEPARATOR.$file)) return true;
+		}
+		if(file_exists($file)) return true;
+		return false;		
+	}
 
 	/**
 	 * Modifies a string to remove all non ASCII characters and spaces.
