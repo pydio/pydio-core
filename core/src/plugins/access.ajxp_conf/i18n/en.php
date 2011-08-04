@@ -115,6 +115,6 @@ $mess=array(
 "101" => "Name",
 "102" => "Identifier",
 "103" => "Description",
-"104" => "Active",
+"104" => "Status",
 ); 
 ?>
