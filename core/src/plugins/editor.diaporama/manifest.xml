@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.diaporama" openable="true" previewProvider="true" text="186" title="136" icon="frame_image.png" className="Diaporama" mimes="png,jpg,jpeg,gif" formId="diaporama_box" label="Image viewer" description="Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images.">
+<editor id="editor.diaporama" order="-1" openable="true" previewProvider="true" text="186" title="136" icon="frame_image.png" className="Diaporama" mimes="png,jpg,jpeg,gif" formId="diaporama_box" label="Image viewer" description="Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images.">
 	<server_settings>
 		<global_param name="META_EXTRACTION_REMOTEWRAPPERS" type="array" label="Remote Wrappers" description="When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped." default="ftpAccessWrapper"/>
 		<global_param name="META_EXTRACTION_THRESHOLD" type="string" label="Size Threshold" description="Threshold" default="50000"/>

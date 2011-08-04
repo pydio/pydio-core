@@ -161,7 +161,6 @@ Class.create("Diaporama", AbstractEditor, {
 		
 		// Observe +/- for zoom
 		this.zoomObs = function(e){
-			console.log(e.keyCode);
 			if(e.keyCode == 107 || e.keyCode == 109){
 				var newValue = (e.keyCode == 107 ? parseInt(this.zoomInput.value) + 20 : parseInt(this.zoomInput.value) - 20);
 				newValue = Math.max(this._minZoom, newValue);
