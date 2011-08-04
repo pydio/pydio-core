@@ -121,12 +121,23 @@ class ConfService
 				$all = $pServ->getPluginsByType($ex[0]);
 				foreach($all as $pName => $pObject){
 					$pObject->init(array());
-					$pServ->setPluginActiveInst($ex[0], $pName, true);
+					try{
+						$pObject->performChecks();
+						$pServ->setPluginActiveInst($ex[0], $pName, true);
+					}catch (Exception $e){
+						$this->errors[$pName] = "[$pName] ".$e->getMessage();
+					}
 				}
 			}else{
 				$pObject = $pServ->getPluginByTypeName($ex[0], $ex[1]);
 				if(!is_object($pObject)) throw new Exception("Cannot find plugin $plugs");
 				$pObject->init(array());
+				try{
+					$pObject->performChecks();
+					$pServ->setPluginActiveInst($ex[0], $ex[1], true);
+				}catch (Exception $e){
+					$this->errors[$ex[1]] = "[$ex[1]] ".$e->getMessage();
+				}
 				$pServ->setPluginActiveInst($ex[0], $ex[1], true);
 			}
 		}
