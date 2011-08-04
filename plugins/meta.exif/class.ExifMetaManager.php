@@ -44,6 +44,12 @@ class ExifMetaManager extends AJXP_Plugin {
 		$this->options = $options;		
 	}
 	
+	public function performChecks(){
+		if(!function_exists("exif_imagetype")){
+			throw new Exception("Exif PHP extension does not seem to be installed!");
+		}
+	}
+	
 	public function initMeta($accessDriver){		
 		$this->accessDriver = $accessDriver;	
 		if(!function_exists("exif_read_data")) return ;		

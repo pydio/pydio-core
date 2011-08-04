@@ -125,7 +125,7 @@ class ConfService
 						$pObject->performChecks();
 						$pServ->setPluginActiveInst($ex[0], $pName, true);
 					}catch (Exception $e){
-						$this->errors[$pName] = "[$pName] ".$e->getMessage();
+						//$this->errors[$pName] = "[$pName] ".$e->getMessage();
 					}
 				}
 			}else{
@@ -136,7 +136,7 @@ class ConfService
 					$pObject->performChecks();
 					$pServ->setPluginActiveInst($ex[0], $ex[1], true);
 				}catch (Exception $e){
-					$this->errors[$ex[1]] = "[$ex[1]] ".$e->getMessage();
+					//$this->errors[$ex[1]] = "[$ex[1]] ".$e->getMessage();
 				}
 				$pServ->setPluginActiveInst($ex[0], $ex[1], true);
 			}

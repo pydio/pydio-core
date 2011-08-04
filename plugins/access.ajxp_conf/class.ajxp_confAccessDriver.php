@@ -952,12 +952,19 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
+			<column messageId="ajxp_conf.104" attributeName="can_active" sortType="String"/>
 			</columns>');					
 			foreach($types[$type] as $pId => $pObject){
+				$errors = "OK";
+				try{
+					$pObject->performChecks();
+				}catch(Exception $e){
+					$errors = "ERROR : ".$e->getMessage();
+				}
 				$meta = array(				
 					"icon" 		=> "preferences_plugin.png",
 					"ajxp_mime" => "ajxp_plugin",
-					"is_active"	=> ($activePlugins[$pId] === true)?"true":"false",
+					"can_active"	=> $errors,
 					"plugin_id" => $pObject->getId(),
 					"plugin_description" => $pObject->getManifestDescription()
 				);
