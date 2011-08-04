@@ -77,7 +77,7 @@ define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG",	false);
 define("AJXP_SERVER_DEBUG",	false);
-define("AJXP_SKIP_CACHE", true);
+define("AJXP_SKIP_CACHE", false);
 
 
 function AjaXplorer_autoload($className){
