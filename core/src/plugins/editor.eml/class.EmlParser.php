@@ -5,6 +5,12 @@ class EmlParser extends AJXP_Plugin{
 	
 	public static $currentListingOnlyEmails;
 	
+	public function performChecks(){
+		if(!AJXP_Utils::searchIncludePath("Mail/mimeDecode.php")){
+			throw new Exception("Cannot find Mail/mimeDecode PEAR library");
+		}
+	}
+	
 	public function switchAction($action, $httpVars, $filesVars){
 		
 		if(!isSet($this->actions[$action])) return false;
@@ -261,6 +267,7 @@ class EmlParser extends AJXP_Plugin{
 					$metadata["eml_".$hKey] = SystemTextEncoding::toUTF8($metadata["eml_".$hKey]);
 				}
 			}
+			$metadata["eml_".$hKey] = str_replace("&amp;", "&", $metadata["eml_".$hKey]);
 		}
 		$metadata["eml_attachments"] = 0;
 		$parts = $structure->parts;
