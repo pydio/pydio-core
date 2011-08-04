@@ -116,5 +116,6 @@ $mess=array(
 "102" => "Identifier",
 "103" => "Description",
 "104" => "Status",
+"105" => "There is no global configuration for this plugin",
 ); 
 ?>
