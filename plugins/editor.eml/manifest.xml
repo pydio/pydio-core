@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.eml" openable="true" text="editor.eml.name" title="editor.eml.title" icon="mail_generic.png" className="EmlViewer" mimes="eml" formId="emlviewer_box" label="Email Viewer" description="Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly.">
 	<class_definition filename="plugins/editor.eml/class.EmlParser.php" classname="EmlParser"/>
-    <client_settings>
-        <resources>
-            <js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer" autoload="true"/>
-            <css file="plugins/editor.eml/emlViewer.css"/>
-            <img_library alias="eml_images" path="plugins/editor.eml/img"/>
-            <i18n namespace="editor.eml" path="plugins/editor.eml/i18n" />
-        </resources>
-    </client_settings>
+    <resources>
+        <js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer" autoload="true"/>
+        <css file="plugins/editor.eml/emlViewer.css"/>
+        <img_library alias="eml_images" path="plugins/editor.eml/img"/>
+        <i18n namespace="editor.eml" path="plugins/editor.eml/i18n" />
+    </resources>
 	<clientForm id="emlviewer_box"><![CDATA[
 		<div id="emlviewer_box" action="view_eml" box_width="80%" box_height="80%" box_padding="0">
 			<div class="action_bar" style="width: 100%;">			
