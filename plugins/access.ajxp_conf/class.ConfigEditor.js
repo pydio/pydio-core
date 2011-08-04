@@ -847,7 +847,12 @@ ConfigEditor = Class.create({
 			var form = new Element('div', {className:'driver_form'});
 			optionsPane.update("<legend>Plugin Configurations</legend>");			
 			optionsPane.insert({bottom:form});
-			this.formManager.createParametersInputs(form, driverParamsHash, true, (paramsValues.size()?paramsValues:null));
+			
+			if(driverParamsHash.size()){
+				this.formManager.createParametersInputs(form, driverParamsHash, true, (paramsValues.size()?paramsValues:null));
+			}else{
+				form.update(MessageHash['ajxp_conf.105']);
+			}
 			
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
