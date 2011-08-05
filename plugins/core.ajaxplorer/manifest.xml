@@ -14,6 +14,7 @@
 		<global_param name="WEBDAV_BASEHOST" group="WebDAV Server" type="string" label="Shares Host" description="Host used in webDAV protocol. Should be detected by default. Please READ THE DOC to safely use this feature." mandatory="false" default=""/>				
 		<global_param name="WEBDAV_DIGESTREALM" group="WebDAV Server" type="string" label="Digest Realm" description="Default realm for authentication. Please READ THE DOC to safely use this feature." mandatory="false" default="ajxp_webdav_realm"/>				
 		<global_param name="CMDLINE_ACTIVE" group="Miscalleneous" type="boolean" label="Command-line Active" description="Use AjaXplorer framework via the command line, allowing CRONTAB jobs or background actions." mandatory="false" default="true"/>				
+		<global_param name="CLI_PHP" group="Miscalleneous" type="string" label="Command-line PHP" description="On specific hosts, you may have to use a specific path to access the php command line" mandatory="false" default="php"/>				
 		<global_param name="NODENAME_MAX_LENGTH" group="Miscalleneous" type="integer" label="Filename length" description="Maximum characters length of new files or folders" mandatory="false" default="255"/>				
 		<global_param name="WEBMASTER_EMAIL" group="Miscalleneous" type="string" label="Admin email" description="Administrator email, not used for the moment" mandatory="false"/>				
 	</server_settings>
