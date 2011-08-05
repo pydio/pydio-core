@@ -66,6 +66,12 @@ class imapAccessDriver extends fsAccessDriver
 		*/
 	}
 	
+	function performChecks(){
+		if(!function_exists("imap_createmailbox")){
+			throw new Exception("PHP Imap extension must be loaded to use this driver!");
+		}
+	}
+	
 	public static function inverseSort($st1, $st2){		
 		return strnatcasecmp($st2, $st1);
 	}
