@@ -62,6 +62,12 @@ class dropboxAccessDriver extends fsAccessDriver
 		}
 	}
 	
+	function performChecks(){
+		if(!AJXP_Utils::searchIncludePath('HTTP/OAuth/Consumer.php')){
+			throw new Exception("The PEAR HTTP_OAuth package must be installed!");
+		}
+	}
+	
 	function isWriteable($dir, $type = "dir"){
 		return true;
 	}
