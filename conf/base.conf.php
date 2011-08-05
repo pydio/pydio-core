@@ -58,7 +58,8 @@ $confPath = realpath(dirname(__FILE__));
 // APPLICATION PATHES CONFIGURATION
 define("AJXP_INSTALL_PATH", $installPath);
 define("AJXP_CONF_PATH", $confPath);
-define("AJXP_CACHE_DIR", AJXP_INSTALL_PATH."/data/cache");
+define("AJXP_DATA_PATH", AJXP_INSTALL_PATH."/data");
+define("AJXP_CACHE_DIR", AJXP_DATA_PATH."/cache");
 define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
 define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
@@ -69,7 +70,7 @@ define("AJXP_BIN_FOLDER_REL", "server/classes");
 define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/classes");
 define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
-define("TESTS_RESULT_FILE", $installPath."/data/conf/diag_result.php");
+define("TESTS_RESULT_FILE", AJXP_CACHE_DIR."/diag_result.php");
 define("AJXP_TESTS_FOLDER", AJXP_INSTALL_PATH."/core/tests");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
