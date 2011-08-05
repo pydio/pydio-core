@@ -194,7 +194,7 @@ class AJXP_Controller{
         $logFile = $logDir."/".$token.".out";
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
 		$user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), AuthService::getLoggedUser()->getId(), MCRYPT_MODE_ECB, $iv));					
-		$cmd = "php ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
+		$cmd = ConfService::getCoreConf("CLI_PHP")." ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
 		foreach($parameters as $key=>$value){
             if($key == "action" || $key == "get_action") continue;
 			$cmd .= " --$key=".escapeshellarg($value);
