@@ -884,6 +884,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$this->parseParameters($httpVars, $options);
 				$confStorage = ConfService::getConfStorageImpl();
 				$confStorage->savePluginConfig($httpVars["plugin_id"], $options);
+				@unlink(AJXP_PLUGINS_CACHE_FILE);
+				@unlink(AJXP_PLUGINS_REQUIRES_FILE);				
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
 				AJXP_XMLWriter::reloadDataNode();
@@ -907,6 +909,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$types = $pServ->getDetectedPlugins();
 		$uniqTypes = array("core" ,"auth", "conf", "log");
 		if($dir == "/plugins"){
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
+			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
+			</columns>');		
+			
 			foreach( $types as $t => $tPlugs){
 				if(in_array($t, $uniqTypes))continue;
 				$meta = array(
@@ -916,7 +922,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t)." plugins", false, $meta);				
 			}
 		}else if($dir == "/core"){
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins">
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="ajxp_conf.plugins">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
@@ -948,7 +954,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			$split = explode("/", $dir);
 			if(empty($split[0])) array_shift($split);
 			$type = $split[1];
-			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins">
+			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="full" template_name="ajxp_conf.plugin_detail">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
