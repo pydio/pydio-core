@@ -260,7 +260,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 
     protected function lockIndex($repositoryId){
         $iPath = AJXP_CACHE_DIR."/indexes";
-        if(!is_dir($iPath)) mkdir($iPath,0666, true);
+        if(!is_dir($iPath)) mkdir($iPath,0755, true);
         touch($iPath."/.ajxp_lock-".$repositoryId.$this->specificId);
     }
 
