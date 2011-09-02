@@ -134,7 +134,7 @@ Class.create("ActionsToolbar", {
 	 */
 	initToolbar: function(toolbar){
 		if(!this.toolbars.get(toolbar)) {
-			return;
+			return '';
 		}
 		var toolEl = $(toolbar+'_toolbar');		
 		if(!toolEl){ 
@@ -350,7 +350,7 @@ Class.create("ActionsToolbar", {
 				var cumul = Position.cumulativeOffset(button.arrowDiv.imgRef);
 				var imgPos = cumul[0] + 11 - scroll;
 				var imgTop = cumul[1] + 17;
-				button.arrowDiv.setStyle({position:'absolute',top:imgTop,left:imgPos});		
+				button.arrowDiv.setStyle({position:'absolute',top:imgTop+"px",left:imgPos+"px"});
 			}else{
 				button.arrowDiv.hide();
 				return;

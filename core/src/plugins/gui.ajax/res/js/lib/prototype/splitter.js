@@ -91,15 +91,17 @@ Class.create("Splitter", AjxpPane, {
 		var divs = this.group.childElements();
 		divs.each(function(div){
 			div.setStyle({
-				position:'absolute',
-				margin:0
+				position:'absolute'/*,
+				margin:0*/
 			});
 		});
 		this.paneA = divs[0];
 		this.paneB = divs[1];
-		this.initBorderA = parseInt(this.paneA.getStyle('borderWidth')) || 0;
-		this.initBorderB = parseInt(this.paneB.getStyle('borderWidth')) || 0;
-		
+		this.initBorderA = parseInt(this.paneA.getStyle('border'+this.options.adjSide1+'Width')) + parseInt(this.paneA.getStyle('border'+this.options.adjSide2+'Width')) || 0;
+		this.initBorderA += parseInt(this.paneA.getStyle('margin'+this.options.adjSide1)) + parseInt(this.paneA.getStyle('margin'+this.options.adjSide2));
+		this.initBorderB = parseInt(this.paneB.getStyle('border'+this.options.adjSide1+'Width')) + parseInt(this.paneB.getStyle('border'+this.options.adjSide2+'Width'))  || 0;
+		this.initBorderB += parseInt(this.paneB.getStyle('margin'+this.options.adjSide1)) + parseInt(this.paneB.getStyle('margin'+this.options.adjSide2));
+
 		this.splitbar = new Element('div', {unselectable:'on'});
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
 		this.paneA.insert({after:this.splitbar});
@@ -149,9 +151,9 @@ Class.create("Splitter", AjxpPane, {
 		
 		// Recompute fixed
 		var optName = this.options.fixed;
-		var borderAdj = (!Prototype.Browser.IE?(this.initBorderA*2):0);		
+		var borderAdj = (!Prototype.Browser.IE?(this.initBorderA):0);
 		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed-borderAdj+'px')); 
-		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB*2):0);		
+		var borderAdj = (!Prototype.Browser.IE?(this.initBorderB):0);
 		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdj+'px')); 
 		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
 		
@@ -238,12 +240,12 @@ Class.create("Splitter", AjxpPane, {
 		this.splitbar.setStyle(this.makeStyleObject(this.options.set, np+'px'));
 		var borderAdj = 0;
 		if(!Prototype.Browser.IE && this.initBorderA){
-			borderAdj = this.initBorderA*2;
+			borderAdj = this.initBorderA;
 		}		
 		this.paneA.setStyle(this.makeStyleObject(this.options.adjust, np-this.paneA._padAdjust-borderAdj+'px'));
 		this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
 		if(!Prototype.Browser.IE && this.initBorderB){
-			borderAdj = this.initBorderB*2;
+			borderAdj = this.initBorderB;
 		}		
 		this.paneB.setStyle(this.makeStyleObject(this.options.adjust, this.group._adjust-this.splitbar._adjust-this.paneB._padAdjust-np-borderAdj+"px"));
 		if(!Prototype.Browser.IE){

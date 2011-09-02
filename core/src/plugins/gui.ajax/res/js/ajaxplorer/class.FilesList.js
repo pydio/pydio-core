@@ -922,13 +922,13 @@ Class.create("FilesList", SelectableElements, {
 		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
 			zIndex:5000, 
 			position:'absolute',
-			marginLeft:0,
-			marginTop:0,
-			height:24
+			marginLeft:'0px',
+			marginTop:'0px',
+			height:'24px'
 		});
 		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
 		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);		
-		edit.setStyle({left:pos.left+offset.left, top:(pos.top+offset.top-scrollTop)});
+		edit.setStyle({left:(pos.left+offset.left)+'px', top:(pos.top+offset.top-scrollTop)+'px'});
 		window.setTimeout(function(){
 			edit.focus();
 			var end = edit.getValue().lastIndexOf("\.");
@@ -973,20 +973,20 @@ Class.create("FilesList", SelectableElements, {
 			edit.setStyle({left:pos.left+offset.left - 70 + origWidth});
 			newWidth = 70;
 		}
-		edit.setStyle({width:newWidth});
+		edit.setStyle({width:newWidth+'px'});
 		
 		buttons.select('input').invoke('setStyle', {
 			margin:0,
-			width:22,
+			width:'22px',
 			border:0,
 			backgroundColor:'transparent'
 		});
 		buttons.setStyle({
 			position:'absolute',
-			width:46,
+			width:'46px',
 			zIndex:2500,
-			left:pos.left+offset.left+origWidth,
-			top:(pos.top+offset.top-scrollTop)-1
+			left:(pos.left+offset.left+origWidth)+'px',
+			top:((pos.top+offset.top-scrollTop)-1)+'px'
 		});
 		var closeFunc = function(){
 			span.setStyle({color:''});
@@ -1038,7 +1038,7 @@ Class.create("FilesList", SelectableElements, {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
 				//}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span id=\"ajxp_label\" class=\"text_label\">" + metaData.get('text')+"</span>");
-				}).update("<span id=\"ajxp_label\" class=\"text_label"+fullview+"\" style=\"padding-left:24px; background-repeat:no-repeat;background-position:4 2px;background-image:url('"+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"')\">" + metaData.get('text')+"</span>");
+				}).update("<span id=\"ajxp_label\" class=\"text_label"+fullview+"\" style=\"padding-left:24px; background-repeat:no-repeat;background-position:4px 2px;background-image:url('"+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"')\">" + metaData.get('text')+"</span>");
 				innerSpan.ajxpNode = ajxpNode; // For draggable
 				tableCell.insert(innerSpan);
 				

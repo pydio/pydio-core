@@ -91,7 +91,7 @@ Class.create("HeaderResizer", {
 		var initSizes;
 		var index=0;
 		data.each(function(el){
-			this.element.insert('<div class="header_cell"><div class="header_label">'+el.label+'</div></div>');
+			this.element.insert('<div class="header_cell"><div class="header_label css_gradient">'+el.label+'</div></div>');
 			if(el  != data.last()){
 				this.element.insert('<div class="resizer">&nbsp;</div>');
 			}
@@ -332,7 +332,7 @@ Class.create("HeaderResizer", {
 			}else{
 				selector = "#"+this.options.body.id+" td.resizer_"+ (i) + " .text_label";
 			}
-			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:this.options.headerData[i].leftPadding+1))+" !important;";
+			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:this.options.headerData[i].leftPadding+1))+"px !important;";
 			this.addStyleRule(sheet, selector, rule);
 		}
 
