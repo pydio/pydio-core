@@ -620,16 +620,16 @@ div.SF_label{
 
 .panelHeader{
     border: none;
-	background-color: #f1f1ef;
 	font-family: Trebuchet MS, sans-serif;
 	font-size: 12px;
-	padding: 3 2 2 7;
+	padding: 3px 2px 2px 7px;
 	margin-bottom:0px;
 	color: #676965;
 	vertical-align: middle;
-	background-color: #f1f1ef;
-	border-bottom : 1px solid #676965;
+	background-color: #fff;
 	height: 18px;
+    margin-bottom: 5px;
+    border-radius: 5px;
 	/*
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F1F1EF', endColorstr='#E6E6E0');
 	background: -webkit-gradient(linear, left top, left bottom, from(#F1F1EF), to(#E6E6E0));
@@ -641,11 +641,11 @@ div.SF_label{
 #action_bar, 
 .action_bar
 {
-    background-color: #f1f1ef;
+    background-color: #eee;
     font-family: Arial;
     font-size: 12px;
     padding: 0px;
-    line-height: 16px;    
+    line-height: 16px;
 }
 
 .action_bar
@@ -682,13 +682,14 @@ div.SF_label{
 	height:44px;
 	margin-right:5px;
 	margin-top:3px;
-	padding:0px;
+	padding:0px 3px;
 	text-align:center;
 	overflow:visible;
-	color: expression('#676965');
+	color: #333;
 	outline:none;
 	-moz-border-radius : 5 5 0 0px;
 	border-radius : 5 5 0 0px;
+    text-shadow: 1px 1px 1px white;
 }
 
 #action_bar a.menuAnchorSelected
@@ -761,6 +762,16 @@ a.carousel-control img{
     /*border-right: 1px solid #79f;*/    
 }
 
+#content_pane{
+    margin: 20px;
+    box-shadow:0px 0px 5px #aaa;
+    background-color: #fff;
+}
+#topPane, #bottomSplitPane{
+    margin: 20px;
+    border:  0px !important;
+}
+
 #locationbar_cont
 {
 	/*background-image:url(../images/ToolbarBg.gif);*/
@@ -769,6 +780,7 @@ a.carousel-control img{
 	height:33px;
 	_height:32px;
 	width:100%;
+    box-shadow:0 0px 5px #bbb;
 }
 
 #locationBar{
@@ -786,19 +798,19 @@ a.carousel-control img{
 	border-right-width:0px;
 	float:left;
 	height:20px;
-	padding:2px 0 0 4px;
+	padding:2px 0px 0px 4px;
 }
 
 #repository_form, #goto_parent
 {
-	-moz-border-radius : 5 0 0 5px;
-	border-radius : 5 0 0 5px;
+	-moz-border-radius : 5px 0px 0px 5px;
+	border-radius : 5px 0px 0px 5px;
 }
 
 #repository_goto, #bookmarks_goto
 {
-	-moz-border-radius : 0 5 5 0px;
-	border-radius : 0 5 5 0px;
+	-moz-border-radius : 0px 5px 5px 0px;
+	border-radius : 0px 5px 5px 0px;
 }
 
 #location_form
@@ -948,6 +960,9 @@ a.carousel-control img{
 
 #current_path{
     padding-left:0px;
+}
+#current_path:focus, #repo_path:focus{
+    outline: none;
 }
 
 /********************************/
@@ -1781,11 +1796,11 @@ tr td.infoPanelLabel
 
 #browser
 {
-	border : 1px solid #676965;
-    padding:10px;
+    /*padding:10px;*/
     clear:left;
-    background-color:#c4c7c1;
-    line-height: 18px
+    background-color:#eee;
+    line-height: 18px;
+    box-shadow: inset 1px 1px 5px #999;
 }
 
 div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .ajxp_simple_container{
@@ -1832,12 +1847,13 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 
 #vertical_splitter{
     overflow: hidden; 
-    background-color: #fff;
 }
 
 #sidebar_splitter{
     overflow: auto;
     width: 200px;
+    background-color: #CFDBE8;
+    box-shadow: rgb(153, 153, 153) 1px 1px 5px inset;
 }
 
 .splitterContentPane{
@@ -1847,15 +1863,10 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 .vsplitbar
 {
    width: 4px;
-   background-color: #e0ecff;
-   background-color: #c4c7c1;
+   /*background-color: #eee;*/
    background-image: url(../images/vgrabber.gif);
    background-repeat: no-repeat;
    background-position: center;
-   /*border: 1px solid;*/
-	border-color:	#fff ButtonShadow
-					ButtonShadow #fff;
-   
 }
 .vsplitbar.active
 {
@@ -1864,20 +1875,15 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 
 .vsplitbar:hover 
 {
-  background-color: #ccc;
 }
 
 .hsplitbar
 {
    height: 4px;
-   background-color: #e0ecff;
-   background-color: #c4c7c1;
+   /*background-color: #eee;*/
    background-image: url(../images/hgrabber.gif);
    background-repeat: no-repeat;
    background-position: center;
-   /*border: 1px solid;   */
-	border-color:	#fff ButtonShadow
-					ButtonShadow #fff;
 }
 .hsplitbar.active
 {
@@ -1885,7 +1891,7 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 
 .hsplitbar:hover{
-  background-color: #ccc;
+  /*background-color: #ccc;*/
 }
 
 
