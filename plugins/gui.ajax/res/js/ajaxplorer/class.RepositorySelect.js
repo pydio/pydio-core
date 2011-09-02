@@ -99,7 +99,7 @@ Class.create("RepositorySelect", {
 			16,
 			'inline_hover', null, true);
 		this.button.setStyle({marginRight:'7px'});		
-		this.button.select('img')[0].setStyle({height:6, width:10, marginLeft:1, marginRight:1, marginTop:8});
+		this.button.select('img')[0].setStyle({height:'6px', width:'10px', marginLeft:'1px', marginRight:'1px', marginTop:'8px'});
 		this.element.insert(this.button);
 	},
 	/**

@@ -498,7 +498,9 @@ Class.create("Modal", {
 			left:leftPosition+'px',
 			width:boxWidth+'px'
 		});
-		new Effect.Corner(this.messageBox,"5px");
+		if(!Modernizr.borderradius) {
+            new Effect.Corner(this.messageBox,"5px");
+        }
 		new Effect.Appear(this.messageBox);
 		this.tempoMessageDivClosing();
 	},
