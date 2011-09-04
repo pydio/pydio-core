@@ -1,4 +1,4 @@
-.css_gradient{
+.css_gradient, .infoPanelGroup, .panelHeader{
 background: rgb(247,247,247); /* Old browsers */
 background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -9,7 +9,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', end
 background: linear-gradient(top, rgba(247,247,247,1) 0%,rgba(227,227,227,1) 50%,rgba(216,216,216,1) 51%,rgba(242,242,242,1) 100%); /* W3C */
 }
 
-.soft_css_gradient{
+.soft_css_gradient, .menu.desktop, .menu.rootDirChooser, .menu.bookmarksMenu{
 background: rgb(255,255,255); /* Old browsers */
 background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
@@ -616,6 +616,8 @@ div.SF_label{
 
 #tree_container{
     background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0px 0px 2px #aaa;
 }
 
 .panelHeader{
@@ -628,14 +630,15 @@ div.SF_label{
 	vertical-align: middle;
 	background-color: #fff;
 	height: 18px;
-    margin-bottom: 5px;
-    border-radius: 5px;
-	/*
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F1F1EF', endColorstr='#E6E6E0');
-	background: -webkit-gradient(linear, left top, left bottom, from(#F1F1EF), to(#E6E6E0));
-	background: -moz-linear-gradient(top,  #F1F1EF,  #E6E6E0);
-	*/
+    margin-bottom: 1px;
+    border-radius: 2px;
 	text-shadow : 1px 1px 1px #FFFFFF;
+    box-shadow: 0px 0px 2px #aaa;
+}
+
+#sidebar_splitter div.panelHeader{
+    padding-top: 5px;
+    padding-bottom: 4px;
 }
 
 #action_bar, 
@@ -764,6 +767,7 @@ a.carousel-control img{
 
 #content_pane{
     margin: 20px;
+    margin-top:17px;
     box-shadow:0px 0px 5px #aaa;
     background-color: #fff;
 }
@@ -873,9 +877,12 @@ a.carousel-control img{
 
 .inline_hover_light
 {
+	/*
 	background-image:url(../images/ToolbarBgReverse.gif);
 	background-position:center center;
 	background-repeat: repeat-x;
+	*/
+    background-color: #fefefe;
 }
 
 .inline_hover
@@ -1537,6 +1544,23 @@ div#upload_files_list div, div#multiple_download_container div
 	letter-spacing: 1;
 }
 
+/***** SCROLLER ******/
+.scroller_track{
+    position: absolute;
+    height: 89%;
+    width: 10px;
+    background-color: #F1F1F1;
+    cursor: move;
+    right: 10px;
+    z-index: 1000;
+    opacity: 0.7;
+    border-radius: 0px 2px 2px 0px;
+    border-left: 1px solid #CCC;
+}
+.scroller_handle{
+    border-radius: 5px;
+}
+
 /*
  SEARCH BOX / INFO PANEL
 */
@@ -1591,7 +1615,12 @@ div.tabulatorContainer{
 	color: #999;
 	text-decoration:none;	
 }
- 
+
+#search_panel{
+    margin: 20px;
+    box-shadow: 0px 0px 6px #aaa;
+}
+
 #search_div
 {
 /*    width: 100%;*/
@@ -1605,6 +1634,7 @@ div.tabulatorContainer{
     overflow: auto;
     height: 120px;
     background-color: #fff;
+    margin-bottom: 3px;
 }
 
 #search_container
@@ -1617,8 +1647,7 @@ div.tabulatorContainer{
      padding-left: 10px;
      padding-top:10px;
      text-align: center;    
-	background-color: #f1f1ef;
-     /*height: 30px;*/
+    /*height: 30px;*/
 }
 #search_form
 {
@@ -1712,11 +1741,16 @@ meta_opt.checked {
 .infoPanelActions
 {
 	padding:5px;
+    font-size: 11px;
 }
 
-#info_panel
+#info_panel .panelContent
 {
-	overflow:auto;
+	overflow:hidden;
+    background-color: #fff;
+    font-family: Arial, Verdana, Sans-serif;
+    border-radius: 2px;
+    box-shadow: 0px 0px 2px #aaa;
 }
 
 #info_panel a
@@ -1766,8 +1800,7 @@ td.infoPanelLabel
 
 .infoPanelGroup
 {
-	border-top: 1px dotted #676965;
-	border-bottom: 1px dotted #676965;
+    border-radius: 0px;
 }
 
 tr.even td.infoPanelLabel
@@ -1783,7 +1816,7 @@ tr td.infoPanelLabel
 .infoPanelImagePreview 
 {
 	width: 100%;
-	background-color: #f1f1ef;
+	background-color: #f1f1f1;
 	text-align:center;
 	padding: 10 0;
 }
@@ -1852,7 +1885,7 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 #sidebar_splitter{
     overflow: auto;
     width: 200px;
-    background-color: #CFDBE8;
+    background-color: #D2DFE9;
     box-shadow: rgb(153, 153, 153) 1px 1px 5px inset;
 }
 
@@ -1871,6 +1904,11 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 .vsplitbar.active
 {
   background-color: #666;
+}
+
+.hsplitbar.folded{
+    opacity: 0;
+    cursor: default;
 }
 
 .vsplitbar:hover 
@@ -2290,8 +2328,7 @@ div.menu a {
 
 .menu.desktop {
 	width: 10em;
-	background: #f1f1ef;
-	border: 1px solid #676965;	
+	border: 1px solid #D1D2D0;
 	padding: 0;
     padding-top: 0px;
     padding-bottom: 1px;
@@ -2413,11 +2450,10 @@ div.menu a {
    font-family: Trebuchet MS, sans-serif, Helvetica, sans-serif;
    position:absolute;
    z-index: 1500;
-   background-color:#f1f1ef;  
    min-width: 150px;
    /* IE */
    width:expression("250px"); 
-   border: 1px solid #676965;
+   border: 1px solid #D1D2D0;
 }
 
 .rootDirChooser img
@@ -2484,8 +2520,7 @@ div.menu a {
    font-family: Trebuchet MS, Helvetica, sans-serif;
    position:absolute;
    z-index: 1500;
-   background-color:#f1f1ef;  
-   border: 1px solid #676965;
+   border: 1px solid #D1D2D0;
    width: 200px;
    padding: 2px;
 }
@@ -2505,7 +2540,7 @@ div.menu a {
 .menuActions {
    float: right;
    width: 50px;
-   padding-top: 3px;
+   padding-top: 0px !important;
    padding-right: 3px;
    text-align: right;
 }
@@ -2563,9 +2598,9 @@ div.menu a {
 /* Generally applied after a Modernizr test */
 /********************************************/
 .css_boxshadow{
-	-moz-box-shadow : 1px 1px 2px rgba(100, 100, 100, 0.5);
-	-webkit-box-shadow : 1px 1px 2px rgba(100, 100, 100, 0.5);
-	box-shadow : 1px 1px 2px rgba(100, 100, 100, 0.5);
+	-moz-box-shadow : 5px 5px 20px rgba(100, 100, 100, 0.5);
+	-webkit-box-shadow : 5px 5px 20px rgba(100, 100, 100, 0.5);
+	box-shadow : 5px 5px 20px rgba(100, 100, 100, 0.5);
 }
 
 /****************************************/
