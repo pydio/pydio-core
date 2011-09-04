@@ -97,7 +97,10 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		if(!this.htmlElement) return;
 		
-		this.htmlElement.update('<div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div>');
+		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><a href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
+        if(this.htmlElement.down('div.panelHeader')){
+            this.htmlElement.down('div#search_panel').insert({top:this.htmlElement.down('div.panelHeader')});
+        }
 		
 		this.metaOptions = [];
 		if(this._ajxpOptions && this._ajxpOptions.metaColumns){
@@ -172,7 +175,7 @@ Class.create("SearchEngine", AjxpPane, {
 	resize: function(){
 		fitHeightToBottom($(this._resultsBoxId));
 		if(this.htmlElement && this.htmlElement.visible()){
-			this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth()-70),70) + "px"});
+			this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth() - this.htmlElement.getStyle("paddingLeft")- this.htmlElement.getStyle("paddingRight") -70),70) + "px"});
 		}
 	},
 	

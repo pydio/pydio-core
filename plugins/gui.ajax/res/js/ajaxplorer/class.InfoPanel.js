@@ -44,7 +44,18 @@ Class.create("InfoPanel", AjxpPane, {
 		$super(htmlElement);
 		attachMobileScroll(htmlElement, "vertical");
 		disableTextSelection(htmlElement);
-		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');	
+        var container = new Element("div", {className:"panelContent", id:"ip_content"});
+
+        this.scroller = new Element('div', {id:'ip_scroller', className:'scroller_track'});
+        this.scroller.insert('<div id="ip_scrollbar_handle" class="scroller_handle"></div>');
+        this.htmlElement.insert(this.scroller);
+        this.htmlElement.insert(container);
+        
+        this.scrollbar = new Control.ScrollBar('ip_content','ip_scroller');
+        window.ipScrollBar = this.scrollbar;
+
+        this.contentContainer = container;
+		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');
 		this.mimesTemplates = new Hash();
 		this.registeredMimes = new Hash();
 		
@@ -92,7 +103,7 @@ Class.create("InfoPanel", AjxpPane, {
 		var userSelection = ajaxplorer.getUserSelection();
 		var contextNode = userSelection.getContextNode();
 		this.empty();
-
+        this.scrollbar.recalculateLayout();
 		if(!contextNode) {
 			return;
 		}
@@ -129,23 +140,25 @@ Class.create("InfoPanel", AjxpPane, {
 				current_folder:currentRep
 			});
 				try{
-				if(!folderNumber && $(this.htmlElement).select('[id="filelist_folders_count"]').length){
-					$(this.htmlElement).select('[id="filelist_folders_count"]')[0].hide();
+				if(!folderNumber && $(this.contentContainer).select('[id="filelist_folders_count"]').length){
+					$(this.contentContainer).select('[id="filelist_folders_count"]')[0].hide();
 				}
-				if(!filesNumber && $(this.htmlElement).select('[id="filelist_files_count').length){
-					$(this.htmlElement).select('[id="filelist_files_count"]')[0].hide();
+				if(!filesNumber && $(this.contentContainer).select('[id="filelist_files_count').length){
+					$(this.contentContainer).select('[id="filelist_files_count"]')[0].hide();
 				}
-				if(!size && $(this.htmlElement).select('[id="filelist_totalsize"]').length){
-					$(this.htmlElement).select('[id="filelist_totalsize"]')[0].hide();
+				if(!size && $(this.contentContainer).select('[id="filelist_totalsize"]').length){
+					$(this.contentContainer).select('[id="filelist_totalsize"]')[0].hide();
 				}
 			}catch(e){}
 			this.addActions('empty');
+            this.scrollbar.recalculateLayout();
 			return;
 		}
 		if(!userSelection.isUnique())
 		{
 			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
 			this.addActions('multiple');
+            this.scrollbar.recalculateLayout();
 			return;
 		}
 		
@@ -160,13 +173,13 @@ Class.create("InfoPanel", AjxpPane, {
 		}
 		
 		this.addActions('unique');
-		var fakes = this.htmlElement.select('div[id="preview_rich_fake_element"]');
+		var fakes = this.contentContainer.select('div[id="preview_rich_fake_element"]');
 		if(fakes && fakes.length){
 			this.currentPreviewElement = this.getPreviewElement(uniqNode, false);			
 			$(fakes[0]).replace(this.currentPreviewElement);			
 			this.resize();
 		}
-		
+		this.scrollbar.recalculateLayout();
 	},
 	/**
 	 * Insert html in content pane
@@ -174,7 +187,7 @@ Class.create("InfoPanel", AjxpPane, {
 	 */
 	setContent : function(sHtml){
 		if(!this.htmlElement) return;
-		this.htmlElement.update(sHtml);
+		this.contentContainer.update(sHtml);
 	},
 	/**
 	 * Show/Hide the panel
@@ -189,7 +202,12 @@ Class.create("InfoPanel", AjxpPane, {
 	 * Resize the panel
 	 */
 	resize : function(){
-		fitHeightToBottom(this.htmlElement, null);	
+		fitHeightToBottom(this.contentContainer, null);
+        this.scrollbar.recalculateLayout();
+        if(this.scrollbar.enabled){
+            fitHeightToBottom(this.scroller, null);
+            this.scrollbar.recalculateLayout();
+        }
 		if(this.currentPreviewElement && this.currentPreviewElement.visible()){
 			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));
 			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:150});
@@ -275,10 +293,10 @@ Class.create("InfoPanel", AjxpPane, {
 				this[pair.key] = MessageHash[pair.value];
 			}.bind(tArgs));
 			var template = new Template(tString);
-			this.htmlElement.insert(template.evaluate(tArgs));
+			this.contentContainer.insert(template.evaluate(tArgs));
 			if(tModifier){
 				var modifierFunc = eval(tModifier);
-				modifierFunc(this.htmlElement);
+				modifierFunc(this.contentContainer);
 			}
 		}
 	},
@@ -303,7 +321,7 @@ Class.create("InfoPanel", AjxpPane, {
 		}.bind(this));
 		actionString += '</div>';
 		if(!count) return;
-		this.htmlElement.insert(actionString);
+		this.contentContainer.insert(actionString);
 	},
 	/**
 	 * Use editors extensions to find a preview element for the current node

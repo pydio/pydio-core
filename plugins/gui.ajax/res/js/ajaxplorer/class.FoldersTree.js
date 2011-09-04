@@ -46,9 +46,18 @@ Class.create("FoldersTree", AjxpPane, {
 	initialize: function ($super, oElement, options)
 	{
 		$super(oElement);
-		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:auto;height:100%;width:100%;'});
+		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:hidden;height:100%;width:100%;'});
+        this.scroller = new Element('div', {id:'tree_scroller', className:'scroller_track'});
+        this.scroller.insert('<div id="scrollbar_handle" class="scroller_handle"></div>');
+        oElement.insert(this.scroller);
 		oElement.insert(this.treeContainer);
 		disableTextSelection(this.treeContainer);
+        this.scrollbar = new Control.ScrollBar('tree_container','tree_scroller', {fixed_scroll_distance:25});
+        var pe = new PeriodicalExecuter(function(){
+            this.scrollbar.recalculateLayout();
+        }.bind(this), 0.5);
+
+
 		this.options = {};
 		if(options){
 			this.options = options;
@@ -160,6 +169,11 @@ Class.create("FoldersTree", AjxpPane, {
 	 */
 	resize : function(){
 		fitHeightToBottom(this.treeContainer, null);
+        this.scrollbar.recalculateLayout();
+        if(this.scrollbar.enabled){
+            fitHeightToBottom(this.scroller, null);
+            this.scrollbar.recalculateLayout();
+        }
 	},
 	
 	/**

@@ -18,6 +18,7 @@ js/lib/scriptaculous/src/effects.js
 js/lib/scriptaculous/src/dragdrop.js
 js/lib/scriptaculous/src/controls.js
 js/lib/scriptaculous/src/slider.js
+js/lib/prototype/proto.scroller.js
 js/lib/prototype/shadower.js
 js/lib/prototype/corners.js
 js/lib/prototype/carousel.js
