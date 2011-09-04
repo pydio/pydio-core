@@ -162,9 +162,6 @@ Class.create("ActionsToolbar", {
 			this.element.subMenus.invoke("destroy");
 		}
 		this.element.select('div').each(function(divElement){			
-			divElement.select('a').each(function(button){
-				if(button.arrowDiv) button.arrowDiv.remove();
-			});
 			divElement.remove();
 		}.bind(this));
 		this.toolbars = new Hash();
@@ -186,22 +183,7 @@ Class.create("ActionsToolbar", {
 		this.element = this.inner;
 		
 		this.carousel = new Carousel(this.outer, [], $A([this.prev,this.next]), {
-			duration:0.1,
-			afterMove : function(){
-				this.carousel.slides.each(function(button){
-					if(button.arrowDiv){
-						button.arrowDiv.show();
-						this.placeArrowDiv(button);
-					}
-				}.bind(this));
-			}.bind(this),
-			beforeMove : function(){
-				this.carousel.slides.each(function(button){
-					if(button.arrowDiv){
-						button.arrowDiv.hide();
-					}
-				}.bind(this));
-			}.bind(this)
+			duration:0.1
 		});
 	},
 	
@@ -250,11 +232,12 @@ Class.create("ActionsToolbar", {
 		//this.elements.push(this.button);
 		if(action.options.subMenu){
 			this.buildActionBarSubMenu(button, action);// TODO
-			button.arrowDiv = new Element('div');
-			button.arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
-			button.arrowDiv.imgRef = img;
-			$$('body')[0].insert(button.arrowDiv);			
-			button.arrowDiv.setStyle({display:'none'});// hide by default
+            button.setStyle({position:'relative'});
+			var arrowDiv = new Element('div');
+			arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
+			arrowDiv.imgRef = img;
+            button.insert(arrowDiv);
+            arrowDiv.setStyle({position:'absolute', top:'18px', right:'8px'});
 		}else{
 			button.observe("mouseover", function(){
 				this.buttonStateHover(button, action);
@@ -280,14 +263,12 @@ Class.create("ActionsToolbar", {
 		}.bind(this));
 		action.observe("show", function(){
 			button.show();
-			this.placeArrowDiv(button);
 		}.bind(this));
 		action.observe("disable", function(){
 			button.addClassName("disabled");
 		}.bind(this));
 		action.observe("enable", function(){
 			button.removeClassName("disabled");
-			this.placeArrowDiv(button);
 		}.bind(this));
 		action.observe("submenu_active", function(submenuItem){
 			if(!submenuItem.src || !action.options.subMenuUpdateImage) return;
@@ -336,6 +317,7 @@ Class.create("ActionsToolbar", {
 	 * @param button HTMLElement
 	 */
 	placeArrowDiv : function(button){
+        return;
 		if(!button.arrowDiv) return;
 		try{
 			if(!button.visible()){
@@ -433,12 +415,6 @@ Class.create("ActionsToolbar", {
 			this.carousel.first();
 			this.outer.setStyle({width:parentWidth + 'px'});
 		}
-		
-		buttons.each(function(button){
-			if(button.arrowDiv){
-				this.placeArrowDiv(button);
-			}			
-		}.bind(this) );
 	},
 	/**
 	 * IAjxpWidget Implementation. Empty.
