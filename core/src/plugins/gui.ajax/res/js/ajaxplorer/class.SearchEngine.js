@@ -63,7 +63,7 @@ Class.create("SearchEngine", AjxpPane, {
 	 */
 	initialize: function($super, mainElementName, ajxpOptions)
 	{
-		$super($(mainElementName));
+		$super($(mainElementName), ajxpOptions);
 		if(ajxpOptions){
 			this._ajxpOptions = ajxpOptions;
 		}

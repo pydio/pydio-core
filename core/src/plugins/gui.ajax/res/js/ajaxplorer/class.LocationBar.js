@@ -48,8 +48,8 @@ Class.create("LocationBar", {
 		this.element = oElement;
 		this.element.ajxpPaneObject = this;
 		this.realPath = '/';
-		this.createGui();		
-		this.options = options || {};
+        this.options = options || {};
+		this.createGui();
 		document.observe("ajaxplorer:user_logged", this.resize.bind(this));
 	},
 	/**
@@ -100,7 +100,22 @@ Class.create("LocationBar", {
 			this.submitPath.bind(this)
 			);
 		this.element.insert(this.gotoButton);
-		
+
+        if(this.options.searchButton){
+            this.searchButton = simpleButton(
+                'search_panel_button',
+                'inlineBarButtonLeft',
+                87, 184,
+                'search.png',
+                16,
+                'inline_hover',
+                function(){
+                    window[this.options.searchButton]['toggleFolding']();
+                }.bind(this)
+            );
+            this.element.insert(this.searchButton);
+        }
+
 		this.bmButton = simpleButton(
 			'bookmarks_goto', 
 			'inlineBarButtonLeft', 

@@ -146,7 +146,7 @@ Class.create("SliderInput", {
 		var topPos = anchorPosition[1] + anchor.getHeight() + this.options.topOffset - anchorScroll[1];
 		var leftPos = anchorPosition[0] + this.options.leftOffset - anchorScroll[0];
 		
-		return {top : topPos, left:leftPos};
+		return {top : topPos+'px', left:leftPos+'px'};
 		
 	}
 	

@@ -138,6 +138,9 @@ class AJXP_Utils
 	}
 	
 	public static function getAjxpTmpDir(){
+        if(ConfService::getCoreConf("AJXP_TMP_DIR") != ""){
+            return ConfService::getCoreConf("AJXP_TMP_DIR");
+        }
 		if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR != ""){
 			return AJXP_TMP_DIR;
 		}

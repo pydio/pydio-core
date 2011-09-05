@@ -82,7 +82,7 @@ class dropboxWrapper implements AjxpWrapper {
 	}
 
 	static public function getRealFSReference($path) {
-		$tmpFile = AJXP_TMP_DIR."/".rand();
+		$tmpFile = AJXP_Utils::getAjxpTmpDir()."/".rand();
 		$path = self::staticInitPath($path);
 		file_put_contents($tmpFile, self::$dropbox->getFile($path));
 		return $tmpFile;
@@ -226,7 +226,7 @@ class dropboxWrapper implements AjxpWrapper {
 			self::$crtTmpFile = self::getRealFSReference($path);
 			self::$crtWritePath = null;
 		}else{
-			self::$crtTmpFile = AJXP_TMP_DIR."/".rand();
+			self::$crtTmpFile = AJXP_Utils::getAjxpTmpDir()."/".rand();
 			self::$crtWritePath = $path;
 		}
 		self::$crtHandle = fopen(self::$crtTmpFile, $mode);

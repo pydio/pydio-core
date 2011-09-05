@@ -47,9 +47,7 @@ Class.create("AjxpPane", {
 		if(!this.htmlElement){
 			throw new Error('Cannot find element for AjxpPane : ' + this.__className);
 		}
-		if(options){
-			this.options = options;
-		}
+		this.options = options || {};
 		this.htmlElement.ajxpPaneObject = this;
 		if(this.htmlElement.getAttribute('ajxpPaneHeader')){
 			this.addPaneHeader(
@@ -123,8 +121,23 @@ Class.create("AjxpPane", {
 	 * @param headerIcon String Path for the icon image
 	 */
 	addPaneHeader : function(headerLabel, headerIcon){
-		this.htmlElement.insert({top : new Element('div', {className:'panelHeader',ajxp_message_id:headerLabel}).update(MessageHash[headerLabel])});
-		disableTextSelection(this.htmlElement.select('div')[0]);
+        var header = new Element('div', {className:'panelHeader',ajxp_message_id:headerLabel}).update(MessageHash[headerLabel]);
+        if(headerIcon){
+            var ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
+            header.insert({top: new Element("img", {src:ic, className:'panelHeaderIcon'})});
+            header.addClassName('panelHeaderWithIcon');
+        }
+        if(this.options.headerClose){
+            var ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
+            var img = new Element("img", {src:ic, className:'panelHeaderCloseIcon', title:MessageHash[this.options.headerClose.title]});
+            header.insert({top: img});
+            var sp = this.options.headerClose.splitter;
+            img.observe("click", function(){
+                window[sp]["fold"]();
+            });
+        }
+		this.htmlElement.insert({top : header});
+		disableTextSelection(header);
 	},
 	
 	/**

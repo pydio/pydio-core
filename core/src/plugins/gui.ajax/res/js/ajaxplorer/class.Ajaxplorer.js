@@ -728,6 +728,10 @@ Class.create("Ajaxplorer", {
 		var tNodes = XPathSelectNodes(this._registry, "client_configs/template");
 		for(var i=0;i<tNodes.length;i++){
 			var target = tNodes[i].getAttribute("element");
+            var themeSpecific = tNodes[i].getAttribute("theme");
+            if(themeSpecific && window.ajxpBootstrap.parameters.get("theme") && window.ajxpBootstrap.parameters.get("theme") != themeSpecific){
+                continue;
+            }
 			if($(target) || $$(target).length){
 				if($(target)) target = $(target);
 				else target = $$(target)[0];

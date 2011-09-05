@@ -449,6 +449,9 @@ $mess=array(
 "411" => "Open",
 "412" => "Upload only",
 "413" => "Shared by",
-"414" => "Use arrows to navigate and +/- to change zoom"
+"414" => "Use arrows to navigate and +/- to change zoom",
+"415" => "Toggle left pane visibility",
+"416" => "Left Pane",
+"leftpane_accesskey" => "L",
 );
 ?>

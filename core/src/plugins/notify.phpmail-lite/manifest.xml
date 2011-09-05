@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<notify id="notify.phpmail-lite" label="Simple Notification" description="Notification system (demonstrative)">
+<notify id="notify.phpmail-lite" enabled="false" label="Simple Notification" description="Notification system (demonstrative)">
 	<registry_contributions>
 		<actions>
 			<!-- Notify Upload Action -->

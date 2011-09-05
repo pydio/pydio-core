@@ -224,7 +224,7 @@ Class.create("AjxpBootstrap", {
 			html += this.parameters.get('customWelcomeScreen');
 		}else{
 			var customWording = this.parameters.get("customWording");
-			html+='	<div id="progressBox" class="dialogBox" style="width:305px;padding:3;display:block;top:30%;z-index:2002;left:20%;position:absolute;">';
+			html+='	<div id="progressBox" class="dialogBox" style="width:305px;padding:3;display:block;top:30%;z-index:2002;left:40%;position:absolute;">';
 			html+='	<div align="left" class="dialogContent" style="color:#676965;font-family:Trebuchet MS,sans-serif;font-size:11px;font-weight:normal;left:10px;padding:3px;">';
 			var icon = customWording.icon || ajxpResourcesFolder+'/images/ICON.png';
 			var title = customWording.title || "AjaXplorer";
@@ -256,9 +256,9 @@ Class.create("AjxpBootstrap", {
 			onTick		: function(pbObj) { 
 				if(pbObj.getPercentage() == 100){
 					new Effect.Opacity('loading_overlay', {
-						from:0.1,
+						from:0.2,
 						to:0,
-						duration:0.5,
+						duration:2,
 						afterFinish:function(effect){
 							$('loading_overlay').remove();
 							$('progressBox').remove();

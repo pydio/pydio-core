@@ -97,7 +97,7 @@
 		]]></extensionOnInit>		
 	</processing>
 	<dependencies>
-		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+		<!-- Stream Wrapper Access, and dependancy to uploader.flex forces the order -->
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|uploader.flex"/>
 	</dependencies>					
 </uploader>
