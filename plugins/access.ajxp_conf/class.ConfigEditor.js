@@ -840,6 +840,12 @@ ConfigEditor = Class.create({
 			
 			
 			var driverParamsHash = $A([]);
+            driverParamsHash.push($H({
+                name:'AJXP_PLUGIN_ENABLED',
+                type:'boolean',
+                label:"Enabled",
+                description:""
+            }));
 			for(var i=0;i<params.length;i++){
 				var hashedParams = this.formManager.parameterNodeToHash(params[i]);
 				driverParamsHash.push(hashedParams);
@@ -1095,19 +1101,11 @@ ConfigEditor = Class.create({
 	parseXmlMessage: function(xmlResponse){
 		if(xmlResponse == null || xmlResponse.documentElement == null) return;
 		var childs = xmlResponse.documentElement.childNodes;	
-		var driversList = false;
-		var driversAtts = $A(['name', 'type', 'label', 'description', 'default', 'mandatory']);
 		var repList = false;
-		var logFilesList = false;
-		var logsList = false;
-		
+
 		for(var i=0; i<childs.length;i++)
 		{
-			if(childs[i].nodeName == "message")
-			{
-				this.displayMessage(childs[i].getAttribute('type'), childs[i].firstChild.nodeValue);
-			}
-			else if(childs[i].nodeName == "update_checkboxes")
+            if(childs[i].nodeName == "update_checkboxes")
 			{
 				var userId = childs[i].getAttribute('user_id');
 				var repositoryId = childs[i].getAttribute('repository_id');
@@ -1124,53 +1122,12 @@ ConfigEditor = Class.create({
 				repList = true;
 				this.repositories.set(childs[i].getAttribute('index'), childs[i]);
 			}
-			else if(childs[i].tagName == "reload_instruction")
-			{
-				var obName = childs[i].getAttribute('object');
-				if(obName == 'list')
-				{
-					var file = childs[i].getAttribute('file');
-					ajaxplorer.getContextHolder().setPendingSelection(file);
-					ajaxplorer.fireContextRefresh();
-					ajaxplorer.getContextHolder().clearPendingSelection();
-				}else if(obName == "repository_list"){
-					ajaxplorer.reloadRepositoriesList();
-				}
-			}			
 		}
+        ajaxplorer.actionBar.parseXmlMessage(xmlResponse);
 	},
 
-	closeMessageDiv: function(){
-		if(this.messageDivOpen)
-		{
-			new Effect.Fade(this.messageBox);
-			this.messageDivOpen = false;
-		}
-	},
-	
-	tempoMessageDivClosing: function(){
-		this.messageDivOpen = true;
-		setTimeout(function(){this.closeMessageDiv();}.bind(this), 3000);
-	},
 	
 	displayMessage: function(messageType, message){
-		this.messageBox = $('message_div');
-		if(!this.messageBox){
-			this.messageBox = new Element("div", {title:MessageHash[98],id:"message_div",className:"messageBox"});
-			$(document.body).insert(this.messageBox);
-			this.messageContent = new Element("div", {id:"message_content"});
-			this.messageBox.update(this.messageContent);
-			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
-		}		
-		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
-		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
-		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
-		$('message_content').innerHTML = message;
-		this.messageBox.style.top = '80%';
-		this.messageBox.style.left = '60%';
-		this.messageBox.style.width = '30%';
-		new Effect.Corner(this.messageBox,"round");
-		new Effect.Appear(this.messageBox);
-		this.tempoMessageDivClosing();
+        ajaxplorer.displayMessage(messageType, message);
 	}
 });

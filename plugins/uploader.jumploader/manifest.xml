@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uploader id="uploader.jumploader" text="51" title="162" label="Jumploader" description="Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc.">
+<uploader id="uploader.jumploader" enabled="false" text="51" title="162" label="Jumploader" description="Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc.">
 	<class_definition filename="plugins/uploader.jumploader/class.JumploaderProcessor.php" classname="JumploaderProcessor"/>
 	<processing>
 		<clientForm id="jumploader_form"><![CDATA[

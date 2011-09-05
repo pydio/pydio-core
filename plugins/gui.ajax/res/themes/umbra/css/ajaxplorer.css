@@ -1,4 +1,4 @@
-.css_gradient, .infoPanelGroup, .panelHeader{
+.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox{
 background: rgb(247,247,247); /* Old browsers */
 background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -9,7 +9,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', end
 background: linear-gradient(top, rgba(247,247,247,1) 0%,rgba(227,227,227,1) 50%,rgba(216,216,216,1) 51%,rgba(242,242,242,1) 100%); /* W3C */
 }
 
-.soft_css_gradient, .menu.desktop, .menu.rootDirChooser, .menu.bookmarksMenu{
+.soft_css_gradient, .menu.desktop, .menu.rootDirChooser, .menu.bookmarksMenu, .action_bar{
 background: rgb(255,255,255); /* Old browsers */
 background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
@@ -54,6 +54,9 @@ input, textarea, select
     border: 1px solid #aaa;
     font-size: 11px;
     font-family: Trebuchet MS, sans-serif, Nimbus Sans L;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
 }
 
 textarea{
@@ -112,9 +115,6 @@ textarea{
    background-color: #f9f9f9;
    -moz-border-radius : 5px;
    border-radius : 5px;
-	-moz-box-shadow : 1px 2px 3px rgba(100, 100, 100, 0.5);
-	-webkit-box-shadow : 1px 1px 1px rgba(100, 100, 100, 0.5);
-	box-shadow : 1px 1px 1px rgba(100, 100, 100, 0.5);
 }
 
 #selectable_div div.selected{
@@ -192,7 +192,6 @@ div.shadow_class
     font-family: Trebuchet MS, sans-serif;
     font-size: 11px;
     padding:5px;
-    border: 1px solid #989A95;
 	-moz-border-radius:5px;
 	border-radius:5px;
 }
@@ -216,15 +215,16 @@ div.shadow_class
 {
     background-color: #fff;
     padding: 10px 10px;
-    border: 1px solid #989A95;
-	-moz-border-radius:0 0 3 3px;
-	border-radius:0 0 3 3px;
+    border: 1px solid #dddddd;
+	-moz-border-radius:0px 0px 3px 3px;
+	border-radius:0px 0px 3px 3px;
 }
 
 .dialogContent input,
 .dialogContent input[type="text"],
 .dialogContent input[type="password"],
-.dialogContent select
+.dialogContent select,
+#search_txt
 {
     margin-left:0px;
     width: 180px;
@@ -237,10 +237,10 @@ div.shadow_class
 	background: -webkit-gradient(linear, left top, left bottom, from(#f3f3f3), to(#fff)); /* for webkit browsers */
 	background: -moz-linear-gradient(top,  #f3f3f3,  #fff); /* for firefox 3.6+ */
 
-	height: 20px;
-	border-radius: 3px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
+	height: 16px;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
 	
 }
 
@@ -502,6 +502,16 @@ div.accordion_content{
     top: 20%;
 	-moz-border-radius : 5px;
 	border-radius : 5px;
+
+width: 305px;
+padding: 3px;
+display: block;
+top: 30%;
+z-index: 2002;
+left: 40%;
+position: absolute;
+padding-bottom: 0;
+box-shadow: 1px 1px 24px #aaa;
 }
 
 .pg_cancel_button{
@@ -636,7 +646,8 @@ div.SF_label{
     box-shadow: 0px 0px 2px #aaa;
 }
 
-#sidebar_splitter div.panelHeader{
+#sidebar_splitter div.panelHeader,
+#search_panel div.panelHeader{
     padding-top: 5px;
     padding-bottom: 4px;
 }
@@ -644,7 +655,6 @@ div.SF_label{
 #action_bar, 
 .action_bar
 {
-    background-color: #eee;
     font-family: Arial;
     font-size: 12px;
     padding: 0px;
@@ -654,8 +664,6 @@ div.SF_label{
 .action_bar
 {
 	height: 51px;
-    background-color: transparent;
-    /*background-image:url(../images/ToolbarBg.gif);*/
 	overflow:hidden;
 }
 
@@ -690,8 +698,8 @@ div.SF_label{
 	overflow:visible;
 	color: #333;
 	outline:none;
-	-moz-border-radius : 5 5 0 0px;
-	border-radius : 5 5 0 0px;
+	-moz-border-radius : 5px 5px 0px 0px;
+	border-radius : 5px 5px 0px 0px;
     text-shadow: 1px 1px 1px white;
 }
 
@@ -1055,7 +1063,7 @@ div.header_resizer div.dragging{
 }
 div.resizeGhost{
 	width: 1px; 
-	border-right: 1px solid grey;
+	border-right: 1px solid #ccc;
 	position:absolute;
 	z-index:1000;
 	opacity:0.7;
@@ -1595,9 +1603,22 @@ div.tabulatorContainer{
 	text-decoration:none;	
 }
 
+.panelHeader.panelHeaderWithIcon{
+    position: relative;
+    padding-left: 26px;
+}
+
 .panelHeader img
 {
-    float:right;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
+.panelHeader img.panelHeaderCloseIcon{
+    left: auto;
+    right: 6px;
+    cursor: pointer;
 }
 
 .toggleInactive
@@ -1651,7 +1672,8 @@ div.tabulatorContainer{
 }
 #search_form
 {
-    border-bottom: 1px solid #676965;
+    border-bottom: 1px solid #ddd;
+    background-color: #eee;
 }
 #search_form a
 {
@@ -1664,15 +1686,14 @@ div.tabulatorContainer{
     padding: 1px;    
 }
 
+#search_form a img{
+    margin-top: 2px;
+    vertical-align: top;
+}
+
 #search_form input
 {
     margin: 0px;
-    padding: 0px;
-    height: 20px;
-    border: 1px solid #aaa;
-	background-image:url('../images/locationBg.gif');
-	background-position:left top;
-	background-repeat:no-repeat;    
 }
 
 #search_meta {
@@ -1706,6 +1727,8 @@ meta_opt.checked {
 {    
     margin-left:0px;
     width: 100%;
+    font-family: Arial, Verdana, sans-serif;
+    font-size: 11px;
 }
 
 #search_results em {
@@ -1744,9 +1767,9 @@ meta_opt.checked {
     font-size: 11px;
 }
 
-#info_panel .panelContent
+#info_panel div.panelContent
 {
-	overflow:hidden;
+	overflow:auto;
     background-color: #fff;
     font-family: Arial, Verdana, Sans-serif;
     border-radius: 2px;
@@ -1816,9 +1839,9 @@ tr td.infoPanelLabel
 .infoPanelImagePreview 
 {
 	width: 100%;
-	background-color: #f1f1f1;
+	background-color: #ffffff;
 	text-align:center;
-	padding: 10 0;
+	padding: 10px 0;
 }
 .infoPanelImagePreview img
 {
@@ -2526,7 +2549,7 @@ div.menu a {
 }
 
 .rightAlignMenu a{
-	padding: 4 5 2 20px;
+	padding: 4px 5px 2px 20px;
 	text-align:right;
 	height: 16px;
 }

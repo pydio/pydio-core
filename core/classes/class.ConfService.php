@@ -42,7 +42,7 @@ class ConfService
 	private $configs = array();
  	
 	/**
-	 * @param AXJP_PluginsService $ajxpPluginService
+	 * @param AJXP_PluginsService $ajxpPluginService
 	 * @return AbstractConfDriver 
 	 */
 	public function confPluginSoftLoad($ajxpPluginService){
@@ -52,16 +52,15 @@ class ConfService
 		);
 	}
 		
-	public static function init($confFile){
+	public static function init(){
 		$inst = self::getInstance();
-		$inst->initInst($confFile);
+		$inst->initInst();
 	}
 	
-	public function initInst($confFile)
+	public function initInst()
 	{
-		include($confFile);
+        include(AJXP_CONF_PATH."/bootstrap_plugins.php");
 		// INIT AS GLOBAL
-		$this->configs["LANGUE"] = $default_language;		
 		$this->configs["AVAILABLE_LANG"] = self::listAvailableLanguages();
 		if(isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"){
 			$this->configs["USE_HTTPS"] = true;
@@ -79,17 +78,19 @@ class ConfService
 			$this->configs["AUTH_DRIVER_DEF"] = $AUTH_DRIVER;
 			$this->configs["LOG_DRIVER_DEF"] = $LOG_DRIVER;
 	        $this->configs["CONF_PLUGINNAME"] = $CONF_STORAGE["NAME"];
-	        $this->configs["ACTIVE_PLUGINS"] = $ACTIVE_PLUGINS;
-	        
+
 	        $this->configs["PLUGINS"] = array(
 	        	"CONF_DRIVER" => $CONF_STORAGE,
 	        	"AUTH_DRIVER" => $AUTH_DRIVER, 
-	        	"LOG_DRIVER"  => $LOG_DRIVER,
-	        	"ACTIVE_PLUGINS" => $ACTIVE_PLUGINS
+	        	"LOG_DRIVER"  => $LOG_DRIVER
 	        );
-		}        		
-		        
-		$this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
+		}
+        if(is_file(AJXP_CONF_PATH."/bootstrap_repositories.php")){
+            include(AJXP_CONF_PATH."/bootstrap_repositories.php");
+            $this->configs["DEFAULT_REPOSITORIES"] = $REPOSITORIES;
+        }else{
+            $this->configs["DEFAULT_REPOSITORIES"] = array();
+        }
 	}
 	
 	public static function start(){
@@ -115,32 +116,20 @@ class ConfService
 	
 	public function initActivePluginsInst(){
 		$pServ = AJXP_PluginsService::getInstance();
-		foreach($this->configs["PLUGINS"]["ACTIVE_PLUGINS"] as $plugs){
-			$ex = explode(".", $plugs);
-			if($ex[1] == "*"){
-				$all = $pServ->getPluginsByType($ex[0]);
-				foreach($all as $pName => $pObject){
-					$pObject->init(array());
-					try{
-						$pObject->performChecks();
-						$pServ->setPluginActiveInst($ex[0], $pName, true);
-					}catch (Exception $e){
-						//$this->errors[$pName] = "[$pName] ".$e->getMessage();
-					}
-				}
-			}else{
-				$pObject = $pServ->getPluginByTypeName($ex[0], $ex[1]);
-				if(!is_object($pObject)) throw new Exception("Cannot find plugin $plugs");
-				$pObject->init(array());
-				try{
-					$pObject->performChecks();
-					$pServ->setPluginActiveInst($ex[0], $ex[1], true);
-				}catch (Exception $e){
-					//$this->errors[$ex[1]] = "[$ex[1]] ".$e->getMessage();
-				}
-				$pServ->setPluginActiveInst($ex[0], $ex[1], true);
-			}
-		}
+        $detected = $pServ->getDetectedPlugins();
+        foreach ($detected as $pType => $pObjects){
+            if(in_array($pType, array("conf", "auth", "log", "access", "meta", "index"))) continue;
+            foreach ($pObjects as $pName => $pObject){
+                $pObject->init(array());
+                try{
+                    $pObject->performChecks();
+                    $pServ->setPluginActiveInst($pType, $pName, true);
+                }catch (Exception $e){
+                    //$this->errors[$pName] = "[$pName] ".$e->getMessage();
+                }
+
+            }
+        }
 	}
 	
 	public function initUniquePluginImplInst($key, $plugType){		
@@ -472,15 +461,16 @@ class ConfService
 	public function getMessagesInst($forceRefresh = false)
 	{
 		if(!isset($this->configs["MESSAGES"]) || $forceRefresh)
-		{			
-			require(AJXP_COREI18N_FOLDER."/".$this->configs["LANGUE"].".php");
+		{
+            $crtLang = self::getLanguage();
+			require(AJXP_COREI18N_FOLDER."/".$crtLang.".php");
 			$this->configs["MESSAGES"] = $mess;
 			$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
 			foreach ($nodes as $node){
 				$nameSpace = $node->getAttribute("namespace");
 				$path = $node->getAttribute("path");
 				$lang = $this->configs["LANGUE"];
-				if(!is_file($path."/".$this->configs["LANGUE"].".php")){
+				if(!is_file($path."/".$crtLang.".php")){
 					$lang = "en"; // Default language, minimum required.
 				}
 				if(is_file($path."/".$lang.".php")){
@@ -571,8 +561,12 @@ class ConfService
 	
 	public static function getLanguage()
 	{		
-		return self::getInstance()->getConfInst("LANGUE");
-	}
+		$lang = self::getInstance()->getConfInst("LANGUE");
+        if($lang == null){
+            $lang = self::getInstance()->getCoreConf("DEFAULT_LANGUAGE");
+        }
+        return $lang;
+    }
 		
 	/**
 	 * @return Repository

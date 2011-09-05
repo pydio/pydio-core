@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="ajxp_ios" label="iOS" description="Template for redirecting to iPhone application">
+    <class_definition filename="plugins/gui.ios/class.IOSGuiPlugin.php" classname="IOSGuiPlugin"/>
 	<registry_contributions>
 		<client_configs uuidAttr="name">
 			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
@@ -30,4 +31,7 @@
 		</action>					
 	</actions>
 	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="gui.mobile"/>
+    </dependencies>
 </guidriver>

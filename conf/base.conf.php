@@ -65,7 +65,6 @@ define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
 define("AJXP_PLUGINS_FOLDER", "plugins");
 define("CLIENT_RESOURCES_FOLDER", "plugins/gui.ajax/res");
-define("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/oxygen");
 define("AJXP_BIN_FOLDER_REL", "server/classes");
 define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/classes");
 define("AJXP_DOCS_FOLDER", "core/doc");
@@ -74,6 +73,10 @@ define("TESTS_RESULT_FILE", AJXP_CACHE_DIR."/diag_result.php");
 define("AJXP_TESTS_FOLDER", AJXP_INSTALL_PATH."/core/tests");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
+// Startup admin password (used at first creation). Once
+// The admin password is created and his password is changed,
+// this config has no more impact.
+define("ADMIN_PASSWORD", "admin");
 
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG",	false);

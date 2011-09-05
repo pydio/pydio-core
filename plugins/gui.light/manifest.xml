@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="light" label="Light" description="Simple Template for Bookmarklets">
+    <class_definition filename="plugins/gui.light/class.LightGuiPlugin.php" classname="LightGuiPlugin"/>
 	<registry_contributions>
 		<client_configs uuidAttr="name">
 			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
@@ -17,4 +18,7 @@
 			]]></template>
 		</client_configs>
 	</registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="gui.ajax"/>
+    </dependencies>
 </guidriver>

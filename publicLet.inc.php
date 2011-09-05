@@ -2,7 +2,7 @@
 require_once("conf/base.conf.php");
 
 $pServ = AJXP_PluginsService::getInstance();
-ConfService::init(AJXP_INSTALL_PATH."/conf/conf.php");
+ConfService::init();
 $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
 $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
 ConfService::start();

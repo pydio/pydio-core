@@ -61,8 +61,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"core"	   	   => array("LABEL" => $mess["ajxp_conf.98"], "ICON" => "preferences_desktop.png"),
 					"plugins"	   => array("LABEL" => $mess["ajxp_conf.99"], "ICON" => "folder_development.png"),
 					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "hdd_external_unmount.png"),
-					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "yast_kuser.png"),
-					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "user_group_new.png"),
+					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "user.png"),
+					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "yast_kuser.png"),
 					"files" => array("LABEL" => $mess["ajxp_shared.3"], "ICON" => "html.png"),
 					"logs" => array("LABEL" => $mess["ajxp_conf.4"], "ICON" => "toggle_log.png"),
 					"diagnostic" => array("LABEL" => $mess["ajxp_conf.5"], "ICON" => "susehelpcenter.png")
@@ -872,6 +872,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						}
 						echo("<param name=\"$key\" value=\"$value\"/>");
 					}
+                    echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
 					echo("</plugin_settings_values>");				
 				}
 				AJXP_XMLWriter::close("admin_data");
@@ -907,7 +908,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$pServ = AJXP_PluginsService::getInstance();
 		$activePlugins = $pServ->getActivePlugins();
 		$types = $pServ->getDetectedPlugins();
-		$uniqTypes = array("core" ,"auth", "conf", "log");
+		$uniqTypes = array("core");
 		if($dir == "/plugins"){
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
@@ -958,8 +959,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
 			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
-			<column messageId="ajxp_conf.104" attributeName="can_active" sortType="String"/>
-			</columns>');					
+			<column messageId="ajxp_conf.104" attributeName="enabled" sortType="String"/>
+			<column messageId="ajxp_conf.105" attributeName="can_active" sortType="String"/>
+			</columns>');
 			foreach($types[$type] as $pId => $pObject){
 				$errors = "OK";
 				try{
@@ -971,6 +973,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"icon" 		=> "preferences_plugin.png",
 					"ajxp_mime" => "ajxp_plugin",
 					"can_active"	=> $errors,
+					"enabled"	=> ($pObject->isEnabled()?"Yes":"No"),
 					"plugin_id" => $pObject->getId(),
 					"plugin_description" => $pObject->getManifestDescription()
 				);

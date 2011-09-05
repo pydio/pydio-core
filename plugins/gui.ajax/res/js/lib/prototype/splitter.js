@@ -33,6 +33,9 @@
  * @author Dave Methvin (dave.methvin@gmail.com)
  */
 Class.create("Splitter", AjxpPane, {
+
+    __implements: ["IActionProvider"],
+
 	/**
 	 * Constructor
 	 * @param container HTMLElement
@@ -44,6 +47,7 @@ Class.create("Splitter", AjxpPane, {
 			activeClass	:	'active',
 			fit			:	null,
             minSize     :   16,
+            foldingButton:  null,
 			onDrag 		:	Prototype.EmptyFunction,
 			endDrag 	:	Prototype.EmptyFunction,
 			startDrag 	:	Prototype.EmptyFunction
@@ -139,6 +143,50 @@ Class.create("Splitter", AjxpPane, {
             this.fold();
         }
 	},
+
+
+    /**
+     * Gets the action of this component
+     * @returns $H
+     */
+    getActions : function(){
+        if(!this.options.foldingButton) return $H();
+        var foldingButtonOptions = this.options.foldingButton;
+
+        // function may be bound to another context
+        var oThis = this;
+        var options = {
+            name:'folding_action',
+            src:'view_left_close.png',
+            text_id:416,
+            title_id:415,
+            text:MessageHash[416],
+            title:MessageHash[415],
+            hasAccessKey:false,
+            subMenu:false,
+            subMenuUpdateImage:false,
+            callback: function(){
+                var state = oThis.toggleFolding();
+                ajaxplorer.actionBar.getActionByName("folding_action").setIconSrc('view_left_'+ (state?'right':'close') + '.png');
+            },
+            listeners : {
+                init:function(){
+                }
+            }
+            };
+        var context = {
+            selection:false,
+            dir:true,
+            actionBar:true,
+            actionBarGroup:'default',
+            contextMenu:true,
+            infoPanel:false
+            };
+        // Create an action from these options!
+        var foldingAction = new Action(options, context);
+        return $H({folding_button:foldingAction});
+    },
+
 	/**
 	 * Resize panes on drag event or manually
 	 * @param event Event
@@ -177,18 +225,45 @@ Class.create("Splitter", AjxpPane, {
 		this.moveSplitter(size);
 	},
 
+    /**
+     * @return boolean Folded (true) or not
+     */
+    toggleFolding : function(){
+        if(this.splitbar.hasClassName("folded")) {
+            this.unfold();
+            return false;
+        }else {
+            this.fold();
+            return true;
+        }
+    },
+
     fold:function(){
+        if(this.effectWorking) return;
         this.prefoldValue = this.options.getAdjust(this.paneA);
-        new Effect.Tween(null, this.prefoldValue, 0, {afterFinish:function(){this.splitbar.addClassName('folded');}.bind(this) }, function(p){ this.moveSplitter(p, true, this.prefoldValue); }.bind(this) );
+        this.effectWorking = true;
+        new Effect.Tween(null, this.prefoldValue, 0, {afterFinish:function(){
+            this.splitbar.addClassName('folded');
+            this.effectWorking = false;
+        }.bind(this)}, function(p){
+            this.moveSplitter(p, true, this.prefoldValue);
+        }.bind(this) );
     },
 
     unfold:function(){
+        if(this.effectWorking) return;
         var target = this.prefoldValue;
         if(!target){
             target = 150;
             this.paneA.setStyle(this.makeStyleObject(this.options.adjust, 150+'px'));
         }
-        new Effect.Tween(null, 0, target, {afterFinish:function(){this.splitbar.removeClassName('folded');}.bind(this) }, function(p){ this.moveSplitter(p, true, target); }.bind(this) );
+        this.effectWorking = true;
+        new Effect.Tween(null, 0, target, {afterFinish:function(){
+            this.splitbar.removeClassName('folded');
+            this.effectWorking = false;
+        }.bind(this) }, function(p){
+            this.moveSplitter(p, true, target);
+        }.bind(this) );
     },
 	/**
 	 * Start drag event

@@ -283,6 +283,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		if($active){
 	 		// Check active plugin dependencies
 	 		$plug = $this->getPluginById($type.".".$name);
+            if(!$plug->isEnabled()) return;
 	 		$deps = $plug->getActiveDependencies($this);
 	 		if(count($deps)){
 	 			$found = false;

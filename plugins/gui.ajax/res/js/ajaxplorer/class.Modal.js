@@ -122,7 +122,7 @@ Class.create("Modal", {
 		this.dialogContent.appendChild(newForm);
 		var boxPadding = $(sFormId).getAttribute("box_padding");
 		if(!boxPadding) boxPadding = 10;
-		this.dialogContent.setStyle({padding:boxPadding});
+		this.dialogContent.setStyle({padding:boxPadding+'px'});
 
 		
 		if(fOnCancel){

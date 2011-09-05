@@ -36,28 +36,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * 
  * Description : configuration file
  */
-
-// Startup admin password (used at first creation). Once
-// The admin password is created and his password is changed, 
-// this config has no more impact.
-define("ADMIN_PASSWORD", "admin");
-
-
-/************************************************
- * TEMPORARY DIR : NOT NECESSARY IN MOST CASES
- ************************************************/
-/**
- * This is necessary only if you have errors concerning
- * the tmp dir access or writeability : most probably, 
- * they are due to PHP SAFE MODE (should disappear in php6) or
- * various OPEN_BASEDIR restrictions.
- * In that case, create and set writeable a tmp folder somewhere
- * at the root of your hosting (but above the web/ or www/ or http/ 
- * if possible!!) and enter here the full path to this folder.
- * For example : define("AJXP_TMP_DIR", "/server/root/path/to/user/ajxp_tmp"));
- */
-define("AJXP_TMP_DIR", "");
-
 /********************************************
  * CUSTOM VARIABLES HOOK
  ********************************************/
@@ -104,12 +82,21 @@ $PLUGINS = array(
 			"AUTOCREATE_AJXPUSER" 	=> false, 
 			"TRANSMIT_CLEAR_PASS"	=> false )
 	),
+    "LOG_DRIVER" => array(
+         "NAME" => "text",
+         "OPTIONS" => array(
+             "LOG_PATH" => "AJXP_INSTALL_PATH/data/logs/",
+             "LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
+             "LOG_CHMOD" => 0770
+         )
+    ),
 	/*
+	// ALTERNATE AUTH_DRIVER CONFIG SAMPLE
 	"AUTH_DRIVER" => array(
 		"NAME"		=> "remote",
 		"OPTIONS"	=> array(
 			"SLAVE_MODE"  => true,
-			"USERS_FILEPATH" => "AJXP_INSTALL_PATH/data/users/users.ser",
+			"USERS_FILEPATH" => "AJXP_INSTALL_PATH/data/plugins/auth.serial/users.ser",
 			"MASTER_AUTH_FUNCTION" => "joomla_remote_auth",
 			"MASTER_HOST"		=> "localhost",
 			"MASTER_URI"		=> "/joomla/",
@@ -120,84 +107,4 @@ $PLUGINS = array(
 		)
 	),
 	*/
-	"LOG_DRIVER" => array(
-	 	"NAME" => "text",
-	 	"OPTIONS" => array( 
-	 		"LOG_PATH" => "AJXP_INSTALL_PATH/data/logs/",
-	 		"LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
-	 		"LOG_CHMOD" => 0770
-	 	)
-	),
-	// Do not use wildcard for uploader, to keep them in a given order
-	// Warning, do not add the "meta." plugins, they are automatically
-	// detected and activated by the application.
-	"ACTIVE_PLUGINS" => array("core.*", "editor.*", "uploader.flex", "uploader.html", "gui.ajax", "hook.*", "downloader.*", "shorten.*")
 );
-if(AJXP_Utils::userAgentIsMobile()){
-	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.mobile";
-	if(AJXP_Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])){
-		$PLUGINS["ACTIVE_PLUGINS"][] = "gui.ios";
-	}
-}
-if(isSet($_COOKIE["AJXP_GUI"])){
-	$PLUGINS["ACTIVE_PLUGINS"][] = "gui.".$_COOKIE["AJXP_GUI"];
-}
-/*********************************************************/
-/* BASIC REPOSITORY CONFIGURATION.
-/* Use the GUI to add new repositories to explore!
-/*   + Log in as "admin" and open the "Settings" Repository
-/*********************************************************/
-$REPOSITORIES[0] = array(
-	"DISPLAY"		=>	"Default Files", 
-	"AJXP_SLUG"		=>  "default",
-	"DRIVER"		=>	"fs", 
-	"DRIVER_OPTIONS"=> array(
-		"PATH"			=>	"AJXP_INSTALL_PATH/data/files", 
-		"CREATE"		=>	true,
-		"RECYCLE_BIN" 	=> 	'recycle_bin',
-		"CHMOD_VALUE"   =>  '0600',
-		"DEFAULT_RIGHTS"=>  "",
-		"PAGINATION_THRESHOLD" => 500,
-		"PAGINATION_NUMBER" => 200,
-		"META_SOURCES"		=> array(
-		/*
-			"meta.serial"=> array(
-				"meta_file_name"	=> ".ajxp_meta",
-				"meta_fields"		=> "testKey1,stars_rate,css_label",
-				"meta_labels"		=> "Test Key,Rating,Label"
-			)
-		*/
-            "index.lucene" => array(
-                "index_meta_fields" => ""
-            )
-		)
-	),
-	
-);
-
-// DO NOT REMOVE THIS!
-// SHARE ELEMENTS
-$REPOSITORIES["ajxp_shared"] = array(
-	"DISPLAY"		=>	"Shared Elements", 
-	"DISPLAY_ID"		=>	"363", 
-	"DRIVER"		=>	"ajxp_shared", 
-	"DRIVER_OPTIONS"=> array(
-		"DEFAULT_RIGHTS" => "rw"
-	)	
-);
-
-// ADMIN REPOSITORY
-$REPOSITORIES[1] = array(
-	"DISPLAY"		=>	"Settings", 
-	"DISPLAY_ID"		=>	"165", 
-	"DRIVER"		=>	"ajxp_conf", 
-	"DRIVER_OPTIONS"=> array()	
-);
-
-/*********************************************/
-/*	DEFAULT LANGUAGE
-/*  Check i18n folder for available values.
-/*********************************************/
-$default_language="en";
-
-?>

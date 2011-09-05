@@ -39,6 +39,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 {	
 	function switchAction($action, $httpVars, $fileVars)
 	{
+        if(!defined("AJXP_THEME_FOLDER")){
+            define("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$this->pluginConf["GUI_THEME"]);
+        }
 		if(!isSet($this->actions[$action])) return;
 		foreach($httpVars as $getName=>$getValue){
 			$$getName = AJXP_Utils::securePath($getValue);
@@ -60,9 +63,15 @@ class AJXP_ClientDriver extends AJXP_Plugin
 						$folder.= "/".$httpVars["pluginPath"];
 					}
 				}
-				if(isset($template_name) && is_file($folder."/".$template_name))
+                $crtTheme = $this->pluginConf["GUI_THEME"];
+                $thFolder = CLIENT_RESOURCES_FOLDER."/themes/$crtTheme/html";
+				if(isset($template_name))
 				{
-					include($folder."/".$template_name);
+                    if(is_file($thFolder."/".$template_name)){
+                        include($thFolder."/".$template_name);
+                    }else if(is_file($folder."/".$template_name)){
+    					include($folder."/".$template_name);
+                    }
 				}
 				
 			break;
@@ -217,7 +226,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					$_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
 				}
 				$config = array();
-				$config["ajxpResourcesFolder"] = AJXP_THEME_FOLDER;
+				$config["ajxpResourcesFolder"] = "plugins/gui.ajax/res/themes/".$this->pluginConf["GUI_THEME"];
 				$config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
 				$config["zipEnabled"] = ConfService::zipEnabled();
 				$config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");
@@ -264,6 +273,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				$config["password_min_length"] = ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth");
 				$config["SECURE_TOKEN"] = AuthService::generateSecureToken();
 				$config["streaming_supported"] = "true";
+                $config["theme"] = $this->pluginConf["GUI_THEME"];
 				header("Content-type:application/json;charset=UTF-8");
 				print(json_encode($config));
 				
@@ -275,6 +285,20 @@ class AJXP_ClientDriver extends AJXP_Plugin
 		
 		return false;		
 	}
+
+    static function filterXml($value){
+        $instance = AJXP_PluginsService::getInstance()->findPlugin("gui", "ajax");
+        if($instance === false) return ;
+        $confs = $instance->getConfigs();
+        $theme = $confs["GUI_THEME"];
+        if(isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])){
+            $value = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"]."plugins/gui.ajax/res/themes/".$theme, $value);
+        }else{
+            $value = str_replace("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$theme, $value);
+        }
+    }
 }
+
+AJXP_Controller::registerIncludeHook("xml.filter", array("AJXP_ClientDriver", "filterXml"));
 
 ?>

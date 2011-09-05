@@ -40,20 +40,22 @@ Class.create("InfoPanel", AjxpPane, {
 	 * @param $super klass Superclass reference
 	 * @param htmlElement HTMLElement
 	 */
-	initialize: function($super, htmlElement){
-		$super(htmlElement);
+	initialize: function($super, htmlElement, options){
+		$super(htmlElement, options);
 		attachMobileScroll(htmlElement, "vertical");
 		disableTextSelection(htmlElement);
         var container = new Element("div", {className:"panelContent", id:"ip_content"});
-
-        this.scroller = new Element('div', {id:'ip_scroller', className:'scroller_track'});
-        this.scroller.insert('<div id="ip_scrollbar_handle" class="scroller_handle"></div>');
-        this.htmlElement.insert(this.scroller);
+        if(options.replaceScroller){
+            this.scroller = new Element('div', {id:'ip_scroller', className:'scroller_track'});
+            this.scroller.insert('<div id="ip_scrollbar_handle" class="scroller_handle"></div>');
+            this.htmlElement.insert(this.scroller);
+            container.setStyle({overflow:"hidden"});
+        }
         this.htmlElement.insert(container);
+        if(options.replaceScroller){
+            this.scrollbar = new Control.ScrollBar('ip_content','ip_scroller');
+        }
         
-        this.scrollbar = new Control.ScrollBar('ip_content','ip_scroller');
-        window.ipScrollBar = this.scrollbar;
-
         this.contentContainer = container;
 		this.setContent('<br><br><center><i>'+MessageHash[132]+'</i></center>');
 		this.mimesTemplates = new Hash();
@@ -103,7 +105,7 @@ Class.create("InfoPanel", AjxpPane, {
 		var userSelection = ajaxplorer.getUserSelection();
 		var contextNode = userSelection.getContextNode();
 		this.empty();
-        this.scrollbar.recalculateLayout();
+        if(this.scrollbar) this.scrollbar.recalculateLayout();
 		if(!contextNode) {
 			return;
 		}
@@ -151,14 +153,14 @@ Class.create("InfoPanel", AjxpPane, {
 				}
 			}catch(e){}
 			this.addActions('empty');
-            this.scrollbar.recalculateLayout();
+            if(this.scrollbar) this.scrollbar.recalculateLayout();
 			return;
 		}
 		if(!userSelection.isUnique())
 		{
 			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
 			this.addActions('multiple');
-            this.scrollbar.recalculateLayout();
+            if(this.scrollbar) this.scrollbar.recalculateLayout();
 			return;
 		}
 		
@@ -179,7 +181,7 @@ Class.create("InfoPanel", AjxpPane, {
 			$(fakes[0]).replace(this.currentPreviewElement);			
 			this.resize();
 		}
-		this.scrollbar.recalculateLayout();
+		if(this.scrollbar) this.scrollbar.recalculateLayout();
 	},
 	/**
 	 * Insert html in content pane
@@ -203,10 +205,12 @@ Class.create("InfoPanel", AjxpPane, {
 	 */
 	resize : function(){
 		fitHeightToBottom(this.contentContainer, null);
-        this.scrollbar.recalculateLayout();
-        if(this.scrollbar.enabled){
-            fitHeightToBottom(this.scroller, null);
+        if(this.scrollbar){
             this.scrollbar.recalculateLayout();
+            if(this.scrollbar.enabled){
+                fitHeightToBottom(this.scroller, null);
+                this.scrollbar.recalculateLayout();
+            }
         }
 		if(this.currentPreviewElement && this.currentPreviewElement.visible()){
 			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));

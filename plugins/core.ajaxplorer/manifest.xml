@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="core.ajaxplorer">
+<ajxpcore id="core.ajaxplorer" description="Main container for core AjaXplorer settings (application title, sharing, webdav server config, etc...)">
 	<server_settings>
 		<global_param name="APPLICATION_TITLE" group="Main" type="string" label="App Title" description="Your application title" mandatory="true" default="AjaXplorer"/>
 		<global_param name="DEFAULT_LANGUAGE" group="Main" type="string" label="Default Language" description="Default language when a user does not have set his/her own." mandatory="true" default="en"/>
@@ -16,6 +16,7 @@
 		<global_param name="CMDLINE_ACTIVE" group="Miscalleneous" type="boolean" label="Command-line Active" description="Use AjaXplorer framework via the command line, allowing CRONTAB jobs or background actions." mandatory="false" default="true"/>				
 		<global_param name="CLI_PHP" group="Miscalleneous" type="string" label="Command-line PHP" description="On specific hosts, you may have to use a specific path to access the php command line" mandatory="false" default="php"/>				
 		<global_param name="NODENAME_MAX_LENGTH" group="Miscalleneous" type="integer" label="Filename length" description="Maximum characters length of new files or folders" mandatory="false" default="255"/>				
-		<global_param name="WEBMASTER_EMAIL" group="Miscalleneous" type="string" label="Admin email" description="Administrator email, not used for the moment" mandatory="false"/>				
+		<global_param name="AJXP_TMP_DIR" group="Miscalleneous" type="string" label="Temporary Folder" description="This is necessary only if you have errors concerning the tmp dir access or writeability : most probably, they are due to PHP SAFE MODE (should disappear in php6) or various OPEN_BASEDIR restrictions. In that case, create and set writeable a tmp folder somewhere at the root of your hosting (but above the web/ or www/ or http/ if possible!!) and enter here the full path to this folder" mandatory="false" default=""/>
+		<global_param name="WEBMASTER_EMAIL" group="Miscalleneous" type="string" label="Admin email" description="Administrator email, not used for the moment" mandatory="false"/>
 	</server_settings>
 </ajxpcore>

@@ -260,12 +260,12 @@ Class.create("AbstractEditor" , {
 			marginBottom:0,
 			backgroundColor:'#fff',
 			width:'100%',
-			height:document.viewport.getHeight(),
+			height:parseInt(document.viewport.getHeight())+"px",
 			zIndex:3000});
 		this.actions.get("fsButton").hide();
 		this.actions.get("nofsButton").show();
 		this.fullScreenListener = function(){
-			this.element.setStyle({height:document.viewport.getHeight()});
+			this.element.setStyle({height:parseInt(document.viewport.getHeight())+"px"});
 			this.resize();		
 		}.bind(this);
 		Event.observe(window, "resize", this.fullScreenListener);
@@ -297,7 +297,7 @@ Class.create("AbstractEditor" , {
 	 */
 	resize : function(size){
 		if(size){
-			this.contentMainContainer.setStyle({height:size});
+			this.contentMainContainer.setStyle({height:size+"px"});
 		}else{
 			fitHeightToBottom(this.contentMainContainer, this.element);
 		}

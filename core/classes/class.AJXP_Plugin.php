@@ -47,6 +47,7 @@ class AJXP_Plugin implements Serializable{
 	 */
 	protected $xPath;
 	protected $manifestLoaded = false;
+    protected $enabled;
 	protected $actions;
 	protected $registryContributions = array();
 	protected $options; // can be passed at init time
@@ -74,7 +75,8 @@ class AJXP_Plugin implements Serializable{
 		"id", 
 		"name", 
 		"type", 
-		"manifestLoaded", 
+		"manifestLoaded",
+        "enabled",
 		"actions", 
 		"registryContributions", 
 		"mixins",
@@ -106,6 +108,21 @@ class AJXP_Plugin implements Serializable{
 	public function performChecks(){
 		
 	}
+    /**
+     * @return bool
+     */
+    public function isEnabled(){
+        if(isSet($this->enabled)) return $this->enabled;
+        $this->enabled = true;
+        if($this->manifestLoaded){
+            $l = $this->xPath->query("@enabled", $this->manifestDoc->documentElement);
+            if($l->length && $l->item(0)->nodeValue === "false"){
+                $this->enabled = false;
+            }
+        }
+        return $this->enabled;
+    }
+
 	protected function loadRegistryContributions(){		
 		$regNodes = $this->xPath->query("registry_contributions/*");
 		for($i=0;$i<$regNodes->length;$i++){
@@ -377,6 +394,11 @@ class AJXP_Plugin implements Serializable{
 				$this->exposeConfigInManifest($key, $value);
 			}
 		}
+
+        // ASSIGN SPECIFIC OPTIONS TO PLUGIN KEY
+        if(isSet($this->pluginConf["AJXP_PLUGIN_ENABLED"])){
+            $this->enabled = $this->pluginConf["AJXP_PLUGIN_ENABLED"];
+        }
 	}
 			
 	public function getConfigs(){
@@ -452,7 +474,7 @@ class AJXP_Plugin implements Serializable{
 		$configNode->appendChild($prop);
 		$this->reloadXPath();
 	}
-	
+
 	public function reloadXPath(){
 		// Relaunch xpath
 		$this->xPath = new DOMXPath($this->manifestDoc);		

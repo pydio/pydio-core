@@ -45,6 +45,9 @@ class Upload extends AbstractTest
     	include("../../conf/conf.php");
     	$tmpDir = ini_get("upload_tmp_dir");
     	if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
+        if(ConfService::getCoreConf("AJXP_TMP_DIR") != ""){
+            $tmpDir = ConfService::getCoreConf("AJXP_TMP_DIR");
+        }
     	if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !=""){
     		$tmpDir = AJXP_TMP_DIR;
     	}
