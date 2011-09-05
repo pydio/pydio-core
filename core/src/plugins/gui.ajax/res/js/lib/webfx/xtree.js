@@ -254,6 +254,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
             }, 100);
         }
 	}
+    document.fire("ajaxplorer:tree_change");
 	return node;
 };
 
@@ -323,7 +324,8 @@ WebFXTreeAbstractNode.prototype.doExpand = function() {
 	this.open = true;
 	if (webFXTreeConfig.usePersistence) {
 		webFXTreeHandler.cookies.setCookie(this.id.substr(18,this.id.length - 18), '1');
-	}	
+	}
+    document.fire("ajaxplorer:tree_change");
 } ;
 
 WebFXTreeAbstractNode.prototype.doCollapse = function() {
@@ -334,7 +336,8 @@ WebFXTreeAbstractNode.prototype.doCollapse = function() {
 	this.open = false;
 	if (webFXTreeConfig.usePersistence) {
 		webFXTreeHandler.cookies.setCookie(this.id.substr(18,this.id.length - 18), '0');
-	}	
+	}
+    document.fire("ajaxplorer:tree_change");
 } ;
 
 WebFXTreeAbstractNode.prototype.expandAll = function() {
