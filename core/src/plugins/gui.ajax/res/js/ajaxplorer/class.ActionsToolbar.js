@@ -45,6 +45,7 @@ Class.create("ActionsToolbar", {
 		this.element.ajxpPaneObject = this;
 		this.options = Object.extend({
 			buttonRenderer : 'this',
+            skipBubbling: false,
 			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote'])
 		}, options || {});
 		var renderer = this.options.buttonRenderer;
@@ -238,7 +239,7 @@ Class.create("ActionsToolbar", {
 			arrowDiv.imgRef = img;
             button.insert(arrowDiv);
             arrowDiv.setStyle({position:'absolute', top:'18px', right:'8px'});
-		}else{
+		}else if(!this.options.skipBubbling) {
 			button.observe("mouseover", function(){
 				this.buttonStateHover(button, action);
 			}.bind(this) );
@@ -299,14 +300,14 @@ Class.create("ActionsToolbar", {
 		var titleSpan = button.select('span')[0];	
 		subMenu.options.beforeShow = function(e){
 			button.addClassName("menuAnchorSelected");
-			this.buttonStateHover(button, action);
+			if(!this.options.skipBubbling) this.buttonStateHover(button, action);
 		  	if(action.subMenuItems.dynamicBuilder){
 		  		action.subMenuItems.dynamicBuilder(subMenu);
 		  	}
 		}.bind(this);		
 		subMenu.options.beforeHide = function(e){
 			button.removeClassName("menuAnchorSelected");
-			this.buttonStateOut(button, action);
+			if(!this.options.skipBubbling) this.buttonStateOut(button, action);
 		}.bind(this);
 		if(!this.element.subMenus) this.element.subMenus = $A([]);
 		this.element.subMenus.push(subMenu);

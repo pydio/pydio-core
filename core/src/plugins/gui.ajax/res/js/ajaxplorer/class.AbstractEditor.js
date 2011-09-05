@@ -164,14 +164,9 @@ Class.create("AbstractEditor" , {
 		this.actionBar.setStyle({
 			zIndex:(parseInt(this.element.getStyle("zIndex")) + 1000),
 			width : '',
-			top: '',
-			borderRadius:'20px',
-			paddingRight:'10px',
-			paddingLeft:'10px',
-			opacity:'0.9',
-			cursor: 'move',
-			boxShadow:'2px 2px 6px rgba(0, 0, 0, 0.4)'			
+			top: ''
 		});
+        this.actionBar.addClassName("floatingBar");
 		this.actionBar.down("div.separator").remove();
 		this.actionBarPlacer = function(){
 			if(this.contentMainContainer){
@@ -259,7 +254,7 @@ Class.create("AbstractEditor" , {
 			left:0,
 			marginBottom:0,
 			backgroundColor:'#fff',
-			width:'100%',
+			width:parseInt(document.viewport.getWidth())+'px',
 			height:parseInt(document.viewport.getHeight())+"px",
 			zIndex:3000});
 		this.actions.get("fsButton").hide();

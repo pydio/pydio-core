@@ -106,11 +106,12 @@ Class.create("LocationBar", {
                 'search_panel_button',
                 'inlineBarButtonLeft',
                 87, 184,
-                'search.png',
+                this.options.searchIcon,
                 16,
                 'inline_hover',
                 function(){
                     window[this.options.searchButton]['toggleFolding']();
+                    $(this.options.searchFocus)['focus']();
                 }.bind(this)
             );
             this.element.insert(this.searchButton);

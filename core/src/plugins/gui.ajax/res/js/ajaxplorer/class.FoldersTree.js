@@ -175,11 +175,8 @@ Class.create("FoldersTree", AjxpPane, {
 	resize : function(){
 		fitHeightToBottom(this.treeContainer, null);
         if(this.scrollbar){
+            this.scroller.setStyle({height:parseInt(this.treeContainer.getHeight())+'px'});
             this.scrollbar.recalculateLayout();
-            if(this.scrollbar.enabled){
-                fitHeightToBottom(this.scroller, null);
-                this.scrollbar.recalculateLayout();
-            }
         }
 	},
 	

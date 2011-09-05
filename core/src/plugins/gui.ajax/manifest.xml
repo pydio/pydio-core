@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="ajxp_client" label="Client Plugin" description="Basic GUI actions">
 	<server_settings>
-        <global_param name="GUI_THEME" group="Start Up Screen" type="string" label="Theme" description="Theme used for display" mandatory="true" default="umbra"/>
+        <global_param name="GUI_THEME" group="Theme" type="select" choices="umbra|Umbra (HTML5),oxygen|Oxygen (Legacy)" label="Theme" description="Theme used for display" mandatory="true" default="umbra"/>
 		<global_param name="CUSTOM_FONT_SIZE" group="Start Up Screen" type="string" label="Title Font Size" description="Font sized used for the title in the start up screen" mandatory="false" default=""/>				
 		<global_param name="CUSTOM_ICON" group="Start Up Screen" type="string" label="Custom Icon" description="URI to a custom image to be used as start up logo" mandatory="false" default=""/>				
 		<global_param name="CUSTOM_ICON_WIDTH" group="Start Up Screen" type="string" label="Icon Width" description="Width of the custom image (by default 35px)" mandatory="false" default=""/>				
@@ -58,12 +58,12 @@
             <template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
 				<div id="toolbars">
 					<div id="action_bar">
-						<div id="buttons_bar" ajxpClass="ActionsToolbar" class="soft_css_gradient"></div>
+						<div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions="{skipBubbling:true}" class="soft_css_gradient"></div>
 						<div id="locationbar_cont" class="css_gradient">
 							<div style="height: 100%;" class="separator"></div>
 							<div style="padding-top : 5px;">
 								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont',searchButton:'searchbar_splitter'}"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont',searchButton:'searchbar_splitter',searchIcon:'xmag.png', searchFocus:'search_txt'}"></div>
 								<div id="logging_string" ajxpClass="UserWidget"></div>
 							</div>
 						</div>
@@ -76,7 +76,7 @@
 							<div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions="{replaceScroller:true}" style="margin:20px;margin-top:10px;padding-right: 10px;" ></div>
 					    </div>
 						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initA:0, minSize:0, startFolded: true}">
-							<div id="searchPane" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="search.png" ajxpOptions="{headerClose:{icon:'1uparrow.png',splitter:'searchbar_splitter',title:86}}" style="height: 0px; overflow:hidden;"></div>
+							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" ajxpOptions="{headerClose:{icon:'1uparrow.png',splitter:'searchbar_splitter',title:86}}" style="height: 0px; overflow:hidden;"></div>
     						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #bbb;"></div>
 					    </div>
 					</div>
