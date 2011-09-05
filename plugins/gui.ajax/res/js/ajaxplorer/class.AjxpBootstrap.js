@@ -258,7 +258,7 @@ Class.create("AjxpBootstrap", {
 					new Effect.Opacity('loading_overlay', {
 						from:0.2,
 						to:0,
-						duration:2,
+						duration:0.8,
 						afterFinish:function(effect){
 							$('loading_overlay').remove();
 							$('progressBox').remove();
