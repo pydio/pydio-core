@@ -332,7 +332,7 @@ Class.create("HeaderResizer", {
 			}else{
 				selector = "#"+this.options.body.id+" td.resizer_"+ (i) + " .text_label";
 			}
-			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:this.options.headerData[i].leftPadding+1))+"px !important;";
+			rule = "width:"+(newSizes[i] - (Prototype.Browser.IE?0:(this.options.headerData[i]?this.options.headerData[i].leftPadding:0)+1))+"px !important;";
 			this.addStyleRule(sheet, selector, rule);
 		}
 

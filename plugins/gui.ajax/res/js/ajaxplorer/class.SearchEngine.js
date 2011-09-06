@@ -63,10 +63,14 @@ Class.create("SearchEngine", AjxpPane, {
 	 */
 	initialize: function($super, mainElementName, ajxpOptions)
 	{
-		$super($(mainElementName), ajxpOptions);
-		if(ajxpOptions){
-			this._ajxpOptions = ajxpOptions;
-		}
+        this._ajxpOptions = {};
+        if($(mainElementName).getAttribute("data-globalOptions")){
+            this._ajxpOptions = $(mainElementName).getAttribute("data-globalOptions").evalJSON();
+        }
+        if(ajxpOptions){
+            this._ajxpOptions = Object.extend(this._ajxpOptions, ajxpOptions);
+        }
+		$super($(mainElementName), this._ajxpOptions);
         this.updateSearchModeFromRegistry();
         document.observe("ajaxplorer:registry_loaded", this.updateSearchModeFromRegistry.bind(this));
 		this.initGUI();

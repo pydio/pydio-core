@@ -110,9 +110,11 @@ Class.create("LocationBar", {
                 16,
                 'inline_hover',
                 function(){
-                    window[this.options.searchButton]['toggleFolding']();
-                    $(this.options.searchFocus)['focus']();
-                }.bind(this)
+                    var folded = window[this.options.searchButton]['toggleFolding']();
+                    if(!folded) $(this.options.searchFocus)['focus']();
+                }.bind(this),
+                false,
+                true
             );
             this.element.insert(this.searchButton);
         }
@@ -121,9 +123,9 @@ Class.create("LocationBar", {
 			'bookmarks_goto', 
 			'inlineBarButtonLeft', 
 			145, 145, 
-			'bookmark_menu.png', 
+			'bookmark.png',
 			16, 
-			'inline_hover');
+			'inline_hover', null, false, true);
 		this.element.insert(this.bmButton);
 		this.initBookmarksBar();
 	},
@@ -258,6 +260,9 @@ Class.create("LocationBar", {
 			if(!this.buttonsWidth){
 				this.buttonsWidth = this.gotoButton.getWidth() + this.parentButton.getWidth() + this.bmButton.getWidth() + 20;
 			}
+            if(this.searchButton){
+                this.buttonsWidth += this.searchButton.getWidth();
+            }
 			var newWidth = Math.min((parentWidth-siblingWidth-this.buttonsWidth),320);
 			if(newWidth < 5){
 				this.element.hide();

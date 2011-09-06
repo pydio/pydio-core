@@ -1,5 +1,5 @@
 .flexbox div.webfx-tree-container.first_container{
-	/*background-image:url('../images/tree-even-odd-bg.png');*/
+	background-image:url('../images/tree-even-odd-bg.png');
 }
 
 .no-flexbox div#tree_container{
@@ -31,38 +31,12 @@
 }
 
 .selected-webfx-tree-item {
-	background-color : #73a2d7;
 	color : white;
-background-image: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-	color-stop(0, rgb(66,128,199)),
-    color-stop(0.54, rgb(115,161,215))
-);
-background-image: -moz-linear-gradient(
-    center bottom,
-    rgb(52,111,179) 0%,
-    rgb(115,161,215) 54%
-);
 }
 
 .selected-webfx-tree-item-inactive 
 {
-	background: #ddd;
 	text-decoration: none;
-background-image: -webkit-gradient(
-    linear,
-    left bottom,
-    left top,
-    color-stop(0, rgb(201,201,201)),
-    color-stop(0.54, rgb(221,221,221))
-);
-background-image: -moz-linear-gradient(
-    center bottom,
-    rgb(201,201,201) 0%,
-    rgb(221,221,221) 54%
-);		
 }
 
 .webfx-tree-item a, .webfx-tree-item a:active, .webfx-tree-item a:hover, .webfx-tree-item a:link {
