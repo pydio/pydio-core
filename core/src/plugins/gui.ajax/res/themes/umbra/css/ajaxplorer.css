@@ -2634,7 +2634,6 @@ div.menu a {
 .menuActions {
    float: right;
    width: 50px;
-   padding-top: 0px !important;
    padding-right: 3px;
    text-align: right;
 }

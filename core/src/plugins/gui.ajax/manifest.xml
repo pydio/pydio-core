@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxp_client" label="Client Plugin" description="Basic GUI actions">
+<guidriver name="ajxp_client" label="Client Plugin" description="Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.">
 	<server_settings>
-        <global_param name="GUI_THEME" group="Theme" type="select" choices="umbra|Umbra (HTML5),oxygen|Oxygen (Legacy)" label="Theme" description="Theme used for display" mandatory="true" default="umbra"/>
+        <global_param name="GUI_THEME" group="Main Options" type="select" choices="umbra|Umbra (HTML5),oxygen|Oxygen (Legacy)" label="Theme" description="Theme used for display" mandatory="true" default="umbra"/>
 		<global_param name="CUSTOM_FONT_SIZE" group="Start Up Screen" type="string" label="Title Font Size" description="Font sized used for the title in the start up screen" mandatory="false" default=""/>				
 		<global_param name="CUSTOM_ICON" group="Start Up Screen" type="string" label="Custom Icon" description="URI to a custom image to be used as start up logo" mandatory="false" default=""/>				
 		<global_param name="CUSTOM_ICON_WIDTH" group="Start Up Screen" type="string" label="Icon Width" description="Width of the custom image (by default 35px)" mandatory="false" default=""/>				
