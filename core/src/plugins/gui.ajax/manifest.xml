@@ -76,7 +76,7 @@
 							<div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions="{replaceScroller:true}" style="margin:20px;margin-top:10px;padding-right: 10px;" ></div>
 					    </div>
 						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initA:0, minSize:0, startFolded: true}">
-							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" ajxpOptions="{headerClose:{icon:'1uparrow.png',splitter:'searchbar_splitter',title:86}}" style="height: 0px; overflow:hidden;"></div>
+							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" data-globalOptions="{headerClose:{icon:'1uparrow.png',splitter:'searchbar_splitter',title:86}}" style="height: 0px; overflow:hidden;"></div>
     						<div id="content_pane" ajxpClass="FilesList" ajxpOptions="'list'" style="border: 1px solid #bbb;"></div>
 					    </div>
 					</div>

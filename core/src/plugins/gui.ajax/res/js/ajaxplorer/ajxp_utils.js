@@ -85,7 +85,7 @@ function resolveImageSource(src, defaultPath, size){
 	}
 }
 
-function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, hoverClass, callback, skipIconResolution){
+function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, hoverClass, callback, skipIconResolution, addArrow){
 	var button = new Element("div", {id:id, className:cssClass});
 	var img = new Element("img", {
 		src:(skipIconResolution?iconSrc:resolveImageSource(iconSrc, '/images/actions/ICON_SIZE', iconSize)), 
@@ -103,6 +103,16 @@ function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, 
 		button.observe("click", callback);
 	}
 	button.setSrc = function(src){img.src=src;};
+    if(addArrow){
+        button.setStyle({position:'relative'});
+        var arrowImg = new Element('img', {
+            src: resolveImageSource('arrow_down.png', '/images'),
+            width:10,
+            height:6,
+            className:'simple_button_arrow'
+        });
+        button.insert(arrowImg);
+    }
 	return button;
 }
 
