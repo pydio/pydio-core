@@ -862,19 +862,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				echo($ajxpPlugin->getManifestRawContent());
 				$definitions = $ajxpPlugin->getConfigsDefinitions();
 				$values = $ajxpPlugin->getConfigs();
-				if(is_array($values) && count($values)){
-					echo("<plugin_settings_values>");
-					foreach($values as $key => $value){
-						if($definitions[$key]["type"] == "array"){
-							$value = implode(",", $value);
-						}else if($definitions[$key]["type"] == "boolean"){
-							$value = ($value === true || $value === "true"?"true":"false");
-						}
-						echo("<param name=\"$key\" value=\"$value\"/>");
-					}
-                    echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
-					echo("</plugin_settings_values>");				
-				}
+                if(!is_array($values)) $values = array();
+                echo("<plugin_settings_values>");
+                foreach($values as $key => $value){
+                    if($definitions[$key]["type"] == "array"){
+                        $value = implode(",", $value);
+                    }else if($definitions[$key]["type"] == "boolean"){
+                        $value = ($value === true || $value === "true"?"true":"false");
+                    }
+                    echo("<param name=\"$key\" value=\"$value\"/>");
+                }
+                echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
+                echo("</plugin_settings_values>");
 				AJXP_XMLWriter::close("admin_data");
 				
 			break;
