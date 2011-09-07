@@ -802,6 +802,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         $metaData["bytesize"] = 0;
         if($isLeaf){
             $metaData["bytesize"] = filesize($ajxpNode->getUrl());
+            if(method_exists($this->wrapperClassName, "getLastRealSize")){
+                $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
+                if($last !== false){
+                    $metaData["bytesize"] = $last;
+                }
+            }
             if($metaData["bytesize"] < 0){
                 $metaData["bytesize"] = sprintf("%u", $metaData["bytesize"]);
             }
