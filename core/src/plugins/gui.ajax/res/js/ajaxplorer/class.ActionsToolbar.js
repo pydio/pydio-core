@@ -56,8 +56,14 @@ Class.create("ActionsToolbar", {
 		}
 		this.toolbars = $H();
 		this.initCarousel();
+        if(this.options.styles){
+            this.buildActionBarStylingMenu();
+            this.style = this.options.defaultStyle;
+            document.observeOnce("ajaxplorer:actions_loaded", function(){
+                window.setTimeout(this.switchStyle.bind(this),50);
+            }.bind(this));
+        }
 		attachMobileScroll(oElement.id, "horizontal");
-		//document.observe("ajaxplorer:loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarsSeparator.bind(this));
 	},
@@ -217,28 +223,33 @@ Class.create("ActionsToolbar", {
 				this.apply();
 			}
 		}.bind(action));
-		var imgPath = resolveImageSource(action.options.src,action.__DEFAULT_ICON_PATH, 22);
+        var icSize = (this.options.defaultIconSize?this.options.defaultIconSize:22);
+        if(this.options.stylesImgSizes && this.style && this.options.stylesImgSizes[this.style]){
+            icSize = this.options.stylesImgSizes[this.style];
+        }
+		var imgPath = resolveImageSource(action.options.src,action.__DEFAULT_ICON_PATH, icSize);
 		var img = new Element('img', {
 			id:action.options.name +'_button_icon',
+            className:'actionbar_button_icon',
 			src:imgPath,
-			width:18,
-			height:18,
+			width:icSize,
+			height:icSize,
 			border:0,
 			align:'absmiddle',
 			alt:action.options.title,
-			title:action.options.title
+			title:action.options.title,
+            'data-action-src':action.options.src
 		});
-		var titleSpan = new Element('span', {id:action.options.name+'_button_label'}).setStyle({paddingLeft:6,paddingRight:6, cursor:'pointer'});
-		button.insert(img).insert(new Element('br')).insert(titleSpan.update(action.getKeyedText()));
+		var titleSpan = new Element('span', {id:action.options.name+'_button_label',className:'actionbar_button_label'});
+		button.insert(img).insert(titleSpan.update(action.getKeyedText()));
 		//this.elements.push(this.button);
 		if(action.options.subMenu){
 			this.buildActionBarSubMenu(button, action);// TODO
             button.setStyle({position:'relative'});
-			var arrowDiv = new Element('div');
+			var arrowDiv = new Element('div', {className:'actionbar_arrow_div'});
 			arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
 			arrowDiv.imgRef = img;
             button.insert(arrowDiv);
-            arrowDiv.setStyle({position:'absolute', top:'18px', right:'8px'});
 		}else if(!this.options.skipBubbling) {
 			button.observe("mouseover", function(){
 				this.buttonStateHover(button, action);
@@ -312,35 +323,61 @@ Class.create("ActionsToolbar", {
 		if(!this.element.subMenus) this.element.subMenus = $A([]);
 		this.element.subMenus.push(subMenu);
 	},
-	
-	/**
-	 * Place an "drop down" arrow on the button.
-	 * @param button HTMLElement
-	 */
-	placeArrowDiv : function(button){
-        return;
-		if(!button.arrowDiv) return;
-		try{
-			if(!button.visible()){
-				button.arrowDiv.hide();
-				return;
-			}
-			var scroll = this.outer.scrollLeft || 0;
-			var pos = button.positionedOffset()[0];
-			var barWidth = this.outer.getWidth();
-			if((scroll <= pos) && (pos < scroll + barWidth)){
-				button.arrowDiv.show();
-				var cumul = Position.cumulativeOffset(button.arrowDiv.imgRef);
-				var imgPos = cumul[0] + 11 - scroll;
-				var imgTop = cumul[1] + 17;
-				button.arrowDiv.setStyle({position:'absolute',top:imgTop+"px",left:imgPos+"px"});
-			}else{
-				button.arrowDiv.hide();
-				return;
-			}
-		}catch(e){};
-	},
-	
+
+    /**
+     * Creates a submenu
+     * @param button HTMLElement The anchor of the submenu
+     * @param action Action The action
+     */
+    buildActionBarStylingMenu : function(){
+        var items = [];
+        var oThis = this;
+        for(var k in this.options.styles){
+            items.push({
+                name: this.options.styles[k],
+                alt: k,
+                image: '',
+                isDefault: (k == "icon_text"),
+                callback: function(){ oThis.switchStyle(this); }
+            });
+        }
+        this.stylingMenu = new Proto.Menu({
+          mouseClick:"right",
+          selector: $(this.element.parentNode),
+          anchor: 'mouse',
+          className: 'menu desktop textual', // this is a class which will be attached to menu container (used for css styling)
+          topOffset : 0,
+          leftOffset : 0,
+          parent : this.element,
+          menuItems: items,
+          fade:true,
+          zIndex:2000
+        });
+    },
+
+    switchStyle: function(command){
+        var style = this.style;
+        if(command){
+            style = command.getAttribute("title");
+            this.style = style;
+        }
+        for(var k in this.options.styles){
+            if(k!=style) this.element.parentNode.removeClassName(k);
+        }
+        this.element.parentNode.addClassName(style);
+        if(this.options.stylesImgSizes && this.options.stylesImgSizes[style]){
+            this.element.select("img.actionbar_button_icon").each(function(img){
+                img.src = resolveImageSource(img.getAttribute("data-action-src"),Action.prototype.__DEFAULT_ICON_PATH, this.options.stylesImgSizes[style]);
+            }.bind(this));
+        }
+
+        var parent = this.element.up("div[@ajxpClass]");
+        while(parent.up("div[@ajxpClass]") != undefined){
+            parent = parent.up("div[@ajxpClass]");
+        }
+        if(parent.ajxpPaneObject) parent.ajxpPaneObject.resize();
+    },
+
 	/**
 	 * Listener for mouseover on the button
 	 * @param button HTMLElement The button

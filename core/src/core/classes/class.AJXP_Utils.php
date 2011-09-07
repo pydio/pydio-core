@@ -256,9 +256,9 @@ class AJXP_Utils
 	{
 		$mess = ConfService::getMessages();
 		$fileName = strtolower($fileName);
-		include(AJXP_INSTALL_PATH."/conf/extensions.conf.php");
+        $EXTENSIONS = ConfService::getRegisteredExtensions();
 		if($isDir){
-			$mime = $RESERVED_EXTENSIONS["folder"];
+			$mime = $EXTENSIONS["folder"];
 		}else{
 			foreach ($EXTENSIONS as $ext){
 				if(preg_match("/\.$ext[0]$/", $fileName)){
@@ -267,9 +267,9 @@ class AJXP_Utils
 			}
 		}
 		if(!isSet($mime)){
-			$mime = $RESERVED_EXTENSIONS["unkown"];
+			$mime = $EXTENSIONS["unkown"];
 		}
-		if(is_numeric($mime[2])){
+		if(is_numeric($mime[2]) || array_key_exists($mime[2], $mess)){
 			$mime[2] = $mess[$mime[2]];
 		}
 		return (($mode == "image"? $mime[1]:$mime[2]));

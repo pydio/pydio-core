@@ -484,6 +484,29 @@ class ConfService
 		
 		return $this->configs["MESSAGES"];
 	}
+
+    public static function getRegisteredExtensions(){
+        return self::getInstance()->getRegisteredExtensionsInst();
+    }
+
+    public function getRegisteredExtensionsInst(){
+        if(!isSet($this->configs["EXTENSIONS"])){
+            $EXTENSIONS = array();
+            $RESERVED_EXTENSIONS = array();
+            include_once(AJXP_CONF_PATH."/extensions.conf.php");
+            $EXTENSIONS = array_merge($RESERVED_EXTENSIONS, $EXTENSIONS);
+            $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//extensions/extension", "nodes");
+            $res = array();
+            foreach($nodes as $node){
+                $res[] = array($node->getAttribute("mime"), $node->getAttribute("icon"), $node->getAttribute("messageId"));
+            }
+            if(count($res)){
+                $EXTENSIONS = array_merge($EXTENSIONS, $res);
+            }
+            $this->configs["EXTENSIONS"] = $EXTENSIONS;
+        }
+        return $this->configs["EXTENSIONS"];
+    }
 	
 	public static function getDeclaredUnsecureActions(){
 		$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//action[@skipSecureToken]", "nodes");

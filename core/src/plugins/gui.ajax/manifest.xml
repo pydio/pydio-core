@@ -31,7 +31,7 @@
 			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[
 				<div id="toolbars">
 					<div id="action_bar">
-						<div id="buttons_bar" ajxpClass="ActionsToolbar"></div>
+						<div id="buttons_bar"  ajxpClass="ActionsToolbar"></div>
 						<div id="locationbar_cont">
 							<div style="height: 100%;" class="separator"></div>
 							<div style="padding-top : 5px;">
@@ -57,8 +57,8 @@
 			]]></template>
             <template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
 				<div id="toolbars">
-					<div id="action_bar">
-						<div id="buttons_bar" ajxpClass="ActionsToolbar" ajxpOptions="{skipBubbling:true}" class="soft_css_gradient"></div>
+					<div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions="{skipBubbling:true,defaultIconSize:16,defaultStyle:'icon_text',styles:{'icons_only':'Icons Only','icon_text':'Icons and Text','text_only':'Text only'},stylesImgSizes:{'icons_only':22,'icon_text':16}}" class="soft_css_gradient"></div>
 						<div id="locationbar_cont" class="css_gradient">
 							<div style="height: 100%;" class="separator"></div>
 							<div style="padding-top : 5px;">
