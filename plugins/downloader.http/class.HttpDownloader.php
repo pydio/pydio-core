@@ -74,7 +74,7 @@ class HttpDownloader extends AJXP_Plugin{
 					AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Triggering DL ", true, 2);
 					AJXP_XMLWriter::close();
                     session_write_close();
-					exit();			
+					exit();
 				}
 				    					    	
 				require_once AJXP_BIN_FOLDER."/class.HttpClient.php";

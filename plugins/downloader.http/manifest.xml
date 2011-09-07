@@ -9,6 +9,10 @@
 		</resources>	
 	</client_settings>
 	<registry_contributions>
+        <extensions>
+            <extension mime="download" messageId="httpdownloader.17" icon="httpdownloader_images/ICON_SIZE/kget_list.png"/>
+            <extension mime="dlpart" messageId="httpdownloader.18" icon="httpdownloader_images/ICON_SIZE/make.png"/>
+        </extensions>
 		<actions>
 			<action name="external_download">
 				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/external_download.png" accessKey="httpdownloader.3" hasAccessKey="true">
@@ -52,7 +56,7 @@
 				</processing>
 			</action>					
 			<action name="external_download_file">
-				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/external_download.png" accessKey="httpdownloader.3" hasAccessKey="false">
+				<gui text="httpdownloader.1" title="httpdownloader.2" src="httpdownloader_images/ICON_SIZE/kget_list.png" accessKey="httpdownloader.3" hasAccessKey="false">
 					<context selection="true" dir="true" recycle="hidden"
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="get" inZip="false">
