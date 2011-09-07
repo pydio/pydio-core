@@ -64,6 +64,7 @@ class fsAccessWrapper implements AjxpWrapper {
     protected static $currentFileKey;
 	protected static $crtZip;
 	protected $realPath;
+    protected static $lastRealSize;
 
     /**
      * Initialize the stream from the given path. 
@@ -250,8 +251,9 @@ class fsAccessWrapper implements AjxpWrapper {
         $PROBE_REAL_SIZE = ConfService::getConf("PROBE_REAL_SIZE");    	
     	if(is_resource($this->fp)){
     		$statValue = fstat($this->fp);
+            fsAccessWrapper::$lastRealSize = false;
     		if($statValue[2] > 0 && $PROBE_REAL_SIZE && !ini_get("safe_mode")){
-	    		$statValue[7] = $statValue["size"] = floatval(trim($this->getTrueSizeOnFileSystem($this->realPath)));
+	    		fsAccessWrapper::$lastRealSize = floatval(trim($this->getTrueSizeOnFileSystem($this->realPath)));
     		}
 	    	return $statValue;    		
     	}
@@ -377,7 +379,11 @@ class fsAccessWrapper implements AjxpWrapper {
 			return rewinddir($this->dH);
 		}
 	}
-	
+
+    public static function getLastRealSize(){
+        return self::$lastRealSize;
+    }
+
 	protected function getTrueSizeOnFileSystem($file) {
 		if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')){
 			$cmd = "stat -L -c%s \"".$file."\"";
