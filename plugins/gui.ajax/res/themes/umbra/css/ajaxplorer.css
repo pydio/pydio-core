@@ -870,7 +870,7 @@ a.carousel-control{
 	display:block;
 	float:left;
 	font-size:10px;
-	height:51px !important;
+	height:51px;
 	padding-top:0;
 	text-align:center;
 	width:8px!important;
@@ -883,7 +883,7 @@ a.carousel-disabled{
 }
 
 a.carousel-control img{
-	margin-top:20px !important;
+	/*margin-top:20px !important;*/
 }
 
 #content_pane{

@@ -478,6 +478,11 @@ Class.create("ActionsToolbar", {
 			var innerSize = last.cumulativeOffset()[0] + last.getWidth();
 		}
 		if(innerSize > parentWidth){
+            var h = parseInt(this.element.up("div.action_bar").getHeight()) - 1;
+            var m = parseInt( (h - 10) / 2);
+            h = h - m;
+            this.prev.setStyle({height:h+'px',paddingTop:m+'px'});
+            this.next.setStyle({height:h+'px',paddingTop:m+'px'});
 			this.prev.show();
 			this.next.show();
 			this.outer.setStyle({width:(parentWidth-this.prev.getWidth()-this.next.getWidth()) + 'px'});
