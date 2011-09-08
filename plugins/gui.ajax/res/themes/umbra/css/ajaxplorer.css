@@ -708,6 +708,15 @@ div.SF_label{
     font-size: 12px;
     padding: 0px;
     line-height: 16px;
+    height:51px;
+}
+
+.action_bar.text_only{
+    height:30px;
+}
+
+.action_bar.icons_only{
+    height:41px;
 }
 
 .action_bar
@@ -824,9 +833,14 @@ div.action_bar.text_only  span.actionbar_button_label{
     margin: 3px 0px;
 }
 
-div.action_bar.icons_only  a img{
+div.action_bar.icons_only img.actionbar_button_icon{
     height: 22px;
     width: 22px;
+}
+
+div.action_bar.icon_text img.actionbar_button_icon{
+    height: 16px;
+    width: 16px;
 }
 
 div.action_bar.text_only a img{
@@ -841,20 +855,12 @@ div.separator
     display: block;
     float: left;
     font-size: 10px;
-    height: 51px;
+    height: 100%;
     margin-left: 2px;
     margin-right: 2px;
     padding-top: 0;
     text-align: center;
     width: 0px;
-}
-
-div.action_bar.text_only div.separator{
-    height: 30px;
-}
-
-div.action_bar.icons_only div.separator{
-    height: 41px;
 }
 
 a.carousel-control{
@@ -2468,8 +2474,11 @@ div.menu a {
 	height:22px;
 }
 
+.menu.desktop.textual{
+    width:7em;
+}
 .menu.desktop.textual img {
-    display:none;
+    margin-right: 6px;
 }
 
 

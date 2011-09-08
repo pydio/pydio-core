@@ -58,7 +58,7 @@
             <template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
 				<div id="toolbars">
 					<div>
-						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions="{skipBubbling:true,defaultIconSize:16,defaultStyle:'icon_text',styles:{'icons_only':'Icons Only','icon_text':'Icons and Text','text_only':'Text only'},stylesImgSizes:{'icons_only':22,'icon_text':16}}" class="soft_css_gradient"></div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions="{skipBubbling:true,defaultIconSize:16,defaultStyle:'icon_text',styles:{'icons_only':'Icons Only','icon_text':'Icons and Text','text_only':'Text only'},stylesImgSizes:{'icons_only':22,'icon_text':16,'text_only':16},stylesBarSizes:{'icons_only':41,'icon_text':51,'text_only':30}}" class="soft_css_gradient"></div>
 						<div id="locationbar_cont" class="css_gradient">
 							<div style="height: 100%;" class="separator"></div>
 							<div style="padding-top : 5px;">
@@ -71,7 +71,7 @@
 				</div>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
 					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions="{direction: 'vertical', initA: 200, maxA:600, minA:0,fit:'height',fitParent:'browser', minSize:0, foldingButton:true}">
-						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initB:200,minA:200}">
+						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions="{direction:'horizontal',initB:200,minB:57}">
 							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions="{display:'dz',replaceScroller:true}" ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png" style="margin:20px;margin-bottom:10px;padding-right: 10px;"></div>
 							<div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions="{replaceScroller:true}" style="margin:20px;margin-top:10px;padding-right: 10px;" ></div>
 					    </div>

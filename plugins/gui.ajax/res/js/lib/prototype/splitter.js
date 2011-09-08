@@ -139,6 +139,7 @@ Class.create("Splitter", AjxpPane, {
 		Event.observe(this.group, "mouseup", this.endSplit.bind(this));
 		// NEW HTML5 : set it to false to disable native draggable!
 		this.splitbar.draggable = false;
+        disableTextSelection(this.group);
         if(this.options.startFolded){
             this.fold();
         }
