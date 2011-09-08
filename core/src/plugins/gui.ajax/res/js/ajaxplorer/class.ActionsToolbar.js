@@ -59,8 +59,13 @@ Class.create("ActionsToolbar", {
         if(this.options.styles){
             this.buildActionBarStylingMenu();
             this.style = this.options.defaultStyle;
-            document.observeOnce("ajaxplorer:actions_loaded", function(){
-                window.setTimeout(this.switchStyle.bind(this),50);
+            document.observe("ajaxplorer:user_logged", function(){
+                if(ajaxplorer.user && ajaxplorer.user.getPreference("action_bar_style")){
+                    this.style = ajaxplorer.user.getPreference("action_bar_style");
+                }else{
+                    this.style = this.options.defaultStyle;
+                }
+                this.switchStyle(false, true);
             }.bind(this));
         }
 		attachMobileScroll(oElement.id, "horizontal");
@@ -330,17 +335,6 @@ Class.create("ActionsToolbar", {
      * @param action Action The action
      */
     buildActionBarStylingMenu : function(){
-        var items = [];
-        var oThis = this;
-        for(var k in this.options.styles){
-            items.push({
-                name: this.options.styles[k],
-                alt: k,
-                image: '',
-                isDefault: (k == "icon_text"),
-                callback: function(){ oThis.switchStyle(this); }
-            });
-        }
         this.stylingMenu = new Proto.Menu({
           mouseClick:"right",
           selector: $(this.element.parentNode),
@@ -349,33 +343,73 @@ Class.create("ActionsToolbar", {
           topOffset : 0,
           leftOffset : 0,
           parent : this.element,
-          menuItems: items,
+          menuItems: [],
+          beforeShow:function(){
+              this.stylingMenu.options.menuItems = this.listStyleMenuItems();
+          }.bind(this),
           fade:true,
           zIndex:2000
         });
     },
 
-    switchStyle: function(command){
+    listStyleMenuItems: function(){
+        var items = [];
+        var oThis = this;
+        for(var k in this.options.styles){
+            items.push({
+                name: this.options.styles[k],
+                alt: k,
+                image: resolveImageSource((k == this.style?'button_ok.png':'transp.png'),Action.prototype.__DEFAULT_ICON_PATH, 16),
+                isDefault: (k == this.style),
+                callback: function(){ oThis.switchStyle(this); }
+            });
+        }
+        return items;
+    },
+
+    switchStyle: function(command, start){
         var style = this.style;
         if(command){
             style = command.getAttribute("title");
             this.style = style;
         }
-        for(var k in this.options.styles){
-            if(k!=style) this.element.parentNode.removeClassName(k);
-        }
-        this.element.parentNode.addClassName(style);
-        if(this.options.stylesImgSizes && this.options.stylesImgSizes[style]){
-            this.element.select("img.actionbar_button_icon").each(function(img){
-                img.src = resolveImageSource(img.getAttribute("data-action-src"),Action.prototype.__DEFAULT_ICON_PATH, this.options.stylesImgSizes[style]);
-            }.bind(this));
-        }
-
         var parent = this.element.up("div[@ajxpClass]");
         while(parent.up("div[@ajxpClass]") != undefined){
             parent = parent.up("div[@ajxpClass]");
         }
-        if(parent.ajxpPaneObject) parent.ajxpPaneObject.resize();
+        var actBar = this.element.up("div.action_bar");
+
+        var applyResize = function(){
+            for(var k in this.options.styles){
+                if(k!=style) this.element.parentNode.removeClassName(k);
+            }
+            this.element.parentNode.addClassName(style);
+            if(this.options.stylesImgSizes && this.options.stylesImgSizes[style]){
+                this.element.select("img.actionbar_button_icon").each(function(img){
+                    img.src = resolveImageSource(img.getAttribute("data-action-src"),Action.prototype.__DEFAULT_ICON_PATH, this.options.stylesImgSizes[style]);
+                }.bind(this));
+            }
+            if(parent.ajxpPaneObject) parent.ajxpPaneObject.resize();
+            if(ajaxplorer.user && !start){
+                ajaxplorer.user.setPreference("action_bar_style", style);
+                ajaxplorer.user.savePreference("action_bar_style");
+            }
+        }.bind(this);
+
+        if(this.options.stylesBarSizes && this.options.stylesBarSizes[style]){
+            new Effect.Morph(actBar, {
+                style:'height:'+this.options.stylesBarSizes[style]+'px',
+                duration:0.5,
+                afterFinish:applyResize,
+                afterUpdate:function(){
+                    if(parent.ajxpPaneObject) parent.ajxpPaneObject.resize();
+                }
+            });
+        }else{
+            applyResize();
+        }
+
+
     },
 
 	/**

@@ -325,6 +325,7 @@ class AJXP_XMLWriter
 			$buffer.="<pref name=\"upload_auto_send\" value=\"".$loggedUser->getPref("upload_auto_send")."\"/>";
 			$buffer.="<pref name=\"upload_auto_close\" value=\"".$loggedUser->getPref("upload_auto_close")."\"/>";
 			$buffer.="<pref name=\"upload_existing\" value=\"".$loggedUser->getPref("upload_existing")."\"/>";
+			$buffer.="<pref name=\"action_bar_style\" value=\"".$loggedUser->getPref("action_bar_style")."\"/>";
 			$buffer.="</preferences>";
 			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>";
 			$bMarks = $loggedUser->getBookmarks();
