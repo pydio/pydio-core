@@ -392,7 +392,7 @@ Class.create("XHRUploader", {
 			marginTop: '7px',
 			height:'4px',
 			padding:0,
-			width:'150px'
+			width:'154px'
 		});
 		var percentText = new Element('span', {style:"float:right;display:block;width:30px;text-align:center;"});
 		var statusText = new Element('span', {style:"float:right;display:block;width:90px;overflow:hidden;text-align:right;"});
