@@ -271,6 +271,7 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 					fitHeightToBottom($(this.contentMainContainer));
 				}else{
 					fitHeightToBottom($(this.contentMainContainer), $(modal.elementName));
+					fitHeightToBottom($(this.element), $(modal.elementName));
 				}
 			}.bind(this), this.options);			
 	},

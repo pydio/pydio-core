@@ -172,7 +172,7 @@ Class.create("Diaporama", AbstractEditor, {
 		Event.observe(document, "keydown", this.zoomObs);
 		this.element.observe("editor:close", function(){
 			Event.stopObserving(document, "keydown", this.zoomObs);
-		});
+		}.bind(this));
 		
 		// Init preferences
 		if(ajaxplorer && ajaxplorer.user){
@@ -194,6 +194,7 @@ Class.create("Diaporama", AbstractEditor, {
 		}.bind(this) );
 		
 		this.element.observe("editor:enterFSend", function(e){this.resize();}.bind(this));
+		this.element.observe("editor:exitFSend", function(e){this.resize();}.bind(this));
 		fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
 		// Fix imgContainer
 		if(Prototype.Browser.IE){
@@ -357,8 +358,16 @@ Class.create("Diaporama", AbstractEditor, {
 		if(!this.timeInput.value) this.timeInput.value = 3;
 		this.pe = new PeriodicalExecuter(this.next.bind(this), parseInt(this.timeInput.value));
 		this.slideShowPlaying = true;
+        window.setTimeout(this.hideActionBar.bind(this), 3000);
 	},
-	
+
+    hideActionBar: function(){
+        new Effect.Fade(this.actionBar);
+        this.element.observeOnce("mousemove", function(){
+            this.actionBar.show();
+        }.bind(this));
+    },
+
 	stop: function(){
 		if(this.pe) this.pe.stop();
 		this.slideShowPlaying = false;

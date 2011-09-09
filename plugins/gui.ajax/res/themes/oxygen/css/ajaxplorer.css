@@ -617,6 +617,10 @@ div.SF_label{
 	overflow:hidden;
 }
 
+.action_bar span.actionbar_button_label{
+    display: block;
+}
+
 #buttons_bar, #locationbar_cont
 {
    /* background-color: #e0ecff;*/

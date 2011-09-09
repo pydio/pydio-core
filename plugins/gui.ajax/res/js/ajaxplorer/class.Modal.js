@@ -226,11 +226,11 @@ Class.create("Modal", {
 			}
 			$(elementName).setStyle({height:boxHeight+'px'});
 		}else{
-			if (Prototype.Browser.IE){	
-				$(elementName).setStyle({height:'1%'});
-			}else{
+			//if (Prototype.Browser.IE){
+				//$(elementName).setStyle({height:'1%'});
+			//}else{
 				$(elementName).setStyle({height:'auto'});
-			}
+			//}
 		}
 		this.refreshDialogPosition();
 		if(boxAutoResize && (this.currentListensToWidth || this.currentListensToHeight) ){

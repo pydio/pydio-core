@@ -107,6 +107,9 @@ Class.create("Splitter", AjxpPane, {
 		this.initBorderB = parseInt(this.paneB.getStyle('border'+this.options.adjSide1+'Width')) + parseInt(this.paneB.getStyle('border'+this.options.adjSide2+'Width'))  || 0;
 		this.initBorderB += parseInt(this.paneB.getStyle('margin'+this.options.adjSide1)) + parseInt(this.paneB.getStyle('margin'+this.options.adjSide2));
 
+        if(!this.initBorderA) this.initBorderA = 0;
+        if(!this.initBorderB) this.initBorderB = 0;
+
 		this.splitbar = new Element('div', {unselectable:'on'});
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
 		this.paneA.insert({after:this.splitbar});
@@ -204,9 +207,9 @@ Class.create("Splitter", AjxpPane, {
 		
 		// Recompute fixed
 		var optName = this.options.fixed;
-		var borderAdjA = (!Prototype.Browser.IE?(this.initBorderA):0);
+		var borderAdjA = this.initBorderA;
 		this.paneA.setStyle(this.makeStyleObject(optName, this.group._fixed-this.paneA._padFixed-borderAdjA+'px'));
-		var borderAdjB = (!Prototype.Browser.IE?(this.initBorderB):0);
+		var borderAdjB = this.initBorderB;
 		this.paneB.setStyle(this.makeStyleObject(optName,this.group._fixed-this.paneB._padFixed-borderAdjB+'px'));
 		this.splitbar.setStyle(this.makeStyleObject(optName, this.group._fixed+'px'));		
 
@@ -275,7 +278,7 @@ Class.create("Splitter", AjxpPane, {
             return false;
         }
 		this.splitbar.addClassName(this.options.activeClass);
-		this.paneA._posAdjust = this.paneA[this.options.offsetAdjust] + this.initBorderA - this.options.eventPointer(event);
+		this.paneA._posAdjust = this.options.getAdjust(this.paneA) + this.initBorderA - this.options.eventPointer(event);
 		/*
 		if(!this.moveObserver){
 			this.moveObserver = this.doSplitMouse.bind(this);
@@ -342,7 +345,7 @@ Class.create("Splitter", AjxpPane, {
 		this.splitbar.setStyle(this.makeStyleObject(this.options.set, np+'px'));
 		var borderAdjA = 0;
 		var borderAdjB = 0;
-		if(!Prototype.Browser.IE && this.initBorderA){
+		if(this.initBorderA){
 			borderAdjA = this.initBorderA;
 		}
         var targetAdjustA = np-this.paneA._padAdjust-borderAdjA;
@@ -352,10 +355,12 @@ Class.create("Splitter", AjxpPane, {
             this.paneA.setStyle(this.makeStyleObject(this.options.adjust, targetAdjustA+'px'));
         }
 		this.paneB.setStyle(this.makeStyleObject(this.options.set, np+this.splitbar._adjust+'px'));
-		if(!Prototype.Browser.IE && this.initBorderB){
+		if(this.initBorderB){
 			borderAdjB = this.initBorderB;
-		}		
-		this.paneB.setStyle(this.makeStyleObject(this.options.adjust, this.group._adjust-this.splitbar._adjust-this.paneB._padAdjust-np-borderAdjB+"px"));
+		}
+        var bSide =this.group._adjust-this.splitbar._adjust-this.paneB._padAdjust-np-borderAdjB;
+        bSide = Math.max(0,bSide);
+		this.paneB.setStyle(this.makeStyleObject(this.options.adjust, bSide+"px"));
 		if(!Prototype.Browser.IE){
 			this.paneA.fire("resize");
 			this.paneB.fire("resize");

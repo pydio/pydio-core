@@ -133,7 +133,8 @@ Class.create("FilesList", SelectableElements, {
 		this._oSortTypes = this.defaultSortTypes;
 		
 		this.initGUI();			
-		Event.observe(document, "keydown", this.keydown.bind(this));		
+		Event.observe(document, "keydown", this.keydown.bind(this));
+        document.observe("ajaxplorer:trigger_repository_switch", this.setOnLoad.bind(this));
 	},
 		
 	/**
@@ -1348,20 +1349,25 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	setOnLoad: function()	{
 		if(this.loading) return;
-		addLightboxMarkupToElement(this.htmlElement);
+        var el = $('table_rows_container');
+        if(this._displayMode == "thumb") el = $('selectable_div');
+        el.setStyle({position:"relative"});
+		addLightboxMarkupToElement(el);
 		var img = new Element('img', {
 			src : ajxpResourcesFolder+'/images/loadingImage.gif'
 		});
-		var overlay = $(this.htmlElement).down("#element_overlay");
+		var overlay = el.down("#element_overlay");
 		overlay.insert(img);
-		img.setStyle({marginTop : Math.max(0, (overlay.getHeight() - img.getHeight())/2) });
+		img.setStyle({marginTop : Math.max(0, (overlay.getHeight() - img.getHeight())/2) + "px"});
 		this.loading = true;
 	},
 	/**
 	 * Remove the loading image
 	 */
 	removeOnLoad: function(){
-		removeLightboxFromElement(this.htmlElement);
+        var el = $('table_rows_container');
+        if(this._displayMode == "thumb") el = $('selectable_div');
+		removeLightboxFromElement(el);
 		this.loading = false;
 	},
 	
