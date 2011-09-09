@@ -85,6 +85,7 @@ Class.create("FoldersTree", AjxpPane, {
 			this.action(e);
 			Event.stop(e);
 		}.bind(this.tree));
+
 		AjxpDroppables.add(this.tree.id);
 		if(!this.tree.open && !this.tree.loading) {
 			this.tree.toggle();		
@@ -191,8 +192,12 @@ Class.create("FoldersTree", AjxpPane, {
 	 * @param protoMenu Proto.Menu 
 	 */
 	setContextualMenu: function(protoMenu){
-		Event.observe(this.rootNodeId+'-anchor', 'contextmenu', function(e){eval(this.action);}.bind(webFXTreeHandler.all[this.rootNodeId]));
-		protoMenu.addElements('#'+this.rootNodeId+'-anchor');
+        Event.observe(this.rootNodeId+'','contextmenu', function(event){
+            this.select();
+            this.action();
+            Event.stop(event);
+        }.bind(webFXTreeHandler.all[this.rootNodeId]));
+         protoMenu.addElements('#'+this.rootNodeId+'');
 		webFXTreeHandler.contextMenu = protoMenu;
 	},
 	
