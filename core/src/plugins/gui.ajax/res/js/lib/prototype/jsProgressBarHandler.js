@@ -182,7 +182,7 @@ JS_BRAMUS.jsProgressBar = Class.create({
 
 			// create the visual aspect of the progressBar
 			$(this.el).update(
-				'<img id="' + this.id + '_percentImage" src="' + this.options.boxImage + '" alt="0%" style="width: ' + this.options.width + 'px; height: ' + this.options.height + 'px; background-position: ' + this.initialPos + 'px 50%; background-image: url(' + this.options.barImage[this.backIndex] + '); padding: 0; margin: 0;" class="percentImage" />' + 
+				'<img id="' + this.id + '_percentImage" src="' + this.options.boxImage + '" alt="0%" style="position:absolute;width: ' + this.options.width + 'px; height: ' + this.options.height + 'px; background-position: ' + this.initialPos + 'px 50%; background-image: url(' + this.options.barImage[this.backIndex] + '); padding: 0; margin: 0;" class="percentImage" />' +
 				((this.options.showText == true)?'<span id="' + this.id + '_percentText" class="percentText">0%</span>':''));
 		
 			this.visualsInitialized = true;

@@ -232,15 +232,15 @@ Class.create("AjxpBootstrap", {
 			var fontSize = customWording.titleFontSize || '35px';
 			html+=' <div style="margin-bottom:4px; font-size:'+fontSize+';font-weight:bold; background-image:url(\''+icon+'\');background-position:left center;background-repeat:no-repeat;padding-left:'+iconWidth+';color:#0077b3;">'+title+'</div>';
 			if(customWording.title){
-				html+='	<div style="padding:4 7;"><div>Powered by AjaXplorer<span id="version_span"></span></div>';								
+				html+='	<div style="padding:4px 7px;position: relative;"><div>Powered by AjaXplorer<span id="version_span"></span></div>';
 			}else{
-				html+='	<div style="padding:4 7;"><div>The web data-browser<span id="version_span"></span></div>';				
+				html+='	<div style="padding:4px 7px;position: relative;"><div>The web data-browser<span id="version_span"></span></div>';
 			}
 			html+='	Written by Charles du Jeu - LGPL License. <br>';
 			if(customWording.welcomeMessage){
 				html+= customWording.welcomeMessage + '<br>';
 			}
-			html+='	<div style="padding:4px;float:right;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
+			html+='	<div style="position:absolute;bottom: 16px;right: 160px;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
 			html+='	</div></div>';
 		}
 		$$('body')[0].insert({top:html});

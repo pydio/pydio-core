@@ -546,7 +546,6 @@ div.accordion_content{
     top: 20%;
 	-moz-border-radius : 5px;
 	border-radius : 5px;
-
     width: 305px;
     padding: 3px;
     display: block;
@@ -554,7 +553,6 @@ div.accordion_content{
     z-index: 2002;
     left: 40%;
     position: absolute;
-    padding-bottom: 0;
     -webkit-box-shadow: 1px 1px 24px #aaa;
     -moz-box-shadow: 1px 1px 24px #aaa;
     box-shadow: 1px 1px 24px #aaa;
@@ -2683,10 +2681,10 @@ div.menu a {
 }
 
 .menuActions {
-   float: right;
-   width: 50px;
-   padding-right: 3px;
-   text-align: right;
+    position: absolute;
+    right: 0px;
+    top: 1px;
+    text-align: right;
 }
 
 .menuActions a{

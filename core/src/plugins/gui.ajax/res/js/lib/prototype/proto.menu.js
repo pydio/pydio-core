@@ -163,7 +163,7 @@ Proto.Menu = Class.create({
 			var newItem = new Element('li', {className: item.separator ? 'separator' : ''});
 			
 			if(item.moreActions){
-				var actionsContainer = new Element('div', {className:'menuActions'});
+				var actionsContainer = new Element('div', {className:'menuActions',style:'padding-top:4px;'});
 				item.moreActions.each(function(action){
 					actionsContainer.insert(
 						new Element('a', {
@@ -176,13 +176,15 @@ Proto.Menu = Class.create({
 					);
 				});
 				newItem.insert(actionsContainer);
+                newItem.setStyle({position:"relative"});
 				actionsContainer.observe("mouseover", function(){newItem.select('a.enabled')[0].addClassName("hovered");});
 				actionsContainer.observe("mouseout", function(){newItem.select('a.enabled')[0].removeClassName("hovered");});
 			}
 			if(item.subMenu){
-				var arrowContainer = new Element('div', {className:'menuActions',style:'padding-top:7px;padding-right:5px'});
+				var arrowContainer = new Element('div', {className:'menuActions',style:'padding-right:7px;'});
 				arrowContainer.insert(new Element('img', {src:this.options.submenuArrow, width:6,height:10}));
 				newItem.insert(arrowContainer);
+                newItem.setStyle({position:"relative"});
 			}
 			
 			newItem.insert(
