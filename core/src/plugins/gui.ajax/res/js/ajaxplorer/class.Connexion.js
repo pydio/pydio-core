@@ -166,7 +166,7 @@ Class.create("Connexion", {
 	 */
 	loadLibrary : function(fileName, onLoadedCode){
 		var path = (this._libUrl?this._libUrl+'/'+fileName:fileName);
-		new Ajax.Request(path, 
+		new Ajax.Request(path,
 		{
 			method:'get',
 			asynchronous: false,

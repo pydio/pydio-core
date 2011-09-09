@@ -56,7 +56,7 @@ Class.create("FoldersTree", AjxpPane, {
 		oElement.insert(this.treeContainer);
 		disableTextSelection(this.treeContainer);
         if(this.options.replaceScroller){
-            this.scrollbar = new Control.ScrollBar('tree_container','tree_scroller', {fixed_scroll_distance:25});
+            this.scrollbar = new Control.ScrollBar('tree_container','tree_scroller');
             document.observe("ajaxplorer:tree_change", this.scrollbar.recalculateLayout.bind(this.scrollbar));
         }
 

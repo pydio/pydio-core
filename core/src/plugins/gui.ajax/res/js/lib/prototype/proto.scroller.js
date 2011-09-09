@@ -117,6 +117,11 @@ Control.ScrollBar = Class.create({
                 else
                     this.handle.style.width = this.slider.handleLength + 'px';
             }
+            if( (this.options.scroll_axis == 'vertical' && parseInt(this.handle.style.height) > this.offsetLength())
+                || parseInt(this.handle.style.width) > this.offsetLength()){
+                this.disable();
+                return;
+            }
             this.scrollBy(0);
         }
     },

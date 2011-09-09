@@ -41,15 +41,21 @@ class AJXP_JSPacker{
 	 * Static function for packing all js into two big files
 	 */
 	function pack(){
-		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/js/bootlist.txt", 
-										CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_boot.js", 
-										"Normal");
-		AJXP_JSPacker::concatListAndPack(CLIENT_RESOURCES_FOLDER."/js/scriptslist.txt", 
-										CLIENT_RESOURCES_FOLDER."/js/ajaxplorer.js", 
-										"Normal");
-		AJXP_JSPacker::concatListAndPack(AJXP_THEME_FOLDER."/css/csslist.txt", 
-										AJXP_THEME_FOLDER."/css/allz.css",
-										"None");
+
+        $sList = glob(CLIENT_RESOURCES_FOLDER."/js/*_list.txt");
+        foreach ($sList as $list){
+            $scriptName = str_replace("_list.txt", ".js", $list);
+            AJXP_JSPacker::concatListAndPack($list,
+                                             $scriptName,
+                                            "Normal");
+        }
+        $sList = glob(AJXP_THEME_FOLDER."/css/*_list.txt");
+        foreach ($sList as $list){
+            $scriptName = str_replace("_list.txt", ".css", $list);
+            AJXP_JSPacker::concatListAndPack($list,
+                                             $scriptName,
+                                            "None");
+        }
 	}
 	
 	function concatListAndPack($src, $out, $mode){

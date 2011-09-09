@@ -155,7 +155,8 @@ Class.create("AjxpBootstrap", {
 		var cssRes = this.parameters.get("cssResources");
 		if(cssRes) cssRes.each(this.loadCSSResource.bind(this));
 		if(this.parameters.get('ajxpResourcesFolder')){
-			window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder');
+            connexion._libUrl = this.parameters.get('ajxpResourcesFolder') + "/js";
+			window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder') + "/themes/" + this.parameters.get("theme");
 		}
 		if(this.parameters.get('additional_js_resource')){
 			connexion.loadLibrary(this.parameters.get('additional_js_resource'));
@@ -187,14 +188,13 @@ Class.create("AjxpBootstrap", {
 	 */
 	detectBaseParameters : function(){
 		$$('script').each(function(scriptTag){
-			if(scriptTag.src.match("/js/ajaxplorer_boot.js") || scriptTag.src.match("/js/ajaxplorer/class.AjxpBootstrap.js")){
-				if(scriptTag.src.match("/js/ajaxplorer_boot.js")){
+			if(scriptTag.src.match("/js/ajaxplorer_boot.js") || scriptTag.src.match("/js/ajaxplorer_boot_protolegacy.js") || scriptTag.src.match("/js/ajaxplorer/class.AjxpBootstrap.js")){
+				if(scriptTag.src.match("/js/ajaxplorer_boot.js") || scriptTag.src.match("/js/ajaxplorer_boot_protolegacy.js")){
 					this.parameters.set("debugMode", false);
 				}else{
 					this.parameters.set("debugMode", true);
 				}
-				this.parameters.set("ajxpResourcesFolder", scriptTag.src.replace('/js/ajaxplorer/class.AjxpBootstrap.js','').replace('/js/ajaxplorer_boot.js', ''));
-				return;
+				this.parameters.set("ajxpResourcesFolder", scriptTag.src.replace('/js/ajaxplorer/class.AjxpBootstrap.js','').replace('/js/ajaxplorer_boot.js', '').replace('/js/ajaxplorer_boot_protolegacy.js', ''));
 			}
 		}.bind(this) );
 		if(this.parameters.get("ajxpResourcesFolder")){
@@ -250,8 +250,8 @@ Class.create("AjxpBootstrap", {
 			animate		: true,										// Animate the progress? - default: true
 			showText	: false,									// show text with percentage in next to the progressbar? - default : true
 			width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: this.parameters.get("ajxpResourcesFolder")+'/images/progress_box.gif',			// boxImage : image around the progress bar
-			barImage	: this.parameters.get("ajxpResourcesFolder")+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
+			boxImage	: window.ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
+			barImage	: window.ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
 			height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
 			onTick		: function(pbObj) { 
 				if(pbObj.getPercentage() == 100){

@@ -150,9 +150,14 @@ Class.create("User", {
 	    var value = this.preferences.get(prefName);	
 	    if(fromJSON && value){
 	    	try{
+                if(typeof value == "object") return value;
 		    	return value.evalJSON();
 	    	}catch(e){
-	    		alert("Error parsing JSON in preferences. You should contact system admin and clear user preferences.");
+                if(console){
+                    console.log("Error parsing JSON in preferences ("+prefName+"). You should contact system admin and clear user preferences.");
+                }else{
+                    alert("Error parsing JSON in preferences. You should contact system admin and clear user preferences.");
+                }
 	    	}
 	    }
 	    return value;
@@ -174,7 +179,7 @@ Class.create("User", {
 	 */
 	setPreference : function(prefName, prefValue, toJSON){
 		if(toJSON){
-			prefValue = prefValue.toJSON();
+			prefValue = Object.toJSON(prefValue);
 		}
 		this.preferences.set(prefName, prefValue);
 	},

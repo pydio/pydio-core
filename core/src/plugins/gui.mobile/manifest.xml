@@ -20,7 +20,7 @@
 							<div style="height: 33px;" class="separator"></div>
 							<div style="padding-top : 5px;">
 								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont'}"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
 								<div id="logging_string" ajxpClass="UserWidget"></div>
 							</div>
 						</div>

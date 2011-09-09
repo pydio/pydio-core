@@ -53,7 +53,7 @@ Class.create("InfoPanel", AjxpPane, {
         }
         this.htmlElement.insert(container);
         if(options.replaceScroller){
-            this.scrollbar = new Control.ScrollBar('ip_content','ip_scroller');
+            this.scrollbar = new Control.ScrollBar('ip_content','ip_scroller', {fixed_scroll_distance:50});
         }
         
         this.contentContainer = container;

@@ -88,6 +88,7 @@ Class.create("AbstractEditor" , {
 		}else{
 			this.actionBar = actionBarSel[0];
 		}
+        this.actionBar.addClassName('editor_action_bar');
 		if(!this.editorOptions.fullscreen){
 			this.defaultActions.unset("fs");
 			this.defaultActions.unset("nofs");
@@ -98,7 +99,10 @@ Class.create("AbstractEditor" , {
 		this.actionBar.select('a').each(function(link){
 			link.onclick = function(){return false;};
 			link.href = "#";
-			var span = link.select('span[message_id]')[0];			
+            link.select("br").invoke("remove");
+            link.select("img").invoke("addClassName", "actionbar_button_icon");
+            link.select("span").invoke("addClassName", "actionbar_button_label");
+			var span = link.select('span[message_id]')[0];
 			if(span) span.update(MessageHash[span.readAttribute("message_id")]);
 			this.actions.set(link.id, link);
 			if(link.getAttribute('access_key')){
@@ -118,7 +122,7 @@ Class.create("AbstractEditor" , {
 			Event.observe(document, "keydown", this.keyObs);
 			this.element.observe("editor:close", function(){
 				Event.stopObserving(document, "keydown", this.keyObs);
-			});
+			}.bind(this));
 		}
 		
 		if(this.actions.get("closeButton")){
@@ -160,6 +164,7 @@ Class.create("AbstractEditor" , {
 	 * Experimental : detach toolbar
 	 */
 	makeToolbarFloatable : function(){
+        this.element.up("div.dialogContent").setStyle({position:'relative'});
 		this.actionBar.absolutize();
 		this.actionBar.setStyle({
 			zIndex:(parseInt(this.element.getStyle("zIndex")) + 1000),
@@ -173,7 +178,7 @@ Class.create("AbstractEditor" , {
 				var w = this.actionBar.getWidth();
 				var elW = this.contentMainContainer.getWidth();
 				this.actionBar.setStyle({left:(Math.max(0,(elW-w)/2))+'px'});				
-				this.actionBar.setStyle({top:(this.contentMainContainer.getHeight()-this.actionBar.getHeight() -(this.fullScreenMode?30:0) )+'px'});
+				this.actionBar.setStyle({top:(this.contentMainContainer.getHeight()-this.actionBar.getHeight() - 30 )+'px'});
 			}
 		}.bind(this);
 		this.element.observe("editor:resize", this.actionBarPlacer);
@@ -240,12 +245,13 @@ Class.create("AbstractEditor" , {
 	 * Switch to fullscreen mode
 	 */
 	setFullScreen : function(){
-		this.element.fire("editor:enterFS");
 		if(!this.contentMainContainer){
 			this.contentMainContainer = this.element;
 		}
 		this.originalHeight = this.contentMainContainer.getHeight();	
 		this.originalWindowTitle = document.title;
+        this.element.fire("editor:enterFS");
+
 		this.element.absolutize();
 		this.actionBar.setStyle({marginTop: 0});
 		$(document.body).insert(this.element);
@@ -276,9 +282,14 @@ Class.create("AbstractEditor" , {
 		if(!this.fullScreenMode) return;
 		this.element.fire("editor:exitFS");
 		Event.stopObserving(window, "resize", this.fullScreenListener);
-		this.element.relativize();
-		$$('.dialogContent')[0].insert(this.element);
-		this.element.setStyle({top:0,left:0,zIndex:100});		
+        var dContent = $$('.dialogContent')[0];
+        dContent.setStyle({position:"relative"});
+		dContent.insert(this.element);
+        this.element.relativize();
+		this.element.setStyle({top:0,left:0,
+            width:parseInt(dContent.getWidth())+'px',
+            height:parseInt(dContent.getHeight())+"px",
+            zIndex:100});
 		this.resize(this.originalHeight);
 		this.actions.get("fsButton").show();
 		this.actions.get("nofsButton").hide();		

@@ -707,16 +707,21 @@ div.SF_label{
     font-family: Arial;
     font-size: 12px;
     padding: 0px;
-    line-height: 16px;
+    line-height: 15px;
     height:51px;
+}
+.action_bar.editor_action_bar{
+    height:55px;
 }
 
 .action_bar.text_only{
+    line-height: 16px;
     height:30px;
 }
 
 .action_bar.icons_only{
-    height:41px;
+    height:40px;
+    line-height: 0px;
 }
 
 .action_bar
@@ -786,7 +791,7 @@ div.action_bar.text_only  span.actionbar_button_label{
     outline: none;
     border-radius: 3px;
     text-shadow: 1px 1px 1px white;
-    margin: 4px 2px 4px 1px;
+    margin: 5px 2px 0px 1px;
     padding-bottom: 1px;
 }
 
@@ -806,7 +811,7 @@ div.action_bar.text_only  span.actionbar_button_label{
 {
    background:white;
    border: 1px solid #ccc;
-   margin: 3px 1px 3px 0px;
+   margin: 4px 1px 0px 0px;
 }
 
 .action_bar.text_only a.menuAnchorSelected,
@@ -825,12 +830,12 @@ div.action_bar.text_only  span.actionbar_button_label{
 {
     color: expression('#c4c7c1');
     border:  0px;
-    margin: 4px 3px 1px 0px;
+    margin: 5px 3px 1px 0px;
 }
 
 .action_bar a img
 {
-    margin: 3px 0px;
+    margin: 2px 0px 0px 0px;
 }
 
 div.action_bar.icons_only img.actionbar_button_icon{
@@ -949,6 +954,9 @@ a.carousel-control img{
 {
     margin-left: 0px;
 }
+#location_form div.location_bar_label{
+    line-height: 18px;
+}
 
 #repository_form
 {
@@ -963,8 +971,13 @@ a.carousel-control img{
     border:none;
     height: 15px;
     width: 325px;
+    float:left;
 }
 
+#repository_form img#repo_icon{
+    float: left;
+    vertical-align:top;
+}
 #repository_form input
 {
     width: 90px;

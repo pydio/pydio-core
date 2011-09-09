@@ -240,7 +240,6 @@ Class.create("ActionsToolbar", {
 			width:icSize,
 			height:icSize,
 			border:0,
-			align:'absmiddle',
 			alt:action.options.title,
 			title:action.options.title,
             'data-action-src':action.options.src
@@ -402,6 +401,7 @@ Class.create("ActionsToolbar", {
                 duration:0.5,
                 afterFinish:applyResize,
                 afterUpdate:function(){
+                    actBar.select("div.separator").invoke("setStyle", {height:(actBar.getHeight()-1)+"px"});
                     if(parent.ajxpPaneObject) parent.ajxpPaneObject.resize();
                 }
             });

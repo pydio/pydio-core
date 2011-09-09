@@ -36,7 +36,15 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class AJXP_ClientDriver extends AJXP_Plugin 
-{	
+{
+    public function loadConfigs($configData){
+        parent::loadConfigs($configData);
+        if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+            // Force legacy theme for the moment
+            $this->pluginConf["GUI_THEME"] = "oxygen";
+        }
+    }
+
 	function switchAction($action, $httpVars, $fileVars)
 	{
         if(!defined("AJXP_THEME_FOLDER")){
@@ -203,13 +211,25 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				setcookie("AJXP_LAST_KNOWN_VERSION", AJXP_VERSION, time() + 3600*24*365, "/");
 				
 				$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
+                $crtTheme = $this->pluginConf["GUI_THEME"];
 				if(ConfService::getConf("JS_DEBUG")){
 					if(!isSet($mess)){
 						$mess = ConfService::getMessages();
 					}
-					include_once(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui_debug.html");
+                    if(is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html")){
+                        include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html");
+                    }else{
+                        include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui_debug.html");
+                    }
 				}else{
-					$content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");	
+                    if(is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui.html")){
+                        $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui.html");
+                    }else{
+                        $content = file_get_contents(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui.html");
+                    }
+                    if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
+                        $content = str_replace("ajaxplorer_boot.js", "ajaxplorer_boot_protolegacy.js", $content);
+                    }
 					$content = AJXP_XMLWriter::replaceAjxpXmlKeywords($content, false);
 					if($JSON_START_PARAMETERS){
 						$content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);
@@ -226,7 +246,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					$_SESSION["AJXP_SERVER_PREFIX_URI"] = $_GET["server_prefix_uri"];
 				}
 				$config = array();
-				$config["ajxpResourcesFolder"] = "plugins/gui.ajax/res/themes/".$this->pluginConf["GUI_THEME"];
+				$config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
 				$config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
 				$config["zipEnabled"] = ConfService::zipEnabled();
 				$config["multipleFilesDownloadEnabled"] = ConfService::getCoreConf("ZIP_CREATION");

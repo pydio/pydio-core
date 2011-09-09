@@ -330,7 +330,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen)
 			var childPadding = parseInt(element.getStyle('paddingBottom')||0) + parseInt(element.getStyle('paddingTop')||0);
 			margin += childPadding;
 		}
-		margin = margin || 0; // avoid NaN in IE
+		if(!margin) margin = 0;
 		element.setStyle({height:(Math.max(0,wh-top-mrg-brd-pad-margin-addMarginBottom))+'px'});
 		if(element.ajxpPaneObject && listen){
 			element.ajxpPaneObject.resize();
