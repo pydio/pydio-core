@@ -275,13 +275,15 @@ div.shadow_class
     border: 1px solid #aaa;
     background-repeat: no-repeat;
     background-position: top left;    
-
-
-	height: 20px;
+	height: 16px;
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 	
+}
+
+.dialogContent select{
+    height: 22px;
 }
 
 .dialogContent input:focus,
@@ -1014,7 +1016,8 @@ a.carousel-control img{
 	border:0px;
 }
 
-.inline_hover_light
+.inline_hover_light,
+.user_widget_hover
 {
    background-color: rgba(255, 255, 255, 0.5);
 }
@@ -1080,7 +1083,7 @@ img.simple_button_arrow{
 	line-height: 16px;
 	border-width: 1px 0px 1px 1px;
 	border-style: solid none solid solid; 
-	border-color: #ddd; 
+	border-color: #bbbbbb;
 	-moz-border-radius: 5px 0pt 0pt 5px; 
 	border-radius: 5px 0pt 0pt 5px; 
 	padding: 3px 0px 3px 7px; 
@@ -1345,9 +1348,9 @@ div.header_resizer div.ascending {
 
 .paginatorInput
 {
-	width:26px;
-	padding: 0 2;
-	height: 16px;
+	width:21px;
+	padding: 0px 2px;
+	height: 14px;
 	text-align: right;
 	border: 1px solid #CCCCCC;
 	margin-right: 2px;
@@ -1924,7 +1927,7 @@ td.infoPanelValue
 
 td.infoPanelLabel
 {
-	padding:6px 5px;
+	padding:3px 5px;
 	font-weight:bold;
 	width:35%;
 }
@@ -2764,6 +2767,25 @@ div.menu a {
 }
 
 #webdav_repo_list input {
-	width: 75%;
+	width: 73%;
 }
 
+input#webdav_password{
+    height: 22px !important;
+}
+
+.video-js-box{
+    margin-left: 10px !important;
+}
+
+.video-js-box.vjs-fullscreen{
+    margin-left: 0px !important;
+}
+
+#video_container{
+    margin: 5px 20px 5px 10px !important;
+}
+
+td.ip_geo_cell{
+    padding-right: 12px !important;
+}

@@ -166,8 +166,10 @@ Class.create("AbstractEditor" , {
 	makeToolbarFloatable : function(){
         this.element.up("div.dialogContent").setStyle({position:'relative'});
 		this.actionBar.absolutize();
+        var crtIndex = parseInt(this.element.getStyle("zIndex"));
+        if(!crtIndex) crtIndex = 1000;
 		this.actionBar.setStyle({
-			zIndex:(parseInt(this.element.getStyle("zIndex")) + 1000),
+			zIndex:(crtIndex + 1000),
 			width : '',
 			top: ''
 		});
@@ -286,6 +288,7 @@ Class.create("AbstractEditor" , {
         dContent.setStyle({position:"relative"});
 		dContent.insert(this.element);
         this.element.relativize();
+        this.element.setStyle({position:"relative"});
 		this.element.setStyle({top:0,left:0,
             width:parseInt(dContent.getWidth())+'px',
             height:parseInt(dContent.getHeight())+"px",

@@ -448,6 +448,9 @@ $mess=array(
 "412" => "Upload seulement",
 "413" => "Partagé par",
 "414" => "Naviguer avec les flèches et zoomer avec +/-",
+"415" => "Toggle left pane visibility",
+"416" => "Left Pane",
+"leftpane_accesskey" => "L",
 /* END SENTENCE */
 );
 ?>

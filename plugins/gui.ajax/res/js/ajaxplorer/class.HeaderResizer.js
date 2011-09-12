@@ -155,7 +155,7 @@ Class.create("HeaderResizer", {
 	resize : function(size){
 		
 		this.mainSize = size;
-		this.element.setStyle({width:this.mainSize});
+		this.element.setStyle({width:this.mainSize+"px"});
 		this.checkBodyScroll();
 		this.resizeHeaders();
 		this.log("Resize:"+size);
@@ -254,9 +254,9 @@ Class.create("HeaderResizer", {
 				this.resizeHeaders(newSizes);
 				if(draggable._ghost){
 					if(draggable._ghost.getOffsetParent()){
-						newPosition -= draggable._ghost.getOffsetParent().positionedOffset()[0] + 2;
+						newPosition -= draggable._ghost.getOffsetParent().cumulativeOffset()[0] + 2;
 					}
-					draggable._ghost.setStyle({left:newPosition-(Prototype.Browser.IE?0:this.options.body.scrollLeft)});
+					draggable._ghost.setStyle({left:(newPosition-(Prototype.Browser.IE?0:this.options.body.scrollLeft))+"px"});
 				}
 			}.bind(this),
 			onStart : function(draggable){				
@@ -268,7 +268,7 @@ Class.create("HeaderResizer", {
 				draggable._initRightCell = draggable.next.getWidth();
 				draggable._ghost = this.createResizeGhost();
 				if(draggable._ghost){
-					draggable._ghost.setStyle({left:draggable.originalLeft});
+					draggable._ghost.setStyle({left:draggable.originalLeft + "px"});
 				}
 			}.bind(this),
 			onEnd : function(draggable){
@@ -293,7 +293,8 @@ Class.create("HeaderResizer", {
 		if(!this.options.body) return null;
 		var ghost = new Element('div', {className:'resizeGhost'});
 		this.options.body.insert({before:ghost});
-		ghost.setStyle({height: this.getInnerHeight(this.options.body) - ((this.options.body.scrollWidth > this.options.body.getWidth())?16:0), left:0});
+        var h = this.getInnerHeight(this.options.body) - ((this.options.body.scrollWidth > this.options.body.getWidth())?16:0);
+		ghost.setStyle({height: h+"px", left:0});
 		return ghost;
 	},
 	
@@ -477,7 +478,7 @@ Class.create("HeaderResizer", {
 			if(!this.scroller){
 				this.element._origWidth = this.element.getWidth();
 				this.scroller = new Element('div', {style:"overflow:hidden;"});
-				this.scroller.setStyle({width:this.element._origWidth});
+				this.scroller.setStyle({width:this.element._origWidth+"px"});
 				$(this.element.parentNode).insert({top:this.scroller});
 				this.scroller.insert(this.element);
 				this.scroller.observer = function(){
@@ -486,13 +487,13 @@ Class.create("HeaderResizer", {
 				}.bind(this);
 				body.observe("scroll", this.scroller.observer);
 			}else{
-				this.scroller.setStyle({width: this.mainSize});
+				this.scroller.setStyle({width: this.mainSize+"px"});
 			}
-			this.element.setStyle({width:body.scrollWidth});
+			this.element.setStyle({width:body.scrollWidth+"px"});
 			this.verticalScrollerMargin=0;
 			this.resizeHeaders();
 		}else if(body.scrollWidth <= body.getWidth() && this.scroller){
-			this.element.setStyle({width:this.element._origWidth});
+			this.element.setStyle({width:this.element._origWidth+"px"});
 			$(this.scroller.parentNode).insert({top:this.element});
 			body.stopObserving("scroll", this.scroller.observer);
 			this.scroller.remove();
