@@ -63,7 +63,7 @@ include_once("$CURRENTPATH/../../conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
 $pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", "$CURRENTPATH/../../conf");
 
-define ("CLIENT_RESOURCES_FOLDER", "client");
+define ("CLIENT_RESOURCES_FOLDER", "");
 ConfService::init("$CURRENTPATH/../../conf/conf.php"); 
 $plugins = ConfService::getConf("PLUGINS");
 require_once("$CURRENTPATH/../../plugins/conf.".$plugins["CONF_DRIVER"]["NAME"]."/class.AJXP_User.php");

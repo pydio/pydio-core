@@ -144,10 +144,12 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	if(!function_exists("mcrypt_create_iv")){
     		return "ERROR : MCrypt must be installed to use publiclets!";
     	}
-    	if($data["PASSWORD"] && !is_file($downloadFolder."/allz.css")){    		
-    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz.css", $downloadFolder."/allz.css");
-    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/22/dialog_ok_apply.png", $downloadFolder."/dialog_ok_apply.png");
-    		@copy(AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/images/actions/16/public_url.png", $downloadFolder."/public_url.png");    		
+    	if($data["PASSWORD"] && !is_file($downloadFolder."/allz.css")){
+            if(!defined("AJXP_THEME_FOLDER")) $th = "plugins/gui.ajax/res/themes/oxygen";
+            else $th = AJXP_THEME_FOLDER ;
+    		@copy(AJXP_INSTALL_PATH."/".$th."/css/allz.css", $downloadFolder."/allz.css");
+    		@copy(AJXP_INSTALL_PATH."/".$th."/images/actions/22/dialog_ok_apply.png", $downloadFolder."/dialog_ok_apply.png");
+    		@copy(AJXP_INSTALL_PATH."/".$th."/images/actions/16/public_url.png", $downloadFolder."/public_url.png");
     	}
     	if(!is_file($downloadFolder."/index.html")){
     		@copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
@@ -226,7 +228,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         {
             if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"]))
             {   
-            	$content = file_get_contents(AJXP_INSTALL_PATH."/client/html/public_links.html");
+            	$content = file_get_contents(AJXP_INSTALL_PATH."/plugins/core.access/res/public_links.html");
             	$language = "en";
             	if(isSet($_GET["lang"])){
             		$language = $_GET["lang"];
@@ -260,6 +262,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         }
         $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
         $driver->initRepository();
+        ConfService::tmpReplaceRepository($data["REPOSITORY"]);
         // Increment counter
         $hash = md5(serialize($data));
         require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");

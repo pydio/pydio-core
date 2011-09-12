@@ -43,13 +43,14 @@ class AJXP_ClientDriver extends AJXP_Plugin
             // Force legacy theme for the moment
             $this->pluginConf["GUI_THEME"] = "oxygen";
         }
+        if(!defined("AJXP_THEME_FOLDER")){
+            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
+        }
     }
 
 	function switchAction($action, $httpVars, $fileVars)
 	{
-        if(!defined("AJXP_THEME_FOLDER")){
-            define("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$this->pluginConf["GUI_THEME"]);
-        }
 		if(!isSet($this->actions[$action])) return;
 		foreach($httpVars as $getName=>$getValue){
 			$$getName = AJXP_Utils::securePath($getValue);
@@ -72,7 +73,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					}
 				}
                 $crtTheme = $this->pluginConf["GUI_THEME"];
-                $thFolder = CLIENT_RESOURCES_FOLDER."/themes/$crtTheme/html";
+                $thFolder = AJXP_THEME_FOLDER."/html";
 				if(isset($template_name))
 				{
                     if(is_file($thFolder."/".$template_name)){
@@ -311,6 +312,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
         if($instance === false) return ;
         $confs = $instance->getConfigs();
         $theme = $confs["GUI_THEME"];
+        $value = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $value);
         if(isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])){
             $value = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"]."plugins/gui.ajax/res/themes/".$theme, $value);
         }else{
