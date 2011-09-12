@@ -60,7 +60,8 @@ Class.create("ExifCellRenderer", {
 			rowspan:2,
 			align:'center',
 			valign:'center',
-			style:'padding:2px;width:60px;'
+			style:'padding:2px;width:60px;',
+            className:'ip_geo_cell'
 		}).update(button);
 		latiCell.insert({after:buttonCell});		
 		// Set all other cells colspan to 2.
