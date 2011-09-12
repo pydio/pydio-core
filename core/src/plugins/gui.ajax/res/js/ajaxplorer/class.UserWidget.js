@@ -42,13 +42,13 @@ Class.create("UserWidget", {
 		this.element.ajxpPaneObject = this;
 		
 		this.mObs1 = function(){
-			this.element.select('div').invoke('setStyle', {borderColor:'#bbbbbb'});			
+            this.element.select('div').invoke('addClassName', 'user_widget_hover');
 		}.bind(this);
 		this.mObs2 = function(){
 			var divs = this.element.select('div');
 			if(!divs.length) return;
-			if(divs[0].hasClassName('inline_hover_light')) return
-			divs.invoke('setStyle', {borderColor:'#dddddd'});	
+			if(divs[0].hasClassName('inline_hover_light')) return;
+            this.element.select('div').invoke('removeClassName', 'user_widget_hover');
 		}.bind(this);
 		this.uLoggedObs = this.updateGui.bind(this);
 		this.actLoaded = this.updateActions.bind(this);
@@ -71,7 +71,7 @@ Class.create("UserWidget", {
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = '<div class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px; border-color:#ddd;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
+				logging_string = '<div class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
 				this.element.removeClassName('disabled');
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
@@ -123,16 +123,16 @@ Class.create("UserWidget", {
 				fade:true,
 				zIndex:1500,
 				beforeShow : function(e){
-					this.element.select('div').invoke('addClassName', 'inline_hover_light');		
-					this.element.select('div').invoke('setStyle', {borderColor:'#bbbbbb'});											
+					this.element.select('div').invoke('addClassName', 'inline_hover_light');
+                    this.element.select('div').invoke('addClassName', 'user_widget_hover');
 				}.bind(this),
 				beforeHide : function(e){
 					this.element.select('div').invoke('removeClassName', 'inline_hover_light');
-					this.element.select('div').invoke('setStyle', {borderColor:'#dddddd'});	
+					this.element.select('div').invoke('removeClassName', 'user_widget_hover');
 				}.bind(this),
 				beforeSelect : function(e){
 					this.element.select('div').invoke('removeClassName', 'inline_hover_light');
-					this.element.select('div').invoke('setStyle', {borderColor:'#dddddd'});	
+                    this.element.select('div').invoke('removeClassName', 'user_widget_hover');
 				}.bind(this)
 			});		
 			this.notify("createMenu");
