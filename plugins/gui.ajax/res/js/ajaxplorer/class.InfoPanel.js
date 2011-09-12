@@ -81,6 +81,11 @@ Class.create("InfoPanel", AjxpPane, {
 		document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );		
 		document.stopObserving("ajaxplorer:user_logged", this.userLogHandler );
 		this.empty();
+        if(this.scrollbar){
+            this.scrollbar.destroy();
+            this.scroller.remove();
+        }
+        this.htmlElement.update("");
 		this.htmlElement = null;
 	},
 	/**

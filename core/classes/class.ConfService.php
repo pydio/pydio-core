@@ -123,6 +123,7 @@ class ConfService
                 $pObject->init(array());
                 try{
                     $pObject->performChecks();
+                    if(!$pObject->isEnabled()) continue;
                     $pServ->setPluginActiveInst($pType, $pName, true);
                 }catch (Exception $e){
                     //$this->errors[$pName] = "[$pName] ".$e->getMessage();
@@ -436,6 +437,12 @@ class ConfService
 		AJXP_Logger::logAction("Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));		
 		$this->configs["REPOSITORIES"] = self::initRepositoriesList($this->configs["DEFAULT_REPOSITORIES"]);				
 	}
+    public static function tmpReplaceRepository($repositoryObject){
+        $inst = self::getInstance();
+        if(isSet($inst->configs["REPOSITORIES"][$repositoryObject->getUniqueId()])){
+            $inst->configs["REPOSITORIES"][$repositoryObject->getUniqueId()] = $repositoryObject;
+        }
+    }
 	
 	public static function deleteRepository($repoId){
 		return self::getInstance()->deleteRepositoryInst($repoId);

@@ -163,8 +163,6 @@ class AJXP_XMLWriter
 	static function replaceAjxpXmlKeywords($xml, $stripSpaces = false){
 		$messages = ConfService::getMessages();			
 		$matches = array();
-		$xml = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $xml);
-		
 		if(isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])){
 			//$xml = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_THEME_FOLDER, $xml);
 			$xml = str_replace("AJXP_SERVER_ACCESS", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_SERVER_ACCESS, $xml);

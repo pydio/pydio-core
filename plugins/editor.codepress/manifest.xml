@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.codepress" openable="true" text="317" title="318" icon="codepress_images/source_edit.png" className="CodePressEditor" mimes="php,php3,php4,php4,phtml,js,java,pl,sql,html,htm,xml,css,jsp" formId="edit_box" write="true" label="CodePress" description="Legacy Syntax Highlighter">
+<editor id="editor.codepress" enabled="false" openable="true" text="317" title="318" icon="codepress_images/source_edit.png" className="CodePressEditor" mimes="php,php3,php4,php4,phtml,js,java,pl,sql,html,htm,xml,css,jsp" formId="edit_box" write="true" label="CodePress" description="Legacy Syntax Highlighter">
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>
 		<!-- Stream Wrapper Access -->

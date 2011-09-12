@@ -42,6 +42,9 @@ class AJXP_JSPacker{
 	 */
 	function pack(){
 
+        // Make sure that the gui.* plugin is loaded
+        $plug = AJXP_PluginsService::getInstance()->getPluginsByType("gui");
+
         $sList = glob(CLIENT_RESOURCES_FOLDER."/js/*_list.txt");
         foreach ($sList as $list){
             $scriptName = str_replace("_list.txt", ".js", $list);
