@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpcore id="core.conf">
+	<server_settings>
+        <global_param name="SAVE_GUEST_PREFERENCES" group="Generic Conf Features"  type="boolean" label="Remember guest preferences" description="If the 'guest' user is enabled, remember her preferences accross sessions."  mandatory="true" default="false"/>
+	</server_settings>
+</ajxpcore>

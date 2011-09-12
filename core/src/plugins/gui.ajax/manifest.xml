@@ -70,8 +70,8 @@
 					</div>
 				</div>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 200, "maxA":600, "minA":0,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":true}'>
-						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initB":200,"minB":57}'>
+					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 350, "maxA":600, "minA":0,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":true}'>
+						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initB":300,"minB":57}'>
 							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png" style="margin:20px;margin-bottom:10px;padding-right: 10px;"></div>
 							<div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true"}' style="margin:20px;margin-top:10px;padding-right: 10px;" ></div>
 					    </div>

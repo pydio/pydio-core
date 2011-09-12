@@ -6,7 +6,7 @@
 	</server_settings>
 	<class_definition filename="plugins/auth.smb/class.smbAuthDriver.php" classname="smbAuthDriver"/>
 	<registry_contributions>
-		<external_file filename="plugins/core.ajaxplorer/standard_auth_actions.xml" include="actions/action[@name='login']" exclude=""/>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/action[@name='login']" exclude=""/>
 		<actions>
 			<!-- OVERRIDE LOGOUT -->
 			<action name="smb_logout" expireDefault="true">

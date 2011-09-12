@@ -287,6 +287,7 @@ class AJXP_XMLWriter
 	{
 		$buffer = "";
 		$loggedUser = AuthService::getLoggedUser();
+        $confDriver = ConfService::getConfStorageImpl();
 		if($userObject != null) $loggedUser = $userObject;
 		if(!AuthService::usersEnabled()){
 			$buffer.="<user id=\"shared\">";
@@ -308,22 +309,14 @@ class AJXP_XMLWriter
 			}
 			$buffer.= AJXP_XMLWriter::writeRepositoriesData($loggedUser, $details);
 			$buffer.="<preferences>";
-			$buffer.="<pref name=\"display\" value=\"".$loggedUser->getPref("display")."\"/>";
-			$buffer.="<pref name=\"lang\" value=\"".$loggedUser->getPref("lang")."\"/>";
-			$buffer.="<pref name=\"diapo_autofit\" value=\"".$loggedUser->getPref("diapo_autofit")."\"/>";
-			$buffer.="<pref name=\"sidebar_splitter_size\" value=\"".$loggedUser->getPref("sidebar_splitter_size")."\"/>";
-			$buffer.="<pref name=\"vertical_splitter_size\" value=\"".$loggedUser->getPref("vertical_splitter_size")."\"/>";			
-			$buffer.="<pref name=\"history_last_repository\" value=\"".$loggedUser->getArrayPref("history", "last_repository")."\"/>";
-			$buffer.="<pref name=\"ls_history\"><![CDATA[".$loggedUser->getPref("ls_history")."]]></pref>";			
-			$buffer.="<pref name=\"pending_folder\" value=\"".$loggedUser->getPref("pending_folder")."\"/>";
-			$buffer.="<pref name=\"thumb_size\" value=\"".$loggedUser->getPref("thumb_size")."\"/>";
-			$buffer.="<pref name=\"columns_size\" value='".$loggedUser->getPref("columns_size")."'/>";
-			$buffer.="<pref name=\"columns_visibility\" value='".$loggedUser->getPref("columns_visibility")."'/>";
-			$buffer.="<pref name=\"plugins_preferences\" value='".$loggedUser->getPref("plugins_preferences")."'/>";
-			$buffer.="<pref name=\"upload_auto_send\" value=\"".$loggedUser->getPref("upload_auto_send")."\"/>";
-			$buffer.="<pref name=\"upload_auto_close\" value=\"".$loggedUser->getPref("upload_auto_close")."\"/>";
-			$buffer.="<pref name=\"upload_existing\" value=\"".$loggedUser->getPref("upload_existing")."\"/>";
-			$buffer.="<pref name=\"action_bar_style\" value=\"".$loggedUser->getPref("action_bar_style")."\"/>";
+            $preferences = $confDriver->getExposedPreferences($loggedUser);
+            foreach($preferences as $prefName => $prefData){
+                if($prefData["type"] == "string"){
+                    $buffer.="<pref name=\"$prefName\" value=\"".$prefData["value"]."\"/>";
+                }else if($prefData["type"] == "json"){
+                    $buffer.="<pref name=\"$prefName\"><![CDATA[".$prefData["value"]."]]></pref>";
+                }
+            }
 			$buffer.="</preferences>";
 			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>";
 			$bMarks = $loggedUser->getBookmarks();
