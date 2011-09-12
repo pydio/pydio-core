@@ -2,7 +2,7 @@
 <authdriver name="basic_http" label="Basic HTTP" description="Use the standard http authentication.">	
 	<class_definition filename="plugins/auth.basic_http/class.basic_httpAuthDriver.php" classname="basic_httpAuthDriver"/>
 	<registry_contributions>
-		<external_file filename="plugins/core.ajaxplorer/standard_auth_actions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
 	</registry_contributions>
 	<dependencies>
 		<pluginClass pluginName="auth.serial"/>

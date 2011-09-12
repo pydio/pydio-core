@@ -166,7 +166,33 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	function getOption($optionName){	
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
 	}
-	
+
+    /**
+     * @param AbstractAjxpUser $userObject
+     * @return array()
+     */
+    function getExposedPreferences($userObject){
+        $stringPrefs = array("display","lang","diapo_autofit","sidebar_splitter_size","vertical_splitter_size","history/last_repository","pending_folder","thumb_size","plugins_preferences","upload_auto_send","upload_auto_close","upload_existing","action_bar_style");
+        $jsonPrefs = array("ls_history","columns_size", "columns_visibility");
+        $prefs = array();
+        if( $userObject->getId()=="guest" && ConfService::getCoreConf("SAVE_GUEST_PREFERENCES", "conf") === false){
+            return array();
+        }
+        foreach($stringPrefs as $pref){
+            if(strstr($pref, "/")!==false){
+                $parts = explode("/", $pref);
+                $value = $userObject->getArrayPref($parts[0], $parts[1]);
+                $pref = str_replace("/", "_", $pref);
+            }else{
+                $value = $userObject->getPref($pref);
+            }
+            $prefs[$pref] = array("value" => $value, "type" => "string" );
+        }
+        foreach ($jsonPrefs as $pref){
+            $prefs[$pref] = array("value" => $userObject->getPref($pref), "type" => "json" );
+        }
+        return $prefs;
+    }
 		
 	function switchAction($action, $httpVars, $fileVars)
 	{
@@ -189,7 +215,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					break;
 				}
 				$dirList = ConfService::getRootDirsList();
-				if(!isSet($dirList[$repository_id]))
+                /** @var $repository_id string */
+                if(!isSet($dirList[$repository_id]))
 				{
 					$errorMessage = "Trying to switch to an unkown repository!";
 					break;
@@ -271,7 +298,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$prefName = AJXP_Utils::sanitize($_GET["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
 					$prefValue = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote(($_GET["pref_value_".$i])));
 					if($prefName == "password") continue;
-					if($prefName != "pending_folder" && ($userObject == null || $userObject->getId() == "guest")){
+					if($prefName != "pending_folder" && $userObject == null){
 						$i++;
 						continue;
 					}

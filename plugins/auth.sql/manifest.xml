@@ -5,6 +5,6 @@
 	</server_settings>
 	<class_definition filename="plugins/auth.sql/class.sqlAuthDriver.php" classname="sqlAuthDriver"/>
 	<registry_contributions>
-		<external_file filename="plugins/core.ajaxplorer/standard_auth_actions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
 	</registry_contributions>
 </authdriver>

@@ -872,7 +872,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                     echo("<param name=\"$key\" value=\"$value\"/>");
                 }
-                echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
+                if($ajxpPlugin->getType() != "core"){
+                    echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
+                }
                 echo("</plugin_settings_values>");
 				AJXP_XMLWriter::close("admin_data");
 				

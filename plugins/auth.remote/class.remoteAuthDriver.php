@@ -76,7 +76,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
         	// NEW WAY : Modify manifest dynamically (more coplicated...)
         	$contribs = $this->xPath->query("registry_contributions/external_file");
         	foreach ($contribs as $contribNode){        		
-        		if($contribNode->getAttribute('filename') == 'server/xml/standard_auth_actions.xml'){
+        		if($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml'){
         			$contribNode->parentNode->removeChild($contribNode);
         		}
         	}

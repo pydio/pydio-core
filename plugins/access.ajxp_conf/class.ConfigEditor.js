@@ -840,12 +840,14 @@ ConfigEditor = Class.create({
 			
 			
 			var driverParamsHash = $A([]);
-            driverParamsHash.push($H({
-                name:'AJXP_PLUGIN_ENABLED',
-                type:'boolean',
-                label:"Enabled",
-                description:""
-            }));
+            if(pluginId.split("\.")[0] != "core"){
+                driverParamsHash.push($H({
+                    name:'AJXP_PLUGIN_ENABLED',
+                    type:'boolean',
+                    label:"Enabled",
+                    description:""
+                }));
+            }
 			for(var i=0;i<params.length;i++){
 				var hashedParams = this.formManager.parameterNodeToHash(params[i]);
 				driverParamsHash.push(hashedParams);
