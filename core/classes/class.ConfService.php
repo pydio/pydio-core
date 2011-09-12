@@ -469,7 +469,7 @@ class ConfService
 			foreach ($nodes as $node){
 				$nameSpace = $node->getAttribute("namespace");
 				$path = $node->getAttribute("path");
-				$lang = $this->configs["LANGUE"];
+				$lang = $crtLang;
 				if(!is_file($path."/".$crtLang.".php")){
 					$lang = "en"; // Default language, minimum required.
 				}
