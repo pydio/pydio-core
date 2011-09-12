@@ -866,32 +866,38 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}
 	}
 	
-	function filterFile($fileName){
-		$pathParts = pathinfo($fileName);
-		if(array_key_exists("HIDE_FILENAMES", $this->driverConf)){
-            if(is_string($this->driverConf["HIDE_FILENAMES"])) $this->driverConf["HIDE_FILENAMES"] = explode(",",$this->driverConf["HIDE_FILENAMES"]);
-			foreach ($this->driverConf["HIDE_FILENAMES"] as $search){
-				if(strcasecmp($search, $pathParts["basename"]) == 0) return true;
-			}
-		}
-		if(array_key_exists("HIDE_EXTENSIONS", $this->driverConf)){
-            if(is_string($this->driverConf["HIDE_EXTENSIONS"])) $this->driverConf["HIDE_EXTENSIONS"] = explode(",",$this->driverConf["HIDE_EXTENSIONS"]);
-			foreach ($this->driverConf["HIDE_EXTENSIONS"] as $search){
-				if(strcasecmp($search, $pathParts["extension"]) == 0) return true;
-			}
-		}
-		return false;
-	}
-	
-	function filterFolder($folderName){
-		if(array_key_exists("HIDE_FOLDERS", $this->driverConf)){
-            if(is_string($this->driverConf["HIDE_FOLDERS"])) $this->driverConf["HIDE_FOLDERS"] = explode(",",$this->driverConf["HIDE_FOLDERS"]);
-			foreach ($this->driverConf["HIDE_FOLDERS"] as $search){
-				if(strcasecmp($search, $folderName) == 0) return true;
-			}
-		}
-		return false;		
-	}
+    function filterFile($fileName){
+        $pathParts = pathinfo($fileName);
+        if(array_key_exists("HIDE_FILENAMES", $this->driverConf)){
+            if(!is_array($this->driverConf["HIDE_FILENAMES"])) {
+                $this->driverConf["HIDE_FILENAMES"] = explode(",",$this->driverConf["HIDE_FILENAMES"]);
+            }
+            foreach ($this->driverConf["HIDE_FILENAMES"] as $search){
+                if(strcasecmp($search, $pathParts["basename"]) == 0) return true;
+            }
+        }
+        if(array_key_exists("HIDE_EXTENSIONS", $this->driverConf)){
+            if(!is_array($this->driverConf["HIDE_EXTENSIONS"])) {
+                $this->driverConf["HIDE_EXTENSIONS"] = explode(",",$this->driverConf["HIDE_EXTENSIONS"]);
+            }
+            foreach ($this->driverConf["HIDE_EXTENSIONS"] as $search){
+                if(strcasecmp($search, $pathParts["extension"]) == 0) return true;
+            }
+        }
+        return false;
+    }
+
+    function filterFolder($folderName){
+        if(array_key_exists("HIDE_FOLDERS", $this->driverConf)){
+            if(!is_array($this->driverConf["HIDE_FOLDERS"])) {
+                $this->driverConf["HIDE_FOLDERS"] = explode(",",$this->driverConf["HIDE_FOLDERS"]);
+            }
+            foreach ($this->driverConf["HIDE_FOLDERS"] as $search){
+                if(strcasecmp($search, $folderName) == 0) return true;
+            }
+        }
+        return false;
+    }
 	
 	function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=null, $realfileSystem=false, $byteOffset=-1, $byteLength=-1)
 	{
