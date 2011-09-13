@@ -2395,6 +2395,48 @@ textarea.editor
   -moz-opacity:1;
 }
 
+#diaporamaMetadataContainer{
+    background-color: #757575;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#diaporamaMetadataContainer div.panelContent{
+    margin-top: 6px;
+    margin-bottom: 6px;
+    margin-left: 6px;
+    background-color: white;
+    border-radius: 7px;
+    margin-right: 3px;
+}
+#diaporamaMetadataContainer div.infoPanelImagePreview{
+    border-radius: 7px;
+}
+#diaporamaSplitter div.vsplitbar{
+    background-color: #757575;
+}
+#diaporamaMetadataContainer div.scroller_track{
+    right: 2px;
+    top: 6px;
+}
+#diaporamaMetadataContainer div.scroller_track,
+#diaporamaMetadataContainer div.scroller_handle{
+    border-radius: 0 7px 7px 0;
+}
+#diaporamaMetadataContainer div.imagePreviewOverlay{
+    background-color:rgba(0, 0, 0, 0.2) !important;
+    opacity: 1 !important;
+}
+
+div.icons_only.diaporama_toolbar{
+    height: 40px !important;
+    width: 446px;
+}
+div.diaporama_toolbar div#diaporama_legend{
+    display: none;
+}
+div.diaporama_toolbar div#diaporama_input_boxes{
+    margin-top: 10px !important;
+}
 
 /***********************/
 /* AUTOCOMPLETION DIV  */

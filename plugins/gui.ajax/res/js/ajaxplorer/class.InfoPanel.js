@@ -44,16 +44,17 @@ Class.create("InfoPanel", AjxpPane, {
 		$super(htmlElement, options);
 		attachMobileScroll(htmlElement, "vertical");
 		disableTextSelection(htmlElement);
-        var container = new Element("div", {className:"panelContent", id:"ip_content"});
+        var id = htmlElement.id;
+        var container = new Element("div", {className:"panelContent", id:"ip_content_"+id});
         if(options.replaceScroller){
-            this.scroller = new Element('div', {id:'ip_scroller', className:'scroller_track'});
-            this.scroller.insert('<div id="ip_scrollbar_handle" class="scroller_handle"></div>');
+            this.scroller = new Element('div', {id:'ip_scroller_'+id, className:'scroller_track'});
+            this.scroller.insert(new Element('div', {id:'ip_scrollbar_handle_'+id, className:'scroller_handle'}));
             this.htmlElement.insert(this.scroller);
             container.setStyle({overflow:"hidden"});
         }
         this.htmlElement.insert(container);
         if(options.replaceScroller){
-            this.scrollbar = new Control.ScrollBar('ip_content','ip_scroller', {fixed_scroll_distance:50});
+            this.scrollbar = new Control.ScrollBar('ip_content_'+id,'ip_scroller_'+id, {fixed_scroll_distance:50});
         }
         
         this.contentContainer = container;
@@ -68,18 +69,21 @@ Class.create("InfoPanel", AjxpPane, {
 			}
 		}.bind(this);
 		this.userLogHandler = this.clearPanels.bind(this);
-		
-		document.observe("ajaxplorer:actions_refreshed", this.updateHandler );
-		document.observe("ajaxplorer:component_config_changed", this.componentConfigHandler );		
-		document.observe("ajaxplorer:user_logged", this.userLogHandler );
+		if(!this.options.skipObservers){
+            document.observe("ajaxplorer:actions_refreshed", this.updateHandler );
+            document.observe("ajaxplorer:component_config_changed", this.componentConfigHandler );
+            document.observe("ajaxplorer:user_logged", this.userLogHandler );
+        }
 	},
 	/**
 	 * Clean destroy of the panel, remove listeners
 	 */
 	destroy : function(){
-		document.stopObserving("ajaxplorer:actions_refreshed", this.updateHandler );
-		document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );		
-		document.stopObserving("ajaxplorer:user_logged", this.userLogHandler );
+        if(!this.options.skipObservers){
+            document.stopObserving("ajaxplorer:actions_refreshed", this.updateHandler );
+            document.stopObserving("ajaxplorer:component_config_changed", this.componentConfigHandler );
+            document.stopObserving("ajaxplorer:user_logged", this.userLogHandler );
+        }
 		this.empty();
         if(this.scrollbar){
             this.scrollbar.destroy();
@@ -105,16 +109,19 @@ Class.create("InfoPanel", AjxpPane, {
 	/**
 	 * Updates content by finding the right template and applying it.
 	 */
-	update : function(){
+	update : function(objectOrEvent){
 		if(!this.htmlElement) return;
-		var userSelection = ajaxplorer.getUserSelection();
-		var contextNode = userSelection.getContextNode();
+        if(objectOrEvent.__className && objectOrEvent.__className == "AjxpNode"){
+            var passedNode = objectOrEvent;
+        }
+        var userSelection = ajaxplorer.getUserSelection();
+        var contextNode = userSelection.getContextNode();
 		this.empty();
         if(this.scrollbar) this.scrollbar.recalculateLayout();
 		if(!contextNode) {
 			return;
 		}
-		if(userSelection.isEmpty())
+		if(!passedNode && userSelection.isEmpty())
 		{
 			var currentRep;
 			if(userSelection.getContextNode()){
@@ -161,15 +168,19 @@ Class.create("InfoPanel", AjxpPane, {
             if(this.scrollbar) this.scrollbar.recalculateLayout();
 			return;
 		}
-		if(!userSelection.isUnique())
+		if(!passedNode && !userSelection.isUnique())
 		{
 			this.setContent('<br><br><center><i>'+ userSelection.getFileNames().length + ' '+MessageHash[128]+'</i></center><br><br>');
 			this.addActions('multiple');
             if(this.scrollbar) this.scrollbar.recalculateLayout();
 			return;
 		}
-		
-		var uniqNode = userSelection.getUniqueNode();
+
+        if(!passedNode){
+            var uniqNode = userSelection.getUniqueNode();
+        }else{
+            uniqNode = passedNode;
+        }
 		var isFile = false;
 		if(uniqNode) isFile = uniqNode.isLeaf();
 		this.evalTemplateForMime((isFile?'generic_file':'generic_dir'), uniqNode);
@@ -312,8 +323,7 @@ Class.create("InfoPanel", AjxpPane, {
 	 * @param selectionType String 'empty', 'multiple', 'unique'
 	 */
 	addActions: function(selectionType){
-		//DEPRECATED
-		//var actions = ajaxplorer.actionBar.getInfoPanelActions();
+        if(this.options.skipActions) return;
 		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("InfoPanel", this.htmlElement.id);
 		if(!actions.length) return;
 		var actionString = '<div class="panelHeader infoPanelGroup">'+MessageHash[5]+'</div><div class="infoPanelActions">';

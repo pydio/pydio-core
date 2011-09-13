@@ -38,9 +38,24 @@ Class.create("Diaporama", AbstractEditor, {
 	_minZoom : 10,
 	_maxZoom : 500,
 	
-	initialize: function($super, oFormObject)
+	initialize: function($super, oFormObject, options)
 	{
-		$super(oFormObject, {floatingToolbar:true});
+        options = {
+            floatingToolbar:true,
+            replaceScroller:false,
+            toolbarStyle: "icons_only diaporama_toolbar"
+        };
+		$super(oFormObject, options);
+
+        var diapoSplitter = oFormObject.down("#diaporamaSplitter");
+        var diapoInfoPanel = oFormObject.down("#diaporamaMetadataContainer");
+        this.splitter = new Splitter(diapoSplitter, {direction:"vertical","initA":250,fit:"height",fitParent:oFormObject.up(".dialogBox")});
+        this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:true});
+        if(window.info_panel){
+            this.infoPanel.registeredMimes = info_panel.registeredMimes;
+            this.infoPanel.mimesTemplates = info_panel.mimesTemplates;
+        }
+
 		this.nextButton = this.actions.get("nextButton");
 		this.previousButton = this.actions.get("prevButton");
 		this.downloadButton = this.actions.get("downloadDiapoButton");
@@ -54,7 +69,19 @@ Class.create("Diaporama", AbstractEditor, {
 		this.imgContainer = this.element.select('div[id="imageContainer"]')[0];
 		this.zoomInput = this.element.select('input[id="zoomValue"]')[0];	
 		this.timeInput = this.element.select('input[id="time"]')[0];
-		
+        this.floatingToolbarAnchor = this.imgContainer;
+        var id = this.imgContainer.parentNode.id;
+        if(options.replaceScroller){
+            this.scroller = new Element('div', {id:'ip_scroller_'+id, className:'scroller_track'});
+            this.scroller.insert(new Element('div', {id:'ip_scrollbar_handle_'+id, className:'scroller_handle'}));
+            this.imgContainer.insert({after:this.scroller});
+            this.imgContainer.setStyle({overflow:"hidden"});
+        }
+        if(options.replaceScroller){
+            this.scrollbar = new Control.ScrollBar(this.imgContainer,'ip_scroller_'+id, {fixed_scroll_distance:50});
+        }
+        this.imgContainer.observe("scroll", this.imageNavigator.bind(this));
+
 		new SliderInput(this.zoomInput, {
 			onSlide:function(value){
 				this.setZoomValue(parseInt(value));
@@ -193,18 +220,25 @@ Class.create("Diaporama", AbstractEditor, {
 			}
 		}.bind(this) );
 		
-		this.element.observe("editor:enterFSend", function(e){this.resize();}.bind(this));
-		this.element.observe("editor:exitFSend", function(e){this.resize();}.bind(this));
+		this.element.observe("editor:enterFSend", function(e){
+            if(this.splitter) this.splitter.options.fitParent = "window";
+            this.resize();
+        }.bind(this));
+		this.element.observe("editor:exitFSend", function(e){
+            if(this.splitter) this.splitter.options.fitParent = this.element.up(".dialogBox");
+            this.resize();
+        }.bind(this));
 		fitHeightToBottom(this.imgContainer, $(modal.elementName), 3);
 		// Fix imgContainer
 		if(Prototype.Browser.IE){
 			this.IEorigWidth = this.element.getWidth();
 			this.imgContainer.setStyle({width:this.IEorigWidth});
 		}
+        disableTextSelection(this.imgTag);
 		if(window.ajxpMobile){
 			this.setFullScreen();
 			attachMobileScroll(this.imgContainer, "both");
-		}				
+		}
 	},
 	
 	resize : function(size){
@@ -221,6 +255,9 @@ Class.create("Diaporama", AbstractEditor, {
 			}
 		}
 		this.resizeImage();
+        if(this.splitter){
+            this.splitter.resize();
+        }
 		this.element.fire("editor:resize", size);
 	},
 	
@@ -233,25 +270,30 @@ Class.create("Diaporama", AbstractEditor, {
 			sCurrentFile = userSelection.getUniqueFileName();
 		}else{
 			allItems = userSelection.getSelectedNodes();
-		}		
+		}
 		this.items = new Array();
+		this.nodes = new Hash();
 		this.sizes = new Hash();
 		$A(allItems).each(function(node){
 			var meta = node.getMetadata();
 			if(meta.get('is_image')=='1'){
+                this.nodes.set(node.getPath(),node);
 				this.items.push(node.getPath());
 				this.sizes.set(node.getPath(),  {height:meta.get('image_height')||'n/a', 
 												 width:meta.get('image_width')||'n/a'});
 			}
 		}.bind(this));	
 		
-		if(!sCurrentFile && this.items.length) sCurrentFile = this.items[0];		
+		if(!sCurrentFile && this.items.length) sCurrentFile = this.items[0];
 		this.currentFile = sCurrentFile;
 		
 		this.setZoomValue(100);
 		this.zoomInput.value = '100 %';	
 		this.updateImage();
 		this.updateButtons();
+        if(this.splitter){
+            this.splitter.resize();
+        }
 	},
 		
 	resizeImage : function(morph){	
@@ -289,8 +331,84 @@ Class.create("Diaporama", AbstractEditor, {
 				new Effect.Opacity(this.imgTag, {from:0,to:1.0, duration:0.3});
 			}
 		}
+        if(this.scrollbar){
+            this.scrollbar.track.setStyle({height:parseInt(this.imgContainer.getHeight())+"px"});
+            this.scrollbar.recalculateLayout();
+        }
+        this.imageNavigator();
 	},
-	
+
+    imageNavigator : function(navigator){
+        var shadowCorrection = ($$('html')[0].hasClassName('boxshadow')?3:0);
+
+        var nav = {};
+        var img = this.imgBorder;
+        var cont = this.imgContainer;
+        nav.top = this.getIntegerStyle(img,"top") + this.getIntegerStyle(img,"marginTop") - cont.scrollTop;
+        nav.left = this.getIntegerStyle(img,"left") + this.getIntegerStyle(img,"marginTop") - cont.scrollLeft;
+        nav.width = img.getWidth() - shadowCorrection;
+        nav.height = img.getHeight() - shadowCorrection;
+        nav.bottom = nav.top+nav.height;
+        nav.right = nav.left+nav.width;
+        nav.centerX = (nav.right-nav.left)/2;
+        nav.centerY = (nav.bottom-nav.top)/2;
+        nav.containerWidth = this.imgContainer.getWidth();
+        nav.containerHeight = this.imgContainer.getHeight();
+
+        var theImage = this.infoPanel.htmlElement.down("img");
+        if(!theImage.openBehaviour){
+            var opener = new Element('div').update(MessageHash[411]);
+            opener.setStyle({
+                width:styleObj.width,
+                position:'absolute',
+                bottom:($$('html')[0].hasClassName('boxshadow')?'3px':'0px'),
+                right:'0px',
+                color: 'white',
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                textAlign: 'center',
+                cursor: 'pointer'
+            });
+            opener.addClassName('imagePreviewOverlay');
+            img.previewOpener = opener;
+            theImage.insert({before:opener});
+            theImage.setStyle({cursor:'pointer'});
+            theImage.openBehaviour = true;
+            theImage.observe("click", function(event){
+                ajaxplorer.actionBar.fireAction('open_with');
+            });
+        }
+
+        if(!this.infoPanel.htmlElement.down("div.imagePreviewOverlay")) return;
+        var overlay = this.infoPanel.htmlElement.down("div.imagePreviewOverlay");
+        overlay.update("").setStyle({border :"1px solid red", display: "block"});
+        var navigatorImg = overlay.next("img");
+        navigatorImg.stopObserving("mouseover");
+        navigatorImg.stopObserving("mouseout");
+        var targetDim = navigatorImg.getDimensions();
+        var ratioX = (targetDim.width) / (nav.width);
+        var ratioY = (targetDim.height) / (nav.height);
+        overlay.setStyle({
+            top: (Math.max(-nav.top, 0) * ratioY - 140) + 'px',
+            left: (Math.max(-nav.left,0) * ratioX) + 'px',
+            width: (Math.min(nav.containerWidth*ratioX, targetDim.width-shadowCorrection)) + "px",
+            height: (Math.min(nav.containerHeight*ratioY, targetDim.height-shadowCorrection)) + "px"
+        });
+    },
+
+    getIntegerStyle : function(object, property){
+        var val = parseInt(object.getStyle(property));
+        if(!val) val = 0;
+        return val;
+    },
+
+    updateInfoPanel:function(){
+        if(!this.infoPanel) return;
+        if(!this.currentFile || !this.nodes.get(this.currentFile)) return;
+        var node = this.nodes.get(this.currentFile);
+        this.infoPanel.update(node);
+    },
 	
 	updateImage : function(){
 		var dimObject = this.sizes.get(this.currentFile);
@@ -308,7 +426,9 @@ Class.create("Diaporama", AbstractEditor, {
 				this.crtHeight = this.imgTag.getHeight();
 				this.crtRatio = this.crtHeight / this.crtWidth;
 			}
-		}.bind(this), from:1.0,to:0, duration:0.3});	
+		}.bind(this), from:1.0,to:0, duration:0.3});
+        
+        this.updateInfoPanel();
 	},
 
 	setZoomValue : function(value){
@@ -452,8 +572,9 @@ Class.create("Diaporama", AbstractEditor, {
 					fontWeight: 'bold',
 					fontSize: '12px',
 					textAlign: 'center',
-					cursor: 'pointer'				
+					cursor: 'pointer'
 				});
+                opener.addClassName('imagePreviewOverlay');
 				img.previewOpener = opener;
 				theImage.insert({before:opener});
 				theImage.setStyle({cursor:'pointer'});
