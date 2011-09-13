@@ -71,6 +71,13 @@ Class.create("ActionsToolbar", {
 		attachMobileScroll(oElement.id, "horizontal");
 		document.observe("ajaxplorer:actions_loaded", this.actionsLoaded.bind(this));
 		document.observe("ajaxplorer:actions_refreshed", this.refreshToolbarsSeparator.bind(this));
+        this.componentConfigHandler = function(event){
+            if(event.memo.className == "ActionsToolbar"){
+                this.parseComponentConfig(event.memo.classConfig.get('all'));
+            }
+        }.bind(this);
+        document.observe("ajaxplorer:component_config_changed", this.componentConfigHandler );
+
 	},
 	
 	getDomNode : function(){
@@ -79,7 +86,23 @@ Class.create("ActionsToolbar", {
 	destroy : function(){
 		
 	},
-	
+
+    /**
+     * Apply the config of a component_config node
+     * Returns true if the GUI needs refreshing
+     * @param domNode XMLNode
+     * @returns Boolean
+     */
+    parseComponentConfig : function(domNode){
+        var config = XPathSelectSingleNode(domNode, 'property[@name="style"]');
+        if(config){
+            var value = config.getAttribute("value");
+            if(this.options.styles && this.options.styles[value]){
+                this.style = value;
+                this.switchStyle();
+            }
+        }
+    },
 	/**
 	 * Handler for actions_loaded event.
 	 * @param event Event ajaxplorer:actions_loaded
