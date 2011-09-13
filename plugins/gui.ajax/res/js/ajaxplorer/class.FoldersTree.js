@@ -53,11 +53,14 @@ Class.create("FoldersTree", AjxpPane, {
             oElement.insert(this.scroller);
             this.treeContainer.setStyle({overflow:"hidden"});
         }
+        this.registeredObservers = $H();
 		oElement.insert(this.treeContainer);
 		disableTextSelection(this.treeContainer);
         if(this.options.replaceScroller){
             this.scrollbar = new Control.ScrollBar('tree_container','tree_scroller');
-            document.observe("ajaxplorer:tree_change", this.scrollbar.recalculateLayout.bind(this.scrollbar));
+            var scrollbarLayoutObserver = this.scrollbar.recalculateLayout.bind(this.scrollbar);
+            document.observe("ajaxplorer:tree_change",  scrollbarLayoutObserver);
+            this.registeredObservers.set("ajaxplorer:tree_change", scrollbarLayoutObserver);
         }
 
 
@@ -96,21 +99,25 @@ Class.create("FoldersTree", AjxpPane, {
 	
 		this.rootNodeId = this.tree.id;
 		this.hasFocus;
-		
-		document.observe("ajaxplorer:context_changed", function(event){
+
+        var ctxChangedObs =function(event){
 			var path = event.memo.getPath();
 			window.setTimeout(function(e){
 				this.setSelectedPath(path);
-			}.bind(this), 100);			
-		}.bind(this) );
-				
-		document.observe("ajaxplorer:root_node_changed", function(event){
+			}.bind(this), 100);
+		}.bind(this);
+		document.observe("ajaxplorer:context_changed",  ctxChangedObs);
+        this.registeredObservers.set("ajaxplorer:context_changed", ctxChangedObs);
+
+        var rootNodeObs = function(event){
 			var ajxpRootNode = event.memo;
 			this.tree.setAjxpRootNode(ajxpRootNode);
-			this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());		
-		}.bind(this));
-		
-		document.observe("ajaxplorer:component_config_changed", function(event){
+			this.changeRootLabel(ajxpRootNode.getLabel(), ajxpRootNode.getIcon());
+		}.bind(this);
+		document.observe("ajaxplorer:root_node_changed", rootNodeObs);
+        this.registeredObservers.set("ajaxplorer:root_node_changed", rootNodeObs);
+
+        var compConfChanged = function(event){
 			if(event.memo.className == "FoldersTree"){
 				var config = event.memo.classConfig.get('all');
 				var options = XPathSelectNodes(config, 'property');
@@ -121,10 +128,19 @@ Class.create("FoldersTree", AjxpPane, {
 					this.tree.filter = this.createFilter();
 				}
 			}
-		}.bind(this) );		
+		}.bind(this);
+		document.observe("ajaxplorer:component_config_changed",  compConfChanged);
+        this.registeredObservers.set("ajaxplorer:component_config_changed", compConfChanged);
 		
 	},
-	
+
+    destroy : function(){
+        this.registeredObservers.each(function (pair){
+            document.stopObserving(pair.key, pair.value);
+        });
+        if(this.tree) this.tree.destroy();
+    },
+
 	/**
 	 * Create a filtering function based on the options display
 	 * @returns Function
