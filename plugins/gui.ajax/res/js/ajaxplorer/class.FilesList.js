@@ -925,7 +925,8 @@ Class.create("FilesList", SelectableElements, {
 			position:'absolute',
 			marginLeft:'0px',
 			marginTop:'0px',
-			height:'24px'
+			height:'24px',
+            padding: 0
 		});
 		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});				
 		modal.showContent('editbox', (posSpan.getWidth()-offset.left)+'', '20', true);		
