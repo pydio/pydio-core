@@ -54,6 +54,9 @@ Class.create("AjxpPane", {
 				this.htmlElement.getAttribute('ajxpPaneHeader'), 
 				this.htmlElement.getAttribute('ajxpPaneIcon'));
 		}
+        if(this.htmlElement && this.options.elementStyle){
+            this.htmlElement.setStyle(this.options.elementStyle);
+        }
 		this.childrenPanes = $A([]);
 		this.scanChildrenPanes(this.htmlElement);
 	},
@@ -85,6 +88,7 @@ Class.create("AjxpPane", {
 	 * Implementation of the IAjxpWidget methods
 	 */	
 	destroy : function(){
+        this.htmlElement.update("");
 		this.htmlElement = null;
 	},
 	

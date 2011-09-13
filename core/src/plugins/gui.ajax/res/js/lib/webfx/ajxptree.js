@@ -46,6 +46,10 @@ AJXPTree.prototype.expand = function() {
 	this._webfxtree_expand();
 };
 
+AJXPTree.prototype.destroy = function(){
+    if(this.ajxpNode) this.ajxpNode.stopObserving();
+};
+
 AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 	if(this.ajxpNode){
 		var oldNode = this.ajxpNode;

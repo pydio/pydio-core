@@ -224,32 +224,8 @@ Class.create("Ajaxplorer", {
 		this.buildGUI($(ajxpBootstrap.parameters.get('MAIN_ELEMENT')));
 		document.fire("ajaxplorer:before_gui_load");
 		// Rewind components creation!
-		var lastInst;
-		if(this.guiCompRegistry && this.guiCompRegistry.length){
-			for(var i=this.guiCompRegistry.length;i>0;i--){
-				var el = this.guiCompRegistry[i-1];
-				var ajxpId = el.ajxpId;
-				this.guiCompRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
-				window[ajxpId] = this.guiCompRegistry[i-1];
-				lastInst = this.guiCompRegistry[i-1];
-			}
-			if(lastInst){
-				lastInst.resize();
-			}
-			for(var j=0;j<this.guiCompRegistry.length;j++){
-				var obj = this.guiCompRegistry[j];
-				if(Class.objectImplements(obj, "IFocusable")){
-					obj.setFocusBehaviour();
-					this._focusables.push(obj);
-				}
-				if(Class.objectImplements(obj, "IContextMenuable")){
-					obj.setContextualMenu(this.contextMenu);
-				}
-				if(Class.objectImplements(obj, "IActionProvider")){
-					if(!this.guiActions) this.guiActions = new Hash();
-					this.guiActions.update(obj.getActions());
-				}
-			}
+		if(this.guiCompRegistry){
+            this.initAjxpWidgets(this.guiCompRegistry);
 		}
 		this.guiLoaded = true;
 		document.fire("ajaxplorer:gui_loaded");
@@ -264,13 +240,46 @@ Class.create("Ajaxplorer", {
 		document.fire("ajaxplorer:registry_loaded", this._registry);		
 	},
 
+    initAjxpWidgets : function(compRegistry){
+        var lastInst;
+        if(compRegistry.length){
+            for(var i=compRegistry.length;i>0;i--){
+                var el = compRegistry[i-1];
+                var ajxpId = el.ajxpId;
+                compRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
+                window[ajxpId] = compRegistry[i-1];
+                lastInst = compRegistry[i-1];
+            }
+            if(lastInst){
+                lastInst.resize();
+            }
+            for(var j=0;j<compRegistry.length;j++){
+                var obj = compRegistry[j];
+                if(Class.objectImplements(obj, "IFocusable")){
+                    obj.setFocusBehaviour();
+                    this._focusables.push(obj);
+                }
+                if(Class.objectImplements(obj, "IContextMenuable")){
+                    obj.setContextualMenu(this.contextMenu);
+                }
+                if(Class.objectImplements(obj, "IActionProvider")){
+                    if(!this.guiActions) this.guiActions = new Hash();
+                    this.guiActions.update(obj.getActions());
+                }
+            }
+        }
+    },
+
 	/**
 	 * Builds the GUI based on the XML definition (template)
 	 * @param domNode
 	 */
-	buildGUI : function(domNode){
+	buildGUI : function(domNode, compRegistry){
 		if(domNode.nodeType != 1) return;
 		if(!this.guiCompRegistry) this.guiCompRegistry = $A([]);
+        if(!compRegistry){
+            compRegistry = this.guiCompRegistry;
+        }
 		domNode = $(domNode);
 		var ajxpClassName = domNode.readAttribute("ajxpClass") || "";
 		var ajxpClass = Class.getByName(ajxpClassName);
@@ -280,10 +289,10 @@ Class.create("Ajaxplorer", {
 			ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
 		}		
 		if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
-			this.guiCompRegistry.push({ajxpId:ajxpId, ajxpNode:domNode, ajxpClass:ajxpClass, ajxpOptions:ajxpOptions});
+			compRegistry.push({ajxpId:ajxpId, ajxpNode:domNode, ajxpClass:ajxpClass, ajxpOptions:ajxpOptions});
 		}		
 		$A(domNode.childNodes).each(function(node){
-			this.buildGUI(node);
+			this.buildGUI(node, compRegistry);
 		}.bind(this) );
 	},
 	
@@ -297,14 +306,18 @@ Class.create("Ajaxplorer", {
 			var ajxpId = parts[i].getAttribute("ajxpId");
 			var ajxpClassName = parts[i].getAttribute("ajxpClass");
 			var ajxpOptionsString = parts[i].getAttribute("ajxpOptions");
+            var cdataContent = "";
+            if(parts[i].firstChild && parts[i].firstChild.nodeType == 4 && parts[i].firstChild.nodeValue != ""){
+                cdataContent = parts[i].firstChild.nodeValue;
+            }
 			
 			var ajxpClass = Class.getByName(ajxpClassName);
 			if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){				
-				toUpdate[ajxpId] = [ajxpClass, ajxpClassName, ajxpOptionsString];
+				toUpdate[ajxpId] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
 			}
 		}
 		for(var id in toUpdate){
-			this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2]);
+			this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2], toUpdate[id][3]);
 		}
 	},
 	
@@ -315,7 +328,7 @@ Class.create("Ajaxplorer", {
 	 * @param ajxpClass IAjxpWidget A widget class
 	 * @param ajxpOptions Object A set of options that may have been decoded from json.
 	 */
-	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString){
+	refreshGuiComponent:function(ajxpId, ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent){
 		if(!window[ajxpId]) return;
 		// First destroy current component, unregister actions, etc.			
 		var oldObj = window[ajxpId];
@@ -331,10 +344,18 @@ Class.create("Ajaxplorer", {
 				this.guiActions.unset(act.key);// = this.guiActions.without(act);
 			}.bind(this) );
 		}
-		
+		if(oldObj.htmlElement) var anchor = oldObj.htmlElement;
 		oldObj.destroy();
 
-		var obj = new ajxpClass($(ajxpId), ajxpOptions);			
+        if(cdataContent && anchor){
+            anchor.insert(cdataContent);
+            var compReg = $A();
+            $A(anchor.children).each(function(el){
+                this.buildGUI(el, compReg);
+            }.bind(this));
+            if(compReg.length) this.initAjxpWidgets(compReg);
+        }
+		var obj = new ajxpClass($(ajxpId), ajxpOptions);
 		if(Class.objectImplements(obj, "IFocusable")){
 			obj.setFocusBehaviour();
 			this._focusables.push(obj);

@@ -114,8 +114,10 @@ Class.create("Splitter", AjxpPane, {
 		this.splitbar.addClassName(this.options.splitbarClass).setStyle({position:'absolute', cursor:this.options.cursor,fontSize:'1px'});
 		this.paneA.insert({after:this.splitbar});
 
-		this.splitbar.observe("mousedown", this.startSplit.bind(this));
-		this.splitbar.observe("mouseup", this.endSplit.bind(this));
+        this.startSplitFunc = this.startSplit.bind(this);
+        this.endSplitFunc = this.endSplit.bind(this);
+		this.splitbar.observe("mousedown", this.startSplitFunc);
+		this.splitbar.observe("mouseup", this.endSplitFunc);
 		
 		this.initCaches();
 		
@@ -137,9 +139,10 @@ Class.create("Splitter", AjxpPane, {
 				this.moveSplitter(parseInt(sizePref));
 			}
 		}.bind(this));
-		
-		Event.observe(this.group, "mousemove", this.doSplitMouse.bind(this));
-		Event.observe(this.group, "mouseup", this.endSplit.bind(this));
+
+        this.doSplitFunc = this.doSplitMouse.bind(this);
+		Event.observe(this.group, "mousemove", this.doSplitFunc);
+		Event.observe(this.group, "mouseup", this.endSplitFunc);
 		// NEW HTML5 : set it to false to disable native draggable!
 		this.splitbar.draggable = false;
         disableTextSelection(this.group);
@@ -148,6 +151,20 @@ Class.create("Splitter", AjxpPane, {
         }
 	},
 
+    destroy:function($super){
+        Event.stopObserving(this.group, "mousemove", this.doSplitFunc);
+        this.splitbar.stopObserving("mousedown", this.startSplitFunc);
+        this.splitbar.stopObserving("mouseup", this.endSplitFunc);
+        this.splitbar.remove();
+        if(this.paneA.ajxpPaneObject) {
+            this.paneA.ajxpPaneObject.destroy();
+            this.paneA.remove();
+        }
+        if(this.paneB.ajxpPaneObject) {
+            this.paneB.ajxpPaneObject.destroy();
+            this.paneB.remove();
+        }
+    },
 
     /**
      * Gets the action of this component
