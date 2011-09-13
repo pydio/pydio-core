@@ -103,13 +103,16 @@ Class.create("AbstractEditor" , {
             link.select("img").invoke("addClassName", "actionbar_button_icon");
             link.select("span").invoke("addClassName", "actionbar_button_label");
 			var span = link.select('span[message_id]')[0];
-			if(span) span.update(MessageHash[span.readAttribute("message_id")]);
+            var title = MessageHash[span.readAttribute("message_id")];
+			if(span) span.update(title);
 			this.actions.set(link.id, link);
 			if(link.getAttribute('access_key')){
 				var aK = link.getAttribute('access_key');
 				if(Event[aK]) aK = Event[aK];
 				this.registeredActions.set(aK, link.id);
+                title += " (" + aK + ")";
 			}
+            link.setAttribute("title", title);
 		}, this);
 		if(this.registeredActions.size()){
 			this.keyObs = function(e){
@@ -150,6 +153,10 @@ Class.create("AbstractEditor" , {
 		if(this.editorOptions.floatingToolbar){
 			this.makeToolbarFloatable();
 		}
+
+        if(this.editorOptions.toolbarStyle){
+            this.actionBar.addClassName(this.editorOptions.toolbarStyle);
+        }
 		
 		attachMobileScroll(this.actionBar, "horizontal");
 		var obs = this.resize.bind(this);
@@ -176,12 +183,12 @@ Class.create("AbstractEditor" , {
         this.actionBar.addClassName("floatingBar");
 		this.actionBar.down("div.separator").remove();
 		this.actionBarPlacer = function(){
-			if(this.contentMainContainer){
-				var w = this.actionBar.getWidth();
-				var elW = this.contentMainContainer.getWidth();
-				this.actionBar.setStyle({left:(Math.max(0,(elW-w)/2))+'px'});				
-				this.actionBar.setStyle({top:(this.contentMainContainer.getHeight()-this.actionBar.getHeight() - 30 )+'px'});
-			}
+            var anchor = (this.floatingToolbarAnchor?this.floatingToolbarAnchor:this.contentMainContainer);
+            if(!anchor) return;
+            var w = this.actionBar.getWidth();
+            var elW = anchor.getWidth();
+            this.actionBar.setStyle({left:(Math.max(0,(elW-w)/2))+(anchor.positionedOffset().left)+'px'});
+            this.actionBar.setStyle({top:(anchor.getHeight()-this.actionBar.getHeight() - 30 )+'px'});
 		}.bind(this);
 		this.element.observe("editor:resize", this.actionBarPlacer);
 		this.element.observe("editor:close", function(){

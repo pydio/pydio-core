@@ -404,7 +404,7 @@ Class.create("AjxpDataModel", {
 		if(!this._selectedNodes.length)
 		{
 			alert('Please select a file!');
-			return;
+			return false;
 		}
 		var tmp = new Array(this._selectedNodes.length);
 		for(i=0;i<this._selectedNodes.length;i++)
