@@ -312,12 +312,17 @@ class AJXP_ClientDriver extends AJXP_Plugin
         if($instance === false) return ;
         $confs = $instance->getConfigs();
         $theme = $confs["GUI_THEME"];
+        if(!defined("AJXP_THEME_FOLDER")){
+            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
+        }
         $value = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $value);
         if(isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])){
             $value = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"]."plugins/gui.ajax/res/themes/".$theme, $value);
         }else{
             $value = str_replace("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$theme, $value);
         }
+        return $value;
     }
 }
 
