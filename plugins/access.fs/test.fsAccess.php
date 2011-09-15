@@ -34,31 +34,37 @@
  * Description : Abstract representation of an action driver. Must be implemented.
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-                                 
-require_once('../classes/class.AbstractTest.php');
 
-class PHPSession extends AbstractTest
+require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
+
+class fsAccessTest extends AbstractTest
 {
-    function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
-    function doTest() 
-    { 
-    	$tmpDir = session_save_path();
-    	$this->testedParams["Session Save Path"] = $tmpDir;
-    	if($tmpDir != ""){
-	    	$this->testedParams["Session Save Path Writeable"] = is_writable($tmpDir);
-	    	if(!$this->testedParams["Session Save Path Writeable"]){
-	    		$this->failedLevel = "error";
-	    		$this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
-	    		return FALSE;
-	    	}    	
-    	}else{
-    		$this->failedLevel = "warning";
-    		$this->failedInfo = "Warning, it seems that your temporary folder used to save session data is not set. If you are encountering troubles with logging and sessions, please check session.save_path in your php.ini. Otherwise you can ignore this.";
-    		return FALSE;    		
-    	}
-        $this->failedLevel = "info";
-        return FALSE;
+    function fsAccessTest() { parent::AbstractTest("Filesystem Plugin", ""); }
+
+    /**
+     * Test Repository
+     *
+     * @param Repository $repo
+     * @return Boolean
+     */
+    function doRepositoryTest($repo){
+        if ($repo->accessType != 'fs' ) return -1;
+        // Check the destination path
+        $this->failedInfo = "";
+        $path = $repo->getOption("PATH", false);
+        $createOpt = $repo->getOption("CREATE");
+        $create = (($createOpt=="true"||$createOpt===true)?true:false);
+        if(strstr($path, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!        
+        if (!$create && !is_dir($path))
+        { 
+        	$this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE; 
+        }
+        else if (!$create && !is_writeable($path))
+        { $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE; }
+        // Do more tests here  
+        return TRUE;    	
     }
+    
 };
 
 ?>
