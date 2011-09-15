@@ -133,7 +133,7 @@ class AJXP_User extends AbstractAjxpUser
 		foreach (array_keys($users) as $id){
 			$object = $confDriver->createUserObject($id);
 			if($object->hasParent() && $object->getParent() == $userId){
-				AJXP_User::deleteUser($id);
+				AJXP_User::deleteUser($id, $deletedSubUsers);
 				$deletedSubUsers[] = $id;
 			}
 		}

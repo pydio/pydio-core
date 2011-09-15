@@ -38,6 +38,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 define('AJXP_SANITIZE_HTML', 1);
 define('AJXP_SANITIZE_HTML_STRICT', 2);
 define('AJXP_SANITIZE_ALPHANUM', 3);
+define('AJXP_SANITIZE_EMAILCHARS', 4);
 
 class AJXP_Utils
 {
@@ -97,6 +98,8 @@ class AJXP_Utils
         $s = ' ' . $s;
         if($level == AJXP_SANITIZE_ALPHANUM){
         	return preg_replace("/[^a-zA-Z0-9_\-\.]/", "", $s);
+        }else if($level == AJXP_SANITIZE_EMAILCHARS){
+            return preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
         }
         
         //begin removal

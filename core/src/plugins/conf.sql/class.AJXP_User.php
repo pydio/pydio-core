@@ -245,7 +245,7 @@ class AJXP_User extends AbstractAjxpUser
 				return -1;
 			}
 			
-			$this->log('REMOVE RIGHTS: [Login]: '.$this->getId().' [Repository UUID]:'.$rootDirId.' [Rights]:'.$rightString);
+			$this->log('REMOVE RIGHTS: [Login]: '.$this->getId().' [Repository UUID]:'.$rootDirId.' [Rights]:'.$this->rights[$rootDirId]);
 			unset($this->rights[$rootDirId]);
 		}
 	}
@@ -259,7 +259,10 @@ class AJXP_User extends AbstractAjxpUser
 	 * @see AbstractAjxpUser#setPref($prefName, $prefValue)
 	 */
 	function setPref($prefName, $prefValue){
-		
+
+        if($prefName == "CUSTOM_PARAMS"){
+            $prefValue = serialize($prefValue);
+        }
 		// Prevent a query if the preferences are identical to the existing preferences.
 		if (array_key_exists($prefName, $this->prefs) && $this->prefs[$prefName] == $prefValue) {
 			return;
@@ -305,6 +308,14 @@ class AJXP_User extends AbstractAjxpUser
 		}
 		
 	}
+
+    function getPref($prefName){
+        $p = parent::getPref($prefName);
+        if($prefName == "CUSTOM_PARAMS" && isSet($p)){
+            return unserialize($p);
+        }
+        return $p;
+    }
 	
 	/**
 	 * Add a user bookmark.
@@ -464,7 +475,15 @@ class AJXP_User extends AbstractAjxpUser
 			}else{
 				$this->rights["ajxp.roles"] = array();
 			}
-		}		
+		}
+        if(isSet($this->rights["ajxp.actions"])){
+            $object = unserialize($this->rights["ajxp.actions"]);
+            if(is_array($object)){
+                $this->rights["ajxp.actions"] = $object;
+            }else{
+                unset($this->rights["ajxp.actions"]);
+            }
+        }
 
 	}
 	
@@ -492,7 +511,15 @@ class AJXP_User extends AbstractAjxpUser
 				'repo_uuid' => 'ajxp.roles', 
 				'rights'	=> serialize($this->rights['ajxp.roles'])));
 		}
-	}	
+        // update specific actions rights
+        dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]='".$this->getId()."' AND [repo_uuid]='ajxp.actions'");
+        if($this->rights["ajxp.actions"] && is_array($this->rights["ajxp.actions"]) && count($this->rights["ajxp.actions"])){
+            dibi::query("INSERT INTO [ajxp_user_rights]", array(
+                'login' => $this->getId(),
+                'repo_uuid' => 'ajxp.actions',
+                'rights'	=> serialize($this->rights['ajxp.actions'])));
+        }
+	}
 	
 	/**
 	 * Get Temporary Data.
@@ -557,7 +584,6 @@ class AJXP_User extends AbstractAjxpUser
 				$deletedSubUsers[] = $childId;
 			}
 		} catch (DibiException $e) {
-			$this->log('Failed to delete user, Reason: '.$e->getMessage());				
 			throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
 		}
 	}

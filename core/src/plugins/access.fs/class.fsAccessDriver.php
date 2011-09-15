@@ -572,7 +572,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
             		$users = "";
             		foreach ($allUsers as $userId => $userObject){            			
             			if($crtValue != "" && (strstr($userId, $crtValue) === false || strstr($userId, $crtValue) != 0)) continue;
-            			if( ( $userObject->hasParent() && $userObject->getParent() == $loggedUser->getId() ) || ConfService::getConf("ALLOW_CROSSUSERS_SHARING") === true  ){
+            			if( ( $userObject->hasParent() && $userObject->getParent() == $loggedUser->getId() ) || ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") === true  ){
             				$users .= "<li>".$userId."</li>";
             			}
             		}
