@@ -35,29 +35,23 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
                                  
-require_once('../classes/class.AbstractTest.php');
+require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
 
-class PHPSession extends AbstractTest
+class ftpAccessTest extends AbstractTest
 {
-    function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
-    function doTest() 
-    { 
-    	$tmpDir = session_save_path();
-    	$this->testedParams["Session Save Path"] = $tmpDir;
-    	if($tmpDir != ""){
-	    	$this->testedParams["Session Save Path Writeable"] = is_writable($tmpDir);
-	    	if(!$this->testedParams["Session Save Path Writeable"]){
-	    		$this->failedLevel = "error";
-	    		$this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
-	    		return FALSE;
-	    	}    	
-    	}else{
-    		$this->failedLevel = "warning";
-    		$this->failedInfo = "Warning, it seems that your temporary folder used to save session data is not set. If you are encountering troubles with logging and sessions, please check session.save_path in your php.ini. Otherwise you can ignore this.";
-    		return FALSE;    		
-    	}
-        $this->failedLevel = "info";
-        return FALSE;
+    function ftpAccessTest() { parent::AbstractTest("Remote FTP Filesystem Plugin", ""); }
+    
+    function doRepositoryTest($repo)
+    {
+    	if($repo->accessType != "ftp") return -1;
+    	
+        $basePath = "../../../plugins/access.ftp/";
+        // Check file exists
+        if (!file_exists($basePath."class.ftpAccessDriver.php")
+         || !file_exists($basePath."manifest.xml"))
+        { $this->failedInfo .= "Missing at least one of the plugin files (class.ftpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
+        
+        return TRUE;    
     }
 };
 
