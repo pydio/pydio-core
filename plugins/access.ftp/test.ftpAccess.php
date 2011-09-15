@@ -45,7 +45,7 @@ class ftpAccessTest extends AbstractTest
     {
     	if($repo->accessType != "ftp") return -1;
     	
-        $basePath = "../../../plugins/access.ftp/";
+        $basePath = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/" ;
         // Check file exists
         if (!file_exists($basePath."class.ftpAccessDriver.php")
          || !file_exists($basePath."manifest.xml"))
