@@ -323,7 +323,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
 		if(AuthService::userExists($userName)){
 			// check that it's a child user
 			$userObject = $confDriver->createUserObject($userName);
-			if( ConfService::getConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
+			if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
 				return 102;
 			}
 		}else{

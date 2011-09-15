@@ -270,7 +270,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					return;						
 				}
 				$forbidden = array("guest", "share");
-				$new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_ALPHANUM);
+				$new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_EMAILCHARS);
 				if(AuthService::userExists($new_user_login) || in_array($new_user_login, $forbidden))
 				{
 					AJXP_XMLWriter::header();
@@ -291,7 +291,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
-				AJXP_XMLWriter::reloadFileList($new_user_login);
+				AJXP_XMLWriter::reloadDataNode("", $new_user_login);
 				AJXP_XMLWriter::close();
 														
 			break;
