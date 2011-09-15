@@ -916,7 +916,20 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
 		$isFile = !$data && !$gzip; 		
 		if($byteLength == -1){
-			$size = ($data ? strlen($filePathOrData) : filesize($filePathOrData));
+            if($data){
+                $size = strlen($filePathOrData);
+            }else{
+                $size = filesize($filePathOrData);
+                if(method_exists($this->wrapperClassName, "getLastRealSize")){
+                    $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
+                    if($last !== false){
+                        $size = $last;
+                    }
+                }
+                if($size < 0){
+                    $size = sprintf("%u", $size);
+                }
+            }
 		}else{
 			$size = $byteLength;
 		}
