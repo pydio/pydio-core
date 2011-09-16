@@ -52,6 +52,10 @@ class AJXP_ClientDriver extends AJXP_Plugin
 	function switchAction($action, $httpVars, $fileVars)
 	{
 		if(!isSet($this->actions[$action])) return;
+        if(!defined("AJXP_THEME_FOLDER")){
+            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
+        }		
 		foreach($httpVars as $getName=>$getValue){
 			$$getName = AJXP_Utils::securePath($getValue);
 		}
