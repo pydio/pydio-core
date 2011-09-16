@@ -611,7 +611,7 @@ div.SF_label{
 .SF_input{
 	float:left;
 	padding:1px !important;
-	width: 59% !important;
+	width: 57% !important;
 	_width:54% !important; /*IE*/
 }
 
@@ -625,7 +625,7 @@ div.SF_label{
 }
 
 .SF_elementWithCheckbox > .SF_input{
-    width: 52% !important;
+    width: 51% !important;
     _width:46% !important; /*IE*/
 }
 
@@ -1762,6 +1762,7 @@ div.tabulatorContainer{
     height: 120px;
     background-color: #fff;
     margin-bottom: 3px;
+    position: relative;
 }
 
 #search_container
@@ -2429,7 +2430,7 @@ textarea.editor
 
 div.icons_only.diaporama_toolbar{
     height: 40px !important;
-    width: 446px;
+    width: 470px;
 }
 div.diaporama_toolbar div#diaporama_legend{
     display: none;

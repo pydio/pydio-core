@@ -43,13 +43,17 @@ Class.create("Diaporama", AbstractEditor, {
         options = {
             floatingToolbar:true,
             replaceScroller:false,
-            toolbarStyle: "icons_only diaporama_toolbar"
+            toolbarStyle: "icons_only diaporama_toolbar",
+            actions : {
+                'toggleSideBar' : '<a id="toggleButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/view_left_close.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
+            }
         };
 		$super(oFormObject, options);
 
         var diapoSplitter = oFormObject.down("#diaporamaSplitter");
         var diapoInfoPanel = oFormObject.down("#diaporamaMetadataContainer");
-        this.splitter = new Splitter(diapoSplitter, {direction:"vertical","initA":250,fit:"height",fitParent:oFormObject.up(".dialogBox")});
+        diapoSplitter.parentNode.setStyle({overflow:"hidden"});
+        this.splitter = new Splitter(diapoSplitter, {direction:"vertical","initA":250,minSize:0,fit:"height",fitParent:oFormObject.up(".dialogBox")});
         this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:true});
         if(window.info_panel){
             this.infoPanel.registeredMimes = info_panel.registeredMimes;
@@ -149,7 +153,12 @@ Class.create("Diaporama", AbstractEditor, {
 			this.updateButtons();
 			return false;
 		}.bind(this);
-		
+        this.actions.get("fsButton").insert({before:this.actions.get("toggleButton")});
+        this.actions.get("toggleButton").observe("click", function(e){
+            Event.stop(e);
+            this.splitter.toggleFolding();
+        }.bind(this));
+
 		this.jsImage = new Image();
 		this.imgBorder.hide();
 		
@@ -338,14 +347,27 @@ Class.create("Diaporama", AbstractEditor, {
         this.imageNavigator();
 	},
 
+    navigatorMove : function(navigator){
+        this.skipScrollObserver = true;
+        var ratioX  = this.imgContainer.getWidth() / navigator.containerWidth;
+        this.imgContainer.scrollLeft = parseInt(navigator.left * ratioX);
+        var ratioY  = this.imgContainer.getHeight() / navigator.containerHeight;
+        this.imgContainer.scrollTop = parseInt(navigator.top * ratioY);
+        if(this.navigatorTimer) window.clearTimeout(this.navigatorTimer);
+        this.navigatorTimer = window.setTimeout(function(){
+            this.skipScrollObserver = false;
+        }.bind(this),500);
+    },
+
     imageNavigator : function(navigator){
         var shadowCorrection = ($$('html')[0].hasClassName('boxshadow')?3:0);
+        if(this.skipScrollObserver) return;
 
         var nav = {};
         var img = this.imgBorder;
         var cont = this.imgContainer;
         nav.top = this.getIntegerStyle(img,"top") + this.getIntegerStyle(img,"marginTop") - cont.scrollTop;
-        nav.left = this.getIntegerStyle(img,"left") + this.getIntegerStyle(img,"marginTop") - cont.scrollLeft;
+        nav.left = this.getIntegerStyle(img,"left") + this.getIntegerStyle(img,"marginLeft") - cont.scrollLeft;
         nav.width = img.getWidth() - shadowCorrection;
         nav.height = img.getHeight() - shadowCorrection;
         nav.bottom = nav.top+nav.height;
@@ -355,46 +377,50 @@ Class.create("Diaporama", AbstractEditor, {
         nav.containerWidth = this.imgContainer.getWidth();
         nav.containerHeight = this.imgContainer.getHeight();
 
-        var theImage = this.infoPanel.htmlElement.down("img");
-        if(!theImage.openBehaviour){
-            var opener = new Element('div').update(MessageHash[411]);
-            opener.setStyle({
-                width:styleObj.width,
-                position:'absolute',
-                bottom:($$('html')[0].hasClassName('boxshadow')?'3px':'0px'),
-                right:'0px',
-                color: 'white',
-                backgroundColor: 'rgba(0,0,0,0.2)',
-                fontWeight: 'bold',
-                fontSize: '12px',
-                textAlign: 'center',
-                cursor: 'pointer'
-            });
-            opener.addClassName('imagePreviewOverlay');
-            img.previewOpener = opener;
-            theImage.insert({before:opener});
-            theImage.setStyle({cursor:'pointer'});
-            theImage.openBehaviour = true;
-            theImage.observe("click", function(event){
-                ajaxplorer.actionBar.fireAction('open_with');
-            });
-        }
-
-        if(!this.infoPanel.htmlElement.down("div.imagePreviewOverlay")) return;
-        var overlay = this.infoPanel.htmlElement.down("div.imagePreviewOverlay");
-        overlay.update("").setStyle({border :"1px solid red", display: "block"});
+        var overlay = this.getNavigatorOverlay();
         var navigatorImg = overlay.next("img");
-        navigatorImg.stopObserving("mouseover");
-        navigatorImg.stopObserving("mouseout");
+        var offset = navigatorImg.positionedOffset();
         var targetDim = navigatorImg.getDimensions();
         var ratioX = (targetDim.width) / (nav.width);
         var ratioY = (targetDim.height) / (nav.height);
         overlay.setStyle({
-            top: (Math.max(-nav.top, 0) * ratioY - 140) + 'px',
-            left: (Math.max(-nav.left,0) * ratioX) + 'px',
+            top: (Math.max(-nav.top, 0) * ratioY + offset.top) + 'px',
+            left: (Math.max(-nav.left,0) * ratioX + offset.left) + 'px',
             width: (Math.min(nav.containerWidth*ratioX, targetDim.width-shadowCorrection)) + "px",
             height: (Math.min(nav.containerHeight*ratioY, targetDim.height-shadowCorrection)) + "px"
         });
+    },
+
+    getNavigatorOverlay : function(){
+        var ov = this.infoPanel.htmlElement.down("div.imagePreviewOverlay");
+        if(ov && ov.draggableInitialized) {
+            return ov;
+        }
+        var theImage = this.infoPanel.htmlElement.down("img");
+        if(!ov){
+            ov = new Element('div',{className:"imagePreviewOverlay"}).setStyle({
+                position:'absolute',
+                cursor: 'move'
+            });
+            theImage.insert({before:ov});
+        }
+        if(!ov.draggableInitialized){
+            theImage.stopObserving("mouseover");
+            theImage.stopObserving("mouseout");
+            theImage.stopObserving("click");
+            ov.update("").setStyle({border :"1px solid red", display: "block",backgroundColor:"rgba(0,0,0,0.2)"});
+            ov.draggableInitialized = new Draggable(ov, {onDrag:function(){
+                var offset = theImage.positionedOffset();
+                var coord = {
+                    top:parseInt(ov.getStyle("top"))-offset.top,
+                    left:parseInt(ov.getStyle("left"))-offset.left,
+                    containerWidth:theImage.getWidth(),
+                    containerHeight:theImage.getHeight()
+                };
+                this.navigatorMove(coord);
+            }.bind(this)});
+        }
+        return ov;
     },
 
     getIntegerStyle : function(object, property){
@@ -551,9 +577,10 @@ Class.create("Diaporama", AbstractEditor, {
 			div.setStyle({
 				height:styleObj.height, 
 				width:styleObj.width, 
-				position:'relative',
+				/*position:'relative',*/
 				display:'inline'
 			});
+            $(div.parentNode).setStyle({position:"relative"});
 		};
 		img.observe("mouseover", function(event){
 			var theImage = event.target;
@@ -564,8 +591,6 @@ Class.create("Diaporama", AbstractEditor, {
 					width:styleObj.width, 
 					display:'none', 
 					position:'absolute', 
-					bottom:($$('html')[0].hasClassName('boxshadow')?'3px':'0px'), 
-					right:'0px',
 					color: 'white',
 					backgroundColor: 'black',
 					opacity: '0.6',
@@ -583,7 +608,13 @@ Class.create("Diaporama", AbstractEditor, {
 					ajaxplorer.actionBar.fireAction('open_with');
 				});
 			}
-			theImage.previewOpener.setStyle({display:'inline'});
+            var off = theImage.positionedOffset();
+			theImage.previewOpener.setStyle({
+                display:'block',
+                left: off.left + 'px',
+                width:theImage.getWidth() + "px",
+                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight()) + "px"
+            });
 		});
 		img.observe("mouseout", function(event){
 			var theImage = event.target;

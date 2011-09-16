@@ -59,6 +59,8 @@
 	filter: alpha(opacity=50);	
 	text-align:center;
 	overflow:hidden;
+    padding: 0px !important;
+    margin: 0px !important;
 }
 
 #element_iframe{

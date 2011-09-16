@@ -139,7 +139,7 @@ Class.create("AjxpTabulator", AjxpPane, {
 	 */
 	getAndSetAjxpObject : function(tabInfo){
 		var ajxpObject = tabInfo.ajxpObject || null;
-		if($(tabInfo.element).ajxpPaneObject && (!ajxpObject || ajxpObject != $(tabInfo.element).ajxpPaneObject) ){
+		if($(tabInfo.element) && $(tabInfo.element).ajxpPaneObject && (!ajxpObject || ajxpObject != $(tabInfo.element).ajxpPaneObject) ){
 			ajxpObject = tabInfo.ajxpObject = $(tabInfo.element).ajxpPaneObject;
 		}
 		return ajxpObject;		

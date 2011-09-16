@@ -16,7 +16,6 @@
 	<registry_contributions>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<client_configs>
-			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
 			<component_config className="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile" defaultWidth="48%"/>

@@ -213,7 +213,7 @@ Class.create("AjxpBootstrap", {
 	 * Inserts a progress bar 
 	 */
 	insertLoaderProgress : function(){
-		var html = '<div id="loading_overlay" style="background-color:#555555;"></div>';
+		var html = '<div id="loading_overlay" style="background-color:#555555;opacity: 0.2;"></div>';
 		if(this.parameters.get('customWelcomeScreen')){
 			try { this.parameters.set('customWelcomeScreen', customFuncDecode(this.parameters.get('customWelcomeScreen')));
 			}catch(e){

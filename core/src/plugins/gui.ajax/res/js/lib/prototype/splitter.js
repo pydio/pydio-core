@@ -132,13 +132,25 @@ Class.create("Splitter", AjxpPane, {
 		//Event.observe(window,"resize", function(e){this.resizeGroup(e, null, true);}.bind(this));
 		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 
-		Event.observe(document, "ajaxplorer:user_logged", function(){		
+        this.userLoggedObs = function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
 			var sizePref = ajaxplorer.user.getPreference(this.htmlElement.id + "_size");
 			if(sizePref){
-				this.moveSplitter(parseInt(sizePref));
+				this.resizeAnimated(parseInt(sizePref));
 			}
-		}.bind(this));
+		}.bind(this);
+		document.observe("ajaxplorer:user_logged",this.userLoggedObs);
+
+        this.compConfigObs = function(event){
+            if(event.memo.className == "Splitter::"+this.htmlElement.id){
+                var node = event.memo.classConfig.get("all");
+                var size = XPathSelectSingleNode(node, 'property[@name="resize"]');
+                if(size){
+                    this.resizeAnimated(parseInt(size.getAttribute("value")));
+                }
+            }
+        }.bind(this);
+        document.observe("ajaxplorer:component_config_changed", this.compConfigObs);
 
         this.doSplitFunc = this.doSplitMouse.bind(this);
 		Event.observe(this.group, "mousemove", this.doSplitFunc);
@@ -155,6 +167,8 @@ Class.create("Splitter", AjxpPane, {
         Event.stopObserving(this.group, "mousemove", this.doSplitFunc);
         this.splitbar.stopObserving("mousedown", this.startSplitFunc);
         this.splitbar.stopObserving("mouseup", this.endSplitFunc);
+        document.stopObserving("ajaxplorer:user_logged",this.userLoggedObs);
+        document.stopObserving("ajaxplorer:component_config_changed", this.compConfigObs);
         this.splitbar.remove();
         if(this.paneA.ajxpPaneObject) {
             this.paneA.ajxpPaneObject.destroy();
@@ -286,6 +300,21 @@ Class.create("Splitter", AjxpPane, {
             this.moveSplitter(p, true, target);
         }.bind(this) );
     },
+
+    resizeAnimated : function(size){
+        if(this.effectWorking) return;
+        if(this.splitbar.hasClassName("folded")){
+            return;
+        }
+        this.effectWorking = true;
+        var current = this.options.getAdjust(this.paneA) + this.initBorderA;
+        new Effect.Tween(null, current, size, {afterFinish:function(){
+            this.effectWorking = false;
+        }.bind(this) }, function(p){
+            this.moveSplitter(p);
+        }.bind(this) );
+    },
+
 	/**
 	 * Start drag event
 	 * @param event Event
@@ -439,11 +468,11 @@ Class.create("Splitter", AjxpPane, {
    * @returns Integer
    */
     getHeight: function(el) {
-        if (el.offsetHeight){
+        if (typeof el.offsetHeight != "undefined"){
             return parseInt(el.offsetHeight);                                 //ie
         } else {
         	var h = el.getHeight();
-        	if(!h){        		
+        	if(!h && el.parentNode){
         		 h = $(el.parentNode).getHeight();
         		 if(!Prototype.Browser.IE) h -= parseInt($(el.parentNode).paddingHeight*2);
         	}
