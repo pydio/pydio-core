@@ -302,6 +302,9 @@ Class.create("Ajaxplorer", {
 	refreshTemplateParts : function(){
 		var parts = XPathSelectNodes(this._registry, "client_configs/template_part");
 		var toUpdate = {};
+		if(!this.templatePartsToRestore){
+			this.templatePartsToRestore = $A();
+		}
 		for(var i=0;i<parts.length;i++){
 			var ajxpId = parts[i].getAttribute("ajxpId");
 			var ajxpClassName = parts[i].getAttribute("ajxpClass");
@@ -314,11 +317,21 @@ Class.create("Ajaxplorer", {
 			var ajxpClass = Class.getByName(ajxpClassName);
 			if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){				
 				toUpdate[ajxpId] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
+				this.templatePartsToRestore = this.templatePartsToRestore.without(ajxpId);
 			}
 		}
+		this.templatePartsToRestore.each(function(key){
+			var part = this.findOriginalTemplatePart(key);
+			var ajxpClassName = part.getAttribute("ajxpClass");
+			var ajxpOptionsString = part.getAttribute("ajxpOptions");
+			var cdataContent = part.innerHTML;
+			toUpdate[key] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];			
+		}.bind(this));
+		
 		for(var id in toUpdate){
 			this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2], toUpdate[id][3]);
 		}
+		this.templatePartsToRestore = $A(Object.keys(toUpdate));
 	},
 	
 	/**
@@ -335,7 +348,10 @@ Class.create("Ajaxplorer", {
 		if(oldObj.__className == ajxpClassName && oldObj.__ajxpOptionsString == ajxpOptionsString){
 			return;
 		}
-		var ajxpOptions = ajxpOptionsString.evalJSON();
+		var ajxpOptions = {};
+		if(ajxpOptionsString){
+			ajxpOptions = ajxpOptionsString.evalJSON();			
+		}
 		if(Class.objectImplements(oldObj, "IFocusable")){
 			this._focusables = this._focusables.without(oldObj);
 		}
@@ -744,7 +760,7 @@ Class.create("Ajaxplorer", {
 	/**
 	 * Inserts the main template in the GUI.
 	 */
-	initTemplates:function(){
+	initTemplates:function(passedTarget){
 		if(!this._registry) return;
 		var tNodes = XPathSelectNodes(this._registry, "client_configs/template");
 		for(var i=0;i<tNodes.length;i++){
@@ -753,9 +769,10 @@ Class.create("Ajaxplorer", {
             if(themeSpecific && window.ajxpBootstrap.parameters.get("theme") && window.ajxpBootstrap.parameters.get("theme") != themeSpecific){
                 continue;
             }
-			if($(target) || $$(target).length){
+			if($(target) || $$(target).length || passedTarget){
 				if($(target)) target = $(target);
 				else target = $$(target)[0];
+				if(passedTarget) target = passedTarget;
 				var position = tNodes[i].getAttribute("position");
 				var obj = {}; obj[position] = tNodes[i].firstChild.nodeValue;
 				target.insert(obj);
@@ -765,6 +782,15 @@ Class.create("Ajaxplorer", {
 		modal.updateLoadingProgress('Html templates loaded');	
 	},
 		
+	findOriginalTemplatePart : function(ajxpId){
+		var tmpElement = new Element("div", {style:"display:none;"});
+		$$("body")[0].insert(tmpElement);
+		this.initTemplates(tmpElement);
+		var tPart = tmpElement.down("#"+ajxpId).clone(true);		
+		tmpElement.remove();
+		return tPart;
+	},
+	
 	/**
 	 * Trigger a simple download
 	 * @param url String
