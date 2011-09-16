@@ -65,8 +65,13 @@ Class.create("Ajaxplorer", {
 	init:function(){
 		document.observe("ajaxplorer:registry_loaded", function(){
 			this.refreshExtensionsRegistry();
-			this.logXmlUser(this._registry);	
-			this.loadActiveRepository();	
+			this.logXmlUser(this._registry);
+            if(this.user){
+                var repId = this.user.getActiveRepository();
+                var repList = this.user.getRepositoriesList();
+                var repositoryObject = repList.get(repId);
+                if(repositoryObject) repositoryObject.loadResources();
+            }
 			if(this.guiLoaded) {
 				this.refreshTemplateParts();
 				this.refreshGuiComponentConfigs();
@@ -76,6 +81,7 @@ Class.create("Ajaxplorer", {
 					this.refreshGuiComponentConfigs();
 				}.bind(this));
 			}
+            this.loadActiveRepository();
 		}.bind(this));
 
 		modal.setLoadingStepCounts(5);
@@ -320,18 +326,22 @@ Class.create("Ajaxplorer", {
 				this.templatePartsToRestore = this.templatePartsToRestore.without(ajxpId);
 			}
 		}
+        var futurePartsToRestore = $A(Object.keys(toUpdate));
 		this.templatePartsToRestore.each(function(key){
 			var part = this.findOriginalTemplatePart(key);
-			var ajxpClassName = part.getAttribute("ajxpClass");
-			var ajxpOptionsString = part.getAttribute("ajxpOptions");
-			var cdataContent = part.innerHTML;
-			toUpdate[key] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];			
+            if(part){
+                var ajxpClassName = part.getAttribute("ajxpClass");
+                var ajxpOptionsString = part.getAttribute("ajxpOptions");
+                var cdataContent = part.innerHTML;
+                var ajxpClass = Class.getByName(ajxpClassName);
+                toUpdate[key] = [ajxpClass, ajxpClassName, ajxpOptionsString, cdataContent];
+            }
 		}.bind(this));
 		
 		for(var id in toUpdate){
 			this.refreshGuiComponent(id, toUpdate[id][0], toUpdate[id][1], toUpdate[id][2], toUpdate[id][3]);
 		}
-		this.templatePartsToRestore = $A(Object.keys(toUpdate));
+		this.templatePartsToRestore = futurePartsToRestore;
 	},
 	
 	/**
@@ -786,7 +796,8 @@ Class.create("Ajaxplorer", {
 		var tmpElement = new Element("div", {style:"display:none;"});
 		$$("body")[0].insert(tmpElement);
 		this.initTemplates(tmpElement);
-		var tPart = tmpElement.down("#"+ajxpId).clone(true);		
+		var tPart = tmpElement.down('[id="'+ajxpId+'"]');
+        if(tPart) tPart = tPart.clone(true);
 		tmpElement.remove();
 		return tPart;
 	},

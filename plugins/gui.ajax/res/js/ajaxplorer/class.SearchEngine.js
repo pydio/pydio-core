@@ -550,7 +550,7 @@ Class.create("SearchEngine", AjxpPane, {
      */
     setOnLoad : function(element){
         addLightboxMarkupToElement(element);
-        var img = new Element("img", {src : ajxpResourcesFolder+"/images/loadingImage.gif", style:"margin-top: 50px;"});
+        var img = new Element("img", {src : ajxpResourcesFolder+"/images/loadingImage.gif", style:"margin-top: 10px;"});
         $(element).down("#element_overlay").insert(img);
         this.loading = true;
     },

@@ -12,14 +12,10 @@
 	</resources>
 	<clientForm id="diaporama_box"><![CDATA[
 		<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_resize="true" box_padding="0">
-			<div class="action_bar" style="width: 100%;">			
-				<div align="right" id="diaporama_legend" style="float: right;padding-top: 1px;padding-right: 5px;height: 21px;margin-top: 4px;margin-left: -111px;width: 112px;font-size: 9px;line-height: 10px;color: #aaa;">
-					AJXP_MESSAGE[414]
-				</div>
+			<div class="action_bar" style="width: 100%;" title="AJXP_MESSAGE[414]">
 				<div align="right" id="diaporama_input_boxes" style="float:right; padding-top: 1px; padding-right: 5px; height: 21px;margin-top:28px;margin-left:30px;">
 					<input id="zoomValue" type="text" style="text-align: center; width: 34px;height: 16px;padding:0px;border: 1px solid #ccc; padding-right: 1px;"/><input id="time" type="text" value="3 s" style="text-align: center; width: 26px;height: 16px;padding:0px;border: 1px solid #ccc; padding-right: 1px;margin-left:10px;"/>
 				</div>
-			
 				<a href="#" access_key="KEY_LEFT" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/back_22.png" alt="" border="0"><br><span message_id="178">AJXP_MESSAGE[178]</span></a>
 				<a href="#" access_key="s" id="stopButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_stop.png" alt="AJXP_MESSAGE[233]" border="0"><br><span message_id="232">AJXP_MESSAGE[232]</span></a>
 				<a href="#" access_key="p" id="playButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_play.png" alt="AJXP_MESSAGE[231]" border="0"><br><span message_id="230">AJXP_MESSAGE[230]</span></a>
