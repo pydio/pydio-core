@@ -362,7 +362,7 @@ Class.create("Diaporama", AbstractEditor, {
 
     navigatorMove : function(navigator){
         this.skipScrollObserver = true;
-        var ratioX  = this.imgContainer.getWidth() / navigator.containerWidth;
+        var ratioX  = (this.imgContainer.getWidth()+6) / (navigator.containerWidth);
         this.imgContainer.scrollLeft = parseInt(navigator.left * ratioX);
         var ratioY  = this.imgContainer.getHeight() / navigator.containerHeight;
         this.imgContainer.scrollTop = parseInt(navigator.top * ratioY);
@@ -424,17 +424,35 @@ Class.create("Diaporama", AbstractEditor, {
             theImage.stopObserving("mouseout");
             theImage.stopObserving("click");
             ov.update("").setStyle({border :"1px solid red", display: "block",backgroundColor:"rgba(0,0,0,0.2)"});
-            ov.draggableInitialized = new Draggable(ov, {onDrag:function(){
-                if(!theImage) return;
-                var offset = theImage.positionedOffset();
-                var coord = {
-                    top:parseInt(ov.getStyle("top"))-offset.top,
-                    left:parseInt(ov.getStyle("left"))-offset.left,
-                    containerWidth:ov.getWidth(),
-                    containerHeight:ov.getHeight()
-                };
-                this.navigatorMove(coord);
-            }.bind(this)});
+            ov.draggableInitialized = new Draggable(ov, {
+                onDrag:function(){
+                    if(!theImage) return;
+                    var offset = theImage.positionedOffset();
+                    var coord = {
+                        top:parseInt(ov.getStyle("top"))-offset.top,
+                        left:parseInt(ov.getStyle("left"))-offset.left,
+                        containerWidth:ov.getWidth(),
+                        containerHeight:ov.getHeight()
+                    };
+                    this.navigatorMove(coord);
+                }.bind(this),
+                snap:function(x,y,theDraggable){
+                    if(!theImage) return;
+                    var offset = theImage.positionedOffset();
+                    var imageDim = theImage.getDimensions();
+                    var objDim = theDraggable.element.getDimensions();
+                    function constrain(n, lower, upper) {
+                        if (n > upper) return upper;
+                        else if (n < lower) return lower;
+                        else return n;
+                    }
+                    return[
+                        constrain(x, 0, imageDim.width-objDim.width) + offset.left,
+                        constrain(y, 0, imageDim.height-objDim.height) + offset.top
+                    ];
+
+                }.bind(this)
+            });
         }
         return ov;
     },
