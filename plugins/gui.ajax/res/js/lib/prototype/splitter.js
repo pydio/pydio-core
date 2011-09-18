@@ -133,11 +133,15 @@ Class.create("Splitter", AjxpPane, {
 		this.resizeGroup(null, this.paneB._init || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 
         this.userLoggedObs = function(){
-			if(!ajaxplorer || !ajaxplorer.user) return;
-			var sizePref = ajaxplorer.user.getPreference(this.htmlElement.id + "_size");
+            var sizePref = this.getUserPreference("size");
+            var folded = this.getUserPreference("folded");
 			if(sizePref){
-				this.resizeAnimated(parseInt(sizePref));
+                if(folded) this.moveSplitter(parseInt(sizePref));
+                else this.resizeAnimated(parseInt(sizePref));
 			}
+            if(folded){
+                this.fold();
+            }
 		}.bind(this);
 		document.observe("ajaxplorer:user_logged",this.userLoggedObs);
 
@@ -145,8 +149,14 @@ Class.create("Splitter", AjxpPane, {
             if(event.memo.className == "Splitter::"+this.htmlElement.id){
                 var node = event.memo.classConfig.get("all");
                 var size = XPathSelectSingleNode(node, 'property[@name="resize"]');
+                var folded = XPathSelectSingleNode(node, 'property[@name="folded"]');
                 if(size){
-                    this.resizeAnimated(parseInt(size.getAttribute("value")));
+                    var sizeValue = parseInt(size.getAttribute("value"));
+                    if(folded && folded.getAttribute("value") == "true") this.moveSplitter(sizeValue);
+                    else this.resizeAnimated(sizeValue);
+                }
+                if(folded && folded.getAttribute("value") == "true"){
+                    this.fold();
                 }
             }
         }.bind(this);
@@ -280,6 +290,7 @@ Class.create("Splitter", AjxpPane, {
         new Effect.Tween(null, this.prefoldValue, 0, {afterFinish:function(){
             this.splitbar.addClassName('folded');
             this.effectWorking = false;
+            this.setUserPreference("folded", true);
         }.bind(this)}, function(p){
             this.moveSplitter(p, true, this.prefoldValue);
         }.bind(this) );
@@ -296,6 +307,7 @@ Class.create("Splitter", AjxpPane, {
         new Effect.Tween(null, 0, target, {afterFinish:function(){
             this.splitbar.removeClassName('folded');
             this.effectWorking = false;
+            this.setUserPreference("folded", false);
         }.bind(this) }, function(p){
             this.moveSplitter(p, true, target);
         }.bind(this) );
@@ -373,11 +385,8 @@ Class.create("Splitter", AjxpPane, {
 		if($(this.paneB).ajxpPaneObject){
 			$(this.paneB).ajxpPaneObject.resize();
 		}
-		if(ajaxplorer && ajaxplorer.user){
-			ajaxplorer.user.setPreference(this.htmlElement.id+'_size', this.getCurrentSize());
-			ajaxplorer.user.savePreference(this.htmlElement.id+'_size');
-		}
-	}, 
+        this.setUserPreference("size", this.getCurrentSize());
+	},
 	/**
 	 * Move the splitter object
 	 * @param np Integer
@@ -505,6 +514,10 @@ Class.create("Splitter", AjxpPane, {
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null));
     	}
     	this.resizeGroup(null, null, true);
+        if(!this.firstResizePassed){
+            this.userLoggedObs();
+            this.firstResizePassed = true;
+        }
     },
     /**
      * Show/hide widget (do nothing)

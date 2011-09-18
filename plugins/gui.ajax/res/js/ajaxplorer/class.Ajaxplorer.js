@@ -406,6 +406,7 @@ Class.create("Ajaxplorer", {
 	 * It will be the mission of each component to check whether its for him or not.
 	 */
 	refreshGuiComponentConfigs : function(){
+        this._guiComponentsConfigs = $H();
 		var nodes = XPathSelectNodes(this._registry, "client_configs/component_config");
 		if(!nodes.length) return;
 		for(var i=0;i<nodes.length;i++){
@@ -420,16 +421,23 @@ Class.create("Ajaxplorer", {
 	setGuiComponentConfig : function(domNode){
 		var className = domNode.getAttribute("className");
 		var classId = domNode.getAttribute("classId") || null;
-		var classConfig = this._guiComponentsConfigs.get(className) || new Hash();		
+		var classConfig = new Hash();
 		if(classId){
 			classConfig.set(classId, domNode);
 		}else{
 			classConfig.set('all', domNode);
 		}
-		this._guiComponentsConfigs.set(className,classConfig);
+        var cumul = this._guiComponentsConfigs.get(className);
+        if(!cumul) cumul = $A();
+		cumul.push(classConfig);
+        this._guiComponentsConfigs.set(className, cumul);
 		document.fire("ajaxplorer:component_config_changed", {className:className, classConfig:classConfig});
 	},
-	
+
+    getGuiComponentConfigs : function(className){
+        return this._guiComponentsConfigs.get(className);
+    },
+
 	/**
 	 * Try reading the cookie and sending it to the server
 	 */

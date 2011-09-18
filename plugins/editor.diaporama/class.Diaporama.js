@@ -53,12 +53,18 @@ Class.create("Diaporama", AbstractEditor, {
         var diapoSplitter = oFormObject.down("#diaporamaSplitter");
         var diapoInfoPanel = oFormObject.down("#diaporamaMetadataContainer");
         diapoSplitter.parentNode.setStyle({overflow:"hidden"});
-        this.splitter = new Splitter(diapoSplitter, {direction:"vertical","initA":250,minSize:0,fit:"height",fitParent:oFormObject.up(".dialogBox")});
+        this.splitter = new Splitter(diapoSplitter, {
+            direction:"vertical",
+            "initA":250,
+            minSize:0,
+            fit:"height",
+            fitParent:oFormObject.up(".dialogBox")
+        });
         this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:true});
-        if(window.info_panel){
-            this.infoPanel.registeredMimes = info_panel.registeredMimes;
-            this.infoPanel.mimesTemplates = info_panel.mimesTemplates;
-        }
+        var ipConfigs = ajaxplorer.getGuiComponentConfigs("InfoPanel");
+        ipConfigs.each(function(el){
+            this.infoPanel.parseComponentConfig(el.get("all"));
+        }.bind(this));
 
 		this.nextButton = this.actions.get("nextButton");
 		this.previousButton = this.actions.get("prevButton");
@@ -68,12 +74,13 @@ Class.create("Diaporama", AbstractEditor, {
 		this.actualSizeButton = this.actions.get('actualSizeButton');
 		this.fitToScreenButton = this.actions.get('fitToScreenButton');
 		
-		this.imgTag = this.element.select('img[id="mainImage"]')[0];
-		this.imgBorder = this.element.select('div[id="imageBorder"]')[0];
-		this.imgContainer = this.element.select('div[id="imageContainer"]')[0];
-		this.zoomInput = this.element.select('input[id="zoomValue"]')[0];	
-		this.timeInput = this.element.select('input[id="time"]')[0];
+		this.imgTag = this.element.down('img[id="mainImage"]');
+		this.imgBorder = this.element.down('div[id="imageBorder"]');
+		this.imgContainer = this.element.down('div[id="imageContainer"]');
+		this.zoomInput = this.actionBar.down('input[id="zoomValue"]');
+		this.timeInput = this.actionBar.down('input[id="time"]');
         this.floatingToolbarAnchor = this.imgContainer;
+        
         var id = this.imgContainer.parentNode.id;
         if(options.replaceScroller){
             this.scroller = new Element('div', {id:'ip_scroller_'+id, className:'scroller_track'});
@@ -248,6 +255,12 @@ Class.create("Diaporama", AbstractEditor, {
 			this.setFullScreen();
 			attachMobileScroll(this.imgContainer, "both");
 		}
+        if(this.splitter){
+            this.splitter.options.onDrag = function(){
+                this.resizeImage();
+                this.actionBarPlacer();
+            }.bind(this);
+        }
 	},
 	
 	resize : function(size){
@@ -383,9 +396,10 @@ Class.create("Diaporama", AbstractEditor, {
         var targetDim = navigatorImg.getDimensions();
         var ratioX = (targetDim.width) / (nav.width);
         var ratioY = (targetDim.height) / (nav.height);
+        var realLeftOffset = Math.max(offset.left, navigatorImg.parentNode.positionedOffset().left);
         overlay.setStyle({
             top: (Math.max(-nav.top, 0) * ratioY + offset.top) + 'px',
-            left: (Math.max(-nav.left,0) * ratioX + offset.left) + 'px',
+            left: (Math.max(-nav.left,0) * ratioX + realLeftOffset) + 'px',
             width: (Math.min(nav.containerWidth*ratioX, targetDim.width-shadowCorrection)) + "px",
             height: (Math.min(nav.containerHeight*ratioY, targetDim.height-shadowCorrection)) + "px"
         });
@@ -397,6 +411,7 @@ Class.create("Diaporama", AbstractEditor, {
             return ov;
         }
         var theImage = this.infoPanel.htmlElement.down("img");
+        if(!theImage) return;
         if(!ov){
             ov = new Element('div',{className:"imagePreviewOverlay"}).setStyle({
                 position:'absolute',
@@ -410,12 +425,13 @@ Class.create("Diaporama", AbstractEditor, {
             theImage.stopObserving("click");
             ov.update("").setStyle({border :"1px solid red", display: "block",backgroundColor:"rgba(0,0,0,0.2)"});
             ov.draggableInitialized = new Draggable(ov, {onDrag:function(){
+                if(!theImage) return;
                 var offset = theImage.positionedOffset();
                 var coord = {
                     top:parseInt(ov.getStyle("top"))-offset.top,
                     left:parseInt(ov.getStyle("left"))-offset.left,
-                    containerWidth:theImage.getWidth(),
-                    containerHeight:theImage.getHeight()
+                    containerWidth:ov.getWidth(),
+                    containerHeight:ov.getHeight()
                 };
                 this.navigatorMove(coord);
             }.bind(this)});
