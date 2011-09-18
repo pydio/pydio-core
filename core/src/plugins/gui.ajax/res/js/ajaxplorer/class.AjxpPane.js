@@ -151,6 +151,24 @@ Class.create("AjxpPane", {
 		this.htmlElement.observe("click", function(){
 			if(ajaxplorer) ajaxplorer.focusOn(this);
 		}.bind(this));
-	}
-	
+	},
+
+
+    getUserPreference : function(prefName){
+        if(!ajaxplorer || !ajaxplorer.user) return;
+        var gui_pref = ajaxplorer.user.getPreference("gui_preferences", true);
+        if(!gui_pref || !gui_pref[this.htmlElement.id+"_"+this.__className]) return;
+        return gui_pref[this.htmlElement.id+"_"+this.__className][prefName];
+    },
+
+    setUserPreference : function(prefName, prefValue){
+        if(!ajaxplorer || !ajaxplorer.user) return;
+        var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
+        if(!guiPref) guiPref = {};
+        if(!guiPref[this.htmlElement.id+"_"+this.__className]) guiPref[this.htmlElement.id+"_"+this.__className] = {};
+        guiPref[this.htmlElement.id+"_"+this.__className][prefName] = prefValue;
+        ajaxplorer.user.setPreference("gui_preferences", guiPref, true);
+        ajaxplorer.user.savePreference("gui_preferences");
+    }
+
 });
