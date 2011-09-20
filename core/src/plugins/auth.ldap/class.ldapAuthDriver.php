@@ -57,8 +57,15 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
-        if ($options["LDAP_FILTER"]) $this->ldapFilter = $options["LDAP_FILTER"];
-		if ($options["LDAP_USERATTR"]){ 
+        if ($options["LDAP_FILTER"]){
+            $this->ldapFilter = $options["LDAP_FILTER"];
+            if (!preg_match("/^\(.*\)$/", $this->ldapFilter)) {
+                $this->ldapFilter = "(" . $this->ldapFilter . ")";
+            }
+        } else {
+            $this->ldapFilter = "(objectClass=person)";
+        }
+        if ($options["LDAP_USERATTR"]){
 			$this->ldapUserAttr = $options["LDAP_USERATTR"]; 
 		}else{ 
 			$this->ldapUserAttr = 'uid' ; 
@@ -103,16 +110,19 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
 
-
+    function getUserEntries($login = null){
+        if ($login == null){
+            $filter = $this->ldapFilter;
+        } else {
+            $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
+        }
+        $ret = ldap_search($this->ldapconn,$this->ldapDN,$filter, array($this->ldapUserAttr));
+        return ldap_get_entries($this->ldapconn, $ret);
+    }
 
 
     function listUsers(){
-    	if ($this->ldapFilter === null){
-			$ret = ldap_search($this->ldapconn,$this->ldapDN,"objectClass=person", array($this->ldapUserAttr));
-		} else {
-			$ret = ldap_search($this->ldapconn,$this->ldapDN,$this->ldapFilter, array($this->ldapUserAttr));
-		}        
-		$entries = ldap_get_entries($this->ldapconn, $ret);
+		$entries = $this->getUserEntries();
         $persons = array();
         unset($entries['count']); // remove 'count' entry
         foreach($entries as $id => $person){
@@ -122,17 +132,14 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
 	function userExists($login){
-    	$ret = ldap_search($this->ldapconn,$this->ldapDN, $this->ldapUserAttr . "=" . $login, array($this->ldapUserAttr));
-		$entries = ldap_get_entries($this->ldapconn, $ret);
-
+        $entries = $this->getUserEntries($login);
 		if(!is_array($entries) || strcmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) return false;
 		return true;
     }
 
     function checkPassword($login, $pass, $seed){
        
-        $ret = ldap_search($this->ldapconn,$this->ldapDN, $this->ldapUserAttr . "=" . $login, array($this->ldapUserAttr));
-        $entries = ldap_get_entries($this->ldapconn, $ret);
+        $entries = $this->getUserEntries($login);
         if ($entries['count']>0) {
             if (@ldap_bind($this->ldapconn,$entries[0]["dn"],$pass)) {
                 AJXP_Logger::logAction('Ldap Password Check:Got user '.$entries[0]["cn"][0]);
