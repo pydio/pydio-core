@@ -61,6 +61,7 @@ class webdavAccessDriver extends fsAccessDriver
 		$create = $this->repository->getOption("CREATE");
 		$path = $this->repository->getOption("PATH");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
+        ConfService::setConf("PROBE_REAL_SIZE", false);
 		/*
 		if($create == true){
 			if(!is_dir($path)) @mkdir($path);
@@ -83,6 +84,9 @@ class webdavAccessDriver extends fsAccessDriver
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 		if(!is_dir($this->urlBase)){
+            if(webdavAccessWrapper::$lastException){
+                throw webdavAccessWrapper::$lastException;
+            }
 			throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
 		}
 		if($recycle != ""){
