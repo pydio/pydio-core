@@ -35,6 +35,10 @@
  */
 Class.create("Ajaxplorer", {
 
+    blockEditorShortcuts : false,
+    blockShortcuts : false,
+    blockNavigation : false,
+
 	/**
 	 * Constructor.
 	 * @param loadRep String A base folder to load after initialization is complete
@@ -1049,7 +1053,15 @@ Class.create("Ajaxplorer", {
 	enableNavigation: function(){
 		this.blockNavigation = false;
 	},
-	
+
+    disableAllKeyBindings : function(){
+       this.blockNavigation = this.blockShortcuts = this.blockEditorShortcuts = true;
+    },
+
+    enableAllKeyBindings : function(){
+       this.blockNavigation = this.blockShortcuts = this.blockEditorShortcuts = false;
+    },
+
 	/**
 	 * Unblocks all access keys
 	 */	

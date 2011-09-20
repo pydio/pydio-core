@@ -252,6 +252,17 @@ function disableTextSelection(target)
 	}
 }
 
+function enableTextSelection(element){
+    if (typeof element.onselectstart!="undefined")
+    { //IE route
+        element.onselectstart=function(){return true;};
+    }
+    else if (typeof element.style.MozUserSelect!="undefined")
+    { //Firefox route
+        element.style.MozUserSelect="text";
+    }
+}
+
 function testStringWidth(text){
 	if(!$('string_tester')){
 		$$('body')[0].insert(new Element('div',{id:'string_tester'}));

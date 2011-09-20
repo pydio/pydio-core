@@ -52,6 +52,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	public $driverConf;
 	protected $wrapperClassName;
 	protected $urlBase;
+    private static $loadedUserBookmarks;
 		
 	function initRepository(){
 		if(is_array($this->pluginConf)){
@@ -216,7 +217,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$chunkCount = intval($httpVars["chunk_count"]);
 				$fileId = $this->urlBase.$selection->getUniqueFile();
 				$sessionKey = "chunk_file_".md5($fileId.time());
-				$totalSize = filesize($fileId);
+				$totalSize = $this->filesystemFileSize($fileId);
 				$chunkSize = intval ( $totalSize / $chunkCount ); 
 				$realFile  = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $fileId, true);
 				$chunkData = array(
@@ -598,7 +599,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$startTime = microtime();
 				
 				$dir = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($dir));
-				$path = $this->urlBase.($dir!= ""?"/".$dir:"");	
+				$path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
 				$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
 				if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
 				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
@@ -801,16 +802,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         $metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
         $metaData["bytesize"] = 0;
         if($isLeaf){
-            $metaData["bytesize"] = filesize($ajxpNode->getUrl());
-            if(method_exists($this->wrapperClassName, "getLastRealSize")){
-                $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
-                if($last !== false){
-                    $metaData["bytesize"] = $last;
-                }
-            }
-            if($metaData["bytesize"] < 0){
-                $metaData["bytesize"] = sprintf("%u", $metaData["bytesize"]);
-            }
+            $metaData["bytesize"] = $this->filesystemFileSize($ajxpNode->getUrl());
         }
         $metaData["filesize"] = AJXP_Utils::roundSize($metaData["bytesize"]);
         if(AJXP_Utils::isBrowsableArchive($nodeName)){
@@ -818,6 +810,25 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         }
 
         //}
+
+        if(!isSet(self::$loadedUserBookmarks)){
+            $user = AuthService::getLoggedUser();
+            if($user == null){
+                self::$loadedUserBookmarks = false;
+            }else{
+                self::$loadedUserBookmarks = $user->getBookmarks();
+            }
+        }
+        if(self::$loadedUserBookmarks !== false){
+            foreach(self::$loadedUserBookmarks as $bookmark){
+                if($bookmark["PATH"] == $ajxpNode->getPath()) {
+                    $ajxpNode->mergeMetadata(array(
+                        "ajxp_bookmarked"=>"true",
+                        "ajxp_overlay_icon" =>"bookmark"));
+                }
+            }
+        }
+
         $ajxpNode->mergeMetadata($metaData);
 
     }
@@ -919,16 +930,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
             if($data){
                 $size = strlen($filePathOrData);
             }else{
-                $size = filesize($filePathOrData);
-                if(method_exists($this->wrapperClassName, "getLastRealSize")){
-                    $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
-                    if($last !== false){
-                        $size = $last;
-                    }
-                }
-                if($size < 0){
-                    $size = sprintf("%u", $size);
-                }
+                $size = $this->filesystemFileSize($filePathOrData);
             }
 		}else{
 			$size = $byteLength;
@@ -1123,7 +1125,22 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			call_user_func(array($this->wrapperClassName, "changeMode"), $filePath, $chmodValue);
 		}		
 	}
-	
+
+    function filesystemFileSize($filePath){
+        $bytesize = filesize($filePath);
+        if(method_exists($this->wrapperClassName, "getLastRealSize")){
+            $last = call_user_func(array($this->wrapperClassName, "getLastRealSize"));
+            if($last !== false){
+                $bytesize = $last;
+            }
+        }
+        if($bytesize < 0){
+            $bytesize = sprintf("%u", $bytesize);
+        }
+
+        return $bytesize;
+    }
+
 	/**
 	 * Extract an archive directly inside the dest directory.
 	 *

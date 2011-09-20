@@ -65,6 +65,7 @@ class SerialMetaManager extends AJXP_Plugin {
 		$even = false;
 		$searchables = array();
         $index = 0;
+        $fieldType = "text";
 		foreach ($def as $key=>$label){
             if(isSet($visibilities[$index])){
                 $lastVisibility = $visibilities[$index];
@@ -78,17 +79,23 @@ class SerialMetaManager extends AJXP_Plugin {
 			if($key == "stars_rate"){
 				$col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
 				$col->setAttribute("sortType", "CellSorterValue");
+                $fieldType = "stars_rate";
 			}else if($key == "css_label"){
 				$col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
-				$col->setAttribute("sortType", "CellSorterValue");				
+				$col->setAttribute("sortType", "CellSorterValue");
+                $fieldType = "css_label";
+            }else if(substr($key,0,5) == "area_"){
+                $searchables[$key] = $label;
+                $fieldType = "textarea";
 			}else{
 				$searchables[$key] = $label;
+                $fieldType = "text";
 			}
 			$contrib->appendChild($col);
 			
 			$trClass = ($even?" class=\"even\"":"");
 			$even = !$even;
-			$cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue" id="ip_'.$key.'">#{'.$key.'}</td></tr>';
+			$cdataParts .= '<tr'.$trClass.'><td class="infoPanelLabel">'.$label.'</td><td class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</td></tr>';
 		}
 		
 		$selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');

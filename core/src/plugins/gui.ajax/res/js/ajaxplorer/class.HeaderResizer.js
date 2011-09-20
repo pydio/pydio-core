@@ -50,7 +50,7 @@ Class.create("HeaderResizer", {
 			bodyRowSelector : 'tr',
 			bodyCellSelector : 'td',
 			bodyIsMaster : false,
-			handleWidth : 3,
+			handleWidth : 1,
 			headerData : null,			
 			useCSS3 : false
 		}, options || { });

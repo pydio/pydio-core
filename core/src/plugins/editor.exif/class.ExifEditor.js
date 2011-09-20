@@ -58,7 +58,7 @@ Class.create("ExifEditor", AbstractEditor, {
 		$super(userSelection);
 		var fileName = userSelection.getUniqueFileName();
 		// LOAD FILE NOW
-		this.contentMainContainer = new Element("div", {id:"exifContainer",style:"overflow:auto;background-image:url('"+ajxpResourcesFolder+"/images/strip.png');font-family:Trebuchet MS"});
+		this.contentMainContainer = new Element("div", {id:"exifContainer",style:"overflow:auto;font-family:Trebuchet MS"});
 		this.element.insert(this.contentMainContainer);
 		fitHeightToBottom($(this.contentMainContainer), $(modal.elementName));
 		this.updateTitle(getBaseName(fileName));

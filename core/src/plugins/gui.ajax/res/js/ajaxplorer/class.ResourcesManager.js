@@ -150,7 +150,7 @@ Class.create("ResourcesManager", {
 		var cssNode = new Element('link', {
 			type : 'text/css',
 			rel  : 'stylesheet',
-			href : fileName,
+			href : fileName+"?v="+window.ajxpBootstrap.parameters.get("ajxpVersion"),
 			media : 'screen'
 		});
 		head.insert(cssNode);

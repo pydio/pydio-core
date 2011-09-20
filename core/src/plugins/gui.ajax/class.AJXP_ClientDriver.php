@@ -208,13 +208,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				if(count($confErrors)){
 					$START_PARAMETERS["ALERT"] = implode(", ", array_values($confErrors));
 				}
-				
-				if(isSet($_COOKIE["AJXP_LAST_KNOWN_VERSION"]) && $_COOKIE["AJXP_LAST_KNOWN_VERSION"] != AJXP_VERSION){
-					$mess = ConfService::getMessages();
-					$START_PARAMETERS["ALERT"] = sprintf($mess[392], AJXP_VERSION);
-				}
-				setcookie("AJXP_LAST_KNOWN_VERSION", AJXP_VERSION, time() + 3600*24*365, "/");
-				
+
 				$JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
                 $crtTheme = $this->pluginConf["GUI_THEME"];
 				if(ConfService::getConf("JS_DEBUG")){
@@ -320,7 +314,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
         }
-        $value = str_replace("AJXP_CLIENT_RESOURCES_FOLDER", CLIENT_RESOURCES_FOLDER, $value);
+        $value = str_replace(array("AJXP_CLIENT_RESOURCES_FOLDER", "AJXP_CURRENT_VERSION"), array(CLIENT_RESOURCES_FOLDER, AJXP_VERSION), $value);
         if(isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])){
             $value = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"]."plugins/gui.ajax/res/themes/".$theme, $value);
         }else{

@@ -342,7 +342,7 @@ Class.create("EmlViewer", AbstractEditor, {
 	
 	attachmentCellRenderer : function(element, ajxpNode, type){
 		if(ajxpNode.getMetadata().get("eml_attachments") == "0") {
-			if(type == "row") element.update(' ');
+			if(type == "row") element.update('<span class="text_label"> </span>');
 			return;
 		}
 		element.setStyle({
@@ -351,7 +351,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			backgroundPosition: (type=="thumb" ? '2px 2px': '5px 4px')
 		});
 		if(type == "row"){
-			element.update(' ');
+			element.update('<span class="text_label"> </span>');
 		}
 		element.setAttribute("title", ajxpNode.getMetadata().get("eml_attachments")+" attachments");
 	}
