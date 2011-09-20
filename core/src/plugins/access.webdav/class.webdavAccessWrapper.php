@@ -39,6 +39,8 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 
 class webdavAccessWrapper extends fsAccessWrapper {		
 
+    public static $lastException;
+
     /**
      * Initialize the stream from the given path. 
      * Concretely, transform ajxp.webdav:// into webdav://
@@ -50,10 +52,19 @@ class webdavAccessWrapper extends fsAccessWrapper {
     	$url = parse_url($path);
     	$repoId = $url["host"];
     	$repoObject = ConfService::getRepositoryById($repoId);
-    	if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
+    	if(!isSet($repoObject)) {
+            $e = new Exception("Cannot find repository with id ".$repoId);
+            self::$lastException = $e;
+            throw $e;
+        }
 		$path = $url["path"];
 		$host = $repoObject->getOption("HOST");
 		$hostParts = parse_url($host);
+        if($hostParts["scheme"] == "https" && !extension_loaded("openssl")){
+            $e = new Exception("Warning you must have the openssl PHP extension loaded to connect an https server!");
+            self::$lastException = $e;
+            throw $e;
+        }
 		$credentials = AJXP_Safe::tryLoadingCredentialsFromSources($hostParts, $repoObject);
 		$user = $credentials["user"];
 		$password = $credentials["password"];
@@ -78,6 +89,7 @@ class webdavAccessWrapper extends fsAccessWrapper {
 			$path = substr($path, 1);
 		}
 		// SHOULD RETURN webdav://host_server/uri/to/webdav/folder
+        AJXP_Logger::debug($host.$basePath."/".$path);
 		return $host.$basePath."/".$path;
     }    
     
@@ -203,8 +215,9 @@ class webdavAccessWrapper extends fsAccessWrapper {
 	}
 
 	public static function changeMode($path, $chmodValue){
-		$realPath = self::initPath($path, "file");
-		chmod($realPath, $chmodValue);
+        // DO NOTHING!
+		//$realPath = self::initPath($path, "file");
+		//chmod($realPath, $chmodValue);
 	}
 }
 ?>
