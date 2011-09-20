@@ -165,7 +165,10 @@ Class.create("Connexion", {
 	 * @param onLoadedCode Function Callback
 	 */
 	loadLibrary : function(fileName, onLoadedCode){
-		var path = (this._libUrl?this._libUrl+'/'+fileName:fileName);
+        if(window.ajxpBootstrap && window.ajxpBootstrap.parameters.get("ajxpVersion") && fileName.indexOf("?")==-1){
+            fileName += "?v="+window.ajxpBootstrap.parameters.get("ajxpVersion");
+        }
+        var path = (this._libUrl?this._libUrl+'/'+fileName:fileName);
 		new Ajax.Request(path,
 		{
 			method:'get',

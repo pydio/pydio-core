@@ -102,71 +102,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="mkdir">			
-			<gui text="154" title="155" src="folder_new.png" accessKey="folder_access_key" hasAccessKey="true">
-				<context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="put" inZip="false"></context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[					
-					modal.showDialogForm('Create', 'mkdir_form', null, function(){
-						var oForm = $(modal.getForm());	
-						var elementToCheck=(oForm['dirname']);
-						if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
-						{
-							alert(MessageHash[125]);
-							return false;
-						}
-						ajaxplorer.actionBar.submitForm(oForm);				
-						hideLightBox(true);
-						return false;
-					});
-					]]></clientCallback>
-				<clientForm id="mkdir_form"><![CDATA[
-				<div id="mkdir_form" action="mkdir" box_width="200">
-				AJXP_MESSAGE[173]<br/>
-				<input type="text" name="dirname" size="30" class="dialogFocus">
-				</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
-		<action name="mkfile">
-			<gui text="156" title="157" src="filenew.png" accessKey="file_access_key" hasAccessKey="true">
-				<context selection="false" dir="true" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					modal.showDialogForm('Create', 'mkfile_form', null, function(){
-						var oForm = $(modal.getForm());	
-						var elementToCheck=(oForm['filename']);
-						if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
-						{
-							alert(MessageHash[125]);
-							return false;
-						}
-						ajaxplorer.actionBar.submitForm(oForm);				
-						hideLightBox(true);
-						return false;
-					});
-					]]></clientCallback>
-				<clientForm id="mkfile_form"><![CDATA[
-				<div id="mkfile_form" action="mkfile" box_width="200">
-				AJXP_MESSAGE[174]<br/>
-				<input type="text" name="filename" size="30" class="dialogFocus">
-				</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
 		<action name="download" fileDefault="true">
 			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get">
+					actionBarGroup="put">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
@@ -373,12 +313,75 @@
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
-		</action>						
+		</action>
+        <action name="open_with">
+            <gui text="316" title="316" src="fileopen.png" accessKey="open_with_access" hasAccessKey="true">
+                <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+                    actionBar="true" contextMenu="true" infoPanel="false"
+                    actionBarGroup="put" inZip="false">
+                </context>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+            <subMenu>
+                <dynamicBuilder><![CDATA[
+                    var context = window.builderContext;
+                    context.builderMenuItems = $A([]);
+                    var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
+                    var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                    if(editors.length){
+                        var index = 0;
+                        var sepAdded = false;
+                        editors.each(function(el){
+                            if(!el.openable) return;
+                            if(el.mimes.include('*')){
+                                if(!sepAdded && index > 0){
+                                    context.builderMenuItems.push({separator:true});
+                                }
+                                sepAdded = true;
+                            }
+                            context.builderMenuItems.push({
+                                name:el.text,
+                                alt:el.title,
+                                isDefault : (index == 0),
+                                image:resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
+                                callback:function(e){this.apply([el]);}.bind(context)
+                            } );
+                            index++;
+                        } );
+                    }
+                    if(!index){
+                        context.builderMenuItems.push({
+                            name:MessageHash[324],
+                            alt:MessageHash[324],
+                            image:resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
+                            callback:function(e){}
+                        } );
+                    }
+                ]]></dynamicBuilder>
+            </subMenu>
+            <processing>
+                <clientCallback prepareModal="false"><![CDATA[
+                    var editorData = window.actionArguments[0];
+                    if(!editorData){
+                        var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
+                        var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                        if(editors.length){
+                            editorData = editors[0];
+                        }
+                    }
+                    if(editorData){
+                        ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                        modal.openEditorDialog(editorData);
+                    }
+                ]]></clientCallback>
+                <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+        </action>
 		<action name="public_url">
 			<gui text="292" title="292" src="public_url.png" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get">
+					actionBarGroup="put">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false" unique="true"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
@@ -620,69 +623,6 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>		
-		<action name="open_with">
-			<gui text="316" title="316" src="fileopen.png" accessKey="open_with_access" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="get" inZip="false">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE" behaviour="hidden"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
-			<subMenu>
-				<dynamicBuilder><![CDATA[
-					var context = window.builderContext;
-					context.builderMenuItems = $A([]);					
-					var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-					var editors = ajaxplorer.findEditorsForMime(selectedMime);
-					if(editors.length){
-						var index = 0;
-						var sepAdded = false;
-						editors.each(function(el){							
-							if(!el.openable) return;
-							if(el.mimes.include('*')){
-								if(!sepAdded && index > 0){ 	
-									context.builderMenuItems.push({separator:true});
-								}
-								sepAdded = true;
-							}
-							context.builderMenuItems.push({
-								name:el.text,
-								alt:el.title,
-								isDefault : (index == 0),
-								image:resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
-								callback:function(e){this.apply([el]);}.bind(context)
-							} );
-							index++;
-						} );					
-					}
-					if(!index){
-						context.builderMenuItems.push({
-							name:MessageHash[324],
-							alt:MessageHash[324],
-							image:resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
-							callback:function(e){}
-						} );					
-					}
-				]]></dynamicBuilder>
-			</subMenu>			
-			<processing>			
-				<clientCallback prepareModal="false"><![CDATA[		
-					var editorData = window.actionArguments[0];
-					if(!editorData){
-						var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
-						var editors = ajaxplorer.findEditorsForMime(selectedMime);
-						if(editors.length){
-							editorData = editors[0];							
-						}					
-					}
-					if(editorData){
-						ajaxplorer.loadEditorResources(editorData.resourcesManager);
-						modal.openEditorDialog(editorData);
-					}
-				]]></clientCallback>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
 		<action name="stat">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"></rightsContext>
 			<processing>
@@ -701,38 +641,6 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>		
-		<action name="chmod">
-			<gui text="287" title="287" src="ksysv.png" accessKey="" hasAccessKey="false">
-				<context selection="true" dir="true" recycle="hidden"  behaviour="hidden"
-					actionBar="false" contextMenu="true" infoPanel="true"
-					actionBarGroup="put" inZip="false">
-				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false" allowedMimes="" behaviour="hidden"></selectionContext></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getUserSelection();					
-					var loadFunc = function(oForm){
-						ajaxplorer.actionBar.propertyPane = new PropertyPanel(userSelection, oForm);
-					};
-					var completeFunc = function(){
-						if(!ajaxplorer.actionBar.propertyPane.valueChanged()){
-							hideLightBox();
-							return false;					
-						}
-						userSelection.updateFormOrUrl(modal.getForm());
-						ajaxplorer.actionBar.submitForm(modal.getForm());
-						hideLightBox();
-						return false;
-					};
-					modal.showDialogForm('Edit Online', 'properties_box', loadFunc, completeFunc);
-					]]></clientCallback>
-				<clientForm id="properties_box"><![CDATA[
-					<div id="properties_box" action="chmod" box_width="180"></div>				
-				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-		</action>
 		<action name="restore">
 			<gui text="222" title="223" src="folder1_important.png" accessKey="restore_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="only"
@@ -759,6 +667,66 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+        <action name="mkdir">
+            <gui text="154" title="155" src="folder_new.png" accessKey="folder_access_key" hasAccessKey="true">
+                <context selection="false" dir="true" recycle="hidden" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="change" inZip="false"></context>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+                    modal.showDialogForm('Create', 'mkdir_form', null, function(){
+                        var oForm = $(modal.getForm());
+                        var elementToCheck=(oForm['dirname']);
+                        if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
+                        {
+                            alert(MessageHash[125]);
+                            return false;
+                        }
+                        ajaxplorer.actionBar.submitForm(oForm);
+                        hideLightBox(true);
+                        return false;
+                    });
+                    ]]></clientCallback>
+                <clientForm id="mkdir_form"><![CDATA[
+                <div id="mkdir_form" action="mkdir" box_width="200">
+                AJXP_MESSAGE[173]<br/>
+                <input type="text" name="dirname" size="30" class="dialogFocus">
+                </div>
+                ]]></clientForm>
+                <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+        </action>
+        <action name="mkfile">
+            <gui text="156" title="157" src="filenew.png" accessKey="file_access_key" hasAccessKey="true">
+                <context selection="false" dir="true" recycle="hidden"
+                    actionBar="false" contextMenu="true" infoPanel="false"
+                    actionBarGroup="change" inZip="false">
+                </context></gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+                    modal.showDialogForm('Create', 'mkfile_form', null, function(){
+                        var oForm = $(modal.getForm());
+                        var elementToCheck=(oForm['filename']);
+                        if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
+                        {
+                            alert(MessageHash[125]);
+                            return false;
+                        }
+                        ajaxplorer.actionBar.submitForm(oForm);
+                        hideLightBox(true);
+                        return false;
+                    });
+                    ]]></clientCallback>
+                <clientForm id="mkfile_form"><![CDATA[
+                <div id="mkfile_form" action="mkfile" box_width="200">
+                AJXP_MESSAGE[174]<br/>
+                <input type="text" name="filename" size="30" class="dialogFocus">
+                </div>
+                ]]></clientForm>
+                <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+        </action>
 		<action name="rename">
 			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
@@ -1008,6 +976,38 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
+        <action name="chmod">
+            <gui text="287" title="287" src="ksysv.png" accessKey="" hasAccessKey="false">
+                <context selection="true" dir="true" recycle="hidden"  behaviour="hidden"
+                    actionBar="false" contextMenu="true" infoPanel="true"
+                    actionBarGroup="change" inZip="false">
+                </context>
+                <selectionContext dir="true" file="true" recycle="false" unique="false" allowedMimes="" behaviour="hidden"></selectionContext></gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+                    var userSelection =  ajaxplorer.getUserSelection();
+                    var loadFunc = function(oForm){
+                        ajaxplorer.actionBar.propertyPane = new PropertyPanel(userSelection, oForm);
+                    };
+                    var completeFunc = function(){
+                        if(!ajaxplorer.actionBar.propertyPane.valueChanged()){
+                            hideLightBox();
+                            return false;
+                        }
+                        userSelection.updateFormOrUrl(modal.getForm());
+                        ajaxplorer.actionBar.submitForm(modal.getForm());
+                        hideLightBox();
+                        return false;
+                    };
+                    modal.showDialogForm('Edit Online', 'properties_box', loadFunc, completeFunc);
+                    ]]></clientCallback>
+                <clientForm id="properties_box"><![CDATA[
+                    <div id="properties_box" action="chmod" box_width="180"></div>
+                ]]></clientForm>
+                <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

@@ -56,7 +56,8 @@ Class.create("IMagickPreviewer", Diaporama, {
 			var text = this.currentIM + ' ('+MessageHash[331]+' '+i+' '+MessageHash[332]+' '+this.items.length+')';
 			this.updateTitle(text);
 		}.bind(this);
-		
+
+        this.resize();
 	},
 	
 	open : function($super, userSelection)

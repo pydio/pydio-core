@@ -159,11 +159,11 @@ Class.create("AjxpBootstrap", {
 			window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder') + "/themes/" + this.parameters.get("theme");
 		}
 		if(this.parameters.get('additional_js_resource')){
-			connexion.loadLibrary(this.parameters.get('additional_js_resource'));
+			connexion.loadLibrary(this.parameters.get('additional_js_resource?v='+this.parameters.get("ajxpVersion")));
 		}
 		this.insertLoaderProgress();
 		if(!this.parameters.get("debugMode")){
-			connexion.loadLibrary("ajaxplorer.js");
+			connexion.loadLibrary("ajaxplorer.js?v="+this.parameters.get("ajxpVersion"));
 		}
 		window.MessageHash = this.parameters.get("i18nMessages");
 		for(var key in MessageHash){
@@ -188,13 +188,15 @@ Class.create("AjxpBootstrap", {
 	 */
 	detectBaseParameters : function(){
 		$$('script').each(function(scriptTag){
-			if(scriptTag.src.match("/js/ajaxplorer_boot.js") || scriptTag.src.match("/js/ajaxplorer_boot_protolegacy.js") || scriptTag.src.match("/js/ajaxplorer/class.AjxpBootstrap.js")){
-				if(scriptTag.src.match("/js/ajaxplorer_boot.js") || scriptTag.src.match("/js/ajaxplorer_boot_protolegacy.js")){
+			if(scriptTag.src.match("/js/ajaxplorer_boot") || scriptTag.src.match("/js/ajaxplorer/class.AjxpBootstrap.js")){
+				if(scriptTag.src.match("/js/ajaxplorer_boot")){
 					this.parameters.set("debugMode", false);
 				}else{
 					this.parameters.set("debugMode", true);
 				}
-				this.parameters.set("ajxpResourcesFolder", scriptTag.src.replace('/js/ajaxplorer/class.AjxpBootstrap.js','').replace('/js/ajaxplorer_boot.js', '').replace('/js/ajaxplorer_boot_protolegacy.js', ''));
+                var src = scriptTag.src.replace('/js/ajaxplorer/class.AjxpBootstrap.js','').replace('/js/ajaxplorer_boot.js', '').replace('/js/ajaxplorer_boot_protolegacy.js', '');
+                if(src.indexOf("?")!=-1) src = src.split("?")[0];
+				this.parameters.set("ajxpResourcesFolder", src);
 			}
 		}.bind(this) );
 		if(this.parameters.get("ajxpResourcesFolder")){
@@ -240,7 +242,7 @@ Class.create("AjxpBootstrap", {
 			if(customWording.welcomeMessage){
 				html+= customWording.welcomeMessage + '<br>';
 			}
-			html+='	<div style="position:absolute;bottom: 16px;right: 160px;"><span id="loaderProgress">0%</span></div><div id="progressState">Booting...</div>';
+			html+='	<div style="position:absolute;bottom: 16px;right: 160px;"><span id="loaderProgress"></span></div><div id="progressState">Booting...</div>';
 			html+='	</div></div>';
 		}
 		$$('body')[0].insert({top:html});

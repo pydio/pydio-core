@@ -257,7 +257,7 @@ Class.create("Diaporama", AbstractEditor, {
 		}
         if(this.splitter){
             this.splitter.options.onDrag = function(){
-                this.resizeImage();
+                this.resizeImage(false);
                 this.actionBarPlacer();
             }.bind(this);
         }
@@ -276,7 +276,7 @@ Class.create("Diaporama", AbstractEditor, {
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 			}
 		}
-		this.resizeImage();
+		this.resizeImage(true);
         if(this.splitter){
             this.splitter.resize();
         }
@@ -361,20 +361,19 @@ Class.create("Diaporama", AbstractEditor, {
 	},
 
     navigatorMove : function(navigator){
+        // Empiric 50 value ...
         this.skipScrollObserver = true;
-        var ratioX  = (this.imgContainer.getWidth()+6) / (navigator.containerWidth);
-        this.imgContainer.scrollLeft = parseInt(navigator.left * ratioX);
-        var ratioY  = this.imgContainer.getHeight() / navigator.containerHeight;
-        this.imgContainer.scrollTop = parseInt(navigator.top * ratioY);
-        if(this.navigatorTimer) window.clearTimeout(this.navigatorTimer);
-        this.navigatorTimer = window.setTimeout(function(){
-            this.skipScrollObserver = false;
-        }.bind(this),500);
+        var ratioX  = (this.imgContainer.getWidth()+50) / (navigator.containerWidth);
+        this.imgContainer.scrollLeft = Math.min(parseInt(navigator.left * ratioX), this.imgContainer.scrollWidth);
+        var ratioY  = (this.imgContainer.getHeight()+50) / navigator.containerHeight;
+        this.imgContainer.scrollTop = Math.min(parseInt(navigator.top * ratioY), this.imgContainer.scrollHeight);
     },
 
     imageNavigator : function(navigator){
         var shadowCorrection = ($$('html')[0].hasClassName('boxshadow')?3:0);
         if(this.skipScrollObserver) return;
+        var overlay = this.getNavigatorOverlay();
+        if(!overlay) return;
 
         var nav = {};
         var img = this.imgBorder;
@@ -390,7 +389,6 @@ Class.create("Diaporama", AbstractEditor, {
         nav.containerWidth = this.imgContainer.getWidth();
         nav.containerHeight = this.imgContainer.getHeight();
 
-        var overlay = this.getNavigatorOverlay();
         var navigatorImg = overlay.next("img");
         var offset = navigatorImg.positionedOffset();
         var targetDim = navigatorImg.getDimensions();
@@ -425,9 +423,16 @@ Class.create("Diaporama", AbstractEditor, {
             theImage.stopObserving("click");
             ov.update("").setStyle({border :"1px solid red", display: "block",backgroundColor:"rgba(0,0,0,0.2)"});
             ov.draggableInitialized = new Draggable(ov, {
+                onStart : function(){
+                    this.skipScrollObserver = true;
+                }.bind(this),
+                onEnd : function(){
+                    this.skipScrollObserver = false;
+                }.bind(this),
                 onDrag:function(){
                     if(!theImage) return;
                     var offset = theImage.positionedOffset();
+                    var dim = theImage.getDimensions();
                     var coord = {
                         top:parseInt(ov.getStyle("top"))-offset.top,
                         left:parseInt(ov.getStyle("left"))-offset.left,
@@ -465,7 +470,7 @@ Class.create("Diaporama", AbstractEditor, {
 
     updateInfoPanel:function(){
         if(!this.infoPanel) return;
-        if(!this.currentFile || !this.nodes.get(this.currentFile)) return;
+        if(!this.currentFile || !this.nodes || !this.nodes.get(this.currentFile)) return;
         var node = this.nodes.get(this.currentFile);
         this.infoPanel.update(node);
     },
@@ -478,7 +483,7 @@ Class.create("Diaporama", AbstractEditor, {
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
 		this.downloadButton.addClassName("disabled");
-		new Effect.Opacity(this.imgTag, {afterFinish : function(){			
+		new Effect.Opacity(this.imgTag, {afterFinish : function(){
 			this.jsImageLoading = true;
 			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile);
 			if(!this.crtWidth && !this.crtHeight){
@@ -643,9 +648,10 @@ Class.create("Diaporama", AbstractEditor, {
 				});
 			}
             var off = theImage.positionedOffset();
+            var realLeftOffset = Math.max(off.left, theImage.parentNode.positionedOffset().left);
 			theImage.previewOpener.setStyle({
                 display:'block',
-                left: off.left + 'px',
+                left: realLeftOffset + 'px',
                 width:theImage.getWidth() + "px",
                 top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight()) + "px"
             });

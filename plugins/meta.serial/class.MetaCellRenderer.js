@@ -135,24 +135,88 @@ Class.create("MetaCellRenderer", {
 	},
 	
 	infoPanelModifier : function(htmlElement){
-		var td = htmlElement.select('#ip_stars_rate')[0];
-		if(td){
-			var obj = new MetaCellRenderer();
-			var value = parseInt(td.innerHTML);
-			td.update(obj.createStars(value));
-		}
-		td = htmlElement.select('#ip_css_label')[0];
-		if(td){
-			var obj = new MetaCellRenderer();
-			var value = td.innerHTML.strip();
-			var rule = obj.findCssRule(value);
-			if(rule){
-				td.addClassName(rule.cssClass);
-				td.update(rule.label);
-			}
-		}				
+        var obj = new MetaCellRenderer();
+        htmlElement.select('[data-metatype]').each(function(td){
+            var metaType = td.readAttribute("data-metatype");
+            switch(metaType){
+                case "stars_rate":
+                    var value = parseInt(td.innerHTML);
+                    td.update(this.createStars(value));
+                break;
+                case "css_label":
+                    var value = td.innerHTML.strip();
+                    var rule = this.findCssRule(value);
+                    if(rule){
+                        td.addClassName(rule.cssClass);
+                        td.update(rule.label);
+                    }
+                break;
+                case "text":
+                case "textarea":
+                    if(typeof td.contentEditable != 'undefined'){
+                        enableTextSelection(td);
+                        var editableDiv = new Element("div", {
+                            contentEditable:"true",
+                            title : "Click to edit inline",
+                            style:"min-height:16px;float:left;width:86%;cursor:pointer;"}).update(td.innerHTML);
+                        td.update(editableDiv);
+                        obj.linkEditableDiv(editableDiv);
+                    }
+                break;
+                default:
+                break;
+            }
+        }.bind(obj));
 	},
-	
+
+    linkEditableDiv : function(div){
+        div.saver = new Element("img", {src:"plugins/gui.ajax/res/themes/umbra/images/actions/22/dialog_ok_apply.png"}).setStyle({
+            float:"left",
+            width: "22px",
+            height:"22px",
+            cursor:"pointer",
+            border:"none"
+        });
+        div.saver.observe("click", function(){
+            if(div.saver.removerTimeout){
+                window.clearTimeout(div.saver.removerTimeout);
+            }
+            var selectedNode = ajaxplorer.getUserSelection().getUniqueNode();
+            var conn = new Connexion();
+            conn.setMethod("POST");
+            conn.setParameters(new Hash({
+                get_action  : 'edit_serial_meta',
+                file	    : selectedNode.getPath()
+            }));
+            conn.addParameter(id, div.textContent);
+            conn.onComplete = function(){
+                div.saver.remove();
+                ajaxplorer.enableAllKeyBindings();
+                ajaxplorer.getContextHolder().setPendingSelection(selectedNode.getPath());
+                ajaxplorer.fireContextRefresh();
+            };
+            conn.sendAsync();
+        });
+
+        div.observe("focus", function(event){
+            var source = event.target;
+            id = source.up("td").id.substring(3);
+            source.insert({after:source.saver});
+            ajaxplorer.disableAllKeyBindings();
+            window.setTimeout(function(){
+                document.observeOnce("click", function(clickEvent){
+                    if(clickEvent.target != source) source.blur();
+                });
+            }, 500);
+        }).observe("blur", function(event){
+            ajaxplorer.enableAllKeyBindings();
+            event.target.saver.removerTimeout = window.setTimeout(function(){
+                event.target.saver.remove();
+            }, 500);
+        });
+
+    },
+
 	formPanelStars: function(formElement, form){
 		var value = formElement.value;
 		var obj = new MetaCellRenderer();

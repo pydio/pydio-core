@@ -1551,7 +1551,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	keydown: function (event)
 	{
-		if(this.blockNavigation) return false;
+		if(ajaxplorer.blockNavigation || this.blockNavigation) return false;
 		if(event.keyCode == 9 && !ajaxplorer.blockNavigation) return false;
 		if(!this.hasFocus) return true;
 		var keyCode = event.keyCode;

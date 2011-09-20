@@ -102,7 +102,7 @@ class ConfService
 		$this->initUniquePluginImplInst("CONF_DRIVER", "conf");
 		$this->initUniquePluginImplInst("AUTH_DRIVER", "auth");		        
 		$this->configs["REPOSITORIES"] = $this->initRepositoriesListInst($this->configs["DEFAULT_REPOSITORIES"]);
-		$this->switchRootDirInst();		
+		//$this->switchRootDirInst();
 	}
 	
 	public static function getErrors(){
@@ -218,10 +218,12 @@ class ConfService
 			if($temporary && isSet($_SESSION['REPO_ID'])){
 				$crtId = $_SESSION['REPO_ID'];
 				$_SESSION['SWITCH_BACK_REPO_ID'] = $crtId;
-				AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
+				//AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
 				//register_shutdown_function(array("ConfService","switchRootDir"), $crtId);
 			}else{
-				AJXP_Logger::debug("switching back to $rootDirIndex");			
+                $crtId = $_SESSION['REPO_ID'];
+                $_SESSION['PREVIOUS_REPO_ID'] = $crtId;
+				//AJXP_Logger::debug("switching back to $rootDirIndex");
 			}
 			$this->configs["REPOSITORY"] = $this->configs["REPOSITORIES"][$rootDirIndex];			
 			$_SESSION['REPO_ID'] = $rootDirIndex;
@@ -239,7 +241,7 @@ class ConfService
 		
 		if($rootDirIndex!=-1 && AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 			$loggedUser = AuthService::getLoggedUser();
-			$loggedUser->setPref("history_last_repository", $rootDirIndex);
+			$loggedUser->setArrayPref("history", "last_repository", $rootDirIndex);
 			$loggedUser->save();
 		}	
 				
@@ -636,7 +638,11 @@ class ConfService
 		}catch (Exception $e){
 			// Remove repositories from the lists
 			unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
-			$this->switchRootDir();
+            if(isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()){
+                $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
+            }else{
+                $this->switchRootDir();
+            }
 			throw $e;
 		}
 		$pServ->setPluginUniqueActiveForType("access", $accessType);			
