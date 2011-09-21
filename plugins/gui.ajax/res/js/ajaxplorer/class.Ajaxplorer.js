@@ -453,7 +453,10 @@ Class.create("Ajaxplorer", {
 			connexion.addParameter('userid', rememberData.user);
 			connexion.addParameter('password', rememberData.pass);
 			connexion.addParameter('cookie_login', 'true');
-			connexion.onComplete = function(transport){this.actionBar.parseXmlMessage(transport.responseXML);}.bind(this);
+			connexion.onComplete = function(transport){
+                hideLightBox();
+                this.actionBar.parseXmlMessage(transport.responseXML);
+            }.bind(this);
 			connexion.sendAsync();	
 		}
 	},

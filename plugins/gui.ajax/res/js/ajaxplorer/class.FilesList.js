@@ -429,8 +429,9 @@ Class.create("FilesList", SelectableElements, {
 				headerData.push({label:label, size:userWidth, leftPadding:leftPadding});				
 			}
 			buffer = '<div id="selectable_div_header" class="sort-table"></div>';
-			buffer = buffer + '<div id="table_rows_container" style="overflow:auto;"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
+			buffer = buffer + '<div id="table_rows_container"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			this.htmlElement.update(buffer);
+            $('table_rows_container').setStyle((this.gridStyle!="grid")?{overflowX:"hidden",overflowY:"auto"}:{overflow:"auto"});
 			attachMobileScroll("table_rows_container", "vertical");
 			oElement = $('selectable_div');
 			
