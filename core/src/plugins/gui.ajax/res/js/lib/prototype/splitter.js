@@ -146,6 +146,10 @@ Class.create("Splitter", AjxpPane, {
 		document.observe("ajaxplorer:user_logged",this.userLoggedObs);
 
         this.compConfigObs = function(event){
+            if(!this.htmlElement){
+                document.stopObserving("ajaxplorer:component_config_changed", this.compConfigObs);
+                return;
+            }
             if(event.memo.className == "Splitter::"+this.htmlElement.id){
                 var node = event.memo.classConfig.get("all");
                 var size = XPathSelectSingleNode(node, 'property[@name="resize"]');
