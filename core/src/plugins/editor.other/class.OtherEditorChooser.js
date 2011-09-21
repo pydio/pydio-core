@@ -61,6 +61,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 	},
 	
 	selectEditor : function(event){
+        Event.stop(event);
 		if(!event.target.editorData) return;
 		ajaxplorer.loadEditorResources(event.target.editorData.resourcesManager);
 		hideLightBox();
