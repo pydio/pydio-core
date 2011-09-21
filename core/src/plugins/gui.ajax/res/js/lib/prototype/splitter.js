@@ -140,7 +140,7 @@ Class.create("Splitter", AjxpPane, {
                 else this.resizeAnimated(parseInt(sizePref));
 			}
             if(folded){
-                this.fold();
+                this.foldWithoutAnim();
             }
 		}.bind(this);
 		document.observe("ajaxplorer:user_logged",this.userLoggedObs);
@@ -156,7 +156,7 @@ Class.create("Splitter", AjxpPane, {
                     else this.resizeAnimated(sizeValue);
                 }
                 if(folded && folded.getAttribute("value") == "true"){
-                    this.fold();
+                    this.foldWithoutAnim();
                 }
             }
         }.bind(this);
@@ -169,7 +169,7 @@ Class.create("Splitter", AjxpPane, {
 		this.splitbar.draggable = false;
         disableTextSelection(this.group);
         if(this.options.startFolded){
-            this.fold();
+            this.foldWithoutAnim();
         }
 	},
 
@@ -311,6 +311,13 @@ Class.create("Splitter", AjxpPane, {
         }.bind(this) }, function(p){
             this.moveSplitter(p, true, target);
         }.bind(this) );
+    },
+
+    foldWithoutAnim : function(){
+        this.prefoldValue = this.options.getAdjust(this.paneA);
+        this.moveSplitter(0, true, this.prefoldValue);
+        this.splitbar.addClassName('folded');
+        this.setUserPreference("folded", true);
     },
 
     resizeAnimated : function(size){

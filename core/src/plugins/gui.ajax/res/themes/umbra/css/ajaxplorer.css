@@ -181,15 +181,17 @@ textarea{
 
 #selectable_div div.selected{
    border: 1px solid #ddd;
+    /*
 	-webkit-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
 	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
+	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);*/
 }
 #selectable_div div.selected-focus{
    border: 1px solid #73A2D7 !important;
+    /*
 	-webkit-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
 	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
-	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
+	box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);*/
 }
 
 .thumbLabel
@@ -1906,6 +1908,7 @@ meta_opt.checked {
 	overflow:auto;
     background-color: #fff;
     font-family: Arial, Verdana, Sans-serif;
+    font-size: 12px;
     border-radius: 2px;
     -webkit-box-shadow: 0px 0px 2px #aaa;
     -moz-box-shadow: 0px 0px 2px #aaa;

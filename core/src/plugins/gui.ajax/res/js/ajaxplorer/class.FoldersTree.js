@@ -48,7 +48,7 @@ Class.create("FoldersTree", AjxpPane, {
 		$super(oElement, options);
 		this.treeContainer = new Element('div', {id:'tree_container', style:'overflow:auto;height:100%;width:100%;'});
         if(this.options.replaceScroller){
-            this.scroller = new Element('div', {id:'tree_scroller', className:'scroller_track'});
+            this.scroller = new Element('div', {id:'tree_scroller', className:'scroller_track', style:"right:"+(parseInt(oElement.getStyle("marginRight"))-parseInt(oElement.getStyle("paddingRight")))+"px"});
             this.scroller.insert('<div id="scrollbar_handle" class="scroller_handle"></div>');
             oElement.insert(this.scroller);
             this.treeContainer.setStyle({overflow:"hidden"});

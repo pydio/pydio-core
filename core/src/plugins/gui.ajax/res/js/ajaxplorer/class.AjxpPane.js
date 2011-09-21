@@ -88,6 +88,9 @@ Class.create("AjxpPane", {
 	 * Implementation of the IAjxpWidget methods
 	 */	
 	destroy : function(){
+        this.childrenPanes.each(function(child){
+            child.destroy();
+        });
         this.htmlElement.update("");
 		this.htmlElement = null;
 	},
