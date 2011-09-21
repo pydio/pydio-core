@@ -67,10 +67,12 @@
 			var dropzone = $('content_pane');
 			dropzone.addClassName('droparea');
 			var dragOverFunc = function(event) {
+			    dropzone.addClassName("dropareaHover");
   				event.preventDefault();
 			};
 			var dropFunc = function(event) {
   				event.preventDefault();
+  				dropzone.removeClassName("dropareaHover");
   				if(event.dataTransfer.files.length){
 	  				window.UploaderDroppedFiles = event.dataTransfer.files;
 	  				ajaxplorer.actionBar.fireAction('upload');

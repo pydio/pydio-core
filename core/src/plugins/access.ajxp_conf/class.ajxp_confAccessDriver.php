@@ -307,7 +307,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$user->save();
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.45"].$httpVars["user_id"], null);
-				AJXP_XMLWriter::reloadFileList(false);
+				AJXP_XMLWriter::reloadCurrentNode(true);
 				AJXP_XMLWriter::close();
 				
 			break;
@@ -570,7 +570,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AuthService::updateUser($loggedUser);
 					
 					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.52"], null);
-					AJXP_XMLWriter::reloadFileList($newRep->getDisplay());
+					AJXP_XMLWriter::reloadDataNode("", $newRep->getUniqueId());
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();
@@ -713,7 +713,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.53"]);
 				}else{
 					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.54"], null);					
-					AJXP_XMLWriter::reloadDataNode("", (isSet($httpVars["newLabel"])?AJXP_Utils::decodeSecureMagic($httpVars["newLabel"]):false));
+					AJXP_XMLWriter::reloadDataNode("", (isSet($httpVars["newLabel"])?$repId:false));
 					AJXP_XMLWriter::reloadRepositoryList();
 				}
 				AJXP_XMLWriter::close();		

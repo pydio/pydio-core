@@ -77,7 +77,7 @@ Class.create("AudioPreviewer", AbstractEditor, {
 			}			
 			return div;
 		}else{
-			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64)});
+			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
 		}
 	},
 	
@@ -87,7 +87,7 @@ Class.create("AudioPreviewer", AbstractEditor, {
 	
 	createFolderPlayer : function(ajxpNode){
 		var template = new Template('<head><title>#{window_title}</title></head><body style="margin:0px; padding:10px;"><div style=\"font-family:Trebuchet MS, sans-serif; color:#79f; font-size:15px; font-weight:bold;\">#{window_title}</div><div style="font-family:Trebuchet MS, sans-serif; color:#666; font-size:10px; padding-bottom: 10px;">#{reading_folder}: #{current_folder}</div><object type="application/x-shockwave-flash" data="plugins/editor.audio/dewplayer-playlist.swf" width="240" height="200"><param name="wmode" value="transparent"><param name="movie" value="plugins/editor.audio/dewplayer-playlist.swf"/><param name="flashvars" value="xml=#{playlist_url}&amp;showtime=true&amp;autoreplay=true&amp;autoplay=true"/></object></body>');
-		newWin = window.open('#', '_blank', 'width=260,height=270,directories=no,location=no,menubar=no,resizeable=yes,scrollbars=no,status=no,toolbar=no');
+		var newWin = window.open('#', '_blank', 'width=260,height=270,directories=no,location=no,menubar=no,resizeable=yes,scrollbars=no,status=no,toolbar=no');
 		try{
 			var playlist_url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'%26get_action=ls%26skip_history=true%26playlist=true%26dir='+base64_encode(ajxpNode.getPath());
 			newWin.document.write(template.evaluate({

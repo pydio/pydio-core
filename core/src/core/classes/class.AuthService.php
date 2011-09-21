@@ -311,7 +311,8 @@ class AuthService
 	static function updateDefaultRights(&$userObject){
 		if(!$userObject->hasParent()){
 			foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
-			{			
+			{
+                if($repoObject->isTemplate) continue;
 				if($repoObject->getDefaultRight() != ""){
 					$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
 				}

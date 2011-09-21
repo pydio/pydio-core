@@ -136,6 +136,9 @@ class ImagePreviewer extends AJXP_Plugin {
 		if(!$isImage) return;
 		$setRemote = false;
 		$remoteWrappers = $this->pluginConf["META_EXTRACTION_REMOTEWRAPPERS"];
+        if(is_string($remoteWrappers)){
+            $remoteWrappers = explode(",",$remoteWrappers);
+        }
 		$remoteThreshold = $this->pluginConf["META_EXTRACTION_THRESHOLD"];		
 		if(in_array($wrapperClassName, $remoteWrappers)){
 			if($remoteThreshold != 0 && isSet($ajxpNode->bytesize)){

@@ -109,7 +109,8 @@ Class.create("IMagickPreviewer", Diaporama, {
 	getPreview : function(ajxpNode){
 		var img = new Element('img', {
 			src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode), 
-			style:'border:1px solid #676965;'
+			style:'border:1px solid #676965;',
+            align:'absmiddle'
 		});
 		img.resizePreviewElement = function(dimensionObject){			
 			var imgDim = {
