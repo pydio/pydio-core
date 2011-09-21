@@ -605,7 +605,11 @@ Class.create("Diaporama", AbstractEditor, {
 	 * @returns {___img1}
 	 */
 	getPreview : function(ajxpNode){
-		var img = new Element('img', {src:Diaporama.prototype.getThumbnailSource(ajxpNode), border:0});
+		var img = new Element('img', {
+            src:Diaporama.prototype.getThumbnailSource(ajxpNode),
+            border:0,
+            align:"absmiddle"
+        });
 		var div = new Element('div');
 		div.insert(img);
 		div.resizePreviewElement = function(dimensionObject){			

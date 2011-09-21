@@ -265,7 +265,7 @@ Class.create("AjxpBootstrap", {
 							$('loading_overlay').remove();
 							$('progressBox').remove();
 						}
-					});					
+					});
 					return false;
 				}
 				return true ;

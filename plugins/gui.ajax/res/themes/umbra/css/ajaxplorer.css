@@ -1576,6 +1576,7 @@ div#upload_files_list div, div#multiple_download_container div
    padding-top: 6px;   
    padding-bottom: 6px; 
    padding-left: 6px;
+   position:relative;
 }
 #upload_files_list img
 {

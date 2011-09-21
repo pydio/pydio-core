@@ -5,7 +5,7 @@
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
-					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true">
+					actionBar="false" actionBarGroup="put" contextMenu="true" infoPanel="true">
 				</context>
 				<selectionContext dir="true" file="true" recycle="false"
 					unique="true" allowedMimes="AJXP_MIMES_ZIP">
@@ -89,7 +89,8 @@
 		</action>
 		<action name="empty_recycle">
 			<gui text="220" title="221" src="trashcan_empty.png" accessKey="empty_recycle_access_key" hasAccessKey="true">
-				<context selection="false" dir="true" recycle="only" actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="default"></context>
+				<context selection="false" dir="true" recycle="only" actionBar="true"
+                         contextMenu="true" infoPanel="false" actionBarGroup="change"></context>
 			</gui>
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>
@@ -102,7 +103,7 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 		</action>
-		<action name="download" fileDefault="true">
+		<action name="download" fileDefault="false">
 			<gui text="88" title="88" src="download_manager.png" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
@@ -314,7 +315,7 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
-        <action name="open_with">
+        <action name="open_with" fileDefault="true">
             <gui text="316" title="316" src="fileopen.png" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"

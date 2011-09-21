@@ -399,9 +399,11 @@ class AJXP_XMLWriter
 		{		
 			$toLast = false;
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
+			if($repoObject->isTemplate) continue;
 			if($repoObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
 				continue;
-			}				
+			}
+            if($repoObject->hasOwner()) continue;
 			$rightString = " r=\"".($role->canRead($repoId)?"1":"0")."\" w=\"".($role->canWrite($repoId)?"1":"0")."\"";
 			$string = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label></repo>";
 			if($toLast){

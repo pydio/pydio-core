@@ -395,8 +395,8 @@ Class.create("XHRUploader", {
 			width:'154px'
 		});
 		var percentText = new Element('span', {style:"float:right;display:block;width:30px;text-align:center;"});
-		var statusText = new Element('span', {style:"float:right;display:block;width:90px;overflow:hidden;text-align:right;"});
-		var container = new Element('div', {style:'border:medium none;margin-top:-5px;padding:0;width:280px;color: #777;'});
+		var statusText = new Element('span', {style:"float:right;display:block;width:66px;overflow:hidden;text-align:right;"});
+		var container = new Element('div', {style:'border:none;padding:0;padding-right:5px;color: #777;'});
 		container.insert(statusText);		
 		container.insert(percentText);		
 		container.insert(div);
