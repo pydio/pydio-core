@@ -225,7 +225,7 @@ Class.create("InfoPanel", AjxpPane, {
             this.scroller.setStyle({height:parseInt(this.contentContainer.getHeight())+'px'});
             this.scrollbar.recalculateLayout();
         }
-		if(this.currentPreviewElement && this.currentPreviewElement.visible()){
+		if(this.htmlElement && this.currentPreviewElement && this.currentPreviewElement.visible()){
 			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));
 			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:150});
 		}
