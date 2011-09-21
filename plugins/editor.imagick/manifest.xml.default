@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.imagick" openable="true" previewProvider="true" formId="diaporama_box" text="328" title="329" icon="frame_image.png" className="IMagickPreviewer" mimes="pdf,svg,tif,tiff,psd,xcf,eps" label="Image Magick" description="Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.">
+	<server_settings>
+		<global_param name="IMAGE_MAGICK_CONVERT" type="string" label="Convert Path" description="Full path on the server to the 'convert' binary" default="" mandatory="true"/> 
+		<global_param name="IM_THUMB_QUALITY" type="string" label="Thumbs Quality" description="Quality used for generating the thumbnails" default="65"/> 
+		<global_param name="IM_VIEWER_QUALITY" type="string" label="Viewer Quality" description="Quality used for generation the high scale images" default="90"/> 
+	</server_settings>
 	<class_definition filename="plugins/editor.imagick/class.IMagickPreviewer.php" classname="IMagickPreviewer"/>
 	<resources>
 		<js file="plugins/editor.imagick/class.IMagickPreviewer.js" className="IMagickPreviewer"/>
