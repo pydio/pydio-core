@@ -113,7 +113,7 @@ Class.create("AbstractEditor" , {
 				var aK = link.getAttribute('access_key');
 				if(Event[aK]) aK = Event[aK];
 				this.registeredActions.set(aK, link.id);
-                title += " (" + aK + ")";
+                if(!(!isNaN(parseFloat(aK)) && isFinite(aK))) title += " (" + aK + ")";
 			}
             link.setAttribute("title", title);
 		}, this);

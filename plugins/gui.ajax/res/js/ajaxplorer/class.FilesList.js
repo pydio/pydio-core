@@ -1275,7 +1275,7 @@ Class.create("FilesList", SelectableElements, {
 			var tW, tH, mT, mB;
 			if(image_element.resizePreviewElement && image_element.getAttribute("is_loaded") == "true")
 			{
-				image_element.resizePreviewElement({width:tSize, height:tSize, margin:defaultMargin});
+				image_element.resizePreviewElement({width:tSize, height:tSize, marginTop:defaultMargin,marginBottom:1});
 			}
 			else
 			{

@@ -276,7 +276,7 @@ Class.create("Diaporama", AbstractEditor, {
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 			}
 		}
-		this.resizeImage(true);
+		this.resizeImage(false);
         if(this.splitter){
             this.splitter.resize();
         }
@@ -342,7 +342,9 @@ Class.create("Diaporama", AbstractEditor, {
 				duration:0.5,
 				afterFinish : function(){
 					this.imgTag.setStyle({height:height+'px', width:width+'px'});
-					new Effect.Opacity(this.imgTag, {from:0,to:1.0, duration:0.3});
+                    if(this.imgTag.getStyle("opacity") == 0){
+    					new Effect.Opacity(this.imgTag, {from:0,to:1.0, duration:0.3});
+                    }
 				}.bind(this)
 			});
 		}else{

@@ -273,7 +273,9 @@ function testStringWidth(text){
 }
 
 function fitRectangleToDimension(rectDim, targetDim){
-	var defaultMargin = targetDim.margin || 0;	
+    var defaultMarginTop = (targetDim.marginTop?targetDim.marginTop:(targetDim.margin?targetDim.margin:0));
+    var defaultMarginBottom = (targetDim.marginBottom?targetDim.marginBottom:(targetDim.margin?targetDim.margin:0));
+	//var defaultMargin = targetDim.margin || 0;
 	if(rectDim.width >= rectDim.height)
 	{				
 		tW = targetDim.width;
@@ -281,10 +283,11 @@ function fitRectangleToDimension(rectDim, targetDim){
 		if(targetDim.maxHeight && tH > targetDim.maxHeight){
 			tH = targetDim.maxHeight;
 			tW = parseInt(rectDim.width / rectDim.height * tH);
-			mT = mB = defaultMargin;
+			mT = defaultMarginTop;
+            mB = defaultMarginBottom;
 		}else{
-			mT = parseInt((tW - tH)/2) + defaultMargin;
-			mB = tW+(defaultMargin*2)-tH-mT-1;				
+			mT = parseInt((tW - tH)/2) + defaultMarginTop;
+			mB = tW+(defaultMarginTop + defaultMarginBottom)-tH-mT-1;
 		}
 	}
 	else
@@ -292,7 +295,8 @@ function fitRectangleToDimension(rectDim, targetDim){
 		tH = targetDim.height;
 		if(targetDim.maxHeight) tH = Math.min(targetDim.maxHeight, tH);
 		tW = parseInt(rectDim.width / rectDim.height * tH);
-		mT = mB = defaultMargin;
+        mT = defaultMarginTop;
+        mB = defaultMarginBottom;
 	}
 	return styleObj = {width:tW+'px', height:tH+'px', marginTop:mT+'px', marginBottom:mB+'px'};	
 }

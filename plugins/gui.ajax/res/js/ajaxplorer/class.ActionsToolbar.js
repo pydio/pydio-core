@@ -313,7 +313,11 @@ Class.create("ActionsToolbar", {
 			if(!submenuItem.src || !action.options.subMenuUpdateImage) return;
 			var images = button.select('img[id="'+action.options.name +'_button_icon"]');
 			if(!images.length) return;
-			images[0].src = resolveImageSource(submenuItem.src, action.__DEFAULT_ICON_PATH,22);
+            icSize = 22;
+            if(this.options.stylesImgSizes && this.style && this.options.stylesImgSizes[this.style]){
+                icSize = this.options.stylesImgSizes[this.style];
+            }
+			images[0].src = resolveImageSource(submenuItem.src, action.__DEFAULT_ICON_PATH,icSize);
 			action.options.src = submenuItem.src;
 		}.bind(this));
 	},
