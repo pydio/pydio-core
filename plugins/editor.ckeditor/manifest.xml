@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.ckeditor" openable="true" order="-1" text="319" title="320" icon="ckeditor_images/html_edit.png" className="AjxpCkEditor" mimes="html,htm" formId="edit_box" write="true" label="CKEditor" description="Wysiwyg HTML Editor, requires separate library to be downloaded.">
+<editor id="editor.ckeditor" enabled="false" openable="true" order="-1" text="319" title="320" icon="ckeditor_images/html_edit.png" className="AjxpCkEditor" mimes="html,htm" formId="edit_box" write="true" label="CKEditor" description="Wysiwyg HTML Editor, requires separate library to be downloaded.">
 	<dependencies>
 		<pluginResources pluginName="editor.text"/>
 		<!-- Stream Wrapper Access -->
