@@ -432,7 +432,7 @@ Class.create("Modal", {
 				$$('body')[0].insert(this.tooltip);
 			}
 			this.tooltip.update(title);
-			this.tooltip.setStyle({top:y,left:x});
+			this.tooltip.setStyle({top:y+"px",left:x+"px"});
 			if(this.tipTimer){
 				window.clearTimeout(this.tipTimer);
 			}

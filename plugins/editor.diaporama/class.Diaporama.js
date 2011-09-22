@@ -625,7 +625,7 @@ Class.create("Diaporama", AbstractEditor, {
 				/*position:'relative',*/
 				display:'inline'
 			});
-            $(div.parentNode).setStyle({position:"relative"});
+            if($(div.parentNode)) $(div.parentNode).setStyle({position:"relative"});
 		};
 		img.observe("mouseover", function(event){
 			var theImage = event.target;
