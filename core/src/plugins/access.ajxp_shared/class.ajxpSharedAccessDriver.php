@@ -341,7 +341,8 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
             $repoObject =& $repos[$repoIndex];
             $repoAccesses = array();
 			foreach ($users as $userId => $userObject) {
-				if(!$userObject->hasParent()) continue;
+				//if(!$userObject->hasParent()) continue;
+                if($userObject->getId() == $loggedUser->getId()) continue;
 				if($userObject->canWrite($repoIndex)){
 					$repoAccesses[] = $userId." (rw)";
 				}else if($userObject->canRead($repoIndex)){

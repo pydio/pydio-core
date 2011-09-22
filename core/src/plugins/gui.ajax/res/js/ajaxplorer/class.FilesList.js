@@ -750,6 +750,7 @@ Class.create("FilesList", SelectableElements, {
 			var oImageToLoad = this.imagesHash.unset(this.imagesHash.keys()[0]);		
 			window.loader = new Image();
 			window.loader.editorClass = oImageToLoad.editorClass;
+            window.loader.onerror = this.loadNextImage.bind(this);
 			window.loader.src = window.loader.editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);
 			var loader = function(){
 				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);

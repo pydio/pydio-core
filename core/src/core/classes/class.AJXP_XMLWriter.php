@@ -352,7 +352,7 @@ class AJXP_XMLWriter
 				// Do not display shared repositories otherwise.
 				if($loggedUser != null && $rootDirObject->hasOwner() && !$loggedUser->hasParent()){
                     // Display the repositories if allow_crossusers is ok
-                    if(ConfService::getConf("ALLOW_CROSSUSERS_SHARING") !== true) continue;
+                    if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true) continue;
                     // But still do not display its own shared repositories!
                     if($rootDirObject->getOwner() == $loggedUser->getId()) continue;
                 }
