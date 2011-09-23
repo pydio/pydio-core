@@ -284,8 +284,12 @@ Class.create("Ajaxplorer", {
 		var ajxpId = domNode.readAttribute("id") || "";
 		var ajxpOptions = {};
 		if(domNode.readAttribute("ajxpOptions")){
-			ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
-		}		
+            try{
+                ajxpOptions = domNode.readAttribute("ajxpOptions").evalJSON();
+            }catch(e){
+                alert("Error while parsing JSON for GUI template part " + ajxpId + "!");
+            }
+		}
 		if(ajxpClass && ajxpId && Class.objectImplements(ajxpClass, "IAjxpWidget")){
 			compRegistry.push({ajxpId:ajxpId, ajxpNode:domNode, ajxpClass:ajxpClass, ajxpOptions:ajxpOptions});
 		}		

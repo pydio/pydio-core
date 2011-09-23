@@ -13,7 +13,7 @@
 				</script>
 			]]></template>
 			<template name="main" element="ajxp_desktop" position="top"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}" style="text-align:center;font-size:1.2em; line-height:1.3em; font-family:Helvetica; background-color: white;">					
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}' style="text-align:center;font-size:1.2em; line-height:1.3em; font-family:Helvetica; background-color: white;">
 				
 					<div style="width:80%;padding:10px; margin:0px auto; ">Do you know that there is a dedicated iPhone/iPad application for AjaXplorer?</div>
 					<a id="ajxpserver-redir" class="m-2" style="width:80%; padding:10px; margin:10px auto; font-size:0.8em;" href="#">Yes I have it already, add this server to my AjaXplorer iOS remote servers</a><br>

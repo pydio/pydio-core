@@ -240,6 +240,11 @@ Class.create("Diaporama", AbstractEditor, {
 		if(window.ajxpMobile){
 			this.setFullScreen();
 			attachMobileScroll(this.imgContainer, "both");
+            if(this.splitter) {
+                window.setTimeout(function(){
+                    if(!this.splitter.splitbar.hasClassName("folded")) this.splitter.fold();
+                }.bind(this),2000);
+            }
 		}
         if(this.splitter){
             this.splitter.options.onDrag = function(){
