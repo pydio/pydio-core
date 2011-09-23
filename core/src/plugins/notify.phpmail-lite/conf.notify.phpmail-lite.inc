@@ -34,7 +34,8 @@ $DRIVER_CONF = array(
 		array("address" => "test2@yourdomain.com", "name" => "Name 2"),
 	),
 	"SUBJECT" => "New upload on server!",
-	"BODY" 	  => "A new file is being uploaded on the server by the user <b>%user</b>",	
+    // you can use AJXP_USER, AJXP_FILE, AJXP_FOLDER and AJXP_ACTION keywords.
+	"BODY" 	  => "A new file is being uploaded on the server by the user <b>AJXP_USER</b>",
 	"MAILER" => "sendmail" // use "mail" or "sendmail", see PHPMailerLite documentation
 );
 ?>

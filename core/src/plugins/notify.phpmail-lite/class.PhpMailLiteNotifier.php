@@ -29,10 +29,19 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 		
 	public function preProcess($action, $httpVars, $fileVars){
 		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["TO"])){
-			throw new Exception("Cannot find configuration for plugin notify.phpmail-lite! Make sur the .inc file was dropped inside the /conf/ folder!");
+			throw new Exception("Cannot find configuration for plugin notify.phpmail-lite! Make sur that you have filled the options in the GUI, or that the .inc file was dropped inside the /conf/ folder!");
 		}
 		require("lib/class.phpmailer-lite.php");
-		
+
+        // Parse options
+        if(is_string($this->pluginConf["FROM"])) {
+            $this->pluginConf["FROM"] = $this->parseStringOption($this->pluginConf["FROM"]);
+        }
+        if(is_string($this->pluginConf["TO"])){
+            $froms = explode(",", $this->pluginConf["TO"]);
+            $this->pluginConf["TO"] = array_map(array($this, "parseStringOption"), $froms);
+        }
+
 		$mail = new PHPMailerLite(true);
 		$mail->Mailer = $this->pluginConf["MAILER"];		
 		$mail->SetFrom($this->pluginConf["FROM"]["address"], $this->pluginConf["FROM"]["name"]);
@@ -44,7 +53,23 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 		$mail->IsHTML(true);                                  // set email format to HTML
 		
 		$mail->Subject = $this->pluginConf["SUBJECT"];
-		$mail->Body = str_replace("%user", AuthService::getLoggedUser()->getId(), $this->pluginConf["BODY"]);
+        $userSelection = new UserSelection();
+        $userSelection->initFromHttpVars($httpVars);
+        $folder = $httpVars["dir"];
+        $file = "";
+        if(!$userSelection->isEmpty()){
+            $file = implode(",", array_map("basename", $userSelection->getFiles()));
+        }
+        if($action == "upload" && isset($fileVars["userfile_0"])){
+            $file = $fileVars["userfile_0"]["name"];
+        }
+        $subject = array("%user", "AJXP_USER", "AJXP_FILE", "AJXP_FOLDER", "AJXP_ACTION");
+        $replace = array(AuthService::getLoggedUser()->getId(),
+                         AuthService::getLoggedUser()->getId(),
+                         $file,
+                         $folder,
+                         $action);
+		$mail->Body = str_replace($subject, $replace, $this->pluginConf["BODY"]);
 		$mail->AltBody = strip_tags($mail->Body);
 		
 		if(!$mail->Send())
@@ -55,6 +80,20 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 		}
 		
 	}
+
+    /**
+     * @param $option String
+     * @return array
+     */
+    function parseStringOption($option){
+        if(strstr($option, ":")){
+            list($name, $ad) = explode(":", $option);
+            $option = array("address" => $ad, "name" => $name);
+        }else{
+            $option = array("address" => $option, "name" => $option);
+        }
+        return $option;
+    }
 
 }
 
