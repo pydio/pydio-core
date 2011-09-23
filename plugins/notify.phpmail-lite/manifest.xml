@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <notify id="notify.phpmail-lite" enabled="false" label="Simple Notification" description="Notification system (demonstrative)">
+    <client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+        <!-- Tests for custom data
+        <resources>
+            <js file="plugins/notify.phpmail-lite/class.NotifierFormEnricher.js" className="NotifierFormEnricher" autoload="true"/>
+        </resources>
+        -->
+    </client_settings>
+    <server_settings>
+        <global_param name="FROM" type="string" label="Sender" description="Name and adress of the sender, use Name:mail_address format." mandatory="true" default=""/>
+        <global_param name="TO" type="string" label="Recipient(s)" description="Comma separated list of recipients, e.g Name1:address1,Name2:address2, etc" mandatory="true" default=""/>
+        <global_param name="SUBJECT" type="string" label="Subject" description="Subject to be displayed in the mail" mandatory="true" default=""/>
+        <global_param name="BODY" type="string" label="Body" description="Body of the email. You can use AJXP_USER, AJXP_FILE, AJXP_FOLDER and AJXP_ACTION keywords." mandatory="false" default=""/>
+        <global_param name="MAILER" type="select" choices="sendmail|sendmail,mail|mail" label="Mailer" description="Php mailer to use (see phpmail-lite documentation).'." mandatory="false" default="sendmail"/>
+    </server_settings>
 	<registry_contributions>
 		<actions>
 			<!-- Notify Upload Action -->
@@ -7,8 +21,8 @@
 				<pre_processing>
 					<serverCallback methodName="preProcess"/>
 				</pre_processing>
-			</action>					
-		</actions>	
+			</action>
+		</actions>
 	</registry_contributions>
 	<dependencies>
 		<activePlugin pluginName="access.fs|access.ftp"/>
