@@ -133,6 +133,7 @@ Class.create("Action", {
 	 */
 	apply: function(){
 		if(this.deny) return;
+        document.fire("ajaxplorer:beforeApply-"+this.options.name);
 		if(this.options.prepareModal){
 			modal.prepareHeader(
 				this.options.title, 
@@ -179,6 +180,7 @@ Class.create("Action", {
 			this.notify("submenu_active", arguments[0][0]);
 		}
 		window.actionArguments = null;
+        document.fire("ajaxplorer:afterApply-"+this.options.name);
 	},
 		
 	/**
