@@ -226,7 +226,7 @@ Class.create("AjxpBootstrap", {
 			}else{
 				html+='	<div style="padding:4px 7px;position: relative;"><div>The web data-browser<span id="version_span"></span></div>';
 			}
-			html+='	Written by Charles du Jeu - LGPL License. <br>';
+			html+='	Written by Charles du Jeu - AGPL License. <br>';
 			if(customWording.welcomeMessage){
 				html+= customWording.welcomeMessage + '<br>';
 			}
