@@ -30,6 +30,9 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 		var node = userSelection.getUniqueNode();
 		var allEditors = this.findActiveEditors(node.getAjxpMime());
 		var selector = this.element.down('#editor_selector');
+        if(window.ajxpMobile){
+            attachMobileScroll(selector, "vertical");
+        }
 		var even = false;
 		allEditors.each(function(el){
 			if(el.editorClass == "OtherEditorChooser") return;

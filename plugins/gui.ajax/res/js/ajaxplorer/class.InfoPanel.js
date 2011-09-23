@@ -30,7 +30,6 @@ Class.create("InfoPanel", AjxpPane, {
 	 */
 	initialize: function($super, htmlElement, options){
 		$super(htmlElement, options);
-		attachMobileScroll(htmlElement, "vertical");
 		disableTextSelection(htmlElement);
         var id = htmlElement.id;
         var container = new Element("div", {className:"panelContent", id:"ip_content_"+id});
@@ -43,6 +42,9 @@ Class.create("InfoPanel", AjxpPane, {
         this.htmlElement.insert(container);
         if(options.replaceScroller){
             this.scrollbar = new Control.ScrollBar('ip_content_'+id,'ip_scroller_'+id, {fixed_scroll_distance:50});
+        }
+        if(window.ajxpMobile){
+            attachMobileScroll(container, "vertical");
         }
         
         this.contentContainer = container;
