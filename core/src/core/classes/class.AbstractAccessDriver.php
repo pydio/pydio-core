@@ -324,10 +324,20 @@ class AbstractAccessDriver extends AJXP_Plugin {
 			$userObject->setParent($loggedUser->id);			
 		}
 		
-		// CREATE SHARED OPTIONS		
+		// CREATE SHARED OPTIONS
+        $options = $this->makeSharedRepositoryOptions($httpVars);
+        $customData = array();
+        foreach($httpVars as $key => $value){
+            if(substr($key, 0, strlen("PLUGINS_DATA_")) == "PLUGINS_DATA_"){
+                $customData[substr($key, strlen("PLUGINS_DATA_"))] = $value;
+            }
+        }
+        if(count($customData)){
+            $options["PLUGINS_DATA"] = $customData;
+        }
 		$newRepo = $this->repository->createSharedChild(
 			$label, 
-			$this->makeSharedRepositoryOptions($httpVars), 
+			$options,
 			$this->repository->id, 
 			$loggedUser->id, 
 			$userName
