@@ -1,3 +1,8 @@
+.even
+{
+    background-color: #f9f9f9;
+}
+
 .soft_css_gradient, .menu.desktop, .menu.rootDirChooser, .menu.bookmarksMenu, .action_bar{
     background: rgb(255,255,255); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
@@ -60,7 +65,7 @@ div.descending > .css_gradient{
     background: -webkit-linear-gradient(top, rgba(115,161,215,1) 46%,rgba(66,128,199,1) 100%); /* Chrome10+,Safari5.1+ */
     background: -o-linear-gradient(top, rgba(115,161,215,1) 46%,rgba(66,128,199,1) 100%); /* Opera11.10+ */
     background: -ms-linear-gradient(top, rgba(115,161,215,1) 46%,rgba(66,128,199,1) 100%); /* IE10+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73a1d7', endColorstr='#4280c7',GradientType=0 ); /* IE6-9 */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73a1d7', endColorstr='#4280c7',GradientType=0 ) !important; /* IE6-9 */
     background: linear-gradient(top, rgba(115,161,215,1) 46%,rgba(66,128,199,1) 100%); /* W3C */
 }
 
@@ -72,6 +77,7 @@ div.descending > .css_gradient{
 #search_txt,
 #location_form, #repository_form
 {
+    background: rgb(243,243,243); /* Old browsers */
     background: rgb(243,243,243); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(243,243,243,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(243,243,243,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
@@ -157,7 +163,7 @@ textarea{
 
 #sidebar_tree_td
 {
-   vertical-align: top;   
+   vertical-align: top;
 }
 
 #sidebar_searchform_td
@@ -204,7 +210,7 @@ textarea{
    width: 64px;
    height: 64px;
    border: 1px solid #ddd;
-   vertical-align: middle;   
+   vertical-align: middle;
 }
 
 .text_label{
@@ -231,14 +237,14 @@ textarea{
 DIALOG BOXES
 */
 /*#upload_form, #createdir_form, #createfile_form, #rename_div*/
-#all_forms 
+#all_forms
 {
     background-color: #eee;
 }
 #all_forms div{display:none;}
 #all_forms form{display:inline;}
 
-#all_forms div div, 
+#all_forms div div,
 #all_forms div.shadow_class
 {display:block;}
 
@@ -274,7 +280,7 @@ div.shadow_class
 
 .dialogTitle
 {
-	color:#333333;	
+	color:#333333;
 	cursor:move;
 	padding:0px 4px 4px;
 }
@@ -298,12 +304,12 @@ div.shadow_class
     width: 180px;
     border: 1px solid #aaa;
     background-repeat: no-repeat;
-    background-position: top left;    
+    background-position: top left;
 	height: 16px;
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
-	
+
 }
 
 .dialogContent select{
@@ -352,8 +358,8 @@ div.shadow_class
 fieldSet input.dialogButton
 {
     margin-left: 6px;
-    width: 22px;    
-    height: 22px;    
+    width: 22px;
+    height: 22px;
     padding:0px;
     background-image: none;
     background-color: #f1f1ef;
@@ -470,7 +476,7 @@ textarea#myCode
     cursor: pointer;
 	filter:alpha(opacity=90);
 	opacity: 0.90;
-	-moz-opacity:0.90;    
+	-moz-opacity:0.90;
 }
 
 .logMessage
@@ -478,7 +484,7 @@ textarea#myCode
     background-color: #009600;
 	filter:alpha(opacity=90);
 	opacity: 0.90;
-	-moz-opacity:0.90;    
+	-moz-opacity:0.90;
 }
 
 html.boxshadow div.logMessage{
@@ -615,19 +621,19 @@ div.SF_disabled{
 }
 
 div.SF_label{
-	float: left; 
-	width: 39%; 
-	text-align: right; 
+	float: left;
+	width: 39%;
+	text-align: right;
 	padding: 3px;
 	padding-right:1%;
 	padding-left:0;
 	line-height: 18px;
 	/*white-space: nowrap; /* css-3 */
-	/*word-wrap: no break-word; /* Internet Explorer 5.5+ */	
+	/*word-wrap: no break-word; /* Internet Explorer 5.5+ */
 }
 
 .no-flexbox div.SF_label{
-	padding-right:3px !important;	
+	padding-right:3px !important;
 }
 
 .SF_input{
@@ -802,7 +808,7 @@ div.action_bar.text_only  span.actionbar_button_label{
 }
 
 .action_bar a
-{    
+{
     display: block;
     float: left;
     font-size: 9px;
@@ -876,7 +882,7 @@ div.action_bar.text_only a img{
 
 .action_bar a.separator,
 div.separator
-{    
+{
     border-left: 1px solid #CCC;
     border-right: 1px solid white;
     display: block;
@@ -985,7 +991,7 @@ a.carousel-control img{
     width: 120px;
 }
 
-#location_form input, 
+#location_form input,
 #repository_form input
 {
     margin:1px 0px 0px 0px;
@@ -1076,7 +1082,7 @@ img.simple_button_arrow{
 {
    color: #084165;
    font-size: 15px;
-   font-family: Trebuchet MS, sans-serif;      
+   font-family: Trebuchet MS, sans-serif;
    font-weight: bold;
    padding-right: 3px;
 }
@@ -1094,22 +1100,22 @@ img.simple_button_arrow{
 }
 #logging_string i img
 {
-    font-style: normal;    
+    font-style: normal;
     cursor: pointer;
 	margin-left:3px;
 	margin-right:7px;
 	margin-top:-4px;
 }
 .user_widget_label{
-	float: left; 
+	float: left;
 	line-height: 16px;
 	border-width: 1px 0px 1px 1px;
-	border-style: solid none solid solid; 
+	border-style: solid none solid solid;
 	border-color: #bbbbbb;
-	-moz-border-radius: 5px 0pt 0pt 5px; 
-	border-radius: 5px 0pt 0pt 5px; 
-	padding: 3px 0px 3px 7px; 
-	_padding: 3px 0px 1px 7px; 
+	-moz-border-radius: 5px 0pt 0pt 5px;
+	border-radius: 5px 0pt 0pt 5px;
+	padding: 3px 0px 3px 7px;
+	_padding: 3px 0px 1px 7px;
 	cursor: pointer;
 }
 
@@ -1124,7 +1130,7 @@ img.simple_button_arrow{
     float:left;
 }
 
-#current_path, 
+#current_path,
 #repo_path
 {
     /*width: 455px;*/
@@ -1184,9 +1190,9 @@ img.simple_button_arrow{
 /******************************/
 div.header_resizer{
 	border-bottom: 1px solid #676965;
-	color: #676965;	
+	color: #676965;
 	background-color: #F1F1EF;
-	overflow:hidden;	
+	overflow:hidden;
 }
 
 div.header_resizer div.header_cell{
@@ -1195,10 +1201,10 @@ div.header_resizer div.header_cell{
 	width:90px;
 	background-color: #F1F1EF;
 	text-shadow : 1px 1px 1px #FFFFFF;
-	
-	white-space:nowrap;	
+
+	white-space:nowrap;
 	border: 0px !important;
-	cursor: pointer;	
+	cursor: pointer;
 }
 
 div.header_resizer div.header_label{
@@ -1211,7 +1217,7 @@ div.header_resizer div.resizer{
 	width:1px;
 	background-color: #ffffff;
 	height: 23px;
-	cursor:e-resize;	
+	cursor:e-resize;
 	border: 0px;
 }
 
@@ -1224,7 +1230,7 @@ div.header_resizer div.dragging{
 	border-left: 1px solid #bbb;
 }
 div.resizeGhost{
-	width: 1px; 
+	width: 1px;
 	border-right: 1px solid #ccc;
 	position:absolute;
 	z-index:1000;
@@ -1290,7 +1296,7 @@ div.header_resizer div.ascending {
 .sort-table thead td div {
 	padding-left: 7px;
 	padding-top: 3px;
-	height: 20px;	
+	height: 20px;
 	overflow:hidden;
 	white-space:nowrap;
 }
@@ -1330,11 +1336,6 @@ div.header_resizer div.ascending {
 	cursor:e-resize;
 }
 
-.even
-{
-    /*background-color: #f4f4f4;*/
-    background-color: #f9f9f9;
-}
 
 .odd
 {
@@ -1390,7 +1391,7 @@ div.multiple_selection_draggable
     padding-bottom:0px;
     border: 1px dashed #999;
     font-family: Trebuchet MS, sans-serif;
-    font-size: 11px;    
+    font-size: 11px;
 	cursor:default;
 	overflow:hidden;
 }
@@ -1435,7 +1436,7 @@ a.enabled
 {
   filter:alpha(opacity=30);
   opacity: 0.3;
-  -moz-opacity:0.3;	
+  -moz-opacity:0.3;
 }
 
 /*
@@ -1482,20 +1483,20 @@ a.bookmark_button
 }
 
 div.bm, div.bm_hover
-{    
+{
    /* border: 1px solid #ddd;*/
 	filter:alpha(opacity=30);
 	opacity: 0.3;
 	-moz-opacity:0.3;
     display: block;
     float: right;
-    text-align: center;    
+    text-align: center;
     font-size: 11px;
     padding: 3px;
     margin-right: 5px;
     /*background-color: #ddd;*/
     font-family: Trebuchet MS, sans-serif;
-    color: #333;    
+    color: #333;
 }
 
 div.bm_hover
@@ -1508,7 +1509,7 @@ div.bm_hover
 	border-top: 1px solid #fff;
 	border-left: 1px solid #fff;
 	border-right: 1px solid buttonshadow;
-	border-bottom: 1px solid buttonshadow;    
+	border-bottom: 1px solid buttonshadow;
     background-color: #ddd;
     */
 }
@@ -1528,7 +1529,7 @@ div#upload_files_list, div#multiple_download_container
    height: 250px;
    width : 320px;
    border: 1px solid #ccc;
-   text-align: left;   
+   text-align: left;
 	-moz-border-radius : 5px;
 	border-radius : 5px;
 }
@@ -1571,8 +1572,8 @@ div#upload_files_list div, div#multiple_download_container div
    overflow: hidden;
    border-bottom: 1px solid #fff;
    background-color: #efefef;
-   padding-top: 6px;   
-   padding-bottom: 6px; 
+   padding-top: 6px;
+   padding-bottom: 6px;
    padding-left: 6px;
    position:relative;
 }
@@ -1584,7 +1585,7 @@ div#upload_files_list div, div#multiple_download_container div
 #upload_files_list div a
 {
    color: #ddd;
-   font-style: italic;   
+   font-style: italic;
 }
 #upload_files_list div a:hover
 {
@@ -1601,34 +1602,34 @@ div#upload_files_list div, div#multiple_download_container div
     text-decoration:none;
     color: #aaa;
 }
-#fileInputContainer {  
-        vertical-align: top;  
-}  
-#fileInputContainerDiv {  
-        height: 120px;  
-        width: 62px; /* to fit 1px border */  
-        margin: 0;  
-        padding: 0;  
-        position: relative;  
-        overflow: hidden;  
-        vertical-align: top;  
-}  
-#fileInputContainer input {  
-        filter:alpha(opacity:0); opacity:0; moz-opacity:0;       
-        position: absolute;  
-        font-size: 60px; /* causes it to fill the containing div */  
-        top:0px; right:0px;  
-        z-index: 10000;  
-        height: 56px;  
-}  
-#fileInputPos {  
-        text-align: left;   
-        height: 60px;  
-        width: 60px;  
-        position: absolute;  
-        top: 0px; right: 0px;  
-        overflow: hidden;  
-        z-index: 9999; /* this was needed to work in IE */  
+#fileInputContainer {
+        vertical-align: top;
+}
+#fileInputContainerDiv {
+        height: 120px;
+        width: 62px; /* to fit 1px border */
+        margin: 0;
+        padding: 0;
+        position: relative;
+        overflow: hidden;
+        vertical-align: top;
+}
+#fileInputContainer input {
+        filter:alpha(opacity:0); opacity:0; moz-opacity:0;
+        position: absolute;
+        font-size: 60px; /* causes it to fill the containing div */
+        top:0px; right:0px;
+        z-index: 10000;
+        height: 56px;
+}
+#fileInputPos {
+        text-align: left;
+        height: 60px;
+        width: 60px;
+        position: absolute;
+        top: 0px; right: 0px;
+        overflow: hidden;
+        z-index: 9999; /* this was needed to work in IE */
 }
 
 .fakeUploadButton {
@@ -1664,16 +1665,16 @@ div#upload_files_list div, div#multiple_download_container div
 	border-radius : 5px;
 }
 
-#uploadBrowseButton {  
-        position: absolute;  
-        top: 0px; right: 0px;  
-        margin:0;  
-}  
-#uploadSendButton {  
-        position: absolute;  
-        top: 60px; right: 0px;  
-        margin:0;  
-}  
+#uploadBrowseButton {
+        position: absolute;
+        top: 0px; right: 0px;
+        margin:0;
+}
+#uploadSendButton {
+        position: absolute;
+        top: 60px; right: 0px;
+        margin:0;
+}
 
 #uploadFilesListContainer
 {
@@ -1729,7 +1730,7 @@ div.tabulatorContainer{
 
 .toggleHeader a, .toggleHeader a, .toggleHeader a:link, .toggleHeader a:visited, .toggleHeader a:hover , .toggleHeader a:active
 {
-	text-decoration:none;	
+	text-decoration:none;
 }
 
 .panelHeader.panelHeaderWithIcon{
@@ -1763,7 +1764,7 @@ div.tabulatorContainer{
 .toggleInactive a, .toggleInactive a:link, .toggleInactive a:visited, .toggleInactive a:hover , .toggleInactive a:active
 {
 	color: #999;
-	text-decoration:none;	
+	text-decoration:none;
 }
 
 #search_panel{
@@ -1799,7 +1800,7 @@ div.tabulatorContainer{
 {
      padding-left: 10px;
      padding-top:5px;
-     text-align: center;    
+     text-align: center;
     height: 25px;
 }
 #search_form
@@ -1809,13 +1810,13 @@ div.tabulatorContainer{
 }
 #search_form a
 {
-    display:block;    
+    display:block;
     float:left;
     width:18px;
     cursor: pointer;
     margin-right: 0px;
     margin-left: 5px;
-    padding: 1px;    
+    padding: 1px;
 }
 
 #search_form a img{
@@ -1859,7 +1860,7 @@ meta_opt.checked {
 }
 
 #search_results
-{    
+{
     margin-left:0px;
     width: 100%;
     font-family: Arial, Verdana, sans-serif;
@@ -1928,7 +1929,7 @@ meta_opt.checked {
 
 #info_panel a img{
 	margin-right : 5px;
-} 
+}
 
 #info_panel a:hover
 {
@@ -1974,7 +1975,7 @@ tr td.infoPanelLabel
 	border-right:1px solid #f4f4f4;
 }
 
-.infoPanelImagePreview 
+.infoPanelImagePreview
 {
 	width: 100%;
 	background-color: #ffffff;
@@ -2011,8 +2012,8 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 	border-bottom: 1px solid #eee;
 	border-right: 1px solid #eee;
 }
-#table_rows_container tr.even td, 
-.infoPanelTable tr.even td 
+#table_rows_container tr.even td,
+.infoPanelTable tr.even td
 {
 	border-top: 0px;
 	border-bottom:0px;
@@ -2042,7 +2043,7 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 }
 
 #vertical_splitter{
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 #sidebar_splitter{
@@ -2076,7 +2077,7 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
     cursor: default !important;
 }
 
-.vsplitbar:hover 
+.vsplitbar:hover
 {
 }
 
@@ -2101,7 +2102,7 @@ div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .a
 #splashScreen
 {
    width: 430px;
-   height: 332px;   
+   height: 332px;
 }
 
 #docFileIframe
@@ -2134,7 +2135,7 @@ ADMIN STYLES
     padding-top: 5px;
     overflow: auto;
 }
-#users_detail_panel, 
+#users_detail_panel,
 #repo_detail_panel{
 	width: 438px;
     height: 299px;
@@ -2151,7 +2152,7 @@ ADMIN STYLES
 {
 	margin:10px;
     font-family: Trebuchet MS, sans-serif;
-    font-size: 13px;	
+    font-size: 13px;
 }
 
 .metaPane{
@@ -2188,12 +2189,12 @@ ADMIN STYLES
 
 
 .user
-{    
+{
     padding-top: 15px;
     padding-left: 5px;
     padding-bottom: 15px;
     background-color: #fff;
-    border-top: 1px solid #fff; 
+    border-top: 1px solid #fff;
     border-bottom: 1px solid #fff;
     border-left: 1px solid #fff;
     margin-left: 5px;
@@ -2223,8 +2224,8 @@ ADMIN STYLES
 }
 
 .config_subblock{
-	border: 1px dotted #ccc; 
-	padding:5px 10px; 
+	border: 1px dotted #ccc;
+	padding:5px 10px;
 	margin-bottom:10px;
 }
 
@@ -2275,9 +2276,9 @@ legend a.active {
 .repository input, .user_delete_confirm
 {
    border: none;
-   margin-left: 1px;   
+   margin-left: 1px;
    margin-top: 0px;
-   padding: 0px;   
+   padding: 0px;
 }
 
 .user_data
@@ -2317,7 +2318,7 @@ legend a.active {
 }
 
 #user_admin_bar .submit_button, .password .submit_button,
-#options_pane .submit_button, .password .submit_button 
+#options_pane .submit_button, .password .submit_button
 {
    width: 30px;
 }
@@ -2327,7 +2328,7 @@ legend a.active {
 #log_chooser b
 {
    font-size: 15px;
-   color: #666;   
+   color: #666;
 }
 
 #user_pref_form input
@@ -2364,7 +2365,7 @@ div#rights_pane{
 	_height: 150px;
 	max-height: 150px;
 	overflow:auto;
-	margin-top:5px;	
+	margin-top:5px;
 	padding: 2px 0;
 	width: 100%;
 }
@@ -2466,7 +2467,7 @@ div.diaporama_toolbar div#diaporama_input_boxes{
 /***********************/
 /* AUTOCOMPLETION DIV  */
 /***********************/
-div.autocomplete 
+div.autocomplete
 {
       position:absolute;
       font-family:Trebuchet MS, sans-serif;
@@ -2477,17 +2478,17 @@ div.autocomplete
       margin:8px 0px 0px;
       padding:0px;
 }
-div.autocomplete ul 
+div.autocomplete ul
 {
       list-style-type:none;
       margin:0px;
       padding:0px;
 }
-div.autocomplete ul li.selected 
-{ 
+div.autocomplete ul li.selected
+{
       background-color: #73a2d7;
 }
-div.autocomplete ul li 
+div.autocomplete ul li
 {
       list-style-type:none;
       display:block;
@@ -2545,7 +2546,7 @@ div.menu a {
     padding-bottom: 0px;
 	width: auto;
    /* IE */
-   width:expression("150px"); 	
+   width:expression("150px");
 	-moz-border-radius : 0px 5px 5px 5px;
 	border-radius : 0px 5px 5px 5px;
 }
@@ -2586,7 +2587,7 @@ div.menu a {
    padding-top: 2px;
    padding-left: 5px;
    padding-right: 25px;
-   padding-bottom: 5px;   
+   padding-bottom: 5px;
    color: #ccc;
    border-bottom: 0px solid #ddd;
    text-align: left;
@@ -2643,7 +2644,7 @@ div.menu a {
 	margin: 1px 1px 0 1px;
 	line-height: 1px !important;
 	padding: 0px;
-	height: 1px !important;	
+	height: 1px !important;
 }
 /* we need explicit enabled class to overcome css deficiences (without creating unnecessary markup) */
 .menu.desktop a.enabled:hover {
@@ -2665,7 +2666,7 @@ div.menu a {
    z-index: 1500;
    min-width: 150px;
    /* IE */
-   width:expression("250px"); 
+   width:expression("250px");
    border: 1px solid #D1D2D0;
 }
 
@@ -2674,7 +2675,7 @@ div.menu a {
    border: 0px;
 }
 
-.rootDirChooser a, 
+.rootDirChooser a,
 .bookmarksMenu a
 {
    display: block;
@@ -2684,7 +2685,7 @@ div.menu a {
    padding-top: 4px;
 }
 
-.rootDirChooser a img, 
+.rootDirChooser a img,
 .bookmarksMenu a img
 {
    margin-right:5px;
@@ -2692,7 +2693,7 @@ div.menu a {
 .rootDirChooser a.disabled IMG{
 	filter: alpha(opacity=30);
 	opacity: 0.3;
-	-moz-opacity: 0.3	
+	-moz-opacity: 0.3
 }
 
 .rootDirChooser span.rootDirTitle
@@ -2702,7 +2703,7 @@ div.menu a {
    font-weight: bold;
    padding-top: 1px;
    padding-left: 5px;
-   padding-right: 50px;   
+   padding-right: 50px;
    color: #ccc;
    border-bottom: 0px solid #ddd;
    text-align: left;
@@ -2723,7 +2724,7 @@ div.menu a {
 	margin: 1px 1px 0 1px;
 	line-height: 1px !important;
 	padding: 0px;
-	height: 1px !important;	
+	height: 1px !important;
 }
 
 
@@ -2763,7 +2764,7 @@ div.menu a {
 	display: inline !important;
 	filter:alpha(opacity=30);
 	opacity: 0.3;
-	-moz-opacity:0.3;	
+	-moz-opacity:0.3;
 	cursor: pointer !important;
 }
 
@@ -2775,7 +2776,7 @@ div.menu a {
 }
 
 .backgroundPanel{
-   position:absolute;   
+   position:absolute;
    right:0;
    bottom:20px;
    padding:1px 5px 3px 7px;
@@ -2825,7 +2826,7 @@ div.menu a {
 }
 
 #webdav_repo_list div{
-	padding: 7px;	
+	padding: 7px;
 }
 
 #webdav_repo_list span{

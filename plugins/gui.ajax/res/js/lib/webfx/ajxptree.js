@@ -1,5 +1,5 @@
 /**
-TODO : I18N THIS STRING
+@todo : I18N THIS STRING
  */
 webFXTreeConfig.loadingText = "Loading...";
 
