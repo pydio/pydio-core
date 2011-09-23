@@ -302,13 +302,13 @@ Class.create("XHRUploader", {
 			// FOLDER!
 			alert(MessageHash[336]);
 			return;
-		}else if(Prototype.Browser.WebKit && !getBaseName(file.fileName).indexOf(".")){
+		}else if(Prototype.Browser.WebKit && !getBaseName(file.name).indexOf(".")){
 			var res = confirm(MessageHash[395]);
 			if(!res){
 				return;
 			}
 		}
-		if(this.maxUploadSize && file.fileSize > this.maxUploadSize){
+		if(this.maxUploadSize && file.size > this.maxUploadSize){
 			alert(MessageHash[211]);
 			return;
 		}
@@ -317,21 +317,21 @@ Class.create("XHRUploader", {
 			return;
 		}
 		
-		var basename = getBaseName(file.fileName);
+		var basename = getBaseName(file.name);
 		if(basename.length > this.namesMaxLength){
 			alert(MessageHash[393].replace("%s", this.namesMaxLength));
 		}
 		
 		
 		if(this.mask){
-			var ext = getFileExtension(file.fileName);
+			var ext = getFileExtension(file.name);
 			if(!this.mask.include(ext)){
 				alert(MessageHash[367] + this.mask.join(', '));
 				return;
 			}
 		}
 		// GET VALUE FROM FILE OBJECT
-		var label = file.fileName;		
+		var label = file.name;		
 		var maxLength = 63;
 		if(label.length > maxLength){
 			label = label.substr(0,20) + '[...]' + label.substr(label.length-(maxLength-20), label.length);
@@ -423,16 +423,16 @@ Class.create("XHRUploader", {
 		if(this.listTarget.childNodes.length){
 			$A(this.listTarget.childNodes).each(function(item){
 				if(item.status == 'new'){
-					size += item.file.fileSize;
+					size += item.file.size;
 					count ++;
 				}else if(item.status == 'loading'){
-					size += item.file.fileSize;
+					size += item.file.size;
 					count ++;
 					uploaded += item.bytesLoaded;
 				}else if(item.status == 'loaded'){
-					size += item.file.fileSize;
+					size += item.file.size;
 					count ++;
-					uploaded += item.file.fileSize;
+					uploaded += item.file.size;
 				}			
 			});
 		}
@@ -554,7 +554,7 @@ Class.create("XHRUploader", {
 		item.updateStatus('loading');
 		
     	var auto_rename = false;
-		if(this.crtContext.fileNameExists(item.file.fileName))
+		if(this.crtContext.fileNameExists(item.file.name))
 		{
 			var behaviour = this.optionPane.getExistingBehaviour();
 			if(behaviour == 'rename'){
@@ -612,8 +612,8 @@ Class.create("XHRUploader", {
         xhr.setRequestHeader("If-Modified-Since", "Mon, 26 Jul 1997 05:00:00 GMT");
         xhr.setRequestHeader("Cache-Control", "no-cache");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.setRequestHeader("X-File-Name", item.file.fileName);
-        xhr.setRequestHeader("X-File-Size", item.file.fileSize);
+        xhr.setRequestHeader("X-File-Name", item.file.name);
+        xhr.setRequestHeader("X-File-Size", item.file.size);
         xhr.setRequestHeader("Content-Type", item.file.type);
         xhr.send(item.file);		
         
