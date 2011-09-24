@@ -361,6 +361,11 @@ class AJXP_Plugin implements Serializable{
 			$paramNode = $this->nodeAttrToHash($xmlNode);
 			$this->pluginConfDefinition[$paramNode["name"]] = $paramNode;
 			if(isset($paramNode["default"])){
+                if($paramNode["type"] == "boolean"){
+                    $paramNode["default"] = ($paramNode["default"] === "true" ? true: false);
+                }else if($paramNode["type"] == "integer"){
+                    $paramNode["default"] = intval($paramNode["default"]);
+                }
 				$this->pluginConf[$paramNode["name"]] = $paramNode["default"];
 			}
 		}					
