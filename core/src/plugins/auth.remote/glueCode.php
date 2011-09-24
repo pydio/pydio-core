@@ -33,8 +33,10 @@ global $AJXP_GLUE_GLOBALS;
 if(!isSet($AJXP_GLUE_GLOBALS)){
 	$AJXP_GLUE_GLOBALS = array();
 }
-
 if (!isSet($CURRENTPATH)) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
+
+include_once("$CURRENTPATH/../../conf/base.conf.php");
+
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Logger.php");
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Plugin.php");
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_PluginsService.php");
@@ -45,32 +47,30 @@ require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AbstractAccessDri
 if (!class_exists("SessionSwitcher")) require_once("$CURRENTPATH/sessionSwitcher.php");
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.ConfService.php");
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AuthService.php");    
-include_once("$CURRENTPATH/../../conf/base.conf.php");
 $pServ = AJXP_PluginsService::getInstance();
-$pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", "$CURRENTPATH/../../conf");
-
 define ("CLIENT_RESOURCES_FOLDER", "");
-ConfService::init("$CURRENTPATH/../../conf/conf.php"); 
-$plugins = ConfService::getConf("PLUGINS");
-require_once("$CURRENTPATH/../../plugins/conf.".$plugins["CONF_DRIVER"]["NAME"]."/class.AJXP_User.php");
-
+ConfService::init();
+$confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
+$pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", $confPlugin);
+require_once("$CURRENTPATH/../../plugins/conf.".$confPlugin->getName()."/class.AJXP_User.php");
+ConfService::start();
 $plugInAction = $AJXP_GLUE_GLOBALS["plugInAction"];
 $secret = $AJXP_GLUE_GLOBALS["secret"];
-$G_AUTH_DRIVER_DEF = $plugins["AUTH_DRIVER"];
-if (!isSet($G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]) || $G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"] == "")
+
+$confPlugs = ConfService::getConf("PLUGINS");
+$authPlug = ConfService::getAuthDriverImpl();
+if ($authPlug->getOption("SECRET") == "")
 {
     if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])){
        die("This file must be included and can't be called directly");
     }
-    if ($_SERVER['PHP_SELF'] != $G_AUTH_DRIVER_DEF["OPTIONS"]["LOGIN_URL"]){
+    if ($_SERVER['PHP_SELF'] != $authPlug->getOption("LOGIN_URL")){
        $plugInAction = "zoooorg";
     }
-} else if ($secret != $G_AUTH_DRIVER_DEF["OPTIONS"]["SECRET"]){    	
+} else if ($secret != $authPlug->getOption("SECRET")){
     $plugInAction = "zuuuuup";
 }
 
-//die($plugInAction);
-  
 switch($plugInAction)
 {
 	case 'login':
