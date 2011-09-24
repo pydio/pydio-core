@@ -345,8 +345,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
 				}
 				$reloadContextNode = true;
-				$reloadDataNode = $dest;
-				
+                if(!(RecycleBinManager::getRelativeRecycle() ==$dest && $this->driverConf["HIDE_RECYCLE"] == true)){
+                    $reloadDataNode = $dest;
+                }
+
 			break;
 			
 			//------------------------------------
@@ -688,7 +690,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
 				
 				// ADD RECYCLE BIN TO THE LIST
-				if($dir == "" && RecycleBinManager::recycleEnabled())
+				if($dir == "" && RecycleBinManager::recycleEnabled() && $this->driverConf["HIDE_RECYCLE"] !== true)
 				{
 					$recycleBinOption = RecycleBinManager::getRelativeRecycle();										
 					if(file_exists($this->urlBase.$recycleBinOption)){
