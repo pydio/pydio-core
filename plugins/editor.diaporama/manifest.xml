@@ -4,7 +4,7 @@
 		<global_param name="META_EXTRACTION_REMOTEWRAPPERS" type="array" label="Remote Wrappers" description="When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped." default="ftpAccessWrapper"/>
 		<global_param name="META_EXTRACTION_THRESHOLD" type="string" label="Size Threshold" description="Threshold" default="50000"/>
 		<global_param name="GENERATE_THUMBNAIL" type="boolean" label="Thumbnails" description="Generate thumbnails or not" default="true"/>
-		<global_param name="THUMBNAIL__QUALITY" type="integer" label="Quality" description="Thumbs quality" default="2"/>
+		<global_param name="THUMBNAIL_QUALITY" type="integer" label="Quality" description="Thumbs quality" default="2"/>
 	</server_settings>
 	<class_definition filename="plugins/editor.diaporama/class.ImagePreviewer.php" classname="ImagePreviewer"/>
 	<resources>
