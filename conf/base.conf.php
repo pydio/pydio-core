@@ -51,7 +51,7 @@ define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
 define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
 define("AJXP_PLUGINS_FOLDER", "plugins");
-define("AJXP_BIN_FOLDER_REL", "server/classes");
+define("AJXP_BIN_FOLDER_REL", "core/classes");
 define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/classes");
 define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
