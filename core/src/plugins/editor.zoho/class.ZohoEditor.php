@@ -8,7 +8,7 @@ define("ZOHO_SECRET_KEY", "e008213e43df0b89f59285d319b74a59");
  * This file is part of AjaXplorer.
  *
  * AjaXplorer is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *

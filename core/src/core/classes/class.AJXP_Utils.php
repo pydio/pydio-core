@@ -4,7 +4,7 @@
  * This file is part of AjaXplorer.
  *
  * AjaXplorer is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -572,6 +572,7 @@ class AJXP_Utils
 	}
 	
 	static function runTests(&$outputArray, &$testedParams){
+		return true;
 		// At first, list folder in the tests subfolder
 		chdir(AJXP_TESTS_FOLDER);
 		$files = glob('*.php'); 
@@ -789,6 +790,12 @@ class AJXP_Utils
 	
 	public static function silentUnlink($file){
 		@unlink($file);
+	}
+	
+	public static function safeIniSet($paramName, $paramValue){
+		$current = ini_get($paramName);
+		if($current == $paramValue) return;
+		ini_set($paramName, $paramValue);
 	}
 	
 }
