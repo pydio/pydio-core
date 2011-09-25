@@ -103,7 +103,7 @@ class ExifMetaManager extends AJXP_Plugin {
 		$urlBase = $wrapperData["protocol"]."://".$repo->getId();		
 		$decoded = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 		$realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
-		ini_set('exif.encode_unicode', 'UTF-8');
+		AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
 		$exifData = exif_read_data($realFile, 0, TRUE);
 		if($exifData !== false && isSet($exifData["GPS"])){
 			$exifData["COMPUTED_GPS"] = $this->convertGPSData($exifData);

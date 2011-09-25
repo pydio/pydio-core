@@ -914,7 +914,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         set_exception_handler('download_exception_handler');
         set_error_handler('download_exception_handler');
         // required for IE, otherwise Content-disposition is ignored
-        if(ini_get('zlib.output_compression')) { ini_set('zlib.output_compression', 'Off'); }
+        if(ini_get('zlib.output_compression')) { 
+         AJXP_Utils::safeIniSet('zlib.output_compression', 'Off'); 
+        }
 
 		$isFile = !$data && !$gzip; 		
 		if($byteLength == -1){

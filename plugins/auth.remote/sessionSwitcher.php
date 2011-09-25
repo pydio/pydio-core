@@ -45,7 +45,9 @@ class SessionSwitcher
 					$saveHandlerData["gc"]					
 				);
 			}else{
-				ini_set('session.save_handler', $saveHandlerType);
+				if(ini_get("session.save_handler")!=$saveHandlerType){
+					ini_set('session.save_handler', $saveHandlerType);
+				}
 			}
             // Start a default session and save on the handler
             session_start();
@@ -80,7 +82,9 @@ class SessionSwitcher
 				$saveHandlerData["gc"]					
 			);
 		}else{
-			ini_set('session.save_handler', $saveHandlerType);
+			if(ini_get("session.save_handler")!=$saveHandlerType){
+				ini_set('session.save_handler', $saveHandlerType);
+			}
 		}
 
         if($loadPreviousSession){
