@@ -1,36 +1,53 @@
-AjaXplorer Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
-Please read /doc/INSTALL.txt to find help with configuration.
+++ AJAXPLORER ++
+Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
 
+Copyright 2007-2011 Charles du Jeu
+The latest code can be found at http://www.ajaxplorer.info/.
 Check for software update online : <span id='software_update' style="color:#79F;">Check Now</span>.
 
-[MAIN DEVELOPER]
-AjaXplorer is developed and maintained by Charles du Jeu, from Paris France.
-Project Page : http://www.ajaxplorer.info/
 
-[CONTRIBUTORS]
-panni, 2011/03/14:
+++ LICENSE ++
+AjaXplorer is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+AjaXplorer is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+
+
+++ CONTRIBUTORS ++
+Cyril Russo
+Panni, 2011/03/14:
 - added support for folder upload using jumploader
 - added support for contextmenu in Opera >10.5X by patching proto.menu.js
+Translators : see mention in translation files
 
-[EXTERNAL LIBRARIES]
-AjaXplorer was developed using various free libraries that are mentionned below. It is mainly an engineering work that used a lot of off-the-shelf components. Please check their websites!
 
-++ JAVASCRIPT FRAMEWORKS & PLUGINS ++
-The Ajax client is mainly based on the prototype.js library.
-http://www.prototypejs.org/
+++ THIRD PARTY LIBRARIES ++
+[JavaScript] 
+	Prototype, Scriptaculous http://www.prototypejs.org/, http://script.aculo.us/ (MIT)
+	Modernizr 	http://modernizr.com (BSD / MIT)
+	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
 
-++ ZIP FEATURES ++
-All the zip/unzip functionnalities implemented are based on the excellent PclZip class developped by PhpConcept.
-http://www.phpconcept.net/pclzip/index.en.php
+[Icons Pack]
+	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
+	
+[Core PHP Classes]
+	EZC WebDAV Backend http://www.ezcomponents.org/ (New BSD)
+	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)
+	Pclzip : http://www.phpconcept.net/pclzip/ (LGPL)
 
-++ WEBFX WIDGETS ++
-The Ajax widgets used for the Tree (XLoadTree) and for table sorting and selection were developed by WebFX.
-http://webfx.eae.net/
-
-++ DEWPLAYER :  MP3 Flash Player ++
-The online mp3 flash player is developed by a french webagency, AlsaCreation.
-http://www.alsacreations.fr/mp3-dewplayer.html
-
-++ MEDIA PLAYER : FLV Player ++
-MC Media Player is a Flash-based media player for embedding video, audio and still images in web pages. It is free to use for both non-profit and commercial websites.
-http://www.flv-player.net/
+[Plugins]
+	PThumb.php http://www.phpclasses.org (LPGL)
+	OpenLayers http://www.openlayers.org (BSD)
+	Video-js http://www.videojs.com/ (LGPL)
+	Zend Lucene http://www.zend.com/ (New BSD)
+	svn_lib.inc (LGPL)
+	PhpMailer-Lite http://phpmailer.sourceforge.net (LGPL)
+	Mp3 Player : http://www.alsacreations.fr/mp3-dewplayer.html
