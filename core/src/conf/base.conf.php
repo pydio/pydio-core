@@ -32,9 +32,6 @@ if(function_exists("xdebug_disable")){
 setlocale(LC_ALL, '');
 
 
-ini_set("session.cookie_httponly", 1);
-//ini_set("session.cookie_path", "ajaxplorer");
-
 $installPath = realpath(dirname(__FILE__)."/..");
 $confPath = realpath(dirname(__FILE__));
 
@@ -85,5 +82,10 @@ function AjaXplorer_autoload($className){
 	}
 }
 spl_autoload_register('AjaXplorer_autoload');
+
+AJXP_Utils::safeIniSet("session.cookie_httponly", 1);
+//AJXP_Utils::safeIniSet("session.cookie_path", "ajaxplorer");
+
+
 
 ?>
