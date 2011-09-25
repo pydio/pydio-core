@@ -61,7 +61,8 @@ $PLUGINS = array(
 				)*/
 			)
 	),
-    // EXAMPLE OF SQL CONF DRIVER
+    // EXAMPLE OF USAGE OF SQL CONF DRIVER
+    // Use the same SQL_DRIVER option for SQL AUTH driver.
     /*
 	"CONF_DRIVER" => array(
 		"NAME"		=> "sql",
@@ -96,13 +97,15 @@ $PLUGINS = array(
              "LOG_CHMOD" => 0770
          )
     ),
-	/*
-	// ALTERNATE AUTH_DRIVER CONFIG SAMPLE
+
+	// ALTERNATE AUTH_DRIVER CONFIG SAMPLE :
+    // Using auth.remote to be the "slave" of a Joomla installation
+    /*
 	"AUTH_DRIVER" => array(
 		"NAME"		=> "remote",
 		"OPTIONS"	=> array(
 			"SLAVE_MODE"  => true,
-			"USERS_FILEPATH" => "AJXP_INSTALL_PATH/data/plugins/auth.serial/users.ser",
+			"USERS_FILEPATH" => "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
 			"MASTER_AUTH_FUNCTION" => "joomla_remote_auth",
 			"MASTER_HOST"		=> "localhost",
 			"MASTER_URI"		=> "/joomla/",
@@ -112,5 +115,5 @@ $PLUGINS = array(
 			"TRANSMIT_CLEAR_PASS"   => true // Don't touch this. It's unsafe (and useless here) to transmit clear password.
 		)
 	),
-	*/
+    */
 );
