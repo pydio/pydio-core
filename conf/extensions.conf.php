@@ -57,6 +57,8 @@ $EXTENSIONS = array(
 	array("png","image.png", 57),
 	array("css","css.png", 58),
 	array("mp3","sound.png", 59),
+	array("m4a","sound.png", 59),
+	array("aac","sound.png", 59),
 	array("xls","spreadsheet.png", 64),
 	array("doc","document.png", 65),
 	array("pdf","pdf.png", 79),
