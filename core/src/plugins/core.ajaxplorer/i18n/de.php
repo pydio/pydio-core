@@ -457,11 +457,11 @@ $mess=array(
 "409" => "WebDAV-Freigaben erfolgreich deaktiviert",
 "410" => "WebDAV-Passwort erfolgreich aktualisiert",
 "411" => "Öffnen",
-"412" => "Upload only",
-"413" => "Shared by",
-"414" => "Use arrows to navigate and +/- to change zoom",
-"415" => "Toggle left pane visibility",
-"416" => "Left Pane",
+"412" => "Nur Hochladen",
+"413" => "Freigegeben von",
+"414" => "Pfeile zum Navigieren und +/- zum Ändern des Zooms",
+"415" => "Die linke Seite Ein- und Ausschalten",
+"416" => "Linke Seite",
 "leftpane_accesskey" => "L",
 /* END SENTENCE */
 );
