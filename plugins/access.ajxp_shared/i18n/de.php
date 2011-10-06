@@ -50,7 +50,7 @@ $mess=array(
 "29"=> "Repositories von Benutzern übertragen.",
 "30"=> "Erzeugte Benutzer zum Zugriff auf die übertragenen Repositories.",
 "31"=> "Beschreibung",
-"32"=> "Reset",
+"32"=> "Zurücksetzen",
 "33"=> "Download-Zähler zurücksetzen",
 ); 
 ?>
