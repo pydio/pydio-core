@@ -511,7 +511,24 @@ Class.create("XHRUploader", {
 	},
 	
 	sendFileMultipart : function(item){
-		var xhr = this.initializeXHR(item);
+		
+    	var auto_rename = false;
+		if(this.crtContext.fileNameExists(item.file.name))
+		{
+			var behaviour = this.optionPane.getExistingBehaviour();
+			if(behaviour == 'rename'){
+				auto_rename = true;
+			}else if(behaviour == 'alert'){
+				if(!confirm(MessageHash[124])){
+					item.remove();
+					return;
+				}
+			}else{
+				// 'overwrite' : do nothing!
+			}
+		}		
+		
+		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""));
 		var file = item.file;
         item.updateProgress(null, 0);
 		item.updateStatus('loading');		
