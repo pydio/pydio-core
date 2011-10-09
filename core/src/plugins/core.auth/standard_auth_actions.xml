@@ -19,7 +19,7 @@
 						modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'), 
 						function(oForm){
 							ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-							if(Prototype.Browser.IE && !oForm.down('input[type="text"]').key_enter_attached){
+							if(Prototype.Browser.IE && !Modernizr.borderradius && !oForm.down('input[type="text"]').key_enter_attached){
 								oForm.select('input').invoke("observe", "keydown", function(event){
 									if(event.keyCode == Event.KEY_RETURN){
 										var el = Event.findElement(event);
