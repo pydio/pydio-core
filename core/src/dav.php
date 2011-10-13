@@ -46,8 +46,7 @@ spl_autoload_register( array( 'ezcBase', 'autoload' ) );
 if(ConfService::getCoreConf("WEBDAV_BASEHOST") != ""){
 	$baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
 }else{
-	$http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
-	$baseURL = $http_mode . $_SERVER['HTTP_HOST'];
+	$baseURL = AJXP_Utils::detectServerURL();
 }				
 $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 
