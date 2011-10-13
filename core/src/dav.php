@@ -21,7 +21,7 @@
  * Description : Command line access of the framework.
  * DAV controller, loads the ezComponent webDav Server
  */
-include_once("conf/base.conf.php");
+include_once("base.conf.php");
 
 //set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
 //set_exception_handler(array("AJXP_XMLWriter", "catchException"));

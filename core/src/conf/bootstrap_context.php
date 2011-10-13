@@ -32,19 +32,13 @@ if(function_exists("xdebug_disable")){
 setlocale(LC_ALL, '');
 
 
-$installPath = realpath(dirname(__FILE__)."/..");
-$confPath = realpath(dirname(__FILE__));
-
-list($vNmber,$vDate) = explode("__",file_get_contents($confPath."/VERSION"));
+list($vNmber,$vDate) = explode("__",file_get_contents(AJXP_CONF_PATH."/VERSION"));
 define("AJXP_VERSION", $vNmber);
 define("AJXP_VERSION_DATE", $vDate);
 
 define("AJXP_EXEC", true);
-require("compat.php");
 
 // APPLICATION PATHES CONFIGURATION
-define("AJXP_INSTALL_PATH", $installPath);
-define("AJXP_CONF_PATH", $confPath);
 define("AJXP_DATA_PATH", AJXP_INSTALL_PATH."/data");
 define("AJXP_CACHE_DIR", AJXP_DATA_PATH."/cache");
 define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
@@ -69,6 +63,7 @@ define("AJXP_CLIENT_DEBUG",	false);
 define("AJXP_SERVER_DEBUG",	false);
 define("AJXP_SKIP_CACHE", false);
 
+require(AJXP_BIN_FOLDER."/compat.php");
 
 function AjaXplorer_autoload($className){
 	$fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";

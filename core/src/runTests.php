@@ -26,7 +26,7 @@
  * It is disabled for security purpose
  */
 die("You are not allowed to see this page (comment first line of the file to access it!)");
-require_once("conf/base.conf.php");
+require_once("base.conf.php");
 
 $outputArray = array();
 $testedParams = array();
