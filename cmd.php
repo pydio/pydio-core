@@ -24,7 +24,7 @@ if(!defined("STDIN")){
 	die("This is the command line version of the framework, you are not allowed to access this page");
 }
 
-include_once("conf/base.conf.php");
+include_once("base.conf.php");
 
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");

@@ -18,25 +18,10 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  *
- * Description : Specific inclusion to run publiclet scripts
+ * This is the main configuration file for configuring the core of the application.
+ * In a standard usage, you should not have to change any variables.
  */
-require_once("base.conf.php");
-
-$pServ = AJXP_PluginsService::getInstance();
-ConfService::init();
-$confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-$pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
-ConfService::start();
-
-
-
-$fakes = '
-// Non working exception class
-class AJXP_Exception extends Exception 
-{
-    public function AJXP_Exception($msg) { echo "$msg"; exit(); }
-}';
-
-eval($fakes);
-
+define("AJXP_INSTALL_PATH", realpath(dirname(__FILE__)));
+define("AJXP_CONF_PATH", AJXP_INSTALL_PATH."/conf");
+require_once(AJXP_CONF_PATH."/bootstrap_context.php");
 ?>
