@@ -157,6 +157,9 @@ Class.create("AjxpPane", {
         var guiPref = ajaxplorer.user.getPreference("gui_preferences", true);
         if(!guiPref) guiPref = {};
         if(!guiPref[this.htmlElement.id+"_"+this.__className]) guiPref[this.htmlElement.id+"_"+this.__className] = {};
+        if(guiPref[this.htmlElement.id+"_"+this.__className][prefName] && guiPref[this.htmlElement.id+"_"+this.__className][prefName] == prefValue){
+            return;
+        }
         guiPref[this.htmlElement.id+"_"+this.__className][prefName] = prefValue;
         ajaxplorer.user.setPreference("gui_preferences", guiPref, true);
         ajaxplorer.user.savePreference("gui_preferences");

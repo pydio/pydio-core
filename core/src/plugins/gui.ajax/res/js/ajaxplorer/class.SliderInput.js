@@ -84,12 +84,17 @@ Class.create("SliderInput", {
 	 * @param value Integer
 	 */
 	setValue : function(value){
+        var original = this.slider.options.onChange;
+        this.slider.options.onChange = Prototype.emptyFunction;
+
 		if(this.slider){
 			this.slider.setValue(value);
 		}
 		if(this.input){
 			this.input.value = value;
 		}
+
+        this.slider.options.onChange = original;
 	},
 	
 	/**
