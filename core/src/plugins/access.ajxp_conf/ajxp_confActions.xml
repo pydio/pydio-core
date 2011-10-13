@@ -43,6 +43,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>				
+        <action name="perform_upgrade">
+            <processing>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
 		<action name="create_user">
 			<gui text="297" title="298" src="yast_user_add.png" accessKey="create_user_accesskey" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"

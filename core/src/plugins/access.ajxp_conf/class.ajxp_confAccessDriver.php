@@ -886,6 +886,23 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 				
 			break;
+
+            case "perform_upgrade" :
+
+                $fakeURL = "http://www.ajaxplorer.info/build/ajaxplorer-20111006-2386.zip";
+                $u = new AjaXplorerUpgrader($fakeURL);
+                while($u->hasNextStep()){
+                    AJXP_Logger::debug("UPGRADE STEP ".$u->currentStepTitle);
+                    $u->execute();
+                    if($u->error != null){
+                        AJXP_Logger::debug("    - error: ".$u->error);
+                        break;
+                    }else{
+                        AJXP_Logger::debug("    - success: ".$u->result);
+                    }
+                }
+
+            break;
 			
 			default:
 			break;
@@ -1220,6 +1237,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	protected function loadPublicletData($file){
+        $inputData = null;
 		$lines = file($file);
 		$id = str_replace(".php", "", basename($file));
 		$code = $lines[3] . $lines[4] . $lines[5];
