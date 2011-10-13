@@ -35,6 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $registeredWrappers = array();
  	private $xmlRegistry;
  	private $pluginFolder;
+    private $tmpDeferRegistryBuild = false;
  	/**
  	 * @var AbstractConfDriver
  	 */
@@ -289,16 +290,18 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 	 		}
  		}
  		$this->activePlugins[$type.".".$name] = $active;
- 		if(isSet($this->xmlRegistry)){
+ 		if(isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild){
  			$this->buildXmlRegistry();
  		}
  	}
  	
  	public function setPluginUniqueActiveForType($type, $name){
  		$typePlugs = $this->getPluginsByType($type);
+        $this->tmpDeferRegistryBuild = true;
  		foreach($typePlugs as $plugName => $plugObject){
- 			$this->setPluginActiveInst($type, $plugName, false);
+		    $this->setPluginActiveInst($type, $plugName, false);
  		}
+        $this->tmpDeferRegistryBuild = false;
  		$this->setPluginActiveInst($type, $name, true);
  	}
  	
