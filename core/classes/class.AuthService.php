@@ -369,7 +369,7 @@ class AuthService
 		$confDriver = ConfService::getConfStorageImpl();
 		$auth = ConfService::getAuthDriverImpl();	
 		$count = $confDriver->countAdminUsers();
-		if(!$count && $auth->userExists("admin")){
+		if(!$count && $auth->userExists("admin") && $confDriver->getName() == "serial"){
 			return -1;
 		}
 		return $count;
