@@ -189,8 +189,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
         if($dlURL != ""){
         	return rtrim($dlURL, "/")."/".$hash.".php";
         }else{
-	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
-	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
+	        $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
 	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/")."/".$hash.".php");
         }
     }

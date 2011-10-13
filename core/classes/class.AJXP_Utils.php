@@ -410,6 +410,13 @@ class AJXP_Utils
     return false;    
   }
 
+    static function detectServerURL(){
+        $protocol = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http' );
+        $port = (( $protocol === 'http' && $_SERVER['SERVER_PORT'] == 80 || $protocol === 'https' && $_SERVER['SERVER_PORT'] == 443 ) ? "" : ":".$_SERVER['SERVER_PORT']);
+        $name = $_SERVER["SERVER_NAME"];
+        return "$protocol://$name$port";
+    }
+
   /**
    * Modifies a string to remove all non ASCII characters and spaces.
    */

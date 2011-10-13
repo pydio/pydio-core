@@ -1177,8 +1177,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if($dlURL!= ""){
         	$downloadBase = rtrim($dlURL, "/");
         }else{
-	        $http_mode = (!empty($_SERVER['HTTPS'])) ? 'https://' : 'http://';
-	        $fullUrl = $http_mode . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']);    
+	        $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
 	        $downloadBase = str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $dlFolder), "/"));
         }
 		
