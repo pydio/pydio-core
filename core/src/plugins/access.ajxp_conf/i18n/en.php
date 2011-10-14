@@ -125,5 +125,9 @@ $mess=array(
 "103" => "Description",
 "104" => "Enabled",
 "105" => "Automatic checks",
+"106" => "Upgrade...",
+"107" => "Automatic version upgrade",
+"108" => "Click on the button to start automatic upgrade procedure. Please check that the application folder is writeable before launching upgrade.",
+"109" => "Start Upgrade",
 ); 
 ?>
