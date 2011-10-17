@@ -887,29 +887,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				
 			break;
 
-            case "perform_upgrade" :
-
-                $fakeURL = "http://www.ajaxplorer.info/build/ajaxplorer-fake-upgrade.zip";
-                $u = new AjaXplorerUpgrader(
-                    $fakeURL,
-                    hash_file("md5", $fakeURL),
-                    "md5",
-                    array("core/classes/class.CaptchaProvider.php")
-                );
-                while($u->hasNextStep()){
-                    print("<div class='upgrade_step'><div class='upgrade_title'>".$u->currentStepTitle."</div>");
-                    $u->execute();
-                    if($u->error != null){
-                        print("<div class='upgrade_error'>- error: ".$u->error."</div>");
-                        break;
-                    }else{
-                        print("<div class='upgrade_success'>- success: ".$u->result."</div>");
-                    }
-                    print("</div>");
-                }
-
-            break;
-			
 			default:
 			break;
 		}
