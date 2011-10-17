@@ -3,6 +3,7 @@
     <server_settings>
         <global_param name="UPDATE_SITE" type="string" label="Update Site" description="Where to update" default="http://localhost/update/"/>
         <global_param name="PRESERVE_FILES" type="string" label="Preserve Files" description="Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." default=""/>
+        <global_param name="ENABLE_324_IMPORT" type="boolean" label="Enable Import From v3.2.4" description="Enable the migration action, available in the Settings repository" default="false"/>
     </server_settings>
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
 		<resources>
@@ -11,11 +12,9 @@
 	</client_settings>
 	<registry_contributions>
         <actions>
-		<action name="get_upgrade_path">
-			<processing>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
+            <action name="get_upgrade_path">
+                <processing><serverCallback methodName="switchAction"></serverCallback></processing>
+            </action>
             <action name="perform_upgrade">
                 <gui text="updater.1" title="updater.2" src="download_manager.png" hasAccessKey="false">
                     <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
@@ -68,6 +67,46 @@
                             <div id="upgrade_status" style="display:none;">
                                 <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;"> AJXP_MESSAGE[updater.4] </div>AJXP_MESSAGE[updater.3]</p>
                                 <iframe id="upgrade_steps" style="height:250px;width:100%;overflow:auto;border:1px solid #ccc;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;"></iframe>
+                            </div>
+                        </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
+            <action name="import_from_324">
+                <processing>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+                <gui text="updater.5" title="updater.6" src="download_manager.png" hasAccessKey="false">
+                    <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+                        actionBar="true" contextMenu="false" infoPanel="false"
+                        actionBarGroup="user" inZip="false">
+                    </context>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="import_324_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                        <dialogOnOpen><![CDATA[
+                            var startButton = $(oForm).down('div[id="start_upgrade_button"]');
+                            startButton.observe("click", function(){
+                                var conn = new Connexion();
+                                conn.addParameter("get_action", "import_from_324");
+                                conn.onComplete = function(transport){
+                                    $(oForm).down('div[id="upgrade_steps"]').update(transport.responseText);
+                                    $(oForm).down('div[id="start_upgrade_button"]').update(MessageHash['updater.9']);
+                                };
+                                conn.sendAsync();
+                            });
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete hideDialog="true"><![CDATA[
+                            $(oForm).down('div[id="start_upgrade_button"]').stopObserving("click");
+                        ]]></dialogOnComplete>
+                        <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                    </clientCallback>
+                    <clientForm id="import_324_form"><![CDATA[
+                        <div id="import_324_form" action="import_from_324" box_width="500">
+                            <div id="upgrade_status">
+                                <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;width: 100px;text-align: center;"> AJXP_MESSAGE[updater.7] </div>AJXP_MESSAGE[updater.8]</p>
+                                <div id="upgrade_steps" style="height:250px;width:100%;overflow:auto;border:1px solid #ccc;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;"></div>
                             </div>
                         </div>
                     ]]></clientForm>

@@ -26,4 +26,9 @@ $mess = array(
     "2" => "Automatic version upgrade",
     "3" => "Click on the button to start automatic upgrade procedure. Please check that the application folder is writeable before launching upgrade.",
     "4" => "Start Upgrade",
+    "5" => "From 3.2.4",
+    "6" => "Import configuration data from 3.2.4",
+    "7" => "Simulate the data import",
+    "8" => "Fill the textfield with the location to your old installation. Use a full path (from the root of the server, like /var/www/path/to/ajxp). Then start a simulation to test the import.",
+    "9" => "Run import now"
 );
