@@ -90,9 +90,14 @@
                             startButton.observe("click", function(){
                                 var conn = new Connexion();
                                 conn.addParameter("get_action", "import_from_324");
+                                conn.addParameter("previous_location", $(oForm).down('input[name="previous_location"]').value);
+                                if($(oForm).down('div[id="start_upgrade_button"]').RUN_NOW){
+                                    conn.addParameter("real_run", "true");
+                                }
                                 conn.onComplete = function(transport){
                                     $(oForm).down('div[id="upgrade_steps"]').update(transport.responseText);
                                     $(oForm).down('div[id="start_upgrade_button"]').update(MessageHash['updater.9']);
+                                    $(oForm).down('div[id="start_upgrade_button"]').RUN_NOW = true;
                                 };
                                 conn.sendAsync();
                             });
@@ -105,7 +110,8 @@
                     <clientForm id="import_324_form"><![CDATA[
                         <div id="import_324_form" action="import_from_324" box_width="500">
                             <div id="upgrade_status">
-                                <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;width: 100px;text-align: center;"> AJXP_MESSAGE[updater.7] </div>AJXP_MESSAGE[updater.8]</p>
+                                <p><div id="start_upgrade_button" style="float: right;border: 1px solid #BBB;padding: 7px;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius: 5px;background-color: #EEE;color: #333;margin-left: 5px;border-image: initial;box-shadow: 1px 1px 7px #ddd;cursor: pointer;font-weight: bold;width: 80px;text-align: center;margin-bottom:10px;"> AJXP_MESSAGE[updater.7] </div>
+                                AJXP_MESSAGE[updater.8] <input name="previous_location" placeholder="Your previous install location"></p>
                                 <div id="upgrade_steps" style="height:250px;width:100%;overflow:auto;border:1px solid #ccc;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;"></div>
                             </div>
                         </div>
