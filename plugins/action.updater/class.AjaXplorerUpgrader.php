@@ -28,7 +28,7 @@ class AjaXplorerUpgrader {
     private $archiveHashMethod;
     private $markedFiles;
 
-    private $debugMode = FALSE;
+    private $debugMode = TRUE;
     private $cleanFile = "UPGRADE/CLEAN-FILES";
     private $additionalScript = "UPGRADE/PHP-SCRIPT";
     private $releaseNote = "UPGRADE/NOTE";
@@ -178,8 +178,8 @@ class AjaXplorerUpgrader {
     function copyCodeFiles(){
         // CORE & PLUGINS
         $targetFolder = $this->installPath;
-        $this->copy_r($this->workingFolder."/core", $targetFolder."/core");
-        $this->copy_r($this->workingFolder."/plugins", $targetFolder."/plugins");
+        self::copy_r($this->workingFolder."/core", $targetFolder."/core");
+        self::copy_r($this->workingFolder."/plugins", $targetFolder."/plugins");
         $rootFiles = glob($this->workingFolder."/*.php");
         foreach($rootFiles as $file){
             copy($file, $targetFolder."/".basename($file));
@@ -252,7 +252,295 @@ class AjaXplorerUpgrader {
     }
 
 
-    function copy_r( $path, $dest )
+    public static function upgradeFrom324($oldLocation, $dryRun = true){
+
+        $logFile = AJXP_CACHE_DIR."/import_from_324.log";
+
+        $itemsToCopy = array(
+            array(
+                "mask"      => "public/*.php",
+                "target"    => "data/public"
+            ),
+            array(
+                "mask"      => "public/.ajxp_publiclet_counters.ser",
+                "target"    => "data/public"
+            ),
+            array(
+                "mask"      => "server/logs/*.txt",
+                "target"    => "data/logs"
+            ),
+            array(
+                "mask"      => "server/conf/repo.ser",
+                "target"    => "data/plugins/conf.serial"
+            ),
+            array(
+                "mask"      => "server/conf/aliases.ser",
+                "target"    => "data/plugins/conf.serial"
+            ),
+            array(
+                "mask"      => "server/users/*",
+                "target"    => "data/plugins/auth.serial"
+            )
+        );
+
+        $configToPluginsConf = array(
+            array(
+                "type"      => "constant",
+                "name"      => "ENABLE_USERS",
+                "target"    => "core.auth/ENABLE_USERS"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "ALLOW_GUEST_BROWSING",
+                "target"    => "core.auth/ALLOW_GUEST_BROWSING"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "AJXP_PASSWORD_MINLENGTH",
+                "target"    => "core.auth/PASSWORD_MINLENGTH"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "AJXP_SESSION_SET_CREDENTIALS",
+                "target"    => "core.auth/SESSION_SET_CREDENTIALS"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "PUBLIC_DOWNLOAD_FOLDER",
+                "target"    => "core.ajaxplorer/PUBLIC_DOWNLOAD_FOLDER"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "PUBLIC_DOWNLOAD_URL",
+                "target"    => "core.ajaxplorer/PUBLIC_DOWNLOAD_URL"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "default_language",
+                "target"    => "core.ajaxplorer/DEFAULT_LANGUAGE"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "GZIP_DOWNLOAD",
+                "target"    => "core.ajaxplorer/GZIP_COMPRESSION"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "GZIP_LIMIT",
+                "target"    => "core.ajaxplorer/GZIP_LIMIT"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "DISABLE_ZIP_CREATION",
+                "target"    => "core.ajaxplorer/ZIP_CREATION",
+                "modifier"  => "NOT"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "AJXP_WEBDAV_ENABLE",
+                "target"    => "core.ajaxplorer/WEBDAV_ENABLE"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "AJXP_WEBDAV_BASEURI",
+                "target"    => "core.ajaxplorer/WEBDAV_BASEURI"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "AJXP_WEBDAV_BASEHOST",
+                "target"    => "core.ajaxplorer/WEBDAV_BASEHOST"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "AJXP_WEBDAV_DIGESTREALM",
+                "target"    => "core.ajaxplorer/WEBDAV_DIGESTREALM"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "webmaster_email",
+                "target"    => "core.ajaxplorer/WEBMASTER_EMAIL"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "max_caracteres",
+                "target"    => "core.ajaxplorer/NODENAME_MAX_LENGTH"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "customTitle",
+                "target"    => "core.ajaxplorer/APPLICATION_TITLE"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "HTTPS_POLICY_FILE",
+                "target"    => "uploader.flex/HTTPS_POLICY_FILE"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "upload_max_number",
+                "target"    => "core.uploader/UPLOAD_MAX_NUMBER"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "upload_max_size_per_file",
+                "target"    => "core.uploader/UPLOAD_MAX_SIZE"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "upload_max_size_total",
+                "target"    => "core.uploader/UPLOAD_MAX_SIZE_TOTAL"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "AJXP_CLIENT_TIMEOUT_TIME",
+                "target"    => "gui.ajax/CLIENT_TIMEOUT_TIME"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "AJXP_CLIENT_TIMEOUT_WARN_BEFORE",
+                "target"    => "gui.ajax/CLIENT_TIMEOUT_WARN"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "GOOGLE_ANALYTICS_ID",
+                "target"    => "gui.ajax/GOOGLE_ANALYTICS_ID"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "GOOGLE_ANALYTICS_DOMAIN",
+                "target"    => "gui.ajax/GOOGLE_ANALYTICS_DOMAIN"
+            ),
+            array(
+                "type"      => "constant",
+                "name"      => "GOOGLE_ANALYTICS_EVENT",
+                "target"    => "gui.ajax/GOOGLE_ANALYTICS_EVENT"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "customTitleFontSize",
+                "target"    => "gui.ajax/CUSTOM_FONT_SIZE"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "customIcon",
+                "target"    => "gui.ajax/CUSTOM_ICON"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "customIconWidth",
+                "target"    => "gui.ajax/CUSTOM_ICON_WIDTH"
+            ),
+            array(
+                "type"      => "variable",
+                "name"      => "welcomeCustomMessage",
+                "target"    => "gui.ajax/CUSTOM_WELCOME_MESSAGE"
+            ),
+        );
+
+        if(!$dryRun){
+            $logFileHandle = fopen($logFile, "w");
+        }
+
+        foreach($itemsToCopy as $item){
+            $files = glob($oldLocation."/".$item["mask"]);
+            foreach ($files as $fileOrFolder){
+                $target = AJXP_INSTALL_PATH."/".$item["target"];
+                if(is_file($fileOrFolder)){
+                    $l = "Copy $fileOrFolder to ".$target."/".basename($fileOrFolder)."\n";
+                    if($dryRun) {
+                        print(nl2br($l));
+                    }else {
+                        copy($fileOrFolder, $target."/".basename($fileOrFolder));
+                        fwrite($logFileHandle, $l);
+                    }
+
+                }else{
+                    $l= "Copy recursively ".$fileOrFolder." to ".$target."\n";
+                    if($dryRun) {
+                        print(nl2br($l));
+                    }else {
+                        self::copy_r($fileOrFolder, $target);
+                        fwrite($logFileHandle, $l);
+                    }
+                }
+            }
+        }
+
+        // FILTER THE CONF FILE TO REMOVE ALL CONSTANTS
+        $originalConfdir = $oldLocation."/server/conf/";
+        $lines = file($originalConfdir."/conf.php");
+        $filteredLines = array();
+        $mutedConstants = array();
+        foreach($lines as $line){
+            if(preg_match('/define\("(.*)", (.*)\);/', $line, $matches)){
+                //var_dump($matches);
+                $value = trim($matches[2]);
+                if(!empty($value)){
+                    if($value[0] == "\""){
+                        $strValue = substr($value, 1, strlen($value)-2);
+                        if(!empty($strValue)){
+                            $mutedConstants[$matches[1]] = $strValue;
+                        }
+                    }else if($value == "true"){
+                        $mutedConstants[$matches[1]] = true;
+                    }else if($value == "false"){
+                        $mutedConstants[$matches[1]] = false;
+                    }else if(is_numeric($value)){
+                        $mutedConstants[$matches[1]] = intval($value);
+                    }else{
+                        eval("\$res = $value;");
+                        $mutedConstants[$matches[1]] = $res;
+                    }
+                }
+                $filteredLines[] = "//".$line;
+            }else{
+                $filteredLines[] = $line;
+            }
+        }
+        if(!$dryRun){
+            fwrite($logFileHandle, "Writing alternate version of conf.php without constants.");
+        }
+        file_put_contents($originalConfdir."/muted_conf.php", implode("", $filteredLines));
+
+        // NOW IMPORT THE MODIFIED CONF FILE AND GATHER ALL DATA
+        include $originalConfdir."/muted_conf.php";
+        foreach ($configToPluginsConf as $localConfig){
+            $localConfigName = $localConfig["name"];
+            if($localConfig["type"] == "constant" && isset($mutedConstants[$localConfigName])){
+                $localConfig["value"] = $mutedConstants[$localConfigName];
+            }else if($localConfig["type"] == "variable" && isSet( $$localConfigName )){
+                $localConfig["value"] = $$localConfigName;
+            }
+            if(!isSet($localConfig["value"])) continue;
+            $l = "Should set ".$localConfig["target"]." to value ".$localConfig["value"]."\n";
+            if($dryRun){
+                print(nl2br($l));
+            } else{
+                list($pluginId, $pluginOptionName) = explode("/", $localConfig["target"]);
+                $confStorage = ConfService::getConfStorageImpl();
+                $confStorage->savePluginConfig($httpVars["plugin_id"], $options);
+                fwrite($logFileHandle, $l);
+            }
+        }
+        if(!$dryRun){
+            @unlink(AJXP_PLUGINS_CACHE_FILE);
+            @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        }
+
+        foreach($REPOSITORIES as $localRepoKey => $localRepoDef){
+            $localRepoString = '$REPOSITORIES['.(is_numeric($localRepoKey)?$localRepoKey:'"'.$localRepoKey.'"').'] = '.str_replace(array("'", "\\\\"), array("\"","\\"), var_export($localRepoDef, true)).';';
+            $l = "Will print this to bootstrap_repositories : \n". $localRepoString;
+            if($dryRun) {
+                print(nl2br($l));
+            }else{
+                file_put_contents($originalConfdir."/bootstrap_repositories.php", $localRepoString);
+                fwrite($logFileHandle, $l);
+            }
+        }
+
+    }
+
+    public static function copy_r( $path, $dest )
     {
         if( is_dir($path) )
         {
@@ -267,7 +555,7 @@ class AjaXplorerUpgrader {
                     // go on
                     if( is_dir( $path.DIRECTORY_SEPARATOR.$file ) )
                     {
-                        $this->copy_r( $path.DIRECTORY_SEPARATOR.$file, $dest.DIRECTORY_SEPARATOR.$file );
+                        self::copy_r( $path.DIRECTORY_SEPARATOR.$file, $dest.DIRECTORY_SEPARATOR.$file );
                     }
                     else
                     {

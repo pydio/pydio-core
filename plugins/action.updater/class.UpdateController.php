@@ -23,6 +23,23 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class UpdateController extends AJXP_Plugin {
 
+	/**
+	 * Parse
+	 * @param DOMNode $contribNode
+	 */
+	protected function parseSpecificContributions(&$contribNode){
+		parent::parseSpecificContributions($contribNode);
+        if($this->pluginConf["ENABLE_324_IMPORT"] == true) return;
+        
+		if($contribNode->nodeName != "actions") return ;
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $compressNodeList = $actionXpath->query('action[@name="import_from_324"]', $contribNode);
+        if(!$compressNodeList->length) return ;
+        unset($this->actions["import_from_324"]);
+        $compressNode = $compressNodeList->item(0);
+        $contribNode->removeChild($compressNode);
+	}
+
     function switchAction($action, $httpVars, $fileVars){
         if(!isSet($this->actions[$action])) return;
         $loggedUser = AuthService::getLoggedUser();
@@ -30,6 +47,13 @@ class UpdateController extends AJXP_Plugin {
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");
 
         switch ($action){
+
+
+            case "import_from_324":
+
+                AjaXplorerUpgrader::upgradeFrom324("E:/charlie/software/SERVERS/local/fresh/ajaxplorer");
+
+            break;
 
             case "get_upgrade_path":
 
