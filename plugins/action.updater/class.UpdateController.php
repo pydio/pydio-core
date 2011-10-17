@@ -65,11 +65,11 @@ class UpdateController extends AJXP_Plugin {
                         print("<div class='upgrade_step'><div class='upgrade_title'>".$u->currentStepTitle."</div>");
                         $u->execute();
                         if($u->error != null){
-                            print("<div class='upgrade_result error'>- error: ".$u->error."</div>");
+                            print("<div class='upgrade_result error'>- Error : ".$u->error."</div>");
                             $errors = true;
                             break;
                         }else{
-                            print("<div class='upgrade_result success'>- success: ".$u->result."</div>");
+                            print("<div class='upgrade_result success'>- ".$u->result."</div>");
                         }
                         print("</div>");
                         // FLUSH OUTPUT, SCROLL DOWN

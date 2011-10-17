@@ -28,7 +28,7 @@ class AjaXplorerUpgrader {
     private $archiveHashMethod;
     private $markedFiles;
 
-    private $debugMode = TRUE;
+    private $debugMode = FALSE;
     private $cleanFile = "UPGRADE/CLEAN-FILES";
     private $additionalScript = "UPGRADE/PHP-SCRIPT";
     private $releaseNote = "UPGRADE/NOTE";
@@ -160,13 +160,19 @@ class AjaXplorerUpgrader {
     function backupMarkedFiles(){
 
         $targetFolder = $this->installPath;
-        foreach($this->markedFiles as $file){
-            if(is_file($targetFolder."/".$file)){
+        foreach($this->markedFiles as $index => $file){
+            $file = trim($file);
+            if(!empty($file) && is_file($targetFolder."/".$file)){
                 $newName = $file.".orig-".date("Ymd");
                 copy($targetFolder."/".$file, $targetFolder."/".$newName);
+            }else{
+                unset($this->markedFiles[$index]);
             }
         }
-        return "The following files have been backup: of ".count($this->markedFiles)." files.";
+        if(!count($this->markedFiles)){
+            return "Nothing to do";
+        }
+        return "Backup of ".count($this->markedFiles)." file(s) marked as preserved.";
     }
 
     function copyCodeFiles(){
@@ -183,6 +189,9 @@ class AjaXplorerUpgrader {
 
     function restoreMarkedFiles(){
 
+        if(!count($this->markedFiles)){
+            return "Nothing to do";
+        }
         $targetFolder = $this->installPath;
         foreach($this->markedFiles as $file){
             $bakupName = $file.".orig-".date("Ymd");
@@ -193,7 +202,7 @@ class AjaXplorerUpgrader {
                 unlink($targetFolder."/".$bakupName);
             }
         }
-        return "The following files have been restored: of ".count($this->markedFiles)." files.";
+        return "Restoration of ".count($this->markedFiles)." file(s) marked as preserved.";
     }
 
 
@@ -230,7 +239,7 @@ class AjaXplorerUpgrader {
 
         if(!is_file($this->workingFolder."/".$this->additionalScript)) return "Nothing to do.";
         include($this->workingFolder."/".$this->additionalScript);
-        return "Executed specific task.";
+        return "Executed specific upgrade task.";
 
     }
 
@@ -239,7 +248,7 @@ class AjaXplorerUpgrader {
         copy($this->workingFolder."/conf/VERSION", $this->installPath."/conf/VERSION");
         $vCont = file_get_contents($this->installPath."/conf/VERSION");
         list($v, $date) = explode("__", $vCont);
-        return "Version upgraded to ".$v." ($date)";
+        return "<b>Version upgraded to ".$v." ($date)</b>";
     }
 
 
