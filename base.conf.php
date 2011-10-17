@@ -21,6 +21,7 @@
  * This is the main configuration file for configuring the core of the application.
  * In a standard usage, you should not have to change any variables.
  */
+define("AJXP_PACKAGING", "zip");
 define("AJXP_INSTALL_PATH", realpath(dirname(__FILE__)));
 define("AJXP_CONF_PATH", AJXP_INSTALL_PATH."/conf");
 require_once(AJXP_CONF_PATH."/bootstrap_context.php");
