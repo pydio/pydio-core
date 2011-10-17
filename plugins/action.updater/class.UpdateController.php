@@ -51,7 +51,8 @@ class UpdateController extends AJXP_Plugin {
 
             case "import_from_324":
 
-                AjaXplorerUpgrader::upgradeFrom324("E:/charlie/software/SERVERS/local/fresh/ajaxplorer");
+                $dryRun = !isSet($httpVars["real_run"]);
+                AjaXplorerUpgrader::upgradeFrom324($httpVars["previous_location"], $dryRun);
 
             break;
 

@@ -254,7 +254,11 @@ class AjaXplorerUpgrader {
 
     public static function upgradeFrom324($oldLocation, $dryRun = true){
 
+        $mess = ConfService::getMessages();
         $logFile = AJXP_CACHE_DIR."/import_from_324.log";
+        if($dryRun){
+            print("<b>".$mess["updater.10"]."</b><br><br>");
+        }
 
         $itemsToCopy = array(
             array(
@@ -455,11 +459,11 @@ class AjaXplorerUpgrader {
                     }
 
                 }else{
-                    $l= "Copy recursively ".$fileOrFolder." to ".$target."\n";
+                    $l= "Copy recursively ".$fileOrFolder." to ".$target."/".basename($fileOrFolder)."\n";
                     if($dryRun) {
                         print(nl2br($l));
                     }else {
-                        self::copy_r($fileOrFolder, $target);
+                        self::copy_r($fileOrFolder, $target."/".basename($fileOrFolder));
                         fwrite($logFileHandle, $l);
                     }
                 }
@@ -504,6 +508,7 @@ class AjaXplorerUpgrader {
 
         // NOW IMPORT THE MODIFIED CONF FILE AND GATHER ALL DATA
         include $originalConfdir."/muted_conf.php";
+        $allOptions = array();
         foreach ($configToPluginsConf as $localConfig){
             $localConfigName = $localConfig["name"];
             if($localConfig["type"] == "constant" && isset($mutedConstants[$localConfigName])){
@@ -514,17 +519,31 @@ class AjaXplorerUpgrader {
             if(!isSet($localConfig["value"])) continue;
             $l = "Should set ".$localConfig["target"]." to value ".$localConfig["value"]."\n";
             if($dryRun){
+                $value = AJXP_Utils::xmlEntities($localConfig["value"]);
+                list($pluginId, $pluginOptionName) = explode("/", $localConfig["target"]);
+                $plug = AJXP_PluginsService::getInstance()->getPluginById($pluginId);
+                $options = $plug->getConfigs();
+                $options[$pluginOptionName] = $value;
                 print(nl2br($l));
             } else{
                 list($pluginId, $pluginOptionName) = explode("/", $localConfig["target"]);
                 $confStorage = ConfService::getConfStorageImpl();
-                $confStorage->savePluginConfig($httpVars["plugin_id"], $options);
+                $value = AJXP_Utils::xmlEntities($localConfig["value"]);
+                if(!isSet($allOptions[$pluginId])){
+                    $plug = AJXP_PluginsService::getInstance()->getPluginById($pluginId);
+                    $allOptions[$pluginId] = $plug->getConfigs();
+                }else{
+                    $allOptions[$pluginId][$pluginOptionName] = $value;
+                }
                 fwrite($logFileHandle, $l);
             }
         }
-        if(!$dryRun){
-            @unlink(AJXP_PLUGINS_CACHE_FILE);
-            @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        if(!$dryRun && count($allOptions)){
+            foreach ($allOptions as $pId => $pOptions){
+                $confStorage->savePluginConfig($pId, $pOptions);
+                @unlink(AJXP_PLUGINS_CACHE_FILE);
+                @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+            }
         }
 
         foreach($REPOSITORIES as $localRepoKey => $localRepoDef){
@@ -536,6 +555,11 @@ class AjaXplorerUpgrader {
                 file_put_contents($originalConfdir."/bootstrap_repositories.php", $localRepoString);
                 fwrite($logFileHandle, $l);
             }
+        }
+
+        if(!$dryRun){
+            fclose($logFileHandle);
+            print("<b>The operation is finished, all actions are logged in $logFile</b>");
         }
 
     }

@@ -29,6 +29,7 @@ $mess = array(
     "5" => "From 3.2.4",
     "6" => "Import configuration data from 3.2.4",
     "7" => "Simulate the data import",
-    "8" => "Fill the textfield with the location to your old installation. Use a full path (from the root of the server, like /var/www/path/to/ajxp). Then start a simulation to test the import.",
-    "9" => "Run import now"
+    "8" => "Enter full path (from server root) to the previous location, then run the simulation",
+    "9" => "Run real import now",
+    "10"=> "This is a 'dry-run'. Please review the logs of all actions that will be performed, and if it's ok for you press 'Run real import now'"
 );
