@@ -42,8 +42,10 @@
                                     var startButton = $(oForm).down('div[id="start_upgrade_button"]');
                                     var stepsContainer = $(oForm).down('iframe[id="upgrade_steps"]');
                                     startButton.observe("click", function(){
-                                        var conn = new Connexion();
-                                        stepsContainer.src = conn._baseUrl + "&get_action=perform_upgrade";
+                                        if(window.confirm('Are you sure you want to perform the upgrade?')){
+                                            var conn = new Connexion();
+                                            stepsContainer.src = conn._baseUrl + "&get_action=perform_upgrade";
+                                        }
                                     });
                                     $(oForm).down('div[id="upgrade_checking"]').hide();
                                     modal.refreshDialogPosition();
