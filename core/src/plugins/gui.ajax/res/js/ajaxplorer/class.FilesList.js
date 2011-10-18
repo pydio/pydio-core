@@ -39,12 +39,13 @@ Class.create("FilesList", SelectableElements, {
 		this.htmlElement = $(oElement);
 		if(typeof initDefaultDispOrOptions == "string"){
 			this.options = {};
-			this._displayMode = initDefaultDispOrOptions;		
+			this._displayMode = initDefaultDispOrOptions;
 		}else{
 			this.options = initDefaultDispOrOptions;
 			this._displayMode = 'list';
 		}
-		
+        this.options.replaceScroller = true;
+
 		Event.observe(document, "ajaxplorer:user_logged", function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
 			disp = ajaxplorer.user.getPreference("display");
@@ -375,6 +376,9 @@ Class.create("FilesList", SelectableElements, {
 		if(this.observer){
 			this.stopObserving("resize", this.observer);
 		}
+        if(this.scrollSizeObserver){
+            this.stopObserving("resize", this.scrollSizeObserver);
+        }
 		if(this._displayMode == "list")
 		{
 			var buffer = '';
@@ -421,18 +425,20 @@ Class.create("FilesList", SelectableElements, {
 			this.htmlElement.update(buffer);
             $('table_rows_container').setStyle((this.gridStyle!="grid")?{overflowX:"hidden",overflowY:"auto"}:{overflow:"auto"});
 			attachMobileScroll("table_rows_container", "vertical");
+            var scrollElement = $("table_rows_container");
 			oElement = $('selectable_div');
 			
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
 				$('table_rows_container').insert({before:this.createPaginator()});
 			}
-			
+
 			this.initSelectableItems(oElement, true, $('table_rows_container'));
 			this._headerResizer = new HeaderResizer($('selectable_div_header'), {
 				headerData : headerData,
 				body : $('table_rows_container'),
 				initSizesType : 'percent',
-				bodyIsMaster : (this.gridStyle == 'grid')
+				bodyIsMaster : (this.gridStyle == 'grid'),
+                scrollerWidth : this.options.replaceScroller?0:18
 			});
 			this._headerResizer.observe("drag_resize", function(){
 				if(this.prefSaver) window.clearTimeout(this.prefSaver);
@@ -512,6 +518,7 @@ Class.create("FilesList", SelectableElements, {
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
 				$('selectable_div').insert({before:this.createPaginator()});
 			}
+            var scrollElement = $("selectable_div");
 			this.observer = function(e){
 				fitHeightToBottom($('selectable_div'), this.htmlElement);
 			}.bind(this);
@@ -535,6 +542,9 @@ Class.create("FilesList", SelectableElements, {
 					this.resizeThumbnails();
 				}.bind(this),
 				onChange : function(value){
+                    if(this.options.replaceScroller){
+                        this.notify("resize");
+                    }
 					if(!ajaxplorer || !ajaxplorer.user) return;
 					ajaxplorer.user.setPreference("thumb_size", this._thumbSize);
 					ajaxplorer.user.savePreference("thumb_size");								
@@ -543,7 +553,25 @@ Class.create("FilesList", SelectableElements, {
 
 			this.disableTextSelection($('selectable_div'));
 			this.initSelectableItems($('selectable_div'), true);
-		}	
+		}
+
+        if(this.options.replaceScroller){
+            this.scroller = new Element('div', {id:'filelist_scroller', className:'scroller_track', style:"right:0px"});
+            this.scroller.insert('<div id="filelist_scrollbar_handle" class="scroller_handle"></div>');
+            scrollElement.insert({before:this.scroller});
+            scrollElement.setStyle({overflow:"hidden"});
+            this.scrollbar = new Control.ScrollBar(scrollElement,'filelist_scroller');
+            if(this.scrollSizeObserver){
+                this.stopObserving("resize", this.scrollSizeObserver);
+            }
+            this.scrollSizeObserver = function(){
+                this.scroller.setStyle({height:parseInt(scrollElement.getHeight())+"px"});
+                this.scrollbar.recalculateLayout();
+            }.bind(this);
+            this.observe("resize", this.scrollSizeObserver);
+        }
+
+
 		this.notify("resize");
 	},
 	
@@ -727,6 +755,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			this.disableTextSelection(allItems[i], true);
 		}
+        this.notify("resize");
 	},
 	/**
 	 * Queue processor for thumbnail async loading
