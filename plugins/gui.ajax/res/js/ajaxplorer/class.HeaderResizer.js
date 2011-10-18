@@ -40,7 +40,8 @@ Class.create("HeaderResizer", {
 			bodyIsMaster : false,
 			handleWidth : 1,
 			headerData : null,			
-			useCSS3 : false
+			useCSS3 : false,
+            scrollerWidth:18
 		}, options || { });
 		if(this.options.headerData){
 			this.generateHeader();
@@ -457,7 +458,7 @@ Class.create("HeaderResizer", {
 	checkBodyScroll : function(){
 		var body = this.options.body;		
 		if( body.scrollHeight>body.getHeight()){
-			this.verticalScrollerMargin=18;
+			this.verticalScrollerMargin=this.options.scrollerWidth;
 		}else if( body.scrollHeight <= body.getHeight()){
 			this.verticalScrollerMargin=0;
 		}
