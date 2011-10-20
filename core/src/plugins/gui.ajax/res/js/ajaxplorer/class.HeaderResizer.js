@@ -143,7 +143,7 @@ Class.create("HeaderResizer", {
 	 */
 	resize : function(size){
 		
-		this.mainSize = size;
+		this.mainSize = size-2;
 		this.element.setStyle({width:this.mainSize+"px"});
 		this.checkBodyScroll();
 		this.resizeHeaders();

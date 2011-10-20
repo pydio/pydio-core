@@ -138,7 +138,7 @@ Control.ScrollBar = Class.create({
             this.slider.setValueBy(-(this.options.fixed_scroll_distance * event.memo.delta / (this.scrollLength()-this.slider.trackLength)));
         } else {
             // Move the content by 1/20 of the page
-            this.slider.setValueBy(-(event.memo.delta / 20));
+            this.slider.setValueBy(-(event.memo.delta / 8));
         }
         event.stop();
         return false;

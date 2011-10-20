@@ -172,8 +172,14 @@ Class.create("SearchEngine", AjxpPane, {
 	},
 	
 	destroy : function(){
-		this.htmlElement.update('');
+		if(this.htmlElement) {
+            var ajxpId = this.htmlElement.id;
+            this.htmlElement.update('');
+        }
 		this.htmlElement = null;
+        if(ajxpId && window[ajxpId]){
+            delete window[ajxpId];
+        }
 	},
 	/**
 	 * Initialise the options for search Metadata
