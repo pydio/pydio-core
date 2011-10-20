@@ -25,7 +25,10 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>
-		</actions>	
+		</actions>
+        <hooks>
+            <serverCallback hookName="node.info" methodName="nodeBookmarkMetadata"></serverCallback>
+        </hooks>
 		<external_file filename="plugins/gui.ajax/ajxpclient_actions.xml" include="actions/*" exclude=""/>
 		<client_configs uuidAttr="name">
 			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[

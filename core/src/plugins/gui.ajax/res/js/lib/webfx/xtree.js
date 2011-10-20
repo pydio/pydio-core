@@ -264,7 +264,14 @@ WebFXTreeAbstractNode.prototype.updateLabel = function(label){
 };
 
 WebFXTreeAbstractNode.prototype.setLabelIcon = function(icon){
-	if($(this.id+'-label')) $(this.id+'-label').setStyle({backgroundImage:'url('+icon+')'});
+    var bgOverlayImage = "'url('"+icon+"')'";
+    var bgOverlayPosition = '4px 1px';
+	if(this.overlayIcon){
+        bgOverlayImage = "url('"+this.overlayIcon+"'), url('"+icon+"')";
+        bgOverlayPosition = "14px 11px, 4px 1px";
+    }
+
+	if($(this.id+'-label')) $(this.id+'-label').setStyle({backgroundImage:bgOverlayImage,backgroundPosition:bgOverlayPosition});
 };
 
 WebFXTreeAbstractNode.prototype.toggle = function() {
@@ -489,7 +496,7 @@ WebFXTree.prototype.toString = function() {
  * WebFXTreeItem class
  */
 
-function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon) {
+function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon, sOverlayIcon) {
 	this.base = WebFXTreeAbstractNode;
 	this.base(sText, sAction);
 	/* Defaults to close */
@@ -498,6 +505,7 @@ function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon) {
 	} else { this.open = false; }
 	if (sIcon) { this.icon = sIcon; }
 	if (sOpenIcon) { this.openIcon = sOpenIcon; }
+    if (sOverlayIcon) { this.overlayIcon = sOverlayIcon; }
 	if (eParent) { eParent.add(this); }
 }
 
@@ -671,7 +679,13 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 		if (!this.openIcon) { this.openIcon = webFXTreeConfig.openFolderIcon; }
 	}
 	else if (!this.icon) { this.icon = webFXTreeConfig.fileIcon; }
-	
+    var bgOverlayImage = '';
+    var bgOverlayPosition = '4px 1px';
+	if(this.overlayIcon){
+        //console.log("Overlay icon!");
+        bgOverlayImage = "url('"+this.overlayIcon+"'), ";
+        bgOverlayPosition = "14px 11px, 4px 1px";
+    }
 	var label = this.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	var str = "<div id=\"" + this.id + "\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
 		indent +
@@ -679,7 +693,7 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
 		"<a href=\"" + this.url + "\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\" onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +
 		(this.target ? " target=\"" + this.target + "\"" : "") +
 		">" +
-		'<span id=\"' +this.id+ '-label\" style="background-image:url(\''+ ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) +'\');">' + label + "</span></a></div>" +
+		'<span id=\"' +this.id+ '-label\" style="background-position:'+bgOverlayPosition+';background-image:'+bgOverlayImage+'url(\''+ ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) +'\');">' + label + "</span></a></div>" +
 		"<div id=\"" + this.id + "-cont\" class=\"webfx-tree-container\" style=\"display: " + ((this.open)?'block':'none') + ";\">";
 	var sb = [];
 	for (var i = 0; i < this.childNodes.length; i++) {

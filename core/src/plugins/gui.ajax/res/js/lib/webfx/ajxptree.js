@@ -28,6 +28,7 @@ function AJXPTree(rootNode, sAction, filter) {
 	if(filter){
 		this.filter = filter;
  	}
+    this.overlayIcon = resolveImageSource(rootNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
 
 	this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);		
 	if(this.open) this.ajxpNode.load();
@@ -102,6 +103,7 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 				oic = resolveImageSource(ajxpNode.getMetadata().get("openicon"), "/images/mimes/ICON_SIZE", 16);
 			}
 			jsNode.updateIcon(ic, oic);
+            jsNode.overlayIcon = resolveImageSource(ajxpNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
 		}
 		if(jsNode.updateLabel) jsNode.updateLabel(ajxpNode.getLabel());
 	}.bind(jsNode));
@@ -136,7 +138,14 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
 	}
 	
 	this.folder = true;
-	this.WebFXTreeItem(ajxpNode.getLabel(), sAction, eParent, icon, (openIcon?openIcon:resolveImageSource("folder_open.png", "/images/mimes/ICON_SIZE", 16)));
+	this.WebFXTreeItem(
+        ajxpNode.getLabel(),
+        sAction,
+        eParent,
+        icon,
+        (openIcon?openIcon:resolveImageSource("folder_open.png", "/images/mimes/ICON_SIZE", 16)),
+        resolveImageSource(ajxpNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8)
+    );
 
 	this.loading = false;
 	this.loaded = false;
@@ -179,13 +188,15 @@ function _ajxpNodeToTree(ajxpNode, parentNode) {
 	if(parentNode.filter){
 		jsNode.filter = parentNode.filter;
 	}
-	
+    jsNode.overlayIcon = resolveImageSource(ajxpNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
+
 	ajxpNode.getChildren().each(function(child){
 		var newNode = _ajxpNodeToTree(child, jsNode);
 		if(newNode){
 			if(jsNode.filter){
 				newNode.filter = jsNode.filter;
 			}
+            newNode.overlayIcon = resolveImageSource(child.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
 			jsNode.add( newNode , false );
 		}
 	});	

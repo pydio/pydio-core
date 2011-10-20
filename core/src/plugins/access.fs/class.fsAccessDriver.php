@@ -802,6 +802,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
         //}
 
+        /*
         if(!isSet(self::$loadedUserBookmarks)){
             $user = AuthService::getLoggedUser();
             if($user == null){
@@ -819,7 +820,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                 }
             }
         }
-
+        */
         $ajxpNode->mergeMetadata($metaData);
 
     }
