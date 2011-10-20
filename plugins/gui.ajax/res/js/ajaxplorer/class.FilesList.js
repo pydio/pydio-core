@@ -26,6 +26,7 @@ Class.create("FilesList", SelectableElements, {
 	
 	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable", "IActionProvider"],
 
+    __allObservers : $A(),
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor
@@ -46,33 +47,34 @@ Class.create("FilesList", SelectableElements, {
 		}
         this.options.replaceScroller = true;
 
-		Event.observe(document, "ajaxplorer:user_logged", function(){
+        var userLoggedObserver = function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
 			disp = ajaxplorer.user.getPreference("display");
 			if(disp && (disp == 'thumb' || disp == 'list')){
 				if(disp != this._displayMode) this.switchDisplayMode(disp);
 			}
-			this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));	
+			this._thumbSize = parseInt(ajaxplorer.user.getPreference("thumb_size"));
 			if(this.slider){
 				this.slider.setValue(this._thumbSize);
 				this.resizeThumbnails();
 			}
-		}.bind(this));		
+		}.bind(this);
+        this._registerObserver(document, "ajaxplorer:user_logged", userLoggedObserver);
 		
 		
 		var loadObserver = this.contextObserver.bind(this);
 		var loadingObs = this.setOnLoad.bind(this);
 		var loadEndObs = this.removeOnLoad.bind(this);
-		document.observe("ajaxplorer:context_changed", function(event){
+        var contextChangedObserver = function(event){
 			var newContext = event.memo;
 			var previous = this.crtContext;
 			if(previous){
 				previous.stopObserving("loaded", loadEndObs);
 				previous.stopObserving("loading", loadingObs);
-			}			
+			}
 			this.crtContext = newContext;
 			if(this.crtContext.isLoaded()) {
-				this.contextObserver(event);			
+				this.contextObserver(event);
 			}else{
 				var oThis = this;
 				this.crtContext.observeOnce("loaded", function(){
@@ -81,23 +83,27 @@ Class.create("FilesList", SelectableElements, {
 				});
 			}
 			this.crtContext.observe("loaded",loadEndObs);
-			this.crtContext.observe("loading",loadingObs);				
-			
-		}.bind(this) );
-		document.observe("ajaxplorer:context_loading", loadingObs);
-		document.observe("ajaxplorer:component_config_changed", function(event){
+			this.crtContext.observe("loading",loadingObs);
+
+		}.bind(this);
+        var componentConfigObserver = function(event){
 			if(event.memo.className == "FilesList"){
 				var refresh = this.parseComponentConfig(event.memo.classConfig.get('all'));
 				if(refresh){
 					this.initGUI();
 				}
 			}
-		}.bind(this) );
-		
-		document.observe("ajaxplorer:selection_changed", function(event){
+		}.bind(this) ;
+        var selectionChangedObserver = function(event){
 			if(event.memo._selectionSource == null || event.memo._selectionSource == this) return;
 			this.setSelectedNodes(ajaxplorer.getContextHolder().getSelectedNodes());
-		}.bind(this));
+		}.bind(this);
+
+		this._registerObserver(document, "ajaxplorer:context_changed", contextChangedObserver );
+		this._registerObserver(document, "ajaxplorer:context_loading", loadingObs);
+		this._registerObserver(document, "ajaxplorer:component_config_changed", componentConfigObserver);
+		this._registerObserver(document, "ajaxplorer:selection_changed", selectionChangedObserver);
+
 		this._thumbSize = 64;
 		this._crtImageIndex = 0;
 	
@@ -121,11 +127,33 @@ Class.create("FilesList", SelectableElements, {
 		this.defaultSortTypes = ["StringDirFile", "NumberKo", "String", "MyDate"];
 		this._oSortTypes = this.defaultSortTypes;
 		
-		this.initGUI();			
-		Event.observe(document, "keydown", this.keydown.bind(this));
-        document.observe("ajaxplorer:trigger_repository_switch", this.setOnLoad.bind(this));
+		this.initGUI();
+        var keydownObserver = this.keydown.bind(this);
+        var repoSwitchObserver = this.setOnLoad.bind(this);
+		this._registerObserver(document, "keydown", keydownObserver);
+        this._registerObserver(document, "ajaxplorer:trigger_repository_switch", repoSwitchObserver);
 	},
-		
+
+    _registerObserver:function(object, eventName, handler){
+        Event.observe(object, eventName, handler);
+        this.__allObservers.push({
+            object:object,
+            event:eventName,
+            handler:handler});
+    },
+
+    _clearObservers:function(){
+        this.__allObservers.each(function(el){
+            Event.stopObserving(el.object, el.event, el.handler);
+        });
+        if(this.observer){
+            this.stopObserving("resize", this.observer);
+        }
+        if(this.scrollSizeObserver){
+            this.stopObserving("resize", this.scrollSizeObserver);
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
@@ -137,6 +165,10 @@ Class.create("FilesList", SelectableElements, {
 	 * Implementation of the IAjxpWidget methods
 	 */
 	destroy : function(){
+        this._clearObservers();
+        if(window[this.htmlElement.id]){
+            delete window[this.htmlElement.id];
+        }
 		this.htmlElement = null;
 	},
 	
@@ -684,9 +716,10 @@ Class.create("FilesList", SelectableElements, {
 	 * Link focusing to ajaxplorer main
 	 */
 	setFocusBehaviour : function(){
-		this.htmlElement.observe("click", function(){
+        var clickObserver = function(){
 			if(ajaxplorer) ajaxplorer.focusOn(this);
-		}.bind(this) );
+		}.bind(this) ;
+        this._registerObserver(this.htmlElement, "click", clickObserver);
 	},
 	
 	/**

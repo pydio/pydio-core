@@ -127,6 +127,9 @@ Class.create("FoldersTree", AjxpPane, {
             document.stopObserving(pair.key, pair.value);
         });
         if(this.tree) this.tree.destroy();
+        if(window[this.htmlElement.id]){
+            delete window[this.htmlElement.id];
+        }
     },
 
 	/**

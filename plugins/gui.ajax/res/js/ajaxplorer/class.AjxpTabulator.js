@@ -114,6 +114,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 			ajxpObject.destroy();
 		}.bind(this));
 		this.htmlElement.update("");
+        if(window[this.htmlElement.id]){
+            delete window[this.htmlElement.id];
+        }
 		this.htmlElement = null;
 	},
 	

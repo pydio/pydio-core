@@ -80,7 +80,11 @@ Class.create("AjxpPane", {
             child.destroy();
         });
         this.htmlElement.update("");
+        if(window[this.htmlElement.id]){
+            delete window[this.htmlElement.id];
+        }
 		this.htmlElement = null;
+
 	},
 	
 	/**
