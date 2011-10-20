@@ -1088,11 +1088,29 @@ Class.create("FilesList", SelectableElements, {
 			}
 			if(s == "ajxp_label")
 			{
+                var textLabel = new Element("span", {
+                    id          :'ajxp_label',
+                    className   :'text_label'+fullview
+                }).update(metaData.get('text'));
+
+                var backgroundPosition = '4px 2px';
+                var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                if(metaData.get('overlay_icon')){
+                    backgroundPosition = '14px 11px, 4px 2px';
+                    backgroundImage = 'url("'+resolveImageSource(metaData.get('overlay_icon'), "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")'
+                }
+                textLabel.setStyle({
+                    paddingLeft:'24px',
+                    backgroundRepeat:'no-repeat',
+                    backgroundPosition:backgroundPosition,
+                    backgroundImage:backgroundImage
+                });
+
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 
 					style:"cursor:default;display:block;"
-				//}).update("<img src=\""+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"\" " + "width=\"16\" height=\"16\" hspace=\"1\" vspace=\"2\" align=\"ABSMIDDLE\" border=\"0\"> <span id=\"ajxp_label\" class=\"text_label\">" + metaData.get('text')+"</span>");
-				}).update("<span id=\"ajxp_label\" class=\"text_label"+fullview+"\" style=\"padding-left:24px; background-repeat:no-repeat;background-position:4px 2px;background-image:url('"+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE/", 16)+"')\">" + metaData.get('text')+"</span>");
+				}).update(textLabel);
+
 				innerSpan.ajxpNode = ajxpNode; // For draggable
 				tableCell.insert(innerSpan);
 				
@@ -1180,6 +1198,19 @@ Class.create("FilesList", SelectableElements, {
 		newRow.insert({"bottom": innerSpan});
 		newRow.IMAGE_ELEMENT = img;
 		newRow.LABEL_ELEMENT = label;
+        if(ajxpNode.getMetadata().get("overlay_icon")){
+            var ovDiv = new Element("div");
+            ovDiv.setStyle({
+                position: "absolute",
+                top: "5px",
+                right: "5px",
+                height: "16px",
+                width: "16px",
+                backgroundImage: "url('"+resolveImageSource(ajxpNode.getMetadata().get('overlay_icon'), "/images/overlays/ICON_SIZE", 16)+"')"
+            });
+            innerSpan.insert({after:ovDiv});
+        }
+
 		this._htmlElement.insert(newRow);
 			
 		var modifiers ;

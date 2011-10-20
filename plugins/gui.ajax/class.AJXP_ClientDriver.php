@@ -27,6 +27,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AJXP_ClientDriver extends AJXP_Plugin 
 {
+    private static $loadedBookmarks;
+
     public function loadConfigs($configData){
         parent::loadConfigs($configData);
         if(preg_match('/MSIE 7/',$_SERVER['HTTP_USER_AGENT']) || preg_match('/MSIE 8/',$_SERVER['HTTP_USER_AGENT'])){
@@ -299,6 +301,26 @@ class AJXP_ClientDriver extends AJXP_Plugin
 		
 		return false;		
 	}
+
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @return
+     */
+    function nodeBookmarkMetadata(&$ajxpNode){
+        $user = AuthService::getLoggedUser();
+        if($user == null) return;
+        if(!isSet(self::$loadedBookmarks)){
+            self::$loadedBookmarks = $user->getBookmarks();
+        }
+        foreach(self::$loadedBookmarks as $bm){
+            if($bm["PATH"] == $ajxpNode->getPath()){
+                $ajxpNode->mergeMetadata(array(
+                         "ajxp_bookmarked" => "true",
+                         "overlay_icon"  => "bookmark.png"
+                    ));
+            }
+        }
+    }
 
     static function filterXml($value){
         $instance = AJXP_PluginsService::getInstance()->findPlugin("gui", "ajax");
