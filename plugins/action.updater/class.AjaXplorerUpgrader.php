@@ -559,7 +559,7 @@ class AjaXplorerUpgrader {
 
         if(!$dryRun){
             fclose($logFileHandle);
-            print("<b>The operation is finished, all actions are logged in $logFile</b>");
+            print("<b>The operation is finished, all actions are logged in $logFile. Nothing was touch on your previous installation, please note that the repositories are not moved.<br>You should now logout, clear your browser cache, and refresh this page. Then you will log in with your previous users ids.</b>");
         }
 
     }
