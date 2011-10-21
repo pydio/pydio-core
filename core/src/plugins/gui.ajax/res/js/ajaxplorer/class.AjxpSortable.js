@@ -177,7 +177,7 @@ Class.create("AjxpSortable", SortableTable, {
 		else
 			s = this.getInnerText(c);
 		if(s[0] == ' ') s = s.substr(1, (s.length-1));	
-		if(oRow.getAttribute('is_file') == '0' || oRow.getAttribute('is_file') == 'false'){		
+		if(!oRow.ajxpNode.isLeaf()){
 			s = '000'+s;
 		}
 		return s.toUpperCase();
@@ -191,8 +191,8 @@ Class.create("AjxpSortable", SortableTable, {
 	 */
 	cellSorterValue : function(oRow, nColumn){
 		var tds = oRow.select('td');
-		if(tds[nColumn] && tds[nColumn].readAttribute('sorter_value')){
-			return parseInt(tds[nColumn].readAttribute('sorter_value'));
+		if(tds[nColumn] && tds[nColumn].getAttribute('data-sorter_value')){
+			return parseInt(tds[nColumn].getAttribute('data-sorter_value'));
 		}
 	},
 	
