@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <action_plugin name="share" label="Sharing Features" description="Share Center actions and hooks">
+    <server_settings>
+        <global_param name="METADATA_FILE" type="string" label="Metadata FIle" description="Hidden file containing shared metadata" mandatory="true" default=".ajxp_share_meta"/>
+    </server_settings>
     <registry_contributions>
+        <hooks>
+            <serverCallback hookName="node.info" methodName="nodeSharedMetadata"></serverCallback>
+            <serverCallback hookName="node.change" methodName="updateNodeSharedData"></serverCallback>
+        </hooks>
         <actions>
             <action name="share">
                 <gui text="292" title="292" src="share.png" hasAccessKey="false">
