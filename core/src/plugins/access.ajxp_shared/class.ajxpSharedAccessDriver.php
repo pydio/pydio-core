@@ -20,7 +20,7 @@
  *
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-
+require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
 /**
  * @package info.ajaxplorer.plugins
  * @class ajxpSharedAccessDriver
@@ -96,54 +96,15 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::header();
 				foreach ($files as $index => $element){
 					$element = basename($element);
-					if($mime == "shared_repository"){
-						$repo = ConfService::getRepositoryById($element);
-						if(!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()){
-							AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
-							break;
-						}else{
-							$res = ConfService::deleteRepository($element);
-							if($res == -1){
-								AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
-								break;
-							}else{
-								if($index == count($files)-1){
-									AJXP_XMLWriter::sendMessage($mess["ajxp_conf.59"], null);						
-									AJXP_XMLWriter::reloadDataNode();
-								}
-							}
-						}
-					}else if( $mime == "shared_user" ){
-						$confDriver = ConfService::getConfStorageImpl();
-						$object = $confDriver->createUserObject($element);
-						if(!$object->hasParent() || $object->getParent() != $loggedUser->getId()){
-							AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
-							break;
-						}else{
-							$res = AuthService::deleteUser($element);
-							if($index == count($files)-1){				
-								AJXP_XMLWriter::sendMessage($mess["ajxp_conf.60"], null);
-								AJXP_XMLWriter::reloadDataNode();
-							}
-						}
-					}else if( $mime == "shared_file" ){
-						$dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");					
-						$publicletData = $this->loadPublicletData($dlFolder."/".$element.".php");
-						if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
-					        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
-			        		PublicletCounter::delete($element);
-							unlink($dlFolder."/".$element.".php");
-							if($index == count($files)-1){
-								AJXP_XMLWriter::sendMessage($mess["ajxp_shared.13"], null);
-								AJXP_XMLWriter::reloadDataNode();
-							}
-						}else{
-							AJXP_XMLWriter::sendMessage(null, $mess["ajxp_shared.12"]);
-							break;
-						}
-					}
+                    $mime = array_pop(explode("shared_", $mime));
+                    ShareCenter::deleteSharedElement($mime, $element, $loggedUser);
+                    if($mime == "repository") $out = $mess["ajxp_conf.59"];
+                    else if($mime == "user") $out = $mess["ajxp_conf.60"];
+                    else if($mime == "file") $out = $mess["ajxp_conf.13"];
 				}
-				AJXP_XMLWriter::close();			
+                AJXP_XMLWriter::sendMessage($out, null);
+                AJXP_XMLWriter::reloadDataNode();
+				AJXP_XMLWriter::close();
 			break;
 			
 			case "clear_expired" :
@@ -165,8 +126,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				$selection = new UserSelection();
 				$selection->initFromHttpVars();
 				$elements = $selection->getFiles();
-		        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
-				foreach ($elements as $element){
+		        foreach ($elements as $element){
 					PublicletCounter::reset(str_replace(".php", "", basename($element)));
 				}
 				AJXP_XMLWriter::header();
@@ -205,7 +165,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
         }
 		
 		foreach ($files as $file){
-			$publicletData = $this->loadPublicletData($file);			
+			$publicletData = ShareCenter::loadPublicletData($file);
 			if(isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
@@ -228,33 +188,19 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		$userId = $loggedUser->getId();
 		$deleted = array();
 		foreach ($files as $file){
-			$publicletData = $this->loadPublicletData($file);			
+			$publicletData = ShareCenter::loadPublicletData($file);
 			if(!isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
 			if(isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()){
 				unlink($file);
 				$deleted[] = basename($file);
-		        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
         		PublicletCounter::delete(str_replace(".php", "", basename($file)));
 			}
 		}
 		return $deleted;
 	}
-	
-	protected function loadPublicletData($file){		
-		$lines = file($file);
-		$id = str_replace(".php", "", basename($file));
-		$code = $lines[3] . $lines[4] . $lines[5];
-		eval($code);
-		$dataModified = (md5($inputData) != $id);
-		$publicletData = unserialize($inputData);
-		$publicletData["SECURITY_MODIFIED"] = $dataModified;		
-        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
-        $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);		
-		return $publicletData;
-	}
-	
+
 	function listUsers(){
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_shared.10" attributeName="repo_accesses" sortType="String"/></columns>');		
 		if(!AuthService::usersEnabled()) return ;
