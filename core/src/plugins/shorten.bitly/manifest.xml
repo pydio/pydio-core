@@ -7,7 +7,7 @@
 	<registry_contributions>
         <actions>
         <!-- Override a simple action -->
-            <action name="public_url">
+            <action name="share">
                 <post_processing>
                     <serverCallback methodName="postProcess" capture="true" applyCondition="$apply=!isSet($httpVars['sub_action']);"/>
                 </post_processing>
@@ -15,4 +15,7 @@
         </actions>
 	</registry_contributions>
 	<class_definition filename="plugins/shorten.bitly/class.BitlyShortener.php" classname="BitlyShortener"/>
+    <dependencies>
+        <activePlugin pluginName="action.share"/>
+    </dependencies>
 </hook>

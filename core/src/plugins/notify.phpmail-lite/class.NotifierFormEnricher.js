@@ -23,7 +23,7 @@
 Class.create("NotifierFormEnricher", {
 
     initialize : function(){
-        document.observe("ajaxplorer:beforeApply-public_url", function(){
+        document.observe("ajaxplorer:beforeApply-share", function(){
             this.enrichShareFolderForm();
         }.bind(this));
     },

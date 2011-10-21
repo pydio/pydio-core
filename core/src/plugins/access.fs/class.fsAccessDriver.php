@@ -544,41 +544,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				
 			break;
             
-            //------------------------------------
-            // SHARING FILE OR FOLDER
-            //------------------------------------
-            case "public_url":
-            	$subAction = (isSet($httpVars["sub_action"])?$httpVars["sub_action"]:"");
-            	if($subAction == "delegate_repo"){
-					header("Content-type:text/plain");				
-					$result = $this->createSharedRepository($httpVars);				
-					print($result);        		
-            	}else if($subAction == "list_shared_users"){
-            		header("Content-type:text/html");
-            		if(!ConfService::getAuthDriverImpl()->usersEditable()){
-            			break;
-            		}
-            		$loggedUser = AuthService::getLoggedUser();
-            		$allUsers = AuthService::listUsers();
-            		$crtValue = $httpVars["value"];
-            		$users = "";
-            		foreach ($allUsers as $userId => $userObject){            			
-            			if($crtValue != "" && (strstr($userId, $crtValue) === false || strstr($userId, $crtValue) != 0)) continue;
-            			if( ( $userObject->hasParent() && $userObject->getParent() == $loggedUser->getId() ) || ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") === true  ){
-            				$users .= "<li>".$userId."</li>";
-            			}
-            		}
-            		if(strlen($users)) {
-            			print("<ul>".$users."</ul>");
-            		}
-            	}else{
-					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-	                $url = $this->makePubliclet($file, $httpVars["password"], $httpVars["expiration"]);
-	                header("Content-type:text/plain");
-	                echo $url;
-            	}
-            break;
-						
 			//------------------------------------
 			//	XML LISTING
 			//------------------------------------
@@ -1627,15 +1592,22 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
     
     
     /** The publiclet URL making */
-    function makePubliclet($filePath, $password, $expire)
+    function makePublicletOptions($filePath, $password, $expire, $repository)
     {
-    	$data = array("DRIVER"=>$this->repository->getAccessType(), "OPTIONS"=>NULL, "FILE_PATH"=>$filePath, "ACTION"=>"download", "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0, "PASSWORD"=>$password);
-    	return $this->writePubliclet($data);
+    	$data = array(
+            "DRIVER"=>$repository->getAccessType(),
+            "OPTIONS"=>NULL,
+            "FILE_PATH"=>$filePath,
+            "ACTION"=>"download",
+            "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0,
+            "PASSWORD"=>$password
+        );
+        return $data;
     }
 
-    function makeSharedRepositoryOptions($httpVars){
+    function makeSharedRepositoryOptions($httpVars, $repository){
 		$newOptions = array(
-			"PATH" => $this->repository->getOption("PATH").AJXP_Utils::decodeSecureMagic($httpVars["file"]), 
+			"PATH" => $repository->getOption("PATH").AJXP_Utils::decodeSecureMagic($httpVars["file"]),
 			"CREATE" => false, 
 			"RECYCLE_BIN" => "", 
 			"DEFAULT_RIGHTS" => "");
