@@ -72,284 +72,40 @@ class AbstractAccessDriver extends AJXP_Plugin {
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
-		if(isSet($this->actions["public_url"])){
-			$disableSharing = false;
-			$downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-			if($downloadFolder == ""){
-				$disableSharing = true;
-			}else if((!is_dir($downloadFolder) || !is_writable($downloadFolder))){
-				AJXP_Logger::logAction("Disabling Public links, $downloadFolder is not writeable!", array("folder" => $downloadFolder, "is_dir" => is_dir($downloadFolder),"is_writeable" => is_writable($downloadFolder)));
-				$disableSharing = true;
-			}else{
-				if(AuthService::usersEnabled()){					
-					$loggedUser = AuthService::getLoggedUser();
-					/*
-					// Should be disabled by AJXP_Controller directly
-					$currentRepo = ConfService::getRepository();
-					if($currentRepo != null){
-						$rights = $loggedUser->getSpecificActionsRights($currentRepo->getId());
-						if(isSet($rights["public_url"]) && $rights["public_url"] === false){
-							$disableSharing = true;
-						}
-					}
-					*/
-					if($loggedUser != null && $loggedUser->getId() == "guest" || $loggedUser == "shared"){
-						$disableSharing = true;
-					}
-				}else{
-					$disableSharing = true;
-				}
-			}
-			if($disableSharing){
-				unset($this->actions["public_url"]);
-				$actionXpath=new DOMXPath($contribNode->ownerDocument);
-				$publicUrlNodeList = $actionXpath->query('action[@name="public_url"]', $contribNode);
-				$publicUrlNode = $publicUrlNodeList->item(0);
-				$contribNode->removeChild($publicUrlNode);
-			}
-		}
 		if($this->detectStreamWrapper() !== false){
 			$this->actions["cross_copy"] = array();
 		}
 	}
-	
-    /** Cypher the publiclet object data and write to disk.
-        @param $data The publiclet data array to write 
-                     The data array must have the following keys:
-                     - DRIVER      The driver used to get the file's content      
-                     - OPTIONS     The driver options to be successfully constructed (usually, the user and password)
-                     - FILE_PATH   The path to the file's content
-                     - PASSWORD    If set, the written publiclet will ask for this password before sending the content
-                     - ACTION      If set, action to perform
-                     - USER        If set, the AJXP user 
-                     - EXPIRE_TIME If set, the publiclet will deny downloading after this time, and probably self destruct.
-        @return the URL to the downloaded file
-    */
-    function writePubliclet($data)
-    {
-    	$downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-    	if(!is_dir($downloadFolder)){
-    		return "ERROR : Public URL folder does not exist!";
-    	}
-    	if(!function_exists("mcrypt_create_iv")){
-    		return "ERROR : MCrypt must be installed to use publiclets!";
-    	}
-    	if($data["PASSWORD"] && !is_file($downloadFolder."/allz.css")){
-            if(!defined("AJXP_THEME_FOLDER")) $th = "plugins/gui.ajax/res/themes/oxygen";
-            else $th = AJXP_THEME_FOLDER ;
-    		@copy(AJXP_INSTALL_PATH."/".$th."/css/allz.css", $downloadFolder."/allz.css");
-    		@copy(AJXP_INSTALL_PATH."/".$th."/images/actions/22/dialog_ok_apply.png", $downloadFolder."/dialog_ok_apply.png");
-    		@copy(AJXP_INSTALL_PATH."/".$th."/images/actions/16/public_url.png", $downloadFolder."/public_url.png");
-    	}
-    	if(!is_file($downloadFolder."/index.html")){
-    		@copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
-    	}
-        $data["PLUGIN_ID"] = $this->id;
-        $data["BASE_DIR"] = $this->baseDir;
-        $data["REPOSITORY"] = $this->repository;
-        if(AuthService::usersEnabled()){
-        	$data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
-        }
-        if($this->hasMixin("credentials_consumer")){
-        	$cred = AJXP_Safe::tryLoadingCredentialsFromSources(array(), $this->repository);
-        	if(isSet($cred["user"]) && isset($cred["password"])){
-        		$data["SAFE_USER"] = $cred["user"];
-        		$data["SAFE_PASS"] = $cred["password"];        		
-        	}
-        }
-        // Force expanded path in publiclet
-        $data["REPOSITORY"]->addOption("PATH", $this->repository->getOption("PATH"));
-        if ($data["ACTION"] == "") $data["ACTION"] = "download";
-        // Create a random key
-        $data["FINAL_KEY"] = md5(mt_rand().time());
-        // Cypher the data with a random key
-        $outputData = serialize($data);
-        // Hash the data to make sure it wasn't modified
-        $hash = md5($outputData);
-        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-        // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
-        $outputData = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $hash, $outputData, MCRYPT_MODE_ECB, $iv));
-        // Okay, write the file:
-        $fileData = "<"."?"."php \n".
-        '   require_once("'.str_replace("\\", "/", AJXP_INSTALL_PATH).'/publicLet.inc.php"); '."\n".
-        '   $id = str_replace(".php", "", basename(__FILE__)); '."\n". // Not using "" as php would replace $ inside
-        '   $cypheredData = base64_decode("'.$outputData.'"); '."\n".
-        '   $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND); '."\n".
-        '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB, $iv));  '."\n".
-        '   if (md5($inputData) != $id) { header("HTTP/1.0 401 Not allowed, script was modified"); exit(); } '."\n".
-        '   // Ok extract the data '."\n".
-        '   $data = unserialize($inputData); AbstractAccessDriver::loadPubliclet($data); ?'.'>';
-        if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE){
-            return "Can't write to PUBLIC URL";
-        }
-        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
-        PublicletCounter::reset($hash);
-        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
-        if($dlURL != ""){
-        	return rtrim($dlURL, "/")."/".$hash.".php";
-        }else{
-	        $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
-	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/")."/".$hash.".php");
-        }
+
+
+    /**
+     * Backward compatibility, now moved to SharedCenter::loadPubliclet();
+     * @param $data
+     * @return void
+     */
+    function loadPubliclet($data){
+        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php");
+        ShareCenter::loadPubliclet($data);
     }
 
-    /** Load a uncyphered publiclet */
-    function loadPubliclet($data)
-    {
-        // create driver from $data
-        $className = $data["DRIVER"]."AccessDriver";
-        if ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"])
-        {
-            // Remove the publiclet, it's done
-            if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE){
-		        $hash = md5(serialize($data));
-		        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
-		        PublicletCounter::delete($hash);
-                unlink($_SERVER["SCRIPT_FILENAME"]);
-            }
-            
-            echo "Link is expired, sorry.";
-            exit();
-        }
-        // Check password
-        if (strlen($data["PASSWORD"]))
-        {
-            if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"]))
-            {   
-            	$content = file_get_contents(AJXP_INSTALL_PATH."/plugins/core.access/res/public_links.html");
-            	$language = "en";
-            	if(isSet($_GET["lang"])){
-            		$language = $_GET["lang"];
-            	}
-            	$messages = array();
-            	if(is_file(AJXP_COREI18N_FOLDER."/".$language.".php")){
-            		include(AJXP_COREI18N_FOLDER."/".$language.".php");
-            		$messages = $mess;
-            	}            	
-				if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $content, $matches, PREG_SET_ORDER)){
-					foreach($matches as $match){
-						$messId = str_replace("]", "", str_replace("[", "", $match[1]));
-						if(isSet($messages[$messId])) $content = str_replace("AJXP_MESSAGE[$messId]", $messages[$messId], $content);
-					}
-				}
-				echo $content;
-                exit(1);
-            }
-        }
-        $filePath = AJXP_INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
-        if(!is_file($filePath)){
-                die("Warning, cannot find driver for conf storage! ($className, $filePath)");
-        }
-        require_once($filePath);        
-        $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
-        $driver->loadManifest();        
-        if($driver->hasMixin("credentials_consumer") && isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])){
-        	// FORCE SESSION MODE
-        	AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
-        	AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
-        }
-        $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
-        $driver->initRepository();
-        ConfService::tmpReplaceRepository($data["REPOSITORY"]);
-        // Increment counter
-        $hash = md5(serialize($data));
-        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
-        PublicletCounter::increment($hash);       
-        // Now call switchAction 
-        //@todo : switchAction should not be hard coded here!!!
-        // Re-encode file-path as it will be decoded by the action.
-        try{
-	        $driver->switchAction($data["ACTION"], array("file"=>SystemTextEncoding::toUTF8($data["FILE_PATH"])), "");
-        }catch (Exception $e){
-        	die($e->getMessage());
-        }
-    }
+    /**
+     * Populate publiclet options
+     * @param String $filePath The path to the file to share
+     * @param String $password optionnal password
+     * @param String $expires optional expiration date
+     * @param Repository $repository
+     * @return Array
+     */
+    function makePublicletOptions($filePath, $password, $expires, $repository) {}
 
-    /** Create a publiclet object, that will be saved in PUBLIC_DOWNLOAD_FOLDER
-	/* Typically, the class will simply create a data array, and call return writePubliclet($data)
-    /* @param String $filePath The path to the file to share
-    /* @param String $password optionnal password
-    /* @param String $expires optional expiration date        
-	/* @return The full public URL to the publiclet.
-    */
-    function makePubliclet($filePath, $password, $expires) {}
-    
-    function makeSharedRepositoryOptions($httpVars){}
+    /**
+     * Populate shared repository options
+     * @param Array $httpVars
+     * @param Repository $repository
+     * @return Array
+     */
+    function makeSharedRepositoryOptions($httpVars, $repository){}
 
-    function createSharedRepository($httpVars){
-		// ERRORS
-		// 100 : missing args
-		// 101 : repository label already exists
-		// 102 : user already exists
-		// 103 : current user is not allowed to share
-		// SUCCESS
-		// 200
-    	
-		if(!isSet($httpVars["repo_label"]) || $httpVars["repo_label"] == "" 
-			||  !isSet($httpVars["repo_rights"]) || $httpVars["repo_rights"] == ""
-			||  !isSet($httpVars["shared_user"]) || $httpVars["shared_user"] == ""){
-			return 100;
-		}
-		$loggedUser = AuthService::getLoggedUser();
-		$actRights = $loggedUser->getSpecificActionsRights($this->repository->id);
-		if(isSet($actRights["public_url"]) && $actRights["public_url"] === false){
-			return 103;
-		}
-		$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
-		$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
-		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
-		$rights = $httpVars["repo_rights"];
-		if($rights != "r" && $rights != "w" && $rights != "rw") return 100;
-		// CHECK USER & REPO DOES NOT ALREADY EXISTS
-		$repos = ConfService::getRepositoriesList();
-		foreach ($repos as $obj){
-			if($obj->getDisplay() == $label){
-				return 101;
-			}
-		}		
-		$confDriver = ConfService::getConfStorageImpl();
-		if(AuthService::userExists($userName)){
-			// check that it's a child user
-			$userObject = $confDriver->createUserObject($userName);
-			if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
-				return 102;
-			}
-		}else{
-			if(!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") return 100;
-			AuthService::createUser($userName, md5($httpVars["shared_pass"]));
-			$userObject = $confDriver->createUserObject($userName);
-			$userObject->clearRights();
-			$userObject->setParent($loggedUser->id);			
-		}
-		
-		// CREATE SHARED OPTIONS
-        $options = $this->makeSharedRepositoryOptions($httpVars);
-        $customData = array();
-        foreach($httpVars as $key => $value){
-            if(substr($key, 0, strlen("PLUGINS_DATA_")) == "PLUGINS_DATA_"){
-                $customData[substr($key, strlen("PLUGINS_DATA_"))] = $value;
-            }
-        }
-        if(count($customData)){
-            $options["PLUGINS_DATA"] = $customData;
-        }
-		$newRepo = $this->repository->createSharedChild(
-			$label, 
-			$options,
-			$this->repository->id, 
-			$loggedUser->id, 
-			$userName
-		);
-		ConfService::addRepository($newRepo);
-						
-		// CREATE USER WITH NEW REPO RIGHTS
-		$userObject->setRight($newRepo->getUniqueId(), $rights);
-		$userObject->setSpecificActionRight($newRepo->getUniqueId(), "public_url", false);
-		$userObject->save();
-		
-    	return 200;
-    }
        
     function crossRepositoryCopy($httpVars){
     	

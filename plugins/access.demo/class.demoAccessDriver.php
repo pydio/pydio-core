@@ -39,17 +39,6 @@ class demoAccessDriver extends fsAccessDriver
 		switch($action)
 		{			
 			//------------------------------------
-			//	ONLINE EDIT
-			//------------------------------------
-			case "public_url":
-				if($httpVars["sub_action"] == "delegate_repo"){
-					return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
-				}else{
-					print($errorMessage);
-				}
-				exit(0);
-			break;
-			//------------------------------------
 			//	WRITE ACTIONS
 			//------------------------------------
 			case "put_content":
