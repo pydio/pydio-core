@@ -744,10 +744,9 @@ Class.create("FilesList", SelectableElements, {
 			if(this._displayMode == "thumb") this._displayMode = "list";
 			else this._displayMode = "thumb";
 		}
-		this.pendingSelection = this.getSelectedFileNames();
+		ajaxplorer.getContextHolder().setPendingSelection(ajaxplorer.getContextHolder().getSelectedNodes());
 		this.initGUI();		
 		this.reload();
-		this.pendingSelection = null;
 		this.fireChange();
 		if(ajaxplorer && ajaxplorer.user){
 			ajaxplorer.user.setPreference("display", this._displayMode);
@@ -806,7 +805,7 @@ Class.create("FilesList", SelectableElements, {
 				var img = oImageToLoad.rowObject.IMAGE_ELEMENT || $(oImageToLoad.index);
 				if(img == null || window.loader == null) return;
 				var newImg = window.loader.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
-				newImg.setAttribute("is_loaded", "true");
+				newImg.setAttribute("data-is_loaded", "true");
 				img.parentNode.replaceChild(newImg, img);
 				oImageToLoad.rowObject.IMAGE_ELEMENT = newImg;
 				this.resizeThumbnails(oImageToLoad.rowObject);
@@ -936,7 +935,11 @@ Class.create("FilesList", SelectableElements, {
 				this.selectFile(pendingFile);
 			}else if(pendingFile.length){
 				for(var f=0;f<pendingFile.length; f++){
-					this.selectFile(pendingFile[f], true);
+                    if(Object.isString(pendingFile[f])){
+                        this.selectFile(pendingFile[f], true);
+                    }else{
+                        this.selectFile(pendingFile[f].getPath(), true);
+                    }
 				}
 			}
 			this.hasFocus = true;
@@ -1062,7 +1065,7 @@ Class.create("FilesList", SelectableElements, {
 		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
 		this.parsingCache.set('tBody', tBody);
 		metaData.each(function(pair){
-			newRow.setAttribute(pair.key, pair.value);
+			//newRow.setAttribute(pair.key, pair.value);
 			if(Prototype.Browser.IE && pair.key == "ID"){
 				newRow.setAttribute("ajxp_sql_"+pair.key, pair.value);
 			}			
@@ -1235,7 +1238,7 @@ Class.create("FilesList", SelectableElements, {
 		{
 			this._crtImageIndex ++;
 			var imgIndex = this._crtImageIndex;
-			img.writeAttribute("is_loaded", "false");
+			img.writeAttribute("data-is_loaded", "false");
 			img.writeAttribute("id", "ajxp_image_"+imgIndex);
 			var crtIndex = this._crtImageIndex;
 			
@@ -1271,7 +1274,7 @@ Class.create("FilesList", SelectableElements, {
 	},
 		
 	partSizeCellRenderer : function(element, ajxpNode, type){
-		element.setAttribute("sorter_value", ajxpNode.getMetadata().get("bytesize"));
+		element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
 		if(!ajxpNode.getMetadata().get("target_bytesize")){
 			return;
 		}
@@ -1311,7 +1314,7 @@ Class.create("FilesList", SelectableElements, {
 			});
 			div.insert({bottom:stopButton});			
 		}
-		span.setAttribute('target_size', ajxpNode.getMetadata().get("target_bytesize"));
+		span.setAttribute('data-target_size', ajxpNode.getMetadata().get("target_bytesize"));
 		window.setTimeout(function(){
 			span.pgBar = new JS_BRAMUS.jsProgressBar(span, percent, options);
 			var pe = new PeriodicalExecuter(function(){
@@ -1329,7 +1332,7 @@ Class.create("FilesList", SelectableElements, {
 						pe.stop();
 						ajaxplorer.actionBar.fireAction("refresh");
 					}else{
-						var newPercentage = parseInt( parseInt(transport.responseText)/parseInt($(uuid).getAttribute('target_size'))*100 );
+						var newPercentage = parseInt( parseInt(transport.responseText)/parseInt($(uuid).getAttribute('data-target_size'))*100 );
 						$(uuid).pgBar.setPercentage(newPercentage);
 						$(uuid).next('span.percent_text').update(newPercentage+"%");
 					}
@@ -1356,7 +1359,7 @@ Class.create("FilesList", SelectableElements, {
 			var label_element = element.LABEL_ELEMENT || element.select('.thumbLabel')[0];
 			var tSize = this._thumbSize;
 			var tW, tH, mT, mB;
-			if(image_element.resizePreviewElement && image_element.getAttribute("is_loaded") == "true")
+			if(image_element.resizePreviewElement && image_element.getAttribute("data-is_loaded") == "true")
 			{
 				image_element.resizePreviewElement({width:tSize, height:tSize, margin:defaultMargin});
 			}
@@ -1489,72 +1492,6 @@ Class.create("FilesList", SelectableElements, {
 			ajaxplorer.getActionBar().fireDefaultAction("dir", selNode);
 		}
 	},
-	
-	/**
-	 * Gets the currently selected names
-	 * Not really used anymore, selection is handled by the datamodel
-	 * @returns Array|null
-	 */
-	getSelectedFileNames: function() {
-		selRaw = this.getSelectedItems();
-		if(!selRaw.length){
-			return null;
-		}
-		var tmp = new Array(selRaw.length);
-		for(i=0;i<selRaw.length;i++)
-		{
-			tmp[i] = selRaw[i].getAttribute('filename');
-		}
-		return tmp;
-	},
-	/**
-	 * Get the number of items
-	 * @returns Integer
-	 */
-	getFilesCount: function() 
-	{	
-		return this.getItems().length;
-	},
-	
-	/**
-	 * Check if a file name exists in the list. 
-	 * DEPRECATED, use AjxpDataModel methods instead.
-	 * @param newFileName String
-	 * @returns Boolean
-	 */
-	fileNameExists: function(newFileName) 
-	{	
-		var allItems = this.getItems();
-		if(!allItems.length)
-		{		
-			return false;
-		}
-		for(i=0;i<allItems.length;i++)
-		{
-			var crtFileName = getBaseName(allItems[i].getAttribute('filename'));
-			if(crtFileName && crtFileName.toLowerCase() == getBaseName(newFileName).toLowerCase()) 
-				return true;
-		}
-		return false;
-	},
-	
-	/**
-	 * Get all file names 
-	 * DEPRECATED, use AjxpDataModel methods instead.
-	 * @returns Array
-	 */	
-	getFileNames : function(separator){
-		var fNames = $A([]);
-		var allItems = this.getItems();
-		for(var i=0;i<allItems.length;i++){
-			fNames.push(getBaseName(allItems[i].getAttribute('filename')));
-		}
-		if(separator){
-			return fNames.join(separator);
-		}else {
-			return fNames.toArray();
-		}
-	},
 
 	/**
 	 * Select a row/thum by its name
@@ -1564,14 +1501,14 @@ Class.create("FilesList", SelectableElements, {
 	selectFile: function(fileName, multiple)
 	{
 		fileName = getBaseName(fileName);
-		if(!this.fileNameExists(fileName)) 
+		if(!ajaxplorer.getContextHolder().fileNameExists(fileName))
 		{
 			return;
 		}
 		var allItems = this.getItems();
 		for(var i=0; i<allItems.length; i++)
 		{
-			if(getBaseName(allItems[i].getAttribute('filename')) == getBaseName(fileName))
+			if(getBaseName(allItems[i].ajxpNode.getPath()) == getBaseName(fileName))
 			{
 				this.setItemSelected(allItems[i], true);
 			}
@@ -1583,15 +1520,6 @@ Class.create("FilesList", SelectableElements, {
 		return;
 	},
 	
-	/**
-	 * DEPRECATED, use AjxpDataModel methods!
-	 * @returns String
-	 */
-	getCurrentRep: function()
-	{
-		return ajaxplorer.getContextNode().getPath();
-	},
-		
 	/**
 	 * Utilitary for selection behaviour
 	 * @param target HTMLElement

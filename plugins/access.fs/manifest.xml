@@ -20,7 +20,7 @@
 			<component_config className="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile" defaultWidth="48%"/>
-					<column messageId="2" attributeName="filesize" sortType="NumericCellSorterValue" modifier="FilesList.prototype.partSizeCellRenderer" defaultWidth="9%"/>
+					<column messageId="2" attributeName="filesize" sortType="CellSorterValue" modifier="FilesList.prototype.partSizeCellRenderer" defaultWidth="9%"/>
 					<column messageId="3" attributeName="mimestring" sortType="String" defaultWidth="10%"/>
 					<column messageId="4" attributeName="ajxp_modiftime" sortType="MyDate" defaultWidth="14%"/>
 				</columns>

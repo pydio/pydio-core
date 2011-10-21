@@ -54,7 +54,7 @@ Class.create("MetaCellRenderer", {
 				if(rule){
 					element.up().addClassName(rule.cssClass);					
 					span.update(rule.label);
-					element.writeAttribute("sorter_value", rule.sortValue);
+					element.writeAttribute("data-sorter_value", rule.sortValue);
 				}
 			}
 		}else if(type =='thumb'){
@@ -117,7 +117,7 @@ Class.create("MetaCellRenderer", {
 		}else{
 			element.update(obj.createStars(value));	
 		}
-		element.writeAttribute("sorter_value", value);	
+		element.writeAttribute("data-sorter_value", value);
 	},
 	
 	infoPanelModifier : function(htmlElement){
