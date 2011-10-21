@@ -23,6 +23,17 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  
 class ShareCenter extends AJXP_Plugin{
 
+    private static $currentMetaName;
+    private static $metaCache;
+    /**
+     * @var AbstractAccessDriver
+     */
+    private $accessDriver;
+    /**
+     * @var Repository
+     */
+    private $repository;
+    private $urlBase;
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
@@ -54,23 +65,35 @@ class ShareCenter extends AJXP_Plugin{
 		}
 	}
 
-    function switchAction($action, $httpVars, $fileVars){
-
+    function init($options){
+        parent::init($options);
         $pServ = AJXP_PluginsService::getInstance();
         $aPlugs = $pServ->getActivePlugins();
         $accessPlugs = $pServ->getPluginsByType("access");
-        $accessDriver = null;
+        $this->repository = ConfService::getRepository();
         foreach($accessPlugs as $pId => $plug){
             if(array_key_exists("access.".$pId, $aPlugs) && $aPlugs["access.".$pId] === true){
-                $accessDriver = $plug;
+                $this->accessDriver = $plug;
+                if(!isSet($this->accessDriver->repository)){
+                    $this->accessDriver->init($this->repository);
+                    $this->accessDriver->initRepository();
+                    $wrapperData = $this->accessDriver->detectStreamWrapper(true);
+                }else{
+                    $wrapperData = $this->accessDriver->detectStreamWrapper(false);
+                }
+                $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
             }
         }
-        if($accessDriver == null){
+    }
+
+    function switchAction($action, $httpVars, $fileVars){
+
+        if(!isSet($this->accessDriver)){
             throw new Exception("Cannot find access driver!");
         }
-        $repository = ConfService::getRepository();
 
-        if($accessDriver->getId() == "access.demo"){
+
+        if($this->accessDriver->getId() == "access.demo"){
             $errorMessage = "This is a demo, all 'write' actions are disabled!";
             if($httpVars["sub_action"] == "delegate_repo"){
                 return AJXP_XMLWriter::sendMessage(null, $errorMessage, false);
@@ -90,7 +113,7 @@ class ShareCenter extends AJXP_Plugin{
             	$subAction = (isSet($httpVars["sub_action"])?$httpVars["sub_action"]:"");
             	if($subAction == "delegate_repo"){
 					header("Content-type:text/plain");
-					$result = $this->createSharedRepository($httpVars, $repository, $accessDriver);
+					$result = $this->createSharedRepository($httpVars, $this->repository, $this->accessDriver);
 					print($result);
             	}else if($subAction == "list_shared_users"){
             		header("Content-type:text/html");
@@ -112,8 +135,11 @@ class ShareCenter extends AJXP_Plugin{
             		}
             	}else{
 					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-	                $data = $accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $repository);
-                    $url = $this->writePubliclet($data, $accessDriver, $repository);
+	                $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $this->repository);
+                    $url = $this->writePubliclet($data, $this->accessDriver, $this->repository);
+                    $this->loadMetaFileData($this->urlBase.$file);
+                    self::$metaCache[basename($file)] =  array_shift(explode(".", basename($url)));
+                    $this->saveMetaFileData($this->urlBase.$file);
 	                header("Content-type:text/plain");
 	                echo $url;
             	}
@@ -127,8 +153,50 @@ class ShareCenter extends AJXP_Plugin{
     }
 
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @return void
+     */
+    function nodeSharedMetadata(&$ajxpNode){
+        $this->loadMetaFileData($ajxpNode->getUrl());
+        if(count(self::$metaCache) && isset(self::$metaCache[basename($ajxpNode->getPath())])){
+            $ajxpNode->mergeMetadata(array(
+                     "ajxp_shared"      => "true",
+                     "overlay_icon"     => "shared.png"
+                ), true);
+        }
+    }
+
+	/**
+	 *
+	 * Hooked to node.change, this will update the index
+	 * if $oldNode = null => create node $newNode
+	 * if $newNode = null => delete node $oldNode
+	 * Else copy or move oldNode to newNode.
+	 *
+	 * @param AJXP_Node $oldNode
+	 * @param AJXP_Node $newNode
+	 * @param Boolean $copy
+	 */
+	public function updateNodeSharedData($oldNode, $newNode = null, $copy = false){
+        $this->loadMetaFileData($oldNode->getUrl());
+        if(count(self::$metaCache) && isset(self::$metaCache[basename($oldNode->getPath())])){
+            try{
+                self::deleteSharedElement(
+                    ($oldNode->isLeaf()?"file":"repository"),
+                    self::$metaCache[basename($oldNode->getPath())],
+                    AuthService::getLoggedUser()
+                );
+                unset(self::$metaCache[basename($oldNode->getPath())]);
+                $this->saveMetaFileData($oldNode->getUrl());
+            }catch(Exception $e){
+
+            }
+        }
+    }
+
     /** Cypher the publiclet object data and write to disk.
-     * @param $data The publiclet data array to write
+     * @param Array $data The publiclet data array to write
                      The data array must have the following keys:
                      - DRIVER      The driver used to get the file's content
                      - OPTIONS     The driver options to be successfully constructed (usually, the user and password)
@@ -210,7 +278,11 @@ class ShareCenter extends AJXP_Plugin{
         }
     }
 
-    /** Load a uncyphered publiclet */
+    /**
+     * @static
+     * @param Array $data
+     * @return void
+     */
     static function loadPubliclet($data)
     {
         // create driver from $data
@@ -301,7 +373,6 @@ class ShareCenter extends AJXP_Plugin{
 		if(isSet($actRights["share"]) && $actRights["share"] === false){
 			return 103;
 		}
-		$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
 		$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
 		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
 		$rights = $httpVars["repo_rights"];
@@ -348,6 +419,11 @@ class ShareCenter extends AJXP_Plugin{
 		);
 		ConfService::addRepository($newRepo);
 
+        $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+        $this->loadMetaFileData($this->urlBase.$file);
+        self::$metaCache[basename($file)] =  $repository->id;
+        $this->saveMetaFileData($this->urlBase.$file);
+
 		// CREATE USER WITH NEW REPO RIGHTS
 		$userObject->setRight($newRepo->getUniqueId(), $rights);
 		$userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
@@ -355,5 +431,88 @@ class ShareCenter extends AJXP_Plugin{
 
     	return 200;
     }
+
+
+    /**
+     * @static
+     * @param String $type
+     * @param String $element
+     * @param AbstractAjxpUser $loggedUser
+     * @return void
+     */
+    public static function deleteSharedElement($type, $element, $loggedUser){
+        $mess = ConfService::getMessages();
+        if($type == "repository"){
+            $repo = ConfService::getRepositoryById($element);
+            if(!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()){
+                throw new Exception($mess["ajxp_shared.12"]);
+            }else{
+                $res = ConfService::deleteRepository($element);
+                if($res == -1){
+                    throw new Exception($mess["ajxp_conf.51"]);
+                }
+            }
+        }else if( $type == "user" ){
+            $confDriver = ConfService::getConfStorageImpl();
+            $object = $confDriver->createUserObject($element);
+            if(!$object->hasParent() || $object->getParent() != $loggedUser->getId()){
+                throw new Exception($mess["ajxp_shared.12"]);
+            }else{
+                AuthService::deleteUser($element);
+            }
+        }else if( $type == "file" ){
+            $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+            $publicletData = self::loadPublicletData($dlFolder."/".$element.".php");
+            if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
+                require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
+                PublicletCounter::delete($element);
+                unlink($dlFolder."/".$element.".php");
+            }else{
+                throw new Exception($mess["ajxp_shared.12"]);
+            }
+        }
+    }
+
+    public static function loadPublicletData($file){
+        $lines = file($file);
+        $inputData = '';
+        $id = str_replace(".php", "", basename($file));
+        $code = $lines[3] . $lines[4] . $lines[5];
+        eval($code);
+        $dataModified = (md5($inputData) != $id);
+        $publicletData = unserialize($inputData);
+        $publicletData["SECURITY_MODIFIED"] = $dataModified;
+        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
+        $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);
+        return $publicletData;
+    }
+
+
+	protected function loadMetaFileData($currentFile){
+		if(preg_match("/\.zip\//",$currentFile)){
+			self::$metaCache = array();
+			return ;
+		}
+		$metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
+		if(self::$currentMetaName == $metaFile && is_array(self::$metaCache)){
+			return;
+		}
+		if(is_file($metaFile) && is_readable($metaFile)){
+			$rawData = file_get_contents($metaFile);
+			self::$metaCache = unserialize($rawData);
+		}else{
+			self::$metaCache = array();
+		}
+	}
+
+	protected function saveMetaFileData($currentFile){
+		$metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
+		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile))){
+			$fp = fopen($metaFile, "w");
+			fwrite($fp, serialize(self::$metaCache), strlen(serialize(self::$metaCache)));
+			fclose($fp);
+			AJXP_Controller::applyHook("version.commit_file", $metaFile);
+		}
+	}
 
 }
