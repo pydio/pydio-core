@@ -20,7 +20,9 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
- 
+
+require_once("class.PublicletCounter.php");
+
 class ShareCenter extends AJXP_Plugin{
 
     private static $currentMetaName;
@@ -158,8 +160,14 @@ class ShareCenter extends AJXP_Plugin{
      * @return void
      */
     function nodeSharedMetadata(&$ajxpNode){
+        if($this->accessDriver->getId() == "access.imap") return;
         $this->loadMetaFileData($ajxpNode->getUrl());
         if(count(self::$metaCache) && isset(self::$metaCache[basename($ajxpNode->getPath())])){
+            if(!self::sharedElementExists($ajxpNode->isLeaf()?"file":"repository", self::$metaCache[basename($ajxpNode->getPath())], AuthService::getLoggedUser())){
+                unset(self::$metaCache[basename($ajxpNode->getPath())]);
+                $this->saveMetaFileData($ajxpNode->getUrl());
+                return;
+            }
             $ajxpNode->mergeMetadata(array(
                      "ajxp_shared"      => "true",
                      "overlay_icon"     => "shared.png"
@@ -179,6 +187,7 @@ class ShareCenter extends AJXP_Plugin{
 	 * @param Boolean $copy
 	 */
 	public function updateNodeSharedData($oldNode, $newNode = null, $copy = false){
+        if($this->accessDriver->getId() == "access.imap") return;
         $this->loadMetaFileData($oldNode->getUrl());
         if(count(self::$metaCache) && isset(self::$metaCache[basename($oldNode->getPath())])){
             try{
@@ -267,7 +276,6 @@ class ShareCenter extends AJXP_Plugin{
         if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE){
             return "Can't write to PUBLIC URL";
         }
-        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
         PublicletCounter::reset($hash);
         $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
         if($dlURL != ""){
@@ -292,7 +300,6 @@ class ShareCenter extends AJXP_Plugin{
             // Remove the publiclet, it's done
             if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE){
 		        $hash = md5(serialize($data));
-		        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
 		        PublicletCounter::delete($hash);
                 unlink($_SERVER["SCRIPT_FILENAME"]);
             }
@@ -342,7 +349,6 @@ class ShareCenter extends AJXP_Plugin{
         ConfService::tmpReplaceRepository($data["REPOSITORY"]);
         // Increment counter
         $hash = md5(serialize($data));
-        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
         PublicletCounter::increment($hash);
         // Now call switchAction
         //@todo : switchAction should not be hard coded here!!!
@@ -421,7 +427,7 @@ class ShareCenter extends AJXP_Plugin{
 
         $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
         $this->loadMetaFileData($this->urlBase.$file);
-        self::$metaCache[basename($file)] =  $repository->id;
+        self::$metaCache[basename($file)] =  $newRepo->getUniqueId();
         $this->saveMetaFileData($this->urlBase.$file);
 
 		// CREATE USER WITH NEW REPO RIGHTS
@@ -464,7 +470,6 @@ class ShareCenter extends AJXP_Plugin{
             $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
             $publicletData = self::loadPublicletData($dlFolder."/".$element.".php");
             if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
-                require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
                 PublicletCounter::delete($element);
                 unlink($dlFolder."/".$element.".php");
             }else{
@@ -472,6 +477,16 @@ class ShareCenter extends AJXP_Plugin{
             }
         }
     }
+
+    public static function sharedElementExists($type, $element, $loggedUser){
+        if($type == "repository"){
+            return (ConfService::getRepositoryById($element) != null);
+        }else if($type == "file"){
+            $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+            return is_file($dlFolder."/".$element.".php");
+        }
+    }
+
 
     public static function loadPublicletData($file){
         $lines = file($file);
@@ -482,7 +497,6 @@ class ShareCenter extends AJXP_Plugin{
         $dataModified = (md5($inputData) != $id);
         $publicletData = unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
-        require_once(AJXP_BIN_FOLDER."/class.PublicletCounter.php");
         $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);
         return $publicletData;
     }
