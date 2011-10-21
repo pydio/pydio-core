@@ -3,6 +3,15 @@
  */
 webFXTreeConfig.loadingText = "Loading...";
 
+function splitOverlayIcons(ajxpNode){
+    if(!ajxpNode.getMetadata().get("overlay_icon")) return false;
+    var ret = [];
+    $A(ajxpNode.getMetadata().get("overlay_icon").split(",")).each(function(el){
+        ret.push(resolveImageSource(el, "/images/overlays/ICON_SIZE", 8));
+    });
+    return ret;
+}
+
 function AJXPTree(rootNode, sAction, filter) {
 	this.WebFXTree = WebFXTree;
 	this.loaded = true;
@@ -28,7 +37,7 @@ function AJXPTree(rootNode, sAction, filter) {
 	if(filter){
 		this.filter = filter;
  	}
-    this.overlayIcon = resolveImageSource(rootNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
+    this.overlayIcon = splitOverlayIcons(rootNode);
 
 	this._loadingItem = new WebFXTreeItem(webFXTreeConfig.loadingText);		
 	if(this.open) this.ajxpNode.load();
@@ -103,7 +112,7 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 				oic = resolveImageSource(ajxpNode.getMetadata().get("openicon"), "/images/mimes/ICON_SIZE", 16);
 			}
 			jsNode.updateIcon(ic, oic);
-            jsNode.overlayIcon = resolveImageSource(ajxpNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
+            jsNode.overlayIcon = splitOverlayIcons(ajxpNode);
 		}
 		if(jsNode.updateLabel) jsNode.updateLabel(ajxpNode.getLabel());
 	}.bind(jsNode));
@@ -144,7 +153,7 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
         eParent,
         icon,
         (openIcon?openIcon:resolveImageSource("folder_open.png", "/images/mimes/ICON_SIZE", 16)),
-        resolveImageSource(ajxpNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8)
+        splitOverlayIcons(ajxpNode)
     );
 
 	this.loading = false;
@@ -188,7 +197,7 @@ function _ajxpNodeToTree(ajxpNode, parentNode) {
 	if(parentNode.filter){
 		jsNode.filter = parentNode.filter;
 	}
-    jsNode.overlayIcon = resolveImageSource(ajxpNode.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
+    jsNode.overlayIcon = splitOverlayIcons(ajxpNode);
 
 	ajxpNode.getChildren().each(function(child){
 		var newNode = _ajxpNodeToTree(child, jsNode);
@@ -196,7 +205,7 @@ function _ajxpNodeToTree(ajxpNode, parentNode) {
 			if(jsNode.filter){
 				newNode.filter = jsNode.filter;
 			}
-            newNode.overlayIcon = resolveImageSource(child.getMetadata().get("overlay_icon"), "/images/overlays/ICON_SIZE", 8);
+            newNode.overlayIcon = splitOverlayIcons(child);
 			jsNode.add( newNode , false );
 		}
 	});	
