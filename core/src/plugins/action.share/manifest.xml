@@ -71,6 +71,7 @@
                                     var response = parseInt(transport.responseText);
                                     if(response == 200){
                                         ajaxplorer.displayMessage('SUCCESS', MessageHash[348]);
+                                        ajaxplorer.fireContextRefresh();
                                         hideLightBox(true);
                                     }else{
                                         messages = {100:349, 101:352, 102:350, 103:351};
@@ -116,6 +117,7 @@
                                                     afterFinish : function(){
                                                         cont.select();
                                                         modal.refreshDialogAppearance();
+                                                        ajaxplorer.fireContextRefresh();
                                                     }
                                                 });
                                             }
