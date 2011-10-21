@@ -267,8 +267,26 @@ WebFXTreeAbstractNode.prototype.setLabelIcon = function(icon){
     var bgOverlayImage = "'url('"+icon+"')'";
     var bgOverlayPosition = '4px 1px';
 	if(this.overlayIcon){
-        bgOverlayImage = "url('"+this.overlayIcon+"'), url('"+icon+"')";
-        bgOverlayPosition = "14px 11px, 4px 1px";
+        switch(this.overlayIcon.length){
+            case 1:
+                bgOverlayPosition = '14px 11px, 4px 1px';
+                bgOverlayImage = 'url("'+this.overlayIcon[0]+'"), ';
+            break;
+            case 2:
+                bgOverlayPosition = '2px 11px, 14px 11px, 4px 1px';
+                bgOverlayImage = 'url("'+this.overlayIcon[0]+'"), url("'+this.overlayIcon[1]+'"), ';
+            break;
+            case 3:
+                bgOverlayPosition = '14px 2px, 2px 11px, 14px 11px, 4px 1px';
+                bgOverlayImage = 'url("'+this.overlayIcon[0]+'"), url("'+this.overlayIcon[1]+'"), url("'+this.overlayIcon[2]+'"), ';
+            break;
+            case 4:
+            default:
+                bgOverlayPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, 4px 1px';
+                bgOverlayImage = 'url("'+this.overlayIcon[0]+'"), url("'+this.overlayIcon[1]+'"), url("'+this.overlayIcon[2]+'"), url("'+this.overlayIcon[3]+'"), ';
+            break;
+        }
+        bgOverlayImage += " url('"+icon+"')";
     }
 
 	if($(this.id+'-label')) $(this.id+'-label').setStyle({backgroundImage:bgOverlayImage,backgroundPosition:bgOverlayPosition});
@@ -682,9 +700,25 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
     var bgOverlayImage = '';
     var bgOverlayPosition = '4px 1px';
 	if(this.overlayIcon){
-        //console.log("Overlay icon!");
-        bgOverlayImage = "url('"+this.overlayIcon+"'), ";
-        bgOverlayPosition = "14px 11px, 4px 1px";
+        switch(this.overlayIcon.length){
+            case 1:
+                bgOverlayPosition = '14px 11px, 4px 1px';
+                bgOverlayImage = "url('"+this.overlayIcon[0]+"'), ";
+            break;
+            case 2:
+                bgOverlayPosition = '2px 11px, 14px 11px, 4px 1px';
+                bgOverlayImage = "url('"+this.overlayIcon[0]+"'), url('"+this.overlayIcon[1]+"'), ";
+            break;
+            case 3:
+                bgOverlayPosition = '14px 2px, 2px 11px, 14px 11px, 4px 1px';
+                bgOverlayImage = "url('"+this.overlayIcon[0]+"'), url('"+this.overlayIcon[1]+"'), url('"+this.overlayIcon[2]+"'), ";
+            break;
+            case 4:
+            default:
+                bgOverlayPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, 4px 1px';
+                bgOverlayImage = "url('"+this.overlayIcon[0]+"'), url('"+this.overlayIcon[1]+"'), url('"+this.overlayIcon[2]+"'), url('"+this.overlayIcon[3]+"'), ";
+            break;
+        }
     }
 	var label = this.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	var str = "<div id=\"" + this.id + "\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +

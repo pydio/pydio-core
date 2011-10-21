@@ -42,13 +42,17 @@
 				image:ajxpResourcesFolder+'/images/actions/16/bookmark_add.png',
 				callback:function(e){
 					var node = ajaxplorer.getContextNode();
+                    node.getMetadata().set('ajxp_bookmarked', 'true');
+                    node.getMetadata().set('overlay_icon', 'bookmark.png');
 					this.addBookmark(node.getPath(), node.getLabel());
 				}.bind(this)
 			};		
 		}.bind(this));
 		document.observe("ajaxplorer:add_bookmark", function(){
 			var node = ajaxplorer.getContextNode();
-			this.addBookmark(node.getPath(), node.getLabel());			
+			this.addBookmark(node.getPath(), node.getLabel());
+            node.getMetadata().set('ajxp_bookmarked', 'true');
+            node.getMetadata().set('overlay_icon', 'bookmark.png');
 		}.bind(this) );
 	},
 	/**

@@ -1099,8 +1099,26 @@ Class.create("FilesList", SelectableElements, {
                 var backgroundPosition = '4px 2px';
                 var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
                 if(metaData.get('overlay_icon')){
-                    backgroundPosition = '14px 11px, 4px 2px';
-                    backgroundImage = 'url("'+resolveImageSource(metaData.get('overlay_icon'), "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")'
+                    var ovIcs = metaData.get('overlay_icon').split(',');
+                    switch(ovIcs.length){
+                        case 1:
+                            backgroundPosition = '14px 11px, 4px 2px';
+                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                        break;
+                        case 2:
+                            backgroundPosition = '2px 11px, 14px 11px, 4px 2px';
+                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                        break;
+                        case 3:
+                            backgroundPosition = '14px 2px, 2px 11px, 14px 11px, 4px 2px';
+                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                        break;
+                        case 4:
+                        default:
+                            backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, 4px 2px';
+                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[3], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                        break;
+                    }
                 }
                 textLabel.setStyle({
                     paddingLeft:'24px',
@@ -1203,13 +1221,28 @@ Class.create("FilesList", SelectableElements, {
 		newRow.LABEL_ELEMENT = label;
         if(ajxpNode.getMetadata().get("overlay_icon")){
             var ovDiv = new Element("div");
+            var ovIcs = $A(ajxpNode.getMetadata().get("overlay_icon").split(","));
+            var bgPos = $A();
+            var bgImg = $A();
+            var bgRep = $A();
+            var index = 0;
+            ovIcs.each(function(ic){
+                bgPos.push('0px '+((index*12)+(index>0?2:0))+'px');
+                bgImg.push("url('"+resolveImageSource(ovIcs[index], "/images/overlays/ICON_SIZE", 12)+"')");
+                bgRep.push('no-repeat');
+                index++;
+            });
+
+
             ovDiv.setStyle({
                 position: "absolute",
-                top: "5px",
-                right: "5px",
-                height: "16px",
-                width: "16px",
-                backgroundImage: "url('"+resolveImageSource(ajxpNode.getMetadata().get('overlay_icon'), "/images/overlays/ICON_SIZE", 16)+"')"
+                top: "3px",
+                right: "2px",
+                height: ((ovIcs.length*12) + (ovIcs.length > 1 ? (ovIcs.length-1)*2 : 0 )) + "px",
+                width: "12px",
+                backgroundImage:bgImg.join(', '),
+                backgroundPosition:bgPos.join(', '),
+                backgroundRepeat:bgRep.join(', ')
             });
             innerSpan.insert({after:ovDiv});
         }

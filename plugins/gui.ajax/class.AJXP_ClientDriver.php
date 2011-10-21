@@ -317,7 +317,13 @@ class AJXP_ClientDriver extends AJXP_Plugin
                 $ajxpNode->mergeMetadata(array(
                          "ajxp_bookmarked" => "true",
                          "overlay_icon"  => "bookmark.png"
-                    ));
+                    ), true);
+                /*
+                 * TESTING MULTIPLE OVERLAYS
+                $ajxpNode->mergeMetadata(array(
+                         "overlay_icon"  => "shared.png"
+                    ), true);
+                */
             }
         }
     }

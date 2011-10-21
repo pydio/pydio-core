@@ -91,8 +91,22 @@ class AJXP_Node{
 		return $this->urlParts["path"];
 	}
 
-	public function mergeMetadata($metadata){
-		$this->_metadata = array_merge($this->_metadata, $metadata);
+	public function mergeMetadata($metadata, $mergeValues = false){
+        if($mergeValues){
+            foreach($metadata as $key => $value){
+                if(isSet($this->_metadata[$key])){
+                    $existingValue = explode(",", $this->_metadata[$key]);
+                    if(!in_array($value, $existingValue)){
+                        array_push($existingValue, $value);
+                        $this->_metadata[$key] = implode(",", $existingValue);
+                    }
+                }else{
+                    $this->_metadata[$key] = $value;
+                }
+            }
+        }else{
+            $this->_metadata = array_merge($this->_metadata, $metadata);
+        }
 	}
 	
 	public function __get($varName){
