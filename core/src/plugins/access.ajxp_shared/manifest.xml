@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="ajxp_shared" label="Shared Elements" description="Browse user shared elements.">
-	<client_settings icon="plugins/access.ajxp_shared/preferences_system_network.png">
+	<client_settings icon="plugins/access.ajxp_shared/share.png">
 		<resources>
 			<i18n namespace="ajxp_shared" path="plugins/access.ajxp_shared/i18n" />		
 		</resources>
