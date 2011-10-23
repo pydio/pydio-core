@@ -49,9 +49,13 @@
                                     <div align="center" class="fakeUploadButton"><img src="AJXP_THEME_FOLDER/images/actions/22/share.png" height="22" width="22"/><br/>AJXP_MESSAGE[309]</div>
                                 </div>
                             </fieldset>
+                            <fieldset style="display:none;" id="share_unshare">
+                                <legend ajxp_message_id="296">AJXP_MESSAGE[296]</legend>
+                                <div id="unshare_button">Unshare</div>
+                            </fieldset>
                             <fieldset style="display:none;" id="share_result">
                                 <legend ajxp_message_id="296">AJXP_MESSAGE[296]</legend>
-                                <input type="text" style="width:200px;margin-right:5px;" id="share_container"/>
+                                <input type="text" style="width:200px;margin-right:1px;" id="share_container"/>
                                 <a id="email" title="AJXP_MESSAGE[323]"><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>
                             </fieldset>
                         </div>
@@ -93,6 +97,16 @@
                         </clientForm>
                     <serverCallback methodName="switchAction"></serverCallback>
                     </processing>
+            </action>
+            <action name="get_publiclet_link">
+                <processing>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
+            <action name="unshare">
+                <processing>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
             </action>
         </actions>
     </registry_contributions>
