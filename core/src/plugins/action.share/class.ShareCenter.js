@@ -108,8 +108,22 @@ Class.create("ShareCenter", {
                     barPosition:'bottom',
                     minchar : 0
                 });
-                var button = $(oForm).down('div.fakeUploadButton');
-                button.observe("click", this.generatePublicLinkCallback.bind(this));
+                var nodeMeta = userSelection.getUniqueNode().getMetadata();
+                if(nodeMeta.get("ajxp_shared")){
+                    oForm.down('fieldset[id="share_generate"]').hide();
+                    oForm.down('fieldset[id="share_result"]').show();
+                    var conn = new Connexion();
+                    conn.addParameter("get_action", "get_publiclet_link");
+                    conn.addParameter("file", userSelection.getUniqueNode().getPath());
+                    conn.onComplete = function(transport){
+                        oForm.down('input[id="share_container"]').value = transport.responseText;
+                    };
+                    conn.sendAsync();
+                    oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
+                }else{
+                    var button = $(oForm).down('div.fakeUploadButton');
+                    button.observe("click", this.generatePublicLinkCallback.bind(this));
+                }
             }.bind(this),
             function(oForm){
                 var button = $(oForm).down('div.fakeUploadButton');
@@ -122,6 +136,14 @@ Class.create("ShareCenter", {
 
     },
 
+
+    performUnshareAction : function(){
+        var userSelection = ajaxplorer.getUserSelection();
+        var conn = new Connexion();
+        conn.addParameter("get_action", "unshare");
+        conn.addParameter("file", userSelection.getUniqueNode().getPath());
+        conn.sendAsync();
+    },
 
     generatePublicLinkCallback : function(){
         var userSelection = ajaxplorer.getUserSelection();

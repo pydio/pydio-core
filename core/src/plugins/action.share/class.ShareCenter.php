@@ -147,6 +147,26 @@ class ShareCenter extends AJXP_Plugin{
             	}
             break;
 
+            case "get_publiclet_link":
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $this->loadMetaFileData($this->urlBase.$file);
+                if(isSet(self::$metaCache[basename($file)])){
+                    header("Content-type:text/plain");
+                    echo $this->buildPublicletLink( self::$metaCache[basename($file)]);
+                }
+            break;
+
+            case "unshare":
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $this->loadMetaFileData($this->urlBase.$file);
+                if(isSet(self::$metaCache[basename($file)])){
+                    $element = self::$metaCache[basename($file)];
+                    self::deleteSharedElement("file", $element, AuthService::getLoggedUser());
+                    unset(self::$metaCache[basename($file)]);
+                    $this->saveMetaFileData($this->urlBase.$file);
+                }
+            break;
+
             default:
             break;
         }
@@ -277,6 +297,11 @@ class ShareCenter extends AJXP_Plugin{
             return "Can't write to PUBLIC URL";
         }
         PublicletCounter::reset($hash);
+        return $this->buildPublicletLink($hash);
+    }
+
+    function buildPublicletLink($hash){
+        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
         if($dlURL != ""){
         	return rtrim($dlURL, "/")."/".$hash.".php";
