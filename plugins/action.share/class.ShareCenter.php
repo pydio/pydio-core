@@ -148,13 +148,32 @@ class ShareCenter extends AJXP_Plugin{
             	}
             break;
 
-            case "get_publiclet_link":
+            case "load_shared_element_data":
+
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $elementType = $httpVars["element_type"];
                 $this->loadMetaFileData($this->urlBase.$file);
                 if(isSet(self::$metaCache[basename($file)])){
-                    header("Content-type:text/plain");
-                    echo $this->buildPublicletLink( self::$metaCache[basename($file)]);
+                    header("Content-type:application/json");
+                    if($elementType == "file"){
+                        $jsonData = array(
+                                         "publiclet_link"   => $this->buildPublicletLink( self::$metaCache[basename($file)]),
+                                         "download_counter" => PublicletCounter::getCount(self::$metaCache[basename($file)])
+                                         );
+                    }else if( $elementType == "repository"){
+                        $repoId = self::$metaCache[basename($file)];
+                        $repo = ConfService::getRepositoryById($repoId);
+                        $users = array();
+                        $jsonData = array(
+                                         "label"    => $repo->getDisplay(),
+                                         "rights"   => "rw",
+                                         "users"    => $users
+                                    );
+                    }
+                    echo json_encode($jsonData);
                 }
+
+
             break;
 
             case "unshare":
@@ -162,7 +181,7 @@ class ShareCenter extends AJXP_Plugin{
                 $this->loadMetaFileData($this->urlBase.$file);
                 if(isSet(self::$metaCache[basename($file)])){
                     $element = self::$metaCache[basename($file)];
-                    self::deleteSharedElement("file", $element, AuthService::getLoggedUser());
+                    self::deleteSharedElement($httpVars["element_type"], $element, AuthService::getLoggedUser());
                     unset(self::$metaCache[basename($file)]);
                     $this->saveMetaFileData($this->urlBase.$file);
                 }

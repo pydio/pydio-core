@@ -56,7 +56,12 @@ Class.create("ShareCenter", {
                     $('create_shared_user').blindDown();
                 });
             }
-        };
+            var nodeMeta = userSelection.getUniqueNode().getMetadata();
+            if(nodeMeta.get("ajxp_shared")){
+                oForm.down('fieldset#share_unshare').show();
+                oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
+            }
+        }.bind(this);
         var submitFunc = function(oForm){
             if($('new_shared_user').value){
                 if( !$('shared_pass').value || $('shared_pass').value.length < ajxpBootstrap.parameters.get('password_min_length')){
@@ -112,14 +117,10 @@ Class.create("ShareCenter", {
                     oForm.down('fieldset#share_generate').hide();
                     oForm.down('fieldset#share_result').show();
                     oForm.down('div#generate_indicator').show();
-                    var conn = new Connexion();
-                    conn.addParameter("get_action", "get_publiclet_link");
-                    conn.addParameter("file", userSelection.getUniqueNode().getPath());
-                    conn.onComplete = function(transport){
-                        oForm.down('input[id="share_container"]').value = transport.responseText;
+                    this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
+                        oForm.down('input[id="share_container"]').value = json['publiclet_link'];
                         oForm.down('div#generate_indicator').hide();
-                    };
-                    conn.sendAsync();
+                    });
                     oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
                 }else{
                     var button = $(oForm).down('div#generate_publiclet');
@@ -137,6 +138,16 @@ Class.create("ShareCenter", {
 
     },
 
+    loadSharedElementData : function(uniqueNode, jsonCallback){
+        var conn = new Connexion();
+        conn.addParameter("get_action", "load_shared_element_data");
+        conn.addParameter("file", uniqueNode.getPath());
+        conn.addParameter("element_type", uniqueNode.isLeaf() ? "file" : "repository");
+        conn.onComplete = function(transport){
+            jsonCallback(transport.responseJSON);
+        };
+        conn.sendAsync();
+    },
 
     performUnshareAction : function(){
         var userSelection = ajaxplorer.getUserSelection();
@@ -144,9 +155,12 @@ Class.create("ShareCenter", {
         var conn = new Connexion();
         conn.addParameter("get_action", "unshare");
         conn.addParameter("file", userSelection.getUniqueNode().getPath());
+        conn.addParameter("element_type", userSelection.getUniqueNode().isLeaf()?"file":"repository");
         conn.onComplete = function(){
             var oForm = modal.getForm();
-            oForm.down('div#generate_publiclet').stopObserving("click");
+            if(oForm.down('div#generate_publiclet')){
+                oForm.down('div#generate_publiclet').stopObserving("click");
+            }
             oForm.down('div#unshare_button').stopObserving("click");
             hideLightBox(true);
             ajaxplorer.fireContextRefresh();
