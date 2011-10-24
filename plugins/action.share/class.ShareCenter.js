@@ -41,27 +41,24 @@ Class.create("ShareCenter", {
                     "shared_user",
                     "shared_users_autocomplete_choices",
                     ajxpServerAccessPath + "&get_action=share&sub_action=list_shared_users",
-                    {minChars:0, paramName:'value'}
+                    {
+                        minChars:0,
+                        paramName:'value',
+                        tokens:[',', '\n'],
+                        frequency:0.1,
+                        indicator:oForm.down('#complete_indicator')
+                    }
                 );
                 $('shared_user').observeOnce("focus", function(){
                     $('share_folder_form').autocompleter.activate();
                 });
-                $('shared_user').observe("blur", function(){
-                    var existing = $('shared_users_autocomplete_choices').select('li').detect(function(li){
-                        return (li.innerHTML == $('shared_user').getValue());
-                    });
-                    if(existing) {
-                        $('shared_pass_div').addClassName('SF_disabled');
-                        $('shared_pass').disable();
-                    }else {
-                        $('shared_pass_div').removeClassName('SF_disabled');
-                        $('shared_pass').enable();
-                    }
+                $('create_shared_user_anchor').observe("click", function(){
+                    $('create_shared_user').blindDown();
                 });
             }
         };
         var submitFunc = function(oForm){
-            if(!$('shared_pass').disabled){
+            if($('new_shared_user').value){
                 if( !$('shared_pass').value || $('shared_pass').value.length < ajxpBootstrap.parameters.get('password_min_length')){
                     alert(MessageHash[378]);
                     return false;
@@ -110,24 +107,28 @@ Class.create("ShareCenter", {
                 });
                 var nodeMeta = userSelection.getUniqueNode().getMetadata();
                 if(nodeMeta.get("ajxp_shared")){
-                    oForm.down('fieldset[id="share_generate"]').hide();
-                    oForm.down('fieldset[id="share_result"]').show();
+                    oForm.down('fieldset#share_unshare').show();
+                    oForm.down('fieldset#share_optional_fields').hide();
+                    oForm.down('fieldset#share_generate').hide();
+                    oForm.down('fieldset#share_result').show();
+                    oForm.down('div#generate_indicator').show();
                     var conn = new Connexion();
                     conn.addParameter("get_action", "get_publiclet_link");
                     conn.addParameter("file", userSelection.getUniqueNode().getPath());
                     conn.onComplete = function(transport){
                         oForm.down('input[id="share_container"]').value = transport.responseText;
+                        oForm.down('div#generate_indicator').hide();
                     };
                     conn.sendAsync();
                     oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
                 }else{
-                    var button = $(oForm).down('div.fakeUploadButton');
+                    var button = $(oForm).down('div#generate_publiclet');
                     button.observe("click", this.generatePublicLinkCallback.bind(this));
                 }
             }.bind(this),
             function(oForm){
-                var button = $(oForm).down('div.fakeUploadButton');
-                button.stopObserving("click");
+                oForm.down('div#generate_publiclet').stopObserving("click");
+                oForm.down('div#unshare_button').stopObserving("click");
                 hideLightBox(true);
                 return false;
             },
@@ -139,18 +140,27 @@ Class.create("ShareCenter", {
 
     performUnshareAction : function(){
         var userSelection = ajaxplorer.getUserSelection();
+        modal.getForm().down("img#stop_sharing_indicator").src=window.ajxpResourcesFolder+"/images/autocompleter-loader.gif";
         var conn = new Connexion();
         conn.addParameter("get_action", "unshare");
         conn.addParameter("file", userSelection.getUniqueNode().getPath());
+        conn.onComplete = function(){
+            var oForm = modal.getForm();
+            oForm.down('div#generate_publiclet').stopObserving("click");
+            oForm.down('div#unshare_button').stopObserving("click");
+            hideLightBox(true);
+            ajaxplorer.fireContextRefresh();
+        };
         conn.sendAsync();
     },
 
     generatePublicLinkCallback : function(){
         var userSelection = ajaxplorer.getUserSelection();
         if(!userSelection.isUnique() || (userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))) return;
+        var oForm = $(modal.getForm());
+        oForm.down('img#generate_image').src = window.ajxpResourcesFolder+"/images/autocompleter-loader.gif";
         var publicUrl = window.ajxpServerAccessPath+'&get_action=share';
         publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
-        var oForm = $(modal.getForm());
         var conn = new Connexion(publicUrl);
         conn.setParameters(oForm.serialize(true));
         conn.addParameter('get_action','share');
