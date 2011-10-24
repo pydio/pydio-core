@@ -60,6 +60,10 @@
                             </fieldset>
                         </div>
                         <div id="share_folder_form" title="Share Folder"  box_width="280" action="share">
+                            <fieldset style="display:none;" id="share_unshare">
+                                <legend ajxp_message_id="296">Folder is shared</legend>
+                                <div class="dialogLegend"><div id="unshare_button" class="fakeUploadButton" style="float:right;margin-left:4px;padding:5px;"><img src="AJXP_THEME_FOLDER/images/actions/22/unshare.png" height="22" width="22" id="stop_sharing_indicator"><br/>Stop sharing</div>Use this button to the share, this will not remove the folder.</div>
+                            </fieldset>
                             <fieldset>
                                 <legend ajxp_message_id="357">AJXP_MESSAGE[357]</legend>
                                 <div class="dialogLegend" ajxp_message_id="358">AJXP_MESSAGE[358]</div>
@@ -105,7 +109,7 @@
                     <serverCallback methodName="switchAction"></serverCallback>
                     </processing>
             </action>
-            <action name="get_publiclet_link">
+            <action name="load_shared_element_data">
                 <processing>
                     <serverCallback methodName="switchAction"></serverCallback>
                 </processing>
