@@ -27,6 +27,7 @@ class ShareCenter extends AJXP_Plugin{
 
     private static $currentMetaName;
     private static $metaCache;
+    private static $fullMetaCache;
     /**
      * @var AbstractAccessDriver
      */
@@ -140,7 +141,7 @@ class ShareCenter extends AJXP_Plugin{
 	                $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $this->repository);
                     $url = $this->writePubliclet($data, $this->accessDriver, $this->repository);
                     $this->loadMetaFileData($this->urlBase.$file);
-                    self::$metaCache[basename($file)] =  array_shift(explode(".", basename($url)));
+                    self::$metaCache[basename($file)] = array_shift(explode(".", basename($url)));
                     $this->saveMetaFileData($this->urlBase.$file);
 	                header("Content-type:text/plain");
 	                echo $url;
@@ -395,8 +396,7 @@ class ShareCenter extends AJXP_Plugin{
 		// 200
 
 		if(!isSet($httpVars["repo_label"]) || $httpVars["repo_label"] == ""
-			||  !isSet($httpVars["repo_rights"]) || $httpVars["repo_rights"] == ""
-			||  !isSet($httpVars["shared_user"]) || $httpVars["shared_user"] == ""){
+			||  !isSet($httpVars["repo_rights"]) || $httpVars["repo_rights"] == ""){
 			return 100;
 		}
 		$loggedUser = AuthService::getLoggedUser();
@@ -404,7 +404,14 @@ class ShareCenter extends AJXP_Plugin{
 		if(isSet($actRights["share"]) && $actRights["share"] === false){
 			return 103;
 		}
-		$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
+        $users = array();
+        if(isSet($httpVars["shared_user"]) && !empty($httpVars["shared_user"])){
+            $users = array_filter(array_map("trim", explode(",", str_replace("\n", ",",$httpVars["shared_user"]))), array("AuthService","userExists"));
+        }
+        if(isSet($httpVars["new_shared_user"]) && ! empty($httpVars["new_shared_user"])){
+            array_push($users, AJXP_Utils::decodeSecureMagic($httpVars["new_shared_user"], AJXP_SANITIZE_ALPHANUM));
+        }
+		//$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
 		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
 		$rights = $httpVars["repo_rights"];
 		if($rights != "r" && $rights != "w" && $rights != "rw") return 100;
@@ -416,19 +423,6 @@ class ShareCenter extends AJXP_Plugin{
 			}
 		}
 		$confDriver = ConfService::getConfStorageImpl();
-		if(AuthService::userExists($userName)){
-			// check that it's a child user
-			$userObject = $confDriver->createUserObject($userName);
-			if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
-				return 102;
-			}
-		}else{
-			if(!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") return 100;
-			AuthService::createUser($userName, md5($httpVars["shared_pass"]));
-			$userObject = $confDriver->createUserObject($userName);
-			$userObject->clearRights();
-			$userObject->setParent($loggedUser->id);
-		}
 
 		// CREATE SHARED OPTIONS
         $options = $accessDriver->makeSharedRepositoryOptions($httpVars, $repository);
@@ -446,19 +440,35 @@ class ShareCenter extends AJXP_Plugin{
 			$options,
 			$repository->id,
 			$loggedUser->id,
-			$userName
+			null
 		);
 		ConfService::addRepository($newRepo);
 
+        foreach($users as $userName){
+            if(AuthService::userExists($userName)){
+                // check that it's a child user
+                $userObject = $confDriver->createUserObject($userName);
+                if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
+                    return 102;
+                }
+            }else{
+                if(!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") return 100;
+                AuthService::createUser($userName, md5($httpVars["shared_pass"]));
+                $userObject = $confDriver->createUserObject($userName);
+                $userObject->clearRights();
+                $userObject->setParent($loggedUser->id);
+            }
+            // CREATE USER WITH NEW REPO RIGHTS
+            $userObject->setRight($newRepo->getUniqueId(), $rights);
+            $userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
+            $userObject->save();
+        }
+
+        // METADATA
         $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
         $this->loadMetaFileData($this->urlBase.$file);
         self::$metaCache[basename($file)] =  $newRepo->getUniqueId();
         $this->saveMetaFileData($this->urlBase.$file);
-
-		// CREATE USER WITH NEW REPO RIGHTS
-		$userObject->setRight($newRepo->getUniqueId(), $rights);
-		$userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
-		$userObject->save();
 
     	return 200;
     }
@@ -529,6 +539,7 @@ class ShareCenter extends AJXP_Plugin{
 
 	protected function loadMetaFileData($currentFile){
 		if(preg_match("/\.zip\//",$currentFile)){
+            self::$fullMetaCache = array();
 			self::$metaCache = array();
 			return ;
 		}
@@ -538,8 +549,10 @@ class ShareCenter extends AJXP_Plugin{
 		}
 		if(is_file($metaFile) && is_readable($metaFile)){
 			$rawData = file_get_contents($metaFile);
-			self::$metaCache = unserialize($rawData);
+            self::$fullMetaCache = unserialize($rawData);
+			self::$metaCache = self::$fullMetaCache[AuthService::getLoggedUser()->getId()];
 		}else{
+            self::$fullMetaCache = array();
 			self::$metaCache = array();
 		}
 	}
@@ -547,8 +560,9 @@ class ShareCenter extends AJXP_Plugin{
 	protected function saveMetaFileData($currentFile){
 		$metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
 		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile))){
+            self::$fullMetaCache[AuthService::getLoggedUser()->getId()] = self::$metaCache;
 			$fp = fopen($metaFile, "w");
-			fwrite($fp, serialize(self::$metaCache), strlen(serialize(self::$metaCache)));
+			fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));
 			fclose($fp);
 			AJXP_Controller::applyHook("version.commit_file", $metaFile);
 		}
