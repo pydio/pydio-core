@@ -9,7 +9,7 @@
 		<client_configs>
             <template_part ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
                 <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
-                <style>#sidebar_splitter{padding-bottom:20px;background-color:#E1D4BC;}</style>
+                <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
             ]]></template_part>
 		</client_configs>	
 		<actions>

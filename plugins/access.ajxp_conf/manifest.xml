@@ -11,7 +11,7 @@
 		<client_configs>
             <template_part ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'><![CDATA[
                 <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="165" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
-                <style>#sidebar_splitter{padding-bottom:20px;background-color:#C0D8C6;}</style>
+                <style>#sidebar_splitter{padding-bottom:20px;background-color:#EAD7A4;}</style>
             ]]></template_part>
 		</client_configs>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
