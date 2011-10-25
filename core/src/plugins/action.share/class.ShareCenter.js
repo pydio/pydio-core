@@ -31,6 +31,17 @@ Class.create("ShareCenter", {
     shareRepository : function(userSelection){
 
         var loadFunc = function(oForm){
+
+            var nodeMeta = userSelection.getUniqueNode().getMetadata();
+            if(nodeMeta.get("ajxp_shared")){
+                // Reorganize
+                var repoFieldset = oForm.down('fieldset#target_repository');
+                repoFieldset.insert(oForm.down('fieldset#target_user div#textarea_sf_element'));
+                repoFieldset.insert(oForm.down('fieldset#target_user div.dialogLegend'));
+                repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user'));
+                oForm.down('fieldset#target_user').remove();
+            }
+
             new Protopass($('shared_pass'), {
                 barContainer : $('pass_strength_container'),
                 barPosition:'bottom'
@@ -56,10 +67,17 @@ Class.create("ShareCenter", {
                     $('create_shared_user').blindDown();
                 });
             }
+            this._currentRepositoryId = null;
             var nodeMeta = userSelection.getUniqueNode().getMetadata();
             if(nodeMeta.get("ajxp_shared")){
                 oForm.down('fieldset#share_unshare').show();
                 oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
+                this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
+                    oForm.down('textarea#shared_user').value = json['users'].join("\n");
+                    oForm.down('input#repo_label').value = json['label'];
+                    oForm.down('select').setValue(json['rights']);
+                    this._currentRepositoryId = json['repositoryId'];
+                }.bind(this));
             }
         }.bind(this);
         var submitFunc = function(oForm){
@@ -78,20 +96,27 @@ Class.create("ShareCenter", {
             publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
             var conn = new Connexion(publicUrl);
             conn.setParameters(modal.getForm().serialize(true));
+            if(this._currentRepositoryId){
+                conn.addParameter("repository_id", this._currentRepositoryId);
+            }
             conn.onComplete = function(transport){
                 var response = parseInt(transport.responseText);
                 if(response == 200){
-                    ajaxplorer.displayMessage('SUCCESS', MessageHash[348]);
+                    if(this._currentRepositoryId){
+                        ajaxplorer.displayMessage('SUCCESS', MessageHash['share_center.19']);
+                    }else{
+                        ajaxplorer.displayMessage('SUCCESS', MessageHash['share_center.18']);
+                    }
                     ajaxplorer.fireContextRefresh();
                     hideLightBox(true);
                 }else{
                     var messages = {100:349, 101:352, 102:350, 103:351};
                     ajaxplorer.displayMessage('ERROR', MessageHash[messages[response]]);
                 }
-            };
+            }.bind(this);
             conn.sendAsync();
             return false;
-        };
+        }.bind(this);
         if(window.ajxpBootstrap.parameters.get("usersEditable") == false){
             ajaxplorer.displayMessage('ERROR', MessageHash[394]);
         }else{
@@ -116,11 +141,21 @@ Class.create("ShareCenter", {
                     oForm.down('fieldset#share_optional_fields').hide();
                     oForm.down('fieldset#share_generate').hide();
                     oForm.down('fieldset#share_result').show();
+                    oForm.down('fieldset#share_result legend').update('Public link');
                     oForm.down('div#generate_indicator').show();
                     this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
                         oForm.down('input[id="share_container"]').value = json['publiclet_link'];
                         oForm.down('div#generate_indicator').hide();
-                    });
+                        var linkDescription = '. ' + MessageHash['share_center.11']+': '+ (json['expire_time'] == 0 ? MessageHash['share_center.14']:json['expire_time']) + ' <br/> ';
+                        linkDescription += '. ' + MessageHash['share_center.12']+': ' + (json['has_password']?MessageHash['share_center.13']:MessageHash['share_center.14']);
+                        linkDescription += '<br/>. '+MessageHash['share_center.15'].replace('%s', '<span id="downloaded_times">'+json['download_counter']+'</span>')+' (';
+                        var descDiv = new Element('div', {style:"margin-top: 5px;"}).update(linkDescription);
+                        var resetLink = new Element('a', {style:'text-decoration:underline;cursor:pointer;', title:MessageHash['share_center.17']}).update(MessageHash['share_center.16']).observe('click', this.resetDownloadCounterCallback.bind(this));
+                        descDiv.insert(resetLink);
+                        descDiv.insert(').');
+                        oForm.down('fieldset#share_result').insert(descDiv);
+                        oForm.down('input[id="share_container"]').select();
+                    }.bind(this));
                     oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
                 }else{
                     var button = $(oForm).down('div#generate_publiclet');
@@ -168,6 +203,16 @@ Class.create("ShareCenter", {
         conn.sendAsync();
     },
 
+    resetDownloadCounterCallback : function(){
+        var conn = new Connexion();
+        conn.addParameter("get_action", "reset_counter");
+        conn.addParameter("file", ajaxplorer.getUserSelection().getUniqueNode().getPath());
+        conn.onComplete = function(){
+            modal.getForm().down('span#downloaded_times').update('0');
+        };
+        conn.sendAsync();
+    },
+
     generatePublicLinkCallback : function(){
         var userSelection = ajaxplorer.getUserSelection();
         if(!userSelection.isUnique() || (userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive'])))) return;
@@ -197,7 +242,9 @@ Class.create("ShareCenter", {
                         afterFinish : function(){
                             cont.select();
                             modal.refreshDialogAppearance();
-                            ajaxplorer.fireContextRefresh();
+                            modal.setCloseAction(function(){
+                                ajaxplorer.fireContextRefresh();
+                            });
                         }
                     });
                 }

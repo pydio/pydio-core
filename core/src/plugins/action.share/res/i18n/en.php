@@ -8,7 +8,20 @@ $mess = array(
     "3" => "Wrong password",
     "4" => "Enter the required password on click on the image to download <b>%s</b> to your hard drive",
     "5" => "password",
-
+    "6" => "Stop Sharing",
+    "7" => "Stopping the share will not remove the file. If you want to change the parameters, re-share the file.",
+    "8" => "File is shared",
+    "9" => "Use this button to stop sharing this folder",
+    "10"=> "Folder is shared",
+    "11"=> "Expiration",
+    "12"=> "Password",
+    "13"=> "Yes",
+    "14"=> "No",
+    "15"=> "File was download %s times",
+    "16"=> "reset",
+    "17"=> "Click to reset download counter",
+    "18"=> "Folder is shared as a new repository",
+    "19"=> "Shared repository options were successfully modified",
 );
 
 ?>

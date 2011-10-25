@@ -8,7 +8,18 @@ $mess = array(
     "3" => "Mauvais mot de passe",
     "4" => "Entrez le mot de passe fourni et cliquez sur l'image télécharger <b>%s</b> sur votre disque dur",
     "5" => "mot de passe",
-
+    "6" => "Ne plus partager",
+    "7" => "L'arrêt du partage ne supprimera pas le fichier. Si vous voulez modifier les paramêtres, veuillez re-partager le fichier.",
+    "8" => "Fichier partagé",
+    "9" => "Utiliser ce bouton pour ne plus partager le répertoire",
+    "10"=> "Répertoire partagé",
+    "11"=> "Expiration",
+    "12"=> "Mot de passe",
+    "13"=> "Oui",
+    "14"=> "Non",
+    "15"=> "Fichier téléchargé %s fois",
+    "16"=> "Remise à zéro",
+    "17"=> "Cliquer pour remettre à zéro le compteur de téléchargements",
 );
 
 ?>
