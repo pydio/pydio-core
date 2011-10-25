@@ -159,6 +159,9 @@ class ShareCenter extends AJXP_Plugin{
                     header("Content-type:application/json");
                     if($elementType == "file"){
                         $pData = self::loadPublicletData(self::$metaCache[basename($file)]);
+                        if($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId()){
+                            throw new Exception("You are not allowed to access this data");
+                        }
                         $jsonData = array(
                                          "publiclet_link"   => $this->buildPublicletLink(self::$metaCache[basename($file)]),
                                          "download_counter" => PublicletCounter::getCount(self::$metaCache[basename($file)]),
@@ -168,6 +171,9 @@ class ShareCenter extends AJXP_Plugin{
                     }else if( $elementType == "repository"){
                         $repoId = self::$metaCache[basename($file)];
                         $repo = ConfService::getRepositoryById($repoId);
+                        if($repo->getOwner() != AuthService::getLoggedUser()->getId()){
+                            throw new Exception("You are not allowed to access this data");
+                        }
                         $sharedUsers = array();
                         $sharedRights = "";
                         $loggedUser = AuthService::getLoggedUser();
@@ -260,6 +266,7 @@ class ShareCenter extends AJXP_Plugin{
 	 */
 	public function updateNodeSharedData($oldNode, $newNode = null, $copy = false){
         if($this->accessDriver->getId() == "access.imap") return;
+        if($oldNode == null) return;
         $this->loadMetaFileData($oldNode->getUrl());
         if(count(self::$metaCache) && isset(self::$metaCache[basename($oldNode->getPath())])){
             try{
@@ -596,7 +603,6 @@ class ShareCenter extends AJXP_Plugin{
         $file = $dlFolder."/".$id.".php";
         $lines = file($file);
         $inputData = '';
-        $id = str_replace(".php", "", basename($file));
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
         $dataModified = (md5($inputData) != $id);

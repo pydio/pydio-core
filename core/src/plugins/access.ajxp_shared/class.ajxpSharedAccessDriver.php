@@ -165,7 +165,9 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
         }
 		
 		foreach ($files as $file){
-			$publicletData = ShareCenter::loadPublicletData($file);
+            $id = array_shift(explode(".", basename($file)));
+            if(strlen($id) != 32) continue;
+			$publicletData = ShareCenter::loadPublicletData($id);
 			if(isset($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
@@ -188,7 +190,9 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		$userId = $loggedUser->getId();
 		$deleted = array();
 		foreach ($files as $file){
-			$publicletData = ShareCenter::loadPublicletData($file);
+            $id = array_shift(explode(".", basename($file)));
+            if(strlen($id) != 32) continue;
+			$publicletData = ShareCenter::loadPublicletData($id);
 			if(!isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
