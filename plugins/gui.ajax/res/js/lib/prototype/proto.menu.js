@@ -200,9 +200,12 @@ Proto.Menu = Class.create({
 						.observe('click', this.onClick.bind(this))
 						.observe('contextmenu', Event.stop)
 						.update(Object.extend(new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'}), {_callback:item.callback} ))
-						.insert(item.name)						
+						.insert(item.name)
 				);
-				newItem._callback = item.callback;					
+            if(item.overlay){
+                newItem.down('img').insert({after:Object.extend(new Element('img', {src:item.overlay, style:'position:relative;margin-left:-12px;top:5px;'}), {_callback:item.callback})});
+            }
+			newItem._callback = item.callback;
 			if(item.subMenu){
 				if(!item.subMenuBeforeShow){
 					item.subMenuBeforeShow = Prototype.emptyFunction;

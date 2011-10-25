@@ -155,7 +155,10 @@ Class.create("Repository", {
 	getSlug : function(){
 		return this.slug;
 	},
-	
+
+    getOverlay : function(){
+        return (this.getOwner() ? resolveImageSource("shared.png", "/images/overlays/ICON_SIZE", 8):"");
+    },
 	
 	/**
 	 * Parses XML Node
