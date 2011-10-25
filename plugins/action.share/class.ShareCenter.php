@@ -357,7 +357,7 @@ class ShareCenter extends AJXP_Plugin{
         {
             if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"]))
             {
-            	$content = file_get_contents(AJXP_INSTALL_PATH."/plugins/core.access/res/public_links.html");
+            	$content = file_get_contents(AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.html");
             	$language = "en";
             	if(isSet($_GET["lang"])){
             		$language = $_GET["lang"];
