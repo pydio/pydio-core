@@ -152,22 +152,45 @@ class ShareCenter extends AJXP_Plugin{
 
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $elementType = $httpVars["element_type"];
+                $messages = ConfService::getMessages();
+
                 $this->loadMetaFileData($this->urlBase.$file);
                 if(isSet(self::$metaCache[basename($file)])){
                     header("Content-type:application/json");
                     if($elementType == "file"){
+                        $pData = self::loadPublicletData(self::$metaCache[basename($file)]);
                         $jsonData = array(
-                                         "publiclet_link"   => $this->buildPublicletLink( self::$metaCache[basename($file)]),
-                                         "download_counter" => PublicletCounter::getCount(self::$metaCache[basename($file)])
+                                         "publiclet_link"   => $this->buildPublicletLink(self::$metaCache[basename($file)]),
+                                         "download_counter" => PublicletCounter::getCount(self::$metaCache[basename($file)]),
+                                         "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
+                                         "has_password"     => (!empty($pData["PASSWORD"]))
                                          );
                     }else if( $elementType == "repository"){
                         $repoId = self::$metaCache[basename($file)];
                         $repo = ConfService::getRepositoryById($repoId);
-                        $users = array();
+                        $sharedUsers = array();
+                        $sharedRights = "";
+                        $loggedUser = AuthService::getLoggedUser();
+                        $users = AuthService::listUsers();
+                        foreach ($users as $userId => $userObject) {
+                            if($userObject->getId() == $loggedUser->getId()) continue;
+                            if($userObject->canWrite($repoId) && $userObject->canRead($repoId)){
+                                $sharedUsers[] = $userId;
+                                $sharedRights = "rw";
+                            }else if($userObject->canRead($repoId)){
+                                $sharedUsers[] = $userId;
+                                $sharedRights = "r";
+                            }else if($userObject->canWrite($repoId)){
+                                $sharedUsers[] = $userId;
+                                $sharedRights = "w";
+                            }
+                        }
+
                         $jsonData = array(
+                                         "repositoryId" => $repoId,
                                          "label"    => $repo->getDisplay(),
-                                         "rights"   => "rw",
-                                         "users"    => $users
+                                         "rights"   => $sharedRights,
+                                         "users"    => $sharedUsers
                                     );
                     }
                     echo json_encode($jsonData);
@@ -184,6 +207,15 @@ class ShareCenter extends AJXP_Plugin{
                     self::deleteSharedElement($httpVars["element_type"], $element, AuthService::getLoggedUser());
                     unset(self::$metaCache[basename($file)]);
                     $this->saveMetaFileData($this->urlBase.$file);
+                }
+            break;
+
+            case "reset_counter":
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $this->loadMetaFileData($this->urlBase.$file);
+                if(isSet(self::$metaCache[basename($file)])){
+                    $element = self::$metaCache[basename($file)];
+                    PublicletCounter::reset($element);
                 }
             break;
 
@@ -438,10 +470,15 @@ class ShareCenter extends AJXP_Plugin{
 		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
 		$rights = $httpVars["repo_rights"];
 		if($rights != "r" && $rights != "w" && $rights != "rw") return 100;
+
+        if(isSet($httpVars["repository_id"])){
+            $editingRepo = ConfService::getRepositoryById($httpVars["repository_id"]);
+        }
+
 		// CHECK USER & REPO DOES NOT ALREADY EXISTS
 		$repos = ConfService::getRepositoriesList();
 		foreach ($repos as $obj){
-			if($obj->getDisplay() == $label){
+			if($obj->getDisplay() == $label && (!isSet($editingRepo) || $editingRepo != $obj)){
 				return 101;
 			}
 		}
@@ -458,14 +495,21 @@ class ShareCenter extends AJXP_Plugin{
         if(count($customData)){
             $options["PLUGINS_DATA"] = $customData;
         }
-		$newRepo = $repository->createSharedChild(
-			$label,
-			$options,
-			$repository->id,
-			$loggedUser->id,
-			null
-		);
-		ConfService::addRepository($newRepo);
+        if(isSet($editingRepo)){
+            $newRepo = $editingRepo;
+            $newRepo->setDisplay($label);
+            $newRepo->options = $options;
+            ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
+        }else{
+            $newRepo = $repository->createSharedChild(
+                $label,
+                $options,
+                $repository->id,
+                $loggedUser->id,
+                null
+            );
+            ConfService::addRepository($newRepo);
+        }
 
         foreach($users as $userName){
             if(AuthService::userExists($userName)){
@@ -488,10 +532,12 @@ class ShareCenter extends AJXP_Plugin{
         }
 
         // METADATA
-        $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-        $this->loadMetaFileData($this->urlBase.$file);
-        self::$metaCache[basename($file)] =  $newRepo->getUniqueId();
-        $this->saveMetaFileData($this->urlBase.$file);
+        if(!isSet($editingRepo)){
+            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $this->loadMetaFileData($this->urlBase.$file);
+            self::$metaCache[basename($file)] =  $newRepo->getUniqueId();
+            $this->saveMetaFileData($this->urlBase.$file);
+        }
 
     	return 200;
     }
@@ -525,11 +571,10 @@ class ShareCenter extends AJXP_Plugin{
                 AuthService::deleteUser($element);
             }
         }else if( $type == "file" ){
-            $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-            $publicletData = self::loadPublicletData($dlFolder."/".$element.".php");
+            $publicletData = self::loadPublicletData($element);
             if(isSet($publicletData["OWNER_ID"]) && $publicletData["OWNER_ID"] == $loggedUser->getId()){
                 PublicletCounter::delete($element);
-                unlink($dlFolder."/".$element.".php");
+                unlink($publicletData["PUBLICLET_PATH"]);
             }else{
                 throw new Exception($mess["ajxp_shared.12"]);
             }
@@ -546,7 +591,9 @@ class ShareCenter extends AJXP_Plugin{
     }
 
 
-    public static function loadPublicletData($file){
+    public static function loadPublicletData($id){
+        $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        $file = $dlFolder."/".$id.".php";
         $lines = file($file);
         $inputData = '';
         $id = str_replace(".php", "", basename($file));
@@ -556,6 +603,7 @@ class ShareCenter extends AJXP_Plugin{
         $publicletData = unserialize($inputData);
         $publicletData["SECURITY_MODIFIED"] = $dataModified;
         $publicletData["DOWNLOAD_COUNT"] = PublicletCounter::getCount($id);
+        $publicletData["PUBLICLET_PATH"] = $file;
         return $publicletData;
     }
 
