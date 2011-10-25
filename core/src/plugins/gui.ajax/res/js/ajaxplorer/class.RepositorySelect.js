@@ -110,6 +110,7 @@ Class.create("RepositorySelect", {
 					name:repoObject.getLabel(),
 					alt:repoObject.getLabel() + (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":""),
 					image:repoObject.getIcon(),
+                    overlay:repoObject.getOverlay(),
 					className:"edit",
 					disabled:selected,
 					callback:function(e){
