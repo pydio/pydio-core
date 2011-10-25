@@ -267,15 +267,11 @@ class ShareCenter extends AJXP_Plugin{
     	if(!function_exists("mcrypt_create_iv")){
     		return "ERROR : MCrypt must be installed to use publiclets!";
     	}
-    	if($data["PASSWORD"] && !is_file($downloadFolder."/allz.css")){
-            if(!defined("AJXP_THEME_FOLDER")) $th = "plugins/gui.ajax/res/themes/oxygen";
-            else $th = AJXP_THEME_FOLDER ;
-    		@copy(AJXP_INSTALL_PATH."/".$th."/css/allz.css", $downloadFolder."/allz.css");
-    		@copy(AJXP_INSTALL_PATH."/".$th."/images/actions/22/dialog_ok_apply.png", $downloadFolder."/dialog_ok_apply.png");
-    		@copy(AJXP_INSTALL_PATH."/".$th."/images/actions/16/public_url.png", $downloadFolder."/public_url.png");
-    	}
-    	if(!is_file($downloadFolder."/index.html")){
-    		@copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
+    	if(!is_file($downloadFolder."/down.png")){
+            $pDir = dirname(__FILE__);
+    		@copy($pDir."/res/down.png", $downloadFolder."/down.png");
+    		@copy($pDir."/res/drive_harddisk.png", $downloadFolder."/drive_harddisk.png");
+            @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
     	}
         $data["PLUGIN_ID"] = $accessDriver->id;
         $data["BASE_DIR"] = $accessDriver->baseDir;
@@ -323,11 +319,12 @@ class ShareCenter extends AJXP_Plugin{
     function buildPublicletLink($hash){
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
+        $langSuffix = "?lang=".ConfService::getLanguage();
         if($dlURL != ""){
-        	return rtrim($dlURL, "/")."/".$hash.".php";
+        	return rtrim($dlURL, "/")."/".$hash.".php".$langSuffix;
         }else{
 	        $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
-	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/")."/".$hash.".php");
+	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/")."/".$hash.".php").$langSuffix;
         }
     }
 
@@ -352,29 +349,36 @@ class ShareCenter extends AJXP_Plugin{
             echo "Link is expired, sorry.";
             exit();
         }
+        // Load language messages
+        $language = "en";
+        if(isSet($_GET["lang"])){
+            $language = $_GET["lang"];
+        }
+        $messages = array();
+        if(is_file(dirname(__FILE__)."/res/i18n/".$language.".php")){
+            include(dirname(__FILE__)."/res/i18n/".$language.".php");
+            $messages = $mess;
+        }else{
+            include(dirname(__FILE__)."/res/i18n/en.php");
+        }
+
+        $AJXP_LINK_HAS_PASSWORD = false;
+        $AJXP_LINK_BASENAME = SystemTextEncoding::toUTF8(basename($data["FILE_PATH"]));
+
         // Check password
         if (strlen($data["PASSWORD"]))
         {
             if (!isSet($_POST['password']) || ($_POST['password'] != $data["PASSWORD"]))
             {
-            	$content = file_get_contents(AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.html");
-            	$language = "en";
-            	if(isSet($_GET["lang"])){
-            		$language = $_GET["lang"];
-            	}
-            	$messages = array();
-            	if(is_file(AJXP_COREI18N_FOLDER."/".$language.".php")){
-            		include(AJXP_COREI18N_FOLDER."/".$language.".php");
-            		$messages = $mess;
-            	}
-				if(preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $content, $matches, PREG_SET_ORDER)){
-					foreach($matches as $match){
-						$messId = str_replace("]", "", str_replace("[", "", $match[1]));
-						if(isSet($messages[$messId])) $content = str_replace("AJXP_MESSAGE[$messId]", $messages[$messId], $content);
-					}
-				}
-				echo $content;
-                exit(1);
+                $AJXP_LINK_HAS_PASSWORD = true;
+                $AJXP_LINK_WRONG_PASSWORD = (isSet($_POST['password']) && ($_POST['password'] != $data["PASSWORD"]));
+                include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
+                return;
+            }
+        }else{
+            if (!isSet($_GET["dl"])){
+                include (AJXP_INSTALL_PATH."/plugins/action.share/res/public_links.php");
+                return;
             }
         }
         $filePath = AJXP_INSTALL_PATH."/plugins/access.".$data["DRIVER"]."/class.".$className.".php";
