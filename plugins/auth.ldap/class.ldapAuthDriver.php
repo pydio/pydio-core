@@ -127,7 +127,8 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
     function checkPassword($login, $pass, $seed){
-       
+
+        if(empty($pass)) return false;
         $entries = $this->getUserEntries($login);
         if ($entries['count']>0) {
             if (@ldap_bind($this->ldapconn,$entries[0]["dn"],$pass)) {
