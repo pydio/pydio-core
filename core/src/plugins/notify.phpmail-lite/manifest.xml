@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <notify id="notify.phpmail-lite" enabled="false" label="Simple Notification" description="Notification system (demonstrative)">
     <client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
-        <!-- Tests for custom data
         <resources>
             <js file="plugins/notify.phpmail-lite/class.NotifierFormEnricher.js" className="NotifierFormEnricher" autoload="true"/>
         </resources>
-        -->
     </client_settings>
     <server_settings>
         <global_param name="FROM" type="string" label="Sender" description="Name and adress of the sender, use Name:mail_address format." mandatory="true" default=""/>
-        <global_param name="TO" type="string" label="Recipient(s)" description="Comma separated list of recipients, e.g Name1:address1,Name2:address2, etc" mandatory="true" default=""/>
+        <global_param name="TO" type="string" label="Recipient(s)" description="Comma separated list of permanent recipients, e.g Name1:address1,Name2:address2, etc. Leave empty if you want only the share feature." mandatory="false" default=""/>
+        <global_param name="SHARE" type="boolean" label="Enrich Shares" description="Add a notification pane to the share mechanism, proposing the user to enter her email to be notified when the shared repository is modified" mandatory="false" default="false"/>
+        <global_param name="ACTIONS" type="string" label="Share on..." description="Comma-separated list of action on wich the notification should be sent" mandatory="true" default="upload,download"/>
         <global_param name="SUBJECT" type="string" label="Subject" description="Subject to be displayed in the mail" mandatory="true" default=""/>
         <global_param name="BODY" type="string" label="Body" description="Body of the email. You can use AJXP_USER, AJXP_FILE, AJXP_FOLDER and AJXP_ACTION keywords." mandatory="false" default=""/>
         <global_param name="MAILER" type="select" choices="sendmail|sendmail,mail|mail" label="Mailer" description="Php mailer to use (see phpmail-lite documentation).'." mandatory="false" default="sendmail"/>
     </server_settings>
 	<registry_contributions>
 		<actions>
-			<!-- Notify Upload Action -->
-			<action name="upload">
-				<pre_processing>
-					<serverCallback methodName="preProcess"/>
-				</pre_processing>
-			</action>
+            <!-- Do not remove, will be generated dynamically -->
 		</actions>
 	</registry_contributions>
 	<dependencies>
