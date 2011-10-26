@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <action_plugin name="share" label="Sharing Features" description="Share Center actions and hooks">
     <server_settings>
-        <global_param name="METADATA_FILE" type="string" label="Metadata FIle" description="Hidden file containing shared metadata" mandatory="true" default=".ajxp_share_meta"/>
+        <global_param name="METADATA_FILE" type="string" label="Metadata File" description="Hidden file containing shared metadata" mandatory="true" default=".ajxp_share_meta"/>
+        <global_param name="METADATA_FILE_LOCATION" type="select" choices="infolders|In Local Folders,global|In Global Folder" label="File location" description="Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." mandatory="true" default="infolders"/>
     </server_settings>
     <client_settings>
         <resources>

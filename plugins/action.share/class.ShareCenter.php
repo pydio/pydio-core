@@ -620,14 +620,20 @@ class ShareCenter extends AJXP_Plugin{
 			self::$metaCache = array();
 			return ;
 		}
-		$metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
-		if(self::$currentMetaName == $metaFile && is_array(self::$metaCache)){
-			return;
-		}
+        $local = ($this->pluginConf["METADATA_FILE_LOCATION"] == "infolders");
+        if($local){
+            $metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
+            if(self::$currentMetaName == $metaFile && is_array(self::$metaCache))return;
+        }else{
+            $metaFile = AJXP_DATA_PATH."/plugins/action.share/".$this->pluginConf["METADATA_FILE"];
+            if(is_array(self::$metaCache)) return;
+        }
 		if(is_file($metaFile) && is_readable($metaFile)){
+            self::$currentMetaName = $metaFile;
 			$rawData = file_get_contents($metaFile);
             self::$fullMetaCache = unserialize($rawData);
-			self::$metaCache = self::$fullMetaCache[AuthService::getLoggedUser()->getId()];
+			self::$metaCache = self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getUniqueId()];
+
 		}else{
             self::$fullMetaCache = array();
 			self::$metaCache = array();
@@ -635,9 +641,20 @@ class ShareCenter extends AJXP_Plugin{
 	}
 
 	protected function saveMetaFileData($currentFile){
-		$metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
-		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile))){
-            self::$fullMetaCache[AuthService::getLoggedUser()->getId()] = self::$metaCache;
+        $local = ($this->pluginConf["METADATA_FILE_LOCATION"] == "infolders");
+        if($local){
+            $metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
+        }else{
+            if(!is_dir(AJXP_DATA_PATH."/plugins/action.share/")){
+                mkdir(AJXP_DATA_PATH."/plugins/action.share/", 0666, true);
+            }
+            $metaFile = AJXP_DATA_PATH."/plugins/action.share/".$this->pluginConf["METADATA_FILE"];
+        }
+		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || (!$local) ){
+            if(!isset(self::$fullMetaCache[AuthService::getLoggedUser()->getId()])){
+                self::$fullMetaCache[AuthService::getLoggedUser()->getId()] = array();
+            }
+            self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getUniqueId()] = self::$metaCache;
 			$fp = fopen($metaFile, "w");
             if($fp !== false){
                 @fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));
