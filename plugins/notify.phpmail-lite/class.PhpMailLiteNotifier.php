@@ -26,9 +26,44 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Send notifications to user on some predefined actions
  */
 class PhpMailLiteNotifier extends AJXP_Plugin {
-		
+
+    public function loadRegistryContributions(){
+        $currentUser = AuthService::getLoggedUser();
+        if($currentUser != null){
+            $cData = $currentUser->getPref("CUSTOM_PARAMS");
+            if($cData != null && isSet($cData["email"])){
+                $this->exposeConfigInManifest("current_user_email", $cData["email"]);
+            }
+        }
+        $actionsBranch = $this->xPath->query("registry_contributions/actions");
+        $actionsNode = $actionsBranch->item(0);
+        foreach(array_map("trim", explode(",",$this->pluginConf["ACTIONS"])) as $action){
+            // Action node
+            $prop = $this->manifestDoc->createElement("action");
+            $attName = $this->manifestDoc->createAttribute("name");
+            $attValue = $this->manifestDoc->createTextNode($action);
+            $attName->appendChild($attValue);
+            $prop->appendChild($attName);
+            $actionsNode->appendChild($prop);
+            // Pre_proc
+            $preproc = $this->manifestDoc->createElement("pre_processing");
+            $prop->appendChild($preproc);
+            // Server callback
+            $sC = $this->manifestDoc->createElement("serverCallback");
+            $sAttName = $this->manifestDoc->createAttribute("methodName");
+            $sAttValue = $this->manifestDoc->createTextNode("preProcess");
+            $sAttName->appendChild($sAttValue);
+            $sC->appendChild($sAttName);
+            $preproc->appendChild($sC);
+        }
+        $this->reloadXPath();
+        parent::loadRegistryContributions();
+
+
+    }
+
 	public function preProcess($action, $httpVars, $fileVars){
-		if(!is_array($this->pluginConf) || !isSet($this->pluginConf["TO"])){
+		if(!is_array($this->pluginConf)){
 			throw new Exception("Cannot find configuration for plugin notify.phpmail-lite! Make sur that you have filled the options in the GUI, or that the .inc file was dropped inside the /conf/ folder!");
 		}
 		require("lib/class.phpmailer-lite.php");
@@ -37,28 +72,51 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
         if(is_string($this->pluginConf["FROM"])) {
             $this->pluginConf["FROM"] = $this->parseStringOption($this->pluginConf["FROM"]);
         }
-        if(is_string($this->pluginConf["TO"])){
+        if(is_string($this->pluginConf["TO"]) && $this->pluginConf["TO"] != ""){
             $froms = explode(",", $this->pluginConf["TO"]);
             $this->pluginConf["TO"] = array_map(array($this, "parseStringOption"), $froms);
         }
 
+        $recipients = $this->pluginConf["TO"];
+
+        if($this->pluginConf["SHARE"]){
+            $repo = ConfService::getRepository();
+            $pData = $repo->getOption("PLUGINS_DATA");
+            if($pData != null && isSet($pData["SHARE_NOTIFICATION_ACTIVE"]) && isSet($pData["SHARE_NOTIFICATION_EMAIL"]) && $pData["SHARE_NOTIFICATION_ACTIVE"] == "on"){
+                $emails = array_map(array($this, "parseStringOption"), explode(",", $pData["SHARE_NOTIFICATION_EMAIL"]));
+                if(is_array($recipients)){
+                    $recipients = array_merge($recipients, $emails);
+                }else{
+                    $recipients = $emails;
+                }
+            }
+        }
+
+        if($recipients == "" || !count($recipients)) {
+            return;
+        }
+
+
+        // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
 		$mail = new PHPMailerLite(true);
 		$mail->Mailer = $this->pluginConf["MAILER"];		
 		$mail->SetFrom($this->pluginConf["FROM"]["address"], $this->pluginConf["FROM"]["name"]);
 		
-		foreach ($this->pluginConf["TO"] as $address){
+		foreach ($recipients as $address){
 			$mail->AddAddress($address["address"], $address["name"]);
 		}		
 		$mail->WordWrap = 50;                                 // set word wrap to 50 characters
 		$mail->IsHTML(true);                                  // set email format to HTML
 		
-		$mail->Subject = $this->pluginConf["SUBJECT"];
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
         $folder = $httpVars["dir"];
         $file = "";
         if(!$userSelection->isEmpty()){
             $file = implode(",", array_map("basename", $userSelection->getFiles()));
+            if($folder == null){
+                $folder = dirname($userSelection->getUniqueFile());
+            }
         }
         if($action == "upload" && isset($fileVars["userfile_0"])){
             $file = $fileVars["userfile_0"]["name"];
@@ -69,6 +127,8 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
                          $file,
                          $folder,
                          $action);
+        
+        $mail->Subject = str_replace($subject, $replace, $this->pluginConf["SUBJECT"]);
 		$mail->Body = str_replace($subject, $replace, $this->pluginConf["BODY"]);
 		$mail->AltBody = strip_tags($mail->Body);
 		
@@ -88,9 +148,9 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
     function parseStringOption($option){
         if(strstr($option, ":")){
             list($name, $ad) = explode(":", $option);
-            $option = array("address" => $ad, "name" => $name);
+            $option = array("address" => trim($ad), "name" => trim($name));
         }else{
-            $option = array("address" => $option, "name" => $option);
+            $option = array("address" => trim($option), "name" => trim($option));
         }
         return $option;
     }

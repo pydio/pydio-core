@@ -530,7 +530,7 @@ class ShareCenter extends AJXP_Plugin{
         if(isSet($editingRepo)){
             $newRepo = $editingRepo;
             $newRepo->setDisplay($label);
-            $newRepo->options = $options;
+            $newRepo->options = array_merge($newRepo->options, $options);
             ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
         }else{
             $newRepo = $repository->createSharedChild(
