@@ -20,6 +20,9 @@ $mess = array(
     "15"=> "Fichier téléchargé %s fois",
     "16"=> "Remise à zéro",
     "17"=> "Cliquer pour remettre à zéro le compteur de téléchargements",
+    "18"=> "Le répertoire a été partagé comme un nouveau dépôt",
+    "19"=> "Les options de partage ont été modifiées avec succès",
+    "20"=> "Ooops, le fichier que vous recherchez n'a pas été trouvé! Peut-être n'est il plus partagé avec vous?"
 );
 
 ?>

@@ -55,7 +55,7 @@ class Repository {
 		$this->setAccessType($driver);
 		$this->setDisplay($display);
 		$this->setId($id);
-		$this->uuid = md5(time());
+		$this->uuid = md5(microtime());
 		$this->slug = AJXP_Utils::slugify($display);
 	}
 	

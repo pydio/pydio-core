@@ -22,6 +22,7 @@ $mess = array(
     "17"=> "Click to reset download counter",
     "18"=> "Folder is shared as a new repository",
     "19"=> "Shared repository options were successfully modified",
+    "20"=> "Ooops, the file you required could not be found! Maybe it was deleted or it is not shared with you anymore."
 );
 
 ?>

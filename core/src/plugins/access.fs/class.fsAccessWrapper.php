@@ -114,7 +114,7 @@ class fsAccessWrapper implements AjxpWrapper {
 				$crtZip = new PclZip(AJXP_Utils::securePath(realpath($repoObject->getOption("PATH")).$zipPath));
 				$liste = $crtZip->listContent();				
 				if($storeOpenContext) self::$crtZip = $crtZip;
-				$folders = array(); $files = array();
+				$folders = array(); $files = array();$builtFolders = array();
 				if($localPath[strlen($localPath)-1] != "/") $localPath.="/";
 				foreach ($liste as $item){
 					$stored = $item["stored_filename"];			
@@ -122,26 +122,37 @@ class fsAccessWrapper implements AjxpWrapper {
 					$pathPos = strpos($stored, $localPath);
 					if($pathPos !== false){
 						$afterPath = substr($stored, $pathPos+strlen($localPath));
-						if($afterPath != "" && (strpos($afterPath, "/")=== false || strpos($afterPath, "/") == strlen($afterPath)-1)){
+						if($afterPath != "" && substr_count($afterPath, "/") < 2){
 							$statValue = array();
-							$statValue[2] = $statValue["mode"] = ($item["folder"]?"00040000":"0100000");
-							$statValue[7] = $statValue["size"] = $item["size"];
-							$statValue[8] = $statValue["atime"] = $item["mtime"];
-							$statValue[9] = $statValue["mtime"] = $item["mtime"];
-							$statValue[10] = $statValue["ctime"] = $item["mtime"];
-							if(strpos($afterPath, "/") == strlen($afterPath)-1){
-								$afterPath = substr($afterPath, 0, strlen($afterPath)-1);
-							}
-							//$statValue["filename"] = $zipPath.$localPath.$afterPath;
-							if($item["folder"]){
-								$folders[$afterPath] = $statValue;
-							}else{
-								$files[$afterPath] = $statValue;
-							}
-						}						
+                            if(substr_count($afterPath, "/") == 0){
+                                $statValue[2] = $statValue["mode"] = ($item["folder"]?"00040000":"0100000");
+                                $statValue[7] = $statValue["size"] = $item["size"];
+                                $statValue[8] = $statValue["atime"] = $item["mtime"];
+                                $statValue[9] = $statValue["mtime"] = $item["mtime"];
+                                $statValue[10] = $statValue["ctime"] = $item["mtime"];
+                                if(strpos($afterPath, "/") == strlen($afterPath)-1){
+                                    $afterPath = substr($afterPath, 0, strlen($afterPath)-1);
+                                }
+                                //$statValue["filename"] = $zipPath.$localPath.$afterPath;
+                                if($item["folder"]){
+                                    $folders[$afterPath] = $statValue;
+                                }else{
+                                    $files[$afterPath] = $statValue;
+                                }
+                            }else{
+                                $afterPath = array_shift(explode("/", $afterPath));
+                                if(isSet($folders[$afterPath]) || isSet($builtFolders[$afterPath])) continue;
+                                $statValue[2] = $statValue["mode"] = "00040000";
+                                $statValue[7] = $statValue["size"] = 0;
+                                $statValue[8] = $statValue["atime"] = $item["mtime"];
+                                $statValue[9] = $statValue["mtime"] = $item["mtime"];
+                                $statValue[10] = $statValue["ctime"] = $item["mtime"];
+                                $builtFolders[$afterPath] = $statValue;
+                            }
+						}
 					}
 				}
-				self::$currentListing = array_merge($folders, $files);
+				self::$currentListing = array_merge($folders, $builtFolders, $files);
 				self::$currentListingKeys = array_keys(self::$currentListing);
 				self::$currentListingIndex = 0;
 				return -1;
