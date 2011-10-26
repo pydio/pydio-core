@@ -639,8 +639,10 @@ class ShareCenter extends AJXP_Plugin{
 		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile))){
             self::$fullMetaCache[AuthService::getLoggedUser()->getId()] = self::$metaCache;
 			$fp = fopen($metaFile, "w");
-			fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));
-			fclose($fp);
+            if($fp !== false){
+                @fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));
+                @fclose($fp);
+            }
 			AJXP_Controller::applyHook("version.commit_file", $metaFile);
 		}
 	}
