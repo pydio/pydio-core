@@ -139,7 +139,7 @@ class sqlLogDriver extends AbstractLogDriver {
 		$action = htmlentities($action);
 		$params = htmlentities($params);
 
-		return "<$node icon=\"{$icon}\" date=\"{$log_datetime}\" is_file=\"{$is_file}\" filename=\"/logs/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}\" ajxp_mime=\"log\" ip=\"{$remote_ip}\" level=\"{$log_level}\" user=\"{$user}\" action=\"{$action}\" params=\"{$params}\"/>";
+		return "<$node icon=\"{$icon}\" date=\"{$log_datetime}\" ajxp_modiftime=\"{$log_unixtime}\" is_file=\"{$is_file}\" filename=\"/logs/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}\" ajxp_mime=\"log\" ip=\"{$remote_ip}\" level=\"{$log_level}\" user=\"{$user}\" action=\"{$action}\" params=\"{$params}\"/>";
 	}
 	
 	/**

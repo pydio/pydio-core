@@ -277,7 +277,11 @@ class textLogDriver extends AbstractLogDriver {
 					$matches[$key] = $match;
 				}
 				if(count($matches) < 3) continue;
-				print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />", false));
+                // rebuild timestamp
+                $date = $matches[1];
+                list($m,$d,$Y,$h,$i,$s) = sscanf($date, "%i-%i-%i %i:%i:%i");
+                $tStamp = mktime($h,$i,$s,$m,$d,$Y);
+				print(SystemTextEncoding::toUTF8("<$nodeName is_file=\"1\" ajxp_modiftime=\"$tStamp\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[1]\" ip=\"$matches[2]\" level=\"$matches[3]\" user=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />", false));
 			}
 		}
 		return ;

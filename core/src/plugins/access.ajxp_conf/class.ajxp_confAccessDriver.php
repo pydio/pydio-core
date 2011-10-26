@@ -1125,7 +1125,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$parts = explode("/", $dir);
 		if(count($parts)>4){
 			$config = '<columns switchDisplayMode="list" switchGridMode="grid" template_name="ajxp_conf.logs">
-				<column messageId="ajxp_conf.17" attributeName="date" sortType="Date" width="10%"/>
+				<column messageId="ajxp_conf.17" attributeName="date" sortType="MyDate" width="10%"/>
 				<column messageId="ajxp_conf.18" attributeName="ip" sortType="String"/>
 				<column messageId="ajxp_conf.19" attributeName="level" sortType="String"/>
 				<column messageId="ajxp_conf.20" attributeName="user" sortType="String"/>
