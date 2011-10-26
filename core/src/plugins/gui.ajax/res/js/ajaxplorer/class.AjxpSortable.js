@@ -203,9 +203,9 @@ Class.create("AjxpSortable", SortableTable, {
 	 * @returns String
 	 */
 	sortTimes : function(oRow, nColumn){
-		if(oRow.ajxp_modiftime){
-			return oRow.ajxp_modiftime;
-		}
+        if(oRow.ajxpNode && oRow.ajxpNode.getMetadata().get("ajxp_modiftime")){
+            return oRow.ajxpNode.getMetadata().get("ajxp_modiftime");
+        }
 	}
 	
 });
