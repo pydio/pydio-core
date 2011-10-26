@@ -100,7 +100,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
                     ShareCenter::deleteSharedElement($mime, $element, $loggedUser);
                     if($mime == "repository") $out = $mess["ajxp_conf.59"];
                     else if($mime == "user") $out = $mess["ajxp_conf.60"];
-                    else if($mime == "file") $out = $mess["ajxp_conf.13"];
+                    else if($mime == "file") $out = $mess["ajxp_shared.13"];
 				}
                 AJXP_XMLWriter::sendMessage($out, null);
                 AJXP_XMLWriter::reloadDataNode();

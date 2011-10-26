@@ -306,12 +306,7 @@ class ShareCenter extends AJXP_Plugin{
     	if(!function_exists("mcrypt_create_iv")){
     		return "ERROR : MCrypt must be installed to use publiclets!";
     	}
-    	if(!is_file($downloadFolder."/down.png")){
-            $pDir = dirname(__FILE__);
-    		@copy($pDir."/res/down.png", $downloadFolder."/down.png");
-    		@copy($pDir."/res/drive_harddisk.png", $downloadFolder."/drive_harddisk.png");
-            @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
-    	}
+        $this->initPublicFolder($downloadFolder);
         $data["PLUGIN_ID"] = $accessDriver->id;
         $data["BASE_DIR"] = $accessDriver->baseDir;
         $data["REPOSITORY"] = $repository;
@@ -355,16 +350,46 @@ class ShareCenter extends AJXP_Plugin{
         return $this->buildPublicletLink($hash);
     }
 
-    function buildPublicletLink($hash){
+    function buildPublicDlURL(){
         $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
         $langSuffix = "?lang=".ConfService::getLanguage();
         if($dlURL != ""){
-        	return rtrim($dlURL, "/")."/".$hash.".php".$langSuffix;
+        	return rtrim($dlURL, "/");
         }else{
 	        $fullUrl = AJXP_Utils::detectServerURL() . dirname($_SERVER['REQUEST_URI']);
-	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/")."/".$hash.".php").$langSuffix;
+	        return str_replace("\\", "/", $fullUrl.rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
         }
+    }
+
+    function buildPublicletLink($hash){
+        return $this->buildPublicDlURL()."/".$hash.".php?lang=".ConfService::getLanguage();
+    }
+
+    function initPublicFolder($downloadFolder){
+        if(is_file($downloadFolder."/down.png")){
+            return;
+        }
+        $language = ConfService::getLanguage();
+        $pDir = dirname(__FILE__);
+        $messages = array();
+        if(is_file($pDir."/res/i18n/".$language.".php")){
+            include($pDir."/res/i18n/".$language.".php");
+            $messages = $mess;
+        }else{
+            include($pDir."/res/i18n/en.php");
+        }
+        $sTitle = sprintf($messages[1], ConfService::getCoreConf("APPLICATION_TITLE"));
+        $sLegend = $messages[20];
+
+        @copy($pDir."/res/down.png", $downloadFolder."/down.png");
+        @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
+        @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
+        file_put_contents($downloadFolder."/.htaccess", "ErrorDocument 404 ".$this->buildPublicDlURL()."/404.html");
+        $content404 = file_get_contents($pDir."/res/404.html");
+        $content404 = str_replace(array("AJXP_MESSAGE_TITLE", "AJXP_MESSAGE_LEGEND"), array($sTitle, $sLegend), $content404);
+        file_put_contents($downloadFolder."/404.html", $content404);
+
     }
 
     /**
@@ -632,7 +657,7 @@ class ShareCenter extends AJXP_Plugin{
             self::$currentMetaName = $metaFile;
 			$rawData = file_get_contents($metaFile);
             self::$fullMetaCache = unserialize($rawData);
-			self::$metaCache = self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getUniqueId()];
+			self::$metaCache = self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getId()];
 
 		}else{
             self::$fullMetaCache = array();
@@ -654,7 +679,7 @@ class ShareCenter extends AJXP_Plugin{
             if(!isset(self::$fullMetaCache[AuthService::getLoggedUser()->getId()])){
                 self::$fullMetaCache[AuthService::getLoggedUser()->getId()] = array();
             }
-            self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getUniqueId()] = self::$metaCache;
+            self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getId()] = self::$metaCache;
 			$fp = fopen($metaFile, "w");
             if($fp !== false){
                 @fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));

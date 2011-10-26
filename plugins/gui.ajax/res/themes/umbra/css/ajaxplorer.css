@@ -94,6 +94,7 @@ MAJOR STYLES
 a:link {
 	color: #676965;
 	text-decoration: none;
+    outline: 0;
 }
 a:visited {
 	text-decoration: none;
@@ -103,9 +104,11 @@ a:hover {
 	text-decoration: none;
 	color: #676965;
 }
-a:active {
+a:active,
+a:focus{
 	text-decoration: none;
 	color: #676965;
+    outline: 0;
 }
 
 body, html
