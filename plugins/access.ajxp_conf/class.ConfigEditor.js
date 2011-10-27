@@ -452,12 +452,12 @@ ConfigEditor = Class.create({
 		{
 			$('chck_'+repositoryId+'_write').disabled = true;
 			var wState = $('chck_'+repositoryId+'_write').checked;
-			rightString = (newState?(wState?'rw':'r'):(wState?'w':'n'));
+			rightString = (newState?(wState?'rw':'r'):(wState?'w':''));
 		}
 		else 
 		{
 			$('chck_'+repositoryId+'_read').disabled = true;
-			rightString = (newState?'rw':($('chck_'+repositoryId+'_read').checked?'r':'n'));
+			rightString = (newState?'rw':($('chck_'+repositoryId+'_read').checked?'r':''));
 		}
 				
 		var parameters = new Hash();

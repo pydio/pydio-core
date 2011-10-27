@@ -139,6 +139,15 @@ class ShareCenter extends AJXP_Plugin{
             	}else{
 					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 	                $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $this->repository);
+                    $customData = array();
+                    foreach($httpVars as $key => $value){
+                        if(substr($key, 0, strlen("PLUGINS_DATA_")) == "PLUGINS_DATA_"){
+                            $customData[substr($key, strlen("PLUGINS_DATA_"))] = $value;
+                        }
+                    }
+                    if(count($customData)){
+                        $data["PLUGINS_DATA"] = $customData;
+                    }
                     $url = $this->writePubliclet($data, $this->accessDriver, $this->repository);
                     $this->loadMetaFileData($this->urlBase.$file);
                     self::$metaCache[$file] = array_shift(explode(".", basename($url)));
@@ -463,11 +472,16 @@ class ShareCenter extends AJXP_Plugin{
         // Increment counter
         $hash = md5(serialize($data));
         PublicletCounter::increment($hash);
-        // Now call switchAction
-        //@todo : switchAction should not be hard coded here!!!
-        // Re-encode file-path as it will be decoded by the action.
+
+        AuthService::logUser($data["OWNER_ID"], "", true);
+        ConfService::loadRepositoryDriver();
+        ConfService::initActivePlugins();
         try{
-	        $driver->switchAction($data["ACTION"], array("file"=>SystemTextEncoding::toUTF8($data["FILE_PATH"])), "");
+            $params = array("file" => SystemTextEncoding::toUTF8($data["FILE_PATH"]));
+            if(isSet($data["PLUGINS_DATA"])){
+                $params["PLUGINS_DATA"] = $data["PLUGINS_DATA"];
+            }
+            AJXP_Controller::findActionAndApply($data["ACTION"], $params, null);
         }catch (Exception $e){
         	die($e->getMessage());
         }
@@ -543,6 +557,21 @@ class ShareCenter extends AJXP_Plugin{
             ConfService::addRepository($newRepo);
         }
 
+
+        if(isSet($httpVars["original_users"])){
+            $originalUsers = explode(",", $httpVars["original_users"]);
+            $removeUsers = array_diff($originalUsers, $users);
+            if(count($removeUsers)){
+                foreach($removeUsers as $user){
+                    if(AuthService::userExists($user)){
+                        $userObject = $confDriver->createUserObject($user);
+                        $userObject->removeRights($newRepo->getId());
+                        $userObject->save();
+                    }
+                }
+            }
+        }
+
         foreach($users as $userName){
             if(AuthService::userExists($userName)){
                 // check that it's a child user
@@ -558,8 +587,8 @@ class ShareCenter extends AJXP_Plugin{
                 $userObject->setParent($loggedUser->id);
             }
             // CREATE USER WITH NEW REPO RIGHTS
-            $userObject->setRight($newRepo->getUniqueId(), $rights);
-            $userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
+            $userObject->setRight($newRepo->getId(), $rights);
+            $userObject->setSpecificActionRight($newRepo->getId(), "share", false);
             $userObject->save();
         }
 
@@ -567,7 +596,7 @@ class ShareCenter extends AJXP_Plugin{
         if(!isSet($editingRepo)){
             $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             $this->loadMetaFileData($this->urlBase.$file);
-            self::$metaCache[$file] =  $newRepo->getUniqueId();
+            self::$metaCache[$file] =  $newRepo->getId();
             $this->saveMetaFileData($this->urlBase.$file);
         }
 

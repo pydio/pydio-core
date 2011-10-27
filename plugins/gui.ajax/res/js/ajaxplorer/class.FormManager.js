@@ -66,6 +66,8 @@ Class.create("FormManager", {
 			var disabledString = (disabled?' disabled="true" ':'');
 			if(type == 'string' || type == 'integer' || type == 'array'){
 				element = '<input type="text" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
+            }else if(type == 'textarea'){
+                element = '<textarea class="SF_input" style="height:70px;" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'"'+disabledString+'>'+defaultValue+'</textarea>'
 		    }else if(type == 'password'){
 				element = '<input type="password" autocomplete="off" ajxp_type="'+type+'" ajxp_mandatory="'+(mandatory?'true':'false')+'" name="'+name+'" value="'+defaultValue+'"'+disabledString+' class="SF_input">';
 			}else if(type == 'boolean'){
@@ -156,8 +158,8 @@ Class.create("FormManager", {
 		prefix = prefix || '';
 		var missingMandatory = $A();
         var checkboxesActive = false;
-		form.select('input').each(function(el){			
-			if(el.type == "text" || el.type == "password"){
+		form.select('input,textarea').each(function(el){
+			if(el.type == "text" || el.type == "password" || el.nodeName.toLowerCase() == 'textarea'){
 				if(el.getAttribute('ajxp_mandatory') == 'true' && el.value == '' && !el.disabled){
 					missingMandatory.push(el);
 				}

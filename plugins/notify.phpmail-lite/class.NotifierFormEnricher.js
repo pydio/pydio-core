@@ -33,27 +33,33 @@ Class.create("NotifierFormEnricher", {
     },
 
     enrichShareFolderForm : function(){
-        if($("share_folder_form") && $("share_folder_form").down("fieldset#notification_fieldset")){
-            $("share_folder_form").down("fieldset#notification_fieldset").remove();
+        var formId = ajaxplorer.getUserSelection().getUniqueNode().isLeaf() ? "share_form" : "share_folder_form";
+        if($(formId) && $(formId).down("fieldset#notification_fieldset")){
+            $(formId).down("fieldset#notification_fieldset").remove();
         }
         var ajxpNode = ajaxplorer.getUserSelection().getUniqueNode();
         if(ajxpNode.getMetadata().get("ajxp_shared")) {
             return;
         }
-        $("share_folder_form").insert({bottom:'<fieldset id="notification_fieldset">\
+        var html = '<fieldset id="notification_fieldset">\
 							<legend ajxp_message_id="357">Notification</legend>\
-							<div ><input type="checkbox" id="share_notification_active" name="PLUGINS_DATA_SHARE_NOTIFICATION_ACTIVE"> Notify me when files are uploaded or downloaded in this repository</div>\
-							<div class="SF_element">\
+							<div ><input type="checkbox" id="share_notification_active" name="PLUGINS_DATA_SHARE_NOTIFICATION_ACTIVE"> Be notified when files are uploaded or downloaded in this repository</div>\
+							<div class="SF_element" style="display:none;" id="share_notification_sf_element">\
 								<div class="SF_label" ajxp_message_id="359"> Target email(s): </div>\
-								<input type="text" value="" name="PLUGINS_DATA_SHARE_NOTIFICATION_EMAIL" id="share_notification_email" class="SF_input" disabled/>\
+								<input type="text" value="" name="PLUGINS_DATA_SHARE_NOTIFICATION_EMAIL" id="share_notification_email" class="SF_input"/>\
 							</div>\
 						</fieldset>\
-        '});
+        ';
+        if(formId == "share_form"){
+            $(formId).down('fieldset#share_generate').insert({before:html});
+        }else{
+            $(formId).insert(html);
+        }
         $('share_notification_active').observe("click", function(){
             if($('share_notification_active').getValue()){
-                $('share_notification_email').enable();
+                Effect.SlideDown($('share_notification_sf_element'));
             }else{
-                $('share_notification_email').disable();
+                Effect.SlideUp($('share_notification_sf_element'));
             }
         });
         if(this.currentUserEmail) {

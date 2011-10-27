@@ -337,6 +337,19 @@ textarea#myCode
 	margin-top: 5px;
 }
 
+.largeButton{
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid #CCC;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    cursor: pointer;
+    text-shadow : 1px 1px 1px #FFFFFF;
+}
+
+
 .dialogArrow
 {
     font-weight: bold;

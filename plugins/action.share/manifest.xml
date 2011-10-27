@@ -35,7 +35,9 @@
                         <div id="share_form" title="AJXP_MESSAGE[293]"  box_width="280" action="share">
                             <fieldset style="display:none;" id="share_unshare">
                                 <legend ajxp_message_id="296">AJXP_MESSAGE[share_center.8]</legend>
-                                <div class="dialogLegend"><div id="unshare_button" class="fakeUploadButton" style="float:left;margin-right:8px;margin-bottom:0px;padding:5px;"><img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" style="margin-bottom:0;" id="stop_sharing_indicator"><div>AJXP_MESSAGE[share_center.6]</div></div>AJXP_MESSAGE[share_center.7]</div>
+                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
+                                        <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
+                                    </div>
                             </fieldset>
                             <fieldset id="share_optional_fields">
                                 <legend ajxp_message_id="307">AJXP_MESSAGE[307]</legend>
@@ -51,8 +53,8 @@
                             </fieldset>
                             <fieldset id="share_generate">
                                 <legend ajxp_message_id="308">AJXP_MESSAGE[308]</legend>
-                                <div align="center" style="color: #999; margin-top:5px; font-size:10px;">
-                                    <div align="center" id="generate_publiclet" class="fakeUploadButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/22/share.png" height="22" width="22"/><br/>AJXP_MESSAGE[309]</div>
+                                <div align="center">
+                                    <div align="center" id="generate_publiclet" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/>AJXP_MESSAGE[309]</div>
                                 </div>
                             </fieldset>
                             <fieldset style="display:none;position:relative;" id="share_result">
@@ -64,7 +66,9 @@
                         <div id="share_folder_form" title="Share Folder"  box_width="280" action="share">
                             <fieldset style="display:none;" id="share_unshare">
                                 <legend ajxp_message_id="296">AJXP_MESSAGE[share_center.10]</legend>
-                                <div class="dialogLegend"><div id="unshare_button" class="fakeUploadButton" style="float:right;margin-left:4px;padding:5px;"><img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" style="margin-bottom:0px;" height="16" width="16" id="stop_sharing_indicator"><br/>AJXP_MESSAGE[share_center.6]</div>AJXP_MESSAGE[share_center.9]</div>
+                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
+                                        <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
+                                    </div>
                             </fieldset>
                             <fieldset id="target_repository">
                                 <legend ajxp_message_id="357">AJXP_MESSAGE[357]</legend>
@@ -86,7 +90,13 @@
                             </fieldset>
                             <fieldset id="target_user">
                                 <legend ajxp_message_id="353">AJXP_MESSAGE[353]</legend>
-                                <div class="dialogLegend" ajxp_message_id="354">Choose one or more users with who you want to share this repository. You can also <span id="create_shared_user_anchor" style="color:black; text-decoration:underline;cursor:pointer;">create your own temporary user</span> to invite someone to connect.</div>
+                                <div class="dialogLegend" ajxp_message_id="354">Choose one or more users with who you want to share this repository.</div>
+                                <div class="SF_element" id="textarea_sf_element" style="position:relative;">
+                                    <div ajxp_message_id="355" class="SF_label">Share with: </div>
+                                    <textarea type="text" style="height:70px;" class="SF_input dialogFocus" value="" name="shared_user" id="shared_user"></textarea>
+                                    <div id="complete_indicator" style="position:absolute;top:8px;right:8px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
+                                    <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;"></div>
+                                </div>
                                 <div style="display:none;" id="create_shared_user">
                                     <div class="SF_element">
                                         <div ajxp_message_id="355" class="SF_label">New user name : </div>
@@ -98,11 +108,9 @@
                                     </div>
                                     <div class="SF_element" id="pass_strength_container"></div>
                                 </div>
-                                <div class="SF_element" id="textarea_sf_element" style="position:relative;">
-                                    <div ajxp_message_id="355" class="SF_label">Existing users : </div>
-                                    <textarea type="text" style="height:70px;" class="SF_input dialogFocus" value="" name="shared_user" id="shared_user"></textarea>
-                                    <div id="complete_indicator" style="position:absolute;top:8px;right:8px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
-                                    <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;"></div>
+                                <div class="SF_element" style="padding-top: 0;" id="create_shared_user_anchor_div">
+                                    <div class="SF_label"></div>
+                                    <div class="SF_input"><span id="create_shared_user_anchor" style="color:black; text-decoration:underline;cursor:pointer;">Create a temporary user</span></div>
                                 </div>
                             </fieldset>
                         </div>
