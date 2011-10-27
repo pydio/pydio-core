@@ -14,7 +14,7 @@
     background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox, .action_bar.floatingBar{
+.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox, .action_bar.floatingBar, .largeButton{
     background: rgb(247,247,247); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -431,6 +431,26 @@ textarea#myCode
 	padding-top: 1px;
 	padding-bottom: 1px;
 	margin-top: 5px;
+}
+
+.largeButton{
+    padding: 5px;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid #CCC;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    border-radius: 7px;
+    cursor: pointer;
+    text-shadow : 1px 1px 1px #FFFFFF;
+}
+.largeButton img{
+    width:16px;
+    height:16px;
+    vertical-align: middle;
+    position: relative;
+    top: -2px;
+    margin-right: 5px;
 }
 
 .dialogArrow

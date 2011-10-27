@@ -80,8 +80,12 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
         $recipients = $this->pluginConf["TO"];
 
         if($this->pluginConf["SHARE"]){
-            $repo = ConfService::getRepository();
-            $pData = $repo->getOption("PLUGINS_DATA");
+            if(isSet($httpVars["PLUGINS_DATA"])){
+                $pData = $httpVars["PLUGINS_DATA"];
+            }else{
+                $repo = ConfService::getRepository();
+                $pData = $repo->getOption("PLUGINS_DATA");
+            }
             if($pData != null && isSet($pData["SHARE_NOTIFICATION_ACTIVE"]) && isSet($pData["SHARE_NOTIFICATION_EMAIL"]) && $pData["SHARE_NOTIFICATION_ACTIVE"] == "on"){
                 $emails = array_map(array($this, "parseStringOption"), explode(",", $pData["SHARE_NOTIFICATION_EMAIL"]));
                 if(is_array($recipients)){

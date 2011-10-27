@@ -36,9 +36,10 @@ Class.create("ShareCenter", {
             if(nodeMeta.get("ajxp_shared")){
                 // Reorganize
                 var repoFieldset = oForm.down('fieldset#target_repository');
+                repoFieldset.down('div.dialogLegend').remove();
                 repoFieldset.insert(oForm.down('fieldset#target_user div#textarea_sf_element'));
-                repoFieldset.insert(oForm.down('fieldset#target_user div.dialogLegend'));
                 repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user'));
+                repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user_anchor_div'));
                 oForm.down('fieldset#target_user').remove();
             }
 
@@ -60,23 +61,28 @@ Class.create("ShareCenter", {
                         indicator:oForm.down('#complete_indicator')
                     }
                 );
-                $('shared_user').observeOnce("focus", function(){
-                    $('share_folder_form').autocompleter.activate();
-                });
-                $('create_shared_user_anchor').observe("click", function(){
-                    $('create_shared_user').blindDown();
+                if(!nodeMeta.get("ajxp_shared")){
+                    $('shared_user').observeOnce("focus", function(){
+                        $('share_folder_form').autocompleter.activate();
+                    });
+                }
+                $('create_shared_user_anchor').observeOnce("click", function(){
+                    $('create_shared_user').appear();
+                    $('create_shared_user_anchor').up('div.SF_element').fade();
                 });
             }
             this._currentRepositoryId = null;
-            var nodeMeta = userSelection.getUniqueNode().getMetadata();
             if(nodeMeta.get("ajxp_shared")){
                 oForm.down('fieldset#share_unshare').show();
                 oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
+                oForm.down('#complete_indicator').show();
                 this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
                     oForm.down('textarea#shared_user').value = json['users'].join("\n");
+                    oForm.insert(new Element('input', {type:"hidden", name:"original_users", value:json['users'].join(',')}));
                     oForm.down('input#repo_label').value = json['label'];
                     oForm.down('select').setValue(json['rights']);
                     this._currentRepositoryId = json['repositoryId'];
+                    oForm.down('#complete_indicator').hide();
                 }.bind(this));
             }
         }.bind(this);
@@ -146,13 +152,12 @@ Class.create("ShareCenter", {
                     this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
                         oForm.down('input[id="share_container"]').value = json['publiclet_link'];
                         oForm.down('div#generate_indicator').hide();
-                        var linkDescription = '. ' + MessageHash['share_center.11']+': '+ (json['expire_time'] == 0 ? MessageHash['share_center.14']:json['expire_time']) + ' <br/> ';
-                        linkDescription += '. ' + MessageHash['share_center.12']+': ' + (json['has_password']?MessageHash['share_center.13']:MessageHash['share_center.14']);
-                        linkDescription += '<br/>. '+MessageHash['share_center.15'].replace('%s', '<span id="downloaded_times">'+json['download_counter']+'</span>')+' (';
-                        var descDiv = new Element('div', {style:"margin-top: 5px;"}).update(linkDescription);
+                        var linkDescription = '<tr><td class="infoPanelValue">' + MessageHash['share_center.11']+'</td><td class="infoPanelValue">'+ (json['expire_time'] == 0 ? MessageHash['share_center.14']:json['expire_time']) + '</td></tr>';
+                        linkDescription += '<tr class="even"><td class="infoPanelValue">'  + MessageHash['share_center.12']+'</td><td class="infoPanelValue">' + (json['has_password']?MessageHash['share_center.13']:MessageHash['share_center.14']) + '</td></tr>';
+                        linkDescription += '<tr><td class="infoPanelValue">' + MessageHash['share_center.15'].replace('%s', '<span id="downloaded_times">'+json['download_counter']+'</span>')+'</td><td class="infoPanelValue" id="ip_reset_button"></td></tr>';
+                        var descDiv = new Element('div', {style:"margin-top: 10px;"}).update('<table class="infoPanelTable" cellspacing="0" cellpadding="0" style="border-top:1px solid #eee;border-left:1px solid #eee;">'+linkDescription+'</table>');
                         var resetLink = new Element('a', {style:'text-decoration:underline;cursor:pointer;', title:MessageHash['share_center.17']}).update(MessageHash['share_center.16']).observe('click', this.resetDownloadCounterCallback.bind(this));
-                        descDiv.insert(resetLink);
-                        descDiv.insert(').');
+                        descDiv.down('#ip_reset_button').insert(resetLink);
                         oForm.down('fieldset#share_result').insert(descDiv);
                         oForm.down('input[id="share_container"]').select();
                     }.bind(this));
