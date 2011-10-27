@@ -811,6 +811,11 @@
                 <serverCallback methodName="switchAction"></serverCallback>
                 </processing>
         </action>
+        <action name="purge">
+            <processing>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

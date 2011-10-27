@@ -352,7 +352,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			break;
 			
 			//------------------------------------
-			//	SUPPRIMER / DELETE
+			//	DELETE
 			//------------------------------------
 			case "delete";
 			
@@ -371,9 +371,21 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$reloadContextNode = true;
 				
 			break;
+
+
+            case "purge" :
+
+                
+                $pTime = intval($this->repository->getOption("PURGE_AFTER"));
+                if($pTime > 0){
+                    $purgeTime = intval($pTime)*3600*24;
+                    $this->recursivePurge($this->urlBase, $purgeTime);
+                }
+
+            break;
 		
 			//------------------------------------
-			//	RENOMMER / RENAME
+			//	RENAME
 			//------------------------------------
 			case "rename";
 			
@@ -1588,7 +1600,33 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
     	}
     	return $vList;
     }
-    
+
+    function recursivePurge($dirName, $purgeTime){
+
+        $handle=opendir($dirName);
+        $count = 0;
+        while (strlen($file = readdir($handle)) > 0)
+        {
+            if($file == "" || $file == ".."  || AJXP_Utils::isHidden($file) ){
+                continue;
+            }
+            if(is_file($dirName."/".$file)){
+                $time = filemtime($dirName."/".$file);
+                $docAge = time() - $time;
+                if( $docAge > $purgeTime){
+                    //unlink($dirName."/".$file);
+                    //AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dirName."/".$file)));
+                    AJXP_Logger::logAction("Purge", array("file" => $dirName."/".$file));
+                    print(" - Purging document : ".$dirName."/".$file."\n");
+                }
+            }else{
+                $this->recursivePurge($dirName."/".$file, $purgeTime);
+            }
+        }
+        closedir($handle);
+
+
+    }
     
     
     /** The publiclet URL making */
