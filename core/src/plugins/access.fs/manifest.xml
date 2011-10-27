@@ -5,6 +5,7 @@
 		<param name="PATH" type="string" label="Path" description="Real path to the root folder on the server" mandatory="true"/>
 		<param name="CREATE" type="boolean" label="Create" description="Create folder if it does not exists" default="true" mandatory="true"/>
         <param name="CHMOD_VALUE" type="string" label="File Creation Mask" description="Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." default="0666"/>
+        <param name="PURGE_AFTER" type="integer" label="Purge Days" description="Option to purge documents after a given number of days. This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." default="0"/>
         <global_param name="SHOW_HIDDEN_FILES" type="boolean" label="Show hidden files" description="Show files beginning with a ." default="false"/>
         <global_param name="HIDE_RECYCLE" type="boolean" label="Hide recycle bin" description="Whether to show the recycle bin folder. Unlike in the following options, the folder will be hidden but still writeable." default="false"/>
         <global_param name="HIDE_EXTENSIONS" type="string" label="Hide extensions" description="Comma-separated list of extensions to hide. Extensions, files and folders that are hidden are also access forbidden." default="ser"/>
