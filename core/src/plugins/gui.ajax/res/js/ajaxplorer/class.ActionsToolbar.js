@@ -384,6 +384,9 @@ Class.create("ActionsToolbar", {
     switchStyle: function(command, start){
         var style = this.style;
         if(command){
+            if(command.nodeName.toLowerCase() == 'img'){
+                command = command.up('a');
+            }
             style = command.getAttribute("title");
             this.style = style;
         }
