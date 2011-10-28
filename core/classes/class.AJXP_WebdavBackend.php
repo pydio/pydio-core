@@ -670,7 +670,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     } 
     
     protected function urlEncodePath($path){
-        if(strstr($_SERVER["HTTP_USER_AGENT"], "WebDAVFS") === false){
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "WebDAVFS") === false && strstr($_SERVER["HTTP_USER_AGENT"], "PEAR::HTTP_WebDAV_Client") === false){
             return rawurlencode($path);
         }
         return $path;
