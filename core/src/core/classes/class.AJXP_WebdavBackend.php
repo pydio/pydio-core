@@ -254,7 +254,8 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 
             case 'displayname':
                 $property = new ezcWebdavDisplayNameProperty();
-                $property->displayName = urldecode( $this->safeBasename( $path ) );
+                //$property->displayName = urldecode( $this->safeBasename( $path ) );
+                $property->displayName = SystemTextEncoding::toUTF8( urldecode( $this->safeBasename( $path )), true);
                 return $property;
 
             case 'getcontenttype':
@@ -548,12 +549,12 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 			if ( is_dir( $url . "/" . $file ) )
             {
                 // Add collection without any children
-                $contents[] = new ezcWebdavCollection( SystemTextEncoding::toUTF8($path, true) .($path== "/"?"":"/"). SystemTextEncoding::toUTF8($file, true) );
+                $contents[] = new ezcWebdavCollection( $this->urlEncodePath( SystemTextEncoding::toUTF8($path, true) .($path== "/"?"":"/"). SystemTextEncoding::toUTF8($file, true) ) );
             }
             else
             {
                 // Add files without content
-                $contents[] = new ezcWebdavResource( SystemTextEncoding::toUTF8($path, true) .($path== "/"?"":"/"). SystemTextEncoding::toUTF8($file, true) );
+                $contents[] = new ezcWebdavResource( $this->urlEncodePath( SystemTextEncoding::toUTF8($path, true) .($path== "/"?"":"/"). SystemTextEncoding::toUTF8($file, true) ));
             }
         }
         return $contents;
@@ -668,7 +669,14 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	
     } 
     
-    
+    protected function urlEncodePath($path){
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "WebDAVFS") === false){
+            return rawurlencode($path);
+        }
+        return $path;
+    }
+
+
 	protected function safeDirname($path){
 		return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", dirname($path)): dirname($path));
 	}

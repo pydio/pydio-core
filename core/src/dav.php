@@ -83,6 +83,9 @@ $server->pluginRegistry->registerPlugin(
 );
 
 //$backend = new ezcWebdavFileBackend(AJXP_INSTALL_PATH."/files/");
+//ob_start();
 $server->handle( $backend ); 
-
+//$c = ob_get_clean();
+//AJXP_Logger::logAction("OUTPUT : ".$c);
+//print($c);
 ?>
