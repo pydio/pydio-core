@@ -165,8 +165,9 @@ Class.create("EmlViewer", AbstractEditor, {
 					get_action:"eml_cp_attachment",
 					attachment_id:attachmentId,
 					destination:selectedNode,
-					dest_repository_id:crossCopy?this.treeSelector.filterSelector.getValue():""
-				});				
+					dest_repository_id:this.treeSelector.filterSelector.getValue()
+				});
+                console.log(connexion._parameters);
 			}
 			connexion.onComplete = function(transport){
 				ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);

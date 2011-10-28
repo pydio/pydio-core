@@ -125,5 +125,6 @@ $mess=array(
 "103" => "Description",
 "104" => "Enabled",
 "105" => "Automatic checks",
+"106" => "Unique Identifier",
 );
 ?>

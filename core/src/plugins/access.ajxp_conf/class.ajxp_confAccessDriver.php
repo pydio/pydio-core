@@ -1069,6 +1069,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
 			<column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
 			<column messageId="ajxp_shared.27" attributeName="owner" sortType="String"/>
+			<column messageId="ajxp_conf.106" attributeName="repository_id" sortType="String"/>
 			</columns>');		
         $repoArray = array();
         $childRepos = array();
