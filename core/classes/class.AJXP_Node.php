@@ -131,7 +131,16 @@ class AJXP_Node{
 	}
 	
 	protected function parseUrl(){
-		$this->urlParts = parse_url($this->_url);
+        if(strstr($this->_url, "#") !== false){
+            $url = str_replace("#", "__HASH__", $this->_url);
+            $this->urlParts = parse_url($url);
+            foreach($this->urlParts as $partKey => $partValue){
+                $this->urlParts[$partKey] = str_replace("__HASH__", "#", $partValue);
+            }
+        }else{
+            $this->urlParts = parse_url($this->_url);
+        }
+
 		if(strstr($this->urlParts["scheme"], "ajxp.")!==false){
 			$pServ = AJXP_PluginsService::getInstance();
 			$this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);

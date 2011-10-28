@@ -124,6 +124,8 @@ $mess=array(
 "102" => "Identifiant",
 "103" => "Description",
 "104" => "Actif",
+"105" => "Vérification",
+"106" => "Identifiant unique",
 /* END SENTENCE */
 );
 ?>
