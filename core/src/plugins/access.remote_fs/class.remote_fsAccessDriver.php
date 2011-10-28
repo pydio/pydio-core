@@ -177,7 +177,7 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, "Error : ".intval($response));
 				}else{
 					if($nextFile!=''){
-						AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
+						AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".SystemTextEncoding::toUTF8($nextFile)." to remote server");
 					}else{					
 						AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Upload done, reloading client.");
 					}

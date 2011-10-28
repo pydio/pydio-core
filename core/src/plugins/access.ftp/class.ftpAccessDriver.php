@@ -110,7 +110,7 @@ class ftpAccessDriver extends fsAccessDriver {
 				AJXP_Logger::debug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
 				AJXP_XMLWriter::header();
 				if($nextFile!=''){
-					AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".$nextFile." to remote server");
+					AJXP_XMLWriter::triggerBgAction("next_to_remote", array(), "Copying file ".SystemTextEncoding::toUTF8($nextFile)." to remote server");
 				}else{
 					AJXP_XMLWriter::triggerBgAction("reload_node", array(), "Upload done, reloading client.");
 				}
