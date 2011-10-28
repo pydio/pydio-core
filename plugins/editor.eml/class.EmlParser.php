@@ -56,10 +56,10 @@ class EmlParser extends AJXP_Plugin{
     			$params = array(
     				'include_bodies' => false,
     				'decode_bodies' => false,
-    				'decode_headers' => true
+    				'decode_headers' => 'UTF-8'
     			);
     			$decoder = $this->getStructureDecoder($file, ($wrapperClassName == "imapAccessWrapper"));
-    			$xml = $decoder->getXML($decoder->decode(array($params)));
+    			$xml = $decoder->getXML($decoder->decode($params));
 				if(function_exists("imap_mime_header_decode")){
 					$doc = DOMDocument::loadXML($xml);
 					$xPath = new DOMXPath($doc);
@@ -267,7 +267,7 @@ class EmlParser extends AJXP_Plugin{
     	$params = array(
     		'include_bodies' => true,
     		'decode_bodies' => false,
-    		'decode_headers' => true
+    		'decode_headers' => 'UTF-8'
     	);    			
 		$mess = ConfService::getMessages();    	
     	$content = file_get_contents($masterFile);
@@ -387,7 +387,7 @@ class EmlParser extends AJXP_Plugin{
 	   		$params = array(
 	   			'include_bodies' => false,
 	   			'decode_bodies' => false,
-	   			'decode_headers' => true
+	   			'decode_headers' => 'UTF-8'
 	   		);
 			$structure = $decoder->decode($params);
 		}
@@ -409,7 +409,7 @@ class EmlParser extends AJXP_Plugin{
 	   	$params = array(
 	   		'include_bodies' => true,
 	   		'decode_bodies' => true,
-	   		'decode_headers' => false
+	   		'decode_headers' => 'UTF-8'
 	   	);
 		$structure = $decoder->decode($params);
 		$part = $this->_findAttachmentById($structure, $attachmentId);
