@@ -230,7 +230,9 @@ Class.create("AjxpBootstrap", {
 			if(customWording.welcomeMessage){
 				html+= customWording.welcomeMessage + '<br>';
 			}
-			html+='	<div style="position:absolute;bottom: 16px;right: 160px;"><span id="loaderProgress"></span></div><div id="progressState">Booting...</div>';
+            html+='<div id="progressState" style="float:left; display: inline;">Booting...</div>';
+			html+='	<div style="margin-top:3px; margin-left: 126px;"><span id="loaderProgress"></span></div>';
+            html+= '<div style="height:10px;"></div>';
 			html+='	</div></div>';
 		}
 		$$('body')[0].insert({top:html});

@@ -456,7 +456,7 @@ Class.create("FilesList", SelectableElements, {
 			buffer = '<div id="selectable_div_header" class="sort-table"></div>';
 			buffer = buffer + '<div id="table_rows_container"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			this.htmlElement.update(buffer);
-            $('table_rows_container').setStyle((this.gridStyle!="grid")?{overflowX:"hidden",overflowY:"auto"}:{overflow:"auto"});
+            $('table_rows_container').setStyle((this.gridStyle!="grid")?{overflowX:"hidden",overflowY:(this.options.replaceScroller?"hidden":"auto")}:{overflow:"auto"});
 			attachMobileScroll("table_rows_container", "vertical");
             var scrollElement = $("table_rows_container");
 			oElement = $('selectable_div');
