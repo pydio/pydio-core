@@ -905,7 +905,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
 			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
 			</columns>');		
-			
+			ksort($types);
 			foreach( $types as $t => $tPlugs){
 				if(in_array($t, $uniqTypes))continue;
 				$meta = array(
@@ -954,6 +954,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.104" attributeName="enabled" sortType="String"/>
 			<column messageId="ajxp_conf.105" attributeName="can_active" sortType="String"/>
 			</columns>');
+            
 			foreach($types[$type] as $pId => $pObject){
 				$errors = "OK";
 				try{

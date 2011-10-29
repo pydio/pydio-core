@@ -91,6 +91,10 @@ class AJXP_Node{
 		return $this->urlParts["path"];
 	}
 
+    public function getRepositoryId(){
+        return $this->urlParts["host"];
+    }
+
 	public function mergeMetadata($metadata, $mergeValues = false){
         if($mergeValues){
             foreach($metadata as $key => $value){

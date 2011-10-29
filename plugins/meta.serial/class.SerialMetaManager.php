@@ -28,10 +28,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class SerialMetaManager extends AJXP_Plugin {
 	
-	private static $currentMetaName;
-	private static $metaCache;
-	
 	protected $accessDriver;
+    /**
+     * @var SerialMetaStore
+     */
+    protected $metaStore;
 	
 	public function init($options){
 		$this->options = $options;		
@@ -39,8 +40,10 @@ class SerialMetaManager extends AJXP_Plugin {
 	}
 	
 	public function initMeta($accessDriver){
-		$this->accessDriver = $accessDriver;		
-		
+		$this->accessDriver = $accessDriver;
+        $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
+        $this->metaStore->accessDriver = $accessDriver;
+
 		$messages = ConfService::getMessages();
 		$def = $this->getMetaDefinition();
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
@@ -143,25 +146,20 @@ class SerialMetaManager extends AJXP_Plugin {
 		
 		$newValues = array();
 		$def = $this->getMetaDefinition();
+        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
 		foreach ($def as $key => $label){
 			if(isSet($httpVars[$key])){
 				$newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
 			}else{
 				if(!isset($original)){
-					$original = array();
-					$this->loadMetaFileData($urlBase.$currentFile);
-					$base = basename($currentFile);
-					if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
-						$original = self::$metaCache[$base];
-					}					
+                    $original = $this->metaStore->retrieveMetadata($ajxpNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
 				}
 				if(isSet($original) && isset($original[$key])){
 					$newValues[$key] = $original[$key];
 				}
 			}
 		}		
-		$this->addMeta($urlBase.$currentFile, $newValues);
-        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
+        $this->metaStore->setMetadata($ajxpNode, "users_meta", $newValues, false, AJXP_METADATA_SCOPE_GLOBAL);
         AJXP_Controller::applyHook("node.change", array(null, &$ajxpNode));
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);	
@@ -174,17 +172,16 @@ class SerialMetaManager extends AJXP_Plugin {
 	 */
 	public function extractMeta(&$ajxpNode){
 		$currentFile = $ajxpNode->getUrl();
-		$metadata = $ajxpNode->metadata;
-		$base = basename($currentFile);
-		$this->loadMetaFileData($currentFile);		
-		if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
-			$encodedMeta = array_map(array("SystemTextEncoding", "toUTF8"), self::$metaCache[$base]);
-			$metadata = array_merge($metadata, $encodedMeta);
-		}
-		// NOT OPTIMAL AT ALL 
-		$metadata["meta_fields"] = $this->options["meta_fields"];
-		$metadata["meta_labels"] = $this->options["meta_labels"];
-		$ajxpNode->metadata = $metadata;
+
+        $metadata = $this->metaStore->retrieveMetadata($ajxpNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+        if(count($metadata)){
+            // @todo : Should be UTF8-IZED at output only !!??
+            array_map(array("SystemTextEncoding", "toUTF8"), $metadata);
+        }
+        $metadata["meta_fields"] = $this->options["meta_fields"];
+        $metadata["meta_labels"] = $this->options["meta_labels"];
+        $ajxpNode->mergeMetadata($metadata);
+        
 	}
 	
 	/**
@@ -196,53 +193,17 @@ class SerialMetaManager extends AJXP_Plugin {
 	public function updateMetaLocation($oldFile, $newFile = null, $copy = false){
 		if($oldFile == null) return;
 		
-		$this->loadMetaFileData($oldFile->getUrl());
-		$oldKey = basename($oldFile->getUrl());
-		if(!array_key_exists($oldKey, self::$metaCache)){
+		$oldMeta = $this->metaStore->retrieveMetadata($oldFile, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
+		if(!count($oldMeta)){
 			return;
 		}
-		$oldData = self::$metaCache[$oldKey];
 		// If it's a move or a delete, delete old data
 		if(!$copy){
-			unset(self::$metaCache[$oldKey]);
-			$this->saveMetaFileData($oldFile->getUrl());
+            $this->metaStore->removeMetadata($oldFile, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
 		}
 		// If copy or move, copy data.
 		if($newFile != null){
-			$this->addMeta($newFile->getUrl(), $oldData);
-		}
-	}
-	
-	public function addMeta($currentFile, $dataArray){
-		$this->loadMetaFileData($currentFile);
-		self::$metaCache[basename($currentFile)] = $dataArray;
-		$this->saveMetaFileData($currentFile);
-	}
-	
-	protected function loadMetaFileData($currentFile){
-		if(preg_match("/\.zip\//",$currentFile)){
-			self::$metaCache = array();
-			return ;
-		}
-		$metaFile = dirname($currentFile)."/".$this->options["meta_file_name"];
-		if(self::$currentMetaName == $metaFile && is_array(self::$metaCache)){
-			return;
-		}
-		if(is_file($metaFile) && is_readable($metaFile)){
-			$rawData = file_get_contents($metaFile);
-			self::$metaCache = unserialize($rawData);
-		}else{
-			self::$metaCache = array();
-		}
-	}
-	
-	protected function saveMetaFileData($currentFile){
-		$metaFile = dirname($currentFile)."/".$this->options["meta_file_name"];
-		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile))){
-			$fp = fopen($metaFile, "w");
-			fwrite($fp, serialize(self::$metaCache), strlen(serialize(self::$metaCache)));
-			fclose($fp);
-			AJXP_Controller::applyHook("version.commit_file", $metaFile);
+            $this->metaStore->setMetadata($newFile, "users_meta", $oldMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
 		}
 	}
 	

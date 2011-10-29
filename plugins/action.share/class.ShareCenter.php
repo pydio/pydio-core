@@ -25,9 +25,6 @@ require_once("class.PublicletCounter.php");
 
 class ShareCenter extends AJXP_Plugin{
 
-    private static $currentMetaName;
-    private static $metaCache;
-    private static $fullMetaCache;
     /**
      * @var AbstractAccessDriver
      */
@@ -37,6 +34,11 @@ class ShareCenter extends AJXP_Plugin{
      */
     private $repository;
     private $urlBase;
+
+    /**
+     * @var SerialMetaStore
+     */
+    private $metaStore;
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
@@ -87,6 +89,8 @@ class ShareCenter extends AJXP_Plugin{
                 $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
             }
         }
+        $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
+        $this->metaStore->accessDriver = $this->accessDriver;
     }
 
     function switchAction($action, $httpVars, $fileVars){
@@ -149,9 +153,13 @@ class ShareCenter extends AJXP_Plugin{
                         $data["PLUGINS_DATA"] = $customData;
                     }
                     $url = $this->writePubliclet($data, $this->accessDriver, $this->repository);
-                    $this->loadMetaFileData($this->urlBase.$file);
-                    self::$metaCache[$file] = array_shift(explode(".", basename($url)));
-                    $this->saveMetaFileData($this->urlBase.$file);
+                    $this->metaStore->setMetadata(
+                        new AJXP_Node($this->urlBase.$file),
+                        "ajxp_shared",
+                        array("element"     => array_shift(explode(".", basename($url)))),
+                        true,
+                        AJXP_METADATA_SCOPE_REPOSITORY
+                    );
 	                header("Content-type:text/plain");
 	                echo $url;
             	}
@@ -163,22 +171,27 @@ class ShareCenter extends AJXP_Plugin{
                 $elementType = $httpVars["element_type"];
                 $messages = ConfService::getMessages();
 
-                $this->loadMetaFileData($this->urlBase.$file);
-                if(isSet(self::$metaCache[$file])){
+                $metadata = $this->metaStore->retrieveMetadata(
+                    new AJXP_Node($this->urlBase.$file),
+                    "ajxp_shared",
+                    true,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+                if(count($metadata)){
                     header("Content-type:application/json");
                     if($elementType == "file"){
-                        $pData = self::loadPublicletData(self::$metaCache[$file]);
+                        $pData = self::loadPublicletData($metadata["element"]);
                         if($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId()){
                             throw new Exception("You are not allowed to access this data");
                         }
                         $jsonData = array(
-                                         "publiclet_link"   => $this->buildPublicletLink(self::$metaCache[$file]),
-                                         "download_counter" => PublicletCounter::getCount(self::$metaCache[$file]),
+                                         "publiclet_link"   => $this->buildPublicletLink($metadata["element"]),
+                                         "download_counter" => PublicletCounter::getCount($metadata["element"]),
                                          "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
                                          "has_password"     => (!empty($pData["PASSWORD"]))
                                          );
                     }else if( $elementType == "repository"){
-                        $repoId = self::$metaCache[$file];
+                        $repoId = $metadata["element"];
                         $repo = ConfService::getRepositoryById($repoId);
                         if($repo->getOwner() != AuthService::getLoggedUser()->getId()){
                             throw new Exception("You are not allowed to access this data");
@@ -216,21 +229,29 @@ class ShareCenter extends AJXP_Plugin{
 
             case "unshare":
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                $this->loadMetaFileData($this->urlBase.$file);
-                if(isSet(self::$metaCache[$file])){
-                    $element = self::$metaCache[$file];
-                    self::deleteSharedElement($httpVars["element_type"], $element, AuthService::getLoggedUser());
-                    unset(self::$metaCache[$file]);
-                    $this->saveMetaFileData($this->urlBase.$file);
+                $ajxpNode = new AJXP_Node($this->urlBase.$file);
+                $metadata = $this->metaStore->retrieveMetadata(
+                    $ajxpNode,
+                    "ajxp_shared",
+                    true,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+                if(count($metadata)){
+                    self::deleteSharedElement($httpVars["element_type"], $metadata["element"], AuthService::getLoggedUser());
+                    $this->metaStore->removeMetadata($ajxpNode, "ajxp_shared", true);
                 }
             break;
 
             case "reset_counter":
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-                $this->loadMetaFileData($this->urlBase.$file);
-                if(isSet(self::$metaCache[$file])){
-                    $element = self::$metaCache[$file];
-                    PublicletCounter::reset($element);
+                $metadata = $this->metaStore->retrieveMetadata(
+                    new AJXP_Node($this->urlBase.$file),
+                    "ajxp_shared",
+                    true,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+                if(isSet($metadata["element"])){
+                    PublicletCounter::reset($metadata["element"]);
                 }
             break;
 
@@ -248,11 +269,10 @@ class ShareCenter extends AJXP_Plugin{
      */
     function nodeSharedMetadata(&$ajxpNode){
         if($this->accessDriver->getId() == "access.imap") return;
-        $this->loadMetaFileData($ajxpNode->getUrl());
-        if(count(self::$metaCache) && isset(self::$metaCache[$ajxpNode->getPath()])){
-            if(!self::sharedElementExists($ajxpNode->isLeaf()?"file":"repository", self::$metaCache[$ajxpNode->getPath()], AuthService::getLoggedUser())){
-                unset(self::$metaCache[$ajxpNode->getPath()]);
-                $this->saveMetaFileData($ajxpNode->getUrl());
+        $metadata = $this->metaStore->retrieveMetadata($ajxpNode, "ajxp_shared", true);
+        if(count($metadata)){
+            if(!self::sharedElementExists($ajxpNode->isLeaf()?"file":"repository", $metadata["element"], AuthService::getLoggedUser())){
+                $this->metaStore->removeMetadata($ajxpNode, "ajxp_shared", true);
                 return;
             }
             $ajxpNode->mergeMetadata(array(
@@ -276,16 +296,15 @@ class ShareCenter extends AJXP_Plugin{
 	public function updateNodeSharedData($oldNode, $newNode = null, $copy = false){
         if($this->accessDriver->getId() == "access.imap") return;
         if($oldNode == null) return;
-        $this->loadMetaFileData($oldNode->getUrl());
-        if(count(self::$metaCache) && isset(self::$metaCache[$oldNode->getPath()])){
+        $metadata = $this->metaStore->retrieveMetadata($oldNode, "ajxp_shared", true);
+        if(count($metadata)){
             try{
                 self::deleteSharedElement(
                     ($oldNode->isLeaf()?"file":"repository"),
-                    self::$metaCache[$oldNode->getPath()],
+                    $metadata["element"],
                     AuthService::getLoggedUser()
                 );
-                unset(self::$metaCache[$oldNode->getPath()]);
-                $this->saveMetaFileData($oldNode->getUrl());
+                $this->metaStore->removeMetadata($oldNode, "ajxp_shared", true);
             }catch(Exception $e){
 
             }
@@ -595,9 +614,13 @@ class ShareCenter extends AJXP_Plugin{
         // METADATA
         if(!isSet($editingRepo)){
             $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-            $this->loadMetaFileData($this->urlBase.$file);
-            self::$metaCache[$file] =  $newRepo->getId();
-            $this->saveMetaFileData($this->urlBase.$file);
+            $this->metaStore->setMetadata(
+                new AJXP_Node($this->urlBase.$file),
+                "ajxp_shared",
+                array("element" => $newRepo->getUniqueId()),
+                true,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
         }
 
     	return 200;
@@ -666,56 +689,5 @@ class ShareCenter extends AJXP_Plugin{
         $publicletData["PUBLICLET_PATH"] = $file;
         return $publicletData;
     }
-
-
-	protected function loadMetaFileData($currentFile){
-		if(preg_match("/\.zip\//",$currentFile)){
-            self::$fullMetaCache = array();
-			self::$metaCache = array();
-			return ;
-		}
-        $local = ($this->pluginConf["METADATA_FILE_LOCATION"] == "infolders");
-        if($local){
-            $metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
-            if(self::$currentMetaName == $metaFile && is_array(self::$metaCache))return;
-        }else{
-            $metaFile = AJXP_DATA_PATH."/plugins/action.share/".$this->pluginConf["METADATA_FILE"];
-            if(is_array(self::$metaCache)) return;
-        }
-		if(is_file($metaFile) && is_readable($metaFile)){
-            self::$currentMetaName = $metaFile;
-			$rawData = file_get_contents($metaFile);
-            self::$fullMetaCache = unserialize($rawData);
-			self::$metaCache = self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getId()];
-
-		}else{
-            self::$fullMetaCache = array();
-			self::$metaCache = array();
-		}
-	}
-
-	protected function saveMetaFileData($currentFile){
-        $local = ($this->pluginConf["METADATA_FILE_LOCATION"] == "infolders");
-        if($local){
-            $metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
-        }else{
-            if(!is_dir(AJXP_DATA_PATH."/plugins/action.share/")){
-                mkdir(AJXP_DATA_PATH."/plugins/action.share/", 0666, true);
-            }
-            $metaFile = AJXP_DATA_PATH."/plugins/action.share/".$this->pluginConf["METADATA_FILE"];
-        }
-		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || (!$local) ){
-            if(!isset(self::$fullMetaCache[AuthService::getLoggedUser()->getId()])){
-                self::$fullMetaCache[AuthService::getLoggedUser()->getId()] = array();
-            }
-            self::$fullMetaCache[AuthService::getLoggedUser()->getId()][$this->repository->getId()] = self::$metaCache;
-			$fp = fopen($metaFile, "w");
-            if($fp !== false){
-                @fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));
-                @fclose($fp);
-            }
-			AJXP_Controller::applyHook("version.commit_file", $metaFile);
-		}
-	}
 
 }
