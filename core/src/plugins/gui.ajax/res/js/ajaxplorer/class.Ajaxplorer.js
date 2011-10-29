@@ -308,6 +308,9 @@ Class.create("Ajaxplorer", {
 			this.templatePartsToRestore = $A();
 		}
 		for(var i=0;i<parts.length;i++){
+            if(parts[i].getAttribute("theme") && parts[i].getAttribute("theme") != ajxpBootstrap.parameters.get("theme")){
+                continue;
+            }
 			var ajxpId = parts[i].getAttribute("ajxpId");
 			var ajxpClassName = parts[i].getAttribute("ajxpClass");
 			var ajxpOptionsString = parts[i].getAttribute("ajxpOptions");

@@ -80,7 +80,7 @@
 					    </div>
 						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initA":0, "minSize":0, "startFolded": true}'>
 							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" data-globalOptions='{"headerClose":{"icon":"panel_vertical_hide.png","splitter":"searchbar_splitter","title":86}}' style="height: 0px; overflow:hidden;"></div>
-    						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='"list"' style="border: 1px solid #bbb;"></div>
+    						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true}' style="border: 1px solid #bbb;"></div>
 					    </div>
 					</div>
 				</div>
@@ -92,13 +92,13 @@
 						<div id="locationbar_cont">
 							<div style="height: 100%;" class="separator"></div>
 							<div style="padding-top : 5px;">
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions="{flexTo:'locationbar_cont'}"></div>
+								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions="{fit:'height',fitParent:'ajxp_desktop'}">
-					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions="{fit:'height',fitParent:'browser'}" style="border: 1px solid #676965;"></div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
+					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}' style="border: 1px solid #676965;"></div>
 				</div>				
 			]]></template>
 			<component_config className="FilesList">

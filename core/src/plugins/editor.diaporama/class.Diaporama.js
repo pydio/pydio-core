@@ -46,7 +46,11 @@ Class.create("Diaporama", AbstractEditor, {
             fit:"height",
             fitParent:oFormObject.up(".dialogBox")
         });
-        this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:true});
+        var replaceScroll = false;
+        if(window.content_pane.options.replaceScroller){
+            replaceScroll = true;
+        }
+        this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:replaceScroll});
         var ipConfigs = ajaxplorer.getGuiComponentConfigs("InfoPanel");
         ipConfigs.each(function(el){
             this.infoPanel.parseComponentConfig(el.get("all"));
