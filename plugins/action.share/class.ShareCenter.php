@@ -420,6 +420,7 @@ class ShareCenter extends AJXP_Plugin{
 
         @copy($pDir."/res/down.png", $downloadFolder."/down.png");
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
+        @copy($pDir."/res/drive_harddisk.png", $downloadFolder."/drive_harddisk.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
         file_put_contents($downloadFolder."/.htaccess", "ErrorDocument 404 ".$this->buildPublicDlURL()."/404.html");
         $content404 = file_get_contents($pDir."/res/404.html");
@@ -592,7 +593,7 @@ class ShareCenter extends AJXP_Plugin{
                 foreach($removeUsers as $user){
                     if(AuthService::userExists($user)){
                         $userObject = $confDriver->createUserObject($user);
-                        $userObject->removeRights($newRepo->getId());
+                        $userObject->removeRights($newRepo->getUniqueId());
                         $userObject->save();
                     }
                 }
@@ -614,8 +615,8 @@ class ShareCenter extends AJXP_Plugin{
                 $userObject->setParent($loggedUser->id);
             }
             // CREATE USER WITH NEW REPO RIGHTS
-            $userObject->setRight($newRepo->getId(), $rights);
-            $userObject->setSpecificActionRight($newRepo->getId(), "share", false);
+            $userObject->setRight($newRepo->getUniqueId(), $rights);
+            $userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
             $userObject->save();
         }
 
