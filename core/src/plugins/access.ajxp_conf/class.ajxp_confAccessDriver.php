@@ -642,7 +642,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				print("<ajxpdriver name=\"".$repository->accessType."\">$manifest</ajxpdriver>");
 				print("<metasources>");
-				$metas = $pServ->getPluginsByType("meta");
+				$metas = $pServ->getPluginsByType("metastore");
+				$metas = array_merge($metas, $pServ->getPluginsByType("meta"));
                 $metas = array_merge($metas, $pServ->getPluginsByType("index"));
 				foreach ($metas as $metaPlug){
 					print("<meta id=\"".$metaPlug->getId()."\">");
@@ -1202,7 +1203,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$t1 = array_shift(explode(".", $key1));
 		$t2 = array_shift(explode(".", $key2));
 		if($t1 == "index") return 1;
+        if($t1 == "metastore") return -1;
 		if($t2 == "index") return -1;
+        if($t2 == "metastore") return 1;
 		return 0;
 	}
 	
