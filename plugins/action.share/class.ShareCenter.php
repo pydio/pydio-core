@@ -89,9 +89,12 @@ class ShareCenter extends AJXP_Plugin{
                 $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
             }
         }
-        $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
-        if($this->metaStore != null){
-            $this->metaStore->accessDriver = $this->accessDriver;
+        $sources = $this->repository->getOption("META_SOURCES");
+        if(isSet($sources["metastore.serial"])){
+            $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
+            if($this->metaStore != null){
+                $this->metaStore->accessDriver = $this->accessDriver;
+            }
         }
     }
 
@@ -494,14 +497,12 @@ class ShareCenter extends AJXP_Plugin{
         	AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
         	AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
         }
-        $driver->init($data["REPOSITORY"], $data["OPTIONS"]);
-        $driver->initRepository();
-        ConfService::tmpReplaceRepository($data["REPOSITORY"]);
-        // Increment counter
         $hash = md5(serialize($data));
         PublicletCounter::increment($hash);
 
         AuthService::logUser($data["OWNER_ID"], "", true);
+        $repoObject = $data["REPOSITORY"];
+        ConfService::switchRootDir($repoObject->getId());
         ConfService::loadRepositoryDriver();
         ConfService::initActivePlugins();
         try{

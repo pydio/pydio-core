@@ -208,7 +208,9 @@ class SerialMetaStore extends AJXP_Plugin {
                 @fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));
                 @fclose($fp);
             }
-			AJXP_Controller::applyHook("version.commit_file", $metaFile);
+			if($scope == AJXP_METADATA_SCOPE_GLOBAL){
+                 AJXP_Controller::applyHook("version.commit_file", $metaFile);
+            }
 		}
 	}
 
