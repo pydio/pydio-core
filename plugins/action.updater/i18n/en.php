@@ -31,5 +31,9 @@ $mess = array(
     "7" => "Simulate the data import",
     "8" => "Enter full path (from server root) to the previous location, then run the simulation",
     "9" => "Run real import now",
-    "10"=> "This is a 'dry-run'. Please review the logs of all actions that will be performed, and if it's ok for you press 'Run real import now'"
+    "10"=> "This is a 'dry-run'. Please review the logs of all actions that will be performed, and if it's ok for you press 'Run real import now'",
+    "11"=> "Migrate meta.serial",
+    "12"=> "Old meta.serial plugin was removed and split into metastore.serial and meta.user",
+    "13"=> "Simulate migration",
+    "14"=> "Run migration now",
 );

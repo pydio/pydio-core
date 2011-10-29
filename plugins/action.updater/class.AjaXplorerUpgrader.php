@@ -564,6 +564,36 @@ class AjaXplorerUpgrader {
 
     }
 
+    public static function migrateMetaSerialPlugin($repositoryId, $dryRun){
+
+        $repo = ConfService::getRepositoryById($repositoryId);
+        if($repo == null) throw new Exception("Cannot find repository!");
+        $sources = $repo->getOption("META_SOURCES");
+        if(!isSet($sources["meta.serial"])) {
+            throw new Exception("This repository does not have the meta.serial plugin!");
+        }
+        if($repo->hasParent()) {
+            throw new Exception("This repository is defined by a template or is shared, you should upgrade the parent instead!");
+        }
+        $oldMetaFileName = $sources["meta.serial"]["meta_file_name"];
+
+        $sources["metastore.serial"] = array("METADATA_FILE" => $oldMetaFileName, "UPGRADE_FROM_METASERIAL" => true);
+        $sources["meta.user"] = array(
+            "meta_fields" => $sources["meta.serial"]["meta_fields"],
+            "meta_labels" => $sources["meta.serial"]["meta_labels"],
+            "meta_visibility" => $sources["meta.serial"]["meta_visibility"]
+        );
+        unset($sources["meta.serial"]);
+        $oldId = $repo->getUniqueId();
+        $repo->addOption("META_SOURCES", $sources);
+        $log = print_r($sources, true);
+        if(!$dryRun){
+            ConfService::replaceRepository($oldId, $repo);
+        }
+        print("Will replace the META_SOURCES options with the following : <br><pre>".($log)."</pre>");
+
+    }
+
     public static function copy_r( $path, $dest )
     {
         if( is_dir($path) )

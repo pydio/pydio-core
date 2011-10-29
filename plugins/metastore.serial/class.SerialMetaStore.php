@@ -150,6 +150,7 @@ class SerialMetaStore extends AJXP_Plugin {
             //if(is_array(self::$fullMetaCache)) return;
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
         }
+        self::$metaCache = array();
 		if(is_file($metaFile) && is_readable($metaFile)){
             self::$currentMetaName = $metaFile;
 			$rawData = file_get_contents($metaFile);
@@ -157,7 +158,12 @@ class SerialMetaStore extends AJXP_Plugin {
             if(isSet(self::$fullMetaCache[$fileKey][$userId])){
                 self::$metaCache = self::$fullMetaCache[$fileKey][$userId];
             }else{
-                self::$metaCache = array();
+                if($this->options["UPGRADE_FROM_METASERIAL"] == true && count(self::$fullMetaCache) && !isSet(self::$fullMetaCache["AJXP_METASTORE_UPGRADED"])){
+                    self::$fullMetaCache = $this->upgradeDataFromMetaSerial(self::$fullMetaCache);
+                    if(isSet(self::$fullMetaCache[$fileKey][$userId])){
+                        self::$metaCache = self::$fullMetaCache[$fileKey][$userId];
+                    }
+                }
             }
 		}else{
             self::$fullMetaCache = array();
@@ -203,6 +209,15 @@ class SerialMetaStore extends AJXP_Plugin {
 			AJXP_Controller::applyHook("version.commit_file", $metaFile);
 		}
 	}
+
+    protected function upgradeDataFromMetaSerial($data){
+        $new = array();
+        foreach ($data as $fileKey => $fileData){
+            $new[$fileKey] = array(AJXP_METADATA_SHAREDUSER => array( "users_meta" => $data ));
+            $new["AJXP_METASTORE_UPGRADED"] = true;
+        }
+        return $new;
+    }
 	
 }
 

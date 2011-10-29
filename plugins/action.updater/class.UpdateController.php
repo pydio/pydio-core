@@ -56,6 +56,13 @@ class UpdateController extends AJXP_Plugin {
 
             break;
 
+            case "migrate_metaserial":
+
+                $dryRun = !isSet($httpVars["real_run"]);
+                AjaXplorerUpgrader::migrateMetaSerialPlugin($httpVars["repository_id"], $dryRun);
+
+            break;
+
             case "get_upgrade_path":
 
                 header("Content-type: application/json");
