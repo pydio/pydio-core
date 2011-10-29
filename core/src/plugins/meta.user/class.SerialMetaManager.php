@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Simple metadata implementation, stored in hidden files inside the
  * folders
  */
-class UserMetaManager extends AJXP_Plugin {
+class SerialMetaManager extends AJXP_Plugin {
 	
 	protected $accessDriver;
     /**
@@ -49,7 +49,7 @@ class UserMetaManager extends AJXP_Plugin {
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
 		$cdataHead = '<div>
-						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.user.1"].'</div>
+						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.serial.1"].'</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
 		$cdataFoot = '</table></div>';
 		$cdataParts = "";
