@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="meta.serial" className="SerialMetaManager" label="Text Metadata" description="Simple metadata implementation stored in a hidden file.">
-	<class_definition filename="plugins/meta.serial/class.SerialMetaManager.php" classname="SerialMetaManager"/>
+<meta id="meta.user" className="UserMetaManager" label="Text Metadata" description="Simple metadata implementation stored in a hidden file.">
+	<class_definition filename="plugins/meta.user/class.UserMetaManager.php" classname="UserMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
-			<i18n namespace="meta.serial" path="plugins/meta.serial/i18n" />
-			<js file="plugins/meta.serial/class.MetaCellRenderer.js" className="MetaCellRenderer" autoload="true"/>		
+			<i18n namespace="meta.user" path="plugins/meta.user/i18n" />
+			<js file="plugins/meta.user/class.MetaCellRenderer.js" className="MetaCellRenderer" autoload="true"/>
 		</resources>
 	</client_settings>	
 	<server_settings>
@@ -30,8 +30,8 @@
 			</component_config>			
 		</client_configs>
 		<actions>
-			<action name="edit_serial_meta">
-				<gui text="meta.serial.1" title="meta.serial.1" src="documentinfo_koffice.png" hasAccessKey="false">
+			<action name="edit_user_meta">
+				<gui text="meta.user.1" title="meta.user.1" src="documentinfo_koffice.png" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
 						actionBar="false" contextMenu="true" infoPanel="false"
 						actionBarGroup="put" inZip="false">
@@ -43,7 +43,7 @@
 					<clientCallback prepareModal="true"><![CDATA[
 						var userSelection = ajaxplorer.getUserSelection();
 						var loadFunc = function(oForm){
-							var form = $(oForm).select('div[id="serial_meta_form"]')[0];
+							var form = $(oForm).select('div[id="user_meta_form"]')[0];
 							var nodeMeta = userSelection.getUniqueNode().getMetadata();
 							var metaFields = nodeMeta.get('meta_fields').split(',');
 							var metaLabels = nodeMeta.get('meta_labels').split(',');
@@ -71,10 +71,10 @@
 							hideLightBox(true);
 							return false;
 						};
-						modal.showDialogForm('Meta Edit', 'serial_meta_form', loadFunc, closeFunc);
+						modal.showDialogForm('Meta Edit', 'user_meta_form', loadFunc, closeFunc);
 						]]></clientCallback>
-					<clientForm id="serial_meta_form"><![CDATA[
-					<div id="serial_meta_form" action="edit_serial_meta" box_width="250"></div>
+					<clientForm id="user_meta_form"><![CDATA[
+					<div id="user_meta_form" action="edit_user_meta" box_width="250"></div>
 					]]></clientForm>
 					<serverCallback methodName="editMeta"></serverCallback>
 					</processing>
