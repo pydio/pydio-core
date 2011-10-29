@@ -176,7 +176,7 @@ class UserMetaManager extends AJXP_Plugin {
         $metadata = $this->metaStore->retrieveMetadata($ajxpNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
         if(count($metadata)){
             // @todo : Should be UTF8-IZED at output only !!??
-            array_map(array("SystemTextEncoding", "toUTF8"), $metadata);
+            // array_map(array("SystemTextEncoding", "toUTF8"), $metadata);
         }
         $metadata["meta_fields"] = $this->options["meta_fields"];
         $metadata["meta_labels"] = $this->options["meta_labels"];

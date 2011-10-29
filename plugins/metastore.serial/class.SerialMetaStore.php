@@ -36,9 +36,10 @@ class SerialMetaStore extends AJXP_Plugin {
 	private static $fullMetaCache;
 
 	public $accessDriver;
-	
+
 	public function init($options){
-		$this->options = $options;		
+		$this->options = $options;
+        $this->loadRegistryContributions();
 	}
 
     public function initMeta($accessDriver){
@@ -89,96 +90,33 @@ class SerialMetaStore extends AJXP_Plugin {
     }
 
 
-	/*
-	public function editMeta($actionName, $httpVars, $fileVars){
-		if(!isSet($this->actions[$actionName])) return;
-		if(is_a($this->accessDriver, "demoAccessDriver")){
-			throw new Exception("Write actions are disabled in demo mode!");
-		}
-		$repo = $this->accessDriver->repository;
-		$user = AuthService::getLoggedUser();
-		if(!$user->canWrite($repo->getId())){
-			throw new Exception("You have no right on this action.");
-		}
-		$selection = new UserSelection();
-		$selection->initFromHttpVars();
-		$currentFile = $selection->getUniqueFile();
-		$wrapperData = $this->accessDriver->detectStreamWrapper(false);
-		$urlBase = $wrapperData["protocol"]."://".$this->accessDriver->repository->getId();
 
-		
-		$newValues = array();
-		$def = $this->getMetaDefinition();
-		foreach ($def as $key => $label){
-			if(isSet($httpVars[$key])){
-				$newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);
-			}else{
-				if(!isset($original)){
-					$original = array();
-					$this->loadMetaFileData($urlBase.$currentFile);
-					$base = basename($currentFile);
-					if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
-						$original = self::$metaCache[$base];
-					}					
-				}
-				if(isSet($original) && isset($original[$key])){
-					$newValues[$key] = $original[$key];
-				}
-			}
-		}		
-		$this->addMeta($urlBase.$currentFile, $newValues);
-        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
-        AJXP_Controller::applyHook("node.change", array(null, &$ajxpNode));
-		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::reloadDataNode("", SystemTextEncoding::toUTF8($currentFile), true);	
-		AJXP_XMLWriter::close();
-	}
-
-
-
-	public function extractMeta(&$ajxpNode){
-		$currentFile = $ajxpNode->getUrl();
-		$metadata = $ajxpNode->metadata;
-		$base = basename($currentFile);
-		$this->loadMetaFileData($currentFile);		
-		if(is_array(self::$metaCache) && array_key_exists($base, self::$metaCache)){
-			$encodedMeta = array_map(array("SystemTextEncoding", "toUTF8"), self::$metaCache[$base]);
-			$metadata = array_merge($metadata, $encodedMeta);
-		}
-		// NOT OPTIMAL AT ALL 
-		$metadata["meta_fields"] = $this->options["meta_fields"];
-		$metadata["meta_labels"] = $this->options["meta_labels"];
-		$ajxpNode->metadata = $metadata;
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @return void
+     */
+	public function enrichNode(&$ajxpNode){
+        // Try both
+        $all = array();
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, AJXP_METADATA_SHAREDUSER);
+        $all[] = self::$metaCache;
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, AuthService::getLoggedUser()->getId());
+        $all[] = self::$metaCache;
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, AJXP_METADATA_SHAREDUSER);
+        $all[] = self::$metaCache;
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, AuthService::getLoggedUser()->getId());
+        $all[] = self::$metaCache;
+        $allMeta = array();
+        foreach($all as $metadata){
+            foreach($metadata as $namespace => $meta){
+                foreach( $meta as $key => $value){
+                    $allMeta[$namespace."-".$key] = $value;
+                }
+            }
+        }
+        $ajxpNode->mergeMetadata($allMeta);
 	}
 	
-
-	public function updateMetaLocation($oldFile, $newFile = null, $copy = false){
-		if($oldFile == null) return;
-		
-		$this->loadMetaFileData($oldFile->getUrl());
-		$oldKey = basename($oldFile->getUrl());
-		if(!array_key_exists($oldKey, self::$metaCache)){
-			return;
-		}
-		$oldData = self::$metaCache[$oldKey];
-		// If it's a move or a delete, delete old data
-		if(!$copy){
-			unset(self::$metaCache[$oldKey]);
-			$this->saveMetaFileData($oldFile->getUrl());
-		}
-		// If copy or move, copy data.
-		if($newFile != null){
-			$this->addMeta($newFile->getUrl(), $oldData);
-		}
-	}
-	
-	public function addMeta($currentFile, $dataArray){
-		$this->loadMetaFileData($currentFile);
-		self::$metaCache[basename($currentFile)] = $dataArray;
-		$this->saveMetaFileData($currentFile);
-	}
-
-	*/
 
     
     /**
