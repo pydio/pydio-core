@@ -39,15 +39,17 @@ $REPOSITORIES[0] = array(
 		"PAGINATION_THRESHOLD" => 500,
 		"PAGINATION_NUMBER" => 200,
 		"META_SOURCES"		=> array(
-		/*
-			"meta.serial"=> array(
-				"meta_file_name"	=> ".ajxp_meta",
-				"meta_fields"		=> "testKey1,stars_rate,css_label",
-				"meta_labels"		=> "Test Key,Rating,Label"
-			)
-		*/
+			"metastore.serial"=> array(
+				"METADATA_FILE"	=> ".ajxp_meta",
+                "METADATA_FILE_LOCATION" => "infolders"
+            ),
+            "meta.user"     => array(
+				"meta_fields"		=> "comment",
+				"meta_labels"		=> "Comment",
+                "meta_visibility"   => "hidden"
+			),
             "index.lucene" => array(
-                "index_meta_fields" => ""
+                "index_meta_fields" => "comment"
             )
 		)
 	),
