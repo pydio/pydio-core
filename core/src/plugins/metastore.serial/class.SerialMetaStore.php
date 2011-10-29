@@ -189,7 +189,7 @@ class SerialMetaStore extends AJXP_Plugin {
             $fileKey = basename($fileKey);
         }else{
             if(!is_dir(dirname($this->globalMetaFile))){
-                mkdir(dirname($this->globalMetaFile), 0666, true);
+                mkdir(dirname($this->globalMetaFile), 0755, true);
             }
             $metaFile = $this->globalMetaFile."_".$repositoryId;
         }

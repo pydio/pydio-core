@@ -103,7 +103,7 @@ class AjaXplorerUpgrader {
 
     function checkDownloadFolder(){
         if(!is_dir($this->workingFolder)){
-            $t = @mkdir($this->workingFolder, 0666, true);
+            $t = @mkdir($this->workingFolder, 0755, true);
             if($t === false) throw new Exception("Cannot create target folder for downloading upgrade archive!");
         }
         return "OK";

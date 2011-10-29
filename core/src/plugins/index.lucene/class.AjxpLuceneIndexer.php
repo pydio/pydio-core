@@ -285,7 +285,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 
     protected function lockIndex($repositoryId){
         $iPath = AJXP_CACHE_DIR."/indexes";
-        if(!is_dir($iPath)) mkdir($iPath,0777, true);
+        if(!is_dir($iPath)) mkdir($iPath,0755, true);
         touch($iPath."/.ajxp_lock-".$repositoryId.$this->specificId);
     }
 
@@ -307,7 +307,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 	protected function loadIndex($repositoryId, $create = true){
         require_once("Zend/Search/Lucene.php");
         $iPath = AJXP_CACHE_DIR."/indexes/index-$repositoryId".$this->specificId;
-        if(!is_dir(AJXP_CACHE_DIR."/indexes")) mkdir(AJXP_CACHE_DIR."/indexes",0777,true);
+        if(!is_dir(AJXP_CACHE_DIR."/indexes")) mkdir(AJXP_CACHE_DIR."/indexes",0755,true);
 		if(is_dir($iPath)){
 		    $index = Zend_Search_Lucene::open($iPath);
 		}else{
