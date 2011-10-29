@@ -21,14 +21,14 @@
 Class.create("MetaCellRenderer", {	
 	initialize: function(){
 		this.cssList = new Hash({
-			'low': {cssClass:'meta_low', label:MessageHash['meta.serial.4'], sortValue:'5'},
-			'todo' : {cssClass:'meta_todo', label:MessageHash['meta.serial.5'], sortValue:'4'},
-			'personal' : {cssClass:'meta_personal', label:MessageHash['meta.serial.6'], sortValue:'3'},
-			'work' : {cssClass:'meta_work', label:MessageHash['meta.serial.7'], sortValue:'2'},
-			'important' : {cssClass:'meta_important', label:MessageHash['meta.serial.8'], sortValue:'1'}
+			'low': {cssClass:'meta_low', label:MessageHash['meta.user.4'], sortValue:'5'},
+			'todo' : {cssClass:'meta_todo', label:MessageHash['meta.user.5'], sortValue:'4'},
+			'personal' : {cssClass:'meta_personal', label:MessageHash['meta.user.6'], sortValue:'3'},
+			'work' : {cssClass:'meta_work', label:MessageHash['meta.user.7'], sortValue:'2'},
+			'important' : {cssClass:'meta_important', label:MessageHash['meta.user.8'], sortValue:'1'}
 		});
 		var head = $$('head')[0];
-		var href = "plugins/meta.serial/css/labelsClasses.css";
+		var href = "plugins/meta.user/css/labelsClasses.css";
 		if(!head.down('link[href="'+href+'"]')){
 			var cssNode = new Element('link', {
 				type : 'text/css',
@@ -80,7 +80,7 @@ Class.create("MetaCellRenderer", {
 			name:'',
 			value:'', 
 			selected:(!value)
-		}).update(MessageHash['meta.serial.2']));
+		}).update(MessageHash['meta.user.2']));
 		cssList.each(function(pair){
 			var option = new Element('option', {
 				name:pair.key,
@@ -213,16 +213,16 @@ Class.create("MetaCellRenderer", {
 	},
 		
 	createStars : function(value, containingForm){
-		var imgOff = 'plugins/meta.serial/rating_off.png';
-		var imgOn = 'plugins/meta.serial/rating.png';
-		var imgRemove = 'plugins/meta.serial/rating_remove.png';
+		var imgOff = 'plugins/meta.user/rating_off.png';
+		var imgOn = 'plugins/meta.user/rating.png';
+		var imgRemove = 'plugins/meta.user/rating_remove.png';
 		var cont = new Element('div');
 		if(containingForm){
 			var img = new Element('img',{
 				src:imgRemove,
 				style:'float:left;cursor:pointer;margin-right:2px;padding-right:3px;border-right:1px solid #ccc;',
 				note:0,
-				title:MessageHash['meta.serial.3']
+				title:MessageHash['meta.user.3']
 			});
 			cont.insert(img);			
 		}

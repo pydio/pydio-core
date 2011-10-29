@@ -163,6 +163,8 @@ class SerialMetaStore extends AJXP_Plugin {
                     if(isSet(self::$fullMetaCache[$fileKey][$userId])){
                         self::$metaCache = self::$fullMetaCache[$fileKey][$userId];
                     }
+                    // Save upgraded version
+                    file_put_contents($metaFile, serialize(self::$fullMetaCache));
                 }
             }
 		}else{
@@ -213,7 +215,7 @@ class SerialMetaStore extends AJXP_Plugin {
     protected function upgradeDataFromMetaSerial($data){
         $new = array();
         foreach ($data as $fileKey => $fileData){
-            $new[$fileKey] = array(AJXP_METADATA_SHAREDUSER => array( "users_meta" => $data ));
+            $new[$fileKey] = array(AJXP_METADATA_SHAREDUSER => array( "users_meta" => $fileData ));
             $new["AJXP_METASTORE_UPGRADED"] = true;
         }
         return $new;
