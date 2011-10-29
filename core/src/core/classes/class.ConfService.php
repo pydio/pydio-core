@@ -108,7 +108,7 @@ class ConfService
 		$pServ = AJXP_PluginsService::getInstance();
         $detected = $pServ->getDetectedPlugins();
         foreach ($detected as $pType => $pObjects){
-            if(in_array($pType, array("conf", "auth", "log", "access", "meta", "index"))) continue;
+            if(in_array($pType, array("conf", "auth", "log", "access", "meta","metastore", "index"))) continue;
             foreach ($pObjects as $pName => $pObject){
                 $pObject->init(array());
                 try{
