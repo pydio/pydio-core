@@ -90,7 +90,9 @@ class ShareCenter extends AJXP_Plugin{
             }
         }
         $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
-        $this->metaStore->accessDriver = $this->accessDriver;
+        if($this->metaStore != null){
+            $this->metaStore->accessDriver = $this->accessDriver;
+        }
     }
 
     function switchAction($action, $httpVars, $fileVars){
@@ -153,13 +155,15 @@ class ShareCenter extends AJXP_Plugin{
                         $data["PLUGINS_DATA"] = $customData;
                     }
                     $url = $this->writePubliclet($data, $this->accessDriver, $this->repository);
-                    $this->metaStore->setMetadata(
-                        new AJXP_Node($this->urlBase.$file),
-                        "ajxp_shared",
-                        array("element"     => array_shift(explode(".", basename($url)))),
-                        true,
-                        AJXP_METADATA_SCOPE_REPOSITORY
-                    );
+                    if($this->metaStore != null){
+                        $this->metaStore->setMetadata(
+                            new AJXP_Node($this->urlBase.$file),
+                            "ajxp_shared",
+                            array("element"     => array_shift(explode(".", basename($url)))),
+                            true,
+                            AJXP_METADATA_SCOPE_REPOSITORY
+                        );
+                    }
 	                header("Content-type:text/plain");
 	                echo $url;
             	}
@@ -171,12 +175,14 @@ class ShareCenter extends AJXP_Plugin{
                 $elementType = $httpVars["element_type"];
                 $messages = ConfService::getMessages();
 
-                $metadata = $this->metaStore->retrieveMetadata(
-                    new AJXP_Node($this->urlBase.$file),
-                    "ajxp_shared",
-                    true,
-                    AJXP_METADATA_SCOPE_REPOSITORY
-                );
+                if($this->metaStore != null){
+                    $metadata = $this->metaStore->retrieveMetadata(
+                        new AJXP_Node($this->urlBase.$file),
+                        "ajxp_shared",
+                        true,
+                        AJXP_METADATA_SCOPE_REPOSITORY
+                    );
+                }
                 if(count($metadata)){
                     header("Content-type:application/json");
                     if($elementType == "file"){
@@ -269,6 +275,7 @@ class ShareCenter extends AJXP_Plugin{
      */
     function nodeSharedMetadata(&$ajxpNode){
         if($this->accessDriver->getId() == "access.imap") return;
+        if($this->metaStore  == null) return;
         $metadata = $this->metaStore->retrieveMetadata($ajxpNode, "ajxp_shared", true);
         if(count($metadata)){
             if(!self::sharedElementExists($ajxpNode->isLeaf()?"file":"repository", $metadata["element"], AuthService::getLoggedUser())){
@@ -295,6 +302,7 @@ class ShareCenter extends AJXP_Plugin{
 	 */
 	public function updateNodeSharedData($oldNode, $newNode = null, $copy = false){
         if($this->accessDriver->getId() == "access.imap") return;
+        if($this->metaStore  == null) return;
         if($oldNode == null) return;
         $metadata = $this->metaStore->retrieveMetadata($oldNode, "ajxp_shared", true);
         if(count($metadata)){
@@ -612,7 +620,7 @@ class ShareCenter extends AJXP_Plugin{
         }
 
         // METADATA
-        if(!isSet($editingRepo)){
+        if(!isSet($editingRepo) && $this->metaStore != null){
             $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             $this->metaStore->setMetadata(
                 new AJXP_Node($this->urlBase.$file),

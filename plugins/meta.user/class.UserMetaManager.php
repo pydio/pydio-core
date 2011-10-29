@@ -33,12 +33,12 @@ class UserMetaManager extends AJXP_Plugin {
      * @var SerialMetaStore
      */
     protected $metaStore;
-	
+
 	public function init($options){
-		$this->options = $options;		
+		$this->options = $options;
 		// Do nothing
 	}
-	
+
 	public function initMeta($accessDriver){
 		$this->accessDriver = $accessDriver;
         $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");

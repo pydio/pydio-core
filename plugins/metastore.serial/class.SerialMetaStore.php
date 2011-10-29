@@ -35,11 +35,14 @@ class SerialMetaStore extends AJXP_Plugin {
 	private static $metaCache;
 	private static $fullMetaCache;
 
+    protected $globalMetaFile;
 	public $accessDriver;
+
 
 	public function init($options){
 		$this->options = $options;
         $this->loadRegistryContributions();
+        $this->globalMetaFile = AJXP_DATA_PATH."/plugins/metastore.serial/ajxp_meta";
 	}
 
     public function initMeta($accessDriver){
@@ -128,8 +131,12 @@ class SerialMetaStore extends AJXP_Plugin {
 	protected function loadMetaFileData($ajxpNode, $scope, $userId){
         $currentFile = $ajxpNode->getUrl();
         $fileKey = $ajxpNode->getPath();
+        if(isSet($this->options["METADATA_FILE_LOCATION"]) && $this->options["METADATA_FILE_LOCATION"] == "outside"){
+            // Force scope
+            $scope = AJXP_METADATA_SCOPE_REPOSITORY;
+        }
         if($scope == AJXP_METADATA_SCOPE_GLOBAL){
-            $metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
+            $metaFile = dirname($currentFile)."/".$this->options["METADATA_FILE"];
             //if(self::$currentMetaName == $metaFile && is_array(self::$metaCache))return;
             // Cannot store metadata inside zips...
             if(preg_match("/\.zip\//",$currentFile)){
@@ -141,7 +148,7 @@ class SerialMetaStore extends AJXP_Plugin {
         }else{
             // already loaded?
             //if(is_array(self::$fullMetaCache)) return;
-            $metaFile = AJXP_DATA_PATH."/plugins/metastore.serial/".$this->pluginConf["METADATA_FILE"]."_".$ajxpNode->getRepositoryId();
+            $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
         }
 		if(is_file($metaFile) && is_readable($metaFile)){
             self::$currentMetaName = $metaFile;
@@ -167,14 +174,18 @@ class SerialMetaStore extends AJXP_Plugin {
         $currentFile = $ajxpNode->getUrl();
         $repositoryId = $ajxpNode->getRepositoryId();
         $fileKey = $ajxpNode->getPath();
+        if(isSet($this->options["METADATA_FILE_LOCATION"]) && $this->options["METADATA_FILE_LOCATION"] == "outside"){
+            // Force scope
+            $scope = AJXP_METADATA_SCOPE_REPOSITORY;
+        }
         if($scope == AJXP_METADATA_SCOPE_GLOBAL){
-            $metaFile = dirname($currentFile)."/".$this->pluginConf["METADATA_FILE"];
+            $metaFile = dirname($currentFile)."/".$this->options["METADATA_FILE"];
             $fileKey = basename($fileKey);
         }else{
-            if(!is_dir(AJXP_DATA_PATH."/plugins/metastore.serial/")){
-                mkdir(AJXP_DATA_PATH."/plugins/metastore.serial/", 0666, true);
+            if(!is_dir(dirname($this->globalMetaFile))){
+                mkdir(dirname($this->globalMetaFile), 0666, true);
             }
-            $metaFile = AJXP_DATA_PATH."/plugins/metastore.serial/".$this->pluginConf["METADATA_FILE"]."_".$repositoryId;
+            $metaFile = $this->globalMetaFile."_".$repositoryId;
         }
 		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || ($scope=="repository") ){
             if(!isset(self::$fullMetaCache[$fileKey])){
