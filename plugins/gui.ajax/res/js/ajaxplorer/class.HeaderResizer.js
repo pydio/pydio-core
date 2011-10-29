@@ -38,7 +38,7 @@ Class.create("HeaderResizer", {
 			bodyRowSelector : 'tr',
 			bodyCellSelector : 'td',
 			bodyIsMaster : false,
-			handleWidth : 1,
+			handleWidth : 3,
 			headerData : null,			
 			useCSS3 : false,
             scrollerWidth:18

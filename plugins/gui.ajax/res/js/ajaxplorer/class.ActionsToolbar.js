@@ -273,6 +273,9 @@ Class.create("ActionsToolbar", {
 				this.buttonStateOut(button, action);
 			}.bind(this) );
 		}
+        if(!this.options.skipBubbling){
+            img.setStyle("width:18px;height:18px;margin-top:8px;");
+        }
 		button.hide();
 		this.attachListeners(button, action);
 		return button;

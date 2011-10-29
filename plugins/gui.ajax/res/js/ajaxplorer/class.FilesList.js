@@ -43,9 +43,10 @@ Class.create("FilesList", SelectableElements, {
 			this._displayMode = initDefaultDispOrOptions;
 		}else{
 			this.options = initDefaultDispOrOptions;
-			this._displayMode = 'list';
+            if(this.options.displayMode) this._displayMode = this.options.displayMode;
+            else this._displayMode = 'list';
 		}
-        this.options.replaceScroller = true;
+        //this.options.replaceScroller = false;
 
         var userLoggedObserver = function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
@@ -470,7 +471,8 @@ Class.create("FilesList", SelectableElements, {
 				body : $('table_rows_container'),
 				initSizesType : 'percent',
 				bodyIsMaster : (this.gridStyle == 'grid'),
-                scrollerWidth : this.options.replaceScroller?0:18
+                scrollerWidth : this.options.replaceScroller?0:18,
+                handleWidth : (this.options.replaceScroller)?1:3
 			});
 			this._headerResizer.observe("drag_resize", function(){
 				if(this.prefSaver) window.clearTimeout(this.prefSaver);
