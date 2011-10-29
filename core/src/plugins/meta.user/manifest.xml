@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="meta.user" className="UserMetaManager" label="Text Metadata" description="Simple metadata implementation stored in a hidden file.">
+<meta id="user" className="UserMetaManager" label="Text Metadata" description="Simple metadata implementation stored in a hidden file.">
 	<class_definition filename="plugins/meta.user/class.UserMetaManager.php" classname="UserMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
