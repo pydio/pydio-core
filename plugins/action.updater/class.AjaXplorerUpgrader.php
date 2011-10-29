@@ -570,7 +570,12 @@ class AjaXplorerUpgrader {
         if($repo == null) throw new Exception("Cannot find repository!");
         $sources = $repo->getOption("META_SOURCES");
         if(!isSet($sources["meta.serial"])) {
-            throw new Exception("This repository does not have the meta.serial plugin!");
+            //throw new Exception("This repository does not have the meta.serial plugin!");
+            $sources["meta.serial"] = array(
+                "meta_file_name" => ".ajxp_meta",
+                "meta_fields"   => "comment_field,css_label",
+                "meta_labels"   => "Comment,Label"
+            );
         }
         if($repo->hasParent()) {
             throw new Exception("This repository is defined by a template or is shared, you should upgrade the parent instead!");
