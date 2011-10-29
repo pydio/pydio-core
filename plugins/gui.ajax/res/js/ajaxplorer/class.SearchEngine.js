@@ -178,7 +178,7 @@ Class.create("SearchEngine", AjxpPane, {
         }
 		this.htmlElement = null;
         if(ajxpId && window[ajxpId]){
-            delete window[ajxpId];
+            try {delete window[ajxpId];}catch(e){}
         }
 	},
 	/**
