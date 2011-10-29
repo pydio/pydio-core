@@ -41,6 +41,10 @@ class SerialMetaStore extends AJXP_Plugin {
 		$this->options = $options;		
 	}
 
+    public function initMeta($accessDriver){
+        $this->accessDriver = $accessDriver;
+    }
+
 
     public function setMetadata($ajxpNode, $nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY){
         $this->loadMetaFileData(
