@@ -89,6 +89,7 @@ class ShareCenter extends AJXP_Plugin{
                 $this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
             }
         }
+        if(!isSet($this->repository)) return ;
         $sources = $this->repository->getOption("META_SOURCES");
         if(isSet($sources["metastore.serial"])){
             $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
