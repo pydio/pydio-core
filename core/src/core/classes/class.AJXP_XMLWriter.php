@@ -346,6 +346,9 @@ class AJXP_XMLWriter
                     // But still do not display its own shared repositories!
                     if($rootDirObject->getOwner() == $loggedUser->getId()) continue;
                 }
+                if($rootDirObject->hasOwner() && $loggedUser != null &&  $details && !($loggedUser->canRead($rootDirIndex) || $loggedUser->canWrite($rootDirIndex) ) ){
+                	continue;
+                }
 				
 				$rightString = "";
 				if($details){
