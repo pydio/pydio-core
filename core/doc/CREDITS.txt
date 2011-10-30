@@ -3,8 +3,6 @@ Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
 
 Copyright 2007-2011 Charles du Jeu
 The latest code can be found at http://www.ajaxplorer.info/.
-Check for software update online : <span id='software_update' style="color:#79F;">Check Now</span>.
-
 
 ++ LICENSE ++
 AjaXplorer is free software: you can redistribute it and/or modify

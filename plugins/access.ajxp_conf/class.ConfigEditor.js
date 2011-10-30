@@ -692,13 +692,6 @@ ConfigEditor = Class.create({
 		if(!this.drivers || !this.driverSelector) return;
 		if(Prototype.Browser.IE){this.driverSelector.hide();}
 		this.driverSelector.update('<option value="0" selected></option>');
-		this.driverSelector.insert(new Element('optgroup', {label:"Access Drivers"}));
-		this.drivers.each(function(pair){
-			var option = new Element('option');
-			option.setAttribute('value', pair.key);
-			option.update(pair.value.get('label'));
-			this.driverSelector.insert({'bottom':option});			
-		}.bind(this) );
 		if(this.templates.size()){
 			this.driverSelector.insert(new Element('optgroup', {label:"Repository Templates"}));
 			this.templates.each(function(pair){
@@ -708,6 +701,13 @@ ConfigEditor = Class.create({
 				this.driverSelector.insert({'bottom':option});			
 			}.bind(this));			
 		}
+		this.driverSelector.insert(new Element('optgroup', {label:"Access Drivers"}));
+		this.drivers.each(function(pair){
+			var option = new Element('option');
+			option.setAttribute('value', pair.key);
+			option.update(pair.value.get('label'));
+			this.driverSelector.insert({'bottom':option});			
+		}.bind(this) );
 		if(Prototype.Browser.IE){this.driverSelector.show();}
 		this.driverSelector.onchange = this.driverSelectorChange.bind(this);
 	},
