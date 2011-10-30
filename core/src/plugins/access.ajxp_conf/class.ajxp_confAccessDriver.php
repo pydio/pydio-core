@@ -857,7 +857,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(!is_array($values)) $values = array();
                 echo("<plugin_settings_values>");
                 foreach($values as $key => $value){
-                    if($definitions[$key]["type"] == "array"){
+                    if($definitions[$key]["type"] == "array" && is_array($value)){
                         $value = implode(",", $value);
                     }else if($definitions[$key]["type"] == "boolean"){
                         $value = ($value === true || $value === "true"?"true":"false");
