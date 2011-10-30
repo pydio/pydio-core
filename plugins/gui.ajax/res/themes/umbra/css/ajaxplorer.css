@@ -566,17 +566,18 @@ html.boxshadow div.errorMessage{
 
 div.accordion_toggle{
     clear:left;
-background-color: #B0C6D8;
-padding: 2px 6px;
-margin-top: 2px;
-color: white;
-font-weight: bold;
-cursor: pointer;
-border-radius: 4px;
-background-image: url('../images/0.gif');
-background-repeat: no-repeat;
-background-position: 5px 6px;
-padding-left: 18px;
+	background-color: #B0C6D8;
+	padding: 2px 6px;
+	margin-top: 2px;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+	border-radius: 4px;
+	background-image: url('../images/0.gif');
+	background-repeat: no-repeat;
+	background-position: 5px 6px;
+	padding-left: 18px;
+	line-height:15px;
 }
 
 div.accordion_toggle_active{

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<hook name="auth_demo" enabled="false" label="Demo (no write actions)" description="Disable pass chnage">
+<hook name="auth_demo" enabled="false" label="Demo (no write actions)" description="Disable pass change">
 	<class_definition filename="plugins/hook.auth_demo/class.demoAuthHook.php" classname="demoAuthHook"/>	
 	<registry_contributions>
 		<actions>
