@@ -1719,7 +1719,9 @@ div#upload_files_list div, div#multiple_download_container div
     border-left: 1px solid #CCC;
 }
 .scroller_handle{
-    border-radius: 5px;
+    -webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
 }
 
 /*
