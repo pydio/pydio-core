@@ -2,7 +2,7 @@
 <action_plugin name="updater" label="Update Engine" description="Automatic update of AjaXplorer. Since version 3.3.3">
     <server_settings>
         <global_param name="UPDATE_SITE" type="string" label="Update Site" description="Where to update" default="http://www.ajaxplorer.info/update/"/>
-        <global_param name="PRESERVE_FILES" type="string" label="Preserve Files" description="Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." default=""/>
+        <global_param name="PRESERVE_FILES" type="textarea" label="Preserve Files" description="Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." default=""/>
         <global_param name="ENABLE_324_IMPORT" type="boolean" label="Enable Import From v3.2.4" description="Enable the migration action, available in the Settings repository" default="false"/>
     </server_settings>
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
