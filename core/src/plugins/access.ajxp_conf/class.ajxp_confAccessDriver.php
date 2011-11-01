@@ -949,11 +949,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			if(empty($split[0])) array_shift($split);
 			$type = $split[1];
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="full" template_name="ajxp_conf.plugin_detail">
-			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
-			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
-			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
-			<column messageId="ajxp_conf.104" attributeName="enabled" sortType="String"/>
-			<column messageId="ajxp_conf.105" attributeName="can_active" sortType="String"/>
+			<column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
+			<column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String" defaultWidth="10%"/>
+			<column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String" defaultWidth="60%"/>
+			<column messageId="ajxp_conf.104" attributeName="enabled" sortType="String" defaultWidth="10%"/>
+			<column messageId="ajxp_conf.105" attributeName="can_active" sortType="String" defaultWidth="10%"/>
 			</columns>');
             
 			foreach($types[$type] as $pId => $pObject){
@@ -978,10 +978,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	function listUsers(){
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.users">
-			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
-			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String"/>
-			<column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String"/>
-			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
+			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
+			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="10%"/>
+			<column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
+			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
 			</columns>');		
 		if(!AuthService::usersEnabled()) return ;
 		$users = AuthService::listUsers();
@@ -1128,12 +1128,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$parts = explode("/", $dir);
 		if(count($parts)>4){
 			$config = '<columns switchDisplayMode="list" switchGridMode="grid" template_name="ajxp_conf.logs">
-				<column messageId="ajxp_conf.17" attributeName="date" sortType="MyDate" width="10%"/>
-				<column messageId="ajxp_conf.18" attributeName="ip" sortType="String"/>
-				<column messageId="ajxp_conf.19" attributeName="level" sortType="String"/>
-				<column messageId="ajxp_conf.20" attributeName="user" sortType="String"/>
-				<column messageId="ajxp_conf.21" attributeName="action" sortType="String"/>
-				<column messageId="ajxp_conf.22" attributeName="params" sortType="String"/>
+				<column messageId="ajxp_conf.17" attributeName="date" sortType="MyDate" defaultWidth="10%"/>
+				<column messageId="ajxp_conf.18" attributeName="ip" sortType="String" defaultWidth="10%"/>
+				<column messageId="ajxp_conf.19" attributeName="level" sortType="String" defaultWidth="10%"/>
+				<column messageId="ajxp_conf.20" attributeName="user" sortType="String" defaultWidth="10%"/>
+				<column messageId="ajxp_conf.21" attributeName="action" sortType="String" defaultWidth="10%"/>
+				<column messageId="ajxp_conf.22" attributeName="params" sortType="String" defaultWidth="50%"/>
 			</columns>';				
 			AJXP_XMLWriter::sendFilesListComponentConfig($config);
 			$date = $parts[count($parts)-1];
@@ -1149,7 +1149,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$testedParams = array();
 		$passed = AJXP_Utils::runTests($outputArray, $testedParams);
 		AJXP_Utils::testResultsToFile($outputArray, $testedParams);		
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList" template_name="ajxp_conf.diagnostic"><column messageId="ajxp_conf.23" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.24" attributeName="data" sortType="String"/></columns>');		
+		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList" template_name="ajxp_conf.diagnostic" defaultWidth="20%"><column messageId="ajxp_conf.23" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.24" attributeName="data" sortType="String"/></columns>');		
 		if(is_file(TESTS_RESULT_FILE)){
 			include_once(TESTS_RESULT_FILE);			
 			foreach ($diagResults as $id => $value){
@@ -1161,13 +1161,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	function listSharedFiles(){
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.shared">
-				<column messageId="ajxp_shared.4" attributeName="ajxp_label" sortType="String" width="20%"/>
-				<column messageId="ajxp_shared.27" attributeName="owner" sortType="String" width="20%"/>
-				<column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" width="20%"/>
-				<column messageId="ajxp_shared.6" attributeName="password" sortType="String" width="5%"/>
-				<column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" width="5%"/>
-				<column messageId="ajxp_shared.20" attributeName="expired" sortType="String" width="5%"/>
-				<column messageId="ajxp_shared.14" attributeName="integrity" sortType="String" width="5%" hidden="true"/>
+				<column messageId="ajxp_shared.4" attributeName="ajxp_label" sortType="String" defaultWidth="30%"/>
+				<column messageId="ajxp_shared.27" attributeName="owner" sortType="String" defaultWidth="10%"/>
+				<column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" defaultWidth="40%"/>
+				<column messageId="ajxp_shared.6" attributeName="password" sortType="String" defaultWidth="4%"/>
+				<column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" defaultWidth="4%"/>
+				<column messageId="ajxp_shared.20" attributeName="expired" sortType="String" defaultWidth="4%"/>
+				<column messageId="ajxp_shared.14" attributeName="integrity" sortType="String" defaultWidth="4%" hidden="true"/>
 			</columns>');
 		$dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
 		if(!is_dir($dlFolder)) return ;		
