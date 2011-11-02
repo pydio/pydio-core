@@ -38,6 +38,12 @@ class UpdateController extends AJXP_Plugin {
         unset($this->actions["import_from_324"]);
         $compressNode = $compressNodeList->item(0);
         $contribNode->removeChild($compressNode);
+
+        $compressNodeList = $actionXpath->query('action[@name="migrate_metaserial"]', $contribNode);
+        if(!$compressNodeList->length) return ;
+        unset($this->actions["import_from_324"]);
+        $compressNode = $compressNodeList->item(0);
+        $contribNode->removeChild($compressNode);
 	}
 
     function switchAction($action, $httpVars, $fileVars){
