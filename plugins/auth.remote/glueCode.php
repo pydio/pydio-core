@@ -35,7 +35,8 @@ if(!isSet($AJXP_GLUE_GLOBALS)){
 }
 if (!isSet($CURRENTPATH)) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
 
-include_once("$CURRENTPATH/../../conf/base.conf.php");
+include_once("$CURRENTPATH/../../base.conf.php");
+include_once("$CURRENTPATH/../../conf/bootstrap_context.php");
 
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Logger.php");
 require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Plugin.php");
