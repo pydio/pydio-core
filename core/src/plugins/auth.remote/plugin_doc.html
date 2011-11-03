@@ -1,0 +1,14 @@
+<p><em>Warning, if you are using this plugin in slave mode with Drupal, Joomla or Wordpress, and encounter problems for connecting to AjaXplorer with the REST clients (iPhone/iPad, webDav), you have to upgrade the plugin. <a href="http://www.ajaxplorer.info/wordpress/2011/06/auth-remote-plugin-upgrade-for-ios-client-users/">More info can be found here</a></em><br>
+<br>
+Generic plugin used for integration with various CMS. In master mode, when you login, AjaXplorer will silently call a predefined URL to also log you on the external application. In slave mode, the plugin is not straightforward to implement, you should check the wordpress and joomla implementation for more examples.&nbsp;Basically, in slave mode, it works as follow :<br>
+<ul><br>
+	<li>Install AjaXplorer with a "&nbsp;standard&nbsp;" authentification plugin, and update your "&nbsp;admin&nbsp;" user with your own password.</li><br>
+	<li>Then switch to this auth.remote plugin in the server/conf/conf.php file.</li><br>
+	<li>In the config, set a secret key (can be anything, not necessary your admin password, beware of "&nbsp;anti-slashing&nbsp;" $ symbol).</li><br>
+	<li>It's ready to use on the AjaXplorer part</li><br>
+	<li>In your CMS, create an authentification mechanism (generally there is also a plugin system) that can be configured with the secret key.</li><br>
+	<li>This mechanism must, at login time, include the plugins/auth.remote/glueCode.php file, the secret key being set as GLOBAL before the inclusion, as well as the $plugInAction variable, and other variable depending on the action (login, logout, addUser, etc).. See the glueCode file to check the implemented actions.</li><br>
+	<li>This way, the glueCode file switches dynamically the session to an AjaXplorer session, logs in a user, then give back the hand to the CMS.</li><br>
+	<li>Once logged in your CMS, you should be able to access AjaXplorer logged in as the same user.</li><br>
+</ul>
+</p>

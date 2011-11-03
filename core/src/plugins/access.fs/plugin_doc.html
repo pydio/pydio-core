@@ -1,0 +1,3 @@
+<p>The default and basic "FileSystem" driver, used to browse, edit, manage, etc all documents contained on a local file system. The default repository bundled with AjaXplorer is using this driver.</p>
+<p>FS Driver implements all the standard actions of AjaXplorer, including upload/download, moving the files in various ways. It registers the stream "ajxp.fs" in the application, that is able to read both local filesystem and zip archives (using PclZip included in the core).</p>
+<p>Actions of this driver are not inside the manifest.xml (too big) but in a separate file, fsActions.xml. It's a good starting point to have a look at this file when you want to hack something in the application.</p>
