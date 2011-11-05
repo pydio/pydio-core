@@ -861,6 +861,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $value = implode(",", $value);
                     }else if($definitions[$key]["type"] == "boolean"){
                         $value = ($value === true || $value === "true"?"true":"false");
+                    }else if($definitions[$key]["type"] == "textarea"){
+                        $value = str_replace("\\n", "__LBR__", $value);
                     }
                     echo("<param name=\"$key\" value=\"$value\"/>");
                 }
