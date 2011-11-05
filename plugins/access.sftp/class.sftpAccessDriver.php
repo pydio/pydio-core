@@ -45,12 +45,13 @@ class sftpAccessDriver extends fsAccessDriver
 		if(!function_exists('ssh2_connect')){
 			throw new Exception("You must have the php ssh2 extension active!");
 		}
+        ConfService::setConf("PROBE_REAL_SIZE", false);
 		$path = $this->repository->getOption("PATH");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		$wrapperData = $this->detectStreamWrapper(true);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
-		if(!is_dir($this->urlBase)){
+		if(!file_exists($this->urlBase)){
 			throw new AJXP_Exception("Cannot find base path ($path) for your repository! Please check the configuration!");
 		}
 		if($recycle != ""){
@@ -192,8 +193,19 @@ class sftpAccessDriver extends fsAccessDriver
 		}
 		
 	}	
-	
+
+    function filesystemFileSize($filePath){
+        $bytesize = filesize($filePath);
+        if($bytesize < 0){
+            $bytesize = sprintf("%u", $bytesize);
+        }
+        return $bytesize;
+    }
+
 	/**
+     * @param $src
+     * @param $dest
+     * @param $basedir
 	 * @return zipfile
 	 */ 
     function makeZip ($src, $dest, $basedir)

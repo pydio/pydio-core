@@ -38,17 +38,17 @@ function disconnectedSftp($code, $message, $language){
 
 function ignoreSftp($message){
 	AJXP_Logger::logAction("SSH2.FTP.ignore");
-	throw new Exception('SSH2.FTP : ignore'.$message, $code);
+	throw new Exception('SSH2.FTP : ignore'.$message);
 }
 
 function debugSftp($message, $language, $always_display){
 	AJXP_Logger::logAction("SSH2.FTP.debug");
-	throw new Exception('SSH2.FTP : debug'.$message, $code);
+	throw new Exception('SSH2.FTP : debug'.$message);
 }
 
 function macerrorSftp($packet){
 	AJXP_Logger::logAction("SSH2.FTP.macerror");
-	throw new Exception('SSH2.FTP : macerror'.$message, $code);
+	throw new Exception('SSH2.FTP : macerror'.$packet);
 }
     
 
@@ -150,8 +150,8 @@ class sftpAccessWrapper extends fsAccessWrapper {
     	$stat = @stat($realPath);
     	$parts = parse_url($path);
     	$repoObject = ConfService::getRepositoryById($parts["host"]);
-    	
-    	AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));    	
+
+    	AbstractAccessDriver::fixPermissions($stat, $repoObject, array($this, "detectRemoteUserId"));
 
     	return $stat;
     }
