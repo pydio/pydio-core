@@ -84,7 +84,7 @@ class AbstractAccessDriver extends AJXP_Plugin {
      * @return void
      */
     function loadPubliclet($data){
-        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php");
+        require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/class.ShareCenter.php");
         ShareCenter::loadPubliclet($data);
     }
 

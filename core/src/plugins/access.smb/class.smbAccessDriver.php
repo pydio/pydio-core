@@ -20,7 +20,7 @@
  *
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-include_once(AJXP_INSTALL_PATH."/plugins/access.smb/smb.php");
+include_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
 
 /**
  * @package info.ajaxplorer.plugins
@@ -72,7 +72,16 @@ class smbAccessDriver extends fsAccessDriver
 		if($contribNode->nodeName != "actions") return ;
 		$this->disableArchiveBrowsingContributions($contribNode);
 	}	
-	
+
+
+    function filesystemFileSize($filePath){
+        $bytesize = filesize($filePath);
+        if($bytesize < 0){
+            $bytesize = sprintf("%u", $bytesize);
+        }
+        return $bytesize;
+    }
+
 }	
 
 ?>
