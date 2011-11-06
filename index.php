@@ -149,7 +149,7 @@ if(AuthService::usersEnabled())
 			AuthService::disconnect();
 			$loggingResult = -3;
 		}else {
-			if($lastRepoId != "" && $lastRepoId!==$currentRepoId && !isSet($httpVars["tmp_repository_id"]) && $loggedUser->canSwitchTo($lastRepoId)){
+			if($lastRepoId !== "" && $lastRepoId!==$currentRepoId && !isSet($httpVars["tmp_repository_id"]) && $loggedUser->canSwitchTo($lastRepoId)){
 				ConfService::switchRootDir($lastRepoId);
 			}else if(!$loggedUser->canSwitchTo($currentRepoId)){
 				ConfService::switchRootDir($defaultRepoId);
