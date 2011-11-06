@@ -97,8 +97,8 @@
 						</div>
 					</div>
 				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}' style="padding-top:17px;">
-					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin-top:0px;"></div>
+				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
+					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>				
 			]]></template>
 			<component_config className="FilesList">

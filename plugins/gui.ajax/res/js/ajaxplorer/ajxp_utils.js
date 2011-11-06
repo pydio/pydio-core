@@ -65,6 +65,9 @@ function resolveImageSource(src, defaultPath, size){
 	var radic = src.substring(0,src.indexOf("/"));
 	if(window.AjxpImageLibraries[radic]){
 		var src = src.replace(radic, window.AjxpImageLibraries[radic]);
+        if(ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
+            src = ajxpBootstrap.parameters.get("SERVER_PREFIX_URI") + src;
+        }
 		return (size?src.replace("ICON_SIZE", size):src);
 	}else{
 		return ajxpResourcesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
