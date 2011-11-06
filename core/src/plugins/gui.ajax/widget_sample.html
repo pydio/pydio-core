@@ -2,8 +2,8 @@
 	<head>
 		<title>AjaXplorer</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel="icon" type="image/x-png" href="client/themes/oxygen/images/html-folder.png">
-		<link rel="stylesheet" type="text/css" href="client/themes/oxygen/css/allz.css">
+		<link rel="icon" type="image/x-png" href="res/themes/umbra/images/html-folder.png">
+		<link rel="stylesheet" type="text/css" href="res/themes/umbra/css/allz.css">
 		<style type="text/css">
 			.widget_title{
 				font-family: "Trebuchet MS", Arial, Helvetica;
@@ -25,16 +25,16 @@
 				position:relative;
 			}
 		</style>
-		<script language="javascript" type="text/javascript" src="client/js/ajaxplorer_boot.js"></script>
+		<script language="javascript" type="text/javascript" src="res/js/ajaxplorer_boot.js"></script>
 		<script type="text/javascript">
 			// Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is 
 			// dynamically replaced by the application!
 			var ajaxplorer, startParameters = {}, MessageHash={};
 			startParameters = {
-				"BOOTER_URL":"content.php?get_action=get_boot_conf",
+				"BOOTER_URL":"../../index.php?get_action=get_boot_conf",
 				"EXT_REP":"\/", 
 				"MAIN_ELEMENT":"ajxp_widget",
-				"SERVER_PREFIX_URI": ""
+				"SERVER_PREFIX_URI": "../../"
 			};
 			window.ajxpBootstrap = new AjxpBootstrap(startParameters);
 		</script>
