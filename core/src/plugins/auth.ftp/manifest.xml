@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="ftp" label="FTP Authentification" description="Authenticate user directly to an FTP server, and connect him to this server.">
+<authdriver name="ftp" label="FTP Authentification" description="Authenticate user directly to an FTP server, and connect him to this server." mixins="authdriver_commons">
 	<server_settings>
+        <param name="FTP_LOGIN_SCREEN" type="boolen" label="FTP Login Screen" description="Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." mandatory="true" default="false"/>
 		<param name="REPOSITORY_ID" type="string" label="Repository" description="Id of the repository to use for testing connexion" mandatory="true"/>
 		<param name="ADMIN_USER" type="string" label="Admin user" description="The ID of an existing admin for Ajaxplorer (using conf.serial)" mandatory="true"/>
 	</server_settings>

@@ -23,4 +23,12 @@
             <param group="Filesystem Commons" name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
         </server_settings>
     </filesystem_commons>
+    <authdriver_commons>
+        <server_settings uuidAttr="name">
+            <param group="Auth Driver Commons" name="TRANSMIT_CLEAR_PASS" type="boolean" label="Transmit Clear Pass" description="Whether the password will be transmitted clear or encoded between the client and the server" default="true"/>
+            <param group="Auth Driver Commons" name="AUTO_CREATE_AJXPUSER" type="boolean" label="Auto Create User" description="When set to true, the user object is created automatically if the authentication succeed. Used by remote authentication systems." mandatory="false" default="false"/>
+            <param group="Auth Driver Commons" name="LOGIN_REDIRECT" type="string" label="Login Redirect" description="If set to a given URL, the login action will not trigger the display of login screen but redirect to this URL." mandatory="false"/>
+            <param group="Auth Driver Commons" name="AJXP_ADMIN_LOGIN" type="string" label="Admin Login" description="For exotic auth drivers, an user ID that must be considered as admin by default." mandatory="false"/>
+        </server_settings>
+    </authdriver_commons>
 </ajxp_mixins>

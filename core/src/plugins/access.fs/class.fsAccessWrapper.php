@@ -218,7 +218,7 @@ class fsAccessWrapper implements AjxpWrapper {
      * @param String $path Maybe in the form "ajxp.fs://repositoryId/pathToFile" 
      * @param String $mode
      * @param unknown_type $options
-     * @param unknown_type $opened_path
+     * @param unknown_type $context
      * @return unknown
      */
     public function stream_open($path, $mode, $options, &$context)

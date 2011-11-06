@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="basic_http" label="Basic HTTP" description="Use the standard http authentication.">	
+<authdriver name="basic_http" label="Basic HTTP" description="Use the standard http authentication." mixins="authdriver_commons">
+    <server_settings>
+        <param name="USERS_FILEPATH" type="string" label="Users" description="The users list" mandatory="true"/>
+    </server_settings>
 	<class_definition filename="plugins/auth.basic_http/class.basic_httpAuthDriver.php" classname="basic_httpAuthDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>

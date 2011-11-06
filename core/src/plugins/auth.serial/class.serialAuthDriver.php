@@ -37,6 +37,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 	}
 
 	function performChecks(){
+        if(!isset($this->options)) return;
 		$usersDir = dirname($this->usersSerFile);
 		if(!is_dir($usersDir) || !is_writable($usersDir)){
 			throw new Exception("Parent folder for users file is either inexistent or not writeable.");
