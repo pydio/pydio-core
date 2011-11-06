@@ -20,8 +20,6 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(AJXP_BIN_FOLDER."/class.AbstractAuthDriver.php");
-
 /**
  * @package info.ajaxplorer.plugins
  * Store authentication data in an SQL database

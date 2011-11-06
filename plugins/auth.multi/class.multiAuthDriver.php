@@ -20,7 +20,6 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(AJXP_BIN_FOLDER."/class.AbstractAuthDriver.php");
 /**
  * @package info.ajaxplorer.plugins
  * Still experimental, ability to encapsulate many auth drivers and choose the right one at login.

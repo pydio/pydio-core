@@ -21,7 +21,7 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessDriver.php");
+require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.fs/class.fsAccessDriver.php");
 @include_once("HTTP/WebDAV/Client.php");
 
 /**

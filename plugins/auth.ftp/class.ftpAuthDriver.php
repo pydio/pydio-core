@@ -20,8 +20,7 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(AJXP_BIN_FOLDER."/class.AbstractAuthDriver.php");
-require_once(AJXP_INSTALL_PATH."/plugins/access.ftp/class.ftpAccessWrapper.php");
+require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/class.ftpAccessWrapper.php");
 
 class ftpSonWrapper extends ftpAccessWrapper {
 	public function initUrl($url){
