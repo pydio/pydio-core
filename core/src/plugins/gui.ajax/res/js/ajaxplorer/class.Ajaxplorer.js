@@ -565,13 +565,13 @@ Class.create("Ajaxplorer", {
 			if(this._initLoadRep != "" && this._initLoadRep != "/"){
 				var copy = this._initLoadRep.valueOf();
 				this._initLoadRep = null;
-				rootNode.observeOnce("loaded", function(){
+				rootNode.observeOnce("first_load", function(){
 						setTimeout(function(){
 							if(this.pathExists(copy)){
 								this.goTo(new AjxpNode(copy));
 							}
 							this.skipLsHistory = false;
-						}.bind(this), 1000);						
+						}.bind(this), 1000);
 				}.bind(this));
 			}else{
 				this.skipLsHistory = false;
