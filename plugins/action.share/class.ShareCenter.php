@@ -577,6 +577,9 @@ class ShareCenter extends AJXP_Plugin{
             $newRepo->options = array_merge($newRepo->options, $options);
             ConfService::replaceRepository($httpVars["repository_id"], $newRepo);
         }else{
+            if($repository->getOption("META_SOURCES")){
+                $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
+            }
             $newRepo = $repository->createSharedChild(
                 $label,
                 $options,
