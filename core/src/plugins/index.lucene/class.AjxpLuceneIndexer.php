@@ -30,6 +30,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
     private $currentIndex;
     private $accessDriver;
     private $metaFields = array();
+    private $indexContent = false;
     private $specificId = "";
     private $verboseIndexation = false;
 
@@ -43,13 +44,23 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         if(!empty($this->options["repository_specific_keywords"])){
             $this->specificId = "-".str_replace(",", "-", AJXP_VarsFilter::filter($this->options["repository_specific_keywords"]));
         }
+        $this->indexContent = ($this->options["index_content"] == true);
 	}
 
     public function initMeta($accessDriver){
         $this->accessDriver = $accessDriver;
-        if(!empty($this->options["index_meta_fields"])){
+        if(!empty($this->options["index_meta_fields"]) || $this->indexContent){
+            $metaFields = $this->metaFields;
             $el = $this->xPath->query("/indexer")->item(0);
-            $el->setAttribute("indexed_meta_fields", json_encode($this->metaFields));
+            if($this->indexContent){
+                if($this->indexContent) $metaFields[] = "ajxp_document_content";
+                $data = array("indexed_meta_fields" => $metaFields,
+                              "additionnal_meta_columns" => array("ajxp_document_content" => "Content")
+                );
+                $el->setAttribute("indexed_meta_fields", json_encode($data));
+            }else{
+                $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
+            }
         }
         parent::init($this->options);
     }
@@ -68,13 +79,17 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 $this->applyAction("index", array(), array());
                 throw new Exception($messages["index.lucene.7"]);
             }
-			if(isSet($this->metaFields) && isSet($httpVars["fields"])){
+			if((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])){
                 $sParts = array();
                 foreach(explode(",",$httpVars["fields"]) as $searchField){
                     if($searchField == "filename"){
                         $sParts[] = "basename:".$httpVars["query"];
                     }else if(in_array($searchField, $this->metaFields)){
                         $sParts[] = "ajxp_meta_".$searchField.":".$httpVars["query"];
+                    }else if($searchField == "ajxp_document_content"){
+                        $sParts[] = "title:".$httpVars["query"];
+                        $sParts[] = "body:".$httpVars["query"];
+                        $sParts[] = "keywords:".$httpVars["query"];
                     }
                 }
                 $query = implode(" OR ", $sParts);
@@ -248,7 +263,16 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
      */
     public function createIndexedDocument($ajxpNode){
         $ajxpNode->loadNodeInfo();
-        $doc = new Zend_Search_Lucene_Document();
+        $ext = pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION);
+        $parseContent = $this->indexContent;
+        if($parseContent && $ajxpNode->bytesize > $this->pluginConf["PARSE_CONTENT_MAX_SIZE"]){
+            $parseContent = false;
+        }
+        if($parseContent && in_array($ext, explode(",",$this->pluginConf["PARSE_CONTENT_HTML"]))){
+            $doc = Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
+        }else{
+            $doc = new Zend_Search_Lucene_Document();
+        }
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), SystemTextEncoding::getEncoding());
@@ -256,6 +280,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             if($ajxpNode->$field != null){
                 $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), SystemTextEncoding::getEncoding());
             }
+        }
+        if($parseContent && in_array($ext, explode(",",$this->pluginConf["PARSE_CONTENT_TXT"]))){
+            $doc->addField(Zend_Search_Lucene_Field::unStored("body", file_get_contents($ajxpNode->getUrl())));
         }
         // Store a cached copy of the metadata
         $doc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", base64_encode(serialize($ajxpNode->metadata))));
