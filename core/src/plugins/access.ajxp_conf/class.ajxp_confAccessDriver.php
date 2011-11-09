@@ -860,7 +860,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if($definitions[$key]["type"] == "array" && is_array($value)){
                         $value = implode(",", $value);
                     }else if($definitions[$key]["type"] == "boolean"){
-                        $value = ($value === true || $value === "true"?"true":"false");
+                        $value = ($value === true || $value === "true" || $value == 1?"true":"false");
                     }else if($definitions[$key]["type"] == "textarea"){
                         $value = str_replace("\\n", "__LBR__", $value);
                     }
