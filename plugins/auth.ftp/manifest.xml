@@ -74,7 +74,7 @@
 								</tr>
 								<tr>
 									<td align="right"><ajxp:message ajxp_message_id="181">AJXP_MESSAGE[181]</ajxp:message> </td><td><input type="text" name="userid" style="width: 100px; padding:0px;"></td>
-									<td align="right"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message> </td><td><input type="password" name="password"  style="width: 100px; padding:0px;"></td>
+									<td align="right"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message> </td><td><input type="password" name="password"  style="width: 90px; padding:0px;"></td>
 								</tr>
 								<tr>
 									<td colspan="4">
@@ -83,11 +83,11 @@
 								</tr>
 								<tr>
 									<td align="right"><ajxp:message ajxp_message_id="">Start</ajxp:message> </td><td><input type="text" name="PATH" style="width: 100px; padding:0px;" class="" value="/"></td>
-									<td align="right"><ajxp:message ajxp_message_id="">Protocol</ajxp:message> </td><td><input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="FALSE" checked> ftp<input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="TRUE"> ftps</td>									
+									<td align="right" style="padding-left:10px;"><ajxp:message ajxp_message_id="">Protocol : </ajxp:message> </td><td><input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="FALSE" checked><label style="display:inline-block;width:27px;"> FTP</label><input type="radio" name="FTP_SECURE" style="width: 12px; padding:0px;" value="TRUE"><label style="display:inline-block;width:27px;"> FTPS</label></td>
 								</tr>								
 								<tr>
 									<td align="right"><ajxp:message ajxp_message_id="">Charset</ajxp:message> </td><td><input type="text" name="CHARSET" style="width: 100px; padding:0px;" class="" value=""></td>
-									<td align="right"><ajxp:message ajxp_message_id="">Active</ajxp:message> </td><td><input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="TRUE"> true<input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="FALSE" checked> false</td>
+									<td align="right"><ajxp:message ajxp_message_id="">Active : </ajxp:message> </td><td><input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="TRUE"><label style="display:inline-block;width:27px;">Yes</label><input type="radio" name="FTP_DIRECT" style="width: 12px; padding:0px;" value="FALSE" checked><label style="display:inline-block;width:27px;">No</label></td>
 								</tr>
 								</table>
 							</div>
