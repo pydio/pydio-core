@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="multi" label="Multiple" description="Encapsulate the use of other drivers">
 	<server_settings>
-		<param name="DRIVERS" type="array" label="Drivers" description="The auth drivers" mandatory="true"/>
+        <param name="MASTER_DRIVER" type="string" label="Master" description="The name of the master driver to use, generally serial." mandatory="true"/>
+		<param name="DRIVERS" type="array" label="Drivers" description="The auth drivers definition, see detailed documenation for more info." mandatory="true"/>
+        <param name="USER_ID_SEPARATOR" type="string" label="Separator" description="This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" mandatory="true" default="_-_"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.multi/class.multiAuthDriver.php" classname="multiAuthDriver"/>
 	<registry_contributions>
