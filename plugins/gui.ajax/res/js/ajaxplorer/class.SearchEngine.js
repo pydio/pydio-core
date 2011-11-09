@@ -72,7 +72,17 @@ Class.create("SearchEngine", AjxpPane, {
         var indexerNode = XPathSelectSingleNode(reg, "plugins/indexer");
         if(indexerNode != null){
             if(indexerNode.getAttribute("indexed_meta_fields")){
-                this.indexedFields = $A(indexerNode.getAttribute("indexed_meta_fields").evalJSON());
+                this.indexedFields = indexerNode.getAttribute("indexed_meta_fields").evalJSON();
+                if(this.indexedFields["indexed_meta_fields"]){
+                    var addColumns = this.indexedFields["additionnal_meta_columns"];
+                    this.indexedFields = $A(this.indexedFields["indexed_meta_fields"]);
+                    if(!this._ajxpOptions.metaColumns) this._ajxpOptions.metaColumns = {};
+                    for(var key in addColumns){
+                        this._ajxpOptions.metaColumns[key] = addColumns[key];
+                    }
+                }else{
+                    this.indexedFields = $A(this.indexedFields);
+                }
             }else{
                 this.indexedFields = $A();
             }
@@ -454,11 +464,16 @@ Class.create("SearchEngine", AjxpPane, {
 				var ajxpNode = this.parseAjxpNode(nodes[i]);
                 if(this.hasMetaSearch()){
                     var searchCols = this.getSearchColumns();
+                    var added = false;
                     for(var k=0;k<searchCols.length;k++){
                         var meta = ajxpNode.getMetadata().get(searchCols[k]);
                         if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
                             this.addResult(currentFolder, ajxpNode, meta);
+                            added = true;
                         }
+                    }
+                    if(!added){
+                        this.addResult(currentFolder, ajxpNode);
                     }
                 }else{
 				    this.addResult(currentFolder, ajxpNode);
@@ -522,6 +537,7 @@ Class.create("SearchEngine", AjxpPane, {
 	 */
 	highlight : function(haystack, needle, truncate){
 		var start = haystack.toLowerCase().indexOf(needle);
+        if(start == -1) return haystack;
 		var end = start + needle.length;
 		if(truncate && haystack.length > truncate){
 			var midTrunc = Math.round(truncate/2);

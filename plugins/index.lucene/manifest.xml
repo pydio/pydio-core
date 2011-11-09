@@ -8,8 +8,12 @@
         </resources>
     </client_settings>
     <server_settings>
+        <param name="index_content" type="boolean" label="Index Content" description="Parses the file when possible and index its content (see plugin global options)" mandatory="true" default="false"/>
         <param name="index_meta_fields" type="string" label="Index Meta Fields" description="Which additionnal fields to index and search" mandatory="false" default=""/>
         <param name="repository_specific_keywords" type="string" label="Repository keywords" description="If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here." mandatory="false" default=""/>
+        <global_param name="PARSE_CONTENT_MAX_SIZE" type="string" label="Parse Content Until" description="Skip content parsing and indexation for files bigger than this size (must be in Bytes)" mandatory="true" default="500000"/>
+        <global_param name="PARSE_CONTENT_HTML" type="string" label="HTML files" description="List of extensions to consider as HTML file and parse content" mandatory="true" default="html,htm"/>
+        <global_param name="PARSE_CONTENT_TXT" type="string" label="Text files" description="List of extensions to consider as Text file and parse content" mandatory="true" default="txt"/>
     </server_settings>
 	<registry_contributions>
 		<hooks>
