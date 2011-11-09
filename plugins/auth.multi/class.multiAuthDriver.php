@@ -97,6 +97,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 		}
 		$xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
 		$xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->getOption("MASTER_DRIVER"), $xmlContent);
+		$xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->getOption("USER_ID_SEPARATOR"), $xmlContent);
 		$patchDoc = DOMDocument::loadXML($xmlContent);
 		$patchNode = $patchDoc->documentElement;
 		$imported = $contribNode->ownerDocument->importNode($patchNode, true);
@@ -119,7 +120,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	protected function extractRealId($userId){
-		$parts = explode("::", $userId);
+		$parts = explode($this->getOption("USER_ID_SEPARATOR"), $userId);
 		if(count($parts) == 2){
 			return $parts[1];
 		}

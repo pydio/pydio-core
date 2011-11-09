@@ -3,6 +3,7 @@
 	var loginRedirect = AJXP_LOGIN_REDIRECT;
 	var authSources = AJXP_MULTIAUTH_SOURCES;
 	var masterAuthSource = 'AJXP_MULTIAUTH_MASTER';
+	var userIdSeparator = 'AJXP_USER_ID_SEPARATOR';
 	if(loginRedirect){
 		document.location.href=loginRedirect;
 	}else{
@@ -41,7 +42,7 @@
 			if(selectedSource == masterAuthSource){
 				connexion.addParameter('userid', oForm.userid.value);
 			}else{
-				connexion.addParameter('userid', selectedSource+'::'+oForm.userid.value);
+				connexion.addParameter('userid', selectedSource+userIdSeparator+oForm.userid.value);
 			}
 			connexion.addParameter('login_seed', oForm.login_seed.value);
 			connexion.addParameter('auth_source', selectedSource);
@@ -61,6 +62,15 @@
 				}
 			};
 			connexion.setMethod('put');
+			document.observeOnce("ajaxplorer:user_logged", function(){
+		        if($('logging_string') && $('logging_string').down('i')){
+		            var ht = $('logging_string').down('i').innerHTML;
+		            var exp = ht.split(userIdSeparator);
+		            if(exp.length > 1){
+                		$('logging_string').down('i').update(exp[1]);
+		            }
+		        }
+			});
 			connexion.sendAsync();
 			oForm.userid.value = '';
 			oForm.password.value = '';
