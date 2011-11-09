@@ -31,7 +31,9 @@
 							document.location.href=loginRedirect;
 						}else{
 							modal.showDialogForm('Log In', 'ftp_login_form', 
-							null, 
+							function(oForm){
+                                ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+							},
 							function(){
 								var oForm = modal.getForm();
 																
@@ -43,7 +45,12 @@
 									}
 								});
 								connexion.onComplete = function(transport){
-									ajaxplorer.actionBar.submitForm(oForm);
+									ajaxplorer.actionBar.submitForm(oForm, true, function(transport){
+                                        ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                        if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
+                                            ajaxplorer.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
+                                        }
+                                    });
 									oForm.reset();
 								};
 								connexion.sendSync();								
@@ -52,7 +59,7 @@
 						}
 						]]></clientCallback>
 						<clientForm id="ftp_login_form"><![CDATA[						
-							<form id="ftp_login_form" action="login" box_width="340">
+							<div id="ftp_login_form" action="login" box_width="340">
 							<input type="hidden" name="get_action" value="login">
 							<input type="hidden" name="login_seed" id="login_seed" value="-1">
 							<div>
@@ -85,7 +92,7 @@
 								</table>
 							</div>
 							
-							</form>					
+							</div>
 						]]></clientForm>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
