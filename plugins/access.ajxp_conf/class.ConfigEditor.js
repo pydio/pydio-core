@@ -656,7 +656,9 @@ ConfigEditor = Class.create({
 					var paramNode = driverParams[j];
 					if(this.currentCreateRepoType == "template" && paramNode.getAttribute('no_templates') == 'true'){
 						continue;
-					}
+					}else if(this.currentCreateRepoType == "repository" && paramNode.getAttribute('templates_only') == 'true'){
+                        continue;
+                    }
 					driverParamsArray.push(this.formManager.parameterNodeToHash(paramNode));
 				}
 				driverDef.set('params', driverParamsArray);
@@ -866,6 +868,8 @@ ConfigEditor = Class.create({
 		var driverParams = XPathSelectNodes(xmlData, "admin_data/ajxpdriver/param");
 		var optionsPane = this.form.select('[id="options_pane"]')[0];		
 		var tplParams = XPathSelectNodes(xmlData, "admin_data/template/option");
+        this.currentRepoIsTemplate = (repo.getAttribute("isTemplate") === "true");
+
 		if(tplParams.length){
 			var tplParamNames = $A();
 			for(var k=0;k<tplParams.length;k++) {
@@ -879,6 +883,11 @@ ConfigEditor = Class.create({
 		for(var i=0;i<driverParams.length;i++){
 			var hashedParams = this.formManager.parameterNodeToHash(driverParams[i]);
 			if(tplParamNames && tplParamNames.include(hashedParams.get('name'))) continue;
+            if(this.currentRepoIsTemplate && driverParams[i].getAttribute('no_templates') == 'true'){
+                continue;
+            }else if(!this.currentRepoIsTemplate && driverParams[i].getAttribute('templates_only') == 'true'){
+                continue;
+            }
 			driverParamsHash.push(hashedParams);
 		}
 				
@@ -906,7 +915,6 @@ ConfigEditor = Class.create({
 		this.currentForm = form;
 		this.currentRepoId = repo.getAttribute("index");
 		this.currentRepoWriteable = writeable;
-		this.currentRepoIsTemplate = (repo.getAttribute("isTemplate") === "true");
 		this.formManager.createParametersInputs(form, driverParamsHash, false, paramsValues, !writeable, false, this.currentRepoIsTemplate);
 		
 		if(!tplParams.length){

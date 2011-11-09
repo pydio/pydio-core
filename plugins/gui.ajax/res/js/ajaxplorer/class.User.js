@@ -225,6 +225,7 @@ Class.create("User", {
 	savePreference : function(prefName){
 		if(!this.preferences.get(prefName)) return;
 		var conn = new Connexion();
+        conn.setMethod('post');
 		conn.addParameter("get_action", "save_user_pref");
 		conn.addParameter("pref_name_" + 0, prefName);
 		conn.addParameter("pref_value_" + 0, this.preferences.get(prefName));

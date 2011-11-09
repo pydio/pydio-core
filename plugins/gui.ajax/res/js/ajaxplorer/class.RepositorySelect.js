@@ -151,6 +151,21 @@ Class.create("RepositorySelect", {
 	        actions = actions.concat(lastActions);
         }
 
+        var menuItems = $A();
+        var otherActions = ajaxplorer.actionBar.getActionsForAjxpWidget("RepositorySelect", this.element.id).each(function(otherAction){
+            menuItems.push({
+                name:otherAction.getKeyedText(),
+                alt:otherAction.options.title,
+                className:"edit",
+                image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
+                callback:function(e){this.apply();}.bind(otherAction)
+            });
+        });
+        if(menuItems.length){
+            actions.push({separator:true});
+            actions = actions.concat(menuItems);
+        }
+
 		if(this.repoMenu){
 			this.repoMenu.options.menuItems = actions;
 			this.repoMenu.refreshList();

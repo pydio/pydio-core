@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="imap" label="Mailbox (Imap or POP)" description="This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension." mixins="slug_provider">
+<ajxpdriver name="imap" label="Mailbox (Imap or POP)" description="This plugin will browse the content of a mailbox (imap or pop) and allow to grab emails attachments and copy them to another repository. Requires the PHP IMAP extension." mixins="slug_provider,template_provider">
 	<client_settings icon="plugins/access.imap/resources/images/16/mail_folder_inbox.png">
 		<resources>
 			<img_library alias="imap_images" path="plugins/access.imap/resources/images"/>	

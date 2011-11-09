@@ -39,6 +39,13 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			$publicUrlNode = $publicUrlNodeList->item(0);
 			$contribNode->removeChild($publicUrlNode);			
 		}		
+		if(!ConfService::getCoreConf("USER_CREATE_REPOSITORY", "conf") && $contribNode->nodeName == "actions"){
+			unset($this->actions["user_create_repository"]);
+			$actionXpath=new DOMXPath($contribNode->ownerDocument);
+			$publicUrlNodeList = $actionXpath->query('action[@name="user_create_repository"]', $contribNode);
+			$publicUrlNode = $publicUrlNodeList->item(0);
+			$contribNode->removeChild($publicUrlNode);
+		}
 	}
 	
 	// NEW FUNCTIONS FOR  LOADING/SAVING PLUGINS CONFIGS
@@ -242,22 +249,22 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$bmUser = $confStorage->createUserObject("shared");
 				}
 				if($bmUser == null) exit(1);
-				if(isSet($_GET["bm_action"]) && isset($_GET["bm_path"]))
+				if(isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"]))
 				{
-					if($_GET["bm_action"] == "add_bookmark")
+					if($httpVars["bm_action"] == "add_bookmark")
 					{
 						$title = "";
-						if(isSet($_GET["bm_title"])) $title = $_GET["bm_title"];
-						if($title == "" && $_GET["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
-						$bmUser->addBookMark(SystemTextEncoding::magicDequote($_GET["bm_path"]), SystemTextEncoding::magicDequote($title));
+						if(isSet($httpVars["bm_title"])) $title = $httpVars["bm_title"];
+						if($title == "" && $httpVars["bm_path"]=="/") $title = ConfService::getCurrentRootDirDisplay();
+						$bmUser->addBookMark(SystemTextEncoding::magicDequote($httpVars["bm_path"]), SystemTextEncoding::magicDequote($title));
 					}
-					else if($_GET["bm_action"] == "delete_bookmark")
+					else if($httpVars["bm_action"] == "delete_bookmark")
 					{
-						$bmUser->removeBookmark($_GET["bm_path"]);
+						$bmUser->removeBookmark($httpVars["bm_path"]);
 					}
-					else if($_GET["bm_action"] == "rename_bookmark" && isset($_GET["bm_title"]))
+					else if($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"]))
 					{
-						$bmUser->renameBookmark($_GET["bm_path"], $_GET["bm_title"]);
+						$bmUser->renameBookmark($httpVars["bm_path"], $httpVars["bm_title"]);
 					}
 				}
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
@@ -283,10 +290,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				
 				$userObject = AuthService::getLoggedUser();
 				$i = 0;
-				while(isSet($_GET["pref_name_".$i]) && isSet($_GET["pref_value_".$i]))
+				while(isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i]))
 				{
-					$prefName = AJXP_Utils::sanitize($_GET["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
-					$prefValue = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote(($_GET["pref_value_".$i])));
+					$prefName = AJXP_Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
+					$prefValue = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote(($httpVars["pref_value_".$i])));
 					if($prefName == "password") continue;
 					if($prefName != "pending_folder" && $userObject == null){
 						$i++;
@@ -366,7 +373,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				print(json_encode($prefs));
 				
 			break;
-			
+
 			default;
 			break;
 		}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="webdav" label="WebDAV (PEAR)" description="Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." mixins="credentials_consumer,filesystem_commons,slug_provider">
+<ajxpdriver name="webdav" label="WebDAV (PEAR)" description="Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
 	<client_settings icon="plugins/access.fs/icon.png"/>
 	<server_settings>
 		<param name="HOST" type="string" label="Host" description="Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." mandatory="true" default="http://webdav.host.com"/>

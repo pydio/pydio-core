@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="ftp" label="FTP Server" description="This driver can access a remote FTP server" mixins="credentials_consumer,filesystem_commons,slug_provider">
+<ajxpdriver name="ftp" label="FTP Server" description="This driver can access a remote FTP server" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
 	<client_settings icon="plugins/access.ftp/icon.png"/>
 	<server_settings>
 		<param group="Connexion" name="FTP_HOST" type="string" label="Host" description="Ftp Host to connect to" mandatory="true"/>
@@ -9,6 +9,7 @@
 		<param group="Connexion" name="FTP_DIRECT" type="boolean" label="Active" description="Whether to use active or passive" mandatory="true" default="false"/>
 		<param group="FTP Server Tweaks" name="FIX_PERMISSIONS" type="select" choices="detect_remote_user_id|Detect remote server user,user|Copy user perms to all,group|Copy group perms to all" label="Fix Permissions" description="How to handle remote permissions to be used by PHP as local permissions. See manual." mandatory="false" default="detect_remote_user_id"/>
 	    <param group="FTP Server Tweaks" name="TMP_UPLOAD" type="string" label="Temporary Folder" description="Temporary folder on the local server used for file uploads. For the moment, it must be placed under your ajaxplorer folder and you must create it and set it writeable by Apache." default="/tmp" mandatory="true"/>
+        <param group="Dynamic FTP" name="DYNAMIC_FTP" type="boolean" label="Pass Ftp data through Auth driver" description="In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." mandatory="false" default="false"/>
 	</server_settings>
 	<registry_contributions>
 		<client_configs>

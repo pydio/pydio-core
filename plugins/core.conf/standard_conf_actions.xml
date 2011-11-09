@@ -6,6 +6,26 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+        <action name="user_create_repository">
+            <gui text="403" title="403" src="drive_remote.png" accessKey="" hasAccessKey="false">
+                <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"></context>
+            </gui>
+            <processing>
+				<clientCallback prepareModal="true" dialogOpenForm="user_create_repository_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+					<dialogOnOpen><![CDATA[
+					]]></dialogOnOpen>
+					<dialogOnComplete hideDialog="true"><![CDATA[
+					]]></dialogOnComplete>
+					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+				</clientCallback>
+				<clientForm id="user_create_repository_form"><![CDATA[
+					<div id="user_create_repository_form" action="user_create_repository" box_width="202">
+						"Create your own repository"
+					</div>
+				]]></clientForm>
+                <serverCallback methodName="switchAction"></serverCallback>
+            </processing>
+        </action>
 		<action name="get_bookmarks">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>

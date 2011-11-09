@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver active="false" name="dropbox" label="Dropbox" description="This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." mixins="filesystem_commons,slug_provider">
+<ajxpdriver active="false" name="dropbox" label="Dropbox" description="This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." mixins="filesystem_commons,slug_provider,template_provider">
 	<client_settings icon="plugins/access.dropbox/dropboxLogo.png"/>
 	<server_settings>
 		<param name="CONSUMER_KEY" type="string" label="Consumer Key" description="Key" mandatory="true"/>
