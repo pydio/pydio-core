@@ -69,12 +69,34 @@ Class.create("Connexion", {
 			this.addParameter('secure_token', Connexion.SECURE_TOKEN);
 		}
 	},
-	
+
+    /**
+     * Show a small loader
+     */
+    showLoader : function(){
+        if(!$('AjxpConnexion-loader') && window.ajxpBootstrap.parameters.get("theme")){
+            var img = new Element("img", {
+                src:ajxpResourcesFolder+"/images/ajxp-connexion-loader.gif",
+                id:'AjxpConnexion-loader',
+                style:'position:absolute;top:2px;right:2px;z-index:40000;display:none;'});
+            $$('body')[0].insert(img);
+        }
+        if($('AjxpConnexion-loader')) $('AjxpConnexion-loader').show();
+    },
+
+    /**
+     * Hide a small loader
+     */
+    hideLoader : function(){
+        if($('AjxpConnexion-loader'))$('AjxpConnexion-loader').hide();
+    },
+
 	/**
 	 * Send Asynchronously
 	 */
 	sendAsync : function(){	
 		this.addSecureToken();
+        this.showLoader();
 		new Ajax.Request(this._baseUrl, 
 		{
 			method:this._method,
@@ -88,6 +110,7 @@ Class.create("Connexion", {
 	 */
 	sendSync : function(){	
 		this.addSecureToken();
+        this.showLoader();
 		new Ajax.Request(this._baseUrl, 
 		{
 			method:this._method,
@@ -102,6 +125,7 @@ Class.create("Connexion", {
 	 * @param transport Transpot
 	 */
 	applyComplete : function(transport){
+        this.hideLoader();
 		var message;
 		var headers = transport.getAllResponseHeaders();
 		if(Prototype.Browser.Gecko && transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName=="parsererror"){
