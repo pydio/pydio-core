@@ -56,12 +56,18 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 
 	
 	public function applyAction($actionName, $httpVars, $fileVars){
+        $messages = ConfService::getMessages();
 		if($actionName == "search"){
 			require_once("Zend/Search/Lucene.php");
             if($this->isIndexLocked(ConfService::getRepository()->getId())){
-                throw new Exception("Warning, the repository is currently being indexed, please retry later.");
+                throw new Exception($messages["index.lucene.6"]);
             }
-			$index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
+            try{
+                $index =  $this->loadIndex(ConfService::getRepository()->getId(), false);
+            }catch(Exception $ex){
+                $this->applyAction("index", array(), array());
+                throw new Exception($messages["index.lucene.7"]);
+            }
 			if(isSet($this->metaFields) && isSet($httpVars["fields"])){
                 $sParts = array();
                 foreach(explode(",",$httpVars["fields"]) as $searchField){
@@ -100,7 +106,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             if(empty($dir)) $dir = "/";
             $repo = ConfService::getRepository();
             if($this->isIndexLocked($repo->getId())){
-                throw new Exception("Warning there seem to be already an indexation running! Please wait!");
+                throw new Exception($messages["index.lucene.6"]);
             }
             $accessType = $repo->getAccessType();
             $accessPlug = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
@@ -114,7 +120,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()){
                 AJXP_Controller::applyActionInBackground($repoId, "index", $httpVars);
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array(), "Indexing $dir in background", true, 2);
+                AJXP_XMLWriter::triggerBgAction("check_lock", array(), sprintf($messages["index.lucene.8"], $dir), true, 2);
                 AJXP_XMLWriter::close();
                 return;
             }
@@ -139,11 +145,11 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             $repoId = $httpVars["repository_id"];
             if($this->isIndexLocked($repoId)){
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), "Indexation runnning in background", true, 3);
+                AJXP_XMLWriter::triggerBgAction("check_lock", array("repository_id" => $repoId), sprintf($messages["index.lucene.8"], ""), true, 3);
                 AJXP_XMLWriter::close();
             }else{
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("info_message", array(), "Indexation finished!", true, 5);
+                AJXP_XMLWriter::triggerBgAction("info_message", array(), $messages["index.lucene.5"], true, 5);
                 AJXP_XMLWriter::close();
             }
         }
@@ -312,7 +318,8 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 		    $index = Zend_Search_Lucene::open($iPath);
 		}else{
             if(!$create){
-                throw new Exception("Cannot find index for current repository! You should trigger the indexation of the data first!");
+                $messages = ConfService::getMessages();
+                throw new Exception($messages["index.lucene.9"]);
             }
 		    $index = Zend_Search_Lucene::create($iPath);
 		}

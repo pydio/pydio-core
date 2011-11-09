@@ -18,15 +18,15 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
- 
+
 $mess = array(
-    "1" => "Index Inhalt",
-    "2" => "Index Verzeichnisinhalt",
-    "3" => "Indexieren im Hintergrund ausführen",
-    "4" => "Der Index scheint gesperrt zu sein, ein Indexierungsprozess könnte bereits laufen. Falls nicht, bitte die .ajxp_lock-Datei im Verzeichnis cache/indexes löschen.",
-    "5" => "Indexierung abgeschlossen",
-    "6" => "Warning, the repository is currently being indexed, please retry later.",
-    "7" => "First indexing of this repository, please wait and retry your search",
-    "8" => "Indexing %s in background",
-    "9" => "Cannot find index for current repository! You should trigger the indexation of the data first!",
+    "1" => "Indexer",
+    "2" => "Indexer le contenu du répertoire",
+    "3" => "Indexation en cours en arrière-plan",
+    "4" => "L'index est vérouillé, une indexation est peut-être en cours. Si ce n'est pas le cas, effacer à la main le fichier .ajxp_lock situé dans cache/indexes",
+    "5" => "Indexation terminée",
+    "6" => "Attention, le dépôt est en cours d'indexation, veuillez réessayer plus tard.",
+    "7" => "Lancement de la première indexation, veuillez attendre puis relancer votre recherche.",
+    "8" => "Indexation (%s) en arrière plan.",
+    "9" => "Impossible de trouver un index pour ce dépôt, vous devrier déclencher l'indexation d'abord.",
 );
