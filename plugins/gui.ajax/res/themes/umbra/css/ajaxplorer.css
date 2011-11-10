@@ -2600,6 +2600,7 @@ div.menu a {
     padding: 0px;
     padding-top: 1px;
     padding-bottom: 1px;
+    overflow-y: hidden;
 }
 
 .menu.desktop.toolbarmenu li {
