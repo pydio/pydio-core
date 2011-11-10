@@ -166,6 +166,7 @@ class Repository {
 	}
 	
 	function getOptionsDefined(){
+        return array_keys($this->options);
 		$keys = array();
 		foreach($this->options as $key => $value){
 			if(!empty($value)) $keys[] = $key;

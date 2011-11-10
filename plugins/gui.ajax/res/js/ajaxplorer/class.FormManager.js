@@ -29,7 +29,15 @@ Class.create("FormManager", {
 	initialize: function(){
 		
 	},
-	
+
+    parseParameters : function (xmlDocument, query){
+        var res = $A();
+        $A(XPathSelectNodes(xmlDocument, query)).each(function(node){
+            res.push(this.parameterNodeToHash(node));
+        }.bind(this));
+        return res;
+    },
+
 	parameterNodeToHash : function(paramNode){
 		var paramsAtts = $A(['name', 'group', 'type', 'label', 'description', 'default', 'mandatory', 'choices']);
 		var paramsHash = new Hash();

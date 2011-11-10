@@ -17,6 +17,7 @@
 	<template_provider>
 		<server_settings uuidAttr="name">
 			<param group="Template Options" name="TPL_USER_CAN_CREATE" type="boolean" label="Allow to user" description="Allow non-admin users to create a repository from this template." mandatory="true" default="false" templates_only="true"/>
+			<param group="Template Options" name="TPL_DEFAULT_LABEL" type="string" label="Default Label" description="Prefilled label for the new repository, you can use the AJXP_USER keyworkd in it." mandatory="true" templates_only="true"/>
             <param group="Template Options" name="TPL_ICON_SMALL" type="string" label="Small Icon" description="16X16 Icon for representing the template" mandatory="false" templates_only="true"/>
             <param group="Template Options" name="TPL_ICON_BIG" type="string" label="Big Icon" description="Big Icon for representing the template" mandatory="false" templates_only="true"/>
 		</server_settings>

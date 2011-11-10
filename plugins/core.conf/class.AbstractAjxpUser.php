@@ -159,6 +159,7 @@ abstract class AbstractAjxpUser
 		$repositoryObject = ConfService::getRepositoryById($repositoryId);
 		if($repositoryObject == null) return false;
 		if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
+        if($repositoryObject->getUniqueUser() && $this->id != $repositoryObject->getUniqueUser()) return false;
 		return ($this->canRead($repositoryId) || $this->canWrite($repositoryId)) ;
 	}
 	

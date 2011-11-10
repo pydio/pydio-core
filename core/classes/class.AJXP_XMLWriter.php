@@ -336,6 +336,9 @@ class AJXP_XMLWriter
 			if($rootDirObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
 				continue;
 			}
+            if($rootDirObject->getUniqueUser() && (!AuthService::usersEnabled() || $loggedUser->getId() == "shared" || $loggedUser->getId() != $rootDirObject->getUniqueUser() )){
+                continue;
+            }
 			if($loggedUser == null || $loggedUser->canRead($rootDirIndex) || $loggedUser->canWrite($rootDirIndex) || $details) {
 				// Do not display standard repositories even in details mode for "sub"users
 				if($loggedUser != null && $loggedUser->hasParent() && !($loggedUser->canRead($rootDirIndex) || $loggedUser->canWrite($rootDirIndex) )) continue;
@@ -358,6 +361,9 @@ class AJXP_XMLWriter
 				if(in_array($rootDirObject->accessType, $streams)){
 					$streamString = "allowCrossRepositoryCopy=\"true\"";
 				}
+                if($rootDirObject->getUniqueUser()){
+                    $streamString .= " user_editable_repository=\"true\" ";
+                }
 				$slugString = "";
 				$slug = $rootDirObject->getSlug();
 				if(!empty($slug)){

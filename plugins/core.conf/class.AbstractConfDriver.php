@@ -374,6 +374,114 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				
 			break;
 
+			case  "get_user_template_logo":
+
+                $tplId = $httpVars["template_id"];
+                $iconFormat = $httpVars["icon_format"];
+                $repo = ConfService::getRepositoryById($tplId);
+                $logo = $repo->getOption("TPL_ICON_".strtoupper($iconFormat));
+                header("image/png");
+                if(isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)){
+                    header("Content-Type: ".AJXP_Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                    header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
+                    header('Cache-Control: public');
+                    readfile(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo);
+                }else{
+                    $logo = "default_template_logo-".($iconFormat == "small"?16:22).".png";
+                    header("Content-Type: ".AJXP_Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                    header("Content-Length: ".filesize(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo));
+                    header('Cache-Control: public');
+                    readfile(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo);
+                }
+
+			break;
+                    
+			case  "get_user_templates_definition":
+
+				AJXP_XMLWriter::header("repository_templates");
+				$repositories = ConfService::getRepositoriesList();
+                $pServ = AJXP_PluginsService::getInstance();
+				foreach ($repositories as $repo){
+					if(!$repo->isTemplate) continue;
+                    if(!$repo->getOption("TPL_USER_CAN_CREATE")) continue;
+					$repoId = $repo->getUniqueId();
+					$repoLabel = $repo->getDisplay();
+					$repoType = $repo->getAccessType();
+					print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
+                    $driverPlug = $pServ->getPluginByTypeName("access", $repoType);
+                    $params = $driverPlug->getManifestRawContent("//param", "node");
+                    $tplDefined = $repo->getOptionsDefined();
+                    $defaultLabel = '';
+                    foreach($params as $paramNode){
+                        $name = $paramNode->getAttribute("name");
+                        if( strpos($name, "TPL_") === 0 ) {
+                            if($name == "TPL_DEFAULT_LABEL"){
+                                $defaultLabel = str_replace("AJXP_USER", AuthService::getLoggedUser()->getId(), $repo->getOption($name));
+                            }
+                            continue;
+                        }
+                        if( in_array($paramNode->getAttribute("name"), $tplDefined) ) continue;
+                        if($paramNode->getAttribute('no_templates') == 'true') continue;
+                        print($paramNode->ownerDocument->saveXML($paramNode));
+                    }
+                    // ADD LABEL
+                    echo '<param name="DISPLAY" type="string" label="'.$mess[359].'" description="'.$mess[429].'" mandatory="true" default="'.$defaultLabel.'"/>';
+					print("</template>");
+				}
+				AJXP_XMLWriter::close("repository_templates");
+
+
+			break;
+
+            case "user_create_repository" :
+
+                $tplId = $httpVars["template_id"];
+                $tplRepo = ConfService::getRepositoryById($tplId);
+                $options = array();
+                self::parseParameters($httpVars, $options);
+                $newRep = $tplRepo->createTemplateChild(AJXP_Utils::sanitize($httpVars["DISPLAY"]), $options, null, AuthService::getLoggedUser()->getId());
+                $res = ConfService::addRepository($newRep);
+                AJXP_XMLWriter::header();
+                if($res == -1){
+                    AJXP_XMLWriter::sendMessage(null, $mess[426]);
+                }else{
+                    $loggedUser = AuthService::getLoggedUser();
+                    $loggedUser->setRight($newRep->getUniqueId(), "rw");
+                    $loggedUser->save();
+                    AuthService::updateUser($loggedUser);
+
+                    AJXP_XMLWriter::sendMessage($mess[425], null);
+                    AJXP_XMLWriter::reloadDataNode("", $newRep->getUniqueId());
+                    AJXP_XMLWriter::reloadRepositoryList();
+                }
+                AJXP_XMLWriter::close();
+
+            break;
+
+            case "user_delete_repository" :
+
+                $repoId = $httpVars["repository_id"];
+                $repository = ConfService::getRepositoryById($repoId);
+                if(!$repository->getUniqueUser()||$repository->getUniqueUser()!=AuthService::getLoggedUser()->getId()){
+                    throw new Exception("You are not allowed to perform this operation!");
+                }
+                $res = ConfService::deleteRepository($repoId);
+                AJXP_XMLWriter::header();
+                if($res == -1){
+                    AJXP_XMLWriter::sendMessage(null, $mess[427]);
+                }else{
+                    $loggedUser = AuthService::getLoggedUser();
+                    $loggedUser->removeRights($repoId);
+                    $loggedUser->save();
+                    AuthService::updateUser($loggedUser);
+
+                    AJXP_XMLWriter::sendMessage($mess[428], null);
+                    AJXP_XMLWriter::reloadRepositoryList();
+                }
+                AJXP_XMLWriter::close();
+
+            break;
+
 			default;
 			break;
 		}
@@ -389,7 +497,48 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				
 		return $xmlBuffer;		
 	}
-	
+
+
+	public static function parseParameters(&$repDef, &$options, $userId = null){
+
+		foreach ($repDef as $key => $value)
+		{
+			$value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
+			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0 && strpos($key, "ajxptype") === false && strpos($key, "_checkbox") === false){
+				if(isSet($repDef[$key."_ajxptype"])){
+					$type = $repDef[$key."_ajxptype"];
+					if($type == "boolean"){
+						$value = ($value == "true"?true:false);
+					}else if($type == "integer"){
+						$value = intval($value);
+					}else if($type == "array"){
+						$value = explode(",", $value);
+					}else if($type == "password" && $userId!=null){
+	                    if (trim($value != "") && function_exists('mcrypt_encrypt'))
+	                    {
+	                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+	                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+	                        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
+	                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
+	                    }
+					}
+					unset($repDef[$key."_ajxptype"]);
+				}
+                if(isSet($repDef[$key."_checkbox"])){
+                    $checked = $repDef[$key."_checkbox"] == "checked";
+                    unset($repDef[$key."_checkbox"]);
+                    if(!$checked) continue;
+                }
+				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
+				unset($repDef[$key]);
+			}else{
+				if($key == "DISPLAY"){
+					$value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
+				}
+				$repDef[$key] = $value;
+			}
+		}
+	}
 
 }
 ?>

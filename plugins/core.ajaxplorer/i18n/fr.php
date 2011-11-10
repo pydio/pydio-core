@@ -1,23 +1,23 @@
 <?php
 /*
- * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
- * This file is part of AjaXplorer.
- *
- * AjaXplorer is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * AjaXplorer is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://www.ajaxplorer.info/>.
- */
+* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+* This file is part of AjaXplorer.
+*
+* AjaXplorer is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* AjaXplorer is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://www.ajaxplorer.info/>.
+*/
 //  French Translation by Charles du Jeu, corrected by GravuTrad
 $mess=array(
 "languageLabel" => "Français",
@@ -458,9 +458,22 @@ $mess=array(
 "412" => "Upload seulement",
 "413" => "Partagé par",
 "414" => "Naviguer avec les flèches et zoomer avec +/-",
-"415" => "Toggle left pane visibility",
-"416" => "Left Pane",
-"leftpane_accesskey" => "L",
+"415" => "Montrer/cacher la colonne de gauche",
+"416" => "Colonne",
+"leftpane_accesskey" => "l",
+"417" => "Ajouter un dépôt ...",
+"418" => "Créer votre propre dépôt",
+"419" => "Chargement des modèles...",
+"420" => "Modèles",
+"421" => "Nouveau %s",
+"422" => "Veuillez remplir les paramêtres requis. Passez sur les titres avec la souris pour avoir plus d'info.",
+"423" => "Supprimer le dépôt",
+"424" => "Etes-vous sûr de vouloir supprimer ce dépôt? Cette opération est irréversible!",
+"425" => "Le dépôt est crée, il est accessible via la liste des dépôts (en haut à gauche). Si vous désirez le supprimer, mettez vous sur un autre dépôt et cliquez sur la crois rouge.",
+"426" => "Erreur à la création du dépôt",
+"427" => "Erreur à la suppression du dépôt",
+"428" => "Le dépôt a été supprimé",
+"429" => "Libellé du dépôt tel qu'il apparaîtra dans la liste",
 /* END SENTENCE */
 );
 ?>

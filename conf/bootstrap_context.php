@@ -74,7 +74,12 @@ function AjaXplorer_autoload($className){
 	$fileName = AJXP_BIN_FOLDER."/"."interface.".$className.".php";
 	if(file_exists($fileName)){
 		require_once($fileName);
+        return;
 	}
+    $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php");
+    if($corePlugClass !== false && count($corePlugClass)){
+        require_once($corePlugClass[0]);
+    }
 }
 spl_autoload_register('AjaXplorer_autoload');
 
