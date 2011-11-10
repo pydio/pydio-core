@@ -33,28 +33,23 @@ global $AJXP_GLUE_GLOBALS;
 if(!isSet($AJXP_GLUE_GLOBALS)){
 	$AJXP_GLUE_GLOBALS = array();
 }
-if (!isSet($CURRENTPATH)) $CURRENTPATH=str_replace("\\", "/", dirname(__FILE__));
+if (!isSet($CURRENTPATH)) {
+    $CURRENTPATH=realpath(__DIR__);
+    $FRAMEWORK_PATH = realpath($CURRENTPATH."/../../");
+}
 
-include_once("$CURRENTPATH/../../base.conf.php");
-include_once("$CURRENTPATH/../../conf/bootstrap_context.php");
+include_once($FRAMEWORK_PATH."/base.conf.php");
 
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Logger.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Plugin.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_PluginsService.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AjxpRole.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AJXP_Utils.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.Repository.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AbstractAccessDriver.php");
-if (!class_exists("SessionSwitcher")) require_once("$CURRENTPATH/sessionSwitcher.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.ConfService.php");
-require_once("$CURRENTPATH/../../".AJXP_BIN_FOLDER_REL."/class.AuthService.php");    
+if (!class_exists("SessionSwitcher")) {
+    require_once("$CURRENTPATH/sessionSwitcher.php");
+}
 $pServ = AJXP_PluginsService::getInstance();
-define ("CLIENT_RESOURCES_FOLDER", "");
 ConfService::init();
 $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
-$pServ->loadPluginsRegistry("$CURRENTPATH/../../plugins", $confPlugin);
-require_once("$CURRENTPATH/../../plugins/conf.".$confPlugin->getName()."/class.AJXP_User.php");
+$pServ->loadPluginsRegistry("$FRAMEWORK_PATH/plugins", $confPlugin);
+require_once("$FRAMEWORK_PATH/plugins/conf.".$confPlugin->getName()."/class.AJXP_User.php");
 ConfService::start();
+
 $plugInAction = $AJXP_GLUE_GLOBALS["plugInAction"];
 $secret = $AJXP_GLUE_GLOBALS["secret"];
 
@@ -63,13 +58,13 @@ $authPlug = ConfService::getAuthDriverImpl();
 if ($authPlug->getOption("SECRET") == "")
 {
     if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])){
-       die("This file must be included and can't be called directly");
+       die("This file must be included and cannot be called directly");
     }
     if ($_SERVER['PHP_SELF'] != $authPlug->getOption("LOGIN_URL")){
-       $plugInAction = "zoooorg";
+       $plugInAction = "WRONG_URL";
     }
 } else if ($secret != $authPlug->getOption("SECRET")){
-    $plugInAction = "zuuuuup";
+    $plugInAction = "WRONG_SECRET";
 }
 
 switch($plugInAction)
