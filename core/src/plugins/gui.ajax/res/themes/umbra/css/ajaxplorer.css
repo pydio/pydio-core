@@ -2552,6 +2552,7 @@ div.menu a {
 	margin: 0;
 	padding: 0;
 	list-style: none;
+    overflow-x: hidden;
 }
 .menu li {
 	list-style-position: outside;
@@ -2782,16 +2783,18 @@ div.menu a {
     right: 0px;
     top: 1px;
     text-align: right;
+    padding-top:2px !important;
 }
 
 .menuActions a{
 	width: 18px;
 	padding: 1px;
-	display: inline !important;
+	display: inline-block !important;
 	filter:alpha(opacity=30);
 	opacity: 0.3;
 	-moz-opacity:0.3;
 	cursor: pointer !important;
+    height: 16px;
 }
 
 .menuActions a:hover

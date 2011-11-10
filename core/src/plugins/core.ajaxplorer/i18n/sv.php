@@ -1,23 +1,23 @@
 <?php
 /*
- * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
- * This file is part of AjaXplorer.
- *
- * AjaXplorer is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * AjaXplorer is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://www.ajaxplorer.info/>.
- */
+* Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+* This file is part of AjaXplorer.
+*
+* AjaXplorer is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* AjaXplorer is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <http://www.ajaxplorer.info/>.
+*/
 $mess=array(
 "languageLabel" => "Svenska",
 "date_format"  => "Y/m/d H:i",
@@ -459,6 +459,19 @@ $mess=array(
 "415" => "Toggle left pane visibility",
 "416" => "Left Pane",
 "leftpane_accesskey" => "L",
+"417" => "Add repository ...",
+"418" => "Create your own repository",
+"419" => "Loading templates...",
+"420" => "Templates",
+"421" => "New %s",
+"422" => "Please fill the required parameters. Fly over the field titles with your mouse to have more information.",
+"423" => "Delete repository",
+"424" => "Are you sure you want to delete this repository? The operation is irreversible.",
+"425" => "The repository is now created, it is added to your repository list, if you want to remove it, make sure to switch to another repository, then click on the red cross beside the repository name.",
+"426" => "There was an error while creating the repository",
+"427" => "There was an error while deleting the repository",
+"428" => "The repository was successfully deleted",
+"429" => "This is how the repository will appear in your list.",
 /* END SENTENCE */
 );
 ?>

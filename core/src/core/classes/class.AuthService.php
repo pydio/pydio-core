@@ -240,8 +240,8 @@ class AuthService
 			$adminUser = $confStorage->createUserObject("admin"); 
 			$adminUser->setAdmin(true);
 			$adminUser->save();
-			$START_PARAMETERS["ALERT"] .= "You may come from a previous version. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
-		}
+			$START_PARAMETERS["ALERT"] .= "There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
+    	}
 	}
     
     static function getLogoutAddress($logUserOut = true)

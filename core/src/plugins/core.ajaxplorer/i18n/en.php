@@ -461,5 +461,18 @@ $mess=array(
 "415" => "Toggle left pane visibility",
 "416" => "Left Pane",
 "leftpane_accesskey" => "L",
+"417" => "Add repository ...",
+"418" => "Create your own repository",
+"419" => "Loading templates...",
+"420" => "Templates",
+"421" => "New %s",
+"422" => "Please fill the required parameters. Fly over the field titles with your mouse to have more information.",
+"423" => "Delete repository",
+"424" => "Are you sure you want to delete this repository? The operation is irreversible.",
+"425" => "The repository is now created, it is added to your repository list, if you want to remove it, make sure to switch to another repository, then click on the red cross beside the repository name.",
+"426" => "There was an error while creating the repository",
+"427" => "There was an error while deleting the repository",
+"428" => "The repository was successfully deleted",
+"429" => "This is how the repository will appear in your list.",
 );
 ?>

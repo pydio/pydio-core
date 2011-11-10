@@ -51,6 +51,10 @@ Class.create("Repository", {
 	 * @var Boolean
 	 */
 	allowCrossRepositoryCopy:false,
+    /**
+     * @var Boolean
+     */
+    userEditable:false,
 	/**
 	 * @var String
 	 */
@@ -167,6 +171,9 @@ Class.create("Repository", {
 	loadFromXml: function(repoNode){
 		if(repoNode.getAttribute('allowCrossRepositoryCopy') && repoNode.getAttribute('allowCrossRepositoryCopy') == "true"){
 			this.allowCrossRepositoryCopy = true;
+		}
+		if(repoNode.getAttribute('user_editable_repository') && repoNode.getAttribute('user_editable_repository') == "true"){
+			this.userEditable = true;
 		}
 		if(repoNode.getAttribute('access_type')){
 			this.setAccessType(repoNode.getAttribute('access_type'));

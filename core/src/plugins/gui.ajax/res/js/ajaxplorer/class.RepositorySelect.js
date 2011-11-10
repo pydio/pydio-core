@@ -117,6 +117,9 @@ Class.create("RepositorySelect", {
 						this.onRepoSelect(''+key);
 					}.bind(this)
 				};
+                if(repoObject.userEditable){
+                    actionData.moreActions = this.getContextActions(key);
+                }
 				if(repoObject.getAccessType() == "ajxp_shared" || repoObject.getAccessType() == "ajxp_conf"){
 					lastActions.push(actionData);
                 }else if(repoObject.getOwner()){
@@ -206,6 +209,34 @@ Class.create("RepositorySelect", {
 		}else{
 			this.showElement(true);
 		}
+	},
+
+	/**
+	 * Gets the bookmark actions for a bookmark
+	 * @param bmPath String
+	 * @param bmTitle String
+	 */
+	getContextActions: function(repositoryId){
+
+		var removeAction = {
+				name:MessageHash[423],
+				alt:MessageHash[423],
+				image:ajxpResourcesFolder+'/images/actions/16/delete_bookmark.png',
+				disabled:false,
+				className:"edit",
+				callback:function(e){
+					if(window.confirm(MessageHash[424])){
+                        var conn = new Connexion();
+                        conn.setParameters({get_action:'user_delete_repository', repository_id:repositoryId});
+                        conn.onComplete = function(transport){
+                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                        };
+                        conn.sendAsync();
+                    }
+				}.bind(this)
+			};
+
+		return new Array(removeAction);
 	},
 	/**
 	 * Show/hide element
