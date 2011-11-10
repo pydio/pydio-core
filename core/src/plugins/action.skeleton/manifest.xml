@@ -1,28 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <action name="skeleton" enabled="false" label="Skeleton Plugin" description="This is an empty container to demonstrate the basics of plugins coding." >
     <server_settings>
-        <!--
-        exposed : Whether this parameter value will be sent to the client, i.e exposed to the world
-        name    : technical name of the parameter
-        type    : "string", "boolean", "textarea", "password", "select" (in the later case, one must find the choices attribute)
-        label   : displayed in the GUI
-        description : ...
-        mandatory : must be non empty
-        default : a default value
-        -->
-        <global_param exposed="true" name="BUTTON_TARGET_URL" type="string" label="Target Url" description="The target URL of the button that will be added to the application" mandatory="true" default="http://www.ajaxplorer.info"/>
-
+        <global_param name="SHOW_CUSTOM_FOOTER" type="boolean" label="Custom Footer" description="Show a custom footer div" mandatory="false" default="false"/>
+        <global_param name="CUSTOM_FOOTER_CONTENT" type="textarea" label="Footer Content" description="Display this content in the footer" mandatory="false" default="Your custom footer content"/>
+        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="Button Target Url" description="The target URL of the button that will be added to the application" mandatory="true" default="http://www.ajaxplorer.info"/>
     </server_settings>
+
+    <client_settings>
+        <resources>
+            <i18n namespace="skeleton" path="plugins/action.skeleton/res/i18n"/>
+            <img_library alias="skeleton_images" path="plugins/action.skeleton/res/images"/>
+        </resources>
+    </client_settings>
 
 	<registry_contributions>
 		<client_configs uuidAttr="name">
 			<template name="bottom" element="ajxp_desktop" position="after"><![CDATA[
-				<div id="optional_bottom_div">Your custom footer content</div>
+				<div id="optional_bottom_div" style="font-family:arial;padding:10px;">This CDATA section will be overriden by the PHP part of the plugin</div>
 			]]></template>
 			<template name="head" element="ajxp_desktop" position="top"><![CDATA[
-				<div id="optional_header_div" style="border: 1px solid black;">Your custom header content</div>
+				<div id="optional_header_div" style="background-color: #999; color: white;font-family:arial;padding:10px;">Your custom header content</div>
 			]]></template>
 		</client_configs>
+        <actions>
+            <action name="my_skeleton_button">
+                <gui text="skeleton.1" title="skeleton.2" src="skeleton_images/ICON_SIZE/url.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var confs = ajaxplorer.getPluginConfigs("action[@name='skeleton']");
+                        var target = confs.get('CUSTOM_BUTTON_TARGET');
+                        if(window.confirm(MessageHash['skeleton.3'].replace('%s', target))){
+                            window.open(target, "my_popup");
+                        }
+                    ]]></clientCallback>
+                </processing>
+            </action>
+        </actions>
 	</registry_contributions>
-	<class_definition filename="plugins/action.skeleton/class.PluginSkeleton.php" classname="HookDemo"/>
+	<class_definition filename="plugins/action.skeleton/class.PluginSkeleton.php" classname="PluginSkeleton"/>
 </action>
