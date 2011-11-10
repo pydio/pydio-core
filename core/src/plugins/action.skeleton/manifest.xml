@@ -37,6 +37,31 @@
                     ]]></clientCallback>
                 </processing>
             </action>
+            <action name="my_skeleton_button_frame">
+                <gui text="skeleton.4" title="skeleton.5" src="skeleton_images/ICON_SIZE/user-desktop.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var dialogLoadFunction = function(){
+                            var conn = new Connexion();
+                            conn.addParameter("get_action", "my_skeleton_button_frame");
+                            conn.onComplete = function(transport){
+                                $('loaded_content').update(transport.responseText);
+                            }
+                            conn.sendAsync();
+                        };
+                        modal.showDialogForm("My Link", "my_skeleton_form", dialogLoadFunction);
+                    ]]></clientCallback>
+                    <clientForm id="my_skeleton_form"><![CDATA[
+                        <div id="my_skeleton_form" box_width="450">
+                            <h3>AJXP_MESSAGE[skeleton.6]</h3>
+                            <div id="loaded_content"><p align="center">AJXP_MESSAGE[skeleton.7]</p></div>
+                        </div>
+                    ]]></clientForm>
+                    <serverCallback methodName="receiveAction" pluginId="action.skeleton"/>
+                </processing>
+            </action>
         </actions>
 	</registry_contributions>
 	<class_definition filename="plugins/action.skeleton/class.PluginSkeleton.php" classname="PluginSkeleton"/>

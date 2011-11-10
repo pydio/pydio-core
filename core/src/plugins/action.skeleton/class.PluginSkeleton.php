@@ -52,6 +52,20 @@ class PluginSkeleton extends AJXP_Plugin {
         }
     }
 
+    /**
+     * @param String $action
+     * @param Array $httpVars
+     * @param Array $fileVars
+     * @return void
+     */
+    function receiveAction($action, $httpVars, $fileVars){
+        if($action == "my_skeleton_button_frame"){
+            header("Content-type:text/html");
+            print("<p>This is a <b>dynamically</b> generated content. It is sent back to the client by the server, thus it can be the result of what you want : a query to a remote API, a constant string (like it is now), or any specific data stored by the application...</p>");
+            print("<p>Here the server sends back directly HTML that is displayed by the client, but other formats can be used when it comes to more structured data, allowing the server to stay focus on the data and the client to adapt the display : <ul><li>JSON : use <b>json_encode/json_decode</b> on the PHP side, and <b>transport.reponseJSON</b> on the client side</li><li>XML : print your own XML on the php side, and use <b>transport.responseXML</b> on the client side.</li><li>The advantage of HTML can also be used to send javascript instruction to the client.</li></ul></p>");
+        }
+    }
+
 	/**
 	 * This is an example of filter that can be hooked to the AJXP_VarsFilter, 
 	 * for using your own custom variables in the repositories configurations.
