@@ -48,6 +48,7 @@ Class.create("FormManager", {
 	},
 	
 	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox){
+        var b=document.body;
         var groupDivs = $H({});
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
@@ -115,6 +116,13 @@ Class.create("FormManager", {
 			    form.insert({'bottom':div});
             }else{
                 var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
+                b.insert(div);
+                var lab = div.down('.SF_label');
+                lab.setStyle({width:parseInt(39*320/100)+'px'});
+                if( parseInt(lab.getHeight()) > 30){
+                    lab.next().setStyle({marginTop:'20px'});
+                }
+                lab.setStyle({width:'39%'});
                 gDiv.insert(div);
                 groupDivs.set(group, gDiv);
             }
