@@ -25,25 +25,33 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package info.ajaxplorer.plugins
  * Simple non-fonctionnal plugin for demoing pre/post processes hooks
  */
-class HookDemo extends AJXP_Plugin {
-		
-	public function preProcess($action, $httpVars, $fileVars){		
-		AJXP_Logger::logAction("pre_".$action, $httpVars);
-		return true;
-	}
-	
-	public function postProcess($action, $httpVars, $params){		
-		AJXP_Logger::logAction("post_".$action, $httpVars);
-		return "postProc1";
-	}
+class PluginSkeleton extends AJXP_Plugin {
 
-	public function postProcess2($action, $httpVars, $params){
-		AJXP_Logger::logAction("2post_".$action, $httpVars);		
-		print($params["ob_output"]);
-		return "postProc2";
-	}
-	
-	
+    /**
+     * @param DOMNode $contribNode
+     * @return void
+     */
+    public function parseSpecificContributions(&$contribNode){
+        if($contribNode->nodeName != "client_configs") return;
+        // This demonstrate how the tight integration of XML, PHP and JS Client make plugins programming
+        // very flexible. Here if the plugin configuration SHOW_CUSTOM_FOOTER is set to false, we
+        // dynamically remove some XML from the manifest before it's sent to the client, thus disabling
+        // the custom footer. In the other case, we update the XML Node content with the CUSTOM_FOOTER_CONTENT
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $footerTplNodeList = $actionXpath->query('template[@name="bottom"]', $contribNode);
+        $footerTplNode = $footerTplNodeList->item(0);
+        if(!$this->pluginConf["SHOW_CUSTOM_FOOTER"]){
+            $contribNode->removeChild($footerTplNode);
+        }else{
+            $content = $this->pluginConf["CUSTOM_FOOTER_CONTENT"];
+            $content = str_replace("\\n", "<br>", $content);
+            $cdata = '<div id="optional_bottom_div" style="font-family:arial;padding:10px;">'.$content.'</div>';
+            $cdataSection = $contribNode->ownerDocument->createCDATASection($cdata);
+            foreach($footerTplNode->childNodes as $child) $footerTplNode->removeChild($child);
+            $footerTplNode->appendChild($cdataSection);
+        }
+    }
+
 	/**
 	 * This is an example of filter that can be hooked to the AJXP_VarsFilter, 
 	 * for using your own custom variables in the repositories configurations.
