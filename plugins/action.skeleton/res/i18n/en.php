@@ -22,7 +22,11 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $mess = array(
-    "1" => "My Link",
+    "1" => "External Link",
     "2" => "Link added by the action.skeleton plugin",
     "3" => "Are you sure that you want to open %s in a new window?",
+    "4" => "Modal Link",
+    "5" => "Open the link in a modal dialog",
+    "6" => "Dynamic content",
+    "7" => "Loading content, please wait..."
 );
