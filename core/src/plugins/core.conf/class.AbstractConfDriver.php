@@ -389,12 +389,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 if(isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)){
                     header("Content-Type: ".AJXP_Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
                     header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
+                    header('Pragma:');
                     header('Cache-Control: public');
                     readfile(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo);
                 }else{
                     $logo = "default_template_logo-".($iconFormat == "small"?16:22).".png";
                     header("Content-Type: ".AJXP_Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
                     header("Content-Length: ".filesize(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo));
+                    header('Pragma:');
                     header('Cache-Control: public');
                     readfile(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo);
                 }

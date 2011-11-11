@@ -338,6 +338,10 @@ class ConfService
 		if(isSet($repository["AJXP_SLUG"])){
 			$repo->setSlug($repository["AJXP_SLUG"]);
 		}
+        if(isSet($repository["IS_TEMPLATE"]) && $repository["IS_TEMPLATE"]){
+            $repo->isTemplate = true;
+            $repo->uuid = $index;
+        }
 		if(array_key_exists("DRIVER_OPTIONS", $repository) && is_array($repository["DRIVER_OPTIONS"])){
 			foreach ($repository["DRIVER_OPTIONS"] as $oName=>$oValue){
 				$repo->addOption($oName, $oValue);

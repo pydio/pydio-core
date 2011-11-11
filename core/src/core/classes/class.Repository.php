@@ -107,26 +107,22 @@ class Repository {
 	}
 	
 	function getClientSettings(){
-		$fileName = AJXP_INSTALL_PATH."/plugins/access.".$this->accessType."/manifest.xml";
-		$settingLine = "";
-		if(is_readable($fileName)){
-			$lines = file($fileName);	
-			$inside = false;		
-			foreach ($lines as $line){
-				$compareLine = strtolower($line);				
-				if(preg_match('/\<client_settings/', trim($compareLine)) > 0){
-					$settingLine = trim($line);
-					if(preg_match("/\/\>/", trim($compareLine))>0 || preg_match("/\<\/client_settings\>/", trim($compareLine)>0)){
-						return $settingLine;
-					}
-					$inside = true;					
-				}else{
-					if($inside) $settingLine.=trim($line);
-					if(preg_match("/\<\/client_settings\>/", trim(strtolower($line)))>0) return $settingLine;
-				}
-			}
-		}
-		return $settingLine;
+        $plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
+        if(!$plugin) return "";
+        if(isSet($this->parentId)){
+            $parentObject = ConfService::getRepositoryById($this->parentId);
+            if($parentObject != null && $parentObject->isTemplate){
+                $ic = $parentObject->getOption("TPL_ICON_SMALL");
+                $settings = $plugin->getManifestRawContent("//client_settings", "node");
+                if(!empty($ic) && $settings->length){
+                    $newAttr = $settings->item(0)->ownerDocument->createAttribute("icon_tpl_id");
+                    $newAttr->nodeValue = $this->parentId;
+                    $settings->item(0)->appendChild($newAttr);
+                    return $settings->item(0)->ownerDocument->saveXML($settings->item(0));
+                }
+            }
+        }
+        return $plugin->getManifestRawContent("//client_settings", "string");
 	}
 	
 	function detectStreamWrapper($register = false, &$streams=null){

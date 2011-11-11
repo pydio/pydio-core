@@ -28,6 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 $REPOSITORIES[0] = array(
 	"DISPLAY"		=>	"Default Files",
+    "DISPLAY_ID"    =>  430,
 	"AJXP_SLUG"		=>  "default",
 	"DRIVER"		=>	"fs",
 	"DRIVER_OPTIONS"=> array(
@@ -36,6 +37,37 @@ $REPOSITORIES[0] = array(
 		"RECYCLE_BIN" 	=> 	'recycle_bin',
 		"CHMOD_VALUE"   =>  '0600',
 		"DEFAULT_RIGHTS"=>  "",
+		"PAGINATION_THRESHOLD" => 500,
+		"PAGINATION_NUMBER" => 200,
+		"META_SOURCES"		=> array(
+			"metastore.serial"=> array(
+				"METADATA_FILE"	=> ".ajxp_meta",
+                "METADATA_FILE_LOCATION" => "infolders"
+            ),
+            "meta.user"     => array(
+				"meta_fields"		=> "comment",
+				"meta_labels"		=> "Comment",
+                "meta_visibility"   => "hidden"
+			),
+            "index.lucene" => array(
+                "index_meta_fields" => "comment"
+            )
+		)
+	),
+
+);
+
+$REPOSITORIES[1] = array(
+	"DISPLAY"		=>	"My Files",
+    "DISPLAY_ID"    =>  432,
+	"AJXP_SLUG"		=>  "my-files",
+	"DRIVER"		=>	"fs",
+	"DRIVER_OPTIONS"=> array(
+		"PATH"			=>	"AJXP_DATA_PATH/personal/AJXP_USER",
+		"CREATE"		=>	true,
+		"RECYCLE_BIN" 	=> 	'recycle_bin',
+		"CHMOD_VALUE"   =>  '0600',
+		"DEFAULT_RIGHTS"=>  "rw",
 		"PAGINATION_THRESHOLD" => 500,
 		"PAGINATION_NUMBER" => 200,
 		"META_SOURCES"		=> array(
@@ -73,4 +105,35 @@ $REPOSITORIES["ajxp_conf"] = array(
 	"DISPLAY_ID"		=>	"165",
 	"DRIVER"		=>	"ajxp_conf",
 	"DRIVER_OPTIONS"=> array()
+);
+
+$REPOSITORIES["fs_template"] = array(
+	"DISPLAY"		=>	"Sample Template",
+    "DISPLAY_ID"    =>  431,
+	"IS_TEMPLATE"	=>  true,
+	"DRIVER"		=>	"fs",
+	"DRIVER_OPTIONS"=> array(
+		"CREATE"		=>	true,
+		"RECYCLE_BIN" 	=> 	'recycle_bin',
+		"CHMOD_VALUE"   =>  '0600',
+		"PAGINATION_THRESHOLD" => 500,
+		"PAGINATION_NUMBER" => 200,
+        "PURGE_AFTER"       => 0,
+        "CHARSET"           => "",
+		"META_SOURCES"		=> array(
+			"metastore.serial"=> array(
+				"METADATA_FILE"	=> ".ajxp_meta",
+                "METADATA_FILE_LOCATION" => "infolders"
+            ),
+            "meta.user"     => array(
+				"meta_fields"		=> "comment",
+				"meta_labels"		=> "Comment",
+                "meta_visibility"   => "hidden"
+			),
+            "index.lucene" => array(
+                "index_meta_fields" => "comment"
+            )
+		)
+	),
+
 );
