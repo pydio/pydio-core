@@ -439,10 +439,10 @@ Class.create("HeaderResizer", {
 		Useless, we only pass in this function in IE
 		var cellPaddLeft = cell.getStyle('paddingLeft') || 0;
 		var cellPaddRight = cell.getStyle('paddingRight') || 0;
-		var labelPaddLeft = label.getStyle('paddingLeft') || 0;
 		var labelPaddRight = label.getStyle('paddingRight') || 0;
 		*/
-		var siblingWidth = 1 + (labelPadding || 0);
+        var labelPaddLeft = parseInt(label.getStyle('paddingLeft')) || 0;
+		var siblingWidth = 1 + labelPaddLeft +(labelPadding || 0);
 		label.siblings().each(function(sib){
 			siblingWidth += sib.getWidth();
 		});
