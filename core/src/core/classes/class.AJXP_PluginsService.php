@@ -383,7 +383,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		foreach($mixinNode->childNodes as $child){
  			if($child->nodeType != XML_ELEMENT_NODE) continue;
  			$uuidAttr = $child->getAttribute("uuidAttr") OR "name";
- 			$this->mergeNodes($manifestDoc, $child->nodeName, $uuidAttr, $child->childNodes);
+ 			$this->mergeNodes($manifestDoc, $child->nodeName, $uuidAttr, $child->childNodes, true);
  		}
 
  		// Reload plugin XPath
@@ -416,7 +416,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		else return $nodes;
  	}
  	
- 	protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes){
+ 	protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes, $doNotOverrideChildren = false){
  		// find or create parent
  		$parentSelection = $original->getElementsByTagName($parentName);
  		if($parentSelection->length){
@@ -431,6 +431,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  				}
  				$childrenSel = $xPath->query($query);
  				if($childrenSel->length){
+                     if($doNotOverrideChildren) continue;
  					foreach ($childrenSel as $existingNode){
 	 					// Clone as many as needed	 					
 	 					$clone = $original->importNode($child, true);
