@@ -474,6 +474,9 @@ $mess=array(
 "427" => "Erreur à la suppression du dépôt",
 "428" => "Le dépôt a été supprimé",
 "429" => "Libellé du dépôt tel qu'il apparaîtra dans la liste",
+"430" => "Fichiers",
+"431" => "Exemple de Modèle",
+"432" => "Mes Documents",
 /* END SENTENCE */
 );
 ?>
