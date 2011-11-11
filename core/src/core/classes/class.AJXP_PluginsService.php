@@ -489,7 +489,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		}
  		return false;
  	}
- 	
+
+     /**
+      * @param string $plugType
+      * @param string $plugName
+      * @return AJXP_Plugin
+      */
  	public function getPluginByTypeName($plugType, $plugName){
  		if(isSet($this->registry[$plugType]) && isSet($this->registry[$plugType][$plugName])){
  			return $this->registry[$plugType][$plugName];

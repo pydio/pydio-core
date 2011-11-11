@@ -29,6 +29,7 @@
             <param group="Filesystem Commons" name="CHARSET" type="string" label="Character Encoding" description="If your server does not set correctly its charset, it can be good to specify it here manually." mandatory="false"/>
             <param group="Filesystem Commons" name="PAGINATION_THRESHOLD" type="integer" label="Pagination Threshold" description="When a folder will contain more items than this number, display will switch to pagination mode, for better performances." default="500"/>
             <param group="Filesystem Commons" name="PAGINATION_NUMBER" type="integer" label="#Items per page" description="Once in pagination mode, number of items to display per page." default="200"/>
+            <global_param name="DEFAULT_METASOURCES" type="string" label="Default Metasources" description="Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" mandatory="false"/>
         </server_settings>
     </filesystem_commons>
     <authdriver_commons>

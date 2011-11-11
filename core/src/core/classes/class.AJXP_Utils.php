@@ -138,6 +138,18 @@ class AJXP_Utils
     }
     return realpath(sys_get_temp_dir());
   }
+
+    public static function parseCSL($string, $hash=false){
+        $exp = array_map("trim", explode(",", $string));
+        if(!$hash) return $exp;
+        $assoc = array();
+        foreach ($exp as $explVal){
+            $reExp = explode("|", $explVal);
+            if(count($reExp) == 1) $assoc[$reExp[0]] = $reExp[0];
+            else $assoc[$reExp[0]] = $reExp[1];
+        }
+        return $assoc;
+    }
   
   static function parseFileDataErrors($boxData)
   {
