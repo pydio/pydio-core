@@ -473,6 +473,9 @@ $mess=array(
 "427" => "There was an error while deleting the repository",
 "428" => "The repository was successfully deleted",
 "429" => "This is how the repository will appear in your list.",
+"430" => "Default Files",
+"431" => "Sample Template",
+"432" => "My Files",
 /* END SENTENCE */
 /* password strength tester */
 /* quick access keys */

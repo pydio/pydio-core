@@ -457,12 +457,12 @@ $mess=array(
 "408" => "WebDAV 共有を有効化しました。これが初めての設定でしたら、パスワードの更新をお忘れなく！",
 "409" => "WebDAV 共有を無効化しました",
 "410" => "WebDAV のパスワードを更新しました",
-"411" => "Open",
-"412" => "Upload only",
-"413" => "Shared by",
-"414" => "Use arrows to navigate and +/- to change zoom",
-"415" => "Toggle left pane visibility",
-"416" => "Left Pane",
+"411" => "開く",
+"412" => "アップロードのみ",
+"413" => "共有されています",
+"414" => "矢印で操作し、+/- でズーム倍率を変更する",
+"415" => "左ペインの表示/非表示を切り替える",
+"416" => "左ペイン",
 "leftpane_accesskey" => "L",
 "417" => "Add repository ...",
 "418" => "Create your own repository",
@@ -477,6 +477,9 @@ $mess=array(
 "427" => "There was an error while deleting the repository",
 "428" => "The repository was successfully deleted",
 "429" => "This is how the repository will appear in your list.",
+"430" => "Default Files",
+"431" => "Sample Template",
+"432" => "My Files",
 /* 文章はここまで */
 /* 文章終了 */
 );
