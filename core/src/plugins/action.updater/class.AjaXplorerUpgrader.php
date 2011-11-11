@@ -28,7 +28,7 @@ class AjaXplorerUpgrader {
     private $archiveHashMethod;
     private $markedFiles;
 
-    private $debugMode = TRUE;
+    private $debugMode = FALSE;
     private $cleanFile = "UPGRADE/CLEAN-FILES";
     private $additionalScript = "UPGRADE/PHP-SCRIPT";
     private $releaseNote = "UPGRADE/NOTE";
