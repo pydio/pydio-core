@@ -357,12 +357,15 @@ ConfigEditor = Class.create({
 		newTd.setStyle({height:newHeight});
 		if(!nosubmit)
 			submitButton.setStyle({marginTop:(parseInt(newHeight/2)-10)});
+        customPane.insert('<div style="clear:both"></div>');
+
 	},
 	
 	generateWalletsPane : function(xmlData){
 		var wallets = this.form.select("#wallets_pane")[0];
 		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
         repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
+        var count = 0;
 		for(var i=0;i<repositories.length;i++){
 			var repoNode = repositories[i];
 			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
@@ -372,12 +375,17 @@ ConfigEditor = Class.create({
 			var walletParams = XPathSelectNodes(xmlData, "admin_data/drivers/ajxpdriver[@name='"+accessType+"']/user_param");				
 			var walletValues = XPathSelectNodes(xmlData, "admin_data/user_wallet/wallet_data[@repo_id='"+repoId+"']");			
 			if(!walletParams.length) continue;			
-			
+			count++;
+
 			var walletPane = new Element('div', {className:"wallet_pane", id:"wallet_pane_"+repoId});
 			this.addRepositoryUserParams(walletPane, repoId, walletParams, walletValues);
 			wallets.insert(new Element('div', {style:'margin-top: 10px;'}).update(MessageHash['ajxp_conf.79']+' "<b>'+ repoLabel + '</b>"'));
+            walletPane.insert('<div style="clear:both"></div>');
 			wallets.insert(walletPane);
-		}			
+		}
+        if(count > 1){
+            wallets.setStyle({height: '150px', overflowY:'auto', overflowX:'hidden'});
+        }
 	},
 	
 	addRepositoryUserParams : function(walletPane, repoId, walletParams, walletValues){
