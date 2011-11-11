@@ -7,7 +7,7 @@
 			</processing>
 		</action>
         <action name="user_create_repository">
-            <gui text="417" title="418" src="hdd_external_unmount.png" accessKey="" hasAccessKey="false">
+            <gui text="417" title="418" src="user-create-repository.png" accessKey="" hasAccessKey="false">
                 <context selection="false" dir="" recycle="true" ajxpWidgets="RepositorySelect"></context>
             </gui>
             <processing>

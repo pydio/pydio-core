@@ -189,7 +189,11 @@ Class.create("Repository", {
 			if(childNode.nodeName == "label"){
 				this.setLabel(childNode.firstChild.nodeValue);
 			}else if(childNode.nodeName == "client_settings"){
-				this.setIcon(childNode.getAttribute('icon'));
+                if(childNode.getAttribute('icon_tpl_id')){
+                    this.setIcon(window.ajxpServerAccessPath+'&get_action=get_user_template_logo&template_id='+childNode.getAttribute('icon_tpl_id')+'&icon_format=small');
+                }else{
+                    this.setIcon(childNode.getAttribute('icon'));
+                }
 				for(var j=0; j<childNode.childNodes.length;j++){
 					var subCh = childNode.childNodes[j];
 					if(subCh.nodeName == 'resources'){
