@@ -12,6 +12,7 @@
         <global_param name="HIDE_FOLDERS" type="textarea" label="Hide folders" description="Comma-separated list of specific folders to hide"/>
         <global_param name="HIDE_FILENAMES" type="textarea" label="Hide files" description="Comma-separated list of specific files to hide"/>
         <global_param name="PROBE_REAL_SIZE" type="boolean" label="Real Size Probing" description="Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)" default="true"/>
+        <global_param name="DEFAULT_METASOURCES" type="string" label="Default Metasources" description="Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" mandatory="false" default="metastore.serial,index.lucene"/>
 	</server_settings>
 	<class_definition filename="plugins/access.fs/class.fsAccessDriver.php" classname="fsAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.fs/class.fsAccessWrapper.php" classname="fsAccessWrapper" protocol="ajxp.fs"/>

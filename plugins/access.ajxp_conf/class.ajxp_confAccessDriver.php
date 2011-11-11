@@ -523,12 +523,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$templateRepo = ConfService::getRepositoryById($templateId);
 					$newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"]);
 				}else{
+                    $pServ = AJXP_PluginsService::getInstance();
+                    $driver = $pServ->getPluginByTypeName("access", $repDef["DRIVER"]);
+
 					$newRep = ConfService::createRepositoryFromArray(0, $repDef);
-					if(!$isTemplate && is_file(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$newRep->getAccessType().".php"))
+                    $testFile = $driver->getBaseDir()."/test.".$newRep->getAccessType()."Access.php";
+					if(!$isTemplate && is_file($testFile))
 					{
-					    chdir(AJXP_TESTS_FOLDER."/plugins");
-						include(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$newRep->getAccessType().".php");
-						$className = "ajxp_".$newRep->getAccessType();
+					    //chdir(AJXP_TESTS_FOLDER."/plugins");
+						include($testFile);
+						$className = $newRep->getAccessType()."AccessTest";
 						$class = new $className();
 						$result = $class->doRepositoryTest($newRep);
 						if(!$result){
@@ -537,7 +541,26 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 							AJXP_XMLWriter::close();
 							return;
 						}
-					}					
+					}
+                    // Apply default metasource if any
+                    if($driver != null && $driver->getConfigs()!=null ){
+                        $confs = $driver->getConfigs();
+                        if(!empty($confs["DEFAULT_METASOURCES"])){
+                            $metaIds = AJXP_Utils::parseCSL($confs["DEFAULT_METASOURCES"]);
+                            $metaSourceOptions = array();
+                            foreach($metaIds as $metaID){
+                                $metaPlug = $pServ->getPluginById($metaID);
+                                if($metaPlug == null) continue;
+                                $pNodes = $metaPlug->getManifestRawContent("//param[@default]", "nodes");
+                                $defaultParams = array();
+                                foreach($pNodes as $domNode){
+                                    $defaultParams[$domNode->getAttribute("name")] = $domNode->getAttribute("default");
+                                }
+                                $metaSourceOptions[$metaID] = $defaultParams;
+                            }
+                            $newRep->addOption("META_SOURCES", $metaSourceOptions);
+                        }
+                    }
 				}
 
                 if ($this->repositoryExists($newRep->getDisplay()))
