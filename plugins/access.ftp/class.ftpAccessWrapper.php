@@ -198,8 +198,8 @@ class ftpAccessWrapper implements AjxpWrapper {
 					AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));					
 					$statValue = $res["stat"];					
 					// Make sure not to loose the "folder" nature!
-					$statValue["mode"] += 0040000;
-					$statValue[2] = $statValue["mode"];
+					//$statValue["mode"] += 0040000;
+					//$statValue[2] = $statValue["mode"];
 					return $statValue;
 				}
 			}
