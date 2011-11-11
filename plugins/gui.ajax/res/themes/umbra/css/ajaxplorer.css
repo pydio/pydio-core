@@ -536,7 +536,7 @@ html.boxshadow div.errorMessage{
 }
 
 .simple_tooltip_observer_active{
-    font-weight: bold;
+    text-decoration: underline;
 }
 
 .simple_tooltip_title{
