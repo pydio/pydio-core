@@ -477,6 +477,10 @@ $mess=array(
 "430" => "Fichiers",
 "431" => "Exemple de Modèle",
 "432" => "Mes Documents",
+"433" => "ready",
+"434" => "sending",
+"435" => "done",
+"436" => "error",
 /* END SENTENCE */
 );
 ?>

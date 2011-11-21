@@ -1,0 +1,25 @@
+<?php
+$mess = array(
+	"1" => "Download distant",
+	"2" => "Télécharger des fichiers depuis un autre serveur",
+	"3" => "m",
+	"4" => "Entrez une ou plusieurs adresses HTTP de fichiers que vous voulez télécharger. Cette action sera effectuée en arrière-plan et vous pourrez continuer à utiliser AjaXplorer pendant ce temps.",
+	"5" => "URL",
+	"6" => "Chargement",
+	"7" => "sur le serveur",
+	"8" => "Fichier téléchargé, rechargement du client!",
+    "9" => "Générer le bookmarklet",
+    "10"=> "Envoyer sur AjaXplorer",
+    "10a"=> "Envoyer dans %s",
+    "10b"=> "Env. dans %s",
+    "10c"=> "Env. dans %s",
+    "10d"=> "AjXp Chargement (%s)",
+    "11"=> "Glissez l'un des liens suivants dans votre barre de favoris : ",
+    "12"=> "Déclencher le chargement de fichier distant.",
+    "13"=> "Depuis votre ordinateur",
+    "14"=> "Depuis un autre serveur",
+    "15"=> "Ou créez un favori manuellement et inserez-y le code suivante : ",
+    "16"=> "Glissez moi sur votre barre de favori!",
+    "17"=> "Télécharger le fichier",
+    "18"=> "Fichier partiel"
+);

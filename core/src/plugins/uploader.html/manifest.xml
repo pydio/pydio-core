@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.html" text="51" title="162" className="MultiUploader" label="HTML Uploader" description="Auto-switching HTML5 or IFrame uploader.">
 	<class_definition filename="plugins/uploader.html/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
+    <server_settings>
+        <global_param expose="true" name="DEFAULT_EXISTING" group="Default Behaviour" type="select" choices="overwrite|Always Override,rename|Auto Rename File,alert|Prompt user" label="Existing Files" description="Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)" mandatory="false" default="rename"/>
+        <global_param expose="true" name="DEFAULT_AUTO_START" group="Default Behaviour" type="boolean" label="Auto Start" description="Default value for automatically starting upload or not" mandatory="false" default="true"/>
+        <global_param expose="true" name="DEFAULT_AUTO_CLOSE" group="Default Behaviour" type="boolean" label="Auto Close" description="Default value for automatically closing the dialog after upload or not" mandatory="false" default="true"/>
+    </server_settings>
 	<resources>
 		<js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
 		<js file="plugins/uploader.html/class.XHRUploader.js" className="XHRUploader"/>

@@ -20,7 +20,8 @@
  */
 Class.create("XHRUploader", {
 	
-	
+	_globalConfigs:null,
+
 	initialize : function( formObject, mask ){
 
 		formObject = $(formObject);
@@ -33,6 +34,11 @@ Class.create("XHRUploader", {
 		this.count = 0;
 		// Current index
 		this.id = 0;
+
+        var confs = ajaxplorer.getPluginConfigs("uploader");
+        if(confs) this._globalConfigs = confs;
+        else this._globalConfigs = $H();
+
 		// Is there a maximum?
 		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['284']){
 			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
@@ -45,12 +51,13 @@ Class.create("XHRUploader", {
 			this.mask = $A(mask);
 		}
 		this.crtContext = ajaxplorer.getUserSelection();
-		
+
 		this.clearList();
 		
 		// INITIALIZE GUI, IF NOT ALREADY!
-		var sendButton = formObject.select('div[id="uploadSendButton"]')[0];
-		if(sendButton.observerSet){
+		this.sendButton = formObject.select('div[id="uploadSendButton"]')[0];
+        this.sendButton.addClassName("disabled");
+		if(this.sendButton.observerSet){
 			this.totalProgressBar = this.mainForm.PROGRESSBAR;
 			this.totalStrings = $('totalStrings');
 			this.uploadedString = $('uploadedString');			
@@ -72,10 +79,12 @@ Class.create("XHRUploader", {
 		
 		var optionsButton = formObject.select('div[id="uploadOptionsButton"]')[0];
 		var closeButton = formObject.select('div[id="uploadCloseButton"]')[0];
-		sendButton.observerSet = true;
-		sendButton.observe("click", function(){
-			ajaxplorer.actionBar.multi_selector.submit();
-		});
+		this.sendButton.observerSet = true;
+		this.sendButton.observe("click", function(){
+            if(!this.hasClassName("disabled")){
+			    ajaxplorer.actionBar.multi_selector.submit();
+            }
+		}.bind(this.sendButton) );
 		optionsButton.observe("click", function(){
 			var optionPane = this.mainForm.down('#uploader_options_pane');
 			var closeSpan = optionsButton.down('span');
@@ -234,6 +243,8 @@ Class.create("XHRUploader", {
 			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_send')){
 				autoSendValue = ajaxplorer.user.getPreference('upload_auto_send');
 				autoSendValue = (autoSendValue =="true" ? true:false);
+            }else if(this._globalConfigs.get('DEFAULT_AUTO_START')){
+                autoSendValue = this._globalConfigs.get('DEFAULT_AUTO_START');
 			}else{
 				var value = getAjxpCookie('upload_auto_send');
 				autoSendValue = ((value && value == "true")?true:false);				
@@ -244,6 +255,8 @@ Class.create("XHRUploader", {
 			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_close')){
 				autoCloseValue = ajaxplorer.user.getPreference('upload_auto_close');
 				autoCloseValue = (autoCloseValue =="true" ? true:false);
+            }else if(this._globalConfigs.get('DEFAULT_AUTO_CLOSE')){
+                autoCloseValue = this._globalConfigs.get('DEFAULT_AUTO_CLOSE');
 			}else{
 				var value = getAjxpCookie('upload_auto_close');
 				autoCloseValue = ((value && value == "true")?true:false);				
@@ -253,12 +266,14 @@ Class.create("XHRUploader", {
 			var existingValue = 'overwrite';
 			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_existing')){
 				existingValue = ajaxplorer.user.getPreference('upload_existing');
+            }else if(this._globalConfigs.get('DEFAULT_EXISTING')){
+                existingValue = this._globalConfigs.get('DEFAULT_EXISTING');
 			}else if(getAjxpCookie('upload_existing')){
 				var value = getAjxpCookie('upload_existing');				
 			}
 			optionPane.down('#uploader_existing_' + existingValue).checked = true;
 			
-		}
+		}.bind(this);
 		return optionPane;
 	},
 	
@@ -290,7 +305,8 @@ Class.create("XHRUploader", {
 			$A(this.listTarget.childNodes).each(function(node){
 				this.removeChild(node);
 			}.bind(this.listTarget) );
-		}		
+		}
+        if(this.sendButton) this.sendButton.addClassName("disabled");
 	},
 
 	/**
@@ -365,9 +381,9 @@ Class.create("XHRUploader", {
 		var id = 'pgBar_' + (this.listTarget.childNodes.length + 1);
 		this.createProgressBar(item, id);
 		item.file = file;
-		item.status = 'new';
-		item.statusText.update('[new]');
+		item.updateStatus('new');
 		this.updateTotalData();
+        this.sendButton.removeClassName("disabled");
 	},
 	
 	createProgressBar : function(item, id){
@@ -411,6 +427,16 @@ Class.create("XHRUploader", {
 		}.bind(item);
 		item.updateStatus = function(status){
 			this.status = status;
+            console.log(status);
+            var messageIds = {
+                "new" : 433,
+                "loading":434,
+                "loaded":435,
+                "error":436
+            };
+            try{
+                status = window.MessageHash[messageIds[status]];
+            }catch(e){};
 			this.statusText.innerHTML = "["+status+"]";
 		}.bind(item);
 	},
@@ -435,7 +461,9 @@ Class.create("XHRUploader", {
 					uploaded += item.file.size;
 				}			
 			});
-		}
+		}else{
+            if(this.sendButton) this.sendButton.addClassName("disabled");
+        }
 		if(size){
 			var percentage = Math.round(100*uploaded/size);
 		}
