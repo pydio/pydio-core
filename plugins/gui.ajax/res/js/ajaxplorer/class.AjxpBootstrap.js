@@ -164,9 +164,6 @@ Class.create("AjxpBootstrap", {
 		if(this.parameters.get("currentLanguage")){
 			window.ajaxplorer.currentLanguage = this.parameters.get("currentLanguage");
 		}
-		if(this.parameters.get("htmlMultiUploaderOptions")){
-			window.htmlMultiUploaderOptions = this.parameters.get("htmlMultiUploaderOptions");
-		}
 		$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
 		window.ajaxplorer.init();		
 	},

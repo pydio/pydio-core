@@ -46,11 +46,9 @@ Class.create("MultiUploader", {
 		if( mask ){
 			this.mask = mask;
 		}
-		
-		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['284']){
-			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
-		}
-		this.namesMaxLength = ajxpBootstrap.parameters.get("filenamesMaxLength");
+
+        this.max  = parseInt(ajaxplorer.getPluginConfigs("uploader").get("UPLOAD_MAX_NUMBER"));
+		this.namesMaxLength = ajaxplorer.getPluginConfigs("ajaxplorer").get("NODENAME_MAX_LENGTH");
 		
 		this.crtContext = ajaxplorer.getUserSelection();
 		this.addElement(formObject.select('.dialogFocus')[0]);
@@ -115,13 +113,10 @@ Class.create("MultiUploader", {
 			ajaxplorer.actionBar.multi_selector.submitMainForm();
 		});
 		optionsButton.observe("click", function(){
-			if(window.htmlMultiUploaderOptions){
-				var message = MessageHash[281] + '\n';
-				for(var key in window.htmlMultiUploaderOptions){
-					message += '. '+ MessageHash[key] + ' : ' + window.htmlMultiUploaderOptions[key] + '\n';
-				}
-				alert(message);
-			}
+            var message = MessageHash[281] + '\n';
+            message += '&nbsp;&nbsp;'+ MessageHash[282] + ':' + roundSize(this.maxUploadSize, '') + '\n';
+            message += '&nbsp;&nbsp;'+ MessageHash[284] + ':' + this.max;
+            alert(message);
 		}.bind(this));
 		closeButton.observe("click", function(){			
 			hideLightBox();

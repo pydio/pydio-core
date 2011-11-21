@@ -39,14 +39,9 @@ Class.create("XHRUploader", {
         if(confs) this._globalConfigs = confs;
         else this._globalConfigs = $H();
 
-		// Is there a maximum?
-		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['284']){
-			this.max = parseInt(window.htmlMultiUploaderOptions['284']);
-		}
-		if(window.htmlMultiUploaderOptions && window.htmlMultiUploaderOptions['282']){
-			this.maxUploadSize = parseInt(window.htmlMultiUploaderOptions['282']);
-		}
-		this.namesMaxLength = ajxpBootstrap.parameters.get("filenamesMaxLength");
+        this.max = parseInt(this._globalConfigs.get("UPLOAD_MAX_NUMBER")) || 0;
+        this.maxUploadSize = this._globalConfigs.get("UPLOAD_MAX_SIZE") || 0;
+		this.namesMaxLength = ajaxplorer.getPluginConfigs("ajaxplorer").get("NODENAME_MAX_LENGTH");
 		if(mask){
 			this.mask = $A(mask);
 		}
@@ -232,14 +227,11 @@ Class.create("XHRUploader", {
 			return value;
 		};
 		optionPane.loadData = function(){
-			if(window.htmlMultiUploaderOptions){
-				var message = '<b>' + MessageHash[281] + '</b> ';
-				for(var key in window.htmlMultiUploaderOptions){
-					message += '&nbsp;&nbsp;'+ MessageHash[key] + ':' + roundSize(window.htmlMultiUploaderOptions[key], '');
-				}
-				optionPane.optionsStrings.update(message);
-			}	
-			var autoSendValue = false;			
+            var message = '<b>' + MessageHash[281] + '</b> ';
+            message += '&nbsp;&nbsp;'+ MessageHash[282] + ':' + roundSize(this.maxUploadSize, '');
+            message += '&nbsp;&nbsp;'+ MessageHash[284] + ':' + this.max;
+            optionPane.optionsStrings.update(message);
+			var autoSendValue = false;
 			if(ajaxplorer.user && ajaxplorer.user.getPreference('upload_auto_send')){
 				autoSendValue = ajaxplorer.user.getPreference('upload_auto_send');
 				autoSendValue = (autoSendValue =="true" ? true:false);
