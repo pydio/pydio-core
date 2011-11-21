@@ -885,9 +885,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }else if($definitions[$key]["type"] == "boolean"){
                         $value = ($value === true || $value === "true" || $value == 1?"true":"false");
                     }else if($definitions[$key]["type"] == "textarea"){
-                        $value = str_replace("\\n", "__LBR__", $value);
+                        //$value = str_replace("\\n", "\n", $value);
                     }
-                    echo("<param name=\"$key\" value=\"$value\"/>");
+                    echo("<param name=\"$key\" value=\"".AJXP_Utils::xmlEntities($value)."\"/>");
                 }
                 if($ajxpPlugin->getType() != "core"){
                     echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");

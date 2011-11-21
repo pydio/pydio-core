@@ -404,7 +404,7 @@ class AJXP_Utils
   }
 
   static function xmlEntities($string, $toUtf8=false){
-    $xmlSafe = str_replace(array("&", "<",">", "\""), array("&amp;", "&lt;","&gt;", "&quot;"), $string);
+    $xmlSafe = str_replace(array("&", "<",">", "\"", "\n", "\r"), array("&amp;", "&lt;","&gt;", "&quot;", "&#13;", "&#10;"), $string);
     if($toUtf8){
       return SystemTextEncoding::toUTF8($xmlSafe);
     }else{
@@ -686,7 +686,7 @@ class AJXP_Utils
     if(is_file($filePath))
     {
       $fileLines = file($filePath);
-      $result = unserialize($fileLines[0]);
+      $result = unserialize(implode("", $fileLines));
     }
     return $result;
   }
