@@ -507,7 +507,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					}catch (Exception $e){
 						return array("ERROR" => array("CODE" => 411, "MESSAGE" => "Forbidden"));
 					}
-					$userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($userfile_name), AJXP_SANITIZE_HTML_STRICT);
+					$userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::fromPostedFileName($userfile_name), AJXP_SANITIZE_HTML_STRICT);
 					$userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 					if(isSet($httpVars["auto_rename"])){
 						$userfile_name = self::autoRenameForDest($destination, $userfile_name);
