@@ -151,8 +151,8 @@ class AJXP_Safe{
 		// Get USER/PASS
 		// 1. Try from URL
 		if(isSet($parsedUrl["user"]) && isset($parsedUrl["pass"])){
-			$user = $parsedUrl["user"];
-			$password = $parsedUrl["pass"];			
+			$user = rawurldecode($parsedUrl["user"]);
+			$password = rawurldecode($parsedUrl["pass"]);
 		}
 		// 2. Try from user wallet
 		if($user==""){

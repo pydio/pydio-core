@@ -111,7 +111,7 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		$wrapper = new ftpSonWrapper();
 		$repoId = $this->options["REPOSITORY_ID"];
 		try{
-			$wrapper->initUrl("ajxp.ftp://$login:$pass@$repoId/");
+            $wrapper->initUrl("ajxp.ftp://".rawurlencode($login).":".rawurlencode($pass)."@$repoId/");
 			AJXP_Safe::storeCredentials($login, $pass);
 		}catch(Exception $e){
 			return false;
