@@ -34,7 +34,7 @@ if(!isSet($AJXP_GLUE_GLOBALS)){
 	$AJXP_GLUE_GLOBALS = array();
 }
 if (!isSet($CURRENTPATH)) {
-    $CURRENTPATH=realpath(__DIR__);
+    $CURRENTPATH=realpath(dirname(__FILE__));
     $FRAMEWORK_PATH = realpath($CURRENTPATH."/../../");
 }
 
