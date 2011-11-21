@@ -348,16 +348,16 @@ class AJXP_Utils
     else return false;
   }
   
-  static function roundSize($filesize)
+  static function roundSize($filesize, $phpConfig = false)
   {
     $mess = ConfService::getMessages();
     $size_unit = $mess["byte_unit_symbol"];
     if($filesize < 0){
       $filesize = sprintf("%u", $filesize);
     }
-    if ($filesize >= 1073741824) {$filesize = round($filesize / 1073741824 * 100) / 100 . " G".$size_unit;}
-    elseif ($filesize >= 1048576) {$filesize = round($filesize / 1048576 * 100) / 100 . " M".$size_unit;}
-    elseif ($filesize >= 1024) {$filesize = round($filesize / 1024 * 100) / 100 . " K".$size_unit;}
+    if ($filesize >= 1073741824) {$filesize = round($filesize / 1073741824 * 100) / 100 . ($phpConfig?"G":" G".$size_unit);}
+    elseif ($filesize >= 1048576) {$filesize = round($filesize / 1048576 * 100) / 100 . ($phpConfig?"M":" M".$size_unit);}
+    elseif ($filesize >= 1024) {$filesize = round($filesize / 1024 * 100) / 100 . ($phpConfig?"K":" K".$size_unit);}
     else {$filesize = $filesize . " ".$size_unit;}
     if($filesize==0) {$filesize="-";}
     return $filesize;

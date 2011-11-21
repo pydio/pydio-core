@@ -256,14 +256,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 		        	"iconWidth"		 => $this->pluginConf["CUSTOM_ICON_WIDTH"],
 		        	"titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
 		        );
-				
-			    $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
-		        $UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
-		        if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
-			    $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
-				$config["htmlMultiUploaderOptions"] = array("282"=>$UploadMaxSize,"284"=>$confTotalNumber);
-					
-				$config["filenamesMaxLength"] = intval(ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 				$config["usersEnabled"] = AuthService::usersEnabled();
 				$config["loggedUser"] = (AuthService::getLoggedUser()!=null);
 				$config["currentLanguage"] = ConfService::getLanguage();
@@ -271,7 +263,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				if(!isSet($this->pluginConf["CLIENT_TIMEOUT_TIME"]) || $this->pluginConf["CLIENT_TIMEOUT_TIME"] == ""){
 					$to = $config["session_timeout"]; 
 				}else{
-					$to = $to = $this->pluginConf["CLIENT_TIMEOUT_TIME"];
+					$to = $this->pluginConf["CLIENT_TIMEOUT_TIME"];
 				}
 				$config["client_timeout"] = $to;
 				$config["client_timeout_warning"] = $this->pluginConf["CLIENT_TIMEOUT_WARN"];
