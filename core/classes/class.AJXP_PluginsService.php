@@ -48,11 +48,16 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 * @param String $pluginFolder
  	 * @param AbstractConfDriver $confStorage
  	 */
- 	public function loadPluginsRegistry($pluginFolder, $confStorage){
- 		if(!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false){
+ 	public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false){
+ 		if(!$rewriteCache && (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
 	 		$reqs = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
 	 		if(count($reqs)){
 	 			foreach ($reqs as $filename){
+                     if(!is_file($filename)){
+                         // CACHE IS OUT OF SYNC WITH REQUIRES
+                         $this->loadPluginsRegistry($pluginFolder, $confStorage, true);
+                         return;
+                     }
 	 				require_once($filename);
 	 			}
 	 			$res = AJXP_Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
