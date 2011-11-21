@@ -39,6 +39,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
         }
+        if(!isSet($configData["CLIENT_TIMEOUT_TIME"])){
+            $this->pluginConf["CLIENT_TIMEOUT_TIME"] = intval(ini_get("session.gc_maxlifetime"));
+        }
     }
 
 	function switchAction($action, $httpVars, $fileVars)
