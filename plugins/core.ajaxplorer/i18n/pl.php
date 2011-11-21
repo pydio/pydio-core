@@ -475,6 +475,10 @@ $mess=array(
 "430" => "Default Files",
 "431" => "Sample Template",
 "432" => "My Files",
+"433" => "ready",
+"434" => "sending",
+"435" => "done",
+"436" => "error",
 /* END SENTENCE */
 );
 ?>

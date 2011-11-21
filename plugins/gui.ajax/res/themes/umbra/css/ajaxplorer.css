@@ -14,7 +14,7 @@
     background: linear-gradient(top, rgba(255,255,255,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
 }
 
-.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox, .action_bar.floatingBar, .largeButton{
+.css_gradient, .infoPanelGroup, .panelHeader, .dialogBox, .action_bar.floatingBar, .largeButton, .fakeUploadButton{
     background: rgb(247,247,247); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(227,227,227,1) 50%, rgba(216,216,216,1) 51%, rgba(242,242,242,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(50%,rgba(227,227,227,1)), color-stop(51%,rgba(216,216,216,1)), color-stop(100%,rgba(242,242,242,1))); /* Chrome,Safari4+ */
@@ -1631,7 +1631,7 @@ div#upload_files_list div, div#multiple_download_container div
         vertical-align: top;
 }
 #fileInputContainerDiv {
-        height: 120px;
+        height: 130px;
         width: 62px; /* to fit 1px border */
         margin: 0;
         padding: 0;
@@ -1662,20 +1662,31 @@ div#upload_files_list div, div#multiple_download_container div
 	padding-top: 8px;
 	padding-bottom: 5px;
 	border: 1px solid #ccc;
-	background-color: white;
 	text-align:center;
 	vertical-align: middle;
 	font-size: 10px;
 	margin-bottom: 5px;
 	cursor:pointer;
+    /*
+    background-color: white;
 	background-image:url('../images/fakeFlashButtonBg.gif');
 	background-position : bottom;
 	background-repeat : repeat-x;
+	*/
 	color : #667;
 	font-weight: bold;
 	-moz-border-radius : 5px;
 	border-radius : 5px;
 }
+
+.fakeUploadButton.disabled{
+    -moz-opacity: 0.5;
+    opacity: 0.5;
+    filter:alpha(opacity=50);
+    cursor: default;
+}
+
+
 .fakeUploadButton img {
     margin-bottom: 3px;
 }
@@ -1697,7 +1708,7 @@ div#upload_files_list div, div#multiple_download_container div
 }
 #uploadSendButton {
         position: absolute;
-        top: 60px; right: 0px;
+        top: 63px; right: 0px;
         margin:0;
 }
 
