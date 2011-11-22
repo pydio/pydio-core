@@ -481,7 +481,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case  "get_drivers_definition":
 				
 				AJXP_XMLWriter::header("drivers");
-				print(ConfService::availableDriversToXML("param"));
+				print(AJXP_XMLWriter::replaceAjxpXmlKeywords(ConfService::availableDriversToXML("param")));
 				AJXP_XMLWriter::close("drivers");
 				
 				
@@ -874,7 +874,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
 				$ajxpPlugin = AJXP_PluginsService::getInstance()->getPluginById($httpVars["plugin_id"]);
 				AJXP_XMLWriter::header("admin_data");
-				echo($ajxpPlugin->getManifestRawContent());
+				echo(AJXP_XMLWriter::replaceAjxpXmlKeywords($ajxpPlugin->getManifestRawContent()));
 				$definitions = $ajxpPlugin->getConfigsDefinitions();
 				$values = $ajxpPlugin->getConfigs();
                 if(!is_array($values)) $values = array();

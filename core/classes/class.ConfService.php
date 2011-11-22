@@ -457,7 +457,17 @@ class ConfService
 	{
 		return (function_exists("gzopen")?true:false);		
 	}
-	
+
+    public static function getMessagesConf($forceRefresh = false){
+        return self::getInstance()->getMessagesInstConf($forceRefresh);
+    }
+    public function getMessagesInstConf($forceRefresh = false)
+    {
+        // make sure they are loaded
+        $mess = $this->getMessagesInst($forceRefresh);
+        return $this->configs["CONF_MESSAGES"];
+    }
+
 	public static function getMessages($forceRefresh = false){
 		return self::getInstance()->getMessagesInst($forceRefresh);
 	}
@@ -466,8 +476,8 @@ class ConfService
 		if(!isset($this->configs["MESSAGES"]) || $forceRefresh)
 		{
             $crtLang = self::getLanguage();
-			require(AJXP_COREI18N_FOLDER."/".$crtLang.".php");
-			$this->configs["MESSAGES"] = $mess;
+			$this->configs["MESSAGES"] = array();
+			$this->configs["CONF_MESSAGES"] = array();
 			$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
 			foreach ($nodes as $node){
 				$nameSpace = $node->getAttribute("namespace");
@@ -479,9 +489,17 @@ class ConfService
 				if(is_file($path."/".$lang.".php")){
 					require($path."/".$lang.".php");					
 					foreach ($mess as $key => $message){
-						$this->configs["MESSAGES"][$nameSpace.".".$key] = $message;
+						$this->configs["MESSAGES"][(empty($nameSpace)?"":$nameSpace.".").$key] = $message;
 					}
 				}
+                $lang = $crtLang;
+                if(!is_file($path."/conf/".$crtLang.".php")){
+                    $lang = "en";
+                }
+                if(is_file($path."/conf/".$lang.".php")){
+                    require($path."/conf/".$lang.".php");
+                    $this->configs["CONF_MESSAGES"] = array_merge($this->configs["CONF_MESSAGES"], $mess);
+                }
 			}
 		}
 		
@@ -591,6 +609,7 @@ class ConfService
         if($lang == null){
             $lang = self::getInstance()->getCoreConf("DEFAULT_LANGUAGE");
         }
+        if(empty($lang)) return "en";
         return $lang;
     }
 		

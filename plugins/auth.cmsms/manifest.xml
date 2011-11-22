@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="cmsms" label="DB Storage" description="Stores the Authentication data in CMSMS FEU.">
+<authdriver name="cmsms" label="CONF_MESSAGE[DB Storage]" description="Stores the Authentication data in CMSMS FEU.">
 	<server_settings>
-		<param name="LOGIN_URL" type="string" label="Login URL" description="if direct access, redirect to the given URL" mandatory="true" />
-		<param name="LOGOUT_URL" type="string" label="Logout URL" description="Redirect to the given URL on loggin out" mandatory="true" />
-		<param name="SECRET" type="string" label="Secret key" description="This key must only be known by remote end" mandatory="true" />
-		<param name="SQL_DRIVER" type="array" label="Connexion" description="The Database Connexion" mandatory="true"/>
-		<param name="PREFIX_TABLE" type="string" label="Prefix tables" description="Prefix of CMSMS tables " mandatory="true"/>
+		<param name="LOGIN_URL" type="string" label="CONF_MESSAGE[Login URL]" description="CONF_MESSAGE[if direct access, redirect to the given URL]" mandatory="true" />
+		<param name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="true" />
+		<param name="SECRET" type="string" label="CONF_MESSAGE[Secret key]" description="CONF_MESSAGE[This key must only be known by remote end]" mandatory="true" />
+		<param name="SQL_DRIVER" type="array" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true"/>
+		<param name="PREFIX_TABLE" type="string" label="CONF_MESSAGE[Prefix tables]" description="CONF_MESSAGE[Prefix of CMSMS tables ]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.cmsms/class.cmsmsAuthDriver.php" classname="cmsmsAuthDriver"/>
 	<registry_contributions>

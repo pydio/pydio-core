@@ -223,7 +223,8 @@ class AJXP_Utils
       AJXP_JSPacker::pack();
     }    
     if(ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])){
-      AJXP_Utils::updateI18nFiles((isSet($parameters["plugin_path"])?$parameters["plugin_path"]:""));
+        self::extractConfStringsFromManifests();
+        self::updateAllI18nLibraries();
     }
     if(ConfService::getConf("JS_DEBUG") && isSet($parameters["clear_plugins_cache"])){
       @unlink(AJXP_PLUGINS_CACHE_FILE);
@@ -429,84 +430,142 @@ class AJXP_Utils
         return "$protocol://$name$port";
     }
 
-  /**
-   * Modifies a string to remove all non ASCII characters and spaces.
-   */
-  static public function slugify($text)
-  {
-    if(empty($text)) return "";
-      // replace non letter or digits by -
-      $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
-   
-      // trim
-      $text = trim($text, '-');
-   
-      // transliterate
-      if (function_exists('iconv'))
+      /**
+       * Modifies a string to remove all non ASCII characters and spaces.
+       */
+      static public function slugify($text)
       {
-          $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-      }
-   
-      // lowercase
-      $text = strtolower($text);
-   
-      // remove unwanted characters
-      $text = preg_replace('~[^-\w]+~', '', $text);
-   
-      if (empty($text))
-      {
-          return 'n-a';
-      }
-   
-      return $text;
-  }  
-  
-  static function updateI18nFiles($pluginPath = ""){
-    if($pluginPath != ""){
-      $baseDir = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginPath;
-      $filenames = glob($baseDir."/*.php");
-    }else{
-      $baseDir = AJXP_COREI18N_FOLDER;
-      $languages = ConfService::listAvailableLanguages();
-      $filenames = array();
-      foreach ($languages as $key => $value){
-        $filenames[] = $baseDir."/".$key.".php";
-      }
-    }
-    include($baseDir."/en.php");
-    $reference = $mess;
-    foreach ($filenames as $filename){
-      //$filename = $baseDir."/".$key.".php";
-      include($filename);
-      $missing = array();
-      foreach ($reference as $messKey=>$message){
-        if(!array_key_exists($messKey, $mess)){
-          $missing[] = "\"$messKey\" => \"$message\",";
-        }
-      }
-      //print_r($missing);
-      if(count($missing)){
-        $header = array();
-        $currentMessages = array();
-        $footer = array();
-        $fileLines = file($filename);
-        foreach ($fileLines as $line){
-          if(strstr($line, "\"") !== false){
-            $currentMessages[] = trim($line);
-          }else{
-            if(!count($currentMessages)){
-              $header[] = trim($line);
-            }else{
-              $footer[] = trim($line);
-            }
+        if(empty($text)) return "";
+          // replace non letter or digits by -
+          $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+
+          // trim
+          $text = trim($text, '-');
+
+          // transliterate
+          if (function_exists('iconv'))
+          {
+              $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
           }
-        }
-        $currentMessages = array_merge($header, $currentMessages, $missing, $footer);
-        file_put_contents($filename, join("\n", $currentMessages));
+
+          // lowercase
+          $text = strtolower($text);
+
+          // remove unwanted characters
+          $text = preg_replace('~[^-\w]+~', '', $text);
+
+          if (empty($text))
+          {
+              return 'n-a';
+          }
+
+          return $text;
       }
+
+    static function extractConfStringsFromManifests(){
+        $plugins = AJXP_PluginsService::getInstance()->getDetectedPlugins();
+        $plug = new AJXP_Plugin("","");
+        foreach ($plugins as $pType => $plugs){
+            foreach($plugs as $plug){
+                $lib = $plug->getManifestRawContent("//i18n", "nodes");
+                if(!$lib->length) continue;
+                $library = $lib->item(0);
+                $namespace = $library->getAttribute("namespace");
+                $path = $library->getAttribute("path");
+                $xml = $plug->getManifestRawContent();
+                // for core, also load mixins
+                $refFile = AJXP_INSTALL_PATH."/".$path."/conf/en.php";
+                $reference = array();
+                if(preg_match_all("/CONF_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
+                    foreach($matches as $match){
+                        $match[1] = str_replace(array("[","]"),"", $match[1]);
+                        $reference[$match[1]] = $match[1];
+                    }
+                }
+                if($namespace == ""){
+                    $mixXml = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/ajxp_mixins.xml");
+                    if(preg_match_all("/MIXIN_MESSAGE(\[.*?\])/", $mixXml, $matches, PREG_SET_ORDER)){
+                        foreach($matches as $match){
+                            $match[1] = str_replace(array("[","]"),"", $match[1]);
+                            $reference[$match[1]] = $match[1];
+                        }
+                    }
+                }
+                if(count($reference)){
+                    self::updateI18nFromRef($refFile, $reference);
+                }
+            }
+        }
     }
-  }
-  
+
+    static function updateAllI18nLibraries(){
+        // UPDATE EN => OTHER LANGUAGES
+        $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
+        foreach ($nodes as $node){
+            $nameSpace = $node->getAttribute("namespace");
+            $path = $node->getAttribute("path");
+            if($nameSpace == ""){
+                self::updateI18nFiles($path, false);
+                self::updateI18nFiles($path."/conf");
+            }else{
+                self::updateI18nFiles($path);
+                self::updateI18nFiles($path."/conf");
+            }
+        }
+    }
+
+      static function updateI18nFiles($libraryPath, $detectLanguages = true){
+          $baseDir = AJXP_INSTALL_PATH."/".$libraryPath;
+          if(!is_dir($baseDir) || !is_file($baseDir."/en.php")) return;
+          if(!$detectLanguages){
+              $languages = ConfService::listAvailableLanguages();
+              $filenames = array();
+              foreach ($languages as $key => $value){
+                  $filenames[] = $baseDir."/".$key.".php";
+              }
+          }else{
+              $filenames = glob($baseDir."/*.php");
+          }
+
+            include($baseDir."/en.php");
+            $reference = $mess;
+
+            foreach ($filenames as $filename){
+                self::updateI18nFromRef($filename, $reference);
+            }
+      }
+
+    static function updateI18nFromRef($filename, $reference){
+        if(!is_file($filename)) return;
+        include($filename);
+        $missing = array();
+        foreach ($reference as $messKey=>$message){
+            if(!array_key_exists($messKey, $mess)){
+                $missing[] = "\"$messKey\" => \"$message\",";
+            }
+        }
+        //print_r($missing);
+        if(count($missing)){
+            $header = array();
+            $currentMessages = array();
+            $footer = array();
+            $fileLines = file($filename);
+            foreach ($fileLines as $line){
+                if(strstr($line, "\"") !== false){
+                    $currentMessages[] = trim($line);
+                }else{
+                    if(!count($currentMessages)){
+                        $header[] = trim($line);
+                    }else{
+                        $footer[] = trim($line);
+                    }
+                }
+            }
+            $currentMessages = array_merge($header, $currentMessages, $missing, $footer);
+            file_put_contents($filename, join("\n", $currentMessages));
+        }
+    }
+
   static function testResultsToTable($outputArray, $testedParams, $showSkipLink = true){
     $style = '
     <style>

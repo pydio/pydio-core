@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<action name="skeleton" enabled="false" label="Skeleton Plugin" description="This is an empty container to demonstrate the basics of plugins coding." >
+<action name="skeleton" enabled="false" label="CONF_MESSAGE[Skeleton Plugin]" description="CONF_MESSAGE[This is an empty container to demonstrate the basics of plugins coding.]" >
     <server_settings>
-        <global_param name="SHOW_CUSTOM_FOOTER" type="boolean" label="Custom Footer" description="Show a custom footer div" mandatory="false" default="false"/>
-        <global_param name="CUSTOM_FOOTER_CONTENT" type="textarea" label="Footer Content" description="Display this content in the footer" mandatory="false" default="Your custom footer content"/>
-        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="Button Target Url" description="The target URL of the button that will be added to the application" mandatory="true" default="http://www.ajaxplorer.info"/>
+        <global_param name="SHOW_CUSTOM_FOOTER" type="boolean" label="CONF_MESSAGE[Custom Footer]" description="CONF_MESSAGE[Show a custom footer div]" mandatory="false" default="false"/>
+        <global_param name="CUSTOM_FOOTER_CONTENT" type="textarea" label="CONF_MESSAGE[Footer Content]" description="CONF_MESSAGE[Display this content in the footer]" mandatory="false" default="Your custom footer content"/>
+        <global_param expose="true" name="CUSTOM_BUTTON_TARGET" type="string" label="CONF_MESSAGE[Button Target Url]" description="CONF_MESSAGE[The target URL of the button that will be added to the application]" mandatory="true" default="http://www.ajaxplorer.info"/>
     </server_settings>
 
     <client_settings>

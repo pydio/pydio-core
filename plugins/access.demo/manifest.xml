@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="demo" label="Demo (no write actions)" description="This is a standard access to the filesystem but with all write actions disabled server-side.">
+<ajxpdriver name="demo" label="CONF_MESSAGE[Demo (no write actions)]" description="CONF_MESSAGE[This is a standard access to the filesystem but with all write actions disabled server-side.]">
 	<client_settings icon="plugins/access.fs/icon.png"/>
 	<server_settings>
-		<param name="PATH" type="string" label="Path" description="Real path to the root folder on the server" mandatory="true"/>
-		<param name="CREATE" type="boolean" label="Create" description="Create folder if it does not exists" default="true" mandatory="true"/>
-		<param name="RECYCLE_BIN" type="string" label="Recycle Bin Folder" description="Leave empty if you do not want to use a recycle bin." default="recycle_bin"/>	
+		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true"/>
+		<param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="true" mandatory="true"/>
+		<param name="RECYCLE_BIN" type="string" label="CONF_MESSAGE[Recycle Bin Folder]" description="CONF_MESSAGE[Leave empty if you do not want to use a recycle bin.]" default="recycle_bin"/>	
 	</server_settings>
 	<class_definition filename="plugins/access.demo/class.demoAccessDriver.php" classname="demoAccessDriver"/>	
 	<class_stream_wrapper filename="plugins/access.fs/class.fsAccessWrapper.php" classname="fsAccessWrapper" protocol="ajxp.demo"/>	

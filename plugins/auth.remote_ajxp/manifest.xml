@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="remote_ajxp" label="Remote AJXP" description="Use another AJXP intall to log in.">
+<authdriver name="remote_ajxp" label="CONF_MESSAGE[Remote AJXP]" description="CONF_MESSAGE[Use another AJXP intall to log in.]">
 	<server_settings>
-		<param name="REMOTE_SERVER" type="string" label="Server" description="The host URL" mandatory="true"/>
-		<param name="REMOTE_PORT" type="string" label="Port" description="The host port" mandatory="true"/>
-		<param name="REMOTE_USER" type="string" label="User name" description="User on the remote host" mandatory="false"/>
-		<param name="REMOTE_PASSWORD" type="string" label="Password" description="Password on the remote host" mandatory="false"/>
-		<param name="REMOTE_SESSION_NAME" type="string" label="Session Name" description="Parameter name to pass the session id" mandatory="false"/>
-		<param name="REMOTE_URL" type="string" label="URI" description="Script URI on the remote server" mandatory="true"/>
+		<param name="REMOTE_SERVER" type="string" label="CONF_MESSAGE[Server]" description="CONF_MESSAGE[The host URL]" mandatory="true"/>
+		<param name="REMOTE_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[The host port]" mandatory="true"/>
+		<param name="REMOTE_USER" type="string" label="CONF_MESSAGE[User name]" description="CONF_MESSAGE[User on the remote host]" mandatory="false"/>
+		<param name="REMOTE_PASSWORD" type="string" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[Password on the remote host]" mandatory="false"/>
+		<param name="REMOTE_SESSION_NAME" type="string" label="CONF_MESSAGE[Session Name]" description="CONF_MESSAGE[Parameter name to pass the session id]" mandatory="false"/>
+		<param name="REMOTE_URL" type="string" label="CONF_MESSAGE[URI]" description="CONF_MESSAGE[Script URI on the remote server]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.remote_ajxp/class.remote_ajxpAuthDriver.php" classname="remote_ajxpAuthDriver"/>
 	<registry_contributions>

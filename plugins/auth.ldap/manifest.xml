@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="ldap" label="LDAP Directory" description="Authentication datas are stored on the LDAP server.">
+<authdriver name="ldap" label="CONF_MESSAGE[LDAP Directory]" description="CONF_MESSAGE[Authentication datas are stored on the LDAP server.]">
 	<server_settings>
-		<param name="LDAP_URL" type="string" label="LDAP URL" description="LDAP Server URL (IP or name)" mandatory="true"/>
-		<param name="LDAP_PORT" type="string" label="LDAP Port" description="LDAP Server Port (leave blank for default)" mandatory="false"/>
-		<param name="LDAP_USER" type="string" label="LDAP bind username" description="Username (uid + dn) of LDAP bind user" mandatory="false"/>
-		<param name="LDAP_PASSWORD" type="string" label="LDAP bind password" description="Password of LDAP bind user" mandatory="false"/>
-		<param name="LDAP_DN" type="string" label="People DN" description="DN where the users are stored" mandatory="false"/>
-		<param name="LDAP_FILTER" type="string" label="LDAP Filter" description="Filter which users to fetch." mandatory="false"/>
-		<param name="LDAP_USERATTR" type="string" label="User attribute" description="Username attribute" mandatory="false"/>		
+		<param name="LDAP_URL" type="string" label="CONF_MESSAGE[LDAP URL]" description="CONF_MESSAGE[LDAP Server URL (IP or name)]" mandatory="true"/>
+		<param name="LDAP_PORT" type="string" label="CONF_MESSAGE[LDAP Port]" description="CONF_MESSAGE[LDAP Server Port (leave blank for default)]" mandatory="false"/>
+		<param name="LDAP_USER" type="string" label="CONF_MESSAGE[LDAP bind username]" description="CONF_MESSAGE[Username (uid + dn) of LDAP bind user]" mandatory="false"/>
+		<param name="LDAP_PASSWORD" type="string" label="CONF_MESSAGE[LDAP bind password]" description="CONF_MESSAGE[Password of LDAP bind user]" mandatory="false"/>
+		<param name="LDAP_DN" type="string" label="CONF_MESSAGE[People DN]" description="CONF_MESSAGE[DN where the users are stored]" mandatory="false"/>
+		<param name="LDAP_FILTER" type="string" label="CONF_MESSAGE[LDAP Filter]" description="CONF_MESSAGE[Filter which users to fetch.]" mandatory="false"/>
+		<param name="LDAP_USERATTR" type="string" label="CONF_MESSAGE[User attribute]" description="CONF_MESSAGE[Username attribute]" mandatory="false"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.ldap/class.ldapAuthDriver.php" classname="ldapAuthDriver"/>
 	<registry_contributions>

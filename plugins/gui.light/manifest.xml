@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="light" label="Light" description="Simple Template for Bookmarklets">
+<guidriver name="light" label="CONF_MESSAGE[Light]" description="CONF_MESSAGE[Simple Template for Bookmarklets]">
     <class_definition filename="plugins/gui.light/class.LightGuiPlugin.php" classname="LightGuiPlugin"/>
 	<registry_contributions>
 		<client_configs uuidAttr="name">

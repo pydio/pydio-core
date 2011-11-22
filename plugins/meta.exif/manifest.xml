@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="meta.exif" className="ExifMetaManager" label="Exif Metadata" description="Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif">
+<meta id="meta.exif" className="ExifMetaManager" label="CONF_MESSAGE[Exif Metadata]" description="CONF_MESSAGE[Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif]">
 	<class_definition filename="plugins/meta.exif/class.ExifMetaManager.php" classname="ExifMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
@@ -8,8 +8,8 @@
 		</resources>
 	</client_settings>	
 	<server_settings>
-		<param name="meta_fields" type="string" label="Info Panel Fields" description="Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." mandatory="false" default="COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude"/>
-		<param name="meta_labels" type="string" label="Info Panel Labels" description="Associated list of labels, be sure to define as many as fields!" mandatory="false" default="Latitude,Longitude"/>
+		<param name="meta_fields" type="string" label="CONF_MESSAGE[Info Panel Fields]" description="CONF_MESSAGE[Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'.]" mandatory="false" default="COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude"/>
+		<param name="meta_labels" type="string" label="CONF_MESSAGE[Info Panel Labels]" description="CONF_MESSAGE[Associated list of labels, be sure to define as many as fields!]" mandatory="false" default="Latitude,Longitude"/>
 	</server_settings>	
 	<registry_contributions>
 		<hooks>
