@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxp_mobile" label="Mobile" description="Template extending gui.ajax for small screen terminals.">
+<guidriver name="ajxp_mobile" label="CONF_MESSAGE[Mobile]" description="CONF_MESSAGE[Template extending gui.ajax for small screen terminals.]">
     <class_definition filename="plugins/gui.mobile/class.MobileGuiPlugin.php" classname="MobileGuiPlugin"/>
 	<registry_contributions>
 		<client_configs uuidAttr="name">

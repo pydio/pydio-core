@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.other" openable="true" order="2000" text="openother.1" title="openother.2" 
 		icon="openother_images/actions/ICON_SIZE/unknown.png" className="OtherEditorChooser" 
-		mimes="*" formId="other_editor_box" label="Open in..." description="Simple Picker to open any type of file in any available editor.">
+		mimes="*" formId="other_editor_box" label="CONF_MESSAGE[Open in...]" description="CONF_MESSAGE[Simple Picker to open any type of file in any available editor.]">
 	<resources>
 		<js file="plugins/editor.other/class.OtherEditorChooser.js" className="OtherEditorChooser"/>
         <i18n namespace="openother" path="plugins/editor.other/resources/i18n" />	

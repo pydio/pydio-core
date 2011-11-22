@@ -151,7 +151,8 @@ class AJXP_XMLWriter
 	}
 	
 	static function replaceAjxpXmlKeywords($xml, $stripSpaces = false){
-		$messages = ConfService::getMessages();			
+		$messages = ConfService::getMessages();
+        $confMessages = ConfService::getMessagesConf();
 		$matches = array();
 		if(isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])){
 			//$xml = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_THEME_FOLDER, $xml);
@@ -177,6 +178,26 @@ class AJXP_XMLWriter
 			foreach($matches as $match){
 				$messId = str_replace("]", "", str_replace("[", "", $match[1]));
 				$xml = str_replace("AJXP_MESSAGE[$messId]", $messages[$messId], $xml);
+			}
+		}
+		if(preg_match_all("/CONF_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
+			foreach($matches as $match){
+				$messId = str_replace(array("[", "]"), "", $match[1]);
+                $message = $messId;
+                if(array_key_exists($messId, $confMessages)){
+                    $message = $confMessages[$messId];
+                }
+				$xml = str_replace("CONF_MESSAGE[$messId]", $message, $xml);
+			}
+		}
+		if(preg_match_all("/MIXIN_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)){
+			foreach($matches as $match){
+				$messId = str_replace(array("[", "]"), "", $match[1]);
+                $message = $messId;
+                if(array_key_exists($messId, $confMessages)){
+                    $message = $confMessages[$messId];
+                }
+				$xml = str_replace("MIXIN_MESSAGE[$messId]", $message, $xml);
 			}
 		}
 		if($stripSpaces){

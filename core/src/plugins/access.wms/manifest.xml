@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="wms" label="WMS Server" description="Browse the layers served by a WMS server.">
+<ajxpdriver name="wms" enabled="false" label="CONF_MESSAGE[WMS Server]" description="CONF_MESSAGE[Browse the layers served by a WMS server.]">
 	<server_settings>
-		<param name="HOST" type="string" label="Wms Server" description="Wms server url" mandatory="true"/>
+		<param name="HOST" type="string" label="CONF_MESSAGE[Wms Server]" description="CONF_MESSAGE[Wms server url]" mandatory="true"/>
 	</server_settings>
 	<client_settings icon="plugins/access.wms/images/world.png">
 		<resources>

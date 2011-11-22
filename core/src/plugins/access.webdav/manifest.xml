@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="webdav" label="WebDAV (PEAR)" description="Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
+<ajxpdriver name="webdav" label="CONF_MESSAGE[WebDAV (PEAR)]" description="CONF_MESSAGE[Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
 	<client_settings icon="plugins/access.fs/icon.png"/>
 	<server_settings>
-		<param name="HOST" type="string" label="Host" description="Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." mandatory="true" default="http://webdav.host.com"/>
-		<param name="PATH" type="string" label="Uri" description="Path to the root folder on the server" mandatory="true"/>
-        <param name="CHMOD_VALUE" type="string" label="File Creation Mask" description="Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." default="0666"/>
+		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too.]" mandatory="true" default="http://webdav.host.com"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path to the root folder on the server]" mandatory="true"/>
+        <param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
 	</server_settings>
 	<class_definition filename="plugins/access.webdav/class.webdavAccessDriver.php" classname="webdavAccessDriver"/>
 	<class_stream_wrapper filename="plugins/access.webdav/class.webdavAccessWrapper.php" classname="webdavAccessWrapper" protocol="ajxp.webdav"/>

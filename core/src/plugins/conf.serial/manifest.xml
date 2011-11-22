@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<confdriver name="serial" label="Serialized Configuration Storage" description="Stores the conf data as serialized PHP values on the filesystem.">
+<confdriver name="serial" label="CONF_MESSAGE[Serialized Configuration Storage]" description="CONF_MESSAGE[Stores the conf data as serialized PHP values on the filesystem.]">
 	<server_settings>
-		<param name="REPOSITORIES_FILEPATH" type="string" label="Repositories" description="The file in which the repositories are stored" mandatory="true"/>
-		<param name="USERS_DIRPATH" type="string" label="Users" description="The folder in which all users files will be stored" mandatory="true"/>
-		<param name="ROLES_FILEPATH" type="string" label="Roles" description="The file in which all roles definitions will be stored" mandatory="true"/>
+		<param name="REPOSITORIES_FILEPATH" type="string" label="CONF_MESSAGE[Repositories]" description="CONF_MESSAGE[The file in which the repositories are stored]" mandatory="true"/>
+		<param name="USERS_DIRPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The folder in which all users files will be stored]" mandatory="true"/>
+		<param name="ROLES_FILEPATH" type="string" label="CONF_MESSAGE[Roles]" description="CONF_MESSAGE[The file in which all roles definitions will be stored]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/conf.serial/class.serialConfDriver.php" classname="serialConfDriver"/>
 	<registry_contributions>

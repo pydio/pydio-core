@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="user" className="UserMetaManager" label="Text Metadata" description="Simple metadata implementation stored in a hidden file.">
+<meta id="user" className="UserMetaManager" label="CONF_MESSAGE[Text Metadata]" description="CONF_MESSAGE[Simple metadata implementation stored in a hidden file.]">
 	<class_definition filename="plugins/meta.user/class.UserMetaManager.php" classname="UserMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
@@ -8,10 +8,10 @@
 		</resources>
 	</client_settings>	
 	<server_settings>
-		<!--<param name="meta_file_name" type="string" label="Meta File" description="Hidden file used inside folders to save meta data" mandatory="true" default=".ajxp_meta"/>-->
-		<param name="meta_fields" type="string" label="Meta Fields" description="Comma separated list of fields, use standard characters here." mandatory="true" default="comment_field"/>
-		<param name="meta_labels" type="string" label="Meta Labels" description="Comma separated list of labels, be sure to define as many as fields!" mandatory="true" default="My Comments"/>
-		<param name="meta_visibility" type="string" label="Columns visibility" description="Set default visibility for each columns. Either by columns, using commas, or one value that will be applied to all columns. Value can be 'visible' or 'hidden'." mandatory="false" default="visible"/>
+		<!--<param name="meta_file_name" type="string" label="CONF_MESSAGE[Meta File]" description="CONF_MESSAGE[Hidden file used inside folders to save meta data]" mandatory="true" default=".ajxp_meta"/>-->
+		<param name="meta_fields" type="string" label="CONF_MESSAGE[Meta Fields]" description="CONF_MESSAGE[Comma separated list of fields, use standard characters here.]" mandatory="true" default="comment_field"/>
+		<param name="meta_labels" type="string" label="CONF_MESSAGE[Meta Labels]" description="CONF_MESSAGE[Comma separated list of labels, be sure to define as many as fields!]" mandatory="true" default="My Comments"/>
+		<param name="meta_visibility" type="string" label="CONF_MESSAGE[Columns visibility]" description="CONF_MESSAGE[Set default visibility for each columns. Either by columns, using commas, or one value that will be applied to all columns. Value can be 'visible' or 'hidden'.]" mandatory="false" default="visible"/>
 	</server_settings>
 	<registry_contributions>
 		<hooks>

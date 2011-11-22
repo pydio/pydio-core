@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="multi" label="Multiple" description="Encapsulate the use of other drivers">
+<authdriver name="multi" label="CONF_MESSAGE[Multiple]" description="CONF_MESSAGE[Encapsulate the use of other drivers]">
 	<server_settings>
-        <param name="MASTER_DRIVER" type="string" label="Master" description="The name of the master driver to use, generally serial." mandatory="true"/>
-		<param name="DRIVERS" type="array" label="Drivers" description="The auth drivers definition, see detailed documenation for more info." mandatory="true"/>
-        <param name="USER_ID_SEPARATOR" type="string" label="Separator" description="This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" mandatory="true" default="_-_"/>
+        <param name="MASTER_DRIVER" type="string" label="CONF_MESSAGE[Master]" description="CONF_MESSAGE[The name of the master driver to use, generally serial.]" mandatory="true"/>
+		<param name="DRIVERS" type="array" label="CONF_MESSAGE[Drivers]" description="CONF_MESSAGE[The auth drivers definition, see detailed documenation for more info.]" mandatory="true"/>
+        <param name="USER_ID_SEPARATOR" type="string" label="CONF_MESSAGE[Separator]" description="CONF_MESSAGE[This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!]" mandatory="true" default="_-_"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.multi/class.multiAuthDriver.php" classname="multiAuthDriver"/>
 	<registry_contributions>

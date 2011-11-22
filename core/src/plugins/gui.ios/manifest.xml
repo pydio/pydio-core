@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxp_ios" label="iOS" description="Template for redirecting to iPhone application">
+<guidriver name="ajxp_ios" label="CONF_MESSAGE[iOS]" description="CONF_MESSAGE[Template for redirecting to iPhone application]">
     <class_definition filename="plugins/gui.ios/class.IOSGuiPlugin.php" classname="IOSGuiPlugin"/>
 	<registry_contributions>
 		<client_configs uuidAttr="name">

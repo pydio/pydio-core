@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="jsapi" label="Javascript Api Browser" description="Browse AjaXplorer Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!">
+<ajxpdriver name="jsapi" label="CONF_MESSAGE[Javascript Api Browser]" description="CONF_MESSAGE[Browse AjaXplorer Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!]">
 	<client_settings icon="plugins/access.jsapi/admin.png">
 		<resources>
 			<i18n namespace="jsapi" path="plugins/access.jsapi/i18n" />

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metastore id="serial" className="SerialMetaStore" label="Files MetaStore" description="Stores metadata inside local hidden files.">
+<metastore id="serial" className="SerialMetaStore" label="CONF_MESSAGE[Files MetaStore]" description="CONF_MESSAGE[Stores metadata inside local hidden files.]">
 	<class_definition filename="plugins/metastore.serial/class.SerialMetaStore.php" classname="SerialMetaStore"/>
 	<server_settings>
-        <param name="METADATA_FILE_LOCATION" type="select" choices="infolders|In Local Folders,outside|Application Data Folder" label="File location" description="Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." mandatory="true" default="infolders"/>
-        <param name="METADATA_FILE" type="string" label="Meta File" description="Hidden file used inside folders to save meta data" mandatory="true" default=".ajxp_meta"/>
+        <param name="METADATA_FILE_LOCATION" type="select" choices="infolders|In Local Folders,outside|Application Data Folder" label="CONF_MESSAGE[File location]" description="CONF_MESSAGE[Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder.]" mandatory="true" default="infolders"/>
+        <param name="METADATA_FILE" type="string" label="CONF_MESSAGE[Meta File]" description="CONF_MESSAGE[Hidden file used inside folders to save meta data]" mandatory="true" default=".ajxp_meta"/>
 	</server_settings>
     <!--
     <registry_contributions>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="serial" label="Serialized authentication storage" description="Stores the Authentication data as serialized PHP values on the filesystem." mixins="authdriver_commons">
+<authdriver name="serial" label="CONF_MESSAGE[Serialized authentication storage]" description="CONF_MESSAGE[Stores the Authentication data as serialized PHP values on the filesystem.]" mixins="authdriver_commons">
 	<server_settings>
-		<param name="USERS_FILEPATH" type="string" label="Users" description="The users list" mandatory="true"/>
+		<param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
 	</server_settings>
 	<class_definition filename="plugins/auth.serial/class.serialAuthDriver.php" classname="serialAuthDriver"/>
 	<registry_contributions>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.codemirror" openable="true" text="code_mirror.1" title="code_mirror.2" icon="codemirror_images/source_edit.png" className="CodeMirrorEditor" mimes="xml,html,htm,js,json,css,php,phtml,sparql,txt,py,c#,java,jsp,sql,cgi,pl,inc,xsl," formId="codemirror_box" label="Source Viewer" description="Syntax Highlighter for all major code source files">
+<editor id="editor.codemirror" openable="true" text="code_mirror.1" title="code_mirror.2" icon="codemirror_images/source_edit.png" className="CodeMirrorEditor" mimes="xml,html,htm,js,json,css,php,phtml,sparql,txt,py,c#,java,jsp,sql,cgi,pl,inc,xsl," formId="codemirror_box" label="CONF_MESSAGE[Source Viewer]" description="CONF_MESSAGE[Syntax Highlighter for all major code source files]">
 	<resources>
 		<i18n namespace="code_mirror" path="plugins/editor.codemirror/i18n" autoload="true"/>			
 		<js file="plugins/editor.codemirror/class.CodeMirrorEditor.js" className="CodeMirrorEditor"/>

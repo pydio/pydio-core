@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.audio" openable="false" previewProvider="true" text="186" title="136" icon="frame_image.png" className="AudioPreviewer" mimes="mp3" label="Audio Player" description="Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window.">
+<editor id="editor.audio" openable="false" previewProvider="true" text="186" title="136" icon="frame_image.png" className="AudioPreviewer" mimes="mp3" label="CONF_MESSAGE[Audio Player]" description="CONF_MESSAGE[Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window.]">
 	<class_definition filename="plugins/editor.audio/class.AudioPreviewer.php" classname="AudioPreviewer"/>
 	<resources>
 		<js file="plugins/editor.audio/class.AudioPreviewer.js" className="AudioPreviewer"/>
