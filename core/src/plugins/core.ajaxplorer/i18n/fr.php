@@ -481,6 +481,8 @@ $mess=array(
 "434" => "sending",
 "435" => "done",
 "436" => "error",
+"437" => "Ouups, il semble que votre jeton de sécurité a expiré! Veuillez simplement %s en cliquant F5 ou le bouton 'Refresh' de votre navigateur/" ,
+"438" => "recharger la page",
 /* END SENTENCE */
 );
 ?>

@@ -20,7 +20,7 @@
 window.logAjxpEven = false;
 function logAjxpBmAction(text){
 	window.logAjxpEven = !window.logAjxpEven;
-	$('actions_log').insert('<div style="border-bottom:1px solid #676965;padding:5px;color:#333;background-color:#'+(window.logAjxpEven?'eee':'fff')+'">' + text + '<div>');
+	$('actions_log').insert('<div class="ajxp_bm_log_action" style="background-color:#'+(window.logAjxpEven?'eee':'fff')+'">' + text + '<div>');
 }
 function string_to_slug(str) {
   str = str.replace('https://', '').replace('http://', '');
@@ -46,7 +46,7 @@ document.observe("ajaxplorer:gui_loaded", function(){
 		if(ajaxplorer.user && !window.ajxpActionRegistered){
 			window.ajxpActionRegistered = true;
 			var params = document.location.href.toQueryParams();
-			logAjxpBmAction('Handling download link '+params['dl_later']);
+			logAjxpBmAction('Downloading '+getBaseName(params['dl_later']));
 			var conn = new Connexion();
 			//var filename = (new Date().getTime()) +".download";
             var filename = string_to_slug(params['dl_later']) + ".download";
@@ -57,7 +57,8 @@ document.observe("ajaxplorer:gui_loaded", function(){
 				filename:filename,
 				content:params['dl_later']
 			});
-			logAjxpBmAction('Creating file ' + filename + ' pointing to ' + params['dl_later']);
+			logAjxpBmAction('Creating download file');
+			//logAjxpBmAction('Creating download file ' + filename + ' pointing to ' + params['dl_later']);
 			conn.sendSync();
 
             if(params["dl_now"] && params["dl_now"] == "true"){
@@ -70,7 +71,11 @@ document.observe("ajaxplorer:gui_loaded", function(){
                         delete_dlfile:'true',
                         dir:params['folder'] || '/'
                     });
-                    logAjxpBmAction('Triggering download in background. This window will close automatically.');
+                    //logAjxpBmAction('Triggering download in background. This window will close automatically.');
+                    conn.onComplete = function(){
+                        logAjxpBmAction('Download started');
+                        document.location.href="plugins/gui.light/close.html";// Will trigger the onload event to close the frame!!
+                    };
                     conn.sendAsync();
                 }, 10);
             }
