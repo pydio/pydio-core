@@ -171,7 +171,7 @@ Class.create("MetaCellRenderer", {
             var conn = new Connexion();
             conn.setMethod("POST");
             conn.setParameters(new Hash({
-                get_action  : 'edit_serial_meta',
+                get_action  : 'edit_user_meta',
                 file	    : selectedNode.getPath()
             }));
             conn.addParameter(id, div.textContent);
@@ -241,7 +241,7 @@ Class.create("MetaCellRenderer", {
 				var selectedNode = ajaxplorer.getUserSelection().getUniqueNode();
 				var conn = new Connexion();
 				conn.setParameters(new Hash({
-					get_action : 'edit_serial_meta',
+					get_action : 'edit_user_meta',
 					stars_rate : note,
 					file	   : selectedNode.getPath()
 				}));
