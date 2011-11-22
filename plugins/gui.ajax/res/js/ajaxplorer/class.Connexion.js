@@ -127,6 +127,15 @@ Class.create("Connexion", {
 	applyComplete : function(transport){
         this.hideLoader();
 		var message;
+        var tokenMessage;
+        var tok1 = "Ooops, it seems that your security token has expired! Please %s by hitting refresh or F5 in your browser!";
+        var tok2 =  "reload the page";
+        if(window.MessageHash && window.MessageHash[437]){
+            var tok1 = window.MessageHash[437];
+            var tok2 = window.MessageHash[438];
+        }
+        tokenMessage = tok1.replace("%s", "<a href='javascript:document.location.reload()' style='text-decoration: underline;'>"+tok2+"</a>");
+
 		var headers = transport.getAllResponseHeaders();
 		if(Prototype.Browser.Gecko && transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName=="parsererror"){
 			message = "Parsing error : \n" + transport.responseXML.documentElement.firstChild.textContent;					
@@ -138,6 +147,7 @@ Class.create("Connexion", {
 			message = transport.responseText.replace("<br />", "");
 		}
 		if(message){
+            if(message == "You are not allowed to access this resource.") message = tokenMessage;
 			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", message);
 			else alert(message);
 		}
@@ -154,8 +164,9 @@ Class.create("Connexion", {
 			}
 			var messageNode = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
 			if(messageNode){
-				messageType = messageNode.getAttribute("type").toUpperCase();
-				messageContent = getDomNodeText(messageNode);
+				var messageType = messageNode.getAttribute("type").toUpperCase();
+				var messageContent = getDomNodeText(messageNode);
+                if(messageContent == "You are not allowed to access this resource.") messageContent = tokenMessage;
 				if(ajaxplorer){
 					ajaxplorer.displayMessage(messageType, messageContent);
 				}else{
