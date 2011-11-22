@@ -236,7 +236,12 @@ Class.create("Modal", {
 				this.notify("modal:resize");
 			}.bind(this);
 			Event.observe(window, "resize", this.currentResizeListener);
-		}
+		}else{
+            this.currentResizeListener = function(){
+                this.refreshDialogPosition();
+            }.bind(this);
+            Event.observe(window, "resize", this.currentResizeListener);
+        }
 			
 		displayLightBoxById(elementName);
 		
@@ -301,8 +306,9 @@ Class.create("Modal", {
 	refreshDialogPosition: function(checkHeight, elementToScroll){
 		var winWidth = $(document.body).getWidth();
 		var winHeight = $(document.body).getHeight();
-		boxWidth = $(this.elementName).getWidth();	
-		var boxHeight = $(this.elementName).getHeight();
+        var element = $(this.elementName);
+		boxWidth = element.getWidth();
+		var boxHeight = element.getHeight();
 		
 		if(checkHeight && boxHeight > parseInt(winHeight*90/100)){
 			var maxHeight = parseInt(winHeight*90/100);
@@ -313,15 +319,18 @@ Class.create("Modal", {
 					overflow:'auto',
 					height:(maxHeight-crtOffset)+'px'
 				});		
-				boxHeight = $(this.elementName).getHeight();
+				boxHeight = element.getHeight();
 			}
 		}
-		// POSITION HORIZONTAL
 		var offsetLeft = parseInt((winWidth - parseInt(boxWidth)) / 2);
-		$(this.elementName).setStyle({left:offsetLeft+'px'});
-		// POSITION VERTICAL
-		var offsetTop = parseInt(((winHeight - boxHeight)/3));
-		$(this.elementName).setStyle({top:offsetTop+'px'});		
+		var offsetTop = parseInt(((winHeight - parseInt(boxHeight))/3));
+        
+        if(element.offsetLeft && element.offsetTop){
+            new Effect.Morph($(this.elementName), {style:'top:'+offsetTop+'px;left:'+offsetLeft+'px', duration:0.4});
+        }else{
+            element.setStyle({top:offsetTop+"px",left:offsetLeft+"px"});
+        }
+
 	},
 	/**
 	 * Refresh appearance after the dialog box changed (shadow)
@@ -554,6 +563,7 @@ Class.create("Modal", {
 		}
 		if(this.currentResizeListener){
 			Event.stopObserving(window, "resize", this.currentResizeListener);
+            this.currentResizeListener = null;
 		}
 	}
 });
