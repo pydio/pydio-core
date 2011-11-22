@@ -432,7 +432,11 @@ Class.create("ActionsManager", {
 					window.ajxpServerAccessPath = parts[0] + "?secure_token=" + Connexion.SECURE_TOKEN;
 					ajxpBootstrap.parameters.set('ajxpServerAccess', window.ajxpServerAccessPath);
 				}
+                if($("generic_dialog_box") && $("generic_dialog_box").down(".ajxp_login_error")){
+                    $("generic_dialog_box").down(".ajxp_login_error").remove();
+                }
 				var result = childs[i].getAttribute('value');
+                var errorId = false;
 				if(result == '1')
 				{
 					hideLightBox(true);
@@ -445,8 +449,7 @@ Class.create("ActionsManager", {
 				}
 				else if(result == '0' || result == '-1')
 				{
-					// Update Form!					
-					alert(MessageHash[285]);
+                    var errorId = 285;
 				}
 				else if(result == '2')
 				{					
@@ -454,16 +457,25 @@ Class.create("ActionsManager", {
 				}
 				else if(result == '-2')
 				{
-					alert(MessageHash[286]);
+                    var errorId = 285;
 				}
 				else if(result == '-3')
 				{
-					alert(MessageHash[366]);
+                    var errorId = 366;
 				}
 				else if(result == '-4')
 				{
-					alert(MessageHash[386]);
+                    var errorId = 386;
 				}
+                if(errorId){
+                    if($("generic_dialog_box") && $("generic_dialog_box").visible() && $("generic_dialog_box").down("div.dialogLegend")){
+                        $("generic_dialog_box").down("div.dialogLegend").insert({bottom:'<div class="ajxp_login_error" style="background-color: #D33131;display: block;font-size: 9px;color: white;border-radius: 3px;padding: 2px 6px;">'+MessageHash[errorId]+'</div>'});
+                        $("generic_dialog_box").shake();
+                    }else{
+                        alert(MessageHash[errorId]);
+                    }
+                }
+
 			}else if(childs[i].tagName == "trigger_bg_action"){
 				var name = childs[i].getAttribute("name");
 				var messageId = childs[i].getAttribute("messageId");
