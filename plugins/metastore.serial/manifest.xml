@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metastore id="serial" label="CONF_MESSAGE[Files MetaStore]" description="CONF_MESSAGE[Stores metadata inside local hidden files.]">
+<metastore id="serial" label="CONF_MESSAGE[Files MetaStore]" description="CONF_MESSAGE[Stores metadata inside local hidden files.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/metastore.serial/class.SerialMetaStore.php" classname="SerialMetaStore"/>
     <client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
         <resources>

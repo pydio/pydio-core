@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="smb" label="CONF_MESSAGE[SMB Authentification]" description="CONF_MESSAGE[Authenticate user by directly connecting to an SMB share]" mixins="authdriver_commons">
+<authdriver name="smb" label="CONF_MESSAGE[SMB Authentification]" description="CONF_MESSAGE[Authenticate user by directly connecting to an SMB share]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="smb_auth" path="plugins/auth.smb/i18n"/>
@@ -39,6 +39,6 @@
 		</actions>
 	</registry_contributions>
 	<dependencies>
-		<plugin pluginName="access.smb"/>
+		<pluginClass pluginName="access.smb"/>
 	</dependencies>	
 </authdriver>

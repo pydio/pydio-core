@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<action_plugin name="updater" label="CONF_MESSAGE[Update Engine]" description="CONF_MESSAGE[Automatic update of AjaXplorer. Since version 3.3.3]">
+<ajxp_plugin name="updater" label="CONF_MESSAGE[Update Engine]" description="CONF_MESSAGE[Automatic update of AjaXplorer. Since version 3.3.3]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
         <global_param name="UPDATE_SITE" type="string" label="CONF_MESSAGE[Update Site]" description="CONF_MESSAGE[Where to update]" default="http://www.ajaxplorer.info/update/"/>
         <global_param name="PRESERVE_FILES" type="textarea" label="CONF_MESSAGE[Preserve Files]" description="CONF_MESSAGE[Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade.]" default=""/>
@@ -74,9 +74,6 @@
                 </processing>
             </action>
             <action name="import_from_324">
-                <processing>
-                    <serverCallback methodName="switchAction"></serverCallback>
-                </processing>
                 <gui text="updater.5" title="updater.6" src="download_manager.png" hasAccessKey="false">
                     <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
                         actionBar="true" contextMenu="false" infoPanel="false"
@@ -120,9 +117,6 @@
                 </processing>
             </action>
             <action name="migrate_metaserial">
-                <processing>
-                    <serverCallback methodName="switchAction"></serverCallback>
-                </processing>
                 <gui text="updater.11" title="updater.12" src="download_manager.png" hasAccessKey="false">
                     <context selection="true" dir="false" recycle="hidden"  behaviour="hidden"
                         actionBar="false" contextMenu="true" actionBarGroup="user" inZip="false">
@@ -173,4 +167,4 @@
         <!-- Image proxy must be implemented -->
         <activePlugin pluginName="access.ajxp_conf"/>
     </dependencies>
-</action_plugin>
+</ajxp_plugin>

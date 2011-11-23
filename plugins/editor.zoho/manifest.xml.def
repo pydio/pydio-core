@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.zoho" openable="true" text="395" title="395" className="ZohoEditor" mimes="doc,odt,sxw" formId="zoho_box" write="true">
+<editor id="editor.zoho" openable="true" text="395" title="395" description="Zoho editor" icon="" label="" className="ZohoEditor" mimes="doc,odt,sxw" formId="zoho_box" write="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.zoho/class.ZohoEditor.php" classname="ZohoEditor"/>
 	<client_settings>
         <resources>
