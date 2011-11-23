@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<driver name="fs" className="class.fsDriver.php">
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
-		<action name="ls" dirDefault="true">			
+		<action name="ls" dirDefault="true">
 			<gui text="32" title="32" src="fileopen.png"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
@@ -591,4 +591,4 @@
 			</infoPanel>		
 		</component_config>
 	</client_configs>
-</driver>
+</registry_contributions>

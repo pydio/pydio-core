@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.diaporama" order="-1" openable="true" previewProvider="true" text="186" title="136" icon="frame_image.png" className="Diaporama" mimes="png,jpg,jpeg,gif" formId="diaporama_box" label="CONF_MESSAGE[Image viewer]" description="CONF_MESSAGE[Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images.]">
+<editor id="editor.diaporama" order="-1" openable="true" previewProvider="true" text="186" title="136" icon="frame_image.png" className="Diaporama" mimes="png,jpg,jpeg,gif" formId="diaporama_box" label="CONF_MESSAGE[Image viewer]" description="CONF_MESSAGE[Image viewer, used for previewing images and browsing them in a diaporam. Generates a thumbnail version of the images.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<server_settings>
 		<global_param name="META_EXTRACTION_REMOTEWRAPPERS" type="array" label="CONF_MESSAGE[Remote Wrappers]" description="CONF_MESSAGE[When connected to a remote server, metadata extraction can make the listing action very long, as it must first copy each file locally. For plugins using the defined wrappers and files whose size is greater than this threshold, the image type and dimension will be skipped.]" default="ftpAccessWrapper"/>
 		<global_param name="META_EXTRACTION_THRESHOLD" type="string" label="CONF_MESSAGE[Size Threshold]" description="CONF_MESSAGE[Threshold]" default="50000"/>
@@ -37,6 +37,10 @@
 			</div>
 		</div>
 	]]></clientForm>
+    <dependencies>
+        <!-- Image proxy must be implemented -->
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
+    </dependencies>				    
 	<registry_contributions>
 		<hooks>
 			<serverCallback hookName="node.change" methodName="removeThumbnail"></serverCallback>
@@ -109,8 +113,4 @@
 			</component_config>
 		</client_configs>			
 	</registry_contributions>
-	<dependencies>
-		<!-- Image proxy must be implemented -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-	</dependencies>				
 </editor>

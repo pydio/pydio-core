@@ -187,9 +187,9 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="plugin">
-                    <xs:sequence>
+                    <xs:choice minOccurs="0">
                         <xs:element ref="class_stream_wrapper"/>
-                    </xs:sequence>
+                    </xs:choice>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
@@ -441,7 +441,8 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="template_part">
-        <xs:complexType>
+        <xs:complexType mixed="true">
+            <xs:attribute name="theme" use="optional" type="xs:NCName"/>
             <xs:attribute name="ajxpClass" use="required" type="xs:NCName"/>
             <xs:attribute name="ajxpId" use="required" type="xs:NCName"/>
             <xs:attribute name="ajxpOptions" use="required"/>
