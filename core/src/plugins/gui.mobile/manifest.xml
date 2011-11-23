@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="ajxp_mobile" label="CONF_MESSAGE[Mobile]" description="CONF_MESSAGE[Template extending gui.ajax for small screen terminals.]">
     <class_definition filename="plugins/gui.mobile/class.MobileGuiPlugin.php" classname="MobileGuiPlugin"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="mobile_gui" path="plugins/gui.mobile/i18n"/>
+        </resources>
+    </client_settings>
 	<registry_contributions>
 		<client_configs uuidAttr="name">
 			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[

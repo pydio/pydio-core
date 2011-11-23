@@ -5,11 +5,14 @@
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>		
 	</dependencies>
-	<resources>
-		<js file="plugins/editor.ckeditor/ckeditor/ckeditor.js" className="CKEDITOR"/>
-		<js file="plugins/editor.ckeditor/class.AjxpCkEditor.js" className="AjxpCkEditor"/>
-		<img_library alias="ckeditor_images" path="plugins/editor.ckeditor"/>
-	</resources>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.ckeditor/ckeditor/ckeditor.js" className="CKEDITOR"/>
+            <js file="plugins/editor.ckeditor/class.AjxpCkEditor.js" className="AjxpCkEditor"/>
+            <img_library alias="ckeditor_images" path="plugins/editor.ckeditor"/>
+            <i18n namespace="ckeditor" path="plugins/editor.ckeditor/resources/i18n" />
+        </resources>
+    </client_settings>
 	<clientForm id="ck_box"><![CDATA[
 		<script type="text/javascript">window.CKEDITOR_BASEPATH = 'plugins/editor.ckeditor/ckeditor/';</script>
 	]]></clientForm>		

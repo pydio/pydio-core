@@ -419,7 +419,6 @@ Class.create("XHRUploader", {
 		}.bind(item);
 		item.updateStatus = function(status){
 			this.status = status;
-            console.log(status);
             var messageIds = {
                 "new" : 433,
                 "loading":434,

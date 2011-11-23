@@ -2,12 +2,14 @@
 <editor id="editor.other" openable="true" order="2000" text="openother.1" title="openother.2" 
 		icon="openother_images/actions/ICON_SIZE/unknown.png" className="OtherEditorChooser" 
 		mimes="*" formId="other_editor_box" label="CONF_MESSAGE[Open in...]" description="CONF_MESSAGE[Simple Picker to open any type of file in any available editor.]">
-	<resources>
-		<js file="plugins/editor.other/class.OtherEditorChooser.js" className="OtherEditorChooser"/>
-        <i18n namespace="openother" path="plugins/editor.other/resources/i18n" />	
-        <img_library alias="openother_images" path="plugins/editor.other/resources/images" /> 
-        <css file="plugins/editor.other/resources/other_chooser.css"/>       	
-	</resources>
+	<client_settings>
+        <resources>
+            <js file="plugins/editor.other/class.OtherEditorChooser.js" className="OtherEditorChooser"/>
+            <i18n namespace="openother" path="plugins/editor.other/resources/i18n" />
+            <img_library alias="openother_images" path="plugins/editor.other/resources/images" />
+            <css file="plugins/editor.other/resources/other_chooser.css"/>
+        </resources>
+	</client_settings>
 	<clientForm id="other_editor_box"><![CDATA[
 		<div id="other_editor_box" action="editer" box_width="340">
 			<div class="editor_selector_title">AJXP_MESSAGE[openother.3]</div>

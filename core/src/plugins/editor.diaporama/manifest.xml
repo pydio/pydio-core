@@ -7,9 +7,12 @@
 		<global_param name="THUMBNAIL_QUALITY" type="integer" label="CONF_MESSAGE[Quality]" description="CONF_MESSAGE[Thumbs quality]" default="2"/>
 	</server_settings>
 	<class_definition filename="plugins/editor.diaporama/class.ImagePreviewer.php" classname="ImagePreviewer"/>
-	<resources>
-		<js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>
-	</resources>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>
+            <i18n namespace="diaporama" path="plugins/editor.diaporama/i18n"/>
+        </resources>
+    </client_settings>
 	<clientForm id="diaporama_box"><![CDATA[
 		<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_resize="true" box_padding="0">
 			<div class="action_bar" style="width: 100%;" title="AJXP_MESSAGE[414]">

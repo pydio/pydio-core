@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "Lucene Search Engine" => "Lucene Search Engine",
 "Zend_Search_Lucene implementation to index all files and search a whole repository quickly." => "Zend_Search_Lucene implementation to index all files and search a whole repository quickly.",
 "Index Content" => "Index Content",

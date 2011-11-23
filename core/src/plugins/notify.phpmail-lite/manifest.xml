@@ -3,6 +3,7 @@
     <client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
         <resources>
             <js file="plugins/notify.phpmail-lite/class.NotifierFormEnricher.js" className="NotifierFormEnricher" autoload="true"/>
+            <i18n namespace="phpmail_lite" path="plugins/notify.phpmail-lite/i18n"/>
         </resources>
     </client_settings>
     <server_settings>

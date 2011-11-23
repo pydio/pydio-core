@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "Text Metadata" => "Text Metadata",
 "Simple metadata implementation stored in a hidden file." => "Simple metadata implementation stored in a hidden file.",
 "Meta File" => "Meta File",
