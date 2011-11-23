@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="fs" label="CONF_MESSAGE[File System (Standard)]" description="CONF_MESSAGE[The most standard access to a filesystem located on the server.]" mixins="filesystem_commons,slug_provider,template_provider">
-	<client_settings icon="plugins/access.fs/icon.png"/>
+    <client_settings icon="plugins/access.fs/icon.png">
+        <resources>
+            <i18n namespace="access_fs" path="plugins/access.fs/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true"/>
 		<param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="true" mandatory="true"/>

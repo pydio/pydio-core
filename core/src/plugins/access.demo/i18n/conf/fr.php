@@ -19,15 +19,13 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.",
-"Consumer Key" => "Consumer Key",
-"Key" => "Key",
-"Consumer Secret" => "Consumer Secret",
-"Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
-"Password" => "Password",
-"User Password" => "User Password",
+"Demo (no write actions)" => "Demo (pas d'écriture)",
+"This is a standard access to the filesystem but with all write actions disabled server-side." => "Standard FS mais les actions en écritures sont désactivées.",
+"Path" => "Chemin",
+"Real path to the root folder on the server" => "Chemin absolu vers le répertoire de base.",
+"Create" => "Création",
+"Create folder if it does not exists" => "Création du répertoire s'il n'existe pas déjà.",
+"Recycle Bin Folder" => "Corbeille",
+"Leave empty if you do not want to use a recycle bin." => "Laisser vide si pas de corbeille",
 );
 ?>

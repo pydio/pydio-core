@@ -19,15 +19,9 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.",
-"Consumer Key" => "Consumer Key",
-"Key" => "Key",
-"Consumer Secret" => "Consumer Secret",
-"Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
-"Password" => "Password",
-"User Password" => "User Password",
+"WMS Server" => "Serveur WMS",
+"Browse the layers served by a WMS server." => "Visualiser les 'layers' publiés sur un serveur WMS.",
+"Wms Server" => "Serveur WMS",
+"Wms server url" => "Url du serveur",
 );
 ?>

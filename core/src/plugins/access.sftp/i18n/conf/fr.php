@@ -19,15 +19,15 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.",
-"Consumer Key" => "Consumer Key",
-"Key" => "Key",
-"Consumer Secret" => "Consumer Secret",
-"Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
-"Password" => "Password",
-"User Password" => "User Password",
+"FTP over SSH" => "FTP sur SSH",
+"Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems." => "Accès à un serveur FTP via SSH. Plus sécurisé et plus simple pour la gestion des permissions.",
+"Server URL" => "URL Serveur",
+"Path to remote sftp server" => "Url du serveur FTP",
+"Port number" => "Port",
+"Port to SSH server" => "Port du serveur FTP",
+"Path" => "Chemin",
+"Real path to the folder on the server" => "Chemin d'accès sur le serveur distant (chemin absolu)",
+"Fix Permissions" => "Correction des permissions",
+"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Gestion des permissions entre le serveur local et le serveur distant.",
 );
 ?>

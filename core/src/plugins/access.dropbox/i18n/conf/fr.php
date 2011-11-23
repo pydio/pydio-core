@@ -20,14 +20,14 @@
 */
 $mess=array(
 "Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.",
-"Consumer Key" => "Consumer Key",
-"Key" => "Key",
-"Consumer Secret" => "Consumer Secret",
-"Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
-"Password" => "Password",
-"User Password" => "User Password",
+"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "Permet de se connecter à un compte dropbox, encore un peu expérimental. Nécessite l'extension PEAR/HTTP_OAuth",
+"Consumer Key" => "Clé d'API",
+"Key" => "API Dropbox (Consumer Key)",
+"Consumer Secret" => "Secret",
+"Secret" => "API Dropbox (Consumer Secret)",
+"User Mail" => "Mail utilisateur",
+"User account" => "Compte utilisateur",
+"Password" => "Mot de passe",
+"User Password" => "Mot de passe",
 );
 ?>

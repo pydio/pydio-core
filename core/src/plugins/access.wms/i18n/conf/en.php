@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "WMS Server" => "WMS Server",
 "Browse the layers served by a WMS server." => "Browse the layers served by a WMS server.",
 "Wms Server" => "Wms Server",

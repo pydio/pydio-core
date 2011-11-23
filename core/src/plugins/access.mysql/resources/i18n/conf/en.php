@@ -19,15 +19,17 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.",
-"Consumer Key" => "Consumer Key",
-"Key" => "Key",
-"Consumer Secret" => "Consumer Secret",
-"Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
+"Mysql Database" => "Mysql Database",
+"This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin." => "This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin.",
+"Host" => "Host",
+"Host to the MySQL Server" => "Host to the MySQL Server",
+"Database" => "Database",
+"Database name" => "Database name",
+"User" => "User",
+"User name (must have privileges to access this db)" => "User name (must have privileges to access this db)",
 "Password" => "Password",
-"User Password" => "User Password",
+"User password" => "User password",
+"Pattern" => "Pattern",
+"If not empty, only tables beginning with such a prefix will be displayed." => "If not empty, only tables beginning with such a prefix will be displayed.",
 );
 ?>

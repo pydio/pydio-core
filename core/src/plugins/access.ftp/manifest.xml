@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="ftp" label="CONF_MESSAGE[FTP Server]" description="CONF_MESSAGE[This driver can access a remote FTP server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
-	<client_settings icon="plugins/access.ftp/icon.png"/>
+    <client_settings icon="plugins/access.ftp/icon.png">
+        <resources>
+            <i18n namespace="ftp_access" path="plugins/access.ftp/i18n"/>
+        </resources>
+    </client_settings>
+
 	<server_settings>
 		<param group="CONF_MESSAGE[Connexion]" name="FTP_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Ftp Host to connect to]" mandatory="true"/>
 		<param group="CONF_MESSAGE[Connexion]" name="FTP_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Ftp Host port]" mandatory="true" default="21"/>
