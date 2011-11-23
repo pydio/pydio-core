@@ -61,7 +61,7 @@ Class.create("FormManager", {
 			if(param.get('descriptionId')){
 				desc = MessageHash[param.get('descriptionId')];
 			}
-            var group = param.get('group') || 'Main Options';
+            var group = param.get('group') || MessageHash[439];
             if(param.get('groupId')){
                 group = MessageHash[param.get('groupId')];
             }

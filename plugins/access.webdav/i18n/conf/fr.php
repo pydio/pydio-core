@@ -25,5 +25,7 @@ $mess=array(
 "Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." => "Chemin du serveur webdav, avec http ou https, et éventuellement les user et passsword.",
 "Uri" => "URI",
 "Path to the root folder on the server" => "Chemin relatif du partage.",
+"File Creation Mask" => "File Creation Mask",
+"Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.",
 );
 ?>

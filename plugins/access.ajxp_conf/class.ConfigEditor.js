@@ -845,7 +845,7 @@ ConfigEditor = Class.create({
                 driverParamsHash.push($H({
                     name:'AJXP_PLUGIN_ENABLED',
                     type:'boolean',
-                    label:"Enabled",
+                    label:MessageHash['ajxp_conf.104'],
                     description:""
                 }));
             }

@@ -26,5 +26,6 @@ $mess=array(
 "Logfile" => "Nom de fichier",
 "The name of the log file" => "Nom des fichiers de log",
 "Files Permissions" => "Permissions",
+"" => "",
 );
 ?>
