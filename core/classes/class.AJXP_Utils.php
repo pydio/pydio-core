@@ -223,8 +223,8 @@ class AJXP_Utils
       AJXP_JSPacker::pack();
     }    
     if(ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])){
-        self::extractConfStringsFromManifests();
-        self::updateAllI18nLibraries();
+        //self::extractConfStringsFromManifests();
+        self::updateAllI18nLibraries((isSet($parameters["create"])?$parameters["create"]:""));
     }
     if(ConfService::getConf("JS_DEBUG") && isSet($parameters["clear_plugins_cache"])){
       @unlink(AJXP_PLUGINS_CACHE_FILE);
@@ -498,25 +498,27 @@ class AJXP_Utils
         }
     }
 
-    static function updateAllI18nLibraries(){
+    static function updateAllI18nLibraries($createLanguage = ""){
         // UPDATE EN => OTHER LANGUAGES
         $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
         foreach ($nodes as $node){
             $nameSpace = $node->getAttribute("namespace");
-            $path = $node->getAttribute("path");
+            $path = AJXP_INSTALL_PATH."/".$node->getAttribute("path");
             if($nameSpace == ""){
-                self::updateI18nFiles($path, false);
-                self::updateI18nFiles($path."/conf");
+                self::updateI18nFiles($path, false, $createLanguage);
+                self::updateI18nFiles($path."/conf", true, $createLanguage);
             }else{
-                self::updateI18nFiles($path);
-                self::updateI18nFiles($path."/conf");
+                self::updateI18nFiles($path, true, $createLanguage);
+                self::updateI18nFiles($path."/conf", true, $createLanguage);
             }
         }
     }
 
-      static function updateI18nFiles($libraryPath, $detectLanguages = true){
-          $baseDir = AJXP_INSTALL_PATH."/".$libraryPath;
+      static function updateI18nFiles($baseDir, $detectLanguages = true, $createLanguage=""){
           if(!is_dir($baseDir) || !is_file($baseDir."/en.php")) return;
+          if($createLanguage != "" && !is_file($baseDir."/$createLanguage.php")){
+              @copy(AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n-template.php", $baseDir."/$createLanguage.php");
+          }
           if(!$detectLanguages){
               $languages = ConfService::listAvailableLanguages();
               $filenames = array();
@@ -550,11 +552,14 @@ class AJXP_Utils
             $currentMessages = array();
             $footer = array();
             $fileLines = file($filename);
+            $insideArray = false;
             foreach ($fileLines as $line){
                 if(strstr($line, "\"") !== false){
                     $currentMessages[] = trim($line);
+                    $insideArray = true;
                 }else{
-                    if(!count($currentMessages)){
+                    if(!$insideArray &&  strstr($line, ");")!==false) $insideArray = true;
+                    if(!$insideArray){
                         $header[] = trim($line);
                     }else{
                         $footer[] = trim($line);
