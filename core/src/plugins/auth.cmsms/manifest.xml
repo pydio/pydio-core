@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="cmsms" label="CONF_MESSAGE[DB Storage]" description="Stores the Authentication data in CMSMS FEU.">
+    <client_settings>
+        <resources>
+            <i18n namespace="cmsms" path="plugins/auth.cmsms/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<param name="LOGIN_URL" type="string" label="CONF_MESSAGE[Login URL]" description="CONF_MESSAGE[if direct access, redirect to the given URL]" mandatory="true" />
 		<param name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="true" />

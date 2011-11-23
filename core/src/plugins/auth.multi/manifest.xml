@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="multi" label="CONF_MESSAGE[Multiple]" description="CONF_MESSAGE[Encapsulate the use of other drivers]">
+    <client_settings>
+        <resources>
+            <i18n namespace="multi_auth" path="plugins/auth.multi/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
         <param name="MASTER_DRIVER" type="string" label="CONF_MESSAGE[Master]" description="CONF_MESSAGE[The name of the master driver to use, generally serial.]" mandatory="true"/>
 		<param name="DRIVERS" type="array" label="CONF_MESSAGE[Drivers]" description="CONF_MESSAGE[The auth drivers definition, see detailed documenation for more info.]" mandatory="true"/>

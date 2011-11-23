@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "Update Engine" => "Update Engine",
 "Automatic update of AjaXplorer. Since version 3.3.3" => "Automatic update of AjaXplorer. Since version 3.3.3",
 "Update Site" => "Update Site",

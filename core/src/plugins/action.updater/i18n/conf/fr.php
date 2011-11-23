@@ -19,16 +19,13 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Login URL" => "Login URL",
-"if direct access, redirect to the given URL" => "if direct access, redirect to the given URL",
-"Logout URL" => "Logout URL",
-"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
-"Secret key" => "Secret key",
-"This key must only be known by remote end" => "This key must only be known by remote end",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
-"Prefix tables" => "Prefix tables",
-"Prefix of CMSMS tables " => "Prefix of CMSMS tables ",
+"Update Engine" => "Mise à jour",
+"Automatic update of AjaXplorer. Since version 3.3.3" => "Mise à jour automatique, depuis la version 3.3.3",
+"Update Site" => "Site de mise à jour",
+"Where to update" => "A priori laisser l'adresse par défaut",
+"Preserve Files" => "Fichiers à conservés",
+"Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." => "Les fichiers déclarés ici (entrer une liste séparée par des virgules, en partant de la racine d'AjaXplorer) seront conservés pendant une mise à jour.",
+"Enable Import From v3.2.4" => "Activer l'import v3.2.4",
+"Enable the migration action, available in the Settings repository" => "Ajoute des boutons pour importer des données depuis une version antérieur (3.2.4)",
 );
 ?>

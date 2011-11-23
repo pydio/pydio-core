@@ -19,16 +19,12 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Login URL" => "Login URL",
-"if direct access, redirect to the given URL" => "if direct access, redirect to the given URL",
-"Logout URL" => "Logout URL",
-"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
-"Secret key" => "Secret key",
-"This key must only be known by remote end" => "This key must only be known by remote end",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
-"Prefix tables" => "Prefix tables",
-"Prefix of CMSMS tables " => "Prefix of CMSMS tables ",
+"1" => "Lien externe",
+"2" => "Lien ajouté par le plugin action.skeleton",
+"3" => "Etes vous sûr de vouloir ouvrir %s dans une nouvelle fenêtre?",
+"4" => "Lien modal",
+"5" => "Ouverture du lien dans une fenêtre modale",
+"6" => "Contenu dynamique",
+"7" => "Chargement du contenu, veuillez patienter...",
 );
 ?>

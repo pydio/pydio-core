@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="basic_http" label="CONF_MESSAGE[Basic HTTP]" description="CONF_MESSAGE[Use the standard http authentication.]" mixins="authdriver_commons">
+    <client_settings>
+        <resources>
+            <i18n namespace="basic_http_auth" path="plugins/auth.basic_http/i18n"/>
+        </resources>
+    </client_settings>
     <server_settings>
         <param name="USERS_FILEPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The users list]" mandatory="true"/>
     </server_settings>

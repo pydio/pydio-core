@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "Sharing Features" => "Sharing Features",
 "Share Center actions and hooks" => "Share Center actions and hooks",
 "Metadata File" => "Metadata File",

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="ftp" label="CONF_MESSAGE[FTP Authentification]" description="CONF_MESSAGE[Authenticate user directly to an FTP server, and connect him to this server.]" mixins="authdriver_commons">
+    <client_settings>
+        <resources>
+            <i18n namespace="ftp_auth" path="plugins/auth.ftp/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
         <param name="FTP_LOGIN_SCREEN" type="boolen" label="CONF_MESSAGE[FTP Login Screen]" description="CONF_MESSAGE[Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog.]" mandatory="true" default="false"/>
 		<param name="REPOSITORY_ID" type="string" label="CONF_MESSAGE[Repository]" description="CONF_MESSAGE[Id of the repository to use for testing connexion]" mandatory="true"/>

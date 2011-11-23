@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="smb" label="CONF_MESSAGE[SMB Authentification]" description="CONF_MESSAGE[Authenticate user by directly connecting to an SMB share]" mixins="authdriver_commons">
+    <client_settings>
+        <resources>
+            <i18n namespace="smb_auth" path="plugins/auth.smb/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<param name="REPOSITORY_ID" type="string" label="CONF_MESSAGE[Repository]" description="CONF_MESSAGE[Id of the repository to use for testing connexion]" mandatory="true"/>
 		<param name="ADMIN_USER" type="string" label="CONF_MESSAGE[Admin user]" description="CONF_MESSAGE[The ID of an existing admin for Ajaxplorer (using conf.serial)]" mandatory="true"/>

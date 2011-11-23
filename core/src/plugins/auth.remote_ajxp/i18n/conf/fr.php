@@ -19,16 +19,19 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Login URL" => "Login URL",
-"if direct access, redirect to the given URL" => "if direct access, redirect to the given URL",
-"Logout URL" => "Logout URL",
-"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
-"Secret key" => "Secret key",
-"This key must only be known by remote end" => "This key must only be known by remote end",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
-"Prefix tables" => "Prefix tables",
-"Prefix of CMSMS tables " => "Prefix of CMSMS tables ",
+"Remote AJXP" => "AJXP distant",
+"Use another AJXP intall to log in." => "Se connecter en négociant sur une autre installation AjaXplorer",
+"Server" => "Serveur",
+"The host URL" => "L'hôte",
+"Port" => "Port",
+"The host port" => "Port",
+"User name" => "Utilisateur",
+"User on the remote host" => "AjaXplorer utilisateur défini sur le serveur distant",
+"Password" => "Mot de passe",
+"Password on the remote host" => "Mot de passe",
+"Session Name" => "Nom de la session",
+"Parameter name to pass the session id" => "Paramêtre pour passer l'id de session",
+"URI" => "URI",
+"Script URI on the remote server" => "Chemin sur le serveur distant.",
 );
 ?>

@@ -19,16 +19,13 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Login URL" => "Login URL",
-"if direct access, redirect to the given URL" => "if direct access, redirect to the given URL",
-"Logout URL" => "Logout URL",
-"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
-"Secret key" => "Secret key",
-"This key must only be known by remote end" => "This key must only be known by remote end",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
-"Prefix tables" => "Prefix tables",
-"Prefix of CMSMS tables " => "Prefix of CMSMS tables ",
+"Multiple" => "Multiple",
+"Encapsulate the use of other drivers" => "Encapsulation de plusieurs drivers",
+"Master" => "Maître",
+"The name of the master driver to use, generally serial." => "Le driver principal à utiliser.",
+"Drivers" => "Drivers",
+"The auth drivers definition, see detailed documenation for more info." => "Les drivers définis (tableau de valeurs PHP). Voir la doc du plugin.",
+"Separator" => "Séparateur",
+"This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Séparateur pour stocker les données des utilisateurs avec en les différenciant correctement selon les drivers.",
 );
 ?>
