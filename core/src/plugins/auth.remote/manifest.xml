@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="remote" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]" mixins="authdriver_commons">
+<authdriver name="remote" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="remote_auth" path="plugins/auth.remote/i18n"/>

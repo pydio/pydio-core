@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="remote_ajxp" label="CONF_MESSAGE[Remote AJXP]" description="CONF_MESSAGE[Use another AJXP intall to log in.]">
+<authdriver name="remote_ajxp" label="CONF_MESSAGE[Remote AJXP]" description="CONF_MESSAGE[Use another AJXP intall to log in.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="remote_ajxp_auth" path="plugins/auth.remote_ajxp/i18n"/>

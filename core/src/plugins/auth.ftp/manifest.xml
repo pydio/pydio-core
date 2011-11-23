@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<authdriver name="ftp" label="CONF_MESSAGE[FTP Authentification]" description="CONF_MESSAGE[Authenticate user directly to an FTP server, and connect him to this server.]" mixins="authdriver_commons">
+<authdriver name="ftp" label="CONF_MESSAGE[FTP Authentification]" description="CONF_MESSAGE[Authenticate user directly to an FTP server, and connect him to this server.]" mixins="authdriver_commons"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="ftp_auth" path="plugins/auth.ftp/i18n"/>
@@ -128,6 +128,6 @@
 		</actions>
 	</registry_contributions>
 	<dependencies>
-		<plugin pluginName="access.ftp"/>
+		<pluginClass pluginName="access.ftp"/>
 	</dependencies>	
 </authdriver>

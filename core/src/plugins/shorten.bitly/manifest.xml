@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<hook id="shorten.bitly" enabled="false" label="CONF_MESSAGE[Bit.ly URL Shortener]" description="CONF_MESSAGE[Shorten Download Links before sending them back to the user. Requires a Bit.ly account.]">
+<ajxp_plugin id="shorten.bitly" enabled="false" label="CONF_MESSAGE[Bit.ly URL Shortener]" description="CONF_MESSAGE[Shorten Download Links before sending them back to the user. Requires a Bit.ly account.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="bitly_shortener" path="plugins/shorten.bitly/i18n" />
@@ -23,4 +23,4 @@
     <dependencies>
         <activePlugin pluginName="action.share"/>
     </dependencies>
-</hook>
+</ajxp_plugin>

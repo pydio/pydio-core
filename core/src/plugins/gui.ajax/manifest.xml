@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxp_client" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]">
+<guidriver name="ajxp_client" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>

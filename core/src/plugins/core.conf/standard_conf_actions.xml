@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<driver name="ajxpclient">
+<registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
 		<action name="switch_repository">
 			<processing>
@@ -289,4 +289,4 @@
 			</processing>		
 		</action>		
 	</actions>
-</driver>
+</registry_contributions>

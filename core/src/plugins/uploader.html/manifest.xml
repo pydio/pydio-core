@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<uploader id="uploader.html" text="51" title="162" className="MultiUploader" label="CONF_MESSAGE[HTML Uploader]" description="CONF_MESSAGE[Auto-switching HTML5 or IFrame uploader.]">
+<uploader id="uploader.html" text="51" title="162" className="MultiUploader" label="CONF_MESSAGE[HTML Uploader]" description="CONF_MESSAGE[Auto-switching HTML5 or IFrame uploader.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/uploader.html/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
     <server_settings>
         <global_param expose="true" name="DEFAULT_EXISTING" group="CONF_MESSAGE[Default Behaviour]" type="select" choices="overwrite|Always Override,rename|Auto Rename File,alert|Prompt user" label="CONF_MESSAGE[Existing Files]" description="CONF_MESSAGE[Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)]" mandatory="false" default="rename"/>
@@ -34,7 +34,11 @@
 				</processing>
 			</action>
 		</actions>
-	</registry_contributions>	
+	</registry_contributions>
+    <dependencies>
+        <!-- Stream Wrapper Access, and dependancy to uploader.flex forces the order -->
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|uploader.flex"/>
+    </dependencies>
 	<processing>	
 		<clientForm id="originalUploadForm"><![CDATA[
 			<!-- UPLOAD FORM -->
@@ -106,8 +110,4 @@
 		}
 		]]></extensionOnInit>		
 	</processing>
-	<dependencies>
-		<!-- Stream Wrapper Access, and dependancy to uploader.flex forces the order -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|uploader.flex"/>
-	</dependencies>					
 </uploader>

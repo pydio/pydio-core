@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<action_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]">
+<ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
         <global_param name="METADATA_FILE" type="string" label="CONF_MESSAGE[Metadata File]" description="CONF_MESSAGE[Hidden file containing shared metadata]" mandatory="true" default=".ajxp_share_meta"/>
         <global_param name="METADATA_FILE_LOCATION" type="select" choices="infolders|In Local Folders,global|In Global Folder" label="CONF_MESSAGE[File location]" description="CONF_MESSAGE[Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder.]" mandatory="true" default="infolders"/>
@@ -140,4 +140,4 @@
     <dependencies>
         <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
     </dependencies>
-</action_plugin>
+</ajxp_plugin>
