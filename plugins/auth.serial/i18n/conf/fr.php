@@ -19,16 +19,9 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Login URL" => "Login URL",
-"if direct access, redirect to the given URL" => "if direct access, redirect to the given URL",
-"Logout URL" => "Logout URL",
-"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
-"Secret key" => "Secret key",
-"This key must only be known by remote end" => "This key must only be known by remote end",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
-"Prefix tables" => "Prefix tables",
-"Prefix of CMSMS tables " => "Prefix of CMSMS tables ",
+"Serialized authentication storage" => "Fichiers sérialisés",
+"Stores the Authentication data as serialized PHP values on the filesystem." => "Stockage des informations dans des fichiers PHP sérialisés.",
+"Users" => "Utilisateurs",
+"The users list" => "Liste des utilisateurs.",
 );
 ?>

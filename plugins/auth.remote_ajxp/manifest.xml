@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="remote_ajxp" label="CONF_MESSAGE[Remote AJXP]" description="CONF_MESSAGE[Use another AJXP intall to log in.]">
+    <client_settings>
+        <resources>
+            <i18n namespace="remote_ajxp_auth" path="plugins/auth.remote_ajxp/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<param name="REMOTE_SERVER" type="string" label="CONF_MESSAGE[Server]" description="CONF_MESSAGE[The host URL]" mandatory="true"/>
 		<param name="REMOTE_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[The host port]" mandatory="true"/>

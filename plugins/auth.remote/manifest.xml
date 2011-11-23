@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="remote" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]" mixins="authdriver_commons">
+    <client_settings>
+        <resources>
+            <i18n namespace="remote_auth" path="plugins/auth.remote/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<param name="SLAVE_MODE" type="boolean" label="CONF_MESSAGE[Authentication mode]" description="CONF_MESSAGE[If set, the remote end calls us to register upon login, else, we will be calling the remote end when login is required]" default="true" mandatory="true" />
 		<param name="LOGIN_URL" type="string" label="CONF_MESSAGE[Login URL]" description="CONF_MESSAGE[When not in slave mode, AJXP calls the given URL as URL?name=XXX&amp;pass=XXX&amp;key=XXX. Else it redirect to the given URL]" mandatory="true" />

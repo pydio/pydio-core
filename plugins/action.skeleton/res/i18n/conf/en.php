@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "Skeleton Plugin" => "Skeleton Plugin",
 "This is an empty container to demonstrate the basics of plugins coding." => "This is an empty container to demonstrate the basics of plugins coding.",
 "Custom Footer" => "Custom Footer",

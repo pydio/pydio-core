@@ -19,16 +19,13 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Login URL" => "Login URL",
-"if direct access, redirect to the given URL" => "if direct access, redirect to the given URL",
-"Logout URL" => "Logout URL",
-"Redirect to the given URL on loggin out" => "Redirect to the given URL on loggin out",
-"Secret key" => "Secret key",
-"This key must only be known by remote end" => "This key must only be known by remote end",
-"Connexion" => "Connexion",
-"The Database Connexion" => "The Database Connexion",
-"Prefix tables" => "Prefix tables",
-"Prefix of CMSMS tables " => "Prefix of CMSMS tables ",
+"Skeleton Plugin" => "Plugin Squelette",
+"This is an empty container to demonstrate the basics of plugins coding." => "Plugin vide pour expliquer les fonctionnalités de base d'un plugin. Ajoute un bouton dans la toolbar pour ouvrir une URL externe, et un header/footer customizés.",
+"Custom Footer" => "Pied de page",
+"Show a custom footer div" => "Afficher un pied de page custom",
+"Footer Content" => "Contenu du pied",
+"Display this content in the footer" => "Contenu affiché si le pied de page est activé.",
+"Button Target Url" => "Cible du bouton",
+"The target URL of the button that will be added to the application" => "URL du bouton ajouté à l'application.",
 );
 ?>

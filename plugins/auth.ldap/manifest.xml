@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="ldap" label="CONF_MESSAGE[LDAP Directory]" description="CONF_MESSAGE[Authentication datas are stored on the LDAP server.]">
+    <client_settings>
+        <resources>
+            <i18n namespace="ldap_auth" path="plugins/auth.ldap/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<param name="LDAP_URL" type="string" label="CONF_MESSAGE[LDAP URL]" description="CONF_MESSAGE[LDAP Server URL (IP or name)]" mandatory="true"/>
 		<param name="LDAP_PORT" type="string" label="CONF_MESSAGE[LDAP Port]" description="CONF_MESSAGE[LDAP Server Port (leave blank for default)]" mandatory="false"/>
