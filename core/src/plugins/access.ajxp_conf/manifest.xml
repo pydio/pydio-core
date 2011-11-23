@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="ajxp_conf" label="CONF_MESSAGE[Admin Driver]" description="CONF_MESSAGE[Access AjaXplorer configuration data.]">
+<ajxpdriver name="ajxp_conf" label="CONF_MESSAGE[Admin Driver]" description="CONF_MESSAGE[Access AjaXplorer configuration data.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
 		<resources>
 			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/i18n" />		

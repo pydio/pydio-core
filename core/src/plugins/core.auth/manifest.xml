@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpcore id="core.auth">
+<ajxpcore id="core.auth" label="AuthDrivers Configs" description="Options applied to all auth drivers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/core.auth/class.CoreAuthLoader.php" classname="CoreAuthLoader"/>
     <client_settings>
         <resources>
