@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "Subversion Repository" => "Subversion Repository",
 "Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline.",
 );

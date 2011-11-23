@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="core.auth">
 	<class_definition filename="plugins/core.auth/class.CoreAuthLoader.php" classname="CoreAuthLoader"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="core_auth" path="plugins/core.auth/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<global_param name="ENABLE_USERS" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Enable Users]" description="Activate the users management system to protect your AjaXplorer installation." mandatory="true" default="true"/>
 		<global_param name="ALLOW_GUEST_BROWSING" group="CONF_MESSAGE[Generic Auth Features]"  type="boolean" label="CONF_MESSAGE[Guest Browsing]" description="Enable the 'guest' user, who does not need to log in." mandatory="true" default="false"/>

@@ -6,10 +6,13 @@
         <global_param expose="true" name="DEFAULT_AUTO_START" group="CONF_MESSAGE[Default Behaviour]" type="boolean" label="CONF_MESSAGE[Auto Start]" description="CONF_MESSAGE[Default value for automatically starting upload or not]" mandatory="false" default="true"/>
         <global_param expose="true" name="DEFAULT_AUTO_CLOSE" group="CONF_MESSAGE[Default Behaviour]" type="boolean" label="CONF_MESSAGE[Auto Close]" description="CONF_MESSAGE[Default value for automatically closing the dialog after upload or not]" mandatory="false" default="true"/>
     </server_settings>
-	<resources>
-		<js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
-		<js file="plugins/uploader.html/class.XHRUploader.js" className="XHRUploader"/>
-	</resources>
+    <client_settings>
+        <resources>
+            <js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
+            <js file="plugins/uploader.html/class.XHRUploader.js" className="XHRUploader"/>
+            <i18n path="plugins/uploader.html/i18n" namespace="html_uploader"/>
+        </resources>
+    </client_settings>
 	<registry_contributions>
 		<actions>
 			<action name="upload">

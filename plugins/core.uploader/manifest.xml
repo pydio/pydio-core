@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="core.uploader">
     <class_definition filename="plugins/core.uploader/class.CoreUploaderLoader.php" classname="CoreUploaderLoader"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="core_uploader" path="plugins/core.uploader/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<global_param expose="true" group="CONF_MESSAGE[Allowed Extensions]" name="ALLOWED_EXTENSIONS" type="string" label="CONF_MESSAGE[Extensions List]" description="Filter the files that are allowed to be uploaded, by extensions. Use a comma-separated list." mandatory="false" default=""/>
 		<global_param expose="true" group="CONF_MESSAGE[Allowed Extensions]" name="ALLOWED_EXTENSIONS_READABLE" type="string" label="CONF_MESSAGE[Ext. Label]" description="User readable label for the list of allowed extensions (images, all files, etc)." mandatory="false" default=""/>

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.flex" text="51" title="162" label="CONF_MESSAGE[Flash uploader]" description="CONF_MESSAGE[Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file.]">
 	<class_definition filename="plugins/uploader.flex/class.FlexUploadProcessor.php" classname="FlexUploadProcessor"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="flex_uploader" path="plugins/uploader.flex/i18n" />
+        </resources>
+    </client_settings>
 	<server_settings>
 		<global_param name="HTTPS_POLICY_FILE" group="CONF_MESSAGE[Miscalleneous]" type="string" label="CONF_MESSAGE[HTTPS Policy]" description="CONF_MESSAGE[An Https Policy file maybe used to solve Flash upload problems when in Https. Use path relative to the web root.]" mandatory="false" default="true"/>
 	</server_settings>

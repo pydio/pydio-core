@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="ajxp_client" label="CONF_MESSAGE[Client Plugin]" description="CONF_MESSAGE[Browser-based rich interface. Contains configurations for theming, custom welcome message, etc.]">
+    <client_settings>
+        <resources>
+            <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
         <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="umbra|Umbra (HTML5),oxygen|Oxygen (Legacy)" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="umbra"/>
 		<global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Start Up Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>

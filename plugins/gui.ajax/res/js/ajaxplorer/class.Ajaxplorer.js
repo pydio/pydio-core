@@ -703,8 +703,9 @@ Class.create("Ajaxplorer", {
 				resourcesManager : new ResourcesManager()				
 			};
 			this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
-			for(var j=0;j<extensions[i].childNodes.length;j++){
-				var child = extensions[i].childNodes[j];
+            var resourceNodes = XPathSelectNodes(extensions[i], "client_settings/resources|dependencies|clientForm");
+			for(var j=0;j<resourceNodes.length;j++){
+				var child = resourceNodes[j];
 				extensionDefinition.resourcesManager.loadFromXmlNode(child);
 			}
 			if(this.initExtension(extensions[i], extensionDefinition)){

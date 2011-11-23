@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.text" openable="true" order="10" text="51" title="162" icon="edit.png" className="TextEditor" mimes="none" formId="edit_box" label="CONF_MESSAGE[Text Editor]" description="CONF_MESSAGE[Very basic text editor]">
-	<resources>
-		<js file="plugins/editor.text/class.TextEditor.js" className="TextEditor"/>
-	</resources>
+	<client_settings>
+        <resources>
+            <js file="plugins/editor.text/class.TextEditor.js" className="TextEditor"/>
+            <i18n path="plugins/editor.text/i18n" namespace="text_editor"/>
+        </resources>
+	</client_settings>
 	<clientForm id="edit_box"><![CDATA[
 		<div id="edit_box" action="editer" box_width="80%" box_height="90%" box_padding="0">
 			<div class="action_bar">

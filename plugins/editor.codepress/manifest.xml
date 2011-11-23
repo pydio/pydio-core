@@ -5,9 +5,12 @@
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>
-	<resources>
-		<js file="plugins/editor.codepress/codepress/codepress.js" className="CodePress"/>
-		<js file="plugins/editor.codepress/class.CodePressEditor.js" className="CodePressEditor"/>
-		<img_library alias="codepress_images" path="plugins/editor.codepress"/>
-	</resources>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.codepress/codepress/codepress.js" className="CodePress"/>
+            <js file="plugins/editor.codepress/class.CodePressEditor.js" className="CodePressEditor"/>
+            <img_library alias="codepress_images" path="plugins/editor.codepress"/>
+            <i18n namespace="codepress" path="plugins/editor.codepress/i18n" />
+        </resources>
+    </client_settings>
 </editor>
