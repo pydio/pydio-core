@@ -204,6 +204,7 @@ class AJXP_XMLWriter
 			$xml = preg_replace("/[\n\r]?/", "", $xml);
 			$xml = preg_replace("/\t/", " ", $xml);
 		}
+        $xml = str_replace(array('xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"','xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd"'), "", $xml);
         AJXP_Controller::applyIncludeHook("xml.filter", array(&$xml));
 		return $xml;		
 	}	
