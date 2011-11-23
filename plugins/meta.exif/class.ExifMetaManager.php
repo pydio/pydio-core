@@ -104,7 +104,8 @@ class ExifMetaManager extends AJXP_Plugin {
 		$decoded = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 		$realFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $urlBase.$decoded);
 		AJXP_Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
-		$exifData = exif_read_data($realFile, 0, TRUE);
+		$exifData = @exif_read_data($realFile, 0, TRUE);
+        if($exifData === false || !is_array($exifData)) return;
 		if($exifData !== false && isSet($exifData["GPS"])){
 			$exifData["COMPUTED_GPS"] = $this->convertGPSData($exifData);
 		}
@@ -148,7 +149,7 @@ class ExifMetaManager extends AJXP_Plugin {
 		if(!preg_match("/\.jpg$|\.jpeg$|\.tif$|\.tiff$/i",$currentFile)) return ;
 		if(!exif_imagetype($currentFile)) return ;
 		$realFile = $ajxpNode->getRealFile();
-		$exif = exif_read_data($realFile, 0, TRUE);
+		$exif = @exif_read_data($realFile, 0, TRUE);
 		if($exif === false) return ;
 		$additionalMeta = array();
 		foreach ($definitions as $def => $label){
