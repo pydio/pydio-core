@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="webdav" label="CONF_MESSAGE[WebDAV (PEAR)]" description="CONF_MESSAGE[Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
-	<client_settings icon="plugins/access.fs/icon.png"/>
+    <client_settings icon="plugins/access.fs/icon.png">
+        <resources>
+            <i18n namespace="webdav_access" path="plugins/access.webdav/i18n"/>
+        </resources>
+    </client_settings>
+
 	<server_settings>
 		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too.]" mandatory="true" default="http://webdav.host.com"/>
 		<param name="PATH" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path to the root folder on the server]" mandatory="true"/>

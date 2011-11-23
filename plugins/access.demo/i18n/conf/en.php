@@ -19,7 +19,6 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"0" => "0",
 "Demo (no write actions)" => "Demo (no write actions)",
 "This is a standard access to the filesystem but with all write actions disabled server-side." => "This is a standard access to the filesystem but with all write actions disabled server-side.",
 "Path" => "Path",

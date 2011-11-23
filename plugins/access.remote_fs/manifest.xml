@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="remote_fs" label="CONF_MESSAGE[Remote Server (via API)]" description="CONF_MESSAGE[Access a remote server implementing the AjaXplorer API (most commonly a remote server with another AjaXplorer installed)]">
-	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png"/>
+	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png">
+        <resources>
+            <i18n namespace="remote_fs_access" path="plugins/access.remote_fs/i18n"/>
+        </resources>
+    </client_settings>
+
 	<server_settings>
 		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Domain name or IP to the remote server, without http]" mandatory="true"/>
 		<param name="URI" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path of the API implementor on the remote server.]" default="/ajaxplorer/content.php" mandatory="true"/>

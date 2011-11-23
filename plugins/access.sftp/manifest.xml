@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="sftp" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
-	<client_settings icon="plugins/access.sftp/icon.png"/>
+    <client_settings icon="plugins/access.sftp/icon.png">
+        <resources>
+            <i18n namespace="sftp_access" path="plugins/access.sftp/i18n"/>
+        </resources>
+    </client_settings>
+
 	<server_settings>
 		<param name="SERV" type="string" label="CONF_MESSAGE[Server URL]" description="CONF_MESSAGE[Path to remote sftp server]" mandatory="true"/>
 		<param name="PORT" type="string" label="CONF_MESSAGE[Port number]" description="CONF_MESSAGE[Port to SSH server]" mandatory="true" default="22"/>

@@ -19,15 +19,17 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.",
-"Consumer Key" => "Consumer Key",
-"Key" => "Key",
-"Consumer Secret" => "Consumer Secret",
-"Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
-"Password" => "Password",
-"User Password" => "User Password",
+"Mysql Database" => "Base de données MySQL",
+"This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin." => "Ce driver permet de visualiser et de modifier des tables et leurs enregistrements dans une base de données MySQL",
+"Host" => "Serveur",
+"Host to the MySQL Server" => "Adresse du serveur MySQL",
+"Database" => "Base",
+"Database name" => "Nom de la base de données",
+"User" => "Utilisateur",
+"User name (must have privileges to access this db)" => "Utilisateur qui a les privilèges pour cette base",
+"Password" => "Mot de passe",
+"User password" => "Mot de passe utilisateur",
+"Pattern" => "Préfixe",
+"If not empty, only tables beginning with such a prefix will be displayed." => "Si non-vide, seules les tables commencant par ce préfixe seront affichées.",
 );
 ?>

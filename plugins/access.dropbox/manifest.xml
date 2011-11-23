@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver active="false" name="dropbox" label="CONF_MESSAGE[Dropbox]" description="CONF_MESSAGE[This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.]" mixins="filesystem_commons,slug_provider,template_provider">
-	<client_settings icon="plugins/access.dropbox/dropboxLogo.png"/>
+	<client_settings icon="plugins/access.dropbox/dropboxLogo.png">
+        <resources>
+            <i18n namespace="access_dropbox" path="plugins/access.dropbox/i18n"/>
+        </resources>
+    </client_settings>
 	<server_settings>
 		<param name="CONSUMER_KEY" type="string" label="CONF_MESSAGE[Consumer Key]" description="CONF_MESSAGE[Key]" mandatory="true"/>
 		<param name="CONSUMER_SECRET" type="string" label="CONF_MESSAGE[Consumer Secret]" description="CONF_MESSAGE[Secret]" mandatory="true"/>

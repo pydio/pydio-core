@@ -19,15 +19,7 @@
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
 $mess=array(
-"Dropbox" => "Dropbox",
-"This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension." => "This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.",
-"Consumer Key" => "Consumer Key",
-"Key" => "Key",
-"Consumer Secret" => "Consumer Secret",
-"Secret" => "Secret",
-"User Mail" => "User Mail",
-"User account" => "User account",
-"Password" => "Password",
-"User Password" => "User Password",
+"Javascript Api Browser" => "Navigateur d'Api Javascript",
+"Browse AjaXplorer Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Ajaxplorer data can be fed by something different than a remote server filesystem!" => "Lister les classes et interfaces javascript et leur methodes, avec affichage du code. Pratique non seulement pour le développement, mais aussi comme démonstration de l'utilisation d'AjaXplorer pour browser d'autres types de données.",
 );
 ?>
