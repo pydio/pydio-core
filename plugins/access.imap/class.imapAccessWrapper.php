@@ -76,8 +76,8 @@ class imapAccessWrapper implements AjxpWrapper {
 		// parse URL
 		$parts = parse_url($path);		
 		$this->repositoryId = $parts["host"];
-		if(!isset(self::$delimiter) && file_exists(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId)){
-			self::$delimiter = file_get_contents(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId);
+		if(!isset(self::$delimiter) && file_exists(AJXP_CACHE_DIR."/access.imap/mailbox_delim_".$this->repositoryId)){
+			self::$delimiter = file_get_contents(AJXP_CACHE_DIR."/access.imap/mailbox_delim_".$this->repositoryId);
 		}		
 		
 		$this->path = substr($parts["path"], 1);
@@ -309,8 +309,9 @@ class imapAccessWrapper implements AjxpWrapper {
 				$x = $obj->name;
 				$x = mb_convert_encoding( $x, "UTF-8", "UTF7-IMAP" );
 				$x = str_replace(self::$currentRef, "", $x);
-				if(!isSet(self::$delimiter) && !file_exists(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId)){
-					file_put_contents(AJXP_CACHE_DIR."/mailbox_delim_".$this->repositoryId, $obj->delimiter);
+				if(!isSet(self::$delimiter) && !file_exists(AJXP_CACHE_DIR."/access.imap/mailbox_delim_".$this->repositoryId)){
+                    if(!is_dir(AJXP_CACHE_DIR."/access.imap")) mkdir(AJXP_CACHE_DIR."/access.imap");
+					file_put_contents(AJXP_CACHE_DIR."/access.imap/mailbox_delim_".$this->repositoryId, $obj->delimiter);
 					self::$delimiter = $obj->delimiter;
 				}
 				$x = str_replace($obj->delimiter, "__delim__", $x);
