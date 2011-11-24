@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.pixlr" openable="true" text="333" title="333" icon="pixlr_images/actions/ICON_SIZE/color_fill.png" className="PixlrEditor" mimes="jpg,jpeg,png,bmp,pxd" formId="pixlr_box" write="true" label="CONF_MESSAGE[Pixlr Editor]" description="CONF_MESSAGE[Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.pixlr/class.PixlrEditor.php" classname="PixlrEditor"/>
+    <server_settings>
+        <global_param
+                description="CONF_MESSAGE[Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)]"
+                label="CONF_MESSAGE[Secure Token]" name="CHECK_SECURITY_TOKEN" type="boolean" default="true" />
+    </server_settings>
 	<client_settings>
         <resources>
             <js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>

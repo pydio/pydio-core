@@ -1,1 +1,2 @@
-ErrorDocument 404 /ajaxplorer/plugins/editor.pixlr/fake_save_pixlr.php
+RewriteEngine On
+RewriteRule ^fake_save_pixlr_(.*).php$ fake_save_pixlr.php
