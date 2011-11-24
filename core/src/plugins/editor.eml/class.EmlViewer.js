@@ -189,6 +189,7 @@ Class.create("EmlViewer", AbstractEditor, {
 		if(html){
 			this.iFrame = new Element('iframe');
 			this.textareaContainer.insert(this.iFrame);
+            this.textareaContainer.setStyle({overflowY:'hidden'});
 			this.iFrameContent = html.firstChild.nodeValue;
 			this.iFrame.contentWindow.document.write(this.iFrameContent);
 			this.iFrame.setStyle({width: '100%', height: '100%', border: '0px'});
@@ -209,7 +210,8 @@ Class.create("EmlViewer", AbstractEditor, {
 			var pre = new Element("pre");
 			pre.insert(XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="plain"]').firstChild.nodeValue);
 			this.textareaContainer.insert(pre);
-			pre.setStyle({display:'block',height: '100%'});
+            this.textareaContainer.setStyle({overflowY:'auto'});
+			pre.setStyle({display:'block',height: '100%',margin:0});
 		}
 	},
 	

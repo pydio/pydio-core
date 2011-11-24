@@ -60,11 +60,12 @@ div.emlAttachCont{
 }
 
 div.emlAttachment{
-padding: 2px 5px 4px 5px;
-background-image: url('attach.png');
-background-repeat: no-repeat;
-background-position: 2px 2px;
-padding-left: 23px;	
+    padding: 2px 5px 4px 5px;
+    background-image: url('attach.png');
+    background-repeat: no-repeat;
+    background-position: 2px 2px;
+    padding-left: 23px;
+    cursor: pointer;
 }
 
 div.emlAttachment.active,
