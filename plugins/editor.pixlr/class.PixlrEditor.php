@@ -52,11 +52,12 @@ class PixlrEditor extends AJXP_Plugin {
 			//$httpClient->setDebug(true);
 			$postData = array();							
 			$httpClient->setHandleRedirects(false);
+            $secure = $httpVars["secure_token"];
 			$params = array(
 				"referrer"	=> "AjaXplorer",
 				"method"	=> "get",
 				"loc"		=> ConfService::getLanguage(),
-				"target"	=> $target."/fake_save_pixlr.php",
+				"target"	=> $target."/fake_save_pixlr_".md5($secure).".php",
 				"exit"		=> $target."/fake_close_pixlr.php",
 				"title"		=> urlencode(basename($file)),
 				"locktarget"=> "false",
@@ -72,19 +73,15 @@ class PixlrEditor extends AJXP_Plugin {
 			$url = $httpVars["new_url"];
 			$urlParts = parse_url($url);
 			$query = $urlParts["query"];
+            $scriptName = basename($urlParts["path"]);
+            $token = str_replace(array("fake_save_pixlr_", ".php"), "", $scriptName);
+            if($token != md5($httpVars["secure_token"])){
+                throw new AJXP_Exception("Invalid Token, this could mean some security problem!");
+            }
 			$params = array();
 			$parameters = parse_str($query, $params);
 
 			$image = $params['image'];
-			/*
-			$type = $params['type'];
-			$state = $params['state'];
-			$filename = $params['title'];		
-			*/
-				
-			if (strpos($image, "pixlr.com") == 0){
-				throw new AJXP_Exception("Invalid Referrer");
-			}
 			$headers = get_headers($image, 1);
 			$content_type = explode("/", $headers['Content-Type']);
 			if ($content_type[0] != "image"){
@@ -99,8 +96,8 @@ class PixlrEditor extends AJXP_Plugin {
 			fclose($orig);
 			fclose($target);
 			
-			header("Content-Type:text/plain");
-			print($mess[115]);
+			//header("Content-Type:text/plain");
+			//print($mess[115]);
 			
 		}
 		
