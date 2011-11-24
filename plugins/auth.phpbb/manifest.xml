@@ -16,7 +16,7 @@ $AUTH_DRIVER = array(
 );
 
 -->
-<authdriver name="phpbb" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<authdriver name="phpbb" enabled="false" label="CONF_MESSAGE[Remote authentication]" description="CONF_MESSAGE[Authentication is done remotely (useful in CMS system).]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="phpbb_auth" path="plugins/auth.phpbb/i18n"/>

@@ -21,8 +21,6 @@
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once("svn_lib.inc.php");
-
 /**
  * @package info.ajaxplorer.plugins
  * Uses svn command lines to extract version infos. Autocommit on change.
@@ -41,7 +39,9 @@ class SvnManager extends AJXP_Plugin {
 	}
 	
 	public function initMeta($accessDriver){
-		$this->accessDriver = $accessDriver;		
+        require_once("svn_lib.inc.php");
+
+		$this->accessDriver = $accessDriver;
 		parent::init($this->options);
 	
 	}

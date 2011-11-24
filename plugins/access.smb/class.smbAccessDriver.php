@@ -20,7 +20,6 @@
  *
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-include_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
 
 /**
  * @package info.ajaxplorer.plugins
@@ -37,6 +36,9 @@ class smbAccessDriver extends fsAccessDriver
 	protected $urlBase;
 		
 	function initRepository(){
+
+        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
+
 		if(is_array($this->pluginConf)){
 			$this->driverConf = $this->pluginConf;
 		}else{

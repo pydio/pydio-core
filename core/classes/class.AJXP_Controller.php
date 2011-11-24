@@ -33,7 +33,7 @@ class AJXP_Controller{
 	private static function initXPath(){		
 		if(!isSet(self::$xPath)){
 			
-			$registry = AJXP_PluginsService::getXmlRegistry();
+			$registry = AJXP_PluginsService::getXmlRegistry( false );
 			$changes = self::filterActionsRegistry($registry);
 			if($changes) AJXP_PluginsService::updateXmlRegistry($registry);
 			self::$xPath = new DOMXPath($registry);		
@@ -90,11 +90,11 @@ class AJXP_Controller{
 		}
 		$action = $actions->item(0);
 		//Check Rights
-		$mess = ConfService::getMessages();
 		if(AuthService::usersEnabled()){
 			$loggedUser = AuthService::getLoggedUser();
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "adminOnly") && 
 				($loggedUser == null || !$loggedUser->isAdmin())){
+                    $mess = ConfService::getMessages();
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess[207]);
 					AJXP_XMLWriter::requireAuth();
@@ -110,6 +110,7 @@ class AJXP_Controller{
 						AJXP_XMLWriter::close();
 						exit(1);					
 					}
+                    $mess = ConfService::getMessages();
 					AJXP_XMLWriter::sendMessage(null, $mess[208]);
 					AJXP_XMLWriter::requireAuth();
 					AJXP_XMLWriter::close();
@@ -117,6 +118,7 @@ class AJXP_Controller{
 				}
 			if( AJXP_Controller::actionNeedsRight($action, $xPath, "write") && 
 				($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRootDirIndex().""))){
+                    $mess = ConfService::getMessages();
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess[207]);
 					AJXP_XMLWriter::requireAuth();

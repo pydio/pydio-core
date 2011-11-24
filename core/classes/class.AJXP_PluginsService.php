@@ -34,6 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $streamWrapperPlugins = array();
  	private $registeredWrappers = array();
  	private $xmlRegistry;
+    private $registryVersion;
  	private $pluginFolder;
     private $tmpDeferRegistryBuild = false;
  	/**
@@ -110,10 +111,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 */
  	private function recursiveLoadPlugin($plugin, $pluginsPool){
  		if($plugin->loadingState!=""){
- 			//print("<div style='padding-left:30px;'>--- Pluging ".$plugin->getId()." already loaded</div>");
  			return ;
  		}
- 		//print("<div style='padding-left:30px;'>--- Loading ".$plugin->getId());
 		$dependencies = $plugin->getDependencies();
 		$plugin->loadingState = "lock";
 		foreach ($dependencies as $dependencyId){
@@ -130,7 +129,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 		$plugin->loadConfigs($options);
 		$this->registry[$plugType][$plugin->getName()] = $plugin;
 		$plugin->loadingState = "loaded";
-		//print("</div>");
  	}
  	
  	/**
@@ -296,7 +294,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		}
  		$this->activePlugins[$type.".".$name] = $active;
  		if(isSet($this->xmlRegistry) && !$this->tmpDeferRegistryBuild){
- 			$this->buildXmlRegistry();
+ 			$this->buildXmlRegistry(($this->registryVersion == "extended"));
  		}
  	}
  	
@@ -334,14 +332,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		return $this->registeredWrappers;
  	}
  	
- 	public function buildXmlRegistry(){
+ 	public function buildXmlRegistry($extendedVersion = true){
  		$actives = $this->getActivePlugins();
  		$reg = new DOMDocument();
  		$reg->loadXML("<ajxp_registry></ajxp_registry>");
  		foreach($actives as $activeName=>$status){
  			if($status === false) continue; 			
  			$plug = $this->getPluginById($activeName);
- 			$contribs = $plug->getRegistryContributions();
+ 			$contribs = $plug->getRegistryContributions($extendedVersion);
  			foreach($contribs as $contrib){
  				$parent = $contrib->nodeName;
  				$nodes = $contrib->childNodes;
@@ -354,10 +352,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		$this->xmlRegistry = $reg;
  	}
  	
- 	public static function getXmlRegistry(){
+ 	public static function getXmlRegistry($extendedVersion = true){
  		$self = self::getInstance();
- 		if(!isSet($self->xmlRegistry)){
- 			$self->buildXmlRegistry();
+ 		if(!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)){
+ 			$self->buildXmlRegistry( $extendedVersion );
+             $self->registryVersion = ($extendedVersion ? "extended":"light");
  		}
  		return $self->xmlRegistry;
  	}

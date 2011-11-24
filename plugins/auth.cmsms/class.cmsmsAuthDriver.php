@@ -19,7 +19,6 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 /**
  * @package info.ajaxplorer.plugins
  * Abstract representation of an access to FEU athentification module(CMS Made Simple).
@@ -62,6 +61,7 @@ class cmsmsAuthDriver extends AbstractAuthDriver {
 
 	
 	function init($options){
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 		parent::init($options);
 		$this->sqlDriver = $options["SQL_DRIVER"];
 		try {

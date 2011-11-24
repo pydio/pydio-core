@@ -43,13 +43,13 @@ class ExifMetaManager extends AJXP_Plugin {
 	public function initMeta($accessDriver){		
 		$this->accessDriver = $accessDriver;	
 		if(!function_exists("exif_read_data")) return ;		
-		$messages = ConfService::getMessages();		
+		//$messages = ConfService::getMessages();
 		$def = $this->getMetaDefinition();
 		if(!count($def)){
 			return ;
 		}
 		$cdataHead = '<div>
-						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.exif.1"].'</div>
+						<div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.exif.1]</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
 		$cdataFoot = '</table></div>';
 		$cdataParts = "";

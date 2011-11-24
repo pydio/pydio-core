@@ -55,8 +55,11 @@ class ImagePreviewer extends AJXP_Plugin {
 				header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($cId))."; name=\"".basename($cId)."\"");
 				header("Content-Length: ".strlen($data));
 				header('Cache-Control: public');
-				print($data);	
-				
+                header("Pragma:");
+                header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
+                header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
+				print($data);
+
 			}else{
 	 			$filesize = filesize($destStreamURL.$file);
 	 			
@@ -64,7 +67,10 @@ class ImagePreviewer extends AJXP_Plugin {
 				header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
 				header("Content-Length: ".$filesize);
 				header('Cache-Control: public');
-				
+                header("Pragma:");
+                header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
+                header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
+
 				$class = $streamData["classname"];
 				$stream = fopen("php://output", "a");
 				call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL.$file, $stream);

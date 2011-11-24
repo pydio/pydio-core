@@ -391,6 +391,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
                     header('Pragma:');
                     header('Cache-Control: public');
+                    header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
+                    header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
                     readfile(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo);
                 }else{
                     $logo = "default_template_logo-".($iconFormat == "small"?16:22).".png";
@@ -398,6 +400,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     header("Content-Length: ".filesize(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo));
                     header('Pragma:');
                     header('Cache-Control: public');
+                    header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
+                    header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
                     readfile(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo);
                 }
 

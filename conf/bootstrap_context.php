@@ -76,7 +76,7 @@ function AjaXplorer_autoload($className){
 		require_once($fileName);
         return;
 	}
-    $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php");
+    $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php", GLOB_NOSORT);
     if($corePlugClass !== false && count($corePlugClass)){
         require_once($corePlugClass[0]);
     }
@@ -84,7 +84,7 @@ function AjaXplorer_autoload($className){
 spl_autoload_register('AjaXplorer_autoload');
 
 AJXP_Utils::safeIniSet("session.cookie_httponly", 1);
-//AJXP_Utils::safeIniSet("session.cookie_path", "ajaxplorer");
+//AJXP_Utils::safeIniSet("session.cookie_path", "/ajaxplorer");
 
 
 
