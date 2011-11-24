@@ -179,7 +179,6 @@ if(AuthService::usersEnabled())
 $loggedUser = AuthService::getLoggedUser();
 if($loggedUser != null && $loggedUser->getPref("lang") != "") ConfService::setLanguage($loggedUser->getPref("lang"));
 else if(isSet($_COOKIE["AJXP_lang"])) ConfService::setLanguage($_COOKIE["AJXP_lang"]);
-$mess = ConfService::getMessages();
 
 //------------------------------------------------------------
 // SPECIAL HANDLING FOR FANCY UPLOADER RIGHTS FOR THIS ACTION

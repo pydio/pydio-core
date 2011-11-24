@@ -20,7 +20,6 @@
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
 /**
  * @package info.ajaxplorer.plugins
  * Authenticates user against an SMB server
@@ -52,6 +51,8 @@ class smbAuthDriver extends AbstractAuthDriver {
 	}
 			
 	function checkPassword($login, $pass, $seed){
+        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
+
 		$_SESSION["AJXP_SESSION_REMOTE_PASS"] = $pass;
 		$repoId = $this->options["REPOSITORY_ID"];
     	$repoObject = ConfService::getRepositoryById($repoId);

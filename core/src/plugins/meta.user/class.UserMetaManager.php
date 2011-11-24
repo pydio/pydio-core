@@ -44,12 +44,12 @@ class UserMetaManager extends AJXP_Plugin {
         $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
         $this->metaStore->accessDriver = $accessDriver;
 
-		$messages = ConfService::getMessages();
+		//$messages = ConfService::getMessages();
 		$def = $this->getMetaDefinition();
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
 		$cdataHead = '<div>
-						<div class="panelHeader infoPanelGroup" colspan="2">'.$messages["meta.user.1"].'</div>
+						<div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.user.1]</div>
 						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">';
 		$cdataFoot = '</table></div>';
 		$cdataParts = "";

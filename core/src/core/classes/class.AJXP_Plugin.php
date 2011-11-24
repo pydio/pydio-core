@@ -44,6 +44,7 @@ class AJXP_Plugin implements Serializable{
 	protected $pluginConf; // can be passed at load time
 	protected $pluginConfDefinition;
 	protected $dependencies;
+    protected $streamData;
 	protected $mixins = array();
 	public $loadingState = "";
 	/**
@@ -70,6 +71,7 @@ class AJXP_Plugin implements Serializable{
 		"actions", 
 		"registryContributions", 
 		"mixins",
+        "streamData",
 		"options", "pluginConf", "pluginConfDefinition", "dependencies", "loadingState", "manifestXML");
 	
 	/**
@@ -246,6 +248,7 @@ class AJXP_Plugin implements Serializable{
 		}
 		$this->xPath = new DOMXPath($this->manifestDoc);
 		$this->loadMixins();
+        $this->detectStreamWrapper();
 		$this->manifestLoaded = true;
 		$this->loadDependencies();
 	}
@@ -306,7 +309,7 @@ class AJXP_Plugin implements Serializable{
 			}
 		}
 	}
-	public function getRegistryContributions(){
+	public function getRegistryContributions($extendedVersion = true){
 		return $this->registryContributions;
 	}
 	protected function loadDependencies(){
@@ -431,16 +434,29 @@ class AJXP_Plugin implements Serializable{
 	}
 	
 	public function detectStreamWrapper($register = false){
-		$files = $this->xPath->query("class_stream_wrapper");
-		if(!$files->length) return false;
-		$streamData = $this->nodeAttrToHash($files->item(0));
-		if(!is_file(AJXP_INSTALL_PATH."/".$streamData["filename"])){
-			return false;
-		}
-		include_once(AJXP_INSTALL_PATH."/".$streamData["filename"]);
-		if(!class_exists($streamData["classname"])){
-			return false;
-		}
+        if(isSet($this->streamData)){
+            if($this->streamData === false) return false;
+            $streamData = $this->streamData;
+            // include wrapper, no other checks needed.
+            include_once(AJXP_INSTALL_PATH."/".$streamData["filename"]);
+        }else{
+            $files = $this->xPath->query("class_stream_wrapper");
+            if(!$files->length) {
+                $this->streamData = false;
+                return false;
+            }
+            $streamData = $this->nodeAttrToHash($files->item(0));
+            if(!is_file(AJXP_INSTALL_PATH."/".$streamData["filename"])){
+                $this->streamData = false;
+                return false;
+            }
+            include_once(AJXP_INSTALL_PATH."/".$streamData["filename"]);
+            if(!class_exists($streamData["classname"])){
+                $this->streamData = false;
+                return false;
+            }
+            $this->streamData = $streamData;
+        }
 		if($register){
 			$pServ = AJXP_PluginsService::getInstance();
 			if(!in_array($streamData["protocol"], stream_get_wrappers())){

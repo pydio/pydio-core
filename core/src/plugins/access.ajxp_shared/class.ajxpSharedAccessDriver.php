@@ -20,7 +20,6 @@
  *
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";
 /**
  * @package info.ajaxplorer.plugins
  * @class ajxpSharedAccessDriver
@@ -28,7 +27,11 @@ require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.Shar
  */
 class ajxpSharedAccessDriver extends AbstractAccessDriver 
 {	
-	
+
+    function initRepository(){
+        require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php";        
+    }
+
 	function switchAction($action, $httpVars, $fileVars){
 		if(!isSet($this->actions[$action])) return;
 		parent::accessPreprocess($action, $httpVars, $fileVars);

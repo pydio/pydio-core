@@ -21,8 +21,7 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.fs/class.fsAccessDriver.php");
-@include_once("HTTP/WebDAV/Client.php");
+//require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.fs/class.fsAccessDriver.php");
 
 /**
  * @package info.ajaxplorer.plugins
@@ -39,6 +38,7 @@ class webdavAccessDriver extends fsAccessDriver
 	protected $urlBase;
 		
 	function initRepository(){
+        @include_once("HTTP/WebDAV/Client.php");
 		if(is_array($this->pluginConf)){
 			$this->driverConf = $this->pluginConf;
 		}else{
