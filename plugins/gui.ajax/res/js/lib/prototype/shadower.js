@@ -134,8 +134,8 @@ var Shadower =
 
 	deshadow: function(element)
 	{
-		if(Modernizr.boxshadow){
-			element.removeClassName("css_boxshadow");
+		if(Modernizr.boxshadow && $(element)){
+			$(element).removeClassName("css_boxshadow");
 			return;
 		}
 		
