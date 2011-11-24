@@ -433,7 +433,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                         }
                         if( in_array($paramNode->getAttribute("name"), $tplDefined) ) continue;
                         if($paramNode->getAttribute('no_templates') == 'true') continue;
-                        print($paramNode->ownerDocument->saveXML($paramNode));
+                        print(AJXP_XMLWriter::replaceAjxpXmlKeywords($paramNode->ownerDocument->saveXML($paramNode)));
                     }
                     // ADD LABEL
                     echo '<param name="DISPLAY" type="string" label="'.$mess[359].'" description="'.$mess[429].'" mandatory="true" default="'.$defaultLabel.'"/>';
