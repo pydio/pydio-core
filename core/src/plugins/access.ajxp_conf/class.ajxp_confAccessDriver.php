@@ -658,11 +658,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					}
 				}
 				$manifest = $plug->getManifestRawContent("server_settings/param");
-				// Remove Slug if is template, ugly way
-				if($repository->isTemplate){
-					$slugString = '<param group="Repository Slug" name="AJXP_SLUG" type="string" label="Alias" description="Alias for replacing the generated unique id of the repository" mandatory="false"/>';
-					$manifest = str_replace($slugString, "", $manifest);
-				}
+                $manifest = AJXP_XMLWriter::replaceAjxpXmlKeywords($manifest);
 				print("<ajxpdriver name=\"".$repository->accessType."\">$manifest</ajxpdriver>");
 				print("<metasources>");
 				$metas = $pServ->getPluginsByType("metastore");
@@ -671,6 +667,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				foreach ($metas as $metaPlug){
 					print("<meta id=\"".$metaPlug->getId()."\">");
 					$manifest = $metaPlug->getManifestRawContent("server_settings/param");
+                    $manifest = AJXP_XMLWriter::replaceAjxpXmlKeywords($manifest);
 					print($manifest);
 					print("</meta>");
 				}
