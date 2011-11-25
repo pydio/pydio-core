@@ -1,8 +1,5 @@
 <?php
 
-define("ZOHO_API_KEY", "e9b144a8a1c29c0c3152ef921a12f1e2");
-define("ZOHO_SECRET_KEY", "e008213e43df0b89f59285d319b74a59");
-
 /*
  * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
  * This file is part of AjaXplorer.
@@ -22,11 +19,10 @@ define("ZOHO_SECRET_KEY", "e008213e43df0b89f59285d319b74a59");
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  *
- * Description : Zoho plugin. 2011 Pawel Wolniewicz http://innodevel.net/
+ * Description : Zoho plugin. First version by Pawel Wolniewicz http://innodevel.net/ 2011
+ * Improved by cdujeu / Https Support now necessary for zoho API.
  */
 defined('AJXP_EXEC') or die( 'Access not allowed');
-
-require_once(AJXP_BIN_FOLDER."/class.HttpClient.php");
 
 class ZohoEditor extends AJXP_Plugin {
 
@@ -42,47 +38,95 @@ class ZohoEditor extends AJXP_Plugin {
 		$streamData = $repository->streamData;
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		    	
-		if($action == "post_to_server"){	
-					
+		if($action == "post_to_zohoserver"){
+
+            require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
+
 			$file = base64_decode($httpVars["file"]);
 			$file = SystemTextEncoding::magicDequote(AJXP_Utils::securePath($file));
-			$target = base64_decode($httpVars["parent_url"])."/plugins/editor.zoho";
+			$target = base64_decode($httpVars["parent_url"]);
 			$tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);			
 			$tmp = SystemTextEncoding::fromUTF8($tmp);
-			$fData = array("tmp_name" => $tmp, "name" => urlencode(basename($file)));
-			$extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
 
-			$httpClient = new HttpClient("export.writer.zoho.com");
-			$postData = array();							
-			$httpClient->setHandleRedirects(false);
+			$extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
+			$httpClient = new http_class();
+            $httpClient->request_method = "POST";
+
+            $secureToken = $httpVars["secure_token"];
+            $_SESSION["ZOHO_CURRENT_EDITED"] = $destStreamURL.$file;
+            $_SESSION["ZOHO_CURRENT_UUID"]   = md5(rand()."-".microtime());
+
+            if($this->pluginConf["USE_ZOHO_AGENT"]){
+                $saveUrl = $this->pluginConf["ZOHO_AGENT_URL"];
+            }else{
+                $saveUrl = $target."/?get_action=postback_from_zohoserver";
+            }
+
 
 			$params = array(
-			'id' => $tmp,
-			'apikey' => ZOHO_API_KEY,
-			'output' => 'url',
-			'lang' => "en",
-			'skey'=> ZOHO_SECRET_KEY,
-			'filename' => urlencode(basename($file)),
-			'persistence' => 'false',
-			 'format' => $extension,
-			'mode' => 'normaledit',
-			"saveurl" => $target."/save_zoho.php"
+                'id' => $_SESSION["ZOHO_CURRENT_UUID"],
+                'apikey' => $this->pluginConf["ZOHO_API_KEY"],
+                'output' => 'url',
+                'lang' => "en",
+                'skey'=> $this->pluginConf["ZOHO_SECRET_KEY"],
+                'filename' => urlencode(basename($file)),
+                'persistence' => 'false',
+                'format' => $extension,
+                'mode' => 'normaledit',
+                'saveurl'   => $saveUrl
 			);
 
+            $httpClient->GetRequestArguments("https://exportwriter.zoho.com/remotedoc.im", $arguments);
+            $arguments["PostValues"] = $params;
+            $arguments["PostFiles"] = array(
+                "content"   => array("FileName" => $tmp, "Content-Type" => "automatic/name")
+            );
+            $err = $httpClient->Open($arguments);
+            if(empty($err)){
+                $err = $httpClient->SendRequest($arguments);
+                if(empty($err)){
+                    $response = "";
+                    while(true){
+                        $error = $httpClient->ReadReplyBody($body, 1000);
+                        if($error != "" || strlen($body) == 0) break;
+                        $response .= $body;
+                    }
+                    $result = trim($response);
+                    $matchlines = explode("\n", $result);
+                    $resultValues = array();
+                    foreach($matchlines as $line){
+                        list($key, $val) = explode("=", $line, 2);
+                        $resultValues[$key] = $val;
+                    }
+                    if($resultValues["RESULT"] == "TRUE" && isSet($resultValues["URL"])){
+                        header("Location: ".$resultValues["URL"]);
+                    }else{
+                        echo "Zoho API Error ".$resultValues["ERROR_CODE"]." : ".$resultValues["WARNING"];
+                        echo "<script>window.parent.setTimeout(function(){parent.hideLightBox();}, 2000);</script>";
+                    }
+                }
+                $httpClient->Close();
+            }
 
-			$langcode = "en";
-			$httpClient->postFile("/remotedoc.im", $params, "content", $fData);
-			$result = $httpClient->getContent();
-			$result = trim($result);
-			$matchlines = explode("\n", $result);
-			$url = explode("URL=", $matchlines[0]);
-			header("Location: ".$url[1]);
+		}else if($action == "retrieve_from_zohoagent"){
+            if(!$this->pluginConf["USE_ZOHO_AGENT"]) return;
 
-			
-		}		
-		
-		return ;
-				
+            $targetFile = $_SESSION["ZOHO_CURRENT_EDITED"];
+            $id = $_SESSION["ZOHO_CURRENT_UUID"].".".pathinfo($targetFile, PATHINFO_EXTENSION);
+            $data = file_get_contents($this->pluginConf["ZOHO_AGENT_URL"]."?ajxp_action=get_file&name=".$id);
+            if(strlen($data)){
+                file_put_contents($targetFile, $data);
+                echo "MODIFIED";
+            }
+        }else if($action == "postback_from_zohoserver"){
+            AJXP_Logger::debug("POSTED BACK FROM ZOOSERVER", $httpVars);
+            $targetFile = $_SESSION["ZOHO_CURRENT_EDITED"];
+            $id = $_SESSION["ZOHO_CURRENT_UUID"];
+            if($httpVars["id"] != $id) return;
+
+        }
+
+
 	}
 	
 }

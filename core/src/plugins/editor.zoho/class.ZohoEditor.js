@@ -33,6 +33,20 @@ Class.create("ZohoEditor", AbstractEditor, {
 			style:"border:none;width:"+this.container.getWidth()+"px;"
 		});						
 		this.container.update(this.contentMainContainer);
+        if(ajaxplorer.getPluginConfigs('editor').get("USE_ZOHO_AGENT") == "1"){
+            this.element.observe("editor:close", function(){
+                var conn = new Connexion();
+                conn.addParameter("get_action", "retrieve_from_zohoagent");
+                conn.onComplete = function(transport){
+                    if(transport.responseText == "MODIFIED"){
+                        ajaxplorer.fireContextRefresh();
+                    }
+                };
+                conn.sendAsync();
+            });
+        }else{
+            ajaxplorer.fireContextRefresh();
+        }
 	},
 
 	
@@ -42,7 +56,7 @@ Class.create("ZohoEditor", AbstractEditor, {
 		this.setOnLoad(true);
 		this.currentNode = userSelection.getUniqueNode();
 		var fName = this.currentNode.getPath();
-		var src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_server&file=" + base64_encode(fName) + "&parent_url=" + base64_encode(getRepName(document.location.href));
+		var src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_zohoserver&file=" + base64_encode(fName) + "&parent_url=" + base64_encode(getRepName(document.location.href));
 		this.contentMainContainer.src = src;
 		var pe = new PeriodicalExecuter(function(){
 			var href;
