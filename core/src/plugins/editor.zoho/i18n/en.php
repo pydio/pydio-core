@@ -21,5 +21,8 @@
 $mess=array(
     "1" => "Office Documents",
     "2" => "Preview and edit office documents online",
+    "3" => "Word Document",
+    "4" => "Presentation Document",
+    "5" => "Spreadsheet Document",
 );
 ?>
