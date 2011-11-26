@@ -40,6 +40,10 @@ class ZohoEditor extends AJXP_Plugin {
 		    	
 		if($action == "post_to_zohoserver"){
 
+            $sheetExt =  explode(",", "xls,xlsx,ods,sxc,csv,tsv");
+            $presExt = explode(",", "ppt,pps,odp,sxi");
+            $docExt = explode(",", "doc,docx,rtf,odt,sxw");
+
             require_once(AJXP_BIN_FOLDER."/http_class/http_class.php");
 
 			$file = base64_decode($httpVars["file"]);
@@ -59,7 +63,7 @@ class ZohoEditor extends AJXP_Plugin {
             if($this->pluginConf["USE_ZOHO_AGENT"]){
                 $saveUrl = $this->pluginConf["ZOHO_AGENT_URL"];
             }else{
-                $saveUrl = $target."/?get_action=postback_from_zohoserver";
+                $saveUrl = $target."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/save_zoho.php";
             }
 
 
@@ -76,7 +80,15 @@ class ZohoEditor extends AJXP_Plugin {
                 'saveurl'   => $saveUrl
 			);
 
-            $httpClient->GetRequestArguments("https://exportwriter.zoho.com/remotedoc.im", $arguments);
+            $service = "exportwriter";
+            if(in_array($extension, $sheetExt)){
+                $service = "sheet";
+            }else if(in_array($extension, $presExt)){
+                $service = "show";
+            }else if(in_array($extension, $docExt)){
+                $service = "exportwriter";
+            }
+            $httpClient->GetRequestArguments("https://".$service.".zoho.com/remotedoc.im", $arguments);
             $arguments["PostValues"] = $params;
             $arguments["PostFiles"] = array(
                 "content"   => array("FileName" => $tmp, "Content-Type" => "automatic/name")
@@ -109,20 +121,22 @@ class ZohoEditor extends AJXP_Plugin {
             }
 
 		}else if($action == "retrieve_from_zohoagent"){
-            if(!$this->pluginConf["USE_ZOHO_AGENT"]) return;
-
             $targetFile = $_SESSION["ZOHO_CURRENT_EDITED"];
             $id = $_SESSION["ZOHO_CURRENT_UUID"].".".pathinfo($targetFile, PATHINFO_EXTENSION);
-            $data = file_get_contents($this->pluginConf["ZOHO_AGENT_URL"]."?ajxp_action=get_file&name=".$id);
-            if(strlen($data)){
-                file_put_contents($targetFile, $data);
-                echo "MODIFIED";
+
+            if($this->pluginConf["USE_ZOHO_AGENT"]){
+                $data = file_get_contents($this->pluginConf["ZOHO_AGENT_URL"]."?ajxp_action=get_file&name=".$id);
+                if(strlen($data)){
+                    file_put_contents($targetFile, $data);
+                    echo "MODIFIED";
+                }
+            }else{
+                if(is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/agent/files/".$id)){
+                    copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/agent/files/".$id, $targetFile);
+                    unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/agent/files/".$id);
+                    echo "MODIFIED";
+                }
             }
-        }else if($action == "postback_from_zohoserver"){
-            AJXP_Logger::debug("POSTED BACK FROM ZOOSERVER", $httpVars);
-            $targetFile = $_SESSION["ZOHO_CURRENT_EDITED"];
-            $id = $_SESSION["ZOHO_CURRENT_UUID"];
-            if($httpVars["id"] != $id) return;
 
         }
 
