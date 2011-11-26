@@ -72,7 +72,7 @@ class UpdateController extends AJXP_Plugin {
             case "get_upgrade_path":
 
                 header("Content-type: application/json");
-                print AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "json");
+                print AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "json", $this->pluginConf["UPDATE_CHANNEL"]);
 
             break;
 
@@ -83,7 +83,7 @@ class UpdateController extends AJXP_Plugin {
                     print "Your installation is managed directly via os packages, you should not upgrade manually.";
                     break;
                 }
-                $res = AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"]);
+                $res = AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "php", $this->pluginConf["UPDATE_CHANNEL"]);
                 if(!count($res->packages)){
                     print("No update is necessary!");
                     break;

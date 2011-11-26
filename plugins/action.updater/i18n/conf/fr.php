@@ -27,5 +27,7 @@ $mess=array(
 "Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." => "Les fichiers déclarés ici (entrer une liste séparée par des virgules, en partant de la racine d'AjaXplorer) seront conservés pendant une mise à jour.",
 "Enable Import From v3.2.4" => "Activer l'import v3.2.4",
 "Enable the migration action, available in the Settings repository" => "Ajoute des boutons pour importer des données depuis une version antérieur (3.2.4)",
+"Update Channel" => "Canal",
+"Check stable or dev channel" => "Canal stable ou développement",
 );
 ?>

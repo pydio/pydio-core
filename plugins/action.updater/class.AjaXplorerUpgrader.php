@@ -68,12 +68,13 @@ class AjaXplorerUpgrader {
             "duplicateConfFiles"    => "Copying configuration files",
             "cleanUnusedFiles"      => "Deleting unused files",
             "specificTask"          => "Running specific upgrade task",
-            "updateVersion"         => "Everything went ok, upgrading version!"
+            "updateVersion"         => "Everything went ok, upgrading version!",
+            "displayNote"           => "Release note : "
         );
     }
 
-    static function getUpgradePath($url, $format = "php"){
-        $json = file_get_contents($url."?version=".AJXP_VERSION);
+    static function getUpgradePath($url, $format = "php", $channel="stable"){
+        $json = file_get_contents($url."?version=".AJXP_VERSION."&channel=".$channel);
         if($format == "php") return json_decode($json);
         else return $json;
     }
@@ -249,6 +250,12 @@ class AjaXplorerUpgrader {
         $vCont = file_get_contents($this->installPath."/conf/VERSION");
         list($v, $date) = explode("__", $vCont);
         return "<b>Version upgraded to ".$v." ($date)</b>";
+    }
+
+    function displayNote(){
+        if(is_file($this->workingFolder."/UPGRADE/NOTE")){
+            return nl2br(file_get_contents($this->workingFolder."/UPGRADE/NOTE"));
+        }
     }
 
 

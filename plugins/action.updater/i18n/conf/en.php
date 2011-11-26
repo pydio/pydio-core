@@ -27,5 +27,7 @@ $mess=array(
 "Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade." => "Files declared here (enter pathes from the root of Ajxp installation, comma-separated) will be backed up and restored before and after upgrade.",
 "Enable Import From v3.2.4" => "Enable Import From v3.2.4",
 "Enable the migration action, available in the Settings repository" => "Enable the migration action, available in the Settings repository",
+"Update Channel" => "Update Channel",
+"Check stable or dev channel" => "Check stable or dev channel",
 );
 ?>
