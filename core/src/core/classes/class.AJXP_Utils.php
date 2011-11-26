@@ -223,7 +223,9 @@ class AJXP_Utils
       AJXP_JSPacker::pack();
     }    
     if(ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])){
-        //self::extractConfStringsFromManifests();
+        if(isSet($parameters["extract"])){
+            self::extractConfStringsFromManifests();
+        }
         self::updateAllI18nLibraries((isSet($parameters["create"])?$parameters["create"]:""));
     }
     if(ConfService::getConf("JS_DEBUG") && isSet($parameters["clear_plugins_cache"])){
