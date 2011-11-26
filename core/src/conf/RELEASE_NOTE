@@ -1,0 +1,3 @@
+This release is an important security fix for a problem introduced in the 3.3.X branch. If you do not wish to upgrade,
+please at least remove the current version of the editor.zoho plugin.
+
