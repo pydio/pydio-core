@@ -33,20 +33,16 @@ Class.create("ZohoEditor", AbstractEditor, {
 			style:"border:none;width:"+this.container.getWidth()+"px;"
 		});						
 		this.container.update(this.contentMainContainer);
-        if(ajaxplorer.getPluginConfigs('editor').get("USE_ZOHO_AGENT") == "1"){
-            this.element.observe("editor:close", function(){
-                var conn = new Connexion();
-                conn.addParameter("get_action", "retrieve_from_zohoagent");
-                conn.onComplete = function(transport){
-                    if(transport.responseText == "MODIFIED"){
-                        ajaxplorer.fireContextRefresh();
-                    }
-                };
-                conn.sendAsync();
-            });
-        }else{
-            ajaxplorer.fireContextRefresh();
-        }
+        this.element.observe("editor:close", function(){
+            var conn = new Connexion();
+            conn.addParameter("get_action", "retrieve_from_zohoagent");
+            conn.onComplete = function(transport){
+                if(transport.responseText == "MODIFIED"){
+                    ajaxplorer.fireContextRefresh();
+                }
+            };
+            conn.sendAsync();
+        });
 	},
 
 	
