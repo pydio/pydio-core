@@ -21,5 +21,7 @@
 $mess=array(
 "Pixlr Editor" => "Pixlr Editor",
 "Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI." => "Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI.",
+"Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)" => "Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)",
+"Secure Token" => "Secure Token",
 );
 ?>
