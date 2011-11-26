@@ -21,5 +21,7 @@
 $mess=array(
 "Pixlr Editor" => "Editeur Pixlr",
 "Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI." => "Connexion au servce Pixlr.com qui permet l'édition en ligne d'images à travers une interface type photoshop.",
+"Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)" => "Ajouter un jeton de sécurité dans la communication entre votre serveur et le service Pixlr. Le fichier .htaccess doit être correctement configuré.",
+"Secure Token" => "Jeton de Sécurité",
 );
 ?>
