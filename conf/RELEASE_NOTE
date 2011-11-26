@@ -1,3 +1,41 @@
+AjaXplorer Core 3.3.5
+
 This release is an important security fix for a problem introduced in the 3.3.X branch. If you do not wish to upgrade,
 please at least remove the current version of the editor.zoho plugin.
 
+[Main Features]
+Security problem fixed in editor.zoho plugin
+XML Registry W3C Schema (XSD) for simpler manifest.xml edition
+Internationalization of all the parameters defined in the XML files.
+Better startup screen / include login errors in login screen instead of js alert
+Performances hunting : lazy loading of many inclusions, of messages array, lightweight version of the registry (extended vs. light) to avoid
+parsing user XML when not necessary (ie most of the time...).
+New Http client for supporting HTTPS / Should replace HttpClient calls everywhere
+Full rewrite of the Zoho plugin
+
+[Uploader]
+Better UX / Change default behaviour in plugin options
+Use parameters "expose" attribute instead of bootstrapParameters when possible.
+Missing decoding at upload!
+
+[Misc]
+Do not use __DIR__, introduces a php5.3 dependancy
+Fix line breaks in a cleaner way at various points (php or xml serialization)
+Rawurlencode() login & password when sending through URL, to allow usage of "/" and other "@". Then decode in AJXP_Safe. Should be rechecked for
+other plugins.
+Fix the randomly not working submenu
+Better error reporting for token expiration / Bookmarklet fixes
+meta.user : Forgotten refactoring for stars rates
+meta.exif : Silently ignore exif_read_data errors
+editor.pixlr : Do not use host as check referer, as it's not anymore always pixlr.com. Pass a token via the save file URL, and verify it's the
+same.
+Fix email management
+fix shadower error / css tweak
+Optional parameter "extract" for update_i18n
+Channel parameter for upgrade / display release note content
+
+[Default configs]
+Moving a full install : auto-rewrite cache if "requires" are out of sync (still to test live)
+Do not enable Probe Real Size by default
+Compute CLIENT_TIMEOUT_TIME default value
+Add a note to explain how to force the flash uploader usage
