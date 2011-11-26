@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="sftp" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
+<ajxpdriver name="sftp" label="CONF_MESSAGE[FTP over SSH]" description="CONF_MESSAGE[Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings icon="plugins/access.sftp/icon.png">
         <resources>
             <i18n namespace="sftp_access" path="plugins/access.sftp/i18n"/>
@@ -13,7 +13,6 @@
 		<param name="FIX_PERMISSIONS" type="string" label="CONF_MESSAGE[Fix Permissions]" description="CONF_MESSAGE[How to handle remote permissions to be used by PHP as local permissions. See manual.]" mandatory="false" default="detect_remote_user_id"/>
 	</server_settings>
 	<class_definition filename="plugins/access.sftp/class.sftpAccessDriver.php" classname="sftpAccessDriver"/>
-	<class_stream_wrapper filename="plugins/access.sftp/class.sftpAccessWrapper.php" classname="sftpAccessWrapper" protocol="ajxp.sftp"/>	
 	<registry_contributions>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
@@ -34,6 +33,7 @@
         <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 	</registry_contributions>
 	<dependencies>
-		<pluginActions pluginName="access.fs"/>
+		<pluginClass pluginName="access.fs"/>
 	</dependencies>	
+    <class_stream_wrapper filename="plugins/access.sftp/class.sftpAccessWrapper.php" classname="sftpAccessWrapper" protocol="ajxp.sftp"/>
 </ajxpdriver>
