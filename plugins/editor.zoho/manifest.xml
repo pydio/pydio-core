@@ -11,7 +11,7 @@
         <resources>
             <js file="plugins/editor.zoho/class.ZohoEditor.js" className="ZohoEditor"/>
             <i18n path="plugins/editor.zoho/i18n" namespace="zoho_editor"/>
-            <img_library path="plugins/editor.zoho" alias="zoho_img"/>
+            <img_library path="plugins/editor.zoho/images" alias="zoho_img"/>
         </resources>
 	</client_settings>
 	<clientForm id="zoho_box"><![CDATA[
@@ -37,6 +37,23 @@
 				</processing>
 			</action>
 		</actions>
+        <extensions>
+            <extension icon="zoho_img/mimes/ICON_SIZE/word.png" messageId="zoho.3" mime="doc"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/word.png" messageId="zoho.3" mime="docx"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/word.png" messageId="zoho.3" mime="odt"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/word.png" messageId="zoho.3" mime="sxw"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/word.png" messageId="zoho.3" mime="rtf"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/spreadsheet.png" messageId="zoho.5" mime="xls"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/spreadsheet.png" messageId="zoho.5" mime="xlsx"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/spreadsheet.png" messageId="zoho.5" mime="ods"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/spreadsheet.png" messageId="zoho.5" mime="sxc"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/spreadsheet.png" messageId="zoho.5" mime="csv"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/spreadsheet.png" messageId="zoho.5" mime="tsv"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/presentation.png" messageId="zoho.4" mime="ppt"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/presentation.png" messageId="zoho.4" mime="pps"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/presentation.png" messageId="zoho.4" mime="odp"/>
+            <extension icon="zoho_img/mimes/ICON_SIZE/presentation.png" messageId="zoho.4" mime="sxi"/>
+        </extensions>
 	</registry_contributions>
 	<dependencies>
 		<!-- Image proxy must be implemented -->
