@@ -69,7 +69,8 @@ class AjaXplorerUpgrader {
             "cleanUnusedFiles"      => "Deleting unused files",
             "specificTask"          => "Running specific upgrade task",
             "updateVersion"         => "Everything went ok, upgrading version!",
-            "displayNote"           => "Release note : "
+            "clearCache"            => "Clearing plugins cache",
+            "displayNote"           => "Release note : ",
         );
     }
 
@@ -250,6 +251,12 @@ class AjaXplorerUpgrader {
         $vCont = file_get_contents($this->installPath."/conf/VERSION");
         list($v, $date) = explode("__", $vCont);
         return "<b>Version upgraded to ".$v." ($date)</b>";
+    }
+
+    function clearCache(){
+        @unlink(AJXP_PLUGINS_CACHE_FILE);
+        @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        return "Ok";
     }
 
     function displayNote(){

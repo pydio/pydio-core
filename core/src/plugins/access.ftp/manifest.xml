@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="ftp" label="CONF_MESSAGE[FTP Server]" description="CONF_MESSAGE[This driver can access a remote FTP server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider">
+<ajxpdriver name="ftp" label="CONF_MESSAGE[FTP Server]" description="CONF_MESSAGE[This driver can access a remote FTP server]" mixins="credentials_consumer,filesystem_commons,slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings icon="plugins/access.ftp/icon.png">
         <resources>
             <i18n namespace="ftp_access" path="plugins/access.ftp/i18n"/>
@@ -37,9 +37,9 @@
         <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
 	</registry_contributions>
 	<class_definition filename="plugins/access.ftp/class.ftpAccessDriver.php" classname="ftpAccessDriver"/>
-	<class_stream_wrapper filename="plugins/access.ftp/class.ftpAccessWrapper.php" classname="ftpAccessWrapper" protocol="ajxp.ftp"/>
 	<dependencies>
-		<pluginActions pluginName="access.fs"/>
-		<pluginActions pluginName="access.remote_fs"/>
+		<pluginClass pluginName="access.fs"/>
+		<pluginClass pluginName="access.remote_fs"/>
 	</dependencies>
+    <class_stream_wrapper filename="plugins/access.ftp/class.ftpAccessWrapper.php" classname="ftpAccessWrapper" protocol="ajxp.ftp"/>
 </ajxpdriver>

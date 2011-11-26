@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver name="remote_fs" label="CONF_MESSAGE[Remote Server (via API)]" description="CONF_MESSAGE[Access a remote server implementing the AjaXplorer API (most commonly a remote server with another AjaXplorer installed)]">
+<ajxpdriver name="remote_fs" label="CONF_MESSAGE[Remote Server (via API)]" description="CONF_MESSAGE[Access a remote server implementing the AjaXplorer API (most commonly a remote server with another AjaXplorer installed)]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings icon="plugins/access.remote_fs/remote_fs_icon.png">
         <resources>
             <i18n namespace="remote_fs_access" path="plugins/access.remote_fs/i18n"/>
@@ -41,8 +41,8 @@
 		</actions>
 	</registry_contributions>
 	<class_definition filename="plugins/access.remote_fs/class.remote_fsAccessDriver.php" classname="remote_fsAccessDriver"/>
-	<class_stream_wrapper filename="plugins/access.remote_fs/class.remote_fsAccessWrapper.php" classname="remote_fsAccessWrapper" protocol="ajxp.remotefs"/>
 	<dependencies>
-		<pluginActions pluginName="access.fs"/>
+		<pluginClass pluginName="access.fs"/>
 	</dependencies>	
+    <class_stream_wrapper filename="plugins/access.remote_fs/class.remote_fsAccessWrapper.php" classname="remote_fsAccessWrapper" protocol="ajxp.remotefs"/>
 </ajxpdriver>
