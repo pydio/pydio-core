@@ -194,6 +194,7 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		
 		this.element.observe("editor:enterFS", function(e){
 			this.currentCode = this.codeMirror.getCode();
+            this.goingToFullScreen = true;
 			this.destroyCodeMirror();
 		}.bind(this) );
 
@@ -210,6 +211,7 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		this.element.observe("editor:exitFSend", function(e){
 			this.initCodeMirror();
 			this.codeMirror.setLineNumbers(this.codeMirror.lineNumbers);
+            this.goingToFullScreen = false;
 		}.bind(this) );
 
 		this.updateHistoryButtons();
@@ -217,7 +219,14 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 		if(window.ajxpMobile){
 			this.setFullScreen();
 			//attachMobileScroll(this.textarea, "vertical");
-		}		
+		}
+
+        this.element.observe("editor:resize", function(event){
+            if(this.goingToFullScreen) return;
+            fitHeightToBottom($(this.contentMainContainer), $(modal.elementName));
+            fitHeightToBottom($(this.element), $(modal.elementName));
+            fitHeightToBottom(this.codeMirror.wrapping);
+        }.bind(this));
 	},
 	
 	updateHistoryButtons: function(){
