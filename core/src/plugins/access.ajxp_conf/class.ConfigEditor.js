@@ -865,7 +865,7 @@ ConfigEditor = Class.create({
                 optionsPane.insert({bottom:form});
                 optionsPane.insert({bottom:docDiv});
             }else{
-                optionsPane.update("<legend>'+MessageHash['ajxp_conf.107'];+'</legend>");
+                optionsPane.update("<legend>"+MessageHash['ajxp_conf.107']+"</legend>");
                 optionsPane.insert({bottom:form});
             }
 
