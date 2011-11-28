@@ -140,6 +140,7 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		this._inputBox.observe("focus", function(e){
 			ajaxplorer.disableShortcuts();
+			ajaxplorer.disableNavigation();
 			this.hasFocus = true;
 			this._inputBox.select();
 			return false;
@@ -147,6 +148,7 @@ Class.create("SearchEngine", AjxpPane, {
 			
 		this._inputBox.observe("blur", function(e){
 			ajaxplorer.enableShortcuts();
+            ajaxplorer.enableNavigation();
 			this.hasFocus = false;
 		}.bind(this));
 		
