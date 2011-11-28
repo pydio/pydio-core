@@ -99,6 +99,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 				$query = $httpVars["query"];
 			}
 			$hits = $index->find($query);
+            $commitIndex = false;
 
 			AJXP_XMLWriter::header();
 			foreach ($hits as $hit){
@@ -112,10 +113,18 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 	$tmpNode = new AJXP_Node(SystemTextEncoding::fromUTF8($hit->node_url), array());
                     $tmpNode->loadNodeInfo();
                 }
+                if(!file_exists($tmpNode->getUrl())){
+                    $index->delete($hit->id);
+                    $commitIndex = true;
+                    continue;
+                }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
 				AJXP_XMLWriter::renderAjxpNode($tmpNode);
 			}
 			AJXP_XMLWriter::close();
+            if($commitIndex){
+                $index->commit();
+            }
 		}else if($actionName == "index"){
 			$dir = AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
             if(empty($dir)) $dir = "/";
