@@ -419,9 +419,9 @@ class AJXP_Utils
     $ps = explode(PATH_SEPARATOR, ini_get('include_path'));
     foreach($ps as $path)
     {
-      if(file_exists($path.DIRECTORY_SEPARATOR.$file)) return true;
+      if(@file_exists($path.DIRECTORY_SEPARATOR.$file)) return true;
     }
-    if(file_exists($file)) return true;
+    if(@file_exists($file)) return true;
     return false;    
   }
 
