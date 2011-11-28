@@ -127,6 +127,8 @@ $mess=array(
 "104" => "Active",
 "105" => "Automatic checks",
 "106" => "Unique Identifier",
+"107" => "Plugin Configurations",
+"108" => "Documentation",
 /* END SENTENCE */
 );
 ?>

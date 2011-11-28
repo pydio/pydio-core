@@ -831,6 +831,7 @@ ConfigEditor = Class.create({
 			var xmlData = transport.responseXML;
 			var params = XPathSelectNodes(xmlData, "//global_param");
 			var values = XPathSelectNodes(xmlData, "//plugin_settings_values/param");
+            var documentation = XPathSelectSingleNode(xmlData, "//plugin_doc");
 			var optionsPane = this.form.select('[id="options_pane"]')[0];
 			
 			var paramsValues = new Hash();
@@ -853,10 +854,21 @@ ConfigEditor = Class.create({
 				var hashedParams = this.formManager.parameterNodeToHash(params[i]);
 				driverParamsHash.push(hashedParams);
 			}
-			var form = new Element('div', {className:'driver_form'});
-			optionsPane.update("<legend>Plugin Configurations</legend>");			
-			optionsPane.insert({bottom:form});
-			
+            var form = new Element('div', {className:'driver_form'});
+            if(documentation){
+                var docDiv = new Element('div', {style:'display:none;overflow:auto;max-height:'+parseInt(document.viewport.getHeight()*50/100)+'px'}).insert(documentation.firstChild.nodeValue);
+                docDiv.select('img').invoke('setStyle', {maxWidth:'220px'});
+                var link1 = MessageHash['ajxp_conf.107'];
+                var link2 = MessageHash['ajxp_conf.108'];
+                var legend = this.createTabbedFieldset(link1, form, link2, docDiv);
+                optionsPane.update(legend);
+                optionsPane.insert({bottom:form});
+                optionsPane.insert({bottom:docDiv});
+            }else{
+                optionsPane.update("<legend>'+MessageHash['ajxp_conf.107'];+'</legend>");
+                optionsPane.insert({bottom:form});
+            }
+
 			if(driverParamsHash.size()){
 				this.formManager.createParametersInputs(form, driverParamsHash, true, (paramsValues.size()?paramsValues:null));
 			}else{
@@ -932,7 +944,8 @@ ConfigEditor = Class.create({
 					form.hide();metaForm.show();
 					metaLegend.addClassName('active');
 					optLegend.removeClassName('active');
-					modal.refreshDialogAppearance();			
+					modal.refreshDialogAppearance();
+                    modal.refreshDialogPosition();
 				}
 			}else{
 				metaForm.update(MessageHash['ajxp_conf.88']);
@@ -986,6 +999,7 @@ ConfigEditor = Class.create({
 				this.formManager.createParametersInputs(addFormDetail, driverParamsHash, true, null, null, true);
 			}
 			modal.refreshDialogAppearance();
+            modal.refreshDialogPosition();
 		}.bind(this));
 
 		metaPane.select('img').each(function(img){
@@ -1058,12 +1072,14 @@ ConfigEditor = Class.create({
 			legend1.addClassName('active');
 			legend2.removeClassName('active');
 			modal.refreshDialogAppearance();
+			modal.refreshDialogPosition();
 		});
 		legend2.observe("click", function(){
 			pane1.hide();pane2.show();
 			legend2.addClassName('active');
 			legend1.removeClassName('active');
 			modal.refreshDialogAppearance();
+            modal.refreshDialogPosition();
 		});				
 		return legend;
 	},

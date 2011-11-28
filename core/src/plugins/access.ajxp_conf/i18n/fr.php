@@ -126,6 +126,8 @@ $mess=array(
 "104" => "Actif",
 "105" => "Vérification",
 "106" => "Identifiant unique",
+"107" => "Configuration du plugin",
+"108" => "Documentation",
 /* END SENTENCE */
 );
 ?>
