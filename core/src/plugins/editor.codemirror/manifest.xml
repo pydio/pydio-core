@@ -10,7 +10,7 @@
         </resources>
     </client_settings>
 	<clientForm id="codemirror_box"><![CDATA[
-		<div id="codemirror_box" action="editer" box_width="80%" box_height="90%" box_padding="0">
+		<div id="codemirror_box" action="editer" box_width="80%" box_height="90%" box_padding="0" box_resize="true">
 			<div class="action_bar" style="position:relative;">
 				<div align="right" style="height: 21px;position: absolute;right: 5px;bottom: 3px;">
 					<span style="font-size:10px;" message_id="AJXP_MESSAGE[code_mirror.6]">AJXP_MESSAGE[code_mirror.6]</span> <input type="text" style="width: 24px; text-align:center;height: 16px; padding: 0px 1px 0px 0px; border: 1px solid rgb(204, 204, 204); margin-right:20px;" id="goto_line"><span style="font-size:10px;" message_id="AJXP_MESSAGE[code_mirror.9]">AJXP_MESSAGE[code_mirror.9]</span> <input type="text" style="text-align: left; width: 80px; height: 16px; padding: 0px 1px 0px 0px; border: 1px solid rgb(204, 204, 204);" placeholder="Search..." value="" id="text_search">
