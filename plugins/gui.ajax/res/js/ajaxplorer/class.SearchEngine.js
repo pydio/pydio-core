@@ -334,8 +334,9 @@ Class.create("SearchEngine", AjxpPane, {
 			icon = 'folder.png';
 			if(folderName != "/") folderName += "/";
 			folderName += fileName;
-		}	
-		var imageString = '<img align="absmiddle" width="16" height="16" src="'+ajxpResourcesFolder+'/images/mimes/16/'+icon+'"> ';
+		}
+        var imgPath = resolveImageSource(icon, '/images/mimes/16', 16);
+		var imageString = '<img align="absmiddle" width="16" height="16" src="'+imgPath+'"> ';
 		var stringToDisplay;
 		if(metaFound){
 			stringToDisplay = fileName + ' (' + this.highlight(metaFound, this.crtText, 20)+ ') ';
