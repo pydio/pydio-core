@@ -215,7 +215,6 @@ Class.create("OLViewer", AbstractEditor, {
         });                
 		if(googleRejected){
 			var remainingLength = layersDefinitions.size();
-			alert('Warning, you must add the line \n<script src="http://maps.google.com/maps/api/js?sensor=false"></script> \n inside the main application template (client/gui.html) to enable Google Maps.\n' + (!remainingLength?'Switching to Open Street Map':''));
 			if(!remainingLength){ // Switch to OSM by default.
 				layersDefinitions.push({type:'OSM'});
 				meta_srs = 'EPSG:4326';
