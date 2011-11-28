@@ -890,6 +890,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
                 }
                 echo("</plugin_settings_values>");
+                if(file_exists($ajxpPlugin->getBaseDir()."/plugin_doc.html")){
+                    echo("<plugin_doc><![CDATA[".file_get_contents($ajxpPlugin->getBaseDir()."/plugin_doc.html")."]]></plugin_doc>");
+                }
 				AJXP_XMLWriter::close("admin_data");
 				
 			break;
