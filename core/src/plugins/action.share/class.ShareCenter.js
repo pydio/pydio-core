@@ -61,6 +61,9 @@ Class.create("ShareCenter", {
                         indicator:oForm.down('#complete_indicator')
                     }
                 );
+                if(Prototype.Browser.IE){
+                    $(document.body).insert($("shared_users_autocomplete_choices"));
+                }
                 if(!nodeMeta.get("ajxp_shared")){
                     $('shared_user').observeOnce("focus", function(){
                         $('share_folder_form').autocompleter.activate();
@@ -86,6 +89,12 @@ Class.create("ShareCenter", {
                 }.bind(this));
             }
         }.bind(this);
+        var closeFunc = function (oForm){
+            if(Prototype.Browser.IE){
+                $(document.body).down("#shared_users_autocomplete_choices").remove();
+                $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
+            }
+        }
         var submitFunc = function(oForm){
             if($('new_shared_user').value){
                 if( !$('shared_pass').value || $('shared_pass').value.length < ajxpBootstrap.parameters.get('password_min_length')){
@@ -121,12 +130,13 @@ Class.create("ShareCenter", {
                 }
             }.bind(this);
             conn.sendAsync();
+            closeFunc(oForm);
             return false;
         }.bind(this);
         if(window.ajxpBootstrap.parameters.get("usersEditable") == false){
             ajaxplorer.displayMessage('ERROR', MessageHash[394]);
         }else{
-            modal.showDialogForm('Get', 'share_folder_form', loadFunc, submitFunc, null);
+            modal.showDialogForm('Get', 'share_folder_form', loadFunc, submitFunc, closeFunc);
         }
     },
 
