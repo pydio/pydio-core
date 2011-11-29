@@ -41,7 +41,11 @@ class UserMetaManager extends AJXP_Plugin {
 
 	public function initMeta($accessDriver){
 		$this->accessDriver = $accessDriver;
-        $this->metaStore = AJXP_PluginsService::getInstance()->getPluginByTypeName("metastore", "serial");
+        $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        if($store === false){
+            throw new Exception("The 'meta.user' plugin requires at least one active 'metastore' plugin");
+        }
+        $this->metaStore = $store;
         $this->metaStore->accessDriver = $accessDriver;
 
 		//$messages = ConfService::getMessages();
