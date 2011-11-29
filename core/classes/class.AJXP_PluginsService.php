@@ -311,7 +311,28 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	public function getActivePlugins(){
  		return $this->activePlugins;	
  	}
- 	
+
+    public function getActivePluginsForType($type, $unique = false){
+        $acts = array();
+        foreach($this->activePlugins as $plugId => $active){
+            if(!$active) continue;
+            list($pT,$pN) = explode(".", $plugId);
+            if($pT == $type && isset($this->registry[$pT][$pN])){
+                if($unique) {
+                    return $this->registry[$pT][$pN];
+                    break;
+                }
+                $acts[$pN] = $this->registry[$pT][$pN];
+            }
+        }
+        if($unique && !count($acts)) return false;
+        return $acts;
+    }
+
+    public function getUniqueActivePluginForType($type){
+        return $this->getActivePluginsForType($type, true);
+    }
+
  	public function getDetectedPlugins(){
  		return $this->registry;
  	}
