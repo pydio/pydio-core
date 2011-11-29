@@ -66,7 +66,7 @@ Class.create("AjxpDraggable", Draggable, {
 			queue: {scope:'_draggable', position:'end'}
 			});
 		};
-		this.options.delay = 200;
+		this.options.delay = (Prototype.Browser.IE?350:200);
 		this.component = component;
 		this.componentType = componentType;
 		AllAjxpDraggables.push(this);
@@ -127,9 +127,18 @@ Class.create("AjxpDraggable", Draggable, {
 
 		if(this.options.ghosting) {
 			var selection = ajaxplorer.getUserSelection();
-			if(selection.isEmpty() && this.component.findSelectableParent){
-				this.component.findSelectableParent(this.element, true);
-			}
+            if(this.component.findSelectableParent){
+                if(selection.isEmpty()){
+                    this.component.findSelectableParent(this.element, true);
+                }else{
+                    var selItems = this.component.getSelectedItems();
+                    var item = this.component.findSelectableParent(this.element, false);
+                    if(!$A(selItems).include(item)){
+                        this.component.setSelectedNodes([]);
+                        this.component.findSelectableParent(this.element, true);
+                    }
+                }
+            }
 			var nodes = selection.getSelectedNodes();
 			
 			this._draggingMultiple = true;
@@ -325,11 +334,11 @@ var AjxpDroppables = {
 					if(draggable.ajxpNode){
 						var srcName = draggable.ajxpNode.getPath();
 					}
-					if(WebFXtimer) clearTimeout(WebFXtimer);
-					var nodeId = null;
-					if(droppable.id && webFXTreeHandler.all[droppable.id]){
-						nodeId = droppable.id;
-					}
+                    if(WebFXtimer) clearTimeout(WebFXtimer);
+                    var nodeId = null;
+                    if(droppable.id && webFXTreeHandler.all[droppable.id]){
+                        nodeId = droppable.id;
+                    }
 					ajaxplorer.actionBar.applyDragMove(srcName, targetName, nodeId, event['ctrlKey']);
 				},
 		onHover:function(draggable, droppable, event)
