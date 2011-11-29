@@ -91,11 +91,11 @@
                             <fieldset id="target_user">
                                 <legend ajxp_message_id="353">AJXP_MESSAGE[353]</legend>
                                 <div class="dialogLegend" ajxp_message_id="354">Choose one or more users with who you want to share this repository.</div>
-                                <div class="SF_element" id="textarea_sf_element" style="position:relative;">
+                                <div class="SF_element" id="textarea_sf_element" style="position:relative;height:75px;">
                                     <div ajxp_message_id="355" class="SF_label">Share with: </div>
                                     <textarea type="text" style="height:70px;" class="SF_input dialogFocus" value="" name="shared_user" id="shared_user"></textarea>
                                     <div id="complete_indicator" style="position:absolute;top:8px;right:8px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
-                                    <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;"></div>
+                                    <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
                                 </div>
                                 <div style="display:none;" id="create_shared_user">
                                     <div class="SF_element">
