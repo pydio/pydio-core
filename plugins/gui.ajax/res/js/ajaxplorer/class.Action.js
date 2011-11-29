@@ -337,8 +337,8 @@ Class.create("Action", {
 			}else if(node.nodeName == "gui"){
 				this.options.text_id = node.getAttribute('text');
 				this.options.title_id = node.getAttribute('title');
-				this.options.text = MessageHash[node.getAttribute('text')];
-				this.options.title = MessageHash[node.getAttribute('title')];
+				this.options.text = MessageHash[node.getAttribute('text')] || 'not_found';
+				this.options.title = MessageHash[node.getAttribute('title')] || 'not_found';
 				this.options.src = node.getAttribute('src');								
 				if(node.getAttribute('hasAccessKey') && node.getAttribute('hasAccessKey') == "true"){
 					this.options.accessKey = node.getAttribute('accessKey');
