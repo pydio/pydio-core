@@ -283,20 +283,20 @@ Class.create("ActionsManager", {
 				ajaxplorer.displayMessage('ERROR', MessageHash[202]);
 				return;
 			}
-			// Check that dest is not the source it self
-			for(var i=0; i<fileNames.length;i++)
-			{			
-				if(fileNames[i] == destDir){
-					ajaxplorer.displayMessage('ERROR', MessageHash[202]);
-					 return;
-				}
-			}
-			// Check that dest is not the direct parent of source, ie current rep!
-			if(destDir == ajaxplorer.getContextNode().getPath()){
-				ajaxplorer.displayMessage('ERROR', MessageHash[203]);
-				 return;
-			}
 		}
+        // Check that dest is not the source it self
+        for(var i=0; i<fileNames.length;i++)
+        {
+            if(fileNames[i] == destDir){
+                if(destNodeName != null) ajaxplorer.displayMessage('ERROR', MessageHash[202]);
+                 return;
+            }
+        }
+        // Check that dest is not the direct parent of source, ie current rep!
+        if(destDir == ajaxplorer.getContextNode().getPath()){
+            if(destNodeName != null) ajaxplorer.displayMessage('ERROR', MessageHash[203]);
+            return;
+        }
 		var connexion = new Connexion();
 		if(copy){
 			connexion.addParameter('get_action', this.defaultActions.get('ctrldragndrop'));
