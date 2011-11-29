@@ -197,9 +197,6 @@ class ftpAccessWrapper implements AjxpWrapper {
 				if($res["name"] == $basename){
 					AbstractAccessDriver::fixPermissions($res["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));					
 					$statValue = $res["stat"];					
-					// Make sure not to loose the "folder" nature!
-					//$statValue["mode"] += 0040000;
-					//$statValue[2] = $statValue["mode"];
 					return $statValue;
 				}
 			}
@@ -226,6 +223,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		foreach($contents as $entry)
        	{
        		$result = $this->rawListEntryToStat($entry);
+            //AbstractAccessDriver::fixPermissions($result["stat"], ConfService::getRepositoryById($this->repositoryId), array($this, "getRemoteUserId"));
        		$isDir = $result["dir"];
        		$statValue = $result["stat"];
        		$file = $result["name"];       		
