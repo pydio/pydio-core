@@ -3,7 +3,7 @@
     background-color: #f9f9f9;
 }
 
-.soft_css_gradient, .menu.desktop, .menu.rootDirChooser, .menu.bookmarksMenu, .action_bar{
+.soft_css_gradient, .menu.desktop, .menu.rootDirChooser, .menu.bookmarksMenu, .action_bar, .slider-pane{
     background: rgb(255,255,255); /* Old browsers */
     background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
@@ -1183,10 +1183,12 @@ img.simple_button_arrow{
 .slider-pane{
 	background-color:#f1f1ef;
 	border:1px solid #CCCCCC;
-	padding:5px 2px;
+	padding:5px 3px;
 	position:absolute;
 	width:11px;
 	z-index:10000;
+    border-radius: 0px 0px 5px 5px;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.25);
 }
 
 .slider-handle,
