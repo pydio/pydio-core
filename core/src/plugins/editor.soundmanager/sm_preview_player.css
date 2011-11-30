@@ -1,0 +1,32 @@
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+.ui360container{
+    background-image: url("../gui.ajax/res/themes/umbra/images/mimes/64/mime_empty.png");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.ui360container.nobackground{
+    background-image: none;
+}
+
+.ui360-vis.ui360-vis-retracted, .ui360-vis.ui360-vis-retracted .sm2-360ui, .sm2-inline-list .ui360-vis.ui360-vis-retracted {
+    height: 100px;
+}
