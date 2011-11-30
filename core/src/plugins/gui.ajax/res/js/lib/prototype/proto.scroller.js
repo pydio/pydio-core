@@ -146,7 +146,7 @@ Control.ScrollBar = Class.create({
     onChange: function(value){
         var scroll_pos = Math.round(value / this.slider.maximum * (this.scrollLength() - this.offsetLength()));
         if (this.options.scroll_axis == 'vertical')
-            this.container.scrollTop = scroll_pos;
+            try{this.container.scrollTop = scroll_pos;}catch(e){}
         else
             this.container.scrollLeft = scroll_pos;
         if(this.notification_timeout)
