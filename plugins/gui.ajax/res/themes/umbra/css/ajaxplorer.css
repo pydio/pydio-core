@@ -343,6 +343,8 @@ div.shadow_class
 	height: auto;
 	width: auto;
 	border-radius : 0px;
+    border:none;
+    filter: none;
 }
 
 .dialogLegend

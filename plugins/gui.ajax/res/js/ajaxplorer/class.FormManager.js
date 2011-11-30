@@ -118,7 +118,7 @@ Class.create("FormManager", {
                 var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
                 b.insert(div);
                 var lab = div.down('.SF_label');
-                lab.setStyle({width:parseInt(39*320/100)+'px'});
+                lab.setStyle({width:parseInt(39*(Prototype.Browser.IE?340:320)/100)+'px'});
                 if( parseInt(lab.getHeight()) > 30){
                     lab.next().setStyle({marginTop:'20px'});
                 }

@@ -96,6 +96,9 @@ Class.create("InfoPanel", AjxpPane, {
 	 * Sets empty content
 	 */
 	empty : function(){
+        if(this.currentPreviewElement && this.currentPreviewElement.destroyElement){
+            this.currentPreviewElement.destroyElement();
+        }
 		this.setContent('');
 	},
 	
@@ -186,7 +189,7 @@ Class.create("InfoPanel", AjxpPane, {
 		this.addActions('unique');
 		var fakes = this.contentContainer.select('div[id="preview_rich_fake_element"]');
 		if(fakes && fakes.length){
-			this.currentPreviewElement = this.getPreviewElement(uniqNode, false);			
+			this.currentPreviewElement = this.getPreviewElement(uniqNode, false);
 			$(fakes[0]).replace(this.currentPreviewElement);			
 			this.resize();
 		}

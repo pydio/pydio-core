@@ -739,15 +739,16 @@ Class.create("FilesList", SelectableElements, {
 	 * @returns String
 	 */
 	switchDisplayMode: function(mode){
-		if(mode){
-			this._displayMode = mode;
-		}
-		else{
-			if(this._displayMode == "thumb") this._displayMode = "list";
-			else this._displayMode = "thumb";
-		}
 		ajaxplorer.getContextHolder().setPendingSelection(ajaxplorer.getContextHolder().getSelectedNodes());
-		this.initGUI();		
+        this.removeCurrentLines(true);
+        
+        if(mode){
+            this._displayMode = mode;
+        }else{
+            this._displayMode = (this._displayMode == "thumb"?"list":"thumb");
+        }
+
+		this.initGUI();
 		this.reload();
 		this.fireChange();
 		if(ajaxplorer && ajaxplorer.user){
@@ -858,6 +859,15 @@ Class.create("FilesList", SelectableElements, {
 		}
 		for(i = 0;i< AllAjxpDraggables.length;i++){
 			if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
+                if(AllAjxpDraggables[i].element.IMAGE_ELEMENT){
+                    try{
+                        if(AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
+                            AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
+                        }
+                        AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
+                        delete AllAjxpDraggables[i].element.IMAGE_ELEMENT;
+                    }catch(e){}
+                }
 				Element.remove(AllAjxpDraggables[i].element);
 			}			
 		}
@@ -1387,7 +1397,7 @@ Class.create("FilesList", SelectableElements, {
 		var defaultMargin = 5;
 		var elList;
 		if(one_element) elList = [one_element]; 
-		else elList = this._htmlElement.getElementsBySelector('.thumbnail_selectable_cell');
+		else elList = this._htmlElement.select('div.thumbnail_selectable_cell');
 		elList.each(function(element){
 			var node = element.ajxpNode;
 			var image_element = element.IMAGE_ELEMENT || element.select('img')[0];		
@@ -1445,15 +1455,18 @@ Class.create("FilesList", SelectableElements, {
 	/**
 	 * Clear the current lines/thumbs 
 	 */
-	removeCurrentLines: function(){
+	removeCurrentLines: function(skipFireChange){
 		var rows;		
 		if(this._displayMode == "list") rows = $(this._htmlElement).select('tr');
-		else if(this._displayMode == "thumb") rows = $(this._htmlElement).select('div');
+		else if(this._displayMode == "thumb") rows = $(this._htmlElement).select('div.thumbnail_selectable_cell');
 		for(i=0; i<rows.length;i++)
 		{
 			try{
 				rows[i].innerHTML = '';
 				if(rows[i].IMAGE_ELEMENT){
+                    if(rows[i].IMAGE_ELEMENT.destroyElement){
+                        rows[i].IMAGE_ELEMENT.destroyElement();
+                    }
 					rows[i].IMAGE_ELEMENT = null;
 					// Does not work on IE, silently catch exception
 					delete(rows[i].IMAGE_ELEMENT);
@@ -1464,7 +1477,7 @@ Class.create("FilesList", SelectableElements, {
 				rows[i].remove();
 			}
 		}
-		this.fireChange();
+		if(!skipFireChange) this.fireChange();
 	},
 	/**
 	 * Add a "loading" image on top of the component
