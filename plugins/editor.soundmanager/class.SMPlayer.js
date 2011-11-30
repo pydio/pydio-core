@@ -89,6 +89,44 @@ if(!window.soundManager){
     });
 }
 
+function addVolumeButton(){
+    if($("sm_volume_button")) return;
+    var locBars = ajaxplorer.guiCompRegistry.select(function(guiComponent){
+        return (guiComponent.__className == "LocationBar");
+    });
+    if(locBars.length){
+        var locBar = locBars[0];
+        var volumeButton = simpleButton(
+            'sm_volume_button',
+			'inlineBarButtonLeft',
+			145, 145,
+			'bookmark.png',
+			16,
+			'inline_hover',
+            null,
+            false,
+            false
+        )
+        volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked.png";
+        locBar.bmButton.insert({before:volumeButton});
+        new SliderInput(volumeButton, {
+            range : $R(0, 100),
+            sliderValue : soundManager.defaultOptions.volume,
+            leftOffset:-1,
+            topOffset:-1,
+            onSlide : function(value){
+                soundManager.defaultOptions.volume = parseInt(value);
+                soundManager.soundIDs.each(function(el){ soundManager.setVolume(el,parseInt(value)); });
+            }.bind(this),
+            onChange : function(value){
+                if(!ajaxplorer || !ajaxplorer.user) return;
+                ajaxplorer.user.setPreference("soundmanager.volume", parseInt(value));
+                ajaxplorer.user.savePreference("soundmanager.volume");
+            }.bind(this)
+        });
+    }
+}
+
 Class.create("SMPlayer", AbstractEditor, {
 
 	fullscreenMode: false,
@@ -97,65 +135,69 @@ Class.create("SMPlayer", AbstractEditor, {
 	},
 		
 	getPreview : function(ajxpNode, rich){
-        if(window.soundManager.enabled){
-            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(ajxpNode.getPath());
-            if(rich){
-                url += '&rich_preview=true&fake=extension.mp3';
-            }else{
-                url += '&fake=extension.mp3';
-            }
-            var container = new Element("div", {className:"ui360container"+(rich?" nobackground":"")});
-            var player = new Element("div", {className:"ui360"+(rich?" ui360-vis ui360-vis-retracted":"")}).update(new Element("a", {href:url}).update(""));
-            container.update(player);
-            container.resizePreviewElement = function(element){
-                if(rich){
-                    player.setStyle({
-                        marginLeft:parseInt((element.width-256)/2)+24+"px",
-                        marginTop:'-15px'
-                    });
-                }else{
-                    if(element.height >= 50)
-                    {
-                        var mT = parseInt((element.height - 50)/2) + element.margin;
-                        var mB = element.height+(element.margin*2)-50-mT-1;
-                        container.removeClassName("nobackground");
-                        container.setStyle({paddingTop:mT+'px', paddingBottom:mB+'px', marginBottom:'0px'});
-                    }else{
-                        var mT = 0;
-                        var mB = element.height-40;
-                        container.addClassName("nobackground");
-                        container.setStyle({paddingTop:mT+'px', paddingBottom:'0px', marginBottom:mB+'px'});
-                    }
-                    container.setStyle({
-                        paddingLeft:Math.ceil((element.width-50)/2)+12+"px"
-                    });
-                }
-            };
-            container.destroyElement = function(){
-                var urlKey = container.down('a.sm2_link').href;
-                if(threeSixtyPlayer.getSoundByURL(urlKey)){
-                    var theSound = threeSixtyPlayer.getSoundByURL(urlKey);
-                    threeSixtyPlayer.sounds = $A(threeSixtyPlayer.sounds).without(theSound);
-                    threeSixtyPlayer.soundsByURL[urlKey] = null;
-                    delete threeSixtyPlayer.soundsByURL[urlKey];
-                    console.log("Destroying " + theSound.sID);
-                    soundManager.destroySound(theSound.sID);
-                }
-            }
-
-            threeSixtyPlayer.config.items = [player];
-            threeSixtyPlayer.init();
-            return container;
-
-        }else{
+        if(!window.soundManager.enabled){
             var im = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
             im.resizePreviewElement = function(element){};
             return im;
         }
+        addVolumeButton();
+        var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(ajxpNode.getPath());
+        if(rich){
+            url += '&rich_preview=true&fake=extension.mp3';
+        }else{
+            url += '&fake=extension.mp3';
+        }
+        var container = new Element("div", {className:"ui360container"+(rich?" nobackground":"")});
+        var player = new Element("div", {className:"ui360"+(rich?" ui360-vis ui360-vis-retracted":"")}).update(new Element("a", {href:url}).update(""));
+        container.update(player);
+        container.resizePreviewElement = function(element){
+            if(rich){
+                player.setStyle({
+                    marginLeft:parseInt((element.width-256)/2)+24+"px",
+                    marginTop:'-15px'
+                });
+            }else{
+                if(element.height >= 50)
+                {
+                    var mT = parseInt((element.height - 50)/2) + element.margin;
+                    var mB = element.height+(element.margin*2)-50-mT-1;
+                    container.removeClassName("nobackground");
+                    container.setStyle({paddingTop:mT+'px', paddingBottom:mB+'px', marginBottom:'0px'});
+                }else{
+                    var mT = 0;
+                    var mB = element.height-40;
+                    container.addClassName("nobackground");
+                    container.setStyle({paddingTop:mT+'px', paddingBottom:'0px', marginBottom:mB+'px'});
+                }
+                container.setStyle({
+                    paddingLeft:Math.ceil((element.width-50)/2)+12+"px"
+                });
+            }
+        };
+        container.destroyElement = function(){
+            var urlKey = container.down('a.sm2_link').href;
+            if(threeSixtyPlayer.getSoundByURL(urlKey)){
+                var theSound = threeSixtyPlayer.getSoundByURL(urlKey);
+                threeSixtyPlayer.sounds = $A(threeSixtyPlayer.sounds).without(theSound);
+                threeSixtyPlayer.soundsByURL[urlKey] = null;
+                delete threeSixtyPlayer.soundsByURL[urlKey];
+                console.log("Destroying " + theSound.sID);
+                soundManager.destroySound(theSound.sID);
+            }
+        }
+
+        threeSixtyPlayer.config.items = [player];
+        threeSixtyPlayer.init();
+        return container;
+
     },
 
     getThumbnailSource : function(ajxpNode){
         return resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
+    },
+
+    filterElement : function(element, ajxpNode){
+        
     }
 
 });
