@@ -115,6 +115,7 @@ function addVolumeButton(){
             leftOffset:-1,
             topOffset:-1,
             onSlide : function(value){
+                volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked"+(parseInt(value)==0?"-muted":"")+".png";
                 soundManager.defaultOptions.volume = parseInt(value);
                 soundManager.soundIDs.each(function(el){ soundManager.setVolume(el,parseInt(value)); });
             }.bind(this),

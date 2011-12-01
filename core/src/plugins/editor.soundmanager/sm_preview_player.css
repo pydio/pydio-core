@@ -18,7 +18,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 .ui360container{
-    background-image: url("../gui.ajax/res/themes/umbra/images/mimes/64/mime_empty.png");
+    background-image: url("player_bg_icon.png");
     background-position: center;
     background-repeat: no-repeat;
 }
