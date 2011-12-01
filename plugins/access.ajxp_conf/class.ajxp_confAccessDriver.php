@@ -938,7 +938,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"icon" 		=> "folder_development.png",					
 					"plugin_id" => $t
 				);
-				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t)." plugins", false, $meta);				
+				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t), false, $meta);
 			}
 		}else if($dir == "/core"){
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="ajxp_conf.plugins">
