@@ -245,13 +245,11 @@ Class.create("LocationBar", {
 					siblingWidth+=s.getWidth();
 				}
 			});
-			if(!this.buttonsWidth){
-				this.buttonsWidth = this.gotoButton.getWidth() + this.parentButton.getWidth() + this.bmButton.getWidth() + 20;
-                if(this.searchButton){
-                    this.buttonsWidth += this.searchButton.getWidth();
-                }
-			}
-			var newWidth = Math.min((parentWidth-siblingWidth-this.buttonsWidth),320);
+            var buttonsWidth = 20;
+            this.element.select("div.inlineBarButton,div.inlineBarButtonLeft,div.inlineBarButtonRight").each(function(el){
+                buttonsWidth += el.getWidth();
+            });
+			var newWidth = Math.min((parentWidth-siblingWidth-buttonsWidth),320);
 			if(newWidth < 5){
 				this.element.hide();
 			}else{
