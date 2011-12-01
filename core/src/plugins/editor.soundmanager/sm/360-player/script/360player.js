@@ -1381,6 +1381,7 @@ soundManager.consoleOnly = true;
 soundManager.flashVersion = 9;
 soundManager.useHighPerformance = true;
 soundManager.useFlashBlock = true;
+soundManager.flashLoadTimeout = 0;
 
 // soundManager.useFastPolling = true; // for more aggressive, faster UI updates (higher CPU use)
 

@@ -21,6 +21,7 @@ window.SM2_DEFER = true;
 if(!window.soundManager){
     var conn = new Connexion();
     conn._libUrl = 'plugins/editor.soundmanager/sm/';
+    conn.loadLibrary('360-player/script/excanvas.js');
     conn.loadLibrary('360-player/script/berniecode-animator.js');
     conn.loadLibrary('script/soundmanager2-nodebug-jsmin.js', function(){
         window.soundManager = new SoundManager('plugins/editor.soundmanager/sm/swf/');
@@ -179,7 +180,6 @@ Class.create("SMPlayer", AbstractEditor, {
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager.enabled){
             var im = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
-            im.resizePreviewElement = function(element){};
             return im;
         }
         addVolumeButton();
