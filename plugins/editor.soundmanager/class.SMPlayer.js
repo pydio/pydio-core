@@ -26,6 +26,9 @@ if(!window.soundManager){
     conn.loadLibrary('script/soundmanager2-nodebug-jsmin.js', function(){
         window.soundManager = new SoundManager('plugins/editor.soundmanager/sm/swf/');
         window.soundManager.url = 'plugins/editor.soundmanager/sm/swf/';
+        if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("soundmanager.volume") !== undefined){
+            soundManager.defaultOptions.volume = ajaxplorer.user.getPreference("soundmanager.volume");
+        }
         conn.loadLibrary('360-player/script/360player.js', function(){
 
             window.threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
@@ -63,6 +66,9 @@ if(!window.soundManager){
                         if(index < links.length-1 ){
                             window.threeSixtyPlayer.handleClick({'target':links[index+1].down("a.sm2_link")});
                         }
+                        if(finishingPlayer.up('.ajxpNodeProvider')){
+                            finishingPlayer.up('.ajxpNodeProvider').removeClassName("SMNodePlaying");
+                        }
                     }
                 }catch(e){}
             };
@@ -70,18 +76,28 @@ if(!window.soundManager){
             window.threeSixtyPlayer.config.onplay = function(smPlayer){
                 try{
                     var playerDiv = smPlayer._360data.oUI360;
-                    if(!playerDiv.hasClassName("ui360-vis")) return;
-                    playerDiv.removeClassName("ui360-vis-retracted");
+                    if(!playerDiv.hasClassName("ui360-vis")) {
+                        if(playerDiv.up('.ajxpNodeProvider')){
+                            playerDiv.up('.ajxpNodeProvider').addClassName("SMNodePlaying");
+                        }
+                    }else{
+                        playerDiv.removeClassName("ui360-vis-retracted");
+                    }
                 }catch(e){}
             };
 
             window.threeSixtyPlayer.config.onstop = function(smPlayer){
                 try{
                     var playerDiv = smPlayer._360data.oUI360;
-                    if(!playerDiv.hasClassName("ui360-vis")) return;
-                    window.setTimeout(function(){
-                        playerDiv.addClassName("ui360-vis-retracted");
-                    }, 1000);
+                    if(!playerDiv.hasClassName("ui360-vis")) {
+                        if(playerDiv.up('.ajxpNodeProvider')){
+                            playerDiv.up('.ajxpNodeProvider').removeClassName("SMNodePlaying");
+                        }
+                    }else{
+                        window.setTimeout(function(){
+                            playerDiv.addClassName("ui360-vis-retracted");
+                        }, 1000);
+                    }
                 }catch(e){}
             };
 
@@ -157,6 +173,7 @@ function addVolumeButton(){
         sliderValue : soundManager.defaultOptions.volume,
         leftOffset:-1,
         topOffset:-1,
+        anchorActiveClass: 'volume_slider_active',
         onSlide : function(value){
             volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked"+(parseInt(value)==0?"-muted":"")+".png";
             soundManager.defaultOptions.volume = parseInt(value);

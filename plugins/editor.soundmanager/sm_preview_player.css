@@ -49,3 +49,11 @@
 .ui360-micro div.sm2-timing{
     line-height: 16px;
 }
+
+.SMNodePlaying{
+    background-color: #ffffc2;
+}
+
+.volume_slider_active{
+    background-color: rgba(255,255,255,0.7);
+}

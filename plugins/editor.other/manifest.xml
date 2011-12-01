@@ -17,11 +17,31 @@
 			<div class="editor_selector_title">AJXP_MESSAGE[openother.3]</div>
 			<div class="dialogLegend">AJXP_MESSAGE[openother.4]</div>
 			<div id="editor_selector"></div>
+			<div id="clear_assoc_link">Clear existing associations</div>
 			<div class="dialogButtons">
 				<input type="image" name="close" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" title="OK" class="dialogButton"/>
 			</div>
 		</div>				
-	]]></clientForm>	
+	]]></clientForm>
+    <processing>
+        <activeCondition><![CDATA[
+            var original = ajaxplorer.__proto__.findEditorsForMime;
+            ajaxplorer.__proto__.findEditorsForMime = function(mime, restrictToPreviewProviders){
+                if(this.user && this.user.getPreference("gui_preferences", true) && this.user.getPreference("gui_preferences", true)["other_editor_extensions"]){
+                    $H(this.user.getPreference("gui_preferences", true)["other_editor_extensions"]).each(function(pair){
+                        var editor = this.getActiveExtensionByType("editor").detect(function(ed){
+                            return ed.editorClass == pair.value;
+                        });
+                        if(editor && !$A(editor.mimes).include(pair.key)){
+                            editor.mimes.push(pair.key);
+                        }
+                    }.bind(this));
+                }
+                return original.apply(this, [mime, restrictToPreviewProviders]);
+            };
+            return true;
+        ]]></activeCondition>
+    </processing>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
