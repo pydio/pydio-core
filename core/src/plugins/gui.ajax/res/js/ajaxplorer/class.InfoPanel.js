@@ -98,6 +98,7 @@ Class.create("InfoPanel", AjxpPane, {
 	empty : function(){
         if(this.currentPreviewElement && this.currentPreviewElement.destroyElement){
             this.currentPreviewElement.destroyElement();
+            this.currentPreviewElement = null;
         }
 		this.setContent('');
 	},
