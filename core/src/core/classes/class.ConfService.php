@@ -670,9 +670,14 @@ class ConfService
 				if(!is_object($instance)) {
 					continue;
 				}
-				$instance->init($metaSources[$plugId]);
-				$instance->initMeta($plugInstance);
-				$pServ->setPluginActive($split[0], $split[1]);
+                try{
+                    $instance->init($metaSources[$plugId]);
+                    $instance->initMeta($plugInstance);
+                }catch(Exception $e){
+                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    $this->errors[] = $e->getMessage();
+                }
+                $pServ->setPluginActive($split[0], $split[1]);
 			}
 		}
 		$this->configs["ACCESS_DRIVER"] = $plugInstance;	
