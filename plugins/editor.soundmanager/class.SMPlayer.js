@@ -87,6 +87,46 @@ if(!window.soundManager){
             window.soundManager.beginDelayedInit();
         });
     });
+    hookToFilesList();
+}
+
+function hookToFilesList(){
+    var fLists = ajaxplorer.guiCompRegistry.select(function(guiComponent){
+        return (guiComponent.__className == "FilesList");
+    });
+    if(!fLists.length){
+        return;
+    }
+    var fList = fLists[0];
+    fList.observe("rows:didInitialize", function(){
+        if(fList.getDisplayMode() != "list" || !window.soundManager.enabled) return;
+        var resManager = ajaxplorer.findEditorById("editor.soundmanager").resourcesManager;
+        if(!resManager.loaded){
+            resManager.load();
+        }
+        $A(fList.getItems()).each(function(row){
+            if(!row.ajxpNode || row.ajxpNode.getAjxpMime() != "mp3") return;
+            addVolumeButton();
+            var url = ajxpBootstrap.parameters.get('ajxpServerAccess')+'&get_action=audio_proxy&file='+base64_encode(row.ajxpNode.getPath())+ '&fake=extension.mp3';
+            var player = new Element("div", {className:"ui360 ui360-micro"}).update(new Element("a", {href:url}).update(""));
+            row.down("span#ajxp_label").setStyle({backgroundImage:'none'}).insert({top:player});
+            threeSixtyPlayer.config.items = [player];
+            threeSixtyPlayer.init();
+        });
+    });
+    fList.observe("rows:willClear", function(){
+        fList._htmlElement.select("div.ui360-micro").each( function(container){
+            var urlKey = container.down('a.sm2_link').href;
+            if(threeSixtyPlayer.getSoundByURL(urlKey)){
+                var theSound = threeSixtyPlayer.getSoundByURL(urlKey);
+                threeSixtyPlayer.sounds = $A(threeSixtyPlayer.sounds).without(theSound);
+                threeSixtyPlayer.soundsByURL[urlKey] = null;
+                delete threeSixtyPlayer.soundsByURL[urlKey];
+                soundManager.destroySound(theSound.sID);
+            }
+        });
+    });
+
 }
 
 function addVolumeButton(){
@@ -94,38 +134,39 @@ function addVolumeButton(){
     var locBars = ajaxplorer.guiCompRegistry.select(function(guiComponent){
         return (guiComponent.__className == "LocationBar");
     });
-    if(locBars.length){
-        var locBar = locBars[0];
-        var volumeButton = simpleButton(
-            'sm_volume_button',
-			'inlineBarButtonLeft',
-			145, 145,
-			'bookmark.png',
-			16,
-			'inline_hover',
-            null,
-            false,
-            false
-        )
-        volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked.png";
-        locBar.bmButton.insert({before:volumeButton});
-        new SliderInput(volumeButton, {
-            range : $R(0, 100),
-            sliderValue : soundManager.defaultOptions.volume,
-            leftOffset:-1,
-            topOffset:-1,
-            onSlide : function(value){
-                volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked"+(parseInt(value)==0?"-muted":"")+".png";
-                soundManager.defaultOptions.volume = parseInt(value);
-                soundManager.soundIDs.each(function(el){ soundManager.setVolume(el,parseInt(value)); });
-            }.bind(this),
-            onChange : function(value){
-                if(!ajaxplorer || !ajaxplorer.user) return;
-                ajaxplorer.user.setPreference("soundmanager.volume", parseInt(value));
-                ajaxplorer.user.savePreference("soundmanager.volume");
-            }.bind(this)
-        });
+    if(!locBars.length){
+        return;
     }
+    var locBar = locBars[0];
+    var volumeButton = simpleButton(
+        'sm_volume_button',
+        'inlineBarButtonLeft',
+        145, 145,
+        'bookmark.png',
+        16,
+        'inline_hover',
+        null,
+        false,
+        false
+    )
+    volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked.png";
+    locBar.bmButton.insert({before:volumeButton});
+    new SliderInput(volumeButton, {
+        range : $R(0, 100),
+        sliderValue : soundManager.defaultOptions.volume,
+        leftOffset:-1,
+        topOffset:-1,
+        onSlide : function(value){
+            volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked"+(parseInt(value)==0?"-muted":"")+".png";
+            soundManager.defaultOptions.volume = parseInt(value);
+            soundManager.soundIDs.each(function(el){ soundManager.setVolume(el,parseInt(value)); });
+        }.bind(this),
+        onChange : function(value){
+            if(!ajaxplorer || !ajaxplorer.user) return;
+            ajaxplorer.user.setPreference("soundmanager.volume", parseInt(value));
+            ajaxplorer.user.savePreference("soundmanager.volume");
+        }.bind(this)
+    });
 }
 
 Class.create("SMPlayer", AbstractEditor, {
@@ -182,7 +223,6 @@ Class.create("SMPlayer", AbstractEditor, {
                 threeSixtyPlayer.sounds = $A(threeSixtyPlayer.sounds).without(theSound);
                 threeSixtyPlayer.soundsByURL[urlKey] = null;
                 delete threeSixtyPlayer.soundsByURL[urlKey];
-                console.log("Destroying " + theSound.sID);
                 soundManager.destroySound(theSound.sID);
             }
         }
