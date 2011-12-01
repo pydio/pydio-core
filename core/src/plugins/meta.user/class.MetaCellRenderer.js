@@ -41,8 +41,17 @@ Class.create("MetaCellRenderer", {
 	},
 	
 	/* LABELS SYSTEM */
-	cssLabelsFilter : function(element, ajxpNode, type){
-		if(type == 'row'){
+	cssLabelsFilter : function(element, ajxpNode, type, ajxpNodeObject){
+        if(!element && ajxpNodeObject){
+            var content = ajxpNode.getMetadata().get('css_label');
+            if(content){
+                var obj = new MetaCellRenderer();
+                var rule = obj.findCssRule(content.strip());
+                if(rule){
+                    ajxpNodeObject.addClassName(rule.cssClass);
+                }
+            }
+        }else if(type == 'row'){
 			try{
 				var span = element.down('span');
 				var content = span.innerHTML;
@@ -103,6 +112,7 @@ Class.create("MetaCellRenderer", {
 	/* STARS RATE SYSTEM */
 	starsRateFilter: function(element, ajxpNode, type){
 		if(type == 'thumb') return;
+        if(!element) return;
 		var value = 0;
 		try{
 			var content = element.select('span')[0].innerHTML;

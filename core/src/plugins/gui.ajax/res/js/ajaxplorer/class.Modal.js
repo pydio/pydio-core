@@ -189,8 +189,8 @@ Class.create("Modal", {
 		ajaxplorer.disableShortcuts();
 		ajaxplorer.disableNavigation();
 		ajaxplorer.blurAll();
-		var winWidth = $(document.body).getWidth();
-		var winHeight = $(document.body).getHeight();
+		var winWidth = document.viewport.getWidth();
+		var winHeight = document.viewport.getHeight();
 	
 		this.currentListensToWidth = false;
 		this.currentListensToHeight = false;
@@ -224,12 +224,12 @@ Class.create("Modal", {
 		if(boxAutoResize && (this.currentListensToWidth || this.currentListensToHeight) ){
 			this.currentResizeListener = function(){
 				if(this.currentListensToWidth){
-					var winWidth = $(document.body).getWidth();
+					var winWidth = document.viewport.getWidth();
 					boxWidth = parseInt((winWidth * this.currentListensToWidth) / 100);
 					$(elementName).setStyle({width:boxWidth+'px'});					
 				}
 				if(this.currentListensToHeight){
-					var winHeight = $(document.body).getHeight();
+					var winHeight = document.viewport.getHeight();
 					boxH = parseInt((winHeight * this.currentListensToHeight) / 100);
 					$(elementName).setStyle({height:boxH+'px'});
 				}
@@ -304,8 +304,8 @@ Class.create("Modal", {
 	 * @param elementToScroll HTMLElement
 	 */
 	refreshDialogPosition: function(checkHeight, elementToScroll){
-		var winWidth = $(document.body).getWidth();
-		var winHeight = $(document.body).getHeight();
+		var winWidth = document.viewport.getWidth();
+		var winHeight = document.viewport.getHeight();
         var element = $(this.elementName);
 		boxWidth = element.getWidth();
 		var boxHeight = element.getHeight();
@@ -326,9 +326,14 @@ Class.create("Modal", {
 		var offsetTop = parseInt(((winHeight - parseInt(boxHeight))/3));
         
         if(element.offsetLeft && element.offsetTop){
-            new Effect.Morph($(this.elementName), {style:'top:'+offsetTop+'px;left:'+offsetLeft+'px', duration:0.4});
+            new Effect.Morph($(this.elementName), {
+                style:'top:'+offsetTop+'px;left:'+offsetLeft+'px',
+                duration:0.4,
+                afterFinish : this.refreshDialogAppearance.bind(this)
+            });
         }else{
             element.setStyle({top:offsetTop+"px",left:offsetLeft+"px"});
+            this.refreshDialogAppearance();
         }
 
 	},

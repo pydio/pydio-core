@@ -37,7 +37,8 @@ Class.create("SliderInput", {
 			topOffset : 2,
 			leftOffset : 3,
 			range : $R(0, 1),
-			alignY : 6
+			alignY : 6,
+            anchorActiveClass: 'slider-anchor-active'
 		}, options || { });
 
 		var original = this.options.onSlide;
@@ -65,21 +66,35 @@ Class.create("SliderInput", {
 		this.holder.insert(this.tracker);
 		this.tracker.insert(this.cursor);		
 		this.holder.hide();
-		$$("body")[0].insert(this.holder);
-		this.slider = new Control.Slider(this.cursor, this.tracker, this.options);		
+		$(document.body).insert(this.holder);
+		this.slider = new Control.Slider(this.cursor, this.tracker, this.options);
+        this.showObserver = this.show.bind(this);
 		if(this.input.getAttribute("type") && this.input.getAttribute("type") == "image" || this.input.nodeName != 'input'){
-			this.input.observe("click", this.show.bind(this) );
+			this.input.observe("click", this.showObserver );
 		}else{
-			this.input.observe("focus", this.show.bind(this) );
+			this.input.observe("focus", this.showObserver );
 		}
-		document.observe("click", function(event){
+        this.docObserver = function(event){
 			var element = Event.findElement(event);
 			if(!element.descendantOf(this.holder) && !element.descendantOf(this.input)
                 && element != this.holder && element!=this.input) {
 				this.hide();
 			}
-		}.bind(this));
+		}.bind(this);
+		document.observe("click", this.docObserver);
 	},
+
+    destroy : function(){
+        try{
+
+            this.input.stopObserving("click", this.showObserver);
+            this.input.stopObserving("focus", this.showObserver);
+            document.stopObserving("click", this.docObserver);
+            this.holder.remove();
+
+        }catch(e){}
+    },
+
 	/**
 	 * Sets the value of the slider
 	 * @param value Integer
@@ -106,6 +121,7 @@ Class.create("SliderInput", {
 		this.holder.setStyle(pos);
 		this.slider.setValue(parseFloat(this.input.value));
 		this.holder.show();
+        this.input.addClassName(this.options.anchorActiveClass);
 		this.delay();
 	},
 	
@@ -119,6 +135,7 @@ Class.create("SliderInput", {
 		}
 		try{this.input.blur();}
 		catch(e){}
+        this.input.removeClassName(this.options.anchorActiveClass);
 	},
 	/**
 	 * Wait until automatically hiding the pane

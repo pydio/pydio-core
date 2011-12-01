@@ -329,6 +329,7 @@ Class.create("EmlViewer", AbstractEditor, {
 	},	
 	
 	attachmentCellRenderer : function(element, ajxpNode, type){
+        if(!element) return;
 		if(ajxpNode.getMetadata().get("eml_attachments") == "0") {
 			if(type == "row") element.update('<span class="text_label"> </span>');
 			return;

@@ -412,6 +412,9 @@ Class.create("FilesList", SelectableElements, {
         if(this.scrollSizeObserver){
             this.stopObserving("resize", this.scrollSizeObserver);
         }
+        if(this.slider){
+            this.slider.destroy();
+        }
 		if(this._displayMode == "list")
 		{
 			var buffer = '';
@@ -927,6 +930,7 @@ Class.create("FilesList", SelectableElements, {
 				newItem = this.ajxpNodeToDiv(child);
 			}
 			newItem.ajxpNode = child;
+            newItem.addClassName("ajxpNodeProvider");
 		}	
 		this.initRows();
 		
@@ -1075,7 +1079,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	ajxpNodeToTableRow: function(ajxpNode){		
 		var metaData = ajxpNode.getMetadata();
-		var newRow = document.createElement("tr");		
+		var newRow = new Element("tr");
 		var tBody = this.parsingCache.get('tBody') || $(this._htmlElement).select("tbody")[0];
 		this.parsingCache.set('tBody', tBody);
 		metaData.each(function(pair){
@@ -1202,6 +1206,26 @@ Class.create("FilesList", SelectableElements, {
 				modifier(tableCell, ajxpNode, 'row');
 			}
 		}
+        // test hidden modifiers
+        var hiddenModifiers = $A();
+        if(this.parsingCache.get("hiddenModifiers")){
+            hiddenModifiers = this.parsingCache.get("hiddenModifiers");
+        }else{
+            this.hiddenColumns.each(function(col){
+                try{
+                    this.columnsDef.each(function(colDef){
+                        if(colDef.attributeName == col && colDef.modifier){
+                           var mod = eval(colDef.modifier);
+                           hiddenModifiers.push(mod);
+                        }
+                    });
+                }catch(e){}
+            }.bind(this) );
+            this.parsingCache.set("hiddenModifiers", hiddenModifiers);
+        }
+        hiddenModifiers.each(function(mod){
+            mod(null,ajxpNode,'row', newRow);
+        });
 		tBody.appendChild(newRow);
 		if(this.even){
 			$(newRow).addClassName('even');
@@ -1321,6 +1345,7 @@ Class.create("FilesList", SelectableElements, {
 	},
 		
 	partSizeCellRenderer : function(element, ajxpNode, type){
+        if(!element) return;
 		element.setAttribute("data-sorter_value", ajxpNode.getMetadata().get("bytesize"));
 		if(!ajxpNode.getMetadata().get("target_bytesize")){
 			return;

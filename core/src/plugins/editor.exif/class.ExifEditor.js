@@ -69,6 +69,7 @@ Class.create("ExifEditor", AbstractEditor, {
 		
 	columnsLayout : function(reset){		
 		var container = this.contentMainContainer;
+        if(!container) return;
 		if(reset){
 			container.select('div.exifSection').each(function(el){container.insert(el);});
 			container.select('div.column').invoke("remove");

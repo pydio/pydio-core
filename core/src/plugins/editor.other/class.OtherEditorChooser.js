@@ -23,13 +23,37 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 	{
 		this.element = oFormObject;
 	},
-	
+
+    /*
+    Not used, reported in activeCondition
+    Dynamic patching of ajaxplorer findEditorsForMime, nice!
+     */
+    patchEditorLoader : function(){
+        var original = ajaxplorer.__proto__.findEditorsForMime;
+        ajaxplorer.__proto__.findEditorsForMime = function(mime, restrictToPreviewProviders){
+            if(this.user && this.user.getPreference("gui_preferences", true) && this.user.getPreference("gui_preferences", true)["other_editor_extensions"]){
+                $H(this.user.getPreference("gui_preferences", true)["other_editor_extensions"]).each(function(pair){
+                    var editor = this.getActiveExtensionByType("editor").detect(function(ed){
+                        return ed.editorClass == pair.value;
+                    });
+                    if(editor && !$A(editor.mimes).include(pair.key)){
+                        editor.mimes.push(pair.key);
+                    }
+                }.bind(this));
+            }
+            return original.apply(this, [mime, restrictToPreviewProviders]);
+        };
+    },
 	
 	open : function($super, userSelection){
 		$super(userSelection);
 		var node = userSelection.getUniqueNode();
 		var allEditors = this.findActiveEditors(node.getAjxpMime());
 		var selector = this.element.down('#editor_selector');
+        var clearAssocLink = this.element.down('#clear_assoc_link');
+        clearAssocLink.observe("click", function(){
+            this.clearAssociations(node.getAjxpMime());
+        }.bind(this) );
         if(window.ajxpMobile){
             attachMobileScroll(selector, "vertical");
         }
@@ -39,9 +63,10 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 			var elDiv = new Element('a', {
 				href:'#', 
 				className:(even?'even':''),
-				style:"background-image:url('"+resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22)+"')"
+				style:"background-image:url('"+resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22)+"');background-size:22px;"
 				}).update(el.text + '<span>'+el.title+'</span>');
 			even = !even;
+            elDiv.currentMime = node.getAjxpMime();
 			elDiv.editorData = el;
 			elDiv.observe('click', this.selectEditor.bind(this));
 			selector.insert(elDiv);
@@ -53,8 +78,46 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 		if(!event.target.editorData) return;
 		ajaxplorer.loadEditorResources(event.target.editorData.resourcesManager);
 		hideLightBox();
-		modal.openEditorDialog(event.target.editorData);		
+		modal.openEditorDialog(event.target.editorData);
+        this.createAssociation(event.target.currentMime, event.target.editorData.editorClass);
 	},
+
+    createAssociation : function(mime, editorClassName){
+        var editor = ajaxplorer.getActiveExtensionByType("editor").detect(function(ed){
+            return ed.editorClass == editorClassName;
+        });
+        if(editor && !$A(editor.mimes).include(mime)){
+            editor.mimes.push(mime);
+            if(ajaxplorer && ajaxplorer.user){
+                var guiPrefs = ajaxplorer.user.getPreference("gui_preferences", true) || {};
+                var exts = guiPrefs["other_editor_extensions"] || {};
+                exts[mime] = editorClassName;
+                guiPrefs["other_editor_extensions"] = exts;
+                ajaxplorer.user.setPreference("gui_preferences", guiPrefs, true);
+                ajaxplorer.user.savePreference("gui_preferences");
+            }
+        }
+    },
+
+    clearAssociations : function(mime){
+        try{
+            var guiPrefs = ajaxplorer.user.getPreference("gui_preferences", true);
+            var assoc = guiPrefs["other_editor_extensions"];
+        }catch(e){}
+        if(assoc && assoc[mime]){
+            var editorClassName = assoc[mime];
+            var editor = ajaxplorer.getActiveExtensionByType("editor").detect(function(ed){
+                return ed.editorClass == editorClassName;
+            });
+            if(editor){
+                editor.mimes = $A(editor.mimes).without(mime);
+            }
+            delete assoc[mime];
+            guiPrefs["other_editor_extensions"] = assoc;
+            ajaxplorer.user.setPreference("gui_preferences", guiPrefs, true);
+            ajaxplorer.user.savePreference("gui_preferences");
+        }
+    },
 	
 	/**
 	 * Find Editors that can handle a given mime type
