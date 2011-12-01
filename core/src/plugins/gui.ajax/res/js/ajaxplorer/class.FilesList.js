@@ -770,6 +770,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Called after the rows/thumbs are populated
 	 */
 	initRows: function(){
+        this.notify("rows:willInitialize");
 		// Disable text select on elements
 		if(this._displayMode == "thumb")
 		{
@@ -791,6 +792,7 @@ Class.create("FilesList", SelectableElements, {
 			this.disableTextSelection(allItems[i], true);
 		}
         this.notify("resize");
+        this.notify("rows:didInitialize");
 	},
 	/**
 	 * Queue processor for thumbnail async loading
@@ -1456,6 +1458,7 @@ Class.create("FilesList", SelectableElements, {
 	 * Clear the current lines/thumbs 
 	 */
 	removeCurrentLines: function(skipFireChange){
+        this.notify("rows:willClear");
 		var rows;		
 		if(this._displayMode == "list") rows = $(this._htmlElement).select('tr');
 		else if(this._displayMode == "thumb") rows = $(this._htmlElement).select('div.thumbnail_selectable_cell');
@@ -1478,6 +1481,7 @@ Class.create("FilesList", SelectableElements, {
 			}
 		}
 		if(!skipFireChange) this.fireChange();
+        this.notify("rows:didClear");
 	},
 	/**
 	 * Add a "loading" image on top of the component
