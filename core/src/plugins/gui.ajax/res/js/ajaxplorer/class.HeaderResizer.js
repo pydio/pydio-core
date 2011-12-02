@@ -483,7 +483,9 @@ Class.create("HeaderResizer", {
 			this.resizeHeaders();
 		}else if(body.scrollWidth <= body.getWidth() && this.scroller){
 			this.element.setStyle({width:this.element._origWidth+"px"});
-			$(this.scroller.parentNode).insert({top:this.element});
+            if($(this.scroller.parentNode)){
+                $(this.scroller.parentNode).insert({top:this.element});
+            }
 			body.stopObserving("scroll", this.scroller.observer);
 			this.scroller.remove();
 			this.scroller = null;			
