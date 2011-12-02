@@ -22,35 +22,95 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * @package info.ajaxplorer.core
  * @class Repository
- * The basic abstraction of a data server
+ * The basic abstraction of a data store. Can map a FileSystem, but can also map data from a totally
+ * different source, like the application configurations, a mailbox, etc.
  */
 class Repository {
 
+    /**
+     * @var string
+     */
 	var $uuid;
+    /**
+     * @var string
+     */
 	var $id;
+    /**
+     * @var string
+     */
 	var $path;
+    /**
+     * @var string
+     */
 	var $display;
+    /**
+     * @var string
+     */
 	var $displayStringId;
+    /**
+     * @var string
+     */
 	var $accessType = "fs";
+    /**
+     * @var string
+     */
 	var $recycle = "";
+    /**
+     * @var bool
+     */
 	var $create = true;
+    /**
+     * @var bool
+     */
 	var $writeable = false;
+    /**
+     * @var bool
+     */
 	var $enabled = true;
+    /**
+     * @var array
+     */
 	var $options = array();
+    /**
+     * @var string
+     */
 	var $slug;
+    /**
+     * @var bool
+     */
     public $isTemplate = false;
 	
+    /**
+     * @var string
+     */
 	private $owner;
+    /**
+     * @var string
+     */
 	private $parentId;
+    /**
+     * @var string
+     */
 	private $uniqueUser;
+    /**
+     * @var bool
+     */
 	private $inferOptionsFromParent = false;
 	/**
 	 * @var Repository
 	 */
 	private $parentTemplateObject;
-	
+	/**
+     * @var array
+     */
 	public $streamData;
-	
+
+    /**
+     * @param string $id
+     * @param string $display
+     * @param string $driver
+     * @return void
+     */
 	function Repository($id, $display, $driver){
 		$this->setAccessType($driver);
 		$this->setDisplay($display);
@@ -58,7 +118,15 @@ class Repository {
 		$this->uuid = md5(microtime());
 		$this->slug = AJXP_Utils::slugify($display);
 	}
-	
+	/**
+     * Create a shared version of this repository
+     * @param string $newLabel
+     * @param array $newOptions
+     * @param string $parentId
+     * @param string $owner
+     * @param string $uniqueUser
+     * @return Repository
+     */
 	function createSharedChild($newLabel, $newOptions, $parentId = null, $owner = null, $uniqueUser = null){
 		$repo = new Repository(0, $newLabel, $this->accessType);
 		$newOptions = array_merge($this->options, $newOptions);
@@ -69,7 +137,14 @@ class Repository {
 		$repo->setOwnerData($parentId, $owner, $uniqueUser);
 		return $repo;
 	}
-	
+	/**
+     * Create a child from this repository if it's a template
+     * @param string $newLabel
+     * @param array $newOptions
+     * @param string $owner
+     * @param string $uniqueUser
+     * @return Repository
+     */
 	function createTemplateChild($newLabel, $newOptions, $owner = null, $uniqueUser = null){
 		$repo = new Repository(0, $newLabel, $this->accessType);
 		$repo->options = $newOptions;
@@ -77,7 +152,10 @@ class Repository {
 		$repo->inferOptionsFromParent = true;
 		return $repo;
 	}
-	
+	/**
+     * Recompute uuid
+     * @return bool
+     */
 	function upgradeId(){
 		if(!isSet($this->uuid)) {
 			$this->uuid = md5(serialize($this));
@@ -86,18 +164,29 @@ class Repository {
 		}
 		return false;
 	}
-	
+	/**
+     * Get a uuid
+     * @param bool $serial
+     * @return string
+     */
 	function getUniqueId($serial=false){
 		if($serial){
 			return md5(serialize($this));
 		}
 		return $this->uuid;
 	}
-	
+	/**
+     * Alias for this repository
+     * @return string
+     */
 	function getSlug(){
 		return $this->slug;
 	}
-	
+	/**
+     * Use the slugify function to generate an alias from the label
+     * @param string $slug
+     * @return void
+     */
 	function setSlug($slug = null){
 		if($slug == null){
 			$this->slug = AJXP_Utils::slugify($this->display);
@@ -105,7 +194,10 @@ class Repository {
 			$this->slug = $slug;
 		}
 	}
-	
+	/**
+     * Get the <client_settings> content of the manifest.xml
+     * @return DOMElement|DOMNodeList|string
+     */
 	function getClientSettings(){
         $plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
         if(!$plugin) return "";
@@ -124,7 +216,12 @@ class Repository {
         }
         return $plugin->getManifestRawContent("//client_settings", "string");
 	}
-	
+	/**
+     * Find the streamWrapper declared by the access driver
+     * @param bool $register
+     * @param array $streams
+     * @return bool
+     */
 	function detectStreamWrapper($register = false, &$streams=null){
 		$plugin = AJXP_PluginsService::findPlugin("access", $this->accessType);
 		if(!$plugin) return(false);
@@ -136,14 +233,24 @@ class Repository {
 		return ($streamData !== false);
 	}
 	
-
+    /**
+     * Add options
+     * @param $oName
+     * @param $oValue
+     * @return void
+     */
 	function addOption($oName, $oValue){
 		if(strpos($oName, "PATH") !== false){
 			$oValue = str_replace("\\", "/", $oValue);
 		}
 		$this->options[$oName] = $oValue;
 	}
-	
+	/**
+     * Get the repository options, filtered in various maners
+     * @param string $oName
+     * @param bool $safe Do not filter
+     * @return mixed|string
+     */
 	function getOption($oName, $safe=false){
 		if(isSet($this->options[$oName])){
 			$value = $this->options[$oName];			
@@ -160,7 +267,10 @@ class Repository {
 		}
 		return "";
 	}
-	
+	/**
+     * Get the options that already have a value
+     * @return array
+     */
 	function getOptionsDefined(){
         return array_keys($this->options);
 		$keys = array();
@@ -169,7 +279,11 @@ class Repository {
 		}
 		return $keys;
 	}
-	
+
+    /**
+     * Get the DEFAULT_RIGHTS option
+     * @return string
+     */
 	function getDefaultRight(){
 		$opt = $this->getOption("DEFAULT_RIGHTS");
 		return (isSet($opt)?$opt:"");
@@ -177,6 +291,7 @@ class Repository {
 	
 	
 	/**
+     * The the access driver type
 	 * @return String
 	 */
 	function getAccessType() {
@@ -184,6 +299,7 @@ class Repository {
 	}
 	
 	/**
+     * The label of this repository
 	 * @return String
 	 */
 	function getDisplay() {
@@ -197,7 +313,7 @@ class Repository {
 	}
 	
 	/**
-	 * @return int
+	 * @return string
 	 */
 	function getId() {
 		return $this->id;
