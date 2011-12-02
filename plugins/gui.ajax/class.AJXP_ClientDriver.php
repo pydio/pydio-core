@@ -109,6 +109,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			case "get_xml_registry" :
 				
 				$regDoc = AJXP_PluginsService::getXmlRegistry();
+                $changes = AJXP_Controller::filterActionsRegistry($regDoc);
+                if($changes) AJXP_PluginsService::updateXmlRegistry($regDoc);
 				if(isSet($_GET["xPath"])){
 					$regPath = new DOMXPath($regDoc);
 					$nodes = $regPath->query($_GET["xPath"]);
