@@ -128,6 +128,9 @@ $mess=array(
 "106" => "Identifiant unique",
 "107" => "Configuration du plugin",
 "108" => "Documentation",
+"109" => "Configurations Globales",
+"110" => "Dépôts & Utilisateurs",
+"111" => "Logs & Autres données",
 /* END SENTENCE */
 );
 ?>
