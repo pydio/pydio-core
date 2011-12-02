@@ -35,12 +35,18 @@ class UserSelection
 	var $inZip = false;
 	var $zipFile;
 	var $localZipPath;
-	
+	/**
+     * Construction selector
+     */
 	function UserSelection()
 	{
 		$this->files = array();
 	}
-	
+	/**
+     * Init the selection from the query vars
+     * @param array $passedArray
+     * @return void
+     */
 	function initFromHttpVars($passedArray=null)
 	{
 		if($passedArray != null){
@@ -50,7 +56,11 @@ class UserSelection
 			$this->initFromArray($_POST);
 		}
 	}
-	
+	/**
+     * Init from a simple array
+     * @param $array
+     * @return
+     */
 	function initFromArray($array)
 	{
 		if(!is_array($array))
@@ -87,18 +97,24 @@ class UserSelection
 			}
 		}
 	}
-	
+	/**
+     * Does the selection have one or more items
+     * @return bool
+     */
 	function isUnique()
 	{
 		return $this->isUnique;
 	}
-	
+	/**
+     * Are we currently inside a zip?
+     * @return bool
+     */
 	function inZip(){
 		return $this->inZip;
 	}
 	/**
-	 * Warning, returns UTF8 encoded path
-	 *
+	 * Returns UTF8 encoded path
+	 * @param bool $decode
 	 * @return String
 	 */
 	function getZipPath($decode = false){
@@ -107,30 +123,42 @@ class UserSelection
 	}
 	
 	/**
-	 * Warning, returns UTF8 encoded path
-	 *
+	 * Returns UTF8 encoded path
+	 * @param bool $decode
 	 * @return String
 	 */
 	function getZipLocalPath($decode = false){
 		if($decode) return AJXP_Utils::decodeSecureMagic($this->localZipPath);
 		else return $this->localZipPath;
 	}
-	
+	/**
+     * Number of selected items
+     * @return int
+     */
 	function getCount()
 	{
 		return count($this->files);
 	}
-	
+	/**
+     * List of items selected
+     * @return string[]
+     */
 	function getFiles()
 	{
 		return $this->files;
 	}
-	
+	/**
+     * First item of the list
+     * @return string
+     */
 	function getUniqueFile()
 	{
 		return $this->files[0];
 	}
-	
+	/**
+     * Is this selection empty?
+     * @return bool
+     */
 	function isEmpty()
 	{
 		if(count($this->files) == 0)
@@ -139,7 +167,12 @@ class UserSelection
 		}
 		return false;
 	}
-	
+	/**
+     * Detect if there is .zip somewhere in the path
+     * @static
+     * @param string $dirPath
+     * @return array|bool
+     */
 	static function detectZip($dirPath){
 		if(preg_match("/\.zip\//i", $dirPath) || preg_match("/\.zip$/i", $dirPath)){
 			$contExt = strpos(strtolower($dirPath), ".zip");
@@ -150,7 +183,11 @@ class UserSelection
 		}
 		return false;
 	}
-	
+	/**
+     * Sets the selected items
+     * @param array $files
+     * @return void
+     */
 	function setFiles($files){
 		$this->files = $files;
 	}

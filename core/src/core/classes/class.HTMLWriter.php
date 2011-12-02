@@ -27,14 +27,26 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class HTMLWriter
 {
-
+    /**
+     * Write an HTML block message
+     * @static
+     * @param string $logMessage
+     * @param string $errorMessage
+     * @return void
+     */
 	static function displayMessage($logMessage, $errorMessage)
 	{
 		$mess = ConfService::getMessages();
 		echo "<div title=\"".$mess[98]."\" id=\"message_div\" onclick=\"closeMessageDiv();\" class=\"messageBox ".(isset($logMessage)?"logMessage":"errorMessage")."\"><table width=\"100%\"><tr><td style=\"width: 66%;\">".(isset($logMessage)?$logMessage:$errorMessage)."</td><td style=\"color: #999; text-align: right;padding-right: 10px; width: 30%;\"><i>".$mess[98]."</i></tr></table></div>";
 		echo "<script>tempoMessageDivClosing();</script>";
 	}
-	    
+
+    /**
+     * Replace the doc files keywords
+     * @static
+     * @param string $docFileName
+     * @return string
+     */
     static function getDocFile($docFileName)
     {
     	$realName = AJXP_DOCS_FOLDER."/".$docFileName.".txt";
@@ -50,14 +62,23 @@ class HTMLWriter
     	}
     	return "File not found : ".$docFileName;
     }
-    
+    /**
+     * Write repository data directly as javascript string
+     * @static
+     * @return mixed|string
+     */
     static function repositoryDataAsJS(){
     	if(AuthService::usersEnabled()) return "";
     	require_once(AJXP_BIN_FOLDER."/class.SystemTextEncoding.php");
     	require_once(AJXP_BIN_FOLDER."/class.AJXP_XMLWriter.php");
     	return str_replace("'", "\'", AJXP_XMLWriter::writeRepositoriesData(null));
     }
-              
+    /**
+     * Write the messages as Javascript
+     * @static
+     * @param array $mess
+     * @return void
+     */
     static function writeI18nMessagesClass($mess)
     {
     	echo "<script language=\"javascript\">\n";
@@ -79,15 +100,32 @@ class HTMLWriter
     	echo "MessageHash;";
     	echo "</script>\n";
     }
-       
+
+    /**
+     * Send a simple Content-type header
+     * @static
+     * @param string $type
+     * @param string $charset
+     * @return void
+     */
     static function charsetHeader($type = 'text/html', $charset='UTF-8'){
     	header("Content-type:$type; charset=$charset");
     }
-    
+    /**
+     * Write a closing </body></html> sequence
+     * @static
+     * @return void
+     */
     static function closeBodyAndPage(){
     	print("</body></html>");
     }
-    
+    /**
+     * Write directly an error as a javascript instruction
+     * @static
+     * @param $errorType
+     * @param $errorMessage
+     * @return
+     */
     static function javascriptErrorHandler($errorType, $errorMessage){    	
     	// Handle "@" case!
     	if(error_reporting() == 0) return ;

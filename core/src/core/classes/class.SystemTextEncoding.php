@@ -26,6 +26,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class SystemTextEncoding
 {
+    /**
+     * Change the charset of a string from input to output
+     * @static
+     * @param string $inputCharset
+     * @param string $outputCharset
+     * @param string $text
+     * @return string
+     */
 	static function changeCharset($inputCharset, $outputCharset, $text)
 	{
 	    if ($inputCharset == $outputCharset) return $text;
@@ -40,7 +48,12 @@ class SystemTextEncoding
 			return @html_entity_decode($content, ENT_QUOTES , $outputCharset);
 		}
 	}
-	
+	/**
+     * Detect the current charset from the current locale
+     * @static
+     * @param string $locale
+     * @return string
+     */
 	static function parseCharset($locale)
 	{
 		$test = explode("@", $locale);
@@ -59,7 +72,11 @@ class SystemTextEncoding
 		if (!strlen($encoding)) $encoding = "UTF-8";
 		return $encoding;
 	}
-	
+    /**
+     * Try to detect the current encoding (cached in session)
+     * @static
+     * @return string
+     */
 	static function getEncoding(){
 	       global $_SESSION;
 	       // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
@@ -67,7 +84,13 @@ class SystemTextEncoding
 	       // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
 	       return SystemTextEncoding::parseCharset(setlocale(LC_CTYPE, 0));
 	}
-	
+	/**
+     * Decode a string from UTF8 to current Charset
+     * @static
+     * @param string $filesystemElement
+     * @param bool $test Try to detect if it's really utf8 or not
+     * @return string
+     */
 	static function fromUTF8($filesystemElement, $test = false){
 		if($test && !SystemTextEncoding::isUtf8($filesystemElement)){
 			return $filesystemElement;
@@ -76,7 +99,11 @@ class SystemTextEncoding
 	    return SystemTextEncoding::changeCharset("UTF-8", $enc, $filesystemElement);
 	}
   
-	/** This function is used when the server's PHP configuration is using magic quote */
+	/**
+     * This function is used when the server's PHP configuration is using magic quote
+     * @param string $text
+     * @return void
+     */
     static function magicDequote($text)
     {
 	    // If the PHP server enables magic quotes, remove them
@@ -84,12 +111,24 @@ class SystemTextEncoding
 	        return stripslashes($text);
 	    return $text;  
     }
-	                         
+
+    /**
+     * Successive call of magicDequote and fromUTF8
+     * @static
+     * @param string $filesystemElement
+     * @return string
+     */
     static function fromPostedFileName($filesystemElement)
     {
 	    return SystemTextEncoding::fromUTF8(SystemTextEncoding::magicDequote($filesystemElement));
 	}
-	
+	/**
+     * Transform a string from current charset to utf8
+     * @static
+     * @param string $filesystemElement
+     * @param bool $test Test if it's already UTF8 or not, to avoid double-encoding
+     * @return string
+     */
 	static function toUTF8($filesystemElement, $test = true){
 		if($test && SystemTextEncoding::isUtf8($filesystemElement)){
 			return $filesystemElement;
@@ -97,7 +136,12 @@ class SystemTextEncoding
 		$enc = SystemTextEncoding::getEncoding();
 		return SystemTextEncoding::changeCharset($enc, "UTF-8", $filesystemElement);
 	}
-	
+	/**
+     * Test if a string seem to be already UTF8-encoded
+     * @static
+     * @param string $string
+     * @return bool
+     */
 	static function isUtf8($string){
     	return preg_match('%^(?: 
 	      [\x09\x0A\x0D\x20-\x7E]            # ASCII 

@@ -45,19 +45,40 @@ class RecycleBinManager
 		self::$rbmRecycle = $repositoryWrapperURL.$recyclePath;
 		self::$rbmRelativeRecycle = $recyclePath;
 	}
-	
+	/**
+     * Get the recycle bin path (repository URL included)
+     * @static
+     * @return string
+     */
 	public static function getRecyclePath(){
 		return self::$rbmRecycle ;
 	}
-	
+	/**
+     * Get the recycle bin path (from the root of the repository)
+     * @static
+     * @return string
+     */
 	public static function getRelativeRecycle(){
 		return self::$rbmRelativeRecycle;
 	}
-	
+	/**
+     * Is the current path the recycle?
+     * @static
+     * @param string $currentLocation PATH from the root of repo
+     * @return bool
+     */
 	public static function currentLocationIsRecycle($currentLocation){
 		return ($currentLocation == self::$rbmRelativeRecycle);
 	}
-	
+	/**
+     * Transform delete/restore actions into move actino
+     * @static
+     * @param string $action
+     * @param UserSelection $selection
+     * @param string $currentLocation
+     * @param array $httpVars
+     * @return array
+     */
 	public static function filterActions($action, $selection, $currentLocation, $httpVars = array()){
 		if(!self::recycleEnabled()) return array();
 		$newArgs = array();
@@ -81,12 +102,21 @@ class RecycleBinManager
 		return $newArgs;
 		
 	}
-	
+	/**
+     * Get the file for caching recylce metadata
+     * @static
+     * @return string
+     */
 	public static function getCacheFileName()
 	{
 		return ".ajxp_recycle_cache.ser";
 	}
-	
+	/**
+     * Update metadata
+     * @static
+     * @param string $originalFilePath
+     * @return void
+     */
 	public static function fileToRecycle($originalFilePath)
 	{
 		$cache = self::loadCache();
@@ -94,6 +124,12 @@ class RecycleBinManager
 		self::saveCache($cache);
 	}
 
+    /**
+     * Update metadata
+     * @static
+     * @param $filePath
+     * @return void
+     */
 	public static function deleteFromRecycle($filePath)
 	{
 		$cache = self::loadCache();
@@ -103,7 +139,12 @@ class RecycleBinManager
 		}
 		self::saveCache($cache);		
 	}
-	
+	/**
+     * Use metadata for getting original location
+     * @static
+     * @param $filePath
+     * @return string
+     */
 	public static function getFileOrigin($filePath)
 	{
 		$cache = self::loadCache();
@@ -113,7 +154,11 @@ class RecycleBinManager
 		}
 		return "";
 	}
-	
+	/**
+     * Load the metadata cache
+     * @static
+     * @return array|mixed|null
+     */
 	public static function loadCache(){
 		$result = array();
 		if(!self::recycleEnabled()) return null;
@@ -129,7 +174,12 @@ class RecycleBinManager
 		}		
 		return $result;
 	}
-	
+	/**
+     * Save the metadata cache
+     * @static
+     * @param $value
+     * @return null
+     */
 	public static function saveCache($value){
 		if(!self::recycleEnabled()) return null;
 		$cachePath = self::getRecyclePath()."/".self::getCacheFileName();
