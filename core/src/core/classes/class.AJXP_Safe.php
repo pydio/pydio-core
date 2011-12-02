@@ -34,7 +34,9 @@ class AJXP_Safe{
 	private $secretKey;	
 	private $separator = "__SAFE_SEPARATOR__";
 	private $forceSessionCredentials = false;
-	
+	/**
+     * Instance constructor
+     */
 	public function __construct(){
 		if(defined('AJXP_SAFE_SECRET_KEY')){
 			$this->secretKey = AJXP_SAFE_SECRET_KEY;
@@ -42,12 +44,20 @@ class AJXP_Safe{
 			$this->secretKey = "\1CDAFx¨op#";
 		}
 	} 
-	
+	/**
+     * Store the user/password pair. Password will be encoded
+     * @param string $user
+     * @param string $password
+     * @return void
+     */
 	public function setCredentials($user, $password){
 		$this->user = $user;
 		$this->encodedPassword = $this->_encodePassword($password, $user);
 	}
-	
+	/**
+     * Return the user/password pair, or false if cannot find it.
+     * @return array|bool
+     */
 	public function getCredentials(){
 		if(isSet($this->user) && isSet($this->encodedPassword)){
 			$decoded = $this->_decodePassword($this->encodedPassword, $this->user);
@@ -61,7 +71,12 @@ class AJXP_Safe{
 			return false;
 		}
 	}
-	
+	/**
+     * Use mcrypt function to encode the password
+     * @param $password
+     * @param $user
+     * @return string
+     */
 	private function _encodePassword($password, $user){
 		if (function_exists('mcrypt_encrypt'))
         {
@@ -72,7 +87,12 @@ class AJXP_Safe{
         }
 		return $password;
 	}
-	
+	/**
+     * Use mcrypt functions to decode the password
+     * @param $encoded
+     * @param $user
+     * @return string
+     */
 	private function _decodePassword($encoded, $user){
         if (function_exists('mcrypt_decrypt'))
         {
@@ -83,11 +103,17 @@ class AJXP_Safe{
         }
 		return $encoded;
 	}
-	
+	/**
+     * Store the password credentials in the session
+     * @return void
+     */
 	public function store(){
 		$_SESSION["AJXP_SAFE_CREDENTIALS"] = base64_encode($this->user.$this->separator.$this->encodedPassword);
 	}
-	
+	/**
+     * Load the credentials from session
+     * @return
+     */
 	public function load(){
 		if(empty($_SESSION["AJXP_SAFE_CREDENTIALS"])) return;
 		$sessData = base64_decode($_SESSION["AJXP_SAFE_CREDENTIALS"]);
@@ -95,13 +121,19 @@ class AJXP_Safe{
 		$this->user = $parts[0];
 		$this->encodedPassword = $parts[1];
 	}
-	
+	/**
+     * Remove the credentials from session
+     * @return void
+     */
 	public function clear(){
 		unset($_SESSION["AJXP_SAFE_CREDENTIALS"]);
 		$this->user = null;
 		$this->encodedPassword = null;
 	}
-	
+	/**
+     * For the session credentials to override other credentials set via config
+     * @return void
+     */
 	public function forceSessionCredentialsUsage(){
 		$this->forceSessionCredentials = true;
 	}
@@ -118,18 +150,32 @@ class AJXP_Safe{
 		}
 		return self::$instance;
 	}
-	
+	/**
+     * Store the user/pass key pair
+     * @static
+     * @param string $user
+     * @param string $password
+     * @return void
+     */
 	public static function storeCredentials($user, $password){
 		$inst = AJXP_Safe::getInstance();
 		$inst->setCredentials($user, $password);
 		$inst->store();
 	}
-	
+	/**
+     * Remove the user/pass encoded from the session
+     * @static
+     * @return void
+     */
 	public static function clearCredentials(){
 		$inst = AJXP_Safe::getInstance();
 		$inst->clear();
 	}
-	
+	/**
+     * Retrieve the user/pass from the session
+     * @static
+     * @return array|bool
+     */
 	public static function loadCredentials(){
 		$inst = AJXP_Safe::getInstance();
 		$inst->load();
@@ -137,10 +183,15 @@ class AJXP_Safe{
 	}
 		
 	/**
-	 * 
+	 * Will try to get the credentials for a given repository as follow :
+     * + Try to get the credentials from the url parsing
+     * + Try to get them from the user "Wallet" (personal data)
+     * + Try to get them from the repository configuration
+     * + Try to get them from the AJXP_Safe.
+     * 
 	 * @param array $parsedUrl
 	 * @param Repository $repository
-	 * @param string $optionsPrefix
+     * @return array
 	 */
 	public static function tryLoadingCredentialsFromSources($parsedUrl, $repository){
 		$user = $password = "";
