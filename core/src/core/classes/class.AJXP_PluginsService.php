@@ -48,6 +48,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 * Loads the full registry, from the cache or not
  	 * @param String $pluginFolder
  	 * @param AbstractConfDriver $confStorage
+     * @param bool $rewriteCache Force a cache rewriting
  	 */
  	public function loadPluginsRegistry($pluginFolder, $confStorage, $rewriteCache = false){
  		if(!$rewriteCache && (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
@@ -108,6 +109,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 * Load plugin class with dependencies first
  	 *
  	 * @param AJXP_Plugin $plugin
+     * @param array $pluginsPool
  	 */
  	private function recursiveLoadPlugin($plugin, $pluginsPool){
  		if($plugin->loadingState!=""){
@@ -135,6 +137,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 * Save the plugins order in a cache
  	 *
  	 * @param array $sortedPlugins
+     * @return bool|void
  	 */
  	private function cachePlugSort($sortedPlugins){
  		if(!AJXP_PLUGINS_CACHE_FILE) return false;
@@ -172,7 +175,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		return $sorted;
  	}
  	
- 	
+ 	/**
+      * Simply load a plugin class, without the whole dependencies et.all
+      * @param string $pluginId
+      * @param array $pluginOptions
+      * @return AJXP_Plugin
+      */
  	public function softLoad($pluginId, $pluginOptions){
 		$plugin = new AJXP_Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
 		$plugin->loadManifest();
@@ -202,7 +210,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			return $plugin;
  		}
  	}
- 	
+ 	/**
+      * Check that a plugin dependencies are loaded, disable it otherwise.
+      * @param $arrayToSort
+      * @return
+      */
  	private function checkDependencies(&$arrayToSort){
  		// First make sure that the given dependencies are present
  		foreach ($arrayToSort as $plugId => $plugObject){
@@ -225,6 +237,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 *
  	 * @param AJXP_Plugin $pluginA
  	 * @param AJXP_Plugin $pluginB
+      * @return integer
  	 */
  	private function sortByDependency($pluginA, $pluginB){
  		//var_dump("Checking " . $pluginA->getId() . " vs " . $pluginB->getId());
@@ -241,11 +254,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		return 0;
  	}
 
+     /**
+      * @param $tableau
+      * @return
+      */
 	private function usort(&$tableau){
 		uasort($tableau, array($this, "sortByDependency"));
 		return ;
     }
-	
+	/**
+     * All the plugins of a given type
+     * @param string $type
+     * @return array
+     */
  	public function getPluginsByType($type){
  		if(isSet($this->registry[$type])) return $this->registry[$type];
  		else return array();
@@ -261,18 +282,36 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		$split = explode(".", $pluginId);
  		return $this->getPluginByTypeName($split[0], $split[1]);
  	}
- 	
+
+     /**
+      * Remove a plugin
+      * @param string $pluginId
+      * @return void
+      */
  	public function removePluginById($pluginId){
  		$split = explode(".", $pluginId);
  		if(isSet($this->registry[$split[0]]) && isSet($this->registry[$split[0]][$split[1]])){
  			unset($this->registry[$split[0]][$split[1]]);
  		}
  	}
- 	
+ 	/**
+      * Add a plugin to the list of active plugins
+      * @static
+      * @param string $type
+      * @param string $name
+      * @param bool $active
+      * @return void
+      */
  	public static function setPluginActive($type, $name, $active=true){
  		self::getInstance()->setPluginActiveInst($type, $name, $active);
  	}
- 	
+ 	/**
+      * Instance implementation of the setPluginActive
+      * @param $type
+      * @param $name
+      * @param bool $active
+      * @return
+      */
  	public function setPluginActiveInst($type, $name, $active=true){
  		if($active){
 	 		// Check active plugin dependencies
@@ -297,7 +336,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			$this->buildXmlRegistry(($this->registryVersion == "extended"));
  		}
  	}
- 	
+ 	/**
+      * Some type require only one active plugin at a time
+      * @param $type
+      * @param $name
+      * @return void
+      */
  	public function setPluginUniqueActiveForType($type, $name){
  		$typePlugs = $this->getPluginsByType($type);
         $this->tmpDeferRegistryBuild = true;
@@ -307,11 +351,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
         $this->tmpDeferRegistryBuild = false;
  		$this->setPluginActiveInst($type, $name, true);
  	}
- 	
+ 	/**
+      * Retrieve the whole active plugins list
+      * @return array
+      */
  	public function getActivePlugins(){
  		return $this->activePlugins;	
  	}
-
+    /**
+     * Retrieve an array of active plugins for type
+     * @param string $type
+     * @param bool $unique
+     * @return array|bool
+     */
     public function getActivePluginsForType($type, $unique = false){
         $acts = array();
         foreach($this->activePlugins as $plugId => $active){
@@ -329,30 +381,59 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
         return $acts;
     }
 
+     /**
+      * Return only one of getActivePluginsForType
+      * @param $type
+      * @return array|bool
+      */
     public function getUniqueActivePluginForType($type){
         return $this->getActivePluginsForType($type, true);
     }
-
+    /**
+     * All the plugins registry, active or not
+     * @return array
+     */
  	public function getDetectedPlugins(){
  		return $this->registry;
  	}
- 	
+ 	/**
+      * All the plugins that declare a stream wrapper
+      * @return array
+      */
  	public function getStreamWrapperPlugins(){
  		return $this->streamWrapperPlugins;
  	}
- 	
+     /**
+      * Add the $protocol/$wrapper to an internal cache
+      * @param string $protocol
+      * @param string $wrapperClassName
+      * @return void
+      */
  	public function registerWrapperClass($protocol, $wrapperClassName){
  		$this->registeredWrappers[$protocol] = $wrapperClassName;
  	}
- 	
+
+     /**
+      * Find a classname for a given protocol
+      * @param $protocol
+      * @return
+      */
  	public function getWrapperClassName($protocol){
  		return $this->registeredWrappers[$protocol];
  	}
- 	
+ 	/**
+      * The protocol/classnames table
+      * @return array
+      */
  	public function getRegisteredWrappers(){
  		return $this->registeredWrappers;
  	}
- 	
+ 	/**
+      * Go through all plugins and call their getRegistryContributions() method.
+      * Add all these contributions to the main XML ajxp_registry document.
+      * @param bool $extendedVersion Will be passed to the plugin, for optimization purpose.
+      * @return void
+      */
  	public function buildXmlRegistry($extendedVersion = true){
  		$actives = $this->getActivePlugins();
  		$reg = new DOMDocument();
@@ -372,7 +453,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		}
  		$this->xmlRegistry = $reg;
  	}
- 	
+
+     /**
+      * Build the XML Registry if not already built, and return it.
+      * @static
+      * @param bool $extendedVersion
+      * @return DOMDocument The registry
+      */
  	public static function getXmlRegistry($extendedVersion = true){
  		$self = self::getInstance();
  		if(!isSet($self->xmlRegistry) || ($self->registryVersion == "light" && $extendedVersion)){
@@ -381,7 +468,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		}
  		return $self->xmlRegistry;
  	}
- 	
+ 	/**
+      * Replace the current xml registry
+      * @static
+      * @param $registry
+      * @return void
+      */
  	public static function updateXmlRegistry($registry){
  		$self = self::getInstance();
  		$self->xmlRegistry = $registry;
@@ -391,7 +483,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 * Append some predefined XML to a plugin instance 
  	 * @param AJXP_Plugin $plugin
  	 * @param DOMDocument $manifestDoc
- 	 * @param String $behaviourName
+ 	 * @param String $mixinName
  	 */
  	public function patchPluginWithMixin(&$plugin, &$manifestDoc, $mixinName){
  		
@@ -416,10 +508,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	}
  	
  	/**
- 	 * 
- 	 * @param unknown_type $query
- 	 * @param unknown_type $stringOrNodeFormat
- 	 * @param return DOMNode[]
+ 	 * Search all plugins manifest with an XPath query, and return either the Nodes, or directly an XML string.
+ 	 * @param string $query
+ 	 * @param string $stringOrNodeFormat
+ 	 * @return DOMNode[]
  	 */
  	public static function searchAllManifests($query, $stringOrNodeFormat = "string"){
  		$buffer = "";
@@ -440,7 +532,16 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		if($stringOrNodeFormat == "string") return $buffer;
  		else return $nodes;
  	}
- 	
+
+ 	/**
+      * Central function of the registry construction, merges some nodes into the existing registry.
+      * @param $original
+      * @param $parentName
+      * @param $uuidAttr
+      * @param $childrenNodes
+      * @param bool $doNotOverrideChildren
+      * @return void
+      */
  	protected function mergeNodes(&$original, $parentName, $uuidAttr, $childrenNodes, $doNotOverrideChildren = false){
  		// find or create parent
  		$parentSelection = $original->getElementsByTagName($parentName);
@@ -478,7 +579,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			}
  		}
  	}
- 	
+ 	/**
+      * Utilitary function
+      * @param $new
+      * @param $old
+      * @return
+      */
  	protected function mergeChildByTagName($new, &$old){
  		if(!$this->hasElementChild($new) || !$this->hasElementChild($old)){
  			$old->parentNode->replaceChild($new, $old); 			
@@ -506,7 +612,12 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			}
  		}
  	}
- 	
+
+     /**
+      * Utilitary
+      * @param $node
+      * @return bool
+      */
  	private function hasElementChild($node){
  		if(!$node->hasChildNodes()) return false;
  		foreach($node->childNodes as $child){
@@ -538,7 +649,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		$instance = self::getInstance();
  		return $instance->getPluginByTypeName($type, $name);
  	}
- 	
+
+     /**
+      * Simply find a plugin by its id (type.name)
+      * @static
+      * @param $id
+      * @return AJXP_Plugin
+      */
  	public static function findPluginById($id){
  		return self::getInstance()->getPluginById($id);
  	}

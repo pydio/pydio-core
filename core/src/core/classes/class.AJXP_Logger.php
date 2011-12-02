@@ -32,7 +32,14 @@ define("LOG_LEVEL_ERROR", "Error");
  * Provides static access to the logging mechanism
  */
 class AJXP_Logger {
-	
+
+    /**
+     * Use current logger instance and write a debug message
+     * @static
+     * @param string $message
+     * @param array $params
+     * @return
+     */
 	public static function debug($message, $params = array()){
 		if(!class_exists("ConfService")) return ;
 		if(!ConfService::getConf("SERVER_DEBUG")) return ;
@@ -49,7 +56,14 @@ class AJXP_Logger {
 		}		
 		$logger->write($message, LOG_LEVEL_DEBUG);				
 	}
-	
+
+    /**
+     * Send an action log message to the current logger instance.
+     * @static
+     * @param string $action
+     * @param array $params
+     * @return
+     */
 	public static function logAction($action, $params=array()){
 		$logger = self::getInstance();		
 		if($logger == null) return ;

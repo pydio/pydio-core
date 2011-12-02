@@ -52,7 +52,11 @@ class AbstractTest
         $MAIN_testsArray[] = $this;
     }
     
-    /** Perform the test, should be overwritten in concrete classes */
+    /**
+     * Perform the test, should be overwritten in concrete classes
+     * @abstract
+     * @return Boolean
+     */
     function doTest() { return FALSE; }
     
     /** 
