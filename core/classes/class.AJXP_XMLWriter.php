@@ -28,7 +28,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AJXP_XMLWriter
 {
 	static $headerSent = false;
-	
+
+    /**
+     * Output Headers, XML <?xml version...?> tag and a root node
+     * @static
+     * @param string $docNode
+     * @param array $attributes
+     * @return
+     */
 	static function header($docNode="tree", $attributes=array())
 	{
 		if(self::$headerSent !== false && self::$headerSent == $docNode) return ;
@@ -45,12 +52,23 @@ class AJXP_XMLWriter
 		print("<$docNode $attString>");
 		
 	}
-	
+	/**
+     * Outputs a closing root not (</tree>)
+     * @static
+     * @param string $docNode
+     * @return void
+     */
 	static function close($docNode="tree")
 	{
 		print("</$docNode>");
 	}
-	
+
+    /**
+     * @static
+     * @param string $data
+     * @param bool $print
+     * @return string
+     */
 	static function write($data, $print){
 		if($print) {
 			print($data);
@@ -59,12 +77,29 @@ class AJXP_XMLWriter
 			return $data;
 		}
 	}
-	
+
+    /**
+     * Ouput the <pagination> tag
+     * @static
+     * @param integer $count
+     * @param integer $currentPage
+     * @param integer $totalPages
+     * @param integer $dirsCount
+     * @return void
+     */
 	static function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1){
 		$string = '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="306" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"/>';		
 		AJXP_XMLWriter::write($string, true);
 	}
-	
+	/**
+     * Prints out the XML headers and preamble, then an open node
+     * @static
+     * @param $nodeName
+     * @param $nodeLabel
+     * @param $isLeaf
+     * @param array $metaData
+     * @return void
+     */
 	static function renderHeaderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array()){
 		header('Content-Type: text/xml; charset=UTF-8');
 		header('Cache-Control: no-cache');
@@ -85,7 +120,17 @@ class AJXP_XMLWriter
         self::$headerSent = "tree";
         self::renderAjxpNode($ajxpNode, false);
     }
-	
+
+    /**
+     * The basic node
+     * @static
+     * @param string $nodeName
+     * @param string $nodeLabel
+     * @param bool $isLeaf
+     * @param array $metaData
+     * @param bool $close
+     * @return void
+     */
 	static function renderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array(), $close=true){
 		$string = "<tree";
 		$metaData["filename"] = $nodeName;
@@ -121,10 +166,26 @@ class AJXP_XMLWriter
             $close);
     }
 
+    /**
+     * Render a node with arguments passed as array
+     * @static
+     * @param $array
+     * @return void
+     */
 	static function renderNodeArray($array){
 		self::renderNode($array[0],$array[1],$array[2],$array[3]);
 	}
-	
+	/**
+     * Error Catcher for PHP errors. Depending on the SERVER_DEBUG config
+     * shows the file/line info or not.
+     * @static
+     * @param $code
+     * @param $message
+     * @param $fichier
+     * @param $ligne
+     * @param $context
+     * @return
+     */
 	static function catchError($code, $message, $fichier, $ligne, $context){
 		if(error_reporting() == 0) return ;
 		if(ConfService::getConf("SERVER_DEBUG")){
@@ -138,8 +199,7 @@ class AJXP_XMLWriter
 	}
 	
 	/**
-	 * Catch exceptions
-	 *
+	 * Catch exceptions, @see catchError
 	 * @param Exception $exception
 	 */
 	static function catchException($exception){
@@ -149,7 +209,14 @@ class AJXP_XMLWriter
             print get_class($innerEx)." thrown within the exception handler! Message was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine()." ".$innerEx->getTraceAsString();            
         }
 	}
-	
+	/**
+     * Dynamically replace XML keywords with their live values.
+     * AJXP_SERVER_ACCESS, AJXP_MIMES_*,AJXP_ALL_MESSAGES, etc.
+     * @static
+     * @param string $xml
+     * @param bool $stripSpaces
+     * @return mixed
+     */
 	static function replaceAjxpXmlKeywords($xml, $stripSpaces = false){
 		$messages = ConfService::getMessages();
         $confMessages = ConfService::getMessagesConf();
@@ -208,38 +275,82 @@ class AJXP_XMLWriter
         AJXP_Controller::applyIncludeHook("xml.filter", array(&$xml));
 		return $xml;		
 	}	
-	
+	/**
+     * Send a <reload> XML instruction for refreshing the list
+     * @static
+     * @param bool $print
+     * @return string
+     */
 	static function reloadCurrentNode($print = true)
 	{
 		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\"/>", $print);
 	}
-	
+
+    /**
+     * Send a <reload> xml instruction for refreshing a given node
+     * @static
+     * @param $nodeName
+     * @param bool $print
+     * @return string
+     */
 	static function reloadNode($nodeName, $print = true)
 	{
 		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\" node=\"$nodeName\"/>", $print);
 	}
-		
+	/**
+     * Send a <reload> XML instruction for refreshing the list
+     * @static
+     * @param $fileOrBool
+     * @param bool $print
+     * @return string
+     */
 	static function reloadFileList($fileOrBool, $print = true)
 	{
 		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
 		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
-	
+	/**
+     * Send a <reload> XML instruction for refreshing the list
+     * @static
+     * @param string $nodePath
+     * @param string $pendingSelection
+     * @param bool $print
+     * @return string
+     */
 	static function reloadDataNode($nodePath="", $pendingSelection="", $print = true){
 		$nodePath = AJXP_Utils::xmlEntities($nodePath, true);
 		$pendingSelection = AJXP_Utils::xmlEntities($pendingSelection, true);
 		return AJXP_XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
 	}
-	
+	/**
+     * Send a <reload> XML instruction for refreshing the repositories list
+     * @static
+     * @param bool $print
+     * @return string
+     */
 	static function reloadRepositoryList($print = true){
 		return AJXP_XMLWriter::write("<reload_instruction object=\"repository_list\"/>", $print);
 	}
-	
+	/**
+     * Outputs a <require_auth/> tag
+     * @static
+     * @param bool $print
+     * @return string
+     */
 	static function requireAuth($print = true)
 	{
 		return AJXP_XMLWriter::write("<require_auth/>", $print);
 	}
-	
+	/**
+     * Triggers a background action client side
+     * @static
+     * @param $actionName
+     * @param $parameters
+     * @param $messageId
+     * @param bool $print
+     * @param int $delay
+     * @return string
+     */
 	static function triggerBgAction($actionName, $parameters, $messageId, $print=true, $delay = 0){
 		$data = AJXP_XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\" delay=\"$delay\">", $print);
 		foreach ($parameters as $paramName=>$paramValue){
@@ -248,7 +359,13 @@ class AJXP_XMLWriter
 		$data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
 		return $data;		
 	}
-	
+	/**
+     * List all bookmmarks as XML
+     * @static
+     * @param $allBookmarks
+     * @param bool $print
+     * @return string
+     */
 	static function writeBookmarks($allBookmarks, $print = true)
 	{
 		$buffer = "";
@@ -267,13 +384,25 @@ class AJXP_XMLWriter
 		if($print) print $buffer;
 		else return $buffer;
 	}
-	
+	/**
+     * Utilitary for generating a <component_config> tag for the FilesList component
+     * @static
+     * @param $config
+     * @return void
+     */
 	static function sendFilesListComponentConfig($config){
 		if(is_string($config)){
 			print("<client_configs><component_config className=\"FilesList\">$config</component_config></client_configs>");
 		}
 	}
-	
+	/**
+     * Send a success or error message to the client.
+     * @static
+     * @param $logMessage
+     * @param $errorMessage
+     * @param bool $print
+     * @return string
+     */
 	static function sendMessage($logMessage, $errorMessage, $print = true)
 	{
 		$messageType = ""; 
@@ -290,11 +419,23 @@ class AJXP_XMLWriter
 		}
 		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}
-
+    /**
+     * Writes the user data as XML
+     * @static
+     * @param null $userObject
+     * @param bool $details
+     * @return void
+     */
 	static function sendUserData($userObject = null, $details=false){
 		print(AJXP_XMLWriter::getUserXML($userObject, $details));
 	}
-	
+	/**
+     * Extract all the user data and put it in XML
+     * @static
+     * @param null $userObject
+     * @param bool $details
+     * @return string
+     */
 	static function getUserXML($userObject = null, $details=false)
 	{
 		$buffer = "";
@@ -339,7 +480,13 @@ class AJXP_XMLWriter
 		}
 		return $buffer;		
 	}
-	
+	/**
+     * Write the repositories access rights in XML format
+     * @static
+     * @param $loggedUser
+     * @param bool $details
+     * @return string
+     */
 	static function writeRepositoriesData($loggedUser, $details=false){
 		$st = "";
 		$st .= "<repositories>";
@@ -444,7 +591,15 @@ class AJXP_XMLWriter
 		$st .= "</actions_rights>";
 		return $st;
 	}
-	
+	/**
+     * Writes a <logging_result> tag
+     * @static
+     * @param integer $result
+     * @param string $rememberLogin
+     * @param string $rememberPass
+     * @param string $secureToken
+     * @return void
+     */
 	static function loggingResult($result, $rememberLogin="", $rememberPass = "", $secureToken="")
 	{
 		$remString = "";

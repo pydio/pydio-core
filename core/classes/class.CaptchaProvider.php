@@ -28,7 +28,11 @@ include_once(AJXP_BIN_FOLDER."/securimage/securimage.php");
  * Implementation of the securimage library
  */
 class CaptchaProvider{
-	
+	/**
+     * Print out a Captcha image
+     * @static
+     * @return void
+     */
 	public static function sendCaptcha(){
 		
 		$libPath = AJXP_BIN_FOLDER."/securimage";
@@ -65,7 +69,13 @@ class CaptchaProvider{
 		//$img->show($libPath."/backgrounds/bg3.jpg");		
 		$img->show();
 	}
-	
+
+    /**
+     * Verify the code against the current image.
+     * @static
+     * @param $code
+     * @return bool
+     */
 	public static function checkCaptchaResult($code){
 		
 		$img = new Securimage();

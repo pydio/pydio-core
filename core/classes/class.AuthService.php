@@ -28,33 +28,58 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AuthService
 {
 	static $roles;
-	
+	/**
+     * Whether the whole users management system is enabled or not.
+     * @static
+     * @return bool
+     */
 	static function usersEnabled()
 	{
 		return ConfService::getCoreConf("ENABLE_USERS", "auth");
 	}
-	
+	/**
+     * Whether the current auth driver supports password update or not
+     * @static
+     * @return void
+     */
 	static function changePasswordEnabled()
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->passwordsEditable();
 	}
-	
+	/**
+     * Get a unique seed from the current auth driver
+     * @static
+     * @return int|string
+     */
 	static function generateSeed(){
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->getSeed(true);
 	}
 	
-	
+	/**
+     * Put a secure token in the session
+     * @static
+     * @return
+     */
 	static function generateSecureToken(){
 		$_SESSION["SECURE_TOKEN"] = md5(time());
 		return $_SESSION["SECURE_TOKEN"];
 	}
-	
+	/**
+     * Get the secure token from the session
+     * @static
+     * @return string|bool
+     */
 	static function getSecureToken(){
 		return (isSet($_SESSION["SECURE_TOKEN"])?$_SESSION["SECURE_TOKEN"]:FALSE);
 	}
-	
+	/**
+     * Verify a secure token value from the session
+     * @static
+     * @param string $token
+     * @return bool
+     */
 	static function checkSecureToken($token){
 		if(isSet($_SESSION["SECURE_TOKEN"]) && $_SESSION["SECURE_TOKEN"] == $token){
 			return true;
@@ -64,7 +89,6 @@ class AuthService
 	
 	/**
 	 * Get the currently logged user object
-	 *
 	 * @return AbstractAjxpUser
 	 */
 	static function getLoggedUser()
@@ -72,7 +96,12 @@ class AuthService
 		if(isSet($_SESSION["AJXP_USER"])) return $_SESSION["AJXP_USER"];
 		return null;
 	}
-	
+	/**
+     * Call the preLogUser() functino on the auth driver implementation
+     * @static
+     * @param string $remoteSessionId
+     * @return
+     */
 	static function preLogUser($remoteSessionId = "")
 	{
 		if(AuthService::getLoggedUser() != null) return ;
@@ -80,7 +109,11 @@ class AuthService
 		$authDriver->preLogUser($remoteSessionId);
 		return ;
 	}
-
+    /**
+     * The array is located in the AjxpTmpDir/failedAJXP.log
+     * @static
+     * @return array
+     */
     static function getBruteForceLoginArray()
     {
         $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
@@ -97,12 +130,23 @@ class AuthService
         }
         return $ret;
     }
+    /**
+     * Store the array
+     * @static
+     * @param $loginArray
+     * @return void
+     */
     static function setBruteForceLoginArray($loginArray)
     {
         $failedLog = AJXP_Utils::getAjxpTmpDir()."/failedAJXP.log";
         @file_put_contents($failedLog, serialize($loginArray));
     }
-
+    /**
+     * Determines whether the user is try to make many attemps
+     * @static
+     * @param $loginArray
+     * @return bool
+     */
     static function checkBruteForceLogin(&$loginArray)
     {
     	$serverAddress = "";
@@ -122,12 +166,25 @@ class AuthService
         if ($login["count"] > 3) return FALSE;
         return TRUE;
     }
-    
+    /**
+     * Is there a brute force login attempt?
+     * @static
+     * @return bool
+     */
     static function suspectBruteForceLogin(){
         $loginAttempt = AuthService::getBruteForceLoginArray();
         return !AuthService::checkBruteForceLogin($loginAttempt);
     }
-
+    /**
+     * Log the user from its credentials
+     * @static
+     * @param string $user_id The user id
+     * @param string $pwd The password
+     * @param bool $bypass_pwd Ignore password or not
+     * @param bool $cookieLogin Is it a logging from the remember me cookie?
+     * @param string $returnSeed The unique seed
+     * @return int
+     */
 	static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{		
 		$confDriver = ConfService::getConfStorageImpl();
@@ -200,12 +257,21 @@ class AuthService
 		AJXP_Logger::logAction("Log In");
 		return 1;
 	}
-	
+	/**
+     * Store the object in the session
+     * @static
+     * @param $userObject
+     * @return void
+     */
 	static function updateUser($userObject)
 	{
 		$_SESSION["AJXP_USER"] = $userObject;
 	}
-	
+	/**
+     * Clear the session
+     * @static
+     * @return void
+     */
 	static function disconnect()
 	{
 		if(isSet($_SESSION["AJXP_USER"])){
@@ -216,7 +282,12 @@ class AuthService
 			}
 		}
 	}
-	
+	/**
+     * Specific operations to perform at boot time
+     * @static
+     * @param array $START_PARAMETERS A HashTable of parameters to send back to the client
+     * @return void
+     */
 	public static function bootSequence(&$START_PARAMETERS){
 		/*
 		if(!is_readable(USERS_DIR)) $START_PARAMETERS["ALERT"] = "Warning, the users directory is not readable!";
@@ -243,7 +314,12 @@ class AuthService
 			$START_PARAMETERS["ALERT"] .= "There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
     	}
 	}
-    
+    /**
+     * If the auth driver implementatino has a logout redirect URL, clear session and return it.
+     * @static
+     * @param bool $logUserOut
+     * @return bool
+     */
     static function getLogoutAddress($logUserOut = true)
     {
         $authDriver = ConfService::getAuthDriverImpl();
@@ -257,7 +333,11 @@ class AuthService
 		}
         return $logout;
     }
-	
+	/**
+     * Compute the default repository id to log the current user
+     * @static
+     * @return int|string
+     */
 	static function getDefaultRootId()
 	{
 		$loggedUser = AuthService::getLoggedUser();
@@ -281,7 +361,9 @@ class AuthService
 	}
 	
 	/**
+     * Update a user with admin rights and return it
 	* @param AJXP_User $adminUser
+     * @return AJXP_User
 	*/
 	static function updateAdminRights($adminUser)
 	{
@@ -309,17 +391,36 @@ class AuthService
 			}
 		}
 	}
-	
+	/**
+     * Use driver implementation to check whether the user exists or not.
+     * @static
+     * @param $userId
+     * @return void
+     */
 	static function userExists($userId)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->userExists($userId);
 	}
-	
+
+	/**
+     * Simple password encoding, should be deported in a more complex/configurable function
+     * @static
+     * @param $pass
+     * @return string
+     */
 	static function encodePassword($pass){
 		return md5($pass);
 	}
-	
+	/**
+     * Check a password
+     * @static
+     * @param $userId
+     * @param $userPass
+     * @param bool $cookieString
+     * @param string $returnSeed
+     * @return bool|void
+     */
 	static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
 	{
 		if($userId == "guest") return true;		
@@ -334,7 +435,14 @@ class AuthService
 		if($seed != $returnSeed) return false;					
 		return $authDriver->checkPassword($userId, $userPass, $returnSeed);
 	}
-	
+	/**
+     * Update the password in the auth driver implementation.
+     * @static
+     * @throws Exception
+     * @param $userId
+     * @param $userPass
+     * @return bool
+     */
 	static function updatePassword($userId, $userPass)
 	{
 		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")){
@@ -346,7 +454,16 @@ class AuthService
 		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
 		return true;
 	}
-	
+	/**
+     * Create a user
+     * @static
+     * @throws Exception
+     * @param $userId
+     * @param $userPass
+     * @param bool $isAdmin
+     * @return null
+     * @todo the minlength check is probably causing problem with the bridges
+     */
 	static function createUser($userId, $userPass, $isAdmin=false)
 	{
 		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest"){
@@ -364,7 +481,11 @@ class AuthService
 		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;
 	}
-	
+	/**
+     * Detect the number of admin users
+     * @static
+     * @return int|void
+     */
 	static function countAdminUsers(){
 		$confDriver = ConfService::getConfStorageImpl();
 		$auth = ConfService::getAuthDriverImpl();	
@@ -374,7 +495,13 @@ class AuthService
 		}
 		return $count;
 	}
-		
+
+    /**
+     * Delete a user in the auth driver impl
+     * @static
+     * @param $userId
+     * @return bool
+     */
 	static function deleteUser($userId)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();
@@ -388,7 +515,11 @@ class AuthService
 		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
 		return true;
 	}
-	
+	/**
+     * Call the auth driver impl to list all existing users
+     * @static
+     * @return array
+     */
 	static function listUsers()
 	{
 		$authDriver = ConfService::getAuthDriverImpl();		
@@ -425,7 +556,12 @@ class AuthService
 		$roles[$roleObject->getId()] = $roleObject;
 		self::saveRolesList($roles);
 	}
-	
+	/**
+     * Delete a role by its id
+     * @static
+     * @param string $roleId
+     * @return void
+     */
 	static function deleteRole($roleId){
 		$roles = self::getRolesList();
 		if(isSet($roles[$roleId])){
@@ -433,14 +569,23 @@ class AuthService
 			self::saveRolesList($roles);
 		}
 	}
-	
+	/**
+     * Get all defined roles
+     * @static
+     * @return array
+     */
 	static function getRolesList(){
 		if(isSet(self::$roles)) return self::$roles;
 		$confDriver = ConfService::getConfStorageImpl();
 		self::$roles = $confDriver->listRoles();
 		return self::$roles;
 	}
-	
+	/**
+     * Update the roles list
+     * @static
+     * @param array $roles
+     * @return void
+     */
 	static function saveRolesList($roles){
 		$confDriver = ConfService::getConfStorageImpl();
 		$confDriver->saveRoles($roles);

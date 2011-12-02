@@ -27,7 +27,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Standard values filtering used in the core.
  */
 class AJXP_VarsFilter {
-	
+
+    /**
+     * Filter the very basic keywords from the XML  : AJXP_USER, AJXP_INSTALL_PATH, AJXP_DATA_PATH
+     * Calls the vars.filter hooks.
+     * @static
+     * @param $value
+     * @return mixed|string
+     */
 	public static function filter($value){
 		if(is_string($value) && strpos($value, "AJXP_USER")!==false){
 			if(AuthService::usersEnabled()){
