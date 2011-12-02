@@ -49,3 +49,4 @@ Translators : see mention in translation files
 	svn_lib.inc (LGPL)
 	PhpMailer-Lite http://phpmailer.sourceforge.net (LGPL)
 	Mp3 Player : http://www.alsacreations.fr/mp3-dewplayer.html
+	SoundManager : http://www.schillmania.com/projects/soundmanager2/ (BSD)

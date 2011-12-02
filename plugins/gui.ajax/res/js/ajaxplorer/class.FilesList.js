@@ -596,7 +596,11 @@ Class.create("FilesList", SelectableElements, {
             this.scroller = new Element('div', {id:'filelist_scroller', className:'scroller_track', style:"right:0px"});
             this.scroller.insert('<div id="filelist_scrollbar_handle" class="scroller_handle"></div>');
             scrollElement.insert({before:this.scroller});
-            scrollElement.setStyle({overflow:"hidden"});
+            if(this.gridStyle == "grid"){
+                scrollElement.setStyle({overflowY:"hidden",overflowX:"auto"});
+            }else{
+                scrollElement.setStyle({overflow:"hidden"});
+            }
             this.scrollbar = new Control.ScrollBar(scrollElement,'filelist_scroller');
             if(this.scrollSizeObserver){
                 this.stopObserving("resize", this.scrollSizeObserver);
@@ -1244,7 +1248,7 @@ Class.create("FilesList", SelectableElements, {
 		var metadata = ajxpNode.getMetadata();
 				
 		var innerSpan = new Element('span', {style:"cursor:default;"});
-		var editors = ajaxplorer.findEditorsForMime(ajxpNode.getAjxpMime(), true);
+		var editors = ajaxplorer.findEditorsForMime((ajxpNode.isLeaf()?ajxpNode.getAjxpMime():"mime_folder"), true);
 		var textNode = ajxpNode.getLabel();
 		var img = AbstractEditor.prototype.getPreview(ajxpNode);
 		var label = new Element('div', {
