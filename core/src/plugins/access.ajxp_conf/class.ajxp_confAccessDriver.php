@@ -48,51 +48,65 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			//	BASIC LISTING
 			//------------------------------------
 			case "ls":
-				$rootNodes = array(
-					"core"	   	   => array("LABEL" => $mess["ajxp_conf.98"], "ICON" => "preferences_desktop.png"),
-					"plugins"	   => array("LABEL" => $mess["ajxp_conf.99"], "ICON" => "folder_development.png"),
-					"repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "hdd_external_unmount.png"),
-					"users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "user.png"),
-					"roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "yast_kuser.png"),
-					"files" => array("LABEL" => $mess["ajxp_shared.3"], "ICON" => "html.png"),
-					"logs" => array("LABEL" => $mess["ajxp_conf.4"], "ICON" => "toggle_log.png"),
-					"diagnostic" => array("LABEL" => $mess["ajxp_conf.5"], "ICON" => "susehelpcenter.png")
-				);
-				$dir = AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:""));
-				$splits = explode("/", $dir);
-				if(count($splits)){
-					if($splits[0] == "") array_shift($splits);
-					if(count($splits)) $strippedDir = strtolower(urldecode($splits[0]));
-					else $strippedDir = "";
-				}				
-				if(array_key_exists($strippedDir, $rootNodes)){
-					AJXP_XMLWriter::header();
-					if($strippedDir == "users"){
-						$this->listUsers();
-					}else if($strippedDir == "roles"){
-						$this->listRoles();
-					}else if($strippedDir == "plugins" || $strippedDir == "core"){
-						$this->listPlugins($dir);
-					}else if($strippedDir == "repositories"){
-						$this->listRepositories();
-					}else if($strippedDir == "logs"){
-						$this->listLogFiles($dir);
-					}else if($strippedDir == "diagnostic"){
-						$this->printDiagnostic();
-					}else if($strippedDir == "files"){
-						$this->listSharedFiles();
-					}
-					AJXP_XMLWriter::close();
-					return;
+
+                $rootNodes = array(
+                    "config" => array(
+                        "LABEL" => $mess["ajxp_conf.109"],
+                        "ICON" => "preferences_desktop.png",
+                        "CHILDREN" => array(
+                            "core"	   	   => array("LABEL" => $mess["ajxp_conf.98"], "ICON" => "preferences_desktop.png", "LIST" => "listPlugins"),
+                            "plugins"	   => array("LABEL" => $mess["ajxp_conf.99"], "ICON" => "folder_development.png", "LIST" => "listPlugins"),
+                        )
+                    ),
+                    "data" => array(
+                        "LABEL" => $mess["ajxp_conf.110"],
+                        "ICON" => "user.png",
+                        "CHILDREN" => array(
+                            "repositories" => array("LABEL" => $mess["ajxp_conf.3"], "ICON" => "hdd_external_unmount.png", "LIST" => "listRepositories"),
+                            "users" => array("LABEL" => $mess["ajxp_conf.2"], "ICON" => "user.png", "LIST" => "listUsers"),
+                            "roles" => array("LABEL" => $mess["ajxp_conf.69"], "ICON" => "yast_kuser.png", "LIST" => "listRoles"),
+                        )
+                    ),
+                    "admin" => array(
+                        "LABEL" => $mess["ajxp_conf.111"],
+                        "ICON" => "toggle_log.png",
+                        "CHILDREN" => array(
+                            "logs" => array("LABEL" => $mess["ajxp_conf.4"], "ICON" => "toggle_log.png", "LIST" => "listLogFiles"),
+                            "files" => array("LABEL" => $mess["ajxp_shared.3"], "ICON" => "html.png", "LIST" => "listSharedFiles"),
+                            "diagnostic" => array("LABEL" => $mess["ajxp_conf.5"], "ICON" => "susehelpcenter.png", "LIST" => "printDiagnostic")
+                        )
+                    ),
+                );
+                    
+				$dir = trim(AJXP_Utils::decodeSecureMagic((isset($httpVars["dir"])?$httpVars["dir"]:"")), " /");
+                if($dir != ""){
+    				$splits = explode("/", $dir);
+                    $root = array_shift($splits);
+                    if(count($splits)){
+                        $child = $splits[0];
+                        if(isSet($rootNodes[$root]["CHILDREN"][$child])){
+                            AJXP_XMLWriter::header();
+                            call_user_func(array($this, $rootNodes[$root]["CHILDREN"][$child]["LIST"]), implode("/", $splits), $root);
+                            AJXP_XMLWriter::close();
+                            return;
+                        }
+                    }else{
+                        $parentName = $root."/";
+                        $nodes = $rootNodes[$root]["CHILDREN"];
+                    }
 				}else{
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/></columns>');
-					foreach ($rootNodes as $key => $data){
-						print '<tree text="'.$data["LABEL"].'" icon="'.$data["ICON"].'" filename="/'.$key.'" parentname="/"/>';
-					}
-					AJXP_XMLWriter::close();
-					return;
-				}
+                    $parentName = "/";
+                    $nodes = $rootNodes;
+                }
+                if(isSet($nodes)){
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/></columns>');
+                    foreach ($nodes as $key => $data){
+                        print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'"/>';
+                    }
+                    AJXP_XMLWriter::close();
+
+                }
 			break;
 			
 			case "stat" :
@@ -921,7 +935,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	
-	function listPlugins($dir){
+	function listPlugins($dir, $root = NULL){
+        $dir = "/$dir";
 		AJXP_Logger::logAction("Listing plugins"); // make sure that the logger is started!
 		$pServ = AJXP_PluginsService::getInstance();
 		$activePlugins = $pServ->getActivePlugins();
@@ -938,7 +953,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"icon" 		=> "folder_development.png",					
 					"plugin_id" => $t
 				);
-				AJXP_XMLWriter::renderNode("/plugins/".$t, ucfirst($t), false, $meta);
+				AJXP_XMLWriter::renderNode("/$root/plugins/".$t, ucfirst($t), false, $meta);
 			}
 		}else if($dir == "/core"){
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="ajxp_conf.plugins">
@@ -966,7 +981,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 						if($activePlugins[$pObject->getId()] !== true) continue;
 						$label = $pObject->getManifestLabel();
 					}
-					AJXP_XMLWriter::renderNode("/plugins/".$pObject->getId(), $label, true, $meta);
+					AJXP_XMLWriter::renderNode("/$root/plugins/".$pObject->getId(), $label, true, $meta);
 				}				
 			}
 		}else{
@@ -996,7 +1011,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"plugin_id" => $pObject->getId(),
 					"plugin_description" => $pObject->getManifestDescription()
 				);
-				AJXP_XMLWriter::renderNode("/plugins/".$pObject->getId(), $pObject->getManifestLabel(), true, $meta);
+				AJXP_XMLWriter::renderNode("/$root/plugins/".$pObject->getId(), $pObject->getManifestLabel(), true, $meta);
 			}
 		}
 	}
@@ -1148,7 +1163,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		}
 	}
 	
-	function listLogFiles($dir){	
+	function listLogFiles($dir, $root = NULL){
+        $dir = "/$dir";
 		$logger = AJXP_Logger::getInstance();
 		$parts = explode("/", $dir);
 		if(count($parts)>4){
@@ -1162,10 +1178,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			</columns>';				
 			AJXP_XMLWriter::sendFilesListComponentConfig($config);
 			$date = $parts[count($parts)-1];
-			$logger->xmlLogs($dir, $date, "tree");
+			$logger->xmlLogs($dir, $date, "tree", $root."/logs");
 		}else{
 			AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.16" attributeName="ajxp_label" sortType="String"/></columns>');
-			$logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null));
+			$logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null), $root."/logs");
 		}
 	}
 	

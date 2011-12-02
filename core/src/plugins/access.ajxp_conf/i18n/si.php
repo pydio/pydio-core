@@ -129,5 +129,8 @@ $mess=array(
 "106" => "Unique Identifier",
 "107" => "Plugin Configurations",
 "108" => "Documentation",
+"109" => "Global Configurations",
+"110" => "Repositories & Users",
+"111" => "Logs & Other Data",
 );
 ?>

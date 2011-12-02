@@ -211,7 +211,7 @@ class textLogDriver extends AbstractLogDriver {
 	 * @param Integer $month The month to list.
 	 * @return null
 	 */
-	function xmlListLogFiles($nodeName="file", $year=null, $month=null){
+	function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs"){
 		$dir = $this->storageDir;
 		if(!is_dir($this->storageDir)) return ;
 		$logs = array();
@@ -233,9 +233,9 @@ class textLogDriver extends AbstractLogDriver {
 				$fullMonth = date("F", $time);
 				if($year != null && $fullYear != $year) continue;
 				if($month != null && $fullMonth != $month) continue;
-				$logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"/logs/$fullYear/$fullMonth/$date\"/>";
-				$years[$logY] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" filename=\"/logs/$fullYear\"/>";
-				$months[$logM] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" filename=\"/logs/$fullYear/$fullMonth\"/>";
+				$logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"$rootPath/$fullYear/$fullMonth/$date\"/>";
+				$years[$logY] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" filename=\"$rootPath/$fullYear\"/>";
+				$months[$logM] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" filename=\"$rootPath/$fullYear/$fullMonth\"/>";
 			}
 			closedir($handle);	
 		}
@@ -258,7 +258,7 @@ class textLogDriver extends AbstractLogDriver {
 	 * @param String $nodeName The name of the node to use for each log item.
 	 * @return null
 	 */
-	function xmlLogs($parentDir, $date, $nodeName = "log"){
+	function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs"){
 				
 		$fName = $this->storageDir."log_".$date.".txt";
 
