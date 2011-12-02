@@ -41,7 +41,7 @@ class AJXP_Controller{
 		return self::$xPath;
 	}
 	
-	private static function filterActionsRegistry(&$registry){
+	public static function filterActionsRegistry(&$registry){
 		if(!AuthService::usersEnabled()) return false ;
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return false;
