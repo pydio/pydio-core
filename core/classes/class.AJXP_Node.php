@@ -23,22 +23,48 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * @package info.ajaxplorer.core
  * @class AJXP_Node
- * Atomic representation of a data.
+ * Atomic representation of a data. This the basic node of the hierarchical data.
+ * Encapsulates the path and url, the nature (leaf or not) and the metadata of the node.
  */
 class AJXP_Node{
+    /**
+     * @var string URL of the node in the form ajxp.protocol://repository_id/path/to/node
+     */
 	protected $_url;
+    /**
+     * @var array The node metadata
+     */
 	protected $_metadata = array();
+    /**
+     * @var string Associated wrapper
+     */
 	protected $_wrapperClassName;
+    /**
+     * @var array Parsed url fragments
+     */
 	protected $urlParts = array();
+    /**
+     * @var string A local representation of a real file, if possible
+     */
 	protected $realFilePointer;
-
+    /**
+     * @var bool Whether the core information of the node is already loaded or not
+     */
     protected $nodeInfoLoaded = false;
-	
+
+    /**
+     * @param string $url URL of the node in the form ajxp.protocol://repository_id/path/to/node
+     * @param array $metadata Node metadata
+     */
 	public function __construct($url, $metadata = array()){
         $this->setUrl($url);
 		$this->_metadata = $metadata;
 	}
 
+    /**
+     * @param $url URL of the node in the form ajxp.protocol://repository_id/path/to/node
+     * @return void
+     */
     public function setUrl($url){
         $this->_url = $url;
         // Clean url
@@ -50,28 +76,54 @@ class AJXP_Node{
         $this->parseUrl();
     }
 
+    /**
+     * @param $boolean Leaf or Collection?
+     * @return void
+     */
     public function setLeaf($boolean){
         $this->_metadata["is_file"] = $boolean;
     }
 
+    /**
+     * @return bool
+     */
     public function isLeaf(){
         return isSet($this->_metadata["is_file"])?$this->_metadata["is_file"]:true;
     }
 
+    /**
+     * @param $label Main label, will set the metadata "text" key.
+     * @return void
+     */
     public function setLabel($label){
         $this->_metadata["text"] = $label;
     }
 
+    /**
+     * @return string Try to get the metadata "text" key, or the basename of the node path.
+     */
     public function getLabel(){
         return isSet($this->_metadata["text"])? $this->_metadata["text"] : basename($this->urlParts["path"]);
     }
 
+    /**
+     * Applies the "node.info" hook, thus going through the plugins that have registered this node, and loading
+     * all metadata at once.
+     * @param bool $forceRefresh
+     * @param bool $contextNode The parent node, if it can be useful for the hooks callbacks
+     * @return
+     */
     public function loadNodeInfo($forceRefresh = false, $contextNode = false){
         if($this->nodeInfoLoaded && !$forceRefresh) return;
         AJXP_Controller::applyHook("node.info", array(&$this, $contextNode));
         $this->nodeInfoLoaded = true;
     }
 
+    /**
+     * Get a real reference to the filesystem. Remote wrappers will copy the file locally.
+     * This will last the time of the script and will be removed afterward.
+     * @return string
+     */
 	public function getRealFile(){
 		if(!isset($this->realFilePointer)){
 			$this->realFilePointer = call_user_func(array($this->_wrapperClassName, "getRealFSReference"), $this->_url, true);
@@ -82,19 +134,34 @@ class AJXP_Node{
 		}
 		return $this->realFilePointer;
 	}
-	
+
+    /**
+     * @return string URL of the node in the form ajxp.protocol://repository_id/path/to/node
+     */
 	public function getUrl(){
 		return $this->_url;
 	}
-	
+
+    /**
+     * @return string The path from the root of the repository
+     */
 	public function getPath(){
 		return $this->urlParts["path"];
 	}
 
+    /**
+     * @return string The repository identifer
+     */
     public function getRepositoryId(){
         return $this->urlParts["host"];
     }
 
+    /**
+     * Pass an array of metadata and merge its content with the current metadata.
+     * @param array $metadata
+     * @param bool $mergeValues
+     * @return void
+     */
 	public function mergeMetadata($metadata, $mergeValues = false){
         if($mergeValues){
             foreach($metadata as $key => $value){
@@ -112,7 +179,12 @@ class AJXP_Node{
             $this->_metadata = array_merge($this->_metadata, $metadata);
         }
 	}
-	
+
+    /**
+     * Magic getter for metadata
+     * @param $varName
+     * @return array|null|string
+     */
 	public function __get($varName){
 		
 		if(strtolower($varName) == "wrapperclassname") return $this->_wrapperClassName;
@@ -125,7 +197,13 @@ class AJXP_Node{
 			return null;
 		}
 	}
-	
+
+    /**
+     * Magic setter for metadata
+     * @param $metaName
+     * @param $metaValue
+     * @return
+     */
 	public function __set($metaName, $metaValue){
 		if(strtolower($metaName) == "metadata"){
 			$this->_metadata = $metaValue;
@@ -133,7 +211,11 @@ class AJXP_Node{
 		}
 		$this->_metadata[$metaName] = $metaValue;
 	}
-	
+
+    /**
+     * Safe parseUrl implementation 
+     * @return void
+     */
 	protected function parseUrl(){
         if(strstr($this->_url, "#") !== false){
             $url = str_replace("#", "__HASH__", $this->_url);

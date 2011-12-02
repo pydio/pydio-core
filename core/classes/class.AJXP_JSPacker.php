@@ -28,7 +28,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class AJXP_JSPacker{
 	
 	/**
-	 * Static function for packing all js into two big files
+	 * Static function for packing all js and css into big files
+     * Auto detect /js/*_list.txt files and /css/*_list.txt files and pack them.
 	 */
 	function pack(){
 
@@ -50,7 +51,14 @@ class AJXP_JSPacker{
                                             "None");
         }
 	}
-	
+
+    /**
+     * Perform actual compression
+     * @param $src
+     * @param $out
+     * @param $mode
+     * @return bool
+     */
 	function concatListAndPack($src, $out, $mode){
 		
 		if(!is_file($src) || !is_readable($src)){

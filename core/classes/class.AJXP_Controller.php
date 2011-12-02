@@ -25,11 +25,25 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Core controller for dispatching the actions
  */
 class AJXP_Controller{
-	
+
+    /**
+     * @var DOMXPath
+     */
 	private static $xPath;
+    /**
+     * @var bool
+     */
 	public static $lastActionNeedsAuth = false;
+    /**
+     * @var array
+     */
 	private static $includeHooks = array();
-	
+
+    /**
+     * Initialize the queryable xPath object
+     * @static
+     * @return DOMXPath
+     */
 	private static function initXPath(){		
 		if(!isSet(self::$xPath)){
 			
@@ -40,7 +54,13 @@ class AJXP_Controller{
 		}
 		return self::$xPath;
 	}
-	
+
+    /**
+     * Check the current user "specificActionsRights" and filter the full registry actions with these.
+     * @static
+     * @param DOMDocument $registry
+     * @return bool
+     */
 	public static function filterActionsRegistry(&$registry){
 		if(!AuthService::usersEnabled()) return false ;
 		$loggedUser = AuthService::getLoggedUser();
@@ -65,7 +85,16 @@ class AJXP_Controller{
 		}
 		return $changes;
 	}
-	
+
+    /**
+     * Main method for querying the XML registry, find an action and all its associated processors,
+     * and apply all the callbacks.
+     * @static
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @return bool
+     */
 	public static function findActionAndApply($actionName, $httpVars, $fileVars){
 		if($actionName == "cross_copy"){
 			$pService = AJXP_PluginsService::getInstance();
@@ -172,6 +201,7 @@ class AJXP_Controller{
 	}
 
     /**
+     * Launch a command-line version of the framework by passing the actionName & parameters as arguments.
      * @static
      * @param String $currentRepositoryId
      * @param String $actionName
@@ -203,7 +233,19 @@ class AJXP_Controller{
             return $process;
 		}		
 	}
-	
+
+    /**
+     * Find a callback node by its xpath query, filtering with the applyCondition if the xml attribute exists.
+     * @static
+     * @param DOMXPath $xPath
+     * @param DOMNode $actionNode
+     * @param string $query
+     * @param string $actionName
+     * @param array $httpVars
+     * @param array $fileVars
+     * @param bool $multiple
+     * @return array|bool
+     */
 	private static function getCallbackNode($xPath, $actionNode, $query ,$actionName, $httpVars, $fileVars, $multiple = true){		
 		$callbacks = $xPath->query($query, $actionNode);
 		if(!$callbacks->length) return false;
@@ -222,7 +264,17 @@ class AJXP_Controller{
 			return $callback;
 		}
 	}
-	
+
+    /**
+     * Check in the callback node if an applyCondition XML attribute exists, and eval its content.
+     * The content must set an $apply boolean as result
+     * @static
+     * @param DOMNode $callback
+     * @param string $actionName
+     * @param array $httpVars
+     * @param array $fileVars
+     * @return bool
+     */
 	private static function appliesCondition($callback, $actionName, $httpVars, $fileVars){
 		if($callback->getAttribute("applyCondition")!=""){
 			$apply = false;
@@ -231,7 +283,19 @@ class AJXP_Controller{
 		}
 		return true;
 	}
-	
+
+    /**
+     * Applies a callback node
+     * @static
+     * @param DOMXPath $xPath
+     * @param DOMNode $callback
+     * @param String $actionName
+     * @param Array $httpVars
+     * @param Array $fileVars
+     * @param null $variableArgs
+     * @throw AJXP_Exception
+     * @return void
+     */
 	private static function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null){
 		//Processing
 		$plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
@@ -249,7 +313,14 @@ class AJXP_Controller{
 			throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
 		}
 	}
-	
+
+    /**
+     * Find all callbacks registered for a given hook and apply them
+     * @static
+     * @param string $hookName
+     * @param array $args
+     * @return
+     */
 	public static function applyHook($hookName, $args){
 		$xPath = self::initXPath();
 		$callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
@@ -259,21 +330,43 @@ class AJXP_Controller{
 			self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args);
 		}
 	}	
-	
+
+    /**
+     * Find the statically defined callbacks for a given hook and apply them
+     * @static
+     * @param $hookName
+     * @param $args
+     * @return
+     */
 	public static function applyIncludeHook($hookName, $args){
 		if(!isSet(self::$includeHooks[$hookName])) return;
 		foreach(self::$includeHooks[$hookName] as $callback){
 			call_user_func_array($callback, $args);			
 		}
 	}
-	
+
+    /**
+     * Register a hook statically when it must be defined before the XML registry construction.
+     * @static
+     * @param $hookName
+     * @param $callback
+     * @return void
+     */
 	public static function registerIncludeHook($hookName, $callback){
 		if(!isSet(self::$includeHooks[$hookName])){
 			self::$includeHooks[$hookName] = array();
 		}
 		self::$includeHooks[$hookName][] = $callback;
 	}
-	
+
+    /**
+     * Check the rightsContext node of an action.
+     * @static
+     * @param DOMNode $actionNode
+     * @param DOMXPath $xPath
+     * @param string $right
+     * @return bool
+     */
 	public static function actionNeedsRight($actionNode, $xPath, $right){
 		$rights = $xPath->query("rightsContext", $actionNode);
 		if(!$rights->length) return false;
@@ -285,7 +378,13 @@ class AJXP_Controller{
 		}
 		return false;
 	}
-	
+
+    /**
+     * Utilitary used by the postprocesors to forward previously computed data
+     * @static
+     * @param array $postProcessData
+     * @return void
+     */
 	public static function passProcessDataThrough($postProcessData){
 		if(isSet($postProcessData["pre_processor_results"]) && is_array($postProcessData["pre_processor_results"])){
 			print(implode("", $postProcessData["pre_processor_results"]));
