@@ -857,7 +857,10 @@ ConfigEditor = Class.create({
             var form = new Element('div', {className:'driver_form'});
             if(documentation){
                 var docDiv = new Element('div', {style:'display:none;overflow:auto;max-height:'+parseInt(document.viewport.getHeight()*50/100)+'px'}).insert(documentation.firstChild.nodeValue);
-                docDiv.select('img').invoke('setStyle', {maxWidth:'220px'});
+                docDiv.select('img').each(function(img){
+                    img.setStyle({width:'220px'});
+                    img.setAttribute('src', 'plugins/'+pluginId+'/'+img.getAttribute('src'));
+                });  
                 var link1 = MessageHash['ajxp_conf.107'];
                 var link2 = MessageHash['ajxp_conf.108'];
                 var legend = this.createTabbedFieldset(link1, form, link2, docDiv);
