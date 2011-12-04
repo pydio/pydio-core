@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * @package info.ajaxplorer.core
- * @class SystemTextEncoding
+ */
+/**
  * Utilitary to launch a process and keep track of it
  */
 class UnixProcess{

@@ -22,8 +22,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AuthService
- * Static access to the authentication mechanism
+ */
+/**
+ * Static access to the authentication mechanism. Encapsulates the authDriver implementation
  */
 class AuthService
 {

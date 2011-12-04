@@ -22,9 +22,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AjxpRole
+ */
+/**
  * Authentication "role" concept : set of permissions that can be applied to
- * one or more users.
+ * one or more users, plus set of actions to be disabled.
  */
 class AjxpRole
 {

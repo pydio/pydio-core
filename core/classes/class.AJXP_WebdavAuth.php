@@ -22,7 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_WebdavAuth
+ */
+/**
  * AjaXplorer implementation of the EZC WebDAV Authenticator
  */
 class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAuthenticator, ezcWebdavAuthorizer, ezcWebdavLockAuthorizer

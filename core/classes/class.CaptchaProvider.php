@@ -24,8 +24,9 @@ include_once(AJXP_BIN_FOLDER."/securimage/securimage.php");
 
 /**
  * @package info.ajaxplorer.core
- * @class CaptchaProvider
- * Implementation of the securimage library
+ */
+/**
+ * Encapsulation of the securimage external library, to generate a Captcha Image on brute force login attempt.
  */
 class CaptchaProvider{
 	/**

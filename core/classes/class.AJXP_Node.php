@@ -22,7 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_Node
+ */
+/**
  * Atomic representation of a data. This the basic node of the hierarchical data.
  * Encapsulates the path and url, the nature (leaf or not) and the metadata of the node.
  */

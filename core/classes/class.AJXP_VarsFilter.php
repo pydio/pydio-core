@@ -22,8 +22,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_VarsFilter
  * @static
+ */
+/**
  * Standard values filtering used in the core.
  */
 class AJXP_VarsFilter {
