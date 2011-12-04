@@ -40,3 +40,11 @@
 	font-weight: normal;
 	display:inline;
 }
+
+#clear_assoc_link{
+    float: left;
+    color: #999;
+    cursor: pointer;
+    padding-top: 10px;
+    padding-left: 5px;
+}
