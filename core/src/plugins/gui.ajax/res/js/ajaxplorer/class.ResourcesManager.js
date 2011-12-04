@@ -135,6 +135,9 @@ Class.create("ResourcesManager", {
 	 */
 	loadCSSResource : function(fileName){
 		var head = $$('head')[0];
+        if(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')){
+            fileName = ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')+fileName;
+        }
 		var cssNode = new Element('link', {
 			type : 'text/css',
 			rel  : 'stylesheet',
