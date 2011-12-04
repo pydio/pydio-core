@@ -20,12 +20,12 @@
 window.SM2_DEFER = true;
 if(!window.soundManager){
     var conn = new Connexion();
-    conn._libUrl = 'plugins/editor.soundmanager/sm/';
+    conn._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
     conn.loadLibrary('360-player/script/excanvas.js');
     conn.loadLibrary('360-player/script/berniecode-animator.js');
     conn.loadLibrary('script/soundmanager2-nodebug-jsmin.js', function(){
         window.soundManager = new SoundManager('plugins/editor.soundmanager/sm/swf/');
-        window.soundManager.url = 'plugins/editor.soundmanager/sm/swf/';
+        window.soundManager.url = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/swf/';
         if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("soundmanager.volume") !== undefined){
             soundManager.defaultOptions.volume = ajaxplorer.user.getPreference("soundmanager.volume");
         }
@@ -116,7 +116,7 @@ function hookToFilesList(){
     }
     var fList = fLists[0];
     fList.observe("rows:didInitialize", function(){
-        if(fList.getDisplayMode() != "list" || !window.soundManager.enabled) return;
+        if(fList.getDisplayMode() != "list" || !window.soundManager || !window.soundManager.enabled) return;
         var resManager = ajaxplorer.findEditorById("editor.soundmanager").resourcesManager;
         if(!resManager.loaded){
             resManager.load();
@@ -166,7 +166,7 @@ function addVolumeButton(){
         false,
         false
     )
-    volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked.png";
+    volumeButton.down("img").src = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+"plugins/editor.soundmanager/kmixdocked.png";
     locBar.bmButton.insert({before:volumeButton});
     new SliderInput(volumeButton, {
         range : $R(0, 100),
@@ -175,7 +175,7 @@ function addVolumeButton(){
         topOffset:-1,
         anchorActiveClass: 'volume_slider_active',
         onSlide : function(value){
-            volumeButton.down("img").src = "plugins/editor.soundmanager/kmixdocked"+(parseInt(value)==0?"-muted":"")+".png";
+            volumeButton.down("img").src = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+"plugins/editor.soundmanager/kmixdocked"+(parseInt(value)==0?"-muted":"")+".png";
             soundManager.defaultOptions.volume = parseInt(value);
             soundManager.soundIDs.each(function(el){ soundManager.setVolume(el,parseInt(value)); });
         }.bind(this),
@@ -185,6 +185,7 @@ function addVolumeButton(){
             ajaxplorer.user.savePreference("soundmanager.volume");
         }.bind(this)
     });
+    locBar.resize();
 }
 
 Class.create("SMPlayer", AbstractEditor, {
@@ -195,7 +196,7 @@ Class.create("SMPlayer", AbstractEditor, {
 	},
 		
 	getPreview : function(ajxpNode, rich){
-        if(!window.soundManager.enabled){
+        if(!window.soundManager || !window.soundManager.enabled){
             var im = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
             return im;
         }
