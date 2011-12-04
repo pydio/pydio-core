@@ -22,7 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_PluginsService
+ */
+/**
  * Core parser for loading / serving plugins
  */
  class AJXP_PluginsService{

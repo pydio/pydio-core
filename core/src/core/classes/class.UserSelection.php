@@ -21,7 +21,8 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * @package info.ajaxplorer.core
- * @class UserSelection
+ */
+/**
  * Abstraction of a user selection passed via http parameters.
  */
 class UserSelection

@@ -22,7 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_WebdavBackend
+ */
+/**
  * AjaXplorer implementation of the EZC WebDAV backend library
  */
 class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLockBackend {

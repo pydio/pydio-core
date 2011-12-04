@@ -22,7 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_Safe
+ */
+/**
  * Credential keeper that can be stored in the session, the credentials are kept crypted.
  */
 class AJXP_Safe{

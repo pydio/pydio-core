@@ -22,6 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
+ */
+/**
  * @interface AjxpWrapper
  * Defines the methods that an access driver must implement to be considered as a file wrapper.
  */

@@ -27,8 +27,9 @@ define("LOG_LEVEL_WARNING", "Warning");
 define("LOG_LEVEL_ERROR", "Error");
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_Logger
  * @static
+ */
+/**
  * Provides static access to the logging mechanism
  */
 class AJXP_Logger {

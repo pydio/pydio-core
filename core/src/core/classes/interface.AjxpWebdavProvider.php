@@ -22,6 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
+ */
+/**
  * @interface AjxpWebdavProvider
  * Interface must be implemented for access drivers that can be accessed via webdav.
  */

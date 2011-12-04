@@ -21,8 +21,10 @@
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_Cache
- * Generic caching system that can be used by the plugins
+ */
+/**
+ * Generic caching system that can be used by the plugins. Use the static factory getItem() to generate
+ * a actual cached instance.
  */
 class AJXP_Cache {
 	

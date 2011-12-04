@@ -26,8 +26,9 @@ define('AJXP_SANITIZE_ALPHANUM', 3);
 define('AJXP_SANITIZE_EMAILCHARS', 4);
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_Utils
- * Various functions
+ */
+/**
+ * Various functions used everywhere, static library
  */
 class AJXP_Utils
 {

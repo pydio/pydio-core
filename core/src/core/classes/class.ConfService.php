@@ -22,8 +22,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class ConfService
- * Configuration holder
+ */
+/**
+ * Configuration holder. Singleton class accessed statically, encapsulates the confDriver implementation.
  */
 class ConfService
 {	

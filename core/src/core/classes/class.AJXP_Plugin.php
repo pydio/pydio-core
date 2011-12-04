@@ -22,7 +22,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.core
- * @class AJXP_Plugin
+ */
+/**
  * The basic concept of plugin. Only needs a manifest.xml file.
  */
 class AJXP_Plugin implements Serializable{
