@@ -17,8 +17,8 @@
 			<div class="editor_selector_title">AJXP_MESSAGE[openother.3]</div>
 			<div class="dialogLegend">AJXP_MESSAGE[openother.4]</div>
 			<div id="editor_selector"></div>
-			<div id="clear_assoc_link">Clear existing associations</div>
 			<div class="dialogButtons">
+			    <div id="clear_assoc_link">AJXP_MESSAGE[openother.5]</div>
 				<input type="image" name="close" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" title="OK" class="dialogButton"/>
 			</div>
 		</div>				
