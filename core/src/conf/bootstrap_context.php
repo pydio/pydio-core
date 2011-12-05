@@ -57,6 +57,12 @@ define("SOFTWARE_UPDATE_SITE", "http://www.ajaxplorer.info/update/");
 // The admin password is created and his password is changed,
 // this config has no more impact.
 define("ADMIN_PASSWORD", "admin");
+// For a specific distribution, you can specify where the
+// log files will be stored. This should be detected by log.* plugins
+// and used if defined. See bootstrap_plugins.php default configs for
+// example in log.serial. Do not forget the trailing slash
+// define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
+
 
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG"  ,	false);
