@@ -25,13 +25,13 @@
  * If you want to run the tests, first comment this line!
  * It is disabled for security purpose
  */
-die("You are not allowed to see this page (comment first line of the file to access it!)");
+// die("You are not allowed to see this page (comment first line of the file to access it!)");
 require_once("base.conf.php");
 
 $outputArray = array();
 $testedParams = array();
 $passed = true;
 $passed = AJXP_Utils::runTests($outputArray, $testedParams);
-print(AJXP_Utils::testResultsToTable($outputArray, $testedParams, false));
+print(AJXP_Utils::testResultsToTable($outputArray, $testedParams, true));
 AJXP_Utils::testResultsToFile($outputArray, $testedParams);
 ?>
