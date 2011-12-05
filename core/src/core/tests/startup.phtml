@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>AjaXplorer</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="icon" type="image/x-png" href="AJXP_THEME_FOLDER/images/html-folder.png">
+		<script src="plugins/gui.ajax/res/js/lib/prototype/prototype.js" type="text/javascript"></script>
+        <style>
+            body {
+                background-color:#fff;
+                margin:0;
+                padding:20;
+                font-family: Helvetica, Verdana, Arial;
+                overflow: hidden;
+            }
+            h1 {
+                font-size: 33px;
+                color: #BBB;
+                height: 20px;
+                text-align: center;
+                margin: 20px auto;
+            }
+
+            div.mainContainer{
+                position: relative;
+                display: block;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+                border-radius: 10px;
+                background-color: #EEF3F7;
+                -webkit-box-shadow: 1px 1px 64px rgba(0,0,0,0.25);
+                -moz-box-shadow: 1px 1px 64px rgba(0,0,0,0.25);
+                box-shadow: 1px 1px 64px rgba(0,0,0,0.25);
+                margin: 40px auto;
+                width: 500px;
+                height: 80%;
+                padding: 18px;
+            }
+
+            p.status{
+                margin-top: 0;
+                font-size: 15px;
+                line-height: 20px;
+                text-align: justify;
+                height: 60px;
+            }
+            p.status a{
+                font-weight: bold;
+                color: #666;
+            }
+            p.status strong{
+                font-weight: normal;
+                font-style: italic;
+            }
+
+            div.testList{
+                font-family: Helvetica, Verdana, Arial;
+                font-size: 15px;
+                margin: 0 auto;
+                height: 331px;
+                overflow-y: scroll;
+                border: 1px solid #DDD;
+                -moz-box-shadow: inset 1px 1px 9px #ddd;
+                -webkit-box-shadow: inset 1px 1px 9px #ddd;
+                box-shadow: inset 1px 1px 9px #ddd;
+                background-color: #ffffff;
+            }
+
+            div.testLine {
+                text-align: left;
+                padding: 10px;
+                padding-bottom: 0px;
+            }
+            div.testClear{
+                clear:both;
+                border-bottom: 1px solid #dddddd;
+                height: 8px;
+            }
+            div.testName{
+                float:left;
+                width:80%;
+                cursor: pointer;
+            }
+            div.testName span{
+            }
+            div.testStatus{
+                float:right;
+                width:20%;
+                text-transform: uppercase;
+                text-align: right;
+                font-weight: bold;
+                color: #090;
+            }
+            div.testLine.error .testStatus{
+                color : #933;
+            }
+            div.testLine.warning .testStatus{
+                color: #f90;
+            }
+            div.testDescription{
+                display:none;
+                font-size: 0.8em;
+                color: #999;
+                clear: both;
+                padding: 5px 0;
+                padding-left: 8px;
+            }
+            div.testDescription.visible
+            {
+                display: block;
+            }
+
+
+        </style>
+
+	</head>
+	<body bgcolor="#FFFFFF" text="#000000" marginheight="0" marginwidth="0" leftmargin="0" topmargin="0"  style="">
+
+        <h1>AjaXplorer Diagnostic Tool</h1>
+
+        <div class="mainContainer">
+            <?php
+                if ($showSkipLink) {
+                    if (count($ALL_ROWS["warning"]) && !count($ALL_ROWS["error"])) {
+                        echo "<p class='status statusWarning'><strong>Status</strong> : You have some warnings, but no fatal error detected, AjaXplorer should run ok. <br/>Please review the warnings, and <a href='index.php?ignore_tests=true'>click here to continue to AjaXplorer</a>.</p>";
+                    } else if(count($ALL_ROWS["error"])) {
+                        echo "<p class='status statusError'><strong>Status</strong> : <b>You have some errors</b> that may prevent AjaXplorer from running. Please review the error lines to check what action you should do. If you want to skip this step, simply <a href='index.php?ignore_tests=true'>click here to continue to Ajaxplorer</a>.</p>";
+                    }else{
+                        echo "<p class='status'><strong>Status</strong> : <b>No specific errors</b> were detected, your AjaXplorer installation should run smoothly! <br/><a href='index.php?ignore_tests=true'>Click there to continue to Ajaxplorer</a></p>";
+                    }
+                }
+            ?>
+
+            <div class="testList">
+            <?php
+
+                foreach ($ALL_ROWS as $testsType => $allTests){
+
+                    foreach($allTests as $testKey => $testInfo){
+
+                        $status = ($testsType == "passed"?"ok":$testsType);
+                        echo "<div class='testLine $testsType'>
+                            <div class='testName'><span>".($testsType != "passed"?"-":"+")."</span> $testKey</div>
+                            <div class='testStatus'>$status</div>
+                            <div class='testDescription ".($testsType != "passed"?" visible":"")."'>$testInfo</div>
+                            <div class='testClear'></div>
+                        </div>";
+
+                    }
+
+                }
+
+            ?>
+            </div>
+
+            <script type="text/javascript">
+                $$('div.testName').invoke("observe", "click", function(event){
+                    var target = event.target;
+                    if(target.tagName.toLowerCase() == "span") target = target.up("div.testName");
+                    target.next("div.testDescription").toggleClassName("visible");
+                    if(target.next("div.testDescription").hasClassName("visible")){
+                        target.down("span").update("-");
+                    }else{
+                        target.down("span").update("+");
+                    }
+                });
+                var resize = function(){
+                    var h1 = document.viewport.getHeight() - 160 ;
+                    var h = h1 - 80;
+                    $$("div.mainContainer")[0].setStyle({height:h1+'px'});
+                    $$("div.testList")[0].setStyle({height:h + 'px'});
+                };
+                Event.observe(window, "resize", resize);
+                resize();
+            </script>
+        </div>
+
+        <!-- <h1 style="text-align: right">Continue to AjaXplorer &gt;&gt; </h1>-->
+    </body>
+</html>
