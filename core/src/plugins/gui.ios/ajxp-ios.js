@@ -18,6 +18,8 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 function cleanURL(url){
+    split = url.split("#");
+   	url = split[0];
 	split = url.split("?");
 	url = split[0];
 	if(url.charAt(url.length-1) == "/") {
@@ -33,5 +35,8 @@ document.observe("ajaxplorer:gui_loaded", function(){
 	var currentHref = document.location.href;
 	
 	$("ajxpserver-redir").href = cleanURL(currentHref).replace("http://", "ajxpserver://");
+    if(currentHref.indexOf("#") > -1){
+        currentHref = currentHref.substr(0, currentHref.indexOf("#"));
+    }
 	$("skipios-redir").href = currentHref + (currentHref.indexOf("?")>-1?"&":"?") + "skipIOS=true";
 });
