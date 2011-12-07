@@ -512,14 +512,21 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	 * Search all plugins manifest with an XPath query, and return either the Nodes, or directly an XML string.
  	 * @param string $query
  	 * @param string $stringOrNodeFormat
+     * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
  	 * @return DOMNode[]
  	 */
- 	public static function searchAllManifests($query, $stringOrNodeFormat = "string"){
+ 	public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false){
  		$buffer = "";
  		$nodes = array();
  		$self = self::getInstance();
- 		foreach ($self->registry as $plugType){ 			
+ 		foreach ($self->registry as $plugType){
  			foreach ($plugType as $plugName => $plugObject){
+                 if($limitToActivePlugins){
+                     $plugId = $plugObject->getId();
+                     if($limitToActivePlugins && (!isSet($self->activePlugins[$plugId]) || $self->activePlugins[$plugId] === false)){
+                         continue;
+                     }
+                 }
  				$res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat);
  				if($stringOrNodeFormat == "string"){
 	 				$buffer .= $res;

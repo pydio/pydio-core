@@ -688,7 +688,7 @@ class ConfService
             $RESERVED_EXTENSIONS = array();
             include_once(AJXP_CONF_PATH."/extensions.conf.php");
             $EXTENSIONS = array_merge($RESERVED_EXTENSIONS, $EXTENSIONS);
-            $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//extensions/extension", "nodes");
+            $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//extensions/extension", "nodes", true);
             $res = array();
             foreach($nodes as $node){
                 $res[] = array($node->getAttribute("mime"), $node->getAttribute("icon"), $node->getAttribute("messageId"));
