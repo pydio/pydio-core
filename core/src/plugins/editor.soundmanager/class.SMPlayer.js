@@ -18,10 +18,9 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 window.SM2_DEFER = true;
-if(!window.soundManager){
+if(!window.soundManager && ajaxplorer.findEditorById("editor.soundmanager")){
     var conn = new Connexion();
     conn._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
-    conn.loadLibrary('360-player/script/excanvas.js');
     conn.loadLibrary('360-player/script/berniecode-animator.js');
     conn.loadLibrary('script/soundmanager2-nodebug-jsmin.js', function(){
         window.soundManager = new SoundManager('plugins/editor.soundmanager/sm/swf/');
@@ -133,6 +132,7 @@ function hookToFilesList(){
     });
     fList.observe("rows:willClear", function(){
         fList._htmlElement.select("div.ui360-micro").each( function(container){
+            if(!container.down('a.sm2_link')) return;
             var urlKey = container.down('a.sm2_link').href;
             if(threeSixtyPlayer.getSoundByURL(urlKey)){
                 var theSound = threeSixtyPlayer.getSoundByURL(urlKey);
