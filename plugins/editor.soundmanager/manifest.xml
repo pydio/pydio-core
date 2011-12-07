@@ -11,6 +11,11 @@
             <css file="plugins/editor.soundmanager/sm_preview_player.css"/>
         </resources>
     </client_settings>
+    <processing>
+        <activeCondition><![CDATA[
+                return (document.createElement("canvas").getContext?true:false);
+        ]]> </activeCondition>
+    </processing>
     <registry_contributions>
         <external_file filename="plugins/editor.audio/manifest.xml" include="registry_contributions/actions[id='audio_proxy']" exclude=""/>
     </registry_contributions>
