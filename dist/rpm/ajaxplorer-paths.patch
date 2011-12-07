@@ -1,0 +1,35 @@
+diff -ru ajaxplorer-core-3.3.5/base.conf.php ajaxplorer-core-3.3.5.paths/base.conf.php
+--- ajaxplorer-core-3.3.5/base.conf.php	2011-10-17 16:23:52.000000000 +0200
++++ ajaxplorer-core-3.3.5.paths/base.conf.php	2011-12-02 16:35:20.000000000 +0100
+@@ -23,6 +23,6 @@
+  */
+ define("AJXP_PACKAGING", "zip");
+ define("AJXP_INSTALL_PATH", realpath(dirname(__FILE__)));
+-define("AJXP_CONF_PATH", AJXP_INSTALL_PATH."/conf");
++define("AJXP_CONF_PATH", "/etc/ajaxplorer");
+ require_once(AJXP_CONF_PATH."/bootstrap_context.php");
+-?>
+\ No newline at end of file
++?>
+Only in ajaxplorer-core-3.3.5.paths: base.conf.php~
+diff -ru ajaxplorer-core-3.3.5/conf/bootstrap_context.php ajaxplorer-core-3.3.5.paths/conf/bootstrap_context.php
+--- ajaxplorer-core-3.3.5/conf/bootstrap_context.php	2011-11-24 16:30:54.000000000 +0100
++++ ajaxplorer-core-3.3.5.paths/conf/bootstrap_context.php	2011-12-02 16:31:49.000000000 +0100
+@@ -39,8 +39,8 @@
+ define("AJXP_EXEC", true);
+ 
+ // APPLICATION PATHES CONFIGURATION
+-define("AJXP_DATA_PATH", AJXP_INSTALL_PATH."/data");
+-define("AJXP_CACHE_DIR", AJXP_DATA_PATH."/cache");
++define("AJXP_DATA_PATH", "/var/lib/ajaxplorer");
++define("AJXP_CACHE_DIR", "/var/cache/ajaxplorer");
+ define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
+ define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
+ define("AJXP_SERVER_ACCESS", "index.php");
+@@ -88,4 +88,4 @@
+ 
+ 
+ 
+-?>
+\ No newline at end of file
++?>
