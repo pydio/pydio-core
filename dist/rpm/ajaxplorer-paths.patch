@@ -1,9 +1,12 @@
-diff -ru ajaxplorer-core-3.3.5/base.conf.php ajaxplorer-core-3.3.5.paths/base.conf.php
---- ajaxplorer-core-3.3.5/base.conf.php	2011-10-17 16:23:52.000000000 +0200
-+++ ajaxplorer-core-3.3.5.paths/base.conf.php	2011-12-02 16:35:20.000000000 +0100
-@@ -23,6 +23,6 @@
+diff -ru ajaxplorer-core-3.3.6/base.conf.php ajaxplorer-core-3.3.6.paths/base.conf.php
+--- ajaxplorer-core-3.3.6/base.conf.php	2011-10-17 16:23:52.000000000 +0200
++++ ajaxplorer-core-3.3.6.paths/base.conf.php	2011-12-07 17:02:13.000000000 +0100
+@@ -21,8 +21,8 @@
+  * This is the main configuration file for configuring the core of the application.
+  * In a standard usage, you should not have to change any variables.
   */
- define("AJXP_PACKAGING", "zip");
+-define("AJXP_PACKAGING", "zip");
++define("AJXP_PACKAGING", "rpm");
  define("AJXP_INSTALL_PATH", realpath(dirname(__FILE__)));
 -define("AJXP_CONF_PATH", AJXP_INSTALL_PATH."/conf");
 +define("AJXP_CONF_PATH", "/etc/ajaxplorer");
@@ -11,10 +14,9 @@ diff -ru ajaxplorer-core-3.3.5/base.conf.php ajaxplorer-core-3.3.5.paths/base.co
 -?>
 \ No newline at end of file
 +?>
-Only in ajaxplorer-core-3.3.5.paths: base.conf.php~
-diff -ru ajaxplorer-core-3.3.5/conf/bootstrap_context.php ajaxplorer-core-3.3.5.paths/conf/bootstrap_context.php
---- ajaxplorer-core-3.3.5/conf/bootstrap_context.php	2011-11-24 16:30:54.000000000 +0100
-+++ ajaxplorer-core-3.3.5.paths/conf/bootstrap_context.php	2011-12-02 16:31:49.000000000 +0100
+diff -ru ajaxplorer-core-3.3.6/conf/bootstrap_context.php ajaxplorer-core-3.3.6.paths/conf/bootstrap_context.php
+--- ajaxplorer-core-3.3.6/conf/bootstrap_context.php	2011-12-05 15:31:06.000000000 +0100
++++ ajaxplorer-core-3.3.6.paths/conf/bootstrap_context.php	2011-12-07 17:04:40.000000000 +0100
 @@ -39,8 +39,8 @@
  define("AJXP_EXEC", true);
  
@@ -26,7 +28,16 @@ diff -ru ajaxplorer-core-3.3.5/conf/bootstrap_context.php ajaxplorer-core-3.3.5.
  define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
  define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
  define("AJXP_SERVER_ACCESS", "index.php");
-@@ -88,4 +88,4 @@
+@@ -61,7 +61,7 @@
+ // log files will be stored. This should be detected by log.* plugins
+ // and used if defined. See bootstrap_plugins.php default configs for
+ // example in log.serial. Do not forget the trailing slash
+-// define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
++define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
+ 
+ 
+ // DEBUG OPTIONS
+@@ -94,4 +94,4 @@
  
  
  
