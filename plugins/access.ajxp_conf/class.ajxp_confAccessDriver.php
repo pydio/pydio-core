@@ -91,7 +91,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             return;
                         }
                     }else{
-                        $parentName = $root."/";
+                        $parentName = "/".$root."/";
                         $nodes = $rootNodes[$root]["CHILDREN"];
                     }
 				}else{
@@ -102,7 +102,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::header();
                     AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/></columns>');
                     foreach ($nodes as $key => $data){
-                        print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" icon="'.$data["ICON"].'" filename="/'.$parentName.$key.'"/>';
+                        print '<tree text="'.AJXP_Utils::xmlEntities($data["LABEL"]).'" icon="'.$data["ICON"].'" filename="'.$parentName.$key.'"/>';
                     }
                     AJXP_XMLWriter::close();
 
