@@ -1120,7 +1120,7 @@ Class.create("FilesList", SelectableElements, {
 
                 var backgroundPosition = '4px 2px';
                 var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                if(metaData.get('overlay_icon')){
+                if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
                     var ovIcs = metaData.get('overlay_icon').split(',');
                     switch(ovIcs.length){
                         case 1:
