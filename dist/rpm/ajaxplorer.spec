@@ -74,8 +74,10 @@ rm -rf %{buildroot}
 #%attr(755,root,apache) %config(noreplace) %{_sysconfdir}/cron.hourly/%{name}
 %attr(755,apache,apache) %{_localstatedir}/lib/%{name}
 %dir %attr(755,apache,apache) %{_localstatedir}/cache/%{name}
-%dir %attr(755,apache,apache) %{_localstatedir}/log/%{name}
 %{_localstatedir}/cache/%{name}/.htaccess
+%dir %attr(755,apache,apache) %{_localstatedir}/log/%{name}
+%{_localstatedir}/log/%{name}/.htaccess
+%{_localstatedir}/log/%{name}/*
 
 %changelog
 * Wed Dec 07 2011 Mathieu Baudier <mbaudier@argeo.org> - 3.3.6-0_20111206_2620
