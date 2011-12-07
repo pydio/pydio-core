@@ -4,7 +4,7 @@
 webFXTreeConfig.loadingText = "Loading...";
 
 function splitOverlayIcons(ajxpNode){
-    if(!ajxpNode.getMetadata().get("overlay_icon")) return false;
+    if(!ajxpNode.getMetadata().get("overlay_icon")  || !Modernizr.multiplebgs) return false;
     var ret = [];
     $A(ajxpNode.getMetadata().get("overlay_icon").split(",")).each(function(el){
         ret.push(resolveImageSource(el, "/images/overlays/ICON_SIZE", 8));
