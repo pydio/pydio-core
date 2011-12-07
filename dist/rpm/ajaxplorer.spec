@@ -1,13 +1,13 @@
 %define ajaxplorerdir %{_datadir}/ajaxplorer
 Name: ajaxplorer
 Version:  3.3.6
-Release:  0-20111206-2620%{?dist}
+Release:  0_20111206_2620%{?dist}
 Summary: PHP rich-client browser for managing files on a web server
 
 Group: Applications/Publishing
 License: AGPL
 URL: http://www.ajaxplorer.info
-Source0: http://sourceforge.net/projects/ajaxplorer/files/ajaxplorer/%{version}/ajaxplorer-core-%{version}-20111206-2620.zip
+Source0: http://sourceforge.net/projects/ajaxplorer/files/ajaxplorer/%{version}/ajaxplorer-core-%{version}-20111206_2620.zip
 Source1: %{name}.conf
 Patch0: ajaxplorer-paths.patch
 
@@ -78,7 +78,7 @@ rm -rf %{buildroot}
 %{_localstatedir}/cache/%{name}/.htaccess
 
 %changelog
-* Wed Dec 07 2011 Mathieu Baudier <mbaudier@argeo.org> - 3.3.6-0-20111206-2620
+* Wed Dec 07 2011 Mathieu Baudier <mbaudier@argeo.org> - 3.3.6-0_20111206_2620
 - Fix issue with logs paths
 
 * Fri Dec 02 2011 Mathieu Baudier <mbaudier@argeo.org> - 3.3.5-1
