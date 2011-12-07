@@ -26,6 +26,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class ZohoEditor extends AJXP_Plugin {
 
+    public function performChecks(){
+        if(!extension_loaded("openssl")){
+            throw new Exception("Zoho plugin requires PHP 'openssl' extension, as posting the document to the Zoho server requires the Https protocol.");
+        }
+    }
+
+
 	public function switchAction($action, $httpVars, $filesVars){
 		
 		if(!isSet($this->actions[$action])) return false;
