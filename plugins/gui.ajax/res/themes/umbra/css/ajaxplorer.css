@@ -150,7 +150,7 @@ textarea{
     margin-top: 0px;
     margin-left: 0px;
     padding: 2px;
-    border: 1px solid #79f;
+    border: 1px solid #5E7C90;
 }
 
 .tooltipped
@@ -380,19 +380,19 @@ fieldSet input.dialogButton
 .editContent textarea, textarea#myCode, .editContent iframe
 {
     border:0px;
-    border-left:1px solid #79f;
+    border-left:1px solid #5E7C90;
     padding:0px;
     margin:0px;
 }
 
 #activity_monitor_warning{
 	position:absolute;
-	left:40%;
+	left:35%;
 	width:20%;
-	top:35%;
+	top:30%;
 	text-align:center;
 	font-size: 16px;
-	color: #79f;
+	color: #5E7C90;
 	font-weight:bold;
 	cursor: pointer;
 }
@@ -1151,7 +1151,7 @@ img.simple_button_arrow{
 {
     display:inline;
     font-family:Trebuchet MS, sans-serif, Helvetica, Arial;
-    color: #79f;
+    color: #5E7C90;
     font-size:15px;
     font-weight:bold;
     float:left;
@@ -2389,7 +2389,7 @@ legend a.active {
 
 #repo_create_form select
 {
-   border: 1px solid #79f;
+   border: 1px solid #5E7C90;
    height: 20px;
    width: 160px;
 }
@@ -2830,7 +2830,7 @@ div.menu a {
    font-weight:bold;
    color: #fff;
    font-family: Trebuchet MS, sans-serif;
-   background-color:#79f;
+   background-color:#5E7C90;
    filter:alpha(opacity=80);
    opacity: 0.8;
    -moz-opacity:0.8;
@@ -2847,7 +2847,7 @@ div.menu a {
 
 #docDiv div.subtitle
 {
-    color: #79f;
+    color: #5E7C90;
     font-size:12px;
     font-weight: bold;
 }
