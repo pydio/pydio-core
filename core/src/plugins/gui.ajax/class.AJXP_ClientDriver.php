@@ -256,6 +256,8 @@ class AJXP_ClientDriver extends AJXP_Plugin
 		        	"title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
 		        	"icon"			 => $this->pluginConf["CUSTOM_ICON"],
 		        	"iconWidth"		 => $this->pluginConf["CUSTOM_ICON_WIDTH"],
+		        	"iconHeight"     => $this->pluginConf["CUSTOM_ICON_HEIGHT"],
+                    "iconOnly"       => $this->pluginConf["CUSTOM_ICON_ONLY"],
 		        	"titleFontSize"	 => $this->pluginConf["CUSTOM_FONT_SIZE"]
 		        );
 				$config["usersEnabled"] = AuthService::usersEnabled();

@@ -1,5 +1,5 @@
-++ AJAXPLORER ++
-Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
+<img src="plugins/gui.ajax/AjxpLogo250.png"/>
+<div style="padding-left:10px;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
 
 Copyright 2007-2011 Charles du Jeu
 The latest code can be found at http://www.ajaxplorer.info/.
@@ -50,3 +50,4 @@ Translators : see mention in translation files
 	PhpMailer-Lite http://phpmailer.sourceforge.net (LGPL)
 	Mp3 Player : http://www.alsacreations.fr/mp3-dewplayer.html
 	SoundManager : http://www.schillmania.com/projects/soundmanager2/ (BSD)
+</div>

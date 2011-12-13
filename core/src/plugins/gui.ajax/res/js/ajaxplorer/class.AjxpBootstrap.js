@@ -217,7 +217,8 @@ Class.create("AjxpBootstrap", {
 			var title = customWording.title || "AjaXplorer";
 			var iconWidth = customWording.iconWidth || '35px';
 			var fontSize = customWording.titleFontSize || '35px';
-			html+=' <div style="margin-bottom:0px; font-size:'+fontSize+';font-weight:bold; background-image:url(\''+icon+'\');background-position:left center;background-repeat:no-repeat;padding-left:'+iconWidth+';color:#0077b3;">'+title+'</div>';
+            var titleDivSize = (customWording.iconHeight ? 'height:' + customWording.iconHeight + ';' : '');
+			html+=' <div style="margin-bottom:0px; font-size:'+fontSize+';font-weight:bold; background-image:url(\''+icon+'\');background-position:left center;background-repeat:no-repeat;padding-left:'+iconWidth+';'+titleDivSize+'color:#0077b3;">'+(customWording.iconOnly?'':title)+'</div>';
 			if(customWording.title.toLowerCase() != "ajaxplorer"){
 				html+='	<div style="padding:4px 7px;position: relative;"><div>Powered by AjaXplorer<span id="version_span"></span></div>';
 			}else{

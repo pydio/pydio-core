@@ -171,7 +171,7 @@ Class.create("ActivityMonitor", {
 		var stringTime = Math.floor(time/60)+'mn'+(time%60) + 's';
 		this.warningPane.down('span.warning_timer').update(stringTime);
 		if(this.warningPane.visible() && time%60%10 == 0){
-			new Effect.Shake(this.warningPane);
+			new Effect.Shake(this.warningPane.down('div.dialogContent'));
 		}
 	},
 	
