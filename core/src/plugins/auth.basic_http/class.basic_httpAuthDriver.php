@@ -50,7 +50,11 @@ class basic_httpAuthDriver extends serialAuthDriver  {
 			}
 		}
 			
-	}	
+
+	}
+    function getLogoutRedirect(){
+    	return AJXP_VarsFilter::filter($this->getOption("LOGOUT_URL"));
+    }
 
 }
 ?>
