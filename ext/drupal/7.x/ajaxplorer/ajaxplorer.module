@@ -12,8 +12,11 @@ function ajaxplorer_help($path, $arg){
   return $output;
 }
 
-function ajaxplorer_perm(){
-	return array("administrate ajaxplorer repositories");
+function ajaxplorer_permission(){
+	return array("administrate ajaxplorer repositories" => array(
+        "title" => t("Administer AjaXplorer repositories"),
+        "description" => t("Administer AjaXplorer repositories")
+	));
 }
 
 function ajaxplorer_user_login(&$edit, $account){
