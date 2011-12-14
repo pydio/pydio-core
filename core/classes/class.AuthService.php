@@ -164,7 +164,13 @@ class AuthService
             $login["count"]++;
         } else $login = array("count"=>1, "time"=>time());
         $loginArray[$serverAddress] = $login;
-        if ($login["count"] > 3) return FALSE;
+        if ($login["count"] > 3) {
+            if(AJXP_SERVER_DEBUG){
+                AJXP_Logger::debug("DEBUG : IGNORING BRUTE FORCE ATTEMPTS!");
+                return true;
+            }
+            return FALSE;
+        }
         return TRUE;
     }
     /**
