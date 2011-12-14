@@ -63,7 +63,7 @@ class ConfService
 		if(isSet($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) == "on"){
 			$this->configs["USE_HTTPS"] = true;
 		}
-		if($this->configs["USE_HTTPS"]){
+		if(isSet($this->configs["USE_HTTPS"])){
 			AJXP_Utils::safeIniSet("session.cookie_secure", true);
 		}
 		$this->configs["JS_DEBUG"] = AJXP_CLIENT_DEBUG;
