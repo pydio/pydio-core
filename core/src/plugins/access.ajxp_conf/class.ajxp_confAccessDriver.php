@@ -495,7 +495,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			case  "get_drivers_definition":
 				
 				AJXP_XMLWriter::header("drivers");
-				print(AJXP_XMLWriter::replaceAjxpXmlKeywords(ConfService::availableDriversToXML("param")));
+				print(AJXP_XMLWriter::replaceAjxpXmlKeywords(ConfService::availableDriversToXML("param", "", true)));
 				AJXP_XMLWriter::close("drivers");
 				
 				

@@ -388,8 +388,13 @@ class ConfService
 		$drvList = $confDriver->listRepositories();
 		if(is_array($drvList)){
 			foreach ($drvList as $repoId=>$repoObject){
-				$repoObject->setId($repoId);
-				$drvList[$repoId] = $repoObject;
+                $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $repoObject->getAccessType());
+                if(!is_object($driver) || !$driver->isEnabled()){
+                    unset($drvList[$repoId]);
+                }else{
+                    $repoObject->setId($repoId);
+                	$drvList[$repoId] = $repoObject;
+                }
 			}
 			$objList = array_merge($objList, $drvList);
 		}
@@ -924,8 +929,8 @@ class ConfService
      * @param string $filterByDriverName
      * @return string
      */
-	public static function availableDriversToXML($filterByTagName = "", $filterByDriverName=""){
-		$nodeList = AJXP_PluginsService::searchAllManifests("//ajxpdriver", "node");
+	public static function availableDriversToXML($filterByTagName = "", $filterByDriverName="", $limitToEnabledPlugins = false){
+		$nodeList = AJXP_PluginsService::searchAllManifests("//ajxpdriver", "node", false, $limitToEnabledPlugins);
 		$xmlBuffer = "";
 		foreach($nodeList as $node){
 			$dName = $node->getAttribute("name");
