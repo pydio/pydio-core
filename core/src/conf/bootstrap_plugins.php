@@ -115,6 +115,22 @@ $PLUGINS = array(
 			"TRANSMIT_CLEAR_PASS"   => true // Don't touch this. It's unsafe (and useless here) to transmit clear password.
 		)
 	),
+    // Same for Drupal 7.X
+    "AUTH_DRIVER"  => array(
+        "NAME" => "remote",
+        "OPTIONS" => array(
+            "SLAVE_MODE" => true,
+            "USERS_FILEPATH" => "AJXP_INSTALL_PATH/plugins/auth.serial/users.ser",
+            "LOGIN_URL" => "/drupal/",
+            "LOGOUT_URL" => "/drupal/?q=user/logout",
+            "MASTER_AUTH_FUNCTION" => "drupal_remote_auth",
+            "MASTER_HOST" => "192.168.0.10",
+            "MASTER_URI" => "/drupal/",
+            "MASTER_AUTH_FORM_ID" => "user-login-form",
+            "SECRET" => "my_own_private_Drupal_key",
+            "TRANSMIT_CLEAR_PASS" => true
+            )
+    ),
     */
     /*
      * MULTI AUTH DRIVER SAMPLE. HERE, WOULD ALLOW TO LOG FROM THE
