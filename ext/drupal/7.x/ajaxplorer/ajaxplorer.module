@@ -13,10 +13,11 @@ function ajaxplorer_help($path, $arg){
 }
 
 function ajaxplorer_permission(){
-	return array("administrate ajaxplorer repositories" => array(
-        "title" => t("Administer AjaXplorer repositories"),
-        "description" => t("Administer AjaXplorer repositories")
-	));
+  return array(
+    'administer ajaxplorer' => array(
+      'title' => t('Administer AjaXplorer repositories'),
+    ),
+  );
 }
 
 function ajaxplorer_user_login(&$edit, $account){
@@ -35,7 +36,8 @@ function ajaxplorer_user_update(&$edit, $account){
     ajxp_user_func("update", $edit, $account);
 }
 function ajaxplorer_user_delete($account){
-    ajxp_user_func("delete", null, $account);
+    $empty = "";
+    ajxp_user_func("delete", $empty, $account);
 }
 
 
@@ -59,10 +61,15 @@ function ajxp_user_func($op, &$edit, $account, $category = null){
 			break;
 			
 		case "insert":
-		case "update":
-			$result = $drupHandler->onAfterStoreUser($edit['name'], $edit['pass'], user_access("administrate ajaxplorer repositories", $account), ($op == "insert"));
+		    $admin = in_array('3', array_values($account->roles)) || in_array('administrator', array_values($account->roles));
+			$result = $drupHandler->onAfterStoreUser($edit['name'], $edit['pass'], $admin, true);
 			break;
-	
+
+		case "update":
+		    $admin = in_array('3', array_values($account->roles)) || in_array('administrator', array_values($account->roles));
+			$result = $drupHandler->onAfterStoreUser($account->name, $account->pass, $admin, false);
+			break;
+
 		case "delete":
 			$drupHandler->onAfterDeleteUser($account->name);
 			break;
