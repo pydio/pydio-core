@@ -530,7 +530,7 @@ class AjaXplorerUpgrader {
             }else if($localConfig["type"] == "variable" && isSet( $$localConfigName )){
                 $localConfig["value"] = $$localConfigName;
             }
-            if(!isSet($localConfig["value"])) continue;
+            if(!isSet($localConfig["value"]) || empty($localConfig["value"])) continue;
             $l = "Should set ".$localConfig["target"]." to value ".$localConfig["value"]."\n";
             if($dryRun){
                 $value = AJXP_Utils::xmlEntities($localConfig["value"]);
