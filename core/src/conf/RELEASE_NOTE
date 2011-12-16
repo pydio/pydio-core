@@ -1,41 +1,61 @@
-AjaXplorer Core 3.3.5
+AjaXplorer 4.0 Release Note
 
-This release is an important security fix for a problem introduced in the 3.3.X branch. If you do not wish to upgrade,
-please at least remove the current version of the editor.zoho plugin.
+License : Affero GPL
+Copyright : Charles du Jeu 2011
+Version number : 4.0.0
+Install instructions : see the 4-steps installation guide (upgrade from 3.2.4 see below).
+Demo : http://ajaxplorer.info/demo
 
-[Main Features]
-Security problem fixed in editor.zoho plugin
-XML Registry W3C Schema (XSD) for simpler manifest.xml edition
-Internationalization of all the parameters defined in the XML files.
-Better startup screen / include login errors in login screen instead of js alert
-Performances hunting : lazy loading of many inclusions, of messages array, lightweight version of the registry (extended vs. light) to avoid
-parsing user XML when not necessary (ie most of the time...).
-New Http client for supporting HTTPS / Should replace HttpClient calls everywhere
-Full rewrite of the Zoho plugin
+This is a major version release. Check ajaxplorer.info for complete description.
+Below are described the changes introduced since v3.3.5
 
-[Uploader]
-Better UX / Change default behaviour in plugin options
-Use parameters "expose" attribute instead of bootstrapParameters when possible.
-Missing decoding at upload!
+[GUI]
 
-[Misc]
-Do not use __DIR__, introduces a php5.3 dependancy
-Fix line breaks in a cleaner way at various points (php or xml serialization)
-Rawurlencode() login & password when sending through URL, to allow usage of "/" and other "@". Then decode in AJXP_Safe. Should be rechecked for
-other plugins.
-Fix the randomly not working submenu
-Better error reporting for token expiration / Bookmarklet fixes
-meta.user : Forgotten refactoring for stars rates
-meta.exif : Silently ignore exif_read_data errors
-editor.pixlr : Do not use host as check referer, as it's not anymore always pixlr.com. Pass a token via the save file URL, and verify it's the
-same.
-Fix email management
-fix shadower error / css tweak
-Optional parameter "extract" for update_i18n
-Channel parameter for upgrade / display release note content
+Fix scrolling overlay in FilesList
+DisableNavigation when search input text is focused
+Correctly resolve icon source in Search Engine
+Remove google API alert, as it’s now commercial
+Avoid full gui blocking if referencing a wrong message ID for action text
+Clean destroyElement() if method exists
+Fire events before/after rows initialization and rows clearing
+Various hacks : go through modifiers even is column is hidden, passing a fourth argument in that case. ChooseOther now implements a full mechanism to remember mimes to editors for the user. Clean destroy of SliderInput. SoundManager : display currently playing with specific class.
+Fix InfoPanel currentPreviewElement destruction
+Scroll overflowX in gridMode
+Fix CodeEditor resize
+Fix various issues with drag’n'drop, particularly polluting IE
+Fix Share Users autocompleter not appearing in IE (insert the box in the body for good positionning)
+Detect Modernizr.multiplebgs and disable overlay icons if not present, otherwise it makes an empty icon.
 
-[Default configs]
-Moving a full install : auto-rewrite cache if "requires" are out of sync (still to test live)
-Do not enable Probe Real Size by default
-Compute CLIENT_TIMEOUT_TIME default value
-Add a note to explain how to force the flash uploader usage
+[CORE]
+
+New method getUniqueActivePluginForType() and application in the metastore users
+Silently test library searching, to avoid open_basedir errors, will return false anyway
+Silently catch meta sources error
+Implementation of editor.soundmanager
+Filter the registry actions before outputting
+ALLOW_GUEST_BROWSING broken
+AJXP_FORCE_LOGPATH optional constant for easing RPM packaging
+Fix : do not load extensions contribution of inactive plugins.
+Various fixes for widget case (when SERVER_PREFIX_URI is set)
+Create a separate template for the tests results…
+Skip brute force login with a log when server is in Debug mode
+AUTH_DRIVER drupal sample included
+Ignore Disabled access plugins, either in the new driver list, or in the current repository list
+silently set_time_limit
+
+[DOCUMENTATION]
+
+Display plugin doc if presentAdd a note to explain how to force the flash uploader usage
+Re-organize Settings data
+Massive PhpDocs comments
+Massive Plugin_doc files & screenshots
+Remove old README from webdav plugin, now the role of plugin_doc.html
+
+[PLUGINS]
+
+Editor.SoundManager : add an active condition to limit to browsers that support canvas, otherwise it’s buggy.
+Gui.ios : Fix # in IOS URL parsing
+access.ajxp_conf : Fix filenames again
+auth.basic_http : Daniel Berteaud patch for configuring logout URL for basic http.
+Index.lucene : Auto-remove false indexes at search time, does not seem to impact the timing
+access.ftp : Fix « permission fixing » losing the folder nature, and remove the fix from ftp wrapper.
