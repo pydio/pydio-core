@@ -21,7 +21,9 @@
 			If it&#39;s not already done, with the standard ajaxplorer authentication mechanism, be sure that at least an &quot;admin&quot; user is created.</p>
 		<p>
 			<strong>2.2 Guest Browsing</strong><br />
-			If you intend to allow guest browsing, in <em>conf.php</em>, set &quot;ALLOW_GUEST_BROWSING&quot; to 1 and if you are logged, log out. This should create the &quot;guest&quot; user. As admin, log back to the interface and create a &quot;Guest&quot; Repository. Go to the users section and grant access (read only may be better) to this repository to the &quot;guest&quot; user. Now, when you log out, you should have access to this repository.</p>
+			If you intend to allow guest browsing, set the &quot;Allow Guest Browsing&quot; option to
+true in the Ajaxplorer Settings &gt; Core Options &gt; Common Auth
+Options, and if you are logged, log out. This should create the &quot;guest&quot; user. As admin, log back to the interface and create a &quot;Guest&quot; Repository. Go to the users section and grant access (read only may be better) to this repository to the &quot;guest&quot; user. Now, when you log out, you should have access to this repository.</p>
 		<p>
 			<strong>2.3 Repositories</strong><br />
 			Now create one or many repositories that you will want your joomla logged users to access. You can use the AJXP_USER keyword inside the repository PATH if you want to create automatically &quot;personnal&quot; folders for each users. Considering the acces rights, the trick here would be to set a DEFAULT_RIGHT value to &quot;rw&quot;, so that you don&#39;t have to manually edit the users rights each time you add them.</p>
@@ -29,18 +31,22 @@
 			2.4 Log out&nbsp;<span class="Apple-style-span" style="font-weight: normal; ">of AjaXplorer</span></h4>
 		<p>
 			<strong>2.5 Auth.remote configuration</strong><br />
-			<span class="Apple-style-span" style="font-weight: normal; ">Now go back to your conf.php and set the Authentification driver to be the <strong>auth.remote</strong>. There is a commented sample in the conf.php aimed at wordpress user, you should use the following values :</span></p>
+			<span class="Apple-style-span" style="font-weight: normal; ">Now go back to your conf/bootstrap_plugins.php and set the Authentification driver to be the <strong>auth.remote</strong>. There is a commented sample in the config file aimed at wordpress user, you should use the following values :</span></p>
 		<pre>
-	$AUTH_DRIVER = array(&nbsp;
+	"AUTH_DRIVER" => array(&nbsp;
 		&quot;NAME&quot; =&gt; &quot;remote&quot;,
 		&quot;OPTIONS&quot; =&gt; array(
 		&quot;SLAVE_MODE&quot; =&gt; true,
-		&quot;USERS_FILEPATH&quot; =&gt; &quot;AJXP_INSTALL_PATH/server/users/users.ser&quot;,
+		&quot;USERS_FILEPATH&quot; =&gt; &quot;AJXP_DATA_PATH/plugins/auth.serial/users.ser&quot;,
 		&quot;LOGIN_URL&quot; =&gt; &quot;/joomla/&quot;,
 		&quot;LOGOUT_URL&quot; =&gt; &quot;/joomla/&quot;,
 		&quot;SECRET&quot; =&gt; &quot;my_own_private_joomla_key&quot;,
-		&quot;TRANSMIT_CLEAR_PASS&quot; =&gt; false)
-	);</pre>
+	        &quot;MASTER_AUTH_FUNCTION&quot; =&gt; &quot;joomla_remote_auth&quot;,
+	        &quot;MASTER_HOST&quot; =&gt; &quot;localhost&quot;, // the joomla host
+	        &quot;MASTER_URI&quot; =&gt; &quot;/joomla/&quot;,
+	        &quot;MASTER_AUTH_FORM_ID&quot; =&gt; &quot;login-form&quot;, // or maybe form-login, check your login page
+		&quot;TRANSMIT_CLEAR_PASS&quot; =&gt; true)
+	),</pre>
 		<p>
 			What you should edit here are only LOGIN_URL, LOGOUT_URL and SECRET. LOGIN&amp;LOGOUT should point to your joomla installation URL on the server (URL, not the folder path from the server root). For example, here we consider joomla to be found at http://www.mydomain.com/joomla/. The SECRET key is what will assure AjaXplorer that the authentification operations called programmatically are indeed called by a trustee. You may put whatever you want, it will be a configuration of the Joomla Ajaxplorer plugin.&nbsp; Warning, if you want to use a "$" sign in your key, you have to put a \ before.</p>
 		<p>
@@ -58,7 +64,7 @@
 			<li>
 				<strong>AjaXplorer Install Path</strong> : here you have to enter the full path to the AjaXplorer installation. &quot;Full path&quot; in the sense of the server filesystem. On Windows, it could be C:/Programs/ApacheData/html/ajaxplorer, or Linux more probably /var/www/html/AjaXplorer. In any cases, use &quot;slashes&quot; and not backslashes, and take care that names are case sensitive.</li>
 			<li>
-				<strong>Secret Key</strong> : here you&#39;ll have to enter the &quot;SECRET&quot; you entered in the AjaXplorer conf.php configuration file. If it&#39;s not the same, it will (silently) not work.</li>
+				<strong>Secret Key</strong> : here you&#39;ll have to enter the &quot;SECRET&quot; you entered in the AjaXplorer boostrap_plugins.php configuration file. If it&#39;s not the same, it will (silently) not work.</li>
 			<li>
 				<strong>Auto Create Users</strong> : This option is useful specially if you are installing this &quot;bridge&quot; when already managing many users in a Joomla installation. By default (&quot;no&quot;), Users will be created in AjaXplorer only by a joomla administrator action of creating a Joomla users. Existing users will not be recognized by AjaXplorer. If you set to &quot;Auto create&quot;, existing users will be automatically created when a user logs in to Joomla.</li>
 		</ul>
