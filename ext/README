@@ -1,0 +1,32 @@
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+
+2011-12-16 : This is the Ajaxplorer v4 Compatible CMS Bridges Package.
+
+The main changes are the How-To updates to be compatible with v4, and the support of Drupal 7.X
+Please refer to ajaxplorer.info for more info.
+
+Package content : 
+
+> Modules for Drupal 6.X & 7.X
+> Wordpress Extension
+> Joomla Plugin for 1.5 & 1.6 , working ok on 1.7
+> Cmsms NOT RETESTED recently
+> "No_Cms" : login page sample if you want a simple external login page.
