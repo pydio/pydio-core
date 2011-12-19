@@ -1,0 +1,17 @@
+[ajaxplorer]
+name=AjaXplorer for EL6 - $basearch
+baseurl=http://dl.ajaxplorer.info/repos/el6/ajaxplorer
+enabled=0
+gpgcheck=0
+
+[ajaxplorer-testing]
+name=AjaXplorer for EL6 (Testing) - $basearch
+baseurl=http://dl.ajaxplorer.info/repos/el6/ajaxplorer-testing
+enabled=1
+gpgcheck=0
+
+[ajaxplorer-sources]
+name=AjaXplorer for EL6 (SRPMs) - $basearch
+baseurl=http://dl.ajaxplorer.info/repos/el6/ajaxplorer-sources
+enabled=0
+gpgcheck=0
