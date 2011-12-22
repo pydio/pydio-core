@@ -38,6 +38,7 @@ class sqlLogDriver extends AbstractLogDriver {
 	 */
 	function init($options){
 		parent::init($options);
+        require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
 		$this->sqlDriver = $options["SQL_DRIVER"];
 		try {
 			dibi::connect($this->sqlDriver);		
