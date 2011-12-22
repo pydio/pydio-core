@@ -166,7 +166,7 @@ Class.create("Action", {
 				var onCompleteFunc = new Function("oForm", completeCode);
 			}
 			var onCancelNode = XPathSelectSingleNode(node, "dialogOnCancel");
-			if(onCancelNode && onCancelNode.firstChild) var onCancelFunc = new Function("oForm", onCompleteNode.firstChild.nodeValue);
+			if(onCancelNode && onCancelNode.firstChild) var onCancelFunc = new Function("oForm", onCancelNode.firstChild.nodeValue);
 			
 			this.options.callback = function(){
 				modal.showDialogForm('Dialog', dialogFormId, onOpenFunc, onCompleteFunc, onCancelFunc, okButtonOnly, skipButtons);
