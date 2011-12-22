@@ -406,9 +406,22 @@ class AuthService
      */
 	static function userExists($userId)
 	{
+        if($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
+            return false;
+        }
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->userExists($userId);
 	}
+
+    /**
+     * Make sure a user id is not reserved for low-level tasks (currently "guest" and "shared").
+     * @static
+     * @param String $username
+     * @return bool
+     */
+    static function isReservedUserId($username){
+        return in_array($username, array("guest", "shared"));
+    }
 
 	/**
      * Simple password encoding, should be deported in a more complex/configurable function
@@ -430,7 +443,7 @@ class AuthService
      */
 	static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
 	{
-		if($userId == "guest") return true;		
+		if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
 		$authDriver = ConfService::getAuthDriverImpl();
 		if($cookieString){		
 			$confDriver = ConfService::getConfStorageImpl();
@@ -473,6 +486,9 @@ class AuthService
      */
 	static function createUser($userId, $userPass, $isAdmin=false)
 	{
+        if(!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest"){
+            throw new Exception("Reserved user id");
+        }
 		if(strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest"){
 			$messages = ConfService::getMessages();
 			throw new Exception($messages[378]);

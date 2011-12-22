@@ -274,9 +274,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::close();
 					return;						
 				}
-				$forbidden = array("guest", "share");
 				$new_user_login = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($httpVars["new_user_login"]), AJXP_SANITIZE_EMAILCHARS);
-				if(AuthService::userExists($new_user_login) || in_array($new_user_login, $forbidden))
+				if(AuthService::userExists($new_user_login) || AuthService::isReservedUserId($new_user_login))
 				{
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.43"]);
@@ -849,9 +848,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::reloadDataNode();
 					AJXP_XMLWriter::close();								
 				}else{
-					$forbidden = array("guest", "share");
-					if(!isset($httpVars["user_id"]) || $httpVars["user_id"]=="" 
-						|| in_array($httpVars["user_id"], $forbidden)
+					if(!isset($httpVars["user_id"]) || $httpVars["user_id"]==""
+						|| AuthService::isReservedUserId($httpVars["user_id"])
 						|| $loggedUser->getId() == $httpVars["user_id"])
 					{
 						AJXP_XMLWriter::header();
