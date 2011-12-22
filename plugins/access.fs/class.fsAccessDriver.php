@@ -900,6 +900,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		if($byteLength == -1){
             if($data){
                 $size = strlen($filePathOrData);
+            }else if ($realfileSystem){
+                $size = sprintf("%u", filesize($filePathOrData));
             }else{
                 $size = $this->filesystemFileSize($filePathOrData);
             }
