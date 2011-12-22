@@ -15,6 +15,7 @@
 		<param name="DB_USER" type="string" label="CONF_MESSAGE[User]" description="CONF_MESSAGE[User name (must have privileges to access this db)]" mandatory="true"/>
 		<param name="DB_PASS" type="string" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User password]" mandatory="false"/>
 		<param name="DB_PTRN" type="string" label="CONF_MESSAGE[Pattern]" description="CONF_MESSAGE[If not empty, only tables beginning with such a prefix will be displayed.]" mandatory="false"/>
+        <param group="CONF_MESSAGE[Repository Commons]" name="DEFAULT_RIGHTS" type="select" choices="r|Read Only,rw|Read and Write,w|Write Only (upload)" label="CONF_MESSAGE[Default Rights]" description="MIXIN_MESSAGE[This right pattern (empty, r, or rw) will be applied at user creation for this repository.]" default=""/>
 	</server_settings>
 	<registry_contributions>
 		<external_file filename="plugins/access.mysql/mysqlActions.xml" include="actions/*"/>

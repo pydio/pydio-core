@@ -31,5 +31,6 @@ $mess=array(
 "User password" => "Mot de passe utilisateur",
 "Pattern" => "Préfixe",
 "If not empty, only tables beginning with such a prefix will be displayed." => "Si non-vide, seules les tables commencant par ce préfixe seront affichées.",
+"Repository Commons" => "Options du dépôt",
 );
 ?>
