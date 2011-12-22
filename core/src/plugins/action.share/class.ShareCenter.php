@@ -53,7 +53,7 @@ class ShareCenter extends AJXP_Plugin{
 			}else{
 				if(AuthService::usersEnabled()){
 					$loggedUser = AuthService::getLoggedUser();
-					if($loggedUser != null && $loggedUser->getId() == "guest" || $loggedUser == "shared"){
+					if($loggedUser != null && AuthService::isReservedUserId($loggedUser->getId())){
 						$disableSharing = true;
 					}
 				}else{
@@ -555,6 +555,20 @@ class ShareCenter extends AJXP_Plugin{
 			}
 		}
 		$confDriver = ConfService::getConfStorageImpl();
+        foreach($users as $userName){
+            if(AuthService::userExists($userName)){
+                // check that it's a child user
+                $userObject = $confDriver->createUserObject($userName);
+                if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
+                    return 102;
+                }
+            }else{
+                if(AuthService::isReservedUserId($userName)){
+                    return 102;
+                }
+                if(!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") return 100;
+            }
+        }
 
 		// CREATE SHARED OPTIONS
         $options = $accessDriver->makeSharedRepositoryOptions($httpVars, $repository);
@@ -605,11 +619,7 @@ class ShareCenter extends AJXP_Plugin{
             if(AuthService::userExists($userName)){
                 // check that it's a child user
                 $userObject = $confDriver->createUserObject($userName);
-                if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
-                    return 102;
-                }
             }else{
-                if(!isSet($httpVars["shared_pass"]) || $httpVars["shared_pass"] == "") return 100;
                 AuthService::createUser($userName, md5($httpVars["shared_pass"]));
                 $userObject = $confDriver->createUserObject($userName);
                 $userObject->clearRights();
