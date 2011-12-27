@@ -40,26 +40,6 @@
 					actionBarGroup="put" inZip="false">
 				</context></gui>
 			<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""></rightsContext>
-			<subMenu>
-				<dynamicBuilder><![CDATA[
-					var context = window.builderContext;
-					context.builderMenuItems = $A([]);
-                    context.builderMenuItems.push({
-                        name:MessageHash['httpdownloader.13'],
-                        alt:MessageHash['httpdownloader.13'],
-                        isDefault : true,
-                        image:resolveImageSource('httpdownloader_images/ICON_SIZE/computer_upload.png', '',  22),
-                        callback:function(e){this.apply();}.bind(context)
-                    } );
-                    context.builderMenuItems.push({
-                        name:MessageHash['httpdownloader.14'],
-                        alt:MessageHash['httpdownloader.2'],
-                        isDefault : false,
-                        image:resolveImageSource('httpdownloader_images/ICON_SIZE/external_download.png', '', 22),
-                        callback:function(e){ajaxplorer.actionBar.fireAction('external_download');}.bind(context)
-                    } );
-				]]></dynamicBuilder>
-			</subMenu>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var uploaders = ajaxplorer.getActiveExtensionByType("uploader");
