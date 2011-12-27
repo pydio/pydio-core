@@ -158,7 +158,7 @@ function addVolumeButton(){
     var volumeButton = simpleButton(
         'sm_volume_button',
         'inlineBarButtonLeft',
-        145, 145,
+        'sm_editor.1', 'sm_editor.1',
         'bookmark.png',
         16,
         'inline_hover',
