@@ -64,24 +64,33 @@ Class.create("BackgroundManager", {
 		}
 		if(this.working) return;
 		var actionDef = this.queue[0];
-		var connexion = new Connexion();
-		connexion.setParameters(actionDef.get('parameters'));
-		connexion.addParameter('get_action', actionDef.get('name'));		
-		connexion.onComplete = function(transport){
-			var xmlResponse = transport.responseXML;
-			if(xmlResponse == null || xmlResponse.documentElement == null) {
-				//alert(transport.responseText);
-				this.working = false;
-				this.next();
-				return;
-			}
-			this.parseAnswer(transport.responseXML);
-			this.working = false;
-		}.bind(this);
-		connexion.sendAsync();
-        this.updatePanelMessage(actionDef.get('messageId'));
-		this.queue.shift();
-		this.working = true;
+        if(actionDef.get('name') == "javascript_instruction" && actionDef.get('parameters').get('callback')){
+            var cb = actionDef.get('parameters').get('callback');
+            this.updatePanelMessage(actionDef.get('messageId'));
+    		this.queue.shift();
+            cb();
+            this.working = false;
+            this.next();
+        }else{
+            var connexion = new Connexion();
+            connexion.setParameters(actionDef.get('parameters'));
+            connexion.addParameter('get_action', actionDef.get('name'));
+            connexion.onComplete = function(transport){
+                var xmlResponse = transport.responseXML;
+                if(xmlResponse == null || xmlResponse.documentElement == null) {
+                    //alert(transport.responseText);
+                    this.working = false;
+                    this.next();
+                    return;
+                }
+                this.parseAnswer(transport.responseXML);
+                this.working = false;
+            }.bind(this);
+            connexion.sendAsync();
+            this.updatePanelMessage(actionDef.get('messageId'));
+    		this.queue.shift();
+    		this.working = true;
+        }
 	},
 
     updatePanelMessage : function(message){
@@ -117,7 +126,10 @@ Class.create("BackgroundManager", {
 					var paramChild = childs[i].childNodes[j];
 					if(paramChild.tagName == 'param'){
 						parameters.set(paramChild.getAttribute("name"), paramChild.getAttribute("value"));
-					}
+					}else if(paramChild.tagName == 'clientCallback'){
+                        var callbackCode = paramChild.firstChild.nodeValue;
+                        var callback = new Function(callbackCode);
+                    }
 				}
 				if(name == "reload_node"){
                     if(delay){
@@ -130,6 +142,9 @@ Class.create("BackgroundManager", {
 					 var dm = ajaxplorer.fireContextRefresh();
                 }else if(name == "info_message"){
                     this.updatePanelMessage(messageId);
+                }else if(name == "javascript_instruction" && callback){
+                    parameters.set("callback", callback);
+                    this.queueAction('javascript_instruction', parameters, messageId);
 				}else{
 					this.queueAction(name, parameters, messageId);
 				}
