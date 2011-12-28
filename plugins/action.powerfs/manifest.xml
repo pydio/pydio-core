@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin enabled="false" label="CONF_MESSAGE[Power FS]" description="CONF_MESSAGE[This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="PowerFSController" filename="plugins/action.powerfs/class.PowerFSController.php"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="powerfs" path="plugins/action.powerfs/i18n"/>
+        </resources>
+    </client_settings>
+    <registry_contributions>
+        <actions>
+            <!-- Override access.fs compression -->
+            <action name="compress">
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="monitor_compression">
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <!-- Override download client callback -->
+            <action name="download">
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var userSelection = ajaxplorer.getUserSelection();
+                        if((userSelection.isUnique() && !userSelection.hasDir()) || (zipEnabled && multipleFilesDownloadEnabled))
+                        {
+                            if(gaTrackEvent){
+                                fileNames = userSelection.getFileNames();
+                                for(var i=0; i<fileNames.length;i++){
+                                    gaTrackEvent("Data", "Download", fileNames[i]);
+                                }
+                            }
+                            var agent = navigator.userAgent;
+                            if(agent && (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1)){
+                                var downloadUrl = ajxpServerAccessPath+'&get_action=download';
+                                downloadUrl = userSelection.updateFormOrUrl(null,downloadUrl);
+                                document.location.href=downloadUrl;
+                            }else{
+                                if( !userSelection.isUnique() || userSelection.hasDir() ){
+
+                                    zipName = getBaseName(userSelection.getContextNode().getPath());
+                                    if(zipName == "") zipName = "Archive";
+                                    var index=1;
+                                    var buff = zipName;
+                                    while(userSelection.fileNameExists(zipName + ".zip")){
+                                        zipName = buff + "-" + index; index ++ ;
+                                    }
+
+                                    var conn = new Connexion();
+                                    conn.addParameter("get_action", "compress");
+                                    conn.addParameter("archive_name", zipName+".zip");
+                                    conn.addParameter("on_end", "download");
+                                    conn.addParameter("dir", userSelection.getContextNode().getPath());
+                                    var selected = userSelection.getFileNames();
+                                    for(var i=0;i<selected.length;i++){
+                                        conn.addParameter("file_"+i, selected[i]);
+                                    }
+                                    conn.onComplete = function(transport){
+                                        this.parseXmlMessage(transport.responseXML);
+                                    }.bind(ajaxplorer.actionBar) ;
+                                    conn.sendAsync();
+
+                                }else{
+                                    $('download_form').action = window.ajxpServerAccessPath;
+                                    $('download_form').secure_token.value = Connexion.SECURE_TOKEN;
+                                    $('download_form').select("input").each(function(input){
+                                        if(input.name!='get_action' && input.name!='secure_token') input.remove();
+                                    });
+                                    userSelection.updateFormOrUrl($('download_form'));
+                                    $('download_form').submit();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var loadFunc = function(oForm){
+                                var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
+                                var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download&file=');
+                                downloader.triggerEnd = function(){hideLightBox()};
+                                fileNames = userSelection.getFileNames();
+                                for(var i=0; i<fileNames.length;i++)
+                                {
+                                    downloader.addListRow(fileNames[i]);
+                                }
+                            };
+                            var closeFunc = function(){
+                                hideLightBox();
+                                return false;
+                            };
+                            modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
+                        }
+                        ]]>
+                    </clientCallback>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="access.fs"/>
+    </dependencies>
+</ajxp_plugin>
