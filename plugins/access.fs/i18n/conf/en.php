@@ -41,6 +41,8 @@ $mess=array(
 "Comma-separated list of specific files to hide" => "Comma-separated list of specific files to hide",
 "Real Size Probing" => "Real Size Probing",
 "Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)" => "Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)",
+"X-SendFile Active" => "X-SendFile Active",
+"Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)" => "Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)",
 "Default Metasources" => "Default Metasources",
 "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver",
 );
