@@ -360,6 +360,14 @@ class AJXP_XMLWriter
 		$data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
 		return $data;		
 	}
+
+    static function triggerBgJSAction($jsCode, $messageId, $print=true, $delay = 0){
+   		$data = AJXP_XMLWriter::write("<trigger_bg_action name=\"javascript_instruction\" messageId=\"$messageId\" delay=\"$delay\">", $print);
+        $data .= AJXP_XMLWriter::write("<clientCallback><![CDATA[".$jsCode."]]></clientCallback>", $print);
+   		$data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
+   		return $data;
+   	}
+
 	/**
      * List all bookmmarks as XML
      * @static
