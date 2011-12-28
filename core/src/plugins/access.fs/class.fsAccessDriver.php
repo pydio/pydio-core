@@ -57,7 +57,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		$path = $this->repository->getOption("PATH");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
 		if($create == true){
-			if(!is_dir($path)) @mkdir($path);
+			if(!is_dir($path)) @mkdir($path, 0755, true);
 			if(!is_dir($path)){
 				throw new AJXP_Exception("Cannot create root path for repository (".$this->repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
 			}
@@ -1035,6 +1035,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		if($data){
 			print($filePathOrData);
 		}else{
+            if($this->pluginConf["USE_XSENDFILE"] && $this->wrapperClassName == "fsAccessWrapper"){
+                if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
+                $filePathOrData = str_replace("\\", "/", $filePathOrData);
+                header("X-Sendfile: ".$filePathOrData);
+                return;
+            }
 			$stream = fopen("php://output", "a");
 			if($realfileSystem){
 				AJXP_Logger::debug("realFS!", array("file"=>$filePathOrData));

@@ -16,6 +16,7 @@
         <global_param name="HIDE_FOLDERS" type="textarea" label="CONF_MESSAGE[Hide folders]" description="CONF_MESSAGE[Comma-separated list of specific folders to hide]"/>
         <global_param name="HIDE_FILENAMES" type="textarea" label="CONF_MESSAGE[Hide files]" description="CONF_MESSAGE[Comma-separated list of specific files to hide]"/>
         <global_param name="PROBE_REAL_SIZE" type="boolean" label="CONF_MESSAGE[Real Size Probing]" description="CONF_MESSAGE[Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)]" default="false"/>
+        <global_param name="USE_XSENDFILE" type="boolean" label="CONF_MESSAGE[X-SendFile Active]" description="CONF_MESSAGE[Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)]" default="false"/>
         <global_param name="DEFAULT_METASOURCES" type="string" label="CONF_MESSAGE[Default Metasources]" description="CONF_MESSAGE[Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false" default="metastore.serial,index.lucene"/>
 	</server_settings>
 	<class_definition filename="plugins/access.fs/class.fsAccessDriver.php" classname="fsAccessDriver"/>
