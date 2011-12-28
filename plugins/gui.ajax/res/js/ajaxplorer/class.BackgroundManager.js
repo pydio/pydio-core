@@ -94,11 +94,9 @@ Class.create("BackgroundManager", {
 	},
 
     updatePanelMessage : function(message){
-        var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" height="16" width="16" align="absmiddle">';
+        var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" width="16" align="absmiddle">';
         this.panel.update(imgString+' '+message);
         this.panel.show();
-        new Effect.Corner(this.panel, "round 8px bl");
-        new Effect.Corner(this.panel, "round 8px tl");
     },
 
 	/**
