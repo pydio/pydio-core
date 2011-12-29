@@ -50,11 +50,16 @@ class SerialMetaStore extends AJXP_Plugin {
     }
 
 
+    protected function getUserId(){
+        if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();
+        return "shared";
+    }
+
     public function setMetadata($ajxpNode, $nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY){
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?AuthService::getLoggedUser()->getId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
         );
         if(!isSet(self::$metaCache[$nameSpace])){
             self::$metaCache[$nameSpace] = array();
@@ -63,7 +68,7 @@ class SerialMetaStore extends AJXP_Plugin {
         $this->saveMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?AuthService::getLoggedUser()->getId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
         );
     }
 
@@ -71,14 +76,14 @@ class SerialMetaStore extends AJXP_Plugin {
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?AuthService::getLoggedUser()->getId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
         );
         if(!isSet(self::$metaCache[$nameSpace])) return;
         unset(self::$metaCache[$nameSpace]);
         $this->saveMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?AuthService::getLoggedUser()->getId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
         );
     }
 
@@ -86,7 +91,7 @@ class SerialMetaStore extends AJXP_Plugin {
         $this->loadMetaFileData(
             $ajxpNode,
             $scope,
-            ($private?AuthService::getLoggedUser()->getId():AJXP_METADATA_SHAREDUSER)
+            ($private?$this->getUserId():AJXP_METADATA_SHAREDUSER)
         );
         if(!isSet(self::$metaCache[$nameSpace])) return array();
         else return self::$metaCache[$nameSpace];
@@ -103,11 +108,11 @@ class SerialMetaStore extends AJXP_Plugin {
         $all = array();
         $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, AJXP_METADATA_SHAREDUSER);
         $all[] = self::$metaCache;
-        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, AuthService::getLoggedUser()->getId());
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_GLOBAL, $this->getUserId());
         $all[] = self::$metaCache;
         $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, AJXP_METADATA_SHAREDUSER);
         $all[] = self::$metaCache;
-        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, AuthService::getLoggedUser()->getId());
+        $this->loadMetaFileData($ajxpNode, AJXP_METADATA_SCOPE_REPOSITORY, $this->getUserId());
         $all[] = self::$metaCache;
         $allMeta = array();
         foreach($all as $metadata){
