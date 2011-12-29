@@ -598,6 +598,7 @@ class AJXP_XMLWriter
 			$st.="<action name=\"$actionId\" value=\"".($actionValue?"true":"false")."\"/>";
 		}
 		$st .= "</actions_rights>";
+        $st .= "<role is_default=\"".($role->isDefault()?"true":"false")."\"/>";
 		return $st;
 	}
 	/**

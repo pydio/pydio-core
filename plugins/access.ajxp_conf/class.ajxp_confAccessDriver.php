@@ -140,7 +140,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				AJXP_XMLWriter::header("admin_data");
 				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
-				AJXP_XMLWriter::close("admin_data");			
+				AJXP_XMLWriter::close("admin_data");
 			break;
 			
 			case "update_role_right" :
@@ -197,6 +197,28 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			
 			break;		
 			
+			case "update_role_default" :
+
+				if(!isSet($httpVars["role_id"])
+					|| !isSet($httpVars["default_value"]))
+				{
+					AJXP_XMLWriter::header();
+					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
+					AJXP_XMLWriter::close();
+					return ;
+				}
+				$role = AuthService::getRole($httpVars["role_id"]);
+				if($role === false) {
+					throw new Exception("Cannot find role!");
+				}
+                $role->setDefault(($httpVars["default_value"] == "true"));
+				AuthService::updateRole($role);
+				AJXP_XMLWriter::header("admin_data");
+				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
+				AJXP_XMLWriter::close("admin_data");
+
+			break;
+
 			case "get_custom_params" :
 				$confStorage = ConfService::getConfStorageImpl();
 				AJXP_XMLWriter::header("admin_data");
@@ -1069,8 +1091,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	function listRoles(){
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.roles">
 			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>			
+			<column messageId="ajxp_conf.114" attributeName="is_default" sortType="String"/>
 			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
-			</columns>');		
+			</columns>');
 		if(!AuthService::usersEnabled()) return ;
 		$roles = AuthService::getRolesList();
 		$mess = ConfService::getMessages();
@@ -1089,6 +1112,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			AJXP_XMLWriter::renderNode("/roles/".$roleId, $roleId, true, array(
 				"icon" => "user_group_new.png",				
 				"rights_summary" => $rightsString,
+                "is_default"    => ($roleObject->isDefault() ? "Yes":"No"),
 				"ajxp_mime" => "role"
 			));
 		}

@@ -131,6 +131,9 @@ $mess=array(
 "109" => "Configurations Globales",
 "110" => "Dépôts & Utilisateurs",
 "111" => "Logs & Autres données",
+"112" => "<b>Appliquer ce rôle par défaut</b> à tous les nouveaux utilisateurs.",
+"113" => "Le rôle a été modifié avec succès",
+"114" => "Defaut",
 /* END SENTENCE */
 );
 ?>

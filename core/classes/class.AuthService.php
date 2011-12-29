@@ -396,6 +396,11 @@ class AuthService
 					$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
 				}
 			}
+            foreach(AuthService::getRolesList() as $roleId => $roleObject){
+                if($roleObject->isDefault()){
+                    $userObject->addRole($roleId);
+                }
+            }
 		}
 	}
 	/**

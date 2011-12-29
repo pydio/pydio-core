@@ -133,5 +133,8 @@ $mess=array(
 "109" => "Global Configurations",
 "110" => "Repositories & Users",
 "111" => "Logs & Other Data",
+"112" => "<b>Apply this role by default</b> to all new users.",
+"113" => "Role status was successfully modified",
+"114" => "Default",
 );
 ?>

@@ -304,6 +304,25 @@ ConfigEditor = Class.create({
 			ajaxplorer.displayMessage('SUCCESS', MessageHash['ajxp_conf.87']);
 		}
 	},
+
+    bindDefaultRoleCheckbox: function(xmlData){
+        var value = XPathGetSingleNodeText(xmlData, 'admin_data/role/@is_default');
+        if(value == "true"){
+            $("default_role_cb").checked = true;
+        }
+        $("default_role_cb").observe("change", function(){
+            var conn = new Connexion();
+            conn.addParameter("get_action", "edit");
+            conn.addParameter("sub_action", "update_role_default");
+            conn.addParameter("role_id", this.roleId);
+            conn.addParameter("default_value", $('default_role_cb').checked? "true":"false");
+            conn.onComplete = function(transport){
+                ajaxplorer.displayMessage('SUCCESS', MessageHash['ajxp_conf.113']);
+                ajaxplorer.fireContextRefresh();
+            };
+            conn.sendAsync();
+        }.bind(this));
+    },
 	
 	loadCreateUserForm : function(){
 		var params = new Hash();
@@ -619,6 +638,7 @@ ConfigEditor = Class.create({
 		connexion.onComplete = function(transport){
 			this.generateRightsTable(transport.responseXML);
 			this.generateActionRightsPane(transport.responseXML);
+            this.bindDefaultRoleCheckbox(transport.responseXML);
 			modal.refreshDialogPosition();
 			modal.refreshDialogAppearance();
 			ajaxplorer.blurAll();

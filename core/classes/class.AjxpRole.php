@@ -31,6 +31,7 @@ class AjxpRole
 {
 	private $id;
 	private $rights = array();
+    private $default = false;
 	/**
      * Constructor
      * @param string $id
@@ -135,7 +136,17 @@ class AjxpRole
 		if(!isset($this->rights["ajxp.actions"][$rootDirId])) $this->rights["ajxp.actions"][$rootDirId] = array();
 		$this->rights["ajxp.actions"][$rootDirId][$actionName] = $allowed;
 	}
-		
+
+    public function setDefault($default)
+    {
+        $this->default = $default;
+    }
+
+    public function isDefault()
+    {
+        return $this->default;
+    }
+
 }
 
 ?>
