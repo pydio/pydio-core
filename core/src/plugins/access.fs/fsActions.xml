@@ -347,13 +347,17 @@
                     if(!editorData){
                         var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
                         var editors = ajaxplorer.findEditorsForMime(selectedMime);
-                        if(editors.length){
+                        if(editors.length && editors[0].openable){
                             editorData = editors[0];
                         }
                     }
                     if(editorData){
                         ajaxplorer.loadEditorResources(editorData.resourcesManager);
                         modal.openEditorDialog(editorData);
+                    }else{
+                        if(ajaxplorer.actionBar.getActionByName("download")){
+                            ajaxplorer.actionBar.getActionByName("download").apply();
+                        }
                     }
                 ]]></clientCallback>
                 <serverCallback methodName="switchAction"></serverCallback>
