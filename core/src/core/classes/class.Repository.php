@@ -96,7 +96,7 @@ class Repository {
     /**
      * @var bool
      */
-	private $inferOptionsFromParent = false;
+	public $inferOptionsFromParent = false;
 	/**
 	 * @var Repository
 	 */
