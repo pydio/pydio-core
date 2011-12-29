@@ -1,25 +1,28 @@
  ------------------------------------------------
-|      AjaXplorer Installation Instructions      |
+|      AjaXplorer Quick Start                   |
  ------------------------------------------------
  
  1 SYSTEM REQUIREMENTS & QUICK INSTALL
  
- To be able to run this system on your webserver, it must have PHP 5 or higher
+ To be able to run this system on your webserver, it must have PHP 5.1 or higher
  running, and you must have an FTP access to upload the files on the server. 
- That's all! No database is needed.
- 
- If you want to use it as fast as possible, just change the ADMIN_PASSWORD in 
- the conf/conf.php file and upload on your server. 
- 
- Check that the "server/conf", "server/logs" and "server/users" folders are writeable by apache user.
- 
- For further configuration, read below.
- 
+ Just make sure that the "data" folder is (recursively) writeable by the webserver.
+
+ That's all! For the default configuration, no database is needed. But if you want to
+ store data in a database, it's possible, see the *.sql plugins.
+
  2 CONFIGURATION
- 
- After unzipping the file into a local folder on your computer, use a text editor 
- to edit the configuration file located in conf/conf.php
- 
+
+    The very basic configurations are to be found in the conf/ folder :
+
+    + You should not have to tweak the bootstrap_context.php, unless you want to customize
+      heavily your installation.
+    + The bootstrap_plugins.php file contains the configurations for the Authentification
+      plugin, the Config plugin (how to save ajaxplorer config data) and the Logger.
+    + The bootstrap_repositories.php contains the default repositories definition. The preferred
+      way of creating new repositories is by using the GUI (switch to the "Settings"), but you
+      can also define them manually in this file if it's more handy for you
+
  2.1 REPOSITORIES 
     
     In AjaXplorer, a repository is a folder that you want to browse/modify with 
@@ -30,7 +33,7 @@
     another when logged to AjaXplorer, and you can precisely set rights for each users (see 
     paragraph 2.2) on each repository. 
     
-    By default, the basic repository is set to the "files" folder inside the ajaxplorer 
+    By default, the basic repository is set to the "data/files" folder inside the ajaxplorer
     installation folder. You can change it to whatever you want, using absolute path 
     like : /home/login/www/location, or /C:/myfolder/ on windows.
     
@@ -48,8 +51,8 @@
     the first time you log in, because otherwise anybody knowing AjaXplorer could login with 
     the standard initial password "admin"...
     
-    You can add / modify / delete users by logging in AjaXplorer as "admin" and clicking on 
-    "Settings" button. For each user, you will be able to give read and/or right access separately 
+    You can add / modify / delete users by logging in AjaXplorer as "admin" and switching to the
+    "Settings" repository. For each user, you will be able to give read and/or right access separately
     on each repository. Note that a user that has no rights on any repository cannot log in.
     
     For a better integration in existing systems, AjaXplorer can "prelog" a user from external 
@@ -73,8 +76,8 @@
 
 	2.2.2 AUTHENTICATION METHOD
 	
-	In ajaXplorer, Authentication is (like the repositories as access and the configuration )
-	plugin-based. By default, in the conf.php file you can see that the basic auth.serial plugin 
+	In ajaXplorer, Authentication is (like the repositories as access and the configuration ) plugin-based.
+	By default, in the conf/boostrap_plugins.php file you can see that the basic auth.serial plugin
 	is used to manage your users. This means that the users and their rights and personnal data 
 	will be stored on the filesystem, in a specific ajaxplorer format. This plugin is the most
 	performant, but may not be suited for managing a huge amount of users, or when managing users
@@ -85,14 +88,25 @@
     				 			
  2.3 FURTHER CONFIGURATION   
  
-	. $max_caracteres	=>		Max number of characters for file and directory names.
-	. $upload_max_number=>		Allowed simultaneous upload to the server.
-	. $webmaster_email	=>		The email of the webmaster, not used for the moment
-	. $use_https		=>		Set this to 'true' if you are working on https connexion. This will not
-								set up an secure server! This is here to fix a bug with Internet Explorer
-								when working on a secure server.
- 
- 3 TIME TO WASTE?
- 
- 	Visit http://www.almasound.com/ and listen to good Reggae Dub & Salsa music!
- 	
+	Switch to the "Settings" repository, and browse the various "Global Configurations" : particularly,
+	you should have a look at the "Core" options, as well as the Plugins > Gui > Client Plugin (gui.ajax)
+	where you can do some basic customization for your interface.
+
+---------------------------------------------------------------------------
+ * Copyright 2007-2011 Charles du Jeu <charles (at) ajaxplorer.info>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
