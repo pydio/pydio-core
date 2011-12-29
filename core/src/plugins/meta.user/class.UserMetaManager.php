@@ -138,7 +138,7 @@ class UserMetaManager extends AJXP_Plugin {
 		}
 		$repo = $this->accessDriver->repository;
 		$user = AuthService::getLoggedUser();
-		if(!$user->canWrite($repo->getId())){
+		if(!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())){
 			throw new Exception("You have no right on this action.");
 		}
 		$selection = new UserSelection();
