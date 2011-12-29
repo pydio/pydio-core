@@ -124,8 +124,9 @@ class sqlConfDriver extends AbstractConfDriver {
 		$repo->enabled = $result['enabled'];
 		$repo->recycle = "";
 		$repo->setSlug($result['slug']);
-        $repo->isTemplate = $result['isTemplate'];
-		
+        $repo->isTemplate = intval($result['isTemplate']) == 1 ? true : false;
+        $repo->inferOptionsFromParent = intval($result['inferOptionsFromParent']) == 1 ? true : false;
+
 		foreach ($options_result as $k => $v) {
 			if($k == "META_SOURCES"){
 				$v = unserialize($v);
@@ -159,7 +160,8 @@ class sqlConfDriver extends AbstractConfDriver {
 				'enabled' => $repository->isEnabled(),
 				'options' => $repository->options,
 				'slug'		=> $repository->getSlug(),
-                'isTemplate'=> $repository->isTemplate
+                'isTemplate'=> $repository->isTemplate,
+                'inferOptionsFromParent'=> ($repository->inferOptionsFromParent?1:0)
 		);
 		
 		return $repository_row;

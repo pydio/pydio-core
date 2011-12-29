@@ -33,6 +33,7 @@ CREATE TABLE ajxp_repo (
  	writeable BOOLEAN, 
  	enabled BOOLEAN ,
  	isTemplate BOOLEAN,
+ 	inferOptionsFromParent BOOLEAN,
  	slug VARCHAR(255)
 );
  
