@@ -135,7 +135,7 @@ class ShareCenter extends AJXP_Plugin{
             		$users = "";
             		foreach ($allUsers as $userId => $userObject){
             			if($crtValue != "" && (strstr($userId, $crtValue) === false || strstr($userId, $crtValue) != 0)) continue;
-            			if( ( $userObject->hasParent() && $userObject->getParent() == $loggedUser->getId() ) || ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") === true  ){
+            			if( ( $userObject->hasParent() && $userObject->getParent() == $loggedUser->getId() ) || ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") == true  ){
             				$users .= "<li>".$userId."</li>";
             			}
             		}
@@ -559,7 +559,7 @@ class ShareCenter extends AJXP_Plugin{
             if(AuthService::userExists($userName)){
                 // check that it's a child user
                 $userObject = $confDriver->createUserObject($userName);
-                if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
+                if( ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->id ) ){
                     return 102;
                 }
             }else{
