@@ -46,9 +46,51 @@ class dropboxAccessDriver extends fsAccessDriver
 		AJXP_Logger::debug("Detected wrapper data", $wrapperData);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
-		if($this->repository->getOption("MAILBOX") != ""){
-			//$this->urlBase .= "/INBOX";
-		}
+
+        $consumerKey = $this->repository->getOption("CONSUMER_KEY");
+        $consumerSecret = $this->repository->getOption("CONSUMER_SECRET");
+        $oauth = new Dropbox_OAuth_PEAR($consumerKey, $consumerSecret);
+
+        // TOKENS IN SESSION?
+        if(!empty($_SESSION["OAUTH_DROPBOX_TOKENS"])) return;
+
+        // TOKENS IN FILE ?
+        $tokens = $this->getTokens($this->repository->getId());
+        if(!empty($tokens)){
+            $_SESSION["OAUTH_DROPBOX_TOKENS"] = $tokens;
+            return;
+        }
+
+        // OAUTH NEGOCIATION
+        if (isset($_SESSION['DROPBOX_NEGOCIATION_STATE'])) {
+            $state = $_SESSION['DROPBOX_NEGOCIATION_STATE'];
+        } else {
+            $state = 1;
+        }
+        switch($state) {
+
+            case 1 :
+                $tokens = $oauth->getRequestToken();
+                //print_r($tokens);
+
+                // Note that if you want the user to automatically redirect back, you can
+                // add the 'callback' argument to getAuthorizeUrl.
+                //echo "Step 2: You must now redirect the user to:\n";
+                $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 2;
+                $_SESSION['oauth_tokens'] = $tokens;
+                throw new Exception("Please go to <a style=\"text-decoration:underline;\" target=\"_blank\" href=\"".$oauth->getAuthorizeUrl()."\">".$oauth->getAuthorizeUrl()."</a> to authorize the access to your dropbox. Then try again to switch to this repository.");
+
+            case 2 :
+                $oauth->setToken($_SESSION['oauth_tokens']);
+                $tokens = $oauth->getAccessToken();
+                $_SESSION['DROPBOX_NEGOCIATION_STATE'] = 3;
+                $_SESSION['OAUTH_DROPBOX_TOKENS'] = $tokens;
+                $this->setTokens($this->repository->getId(), $tokens);
+                return;
+        }
+
+        throw new Exception("Impossible to find the tokens for accessing the dropbox repository");
+
 	}
 	
 	function performChecks(){
@@ -60,6 +102,14 @@ class dropboxAccessDriver extends fsAccessDriver
 	function isWriteable($dir, $type = "dir"){
 		return true;
 	}
+
+    function getTokens($repositoryId){
+        return AJXP_Utils::loadSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_tokens");
+    }
+    function setTokens($repositoryId, $oauth_tokens){
+        return AJXP_Utils::saveSerialFile(AJXP_DATA_PATH."/plugins/access.dropbox/".$repositoryId."_tokens", $oauth_tokens, true);
+    }
+
 }
 
 ?>

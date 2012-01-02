@@ -9,6 +9,32 @@
  * @license http://code.google.com/p/dropbox-php/wiki/License MIT
  */
 
+if (!class_exists('HTTP_OAuth_Consumer')) {
+
+    // We're going to try to load in manually
+    include 'HTTP/OAuth/Consumer.php';
+
+}
+if (!class_exists('HTTP_OAuth_Consumer'))
+    throw new Dropbox_Exception('The HTTP_OAuth_Consumer class could not be found! Did you install the pear HTTP_OAUTH class?');
+
+/* fix ssl issues */
+class HTTP_OAuth_Consumer_Dropbox extends  HTTP_OAuth_Consumer
+{
+    public function getOAuthConsumerRequest()
+    {
+        if (!$this->consumerRequest instanceof HTTP_OAuth_Consumer_Request) {
+            $this->consumerRequest = new HTTP_OAuth_Consumer_Request;
+        }
+
+        $this->consumerRequest->setConfig(array(
+                    'ssl_verify_peer' => false,
+                    'ssl_verify_host' => false
+                ));
+
+        return $this->consumerRequest;
+    }
+}
 
 /**
  * This class is used to sign all requests to dropbox
@@ -41,16 +67,7 @@ class Dropbox_OAuth_PEAR extends Dropbox_OAuth {
      */
     public function __construct($consumerKey, $consumerSecret) {
 
-        if (!class_exists('HTTP_OAuth_Consumer')) {
-
-            // We're going to try to load in manually
-            include 'HTTP/OAuth/Consumer.php';
-
-        }
-        if (!class_exists('HTTP_OAuth_Consumer')) 
-            throw new Dropbox_Exception('The HTTP_OAuth_Consumer class could not be found! Did you install the pear HTTP_OAUTH class?');
-
-        $this->OAuth = new HTTP_OAuth_Consumer($consumerKey, $consumerSecret);
+        $this->OAuth = new HTTP_OAuth_Consumer_Dropbox($consumerKey, $consumerSecret);
         $this->consumerKey = $consumerKey;
 
     }
@@ -82,9 +99,18 @@ class Dropbox_OAuth_PEAR extends Dropbox_OAuth {
      * @param array $httpHeaders 
      * @return string 
      */
-    public function fetch($uri, $arguments = array(), $method = 'GET', $httpHeaders = array()) {
+    public function fetch($uri, $arguments = array(), $method = 'GET', $httpHeaders = array())
+    {
+        $httpRequest = new HTTP_Request2(null, 
+                HTTP_Request2::METHOD_GET, 
+                array(
+                    'ssl_verify_peer' => false, 
+                    'ssl_verify_host' => false
+                )
+        );
 
         $consumerRequest = new HTTP_OAuth_Consumer_Request();
+        $consumerRequest->accept($httpRequest);
         $consumerRequest->setUrl($uri);
         $consumerRequest->setMethod($method);
         $consumerRequest->setSecrets($this->OAuth->getSecrets());
