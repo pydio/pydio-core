@@ -33,7 +33,11 @@ Class.create("BrowserOpener", AbstractEditor, {
         var nonSecureAccessPath = ajxpServerAccessPath.substring(0, ajxpServerAccessPath.lastIndexOf('?'));
         var open_file_url = url + "/" + nonSecureAccessPath + "?get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(fileName);
         myRef = window.open(open_file_url);
-        hideLightBox();
+        if(!Modernizr.boxshadow){
+            window.setTimeout('hideLightBox()', 1500);
+        }else{
+            hideLightBox();
+        }
 	},
 	
 	openURL : function(fileName){
