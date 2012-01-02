@@ -57,9 +57,8 @@ class dropboxWrapper implements AjxpWrapper {
 			$pass = $repo->getOption("PASS");
 			
 			self::$oauth = new Dropbox_OAuth_PEAR($consumerKey, $consumerSecret);
+            self::$oauth->setToken($_SESSION["OAUTH_DROPBOX_TOKENS"]);
 			self::$dropbox = new Dropbox_API(self::$oauth);
-			$tokens = self::$dropbox->getToken($email, $pass); 
-			self::$oauth->setToken($tokens);			
 		}
 		$path = parse_url($ajxpPath, PHP_URL_PATH);
 		if($path == "") return "/";
