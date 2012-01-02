@@ -1,10 +1,58 @@
-AjaXplorer 4.0 Release Note
+AjaXplorer 4.0.1 Release Note
 
 License : Affero GPL
 Copyright : Charles du Jeu 2011
-Version number : 4.0.0
-Install instructions : see the 4-steps installation guide (upgrade from 3.2.4 see below).
+Version number : 4.0.1
 Demo : http://ajaxplorer.info/demo
+
+This is a bugfix release.
+
+[New]
++ "Default Role" implementation : like "Default Rights", all newly created users will have this
+role.
++ Command-line delegation for both "compress" and multiple "download" actions, using the server
+"zip" command.
++ Option for delegating the dowloads to the server, using the X-SendFile server module
+(external module to install, available for Apache, Lighttpd & Nginx).
+
+[GUI]
+Fix IE7 double click for opening in external window : closing the lightbox too fast was
+creating error with the shadower script.
+Default double click switch to "download" if no openable editor available.
+Typo error onCancel / onComplete function
+
+[Plugins]
+[access.fs] Error in readFile was breaking multiple files download in any other browser than
+Chrome (wrong headers sent)
+[access.dropbox] Missing columns definitions for dropbox plugin / Update dropbox-php for API
+1.0, plus patch to skip SSL certificate, plus OAuth negociation at repository initiation.
+[conf.sql] Fix conf.sql for templates children
+[downloader.http] Move upload>subMenu as a downloader.http override, thus no submenu if this
+plugin is not active.
+[editor.audio] Wrong tooltip for Volume Button
+[access.mysql] Add DEFAULT_RIGHTS option for Mysql driver
+[editor.diaporama] Handle "array" config case during serial/deserialization (only applicable in
+editor.diaporama until now, was breaking its configuration)
+[editor.jumploader] Jumploader old doc was not correctly reported
+[log.sql] Forgotten DIBI Require
+
+
+[Core Auth]
+ALLOW_CROSSUSER_SHARING : Do not compare to === true
+"guest" user handling when ALLOW_GUEST_BROWSING is not active. Better check for delegate
+repository creation, check for errors before creating anything. New method
+AuthServide::isReservedUserId() for a future modularization of the "guest" concept.
+
+[Misc]
+Fix background action when users are not enabled.
+Fix metastore & meta plugin when no user enabled!
+Rename default text file and update the content
+Fix backgroundPanel style
+Ability to transmit directly a javascript instruction to the backgroundManager
+
+
+-------------------------------------------------------------
+AjaXplorer 4.0 Release Note
 
 This is a major version release. Check ajaxplorer.info for complete description.
 Below are described the changes introduced since v3.3.5
