@@ -183,10 +183,14 @@ class AjaXplorerUpgrader {
         self::copy_r($this->workingFolder."/core", $targetFolder."/core");
         self::copy_r($this->workingFolder."/plugins", $targetFolder."/plugins");
         $rootFiles = glob($this->workingFolder."/*.php");
-        foreach($rootFiles as $file){
-            copy($file, $targetFolder."/".basename($file));
+        if($rootFiles !== false){
+            foreach($rootFiles as $file){
+                copy($file, $targetFolder."/".basename($file));
+            }
+            return "Upgraded core, plugins and base access points.";
+        }else{
+            return "Upgrade core and plugins. Nothing to do at the base";
         }
-        return "Upgraded core, plugins and base access points.";
     }
 
     function restoreMarkedFiles(){
@@ -461,6 +465,7 @@ class AjaXplorerUpgrader {
 
         foreach($itemsToCopy as $item){
             $files = glob($oldLocation."/".$item["mask"]);
+            if($files === false) continue;
             foreach ($files as $fileOrFolder){
                 $target = AJXP_INSTALL_PATH."/".$item["target"];
                 if(is_file($fileOrFolder)){
@@ -485,7 +490,7 @@ class AjaXplorerUpgrader {
         }
 
         // FILTER THE CONF FILE TO REMOVE ALL CONSTANTS
-        $originalConfdir = $oldLocation."/server/conf/";
+        $originalConfdir = $oldLocation."/server/conf";
         $lines = file($originalConfdir."/conf.php");
         $filteredLines = array();
         $mutedConstants = array();
