@@ -77,7 +77,7 @@ if( !function_exists('json_encode')){
 
 
 if ( !function_exists('json_decode') ){
-	function json_decode($json, $opt)
+	function json_decode($json, $opt=null)
 	{
 		// Author: walidator.info 2009
 		$comment = false;
