@@ -75,13 +75,13 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 	
 	protected function getAccessDriver(){
 		if(!isset($this->accessDriver)){
-			$confDriver = ConfService::getConfStorageImpl();
-			$this->accessDriver = ConfService::loadRepositoryDriver();
-			if(!$this->accessDriver instanceof AjxpWebdavProvider){
-				throw new ezcBaseFileNotFoundException( $this->repository->getUniqueId() );
-			}
-			$wrapperData = $this->accessDriver->detectStreamWrapper(true);
-			$this->wrapperClassName = $wrapperData["classname"];			
+            $confDriver = ConfService::getConfStorageImpl();
+            $this->accessDriver = ConfService::loadRepositoryDriver();
+            if(!$this->accessDriver instanceof AjxpWebdavProvider){
+                throw new ezcBaseFileNotFoundException( $this->repository->getUniqueId() );
+            }
+            $wrapperData = $this->accessDriver->detectStreamWrapper(true);
+            $this->wrapperClassName = $wrapperData["classname"];
 		}
 		return $this->accessDriver;
 	}
@@ -589,13 +589,23 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
             );
         }
 
-        // Check if resource is available
-        if ( !$this->nodeExists( $source ) )
-        {
+        try {
+            // Check if resource is available
+            if ( !$this->nodeExists( $source ) )
+            {
+                return new ezcWebdavErrorResponse(
+                    ezcWebdavResponse::STATUS_404,
+                    $source
+                );
+            }
+        }catch(Exception $e){
+
             return new ezcWebdavErrorResponse(
-                ezcWebdavResponse::STATUS_404,
-                $source
+                ezcWebdavResponse::STATUS_500,
+                $source,
+                $e->getMessage()
             );
+
         }
 
         // Verify If-[None-]Match headers
