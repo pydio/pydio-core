@@ -39,20 +39,27 @@ Class.create("AjxpBootstrap", {
 		}		
 		Event.observe(document, 'dom:loaded', function(){
 			this.insertBasicSkeleton(this.parameters.get('MAIN_ELEMENT'));
-			if(window.opener && window.opener.ajxpBootstrap){
-				this.parameters = window.opener.ajxpBootstrap.parameters;
-				// Handle queryString case, as it's not passed via get_boot_conf
-				var qParams = document.location.href.toQueryParams();
-				if(qParams['external_selector_type']){
-					this.parameters.set('SELECTOR_DATA', {type:qParams['external_selector_type'], data:qParams});
-				}else{
-					if(this.parameters.get('SELECTOR_DATA')) this.parameters.unset('SELECTOR_DATA');
-				}
-				this.refreshContextVariablesAndInit(new Connexion());
-			}else{
-				this.loadBootConfig();						
-			}
-		}.bind(this));		
+            var startedFromOpener = false;
+            try{
+                if(window.opener && window.opener.ajxpBootstrap){
+                    this.parameters = window.opener.ajxpBootstrap.parameters;
+                    // Handle queryString case, as it's not passed via get_boot_conf
+                    var qParams = document.location.href.toQueryParams();
+                    if(qParams['external_selector_type']){
+                        this.parameters.set('SELECTOR_DATA', {type:qParams['external_selector_type'], data:qParams});
+                    }else{
+                        if(this.parameters.get('SELECTOR_DATA')) this.parameters.unset('SELECTOR_DATA');
+                    }
+                    this.refreshContextVariablesAndInit(new Connexion());
+                    startedFromOpener = true;
+                }
+            }catch(e){
+                if(console && console.log) console.log(e);
+            }
+            if(!startedFromOpener){
+                this.loadBootConfig();
+            }
+		}.bind(this));
 		document.observe("ajaxplorer:before_gui_load", function(e){
 			var desktop = $(this.parameters.get('MAIN_ELEMENT'));
 			var options = desktop.getAttribute("ajxpOptions").evalJSON(false);
