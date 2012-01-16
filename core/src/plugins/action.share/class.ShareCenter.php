@@ -382,6 +382,7 @@ class ShareCenter extends AJXP_Plugin{
         if (@file_put_contents($downloadFolder."/".$hash.".php", $fileData) === FALSE){
             return "Can't write to PUBLIC URL";
         }
+        @chmod($downloadFolder."/".$hash.".php", 0755);
         PublicletCounter::reset($hash);
         return $this->buildPublicletLink($hash);
     }
