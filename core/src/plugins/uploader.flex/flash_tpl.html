@@ -110,7 +110,7 @@ var flashVarExt = '&fileTypes=*.*&fileTypeDescription=All%20files';
 var configs = parent.ajaxplorer.getPluginConfigs("uploader");
 if(configs.get("ALLOWED_EXTENSIONS") && configs.get("ALLOWED_EXTENSIONS_READABLE")){
 	var exts = [];
-	configs.get("ALLOWED_EXTENSIONS").each(function(el){exts.push("*."+el); });
+	parent.$A(configs.get("ALLOWED_EXTENSIONS").split(",")).each(function(el){exts.push("*."+el); });
 	flashVarExt = '&fileTypes='+exts.join(";")+'&fileTypeDescription='+escape(configs.get("ALLOWED_EXTENSIONS_READABLE"));
 }
 
