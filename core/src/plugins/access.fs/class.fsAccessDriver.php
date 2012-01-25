@@ -282,6 +282,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			case "get_content":
 					
 				$dlFile = $this->urlBase.$selection->getUniqueFile();
+                AJXP_Logger::logAction("Get_content", array("files"=>$selection));
 				if(AJXP_Utils::getStreamingMimeType(basename($dlFile))!==false){
 					$this->readFile($this->urlBase.$selection->getUniqueFile(), "stream_content");					
 				}else{
@@ -1622,8 +1623,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                 $time = filemtime($dirName."/".$file);
                 $docAge = time() - $time;
                 if( $docAge > $purgeTime){
-                    //unlink($dirName."/".$file);
-                    //AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dirName."/".$file)));
+                    unlink($dirName."/".$file);
+                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dirName."/".$file)));
                     AJXP_Logger::logAction("Purge", array("file" => $dirName."/".$file));
                     print(" - Purging document : ".$dirName."/".$file."\n");
                 }
