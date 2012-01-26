@@ -151,6 +151,7 @@ class UserMetaManager extends AJXP_Plugin {
 		$newValues = array();
 		$def = $this->getMetaDefinition();
         $ajxpNode = new AJXP_Node($urlBase.$currentFile);
+        AJXP_Controller::applyHook("node.before_change", array(&$ajxpNode));
 		foreach ($def as $key => $label){
 			if(isSet($httpVars[$key])){
 				$newValues[$key] = AJXP_Utils::decodeSecureMagic($httpVars[$key]);

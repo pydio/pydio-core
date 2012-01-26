@@ -139,6 +139,7 @@ class HttpDownloader extends AJXP_Plugin{
 				rename($tmpFilename, $filename);
 				unlink($hiddenFilename);
 				if(isset($dlFile) && isSet($httpVars["delete_dlfile"]) && is_file($dlFile)){
+                    AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($dlFile)));
 					unlink($dlFile);
                     AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
 				}

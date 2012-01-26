@@ -304,6 +304,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					$code=str_replace("&lt;","<",$code);
 				}
 				$fileName = $this->urlBase.$file;
+                $currentNode = new AJXP_Node($fileName);
+                try{
+                    AJXP_Controller::applyHook("node.before_change", array(&$currentNode));
+                }catch(Exception $e){
+                    header("Content-Type:text/plain");
+                    $e->getMessage();
+                }
 				if(!is_file($fileName) || !$this->isWriteable($fileName, "file")){
 					header("Content-Type:text/plain");
 					print((!$this->isWriteable($fileName, "file")?"1001":"1002"));
@@ -312,6 +319,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$fp=fopen($fileName,"w");
 				fputs ($fp,$code);
 				fclose($fp);
+                AJXP_Controller::applyHook("node.change", array($currentNode, new AJXP_Node($fileName), false));
 				header("Content-Type:text/plain");
 				print($mess[115]);
 				
@@ -414,6 +422,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				if(isSet($error)){
 					throw new AJXP_Exception($error);
 				}
+                $currentNodeDir = new AJXP_Node($this->urlBase.$dir);
+                AJXP_Controller::applyHook("node.before_change", array(&$currentNodeDir));
 				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
@@ -435,6 +445,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 				$this->filterUserSelectionToHidden(array($filename));
 				$content = "";
+                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$dir)));
 				if(isSet($httpVars["content"])){
 					$content = $httpVars["content"];
 				}
@@ -508,6 +519,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					}catch (Exception $e){
 						return array("ERROR" => array("CODE" => 411, "MESSAGE" => "Forbidden"));
 					}
+
 					$userfile_name=AJXP_Utils::sanitize(SystemTextEncoding::fromPostedFileName($userfile_name), AJXP_SANITIZE_HTML_STRICT);
 					$userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 					if(isSet($httpVars["auto_rename"])){
@@ -516,6 +528,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					if(isSet($boxData["input_upload"])){
 						try{
 							AJXP_Logger::debug("Begining reading INPUT stream");
+                            if(file_exists($destination."/".$userfile_name)){
+                                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destination."/".$userfile_name)));
+                            }
+                            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destination)));
 							$input = fopen("php://input", "r");
 							$output = fopen("$destination/".$userfile_name, "w");
 							$sizeRead = 0;
@@ -1217,8 +1233,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		{
 			throw new AJXP_Exception($mess[100]." $nom_fic");
 		}
+        $oldNode = new AJXP_Node($old);
+        AJXP_Controller::applyHook("node.before_change", array(&$oldNode));
 		rename($old,$new);
-        AJXP_Controller::applyHook("node.change", array(new AJXP_Node($old), new AJXP_Node($new), false));
+        AJXP_Controller::applyHook("node.change", array($oldNode, new AJXP_Node($new), false));
 	}
 	
 	function autoRenameForDest($destination, $fileName){
@@ -1321,7 +1339,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			{
 				$logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
 				continue;
-			}		
+			}
 			$this->deldir($fileToDelete);
 			if(is_dir($fileToDelete))
 			{
@@ -1379,7 +1397,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		{			
 			$errors = array();
 			$succFiles = array();
-			if($move){				
+			if($move){
+                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($realSrcFile)));
 				if(file_exists($destFile)) $this->deldir($destFile);
 				$res = rename($realSrcFile, $destFile);
 			}else{				
@@ -1395,7 +1414,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}
 		else 
 		{			
-			if($move){	
+			if($move){
+                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($realSrcFile)));
 				if(file_exists($destFile)) unlink($destFile);				
 				$res = rename($realSrcFile, $destFile);
 				AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
@@ -1516,6 +1536,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	{
 		if(is_dir($location))
 		{
+            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($location)));
 			$all=opendir($location);
 			while ($file=readdir($all))
 			{
@@ -1541,6 +1562,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		else
 		{
 			if(file_exists("$location")) {
+                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($location)));
 				$test = @unlink("$location");
 				if(!$test) throw new Exception("Cannot delete file ".$location);
 			}
@@ -1623,8 +1645,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                 $time = filemtime($dirName."/".$file);
                 $docAge = time() - $time;
                 if( $docAge > $purgeTime){
+                    $node = new AJXP_Node($dirName."/".$file);
+                    AJXP_Controller::applyHook("node.before_change", array($node));
                     unlink($dirName."/".$file);
-                    AJXP_Controller::applyHook("node.change", array(new AJXP_Node($dirName."/".$file)));
+                    AJXP_Controller::applyHook("node.change", array($node));
                     AJXP_Logger::logAction("Purge", array("file" => $dirName."/".$file));
                     print(" - Purging document : ".$dirName."/".$file."\n");
                 }
