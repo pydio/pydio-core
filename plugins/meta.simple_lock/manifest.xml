@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="simple_lock" label="CONF_MESSAGE[Simple Lock]" description="CONF_MESSAGE[Manual Locking mechanism to avoid concurrent edition]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/meta.simple_lock/class.SimpleLockManager.php" classname="SimpleLockManager"/>
+   	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
+   		<resources>
+   			<i18n namespace="meta.simple_lock" path="plugins/meta.simple_lock/i18n" />
+            <img_library alias="meta_simple_lock" path="plugins/meta.simple_lock/icons"/>
+   		</resources>
+   	</client_settings>
+   	<registry_contributions>
+   		<hooks>
+   			<serverCallback hookName="node.info" methodName="processLockMeta"></serverCallback>
+   			<serverCallback hookName="node.before_change" methodName="checkFileLock"></serverCallback>
+   		</hooks>
+        <actions>
+            <action name="sl_lock">
+                <gui src="meta_simple_lock/ICON_SIZE/lock.png" text="meta.simple_lock.1" title="meta.simple_lock.2">
+                    <context dir="false" recycle="false" selection="true" contextMenu="true" actionBarGroup="put" />
+                    <selectionContext dir="false" file="true" recycle="false" unique="true"/>
+                </gui>
+                <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var conn = new Connexion();
+                        conn.addParameter("get_action", "sl_lock");
+                        var n = ajaxplorer.getUserSelection().getUniqueNode();
+                        conn.addParameter("file", n.getPath());
+                        if(n.getMetadata().get("sl_locked")){
+                            conn.addParameter("unlock", "true");
+                        }
+                        conn.onComplete = function(transport){
+                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                        };
+                        conn.sendAsync();
+                    ]]></clientCallback>
+                    <clientListener name="selectionChange"><![CDATA[
+					if(ajaxplorer){
+						var action = ajaxplorer.getActionBar().getActionByName("sl_lock");
+						var n = ajaxplorer.getUserSelection().getUniqueNode();
+                        if(action && n){
+                            action.selectionContext.allowedMimes = $([]);
+                            if(n.getMetadata().get("sl_locked")){
+                                action.setIconSrc('meta_simple_lock/ICON_SIZE/unlock.png');
+                                action.setLabel('meta.simple_lock.3');
+                                if(!n.getMetadata().get("sl_mylock")){
+                                    action.selectionContext.allowedMimes = $(["fake_extension_that_never_exists"]);
+                                }
+                            }else{
+                                action.setIconSrc('meta_simple_lock/ICON_SIZE/lock.png');
+                                action.setLabel('meta.simple_lock.1');
+                            }
+                        }
+					}
+                    ]]></clientListener>
+                    <serverCallback methodName="applyChangeLock"/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+</meta>
