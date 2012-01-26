@@ -260,7 +260,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				// Add WALLET DATA : DEFINITIONS AND VALUES
 				print("<drivers>");
-				print(ConfService::availableDriversToXML("user_param"));
+				print(AJXP_XMLWriter::replaceAjxpXmlKeywords(ConfService::availableDriversToXML("user_param")));
 				print("</drivers>");				
 				$wallet = $userObject->getPref("AJXP_WALLET");
 				if(is_array($wallet) && count($wallet)>0){
