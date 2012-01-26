@@ -1055,7 +1055,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
             if($this->pluginConf["USE_XSENDFILE"] && $this->wrapperClassName == "fsAccessWrapper"){
                 if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
                 $filePathOrData = str_replace("\\", "/", $filePathOrData);
-                header("X-Sendfile: ".$filePathOrData);
+                header("X-Sendfile: ".SystemTextEncoding::toUTF8($filePathOrData));
                 return;
             }
 			$stream = fopen("php://output", "a");
