@@ -136,9 +136,10 @@ class sftpAccessDriver extends fsAccessDriver
 		}
 		else 
 		{			
-			if($move){	
+			if($move){
+                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($realSrcFile)));
 				if(file_exists($destFile)) unlink($destFile);				
-				$res = rename($realSrcFile, $destFile);
+				rename($realSrcFile, $destFile);
 				AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
 			}else{
 				try{
