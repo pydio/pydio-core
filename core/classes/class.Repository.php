@@ -96,7 +96,7 @@ class Repository {
     /**
      * @var bool
      */
-	public $inferOptionsFromParent = false;
+	private $inferOptionsFromParent;
 	/**
 	 * @var Repository
 	 */
@@ -118,6 +118,7 @@ class Repository {
 		$this->setId($id);
 		$this->uuid = md5(microtime());
 		$this->slug = AJXP_Utils::slugify($display);
+        $this->inferOptionsFromParent = false;
 	}
 	/**
      * Create a shared version of this repository
@@ -150,7 +151,7 @@ class Repository {
 		$repo = new Repository(0, $newLabel, $this->accessType);
 		$repo->options = $newOptions;
 		$repo->setOwnerData($this->id, $owner, $uniqueUser);
-		$repo->inferOptionsFromParent = true;
+		$repo->setInferOptionsFromParent(true);
 		return $repo;
 	}
 	/**
@@ -401,7 +402,15 @@ class Repository {
 	function hasParent(){
 		return isSet($this->parentId);
 	}
-		
+
+    function setInferOptionsFromParent($bool){
+        $this->inferOptionsFromParent = $bool;
+    }
+
+    function getInferOptionsFromParent(){
+        return $this->inferOptionsFromParent;
+    }
+
 }
 
 ?>
