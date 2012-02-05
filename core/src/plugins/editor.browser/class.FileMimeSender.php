@@ -89,6 +89,7 @@ class FileMimeSender extends AJXP_Plugin {
                     }
                 }
             }
+            fclose($fp);
             // If still no mimetype, give up and serve application/octet-stream
             if(empty($fileMime))
                 $fileMime = "application/octet-stream";
