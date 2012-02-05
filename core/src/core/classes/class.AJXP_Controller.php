@@ -301,7 +301,7 @@ class AJXP_Controller{
      * @throw AJXP_Exception
      * @return void
      */
-	private static function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null){
+	private static function applyCallback($xPath, $callback, &$actionName, &$httpVars, &$fileVars, &$variableArgs = null, $defer = false){
 		//Processing
 		$plugId = $xPath->query("@pluginId", $callback)->item(0)->value;
 		$methodName = $xPath->query("@methodName", $callback)->item(0)->value;		
@@ -312,7 +312,11 @@ class AJXP_Controller{
 			if($variableArgs == null){
 				return $plugInstance->$methodName($actionName, $httpVars, $fileVars);
 			}else{
-				call_user_func_array(array($plugInstance, $methodName), $variableArgs);
+                if($defer == true){
+                    AJXP_ShutdownScheduler::getInstance()->registerShutdownEventArray(array($plugInstance, $methodName), $variableArgs);
+                }else{
+                    call_user_func_array(array($plugInstance, $methodName), $variableArgs);
+                }
 			}
 		}else{
 			throw new AJXP_Exception("Cannot find method $methodName for plugin $plugId!");
@@ -329,10 +333,12 @@ class AJXP_Controller{
 	public static function applyHook($hookName, $args){
 		$xPath = self::initXPath();
 		$callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
-		if(!$callbacks->length) return ;		
+		if(!$callbacks->length) return ;
+        $callback = new DOMNode();
 		foreach ($callbacks as $callback){
-			$fake1; $fake2; $fake3;
-			self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args);
+            $fake1; $fake2; $fake3;
+            $defer = ($callback->attributes->getNamedItem("defer") != null && $callback->attributes->getNamedItem("defer")->nodeValue == "true");
+            self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args, $defer);
 		}
 	}	
 

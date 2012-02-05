@@ -528,6 +528,7 @@
             <xs:attribute name="hookName" type="xs:NCName"/>
             <xs:attribute name="methodName" use="required" type="xs:NCName"/>
             <xs:attribute name="pluginId" use="optional" type="xs:NCName"/>
+            <xs:attribute name="defer" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="client_settings">
