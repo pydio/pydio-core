@@ -343,8 +343,8 @@ class ShareCenter extends AJXP_Plugin{
     		return "ERROR : MCrypt must be installed to use publiclets!";
     	}
         $this->initPublicFolder($downloadFolder);
-        $data["PLUGIN_ID"] = $accessDriver->id;
-        $data["BASE_DIR"] = $accessDriver->baseDir;
+        $data["PLUGIN_ID"] = $accessDriver->getId();
+        $data["BASE_DIR"] = $accessDriver->getBaseDir();
         $data["REPOSITORY"] = $repository;
         if(AuthService::usersEnabled()){
         	$data["OWNER_ID"] = AuthService::getLoggedUser()->getId();
