@@ -84,17 +84,17 @@ class UpdateController extends AJXP_Plugin {
                     break;
                 }
                 $res = AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "php", $this->pluginConf["UPDATE_CHANNEL"]);
-                if(!count($res->packages)){
+                if(!count($res["packages"])){
                     print("No update is necessary!");
                     break;
                 }
                 include(dirname(__FILE__)."/output_head.html");
-                foreach($res->packages as $index => $zipPackage){
+                foreach($res["packages"] as $index => $zipPackage){
                     print("<div class='main_step'>Applying upgrade ".basename($zipPackage)."</div>");
                     $u = new AjaXplorerUpgrader(
                         $zipPackage,
-                        $res->hashes[$index],
-                        $res->hash_method,
+                        $res["hashes"][$index],
+                        $res["hash_method"],
                         explode(",",$this->pluginConf["PRESERVE_FILES"])
                     );
                     $errors = false;
