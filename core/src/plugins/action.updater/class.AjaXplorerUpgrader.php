@@ -76,7 +76,7 @@ class AjaXplorerUpgrader {
 
     static function getUpgradePath($url, $format = "php", $channel="stable"){
         $json = file_get_contents($url."?version=".AJXP_VERSION."&channel=".$channel);
-        if($format == "php") return json_decode($json);
+        if($format == "php") return json_decode($json, true);
         else return $json;
     }
 
