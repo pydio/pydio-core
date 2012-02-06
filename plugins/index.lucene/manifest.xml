@@ -17,7 +17,7 @@
     </server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.change" methodName="updateNodeIndex"></serverCallback>			
+			<serverCallback hookName="node.change" methodName="updateNodeIndex" defer="true"></serverCallback>
 		</hooks>
 		<actions>
 			<action name="search">
