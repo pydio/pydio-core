@@ -67,11 +67,10 @@
 			<script language="javascript">$('originalUploadForm').hide();</script>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[ 
-			var configs = ajaxplorer.getPluginConfigs("uploader");
 			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
-				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm, configs.get('ALLOWED_EXTENSIONS').split(","));
+				ajaxplorer.actionBar.multi_selector = new XHRUploader(oForm);
 			}else{
-				ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm, configs.get('ALLOWED_EXTENSIONS').split(","));
+				ajaxplorer.actionBar.multi_selector = new MultiUploader(oForm);
 			}
 		]]></dialogOnOpen>
 		<extensionOnInit><![CDATA[		
