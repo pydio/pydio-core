@@ -16,7 +16,7 @@
 	<registry_contributions>
 		<hooks>
 			<serverCallback hookName="node.info" methodName="extractMeta"></serverCallback>
-			<serverCallback hookName="node.change" methodName="updateMetaLocation"></serverCallback>
+			<serverCallback hookName="node.change" methodName="updateMetaLocation" defer="true"></serverCallback>
 		</hooks>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
