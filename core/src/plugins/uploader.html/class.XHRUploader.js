@@ -42,8 +42,11 @@ Class.create("XHRUploader", {
         this.max = parseInt(this._globalConfigs.get("UPLOAD_MAX_NUMBER")) || 0;
         this.maxUploadSize = this._globalConfigs.get("UPLOAD_MAX_SIZE") || 0;
 		this.namesMaxLength = ajaxplorer.getPluginConfigs("ajaxplorer").get("NODENAME_MAX_LENGTH");
-		if(mask){
-			this.mask = $A(mask);
+        this.mask = false;
+        mask = this._globalConfigs.get("ALLOWED_EXTENSIONS");
+		if(mask && mask.trim() != ""){
+			this.mask = $A(mask.split(","));
+            this.maskLabel = this._globalConfigs.get("ALLOWED_EXTENSIONS_READABLE");
 		}
 		this.crtContext = ajaxplorer.getUserSelection();
 
@@ -334,7 +337,7 @@ Class.create("XHRUploader", {
 		if(this.mask){
 			var ext = getFileExtension(file.name);
 			if(!this.mask.include(ext)){
-				alert(MessageHash[367] + this.mask.join(', '));
+				alert(MessageHash[367] + this.mask.join(', ') + (this.maskLabel? " ("+ this.maskLabel +")":"" ) );
 				return;
 			}
 		}

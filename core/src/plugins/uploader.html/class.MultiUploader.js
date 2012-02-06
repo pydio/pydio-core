@@ -43,8 +43,11 @@ Class.create("MultiUploader", {
 		this.count = 0;
 		// Current index
 		this.id = 0;
-		if( mask ){
-			this.mask = mask;
+        this.mask = false;
+        mask = ajaxplorer.getPluginConfigs("uploader").get("ALLOWED_EXTENSIONS");
+		if(mask && mask.trim() != ""){
+			this.mask = $A(mask.split(","));
+            this.maskLabel = ajaxplorer.getPluginConfigs("uploader").get("ALLOWED_EXTENSIONS_READABLE");
 		}
 
         this.max  = parseInt(ajaxplorer.getPluginConfigs("uploader").get("UPLOAD_MAX_NUMBER"));
@@ -193,7 +196,7 @@ Class.create("MultiUploader", {
 		if(this.mask){
 			var ext = getFileExtension(element.value);
 			if(!this.mask.include(ext)){
-				alert(MessageHash[367] + this.mask.join(', '));
+                alert(MessageHash[367] + this.mask.join(', ') + (this.maskLabel? " ("+ this.maskLabel +")":"" ) );
 				return;
 			}
 		}		
