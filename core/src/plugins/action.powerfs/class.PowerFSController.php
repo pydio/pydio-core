@@ -149,7 +149,7 @@ class PowerFSController extends AJXP_Plugin
                         file_put_contents($percentFile, $percent);
                     }
                     // avoid a busy wait
-                    sleep(1);
+                    if($percent < 100) sleep(1);
                 }
                 pclose($proc);
                 file_put_contents($percentFile, 100);
