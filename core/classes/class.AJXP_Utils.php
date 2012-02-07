@@ -844,6 +844,7 @@ class AJXP_Utils
             require_once($file);
             // Then create the test class
             $testName = str_replace(".php", "", substr($file, 5));
+            if(!class_exists($testName)) continue;
             $class = new $testName();
 
             $result = $class->doTest();
