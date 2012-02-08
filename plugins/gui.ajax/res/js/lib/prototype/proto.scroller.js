@@ -20,6 +20,7 @@ Control.ScrollBar = Class.create({
         this.enabled = false;
         this.notificationTimeout = false;
         this.container = $(container);
+        this.container.scrollerInstance = this;
         this.boundMouseWheelEvent = this.onMouseWheel.bindAsEventListener(this);
         this.boundResizeObserver = this.onWindowResize.bind(this);
         this.track = $(track);
@@ -215,6 +216,9 @@ Control.ScrollBar = Class.create({
         if(!this.enabled)
             return false;
         this.slider.setValueBy(y / (this.getCurrentMaximumDelta() == 0 ? 1 : this.getCurrentMaximumDelta()) );
+    },
+    destroy: function(){
+        this.container.scrollerInstance = null;
     }
 });
 Object.extend(Control.ScrollBar,

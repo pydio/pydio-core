@@ -126,6 +126,7 @@ Class.create("FoldersTree", AjxpPane, {
         this.registeredObservers.each(function (pair){
             document.stopObserving(pair.key, pair.value);
         });
+        if(this.scrollbar) this.scrollbar.destroy();
         if(this.tree) this.tree.destroy();
         if(window[this.htmlElement.id]){
             delete window[this.htmlElement.id];
