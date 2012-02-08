@@ -30,24 +30,10 @@ class FlexUploadProcessor extends AJXP_Plugin {
 	private static $active = false;
 	
 	public function preProcess($action, &$httpVars, &$fileVars){
-		$repository = ConfService::getRepository();
-		$skipDecoding = false;
-		if($repository->detectStreamWrapper(false)){
-			$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
-			$streamData = $plugin->detectStreamWrapper(true);		
-	    	if($streamData["protocol"] == "ajxp.ftp" || $streamData["protocol"]=="ajxp.remotefs"){
-	    		AJXP_Logger::debug("Skip decoding");
-	    		$skipDecoding = true;
-	    	}
-		}
-		
 		if(isSet($fileVars["Filedata"])){
 			self::$active = true;
 			AJXP_Logger::debug("Dir before base64", $httpVars);
 			$httpVars["dir"] = base64_decode(urldecode($httpVars["dir"]));
-			if(!$skipDecoding) {
-				$fileVars["Filedata"]["name"] = SystemTextEncoding::fromUTF8($fileVars["Filedata"]["name"]);
-			}
 			$fileVars["userfile_0"] = $fileVars["Filedata"];
 			unset($fileVars["Filedata"]);
 			AJXP_Logger::debug("Setting FlexProc active");
