@@ -300,7 +300,39 @@ WebFXTreeAbstractNode.prototype.toggle = function() {
 } ;
 
 WebFXTreeAbstractNode.prototype.select = function() {
-	if($(this.id + '-anchor')) $(this.id + '-anchor').focus();
+	if($(this.id + '-anchor')) {
+        $(this.id + '-anchor').focus();
+        try{
+            if(!this.scrollContainer){
+                var root = this;
+                while (root.parentNode) { root = root.parentNode; }
+                this.rootOffset = $(root.id).offsetTop;
+                this.scrollContainer = $(root.id).parentNode;
+            }
+            if(this.scrollContainer.scrollerInstance){
+                this.scrollContainer.scrollerInstance.scrollTo(this.scrollContainer.scrollTop);
+                var oEl = $(this.id);
+                // CHECK THAT SCROLLING IS OK
+                var elHeight = $(oEl).getHeight();
+                var scrollOffset = oEl.offsetTop - this.rootOffset;
+                var parentHeight = this.scrollContainer.getHeight();
+                var parentScrollTop = this.scrollContainer.scrollTop;
+
+                var sTop = -1;
+                if(scrollOffset+elHeight > (parentHeight+parentScrollTop)){
+                    sTop = scrollOffset-parentHeight+elHeight;
+                }else if(scrollOffset < (parentScrollTop)){
+                    sTop = scrollOffset-elHeight;
+                }
+                if(sTop != -1){
+                    this.scrollContainer.scrollerInstance.scrollTo(sTop);
+                }
+            }
+        }catch(e){
+            if(console) console.log(e);
+        }
+
+    }
 };
 
 WebFXTreeAbstractNode.prototype.deSelect = function() {
