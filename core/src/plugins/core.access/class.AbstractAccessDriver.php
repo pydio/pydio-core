@@ -232,14 +232,14 @@ class AbstractAccessDriver extends AJXP_Plugin {
     	if($p != NULL){
             $isdir = ($p&0040000?true:false);
             $changed = false;
-	    	if( ( isSet($uid) && $stat["uid"] == $uid ) || $fixPermPolicy === "u"  ) {
+	    	if( ( isSet($uid) && $stat["uid"] == $uid ) || $fixPermPolicy == "user"  ) {
     			AJXP_Logger::debug("upgrading abit to ubit");
                 $changed = true;
     			$p  = $p&7777770;
     			if( $p&0x0100 ) $p += 04;
 	    		if( $p&0x0080 ) $p += 02;
 	    		if( $p&0x0040 ) $p += 01;
-	    	}else if( ( isSet($gid) && $stat["gid"] == $gid )  || $fixPermPolicy === "g"  ) {
+	    	}else if( ( isSet($gid) && $stat["gid"] == $gid )  || $fixPermPolicy == "group"  ) {
 	    		AJXP_Logger::debug("upgrading abit to gbit");
                 $changed = true;
     			$p  = $p&7777770;
