@@ -235,13 +235,21 @@ SelectableElements = Class.create({
 				var parentHeight = parent.getHeight();
 				var parentScrollTop = parent.scrollTop;
 				var elHeight = $(oEl).getHeight(); 
-				
+
+                var sTop = -1;
 				if(scrollOffset+elHeight > (parentHeight+parentScrollTop)){			
-					parent.scrollTop = scrollOffset-parentHeight+elHeight;
+					sTop = scrollOffset-parentHeight+elHeight;
 				}else if(scrollOffset < (parentScrollTop)){
-					parent.scrollTop = scrollOffset-elHeight;
+					sTop = scrollOffset-elHeight;
 				}
-			}			
+                if(sTop != -1){
+                    if(parent.scrollerInstance){
+                        parent.scrollerInstance.scrollTo(sTop);
+                    }else{
+                        parent.scrollTop = sTop;
+                    }
+                }
+			}
 		}
 		else{		
 			$(oEl).removeClassName("selected");
