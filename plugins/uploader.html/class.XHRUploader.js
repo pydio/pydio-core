@@ -96,6 +96,7 @@ Class.create("XHRUploader", {
 			}
 		}.bind(this));
 		closeButton.observe("click", function(){
+            if(this.hasLoadingItem()) return;
 			hideLightBox();
 		}.bind(this));
 
@@ -477,6 +478,7 @@ Class.create("XHRUploader", {
 			//this.sendFile(item);
 			this.sendFileMultipart(item);
 		}else{
+            if(this.hasLoadingItem()) return;
 			ajaxplorer.fireContextRefresh();
 			if(this.optionPane.autoCloseCheck.checked){
 				hideLightBox(true);
@@ -493,7 +495,15 @@ Class.create("XHRUploader", {
 		}
 		return false;
 	},
-	
+
+    hasLoadingItem : function(){
+        for(var i=0;i<this.listTarget.childNodes.length;i++){
+            if(this.listTarget.childNodes[i].status == 'loading'){
+                return true;
+            }
+        }
+        return false;
+    },
 	
 	initializeXHR : function(item, queryStringParam){
 
