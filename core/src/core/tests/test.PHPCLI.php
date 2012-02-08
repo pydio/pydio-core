@@ -60,7 +60,7 @@ class PHPCLI extends AbstractTest
 
         sleep(1);
         $availability = true;
-        if(!is_file(AJXP_CACHE_DIR."/cli_result.php")){
+        if(is_file(AJXP_CACHE_DIR."/cli_result.php")){
             $this->testedParams["Command Line Available"] = "Yes";
             unlink(AJXP_CACHE_DIR."/cli_result.php");
             $this->failedInfo = "Php command line detected, this will allow to send some tasks in background!";
