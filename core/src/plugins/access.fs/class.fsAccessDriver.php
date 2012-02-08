@@ -865,7 +865,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	
     function filterFile($fileName){
         $pathParts = pathinfo($fileName);
-        if(array_key_exists("HIDE_FILENAMES", $this->driverConf)){
+        if(array_key_exists("HIDE_FILENAMES", $this->driverConf) && !empty($this->driverConf["HIDE_FILENAMES"])){
             if(!is_array($this->driverConf["HIDE_FILENAMES"])) {
                 $this->driverConf["HIDE_FILENAMES"] = explode(",",$this->driverConf["HIDE_FILENAMES"]);
             }
@@ -873,7 +873,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                 if(strcasecmp($search, $pathParts["basename"]) == 0) return true;
             }
         }
-        if(array_key_exists("HIDE_EXTENSIONS", $this->driverConf)){
+        if(array_key_exists("HIDE_EXTENSIONS", $this->driverConf) && !empty($this->driverConf["HIDE_EXTENSIONS"])){
             if(!is_array($this->driverConf["HIDE_EXTENSIONS"])) {
                 $this->driverConf["HIDE_EXTENSIONS"] = explode(",",$this->driverConf["HIDE_EXTENSIONS"]);
             }
@@ -885,7 +885,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
     }
 
     function filterFolder($folderName){
-        if(array_key_exists("HIDE_FOLDERS", $this->driverConf)){
+        if(array_key_exists("HIDE_FOLDERS", $this->driverConf) && !empty($this->driverConf["HIDE_FOLDERS"])){
             if(!is_array($this->driverConf["HIDE_FOLDERS"])) {
                 $this->driverConf["HIDE_FOLDERS"] = explode(",",$this->driverConf["HIDE_FOLDERS"]);
             }
