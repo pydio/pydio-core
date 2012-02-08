@@ -1421,15 +1421,19 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), false));
 			}else{
 				try{
-					$src = fopen($realSrcFile, "r");
-					$dest = fopen($destFile, "w");
-					if($dest !== false){
-						while (!feof($src)) {
-							stream_copy_to_stream($src, $dest, 4096);
-						}					
-						fclose($dest);
-					}
-					fclose($src);
+                    if(call_user_func(array($this->wrapperClassName, "isRemote"))){
+                        $src = fopen($realSrcFile, "r");
+                        $dest = fopen($destFile, "w");
+                        if($dest !== false){
+                            while (!feof($src)) {
+                                stream_copy_to_stream($src, $dest, 4096);
+                            }
+                            fclose($dest);
+                        }
+                        fclose($src);
+                    }else{
+                        copy($realSrcFile, $destFile);
+                    }
 					AJXP_Controller::applyHook("node.change", array(new AJXP_Node($realSrcFile), new AJXP_Node($destFile), true));
 				}catch (Exception $e){
 					$error[] = $e->getMessage();
