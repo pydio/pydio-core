@@ -187,7 +187,49 @@ Class.create("AjxpDraggable", Draggable, {
 		this.dndAction = ajaxplorer.getActionBar().getDefaultAction('dragndrop');
 		this.ctrlDndAction = ajaxplorer.getActionBar().getDefaultAction('ctrldragndrop');			
     },
-    
+
+
+    updateDrag: function(event, pointer) {
+      if(!this.dragging) this.startDrag(event);
+      if(!this.options.quiet){
+        Position.prepare();
+        Position.includeScrollOffsets = true;
+        Droppables.show(pointer, this.element);
+      }
+
+      Draggables.notify('onDrag', this, event);
+
+      this.draw(pointer);
+      if(this.options.change) this.options.change(this);
+
+      if(this.options.scroll) {
+        this.stopScrolling();
+
+        var p;
+        if (this.options.scroll == window) {
+          with(this._getWindowScroll(this.options.scroll)) { p = [ left, top, left+width, top+height ]; }
+        } else {
+          p = Position.page(this.options.scroll);
+          p[0] += /*this.options.scroll.scrollLeft + */Position.deltaX;
+          p[1] += /*this.options.scroll.scrollTop + */ Position.deltaY;
+          p[2] = p[0]+this.options.scroll.offsetWidth;
+          p[3] = p[1]+this.options.scroll.offsetHeight;
+        }
+        var speed = [0,0];
+        if(pointer[0] < (p[0]+this.options.scrollSensitivity)) speed[0] = pointer[0]-(p[0]+this.options.scrollSensitivity);
+        if(pointer[1] < (p[1]+this.options.scrollSensitivity)) speed[1] = pointer[1]-(p[1]+this.options.scrollSensitivity);
+        if(pointer[0] > (p[2]-this.options.scrollSensitivity)) speed[0] = pointer[0]-(p[2]-this.options.scrollSensitivity);
+        if(pointer[1] > (p[3]-this.options.scrollSensitivity)) speed[1] = pointer[1]-(p[3]-this.options.scrollSensitivity);
+        this.startScrolling(speed);
+      }
+
+      // fix AppleWebKit rendering
+      if(Prototype.Browser.WebKit) window.scrollBy(0,0);
+
+      Event.stop(event);
+    },
+
+
     draw: function(point) {
         var pos = Position.cumulativeOffset(this.element);
         if(this.options.ghosting) {
@@ -286,6 +328,46 @@ Class.create("AjxpDraggable", Draggable, {
 		Draggables.deactivate(this);
 		Droppables.reset();
 	}, 
+
+    scroll: function() {
+      var current = new Date();
+      var delta = current - this.lastScrolled;
+      this.lastScrolled = current;
+      if(this.options.scroll == window) {
+        with (this._getWindowScroll(this.options.scroll)) {
+          if (this.scrollSpeed[0] || this.scrollSpeed[1]) {
+            var d = delta / 1000;
+            this.options.scroll.scrollTo( left + d*this.scrollSpeed[0], top + d*this.scrollSpeed[1] );
+          }
+        }
+      } else {
+          if(this.options.scroll.scrollerInstance){
+              var pos = this.options.scroll.scrollTop + this.scrollSpeed[1] * delta / 1000;
+              this.options.scroll.scrollerInstance.scrollTo(pos);
+          }else{
+              this.options.scroll.scrollLeft += this.scrollSpeed[0] * delta / 1000;
+              this.options.scroll.scrollTop  += this.scrollSpeed[1] * delta / 1000;
+          }
+      }
+
+      Position.prepare();
+      Position.includeScrollOffsets = true;
+      Droppables.show(Draggables._lastPointer, this.element);
+      Draggables.notify('onDrag', this);
+      if (this._isScrollChild) {
+        Draggables._lastScrollPointer = Draggables._lastScrollPointer || $A(Draggables._lastPointer);
+        Draggables._lastScrollPointer[0] += this.scrollSpeed[0] * delta / 1000;
+        Draggables._lastScrollPointer[1] += this.scrollSpeed[1] * delta / 1000;
+        if (Draggables._lastScrollPointer[0] < 0)
+          Draggables._lastScrollPointer[0] = 0;
+        if (Draggables._lastScrollPointer[1] < 0)
+          Draggables._lastScrollPointer[1] = 0;
+        this.draw(Draggables._lastScrollPointer);
+      }
+
+      if(this.options.change) this.options.change(this);
+    },
+
 
 	/**
 	 * Triggered when the ctrlkey is pressed or released
