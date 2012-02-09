@@ -61,6 +61,7 @@ class fsAccessWrapper implements AjxpWrapper {
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false){
+        $path = self::unPatchPathForBaseDir($path);
     	$url = parse_url($path);
     	$repoId = $url["host"];
     	if(isSet($url["fragment"]) && strlen($url["fragment"]) > 0){
@@ -161,7 +162,18 @@ class fsAccessWrapper implements AjxpWrapper {
 			return realpath($repoObject->getOption("PATH")).$url["path"];
 		}    	
     }
-    
+
+    public static function patchPathForBaseDir($dirPath){
+        if(!ini_get("open_basedir") || !preg_match('/\.zip/i', $dirPath)) return $dirPath;
+        return str_replace(".zip", "__ZIP_EXTENSION__", $dirPath);
+
+    }
+
+    public static function unPatchPathForBaseDir($dirPath){
+        if(!ini_get("open_basedir")) return $dirPath;
+        return str_replace("__ZIP_EXTENSION__", ".zip", $dirPath);
+    }
+
     public static function removeTmpFile($tmpDir, $tmpFile){
     	if(is_file($tmpFile)) unlink($tmpFile);
     	if(is_dir($tmpDir)) rmdir($tmpDir);
@@ -266,7 +278,19 @@ class fsAccessWrapper implements AjxpWrapper {
     }
     
     public function url_stat($path, $flags){    
-    	// File and zip case	
+    	// File and zip case
+        $patchedPath = self::patchPathForBaseDir($path);
+        if(ini_get("open_basedir") && preg_match('/__ZIP_EXTENSION__/', $patchedPath)){
+            // Zip Folder case
+            self::$lastRealSize = false;
+            $search = basename($path);
+            $realBase = $this->initPath(dirname($path), "dir");
+            if($realBase == -1){
+                if(array_key_exists($search, self::$currentListing)){
+                    return self::$currentListing[$search];
+                }
+            }
+        }
     	if($fp = @fopen($path, "r")){    		
 	    	$stat = fstat($fp);
     		fclose($fp);
