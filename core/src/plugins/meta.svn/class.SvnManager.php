@@ -132,7 +132,7 @@ class SvnManager extends AJXP_Plugin {
 			}else if(isSet($revRange)){
 				print("<revision_range start='$revRange[0]' end='$revRange[1]'/>");
 			}
-			print(SystemTextEncoding::toUTF8(implode("", $lines)));
+			print(SystemTextEncoding::toUTF8(implode("", $lines), false));
 			AJXP_XMLWriter::close();
 		}else if($actionName == "svndownload"){
 			$revision = $httpVars["revision"];
@@ -275,14 +275,18 @@ class SvnManager extends AJXP_Plugin {
 	 * @param AJXP_Node $ajxpNode
 	 */
 	public function extractMeta(&$ajxpNode){
-		if(isSet($_SESSION["SVN_COMMAND_RUNNING"]) && $_SESSION["SVN_COMMAND_RUNNING"] === true) return ;
+		//if(isSet($_SESSION["SVN_COMMAND_RUNNING"]) && $_SESSION["SVN_COMMAND_RUNNING"] === true) return ;
 		$realDir = dirname($ajxpNode->getRealFile());
 		if(SvnManager::$svnListDir == $realDir){
 			$entries = SvnManager::$svnListCache;
 		}else{
-			SvnManager::$svnListDir = $realDir;
-			$entries = $this->svnListNode($realDir);
-			SvnManager::$svnListCache = $entries;
+            try{
+                SvnManager::$svnListDir = $realDir;
+                $entries = $this->svnListNode($realDir);
+                SvnManager::$svnListCache = $entries;
+            }catch(Exception $e){
+                AJXP_Logger::logAction("Error", array($e->getMessage()));
+            }
 		}
 		$fileId = SystemTextEncoding::toUTF8(basename($ajxpNode->getUrl()));
 		if(isSet($entries[$fileId])){
@@ -297,9 +301,9 @@ class SvnManager extends AJXP_Plugin {
 			$switches = '--xml -r'.$revision;
 		}
 		$_SESSION["SVN_COMMAND_RUNNING"] = true;
-		if(substr(strtolower(PHP_OS), 0, 3) == "win") session_write_close();
+		//if(substr(strtolower(PHP_OS), 0, 3) == "win") session_write_close();
 		$res = ExecSvnCmd($command, $realPath, $switches);
-		if(substr(strtolower(PHP_OS), 0, 3) == "win") session_start();
+		//if(substr(strtolower(PHP_OS), 0, 3) == "win") session_start();
 		unset($_SESSION["SVN_COMMAND_RUNNING"]);
 		$domDoc = DOMDocument::loadXML($res[IDX_STDOUT]);
 		$xPath = new DOMXPath($domDoc);
