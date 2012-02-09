@@ -41,6 +41,9 @@ Class.create("ActivityMonitor", {
 	 */
 	initialize : function(serverSessionTime, clientSessionTime, warningMinutes){
 		if(!serverSessionTime) return;
+        if(serverSessionTime <= 60*this._renewMinutes){
+            this._renewMinutes = 2;
+        }
 		if(clientSessionTime == -1){
 			this._renewTime = serverSessionTime - this._renewMinutes*60;
 			this.serverInterval = window.setInterval(this.serverObserver.bind(this), this._renewTime*1000);
