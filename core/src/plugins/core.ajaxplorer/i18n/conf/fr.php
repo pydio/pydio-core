@@ -103,5 +103,18 @@ $mess=array(
 "If set to a given URL, the login action will not trigger the display of login screen but redirect to this URL." => "Si non-vide, l'action de login va déclencher une redirection vers une autre page plutôt que l'affichage du formulaire de login.",
 "Admin Login" => "Admin Login",
 "For exotic auth drivers, an user ID that must be considered as admin by default." => "Pour les auth drivers externe, peut permettre de fixer un login qui sera considérer comme administrateur.",
+"Show hidden files" => "Fichiers système",
+"Show files beginning with a ." => "Montrer les fichiers commencant par un point.",
+"Hide recycle bin" => "Cacher la corbeille",
+"Whether to show the recycle bin folder. Unlike in the following options, the folder will be hidden but still writeable." => "Considérer la corbeille comme un fichier caché mais garder la fonctionnalité de corbeille active.",
+"Hide extensions" => "Extensions cachées",
+"Comma-separated list of extensions to hide. Extensions, files and folders that are hidden are also access forbidden." => "Liste séparée par des virgules d'extensions à ne pas lister.",
+"Hide folders" => "Répertoires cachés",
+"Comma-separated list of specific folders to hide" => "Liste séparée par des virgules de répertoires à cacher systématiquement.",
+"Hide files" => "Fichiers cachés",
+"Comma-separated list of specific files to hide" => "Liste séparée par des virgules de fichiers à cacher.",
+"Metadata and indexation" => "Metadonnées et indexation",
+"Default Metasources" => "MetaSources par défaut",
+"Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Liste de plugins metastore et meta qui seront appliqués automatiquement aux dépôts créés avec ce driver.",
 );
 ?>
