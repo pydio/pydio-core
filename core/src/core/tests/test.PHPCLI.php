@@ -54,8 +54,7 @@ class PHPCLI extends AbstractTest
             file_put_contents($tmpBat, $cmd);
             pclose(popen("start /b ".$tmpBat, 'r'));
         }else{
-            $process = new UnixProcess($cmd, $logFile);
-            return $process;
+            new UnixProcess($cmd, $logFile);
         }
 
         sleep(1);
