@@ -156,7 +156,7 @@ class SerialMetaStore extends AJXP_Plugin {
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
         }
         self::$metaCache = array();
-		if(is_file($metaFile) && is_readable($metaFile)){
+		if(@is_file($metaFile) && is_readable($metaFile)){
             self::$currentMetaName = $metaFile;
 			$rawData = file_get_contents($metaFile);
             self::$fullMetaCache = unserialize($rawData);
@@ -200,7 +200,7 @@ class SerialMetaStore extends AJXP_Plugin {
             }
             $metaFile = $this->globalMetaFile."_".$repositoryId;
         }
-		if((is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || ($scope=="repository") ){
+		if((@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || ($scope=="repository") ){
             if(!isset(self::$fullMetaCache[$fileKey])){
                 self::$fullMetaCache[$fileKey] = array();
             }
