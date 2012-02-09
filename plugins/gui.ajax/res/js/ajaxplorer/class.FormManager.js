@@ -86,8 +86,8 @@ Class.create("FormManager", {
 					if(defaultValue == "true" || defaultValue == "1") selectTrue = true;
 					if(defaultValue == "false" || defaultValue == "0") selectFalse = true;
 				}
-				element = '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> Yes';
-				element = element + '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> No';
+				element = '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> '+MessageHash[440];
+				element = element + '<input type="radio" ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> '+MessageHash[441];
 				element = '<div class="SF_input">'+element+'</div>';
 			}else if(type == 'select' && param.get('choices')){
                 var choices = param.get('choices').split(",");

@@ -1015,7 +1015,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.104" attributeName="enabled" sortType="String" defaultWidth="10%"/>
 			<column messageId="ajxp_conf.105" attributeName="can_active" sortType="String" defaultWidth="10%"/>
 			</columns>');
-            
+            $mess = ConfService::getMessages();
 			foreach($types[$type] as $pId => $pObject){
 				$errors = "OK";
 				try{
@@ -1027,7 +1027,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					"icon" 		=> "preferences_plugin.png",
 					"ajxp_mime" => "ajxp_plugin",
 					"can_active"	=> $errors,
-					"enabled"	=> ($pObject->isEnabled()?"Yes":"No"),
+					"enabled"	=> ($pObject->isEnabled()?$mess[440]:$mess[441]),
 					"plugin_id" => $pObject->getId(),
 					"plugin_description" => $pObject->getManifestDescription()
 				);
@@ -1112,7 +1112,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			AJXP_XMLWriter::renderNode("/roles/".$roleId, $roleId, true, array(
 				"icon" => "user_group_new.png",				
 				"rights_summary" => $rightsString,
-                "is_default"    => ($roleObject->isDefault() ? "Yes":"No"),
+                "is_default"    => ($roleObject->isDefault() ? $mess[440]:$mess[441]),
 				"ajxp_mime" => "role"
 			));
 		}

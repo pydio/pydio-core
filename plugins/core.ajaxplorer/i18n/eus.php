@@ -483,6 +483,8 @@ $mess=array(
 "437" => "Ooops, it seems that your security token has expired! Please %s by hitting refresh or F5 in your browser!",
 "438" => "reload the page",
 "439" => "Main Options",
+"440" => "Yes",
+"441" => "No",
 /* END SENTENCE */
 /* END SENTENCE */
 );
