@@ -1,10 +1,59 @@
-AjaXplorer 4.0.1 Release Note
+AjaXplorer 4.0.2 Release Note
 
 License : Affero GPL
-Copyright : Charles du Jeu 2011
-Version number : 4.0.1
+Copyright : Charles du Jeu 2012
+Version number : 4.0.2
 Demo : http://ajaxplorer.info/demo
 
+
+[Security]
+Fix a potential XSS via the doc feature
+
+[Hooks]
+Ability to apply callbacks in a "deferred" way, i.e. after the output is sent to the client. Drastically increasing user experience.
+New hook "node.before_change", to be used by locking plugins
+
+[Access drivers]
+Moved global parameters "hide folder, show hidden files, etc" to the filesystem_commons mixin.
+Test HIDE_XXX is not empty, otherwise there are false-negatives
+Try to chmod 755 publiclets to make sure they are executable.
+Typo error in the fixPermissions() routine
+Access.fs : Deploy various strategies to go around open_basedir php inconsistencies.
+Access.fs : Use copy() when driver is not remote, it's much more efficient
+Access.fs : X-Sendfile needs UTF8
+Action.powerfs : Do not sleep() at the end of the archive creation, otherwise the zip_operation file is created again
+Access.fs : "Purge" action was commited commented
+
+[Gui]
+Place the window.opener tentative inside a try/catch to avoid permission error
+Adapt tree scrolling when focusing on a given node, + compile
+Fix dragndrop & scrolling problems.
+NL2BR for line feeds in the notification body
+Editor.browser : url broken if there are paremeters in the current url
+Editor.browser : Filehandle left open, was breaking download on CentOS
+
+[Plugins]
+Meta.simple_lock : Simple "locking" implementation : manually lock/unlock files to other users.
+Action.skeleton: custom_target_url typo error
+Auth.ftp  : Translate FTP dynamic login screen / Translate yes/no options
+Uploader.flex : FlexUploadProcessor, double utf8 decoding was breaking special chars!
+Uploader.html : Make sure no to close the uploader if some file is still loading
+Uploader.html : Fix the allowed extension mechanism
+Access.ajxp_conf : fix MIXIN_MESSAGE appearance in Wallet data
+german translation for action.share
+Fix uploaders ALLOWED_EXTENSIONS usage (comma separated list), and text for other uploaders to enable flex if it's the only one.
+
+[Core & Language]
+Add a new test for detecting the CLI php
+Catch exception in webdav backend and encapsulate in a webdav error.
+Fix compat version of json_decode, and make sure to expect the "assoc" version of the function, as the compat version only support this (not the stdClass). Was breaking upgrade for php5.1.X
+Weirdness in serializations with the inferOptionsFromParent property, seem to be fixed by setting it private with getter/setter. Was breaking share metadata in templates children...
+For php 5.1, the protected nature of the properties fail, do not call them directly, use the getter() instead.
+
+
+
+AjaXplorer 4.0.1 Release Note
+------------------------------------------------------
 This is a bugfix release.
 
 [New]
