@@ -102,5 +102,18 @@ $mess=array(
 "If set to a given URL, the login action will not trigger the display of login screen but redirect to this URL." => "If set to a given URL, the login action will not trigger the display of login screen but redirect to this URL.",
 "Admin Login" => "Admin Login",
 "For exotic auth drivers, an user ID that must be considered as admin by default." => "For exotic auth drivers, an user ID that must be considered as admin by default.",
+"Show hidden files" => "Show hidden files",
+"Show files beginning with a ." => "Show files beginning with a .",
+"Hide recycle bin" => "Hide recycle bin",
+"Whether to show the recycle bin folder. Unlike in the following options, the folder will be hidden but still writeable." => "Whether to show the recycle bin folder. Unlike in the following options, the folder will be hidden but still writeable.",
+"Hide extensions" => "Hide extensions",
+"Comma-separated list of extensions to hide. Extensions, files and folders that are hidden are also access forbidden." => "Comma-separated list of extensions to hide. Extensions, files and folders that are hidden are also access forbidden.",
+"Hide folders" => "Hide folders",
+"Comma-separated list of specific folders to hide" => "Comma-separated list of specific folders to hide",
+"Hide files" => "Hide files",
+"Comma-separated list of specific files to hide" => "Comma-separated list of specific files to hide",
+"Metadata and indexation" => "Metadata and indexation",
+"Default Metasources" => "Default Metasources",
+"Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver",
 );
 ?>

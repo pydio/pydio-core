@@ -10,14 +10,8 @@
 		<param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="true" mandatory="true"/>
         <param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
         <param name="PURGE_AFTER" type="integer" label="CONF_MESSAGE[Purge Days]" description="CONF_MESSAGE[Option to purge documents after a given number of days. This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature.]" default="0"/>
-        <global_param name="SHOW_HIDDEN_FILES" type="boolean" label="CONF_MESSAGE[Show hidden files]" description="CONF_MESSAGE[Show files beginning with a .]" default="false"/>
-        <global_param name="HIDE_RECYCLE" type="boolean" label="CONF_MESSAGE[Hide recycle bin]" description="CONF_MESSAGE[Whether to show the recycle bin folder. Unlike in the following options, the folder will be hidden but still writeable.]" default="false"/>
-        <global_param name="HIDE_EXTENSIONS" type="string" label="CONF_MESSAGE[Hide extensions]" description="CONF_MESSAGE[Comma-separated list of extensions to hide. Extensions, files and folders that are hidden are also access forbidden.]" default="ser"/>
-        <global_param name="HIDE_FOLDERS" type="textarea" label="CONF_MESSAGE[Hide folders]" description="CONF_MESSAGE[Comma-separated list of specific folders to hide]"/>
-        <global_param name="HIDE_FILENAMES" type="textarea" label="CONF_MESSAGE[Hide files]" description="CONF_MESSAGE[Comma-separated list of specific files to hide]"/>
         <global_param name="PROBE_REAL_SIZE" type="boolean" label="CONF_MESSAGE[Real Size Probing]" description="CONF_MESSAGE[Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)]" default="false"/>
         <global_param name="USE_XSENDFILE" type="boolean" label="CONF_MESSAGE[X-SendFile Active]" description="CONF_MESSAGE[Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)]" default="false"/>
-        <global_param name="DEFAULT_METASOURCES" type="string" label="CONF_MESSAGE[Default Metasources]" description="CONF_MESSAGE[Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false" default="metastore.serial,index.lucene"/>
 	</server_settings>
 	<class_definition filename="plugins/access.fs/class.fsAccessDriver.php" classname="fsAccessDriver"/>
 	<registry_contributions>
