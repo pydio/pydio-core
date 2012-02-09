@@ -136,6 +136,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		parent::accessPreprocess($action, $httpVars, $fileVars);
 		$selection = new UserSelection();
 		$dir = $httpVars["dir"] OR "";
+        if($this->wrapperClassName == "fsAccessWrapper"){
+            $dir = fsAccessWrapper::patchPathForBaseDir($dir);
+        }
 		$dir = AJXP_Utils::securePath($dir);
 		if($action != "upload"){
 			$dir = AJXP_Utils::decodeSecureMagic($dir);
@@ -549,7 +552,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 							break;
 						}
 					}else{
-						if (!move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name))
+                        $result = @move_uploaded_file($boxData["tmp_name"], "$destination/".$userfile_name);
+                        if(!$result){
+                            $realPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"),"$destination/".$userfile_name);
+                            $result = move_uploaded_file($boxData["tmp_name"], $realPath);
+                        }
+						if (!$result)
 						{
 							$errorCode=411;
 							$errorMessage="$mess[33] ".$userfile_name;
@@ -585,6 +593,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				
 				$dir = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($dir));
 				$path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
+                $nonPatchedPath = $path;
+                if($this->wrapperClassName == "fsAccessWrapper") {
+                    $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
+                }
 				$threshold = $this->repository->getOption("PAGINATION_THRESHOLD");
 				if(!isSet($threshold) || intval($threshold) == 0) $threshold = 500;
 				$limitPerPage = $this->repository->getOption("PAGINATION_NUMBER");
@@ -607,7 +619,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				if(RecycleBinManager::recycleEnabled() && $dir == ""){
                     $metaData["repo_has_recycle"] = "true";
 				}
-				$parentAjxpNode = new AJXP_Node($path, $metaData);
+				$parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
                 $parentAjxpNode->loadNodeInfo(false, true);
 				AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
 				if(isSet($totalPages) && isSet($crtPage)){
@@ -626,7 +638,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$cursor = 0;
 				$handle = opendir($path);
 				if(!$handle) {
-					throw new AJXP_Exception("Cannot open dir ".$path);
+					throw new AJXP_Exception("Cannot open dir ".$nonPatchedPath);
 				}
 				closedir($handle);				
 				$fullList = array("d" => array(), "z" => array(), "f" => array());				
@@ -654,14 +666,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						break;
 					}					
 					
-					$currentFile = $path."/".$nodeName;
+					$currentFile = $nonPatchedPath."/".$nodeName;
                     $meta = array();
                     if($isLeaf != "") $meta = array("is_file" => ($isLeaf?"1":"0"));
                     $node = new AJXP_Node($currentFile, $meta);
                     $node->setLabel($nodeName);
                     $node->loadNodeInfo();
 					if(!empty($metaData["nodeName"]) && $metaData["nodeName"] != $nodeName){
-                        $node->setUrl($path."/".$metaData["nodeName"]);
+                        $node->setUrl($nonPatchedPath."/".$metaData["nodeName"]);
 					}
 
                     $nodeType = "d";
@@ -901,6 +913,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		if($gzip === null){
 			$gzip = ConfService::getCoreConf("GZIP_COMPRESSION");
 		}
+        if($this->wrapperClassName == "fsAccessWrapper"){
+            $filePathOrData = fsAccessWrapper::patchPathForBaseDir($filePathOrData);
+        }
 		session_write_close();
 
 		restore_error_handler();
