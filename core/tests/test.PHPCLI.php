@@ -32,7 +32,8 @@ class PHPCLI extends AbstractTest
     {
         $defaultCli = "php";
         $token = md5(time());
-        if(!is_writable(AJXP_CACHE_DIR)){
+        $windows = (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows");
+        if(!is_writable(AJXP_CACHE_DIR) || ($windows && !function_exists("popen")) || (!$windows && !function_exists("exec"))){
             $this->testedParams["Command Line Available"] = "No";
             $this->failedLevel = "warning";
             $this->failedInfo = "Php command line not detected (cache directory not writeable), this is NOT BLOCKING, but enabling it could allow to send some long tasks in background. If you do not have the ability to tweak your server, you can safely ignore this warning.";
@@ -47,7 +48,7 @@ class PHPCLI extends AbstractTest
 
         $cmd = $defaultCli." ".AJXP_CACHE_DIR.DIRECTORY_SEPARATOR."cli_test.php";
 
-        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
+        if ($windows){
             $tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "data","tmp", md5(time()).".bat"));
             $cmd .= " > ".$logFile;
             $cmd .= "\n DEL $tmpBat";
