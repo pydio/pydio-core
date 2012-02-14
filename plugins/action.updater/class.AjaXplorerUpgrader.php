@@ -162,6 +162,9 @@ class AjaXplorerUpgrader {
     function backupMarkedFiles(){
 
         $targetFolder = $this->installPath;
+        if(!is_array($this->markedFiles) || !count($this->markedFiles)){
+            return "Nothing to do";
+        }
         foreach($this->markedFiles as $index => $file){
             $file = trim($file);
             if(!empty($file) && is_file($targetFolder."/".$file)){
@@ -214,9 +217,11 @@ class AjaXplorerUpgrader {
 
     function duplicateConfFiles(){
         $confFiles = glob($this->workingFolder."/conf/*.php");
-        foreach($confFiles as $file){
-            $newFileName = $this->installPath."/conf/".basename($file).".new-".date("Ymd");
-            copy($file, $newFileName);
+        if($confFiles !== false){
+            foreach($confFiles as $file){
+                $newFileName = $this->installPath."/conf/".basename($file).".new-".date("Ymd");
+                copy($file, $newFileName);
+            }
         }
         return "Successfully copied ".count($confFiles)." files inside config folder (not overriden, please review them)";
     }
