@@ -6,8 +6,9 @@
         </resources>
     </client_settings>
 	<server_settings>
-		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Full path to the Samba Share without trailing slash. Can contain user:password too.]" mandatory="true" default="//SERVER_IP/SHARE"/>
-		<param name="PATH" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path to the root folder on the server]" mandatory="false"/>
+		<param name="HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Server IP or name, do not use add slashes or backward slashes]" mandatory="true" default="SERVER_IP"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Uri]" description="CONF_MESSAGE[Path to the share and complementary URI if necessary]" mandatory="false"/>
+        <global_param name="SMBCLIENT" type="string" label="CONF_MESSAGE[Smbclient]" description="CONF_MESSAGE[Path to smbclient executable, considered to be in the path by default.]" mandatory="true" default="smbclient"/>
 		<param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
 	</server_settings>
 	<class_definition filename="plugins/access.smb/class.smbAccessDriver.php" classname="smbAccessDriver"/>
