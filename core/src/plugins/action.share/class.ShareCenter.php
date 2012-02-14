@@ -490,15 +490,17 @@ class ShareCenter extends AJXP_Plugin{
         require_once($filePath);
         $driver = new $className($data["PLUGIN_ID"], $data["BASE_DIR"]);
         $driver->loadManifest();
-        if($driver->hasMixin("credentials_consumer") && isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])){
-        	// FORCE SESSION MODE
-        	AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
-        	AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
-        }
+
         $hash = md5(serialize($data));
         PublicletCounter::increment($hash);
 
         AuthService::logUser($data["OWNER_ID"], "", true);
+        if($driver->hasMixin("credentials_consumer") && isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])){
+            // FORCE SESSION MODE
+            AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
+            AJXP_Safe::storeCredentials($data["SAFE_USER"], $data["SAFE_PASS"]);
+        }
+
         $repoObject = $data["REPOSITORY"];
         ConfService::switchRootDir($repoObject->getId());
         ConfService::loadRepositoryDriver();
