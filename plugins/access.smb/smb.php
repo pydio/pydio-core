@@ -138,9 +138,9 @@ class smb {
         $port = ($purl['port'] <> 139 ? ' -p ' . escapeshellarg ($purl['port']) : '');
         $options = '-O ' . escapeshellarg(SMB4PHP_SMBOPTIONS);
         //AJXP_Logger::debug($auth);
-        AJXP_Logger::debug("SMBCLIENT", " -N {$options} {$port} {$options} {$params} 2>/dev/null {$auth}");
+        AJXP_Logger::debug("SMBCLIENT", " -N {$options} {$port} {$options} {$params} 2>/dev/null [auth data]");
 	//AJXP_Logger::debug("I just ran an smbclient call");
-        $output = popen (SMB4PHP_SMBCLIENT." -N {$options} {$port} {$options} {$params} 2>/dev/null {$auth}", 'r'); 
+        $output = popen (SMB4PHP_SMBCLIENT." -N {$options} {$port} {$options} {$params} 2>/dev/null {$auth}", 'r');
         $info = array ();
         while ($line = fgets ($output, 4096)) {
             list ($tag, $regs, $i) = array ('skip', array (), array ());
@@ -381,11 +381,14 @@ class smb {
 		$pu['scheme'] = 'smb';
 		$temp = substr($url, 6);
 		//echo $temp . "\n";
-		$i = 0;
-		while($temp[$i] != ':'){
-			$i++;
-		}
-		$pu['user'] = substr($temp, 0 , $i);
+        $pu['user'] = "";
+        if(strstr($temp, ":") !== false){
+            $i = 0;
+            while($temp[$i] != ':'){
+                $i++;
+            }
+            $pu['user'] = substr($temp, 0 , $i);
+        }
 		//echo $pu['user'] . "\n";
 
 		$temp = substr($temp, $i + 1);
@@ -464,7 +467,7 @@ class smb_stream_wrapper extends smb {
                 break;
             case 'share':
             case 'path':
-            	$o = smb::execute ('dir "'.$pu['path'].'\*"', $pu);            	
+            	$o = smb::execute ('dir "'.$pu['path'].'\*"', $pu);
                 if (is_array($o)) {
                 	if(isSet($o['info'])){
 	                   $this->dir = array_keys($o['info']);	                   
