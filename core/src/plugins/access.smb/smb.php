@@ -152,7 +152,8 @@ class smb {
             $auth = '';
         } else {
 			//$purl['pass'] = preg_replace('/@/', '\@', $purl['pass']);
-            $auth = ($purl['user'] <> '' ? (' -U ' . escapeshellarg ($purl['user'] . '%' . $purl['pass'])) : '');
+            $auth = ($purl['user'] <> '' ? (' -U ' . escapeshellarg ($purl['user'] . '__SEP__' . $purl['pass'])) : '');
+            $auth = str_replace("__SEP__", "%", $auth);
             //self::debug($auth);
         }
         if ($purl['domain'] <> '') {
@@ -355,7 +356,11 @@ class smb {
         global $__smb_cache;
         $url = smb::cleanUrl($url);
         $is_file = (strpos ($info['attr'],'D') === FALSE);
-        $s = ($is_file) ? stat ('/etc/passwd') : stat ('/tmp');
+        if(stripos(PHP_OS, "win") !== false){
+            $s = ($is_file) ? stat (__FILE__) : stat (dirname(__FILE__));
+        }else{
+            $s = ($is_file) ? stat ('/etc/passwd') : stat ('/tmp');
+        }
         if($is_file){
         	$s[2] = $s['mode'] = 0666;
         	$s[2] = $s['mode'] |= 0100000;
