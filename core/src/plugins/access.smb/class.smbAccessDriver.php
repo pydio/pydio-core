@@ -37,17 +37,20 @@ class smbAccessDriver extends fsAccessDriver
 		
 	function initRepository(){
 
-        require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
-
 		if(is_array($this->pluginConf)){
 			$this->driverConf = $this->pluginConf;
 		}else{
 			$this->driverConf = array();
 		}
+        $smbclientPath = $this->driverConf["SMBCLIENT"];
+        define ('SMB4PHP_SMBCLIENT', $smbclientPath);
+
+        require_once($this->getBaseDir()."/smb.php");
+
 
 		$create = $this->repository->getOption("CREATE");
 		$recycle = $this->repository->getOption("RECYCLE_BIN");
-		
+
 		$wrapperData = $this->detectStreamWrapper(true);
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
