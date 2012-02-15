@@ -28,10 +28,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class IOSGuiPlugin extends AJXP_Plugin {
 
     public function performChecks(){
-        if(!AJXP_Utils::userAgentIsMobile()) throw new Exception("no");
-        if (!(AJXP_Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"]))){
-            throw new Exception("no");
+        if (AJXP_Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])){
+            return;
         }
+        if (AJXP_Utils::userAgentIsAndroid() && !isSet($_GET["skipANDROID"]) && !isSet($_COOKIE["SKIP_ANDROID"])){
+            return;
+        }
+        throw new Exception("Active only when mobile user agent detected.");
     }
 
 }

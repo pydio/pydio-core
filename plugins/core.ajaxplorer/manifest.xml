@@ -6,7 +6,7 @@
         </resources>
     </client_settings>
 	<server_settings>
-		<global_param name="APPLICATION_TITLE" group="CONF_MESSAGE[Main]" type="string" label="CONF_MESSAGE[App Title]" description="CONF_MESSAGE[Your application title]" mandatory="true" default="AjaXplorer"/>
+		<global_param name="APPLICATION_TITLE" group="CONF_MESSAGE[Main]" type="string" label="CONF_MESSAGE[App Title]" description="CONF_MESSAGE[Your application title]" mandatory="true" default="AjaXplorer" expose="true"/>
 		<global_param name="DEFAULT_LANGUAGE" group="CONF_MESSAGE[Main]" type="string" label="CONF_MESSAGE[Default Language]" description="CONF_MESSAGE[Default language when a user does not have set his/her own.]" mandatory="true" default="en"/>
 		<global_param name="PUBLIC_DOWNLOAD_FOLDER" group="CONF_MESSAGE[Sharing]" type="string" label="CONF_MESSAGE[Download Folder]" description="CONF_MESSAGE[Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature.]" mandatory="false" default="AJXP_INSTALL_PATH/data/public"/>
 		<global_param name="PUBLIC_DOWNLOAD_URL" group="CONF_MESSAGE[Sharing]" type="string" label="CONF_MESSAGE[Download URL]" description="CONF_MESSAGE[If not inferred directly from the current ajaxplorer URI plus the public download folder name, replace the public access URL here.]" mandatory="false" default=""/>
