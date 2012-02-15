@@ -313,6 +313,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                 }catch(Exception $e){
                     header("Content-Type:text/plain");
                     $e->getMessage();
+                    return;
                 }
 				if(!is_file($fileName) || !$this->isWriteable($fileName, "file")){
 					header("Content-Type:text/plain");
