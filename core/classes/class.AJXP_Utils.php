@@ -299,6 +299,9 @@ class AJXP_Utils
         if (isSet($parameters["skipIOS"])) {
             setcookie("SKIP_IOS", "true");
         }
+        if (isSet($parameters["skipANDROID"])) {
+            setcookie("SKIP_ANDROID", "true");
+        }
         if (isSet($parameters["gui"])) {
             setcookie("AJXP_GUI", $parameters["gui"]);
             if ($parameters["gui"] == "light") $session["USE_EXISTING_TOKEN_IF_EXISTS"] = true;
@@ -990,6 +993,7 @@ class AJXP_Utils
                     || strpos($ua, 'nokia') !== false
                     || strpos($ua, 'samsung') !== false
                     || strpos($ua, 'mobile') !== false
+                    || strpos($ua, 'android') !== false
                     || strpos($ua, 'windows ce') !== false
                     || strpos($ua, 'epoc') !== false
                     || strpos($ua, 'opera mini') !== false
@@ -1064,9 +1068,19 @@ class AJXP_Utils
      */
     public static function userAgentIsIOS()
     {
-        if (strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "iphone") !== false) return true;
-        if (strpos(strtolower($_SERVER["HTTP_USER_AGENT"]), "ipad") !== false) return true;
+        if (stripos($_SERVER["HTTP_USER_AGENT"], "iphone") !== false) return true;
+        if (stripos($_SERVER["HTTP_USER_AGENT"], "ipad") !== false) return true;
+        if (stripos($_SERVER["HTTP_USER_AGENT"], "ipod") !== false) return true;
         return false;
+    }
+    /**
+     * Detect Android UA
+     * @static
+     * @return bool
+     */
+    public static function userAgentIsAndroid()
+    {
+        return (stripos($_SERVER["HTTP_USER_AGENT"], "android") !== false);
     }
     /**
      * Try to remove a file without errors

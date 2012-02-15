@@ -38,7 +38,6 @@ document.observe("ajaxplorer:gui_loaded", function(){
     if(currentHref.indexOf("#") > -1){
         currentHref = currentHref.substr(0, currentHref.indexOf("#"));
     }
-	$("skipios-redir").href = currentHref + (currentHref.indexOf("?")>-1?"&":"?") + "skipIOS=true";
     var suffix;
     if(navigator.userAgent.match(/android/i)){
         $("appstore-redir").href = ajaxplorer.getPluginConfigs("guidriver").get("ANDROID_URL");
@@ -48,6 +47,7 @@ document.observe("ajaxplorer:gui_loaded", function(){
         $("appstore-redir").href = ajaxplorer.getPluginConfigs("guidriver").get("IOS_URL");
         suffix = "ios";
     }
+    $("skipios-redir").href = currentHref + (currentHref.indexOf("?")>-1?"&":"?") + "skip"+suffix.toUpperCase()+"=true";
     $("message-id-1").update(MessageHash["ios_gui.1."+suffix].replace("%s", ajaxplorer.getPluginConfigs("ajaxplorer").get("APPLICATION_TITLE")));
     $("ajxpserver-redir").update(MessageHash["ios_gui.2."+suffix].replace("%s", ajaxplorer.getPluginConfigs("ajaxplorer").get("APPLICATION_TITLE")));
     $("appstore-redir").update(MessageHash["ios_gui.3."+suffix].replace("%s", ajaxplorer.getPluginConfigs("ajaxplorer").get("APPLICATION_TITLE")));
