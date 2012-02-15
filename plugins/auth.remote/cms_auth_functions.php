@@ -28,7 +28,7 @@
  * @return array
  */
 function extractResponseCookies($client){
-	AJXP_Logger::debug(print_r($client, true));
+	//AJXP_Logger::debug(print_r($client, true));
 	$cooks = $client->getHeader("set-cookie");
 	if(empty($cooks)) return array();
 	if(is_string($cooks)){
@@ -66,26 +66,42 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = ""){
 	$client->setHandleRedirects(false);
 	$res = $client->get($uri);
 	$content = $client->getContent();
-	$xmlDoc = DOMDocument::loadHTML($content);
-	$xPath = new DOMXPath($xmlDoc);
-	if($formId == "") $formId = "login-form";
-	$nodes = $xPath->query('//form[@id="'.$formId.'"]');
-	if(!$nodes->length) {
-		return "";
-	}
-	$form = $nodes->item(0);
-	$postUri = $form->getAttribute("action");
-	$hiddens = $xPath->query('//input[@type="hidden"]', $form);
-	AJXP_Logger::debug("Carry on ". $hiddens->length);
-	$postData = array(
-		"username" => $login, 
-		"password" => $pass,
-		"Submit"   => "Log in",
-		"remember" => "yes"
-	);
-	foreach($hiddens as $hiddenNode){
-		$postData[$hiddenNode->getAttribute("name")] = $hiddenNode->getAttribute("value");
-	}
+    $postData = array(
+   		"username" => $login,
+   		"password" => $pass,
+   		"Submit"   => "Log in",
+   		"remember" => "yes"
+   	);
+    $xmlDoc = @DOMDocument::loadHTML($content);
+    if($xmlDoc === false){
+        $pos1 = strpos($content, "<form ");
+        $pos2 = strpos($content, "</form>", $pos1);
+        $content = substr($content, $pos1, $pos2 + "7" - $pos1);
+        $xmlDoc = @DOMDocument::loadHTML($content);
+    }
+    if($xmlDoc !== false){
+       	$xPath = new DOMXPath($xmlDoc);
+       	if($formId == "") $formId = "login-form";
+       	$nodes = $xPath->query('//form[@id="'.$formId.'"]');
+       	if(!$nodes->length) {
+       		return "";
+       	}
+       	$form = $nodes->item(0);
+       	$postUri = $form->getAttribute("action");
+       	$hiddens = $xPath->query('//input[@type="hidden"]', $form);
+        foreach($hiddens as $hiddenNode){
+       		$postData[$hiddenNode->getAttribute("name")] = $hiddenNode->getAttribute("value");
+       	}
+    }else{
+        // Grab all inputs and hardcode $postUri.
+        if(preg_match_all("<input type=\"hidden\" name=\"(.*)\" value=\"(.*)\">", $content, $matches)){
+            foreach($matches[0] as $key => $match){
+                $postData[$matches[1][$key]] = $matches[2][$key];
+            }
+            $postUri = "/login-form";
+        }
+    }
+	//AJXP_Logger::debug("Carry on ". $hiddens->length);
 	$client->setHandleRedirects(false);
 	$client->setHeadersOnly(true);
 	$client->setCookies(extractResponseCookies($client));
