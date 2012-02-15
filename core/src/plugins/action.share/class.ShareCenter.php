@@ -130,14 +130,19 @@ class ShareCenter extends AJXP_Plugin{
             			break;
             		}
             		$loggedUser = AuthService::getLoggedUser();
-            		$allUsers = AuthService::listUsers();
-            		$crtValue = $httpVars["value"];
+                    $crtValue = $httpVars["value"];
+                    if(!empty($crtValue)) $regexp = '/^'.$crtValue.'/i';
+                    else $regexp = null;
+            		$allUsers = AuthService::listUsers($regexp);
             		$users = "";
+                    $limit = $this->pluginConf["SHARED_USERS_LIST_LIMIT"];
+                    $index = 0;
             		foreach ($allUsers as $userId => $userObject){
-            			if($crtValue != "" && (strstr($userId, $crtValue) === false || strstr($userId, $crtValue) != 0)) continue;
             			if( ( $userObject->hasParent() && $userObject->getParent() == $loggedUser->getId() ) || ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") == true  ){
             				$users .= "<li>".$userId."</li>";
             			}
+                        $index ++;
+                        if($index == $limit) break;
             		}
             		if(strlen($users)) {
             			print("<ul>".$users."</ul>");
@@ -539,7 +544,11 @@ class ShareCenter extends AJXP_Plugin{
             $users = array_filter(array_map("trim", explode(",", str_replace("\n", ",",$httpVars["shared_user"]))), array("AuthService","userExists"));
         }
         if(isSet($httpVars["new_shared_user"]) && ! empty($httpVars["new_shared_user"])){
-            array_push($users, AJXP_Utils::decodeSecureMagic($httpVars["new_shared_user"], AJXP_SANITIZE_ALPHANUM));
+            $newshareduser = AJXP_Utils::decodeSecureMagic($httpVars["new_shared_user"], AJXP_SANITIZE_ALPHANUM);
+            if(!empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"]) && strpos($newshareduser, $this->pluginConf["SHARED_USERS_TMP_PREFIX"])!==0 ){
+                $newshareduser = $this->pluginConf["SHARED_USERS_TMP_PREFIX"] . $newshareduser;
+            }
+            array_push($users, $newshareduser);
         }
 		//$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
 		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);

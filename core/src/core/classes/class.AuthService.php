@@ -547,7 +547,7 @@ class AuthService
      * @static
      * @return array
      */
-	static function listUsers()
+	static function listUsers($regexp = null)
 	{
 		$authDriver = ConfService::getAuthDriverImpl();		
 		$confDriver = ConfService::getConfStorageImpl();
@@ -556,6 +556,7 @@ class AuthService
 		foreach (array_keys($users) as $userId)
 		{
 			if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
+            if($regexp != null && !preg_match($regexp, $userId)) continue;
 			$allUsers[$userId] = $confDriver->createUserObject($userId);
 		}
 		return $allUsers;

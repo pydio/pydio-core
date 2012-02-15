@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
-        <global_param name="METADATA_FILE" type="string" label="CONF_MESSAGE[Metadata File]" description="CONF_MESSAGE[Hidden file containing shared metadata]" mandatory="true" default=".ajxp_share_meta"/>
-        <global_param name="METADATA_FILE_LOCATION" type="select" choices="infolders|In Local Folders,global|In Global Folder" label="CONF_MESSAGE[File location]" description="CONF_MESSAGE[Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder.]" mandatory="true" default="infolders"/>
+        <global_param name="SHARED_USERS_LIST_MINIMUM" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Minimum number of characters to start getting results by auto-completion when sharing a folder with other users]" label="CONF_MESSAGE[Autocomplete minimum chars]" type="integer" default="2" expose="true"/>
+        <global_param name="SHARED_USERS_LIST_LIMIT" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Limit the number of results returned by the auto-completion feature when sharing a folder with other users]" label="CONF_MESSAGE[Autocompletion results limit]" type="integer" default="50" expose="true"/>
+        <global_param name="SHARED_USERS_TMP_PREFIX" group="CONF_MESSAGE[Shared users configurations]" description="CONF_MESSAGE[Mandatory prefix for users created temporary users login]" label="CONF_MESSAGE[Tmp users prefix]" type="string" expose="true"/>
+        <global_param name="METADATA_FILE" group="CONF_MESSAGE[Metadata Files]" type="string" label="CONF_MESSAGE[Metadata File]" description="CONF_MESSAGE[Hidden file containing shared metadata]" mandatory="true" default=".ajxp_share_meta"/>
+        <global_param name="METADATA_FILE_LOCATION" group="CONF_MESSAGE[Metadata Files]" type="select" choices="infolders|In Local Folders,global|In Global Folder" label="CONF_MESSAGE[File location]" description="CONF_MESSAGE[Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder.]" mandatory="true" default="infolders"/>
     </server_settings>
     <client_settings>
         <resources>
