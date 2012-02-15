@@ -54,7 +54,7 @@ Class.create("ShareCenter", {
                     "shared_users_autocomplete_choices",
                     ajxpServerAccessPath + "&get_action=share&sub_action=list_shared_users",
                     {
-                        minChars:0,
+                        minChars:ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_LIST_MINIMUM"),
                         paramName:'value',
                         tokens:[',', '\n'],
                         frequency:0.1,
@@ -70,6 +70,10 @@ Class.create("ShareCenter", {
                     });
                 }
                 $('create_shared_user_anchor').observeOnce("click", function(){
+                    var pref = ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_TMP_PREFIX");
+                    if(pref){
+                        $("new_shared_user").setValue(pref);
+                    }
                     $('create_shared_user').appear();
                     $('create_shared_user_anchor').up('div.SF_element').fade();
                 });
