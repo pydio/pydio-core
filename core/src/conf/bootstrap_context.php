@@ -29,7 +29,7 @@ if(function_exists("xdebug_disable")){
 }
 @error_reporting(E_ALL & ~E_NOTICE);
 //Windows users may have to uncomment this
-setlocale(LC_ALL, '');
+//setlocale(LC_ALL, '');
 
 
 list($vNmber,$vDate) = explode("__",file_get_contents(AJXP_CONF_PATH."/VERSION"));
