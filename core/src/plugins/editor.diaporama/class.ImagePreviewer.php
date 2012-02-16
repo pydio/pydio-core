@@ -27,6 +27,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class ImagePreviewer extends AJXP_Plugin {
 
+    private $currentDimension;
+
 	public function switchAction($action, $httpVars, $filesVars){
 		
 		if(!isSet($this->actions[$action])) return false;
@@ -48,7 +50,10 @@ class ImagePreviewer extends AJXP_Plugin {
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			
 			if(isSet($httpVars["get_thumb"]) && $this->pluginConf["GENERATE_THUMBNAIL"]){
-				$cacheItem = AJXP_Cache::getItem("diaporama_200", $destStreamURL.$file, array($this, "generateThumbnail"));
+                $dimension = 200;
+                if(isSet($httpVars["dimension"]) && is_numeric($httpVars["dimension"])) $dimension = $httpVars["dimension"];
+                $this->currentDimension = $dimension;
+				$cacheItem = AJXP_Cache::getItem("diaporama_".$dimension, $destStreamURL.$file, array($this, "generateThumbnail"));
 				$data = $cacheItem->getData();
 				$cId = $cacheItem->getId();
 				
@@ -91,16 +96,19 @@ class ImagePreviewer extends AJXP_Plugin {
 		if($oldFile == null) return ;
 		if(!$this->handleMime($oldFile->getUrl())) return;
 		if($newFile == null || $copy == false){
-			AJXP_Logger::debug("Should find cache item ".$oldFile->getUrl());
-			AJXP_Cache::clearItem("diaporama_200", $oldFile->getUrl());			
+			$diapoFolders = glob(AJXP_CACHE_DIR."/diaporama_*",GLOB_ONLYDIR);
+            if($diapoFolders !== false && is_array($diapoFolders)){
+                foreach($diapoFolders as $f) {
+                    $f = basename($f);
+                    AJXP_Logger::debug("GLOB ".$f);
+                    AJXP_Cache::clearItem($f, $oldFile->getUrl());
+                }
+            }
 		}
 	}
-	
-	public function generateThumbnail400($masterFile, $targetFile){
-		return $this->generateThumbnail($masterFile, $targetFile, 380);
-	}
-	
-	public function generateThumbnail($masterFile, $targetFile, $size = 200){
+
+	public function generateThumbnail($masterFile, $targetFile){
+        $size = $this->currentDimension;
 		require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
 		$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
 		if(!$pThumb->isError()){

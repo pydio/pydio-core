@@ -43,7 +43,7 @@
     </dependencies>				    
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.change" methodName="removeThumbnail"></serverCallback>
+			<serverCallback hookName="node.change" methodName="removeThumbnail" defer="true"></serverCallback>
 		</hooks>		
 		<actions>
 			<action name="slideshow_sel">
