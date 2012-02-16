@@ -1,11 +1,41 @@
-AjaXplorer 4.0.2 Release Note
+AjaXplorer 4.0.3 Release Note
 
 License : Affero GPL
 Copyright : Charles du Jeu 2012
-Version number : 4.0.2
+Version number : 4.0.3
 Demo : http://ajaxplorer.info/demo
+Rev Number : 2746
 
+[Fix side effects of previous release]
+Revert bootstrap_context commited once again with setlocale uncommented.
+PHPCLI test : detect the disabled functions to avoid ugly error at startup!
+The open_basedir fix for zip browsing was breaking the zip extension on download.
+Test glob result in upgrader
+Locked file could save content even if hook node.before_change returned an exception.
 
+[Access Samba]
+Make smb access more robust : configure smbclient path, blur credential in debug, get the procopen error stream, etc...
+Access.smb : handle Windows case for smbclient+cygwin install. Nice!
+Fix a couple of samba tweaks, plus shared links when using auth.smb/access.smb, may impact other auth.** drivers
+Update access.smb documentation
+
+[Users number scalability]
+New options for the ShareCenter : Ability to pass a regexp pattern to AuthService::listUsers()
+Touch a file in the cache to avoid triggering countAdminUser() if not necessary (ie do it only the very first time). Can be very long when a lot of users!
+
+[Android client redirection]
+Adapt iOS GUI Plugin for Android as well, ability to set the app url via the configurations.
+Handle the skipANDROID parameter & cookie
+
+[Other]
+Editor.diaporama : defer cache cleaning hook
+Editor.diaporam : allow the client to ask a specific thumbnail dimension => useful for mobile devices!
+Make joomla_auth_remote function more robust, when the HTML cannot be correctly parsed by a DOMDocument.
+Auth.remote MASTER_XXX variable documentation update, along with the website How-To.
+
+-------------------------------------------------------------------------
+AjaXplorer 4.0.2
+Rev Number : 2728
 [Security]
 Fix a potential XSS via the doc feature
 
