@@ -34,14 +34,14 @@ document.observe("ajaxplorer:gui_loaded", function(){
 	});
 	var currentHref = document.location.href;
 	
-	$("ajxpserver-redir").href = cleanURL(currentHref).replace("http://", "ajxpserver://");
+	$("ajxpserver-redir").href = cleanURL(currentHref).replace("http://", "ajxpserver://").replace("https://", "ajxpservers://");
     if(currentHref.indexOf("#") > -1){
         currentHref = currentHref.substr(0, currentHref.indexOf("#"));
     }
     var suffix;
     if(navigator.userAgent.match(/android/i)){
         $("appstore-redir").href = ajaxplorer.getPluginConfigs("guidriver").get("ANDROID_URL");
-        $("ajxpserver-redir").hide();
+        //$("ajxpserver-redir").hide();
         suffix = "android";
     }else{
         $("appstore-redir").href = ajaxplorer.getPluginConfigs("guidriver").get("IOS_URL");
