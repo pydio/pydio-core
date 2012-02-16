@@ -4,7 +4,7 @@ License : Affero GPL
 Copyright : Charles du Jeu 2012
 Version number : 4.0.3
 Demo : http://ajaxplorer.info/demo
-Rev Number : 2746
+Rev Number : 2748
 
 [Fix side effects of previous release]
 Revert bootstrap_context commited once again with setlocale uncommented.
