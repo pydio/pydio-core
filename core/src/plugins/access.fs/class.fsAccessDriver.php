@@ -915,6 +915,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			$gzip = ConfService::getCoreConf("GZIP_COMPRESSION");
 		}
         if($this->wrapperClassName == "fsAccessWrapper"){
+            $originalFilePath = $filePathOrData;
             $filePathOrData = fsAccessWrapper::patchPathForBaseDir($filePathOrData);
         }
 		session_write_close();
@@ -945,7 +946,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			$gzip = false; // disable gzip
 		}
 		
-		$localName = ($localName=="" ? basename($filePathOrData) : $localName);
+		$localName = ($localName=="" ? basename((isSet($originalFilePath)?$originalFilePath:$filePathOrData)) : $localName);
 		if($headerType == "plain")
 		{
 			header("Content-type:text/plain");
