@@ -18,12 +18,23 @@
 *
 * The latest code can be found at <http://www.ajaxplorer.info/>.
 */
-//	Translation by Luca Zorzi
-//	http://lublog.tuttoeniente.net/
-//	luca [AT] tuttoeniente [DOT] net
 //
-//	Updated for AjaXplorer 2.5.5 by
-//      Davide Cavalca <davide at cavalca dot name>
+//      Updated for Ajaxplorer 4.0.2
+//      Italian transalation version: 4.0.2-001
+//
+//      Maintained by Michele Beltrame
+//      http://www.cattlegrid.info/
+//      mb [AT] italpro [DOT] net
+//
+//      Previous maintainers:
+//
+//          Updates for AjaXplorer 2.5.5 by
+//          Davide Cavalca <davide at cavalca dot name>
+//
+//          Original translation by Luca Zorzi
+//          http://lublog.tuttoeniente.net/
+//          luca [AT] tuttoeniente [DOT] net
+//
 //
 //---------------------------------------------------------------------------------------------------
 
@@ -220,7 +231,7 @@ $mess=array(
 "about_access_key" => "z",
 "empty_recycle_access_key" => "o",
 "restore_access_key" => "i",
-"171" => "Esplora il tuo computer",
+"171" => "Esplora computer",
 "172" => "La tua selezione",
 "173" => "Nome della nuova cartella",
 "174" => "Nome del nuovo file",
@@ -344,8 +355,8 @@ $mess=array(
 "291" => "Applicare in modo ricorsivo?",
 "292" => "Collegamento pubblico",
 "293" => "Crea un collegamento pubblico a questo file",
-"294" => "Scadenza collegamento (giorni)",
-"295" => "Password (lasciare vuoto per ora)",
+"294" => "Scadenza collegamento e password",
+"295" => "Scadenza collegamento (giorni)",
 "296" => "Prego copiare il link seguente:",
 "297" => "Nuovo utente",
 "298" => "Crea un nuovo utente",
@@ -369,7 +380,7 @@ $mess=array(
 "314" => "Comprimi la selezione in uno zip...",
 "315" => "Comprimi la selezione in",
 "316" => "Apri con...",
-"open_with_access" => "O",
+"open_with_access" => "c",
 "317" => "Vedi sorgente",
 "318" => "Vedi codice sorgente CodePress",
 "319" => "Editor HTML",
@@ -406,7 +417,7 @@ $mess=array(
 "350" => "Un utente che non sei tu esiste gi&agrave; con questo nome, scegli un altro nome.",
 "351" => "Non sei autorizzato a condividere elementi pubblici.",
 "352" => "Un repository con lo stesso nome esiste gi&agrave;, per favore scegli un altro nome.",
-"353" => "Target utente",
+"353" => "Utente destinatario",
 "354" => "Crea un nuovo utente o scegline uno di quelli esistenti dalla lista.",
 "355" => "Utente",
 "356" => "Password",
@@ -434,7 +445,7 @@ $mess=array(
 "379" => "Parola non sicura!",
 "380" => "Troppo corta",
 "381" => "Molto debole",
-"382" => "Bebole",
+"382" => "Debole",
 "383" => "Media",
 "384" => "Forte",
 "385" => "Molto forte",
@@ -453,20 +464,20 @@ $mess=array(
 "400" => "Numero di pezzi:",
 "401" => "È possibile scaricare e installare il software che segue per assemblare i pezzi copiati sul computer: ",
 "402" => "http://www.hjsplit.org/",
-"403" => "WebDAV Preferences",
-"404" => "You can use the WebDAV protocol to mount your AjaXplorer repositories as a 'network drive' on various clients, including Windows, Mac, iPhone, etc.",
-"405" => "Use the following URLS to access your repositories, with your username and the password you entered. Warning, this won't work until you set this feature as 'active' and you enter your password.",
-"406" => "Activate WebDAV shares",
-"407" => "Enter your password if it's the first time that you are activating webDAV shares, or if you want to re-type a new password :",
-"408" => "Activated WebDav shares successfully, do not forget to update your password if it's the first time!",
-"409" => "De-activated WebDav shares successfully",
-"410" => "Updated webDav password successfully",
-"411" => "Open",
-"412" => "Upload only",
-"413" => "Shared by",
-"414" => "Use arrows to navigate and +/- to change zoom",
-"415" => "Toggle left pane visibility",
-"416" => "Left Pane",
+"403" => "Preferenze WebDAV",
+"404" => "Puoi utilizzare il protocollo WebDAV per montare i tuoi repository AjaXplorer come 'dischi di rete' su vari client, inclusi Windows, Mac, iPhone, etc.",
+"405" => "Utilizza le seguenti URLs per accedere ai tuoi repository, con lo username e password che hai inserito. Attenzione: ciò non funzionerà finché non imposti questa caratteristicha come 'attiva' ed inserisci la tuo password.",
+"406" => "Attiva le condivisioni WebDAV",
+"407" => "Inserisci la tua password se è la prima volta che attivi le condivisioni WebDAV, oppure se vuoi re-inserire una nuova password :",
+"408" => "Condivisioni WebDav attivate correttamente, non dimenticare di aggiornare la tua password se questa è la prima attivazione!",
+"409" => "Condivisioni WebDav disattivate correttamente",
+"410" => "Password WebDav aggiornata correttamente",
+"411" => "Apri",
+"412" => "Solo upload",
+"413" => "Condiviso da",
+"414" => "Usa le frecce per navigare e +/- per variare lo zoom",
+"415" => "Nascondi/visualizza pannello di sinistra",
+"416" => "Pannello Sx",
 "leftpane_accesskey" => "L",
 "417" => "Add repository ...",
 "418" => "Create your own repository",
