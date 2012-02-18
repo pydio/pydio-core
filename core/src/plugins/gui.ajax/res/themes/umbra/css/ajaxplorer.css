@@ -2905,3 +2905,24 @@ input#webdav_password{
 td.ip_geo_cell{
     padding-right: 12px !important;
 }
+
+
+.pluginfo_list {
+    padding-left: 0px;
+}
+
+.pluginfo_list li:nth-child(2n+1) {
+    background-color: #F7F7F7;
+}
+
+.pluginfo_list li {
+    list-style: none;
+    padding: 2px 0;
+    overflow: hidden;
+}
+
+.pluginfo_key {
+    display: inline-block;
+    width: 90px;
+    font-weight: bold;
+}
