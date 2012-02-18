@@ -36,7 +36,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  	private $registeredWrappers = array();
  	private $xmlRegistry;
     private $registryVersion;
- 	private $pluginFolder;
     private $tmpDeferRegistryBuild = false;
  	/**
  	 * @var AbstractConfDriver
@@ -76,24 +75,29 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 	 			return ;
 	 		}
  		}
- 		$this->pluginFolder = $pluginFolder;
+        if(is_string($pluginFolder)){
+            $pluginFolder = array($pluginFolder);
+        }
  		$this->confStorage = $confStorage;
- 		$handler = opendir($pluginFolder);
- 		$pluginsPool = array();
- 		if($handler){
- 			while ( ($item = readdir($handler)) !==false) {
- 				if($item == "." || $item == ".." || !is_dir($pluginFolder."/".$item) || strstr($item,".")===false) continue ;
- 				$plugin = new AJXP_Plugin($item, $pluginFolder."/".$item);				
-				$plugin->loadManifest();
-				if($plugin->manifestLoaded()){
-					$pluginsPool[$plugin->getId()] = $plugin;
-					if(method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false){
-						$this->streamWrapperPlugins[] = $plugin->getId();
-					}
-				}
- 			}
- 			closedir($handler);
- 		}
+         $pluginsPool = array();
+
+        foreach($pluginFolder as $sourceFolder){
+            $handler = @opendir($sourceFolder);
+            if($handler){
+                while ( ($item = readdir($handler)) !==false) {
+                    if($item == "." || $item == ".." || !is_dir($sourceFolder."/".$item) || strstr($item,".")===false) continue ;
+                    $plugin = new AJXP_Plugin($item, $sourceFolder."/".$item);
+                    $plugin->loadManifest();
+                    if($plugin->manifestLoaded()){
+                        $pluginsPool[$plugin->getId()] = $plugin;
+                        if(method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false){
+                            $this->streamWrapperPlugins[] = $plugin->getId();
+                        }
+                    }
+                }
+                closedir($handler);
+            }
+        }
  		if(count($pluginsPool)){
  			$this->checkDependencies($pluginsPool);
  			foreach ($pluginsPool as $plugin){

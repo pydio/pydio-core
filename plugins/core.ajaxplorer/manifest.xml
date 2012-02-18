@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="core.ajaxplorer" label="Core Options" description="CONF_MESSAGE[Main container for core AjaXplorer settings (application title, sharing, webdav server config, etc...)]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Charles du Jeu</plugin_author>
+        <plugin_version>follow</plugin_version>
+        <plugin_uri>http://ajaxplorer.info/plugins/core/ajaxplorer</plugin_uri>
+        <core_relation packaged="true" tested_version="follow_core"/>
+    </plugin_info>
     <client_settings>
         <resources>
             <i18n namespace="" path="plugins/core.ajaxplorer/i18n"/>
