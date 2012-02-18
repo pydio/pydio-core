@@ -601,6 +601,60 @@ class AJXP_Plugin implements Serializable{
 		$this->reloadXPath();
 	}
 
+    public function getPluginInformation(){
+        $info = array(
+            "plugin_author" => "",
+            "plugin_uri"   => "",
+            "core_packaged" => true,
+            "plugin_version"=> "follow",
+            "core_version" => AJXP_VERSION,
+        );
+        $infoBranch = $this->xPath->query("plugin_info");
+        if($infoBranch->length){
+            foreach($infoBranch->item(0)->childNodes as $child){
+                if($child->nodeType != 1) continue;
+                if($child->nodeName != "core_relation") {
+                    $info[$child->nodeName] = $child->nodeValue;
+                }else{
+                    if($child->getAttribute("packaged") == "false") $info["core_packaged"] = false;
+                    $coreV = $child->getAttribute("tested_version");
+                    if($coreV == "follow") $coreV = AJXP_VERSION;
+                    $info["core_version"] = $coreV;
+                }
+            }
+        }
+        return $info;
+    }
+
+    public function getPluginInformationHTML($defaultAuthor, $defaultUriBase){
+        $pInfo = $this->getPluginInformation();
+        $pInfoString = "";
+        if(empty($pInfo["plugin_uri"])){
+            if($pInfo["core_packaged"]) $pInfo["plugin_uri"] = $defaultUriBase.$this->getType()."/".$this->getName()."/";
+            else $pInfo["plugin_uri"] = "N/A";
+        }
+        if($pInfo["plugin_uri"] != "N/A"){
+            $pInfo["plugin_uri"] = "<a href='".$pInfo["plugin_uri"]."' title='".$pInfo["plugin_uri"]."' target='_blank'>".substr($pInfo["plugin_uri"], 0, 20)."[...]</a>";
+        }
+        if($pInfo["core_packaged"]){
+            unset($pInfo["plugin_version"]);
+            unset($pInfo["core_version"]);
+        }
+        $pInfo["core_packaged"] = ($pInfo["core_packaged"] === true ? "Yes": "No");
+        $humanKeys = array(
+            "plugin_author" => "Author",
+            "plugin_version" => "Version",
+            "plugin_uri"    => "Url",
+            "core_packaged" => "Core distrib.",
+            "core_version"   => "Core version"
+        );
+        if(empty($pInfo["plugin_author"])) $pInfo["plugin_author"] = $defaultAuthor;
+        foreach($pInfo as $k => $v){
+            $pInfoString .= "<li><span class='pluginfo_key'>".$humanKeys[$k]."</span><span class='pluginfo_value'>$v</span></li>";
+        }
+        return "<ul class='pluginfo_list'>$pInfoString</ul>";
+    }
+
     /**
      * @return void
      */

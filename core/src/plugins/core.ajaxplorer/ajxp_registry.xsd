@@ -135,6 +135,7 @@
 
     <xs:complexType name="ajxp_plugin_type">
         <xs:choice maxOccurs="unbounded">
+            <xs:element minOccurs="0" ref="plugin_info" />
             <xs:element minOccurs="0" ref="class_definition" />
             <xs:element minOccurs="0" ref="client_settings"/>
             <xs:element minOccurs="0" ref="server_settings"/>
@@ -251,6 +252,7 @@
                 <xs:extension base="ajxp_plugin_type">
                     <xs:sequence>
                         <xs:choice maxOccurs="unbounded">
+                            <xs:element minOccurs="0" ref="plugin_info" />
                             <xs:element minOccurs="0" ref="class_definition" />
                             <xs:element minOccurs="0" ref="client_settings"/>
                             <xs:element minOccurs="0" ref="server_settings"/>
@@ -623,6 +625,25 @@
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>
             <xs:attribute name="type" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="plugin_info">
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element minOccurs="0" ref="plugin_author" />
+                <xs:element minOccurs="0" ref="plugin_version" />
+                <xs:element minOccurs="0" ref="plugin_uri" />
+                <xs:element minOccurs="0" ref="core_relation" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="plugin_author"/>
+    <xs:element name="plugin_version"/>
+    <xs:element name="plugin_uri"/>
+    <xs:element name="core_relation">
+        <xs:complexType>
+            <xs:attribute name="packaged" use="required" type="xs:boolean" default="false"/>
+            <xs:attribute name="tested_version" use="required" default="follow_core"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="class_definition">
