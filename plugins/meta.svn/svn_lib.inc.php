@@ -1,7 +1,7 @@
 <?php
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 SVN Web Control
-Copyright ©2006 by sTEFANs
+Copyright ï¿½2006 by sTEFANs
 Created on 20.02.2006
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ at http://opensource.org/licenses/lgpl-license.php
  * @package Swc
  * @subpackage Inc
  * @author Stefan Schraml
- * @copyright Copyright ©2006 by sTEFANs
+ * @copyright Copyright ï¿½2006 by sTEFANs
  * @license http://opensource.org/licenses/lgpl-license.php GNU Lesser General Public License
  * @version v1.1.0
  * @since v1.0.0
@@ -610,7 +610,7 @@ define('IDX_VALUE', 1);
 		$cwd = NULL; //'/tmp';
 		$pipes = NULL;
 		
-		$cmdline = $cmd." ".$switches." ".$arg;
+		$cmdline = (SVNLIB_PATH!=""?SVNLIB_PATH."/":"").$cmd." ".$switches." ".$arg;
 		
 		/*
 		$output = shell_exec($cmdline);
