@@ -20,7 +20,10 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-
+define('SVNLIB_PATH', '');
+if(SVNLIB_PATH != ""){
+    putenv("LD_LIBRARY_PATH=".SVNLIB_PATH);
+}
 /**
  * @package info.ajaxplorer.plugins
  * Uses svn command lines to extract version infos. Autocommit on change.
@@ -159,7 +162,7 @@ class SvnManager extends AJXP_Plugin {
                 header("Cache-Control: private",false);
             }
 			
-			system("svn cat -r$revision $realFile");
+			system( (SVNLIB_PATH!=""?SVNLIB_PATH."/":"") ."svn cat -r$revision $realFile");
 			exit(0);
 		}else if($actionName == "svnswitch"){
 			$revision = $httpVars["revision"];
@@ -171,7 +174,7 @@ class SvnManager extends AJXP_Plugin {
 		switch ($actionName){
 			case "mkdir":
 				$init = $this->initDirAndSelection($httpVars, array("NEW_DIR" => AJXP_Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["dirname"])));
-				$res = ExecSvnCmd("svn add", $init["NEW_DIR"]);				
+				$res = ExecSvnCmd("svn add", $init["NEW_DIR"]);
 				$this->commitMessageParams = $httpVars["dirname"];
 			break;
 			case "mkfile":
