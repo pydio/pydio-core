@@ -897,13 +897,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         return false;
     }
 
-    function filterFolder($folderName){
+    function filterFolder($folderName, $compare = "equals"){
         if(array_key_exists("HIDE_FOLDERS", $this->driverConf) && !empty($this->driverConf["HIDE_FOLDERS"])){
             if(!is_array($this->driverConf["HIDE_FOLDERS"])) {
                 $this->driverConf["HIDE_FOLDERS"] = explode(",",$this->driverConf["HIDE_FOLDERS"]);
             }
             foreach ($this->driverConf["HIDE_FOLDERS"] as $search){
-                if(strcasecmp($search, $folderName) == 0) return true;
+                if($compare == "equals" && strcasecmp($search, $folderName) == 0) return true;
+                if($compare == "contains" && strpos($folderName, "/".$search) !== false) return true;
             }
         }
         return false;
@@ -1629,6 +1630,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	}
 	
 	/**
+	 * @var fsAccessDriver
+	 */
+	public static $filteringDriverInstance;
+	/**
 	 * @return zipfile
 	 */ 
     function makeZip ($src, $dest, $basedir)
@@ -1645,13 +1650,16 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
     	}
     	AJXP_Logger::debug("Pathes", $filePaths);
     	AJXP_Logger::debug("Basedir", array($basedir));
+    	self::$filteringDriverInstance = $this;
     	$archive = new PclZip($dest);
-    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON);
+    	$vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, 'zipPreAddCallback');
     	if(!$vList){
     		throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
     	}
+    	self::$filteringDriverInstance = null;
     	return $vList;
     }
+    
 
     function recursivePurge($dirName, $purgeTime){
 
@@ -1708,5 +1716,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
     
 }
+
+    function zipPreAddCallback($value, $header){
+    	if(fsAccessDriver::$filteringDriverInstance == null) return true;
+    	$search = $header["filename"];
+    	return !(fsAccessDriver::$filteringDriverInstance->filterFile($search) 
+    	|| fsAccessDriver::$filteringDriverInstance->filterFolder($search, "contains"));
+    }
+
 
 ?>
