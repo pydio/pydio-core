@@ -428,7 +428,7 @@ class ShareCenter extends AJXP_Plugin{
         @copy($pDir."/res/button_cancel.png", $downloadFolder."/button_cancel.png");
         @copy($pDir."/res/drive_harddisk.png", $downloadFolder."/drive_harddisk.png");
         @copy(AJXP_INSTALL_PATH."/server/index.html", $downloadFolder."/index.html");
-        file_put_contents($downloadFolder."/.htaccess", "ErrorDocument 404 ".$this->buildPublicDlURL()."/404.html");
+        file_put_contents($downloadFolder."/.htaccess", "ErrorDocument 404 ".$this->buildPublicDlURL()."/404.html\n<Files \".ajxp_*\">\ndeny from all\n</Files>");
         $content404 = file_get_contents($pDir."/res/404.html");
         $content404 = str_replace(array("AJXP_MESSAGE_TITLE", "AJXP_MESSAGE_LEGEND"), array($sTitle, $sLegend), $content404);
         file_put_contents($downloadFolder."/404.html", $content404);
