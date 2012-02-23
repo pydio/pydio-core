@@ -11,6 +11,7 @@
         <actions>
             <!-- Override access.fs compression -->
             <action name="compress">
+                <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
                 <processing>
                     <serverCallback methodName="switchAction"/>
                 </processing>

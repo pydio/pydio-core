@@ -676,6 +676,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					if(!empty($node->metaData["nodeName"]) && $node->metaData["nodeName"] != $nodeName){
                         $node->setUrl($nonPatchedPath."/".$node->metaData["nodeName"]);
 					}
+                    if(!empty($node->metaData["hidden"]) && $node->metaData["hidden"] === true){
+               			continue;
+               		}
 
                     $nodeType = "d";
                     if($node->isLeaf()){
@@ -1074,6 +1077,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                 if(!$realfileSystem) $filePathOrData = fsAccessWrapper::getRealFSReference($filePathOrData);
                 $filePathOrData = str_replace("\\", "/", $filePathOrData);
                 header("X-Sendfile: ".SystemTextEncoding::toUTF8($filePathOrData));
+                header("Content-type: application/octet-stream");
+                header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
                 return;
             }
 			$stream = fopen("php://output", "a");

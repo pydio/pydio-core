@@ -73,7 +73,7 @@ class AJXP_JSPacker{
 		    while (!feof($handle)) {
 		        $jsline = fgets($handle, 4096) ;
 		        if(rtrim($jsline,"\n") != ""){
-					$code = file_get_contents(AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($jsline,"\n")) ;
+					$code = file_get_contents(AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/".rtrim($jsline,"\n\r")) ;
 					if ($code) $jscode .= $code ;
 		        }
 		    }
