@@ -673,8 +673,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     $node = new AJXP_Node($currentFile, $meta);
                     $node->setLabel($nodeName);
                     $node->loadNodeInfo();
-					if(!empty($metaData["nodeName"]) && $metaData["nodeName"] != $nodeName){
-                        $node->setUrl($nonPatchedPath."/".$metaData["nodeName"]);
+					if(!empty($node->metaData["nodeName"]) && $node->metaData["nodeName"] != $nodeName){
+                        $node->setUrl($nonPatchedPath."/".$node->metaData["nodeName"]);
 					}
 
                     $nodeType = "d";
