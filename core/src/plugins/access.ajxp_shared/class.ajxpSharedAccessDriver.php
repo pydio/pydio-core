@@ -156,6 +156,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		$dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
 		if(!is_dir($dlFolder)) return ;		
 		$files = glob($dlFolder."/*.php");
+        if(!is_array($files))return;
 		$mess = ConfService::getMessages();
 		$loggedUser = AuthService::getLoggedUser();
 		$userId = $loggedUser->getId();
