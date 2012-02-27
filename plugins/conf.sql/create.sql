@@ -9,7 +9,7 @@ CREATE TABLE ajxp_user_prefs (
 	rid INTEGER PRIMARY KEY AUTO_INCREMENT, 
 	login VARCHAR(255) NOT NULL, 
 	name VARCHAR(255) NOT NULL, 
-	val VARCHAR(255)
+	val VARCHAR(2000)
 );
 
 CREATE TABLE ajxp_user_bookmarks ( 
@@ -41,7 +41,7 @@ CREATE TABLE ajxp_repo_options (
 	oid INTEGER PRIMARY KEY AUTO_INCREMENT, 
 	uuid VARCHAR(33) NOT NULL, 
 	name VARCHAR(50) NOT NULL, 
-	val VARCHAR(255) 
+	val VARCHAR(2000)
 );
 
 CREATE TABLE ajxp_roles (
