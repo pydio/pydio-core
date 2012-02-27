@@ -50,7 +50,7 @@ class smb {
         }
         if (count ($userdomain = explode (';', urldecode ($pu['user']))) > 1)
             @list ($pu['domain'], $pu['user']) = $userdomain;
-        $path = preg_replace (array ('/^\//', '/\/$/'), '', urldecode ($pu['path']));
+        $path = preg_replace (array ('/^\//', '/\/$/'), '', rawurldecode ($pu['path']));
         list ($pu['share'], $pu['path']) = (preg_match ('/^([^\/]+)\/(.*)/', $path, $regs))
           ? array ($regs[1], preg_replace ('/\//', '\\', $regs[2]))
           : array ($path, '');
@@ -327,8 +327,8 @@ class smb {
                 break;
              }
             case 'path':          	
+                //self::debug('before exe'.print_r($pu, true));
             	$o = smb::execute ('dir "'.$pu['path'].'"', $pu);
-            	//self::debug(print_r($o, true));
                 if ($o != null) {
                 	if($o == "NOT_FOUND"){
                 		return null;
