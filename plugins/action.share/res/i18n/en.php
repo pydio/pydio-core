@@ -6,7 +6,7 @@ $mess = array(
     // will be replaced by the filename to download
     "2" => "Click on the image to download <b>%s</b> to your hard drive",
     "3" => "Wrong password",
-    "4" => "Enter the required password on click on the image to download <b>%s</b> to your hard drive",
+    "4" => "Enter the required password and click on the image to download <b>%s</b> to your hard drive",
     "5" => "password",
     "6" => "Stop Sharing",
     "7" => "Stopping the share will not remove the file. If you want to change the parameters, re-share the file.",
