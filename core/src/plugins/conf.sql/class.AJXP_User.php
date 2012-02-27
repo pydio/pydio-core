@@ -244,8 +244,8 @@ class AJXP_User extends AbstractAjxpUser
 	 */
 	function setPref($prefName, $prefValue){
 
-        if($prefName == "CUSTOM_PARAMS"){
-            $prefValue = serialize($prefValue);
+        if(!is_string($prefValue)){
+            $prefValue = '$phpserial$'.serialize($prefValue);
         }
 		// Prevent a query if the preferences are identical to the existing preferences.
 		if (array_key_exists($prefName, $this->prefs) && $this->prefs[$prefName] == $prefValue) {
@@ -295,8 +295,15 @@ class AJXP_User extends AbstractAjxpUser
 
     function getPref($prefName){
         $p = parent::getPref($prefName);
-        if($prefName == "CUSTOM_PARAMS" && isSet($p)){
-            return unserialize($p);
+        if(isSet($p)){
+            if(strpos($p, '$phpserial$') !== false && strpos($p, '$phpserial$') === 0){
+                $p = substr($p, strlen('$phpserial$'));
+                return unserialize($p);
+            }
+            // old method
+            if($prefName == "CUSTOM_PARAMS"){
+                return unserialize($p);
+            }
         }
         return $p;
     }
