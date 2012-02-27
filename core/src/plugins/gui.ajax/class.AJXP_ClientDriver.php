@@ -70,9 +70,9 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				HTMLWriter::charsetHeader();
 				$folder = CLIENT_RESOURCES_FOLDER."/html";
 				if(isSet($httpVars["pluginName"])){
-					$folder = "plugins/".$httpVars["pluginName"];
+					$folder = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".AJXP_Utils::securePath($httpVars["pluginName"]);
 					if(isSet($httpVars["pluginPath"])){
-						$folder.= "/".$httpVars["pluginPath"];
+						$folder.= "/".AJXP_Utils::securePath($httpVars["pluginPath"]);
 					}
 				}
                 $crtTheme = $this->pluginConf["GUI_THEME"];
