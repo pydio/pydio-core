@@ -60,14 +60,16 @@ class PowerFSController extends AJXP_Plugin
                     if($httpVars["on_end"] == "reload"){
                         AJXP_XMLWriter::triggerBgAction("reload_node", array(), "powerfs.2", true, 2);
                     }else{
-                        $archiveName =  $dir."/".$httpVars["archive_name"];
+                        $archiveName =  $httpVars["archive_name"];
                         $jsCode = "
                             $('download_form').action = window.ajxpServerAccessPath;
                             $('download_form').secure_token.value = window.Connexion.SECURE_TOKEN;
                             $('download_form').select('input').each(function(input){
                                 if(input.name!='get_action' && input.name!='secure_token') input.remove();
                             });
-                            $('download_form').insert(new Element('input', {type:'hidden', name:'file', value:'".$archiveName."'}));
+                            $('download_form').insert(new Element('input', {type:'hidden', name:'ope_id', value:'".$httpVars["ope_id"]."'}));
+                            $('download_form').insert(new Element('input', {type:'hidden', name:'archive_name', value:'".$archiveName."'}));
+                            $('download_form').insert(new Element('input', {type:'hidden', name:'get_action', value:'postcompress_download'}));
                             $('download_form').submit();
                         ";
                         AJXP_XMLWriter::triggerBgJsAction($jsCode, "powerfs.3", true);
@@ -78,12 +80,21 @@ class PowerFSController extends AJXP_Plugin
 
                 break;
 
+            case "postcompress_download":
+
+                $archive = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$httpVars["archive_name"];
+                //$fsDriver = new fsAccessDriver("fake", "");
+                $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
+                $fsDriver->readFile($archive, "force-download", $httpVars["archive_name"], false, null, true);
+                break;
+
             case "compress" :
+            case "precompress" :
 
                 if(!ConfService::currentContextIsCommandLine() && ConfService::backgroundActionsSupported()){
                     $opeId = substr(md5(time()),0,10);
                     $httpVars["ope_id"] = $opeId;
-                    AJXP_Controller::applyActionInBackground(ConfService::getRepository()->getId(), "compress", $httpVars);
+                    AJXP_Controller::applyActionInBackground(ConfService::getRepository()->getId(), $action, $httpVars);
                     AJXP_XMLWriter::header();
                     $bgParameters = array(
                         "dir" => $dir,
@@ -103,25 +114,36 @@ class PowerFSController extends AJXP_Plugin
 
                 $rootDir = fsAccessWrapper::getRealFSReference($urlBase) . $dir;
                 $percentFile = $rootDir."/.zip_operation_".$httpVars["ope_id"];
-
+                $compressLocally = ($action == "compress" ? true : false);
                 // List all files
                 $todo = array();
                 $args = array();
+                $replaceSearch = array($rootDir, "\\");
+                $replaceReplace = array("", "/");
                 foreach($selection->getFiles() as $selectionFile){
                     $args[] = '"'.substr($selectionFile, strlen($dir)+($dir=="/"?0:1)).'"';
                     $selectionFile = fsAccessWrapper::getRealFSReference($urlBase.$selectionFile);
-                    $todo[] = ltrim(str_replace(array($rootDir, "\\"), array("", "/"), $selectionFile), "/");
+                    $todo[] = ltrim(str_replace($replaceSearch, $replaceReplace, $selectionFile), "/");
                     if(is_dir($selectionFile)){
                         $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($selectionFile), RecursiveIteratorIterator::SELF_FIRST);
                         foreach($objects as $name => $object){
-                            $todo[] = str_replace(array($rootDir, "\\"), array("", "/"), $name);
+                            $todo[] = str_replace($replaceSearch, $replaceReplace, $name);
                         }
                     }
                 }
                 $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows")? "&" : ";");
                 $archiveName = $httpVars["archive_name"];
-                $cmd = "zip -r \"".$archiveName."\" ".implode(" ", $args)." ".$cmdSeparator." echo ZIP_FINISHED";
+                if(!$compressLocally){
+                    $archiveName = AJXP_Utils::getAjxpTmpDir()."/".$httpVars["ope_id"]."_".$archiveName;
+                }
                 chdir($rootDir);
+                $cmd = "zip -r \"".$archiveName."\" ".implode(" ", $args);
+                $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
+                $c = $fsDriver->getConfigs();
+                if(!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false){
+                    $cmd .= " -x .\*";
+                }
+                $cmd .= " ".$cmdSeparator." echo ZIP_FINISHED";
                 $proc = popen($cmd, "r");
                 $toks = array();
                 $handled = array();

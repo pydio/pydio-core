@@ -11,6 +11,17 @@
         <actions>
             <!-- Override access.fs compression -->
             <action name="compress">
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="precompress">
+                <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="postcompress_download">
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
                 <processing>
                     <serverCallback methodName="switchAction"/>
@@ -51,9 +62,9 @@
                                     }
 
                                     var conn = new Connexion();
-                                    conn.addParameter("get_action", "compress");
+                                    conn.addParameter("get_action", "precompress");
                                     conn.addParameter("archive_name", zipName+".zip");
-                                    conn.addParameter("on_end", "download");
+                                    conn.addParameter("on_end", "postcompress_download");
                                     conn.addParameter("dir", userSelection.getContextNode().getPath());
                                     var selected = userSelection.getFileNames();
                                     for(var i=0;i<selected.length;i++){
@@ -69,6 +80,7 @@
                                     $('download_form').secure_token.value = Connexion.SECURE_TOKEN;
                                     $('download_form').select("input").each(function(input){
                                         if(input.name!='get_action' && input.name!='secure_token') input.remove();
+                                        if(input.name=='get_action') input.value = 'download';
                                     });
                                     userSelection.updateFormOrUrl($('download_form'));
                                     $('download_form').submit();
