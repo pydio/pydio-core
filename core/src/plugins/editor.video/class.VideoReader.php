@@ -108,7 +108,28 @@ class VideoReader extends AJXP_Plugin {
 			HTMLWriter::charsetHeader("text/plain");
 			print(session_id());
 		}
-	}	
+	}
+
+    /**
+     * @param AJXP_Node $ajxpNode
+     */
+    public function videoAlternateVersions(&$ajxpNode){
+        if(!preg_match('/\.mpg$|\.mp4$|\.ogv$|\.webm$/i', $ajxpNode->getLabel())) return;
+        if(file_exists(str_replace(".mpg","_PREVIEW.mp4", $ajxpNode->getUrl()))){
+            $ajxpNode->mergeMetadata(array("video_altversion_mp4" => str_replace(".mpg","_PREVIEW.mp4", $ajxpNode->getPath())));
+        }
+        $rotating = array("mp4","ogv", "webm");
+        foreach($rotating as $ext){
+            if(preg_match('/\.'.$ext.'$/i', $ajxpNode->getLabel())){
+                foreach($rotating as $other){
+                    if($other == $ext) continue;
+                    if(file_exists(str_replace($ext, $other,$ajxpNode->getUrl()))){
+                        $ajxpNode->mergeMetadata(array("video_altversion_".$other => str_replace($ext, $other, $ajxpNode->getPath())));
+                    }
+                }
+            }
+        }
+    }
 	
 }
 
