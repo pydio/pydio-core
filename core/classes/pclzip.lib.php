@@ -5950,7 +5950,8 @@
         }
       }
     }
-
+      // keep scheme://blabla intact!
+    if(strstr($v_result, ":/")) $v_result = str_replace(":/", "://", $v_result);
     // ----- Return
     //--(MAGIC-PclTrace)--//PclTraceFctEnd(__FILE__, __LINE__, $v_result);
     return $v_result;

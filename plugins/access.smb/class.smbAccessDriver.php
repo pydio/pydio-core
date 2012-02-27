@@ -62,10 +62,34 @@ class smbAccessDriver extends fsAccessDriver
 	 */
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
-		if($contribNode->nodeName != "actions") return ;
+		if($contribNode->nodeName != "actions" || (isSet($this->pluginConf["SMB_ENABLE_ZIP"]) && $this->pluginConf["SMB_ENABLE_ZIP"] == true)) {
+            return ;
+        }
 		$this->disableArchiveBrowsingContributions($contribNode);
-	}	
+	}
 
+    function makeZip ($src, $dest, $basedir)
+    {
+        @set_time_limit(0);
+        require_once(AJXP_BIN_FOLDER."/pclzip.lib.php");
+        $filePaths = array();
+        foreach ($src as $item){
+            $realFile = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $this->urlBase."/".AJXP_Utils::securePath($item));
+            $basedir = trim(dirname($realFile));
+            $filePaths[] = array(PCLZIP_ATT_FILE_NAME => $realFile,
+                PCLZIP_ATT_FILE_NEW_SHORT_NAME => basename($item));
+        }
+        AJXP_Logger::debug("Pathes", $filePaths);
+        AJXP_Logger::debug("Basedir", array($basedir));
+        self::$filteringDriverInstance = $this;
+        $archive = new PclZip($dest);
+        $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON);
+        if(!$vList){
+            throw new Exception("Zip creation error : ($dest) ".$archive->errorInfo(true));
+        }
+        self::$filteringDriverInstance = null;
+        return $vList;
+    }
 
     function filesystemFileSize($filePath){
         $bytesize = filesize($filePath);
