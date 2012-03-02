@@ -246,6 +246,14 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			}
 			this.expand();
 		}
+        if(Prototype.Browser.IE || Prototype.Browser.Opera){
+            var sizes = $(node.id).childElements().collect(Element.getWidth);
+            var sum = 0;
+            for(var i=0;i<sizes.length;i++) sum += sizes[i];
+            if(sum) {
+                $(node.id).setStyle({width:sum+50+'px'});
+            }
+        }
 	}
 	return node;
 };

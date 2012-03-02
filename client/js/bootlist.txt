@@ -1,4 +1,3 @@
-js/lib/prototype/prototype.js
 js/lib/prototype/prototype.livepipe.js
 js/lib/prototype/prototype.oo.js
 js/lib/modernizr/modernizr.min.js
