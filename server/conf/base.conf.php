@@ -44,8 +44,8 @@ if(function_exists("date_default_timezone_set") and function_exists("date_defaul
 
 ini_set("session.cookie_httponly", 1);
 
-define("AJXP_VERSION", "3.2.4");
-define("AJXP_VERSION_DATE", "2011/06/08");
+define("AJXP_VERSION", "3.2.5");
+define("AJXP_VERSION_DATE", "2012/03/02");
 
 define("AJXP_EXEC", true);
 require("compat.php");
