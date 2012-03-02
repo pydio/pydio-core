@@ -1,3 +1,18 @@
+AjaXplorer 4.0.4 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Version number : 4.0.4
+Demo : http://ajaxplorer.info/demo
+Rev Number : 2771
+
+This is a security upgrade that fixes an important vulnerability that was discovered and could allow
+directory traversal. Please upgrade your older versions immediately.
+> Fix directory traversal exploit
+> Change the "remember me" mechanism to make it more secure and lower the risk in case of cookie stealing.
+> Fix the default htaccess dropped inside the "public" folder.
+
+
 AjaXplorer 4.0.3 Release Note
 
 License : Affero GPL
