@@ -13,7 +13,7 @@
 	</server_settings>	
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractMeta"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">			

@@ -112,11 +112,12 @@ class AJXP_Node{
      * all metadata at once.
      * @param bool $forceRefresh
      * @param bool $contextNode The parent node, if it can be useful for the hooks callbacks
+     * @param mixed $details A specification of expected metadata fields, or minimal
      * @return
      */
-    public function loadNodeInfo($forceRefresh = false, $contextNode = false){
+    public function loadNodeInfo($forceRefresh = false, $contextNode = false, $details = false){
         if($this->nodeInfoLoaded && !$forceRefresh) return;
-        AJXP_Controller::applyHook("node.info", array(&$this, $contextNode));
+        AJXP_Controller::applyHook("node.info", array(&$this, $contextNode, $details));
         $this->nodeInfoLoaded = true;
     }
 

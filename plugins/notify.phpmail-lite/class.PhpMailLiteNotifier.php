@@ -125,12 +125,14 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
         if($action == "upload" && isset($fileVars["userfile_0"])){
             $file = $fileVars["userfile_0"]["name"];
         }
-        $subject = array("%user", "AJXP_USER", "AJXP_FILE", "AJXP_FOLDER", "AJXP_ACTION");
+        $subject = array("%user", "AJXP_USER", "AJXP_FILE", "AJXP_FOLDER", "AJXP_ACTION","AJXP_REPOSITORY");
         $replace = array(AuthService::getLoggedUser()->getId(),
                          AuthService::getLoggedUser()->getId(),
                          $file,
                          $folder,
-                         $action);
+                         $action,
+                        ConfService::getRepository()->getDisplay()
+        );
         $body = str_replace($subject, $replace, $this->pluginConf["BODY"]);
         $mail->Subject = str_replace($subject, $replace, $this->pluginConf["SUBJECT"]);
 		$mail->Body = nl2br($body);

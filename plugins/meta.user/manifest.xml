@@ -15,7 +15,7 @@
 	</server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractMeta"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMeta" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
 			<serverCallback hookName="node.change" methodName="updateMetaLocation" defer="true"></serverCallback>
 		</hooks>
 		<client_configs>

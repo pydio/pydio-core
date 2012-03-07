@@ -452,7 +452,7 @@ Class.create("Ajaxplorer", {
                 hideLightBox();
                 this.actionBar.parseXmlMessage(transport.responseXML);
             }.bind(this);
-			connexion.sendAsync();	
+			connexion.sendSync();
 		}
 	},
 			

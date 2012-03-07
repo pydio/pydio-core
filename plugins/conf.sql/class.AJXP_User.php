@@ -525,7 +525,7 @@ class AJXP_User extends AbstractAjxpUser
 			$dirPath = AJXP_INSTALL_PATH."/data/users";
 			AJXP_Logger::logAction("getTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
 		}
-		return AJXP_Utils::loadSerialFile($dirPath."/".$this->getId()."/-temp-".$key.".ser");
+		return AJXP_Utils::loadSerialFile($dirPath."/".$this->getId()."-temp-".$key.".ser");
 	}
 	
 	/**
