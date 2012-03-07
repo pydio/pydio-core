@@ -79,7 +79,7 @@
 			</action>
 		</actions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractImageMetaData"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractImageMetaData" applyCondition="$apply=($args[2]!='minimal');"></serverCallback>
 		</hooks>
 		<client_configs>
 			<component_config className="FilesList">

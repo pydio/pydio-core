@@ -52,15 +52,33 @@ abstract class AbstractAjxpUser
 		$this->storage = $storage;		
 		$this->load();
 	}
-	
+
+    function checkCookieString($cookieString){
+        if($this->getPref("cookie_hash") == "") return false;
+        $hashes = explode(",", $this->getPref("cookie_hash"));
+        return in_array($cookieString, $hashes);
+    }
+
+    function invalidateCookieString($cookieString = ""){
+        if($this->getPref("cookie_hash") == "") return false;
+        $hashes = explode(",", $this->getPref("cookie_hash"));
+        if(in_array($cookieString, $hashes)) $hashes = array_diff($hashes, array($cookieString));
+        $this->setPref("cookie_hash", implode(",", $hashes));
+        $this->save();
+    }
+
 	function getCookieString(){
-		$hash = $this->getPref("cookie_hash");
-		if($hash == ""){
-			$hash = md5($this->id.":".time());
-			$this->setPref("cookie_hash", $hash);
-			$this->save();
-		}
-		return md5($this->id.":".$hash.":ajxp");
+		$hashes = $this->getPref("cookie_hash");
+        if($hashes == ""){
+            $hashes = array();
+        }else{
+            $hashes = explode(",", $hashes);
+        }
+        $newHash =  md5($this->id.":".time());
+        array_push($hashes, $newHash);
+        $this->setPref("cookie_hash", implode(",",$hashes));
+        $this->save();
+		return $newHash; //md5($this->id.":".$newHash.":ajxp");
 	}
 	
 	function getId(){

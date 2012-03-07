@@ -621,8 +621,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     $metaData["repo_has_recycle"] = "true";
 				}
 				$parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
-                $parentAjxpNode->loadNodeInfo(false, true);
-				AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
+                $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));
+                if(AJXP_XMLWriter::$headerSent == "tree"){
+                    AJXP_XMLWriter::renderAjxpNode($parentAjxpNode, false);
+                }else{
+                    AJXP_XMLWriter::renderAjxpHeaderNode($parentAjxpNode);
+                }
 				if(isSet($totalPages) && isSet($crtPage)){
 					AJXP_XMLWriter::renderPaginationData(
 						$countFiles, 
@@ -672,7 +676,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     if($isLeaf != "") $meta = array("is_file" => ($isLeaf?"1":"0"));
                     $node = new AJXP_Node($currentFile, $meta);
                     $node->setLabel($nodeName);
-                    $node->loadNodeInfo();
+                    $node->loadNodeInfo(false, false, ($lsOptions["l"]?"all":"minimal"));
 					if(!empty($node->metaData["nodeName"]) && $node->metaData["nodeName"] != $nodeName){
                         $node->setUrl($nonPatchedPath."/".$node->metaData["nodeName"]);
 					}
@@ -694,8 +698,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
 					$fullList[$nodeType][$nodeName] = $node;
 					$cursor ++;
-				}				
-				array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["d"]);
+				}
+                if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
+                    foreach($fullList["d"] as $nodeDir){
+                        $this->switchAction("ls", array(
+                            "dir" => SystemTextEncoding::toUTF8($nodeDir->getPath()),
+                            "options"=> $httpVars["options"],
+                            "recursive" => "true"
+                        ), array());
+                    }
+                }else{
+                    array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["d"]);
+                }
 				array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["z"]);
 				array_map(array("AJXP_XMLWriter", "renderAjxpNode"), $fullList["f"]);
 				
@@ -762,7 +776,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
      * @param AJXP_Node $ajxpNode
      * @return void
      */
-    function loadNodeInfo(&$ajxpNode){
+    function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false){
 
         $nodeName = basename($ajxpNode->getPath());
         $metaData = $ajxpNode->metadata;
@@ -810,28 +824,17 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
             $metaData["ajxp_mime"] = "ajxp_browsable_archive";
         }
 
-        //}
-
-        /*
-        if(!isSet(self::$loadedUserBookmarks)){
-            $user = AuthService::getLoggedUser();
-            if($user == null){
-                self::$loadedUserBookmarks = false;
-            }else{
-                self::$loadedUserBookmarks = $user->getBookmarks();
-            }
+        if($details == "minimal"){
+            $miniMeta = array(
+                "is_file" => $metaData["is_file"],
+                "filename" => $metaData["filename"],
+                "bytesize" => $metaData["bytesize"],
+                "ajxp_modiftime" => $metaData["ajxp_modiftime"],
+            );
+            $ajxpNode->mergeMetadata($miniMeta);
+        }else{
+            $ajxpNode->mergeMetadata($metaData);
         }
-        if(self::$loadedUserBookmarks !== false){
-            foreach(self::$loadedUserBookmarks as $bookmark){
-                if($bookmark["PATH"] == $ajxpNode->getPath()) {
-                    $ajxpNode->mergeMetadata(array(
-                        "ajxp_bookmarked"=>"true",
-                        "ajxp_overlay_icon" =>"bookmark"));
-                }
-            }
-        }
-        */
-        $ajxpNode->mergeMetadata($metaData);
 
     }
 

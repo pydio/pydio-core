@@ -175,7 +175,7 @@ class UserMetaManager extends AJXP_Plugin {
 	 * 
 	 * @param AJXP_Node $ajxpNode
 	 */
-	public function extractMeta(&$ajxpNode){
+	public function extractMeta(&$ajxpNode, $contextNode = false, $details = false){
 		$currentFile = $ajxpNode->getUrl();
 
         $metadata = $this->metaStore->retrieveMetadata($ajxpNode, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
