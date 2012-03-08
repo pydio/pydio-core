@@ -419,12 +419,12 @@ class AJXP_XMLWriter
 		if($errorMessage == null)
 		{
 			$messageType = "SUCCESS";
-			$message = AJXP_Utils::xmlEntities($logMessage);
+			$message = AJXP_Utils::xmlContentEntities($logMessage);
 		}
 		else
 		{
 			$messageType = "ERROR";
-			$message = AJXP_Utils::xmlEntities($errorMessage);
+			$message = AJXP_Utils::xmlContentEntities($errorMessage);
 		}
 		return AJXP_XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
 	}

@@ -584,6 +584,24 @@ class AJXP_Utils
         }
     }
 
+
+    /**
+     * Replace specific chars by their XML Entities, for use inside attributes value
+     * @static
+     * @param $string
+     * @param bool $toUtf8
+     * @return mixed|string
+     */
+    static function xmlContentEntities($string, $toUtf8 = false)
+    {
+        $xmlSafe = str_replace(array("&", "<", ">", "\""), array("&amp;", "&lt;", "&gt;", "&quot;"), $string);
+        if ($toUtf8) {
+            return SystemTextEncoding::toUTF8($xmlSafe);
+        } else {
+            return $xmlSafe;
+        }
+    }
+
     /**
      * Search include path for a given file
      * @static
