@@ -127,8 +127,8 @@ Class.create("Diaporama", AbstractEditor, {
 			return false;
 		}.bind(this);
 		this.downloadButton.onclick = function(){
-			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
+			if(!this.currentFile) return;
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+encodeURIComponent(this.currentFile));
 			return false;
 		}.bind(this);
 		this.actualSizeButton.onclick = function(){
