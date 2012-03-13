@@ -544,7 +544,7 @@ class AJXP_Utils
     static function convertBytes($value)
     {
         if (is_numeric($value)) {
-            return $value;
+            return intval($value);
         }
         else
         {
