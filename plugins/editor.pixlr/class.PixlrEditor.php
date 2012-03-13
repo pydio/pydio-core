@@ -73,6 +73,9 @@ class PixlrEditor extends AJXP_Plugin {
       
     }else if($action == "retrieve_pixlr_image"){
       $file = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
+        $node = new AJXP_Node($destStreamURL.$file);
+        $node->loadNodeInfo();
+        AJXP_Controller::applyHook("node.before_change", array(&$node));
       $url = $httpVars["new_url"];
       $urlParts = parse_url($url);
       $query = $urlParts["query"];
