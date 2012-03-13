@@ -264,9 +264,10 @@ class ConfService
 		{
 			if($temporary && isSet($_SESSION['REPO_ID'])){
 				$crtId = $_SESSION['REPO_ID'];
-				$_SESSION['SWITCH_BACK_REPO_ID'] = $crtId;
-				//AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
-				//register_shutdown_function(array("ConfService","switchRootDir"), $crtId);
+                if($crtId != $rootDirIndex){
+                    $_SESSION['SWITCH_BACK_REPO_ID'] = $crtId;
+                    //AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
+                }
 			}else{
                 $crtId = $_SESSION['REPO_ID'];
                 $_SESSION['PREVIOUS_REPO_ID'] = $crtId;
