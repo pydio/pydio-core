@@ -66,7 +66,7 @@ class AudioPreviewer extends AJXP_Plugin {
 			}
 			// We transform the XML into XSPF
 			$xmlString = $postProcessData["ob_output"];
-            $xmlDoc = new DOMDocument(1.0,"UTF-8");
+            $xmlDoc = new DOMDocument();
             $xmlDoc->loadXML($xmlString);
 			$xElement = $xmlDoc->documentElement;
 			header("Content-Type:application/xspf+xml;charset=UTF-8");
@@ -76,7 +76,8 @@ class AudioPreviewer extends AJXP_Plugin {
 			foreach ($xElement->childNodes as $child){
 				$isFile = ($child->getAttribute("is_file") == "true");
 				$label = $child->getAttribute("text");
-				$ext = strtolower(end(explode(".", $label)));
+                $ar = explode(".", $label);
+				$ext = strtolower(end($ar));
 				if(!$isFile || $ext != "mp3") continue;
 				print("<track><location>".AJXP_SERVER_ACCESS."?secure_token=".AuthService::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>");
 			}
