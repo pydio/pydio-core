@@ -752,7 +752,7 @@
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
 						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						ajaxplorer.actionBar.submitForm(oForm);
+						ajaxplorer.actionBar.submitForm(oForm, true);
 						hideLightBox(true);
 						return false;
 					});

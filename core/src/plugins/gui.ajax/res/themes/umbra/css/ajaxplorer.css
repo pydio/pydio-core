@@ -492,7 +492,9 @@ textarea#myCode
 {
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial;
     font-size: 11px;
-    padding: 10px;
+    margin: 8px;
+    overflow-y: auto;
+    max-height: 120px;
 }
 
 .errorMessage

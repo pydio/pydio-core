@@ -88,7 +88,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 		
 	protected function fixPath($path){
 		if ($path == "\\") $path = "";
-		AJXP_Logger::debug("fixPath called ".$path);
+		//AJXP_Logger::debug("fixPath called ".$path);
 		/*
 		$bt = debug_backtrace();
 		$calls = array();
@@ -559,8 +559,8 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
             }
         }
         return $contents;
-    	    	
-    }    
+
+    }
     
     
     /**
@@ -639,7 +639,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
                 )
             );
         }
-        
+
         // Add ETag header
         $res->setHeader( 'ETag', $this->getETag( $source ) );
 
@@ -681,10 +681,17 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     } 
     
     protected function urlEncodePath($path){
-        if(strstr($_SERVER["HTTP_USER_AGENT"], "WebDAVFS") === false && strstr($_SERVER["HTTP_USER_AGENT"], "PEAR::HTTP_WebDAV_Client") === false){
-            return rawurlencode($path);
+        //AJXP_Logger::debug("User Agent : ".$_SERVER["HTTP_USER_AGENT"]);
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "MiniRedir") !== false){
+            return $path;
         }
-        return $path;
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "WebDAVFS") !== false){
+            return $path;
+        }
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "PEAR::HTTP_WebDAV_Client") !== false){
+            return $path;
+        }
+        return rawurlencode($path);
     }
 
 
