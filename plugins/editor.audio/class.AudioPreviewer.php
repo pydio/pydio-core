@@ -66,7 +66,8 @@ class AudioPreviewer extends AJXP_Plugin {
 			}
 			// We transform the XML into XSPF
 			$xmlString = $postProcessData["ob_output"];
-			$xmlDoc = DOMDocument::loadXML($xmlString);
+            $xmlDoc = new DOMDocument(1.0,"UTF-8");
+            $xmlDoc->loadXML($xmlString);
 			$xElement = $xmlDoc->documentElement;
 			header("Content-Type:application/xspf+xml;charset=UTF-8");
 			print('<?xml version="1.0" encoding="UTF-8"?>');

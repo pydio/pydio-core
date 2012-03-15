@@ -35,7 +35,8 @@ class remote_fsAccessDriver extends AbstractAccessDriver
 			// Register one preprocessor per capability. 		
 			foreach ($this->plugCapabilities as $capability){
 				$xml = '<action name="'.$capability.'"><pre_processing><serverCallback methodName="switchAction"/></pre_processing></action>';
-				$tmpDoc = DOMDocument::loadXML($xml);
+                $tmpDoc = new DOMDocument();
+				$tmpDoc->loadXML($xml);
 				$newNode = $this->manifestDoc->importNode($tmpDoc->documentElement, true);
 				$this->xPath->query("registry_contributions/actions")->item(0)->appendChild($newNode);
 			}
