@@ -28,6 +28,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class IMagickPreviewer extends AJXP_Plugin {
 
 	protected $extractAll = false;
+	protected $onTheFly = false;
 	
 	public function switchAction($action, $httpVars, $filesVars){
 		
@@ -49,13 +50,21 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			
 			if(!filesize($destStreamURL."/".$file)) return ;
+			
 			$cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $destStreamURL.$file, array($this, "generateJpegsCallback"));
 			$cacheData = $cache->getData();
 			
-			if($this->extractAll){
+			if(false && $this->extractAll){ // extract all on first view
 				$ext = pathinfo($file, PATHINFO_EXTENSION);
 				$prefix = str_replace(".$ext", "", $cache->getId());
 				$files = $this->listExtractedJpg($prefix);
+				header("Content-Type: application/json");
+				print(json_encode($files));
+				return;
+			}else if($this->extractAll){ // on the fly extract mode
+				$ext = pathinfo($file, PATHINFO_EXTENSION);
+				$prefix = str_replace(".$ext", "", $cache->getId());
+				$files = $this->listPreviewFiles($destStreamURL.$file, $prefix);
 				header("Content-Type: application/json");
 				print(json_encode($files));
 				return;
@@ -69,6 +78,10 @@ class IMagickPreviewer extends AJXP_Plugin {
 			
 		}else if($action == "get_extracted_page" && isSet($httpVars["file"])){
 			$file = AJXP_CACHE_DIR."/imagick_full/".$httpVars["file"];
+			if(!is_file($file)){
+				$this->onTheFly = true;
+				$this->generateJpegsCallback($httpVars["src_file"], $file);
+			}
 			if(!is_file($file)) return ;
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
 			header("Content-Length: ".filesize($file));
@@ -124,33 +137,58 @@ class IMagickPreviewer extends AJXP_Plugin {
 		return $files;
 	}
 	
-	public function generateJpegsCallback($masterFile, $targetFile){
-		$extension = pathinfo($masterFile, PATHINFO_EXTENSION);
-		//if(in_array(strtolower($extension), array("svg"))) $this->extractAll = true;
-		$workingDir = dirname($targetFile);
-		$fp = fopen($masterFile, "r");
-		$tmpFileName = $workingDir."/ajxp_tmp_".md5(time()).".$extension";
-		$tmpFile = fopen($tmpFileName, "w");
-		register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFileName);			
-		while(!feof($fp)) {
-			stream_copy_to_stream($fp, $tmpFile, 4096);
+	protected function listPreviewFiles($file, $prefix){
+		$files = array();
+		$index = 0;
+		$count = $this->countPages($file);
+		while($index < $count){
+			$extract = $prefix."-".$index.".jpg";
+			list($width, $height, $type, $attr) = @getimagesize($extract);
+			$files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+			$index ++;
 		}
-		fclose($tmpFile);
-		fclose($fp);
+		if(is_file($prefix.".jpg")){
+			$extract = $prefix.".jpg";
+			list($width, $height, $type, $attr) = @getimagesize($extract);
+			$files[] = array("file" => basename($extract), "width"=>$width, "height"=>$height);
+		}
+		return $files;
+	}
+	
+	public function generateJpegsCallback($masterFile, $targetFile){
+		$repository = ConfService::getRepository();
+		$streamData = $repository->streamData;
+		$destStreamURL = $streamData["protocol"]."://".$repository->getId();
+		$path = $repository->getOption("PATH");
+		$masterFile = $path . str_replace($destStreamURL, "", $masterFile);
+		$masterFile = str_replace("/", "\\", $masterFile);
+		$extension = pathinfo($masterFile, PATHINFO_EXTENSION);
+		$workingDir = dirname($targetFile);
 		$out = array();
 		$return = 0;
 		$tmpFileThumb =  str_replace(".$extension", ".jpg", $targetFile);
+		$tmpFileThumb =  str_replace("/", "\\", $tmpFileThumb);
 		if(!$this->extractAll){
 			//register_shutdown_function("unlink", $tmpFileThumb);
 		}else{
 			@set_time_limit(90);
 		}
 		chdir($workingDir);
-		$pageLimit = ($this->extractAll?"":"[0]");
+		if($this->onTheFly){
+			//extract page number
+			$pageNumber = strrchr($targetFile, "-");
+			$pageNumber = str_replace(array(".jpg","-"), "", $pageNumber);
+			$pageLimit = "[".$pageNumber."]";
+			$this->extractAll = true;
+		}else{
+			//$pageLimit = ($this->extractAll?"":"[0]");
+			$pageLimit = "[0]";
+			if($this->extractAll) $tmpFileThumb = str_replace(".jpg", "-0.jpg", $tmpFileThumb);
+		}
 		$params = ($this->extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
-		$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".basename($tmpFileName).$pageLimit." ".$params." ".basename($tmpFileThumb);
-		//AJXP_Logger::debug("IMagick Command : $cmd");
-		session_write_close(); // Be sure to give the hand back			
+		$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".($masterFile).$pageLimit." ".$params." ".($tmpFileThumb);
+		AJXP_Logger::logAction("IMagick Command : $cmd");
+		session_write_close(); // Be sure to give the hand back
 		exec($cmd, $out, $return);
 		if(is_array($out) && count($out)){
 			throw new AJXP_Exception(implode("\n", $out));
@@ -166,6 +204,23 @@ class IMagickPreviewer extends AJXP_Plugin {
 		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 		return in_array($ext, $mimesAtt);
 	}
+	
+	protected function countPages($file) 
+	{
+		if(!file_exists($file))return null;
+		if (!$fp = @fopen($file,"r"))return null;
+		$max=0;
+		while(!feof($fp)) {
+			$line = fgets($fp, 255);
+			if (preg_match('/\/Count [0-9]+/', $line, $matches)){
+							preg_match('/[0-9]+/',$matches[0], $matches2);
+							if ($max<$matches2[0]) $max=$matches2[0];
+			}
+		}
+		fclose($fp);
+		return (int)$max;
+	}
+
 	
 }
 ?>

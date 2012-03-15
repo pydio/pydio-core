@@ -92,7 +92,8 @@ class HttpDownloader extends AJXP_Plugin{
 				$collectHeaders = $client->collectHeaders;
 				$totalSize = -1;
 		    	if(!empty($collectHeaders["content-disposition"]) && strstr($collectHeaders["content-disposition"], "filename")!== false){
-		    		$basename = trim(array_pop(explode("filename=", $collectHeaders["content-disposition"])));
+                    $ar = explode("filename=", $collectHeaders["content-disposition"]);
+		    		$basename = trim(array_pop($ar));
 		    		$basename = str_replace("\"", "", $basename); // Remove quotes
 		    	}
 		    	if(!empty($collectHeaders["content-length"])){

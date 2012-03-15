@@ -307,7 +307,7 @@ abstract class AbstractAjxpUser
 	 * @param Array $deletedSubUsers an empty array to be filled by the method
 	 * @return null or -1 on error.
 	 */
-	static abstract function deleteUser($userId, &$deletedSubUsers);
+	static function deleteUser($userId, &$deletedSubUsers){}
 	
 	abstract function getTemporaryData($key);
 	

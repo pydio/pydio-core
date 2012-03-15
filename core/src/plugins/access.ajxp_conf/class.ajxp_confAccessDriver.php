@@ -1265,8 +1265,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	function metaSourceOrderingFunction($key1, $key2){
-		$t1 = array_shift(explode(".", $key1));
-		$t2 = array_shift(explode(".", $key2));
+        $a1 = explode(".", $key1);
+		$t1 = array_shift($a1);
+        $a2 = explode(".", $key2);
+		$t2 = array_shift($a2);
 		if($t1 == "index") return 1;
         if($t1 == "metastore") return -1;
 		if($t2 == "index") return -1;

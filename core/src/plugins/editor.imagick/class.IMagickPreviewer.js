@@ -20,6 +20,7 @@
 Class.create("IMagickPreviewer", Diaporama, {
 
 	fullscreenMode: false,
+	src_file: "",
 
 	initialize: function($super, oFormObject)
 	{
@@ -47,6 +48,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	
 	open : function($super, userSelection)
 	{
+		this.src_file = userSelection.getUniqueFileName();
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
 			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+userSelection.getUniqueFileName());
@@ -124,7 +126,27 @@ Class.create("IMagickPreviewer", Diaporama, {
 	removeOnLoad: function(){
 		removeLightboxFromElement(this.imgContainer);
 		this.loading = false;
-	}
+	},
 	
+	updateImage : function(){
+		var dimObject = this.sizes.get(this.currentFile);
+		this.crtHeight = dimObject.height;
+		this.crtWidth = dimObject.width;
+		if(this.crtWidth){
+			this.crtRatio = this.crtHeight / this.crtWidth;
+		}
+		this.downloadButton.addClassName("disabled");
+		new Effect.Opacity(this.imgTag, {afterFinish : function(){
+			this.jsImageLoading = true;
+			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile) + "&src_file=" + this.src_file;
+			if(!this.crtWidth && !this.crtHeight){
+				this.crtWidth = this.imgTag.getWidth();
+				this.crtHeight = this.imgTag.getHeight();
+				this.crtRatio = this.crtHeight / this.crtWidth;
+			}
+		}.bind(this), from:1.0,to:0, duration:0.3});
+        
+        this.updateInfoPanel();
+	}
 	
 });

@@ -161,10 +161,11 @@ class ShareCenter extends AJXP_Plugin{
                     }
                     $url = $this->writePubliclet($data, $this->accessDriver, $this->repository);
                     if($this->metaStore != null){
+                        $ar = explode(".", basename($url));
                         $this->metaStore->setMetadata(
                             new AJXP_Node($this->urlBase.$file),
                             "ajxp_shared",
-                            array("element"     => array_shift(explode(".", basename($url)))),
+                            array("element"     => array_shift($ar)),
                             true,
                             AJXP_METADATA_SCOPE_REPOSITORY
                         );
