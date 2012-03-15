@@ -327,7 +327,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
         }
     }
 
-    static function filterXml($value){
+    static function filterXml(&$value){
         $instance = AJXP_PluginsService::getInstance()->findPlugin("gui", "ajax");
         if($instance === false) return ;
         $confs = $instance->getConfigs();

@@ -312,7 +312,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     AJXP_Controller::applyHook("node.before_change", array(&$currentNode));
                 }catch(Exception $e){
                     header("Content-Type:text/plain");
-                    $e->getMessage();
+                    print $e->getMessage();
                     return;
                 }
 				if(!is_file($fileName) || !$this->isWriteable($fileName, "file")){

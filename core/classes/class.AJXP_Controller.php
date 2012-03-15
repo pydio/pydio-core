@@ -354,7 +354,7 @@ class AJXP_Controller{
      * @param $args
      * @return
      */
-	public static function applyIncludeHook($hookName, $args){
+	public static function applyIncludeHook($hookName, &$args){
 		if(!isSet(self::$includeHooks[$hookName])) return;
 		foreach(self::$includeHooks[$hookName] as $callback){
 			call_user_func_array($callback, $args);			

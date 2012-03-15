@@ -141,7 +141,8 @@ class fsAccessWrapper implements AjxpWrapper {
                                     $files[$afterPath] = $statValue;
                                 }
                             }else{
-                                $afterPath = array_shift(explode("/", $afterPath));
+                                $arr = explode("/", $afterPath);
+                                $afterPath = array_shift($arr);
                                 if(isSet($folders[$afterPath]) || isSet($builtFolders[$afterPath])) continue;
                                 $statValue[2] = $statValue["mode"] = "00040000";
                                 $statValue[7] = $statValue["size"] = 0;

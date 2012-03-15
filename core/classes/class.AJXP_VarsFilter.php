@@ -56,7 +56,8 @@ class AJXP_VarsFilter {
 		if(is_string($value) && strpos($value, "AJXP_DATA_PATH") !== false){
 			$value = str_replace("AJXP_DATA_PATH", AJXP_DATA_PATH, $value);
 		}
-		AJXP_Controller::applyIncludeHook("vars.filter", array(&$value));		 
+        $tab = array(&$value);
+		AJXP_Controller::applyIncludeHook("vars.filter", $tab);
 		return $value;
 	}
 }

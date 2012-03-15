@@ -37,7 +37,8 @@ function extractResponseCookies($client){
 	$cookies = array();
 	foreach ($cooks as $cookieString){
 		list($name,$value) = explode("=", $cookieString);
-		$value = array_shift(explode(";", $value));
+        $ar = explode(";", $value);
+		$value = array_shift($ar);
 		$cookies[$name] = $value;
 	}
 	return $cookies;
