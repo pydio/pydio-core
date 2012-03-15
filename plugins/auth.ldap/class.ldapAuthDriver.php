@@ -104,8 +104,20 @@ class ldapAuthDriver extends AbstractAuthDriver {
         } else {
             $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
-        $ret = ldap_search($this->ldapconn,$this->ldapDN,$filter, array($this->ldapUserAttr));
-        return ldap_get_entries($this->ldapconn, $ret);
+        if(is_array($this->ldapDN)) {
+                $entries=array('count'=>0);
+                foreach($this->ldapDN as $aDN) {
+                    $ret = ldap_search($this->ldapconn,$aDN,$filter,array($this->ldapUserAttr));
+                    $entries = ldap_get_entries($this->ldapconn, $ret);
+                    if($entries['count']!=0) {
+                        return $entries;
+                    }
+                }
+                return $entries;
+        } else {
+            $ret = ldap_search($this->ldapconn,$this->ldapDN,$filter, array($this->ldapUserAttr));
+            return ldap_get_entries($this->ldapconn, $ret);
+        }
     }
 
 
