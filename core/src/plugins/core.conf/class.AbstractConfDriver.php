@@ -385,7 +385,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 $iconFormat = $httpVars["icon_format"];
                 $repo = ConfService::getRepositoryById($tplId);
                 $logo = $repo->getOption("TPL_ICON_".strtoupper($iconFormat));
-                header("image/png");
                 if(isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)){
                     header("Content-Type: ".AJXP_Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
                     header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
