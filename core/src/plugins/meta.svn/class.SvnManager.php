@@ -308,7 +308,8 @@ class SvnManager extends AJXP_Plugin {
 		$res = ExecSvnCmd($command, $realPath, $switches);
 		//if(substr(strtolower(PHP_OS), 0, 3) == "win") session_start();
 		unset($_SESSION["SVN_COMMAND_RUNNING"]);
-		$domDoc = DOMDocument::loadXML($res[IDX_STDOUT]);
+        $domDoc = new DOMDocument();
+		$domDoc->loadXML($res[IDX_STDOUT]);
 		$xPath = new DOMXPath($domDoc);
 		$entriesList = $xPath->query("list/entry");
 		$entries = array();

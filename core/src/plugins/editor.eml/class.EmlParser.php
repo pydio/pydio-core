@@ -61,7 +61,8 @@ class EmlParser extends AJXP_Plugin{
     			$decoder = $this->getStructureDecoder($file, ($wrapperClassName == "imapAccessWrapper"));
     			$xml = $decoder->getXML($decoder->decode($params));
 				if(function_exists("imap_mime_header_decode")){
-					$doc = DOMDocument::loadXML($xml);
+                    $doc = new DOMDocument();
+                    $doc->loadXML($xml);
 					$xPath = new DOMXPath($doc);
 					$headers = $xPath->query("//headername");
 					$changes = false;
