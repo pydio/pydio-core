@@ -94,7 +94,7 @@ if(AuthService::usersEnabled())
 		CaptchaProvider::sendCaptcha();
 		exit(0) ;
 	}else if($action == "logout"){
-		AuthService::disconnect();		
+		AuthService::disconnect();
 		$loggingResult = 2;
 		session_destroy();
 	}else if($action == "back"){
@@ -110,12 +110,12 @@ if(AuthService::usersEnabled())
 			$userId = (isSet($httpVars["userid"])?$httpVars["userid"]:null);
 			$userPass = (isSet($httpVars["password"])?$httpVars["password"]:null);
 			$rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
-			$cookieLogin = (isSet($httpVars["cookie_login"])?true:false); 
+			$cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
 			$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
 			if($rememberMe && $loggingResult == 1){
-				$rememberLogin = $userId;
+				$rememberLogin = "notify";
+				$rememberPass = "notify";
 				$loggedUser = AuthService::getLoggedUser();
-				$rememberPass =  $loggedUser->getCookieString();
 			}
 			if($loggingResult == 1){
 				session_regenerate_id(true);
@@ -137,7 +137,7 @@ if(AuthService::usersEnabled())
 		if(isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])){
 			$loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
 			$loggedUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
-			$loggedUser->save();
+			$loggedUser->save("user");
 			AuthService::updateUser($loggedUser);
 			unset($_SESSION["PENDING_REPOSITORY_ID"]);
 			unset($_SESSION["PENDING_FOLDER"]);
@@ -166,6 +166,9 @@ if(AuthService::usersEnabled())
 	}
 	if(isset($loggingResult))
 	{
+        if($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))){
+            AuthService::refreshRememberCookie($loggedUser);
+        }
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
 		AJXP_XMLWriter::close();
