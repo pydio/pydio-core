@@ -622,7 +622,7 @@ class ShareCenter extends AJXP_Plugin{
                     if(AuthService::userExists($user)){
                         $userObject = $confDriver->createUserObject($user);
                         $userObject->removeRights($newRepo->getUniqueId());
-                        $userObject->save();
+                        $userObject->save("superuser");
                     }
                 }
             }
@@ -641,7 +641,7 @@ class ShareCenter extends AJXP_Plugin{
             // CREATE USER WITH NEW REPO RIGHTS
             $userObject->setRight($newRepo->getUniqueId(), $rights);
             $userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
-            $userObject->save();
+            $userObject->save("superuser");
         }
 
         // METADATA

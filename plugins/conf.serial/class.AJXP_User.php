@@ -75,7 +75,7 @@ class AJXP_User extends AbstractAjxpUser
 		}
 	}
 	
-	function save(){
+	function save($context = "superuser"){
 		$serialDir = $this->storage->getOption("USERS_DIRPATH");
 		if($this->isAdmin() === true){
 			$this->rights["ajxp.admin"] = true;
@@ -85,7 +85,9 @@ class AJXP_User extends AbstractAjxpUser
 		if($this->hasParent()){
 			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
-		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights);
+        if($context == "superuser"){
+            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights);
+        }
 		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs);
 		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks);		
 	}	

@@ -313,7 +313,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(is_array($customData) && count($customData)>0)
 					$newUser->setPref("CUSTOM_PARAMS", $customData);
 				
-				$newUser->save();
+				$newUser->save("superuser");
 				AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
@@ -330,7 +330,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$confStorage = ConfService::getConfStorageImpl();		
 				$user = $confStorage->createUserObject($userId);
 				$user->setAdmin(($httpVars["right_value"]=="1"?true:false));
-				$user->save();
+				$user->save("superuser");
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.45"].$httpVars["user_id"], null);
 				AJXP_XMLWriter::reloadCurrentNode(true);
@@ -615,7 +615,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}else{
 					$loggedUser = AuthService::getLoggedUser();
 					$loggedUser->setRight($newRep->getUniqueId(), "rw");
-					$loggedUser->save();
+					$loggedUser->save("superuser");
 					AuthService::updateUser($loggedUser);
 					
 					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.52"], null);
@@ -1312,7 +1312,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		}else{
 			$user->removeRole($roleId);
 		}
-		$user->save();
+		$user->save("superuser");
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser->getId() == $user->getId()){
 			AuthService::updateUser($user);

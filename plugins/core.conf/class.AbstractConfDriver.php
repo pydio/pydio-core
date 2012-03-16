@@ -231,7 +231,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 					$user = AuthService::getLoggedUser();
 					$activeRepId = ConfService::getCurrentRootDirIndex();
 					$user->setArrayPref("history", "last_repository", $activeRepId);
-					$user->save();
+					$user->save("user");
 				}
 				//$logMessage = "Successfully Switched!";
 				AJXP_Logger::logAction("Switch Repository", array("rep. id"=>$repository_id));
@@ -274,12 +274,12 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				}
 				if(AuthService::usersEnabled() && AuthService::getLoggedUser() != null)
 				{
-					$bmUser->save();
+					$bmUser->save("user");
 					AuthService::updateUser($bmUser);
 				}
 				else if(!AuthService::usersEnabled())
 				{
-					$bmUser->save();
+					$bmUser->save("user");
 				}		
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::writeBookmarks($bmUser->getBookmarks());
@@ -305,7 +305,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 						continue;
 					}
 					$userObject->setPref($prefName, $prefValue);
-					$userObject->save();
+					$userObject->save("user");
 					AuthService::updateUser($userObject);
 					//setcookie("AJXP_$prefName", $prefValue);
 					$i++;
@@ -352,7 +352,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 						$davData["PASS"] = $password;
 					}
 					$userObject->setPref("AJXP_WEBDAV_DATA", $davData);
-					$userObject->save();
+					$userObject->save("user");
 				}
 				$davData = $userObject->getPref("AJXP_WEBDAV_DATA");				
 				if(!empty($davData)){
@@ -457,7 +457,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 }else{
                     $loggedUser = AuthService::getLoggedUser();
                     $loggedUser->setRight($newRep->getUniqueId(), "rw");
-                    $loggedUser->save();
+                    $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);
 
                     AJXP_XMLWriter::sendMessage($mess[425], null);
@@ -482,7 +482,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 }else{
                     $loggedUser = AuthService::getLoggedUser();
                     $loggedUser->removeRights($repoId);
-                    $loggedUser->save();
+                    $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);
 
                     AJXP_XMLWriter::sendMessage($mess[428], null);

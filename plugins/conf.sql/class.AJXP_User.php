@@ -480,10 +480,14 @@ class AJXP_User extends AbstractAjxpUser
 	
 	/**
 	 * Save user rights, preferences and bookmarks.
-	 * 
+	 * @param String $context
 	 * @see AbstractAjxpUser#save()
 	 */
-	function save(){
+	function save($context = "superuser"){
+        if($context != "superuser"){
+            // Nothing specific to do, prefs and bookmarks are saved on-the-fly.
+            return;
+        }
 		$this->log('Saving user...');
 		
 		if($this->isAdmin() === true){
