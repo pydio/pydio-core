@@ -64,7 +64,7 @@ abstract class AbstractAjxpUser
         $hashes = explode(",", $this->getPref("cookie_hash"));
         if(in_array($cookieString, $hashes)) $hashes = array_diff($hashes, array($cookieString));
         $this->setPref("cookie_hash", implode(",", $hashes));
-        $this->save();
+        $this->save("user");
     }
 
 	function getCookieString(){
@@ -77,7 +77,7 @@ abstract class AbstractAjxpUser
         $newHash =  md5($this->id.":".time());
         array_push($hashes, $newHash);
         $this->setPref("cookie_hash", implode(",",$hashes));
-        $this->save();
+        $this->save("user");
 		return $newHash; //md5($this->id.":".$newHash.":ajxp");
 	}
 	
@@ -296,7 +296,7 @@ abstract class AbstractAjxpUser
 	
 	abstract function load();
 	
-	abstract function save();
+	abstract function save($context = "superuser");
 
 	/**
 	 * Static function for deleting a user.

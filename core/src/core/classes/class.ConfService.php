@@ -290,7 +290,7 @@ class ConfService
 		if($rootDirIndex!=-1 && AuthService::usersEnabled() && AuthService::getLoggedUser()!=null){
 			$loggedUser = AuthService::getLoggedUser();
 			$loggedUser->setArrayPref("history", "last_repository", $rootDirIndex);
-			$loggedUser->save();
+			$loggedUser->save("user");
 		}	
 				
 	}

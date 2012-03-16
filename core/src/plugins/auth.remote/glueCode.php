@@ -91,7 +91,7 @@ switch($plugInAction)
 			   	}else{
 					AuthService::updateDefaultRights($userObject);
 			   	}
-				$userObject->save();		   	
+				$userObject->save("superuser");
 		   	}	        
 	    }
 	    break;
@@ -128,7 +128,7 @@ switch($plugInAction)
 				$confDriver = ConfService::getConfStorageImpl();
 				$user = $confDriver->createUserObject($user["name"]);
 				$user->setAdmin($isAdmin);
-				$user->save();
+				$user->save("superuser");
 	            $result = TRUE;
 	        }
 	        else $result = FALSE;

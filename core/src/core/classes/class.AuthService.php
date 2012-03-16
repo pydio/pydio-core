@@ -246,7 +246,7 @@ class AuthService
 				{
 					AuthService::createUser("guest", "");
 					$guest = $confDriver->createUserObject("guest");
-					$guest->save();
+					$guest->save("superuser");
 				}
 				AuthService::logUser("guest", null);
 				return 1;
@@ -358,7 +358,7 @@ class AuthService
 			$confStorage = ConfService::getConfStorageImpl();
 			$adminUser = $confStorage->createUserObject("admin"); 
 			$adminUser->setAdmin(true);
-			$adminUser->save();
+			$adminUser->save("superuser");
 			$START_PARAMETERS["ALERT"] .= "There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.";
     	}
         @file_put_contents(AJXP_CACHE_DIR."/admin_counted", "true");
@@ -546,7 +546,7 @@ class AuthService
 		if($isAdmin){
 			$user = $confDriver->createUserObject($userId);
 			$user->setAdmin(true);			
-			$user->save();
+			$user->save("superuser");
 		}
 		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;
