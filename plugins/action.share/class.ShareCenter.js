@@ -161,7 +161,7 @@ Class.create("ShareCenter", {
                     oForm.down('fieldset#share_optional_fields').hide();
                     oForm.down('fieldset#share_generate').hide();
                     oForm.down('fieldset#share_result').show();
-                    oForm.down('fieldset#share_result legend').update('Public link');
+                    oForm.down('fieldset#share_result legend').update(MessageHash[296]);
                     oForm.down('div#generate_indicator').show();
                     this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
                         oForm.down('input[id="share_container"]').value = json['publiclet_link'];
