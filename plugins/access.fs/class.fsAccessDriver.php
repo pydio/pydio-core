@@ -921,7 +921,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		if($gzip === null){
 			$gzip = ConfService::getCoreConf("GZIP_COMPRESSION");
 		}
-        if($this->wrapperClassName == "fsAccessWrapper"){
+        if(!$realfileSystem && $this->wrapperClassName == "fsAccessWrapper"){
             $originalFilePath = $filePathOrData;
             $filePathOrData = fsAccessWrapper::patchPathForBaseDir($filePathOrData);
         }
