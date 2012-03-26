@@ -37,7 +37,7 @@
                         <clientForm id="share_form"><![CDATA[
                         <div id="share_form" title="AJXP_MESSAGE[293]"  box_width="280" action="share">
                             <fieldset style="display:none;" id="share_unshare">
-                                <legend ajxp_message_id="296">AJXP_MESSAGE[share_center.8]</legend>
+                                <legend ajxp_message_id="share_center.8">AJXP_MESSAGE[share_center.8]</legend>
                                     <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
                                         <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
                                     </div>
@@ -68,7 +68,7 @@
                         </div>
                         <div id="share_folder_form" title="Share Folder"  box_width="280" action="share">
                             <fieldset style="display:none;" id="share_unshare">
-                                <legend ajxp_message_id="296">AJXP_MESSAGE[share_center.10]</legend>
+                                <legend ajxp_message_id="share_center.10">AJXP_MESSAGE[share_center.10]</legend>
                                     <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
                                         <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
                                     </div>
