@@ -24,7 +24,7 @@ require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/class.ftpAcc
 
 class ftpSonWrapper extends ftpAccessWrapper {
 	public function initUrl($url){
-		$this->parseUrl($url);
+		$this->parseUrl($url, true);
 	}
 }
 
@@ -89,6 +89,7 @@ class ftpAuthDriver extends AbstractAuthDriver {
 			AJXP_User::deleteUser($crtUser, $subUsers);
 		}
 		AuthService::disconnect();
+        session_destroy();
 		session_write_close();
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::loggingResult(2);
