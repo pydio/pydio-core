@@ -356,7 +356,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		return array("name"=>$file, "stat"=>$statValue, "dir"=>$isDir);
 	}
 	
-	protected function parseUrl($url){
+	protected function parseUrl($url, $forceLogin = false){
 		// URL MAY BE ajxp.ftp://username:password@host/path
 		$urlParts = parse_url($url);
 		$this->repositoryId = $urlParts["host"];
@@ -390,7 +390,7 @@ class ftpAccessWrapper implements AjxpWrapper {
 		// Test Connexion and server features
         global $_SESSION;
         $cacheKey = $repository->getId()."_ftpCharset";
-        if (!isset($_SESSION[$cacheKey]) || !strlen($_SESSION[$cacheKey]))
+        if (!isset($_SESSION[$cacheKey]) || !strlen($_SESSION[$cacheKey]) || $forceLogin)
         {
             $features = $this->getServerFeatures();
             if(!isSet($_SESSION["AJXP_CHARSET"]) || $_SESSION["AJXP_CHARSET"] == "") $_SESSION["AJXP_CHARSET"] = $features["charset"];
