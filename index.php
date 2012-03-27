@@ -23,6 +23,15 @@
  */
 include_once("base.conf.php");
 
+if( !isSet($_GET["action"]) && !isSet($_GET["get_action"])
+    && !isSet($_POST["action"]) && !isSet($_POST["get_action"])
+    && defined("AJXP_FORCE_SSL_REDIRECT") && AJXP_FORCE_SSL_REDIRECT === true
+    && $_SERVER['SERVER_PORT'] != 443) {
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+    exit();
+}
+
 if(isSet($_GET["ajxp_sessid"]))
 {
     // Don't overwrite cookie
