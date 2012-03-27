@@ -40,7 +40,7 @@ class fsAccessTest extends AbstractTest
         $createOpt = $repo->getOption("CREATE");
         $create = (($createOpt=="true"||$createOpt===true)?true:false);
         if(strstr($path, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!        
-        if (!$create && !is_dir($path))
+        if (!$create && !@is_dir($path))
         { 
         	$this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE; 
         }

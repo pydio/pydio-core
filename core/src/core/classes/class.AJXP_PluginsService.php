@@ -85,7 +85,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
             $handler = @opendir($sourceFolder);
             if($handler){
                 while ( ($item = readdir($handler)) !==false) {
-                    if($item == "." || $item == ".." || !is_dir($sourceFolder."/".$item) || strstr($item,".")===false) continue ;
+                    if($item == "." || $item == ".." || !@is_dir($sourceFolder."/".$item) || strstr($item,".")===false) continue ;
                     $plugin = new AJXP_Plugin($item, $sourceFolder."/".$item);
                     $plugin->loadManifest();
                     if($plugin->manifestLoaded()){

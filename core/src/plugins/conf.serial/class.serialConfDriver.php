@@ -70,6 +70,7 @@ class serialConfDriver extends AbstractConfDriver {
 		$data = AJXP_Utils::loadSerialFile($this->pluginsConfigsFile);
 		if(isSet($data[$pluginId]) && is_array($data[$pluginId])){
 			foreach ($data[$pluginId] as $key => $value){
+                if(isSet($options[$key])) continue;
                 if(is_string($value)){
                     if(strpos($value, "\\n")){
                         $value = str_replace("\\n", "\n", $value);
