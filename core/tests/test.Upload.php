@@ -38,7 +38,7 @@ class Upload extends AbstractTest
     	if(defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !=""){
     		$tmpDir = AJXP_TMP_DIR;
     	}
-    	$this->testedParams["Upload Tmp Dir Writeable"] = is_writable($tmpDir);
+    	$this->testedParams["Upload Tmp Dir Writeable"] = @is_writable($tmpDir);
     	$this->testedParams["PHP Upload Max Size"] = $this->returnBytes(ini_get("upload_max_filesize"));
     	$this->testedParams["PHP Post Max Size"] = $this->returnBytes(ini_get("post_max_size"));
     	//$this->testedParams["AJXP Upload Max Size"] = $this->returnBytes($upload_max_size_per_file);
@@ -48,6 +48,7 @@ class Upload extends AbstractTest
     	if(!$this->testedParams["Upload Tmp Dir Writeable"]){
     		$this->failedLevel = "error";
     		$this->failedInfo = "The temporary folder used by PHP to upload files is either incorrect or not writeable! Upload will not work. Please check : ".ini_get("upload_tmp_dir");
+            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_TMP_DIR parameter in the <i>conf/bootstrap_conf.php</i> file</p>";
     		return FALSE;
     	}
         /*
