@@ -36,7 +36,8 @@ class SSLEncryption extends AbstractTest
 			$ssl = true;
 		}        
         if (!$ssl) { 
-        	$this->failedLevel = "warning"; 
+        	$this->failedLevel = "warning";
+            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : if your server supports HTTPS, set the AJXP_FORCE_REDIRECT_HTTPS parameter in the <i>conf/bootstrap_conf.php</i> file.</p>";
         	return FALSE; 
         }else{
         	$this->failedInfo .= "Https protocol detected"; 

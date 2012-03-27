@@ -29,14 +29,15 @@ class PHPSession extends AbstractTest
 {
     function PHPSession() { parent::AbstractTest("PHP Session", "<b>Testing configs</b>"); }
     function doTest() 
-    { 
+    {
     	$tmpDir = session_save_path();
     	$this->testedParams["Session Save Path"] = $tmpDir;
     	if($tmpDir != ""){
-	    	$this->testedParams["Session Save Path Writeable"] = is_writable($tmpDir);
+	    	$this->testedParams["Session Save Path Writeable"] = @is_writable($tmpDir);
 	    	if(!$this->testedParams["Session Save Path Writeable"]){
 	    		$this->failedLevel = "error";
 	    		$this->failedInfo = "The temporary folder used by PHP to save the session data is either incorrect or not writeable! Please check : ".session_save_path();
+	    		$this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : create your own temporary folder for sessions and set the session.save_path parameter in the conf/bootstrap_conf.php</p>";
 	    		return FALSE;
 	    	}    	
     	}else{

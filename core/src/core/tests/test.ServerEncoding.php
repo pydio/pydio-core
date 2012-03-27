@@ -32,8 +32,18 @@ class ServerEncoding extends AbstractTest
     { 
         // Get the locale
         $locale = setlocale(LC_CTYPE, 0);
-        if ($locale == 'C') { $this->failedLevel = "warning"; $this->failedInfo .= "Detected locale: $locale (using UTF-8)"; return FALSE; }
-        if (strpos($locale, '.') === FALSE) { $this->failedLevel = "warning"; $this->failedInfo .= "Locale doesn't contain encoding: $locale (so using UTF-8)"; return FALSE; }
+        if ($locale == 'C') {
+            $this->failedLevel = "warning";
+            $this->failedInfo .= "Detected locale: $locale (using UTF-8)";
+            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_LOCALE parameter to the correct value in the <i>conf/bootstrap_conf.php</i> file</p>";
+            return FALSE;
+        }
+        if (strpos($locale, '.') === FALSE) {
+            $this->failedLevel = "warning";
+            $this->failedInfo .= "Locale doesn't contain encoding: $locale (so using UTF-8)";
+            $this->failedInfo .= "<p class='suggestion'><b>Suggestion</b> : Set the AJXP_LOCALE parameter to the correct value in the <i>conf/bootstrap_conf.php</i> file</p>";
+            return FALSE;
+        }
         // Check if we have iconv
         if (!function_exists("iconv") && floatval(phpversion()) > 5.0) { $this->failedInfo .= "Couldn't find iconv. Please use a PHP version with iconv support"; return FALSE; }
         if (floatval(phpversion) > 5.0)
