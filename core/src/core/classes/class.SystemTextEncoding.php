@@ -108,8 +108,8 @@ class SystemTextEncoding
     static function magicDequote($text)
     {
 	    // If the PHP server enables magic quotes, remove them
-	    //if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
-	    //    return stripslashes($text);
+	    if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
+	        return stripslashes($text);
 	    return $text;  
     }
 
