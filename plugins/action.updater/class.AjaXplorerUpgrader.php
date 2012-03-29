@@ -265,6 +265,7 @@ class AjaXplorerUpgrader {
     function clearCache(){
         @unlink(AJXP_PLUGINS_CACHE_FILE);
         @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        @unlink(AJXP_PLUGINS_MESSAGES_FILE);
         return "Ok";
     }
 
@@ -565,9 +566,10 @@ class AjaXplorerUpgrader {
         if(!$dryRun && count($allOptions)){
             foreach ($allOptions as $pId => $pOptions){
                 $confStorage->savePluginConfig($pId, $pOptions);
-                @unlink(AJXP_PLUGINS_CACHE_FILE);
-                @unlink(AJXP_PLUGINS_REQUIRES_FILE);
             }
+            @unlink(AJXP_PLUGINS_CACHE_FILE);
+            @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+            @unlink(AJXP_PLUGINS_MESSAGES_FILE);
         }
 
         foreach($REPOSITORIES as $localRepoKey => $localRepoDef){

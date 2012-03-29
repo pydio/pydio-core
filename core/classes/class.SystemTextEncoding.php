@@ -49,6 +49,8 @@ class SystemTextEncoding
 			return @html_entity_decode($content, ENT_QUOTES , $outputCharset);
 		}
 	}
+
+    static $currentCharsetValue;
 	/**
      * Detect the current charset from the current locale
      * @static
@@ -83,7 +85,10 @@ class SystemTextEncoding
 	       // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
 	       if (isset($_SESSION["AJXP_CHARSET"]) && strlen($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
 	       // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
-	       return SystemTextEncoding::parseCharset(setlocale(LC_CTYPE, 0));
+           if(self::$currentCharsetValue == null){
+               self::$currentCharsetValue = self::parseCharset(setlocale(LC_CTYPE, 0));
+           }
+	       return self::$currentCharsetValue;
 	}
 	/**
      * Decode a string from UTF8 to current Charset
