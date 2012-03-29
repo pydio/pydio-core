@@ -941,6 +941,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$confStorage->savePluginConfig($httpVars["plugin_id"], $options);
 				@unlink(AJXP_PLUGINS_CACHE_FILE);
 				@unlink(AJXP_PLUGINS_REQUIRES_FILE);				
+				@unlink(AJXP_PLUGINS_MESSAGES_FILE);
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
 				AJXP_XMLWriter::reloadDataNode();

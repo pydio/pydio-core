@@ -683,6 +683,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     if(!empty($node->metaData["hidden"]) && $node->metaData["hidden"] === true){
                			continue;
                		}
+                    if(!empty($node->metaData["mimestring_id"]) && array_key_exists($node->metaData["mimestring_id"], $mess)){
+                        $node->mergeMetadata(array("mimestring" =>  $mess[$node->metaData["mimestring_id"]]));
+                    }
 
                     $nodeType = "d";
                     if($node->isLeaf()){
@@ -796,8 +799,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
             $ajxpNode->setLabel($mess[122]);
             $metaData["ajxp_mime"] = "ajxp_recycle";
         }else{
-            $metaData["mimestring"] = AJXP_Utils::mimetype($ajxpNode->getUrl(), "type", !$isLeaf);
-            $metaData["icon"] = AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
+            $mimeData = AJXP_Utils::mimeData($ajxpNode->getUrl(), !$isLeaf);
+            $metaData["mimestring_id"] = $mimeData[0]; //AJXP_Utils::mimetype($ajxpNode->getUrl(), "type", !$isLeaf);
+            $metaData["icon"] = $mimeData[1]; //AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
             if($metaData["icon"] == "folder.png"){
                 $metaData["openicon"] = "folder_open.png";
             }
