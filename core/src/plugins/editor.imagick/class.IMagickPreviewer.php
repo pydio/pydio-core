@@ -161,13 +161,17 @@ class IMagickPreviewer extends AJXP_Plugin {
 		$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		$path = $repository->getOption("PATH");
 		$masterFile = $path . str_replace($destStreamURL, "", $masterFile);
-		$masterFile = str_replace("/", "\\", $masterFile);
+        if(DIRECTORY_SEPARATOR == "\\"){
+            $masterFile = str_replace("/", "\\", $masterFile);
+        }
 		$extension = pathinfo($masterFile, PATHINFO_EXTENSION);
 		$workingDir = dirname($targetFile);
 		$out = array();
 		$return = 0;
 		$tmpFileThumb =  str_replace(".$extension", ".jpg", $targetFile);
-		$tmpFileThumb =  str_replace("/", "\\", $tmpFileThumb);
+        if(DIRECTORY_SEPARATOR == "\\"){
+    		$tmpFileThumb =  str_replace("/", "\\", $tmpFileThumb);
+        }
 		if(!$this->extractAll){
 			//register_shutdown_function("unlink", $tmpFileThumb);
 		}else{
