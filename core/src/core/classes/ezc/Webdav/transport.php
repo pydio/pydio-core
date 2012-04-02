@@ -171,7 +171,11 @@ class ezcWebdavTransport
      */
     public final function parseRequest( $uri )
     {
-        $body = $this->retrieveBody();
+        if($_SERVER["REQUEST_METHOD"] == "PUT"){
+            $body = "";
+        }else{
+            $body = $this->retrieveBody();
+        }
         $path = $this->retrievePath( $uri );
 
         if ( isset( self::$parsingMap[$_SERVER['REQUEST_METHOD']] )  )

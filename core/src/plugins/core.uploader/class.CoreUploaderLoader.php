@@ -31,7 +31,7 @@ class CoreUploaderLoader extends AJXP_Plugin{
         $data = parent::getConfigs();
         $confMaxSize = AJXP_Utils::convertBytes($data["UPLOAD_MAX_SIZE"]);
         $UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
-        if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+        if(intval($confMaxSize) > 0) $UploadMaxSize = min (intval($UploadMaxSize), intval($confMaxSize));
         $data["UPLOAD_MAX_SIZE"] = $UploadMaxSize;
         return $data;
     }

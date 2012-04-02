@@ -261,6 +261,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					register_shutdown_function("unlink", $file);					
 					copy($file, $this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName));
 					@rename($this->urlBase.$dir."/".str_replace(".zip", ".tmp", $localName), $this->urlBase.$dir."/".$localName);
+                    AJXP_Controller::applyHook("node.change", array(null, new AJXP_Node($this->urlBase.$dir."/".$localName), false));
 					$reloadContextNode = true;
 					$pendingSelection = $localName;					
 			break;
@@ -426,15 +427,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				if(isSet($error)){
 					throw new AJXP_Exception($error);
 				}
-                $currentNodeDir = new AJXP_Node($this->urlBase.$dir);
-                AJXP_Controller::applyHook("node.before_change", array(&$currentNodeDir));
 				$messtmp.="$mess[38] ".SystemTextEncoding::toUTF8($dirname)." $mess[39] ";
 				if($dir=="") {$messtmp.="/";} else {$messtmp.= SystemTextEncoding::toUTF8($dir);}
 				$logMessage = $messtmp;
 				$pendingSelection = $dirname;
 				$reloadContextNode = true;
-                $newNode = new AJXP_Node($this->urlBase.$dir."/".$dirname);
-                AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
                 AJXP_Logger::logAction("Create Dir", array("dir"=>$dir."/".$dirname));
 
 			break;
@@ -449,7 +446,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
 				$this->filterUserSelectionToHidden(array($filename));
 				$content = "";
-                AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$dir)));
 				if(isSet($httpVars["content"])){
 					$content = $httpVars["content"];
 				}
@@ -463,8 +459,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				$reloadContextNode = true;
 				$pendingSelection = $dir."/".$filename;
 				AJXP_Logger::logAction("Create File", array("file"=>$dir."/".$filename));
-				$newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
-				AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
+				//$newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
+				//AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
 		
 			break;
 			
@@ -581,7 +577,28 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				return ;
 				
 			break;
-            
+
+            case "lsync" :
+
+                if(!defined("STDIN")){
+                    die("This command must be accessed via CLI only.");
+                }
+                $fromNode = null;
+                $toNode = null;
+                $copyOrMove = false;
+                if(isSet($httpVars["from"])) {
+                    $fromNode = new AJXP_Node($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["from"]));
+                }
+                if(isSet($httpVars["to"])) {
+                    $toNode = new AJXP_Node($this->urlBase.AJXP_Utils::decodeSecureMagic($httpVars["to"]));
+                }
+                if(isSet($httpVars["copy"]) && $httpVars["copy"] == "true"){
+                    $copyOrMove = true;
+                }
+                AJXP_Controller::applyHook("node.change", array($fromNode, $toNode, $copyOrMove));
+
+            break;
+
 			//------------------------------------
 			//	XML LISTING
 			//------------------------------------
@@ -1290,6 +1307,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	
 	function mkDir($crtDir, $newDirName)
 	{
+        $currentNodeDir = new AJXP_Node($this->urlBase.$crtDir);
+        AJXP_Controller::applyHook("node.before_change", array(&$currentNodeDir));
+
 		$mess = ConfService::getMessages();
 		if($newDirName=="")
 		{
@@ -1316,11 +1336,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		$old = umask(0);
 		mkdir($this->urlBase."$crtDir/$newDirName", $dirMode);
 		umask($old);
+        $newNode = new AJXP_Node($this->urlBase.$crtDir."/".$newDirName);
+        AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
 		return null;		
 	}
 	
 	function createEmptyFile($crtDir, $newFileName, $content = "")
 	{
+        AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$crtDir)));
 		$mess = ConfService::getMessages();
 		if($newFileName=="")
 		{
@@ -1346,6 +1369,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			}
 			$this->changeMode($this->urlBase."$crtDir/$newFileName");
 			fclose($fp);
+            $newNode = new AJXP_Node($this->urlBase."$crtDir/$newFileName");
+            AJXP_Controller::applyHook("node.change", array(null, $newNode, false));
 			return null;
 		}
 		else
@@ -1640,7 +1665,26 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			}
 		}
 	}
-	
+
+    /**
+     * @param String $from
+     * @param String $to
+     * @param Boolean $copy
+     */
+    function nodeChanged(&$from, &$to, $copy = false){
+        if($from != null) $from = new AJXP_Node($this->urlBase.$from);
+        if($to != null) $to = new AJXP_Node($this->urlBase.$to);
+        AJXP_Controller::applyHook("node.change", array($from, $to, $copy));
+    }
+
+    /**
+     * @param String $node
+     */
+    function nodeWillChange($node){
+        AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node)));
+    }
+
+
 	/**
 	 * @var fsAccessDriver
 	 */

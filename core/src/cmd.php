@@ -71,6 +71,8 @@ if(isSet($options["p"])){
 
 $optAction = $options["a"];
 $optRepoId = $options["r"] OR false;
+$optDetectUser = $options["detect_user"] OR false;
+$detectedUser = false;
 
 if($optRepoId !== false){
 	$repository = ConfService::getRepositoryById($optRepoId);
@@ -80,7 +82,26 @@ if($optRepoId !== false){
 			$optRepoId =($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
 		}
 	}
+    if($optDetectUser != false){
+        $path = $repository->getOption("PATH", true);
+        if(strpos($path, "AJXP_USER") !== false){
+            $path = str_replace(
+                array("AJXP_INSTALL_PATH", "AJXP_DATA_PATH", "/"),
+                array(AJXP_INSTALL_PATH, AJXP_DATA_PATH, DIRECTORY_SEPARATOR),
+                $path
+            );
+            $parts = explode("AJXP_USER", $path);
+            if(count($parts) == 1) $parts[1] = "";
+            $first = str_replace("\\", "\\\\", $parts[0]);
+            $last = str_replace("\\", "\\\\", $parts[1]);
+            if(preg_match("/$first(.*)$last.*/", $optDetectUser, $matches)){
+                $detectedUser = $matches[1];
+            }
+        }
+    }
 	ConfService::switchRootDir($optRepoId, true);
+}else{
+    die("You must pass a -r argument specifying either a repository id or alias");
 }
 
 if(AuthService::usersEnabled())
@@ -92,6 +113,12 @@ if(AuthService::usersEnabled())
 	$loggingResult = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
 	// Check that current user can access current repository, try to switch otherwise.
 	$loggedUser = AuthService::getLoggedUser();
+    if($loggedUser != null && $detectedUser !== false && $loggedUser->isAdmin()){
+        AuthService::disconnect();
+        AuthService::logUser($detectedUser, "empty", true, false, "");
+        $loggedUser = AuthService::getLoggedUser();
+    }
+
 	if($loggedUser != null)
 	{
 		$currentRepoId = ConfService::getCurrentRootDirIndex();

@@ -54,6 +54,18 @@ interface AjxpWebdavProvider {
 	 * @param String $newDirName
 	 */
 	function createEmptyFile($path, $newDirName);
+
+    /**
+     * @param String $from
+     * @param String $to
+     * @param Boolean $copy
+     */
+    function nodeChanged(&$from, &$to, $copy = false);
+
+    /**
+     * @param String $node
+     */
+    function nodeWillChange($node);
 }
 
 ?>
