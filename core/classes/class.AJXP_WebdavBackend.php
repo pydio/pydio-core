@@ -72,7 +72,11 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
         $this->options['hideDotFiles']           = true;
 		
 	}
-	
+
+    /**
+     * @return AjxpWebdavProvider
+     * @throws ezcBaseFileNotFoundException
+     */
 	protected function getAccessDriver(){
 		if(!isset($this->accessDriver)){
             $confDriver = ConfService::getConfStorageImpl();
@@ -143,13 +147,22 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @param string $content 
      * @return void
      */
-     protected function setResourceContents( $path, $content ){
-     	$path = $this->fixPath($path);
-     	AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
-     	$fp=fopen($this->getAccessDriver()->getRessourceUrl($path),"w");
-		fputs ($fp,$content);
-		fclose($fp);     	
-     }
+    protected function setResourceContents( $path, $content ){
+        $path = $this->fixPath($path);
+        AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
+        $this->getAccessDriver()->nodeWillChange($path);
+
+        $fp=fopen($this->getAccessDriver()->getRessourceUrl($path),"w");
+		$in = fopen( 'php://input', 'r' );
+        while ( $data = fread( $in, 1024 ) )
+        {
+            fputs($fp, $data, strlen($data));
+        }
+        fclose($in);
+        fclose($fp);
+    	$toto = null;
+        $this->getAccessDriver()->nodeChanged($toto, $path);
+    }
 
     /**
      * Returns the content of a resource.

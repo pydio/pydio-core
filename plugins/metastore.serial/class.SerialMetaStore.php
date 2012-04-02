@@ -156,7 +156,7 @@ class SerialMetaStore extends AJXP_Plugin {
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
         }
         self::$metaCache = array();
-		if(!isSet(self::$fullMetaCache) && @is_file($metaFile) && is_readable($metaFile)){
+		if((!isSet(self::$fullMetaCache) || self::$currentMetaName != $metaFile  ) && @is_file($metaFile) && is_readable($metaFile)){
             self::$currentMetaName = $metaFile;
 			$rawData = file_get_contents($metaFile);
             self::$fullMetaCache = unserialize($rawData);
