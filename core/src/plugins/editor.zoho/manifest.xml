@@ -3,7 +3,7 @@
 	<class_definition filename="plugins/editor.zoho/class.ZohoEditor.php" classname="ZohoEditor"/>
     <server_settings>
         <global_param name="ZOHO_API_KEY" type="string" description="CONF_MESSAGE[Zoho API Key, you must have registered to api.zoho.com]" label="CONF_MESSAGE[API Key]" mandatory="true"/>
-        <global_param name="ZOHO_SECRET_KEY" type="string" description="CONF_MESSAGE[Zoho secret key, you must have registered to api.zoho.com]" label="CONF_MESSAGE[Secret Key]" mandatory="true"/>
+        <!--<global_param name="ZOHO_SECRET_KEY" type="string" description="CONF_MESSAGE[Zoho secret key, you must have registered to api.zoho.com]" label="CONF_MESSAGE[Secret Key]" mandatory="true"/>-->
         <global_param name="USE_ZOHO_AGENT" expose="true" type="boolean" description="CONF_MESSAGE[If you are working locally or behind a firewall, you can install an ajaxplorer Zoho Agent somewhere in the public zone. See the plugin folder content.]" label="CONF_MESSAGE[Use Z-Agent]" mandatory="false" default="false"/>
         <global_param name="ZOHO_AGENT_URL" type="string" description="CONF_MESSAGE[If you use the agent, enter its URL here.]" label="CONF_MESSAGE[Z-Agent URL]" mandatory="false"/>
     </server_settings>
