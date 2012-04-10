@@ -13,8 +13,13 @@ listing for future featured.
 PHP 5.4 Support     : Call-time pass by reference are deprecated, replace static calls to DOMDocument::loadXML
 Cross-Repository copy : two successive node expand changed the current repository to the destination repository (switch back replaced twice).
 Core                : Fix mkdir() call for the cmd_outputs folder
+Metadata loading    : Set a "hidden" metadata to a passed node
 Access.fs           : handle symlinks more properly
+Access.fs           : Filter files and folders when creating Zips, using PCLZIP_CB_PRE_ADD callback
 Access.smb          : Clean URL everywhere, pass the Locale as environnement variable when defined
+Access.fs           : Big typo error making the "nodeName" resetting useless
+Access.smb          : override makeZip and allow its usage (by plugin configuration), as it can be an option when on a very fast network connection.
+Access.smb          : fix "+" in folder name, use rawurldecode() instead of urldecode()
 Open_basedir        : Multiple files downloads broken, do not "patch path" in readFile function when on the realFileSystem.
 Core.conf           : Add a $context parameter to the user save() method, to avoid "over saving" data : if context is "superuser", save preferences and rights, where as in context "user" save only preferences.
 Core.uploader       : should solve the problems of setting the upload limit.
@@ -28,17 +33,23 @@ Remember me         : reported from 4.0.3 branch
 Tpl Logo image      : Wrong content type header
 Massive deletion    : POST instead of GET
 Error Message       : Restyle message box (max height), fixed broken carriage return
+JSPacker            : rtrim windows line feed
 
 [OTHER PLUGINS]
+Conf.sql            : Auto detect "objects" preferences and serialize them in the DB, adding the $phpserial$ prefix. Fixes AJXP_WEBDAV_DATA of users, as well as PLUGINS_DATA used by notify.phpmail
 Editor.diaporama    : fix the "navigator" when the is a marginTop on the thumbnail, encodeURIComponent before triggering download action, otherwise breaks (e.g. & in file name)
 Editor.zoho         : as reported by zoho support team, the Secret Key is in fact deprecated and no more necessary, apply node.before_change hook before saving
 Editor.pixlr        : apply node.before_change hook before saving
 Editor.imagick      : do not inverse slashes if not necessary!
+Editor.video        : Pass alternate videos versions in the metadata, and set them as HTML5 video source (require an external pre-encoding)
 Index.lucene        : ignore case for determining content-indexed extensions
 Uploader.*          : trigger events ajaxplorer:longtask_starting / ajaxplorer:longtask_finished
 Auth.ftp            : Force call to getServerFeatures() when coming from the login operation.
 Auth.ldap           : Jon Peck ldap contrib : ability to configure DN as an array and iterate through them
+Meta.svn            : manually set a library path to access the SVN commands.
 Meta.filehasher     : new utility for accelerating synchronization, compute and store file md5 in metadata (if metastore active) and delete on file change.
+Action.powerfs      : Fix zip delegation : do not sleep for one second, change the download mechanism, and place the zip inside the temporary folder, otherwise it makes problems for read-only folders. Allow compression when using powerfs in read mode, Todo : exclude hidden files from zip operation using an exclude list,
+Action.share        : AjxpSharedDriver avoid error on empty glob(), fix typo error
 
 [PERFORMANCES]
 Performance hunting : cache slow processing data when possible (registered extensions, messages, etc), either in memory (static var) or in cache files.
@@ -49,7 +60,11 @@ New config file     : New optional config file to set the configs that must be s
 Test.gpc            : Totally commenting magic_quote_gpc breaks JSON if magic_quote is active!
 Test.writeability   : Call is_dir silently to avoid error triggering and let the diagnostic tool run
 Tests failed        : Suggest changes (in the new bootstrap_conf.php file)
+Documentation       : Plugin Info XML, ability to browse many plugins folders (experimental)
+Security            : Reported from 4.0.4 branch
 
+
+--- PREVIOUS RELEASES
 
 AjaXplorer 4.0.4 Release Note
 
