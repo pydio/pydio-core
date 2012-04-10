@@ -79,7 +79,7 @@ class ZohoEditor extends AJXP_Plugin {
                 'apikey' => $this->pluginConf["ZOHO_API_KEY"],
                 'output' => 'url',
                 'lang' => "en",
-                'skey'=> $this->pluginConf["ZOHO_SECRET_KEY"],
+                //'skey'=> $this->pluginConf["ZOHO_SECRET_KEY"],
                 'filename' => urlencode(basename($file)),
                 'persistence' => 'false',
                 'format' => $extension,
