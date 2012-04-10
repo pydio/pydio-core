@@ -272,12 +272,14 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
      */
     public function createIndexedDocument($ajxpNode){
         $ajxpNode->loadNodeInfo();
-        $ext = pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION);
+        $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
+        $htmlParseExt = array_map("strtolower", array_map("trim", explode(",",$this->pluginConf["PARSE_CONTENT_HTML"])));
+        $txtParseExt = array_map("strtolower", array_map("trim", explode(",",$this->pluginConf["PARSE_CONTENT_TXT"])));
         $parseContent = $this->indexContent;
         if($parseContent && $ajxpNode->bytesize > $this->pluginConf["PARSE_CONTENT_MAX_SIZE"]){
             $parseContent = false;
         }
-        if($parseContent && in_array($ext, explode(",",$this->pluginConf["PARSE_CONTENT_HTML"]))){
+        if($parseContent && in_array($ext, $htmlParseExt)){
             $doc = Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         }else{
             $doc = new Zend_Search_Lucene_Document();
@@ -290,7 +292,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), SystemTextEncoding::getEncoding());
             }
         }
-        if($parseContent && in_array($ext, explode(",",$this->pluginConf["PARSE_CONTENT_TXT"]))){
+        if($parseContent && in_array($ext, $txtParseExt)){
             $doc->addField(Zend_Search_Lucene_Field::unStored("body", file_get_contents($ajxpNode->getUrl())));
         }
         // Store a cached copy of the metadata
