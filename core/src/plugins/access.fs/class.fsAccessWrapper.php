@@ -314,6 +314,18 @@ class fsAccessWrapper implements AjxpWrapper {
     	if($real != -1 && is_file($real)){
     		return stat($real);
     	}
+        // Handle symlinks!
+        if($real != -1 && is_link($real)){
+       		$realFile = @readlink($real);
+       		if(is_file($realFile) || is_dir($realFile)) {
+       			return stat($realFile);
+       		} else {
+                // symlink is broken, delete it.
+       			@unlink($real);
+       			return null;
+       		}
+       	}
+
     	// Non existing file
    		return null;
     }
