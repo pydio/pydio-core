@@ -344,7 +344,8 @@ Class.create("MultiUploader", {
 		if(error && typeof(error) == "string") alert(error);
 		var nextToSubmit = $('pendingform_'+this.nextToUpload);
 		if(nextToSubmit)
-		{			
+		{
+            document.fire("ajaxplorer:longtask_starting");
 			this.currentFileUploading = nextToSubmit.multi_index;
 			this.updateRowByIndex(this.currentFileUploading, 'loading');
 			var crtValue = $(nextToSubmit).getElementsBySelector('input[type="file"]')[0].value;
@@ -360,6 +361,7 @@ Class.create("MultiUploader", {
 		}
 		else
 		{
+            document.fire("ajaxplorer:longtask_finished");
 			ajaxplorer.fireContextRefresh();
 		}
 		

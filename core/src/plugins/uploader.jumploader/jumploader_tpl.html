@@ -49,6 +49,7 @@ function appletInitialized(uploader){
 	applet.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&ajxp_sessid=" + clientId);
 	applet.getUploaderConfig().setPartitionLength(partitionLength);
 	applet.getUploaderConfig().setMaxFileLength(maxFileLength);
+    parent.document.fire("ajaxplorer:longtask_starting");
 }
 
 function uploaderStatusChanged(uploader){
@@ -56,6 +57,7 @@ function uploaderStatusChanged(uploader){
 	// 1 = uploading, 0 is back to normal => we assume "uploaded"
 	if(uploader.getStatus() == 0){
 		parent.ajaxplorer.fireContextRefresh();
+        parent.document.fire("ajaxplorer:longtask_finished");
 	}
 }
 
