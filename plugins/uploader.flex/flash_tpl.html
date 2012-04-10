@@ -64,6 +64,7 @@ function triggerFlashEvent(){
 	try{
 		switch(eventType){
 			case "currentFiles":
+                parent.document.fire("ajaxplorer:longtask_starting");
 				return parent.ajaxplorer.getUserSelection().getContextFileNames("__AJXP_SEP__");
 			break;
 			case "currentFolder":
@@ -71,6 +72,7 @@ function triggerFlashEvent(){
 				return folder.replace("+", "%2B");
 			break;	
 			case "uploadComplete":
+                parent.document.fire("ajaxplorer:longtask_finished");
 				parent.ajaxplorer.fireContextRefresh();
 			break;
 			case "getMessage":
