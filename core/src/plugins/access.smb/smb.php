@@ -173,7 +173,11 @@ class smb {
             1 => array("pipe", "w"),  	// stdout is a pipe that the child will write to
             2 => array("pipe", "w") 	// stderr is a pipe to write to
         );
-        $process = proc_open($cmd, $descriptorspec, $pipes, null, null);
+        $env = null;
+        if(defined('AJXP_LOCALE')){
+            $env = array("LC_ALL" => AJXP_LOCALE);
+        }
+        $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
         if(is_resource($process)){
             fclose($pipes[0]);
             $error = stream_get_contents($pipes[2]);
@@ -395,6 +399,7 @@ class smb {
     # commands
 
     function unlink ($url) {
+        $url = smb::cleanUrl($url);
         $pu = smb::parse_url($url);
         if ($pu['type'] <> 'path') trigger_error('unlink(): error in URL', E_USER_ERROR);
         smb::clearstatcache ($url);
@@ -403,6 +408,9 @@ class smb {
     }
 
     function rename ($url_from, $url_to) {
+        $url_from = smb::cleanUrl($url_from);
+        $url_to = smb::cleanUrl($url_to);
+
         list ($from, $to) = array (smb::parse_url($url_from), smb::parse_url($url_to));
         if ($from['host'] <> $to['host'] ||
             $from['share'] <> $to['share'] ||
@@ -420,13 +428,16 @@ class smb {
 
     function mkdir ($url, $mode, $options) {
 		//self::debug("hmmmmm");
+        $url = smb::cleanUrl($url);
         $pu = smb::parse_url($url);
+
         //self::debug("huh");
         if ($pu['type'] <> 'path') trigger_error('mkdir(): error in URL', E_USER_ERROR);
         return smb::execute ('mkdir "'.$pu['path'].'"', $pu);
     }
 
     function rmdir ($url) {
+        $url = smb::cleanUrl($url);
         $pu = smb::parse_url($url);
         if ($pu['type'] <> 'path') trigger_error('rmdir(): error in URL', E_USER_ERROR);
         smb::clearstatcache ($url);
@@ -514,6 +525,7 @@ class smb_stream_wrapper extends smb {
             $this->dir_index = 0;
             return TRUE;
         }
+        $url = smb::cleanUrl($url);
         $pu = smb::parse_url ($url);
         switch ($pu['type']) {
             case 'host':
@@ -586,6 +598,7 @@ class smb_stream_wrapper extends smb {
     # streams
 
     function stream_open ($url, $mode, $options, $opened_path) {
+        $url = smb::cleanUrl($url);
         $this->url = $url;
         $this->mode = $mode;
         $this->defer_stream_read;
