@@ -213,7 +213,7 @@ class AJXP_Controller{
 	public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters){
 		$token = md5(time());
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
-        if(!is_dir($logDir)) mkdir($logDir, 755);
+        if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
         $user = "shared";
