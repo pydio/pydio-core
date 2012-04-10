@@ -264,7 +264,7 @@ class ConfService
 		{
 			if($temporary && isSet($_SESSION['REPO_ID'])){
 				$crtId = $_SESSION['REPO_ID'];
-                if($crtId != $rootDirIndex){
+                if($crtId != $rootDirIndex && !isSet($_SESSION['SWITCH_BACK_REPO_ID'])){
                     $_SESSION['SWITCH_BACK_REPO_ID'] = $crtId;
                     //AJXP_Logger::debug("switching to $rootDirIndex, registering $crtId");
                 }
