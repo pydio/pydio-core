@@ -32,6 +32,7 @@ Class.create("ActivityMonitor", {
 	_logoutMinutes:0,
 	_lastActive:0,	
 	_state:'active',
+    _longTaskRunning : false,
 	
 	/**
 	 * Constructor
@@ -50,8 +51,12 @@ Class.create("ActivityMonitor", {
 			return;
 		}
 		this._serverSessionTime = serverSessionTime;
-		if(warningMinutes) this._warningMinutes = warningMinutes;
-		this._warningTime = clientSessionTime - this._warningMinutes*60;
+		if(warningMinutes) {
+            this._warningMinutes = warningMinutes;
+            this._warningTime = clientSessionTime - this._warningMinutes*60;
+        }else{
+            this._warningTime = false
+        }
 		this._logoutTime = clientSessionTime - this._logoutMinutes*60;
 		this._renewTime = serverSessionTime - this._renewMinutes*60;
 		this._lastActive = this.getNow();
@@ -75,7 +80,13 @@ Class.create("ActivityMonitor", {
 				this.interval = window.setInterval(this.idleObserver.bind(this), 5000);
 				this.serverInterval = window.setInterval(this.serverObserver.bind(this), this._renewTime*1000);
 			}
-		}.bind(this));		
+		}.bind(this));
+        document.observe("ajaxplorer:longtask_starting", function(){
+            this._longTaskRunning = true;
+        }.bind(this));
+        document.observe("ajaxplorer:longtask_finished", function(){
+            this._longTaskRunning = false;
+        }.bind(this));
 	},
 	/**
 	 * Listener to clear the timer 
@@ -87,7 +98,8 @@ Class.create("ActivityMonitor", {
 		}
 		this.timer = window.setTimeout(this.activityUpdater.bind(this), 1000);
 	},
-	
+
+
 	/**
 	 * Set last activity time
 	 */
@@ -112,6 +124,10 @@ Class.create("ActivityMonitor", {
 	 */
 	idleObserver : function(){
 		if(this._state == 'inactive') return;
+        if(this._longTaskRunning){
+            this.activityUpdater();
+            return;
+        }
 		var idleTime = (this.getNow() - this._lastActive);
 		if( idleTime >= this._logoutTime ){
 			//console.log('firing logout');
@@ -122,7 +138,7 @@ Class.create("ActivityMonitor", {
 			ajaxplorer.actionBar.fireDefaultAction("expire");
 			return;
 		}
-		if( idleTime >= this._warningTime ){
+		if( this._warningTime && idleTime >= this._warningTime ){
 			if(this._state == 'active'){
 				this.setWarningState();
 			}
