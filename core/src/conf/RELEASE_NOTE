@@ -1,3 +1,62 @@
+AjaXplorer 4.1.0 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Version number : 4.1.0
+Demo : http://ajaxplorer.info/demo
+Rev Number : 2817
+
+This is a development release that fixes numerous bugs and introduces low-level features like infinite depth
+listing for future featured.
+
+[CORE & ACCESS DRIVERS]
+PHP 5.4 Support     : Call-time pass by reference are deprecated, replace static calls to DOMDocument::loadXML
+Cross-Repository copy : two successive node expand changed the current repository to the destination repository (switch back replaced twice).
+Core                : Fix mkdir() call for the cmd_outputs folder
+Access.fs           : handle symlinks more properly
+Access.smb          : Clean URL everywhere, pass the Locale as environnement variable when defined
+Open_basedir        : Multiple files downloads broken, do not "patch path" in readFile function when on the realFileSystem.
+Core.conf           : Add a $context parameter to the user save() method, to avoid "over saving" data : if context is "superuser", save preferences and rights, where as in context "user" save only preferences.
+Core.uploader       : should solve the problems of setting the upload limit.
+WebDAV Server       : detect MiniRedir user agent
+Synchro             : Recursive listing implementation & hooks applyCondition for better performances. Testing synchro tool
+Synchro             : Various tricks to trigger the metadata updates from outside, and webdav optims
+
+[AJAX GUI]
+Client Session timer: hook to "ajaxplorer:longtask_xxx" events to avoid disconnecting during very long task (namely uploads for the moment)
+Remember me         : reported from 4.0.3 branch
+Tpl Logo image      : Wrong content type header
+Massive deletion    : POST instead of GET
+Error Message       : Restyle message box (max height), fixed broken carriage return
+
+[OTHER PLUGINS]
+Editor.diaporama    : fix the "navigator" when the is a marginTop on the thumbnail, encodeURIComponent before triggering download action, otherwise breaks (e.g. & in file name)
+Editor.zoho         : as reported by zoho support team, the Secret Key is in fact deprecated and no more necessary, apply node.before_change hook before saving
+Editor.pixlr        : apply node.before_change hook before saving
+Editor.imagick      : do not inverse slashes if not necessary!
+Index.lucene        : ignore case for determining content-indexed extensions
+Uploader.*          : trigger events ajaxplorer:longtask_starting / ajaxplorer:longtask_finished
+Auth.ftp            : Force call to getServerFeatures() when coming from the login operation.
+Auth.ldap           : Jon Peck ldap contrib : ability to configure DN as an array and iterate through them
+Meta.filehasher     : new utility for accelerating synchronization, compute and store file md5 in metadata (if metastore active) and delete on file change.
+
+[PERFORMANCES]
+Performance hunting : cache slow processing data when possible (registered extensions, messages, etc), either in memory (static var) or in cache files.
+New cache file      : Define plugins_message.ser file cache, contains all i18n messages (collecting them was very long).
+
+[TESTS AND INSTALL]
+New config file     : New optional config file to set the configs that must be set before anything else : LOCALE, TMP_DIR, INI_SET
+Test.gpc            : Totally commenting magic_quote_gpc breaks JSON if magic_quote is active!
+Test.writeability   : Call is_dir silently to avoid error triggering and let the diagnostic tool run
+Tests failed        : Suggest changes (in the new bootstrap_conf.php file)
+
+
+AjaXplorer 4.0.4 Release Note
+
+A vulnerability was discovered that could allow a non-logged user to access other files on the server
+file system. The « remember me » mechanism was also improved to lower the session hacking probability
+in case of « cookie stealing ».
+
 AjaXplorer 4.0.3 Release Note
 
 License : Affero GPL
