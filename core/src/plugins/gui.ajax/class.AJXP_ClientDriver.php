@@ -94,7 +94,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 			case "get_i18n_messages":
 
                 $refresh = false;
-                if(AuthService::getLoggedUser() == null && isSet($httpVars["lang"])){
+                if(isSet($httpVars["lang"])){
                     ConfService::setLanguage($httpVars["lang"]);
                     $refresh = true;
                 }
