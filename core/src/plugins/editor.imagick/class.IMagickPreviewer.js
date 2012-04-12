@@ -93,20 +93,71 @@ Class.create("IMagickPreviewer", Diaporama, {
 		connexion.sendAsync();
 	},
 						
-	getPreview : function(ajxpNode){
-		var img = new Element('img', {
-			src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode), 
+	getPreview : function(ajxpNode){		
+		var img = new Element('img', {			
 			style:'border:1px solid #676965;',
-            align:'absmiddle'
-		});
+            align:'absmiddle',
+            src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode)
+		});		
 		img.resizePreviewElement = function(dimensionObject){			
+			ratio = img.ratio;
+			if(!ratio) {
+				var fakeIm = new Image();
+				fakeIm.onload = function(){	
+					img.ratio = fakeIm.width/fakeIm.height;
+					img.resizePreviewElement(dimensionObject);
+				}
+				fakeIm.src = img.src;
+				//img.onload = function(){img.resizePreviewElement(dimensionObject);};
+				ratio = 1.0;
+			}
 			var imgDim = {
-				width:21, 
-				height:29
+				width:20,
+				height:20/ratio
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
 			img.setStyle(styleObj);
 		}
+		img.observe("mouseover", function(event){
+			var theImage = event.target;
+			if(theImage.up('.thumbnail_selectable_cell')) return;
+			if(!theImage.openBehaviour){
+				var opener = new Element('div').update(MessageHash[411]);
+				opener.setStyle({
+					width:styleObj.width, 
+					display:'none', 
+					position:'absolute', 
+					color: 'white',
+					backgroundColor: 'black',
+					opacity: '0.6',
+					fontWeight: 'bold',
+					fontSize: '12px',
+					textAlign: 'center',
+					cursor: 'pointer'
+				});
+                opener.addClassName('imagePreviewOverlay');
+				img.previewOpener = opener;
+				theImage.insert({before:opener});
+				theImage.setStyle({cursor:'pointer'});
+				theImage.openBehaviour = true;
+				theImage.observe("click", function(event){
+					ajaxplorer.actionBar.fireAction('open_with');
+				});
+			}
+            var off = theImage.positionedOffset();
+            var realLeftOffset = Math.max(off.left, theImage.parentNode.positionedOffset().left);
+			theImage.previewOpener.setStyle({
+                display:'block',
+                left: realLeftOffset + 'px',
+                width:theImage.getWidth() + "px",
+                top: (off.top + theImage.getHeight() - theImage.previewOpener.getHeight()) + "px"
+            });
+		});
+		img.observe("mouseout", function(event){
+			var theImage = event.target;
+			if(theImage.up('.thumbnail_selectable_cell')) return;
+			theImage.previewOpener.setStyle({display:'none'});
+		});		
 		return img;
 	},
 	
