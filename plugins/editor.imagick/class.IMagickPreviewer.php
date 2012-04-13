@@ -30,7 +30,20 @@ class IMagickPreviewer extends AJXP_Plugin {
 	protected $extractAll = false;
 	protected $onTheFly = false;
 	protected $useOnTheFly = false;
-	
+
+    protected $imagickExtensions = array("pdf", "svg", "tif", "tiff", "psd", "xcf", "eps");
+    protected $unoconvExtensios = array("xls", "xlsx", "ods", "doc", "docx", "odt", "ppt", "pptx", "odp", "rtf");
+
+    public function loadConfigs($configsData){
+        parent::loadConfigs($configsData);
+        if(isSet($configsData["UNOCONV"]) && !empty($configsData["UNOCONV"])){
+            // APPEND THE UNOCONV SUPPORTED EXTENSIONS
+            $this->manifestDoc->documentElement->setAttribute("mimes", implode(",", array_merge($this->imagickExtensions,$this->unoconvExtensios)));
+        }else{
+            $this->manifestDoc->documentElement->setAttribute("mimes", implode(",", $this->imagickExtensions));
+        }
+    }
+
 	public function switchAction($action, $httpVars, $filesVars){
 		
 		if(!isSet($this->actions[$action])) return false;
@@ -155,7 +168,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 		if(isset($this->pluginConf["UNOCONV"]) && !empty($this->pluginConf["UNOCONV"])){
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
-			if($unoconv !== false && in_array($extension, $officeExt)){
+			if(in_array($extension, $officeExt)){
 				$unoDoc = $prefix."_unoconv.pdf";
 				if(is_file($unoDoc)) $file = $unoDoc;
 			}			
