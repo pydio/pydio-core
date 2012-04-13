@@ -820,8 +820,8 @@ ConfigEditor = Class.create({
 			return false;
 		}		
 		this.submitForm('edit_repository', 'create_repository', toSubmit, null, function(){
-			hideLightBox();			
-		}.bind(this));
+			hideLightBox();
+		}.bind(this), function(){});
 		return false;		
 	},
 	
@@ -1107,7 +1107,7 @@ ConfigEditor = Class.create({
 		return legend;
 	},
 	
-	submitForm: function(mainAction, action, parameters, formName, callback){
+	submitForm: function(mainAction, action, parameters, formName, callback, errorCallback){
 		//var connexion = new Connexion('admin.php');
 		var connexion = new Connexion();
 		if(formName)
@@ -1123,11 +1123,15 @@ ConfigEditor = Class.create({
 			connexion.setParameters(parameters);
 		}
 		if(!callback){
-			connexion.onComplete = function(transport){this.parseXmlMessage(transport.responseXML);}.bind(this);
+			connexion.onComplete = function(transport){
+                var res = this.parseXmlMessage(transport.responseXML);
+                if(!res && errorCallback) errorCallback(transport.responseXML);
+            }.bind(this);
 		}else{
 			connexion.onComplete = function(transport){
-				this.parseXmlMessage(transport.responseXML);
-				callback(transport.responseXML);
+				var res = this.parseXmlMessage(transport.responseXML);
+                if(!res && errorCallback) errorCallback(transport.responseXML);
+                else callback(transport.responseXML);
 			}.bind(this);
 		}
 		connexion.sendAsync();
@@ -1172,6 +1176,13 @@ ConfigEditor = Class.create({
 			}
 		}
         ajaxplorer.actionBar.parseXmlMessage(xmlResponse);
+        if(xmlResponse.documentElement){
+            window.RESPONSETEST = xmlResponse.documentElement;
+            if(XPathSelectSingleNode(xmlResponse.documentElement, 'message[@type="ERROR"]') != null){
+                return false;
+            }
+        }
+        return true;
 	},
 
 	

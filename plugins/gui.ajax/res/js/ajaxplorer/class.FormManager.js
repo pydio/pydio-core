@@ -130,7 +130,10 @@ Class.create("FormManager", {
         if(!groupDivs.size()) return;
         var firstGroup = true;
         groupDivs.each(function(pair){
-            var title = new Element('div',{className:'accordion_toggle'}).update(pair.key);
+            var title = new Element('div',{className:'accordion_toggle', tabIndex:0}).update(pair.key);
+            title.observe('focus', function(){
+                if(form.SF_accordion) form.SF_accordion.activate(title);
+            });
             form.insert(title);
             form.insert(pair.value);
         });
