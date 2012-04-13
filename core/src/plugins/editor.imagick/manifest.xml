@@ -12,7 +12,7 @@
 		<global_param name="IM_THUMB_QUALITY" type="string" label="CONF_MESSAGE[Thumbs Quality]" description="CONF_MESSAGE[Quality used for generating the thumbnails]" default="65"/>
 		<global_param name="IM_VIEWER_QUALITY" type="string" label="CONF_MESSAGE[Viewer Quality]" description="CONF_MESSAGE[Quality used for generation the high scale images]" default="90"/>
 		<global_param name="ONTHEFLY_THRESHOLD" type="integer" label="CONF_MESSAGE[Pregeneration Threshold]" description="CONF_MESSAGE[Threshold (in MegaByte) under which the pages are all generated when opening the document, and over which pages are generated on-demand only]" default="5"/>
-		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary]" default="" mandatory="true"/>		
+		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary]" default="" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
 		<hooks>
