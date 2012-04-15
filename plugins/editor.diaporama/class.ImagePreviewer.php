@@ -96,7 +96,7 @@ class ImagePreviewer extends AJXP_Plugin {
 		if($oldFile == null) return ;
 		if(!$this->handleMime($oldFile->getUrl())) return;
 		if($newFile == null || $copy == false){
-			$diapoFolders = glob(AJXP_CACHE_DIR."/diaporama_*",GLOB_ONLYDIR);
+			$diapoFolders = glob((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/diaporama_*",GLOB_ONLYDIR);
             if($diapoFolders !== false && is_array($diapoFolders)){
                 foreach($diapoFolders as $f) {
                     $f = basename($f);
