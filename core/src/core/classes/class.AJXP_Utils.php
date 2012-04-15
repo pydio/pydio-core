@@ -977,6 +977,12 @@ class AJXP_Utils
         file_put_contents(TESTS_RESULT_FILE, $content);
     }
 
+    static function isStream($path){
+        $wrappers = stream_get_wrappers();
+        $wrappers_re = '(' . join('|', $wrappers) . ')';
+        return preg_match( "!^$wrappers_re://!", $path ) === 1;
+    }
+
     /**
      * Load an array stored serialized inside a file.
      *
