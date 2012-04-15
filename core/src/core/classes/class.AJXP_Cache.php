@@ -86,7 +86,7 @@ class AJXP_Cache {
      * @return void
      */
 	public function AJXP_Cache($pluginId, $filepath, $dataCallback, $idComputerCallback = NULL){
-		$this->cacheDir = AJXP_CACHE_DIR;
+		$this->cacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
 		$this->masterFile = $filepath;
 		$this->dataCallback = $dataCallback;
 		if($idComputerCallback != null){
@@ -145,7 +145,7 @@ class AJXP_Cache {
      * @return void
      */
 	public function touch(){
-		touch($this->cacheId, filemtime($this->masterFile));
+		@touch($this->cacheId, filemtime($this->masterFile));
 	}
 	
 	/**
