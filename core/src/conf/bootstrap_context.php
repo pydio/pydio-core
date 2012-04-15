@@ -41,6 +41,7 @@ define("AJXP_EXEC", true);
 // APPLICATION PATHES CONFIGURATION
 define("AJXP_DATA_PATH", AJXP_INSTALL_PATH."/data");
 define("AJXP_CACHE_DIR", AJXP_DATA_PATH."/cache");
+define("AJXP_SHARED_CACHE_DIR", AJXP_INSTALL_PATH."/data/cache");
 define("AJXP_PLUGINS_CACHE_FILE", AJXP_CACHE_DIR."/plugins_cache.ser");
 define("AJXP_PLUGINS_REQUIRES_FILE", AJXP_CACHE_DIR."/plugins_requires.ser");
 define("AJXP_PLUGINS_MESSAGES_FILE", AJXP_CACHE_DIR."/plugins_messages.ser");
