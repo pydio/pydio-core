@@ -73,7 +73,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 			
 			$cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $destStreamURL.$file, array($this, "generateJpegsCallback"));
 			$cacheData = $cache->getData();
-			
+
 			if(!$this->useOnTheFly && $this->extractAll){ // extract all on first view
 				$ext = pathinfo($file, PATHINFO_EXTENSION);
 				$prefix = str_replace(".$ext", "", $cache->getId());
@@ -97,7 +97,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 			}			
 			
 		}else if($action == "get_extracted_page" && isSet($httpVars["file"])){
-			$file = AJXP_CACHE_DIR."/imagick_full/".AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+			$file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 			if(!is_file($file)){
 				$srcfile = AJXP_Utils::decodeSecureMagic($httpVars["src_file"]);
 				$size = filesize($destStreamURL."/".$srcfile);
@@ -140,7 +140,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$prefix = str_replace(".".pathinfo($cache->getId(), PATHINFO_EXTENSION), "", $cache->getId());
 			$files = $this->listExtractedJpg($prefix);				
 			foreach ($files as $file){
-				if(is_file(AJXP_CACHE_DIR."/".$file["file"])) unlink(AJXP_CACHE_DIR."/".$file["file"]);
+				if(is_file((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/".$file["file"])) unlink(AJXP_CACHE_DIR."/".$file["file"]);
 			}				
 		}		
 	}
@@ -196,13 +196,18 @@ class IMagickPreviewer extends AJXP_Plugin {
 		}
 		$repository = ConfService::getRepository();
 		$streamData = $repository->streamData;
-		$destStreamURL = $streamData["protocol"]."://".$repository->getId();
-		$path = $repository->getOption("PATH");
-		$masterFile = $path . str_replace($destStreamURL, "", $masterFile);
+        $masterFile = call_user_func(array($streamData["classname"], "getRealFSReference"), $masterFile);
         if(DIRECTORY_SEPARATOR == "\\"){
             $masterFile = str_replace("/", "\\", $masterFile);
         }
 		$extension = pathinfo($masterFile, PATHINFO_EXTENSION);
+        $wrappers = stream_get_wrappers();
+        $wrappers_re = '(' . join('|', $wrappers) . ')';
+        $isStream = (preg_match( "!^$wrappers_re://!", $targetFile ) === 1);
+        if($isStream){
+            $backToStreamTarget = $targetFile;
+            $targetFile = tempnam(AJXP_Utils::getAjxpTmpDir(), "imagick_").".pdf";
+        }
 		$workingDir = dirname($targetFile);
 		$out = array();
 		$return = 0;
@@ -251,8 +256,34 @@ class IMagickPreviewer extends AJXP_Plugin {
 		}
 		if(!$this->extractAll){
 			rename($tmpFileThumb, $targetFile);
-		}
-		return true;				
+            if($isStream){
+                AJXP_Logger::debug("Copy preview file to remote", $backToStreamTarget);
+                copy($targetFile, $backToStreamTarget);
+                unlink($targetFile);
+            }
+		}else{
+            if($isStream){
+                if(is_file(str_replace(".$extension", "", $targetFile))){
+                    $targetFile = str_replace(".$extension", "", $targetFile);
+                }
+                if(is_file($targetFile)){
+                    AJXP_Logger::debug("Copy preview file to remote", $backToStreamTarget);
+                    copy($targetFile, $backToStreamTarget);
+                    unlink($targetFile);
+                }
+                AJXP_Logger::debug("Searching for ", str_replace(".jpg", "-0.jpg", $tmpFileThumb));
+                $i = 0;
+                while(file_exists(str_replace(".jpg", "-$i.jpg", $tmpFileThumb))){
+                    $page = str_replace(".jpg", "-$i.jpg", $tmpFileThumb);
+                    $remote_page = str_replace(".$extension", "-$i.jpg", $backToStreamTarget);
+                    AJXP_Logger::debug("Copy preview file to remote", $remote_page);
+                    copy($page, $remote_page);
+                    unlink($page);
+                    $i++;
+                }
+            }
+        }
+		return true;
 	}
 	
 	protected function handleMime($filename){
@@ -263,7 +294,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 	
 	protected function countPages($file) 
 	{
-		$ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+		$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 		if($ext != "pdf") return 20;
 		if(!file_exists($file))return null;
 		if (!$fp = @fopen($file,"r"))return null;

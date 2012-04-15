@@ -456,10 +456,18 @@ class PThumb{
             }
             
             if (!$cached){
-                return $this -> set_error("Method print_thumbnail: Error in cache generation of image '$image'.");
+                return $this -> set_error("Method print_thumbnail 1: Error in cache generation of image '$image'.");
             }
         }
         if ($target_file != false){
+            $wrappers = stream_get_wrappers();
+            $wrappers_re = '(' . join('|', $wrappers) . ')';
+            $isStream = (preg_match( "!^$wrappers_re://!", $target_file ) === 1);
+            if($isStream){
+                $backToStreamTarget = $target_file;
+                $target_file = tempnam(AJXP_Utils::getAjxpTmpDir(), "pthumb_");
+            }
+
             switch ($format){
                 case 1:
                     $cached = @imagegif($thumbnail,$target_file);
@@ -480,6 +488,10 @@ class PThumb{
                     $cached = false;
             }
             
+            if($cached && $isStream){
+                $cached = @copy($target_file, $backToStreamTarget);
+                @unlink($target_file);
+            }
             if (!$cached){
                 return $this -> set_error("Method print_thumbnail: Error in cache generation of image '$image'.");
             }
