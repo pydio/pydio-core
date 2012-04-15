@@ -376,17 +376,17 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
     }
 
     protected function lockIndex($repositoryId){
-        $iPath = AJXP_CACHE_DIR."/indexes";
+        $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes";
         if(!is_dir($iPath)) mkdir($iPath,0755, true);
         touch($iPath."/.ajxp_lock-".$repositoryId.$this->specificId);
     }
 
     protected function isIndexLocked($repositoryId){
-        return file_exists(AJXP_CACHE_DIR."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
+        return file_exists((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
     }
 
     protected function releaseLock($repositoryId){
-        @unlink(AJXP_CACHE_DIR."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
+        @unlink((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.ajxp_lock-".$repositoryId.$this->specificId);
     }
 
 	/**
@@ -398,8 +398,9 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
 	 */
 	protected function loadIndex($repositoryId, $create = true){
         require_once("Zend/Search/Lucene.php");
-        $iPath = AJXP_CACHE_DIR."/indexes/index-$repositoryId".$this->specificId;
-        if(!is_dir(AJXP_CACHE_DIR."/indexes")) mkdir(AJXP_CACHE_DIR."/indexes",0755,true);
+        $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);
+        $iPath = $mainCacheDir."/indexes/index-$repositoryId".$this->specificId;
+        if(!is_dir($mainCacheDir."/indexes")) mkdir($mainCacheDir."/indexes",0755,true);
 		if(is_dir($iPath)){
 		    $index = Zend_Search_Lucene::open($iPath);
 		}else{
