@@ -57,8 +57,7 @@ class textLogDriver extends AbstractLogDriver {
 	 * Close file handle on objects destructor.
 	 */
 	function __destruct(){
-		if($this->fileHandle !== false);
-		$this->close();
+		if($this->fileHandle !== false) $this->close();
 	}
 	
 	/**
@@ -174,7 +173,7 @@ class textLogDriver extends AbstractLogDriver {
 	 * formats the error message in representable manner
 	 *
 	 * @param $message String this is the message to be formatted
-	 * @param $severity Severity level of the message: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
+	 * @param $severity int Severity level of the message: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
 	 * @return String the formatted message.
 	 */
 	function formatMessage($message, $severity) {
