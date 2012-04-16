@@ -989,10 +989,15 @@ class AJXP_Utils
      * @param String $filePath Full path to the file
      * @return Array
      */
-    static function loadSerialFile($filePath)
+    static function loadSerialFile($filePath, $skipCheck = false)
     {
         $filePath = AJXP_VarsFilter::filter($filePath);
         $result = array();
+        if($skipCheck){
+            $fileLines = @file($filePath);
+            if($fileLines !== false) $result = unserialize(implode("", $fileLines));
+            return $result;
+        }
         if (is_file($filePath)) {
             $fileLines = file($filePath);
             $result = unserialize(implode("", $fileLines));
