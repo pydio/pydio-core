@@ -77,6 +77,8 @@ class AJXP_User extends AbstractAjxpUser
 	
 	function save($context = "superuser"){
 		$serialDir = $this->storage->getOption("USERS_DIRPATH");
+        $fastCheck = $this->storage->getOption("FAST_CHECKS");
+        $fastCheck = ($fastCheck == "true" || $fastCheck == true);
 		if($this->isAdmin() === true){
 			$this->rights["ajxp.admin"] = true;
 		}else{
@@ -86,18 +88,22 @@ class AJXP_User extends AbstractAjxpUser
 			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
         if($context == "superuser"){
-            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights);
+            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
         }
-		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs);
-		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks);		
+		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
+		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
 	}	
 	
 	function getTemporaryData($key){
-		return AJXP_Utils::loadSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser");
+        $fastCheck = $this->storage->getOption("FAST_CHECKS");
+        $fastCheck = ($fastCheck == "true" || $fastCheck == true);
+		return AJXP_Utils::loadSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser",$fastCheck);
 	}
 	
 	function saveTemporaryData($key, $value){
-		return AJXP_Utils::saveSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser", $value);
+        $fastCheck = $this->storage->getOption("FAST_CHECKS");
+        $fastCheck = ($fastCheck == "true" || $fastCheck == true);
+		return AJXP_Utils::saveSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser", $value, !$fastCheck);
 	}
 	
 	/**

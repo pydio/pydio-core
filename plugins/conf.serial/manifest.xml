@@ -9,6 +9,7 @@
 		<param name="REPOSITORIES_FILEPATH" type="string" label="CONF_MESSAGE[Repositories]" description="CONF_MESSAGE[The file in which the repositories are stored]" mandatory="true"/>
 		<param name="USERS_DIRPATH" type="string" label="CONF_MESSAGE[Users]" description="CONF_MESSAGE[The folder in which all users files will be stored]" mandatory="true"/>
 		<param name="ROLES_FILEPATH" type="string" label="CONF_MESSAGE[Roles]" description="CONF_MESSAGE[The file in which all roles definitions will be stored]" mandatory="true"/>
+		<param name="FAST_CHECKS" type="boolean" label="CONF_MESSAGE[Fast Checks]" description="CONF_MESSAGE[When using a custom stream wrapper to read the files, this can increase performances by skipping various is_file,is_dir checks]" mandatory="false" default="false"/>
 	</server_settings>
 	<class_definition filename="plugins/conf.serial/class.serialConfDriver.php" classname="serialConfDriver"/>
 	<registry_contributions>
