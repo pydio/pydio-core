@@ -26,7 +26,7 @@ class FileHasher extends AJXP_Plugin
     protected $accessDriver;
     const METADATA_HASH_NAMESPACE = "file_hahser";
     /**
-    * @var SerialMetaStore
+    * @var MetaStoreProvider
     */
     protected $metaStore;
 
@@ -37,7 +37,7 @@ class FileHasher extends AJXP_Plugin
         //   throw new Exception("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         //}
         $this->metaStore = $store;
-        $this->metaStore->accessDriver = $accessDriver;
+        $this->metaStore->initMeta($accessDriver);
     }
 
     /**

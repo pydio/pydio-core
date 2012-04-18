@@ -4,13 +4,13 @@
     <class_definition filename="plugins/meta.filehasher/class.FileHasher.php" classname="FileHasher"/>
    	<client_settings>
    		<resources>
-   			<i18n namespace="meta.simple_lock" path="plugins/meta.filehasher/i18n" />
+   			<i18n namespace="meta.filehasher" path="plugins/meta.filehasher/i18n" />
    		</resources>
    	</client_settings>
    	<registry_contributions>
    		<hooks>
-   			<serverCallback hookName="node.info" methodName="getFileHash" applyCondition="$apply = isSet($_GET['recursive']);"></serverCallback>
-   			<serverCallback hookName="node.change" methodName="invalidateHash" defer="true"></serverCallback>
+   			<serverCallback hookName="node.info" methodName="getFileHash" applyCondition="$apply = isSet($_GET['recursive']);"/>
+   			<serverCallback hookName="node.change" methodName="invalidateHash" defer="true"/>
    		</hooks>
     </registry_contributions>
 </meta>

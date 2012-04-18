@@ -27,10 +27,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * folders
  */
 class UserMetaManager extends AJXP_Plugin {
-	
+
+    /**
+     * @var AbstractAccessDriver
+     */
 	protected $accessDriver;
     /**
-     * @var SerialMetaStore
+     * @var MetaStoreProvider
      */
     protected $metaStore;
 
@@ -46,7 +49,7 @@ class UserMetaManager extends AJXP_Plugin {
             throw new Exception("The 'meta.user' plugin requires at least one active 'metastore' plugin");
         }
         $this->metaStore = $store;
-        $this->metaStore->accessDriver = $accessDriver;
+        $this->metaStore->initMeta($accessDriver);
 
 		//$messages = ConfService::getMessages();
 		$def = $this->getMetaDefinition();
@@ -73,7 +76,7 @@ class UserMetaManager extends AJXP_Plugin {
 			$col->setAttribute("messageString", $label);
 			$col->setAttribute("attributeName", $key);
 			$col->setAttribute("sortType", "String");
-            $col->setAttribute("defaultVisibilty", $lastVisibility);
+            if(isSet($lastVisibility)) $col->setAttribute("defaultVisibilty", $lastVisibility);
 			if($key == "stars_rate"){
 				$col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
 				$col->setAttribute("sortType", "CellSorterValue");
@@ -98,7 +101,7 @@ class UserMetaManager extends AJXP_Plugin {
 		
 		$selection = $this->xPath->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
 		$contrib = $selection->item(0);
-		$contrib->setAttribute("attributes", implode(",", array_keys($def)));		
+		$contrib->setAttribute("attributes", implode(",", array_keys($def)));
 		if(isset($def["stars_rate"]) || isSet($def["css_label"])){
 			$contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelModifier");
 		}

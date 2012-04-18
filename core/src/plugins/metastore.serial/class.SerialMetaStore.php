@@ -20,23 +20,19 @@
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-define('AJXP_METADATA_SHAREDUSER', 'AJXP_METADATA_SHAREDUSER');
-
-define('AJXP_METADATA_SCOPE_GLOBAL', 1);
-define('AJXP_METADATA_SCOPE_REPOSITORY', 2);
 /**
  * @package info.ajaxplorer.plugins
  * Simple metadata implementation, stored in hidden files inside the
  * folders
  */
-class SerialMetaStore extends AJXP_Plugin {
+class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
 	
 	private static $currentMetaName;
 	private static $metaCache;
 	private static $fullMetaCache;
 
     protected $globalMetaFile;
-	public $accessDriver;
+	protected $accessDriver;
 
 
 	public function init($options){
