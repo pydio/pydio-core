@@ -53,26 +53,32 @@ $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 $requestUri = $_SERVER["REQUEST_URI"];
 $end = substr($requestUri, strlen($baseURI."/"));
 $parts = explode("/", $end);
-$repositoryId = $parts[0];
+$pathBase = $parts[0];
+$repositoryId = $pathBase;
 
+AJXP_Logger::debug("Searching by id $repositoryId");
 $repository = ConfService::getRepositoryById($repositoryId);
 if($repository == null){
 	AJXP_Logger::debug("Searching by alias $repositoryId");
 	$repository = ConfService::getRepositoryByAlias($repositoryId);
+	if($repository != null){
+		$repositoryId = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+	}
 }
 if($repository == null){
 	AJXP_Logger::debug("not found, dying $repositoryId");
 	die('You are not allowed to access this service');
 }
+AJXP_Logger::debug("Found repository with id ".$repository->getDisplay()."-".$repositoryId);
 
 $server = ezcWebdavServer::getInstance();
-$pathFactory = new ezcWebdavBasicPathFactory($baseURL.$baseURI."/$repositoryId");
+$pathFactory = new ezcWebdavBasicPathFactory($baseURL.$baseURI."/".$pathBase);
 foreach ( $server->configurations as $conf ){
     $conf->pathFactory = $pathFactory;
 }
 if(AuthService::usersEnabled()){
 	$server->options->realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
-	$server->auth = new AJXP_WebdavAuth($repository->getId());
+	$server->auth = new AJXP_WebdavAuth($repositoryId);
 }
 
 $backend = new AJXP_WebdavBackend($repository);
