@@ -609,7 +609,13 @@ define('IDX_VALUE', 1);
 		set_time_limit(100);
 		$cwd = NULL; //'/tmp';
 		$pipes = NULL;
-		
+
+        if(is_array($arg)){
+            $arg = implode(" ", array_map("escapeshellarg", $arg));
+        }else{
+            $arg = escapeshellarg($arg);
+        }
+
 		$cmdline = (SVNLIB_PATH!=""?SVNLIB_PATH."/":"").$cmd." ".$switches." ".$arg;
 		
 		/*
