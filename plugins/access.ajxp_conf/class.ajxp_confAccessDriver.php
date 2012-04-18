@@ -700,7 +700,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$metas = array_merge($metas, $pServ->getPluginsByType("meta"));
                 $metas = array_merge($metas, $pServ->getPluginsByType("index"));
 				foreach ($metas as $metaPlug){
-					print("<meta id=\"".$metaPlug->getId()."\">");
+					print("<meta id=\"".$metaPlug->getId()."\" label=\"".AJXP_Utils::xmlEntities($metaPlug->getManifestLabel())."\">");
 					$manifest = $metaPlug->getManifestRawContent("server_settings/param");
                     $manifest = AJXP_XMLWriter::replaceAjxpXmlKeywords($manifest);
 					print($manifest);

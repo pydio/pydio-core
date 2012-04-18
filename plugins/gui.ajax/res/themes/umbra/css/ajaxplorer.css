@@ -2200,20 +2200,32 @@ ADMIN STYLES
 }
 
 .metaPane{
-	border-bottom:1px solid #eee;
-	border-top:1px solid #ccc;
 	background-color: #f6f6f6;
 	margin-bottom:5px;
 	margin-top:2px;
 	float:left;
 	padding:6px 5px 8px;
 	width:96%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 
-.metaPane img{
+.metaPane img,
+img.metaPaneTitle
+{
 	float:right;
 	cursor:pointer;
 	margin-left: 3px;
+}
+
+img.metaPaneTitle{
+    display:none;
+}
+
+div.accordion_toggle_active img.metaPaneTitle
+{
+    display:inline;
 }
 
 .metaPane span.title{
