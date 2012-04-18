@@ -819,8 +819,40 @@ ConfigEditor = Class.create({
 			this.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
 			return false;
 		}		
-		this.submitForm('edit_repository', 'create_repository', toSubmit, null, function(){
-			hideLightBox();
+		this.submitForm('edit_repository', 'create_repository', toSubmit, null, function(responseXML){
+			//hideLightBox();
+            var reloadNode = XPathSelectSingleNode(responseXML.documentElement, "//reload_instruction/@file");
+            if(reloadNode && reloadNode.nodeValue){
+                var newRepoId = reloadNode.nodeValue;
+                var loadFunc = function(oForm){
+                    ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+                    if(!ajaxplorer.actionBar.configEditor){
+                        ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
+                    }
+                    ajaxplorer.actionBar.configEditor.setForm(oForm);
+                    ajaxplorer.actionBar.configEditor.loadRepository(newRepoId, true);
+                };
+                var closeFunc = function(){
+                    var toSubmit = new Hash();
+                    var configEditor = ajaxplorer.actionBar.configEditor;
+                    if(!configEditor.currentRepoWriteable){
+                        hideLightBox();
+                        return;
+                    }
+                    toSubmit.set("repository_id", configEditor.currentRepoId);
+                    var missing = configEditor.formManager.serializeParametersInputs(configEditor.currentForm, toSubmit, 'DRIVER_OPTION_', configEditor.currentRepoIsTemplate);
+                    if(missing && !configEditor.currentRepoIsTemplate){
+                        configEditor.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
+                    }else{
+                        configEditor.submitForm('edit_repository', 'edit_repository_data', toSubmit, null, function(){
+                            this.loadRepList();
+                            this.loadUsers();
+                        }.bind(configEditor));
+                        hideLightBox();
+                    }
+                };
+                modal.showDialogForm('Edit Online', 'edit_repo_box', loadFunc, closeFunc);
+            }
 		}.bind(this), function(){});
 		return false;		
 	},
@@ -980,20 +1012,49 @@ ConfigEditor = Class.create({
 	feedMetaSourceForm : function(xmlData, metaPane){
 		var data = XPathSelectSingleNode(xmlData, 'admin_data/repository/param[@name="META_SOURCES"]');
 		if(data && data.firstChild && data.firstChild.nodeValue){
-			metaSourcesData = data.firstChild.nodeValue.evalJSON();
+			var metaSourcesData = data.firstChild.nodeValue.evalJSON();
 			for(var plugId in metaSourcesData){
-				var form = new Element("div", {className:"metaPane"}).update("<img name=\"delete_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\"><img name=\"edit_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">Plugin '"+plugId+"'</span>");
+                var metaLabel = XPathSelectSingleNode(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/@label').nodeValue;
+				//var form = new Element("div", {className:"metaPane"}).update("<img name=\"delete_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\"><img name=\"edit_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">"+metaLabel+"</span>");
+                var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
+
+				var titleString = "<img name=\"delete_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\" style='float:right;' class='metaPaneTitle'>"+(metaDefNodes.length?"<img name=\"edit_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\" style='float:right;' class='metaPaneTitle'>":"")+"<span class=\"title\">"+metaLabel+"</span>";
+                var title = new Element('div',{className:'accordion_toggle', tabIndex:0}).update(titleString);
+                var form = new Element("div", {className:"accordion_content"});
+				title._plugId = plugId;
 				form._plugId = plugId;
-				var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
-				var driverParamsHash = $A([]);
-				for(var i=0;i<metaDefNodes.length;i++){
-					driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));
-				}
-				paramsValues = new Hash(metaSourcesData[plugId]);
-				this.formManager.createParametersInputs(form, driverParamsHash, true, paramsValues, false, true);
-				metaPane.insert(form);
+                if(metaDefNodes.length){
+                    var driverParamsHash = $A([]);
+                    for(var i=0;i<metaDefNodes.length;i++){
+                        driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));
+                    }
+                    var paramsValues = new Hash(metaSourcesData[plugId]);
+                    this.formManager.createParametersInputs(form, driverParamsHash, true, paramsValues, false, true);
+                }else{
+                    form.update('No parameters');
+                }
+                metaPane.insert(title);
+                metaPane.insert(form);
+                title.observe('focus', function(event){
+                    if(metaPane.SF_accordion && metaPane.SF_accordion.showAccordion!=event.target.next(0)) {
+                        metaPane.SF_accordion.activate(event.target);
+                    }
+                });
 			}
+            metaPane.SF_accordion = new accordion(metaPane, {
+                classNames : {
+                    toggle : 'accordion_toggle',
+                    toggleActive : 'accordion_toggle_active',
+                    content : 'accordion_content'
+                },
+                defaultSize : {
+                    width : '360px',
+                    height: null
+                },
+                direction : 'vertical'
+            });
 		}
+
 		var addForm = new Element("div", {className:"metaPane"}).update("<div style='clear:both;'><img name=\"add_meta_source\" src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">"+MessageHash['ajxp_conf.11']+"</span></div>");
 		var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>"+MessageHash['ajxp_conf.12']+" :</div>");
 		this.metaSelector = new Element("select", {name:'new_meta_source', className:'SF_input'});
@@ -1001,11 +1062,12 @@ ConfigEditor = Class.create({
 		this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
 		for(var i=0;i<choices.length;i++){
 			var id = choices[i].getAttribute("id");
-			this.metaSelector.insert(new Element("option",{value:id}).update(id));
+			var label = choices[i].getAttribute("label");
+			this.metaSelector.insert(new Element("option",{value:id}).update(label));
 		}		
 		addForm.insert(formEl);
 		formEl.insert(this.metaSelector);
-		metaPane.insert(addForm);
+		metaPane.insert({top:addForm});
 		var addFormDetail = new Element("div");
 		addForm.insert(addFormDetail);
 		addForm.select('img')[0]._form = addForm;
@@ -1033,10 +1095,11 @@ ConfigEditor = Class.create({
 	
 	metaActionClick : function(event){
 		var img = Event.findElement(event, 'img');
+        Event.stop(event);
 		if(img._form){
 			var form = img._form;
 		}else{
-			var form = Event.findElement(event, 'div');
+			var form = Event.findElement(event, 'div').next(0);
 		}
 		//var params = target._parameters;
 		var params = new Hash();
@@ -1177,7 +1240,6 @@ ConfigEditor = Class.create({
 		}
         ajaxplorer.actionBar.parseXmlMessage(xmlResponse);
         if(xmlResponse.documentElement){
-            window.RESPONSETEST = xmlResponse.documentElement;
             if(XPathSelectSingleNode(xmlResponse.documentElement, 'message[@type="ERROR"]') != null){
                 return false;
             }
