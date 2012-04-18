@@ -36,7 +36,7 @@ class ShareCenter extends AJXP_Plugin{
     private $urlBase;
 
     /**
-     * @var SerialMetaStore
+     * @var MetaStoreProvider
      */
     private $metaStore;
 
@@ -91,7 +91,7 @@ class ShareCenter extends AJXP_Plugin{
         }
         $this->metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if($this->metaStore !== false){
-            $this->metaStore->accessDriver = $this->accessDriver;
+            $this->metaStore->initMeta($this->accessDriver);
         }
     }
 
