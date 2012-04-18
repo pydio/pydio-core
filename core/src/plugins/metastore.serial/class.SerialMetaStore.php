@@ -212,7 +212,7 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
                 @fclose($fp);
             }
 			if($scope == AJXP_METADATA_SCOPE_GLOBAL){
-                 AJXP_Controller::applyHook("version.commit_file", $metaFile);
+                 AJXP_Controller::applyHook("version.commit_file", array($metaFile, $ajxpNode));
             }
 		}
 	}

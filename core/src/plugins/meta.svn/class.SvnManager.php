@@ -99,8 +99,12 @@ class SvnManager extends AJXP_Plugin {
 			$this->commitChanges("ADD", array("dir" => dirname($repoFile)), array());
 		}
 	}
-	
-	public function commitFile($file){
+
+    /**
+     * @param String $file URL of the file to commit (probably a metadata)
+     * @param AJXP_Node $ajxpNode Optionnal node to commit along.
+     */
+	public function commitFile($file, $ajxpNode = null){
 		$repo = ConfService::getRepository();
 		$repo->detectStreamWrapper();
 		$wrapperData = $repo->streamData;
@@ -110,7 +114,18 @@ class SvnManager extends AJXP_Plugin {
 		if(count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?"){
 			$res2 = ExecSvnCmd("svn add", "$realFile");
 		}
-		$this->commitChanges("COMMIT_META", $realFile, array());
+        if($ajxpNode != null){
+            $nodeRealFile = call_user_func(array($wrapperData["classname"], "getRealFSReference"), $ajxpNode->getUrl());
+            ExecSvnCmd("svn propset metachange ".time(), $nodeRealFile);
+            // WILL COMMIT BOTH AT ONCE
+            $command = "svn commit";
+            $user = AuthService::getLoggedUser()->getId();
+            $switches = "-m \"AjaXplorer||$user||COMMIT_META".(isSet($this->commitMessageParams)?"||".$this->commitMessageParams:"")."\"";
+            ExecSvnCmd($command, array($realFile, $nodeRealFile), $switches);
+            ExecSvnCmd('svn update', dirname($nodeRealFile), '');
+        }else{
+            $this->commitChanges("COMMIT_META", $realFile, array());
+        }
 	}
 	
 	public function switchAction($actionName, $httpVars, $filesVars){
