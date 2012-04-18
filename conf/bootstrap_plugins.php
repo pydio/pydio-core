@@ -55,6 +55,7 @@ $PLUGINS = array(
 			"REPOSITORIES_FILEPATH"	=> "AJXP_DATA_PATH/plugins/conf.serial/repo.ser",
 			"ROLES_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/roles.ser",
 			"USERS_DIRPATH"			=> "AJXP_DATA_PATH/plugins/auth.serial",
+            "FAST_CHECKS"		    => false,
 			"CUSTOM_DATA"			=> array(
 					"email"	=> "Email", 
 					"country" => "Country"
@@ -66,7 +67,8 @@ $PLUGINS = array(
 		"OPTIONS"	=> array(
 			"LOGIN_REDIRECT"		=> false,
 			"USERS_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
-			"AUTOCREATE_AJXPUSER" 	=> false, 
+			"AUTOCREATE_AJXPUSER" 	=> false,
+            "FAST_CHECKS"		    => false,
 			"TRANSMIT_CLEAR_PASS"	=> false )
 	),
     "LOG_DRIVER" => array(
