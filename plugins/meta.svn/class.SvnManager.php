@@ -228,7 +228,7 @@ class SvnManager extends AJXP_Plugin {
 			}else{
 				$destFile = $init["DEST_DIR"]."/".basename($selectedFile);			
 			}
-			$res = ExecSvnCmd("svn $action", "$selectedFile $destFile", '');
+			$res = ExecSvnCmd("svn $action", array($selectedFile,$destFile), '');
 		}
 		if($actionName != "rename"){
 			$this->commitMessageParams .= "[".implode(",",$init["SELECTION"])."]";
