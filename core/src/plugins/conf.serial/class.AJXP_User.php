@@ -40,7 +40,9 @@ class AJXP_User extends AbstractAjxpUser
 	 * @var AbstractConfDriver
 	 */
 	var $storage;
-	
+	var $registerForSave = array();
+
+
 	function AJXP_User($id, $storage=null){
 		parent::AbstractAjxpUser($id, $storage);
 	}
@@ -87,12 +89,33 @@ class AJXP_User extends AbstractAjxpUser
 		if($this->hasParent()){
 			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
+
+
         if($context == "superuser"){
+            //AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
+            $this->registerForSave["rights"] = true;
+        }
+        $this->registerForSave["prefs"] = true;
+		//AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
+        $this->registerForSave["bookmarks"] = true;
+		//AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
+	}
+
+    function __destruct(){
+        if(count($this->registerForSave)==0) return;
+        $serialDir = $this->storage->getOption("USERS_DIRPATH");
+        $fastCheck = $this->storage->getOption("FAST_CHECKS");
+        $fastCheck = ($fastCheck == "true" || $fastCheck == true);
+        if(isSet($this->registerForSave["rights"])){
             AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
         }
-		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
-		AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
-	}	
+        if(isSet($this->registerForSave["prefs"])){
+            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
+        }
+        if(isSet($this->registerForSave["bookmarks"])){
+            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
+        }
+    }
 	
 	function getTemporaryData($key){
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
