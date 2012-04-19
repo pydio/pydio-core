@@ -34,6 +34,9 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
     protected $currentRead;
     protected $currentWrite;
     private $secretKey;
+
+    protected $tokens;
+    protected $tokenFile;
     
     public function __construct($repositoryId){
     	$this->repositoryId = $repositoryId;
@@ -41,7 +44,21 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
 			$this->secretKey = AJXP_SAFE_SECRET_KEY;
 		}else{
 			$this->secretKey = "\1CDAFx¨op#";
-		}    	
+		}
+        $this->tokenFile = AJXP_SHARED_CACHE_DIR."/davlocks/$repositoryId";
+        $this->tokens = array();
+        if(file_exists($this->tokenFile)){
+            $this->tokens = unserialize(file_get_contents($this->tokenFile));
+        }
+    }
+
+    public function __destruct(){
+        if($this->tokens !== array()){
+            if(!is_dir(AJXP_SHARED_CACHE_DIR."/davlocks")){
+                mkdir(AJXP_SHARED_CACHE_DIR."/davlocks", 0755, true);
+            }
+            file_put_contents($this->tokenFile, serialize($this->tokens));
+        }
     }
     
     protected function updateCurrentUserRights($user){
@@ -228,7 +245,13 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
      * @param string $lockToken 
      * @return void
      */
-    public function assignLock( $user, $lockToken ){}
+    public function assignLock( $user, $lockToken ){
+        AJXP_Logger::debug("ASSIGNING DAVLOCK $user $lockToken");
+        if(!isSet($this->tokens[$user])){
+            $this->tokens[$user] = array();
+        }
+        $this->tokens[$user][$lockToken] = true;
+    }
 
     /**
      * Returns if the given $lockToken is owned by the given $user.
@@ -239,7 +262,10 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
      * @param string $lockToken 
      * @return bool
      */
-    public function ownsLock( $user, $lockToken ){return true;}
+    public function ownsLock( $user, $lockToken ){
+        AJXP_Logger::debug("TESTING DAVLOCK $user $lockToken");
+        return (isset($this->tokens[$user][$lockToken]));
+    }
     
     /**
      * Removes the assignement of $lockToken from $user.
@@ -252,7 +278,10 @@ class AJXP_WebdavAuth implements ezcWebdavBasicAuthenticator, ezcWebdavDigestAut
      * @param string $user 
      * @param string $lockToken 
      */
-    public function releaseLock( $user, $lockToken ){}	
+    public function releaseLock( $user, $lockToken ){
+        AJXP_Logger::debug("RELEASING DAVLOCK $user $lockToken");
+        unset($this->tokens[$user][$lockToken]);
+    }
     
 }
 
