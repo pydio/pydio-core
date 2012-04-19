@@ -40,7 +40,23 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
 	 * @var string
 	 */
 	protected $wrapperClassName;
-	
+
+   /**
+    * Keeps track of the lock level.
+    *
+    * Each time the lock() method is called, this counter is raised by 1. if
+    * it was 0 before, the actual locking mechanism gets into action,
+    * otherwise just the counter is raised. The lock is physically only freed,
+    * if this counter is 0.
+    *
+    * This mechanism allows nested locking, as it is necessary, if the lock
+    * plugin locks this backend external, but interal locking needs still to
+    * be supported.
+    *
+    * @var int
+    */
+    protected $lockLevel = 0;
+
     protected $handledLiveProperties = array( 
         'getcontentlength', 
         'getlastmodified', 
@@ -133,7 +149,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      */
     protected function createResource( $path, $content = null ){
     	$path = $this->fixPath($path);
-    	AJXP_Logger::debug("AJXP_WebdavBackend :: createResource ($path)");
+    	//AJXP_Logger::debug("AJXP_WebdavBackend :: createResource ($path)");
     	$this->getAccessDriver()->createEmptyFile($this->safeDirname($path), $this->safeBasename($path));
     }
 
@@ -149,7 +165,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      */
     protected function setResourceContents( $path, $content ){
         $path = $this->fixPath($path);
-        AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
+        //AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
         $this->getAccessDriver()->nodeWillChange($path);
 
         $fp=fopen($this->getAccessDriver()->getRessourceUrl($path),"w");
@@ -184,6 +200,16 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      }
 
     /**
+     * @return MetaStoreProvider|bool
+     */
+    protected function getMetastore(){
+        $metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        if($metaStore === false) return false;
+        $metaStore->initMeta($this->getAccessDriver());
+        return $metaStore;
+    }
+
+    /**
      * Manually sets a property on a resource.
      *
      * Sets the given $propertyBackup for the resource identified by $path.
@@ -193,6 +219,25 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return bool
      */
     public function setProperty( $path, ezcWebdavProperty $property ){
+        if($property->name == "lockdiscovery" || $property->namespace != "DAV:"){
+            $metaStore = $this->getMetastore();
+            if($metaStore == false) return true;
+            $node = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($this->fixPath($path)));
+            $existingMeta = $metaStore->retrieveMetadata($node, "ezcWEBDAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+            if(is_array($existingMeta)){
+                $existingMeta[$property->name] = base64_encode(serialize($property));
+            }else{
+                $existingMeta = array($property->name => base64_encode(serialize($property)));
+            }
+            $metaStore->setMetadata(
+                $node,
+                "ezcWEBDAV",
+                $existingMeta,
+                false,
+                AJXP_METADATA_SCOPE_GLOBAL
+            );
+            AJXP_Logger::debug("DAVLOCK Saved property".$property->name);
+        }
 		return true;
     }
 
@@ -206,6 +251,23 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return bool
      */
     public function removeProperty( $path, ezcWebdavProperty $property ){
+        if($property->name == "lockdiscovery" || $property->namespace != "DAV:"){
+            AJXP_Logger::debug("DAVLOCK Clearing property ? ".$property->name);
+            $metaStore = $this->getMetastore();
+            if($metaStore == false) {
+                AJXP_Logger::debug("DAVLOCK > no store");
+                return true;
+            }
+            $node = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($this->fixPath($path)));
+            $existingMeta = $metaStore->retrieveMetadata($node, "ezcWEBDAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+            if(!is_array($existingMeta) || !isSet($existingMeta[$property->name])) {
+                AJXP_Logger::debug("DAVLOCK > not found for ".$node->getUrl());
+                return true;
+            }
+            unset($existingMeta[$property->name]);
+            $metaStore->setMetadata($node, "ezcWEBDAV",$existingMeta,false,AJXP_METADATA_SCOPE_GLOBAL);
+            AJXP_Logger::debug("DAVLOCK Cleared property ".$property->name);
+        }
     	return true;
     }
 
@@ -220,6 +282,20 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return bool
      */
     public function resetProperties( $path, ezcWebdavPropertyStorage $properties ){
+        $metaStore = $this->getMetastore();
+        if($metaStore == false) return true;
+        $metaStore->removeMetadata(
+            new AJXP_Node($this->getAccessDriver()->getRessourceUrl($this->fixPath($path))),
+            "ezcWEBDAV",
+            false,
+            AJXP_METADATA_SCOPE_GLOBAL
+        );
+        AJXP_Logger::debug("DAVLOCK Clearing properties");
+        if($properties != null){
+            foreach($properties->getAllProperties() as $pName => $property){
+                $this->setProperty($path, $property);
+            }
+        }
 		return true;
     }
 
@@ -238,12 +314,18 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     public function getProperty( $path, $propertyName, $namespace = 'DAV:' ){
     	$path = $this->fixPath($path);
     	$url = $this->getAccessDriver()->getRessourceUrl($path);
-	    //AJXP_Logger::debug("Getting Property : ".$propertyName." for url ".$url);	
         $storage = $this->getPropertyStorage( $path );
 
         // Handle dead propreties
         if ( $namespace !== 'DAV:' )
         {
+            $metaStore = $this->getMetastore();
+            if($metaStore == false) return true;
+            $node = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($this->fixPath($path)));
+            $existingMeta = $metaStore->retrieveMetadata($node, "ezcWEBDAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+            if(is_array($existingMeta) && isSet($existingMeta[$propertyName])) {
+                return unserialize(base64_decode($existingMeta[$propertyName]));
+            }
             $properties = $storage->getAllProperties();
             return $properties[$namespace][$propertyName];
         }
@@ -295,10 +377,31 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
                 return $property;
 
             case 'lockdiscovery':
+                $metaStore = $this->getMetastore();
                 $property = new ezcWebdavLockDiscoveryProperty();
+                if($metaStore == false){
+                    return $property;
+                }
+                $metadata = $metaStore->retrieveMetadata(
+                    new AJXP_Node($this->getAccessDriver()->getRessourceUrl($this->fixPath($path))),
+                    "ezcWEBDAV",
+                    false,
+                    AJXP_METADATA_SCOPE_GLOBAL
+                );
+                if(isSet($metadata["lockdiscovery"])){
+                    $property = unserialize(base64_decode($metadata["lockdiscovery"]));
+                    AJXP_Logger::debug("DAVLOCK Found Property : ".$propertyName." for url ".$url);
+                }
                 return $property;
 
             default:
+                $metaStore = $this->getMetastore();
+                if($metaStore == false) return true;
+                $node = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($this->fixPath($path)));
+                $existingMeta = $metaStore->retrieveMetadata($node, "ezcWEBDAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+                if(is_array($existingMeta) && isSet($existingMeta[$propertyName])) {
+                    return unserialize(base64_decode($existingMeta[$propertyName]));
+                }
                 // Handle all other live properties like dead properties
                 $properties = $storage->getAllProperties();
                 return $properties[$namespace][$propertyName];
@@ -417,7 +520,15 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	//$path = utf8_decode($path);
     	$path = $this->fixPath($path);
         $storage = $this->getPropertyStorage( $path );
-        
+        $metaStore = $this->getMetastore();
+        if($metaStore == false) return true;
+        $node = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($path));
+        $existingMeta = $metaStore->retrieveMetadata($node, "ezcWEBDAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+        if(is_array($existingMeta) && count($existingMeta)) {
+            foreach($existingMeta as $pName => $serialized){
+                $storage->attach(unserialize(base64_decode($serialized)));
+            }
+        }
         // Add all live properties to stored properties
         foreach ( $this->handledLiveProperties as $property )
         {
@@ -474,6 +585,19 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	}else{
 			$this->getAccessDriver()->copyOrMoveFile( $this->safeDirname($toPath), $fromPath, $error, $success, $move = false);
     	}
+        $metaStore = $this->getMetastore();
+        if($metaStore != false){
+            $fromNode = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($fromPath));
+            $toNode = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($toPath));
+            $existingMeta = $metaStore->retrieveMetadata($fromNode, "ezcWEBDAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+            if(is_array($existingMeta)){
+                $metaStore->removeMetadata($fromNode, "ezcWEBDAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+                foreach($existingMeta as $name => $serialized){
+                    if($name == "lockdiscovery") unset($existingMeta[$name]);
+                }
+                $metaStore->setMetadata($toNode, "ezcWEBDAV", $existingMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
+            }
+        }
     	return $error;
     }
 
@@ -491,6 +615,14 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	$path = $this->fixPath($path);
     	$logs = array();
     	$this->getAccessDriver()->delete(array($path), $logs);
+        $metaStore = $this->getMetastore();
+        if($metaStore == false) return;
+        $metaStore->removeMetadata(
+            new AJXP_Node($this->getAccessDriver()->getRessourceUrl($path)),
+            "ezcWEBDAV",
+            false,
+            AJXP_METADATA_SCOPE_GLOBAL
+        );
     }
 
     /**
@@ -663,35 +795,90 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     
 	
     /**
-     * Acquire a backend lock.
+     * Locks the backend.
      *
-     * This method must acquire an exclusive lock of the backend. If the
-     * backend is already locked by a different request, the must must retry to
-     * acquire the lock continously and wait between each retry $waitTime micro
-     * seconds. If $timeout microseconds have passed since the method was
-     * called, it must throw an exception of type {@link
-     * ezcWebdavLockTimeoutException}.
-     * 
-     * @param int $waitTime Microseconds.
-     * @param int $timeout Microseconds.
+     * Tries to lock the backend. If the lock is already owned by this process,
+     * locking is successful. If $timeout is reached before a lock could be
+     * acquired, an {@link ezcWebdavLockTimeoutException} is thrown. Waits
+     * $waitTime microseconds between attempts to lock the backend.
+     *
+     * @param int $waitTime
+     * @param int $timeout
      * @return void
      */
-    public function lock( $waitTime, $timeout ){
-    	
+    public function lock( $waitTime, $timeout )
+    {
+        /*
+        // Check and raise lockLevel counter
+        if ( $this->lockLevel > 0 )
+        {
+            // Lock already acquired
+            ++$this->lockLevel;
+            return;
+        }
+
+        $lockStart = microtime( true );
+
+        $lockFileName = AJXP_SHARED_CACHE_DIR."/davlocks/".$this->options->lockFileName;
+        if(!is_dir(AJXP_SHARED_CACHE_DIR."/davlocks")){
+            mkdir(AJXP_SHARED_CACHE_DIR."/davlocks", 0644, true);
+        }
+
+        if ( is_file( $lockFileName ) && !is_writable( $lockFileName )
+             || !is_file( $lockFileName ) && !is_writable(dirname( $lockFileName ) ) )
+        {
+            throw new ezcBaseFilePermissionException(
+                $lockFileName,
+                ezcBaseFileException::WRITE,
+                'Cannot be used as lock file.'
+            );
+        }
+
+        // fopen in mode 'x' will only open the file, if it does not exist yet.
+        // Even this is is expected it will throw a warning, if the file
+        // exists, which we need to silence using the @
+        while ( ( $fp = @fopen( $lockFileName, 'x' ) ) === false )
+        {
+            // This is untestable.
+            if ( microtime( true ) - $lockStart > $timeout )
+            {
+                // Release timed out lock
+                unlink( $lockFileName );
+                $lockStart = microtime( true );
+            }
+            else
+            {
+                usleep( $waitTime );
+            }
+        }
+
+        // Store random bit in file ... the microtime for example - might prove
+        // useful some time.
+        fwrite( $fp, microtime() );
+        fclose( $fp );
+
+        // Add first lock
+        ++$this->lockLevel;
+        */
     }
 
     /**
-     * Release the backend lock.
+     * Removes the lock.
      *
-     * This method is called to unlock the backend. The lock that was acquired
-     * using {@link lock()} must be released, so that the backend can be locked
-     * by another request.
-     * 
      * @return void
      */
-    public function unlock(){
-    	
-    } 
+    public function unlock()
+    {
+        /*
+        if ( --$this->lockLevel === 0 )
+        {
+            // Remove the lock file
+            $lockFileName = AJXP_SHARED_CACHE_DIR."/davlocks/".$this->options->lockFileName;
+            unlink( $lockFileName );
+        }
+        */
+    }
+
     
     protected function urlEncodePath($path){
         //AJXP_Logger::debug("User Agent : ".$_SERVER["HTTP_USER_AGENT"]);

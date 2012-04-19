@@ -1778,7 +1778,7 @@ abstract class ezcWebdavSimpleBackend extends ezcWebdavBackend implements ezcWeb
      * @param ezcWebdavAuthBasic|ezcWebdavAúthDigest $authHeader
      * @return ezcWebdavErrorResponse
      */
-    private function createUnauthorizedResponse( $path, $authHeader = null )
+    protected function createUnauthorizedResponse( $path, $authHeader = null )
     {
         // Check for anonymous auth
         if ( $authHeader === null || $authHeader->username === '' )
