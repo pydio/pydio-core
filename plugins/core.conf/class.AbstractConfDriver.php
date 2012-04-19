@@ -364,7 +364,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				$loggedUser = AuthService::getLoggedUser();
 				foreach($repoList as $repoIndex => $repoObject){
 					$accessType = $repoObject->getAccessType();
-					if(in_array($accessType, array("fs", "ftp")) && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))){
+                    $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
+					if(is_a($driver, "AjxpWebdavProvider") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))){
 						$davRepos[$repoIndex] = $webdavBaseUrl ."".($repoObject->getSlug()==null?$repoObject->getId():$repoObject->getSlug());
 					}
 				}
@@ -376,7 +377,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				);
 				HTMLWriter::charsetHeader("application/json");
 				print(json_encode($prefs));
-				
+
 			break;
 
 			case  "get_user_template_logo":
