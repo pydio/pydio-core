@@ -83,7 +83,7 @@ Class.create("ActionsManager", {
 	getContextActions: function(srcElement)
 	{		
 		var actionsSelectorAtt = 'selectionContext';
-		if(srcElement.id && (srcElement.id == 'table_rows_container' ||  srcElement.id == 'selectable_div'))
+		if(srcElement.id && (srcElement.hasClassName('table_rows_container') ||  srcElement.hasClassName('selectable_div')))
 		{
 			actionsSelectorAtt = 'genericContext';
 		}

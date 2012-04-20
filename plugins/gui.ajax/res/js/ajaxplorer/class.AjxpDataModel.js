@@ -36,13 +36,16 @@ Class.create("AjxpDataModel", {
 	
 	_rootNode : null,
 
+    _globalEvents : true,
+
 	/**
 	 * Constructor
 	 */
-	initialize: function(){
+	initialize: function(localEvents){
 		this._currentRep = '/';
 		this._selectedNodes = $A([]);
 		this._bEmpty = true;
+        if(localEvents) this._globalEvents = false;
 	},
 	
 	/**
@@ -85,20 +88,20 @@ Class.create("AjxpDataModel", {
 					delete(firstFake);
 					this.requireContextChange(parent);
 				}.bind(this) );
-				document.fire("ajaxplorer:context_loading");
+				this.publish("context_loading");
 				firstFake.load(this._iAjxpNodeProvider);
 				return;
 			}
 		}		
 		ajxpNode.observeOnce("loaded", function(){
 			this.setContextNode(ajxpNode, true);			
-			document.fire("ajaxplorer:context_loaded");
+			this.publish("context_loaded");
 		}.bind(this));
 		ajxpNode.observeOnce("error", function(message){
 			ajaxplorer.displayMessage("ERROR", message);
-			document.fire("ajaxplorer:context_loaded");
+			this.publish("context_loaded");
 		}.bind(this));
-		document.fire("ajaxplorer:context_loading");
+		this.publish("context_loading");
 		try{
 			if(forceReload){
 				if(paginationPage){
@@ -109,7 +112,7 @@ Class.create("AjxpDataModel", {
 				ajxpNode.load(this._iAjxpNodeProvider);
 			}
 		}catch(e){
-			document.fire("ajaxplorer:context_loaded");
+			this.publish("context_loaded");
 		}
 	},
 	
@@ -123,7 +126,7 @@ Class.create("AjxpDataModel", {
 		this._rootNode.observe("child_added", function(c){
 				//console.log(c);
 		});
-		document.fire("ajaxplorer:root_node_changed", this._rootNode);
+		this.publish("root_node_changed", this._rootNode);
 		this.setContextNode(this._rootNode);
 	},
 	
@@ -146,9 +149,24 @@ Class.create("AjxpDataModel", {
 		}
 		this._contextNode = ajxpDataNode;
 		this._currentRep = ajxpDataNode.getPath();
-		document.fire("ajaxplorer:context_changed", ajxpDataNode);
+        this.publish("context_changed", ajxpDataNode);
 	},
-	
+
+    /**
+     *
+     */
+    publish:function(eventName, optionalData){
+        var args = $A(arguments).slice(1);
+        //args.unshift(this);
+        if(this._globalEvents){
+            args.unshift("ajaxplorer:"+eventName);
+            document.fire.apply(document, args);
+        }else{
+            args.unshift(eventName);
+            this.notify.apply(this,args);
+        }
+    },
+
 	/**
 	 * Get the current context node
 	 * @returns AjxpNode
@@ -212,7 +230,7 @@ Class.create("AjxpDataModel", {
 	nextNodeReloader : function(){
 		if(!this.queue.length) {
 			window.setTimeout(function(){
-				document.fire("ajaxplorer:context_changed", this._contextNode);
+				this.publish("context_changed", this._contextNode);
 			}.bind(this), 200);
 			return;
 		}
@@ -275,7 +293,7 @@ Class.create("AjxpDataModel", {
 				if(selectedNode.isRecycle()) this._isRecycle = true;
 			}
 		}
-		document.fire("ajaxplorer:selection_changed", this);	
+		this.publish("selection_changed", this);
 	},
 	
 	/**
