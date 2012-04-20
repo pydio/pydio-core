@@ -95,11 +95,11 @@ textarea{
 	box-shadow : 1px 1px 1px rgba(100, 100, 100, 0.5);
 }
 
-#selectable_div div.selected{
+.selectable_div div.selected{
    border: 1px solid #ddd;
 	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
 }
-#selectable_div div.selected-focus{
+.selectable_div div.selected-focus{
    border: 1px solid #73A2D7 !important;
 	-moz-box-shadow : 1px 2px 3px rgba(50, 50, 50, 0.8);
 }
@@ -1766,35 +1766,35 @@ tr td.infoPanelLabel
     line-height: 18px
 }
 
-div#selectable_div, #table_rows_container, #tree_container, #bottomSplitPane, .ajxp_simple_container{
+div.selectable_div, .table_rows_container, #tree_container, #bottomSplitPane, .ajxp_simple_container{
     font-family: Trebuchet MS, sans-serif, Helvetica, Arial, Sans-serif;
     font-size: 11px;
 }
 
-#table_rows_container td,
+.table_rows_container td,
 .infoPanelTable td
 {
 	border-top: 1px solid #eee;
 	border-bottom: 1px solid #eee;
 	border-right: 1px solid #eee;
 }
-#table_rows_container tr.even td, 
+.table_rows_container tr.even td, 
 .infoPanelTable tr.even td 
 {
 	border-top: 0px;
 	border-bottom:0px;
 }
-#table_rows_container tr:first-child td,
+.table_rows_container tr:first-child td,
 .infoPanelTable tr:first-child td
 {
 	border-top:0px;
 }
-#table_rows_container tr:last-child td,
+.table_rows_container tr:last-child td,
 .infoPanelTable tr:last-child td
 {
 	border-bottom: 1px solid #eee;
 }
-#table_rows_container tr.selected-focus td,
+.table_rows_container tr.selected-focus td,
 .infoPanelTable tr.selected-focus td
 {
 	border-right: 1px solid #73A2D7;

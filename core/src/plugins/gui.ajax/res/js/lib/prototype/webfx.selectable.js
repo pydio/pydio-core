@@ -228,8 +228,10 @@ SelectableElements = Class.create({
 			
 			if(!this.skipScroll){
 				// CHECK THAT SCROLLING IS OK
-				var parent = $('selectable_div');
-				if($('table_rows_container')) parent = $('table_rows_container');		
+				var parent = this._htmlElement;
+				if(this._htmlElement.up('.table_rows_container')) {
+                    parent = this._htmlElement.up('.table_rows_container');
+                }
 				var scrollOffset = oEl.offsetTop;
 				
 				var parentHeight = parent.getHeight();

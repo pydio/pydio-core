@@ -27,6 +27,8 @@ Class.create("FilesList", SelectableElements, {
 	__implements : ["IAjxpWidget", "IFocusable", "IContextMenuable", "IActionProvider"],
 
     __allObservers : $A(),
+    __currentInstanceIndex:1,
+    _dataModel:null,
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor
@@ -43,10 +45,22 @@ Class.create("FilesList", SelectableElements, {
 			this._displayMode = initDefaultDispOrOptions;
 		}else{
 			this.options = initDefaultDispOrOptions;
-            if(this.options.displayMode) this._displayMode = this.options.displayMode;
-            else this._displayMode = 'list';
+            if(this.options.displayMode) {
+                this._displayMode = this.options.displayMode;
+            }else {
+                this._displayMode = 'list';
+            }
+            if(this.options.dataModel){
+                this._dataModel = this.options.dataModel;
+            }
 		}
         //this.options.replaceScroller = false;
+        if(!FilesList.staticIndex) {
+            FilesList.staticIndex = 1;
+        }else{
+            FilesList.staticIndex ++;
+        }
+        this.__currentInstanceIndex = FilesList.staticIndex;
 
         var userLoggedObserver = function(){
 			if(!ajaxplorer || !ajaxplorer.user) return;
@@ -97,13 +111,21 @@ Class.create("FilesList", SelectableElements, {
 		}.bind(this) ;
         var selectionChangedObserver = function(event){
 			if(event.memo._selectionSource == null || event.memo._selectionSource == this) return;
-			this.setSelectedNodes(ajaxplorer.getContextHolder().getSelectedNodes());
+            var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
+			this.setSelectedNodes(dm.getSelectedNodes());
 		}.bind(this);
 
-		this._registerObserver(document, "ajaxplorer:context_changed", contextChangedObserver );
-		this._registerObserver(document, "ajaxplorer:context_loading", loadingObs);
-		this._registerObserver(document, "ajaxplorer:component_config_changed", componentConfigObserver);
-		this._registerObserver(document, "ajaxplorer:selection_changed", selectionChangedObserver);
+        if(this._dataModel){
+            this._registerObserver(this._dataModel, "context_changed", contextChangedObserver, true );
+            this._registerObserver(this._dataModel, "context_loading", loadingObs, true);
+            this._registerObserver(this._dataModel, "component_config_changed", componentConfigObserver, true);
+            this._registerObserver(this._dataModel, "selection_changed", selectionChangedObserver, true);
+        }else{
+            this._registerObserver(document, "ajaxplorer:context_changed", contextChangedObserver, false );
+            this._registerObserver(document, "ajaxplorer:context_loading", loadingObs, false);
+            this._registerObserver(document, "ajaxplorer:component_config_changed", componentConfigObserver, false);
+            this._registerObserver(document, "ajaxplorer:selection_changed", selectionChangedObserver, false);
+        }
 
 		this._thumbSize = 64;
 		this._crtImageIndex = 0;
@@ -135,17 +157,27 @@ Class.create("FilesList", SelectableElements, {
         this._registerObserver(document, "ajaxplorer:trigger_repository_switch", repoSwitchObserver);
 	},
 
-    _registerObserver:function(object, eventName, handler){
-        Event.observe(object, eventName, handler);
+    _registerObserver:function(object, eventName, handler, objectEvent){
+        if(objectEvent){
+            object.observe(eventName, handler);
+        }else{
+            Event.observe(object, eventName, handler);
+        }
         this.__allObservers.push({
             object:object,
             event:eventName,
-            handler:handler});
+            handler:handler,
+            objectEvent:objectEvent
+        });
     },
 
     _clearObservers:function(){
         this.__allObservers.each(function(el){
-            Event.stopObserving(el.object, el.event, el.handler);
+            if(el.objectEvent){
+                el.object.stopObserving(el.event, el.handler);
+            }else{
+                Event.stopObserving(el.object, el.event, el.handler);
+            }
         });
         if(this.observer){
             this.stopObserving("resize", this.observer);
@@ -456,22 +488,23 @@ Class.create("FilesList", SelectableElements, {
 				}
 				headerData.push({label:label, size:userWidth, leftPadding:leftPadding});				
 			}
-			buffer = '<div id="selectable_div_header" class="sort-table"></div>';
-			buffer = buffer + '<div id="table_rows_container"><table id="selectable_div" class="sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
+			buffer = '<div id="selectable_div_header-'+this.__currentInstanceIndex+'" class="sort-table"></div>';
+			buffer = buffer + '<div id="table_rows_container-'+this.__currentInstanceIndex+'" class="table_rows_container"><table id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div sort-table" width="100%" cellspacing="0"><tbody></tbody></table></div>';
 			this.htmlElement.update(buffer);
-            $('table_rows_container').setStyle((this.gridStyle!="grid")?{overflowX:"hidden",overflowY:(this.options.replaceScroller?"hidden":"auto")}:{overflow:"auto"});
-			attachMobileScroll("table_rows_container", "vertical");
-            var scrollElement = $("table_rows_container");
-			oElement = $('selectable_div');
+            var contentContainer = this.htmlElement.down("div.table_rows_container");
+            contentContainer.setStyle((this.gridStyle!="grid")?{overflowX:"hidden",overflowY:(this.options.replaceScroller?"hidden":"auto")}:{overflow:"auto"});
+			attachMobileScroll(contentContainer, "vertical");
+            var scrollElement = contentContainer;
+			var oElement = this.htmlElement.down(".selectable_div");
 			
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
-				$('table_rows_container').insert({before:this.createPaginator()});
+				contentContainer.insert({before:this.createPaginator()});
 			}
 
-			this.initSelectableItems(oElement, true, $('table_rows_container'));
-			this._headerResizer = new HeaderResizer($('selectable_div_header'), {
+			this.initSelectableItems(oElement, true, contentContainer);
+			this._headerResizer = new HeaderResizer(this.htmlElement.down('div.sort-table'), {
 				headerData : headerData,
-				body : $('table_rows_container'),
+				body : contentContainer,
 				initSizesType : 'percent',
 				bodyIsMaster : (this.gridStyle == 'grid'),
                 scrollerWidth : this.options.replaceScroller?0:18,
@@ -491,10 +524,10 @@ Class.create("FilesList", SelectableElements, {
 					ajaxplorer.user.savePreference("columns_size");
 				}.bind(this), 2000);				
 			}.bind(this) );
-			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), $('selectable_div_header'));
+			this._sortableTable = new AjxpSortable(oElement, this.getVisibleSortTypes(), this.htmlElement.down('div.sort-table'));
 			this._sortableTable.onsort = function(){
 				this.redistributeBackgrounds();
-				var ctxt = ajaxplorer.getContextNode();
+				var ctxt = this.getCurrentContextNode();
 				ctxt.getMetadata().set("filesList.sortColumn", ''+this._sortableTable.sortColumn);
 				ctxt.getMetadata().set("filesList.descending", this._sortableTable.descending);
 			}.bind(this);
@@ -503,14 +536,14 @@ Class.create("FilesList", SelectableElements, {
 					this.reload(params);
 				}.bind(this), this.columnsDef, this.paginationData.get('currentOrderCol')||-1, this.paginationData.get('currentOrderDir') );
 			}
-			this.disableTextSelection($('selectable_div_header'));
-			this.disableTextSelection($('table_rows_container'));
+			this.disableTextSelection(this.htmlElement.down('div.sort-table'), true);
+			this.disableTextSelection(contentContainer, true);
 			this.observer = function(e){
-				fitHeightToBottom($('table_rows_container'), this.htmlElement);
+				fitHeightToBottom(contentContainer, this.htmlElement);
 				if(Prototype.Browser.IE){
-					this._headerResizer.resize($('table_rows_container').getWidth());
+					this._headerResizer.resize(contentContainer.getWidth());
 				}else{
-					this._headerResizer.resize($('content_pane').getWidth());
+					this._headerResizer.resize(this.htmlElement.getWidth());
 				}
 			}.bind(this);
 			this.observe("resize", this.observer);
@@ -520,7 +553,7 @@ Class.create("FilesList", SelectableElements, {
 				delete this.headerMenu;
 			}
 			this.headerMenu = new Proto.Menu({
-			  selector: '#selectable_div_header', 
+			  selector: '#selectable_div_header-'+this.__currentInstanceIndex,
 			  className: 'menu desktop',
 			  menuItems: [],
 			  fade:true,
@@ -549,15 +582,15 @@ Class.create("FilesList", SelectableElements, {
 				delete this.headerMenu;
 			}
 			var buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
-			buffer += '<div id="selectable_div" style="overflow:auto; padding:2px 5px;">';
+			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div" style="overflow:auto; padding:2px 5px;">';
 			this.htmlElement.update(buffer);
-			attachMobileScroll("selectable_div", "vertical");
+			attachMobileScroll(this.htmlElement.down(".selectable_div"), "vertical");
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){				
-				$('selectable_div').insert({before:this.createPaginator()});
+                this.htmlElement.down(".selectable_div").insert({before:this.createPaginator()});
 			}
-            var scrollElement = $("selectable_div");
+            var scrollElement = this.htmlElement.down(".selectable_div");
 			this.observer = function(e){
-				fitHeightToBottom($('selectable_div'), this.htmlElement);
+				fitHeightToBottom(scrollElement, this.htmlElement);
 			}.bind(this);
 			this.observe("resize", this.observer);
 			
@@ -588,8 +621,8 @@ Class.create("FilesList", SelectableElements, {
 				}.bind(this)
 			});
 
-			this.disableTextSelection($('selectable_div'));
-			this.initSelectableItems($('selectable_div'), true);
+			this.disableTextSelection(scrollElement, true);
+			this.initSelectableItems(scrollElement, true);
 		}
 
         if(this.options.replaceScroller){
@@ -652,7 +685,7 @@ Class.create("FilesList", SelectableElements, {
 					currentInput.setValue(current);
 					return;
 				}
-				var node = ajaxplorer.getContextNode();
+				var node = this.getCurrentContextNode();
 				node.getMetadata().get("paginationData").set("new_page", new_page);
 				ajaxplorer.updateContextData(node);
 			}
@@ -668,7 +701,7 @@ Class.create("FilesList", SelectableElements, {
 	 * @returns HTMLElement
 	 */
 	createPaginatorLink:function(page, text, title){
-		var node = ajaxplorer.getContextNode();
+		var node = this.getCurrentContextNode();
 		return new Element('a', {href:'#', style:'font-size:12px;padding:0 7px;', title:title}).update(text).observe('click', function(e){
 			node.getMetadata().get("paginationData").set("new_page", page);
 			ajaxplorer.updateContextData(node);
@@ -702,7 +735,12 @@ Class.create("FilesList", SelectableElements, {
 	setContextualMenu: function(protoMenu){
 		this.protoMenu = protoMenu;	
 	},
-	
+
+    getCurrentContextNode : function(){
+        if(this._dataModel) return this._dataModel.getContextNode();
+        else return ajaxplorer.getContextNode();
+    },
+
 	/**
 	 * Resizes the widget
 	 */
@@ -715,8 +753,8 @@ Class.create("FilesList", SelectableElements, {
     		}
     		fitHeightToBottom(this.htmlElement, (this.options.fitParent?$(this.options.fitParent):null), expr);
     	}		
-    	if($('table_rows_container') && Prototype.Browser.IE && this.gridStyle == "file"){
-    		$('table_rows_container').setStyle({width:'100%'});
+    	if(this.htmlElement.down('.table_rows_container') && Prototype.Browser.IE && this.gridStyle == "file"){
+            this.htmlElement.down('.table_rows_container').setStyle({width:'100%'});
     	}
 		this.notify("resize");
 	},
@@ -746,7 +784,8 @@ Class.create("FilesList", SelectableElements, {
 	 * @returns String
 	 */
 	switchDisplayMode: function(mode){
-		ajaxplorer.getContextHolder().setPendingSelection(ajaxplorer.getContextHolder().getSelectedNodes());
+        var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
+		dm.setPendingSelection(dm.getSelectedNodes());
         this.removeCurrentLines(true);
         
         if(mode){
@@ -782,12 +821,12 @@ Class.create("FilesList", SelectableElements, {
 		if(this._displayMode == "thumb")
 		{
 			this.resizeThumbnails();		
-			if(this.protoMenu) this.protoMenu.addElements('#selectable_div');	
+			if(this.protoMenu) this.protoMenu.addElements('#selectable_div-'+this.__currentInstanceIndex);
 			window.setTimeout(this.loadNextImage.bind(this),10);		
 		}
 		else
 		{
-			if(this.protoMenu) this.protoMenu.addElements('#table_rows_container');
+			if(this.protoMenu) this.protoMenu.addElements('#table_rows_container-'+this.__currentInstanceIndex);
 			if(this._headerResizer){
 				this._headerResizer.resize(this.htmlElement.getWidth()-2);
 			}
@@ -837,8 +876,8 @@ Class.create("FilesList", SelectableElements, {
 	 * @param additionnalParameters Object
 	 */
 	reload: function(additionnalParameters){
-		if(ajaxplorer.getContextNode()){
-			this.fill(ajaxplorer.getContextNode());
+		if(this.getCurrentContextNode()){
+			this.fill(this.getCurrentContextNode());
 		}
 	},
 	/**
@@ -857,7 +896,7 @@ Class.create("FilesList", SelectableElements, {
 		this.imagesHash = new Hash();
 		if(this.protoMenu){
 			this.protoMenu.removeElements('.ajxp_draggable');
-			this.protoMenu.removeElements('#selectable_div');
+			this.protoMenu.removeElements('.selectable_div');
 		}
 		for(var i = 0; i< AllAjxpDroppables.length;i++){
 			var el = AllAjxpDroppables[i];
@@ -949,9 +988,10 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sort(sortColumn, descending);
 			this._sortableTable.updateHeaderArrows();
 		}
-		if(ajaxplorer.getContextHolder().getPendingSelection())
+        var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
+		if(dm.getPendingSelection())
 		{
-			var pendingFile = ajaxplorer.getContextHolder().getPendingSelection();
+			var pendingFile = dm.getPendingSelection();
 			if(Object.isString(pendingFile))
 			{
 				this.selectFile(pendingFile);
@@ -965,7 +1005,7 @@ Class.create("FilesList", SelectableElements, {
 				}
 			}
 			this.hasFocus = true;
-			ajaxplorer.getContextHolder().clearPendingSelection();
+			dm.clearPendingSelection();
 		}	
 		if(this.hasFocus){
 			window.setTimeout(function(){ajaxplorer.focusOn(this);}.bind(this),200);
@@ -987,13 +1027,13 @@ Class.create("FilesList", SelectableElements, {
 			var posSpan = item.select('span.list_selectable_span')[0];
 			offset.top=1;
 			offset.left=20;
-			scrollTop = $('table_rows_container').scrollTop;
+			scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
 		}else{
 			var span = item.select('div.thumbLabel')[0];
 			var posSpan = span;
 			offset.top=2;
 			offset.left=3;
-			scrollTop = $('selectable_div').scrollTop;
+			scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
 		}
 		var pos = posSpan.cumulativeOffset();
 		var text = span.innerHTML;
@@ -1166,7 +1206,7 @@ Class.create("FilesList", SelectableElements, {
 								revert:true,
 								ghosting:true,
 								scroll:($('tree_container')?'tree_container':null),
-								containerScroll: $('table_rows_container')
+								containerScroll: this.htmlElement.down('div.table_rows_container')
 							},
 							this,
 							'filesList'
@@ -1337,7 +1377,7 @@ Class.create("FilesList", SelectableElements, {
 					revert:true,
 					ghosting:true,
 					scroll:($('tree_container')?'tree_container':null),
-					containerScroll:$('selectable_div')
+					containerScroll:this.htmlElement.down(".selectable_div")
 				}, this, 'filesList');
 			}.bind(this), 500);
 		}
@@ -1375,7 +1415,7 @@ Class.create("FilesList", SelectableElements, {
 				conn.setParameters({
 					action: 'stop_dl',
 					file : ajxpNode.getPath(),
-					dir : ajaxplorer.getContextNode().getPath()
+					dir : this.getCurrentContextNode().getPath()
 				});
 				conn.onComplete = function(transport){
 					if(transport.responseText == 'stop' && $(uuid).pe) {
@@ -1549,7 +1589,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	fireDblClick: function (e) 
 	{
-		if(ajaxplorer.getContextNode().getAjxpMime() == "ajxp_recycle")
+		if(this.getCurrentContextNode().getAjxpMime() == "ajxp_recycle")
 		{
 			return; // DO NOTHING IN RECYCLE BIN
 		}
