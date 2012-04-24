@@ -19,21 +19,52 @@
  * Description : Simple display of SVN logs.
  */
 Class.create("SVNLogger", {
-	initialize:function(form){
+initialize:function(form){
 		this.element = form.select('[id="svnlog_box"]')[0];
-		this.container = new Element('div', {
+
+        this.element.up('div.dialogContent').setStyle({padding:0});
+        this.element.setStyle({
+            height:'315px',
+            position:'relative'
+        });
+
+        this.versionsDm = new AjxpDataModel(true);
+        this.versionsRoot = new AjxpNode("/", false, "Versions", "folder.png");
+        this.versionsDm.setRootNode(this.versionsRoot);
+
+        this.filesList = new FilesList(this.element, {
+            dataModel:this.versionsDm,
+            columnsDef:[{attributeName:"ajxp_label", messageId:1},
+                        {attributeName:"revision", messageString:'#'},
+                        {attributeName:"revision_log", messageString:'Message'},
+                        {attributeName:"revision_date", messageId:4},
+                        {attributeName:"author", messageString:'Author'},
+                        {attributeName:"links", messageString:'Actions'}
+            ],
+            defaultSortTypes:["String", "String", "String", "String"],
+            columnsTemplate:"svnlog",
+            selectable: false,
+            replaceScroller:true
+        });
+        this.container = this.element;
+        /*
+        this.container = new Element('div', {
 			style:"height:310px;overflow:auto;"
 		});
-		this.element.up('div.dialogContent').setStyle({padding:0});
-		this.element.insert(this.container);	
+		this.element.insert(this.container);
+		*/
 		this.template = new Template('<div style="padding: 0px; border: 1px solid rgb(204, 204, 204); margin: 5px 8px 8px 4px;"><div style="padding: 3px; background-color: rgb(238, 238, 238);#{cssStyle}"><b>#{dateString} :</b> #{date} &nbsp;&nbsp;&nbsp;&nbsp;<b>#{revString} :</b> #{revision} &nbsp;&nbsp;&nbsp;&nbsp;<b>#{authString} :</b> #{author}<br></div><div style="padding: 3px;color:#333;word-wrap:break-word;">#{message}</div><div style="text-align: right; padding: 3px;">#{downloadLink}</div></div>');
 		this.downloadTemplate = new Template('<a style="color:#79f;font-weight:bold;" ajxp_download="'+window.ajxpServerAccessPath+'&get_action=svndownload&file=#{fileName}&revision=#{revision}" href="#">#{downloadString}</a>');
+		this.revertTemplate = new Template('<a style="color:#79f;font-weight:bold;" ajxp_url="'+window.ajxpServerAccessPath+'&get_action=revert_file&file=#{fileName}&revision=#{revision}" href="#">#{revertString}</a>');
+		this.compareTemplate = new Template('<a style="color:#79f;font-weight:bold;" ajxp_url="'+window.ajxpServerAccessPath+'&get_action=revert_file&compare=true&file=#{fileName}&revision=#{revision}" href="#">#{revertString}</a>');
 		this.switchTemplate = new Template('<a style="color:#79f;font-weight:bold;" ajxp_url="'+window.ajxpServerAccessPath+'&get_action=svnswitch&revision=#{revision}" href="#">#{switchString}</a>');
 		this.revMessage = MessageHash[243];
 		this.authorMessage = MessageHash[244];
 		this.dateMessage = MessageHash[245];
 		this.messMessage = MessageHash[246];
 		this.downMessage = MessageHash[88];
+		this.revertMessage = "Revert";
+		this.compareMessage = "Compare";
 		this.switchMessage = MessageHash['meta.svn.3'];
 		if(!$('svndownload_iframe')){
 			$('hidden_frames').insert('<iframe id="svndownload_iframe" name="svndownload_iframe" style="display:none"></iframe>');
@@ -49,64 +80,105 @@ Class.create("SVNLogger", {
 		}
 		this.fileName = ajxpNode.getPath();
 		this.isFile = ajxpNode.isLeaf();
+        this.currentFileMetadata = ajxpNode.getMetadata();
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'svnlog');
 		connexion.addParameter('file', this.fileName);
 		connexion.onComplete = this.displayResponse.bind(this);
 		this.setOnLoad();
 		connexion.sendAsync();
-	},
-	
-	addEntry:function(revision,author,date,message){
-		var separator = '||';
-		if(message.indexOf(separator)>-1){
-			var split = message.split(separator);			
-			author = split[1];
-			message = "<b>"+split[2].toUpperCase()+"</b>";
-			if(split[3]){
-				message += " : "+split[3];
-			}
-		}
-		
-		var dateParts = date.split('\.');
+    },
+
+addEntry:function(revision,author,date,message){
+        var separator = '||';
+        if(message.indexOf(separator)>-1){
+            var split = message.split(separator);
+            author = split[1];
+            if(split[2].toLowerCase().startsWith("rename") && split[3]){
+                var previousFileName = getBaseName($A(split[3].split("item:")).last());
+            }
+            message = "<b>"+split[2].toUpperCase()+"</b>";
+            if(split[3]){
+                message += " : "+split[3];
+            }
+        }
+
+        var dateParts = date.split('\.');
+
 		date = dateParts[0].replace("T", " ");
-		
-		var skipSwitch = false;
-		var cssStyle = '';
-		if(this.currentRev){
-			if(this.currentRev.firstChild.nodeValue == revision){
-				skipSwitch = true;
-				cssStyle = "background-color:#efe;";
-			}
-		}else if(this.revisionRange){
-			var start = parseInt(this.revisionRange.getAttribute('start'));
-			var end = parseInt(this.revisionRange.getAttribute('end'));
-			var rev = parseInt(revision);
-			if(start <= rev && rev <= end){
-				cssStyle = "background-color:#fee;";
-			}
-		}
-		
-		var dLink = (this.isFile?this.downloadTemplate.evaluate({
-			fileName:this.fileName, 
-			revision:revision,
-			downloadString:this.downMessage
-		}):(!skipSwitch?this.switchTemplate.evaluate({
-			revision:revision,
-			switchString:this.switchMessage
-		}):''));
-		this.container.insert(this.template.evaluate({
-			revision:revision,
-			author:author,
-			date:date,
-			message:message,
-			downloadLink:dLink,			
-			cssStyle:cssStyle,
-			revString:this.revMessage,
-			authString:this.authorMessage,
-			dateString:this.dateMessage,
-			messString:this.messMessage
-		}));
+        var skipSwitch = false;
+        var cssStyle = '';
+        if(this.currentRev){
+            if(this.currentRev.firstChild.nodeValue == revision){
+                skipSwitch = true;
+                cssStyle = "background-color:#efe;";
+            }
+        }else if(this.revisionRange){
+            var start = parseInt(this.revisionRange.getAttribute('start'));
+            var end = parseInt(this.revisionRange.getAttribute('end'));
+            var rev = parseInt(revision);
+            if(start <= rev && rev <= end){
+                cssStyle = "background-color:#fee;";
+            }
+        }
+
+        var dLink = (this.isFile?this.downloadTemplate.evaluate({
+            fileName:this.fileName,
+            revision:revision,
+            downloadString:this.downMessage
+        }):(!skipSwitch?this.switchTemplate.evaluate({
+            revision:revision,
+            switchString:this.switchMessage
+        }):''));
+        if(this.isFile){
+            var dLink2 = this.revertTemplate.evaluate({
+                fileName:this.fileName,
+                revision:revision,
+                revertString:this.revertMessage
+            });
+            var dLink3 = this.compareTemplate.evaluate({
+                fileName:this.fileName,
+                revision:revision,
+                revertString:this.compareMessage
+            });
+            dLink = dLink + " | " + dLink2 + " | " + dLink3;
+        }
+
+
+        if(this.filesList){
+
+            var node = new AjxpNode("/"+revision, true, "Revision "+revision, "mime_empty.png");
+            if(this.previousFileName){
+                node.getMetadata().set('text', this.previousFileName);
+            }else{
+                node.getMetadata().set('text', this.fileName);
+            }
+            node.getMetadata().set('icon', this.currentFileMetadata.get('icon'));
+            node.getMetadata().set('revision_log', message);
+            node.getMetadata().set('revision_date', date.split(' ')[0]);
+            node.getMetadata().set('revision', revision);
+            node.getMetadata().set('author', author);
+            node.getMetadata().set('links', dLink);
+            this.versionsRoot.addChild(node);
+
+        }else{
+
+            this.container.insert(this.template.evaluate({
+                revision:revision,
+                author:author,
+                date:date,
+                message:message,
+                downloadLink:dLink,
+                cssStyle:cssStyle,
+                revString:this.revMessage,
+                authString:this.authorMessage,
+                dateString:this.dateMessage,
+                messString:this.messMessage
+            }));
+        }
+
+        if(previousFileName) this.previousFileName = previousFileName;
+
 	},
 	
 	displayResponse: function(transport){
@@ -138,6 +210,9 @@ Class.create("SVNLogger", {
 		}finally{
 			this.removeOnLoad();
 		}
+        if(this.filesList){
+            this.filesList.reload();
+        }
 		this.container.select("a").invoke("observe", "click", function(e){
 			var a = e.findElement();
 			if(a.getAttribute("ajxp_url")){
@@ -151,7 +226,7 @@ Class.create("SVNLogger", {
 				$('svndownload_iframe').src = a.getAttribute("ajxp_download");
 			}
 			Event.stop(e);
-		});		
+		});
 	},
 	close:function(){
 		
