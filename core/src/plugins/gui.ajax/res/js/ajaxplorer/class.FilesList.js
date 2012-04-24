@@ -141,15 +141,23 @@ Class.create("FilesList", SelectableElements, {
 		
 		// Default headersDef
 		this.hiddenColumns = $A([]);
-		this.columnsDef = $A([]);
-		this.columnsDef.push({messageId:1,attributeName:'ajxp_label'});
-		this.columnsDef.push({messageId:2,attributeName:'filesize'});
-		this.columnsDef.push({messageId:3,attributeName:'mimestring'});
-		this.columnsDef.push({messageId:4,attributeName:'ajxp_modiftime'});
-		// Associated Defaults
-		this.defaultSortTypes = ["StringDirFile", "NumberKo", "String", "MyDate"];
-		this._oSortTypes = this.defaultSortTypes;
-		
+        if(this.options.columnsDef){
+            this.columnsDef = this.options.columnsDef;
+            this.defaultSortTypes = this.options.defaultSortTypes;
+            if(this.options.columnsTemplate){
+                this.columnsTemplate = this.options.columnsTemplate;
+            }
+        }else{
+            this.columnsDef = $A([]);
+            this.columnsDef.push({messageId:1,attributeName:'ajxp_label'});
+            this.columnsDef.push({messageId:2,attributeName:'filesize'});
+            this.columnsDef.push({messageId:3,attributeName:'mimestring'});
+            this.columnsDef.push({messageId:4,attributeName:'ajxp_modiftime'});
+            // Associated Defaults
+            this.defaultSortTypes = ["StringDirFile", "NumberKo", "String", "MyDate"];
+        }
+        this._oSortTypes = this.defaultSortTypes;
+
 		this.initGUI();
         var keydownObserver = this.keydown.bind(this);
         var repoSwitchObserver = this.setOnLoad.bind(this);
@@ -501,7 +509,11 @@ Class.create("FilesList", SelectableElements, {
 				contentContainer.insert({before:this.createPaginator()});
 			}
 
-			this.initSelectableItems(oElement, true, contentContainer);
+            if(this.options.selectable == undefined || this.options.selectable === true){
+                this.initSelectableItems(oElement, true, contentContainer);
+            }else{
+                this.initNonSelectableItems(oElement);
+            }
 			this._headerResizer = new HeaderResizer(this.htmlElement.down('div.sort-table'), {
 				headerData : headerData,
 				body : contentContainer,
@@ -543,7 +555,9 @@ Class.create("FilesList", SelectableElements, {
 				if(Prototype.Browser.IE){
 					this._headerResizer.resize(contentContainer.getWidth());
 				}else{
-					this._headerResizer.resize(this.htmlElement.getWidth());
+                    var width = this.htmlElement.getWidth();
+                    width -= parseInt(this.htmlElement.getStyle("borderLeftWidth")) + parseInt(this.htmlElement.getStyle("borderRightWidth"));
+					this._headerResizer.resize(width);
 				}
 			}.bind(this);
 			this.observe("resize", this.observer);
@@ -622,19 +636,23 @@ Class.create("FilesList", SelectableElements, {
 			});
 
 			this.disableTextSelection(scrollElement, true);
-			this.initSelectableItems(scrollElement, true);
+            if(this.options.selectable == undefined || this.options.selectable === true){
+			    this.initSelectableItems(scrollElement, true);
+            }else{
+                this.initNonSelectableItems(scrollElement);
+            }
 		}
 
         if(this.options.replaceScroller){
-            this.scroller = new Element('div', {id:'filelist_scroller', className:'scroller_track', style:"right:0px"});
-            this.scroller.insert('<div id="filelist_scrollbar_handle" class="scroller_handle"></div>');
+            this.scroller = new Element('div', {id:'filelist_scroller'+this.__currentInstanceIndex, className:'scroller_track', style:"right:0px"});
+            this.scroller.insert('<div id="filelist_scrollbar_handle'+this.__currentInstanceIndex+'" class="scroller_handle"></div>');
             scrollElement.insert({before:this.scroller});
             if(this.gridStyle == "grid"){
                 scrollElement.setStyle({overflowY:"hidden",overflowX:"auto"});
             }else{
                 scrollElement.setStyle({overflow:"hidden"});
             }
-            this.scrollbar = new Control.ScrollBar(scrollElement,'filelist_scroller');
+            this.scrollbar = new Control.ScrollBar(scrollElement,'filelist_scroller'+this.__currentInstanceIndex);
             if(this.scrollSizeObserver){
                 this.stopObserving("resize", this.scrollSizeObserver);
             }
