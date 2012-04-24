@@ -37,7 +37,7 @@
 									<td class="infoPanelLabel">Revision Date</td>
 									<td class="infoPanelValue">#{last_revision_date}</td>
 								</tr>
-								<tr class="even">
+								<tr>
 									<td class="infoPanelLabel">Revision Author</td>
 									<td class="infoPanelValue">#{last_revision_author}</td>
 								</tr>
@@ -70,7 +70,7 @@
 							modal.showDialogForm('SVN', 'svnlog_box', loadFunc, closeFunc, null, true, true);
 						]]></clientCallback>
 					<clientForm id="svnlog_box"><![CDATA[
-					<div id="svnlog_box" action="svnlog" box_width="450" box_height="340"></div>
+					<div id="svnlog_box" action="svnlog" box_width="80%" box_height="340"></div>
 					]]></clientForm>
 					<serverCallback methodName="switchAction"></serverCallback>
 					</processing>
@@ -100,6 +100,11 @@
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>		
+			<action name="revert_file">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
 			<action name="svnswitch">
 				<processing>
 					<serverCallback methodName="switchAction"></serverCallback>

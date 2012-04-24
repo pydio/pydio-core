@@ -120,7 +120,7 @@ class SvnManager extends AJXP_Plugin {
             // WILL COMMIT BOTH AT ONCE
             $command = "svn commit";
             $user = AuthService::getLoggedUser()->getId();
-            $switches = "-m \"AjaXplorer||$user||COMMIT_META".(isSet($this->commitMessageParams)?"||".$this->commitMessageParams:"")."\"";
+            $switches = "-m \"AjaXplorer||$user||COMMIT_META||file:".escapeshellarg($file)."\"";
             ExecSvnCmd($command, array($realFile, $nodeRealFile), $switches);
             ExecSvnCmd('svn update', dirname($nodeRealFile), '');
         }else{
@@ -176,9 +176,24 @@ class SvnManager extends AJXP_Plugin {
                 header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
                 header("Cache-Control: private",false);
             }
-			
+			$realFile = escapeshellarg($realFile);
 			system( (SVNLIB_PATH!=""?SVNLIB_PATH."/":"") ."svn cat -r$revision $realFile");
 			exit(0);
+        }else if($actionName == "revert_file"){
+
+            $revision = $httpVars["revision"];
+   			$realFile = $init["SELECTION"][0];
+            $compare = (isSet($httpVars["compare"]) && $httpVars["compare"] == "true");
+            $escapedFile = escapeshellarg($realFile);
+            if($compare){
+                $ext = pathinfo($realFile, PATHINFO_EXTENSION);
+                $targetFile = preg_replace("/\.$ext$/", "-r$revision.$ext", $realFile);
+                system( (SVNLIB_PATH!=""?SVNLIB_PATH."/":"") ."svn cat -r$revision $escapedFile > ".escapeshellarg($targetFile));
+            }else{
+                system( (SVNLIB_PATH!=""?SVNLIB_PATH."/":"") ."svn cat -r$revision $escapedFile > $escapedFile");
+                $this->commitChanges($actionName, $realFile, array());
+            }
+
 		}else if($actionName == "svnswitch"){
 			$revision = $httpVars["revision"];
 			ExecSvnCmd("svn update -r$revision ".$init["DIR"]);
