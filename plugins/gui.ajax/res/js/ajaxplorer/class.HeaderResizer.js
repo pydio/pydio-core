@@ -77,6 +77,7 @@ Class.create("HeaderResizer", {
 	generateHeader : function(){
 		var data = this.options.headerData;
 		this.element.addClassName('header_resizer');
+		this.element.addClassName('css_gradient');
 		var initSizes;
 		var index=0;
 		data.each(function(el){
@@ -104,6 +105,7 @@ Class.create("HeaderResizer", {
 		var computeWidth = this.getInnerWidth() - (this.cells.length - 1) * this.options.handleWidth;
 		var uniqueSize = Math.floor(computeWidth * ratio);
 		for(var i=0;i<this.cells.length;i++) sizes[i] = uniqueSize;
+        this.log("Compute equal size on "+this.getInnerWidth() + " result:"+sizes.join(","));
 		return sizes;
 	},
 	
@@ -143,7 +145,7 @@ Class.create("HeaderResizer", {
 	 */
 	resize : function(size){
 		
-		this.mainSize = size-2;
+		this.mainSize = size;
 		this.element.setStyle({width:this.mainSize+"px"});
 		this.checkBodyScroll();
 		this.resizeHeaders();
@@ -165,7 +167,7 @@ Class.create("HeaderResizer", {
 		var innerWidth = this.getInnerWidth();	
 		if(!innerWidth) return;	
 		if(!sizes && this.currentInner && innerWidth != this.currentInner){
-			sizes = this.computePercentSizes(this.currentSizes, this.currentInner);						
+			sizes = this.computePercentSizes(this.currentSizes, this.currentInner);
 		}
 		//console.log("return");
 		if(!sizes) return;

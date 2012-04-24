@@ -38,6 +38,15 @@ SelectableElements = Class.create({
 		this.initSelectableItems(oElement, bMultiple);
 	},
 
+    initNonSelectableItems:function(oElement){
+        this._htmlElement = oElement;
+        this._multiple = false;
+
+        this._selectedItems = [];
+        this._fireChange = true;
+        this.hasFocus = false;
+    },
+
 	initSelectableItems: function(oElement, bMultiple, dragSelectionElement) {
 	
 		this._htmlElement = oElement;
