@@ -1216,26 +1216,28 @@ Class.create("FilesList", SelectableElements, {
 				tableCell.insert(innerSpan);
 				
 				// Defer Drag'n'drop assignation for performances
-				window.setTimeout(function(){
-					if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
-						var newDrag = new AjxpDraggable(
-							innerSpan, 
-							{
-								revert:true,
-								ghosting:true,
-								scroll:($('tree_container')?'tree_container':null),
-								containerScroll: this.htmlElement.down('div.table_rows_container')
-							},
-							this,
-							'filesList'
-						);							
-						if(this.protoMenu) this.protoMenu.addElements(innerSpan);						
-					}
-					if(!ajxpNode.isLeaf())
-					{
-						AjxpDroppables.add(innerSpan);
-					}
-				}.bind(this), 500);
+                if(this.options.draggable == undefined || this.options.draggable === true){
+                    window.setTimeout(function(){
+                        if(ajxpNode.getAjxpMime() != "ajxp_recycle"){
+                            var newDrag = new AjxpDraggable(
+                                innerSpan,
+                                {
+                                    revert:true,
+                                    ghosting:true,
+                                    scroll:($('tree_container')?'tree_container':null),
+                                    containerScroll: this.htmlElement.down('div.table_rows_container')
+                                },
+                                this,
+                                'filesList'
+                            );
+                            if(this.protoMenu) this.protoMenu.addElements(innerSpan);
+                        }
+                        if(!ajxpNode.isLeaf())
+                        {
+                            AjxpDroppables.add(innerSpan);
+                        }
+                    }.bind(this), 500);
+                }
 				
 			}else if(s=="ajxp_modiftime"){
 				var date = new Date();

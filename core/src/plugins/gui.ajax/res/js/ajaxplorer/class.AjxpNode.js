@@ -207,7 +207,7 @@ Class.create("AjxpNode", {
 	 * Gets the metadat
 	 * @returns $H()
 	 */
-	getMetadata : function(data){
+	getMetadata : function(){
 		return this._metadata;
 	},
 	/**

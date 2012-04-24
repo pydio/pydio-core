@@ -92,8 +92,13 @@ class SvnManager extends AJXP_Plugin {
 	}
 		
 	protected function addIfNotVersionned($repoFile, $realFile){
-		$res = ExecSvnCmd("svnversion", $realFile, "");
-		if(!is_numeric(implode("", $res[IDX_STDOUT]))){
+        $error = false;
+        try{
+            $res = ExecSvnCmd("svnversion", $realFile, "");
+        }catch(Exception $e){
+            $error = true;
+        }
+		if($error || !is_numeric(implode("", $res[IDX_STDOUT]))){
 			$res2 = ExecSvnCmd("svn add", "$realFile");
 			$this->commitMessageParams = "Recycle cache file";
 			$this->commitChanges("ADD", array("dir" => dirname($repoFile)), array());
@@ -215,7 +220,13 @@ class SvnManager extends AJXP_Plugin {
 			case "upload":
 				if(isSet($filesVars) && isSet($filesVars["userfile_0"]) && isSet($filesVars["userfile_0"]["name"])){
 					$init = $this->initDirAndSelection($httpVars, array("NEW_FILE" => SystemTextEncoding::fromUTF8($httpVars["dir"])."/".$filesVars["userfile_0"]["name"]));
-					$res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
+                    $res = ExecSvnCmd("svn status ", $init["NEW_FILE"]);
+                    if(count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?"){
+                        $res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
+                    }else {
+                        $res = true;
+                    }
+					//$res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
 					$this->commitMessageParams = $filesVars["userfile_0"]["name"];
 				}
 			break;
@@ -243,6 +254,7 @@ class SvnManager extends AJXP_Plugin {
 			}else{
 				$destFile = $init["DEST_DIR"]."/".basename($selectedFile);			
 			}
+            $this->addIfNotVersionned(str_replace($init["DIR"], "", $selectedFile), $selectedFile);
 			$res = ExecSvnCmd("svn $action", array($selectedFile,$destFile), '');
 		}
 		if($actionName != "rename"){
