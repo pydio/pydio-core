@@ -5,6 +5,7 @@
 		<resources>
 			<i18n namespace="meta.user" path="plugins/meta.user/i18n" />
 			<js file="plugins/meta.user/class.MetaCellRenderer.js" className="MetaCellRenderer" autoload="true"/>
+            <img_library alias="meta_user" path="plugins/meta.user/img"/>
 		</resources>
 	</client_settings>	
 	<server_settings>
@@ -31,7 +32,7 @@
 		</client_configs>
 		<actions>
 			<action name="edit_user_meta">
-				<gui text="meta.user.1" title="meta.user.1" src="documentinfo_koffice.png" hasAccessKey="false">
+				<gui text="meta.user.1" title="meta.user.1" src="meta_user/ICON_SIZE/tag.png" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
 						actionBar="false" contextMenu="true" infoPanel="false"
 						actionBarGroup="put" inZip="false">
