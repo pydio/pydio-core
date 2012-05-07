@@ -617,7 +617,7 @@ define('IDX_VALUE', 1);
         }
 
 		$cmdline = (SVNLIB_PATH!=""?SVNLIB_PATH."/":"").$cmd." ".$switches." ".$arg;
-		
+
 		/*
 		$output = shell_exec($cmdline);
 		$result = array();
