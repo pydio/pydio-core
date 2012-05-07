@@ -115,7 +115,7 @@ Class.create("ActivityMonitor", {
 		new Ajax.Request(window.ajxpServerAccessPath, 
 		{
 			method:'get',
-			parameters:{ping:'true'}
+			parameters:{get_action:'ping'}
 		});		
 	},
 	
