@@ -133,8 +133,12 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      * @return void
      */
      protected function createCollection( $path ){
-     	$path = $this->fixPath($path);
-     	$this->getAccessDriver()->mkDir($this->safeDirname($path), $this->safeBasename($path));
+     	 $path = $this->fixPath($path);
+     	 //$this->getAccessDriver()->mkDir($this->safeDirname($path), $this->safeBasename($path));
+         AJXP_Controller::findActionAndApply("mkdir", array(
+             "dir" => $this->safeDirname($path),
+             "dirname" => $this->safeBasename($path)
+         ), array());
      }
 
     /**
@@ -150,7 +154,13 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     protected function createResource( $path, $content = null ){
     	$path = $this->fixPath($path);
     	//AJXP_Logger::debug("AJXP_WebdavBackend :: createResource ($path)");
-    	$this->getAccessDriver()->createEmptyFile($this->safeDirname($path), $this->safeBasename($path));
+    	//$this->getAccessDriver()->createEmptyFile($this->safeDirname($path), $this->safeBasename($path));
+        $params = array(
+            "dir" => $this->safeDirname($path),
+            "filename" => $this->safeBasename($path)
+        );
+        if($content != null) $params["content"] = $content;
+        AJXP_Controller::findActionAndApply("mkfile", $params, array());
     }
 
     /**
@@ -579,12 +589,30 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     	$toPath = $this->fixPath($toPath);
     	$error = array();
     	$success = array();
-    	// Handle duplicate
-    	if($this->safeDirname($toPath) == $this->safeDirname($fromPath)){
-    		rename($this->getAccessDriver()->getRessourceUrl($fromPath), $this->getAccessDriver()->getRessourceUrl($toPath));
-    	}else{
-			$this->getAccessDriver()->copyOrMoveFile( $this->safeDirname($toPath), $fromPath, $error, $success, $move = false);
-    	}
+        ob_start();
+        try{
+            if($this->safeDirname($toPath) == $this->safeDirname($fromPath)){
+                AJXP_Controller::findActionAndApply("rename", array(
+                    "filename_new"      => basename($toPath),
+                    "dir"               => dirname($fromPath),
+                    "file"              => $fromPath
+                ), array());
+                //rename($this->getAccessDriver()->getRessourceUrl($fromPath), $this->getAccessDriver()->getRessourceUrl($toPath));
+            }else{
+                AJXP_Controller::findActionAndApply("copy", array(
+                    "dest"      => dirname($toPath),
+                    "dir"       => dirname($fromPath),
+                    "file_0"    => $fromPath
+                ), array());
+                //$this->getAccessDriver()->copyOrMoveFile( $this->safeDirname($toPath), $fromPath, $error, $success, $move = false);
+            }
+        }catch(Exception $e){
+            AJXP_Logger::debug("ERROR : ".$e->getMessage());
+        }
+
+        $result = ob_get_flush();
+        AJXP_Logger::debug("RESULT : ".$result, $error);
+
         $metaStore = $this->getMetastore();
         if($metaStore != false){
             $fromNode = new AJXP_Node($this->getAccessDriver()->getRessourceUrl($fromPath));
@@ -614,7 +642,19 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     protected function performDelete( $path ){
     	$path = $this->fixPath($path);
     	$logs = array();
-    	$this->getAccessDriver()->delete(array($path), $logs);
+    	//$this->getAccessDriver()->delete(array($path), $logs);
+        ob_start();
+        try{
+            AJXP_Controller::findActionAndApply("delete", array(
+                "dir"       => dirname($path),
+                "file_0"    => $path
+            ), array());
+        }catch(Exception $e){
+
+        }
+        $result = ob_get_flush();
+        AJXP_Logger::debug("RESULT : ".$result);
+
         $metaStore = $this->getMetastore();
         if($metaStore == false) return;
         $metaStore->removeMetadata(
@@ -623,6 +663,7 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
             false,
             AJXP_METADATA_SCOPE_GLOBAL
         );
+        return null;
     }
 
     /**
