@@ -198,6 +198,26 @@
 					]]></clientCallback>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
-		</action>		
+		</action>
+        <action name="get_seed">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="get_secure_token">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="get_captcha">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
+        <action name="back">
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
 	</actions>
 </registry_contributions>

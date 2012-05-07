@@ -35,7 +35,56 @@ class AbstractAuthDriver extends AJXP_Plugin {
 		if(!isSet($this->actions[$action])) return;
 		$mess = ConfService::getMessages();
 		
-		switch ($action){			
+		switch ($action){
+
+            case "login" :
+
+                if(!AuthService::usersEnabled()) return;
+                $rememberLogin = "";
+                $rememberPass = "";
+                $secureToken = "";
+                $loggedUser = null;
+                include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
+        		if(AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))){
+        			$loggingResult = -4;
+        		}else{
+        			$userId = (isSet($httpVars["userid"])?$httpVars["userid"]:null);
+        			$userPass = (isSet($httpVars["password"])?$httpVars["password"]:null);
+        			$rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
+        			$cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
+        			$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
+        			if($rememberMe && $loggingResult == 1){
+        				$rememberLogin = "notify";
+        				$rememberPass = "notify";
+        				$loggedUser = AuthService::getLoggedUser();
+        			}
+        			if($loggingResult == 1){
+        				session_regenerate_id(true);
+        				$secureToken = AuthService::generateSecureToken();
+        			}
+        			if($loggingResult < 1 && AuthService::suspectBruteForceLogin()){
+        				$loggingResult = -4; // Force captcha reload
+        			}
+        		}
+                if($loggedUser != null)
+               	{
+                       $res = ConfService::switchUserToActiveRepository($loggedUser, (isSet($httpVars["tmp_repository_id"])?$httpVars["tmp_repository_id"]:"-1"));
+                       if(!$res){
+                           AuthService::disconnect();
+                           $loggingResult = -3;
+                       }
+               	}
+
+                if($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))){
+                    AuthService::refreshRememberCookie($loggedUser);
+                }
+        		AJXP_XMLWriter::header();
+        		AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
+        		AJXP_XMLWriter::close();
+
+
+            break;
+
 			//------------------------------------
 			//	CHANGE USER PASSWORD
 			//------------------------------------	
@@ -63,7 +112,51 @@ class AbstractAuthDriver extends AJXP_Plugin {
 				print "SUCCESS";
 				
 			break;					
-					
+
+            case "logout" :
+
+                AuthService::disconnect();
+                $loggingResult = 2;
+                session_destroy();
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::loggingResult($loggingResult, null, null, null);
+                AJXP_XMLWriter::close();
+
+
+            break;
+
+            case "get_seed" :
+                $seed = AuthService::generateSeed();
+                if(AuthService::suspectBruteForceLogin()){
+                    HTMLWriter::charsetHeader('application/json');
+                    print json_encode(array("seed" => $seed, "captcha" => true));
+                }else{
+                    HTMLWriter::charsetHeader("text/plain");
+                    print $seed;
+                }
+                //exit(0);
+            break;
+
+            case "get_secure_token" :
+                HTMLWriter::charsetHeader("text/plain");
+                print AuthService::generateSecureToken();
+                //exit(0);
+            break;
+
+            case "get_captcha":
+                include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
+                CaptchaProvider::sendCaptcha();
+                //exit(0) ;
+            break;
+
+            case "back":
+                AJXP_XMLWriter::header("url");
+                  echo AuthService::getLogoutAddress(false);
+                  AJXP_XMLWriter::close("url");
+                //exit(1);
+
+            break;
+
 			default;
 			break;
 		}				

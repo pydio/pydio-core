@@ -229,7 +229,31 @@ class ConfService
 		return self::getInstance()->getUniquePluginImplInst("LOG_DRIVER", "log");
 	}
 
-	
+	public static function switchUserToActiveRepository($loggedUser, $parameterId = -1){
+        if(isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])){
+            $loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
+            $loggedUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
+            $loggedUser->save("user");
+            AuthService::updateUser($loggedUser);
+            unset($_SESSION["PENDING_REPOSITORY_ID"]);
+            unset($_SESSION["PENDING_FOLDER"]);
+        }
+        $currentRepoId = ConfService::getCurrentRootDirIndex();
+        $lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
+        $defaultRepoId = AuthService::getDefaultRootId();
+        if($defaultRepoId == -1){
+            return false;
+        }else {
+            if($lastRepoId !== "" && $lastRepoId!==$currentRepoId && $parameterId == -1 && $loggedUser->canSwitchTo($lastRepoId)){
+                ConfService::switchRootDir($lastRepoId);
+            }else if(!$loggedUser->canSwitchTo($currentRepoId)){
+                ConfService::switchRootDir($defaultRepoId);
+            }
+        }
+        return true;
+    }
+
+
     /**
      * See instance method
      * @static

@@ -81,90 +81,9 @@ if(AuthService::usersEnabled())
 {
 	$httpVars = array_merge($_GET, $_POST);
 
-	$rememberLogin = "";
-	$rememberPass = "";
-	$secureToken = "";
-	if($action == "get_seed"){
-		$seed = AuthService::generateSeed();
-		if(AuthService::suspectBruteForceLogin()){
-			HTMLWriter::charsetHeader('application/json');
-			print json_encode(array("seed" => $seed, "captcha" => true));
-		}else{
-			HTMLWriter::charsetHeader("text/plain");
-			print $seed;		
-		}
-		exit(0);
-	}else if($action == "get_secure_token"){
-		HTMLWriter::charsetHeader("text/plain");
-		print AuthService::generateSecureToken();
-		exit(0);
-	}else if($action == "get_captcha"){
-		include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
-		CaptchaProvider::sendCaptcha();
-		exit(0) ;
-	}else if($action == "logout"){
-		AuthService::disconnect();
-		$loggingResult = 2;
-		session_destroy();
-	}else if($action == "back"){
-		AJXP_XMLWriter::header("url");
-        echo AuthService::getLogoutAddress(false);
-        AJXP_XMLWriter::close("url");
-		exit(1);
-    }else if($action == "login"){
-		include_once(AJXP_BIN_FOLDER."/class.CaptchaProvider.php");
-		if(AuthService::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))){
-			$loggingResult = -4;
-		}else{
-			$userId = (isSet($httpVars["userid"])?$httpVars["userid"]:null);
-			$userPass = (isSet($httpVars["password"])?$httpVars["password"]:null);
-			$rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
-			$cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
-			$loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
-			if($rememberMe && $loggingResult == 1){
-				$rememberLogin = "notify";
-				$rememberPass = "notify";
-				$loggedUser = AuthService::getLoggedUser();
-			}
-			if($loggingResult == 1){
-				session_regenerate_id(true);
-				$secureToken = AuthService::generateSecureToken();
-			}
-			if($loggingResult < 1 && AuthService::suspectBruteForceLogin()){
-				$loggingResult = -4; // Force captcha reload
-			}
-		}
-	}
-	else 
-	{
-		AuthService::logUser(null, null);	
-	}
-	// Check that current user can access current repository, try to switch otherwise.
-	$loggedUser = AuthService::getLoggedUser();
-	if($loggedUser != null)
-	{
-		if(isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])){
-			$loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
-			$loggedUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
-			$loggedUser->save("user");
-			AuthService::updateUser($loggedUser);
-			unset($_SESSION["PENDING_REPOSITORY_ID"]);
-			unset($_SESSION["PENDING_FOLDER"]);
-		}
-		$currentRepoId = ConfService::getCurrentRootDirIndex();
-		$lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
-		$defaultRepoId = AuthService::getDefaultRootId();
-		if($defaultRepoId == -1){
-			AuthService::disconnect();
-			$loggingResult = -3;
-		}else {
-			if($lastRepoId !== "" && $lastRepoId!==$currentRepoId && !isSet($httpVars["tmp_repository_id"]) && $loggedUser->canSwitchTo($lastRepoId)){
-				ConfService::switchRootDir($lastRepoId);
-			}else if(!$loggedUser->canSwitchTo($currentRepoId)){
-				ConfService::switchRootDir($defaultRepoId);
-			}
-		}
-	}
+    AuthService::logUser(null, null);
+    // Check that current user can access current repository, try to switch otherwise.
+    $loggedUser = AuthService::getLoggedUser();
 	if($loggedUser == null)
 	{
 		// Try prelogging user if the session expired but the logging data is in fact still present
@@ -173,16 +92,15 @@ if(AuthService::usersEnabled())
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) $requireAuth = true;
 	}
-	if(isset($loggingResult))
-	{
-        if($loggedUser != null && (AuthService::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))){
-            AuthService::refreshRememberCookie($loggedUser);
-        }
-		AJXP_XMLWriter::header();
-		AJXP_XMLWriter::loggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken);
-		AJXP_XMLWriter::close();
-		exit(1);
-	}
+    if($loggedUser != null)
+   	{
+           $res = ConfService::switchUserToActiveRepository($loggedUser, (isSet($httpVars["tmp_repository_id"])?$httpVars["tmp_repository_id"]:"-1"));
+           if(!$res){
+               AuthService::disconnect();
+               $requireAuth = true;
+           }
+   	}
+
 }else{
 	AJXP_Logger::debug(ConfService::getCurrentRootDirIndex());	
 }
