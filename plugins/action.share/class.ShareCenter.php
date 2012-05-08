@@ -549,7 +549,9 @@ class ShareCenter extends AJXP_Plugin{
             if(!empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"]) && strpos($newshareduser, $this->pluginConf["SHARED_USERS_TMP_PREFIX"])!==0 ){
                 $newshareduser = $this->pluginConf["SHARED_USERS_TMP_PREFIX"] . $newshareduser;
             }
-            array_push($users, $newshareduser);
+            if(!AuthService::userExists($newshareduser)){
+                array_push($users, $newshareduser);
+            }
         }
 		//$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
 		$label = AJXP_Utils::decodeSecureMagic($httpVars["repo_label"]);
