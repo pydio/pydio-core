@@ -53,13 +53,19 @@ class FileHasher extends AJXP_Plugin
                    FileHasher::METADATA_HASH_NAMESPACE,
                    false,
                    AJXP_METADATA_SCOPE_GLOBAL);
+                $mtime = filemtime($node->getUrl());
                 if(is_array($hashMeta)
-                    && array_key_exists("md5", $hashMeta)){
+                    && array_key_exists("md5", $hashMeta)
+                    && array_key_exists("md5_mtime", $hashMeta)
+                    && $hashMeta["md5_mtime"] >= $mtime){
                     $md5 = $hashMeta["md5"];
                 }
                 if($md5 == null){
                     $md5 = md5_file($node->getUrl());
-                    $hashMeta = array("md5" => $md5);
+                    $hashMeta = array(
+                        "md5" => $md5,
+                        "md5_mtime" => $mtime
+                    );
                     $this->metaStore->setMetadata($node, FileHasher::METADATA_HASH_NAMESPACE, $hashMeta, false, AJXP_METADATA_SCOPE_GLOBAL);
                 }
 
@@ -78,49 +84,4 @@ class FileHasher extends AJXP_Plugin
         $this->metaStore->removeMetadata($oldNode, FileHasher::METADATA_HASH_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
     }
 
-    /**
-     * @param AJXP_Node $node
-     */
-    public function processLockMeta($node){
-        // Transform meta into overlay_icon
-        // AJXP_Logger::debug("SHOULD PROCESS METADATA FOR ", $node->getLabel());
-        $lock = $this->metaStore->retrieveMetadata(
-           $node,
-           SimpleLockManager::METADATA_HASH_NAMESPACE,
-           false,
-           AJXP_METADATA_SCOPE_GLOBAL);
-        if(is_array($lock)
-            && array_key_exists("lock_user", $lock)){
-            if($lock["lock_user"] != AuthService::getLoggedUser()->getId()){
-                $node->mergeMetadata(array(
-                    "sl_locked" => "true",
-                    "overlay_icon" => "meta_simple_lock/ICON_SIZE/lock.png"
-                ), true);
-            }else{
-                $node->mergeMetadata(array(
-                    "sl_locked" => "true",
-                    "sl_mylock" => "true",
-                    "overlay_icon" => "meta_simple_lock/ICON_SIZE/lock_my.png"
-                ), true);
-            }
-        }
-    }
-
-    /**
-     * @param AJXP_Node $node
-     */
-    public function checkFileLock($node){
-        AJXP_Logger::debug("SHOULD CHECK LOCK METADATA FOR ", $node->getLabel());
-        $lock = $this->metaStore->retrieveMetadata(
-           $node,
-           SimpleLockManager::METADATA_HASH_NAMESPACE,
-           false,
-           AJXP_METADATA_SCOPE_GLOBAL);
-        if(is_array($lock)
-            && array_key_exists("lock_user", $lock)
-            && $lock["lock_user"] != AuthService::getLoggedUser()->getId()){
-            $mess = ConfService::getMessages();
-            throw new Exception($mess["meta.simple_lock.5"]);
-        }
-    }
 }
