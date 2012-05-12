@@ -78,7 +78,7 @@ class FileHasher extends AJXP_Plugin
         }
     }
 
-    public function invalidateHash($oldNode, $newNode, $copy){
+    public function invalidateHash($oldNode = null, $newNode = null, $copy = false){
         if($this->metaStore == false) return;
         if($oldNode == null) return;
         $this->metaStore->removeMetadata($oldNode, FileHasher::METADATA_HASH_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);

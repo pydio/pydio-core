@@ -95,6 +95,8 @@ class PixlrEditor extends AJXP_Plugin {
       if ($content_type[0] != "image"){
         throw new AJXP_Exception("Invalid File Type");
       }
+        $content_length = intval($headers["Content-Length"]);
+        if($content_length != 0) AJXP_Controller::applyHook("node.before_change", array(&$node, $content_length));
       
       $orig = fopen($image, "r");
       $target = fopen($destStreamURL.$file, "w");
