@@ -485,6 +485,20 @@ Class.create("Action", {
 			$(this.options.name+'_button_icon').title = this.options.title;
 		}
 	},
+
+    refreshInstances : function(){
+        $$('#action_instance_'+this.options.name).each(function(instance){
+            // Check img
+            var img;
+            if(instance.firstChild.nodeType == Node.ELEMENT_NODE && instance.firstChild.nodeName.toLowerCase()=="img"){
+                img = instance.firstChild.cloneNode(true);
+            }
+            instance.update(this.getKeyedText());
+            if(img){
+                instance.insert({top:img});
+            }
+        }.bind(this));
+    },
 	
 	/**
 	 * Grab its label from the i18n MessageHash

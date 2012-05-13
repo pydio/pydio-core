@@ -45,12 +45,16 @@ class AJXP_User extends AbstractAjxpUser
 
 	function AJXP_User($id, $storage=null){
 		parent::AbstractAjxpUser($id, $storage);
+        $this->registerForSave = array();
 	}
+
+    function __wakeup(){
+        $this->registerForSave = array();
+    }
 			
 	function storageExists(){		
 		return is_dir( AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".$this->getId() );
 	}
-				
 	
 	function load(){
 		$serialDir = $this->storage->getOption("USERS_DIRPATH");
@@ -115,6 +119,7 @@ class AJXP_User extends AbstractAjxpUser
         if(isSet($this->registerForSave["bookmarks"])){
             AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
         }
+        $this->registerForSave = array();
     }
 	
 	function getTemporaryData($key){

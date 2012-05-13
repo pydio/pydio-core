@@ -90,6 +90,7 @@ Class.create("UserWidget", {
 		var actions = ajaxplorer.actionBar.getActionsForAjxpWidget("UserWidget", this.element.id).each(function(action){
 			menuItems.push({
 				name:action.getKeyedText(),
+                action_id:action.options.name,
 				alt:action.options.title,
 				image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),						
 				callback:function(e){this.apply();}.bind(action)

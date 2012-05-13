@@ -186,13 +186,17 @@ Proto.Menu = Class.create({
 				newItem.insert(arrowContainer);
                 newItem.setStyle({position:"relative"});
 			}
-			
+			if(item.action_id && ajaxplorer && ajaxplorer.getActionBar() && ajaxplorer.getActionBar().getActionByName(item.action_id)){
+                item.name = ajaxplorer.getActionBar().getActionByName(item.action_id).getKeyedText();
+                item.title = ajaxplorer.getActionBar().getActionByName(item.action_id).options.title;
+            }
 			newItem.insert(
 					item.separator 
 						? '' 
 						: Object.extend(new Element('a', {
 							href: '#',
 							title: item.alt,
+                            id:(item.action_id?'action_instance_'+item.action_id:''),
 							className: (item.className?item.className+' ':'') + (item.disabled ? 'disabled' : 'enabled'),
 							style:(item.isDefault?'font-weight:bold':'')
 						}), { _callback: item.callback })
