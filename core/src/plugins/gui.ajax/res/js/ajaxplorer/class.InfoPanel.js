@@ -328,8 +328,10 @@ Class.create("InfoPanel", AjxpPane, {
 		actions.each(function(action){
 			if(selectionType == 'empty' && action.context.selection) return;
 			if(selectionType == 'multiple' && action.selectionContext.unique) return; 
-			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;			
-			actionString += '<a href="" onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
+			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;
+            var id ="";
+            if(action.options.name) id = 'id="action_instance_'+action.options.name+'"';
+			actionString += '<a href="" '+id+' onclick="ajaxplorer.actionBar.fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
 			count++;
 		}.bind(this));
 		actionString += '</div>';

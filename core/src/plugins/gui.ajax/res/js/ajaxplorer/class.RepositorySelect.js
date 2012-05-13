@@ -159,6 +159,7 @@ Class.create("RepositorySelect", {
             menuItems.push({
                 name:otherAction.getKeyedText(),
                 alt:otherAction.options.title,
+                action_id:otherAction.options.name,
                 className:"edit",
                 image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
                 callback:function(e){this.apply();}.bind(otherAction)
