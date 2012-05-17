@@ -29,6 +29,11 @@ class multiAuthDriver extends AbstractAuthDriver {
 	var $driverName = "multi";
 	var $driversDef = array();
 	var $currentDriver;
+
+    var $masterSlaveMode = false;
+    var $masterName;
+    var $slaveName;
+
 	/**
 	 * @var $drivers AbstractAuthDriver[]
 	 */
@@ -38,6 +43,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 		//parent::init($options);
 		$this->options = $options;
 		$this->driversDef = $this->getOption("DRIVERS");
+        $this->masterSlaveMode = ($this->getOption("MODE") == "MASTER_SLAVE");
+        $this->masterName = $this->getOption("MASTER_DRIVER");
 		foreach($this->driversDef as $def){
 			$name = $def["NAME"];
 			$options = $def["OPTIONS"];
@@ -48,6 +55,9 @@ class multiAuthDriver extends AbstractAuthDriver {
 				throw new Exception("Cannot find plugin $name for type 'auth'");
 			}
 			$instance->init($options);
+            if($this->masterSlaveMode && $name != $this->getOption("MASTER_DRIVER")){
+                $this->slaveName = $name;
+            }
 			$this->drivers[$name] = $instance;
 		}
 		// THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
@@ -79,6 +89,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
+        if($this->masterSlaveMode) return;
 		if($contribNode->nodeName != "actions") return ;
 		// Replace callback code
 		$actionXpath=new DOMXPath($contribNode->ownerDocument);
@@ -146,6 +157,14 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function preLogUser($remoteSessionId){
+        if($this->masterSlaveMode){
+            $this->drivers[$this->slaveName]->preLogUser($remoteSessionId);
+            if(AuthService::getLoggedUser() == null){
+                return $this->drivers[$this->masterName]->preLogUser($remoteSessionId);
+            }
+            return;
+        }
+
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->preLogUser($remoteSessionId);
 		}else{
@@ -154,6 +173,15 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function userExists($login){
+        if($this->masterSlaveMode){
+            if($this->drivers[$this->slaveName]->userExists($login)){
+                return true;
+            }
+            if($this->drivers[$this->masterName]->userExists($login)){
+                return true;
+            }
+            return false;
+        }
 		$login = $this->extractRealId($login);
 		AJXP_Logger::debug("user exists ".$login);
 		if($this->getCurrentDriver()){
@@ -164,6 +192,25 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function checkPassword($login, $pass, $seed){
+        if($this->masterSlaveMode){
+            if($this->drivers[$this->masterName]->userExists($login)){
+                // check master, and refresh slave if necessary
+                if($this->drivers[$this->masterName]->checkPassword($login, $pass, $seed)){
+                    if($this->drivers[$this->slaveName]->userExists($login)){
+                        $this->drivers[$this->slaveName]->changePassword($login, $pass);
+                    }else{
+                        $this->drivers[$this->slaveName]->createUser($login, $pass);
+                    }
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                $res = $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
+                return $res;
+            }
+        }
+
 		$login = $this->extractRealId($login);
 		AJXP_Logger::debug("check pass ".$login);
 		if($this->getCurrentDriver()){
@@ -174,6 +221,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function usersEditable(){
+        if($this->masterSlaveMode) return true;
+
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->usersEditable();
 		}else{
@@ -182,6 +231,8 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function passwordsEditable(){
+        if($this->masterSlaveMode) return true;
+
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->passwordsEditable();
 		}else{
@@ -192,6 +243,10 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function createUser($login, $passwd){
+        if($this->masterSlaveMode){
+            return $this->drivers[$this->slaveName]->createUser($login, $passwd);
+        }
+
 		$login = $this->extractRealId($login);		
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->createUser($login, $passwd);
@@ -201,6 +256,10 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 	
 	function changePassword($login, $newPass){
+        if($this->masterSlaveMode){
+            return $this->drivers[$this->slaveName]->changePassword($login, $newPass);
+        }
+
 		if($this->getCurrentDriver() && $this->getCurrentDriver()->usersEditable()){
 			return $this->getCurrentDriver()->changePassword($login, $newPass);
 		}else{
@@ -209,6 +268,10 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}	
 
 	function deleteUser($login){
+        if($this->masterSlaveMode){
+            return $this->drivers[$this->slaveName]->deleteUser($login);
+        }
+
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->deleteUser($login);
 		}else{
@@ -217,6 +280,10 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 
 	function getUserPass($login){
+        if($this->masterSlaveMode){
+            return $this->drivers[$this->slaveName]->getUserPass($login);
+        }
+
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->getUserPass($login);
 		}else{
@@ -225,6 +292,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function filterCredentials($userId, $pwd){
+        if($this->masterSlaveMode) return array($userId, $pwd);
 		return array($this->extractRealId($userId), $pwd);
 	}	
 

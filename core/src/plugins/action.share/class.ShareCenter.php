@@ -635,7 +635,12 @@ class ShareCenter extends AJXP_Plugin{
                 // check that it's a child user
                 $userObject = $confDriver->createUserObject($userName);
             }else{
-                AuthService::createUser($userName, md5($httpVars["shared_pass"]));
+                if(ConfService::getAuthDriverImpl()->getOption("TRANSMIT_CLEAR_PASS")){
+                    $pass = $httpVars["shared_pass"];
+                }else{
+                    $pass = md5($httpVars["shared_pass"]);
+                }
+                AuthService::createUser($userName, $pass);
                 $userObject = $confDriver->createUserObject($userName);
                 $userObject->clearRights();
                 $userObject->setParent($loggedUser->id);
