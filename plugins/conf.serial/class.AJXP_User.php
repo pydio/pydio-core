@@ -41,7 +41,7 @@ class AJXP_User extends AbstractAjxpUser
 	 */
 	var $storage;
 	var $registerForSave = array();
-
+    var $create = true;
 
 	function AJXP_User($id, $storage=null){
 		parent::AbstractAjxpUser($id, $storage);
@@ -57,8 +57,10 @@ class AJXP_User extends AbstractAjxpUser
 	}
 	
 	function load(){
+        $this->create = false;
 		$serialDir = $this->storage->getOption("USERS_DIRPATH");
 		$this->rights = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/rights.ser");
+        if(count($this->rights) == 0) $this->create = true;
 		$this->prefs = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/prefs.ser");
 		$this->bookmarks = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/bookmarks.ser");
 		if(isSet($this->rights["ajxp.admin"]) && $this->rights["ajxp.admin"] === true){
@@ -110,7 +112,7 @@ class AJXP_User extends AbstractAjxpUser
         $serialDir = $this->storage->getOption("USERS_DIRPATH");
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
-        if(isSet($this->registerForSave["rights"])){
+        if(isSet($this->registerForSave["rights"]) || $this->create){
             AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
         }
         if(isSet($this->registerForSave["prefs"])){

@@ -957,7 +957,19 @@ class ConfService
                 $pServ->setPluginActive($split[0], $split[1]);
 			}
 		}
-		$this->configs["ACCESS_DRIVER"] = $plugInstance;	
+        if(count($this->errors)>0){
+            $e = new AJXP_Exception("Error while loading repository feature : ".implode(",",$this->errors));
+			// Remove repositories from the lists
+			unset($this->configs["REPOSITORIES"][$crtRepository->getId()]);
+            if(isSet($_SESSION["PREVIOUS_REPO_ID"]) && $_SESSION["PREVIOUS_REPO_ID"] !=$crtRepository->getId()){
+                $this->switchRootDir($_SESSION["PREVIOUS_REPO_ID"]);
+            }else{
+                $this->switchRootDir();
+            }
+			throw $e;
+        }
+
+		$this->configs["ACCESS_DRIVER"] = $plugInstance;
 		return $this->configs["ACCESS_DRIVER"];
 	}
 

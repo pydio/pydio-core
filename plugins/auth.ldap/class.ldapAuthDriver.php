@@ -45,9 +45,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
-        if ($options["LDAP_FILTER"]){
+        if (isSet($options["LDAP_FILTER"])){
             $this->ldapFilter = $options["LDAP_FILTER"];
-            if (!preg_match("/^\(.*\)$/", $this->ldapFilter)) {
+            if ($this->ldapFilter != "" &&  !preg_match("/^\(.*\)$/", $this->ldapFilter)) {
                 $this->ldapFilter = "(" . $this->ldapFilter . ")";
             }
         } else {
@@ -102,7 +102,8 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($login == null){
             $filter = $this->ldapFilter;
         } else {
-            $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
+            if($this->ldapFilter == "") $filter = "(" . $this->ldapUserAttr . "=" . $login . ")";
+            else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
         if(is_array($this->ldapDN)) {
                 $entries=array('count'=>0);
