@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="action.scheduler" label="CONF_MESSAGE[Tasks Scheduler]" description="CONF_MESSAGE[Register tasks to be run on a regular basis instead of writing them one by one in cron tab.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <client_settings>
+        <resources>
+            <i18n namespace="action_scheduler" path="plugins/action.scheduler/res/i18n"/>
+        </resources>
+    </client_settings>
+    <registry_contributions>
+        <actions>
+            <action name="run_scheduler">
+                <gui text="292" title="292" src="share.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden"
+                        actionBar="true" contextMenu="true" infoPanel="true"
+                        actionBarGroup="put">
+                    </context>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                        var connexion = new Connexion();
+                        connexion.setParameters(new Hash({get_action:'run_scheduler'}));
+                        connexion.sendAsync();
+                    ]]></clientCallback>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                    </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+    <class_definition filename="plugins/action.scheduler/class.AjxpScheduler.php" classname="AjxpScheduler"/>
+    <dependencies>
+        <activePlugin pluginName="access.ajxp_conf"/>
+    </dependencies>
+</ajxp_plugin>
