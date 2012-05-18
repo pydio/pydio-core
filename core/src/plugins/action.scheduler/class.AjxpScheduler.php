@@ -23,7 +23,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class AjxpScheduler extends AJXP_Plugin{
 
+    var $db;
 
+    function __construct($id, $baseDir){
+        parent::__construct($id, $baseDir);
+        $this->db =AJXP_DATA_PATH."/plugins/action.scheduler/calendar.json" ;
+        if(!is_dir(dirname($this->db))) mkdir(dirname($this->db), 0755, true);
+    }
 
     function switchAction($action, $httpVars, $postProcessData){
 
@@ -86,6 +92,18 @@ class AjxpScheduler extends AJXP_Plugin{
         AJXP_XMLWriter::renderNode("/admin/scheduler/task1", "Task 1", true, array("task_schedule" => date($mess["date_format"], $res) ));
         AJXP_XMLWriter::close();
 
+    }
+
+    function addTask($action, $httpVars, $fileVars){
+        $data = array();
+        $data["SCHEDULE"] = $httpVars["schedule"];
+        $data["ACTION"] = $httpVars["action_name"];
+        $data["REPOSITORY_ID"] =$httpVars["repository_id"];
+        $data["PARAMS"] = array();
+        foreach($httpVars as $key => $value){
+            if(preg_match('/^PARAM_/', $key)) $data["PARAMS"][str_replace("PARAM_", "", $key)] = $value;
+        }
+        file_put_contents($this->db, json_encode($data));
     }
 
     function getNextExecutionTimeForScript($referenceTime, $timeArray)
