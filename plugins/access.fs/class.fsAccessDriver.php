@@ -1808,6 +1808,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			"CREATE" => false, 
 			"RECYCLE_BIN" => "", 
 			"DEFAULT_RIGHTS" => "");
+        if($repository->getOption("USE_SESSION_CREDENTIALS")===true){
+            $newOptions["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
+        }
     	return $newOptions;			
     }
 

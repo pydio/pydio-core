@@ -922,6 +922,32 @@ class ConfService
 		$accessType = $crtRepository->getAccessType();
 		$pServ = AJXP_PluginsService::getInstance();
 		$plugInstance = $pServ->getPluginByTypeName("access", $accessType);
+
+        // TRIGGER BEFORE INIT META
+        $metaSources = $crtRepository->getOption("META_SOURCES");
+        if(isSet($metaSources) && is_array($metaSources) && count($metaSources)){
+            $keys = array_keys($metaSources);
+            foreach ($keys as $plugId){
+                if($plugId == "") continue;
+                $split = explode(".", $plugId);
+                $instance = $pServ->getPluginById($plugId);
+                if(!is_object($instance)) {
+                    continue;
+                }
+                if(!method_exists($instance, "beforeInitMeta")){
+                    continue;
+                }
+                try{
+                    $instance->init($metaSources[$plugId]);
+                    $instance->beforeInitMeta($plugInstance);
+                }catch(Exception $e){
+                    AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    $this->errors[] = $e->getMessage();
+                }
+            }
+        }
+
+        // INIT MAIN DRIVER
 		$plugInstance->init($crtRepository);
 		try{
 			$plugInstance->initRepository();
@@ -937,6 +963,7 @@ class ConfService
 		}
 		$pServ->setPluginUniqueActiveForType("access", $accessType);			
 		
+        // TRIGGER INIT META
 		$metaSources = $crtRepository->getOption("META_SOURCES");
 		if(isSet($metaSources) && is_array($metaSources) && count($metaSources)){
 			$keys = array_keys($metaSources);			
