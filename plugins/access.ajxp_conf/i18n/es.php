@@ -134,6 +134,7 @@ $mess=array(
 "112" => "<b>Aplique este rol por defecto</b> a los nuevos usuarios.",
 "113" => "Estado del rol modificado con éxito",
 "114" => "Por defecto",
+"115" => "Scheme",
 /* END SENTENCE */
 );
 ?>

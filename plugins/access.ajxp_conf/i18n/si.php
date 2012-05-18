@@ -135,5 +135,6 @@ $mess=array(
 "112" => "<b>Apply this role by default</b> to all new users.",
 "113" => "Role status was successfully modified",
 "114" => "Default",
+"115" => "Scheme",
 );
 ?>

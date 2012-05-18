@@ -134,6 +134,7 @@ $mess=array(
 "112" => "<b>Appliquer ce rôle par défaut</b> à tous les nouveaux utilisateurs.",
 "113" => "Le rôle a été modifié avec succès",
 "114" => "Defaut",
+"115" => "Schema",
 /* END SENTENCE */
 );
 ?>

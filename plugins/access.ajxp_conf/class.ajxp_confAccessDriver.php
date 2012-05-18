@@ -1040,12 +1040,22 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	}
 	
 	function listUsers(){
-		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.users">
-			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
-			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="10%"/>
-			<column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
-			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
-			</columns>');		
+        $columns = '<columns switchGridMode="filelist" template_name="ajxp_conf.users">
+        			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
+        			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="10%"/>
+        			<column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
+        			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
+        			</columns>';
+        if(AuthService::driverSupportsAuthSchemes()){
+            $columns = '<columns switchGridMode="filelist" template_name="ajxp_conf.users">
+            			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
+            			<column messageId="ajxp_conf.115" attributeName="auth_scheme" sortType="String" defaultWidth="5%"/>
+            			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="5%"/>
+            			<column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
+            			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
+            </columns>';
+        }
+		AJXP_XMLWriter::sendFilesListComponentConfig($columns);
 		if(!AuthService::usersEnabled()) return ;
 		$users = AuthService::listUsers();
 		$mess = ConfService::getMessages();
@@ -1081,9 +1091,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				$rightsString = implode(", ", $r);
 			}
-			AJXP_XMLWriter::renderNode("/users/".$userId, $userId, true, array(
+            $nodeLabel = $userId;
+            $scheme = AuthService::getAuthScheme($userId);
+			AJXP_XMLWriter::renderNode("/users/".$userId, $nodeLabel, true, array(
 				"isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")], 
-				"icon" => $icon.".png",				
+				"icon" => $icon.".png",
+                "auth_scheme" => ($scheme != null? $scheme : ""),
 				"rights_summary" => $rightsString,
 				"ajxp_roles" => implode(", ", array_keys($userObject->getRoles())),
 				"ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":"")
