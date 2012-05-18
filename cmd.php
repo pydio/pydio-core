@@ -20,7 +20,7 @@
  *
  * Description : Command line access of the framework.
  */
-if(!defined("STDIN")){
+if(php_sapi_name() !== "cli"){
 	die("This is the command line version of the framework, you are not allowed to access this page");
 }
 

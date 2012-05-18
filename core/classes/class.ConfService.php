@@ -191,7 +191,7 @@ class ConfService
      * @return bool
      */
 	public static function currentContextIsCommandLine(){
-		return defined('STDIN');
+		return php_sapi_name() === "cli";
 	}
 	/**
      * Check the presence of mcrypt and option CMDLINE_ACTIVE
