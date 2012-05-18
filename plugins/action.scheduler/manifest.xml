@@ -32,6 +32,11 @@
                     <serverCallback methodName="switchAction" applyCondition="$apply=($httpVars['dir']=='/admin');" capture="true"/>
                 </post_processing>
             </action>
+            <action name="scheduler_addTask">
+                <processing>
+                    <serverCallback methodName="addTask"/>
+                </processing>
+            </action>
         </actions>
     </registry_contributions>
     <class_definition filename="plugins/action.scheduler/class.AjxpScheduler.php" classname="AjxpScheduler"/>
