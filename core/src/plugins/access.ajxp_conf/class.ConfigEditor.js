@@ -576,8 +576,19 @@ ConfigEditor = Class.create({
 		extraParams.each( function(input){
 			parameters.set('DRIVER_OPTION_'+input.name, input.value);
 		});
-		this.submitForm("create_user", 'create_user', parameters, null);
-		return true;		
+        var newUserName = login.value;
+		this.submitForm("create_user", 'create_user', parameters, null, function(responseXML){
+            // success callback
+            hideLightBox();
+            var loadFunc = function(oForm){
+                this.setForm(oForm);
+                this.loadUser(newUserName);
+            }.bind(this);
+            modal.showDialogForm('', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);
+        }.bind(this), function(responseXML){
+            // error callback;
+        });
+		return false;
 	},
 
 	deleteUser: function(){

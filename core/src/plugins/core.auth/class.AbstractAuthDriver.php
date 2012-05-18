@@ -198,19 +198,37 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	
 	function preLogUser($sessionId){}	
 
+    /**
+     * @return Array
+     */
 	function listUsers(){}
+    /**
+     * @param $login
+     * @return boolean
+     */
 	function userExists($login){}	
 	function checkPassword($login, $pass, $seed){}
 	function createCookieString($login){}
-	
-	
+
+
 	function usersEditable(){}
 	function passwordsEditable(){}
 	
 	function createUser($login, $passwd){}	
 	function changePassword($login, $newPass){}	
 	function deleteUser($login){}
-	
+
+    function supportsAuthSchemes(){
+        return false;
+    }
+    /**
+     * @param $login
+     * @return String
+     */
+    function getAuthScheme($login){
+        return null;
+    }
+
 	function getLoginRedirect(){
 		if(isSet($this->options["LOGIN_REDIRECT"])){
 			return $this->options["LOGIN_REDIRECT"];

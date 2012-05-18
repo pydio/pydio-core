@@ -73,17 +73,23 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	}	
 			
 	function listUsers(){
-		return AJXP_Utils::loadSerialFile($this->usersSerFile);
+		$users = AJXP_Utils::loadSerialFile($this->usersSerFile);
+        if(AuthService::ignoreUserCase()){
+            $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
+        }
+        return $users;
 	}
 	
 	function userExists($login){
 		$users = $this->listUsers();
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		if(!is_array($users) || !array_key_exists($login, $users)) return false;
 		return true;
 	}	
 	
 	function checkPassword($login, $pass, $seed){	
 
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		global $AJXP_GLUE_GLOBALS;
 		if(isSet($AJXP_GLUE_GLOBALS)){
 			$userStoredPass = $this->getUserPass($login);
@@ -133,6 +139,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function createUser($login, $passwd){
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		$users = $this->listUsers();
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
@@ -144,6 +151,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);		
 	}	
 	function changePassword($login, $newPass){
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		$users = $this->listUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
@@ -154,6 +162,7 @@ class remoteAuthDriver extends AbstractAuthDriver {
 		AJXP_Utils::saveSerialFile($this->usersSerFile, $users);
 	}	
 	function deleteUser($login){
+        if(AuthService::ignoreUserCase()) $login = strtolower($login);
 		$users = $this->listUsers();
 		if(is_array($users) && array_key_exists($login, $users))
 		{

@@ -34,6 +34,8 @@ class multiAuthDriver extends AbstractAuthDriver {
     var $masterName;
     var $slaveName;
 
+    static $schemesCache = array();
+
 	/**
 	 * @var $drivers AbstractAuthDriver[]
 	 */
@@ -144,8 +146,32 @@ class multiAuthDriver extends AbstractAuthDriver {
 			$driver->performChecks();
 		}
 	}
-	
+
+    function getAuthScheme($login){
+        if(isSet(multiAuthDriver::$schemesCache[$login])){
+            return multiAuthDriver::$schemesCache[$login];
+        }
+        return null;
+    }
+
+    function supportsAuthSchemes(){
+        return true;
+    }
+
+    function addToCache($usersList, $scheme){
+        foreach($usersList as $userName){
+            multiAuthDriver::$schemesCache[$userName] = $scheme;
+        }
+    }
+
 	function listUsers(){
+        if($this->masterSlaveMode){
+            $masterUsers = $this->drivers[$this->slaveName]->listUsers();
+            $this->addToCache(array_keys($masterUsers), $this->slaveName);
+            $slaveUsers = $this->drivers[$this->masterName]->listUsers();
+            $this->addToCache(array_keys($slaveUsers), $this->masterName);
+            return array_merge($masterUsers, $slaveUsers);
+        }
 		if($this->getCurrentDriver()){
 			return $this->getCurrentDriver()->listUsers();
 		}

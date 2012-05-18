@@ -987,6 +987,7 @@ class AJXP_Utils
      * Load an array stored serialized inside a file.
      *
      * @param String $filePath Full path to the file
+     * @param Boolean $skipCheck do not test for file existence before opening
      * @return Array
      */
     static function loadSerialFile($filePath, $skipCheck = false)

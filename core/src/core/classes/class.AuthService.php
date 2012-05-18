@@ -183,6 +183,18 @@ class AuthService
         return !AuthService::checkBruteForceLogin($loginAttempt);
     }
 
+    static function filterUserSensitivity($user){
+        if(!ConfService::getCoreConf("CASE_SENSITIVE", "auth")){
+            return strtolower($user);
+        }else{
+            return $user;
+        }
+    }
+
+    static function ignoreUserCase(){
+        return !ConfService::getCoreConf("CASE_SENSITIVE", "auth");
+    }
+
     /**
      * @static
      * @param AbstractAjxpUser $user
@@ -229,6 +241,7 @@ class AuthService
      */
 	static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
 	{
+        $user_id = self::filterUserSensitivity($user_id);
         if($cookieLogin && !isSet($_COOKIE["AjaXplorer-remember"])){
             return -5; // SILENT IGNORE
         }
@@ -301,7 +314,7 @@ class AuthService
 		}
 		$_SESSION["AJXP_USER"] = $user;
 		if($authDriver->autoCreateUser() && !$user->storageExists()){
-			$user->save();
+			$user->save("superuser"); // make sure update rights now
 		}
 		AJXP_Logger::logAction("Log In");
 		return 1;
@@ -604,7 +617,17 @@ class AuthService
 		}
 		return $allUsers;
 	}
-		
+
+    static function getAuthScheme($userName){
+        $authDriver = ConfService::getAuthDriverImpl();
+        return $authDriver->getAuthScheme($userName);
+    }
+
+    static function driverSupportsAuthSchemes(){
+        $authDriver = ConfService::getAuthDriverImpl();
+        return $authDriver->supportsAuthSchemes();
+    }
+
 	/**
 	 * Get Role by Id
 	 *

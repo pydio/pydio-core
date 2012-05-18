@@ -127,14 +127,21 @@ class ldapAuthDriver extends AbstractAuthDriver {
         $persons = array();
         unset($entries['count']); // remove 'count' entry
         foreach($entries as $id => $person){
-            $persons[$person[$this->ldapUserAttr][0]] = "XXX";
+            $login = $person[$this->ldapUserAttr][0];
+            if(AuthService::ignoreUserCase()) $login = strtolower($login);
+            $persons[$login] = "XXX";
         }
         return $persons;
     }
 
 	function userExists($login){
         $entries = $this->getUserEntries($login);
-		if(!is_array($entries) || strcmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) return false;
+        if(!is_array($login)) return false;
+        if(AuthService::ignoreUserCase() && strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
+            return false;
+        }else if(strcmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
+            return false;
+        }
 		return true;
     }
 
@@ -149,7 +156,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             }
             return false;
         } else {
-            AJXP_Logger::logAction("Ldap Password Check:No user $user_id found");
+            AJXP_Logger::logAction("Ldap Password Check:No user $login found");
             return false;
         }
     }
