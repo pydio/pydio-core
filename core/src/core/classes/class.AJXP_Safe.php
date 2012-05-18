@@ -115,9 +115,12 @@ class AJXP_Safe{
      * Load the credentials from session
      * @return
      */
-	public function load(){
-		if(empty($_SESSION["AJXP_SAFE_CREDENTIALS"])) return;
-		$sessData = base64_decode($_SESSION["AJXP_SAFE_CREDENTIALS"]);
+	public function load($encodedString = ""){
+        if($encodedString == "" && !empty($_SESSION["AJXP_SAFE_CREDENTIALS"])){
+            $encodedString = $_SESSION["AJXP_SAFE_CREDENTIALS"];
+        }
+		if(empty($encodedString)) return;
+		$sessData = base64_decode($encodedString);
 		$parts = explode($this->separator, $sessData);
 		$this->user = $parts[0];
 		$this->encodedPassword = $parts[1];
@@ -182,6 +185,16 @@ class AJXP_Safe{
 		$inst->load();
 		return $inst->getCredentials();
 	}
+
+    public static function getEncodedCredentialString(){
+        return $_SESSION["AJXP_SAFE_CREDENTIALS"];
+    }
+
+    public static function getCredentialsFromEncodedString($encoded){
+        $tmpInstance = new AJXP_Safe();
+        $tmpInstance->load($encoded);
+        return $tmpInstance->getCredentials();
+    }
 		
 	/**
 	 * Will try to get the credentials for a given repository as follow :
@@ -222,7 +235,11 @@ class AJXP_Safe{
 			$user = $repository->getOption($optionsPrefix."USER");
 			$password = $repository->getOption($optionsPrefix."PASS");
 		}
-		// 4. Try from session		
+        // 4. Test if there are encoded credentials available
+        if($user == "" && $repository->getOption("ENCODED_CREDENTIALS") != ""){
+            list($user, $password) = AJXP_Safe::getCredentialsFromEncodedString($repository->getOption("ENCODED_CREDENTIALS"));
+        }
+		// 5. Try from session
 		if($user=="" && ( $repository->getOption("USE_SESSION_CREDENTIALS") || self::getInstance()->forceSessionCredentials )){
 			$safeCred = AJXP_Safe::loadCredentials();
 			if($safeCred !== false){			

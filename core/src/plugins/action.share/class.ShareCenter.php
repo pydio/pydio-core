@@ -551,6 +551,8 @@ class ShareCenter extends AJXP_Plugin{
             }
             if(!AuthService::userExists($newshareduser)){
                 array_push($users, $newshareduser);
+            }else{
+                throw new Exception("User already exists, please choose another name.");
             }
         }
 		//$userName = AJXP_Utils::decodeSecureMagic($httpVars["shared_user"], AJXP_SANITIZE_ALPHANUM);
@@ -604,6 +606,11 @@ class ShareCenter extends AJXP_Plugin{
         }else{
             if($repository->getOption("META_SOURCES")){
                 $options["META_SOURCES"] = $repository->getOption("META_SOURCES");
+                foreach($options["META_SOURCES"] as $index => $data){
+                    if(isSet($data["USE_SESSION_CREDENTIALS"]) && $data["USE_SESSION_CREDENTIALS"] === true){
+                        $options["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
+                    }
+                }
             }
             $newRepo = $repository->createSharedChild(
                 $label,

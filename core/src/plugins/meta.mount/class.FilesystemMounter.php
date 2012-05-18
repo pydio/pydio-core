@@ -25,18 +25,30 @@ class FilesystemMounter extends AJXP_Plugin
 {
     protected $accessDriver;
 
-    public function initMeta($accessDriver){
+    public function beforeInitMeta($accessDriver){
         $this->accessDriver = $accessDriver;
         if($this->isAlreadyMounted()) return;
         $this->mountFS();
+    }
+
+    public function initMeta($accessDriver){
+        $this->accessDriver = $accessDriver;
+        /*
+        if($this->isAlreadyMounted()) return;
+        $this->mountFS();
+        */
     }
 
     protected function getCredentials(){
 		// 1. Try from plugin config
         $user = $this->options["USER"];
         $password = $this->options["PASS"];
+        // 1BIS : encoded?
+        if($user == "" && isSet($this->options["ENCODED_CREDENTIALS"])){
+            list($user,$password) = AJXP_Safe::getCredentialsFromEncodedString($this->options["ENCODED_CREDENTIALS"]);
+        }
 		// 2. Try from session
-		if($user=="" &&  $this->options["USE_SESSION_CREDENTIALS"] ){
+		if($user=="" &&  isSet($this->options["USE_SESSION_CREDENTIALS"]) ){
 			$safeCred = AJXP_Safe::loadCredentials();
 			if($safeCred !== false){
 				$user = $safeCred["user"];
