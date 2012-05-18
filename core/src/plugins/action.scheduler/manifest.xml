@@ -24,6 +24,14 @@
                     <serverCallback methodName="switchAction"></serverCallback>
                     </processing>
             </action>
+            <action name="ls">
+                <pre_processing>
+                    <serverCallback methodName="listTasks" applyCondition="$apply=($httpVars['dir']=='/admin/scheduler');"/>
+                </pre_processing>
+                <post_processing>
+                    <serverCallback methodName="switchAction" applyCondition="$apply=($httpVars['dir']=='/admin');" capture="true"/>
+                </post_processing>
+            </action>
         </actions>
     </registry_contributions>
     <class_definition filename="plugins/action.scheduler/class.AjxpScheduler.php" classname="AjxpScheduler"/>

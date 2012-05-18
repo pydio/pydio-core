@@ -25,7 +25,7 @@ class AjxpScheduler extends AJXP_Plugin{
 
 
 
-    function switchAction($action, $httpVars, $fileVars){
+    function switchAction($action, $httpVars, $postProcessData){
 
         switch($action){
 
@@ -34,6 +34,7 @@ class AjxpScheduler extends AJXP_Plugin{
             //------------------------------------
             case "run_scheduler":
 
+                $mess = ConfService::getMessages();
                 $timeArray = array();
                 $timeArray['minutes'] = '/2';
                 $timeArray['hours'] = '*';
@@ -45,7 +46,6 @@ class AjxpScheduler extends AJXP_Plugin{
                 $lastExec = time()-60*$masterInterval;
                 $res = $this->getNextExecutionTimeForScript(time()-60*$masterInterval, $timeArray);
                 if($res >= $lastExec && $res < $now){
-                    $mess = ConfService::getMessages();
                     echo "RUN NOW " .  date($mess["date_format"], $res) . " last exec was ". date($mess["date_format"], $lastExec);
                 }else{
                     echo "NOTHING TO DO";
@@ -53,9 +53,38 @@ class AjxpScheduler extends AJXP_Plugin{
 
             break;
 
+            case "ls":
+
+                $captured = $postProcessData["ob_output"];
+                $node = '<tree text="Scheduler" icon="susehelpcenter.png" filename="/admin/scheduler"/>';
+                print str_replace("</tree>", "$node</tree>", $captured);
+
+            break;
+
             default:
             break;
         }
+
+    }
+
+    function listTasks($action, $httpVars, $postProcessData){
+
+        AJXP_XMLWriter::renderHeaderNode("tree", "Scheduler", false);
+        AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
+     			<column messageId="Task Label" attributeName="ajxp_label" sortType="String"/>
+     			<column messageId="Next Schedule" attributeName="task_schedule" sortType="String"/>
+        </columns>');
+
+        $timeArray = array();
+        $timeArray['minutes'] = '/3';
+        $timeArray['hours'] = '*';
+        $timeArray['days'] = '*';
+        $timeArray['dayWeek'] = '1-6';
+        $timeArray['months'] = '*';
+        $res = $this->getNextExecutionTimeForScript(time(), $timeArray);
+        $mess =ConfService::getMessages();
+        AJXP_XMLWriter::renderNode("/admin/scheduler/task1", "Task 1", true, array("task_schedule" => date($mess["date_format"], $res) ));
+        AJXP_XMLWriter::close();
 
     }
 
