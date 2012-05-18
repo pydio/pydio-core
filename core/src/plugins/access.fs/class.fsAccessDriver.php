@@ -618,7 +618,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
             case "lsync" :
 
-                if(!defined("STDIN")){
+                if(!ConfService::currentContextIsCommandLine()){
                     die("This command must be accessed via CLI only.");
                 }
                 $fromNode = null;
