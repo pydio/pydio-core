@@ -75,35 +75,67 @@ class AjxpScheduler extends AJXP_Plugin{
 
     function listTasks($action, $httpVars, $postProcessData){
 
+        $mess =ConfService::getMessages();
         AJXP_XMLWriter::renderHeaderNode("tree", "Scheduler", false);
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
-     			<column messageId="Task Label" attributeName="ajxp_label" sortType="String"/>
-     			<column messageId="Next Schedule" attributeName="task_schedule" sortType="String"/>
+     			<column messageId="action.scheduler.1" attributeName="ajxp_label" sortType="String"/>
+     			<column messageId="action.scheduler.2" attributeName="SCHEDULE" sortType="String"/>
+     			<column messageId="action.scheduler.3" attributeName="NEXT_EXECUTION" sortType="String"/>
+     			<column messageId="action.scheduler.4" attributeName="REPOSITORY_ID" sortType="String"/>
+     			<column messageId="action.scheduler.5" attributeName="PARAMS" sortType="String"/>
         </columns>');
+        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        foreach ($tasks as $task){
 
-        $timeArray = array();
-        $timeArray['minutes'] = '/3';
-        $timeArray['hours'] = '*';
-        $timeArray['days'] = '*';
-        $timeArray['dayWeek'] = '1-6';
-        $timeArray['months'] = '*';
-        $res = $this->getNextExecutionTimeForScript(time(), $timeArray);
-        $mess =ConfService::getMessages();
-        AJXP_XMLWriter::renderNode("/admin/scheduler/task1", "Task 1", true, array("task_schedule" => date($mess["date_format"], $res) ));
+            $timeArray = $this->getTimeArray($task["SCHEDULE"]);
+            $res = $this->getNextExecutionTimeForScript(time(), $timeArray);
+                $task["NEXT_EXECUTION"] = date($mess["date_format"], $res);
+                $task["PARAMS"] = implode(", ", $task["PARAMS"]);
+
+                AJXP_XMLWriter::renderNode("/admin/scheduler/".$task["ID"],
+                    "Action ".$task["ACTION"],
+                    true,
+                    $task
+                );
+            }
         AJXP_XMLWriter::close();
 
     }
 
-    function addTask($action, $httpVars, $fileVars){
-        $data = array();
-        $data["SCHEDULE"] = $httpVars["schedule"];
-        $data["ACTION"] = $httpVars["action_name"];
-        $data["REPOSITORY_ID"] =$httpVars["repository_id"];
-        $data["PARAMS"] = array();
-        foreach($httpVars as $key => $value){
-            if(preg_match('/^PARAM_/', $key)) $data["PARAMS"][str_replace("PARAM_", "", $key)] = $value;
+    function getTimeArray($schedule){
+        $parts = explode(" ", $schedule);
+        $timeArray['minutes'] = $parts[0];
+        $timeArray['hours'] = $parts[1];
+        $timeArray['days'] = $parts[2];
+        $timeArray['dayWeek'] = $parts[3];
+        $timeArray['months'] = $parts[4];
+        return $timeArray;
+    }
+
+
+    function handleTasks($action, $httpVars, $fileVars){
+
+        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        switch ($action){
+            case "scheduler_addTask":
+                $data["ID"] = substr(md5(time()), 0, 16);
+                $data["SCHEDULE"] = $httpVars["schedule"];
+                $data["ACTION"] = $httpVars["action_name"];
+                $data["REPOSITORY_ID"] =$httpVars["repository_id"];
+                $data["PARAMS"] = array();
+                foreach($httpVars as $key => $value){
+                    if(preg_match('/^PARAM_/', $key)) $data["PARAMS"][str_replace("PARAM_", "", $key)] = $value;
+                }
+                $tasks[] = $data;
+            break;
+
+            default:
+            break;
         }
-        file_put_contents($this->db, json_encode($data));
+
+        var_dump($tasks);
+        AJXP_Utils::saveSerialFile($this->db, $tasks, true, false, "json");
+
     }
 
     function getNextExecutionTimeForScript($referenceTime, $timeArray)

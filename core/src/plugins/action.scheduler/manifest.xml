@@ -2,26 +2,19 @@
 <ajxp_plugin id="action.scheduler" label="CONF_MESSAGE[Tasks Scheduler]" description="CONF_MESSAGE[Register tasks to be run on a regular basis instead of writing them one by one in cron tab.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
-            <i18n namespace="action_scheduler" path="plugins/action.scheduler/res/i18n"/>
+            <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="run_scheduler">
-                <gui text="292" title="292" src="share.png" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden"
-                        actionBar="true" contextMenu="true" infoPanel="true"
-                        actionBarGroup="put">
-                    </context>
-                </gui>
-                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         var connexion = new Connexion();
                         connexion.setParameters(new Hash({get_action:'run_scheduler'}));
                         connexion.sendAsync();
                     ]]></clientCallback>
-                    <serverCallback methodName="switchAction"></serverCallback>
+                    <serverCallback methodName="switchAction"/>
                     </processing>
             </action>
             <action name="ls">
@@ -33,8 +26,42 @@
                 </post_processing>
             </action>
             <action name="scheduler_addTask">
+                <gui text="292" title="292" src="share.png" hasAccessKey="false">
+                    <context selection="false" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="put">
+                    </context>
+                </gui>
                 <processing>
-                    <serverCallback methodName="addTask"/>
+                    <clientCallback prepareModal="true" dialogOpenForm="scheduler-task-form" dialogOkButtonOnly="false" dialogSkipButtons="false">
+                       <dialogOnOpen><![CDATA[
+                           this.currentFormManager = new FormManager();
+                           this.currentFormManager.params = $A([
+                                    $H({name:'action',label:MessageHash['action.scheduler.1'], description:MessageHash['action.scheduler.1d'],type:'string', mandatory:true}),
+                                    $H({name:'schedule',label:MessageHash['action.scheduler.2'], description:MessageHash['action.scheduler.2d'],type:'string', mandatory:true}),
+                                    $H({name:'repository_id',label:MessageHash['action.scheduler.4'], description:MessageHash['action.scheduler.4d'],type:'string', mandatory:true}),
+                                    $H({name:'params',label:MessageHash['action.scheduler.5'], description:MessageHash['action.scheduler.5d'],type:'string', mandatory:true})
+                                ]);
+
+                           this.currentFormManager.createParametersInputs(
+                                $('scheduler-task-form'),
+                                this.currentFormManager.params,
+                                true
+                           );
+                       ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+                            var values = new Hash({});
+                           this.currentFormManager.serializeParametersInputs(
+                                $('scheduler-task-form'),
+                                values,
+                                '');
+                                console.log(values);
+                       ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="scheduler-task-form"><![CDATA[
+                        <div id="scheduler-task-form"></div>
+                    ]]></clientForm>
+                    <serverCallback methodName="handleTasks"/>
                 </processing>
             </action>
         </actions>
