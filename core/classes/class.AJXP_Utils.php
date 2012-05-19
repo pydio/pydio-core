@@ -990,18 +990,22 @@ class AJXP_Utils
      * @param Boolean $skipCheck do not test for file existence before opening
      * @return Array
      */
-    static function loadSerialFile($filePath, $skipCheck = false)
+    static function loadSerialFile($filePath, $skipCheck = false, $format="ser")
     {
         $filePath = AJXP_VarsFilter::filter($filePath);
         $result = array();
         if($skipCheck){
             $fileLines = @file($filePath);
-            if($fileLines !== false) $result = unserialize(implode("", $fileLines));
+            if($fileLines !== false) {
+                if($format == "ser") $result = unserialize(implode("", $fileLines));
+                else if($format == "json") $result = json_decode(implode("", $fileLines), true);
+            }
             return $result;
         }
         if (is_file($filePath)) {
             $fileLines = file($filePath);
-            $result = unserialize(implode("", $fileLines));
+            if($format == "ser") $result = unserialize(implode("", $fileLines));
+            else if($format == "json") $result = json_decode(implode("", $fileLines), true);
         }
         return $result;
     }
@@ -1014,7 +1018,7 @@ class AJXP_Utils
      * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
      * @param bool $silent Silently write the file, are throw an exception on problem.
      */
-    static function saveSerialFile($filePath, $value, $createDir = true, $silent = false)
+    static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser")
     {
         $filePath = AJXP_VarsFilter::filter($filePath);
         if ($createDir && !is_dir(dirname($filePath))) {
@@ -1026,7 +1030,9 @@ class AJXP_Utils
         }
         try {
             $fp = fopen($filePath, "w");
-            fwrite($fp, serialize($value));
+            if($format == "ser") $content = serialize($value);
+            else if($format == "json") $content = json_encode($value);
+            fwrite($fp, $content);
             fclose($fp);
         } catch (Exception $e) {
             if ($silent) return;

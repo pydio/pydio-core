@@ -546,6 +546,7 @@ class AuthService
      */
 	static function createUser($userId, $userPass, $isAdmin=false)
 	{
+        AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin));
         if(!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest"){
             throw new Exception("Reserved user id");
         }
@@ -561,6 +562,7 @@ class AuthService
 			$user->setAdmin(true);			
 			$user->save("superuser");
 		}
+        AJXP_Controller::applyHook("user.after_create", array($user));
 		AJXP_Logger::logAction("Create User", array("user_id"=>$userId));
 		return null;
 	}
@@ -587,6 +589,7 @@ class AuthService
      */
 	static function deleteUser($userId)
 	{
+        AJXP_Controller::applyHook("user.before_delete", array($userId));
 		$authDriver = ConfService::getAuthDriverImpl();
 		$authDriver->deleteUser($userId);
 		$subUsers = array();
@@ -595,7 +598,8 @@ class AuthService
 			$authDriver->deleteUser($deletedUser);
 		}
 
-		AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
+        AJXP_Controller::applyHook("user.after_delete", array($userId));
+        AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
 		return true;
 	}
 	/**
