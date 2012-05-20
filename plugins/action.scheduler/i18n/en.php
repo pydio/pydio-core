@@ -32,7 +32,13 @@ $mess = array(
     "6" => "Param Name",
     "6d" => "Action specific parameter name",
     "7" => "Param Value",
-    "7d" => "Action specific parameter value"
+    "7d" => "Action specific parameter value",
+    "8" => "New task",
+    "9" => "Schedule a task to be executed on a regular basis",
+    "10" => "Edit task",
+    "11" => "Edit scheduled task parameters",
+    "12" => "Label",
+    "12d"=> "Human readable label for this task"
 );
 
 ?>
