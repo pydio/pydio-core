@@ -276,40 +276,6 @@ class AJXP_XMLWriter
         $tab = array(&$xml);
         AJXP_Controller::applyIncludeHook("xml.filter", $tab);
 		return $xml;
-	}	
-	/**
-     * Send a <reload> XML instruction for refreshing the list
-     * @static
-     * @param bool $print
-     * @return string
-     */
-	static function reloadCurrentNode($print = true)
-	{
-		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\"/>", $print);
-	}
-
-    /**
-     * Send a <reload> xml instruction for refreshing a given node
-     * @static
-     * @param $nodeName
-     * @param bool $print
-     * @return string
-     */
-	static function reloadNode($nodeName, $print = true)
-	{
-		return AJXP_XMLWriter::write("<reload_instruction object=\"tree\" node=\"$nodeName\"/>", $print);
-	}
-	/**
-     * Send a <reload> XML instruction for refreshing the list
-     * @static
-     * @param $fileOrBool
-     * @param bool $print
-     * @return string
-     */
-	static function reloadFileList($fileOrBool, $print = true)
-	{
-		if(is_string($fileOrBool)) return AJXP_XMLWriter::write("<reload_instruction object=\"list\" file=\"".AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($fileOrBool))."\"/>", $print);
-		else return AJXP_XMLWriter::write("<reload_instruction object=\"list\"/>", $print);
 	}
 	/**
      * Send a <reload> XML instruction for refreshing the list
