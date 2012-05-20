@@ -39,10 +39,14 @@ Class.create("FormManager", {
     },
 
 	parameterNodeToHash : function(paramNode){
-		var paramsAtts = $A(['name', 'group', 'type', 'label', 'description', 'default', 'mandatory', 'choices']);
+		var paramsAtts = $A(['name', 'group', 'replicationGroup', 'type', 'label', 'description', 'default', 'mandatory', 'choices']);
 		var paramsHash = new Hash();
 		paramsAtts.each(function(attName){
-			paramsHash.set(attName, (XPathGetSingleNodeText(paramNode, '@'+attName) || ''));
+            var value = (XPathGetSingleNodeText(paramNode, '@'+attName) || '');
+            if( (attName == "label" || attName == "description" || attName == "group") && MessageHash[value] ){
+                value = MessageHash[value];
+            }
+			paramsHash.set(attName, value);
 		});
 		return paramsHash;
 	},
@@ -50,6 +54,7 @@ Class.create("FormManager", {
 	createParametersInputs : function(form, parametersDefinitions, showTip, values, disabled, skipAccordion, addFieldCheckbox){
         var b=document.body;
         var groupDivs = $H({});
+        var replicableGroups = $H({});
 		parametersDefinitions.each(function(param){		
 			var label = param.get('label');
 			if(param.get('labelId')){
@@ -112,6 +117,20 @@ Class.create("FormManager", {
 			if(desc){
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
+
+            if(param.get('replicableGroup')){
+                var repGroupName = param.get('replicationGroup');
+                var repGroup;
+                if(replicableGroups.get(repGroupName)) {
+                    repGroup = replicableGroups.get(repGroupName);
+                }else {
+                    repGroup = new Element("div", {id:"replicable_"+repGroupName, className:'SF_replicableGroup'});
+                }
+                repGroup.insert(div);
+                replicableGroups.set(repGroupName, repGroup);
+                div = repGroup;
+            }
+
             if(skipAccordion){
 			    form.insert({'bottom':div});
             }else{
@@ -126,7 +145,17 @@ Class.create("FormManager", {
                 gDiv.insert(div);
                 groupDivs.set(group, gDiv);
             }
-		});
+		}.bind(this));
+        if(replicableGroups.size()){
+            replicableGroups.each(function(pair){
+                var repGroup = pair.value;
+                var replicationButton = new Element("a", {className:'replication_button'}).update("Replicate").observe("click", function(event){
+                    this.replicateRow(repGroup,  1, form);
+                }.bind(this));
+                repGroup.insert({bottom:replicationButton});
+                repGroup.insert({bottom:new Element('div', {className:'SF_rgClear'})});
+            }.bind(this));
+        }
         if(!groupDivs.size()) return;
         var firstGroup = true;
         groupDivs.each(function(pair){
@@ -228,23 +257,41 @@ Class.create("FormManager", {
 	 * @param number Integer
 	 * @param form HTMLForm
 	 */
-	replicateRow : function(templateRow, number, form){		
-		for(var index=0;index < number-1 ;index++){
-			tr = $(templateRow.cloneNode(true));
-			if(tr.id) tr.id = tr.id+'_'+(index+1);
+	replicateRow : function(templateRow, number, form){
+        var repIndex = templateRow.getAttribute('data-ajxp-replication-index');
+        if(repIndex === null){
+            repIndex = 0;
+        }else{
+            repIndex = parseInt(repIndex);
+        }
+		for(var index=0;index < number ;index++){
+            repIndex ++;
+            templateRow.setAttribute('data-ajxp-replication-index', repIndex);
+			var tr = $(templateRow.cloneNode(true));
+			if(tr.id) tr.id = tr.id+'_'+repIndex;
 			var inputs = tr.select('input', 'select', 'textarea');
 			inputs.each(function(input){
-				var newName = input.getAttribute('name')+'_'+(index+1);
+				var newName = input.getAttribute('name')+'_'+repIndex;
 				input.setAttribute('name', newName);
 				if(form && Prototype.Browser.IE){form[newName] = input;}
 			});
 			templateRow.up().insert({bottom:tr});
+            if(tr.select('.replication_button').length){
+                tr.select('.replication_button').invoke("remove");
+            }
+            if(index == number - 1){
+                if(templateRow.up().select('.replication_button').length){
+                    tr.insert(templateRow.up().select('.replication_button')[0]);
+                }
+            }
 		}
+        /*
 		templateRow.select('input', 'select', 'textarea').each(function(origInput){
 			var newName = origInput.getAttribute('name')+'_0';
 			origInput.setAttribute('name', newName);
 			if(form && Prototype.Browser.IE){form[newName] = origInput;}
 		});
+		*/
 	},
 	
 	/**

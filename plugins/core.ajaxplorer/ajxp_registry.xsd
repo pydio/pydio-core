@@ -488,6 +488,7 @@
                 <xs:element minOccurs="0" ref="dialogOnOpen"/>
                 <xs:element minOccurs="0" ref="extensionOnInit"/>
                 <xs:element minOccurs="0" ref="clientListener"/>
+                <xs:element minOccurs="0" ref="standardFormDefinition"/>
                 <xs:choice minOccurs="0">
                     <xs:element ref="serverCallback"/>
                     <xs:element ref="activeCondition"/>
@@ -531,6 +532,13 @@
             <xs:attribute name="methodName" use="required" type="xs:NCName"/>
             <xs:attribute name="pluginId" use="optional" type="xs:NCName"/>
             <xs:attribute name="defer" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="standardFormDefinition">
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element ref="param"/>
+            </xs:choice>
         </xs:complexType>
     </xs:element>
     <xs:element name="client_settings">
@@ -608,6 +616,7 @@
             <xs:attribute name="description" use="required"/>
             <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
+            <xs:attribute name="replicationGroup"/>
             <xs:attribute name="label" use="required"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
@@ -620,6 +629,7 @@
             <xs:attribute name="default"/>
             <xs:attribute name="description" use="required"/>
             <xs:attribute name="group"/>
+            <xs:attribute name="replicationGroup"/>
             <xs:attribute name="label" use="required"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
@@ -634,6 +644,7 @@
             <xs:attribute name="default"/>
             <xs:attribute name="description" use="required"/>
             <xs:attribute name="group"/>
+            <xs:attribute name="replicationGroup"/>
             <xs:attribute name="label" use="required"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>

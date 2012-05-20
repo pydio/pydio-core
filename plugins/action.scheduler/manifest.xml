@@ -36,13 +36,10 @@
                     <clientCallback prepareModal="true" dialogOpenForm="scheduler-task-form" dialogOkButtonOnly="false" dialogSkipButtons="false">
                        <dialogOnOpen><![CDATA[
                            this.currentFormManager = new FormManager();
-                           this.currentFormManager.params = $A([
-                                    $H({name:'action',label:MessageHash['action.scheduler.1'], description:MessageHash['action.scheduler.1d'],type:'string', mandatory:true}),
-                                    $H({name:'schedule',label:MessageHash['action.scheduler.2'], description:MessageHash['action.scheduler.2d'],type:'string', mandatory:true}),
-                                    $H({name:'repository_id',label:MessageHash['action.scheduler.4'], description:MessageHash['action.scheduler.4d'],type:'string', mandatory:true}),
-                                    $H({name:'params',label:MessageHash['action.scheduler.5'], description:MessageHash['action.scheduler.5d'],type:'string', mandatory:true})
-                                ]);
+                           var xmlDefinition = ajaxplorer.getXmlRegistry();
+                           var node = XPathSelectSingleNode(xmlDefinition, 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
 
+                           this.currentFormManager.params = this.currentFormManager.parseParameters(node, "param");
                            this.currentFormManager.createParametersInputs(
                                 $('scheduler-task-form'),
                                 this.currentFormManager.params,
@@ -59,8 +56,15 @@
                        ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="scheduler-task-form"><![CDATA[
-                        <div id="scheduler-task-form"></div>
+                        <div id="scheduler-task-form" box_width="300"></div>
                     ]]></clientForm>
+                    <standardFormDefinition>
+                        <param name="schedule" group="Task execution" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
+                        <param name="repository_id" group="Task execution" label="action.scheduler.4" description="action.scheduler.4d" type="string" mandatory="true"/>
+                        <param name="action" group="Parameters" label="action.scheduler.1" description="action.scheduler.1d" type="string" mandatory="true"/>
+                        <param name="param_name" group="Parameters" replicationGroup="group1" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
+                        <param name="param_value" group="Parameters" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>
+                    </standardFormDefinition>
                     <serverCallback methodName="handleTasks"/>
                 </processing>
             </action>
