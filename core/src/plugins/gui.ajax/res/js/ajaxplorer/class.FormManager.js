@@ -118,7 +118,7 @@ Class.create("FormManager", {
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
 
-            if(param.get('replicableGroup')){
+            if(param.get('replicationGroup')){
                 var repGroupName = param.get('replicationGroup');
                 var repGroup;
                 if(replicableGroups.get(repGroupName)) {
@@ -149,11 +149,28 @@ Class.create("FormManager", {
         if(replicableGroups.size()){
             replicableGroups.each(function(pair){
                 var repGroup = pair.value;
-                var replicationButton = new Element("a", {className:'replication_button'}).update("Replicate").observe("click", function(event){
+                var replicationButton = new Element("a", {className:'SF_replication_Add', title:'Replicate this group'}).update("&nbsp;").observe("click", function(event){
                     this.replicateRow(repGroup,  1, form);
                 }.bind(this));
                 repGroup.insert({bottom:replicationButton});
                 repGroup.insert({bottom:new Element('div', {className:'SF_rgClear'})});
+                if(values){
+                    var hasReplicates = true;
+                    var replicIndex = 1;
+                    while(hasReplicates){
+                        //hasReplicates = false;
+                        var repInputs = repGroup.select('input,select,textarea');
+                        if(!repInputs.length) break;
+                        repInputs.each(function(element){
+                            var name = element.name;
+                            hasReplicates &= (values.get(name+"_"+replicIndex) != null);
+                        });
+                        if(hasReplicates){
+                            this.replicateRow(repGroup, 1, form, values);
+                            replicIndex++;
+                        }
+                    }
+                }
             }.bind(this));
         }
         if(!groupDivs.size()) return;
@@ -257,7 +274,7 @@ Class.create("FormManager", {
 	 * @param number Integer
 	 * @param form HTMLForm
 	 */
-	replicateRow : function(templateRow, number, form){
+	replicateRow : function(templateRow, number, form, values){
         var repIndex = templateRow.getAttribute('data-ajxp-replication-index');
         if(repIndex === null){
             repIndex = 0;
@@ -274,16 +291,28 @@ Class.create("FormManager", {
 				var newName = input.getAttribute('name')+'_'+repIndex;
 				input.setAttribute('name', newName);
 				if(form && Prototype.Browser.IE){form[newName] = input;}
+                if(values && values.get(newName)){
+                    input.setValue(values.get(newName));
+                }
 			});
 			templateRow.up().insert({bottom:tr});
-            if(tr.select('.replication_button').length){
-                tr.select('.replication_button').invoke("remove");
+            if(tr.select('.SF_replication_Add').length){
+                tr.select('.SF_replication_Add').invoke("remove");
             }
             if(index == number - 1){
-                if(templateRow.up().select('.replication_button').length){
-                    tr.insert(templateRow.up().select('.replication_button')[0]);
+                if(templateRow.up().select('.SF_replication_Add').length){
+                    tr.insert(templateRow.up().select('.SF_replication_Add')[0]);
                 }
             }
+            var removeButton = new Element('a', {className:'SF_replication_Remove', title:'Remove this group'})
+                .update('&nbsp;')
+                .observe('click', function(){
+                    if(tr.select('.SF_replication_Add').length){
+                        tr.previous('.SF_replicableGroup').insert(tr.select('.SF_replication_Add')[0]);
+                    }
+                    tr.remove();
+            });
+            tr.insert(removeButton);
 		}
         /*
 		templateRow.select('input', 'select', 'textarea').each(function(origInput){

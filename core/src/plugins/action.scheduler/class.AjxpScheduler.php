@@ -62,7 +62,7 @@ class AjxpScheduler extends AJXP_Plugin{
             case "ls":
 
                 $captured = $postProcessData["ob_output"];
-                $node = '<tree text="Scheduler" icon="susehelpcenter.png" filename="/admin/scheduler"/>';
+                $node = '<tree text="Scheduler" icon="scheduler/ICON_SIZE/shellscript.png" filename="/admin/scheduler"/>';
                 print str_replace("</tree>", "$node</tree>", $captured);
 
             break;
@@ -78,22 +78,25 @@ class AjxpScheduler extends AJXP_Plugin{
         $mess =ConfService::getMessages();
         AJXP_XMLWriter::renderHeaderNode("tree", "Scheduler", false);
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
-     			<column messageId="action.scheduler.1" attributeName="ajxp_label" sortType="String"/>
-     			<column messageId="action.scheduler.2" attributeName="SCHEDULE" sortType="String"/>
+     			<column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>
+     			<column messageId="action.scheduler.1" attributeName="action_name" sortType="String"/>
+     			<column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>
      			<column messageId="action.scheduler.3" attributeName="NEXT_EXECUTION" sortType="String"/>
-     			<column messageId="action.scheduler.4" attributeName="REPOSITORY_ID" sortType="String"/>
+     			<column messageId="action.scheduler.4" attributeName="repository_id" sortType="String"/>
      			<column messageId="action.scheduler.5" attributeName="PARAMS" sortType="String"/>
         </columns>');
         $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
         foreach ($tasks as $task){
 
-            $timeArray = $this->getTimeArray($task["SCHEDULE"]);
+            $timeArray = $this->getTimeArray($task["schedule"]);
             $res = $this->getNextExecutionTimeForScript(time(), $timeArray);
                 $task["NEXT_EXECUTION"] = date($mess["date_format"], $res);
                 $task["PARAMS"] = implode(", ", $task["PARAMS"]);
+                $task["icon"] = "scheduler/ICON_SIZE/shellscript.png";
+                $task["ajxp_mime"] = "scheduler_task";
 
-                AJXP_XMLWriter::renderNode("/admin/scheduler/".$task["ID"],
-                    "Action ".$task["ACTION"],
+                AJXP_XMLWriter::renderNode("/admin/scheduler/".$task["task_id"],
+                    (isSet($task["label"])?$task["label"]:"Action ".$task["action_name"]),
                     true,
                     $task
                 );
@@ -104,6 +107,7 @@ class AjxpScheduler extends AJXP_Plugin{
 
     function getTimeArray($schedule){
         $parts = explode(" ", $schedule);
+        if(count($parts)!=5) throw new Exception("Invalid Schedule Format");
         $timeArray['minutes'] = $parts[0];
         $timeArray['hours'] = $parts[1];
         $timeArray['days'] = $parts[2];
@@ -118,23 +122,78 @@ class AjxpScheduler extends AJXP_Plugin{
         $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
         switch ($action){
             case "scheduler_addTask":
-                $data["ID"] = substr(md5(time()), 0, 16);
-                $data["SCHEDULE"] = $httpVars["schedule"];
-                $data["ACTION"] = $httpVars["action_name"];
-                $data["REPOSITORY_ID"] =$httpVars["repository_id"];
-                $data["PARAMS"] = array();
-                foreach($httpVars as $key => $value){
-                    if(preg_match('/^PARAM_/', $key)) $data["PARAMS"][str_replace("PARAM_", "", $key)] = $value;
+                if(isSet($httpVars["task_id"])){
+                    foreach($tasks as $index => $task){
+                        if($task["task_id"] == $httpVars["task_id"]){
+                            $data = $task;
+                            $theIndex = $index;
+                        }
+                    }
                 }
-                $tasks[] = $data;
+                if(!isSet($theIndex)){
+                    $data = array();
+                    $data["task_id"] = substr(md5(time()), 0, 16);
+                }
+                $data["label"] = $httpVars["label"];
+                $data["schedule"] = $httpVars["schedule"];
+                $data["action_name"] = $httpVars["action_name"];
+                $data["repository_id"] =$httpVars["repository_id"];
+                $data["PARAMS"] = array();
+                if(!empty($httpVars["param_name"]) && !empty($httpVars["param_value"])){
+                    $data["PARAMS"][$httpVars["param_name"]] = $httpVars["param_value"];
+                }
+                foreach($httpVars as $key => $value){
+                    if(preg_match('/^param_name_/', $key)) {
+                        $paramIndex = str_replace("param_name_", "", $key);
+                        if(preg_match('/ajxptype/', $paramIndex)) continue;
+                        if(isSet($httpVars["param_value_".$paramIndex])){
+                            $data["PARAMS"][$value] = $httpVars["param_value_".$paramIndex];
+                        }
+                    }
+                }
+                if(isSet($theIndex)) $tasks[$theIndex] = $data;
+                else $tasks[] = $data;
+                AJXP_Utils::saveSerialFile($this->db, $tasks, true, false, "json");
+
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage("Successfully added/edited task", null);
+                AJXP_XMLWriter::reloadDataNode();
+                AJXP_XMLWriter::close();
+
+            break;
+
+            case "scheduler_loadTask":
+
+                $found = false;
+                foreach($tasks as $task){
+                    if($task["task_id"] == $httpVars["task_id"]){
+                        $index = 0;
+                        $found = true;
+                        foreach($task["PARAMS"] as $pName => $pValue){
+                            if($index == 0){
+                                $task["param_name"] = $pName;
+                                $task["param_value"] = $pValue;
+                            }else{
+                                $task["param_name_".$index] = $pName;
+                                $task["param_value_".$index] = $pValue;
+                            }
+                            $index ++;
+                        }
+                        unset($task["PARAMS"]);
+                        break;
+                    }
+                }
+                if($found){
+                    HTMLWriter::charsetHeader("application/json");
+                    echo json_encode($task);
+                }
+
             break;
 
             default:
             break;
         }
-
-        var_dump($tasks);
-        AJXP_Utils::saveSerialFile($this->db, $tasks, true, false, "json");
+        //var_dump($tasks);
 
     }
 

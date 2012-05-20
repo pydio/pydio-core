@@ -333,7 +333,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$user->save("superuser");
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.45"].$httpVars["user_id"], null);
-				AJXP_XMLWriter::reloadCurrentNode(true);
+				AJXP_XMLWriter::reloadDataNode();
 				AJXP_XMLWriter::close();
 				
 			break;
@@ -1341,7 +1341,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		foreach ($repDef as $key => $value)
 		{
 			$value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
-			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0 && strpos($key, "ajxptype") === false && strpos($key, "_checkbox") === false){
+			if(strpos($key, "DRIVER_OPTION_")!== false
+                && strpos($key, "DRIVER_OPTION_")==0
+                && strpos($key, "ajxptype") === false
+                && strpos($key, "_checkbox") === false){
 				if(isSet($repDef[$key."_ajxptype"])){
 					$type = $repDef[$key."_ajxptype"];
 					if($type == "boolean"){
