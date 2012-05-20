@@ -3,6 +3,7 @@
     <client_settings>
         <resources>
             <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
+            <img_library alias="scheduler" path="plugins/action.scheduler/icons"/>
         </resources>
     </client_settings>
     <registry_contributions>
@@ -25,8 +26,13 @@
                     <serverCallback methodName="switchAction" applyCondition="$apply=($httpVars['dir']=='/admin');" capture="true"/>
                 </post_processing>
             </action>
+            <action name="scheduler_loadTask">
+                <processing>
+                    <serverCallback methodName="handleTasks"/>
+                </processing>
+            </action>
             <action name="scheduler_addTask">
-                <gui text="292" title="292" src="share.png" hasAccessKey="false">
+                <gui text="action.scheduler.8" title="action.scheduler.9" src="scheduler/ICON_SIZE/application_x_executable_script.png" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="put">
@@ -40,32 +46,78 @@
                            var node = XPathSelectSingleNode(xmlDefinition, 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
 
                            this.currentFormManager.params = this.currentFormManager.parseParameters(node, "param");
-                           this.currentFormManager.createParametersInputs(
-                                $('scheduler-task-form'),
-                                this.currentFormManager.params,
-                                true
-                           );
+
+                           if(window.actionArguments && window.actionArguments[0]){
+                               var tId = window.actionArguments[0].getPath();
+                               tId = getBaseName(tId);
+                               this.currentFormManager.task_id = tId;
+                               var conn = new Connexion();
+                               conn.setParameters(new Hash({get_action:'scheduler_loadTask',task_id:tId}));
+                               var values;
+                               conn.onComplete = function(transport){
+                                    values = $H(transport.responseJSON);
+                                   this.currentFormManager.createParametersInputs(
+                                        $('scheduler-task-form'),
+                                        this.currentFormManager.params,
+                                        true,
+                                        values
+                                   );
+                               }.bind(this);
+                               conn.sendAsync();
+                           }else{
+                               this.currentFormManager.createParametersInputs(
+                                    $('scheduler-task-form'),
+                                    this.currentFormManager.params,
+                                    true
+                               );
+                           }
                        ]]></dialogOnOpen>
                         <dialogOnComplete><![CDATA[
                             var values = new Hash({});
-                           this.currentFormManager.serializeParametersInputs(
+                            this.currentFormManager.serializeParametersInputs(
                                 $('scheduler-task-form'),
                                 values,
                                 '');
-                                console.log(values);
+
+                            var conn = new Connexion();
+                            values.set('get_action', 'scheduler_addTask');
+                            if(this.currentFormManager.task_id){
+                                values.set('task_id',this.currentFormManager.task_id);
+                            }
+                            conn.setParameters(values);
+                            conn.sendAsync();
+                            conn.onComplete = function(transport){
+                                var res = ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                if(res) hideLightBox();
+                            };
                        ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="scheduler-task-form"><![CDATA[
                         <div id="scheduler-task-form" box_width="300"></div>
                     ]]></clientForm>
                     <standardFormDefinition>
+                        <param name="label" group="Task execution" label="action.scheduler.12" description="action.scheduler.12d" type="string" mandatory="true"/>
                         <param name="schedule" group="Task execution" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
                         <param name="repository_id" group="Task execution" label="action.scheduler.4" description="action.scheduler.4d" type="string" mandatory="true"/>
-                        <param name="action" group="Parameters" label="action.scheduler.1" description="action.scheduler.1d" type="string" mandatory="true"/>
+                        <param name="action_name" group="Parameters" label="action.scheduler.1" description="action.scheduler.1d" type="string" mandatory="true"/>
                         <param name="param_name" group="Parameters" replicationGroup="group1" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
                         <param name="param_value" group="Parameters" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>
                     </standardFormDefinition>
                     <serverCallback methodName="handleTasks"/>
+                </processing>
+            </action>
+            <action name="scheduler_editTask">
+                <gui text="action.scheduler.10" title="action.scheduler.11" src="scheduler/ICON_SIZE/shellscript.png" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="change"/>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var u = ajaxplorer.getUserSelection();
+                        ajaxplorer.getActionBar().fireAction('scheduler_addTask', u.getUniqueNode());
+                    ]]></clientCallback>
                 </processing>
             </action>
         </actions>

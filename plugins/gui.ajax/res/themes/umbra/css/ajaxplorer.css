@@ -692,9 +692,29 @@ div.SF_label{
 .SF_replicableGroup{
     background-color:#EEE;
     clear: both;
-    height: 61px;
+    position: relative;
     margin-bottom: 5px;
     border-radius: 5px;
+}
+
+.SF_replication_Add,
+.SF_replication_Remove
+{
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-image: url('../images/0.gif');
+    background-repeat: no-repeat;
+    background-position: 5px 6px;
+    position:absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.SF_replication_Remove
+{
+    background-image: url('../images/1.gif');
+    top: 0;
 }
 
 .SF_rgClear{
