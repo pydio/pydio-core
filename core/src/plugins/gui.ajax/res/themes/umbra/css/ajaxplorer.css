@@ -689,6 +689,19 @@ div.SF_label{
 	border: 1px solid #D8B0B0 !important;
 }
 
+.SF_replicableGroup{
+    background-color:#EEE;
+    clear: both;
+    height: 61px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.SF_rgClear{
+    clear:left;
+    height: 3px;
+}
+
 .accordion_toggle_failed {
 	background-color: #D8B0B0 !important;
 }

@@ -28,7 +28,11 @@ $mess = array(
     "4" => "Repository ID",
     "4d" => "Id of the target repository",
     "5" => "Parameters",
-    "5d" => "Replicable action parameters"
+    "5d" => "Replicable action parameters",
+    "6" => "Param Name",
+    "6d" => "Action specific parameter name",
+    "7" => "Param Value",
+    "7d" => "Action specific parameter value"
 );
 
 ?>
