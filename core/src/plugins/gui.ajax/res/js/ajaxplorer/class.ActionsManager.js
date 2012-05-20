@@ -395,6 +395,7 @@ Class.create("ActionsManager", {
 		var childs = xmlResponse.documentElement.childNodes;	
 		
 		var reloadNodes = [];
+        var error = false;
 		
 		for(var i=0; i<childs.length;i++)
 		{
@@ -403,6 +404,7 @@ Class.create("ActionsManager", {
 				var messageTxt = "No message";
 				if(childs[i].firstChild) messageTxt = childs[i].firstChild.nodeValue;
 				ajaxplorer.displayMessage(childs[i].getAttribute('type'), messageTxt);
+                if(childs[i].getAttribute('type') == 'ERROR') error = true;
 			}
 			else if(childs[i].tagName == "reload_instruction")
 			{
@@ -469,6 +471,7 @@ Class.create("ActionsManager", {
                     var errorId = 386;
 				}
                 if(errorId){
+                    error = true;
                     if($("generic_dialog_box") && $("generic_dialog_box").visible() && $("generic_dialog_box").down("div.dialogLegend")){
                         $("generic_dialog_box").down("div.dialogLegend").insert({bottom:'<div class="ajxp_login_error" style="background-color: #D33131;display: block;font-size: 9px;color: white;border-radius: 3px;padding: 2px 6px;">'+MessageHash[errorId]+'</div>'});
                         $("generic_dialog_box").shake();
@@ -495,6 +498,7 @@ Class.create("ActionsManager", {
 		if(reloadNodes.length){
 			ajaxplorer.getContextHolder().multipleNodesReload(reloadNodes);
 		}
+        return !error;
 	},
 	
 	/**
