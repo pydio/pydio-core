@@ -33,6 +33,7 @@ class multiAuthDriver extends AbstractAuthDriver {
     var $masterSlaveMode = false;
     var $masterName;
     var $slaveName;
+    var $baseName;
 
     static $schemesCache = array();
 
@@ -47,6 +48,7 @@ class multiAuthDriver extends AbstractAuthDriver {
 		$this->driversDef = $this->getOption("DRIVERS");
         $this->masterSlaveMode = ($this->getOption("MODE") == "MASTER_SLAVE");
         $this->masterName = $this->getOption("MASTER_DRIVER");
+        $this->baseName = $this->getOption("USER_BASE_DRIVER");
 		foreach($this->driversDef as $def){
 			$name = $def["NAME"];
 			$options = $def["OPTIONS"];
@@ -166,6 +168,11 @@ class multiAuthDriver extends AbstractAuthDriver {
 
 	function listUsers(){
         if($this->masterSlaveMode){
+            if(!empty($this->baseName)) {
+                $users = $this->drivers[$this->baseName]->listUsers();
+                $this->addToCache(array_keys($users), $this->baseName);
+                return $users;
+            }
             $masterUsers = $this->drivers[$this->slaveName]->listUsers();
             $this->addToCache(array_keys($masterUsers), $this->slaveName);
             $slaveUsers = $this->drivers[$this->masterName]->listUsers();
