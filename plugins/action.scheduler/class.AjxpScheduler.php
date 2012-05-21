@@ -91,6 +91,8 @@ class AjxpScheduler extends AJXP_Plugin{
         $now = time();
         $lastExec = time()-60*$masterInterval;
         $res = $this->getNextExecutionTimeForScript($lastExec, $timeArray);
+        $test = date("Y-m-d H:i", $lastExec). " -- ".date("Y-m-d H:i", $res)." --  ".date("Y-m-d H:i", $now);
+
         $alreadyRunning = false;
         $queued = false;
         if($status == null) $status = $this->getTaskStatus($taskId);
@@ -101,7 +103,7 @@ class AjxpScheduler extends AJXP_Plugin{
                 $queued = true; // Run now !
             }
         }
-        if(!$alreadyRunning && $currentlyRunning >= $maximumProcesses){
+        if( $res >= $lastExec && $res < $now && !$alreadyRunning && $currentlyRunning >= $maximumProcesses){
             $this->setTaskStatus($taskId, "QUEUED", true);
             $alreadyRunning = true;
             $queued = false;
