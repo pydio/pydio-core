@@ -136,7 +136,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
 	function userExists($login){
         $entries = $this->getUserEntries($login);
-        if(!is_array($login)) return false;
+        if(!is_array($entries)) return false;
         if(AuthService::ignoreUserCase() && strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
             return false;
         }else if(strcmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
