@@ -31,6 +31,104 @@ class AjxpScheduler extends AJXP_Plugin{
         if(!is_dir(dirname($this->db))) mkdir(dirname($this->db), 0755, true);
     }
 
+    function getTaskById($tId){
+        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        foreach($tasks as $task){
+            if( !empty($task["task_id"]) && $task["task_id"] == $tId) {
+                return $task;
+            }
+        }
+        throw new Exception("Cannot find task");
+    }
+
+    function setTaskStatus($taskId, $status, $preserveModeDate =false){
+        $statusFile = AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status";
+        if($preserveModeDate) $mtime = filemtime($statusFile);
+        file_put_contents($statusFile, $status);
+        if($preserveModeDate) @touch($statusFile, $mtime);
+    }
+
+    function getTaskStatus($taskId){
+        $statusFile = AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status";
+        if(file_exists($statusFile)){
+            $c = explode(":", file_get_contents($statusFile));
+            if($c[0] == "RUNNING" && isSet($c[1]) && is_numeric($c[1])){
+                $process = new UnixProcess();
+                $process->setPid(intval($c[1]));
+                $s = $process->status();
+                if($s === false){
+                    // Process was probably killed!
+                    $this->setTaskStatus($taskId, "KILLED", true);
+                    return array("KILLED");
+                }
+            }
+            return $c;
+        }
+        return false;
+    }
+
+    function countCurrentlyRunning(){
+        $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+        $count = 0;
+        foreach($tasks as $task){
+            $s = $this->getTaskStatus($task["task_id"]);
+            if($s !== false && $s[0] == "RUNNING"){
+                $count++;
+            }
+        }
+        return $count;
+    }
+
+    function runTask($taskId, $status = null, &$currentlyRunning = -1){
+        $data = $this->getTaskById($taskId);
+        $mess = ConfService::getMessages();
+        $timeArray = $this->getTimeArray($data["schedule"]);
+
+        // TODO : Set MasterInterval as config, or detect last execution?
+        $masterInterval = 1;
+        $maximumProcesses = 2;
+
+        $now = time();
+        $lastExec = time()-60*$masterInterval;
+        $res = $this->getNextExecutionTimeForScript($lastExec, $timeArray);
+        $alreadyRunning = false;
+        $queued = false;
+        if($status == null) $status = $this->getTaskStatus($taskId);
+        if($status !== false){
+            if($status[0] == "RUNNING"){
+                $alreadyRunning = true;
+            }else if(in_array("QUEUED", $status)){
+                $queued = true; // Run now !
+            }
+        }
+        if(!$alreadyRunning && $currentlyRunning >= $maximumProcesses){
+            $this->setTaskStatus($taskId, "QUEUED", true);
+            $alreadyRunning = true;
+            $queued = false;
+        }
+        if( ( $res >= $lastExec && $res < $now && !$alreadyRunning ) || $queued ){
+            $process = AJXP_Controller::applyActionInBackground(
+                $data["repository_id"],
+                $data["action_name"],
+                $data["PARAMS"],
+                AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status");
+            if($process != null && is_a($process, "UnixProcess")){
+                $this->setTaskStatus($taskId, "RUNNING:".$process->getPid());
+            }else{
+                $this->setTaskStatus($taskId, "RUNNING");
+            }
+            $currentlyRunning ++;
+            return true;
+        }
+        return false;
+    }
+
+    function sortTasksByPriorityStatus($data1, $data2){
+        if(is_array($data1["status"]) && in_array("QUEUED", $data1["status"])) return -1;
+        if(is_array($data2["status"]) && in_array("QUEUED", $data2["status"])) return 1;
+        return 0;
+    }
+
     function switchAction($action, $httpVars, $postProcessData){
 
         switch($action){
@@ -38,24 +136,39 @@ class AjxpScheduler extends AJXP_Plugin{
             //------------------------------------
             // SHARING FILE OR FOLDER
             //------------------------------------
-            case "run_scheduler":
+            case "scheduler_runAll":
 
-                $mess = ConfService::getMessages();
-                $timeArray = array();
-                $timeArray['minutes'] = '/2';
-                $timeArray['hours'] = '*';
-                $timeArray['days'] = '*';
-                $timeArray['dayWeek'] = '1-6';
-                $timeArray['months'] = '*';
-                $masterInterval = 1;
-                $now = time();
-                $lastExec = time()-60*$masterInterval;
-                $res = $this->getNextExecutionTimeForScript(time()-60*$masterInterval, $timeArray);
-                if($res >= $lastExec && $res < $now){
-                    echo "RUN NOW " .  date($mess["date_format"], $res) . " last exec was ". date($mess["date_format"], $lastExec);
-                }else{
-                    echo "NOTHING TO DO";
+                $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
+                $message = "";
+                $startRunning = $this->countCurrentlyRunning();
+                $statuses = array();
+                foreach($tasks as $index => $task){
+                    $tasks[$index]["status"] = $this->getTaskStatus($task["task_id"]);
                 }
+                usort($tasks, array($this, "sortTasksByPriorityStatus"));
+                foreach($tasks as $task){
+                    if(isSet($task["task_id"])){
+                        $res = $this->runTask($task["task_id"], $task["status"], $startRunning);
+                        if($res){
+                            $message .= "Running ".$task["label"]." \n ";
+                        }
+                    }
+                }
+                if(empty($message)) $message = "Nothing to do";
+
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage($message, null);
+                AJXP_XMLWriter::reloadDataNode();
+                AJXP_XMLWriter::close();
+
+            break;
+
+            case "scheduler_runTask":
+
+                $this->runTask($httpVars["task_id"]);
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::reloadDataNode();
+                AJXP_XMLWriter::close();
 
             break;
 
@@ -79,11 +192,12 @@ class AjxpScheduler extends AJXP_Plugin{
         AJXP_XMLWriter::renderHeaderNode("tree", "Scheduler", false);
         AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
      			<column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>
-     			<column messageId="action.scheduler.1" attributeName="action_name" sortType="String"/>
      			<column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>
+     			<column messageId="action.scheduler.1" attributeName="action_name" sortType="String"/>
+     			<column messageId="action.scheduler.4s" attributeName="repository_id" sortType="String"/>
      			<column messageId="action.scheduler.3" attributeName="NEXT_EXECUTION" sortType="String"/>
-     			<column messageId="action.scheduler.4" attributeName="repository_id" sortType="String"/>
-     			<column messageId="action.scheduler.5" attributeName="PARAMS" sortType="String"/>
+     			<column messageId="action.scheduler.14" attributeName="LAST_EXECUTION" sortType="String"/>
+     			<column messageId="action.scheduler.13" attributeName="STATUS" sortType="String"/>
         </columns>');
         $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
         foreach ($tasks as $task){
@@ -94,6 +208,15 @@ class AjxpScheduler extends AJXP_Plugin{
                 $task["PARAMS"] = implode(", ", $task["PARAMS"]);
                 $task["icon"] = "scheduler/ICON_SIZE/shellscript.png";
                 $task["ajxp_mime"] = "scheduler_task";
+                $sFile = AJXP_CACHE_DIR."/cmd_outputs/task_".$task["task_id"].".status";
+                if(is_file($sFile)){
+                    $s = $this->getTaskStatus($task["task_id"]);
+                    $task["STATUS"] = implode(":", $s);
+                    $task["LAST_EXECUTION"] = date($mess["date_format"], filemtime($sFile));
+                }else{
+                    $task["STATUS"] = "n/a";
+                    $task["LAST_EXECUTION"] = "n/a";
+                }
 
                 AJXP_XMLWriter::renderNode("/admin/scheduler/".$task["task_id"],
                     (isSet($task["label"])?$task["label"]:"Action ".$task["action_name"]),
@@ -195,6 +318,13 @@ class AjxpScheduler extends AJXP_Plugin{
         }
         //var_dump($tasks);
 
+    }
+
+    function fakeLongTask($action, $httpVars, $fileVars){
+        $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
+        print('STARTING FAKE TASK');
+        sleep($minutes * 60);
+        print('ENDIND FAKE TASK');
     }
 
     function getNextExecutionTimeForScript($referenceTime, $timeArray)
