@@ -26,6 +26,7 @@ $mess = array(
     "2d" => "Crontab like expression under the following format : minutes hours days dayWeeks monthes. You can use wildcards, steps and ranges.",
     "3" => "Next Execution",
     "4" => "Repository ID",
+    "4s" => "Repository",
     "4d" => "Id of the target repository",
     "5" => "Parameters",
     "5d" => "Replicable action parameters",
@@ -38,7 +39,13 @@ $mess = array(
     "10" => "Edit task",
     "11" => "Edit scheduled task parameters",
     "12" => "Label",
-    "12d"=> "Human readable label for this task"
+    "12d"=> "Human readable label for this task",
+    "13" => "Status",
+    "14" => "Last Execution",
+    "15"=> "Run task",
+    "15d" => "Trigger selected task now",
+    "16" => "Run tasks",
+    "16d" => "Trigger scheduler and run scheduled tasks"
 );
 
 ?>
