@@ -31,6 +31,28 @@ class AjxpScheduler extends AJXP_Plugin{
         if(!is_dir(dirname($this->db))) mkdir(dirname($this->db), 0755, true);
     }
 
+    function parseSpecificContributions(&$contribNode){
+        parent::parseSpecificContributions($contribNode);
+        if($contribNode->nodeName != "actions") return;
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+    	$paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="repository_id"]', $contribNode);
+        if(!$paramList->length) return;
+        $paramNode = $paramList->item(0);
+        $sVals = array();
+        $repos = ConfService::getRepositoriesList();
+        foreach($repos as $repoId => $repoObject){
+            $sVals[] = $repoId."|".$repoObject->getDisplay();
+        }
+        $sVals[] = "*|All Repositories";
+        $paramNode->attributes->getNamedItem("choices")->nodeValue = implode(",", $sVals);
+
+        if(!AuthService::usersEnabled() || AuthService::getLoggedUser() == null) return;
+    	$paramList = $actionXpath->query('action[@name="scheduler_addTask"]/processing/standardFormDefinition/param[@name="user_id"]', $contribNode);
+        if(!$paramList->length) return;
+        $paramNode = $paramList->item(0);
+        $paramNode->attributes->getNamedItem("default")->nodeValue = AuthService::getLoggedUser()->getId();
+    }
+
     function getTaskById($tId){
         $tasks = AJXP_Utils::loadSerialFile($this->db, false, "json");
         foreach($tasks as $task){
@@ -109,10 +131,17 @@ class AjxpScheduler extends AJXP_Plugin{
             $queued = false;
         }
         if( ( $res >= $lastExec && $res < $now && !$alreadyRunning ) || $queued ){
+            if($data["user_id"] == "*"){
+                $data["user_id"] = implode(",", array_keys(AuthService::listUsers()));
+            }
+            if($data["repository_id"] == "*"){
+                $data["repository_id"] = implode(",", array_keys(ConfService::getRepositoriesList()));
+            }
             $process = AJXP_Controller::applyActionInBackground(
                 $data["repository_id"],
                 $data["action_name"],
                 $data["PARAMS"],
+                $data["user_id"],
                 AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status");
             if($process != null && is_a($process, "UnixProcess")){
                 $this->setTaskStatus($taskId, "RUNNING:".$process->getPid());
@@ -197,6 +226,7 @@ class AjxpScheduler extends AJXP_Plugin{
      			<column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>
      			<column messageId="action.scheduler.1" attributeName="action_name" sortType="String"/>
      			<column messageId="action.scheduler.4s" attributeName="repository_id" sortType="String"/>
+     			<column messageId="action.scheduler.17" attributeName="user_id" sortType="String"/>
      			<column messageId="action.scheduler.3" attributeName="NEXT_EXECUTION" sortType="String"/>
      			<column messageId="action.scheduler.14" attributeName="LAST_EXECUTION" sortType="String"/>
      			<column messageId="action.scheduler.13" attributeName="STATUS" sortType="String"/>
@@ -263,6 +293,12 @@ class AjxpScheduler extends AJXP_Plugin{
                 $data["schedule"] = $httpVars["schedule"];
                 $data["action_name"] = $httpVars["action_name"];
                 $data["repository_id"] =$httpVars["repository_id"];
+                $i = 1;
+                while(array_key_exists("repository_id_".$i, $httpVars)) {
+                    $data["repository_id"].=",".$httpVars["repository_id_".$i];
+                    $i++;
+                }
+                $data["user_id"] = $httpVars["user_id"];
                 $data["PARAMS"] = array();
                 if(!empty($httpVars["param_name"]) && !empty($httpVars["param_value"])){
                     $data["PARAMS"][$httpVars["param_name"]] = $httpVars["param_value"];
@@ -305,6 +341,13 @@ class AjxpScheduler extends AJXP_Plugin{
                             $index ++;
                         }
                         unset($task["PARAMS"]);
+                        if(strpos($task["repository_id"], ",") !== false){
+                            $ids = explode(",", $task["repository_id"]);
+                            $task["repository_id"] = $ids[0];
+                            for($i = 1; $i<count($ids);$i++){
+                                $task["repository_id_".$i] = $ids[$i];
+                            }
+                        }
                         break;
                     }
                 }

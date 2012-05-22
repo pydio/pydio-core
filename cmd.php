@@ -43,14 +43,15 @@ ConfService::start();
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
-session_name("AjaXplorer");
-session_start();
+//session_name("AjaXplorer");
+//session_start();
 
 
 $optArgs = array();
 $options = array();
 $regex = '/^-(-?)([a-zA-z0-9_]*)=(.*)/';
 foreach ($argv as $key => $argument){
+    echo("$key => $argument \n");
 	if(preg_match($regex, $argument, $matches)){
 		if($matches[1] == "-"){
 			$optArgs[trim($matches[2])] = SystemTextEncoding::toUTF8(trim($matches[3]));
@@ -59,7 +60,9 @@ foreach ($argv as $key => $argument){
 		}
 	}
 }
+
 $optUser = $options["u"];
+
 if(isSet($options["p"])){
 	$optPass = $options["p"];
 }else{
@@ -68,9 +71,25 @@ if(isSet($options["p"])){
 	$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
     $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken."\1CDAFx¨op#"), base64_decode($optUser), MCRYPT_MODE_ECB, $iv));
 }
+if(strpos($optUser,",") !== false){
+    $originalOptUser = $optUser;
+    $nextUsers = explode(",", $optUser);
+    $optUser = array_shift($nextUsers);
+    $nextUsers = implode(",",$nextUsers);
+}
 
+
+$optStatusFile = $options["s"] OR false;
 $optAction = $options["a"];
 $optRepoId = $options["r"] OR false;
+if(strpos($optRepoId,",") !== false){
+    $nextRepositories = explode(",", $optRepoId);
+    $optRepoId = array_shift($nextRepositories);
+    $nextRepositories = implode(",", $nextRepositories);
+}
+
+echo("REPOSITORY : ".$optRepoId." USER : ".$optUser."\n");
+
 $optDetectUser = $options["detect_user"] OR false;
 $detectedUser = false;
 
@@ -101,6 +120,9 @@ if($optRepoId !== false){
     }
 	ConfService::switchRootDir($optRepoId, true);
 }else{
+    if($optStatusFile){
+        file_put_contents($optStatusFile, "ERROR:You must pass a -r argument specifying either a repository id or alias");
+    }
     die("You must pass a -r argument specifying either a repository id or alias");
 }
 
@@ -148,6 +170,9 @@ if(AuthService::usersEnabled())
 		AJXP_XMLWriter::header();
 		AJXP_XMLWriter::loggingResult($loggingResult, false, false, "");
 		AJXP_XMLWriter::close();
+        if($optStatusFile){
+            file_put_contents($optStatusFile, "ERROR:No user logged");
+        }
 		exit(1);
 	}
 }else{
@@ -181,5 +206,31 @@ if($xmlResult !== false && $xmlResult != ""){
 	AJXP_XMLWriter::requireAuth();
 	AJXP_XMLWriter::close();
 }
-session_write_close();
+echo("NEXT REPO ".$nextRepositories." (".$options["r"].")\n");
+echo("NEXT USERS ".$nextUsers." ( ".$originalOptUser." )\n");
+if(!empty($nextUsers) || !empty($nextRepositories)){
+
+    if(!empty($nextUsers)){
+        sleep(1);
+        $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, $nextUsers, $optStatusFile);
+        if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
+            file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
+        }
+    }
+    if(!empty($nextRepositories)){
+        sleep(1);
+        $process = AJXP_Controller::applyActionInBackground($nextRepositories, $optAction, $optArgs, $originalOptUser, $optStatusFile);
+        if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
+            file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
+        }
+    }
+
+}else if(isSet($optStatusFile)){
+
+    $status = explode(":", file_get_contents($optStatusFile));
+    file_put_contents($optStatusFile, "FINISHED".(in_array("QUEUED", $status)?":QUEUED":""));
+
+}
+
+
 ?>
