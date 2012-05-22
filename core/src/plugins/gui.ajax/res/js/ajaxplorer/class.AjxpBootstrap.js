@@ -311,6 +311,10 @@ Class.create("AjxpBootstrap", {
 	 * @param desktopNode String The id of the node to attach
 	 */
 	insertBasicSkeleton : function(desktopNode){
+        var elem = new Element("div", {style:"position: absolute;z-index: 10000; bottom: 0; right: 0; color: #666;font-family: Arial;font-size: 11px;text-align: right;padding: 3px; padding-right: 10px;"});
+        elem.update('AjaXplorer Community - Free non supported version &copy; C. du Jeu 2008-2012 - <a target="_blank" href="http://ajaxplorer.info/">http://ajaxplorer.info/</a>');
+        $(desktopNode).insert({after:elem});
+        disableTextSelection(elem);
 		if($('all_forms')) return;
 		$(desktopNode).insert({after:
 			'<div id="all_forms">\
