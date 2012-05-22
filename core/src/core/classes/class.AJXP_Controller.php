@@ -210,17 +210,23 @@ class AJXP_Controller{
      * @param Array $parameters
      * @return null|UnixProcess
      */
-	public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters){
+	public static function applyActionInBackground($currentRepositoryId, $actionName, $parameters, $user ="", $statusFile = ""){
 		$token = md5(time());
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
         if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
 		$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-        $user = "shared";
+        if(empty($user)){
+            if(AuthService::usersEnabled()) $user = AuthService::getLoggedUser()->getId();
+            else $user = "shared";
+        }
         if(AuthService::usersEnabled()){
-            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), AuthService::getLoggedUser()->getId(), MCRYPT_MODE_ECB, $iv));
+            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), $user, MCRYPT_MODE_ECB, $iv));
         }
 		$cmd = ConfService::getCoreConf("CLI_PHP")." ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
+        if($statusFile != ""){
+            $cmd .= " -s=".$statusFile;
+        }
 		foreach($parameters as $key=>$value){
             if($key == "action" || $key == "get_action") continue;
 			$cmd .= " --$key=".escapeshellarg($value);

@@ -128,9 +128,10 @@
                         <div id="scheduler-task-form" box_width="300"></div>
                     ]]></clientForm>
                     <standardFormDefinition>
-                        <param name="label" group="Task execution" label="action.scheduler.12" description="action.scheduler.12d" type="string" mandatory="true"/>
-                        <param name="schedule" group="Task execution" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
-                        <param name="repository_id" group="Task execution" label="action.scheduler.4" description="action.scheduler.4d" type="string" mandatory="true"/>
+                        <param name="label" group="Execution Context" label="action.scheduler.12" description="action.scheduler.12d" type="string" mandatory="true"/>
+                        <param name="schedule" group="Execution Context" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
+                        <param name="user_id" group="Execution Context" label="action.scheduler.17" description="action.scheduler.17d" type="string" mandatory="true" default=""/>
+                        <param name="repository_id" group="Execution Context" replicationGroup="group2" label="action.scheduler.4" description="action.scheduler.4d" type="select" choices="" mandatory="true"/>
                         <param name="action_name" group="Parameters" label="action.scheduler.1" description="action.scheduler.1d" type="string" mandatory="true"/>
                         <param name="param_name" group="Parameters" replicationGroup="group1" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
                         <param name="param_value" group="Parameters" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>

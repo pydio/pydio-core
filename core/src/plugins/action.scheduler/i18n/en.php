@@ -45,7 +45,9 @@ $mess = array(
     "15"=> "Run task",
     "15d" => "Trigger selected task now",
     "16" => "Run tasks",
-    "16d" => "Trigger scheduler and run scheduled tasks"
+    "16d" => "Trigger scheduler and run scheduled tasks",
+    "17" => "User(s)",
+    "17d" => "Enter a comma separated list of users, or wildcard * to recurse the task on all users."
 );
 
 ?>
