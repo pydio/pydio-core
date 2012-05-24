@@ -119,10 +119,23 @@ class UserMetaManager extends AJXP_Plugin {
 	}
 		
 	protected function getMetaDefinition(){
+        foreach($this->options as $key => $val){
+            $matches = array();
+            if(preg_match('/^meta_fields_(.*)$/', $key, $matches) != 0){
+                $repIndex = $matches[1];
+                $this->options["meta_fields"].=",".$val;
+                $this->options["meta_labels"].=",".$this->options["meta_labels_".$repIndex];
+                if(isSet($this->options["meta_visibility_".$repIndex]) && isSet($this->options["meta_visibility"])){
+                    $this->options["meta_visibility"].=",".$this->options["meta_visibility_".$repIndex];
+                }
+            }
+        }
+
 		$fields = $this->options["meta_fields"];
 		$arrF = explode(",", $fields);
 		$labels = $this->options["meta_labels"];
 		$arrL = explode(",", $labels);
+
 		$result = array();
 		foreach ($arrF as $index => $value){
 			if(isSet($arrL[$index])){
