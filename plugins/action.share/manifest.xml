@@ -26,7 +26,7 @@
                         actionBarGroup="put">
                     </context>
                     <selectionContext dir="true" file="true" recycle="false" unique="true"></selectionContext></gui>
-                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+                <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         if(!ajaxplorer.actionBar.shareCenter){
@@ -119,6 +119,12 @@
                         </div>
                         ]]>
                         </clientForm>
+                    <clientListener name="init"><![CDATA[
+                        if(ajaxplorer.user && !ajaxplorer.user.canWrite()){
+                            var action = ajaxplorer.getActionBar().getActionByName('share');
+                            action.selectionContext.dir = false;
+                        }
+                    ]]></clientListener>
                     <serverCallback methodName="switchAction"></serverCallback>
                     </processing>
             </action>
