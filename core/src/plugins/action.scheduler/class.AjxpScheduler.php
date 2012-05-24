@@ -306,8 +306,8 @@ class AjxpScheduler extends AJXP_Plugin{
                 foreach($httpVars as $key => $value){
                     if(preg_match('/^param_name_/', $key)) {
                         $paramIndex = str_replace("param_name_", "", $key);
-                        if(preg_match('/_ajxptype/', $paramIndex)) continue;
-                        if(preg_match('/_replication/', $paramIndex)) continue;
+                        if(preg_match('/ajxptype/', $paramIndex)) continue;
+                        if(preg_match('/replication/', $paramIndex)) continue;
                         if(isSet($httpVars["param_value_".$paramIndex])){
                             $data["PARAMS"][$value] = $httpVars["param_value_".$paramIndex];
                         }
