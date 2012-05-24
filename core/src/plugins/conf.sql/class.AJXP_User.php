@@ -478,7 +478,12 @@ class AJXP_User extends AbstractAjxpUser
         }
 
 	}
-	
+
+    function clearRights(){
+        $this->rights = array();
+        dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]='".$this->getId()."'");
+    }
+
 	/**
 	 * Save user rights, preferences and bookmarks.
 	 * @param String $context
