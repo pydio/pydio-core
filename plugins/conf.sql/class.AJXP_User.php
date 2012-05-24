@@ -441,7 +441,8 @@ class AJXP_User extends AbstractAjxpUser
 		if (!is_array($this->bookmarks)) { 
 			$this->bookmarks = Array();
 		}
-		
+
+        $this->bookmarks = array();
 		foreach ($all_bookmarks as $b) {
 			if (!is_array($this->bookmarks[$b['repo_uuid']])) {
 				$this->bookmarks[$b['repo_uuid']] = Array();
