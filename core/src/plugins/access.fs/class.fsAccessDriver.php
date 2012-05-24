@@ -1324,7 +1324,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         AJXP_Controller::applyHook("node.change", array($oldNode, new AJXP_Node($new), false));
 	}
 	
-	function autoRenameForDest($destination, $fileName){
+	public static function autoRenameForDest($destination, $fileName){
 		if(!is_file($destination."/".$fileName)) return $fileName;
 		$i = 1;
 		$ext = "";

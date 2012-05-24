@@ -132,6 +132,10 @@ class ftpAccessDriver extends fsAccessDriver {
 						$errorMessage = $err[1];
 						break;
 					}
+                    if(isSet($httpVars["auto_rename"])){
+                        $destination = $this->urlBase.$rep_source;
+                        $boxData["name"] = fsAccessDriver::autoRenameForDest($destination, $boxData["name"]);
+                    }
 					$boxData["destination"] = base64_encode($rep_source);
 					$destCopy = AJXP_XMLWriter::replaceAjxpXmlKeywords($this->repository->getOption("TMP_UPLOAD"));
 					AJXP_Logger::debug("Upload : tmp upload folder", array($destCopy));
