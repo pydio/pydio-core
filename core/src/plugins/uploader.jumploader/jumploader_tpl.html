@@ -42,18 +42,16 @@ var partitionLength = <?php echo ($partitionLength?$partitionLength:-1); ?>;
 var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
 var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
-function appletInitialized(uploader){	
-	var applet = document.getElementById('jumpLoaderApplet');
-	var origUrl = applet.getUploaderConfig().getUploadUrl();
+function appletInitialized(uploader){
+	var origUrl = uploader.getUploaderConfig().getUploadUrl();
 	var currentFolder = parent.base64_encode(parent.ajaxplorer.getUserSelection().getContextNode().getPath());
-	applet.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&ajxp_sessid=" + clientId);
-	applet.getUploaderConfig().setPartitionLength(partitionLength);
-	applet.getUploaderConfig().setMaxFileLength(maxFileLength);
+    uploader.getUploaderConfig().setUploadUrl(origUrl + "&dir=" + currentFolder + "&ajxp_sessid=" + clientId);
+    uploader.getUploaderConfig().setPartitionLength(partitionLength);
+    uploader.getUploaderConfig().setMaxFileLength(maxFileLength);
     parent.document.fire("ajaxplorer:longtask_starting");
 }
 
 function uploaderStatusChanged(uploader){
-	var applet = document.getElementById('jumpLoaderApplet');
 	// 1 = uploading, 0 is back to normal => we assume "uploaded"
 	if(uploader.getStatus() == 0){
 		parent.ajaxplorer.fireContextRefresh();
