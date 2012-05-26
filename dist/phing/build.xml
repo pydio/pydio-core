@@ -101,6 +101,7 @@
                   port="${ftp.port}"
                   username="${ftp.username}"
                   password="${ftp.password}"
+                  passive="${ftp.passive}"
                   dir="${ftp.dir}">
                   <fileset dir="${build.working_folder}">
                       <include name="${package_toload}"/>

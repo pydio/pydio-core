@@ -5,3 +5,7 @@ ftp.username=
 ftp.password=
 ftp.dir=
 ftp.port=
+ftp.passive=
+phing.log.mail.from=
+phing.log.mail.subject=
+phing.log.mail.recipients=
