@@ -11,6 +11,7 @@
 
 
     <target name="build" description="Main sequence">
+        <phingcall target="prepare"/>
         <phingcall target="zip"/>
         <phingcall target="deploy"/>
         <phingcall target="clean"/>
@@ -18,7 +19,8 @@
 
     <target name="deploy" description="Send package to FTP">
         <phingcall target="ftp_deploy">
-            <property name="package_toload" value="${packaged_zip}"/>
+            <property name="base_folder" value="${build.working_folder}/build"/>
+            <property name="package_toload" value="*.zip"/>
         </phingcall>
     </target>
 
@@ -61,25 +63,48 @@
         <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
     </target>
 
-    <target name="filter_plugins" description="Discriminate 'core' and 'ext' plugins">
-        <plugindiscriminate all="${build.source_folder}/plugins" ext="${build.working_folder}/ext_plugins"/>
+    <target name="prepare" description="Checkout, discriminate foldes">
+        <phingcall target="svn_export"/>
+        <phingcall target="filter_plugins"/>
     </target>
 
-    <target name="zip" depends="svn_export" description="Package as Zip archive">
+    <target name="zip" description="Package as Zip archive">
+        <mkdir dir="${build.working_folder}/build" />
         <tstamp/>
         <property name="packaged_zip" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.zip"/>
         <zip
                 basedir="${build.source_folder}"
-                destfile="${build.working_folder}/${packaged_zip}"
+                destfile="${build.working_folder}/build/${packaged_zip}"
                 includeemptydirs="true"
                 />
+        <phingcall target="build_external_plugins"/>
+    </target>
+
+    <target name="filter_plugins" description="Discriminate 'core' and 'ext' plugins">
+        <mkdir dir="${build.working_folder}/ext_plugins" />
+        <plugindiscriminate all="${build.source_folder}/plugins" ext="${build.working_folder}/ext_plugins"/>
+    </target>
+
+    <target name="build_external_plugins">
+        <foreach param="filename" absparam="absfilename" target="zip_plugin">
+            <fileset dir="${build.working_folder}/ext_plugins">
+                <include name="*.*"/>
+            </fileset>
+        </foreach>
+    </target>
+
+    <target name="zip_plugin" >
+        <tstamp/>
+        <property name="packaged_plugin" value="plugin-${filename}-${DSTAMP}.zip"/>
+        <zip
+                basedir="${absfilename}"
+                destfile="${build.working_folder}/build/${packaged_plugin}"
+                includeemptydirs="true"
+        />
     </target>
 
     <target name="clean" description="Clean all working folders">
-        <foreach list="${build.source_folder},${svn.local_folder}" param="filename" absparam="absfilename" target="delete_me">
-            <fileset dir="${build.working_folder}">
-                <include name="*.zip"/>
-            </fileset>
+        <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
     </target>
     <target name="delete_me">
@@ -100,7 +125,7 @@
     <!-- GENERIC TASKS -->
     <target name="ftp_deploy" description="Generic FTP deployment">
         <if>
-            <available file="${build.working_folder}/${package_toload}"/>
+            <available file="${base_folder}/${package_toload}"/>
             <then>
                 <ftpdeploy
                   host="${ftp.host}"
@@ -109,7 +134,7 @@
                   password="${ftp.password}"
                   passive="${ftp.passive}"
                   dir="${ftp.dir}">
-                  <fileset dir="${build.working_folder}">
+                  <fileset dir="${base_folder}">
                       <include name="${package_toload}"/>
                   </fileset>
                 </ftpdeploy>
