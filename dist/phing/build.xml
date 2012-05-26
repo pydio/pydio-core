@@ -124,26 +124,18 @@
 
     <!-- GENERIC TASKS -->
     <target name="ftp_deploy" description="Generic FTP deployment">
-        <if>
-            <available file="${base_folder}/${package_toload}"/>
-            <then>
-                <ftpdeploy
-                  host="${ftp.host}"
-                  port="${ftp.port}"
-                  username="${ftp.username}"
-                  password="${ftp.password}"
-                  passive="${ftp.passive}"
-                  dir="${ftp.dir}">
-                  <fileset dir="${base_folder}">
-                      <include name="${package_toload}"/>
-                  </fileset>
-                </ftpdeploy>
-                <echo message="Successfully sent ${package_toload} to ${ftp.host}"/>
-            </then>
-            <else>
-                <echo message="Cannot find ${package_toload}"/>
-            </else>
-        </if>
+        <ftpdeploy
+          host="${ftp.host}"
+          port="${ftp.port}"
+          username="${ftp.username}"
+          password="${ftp.password}"
+          passive="${ftp.passive}"
+          dir="${ftp.dir}">
+          <fileset dir="${base_folder}">
+              <include name="${package_toload}"/>
+          </fileset>
+        </ftpdeploy>
+        <echo message="Successfully sent ${package_toload} to ${ftp.host}"/>
     </target>
 
     <target name="lint" description="Check syntax of sources">
