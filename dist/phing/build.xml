@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="F:\VBox Machines\DebianShare\phing-grammar.rng"
+            type="application/xml"
+            schematypens="http://relaxng.org/ns/structure/1.0" ?>
+<project name="AjaXplorer" default="build">
+
+    <property file="build.properties"/>
+    <property name="build.source_folder" value="${build.working_folder}/source"/>
+    <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
+
+    <target name="build" depends="package_zip">
+        <phingcall target="ftp_deploy">
+            <property name="package_toload" value="${packaged_zip}"/>
+        </phingcall>
+        <phingcall target="clean_all"/>
+    </target>
+
+    <target name="echo_properties">
+        <echo message="Build folder is ${build.working_folder}"/>
+        <echo message="Source folder is ${build.source_folder}"/>
+    </target>
+
+    <target name="svn_update">
+        <echo msg="Checking out from ${svn.repository_url} or update and export"/>
+        <if>
+            <available type="dir" file="${svn.local_folder}"/>
+            <then>
+                <echo msg="==> Update only, dir already exists"/>
+                <svnupdate
+                        revision="HEAD"
+                        repositoryurl="${svn.repository_url}"
+                        todir="${svn.local_folder}"
+                />
+            </then>
+            <else>
+                <echo msg="==> Checkout from SVN"/>
+                <mkdir dir="${svn.local_folder}"/>
+                <svncheckout
+                        revision="HEAD"
+                        repositoryurl="${svn.repository_url}"
+                        todir="${svn.local_folder}"
+                />
+            </else>
+        </if>
+    </target>
+    <target name="svn_export" depends="svn_update">
+        <if>
+            <not><available type="dir" file="${svn.local_folder}"/></not>
+            <then>
+                <phingcall target="svn_update"/>
+            </then>
+        </if>
+        <if>
+            <available type="dir" file="${build.source_folder}"/>
+            <then><delete dir="${build.source_folder}"/></then>
+        </if>
+        <svnexport
+                repositoryurl="${svn.local_folder}"
+                todir="${build.source_folder}"
+                revision=""
+                />
+        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
+    </target>
+
+    <target name="package_zip" depends="svn_export">
+        <tstamp/>
+        <property name="packaged_zip" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.zip"/>
+        <zip
+                basedir="${build.source_folder}"
+                destfile="${build.working_folder}/${packaged_zip}"
+                includeemptydirs="true"
+                />
+    </target>
+
+    <target name="clean_all">
+        <foreach list="${build.source_folder},${svn.local_folder}" param="filename" absparam="absfilename" target="delete_me">
+            <fileset dir="${build.working_folder}">
+                <include name="*.zip"/>
+            </fileset>
+        </foreach>
+    </target>
+    <target name="delete_me">
+        <if>
+            <available file="${filename}"/>
+            <then>
+                <delete dir="${filename}"/>
+            </then>
+            <elseif>
+                <available file="${absfilename}"/>
+                <then>
+                    <delete file="${absfilename}"/>
+                </then>
+            </elseif>
+        </if>
+    </target>
+
+    <target name="ftp_deploy">
+        <if>
+            <available file="${build.working_folder}/${package_toload}"/>
+            <then>
+                <ftpdeploy
+                  host="${ftp.host}"
+                  port="${ftp.port}"
+                  username="${ftp.username}"
+                  password="${ftp.password}"
+                  dir="${ftp.dir}">
+                  <fileset dir="${build.working_folder}">
+                      <include name="${package_toload}"/>
+                  </fileset>
+                </ftpdeploy>
+                <echo message="Successfully sent ${package_toload} to ${ftp.host}"/>
+            </then>
+            <else>
+                <echo message="Cannot find ${package_toload}"/>
+            </else>
+        </if>
+    </target>
+
+</project>
