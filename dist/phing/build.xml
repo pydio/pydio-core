@@ -8,24 +8,22 @@
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
 
-    <target name="build" depends="package_zip">
+    <target name="build" description="Main sequence">
+        <phingcall target="zip"/>
+        <phingcall target="deploy"/>
+        <phingcall target="clean"/>
+    </target>
+
+    <target name="deploy" description="Send package to FTP">
         <phingcall target="ftp_deploy">
             <property name="package_toload" value="${packaged_zip}"/>
         </phingcall>
-        <phingcall target="clean_all"/>
     </target>
 
-    <target name="echo_properties">
-        <echo message="Build folder is ${build.working_folder}"/>
-        <echo message="Source folder is ${build.source_folder}"/>
-    </target>
-
-    <target name="svn_update">
-        <echo msg="Checking out from ${svn.repository_url} or update and export"/>
+    <target name="svn_update" description="Checkout or update depending on working-copy presence.">
         <if>
             <available type="dir" file="${svn.local_folder}"/>
             <then>
-                <echo msg="==> Update only, dir already exists"/>
                 <svnupdate
                         revision="HEAD"
                         repositoryurl="${svn.repository_url}"
@@ -33,7 +31,6 @@
                 />
             </then>
             <else>
-                <echo msg="==> Checkout from SVN"/>
                 <mkdir dir="${svn.local_folder}"/>
                 <svncheckout
                         revision="HEAD"
@@ -43,7 +40,7 @@
             </else>
         </if>
     </target>
-    <target name="svn_export" depends="svn_update">
+    <target name="svn_export" depends="svn_update" description="Export SVN data">
         <if>
             <not><available type="dir" file="${svn.local_folder}"/></not>
             <then>
@@ -62,7 +59,7 @@
         <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
     </target>
 
-    <target name="package_zip" depends="svn_export">
+    <target name="zip" depends="svn_export" description="Package as Zip archive">
         <tstamp/>
         <property name="packaged_zip" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.zip"/>
         <zip
@@ -72,7 +69,7 @@
                 />
     </target>
 
-    <target name="clean_all">
+    <target name="clean" description="Clean all working folders">
         <foreach list="${build.source_folder},${svn.local_folder}" param="filename" absparam="absfilename" target="delete_me">
             <fileset dir="${build.working_folder}">
                 <include name="*.zip"/>
@@ -94,7 +91,8 @@
         </if>
     </target>
 
-    <target name="ftp_deploy">
+    <!-- GENERIC TASKS -->
+    <target name="ftp_deploy" description="Generic FTP deployment">
         <if>
             <available file="${build.working_folder}/${package_toload}"/>
             <then>
@@ -114,6 +112,14 @@
                 <echo message="Cannot find ${package_toload}"/>
             </else>
         </if>
+    </target>
+
+    <target name="lint" description="Check syntax of sources">
+        <phplint>
+            <fileset dir="${build.source_folder}">
+                <include name="**/*.php"/>
+            </fileset>
+        </phplint>
     </target>
 
 </project>
