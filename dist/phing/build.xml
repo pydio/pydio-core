@@ -7,7 +7,6 @@
     <property file="build.properties"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
-    <property name="SVN_LASTREVISION" value=""/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
 
 
@@ -67,7 +66,6 @@
                 todir="${build.source_folder}"
                 revision=""
                 />
-        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
     </target>
 
     <target name="prepare" description="Checkout, discriminate foldes">
@@ -79,6 +77,7 @@
         <mkdir dir="${build.working_folder}/build" />
         <mkdir dir="${build.working_folder}/build/plugins" />
         <tstamp/>
+        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
         <property name="packaged_zip" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.zip"/>
         <zip
                 basedir="${build.source_folder}"
