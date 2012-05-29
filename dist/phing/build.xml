@@ -7,6 +7,7 @@
     <property file="build.properties"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
+    <property name="SVN_LASTREVISION" value=""/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
 
 
@@ -20,6 +21,12 @@
     <target name="deploy" description="Send package to FTP">
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build"/>
+            <property name="remote_folder" value="${ftp.dir}"/>
+            <property name="package_toload" value="*.zip"/>
+        </phingcall>
+        <phingcall target="ftp_deploy">
+            <property name="base_folder" value="${build.working_folder}/build/plugins"/>
+            <property name="remote_folder" value="${ftp.dir}/plugins"/>
             <property name="package_toload" value="*.zip"/>
         </phingcall>
     </target>
@@ -70,6 +77,7 @@
 
     <target name="zip" description="Package as Zip archive">
         <mkdir dir="${build.working_folder}/build" />
+        <mkdir dir="${build.working_folder}/build/plugins" />
         <tstamp/>
         <property name="packaged_zip" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.zip"/>
         <zip
@@ -98,7 +106,7 @@
         <property name="packaged_plugin" value="plugin-${filename}-${DSTAMP}.zip"/>
         <zip
                 basedir="${absfilename}"
-                destfile="${build.working_folder}/build/${packaged_plugin}"
+                destfile="${build.working_folder}/build/plugins/${packaged_plugin}"
                 includeemptydirs="true"
         />
     </target>
@@ -130,7 +138,7 @@
           username="${ftp.username}"
           password="${ftp.password}"
           passive="${ftp.passive}"
-          dir="${ftp.dir}">
+          dir="${remote_folder}">
           <fileset dir="${base_folder}">
               <include name="${package_toload}"/>
           </fileset>
