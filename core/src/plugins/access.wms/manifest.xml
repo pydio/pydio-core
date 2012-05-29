@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="wms" enabled="false" label="CONF_MESSAGE[WMS Server]" description="CONF_MESSAGE[Browse the layers served by a WMS server.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<server_settings>
+    <plugin_info>
+        <core_relation packaged="false" tested_version="4.0.4"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+    <server_settings>
 		<param name="HOST" type="string" label="CONF_MESSAGE[Wms Server]" description="CONF_MESSAGE[Wms server url]" mandatory="true"/>
 	</server_settings>
 	<client_settings icon="plugins/access.wms/images/world.png">

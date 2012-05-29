@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logdriver name="syslog" label="CONF_MESSAGE[Syslog logger]" description="CONF_MESSAGE[Send the logs to the system syslog]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Charles du Jeu</plugin_author>
+        <core_relation packaged="false" tested_version="4.0.4"/>
+    </plugin_info>
     <class_definition filename="plugins/log.syslog/class.sysLogDriver.php" classname="sysLogDriver"/>
     <client_settings>
         <resources>

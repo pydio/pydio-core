@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <authdriver name="cmsms" enabled="false" label="CONF_MESSAGE[DB Storage]" description="Stores the Authentication data in CMSMS FEU."  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="3.5.0"/>
+    <plugin_author>Jean-Christophe Ghio</plugin_author>
+    </plugin_info>
     <client_settings>
         <resources>
             <i18n namespace="cmsms" path="plugins/auth.cmsms/i18n"/>
