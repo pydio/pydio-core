@@ -8,6 +8,23 @@
    		</resources>
    	</client_settings>
    	<registry_contributions>
+           <actions>
+               <action name="filehasher_signature">
+                   <processing>
+                       <serverCallback methodName="switchActions"/>
+                   </processing>
+               </action>
+               <action name="filehasher_delta">
+                   <processing>
+                       <serverCallback methodName="switchActions"/>
+                   </processing>
+               </action>
+               <action name="filehasher_patch">
+                   <processing>
+                       <serverCallback methodName="switchActions"/>
+                   </processing>
+               </action>
+           </actions>
    		<hooks>
    			<serverCallback hookName="node.info" methodName="getFileHash" applyCondition="$apply = isSet($_GET['recursive']);"/>
    			<serverCallback hookName="node.change" methodName="invalidateHash" defer="true"/>

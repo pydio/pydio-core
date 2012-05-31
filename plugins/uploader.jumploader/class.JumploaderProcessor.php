@@ -35,6 +35,7 @@ class JumploaderProcessor extends AJXP_Plugin {
 	private static $skipDecoding = false;
 	
 	public function preProcess($action, &$httpVars, &$fileVars){
+        if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
 		$repository = ConfService::getRepository();
 		if($repository->detectStreamWrapper(false)){
 			$plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
@@ -66,6 +67,7 @@ class JumploaderProcessor extends AJXP_Plugin {
 	}	
 	
 	public function postProcess($action, $httpVars, $postProcessData){
+        if(isSet($httpVars["simple_uploader"]) || isSet($httpVars["xhr_uploader"])) return;
 		if(self::$skipDecoding){
 			
 		}

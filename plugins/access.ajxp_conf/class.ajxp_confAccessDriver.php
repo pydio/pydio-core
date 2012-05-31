@@ -1337,13 +1337,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	
 	function parseParameters(&$repDef, &$options, $userId = null){
-		
+
+        $replicationGroups = array();
 		foreach ($repDef as $key => $value)
 		{
 			$value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
 			if(strpos($key, "DRIVER_OPTION_")!== false
                 && strpos($key, "DRIVER_OPTION_")==0
                 && strpos($key, "ajxptype") === false
+                && strpos($key, "_replication") === false
                 && strpos($key, "_checkbox") === false){
 				if(isSet($repDef[$key."_ajxptype"])){
 					$type = $repDef[$key."_ajxptype"];
@@ -1369,6 +1371,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     unset($repDef[$key."_checkbox"]);
                     if(!$checked) continue;
                 }
+                if(isSet($repDef[$key."_replication"])){
+                    $repKey = $repDef[$key."_replication"];
+                    if(!is_array($replicationGroups[$repKey])) $replicationGroups[$repKey] = array();
+                    $replicationGroups[$repKey][] = $key;
+                }
 				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
 				unset($repDef[$key]);
 			}else{
@@ -1377,7 +1384,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				$repDef[$key] = $value;		
 			}
-		}		
+		}
+        // DO SOMETHING WITH REPLICATED PARAMETERS?
+        if(count($replicationGroups)){
+
+        }
 	}
 	    
 }

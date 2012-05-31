@@ -30,6 +30,17 @@ class FileHasher extends AJXP_Plugin
     */
     protected $metaStore;
 
+    public static function rsyncEnabled(){
+        return function_exists("rsync_generate_signature");
+    }
+
+    public function parseSpecificContributions(DOMNode &$contribNode){
+        parent::parseSpecificContributions($contribNode);
+        if(!self::rsyncEnabled()){
+            // REMOVE rsync actions get_filesignature
+        }
+    }
+
    	public function initMeta($accessDriver){
    		$this->accessDriver = $accessDriver;
         $store = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
@@ -38,6 +49,61 @@ class FileHasher extends AJXP_Plugin
         //}
         $this->metaStore = $store;
         $this->metaStore->initMeta($accessDriver);
+    }
+
+    public function switchActions($actionName, $httpVars, $fileVars){
+        //$urlBase = $this->accessDriver
+        $repository = ConfService::getRepository();
+        if(!$repository->detectStreamWrapper(true)){
+            return false;
+        }
+        if(!isSet($this->pluginConf)){
+            $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
+        }
+        $streamData = $repository->streamData;
+        $this->streamData = $streamData;
+        $destStreamURL = $streamData["protocol"]."://".$repository->getId();
+        switch($actionName){
+            case "filehasher_signature":
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                if(!file_exists($destStreamURL.$file)) break;
+                $cacheItem = AJXP_Cache::getItem("signatures", $destStreamURL.$file, array($this, "generateSignature"));
+                $data = $cacheItem->getData();
+                header("Content-Type:application/octet-stream");
+                header("Content-Length", strlen($data));
+                echo($data);
+            break;
+            case "filehasher_delta":
+            case "filehasher_patch":
+                // HANDLE UPLOAD DATA
+                if(!isSet($fileVars) && !is_array($fileVars["userfile_0"])) {
+                    throw new Exception("These action should find uploaded data");
+                }
+                $uploadedData = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-sig");
+                move_uploaded_file($fileVars["userfile_0"]["tmp_name"], $uploadedData);
+
+                $fileUrl = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $file = call_user_func(array($this->streamData["classname"], "getRealFSReference"), $fileUrl, true);
+                if($actionName == "filehasher_delta"){
+                    $signatureFile = $uploadedData;
+                    $deltaFile = tempnam(AJXP_Utils::getAjxpTmpDir(), $actionName."-delta");
+                    rsync_generate_delta($signatureFile, $file, $deltaFile);
+                    header("Content-Type:application/octet-stream");
+                    header("Content-Length:".filesize($deltaFile));
+                    readfile($deltaFile);
+                    unlink($signatureFile);
+                    unlink($deltaFile);
+                }else{
+                    $patched = $file.".rdiff_patched";
+                    $deltaFile = $uploadedData;
+                    rsync_patch_file($file, $deltaFile, $patched);
+                    rename($patched, $file);
+                    header("Content-Type:text/plain");
+                    echo md5_file($file);
+                }
+
+            break;
+        }
     }
 
     /**
@@ -84,4 +150,8 @@ class FileHasher extends AJXP_Plugin
         $this->metaStore->removeMetadata($oldNode, FileHasher::METADATA_HASH_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
     }
 
+
+    public function generateSignature($masterFile, $targetFile){
+        rsync_generate_signature($masterFile, $targetFile);
+    }
 }
