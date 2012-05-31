@@ -412,8 +412,13 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			
 				$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 				$filename_new = AJXP_Utils::decodeSecureMagic($httpVars["filename_new"]);
+                $dest = null;
+                if(isSet($httpVars["dest"])){
+                    $dest = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
+                    $filename_new = "";
+                }
 				$this->filterUserSelectionToHidden(array($filename_new));
-				$this->rename($file, $filename_new);
+				$this->rename($file, $filename_new, $dest);
 				$logMessage= SystemTextEncoding::toUTF8($file)." $mess[41] ".SystemTextEncoding::toUTF8($filename_new);
 				$reloadContextNode = true;
 				$pendingSelection = $filename_new;
@@ -1294,7 +1299,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		return $this->rename($filePath, $newFilename);
 	}
 	
-	function rename($filePath, $filename_new)
+	function rename($filePath, $filename_new, $dest = null)
 	{
 		$nom_fic=basename($filePath);
 		$mess = ConfService::getMessages();
@@ -1305,8 +1310,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		{
 			throw new AJXP_Exception($mess[34]." ".$nom_fic." ".$mess[99]);
 		}
-		$new=dirname($old)."/".$filename_new;
-		if($filename_new=="")
+        if($dest == null) $new=dirname($old)."/".$filename_new;
+        else $new = $this->urlBase.$dest;
+		if($filename_new=="" && $dest == null)
 		{
 			throw new AJXP_Exception("$mess[37]");
 		}
