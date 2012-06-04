@@ -149,6 +149,9 @@ class ShareCenter extends AJXP_Plugin{
             		}
             	}else{
 					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                    if(!isSet($httpVars["downloadlimit"])){
+                        $httpVars["downloadlimit"] = 0;
+                    }
 	                $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $httpVars["downloadlimit"], $this->repository);
                     $customData = array();
                     foreach($httpVars as $key => $value){
