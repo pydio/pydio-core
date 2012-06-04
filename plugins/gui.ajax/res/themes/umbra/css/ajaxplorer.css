@@ -671,6 +671,21 @@ div.SF_label{
 	_width:54% !important; /*IE*/
 }
 
+div.SF_element.SF_largeLabel > div.SF_label{
+    width: 57% !important;
+   	_width:54% !important; /*IE*/
+}
+
+div.SF_element.SF_largeLabel > .SF_input{
+    width: 39% !important;
+}
+
+div.SF_element.SF_largeLabel > input.SF_input.SF_number,
+input.SF_input.SF_number{
+    width: 30px !important;
+    text-align: right;
+}
+
 .SF_box{
    width: 20px !important;
 }

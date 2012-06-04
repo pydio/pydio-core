@@ -243,6 +243,7 @@ ConfigEditor = Class.create({
 		var repositories = $A(XPathSelectNodes(xmlData, "//repo"));
         repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
         var odd = true;
+        var defaultRepository = XPathGetSingleNodeText(xmlData, '//pref[@name="force_default_repository"]/@value');
 		for(var i=0;i<repositories.length;i++){
 			var repoNode = repositories[i];
 			var repoLabel = XPathGetSingleNodeText(repoNode, "label");
@@ -263,7 +264,13 @@ ConfigEditor = Class.create({
 			rightsCell.insert(writeBox);
 			var tr = new Element('tr', {className:(odd?'odd':'even')});
 			odd = !odd;
-			var titleCell = new Element('td', {width:'45%'}).update('<img src="'+ajxpResourcesFolder+'/images/mimes/16/folder_red.png" style="float:left;margin-right:5px;">'+repoLabel);
+			var titleCell = new Element('td', {width:'45%'}).update('<img src="'+ajxpResourcesFolder+'/images/mimes/16/folder_red.png" style="float:left;margin-right:5px;">');
+            var theLabel = new Element("span",{className:'repositoryLabel', style:'cursor:pointer;', 'data-repoId':repoId}).update(repoLabel);
+            theLabel.observe("click", this.changeUserDefaultRepository.bind(this));
+            if(defaultRepository && repoId == defaultRepository){
+                theLabel.setStyle({fontWeight:"bold"});
+            }
+            titleCell.insert(theLabel);
 			tr.insert(titleCell);
 			tr.insert(rightsCell);
 			rightsTable.insert({bottom:tr});			
@@ -453,7 +460,35 @@ ConfigEditor = Class.create({
 		}
 		this.submitForm("edit_user", 'save_repository_user_params', parameters, null);
 	},
-	
+
+
+    changeUserDefaultRepository : function(event){
+        var target = event.target;
+        var repoId = target.getAttribute("data-repoId");
+        if(!$('chck_'+repoId+'_read').checked && !$('chck_'+repoId+'_write').checked){
+            alert("Please select an accessible repository to set as default!");
+            return ;
+        }
+        target.up('tbody').select('span.repositoryLabel').each(function(l){
+            l.setStyle({fontWeight:(l!=target)?'normal':'bold'});
+        });
+        this.setDefaultRepository(repoId);
+    },
+
+    setDefaultRepository : function(repositoryId){
+
+        var conn = new Connexion();
+        conn.setParameters(new Hash({
+            get_action:'save_user_preference',
+            user_id:this.userId,
+            pref_name_0:'force_default_repository',
+            pref_value_0:repositoryId
+        }))
+        conn.onComplete = function(transport){
+                this.parseXmlMessage(transport.responseXML);
+            }.bind(this);
+        conn.sendAsync();
+    },
 		
 	changeUserOrRoleRight: function(event){	
 		var oChckBox = Event.element(event);
