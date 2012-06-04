@@ -149,7 +149,7 @@ class ShareCenter extends AJXP_Plugin{
             		}
             	}else{
 					$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-	                $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $this->repository);
+	                $data = $this->accessDriver->makePublicletOptions($file, $httpVars["password"], $httpVars["expiration"], $httpVars["downloadlimit"], $this->repository);
                     $customData = array();
                     foreach($httpVars as $key => $value){
                         if(substr($key, 0, strlen("PLUGINS_DATA_")) == "PLUGINS_DATA_"){
@@ -199,6 +199,7 @@ class ShareCenter extends AJXP_Plugin{
                         $jsonData = array(
                                          "publiclet_link"   => $this->buildPublicletLink($metadata["element"]),
                                          "download_counter" => PublicletCounter::getCount($metadata["element"]),
+                                         "download_limit"   => $pData["DOWNLOAD_LIMIT"],
                                          "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
                                          "has_password"     => (!empty($pData["PASSWORD"]))
                                          );
@@ -445,11 +446,12 @@ class ShareCenter extends AJXP_Plugin{
     {
         // create driver from $data
         $className = $data["DRIVER"]."AccessDriver";
-        if ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"])
+        $hash = md5(serialize($data));
+        if ( ($data["EXPIRE_TIME"] && time() > $data["EXPIRE_TIME"]) || 
+            ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && $data["DOWNLOAD_LIMIT"] <= PublicletCounter::getCount($hash)) )
         {
             // Remove the publiclet, it's done
             if (strstr(realpath($_SERVER["SCRIPT_FILENAME"]),realpath(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"))) !== FALSE){
-		        $hash = md5(serialize($data));
 		        PublicletCounter::delete($hash);
                 unlink($_SERVER["SCRIPT_FILENAME"]);
             }

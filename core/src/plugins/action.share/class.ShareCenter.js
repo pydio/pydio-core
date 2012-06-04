@@ -168,7 +168,8 @@ Class.create("ShareCenter", {
                         oForm.down('div#generate_indicator').hide();
                         var linkDescription = '<tr><td class="infoPanelValue">' + MessageHash['share_center.11']+'</td><td class="infoPanelValue">'+ (json['expire_time'] == 0 ? MessageHash['share_center.14']:json['expire_time']) + '</td></tr>';
                         linkDescription += '<tr class="even"><td class="infoPanelValue">'  + MessageHash['share_center.12']+'</td><td class="infoPanelValue">' + (json['has_password']?MessageHash['share_center.13']:MessageHash['share_center.14']) + '</td></tr>';
-                        linkDescription += '<tr><td class="infoPanelValue">' + MessageHash['share_center.15'].replace('%s', '<span id="downloaded_times">'+json['download_counter']+'</span>')+'</td><td class="infoPanelValue" id="ip_reset_button"></td></tr>';
+                        linkDescription += '<tr class="infoPanelValue"><td class="infoPanelValue">'  + MessageHash['share_center.22']+'</td><td class="infoPanelValue">' + (json['download_limit'] == 0 ? MessageHash['share_center.25']:json['download_limit']) + '</td></tr>';
+                        linkDescription += '<tr><td class="even">' + MessageHash['share_center.15'].replace('%s', '<span id="downloaded_times">'+json['download_counter']+'</span>')+'</td><td class="infoPanelValue" id="ip_reset_button"></td></tr>';
                         var descDiv = new Element('div', {style:"margin-top: 10px;"}).update('<table class="infoPanelTable" cellspacing="0" cellpadding="0" style="border-top:1px solid #eee;border-left:1px solid #eee;">'+linkDescription+'</table>');
                         var resetLink = new Element('a', {style:'text-decoration:underline;cursor:pointer;', title:MessageHash['share_center.17']}).update(MessageHash['share_center.16']).observe('click', this.resetDownloadCounterCallback.bind(this));
                         descDiv.down('#ip_reset_button').insert(resetLink);

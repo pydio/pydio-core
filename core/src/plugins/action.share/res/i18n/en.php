@@ -22,7 +22,10 @@ $mess = array(
     "17"=> "Click to reset download counter",
     "18"=> "Folder is shared as a new repository",
     "19"=> "Shared repository options were successfully modified",
-    "20"=> "Ooops, the file you required could not be found! Maybe it was deleted or it is not shared with you anymore."
+    "20"=> "Ooops, the file you required could not be found! Maybe it was deleted or it is not shared with you anymore.",
+    "21"=> "Expire after (days): ",
+    "22"=> "Allowed Downloads: ",
+    "23"=> "Optional password: ",
+    "24"=> "Set expiration limits and define a password to access the file, then click on \"Generate\".",
+    "25"=> "No limit"
 );
-
-?>

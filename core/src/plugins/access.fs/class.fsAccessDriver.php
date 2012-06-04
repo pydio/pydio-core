@@ -1795,7 +1795,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
     
     
     /** The publiclet URL making */
-    function makePublicletOptions($filePath, $password, $expire, $repository)
+    function makePublicletOptions($filePath, $password, $expire, $downloadlimit, $repository)
     {
     	$data = array(
             "DRIVER"=>$repository->getAccessType(),
@@ -1803,6 +1803,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
             "FILE_PATH"=>$filePath,
             "ACTION"=>"download",
             "EXPIRE_TIME"=>$expire ? (time() + $expire * 86400) : 0,
+            "DOWNLOAD_LIMIT"=>$downloadlimit ? $downloadlimit : 0,
             "PASSWORD"=>$password
         );
         return $data;

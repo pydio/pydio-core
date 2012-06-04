@@ -92,11 +92,12 @@ class AbstractAccessDriver extends AJXP_Plugin {
      * Populate publiclet options
      * @param String $filePath The path to the file to share
      * @param String $password optionnal password
+     * @param String $downloadlimit optional limit for downloads
      * @param String $expires optional expiration date
      * @param Repository $repository
      * @return Array
      */
-    function makePublicletOptions($filePath, $password, $expires, $repository) {}
+    function makePublicletOptions($filePath, $password, $expires, $downloadlimit, $repository) {}
 
     /**
      * Populate shared repository options

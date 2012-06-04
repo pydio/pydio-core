@@ -44,13 +44,18 @@
                             </fieldset>
                             <fieldset id="share_optional_fields">
                                 <legend ajxp_message_id="307">AJXP_MESSAGE[307]</legend>
-                                <div ajxp_message_id="294" class="dialogLegend">AJXP_MESSAGE[294]</div>
-                                <div style="padding:10px 5px 0 5;">
-                                    <span ajxp_message_id="295">AJXP_MESSAGE[295]</span>
-                                    <input type="text" name="expiration" value="0" style="width: 20px ! important;margin-right:10px;">
-
-                                    <span ajxp_message_id="182">AJXP_MESSAGE[182]</span>
-                                    <input type="password" style="width:60px;" name="password" value="" autocomplete="off">
+                                <div class="dialogLegend" ajxp_message_id="share_center.24">AJXP_MESSAGE[share_center.24]</div>
+                                <div class="SF_element SF_largeLabel">
+                                    <div class="SF_label" ajxp_message_id="share_center.21">AJXP_MESSAGE[share_center.21]</div>
+                                    <input type="text" name="expiration" value="0" class="SF_input SF_number">
+                                </div>
+                                <div class="SF_element SF_largeLabel">
+                                    <div class="SF_label" ajxp_message_id="share_center.22">AJXP_MESSAGE[share_center.22]</div>
+                                    <input type="text" name="downloadlimit" value="0" class="SF_input SF_number">
+                                </div>
+                                <div class="SF_element SF_largeLabel">
+                                    <div class="SF_label" ajxp_message_id="share_center.23">AJXP_MESSAGE[share_center.23]</div>
+                                    <input type="password" name="password" value="" autocomplete="off"class="SF_input">
                                 </div>
                                 <div class="SF_element" id="public_pass_container"></div>
                             </fieldset>
