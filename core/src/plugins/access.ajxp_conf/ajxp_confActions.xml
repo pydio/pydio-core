@@ -411,6 +411,11 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="save_user_preference">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="edit_meta_source">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>

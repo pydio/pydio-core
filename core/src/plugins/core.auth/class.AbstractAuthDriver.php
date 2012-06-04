@@ -66,9 +66,17 @@ class AbstractAuthDriver extends AJXP_Plugin {
         				$loggingResult = -4; // Force captcha reload
         			}
         		}
+                $loggedUser = AuthService::getLoggedUser();
                 if($loggedUser != null)
                	{
-                       $res = ConfService::switchUserToActiveRepository($loggedUser, (isSet($httpVars["tmp_repository_id"])?$httpVars["tmp_repository_id"]:"-1"));
+                       $force = $loggedUser->getPref("force_default_repository");
+                       $passId = -1;
+                       if(isSet($httpVars["tmp_repository_id"])){
+                           $passId = $httpVars["tmp_repository_id"];
+                       }else if($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"])){
+                           $passId = $force;
+                       }
+                       $res = ConfService::switchUserToActiveRepository($loggedUser, $passId);
                        if(!$res){
                            AuthService::disconnect();
                            $loggingResult = -3;

@@ -512,6 +512,38 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				AJXP_XMLWriter::close();
 										
 			break;
+
+            case "save_user_preference":
+
+                if(!isSet($httpVars["user_id"]) || !AuthService::userExists($httpVars["user_id"]) ){
+                    throw new Exception($mess["ajxp_conf.61"]);
+                }
+                $userId = $httpVars["user_id"];
+                if($userId == $loggedUser->getId()){
+                    $userObject = $loggedUser;
+                }else{
+                    $confStorage = ConfService::getConfStorageImpl();
+                    $userObject = $confStorage->createUserObject($userId);
+                }
+                $i = 0;
+                while(isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i]))
+                {
+                    $prefName = AJXP_Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
+                    $prefValue = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote(($httpVars["pref_value_".$i])));
+                    if($prefName == "password") continue;
+                    if($prefName != "pending_folder" && $userObject == null){
+                        $i++;
+                        continue;
+                    }
+                    $userObject->setPref($prefName, $prefValue);
+                    $userObject->save("user");
+                    $i++;
+                }
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage("Saved preference!", null);
+                AJXP_XMLWriter::close();
+
+            break;
 	
 			case  "get_drivers_definition":
 				

@@ -174,7 +174,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
      * @return array()
      */
     function getExposedPreferences($userObject){
-        $stringPrefs = array("display","lang","diapo_autofit","sidebar_splitter_size","vertical_splitter_size","history/last_repository","pending_folder","thumb_size","plugins_preferences","upload_auto_send","upload_auto_close","upload_existing","action_bar_style");
+        $stringPrefs = array("display","lang","diapo_autofit","sidebar_splitter_size","vertical_splitter_size","history/last_repository","pending_folder","thumb_size","plugins_preferences","upload_auto_send","upload_auto_close","upload_existing","action_bar_style", "force_default_repository");
         $jsonPrefs = array("ls_history","columns_size", "columns_visibility", "gui_preferences");
         $prefs = array();
         if( $userObject->getId()=="guest" && ConfService::getCoreConf("SAVE_GUEST_PREFERENCES", "conf") === false){
@@ -216,7 +216,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				{
 					break;
 				}
-				$dirList = ConfService::getRootDirsList();
+				$dirList = ConfService::getRepositoriesList();
                 /** @var $repository_id string */
                 if(!isSet($dirList[$repository_id]))
 				{
