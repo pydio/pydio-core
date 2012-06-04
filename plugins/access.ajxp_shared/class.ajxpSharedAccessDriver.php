@@ -150,7 +150,8 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 		AJXP_XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist">
 				<column messageId="ajxp_shared.4" attributeName="ajxp_label" sortType="String" width="20%"/>
 				<column messageId="ajxp_shared.17" attributeName="download_url" sortType="String" width="20%"/>
-				<column messageId="ajxp_shared.20" attributeName="download_count" sortType="String" width="5%"/>
+				<column messageId="ajxp_shared.20" attributeName="download_count" sortType="String" width="2%"/>
+                <column messageId="share_center.22" attributeName="download_limit" sortType="String" width="2%"/>
 				<column messageId="ajxp_shared.6" attributeName="password" sortType="String" width="5%"/>
 				<column messageId="ajxp_shared.7" attributeName="expiration" sortType="String" width="5%"/>				
 			</columns>');
@@ -183,6 +184,7 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 				"password" => ($publicletData["PASSWORD"]!=""?$publicletData["PASSWORD"]:"-"), 
 				"expiration" => ($publicletData["EXPIRE_TIME"]!=0?($expired?"[!]":"").date($mess["date_format"], $publicletData["EXPIRE_TIME"]):"-"), 				
 				"download_count" => $publicletData["DOWNLOAD_COUNT"],
+                "download_limit" => ($publicletData["DOWNLOAD_LIMIT"] == 0 ? "-" : $publicletData["DOWNLOAD_LIMIT"] ),
 				"integrity"  => (!$publicletData["SECURITY_MODIFIED"]?$mess["ajxp_shared.15"]:$mess["ajxp_shared.16"]),
 				"download_url" => $downloadBase . "/".basename($file),
 				"ajxp_mime" => "shared_file")
@@ -203,7 +205,8 @@ class ajxpSharedAccessDriver extends AbstractAccessDriver
 			if(!isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $userId){
 				continue;
 			}
-			if(isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()){
+			if( (isSet($publicletData["EXPIRE_TIME"]) && is_numeric($publicletData["EXPIRE_TIME"]) && $publicletData["EXPIRE_TIME"] > 0 && $publicletData["EXPIRE_TIME"] < time()) ||
+                            (isSet($publicletData["DOWNLOAD_LIMIT"]) && $publicletData["DOWNLOAD_LIMIT"] > 0 && $publicletData["DOWNLOAD_LIMIT"] <= $publicletData["DOWNLOAD_COUNT"]) ) {
 				unlink($file);
 				$deleted[] = basename($file);
         		PublicletCounter::delete(str_replace(".php", "", basename($file)));

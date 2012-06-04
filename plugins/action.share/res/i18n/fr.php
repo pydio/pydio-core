@@ -22,7 +22,10 @@ $mess = array(
     "17"=> "Cliquer pour remettre à zéro le compteur de téléchargements",
     "18"=> "Le répertoire a été partagé comme un nouveau dépôt",
     "19"=> "Les options de partage ont été modifiées avec succès",
-    "20"=> "Ooops, le fichier que vous recherchez n'a pas été trouvé! Peut-être n'est il plus partagé avec vous?"
+    "20"=> "Ooops, le fichier que vous recherchez n'a pas été trouvé! Peut-être n'est il plus partagé avec vous?",
+    "21"=> "Expire après (jours): ",
+    "22"=> "Downloads autorisés: ",
+    "23"=> "Mot de passe: ",
+    "24"=> "Fixer les limites d'expiration et un mot de passe optionnel, puis cliquer sur \"Génerer\".",
+    "25"=> "Pas de limite"
 );
-
-?>

@@ -21,6 +21,10 @@ $mess = array(
     "17"=> "Klicken um den Zähler zurückzusetzen",
     "18"=> "Ordner ist als neues Repository freigegeben",
     "19"=> "Freigegebene Repository Optionen wurden erfolgreich geändert",
-    "20"=> "Ooops, die gesuchte Datei konnte nicht gefunden werden! Möglicherweise wurde die Datei bereits entfernt, oder ist nicht mehr freigegeben."
+    "20"=> "Ooops, die gesuchte Datei konnte nicht gefunden werden! Möglicherweise wurde die Datei bereits entfernt, oder ist nicht mehr freigegeben.",
+    "21"=> "Expire after (days): ",
+    "22"=> "Erlaubte Downloads: ",
+    "23"=> "Optional password: ",
+    "24"=> "Set expiration limits and define a password to access the file, then click on \"Generate\".",
+    "25"=> "Kein limit"
 );
-?>
