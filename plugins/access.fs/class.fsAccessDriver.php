@@ -67,6 +67,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					throw new AJXP_Exception("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
 				}
 			}
+            $dataTemplate = $this->repository->getOption("DATA_TEMPLATE");
+            if(!empty($dataTemplate) && is_dir($dataTemplate) && !is_file($path."/.ajxp_template")){
+                $errs = array();$succ = array();
+                $this->dircopy($dataTemplate, $path, $succ, $errs, false, false);
+                touch($path."/.ajxp_template");
+            }
 		}else{
 			if(!is_dir($path)){
 				throw new AJXP_Exception("Cannot find base path for your repository! Please check the configuration!");
@@ -1587,7 +1593,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	// Syntaxis: [$number =] dircopy($sourcedirectory, $destinationdirectory [, $verbose]);
 	// Example: $num = dircopy('A:\dir1', 'B:\dir2', 1);
 
-	function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false) 
+	function dircopy($srcdir, $dstdir, &$errors, &$success, $verbose = false, $convertSrcFile = true)
 	{
 		$num = 0;
 		//$verbose = true;
@@ -1605,8 +1611,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
 						if($ow > 0) 
 						{
-							try { 
-								$tmpPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $srcfile);
+							try {
+                                if($convertSrcFile) $tmpPath = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $srcfile);
+                                else $tmpPath = $srcfile;
 								if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
 								copy($tmpPath, $dstfile);
 								$success[] = $srcfile;
@@ -1619,7 +1626,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					else
 					{
 						if($verbose) echo "Dircopy $srcfile";
-						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose);
+						$num += $this->dircopy($srcfile, $dstfile, $errors, $success, $verbose, $convertSrcFile);
 					}
 				}
 			}

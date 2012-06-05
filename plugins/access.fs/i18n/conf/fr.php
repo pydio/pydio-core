@@ -33,5 +33,6 @@ $mess=array(
 "Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)" => "Pour contourner la limitation à 2Go, utilise un appel système pour récuperer la taille des fichiers. Peut entrer en conflit avec des limitations du php (shell_exec).",
 "X-SendFile Active" => "X-Sendfile Actif",
 "Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)" => "Déleguer les opérations de téléchargement au serveur web grâce au module X-SendFile. Attention, il est packagé par défaut dans Lighttpd mais doit être téléchargé et ajouté manuellement dans Apache. Il faut aussi configurer manuellement les chemins autorisés pour télécharger des fichiers, voir la directive XSendFilePath.",
+"Data template" => "Données préchargées",
+"Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded." => "Chemin vers un répertoire sur le filesystem dont le contenu va être copié dans le dépôt à la première connexion."
 );
-?>
