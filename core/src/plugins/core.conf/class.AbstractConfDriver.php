@@ -457,6 +457,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     AJXP_XMLWriter::sendMessage(null, $mess[426]);
                 }else{
                     $loggedUser = AuthService::getLoggedUser();
+                    // Make sure we do not overwrite otherwise loaded rights.
+                    $loggedUser->load();
                     $loggedUser->setRight($newRep->getUniqueId(), "rw");
                     $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);
@@ -482,6 +484,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     AJXP_XMLWriter::sendMessage(null, $mess[427]);
                 }else{
                     $loggedUser = AuthService::getLoggedUser();
+                    // Make sure we do not override remotely set rights
+                    $loggedUser->load();
                     $loggedUser->removeRights($repoId);
                     $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);
