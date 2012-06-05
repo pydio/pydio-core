@@ -33,5 +33,6 @@ $mess=array(
 "Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)" => "Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)",
 "X-SendFile Active" => "X-SendFile Active",
 "Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)" => "Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)",
+"Data template" => "Data template",
+"Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded." => "Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded."
 );
-?>
