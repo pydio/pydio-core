@@ -53,7 +53,7 @@ class PHPCLI extends AbstractTest
             $cmd .= " > ".$logFile;
             $cmd .= "\n DEL $tmpBat";
             file_put_contents($tmpBat, $cmd);
-            pclose(popen("start /b ".$tmpBat, 'r'));
+            @pclose(@popen("start /b ".$tmpBat, 'r'));
         }else{
             new UnixProcess($cmd, $logFile);
         }
