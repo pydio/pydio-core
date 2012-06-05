@@ -540,7 +540,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $i++;
                 }
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::sendMessage("Saved preference!", null);
+                AJXP_XMLWriter::sendMessage("Succesfully saved user preference", null);
                 AJXP_XMLWriter::close();
 
             break;

@@ -246,6 +246,8 @@ class ConfService
         }else {
             if($lastRepoId !== "" && $lastRepoId!==$currentRepoId && $parameterId == -1 && $loggedUser->canSwitchTo($lastRepoId)){
                 ConfService::switchRootDir($lastRepoId);
+            }else if($parameterId != -1 && $loggedUser->canSwitchTo($parameterId)){
+                ConfService::switchRootDir($parameterId);
             }else if(!$loggedUser->canSwitchTo($currentRepoId)){
                 ConfService::switchRootDir($defaultRepoId);
             }
