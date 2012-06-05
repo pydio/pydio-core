@@ -199,8 +199,13 @@ class ShareCenter extends AJXP_Plugin{
                         if($pData["OWNER_ID"] != AuthService::getLoggedUser()->getId()){
                             throw new Exception("You are not allowed to access this data");
                         }
+                        if(isSet($metadata["short_form_url"])){
+                            $link = $metadata["short_form_url"];
+                        }else{
+                            $link = $this->buildPublicletLink($metadata["element"]);
+                        }
                         $jsonData = array(
-                                         "publiclet_link"   => $this->buildPublicletLink($metadata["element"]),
+                                         "publiclet_link"   => $link,
                                          "download_counter" => PublicletCounter::getCount($metadata["element"]),
                                          "download_limit"   => $pData["DOWNLOAD_LIMIT"],
                                          "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
