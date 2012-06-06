@@ -1424,7 +1424,8 @@ Class.create("FilesList", SelectableElements, {
 			width		: 80,										// Width of the progressbar - don't forget to adjust your image too!!!
 			boxImage	: window.ajxpResourcesFolder+'/images/progress_box_80.gif',			// boxImage : image around the progress bar
 			barImage	: window.ajxpResourcesFolder+'/images/progress_bar_80.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 11										// Height of the progressbar - don't forget to adjust your image too!!!
+			height		: 8,										// Height of the progressbar - don't forget to adjust your image too!!!
+            visualStyle : 'position:relative;'
 		};
 		element.update(div);
 		div.insert({top:span});
