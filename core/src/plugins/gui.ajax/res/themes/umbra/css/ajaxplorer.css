@@ -1020,6 +1020,7 @@ a.carousel-control img{
     -webkit-box-shadow:0 0px 5px #bbb;
     -moz-box-shadow:0 0px 5px #bbb;
     box-shadow:0 0px 5px #bbb;
+    clear:left;
 }
 
 #locationBar{

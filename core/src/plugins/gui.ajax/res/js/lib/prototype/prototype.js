@@ -2533,13 +2533,22 @@ if (Prototype.Browser.Opera) {
 }
 
 else if (Prototype.Browser.IE) {
+ // Opacity feature test borrowed from Modernizr.
+  var STANDARD_CSS_OPACITY_SUPPORTED = (function() {
+        var DIV = document.createElement("div");
+        DIV.style.cssText = "opacity:.55";
+        var result =  /^0.55/.test(DIV.style.opacity);
+        DIV = null;
+        return result;
+  })();
+
   Element.Methods.getStyle = function(element, style) {
     element = $(element);
     style = (style == 'float' || style == 'cssFloat') ? 'styleFloat' : style.camelize();
     var value = element.style[style];
     if (!value && element.currentStyle) value = element.currentStyle[style];
 
-    if (style == 'opacity') {
+    if (style == 'opacity' && !STANDARD_CSS_OPACITY_SUPPORTED ) {
       if (value = (element.getStyle('filter') || '').match(/alpha\(opacity=(.*)\)/))
         if (value[1]) return parseFloat(value[1]) / 100;
       return 1.0;
@@ -2554,6 +2563,13 @@ else if (Prototype.Browser.IE) {
   };
 
   Element.Methods.setOpacity = function(element, value) {
+      if(STANDARD_CSS_OPACITY_SUPPORTED){
+          element = $(element);
+          if (value == 1 || value === '') value = '';
+          else if (value < 0.00001) value = 0;
+          element.style.opacity = value;
+          return element;
+      }
     function stripAlpha(filter){
       return filter.replace(/alpha\([^\)]*\)/gi,'');
     }
