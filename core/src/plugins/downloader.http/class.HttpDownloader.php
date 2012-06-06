@@ -79,7 +79,7 @@ class HttpDownloader extends AJXP_Plugin{
 				);
 				$client->setHeadersOnly(true, $collectHeaders);
 				$client->setMaxRedirects(8);
-				$client->setDebug(true);
+				$client->setDebug(false);
 				$client->get($getPath);
 				
 				$pidHiddenFileName = $destStreamURL.".".$basename.".pid";
@@ -100,6 +100,10 @@ class HttpDownloader extends AJXP_Plugin{
 		    		$totalSize = intval($collectHeaders["content-length"]);
 		    		AJXP_Logger::debug("Should download $totalSize bytes!");
 		    	}
+                if($totalSize != -1){
+                    $node = new AJXP_Node($destStreamURL.$basename);
+                    AJXP_Controller::applyHook("node.before_create", array($node, $totalSize));
+                }
 				$qData = false;
 				if(!empty($collectHeaders["ajxp-last-redirection"])){
 					$newParsed = parse_url($collectHeaders["ajxp-last-redirection"]);

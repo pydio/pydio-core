@@ -137,33 +137,6 @@ class AJXP_ClientDriver extends AJXP_Plugin
 				
 			break;
 			
-			//------------------------------------
-			//	CHECK UPDATE
-			//------------------------------------
-			case "check_software_update":
-			
-				$content = @file_get_contents(SOFTWARE_UPDATE_SITE."ajxp.version");
-				$message = $mess["345"];
-				if(isSet($content) && $content != ""){
-					if(strstr($content, "::URL::")!== false){
-						list($version, $downloadUrl) = explode("::URL::", $content);
-					}else{
-						$version = $content;
-						$downloadUrl = "http://www.ajaxplorer.info/";
-					}
-					$compare = version_compare(AJXP_VERSION, $content);
-					if($compare >= 0){
-						$message = $mess["346"];
-					}else{
-						$link = '<a target="_blank" href="'.$downloadUrl.'">'.$downloadUrl.'</a>';
-						$message = sprintf($mess["347"], $version, $link);
-					}
-				}
-				HTMLWriter::charsetHeader("text/plain");
-				print($message);
-				
-			break;
-			
 
 			//------------------------------------
 			//	GET BOOT GUI
