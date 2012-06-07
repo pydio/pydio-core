@@ -51,6 +51,13 @@ class UpdateController extends AJXP_Plugin {
         $loggedUser = AuthService::getLoggedUser();
         if(AuthService::usersEnabled() && !$loggedUser->isAdmin()) return ;
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.updater/class.AjaXplorerUpgrader.php");
+        if(!empty($this->pluginConf["PROXY_HOST"])){
+            AjaXplorerUpgrader::configureProxy(
+                $this->pluginConf["PROXY_HOST"],
+                $this->pluginConf["PROXY_USER"],
+                $this->pluginConf["PROXY_PASS"]
+            );
+        }
 
         switch ($action){
 
