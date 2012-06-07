@@ -479,7 +479,9 @@ text/xml xml
 video/3gpp 3gp
 video/dv dv dif
 video/isivideo
-video/mpeg mpeg mpg mp2 mp4 mpe vob
+video/mp4 mp4
+video/mpeg mpeg mpg mp2 mpe vob
+video/x-m4v m4v
 video/ogg ogv
 video/quicktime qt mov moov qtvr
 video/vivo
