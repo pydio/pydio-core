@@ -607,20 +607,50 @@ class AuthService
      * @static
      * @return array
      */
-	static function listUsers($regexp = null)
+	static function listUsers($regexp = null, $offset = -1, $limit = -1, $cleanLosts = true)
 	{
-		$authDriver = ConfService::getAuthDriverImpl();		
+		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
 		$allUsers = array();
-		$users = $authDriver->listUsers();
+        $paginated = false;
+        if(($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()){
+            $users = $authDriver->listUsersPaginated($regexp, $offset, $limit);
+            $paginated = true;
+        }else{
+            $users = $authDriver->listUsers();
+        }
 		foreach (array_keys($users) as $userId)
 		{
 			if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
-            if($regexp != null && !preg_match($regexp, $userId)) continue;
+            if($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match($regexp, $userId)) continue;
 			$allUsers[$userId] = $confDriver->createUserObject($userId);
+            if($paginated){
+                // Make sure to reload all children objects
+                foreach($confDriver->getUserChildren($userId) as $childObject){
+                    $allUsers[$childObject->getId()] = $childObject;
+                }
+            }
 		}
+        if($paginated && $cleanLosts){
+            // Remove 'lost' items (children without parents).
+            foreach($allUsers as $id => $object){
+                if($object->hasParent() && !array_key_exists($object->getParent(), $allUsers)){
+                    unset($allUsers[$id]);
+                }
+            }
+        }
 		return $allUsers;
 	}
+
+    static function authSupportsPagination(){
+        $authDriver = ConfService::getAuthDriverImpl();
+        return $authDriver->supportsUsersPagination();
+    }
+
+    static function authCountUsers(){
+        $authDriver = ConfService::getAuthDriverImpl();
+        return $authDriver->getUsersCount();
+    }
 
     static function getAuthScheme($userName){
         $authDriver = ConfService::getAuthDriverImpl();
