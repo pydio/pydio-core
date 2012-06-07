@@ -35,7 +35,7 @@ Class.create("VideoPreviewer", AbstractEditor, {
 
             var html5proxies = $H({});
 			var mime = ajxpNode.getAjxpMime();
-            if(mime == "mp4" || mime == "webm" || mime == "ogv"){
+            if(mime == "mp4" || mime == "m4v" || mime == "webm" || mime == "ogv"){
                 html5proxies.set(mime, ajxpNode.getPath());
             }
             var meta = ajxpNode.getMetadata();
@@ -65,6 +65,7 @@ Class.create("VideoPreviewer", AbstractEditor, {
 
 				var types = {
 					mp4:'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+					m4v:'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
 					webm:'video/webm; codecs="vp8, vorbis"',
 					ogv:'video/ogg; codecs="theora, vorbis"'
 				};
@@ -102,7 +103,7 @@ Class.create("VideoPreviewer", AbstractEditor, {
 							defaultVolume: 0.85, // Will be overridden by user's last volume if available
 							flashVersion: 9, // Required flash version for fallback
 							linksHiding: true, // Hide download links when video is supported,
-							playerFallbackOrder : (mime == "mp4"?["html5", "flash", "links"]:["html5", "links"])
+							playerFallbackOrder : (mime == "mp4" || mime=="m4v"?["html5", "flash", "links"]:["html5", "links"])
 						});
 					}
 					div.setStyle({width:dimensionObject.width});

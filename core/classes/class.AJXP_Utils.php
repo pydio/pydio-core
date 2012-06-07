@@ -498,7 +498,7 @@ class AJXP_Utils
             return "video/quicktime";
         }
         else if (preg_match("/\.m4v$/i", $fileName)) {
-            return "video/m4v";
+            return "video/x-m4v";
         }
         else if (preg_match("/\.3gp$/i", $fileName)) {
             return "video/3gpp";

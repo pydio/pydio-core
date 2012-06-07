@@ -50,6 +50,8 @@ class VideoReader extends AJXP_Plugin {
 				header("Content-Type: video/ogg; name=\"".basename($file)."\"");
  			}else if(preg_match("/\.mp4$/", $file)){
  				header("Content-Type: video/mp4; name=\"".basename($file)."\"");
+ 			}else if(preg_match("/\.m4v$/", $file)){
+ 				header("Content-Type: video/x-m4v; name=\"".basename($file)."\"");
  			}else if(preg_match("/\.webm$/", $file)){
  				header("Content-Type: video/webm; name=\"".basename($file)."\"");
  			}
