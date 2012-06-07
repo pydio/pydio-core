@@ -669,18 +669,21 @@ class ConfService
      */
 	public function getMessagesInst($forceRefresh = false)
 	{
-        if(!isset($this->configs["MESSAGES"]) && is_file(AJXP_PLUGINS_MESSAGES_FILE) && !$forceRefresh){
-            include(AJXP_PLUGINS_MESSAGES_FILE);
+        $crtLang = self::getLanguage();
+        $messageCacheDir = dirname(AJXP_PLUGINS_MESSAGES_FILE)."/i18n";
+        $messageFile = $messageCacheDir."/".$crtLang."_".basename(AJXP_PLUGINS_MESSAGES_FILE);
+        if(isSet($this->configs["MESSAGES"]) && !$forceRefresh){
+            return $this->configs["MESSAGES"];
+        }
+        if(!isset($this->configs["MESSAGES"]) && is_file($messageFile)){
+            include($messageFile);
             if(isSet($MESSAGES)){
                 $this->configs["MESSAGES"] = $MESSAGES;
             }
             if(isSet($CONF_MESSAGES)){
                 $this->configs["CONF_MESSAGES"] = $CONF_MESSAGES;
             }
-        }
-		if(!isset($this->configs["MESSAGES"]) || $forceRefresh)
-		{
-            $crtLang = self::getLanguage();
+        }else {
 			$this->configs["MESSAGES"] = array();
 			$this->configs["CONF_MESSAGES"] = array();
 			$nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
@@ -706,7 +709,8 @@ class ConfService
                     $this->configs["CONF_MESSAGES"] = array_merge($this->configs["CONF_MESSAGES"], $mess);
                 }
 			}
-            @file_put_contents(AJXP_PLUGINS_MESSAGES_FILE, "<?php \$MESSAGES = ".var_export($this->configs["MESSAGES"], true) ." ; \$CONF_MESSAGES = ".var_export($this->configs["CONF_MESSAGES"], true) ." ; ");
+            if(!is_dir($messageCacheDir)) mkdir($messageCacheDir);
+            @file_put_contents($messageFile, "<?php \$MESSAGES = ".var_export($this->configs["MESSAGES"], true) ." ; \$CONF_MESSAGES = ".var_export($this->configs["CONF_MESSAGES"], true) ." ; ");
 		}
 		
 		return $this->configs["MESSAGES"];
