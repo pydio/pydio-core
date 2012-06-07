@@ -33,6 +33,7 @@ class AjaXplorerUpgrader {
     private $additionalScript = "UPGRADE/PHP-SCRIPT";
     private $releaseNote = "UPGRADE/NOTE";
     private $installPath;
+    private static $context = null;
 
     private $archive;
     private $workingFolder;
@@ -72,10 +73,20 @@ class AjaXplorerUpgrader {
             "clearCache"            => "Clearing plugins cache",
             "displayNote"           => "Release note : ",
         );
+
+    }
+
+    public static function configureProxy($proxyHost, $proxyUser, $proxyPass){
+        $proxy = array( 'http' => array( 'proxy' => 'tcp://'.$proxyHost, 'request_fulluri' => true ) );
+        if(!empty($proxyUser) && !empty($proxyPass)) {
+            $auth = base64_encode($proxyUser.":".$proxyPass);
+            $proxy['http']['header'] = "Proxy-Authorization: Basic $auth";
+        }
+        self::$context = stream_context_create($proxy);
     }
 
     static function getUpgradePath($url, $format = "php", $channel="stable"){
-        $json = file_get_contents($url."?version=".AJXP_VERSION."&channel=".$channel);
+        $json = file_get_contents($url."?version=".AJXP_VERSION."&channel=".$channel, null, self::$context);
         if($format == "php") return json_decode($json, true);
         else return $json;
     }
@@ -124,7 +135,7 @@ class AjaXplorerUpgrader {
         if($this->debugMode && is_file($this->archive)) {
             return "Already downloaded";
         }
-        $content = file_get_contents($this->archiveURL);
+        $content = file_get_contents($this->archiveURL, null, self::$context);
         if($content === false || strlen($content) == 0){
             throw new Exception("Error while downloading");
         }
