@@ -164,7 +164,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	abstract function instantiateAbstractUserImpl($userId);
 	
 	abstract function getUserClassFileName();
-	
+
+    /**
+     * @abstract
+     * @param $userId
+     * @return array()
+     */
+    abstract function getUserChildren($userId);
+
 	function getOption($optionName){	
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
 	}

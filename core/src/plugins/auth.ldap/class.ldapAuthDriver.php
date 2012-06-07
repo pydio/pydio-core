@@ -98,27 +98,67 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
 
-    function getUserEntries($login = null){
+    function getUserEntries($login = null, $countOnly = false, $offset = -1, $limit = -1){
         if ($login == null){
             $filter = $this->ldapFilter;
         } else {
             if($this->ldapFilter == "") $filter = "(" . $this->ldapUserAttr . "=" . $login . ")";
             else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
-        if(is_array($this->ldapDN)) {
-                $entries=array('count'=>0);
-                foreach($this->ldapDN as $aDN) {
-                    $ret = ldap_search($this->ldapconn,$aDN,$filter,array($this->ldapUserAttr));
-                    $entries = ldap_get_entries($this->ldapconn, $ret);
-                    if($entries['count']!=0) {
-                        return $entries;
-                    }
-                }
-                return $entries;
-        } else {
-            $ret = ldap_search($this->ldapconn,$this->ldapDN,$filter, array($this->ldapUserAttr));
-            return ldap_get_entries($this->ldapconn, $ret);
+        $conn = array();
+        if(is_array($this->ldapDN)){
+            foreach($this->ldapDN as $dn){
+                $conn[] = $this->ldapconn;
+            }
+        }else{
+            $conn = array($this->ldapconn);
         }
+        $ret = ldap_search($conn,$this->ldapDN,$filter, array($this->ldapUserAttr));
+        $allEntries = array("count" => 0);
+        foreach($ret as $resourceResult){
+            if($countOnly){
+                $allEntries["count"] += ldap_count_entries($this->ldapconn, $resourceResult);
+                continue;
+            }
+            $entries = ldap_get_entries($this->ldapconn, $resourceResult);
+            $index = 0;
+            if(!empty($entries["count"])){
+                $allEntries["count"] += $entries["count"];
+                unset($entries["count"]);
+                foreach($entries as $entry){
+                    if($offset != -1 && $index < $offset){
+                        $index ++; continue;
+                    }
+                    $allEntries[] = $entry;
+                    $index ++;
+                    if($limit!= -1 && $index >= $offset + $limit) break;
+                }
+            }
+        }
+        return $allEntries;
+    }
+
+    function supportsUsersPagination(){
+        return true;
+    }
+    function listUsersPaginated($regexp, $offset, $limit){
+
+        if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."*";
+        else if($regexp[strlen($regexp)-1] == "$") $regexp = "*".rtrim($regexp, "$");
+
+        $entries = $this->getUserEntries($regexp, false, $offset, $limit);
+        $persons = array();
+        unset($entries['count']); // remove 'count' entry
+        foreach($entries as $id => $person){
+            $login = $person[$this->ldapUserAttr][0];
+            if(AuthService::ignoreUserCase()) $login = strtolower($login);
+            $persons[$login] = "XXX";
+        }
+        return $persons;
+    }
+    function getUsersCount(){
+        $res = $this->getUserEntries(null, true, null);
+        return $res["count"];
     }
 
 

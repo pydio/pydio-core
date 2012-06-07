@@ -206,6 +206,16 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	
 	function preLogUser($sessionId){}	
 
+    function supportsUsersPagination(){
+        return false;
+    }
+    function listUsersPaginated($regexp, $offset, $limit){
+        return $this->listUsers();
+    }
+    function getUsersCount(){
+        return -1;
+    }
+
     /**
      * @return Array
      */

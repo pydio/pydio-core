@@ -323,6 +323,18 @@ class sqlConfDriver extends AbstractConfDriver {
 		}
 		*/
 	}
+
+    function getUserChildren( $userId ){
+
+        $children = array();
+        $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s', "ajxp.parent_user", $userId);
+        $all = $children_results->fetchAll();
+        foreach ($all as $item){
+            $children[] = $this->createUserObject($item["login"]);
+        }
+        return $children;
+
+    }
 	
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
 	/**

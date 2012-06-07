@@ -166,6 +166,18 @@ class multiAuthDriver extends AbstractAuthDriver {
         }
     }
 
+    function supportsUsersPagination(){
+        return (!empty($this->baseName) && $this->drivers[$this->baseName]->supportsUsersPagination());
+    }
+
+    function listUsersPaginated($regexp, $offset, $limit){
+        return $this->drivers[$this->baseName]->listUsersPaginated($regexp, $offset, $limit);
+    }
+
+    function getUsersCount(){
+        return $this->drivers[$this->baseName]->getUsersCount();
+    }
+
 	function listUsers(){
         if($this->masterSlaveMode){
             if(!empty($this->baseName)) {

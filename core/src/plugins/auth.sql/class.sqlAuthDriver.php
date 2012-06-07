@@ -40,9 +40,30 @@ class sqlAuthDriver extends AbstractAuthDriver {
 			exit(1);
 		}		
 	}
-			
+
+    function supportsUsersPagination(){
+        return true;
+    }
+    function listUsersPaginated($regexp, $offset, $limit){
+        if($regexp != null){
+            if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
+            else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' ORDER BY [login] ASC") ;
+        }else if($offset != -1 || $limit != -1){
+            $res = dibi::query("SELECT * FROM [ajxp_users]  ORDER BY [login] ASC LIMIT $offset,$limit");
+        }else{
+            $res = dibi::query("SELECT * FROM [ajxp_users] ORDER BY [login] ASC");
+        }
+        $pairs = $res->fetchPairs('login', 'password');
+   		return $pairs;
+    }
+    function getUsersCount(){
+        $res = dibi::query("SELECT [login] FROM [ajxp_users]") ;
+        return $res->getRowCount();
+    }
+
 	function listUsers(){
-		$res = dibi::query("SELECT * FROM [ajxp_users]");
+		$res = dibi::query("SELECT * FROM [ajxp_users] ORDER BY [login] ASC");
 		$pairs = $res->fetchPairs('login', 'password');
 		return $pairs;
 	}

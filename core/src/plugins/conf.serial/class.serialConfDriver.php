@@ -201,7 +201,26 @@ class serialConfDriver extends AbstractConfDriver {
 		$byId[$repositoryId] = $repositorySlug;
 		AJXP_Utils::saveSerialFile($this->aliasesIndexFile, array_flip($byId));
 	}
-	
+
+    /**
+     * @abstract
+     * @param $userId
+     * @return array()
+     */
+    function getUserChildren($userId){
+        $result = array();
+        $authDriver = ConfService::getAuthDriverImpl();
+        $confDriver = ConfService::getConfStorageImpl();
+        $users = $authDriver->listUsers();
+        foreach (array_keys($users) as $id){
+            $object = $confDriver->createUserObject($id);
+            if($object->hasParent() && $object->getParent() == $userId){
+                $result[] = $object;
+            }
+        }
+        return $result;
+    }
+
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
 	/**
 	 * Instantiate the right class
