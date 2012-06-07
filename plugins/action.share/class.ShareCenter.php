@@ -131,11 +131,11 @@ class ShareCenter extends AJXP_Plugin{
             		}
             		$loggedUser = AuthService::getLoggedUser();
                     $crtValue = $httpVars["value"];
-                    if(!empty($crtValue)) $regexp = '/^'.$crtValue.'/i';
+                    if(!empty($crtValue)) $regexp = '^'.$crtValue;
                     else $regexp = null;
-            		$allUsers = AuthService::listUsers($regexp);
-            		$users = "";
-                    $limit = $this->pluginConf["SHARED_USERS_LIST_LIMIT"];
+                    $limit = min($this->pluginConf["SHARED_USERS_LIST_LIMIT"], 20);
+                    $allUsers = AuthService::listUsers($regexp, 0, $limit, false);
+                    $users = "";
                     $index = 0;
             		foreach ($allUsers as $userId => $userObject){
             			if( ( $userObject->hasParent() && $userObject->getParent() == $loggedUser->getId() ) || ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") == true  ){
