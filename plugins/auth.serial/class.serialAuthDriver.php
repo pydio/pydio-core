@@ -55,6 +55,32 @@ class serialAuthDriver extends AbstractAuthDriver {
         }
         return $users;
 	}
+
+    function supportsUsersPagination(){
+        return true;
+    }
+    function listUsersPaginated($regexp, $offset = -1 , $limit = -1){
+        $users = $this->listUsers();
+        $result = array();
+        $index = 0;
+        foreach($users as $usr => $pass){
+            if(!empty($regexp) && !preg_match("/$regexp/", $usr)){
+                continue;
+            }
+            if($offset != -1 && $index < $offset) {
+                $index ++;
+                continue;
+            }
+            $result[$usr] = $pass;
+            $index ++;
+            if($limit != -1 && count($result) >= $limit) break;
+        }
+        return $result;
+    }
+    function getUsersCount(){
+        return count($this->listUsers());
+    }
+
 	
 	function userExists($login){
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
