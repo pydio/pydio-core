@@ -84,9 +84,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $root = array_shift($splits);
                     if(count($splits)){
                         $child = $splits[0];
+                        if(strstr(urldecode($child), "#") !== false){
+                            list($child, $hash) = explode("#", urldecode($child));
+                        }
                         if(isSet($rootNodes[$root]["CHILDREN"][$child])){
                             AJXP_XMLWriter::header();
-                            call_user_func(array($this, $rootNodes[$root]["CHILDREN"][$child]["LIST"]), implode("/", $splits), $root);
+                            call_user_func(array($this, $rootNodes[$root]["CHILDREN"][$child]["LIST"]), implode("/", $splits), $root, $hash);
                             AJXP_XMLWriter::close();
                             return;
                         }
@@ -1071,7 +1074,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		}
 	}
 	
-	function listUsers(){
+	function listUsers($root, $child, $hashValue = null){
         $columns = '<columns switchGridMode="filelist" template_name="ajxp_conf.users">
         			<column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
         			<column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="10%"/>
@@ -1089,7 +1092,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
 		AJXP_XMLWriter::sendFilesListComponentConfig($columns);
 		if(!AuthService::usersEnabled()) return ;
-		$users = AuthService::listUsers();
+        $count = AuthService::authCountUsers();
+        $USER_PER_PAGE = 50;
+        if(empty($hashValue)) $hashValue = 1;
+        if(AuthService::authSupportsPagination() && $count > $USER_PER_PAGE){
+            $offset = ($hashValue - 1) * $USER_PER_PAGE;
+            AJXP_XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
+            $users = AuthService::listUsers("", $offset, $USER_PER_PAGE);
+        }else{
+            $users = AuthService::listUsers();
+        }
 		$mess = ConfService::getMessages();
 		$repos = ConfService::getRepositoriesList();
 		$loggedUser = AuthService::getLoggedUser();		
