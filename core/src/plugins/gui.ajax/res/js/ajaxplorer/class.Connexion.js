@@ -145,9 +145,11 @@ Class.create("Connexion", {
 			message = "Unknown Parsing Error!";
 		}else if(headers.indexOf("text/xml") == -1 && headers.indexOf("application/json") == -1 && transport.responseText.indexOf("<b>Fatal error</b>") > -1){
 			message = transport.responseText.replace("<br />", "");
-		}
+		}else if(transport.status == 500){
+            message = "Internal Server Error: you should check your web server logs to find what's going wrong!";
+        }
 		if(message){
-            if(message == "You are not allowed to access this resource.") message = tokenMessage;
+            if(message.startsWith("You are not allowed to access this resource.")) message = tokenMessage;
 			if(ajaxplorer) ajaxplorer.displayMessage("ERROR", message);
 			else alert(message);
 		}
