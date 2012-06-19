@@ -310,24 +310,33 @@ class ftpAccessWrapper implements AjxpWrapper {
         return $contents;		
 	}
 	
-	protected function rawListEntryToStat($entry, $filterStatPerms = false){
+	protected function rawListEntryToStat($entry, $filterStatPerms = false)
+    {
         $info = array();    
-		$vinfo = preg_split("/[\s]+/", $entry, 9);
+		$vinfo = preg_split("/[\s]+/", $entry);
 		AJXP_Logger::debug("RAW LIST", $entry);
 		$statValue = array();
-		if ($vinfo[0] !== "total")
-       	{
-	        $fileperms = $vinfo[0];                                         
-			$info['num']   = $vinfo[1];
-      		$info['owner'] = $vinfo[2];
-      		$info['group'] = $vinfo[3];
-      		$info['size']  = $vinfo[4];
-      		$info['month'] = $vinfo[5];
-      		$info['day']   = $vinfo[6];
-      		$info['timeOrYear']  = $vinfo[7];
-      		$info['name']  = $vinfo[8];
+		if ($vinfo[0] !== "total"){
+            $fileperms = $vinfo[0];
+            $info['num']   = $vinfo[1];
+            $info['owner'] = $vinfo[2];
+            $info['groups'] = array();
+            $i = 3;
+            while(true){
+                $info['groups'][] = $vinfo[$i];
+                $i++;
+                // Detect "Size" and "Month"
+                if(is_numeric($vinfo[$i]) && !is_numeric($vinfo[$i+1])) break;
+            }
+            $info['group'] = implode(" ", $info["groups"]);
+            $info['size']  = $vinfo[$i]; $i++;
+            $info['month'] = $vinfo[$i]; $i++;
+      		$info['day']   = $vinfo[$i]; $i++;
+      		$info['timeOrYear']  = $vinfo[$i]; $i++;
+      		//$info['name']  = $vinfo[$i]; $i++;
 		 }
-    	 $file = trim($info['name']);
+         $resplit = preg_split("/[\s]+/", $entry, 8 + count($info["groups"]));
+    	 $file = trim(array_pop($resplit));
 		 $statValue[7] = $statValue["size"] = trim($info['size']);
 		 if(strstr($info["timeOrYear"], ":")){
 		 	$info["time"] = $info["timeOrYear"];
