@@ -105,7 +105,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 				else $this->useOnTheFly = false;
 				
 				if($this->useOnTheFly) $this->onTheFly = true;
-				$this->generateJpegsCallback($srcfile, $file);
+				$this->generateJpegsCallback($destStreamURL.$srcfile, $file);
 			}
 			if(!is_file($file)) return ;
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
