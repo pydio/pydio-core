@@ -320,8 +320,10 @@ class AJXP_XMLWriter
      * @return string
      */
 	static function triggerBgAction($actionName, $parameters, $messageId, $print=true, $delay = 0){
+        $messageId = AJXP_Utils::xmlEntities($messageId);
 		$data = AJXP_XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\" delay=\"$delay\">", $print);
 		foreach ($parameters as $paramName=>$paramValue){
+            $paramValue = AJXP_Utils::xmlEntities($paramValue);
 			$data .= AJXP_XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
 		}
 		$data .= AJXP_XMLWriter::write("</trigger_bg_action>", $print);
