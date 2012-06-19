@@ -274,8 +274,9 @@ class ftpAccessWrapper implements AjxpWrapper {
 			$rl_dirlist = @ftp_rawlist($link, ".");
 			//AJXP_Logger::debug("FILE RAWLIST FROM ".$parentDir);
 			if (is_array($rl_dirlist)){
+                $escaped = preg_quote($fileName);
 				foreach($rl_dirlist as $rl_index => $rl_entry){
-					if (preg_match("/ $fileName$/" , $rl_entry)){
+					if (preg_match("/ $escaped$/" , $rl_entry)){
 						$contents = array($rl_dirlist[$rl_index]);
 					}
 				}
