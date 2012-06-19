@@ -51,6 +51,7 @@ Class.create("MultiUploader", {
 		}
 
         this.max  = parseInt(ajaxplorer.getPluginConfigs("uploader").get("UPLOAD_MAX_NUMBER"));
+        this.maxUploadSize  = parseInt(ajaxplorer.getPluginConfigs("uploader").get("UPLOAD_MAX_SIZE"));
 		this.namesMaxLength = ajaxplorer.getPluginConfigs("ajaxplorer").get("NODENAME_MAX_LENGTH");
 		
 		this.crtContext = ajaxplorer.getUserSelection();
@@ -98,14 +99,15 @@ Class.create("MultiUploader", {
 			$('uploadBrowseButton').show();
 			$('uploadSendButton').show();
 		}
-		modal.setCloseAction(function(){
-			if(Prototype.Browser.IE){
-				$(document.body).insert($('uploadBrowseButton'));
-				$(document.body).insert($('uploadSendButton'));
-				$('uploadBrowseButton').hide();
-				$('uploadSendButton').hide();
-			}
-		});
+        if(Prototype.Browser.IE){
+            modal.closeValidation = function(){
+                $(document.body).insert($('uploadBrowseButton'));
+                $(document.body).insert($('uploadSendButton'));
+                $('uploadBrowseButton').hide();
+                $('uploadSendButton').hide();
+                return true;
+            };
+        }
 		// ATTACH LISTENERS ON BUTTONS (once only, that for the "observerSet")
 		var sendButton = formObject.down('div[id="uploadSendButton"]');
 		if(sendButton.observerSet) return;		
@@ -117,8 +119,8 @@ Class.create("MultiUploader", {
 		});
 		optionsButton.observe("click", function(){
             var message = MessageHash[281] + '\n';
-            message += '&nbsp;&nbsp;'+ MessageHash[282] + ':' + roundSize(this.maxUploadSize, '') + '\n';
-            message += '&nbsp;&nbsp;'+ MessageHash[284] + ':' + this.max;
+            message += '   '+ MessageHash[282] + ':' + roundSize(this.maxUploadSize, '') + '\n';
+            message += '   '+ MessageHash[284] + ':' + this.max;
             alert(message);
 		}.bind(this));
 		closeButton.observe("click", function(){			
@@ -170,7 +172,7 @@ Class.create("MultiUploader", {
 
 			};
 			// If we've reached maximum number, disable input element
-			if( this.max != -1 && this.count >= this.max ){
+			if( this.max > 0 && this.count >= this.max ){
 				element.disabled = true;
 			}else{
 				element.disabled = false;
