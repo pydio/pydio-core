@@ -192,7 +192,11 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
                 if($child[0] == ".") continue;
                 $newUrl = $url."/".$child;
                 AJXP_Logger::debug("Indexing Node ".$newUrl);
-                $this->updateNodeIndex(null, new AJXP_Node($newUrl));
+                try{
+                    $this->updateNodeIndex(null, new AJXP_Node($newUrl));
+                }catch (Exception $e){
+                    AJXP_Logger::debug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
+                }
             }
             closedir($handle);
         }else{
@@ -278,19 +282,20 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
             $parseContent = false;
         }
         if($parseContent && in_array($ext, explode(",",$this->pluginConf["PARSE_CONTENT_HTML"]))){
-            $doc = Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
+            $doc = @Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         }elseif($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Docx")){
         	$realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-        	$doc = Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
+        	$doc = @Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
         }elseif($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Pptx")){
         	$realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-        	$doc = Zend_Search_Lucene_Document_Docx::loadPptxFile($realFile);
+        	$doc = @Zend_Search_Lucene_Document_Pptx::loadPptxFile($realFile);
         }elseif($parseContent && $ext == "xlsx" && class_exists("Zend_Search_Lucene_Document_Xlsx")){
         	$realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-        	$doc = Zend_Search_Lucene_Document_Docx::loadXlsxFile($realFile);
+        	$doc = @Zend_Search_Lucene_Document_Xlsx::loadXlsxFile($realFile);
         }else{
             $doc = new Zend_Search_Lucene_Document();
         }
+        if($doc == null) throw new Exception("Could not load document");
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), SystemTextEncoding::getEncoding());
         $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), SystemTextEncoding::getEncoding());
