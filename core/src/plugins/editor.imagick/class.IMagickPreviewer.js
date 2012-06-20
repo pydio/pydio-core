@@ -24,7 +24,13 @@ Class.create("IMagickPreviewer", Diaporama, {
 
 	initialize: function($super, oFormObject)
 	{
-		$super(oFormObject);
+        var options = {
+            floatingToolbar:true,
+            replaceScroller:false,
+            toolbarStyle: "icons_only diaporama_toolbar",
+            actions : {}
+        };
+		$super(oFormObject, options);
 		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=get_extracted_page&file=";
 		// Override onload for the text
 		this.jsImage.onload = function(){
