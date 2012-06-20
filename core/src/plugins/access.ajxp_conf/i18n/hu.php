@@ -136,6 +136,8 @@ $mess=array(
 "113" => "Role status was successfully modified",
 "114" => "Default",
 "115" => "Scheme",
+"116" => "Template Label",
+"117" => "Template Driver",
 /* END SENTENCE */
 );
 ?>
