@@ -93,9 +93,10 @@
     </xs:element>
     <xs:element name="subMenu">
         <xs:complexType>
-            <xs:sequence>
+            <xs:choice maxOccurs="1">
                 <xs:element ref="dynamicBuilder"/>
-            </xs:sequence>
+                <xs:element ref="dynamicItems"/>
+            </xs:choice>
         </xs:complexType>
     </xs:element>
     <xs:element name="dynamicBuilder" type="xs:string"/>
@@ -113,6 +114,19 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="dynamicItems">
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element ref="item"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="item">
+        <xs:complexType>
+            <xs:attribute name="actionId" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
 
     <xs:element name="registry_contributions">
         <xs:complexType>
