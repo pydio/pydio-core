@@ -134,7 +134,7 @@
 			</processing>
 		</action>
 		<action name="create_repository">
-			<gui text="ajxp_conf.3" title="300" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="true">
+			<gui text="299" title="300" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="put" inZip="false">
