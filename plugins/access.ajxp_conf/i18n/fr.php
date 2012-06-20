@@ -49,8 +49,8 @@ $mess=array(
 "28" => "L'utilisateur est administrateur?",
 "29" => "Lire",
 "30" => "Ecrire",
-"32" => "Plugin du répository",
-"33" => "Loading...",
+"32" => "Plugin du dépôt",
+"33" => "Chargement...",
 "34" => "Etes vous sur de vouloir effacer cet utilisateur? Cette opération est irréversible!",
 "35" => "Etes vous sur de vouloir effacer ce dépôt? Cette opération est irréversible!",
 "36" => "Des champs obligatoires ne sont pas remplis!",
@@ -135,6 +135,8 @@ $mess=array(
 "113" => "Le rôle a été modifié avec succès",
 "114" => "Defaut",
 "115" => "Schema",
+"116" => "Nom du modèle",
+"117" => "Plugin d'accès",
 /* END SENTENCE */
 );
 ?>

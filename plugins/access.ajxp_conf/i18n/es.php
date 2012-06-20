@@ -135,6 +135,8 @@ $mess=array(
 "113" => "Estado del rol modificado con éxito",
 "114" => "Por defecto",
 "115" => "Scheme",
+"116" => "Template Label",
+"117" => "Template Driver",
 /* END SENTENCE */
 );
 ?>
