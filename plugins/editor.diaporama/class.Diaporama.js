@@ -26,35 +26,39 @@ Class.create("Diaporama", AbstractEditor, {
 	
 	initialize: function($super, oFormObject, options)
 	{
-        options = {
+        options = Object.extend({
             floatingToolbar:true,
             replaceScroller:false,
             toolbarStyle: "icons_only diaporama_toolbar",
             actions : {
                 'toggleSideBar' : '<a id="toggleButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/view_left_close.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
             }
-        };
+        }, options);
 		$super(oFormObject, options);
 
         var diapoSplitter = oFormObject.down("#diaporamaSplitter");
         var diapoInfoPanel = oFormObject.down("#diaporamaMetadataContainer");
         diapoSplitter.parentNode.setStyle({overflow:"hidden"});
-        this.splitter = new Splitter(diapoSplitter, {
-            direction:"vertical",
-            "initA":250,
-            minSize:0,
-            fit:"height",
-            fitParent:oFormObject.up(".dialogBox")
-        });
-        var replaceScroll = false;
-        if(window.content_pane.options.replaceScroller){
-            replaceScroll = true;
+        if(this.actions.get("toggleButton")){
+            this.splitter = new Splitter(diapoSplitter, {
+                direction:"vertical",
+                "initA":250,
+                minSize:0,
+                fit:"height",
+                fitParent:oFormObject.up(".dialogBox")
+            });
+            var replaceScroll = false;
+            if(window.content_pane && window.content_pane.options.replaceScroller){
+                replaceScroll = true;
+            }
+            this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:replaceScroll});
+            var ipConfigs = ajaxplorer.getGuiComponentConfigs("InfoPanel");
+            ipConfigs.each(function(el){
+                this.infoPanel.parseComponentConfig(el.get("all"));
+            }.bind(this));
+        }else{
+            diapoInfoPanel.remove();
         }
-        this.infoPanel = new InfoPanel(diapoInfoPanel, {skipObservers:true,skipActions:true, replaceScroller:replaceScroll});
-        var ipConfigs = ajaxplorer.getGuiComponentConfigs("InfoPanel");
-        ipConfigs.each(function(el){
-            this.infoPanel.parseComponentConfig(el.get("all"));
-        }.bind(this));
 
 		this.nextButton = this.actions.get("nextButton");
 		this.previousButton = this.actions.get("prevButton");
@@ -150,11 +154,13 @@ Class.create("Diaporama", AbstractEditor, {
 			this.updateButtons();
 			return false;
 		}.bind(this);
-        this.actions.get("fsButton").insert({before:this.actions.get("toggleButton")});
-        this.actions.get("toggleButton").observe("click", function(e){
-            Event.stop(e);
-            this.splitter.toggleFolding();
-        }.bind(this));
+        if(this.actions.get("toggleButton")){
+            this.actions.get("fsButton").insert({before:this.actions.get("toggleButton")});
+            this.actions.get("toggleButton").observe("click", function(e){
+                Event.stop(e);
+                this.splitter.toggleFolding();
+            }.bind(this));
+        }
 
 		this.jsImage = new Image();
 		this.imgBorder.hide();
@@ -244,17 +250,17 @@ Class.create("Diaporama", AbstractEditor, {
 		if(window.ajxpMobile){
 			this.setFullScreen();
 			attachMobileScroll(this.imgContainer, "both");
-            if(this.splitter) {
-                window.setTimeout(function(){
-                    if(!this.splitter.splitbar.hasClassName("folded")) this.splitter.fold();
-                }.bind(this),2000);
-            }
 		}
         if(this.splitter){
             this.splitter.options.onDrag = function(){
                 this.resizeImage(false);
                 this.actionBarPlacer();
             }.bind(this);
+            if(window.ajxpMobile || !this.actions.get("toggleButton")) {
+                window.setTimeout(function(){
+                    if(!this.splitter.splitbar.hasClassName("folded")) this.splitter.fold();
+                }.bind(this),2000);
+            }
         }
 	},
 	
@@ -401,6 +407,7 @@ Class.create("Diaporama", AbstractEditor, {
     },
 
     getNavigatorOverlay : function(){
+        if(!this.infoPanel) return;
         var ov = this.infoPanel.htmlElement.down("div.imagePreviewOverlay");
         if(ov && ov.draggableInitialized) {
             return ov;
