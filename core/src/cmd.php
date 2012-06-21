@@ -206,8 +206,8 @@ if($xmlResult !== false && $xmlResult != ""){
 	AJXP_XMLWriter::requireAuth();
 	AJXP_XMLWriter::close();
 }
-echo("NEXT REPO ".$nextRepositories." (".$options["r"].")\n");
-echo("NEXT USERS ".$nextUsers." ( ".$originalOptUser." )\n");
+//echo("NEXT REPO ".$nextRepositories." (".$options["r"].")\n");
+//echo("NEXT USERS ".$nextUsers." ( ".$originalOptUser." )\n");
 if(!empty($nextUsers) || !empty($nextRepositories)){
 
     if(!empty($nextUsers)){
