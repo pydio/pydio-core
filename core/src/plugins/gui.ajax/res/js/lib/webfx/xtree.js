@@ -264,7 +264,7 @@ WebFXTreeAbstractNode.prototype.updateLabel = function(label){
 };
 
 WebFXTreeAbstractNode.prototype.setLabelIcon = function(icon){
-    var bgOverlayImage = "'url('"+icon+"')'";
+    var bgOverlayImage = "url('"+icon+"')";
     var bgOverlayPosition = '4px 1px';
 	if(this.overlayIcon){
         switch(this.overlayIcon.length){
@@ -289,7 +289,12 @@ WebFXTreeAbstractNode.prototype.setLabelIcon = function(icon){
         bgOverlayImage += " url('"+icon+"')";
     }
 
-	if($(this.id+'-label')) $(this.id+'-label').setStyle({backgroundImage:bgOverlayImage,backgroundPosition:bgOverlayPosition});
+	if($(this.id+'-label')) {
+        $(this.id+'-label').setStyle({
+            backgroundImage:bgOverlayImage,
+            backgroundPosition:bgOverlayPosition
+        });
+    }
 };
 
 WebFXTreeAbstractNode.prototype.toggle = function() {
