@@ -21,12 +21,10 @@
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build"/>
             <property name="remote_folder" value="${ftp.dir}"/>
-            <property name="package_toload" value="*.zip"/>
         </phingcall>
         <phingcall target="ftp_deploy">
             <property name="base_folder" value="${build.working_folder}/build/plugins"/>
             <property name="remote_folder" value="${ftp.dir}/plugins"/>
-            <property name="package_toload" value="*.zip"/>
         </phingcall>
     </target>
 
@@ -99,11 +97,18 @@
         <tstamp/>
         <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
         <property name="packaged_zip" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.zip"/>
+        <property name="packaged_tar" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.tar.gz"/>
         <zip
                 basedir="${build.source_folder}"
                 destfile="${build.working_folder}/build/${packaged_zip}"
                 includeemptydirs="true"
                 />
+        <tar
+                basedir="${build.source_folder}"
+                destfile="${build.working_folder}/build/${packaged_tar}"
+                includeemptydirs="true"
+                compression="gzip"
+            />
         <phingcall target="build_external_plugins"/>
     </target>
 
@@ -123,10 +128,17 @@
     <target name="zip_plugin" >
         <tstamp/>
         <property name="packaged_plugin" value="plugin-${filename}-${DSTAMP}.zip"/>
+        <property name="packaged_plugin_tar" value="plugin-${filename}-${DSTAMP}.tar.gz"/>
         <zip
                 basedir="${absfilename}"
                 destfile="${build.working_folder}/build/plugins/${packaged_plugin}"
                 includeemptydirs="true"
+        />
+        <tar
+                basedir="${absfilename}"
+                destfile="${build.working_folder}/build/plugins/${packaged_plugin_tar}"
+                includeemptydirs="true"
+                compression="gzip"
         />
     </target>
 
@@ -159,10 +171,11 @@
           passive="${ftp.passive}"
           dir="${remote_folder}">
           <fileset dir="${base_folder}">
-              <include name="${package_toload}"/>
+              <include name="*.zip"/>
+              <include name="*.tar.gz"/>
           </fileset>
         </ftpdeploy>
-        <echo message="Successfully sent ${package_toload} to ${ftp.host}"/>
+        <echo message="Successfully sent zip and tars from ${base_folder} to ${ftp.host}"/>
     </target>
 
     <target name="lint" description="Check syntax of sources">
