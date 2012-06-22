@@ -22,7 +22,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package info.ajaxplorer.plugins
- * Still experimental, ability to encapsulate many auth drivers and choose the right one at login.
+ * Ability to encapsulate many auth drivers and choose the right one at login.
  */
 class multiAuthDriver extends AbstractAuthDriver {
 	
