@@ -61,9 +61,18 @@
             <available type="dir" file="${build.source_folder}"/>
             <then><delete dir="${build.source_folder}"/></then>
         </if>
+        <tstamp/>
+        <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
+        <property name="INNER_DIRECTORY" value="${build.source_folder}/ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        <if>
+            <not><available type="dir" file="${INNER_DIRECTORY}"/></not>
+            <then>
+                <mkdir dir="${INNER_DIRECTORY}"/>
+            </then>
+        </if>
         <svnexport
-                repositoryurl="${svn.local_folder}"
-                todir="${build.source_folder}"
+                repositoryurl="${svn.local_folder}/ajaxplorer-${SVN_LASTREVISION}"
+                todir="${INNER_DIRECTORY}"
                 revision=""
                 />
     </target>
