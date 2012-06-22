@@ -48,7 +48,8 @@
             </else>
         </if>
     </target>
-    <target name="svn_export" depends="svn_update" description="Export SVN data">
+
+    <target name="prepare" description="Export SVN, prepare VERSION and discriminate plugins">
         <if>
             <not><available type="dir" file="${svn.local_folder}"/></not>
             <then>
@@ -70,11 +71,13 @@
                 <delete dir="${INNER_DIRECTORY}"/>
             </then>
         </if>
+        <!-- EXPORT SVN -->
         <svnexport
                 repositoryurl="${svn.local_folder}"
                 todir="${INNER_DIRECTORY}"
                 revision=""
                 />
+        <!-- PREPARE VERSION FILE -->
         <move file="${INNER_DIRECTORY}/conf/VERSION.tpl" tofile="${INNER_DIRECTORY}/conf/VERSION" overwrite="true">
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
@@ -84,11 +87,10 @@
                 </replacetokens>
             </filterchain>
         </move>
-    </target>
+        <!-- DISCRIMINATE PLUGINS -->
+        <mkdir dir="${build.working_folder}/ext_plugins" />
+        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>
 
-    <target name="prepare" description="Checkout, discriminate foldes">
-        <phingcall target="svn_export"/>
-        <phingcall target="filter_plugins"/>
     </target>
 
     <target name="zip" description="Package as Zip archive">
@@ -110,11 +112,6 @@
                 compression="gzip"
             />
         <phingcall target="build_external_plugins"/>
-    </target>
-
-    <target name="filter_plugins" description="Discriminate 'core' and 'ext' plugins">
-        <mkdir dir="${build.working_folder}/ext_plugins" />
-        <plugindiscriminate all="${build.source_folder}/plugins" ext="${build.working_folder}/ext_plugins"/>
     </target>
 
     <target name="build_external_plugins">
