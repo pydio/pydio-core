@@ -61,7 +61,9 @@
             <not><available type="dir" file="${build.source_folder}"/></not>
             <then><mkdir dir="${build.source_folder}"/></then>
         </if>
-        <tstamp/>
+        <tstamp>
+            <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
+        </tstamp>
         <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
         <property name="INNER_DIRECTORY" value="${build.source_folder}/ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
         <if>
@@ -75,6 +77,15 @@
                 todir="${INNER_DIRECTORY}"
                 revision=""
                 />
+        <move file="${INNER_DIRECTORY}/conf/VERSION.tpl" tofile="${INNER_DIRECTORY}/conf/VERSION" overwrite="true">
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+                    <token key="REVISION" value="${SVN_LASTREVISION}"/>
+                </replacetokens>
+            </filterchain>
+        </move>
     </target>
 
     <target name="prepare" description="Checkout, discriminate foldes">

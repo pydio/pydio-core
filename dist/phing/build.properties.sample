@@ -1,4 +1,5 @@
 build.working_folder=/home/builder
+build.version=
 svn.repository_url=
 ftp.host=
 ftp.username=
