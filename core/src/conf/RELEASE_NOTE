@@ -1,10 +1,10 @@
-AjaXplorer 4.2.0 Release Note
+AjaXplorer ##VERSION_NUMBER## Release Note
 
 License : Affero GPL
 Copyright : Charles du Jeu 2012
-Version number : 4.2.0
 Demo : http://ajaxplorer.info/demo
-Rev Number : 2950
+Date : ##VERSION_DATE##
+Rev Number : ##REVISION##
 
 This is a major stable release that includes numerous bugfixes from the 4.1.0 and a lot of new features.
 
