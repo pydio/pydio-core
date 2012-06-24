@@ -30,7 +30,7 @@ class PHPCLI extends AbstractTest
     function PHPCLI() { parent::AbstractTest("PHP Command Line", "Testing PHP command line (default is php)"); }
     function doTest() 
     {
-        $defaultCli = "php";
+        $defaultCli = ConfService::getCoreConf("PHP_CLI");
         $token = md5(time());
         $windows = (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows");
         if(!is_writable(AJXP_CACHE_DIR) || ($windows && !function_exists("popen")) || (!$windows && !function_exists("exec"))){
@@ -40,7 +40,7 @@ class PHPCLI extends AbstractTest
             return FALSE;
         }
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
-        if(!is_dir($logDir)) mkdir($logDir, 755);
+        if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
 
         $testScript = AJXP_CACHE_DIR."/cli_test.php";
@@ -67,6 +67,7 @@ class PHPCLI extends AbstractTest
         }else{
             if(is_file($logFile)){
                 $log = file_get_contents($logFile);
+                unlink($logFile);
             }
             $this->testedParams["Command Line Available"] = "No : $log";
             $this->failedLevel = "warning";
