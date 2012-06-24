@@ -47,7 +47,7 @@ include_once 'phing/Task.php';
           $results = glob($this->all."/*");
           foreach($results as $pluginDir){
               if(!$this->isCore($pluginDir)){
-                  print("Moving ".$pluginDir." to the external plugins");
+                  $this->log("Moving ".$pluginDir." to the external plugins", Project::MSG_INFO);
                   rename($pluginDir, $this->ext."/".basename($pluginDir));
               }
           }

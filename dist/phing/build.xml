@@ -5,9 +5,13 @@
 <project name="AjaXplorer" default="build">
 
     <property file="build.properties"/>
+    <property name="build.env" value="testing"/>
+    <property name="upgrade.previous_revision" value=""/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
+    <taskdef classname="lib.AjxpSvnSummarizeTask" name="svn_summarize"/>
+    <taskdef classname="lib.AjxpParseSvnSummarize" name="parse_svn_summarize"/>
 
 
     <target name="build" description="Main sequence">
@@ -89,10 +93,30 @@
         </move>
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
-        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>
-
+        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
     </target>
 
+    <target name="prepare_upgrade" description="Building upgrade package">
+        <if>
+            <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
+            <then><mkdir dir="${build.working_folder}/upgrade"/></then>
+        </if>
+    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${version1}-${version2}"/>
+    	<svn_summarize
+    	 revision1="${upgrade.previous_revision}"
+    	 revision2="${SVN_LASTREVISION}"
+    	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 repositoryurl="${svn.local_folder}"
+    	 />
+    	 <parse_svn_summarize
+    	 	summarizeFile="${build.working_folder}/upgrade/svn_summarize"
+    	 	sourceDir="${svn.local_folder}"
+    	 	upgradeDir="${upgrade_export}"
+    	 	extPluginsFolder="${build.working_folder}/ext_plugins"
+    	 />
+		<copy file="${INNER_DIRECTORY}/conf/VERSION" tofile="${upgrade_export}/conf/VERSION" overwrite="true"/>
+    </target>
+    
     <target name="zip" description="Package as Zip archive">
         <mkdir dir="${build.working_folder}/build" />
         <mkdir dir="${build.working_folder}/build/plugins" />
