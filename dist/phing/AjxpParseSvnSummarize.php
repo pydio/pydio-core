@@ -35,10 +35,7 @@ include_once 'phing/Task.php';
       private $sourceDir;
       private $upgradeDir;
       private $extPluginsFolder;
-      private $ignores = array(
-      	"/conf/VERSION.tpl",
-      	"/conf/VERSION"
-      );
+      private $ignores = array();
 
       public function setSummarizeFile($summarizeFile){
           $this->summarizeFile = $summarizeFile;
@@ -65,8 +62,6 @@ include_once 'phing/Task.php';
       	$summarizeLines = file($this->summarizeFile);
       	$toDelete = array();
 
-      	@mkdir ($this->upgradeDir);
-      	@mkdir ($this->upgradeDir."/UPGRADE");
       	foreach($summarizeLines as $line){
       		list($letter, $path) = preg_split('/[\s]+/', trim($line), 2);
       		$end = str_replace($this->sourceDir, '', $path);
@@ -83,9 +78,9 @@ include_once 'phing/Task.php';
    				}
    			}
       		if(is_dir($this->sourceDir.$end)){
-      			if(!is_dir($this->upgradeDir.$end)) mkdir($this->upgradeDir.$end, 777, true);
+      			if(!is_dir($this->upgradeDir.$end)) mkdir($this->upgradeDir.$end, 0777, true);
       		}else if(is_file($this->sourceDir.$end)){
-      			if(!is_dir($this->upgradeDir."/".dirname($end))) mkdir($this->upgradeDir."/".dirname($end), 777, true);
+      			if(!is_dir($this->upgradeDir."/".dirname($end))) mkdir($this->upgradeDir."/".dirname($end), 0777, true);
       			$this->log("-- Copy ".$this->sourceDir.$end ." to ".$this->upgradeDir.$end, Project::MSG_INFO);
       			copy($this->sourceDir.$end, $this->upgradeDir.$end);
       		}
@@ -100,7 +95,7 @@ include_once 'phing/Task.php';
       {
       	if( is_dir($path) )
       	{
-      		@mkdir( $dest );
+      		@mkdir( $dest , 0777);
       		$objects = scandir($path);
       		if( sizeof($objects) > 0 )
       		{

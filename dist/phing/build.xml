@@ -21,7 +21,7 @@
 		        <phingcall target="prepare_upgrade"/>
 		        <phingcall target="zip_upgrade"/>
 		        <if>
-		        	<equals arg1="${skip_deploy}" arg2="false"/>
+		        	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
 		        	<then>
 		        		<phingcall target="deploy_upgrade"/>
 		        	</then>
@@ -33,16 +33,38 @@
         </if>
         <phingcall target="zip"/>
         <if>
-        	<equals arg1="${skip_deploy}" arg2="false"/>
+        	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
         	<then>
 		        <phingcall target="deploy"/>
 		        <phingcall target="clean"/>
 		    </then>
 		</if>
     </target>
+    
+    <target name="tag_version" description="Tag svn with the version, and upgrade version number for future builds to next_version">
+	    <svncopy
+	       message="${version} tag"	
+		   username="${svn.username}"
+		   password="${svn.password}"
+		   force="true"
+		   nocache="true"
+		   repositoryurl="${svn.repository_url}${svn.trunk_root}"
+		   todir="${svn.repository_url}${svn.tags}/ajaxplorer-core-${version}"/>
+		<reflexive>
+		    <fileset dir=".">
+		        <include pattern="build.properties" />
+		    </fileset>
+		    <filterchain>
+		        <replaceregexp>
+		            <regexp pattern="${version}" replace="${next_version}"/>
+		        </replaceregexp>
+		    </filterchain>
+		</reflexive>
+    </target>
 
     <target name="usage" description="Describe this script usage">
-        <echo message="For releasing : phing -Denv=release -DskipDeploy=true -Dprevious_revision=2861 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
+        <echo message="For releasing and deploying : phing -Denv=release -Dskip_deploy=false -Dprevious_revision=2861 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
+        <echo message="For tagging : phing tag -Dversion=4.2.0 -Dnext_version=4.3.0"/>
     </target>
 
     <target name="deploy" description="Send package to FTP">
@@ -70,7 +92,7 @@
             <then>
                 <svnupdate
                         revision="HEAD"
-                        repositoryurl="${svn.repository_url}"
+                        repositoryurl="${svn.repository_url}/${svn.trunk_root}"
                         todir="${svn.local_folder}"
                 />
             </then>
@@ -78,7 +100,7 @@
                 <mkdir dir="${svn.local_folder}"/>
                 <svncheckout
                         revision="HEAD"
-                        repositoryurl="${svn.repository_url}"
+                        repositoryurl="${svn.repository_url}/${svn.trunk_root}"
                         todir="${svn.local_folder}"
                 />
             </else>
@@ -123,26 +145,39 @@
                 revision=""
                 />
         <!-- PREPARE VERSION FILE -->
-        <move file="${INNER_DIRECTORY}/conf/VERSION.tpl" tofile="${INNER_DIRECTORY}/conf/VERSION" overwrite="true">
+        <phingcall target="replace_variables">
+        	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
+        </phingcall>
+        
+        <!-- DISCRIMINATE PLUGINS -->
+        <mkdir dir="${build.working_folder}/ext_plugins" />
+        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
+    </target>
+
+    <target name="replace_variables" description="Replace version, revision number, etc in files">
+        <reflexive>
+        	<fileset dir="${passed_directory}">
+        		<include pattern="conf/VERSION"/>
+        		<include pattern="conf/RELEASE_NOTE"/>
+        	</fileset>
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
                     <token key="VERSION_DATE" value="${VERSION_DATE}"/>
                     <token key="REVISION" value="${SVN_LASTREVISION}"/>
                 </replacetokens>
-            </filterchain>
-        </move>
-        <!-- DISCRIMINATE PLUGINS -->
-        <mkdir dir="${build.working_folder}/ext_plugins" />
-        <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
+            </filterchain>        	
+        </reflexive>    
     </target>
-
+    
     <target name="prepare_upgrade" description="Building upgrade package" depends="prepare">
         <if>
             <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
             <then><mkdir dir="${build.working_folder}/upgrade"/></then>
         </if>
     	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${previous_version}-${new_version}"/>
+    	<mkdir dir="${upgrade_export}"/>
+    	<mkdir dir="${upgrade_export}/UPGRADE"/>
     	<svn_summarize
     	 revision1="${previous_revision}"
     	 revision2="${SVN_LASTREVISION}"
@@ -155,7 +190,13 @@
     	 	upgradeDir="${upgrade_export}"
     	 	extPluginsFolder="${build.working_folder}/ext_plugins"
     	 />
+		<!--
 		<copy file="${INNER_DIRECTORY}/conf/VERSION" tofile="${upgrade_export}/conf/VERSION" overwrite="true"/>
+		-->
+        <phingcall target="replace_variables">
+        	<property name="passed_directory" value="${upgrade_export}"/>
+        </phingcall>
+		
     </target>
     
     <target name="zip" description="Package as Zip archive">

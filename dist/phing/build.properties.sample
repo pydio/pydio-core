@@ -1,6 +1,10 @@
 build.working_folder=/home/builder
 build.version=
 svn.repository_url=
+svn.trunk_root=
+svn.tags=
+svn.username=
+svn.password=
 ftp.host=
 ftp.username=
 ftp.password=
