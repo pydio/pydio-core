@@ -34,7 +34,7 @@ class FileHasher extends AJXP_Plugin
         return function_exists("rsync_generate_signature");
     }
 
-    public function parseSpecificContributions(DOMNode &$contribNode){
+    public function parseSpecificContributions(&$contribNode){
         parent::parseSpecificContributions($contribNode);
         if(!self::rsyncEnabled()){
             // REMOVE rsync actions get_filesignature
