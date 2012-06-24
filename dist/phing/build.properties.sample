@@ -5,6 +5,7 @@ ftp.host=
 ftp.username=
 ftp.password=
 ftp.dir=
+ftp.update_dir=
 ftp.port=
 ftp.passive=
 phing.log.mail.from=

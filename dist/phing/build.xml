@@ -5,8 +5,8 @@
 <project name="AjaXplorer" default="build">
 
     <property file="build.properties"/>
-    <property name="build.env" value="testing"/>
-    <property name="upgrade.previous_revision" value=""/>
+    <property name="env" value="testing"/>
+    <property name="skip_deploy" value="false"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
@@ -15,10 +15,34 @@
 
 
     <target name="build" description="Main sequence">
-        <phingcall target="prepare"/>
+        <if>
+        	<equals arg1="${env}" arg2="release"/>        	
+        	<then>
+		        <phingcall target="prepare_upgrade"/>
+		        <phingcall target="zip_upgrade"/>
+		        <if>
+		        	<equals arg1="${skip_deploy}" arg2="false"/>
+		        	<then>
+		        		<phingcall target="deploy_upgrade"/>
+		        	</then>
+		        </if>
+        	</then>
+        	<else>
+        	     <phingcall target="prepare"/>
+        	</else>
+        </if>
         <phingcall target="zip"/>
-        <phingcall target="deploy"/>
-        <phingcall target="clean"/>
+        <if>
+        	<equals arg1="${skip_deploy}" arg2="false"/>
+        	<then>
+		        <phingcall target="deploy"/>
+		        <phingcall target="clean"/>
+		    </then>
+		</if>
+    </target>
+
+    <target name="usage" description="Describe this script usage">
+        <echo message="For releasing : phing -Denv=release -DskipDeploy=true -Dprevious_revision=2861 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
     </target>
 
     <target name="deploy" description="Send package to FTP">
@@ -31,6 +55,14 @@
             <property name="remote_folder" value="${ftp.dir}/plugins"/>
         </phingcall>
     </target>
+    
+    <target name="deploy_upgrade" description="Send package to FTP">
+        <phingcall target="ftp_deploy">
+            <property name="base_folder" value="${build.working_folder}/build/upgrade"/>
+            <property name="remote_folder" value="${ftp.update_dir}"/>
+        </phingcall>
+    </target>
+        
 
     <target name="svn_update" description="Checkout or update depending on working-copy presence.">
         <if>
@@ -68,7 +100,16 @@
             <format property="VERSION_DATE" pattern="%Y-%m-%d"/>
         </tstamp>
         <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
-        <property name="INNER_DIRECTORY" value="${build.source_folder}/ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        <if>
+        	<equals arg1="${env}" arg2="testing"/>        	
+        	<then>
+        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        	</then>
+        	<else>
+        		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
+        	</else>
+        </if>
+        <property name="INNER_DIRECTORY" value="${build.source_folder}/${package_name}"/>
         <if>
             <available type="dir" file="${INNER_DIRECTORY}"/>
             <then>
@@ -96,14 +137,14 @@
         <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
     </target>
 
-    <target name="prepare_upgrade" description="Building upgrade package">
+    <target name="prepare_upgrade" description="Building upgrade package" depends="prepare">
         <if>
             <not><available type="dir" file="${build.working_folder}/upgrade"/></not>
             <then><mkdir dir="${build.working_folder}/upgrade"/></then>
         </if>
-    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${version1}-${version2}"/>
+    	<property name="upgrade_export" value="${build.working_folder}/upgrade/export/ajaxplorer-core-upgrade-${previous_version}-${new_version}"/>
     	<svn_summarize
-    	 revision1="${upgrade.previous_revision}"
+    	 revision1="${previous_revision}"
     	 revision2="${SVN_LASTREVISION}"
     	 summarizeFile="${build.working_folder}/upgrade/svn_summarize"
     	 repositoryurl="${svn.local_folder}"
@@ -122,8 +163,17 @@
         <mkdir dir="${build.working_folder}/build/plugins" />
         <tstamp/>
         <svnlastrevision workingcopy="${svn.local_folder}" propertyname="SVN_LASTREVISION"/>
-        <property name="packaged_zip" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.zip"/>
-        <property name="packaged_tar" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}.tar.gz"/>
+        <if>
+        	<equals arg1="${env}" arg2="testing"/>        	
+        	<then>
+        		<property name="package_name" value="ajaxplorer-${DSTAMP}-${SVN_LASTREVISION}"/>
+        	</then>
+        	<else>
+        		<property name="package_name" value="ajaxplorer-core-${new_version}"/>
+        	</else>
+        </if>        
+        <property name="packaged_zip" value="${package_name}.zip"/>
+        <property name="packaged_tar" value="${package_name}.tar.gz"/>
         <zip
                 basedir="${build.source_folder}"
                 destfile="${build.working_folder}/build/${packaged_zip}"
@@ -136,6 +186,17 @@
                 compression="gzip"
             />
         <phingcall target="build_external_plugins"/>
+    </target>
+    
+    <target name="zip_upgrade" description="Packaging upgrade">
+        <mkdir dir="${build.working_folder}/build" />
+        <mkdir dir="${build.working_folder}/build/upgrade" />
+        <property name="packaged_zip" value="ajaxplorer-core-upgrade-${previous_version}-${new_version}.zip"/>
+        <zip
+                basedir="${build.working_folder}/upgrade/export/"
+                destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
+                includeemptydirs="true"
+                />
     </target>
 
     <target name="build_external_plugins">
@@ -164,7 +225,7 @@
     </target>
 
     <target name="clean" description="Clean all working folders">
-        <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins" param="filename" absparam="absfilename" target="delete_me">
+        <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
     </target>
     <target name="delete_me">
@@ -196,7 +257,7 @@
               <include name="*.tar.gz"/>
           </fileset>
         </ftpdeploy>
-        <echo message="Successfully sent zip and tars from ${base_folder} to ${ftp.host}"/>
+        <echo message="Successfully sent zip and tars from ${base_folder} to ${ftp.host}/${remote_folder}"/>
     </target>
 
     <target name="lint" description="Check syntax of sources">
