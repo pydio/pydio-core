@@ -57,7 +57,7 @@ $PLUGINS = array(
 			"USERS_DIRPATH"			=> "AJXP_DATA_PATH/plugins/auth.serial",
             "FAST_CHECKS"		    => false,
 			"CUSTOM_DATA"			=> array(
-					"email"	=> "Email", 
+					"email"	=> "Email",
 					"country" => "Country"
 				)
 			)
@@ -78,99 +78,5 @@ $PLUGINS = array(
              "LOG_FILE_NAME" => 'log_' . date('m-d-y') . '.txt',
              "LOG_CHMOD" => 0770
          )
-    ),
-
-    // SAMPLE USAGE OF SQL CONF DRIVER
-    // Use the same SQL_DRIVER option for SQL AUTH driver.
-    /*
-	"CONF_DRIVER" => array(
-		"NAME"		=> "sql",
-		"OPTIONS"	=> array(
-			"SQL_DRIVER"	=> array(
-                "driver" => "mysql",
-                "host"   => "localhost",
-                "database"   => "ajxp",
-                "user"   => "root",
-                "password"   => "",
-            ),
-			"CUSTOM_DATA"			=> array(
-					"email"	=> "Email",
-					"country" => "Country"
-				)
-			)
-	),
-    */
-	// ALTERNATE AUTH_DRIVER CONFIG SAMPLE :
-    // Using auth.remote to be the "slave" of a Joomla installation
-    /*
-	"AUTH_DRIVER" => array(
-		"NAME"		=> "remote",
-		"OPTIONS"	=> array(
-			"SLAVE_MODE"  => true,
-			"USERS_FILEPATH" => "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
-			"MASTER_AUTH_FUNCTION" => "joomla_remote_auth",
-			"MASTER_HOST"		=> "localhost",
-			"MASTER_URI"		=> "/joomla/",
-			"LOGIN_URL" => "/joomla/",  // The URL to redirect (or call) upon login (typically if one of your user type: http://yourserver/path/to/ajxp, he will get redirected to this url to login into your frontend
-			"LOGOUT_URL" => "/joomla/",  // The URL to redirect upon login out (see above)
-			"SECRET" => "myprivatesecret",// the same as the one you put in the WP plugin option.
-			"TRANSMIT_CLEAR_PASS"   => true // Don't touch this. It's unsafe (and useless here) to transmit clear password.
-		)
-	),
-    // Same for Drupal 7.X
-    "AUTH_DRIVER"  => array(
-        "NAME" => "remote",
-        "OPTIONS" => array(
-            "SLAVE_MODE" => true,
-            "USERS_FILEPATH" => "AJXP_INSTALL_PATH/plugins/auth.serial/users.ser",
-            "LOGIN_URL" => "/drupal/",
-            "LOGOUT_URL" => "/drupal/?q=user/logout",
-            "MASTER_AUTH_FUNCTION" => "drupal_remote_auth",
-            "MASTER_HOST" => "192.168.0.10",
-            "MASTER_URI" => "/drupal/",
-            "MASTER_AUTH_FORM_ID" => "user-login-form",
-            "SECRET" => "my_own_private_Drupal_key",
-            "TRANSMIT_CLEAR_PASS" => true
-            )
-    ),
-    */
-    /*
-     * MULTI AUTH DRIVER SAMPLE. HERE, WOULD ALLOW TO LOG FROM THE
-     * LOCAL SERIAL FILES, OR AUTHENTICATING AGAINST A PREDEFINED FTP SERVER.
-     * THE REPOSITORY "dynamic_ftp" SHOULD BE DEFINED INSIDE bootstrap_repositories.php
-     * WITH THE CORRECT FTP CONNEXION DATA, AND THE CORE APPLICATION CONFIG "Set Credentials in Session"
-     * SHOULD BE SET TO TRUE.
-    "AUTH_DRIVER" => array(
-        "NAME"      => "multi",
-        "OPTIONS"   => array(
-            "MASTER_DRIVER"         => "serial",
-            "TRANSMIT_CLEAR_PASS"	=> true,
-            "USER_ID_SEPARATOR"     => "_-_",
-            "DRIVERS" => array(
-                "serial" => array(
-                        "LABEL"     => "Local",
-                        "NAME"		=> "serial",
-                        "OPTIONS"	=> array(
-                            "LOGIN_REDIRECT"		=> false,
-                            "USERS_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/users.ser",
-                            "AUTOCREATE_AJXPUSER" 	=> false,
-                            "TRANSMIT_CLEAR_PASS"	=> false )
-                    ),
-                "ftp"   => array(
-                    "LABEL"     => "Remote FTP",
-                    "NAME"		=> "ftp",
-                    "OPTIONS"	=> array(
-                        "LOGIN_REDIRECT"		=> false,
-                        "REPOSITORY_ID"		    => "dynamic_ftp",
-                        "ADMIN_USER"		    => "admin",
-                        "FTP_LOGIN_SCREEN"      => false,
-                        "AUTOCREATE_AJXPUSER" 	=> true,
-                        "TRANSMIT_CLEAR_PASS"	=> true,
-                    )
-                )
-            )
-        )
-    ),
-    */
-
+    )
 );
