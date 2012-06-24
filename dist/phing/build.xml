@@ -190,12 +190,26 @@
     	 	upgradeDir="${upgrade_export}"
     	 	extPluginsFolder="${build.working_folder}/ext_plugins"
     	 />
-		<!--
-		<copy file="${INNER_DIRECTORY}/conf/VERSION" tofile="${upgrade_export}/conf/VERSION" overwrite="true"/>
-		-->
         <phingcall target="replace_variables">
         	<property name="passed_directory" value="${upgrade_export}"/>
         </phingcall>
+        
+        <!-- COPY RELEASE NOTE -->
+		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
+		
+		<!-- ADDITIONAL UPGRADE SCRIPT -->
+		<mkdir dir="${build.working_folder}/upgrade/additional_scripts"/>
+        <svncheckout
+                revision="HEAD"
+                repositoryurl="${svn.repository_url}${svn.upgrade_scripts}"
+                todir="${build.working_folder}/upgrade/additional_scripts"
+        />        
+		<if>
+			<available type="file" file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php"/>
+			<then>
+				<copy file="${build.working_folder}/upgrade/additional_scripts/${new_version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
+			</then>
+		</if>
 		
     </target>
     

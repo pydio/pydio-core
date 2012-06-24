@@ -3,6 +3,7 @@ build.version=
 svn.repository_url=
 svn.trunk_root=
 svn.tags=
+svn.upgrade_scripts=
 svn.username=
 svn.password=
 ftp.host=
