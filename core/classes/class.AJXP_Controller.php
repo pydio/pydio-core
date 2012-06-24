@@ -233,13 +233,13 @@ class AJXP_Controller{
 		}
 		if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
 			$tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "data","tmp", md5(time()).".bat"));
-            $cmd .= " > ".$logFile;
+            if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
 			$cmd .= "\n DEL $tmpBat";
 			AJXP_Logger::debug("Writing file $cmd to $tmpBat");
 			file_put_contents($tmpBat, $cmd);
 			pclose(popen("start /b ".$tmpBat, 'r'));
 		}else{
-			$process = new UnixProcess($cmd, $logFile);
+			$process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
 			AJXP_Logger::debug("Starting process and sending output dev null");
             return $process;
 		}		
@@ -347,7 +347,7 @@ class AJXP_Controller{
                 eval($callback->getAttribute("applyCondition"));
                 if(!$apply) continue;
           	}
-            $fake1; $fake2; $fake3;
+            //$fake1; $fake2; $fake3;
             $defer = ($callback->attributes->getNamedItem("defer") != null && $callback->attributes->getNamedItem("defer")->nodeValue == "true");
             self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args, $defer);
 		}
