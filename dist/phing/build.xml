@@ -276,6 +276,8 @@
 		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
 		<mkdir dir="${build.working_folder}/dist"/>
 		<mkdir dir="${build.working_folder}/rpm"/>
+		<mkdir dir="${build.working_folder}/deb"/>
+		<mkdir dir="${build.working_folder}/deb/builddeb"/>
         <svncheckout
                 revision="HEAD"
                 repositoryurl="${svn.repository_url}${svn.dist_root}"
@@ -289,6 +291,7 @@
                 </replacetokens>
             </filterchain>        
         </copy>
+        <!--
     	<scp 
     		username="${rpm_machine.user}" 
     		password="${rpm_machine.password}"
@@ -337,6 +340,39 @@
 			todir="${build.working_folder}/build"
 			file="ajaxplorer-${build.version}-1.el6.noarch.rpm"
 		/>
+		-->
+		
+		<!-- PREPARE DEBIAN BUILD -->
+		<copy toDir="${build.working_folder}/deb/builddeb">
+			<fileset dir="${build.working_folder}/dist/deb">
+				<include name="**/*"/>
+			</fileset>
+			<fileset dir="${build.source_folder}/">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		
+		
+		<!-- UPGRADE CHANGELOG -->
+		<tstamp><format property="FORMATTED_DATE" pattern="%r"/></tstamp>
+        <reflexive>
+        	<fileset dir="${build.working_folder}/deb/builddeb/debian">
+        		<include pattern="changelog.tpl"/>
+        	</fileset>
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="FORMATTED_DATE" value="${FORMATTED_DATE}"/>
+                </replacetokens>
+            </filterchain>
+        </reflexive>
+        <loadfile property="previous_changelog" file="${build.working_folder}/deb/builddeb/debian/changelog"/>
+        <append destFile="${build.working_folder}/deb/builddeb/debian/changelog.tpl" text="${previous_changelog}"/>
+		<move file="${build.working_folder}/deb/builddeb/debian/changelog.tpl" tofile="${build.working_folder}/deb/builddeb/debian/changelog" overwrite="true"/>
+		
+		<exec command="make builddeb" dir="${build.working_folder}/deb/builddeb" />
+		
+		<!-- SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
 		
     </target>
     
