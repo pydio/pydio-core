@@ -1,0 +1,14 @@
+ajaxplorer (4.0.4-2) stable; urgency=high
+
+  * make proper use of dh_lintian
+  * updated debian/rules
+  * renamed lintian.rules to ajaxplorer.lintian-overrides
+
+ -- Aurelien Requiem <aurelien.requiem@loadedtech.com.au>  Sun, 10 Jun 2012 18:11:35 +1000
+
+ajaxplorer (4.0.4-1) stable; urgency=high
+
+  * Initial release.
+  * closes: #668381
+
+ -- Aurelien Requiem <aurelien.requiem@loadedtech.com.au>  Fri, 27 Apr 2012 20:34:54 +1000

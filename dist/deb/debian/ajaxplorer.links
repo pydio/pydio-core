@@ -1,0 +1,5 @@
+etc/ajaxplorer/bootstrap_context.php		usr/share/ajaxplorer/conf/bootstrap_context.php
+etc/ajaxplorer/bootstrap_plugins.php		usr/share/ajaxplorer/conf/bootstrap_plugins.php
+etc/ajaxplorer/bootstrap_repositories.php	usr/share/ajaxplorer/conf/bootstrap_repositories.php
+etc/ajaxplorer/extensions.conf.php		usr/share/ajaxplorer/conf/extensions.conf.php
+var/lib/ajaxplorer/data				usr/share/ajaxplorer/data

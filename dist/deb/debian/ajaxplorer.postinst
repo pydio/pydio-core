@@ -1,0 +1,24 @@
+#!/bin/sh
+# postinst script for phpmyadmin
+
+set -e
+
+VAR_DIR="/var/lib/ajaxplorer"
+
+VAR_OWNER="www-data:www-data"
+VAR_PERMS_F="0640"
+VAR_PERMS_D="0750"
+
+if [ "$1" = "configure" ];
+then
+
+	if [ ! -f "$VAR_DIR/data/cache/plugins_cache.ser" ]
+	then
+		# permissions and ownerships
+		# var
+		chown -R $VAR_OWNER $VAR_DIR
+		find $VAR_DIR -type d -exec chmod $VAR_PERMS_D {} \;
+		find $VAR_DIR -type f -exec chmod $VAR_PERMS_F {} \;
+		# etc
+	fi
+fi

@@ -1,0 +1,54 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+REVISION := $(shell head -1 debian/changelog | sed 's/.*(//;s/).*//;s/.*-//')
+VERSION	:= $(shell head -1 debian/changelog | sed 's/.*(//;s/).*//;s/-.*//')
+
+d = debian/ajaxplorer
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean 
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	dh_link
+
+#	$(MAKE) install DESTDIR=$(CURDIR)/$d
+# build architecture-independent files
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdirs 
+	dh_install --sourcedir=ajaxplorer-core-$(VERSION)
+	cp debian/conf/apache2.conf $(d)/usr/share/doc/ajaxplorer/apache2.sample.conf
+	dh_lintian
+	dh_fixperms
+	tar -zcvf $(d)/usr/share/doc/ajaxplorer/all_other_lics.gz `find $(d) -type f -iname "*license*"`
+	find $(d) -type f -iname "*licen*e*" -exec rm {} \;
+	dh_installchangelogs
+	dh_installdocs
+	rm $(d)/usr/share/doc/ajaxplorer/INSTALL.txt
+	dh_installdebconf
+	dh_compress
+	dh_link
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# build architecture-dependent files
+binary-arch: build install
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

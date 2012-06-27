@@ -1,0 +1,13 @@
+*.php								usr/share/ajaxplorer
+.htaccess							usr/share/ajaxplorer
+core/classes							usr/share/ajaxplorer/core
+core/tests							usr/share/ajaxplorer/core
+plugins								usr/share/ajaxplorer
+
+conf/*.php							etc/ajaxplorer
+
+data								var/lib/ajaxplorer
+
+conf/RELEASE_NOTE						usr/share/ajaxplorer/conf/
+conf/VERSION							usr/share/ajaxplorer/conf/
+core/doc/*							usr/share/doc/ajaxplorer
