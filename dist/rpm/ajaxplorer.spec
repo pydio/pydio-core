@@ -1,6 +1,6 @@
 %define ajaxplorerdir %{_datadir}/ajaxplorer
 Name: ajaxplorer
-Version:  4.0.0
+Version:  4.2.0
 Release:  1%{?dist}
 Summary: PHP rich-client browser for managing files on a web server
 
@@ -14,7 +14,7 @@ Patch0: ajaxplorer-paths.patch
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires: php php-xml php-gd
-#Requires: php-mcrypt
+Requires: php-mcrypt
 
 %description
 AjaXplorer is a PHP rich-client browser for managing files on a web server without FTP.
@@ -25,7 +25,14 @@ AjaXplorer is a PHP rich-client browser for managing files on a web server witho
 
 %setup -q -n %{name}-core-%{version}
 
-%patch0 -p1 -b .paths
+#%patch0 -p1 -b .paths
+sed -i 's/"zip"/"rpm"/g' base.conf.php
+sed -i 's/AJXP_INSTALL_PATH."\/conf"/"\/etc\/ajaxplorer"/g' base.conf.php
+
+sed -i 's/AJXP_DATA_PATH."\/cache"/"\/var\/cache\/ajaxplorer"/g' conf/bootstrap_context.php
+sed -i 's/AJXP_INSTALL_PATH."\/data\/cache"/"\/var\/cache\/ajaxplorer"/g' conf/bootstrap_context.php
+sed -i 's/AJXP_INSTALL_PATH."\/data"/"\/var\/lib\/ajaxplorer"/g' conf/bootstrap_context.php
+sed -i 's/\/\/ define("AJXP_FORCE_LOGPATH/define("AJXP_FORCE_LOGPATH/g' conf/bootstrap_context.php
 
 %build
 
