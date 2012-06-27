@@ -291,7 +291,6 @@
                 </replacetokens>
             </filterchain>        
         </copy>
-        <!--
     	<scp 
     		username="${rpm_machine.user}" 
     		password="${rpm_machine.password}"
@@ -340,7 +339,6 @@
 			todir="${build.working_folder}/build"
 			file="ajaxplorer-${build.version}-1.el6.noarch.rpm"
 		/>
-		-->
 		
 		<!-- PREPARE DEBIAN BUILD -->
 		<copy toDir="${build.working_folder}/deb/builddeb">
@@ -354,7 +352,7 @@
 		
 		
 		<!-- UPGRADE CHANGELOG -->
-		<tstamp><format property="FORMATTED_DATE" pattern="%r"/></tstamp>
+		<tstamp><format property="FORMATTED_DATE" pattern="%a, %d %b %Y %H:%M:%S %z"/></tstamp>
         <reflexive>
         	<fileset dir="${build.working_folder}/deb/builddeb/debian">
         		<include pattern="changelog.tpl"/>
@@ -370,7 +368,15 @@
         <append destFile="${build.working_folder}/deb/builddeb/debian/changelog.tpl" text="${previous_changelog}"/>
 		<move file="${build.working_folder}/deb/builddeb/debian/changelog.tpl" tofile="${build.working_folder}/deb/builddeb/debian/changelog" overwrite="true"/>
 		
-		<exec command="make builddeb" dir="${build.working_folder}/deb/builddeb" />
+		<exec command="make builddeb" dir="${build.working_folder}/deb/builddeb" passthru="true"/>
+		
+		<move toDir="${build.working_folder}/build">
+			<fileset dir="${build.working_folder}/deb/">
+				<include pattern="*.deb"/>
+				<include pattern="*.dsc"/>
+				<include pattern="*.changes"/>
+			</fileset>
+		</move>
 		
 		<!-- SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
 		
