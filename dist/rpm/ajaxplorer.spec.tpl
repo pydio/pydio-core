@@ -1,6 +1,6 @@
 %define ajaxplorerdir %{_datadir}/ajaxplorer
 Name: ajaxplorer
-Version:  4.2.0
+Version:  ##VERSION_NUMBER##
 Release:  1%{?dist}
 Summary: Build your own box with AjaXplorer : web RIA, mobile applications, desktop sync
 
@@ -8,7 +8,7 @@ Group: Applications/Publishing
 License: AGPL
 Vendor: Abstrium SAS
 URL: http://ajaxplorer.info/
-Source0: http://sourceforge.net/projects/ajaxplorer/files/ajaxplorer/stable-channel/%{version}/ajaxplorer-core-%{version}.zip
+Source0: http://sourceforge.net/projects/ajaxplorer/files/ajaxplorer/##CHANNEL##-channel/%{version}/ajaxplorer-core-%{version}.zip
 Source1: %{name}.conf
 
 BuildArch: noarch
