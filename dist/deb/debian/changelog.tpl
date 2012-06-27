@@ -1,4 +1,4 @@
-ajaxplorer (##VERSION_NUMBER##-1) stable; urgency=high
+ajaxplorer (##VERSION_NUMBER##) stable; urgency=high
 
   * New release
 
