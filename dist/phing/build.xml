@@ -153,22 +153,6 @@
         <mkdir dir="${build.working_folder}/ext_plugins" />
         <plugindiscriminate all="${INNER_DIRECTORY}/plugins" ext="${build.working_folder}/ext_plugins"/>		
     </target>
-
-    <target name="replace_variables" description="Replace version, revision number, etc in files">
-        <reflexive>
-        	<fileset dir="${passed_directory}">
-        		<include pattern="conf/VERSION"/>
-        		<include pattern="conf/RELEASE_NOTE"/>
-        	</fileset>
-            <filterchain>
-                <replacetokens begintoken="##" endtoken="##">
-                    <token key="VERSION_NUMBER" value="${build.version}"/>
-                    <token key="VERSION_DATE" value="${VERSION_DATE}"/>
-                    <token key="REVISION" value="${SVN_LASTREVISION}"/>
-                </replacetokens>
-            </filterchain>        	
-        </reflexive>    
-    </target>
     
     <target name="prepare_upgrade" description="Building upgrade package" depends="prepare">
         <if>
@@ -241,6 +225,14 @@
                 compression="gzip"
             />
         <phingcall target="build_external_plugins"/>
+        <if>
+        	<not><equals arg1="${env}" arg2="testing"/></not>
+        	<then>
+        		<phingcall target="linux_packages">
+        			<property name="packaged_zip" value="${packaged_zip}"/>
+        		</phingcall>
+        	</then>
+        </if>
     </target>
     
     <target name="zip_upgrade" description="Packaging upgrade">
@@ -279,6 +271,75 @@
         />
     </target>
 
+    <target name="linux_packages" description="Trigger RPM and Debian packages builds, release ZIP only.">
+    
+		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
+		<mkdir dir="${build.working_folder}/dist"/>
+		<mkdir dir="${build.working_folder}/rpm"/>
+        <svncheckout
+                revision="HEAD"
+                repositoryurl="${svn.repository_url}${svn.dist_root}"
+                todir="${build.working_folder}/dist"
+        />
+        <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="CHANNEL" value="stable"/>
+                </replacetokens>
+            </filterchain>        
+        </copy>
+    	<scp 
+    		username="${rpm_machine.user}" 
+    		password="${rpm_machine.password}"
+			host="${rpm_machine.host}" 
+			fetch="false"
+			todir="${rpm_machine.rpmbuild_folder}/SOURCES"
+			file="${packaged_zip}" 
+			/>    
+    	<scp 
+    		username="${rpm_machine.user}" 
+    		password="${rpm_machine.password}"
+			host="${rpm_machine.host}" 
+			fetch="false"
+			todir="${rpm_machine.rpmbuild_folder}/SOURCES"
+			file="${build.working_folder}/dist/rpm/ajaxplorer.conf"
+			>
+		</scp>
+    	<scp 
+    		username="${rpm_machine.user}" 
+    		password="${rpm_machine.password}"
+			host="${rpm_machine.host}" 
+			fetch="false"
+			todir="${rpm_machine.worker_folder}"
+			file="${build.working_folder}/dist/rpm/ajaxplorer.spec"
+			>
+		</scp>
+    	<ssh
+    		username="${rpm_machine.user}" 
+    		password="${rpm_machine.password}"
+			host="${rpm_machine.host}" 
+			command="rpmbuild -ba ${rpm_machine.worker_folder}/ajaxplorer.spec"
+			display="true"
+		/>    	
+    	<ssh
+    		username="${rpm_machine.user}" 
+    		password="${rpm_machine.password}"
+			host="${rpm_machine.host}" 
+			command="rm -rf ${rpm_machine.worker_folder}/*"
+			display="true"
+		/>
+    	<scp 
+    		username="${rpm_machine.user}" 
+    		password="${rpm_machine.password}"
+			host="${rpm_machine.host}" 
+			fetch="true"
+			todir="${build.working_folder}/build"
+			file="ajaxplorer-${build.version}-1.el6.noarch.rpm"
+		/>
+		
+    </target>
+    
     <target name="clean" description="Clean all working folders">
         <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
@@ -299,6 +360,23 @@
     </target>
 
     <!-- GENERIC TASKS -->
+    
+    <target name="replace_variables" description="Replace version, revision number, etc in files">
+        <reflexive>
+        	<fileset dir="${passed_directory}">
+        		<include pattern="conf/VERSION"/>
+        		<include pattern="conf/RELEASE_NOTE"/>
+        	</fileset>
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="VERSION_NUMBER" value="${build.version}"/>
+                    <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+                    <token key="REVISION" value="${SVN_LASTREVISION}"/>
+                </replacetokens>
+            </filterchain>        	
+        </reflexive>    
+    </target>    
+    
     <target name="ftp_deploy" description="Generic FTP deployment">
         <ftpdeploy
           host="${ftp.host}"
