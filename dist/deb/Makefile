@@ -3,13 +3,14 @@
 DESTDIR		= /
 DIST		= stable
 URGENCY		= high
+KEY_ID		= ##KEY_ID##
 
 MAKE_OPTS	= -s -w
 
 INSTALL		= /usr/bin/install
 
 builddeb:
-		dpkg-buildpackage -rfakeroot
+		dpkg-buildpackage -rfakeroot -k${KEY_ID}
 
 checkdeb:
 		lintian --checksums --color auto -v -i  ../`parsechangelog | grep ^Source | awk '{print $$2}'`_`parsechangelog | grep ^Version | awk '{print $$2}'`_*.deb
