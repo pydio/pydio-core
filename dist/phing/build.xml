@@ -349,6 +349,9 @@
 			file="${rpm_machine.rpmbuild_folder}/SRPMS/ajaxplorer-${build.version}-1.el6.src.rpm"
 		/>
 		
+		<exec passthru="true" command="rpmsign --addsign ${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.noarch.rpm" />
+		<exec passthru="true" command="rpmsign --addsign ${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.src.rpm" />
+		
 		<!-- PREPARE DEBIAN BUILD -->
 		<copy toDir="${build.working_folder}/deb/builddeb">
 			<fileset dir="${build.working_folder}/dist/deb">
