@@ -1,4 +1,5 @@
 build.working_folder=/home/builder
+build.repositories_folder=/home/builder/repositories
 build.version=
 svn.repository_url=
 svn.trunk_root=
@@ -22,3 +23,7 @@ rpm_machine.password=
 rpm_machine.host=
 rpm_machine.rpmbuild_folder=
 rpm_machine.worker_folder=
+repository_machine.host=
+repository_machine.user=
+repository_machine.password=
+repository_machine.folder=

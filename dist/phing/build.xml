@@ -273,7 +273,6 @@
 
     <target name="linux_packages" description="Trigger RPM and Debian packages builds, release ZIP only.">
     
-		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
 		<mkdir dir="${build.working_folder}/dist"/>
 		<mkdir dir="${build.working_folder}/rpm"/>
 		<mkdir dir="${build.working_folder}/deb"/>
@@ -283,6 +282,8 @@
                 repositoryurl="${svn.repository_url}${svn.dist_root}"
                 todir="${build.working_folder}/dist"
         />
+        
+		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
         <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
@@ -337,7 +338,15 @@
 			host="${rpm_machine.host}" 
 			fetch="true"
 			todir="${build.working_folder}/build"
-			file="ajaxplorer-${build.version}-1.el6.noarch.rpm"
+			file="${rpm_machine.rpmbuild_folder}/RPMS/noarch/ajaxplorer-${build.version}-1.el6.noarch.rpm"
+		/>
+		<scp 
+    		username="${rpm_machine.user}" 
+    		password="${rpm_machine.password}"
+			host="${rpm_machine.host}" 
+			fetch="true"
+			todir="${build.working_folder}/build"
+			file="${rpm_machine.rpmbuild_folder}/SRPMS/ajaxplorer-${build.version}-1.el6.src.rpm"
 		/>
 		
 		<!-- PREPARE DEBIAN BUILD -->
@@ -370,15 +379,36 @@
 		
 		<exec command="make builddeb" dir="${build.working_folder}/deb/builddeb" passthru="true"/>
 		
-		<move toDir="${build.working_folder}/build">
-			<fileset dir="${build.working_folder}/deb/">
-				<include pattern="*.deb"/>
-				<include pattern="*.dsc"/>
-				<include pattern="*.changes"/>
+		<copy toDir="${build.working_folder}/build">
+			<fileset dir="${build.working_folder}/deb">
+				<include name="ajaxplorer_*.deb"/>
 			</fileset>
-		</move>
+		</copy>
 		
-		<!-- SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
+		<!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
+		
+		
+		<!-- UPDATE APT REPOSITORY -->		
+		<exec command="reprepro -Vb . include squeeze ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
+
+		<!-- UPDATE EL6 RPM REPOSITORY -->		
+		<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-testing/"/>
+		<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-testing/" passthru="true"/>
+
+		<!-- UPDATE EL6 SOURCES REPOSITORY -->		
+		<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
+		<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
+
+		<!-- SYNCHRONIZE -->
+		<scp 
+			username="${repository_machine.user}" 
+			password="${repository_machine.password}"
+			host="${repository_machine.host}" 
+			todir="${repository_machine.folder}">
+		    <fileset dir="${build.repositories_folder}">
+		        <include name="**/*" />
+		    </fileset>
+		</scp>		
 		
     </target>
     
