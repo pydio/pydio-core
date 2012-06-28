@@ -1,6 +1,6 @@
-[ajaxplorer]
-name=AjaXplorer for EL6 - $basearch
-baseurl=http://dl.ajaxplorer.info/repos/el6/ajaxplorer
+[ajaxplorer-stable]
+name=AjaXplorer for EL6 (Stable) - $basearch
+baseurl=http://dl.ajaxplorer.info/repos/el6/ajaxplorer-stable
 enabled=1
 gpgcheck=1
 gpgkey=http://dl.ajaxplorer.info/repos/charles@ajaxplorer.info.gpg.key
