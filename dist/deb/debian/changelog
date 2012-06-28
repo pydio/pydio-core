@@ -1,3 +1,8 @@
+ajaxplorer (4.2.0) stable; urgency=high
+
+  * New release
+
+ -- Charles du Jeu <charles@ajaxplorer.info>  Thu, 28 Jun 2012 15:26:06 +0200
 ajaxplorer (4.0.4-2) stable; urgency=high
 
   * make proper use of dh_lintian
