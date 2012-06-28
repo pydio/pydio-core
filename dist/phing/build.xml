@@ -7,6 +7,7 @@
     <property file="build.properties"/>
     <property name="env" value="testing"/>
     <property name="skip_deploy" value="false"/>
+    <property name="build_channel" value="dev"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
@@ -288,72 +289,23 @@
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
-                    <token key="CHANNEL" value="stable"/>
+                    <token key="CHANNEL" value="${build_channel}"/>
                 </replacetokens>
             </filterchain>        
         </copy>
-    	<scp 
-    		username="${rpm_machine.user}" 
-    		password="${rpm_machine.password}"
-			host="${rpm_machine.host}" 
-			fetch="false"
-			todir="${rpm_machine.rpmbuild_folder}/SOURCES"
-			file="${packaged_zip}" 
-			/>    
-    	<scp 
-    		username="${rpm_machine.user}" 
-    		password="${rpm_machine.password}"
-			host="${rpm_machine.host}" 
-			fetch="false"
-			todir="${rpm_machine.rpmbuild_folder}/SOURCES"
-			file="${build.working_folder}/dist/rpm/ajaxplorer.conf"
-			>
-		</scp>
-    	<scp 
-    		username="${rpm_machine.user}" 
-    		password="${rpm_machine.password}"
-			host="${rpm_machine.host}" 
-			fetch="false"
-			todir="${rpm_machine.worker_folder}"
-			file="${build.working_folder}/dist/rpm/ajaxplorer.spec"
-			>
-		</scp>
-    	<ssh
-    		username="${rpm_machine.user}" 
-    		password="${rpm_machine.password}"
-			host="${rpm_machine.host}" 
-			command="rpmbuild -ba ${rpm_machine.worker_folder}/ajaxplorer.spec"
-			display="true"
-		/>    	
-    	<ssh
-    		username="${rpm_machine.user}" 
-    		password="${rpm_machine.password}"
-			host="${rpm_machine.host}" 
-			command="rm -rf ${rpm_machine.worker_folder}/*"
-			display="true"
-		/>
-    	<scp 
-    		username="${rpm_machine.user}" 
-    		password="${rpm_machine.password}"
-			host="${rpm_machine.host}" 
-			fetch="true"
-			todir="${build.working_folder}/build"
-			file="${rpm_machine.rpmbuild_folder}/RPMS/noarch/ajaxplorer-${build.version}-1.el6.noarch.rpm"
-		/>
-		<scp 
-    		username="${rpm_machine.user}" 
-    		password="${rpm_machine.password}"
-			host="${rpm_machine.host}" 
-			fetch="true"
-			todir="${build.working_folder}/build"
-			file="${rpm_machine.rpmbuild_folder}/SRPMS/ajaxplorer-${build.version}-1.el6.src.rpm"
-		/>
-		
-		<exec passthru="true" command="rpmsign --addsign ${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.noarch.rpm" />
-		<exec passthru="true" command="rpmsign --addsign ${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.src.rpm" />
+        <copy file="${packaged_zip}" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
+		<copy file="${build.working_folder}/dist/rpm/ajaxplorer.conf" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
+		<exec command="rpmbuild --sign -ba ${build.working_folder}/dist/rpm/ajaxplorer.spec"
+			passthru="true"/>
+		<copy overwrite="true" 
+			file="${rpm.build_folder}/RPMS/noarch/ajaxplorer-${build.version}-1.noarch.rpm" 
+			toDir="${build.working_folder}/build"/>
+		<copy overwrite="true" 
+			file="${rpm.build_folder}/SRPMS/ajaxplorer-${build.version}-1.src.rpm" 
+			toDir="${build.working_folder}/build"/>
 		
 		<!-- PREPARE DEBIAN BUILD -->
-		<copy toDir="${build.working_folder}/deb/builddeb">
+		<copy toDir="${build.working_folder}/deb/builddeb" overwrite="true">
 			<fileset dir="${build.working_folder}/dist/deb">
 				<include name="**/*"/>
 			</fileset>
@@ -362,6 +314,17 @@
 			</fileset>
 		</copy>
 		
+		<!-- UPGRADE Makefile -->
+        <reflexive>
+        	<fileset dir="${build.working_folder}/deb/builddeb">
+        		<include pattern="Makefile"/>
+        	</fileset>
+            <filterchain>
+                <replacetokens begintoken="##" endtoken="##">
+                    <token key="KEY_ID" value="${build.signing_key_id}"/>
+                </replacetokens>
+            </filterchain>
+        </reflexive>
 		
 		<!-- UPGRADE CHANGELOG -->
 		<tstamp><format property="FORMATTED_DATE" pattern="%a, %d %b %Y %H:%M:%S %z"/></tstamp>
@@ -387,36 +350,55 @@
 				<include name="ajaxplorer_*.deb"/>
 			</fileset>
 		</copy>
-		
-		<!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
-		
-		
-		<!-- UPDATE APT REPOSITORY -->		
-		<exec command="reprepro -Vb . include squeeze ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
 
-		<!-- UPDATE EL6 RPM REPOSITORY -->		
-		<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-testing/"/>
-		<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-testing/" passthru="true"/>
-
-		<!-- UPDATE EL6 SOURCES REPOSITORY -->		
-		<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.el6.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
-		<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
-
-		<!-- SYNCHRONIZE -->
-		<scp 
-			username="${repository_machine.user}" 
-			password="${repository_machine.password}"
-			host="${repository_machine.host}" 
-			todir="${repository_machine.folder}">
-		    <fileset dir="${build.repositories_folder}">
-		        <include name="**/*" />
-		    </fileset>
-		</scp>		
+		
+		<!-- NOW DEPLOY, TO LOCAL REPO THEN TO REMOTE COPY -->
+		<if>
+			<not><equals arg1="${skip_deploy}" arg2="true"/></not>
+			<then>
+		
+				<!-- TODO: SHOULD REPORT BACK THE CHANGELOG AND COMMIT -->
+				
+				
+				<!-- UPDATE APT REPOSITORY -->		
+				<exec command="reprepro --ask-passphrase -Vb . include squeeze ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
+		
+				<if>
+					<eq arg1="${build_channel}" arg2="stable"/>
+					<then>
+						<!-- UPDATE EL6 RPM REPOSITORY -->		
+						<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-stable/"/>
+						<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-stable/" passthru="true"/>
+					</then>
+					<else>
+						<!-- UPDATE EL6 RPM REPOSITORY -->		
+						<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-testing/"/>
+						<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-testing/" passthru="true"/>
+					</else>
+				</if>
+		
+				<!-- UPDATE EL6 SOURCES REPOSITORY -->		
+				<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.src.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-sources/"/>
+				<exec command="createrepo ." dir="${build.repositories_folder}/el6/ajaxplorer-sources/" passthru="true"/>
+		
+		
+				<!-- SYNCHRONIZE -->
+				<scp 
+					username="${repository_machine.user}" 
+					password="${repository_machine.password}"
+					host="${repository_machine.host}" 
+					todir="${repository_machine.folder}">
+				    <fileset dir="${build.repositories_folder}">
+				        <include name="**/*" />
+				    </fileset>
+				</scp>					
+			</then>
+		</if>
 		
     </target>
     
     <target name="clean" description="Clean all working folders">
-        <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade" param="filename" absparam="absfilename" target="delete_me">
+        <foreach list="${build.source_folder},${svn.local_folder},${build.working_folder}/build,${build.working_folder}/ext_plugins,${build.working_folder}/upgrade,${build.working_folder}/dist,${build.working_folder}/deb,${build.working_folder}/rpm" param="filename" absparam="absfilename" target="delete_me">
         </foreach>
     </target>
     <target name="delete_me">
