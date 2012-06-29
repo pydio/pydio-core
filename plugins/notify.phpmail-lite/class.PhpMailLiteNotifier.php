@@ -66,6 +66,7 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 		if(!is_array($this->pluginConf)){
 			throw new Exception("Cannot find configuration for plugin notify.phpmail-lite! Make sur that you have filled the options in the GUI, or that the .inc file was dropped inside the /conf/ folder!");
 		}
+        if( $action == "upload" &&  !isSet($httpVars["dir"])) return;
 		require("lib/class.phpmailer-lite.php");
 
         // Parse options
@@ -114,16 +115,26 @@ class PhpMailLiteNotifier extends AJXP_Plugin {
 		
         $userSelection = new UserSelection();
         $userSelection->initFromHttpVars($httpVars);
-        $folder = $httpVars["dir"];
-        $file = "";
-        if(!$userSelection->isEmpty()){
-            $file = implode(",", array_map("basename", $userSelection->getFiles()));
-            if($folder == null){
-                $folder = dirname($userSelection->getUniqueFile());
+        if($action == "upload" && !isSet($httpVars["simple_uploader"]) && !isSet($httpVars["xhr_uploader"])){
+            // FLEX UPLOADER, BASE64 DECODE!
+            if(isset($fileVars["userfile_0"])){
+               $file = $fileVars["userfile_0"]["name"];
+            }else if(isSet($httpVars["Filename"])){
+                $file = $httpVars["Filename"];
             }
-        }
-        if($action == "upload" && isset($fileVars["userfile_0"])){
-            $file = $fileVars["userfile_0"]["name"];
+            $folder = base64_decode($httpVars["dir"]);
+        }else{
+            $folder = $httpVars["dir"];
+            $file = "";
+            if(!$userSelection->isEmpty()){
+                $file = implode(",", array_map("basename", $userSelection->getFiles()));
+                if($folder == null){
+                    $folder = dirname($userSelection->getUniqueFile());
+                }
+            }
+            if($action == "upload" && isset($fileVars["userfile_0"])){
+                $file = $fileVars["userfile_0"]["name"];
+            }
         }
         $subject = array("%user", "AJXP_USER", "AJXP_FILE", "AJXP_FOLDER", "AJXP_ACTION","AJXP_REPOSITORY");
         $replace = array(AuthService::getLoggedUser()->getId(),
