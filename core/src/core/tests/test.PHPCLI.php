@@ -30,7 +30,7 @@ class PHPCLI extends AbstractTest
     function PHPCLI() { parent::AbstractTest("PHP Command Line", "Testing PHP command line (default is php)"); }
     function doTest() 
     {
-        $defaultCli = ConfService::getCoreConf("PHP_CLI");
+        $defaultCli = ConfService::getCoreConf("CLI_PHP");
         $token = md5(time());
         $windows = (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows");
         if(!is_writable(AJXP_CACHE_DIR) || ($windows && !function_exists("popen")) || (!$windows && !function_exists("exec"))){
