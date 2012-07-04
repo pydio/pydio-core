@@ -35,6 +35,9 @@ class AjxpScheduler extends AJXP_Plugin{
         if(!ConfService::backgroundActionsSupported()) {
             throw new Exception("The command line must be supported. See 'AjaXplorer Core Options'.");
         }
+        if(!is_dir(dirname($this->db))) {
+            throw new Exception("Could not create the db folder!");
+        }
     }
 
     function parseSpecificContributions(&$contribNode){
