@@ -43,8 +43,11 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
-set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
-set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+if(is_file(TESTS_RESULT_FILE)){
+    set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
+    set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+}
+
 $pServ = AJXP_PluginsService::getInstance();
 ConfService::init();
 $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
