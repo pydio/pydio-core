@@ -40,24 +40,24 @@ Class.create("HistoryBrowser", {
 
         this.dlAction = new Action({
             name: "dl_history",
-            text: "Download",
-            title: "Download selected file version on your computer",
+            text_id: 'meta.git.3',
+            title: 'meta.git.4',
             callback: function(){
                 this.dlActionCallback("dl");
             }.bind(this)
         });
         this.openAction = new Action({
             name: "open_history",
-            text: "Preview (browser)",
-            title: "Open selected version in another browser window",
+            text: 'meta.git.5',
+            title: 'meta.git.6',
             callback: function(){
                 this.dlActionCallback("open");
             }.bind(this)
         });
         this.revertAction = new Action({
             name: "revert_history",
-            text: "Revert to...",
-            title: "Directly revert the file to the selected version",
+            text: 'meta.git.7',
+            title: 'meta.git.8',
             callback: this.revertActionCallback.bind(this)
         });
         this.toolbarObject = new ActionsToolbar(this.toolbar, {
@@ -119,13 +119,13 @@ Class.create("HistoryBrowser", {
         if(this.isFile){
             this.filesList = new FilesList(this.element, {
                 dataModel:this.versionsDm,
-                columnsDef:[{attributeName:"index", messageString:"#", sortType:'String', fixedWidth:'5'},
-                            {attributeName:"ajxp_modiftime", messageString:'Date', sortType:'String', fixedWidth:"40"},
-                            {attributeName:"MESSAGE", messageString:'Author', sortType:'String', fixedWidth:"20"},
-                            {attributeName:"EVENT", messageString:'Modification', sortType:'String', fixedWidth:"20"}//,
+                columnsDef:[{attributeName:"index", messageId:'meta.git.9', sortType:'String', fixedWidth:'5'},
+                            {attributeName:"ajxp_modiftime", messageId:'meta.git.10', sortType:'String', fixedWidth:"40"},
+                            {attributeName:"MESSAGE", messageId:'meta.git.11', sortType:'String', fixedWidth:"20"},
+                            {attributeName:"EVENT", messageId:'meta.git.12', sortType:'String', fixedWidth:"20"}//,
                             //{attributeName:"ajxp_label", messageId:1, sortType:'String'}
                 ],
-                defaultSortTypes:["Number", "Date", "String", "String", "String"],
+                defaultSortTypes:["Number", "Date", "String", "String"],
                 columnsTemplate:"history_file",
                 selectable: true,
                 draggable: false,
@@ -171,7 +171,7 @@ Class.create("HistoryBrowser", {
     },
 
     revertActionCallback: function(){
-        var conf = window.confirm("Are you sure you want to do this? Reverting to an old version will now create a new version of the document with the selected revision.");
+        var conf = window.confirm(MessageHash["meta.git.13"]);
         if(!conf) return;
         var connex = new Connexion();
         var selectedNode = this.versionsDm.getSelectedNodes()[0];
