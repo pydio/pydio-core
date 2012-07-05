@@ -1,0 +1,223 @@
+<?php
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+
+defined('AJXP_EXEC') or die('Access not allowed');
+
+class GitManager extends AJXP_Plugin
+{
+
+    private $repoBase;
+
+    public function performChecks(){
+        @require_once("VersionControl/Git.php");
+        if(!class_exists("VersionControl_Git")){
+            throw new Exception("Cannot find PEAR library VersionControl/Git");
+        }
+    }
+
+    public function initMeta($accessDriver){
+        @require_once("VersionControl/Git.php");
+        $repo = ConfService::getRepository();
+        $this->repoBase = $repo->getOption("PATH");
+    }
+
+    public function applyActions($actionName, $httpVars, $fileVars){
+
+        $git = new VersionControl_Git($this->repoBase);
+        switch($actionName){
+            case "git_history":
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $file = ltrim($file, "/");
+
+                $res = $this->gitHistory($git, $file);
+                AJXP_XMLWriter::header();
+                foreach($res as &$commit){
+                    AJXP_XMLWriter::renderNode("/".$commit["ID"], basename($commit["FILE"]), true, $commit);
+                }
+                AJXP_XMLWriter::close();
+                break;
+            break;
+
+            case "git_getfile":
+
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $commitId = $httpVars["commit_id"];
+
+                $command = $git->getCommand("cat-file");
+                $command->setOption("s", true);
+                $command->addArgument($commitId.":".$file);
+                $size = $command->execute();
+
+                $command = $git->getCommand("show");
+                $command->addArgument($commitId.":".$file);
+                $commandLine = $command->createCommandString();
+
+                header("Content-Disposition: attachment; filename=\"".basename($file)."\"");
+                header("Content-Length: ".$size);
+                $outputStream = fopen("php://output", "a");
+                $this->executeCommandInStreams($git, $commandLine, $outputStream);
+                fclose($outputStream);
+                break;
+
+            break;
+
+            default:
+            break;
+        }
+
+
+    }
+
+    protected function executeCommandInStreams($git, $commandLine, $outputStream, $errorStream = null){
+
+        $descriptorspec = array(
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'w'),
+        );
+        $pipes = array();
+        $resource = proc_open($commandLine, $descriptorspec, $pipes, realpath($git->getDirectory()));
+
+        //$stdout = stream_get_contents($pipes[1]);
+        //$stderr = stream_get_contents($pipes[2]);
+        $bufLength = 4096;
+        while( ($read = fread($pipes[1], $bufLength)) != false ){
+            fputs($outputStream, $read, strlen($read));
+        }
+        //stream_copy_to_stream($pipes[1], $outputStream);
+        if($errorStream != null){
+            stream_copy_to_stream($pipes[2], $errorStream);
+        }else{
+            $stderr = stream_get_contents($pipes[2]);
+        }
+        foreach ($pipes as $pipe) {
+            fclose($pipe);
+        }
+
+        $status = trim(proc_close($resource));
+        return $status;
+
+    }
+
+    protected function gitHistory($git, $file){
+        $command = $git->getCommand("log");
+        $command->setOption("follow", true);
+        $command->setOption("p", true);
+        $command->addArgument($file);
+        //var_dump($command->createCommandString());
+        $res = $command->execute();
+        $lines = explode(PHP_EOL, $res);
+        $allCommits = array();
+        while(count($lines)){
+            $line = array_shift($lines);
+            if(preg_match("/^commit /i", $line)) {
+                if(isSet($currentCommit)) $allCommits[] = $currentCommit;
+                $currentCommit = array();
+                $currentCommit["ID"] = substr($line, strlen("commit "));
+                $grabMessageLines = false;
+                $grabOtherLines = false;
+            }else if(preg_match("/^diff --git a\/(.*) b\/(.*)/i", $line, $matches)){
+                $origA = $matches[1];
+                $origB = $matches[2];
+                $currentCommit["FILE"] = $origB;
+                if($origB != $origA){
+                    if(basename($origB) != basename($origA)){
+                        $currentCommit["EVENT"] = "RENAME";
+                    }else if(dirname($origA) != dirname($origB)){
+                        $currentCommit["EVENT"] = "MOVE";
+                    }
+                }else{
+                    $currentCommit["EVENT"] = "MODIFICATION";
+                    $currentCommit["DETAILS"] = array();
+                    $grabOtherLines = true;
+                }
+            }else if(preg_match("/^Date: /", $line)){
+                $currentCommit["DATE"] = trim(substr($line, strlen("Date: ")));
+                $currentCommit["TIME"] = strtotime(substr($line, strlen("Date: ")));
+            }else if($grabOtherLines){
+                if(count($currentCommit["DETAILS"]) >= 10) continue;
+                $currentCommit["DETAILS"][] = $line;
+            }else if(trim($line) == ""){
+                $grabMessageLines = !$grabMessageLines;
+            }else if($grabMessageLines){
+                if(!isSet($currentCommit["MESSAGE"])) $currentCommit["MESSAGE"] = "";
+                $currentCommit["MESSAGE"] .= trim($line);
+            }
+        }
+        // $currentCommit
+        if(count($currentCommit["DETAILS"]) && substr($currentCommit["DETAILS"][0], 0, strlen("new file")) == "new file"){
+            $currentCommit["EVENT"] = "CREATION";
+            unset($currentCommit["DETAILS"]);
+        }
+        $allCommits[] = $currentCommit;
+        return $allCommits;
+    }
+
+
+    /**
+     * @param AJXP_Node $fromNode
+     * @param AJXP_Node$toNode
+     * @param boolean $copy
+     */
+    public function changesHook($fromNode=null, $toNode=null, $copy=false){
+        $this->commitChanges();
+        return;
+        /*
+        $refNode = $fromNode;
+        if($fromNode == null && $toNode != null){
+            $refNode = $toNode;
+        }
+        $this->commitChanges(dirname($refNode->getPath()));
+        */
+    }
+
+    private function commitChanges($path = null){
+        $git = new VersionControl_Git($this->repoBase);
+        $command = $git->getCommand("add");
+        $command->addArgument(".");
+        try{
+            $cmd = $command->createCommandString();
+            AJXP_Logger::debug("Git command ".$cmd);
+            $res = $command->execute();
+        }catch (Exception $e){
+            AJXP_Logger::debug("Error ".$e->getMessage());
+        }
+        AJXP_Logger::debug("GIT RESULT ADD : ".$res);
+
+        $command = $git->getCommand("commit");
+        $command->setOption("a", true);
+        $userId = "no user";
+        if(AuthService::getLoggedUser()!=null){
+            $userId = AuthService::getLoggedUser()->getId();
+        }
+        $command->setOption("m", "Git auto-commit_Node changed_".$userId);
+        //$command->addArgument($path);
+
+        try{
+            $cmd = $command->createCommandString();
+            AJXP_Logger::debug("Git command ".$cmd);
+            $res = $command->execute();
+        }catch (Exception $e){
+            AJXP_Logger::debug("Error ".$e->getMessage());
+        }
+        AJXP_Logger::debug("GIT RESULT COMMIT : ".$res);
+    }
+
+}

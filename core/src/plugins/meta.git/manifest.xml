@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin label="CONF_MESSAGE[Git-based Versioning]" description="CONF_MESSAGE[Keep tracks of all files modifications using a local Git repository]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="GitManager" filename="plugins/meta.git/class.GitManager.php"/>
+    <registry_contributions>
+        <actions>
+            <action name="git_history">
+                <processing>
+                    <serverCallback methodName="applyActions"/>
+                </processing>
+            </action>
+            <action name="git_getfile">
+                <processing>
+                    <serverCallback methodName="applyActions"/>
+                </processing>
+            </action>
+        </actions>
+        <hooks>
+            <serverCallback hookName="node.change" methodName="changesHook" defer="true" />
+            <serverCallback hookName="version.commit" methodName="changesHook" defer="true" />
+        </hooks>
+    </registry_contributions>
+</ajxp_plugin>
