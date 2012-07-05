@@ -49,7 +49,10 @@ class GitManager extends AJXP_Plugin
 
                 $res = $this->gitHistory($git, $file);
                 AJXP_XMLWriter::header();
+                $ic = AJXP_Utils::mimetype($file, "image", false);
                 foreach($res as &$commit){
+                    unset($commit["DETAILS"]);
+                    $commit["icon"] = $ic;
                     AJXP_XMLWriter::renderNode("/".$commit["ID"], basename($commit["FILE"]), true, $commit);
                 }
                 AJXP_XMLWriter::close();
@@ -128,7 +131,12 @@ class GitManager extends AJXP_Plugin
         while(count($lines)){
             $line = array_shift($lines);
             if(preg_match("/^commit /i", $line)) {
-                if(isSet($currentCommit)) $allCommits[] = $currentCommit;
+                if(isSet($currentCommit)) {
+                    if(isSet($currentCommit["DETAILS"])){
+                        $currentCommit["DETAILS"] = implode(PHP_EOL, $currentCommit["DETAILS"]);
+                    }
+                    $allCommits[] = $currentCommit;
+                }
                 $currentCommit = array();
                 $currentCommit["ID"] = substr($line, strlen("commit "));
                 $grabMessageLines = false;
@@ -150,7 +158,7 @@ class GitManager extends AJXP_Plugin
                 }
             }else if(preg_match("/^Date: /", $line)){
                 $currentCommit["DATE"] = trim(substr($line, strlen("Date: ")));
-                $currentCommit["TIME"] = strtotime(substr($line, strlen("Date: ")));
+                $currentCommit["ajxp_modiftime"] = strtotime(substr($line, strlen("Date: ")));
             }else if($grabOtherLines){
                 if(count($currentCommit["DETAILS"]) >= 10) continue;
                 $currentCommit["DETAILS"][] = $line;
@@ -207,7 +215,7 @@ class GitManager extends AJXP_Plugin
         if(AuthService::getLoggedUser()!=null){
             $userId = AuthService::getLoggedUser()->getId();
         }
-        $command->setOption("m", "Git auto-commit_Node changed_".$userId);
+        $command->setOption("m", $userId);
         //$command->addArgument($path);
 
         try{
