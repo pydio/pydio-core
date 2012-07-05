@@ -1338,6 +1338,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if($t1 == "metastore") return -1;
 		if($t2 == "index") return -1;
         if($t2 == "metastore") return 1;
+        if($key1 == "meta.git" || $key1 == "meta.svn") return 1;
+        if($key2 == "meta.git" || $key2 == "meta.svn") return -1;
 		return 0;
 	}
 	

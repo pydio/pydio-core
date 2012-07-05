@@ -73,6 +73,7 @@ Class.create("BackgroundManager", {
             this.next();
         }else{
             var connexion = new Connexion();
+            connexion.setMethod("POST");
             connexion.setParameters(actionDef.get('parameters'));
             connexion.addParameter('get_action', actionDef.get('name'));
             connexion.onComplete = function(transport){

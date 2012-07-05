@@ -37,6 +37,10 @@ class GitManager extends AJXP_Plugin
         @require_once("VersionControl/Git.php");
         $repo = ConfService::getRepository();
         $this->repoBase = $repo->getOption("PATH");
+        if(!is_dir($this->repoBase.DIRECTORY_SEPARATOR.".git")){
+            $git = new VersionControl_Git($this->repoBase);
+            $git->initRepository();
+        }
     }
 
     public function applyActions($actionName, $httpVars, $fileVars){
