@@ -30,7 +30,7 @@ Class.create("HistoryBrowser", {
 
         this.element.up('div.dialogContent').setStyle({padding:0});
         this.element.setStyle({
-            height:'257px',
+            height:'347px',
             position:'relative'
         });
         this.container = this.element;
@@ -40,13 +40,23 @@ Class.create("HistoryBrowser", {
 
         this.dlAction = new Action({
             name: "dl_history",
-            text: "Download version",
+            text: "Download",
             title: "Download selected file version on your computer",
-            callback: this.dlActionCallback.bind(this)
+            callback: function(){
+                this.dlActionCallback("dl");
+            }.bind(this)
+        });
+        this.openAction = new Action({
+            name: "open_history",
+            text: "Preview (browser)",
+            title: "Open selected version in another browser window",
+            callback: function(){
+                this.dlActionCallback("open");
+            }.bind(this)
         });
         this.revertAction = new Action({
             name: "revert_history",
-            text: "Revert",
+            text: "Revert to...",
             title: "Directly revert the file to the selected version",
             callback: this.revertActionCallback.bind(this)
         });
@@ -55,13 +65,14 @@ Class.create("HistoryBrowser", {
             skipBubbling: true,
             toolbarsList : $A(['history'])
         });
-        this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.dlAction));
         this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.revertAction));
+        this.toolbar.insert("<div class='separator'></div>")
+        this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.dlAction));
+        this.toolbar.insert(this.toolbarObject.renderToolbarAction(this.openAction));
         this.toolbarObject.resize();
-        this.dlAction.show();
-        this.dlAction.disable();
-        this.revertAction.show();
-        this.revertAction.disable();
+        this.dlAction.show(); this.dlAction.disable();
+        this.revertAction.show(); this.revertAction.disable();
+        this.openAction.show(); this.openAction.disable();
 
         this.versionsDm = new AjxpDataModel(true);
         this.versionsRoot = new AjxpNode("/", false, "Versions", "folder.png");
@@ -72,10 +83,12 @@ Class.create("HistoryBrowser", {
             if(selection.length) {
                 this.dlAction.enable();
                 this.revertAction.enable();
+                this.openAction.enable();
             }
             else {
                 this.dlAction.disable();
                 this.revertAction.disable();
+                this.openAction.disable();
             }
         }.bind(this));
 
@@ -84,17 +97,17 @@ Class.create("HistoryBrowser", {
 	open: function(currentRep){
 		var selection = ajaxplorer.getUserSelection();
 		if(currentRep || selection.isEmpty()){
-			var ajxpNode = ajaxplorer.getContextNode();
+			this.ajxpNode = ajaxplorer.getContextNode();
 		}else{
-			var ajxpNode = selection.getUniqueNode();
+            this.ajxpNode = selection.getUniqueNode();
 		}
-		this.fileName = ajxpNode.getPath();
-		this.isFile = ajxpNode.isLeaf();
-        this.currentFileMetadata = ajxpNode.getMetadata();
+		this.fileName = this.ajxpNode.getPath();
+		this.isFile = this.ajxpNode.isLeaf();
+        this.currentFileMetadata = this.ajxpNode.getMetadata();
 
         var provider = new RemoteNodeProvider();
         provider.initProvider(
-            {get_action:'git_history',file:ajxpNode.getPath()}
+            {get_action:'git_history',file:this.ajxpNode.getPath()}
         );
         this.versionsDm.setRootNode(this.versionsRoot);
         this.versionsDm.setAjxpNodeProvider(provider);
@@ -106,12 +119,13 @@ Class.create("HistoryBrowser", {
         if(this.isFile){
             this.filesList = new FilesList(this.element, {
                 dataModel:this.versionsDm,
-                columnsDef:[{attributeName:"ajxp_label", messageId:1, sortType:'String'},
-                            {attributeName:"ajxp_modiftime", messageId:4, sortType:'String'},
-                            {attributeName:"MESSAGE", messageString:'Author', sortType:'String'},
-                            {attributeName:"EVENT", messageString:'Event', sortType:'String'}
+                columnsDef:[{attributeName:"index", messageString:"#", sortType:'String', fixedWidth:'5'},
+                            {attributeName:"ajxp_modiftime", messageString:'Date', sortType:'String', fixedWidth:"40"},
+                            {attributeName:"MESSAGE", messageString:'Author', sortType:'String', fixedWidth:"20"},
+                            {attributeName:"EVENT", messageString:'Modification', sortType:'String', fixedWidth:"20"}//,
+                            //{attributeName:"ajxp_label", messageId:1, sortType:'String'}
                 ],
-                defaultSortTypes:["String", "Date", "String", "String"],
+                defaultSortTypes:["Number", "Date", "String", "String", "String"],
                 columnsTemplate:"history_file",
                 selectable: true,
                 draggable: false,
@@ -135,12 +149,43 @@ Class.create("HistoryBrowser", {
         }
     },
 
-    dlActionCallback: function(){
-
+    dlActionCallback: function(action){
+        var connex = new Connexion();
+        if(action == "dl") connex.addSecureToken();
+        var selectedNode = this.versionsDm.getSelectedNodes()[0];
+        var params = {
+            get_action  : 'git_getfile',
+            file        : selectedNode.getMetadata().get("FILE"),
+            commit_id   : selectedNode.getMetadata().get("ID"),
+            attach      : (action == "dl" ? "download": "inline")
+           };
+        var src = connex._baseUrl;
+        for(var key in params){
+            src += "&" + key + "=" + encodeURIComponent(params[key]);
+        }
+        if(action == "dl"){
+            $("historydownload_iframe").setAttribute("src", src);
+        }else{
+            window.open(src);
+        }
     },
 
     revertActionCallback: function(){
-        var conf = window.confirm("Are you sure you want to revert? This will create a new version anyway.");
+        var conf = window.confirm("Are you sure you want to do this? Reverting to an old version will now create a new version of the document with the selected revision.");
+        if(!conf) return;
+        var connex = new Connexion();
+        var selectedNode = this.versionsDm.getSelectedNodes()[0];
+        connex.setParameters($H({
+            get_action  : 'git_revertfile',
+            original_file: this.ajxpNode.getPath(),
+            file        : selectedNode.getMetadata().get("FILE"),
+            commit_id   : selectedNode.getMetadata().get("ID")
+        }));
+        connex.onComplete = function(transport){
+            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+            hideLightBox();
+        }
+        connex.sendAsync();
     },
 
 	close:function(){

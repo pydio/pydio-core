@@ -50,19 +50,49 @@ class GitManager extends AJXP_Plugin
                 $res = $this->gitHistory($git, $file);
                 AJXP_XMLWriter::header();
                 $ic = AJXP_Utils::mimetype($file, "image", false);
+                $index = count($res);
                 foreach($res as &$commit){
                     unset($commit["DETAILS"]);
                     $commit["icon"] = $ic;
+                    $commit["index"] = $index;
+                    $index --;
                     AJXP_XMLWriter::renderNode("/".$commit["ID"], basename($commit["FILE"]), true, $commit);
                 }
                 AJXP_XMLWriter::close();
                 break;
             break;
 
+            case "git_revertfile":
+
+                $originalFile = AJXP_Utils::decodeSecureMagic($httpVars["original_file"]);
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $commitId = $httpVars["commit_id"];
+                $attach = $httpVars["attach"];
+
+                $command = $git->getCommand("cat-file");
+                $command->setOption("s", true);
+                $command->addArgument($commitId.":".$file);
+                $size = $command->execute();
+
+                $command = $git->getCommand("show");
+                $command->addArgument($commitId.":".$file);
+                $commandLine = $command->createCommandString();
+                $outputStream = fopen($this->repoBase.$originalFile, "w");
+                $this->executeCommandInStreams($git, $commandLine, $outputStream);
+                fclose($outputStream);
+                $this->commitChanges();
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::reloadDataNode();
+                AJXP_XMLWriter::close();
+
+
+            break;
+
             case "git_getfile":
 
                 $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
                 $commitId = $httpVars["commit_id"];
+                $attach = $httpVars["attach"];
 
                 $command = $git->getCommand("cat-file");
                 $command->setOption("s", true);
@@ -73,8 +103,27 @@ class GitManager extends AJXP_Plugin
                 $command->addArgument($commitId.":".$file);
                 $commandLine = $command->createCommandString();
 
-                header("Content-Disposition: attachment; filename=\"".basename($file)."\"");
-                header("Content-Length: ".$size);
+                if($attach == "inline"){
+                    $fileExt = substr(strrchr(basename($file), '.'), 1);
+                    if(empty($fileExt)){
+                        $fileMime = "application/octet-stream";
+                    } else {
+                        $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
+                        $lines = file( AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.browser/resources/other/mime.types");
+                        foreach($lines as $line) {
+                            if(substr($line, 0, 1) == '#')
+                                continue; // skip comments
+                            $line = rtrim($line) . " ";
+                            if(!preg_match($regex, $line, $matches))
+                                continue; // no match to the extension
+                            $fileMime = $matches[1];
+                        }
+                    }
+                    if(empty($fileMime)) $fileMime = "application/octet-stream";
+                    HTMLWriter::generateInlineHeaders(basename($file), $size, $fileMime);
+                }else{
+                    HTMLWriter::generateAttachmentsHeader(basename($file), $size, false, false);
+                }
                 $outputStream = fopen("php://output", "a");
                 $this->executeCommandInStreams($git, $commandLine, $outputStream);
                 fclose($outputStream);
