@@ -40,24 +40,24 @@ Class.create("HistoryBrowser", {
 
         this.dlAction = new Action({
             name: "dl_history",
-            text_id: 'meta.git.3',
-            title: 'meta.git.4',
+            text: MessageHash['meta.git.3'],
+            title: MessageHash['meta.git.4'],
             callback: function(){
                 this.dlActionCallback("dl");
             }.bind(this)
         });
         this.openAction = new Action({
             name: "open_history",
-            text: 'meta.git.5',
-            title: 'meta.git.6',
+            text: MessageHash['meta.git.5'],
+            title: MessageHash['meta.git.6'],
             callback: function(){
                 this.dlActionCallback("open");
             }.bind(this)
         });
         this.revertAction = new Action({
             name: "revert_history",
-            text: 'meta.git.7',
-            title: 'meta.git.8',
+            text: MessageHash['meta.git.7'],
+            title: MessageHash['meta.git.8'],
             callback: this.revertActionCallback.bind(this)
         });
         this.toolbarObject = new ActionsToolbar(this.toolbar, {

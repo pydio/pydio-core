@@ -21,7 +21,7 @@
             <action name="git_history">
                 <gui text="meta.git.1" title="meta.git.2" src="history_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
                     <context selection="true" dir="false" recycle="false" behaviour="hidden"
-                        actionBar="true" contextMenu="true" infoPanel="false"
+                        actionBar="false" contextMenu="true" infoPanel="false"
                         actionBarGroup="put">
                     </context>
                     <selectionContext dir="false" file="true" recycle="true" unique="true" behaviour="hidden"/></gui>
