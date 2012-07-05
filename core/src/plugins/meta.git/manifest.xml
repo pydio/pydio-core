@@ -19,8 +19,8 @@
                         actionBar="true" contextMenu="true" infoPanel="false"
                         actionBarGroup="put">
                     </context>
-                    <selectionContext dir="false" file="true" recycle="true" unique="true" behaviour="hidden"></selectionContext></gui>
-                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+                    <selectionContext dir="false" file="true" recycle="true" unique="true" behaviour="hidden"/></gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
                     <clientCallback prepareModal="true"><![CDATA[
                         var loadFunc = function(oForm){
@@ -35,9 +35,9 @@
                         modal.showDialogForm('SVN', 'history_box', loadFunc, closeFunc, null, true, true);
                     ]]></clientCallback>
                     <clientForm id="history_box"><![CDATA[
-                    <div id="history_box" action="git_history" box_width="50%" box_height="310">
+                    <div id="history_box" action="git_history" box_width="300" box_height="400">
                         <div class="action_bar text_only">
-                        <div class="separator" style="height: 30px; "></div>
+                        <div class="separator"></div>
                         </div>
                         <div id="versions_table"></div>
                     </div>
@@ -45,7 +45,12 @@
                     <serverCallback methodName="applyActions"/>
                 </processing>
             </action>
-            <action name="git_getfile">
+            <action name="git_getfile" skipSecureToken="true">
+                <processing>
+                    <serverCallback methodName="applyActions"/>
+                </processing>
+            </action>
+            <action name="git_revertfile" skipSecureToken="true">
                 <processing>
                     <serverCallback methodName="applyActions"/>
                 </processing>
