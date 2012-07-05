@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Git-based Versioning]" description="CONF_MESSAGE[Keep tracks of all files modifications using a local Git repository]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="true" tested_version="4.2.0"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
     <class_definition classname="GitManager" filename="plugins/meta.git/class.GitManager.php"/>
     <client_settings>
         <resources>
+            <i18n namespace="meta.git" path="plugins/meta.git/i18n"/>
             <js className="HistoryBrowser" file="plugins/meta.git/class.HistoryBrowser.js" autoload="true"/>
             <img_library alias="history_images" path="plugins/meta.git/images"/>
         </resources>
@@ -14,7 +19,7 @@
     <registry_contributions>
         <actions>
             <action name="git_history">
-                <gui text="meta.svn.2" title="meta.svn.1" src="history_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
+                <gui text="meta.git.1" title="meta.git.2" src="history_images/actions/ICON_SIZE/system_file_manager.png" hasAccessKey="false">
                     <context selection="true" dir="false" recycle="false" behaviour="hidden"
                         actionBar="true" contextMenu="true" infoPanel="false"
                         actionBarGroup="put">

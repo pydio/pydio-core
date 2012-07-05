@@ -55,10 +55,12 @@ class GitManager extends AJXP_Plugin
                 AJXP_XMLWriter::header();
                 $ic = AJXP_Utils::mimetype($file, "image", false);
                 $index = count($res);
+                $mess = ConfService::getMessages();
                 foreach($res as &$commit){
                     unset($commit["DETAILS"]);
                     $commit["icon"] = $ic;
                     $commit["index"] = $index;
+                    $commit["EVENT"] = $mess["meta.git.".$commit["EVENT"]];
                     $index --;
                     AJXP_XMLWriter::renderNode("/".$commit["ID"], basename($commit["FILE"]), true, $commit);
                 }
