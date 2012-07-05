@@ -162,7 +162,12 @@ Class.create("AjxpDataModel", {
             args.unshift("ajaxplorer:"+eventName);
             document.fire.apply(document, args);
         }else{
-            args.unshift(eventName);
+            if(args.length){
+                args = [eventName, {memo:args[0]}];
+            }else{
+                args.unshift(eventName);
+            }
+            //args.unshift(eventName);
             this.notify.apply(this,args);
         }
     },

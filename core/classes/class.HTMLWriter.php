@@ -133,7 +133,84 @@ class HTMLWriter
     	restore_error_handler();    	
     	die("<script language='javascript'>parent.ajaxplorer.displayMessage('ERROR', '".str_replace("'", "\'", $errorMessage)."');</script>");
     }
-    
+
+    /**
+     * @static
+     * @param string $attachmentName
+     * @param int $dataSize
+     * @param bool $isFile
+     * @param bool $gzip If true, make sure the $dataSize is the size of the ENCODED data.
+     */
+    static function generateAttachmentsHeader(&$attachmentName, $dataSize, $isFile=true, $gzip=false){
+
+        if(preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])){
+     		$attachmentName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($attachmentName)));
+     	}
+
+        header("Content-Type: application/force-download; name=\"".$attachmentName."\"");
+        header("Content-Transfer-Encoding: binary");
+        if($gzip){
+            header("Content-Encoding: gzip");
+        }
+        header("Content-Length: ".$dataSize);
+        if ($isFile && ($dataSize != 0))
+        {
+            header("Content-Range: bytes 0-" . ($dataSize- 1) . "/" . $dataSize . ";");
+        }
+        header("Content-Disposition: attachment; filename=\"".$attachmentName."\"");
+        header("Expires: 0");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Pragma: no-cache");
+        if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+        {
+            header("Cache-Control: max_age=0");
+            header("Pragma: public");
+        }
+
+        // IE8 is dumb
+        if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+        {
+            header("Pragma: public");
+            header("Expires: 0");
+            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+            header("Cache-Control: private",false);
+        }
+
+        // For SSL websites there is a bug with IE see article KB 323308
+        // therefore we must reset the Cache-Control and Pragma Header
+        if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+        {
+            header("Cache-Control:");
+            header("Pragma:");
+        }
+    }
+
+    static function generateInlineHeaders($attachName, $fileSize, $mimeType){
+
+        //Send headers
+        header("Content-Type: " . $mimeType . "; name=\"" . $attachName . "\"");
+        header("Content-Disposition: inline; filename=\"" . $attachName . "\"");
+        // changed header for IE 7 & 8
+        if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+        {
+            header("Pragma: public");
+            header("Expires: 0");
+            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+            header("Cache-Control: private",false);
+        }else{
+            header("Cache-Control: public");
+        }
+        header("Content-Length: " . $fileSize);
+
+        // Neccessary for IE 8 and xx
+        if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
+        {
+            header("Cache-Control:");
+            header("Pragma:");
+        }
+
+    }
+
 }
 
 ?>

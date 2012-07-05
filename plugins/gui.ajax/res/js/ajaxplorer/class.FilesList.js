@@ -29,6 +29,7 @@ Class.create("FilesList", SelectableElements, {
     __allObservers : $A(),
     __currentInstanceIndex:1,
     _dataModel:null,
+    _doubleClickListener:null,
 	/**
 	 * Constructor
 	 * @param $super klass Reference to the constructor
@@ -52,6 +53,9 @@ Class.create("FilesList", SelectableElements, {
             }
             if(this.options.dataModel){
                 this._dataModel = this.options.dataModel;
+            }
+            if(this.options.doubleClickListener){
+                this._doubleClickListener = this.options.doubleClickListener;
             }
 		}
         //this.options.replaceScroller = false;
@@ -1600,8 +1604,12 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	fireChange: function()
 	{		
-		if(this._fireChange){			
-			ajaxplorer.updateContextData(null, this.getSelectedNodes(), this);			
+		if(this._fireChange){
+            if(this._dataModel){
+                this._dataModel.setSelectedNodes(this.getSelectedNodes());
+            }else{
+                ajaxplorer.updateContextData(null, this.getSelectedNodes(), this);
+            }
 		}
 	},
 	
@@ -1620,6 +1628,11 @@ Class.create("FilesList", SelectableElements, {
 			return; // Prevent from double clicking header!
 		}
 		var selNode = selRaw[0].ajxpNode;
+        if(this._doubleClickListener){
+            this._doubleClickListener(selNode);
+            return;
+        }
+        if(this._dataModel) return;
 		if(selNode.isLeaf())
 		{
 			ajaxplorer.getActionBar().fireDefaultAction("file");

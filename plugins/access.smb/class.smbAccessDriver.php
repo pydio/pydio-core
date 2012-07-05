@@ -55,6 +55,13 @@ class smbAccessDriver extends fsAccessDriver
 		$this->wrapperClassName = $wrapperData["classname"];
 		$this->urlBase = $wrapperData["protocol"]."://".$this->repository->getId();
 	}
+
+    function detectStreamWrapper($register = false){
+        if($register){
+            require_once($this->getBaseDir()."/smb.php");
+        }
+        return parent::detectStreamWrapper($register);
+    }
 	
 	/**
 	 * Parse 

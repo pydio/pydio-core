@@ -1036,9 +1036,11 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 		}
 		else
 		{
+            /*
 			if(preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']) || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])){
 				$localName = str_replace("+", " ", urlencode(SystemTextEncoding::toUTF8($localName)));
 			}
+            */
 			if ($isFile) {
 				header("Accept-Ranges: 0-$size");
 				AJXP_Logger::debug("Sending accept range 0-$size");
@@ -1100,6 +1102,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				return;
 			} else
 			{
+                if($gzip){
+                    $gzippedData = ($data?gzencode($filePathOrData,9):gzencode(file_get_contents($filePathOrData), 9));
+                    $size = strlen($gzippedData);
+                }
+                HTMLWriter::generateAttachmentsHeader($localName, $size, $isFile, $gzip);
+                /*
 				header("Content-Type: application/force-download; name=\"".$localName."\"");
 				header("Content-Transfer-Encoding: binary");
 				if($gzip){
@@ -1136,6 +1144,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					header("Cache-Control:");
 					header("Pragma:");
 				}
+                */
 				if($gzip){
 					print $gzippedData;
 					return;

@@ -78,7 +78,7 @@ class FileMimeSender extends AJXP_Plugin {
                     $fileMime = "application/octet-stream";
                 else {
                     $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
-                    $lines = file(AJXP_INSTALL_PATH . "/plugins/editor.browser/mime.types");
+                    $lines = file( $this->getBaseDir()."/resources/other/mime.types");
                     foreach($lines as $line) {
                         if(substr($line, 0, 1) == '#')
                             continue; // skip comments
@@ -95,28 +95,8 @@ class FileMimeSender extends AJXP_Plugin {
                 $fileMime = "application/octet-stream";
                 
             //Send headers
-            header("Content-Type: " . $fileMime . "; name=\"" . basename($file) . "\"");
-            header("Content-Disposition: inline; filename=\"" . basename($file) . "\"");
-            // changed header for IE 7 & 8
-            if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
-            {
-                header("Pragma: public");
-                header("Expires: 0");
-                header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-                header("Cache-Control: private",false);
-            }else{
-                header("Cache-Control: public");
-            }
-            header("Content-Length: " . $filesize);
+            HTMLWriter::generateInlineHeaders(basename($file), $filesize, $fileMime);
 
-            // Neccessary for IE 8 and xx
-            if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
-            {
-                header("Cache-Control:");
-                header("Pragma:");
-            }
-            // end of changes
-            //Send data
             $class = $streamData["classname"];
             $stream = fopen("php://output", "a");
             call_user_func(array($streamData["classname"], "copyFileInStream"), $destStreamURL . $file, $stream);
