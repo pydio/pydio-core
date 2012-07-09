@@ -924,6 +924,9 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
     
     protected function urlEncodePath($path){
         //AJXP_Logger::debug("User Agent : ".$_SERVER["HTTP_USER_AGENT"]);
+        if(strstr($_SERVER["HTTP_USER_AGENT"], "GoodReader") !== false){
+            return $path;
+        }
         if(strstr($_SERVER["HTTP_USER_AGENT"], "MiniRedir") !== false){
             return $path;
         }
