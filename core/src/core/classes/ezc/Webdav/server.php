@@ -223,7 +223,15 @@ class ezcWebdavServer
             else
             {
                 // Let backend process the request
-                $response = $this->backend->performRequest( $request );
+                try{
+                    $response = $this->backend->performRequest( $request );
+                }catch(Exception $e){
+                    $response =  new ezcWebdavErrorResponse(
+                        ezcWebdavResponse::STATUS_507,
+                        $request->requestUri,
+                        $e->getMessage()
+                    );
+                }
             }
         }
         else
