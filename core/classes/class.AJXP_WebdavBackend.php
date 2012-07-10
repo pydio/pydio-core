@@ -175,8 +175,8 @@ class AJXP_WebdavBackend extends ezcWebdavSimpleBackend implements ezcWebdavLock
      */
     protected function setResourceContents( $path, $content ){
         $path = $this->fixPath($path);
-        //AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
-        $this->getAccessDriver()->nodeWillChange($path);
+        AJXP_Logger::debug("AJXP_WebdavBackend :: putResourceContent ($path)");
+        $this->getAccessDriver()->nodeWillChange($path, intval($_SERVER["CONTENT_LENGTH"]));
 
         $fp=fopen($this->getAccessDriver()->getRessourceUrl($path),"w");
 		$in = fopen( 'php://input', 'r' );

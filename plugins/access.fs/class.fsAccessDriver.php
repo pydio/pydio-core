@@ -1743,8 +1743,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
     /**
      * @param String $node
      */
-    function nodeWillChange($node){
-        AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node)));
+    function nodeWillChange($node, $newSize = null){
+        if($newSize != null){
+            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node), $newSize));
+        }else{
+            AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($this->urlBase.$node)));
+        }
     }
 
 

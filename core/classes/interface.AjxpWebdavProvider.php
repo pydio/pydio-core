@@ -65,7 +65,7 @@ interface AjxpWebdavProvider {
     /**
      * @param String $node
      */
-    function nodeWillChange($node);
+    function nodeWillChange($node, $newSize = null);
 }
 
 ?>
