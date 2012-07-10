@@ -141,6 +141,7 @@ class QuotaComputer extends AJXP_Plugin
 
     private function computeDirSpace($dir){
 
+        AJXP_Logger::debug("Computing dir space for : ".$dir);
         $s = -1;
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
 
@@ -153,11 +154,13 @@ class QuotaComputer extends AJXP_Plugin
                 echo 'can not create object';
             }
         }else{
-
-            $io = popen ( '/usr/bin/du -sb ' . escapeshellarg($dir), 'r' );
+            if(PHP_OS == "Darwin") $option = "-sk";
+            else $option = "-sb";
+            $io = popen ( '/usr/bin/du '.$option.' ' . escapeshellarg($dir), 'r' );
            	$size = fgets ( $io, 4096);
             $size = trim(str_replace($dir, "", $size));
             $s = intval($size);
+            if(PHP_OS == "Darwin") $s = $s * 1024;
            	//$s = intval(substr ( $size, 0, strpos ( $size, ' ' ) ));
            	pclose ( $io );
         }
