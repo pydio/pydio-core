@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver name="s3" label="CONF_MESSAGE[S3 (Amazon Web Service)]" description="CONF_MESSAGE[Access an AWS server. Requires AWS-SDK for PHP]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/access.s3/class.s3AccessDriver.php" classname="s3AccessDriver"/>
+    <client_settings icon="plugins/access.fs/icon.png">
+        <resources>
+            <i18n namespace="s3_access" path="plugins/access.s3/i18n"/>
+        </resources>
+    </client_settings>
+
+	<server_settings>
+		<param name="API_KEY" type="string" label="CONF_MESSAGE[Key]" description="CONF_MESSAGE[S3 Api Key]" mandatory="true" default=""/>
+		<param name="SECRET_KEY" type="string" label="CONF_MESSAGE[Secret Key]" description="CONF_MESSAGE[S3 secret key]" mandatory="true"/>
+		<param name="REGION" type="select" choices="s3-website-us-east-1.amazonaws.com|US Standard (Virginia),s3-website-us-west-1.amazonaws.com|US West 1 (Northern California),s3-website-us-west-2.amazonaws.com|US West 2 (Oregon),s3-website-eu-west-1.amazonaws.com|EU (Ireland),s3-website-ap-southeast-1.amazonaws.com|South-East (Singapore),s3-website-ap-northeast-1.amazonaws.com|Asia Pacific (Japan),s3-website-sa-east-1.amazonaws.com|South America (Sao Paulo),s3-website-us-gov-west-1.amazonaws.com|EU Governement Cloud" label="CONF_MESSAGE[Region]" description="CONF_MESSAGE[S3 storage region]" mandatory="true"/>
+		<param name="CONTAINER" type="string" label="CONF_MESSAGE[Container]" description="CONF_MESSAGE[Root container in the S3 storage]" mandatory="true"/>
+	</server_settings>
+	<registry_contributions>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/client_configs/*" exclude=""/>
+		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
+        <external_file filename="plugins/access.fs/manifest.xml" include="registry_contributions/hooks/*" exclude=""/>
+	</registry_contributions>
+    <dependencies>
+        <pluginClass pluginName="access.fs"/>
+    </dependencies>
+    <class_stream_wrapper filename="plugins/access.s3/class.s3AccessWrapper.php" classname="s3AccessWrapper" protocol="ajxp.s3"/>
+</ajxpdriver>
