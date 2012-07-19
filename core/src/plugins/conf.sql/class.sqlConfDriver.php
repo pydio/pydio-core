@@ -207,7 +207,8 @@ class sqlConfDriver extends AbstractConfDriver {
 		$res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [uuid] = %s', $repositoryId);
 		
 		if (count($res) > 0) {
-			$repo_row = $res->fetchSingle();
+            $repo_row = $res->fetchAll();
+            $repo_row = $repo_row[0];
 			$res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
 			$opts = $res_opts->fetchPairs('name', 'val');
 			$repository = $this->repoFromDb($repo_row, $opts);	
@@ -227,10 +228,11 @@ class sqlConfDriver extends AbstractConfDriver {
 		$res = dibi::query('SELECT * FROM [ajxp_repo] WHERE [slug] = %s', $repositorySlug);
 		
 		if (count($res) > 0) {
-			$repo_row = $res->fetchSingle();
-			$res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
-			$opts = $res_opts->fetchPairs('name', 'val');
-			$repository = $this->repoFromDb($repo_row, $opts);	
+            $repo_row = $res->fetchAll();
+            $repo_row = $repo_row[0];
+            $res_opts = dibi::query('SELECT * FROM [ajxp_repo_options] WHERE [uuid] = %s', $repo_row['uuid']);
+            $opts = $res_opts->fetchPairs('name', 'val');
+			$repository = $this->repoFromDb($repo_row, $opts);
 			return $repository;
 		}
 		
