@@ -223,7 +223,8 @@ class AJXP_Controller{
         if(AuthService::usersEnabled()){
             $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token."\1CDAFx¨op#"), $user, MCRYPT_MODE_ECB, $iv));
         }
-		$cmd = ConfService::getCoreConf("CLI_PHP")." ".AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
+        $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
+		$cmd = ConfService::getCoreConf("CLI_PHP")." ".$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
         if($statusFile != ""){
             $cmd .= " -s=".$statusFile;
         }
@@ -232,12 +233,17 @@ class AJXP_Controller{
 			$cmd .= " --$key=".escapeshellarg($value);
 		}
 		if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
-			$tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "data","tmp", md5(time()).".bat"));
             if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
-			$cmd .= "\n DEL $tmpBat";
-			AJXP_Logger::debug("Writing file $cmd to $tmpBat");
-			file_put_contents($tmpBat, $cmd);
-			pclose(popen("start /b ".$tmpBat, 'r'));
+            if(class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")){
+                $WshShell   = new COM("WScript.Shell");
+                $oExec      = $WshShell->Run("cmd /C $cmd", 0, false);
+            }else{
+                $tmpBat = implode(DIRECTORY_SEPARATOR, array( $robustInstallPath, "data","tmp", md5(time()).".bat"));
+                $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
+                AJXP_Logger::debug("Writing file $cmd to $tmpBat");
+                file_put_contents($tmpBat, $cmd);
+                pclose(popen("start /b ".chr(34).$tmpBat.chr(34), 'r'));
+            }
 		}else{
 			$process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
 			AJXP_Logger::debug("Starting process and sending output dev null");

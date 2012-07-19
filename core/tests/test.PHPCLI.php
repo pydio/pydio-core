@@ -45,30 +45,54 @@ class PHPCLI extends AbstractTest
         $fName = ($windows ? "popen" : "exec");
         $notFoundFunction = in_array($fName, $disabled_functions) || !function_exists($fName) || !is_callable($fName);
 
-        if($safeEnabled ||  $notFoundFunction ){
-            $this->testedParams["Command Line Available"] = "No";
-            $this->failedLevel = "warning";
-            $this->failedInfo = "Php command line not detected (there seem to be some safe_mode or a-like restriction), this is NOT BLOCKING, but enabling it could allow to send some long tasks in background. If you do not have the ability to tweak your server, you can safely ignore this warning.";
-            return FALSE;
+        $comEnabled = class_exists("COM");
+        $useCOM = false;
+
+        if( ( $safeEnabled ||  $notFoundFunction )){
+            if($comEnabled){
+                $useCOM = true;
+            }else{
+                $this->testedParams["Command Line Available"] = "No";
+                $this->failedLevel = "warning";
+                $this->failedInfo = "Php command line not detected (there seem to be some safe_mode or a-like restriction), this is NOT BLOCKING, but enabling it could allow to send some long tasks in background. If you do not have the ability to tweak your server, you can safely ignore this warning.";
+                return FALSE;
+            }
         }
 
         $defaultCli = ConfService::getCoreConf("CLI_PHP");
+        if($defaultCli == null) $defaultCli = "php";
+
         $token = md5(time());
-        $logDir = AJXP_CACHE_DIR."/cmd_outputs";
+        $robustCacheDir = str_replace("/", DIRECTORY_SEPARATOR, AJXP_CACHE_DIR);
+        $logDir = $robustCacheDir.DIRECTORY_SEPARATOR."cmd_outputs";
         if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
 
         $testScript = AJXP_CACHE_DIR."/cli_test.php";
-        file_put_contents($testScript, "<?php file_put_contents('".AJXP_CACHE_DIR.DIRECTORY_SEPARATOR."cli_result.php', 'cli'); ?>");
+        file_put_contents($testScript, "<?php file_put_contents('".$robustCacheDir.DIRECTORY_SEPARATOR."cli_result.php', 'cli'); ?>");
 
-        $cmd = $defaultCli." ".AJXP_CACHE_DIR.DIRECTORY_SEPARATOR."cli_test.php";
+        $cmd = $defaultCli." ". $robustCacheDir .DIRECTORY_SEPARATOR."cli_test.php";
 
         if ($windows){
-            $tmpBat = implode(DIRECTORY_SEPARATOR, array(AJXP_INSTALL_PATH, "data","tmp", md5(time()).".bat"));
+
             $cmd .= " > ".$logFile;
-            $cmd .= "\n DEL $tmpBat";
-            file_put_contents($tmpBat, $cmd);
-            @pclose(@popen("start /b ".$tmpBat, 'r'));
+            $comCommand = $cmd;
+            if($useCOM){
+                $WshShell   = new COM("WScript.Shell");
+                $res = $WshShell->Run("cmd /C $comCommand", 0, false);
+            }else{
+                $tmpBat = implode(DIRECTORY_SEPARATOR, array(str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH), "data","tmp", md5(time()).".bat"));
+                $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
+                file_put_contents($tmpBat, $cmd);
+                @pclose(@popen("start /b ".chr(34).$tmpBat.chr(34), 'r'));
+                sleep(1);
+                // Failed, but we can try with COM
+                if( ! is_file(AJXP_CACHE_DIR."/cli_result.php") && $comEnabled ){
+                    $useCOM = true;
+                    $WshShell   = new COM("WScript.Shell");
+                    $res = $WshShell->Run("cmd /C $comCommand", 0, false);
+                }
+            }
         }else{
             new UnixProcess($cmd, $logFile);
         }
@@ -78,7 +102,13 @@ class PHPCLI extends AbstractTest
         if(is_file(AJXP_CACHE_DIR."/cli_result.php")){
             $this->testedParams["Command Line Available"] = "Yes";
             unlink(AJXP_CACHE_DIR."/cli_result.php");
-            $this->failedInfo = "Php command line detected, this will allow to send some tasks in background!";
+            if($useCOM){
+                $this->failedLevel = "warning";
+                $availability = true;
+                $this->failedInfo = "Php command line detected, but using the windows COM extension. Just make sure to <b>enable COM</b> in the AjaXplorer Core Options";
+            }else{
+                $this->failedInfo = "Php command line detected, this will allow to send some tasks in background. Enable it in the AjaXplorer Core Options";
+            }
         }else{
             if(is_file($logFile)){
                 $log = file_get_contents($logFile);
