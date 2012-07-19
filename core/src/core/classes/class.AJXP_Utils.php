@@ -370,7 +370,7 @@ class AJXP_Utils
             $pos = strrpos($fileName, ".");
             if($pos !== false){
                 $fileExt = substr($fileName, $pos + 1);
-                if(array_key_exists($fileExt, self::$registeredExtensions) && $fileExt != "ajxp_folder" && $fileExt != "ajxp_empty"){
+                if(!empty($fileExt) && array_key_exists($fileExt, self::$registeredExtensions) && $fileExt != "ajxp_folder" && $fileExt != "ajxp_empty"){
                     $mime = self::$registeredExtensions[$fileExt];
                 }
             }
