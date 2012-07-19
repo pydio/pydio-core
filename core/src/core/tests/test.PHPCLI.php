@@ -30,15 +30,30 @@ class PHPCLI extends AbstractTest
     function PHPCLI() { parent::AbstractTest("PHP Command Line", "Testing PHP command line (default is php)"); }
     function doTest() 
     {
-        $defaultCli = ConfService::getCoreConf("CLI_PHP");
-        $token = md5(time());
-        $windows = (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows");
-        if(!is_writable(AJXP_CACHE_DIR) || ($windows && !function_exists("popen")) || (!$windows && !function_exists("exec"))){
+        if(!is_writable(AJXP_CACHE_DIR)){
             $this->testedParams["Command Line Available"] = "No";
             $this->failedLevel = "warning";
             $this->failedInfo = "Php command line not detected (cache directory not writeable), this is NOT BLOCKING, but enabling it could allow to send some long tasks in background. If you do not have the ability to tweak your server, you can safely ignore this warning.";
             return FALSE;
         }
+        $windows = (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows");
+
+        $sModeExecDir = ini_get("safe_mode_exec_dir") ;
+        $safeEnabled = ini_get("safe_mode") || !empty($sModeExecDir);
+
+        $disabled_functions=explode(',',ini_get('disable_functions'));
+        $fName = ($windows ? "popen" : "exec");
+        $notFoundFunction = in_array($fName, $disabled_functions) || !function_exists($fName) || !is_callable($fName);
+
+        if($safeEnabled ||  $notFoundFunction ){
+            $this->testedParams["Command Line Available"] = "No";
+            $this->failedLevel = "warning";
+            $this->failedInfo = "Php command line not detected (there seem to be some safe_mode or a-like restriction), this is NOT BLOCKING, but enabling it could allow to send some long tasks in background. If you do not have the ability to tweak your server, you can safely ignore this warning.";
+            return FALSE;
+        }
+
+        $defaultCli = ConfService::getCoreConf("CLI_PHP");
+        $token = md5(time());
         $logDir = AJXP_CACHE_DIR."/cmd_outputs";
         if(!is_dir($logDir)) mkdir($logDir, 0755);
         $logFile = $logDir."/".$token.".out";
