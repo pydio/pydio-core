@@ -556,7 +556,7 @@ class smb_stream_wrapper extends smb {
                 		$this->adddircache($url, $this->dir);
                 	}
                 } else {                	
-                   trigger_error ("dir_opendir(): dir failed for path '{$path}'", E_USER_WARNING);
+                   trigger_error ("dir_opendir(): dir failed for path '{$pu['path']}'", E_USER_WARNING);
                 }
                 break;
             default:
