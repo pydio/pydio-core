@@ -31,6 +31,13 @@ class AjxpScheduler extends AJXP_Plugin{
         if(!is_dir(dirname($this->db))) mkdir(dirname($this->db), 0755, true);
     }
 
+    function unserialize($serialized){
+        parent::unserialize($serialized);
+        $this->db =AJXP_DATA_PATH."/plugins/action.scheduler/calendar.json" ;
+        if(!is_dir(dirname($this->db))) mkdir(dirname($this->db), 0755, true);
+    }
+
+
     function performChecks(){
         if(!ConfService::backgroundActionsSupported()) {
             throw new Exception("The command line must be supported. See 'AjaXplorer Core Options'.");
