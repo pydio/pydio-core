@@ -34,7 +34,7 @@ class GitManager extends AJXP_Plugin
     }
 
     public function initMeta($accessDriver){
-        @require_once("VersionControl/Git.php");
+        require_once("VersionControl/Git.php");
         $repo = ConfService::getRepository();
         $this->repoBase = $repo->getOption("PATH");
         if(!is_dir($this->repoBase.DIRECTORY_SEPARATOR.".git")){
