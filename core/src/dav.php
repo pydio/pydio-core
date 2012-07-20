@@ -83,15 +83,19 @@ if(AuthService::usersEnabled()){
 
 $backend = new AJXP_WebdavBackend($repository);
 
-$lockConf = new ezcWebdavLockPluginConfiguration();
+/*
+$lockConf = new ezcWebdavLockPluginConfiguration(
+    new ezcWebdavLockPluginOptions(
+        array("lockTimeout" => 60)
+    )
+);
 $server->pluginRegistry->registerPlugin(
 	$lockConf
 );
+*/
 
-//$backend = new ezcWebdavFileBackend(AJXP_INSTALL_PATH."/files/");
-//ob_start();
-$server->handle( $backend ); 
-//$c = ob_get_clean();
-//AJXP_Logger::logAction("OUTPUT : ".$c);
-//print($c);
-?>
+//$administrator = new ezcWebdavLockAdministrator($backend);
+//$administrator->purgeLocks();
+
+
+$server->handle( $backend );

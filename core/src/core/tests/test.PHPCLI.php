@@ -117,6 +117,9 @@ class PHPCLI extends AbstractTest
             $this->testedParams["Command Line Available"] = "No : $log";
             $this->failedLevel = "warning";
             $this->failedInfo = "Php command line not detected, this is NOT BLOCKING, but enabling it could allow to send some long tasks in background. If you do not have the ability to tweak your server, you can safely ignore this warning.";
+            if($windows){
+                $this->failedInfo .= "<br> On Windows, try to activate the php COM extension, and set correct rights to the cmd exectuble to make it runnable by the web server, this should solve the problem.";
+            }
             $availability = false;
         }
         unlink(AJXP_CACHE_DIR."/cli_test.php");
