@@ -6,6 +6,51 @@ Demo : http://ajaxplorer.info/demo
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
 
+This is a bug fix release, and introduce two new features : simple but efficient documents automatic-versionning based on GIT,
+and Amazon S3 driver. Other clouds drivers will come soon (Swift from Open Stack among others).
+
+[NEW FEATURES]
+Meta.git    : Git based versioning, way more simple than with svn, simply install GIT on the server and install the PEAR/VersionControl_Git library. Open in browser, revert to a given revision, cosmetics.
+Access.S3   : Based on Pun'k Avenue s3 "better stream wrapper" implementation, and the aws-sdk from AWS (not packaged by default).
+
+[BUG FIXES]
+Auth.ftp & Auth.smb were broken
+Notify.phpmail-lite : Base64_decode when necessary
+Disable scheduler if not able to create db folder
+Do not catch errors and exception at the very first boot
+[core] Factorise generateAttachmentHeaders and generateInlineHeaders inside HTMLWriter, and use them in fsAccessDriver and in FileMimeSendSender.
+[gui.ajax] Fix various things in JS files for FilesList class impermeability.
+[access.smb] Make sure to register smb:// wrapper (bug in cross-repository copy)
+[access.ajxp_confDriver] Not very nice, but working, make sure to register meta.svn & meta.git after the others (will trigger the hooks accordingly) @todo : generic reflexion on the hooks/plugins ordering.
+[action.scheduler] Missing xmlEntities call on repositories list, could break the interface.
+[action.scheduler] Make sure the folder is also initialize on unserialization
+[meta.quota] Fix shell epression used for computing quota on Darwin
+[core.auth] Wrong ajax response on pass-change error, reported by @ultreia
+[AJXP_Utils] Fix from @mattlef : avoid exception on empty extension filename
+
+[CLI & ASSOCIATED TEST]
+CLI : detect / configure / use COM WScript.Shell to enable command line on IIS. Require giving correct rights to the cmd.exe executable.
+Typo error totally breaking the PHPCLI test.
+Test CLI : more tests on safe_mode & exec detection to be sure it will not crash
+
+[WebDAV]
+Disable locking for the moment, triggering too much random upload problem
+[Quotas] webDAV and quota checking
+[WebDAV] Fix error if a repository has no metastore
+Conf.sql :  getRepositoryByAlias was simply broken, making webDAV fail when using conf.sql
+GoodReader WebDAV client : do not urlEncode
+
+
+
+
+AjaXplorer 4.2.0 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Demo : http://ajaxplorer.info/demo
+Date : 2012-06-24
+Rev Number : 2976
+
 This is a major stable release that includes numerous bugfixes from the 4.1.0 and a lot of new features.
 
 [NEW FEATURES]
