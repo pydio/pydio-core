@@ -469,6 +469,7 @@ class AuthService
         if($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
             return false;
         }
+        $userId = AuthService::filterUserSensitivity($userId);
 		$authDriver = ConfService::getAuthDriverImpl();
 		return $authDriver->userExists($userId);
 	}
@@ -480,6 +481,7 @@ class AuthService
      * @return bool
      */
     static function isReservedUserId($username){
+        $username = AuthService::filterUserSensitivity($username);
         return in_array($username, array("guest", "shared"));
     }
 
@@ -504,6 +506,7 @@ class AuthService
 	static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
 	{
 		if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
+        $userId = AuthService::filterUserSensitivity($userId);
 		$authDriver = ConfService::getAuthDriverImpl();
 		if($cookieString){		
 			$confDriver = ConfService::getConfStorageImpl();
@@ -529,6 +532,7 @@ class AuthService
 			$messages = ConfService::getMessages();
 			throw new Exception($messages[378]);
 		}
+        $userId = AuthService::filterUserSensitivity($userId);
 		$authDriver = ConfService::getAuthDriverImpl();
 		$authDriver->changePassword($userId, $userPass);
 		AJXP_Logger::logAction("Update Password", array("user_id"=>$userId));
@@ -546,6 +550,7 @@ class AuthService
      */
 	static function createUser($userId, $userPass, $isAdmin=false)
 	{
+        $userId = AuthService::filterUserSensitivity($userId);
         AJXP_Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin));
         if(!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest"){
             throw new Exception("Reserved user id");
@@ -589,6 +594,7 @@ class AuthService
      */
 	static function deleteUser($userId)
 	{
+        $userId = AuthService::filterUserSensitivity($userId);
         AJXP_Controller::applyHook("user.before_delete", array($userId));
 		$authDriver = ConfService::getAuthDriverImpl();
 		$authDriver->deleteUser($userId);
