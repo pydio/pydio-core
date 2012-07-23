@@ -14,6 +14,7 @@ Meta.git    : Git based versioning, way more simple than with svn, simply instal
 Access.S3   : Based on Pun'k Avenue s3 "better stream wrapper" implementation, and the aws-sdk from AWS (not packaged by default).
 
 [BUG FIXES]
+gui.mobile : open/info menu had disappeared (FilesList refactoring).
 Auth.ftp & Auth.smb were broken
 Notify.phpmail-lite : Base64_decode when necessary
 Disable scheduler if not able to create db folder
@@ -21,6 +22,7 @@ Do not catch errors and exception at the very first boot
 [core] Factorise generateAttachmentHeaders and generateInlineHeaders inside HTMLWriter, and use them in fsAccessDriver and in FileMimeSendSender.
 [gui.ajax] Fix various things in JS files for FilesList class impermeability.
 [access.smb] Make sure to register smb:// wrapper (bug in cross-repository copy)
+[access.smb] Apply Thomas Oettli tweaks (new DOMAIN parameter).
 [access.ajxp_confDriver] Not very nice, but working, make sure to register meta.svn & meta.git after the others (will trigger the hooks accordingly) @todo : generic reflexion on the hooks/plugins ordering.
 [action.scheduler] Missing xmlEntities call on repositories list, could break the interface.
 [action.scheduler] Make sure the folder is also initialize on unserialization
