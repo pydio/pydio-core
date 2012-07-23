@@ -84,7 +84,7 @@ class s3AccessDriver extends fsAccessDriver
         return true;
     }
 
-    function loadNodeInfo(AJXP_Node &$node, $parentNode = false, $details = false){
+    function loadNodeInfo(&$node, $parentNode = false, $details = false){
         parent::loadNodeInfo($node, $parentNode, $details);
         if(!$node->isLeaf()){
             $node->setLabel(rtrim($node->getLabel(), "/"));
