@@ -38,6 +38,9 @@ class s3AccessDriver extends fsAccessDriver
 
     public function performChecks(){
         // Check CURL, OPENSSL & AWS LIBRARY
+        if(!extension_loaded("curl")) throw new Exception("Cannot find php_curl extension!");
+        if(!extension_loaded("openssl")) throw new Exception("Cannot find openssl extension!");
+        if(!file_exists($this->getBaseDir()."/aws-sdk/sdk.class.php")) throw new Exception("Cannot find AWS PHP SDK. Make sure it is installed in the aws-sdk folder.");
    	}
 
 		
