@@ -120,7 +120,7 @@ class AJXP_ClientDriver extends AJXP_Plugin
 					}
 					AJXP_XMLWriter::close("ajxp_registry_part");
 				}else{
-                    AJXP_Utils::safeIniSet("zlib.output_compression", "On");
+                    AJXP_Utils::safeIniSet("zlib.output_compression", "4096");
 					header('Content-Type: application/xml; charset=UTF-8');
                     print(AJXP_XMLWriter::replaceAjxpXmlKeywords($regDoc->saveXML()));
 				}
