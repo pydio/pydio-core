@@ -78,10 +78,10 @@ function initAjxpMobileActions(){
 			var container;
 			if(listDisp == "thumb"){
 				left = itemPos[0] + 2;
-				container = list.down(".selectable_div");
+				container = list.htmlElement.down(".selectable_div");
 			}else{
 				left = itemPos[0] + itemDim.width - 90 - 2;
-				container = list.down(".table_rows_container");
+				container = list.htmlElement.down(".table_rows_container");
 			}
 			container.insert(mobileActions);
 			container.setStyle({position:'relative'});
