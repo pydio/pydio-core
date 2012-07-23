@@ -192,7 +192,15 @@ class AJXP_XMLWriter
 		if(ConfService::getConf("SERVER_DEBUG")){
 			$message = "$message in $fichier (l.$ligne)";
 		}
-		AJXP_Logger::logAction("error", array("message" => $message));
+        try{
+            AJXP_Logger::logAction("error", array("message" => $message));
+        }catch(Exception $e){
+            // This will probably trigger a double exception!
+            echo "<pre>Error in error";
+            debug_print_backtrace();
+            echo "</pre>";
+            die("Recursive exception. Original error was : ".$message. " in $fichier , line $ligne");
+        }
 		if(!headers_sent()) AJXP_XMLWriter::header();
 		AJXP_XMLWriter::sendMessage(null, SystemTextEncoding::toUTF8($message), true);
 		AJXP_XMLWriter::close();
