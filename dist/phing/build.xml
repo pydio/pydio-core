@@ -181,6 +181,15 @@
         
         <!-- COPY RELEASE NOTE -->
 		<copy file="${upgrade_export}/conf/RELEASE_NOTE" toFile="${upgrade_export}/UPGRADE/NOTE"/>
+		<copy file="${svn.local_folder}/conf/VERSION" toFile="${upgrade_export}/conf/VERSION">
+	            <filterchain>
+        	        <replacetokens begintoken="##" endtoken="##">
+                	    <token key="VERSION_NUMBER" value="${build.version}"/>
+  	                  <token key="VERSION_DATE" value="${VERSION_DATE}"/>
+        	            <token key="REVISION" value="${SVN_LASTREVISION}"/>
+                	</replacetokens>
+          	    </filterchain>
+		</copy>
 		
 		<!-- ADDITIONAL UPGRADE SCRIPT -->
 		<mkdir dir="${build.working_folder}/upgrade/additional_scripts"/>
@@ -230,7 +239,7 @@
         	<not><equals arg1="${env}" arg2="testing"/></not>
         	<then>
         		<phingcall target="linux_packages">
-        			<property name="packaged_zip" value="${packaged_zip}"/>
+        			<property name="packaged_zip" value="${build.working_folder}/build/${packaged_zip}"/>
         		</phingcall>
         	</then>
         </if>
@@ -285,7 +294,7 @@
         />
         
 		<!-- TOKEN REPLACE THE RPM SPEC FILE -->
-        <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
+        <copy file="${build.working_folder}/dist/rpm/ajaxplorer.spec.tpl" overwrite="true" toFile="${build.working_folder}/rpm/ajaxplorer.spec">
             <filterchain>
                 <replacetokens begintoken="##" endtoken="##">
                     <token key="VERSION_NUMBER" value="${build.version}"/>
@@ -295,7 +304,7 @@
         </copy>
         <copy file="${packaged_zip}" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
 		<copy file="${build.working_folder}/dist/rpm/ajaxplorer.conf" toDir="${rpm.build_folder}/SOURCES" overwrite="true"/>
-		<exec command="rpmbuild --sign -ba ${build.working_folder}/dist/rpm/ajaxplorer.spec"
+		<exec command="rpmbuild --sign -ba ${build.working_folder}/rpm/ajaxplorer.spec"
 			passthru="true"/>
 		<copy overwrite="true" 
 			file="${rpm.build_folder}/RPMS/noarch/ajaxplorer-${build.version}-1.noarch.rpm" 
@@ -364,7 +373,7 @@
 				<exec command="reprepro --ask-passphrase -Vb . include squeeze ${build.working_folder}/deb/ajaxplorer_${build.version}_amd64.changes" dir="${build.repositories_folder}/apt/" passthru="true"/>
 		
 				<if>
-					<eq arg1="${build_channel}" arg2="stable"/>
+					<equals arg1="${build_channel}" arg2="stable"/>
 					<then>
 						<!-- UPDATE EL6 RPM REPOSITORY -->		
 						<copy file="${build.working_folder}/build/ajaxplorer-${build.version}-1.noarch.rpm" toDir="${build.repositories_folder}/el6/ajaxplorer-stable/"/>
