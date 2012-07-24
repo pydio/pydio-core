@@ -12,8 +12,9 @@
         <global_param name="SHARE" type="boolean" label="CONF_MESSAGE[Enrich Shares]" description="CONF_MESSAGE[Add a notification pane to the share mechanism, proposing the user to enter her email to be notified when the shared repository is modified]" mandatory="false" default="false"/>
         <global_param name="ACTIONS" type="string" label="CONF_MESSAGE[Notify on...]" description="CONF_MESSAGE[Comma-separated list of action on wich the notification should be sent]" mandatory="true" default="upload,download"/>
         <global_param name="SUBJECT" type="string" label="CONF_MESSAGE[Subject]" description="CONF_MESSAGE[Subject to be displayed in the mail]" mandatory="true" default="AJXP_FILE Modified"/>
-        <global_param name="BODY" type="textarea" label="CONF_MESSAGE[Body]" description="CONF_MESSAGE[Body of the email. You can use AJXP_USER, AJXP_FILE, AJXP_FOLDER and AJXP_ACTION keywords.]" mandatory="true" default="AJXP_ACTION : AJXP_FILE"/>
+        <global_param name="BODY" type="textarea" label="CONF_MESSAGE[Body]" description="CONF_MESSAGE[Body of the email. You can use AJXP_USER, AJXP_FILE, AJXP_FOLDER and AJXP_ACTION, AJXP_FOLDER_URL keywords.]" mandatory="true" default="AJXP_ACTION : AJXP_FILE"/>
         <global_param name="MAILER" type="select" choices="sendmail|sendmail,mail|mail" label="CONF_MESSAGE[Mailer]" description="CONF_MESSAGE[Php mailer to use (see phpmail-lite documentation).'.]" mandatory="true" default="sendmail"/>
+        <global_param name="SERVER_URL" type="string" label="CONF_MESSAGE[Server URL]" description="CONF_MESSAGE[Necessary configuration if you want to use the AJXP_FOLDER_URL variable]" mandatory="false" default=""/>
     </server_settings>
 	<registry_contributions>
 		<actions>
