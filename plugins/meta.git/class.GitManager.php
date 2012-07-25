@@ -27,8 +27,8 @@ class GitManager extends AJXP_Plugin
     private $repoBase;
 
     public function performChecks(){
-        @require_once("VersionControl/Git.php");
-        if(!class_exists("VersionControl_Git")){
+        $ex = AJXP_Utils::searchIncludePath("VersionControl/Git.php");
+        if(!$ex){
             throw new Exception("Cannot find PEAR library VersionControl/Git");
         }
     }
