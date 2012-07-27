@@ -617,14 +617,33 @@ Class.create("Diaporama", AbstractEditor, {
             border:0,
             align:"absmiddle"
         });
+        if(!parseInt(ajxpNode.getMetadata().get("image_width"))){
+            var imgObject = new Image();
+            imgObject.onload = function(){
+                img.DIMENSIONS_LOADING = false;
+                ajxpNode.getMetadata().set("image_width", this.width);
+                ajxpNode.getMetadata().set("image_height", this.height);
+            }
+            imgObject.onerror = function(){
+                img.DIMENSIONS_LOADING = false;
+            };
+            img.DIMENSIONS_LOADING = true;
+            imgObject.src = Diaporama.prototype.getThumbnailSource(ajxpNode);
+        }
 		var div = new Element('div');
 		div.insert(img);
-		div.resizePreviewElement = function(dimensionObject){			
-			var imgDim = {
-				width:parseInt(ajxpNode.getMetadata().get("image_width")), 
-				height:parseInt(ajxpNode.getMetadata().get("image_height"))
-			};
-			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
+		div.resizePreviewElement = function(dimensionObject){
+            var styleObj;
+            if(!parseInt(ajxpNode.getMetadata().get("image_width"))){
+                styleObj = fitRectangleToDimension({width:50,height:50}, dimensionObject);
+                if(img.DIMENSIONS_LOADING) window.setTimeout(function(){ div.resizePreviewElement(dimensionObject); }, 1000);
+            }else{
+                var imgDim = {
+                    width:parseInt(ajxpNode.getMetadata().get("image_width")),
+                    height:parseInt(ajxpNode.getMetadata().get("image_height"))
+                };
+                styleObj = fitRectangleToDimension(imgDim, dimensionObject);
+            }
 			img.setStyle(styleObj);
 			div.setStyle({
 				height:styleObj.height, 
