@@ -201,6 +201,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 				this.crtHeight = this.imgTag.getHeight();
 				this.crtRatio = this.crtHeight / this.crtWidth;
 			}
+            this.imgTag.show();
 		}.bind(this), from:1.0,to:0, duration:0.3});
         
         this.updateInfoPanel();
