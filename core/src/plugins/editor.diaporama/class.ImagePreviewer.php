@@ -66,9 +66,11 @@ class ImagePreviewer extends AJXP_Plugin {
 				print($data);
 
 			}else{
-	 			$filesize = filesize($destStreamURL.$file);
+	 			//$filesize = filesize($destStreamURL.$file);
 	 			
 	 			$fp = fopen($destStreamURL.$file, "r");
+                $stat = fstat($fp);
+                $filesize = $stat["size"];
 				header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
 				header("Content-Length: ".$filesize);
 				header('Cache-Control: public');
@@ -113,8 +115,11 @@ class ImagePreviewer extends AJXP_Plugin {
 		$pThumb = new PThumb($this->pluginConf["THUMBNAIL_QUALITY"]);
 		if(!$pThumb->isError()){
 			$pThumb->remote_wrapper = $this->streamData["classname"];
-			$sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);		
+            //AJXP_Logger::debug("Will fit thumbnail");
+			$sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);
+            //AJXP_Logger::debug("Will print thumbnail");
 			$pThumb->print_thumbnail($masterFile,$sizes[0],$sizes[1],false, false, $targetFile);
+            //AJXP_Logger::debug("Done");
 			if($pThumb->isError()){
 				print_r($pThumb->error_array);
 				AJXP_Logger::logAction("error", $pThumb->error_array);
