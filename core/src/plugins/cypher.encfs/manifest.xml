@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin label="CONF_MESSAGE[Encfs Mount]" description="CONF_MESSAGE[Dynamically create/mount/umount an encfs filesystem]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="4.2.2"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+    <class_definition classname="EncfsMounter" filename="plugins/cypher.encfs/class.EncfsMounter.php"/>
+</ajxp_plugin>
