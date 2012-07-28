@@ -40,21 +40,18 @@ class EncfsMounter extends AJXP_Plugin
             fwrite($pipes[0], "\n");
             fwrite($pipes[0], $secret);
             fflush($pipes[0]);
-            //fwrite($pipes[0], $secret);
             fclose($pipes[0]);
             while($s= fgets($pipes[1], 1024)) {
-              // read from the pipe
               $text .= $s;
             }
             fclose($pipes[1]);
-            // optional:
             while($s= fgets($pipes[2], 1024)) {
               $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
-        var_dump($text);
-        var_dump($error);
+        //var_dump($text);
+        //var_dump($error);
         if(( !empty($error) || stristr($text, "invalid password")!==false ) && file_exists($raw."/".basename($originalXML))){
             unlink($raw."/".basename($originalXML));
             return false;
@@ -78,18 +75,16 @@ class EncfsMounter extends AJXP_Plugin
             fwrite($pipes[0], $secret);
             fclose($pipes[0]);
             while($s= fgets($pipes[1], 1024)) {
-              // read from the pipe
               $text .= $s;
             }
             fclose($pipes[1]);
-            // optional:
             while($s= fgets($pipes[2], 1024)) {
               $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
-        var_dump($text);
-        var_dump($error);
+        //var_dump($text);
+        //var_dump($error);
     }
 
     public static function umountFolder($clear){
@@ -102,17 +97,15 @@ class EncfsMounter extends AJXP_Plugin
         $text = ""; $error = "";
         if (is_resource($process)) {
             while($s= fgets($pipes[1], 1024)) {
-              // read from the pipe
               $text .= $s;
             }
             fclose($pipes[1]);
-            // optional:
             while($s= fgets($pipes[2], 1024)) {
               $error .= $s . "\n";
             }
             fclose($pipes[2]);
         }
-        var_dump($text);
-        var_dump($error);
+        //var_dump($text);
+        //var_dump($error);
     }
 }
