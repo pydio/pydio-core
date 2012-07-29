@@ -93,7 +93,7 @@ class AJXP_Node{
     }
 
     /**
-     * @param $label Main label, will set the metadata "text" key.
+     * @param $label String Main label, will set the metadata "text" key.
      * @return void
      */
     public function setLabel($label){
