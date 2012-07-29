@@ -71,6 +71,7 @@
     <xs:element name="selectionContext">
         <xs:complexType mixed="true">
             <xs:attribute name="allowedMimes"/>
+            <xs:attribute name="evalMetadata"/>
             <xs:attribute name="behaviour" type="xs:NCName"/>
             <xs:attribute name="dir" use="required" type="xs:boolean"/>
             <xs:attribute name="editable" type="xs:boolean"/>
