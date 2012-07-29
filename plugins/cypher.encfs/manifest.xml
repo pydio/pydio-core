@@ -5,5 +5,119 @@
         <core_relation packaged="false" tested_version="4.2.2"/>
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
+    <client_settings>
+        <resources>
+            <i18n namespace="encfs" path="plugins/cypher.encfs/resources/i18n"/>
+            <img_library alias="cypher.encfs" path="plugins/cypher.encfs/resources/img"/>
+        </resources>
+    </client_settings>
     <class_definition classname="EncfsMounter" filename="plugins/cypher.encfs/class.EncfsMounter.php"/>
+    <registry_contributions>
+        <actions>
+            <action name="encfs.cypher_folder_create">
+                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" text="encfs.5" title="encfs.6" hasAccessKey="false">
+                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                    <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="!metadata.get('ENCFS_clear_folder')"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="encfs_cypher">
+                        <dialogOnComplete><![CDATA[
+                             var passValue = $(oForm).down('input[name="password"]').getValue();
+                             var passValue2 = $(oForm).down('input[name="password_confirm"]').getValue();
+                             if(passValue != passValue2){
+                                 ajaxplorer.displayMessage('ERROR', 'Warning, both passwords differ');
+                                 return;
+                             }
+                             var conn = new Connexion();
+                             conn.setParameters($H({
+                                get_action:'encfs.cypher_folder',
+                                dir:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
+                                pass: passValue
+                             }));
+                             conn.onComplete = function(transport){
+                                ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                             };
+                             conn.sendAsync();
+                             hideLightBox();
+                        ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="encfs_cypher"><![CDATA[
+                         <div id="encfs_cypher" name="encfs_cypher" box_width="320">
+                         <div class="legend">Choose an encryption key to make your data inaccessible by anyone but you. Be aware that if you loose the key, your data will be lost forever!</div>
+                         <div class="SF_element">
+                            <div class="SF_label">Encryption Key</div>
+                            <input type="password" name="password" class="dialogFocus"/>
+                         </div>
+                         <div class="SF_element">
+                            <div class="SF_label">Confirm Key</div>
+                            <input type="password" name="password_confirm"/>
+                         </div>
+                         </div>
+                     ]]></clientForm>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="encfs.cypher_folder">
+                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" text="encfs.1" title="encfs.2" hasAccessKey="false">
+                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                    <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder_mounted')"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                         var conn = new Connexion();
+                         conn.setParameters($H({
+                            get_action:'encfs.cypher_folder',
+                            dir:ajaxplorer.getUserSelection().getUniqueNode().getPath()
+                         }));
+                         conn.onComplete = function(transport){
+                            ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                         };
+                         conn.sendAsync();
+                         hideLightBox();
+                        ]]></clientCallback>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="encfs.uncypher_folder">
+                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" text="encfs.3" title="encfs.4" hasAccessKey="false">
+                    <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
+                    <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder') &amp;&amp; !metadata.get('ENCFS_clear_folder_mounted')"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="encfs_mount">
+                        <dialogOnComplete><![CDATA[
+                             var passValue = $(oForm).down('input[name="password"]').getValue();
+                             var conn = new Connexion();
+                             conn.setParameters($H({
+                                get_action:'encfs.uncypher_folder',
+                                dir:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
+                                pass: passValue
+                                }));
+                             conn.onComplete = function(transport){
+                                ajaxplorer.getActionBar().parseXmlMessage(transport.responseXML);
+                             };
+                             conn.sendAsync();
+                             hideLightBox();
+                        ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="encfs_mount"><![CDATA[
+                         <div id="encfs_mount" name="encfs_mount" box_width="320">
+                         <div class="legend">Enter the encryption key you have chosen when first encrypting this folder.</div>
+                         <div class="SF_element">
+                            <div class="SF_label">Key</div>
+                            <input class="SF_input" type="password" name="password" class="dialogFocus"/>
+                         </div>
+                         </div>
+                     ]]></clientForm>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+        </actions>
+        <hooks>
+            <serverCallback methodName="filterENCFS" hookName="node.info"/>
+        </hooks>
+    </registry_contributions>
+    <dependencies>
+        <activePlugin pluginName="access.fs"/>
+    </dependencies>
 </ajxp_plugin>
