@@ -82,6 +82,9 @@ class textLogDriver extends AbstractLogDriver {
 				$create = true; 
 			}
 			$this->fileHandle = @fopen($this->storageDir . $this->logFileName, "at+");
+            if($this->fileHandle === false){
+                error_log("[AjaXplorer] Cannot open log file ".$this->storageDir . $this->logFileName);
+            }
 			if($this->fileHandle !== false && count($this->stack)){
 				$this->stackFlush();
 			}
@@ -135,7 +138,7 @@ class textLogDriver extends AbstractLogDriver {
 		if ($this->fileHandle !== false) {
 			if(count($this->stack)) $this->stackFlush();						
 			if (@fwrite($this->fileHandle, $textMessage) === false) {
-				//print "There was an error writing to log file.";
+				error_log("[AjaXplorer] There was an error writing to log file.");
 			}
 		}else{			
 			$this->stack[] = $textMessage;
