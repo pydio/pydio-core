@@ -40,14 +40,15 @@ require_once($confStorageDriver->getUserClassFileName());
 
 //session_start();
 
-require_once AJXP_BIN_FOLDER."/ezc/Base/base.php";
-spl_autoload_register( array( 'ezcBase', 'autoload' ) );
+//require_once AJXP_BIN_FOLDER."/ezc/Base/base.php";
+//spl_autoload_register( array( 'ezcBase', 'autoload' ) );
+include 'core/classes/sabredav/Sabre/autoload.php';
 
 if(ConfService::getCoreConf("WEBDAV_BASEHOST") != ""){
-	$baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
+    $baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
 }else{
-	$baseURL = AJXP_Utils::detectServerURL();
-}				
+    $baseURL = AJXP_Utils::detectServerURL();
+}
 $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 
 $requestUri = $_SERVER["REQUEST_URI"];
@@ -56,21 +57,40 @@ $parts = explode("/", $end);
 $pathBase = $parts[0];
 $repositoryId = $pathBase;
 
-AJXP_Logger::debug("Searching by id $repositoryId");
+//AJXP_Logger::debug("Searching by id $repositoryId");
 $repository = ConfService::getRepositoryById($repositoryId);
 if($repository == null){
-	AJXP_Logger::debug("Searching by alias $repositoryId");
-	$repository = ConfService::getRepositoryByAlias($repositoryId);
-	if($repository != null){
-		$repositoryId = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
-	}
+    //AJXP_Logger::debug("Searching by alias $repositoryId");
+    $repository = ConfService::getRepositoryByAlias($repositoryId);
+    if($repository != null){
+        $repositoryId = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+    }
 }
 if($repository == null){
-	AJXP_Logger::debug("not found, dying $repositoryId");
-	die('You are not allowed to access this service');
+    AJXP_Logger::debug("not found, dying $repositoryId");
+    die('You are not allowed to access this service');
 }
-AJXP_Logger::debug("Found repository with id ".$repository->getDisplay()."-".$repositoryId);
+//AJXP_Logger::debug("Found repository with id ".$repository->getDisplay()."-".$repositoryId);
 
+
+
+
+$rootDir =  new AJXP_Sabre_Collection("/", $repository, null);
+$server = new Sabre_DAV_Server($rootDir);
+$server->setBaseUri($baseURI."/".$pathBase);
+
+$authBackend = new AJXP_Sabre_AuthBackend(0);
+$authPlugin = new Sabre_DAV_Auth_Plugin($authBackend,'Ajxp-DAV-Share');
+$server->addPlugin($authPlugin);
+
+$lockBackend = new Sabre_DAV_Locks_Backend_File("data/plugins/server.sabredav/locks");
+$lockPlugin = new Sabre_DAV_Locks_Plugin($lockBackend);
+$server->addPlugin($lockPlugin);
+
+$server->exec();
+
+
+/*
 $server = ezcWebdavServer::getInstance();
 $pathFactory = new ezcWebdavBasicPathFactory($baseURL.$baseURI."/".$pathBase);
 foreach ( $server->configurations as $conf ){
@@ -83,7 +103,6 @@ if(AuthService::usersEnabled()){
 
 $backend = new AJXP_WebdavBackend($repository);
 
-/*
 $lockConf = new ezcWebdavLockPluginConfiguration(
     new ezcWebdavLockPluginOptions(
         array("lockTimeout" => 60)
@@ -92,10 +111,10 @@ $lockConf = new ezcWebdavLockPluginConfiguration(
 $server->pluginRegistry->registerPlugin(
 	$lockConf
 );
-*/
 
 //$administrator = new ezcWebdavLockAdministrator($backend);
 //$administrator->purgeLocks();
 
 
 $server->handle( $backend );
+*/
