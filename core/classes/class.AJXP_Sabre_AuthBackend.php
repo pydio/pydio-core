@@ -1,0 +1,90 @@
+<?php
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
+
+class AJXP_Sabre_AuthBackend extends Sabre_DAV_Auth_Backend_AbstractDigest{
+
+    protected $currentUser;
+    private  $secretKey;
+    private $repositoryId;
+
+    function __construct($repositoryId){
+        $this->repositoryId = $repositoryId;
+        if(defined('AJXP_SAFE_SECRET_KEY')){
+            $this->secretKey = AJXP_SAFE_SECRET_KEY;
+        }else{
+            $this->secretKey = "\1CDAFx¨op#";
+        }
+    }
+
+    public function getDigestHash($realm, $username){
+        if(!AuthService::userExists($username)){
+            AJXP_Logger::debug("not exists! ".$username);
+            return false;
+        }
+        $confDriver = ConfService::getConfStorageImpl();
+        $user = $confDriver->createUserObject($username);
+        $webdavData = $user->getPref("AJXP_WEBDAV_DATA");
+        if(empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true || !isSet($webdavData["PASS"])){
+            return false;
+        }
+        $pass = $this->_decodePassword($webdavData["PASS"], $username);
+        return md5("{$username}:{$realm}:{$pass}");
+
+    }
+
+    public function authenticate(Sabre_DAV_Server $server, $realm){
+        $success = parent::authenticate($server, $realm);
+        if($success){
+            AuthService::logUser($this->currentUser, null, true);
+            $res = $this->updateCurrentUserRights(AuthService::getLoggedUser());
+            if($res === false){
+                return false;
+            }
+            if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
+                $webdavData = AuthService::getLoggedUser()->getPref("AJXP_WEBDAV_DATA");
+                AJXP_Safe::storeCredentials($this->currentUser, $this->_decodePassword($webdavData["PASS"], $this->currentUser));
+            }
+        }
+        return $success;
+    }
+
+
+    protected function updateCurrentUserRights($user){
+        if(!$user->canSwitchTo($this->repositoryId)){
+            return false;
+        }
+        return true;
+    }
+
+    private function _decodePassword($encoded, $user){
+        if (function_exists('mcrypt_decrypt'))
+        {
+            $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+            $encoded = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($user.$this->secretKey), base64_decode($encoded), MCRYPT_MODE_ECB, $iv));
+        }
+        return $encoded;
+    }
+
+
+
+}
