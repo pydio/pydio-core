@@ -1,12 +1,29 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: admin
- * Date: 02/08/12
- * Time: 17:37
- * To change this template use File | Settings | File Templates.
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
-class AJXP_Sabre_Node implements Sabre_DAV_INode/*, Sabre_DAV_IProperties*/
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
+/**
+ * @package info.ajaxplorer.core
+ */
+class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
 {
 
     /**
@@ -136,13 +153,24 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode/*, Sabre_DAV_IProperties*/
      * @param array $mutations
      * @return bool|array
      */
-    /*
     function updateProperties($mutations){
 
         AJXP_Logger::debug("UPDATE PROPERTIES", $mutations);
+        $metaStore = $this->getMetastore();
+
+        foreach($mutations as $p => $data){
+            list($namespace, $pname) = explode("}", ltrim($p, "{"));
+            if($namespace != "DAV:" && $metaStore){
+                list($pname, $pvalue) = explode("=", $pname);
+                $data = $metaStore->retrieveMetadata(new AJXP_Node($this->url), "SABRE_DAV:".$namespace, false, AJXP_METADATA_SCOPE_REPOSITORY);
+                $data[$pname] = $pvalue;
+                $metaStore->setMetadata(new AJXP_Node($this->url), "SABRE_DAV:".$namespace, $data, false, AJXP_METADATA_SCOPE_REPOSITORY);
+                AJXP_Logger::debug("UPDATED Metadata for ". $p, $data);
+            }
+        }
+
         return true;
     }
-    */
 
     /**
      * Returns a list of properties for this nodes.
@@ -155,10 +183,31 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode/*, Sabre_DAV_IProperties*/
      * @param array $properties
      * @return void
      */
-    /*
     function getProperties($properties){
-        AJXP_Logger::debug("GET PROPERTIES", $properties);
-        return array();
+
+        $metaStore = $this->getMetastore();
+        $arr = array();
+        foreach($properties as $p){
+            list($namespace, $pname) = explode("}", ltrim($p, "{"));
+            if($namespace != "DAV:" && $metaStore){
+                $data = $metaStore->retrieveMetadata(new AJXP_Node($this->url), "SABRE_DAV:".$namespace, false, AJXP_METADATA_SCOPE_REPOSITORY);
+                if(!isSet($arr[200]))$arr[200] = array();
+                $arr[200][$pname] = $data[$pname];
+                AJXP_Logger::debug("Metadata for ". $p, $data);
+            }
+        }
+        return $arr;
     }
-    */
+
+    /**
+     * @return MetaStoreProvider|bool
+     */
+    protected function getMetastore(){
+        $metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+        if($metaStore === false) return false;
+        $metaStore->initMeta($this->accessDriver);
+        return $metaStore;
+    }
+
+
 }

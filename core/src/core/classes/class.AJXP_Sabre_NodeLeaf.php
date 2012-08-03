@@ -1,10 +1,27 @@
 <?php
+/*
+ * Copyright 2007-2011 Charles du Jeu <contact (at) cdujeu.me>
+ * This file is part of AjaXplorer.
+ *
+ * AjaXplorer is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AjaXplorer is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with AjaXplorer.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://www.ajaxplorer.info/>.
+ */
+defined('AJXP_EXEC') or die( 'Access not allowed');
+
 /**
- * Created by JetBrains PhpStorm.
- * User: admin
- * Date: 02/08/12
- * Time: 18:04
- * To change this template use File | Settings | File Templates.
+ * @package info.ajaxplorer.core
  */
 class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
 {
@@ -65,6 +82,25 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
      * @return void
      */
     function getContentType(){
+        if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
+        {
+            $fInfo = new fInfo( FILEINFO_MIME );
+            $mimeType = $fInfo->file( $this->url );
+
+            // The documentation tells to do this, but it does not work with a
+            // current version of pecl/fileinfo
+            // $fInfo->close();
+
+            return $mimeType;
+        }
+
+        // Check if extension ext/mime-magic is usable.
+        if ( $this->options->useMimeExts &&
+            ezcBaseFeatures::hasExtensionSupport( 'mime_magic' ) &&
+            ( $mimeType = mime_content_type( $this->url ) ) !== false )
+        {
+            return $mimeType;
+        }
         return null;
     }
 
