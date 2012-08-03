@@ -120,7 +120,6 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre_DAV_ICollec
      */
     function getChildren(){
 
-        AJXP_Logger::debug("Getting children of ".$this->path);
         if(isSet($this->children)) {
             return $this->children;
         }
