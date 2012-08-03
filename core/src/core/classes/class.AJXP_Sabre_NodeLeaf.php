@@ -31,14 +31,17 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
      */
     function put($data){
 
-        $this->accessDriver->nodeWillChange($this->path, intval($_SERVER["CONTENT_LENGTH"]));
+        // Warning, passed by ref
+        $p = $this->path;
+
+        $this->accessDriver->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
 
         $stream = fopen($this->url, "w");
         stream_copy_to_stream($data, $stream);
         fclose($stream);
 
         $toto = null;
-        $this->accessDriver->nodeChanged($toto, $this->path);
+        $this->accessDriver->nodeChanged($toto, $p);
 
         return $this->getETag();
     }
@@ -91,6 +94,8 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
     function getSize(){
         return filesize($this->url);
     }
+
+
 
 
 }

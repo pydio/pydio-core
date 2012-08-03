@@ -38,32 +38,42 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre_DAV_ICollec
     function createFile($name, $data = null){
 
         try{
+            $name = ltrim($name, "/");
             AJXP_Logger::debug("CREATE FILE $name");
-            if($data != null){
-                $p = $this->path."/$name";
-                $this->accessDriver->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
-            }
 
-                AJXP_Controller::findActionAndApply("mkfile", array(
-                    "dir" => $this->path,
-                    "filename" => $name
-                ), array());
-            if( $data =!null && is_file($this->path."/".$name)){
-                $stream = fopen($this->url."/".$name, "w");
-                stream_copy_to_stream($data, $stream);
-                fclose($stream);
+            AJXP_Controller::findActionAndApply("mkfile", array(
+                "dir" => $this->path,
+                "filename" => $name
+            ), array());
+
+            if( $data != null && is_file($this->url."/".$name)){
+
+                $p = $this->path."/".$name;
+                $this->accessDriver->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
+                AJXP_Logger::debug("Should now copy stream or string in ".$this->url."/".$name);
+                if(is_resource($data)){
+                    $stream = fopen($this->url."/".$name, "w");
+                    stream_copy_to_stream($data, $stream);
+                    fclose($stream);
+                }else if(is_string($data)){
+                    file_put_contents($data, $this->url."/".$name);
+                }
+
+                $toto = null;
+                $this->accessDriver->nodeChanged($toto, $p);
+
             }
             $node = new AJXP_Sabre_NodeLeaf($this->path."/".$name, $this->repository, $this->accessDriver);
-
-            $toto = null;
-            $p = $this->path."/$name";
-            $this->accessDriver->nodeChanged($toto, $p);
+            if(isSet($this->children)){
+                $this->children = null;
+            }
+            return $node->getETag();
 
         }catch (Exception $e){
-            AJXP_Logger::debug("Error ", $e->getTraceAsString());
+            AJXP_Logger::debug("Error ".$e->getMessage(), $e->getTraceAsString());
+            return null;
         }
 
-        return $node->getETag();
 
     }
 
@@ -74,6 +84,10 @@ class AJXP_Sabre_Collection extends AJXP_Sabre_Node implements Sabre_DAV_ICollec
      * @return void
      */
     function createDirectory($name){
+
+        if(isSet($this->children)){
+            $this->children = null;
+        }
 
         AJXP_Controller::findActionAndApply("mkdir", array(
             "dir" => $this->path,
