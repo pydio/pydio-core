@@ -52,40 +52,59 @@ if(ConfService::getCoreConf("WEBDAV_BASEHOST") != ""){
 $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 
 $requestUri = $_SERVER["REQUEST_URI"];
-$end = substr($requestUri, strlen($baseURI."/"));
-$parts = explode("/", $end);
-$pathBase = $parts[0];
-$repositoryId = $pathBase;
+$end = trim(substr($requestUri, strlen($baseURI."/")));
+if(!empty($end) && $end[0] != "?"){
 
-//AJXP_Logger::debug("Searching by id $repositoryId");
-$repository = ConfService::getRepositoryById($repositoryId);
-if($repository == null){
-    //AJXP_Logger::debug("Searching by alias $repositoryId");
-    $repository = ConfService::getRepositoryByAlias($repositoryId);
-    if($repository != null){
-        $repositoryId = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+    $parts = explode("/", $end);
+    $pathBase = $parts[0];
+    $repositoryId = $pathBase;
+
+    //AJXP_Logger::debug("Searching by id $repositoryId");
+    $repository = ConfService::getRepositoryById($repositoryId);
+    if($repository == null){
+        //AJXP_Logger::debug("Searching by alias $repositoryId");
+        $repository = ConfService::getRepositoryByAlias($repositoryId);
+        if($repository != null){
+            $repositoryId = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+        }
     }
+    if($repository == null){
+        AJXP_Logger::debug("not found, dying $repositoryId");
+        die('You are not allowed to access this service');
+    }
+    //AJXP_Logger::debug("Found repository with id ".$repository->getDisplay()."-".$repositoryId);
+
+    $rootDir =  new AJXP_Sabre_Collection("/", $repository, null);
+    $server = new Sabre_DAV_Server($rootDir);
+    $server->setBaseUri($baseURI."/".$pathBase);
+
+
+}else{
+
+    $rootDir = new AJXP_Sabre_RootCollection("root");
+    $server = new Sabre_DAV_Server($rootDir);
+    $server->setBaseUri($baseURI);
+
 }
-if($repository == null){
-    AJXP_Logger::debug("not found, dying $repositoryId");
-    die('You are not allowed to access this service');
-}
-//AJXP_Logger::debug("Found repository with id ".$repository->getDisplay()."-".$repositoryId);
 
 
 
 
-$rootDir =  new AJXP_Sabre_Collection("/", $repository, null);
-$server = new Sabre_DAV_Server($rootDir);
-$server->setBaseUri($baseURI."/".$pathBase);
 
 $authBackend = new AJXP_Sabre_AuthBackend(0);
-$authPlugin = new Sabre_DAV_Auth_Plugin($authBackend,'Ajxp-DAV-Share');
+$authPlugin = new Sabre_DAV_Auth_Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
 $server->addPlugin($authPlugin);
 
 $lockBackend = new Sabre_DAV_Locks_Backend_File("data/plugins/server.sabredav/locks");
 $lockPlugin = new Sabre_DAV_Locks_Plugin($lockBackend);
 $server->addPlugin($lockPlugin);
+
+if(ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")){
+    $browerPlugin = new Sabre_DAV_Browser_Plugin(false, true);
+    $extPlugin = new Sabre_DAV_Browser_GuessContentType();
+    $server->addPlugin($browerPlugin);
+    $server->addPlugin($extPlugin);
+}
 
 $server->exec();
 
