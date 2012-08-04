@@ -225,6 +225,10 @@ class AJXP_Controller{
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
 		$cmd = ConfService::getCoreConf("CLI_PHP")." ".$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
+		/* Inserted next 3 lines to quote the command if in windows - rmeske*/
+		if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows"){
+			$cmd = ConfService::getCoreConf("CLI_PHP")." ".chr(34).$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php".chr(34)." -u=$user -t=$token -a=$actionName -r=$currentRepositoryId";
+		}
         if($statusFile != ""){
             $cmd .= " -s=".$statusFile;
         }
@@ -242,7 +246,10 @@ class AJXP_Controller{
                 $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
                 AJXP_Logger::debug("Writing file $cmd to $tmpBat");
                 file_put_contents($tmpBat, $cmd);
-                pclose(popen("start /b ".chr(34).$tmpBat.chr(34), 'r'));
+ 				/* Following 1 line modified by rmeske: The windows Start command identifies the first parameter in quotes as a title for the window.  Therefore, when enclosing a command with double quotes you must include a window title first
+				START	["title"] [/Dpath] [/I] [/MIN] [/MAX] [/SEPARATE | /SHARED] [/LOW | /NORMAL | /HIGH | /REALTIME] [/WAIT] [/B] [command / program] [parameters]
+				*/
+               pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
             }
 		}else{
 			$process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
