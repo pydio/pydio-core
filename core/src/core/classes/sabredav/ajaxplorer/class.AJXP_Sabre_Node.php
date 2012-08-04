@@ -65,9 +65,6 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      */
     function delete(){
 
-
-
-        AJXP_Logger::debug("Delete? ".$this->path);
         ob_start();
         try{
             AJXP_Controller::findActionAndApply("delete", array(
@@ -77,8 +74,8 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
         }catch(Exception $e){
 
         }
-        $result = ob_get_flush();
-        AJXP_Logger::debug("RESULT : ".$result);
+        ob_get_flush();
+        $this->putResourceData(array());
 
     }
 
@@ -100,12 +97,16 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      * @return void
      */
     function setName($name){
+        $data = $this->getResourceData();
+        ob_start();
         AJXP_Controller::findActionAndApply("rename", array(
             "filename_new"      => $name,
             "dir"               => dirname($this->path),
             "file"              => $this->path
         ), array());
-
+        ob_get_flush();
+        $this->putResourceData(array());
+        $this->putResourceData($data, dirname($this->url)."/".$name);
     }
 
     /**
@@ -121,83 +122,77 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
     /**
      * Updates properties on this node,
      *
-     * The properties array uses the propertyName in clark-notation as key,
-     * and the array value for the property value. In the case a property
-     * should be deleted, the property value will be null.
-     *
-     * This method must be atomic. If one property cannot be changed, the
-     * entire operation must fail.
-     *
-     * If the operation was successful, true can be returned.
-     * If the operation failed, false can be returned.
-     *
-     * Deletion of a non-existent property is always successful.
-     *
-     * Lastly, it is optional to return detailed information about any
-     * failures. In this case an array should be returned with the following
-     * structure:
-     *
-     * array(
-     *   403 => array(
-     *      '{DAV:}displayname' => null,
-     *   ),
-     *   424 => array(
-     *      '{DAV:}owner' => null,
-     *   )
-     * )
-     *
-     * In this example it was forbidden to update {DAV:}displayname.
-     * (403 Forbidden), which in turn also caused {DAV:}owner to fail
-     * (424 Failed Dependency) because the request needs to be atomic.
-     *
-     * @param array $mutations
+     * @param array $properties
+     * @see Sabre_DAV_IProperties::updateProperties
      * @return bool|array
      */
-    function updateProperties($mutations){
+    public function updateProperties($properties) {
 
-        AJXP_Logger::debug("UPDATE PROPERTIES", $mutations);
-        $metaStore = $this->getMetastore();
+        $resourceData = $this->getResourceData();
 
-        foreach($mutations as $p => $data){
-            list($namespace, $pname) = explode("}", ltrim($p, "{"));
-            if($namespace != "DAV:" && $metaStore){
-                list($pname, $pvalue) = explode("=", $pname);
-                $data = $metaStore->retrieveMetadata(new AJXP_Node($this->url), "SABRE_DAV:".$namespace, false, AJXP_METADATA_SCOPE_REPOSITORY);
-                $data[$pname] = $pvalue;
-                $metaStore->setMetadata(new AJXP_Node($this->url), "SABRE_DAV:".$namespace, $data, false, AJXP_METADATA_SCOPE_REPOSITORY);
-                AJXP_Logger::debug("UPDATED Metadata for ". $p, $data);
+        foreach($properties as $propertyName=>$propertyValue) {
+
+            // If it was null, we need to delete the property
+            if (is_null($propertyValue)) {
+                if (isset($resourceData['properties'][$propertyName])) {
+                    unset($resourceData['properties'][$propertyName]);
+                }
+            } else {
+                $resourceData['properties'][$propertyName] = $propertyValue;
             }
+
         }
 
+        //AJXP_Logger::debug("Saving Data", $resourceData);
+        $this->putResourceData($resourceData);
         return true;
     }
 
     /**
-     * Returns a list of properties for this nodes.
+     * Returns a list of properties for this nodes.;
      *
-     * The properties list is a list of propertynames the client requested,
-     * encoded in clark-notation {xmlnamespace}tagname
-     *
-     * If the array is empty, it means 'all properties' were requested.
+     * The properties list is a list of propertynames the client requested, encoded as xmlnamespace#tagName, for example: http://www.example.org/namespace#author
+     * If the array is empty, all properties should be returned
      *
      * @param array $properties
-     * @return void
+     * @return array
      */
-    function getProperties($properties){
+    function getProperties($properties) {
+
+        $resourceData = $this->getResourceData();
+
+        // if the array was empty, we need to return everything
+        if (!$properties) return $resourceData['properties'];
+
+        $props = array();
+        foreach($properties as $property) {
+            if (isset($resourceData['properties'][$property])) $props[$property] = $resourceData['properties'][$property];
+        }
+
+        return $props;
+
+    }
+
+    protected function putResourceData($array, $newURL = null){
 
         $metaStore = $this->getMetastore();
-        $arr = array();
-        foreach($properties as $p){
-            list($namespace, $pname) = explode("}", ltrim($p, "{"));
-            if($namespace != "DAV:" && $metaStore){
-                $data = $metaStore->retrieveMetadata(new AJXP_Node($this->url), "SABRE_DAV:".$namespace, false, AJXP_METADATA_SCOPE_REPOSITORY);
-                if(!isSet($arr[200]))$arr[200] = array();
-                $arr[200][$pname] = $data[$pname];
-                AJXP_Logger::debug("Metadata for ". $p, $data);
-            }
+        if($metaStore != false){
+            $metaStore->setMetadata(new AJXP_Node(($newURL!=null?$newURL:$this->url)), "SABRE_DAV", $array, false, AJXP_METADATA_SCOPE_GLOBAL);
         }
-        return $arr;
+
     }
+
+
+    protected function getResourceData(){
+        $metaStore = $this->getMetastore();
+        $data = array();
+        if($metaStore != false){
+            $data = $metaStore->retrieveMetadata(new AJXP_Node($this->url), "SABRE_DAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+        }
+        if (!isset($data['properties'])) $data['properties'] = array();
+        return $data;
+    }
+
 
     /**
      * @return MetaStoreProvider|bool
