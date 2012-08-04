@@ -82,6 +82,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
      * @return void
      */
     function getContentType(){
+        /*
         if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
         {
             $fInfo = new fInfo( FILEINFO_MIME );
@@ -101,6 +102,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
         {
             return $mimeType;
         }
+        */
         return null;
     }
 
