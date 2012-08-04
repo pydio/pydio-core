@@ -74,8 +74,10 @@ class PHPCLI extends AbstractTest
         $cmd = $defaultCli." ". $robustCacheDir .DIRECTORY_SEPARATOR."cli_test.php";
 
         if ($windows){
-
-            $cmd .= " > ".$logFile;
+			/* Next 2 lines modified by rmeske: Need to wrap the folder and file paths in double quotes.  */
+			$cmd = $defaultCli." ". chr(34).$robustCacheDir .DIRECTORY_SEPARATOR."cli_test.php".chr(34);
+            $cmd .= " > ".chr(34).$logFile.chr(34);
+			
             $comCommand = $cmd;
             if($useCOM){
                 $WshShell   = new COM("WScript.Shell");
@@ -84,7 +86,10 @@ class PHPCLI extends AbstractTest
                 $tmpBat = implode(DIRECTORY_SEPARATOR, array(str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH), "data","tmp", md5(time()).".bat"));
                 $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
                 file_put_contents($tmpBat, $cmd);
-                @pclose(@popen("start /b ".chr(34).$tmpBat.chr(34), 'r'));
+				/* Following 1 line modified by rmeske: The windows Start command identifies the first parameter in quotes as a title for the window.  Therefore, when enclosing a command with double quotes you must include a window title first
+				START	["title"] [/Dpath] [/I] [/MIN] [/MAX] [/SEPARATE | /SHARED] [/LOW | /NORMAL | /HIGH | /REALTIME] [/WAIT] [/B] [command / program] [parameters]
+				*/
+                @pclose(@popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
                 sleep(1);
                 // Failed, but we can try with COM
                 if( ! is_file(AJXP_CACHE_DIR."/cli_result.php") && $comEnabled ){
