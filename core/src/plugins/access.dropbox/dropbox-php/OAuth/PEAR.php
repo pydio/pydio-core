@@ -153,6 +153,8 @@ class Dropbox_OAuth_PEAR extends Dropbox_OAuth {
                 throw new Dropbox_Exception_NotFound('Resource at uri: ' . $uri . ' could not be found');
             case 507 : 
                 throw new Dropbox_Exception_OverQuota('This dropbox is full');
+            case 400 :
+                throw new Exception('Bad Request : '. $response->getBody());
 
         }
 
