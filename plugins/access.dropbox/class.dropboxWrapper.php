@@ -181,7 +181,10 @@ class dropboxWrapper implements AjxpWrapper {
 		$path = $this->initPath($path);
 		$metadata = self::$dropbox->getMetaData($path);
 		AJXP_Logger::debug("CONTENT for $path", $metadata);
-		self::$crtDirContent = $metadata["contents"];		
+		self::$crtDirContent = $metadata["contents"];
+        if(!is_array(self::$crtDirContent)){
+            return false;
+        }
 		return true;
 	}
 	
