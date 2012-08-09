@@ -608,6 +608,11 @@ ConfigEditor = Class.create({
 		parameters = new Hash();
 		parameters.set('new_user_login', login.value);
 		parameters.set('new_user_pwd', this.encodePassword(pass.value));
+        var currentPath = ajaxplorer.getContextNode().getPath();
+        if(currentPath.startsWith("/data/users")){
+            var groupPath = currentPath.substr("/data/users".length);
+            parameters.set('group_path', groupPath);
+        }
 		extraParams.each( function(input){
 			parameters.set('DRIVER_OPTION_'+input.name, input.value);
 		});
@@ -714,8 +719,12 @@ ConfigEditor = Class.create({
 		}.bind(this));
 		this.drivers = new Hash();
 		this.templates = new Hash();
-		this.submitForm('create_repository', 'get_drivers_definition', new Hash(), null, function(xmlData){			
-			var driverNodes = XPathSelectNodes(xmlData, "drivers/ajxpdriver");			
+		this.submitForm('create_repository', 'get_drivers_definition', new Hash(), null, function(xmlData){
+            var root = XPathSelectSingleNode(xmlData, "drivers");
+            if(root.getAttribute("allowed") == "false"){
+                this.drivers.NOT_ALLOWED = true;
+            }
+			var driverNodes = XPathSelectNodes(xmlData, "drivers/ajxpdriver");
 			for(var i=0;i<driverNodes.length;i++){				
 				var driver = driverNodes[i];
 				var driverDef = new Hash();
@@ -777,13 +786,15 @@ ConfigEditor = Class.create({
 				this.driverSelector.insert({'bottom':option});			
 			}.bind(this));			
 		}
-		this.driverSelector.insert(new Element('optgroup', {label:"Access Drivers"}));
-		this.drivers.each(function(pair){
-			var option = new Element('option');
-			option.setAttribute('value', pair.key);
-			option.update(pair.value.get('label'));
-			this.driverSelector.insert({'bottom':option});			
-		}.bind(this) );
+        if(!this.drivers.NOT_ALLOWED){
+            this.driverSelector.insert(new Element('optgroup', {label:"Access Drivers"}));
+            this.drivers.each(function(pair){
+                var option = new Element('option');
+                option.setAttribute('value', pair.key);
+                option.update(pair.value.get('label'));
+                this.driverSelector.insert({'bottom':option});
+            }.bind(this) );
+        }
 		if(Prototype.Browser.IE){this.driverSelector.show();}
 		this.driverSelector.onchange = this.driverSelectorChange.bind(this);
 	},
