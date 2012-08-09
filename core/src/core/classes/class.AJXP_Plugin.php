@@ -38,6 +38,7 @@ class AJXP_Plugin implements Serializable{
 	 */
 	protected $xPath;
 	protected $manifestLoaded = false;
+    protected $externalFilesAppended = false;
     protected $enabled;
 	protected $actions;
 	protected $registryContributions = array();
@@ -68,6 +69,7 @@ class AJXP_Plugin implements Serializable{
 		"name", 
 		"type", 
 		"manifestLoaded",
+        "externalFilesAppended",
         "enabled",
 		"actions", 
 		"registryContributions", 
@@ -124,7 +126,7 @@ class AJXP_Plugin implements Serializable{
      * Main function for loading all the nodes under registry_contributions.
      * @return void
      */
-	protected function loadRegistryContributions(){		
+	protected function loadRegistryContributions($dry = false){
 		$regNodes = $this->xPath->query("registry_contributions/*");
 		for($i=0;$i<$regNodes->length;$i++){
 			$regNode = $regNodes->item($i);
@@ -145,10 +147,10 @@ class AJXP_Plugin implements Serializable{
 				}else{
 					$exclude = array();
 				}
-				$this->initXmlContributionFile($filename, $include, $exclude);
+				$this->initXmlContributionFile($filename, $include, $exclude, $dry);
 			}else{
 				$this->registryContributions[]=$regNode;
-				$this->parseSpecificContributions($regNode);
+				if(!$dry) $this->parseSpecificContributions($regNode);
 			}
 		}
 		// add manifest as a "plugins" (remove parsed contrib)
@@ -162,7 +164,7 @@ class AJXP_Plugin implements Serializable{
 			$manifestNode->removeChild($regNodeParent->item(0));
 		}
 		$this->registryContributions[]=$pluginContrib->documentElement;
-		$this->parseSpecificContributions($pluginContrib->documentElement);
+        if(!$dry) $this->parseSpecificContributions($pluginContrib->documentElement);
 	}
 
 	/**
@@ -172,12 +174,12 @@ class AJXP_Plugin implements Serializable{
      * @param array $exclude XPath query for XML Nodes to exclude from the included ones.
      * @return
      */
-	protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array()){
+	protected function initXmlContributionFile($xmlFile, $include=array("*"), $exclude=array(), $dry = false){
 		$contribDoc = new DOMDocument();
 		$contribDoc->load(AJXP_INSTALL_PATH."/".$xmlFile);
 		if(!is_array($include) && !is_array($exclude)){
 			$this->registryContributions[] = $contribDoc->documentElement;
-			$this->parseSpecificContributions($contribDoc->documentElement);
+            if(!$dry) $this->parseSpecificContributions($contribDoc->documentElement);
 			return;
 		}
 		$xPath = new DOMXPath($contribDoc);
@@ -211,14 +213,31 @@ class AJXP_Plugin implements Serializable{
 			}
 		}
 		if(!count($selected)) return;
+        $originalRegContrib = $this->xPath->query("registry_contributions")->item(0);
 		foreach($selected as $parentNodeName => $data){
 			$node = $data["parent"]->cloneNode(false);
+            //$newNode = $originalRegContrib->ownerDocument->importNode($node, false);
+            if($dry){
+                $localRegParent = $this->xPath->query("registry_contributions/".$parentNodeName);
+                if($localRegParent->length) {
+                    $localRegParent = $localRegParent->item(0);
+                }
+                else{
+                    $localRegParent = $originalRegContrib->ownerDocument->createElement($parentNodeName);
+                    $originalRegContrib->appendChild($localRegParent);
+                }
+            }
 			foreach($data["nodes"] as $childNode){
 				$node->appendChild($childNode);
+                if($dry) $localRegParent->appendChild($localRegParent->ownerDocument->importNode($childNode, true));
 			}
 			$this->registryContributions[] = $node;
-			$this->parseSpecificContributions($node);			
-		}		
+            if(!$dry) {
+                $this->parseSpecificContributions($node);
+            }else{
+                $this->reloadXPath();
+            }
+		}
 	}
     /**
      * Dynamically modify some registry contributions nodes. Can be easily derivated to enable/disable
@@ -342,7 +361,11 @@ class AJXP_Plugin implements Serializable{
      * @param string $format
      * @return DOMElement|DOMNodeList|string
      */
-	public function getManifestRawContent($xmlNodeName = "", $format = "string"){
+	public function getManifestRawContent($xmlNodeName = "", $format = "string", $externalFiles = false){
+        if($externalFiles && !$this->externalFilesAppended) {
+            $this->loadRegistryContributions(true);
+            $this->externalFilesAppended = true;
+        }
 		if($xmlNodeName == ""){
 			if($format == "string"){
 				return $this->manifestDoc->saveXML($this->manifestDoc->documentElement);
@@ -719,4 +742,3 @@ class AJXP_Plugin implements Serializable{
 		return true;
 	}
 }
-?>
