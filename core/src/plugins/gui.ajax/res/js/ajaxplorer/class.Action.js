@@ -294,8 +294,8 @@ Class.create("Action", {
 		if(!selectionContext.recycle && bRecycle){
 			return this.disable();
 		}
-		if((selectionContext.allowedMimes.size() && userSelection && !userSelection.hasMime(selectionContext.allowedMimes) && !selectionContext.allowedMimes.include('*')) 
-			&& !(selectionContext.dir && bDir)){
+		if(selectionContext.allowedMimes.size() && userSelection  && !selectionContext.allowedMimes.include('*')
+            &&  !userSelection.hasMime(selectionContext.allowedMimes)){
 			if(selectionContext.behaviour == 'hidden') return this.hide();
 			else return this.disable();
 		}
