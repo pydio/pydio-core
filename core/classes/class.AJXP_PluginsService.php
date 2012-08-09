@@ -519,7 +519,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
      * @param boolean $limitToActivePlugins Whether to search only in active plugins or in all plugins
  	 * @return DOMNode[]
  	 */
- 	public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false){
+ 	public static function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false){
  		$buffer = "";
  		$nodes = array();
  		$self = self::getInstance();
@@ -534,7 +534,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
                  if($limitToEnabledPlugins){
                      if(!$plugObject->isEnabled()) continue;
                  }
- 				$res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat);
+ 				$res = $plugObject->getManifestRawContent($query, $stringOrNodeFormat, $loadExternalFiles);
  				if($stringOrNodeFormat == "string"){
 	 				$buffer .= $res;
  				}else{
