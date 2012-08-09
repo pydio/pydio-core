@@ -26,7 +26,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * The basic abstraction of a data store. Can map a FileSystem, but can also map data from a totally
  * different source, like the application configurations, a mailbox, etc.
  */
-class Repository {
+class Repository implements AjxpGroupPathProvider {
 
     /**
      * @var string
@@ -105,6 +105,12 @@ class Repository {
      * @var array
      */
 	public $streamData;
+
+    /**
+     * @var String the groupPath of the administrator who created that repository.
+     */
+    protected $groupPath;
+
 
     /**
      * @param string $id
@@ -424,6 +430,20 @@ class Repository {
         return $this->inferOptionsFromParent;
     }
 
-}
+    /**
+     * @param String $groupPath
+     */
+    public function setGroupPath($groupPath)
+    {
+        $this->groupPath = $groupPath;
+    }
 
-?>
+    /**
+     * @return String
+     */
+    public function getGroupPath()
+    {
+        return $this->groupPath;
+    }
+
+}
