@@ -37,7 +37,22 @@
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
-		</action>				
+		</action>
+        <action name="list_all_plugins_actions">
+            <processing>
+                <serverCallback methodName="listAllActions"></serverCallback>
+            </processing>
+        </action>
+        <action name="list_all_repositories">
+            <processing>
+                <serverCallback methodName="listAllActions"></serverCallback>
+            </processing>
+        </action>
+        <action name="list_all_users">
+            <processing>
+                <serverCallback methodName="listAllActions"></serverCallback>
+            </processing>
+        </action>
 		<action name="get_plugin_manifest">
 			<processing>
 				<serverCallback methodName="switchAction"></serverCallback>
@@ -51,6 +66,7 @@
             <subMenu>
                 <dynamicItems>
                     <item actionId="create_user"/>
+                    <item actionId="create_group"/>
                     <item actionId="create_role"/>
                 </dynamicItems>
             </subMenu>
@@ -133,6 +149,43 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="create_group">
+			<gui text="ajxp_conf.118" title="ajxp_conf.118" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+					actionBar="false" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					modal.showDialogForm('Create Role', 'create_group_box');
+					]]></clientCallback>
+				<clientForm id="create_group_box"><![CDATA[
+					<div id="create_group_box" action="create_group" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">Group ID : </div><input name="group_name" type="text" class="dialogFocus SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">Group Label : </div><input name="group_label" type="text" class="dialogFocus SF_input"/>
+						</div>
+					</div>
+				]]></clientForm>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="user_update_group" dragndropDefault="true">
+			<gui text="ajxp_conf.75" title="ajxp_conf.75" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+					actionBar="false" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"></rightsContext>
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+		</action>
 		<action name="create_repository">
 			<gui text="299" title="300" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="true">
 				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
@@ -179,7 +232,7 @@
 							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 						}
 						ajaxplorer.actionBar.configEditor.setForm(oForm);
-						ajaxplorer.actionBar.configEditor.initCreateRepoWizard(window.createRepoCmd);
+						ajaxplorer.actionBar.configEditor.initCreateRepoWizard((window.createRepoCmd?window.createRepoCmd:'repository'));
 					};				
 					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
 					]]></clientCallback>
@@ -281,7 +334,7 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,ajxp_plugin" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,group,ajxp_plugin" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -289,14 +342,18 @@
 					var node = userSelection.getUniqueNode();
 					var meta = node.getMetadata();
 					var mime = meta.get("ajxp_mime");
-					if(mime == "user" || mime == "user_editable" || mime == "role"){
+					if(mime == "user" || mime == "user_editable" || mime == "role" || mime == "group" ){
 						var loadFunc = function(oForm){
 							ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
 							if(!ajaxplorer.actionBar.configEditor){
 								ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
 							}						
 							ajaxplorer.actionBar.configEditor.setForm(oForm);
-							if(mime == "role"){
+							if(mime == "group"){
+							    var grpPath = node.getPath();
+							    grpPath = grpPath.substr("/data/users".length);
+								ajaxplorer.actionBar.configEditor.loadRole("AJXP_GRP_"+grpPath);
+							}else if(mime == "role"){
 								ajaxplorer.actionBar.configEditor.loadRole(meta.get("text"));
 							}else{
 								ajaxplorer.actionBar.configEditor.loadUser(meta.get("text"));
@@ -377,8 +434,8 @@
 									</table>
 								</div>
 								<div id="actions_pane" style="display:none;padding-top:5px;color:#666;">
-								    <div style="border:1px solid #aaa;padding:5px;margin-bottom:5px;"><input type="checkbox" id="default_role_cb" style="float:left;">AJXP_MESSAGE[ajxp_conf.112]</div>
-									<div style="border:1px solid #aaa;padding:5px;"><div style="margin-bottom:5px;"><b>AJXP_MESSAGE[ajxp_conf.85]</b> : AJXP_MESSAGE[ajxp_conf.86]</div>
+								    <div style="padding:5px;margin-bottom:5px;"><input type="checkbox" id="default_role_cb" style="float:left;">AJXP_MESSAGE[ajxp_conf.112]</div>
+									<div style="padding:5px;"><div style="margin-bottom:5px;"><b>AJXP_MESSAGE[ajxp_conf.85]</b> : AJXP_MESSAGE[ajxp_conf.86]</div>
                                         <textarea id="disabled_actions" style="width:317px;padding:1px; height:60px;"></textarea>
                                         <input type="image" value="SAVE" class="dialogButton onclick="return false;" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" id="submit_actions_pane" style="float:right;margin:0px;"/>
 									</div>
