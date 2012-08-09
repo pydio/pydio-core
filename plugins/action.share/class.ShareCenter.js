@@ -28,7 +28,38 @@ Class.create("ShareCenter", {
         }
     },
 
+    createUserEntry : function(isGroup, isTemporary, entryId, entryLabel, assignedRights, skipObservers){
+        var li = new Element("div", {className:"user_entry"}).update(entryLabel);
+        if(isGroup){
+            li.addClassName("group_entry");
+        }else if(isTemporary){
+            li.addClassName("user_entry_temp");
+        }
+        li.writeAttribute("data-entry_id", entryLabel);
+        var id = Math.random();
+        li.insert({top:'<div style="float: right;"><input type="checkbox" id="r'+id+'" name="r" '+(assignedRights.startsWith("r")?"checked":"") +'><label for="r'+id+'">'+MessageHash[361]+'</label><input id="w'+id+'" type="checkbox" name="w"  '+(assignedRights.endsWith("w")?"checked":"") +'><label for="w'+id+'">'+MessageHash[412]+'</label></div>'});
+        li.insert({bottom:'<span style="display: none;" class="delete_user_entry">&nbsp;</span>'});
+
+        if(!skipObservers){
+            li.setStyle({opacity:0});
+            li.observe("mouseover", function(event){li.down('span').show();});
+            li.observe("mouseout", function(event){li.down('span').hide();});
+            li.down("span").observe("click", function(){
+                Effect.Fade(li, {duration:0.3, afterFinish:li.remove.bind(li)});
+            });
+            li.appendToList = function(htmlObject){
+                htmlObject.insert({bottom:li});
+                Effect.Appear(li, {duration:0.3});
+            };
+        }
+
+        return li;
+
+    },
+
     shareRepository : function(userSelection){
+
+        var entryTplGenerator = this.createUserEntry.bind(this);
 
         var loadFunc = function(oForm){
 
@@ -36,19 +67,20 @@ Class.create("ShareCenter", {
             if(nodeMeta.get("ajxp_shared")){
                 // Reorganize
                 var repoFieldset = oForm.down('fieldset#target_repository');
-                repoFieldset.down('div.dialogLegend').remove();
-                repoFieldset.insert(oForm.down('fieldset#target_user div#textarea_sf_element'));
-                repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user'));
-                repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user_anchor_div'));
-                oForm.down('fieldset#target_user').remove();
+                //repoFieldset.down('div.dialogLegend').remove();
+                //repoFieldset.insert(oForm.down('fieldset#target_user div#textarea_sf_element'));
+                //repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user'));
+                //repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user_anchor_div'));
+                //oForm.down('fieldset#target_user').remove();
             }
 
-            new Protopass($('shared_pass'), {
+            var ppass = new Protopass($('shared_pass'), {
                 barContainer : $('pass_strength_container'),
                 barPosition:'bottom'
             });
             oForm.down('#repo_label').setValue(getBaseName(userSelection.getUniqueNode().getPath()));
             if(!$('share_folder_form').autocompleter){
+                var pref = ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_TMP_PREFIX");
                 $('share_folder_form').autocompleter = new Ajax.Autocompleter(
                     "shared_user",
                     "shared_users_autocomplete_choices",
@@ -58,24 +90,71 @@ Class.create("ShareCenter", {
                         paramName:'value',
                         tokens:[',', '\n'],
                         frequency:0.1,
-                        indicator:oForm.down('#complete_indicator')
+                        indicator:oForm.down('#complete_indicator'),
+                        afterUpdateElement: function(element, selectedLi){
+                            id = Math.random();
+                            var label = selectedLi.getAttribute("data-label");
+                            if(selectedLi.getAttribute("data-temporary") && pref && ! label.startsWith(pref)){
+                                label = pref + label;
+                            }
+                            var li = entryTplGenerator(selectedLi.getAttribute("data-group"),
+                                selectedLi.getAttribute("data-temporary"),
+                                label,
+                                label,
+                                "r"
+                            );
+
+                            if(selectedLi.getAttribute("data-temporary")){
+                                element.readOnly = true;
+                                $("shared_pass").setValue(""); $("shared_pass_confirm").setValue("");
+                                element.setValue("Creating "+ label + " : choose a password");
+                                $('create_shared_user').select('div.dialogButtons>input').invoke("addClassName", "dialogButtons");
+                                $('create_shared_user').select('div.dialogButtons>input').invoke("stopObserving", "click");
+                                $('create_shared_user').select('div.dialogButtons>input').invoke("observe", "click", function(event){
+                                    Event.stop(event);
+                                    var close = false;
+                                    if(event.target.name == "ok"){
+                                        if( !$('shared_pass').value || $('shared_pass').value.length < ajxpBootstrap.parameters.get('password_min_length')){
+                                            alert(MessageHash[378]);
+                                        }else if($("shared_pass").getValue() == $("shared_pass_confirm").getValue()){
+                                            li.NEW_USER_PASSWORD = $("shared_pass").getValue();
+                                            li.appendToList($('shared_users_summary'));
+                                            close = true;
+                                        }
+                                    }else if(event.target.name == "cancel"){
+                                        close = true;
+                                    }
+                                    if(close) {
+                                        element.setValue("");
+                                        element.readOnly = false;
+                                        Effect.BlindUp('create_shared_user', {duration:0.4});
+                                        $('create_shared_user').select('div.dialogButtons>input').invoke("removeClassName", "dialogButtons");
+                                    }
+                                });
+                                Effect.BlindDown('create_shared_user', {duration:0.6, transition:Effect.Transitions.spring, afterFinish:function(){$('shared_pass').focus();}});
+                            }else{
+                                element.setValue("");
+                                li.appendToList($('shared_users_summary'));
+                            }
+                        }
                     }
                 );
+                $('share_folder_form').autocompleter.options.onComplete  = function(transport){
+                    var tmpElement = new Element('div');
+                    tmpElement.update(transport.responseText);
+                    $("shared_users_summary").select("div.user_entry").each(function(li){
+                        var found = tmpElement.down('[data-label="'+li.getAttribute("data-entry_id")+'"]');
+                        if(found) {
+                            found.remove();
+                        }
+                    });
+                    this.updateChoices(tmpElement.innerHTML);
+                }.bind($('share_folder_form').autocompleter);
                 if(Prototype.Browser.IE){
                     $(document.body).insert($("shared_users_autocomplete_choices"));
                 }
-                if(!nodeMeta.get("ajxp_shared")){
-                    $('shared_user').observeOnce("focus", function(){
-                        $('share_folder_form').autocompleter.activate();
-                    });
-                }
-                $('create_shared_user_anchor').observeOnce("click", function(){
-                    var pref = ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_TMP_PREFIX");
-                    if(pref){
-                        $("new_shared_user").setValue(pref);
-                    }
-                    $('create_shared_user').appear();
-                    $('create_shared_user_anchor').up('div.SF_element').fade();
+                $('shared_user').observe("click", function(){
+                    $('share_folder_form').autocompleter.activate();
                 });
             }
             this._currentRepositoryId = null;
@@ -84,40 +163,53 @@ Class.create("ShareCenter", {
                 oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
                 oForm.down('#complete_indicator').show();
                 this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
-                    oForm.down('textarea#shared_user').value = json['users'].join("\n");
-                    oForm.insert(new Element('input', {type:"hidden", name:"original_users", value:json['users'].join(',')}));
                     oForm.down('input#repo_label').value = json['label'];
-                    oForm.down('select').setValue(json['rights']);
+                    oForm.insert(new Element('input', {type:"hidden", name:"original_users", value:json['users'].join(',')}));
                     this._currentRepositoryId = json['repositoryId'];
                     oForm.down('#complete_indicator').hide();
+                    $A(json['users']).each(function(u){
+                        var newItem = entryTplGenerator(false, false, u, u, json['rights'][u]);
+                        newItem.appendToList($('shared_users_summary'));
+                    });
                 }.bind(this));
+            }else{
+                $('shared_user').observeOnce("focus", function(){
+                    $('share_folder_form').autocompleter.activate();
+                });
             }
         }.bind(this);
         var closeFunc = function (oForm){
             if(Prototype.Browser.IE){
                 $(document.body).down("#shared_users_autocomplete_choices").remove();
                 $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
+                $('create_shared_user').select('div.dialogButtons>input').invoke("removeClassName", "dialogButtons");
             }
         }
         var submitFunc = function(oForm){
-            if($('new_shared_user').value){
-                if( !$('shared_pass').value || $('shared_pass').value.length < ajxpBootstrap.parameters.get('password_min_length')){
-                    alert(MessageHash[378]);
-                    return false;
-                }
-            }
             if(!oForm.down('input[name="repo_label"]').value){
                 alert(MessageHash[349]);
                 return false;
             }
             var userSelection = ajaxplorer.getUserSelection();
             var publicUrl = ajxpServerAccessPath+'&get_action=share&sub_action=delegate_repo';
-            publicUrl = userSelection.updateFormOrUrl(null,publicUrl);
+            publicUrl = userSelection.updateFormOrUrl(null, publicUrl);
             var conn = new Connexion(publicUrl);
-            conn.setParameters(modal.getForm().serialize(true));
+            conn.setMethod("POST");
+            var params = modal.getForm().serialize(true);
+            conn.setParameters(params);
             if(this._currentRepositoryId){
                 conn.addParameter("repository_id", this._currentRepositoryId);
             }
+            var index = 0;
+            $("shared_users_summary").select("div.user_entry").each(function(entry){
+                conn.addParameter("user_"+index, entry.getAttribute("data-entry_id"));
+                conn.addParameter("right_read_"+index, entry.down('input[name="r"]').checked ? "true":"false");
+                conn.addParameter("right_write_"+index, entry.down('input[name="w"]').checked ? "true":"false");
+                if(entry.NEW_USER_PASSWORD){
+                    conn.addParameter("user_pass_"+index, entry.NEW_USER_PASSWORD);
+                }
+                index++;
+            });
             conn.onComplete = function(transport){
                 var response = parseInt(transport.responseText);
                 if(response == 200){
