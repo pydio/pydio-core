@@ -104,7 +104,13 @@ Class.create("FormManager", {
 				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> '+MessageHash[441];
 				element = '<div class="SF_input">'+element+'</div>';
 			}else if(type == 'select' && param.get('choices')){
-                var choices = param.get('choices').split(",");
+                var choices, json_list;
+                if(param.get("choices").startsWith("json_list:")){
+                    choices = ["loading|Loading..."];
+                    json_list = param.get("choices").split(":")[1];
+                }else{
+                    choices = param.get('choices').split(",");
+                }
                 element = '<select class="SF_input" name="'+name+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" >';
                 if(!mandatory) element += '<option value=""></option>';
                 for(var k=0;k<choices.length;k++){
@@ -134,6 +140,26 @@ Class.create("FormManager", {
 			if(desc){
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
+            if(json_list){
+                var conn = new Connexion();
+                element = div.down("select");
+                conn.setParameters({get_action:json_list});
+                conn.onComplete = function(transport){
+                    element.down("option").update("Select an action");
+                    var json = transport.responseJSON;
+                    if(json.HAS_GROUPS){
+                        for(var key in json.LIST){
+                            var opt = new Element("OPTGROUP", {label:key});
+                            element.insert(opt);
+                            for (var index=0;index<json.LIST[key].length;index++){
+                                var option = new Element("OPTION").update(json.LIST[key][index].action);
+                                element.insert(option);
+                            }
+                        }
+                    }
+                };
+                conn.sendAsync();
+            }
 
             if(param.get('replicationGroup')){
                 var repGroupName = param.get('replicationGroup');

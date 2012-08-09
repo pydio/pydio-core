@@ -349,8 +349,9 @@ div.shadow_class
 
 .dialogLegend
 {
-    color:#aaa;
-    font-size:0.9em;
+    color: #666;
+    padding-bottom: 5px;
+    line-height: 16px;
 }
 
 .dialogButtons
@@ -2496,6 +2497,71 @@ div.user_role{
 	border : 1px solid #ffffef;
 }
 
+.editable_users_list{
+
+    border: 1px solid #AAAAAA;
+    height: 130px;
+    overflow: auto;
+    clear:left;
+    position: relative;
+    margin-top: 5px;
+    border-radius: 3px;
+
+}
+
+.editable_users_list div.user_entry,
+li.complete_user_entry,
+li.complete_group_entry,
+li.complete_user_entry_temp
+{
+    padding: 8px 5px 8px 25px !important;
+    clear: left;
+    background-color: rgba(255, 255, 255, 0.7);
+    background-image: url("../images/mimes/16/user.png");
+    background-repeat: no-repeat;
+    background-position: 4px 5px;
+    border-bottom: 1px solid #F1F1EF;
+}
+
+li.complete_group_entry,
+.editable_users_list div.group_entry
+{
+    background-image: url("../images/mimes/16/users-folder.png");
+}
+
+li.complete_user_entry_temp,
+.editable_users_list div.user_entry_temp
+{
+    background-image: url("../images/mimes/16/user_shared.png");
+}
+
+.editable_users_list span.delete_user_entry{
+    background-image: url("../images/mimes/16/trashcan.png");
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    background-size: 100%;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.editable_users_list label{
+    padding: 0 3px;
+    cursor: pointer;
+}
+
+#create_shared_user{
+    width: 84%;
+    background-color: #EEE;
+    margin: 0 6%;
+    box-shadow: 0px 0px 7px #666;
+    padding: 1px 4px;
+    border-radius: 0px 0px 7px 7px;
+
+    position: absolute;
+    top: -1px;
+}
+
 /***********************/
 /* EDITORS & DIAPORAMA */
 /***********************/
@@ -2578,6 +2644,8 @@ div.autocomplete
       border:1px solid #bbb;
       margin:8px 0px 0px;
       padding:0px;
+      box-shadow: 2px 2px 3px #cccccc;
+      border-radius: 0 0 2px 2px;
 }
 div.autocomplete ul
 {
@@ -2594,7 +2662,7 @@ div.autocomplete ul li
       list-style-type:none;
       display:block;
       margin:0;
-      padding:2px;
+      padding:7px;
       cursor:pointer;
 }
 
