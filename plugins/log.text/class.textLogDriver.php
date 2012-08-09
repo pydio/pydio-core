@@ -138,7 +138,7 @@ class textLogDriver extends AbstractLogDriver {
 		if ($this->fileHandle !== false) {
 			if(count($this->stack)) $this->stackFlush();						
 			if (@fwrite($this->fileHandle, $textMessage) === false) {
-				error_log("[AjaXplorer] There was an error writing to log file.");
+				error_log("[AjaXplorer] There was an error writing to log file ($textMessage)");
 			}
 		}else{			
 			$this->stack[] = $textMessage;
@@ -167,7 +167,7 @@ class textLogDriver extends AbstractLogDriver {
 		$success = @fclose($this->fileHandle);
 		if ($success === false) {
 			// Failure to close the log file
-			$this->write("AJXP_Logger failed to close the handle to the log file", LOG_LEVEL_ERROR);
+			// error_log("[AjaXplorer] AJXP_Logger failed to close the handle to the log file");
 		}
 		
 	}
