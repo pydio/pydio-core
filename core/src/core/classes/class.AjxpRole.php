@@ -27,11 +27,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Authentication "role" concept : set of permissions that can be applied to
  * one or more users, plus set of actions to be disabled.
  */
-class AjxpRole
+class AjxpRole implements AjxpGroupPathProvider
 {
 	private $id;
 	private $rights = array();
     private $default = false;
+    /**
+     * @var String
+     */
+    protected $groupPath;
 	/**
      * Constructor
      * @param string $id
@@ -145,6 +149,22 @@ class AjxpRole
     public function isDefault()
     {
         return $this->default;
+    }
+
+    /**
+     * @param String $groupPath
+     */
+    public function setGroupPath($groupPath)
+    {
+        $this->groupPath = $groupPath;
+    }
+
+    /**
+     * @return String
+     */
+    public function getGroupPath()
+    {
+        return $this->groupPath;
     }
 
 }

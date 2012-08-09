@@ -404,7 +404,7 @@ class AuthService
 	{
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return 0;
-		$repoList = ConfService::getRootDirsList();
+		$repoList = ConfService::getRepositoriesList();
 		foreach ($repoList as $rootDirIndex => $rootDirObject)
 		{			
 			if($loggedUser->canRead($rootDirIndex."") || $loggedUser->canWrite($rootDirIndex."")) {
@@ -429,9 +429,10 @@ class AuthService
 	*/
 	static function updateAdminRights($adminUser)
 	{
-		foreach (array_keys(ConfService::getRootDirsList()) as $rootDirIndex)
-		{			
-			$adminUser->setRight($rootDirIndex, "rw");
+		foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
+		{
+            if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
+			$adminUser->setRight($repoId, "rw");
 		}
 		$adminUser->save();
 		return $adminUser;
@@ -446,12 +447,14 @@ class AuthService
 		if(!$userObject->hasParent()){
 			foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
 			{
+                if(!self::allowedForCurrentGroup($repoObject, $userObject)) continue;
                 if($repoObject->isTemplate) continue;
 				if($repoObject->getDefaultRight() != ""){
 					$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
 				}
 			}
             foreach(AuthService::getRolesList() as $roleId => $roleObject){
+                if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
                 if($roleObject->isDefault()){
                     $userObject->addRole($roleId);
                 }
@@ -608,22 +611,45 @@ class AuthService
         AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
 		return true;
 	}
+
+    static function filterBaseGroup($baseGroup){
+        $u = self::getLoggedUser();
+        if($u == null) return $baseGroup;
+        if($u->getGroupPath() != "/") {
+            if($baseGroup == "/") return $u->getGroupPath();
+            else return $u->getGroupPath().$baseGroup;
+        }else{
+            return $baseGroup;
+        }
+    }
+
+    static function listChildrenGroups($baseGroup = "/"){
+
+        return ConfService::getAuthDriverImpl()->listChildrenGroups(self::filterBaseGroup($baseGroup));
+
+    }
+
+    static function createGroup($baseGroup, $groupName, $groupLabel){
+        ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
+    }
+
 	/**
      * Call the auth driver impl to list all existing users
      * @static
      * @return array
      */
-	static function listUsers($regexp = null, $offset = -1, $limit = -1, $cleanLosts = true)
+	static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true)
 	{
+        $baseGroup = self::filterBaseGroup($baseGroup);
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
 		$allUsers = array();
         $paginated = false;
         if(($regexp != null || $offset != -1 || $limit != -1) && $authDriver->supportsUsersPagination()){
-            $users = $authDriver->listUsersPaginated($regexp, $offset, $limit);
+            $users = $authDriver->listUsersPaginated($baseGroup, $regexp, $offset, $limit);
             $paginated = true;
         }else{
-            $users = $authDriver->listUsers();
+            $users = $authDriver->listUsers($baseGroup);
         }
 		foreach (array_keys($users) as $userId)
 		{
@@ -725,7 +751,13 @@ class AuthService
 		$confDriver->saveRoles($roles);
 		self::$roles = $roles;		
 	}
-	
+
+    static function allowedForCurrentGroup(AjxpGroupPathProvider $provider, $userObject = null){
+        $l = ($userObject == null ? self::getLoggedUser() : $userObject);
+        if($l == null || $l->getGroupPath() == null || $provider->getGroupPath() == null) return true;
+        return (strpos($provider->getGroupPath(), $l->getGroupPath(), 0) === 0);
+    }
+
 }
 
 ?>

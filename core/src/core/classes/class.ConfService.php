@@ -324,7 +324,7 @@ class ConfService
     /**
      * See instance method
      * @static
-     * @return array
+     * @return Repository[]
      */
 	public static function getRepositoriesList(){
 		return self::getInstance()->getRepositoriesListInst();

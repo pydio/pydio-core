@@ -469,7 +469,7 @@ class AJXP_XMLWriter
 	/**
      * Write the repositories access rights in XML format
      * @static
-     * @param $loggedUser
+     * @param AJXP_User|null $loggedUser
      * @param bool $details
      * @return string
      */
@@ -478,7 +478,8 @@ class AJXP_XMLWriter
 		$st .= "<repositories>";
 		$streams = ConfService::detectRepositoryStreams(false);
 		foreach (ConfService::getRepositoriesList() as $rootDirIndex => $rootDirObject)
-		{		
+		{
+            if(!AuthService::allowedForCurrentGroup($rootDirObject)) continue;
 			if($rootDirObject->isTemplate) continue;
 			$toLast = false;
 			if($rootDirObject->getAccessType()=="ajxp_conf"){
@@ -552,6 +553,7 @@ class AJXP_XMLWriter
 		foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
 		{		
 			$toLast = false;
+            if(!AuthService::allowedForCurrentGroup($repoObject)) continue;
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
 			if($repoObject->isTemplate) continue;
 			if($repoObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
