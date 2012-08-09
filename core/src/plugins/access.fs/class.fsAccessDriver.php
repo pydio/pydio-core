@@ -871,6 +871,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
             if($metaData["icon"] == "folder.png"){
                 $metaData["openicon"] = "folder_open.png";
             }
+            if(!$isLeaf){
+                $metaData["ajxp_mime"] = "ajxp_folder";
+            }
         }
         //if($lsOptions["l"]){
 
@@ -1107,44 +1110,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     $size = strlen($gzippedData);
                 }
                 HTMLWriter::generateAttachmentsHeader($localName, $size, $isFile, $gzip);
-                /*
-				header("Content-Type: application/force-download; name=\"".$localName."\"");
-				header("Content-Transfer-Encoding: binary");
-				if($gzip){
-					header("Content-Encoding: gzip");
-					// If gzip, recompute data size!
-					$gzippedData = ($data?gzencode($filePathOrData,9):gzencode(file_get_contents($filePathOrData), 9));
-					$size = strlen($gzippedData);
-				}
-				header("Content-Length: ".$size);
-				if ($isFile && ($size != 0)) header("Content-Range: bytes 0-" . ($size - 1) . "/" . $size . ";");
-				header("Content-Disposition: attachment; filename=\"".$localName."\"");
-				header("Expires: 0");
-				header("Cache-Control: no-cache, must-revalidate");
-				header("Pragma: no-cache");
-				if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])){
-					header("Cache-Control: max_age=0");
-					header("Pragma: public");
-				}
-
-                // IE8 is dumb
-				if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
-                {
-                    header("Pragma: public");
-                    header("Expires: 0");
-                    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-                    header("Cache-Control: private",false);
-//                    header("Content-Type: application/octet-stream");
-                }
-
-				// For SSL websites there is a bug with IE see article KB 323308
-				// therefore we must reset the Cache-Control and Pragma Header
-				if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT']))
-				{
-					header("Cache-Control:");
-					header("Pragma:");
-				}
-                */
 				if($gzip){
 					print $gzippedData;
 					return;
@@ -1288,7 +1253,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	
 	function copyOrMove($destDir, $selectedFiles, &$error, &$success, $move = false)
 	{
-		AJXP_Logger::debug("CopyMove", array("dest"=>$destDir));
+		AJXP_Logger::debug("CopyMove", array("dest"=>$destDir, "selection" => $selectedFiles));
 		$mess = ConfService::getMessages();
 		if(!$this->isWriteable($this->urlBase.$destDir))
 		{
@@ -1735,9 +1700,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
      * @param Boolean $copy
      */
     function nodeChanged(&$from, &$to, $copy = false){
-        if($from != null) $from = new AJXP_Node($this->urlBase.$from);
-        if($to != null) $to = new AJXP_Node($this->urlBase.$to);
-        AJXP_Controller::applyHook("node.change", array($from, $to, $copy));
+        $fromNode = $toNode = null;
+        if($from != null) $fromNode = new AJXP_Node($this->urlBase.$from);
+        if($to != null) $toNode = new AJXP_Node($this->urlBase.$to);
+        AJXP_Controller::applyHook("node.change", array($fromNode, $toNode, $copy));
     }
 
     /**
