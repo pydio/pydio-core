@@ -172,7 +172,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
      */
     abstract function getUserChildren($userId);
 
-	function getOption($optionName){	
+    /**
+     * @abstract
+     * @param string $repositoryId
+     * @return array()
+     */
+    abstract function getUsersForRepository($repositoryId);
+
+	function getOption($optionName){
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
 	}
 
@@ -457,13 +464,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 $tplRepo = ConfService::getRepositoryById($tplId);
                 $options = array();
                 self::parseParameters($httpVars, $options);
-                $newRep = $tplRepo->createTemplateChild(AJXP_Utils::sanitize($httpVars["DISPLAY"]), $options, null, AuthService::getLoggedUser()->getId());
+                $loggedUser = AuthService::getLoggedUser();
+                $newRep = $tplRepo->createTemplateChild(AJXP_Utils::sanitize($httpVars["DISPLAY"]), $options, null, $loggedUser->getId());
+                $gPath = $loggedUser->getGroupPath();
+                if(!empty($gPath)){
+                    $newRep->setGroupPath($gPath);
+                }
                 $res = ConfService::addRepository($newRep);
                 AJXP_XMLWriter::header();
                 if($res == -1){
                     AJXP_XMLWriter::sendMessage(null, $mess[426]);
                 }else{
-                    $loggedUser = AuthService::getLoggedUser();
                     // Make sure we do not overwrite otherwise loaded rights.
                     $loggedUser->load();
                     $loggedUser->setRight($newRep->getUniqueId(), "rw");

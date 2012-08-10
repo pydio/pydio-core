@@ -35,9 +35,9 @@ Class.create("ShareCenter", {
         }else if(isTemporary){
             li.addClassName("user_entry_temp");
         }
-        li.writeAttribute("data-entry_id", entryLabel);
+        li.writeAttribute("data-entry_id", entryId);
         var id = Math.random();
-        li.insert({top:'<div style="float: right;"><input type="checkbox" id="r'+id+'" name="r" '+(assignedRights.startsWith("r")?"checked":"") +'><label for="r'+id+'">'+MessageHash[361]+'</label><input id="w'+id+'" type="checkbox" name="w"  '+(assignedRights.endsWith("w")?"checked":"") +'><label for="w'+id+'">'+MessageHash[412]+'</label></div>'});
+        li.insert({top:'<div style="float: right;"><input type="checkbox" id="r'+id+'" name="r" '+(assignedRights.startsWith("r")?"checked":"") +'><label for="r'+id+'">'+MessageHash[361]+'</label><input id="w'+id+'" type="checkbox" name="w"  '+(assignedRights.endsWith("w")?"checked":"") +'><label for="w'+id+'">'+MessageHash[362]+'</label></div>'});
         li.insert({bottom:'<span style="display: none;" class="delete_user_entry">&nbsp;</span>'});
 
         if(!skipObservers){
@@ -97,9 +97,9 @@ Class.create("ShareCenter", {
                             if(selectedLi.getAttribute("data-temporary") && pref && ! label.startsWith(pref)){
                                 label = pref + label;
                             }
-                            var li = entryTplGenerator(selectedLi.getAttribute("data-group"),
-                                selectedLi.getAttribute("data-temporary"),
-                                label,
+                            var li = entryTplGenerator(selectedLi.getAttribute("data-group")?true:false,
+                                selectedLi.getAttribute("data-temporary")?true:false,
+                                selectedLi.getAttribute("data-group")?selectedLi.getAttribute("data-group"):label,
                                 label,
                                 "r"
                             );
@@ -208,6 +208,7 @@ Class.create("ShareCenter", {
                 if(entry.NEW_USER_PASSWORD){
                     conn.addParameter("user_pass_"+index, entry.NEW_USER_PASSWORD);
                 }
+                conn.addParameter("entry_type_"+index, entry.hasClassName("group_entry")?"group":"user");
                 index++;
             });
             conn.onComplete = function(transport){

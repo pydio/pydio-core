@@ -47,20 +47,34 @@ class serialAuthDriver extends AbstractAuthDriver {
 			throw new Exception("Users file exists but is not writeable!");
 		}
 	}
-	
-	function listUsers(){
-		$users = AJXP_Utils::loadSerialFile($this->usersSerFile);
+
+    protected function _listAllUsers(){
+        $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
         if(AuthService::ignoreUserCase()){
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
+        ConfService::getConfStorageImpl()->filterUsersByGroup($users, "/", true);
+        return $users;
+    }
+	
+	function listUsers($baseGroup = "/"){
+        $users = AJXP_Utils::loadSerialFile($this->usersSerFile);
+        if(AuthService::ignoreUserCase()){
+            $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
+        }
+        ConfService::getConfStorageImpl()->filterUsersByGroup($users, $baseGroup, false);
         return $users;
 	}
+
+    function listChildrenGroups($baseGroup = "/"){
+        return ConfService::getConfStorageImpl()->getChildrenGroups($baseGroup);
+    }
 
     function supportsUsersPagination(){
         return true;
     }
-    function listUsersPaginated($regexp, $offset = -1 , $limit = -1){
-        $users = $this->listUsers();
+    function listUsersPaginated($baseGroup = "/", $regexp, $offset = -1 , $limit = -1){
+        $users = $this->listUsers($baseGroup);
         $result = array();
         $index = 0;
         foreach($users as $usr => $pass){
@@ -84,7 +98,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 	
 	function userExists($login){
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->listUsers();
+		$users = $this->_listAllUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return false;
 		return true;
 	}	
@@ -109,7 +123,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 	
 	function createUser($login, $passwd){
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->listUsers();
+		$users = $this->_listAllUsers();
 		if(!is_array($users)) $users = array();
 		if(array_key_exists($login, $users)) return "exists";
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
@@ -121,7 +135,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 	}	
 	function changePassword($login, $newPass){
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->listUsers();
+		$users = $this->_listAllUsers();
 		if(!is_array($users) || !array_key_exists($login, $users)) return ;
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
 			$users[$login] = md5($newPass);
@@ -132,7 +146,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 	}	
 	function deleteUser($login){
         if(AuthService::ignoreUserCase()) $login = strtolower($login);
-		$users = $this->listUsers();
+		$users = $this->_listAllUsers();
 		if(is_array($users) && array_key_exists($login, $users))
 		{
 			unset($users[$login]);
@@ -142,7 +156,7 @@ class serialAuthDriver extends AbstractAuthDriver {
 
 	function getUserPass($login){
 		if(!$this->userExists($login)) return false;
-		$users = $this->listUsers();
+		$users = $this->_listAllUsers();
 		return $users[$login];
 	}
 

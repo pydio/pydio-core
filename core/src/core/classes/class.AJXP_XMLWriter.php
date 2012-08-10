@@ -442,6 +442,7 @@ class AJXP_XMLWriter
 			}else{
 				$buffer .= "<ajxp_roles>";
 				foreach ($loggedUser->getRoles() as $roleId => $boolean){
+                    if(strpos($roleId, "AJXP_GRP_") === 0) continue;
 					if($boolean === true) $buffer.= "<role id=\"$roleId\"/>";
 				}
 				$buffer .= "</ajxp_roles>";
@@ -479,7 +480,9 @@ class AJXP_XMLWriter
 		$streams = ConfService::detectRepositoryStreams(false);
 		foreach (ConfService::getRepositoriesList() as $rootDirIndex => $rootDirObject)
 		{
-            if(!AuthService::allowedForCurrentGroup($rootDirObject)) continue;
+            if(!AuthService::canAssign($rootDirObject, $loggedUser)) {
+                continue;
+            }
 			if($rootDirObject->isTemplate) continue;
 			$toLast = false;
 			if($rootDirObject->getAccessType()=="ajxp_conf"){
@@ -553,7 +556,7 @@ class AJXP_XMLWriter
 		foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
 		{		
 			$toLast = false;
-            if(!AuthService::allowedForCurrentGroup($repoObject)) continue;
+            if(!AuthService::canAssign($repoObject)) continue;
 			if($repoObject->getAccessType() == "ajxp_conf") continue;
 			if($repoObject->isTemplate) continue;
 			if($repoObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){

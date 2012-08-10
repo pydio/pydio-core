@@ -614,6 +614,8 @@ class AuthService
 
     static function filterBaseGroup($baseGroup){
         $u = self::getLoggedUser();
+        // make sure it starts with a slash.
+        $baseGroup = "/".ltrim($baseGroup, "/");
         if($u == null) return $baseGroup;
         if($u->getGroupPath() != "/") {
             if($baseGroup == "/") return $u->getGroupPath();
@@ -633,9 +635,21 @@ class AuthService
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
     }
 
-	/**
-     * Call the auth driver impl to list all existing users
+    static function getChildrenUsers($parentUserId){
+        return ConfService::getConfStorageImpl()->getUserChildren($parentUserId);
+    }
+
+    static function getUsersForRepository($repositoryId){
+        return ConfService::getConfStorageImpl()->getUsersForRepository($repositoryId);
+    }
+
+    /**
      * @static
+     * @param string $baseGroup
+     * @param null $regexp
+     * @param $offset
+     * @param $limit
+     * @param bool $cleanLosts
      * @return array
      */
 	static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true)
@@ -698,14 +712,23 @@ class AuthService
 	 * Get Role by Id
 	 *
 	 * @param string $roleId
+     * @param boolean $createIfNotExists
 	 * @return AjxpRole
 	 */
-	static function getRole($roleId){
+	static function getRole($roleId, $createIfNotExists = false){
 		$roles = self::getRolesList();
 		if(isSet($roles[$roleId])) return $roles[$roleId];
+        if($createIfNotExists){
+            $role = new AjxpRole($roleId);
+            if(self::getLoggedUser()!=null && self::getLoggedUser()->getGroupPath()!=null){
+                $role->setGroupPath(self::getLoggedUser()->getGroupPath());
+            }
+            self::updateRole($role);
+            return $role;
+        }
 		return false;
 	}
-	
+
 	/**
 	 * Create or update role
 	 *
@@ -754,8 +777,26 @@ class AuthService
 
     static function allowedForCurrentGroup(AjxpGroupPathProvider $provider, $userObject = null){
         $l = ($userObject == null ? self::getLoggedUser() : $userObject);
-        if($l == null || $l->getGroupPath() == null || $provider->getGroupPath() == null) return true;
-        return (strpos($provider->getGroupPath(), $l->getGroupPath(), 0) === 0);
+        $pGP = $provider->getGroupPath();
+        if(empty($pGP)) $pGP = "/";
+        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
+        return (strpos($l->getGroupPath(), $pGP, 0) === 0);
+    }
+
+    static function canAdministrate(AjxpGroupPathProvider $provider, $userObject = null){
+        $l = ($userObject == null ? self::getLoggedUser() : $userObject);
+        $pGP = $provider->getGroupPath();
+        if(empty($pGP)) $pGP = "/";
+        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
+        return (strpos($pGP, $l->getGroupPath(), 0) === 0);
+    }
+
+    static function canAssign(AjxpGroupPathProvider $provider, $userObject = null){
+        $l = ($userObject == null ? self::getLoggedUser() : $userObject);
+        $pGP = $provider->getGroupPath();
+        if(empty($pGP)) $pGP = "/";
+        if($l == null || $l->getGroupPath() == null || $pGP == null) return true;
+        return (strpos($l->getGroupPath(), $pGP, 0) === 0);
     }
 
 }

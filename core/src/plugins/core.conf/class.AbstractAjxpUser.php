@@ -36,6 +36,8 @@ abstract class AbstractAjxpUser
 	var $bookmarks;
 	var $version;
 	var $parentUser;
+
+    var $groupPath = "/";
 	
 	/**
 	 * Conf Storage implementation
@@ -323,6 +325,17 @@ abstract class AbstractAjxpUser
              $password = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($this->getId()."\1CDAFx¨op#"), base64_decode($password), MCRYPT_MODE_ECB, $iv));
         }
         return $password;
+    }
+
+    public function setGroupPath($groupPath)
+    {
+        $this->groupPath = $groupPath;
+    }
+
+    public function getGroupPath()
+    {
+        if(!isSet($this->groupPath)) return null;
+        return $this->groupPath;
     }
 }
 
