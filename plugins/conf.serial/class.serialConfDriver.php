@@ -26,14 +26,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Implementation of the configuration driver on serial files
  */
 class serialConfDriver extends AbstractConfDriver {
-		
+
 	var $repoSerialFile;
 	var $usersSerialDir;
 	var $rolesSerialFile;
-	
+
 	var $aliasesIndexFile;
 	var $pluginsConfigsFile;
-	
+
 	function init($options){
 		parent::init($options);
 		$this->repoSerialFile = AJXP_VarsFilter::filter($options["REPOSITORIES_FILEPATH"]);
@@ -42,14 +42,14 @@ class serialConfDriver extends AbstractConfDriver {
 		$this->aliasesIndexFile = dirname($this->repoSerialFile)."/aliases.ser";
 		$this->pluginsConfigsFile = dirname($this->repoSerialFile)."/plugins_configs.ser";
 	}
-	
+
 	function performChecks(){
         if(isSet($this->options["FAST_CHECKS"]) && $this->options["FAST_CHECKS"] === true) return;
 		$this->performSerialFileCheck($this->repoSerialFile, "repositories file");
 		$this->performSerialFileCheck($this->usersSerialDir, "users file", true);
 		$this->performSerialFileCheck($this->rolesSerialFile, "roles file");
 	}
-	
+
 	function performSerialFileCheck($file, $fileLabel, $isDir = false){
 		if($isDir){
 			if(!is_dir($file) || !is_writable($file)){
@@ -65,7 +65,7 @@ class serialConfDriver extends AbstractConfDriver {
 			throw new Exception(ucfirst($fileLabel)." exists but is not writeable!");
 		}
 	}
-	
+
 	// SAVE / LOAD PLUGINS CONF
 	function _loadPluginConfig($pluginId, &$options){
 		$data = AJXP_Utils::loadSerialFile($this->pluginsConfigsFile);
@@ -84,7 +84,7 @@ class serialConfDriver extends AbstractConfDriver {
 			}
 		}
 	}
-	
+
 	function savePluginConfig($pluginId, $options){
 		$data = AJXP_Utils::loadSerialFile($this->pluginsConfigsFile);
         foreach ($options as $k=>$v){
@@ -95,34 +95,34 @@ class serialConfDriver extends AbstractConfDriver {
 		$data[$pluginId] = $options;
 		AJXP_Utils::saveSerialFile($this->pluginsConfigsFile, $data);
 	}
-	
+
 	// SAVE / EDIT / CREATE / DELETE REPOSITORY
 	function listRepositories(){
 		return AJXP_Utils::loadSerialFile($this->repoSerialFile);
-		
+
 	}
-	
+
 	function listRoles(){
 		return AJXP_Utils::loadSerialFile($this->rolesSerialFile);
 	}
-	
+
 	function saveRoles($roles){
 		AJXP_Utils::saveSerialFile($this->rolesSerialFile, $roles);
 	}
-	
+
 	function countAdminUsers(){
 		$confDriver = ConfService::getConfStorageImpl();
-		$authDriver = ConfService::getAuthDriverImpl();			
+		$authDriver = ConfService::getAuthDriverImpl();
 		$count = 0;
 		$users = $authDriver->listUsers();
 		foreach (array_keys($users) as $userId){
 			$userObject = $confDriver->createUserObject($userId);
-			$userObject->load();			
+			$userObject->load();
 			if($userObject->isAdmin()) $count++;
-		}		
+		}
 		return $count;
 	}
-	
+
 	/**
 	 * Unique ID of the repositor
 	 *
@@ -132,7 +132,7 @@ class serialConfDriver extends AbstractConfDriver {
 	function getRepositoryById($repositoryId){
 		$repositories = AJXP_Utils::loadSerialFile($this->repoSerialFile);
 		if(isSet($repositories[$repositoryId])){
-			return $repositories[$repositoryId];		
+			return $repositories[$repositoryId];
 		}
 		return null;
 	}
@@ -141,7 +141,7 @@ class serialConfDriver extends AbstractConfDriver {
 	 *
 	 * @param String $repositorySlug
 	 * @return Repository
-	 */	
+	 */
 	function getRepositoryByAlias($repositorySlug){
 		$data = AJXP_Utils::loadSerialFile($this->aliasesIndexFile);
 		if(isSet($data[$repositorySlug])){
@@ -149,12 +149,12 @@ class serialConfDriver extends AbstractConfDriver {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Store a newly created repository 
+	 * Store a newly created repository
 	 *
 	 * @param Repository $repositoryObject
-	 * @param Boolean $update 
+	 * @param Boolean $update
 	 * @return -1 if failed
 	 */
 	function saveRepository($repositoryObject, $update = false){
@@ -181,7 +181,7 @@ class serialConfDriver extends AbstractConfDriver {
 	 * Delete a repository, given its unique ID.
 	 *
 	 * @param String $repositoryId
-	 */	
+	 */
 	function deleteRepository($repositoryId){
 		$repositories = AJXP_Utils::loadSerialFile($this->repoSerialFile);
 		$newList = array();
@@ -221,19 +221,83 @@ class serialConfDriver extends AbstractConfDriver {
         return $result;
     }
 
-	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
-	/**
+    /**
+     * @param string $repositoryId
+     * @return array()
+     */
+    function getUsersForRepository($repositoryId){
+        $result = array();
+        $authDriver = ConfService::getAuthDriverImpl();
+        $confDriver = ConfService::getConfStorageImpl();
+        $users = $authDriver->listUsers();
+        foreach (array_keys($users) as $id){
+            $object = $confDriver->createUserObject($id);
+            if($object->canSwitchTo($repositoryId)){
+                $result[] = $object;
+            }
+        }
+        return $result;
+    }
+
+
+    function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false){
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        foreach($flatUsersList as $userid => $userdata){
+            if(array_key_exists($userid, $groups)){
+                $path = $groups[$userid];
+                if(substr($path, 0, strlen($baseGroup)) != $baseGroup){
+                    unset($flatUsersList[$userid]);
+                }else if(strlen($path) > strlen($baseGroup)){
+                    if(!$fullTree) unset($flatUsersList[$userid]);
+                }
+            }else{
+                if($baseGroup != "/"){
+                    unset($flatUsersList[$userid]);
+                }
+            }
+        }
+    }
+
+    function getChildrenGroups($baseGroup = "/"){
+
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $levelGroups = array();
+        $labels = array();
+        asort($groups);
+        foreach($groups as $id => $path){
+            if(substr($path, 0, strlen($baseGroup)) == $baseGroup && strlen($path) >  strlen($baseGroup)){
+                $parts = explode("/", ltrim(substr($path, strlen($baseGroup)), "/"));
+                $sub = array_shift($parts);
+                if(!isset($levelGroups[$sub])) $levelGroups[$sub] = $path;
+                if(substr($id, 0, strlen("AJXP_GROUP:")) == "AJXP_GROUP:"){
+                    $labels[$path] = array_pop(explode(":", $id, 2));
+                }
+            }
+        }
+        foreach($levelGroups as $gId => $grPath){
+            if(isSet($labels[$grPath])) $levelGroups[$gId] = $labels[$grPath];
+            else $levelGroups[$gId] = $gId;
+        }
+        return $levelGroups;
+    }
+
+    function createGroup($groupPath, $groupLabel){
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups["AJXP_GROUP:$groupLabel"] = $groupPath;
+        AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($this->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+    }
+
+    /**
 	 * Instantiate the right class
 	 *
-	 * @param AbstractAjxpUser $userId
+	 * @param String $userId
+     * @return AbstractAjxpUser
 	 */
 	function instantiateAbstractUserImpl($userId){
 		return new AJXP_User($userId, $this);
 	}
-	
-	
+
 	function getUserClassFileName(){
 		return AJXP_INSTALL_PATH."/plugins/conf.serial/class.AJXP_User.php";
-	}	
+	}
 }
-?>

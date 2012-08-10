@@ -29,6 +29,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class ajxp_confAccessDriver extends AbstractAccessDriver 
 {	
 
+    private $listSpecialRoles = true;
+
 	function listAllActions($action, $httpVars, $fileVars){
         if(!isSet($this->actions[$action])) return;
         parent::accessPreprocess($action, $httpVars, $fileVars);
@@ -235,18 +237,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $roleId = "AJXP_GRP_".$groupPath;
                     $roleGroup = true;
                 }
-				$role = AuthService::getRole($roleId);
+                // second param = create if not exists.
+				$role = AuthService::getRole($roleId, $roleGroup);
 				if($role === false) {
-                    if($roleGroup){
-                        // AUTO CREATE UNIQUE ROLE FOR THIS GROUP
-                        $role = new AjxpRole($roleId);
-                        if(AuthService::getLoggedUser()!=null && AuthService::getLoggedUser()->getGroupPath()!=null){
-                            $role->setGroupPath(AuthService::getLoggedUser()->getGroupPath());
-                        }
-                        AuthService::updateRole($role);
-                    }else{
-                        throw new Exception("Cant find role! ");
-                    }
+                    throw new Exception("Cant find role! ");
 				}
 				AJXP_XMLWriter::header("admin_data");
 				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
@@ -389,8 +383,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				print("<edit_options edit_pass=\"".$editPass."\" edit_admin_right=\"".(($userId!="guest"&&$userId!=$loggedUser->getId())?"1":"0")."\" edit_delete=\"".(($userId!="guest"&&$userId!=$loggedUser->getId()&&$authDriver->usersEditable())?"1":"0")."\"/>");
 				print("<ajxp_roles>");
 				foreach (AuthService::getRolesList() as $roleId => $roleObject){
-                    if(strpos($roleId, "AJXP_GRP_") === 0) continue;
-                    if(!AuthService::allowedForCurrentGroup($roleObject)) continue;
+                    if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
+                    if(!AuthService::canAssign($roleObject)) continue;
 					print("<role id=\"$roleId\"/>");
 				}
 				print("</ajxp_roles>");
@@ -827,7 +821,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					throw new Exception("Cannot find repository with id $repId");
 				}
 				$repository = $repList[$repId];
-                if(!AuthService::allowedForCurrentGroup($repository)){
+                if(!AuthService::canAdministrate($repository)){
                     throw new Exception("You are not allowed to edit this repository!");
                 }
 				$pServ = AJXP_PluginsService::getInstance();
@@ -1358,9 +1352,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 		$repos = ConfService::getRepositoriesList();
         ksort($roles);
         foreach($roles as $roleId => $roleObject) {
-            if(strpos($roleId, "AJXP_GRP_") === 0) continue;
+            if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
 			$r = array();
-            if(!AuthService::allowedForCurrentGroup($roleObject)) continue;
+            if(!AuthService::canAdministrate($roleObject)) continue;
 			foreach ($repos as $repoId => $repository){
 				if($repository->getAccessType() == "ajxp_shared") continue;
                 if(!$roleObject->canRead($repoId) && !$roleObject->canWrite($repoId)) continue;
@@ -1398,18 +1392,22 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $repoArray = array();
         $childRepos = array();
         $templateRepos = array();
+        $flatChildrenRepos = array();
 		foreach ($repos as $repoIndex => $repoObject){
-            if(!AuthService::allowedForCurrentGroup($repoObject)){
+            if(!AuthService::canAdministrate($repoObject)){
                 continue;
             }
 			if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
 			if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
             $name = AJXP_Utils::xmlEntities(SystemTextEncoding::toUTF8($repoObject->getDisplay()));
 			if($repoObject->hasOwner() || $repoObject->hasParent()) {
-				$parentId = $repoObject->getParentId();	        	
-				if(!isSet($childRepos[$parentId])) $childRepos[$parentId] = array();
-				$childRepos[$parentId][] = array("name" => $name, "index" => $repoIndex);
-				continue;
+				$parentId = $repoObject->getParentId();
+                if(isSet($repos[$parentId]) && AuthService::canAdministrate($repos[$parentId])){
+                    if(!isSet($childRepos[$parentId])) $childRepos[$parentId] = array();
+                    $childRepos[$parentId][] = array("name" => $name, "index" => $repoIndex);
+                    $flatChildrenRepos[] = $repoIndex;
+                    continue;
+                }
 			}
 			if($repoObject->isTemplate){
 				$templateRepos[$name] = $repoIndex;
@@ -1433,7 +1431,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         foreach ($sortedArray as $name => $repoIndex) {
             $repoObject =& $repos[$repoIndex];
-            $icon = (($repoObject->hasOwner()||$repoObject->hasParent())?"repo_child.png":"hdd_external_unmount.png");
+            $icon = (in_array($repoIndex, $flatChildrenRepos)?"repo_child.png":"hdd_external_unmount.png");
             $editable = $repoObject->isWriteable();
             if($repoObject->isTemplate) {
                 $icon = "hdd_external_mount.png";

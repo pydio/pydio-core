@@ -562,22 +562,29 @@ class ShareCenter extends AJXP_Plugin{
         $users = array();
         $uRights = array();
         $uPasses = array();
+        $groups = array();
 
         $index = 0;
         while(isSet($httpVars["user_".$index])){
-            $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_ALPHANUM);
-            if(!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])){
-                return 100;
-            }else if(AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])){
-                throw new Exception("User $u already exists, please choose another name.");
-            }
-            if(!AuthService::userExists($u) && !empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"])
+            $eType = $httpVars["entry_type_".$index];
+            if($eType == "user"){
+                $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_ALPHANUM);
+                if(!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])){
+                    return 100;
+                }else if(AuthService::userExists($u) && isSet($httpVars["user_pass_".$index])){
+                    throw new Exception("User $u already exists, please choose another name.");
+                }
+                if(!AuthService::userExists($u) && !empty($this->pluginConf["SHARED_USERS_TMP_PREFIX"])
                 && strpos($u, $this->pluginConf["SHARED_USERS_TMP_PREFIX"])!==0 ){
-                $u = $this->pluginConf["SHARED_USERS_TMP_PREFIX"] . $u;
+                    $u = $this->pluginConf["SHARED_USERS_TMP_PREFIX"] . $u;
+                }
+                $users[] = $u;
+            }else{
+                $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index]);
+                $groups[] = $u;
             }
-            $users[] = $u;
             $uRights[$u] = ($httpVars["right_read_".$index]=="true"?"r":"").($httpVars["right_write_".$index]=="true"?"w":"");
-            $uPasses[$u] = $httpVars["user_pass_".$index];
+            $uPasses[$u] = isSet($httpVars["user_pass_".$index])?$httpVars["user_pass_".$index]:"";
             $index ++;
         }
 
@@ -683,6 +690,13 @@ class ShareCenter extends AJXP_Plugin{
             $userObject->setRight($newRepo->getUniqueId(), $uRights[$userName]);
             $userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
             $userObject->save("superuser");
+        }
+
+        foreach($groups as $group){
+            $grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
+            $grRole->setRight($newRepo->getUniqueId(), $uRights[$group]);
+            $grRole->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
+            AuthService::updateRole($grRole);
         }
 
         // METADATA

@@ -43,36 +43,69 @@ class AJXP_User extends AbstractAjxpUser
 	var $registerForSave = array();
     var $create = true;
 
-	function AJXP_User($id, $storage=null){
+    /**
+     * @param $id
+     * @param serialConfDriver $storage
+     */
+    function AJXP_User($id, $storage=null){
 		parent::AbstractAjxpUser($id, $storage);
         $this->registerForSave = array();
-	}
+    }
+
+    function setGroupPath($groupPath){
+        parent::setGroupPath($groupPath);
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        $groups[$this->getId()] = $groupPath;
+        AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+    }
 
     function __wakeup(){
         $this->registerForSave = array();
     }
-			
-	function storageExists(){		
-		return is_dir( AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".$this->getId() );
+
+    protected function getStoragePath(){
+        $subDir = trim($this->getGroupPath(), "/");
+        $res = AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".(empty($subDir)?"":$subDir."/").$this->getId();
+        return $res;
+    }
+
+	function storageExists(){
+        return is_dir($this->getStoragePath());
 	}
-	
+
 	function load(){
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        if(isSet($groups[$this->getId()])) $this->groupPath = $groups[$this->getId()];
+
         $this->create = false;
-		$serialDir = $this->storage->getOption("USERS_DIRPATH");
-		$this->rights = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/rights.ser");
+        $this->rights = AJXP_Utils::loadSerialFile($this->getStoragePath()."/rights.ser");
         if(count($this->rights) == 0) $this->create = true;
-		$this->prefs = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/prefs.ser");
-		$this->bookmarks = AJXP_Utils::loadSerialFile($serialDir."/".$this->getId()."/bookmarks.ser");
+		$this->prefs = AJXP_Utils::loadSerialFile($this->getStoragePath()."/prefs.ser");
+		$this->bookmarks = AJXP_Utils::loadSerialFile($this->getStoragePath()."/bookmarks.ser");
 		if(isSet($this->rights["ajxp.admin"]) && $this->rights["ajxp.admin"] === true){
 			$this->setAdmin(true);
 		}
 		if(isSet($this->rights["ajxp.parent_user"])){
 			$this->setParent($this->rights["ajxp.parent_user"]);
 		}
+        if(isSet($this->rights["ajxp.group_path"])){
+            $this->setGroupPath($this->rights["ajxp.group_path"]);
+        }
+        $allRoles = AuthService::getRolesList(); // Maintained as instance variable
+        // LOAD GROUP ROLES IF THEY EXIST
+        if($this->groupPath != null){
+            $base = "/";
+            $exp = explode("/", $this->groupPath);
+            foreach($exp as $pathPart){
+                $base = $base . $pathPart;
+                if(isSet($allRoles["AJXP_GRP_".$base])){
+                    $this->roles["AJXP_GRP_".$base] = $allRoles["AJXP_GRP_".$base];
+                    $this->rights["ajxp.roles"]["AJXP_GRP_".$base] = true;
+                }
+            }
+        }
 		// Load roles
 		if(isSet($this->rights["ajxp.roles"])){
-			//$allRoles = $this->storage->listRoles();
-			$allRoles = AuthService::getRolesList(); // Maintained as instance variable
 			foreach (array_keys($this->rights["ajxp.roles"]) as $roleId){
 				if(isSet($allRoles[$roleId])){
 					$this->roles[$roleId] = $allRoles[$roleId];
@@ -84,9 +117,6 @@ class AJXP_User extends AbstractAjxpUser
 	}
 	
 	function save($context = "superuser"){
-		$serialDir = $this->storage->getOption("USERS_DIRPATH");
-        $fastCheck = $this->storage->getOption("FAST_CHECKS");
-        $fastCheck = ($fastCheck == "true" || $fastCheck == true);
 		if($this->isAdmin() === true){
 			$this->rights["ajxp.admin"] = true;
 		}else{
@@ -95,31 +125,27 @@ class AJXP_User extends AbstractAjxpUser
 		if($this->hasParent()){
 			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
-
+        $this->rights["ajxp.group_path"] = $this->getGroupPath();
 
         if($context == "superuser"){
-            //AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
             $this->registerForSave["rights"] = true;
         }
         $this->registerForSave["prefs"] = true;
-		//AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
         $this->registerForSave["bookmarks"] = true;
-		//AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
 	}
 
     function __destruct(){
         if(count($this->registerForSave)==0) return;
-        $serialDir = $this->storage->getOption("USERS_DIRPATH");
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         if(isSet($this->registerForSave["rights"]) || $this->create){
-            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
+            AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, !$fastCheck);
         }
         if(isSet($this->registerForSave["prefs"])){
-            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
+            AJXP_Utils::saveSerialFile($this->getStoragePath()."/prefs.ser", $this->prefs, !$fastCheck);
         }
         if(isSet($this->registerForSave["bookmarks"])){
-            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
+            AJXP_Utils::saveSerialFile($this->getStoragePath()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
         }
         $this->registerForSave = array();
     }
@@ -127,13 +153,13 @@ class AJXP_User extends AbstractAjxpUser
 	function getTemporaryData($key){
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
-		return AJXP_Utils::loadSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser",$fastCheck);
+        return AJXP_Utils::loadSerialFile($this->getStoragePath()."/".$key.".ser",$fastCheck);
 	}
 	
 	function saveTemporaryData($key, $value){
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
-		return AJXP_Utils::saveSerialFile($this->storage->getOption("USERS_DIRPATH")."/".$this->getId()."/".$key.".ser", $value, !$fastCheck);
+        return AJXP_Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
 	}
 	
 	/**
@@ -144,14 +170,14 @@ class AJXP_User extends AbstractAjxpUser
 	 */
 	static function deleteUser($userId, &$deletedSubUsers){
 		$storage = ConfService::getConfStorageImpl();
-		$serialDir = AJXP_VarsFilter::filter($storage->getOption("USERS_DIRPATH"));
-		$files = glob($serialDir."/".$userId."/*.ser");
+        $user = ConfService::getConfStorageImpl()->createUserObject($userId);
+        $files = glob($user->getStoragePath()."/*.ser");
 		if(is_array($files) && count($files)){
 			foreach ($files as $file){
 				unlink($file);
 			}
 		}
-		if(is_dir($serialDir."/".$userId)) rmdir($serialDir."/".$userId);
+		if(is_dir($user->getStoragePath())) rmdir($user->getStoragePath());
 		
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();		
@@ -163,8 +189,15 @@ class AJXP_User extends AbstractAjxpUser
 				$deletedSubUsers[] = $id;
 			}
 		}
-		
-	}
+
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        if(isSet($groups[$userId])){
+            unset($groups[$userId]);
+            AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+
+        }
+
+    }
 
 }
 
