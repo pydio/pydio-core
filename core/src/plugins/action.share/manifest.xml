@@ -16,7 +16,7 @@
     <registry_contributions>
         <hooks>
             <serverCallback hookName="node.info" methodName="nodeSharedMetadata"></serverCallback>
-            <serverCallback hookName="node.change" methodName="updateNodeSharedData"></serverCallback>
+            <serverCallback hookName="node.before_change" methodName="updateNodeSharedData"></serverCallback>
         </hooks>
         <actions>
             <action name="share">
