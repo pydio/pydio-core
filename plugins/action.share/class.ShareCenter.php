@@ -325,12 +325,16 @@ class ShareCenter extends AJXP_Plugin{
 	 * @param AJXP_Node $newNode
 	 * @param Boolean $copy
 	 */
-	public function updateNodeSharedData($oldNode, $newNode = null, $copy = false){
+	public function updateNodeSharedData($oldNode/*, $newNode = null, $copy = false*/){
         if($this->accessDriver->getId() == "access.imap") return;
         if($this->metaStore  == null) return;
         if($oldNode == null) return;
         $metadata = $this->metaStore->retrieveMetadata($oldNode, "ajxp_shared", true);
         if(count($metadata)){
+            // TODO
+            // Make sure node info is loaded, to check if it's a dir or a file.
+            // Maybe could be directly embedded in metadata, to avoid having to load here.
+            $oldNode->loadNodeInfo();
             try{
                 self::deleteSharedElement(
                     ($oldNode->isLeaf()?"file":"repository"),
@@ -339,7 +343,7 @@ class ShareCenter extends AJXP_Plugin{
                 );
                 $this->metaStore->removeMetadata($oldNode, "ajxp_shared", true);
             }catch(Exception $e){
-
+                AJXP_Logger::logAction("ERROR : ".$e->getMessage(), $e->getTrace() );
             }
         }
     }
@@ -724,6 +728,7 @@ class ShareCenter extends AJXP_Plugin{
      */
     public static function deleteSharedElement($type, $element, $loggedUser){
         $mess = ConfService::getMessages();
+        AJXP_Logger::debug($type."-".$element);
         if($type == "repository"){
             $repo = ConfService::getRepositoryById($element);
             if(!$repo->hasOwner() || $repo->getOwner() != $loggedUser->getId()){
@@ -766,6 +771,7 @@ class ShareCenter extends AJXP_Plugin{
     public static function loadPublicletData($id){
         $dlFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
         $file = $dlFolder."/".$id.".php";
+        if(!is_file($file)) return array();
         $lines = file($file);
         $inputData = '';
         $code = $lines[3] . $lines[4] . $lines[5];
