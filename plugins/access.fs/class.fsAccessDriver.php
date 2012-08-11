@@ -362,14 +362,25 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 					$action = "copy";
 					$this->extractArchive($dest, $selection, $error, $success);
 				}else{
-					$this->copyOrMove($dest, $selection->getFiles(), $error, $success, ($action=="move"?true:false));
+                    $move = ($action == "move" ? true : false);
+                    if($move && isSet($httpVars["force_copy_delete"])){
+                        $move = false;
+                    }
+					$this->copyOrMove($dest, $selection->getFiles(), $error, $success, $move);
+
 				}
 				
 				if(count($error)){					
 					throw new AJXP_Exception(SystemTextEncoding::toUTF8(join("\n", $error)));
 				}else {
-					$logMessage = join("\n", $success);
-					AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
+                    if(isSet($httpVars["force_copy_delete"])){
+                        $errorMessage = $this->delete($selection->getFiles(), $logMessages);
+                        if($errorMessage) throw new AJXP_Exception(SystemTextEncoding::toUTF8($errorMessage));
+                        AJXP_Logger::logAction("Copy/Delete", array("files"=>$selection, "destination" => $dest));
+                    }else{
+                        AJXP_Logger::logAction(($action=="move"?"Move":"Copy"), array("files"=>$selection, "destination"=>$dest));
+                    }
+                    $logMessage = join("\n", $success);
 				}
 				$reloadContextNode = true;
                 if(!(RecycleBinManager::getRelativeRecycle() ==$dest && $this->driverConf["HIDE_RECYCLE"] == true)){
