@@ -36,6 +36,12 @@ interface MetaStoreProvider {
 
     /**
      * @abstract
+     * @return bool
+     */
+    public function inherentMetaMove();
+
+    /**
+     * @abstract
      * @param AJXP_Node $ajxpNode
      * @param String $nameSpace
      * @param array $metaData
