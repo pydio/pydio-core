@@ -113,7 +113,7 @@
                          <div class="legend">Enter the encryption key you have chosen when first encrypting this folder.</div>
                          <div class="SF_element">
                             <div class="SF_label">Key</div>
-                            <input class="SF_input" type="password" name="password" class="SF_input dialogFocus"/>
+                            <input type="password" name="password" class="SF_input dialogFocus"/>
                          </div>
                          </div>
                      ]]></clientForm>

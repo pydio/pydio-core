@@ -4,11 +4,7 @@
 	<server_settings>
         <param name="FS_SIZE_LIMITATION" type="integer" label="CONF_MESSAGE[Size limit]" description="CONF_MESSAGE[Some filesystem have size limitations]" mandatory="true" default="0"/>
 	</server_settings>
-    <!--
-    <registry_contributions>
-        <hooks>
-            <serverCallback hookName="node.info" methodName="enrichNode"></serverCallback>
-        </hooks>
-    </registry_contributions>
-    -->
+    <dependencies>
+        <activePlugin pluginName="access.fs"/>
+    </dependencies>
 </metastore>
