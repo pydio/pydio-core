@@ -1,6 +1,8 @@
 <p>
     This plugin allows your users to cypher a folder at the root of their repository, using the underlying EncFS mounting.
-    It thus requires a filesystem as driver, and encfs installed on it.<br>
+    It thus requires a filesystem as driver, and encfs installed on it. You must also make sure that the www user will have
+    the right to execute the encfs <i>and encfsctl</i> command, use SUDO for this, for example <br>
+    <b>www-data ALL = NOPASSWD: /usr/bin/encfs,/usr/bin/encfsctl</b><br>
     In order to be able to execute the encfs commands in a totally non-interactive way, you must generate a template file called .encfs6.xml
     before using the plugin. See the instructions below.
 </p>
