@@ -50,6 +50,13 @@ class s3MetaStore extends AJXP_Plugin implements MetaStoreProvider {
         $this->bucketName = $this->accessDriver->repository->getOption("CONTAINER");
     }
 
+    /**
+     * @abstract
+     * @return bool
+     */
+    public function inherentMetaMove(){
+        return true;
+    }
 
     protected function getUserId(){
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();

@@ -1,0 +1,17 @@
+<p>The metastore provider relys on the filesystem Extended Attributes, this feature must thus be active on the underlying FS. 
+    This generally requires the following
+    <ul>
+        <li>Linux filesystem supporting xattr (ext2/3/4, xfs, ReiserFs, hfs, etc).</li>
+        <li>xattr package installed (<i>apt-get install xattr</i> on Debian 6 for example)</li>
+        <li>libattr library installed (<i>apt-get install libattr1-dev</i> on Debian 6 for example)</li>
+        <li>The filesystem must be mounted with the xattr attributes enabled, generaly by adding the user_xattr parameter in the /etc/fstab line.</li>
+        <li>And finally, the PHP xattr extension (<i>pecl install xattr</i>)</li>
+    </ul>
+    Once activated, various metadata will be stored directly along with the filesystem nodes themselves, avoiding ajaxplorer to have
+    to monitor and update the metadata on the various files operation (move/delete).</p> 
+        
+<p>This can be recommended if you plan to let your
+    users accessing the filesystem via another channel than ajaxplorer (e.g. samba, direct ftp, etc). In this latter case, warning, it
+    does not exempt you of setting up some synchronization mechanism to trigger events in the backend, to be sure all indexes are up-to-date, and
+    various hooks are correctly triggered.
+</p>

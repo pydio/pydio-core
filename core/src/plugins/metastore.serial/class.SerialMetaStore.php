@@ -45,6 +45,14 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
         $this->accessDriver = $accessDriver;
     }
 
+    /**
+     * @abstract
+     * @return bool
+     */
+    public function inherentMetaMove(){
+        return false;
+    }
+
 
     protected function getUserId(){
         if(AuthService::usersEnabled()) return AuthService::getLoggedUser()->getId();

@@ -213,6 +213,7 @@ class UserMetaManager extends AJXP_Plugin {
 	 */
 	public function updateMetaLocation($oldFile, $newFile = null, $copy = false){
 		if($oldFile == null) return;
+        if(!$copy && $this->metaStore->inherentMetaMove()) return;
 		
 		$oldMeta = $this->metaStore->retrieveMetadata($oldFile, "users_meta", false, AJXP_METADATA_SCOPE_GLOBAL);
 		if(!count($oldMeta)){
