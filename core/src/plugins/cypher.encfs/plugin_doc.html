@@ -1,0 +1,13 @@
+<p>
+    This plugin allows your users to cypher a folder at the root of their repository, using the underlying EncFS mounting.
+    It thus requires a filesystem as driver, and encfs installed on it.<br>
+    In order to be able to execute the encfs commands in a totally non-interactive way, you must generate a template file called .encfs6.xml
+    before using the plugin. See the instructions below.
+</p>
+<p>Once installed (see http://www.arg0.net/encfsintro), simply use the standard encfs command to create an encrypted folder :
+    <br><b>encfs ~/.crypt-raw ~/crypt</b><br>
+    Follow the instructions and choose how the filesystem will be encrypted, and set a simple password. Do not bother about
+    this password strength, it will be changed anyway when the user will actually cypher its own folder. Simply remember it. Once 
+    this is done, you can find inside the /.crypt-raw/ folder an <b>.encfs6.xml</b> file.<br>
+    Use the full path to this file, along with your simple password, as parameters for the cypher.encfs plugin in the AjaXplorer GUI.
+</p>

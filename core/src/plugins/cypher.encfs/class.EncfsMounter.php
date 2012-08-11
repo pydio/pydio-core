@@ -30,13 +30,63 @@ class EncfsMounter extends AJXP_Plugin
         return $path;
     }
 
+    public function cypherAllMounted($actionName, &$httpVars, &$fileVars){
+        $dirs = glob($this->getWorkingPath()."/ENCFS_CLEAR_*/.ajxp_mount");
+        if($dirs!==false && count($dirs)){
+            foreach($dirs as $mountedFile){
+                $mountedDir = dirname($mountedFile);
+                AJXP_Logger::debug("Warning, $mountedDir was not unmounted before $actionName");
+                $this->umountFolder($mountedDir);
+            }
+        }
+    }
+
+    public function preProcessMove($actionName, &$httpVars, &$fileVars){
+        $destO = AJXP_Utils::decodeSecureMagic($httpVars["dest"]);
+        $dest = substr($destO, 1, strpos(ltrim($destO, "/"), "/"));
+        if(empty($dest)) $dest = ltrim($destO, "/");
+        $userSelection = new UserSelection();
+        $userSelection->initFromHttpVars($httpVars);
+        if(!$userSelection->isEmpty()){
+            $testFileO = $userSelection->getUniqueFile();
+            $testFile = substr($testFileO, 1, strpos(ltrim($testFileO, "/"), "/"));
+            if(empty($testFile)) $testFile = ltrim($testFileO, "/");
+            if($actionName == "move"){
+                if( (strstr($dest, "ENCFS_CLEAR_")!=false && strstr($testFile, "ENCFS_CLEAR_")===false)
+                    || (strstr($dest, "ENCFS_CLEAR_")===false && strstr($testFile, "ENCFS_CLEAR_")!==false)
+                    || (strstr($dest, "ENCFS_CLEAR_")!=false && strstr($testFile, "ENCFS_CLEAR_")!==false
+                        &&  $testFile != $dest)
+                ){
+                    $httpVars["force_copy_delete"] = "true";
+                    AJXP_Logger::debug("One mount to another, copy/delete instead of move ($dest, $testFile)");
+                }
+            }else if( $actionName == "delete" && RecycleBinManager::recycleEnabled() ){
+                if(strstr($testFile, "ENCFS_CLEAR_")!==false){
+                    $httpVars["force_copy_delete"] = "true";
+                    AJXP_Logger::debug("One mount to another, copy/delete instead of move");
+                }
+            }else if ($actionName == "restore"){
+                if(strstr(RecycleBinManager::getFileOrigin($testFile), "ENCFS_CLEAR_")){
+                    $httpVars["force_copy_delete"] = "true";
+                    AJXP_Logger::debug("One mount to another, copy/delete instead of move");
+                }
+            }
+        }
+    }
+
     public function switchAction($actionName, $httpVars, $fileVars){
 
         //var_dump($httpVars);
 
         switch($actionName){
             case "encfs.cypher_folder" :
+                if(empty($this->pluginConf["ENCFS_XML_TEMPLATE"]) || !is_file($this->pluginConf["ENCFS_XML_TEMPLATE"])){
+                    throw new Exception("It seems that you have not set the plugin 'Enfcs XML File' configuration, or the system cannot find it!");
+                }
                 $dir = $this->getWorkingPath().AJXP_Utils::decodeSecureMagic($httpVars["dir"]);
+                if(dirname($dir) != $this->getWorkingPath()){
+                    throw new Exception("Please cypher only folders at the root of your repository");
+                }
                 $pass = $httpVars["pass"];
                 $raw  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_RAW_".basename($dir);
                 if(!strstr($dir, "ENCFS_CLEAR_") && !is_dir($raw)){
@@ -44,7 +94,7 @@ class EncfsMounter extends AJXP_Plugin
                     $clear  = dirname($dir).DIRECTORY_SEPARATOR."ENCFS_CLEAR_".basename($dir);
 
                     mkdir($raw);
-                    $result = self::initEncFolder($raw, "/home/charles/encfs-raw2/.encfs6.xml", "123456", $pass);
+                    $result = self::initEncFolder($raw, $this->pluginConf["ENCFS_XML_TEMPLATE"], $this->pluginConf["ENCFS_XML_PASSWORD"], $pass);
                     if($result){
                         // Mount folder
                         mkdir($clear);
@@ -52,9 +102,11 @@ class EncfsMounter extends AJXP_Plugin
                         $content = scandir($dir);
                         foreach($content as $fileOrFolder){
                             if($fileOrFolder == "." || $fileOrFolder == "..") continue;
-                            rename($dir . DIRECTORY_SEPARATOR . $fileOrFolder, $clear . DIRECTORY_SEPARATOR . $fileOrFolder );
+                            $cmd = "mv ". escapeshellarg($dir . DIRECTORY_SEPARATOR . $fileOrFolder)." ". escapeshellarg($clear . DIRECTORY_SEPARATOR);
+                            $exec = shell_exec($cmd);
                         }
                         self::umountFolder($clear);
+                        rmdir($dir);
                     }
                 }else if(substr(basename($dir), 0, strlen("ENCFS_CLEAR_")) == "ENCFS_CLEAR_"){
                     // SIMPLY UNMOUNT

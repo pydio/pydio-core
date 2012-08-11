@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin label="CONF_MESSAGE[Encfs Mount]" description="CONF_MESSAGE[Dynamically create/mount/umount an encfs filesystem]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<ajxp_plugin enabled="false" label="CONF_MESSAGE[Encfs Mount]" description="CONF_MESSAGE[Dynamically create/mount/umount an encfs filesystem]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
         <core_relation packaged="false" tested_version="4.2.2"/>
@@ -11,6 +11,14 @@
             <img_library alias="cypher.encfs" path="plugins/cypher.encfs/resources/img"/>
         </resources>
     </client_settings>
+    <server_settings>
+        <global_param description="CONF_MESSAGE[Full path on the server to a pre-generated .encfs6.xml file]"
+                      label="CONF_MESSAGE[Encfs XML File]"
+                      name="ENCFS_XML_TEMPLATE" type="string" mandatory="true"/>
+        <global_param description="CONF_MESSAGE[Password used when generating the encfs6.xml file]"
+                      label="CONF_MESSAGE[Encfs Password]" name="ENCFS_XML_PASSWORD"
+                      type="string" mandatory="true" />
+    </server_settings>
     <class_definition classname="EncfsMounter" filename="plugins/cypher.encfs/class.EncfsMounter.php"/>
     <registry_contributions>
         <actions>
@@ -46,11 +54,11 @@
                          <div class="legend">Choose an encryption key to make your data inaccessible by anyone but you. Be aware that if you loose the key, your data will be lost forever!</div>
                          <div class="SF_element">
                             <div class="SF_label">Encryption Key</div>
-                            <input type="password" name="password" class="dialogFocus"/>
+                            <input type="password" name="password" class="SF_input dialogFocus"/>
                          </div>
                          <div class="SF_element">
                             <div class="SF_label">Confirm Key</div>
-                            <input type="password" name="password_confirm"/>
+                            <input type="password" name="password_confirm" class="SF_input"/>
                          </div>
                          </div>
                      ]]></clientForm>
@@ -105,12 +113,37 @@
                          <div class="legend">Enter the encryption key you have chosen when first encrypting this folder.</div>
                          <div class="SF_element">
                             <div class="SF_label">Key</div>
-                            <input class="SF_input" type="password" name="password" class="dialogFocus"/>
+                            <input class="SF_input" type="password" name="password" class="SF_input dialogFocus"/>
                          </div>
                          </div>
                      ]]></clientForm>
                     <serverCallback methodName="switchAction"/>
                 </processing>
+            </action>
+            <action name="move">
+                <pre_processing>
+                    <serverCallback methodName="preProcessMove"/>
+                </pre_processing>
+            </action>
+            <action name="delete">
+                <pre_processing>
+                    <serverCallback methodName="preProcessMove"/>
+                </pre_processing>
+            </action>
+            <action name="restore">
+                <pre_processing>
+                    <serverCallback methodName="preProcessMove"/>
+                </pre_processing>
+            </action>
+            <action name="logout">
+                <pre_processing>
+                    <serverCallback methodName="cypherAllMounted"/>
+                </pre_processing>
+            </action>
+            <action name="switch_repository">
+                <pre_processing>
+                    <serverCallback methodName="cypherAllMounted"/>
+                </pre_processing>
             </action>
         </actions>
         <hooks>
