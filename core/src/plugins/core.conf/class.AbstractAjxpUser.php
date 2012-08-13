@@ -86,8 +86,11 @@ abstract class AbstractAjxpUser
 	function getId(){
 		return $this->id;
 	}
-	
-	function storageExists(){
+
+    /**
+     * @return bool
+     */
+    function storageExists(){
 		
 	}
 	

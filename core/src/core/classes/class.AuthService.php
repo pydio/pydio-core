@@ -41,7 +41,7 @@ class AuthService
 	/**
      * Whether the current auth driver supports password update or not
      * @static
-     * @return void
+     * @return bool
      */
 	static function changePasswordEnabled()
 	{
@@ -101,7 +101,7 @@ class AuthService
      * Call the preLogUser() functino on the auth driver implementation
      * @static
      * @param string $remoteSessionId
-     * @return
+     * @return void
      */
 	static function preLogUser($remoteSessionId = "")
 	{
@@ -150,7 +150,6 @@ class AuthService
      */
     static function checkBruteForceLogin(&$loginArray)
     {
-    	$serverAddress = "";
     	if(isSet($_SERVER['REMOTE_ADDR'])){
     		$serverAddress = $_SERVER['REMOTE_ADDR'];
     	}else{
@@ -424,8 +423,8 @@ class AuthService
 	
 	/**
      * Update a user with admin rights and return it
-	* @param AJXP_User $adminUser
-     * @return AJXP_User
+	* @param AbstractAjxpUser $adminUser
+     * @return AbstractAjxpUser
 	*/
 	static function updateAdminRights($adminUser)
 	{
@@ -465,7 +464,7 @@ class AuthService
      * Use driver implementation to check whether the user exists or not.
      * @static
      * @param $userId
-     * @return void
+     * @return bool
      */
 	static function userExists($userId)
 	{
@@ -565,6 +564,7 @@ class AuthService
 		$authDriver = ConfService::getAuthDriverImpl();
 		$confDriver = ConfService::getConfStorageImpl();
 		$authDriver->createUser($userId, $userPass);
+        $user = null;
 		if($isAdmin){
 			$user = $confDriver->createUserObject($userId);
 			$user->setAdmin(true);			
@@ -755,7 +755,7 @@ class AuthService
 	/**
      * Get all defined roles
      * @static
-     * @return array
+     * @return AjxpRole[]
      */
 	static function getRolesList(){
 		if(isSet(self::$roles)) return self::$roles;
@@ -800,5 +800,3 @@ class AuthService
     }
 
 }
-
-?>

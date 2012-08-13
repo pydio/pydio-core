@@ -175,7 +175,11 @@ class multiAuthDriver extends AbstractAuthDriver {
     }
 
     function getUsersCount(){
-        return $this->drivers[$this->baseName]->getUsersCount();
+        if(empty($this->baseName)){
+            return $this->drivers[$this->slaveName]->getUsersCount() +  $this->drivers[$this->masterName]->getUsersCount();
+        }else{
+            return $this->drivers[$this->baseName]->getUsersCount();
+        }
     }
 
 	function listUsers(){
