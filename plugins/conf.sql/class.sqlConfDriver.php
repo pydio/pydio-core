@@ -337,7 +337,21 @@ class sqlConfDriver extends AbstractConfDriver {
         return $children;
 
     }
-	
+
+    /**
+     * @param string $repositoryId
+     * @return array()
+     */
+    function getUsersForRepository($repositoryId){
+        $result = array();
+        $children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s GROUP BY [login]', $repositoryId);
+        $all = $children_results->fetchAll();
+        foreach ($all as $item){
+            $result[] = $this->createUserObject($item["login"]);
+        }
+        return $result;
+    }
+
 	// SAVE / EDIT / CREATE / DELETE USER OBJECT (except password)
 	/**
 	 * Instantiate the right class
@@ -392,6 +406,36 @@ class sqlConfDriver extends AbstractConfDriver {
 		$rows = dibi::query("SELECT [login] FROM ajxp_user_rights WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
 		return count($rows);
 	}
-	
+
+    /**
+     * @param AbstractAjxpUser[] $flatUsersList
+     * @param string $baseGroup
+     * @param bool $fullTree
+     * @return void
+     * @todo
+     */
+    function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false){
+
+    }
+
+    /**
+     * @param string $groupPath
+     * @param string $groupLabel
+     * @return mixed
+     * @todo
+     */
+    function createGroup($groupPath, $groupLabel){
+
+    }
+
+    /**
+     * @param string $baseGroup
+     * @return string[]
+     * @todo
+     */
+    function getChildrenGroups($baseGroup = "/"){
+        return array();
+    }
+
 }
 ?>

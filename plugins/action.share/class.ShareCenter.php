@@ -330,7 +330,7 @@ class ShareCenter extends AJXP_Plugin{
         if($this->metaStore  == null) return;
         if($oldNode == null) return;
         $metadata = $this->metaStore->retrieveMetadata($oldNode, "ajxp_shared", true);
-        if(count($metadata)){
+        if(count($metadata) && !empty($metadata["element"])){
             // TODO
             // Make sure node info is loaded, to check if it's a dir or a file.
             // Maybe could be directly embedded in metadata, to avoid having to load here.

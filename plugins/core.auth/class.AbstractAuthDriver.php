@@ -227,13 +227,33 @@ class AbstractAuthDriver extends AJXP_Plugin {
      * @param $login
      * @return boolean
      */
-	function userExists($login){}	
-	function checkPassword($login, $pass, $seed){}
-	function createCookieString($login){}
+	function userExists($login){}
+
+    /**
+     * @param string $login
+     * @param string $pass
+     * @param string $seed
+     * @return bool
+     */
+    function checkPassword($login, $pass, $seed){}
+
+    /**
+     * @param string $login
+     * @return string
+     */
+    function createCookieString($login){}
 
 
+
+    /**
+     * @return bool
+     */
 	function usersEditable(){}
-	function passwordsEditable(){}
+
+    /**
+     * @return bool
+     */
+    function passwordsEditable(){}
 	
 	function createUser($login, $passwd){}	
 	function changePassword($login, $newPass){}	
@@ -290,6 +310,15 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	function filterCredentials($userId, $pwd){
 		return array($userId, $pwd);
 	}
-		
+
+    /**
+     * List children groups of a given group. By default will report this on the CONF driver,
+     * but can be overriden to grab info directly from auth driver (ldap, etc).
+     * @param string $baseGroup
+     * @return string[]
+     */
+    function listChildrenGroups($baseGroup = "/"){
+        return ConfService::getConfStorageImpl()->getChildrenGroups($baseGroup);
+    }
+
 }
-?>

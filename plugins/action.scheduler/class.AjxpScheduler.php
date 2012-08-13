@@ -242,10 +242,12 @@ class AjxpScheduler extends AJXP_Plugin{
     }
 
     function placeConfigNode(&$configTree){
-        $configTree["admin"]["CHILDREN"]["scheduler"] = array(
-            "LABEL" => "Scheduler",
-            "ICON" => "scheduler/ICON_SIZE/player_time.png",
-            "LIST" => array($this, "listTasks"));
+        if(isSet($configTree["admin"])){
+            $configTree["admin"]["CHILDREN"]["scheduler"] = array(
+                "LABEL" => "Scheduler",
+                "ICON" => "scheduler/ICON_SIZE/player_time.png",
+                "LIST" => array($this, "listTasks"));
+        }
     }
 
     function listTasks($action, $httpVars, $postProcessData){

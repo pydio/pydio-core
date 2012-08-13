@@ -66,10 +66,6 @@ class serialAuthDriver extends AbstractAuthDriver {
         return $users;
 	}
 
-    function listChildrenGroups($baseGroup = "/"){
-        return ConfService::getConfStorageImpl()->getChildrenGroups($baseGroup);
-    }
-
     function supportsUsersPagination(){
         return true;
     }

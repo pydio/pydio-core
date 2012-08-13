@@ -168,7 +168,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
     /**
      * @abstract
      * @param $userId
-     * @return array()
+     * @return AbstractAjxpUser[]
      */
     abstract function getUserChildren($userId);
 
@@ -178,6 +178,28 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
      * @return array()
      */
     abstract function getUsersForRepository($repositoryId);
+
+
+    /**
+     * @param AbstractAjxpUser[] $flatUsersList
+     * @param string $baseGroup
+     * @param bool $fullTree
+     * @return void
+     */
+    abstract function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false);
+
+    /**
+     * @param string $groupPath
+     * @param string $groupLabel
+     * @return mixed
+     */
+    abstract function createGroup($groupPath, $groupLabel);
+
+    /**
+     * @param string $baseGroup
+     * @return string[]
+     */
+    abstract function getChildrenGroups($baseGroup = "/");
 
 	function getOption($optionName){
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
