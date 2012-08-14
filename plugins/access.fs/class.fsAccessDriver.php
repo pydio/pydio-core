@@ -798,7 +798,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				{
 					$recycleBinOption = RecycleBinManager::getRelativeRecycle();										
 					if(file_exists($this->urlBase.$recycleBinOption)){
-						$recycleIcon = ($this->countFiles($this->urlBase.$recycleBinOption, false, true)>0?"trashcan_full.png":"trashcan.png");
 						$recycleNode = new AJXP_Node($this->urlBase.$recycleBinOption);
                         $recycleNode->loadNodeInfo();
                         AJXP_XMLWriter::renderAjxpNode($recycleNode);
@@ -1172,7 +1171,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 	}
 
 	function countFiles($dirName, $foldersOnly = false, $nonEmptyCheckOnly = false){
-		$handle=opendir($dirName);
+		$handle=@opendir($dirName);
+        if($handle === false){
+            throw new Exception("Error while trying to open directory ".$dirName);
+        }
 		$count = 0;
 		while (strlen($file = readdir($handle)) > 0)
 		{
