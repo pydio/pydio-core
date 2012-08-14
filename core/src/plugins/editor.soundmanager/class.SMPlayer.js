@@ -18,7 +18,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 window.SM2_DEFER = true;
-if(!window.soundManager && ajaxplorer.findEditorById("editor.soundmanager")){
+if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager && ajaxplorer.findEditorById("editor.soundmanager")){
     var conn = new Connexion();
     conn._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
     conn.loadLibrary('360-player/script/berniecode-animator.js');
@@ -216,6 +216,11 @@ Class.create("SMPlayer", AbstractEditor, {
                     marginLeft:parseInt((element.width-256)/2)+24+"px",
                     marginTop:'-15px'
                 });
+                if(Prototype.Browser.IE) {
+                    try{
+                        player.up("div").up("div").next("div.panelHeader").setStyle({width:'100%'});
+                    }catch (e){}
+                }
             }else{
                 if(element.height >= 50)
                 {
