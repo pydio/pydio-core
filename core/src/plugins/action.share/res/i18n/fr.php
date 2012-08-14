@@ -27,5 +27,6 @@ $mess = array(
     "22"=> "Downloads autorisés: ",
     "23"=> "Mot de passe: ",
     "24"=> "Fixer les limites d'expiration et un mot de passe optionnel, puis cliquer sur \"Génerer\".",
-    "25"=> "Pas de limite"
+    "25"=> "Pas de limite",
+    "26"=> "Choisir les utilisateurs et les groupes et leurs droits d'accès."
 );

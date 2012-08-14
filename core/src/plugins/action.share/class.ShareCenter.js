@@ -29,7 +29,8 @@ Class.create("ShareCenter", {
     },
 
     createUserEntry : function(isGroup, isTemporary, entryId, entryLabel, assignedRights, skipObservers){
-        var li = new Element("div", {className:"user_entry"}).update(entryLabel);
+        var spanLabel = new Element("span", {className:"user_entry_label"}).update(entryLabel);
+        var li = new Element("div", {className:"user_entry"}).update(spanLabel);
         if(isGroup){
             li.addClassName("group_entry");
         }else if(isTemporary){
@@ -37,14 +38,14 @@ Class.create("ShareCenter", {
         }
         li.writeAttribute("data-entry_id", entryId);
         var id = Math.random();
-        li.insert({top:'<div style="float: right;"><input type="checkbox" id="r'+id+'" name="r" '+(assignedRights.startsWith("r")?"checked":"") +'><label for="r'+id+'">'+MessageHash[361]+'</label><input id="w'+id+'" type="checkbox" name="w"  '+(assignedRights.endsWith("w")?"checked":"") +'><label for="w'+id+'">'+MessageHash[362]+'</label></div>'});
+        li.insert({top:'<div class="user_entry_rights"><input type="checkbox" id="r'+id+'" name="r" '+(assignedRights.startsWith("r")?"checked":"") +'><label for="r'+id+'">'+MessageHash[361]+'</label><input id="w'+id+'" type="checkbox" name="w"  '+(assignedRights.endsWith("w")?"checked":"") +'><label for="w'+id+'">'+MessageHash[362]+'</label></div>'});
         li.insert({bottom:'<span style="display: none;" class="delete_user_entry">&nbsp;</span>'});
 
         if(!skipObservers){
             li.setStyle({opacity:0});
-            li.observe("mouseover", function(event){li.down('span').show();});
-            li.observe("mouseout", function(event){li.down('span').hide();});
-            li.down("span").observe("click", function(){
+            li.observe("mouseover", function(event){li.down('span.delete_user_entry').show();});
+            li.observe("mouseout", function(event){li.down('span.delete_user_entry').hide();});
+            li.down("span.delete_user_entry").observe("click", function(){
                 Effect.Fade(li, {duration:0.3, afterFinish:li.remove.bind(li)});
             });
             li.appendToList = function(htmlObject){
@@ -67,11 +68,6 @@ Class.create("ShareCenter", {
             if(nodeMeta.get("ajxp_shared")){
                 // Reorganize
                 var repoFieldset = oForm.down('fieldset#target_repository');
-                //repoFieldset.down('div.dialogLegend').remove();
-                //repoFieldset.insert(oForm.down('fieldset#target_user div#textarea_sf_element'));
-                //repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user'));
-                //repoFieldset.insert(oForm.down('fieldset#target_user div#create_shared_user_anchor_div'));
-                //oForm.down('fieldset#target_user').remove();
             }
 
             var ppass = new Protopass($('shared_pass'), {
@@ -121,7 +117,7 @@ Class.create("ShareCenter", {
                                             li.appendToList($('shared_users_summary'));
                                             close = true;
                                         }
-                                    }else if(event.target.name == "cancel"){
+                                    }else if(event.target.name.startsWith("can")){
                                         close = true;
                                     }
                                     if(close) {
@@ -164,11 +160,10 @@ Class.create("ShareCenter", {
                 oForm.down('#complete_indicator').show();
                 this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
                     oForm.down('input#repo_label').value = json['label'];
-                    oForm.insert(new Element('input', {type:"hidden", name:"original_users", value:json['users'].join(',')}));
                     this._currentRepositoryId = json['repositoryId'];
                     oForm.down('#complete_indicator').hide();
-                    $A(json['users']).each(function(u){
-                        var newItem = entryTplGenerator(false, false, u, u, json['rights'][u]);
+                    $A(json['entries']).each(function(u){
+                        var newItem = entryTplGenerator(u.TYPE=="group", u.TYPE =="tmp_user", u.ID, u.LABEL, u.RIGHT);
                         newItem.appendToList($('shared_users_summary'));
                     });
                 }.bind(this));
@@ -181,7 +176,9 @@ Class.create("ShareCenter", {
         var closeFunc = function (oForm){
             if(Prototype.Browser.IE){
                 $(document.body).down("#shared_users_autocomplete_choices").remove();
-                $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
+                if($(document.body).down("#shared_users_autocomplete_choices_iefix")){
+                    $(document.body).down("#shared_users_autocomplete_choices_iefix").remove();
+                }
                 $('create_shared_user').select('div.dialogButtons>input').invoke("removeClassName", "dialogButtons");
             }
         }
