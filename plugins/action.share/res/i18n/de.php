@@ -26,5 +26,6 @@ $mess = array(
     "22"=> "Erlaubte Downloads: ",
     "23"=> "Optional password: ",
     "24"=> "Set expiration limits and define a password to access the file, then click on \"Generate\".",
-    "25"=> "Kein limit"
+    "25"=> "Kein limit",
+    "26"=> "Choose users or groups and set their access rights. 'Write' only will create an upload-only repository."
 );

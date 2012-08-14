@@ -139,17 +139,20 @@ class ShareCenter extends AJXP_Plugin{
                     $users = "";
                     $index = 0;
                     if($regexp != null && !count($allUsers)){
-                        $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'>$crtValue (create user)</li>";
-                    }else if(count($allGroups)){
-                        $users .= "<li class='complete_group_entry' data-group='/' data-label='My Group'>My Group</li>";
+                        $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (create user)</span></li>";
+                    }
+                    if(count($allGroups)){
+                        if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='My Group'><span class='user_entry_label'>My Group</span></li>";
                         foreach($allGroups as $groupId => $groupLabel){
-                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel'>".$groupLabel."</li>";
+                            if($regexp == null ||  preg_match("/$regexp/i", $groupLabel)){
+                                $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel'><span class='user_entry_label'>".$groupLabel."</span></li>";
+                            }
                         }
                     }
                     foreach ($allUsers as $userId => $userObject){
                         if( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING")) || $userObject->getParent() == $loggedUser->getId() ){
                             if($regexp != null && !preg_match("/$regexp/i", $userId)) continue;
-            				$users .= "<li class='complete_user_entry' data-label='$userId'>".$userId."</li>";
+            				$users .= "<li class='complete_user_entry' data-label='$userId'><span class='user_entry_label'>".$userId."</span></li>";
                             $index ++;
                         }
                         if($index == $limit) break;
@@ -227,30 +230,14 @@ class ShareCenter extends AJXP_Plugin{
                         if($repo->getOwner() != AuthService::getLoggedUser()->getId()){
                             throw new Exception("You are not allowed to access this data");
                         }
-                        $sharedUsers = array();
-                        $sharedRights = "";
-                        $loggedUser = AuthService::getLoggedUser();
-                        $users = AuthService::listUsers();
-                        foreach ($users as $userId => $userObject) {
-                            if($userObject->getId() == $loggedUser->getId()) continue;
-                            if($userObject->canWrite($repoId) && $userObject->canRead($repoId)){
-                                $sharedUsers[] = $userId;
-                                $sharedRights[$userId] = "rw";
-                            }else if($userObject->canRead($repoId)){
-                                $sharedUsers[] = $userId;
-                                $sharedRights[$userId] = "r";
-                            }else if($userObject->canWrite($repoId)){
-                                $sharedUsers[] = $userId;
-                                $sharedRights[$userId] = "w";
-                            }
-                        }
+
+                        $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId);
 
                         $jsonData = array(
-                                         "repositoryId" => $repoId,
-                                         "label"    => $repo->getDisplay(),
-                                         "rights"   => $sharedRights,
-                                         "users"    => $sharedUsers
-                                    );
+                            "repositoryId" => $repoId,
+                            "label"    => $repo->getDisplay(),
+                            "entries"   => $sharedEntries
+                        );
                     }
                     echo json_encode($jsonData);
                 }
@@ -546,6 +533,64 @@ class ShareCenter extends AJXP_Plugin{
         }
     }
 
+    /**
+     * @param String $repoId
+     * @return array
+     */
+    function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups = true){
+
+        $loggedUser = AuthService::getLoggedUser();
+        $users = AuthService::listUsers();
+        $groups = AuthService::listChildrenGroups("/");
+        $sharedEntries = array();
+        if(!$mixUsersAndGroups){
+            $sharedGroups = array();
+        }
+
+        foreach($groups as $gId => $gLabel){
+            $r = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($gId));
+            if($r != null){
+                $right = $r->getRight($repoId);
+                if(!empty($right)){
+                    $entry = array(
+                        "ID"    => $gId,
+                        "TYPE"  => "group",
+                        "LABEL" => $gLabel,
+                        "RIGHT" => $right);
+                    if(!$mixUsersAndGroups){
+                        $sharedGroups[$gId] = $entry;
+                    }else{
+                        $sharedEntries[] = $entry;
+                    }
+                }
+            }
+        }
+
+        foreach ($users as $userId => $userObject) {
+            if($userObject->getId() == $loggedUser->getId()) continue;
+            $ri = $userObject->getRight($repoId);
+            if(!empty($ri)){
+                $entry =  array(
+                    "ID"    => $userId,
+                    "TYPE"  => $userObject->hasParent()?"tmp_user":"user",
+                    "LABEL" => $userId,
+                    "RIGHT" => $userObject->getRight($repoId)
+                );
+                if(!$mixUsersAndGroups){
+                    $sharedEntries[$userId] = $entry;
+                }else{
+                    $sharedEntries[] = $entry;
+                }
+            }
+        }
+
+        if(!$mixUsersAndGroups){
+            return array("USERS" => $sharedEntries, "GROUPS" => $sharedGroups);
+        }
+        return $sharedEntries;
+
+    }
+
     function createSharedRepository($httpVars, $repository, $accessDriver){
 		// ERRORS
 		// 100 : missing args
@@ -571,6 +616,11 @@ class ShareCenter extends AJXP_Plugin{
         $index = 0;
         while(isSet($httpVars["user_".$index])){
             $eType = $httpVars["entry_type_".$index];
+            $rightString = ($httpVars["right_read_".$index]=="true"?"r":"").($httpVars["right_write_".$index]=="true"?"w":"");
+            if(empty($rightString)) {
+                $index++;
+                continue;
+            }
             if($eType == "user"){
                 $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index], AJXP_SANITIZE_ALPHANUM);
                 if(!AuthService::userExists($u) && !isSet($httpVars["user_pass_".$index])){
@@ -587,7 +637,7 @@ class ShareCenter extends AJXP_Plugin{
                 $u = AJXP_Utils::decodeSecureMagic($httpVars["user_".$index]);
                 $groups[] = $u;
             }
-            $uRights[$u] = ($httpVars["right_read_".$index]=="true"?"r":"").($httpVars["right_write_".$index]=="true"?"w":"");
+            $uRights[$u] = $rightString;
             $uPasses[$u] = isSet($httpVars["user_pass_".$index])?$httpVars["user_pass_".$index]:"";
             $index ++;
         }
@@ -660,8 +710,10 @@ class ShareCenter extends AJXP_Plugin{
         }
 
 
-        if(isSet($httpVars["original_users"])){
-            $originalUsers = explode(",", $httpVars["original_users"]);
+        if(isSet($editingRepo)){
+
+            $currentRights = $this->computeSharedRepositoryAccessRights($httpVars["repository_id"], false);
+            $originalUsers = array_keys($currentRights["USERS"]);
             $removeUsers = array_diff($originalUsers, $users);
             if(count($removeUsers)){
                 foreach($removeUsers as $user){
@@ -669,6 +721,17 @@ class ShareCenter extends AJXP_Plugin{
                         $userObject = $confDriver->createUserObject($user);
                         $userObject->removeRights($newRepo->getUniqueId());
                         $userObject->save("superuser");
+                    }
+                }
+            }
+            $originalGroups = array_keys($currentRights["GROUPS"]);
+            $removeGroups = array_diff($originalGroups, $groups);
+            if(count($removeGroups)){
+                foreach($removeGroups as $groupId){
+                    $role = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($groupId));
+                    if($role !== false){
+                        $role->removeRights($newRepo->getUniqueId());
+                        AuthService::updateRole($role);
                     }
                 }
             }
