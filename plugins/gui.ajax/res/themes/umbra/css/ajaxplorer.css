@@ -345,6 +345,7 @@ div.shadow_class
 	border-radius : 0px;
     border:none;
     filter: none;
+    background: none;
 }
 
 .dialogLegend
@@ -2514,23 +2515,52 @@ li.complete_user_entry,
 li.complete_group_entry,
 li.complete_user_entry_temp
 {
-    padding: 8px 5px 8px 25px !important;
     clear: left;
     background-color: rgba(255, 255, 255, 0.7);
-    background-image: url("../images/mimes/16/user.png");
-    background-repeat: no-repeat;
-    background-position: 4px 5px;
     border-bottom: 1px solid #F1F1EF;
 }
 
+div.editable_users_list div.user_entry_rights{
+    float: right;
+    padding-top: 8px;
+    padding-right: 4px;
+}
+.no-flexbox div.editable_users_list div.user_entry_rights{
+    padding-top: 4px;
+}
+
+li.complete_user_entry,
 li.complete_group_entry,
-.editable_users_list div.group_entry
+li.complete_user_entry_temp{
+    padding: 0 !important;
+}
+
+
+.editable_users_list div.user_entry span.user_entry_label,
+li.complete_user_entry span.user_entry_label,
+li.complete_group_entry span.user_entry_label,
+li.complete_user_entry_temp span.user_entry_label
+{
+    display: inline-block;
+    padding: 8px 5px 8px 25px !important;
+    background-image: url("../images/mimes/16/user.png");
+    background-repeat: no-repeat;
+    background-position: 4px 5px;
+
+}
+
+li.complete_user_entry{
+
+}
+
+li.complete_group_entry span.user_entry_label,
+.editable_users_list div.group_entry span.user_entry_label
 {
     background-image: url("../images/mimes/16/users-folder.png");
 }
 
-li.complete_user_entry_temp,
-.editable_users_list div.user_entry_temp
+li.complete_user_entry_temp span.user_entry_label,
+.editable_users_list div.user_entry_temp span.user_entry_label
 {
     background-image: url("../images/mimes/16/user_shared.png");
 }

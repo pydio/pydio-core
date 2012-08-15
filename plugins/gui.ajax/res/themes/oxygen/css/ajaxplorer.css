@@ -206,7 +206,7 @@ div.shadow_class
 .dialogContent select
 {
     margin-left:0px;
-    width: 180px;
+    /*width: 180px;*/
     border: 1px solid #aaa;
     background-image:url('../images/locationBg.gif');
     background-repeat: no-repeat;
@@ -245,7 +245,7 @@ div.shadow_class
 .dialogContent input[type="radio"]
 {
 	height: auto;
-	width: auto;
+	width: auto !important;
 	border-radius : 0px;
 }
 
@@ -2165,6 +2165,101 @@ div.user_role{
 	border : 1px solid #ffffef;
 }
 
+.editable_users_list{
+
+    border: 1px solid #AAAAAA;
+    height: 130px;
+    overflow: auto;
+    clear:left;
+    position: relative;
+    margin-top: 5px;
+    border-radius: 3px;
+
+}
+
+.editable_users_list div.user_entry,
+li.complete_user_entry,
+li.complete_group_entry,
+li.complete_user_entry_temp
+{
+    clear: left;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid #F1F1EF;
+}
+
+.editable_users_list div.user_entry_rights{
+    float: right;
+    padding-top: 8px;
+    padding-right: 4px;
+}
+.no-flexbox .editable_users_list div.user_entry_rights{
+    padding-top: 4px;
+}
+
+li.complete_user_entry,
+li.complete_group_entry,
+li.complete_user_entry_temp{
+    padding: 0 !important;
+}
+
+
+.editable_users_list div.user_entry span.user_entry_label,
+li.complete_user_entry span.user_entry_label,
+li.complete_group_entry span.user_entry_label,
+li.complete_user_entry_temp span.user_entry_label
+{
+    display: inline-block;
+    padding: 8px 5px 8px 25px !important;
+    background-image: url("../images/mimes/16/user.png");
+    background-repeat: no-repeat;
+    background-position: 4px 5px;
+
+}
+
+li.complete_user_entry{
+
+}
+
+li.complete_group_entry span.user_entry_label,
+.editable_users_list div.group_entry span.user_entry_label
+{
+    background-image: url("../images/mimes/16/users-folder.png");
+}
+
+li.complete_user_entry_temp span.user_entry_label,
+.editable_users_list div.user_entry_temp span.user_entry_label
+{
+    background-image: url("../images/mimes/16/user_shared.png");
+}
+
+.editable_users_list span.delete_user_entry{
+    background-image: url("../images/mimes/16/trashcan.png");
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    background-size: 100%;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.editable_users_list label{
+    padding: 0 3px;
+    cursor: pointer;
+}
+
+#create_shared_user{
+    width: 84%;
+    background-color: #EEE;
+    margin: 0 6%;
+    box-shadow: 0px 0px 7px #666;
+    padding: 1px 4px;
+    border-radius: 0px 0px 7px 7px;
+
+    position: absolute;
+    top: -1px;
+}
+
+
 /***********************/
 /* EDITORS & DIAPORAMA */
 /***********************/
@@ -2205,6 +2300,7 @@ div.autocomplete
       border:1px solid #bbb;
       margin:8px 0px 0px;
       padding:0px;
+      z-index: 10000 !important;
 }
 div.autocomplete ul 
 {
