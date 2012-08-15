@@ -428,6 +428,11 @@ class sqlConfDriver extends AbstractConfDriver {
 
     }
 
+
+    function deleteGroup($groupPath){
+
+    }
+
     /**
      * @param string $baseGroup
      * @return string[]

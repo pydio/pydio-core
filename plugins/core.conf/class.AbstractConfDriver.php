@@ -153,6 +153,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 		if(!$abstractUser->storageExists()){			
 			AuthService::updateDefaultRights($abstractUser);
 		}
+        AuthService::updateAuthProvidedGroup($abstractUser);
 		return $abstractUser;
 	}
 	
@@ -196,6 +197,14 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
     abstract function createGroup($groupPath, $groupLabel);
 
     /**
+     * @abstract
+     * @param $groupPath
+     * @return void
+     */
+    abstract function deleteGroup($groupPath);
+
+
+        /**
      * @param string $baseGroup
      * @return string[]
      */

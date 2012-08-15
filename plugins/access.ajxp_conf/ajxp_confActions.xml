@@ -507,7 +507,7 @@
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role" image="false" editable="false"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,shared_file,role,group" image="false" editable="false"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
@@ -526,6 +526,10 @@
 					}else if(meta.get("ajxp_mime") == "shared_file"){
 						deleteMessage = MessageHash['ajxp_shared.11'];
 						fieldName = "shared_file";
+						fieldValue = meta.get("filename");
+					}else if(meta.get("ajxp_mime") == "group"){
+						deleteMessage = MessageHash['ajxp_shared.11'];
+						fieldName = "group";
 						fieldValue = meta.get("filename");
 					}else{
 						deleteMessage = MessageHash['ajxp_conf.35'];

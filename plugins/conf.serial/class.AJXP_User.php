@@ -65,7 +65,9 @@ class AJXP_User extends AbstractAjxpUser
 
     protected function getStoragePath(){
         $subDir = trim($this->getGroupPath(), "/");
-        $res = AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".(empty($subDir)?"":$subDir."/").$this->getId();
+        $id = $this->getId();
+        if(AuthService::ignoreUserCase()) $id = strtolower($id);
+        $res = AJXP_VarsFilter::filter($this->storage->getOption("USERS_DIRPATH"))."/".(empty($subDir)?"":$subDir."/").$id;
         return $res;
     }
 

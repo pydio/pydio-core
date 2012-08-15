@@ -321,4 +321,10 @@ class AbstractAuthDriver extends AJXP_Plugin {
         return ConfService::getConfStorageImpl()->getChildrenGroups($baseGroup);
     }
 
+    /**
+     * @param AJXP_User $userObject
+     */
+    function updateUserGroup(&$userObject){
+    }
+
 }
