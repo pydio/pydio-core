@@ -35,6 +35,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapUserAttr;
 
     var $ldapconn = null;
+    var $separateGroup = "";
 
 
     function init($options){
@@ -141,7 +142,9 @@ class ldapAuthDriver extends AbstractAuthDriver {
     function supportsUsersPagination(){
         return true;
     }
-    function listUsersPaginated($regexp, $offset, $limit){
+    function listUsersPaginated($baseGroup="/", $regexp, $offset, $limit){
+
+        if($baseGroup != "/".$this->separateGroup) return array();
 
         if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."*";
         else if($regexp[strlen($regexp)-1] == "$") $regexp = "*".rtrim($regexp, "$");
@@ -162,7 +165,21 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
 
 
-    function listUsers(){
+    /**
+     * List children groups of a given group. By default will report this on the CONF driver,
+     * but can be overriden to grab info directly from auth driver (ldap, etc).
+     * @param string $baseGroup
+     * @return string[]
+     */
+    function listChildrenGroups($baseGroup = "/"){
+        $arr = array();
+        if($baseGroup == "/" && !empty($this->separateGroup)) $arr[$this->separateGroup] = "LDAP Annuary";
+        return $arr;
+    }
+
+
+    function listUsers($baseGroup = "/"){
+        if($baseGroup != "/".$this->separateGroup) return array();
 		$entries = $this->getUserEntries();
         $persons = array();
         unset($entries['count']); // remove 'count' entry
@@ -177,12 +194,11 @@ class ldapAuthDriver extends AbstractAuthDriver {
 	function userExists($login){
         $entries = $this->getUserEntries($login);
         if(!is_array($entries)) return false;
-        if(AuthService::ignoreUserCase() && strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
-            return false;
-        }else if(strcmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
-            return false;
+        if(AuthService::ignoreUserCase()) {
+            return (strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
+        }else {
+            return (strcmp($login, $entries[0][$this->ldapUserAttr][0]) == 0 );
         }
-		return true;
     }
 
     function checkPassword($login, $pass, $seed){
@@ -206,6 +222,10 @@ class ldapAuthDriver extends AbstractAuthDriver {
     }
     function passwordsEditable(){
         return false;
+    }
+
+    function updateUserGroup(&$userObject){
+        if(!empty($this->separateGroup)) $userObject->setGroupPath("/".$this->separateGroup);
     }
 
 }

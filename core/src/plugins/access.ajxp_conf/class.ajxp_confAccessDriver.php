@@ -1080,8 +1080,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::header();
 					AJXP_XMLWriter::sendMessage($mess["ajxp_conf.66"], null);
 					AJXP_XMLWriter::reloadDataNode();
-					AJXP_XMLWriter::close();								
-				}else{
+					AJXP_XMLWriter::close();
+                }else if(isSet($httpVars["group"])){
+                    $groupPath = $httpVars["group"];
+                    $basePath = substr(dirname($groupPath), strlen("/data/users"));
+                    $gName = basename($groupPath);
+                    AuthService::deleteGroup($basePath, $gName);
+                    AJXP_XMLWriter::header();
+                    AJXP_XMLWriter::reloadDataNode();
+                    AJXP_XMLWriter::close();
+                }else{
 					if(!isset($httpVars["user_id"]) || $httpVars["user_id"]==""
 						|| AuthService::isReservedUserId($httpVars["user_id"])
 						|| $loggedUser->getId() == $httpVars["user_id"])

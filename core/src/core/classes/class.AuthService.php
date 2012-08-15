@@ -460,6 +460,11 @@ class AuthService
             }
 		}
 	}
+
+    static function updateAuthProvidedGroup(&$userObject){
+        ConfService::getAuthDriverImpl()->updateUserGroup($userObject);
+    }
+
 	/**
      * Use driver implementation to check whether the user exists or not.
      * @static
@@ -635,6 +640,10 @@ class AuthService
         ConfService::getConfStorageImpl()->createGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName, $groupLabel);
     }
 
+    static function deleteGroup($baseGroup, $groupName){
+        ConfService::getConfStorageImpl()->deleteGroup(rtrim(self::filterBaseGroup($baseGroup), "/")."/".$groupName);
+    }
+
     static function getChildrenUsers($parentUserId){
         return ConfService::getConfStorageImpl()->getUserChildren($parentUserId);
     }
@@ -668,7 +677,7 @@ class AuthService
 		foreach (array_keys($users) as $userId)
 		{
 			if(($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
-            if($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match($regexp, $userId)) continue;
+            if($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match("/$regexp/i", $userId)) continue;
 			$allUsers[$userId] = $confDriver->createUserObject($userId);
             if($paginated){
                 // Make sure to reload all children objects
