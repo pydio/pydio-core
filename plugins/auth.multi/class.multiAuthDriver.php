@@ -35,7 +35,7 @@ class multiAuthDriver extends AbstractAuthDriver {
     var $slaveName;
     var $baseName;
 
-    static $schemesCache = array();
+    static $schemesCache = null;
 
 	/**
 	 * @var $drivers AbstractAuthDriver[]
@@ -150,7 +150,11 @@ class multiAuthDriver extends AbstractAuthDriver {
 	}
 
     function getAuthScheme($login){
-        if(isSet(multiAuthDriver::$schemesCache[$login])){
+        if(!isSet(multiAuthDriver::$schemesCache)){
+            foreach($this->drivers as $scheme => $d){
+                if($d->userExists($login)) return $scheme;
+            }
+        } else if(isSet(multiAuthDriver::$schemesCache[$login])){
             return multiAuthDriver::$schemesCache[$login];
         }
         return null;
@@ -161,6 +165,9 @@ class multiAuthDriver extends AbstractAuthDriver {
     }
 
     function addToCache($usersList, $scheme){
+        if(!isset(multiAuthDriver::$schemesCache)){
+            multiAuthDriver::$schemesCache = array();
+        }
         foreach($usersList as $userName){
             multiAuthDriver::$schemesCache[$userName] = $scheme;
         }
@@ -205,10 +212,10 @@ class multiAuthDriver extends AbstractAuthDriver {
 		return $allUsers;
 	}
 
-    function updateUserGroup(&$userObject){
+    function updateUserObject(&$userObject){
         $s = $this->getAuthScheme($userObject->getId());
         if(isSet($this->drivers[$s])){
-            $this->drivers[$s]->updateUserGroup($userObject);
+            $this->drivers[$s]->updateUserObject($userObject);
         }
     }
 

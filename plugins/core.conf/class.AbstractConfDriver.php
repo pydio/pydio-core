@@ -32,14 +32,38 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
-		if(!ConfService::getCoreConf("WEBDAV_ENABLE") && $contribNode->nodeName == "actions"){
+        if($contribNode->nodeName != "actions") return;
+
+        // WEBDAV ACTION
+		if(!ConfService::getCoreConf("WEBDAV_ENABLE")){
 			unset($this->actions["webdav_preferences"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="webdav_preferences"]', $contribNode);
 			$publicUrlNode = $publicUrlNodeList->item(0);
 			$contribNode->removeChild($publicUrlNode);			
-		}		
-		if(!ConfService::getCoreConf("USER_CREATE_REPOSITORY", "conf") && $contribNode->nodeName == "actions"){
+		}
+
+        // PERSONAL INFORMATIONS
+        $hasExposed = false;
+        if(isSet($this->options["CUSTOM_DATA"])){
+            $custom = $this->options["CUSTOM_DATA"];
+            foreach($custom as $key => $value){
+                if(is_array($value) && isSet($value["exposed"])){
+                    $hasExposed = true;
+                    break;
+                }
+            }
+        }
+        if(!$hasExposed){
+            unset($this->actions["custom_data_edit"]);
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $publicUrlNodeList = $actionXpath->query('action[@name="custom_data_edit"]', $contribNode);
+            $publicUrlNode = $publicUrlNodeList->item(0);
+            $contribNode->removeChild($publicUrlNode);
+        }
+
+        // CREATE A NEW REPOSITORY
+		if(!ConfService::getCoreConf("USER_CREATE_REPOSITORY", "conf")){
 			unset($this->actions["user_create_repository"]);
 			$actionXpath=new DOMXPath($contribNode->ownerDocument);
 			$publicUrlNodeList = $actionXpath->query('action[@name="user_create_repository"]', $contribNode);
@@ -51,6 +75,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 			$publicUrlNode = $publicUrlNodeList->item(0);
 			$contribNode->removeChild($publicUrlNode);
 		}
+
 	}
 	
 	// NEW FUNCTIONS FOR  LOADING/SAVING PLUGINS CONFIGS
@@ -153,7 +178,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 		if(!$abstractUser->storageExists()){			
 			AuthService::updateDefaultRights($abstractUser);
 		}
-        AuthService::updateAuthProvidedGroup($abstractUser);
+        AuthService::updateAuthProvidedData($abstractUser);
 		return $abstractUser;
 	}
 	
@@ -237,6 +262,18 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
         }
         foreach ($jsonPrefs as $pref){
             $prefs[$pref] = array("value" => $userObject->getPref($pref), "type" => "json" );
+        }
+
+        $customValue = $userObject->getPref("CUSTOM_PARAMS");
+        $custom = ConfService::getConfStorageImpl()->getOption("CUSTOM_DATA");
+        if(is_array($custom) && count($custom)){
+            foreach($custom as $key => $value){
+                if(is_string($value)) continue;
+                if(is_array($value) && isset($value["exposed"]) && $value["exposed"] == true){
+                    $value["value"] = (isSet($customValue[$key])?$customValue[$key]:"");
+                    $prefs["CUSTOM_PARAM_".$key] = $value;
+                }
+            }
         }
         return $prefs;
     }
@@ -361,6 +398,35 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 				
 			break;					
 					
+			//------------------------------------
+			//	SAVE USER PREFERENCE
+			//------------------------------------
+			case "custom_data_edit":
+
+                $userObject = AuthService::getLoggedUser();
+                $data = array();
+                AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "CUSTOM_PARAM_");
+
+                $customValue = $userObject->getPref("CUSTOM_PARAMS");
+                $custom = ConfService::getConfStorageImpl()->getOption("CUSTOM_DATA");
+                if(is_array($custom) && count($custom)){
+                    foreach($custom as $key => $value){
+                        if(is_string($value)) continue;
+                        if(is_array($value) && isset($value["exposed"]) && $value["exposed"] == true
+                            && (!isset($value["readonly"]) || $value["readonly"] != "true") && isSet($data[$key])){
+                            $customValue[$key] = $data[$key];
+                        }
+                    }
+                }
+                $userObject->setPref("CUSTOM_PARAMS", $customValue);
+                $userObject->save();
+
+				AJXP_XMLWriter::header();
+				AJXP_XMLWriter::sendMessage("Successfully updated your account", null);
+                AJXP_XMLWriter::close();
+
+			break;
+
 			//------------------------------------
 			// WEBDAV PREFERENCES
 			//------------------------------------
@@ -494,7 +560,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 $tplId = $httpVars["template_id"];
                 $tplRepo = ConfService::getRepositoryById($tplId);
                 $options = array();
-                self::parseParameters($httpVars, $options);
+                AJXP_Utils::parseStandardFormParameters($httpVars, $options);
                 $loggedUser = AuthService::getLoggedUser();
                 $newRep = $tplRepo->createTemplateChild(AJXP_Utils::sanitize($httpVars["DISPLAY"]), $options, null, $loggedUser->getId());
                 $gPath = $loggedUser->getGroupPath();
@@ -562,47 +628,4 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 		return $xmlBuffer;		
 	}
 
-
-	public static function parseParameters(&$repDef, &$options, $userId = null){
-
-		foreach ($repDef as $key => $value)
-		{
-			$value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
-			if(strpos($key, "DRIVER_OPTION_")!== false && strpos($key, "DRIVER_OPTION_")==0 && strpos($key, "ajxptype") === false && strpos($key, "_checkbox") === false){
-				if(isSet($repDef[$key."_ajxptype"])){
-					$type = $repDef[$key."_ajxptype"];
-					if($type == "boolean"){
-						$value = ($value == "true"?true:false);
-					}else if($type == "integer"){
-						$value = intval($value);
-					}else if($type == "array"){
-						$value = explode(",", $value);
-					}else if($type == "password" && $userId!=null){
-	                    if (trim($value != "") && function_exists('mcrypt_encrypt'))
-	                    {
-	                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-	                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-	                        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-	                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
-	                    }
-					}
-					unset($repDef[$key."_ajxptype"]);
-				}
-                if(isSet($repDef[$key."_checkbox"])){
-                    $checked = $repDef[$key."_checkbox"] == "checked";
-                    unset($repDef[$key."_checkbox"]);
-                    if(!$checked) continue;
-                }
-				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
-				unset($repDef[$key]);
-			}else{
-				if($key == "DISPLAY"){
-					$value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
-				}
-				$repDef[$key] = $value;
-			}
-		}
-	}
-
 }
-?>

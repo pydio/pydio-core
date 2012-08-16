@@ -324,7 +324,7 @@ class AbstractAuthDriver extends AJXP_Plugin {
     /**
      * @param AJXP_User $userObject
      */
-    function updateUserGroup(&$userObject){
+    function updateUserObject(&$userObject){
     }
 
 }

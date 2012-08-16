@@ -37,6 +37,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
     var $ldapconn = null;
     var $separateGroup = "";
 
+    var $customParamsMapping = array();
 
     function init($options){
         parent::init($options);
@@ -46,6 +47,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
         if ($options["LDAP_PASSWORD"]) $this->ldapAdminPassword = $options["LDAP_PASSWORD"];
         if ($options["LDAP_DN"]) $this->ldapDN = $options["LDAP_DN"];
+        if (is_array($options["CUSTOM_DATA_MAPPING"])) $this->customParamsMapping = $options["CUSTOM_DATA_MAPPING"];
         if (isSet($options["LDAP_FILTER"])){
             $this->ldapFilter = $options["LDAP_FILTER"];
             if ($this->ldapFilter != "" &&  !preg_match("/^\(.*\)$/", $this->ldapFilter)) {
@@ -114,7 +116,11 @@ class ldapAuthDriver extends AbstractAuthDriver {
         }else{
             $conn = array($this->ldapconn);
         }
-        $ret = ldap_search($conn,$this->ldapDN,$filter, array($this->ldapUserAttr));
+        $expected = array($this->ldapUserAttr);
+        if($login != null && !empty($this->customParamsMapping)){
+            $expected = array_merge($expected, array_keys($this->customParamsMapping));
+        }
+        $ret = ldap_search($conn,$this->ldapDN,$filter, $expected);
         $allEntries = array("count" => 0);
         foreach($ret as $resourceResult){
             if($countOnly){
@@ -224,9 +230,34 @@ class ldapAuthDriver extends AbstractAuthDriver {
         return false;
     }
 
-    function updateUserGroup(&$userObject){
+    function updateUserObject(&$userObject){
         if(!empty($this->separateGroup)) $userObject->setGroupPath("/".$this->separateGroup);
+        if(!empty($this->customParamsMapping)){
+            $checkValues =  array_values($this->customParamsMapping);
+            $prefs = $userObject->getPref("CUSTOM_PARAMS");
+            if(!is_array($prefs)) {
+                $prefs = array();
+            }
+            // If one value exist, we consider the mapping has already been done.
+            foreach($checkValues as $val){
+                if(array_key_exists($val, $prefs)) return;
+            }
+            $changes = false;
+            $entries = $this->getUserEntries($userObject->getId());
+            if($entries["count"]){
+                $entry = $entries[0];
+                foreach($this->customParamsMapping as $key => $value){
+                    if(isSet($entry[$key])){
+                        $prefs[$value] = $entry[$key][0];
+                        $changes = true;
+                    }
+                }
+            }
+            if($changes){
+                $userObject->setPref("CUSTOM_PARAMS", $prefs);
+                $userObject->save();
+            }
+        }
     }
 
 }
-?>
