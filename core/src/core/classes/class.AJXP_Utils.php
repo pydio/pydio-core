@@ -1173,6 +1173,61 @@ class AJXP_Utils
         @ini_set($paramName, $paramValue);
     }
 
+    public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_"){
+
+        $replicationGroups = array();
+        foreach ($repDef as $key => $value)
+        {
+            $value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
+            if(strpos($key, $prefix)!== false
+                && strpos($key, $prefix)==0
+                && strpos($key, "ajxptype") === false
+                && strpos($key, "_replication") === false
+                && strpos($key, "_checkbox") === false){
+                if(isSet($repDef[$key."_ajxptype"])){
+                    $type = $repDef[$key."_ajxptype"];
+                    if($type == "boolean"){
+                        $value = ($value == "true"?true:false);
+                    }else if($type == "integer"){
+                        $value = intval($value);
+                    }else if($type == "array"){
+                        $value = explode(",", $value);
+                    }else if($type == "password" && $userId!=null){
+                        if (trim($value != "") && function_exists('mcrypt_encrypt'))
+                        {
+                            // The initialisation vector is only required to avoid a warning, as ECB ignore IV
+                            $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
+                            // We encode as base64 so if we need to store the result in a database, it can be stored in text column
+                            $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
+                        }
+                    }
+                    unset($repDef[$key."_ajxptype"]);
+                }
+                if(isSet($repDef[$key."_checkbox"])){
+                    $checked = $repDef[$key."_checkbox"] == "checked";
+                    unset($repDef[$key."_checkbox"]);
+                    if(!$checked) continue;
+                }
+                if(isSet($repDef[$key."_replication"])){
+                    $repKey = $repDef[$key."_replication"];
+                    if(!is_array($replicationGroups[$repKey])) $replicationGroups[$repKey] = array();
+                    $replicationGroups[$repKey][] = $key;
+                }
+                $options[substr($key, strlen($prefix))] = $value;
+                unset($repDef[$key]);
+            }else{
+                if($key == "DISPLAY"){
+                    $value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
+                }
+                $repDef[$key] = $value;
+            }
+        }
+        // DO SOMETHING WITH REPLICATED PARAMETERS?
+        if(count($replicationGroups)){
+
+        }
+    }
+
 }
 
 ?>

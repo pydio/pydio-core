@@ -461,8 +461,8 @@ class AuthService
 		}
 	}
 
-    static function updateAuthProvidedGroup(&$userObject){
-        ConfService::getAuthDriverImpl()->updateUserGroup($userObject);
+    static function updateAuthProvidedData(&$userObject){
+        ConfService::getAuthDriverImpl()->updateUserObject($userObject);
     }
 
 	/**

@@ -451,10 +451,18 @@ class AJXP_XMLWriter
 			$buffer.="<preferences>";
             $preferences = $confDriver->getExposedPreferences($loggedUser);
             foreach($preferences as $prefName => $prefData){
+                $atts = "";
+                if(isSet($prefData["exposed"]) && $prefData["exposed"] == true){
+                    foreach($prefData as $k => $v) {
+                        if($k=="name") continue;
+                        if($k == "value") $k = "default";
+                        $atts .= "$k='$v' ";
+                    }
+                }
                 if($prefData["type"] == "string"){
-                    $buffer.="<pref name=\"$prefName\" value=\"".$prefData["value"]."\"/>";
+                    $buffer.="<pref name=\"$prefName\" value=\"".$prefData["value"]."\" $atts/>";
                 }else if($prefData["type"] == "json"){
-                    $buffer.="<pref name=\"$prefName\"><![CDATA[".$prefData["value"]."]]></pref>";
+                    $buffer.="<pref name=\"$prefName\" $atts><![CDATA[".$prefData["value"]."]]></pref>";
                 }
             }
 			$buffer.="</preferences>";
