@@ -355,9 +355,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if(is_array($customData) && count($customData)>0 ){
 					$userCustom = $userObject->getPref("CUSTOM_PARAMS");
 					print("<custom_data>");
-					foreach($customData as $custName=>$custValue){
-						$value = isset($userCustom[$custName]) ? $userCustom[$custName] : '';
-						print("<param name=\"$custName\" type=\"string\" label=\"$custValue\" description=\"\" value=\"$value\"/>");
+                    foreach($customData as $custName=>$custValue){
+                        $value = isset($userCustom[$custName]) ? $userCustom[$custName] : '';
+                        if(is_array($custValue)){
+                            print("<param  name=\"$custName\" value='$value' ");
+                            foreach($custValue as $attName => $attValue) print ($attName."='".$attValue."' ");
+                            print("/>");
+                        }else{
+                            print("<param name=\"$custName\" type=\"string\" label=\"$custValue\" description=\"\" value=\"$value\"/>");
+                        }
 					}
 					print("</custom_data>");
 				}
@@ -1601,57 +1607,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	
 	function parseParameters(&$repDef, &$options, $userId = null){
 
-        $replicationGroups = array();
-		foreach ($repDef as $key => $value)
-		{
-			$value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
-			if(strpos($key, "DRIVER_OPTION_")!== false
-                && strpos($key, "DRIVER_OPTION_")==0
-                && strpos($key, "ajxptype") === false
-                && strpos($key, "_replication") === false
-                && strpos($key, "_checkbox") === false){
-				if(isSet($repDef[$key."_ajxptype"])){
-					$type = $repDef[$key."_ajxptype"];
-					if($type == "boolean"){
-						$value = ($value == "true"?true:false);
-					}else if($type == "integer"){
-						$value = intval($value);
-					}else if($type == "array"){
-						$value = explode(",", $value);
-					}else if($type == "password" && $userId!=null){						
-	                    if (trim($value != "") && function_exists('mcrypt_encrypt'))
-	                    {
-	                        // The initialisation vector is only required to avoid a warning, as ECB ignore IV
-	                        $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-	                        // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-	                        $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
-	                    }						
-					}
-					unset($repDef[$key."_ajxptype"]);
-				}
-                if(isSet($repDef[$key."_checkbox"])){
-                    $checked = $repDef[$key."_checkbox"] == "checked";
-                    unset($repDef[$key."_checkbox"]);
-                    if(!$checked) continue;
-                }
-                if(isSet($repDef[$key."_replication"])){
-                    $repKey = $repDef[$key."_replication"];
-                    if(!is_array($replicationGroups[$repKey])) $replicationGroups[$repKey] = array();
-                    $replicationGroups[$repKey][] = $key;
-                }
-				$options[substr($key, strlen("DRIVER_OPTION_"))] = $value;
-				unset($repDef[$key]);
-			}else{
-				if($key == "DISPLAY"){
-					$value = SystemTextEncoding::fromUTF8(AJXP_Utils::securePath($value));
-				}
-				$repDef[$key] = $value;		
-			}
-		}
-        // DO SOMETHING WITH REPLICATED PARAMETERS?
-        if(count($replicationGroups)){
+        AJXP_Utils::parseStandardFormParameters($repDef, $options, $userId);
 
-        }
 	}
 	    
 }

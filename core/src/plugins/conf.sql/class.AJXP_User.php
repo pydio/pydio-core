@@ -535,7 +535,8 @@ class AJXP_User extends AbstractAjxpUser
 			$dirPath = AJXP_INSTALL_PATH."/data/users";
 			AJXP_Logger::logAction("getTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
 		}
-		return AJXP_Utils::loadSerialFile($dirPath."/".$this->getId()."-temp-".$key.".ser");
+        $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
+		return AJXP_Utils::loadSerialFile($dirPath."/".$id."/temp-".$key.".ser");
 	}
 	
 	/**
@@ -552,7 +553,8 @@ class AJXP_User extends AbstractAjxpUser
 			$dirPath = AJXP_INSTALL_PATH."/data/users";
 			AJXP_Logger::logAction("setTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
 		}
-		return AJXP_Utils::saveSerialFile($dirPath."/".$this->getId()."-temp-".$key.".ser", $value);
+        $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
+        return AJXP_Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
 	}
 	
 	/**

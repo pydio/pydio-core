@@ -39,7 +39,7 @@ Class.create("FormManager", {
     },
 
 	parameterNodeToHash : function(paramNode){
-		var paramsAtts = $A(['name', 'group', 'replicationGroup', 'type', 'label', 'description', 'default', 'mandatory', 'choices']);
+		var paramsAtts = $A(['name', 'group', 'replicationGroup', 'type', 'label', 'description', 'default', 'mandatory', 'choices', 'readonly']);
 		var paramsHash = new Hash();
 		paramsAtts.each(function(attName){
             var value = (XPathGetSingleNodeText(paramNode, '@'+attName) || '');
@@ -77,13 +77,13 @@ Class.create("FormManager", {
 				defaultValue = values.get(name);
 			}
 			var element;
-			var disabledString = (disabled?' disabled="true" ':'');
+			var disabledString = (disabled || param.get('readonly')?' disabled="true" ':'');
             var commonAttributes = {
                 'name'                  : name,
                 'data-ajxp_type'        : type,
                 'data-ajxp_mandatory'   : (mandatory?'true':'false')
             };
-            if(disabled){
+            if(disabled || param.get('readonly')){
                 commonAttributes['disabled'] = 'true';
             }
 			if(type == 'string' || type == 'integer' || type == 'array'){

@@ -46,7 +46,7 @@ Class.create("UserWidget", {
 		this.element.observe("mouseover", this.mObs1 );
 		this.element.observe("mouseout", this.mObs2 );		
 		document.observe("ajaxplorer:user_logged", this.uLoggedObs );
-		document.observe("ajaxplorer:actions_loaded", this.actLoaded );		
+		document.observe("ajaxplorer:actions_loaded", this.actLoaded );
 		if(Prototype.Browser.IE) {
 			document.observe("ajaxplorer:actions_refreshed", this.actLoaded );
 		}
@@ -61,7 +61,11 @@ Class.create("UserWidget", {
 		{
 			if(oUser.id != 'guest') 
 			{
-				logging_string = '<div class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id+' </i></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
+                var label = oUser.id;
+                if(oUser.getPreference('CUSTOM_PARAM_display_name')){
+                    label = oUser.getPreference('CUSTOM_PARAM_display_name');
+                }
+				logging_string = '<div class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ label +' </i></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
 				this.element.removeClassName('disabled');
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
