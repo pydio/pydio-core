@@ -48,11 +48,11 @@ class sqlAuthDriver extends AbstractAuthDriver {
         if($regexp != null){
             if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
             else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
-            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' ORDER BY [login] ASC") ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [login] LIKE '".$regexp."' AND [groupPath] LIKE %s ORDER BY [login] ASC", $baseGroup."%") ;
         }else if($offset != -1 || $limit != -1){
-            $res = dibi::query("SELECT * FROM [ajxp_users]  ORDER BY [login] ASC LIMIT $offset,$limit");
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC LIMIT $offset,$limit", $baseGroup."%");
         }else{
-            $res = dibi::query("SELECT * FROM [ajxp_users] ORDER BY [login] ASC");
+            $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC", $baseGroup."%");
         }
         $pairs = $res->fetchPairs('login', 'password');
    		return $pairs;
