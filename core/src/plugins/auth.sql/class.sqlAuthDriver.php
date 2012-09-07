@@ -44,7 +44,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
     function supportsUsersPagination(){
         return true;
     }
-    function listUsersPaginated($regexp, $offset, $limit){
+    function listUsersPaginated($baseGroup = "/", $regexp, $offset, $limit){
         if($regexp != null){
             if($regexp[0]=="^") $regexp = ltrim($regexp, "^")."%";
             else if($regexp[strlen($regexp)-1] == "$") $regexp = "%".rtrim($regexp, "$");
@@ -62,9 +62,15 @@ class sqlAuthDriver extends AbstractAuthDriver {
         return $res->getRowCount();
     }
 
-	function listUsers(){
-		$res = dibi::query("SELECT * FROM [ajxp_users] ORDER BY [login] ASC");
-		$pairs = $res->fetchPairs('login', 'password');
+	function listUsers($baseGroup="/"){
+        $pairs = array();
+		$res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %s ORDER BY [login] ASC", $baseGroup."%");
+		$rows = $res->fetchAll();
+        foreach($rows as $row){
+            $grp = $row["groupPath"];
+            if(strlen($grp) > strlen($baseGroup)) continue;
+            $pairs[$row["login"]] = $row["password"];
+        }
 		return $pairs;
 	}
 	

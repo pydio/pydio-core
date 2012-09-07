@@ -425,12 +425,12 @@ class sqlConfDriver extends AbstractConfDriver {
      * @todo
      */
     function createGroup($groupPath, $groupLabel){
-
+        dibi::query("INSERT INTO [ajxp_groups]", array("groupPath" => $groupPath, "groupLabel" => $groupLabel));
     }
 
 
     function deleteGroup($groupPath){
-
+        dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] = %s", $groupPath);
     }
 
     /**
@@ -439,7 +439,12 @@ class sqlConfDriver extends AbstractConfDriver {
      * @todo
      */
     function getChildrenGroups($baseGroup = "/"){
-        return array();
+        $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $baseGroup."%");
+        $pairs = $res->fetchPairs("groupPath", "groupLabel");
+        foreach($pairs as $path => $label){
+            if(strlen($path) <= strlen($baseGroup)) unset($pairs[$path]);
+        }
+        return $pairs;
     }
 
 }
