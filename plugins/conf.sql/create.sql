@@ -48,7 +48,12 @@ CREATE TABLE ajxp_roles (
 	role_id VARCHAR(50) PRIMARY KEY, 
 	serial_role TEXT(500) NOT NULL
 );
- 
+
+CREATE TABLE ajxp_groups (
+    groupPath VARCHAR(255) PRIMARY KEY,
+    groupLabel VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE ajxp_plugin_configs (
   id VARCHAR(50) NOT NULL,
   configs LONGTEXT NOT NULL,

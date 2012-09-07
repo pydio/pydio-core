@@ -415,8 +415,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::close();
 					return;									
 				}
-				
-				$confStorage = ConfService::getConfStorageImpl();		
+
+                AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
+                $confStorage = ConfService::getConfStorageImpl();
 				$newUser = $confStorage->createUserObject($new_user_login);
                 $basePath = AuthService::getLoggedUser()->getGroupPath();
                 if(empty ($basePath)) $basePath = "/";
@@ -432,7 +433,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					$newUser->setPref("CUSTOM_PARAMS", $customData);
 				
 				$newUser->save("superuser");
-				AuthService::createUser($new_user_login, $httpVars["new_user_pwd"]);
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
 				AJXP_XMLWriter::reloadDataNode("", $new_user_login);
@@ -1301,7 +1301,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         foreach($groups as $groupId => $groupLabel){
 
-            AJXP_XMLWriter::renderNode("/data/".$root."/".$groupId,
+            AJXP_XMLWriter::renderNode("/data/".$root."/".ltrim($groupId,"/"),
                 $groupLabel, false, array(
                     "icon" => "users-folder.png",
                     "ajxp_mime" => "group"

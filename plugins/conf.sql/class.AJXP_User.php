@@ -295,7 +295,7 @@ class AJXP_User extends AbstractAjxpUser
 
     function getPref($prefName){
         $p = parent::getPref($prefName);
-        if(isSet($p)){
+        if(isSet($p) && is_string($p)){
             if(strpos($p, '$phpserial$') !== false && strpos($p, '$phpserial$') === 0){
                 $p = substr($p, strlen('$phpserial$'));
                 return unserialize($p);
@@ -421,8 +421,11 @@ class AJXP_User extends AbstractAjxpUser
 	 */
 	function load(){
 		$this->log('Loading all user data..');
+        // update group
+        $res = dibi::query('SELECT [groupPath] FROM [ajxp_users] WHERE [login] = %s', $this->getId());
+        $this->groupPath = $res->fetchSingle();
+
 		$result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM [ajxp_user_rights] WHERE [login] = %s', $this->getId());
-		
 		$this->rights = $result_rights->fetchPairs('repo_uuid', 'rights');
 		
 		// Db field returns integer or string so we are required to cast it in order to make the comparison
@@ -520,6 +523,12 @@ class AJXP_User extends AbstractAjxpUser
                 'repo_uuid' => 'ajxp.actions',
                 'rights'	=> serialize($this->rights['ajxp.actions'])));
         }
+
+        if(!empty($this->groupPath)){
+            // Trigger ajxp_users table update
+            $this->setGroupPath($this->groupPath);
+        }
+
 	}
 	
 	/**
@@ -590,5 +599,11 @@ class AJXP_User extends AbstractAjxpUser
 			throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
 		}
 	}
+
+    function setGroupPath($groupPath){
+        $this->groupPath = $groupPath;
+        dibi::query('UPDATE [ajxp_users] SET ', Array('groupPath'=>$groupPath), 'WHERE [login] = %s', $this->getId());
+        $this->log('UPDATE GROUP: [Login]: '.$this->getId().' [Group]:'.$groupPath);
+    }
 
 }
