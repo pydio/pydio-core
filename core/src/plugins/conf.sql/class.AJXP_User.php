@@ -424,6 +424,10 @@ class AJXP_User extends AbstractAjxpUser
         // update group
         $res = dibi::query('SELECT [groupPath] FROM [ajxp_users] WHERE [login] = %s', $this->getId());
         $this->groupPath = $res->fetchSingle();
+        if(empty($this->groupPath)){
+            // Auto migrate from old version
+            $this->setGroupPath("/");
+        }
 
 		$result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM [ajxp_user_rights] WHERE [login] = %s', $this->getId());
 		$this->rights = $result_rights->fetchPairs('repo_uuid', 'rights');
@@ -525,7 +529,6 @@ class AJXP_User extends AbstractAjxpUser
         }
 
         if(!empty($this->groupPath)){
-            // Trigger ajxp_users table update
             $this->setGroupPath($this->groupPath);
         }
 
