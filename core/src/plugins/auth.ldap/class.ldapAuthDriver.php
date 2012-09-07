@@ -41,7 +41,6 @@ class ldapAuthDriver extends AbstractAuthDriver {
 
     function init($options){
         parent::init($options);
-        AJXP_Logger::logAction('Auth.ldap :: init');
         $this->ldapUrl = $options["LDAP_URL"];
         if ($options["LDAP_PORT"]) $this->ldapPort = $options["LDAP_PORT"];
         if ($options["LDAP_USER"]) $this->ldapAdminUsername = $options["LDAP_USER"];
@@ -60,14 +59,29 @@ class ldapAuthDriver extends AbstractAuthDriver {
 			$this->ldapUserAttr = $options["LDAP_USERATTR"]; 
 		}else{ 
 			$this->ldapUserAttr = 'uid' ; 
-		}        
+		}
+        /*
         $this->ldapconn = $this->LDAP_Connect();
         if ($this->ldapconn == null) AJXP_Logger::logAction('LDAP Server connexion could NOT be established');
+        */
+    }
+
+    function startConnexion(){
+        AJXP_Logger::logAction('Auth.ldap :: init');
+        if($this->ldapconn == null){
+            $this->ldapconn = $this->LDAP_Connect();
+            if($this->ldapconn == null) {
+                AJXP_Logger::logAction('LDAP Server connexion could NOT be established');
+            }
+        }
+        //return $this->ldapconn;
     }
 
     function __deconstruct(){
         //@todo : if PHP server < 5, this method will never be closed. Maybe use a close() method ?
-        ldap_close($this->ldapconn);
+        if($this->ldapconn != null){
+            ldap_close($this->ldapconn);
+        }
     }
 
     function LDAP_Connect(){
@@ -108,6 +122,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             if($this->ldapFilter == "") $filter = "(" . $this->ldapUserAttr . "=" . $login . ")";
             else  $filter = "(&" . $this->ldapFilter . "(" . $this->ldapUserAttr . "=" . $login . "))";
         }
+        $this->startConnexion();
         $conn = array();
         if(is_array($this->ldapDN)){
             foreach($this->ldapDN as $dn){
