@@ -328,6 +328,31 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="edit2" fileDefault="true">
+			<gui text="ajxp_conf.93" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+					actionBar="true" contextMenu="true" infoPanel="true"
+					actionBarGroup="change" inZip="false">
+				</context>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role" behaviour="hidden"></selectionContext></gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
+            <processing>
+                <clientCallback prepareModal="false"><![CDATA[
+                    var editorData = window.actionArguments[0];
+                    if(!editorData){
+                        var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
+                        var editors = ajaxplorer.findEditorsForMime(selectedMime);
+                        if(editors.length && editors[0].openable){
+                            editorData = editors[0];
+                        }
+                    }
+                    if(editorData){
+                        ajaxplorer.loadEditorResources(editorData.resourcesManager);
+                        modal.openEditorDialog(editorData);
+                    }
+                ]]></clientCallback>
+            </processing>
+        </action>
 		<action name="edit" fileDefault="true">
 			<gui text="ajxp_conf.93" title="301" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
