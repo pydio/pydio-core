@@ -470,7 +470,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				$confStorage = ConfService::getConfStorageImpl();		
 				$user = $confStorage->createUserObject($httpVars["user_id"]);
-				$user->setRight(AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), AJXP_Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
+				$user->personalRole->setAcl(AJXP_Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM), AJXP_Utils::sanitize($httpVars["right"], AJXP_SANITIZE_ALPHANUM));
 				$user->save();
 				$loggedUser = AuthService::getLoggedUser();
 				if($loggedUser->getId() == $user->getId()){
@@ -805,7 +805,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
 				}else{
 					$loggedUser = AuthService::getLoggedUser();
-					$loggedUser->setRight($newRep->getUniqueId(), "rw");
+					$loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
 					$loggedUser->save("superuser");
 					AuthService::updateUser($loggedUser);
 					

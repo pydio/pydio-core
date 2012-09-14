@@ -163,6 +163,20 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
      */
 	abstract function listRoles($roleIds = array(), $excludeReserved = false);
 	abstract function saveRoles($roles);
+
+    /**
+     * @abstract
+     * @param AJXP_Role $role
+     * @return void
+     */
+    abstract function updateRole($role);
+
+    /**
+     * @abstract
+     * @param AJXP_Role|String $role
+     * @return void
+     */
+    abstract function deleteRole($role);
 	
 	/**
 	 * Specific queries
@@ -170,7 +184,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	abstract function countAdminUsers();
 	
 	/**
-	 * Instantiate a new AJXP_User
+	 * Instantiate a new AbstractAjxpUser
 	 *
 	 * @param String $userId
 	 * @return AbstractAjxpUser
@@ -585,7 +599,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 }else{
                     // Make sure we do not overwrite otherwise loaded rights.
                     $loggedUser->load();
-                    $loggedUser->setRight($newRep->getUniqueId(), "rw");
+                    $loggedUser->personalRole->setAcl($newRep->getUniqueId(), "rw");
                     $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);
 

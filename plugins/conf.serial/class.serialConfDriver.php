@@ -124,6 +124,22 @@ class serialConfDriver extends AbstractConfDriver {
 		AJXP_Utils::saveSerialFile($this->rolesSerialFile, $roles);
 	}
 
+    function updateRole($role){
+        $all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);
+        $all[$role->getId()] = $role;
+        AJXP_Utils::saveSerialFile($this->rolesSerialFile, $all);
+    }
+
+    function deleteRole($role){
+        // Mixed input Object or ID
+        if(is_a($role, "AJXP_Role")) $roleId = $role->getId();
+        else $roleId = $role;
+
+        $all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);
+        if(isSet($all[$roleId])) unset($all[$roleId]);
+        AJXP_Utils::saveSerialFile($this->rolesSerialFile, $all);
+    }
+
 	function countAdminUsers(){
 		$confDriver = ConfService::getConfStorageImpl();
 		$authDriver = ConfService::getAuthDriverImpl();
