@@ -452,7 +452,7 @@ class AuthService
 					$userObject->setRight($repositoryId, $repoObject->getDefaultRight());
 				}
 			}
-            foreach(AuthService::getRolesList() as $roleId => $roleObject){
+            foreach(AuthService::getRolesList(array(), true) as $roleId => $roleObject){
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
                 if($roleObject->isDefault()){
                     $userObject->addRole($roleId);
@@ -595,7 +595,7 @@ class AuthService
 	}
 
     /**
-     * Delete a user in the auth driver impl
+     * Delete a user in the auth/conf driver impl
      * @static
      * @param $userId
      * @return bool
@@ -607,11 +607,10 @@ class AuthService
 		$authDriver = ConfService::getAuthDriverImpl();
 		$authDriver->deleteUser($userId);
 		$subUsers = array();
-		AJXP_User::deleteUser($userId, $subUsers);
+		ConfService::getConfStorageImpl()->deleteUser($userId, $subUsers);
 		foreach ($subUsers as $deletedUser){
 			$authDriver->deleteUser($deletedUser);
 		}
-
         AJXP_Controller::applyHook("user.after_delete", array($userId));
         AJXP_Logger::logAction("Delete User", array("user_id"=>$userId, "sub_user" => implode(",", $subUsers)));
 		return true;
@@ -722,13 +721,13 @@ class AuthService
 	 *
 	 * @param string $roleId
      * @param boolean $createIfNotExists
-	 * @return AjxpRole
+	 * @return AJXP_Role
 	 */
 	static function getRole($roleId, $createIfNotExists = false){
 		$roles = self::getRolesList();
 		if(isSet($roles[$roleId])) return $roles[$roleId];
         if($createIfNotExists){
-            $role = new AjxpRole($roleId);
+            $role = new AJXP_Role($roleId);
             if(self::getLoggedUser()!=null && self::getLoggedUser()->getGroupPath()!=null){
                 $role->setGroupPath(self::getLoggedUser()->getGroupPath());
             }
@@ -741,7 +740,7 @@ class AuthService
 	/**
 	 * Create or update role
 	 *
-	 * @param AjxpRole $roleObject
+	 * @param AJXP_Role $roleObject
 	 */
 	static function updateRole($roleObject){
 		$roles = self::getRolesList();
@@ -764,12 +763,24 @@ class AuthService
 	/**
      * Get all defined roles
      * @static
+     * @param array $roleIds
+     * @param boolean $excludeReserved,
      * @return AjxpRole[]
      */
-	static function getRolesList(){
-		if(isSet(self::$roles)) return self::$roles;
+	static function getRolesList($roleIds = array(), $excludeReserved = false){
+		//if(isSet(self::$roles)) return self::$roles;
 		$confDriver = ConfService::getConfStorageImpl();
-		self::$roles = $confDriver->listRoles();
+		self::$roles = $confDriver->listRoles($roleIds, $excludeReserved);
+        $repoList = null;
+        foreach(self::$roles as $roleId => $roleObject){
+            if(is_a($roleObject, "AjxpRole")){
+                if($repoList == null) $repoList = ConfService::getRepositoriesList();
+                $newRole = new AJXP_Role($roleId);
+                $newRole->migrateDeprectated($repoList, $roleObject);
+                self::$roles[$roleId] = $newRole;
+                self::saveRolesList(self::$roles);
+            }
+        }
 		return self::$roles;
 	}
 	/**

@@ -36,6 +36,31 @@ class AJXP_Role implements AjxpGroupPathProvider
     protected $actions = array();
     protected $autoApplies = array();
 
+    public function __construct($id){
+        $this->roleId = $id;
+    }
+
+    public function migrateDeprectated($repositoriesList, AjxpRole $oldRole){
+        $repositoriesList["ajxp.all"] = "";
+        foreach($repositoriesList as $repoId => $repoObject){
+            $right = $oldRole->getRight($repoId);
+            if(!empty($right)) $this->setAcl($repoId, $right);
+            $actions = $oldRole->getSpecificActionsRights($repoId);
+            if(count($actions)){
+                foreach($actions as $act => $status){
+                    if($repoId == "ajxp.all"){
+                        $this->setActionState("plugin_all", $act, AJXP_REPO_SCOPE_ALL, $status);
+                    }else{
+                        $this->setActionState("plugin_all", $act, $repoId, $status);
+                    }
+                }
+            }
+        }
+        $this->setGroupPath($oldRole->getGroupPath());
+        if($oldRole->isDefault()){
+            $this->setAutoApplies(array("all"));
+        }
+    }
 
     public function isGroupRole(){
         return strpos($this->roleId, "AJXP_GRP_") === 0;
@@ -43,6 +68,30 @@ class AJXP_Role implements AjxpGroupPathProvider
     public function isUserRole(){
         return strpos($this->roleId, "AJXP_USER_") === 0;
     }
+
+
+    /**
+     * Whether this role can read the given repo
+     * @param string $repositoryId Repository ID
+     * @return bool
+     */
+    function canRead($repositoryId){
+        $right = $this->getAcl($repositoryId);
+        if($right == "rw" || $right == "r") return true;
+        return false;
+    }
+
+    /**
+     * Whether this role can write the given repo
+     * @param string $repositoryId Repository ID
+     * @return bool
+     */
+    function canWrite($repositoryId){
+        $right = $this->getAcl($repositoryId);
+        if($right == "rw" || $right == "w") return true;
+        return false;
+    }
+
 
     /**
      * @param string $repositoryId
@@ -131,6 +180,18 @@ class AJXP_Role implements AjxpGroupPathProvider
         $this->actions = $this->setArrayValue($this->actions, $repositoryId, $pluginId, $actionName, $state);
         return;
     }
+
+    public function listActionsStates(){
+        return $this->actions;
+    }
+
+    public function listActionsStatesFor($repositoryId){
+        if(isSet($this->actions[$repositoryId])){
+            return $this->actions[$repositoryId];
+        }
+        return array();
+    }
+
     /**
      * @param string $pluginId
      * @param string $actionName
@@ -147,10 +208,11 @@ class AJXP_Role implements AjxpGroupPathProvider
         }
         return $inputState;
     }
+
     /**
      * @return array
      */
-    public function listActionStates(){
+    public function listAllActionsStates(){
         return $this->actions;
     }
 
@@ -159,9 +221,9 @@ class AJXP_Role implements AjxpGroupPathProvider
      * @return AJXP_Role
      */
     public function override(AJXP_Role $role){
-        $newRole = new AJXP_Role();
+        $newRole = new AJXP_Role($role->getId());
 
-        $newAcls = array_merge($role->listAcls(), $this->listAcls());
+        $newAcls = $this->array_merge_recursive2($role->listAcls(), $this->listAcls());
         foreach($newAcls as $repoId => $rightString){
             if($rightString == AJXP_VALUE_CLEAR) continue;
             $newRole->setAcl($repoId, $rightString);
@@ -177,7 +239,7 @@ class AJXP_Role implements AjxpGroupPathProvider
             }
         }
 
-        $newActions = $this->array_merge_recursive2($role->listActionStates(), $this->listActionStates());
+        $newActions = $this->array_merge_recursive2($role->listActionsStates(), $this->listActionsStates());
         foreach($newActions as $repoId => $data){
             foreach ($data as $pluginId => $action) {
                 foreach($action as $actionName => $actionState){
@@ -262,22 +324,17 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $this->groupPath;
     }
 
-    public function setRoleId($roleId)
-    {
-        $this->roleId = $roleId;
-    }
-
-    public function getRoleId()
+    public function getId()
     {
         return $this->roleId;
     }
 
-    public function setRoleLabel($roleLabel)
+    public function setLabel($roleLabel)
     {
         $this->roleLabel = $roleLabel;
     }
 
-    public function getRoleLabel()
+    public function getLabel()
     {
         return $this->roleLabel;
     }
@@ -296,4 +353,78 @@ class AJXP_Role implements AjxpGroupPathProvider
     public function autoAppliesTo($specificRight){
         return in_array($specificRight, $this->autoApplies);
     }
+
+
+    ////////////// DEPRECATED METHODS /////////////
+    /**
+     * @deprecated
+     * @param $repositoryId
+     * @return string
+     */
+    function getRight($repositoryId){
+        return $this->getAcl($repositoryId);
+    }
+    /**
+     * @param $repositoryId
+     * @param $rightString
+     * @deprecated
+     */
+    function setRight($repositoryId, $rightString){
+        $this->setAcl($repositoryId, $rightString);
+    }
+
+    /**
+     * @param $repositoryId
+     * @deprecated
+     */
+    function removeRights($repositoryId){
+        $this->setAcl($repositoryId, "");
+    }
+
+    /**
+     * Get the specific actions rights (see setSpecificActionsRights)
+     * @param $rootDirId
+     * @return array
+     * @deprecated
+     */
+    function getSpecificActionsRights($rootDirId){
+        // flatten one level
+        if($rootDirId == "ajxp.all") $rootDirId = AJXP_REPO_SCOPE_ALL;
+        $actions = $this->listActionsStatesFor($rootDirId);
+        $all = array();
+        foreach($actions as $pluginId => $acts){
+            $all = array_merge($all, $acts);
+        }
+        return $all;
+    }
+
+    /**
+     * This method allows to specifically disable some actions for a given role for one or more repository.
+     * @param string $rootDirId Repository id or "ajxp.all" for all repositories
+     * @param string $actionName
+     * @param bool $allowed
+     * @deprecated
+     * @return void
+     */
+    function setSpecificActionRight($rootDirId, $actionName, $allowed){
+        if($rootDirId == "ajxp.all") $rootDirId = AJXP_REPO_SCOPE_ALL;
+        $this->setActionState("all_plugins", $actionName, $rootDirId, $allowed);
+    }
+
+    /**
+     * @return bool
+     * @deprecated
+     */
+    function isDefault(){
+        return $this->autoAppliesTo("all");
+    }
+
+    /**
+     * @deprecated
+     */
+    function setDefault($value){
+        if($value) $this->setAutoApplies(array("all"));
+        else $this->setAutoApplies(array());
+    }
+
 }

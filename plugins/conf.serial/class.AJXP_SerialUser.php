@@ -25,7 +25,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package info.ajaxplorer.plugins
  * Implementation of the AbstractUser for serial 
  */
-class AJXP_User extends AbstractAjxpUser 
+class AJXP_SerialUser extends AbstractAjxpUser
 {
 	var $id;
 	var $hasAdmin = false;
@@ -93,29 +93,46 @@ class AJXP_User extends AbstractAjxpUser
         if(isSet($this->rights["ajxp.group_path"])){
             $this->setGroupPath($this->rights["ajxp.group_path"]);
         }
-        $allRoles = AuthService::getRolesList(); // Maintained as instance variable
-        // LOAD GROUP ROLES IF THEY EXIST
+
+        $rolesToLoad = array();
+        if(isSet($this->rights["ajxp.roles"])) {
+            $rolesToLoad = array_keys($this->rights["ajxp.roles"]);
+        }
         if($this->groupPath != null){
-            $base = "/";
+            $base = "";
             $exp = explode("/", $this->groupPath);
             foreach($exp as $pathPart){
-                $base = $base . $pathPart;
-                if(isSet($allRoles["AJXP_GRP_".$base])){
-                    $this->roles["AJXP_GRP_".$base] = $allRoles["AJXP_GRP_".$base];
-                    $this->rights["ajxp.roles"]["AJXP_GRP_".$base] = true;
-                }
+                if(empty($pathPart)) continue;
+                $base = $base . "/" . $pathPart;
+                $rolesToLoad[] = "AJXP_GRP_".$base;
             }
         }
 		// Load roles
-		if(isSet($this->rights["ajxp.roles"])){
-			foreach (array_keys($this->rights["ajxp.roles"]) as $roleId){
+		if(count($rolesToLoad)){
+            $allRoles = AuthService::getRolesList($rolesToLoad);
+			foreach ($rolesToLoad as $roleId){
 				if(isSet($allRoles[$roleId])){
 					$this->roles[$roleId] = $allRoles[$roleId];
-				}else{
+                    $this->rights["ajxp.roles"][$roleId] = true;
+				}else if(is_array($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])){
 					unset($this->rights["ajxp.roles"][$roleId]);
 				}
 			}
 		}
+
+        // LOAD USR ROLE LOCALLY
+        $personalRole = AJXP_Utils::loadSerialFile($this->getStoragePath()."/role.ser");
+        if(is_a($personalRole, "AJXP_Role")){
+            $this->personalRole = $personalRole;
+            $this->roles["AJXP_USR_"."/".$this->id] = $personalRole;
+        }else{
+            // MIGRATE NOW !
+            $this->migrateRightsToPersonalRole();
+            AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, true);
+            AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, true);
+        }
+
+        $this->recomputeMergedRole();
 	}
 	
 	function save($context = "superuser"){
@@ -142,6 +159,7 @@ class AJXP_User extends AbstractAjxpUser
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         if(isSet($this->registerForSave["rights"]) || $this->create){
             AJXP_Utils::saveSerialFile($this->getStoragePath()."/rights.ser", $this->rights, !$fastCheck);
+            AJXP_Utils::saveSerialFile($this->getStoragePath()."/role.ser", $this->personalRole, !$fastCheck);
         }
         if(isSet($this->registerForSave["prefs"])){
             AJXP_Utils::saveSerialFile($this->getStoragePath()."/prefs.ser", $this->prefs, !$fastCheck);
@@ -163,45 +181,5 @@ class AJXP_User extends AbstractAjxpUser
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
         return AJXP_Utils::saveSerialFile($this->getStoragePath()."/".$key.".ser", $value, !$fastCheck);
 	}
-	
-	/**
-	 * Static function for deleting a user
-	 * 
-	 * @param String $userId
-	 * @param Array $deletedSubUsers
-	 */
-	static function deleteUser($userId, &$deletedSubUsers){
-		$storage = ConfService::getConfStorageImpl();
-        $user = ConfService::getConfStorageImpl()->createUserObject($userId);
-        $files = glob($user->getStoragePath()."/*.ser");
-		if(is_array($files) && count($files)){
-			foreach ($files as $file){
-				unlink($file);
-			}
-		}
-		if(is_dir($user->getStoragePath())) rmdir($user->getStoragePath());
-		
-		$authDriver = ConfService::getAuthDriverImpl();
-		$confDriver = ConfService::getConfStorageImpl();		
-		$users = $authDriver->listUsers();
-		foreach (array_keys($users) as $id){
-			$object = $confDriver->createUserObject($id);
-			if($object->hasParent() && $object->getParent() == $userId){
-				AJXP_User::deleteUser($id, $deletedSubUsers);
-				$deletedSubUsers[] = $id;
-			}
-		}
-
-        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser");
-        if(isSet($groups[$userId])){
-            unset($groups[$userId]);
-            AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
-
-        }
-
-    }
 
 }
-
-
-?>

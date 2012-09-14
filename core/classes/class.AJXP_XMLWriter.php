@@ -442,7 +442,6 @@ class AJXP_XMLWriter
 			}else{
 				$buffer .= "<ajxp_roles>";
 				foreach ($loggedUser->getRoles() as $roleId => $boolean){
-                    if(strpos($roleId, "AJXP_GRP_") === 0) continue;
 					if($boolean === true) $buffer.= "<role id=\"$roleId\"/>";
 				}
 				$buffer .= "</ajxp_roles>";

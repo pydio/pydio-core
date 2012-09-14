@@ -157,9 +157,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 		
 	/**
 	 * Must return an associative array of roleId => AjxpRole objects.
-	 *
-	 */
-	abstract function listRoles();
+     * @param array $roleIds
+     * @param boolean $excludeReserved,
+     * @return array AjxpRole[]
+     */
+	abstract function listRoles($roleIds = array(), $excludeReserved = false);
 	abstract function saveRoles($roles);
 	
 	/**
@@ -181,8 +183,17 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
         AuthService::updateAuthProvidedData($abstractUser);
 		return $abstractUser;
 	}
-	
-	/**
+
+    /**
+     * Function for deleting a user
+     *
+     * @param String $userId
+     * @param Array $deletedSubUsers
+     */
+    abstract function deleteUser($userId, &$deletedSubUsers);
+
+
+        /**
 	 * Instantiate the right class
 	 *
 	 * @param AbstractAjxpUser $userId
