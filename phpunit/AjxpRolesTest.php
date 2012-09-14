@@ -101,4 +101,23 @@ class AjxpRolesTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testRolesStorage(){
+
+        $pServ = AJXP_PluginsService::getInstance();
+        ConfService::init();
+        $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
+        $pServ->loadPluginsRegistry(AJXP_INSTALL_PATH."/plugins", $confPlugin);
+        ConfService::start();
+
+        $r = new AJXP_Role("phpunit_temporary_role");
+        $r->setAcl(0, "rw");
+        AuthService::updateRole($r);
+        $r1 = AuthService::getRole("phpunit_temporary_role");
+        $this->assertTrue(is_a($r1, "AJXP_Role"));
+        $this->assertEquals("rw", $r1->getAcl(0));
+        AuthService::deleteRole("phpunit_temporary_role");
+        $r2 = AuthService::getRole("phpunit_temporary_role");
+        $this->assertFalse($r2);
+    }
+
 }
