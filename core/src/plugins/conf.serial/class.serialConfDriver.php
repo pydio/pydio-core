@@ -102,8 +102,22 @@ class serialConfDriver extends AbstractConfDriver {
 
 	}
 
-	function listRoles(){
-		return AJXP_Utils::loadSerialFile($this->rolesSerialFile);
+	function listRoles($roleIds = array(), $excludeReserved = false){
+		$all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);
+        $result = array();
+        if(count($roleIds)){
+            foreach($roleIds as $id){
+                if(isSet($all[$id]) && !($excludeReserved && strpos($id,"AJXP_") === 0)) {
+                    $result[$id] = $all[$id];
+                }
+            }
+        }else{
+            foreach($all as $id => $role){
+                if($excludeReserved && strpos($id,"AJXP_") === 0) continue;
+                $result[$id] = $role;
+            }
+        }
+        return $result;
 	}
 
 	function saveRoles($roles){
@@ -307,10 +321,47 @@ class serialConfDriver extends AbstractConfDriver {
      * @return AbstractAjxpUser
 	 */
 	function instantiateAbstractUserImpl($userId){
-		return new AJXP_User($userId, $this);
+		return new AJXP_SerialUser($userId, $this);
 	}
 
 	function getUserClassFileName(){
-		return AJXP_INSTALL_PATH."/plugins/conf.serial/class.AJXP_User.php";
+		return AJXP_INSTALL_PATH."/plugins/conf.serial/class.AJXP_SerialUser.php";
 	}
+
+    /**
+     * Function for deleting a user
+     *
+     * @param String $userId
+     * @param Array $deletedSubUsers
+     */
+    function deleteUser($userId, &$deletedSubUsers)
+    {
+        $user = $this->createUserObject($userId);
+        $files = glob($user->getStoragePath()."/*.ser");
+        if(is_array($files) && count($files)){
+            foreach ($files as $file){
+                unlink($file);
+            }
+        }
+        if(is_dir($user->getStoragePath())) {
+            rmdir($user->getStoragePath());
+        }
+
+        $authDriver = ConfService::getAuthDriverImpl();
+        $users = $authDriver->listUsers();
+        foreach (array_keys($users) as $id){
+            $object = $this->createUserObject($id);
+            if($object->hasParent() && $object->getParent() == $userId){
+                $this->deleteUser($id, $deletedSubUsers);
+                $deletedSubUsers[] = $id;
+            }
+        }
+
+        $groups = AJXP_Utils::loadSerialFile(AJXP_VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser");
+        if(isSet($groups[$userId])){
+            unset($groups[$userId]);
+            AJXP_Utils::saveSerialFile(AJXP_VarsFilter::filter($user->storage->getOption("USERS_DIRPATH"))."/groups.ser", $groups);
+
+        }
+    }
 }

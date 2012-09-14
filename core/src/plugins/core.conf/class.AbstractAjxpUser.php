@@ -31,14 +31,25 @@ abstract class AbstractAjxpUser
 	var $id;
 	var $hasAdmin = false;
 	var $rights;
-	var $roles;
+    /**
+     * @var AJXP_Role[]
+     */
+    var $roles;
 	var $prefs;
 	var $bookmarks;
 	var $version;
 	var $parentUser;
 
     var $groupPath = "/";
-	
+    /**
+     * @var AJXP_Role
+     */
+    var $mergedRole;
+    /**
+     * @var AJXP_Role
+     */
+    var $personalRole;
+
 	/**
 	 * Conf Storage implementation
 	 *
@@ -46,7 +57,7 @@ abstract class AbstractAjxpUser
 	 */
 	var $storage;
 	
-	function AbstractAjxpUser($id, $storage=null){		
+	function AbstractAjxpUser($id, $storage=null){
 		$this->id = $id;
 		if($storage == null){
 			$storage = ConfService::getConfStorageImpl();
@@ -106,12 +117,14 @@ abstract class AbstractAjxpUser
 	function addRole($roleId){
 		if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
 		$this->rights["ajxp.roles"][$roleId] = true;
+        $this->recomputeMergedRole();
 	}
 	
 	function removeRole($roleId){
 		if(isSet($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])){
 			unset($this->rights["ajxp.roles"][$roleId]);
 		}
+        $this->recomputeMergedRole();
 	}
 	
 	function getRoles(){
@@ -140,36 +153,24 @@ abstract class AbstractAjxpUser
 	}
 	
 	function canRead($rootDirId){
-		$right = $this->getRight($rootDirId);
-		if($right == "rw" || $right == "r") return true;
-		return false;
+
+        return $this->mergedRole->canRead($rootDirId);
+
 	}
 	
 	function canWrite($rootDirId){
-		$right = $this->getRight($rootDirId);
-		if($right == "rw" || $right == "w") return true;
-		return false;
-	}
+        return $this->mergedRole->canWrite($rootDirId);
+    }
 	
 	function getSpecificActionsRights($rootDirId){
-		$result = array();
-		if(isSet($this->rights["ajxp.actions"]) && isSet($this->rights["ajxp.actions"][$rootDirId])){
-			$result = $this->rights["ajxp.actions"][$rootDirId];
-		}
-		// Check in roles if any
-		if(isSet($this->roles)){
-			foreach ($this->roles as $role){
-				$rights = $role->getSpecificActionsRights($rootDirId);
-				if(is_array($rights) && count($rights)) $result = array_merge($result, $rights);
-			}
-		}		
-		return $result;
+        return $this->mergedRole->listActionsStatesFor($rootDirId);
 	}
 	
-	function setSpecificActionRight($rootDirId, $actionName, $allowed){		
-		if(!isSet($this->rights["ajxp.actions"])) $this->rights["ajxp.actions"] = array();
-		if(!isset($this->rights["ajxp.actions"][$rootDirId])) $this->rights["ajxp.actions"][$rootDirId] = array();
-		$this->rights["ajxp.actions"][$rootDirId][$actionName] = $allowed;
+	function setSpecificActionRight($rootDirId, $actionName, $allowed){
+
+        $this->personalRole->setActionState("plugin.all", $actionName, $rootDirId, $allowed);
+        $this->recomputeMergedRole();
+
 	}
 	
 	/**
@@ -183,46 +184,23 @@ abstract class AbstractAjxpUser
 		if($repositoryObject == null) return false;
 		if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
         if($repositoryObject->getUniqueUser() && $this->id != $repositoryObject->getUniqueUser()) return false;
-		return ($this->canRead($repositoryId) || $this->canWrite($repositoryId)) ;
+		return ($this->mergedRole->canRead($repositoryId) || $this->mergedRole->canWrite($repositoryId)) ;
 	}
 	
 	function getRight($rootDirId){
-		if(isSet($this->rights[$rootDirId]) && $this->rights[$rootDirId] != "") {
-			if($this->rights[$rootDirId] == "n") return ""; // Force overriding the role
-			return $this->rights[$rootDirId];
-		}
-		// Check in roles if any
-		if(isSet($this->roles)){			
-			foreach ($this->roles as $role){
-				$right = $role->getRight($rootDirId);
-				if($right != "") return $right;
-			}
-		}
-		return "";
+        return $this->mergedRole->getAcl($rootDirId);
 	}
 	
 	function setRight($rootDirId, $rightString){
-		// If a role already has this right, set user's right to ""
-		if(isSet($this->roles)){			
-			foreach ($this->roles as $role){
-				$right = $role->getRight($rootDirId);
-				if($right == $rightString){
-					$rightString = "";
-					break;
-				}
-			}
-		}
-		$this->rights[$rootDirId] = $rightString;
+        $this->personalRole->setAcl($rootDirId, $rightString);
+        $this->recomputeMergedRole();
 	}
 	
 	function removeRights($rootDirId){
-		if(isSet($this->rights[$rootDirId])) unset($this->rights[$rootDirId]);
+        $this->personalRole->setAcl($rootDirId, "");
+        $this->recomputeMergedRole();
 	}
 	
-	function clearRights(){
-		$this->rights = array();
-	}
-		
 	function getPref($prefName){
 		if(isSet($this->prefs[$prefName])) return $this->prefs[$prefName];
 		return "";
@@ -302,17 +280,6 @@ abstract class AbstractAjxpUser
 	abstract function load();
 	
 	abstract function save($context = "superuser");
-
-	/**
-	 * Static function for deleting a user.
-	 * Also removes associated rights, preferences and bookmarks.
-	 * WARNING : MUST ALSO DELETE THE CHILDREN!
-	 *
-	 * @param String $userId Login to delete.
-	 * @param Array $deletedSubUsers an empty array to be filled by the method
-	 * @return null or -1 on error.
-	 */
-	static function deleteUser($userId, &$deletedSubUsers){}
 	
 	abstract function getTemporaryData($key);
 	
@@ -339,6 +306,36 @@ abstract class AbstractAjxpUser
     {
         if(!isSet($this->groupPath)) return null;
         return $this->groupPath;
+    }
+
+    protected function recomputeMergedRole(){
+        if(!count($this->roles)) {
+            throw new Exception("Empty role, this is not normal");
+        }
+        $this->mergedRole =  $this->roles[array_shift(array_keys($this->roles))];
+        $index = 0;
+        foreach($this->roles as $role){
+            if($index > 0) $this->mergedRole = $role->override($this->mergedRole);
+            $index ++;
+        }
+    }
+
+    protected function migrateRightsToPersonalRole(){
+        $this->personalRole = new AJXP_Role("AJXP_USR_"."/".$this->id);
+        $this->roles["AJXP_USR_"."/".$this->id] = $this->personalRole;
+        foreach($this->rights as $rightKey => $rightValue){
+            if($rightKey == "ajxp.actions" && is_array($rightValue)){
+                foreach($rightValue as $repoId => $repoData){
+                    foreach($repoData as $actionName => $actionState){
+                        $this->personalRole->setActionState("plugin.all", $actionName, $repoId, $actionState);
+                    }
+                }
+                unset($this->rights[$rightKey]);
+            }
+            if(strpos($rightKey, "ajxp.") === 0) continue;
+            $this->personalRole->setAcl($rightKey, $rightValue);
+            unset($this->rights[$rightKey]);
+        }
     }
 }
 

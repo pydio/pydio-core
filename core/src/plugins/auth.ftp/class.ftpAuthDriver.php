@@ -86,7 +86,7 @@ class ftpAuthDriver extends AbstractAuthDriver {
 		$adminUser = $this->options["ADMIN_USER"];
 		$subUsers = array();
 		if($crtUser != $adminUser && $crtUser!=""){
-			AJXP_User::deleteUser($crtUser, $subUsers);
+            ConfService::getConfStorageImpl()->deleteUser($crtUser, $subUsers);
 		}
 		AuthService::disconnect();
         session_destroy();

@@ -29,7 +29,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class ajxp_confAccessDriver extends AbstractAccessDriver 
 {	
 
-    private $listSpecialRoles = true;
+    private $listSpecialRoles = AJXP_SERVER_DEBUG;
 
 	function listAllActions($action, $httpVars, $fileVars){
         if(!isSet($this->actions[$action])) return;
@@ -388,8 +388,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
 				print("<edit_options edit_pass=\"".$editPass."\" edit_admin_right=\"".(($userId!="guest"&&$userId!=$loggedUser->getId())?"1":"0")."\" edit_delete=\"".(($userId!="guest"&&$userId!=$loggedUser->getId()&&$authDriver->usersEditable())?"1":"0")."\"/>");
 				print("<ajxp_roles>");
-				foreach (AuthService::getRolesList() as $roleId => $roleObject){
-                    if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
+				foreach (AuthService::getRolesList(array(), !$this->listSpecialRoles) as $roleId => $roleObject){
+                    //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
                     if(!AuthService::canAssign($roleObject)) continue;
 					print("<role id=\"$roleId\"/>");
 				}
@@ -581,7 +581,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}				
 				print("</ajxp_roles></user>");
 				print("<ajxp_roles>");
-				foreach (AuthService::getRolesList() as $roleId => $roleObject){
+				foreach (AuthService::getRolesList(array(), !$this->listSpecialRoles) as $roleId => $roleObject){
 					print("<role id=\"$roleId\"/>");
 				}
 				print("</ajxp_roles>");				
@@ -1361,12 +1361,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			<column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
 			</columns>');
 		if(!AuthService::usersEnabled()) return ;
-		$roles = AuthService::getRolesList();
+		$roles = AuthService::getRolesList(array(), !$this->listSpecialRoles);
 		$mess = ConfService::getMessages();
 		$repos = ConfService::getRepositoriesList();
         ksort($roles);
         foreach($roles as $roleId => $roleObject) {
-            if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
+            //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
 			$r = array();
             if(!AuthService::canAdministrate($roleObject)) continue;
 			foreach ($repos as $repoId => $repository){
