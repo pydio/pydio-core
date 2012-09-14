@@ -44,11 +44,11 @@ abstract class AbstractAjxpUser
     /**
      * @var AJXP_Role
      */
-    var $mergedRole;
+    public $mergedRole;
     /**
-     * @var AJXP_Role
+     * @var AJXP_Role Accessible for update
      */
-    var $personalRole;
+    public $personalRole;
 
 	/**
 	 * Conf Storage implementation
@@ -153,9 +153,7 @@ abstract class AbstractAjxpUser
 	}
 	
 	function canRead($rootDirId){
-
         return $this->mergedRole->canRead($rootDirId);
-
 	}
 	
 	function canWrite($rootDirId){
@@ -200,6 +198,11 @@ abstract class AbstractAjxpUser
         $this->personalRole->setAcl($rootDirId, "");
         $this->recomputeMergedRole();
 	}
+
+    function clearRights(){
+        $this->personalRole->clearAcls();
+        $this->recomputeMergedRole();
+    }
 	
 	function getPref($prefName){
 		if(isSet($this->prefs[$prefName])) return $this->prefs[$prefName];

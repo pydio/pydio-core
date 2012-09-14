@@ -477,7 +477,7 @@ class AJXP_XMLWriter
 	/**
      * Write the repositories access rights in XML format
      * @static
-     * @param AJXP_User|null $loggedUser
+     * @param AbstractAjxpUser|null $loggedUser
      * @param bool $details
      * @return string
      */

@@ -98,9 +98,7 @@ class sqlAuthDriver extends AbstractAuthDriver {
 	}
 	
 	function createUser($login, $passwd){
-		$users = $this->listUsers();
-		if(!is_array($users)) $users = array();
-		if(array_key_exists($login, $users)) return "exists";
+		if($this->userExists($login)) return "exists";
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
 			$userData["password"] = md5($passwd);
@@ -110,18 +108,17 @@ class sqlAuthDriver extends AbstractAuthDriver {
 		dibi::query('INSERT INTO [ajxp_users]', $userData);
 	}	
 	function changePassword($login, $newPass){
-		$users = $this->listUsers();
-		if(!is_array($users) || !array_key_exists($login, $users)) return ;
+        if(!$this->userExists($login)) throw new Exception("User does not exists!");
 		$userData = array("login" => $login);
 		if($this->getOption("TRANSMIT_CLEAR_PASS") === true){
 			$userData["password"] = md5($newPass);
 		}else{
 			$userData["password"] = $newPass;
 		}
-		dibi::query("UPDATE [ajxp_users] SET ", $userData, "WHERE `login`=%s", $login);
+		dibi::query("UPDATE [ajxp_users] SET ", $userData, "WHERE [login]=%s", $login);
 	}	
 	function deleteUser($login){
-		dibi::query("DELETE FROM [ajxp_users] WHERE `login`=%s", $login);
+		dibi::query("DELETE FROM [ajxp_users] WHERE [login]=%s", $login);
 	}
 
 	function getUserPass($login){

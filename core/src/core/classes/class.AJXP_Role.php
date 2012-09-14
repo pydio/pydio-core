@@ -123,6 +123,10 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $this->acls;
     }
 
+    public function clearAcls(){
+        $this->acls = array();
+    }
+
     /**
      * @param string $pluginId
      * @param string $parameterName

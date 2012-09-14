@@ -47,7 +47,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
      * @param $id
      * @param serialConfDriver $storage
      */
-    function AJXP_User($id, $storage=null){
+    function AJXP_SerialUser($id, $storage=null){
 		parent::AbstractAjxpUser($id, $storage);
         $this->registerForSave = array();
     }
@@ -94,6 +94,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
             $this->setGroupPath($this->rights["ajxp.group_path"]);
         }
 
+        // LOAD ROLES
         $rolesToLoad = array();
         if(isSet($this->rights["ajxp.roles"])) {
             $rolesToLoad = array_keys($this->rights["ajxp.roles"]);

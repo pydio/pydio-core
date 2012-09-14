@@ -37,7 +37,7 @@ require_once(AJXP_BIN_FOLDER."/dibi.compact.php");
  * @author ebrosnan
  *
  */
-class AJXP_User extends AbstractAjxpUser 
+class AJXP_SqlUser extends AbstractAjxpUser
 {
 	/**
 	 * Whether queries will be logged with AJXP_Logger
@@ -94,12 +94,12 @@ class AJXP_User extends AbstractAjxpUser
 	 * AJXP_User Constructor
 	 * @param $id String User login name.
 	 * @param $storage AbstractConfDriver User storage implementation.
-	 * @return AJXP_User
+	 * @return AJXP_SqlUser
 	 */
-	function AJXP_User($id, $storage=null, $debugEnabled = false){
+	function AJXP_SqlUser($id, $storage=null, $debugEnabled = false){
 		parent::AbstractAjxpUser($id, $storage);
 		//$this->debugEnabled = true;
-		
+
 		$this->log('Instantiating User');
 	}
 	
@@ -111,7 +111,7 @@ class AJXP_User extends AbstractAjxpUser
 	 * @return boolean false if storage does not exist
 	 */
 	function storageExists(){		
-		$this->log('Checking for existence of AJXP_User storage...');
+		$this->log('Checking for existence of AJXP_SqlUser storage...');
 		
 		try {
 			$dbinfo = dibi::getDatabaseInfo();
@@ -152,88 +152,7 @@ class AJXP_User extends AbstractAjxpUser
 			$logger->write($textMessage, $severityLevel);
 		}
 	}
-	
-	/**
-	 * Set the access rights of the user to a repository.
-	 * 
-	 * In the SQL implementation, the query is performed straight away.
-	 * Performing the query on AJXP_User::save() provides no speed benefit, as operations are usually carried out
-	 * one at a time and then saved.
-	 * 
-	 * @param $rootDirId String Repository Unique ID
-	 * @param $rightString String String containing access rights, one of '' | 'r' | 'rw'
-	 * @return null or -1 on error
-	 * 
-	 * @see AbstractAjxpUser#setRight($rootDirId, $rightString)
-	 */
-	function setRight($rootDirId, $rightString){
-		
-		// Prevent a query if the rights are identical to the existing rights.
-		if (array_key_exists($rootDirId, $this->rights) && $this->rights[$rootDirId] == $rightString) {
-			return;
-		}
-		
-		// Try/Catch DibiException
-		try {
-			// Update an existing right
-			if (array_key_exists($rootDirId, $this->rights)) {
-				
-				// Delete an existing rights row, because we have no permission at all to this repository.
-				if ('' == $rightString) {
-	
-					dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] = %s', $this->getId(), $rootDirId);
-	
-					$this->log('DELETE RIGHTS: [Login]: '.$this->getId().' [Repository UUID]:'.$rootDirId.' [Rights]:'.$rightString);
-					unset($this->rights[$rootDirId]); 
-					
-				// Update an existing rights row, because only some of the rights have changed.
-				} else {
-	
-					dibi::query('UPDATE [ajxp_user_rights] SET ', Array('rights'=>$rightString), 'WHERE [login] = %s AND [repo_uuid] = %s', $this->getId(), $rootDirId);
-	
-					$this->log('UPDATE RIGHTS: [Login]: '.$this->getId().' [Repository UUID]:'.$rootDirId.' [Rights]:'.$rightString);
-					$this->rights[$rootDirId] = $rightString;
-				}
-			
-			// The repository supplied does not exist, so insert the right.
-			} else {
-	
-				dibi::query('INSERT INTO [ajxp_user_rights]', Array(
-					'login' => $this->getId(),
-					'repo_uuid' => $rootDirId,
-					'rights' => $rightString		
-				));
-				
-				$this->log('INSERT RIGHTS: [Login]: '.$this->getId().' [Repository UUID]:'.$rootDirId.' [Rights]:'.$rightString);
-				$this->rights[$rootDirId] = $rightString;
-			}
-			
-		} catch (DibiException $e) {
-			$this->log('MODIFY RIGHTS FAILED: Reason: '.$e->getMessage());
-		}
-	}
-	
-	/**
-	 * Remove rights to the specified repository unique id.
-	 * 
-	 * @param $rootDirId String Repository Unique ID
-	 * @return null or -1 on error
-	 * @see AbstractAjxpUser#removeRights($rootDirId)
-	 */
-	function removeRights($rootDirId){
-		if (array_key_exists($rootDirId, $this->rights)) {
-			try {
-				dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s AND [repo_uuid] = %s', $this->getId(), $rootDirId);
-			} catch (DibiException $e) {
-				$this->log('DELETE RIGHTS: FAILED Reason: '.$e->getMessage());
-				return -1;
-			}
-			
-			$this->log('REMOVE RIGHTS: [Login]: '.$this->getId().' [Repository UUID]:'.$rootDirId.' [Rights]:'.$this->rights[$rootDirId]);
-			unset($this->rights[$rootDirId]);
-		}
-	}
-	
+
 	/**
 	 * Set a user preference.
 	 * 
@@ -300,7 +219,11 @@ class AJXP_User extends AbstractAjxpUser
                 $p = substr($p, strlen('$phpserial$'));
                 return unserialize($p);
             }
-            // old method
+            if(strpos($p, '$json$') !== false && strpos($p, '$json$') === 0){
+                $p = substr($p, strlen('$json$'));
+                return json_decode($p, true);
+            }
+            // By default, unserialize
             if($prefName == "CUSTOM_PARAMS"){
                 return unserialize($p);
             }
@@ -457,38 +380,62 @@ class AJXP_User extends AbstractAjxpUser
 			
 			$this->bookmarks[$b['repo_uuid']][] = Array('PATH'=>$b['path'], 'TITLE'=>$b['title']);
 		}
-		
-		// Load roles
-		if(isSet($this->rights["ajxp.roles"])){
-			$object = unserialize($this->rights["ajxp.roles"]);
-			if(is_array($object)){
-				$this->rights["ajxp.roles"] = $object;
-				$allRoles = AuthService::getRolesList(); // Maintained as instance variable
-				foreach (array_keys($this->rights["ajxp.roles"]) as $roleId){
-					if(isSet($allRoles[$roleId])){
-						$this->roles[$roleId] = $allRoles[$roleId];
-					}else{
-						unset($this->rights["ajxp.roles"][$roleId]);
-					}
-				}
-			}else{
-				$this->rights["ajxp.roles"] = array();
-			}
-		}
-        if(isSet($this->rights["ajxp.actions"])){
-            $object = unserialize($this->rights["ajxp.actions"]);
-            if(is_array($object)){
-                $this->rights["ajxp.actions"] = $object;
-            }else{
-                unset($this->rights["ajxp.actions"]);
+
+        // COLLECT ROLES TO LOAD
+        $rolesToLoad = array();
+        if(isSet($this->rights["ajxp.roles"])) {
+            if(is_string($this->rights["ajxp.roles"])){
+                if(strpos($this->rights["ajxp.roles"], '$phpserial$') === 0) {
+                    $this->rights["ajxp.roles"] = unserialize(str_replace('$phpserial$', '', $this->rights["ajxp.roles"]));
+                }else if(strpos($this->rights["ajxp.roles"], '$json$') === 0) {
+                    $this->rights["ajxp.roles"] = json_decode(str_replace('$json$', '', $this->rights["ajxp.roles"]), true);
+                }else{
+                    $this->rights["ajxp.roles"] = unserialize($this->rights["ajxp.roles"]);
+                }
+            }
+            $rolesToLoad = array_keys($this->rights["ajxp.roles"]);
+        }
+        if($this->groupPath != null){
+            $base = "";
+            $exp = explode("/", $this->groupPath);
+            foreach($exp as $pathPart){
+                if(empty($pathPart)) continue;
+                $base = $base . "/" . $pathPart;
+                $rolesToLoad[] = "AJXP_GRP_".$base;
+            }
+        }
+        $rolesToLoad[] = "AJXP_USR_/".$this->id;
+
+        // NOW LOAD THEM
+        if(count($rolesToLoad)){
+            $allRoles = AuthService::getRolesList($rolesToLoad);
+            foreach ($rolesToLoad as $roleId){
+                if(isSet($allRoles[$roleId])){
+                    $this->roles[$roleId] = $allRoles[$roleId];
+                    $this->rights["ajxp.roles"][$roleId] = true;
+                }else if(is_array($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])){
+                    unset($this->rights["ajxp.roles"][$roleId]);
+                }
             }
         }
 
-	}
-
-    function clearRights(){
-        $this->rights = array();
-        dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]='".$this->getId()."'");
+        // CHECK USER PERSONAL ROLE
+        if(isSet($this->roles["AJXP_USR_"."/".$this->id]) && is_a($this->roles["AJXP_USR_"."/".$this->id], "AJXP_Role")){
+            $this->personalRole = $this->roles["AJXP_USR_"."/".$this->id];
+        }else{
+            // MIGRATE NOW !
+            $originalRights = $this->rights;
+            $this->migrateRightsToPersonalRole();
+            $removedRights = array_diff($originalRights, $this->rights);
+            foreach($removedRights as $i => $v) $removedRights[$i] = "[repo_uuid]='$i'";
+            $this->roles["AJXP_USR_"."/".$this->id] = $this->personalRole;
+            // SAVE RIGHT AND ROLE
+            if(count($removedRights)) {
+                dibi::query("DELETE FROM [ajxp_user_rights] WHERE ".implode(" OR ", $removedRights));
+            }
+            AuthService::updateRole($this->personalRole);
+        }
+        $this->recomputeMergedRole();
     }
 
 	/**
@@ -502,31 +449,31 @@ class AJXP_User extends AbstractAjxpUser
             return;
         }
 		$this->log('Saving user...');
-		
-		if($this->isAdmin() === true){
-			$this->setRight("ajxp.admin", "1");
-		}else{
-			$this->setRight("ajxp.admin", "0");
-		}
+
+        // UPDATE RIGHTS ARRAY
+        $this->rights["ajxp.admin"] = ($this->isAdmin() ? "1" : "0");
 		if($this->hasParent()){
-			$this->setRight("ajxp.parent_user", $this->parentUser);
+			$this->rights["ajxp.parent_user"] = $this->parentUser;
 		}
-		// update roles
-		dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]='".$this->getId()."' AND [repo_uuid]='ajxp.roles'");
-		if($this->rights["ajxp.roles"] && is_array($this->rights["ajxp.roles"]) && count($this->rights["ajxp.roles"])){
+
+        // UPDATE TABLE
+		dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]=%s", $this->getId());
+        foreach($this->rights as $rightKey => $rightValue){
+            if($rightKey == "ajxp.roles"){
+                if(is_array($rightValue) && count($rightValue)){
+                    $rightValue = '$phpserial$'.serialize($rightValue);
+                }else{
+                    continue;
+                }
+            }
 			dibi::query("INSERT INTO [ajxp_user_rights]", array(
 				'login' => $this->getId(), 
-				'repo_uuid' => 'ajxp.roles', 
-				'rights'	=> serialize($this->rights['ajxp.roles'])));
+				'repo_uuid' => $rightKey,
+				'rights'	=> $rightValue
+            ));
 		}
-        // update specific actions rights
-        dibi::query("DELETE FROM [ajxp_user_rights] WHERE [login]='".$this->getId()."' AND [repo_uuid]='ajxp.actions'");
-        if($this->rights["ajxp.actions"] && is_array($this->rights["ajxp.actions"]) && count($this->rights["ajxp.actions"])){
-            dibi::query("INSERT INTO [ajxp_user_rights]", array(
-                'login' => $this->getId(),
-                'repo_uuid' => 'ajxp.actions',
-                'rights'	=> serialize($this->rights['ajxp.actions'])));
-        }
+
+        AuthService::updateRole($this->personalRole);
 
         if(!empty($this->groupPath)){
             $this->setGroupPath($this->groupPath);
@@ -567,40 +514,6 @@ class AJXP_User extends AbstractAjxpUser
 		}
         $id = AuthService::ignoreUserCase()?strtolower($this->getId()):$this->getId();
         return AJXP_Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
-	}
-	
-	/**
-	 * Static function for deleting a user.
-	 * Also removes associated rights, preferences and bookmarks.
-	 * WARNING : must also delete the children!
-	 *
-	 * @param String $userId Login to delete.
-	 * @param Array $deletedSubUsers
-	 * @return null or -1 on error.
-	 */
-	static function deleteUser($userId, &$deletedSubUsers){
-		$children = array();
-		try {
-			// FIND ALL CHILDREN FIRST
-			$children_results = dibi::query('SELECT [login] FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s', "ajxp.parent_user", $userId);
-			$all = $children_results->fetchAll();
-			foreach ($all as $item){
-				$children[] = $item["login"];
-			}
-			dibi::begin();
-			//This one is done by AUTH_DRIVER, not CONF_DRIVER
-			//dibi::query('DELETE FROM [ajxp_users] WHERE [login] = %s', $userId);
-			dibi::query('DELETE FROM [ajxp_user_rights] WHERE [login] = %s', $userId);
-			dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
-			dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);					
-			dibi::commit();
-			foreach ($children as $childId){
-				AJXP_User::deleteUser($childId, $deletedSubUsers);
-				$deletedSubUsers[] = $childId;
-			}
-		} catch (DibiException $e) {
-			throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
-		}
 	}
 
     function setGroupPath($groupPath){
