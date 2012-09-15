@@ -20,6 +20,8 @@
 Class.create("RoleEditor", AbstractEditor, {
 
     tab : null,
+    roleData : null,
+    pluginsData : null,
 
 	initialize: function($super, oFormObject)
 	{
@@ -37,8 +39,8 @@ Class.create("RoleEditor", AbstractEditor, {
         }
         this.tab = new AjxpSimpleTabs(oFormObject.down("#roleTabulator"));
     },
-	
-	
+
+
 	open : function($super, userSelection){
 		$super(userSelection);
 		var fileName = userSelection.getUniqueFileName();
@@ -52,16 +54,106 @@ Class.create("RoleEditor", AbstractEditor, {
             format:'json'
         });
         conn.onComplete = function(transport){
-            this.generateRightsTable(transport.responseJSON);
-            this.generateActionsPane(transport.responseJSON);
+            this.roleData = transport.responseJSON;
+            if(this.roleData.ROLE.ACTIONS.length == 0){
+                this.roleData.ROLE.ACTIONS = {};
+            }
+            this.generateRightsTable();
+            this.populateActionsPane();
+            this.feedRepositoriesSelectors();
         }.bind(this);
         conn.sendAsync();
+
+        var conn2 = new Connexion();
+        conn2.setParameters({get_action:"list_all_plugins_actions"});
+        conn2.onComplete = function(transport){
+            this.feedPluginsSelectors(transport.responseJSON);
+        }.bind(this);
+        conn2.sendAsync();
 	},
 
-    generateRightsTable : function(jsonData){
+    setDirty : function(){
+        this.actions.get("saveButton").removeClassName("disabled");
+    },
+
+    setClean : function(){
+        this.actions.get("saveButton").addClassName("disabled");
+    },
+
+    isDirty : function(){
+        return !this.actions.get("saveButton").hasClassName("disabled");
+    },
+
+    feedPluginsSelectors : function(jsonData){
+        this.pluginsData = jsonData.LIST;
+        var oManager = this;
+        this.element.select("select.plugin_selector").each(function(select){
+            for(var key in jsonData.LIST){
+                select.insert(new Element("option", {value:key}).update(key));
+            }
+            var nextSelect = select.up("div.SF_element").next().down("select");
+            var lastSelect = nextSelect.up("div.SF_element").next().down("select");
+            var button = lastSelect.next("div.add_button");
+            var type = nextSelect.hasClassName("action_selector") ?  "action" : "parameter";
+
+            button.observe("click", function(){
+                if(button.hasClassName("disabled")) return;
+                if(type == "action"){
+                    oManager.addActionToList(select.getValue(), nextSelect.getValue(), lastSelect.getValue());
+                }
+                nextSelect.disabled = true;
+                lastSelect.disabled = true;
+                lastSelect.setValue(-1);
+                button.addClassName("disabled");
+            });
+
+            select.observe("change", function(){
+                if(type == "action"){
+                    var actions = oManager.pluginsData[select.getValue()];
+                    nextSelect.select("*").invoke("remove");
+                    nextSelect.insert(new Element("option", {value:-1}).update("Select an action..."));
+                    for(var key in actions){
+                        if(!actions[key]["action"]) continue;
+                        var label = actions[key]["label"];
+                        if(label && MessageHash[label]){
+                            label = actions[key]["action"] +" (" +MessageHash[label] +")";
+                        }else{
+                            label = actions[key]["action"];
+                        }
+                        nextSelect.insert(new Element("option", {value:actions[key]["action"]}).update(label));
+                    }
+                }
+                nextSelect.disabled = false;
+                lastSelect.disabled = true;
+                nextSelect.observeOnce("change", function(){
+                    lastSelect.disabled = false;
+                    lastSelect.focus();
+                    lastSelect.down("option").update("Select one or all repositories...");
+                    lastSelect.observeOnce("change", function(){
+                        button.removeClassName("disabled");
+                    } );
+                } );
+            } );
+            select.disabled = false;
+        } );
+    },
+
+    feedRepositoriesSelectors : function(){
+        var repositories = this.roleData.REPOSITORIES;
+        this.element.select("select.repository_selector").each(function(select){
+            select.insert(new Element("option", {value:-1}).update(""));
+            select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_ALL"}).update("All Repositories"));
+            for(var key in repositories){
+                select.insert(new Element("option", {value:key}).update(repositories[key]));
+            }
+            //select.disabled = false;
+        }.bind(this));
+    },
+
+    generateRightsTable : function(){
    		var rightsPane = this.element.down('#pane-acls');
    		var rightsTable = rightsPane.down('#acls-selected');
-   		var repositories = jsonData.REPOSITORIES;
+   		var repositories = this.roleData.REPOSITORIES;
         //repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
         //var defaultRepository = XPathGetSingleNodeText(xmlData, '//pref[@name="force_default_repository"]/@value');
    		for(var repoId in repositories){
@@ -91,28 +183,53 @@ Class.create("RoleEditor", AbstractEditor, {
    			rightsTable.insert({bottom:tr});
 
    			// FOR IE, set checkboxes state AFTER dom insertion.
-   			readBox.checked = (jsonData.ROLE.ACL[repoId] && jsonData.ROLE.ACL[repoId].indexOf("r") !== -1);
-   			writeBox.checked = (jsonData.ROLE.ACL[repoId] && jsonData.ROLE.ACL[repoId].indexOf("w") !== -1);
+   			readBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("r") !== -1);
+   			writeBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("w") !== -1);
    		}
    		// rightsTable.down('#loading_row').remove();
    	},
 
-    generateActionsPane : function(jsonData){
+    populateActionsPane : function(){
         var actionsPane = this.element.down("#actions-selected");
         actionsPane.select("*").invoke("remove");
-        var actionsData = jsonData.ROLE.ACTIONS;
+        var actionsData = this.roleData.ROLE.ACTIONS;
         if(!Object.keys(actionsData).length) return;
         for(var repoScope in actionsData){
             for(var pluginId in actionsData[repoScope]){
                 for(var actionName in actionsData[repoScope][pluginId]){
                     var el = new Element("div");
-                    var repoLab = (repoScope == "AJXP_REPO_SCOPE_ALL" ? "All Repositories" : jsonData.REPOSITORIES[repoScope]);
+                    var remove = new Element("span", {className:"list_remove_item"}).update("Remove");
+                    el.insert(remove);
+                    var repoLab = (repoScope == "AJXP_REPO_SCOPE_ALL" ? "All Repositories" : this.roleData.REPOSITORIES[repoScope]);
                     var pluginLab = (pluginId == "all_plugins" ? "All Plugins" : pluginId);
-                    el.update(repoLab + " &gt; " + pluginLab + " &gt; " + actionName + " (disabled)");
+                    el.insert(repoLab + " &gt; " + pluginLab + " &gt; " + actionName + " (disabled)");
                     actionsPane.insert(el);
+                    remove.observeOnce("click", this.actionListRemoveObserver(repoScope, pluginId, actionName) );
                 }
             }
         }
+    },
+
+    addActionToList: function(plugin, action, scope){
+        if(!this.roleData.ROLE.ACTIONS) this.roleData.ROLE.ACTIONS = {};
+        if(!this.roleData.ROLE.ACTIONS[scope]) this.roleData.ROLE.ACTIONS[scope] = {};
+        if(!this.roleData.ROLE.ACTIONS[scope][plugin]) this.roleData.ROLE.ACTIONS[scope][plugin] = {};
+        this.roleData.ROLE.ACTIONS[scope][plugin][action] = false;
+        this.populateActionsPane();
+        this.element.down("#actions-selected").scrollTop = 10000;
+        this.setDirty();
+    },
+
+
+    actionListRemoveObserver : function(scope, plugin, action){
+        return function(){
+            try{
+                delete this.roleData.ROLE.ACTIONS[scope][plugin][action];
+            }catch(e){}
+            this.populateActionsPane();
+            this.setDirty();
+        }.bind(this);
     }
+
 
 });
