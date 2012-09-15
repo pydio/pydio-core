@@ -35,6 +35,7 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
             htmlElement.insert(new Element("div", {className:"tabpanes"}));
         }
         this.panes = htmlElement.down("div.tabpanes");
+        fitHeightToBottom(this.panes, this.element);
         if(htmlElement.down("ul.tabrow")){
             this.tabRow = htmlElement.down("ul.tabrow");
             htmlElement.down("ul.tabrow").select("li").each(function(tab){
@@ -45,6 +46,9 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
                     this.addTab(tab);
                 }
             }.bind(this));
+            window.setTimeout( function(){
+                this.selectTabByIndex(0);
+            }.bind(this), 100);
         }else{
             htmlElement.insert(new Element("ul", {className:"tabrow"}));
             this.tabRow = htmlElement.down("ul.tabrow");
@@ -59,13 +63,20 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
         if(!pane){
             pane = new Element("div");
         }
+        pane.addClassName("tabPane");
         tab.tabPANE = pane;
         this.panes.insert(pane);
+        fitHeightToBottom(pane, this.panes);
+        pane.setStyle({overflowY:"auto"});
         tab.setSelected = function(){
-            this.panes.select("div").invoke("hide");
+            this.panes.select("div.tabPane").invoke("hide");
             tab.tabPANE.show();
             this.tabRow.select("li").invoke("removeClassName", "selected");
             tab.addClassName("selected");
+            pane.setStyle({height:parseInt(this.panes.getHeight())+"px"});
+            if(tab.tabPANE.resizeOnShow){
+                tab.tabPANE.resizeOnShow(this);
+            }
         }.bind(this);
         tab.observe("click", function(){
             tab.setSelected();
@@ -73,11 +84,17 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
         tab.setSelected();
     },
 
+    selectTabByIndex : function(index){
+        try{
+            this.tabRow.select("li")[index].setSelected();
+        }catch(e){}
+    },
+
 	/**
 	 * Resizes the widget
 	 */
 	resize : function(){
-        fitHeightToBottom(this.htmlElement);
+
 	},
 	
 	/**

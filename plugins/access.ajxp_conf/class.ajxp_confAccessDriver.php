@@ -242,9 +242,21 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				if($role === false) {
                     throw new Exception("Cant find role! ");
 				}
-				AJXP_XMLWriter::header("admin_data");
-				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
-				AJXP_XMLWriter::close("admin_data");
+                if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
+                    HTMLWriter::charsetHeader("application/json");
+                    $roleData = array();
+                    $roleData["ACL"] = $role->listAcls();
+                    $roleData["ACTIONS"] = $role->listActionsStates();
+                    $roleData["PARAMETERS"] = $role->listParameters();
+                    $roleData["APPLIES"] = $role->listAutoApplies();
+                    $repos = ConfService::getAdministrableRepositories(true);
+                    $data = array("ROLE" => $roleData, "REPOSITORIES" => $repos);
+                    echo json_encode($data);
+                }else{
+                    AJXP_XMLWriter::header("admin_data");
+                    print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
+                    AJXP_XMLWriter::close("admin_data");
+                }
 			break;
 			
 			case "update_role_right" :
