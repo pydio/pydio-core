@@ -3,25 +3,68 @@
 	<client_settings>
         <resources>
             <js file="plugins/editor.ajxp_role/class.RoleEditor.js" className="RoleEditor"/>
-            <i18n path="plugins/editor.text/i18n" namespace="ajxp_role_editor"/>
+            <i18n path="plugins/editor.ajxp_role/i18n" namespace="ajxp_role_editor"/>
+            <css file="plugins/editor.ajxp_role/rolesEditor.css" />
         </resources>
 	</client_settings>
 	<clientForm id="role_edit_box"><![CDATA[
 		<div id="role_edit_box" action="editer" box_width="60%" box_height="80%" box_padding="0">
-			<div class="action_bar">
-				<a href="#" onclick="return false;" id="saveButton" onclick="return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a>
+		    <div class="editor_header">
+                <div class="action_bar">
+                    <a href="#" onclick="return false;" class="disabled" id="saveButton" onclick="return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a>
+                </div>
+                <span class="header_label"></span>
 			</div>
 			<div id="roleTabulator">
 			    <ul class="tabrow">
-                    <li class="selected" data-PaneID="c1"><a href="#">ACL</a></li>
-                    <li class="" data-PaneID="c2"><a href="#">Parameters</a></li>
-                    <li class="" data-PaneID="c3"><a href="#">Actions</a></li>
+                    <li class="selected" data-PaneID="pane-acls"><span>ACL</span></li>
+                    <li class="" data-PaneID="pane-actions"><span>Actions</span></li>
+                    <li class="" data-PaneID="pane-parameters"><span>Parameters</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>
-                <div id="c1">C1</div>
-                <div id="c2">C2</div>
-                <div id="c3">C3</div>
+                <div id="pane-acls">
+                    <div class="dialogLegend">Select the repositories to which the use with this role will have access. Use the 'Deny' value to either override a value set by a previous role, or definitely deny the access to this repository even to inherited roles.</div>
+                    <div id="acls-selected"></div>
+                </div>
+                <div id="pane-actions">
+                    <div id="actions-selector">
+                        <div class="dialogLegend">Use the selectors below to select the actions you want to disabled for the users of this role. You can choose to disable the action for all repositories, or for a given repository only.</div>
+                        <div class="SF_element">
+                            <div class="SF_label">Plugin Identifier</div>
+                            <select class="SF_input"><option value="0">Select a plugin...</option></select>
+                        </div>
+                        <div class="SF_element">
+                            <div class="SF_label">Action Name</div>
+                            <select class="SF_input" disabled="true"><option value="0">Select an action...</option></select>
+                        </div>
+                        <div class="SF_element">
+                            <div class="SF_label">Repository Scope</div>
+                            <select class="SF_input" disabled="true"><option value="0">Disable this action for ...</option></select>
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div id="actions-selected"></div>
+                </div>
+                <div id="pane-parameters">
+                    <div id="parameters-selector">
+                        <div class="dialogLegend">Use the selectors below to select the actions you want to disabled for the users of this role. You can choose to disable the action for all repositories, or for a given repository only.</div>
+                        <div class="SF_element">
+                            <div class="SF_label">Plugin Identifier</div>
+                            <select class="SF_input"><option value="0">Select a plugin...</option></select>
+                        </div>
+                        <div class="SF_element">
+                            <div class="SF_label">Parameter Name</div>
+                            <select class="SF_input" disabled="true"><option value="0">Select an action...</option></select>
+                        </div>
+                        <div class="SF_element">
+                            <div class="SF_label">Repository Scope</div>
+                            <select class="SF_input" disabled="true"><option value="0">Disable this action for ...</option></select>
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div id="parameters-selected"></div>
+                </div>
 			</div>
 		</div>				
 	]]></clientForm>

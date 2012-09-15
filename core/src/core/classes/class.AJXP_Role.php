@@ -174,6 +174,10 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $this->parameters;
     }
 
+    public function listAutoApplies(){
+        return $this->autoApplies;
+    }
+
     /**
      * @param string $pluginId
      * @param string $actionName

@@ -330,6 +330,26 @@ class ConfService
 		return self::getInstance()->getRepositoriesListInst();
 	}
 
+    public static function getAdministrableRepositories($labelOnly = false){
+        $result = array();
+        foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
+        {
+            if(!AuthService::canAssign($repoObject)) continue;
+            if($repoObject->getAccessType() == "ajxp_conf") continue;
+            if($repoObject->isTemplate) continue;
+            if($repoObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
+                continue;
+            }
+            if($repoObject->hasOwner()) continue;
+            if($labelOnly){
+                $result[$repoId] = $repoObject->getDisplay();
+            }else{
+                $result[$repoId] = $repoObject;
+            }
+        }
+        return $result;
+    }
+
     /**
      * Return the full list of repositories, as id => objects
      * @return array
