@@ -66,3 +66,31 @@ div#acls-selected label{
     text-align: left;
     min-width: 28px;
 }
+
+#actions-selector div.SF_element,
+#parameters-selector div.SF_element
+{
+    width: 80%;
+}
+
+div.add_button{
+    position: absolute;
+    right: 14%;
+    padding: 5px;
+    display: inline-block;
+    cursor: pointer;
+    color: #195470;
+    text-decoration: underline;
+}
+span.list_remove_item{
+    float:right;
+    display: inline-block;
+    cursor: pointer;
+    color: #195470;
+    text-decoration: underline;
+}
+
+
+div.add_button.disabled{
+    opacity: 0.5;
+}
