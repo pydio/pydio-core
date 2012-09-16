@@ -69,13 +69,13 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
         fitHeightToBottom(pane, this.panes);
         pane.setStyle({overflowY:"auto"});
         tab.setSelected = function(){
-            this.panes.select("div.tabPane").invoke("hide");
+            this.panes.childElements("div.tabPane").invoke("hide");
             tab.tabPANE.show();
             this.tabRow.select("li").invoke("removeClassName", "selected");
             tab.addClassName("selected");
             pane.setStyle({height:parseInt(this.panes.getHeight())+"px"});
             if(tab.tabPANE.resizeOnShow){
-                tab.tabPANE.resizeOnShow(this);
+                tab.tabPANE.resizeOnShow(tab,tab.tabPANE);
             }
         }.bind(this);
         tab.observe("click", function(){

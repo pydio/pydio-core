@@ -43,6 +43,16 @@
                 <serverCallback methodName="listAllActions"></serverCallback>
             </processing>
         </action>
+        <action name="list_all_plugins_parameters">
+            <processing>
+                <serverCallback methodName="listAllActions"></serverCallback>
+            </processing>
+        </action>
+        <action name="parameters_to_form_definitions">
+            <processing>
+                <serverCallback methodName="listAllActions"></serverCallback>
+            </processing>
+        </action>
         <action name="list_all_repositories">
             <processing>
                 <serverCallback methodName="listAllActions"></serverCallback>

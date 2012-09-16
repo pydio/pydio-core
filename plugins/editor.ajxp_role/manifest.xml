@@ -32,7 +32,7 @@
                         <div class="dialogLegend">Use the selectors below to select the actions you want to disabled for the users of this role. You can choose to disable the action for all repositories, or for a given repository only.</div>
                         <div class="SF_element">
                             <div class="SF_label">Plugin Identifier</div>
-                            <select class="SF_input plugin_selector"><option value="0">Select a plugin...</option></select>
+                            <select class="SF_input plugin_selector"><option value="-1">Select a plugin...</option></select>
                         </div>
                         <div class="SF_element">
                             <div class="SF_label">Action Name</div>
@@ -49,18 +49,19 @@
                 </div>
                 <div id="pane-parameters">
                     <div id="parameters-selector">
-                        <div class="dialogLegend">Use the selectors below to select the actions you want to disabled for the users of this role. You can choose to disable the action for all repositories, or for a given repository only.</div>
+                        <div class="dialogLegend">Use the selectors below to select the parameters you want to refine for the users of this role. Can be applied to all or one given repository only, although this may depend on the plugin context.</div>
                         <div class="SF_element">
                             <div class="SF_label">Plugin Identifier</div>
-                            <select class="SF_input plugin_selector"><option value="0">Select a plugin...</option></select>
+                            <select class="SF_input plugin_selector"><option value="-1">Select a plugin...</option></select>
                         </div>
                         <div class="SF_element">
                             <div class="SF_label">Parameter Name</div>
-                            <select class="SF_input parameter_selector" disabled="true"><option value="0">Select an action...</option></select>
+                            <select class="SF_input parameter_selector" disabled="true"></select>
                         </div>
                         <div class="SF_element">
                             <div class="SF_label">Repository Scope</div>
-                            <select class="SF_input repository_selector" disabled="true"><option value="0">Disable this action for ...</option></select>
+                            <select class="SF_input repository_selector" disabled="true"></select>
+                            <div class="add_button disabled">Add now</div>
                         </div>
                         <div style="clear:both;"></div>
                     </div>
