@@ -50,7 +50,7 @@ Class.create("RoleEditor", AbstractEditor, {
                     var pluginId = toggle.innerHTML;
                     var formPane = toggle.next("div.accordion_content");
                     var parametersHash = new $H();
-                    fManager.serializeParametersInputs(formPane, parametersHash);
+                    fManager.serializeParametersInputs(formPane, parametersHash, "ROLE_PARAM_");
                     fullPostData['FORMS'][repoScope][pluginId] = parametersHash;
                 }.bind(this) );
             }.bind(this) );
