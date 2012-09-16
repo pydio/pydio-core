@@ -79,6 +79,62 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 HTMLWriter::charsetHeader("application/json");
                 echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
                 break;
+            case "list_all_plugins_parameters":
+                $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//param|//global_param", "node", false, true, true);
+                $actions = array();
+                $mess = ConfService::getMessages();
+                foreach($nodes as $node){
+                    if($node->parentNode->nodeName != "server_settings") continue;
+                    $parentPlugin = $node->parentNode->parentNode;
+                    $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
+                    if(empty($pId)){
+                        $pId = $parentPlugin->nodeName .".";
+                        if($pId == "ajxpdriver.") $pId = "access.";
+                        $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
+                    }
+                    //echo($pId." : ". $node->attributes->getNamedItem("name")->nodeValue . " (".$messId.")<br>");
+                    if(!is_array($actions[$pId])) $actions[$pId] = array();
+                    $actionName = $node->attributes->getNamedItem("name")->nodeValue;
+                    $messId = $node->attributes->getNamedItem("label")->nodeValue;
+                    $actions[$pId][$actionName] = array( "parameter" => $actionName , "label" => AJXP_XMLWriter::replaceAjxpXmlKeywords($messId));
+
+                }
+                foreach($actions as $actPid => $actionGroup){
+                    ksort($actionGroup, SORT_STRING);
+                    $actions[$actPid] = array();
+                    foreach($actionGroup as $k => $v){
+                        $actions[$actPid][] = $v;
+                    }
+                }
+                HTMLWriter::charsetHeader("application/json");
+                echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
+                break;
+            case "parameters_to_form_definitions" :
+
+                $data = json_decode($httpVars["json_parameters"], true);
+                AJXP_XMLWriter::header("standard_form");
+                foreach($data as $repoScope => $pluginsData){
+                    echo("<repoScope id='$repoScope'>");
+                    foreach($pluginsData as $pluginId => $paramData){
+                        foreach($paramData as $paramId => $paramValue){
+                            $query = "//param[@name='$paramId']|//global_param[@name='$paramId']";
+                            $nodes = AJXP_PluginsService::getInstance()->searchAllManifests($query, "node", false, true, true);
+                            if(!count($nodes)) continue;
+                            $n = $nodes[0];
+                            if($n->attributes->getNamedItem("group") != null){
+                                $n->attributes->getNamedItem("group")->nodeValue = "$pluginId";
+                            }else{
+                                $n->appendChild($n->ownerDocument->createAttribute("group"));
+                                $n->attributes->getNamedItem("group")->nodeValue = "$pluginId";
+                            }
+                            echo(AJXP_XMLWriter::replaceAjxpXmlKeywords($n->ownerDocument->saveXML($n)));
+                        }
+                    }
+                    echo("</repoScope>");
+                }
+                AJXP_XMLWriter::close("standard_form");
+                break;
+
             default:
                 break;
         }
@@ -258,6 +314,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     AJXP_XMLWriter::close("admin_data");
                 }
 			break;
+
+            case "post_json_role" :
+
+                $data = json_decode($httpVars["json_data"], true);
+                var_dump($data);
+
+            break;
 			
 			case "update_role_right" :
 				if(!isSet($httpVars["role_id"]) 

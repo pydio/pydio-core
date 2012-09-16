@@ -38,6 +38,33 @@ Class.create("RoleEditor", AbstractEditor, {
             fitHeightToBottom($("acls-selected"), $("pane-acls"), 20);
         }
         this.tab = new AjxpSimpleTabs(oFormObject.down("#roleTabulator"));
+        this.pluginsData = {};
+        this.actions.get("saveButton").observe("click", function(){
+            var fullPostData = {};
+            var fManager = new FormManager();
+            fullPostData['FORMS'] = {};
+            this.element.down("#parameters-selected").select("div.role_edit-params-form").each(function(repoForm){
+                var repoScope = repoForm.id.replace("params-form-", "");
+                fullPostData['FORMS'][repoScope] = {};
+                repoForm.select("div.accordion_toggle").each(function(toggle){
+                    var pluginId = toggle.innerHTML;
+                    var formPane = toggle.next("div.accordion_content");
+                    var parametersHash = new $H();
+                    fManager.serializeParametersInputs(formPane, parametersHash);
+                    fullPostData['FORMS'][repoScope][pluginId] = parametersHash;
+                }.bind(this) );
+            }.bind(this) );
+            fullPostData['ROLE'] = this.roleData.ROLE;
+            var conn = new Connexion();
+            conn.setParameters({
+                get_action:'edit',
+                sub_action:'post_json_role',
+                json_data: Object.toJSON(fullPostData)
+            });
+            conn.setMethod("post");
+            conn.sendAsync();
+
+        }.bind(this) );
     },
 
 
@@ -58,6 +85,9 @@ Class.create("RoleEditor", AbstractEditor, {
             if(this.roleData.ROLE.ACTIONS.length == 0){
                 this.roleData.ROLE.ACTIONS = {};
             }
+            if(this.roleData.ROLE.PARAMETERS.length == 0){
+                this.roleData.ROLE.PARAMETERS = {};
+            }
             this.generateRightsTable();
             this.populateActionsPane();
             this.feedRepositoriesSelectors();
@@ -67,9 +97,16 @@ Class.create("RoleEditor", AbstractEditor, {
         var conn2 = new Connexion();
         conn2.setParameters({get_action:"list_all_plugins_actions"});
         conn2.onComplete = function(transport){
-            this.feedPluginsSelectors(transport.responseJSON);
+            this.feedPluginsSelectors(transport.responseJSON, this.element.select("select.plugin_selector")[0]);
         }.bind(this);
         conn2.sendAsync();
+
+        var conn3 = new Connexion();
+        conn3.setParameters({get_action:"list_all_plugins_parameters"});
+        conn3.onComplete = function(transport){
+            this.feedPluginsSelectors(transport.responseJSON, this.element.select("select.plugin_selector")[1]);
+        }.bind(this);
+        conn3.sendAsync();
 	},
 
     setDirty : function(){
@@ -84,58 +121,58 @@ Class.create("RoleEditor", AbstractEditor, {
         return !this.actions.get("saveButton").hasClassName("disabled");
     },
 
-    feedPluginsSelectors : function(jsonData){
-        this.pluginsData = jsonData.LIST;
+    feedPluginsSelectors : function(jsonData, select){
         var oManager = this;
-        this.element.select("select.plugin_selector").each(function(select){
-            for(var key in jsonData.LIST){
-                select.insert(new Element("option", {value:key}).update(key));
+        for(var key in jsonData.LIST){
+            select.insert(new Element("option", {value:key}).update(key));
+        }
+        var nextSelect = select.up("div.SF_element").next().down("select");
+        var lastSelect = nextSelect.up("div.SF_element").next().down("select");
+        var button = lastSelect.next("div.add_button");
+        var type = nextSelect.hasClassName("action_selector") ?  "action" : "parameter";
+        this.pluginsData[type] = jsonData.LIST;
+
+        button.observe("click", function(){
+            if(button.hasClassName("disabled")) return;
+            if(type == "action"){
+                oManager.addActionToList(select.getValue(), nextSelect.getValue(), lastSelect.getValue());
+            }else if(type == "parameter"){
+                oManager.addParameterToList(select.getValue(), nextSelect.getValue(), lastSelect.getValue());
             }
-            var nextSelect = select.up("div.SF_element").next().down("select");
-            var lastSelect = nextSelect.up("div.SF_element").next().down("select");
-            var button = lastSelect.next("div.add_button");
-            var type = nextSelect.hasClassName("action_selector") ?  "action" : "parameter";
+            select.setValue(-1);
+            nextSelect.disabled = true;
+            lastSelect.disabled = true;
+            lastSelect.setValue(-1);
+            button.addClassName("disabled");
+        });
 
-            button.observe("click", function(){
-                if(button.hasClassName("disabled")) return;
-                if(type == "action"){
-                    oManager.addActionToList(select.getValue(), nextSelect.getValue(), lastSelect.getValue());
+        select.observe("change", function(){
+            var actions = oManager.pluginsData[type][select.getValue()];
+            nextSelect.select("*").invoke("remove");
+            nextSelect.insert(new Element("option", {value:-1}).update((type == "action" ? "Select an action...":"Select a parameter")));
+            for(var key in actions){
+                if(!actions[key][type]) continue;
+                var label = actions[key]['label'];
+                if(label){
+                    if(MessageHash[label]) label = actions[key][type] +" (" +MessageHash[label] +")";
+                    else label = actions[key][type] +" (" +label +")";
+                }else{
+                    label = actions[key][type];
                 }
-                nextSelect.disabled = true;
-                lastSelect.disabled = true;
-                lastSelect.setValue(-1);
-                button.addClassName("disabled");
-            });
-
-            select.observe("change", function(){
-                if(type == "action"){
-                    var actions = oManager.pluginsData[select.getValue()];
-                    nextSelect.select("*").invoke("remove");
-                    nextSelect.insert(new Element("option", {value:-1}).update("Select an action..."));
-                    for(var key in actions){
-                        if(!actions[key]["action"]) continue;
-                        var label = actions[key]["label"];
-                        if(label && MessageHash[label]){
-                            label = actions[key]["action"] +" (" +MessageHash[label] +")";
-                        }else{
-                            label = actions[key]["action"];
-                        }
-                        nextSelect.insert(new Element("option", {value:actions[key]["action"]}).update(label));
-                    }
-                }
-                nextSelect.disabled = false;
-                lastSelect.disabled = true;
-                nextSelect.observeOnce("change", function(){
-                    lastSelect.disabled = false;
-                    lastSelect.focus();
-                    lastSelect.down("option").update("Select one or all repositories...");
-                    lastSelect.observeOnce("change", function(){
-                        button.removeClassName("disabled");
-                    } );
+                nextSelect.insert(new Element("option", {value:actions[key][type]}).update(label));
+            }
+            nextSelect.disabled = false;
+            lastSelect.disabled = true;
+            nextSelect.observeOnce("change", function(){
+                lastSelect.disabled = false;
+                lastSelect.focus();
+                lastSelect.down("option").update("Select one or all repositories...");
+                lastSelect.observeOnce("change", function(){
+                    button.removeClassName("disabled");
                 } );
             } );
-            select.disabled = false;
         } );
+        select.disabled = false;
     },
 
     feedRepositoriesSelectors : function(){
@@ -161,6 +198,9 @@ Class.create("RoleEditor", AbstractEditor, {
    			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'});
    			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'});
    			var blockBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_block'});
+            this.bindRightCheckBox(this.roleData, ["ROLE", "ACL", repoId], readBox);
+            this.bindRightCheckBox(this.roleData, ["ROLE", "ACL", repoId], writeBox);
+            this.bindRightCheckBox(this.roleData, ["ROLE", "ACL", repoId], blockBox);
    			var rightsCell = new Element('div', {className:"repositoryRights"});
             rightsCell.insert(readBox);
             rightsCell.insert('<label for="chck_'+repoId+'_read">' + MessageHash['ajxp_conf.29'] + '</label> ');
@@ -210,6 +250,63 @@ Class.create("RoleEditor", AbstractEditor, {
         }
     },
 
+    populateParametersPane : function(){
+        var parametersPane = this.element.down("#parameters-selected");
+        var actionsData = this.roleData.ROLE.PARAMETERS;
+        if(!Object.keys(actionsData).length){
+            parametersPane.update("");
+            parametersPane.removeClassName("nonempty");
+            parametersPane.insert(new Element("ul", {className:"tabrow"}));
+            return;
+        }
+        var conn = new Connexion();
+        conn.setParameters({
+            get_action:'parameters_to_form_definitions',
+            json_parameters : Object.toJSON(actionsData)
+        });
+        conn.onComplete = function(transport){
+
+            parametersPane.update("");
+            parametersPane.removeClassName("non_empty");
+            parametersPane.insert(new Element("ul", {className:"tabrow"}));
+
+            // Parse result as a standard form
+            var xml = transport.responseXML;
+            var formManager = new FormManager();
+            var scopes = XPathSelectNodes(xml, "standard_form/repoScope");
+            if(!scopes.length) return;
+            for(var i=0;i<scopes.length;i++){
+                var id = scopes[i].getAttribute("id");
+                var scopeLabel;
+                if(id == "AJXP_REPO_SCOPE_ALL") scopeLabel = "All Repositories";
+                else scopeLabel = this.roleData.REPOSITORIES[id];
+                var tab = new Element("li", {"data-PaneID":"params-form-" + id}).update('<span>'+scopeLabel+'</span>');
+                parametersPane.down("ul.tabrow").insert(tab);
+
+                var pane = new Element("div", {id:"params-form-" + id, className:"role_edit-params-form"});
+                parametersPane.insert(pane);
+                pane.resizeOnShow = function(passedTab, passedPane){
+                    fitHeightToBottom(passedPane, $("parameters-selected"));
+                };
+                var formParams = formManager.parseParameters(xml, 'standard_form/repoScope[@id="'+id+'"]/*');
+                formManager.createParametersInputs(pane, formParams, true, null, false, false, false);
+            }
+            pane.select("div.accordion_content").invoke("setStyle", {display:"block"});
+            new AjxpSimpleTabs(parametersPane);
+            parametersPane.addClassName("non_empty");
+
+        }.bind(this);
+        conn.sendAsync();
+    },
+
+    addParameterToList: function(plugin, parameter, scope){
+        if(!this.roleData.ROLE.PARAMETERS) this.roleData.ROLE.PARAMETERS = {};
+        if(!this.roleData.ROLE.PARAMETERS[scope]) this.roleData.ROLE.PARAMETERS[scope] = {};
+        if(!this.roleData.ROLE.PARAMETERS[scope][plugin]) this.roleData.ROLE.PARAMETERS[scope][plugin] = {};
+        this.roleData.ROLE.PARAMETERS[scope][plugin][parameter] = "";
+        this.populateParametersPane();
+    },
+
     addActionToList: function(plugin, action, scope){
         if(!this.roleData.ROLE.ACTIONS) this.roleData.ROLE.ACTIONS = {};
         if(!this.roleData.ROLE.ACTIONS[scope]) this.roleData.ROLE.ACTIONS[scope] = {};
@@ -229,6 +326,41 @@ Class.create("RoleEditor", AbstractEditor, {
             this.populateActionsPane();
             this.setDirty();
         }.bind(this);
+    },
+
+    bindRightCheckBox:function(structure, keys, checkbox){
+        checkbox.observe("change", function(){
+            var siblings = checkbox.up(".repositoryRights").select('input[type="checkbox"]');
+            var right = "";
+            var r = siblings[0];
+            var w = siblings[1];
+            var d = siblings[2];
+            if(d.checked){
+                r.checked = w.checked = false;
+                r.disabled = w.disabled = true;
+                right = "n";
+            }else{
+                r.disabled = w.disabled = false;
+            }
+            if(r.checked) right += "r";
+            if(w.checked) right += "w";
+            if(keys.length>1){
+                if(!structure[keys[0]]) structure[keys[0]] = {};
+                var c = structure[keys[0]];
+                for(var i=1;i<keys.length;i++){
+                    if(i == keys.length -1) {
+                        if(right) c[keys[i]] = right;
+                        else delete c[keys[i]];
+                    }else{
+                        if(!c[keys[i]]) c[keys[i]] = {};
+                        c = c[keys[i]];
+                    }
+                }
+            }else{
+                if(right) structure[keys[0]] = right;
+                else delete structure[keys[0]];
+            }
+        });
     }
 
 
