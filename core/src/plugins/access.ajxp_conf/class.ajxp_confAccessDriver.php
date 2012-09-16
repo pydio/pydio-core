@@ -319,6 +319,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
                 $data = json_decode($httpVars["json_data"], true);
                 var_dump($data);
+                $roleData = $data["ROLE"];
+                $forms = $data["FORMS"];
+                foreach($forms as $repoScope => $plugData){
+                    foreach($plugData as $plugId => $formsData){
+                        $parsed = array();
+                        AJXP_Utils::parseStandardFormParameters($formsData, $parsed, null, "ROLE_PARAM_");
+                        $roleData["PARAMETERS"][$repoScope][$plugId] = $parsed;
+                    }
+                }
+
 
             break;
 			
