@@ -62,7 +62,17 @@ accordion.prototype = {
 			this.currentAccordion = $(accordion.next(0)).setStyle(options._object);
 		}.bind(this));
 	},
-	
+
+    openAll : function(){
+        this.container.select('div.'+this.options.classNames.toggle).each(function(accordion) {
+            accordion.stopObserving("click");
+            accordion.stopObserving("focus");
+        });
+        this.container.select('div.'+this.options.classNames.content).each(function(accordion) {
+            accordion.setStyle({display:"block", height:"auto"});
+        });
+    },
+
 	//
 	//  Activate an accordion
 	//
