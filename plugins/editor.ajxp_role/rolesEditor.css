@@ -105,3 +105,15 @@ div#parameters-selected.non_empty{
     border: 0;
     border-bottom: 1px solid #ccc;
 }
+
+div#parameters-selected div.SF_element{
+    position: relative;
+}
+div#parameters-selected .SF_input{
+    width: 45% !important;
+}
+div#parameters-selected span.list_remove_item{
+    position: absolute;
+    top: 8px;
+    right: 0;
+}

@@ -128,6 +128,34 @@ class AJXP_Role implements AjxpGroupPathProvider
     }
 
     /**
+     * Send all role informations as an associative array
+     * @return array
+     */
+    public function getDataArray(){
+        $roleData = array();
+        $roleData["ACL"] = $this->listAcls();
+        $roleData["ACTIONS"] = $this->listActionsStates();
+        $roleData["PARAMETERS"] = $this->listParameters();
+        $roleData["APPLIES"] = $this->listAutoApplies();
+        return $roleData;
+    }
+
+    /**
+     * Update the role information from an associative array
+     * @see getDataArray()
+     * @param array $roleData
+     */
+    public function bunchUpdate($roleData){
+
+        $this->acls = $roleData["ACL"];
+        $this->actions = $roleData["ACTIONS"];
+        $this->parameters = $roleData["PARAMETERS"];
+        $this->autoApplies = $roleData["APPLIES"];
+
+    }
+
+
+    /**
      * @param string $pluginId
      * @param string $parameterName
      * @param mixed $parameterValue can be AJXP_VALUE_CLEAR (force clear previous), or empty string for clearing value (apply previous).

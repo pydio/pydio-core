@@ -22,6 +22,7 @@ Class.create("RoleEditor", AbstractEditor, {
     tab : null,
     roleData : null,
     pluginsData : null,
+    roleId : null,
 
 	initialize: function($super, oFormObject)
 	{
@@ -33,45 +34,77 @@ Class.create("RoleEditor", AbstractEditor, {
         }
         $("pane-parameters").resizeOnShow = function(tab){
             fitHeightToBottom($("parameters-selected"), $("pane-parameters"), 20);
+            $("parameters-selected").select("div.tabPane").each(function(subTab){
+                if(subTab.resizeOnShow) subTab.resizeOnShow(null, subTab);
+            });
         }
         $("pane-acls").resizeOnShow = function(tab){
             fitHeightToBottom($("acls-selected"), $("pane-acls"), 20);
         }
         this.tab = new AjxpSimpleTabs(oFormObject.down("#roleTabulator"));
         this.pluginsData = {};
-        this.actions.get("saveButton").observe("click", function(){
-            var fullPostData = {};
-            var fManager = new FormManager();
-            fullPostData['FORMS'] = {};
-            this.element.down("#parameters-selected").select("div.role_edit-params-form").each(function(repoForm){
-                var repoScope = repoForm.id.replace("params-form-", "");
-                fullPostData['FORMS'][repoScope] = {};
-                repoForm.select("div.accordion_toggle").each(function(toggle){
-                    var pluginId = toggle.innerHTML;
-                    var formPane = toggle.next("div.accordion_content");
-                    var parametersHash = new $H();
-                    fManager.serializeParametersInputs(formPane, parametersHash, "ROLE_PARAM_");
-                    fullPostData['FORMS'][repoScope][pluginId] = parametersHash;
-                }.bind(this) );
-            }.bind(this) );
-            fullPostData['ROLE'] = this.roleData.ROLE;
-            var conn = new Connexion();
-            conn.setParameters({
-                get_action:'edit',
-                sub_action:'post_json_role',
-                json_data: Object.toJSON(fullPostData)
-            });
-            conn.setMethod("post");
-            conn.sendAsync();
-
+        this.actions.get("saveButton").observe("click", this.save.bind(this) );
+        modal.setCloseValidation(function(){
+            if(this.isDirty()){
+                var confirm = window.confirm("There are unsaved changes, are you sure you want to close?");
+                if(!confirm) return false;
+            }
+            return true;
         }.bind(this) );
     },
 
+    save : function(){
+        if(!this.isDirty()) return;
+        var fullPostData = {};
+        var fManager = new FormManager();
+        fullPostData['FORMS'] = {};
+        this.element.down("#parameters-selected").select("div.role_edit-params-form").each(function(repoForm){
+            var repoScope = repoForm.id.replace("params-form-", "");
+            fullPostData['FORMS'][repoScope] = {};
+            repoForm.select("div.accordion_toggle").each(function(toggle){
+                var pluginId = toggle.innerHTML;
+                var formPane = toggle.next("div.accordion_content");
+                var parametersHash = new $H();
+                fManager.serializeParametersInputs(formPane, parametersHash, "ROLE_PARAM_");
+                fullPostData['FORMS'][repoScope][pluginId] = parametersHash;
+            }.bind(this) );
+        }.bind(this) );
+        fullPostData['ROLE'] = this.roleData.ROLE;
+        var conn = new Connexion();
+        conn.setParameters({
+            get_action:'edit',
+            sub_action:'post_json_role',
+            role_id   : this.roleId,
+            json_data : Object.toJSON(fullPostData)
+        });
+        conn.setMethod("post");
+        conn.onComplete = function(transport){
+
+            var response = transport.responseJSON;
+            var updatedJSON = response.ROLE;
+            if(response.SUCCESS){
+                ajaxplorer.displayMessage("SUCCESS", "Role updated successfully");
+                this.roleData.ROLE = updatedJSON;
+                this.generateRightsTable();
+                this.populateActionsPane();
+                this.populateParametersPane();
+                this.feedRepositoriesSelectors();
+                ajaxplorer.fireContextRefresh();
+                this.setClean();
+            }else{
+                ajaxplorer.displayMessage("ERROR", response.ERROR);
+            }
+
+        }.bind(this);
+        conn.sendAsync();
+
+    },
 
 	open : function($super, userSelection){
 		$super(userSelection);
 		var fileName = userSelection.getUniqueFileName();
         var base = getBaseName(fileName);
+        this.roleId = base;
         this.element.down("span.header_label").update(base);
         var conn = new Connexion();
         conn.setParameters({
@@ -90,6 +123,7 @@ Class.create("RoleEditor", AbstractEditor, {
             }
             this.generateRightsTable();
             this.populateActionsPane();
+            this.populateParametersPane();
             this.feedRepositoriesSelectors();
         }.bind(this);
         conn.sendAsync();
@@ -178,6 +212,7 @@ Class.create("RoleEditor", AbstractEditor, {
     feedRepositoriesSelectors : function(){
         var repositories = this.roleData.REPOSITORIES;
         this.element.select("select.repository_selector").each(function(select){
+            select.select("option").invoke("remove");
             select.insert(new Element("option", {value:-1}).update(""));
             select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_ALL"}).update("All Repositories"));
             for(var key in repositories){
@@ -190,7 +225,8 @@ Class.create("RoleEditor", AbstractEditor, {
     generateRightsTable : function(){
    		var rightsPane = this.element.down('#pane-acls');
    		var rightsTable = rightsPane.down('#acls-selected');
-   		var repositories = this.roleData.REPOSITORIES;
+        rightsTable.update("");
+        var repositories = this.roleData.REPOSITORIES;
         //repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
         //var defaultRepository = XPathGetSingleNodeText(xmlData, '//pref[@name="force_default_repository"]/@value');
    		for(var repoId in repositories){
@@ -222,9 +258,14 @@ Class.create("RoleEditor", AbstractEditor, {
    			tr.insert(rightsCell);
    			rightsTable.insert({bottom:tr});
 
-   			// FOR IE, set checkboxes state AFTER dom insertion.
-   			readBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("r") !== -1);
-   			writeBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("w") !== -1);
+   			blockBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("AJXP_VALUE_CLEAR") !== -1);
+            if(!blockBox.checked){
+                // FOR IE, set checkboxes state AFTER dom insertion.
+                readBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("r") !== -1);
+                writeBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("w") !== -1);
+            }else{
+                readBox.disabled = writeBox.disabled;
+            }
    		}
    		// rightsTable.down('#loading_row').remove();
    	},
@@ -295,6 +336,15 @@ Class.create("RoleEditor", AbstractEditor, {
             new AjxpSimpleTabs(parametersPane);
             parametersPane.addClassName("non_empty");
 
+            // UPDATE FORMS ELEMENTS
+            parametersPane.select("div.SF_element").each(function(element){
+                var removeLink = new Element("span", {className:"list_remove_item"}).update("Remove");
+                element.insert(removeLink);
+                removeLink.observe("click", this.parameterListRemoveObserver(element) );
+                element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
+                element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
+            }.bind(this) );
+
         }.bind(this);
         conn.sendAsync();
     },
@@ -305,6 +355,7 @@ Class.create("RoleEditor", AbstractEditor, {
         if(!this.roleData.ROLE.PARAMETERS[scope][plugin]) this.roleData.ROLE.PARAMETERS[scope][plugin] = {};
         this.roleData.ROLE.PARAMETERS[scope][plugin][parameter] = "";
         this.populateParametersPane();
+        this.setDirty();
     },
 
     addActionToList: function(plugin, action, scope){
@@ -328,6 +379,20 @@ Class.create("RoleEditor", AbstractEditor, {
         }.bind(this);
     },
 
+    parameterListRemoveObserver : function(element){
+        var scope,plugin,parameter;
+        scope = element.up("div.tabPane").getAttribute("id").replace("params-form-", "");
+        plugin = element.up("div.accordion_content").previous("div.accordion_toggle").innerHTML;
+        parameter = element.down("[name]").getAttribute("name");
+        return function(){
+            try{
+                delete this.roleData.ROLE.PARAMETERS[scope][plugin][parameter];
+            }catch(e){}
+            this.populateParametersPane();
+            this.setDirty();
+        }.bind(this);
+    },
+
     bindRightCheckBox:function(structure, keys, checkbox){
         checkbox.observe("change", function(){
             var siblings = checkbox.up(".repositoryRights").select('input[type="checkbox"]');
@@ -338,7 +403,7 @@ Class.create("RoleEditor", AbstractEditor, {
             if(d.checked){
                 r.checked = w.checked = false;
                 r.disabled = w.disabled = true;
-                right = "n";
+                right = "AJXP_VALUE_CLEAR";
             }else{
                 r.disabled = w.disabled = false;
             }
@@ -360,7 +425,8 @@ Class.create("RoleEditor", AbstractEditor, {
                 if(right) structure[keys[0]] = right;
                 else delete structure[keys[0]];
             }
-        });
+            this.setDirty();
+        }.bind(this) );
     }
 
 

@@ -127,6 +127,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 $n->appendChild($n->ownerDocument->createAttribute("group"));
                                 $n->attributes->getNamedItem("group")->nodeValue = "$pluginId";
                             }
+                            if(is_bool($paramValue)) $paramValue = ($paramValue ? "true" : "false");
+                            if($n->attributes->getNamedItem("default") != null){
+                                $n->attributes->getNamedItem("default")->nodeValue = $paramValue;
+                            }else{
+                                $n->appendChild($n->ownerDocument->createAttribute("default"));
+                                $n->attributes->getNamedItem("default")->nodeValue = $paramValue;
+                            }
                             echo(AJXP_XMLWriter::replaceAjxpXmlKeywords($n->ownerDocument->saveXML($n)));
                         }
                     }
@@ -300,11 +307,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				}
                 if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
                     HTMLWriter::charsetHeader("application/json");
-                    $roleData = array();
-                    $roleData["ACL"] = $role->listAcls();
-                    $roleData["ACTIONS"] = $role->listActionsStates();
-                    $roleData["PARAMETERS"] = $role->listParameters();
-                    $roleData["APPLIES"] = $role->listAutoApplies();
+                    $roleData = $role->getDataArray();
                     $repos = ConfService::getAdministrableRepositories(true);
                     $data = array("ROLE" => $roleData, "REPOSITORIES" => $repos);
                     echo json_encode($data);
@@ -317,8 +320,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "post_json_role" :
 
+                $roleId = SystemTextEncoding::magicDequote($httpVars["role_id"]);
+                $roleGroup = false;
+                if(strpos($roleId, "AJXP_GRP_") === 0){
+                    $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_")));
+                    $roleId = "AJXP_GRP_".$groupPath;
+                    $roleGroup = true;
+                }
+                // second param = create if not exists.
+                $originalRole = AuthService::getRole($roleId, $roleGroup);
+                if($originalRole === false) {
+                    throw new Exception("Cant find role! ");
+                }
+
                 $data = json_decode($httpVars["json_data"], true);
-                var_dump($data);
                 $roleData = $data["ROLE"];
                 $forms = $data["FORMS"];
                 foreach($forms as $repoScope => $plugData){
@@ -329,6 +344,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                 }
 
+                $output = array();
+                try{
+                    $originalRole->bunchUpdate($roleData);
+                    AuthService::updateRole($originalRole);
+                    $output = array("ROLE" => $originalRole->getDataArray(), "SUCCESS" => true);
+                }catch (Exception $e){
+                    $output = array("ERROR" => $e->getMessage());
+                }
+                HTMLWriter::charsetHeader("application/json");
+                echo(json_encode($output));
 
             break;
 			
