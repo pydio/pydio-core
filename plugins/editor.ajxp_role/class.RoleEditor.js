@@ -331,6 +331,9 @@ Class.create("RoleEditor", AbstractEditor, {
                 };
                 var formParams = formManager.parseParameters(xml, 'standard_form/repoScope[@id="'+id+'"]/*');
                 formManager.createParametersInputs(pane, formParams, true, null, false, false, false);
+                if(pane.SF_accordion){
+                    pane.SF_accordion.openAll();
+                }
             }
             pane.select("div.accordion_content").invoke("setStyle", {display:"block"});
             new AjxpSimpleTabs(parametersPane);
