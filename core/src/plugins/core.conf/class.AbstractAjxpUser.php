@@ -45,6 +45,12 @@ abstract class AbstractAjxpUser
      * @var AJXP_Role
      */
     public $mergedRole;
+
+    /**
+     * @var AJXP_Role
+     */
+    public $parentRole;
+
     /**
      * @var AJXP_Role Accessible for update
      */
@@ -117,19 +123,25 @@ abstract class AbstractAjxpUser
 	function addRole($roleId){
 		if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
 		$this->rights["ajxp.roles"][$roleId] = true;
+        uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
         $this->recomputeMergedRole();
 	}
 	
 	function removeRole($roleId){
 		if(isSet($this->rights["ajxp.roles"]) && isSet($this->rights["ajxp.roles"][$roleId])){
 			unset($this->rights["ajxp.roles"][$roleId]);
-		}
+            uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
+        }
         $this->recomputeMergedRole();
 	}
 	
 	function getRoles(){
-		if(isSet($this->rights["ajxp.roles"])) return $this->rights["ajxp.roles"];
-		else return array();
+		if(isSet($this->rights["ajxp.roles"])) {
+            uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
+            return $this->rights["ajxp.roles"];
+        }else {
+            return array();
+        }
 	}
 	
 	function isAdmin(){
@@ -315,10 +327,17 @@ abstract class AbstractAjxpUser
         if(!count($this->roles)) {
             throw new Exception("Empty role, this is not normal");
         }
+        uksort($this->roles, array($this, "orderRoles"));
         $this->mergedRole =  $this->roles[array_shift(array_keys($this->roles))];
+        if(count($this->roles) > 1){
+            $this->parentRole = $this->mergedRole;
+        }
         $index = 0;
         foreach($this->roles as $role){
-            if($index > 0) $this->mergedRole = $role->override($this->mergedRole);
+            if($index > 0) {
+                $this->mergedRole = $role->override($this->mergedRole);
+                if($index < count($this->roles) -1 ) $this->parentRole = $role->override($this->parentRole);
+            }
             $index ++;
         }
     }
@@ -340,7 +359,13 @@ abstract class AbstractAjxpUser
             unset($this->rights[$rightKey]);
         }
     }
+
+    protected function orderRoles($r1, $r2){
+        if(strpos($r1, "AJXP_GRP_") === 0) return -1;
+        if(strpos($r2, "AJXP_GRP_") === 0) return 1;
+        if(strpos($r1, "AJXP_USR_") === 0) return 1;
+        if(strpos($r2, "AJXP_USR_") === 0) return -1;
+        return 0;
+    }
+
 }
-
-
-?>
