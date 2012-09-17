@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.ajxp_role" openable="true" order="10" text="ajxp_role_editor.2" title="ajxp_role_editor.1" icon="edit.png" className="RoleEditor" mimes="role" formId="role_edit_box" label="CONF_MESSAGE[Role Editor]" description="CONF_MESSAGE[Administrator Role Editor]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.ajxp_role" openable="true" order="10" text="ajxp_role_editor.2" title="ajxp_role_editor.1" icon="edit.png" className="RoleEditor" mimes="role,group,user,user_editable" formId="role_edit_box" label="CONF_MESSAGE[Role Editor]" description="CONF_MESSAGE[Administrator Role Editor]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
             <js file="plugins/editor.ajxp_role/class.RoleEditor.js" className="RoleEditor"/>

@@ -827,9 +827,11 @@ div.editor_header{
 
 div.editor_header > div.editor_action_bar {
     float: right;
-    padding-right: 10px;
+    padding-right: 8px;
     background: none;
-    padding-top: 5px;
+    padding-top: 15px;
+    height: 42px;
+    padding-left: 10px;
 }
 
 div.editor_header > div.editor_action_bar > div.separator{
@@ -844,6 +846,7 @@ div.editor_header > span.header_label{
     background-size: 40px;
     background-repeat: no-repeat;
     background-position: 14px 9px;
+    text-shadow: 1px 1px 5px black;
 }
 
 .action_bar.text_only{
@@ -3123,11 +3126,11 @@ td.ip_geo_cell{
     list-style: none;
     margin: 10px 0 0px;
     padding: 0 20px;
-    line-height: 21px;
-    height: 23px;
+    line-height: 24px;
+    height: 26px;
     overflow: hidden;
-    font-size: 11px;
-    font-family: verdana;
+    font-size: 13px;
+    font-family: Verdana;
     position: relative;
 }
 

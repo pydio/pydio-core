@@ -21,6 +21,11 @@ Class.create("RoleEditor", AbstractEditor, {
 
     tab : null,
     roleData : null,
+    roleParent : null,
+
+    roleRead: null,
+    roleWrite: null,
+
     pluginsData : null,
     roleId : null,
 
@@ -51,6 +56,48 @@ Class.create("RoleEditor", AbstractEditor, {
             }
             return true;
         }.bind(this) );
+        oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
+    },
+
+    computeRoleRead : function(){
+        if(!this.roleParent) {
+            this.roleRead = this.roleData.ROLE;
+        }else{
+            // MERGE roleParent & roleData
+            this.roleRead = this.mergeObjectsRecursive(this.roleParent, this.roleData.ROLE);
+        }
+    },
+
+    mergeObjectsRecursive : function(source, destination){
+        var newObject = {};
+        for (var property in source) {
+            if (source.hasOwnProperty(property)) {
+                if( source[property] === null ) continue;
+                if( destination.hasOwnProperty(property)){
+                    if(source[property] instanceof Object && destination instanceof Object){
+                        newObject[property] = this.mergeObjectsRecursive(source[property], destination[property]);
+                    }else{
+                        newObject[property] = destination[property];
+                    }
+                }else{
+                    if(source[property] instanceof Object) {
+                        newObject[property] = this.mergeObjectsRecursive(source[property], {});
+                    }else{
+                        newObject[property] = source[property];
+                    }
+                }
+            }
+        }
+        for (var property in destination){
+            if(destination.hasOwnProperty(property) && !newObject.hasOwnProperty(property) && destination[property]!==null){
+                if(destination[property] instanceof Object) {
+                    newObject[property] = this.mergeObjectsRecursive(destination[property], {});
+                }else{
+                    newObject[property] = destination[property];
+                }
+            }
+        }
+        return newObject;
     },
 
     save : function(){
@@ -69,7 +116,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 fullPostData['FORMS'][repoScope][pluginId] = parametersHash;
             }.bind(this) );
         }.bind(this) );
-        fullPostData['ROLE'] = this.roleData.ROLE;
+        fullPostData['ROLE'] = this.roleWrite;
         var conn = new Connexion();
         conn.setParameters({
             get_action:'edit',
@@ -84,11 +131,8 @@ Class.create("RoleEditor", AbstractEditor, {
             var updatedJSON = response.ROLE;
             if(response.SUCCESS){
                 ajaxplorer.displayMessage("SUCCESS", "Role updated successfully");
-                this.roleData.ROLE = updatedJSON;
-                this.generateRightsTable();
-                this.populateActionsPane();
-                this.populateParametersPane();
-                this.feedRepositoriesSelectors();
+                response.REPOSITORIES = this.roleData.REPOSITORIES;
+                this.initJSONResponse(response);
                 ajaxplorer.fireContextRefresh();
                 this.setClean();
             }else{
@@ -102,29 +146,27 @@ Class.create("RoleEditor", AbstractEditor, {
 
 	open : function($super, userSelection){
 		$super(userSelection);
-		var fileName = userSelection.getUniqueFileName();
-        var base = getBaseName(fileName);
-        this.roleId = base;
-        this.element.down("span.header_label").update(base);
+        var node = userSelection.getUniqueNode();
+        var mime = node.getAjxpMime();
+        if(mime == "role"){
+            this.roleId = getBaseName(node.getPath());
+        }else if(mime == "group"){
+            this.roleId = "AJXP_GRP_" + node.getPath().replace("/data/users", "");
+        }else if(mime == "user" || mime == "user_editable"){
+            this.roleId = "AJXP_USR_/" + getBaseName(node.getPath());
+        }
+        this.element.down("span.header_label").update(this.roleId);
         var conn = new Connexion();
         conn.setParameters({
             get_action:"edit",
             sub_action:"edit_role",
-            role_id: base,
+            role_id: this.roleId,
             format:'json'
         });
         conn.onComplete = function(transport){
-            this.roleData = transport.responseJSON;
-            if(this.roleData.ROLE.ACTIONS.length == 0){
-                this.roleData.ROLE.ACTIONS = {};
-            }
-            if(this.roleData.ROLE.PARAMETERS.length == 0){
-                this.roleData.ROLE.PARAMETERS = {};
-            }
-            this.generateRightsTable();
-            this.populateActionsPane();
-            this.populateParametersPane();
-            this.feedRepositoriesSelectors();
+
+            this.initJSONResponse(transport.responseJSON);
+
         }.bind(this);
         conn.sendAsync();
 
@@ -142,6 +184,38 @@ Class.create("RoleEditor", AbstractEditor, {
         }.bind(this);
         conn3.sendAsync();
 	},
+
+    initJSONResponse : function(responseJSON){
+
+        this.roleData = responseJSON;
+        this.testArray(this.roleData.ROLE, "ACL");
+        this.testArray(this.roleData.ROLE, "ACTIONS");
+        this.testArray(this.roleData.ROLE, "PARAMETERS");
+
+        this.roleWrite = this.roleData.ROLE;
+        if(responseJSON.PARENT_ROLE){
+            this.roleParent = responseJSON.PARENT_ROLE;
+            this.testArray(this.roleParent, "ACL");
+            this.testArray(this.roleParent, "ACTIONS");
+            this.testArray(this.roleParent, "PARAMETERS");
+        }
+        this.computeRoleRead();
+        this.generateRightsTable();
+        this.populateActionsPane();
+        this.populateParametersPane();
+        this.feedRepositoriesSelectors();
+
+    },
+
+    testArray : function(container, value){
+        if(Object.isArray(container[value])){
+            var copy = container[value].clone();
+            container[value] = {};
+            for(var i = 0; i<copy.length; i++){
+                container[value][i] = copy[i];
+            }
+        }
+    },
 
     setDirty : function(){
         this.actions.get("saveButton").removeClassName("disabled");
@@ -234,9 +308,9 @@ Class.create("RoleEditor", AbstractEditor, {
    			var readBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_read'});
    			var writeBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_write'});
    			var blockBox = new Element('input', {type:'checkbox', id:'chck_'+repoId+'_block'});
-            this.bindRightCheckBox(this.roleData, ["ROLE", "ACL", repoId], readBox);
-            this.bindRightCheckBox(this.roleData, ["ROLE", "ACL", repoId], writeBox);
-            this.bindRightCheckBox(this.roleData, ["ROLE", "ACL", repoId], blockBox);
+            this.bindRightCheckBox(this.roleWrite, ["ACL", repoId], readBox);
+            this.bindRightCheckBox(this.roleWrite, ["ACL", repoId], writeBox);
+            this.bindRightCheckBox(this.roleWrite, ["ACL", repoId], blockBox);
    			var rightsCell = new Element('div', {className:"repositoryRights"});
             rightsCell.insert(readBox);
             rightsCell.insert('<label for="chck_'+repoId+'_read">' + MessageHash['ajxp_conf.29'] + '</label> ');
@@ -258,11 +332,11 @@ Class.create("RoleEditor", AbstractEditor, {
    			tr.insert(rightsCell);
    			rightsTable.insert({bottom:tr});
 
-   			blockBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("AJXP_VALUE_CLEAR") !== -1);
+   			blockBox.checked = (this.roleRead.ACL[repoId] && this.roleRead.ACL[repoId].indexOf("AJXP_VALUE_CLEAR") !== -1);
             if(!blockBox.checked){
                 // FOR IE, set checkboxes state AFTER dom insertion.
-                readBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("r") !== -1);
-                writeBox.checked = (this.roleData.ROLE.ACL[repoId] && this.roleData.ROLE.ACL[repoId].indexOf("w") !== -1);
+                readBox.checked = (this.roleRead.ACL[repoId] && this.roleRead.ACL[repoId].indexOf("r") !== -1);
+                writeBox.checked = (this.roleRead.ACL[repoId] && this.roleRead.ACL[repoId].indexOf("w") !== -1);
             }else{
                 readBox.disabled = writeBox.disabled;
             }
@@ -273,11 +347,14 @@ Class.create("RoleEditor", AbstractEditor, {
     populateActionsPane : function(){
         var actionsPane = this.element.down("#actions-selected");
         actionsPane.select("*").invoke("remove");
-        var actionsData = this.roleData.ROLE.ACTIONS;
+        var actionsData = this.roleRead.ACTIONS;
         if(!Object.keys(actionsData).length) return;
         for(var repoScope in actionsData){
             for(var pluginId in actionsData[repoScope]){
                 for(var actionName in actionsData[repoScope][pluginId]){
+                    if(repoScope != "AJXP_REPO_SCOPE_ALL" && ! this.roleData.REPOSITORIES[repoScope]){
+                        continue;
+                    }
                     var el = new Element("div");
                     var remove = new Element("span", {className:"list_remove_item"}).update("Remove");
                     el.insert(remove);
@@ -293,7 +370,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
     populateParametersPane : function(){
         var parametersPane = this.element.down("#parameters-selected");
-        var actionsData = this.roleData.ROLE.PARAMETERS;
+        var actionsData = this.roleRead.PARAMETERS;
         if(!Object.keys(actionsData).length){
             parametersPane.update("");
             parametersPane.removeClassName("nonempty");
@@ -353,19 +430,21 @@ Class.create("RoleEditor", AbstractEditor, {
     },
 
     addParameterToList: function(plugin, parameter, scope){
-        if(!this.roleData.ROLE.PARAMETERS) this.roleData.ROLE.PARAMETERS = {};
-        if(!this.roleData.ROLE.PARAMETERS[scope]) this.roleData.ROLE.PARAMETERS[scope] = {};
-        if(!this.roleData.ROLE.PARAMETERS[scope][plugin]) this.roleData.ROLE.PARAMETERS[scope][plugin] = {};
-        this.roleData.ROLE.PARAMETERS[scope][plugin][parameter] = "";
+        if(!this.roleWrite.PARAMETERS) this.roleWrite.PARAMETERS = {};
+        if(!this.roleWrite.PARAMETERS[scope]) this.roleWrite.PARAMETERS[scope] = {};
+        if(!this.roleWrite.PARAMETERS[scope][plugin]) this.roleWrite.PARAMETERS[scope][plugin] = {};
+        this.roleWrite.PARAMETERS[scope][plugin][parameter] = "";
+        this.computeRoleRead();
         this.populateParametersPane();
         this.setDirty();
     },
 
     addActionToList: function(plugin, action, scope){
-        if(!this.roleData.ROLE.ACTIONS) this.roleData.ROLE.ACTIONS = {};
-        if(!this.roleData.ROLE.ACTIONS[scope]) this.roleData.ROLE.ACTIONS[scope] = {};
-        if(!this.roleData.ROLE.ACTIONS[scope][plugin]) this.roleData.ROLE.ACTIONS[scope][plugin] = {};
-        this.roleData.ROLE.ACTIONS[scope][plugin][action] = false;
+        if(!this.roleWrite.ACTIONS) this.roleWrite.ACTIONS = {};
+        if(!this.roleWrite.ACTIONS[scope]) this.roleWrite.ACTIONS[scope] = {};
+        if(!this.roleWrite.ACTIONS[scope][plugin]) this.roleWrite.ACTIONS[scope][plugin] = {};
+        this.roleWrite.ACTIONS[scope][plugin][action] = false;
+        this.computeRoleRead();
         this.populateActionsPane();
         this.element.down("#actions-selected").scrollTop = 10000;
         this.setDirty();
@@ -375,7 +454,8 @@ Class.create("RoleEditor", AbstractEditor, {
     actionListRemoveObserver : function(scope, plugin, action){
         return function(){
             try{
-                delete this.roleData.ROLE.ACTIONS[scope][plugin][action];
+                delete this.roleWrite.ACTIONS[scope][plugin][action];
+                this.computeRoleRead();
             }catch(e){}
             this.populateActionsPane();
             this.setDirty();
@@ -389,7 +469,8 @@ Class.create("RoleEditor", AbstractEditor, {
         parameter = element.down("[name]").getAttribute("name");
         return function(){
             try{
-                delete this.roleData.ROLE.PARAMETERS[scope][plugin][parameter];
+                delete this.roleWrite.PARAMETERS[scope][plugin][parameter];
+                this.computeRoleRead();
             }catch(e){}
             this.populateParametersPane();
             this.setDirty();

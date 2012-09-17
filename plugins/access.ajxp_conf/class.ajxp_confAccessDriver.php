@@ -300,8 +300,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $roleId = "AJXP_GRP_".$groupPath;
                     $roleGroup = true;
                 }
-                // second param = create if not exists.
-				$role = AuthService::getRole($roleId, $roleGroup);
+                if(strpos($roleId, "AJXP_USR_") === 0){
+                    $usrId = str_replace("AJXP_USR_/", "", $roleId);
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($usrId);
+                    $role = $userObject->personalRole;
+                }else{
+                    $role = AuthService::getRole($roleId, $roleGroup);
+                }
 				if($role === false) {
                     throw new Exception("Cant find role! ");
 				}
@@ -309,7 +314,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     HTMLWriter::charsetHeader("application/json");
                     $roleData = $role->getDataArray();
                     $repos = ConfService::getAdministrableRepositories(true);
-                    $data = array("ROLE" => $roleData, "REPOSITORIES" => $repos);
+                    $data = array(
+                        "ROLE" => $roleData,
+                        "REPOSITORIES" => $repos
+                    );
+                    if(isSet($userObject) && isSet($userObject->parentRole)){
+                        $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
+                    }
                     echo json_encode($data);
                 }else{
                     AJXP_XMLWriter::header("admin_data");
@@ -327,8 +338,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $roleId = "AJXP_GRP_".$groupPath;
                     $roleGroup = true;
                 }
-                // second param = create if not exists.
-                $originalRole = AuthService::getRole($roleId, $roleGroup);
+                if(strpos($roleId, "AJXP_USR_") === 0){
+                    $usrId = str_replace("AJXP_USR_/", "", $roleId);
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($usrId);
+                    $originalRole = $userObject->personalRole;
+                }else{
+                    // second param = create if not exists.
+                    $originalRole = AuthService::getRole($roleId, $roleGroup);
+                }
                 if($originalRole === false) {
                     throw new Exception("Cant find role! ");
                 }
@@ -347,7 +364,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $output = array();
                 try{
                     $originalRole->bunchUpdate($roleData);
-                    AuthService::updateRole($originalRole);
+                    if(isSet($userObject)){
+                        $userObject->personalRole = $originalRole;
+                        $userObject->save("superuser");
+                    }else{
+                        AuthService::updateRole($originalRole);
+                    }
                     $output = array("ROLE" => $originalRole->getDataArray(), "SUCCESS" => true);
                 }catch (Exception $e){
                     $output = array("ERROR" => $e->getMessage());
@@ -1720,5 +1742,5 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         AJXP_Utils::parseStandardFormParameters($repDef, $options, $userId);
 
 	}
-	    
+
 }
