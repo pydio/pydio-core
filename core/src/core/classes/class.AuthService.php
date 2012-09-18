@@ -756,6 +756,25 @@ class AuthService
 	static function deleteRole($roleId){
         ConfService::getConfStorageImpl()->deleteRole($roleId);
 	}
+
+    static function filterPluginParameters($pluginId, $params, $repoId = null){
+        $logged = self::getLoggedUser();
+        if($logged == null) return $params;
+        if($repoId == null){
+            $repo = ConfService::getRepository();
+            if($repo!=null) $repoId = $repo->getId();
+        }
+        if($logged == null) return $params;
+        $roleParams = $logged->mergedRole->listParameters();
+        if(iSSet($roleParams[AJXP_REPO_SCOPE_ALL][$pluginId])){
+            $params = array_merge($params, $roleParams[AJXP_REPO_SCOPE_ALL][$pluginId]);
+        }
+        if($repoId != null && isSet($roleParams[$repoId][$pluginId])){
+            $params = array_merge($params, $roleParams[$repoId][$pluginId]);
+        }
+        return $params;
+    }
+
 	/**
      * Get all defined roles
      * @static

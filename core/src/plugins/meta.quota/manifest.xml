@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta id="quota" label="CONF_MESSAGE[User quota]" description="CONF_MESSAGE[Maintain the size of a given directory for each user]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<meta id="meta.quota" label="CONF_MESSAGE[User quota]" description="CONF_MESSAGE[Maintain the size of a given directory for each user]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/meta.quota/class.QuotaComputer.php" classname="QuotaComputer"/>
     <server_settings>

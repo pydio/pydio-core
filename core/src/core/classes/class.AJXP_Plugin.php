@@ -98,7 +98,7 @@ class AJXP_Plugin implements Serializable{
      */
 	public function init($options){
 		$this->options = $options;
-		$this->loadRegistryContributions();
+		//$this->loadRegistryContributions();
 	}
 	/**
 	 * Perform initialization checks, and throw exception if problems found.
@@ -392,6 +392,7 @@ class AJXP_Plugin implements Serializable{
      * @return array
      */
 	public function getRegistryContributions($extendedVersion = true){
+        $this->loadRegistryContributions();
 		return $this->registryContributions;
 	}
     /**
