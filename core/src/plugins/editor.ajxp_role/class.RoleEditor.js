@@ -59,6 +59,17 @@ Class.create("RoleEditor", AbstractEditor, {
         oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
     },
 
+    isInherited : function(parameterKeys){
+        if(!this.roleParent || !this.roleWrite) return;
+        // Child role is roleWrite
+        var test = this.roleWrite;
+        for(var i=0;i<parameterKeys.length;i++){
+            if(test[parameterKeys[i]] == undefined) return true;
+            if(test[parameterKeys[i]]) test = test[parameterKeys[i]];
+        }
+        return false;
+    },
+
     computeRoleRead : function(){
         if(!this.roleParent) {
             this.roleRead = this.roleData.ROLE;
@@ -113,6 +124,15 @@ Class.create("RoleEditor", AbstractEditor, {
                 var formPane = toggle.next("div.accordion_content");
                 var parametersHash = new $H();
                 fManager.serializeParametersInputs(formPane, parametersHash, "ROLE_PARAM_");
+                parametersHash.each(function(pair){
+                    var pName = pair.key.replace("ROLE_PARAM_", "");
+                    if(pName.endsWith("_ajxptype") || pName.endsWith("_replication") || pName.endsWith("_checkbox")) return;
+                    if(this.isInherited(['PARAMETERS', repoScope, pluginId, pName])){
+                        if(this.roleParent['PARAMETERS'][repoScope][pluginId][pName] == pair.value){
+                            parametersHash.unset(pair.key);
+                        }
+                    }
+                }.bind(this) );
                 fullPostData['FORMS'][repoScope][pluginId] = parametersHash;
             }.bind(this) );
         }.bind(this) );
@@ -322,6 +342,10 @@ Class.create("RoleEditor", AbstractEditor, {
    			var titleCell = new Element('div', {className:"repositoryLabel"}).update('<img src="'+ajxpResourcesFolder+'/images/mimes/16/folder_red.png" style="float:left;margin-right:5px;">');
             var theLabel = new Element("span",{style:'cursor:pointer;', 'data-repoId':repoId}).update(repoLabel);
             titleCell.insert(theLabel);
+            if(this.isInherited(["ACL", repoId])) {
+                theLabel.insert(" (inherited)");
+                theLabel.addClassName("inherited");
+            }
                /*
                theLabel.observe("click", this.changeUserDefaultRepository.bind(this));
                if(defaultRepository && repoId == defaultRepository){
@@ -360,7 +384,18 @@ Class.create("RoleEditor", AbstractEditor, {
                     el.insert(remove);
                     var repoLab = (repoScope == "AJXP_REPO_SCOPE_ALL" ? "All Repositories" : this.roleData.REPOSITORIES[repoScope]);
                     var pluginLab = (pluginId == "all_plugins" ? "All Plugins" : pluginId);
-                    el.insert(repoLab + " &gt; " + pluginLab + " &gt; " + actionName + " (disabled)");
+                    var state = actionsData[repoScope][pluginId][actionName] === false ? "disabled":"enabled";
+                    el.insert(repoLab + " &gt; " + pluginLab + " &gt; " + actionName + " - "+ state);
+                    if(this.isInherited(['ACTIONS', repoScope, pluginId, actionName])){
+                        el.insert(" (inherited)");
+                        el.addClassName("inherited");
+                        if(state == 'disabled'){
+                            remove.update("Enable");
+                            remove.setAttribute("data-ajxpEnable", "true");
+                        }else{
+                            remove.update("Disable");
+                        }
+                    }
                     actionsPane.insert(el);
                     remove.observeOnce("click", this.actionListRemoveObserver(repoScope, pluginId, actionName) );
                 }
@@ -407,6 +442,12 @@ Class.create("RoleEditor", AbstractEditor, {
                     fitHeightToBottom(passedPane, $("parameters-selected"));
                 };
                 var formParams = formManager.parseParameters(xml, 'standard_form/repoScope[@id="'+id+'"]/*');
+                for(var k=0;k<formParams.length;k++){
+                    var h = formParams[k];
+                    if(this.isInherited(["PARAMETERS", id, h.get("group"), h.get("name")])){
+                        h.set("label", '<span class="inherited">' + h.get("label") + ' (inherited)' + '</span>');
+                    }
+                }
                 formManager.createParametersInputs(pane, formParams, true, null, false, false, false);
                 if(pane.SF_accordion){
                     pane.SF_accordion.openAll();
@@ -418,9 +459,11 @@ Class.create("RoleEditor", AbstractEditor, {
 
             // UPDATE FORMS ELEMENTS
             parametersPane.select("div.SF_element").each(function(element){
-                var removeLink = new Element("span", {className:"list_remove_item"}).update("Remove");
-                element.insert(removeLink);
-                removeLink.observe("click", this.parameterListRemoveObserver(element) );
+                if(!element.down("span.inherited")){
+                    var removeLink = new Element("span", {className:"list_remove_item"}).update("Remove");
+                    element.insert(removeLink);
+                    removeLink.observe("click", this.parameterListRemoveObserver(element) );
+                }
                 element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
                 element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
             }.bind(this) );
@@ -439,11 +482,14 @@ Class.create("RoleEditor", AbstractEditor, {
         this.setDirty();
     },
 
-    addActionToList: function(plugin, action, scope){
+    addActionToList: function(plugin, action, scope, value){
         if(!this.roleWrite.ACTIONS) this.roleWrite.ACTIONS = {};
         if(!this.roleWrite.ACTIONS[scope]) this.roleWrite.ACTIONS[scope] = {};
-        if(!this.roleWrite.ACTIONS[scope][plugin]) this.roleWrite.ACTIONS[scope][plugin] = {};
-        this.roleWrite.ACTIONS[scope][plugin][action] = false;
+        if(!this.roleWrite.ACTIONS[scope][plugin] || Object.isArray(this.roleWrite.ACTIONS[scope][plugin]) ) {
+            this.roleWrite.ACTIONS[scope][plugin] = {};
+        }
+        if(!value) value = false;
+        this.roleWrite.ACTIONS[scope][plugin][action] = value;
         this.computeRoleRead();
         this.populateActionsPane();
         this.element.down("#actions-selected").scrollTop = 10000;
@@ -452,9 +498,14 @@ Class.create("RoleEditor", AbstractEditor, {
 
 
     actionListRemoveObserver : function(scope, plugin, action){
-        return function(){
+        return function(event){
             try{
-                delete this.roleWrite.ACTIONS[scope][plugin][action];
+                if(event.target.getAttribute("data-ajxpEnable")){
+                    this.addActionToList(plugin, action, scope, true);
+                    return;
+                }else{
+                    delete this.roleWrite.ACTIONS[scope][plugin][action];
+                }
                 this.computeRoleRead();
             }catch(e){}
             this.populateActionsPane();

@@ -173,7 +173,9 @@ abstract class AbstractAjxpUser
     }
 	
 	function getSpecificActionsRights($rootDirId){
-        return $this->mergedRole->listActionsStatesFor($rootDirId);
+        $all = $this->mergedRole->listActionsStatesFor(AJXP_REPO_SCOPE_ALL);
+        $repo = $this->mergedRole->listActionsStatesFor($rootDirId);
+        return array_merge($all, $repo);
 	}
 	
 	function setSpecificActionRight($rootDirId, $actionName, $allowed){

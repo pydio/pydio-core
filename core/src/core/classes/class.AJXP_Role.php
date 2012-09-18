@@ -21,8 +21,9 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-const AJXP_VALUE_CLEAR = "AJXP_VALUE_CLEAR";
-const AJXP_REPO_SCOPE_ALL = "AJXP_REPO_SCOPE_ALL";
+define('AJXP_VALUE_CLEAR', "AJXP_VALUE_CLEAR");
+define('AJXP_REPO_SCOPE_ALL',"AJXP_REPO_SCOPE_ALL");
+define('AJXP_PLUGINS_SCOPE_ALL',"plugin_all");
 
 class AJXP_Role implements AjxpGroupPathProvider
 {
@@ -49,9 +50,9 @@ class AJXP_Role implements AjxpGroupPathProvider
             if(count($actions)){
                 foreach($actions as $act => $status){
                     if($repoId == "ajxp.all"){
-                        $this->setActionState("plugin_all", $act, AJXP_REPO_SCOPE_ALL, $status);
+                        $this->setActionState(AJXP_PLUGINS_SCOPE_ALL, $act, AJXP_REPO_SCOPE_ALL, $status);
                     }else{
-                        $this->setActionState("plugin_all", $act, $repoId, $status);
+                        $this->setActionState(AJXP_PLUGINS_SCOPE_ALL, $act, $repoId, $status);
                     }
                 }
             }
@@ -444,7 +445,7 @@ class AJXP_Role implements AjxpGroupPathProvider
      */
     function setSpecificActionRight($rootDirId, $actionName, $allowed){
         if($rootDirId == "ajxp.all") $rootDirId = AJXP_REPO_SCOPE_ALL;
-        $this->setActionState("all_plugins", $actionName, $rootDirId, $allowed);
+        $this->setActionState(AJXP_PLUGINS_SCOPE_ALL, $actionName, $rootDirId, $allowed);
     }
 
     /**

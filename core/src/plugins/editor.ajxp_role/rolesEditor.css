@@ -36,6 +36,12 @@ div.editor_header span.actionbar_button_label {
     padding-left: 23px;
 }
 
+div#role_edit_box span.inherited,
+div#role_edit_box div.inherited
+{
+    color: #888888;
+    font-style: italic;
+}
 
 div#actions-selector,
 div#parameters-selector,
