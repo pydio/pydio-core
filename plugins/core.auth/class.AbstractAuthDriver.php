@@ -176,6 +176,7 @@ class AbstractAuthDriver extends AJXP_Plugin {
 	
 	
 	public function getRegistryContributions( $extendedVersion = true ){
+        $this->loadRegistryContributions();
         if(!$extendedVersion) return $this->registryContributions;
         
 		$logged = AuthService::getLoggedUser();
