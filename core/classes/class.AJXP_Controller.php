@@ -68,23 +68,25 @@ class AJXP_Controller{
 		$loggedUser = AuthService::getLoggedUser();
 		if($loggedUser == null) return false;
 		$crtRepo = ConfService::getRepository();
-		$crtRepoId = "ajxp.all";
+		$crtRepoId = AJXP_REPO_SCOPE_ALL; // "ajxp.all";
 		if($crtRepo != null && is_a($crtRepo, "Repository")){
 			$crtRepoId = $crtRepo->getId();
 		}
 		$actionRights = $loggedUser->getSpecificActionsRights($crtRepoId);
 		$changes = false;
 		$xPath = new DOMXPath($registry);
-		foreach ($actionRights as $actionName => $enabled){
-			if($enabled !== false) continue;
-			$actions = $xPath->query("actions/action[@name='$actionName']");		
-			if(!$actions->length){
-				continue;
-			}
-			$action = $actions->item(0);
-			$action->parentNode->removeChild($action);
-			$changes = true;
-		}
+        foreach($actionRights as $pluginName => $actions){
+            foreach ($actions as $actionName => $enabled){
+                if($enabled !== false) continue;
+                $actions = $xPath->query("actions/action[@name='$actionName']");
+                if(!$actions->length){
+                    continue;
+                }
+                $action = $actions->item(0);
+                $action->parentNode->removeChild($action);
+                $changes = true;
+            }
+        }
 		return $changes;
 	}
 
