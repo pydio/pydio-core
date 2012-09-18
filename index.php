@@ -56,6 +56,7 @@ ConfService::start();
 
 $confStorageDriver = ConfService::getConfStorageImpl();
 require_once($confStorageDriver->getUserClassFileName());
+//new AjxpSessionHandler();
 session_name("AjaXplorer");
 session_start();
 
@@ -148,4 +149,3 @@ if($xmlResult !== false && $xmlResult != ""){
 	AJXP_XMLWriter::close();
 }
 session_write_close();
-?>

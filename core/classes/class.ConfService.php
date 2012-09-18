@@ -868,6 +868,7 @@ class ConfService
 		$coreP = AJXP_PluginsService::getInstance()->findPlugin("core", $coreType);
 		if($coreP === false) return null;
 		$confs = $coreP->getConfigs();
+        $confs = AuthService::filterPluginParameters("core.".$coreType, $confs);
 		return (isSet($confs[$varName]) ? AJXP_VarsFilter::filter($confs[$varName]) : null);
 	}
 	
@@ -964,7 +965,7 @@ class ConfService
                     continue;
                 }
                 try{
-                    $instance->init($metaSources[$plugId]);
+                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
                     $instance->beforeInitMeta($plugInstance);
                 }catch(Exception $e){
                     AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
@@ -1001,7 +1002,7 @@ class ConfService
 					continue;
 				}
                 try{
-                    $instance->init($metaSources[$plugId]);
+                    $instance->init(AuthService::filterPluginParameters($plugId, $metaSources[$plugId], $crtRepository->getId()));
                     $instance->initMeta($plugInstance);
                 }catch(Exception $e){
                     AJXP_Logger::logAction('ERROR : Cannot instanciate Meta plugin, reason : '.$e->getMessage());
