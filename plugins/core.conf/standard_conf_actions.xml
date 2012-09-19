@@ -210,13 +210,20 @@
 				<clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
 					    var f = new FormManager();
-                        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]");
-                        f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, false, false, true);
+                        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
+                        var values = {};
+                        ajaxplorer.user.preferences.each(function(pair){
+                            if(pair.key.startsWith("CUSTOM_PARAM_")){
+                                values[pair.key.replace("CUSTOM_PARAM_", "")] = pair.value;
+                            }
+                        });
+                        values = $H(values);
+                        f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, values, false, true);
 					]]></dialogOnOpen>
 					<dialogOnComplete hideDialog="true"><![CDATA[
 					    var params = $H();
 					    var f = new FormManager();
-                        f.serializeParametersInputs(oForm.down('#custom_data_edit'), params);
+                        f.serializeParametersInputs(oForm.down('#custom_data_edit'), params, 'CUSTOM_PARAM_');
                         var conn = new Connexion();
                         params.set("get_action", "custom_data_edit");
                         conn.setParameters(params);

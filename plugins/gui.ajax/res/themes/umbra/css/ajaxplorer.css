@@ -319,6 +319,10 @@ div.shadow_class
     height: 22px;
 }
 
+.dialogContent select[multiple]{
+    height: 66px;
+}
+
 .dialogContent input:focus,
 .dialogContent input[type="text"]:focus,
 .dialogContent input[type="password"]:focus,
@@ -840,7 +844,7 @@ div.editor_header > div.editor_action_bar > div.separator{
 
 div.editor_header > span.header_label{
     font-size: 28px;
-    padding: 15px 62px;
+    padding: 15px 0 0 62px;
     display: inline-block;
     background-image: url('../images/mimes/64/user-acl.png');
     background-size: 40px;

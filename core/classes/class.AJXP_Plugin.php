@@ -42,6 +42,7 @@ class AJXP_Plugin implements Serializable{
     protected $enabled;
 	protected $actions;
 	protected $registryContributions = array();
+    protected $contributionsLoaded = false;
 	protected $options; // can be passed at init time
 	protected $pluginConf; // can be passed at load time
 	protected $pluginConfDefinition;
@@ -72,7 +73,8 @@ class AJXP_Plugin implements Serializable{
         "externalFilesAppended",
         "enabled",
 		"actions", 
-		"registryContributions", 
+		"registryContributions",
+        "contributionsLoaded",
 		"mixins",
         "streamData",
 		"options", "pluginConf", "pluginConfDefinition", "dependencies", "loadingState", "manifestXML");
@@ -149,8 +151,10 @@ class AJXP_Plugin implements Serializable{
 				}
 				$this->initXmlContributionFile($filename, $include, $exclude, $dry);
 			}else{
-				$this->registryContributions[]=$regNode;
-				if(!$dry) $this->parseSpecificContributions($regNode);
+                if(!$dry) {
+                    $this->registryContributions[]=$regNode;
+                    $this->parseSpecificContributions($regNode);
+                }
 			}
 		}
 		// add manifest as a "plugins" (remove parsed contrib)
@@ -163,8 +167,11 @@ class AJXP_Plugin implements Serializable{
 		if($regNodeParent->length){
 			$manifestNode->removeChild($regNodeParent->item(0));
 		}
-		$this->registryContributions[]=$pluginContrib->documentElement;
-        if(!$dry) $this->parseSpecificContributions($pluginContrib->documentElement);
+        if(!$dry) {
+            $this->registryContributions[]=$pluginContrib->documentElement;
+            $this->parseSpecificContributions($pluginContrib->documentElement);
+            $this->contributionsLoaded = true;
+        }
 	}
 
 	/**
@@ -178,8 +185,10 @@ class AJXP_Plugin implements Serializable{
 		$contribDoc = new DOMDocument();
 		$contribDoc->load(AJXP_INSTALL_PATH."/".$xmlFile);
 		if(!is_array($include) && !is_array($exclude)){
-			$this->registryContributions[] = $contribDoc->documentElement;
-            if(!$dry) $this->parseSpecificContributions($contribDoc->documentElement);
+            if(!$dry) {
+                $this->registryContributions[] = $contribDoc->documentElement;
+                $this->parseSpecificContributions($contribDoc->documentElement);
+            }
 			return;
 		}
 		$xPath = new DOMXPath($contribDoc);
@@ -231,8 +240,8 @@ class AJXP_Plugin implements Serializable{
 				$node->appendChild($childNode);
                 if($dry) $localRegParent->appendChild($localRegParent->ownerDocument->importNode($childNode, true));
 			}
-			$this->registryContributions[] = $node;
             if(!$dry) {
+                $this->registryContributions[] = $node;
                 $this->parseSpecificContributions($node);
             }else{
                 $this->reloadXPath();
@@ -392,7 +401,9 @@ class AJXP_Plugin implements Serializable{
      * @return array
      */
 	public function getRegistryContributions($extendedVersion = true){
-        $this->loadRegistryContributions();
+        if(!$this->contributionsLoaded) {
+            $this->loadRegistryContributions();
+        }
 		return $this->registryContributions;
 	}
     /**

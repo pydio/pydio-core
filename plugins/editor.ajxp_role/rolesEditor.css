@@ -45,9 +45,28 @@ div#role_edit_box div.inherited
 
 div#actions-selector,
 div#parameters-selector,
-div#pane-acls > div.dialogLegend
+div#pane-acls > div.dialogLegend,
+div#pane-infos
 {
     padding: 20px;
+}
+
+div#pane-infos > div{
+    clear: both;
+}
+
+div#pane-infos > div.innerTitle{
+    font-size: 24px;
+    border-bottom: 1px solid #195470;
+    color: #195470;
+    margin-bottom: 10px;
+}
+
+div#account_actions{
+    background: none;
+    float: right;
+    padding: 5px;
+    height: 30px;
 }
 
 div#actions-selected,
