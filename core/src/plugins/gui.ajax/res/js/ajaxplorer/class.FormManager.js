@@ -105,14 +105,25 @@ Class.create("FormManager", {
 				element = '<div class="SF_input">'+element+'</div>';
 			}else if(type == 'select' && param.get('choices')){
                 var choices, json_list;
-                if(param.get("choices").startsWith("json_list:")){
-                    choices = ["loading|Loading..."];
-                    json_list = param.get("choices").split(":")[1];
+                if(Object.isString(param.get("choices"))){
+                    if(param.get("choices").startsWith("json_list:")){
+                        choices = ["loading|Loading..."];
+                        json_list = param.get("choices").split(":")[1];
+                    }else if(param.get("choices") == "AJXP_AVAILABLE_LANGUAGES"){
+                        var object = window.ajxpBootstrap.parameters.get("availableLanguages");
+                        choices = [];
+                        for(var key in object){
+                            choices.push(key + "|" + object[key]);
+                        }
+                    }else{
+                        choices = param.get('choices').split(",");
+                    }
                 }else{
-                    choices = param.get('choices').split(",");
+                    choices = param.get("choices");
                 }
-                element = '<select class="SF_input" name="'+name+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" >';
-                if(!mandatory) element += '<option value=""></option>';
+                var multiple = param.get("multiple") ? "multiple='true'":"";
+                element = '<select class="SF_input" name="'+name+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" '+multiple+'>';
+                if(!mandatory && !multiple) element += '<option value=""></option>';
                 for(var k=0;k<choices.length;k++){
                     var cLabel, cValue;
                     var cSplit = choices[k].split("|");

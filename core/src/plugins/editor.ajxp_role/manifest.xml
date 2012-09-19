@@ -17,11 +17,19 @@
 			</div>
 			<div id="roleTabulator">
 			    <ul class="tabrow">
-                    <li class="selected" data-PaneID="pane-acls"><span>ACL</span></li>
+                    <li class="selected" data-PaneID="pane-infos"><span>Info</span></li>
+                    <li class="" data-PaneID="pane-acls"><span>ACL</span></li>
                     <li class="" data-PaneID="pane-actions"><span>Actions</span></li>
                     <li class="" data-PaneID="pane-parameters"><span>Parameters</span></li>
 	            </ul>
 	            <div class="tabpanes">
+	            </div>
+	            <div id="pane-infos">
+	                <div class="innerTitle">Generic Informations</div>
+                    <div id="account_infos"></div>
+                    <div id="account_actions" class="action_bar editor_header"></div>
+	                <div class="innerTitle">Custom Fields</div>
+                    <div id="account_custom"></div>
 	            </div>
                 <div id="pane-acls">
                     <div class="dialogLegend">Select the repositories to which the use with this role will have access. Use the 'Deny' value to either override a value set by a previous role, or definitely deny the access to this repository even to inherited roles.</div>

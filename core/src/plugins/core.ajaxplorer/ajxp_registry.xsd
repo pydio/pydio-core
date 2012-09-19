@@ -636,6 +636,8 @@
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="type" use="required" type="xs:NCName"/>
+            <xs:attribute name="scope"/>
+            <xs:attribute name="repoScope"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="param">
@@ -643,6 +645,7 @@
             <xs:attribute name="choices"/>
             <xs:attribute name="default"/>
             <xs:attribute name="description" use="required"/>
+            <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
             <xs:attribute name="replicationGroup"/>
             <xs:attribute name="label" use="required"/>
@@ -651,6 +654,8 @@
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>
             <xs:attribute name="type" use="required" type="xs:NCName"/>
+            <xs:attribute name="scope"/>
+            <xs:attribute name="repoScope"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="user_param">
@@ -658,6 +663,7 @@
             <xs:attribute name="choices"/>
             <xs:attribute name="default"/>
             <xs:attribute name="description" use="required"/>
+            <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
             <xs:attribute name="replicationGroup"/>
             <xs:attribute name="label" use="required"/>
@@ -666,6 +672,8 @@
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>
             <xs:attribute name="type" use="required" type="xs:NCName"/>
+            <xs:attribute name="scope"/>
+            <xs:attribute name="repoScope"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="plugin_info">

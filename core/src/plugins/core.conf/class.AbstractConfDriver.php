@@ -54,6 +54,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 }
             }
         }
+
+        $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+        if(is_array($paramNodes) && count($paramNodes)) $hasExposed = true;
+
         if(!$hasExposed){
             unset($this->actions["custom_data_edit"]);
             $actionXpath=new DOMXPath($contribNode->ownerDocument);
@@ -287,6 +291,22 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
         }
         foreach ($jsonPrefs as $pref){
             $prefs[$pref] = array("value" => $userObject->getPref($pref), "type" => "json" );
+        }
+
+        $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+        if(is_array($paramNodes) && count($paramNodes)){
+            foreach($paramNodes as $xmlNode){
+                if($xmlNode->getAttribute("expose") == "true"){
+                    $parentNode = $xmlNode->parentNode->parentNode;
+                    $pluginId = $parentNode->getAttribute("id");
+                    if(empty($pluginId)){
+                        $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
+                    }
+                    $name = $xmlNode->getAttribute("name");
+                    $value = $userObject->personalRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "");
+                    $prefs["CUSTOM_PARAM_".$name] = array("value" => $value, "type" => "string");
+                }
+            }
         }
 
         $customValue = $userObject->getPref("CUSTOM_PARAMS");

@@ -34,6 +34,9 @@ Class.create("RoleEditor", AbstractEditor, {
 		$super(oFormObject, {fullscreen:false});
         fitHeightToBottom(oFormObject.down("#roleTabulator"), oFormObject.up(".dialogBox"));
         // INIT TAB
+        $("pane-infos").resizeOnShow = function(tab){
+            fitHeightToBottom($("pane-infos"), $("role_edit_box"));
+        }
         $("pane-actions").resizeOnShow = function(tab){
             fitHeightToBottom($("actions-selected"), $("pane-actions"), 20);
         }
@@ -168,14 +171,17 @@ Class.create("RoleEditor", AbstractEditor, {
 		$super(userSelection);
         var node = userSelection.getUniqueNode();
         var mime = node.getAjxpMime();
+        var scope = mime;
         if(mime == "role"){
             this.roleId = getBaseName(node.getPath());
         }else if(mime == "group"){
             this.roleId = "AJXP_GRP_" + node.getPath().replace("/data/users", "");
         }else if(mime == "user" || mime == "user_editable"){
             this.roleId = "AJXP_USR_/" + getBaseName(node.getPath());
+            scope = "user";
         }
         this.element.down("span.header_label").update(this.roleId);
+        this.buildInfoPane(node, scope);
         var conn = new Connexion();
         conn.setParameters({
             get_action:"edit",
@@ -184,9 +190,7 @@ Class.create("RoleEditor", AbstractEditor, {
             format:'json'
         });
         conn.onComplete = function(transport){
-
             this.initJSONResponse(transport.responseJSON);
-
         }.bind(this);
         conn.sendAsync();
 
@@ -204,6 +208,65 @@ Class.create("RoleEditor", AbstractEditor, {
         }.bind(this);
         conn3.sendAsync();
 	},
+
+    buildInfoPane : function(node, scope){
+        var f = new FormManager();
+        if(scope == "user"){
+            // MAIN INFO
+            var defs = [
+                $H({"name":"login",label:"User identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
+                $H({"name":"pass",label:"Password","type":"password"}),
+                $H({"name":"pass_confirm",label:"Confirm Password","type":"password"}),
+                $H({"name":"rights",label:"Specific Rights","type":"select", choices:"admin|Administrator,shared|Shared,guest|Guest"}),
+                $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:"role1|Role1,role2|Role2"})
+            ];
+            defs = $A(defs);
+            f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+
+            // BUTTONS
+            var buttonPane = this.element.down("#pane-infos").down("#account_actions");
+            var b1 = new Element("a", {}).update("Kill current session");
+            buttonPane.insert(b1);
+            var b2 = new Element("a", {}).update("Lock out account");
+            buttonPane.insert(b2);
+            var b3 = new Element("a", {}).update("Force Pass Change");
+            buttonPane.insert(b3);
+
+        }else if(scope == "role"){
+            // MAIN INFO
+            var defs = [
+                $H({"name":"roleId",label:"Role identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
+                $H({"name":"rights",label:"Apply automatically to users with the right...","type":"select", multiple:true, choices:"admin|Administrator,shared|Shared,guest|Guest"})
+            ];
+            defs = $A(defs);
+            f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+
+            // REMOVE BUTTONS
+            this.element.down("#pane-infos").down("#account_actions").remove();
+
+        }else if(scope == "group"){
+            // MAIN INFO
+            var defs = [
+                $H({"name":"groupId",label:"Group Label","type":"string", default:getBaseName(node.getPath())})
+            ];
+            defs = $A(defs);
+            f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+
+            // REMOVE BUTTONS
+            this.element.down("#pane-infos").down("#account_actions").remove();
+        }
+
+        // CUSTOM DATA
+        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "//param[contains(@scope,'"+scope+"')]");
+        definitions.each(function(param){
+            if(param.get("readonly"))param.set("readonly", false);
+        });
+        if(!definitions.length){
+            this.element.down("#pane-infos").down("#account_custom").previous().remove();
+        }else{
+            f.createParametersInputs(this.element.down("#pane-infos").down("#account_custom"), definitions, true, false, false, true);
+        }
+    },
 
     initJSONResponse : function(responseJSON){
 
