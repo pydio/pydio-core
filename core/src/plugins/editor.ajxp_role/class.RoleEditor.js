@@ -29,10 +29,25 @@ Class.create("RoleEditor", AbstractEditor, {
     pluginsData : null,
     roleId : null,
 
-	initialize: function($super, oFormObject)
+    /**
+     * Resizes the main container
+     * @param size int|null
+     */
+    resize : function(size){
+        if(size){
+            this.contentMainContainer.setStyle({height:size+"px"});
+        }else{
+            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
+            this.tab.resize();
+        }
+        this.element.fire("editor:resize", size);
+    },
+
+    initialize: function($super, oFormObject)
 	{
 		$super(oFormObject, {fullscreen:false});
-        fitHeightToBottom(oFormObject.down("#roleTabulator"), oFormObject.up(".dialogBox"));
+        fitHeightToBottom(this.element.down("#roleTabulator"), this.element.up(".dialogBox"));
+        this.contentMainContainer = this.element.down("#roleTabulator");
         // INIT TAB
         $("pane-infos").resizeOnShow = function(tab){
             fitHeightToBottom($("pane-infos"), $("role_edit_box"));
@@ -170,10 +185,13 @@ Class.create("RoleEditor", AbstractEditor, {
         conn.onComplete = function(transport){
 
             var response = transport.responseJSON;
-            var updatedJSON = response.ROLE;
             if(response.SUCCESS){
                 ajaxplorer.displayMessage("SUCCESS", "Role updated successfully");
                 response.REPOSITORIES = this.roleData.REPOSITORIES;
+                if(this.roleData.USER_ROLES)response.USER_ROLES = this.roleData.USER_ROLES;
+                if(this.roleData.ALL_ROLES)response.ALL_ROLES = this.roleData.ALL_ROLES;
+                if(this.roleData.USER_PROFILE)response.USER_PROFILE = this.roleData.USER_PROFILE;
+                if(this.roleData.ALL_PROFILES)response.ALL_PROFILES = this.roleData.ALL_PROFILES;
                 this.initJSONResponse(response);
                 ajaxplorer.fireContextRefresh();
                 this.setClean();
@@ -200,6 +218,10 @@ Class.create("RoleEditor", AbstractEditor, {
             scope = "user";
         }
         this.element.down("span.header_label").update(this.roleId);
+        this.loadRoleData(true, node, scope);
+	},
+
+    loadRoleData : function(withInfoPane, node, scope){
         var conn = new Connexion();
         conn.setParameters({
             get_action:"edit",
@@ -209,7 +231,7 @@ Class.create("RoleEditor", AbstractEditor, {
         });
         conn.onComplete = function(transport){
             this.initJSONResponse(transport.responseJSON);
-            this.buildInfoPane(node, scope);
+            if(withInfoPane) this.buildInfoPane(node, scope);
         }.bind(this);
         conn.sendAsync();
 
@@ -226,10 +248,38 @@ Class.create("RoleEditor", AbstractEditor, {
             this.feedPluginsSelectors(transport.responseJSON, this.element.select("select.plugin_selector")[1]);
         }.bind(this);
         conn3.sendAsync();
-	},
+    },
 
-    updateRoles : function(){
-
+    updateRoles : function(selection){
+        // DIFF
+        var orig = this.roleData.USER_ROLES || $A();
+        var currentUserId = this.roleId.replace("AJXP_USR_/", "");
+        orig.each(function(el){
+            if(!selection[el]) {
+                var conn = new Connexion();
+                conn.setParameters({
+                    get_action:"edit",
+                    sub_action:"user_delete_role",
+                    user_id : currentUserId,
+                    role_id : el
+                });
+                conn.sendSync();
+            }
+        });
+        selection.each(function(el){
+            if(!orig[el]) {
+                var conn = new Connexion();
+                conn.setParameters({
+                    get_action:"edit",
+                    sub_action:"user_add_role",
+                    user_id : currentUserId,
+                    role_id : el
+                });
+                conn.sendSync();
+            }
+        });
+        this.loadRoleData(false);
+        this.setClean();
     },
 
     buildInfoPane : function(node, scope){
@@ -237,28 +287,52 @@ Class.create("RoleEditor", AbstractEditor, {
         if(scope == "user"){
             // MAIN INFO
             var rolesChoicesString = this.roleData.ALL_ROLES.join(",");
+            var profilesChoices = this.roleData.ALL_PROFILES.join(",");
             var defs = [
                 $H({"name":"login",label:"User identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
-                $H({"name":"pass",label:"Password","type":"password"}),
-                $H({"name":"pass_confirm",label:"Confirm Password","type":"password"}),
-                $H({"name":"rights",label:"Specific Rights","type":"select", choices:"admin|Administrator,shared|Shared,guest|Guest"}),
+                $H({"name":"rights",label:"Specific Rights","type":"select", choices:profilesChoices, default:this.roleData.USER_PROFILE}),
                 $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER_ROLES.join(",")})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
             var rolesSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="roles"]');
             rolesSelect.observe("change", function(){
-                this.updateRoles();
-            });
+                this.setDirty();
+                if(this.updateRoleAccumulator){
+                    window.clearTimeout(this.updateRoleAccumulator);
+                }
+                this.updateRoleAccumulator = window.setTimeout(function(){
+                    this.updateRoles(rolesSelect.getValue());
+                }.bind(this) , 500);
+            }.bind(this) );
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
+            var b0 = new Element("a", {}).update("Change Password");
+            buttonPane.insert(b0);
+            var userId = this.roleId.replace("AJXP_USR_/", "");
+            b0.observe("click", function(){
+                var p1 = window.prompt("Enter new password for user");
+                var p2 = window.prompt("Confirm new password for user");
+                if(p2 == p1){
+                    var conn = new Connexion();
+                    conn.setParameters({
+                        get_action:"edit",
+                        sub_action:"update_user_pwd",
+                        user_id : userId,
+                        user_pwd : p2
+                    });
+                    conn.sendAsync();
+                }
+            });
+            /*
             var b1 = new Element("a", {}).update("Kill current session");
             buttonPane.insert(b1);
             var b2 = new Element("a", {}).update("Lock out account");
             buttonPane.insert(b2);
             var b3 = new Element("a", {}).update("Force Pass Change");
             buttonPane.insert(b3);
+            */
 
         }else if(scope == "role"){
             // MAIN INFO
@@ -299,6 +373,9 @@ Class.create("RoleEditor", AbstractEditor, {
             try{
                 param.set("default", this.roleRead.PARAMETERS["AJXP_REPO_SCOPE_ALL"][plugId][param.get("name")]);
             }catch(e){}
+            if(param.get("name").endsWith("DISPLAY_NAME") && param.get("default")){
+                this.element.down("span.header_label").update(param.get("default"));
+            }
             param.set("name", "AJXP_REPO_SCOPE_ALL/" + plugId + "/" + param.get("name"));
         }.bind(this));
         if(!definitions.length){
@@ -540,10 +617,18 @@ Class.create("RoleEditor", AbstractEditor, {
             for(var i=0;i<scopes.length;i++){
                 var id = scopes[i].getAttribute("id");
                 var scopeLabel;
-                if(id == "AJXP_REPO_SCOPE_ALL") scopeLabel = "All Repositories";
+                var setTop = false;
+                if(id == "AJXP_REPO_SCOPE_ALL") {
+                    scopeLabel = "All Repositories";
+                    setTop = true;
+                }
                 else scopeLabel = this.roleData.REPOSITORIES[id];
                 var tab = new Element("li", {"data-PaneID":"params-form-" + id}).update('<span>'+scopeLabel+'</span>');
-                parametersPane.down("ul.tabrow").insert(tab);
+                if(setTop){
+                    parametersPane.down("ul.tabrow").insert({top:tab});
+                }else{
+                    parametersPane.down("ul.tabrow").insert(tab);
+                }
 
                 var pane = new Element("div", {id:"params-form-" + id, className:"role_edit-params-form"});
                 parametersPane.insert(pane);

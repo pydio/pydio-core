@@ -143,7 +143,14 @@ abstract class AbstractAjxpUser
             return array();
         }
 	}
-	
+
+    function getAjxpProfile(){
+        if($this->isAdmin()) return "admin";
+        if($this->hasParent()) return "shared";
+        if($this->getId() == "guest") return "guest";
+        return "standard";
+    }
+
 	function isAdmin(){
 		return $this->hasAdmin; 
 	}

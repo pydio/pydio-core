@@ -319,6 +319,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         "REPOSITORIES" => $repos
                     );
                     if(isSet($userObject)){
+                        $data["USER_PROFILE"] = $userObject->getAjxpProfile();
+                        $data["ALL_PROFILES"] = array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest");
                         $data["USER_ROLES"] = array_keys($userObject->getRoles());
                         $data["ALL_ROLES"] = array_keys(AuthService::getRolesList(array(), true));
                         if(isSet($userObject->parentRole)){
