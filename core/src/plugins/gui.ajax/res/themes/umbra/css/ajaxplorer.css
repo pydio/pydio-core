@@ -843,7 +843,8 @@ div.editor_header > div.editor_action_bar > div.separator{
 }
 
 div.editor_header > span.header_label{
-    font-size: 28px;
+    font-size: 24px;
+    width: 52%;
     padding: 15px 0 0 62px;
     display: inline-block;
     background-image: url('../images/mimes/64/user-acl.png');
@@ -3057,6 +3058,13 @@ div.menu a {
     -moz-box-shadow : 5px 5px 60px #303030;
     -webkit-box-shadow : 5px 5px 60px #303030;
 	box-shadow : 5px 5px 60px #303030;
+}
+
+div.dialogBox div.dialogBox.css_boxshadow{
+    -moz-box-shadow: 2px 2px 10px #4C5B6B;
+    -webkit-box-shadow: 2px 2px 10px #4C5B6B;
+    box-shadow: 2px 2px 10px #4C5B6B;
+    border: 1px solid white;
 }
 
 /****************************************/

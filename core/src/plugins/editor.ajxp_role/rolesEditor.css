@@ -64,9 +64,8 @@ div#pane-infos > div.innerTitle{
 
 div#account_actions{
     background: none;
-    float: right;
-    padding: 5px;
-    height: 30px;
+    text-align: right;
+    padding: 12px 5px 18px;
 }
 
 div#actions-selected,
@@ -171,4 +170,48 @@ div#parameters-selected span.list_remove_item{
     position: absolute;
     top: 8px;
     right: 0;
+}
+
+a.m-2 {
+    background: -webkit-gradient( linear, left top, left bottom, from(#2A93C5), to(#226C8F) );
+    border: 1px solid #14528f;
+	-webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
+	color: #fff;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
+	-webkit-transition: -webkit-box-shadow .1s linear;
+	-webkit-border-radius: 3px;
+	font: bold 11px "Helvetica Neue", Arial, Geneva, sans-serif;
+	padding: 4px 7px;
+	cursor: pointer;
+	display: inline-block;
+	text-decoration: none;
+    margin-right: 8px;
+}
+
+a.m-2:hover {
+	-webkit-box-shadow: 0 0 5px #6496ff;
+}
+
+a.m-2:active {
+	background: -webkit-gradient(
+			linear,
+			left top,
+			left bottom,
+			from(#2b70c4),
+			to(#64abe6)
+		);
+	-webkit-box-shadow: inset 0 0 5px rgba(255, 255, 255, .25);
+}
+
+a.m-2.disabled {
+	background: -webkit-gradient(
+			linear,
+			left top,
+			left bottom,
+			from(#64abe6),
+			to(#2b70c4)
+		);
+	-webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .15);
+	cursor: auto;
+	opacity: .5;
 }

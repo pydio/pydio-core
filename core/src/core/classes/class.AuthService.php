@@ -299,6 +299,9 @@ class AuthService
         }
 
         $user = $confDriver->createUserObject($user_id);
+        if($user->getLock() == "logout"){
+            return -1;
+        }
 		if($authDriver->isAjxpAdmin($user_id)){
 			$user->setAdmin(true);
 		}
