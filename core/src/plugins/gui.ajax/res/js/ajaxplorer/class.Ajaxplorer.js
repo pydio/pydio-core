@@ -485,11 +485,18 @@ Class.create("Ajaxplorer", {
 		var repositoryObject = new Repository(null);
 		if(this.user != null)
 		{
-			var repId = this.user.getActiveRepository();
+            var repId = this.user.getActiveRepository();
 			var repList = this.user.getRepositoriesList();			
 			repositoryObject = repList.get(repId);
 			if(!repositoryObject){
-				alert("No active repository found for user!");
+                if(this.user.lock){
+                    this.actionBar.loadActionsFromRegistry(this._registry);
+                    window.setTimeout(function(){
+                        this.actionBar.fireAction(this.user.lock);
+                    }.bind(this), 50);
+                    return;
+                }
+                alert("No active repository found for user!");
 			}
 			if(this.user.getPreference("pending_folder") && this.user.getPreference("pending_folder") != "-1"){
 				this._initLoadRep = this.user.getPreference("pending_folder");

@@ -151,6 +151,21 @@ abstract class AbstractAjxpUser
         return "standard";
     }
 
+    function setLock($lockAction){
+        $this->rights["ajxp.lock"] = $lockAction;
+    }
+
+    function removeLock(){
+        $this->rights["ajxp.lock"] = false;
+    }
+
+    function getLock(){
+        if(!empty($this->rights["ajxp.lock"])){
+            return $this->rights["ajxp.lock"];
+        }
+        return false;
+    }
+
 	function isAdmin(){
 		return $this->hasAdmin; 
 	}
@@ -172,10 +187,12 @@ abstract class AbstractAjxpUser
 	}
 	
 	function canRead($rootDirId){
+        if(!empty($this->rights["ajxp.lock"])) return false;
         return $this->mergedRole->canRead($rootDirId);
 	}
 	
 	function canWrite($rootDirId){
+        if(!empty($this->rights["ajxp.lock"])) return false;
         return $this->mergedRole->canWrite($rootDirId);
     }
 	
@@ -332,7 +349,7 @@ abstract class AbstractAjxpUser
         return $this->groupPath;
     }
 
-    protected function recomputeMergedRole(){
+    public function recomputeMergedRole(){
         if(!count($this->roles)) {
             throw new Exception("Empty role, this is not normal");
         }

@@ -114,6 +114,10 @@ class AbstractAuthDriver extends AJXP_Plugin {
 				}
 				if(AuthService::checkPassword($userObject->getId(), $oldPass, false, $passSeed)){
 					AuthService::updatePassword($userObject->getId(), $newPass);
+                    if($userObject->getLock() == "pass_change"){
+                        $userObject->removeLock();
+                        $userObject->save("superuser");
+                    }
 				}else{
 					header("Content-Type:text/plain");
 					print "PASS_ERROR";

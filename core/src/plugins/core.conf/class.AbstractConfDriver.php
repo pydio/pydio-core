@@ -303,7 +303,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                         $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
                     }
                     $name = $xmlNode->getAttribute("name");
-                    $value = $userObject->personalRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "");
+                    $value = $userObject->mergedRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "");
                     $prefs["CUSTOM_PARAM_".$name] = array("value" => $value, "type" => "string");
                 }
             }
@@ -452,19 +452,32 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 $data = array();
                 AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "CUSTOM_PARAM_");
 
-                $customValue = $userObject->getPref("CUSTOM_PARAMS");
-                $custom = ConfService::getConfStorageImpl()->getOption("CUSTOM_DATA");
-                if(is_array($custom) && count($custom)){
-                    foreach($custom as $key => $value){
-                        if(is_string($value)) continue;
-                        if(is_array($value) && isset($value["exposed"]) && $value["exposed"] == true
-                            && (!isset($value["readonly"]) || $value["readonly"] != "true") && isSet($data[$key])){
-                            $customValue[$key] = $data[$key];
+                $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+                $rChanges = false;
+                if(is_array($paramNodes) && count($paramNodes)){
+                    foreach($paramNodes as $xmlNode){
+                        if($xmlNode->getAttribute("expose") == "true"){
+                            $parentNode = $xmlNode->parentNode->parentNode;
+                            $pluginId = $parentNode->getAttribute("id");
+                            if(empty($pluginId)){
+                                $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
+                            }
+                            $name = $xmlNode->getAttribute("name");
+                            if(isSet($data[$name])){
+                                if($userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]){
+                                    $userObject->personalRole->setParameterValue($pluginId, $name, $data[$name]);
+                                    $rChanges = true;
+                                }
+                            }
                         }
                     }
                 }
-                $userObject->setPref("CUSTOM_PARAMS", $customValue);
-                $userObject->save();
+                if($rChanges){
+                    AuthService::updateRole($userObject->personalRole);
+                    $userObject->recomputeMergedRole();
+                    AuthService::updateUser($userObject);
+                }
+
 
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage("Successfully updated your account", null);

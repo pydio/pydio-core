@@ -384,61 +384,25 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 echo(json_encode($output));
 
             break;
-			
-			case "update_role_right" :
-				if(!isSet($httpVars["role_id"]) 
-					|| !isSet($httpVars["repository_id"]) 
-					|| !isSet($httpVars["right"]))
-				{
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-					print("<update_checkboxes user_id=\"".$httpVars["role_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
-					AJXP_XMLWriter::close();
-					return ;
-				}
-				$role = AuthService::getRole($httpVars["role_id"]);
-				if($role === false) {
-					throw new Exception("Cant find role!");
-				}
-				$role->setRight($httpVars["repository_id"], $httpVars["right"]);
-				AuthService::updateRole($role);
-				AJXP_XMLWriter::header();
-				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.64"].$httpVars["role_id"], null);
-				print("<update_checkboxes user_id=\"".$httpVars["role_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"".$role->canRead($httpVars["repository_id"])."\" write=\"".$role->canWrite($httpVars["repository_id"])."\"/>");
-				//AJXP_XMLWriter::reloadRepositoryList();
-				AJXP_XMLWriter::close();
-			break;
 
-			case "update_role_actions" : 
-			
-				if(!isSet($httpVars["role_id"])  
-					|| !isSet($httpVars["disabled_actions"]))
-				{
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-					AJXP_XMLWriter::close();
-					return ;
-				}
-				$role = AuthService::getRole($httpVars["role_id"]);
-				if($role === false) {
-					throw new Exception("Cant find role!");
-				}
-				$actions = explode(",", $httpVars["disabled_actions"]);
-				// Clear and reload actions
-				foreach ($role->getSpecificActionsRights("ajxp.all") as $actName => $actValue){
-					$role->setSpecificActionRight("ajxp.all", $actName, true);
-				}
-				foreach ($actions as $action){
-					if(($action = AJXP_Utils::sanitize($action, AJXP_SANITIZE_ALPHANUM)) == "") continue;
-					$role->setSpecificActionRight("ajxp.all", $action, false);
-				}
-				AuthService::updateRole($role);
-				AJXP_XMLWriter::header("admin_data");
-				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
-				AJXP_XMLWriter::close("admin_data");				
-			
-			break;		
-			
+
+            case "user_set_lock" :
+
+                $userId = AJXP_Utils::decodeSecureMagic($httpVars["user_id"]);
+                $lock = ($httpVars["lock"] == "true" ? true : false);
+                $lockType = $httpVars["lock_type"];
+                if(AuthService::userExists($userId)){
+                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    if($lock){
+                        $userObject->setLock($lockType);
+                    }else{
+                        $userObject->removeLock();
+                    }
+                    $userObject->save("superuser");
+                }
+
+            break;
+
 			case "update_role_default" :
 
 				if(!isSet($httpVars["role_id"])
