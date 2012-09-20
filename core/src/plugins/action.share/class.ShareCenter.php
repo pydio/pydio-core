@@ -428,7 +428,9 @@ class ShareCenter extends AJXP_Plugin{
         $messages = array();
         if(is_file($pDir."/res/i18n/".$language.".php")){
             include($pDir."/res/i18n/".$language.".php");
-            $messages = $mess;
+            if(isSet($mess)){
+                $messages = $mess;
+            }
         }else{
             include($pDir."/res/i18n/en.php");
         }
@@ -476,7 +478,7 @@ class ShareCenter extends AJXP_Plugin{
         $messages = array();
         if(is_file(dirname(__FILE__)."/res/i18n/".$language.".php")){
             include(dirname(__FILE__)."/res/i18n/".$language.".php");
-            $messages = $mess;
+            if(isSet($mess)) $messages = $mess;
         }else{
             include(dirname(__FILE__)."/res/i18n/en.php");
         }
@@ -550,7 +552,7 @@ class ShareCenter extends AJXP_Plugin{
         foreach($groups as $gId => $gLabel){
             $r = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($gId));
             if($r != null){
-                $right = $r->getRight($repoId);
+                $right = $r->getAcl($repoId);
                 if(!empty($right)){
                     $entry = array(
                         "ID"    => $gId,
@@ -568,13 +570,13 @@ class ShareCenter extends AJXP_Plugin{
 
         foreach ($users as $userId => $userObject) {
             if($userObject->getId() == $loggedUser->getId()) continue;
-            $ri = $userObject->getRight($repoId);
+            $ri = $userObject->getAcl($repoId);
             if(!empty($ri)){
                 $entry =  array(
                     "ID"    => $userId,
                     "TYPE"  => $userObject->hasParent()?"tmp_user":"user",
                     "LABEL" => $userId,
-                    "RIGHT" => $userObject->getRight($repoId)
+                    "RIGHT" => $userObject->getAcl($repoId)
                 );
                 if(!$mixUsersAndGroups){
                     $sharedEntries[$userId] = $entry;
@@ -752,16 +754,17 @@ class ShareCenter extends AJXP_Plugin{
                 $userObject->clearRights();
                 $userObject->setParent($loggedUser->id);
                 $userObject->setGroupPath($loggedUser->getGroupPath());
+                AJXP_Controller::applyHook("user.after_create", array($userObject));
             }
             // CREATE USER WITH NEW REPO RIGHTS
-            $userObject->setRight($newRepo->getUniqueId(), $uRights[$userName]);
+            $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
             $userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
             $userObject->save("superuser");
         }
 
         foreach($groups as $group){
             $grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
-            $grRole->setRight($newRepo->getUniqueId(), $uRights[$group]);
+            $grRole->setAcl($newRepo->getUniqueId(), $uRights[$group]);
             $grRole->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
             AuthService::updateRole($grRole);
         }
