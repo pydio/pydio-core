@@ -336,11 +336,11 @@ Class.create("AbstractEditor" , {
 	 * Add a loading image to the given element
 	 * @param element Element dom node
 	 */
-	setOnLoad : function(element){	
+	setOnLoad : function(element){
+        if(!element) element = this.element;
 		addLightboxMarkupToElement(element);
-		var img = document.createElement("img");
-		img.src = ajxpResourcesFolder+"/images/loadingImage.gif";
-		$(element).select("#element_overlay")[0].appendChild(img);
+		var img = new Element("img", {src: ajxpResourcesFolder+"/images/loadingImage.gif"});
+		$(element).down("#element_overlay").insert(img);
 		this.loading = true;
 	},
 	/**
@@ -348,9 +348,42 @@ Class.create("AbstractEditor" , {
 	 * @param element Element dom node
 	 */
 	removeOnLoad : function(element){
+        if(!element) element = this.element;
 		removeLightboxFromElement(element);
 		this.loading = false;	
 	},
+
+    simpleModal : function(element, content, okCallback, cancelCallback, position){
+        if(!element) element = this.element;
+        var box = new Element("div", {className:"dialogBox css_boxshadow"});
+        box.insert(content);
+        content.addClassName("dialogContent");
+        addLightboxMarkupToElement(element);
+        $(element).down("#element_overlay").insert({after:box});
+        modal.addSubmitCancel(content, cancelCallback, (cancelCallback==null), position);
+        content.down(".dialogButtons").select("input").each(function(button){
+            if(((cancelCallback==null) && button.getAttribute("name") == "close") || button.getAttribute("name") == "ok"){
+                button.observe("click", function(event){
+                    Event.stop(event);
+                    var res = okCallback();
+                    if(res){
+                        box.remove();
+                        removeLightboxFromElement(element);
+                    }
+                });
+            }else{
+                button.stopObserving("click");
+                button.observe("click", function(event){
+                    Event.stop(event);
+                    var res = cancelCallback();
+                    if(res){
+                        box.remove();
+                        removeLightboxFromElement(element);
+                    }
+                });
+            }
+        });
+    },
 
 	/**
 	 * Called by the other components to create a preview (thumbnail) of a given node

@@ -27,7 +27,7 @@
 	            <div id="pane-infos">
 	                <div class="innerTitle">Generic Informations</div>
                     <div id="account_infos"></div>
-                    <div id="account_actions" class="action_bar editor_header"></div>
+                    <div id="account_actions"></div>
 	                <div class="innerTitle">Custom Fields</div>
                     <div id="account_custom"></div>
 	            </div>

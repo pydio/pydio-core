@@ -29,26 +29,13 @@ Class.create("RoleEditor", AbstractEditor, {
     pluginsData : null,
     roleId : null,
 
-    /**
-     * Resizes the main container
-     * @param size int|null
-     */
-    resize : function(size){
-        if(size){
-            this.contentMainContainer.setStyle({height:size+"px"});
-        }else{
-            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
-            this.tab.resize();
-        }
-        this.element.fire("editor:resize", size);
-    },
-
     initialize: function($super, oFormObject)
 	{
 		$super(oFormObject, {fullscreen:false});
         fitHeightToBottom(this.element.down("#roleTabulator"), this.element.up(".dialogBox"));
         this.contentMainContainer = this.element.down("#roleTabulator");
         // INIT TAB
+        this.element.down("#pane-infos").setStyle({position:"relative"});
         $("pane-infos").resizeOnShow = function(tab){
             fitHeightToBottom($("pane-infos"), $("role_edit_box"));
         }
@@ -75,58 +62,6 @@ Class.create("RoleEditor", AbstractEditor, {
             return true;
         }.bind(this) );
         oFormObject.down(".action_bar").select("a").invoke("addClassName", "css_gradient");
-    },
-
-    isInherited : function(parameterKeys){
-        if(!this.roleParent || !this.roleWrite) return;
-        // Child role is roleWrite
-        var test = this.roleWrite;
-        for(var i=0;i<parameterKeys.length;i++){
-            if(test[parameterKeys[i]] == undefined) return true;
-            if(test[parameterKeys[i]]) test = test[parameterKeys[i]];
-        }
-        return false;
-    },
-
-    computeRoleRead : function(){
-        if(!this.roleParent) {
-            this.roleRead = this.roleData.ROLE;
-        }else{
-            // MERGE roleParent & roleData
-            this.roleRead = this.mergeObjectsRecursive(this.roleParent, this.roleData.ROLE);
-        }
-    },
-
-    mergeObjectsRecursive : function(source, destination){
-        var newObject = {};
-        for (var property in source) {
-            if (source.hasOwnProperty(property)) {
-                if( source[property] === null ) continue;
-                if( destination.hasOwnProperty(property)){
-                    if(source[property] instanceof Object && destination instanceof Object){
-                        newObject[property] = this.mergeObjectsRecursive(source[property], destination[property]);
-                    }else{
-                        newObject[property] = destination[property];
-                    }
-                }else{
-                    if(source[property] instanceof Object) {
-                        newObject[property] = this.mergeObjectsRecursive(source[property], {});
-                    }else{
-                        newObject[property] = source[property];
-                    }
-                }
-            }
-        }
-        for (var property in destination){
-            if(destination.hasOwnProperty(property) && !newObject.hasOwnProperty(property) && destination[property]!==null){
-                if(destination[property] instanceof Object) {
-                    newObject[property] = this.mergeObjectsRecursive(destination[property], {});
-                }else{
-                    newObject[property] = destination[property];
-                }
-            }
-        }
-        return newObject;
     },
 
     save : function(){
@@ -218,10 +153,29 @@ Class.create("RoleEditor", AbstractEditor, {
             scope = "user";
         }
         this.element.down("span.header_label").update(this.roleId);
-        this.loadRoleData(true, node, scope);
+        this.node = node;
+        this.scope = scope;
+        this.loadRoleData(true);
 	},
 
-    loadRoleData : function(withInfoPane, node, scope){
+
+    /**
+     * Resizes the main container
+     * @param size int|null
+     */
+    resize : function(size){
+        if(size){
+            this.contentMainContainer.setStyle({height:size+"px"});
+        }else{
+            fitHeightToBottom(this.contentMainContainer, this.element.up(".dialogBox"));
+            this.tab.resize();
+        }
+        this.element.fire("editor:resize", size);
+    },
+
+
+    loadRoleData : function(withInfoPane){
+        this.setOnLoad(this.element.down("#pane-infos"));
         var conn = new Connexion();
         conn.setParameters({
             get_action:"edit",
@@ -231,7 +185,8 @@ Class.create("RoleEditor", AbstractEditor, {
         });
         conn.onComplete = function(transport){
             this.initJSONResponse(transport.responseJSON);
-            if(withInfoPane) this.buildInfoPane(node, scope);
+            if(withInfoPane) this.buildInfoPane(this.node, this.scope);
+            this.removeOnLoad(this.element.down("#pane-infos"));
         }.bind(this);
         conn.sendAsync();
 
@@ -308,24 +263,46 @@ Class.create("RoleEditor", AbstractEditor, {
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
-            var b0 = new Element("a", {}).update("Change Password");
+            var b0 = new Element("a", {className:'m-2'}).update("Change Password");
             buttonPane.insert(b0);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b0.observe("click", function(){
-                var p1 = window.prompt("Enter new password for user");
-                var p2 = window.prompt("Confirm new password for user");
-                if(p2 == p1){
+                var pane = new Element("div", {style:"width:200px;"});
+                pane.insert(new Element("div", {className:"dialogLegend"}).update("Enter the new password for this user"));
+                var passEl1 = new Element("div", {className:"SF_element"});
+                passEl1.insert(new Element("div",{className:"SF_label"}).update("Password"));
+                passEl1.insert(new Element("input",{type:"password",name:"password",className:"SF_input",id:"pass"}));
+                pane.insert(passEl1);
+                var passEl2 = passEl1.cloneNode(true);passEl2.down("div").update("Confirm"); passEl2.down("input").setAttribute("name", "pass_confirm");
+                pane.insert(passEl2);
+                pane.insert('<div class="SF_element" id="pwd_strength_container"></div>');
+                this.simpleModal(this.element.down("#pane-infos"),pane, function(){
+                    var p1 = passEl1.down("input").getValue();
+                    var p2 = passEl2.down("input").getValue();
+                    if(p2 != p1){
+                        alert("Passwords differ!");
+                        return false;
+                    }
+                    if(p1.length < strength.options.minchar){
+                        alert("Password is too short!");
+                        return false;
+                    }
                     var conn = new Connexion();
                     conn.setParameters({
                         get_action:"edit",
                         sub_action:"update_user_pwd",
                         user_id : userId,
-                        user_pwd : p2
+                        user_pwd : this.encodePassword(p1)
                     });
                     conn.sendAsync();
-                }
-            });
-            var b1 = new Element("a", {}).update("Lock user");
+                    return true;
+                }.bind(this), function(){return true;});
+                var strength = new Protopass(passEl1.down("input"), {
+                    barContainer:pane.down('#pwd_strength_container')
+                });
+            }.bind(this));
+            var locked = this.roleData.USER_LOCK ? true : false;
+            var b1 = new Element("a", {className:'m-2'}).update((locked?"Reactivate user":"Lock out user"));
             buttonPane.insert(b1);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b1.observe("click", function(){
@@ -334,12 +311,16 @@ Class.create("RoleEditor", AbstractEditor, {
                     get_action:"edit",
                     sub_action:"user_set_lock",
                     user_id : userId,
-                    lock : "true",
-                    lock_type: "simple"
+                    lock : (locked?"false":"true")
                 });
+                if(!locked) conn.addParameter("lock_type", "logout");
+                conn.onComplete = function(transport){
+                    locked = !locked;
+                    b1.update((locked?"Reactivate user":"Lock out user"));
+                }.bind(this);
                 conn.sendAsync();
-            });
-            var b2 = new Element("a", {}).update("Ask Pass Change");
+            }.bind(this) );
+            var b2 = new Element("a", {className:'m-2'}).update("Force Pass Change");
             buttonPane.insert(b2);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b2.observe("click", function(){
@@ -354,10 +335,6 @@ Class.create("RoleEditor", AbstractEditor, {
                 conn.sendAsync();
             });
             /*
-            var b1 = new Element("a", {}).update("Kill current session");
-            buttonPane.insert(b1);
-            var b2 = new Element("a", {}).update("Lock out account");
-            buttonPane.insert(b2);
             var b3 = new Element("a", {}).update("Force Pass Change");
             buttonPane.insert(b3);
             */
@@ -402,7 +379,9 @@ Class.create("RoleEditor", AbstractEditor, {
                 param.set("default", this.roleRead.PARAMETERS["AJXP_REPO_SCOPE_ALL"][plugId][param.get("name")]);
             }catch(e){}
             if(param.get("name").endsWith("DISPLAY_NAME") && param.get("default")){
-                this.element.down("span.header_label").update(param.get("default"));
+                var display = param.get("default");
+                if(this.roleData.USER_LOCK) display += " (locked)";
+                this.element.down("span.header_label").update(display);
             }
             param.set("name", "AJXP_REPO_SCOPE_ALL/" + plugId + "/" + param.get("name"));
         }.bind(this));
@@ -784,7 +763,78 @@ Class.create("RoleEditor", AbstractEditor, {
             }
             this.setDirty();
         }.bind(this) );
-    }
+    },
+
+    isInherited : function(parameterKeys){
+        if(!this.roleParent || !this.roleWrite) return;
+        // Child role is roleWrite
+        var test = this.roleWrite;
+        for(var i=0;i<parameterKeys.length;i++){
+            if(test[parameterKeys[i]] == undefined) return true;
+            if(test[parameterKeys[i]]) test = test[parameterKeys[i]];
+        }
+        return false;
+    },
+
+    computeRoleRead : function(){
+        if(!this.roleParent) {
+            this.roleRead = this.roleData.ROLE;
+        }else{
+            // MERGE roleParent & roleData
+            this.roleRead = this.mergeObjectsRecursive(this.roleParent, this.roleData.ROLE);
+        }
+    },
+
+    mergeObjectsRecursive : function(source, destination){
+        var newObject = {};
+        for (var property in source) {
+            if (source.hasOwnProperty(property)) {
+                if( source[property] === null ) continue;
+                if( destination.hasOwnProperty(property)){
+                    if(source[property] instanceof Object && destination instanceof Object){
+                        newObject[property] = this.mergeObjectsRecursive(source[property], destination[property]);
+                    }else{
+                        newObject[property] = destination[property];
+                    }
+                }else{
+                    if(source[property] instanceof Object) {
+                        newObject[property] = this.mergeObjectsRecursive(source[property], {});
+                    }else{
+                        newObject[property] = source[property];
+                    }
+                }
+            }
+        }
+        for (var property in destination){
+            if(destination.hasOwnProperty(property) && !newObject.hasOwnProperty(property) && destination[property]!==null){
+                if(destination[property] instanceof Object) {
+                    newObject[property] = this.mergeObjectsRecursive(destination[property], {});
+                }else{
+                    newObject[property] = destination[property];
+                }
+            }
+        }
+        return newObject;
+    },
+
+    encodePassword : function(password){
+   		// First get a seed to check whether the pass should be encoded or not.
+   		var sync = new Connexion();
+   		var seed;
+   		sync.addParameter('get_action', 'get_seed');
+   		sync.onComplete = function(transport){
+   			seed = transport.responseText;
+   		};
+   		sync.sendSync();
+   		var encoded;
+   		if(seed != '-1'){
+   			encoded = hex_md5(password);
+   		}else{
+   			encoded = password;
+   		}
+   		return encoded;
+
+   	}
 
 
 });
