@@ -490,6 +490,8 @@ $mess=array(
 "439" => "Main Options",
 "440" => "Yes",
 "441" => "No",
+"442" => "My Account",
+"443" => "Update your personal information",
 /* END SENTENCE */
 );
 ?>

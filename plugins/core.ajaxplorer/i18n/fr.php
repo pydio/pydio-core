@@ -486,6 +486,8 @@ $mess=array(
 "439" => "Options principales",
 "440" => "Oui",
 "441" => "Non",
+"442" => "Mon Compte",
+"443" => "Mettre à jour vos informations",
 /* END SENTENCE */
 );
 ?>
