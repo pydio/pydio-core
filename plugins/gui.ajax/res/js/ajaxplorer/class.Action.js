@@ -82,7 +82,7 @@ Class.create("Action", {
 			noUser:true,
 			userLogged:true,
 			guestLogged:false,
-			read:true,
+			read:false,
 			write:false,
 			adminOnly:false
 			}, arguments[3] || { });

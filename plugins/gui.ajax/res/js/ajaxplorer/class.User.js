@@ -68,6 +68,10 @@ Class.create("User", {
 	 * @var Boolean
 	 */
 	isAdmin:false,
+    /**
+     * @var String
+     */
+    lock : false,
 
 	/**
 	 * Constructor
@@ -301,6 +305,9 @@ Class.create("User", {
 			{
 				var attr = userNodes[i].getAttribute("is_admin");
 				if(attr && attr == "1") this.isAdmin = true;
+                if(userNodes[i].getAttribute("lock")){
+                    this.lock = userNodes[i].getAttribute("lock");
+                }
 			}
 		}
 		// Make sure it happens at the end

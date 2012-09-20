@@ -436,6 +436,7 @@ class AJXP_XMLWriter
 			$buffer.= AJXP_XMLWriter::writeRepositoriesData(null, $details);
 			$buffer.="</user>";	
 		}else if($loggedUser != null){
+            $lock = $loggedUser->getLock();
 			$buffer.="<user id=\"".$loggedUser->id."\">";
 			if(!$details){
 				$buffer.="<active_repo id=\"".ConfService::getCurrentRootDirIndex()."\" write=\"".($loggedUser->canWrite(ConfService::getCurrentRootDirIndex())?"1":"0")."\" read=\"".($loggedUser->canRead(ConfService::getCurrentRootDirIndex())?"1":"0")."\"/>";
@@ -465,7 +466,7 @@ class AJXP_XMLWriter
                 }
             }
 			$buffer.="</preferences>";
-			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"/>";
+			$buffer.="<special_rights is_admin=\"".($loggedUser->isAdmin()?"1":"0")."\"  ".($lock!==false?"lock=\"$lock\"":"")."/>";
 			$bMarks = $loggedUser->getBookmarks();
 			if(count($bMarks)){
 				$buffer.= "<bookmarks>".AJXP_XMLWriter::writeBookmarks($bMarks, false)."</bookmarks>";

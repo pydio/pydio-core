@@ -12,5 +12,6 @@
 	<class_definition filename="plugins/conf.sql/class.sqlConfDriver.php" classname="sqlConfDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*" exclude=""/>
+		<external_file filename="plugins/core.conf/custom_fields.xml" include="*" exclude=""/>
 	</registry_contributions>
 </confdriver>

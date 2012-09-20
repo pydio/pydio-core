@@ -325,6 +325,34 @@ Class.create("RoleEditor", AbstractEditor, {
                     conn.sendAsync();
                 }
             });
+            var b1 = new Element("a", {}).update("Lock user");
+            buttonPane.insert(b1);
+            var userId = this.roleId.replace("AJXP_USR_/", "");
+            b1.observe("click", function(){
+                var conn = new Connexion();
+                conn.setParameters({
+                    get_action:"edit",
+                    sub_action:"user_set_lock",
+                    user_id : userId,
+                    lock : "true",
+                    lock_type: "simple"
+                });
+                conn.sendAsync();
+            });
+            var b2 = new Element("a", {}).update("Ask Pass Change");
+            buttonPane.insert(b2);
+            var userId = this.roleId.replace("AJXP_USR_/", "");
+            b2.observe("click", function(){
+                var conn = new Connexion();
+                conn.setParameters({
+                    get_action:"edit",
+                    sub_action:"user_set_lock",
+                    user_id : userId,
+                    lock : "true",
+                    lock_type : "pass_change"
+                });
+                conn.sendAsync();
+            });
             /*
             var b1 = new Element("a", {}).update("Kill current session");
             buttonPane.insert(b1);
