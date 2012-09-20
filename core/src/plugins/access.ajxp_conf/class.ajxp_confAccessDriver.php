@@ -318,8 +318,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         "ROLE" => $roleData,
                         "REPOSITORIES" => $repos
                     );
-                    if(isSet($userObject) && isSet($userObject->parentRole)){
-                        $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
+                    if(isSet($userObject)){
+                        $data["USER_ROLES"] = array_keys($userObject->getRoles());
+                        $data["ALL_ROLES"] = array_keys(AuthService::getRolesList(array(), true));
+                        if(isSet($userObject->parentRole)){
+                            $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
+                        }
                     }
                     echo json_encode($data);
                 }else{
