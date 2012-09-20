@@ -182,6 +182,7 @@ Class.create("Ajaxplorer", {
 			this.actionBar.loadActionsFromRegistry(this._registry);
 		}
 		document.observe("ajaxplorer:registry_loaded", function(event){
+            if(Prototype.Browser.IE) ResourcesManager.prototype.loadAutoLoadResources(event.memo);
 			this.actionBar.loadActionsFromRegistry(event.memo);
 		}.bind(this) );
 				
