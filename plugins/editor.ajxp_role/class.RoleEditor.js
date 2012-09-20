@@ -139,6 +139,25 @@ Class.create("RoleEditor", AbstractEditor, {
                 fullPostData['FORMS'][repoScope][pluginId] = parametersHash;
             }.bind(this) );
         }.bind(this) );
+        var customFieldsHash = new $H();
+        fManager.serializeParametersInputs(this.element.down("#pane-infos").down("#account_custom"), customFieldsHash, "ROLE_CUSTOM_");
+        customFieldsHash.each(function(pair){
+            var pName = pair.key.replace("ROLE_CUSTOM_", "");
+            if(pName.endsWith("_ajxptype") || pName.endsWith("_replication") || pName.endsWith("_checkbox")) return;
+            var parts = pName.split("/");
+            var repoScope = parts[0];
+            var paramName = parts[2];
+            var pluginId = parts[1];
+            // update roleWrite
+            if(!this.roleWrite.PARAMETERS[repoScope]) this.roleWrite.PARAMETERS[repoScope] = {};
+            if(!this.roleWrite.PARAMETERS[repoScope][pluginId]) this.roleWrite.PARAMETERS[repoScope][pluginId] = {};
+            this.roleWrite.PARAMETERS[repoScope][pluginId][paramName] = pair.value;
+            // update FORMS
+            if(!fullPostData['FORMS'][repoScope]) fullPostData['FORMS'][repoScope] = {};
+            if(!fullPostData['FORMS'][repoScope][pluginId]) fullPostData['FORMS'][repoScope][pluginId] = $H({});
+            fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName, pair.value);
+        }.bind(this));
+
         fullPostData['ROLE'] = this.roleWrite;
         var conn = new Connexion();
         conn.setParameters({
@@ -181,7 +200,6 @@ Class.create("RoleEditor", AbstractEditor, {
             scope = "user";
         }
         this.element.down("span.header_label").update(this.roleId);
-        this.buildInfoPane(node, scope);
         var conn = new Connexion();
         conn.setParameters({
             get_action:"edit",
@@ -191,6 +209,7 @@ Class.create("RoleEditor", AbstractEditor, {
         });
         conn.onComplete = function(transport){
             this.initJSONResponse(transport.responseJSON);
+            this.buildInfoPane(node, scope);
         }.bind(this);
         conn.sendAsync();
 
@@ -209,19 +228,28 @@ Class.create("RoleEditor", AbstractEditor, {
         conn3.sendAsync();
 	},
 
+    updateRoles : function(){
+
+    },
+
     buildInfoPane : function(node, scope){
         var f = new FormManager();
         if(scope == "user"){
             // MAIN INFO
+            var rolesChoicesString = this.roleData.ALL_ROLES.join(",");
             var defs = [
                 $H({"name":"login",label:"User identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
                 $H({"name":"pass",label:"Password","type":"password"}),
                 $H({"name":"pass_confirm",label:"Confirm Password","type":"password"}),
                 $H({"name":"rights",label:"Specific Rights","type":"select", choices:"admin|Administrator,shared|Shared,guest|Guest"}),
-                $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:"role1|Role1,role2|Role2"})
+                $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER_ROLES.join(",")})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
+            var rolesSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="roles"]');
+            rolesSelect.observe("change", function(){
+                this.updateRoles();
+            });
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
@@ -259,13 +287,31 @@ Class.create("RoleEditor", AbstractEditor, {
         // CUSTOM DATA
         var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "//param[contains(@scope,'"+scope+"')]");
         definitions.each(function(param){
-            if(param.get("readonly"))param.set("readonly", false);
-        });
+            if(param.get("readonly")){
+                param.set("readonly", false);
+            }
+            var xmlNode = param.get("xmlNode");
+            var plugNode = xmlNode.parentNode.parentNode;
+            var plugId = plugNode.getAttribute("id");
+            if(!plugId){
+                plugId = plugNode.nodeName + "." + plugNode.getAttribute("name");
+            }
+            try{
+                param.set("default", this.roleRead.PARAMETERS["AJXP_REPO_SCOPE_ALL"][plugId][param.get("name")]);
+            }catch(e){}
+            param.set("name", "AJXP_REPO_SCOPE_ALL/" + plugId + "/" + param.get("name"));
+        }.bind(this));
         if(!definitions.length){
             this.element.down("#pane-infos").down("#account_custom").previous().remove();
         }else{
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_custom"), definitions, true, false, false, true);
         }
+
+        // UPDATE FORMS ELEMENTS
+        this.element.down("#pane-infos").select("div.SF_element").each(function(element){
+            element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
+            element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
+        }.bind(this) );
     },
 
     initJSONResponse : function(responseJSON){

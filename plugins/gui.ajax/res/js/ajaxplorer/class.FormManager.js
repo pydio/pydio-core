@@ -48,6 +48,7 @@ Class.create("FormManager", {
             }
 			paramsHash.set(attName, value);
 		});
+        paramsHash.set("xmlNode", paramNode);
 		return paramsHash;
 	},
 	
@@ -130,7 +131,14 @@ Class.create("FormManager", {
                     cValue = cSplit[0];
                     if(cSplit.length > 1 ) cLabel = cSplit[1];
                     else cLabel = cValue;
-                    var selectedString = (defaultValue == cValue ? ' selected' : '');
+                    var selectedString = '';
+                    if(param.get("multiple")){
+                        $A(defaultValue.split(",")).each(function(defV){
+                            if(defV == cValue) selectedString = ' selected';
+                        });
+                    }else{
+                        selectedString = (defaultValue == cValue ? ' selected' : '');
+                    }
                     element += '<option value="'+cValue+'"'+selectedString+'>'+cLabel+'</option>';
                 }
                 element += '</select>';
