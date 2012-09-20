@@ -94,7 +94,15 @@ Class.create("AjxpSimpleTabs", AjxpPane, {
 	 * Resizes the widget
 	 */
 	resize : function(){
-
+        fitHeightToBottom(this.panes, this.element);
+        this.tabRow.select("li").each(function(tab){
+            if(tab.tabPANE){
+                fitHeightToBottom(tab.tabPANE, this.panes);
+                if(tab.hasClassName("selected") && tab.tabPANE.resizeOnShow){
+                    tab.tabPANE.resizeOnShow(tab, tab.tabPANE);
+                }
+            }
+        }.bind(this) );
 	},
 	
 	/**
