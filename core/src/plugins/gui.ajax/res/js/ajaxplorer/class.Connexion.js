@@ -219,7 +219,7 @@ Class.create("Connexion", {
 					}
 					catch(e)
 					{
-						alert('error loading '+fileName+':'+e);
+						alert('error loading '+fileName+':'+ e.message);
 					}
 				}
 				document.fire("ajaxplorer:server_answer");				
