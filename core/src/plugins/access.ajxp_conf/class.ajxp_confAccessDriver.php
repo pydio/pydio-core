@@ -313,7 +313,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
                     HTMLWriter::charsetHeader("application/json");
                     $roleData = $role->getDataArray();
-                    $repos = ConfService::getAdministrableRepositories(true);
+                    $repos = ConfService::getAccessibleRepositories($userObject, true, true);
                     $data = array(
                         "ROLE" => $roleData,
                         "REPOSITORIES" => $repos
