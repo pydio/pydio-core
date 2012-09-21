@@ -389,7 +389,7 @@ Class.create("Action", {
 					if(node.childNodes[j].nodeName == "staticItems" || node.childNodes[j].nodeName == "dynamicItems"){
 						this.subMenuItems[node.childNodes[j].nodeName] = [];
 						for(var k=0;k<node.childNodes[j].childNodes.length;k++){
-							if(node.childNodes[j].childNodes[k].nodeName == "item"){
+							if(node.childNodes[j].childNodes[k].nodeName.startsWith("item")){
 								var item = {};
 								for(var z=0;z<node.childNodes[j].childNodes[k].attributes.length;z++){
 									var attribute = node.childNodes[j].childNodes[k].attributes[z];
