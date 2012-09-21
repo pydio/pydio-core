@@ -316,14 +316,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $repos = ConfService::getAccessibleRepositories($userObject, true, true);
                     $data = array(
                         "ROLE" => $roleData,
-                        "REPOSITORIES" => $repos
+                        "ALL"  => array(
+                            "REPOSITORIES" => $repos
+                        )
                     );
                     if(isSet($userObject)){
-                        $data["USER_LOCK"] = $userObject->getLock();
-                        $data["USER_PROFILE"] = $userObject->getAjxpProfile();
-                        $data["ALL_PROFILES"] = array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest");
-                        $data["USER_ROLES"] = array_keys($userObject->getRoles());
-                        $data["ALL_ROLES"] = array_keys(AuthService::getRolesList(array(), true));
+                        $data["USER"] = array();
+                        $data["USER"]["LOCK"] = $userObject->getLock();
+                        $data["USER"]["DEFAULT_REPOSITORY"] = $userObject->getPref("force_default_repository");
+                        $data["USER"]["PROFILE"] = $userObject->getAjxpProfile();
+                        $data["ALL"]["PROFILES"] = array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest");
+                        $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
+                        $data["ALL"]["ROLES"] = array_keys(AuthService::getRolesList(array(), true));
                         if(isSet($userObject->parentRole)){
                             $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
                         }
@@ -363,7 +367,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 foreach($forms as $repoScope => $plugData){
                     foreach($plugData as $plugId => $formsData){
                         $parsed = array();
-                        AJXP_Utils::parseStandardFormParameters($formsData, $parsed, null, "ROLE_PARAM_");
+                        AJXP_Utils::parseStandardFormParameters(
+                            $formsData,
+                            $parsed,
+                            ($userObject!=null?$usrId:null),
+                            "ROLE_PARAM_"
+                        );
                         $roleData["PARAMETERS"][$repoScope][$plugId] = $parsed;
                     }
                 }

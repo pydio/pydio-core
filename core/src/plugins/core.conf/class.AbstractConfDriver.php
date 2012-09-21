@@ -29,7 +29,29 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 		
 	var $options;
 	var $driverType = "conf";
-	
+
+
+    public function init($options){
+        parent::init($options);
+
+        // BACKWARD COMPATIBILIY PREVIOUS CONFIG VIA OPTIONS
+        if(isSet($options["CUSTOM_DATA"])){
+            $custom = $options["CUSTOM_DATA"];
+            $serverSettings = $this->xPath->query('//server_settings')->item(0);
+            foreach($custom as $key => $value){
+                $n = $this->manifestDoc->createElement("param");
+                $n->setAttribute("name", $key);
+                $n->setAttribute("label", $value);
+                $n->setAttribute("description", $value);
+                $n->setAttribute("type", "string");
+                $n->setAttribute("scope", "user");
+                $serverSettings->appendChild($n);
+            }
+            $this->reloadXPath();
+        }
+    }
+
+
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
         if($contribNode->nodeName != "actions") return;
@@ -45,16 +67,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
         // PERSONAL INFORMATIONS
         $hasExposed = false;
-        if(isSet($this->options["CUSTOM_DATA"])){
-            $custom = $this->options["CUSTOM_DATA"];
-            foreach($custom as $key => $value){
-                if(is_array($value) && isSet($value["exposed"])){
-                    $hasExposed = true;
-                    break;
-                }
-            }
-        }
-
         $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
         if(is_array($paramNodes) && count($paramNodes)) $hasExposed = true;
 
@@ -309,17 +321,6 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
             }
         }
 
-        $customValue = $userObject->getPref("CUSTOM_PARAMS");
-        $custom = ConfService::getConfStorageImpl()->getOption("CUSTOM_DATA");
-        if(is_array($custom) && count($custom)){
-            foreach($custom as $key => $value){
-                if(is_string($value)) continue;
-                if(is_array($value) && isset($value["exposed"]) && $value["exposed"] == true){
-                    $value["value"] = (isSet($customValue[$key])?$customValue[$key]:"");
-                    $prefs["CUSTOM_PARAM_".$key] = $value;
-                }
-            }
-        }
         return $prefs;
     }
 		
