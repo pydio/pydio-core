@@ -346,7 +346,7 @@ class ConfService
             }
             if($repositoryObject->isTemplate) continue;
             $toLast = false;
-            if($repositoryObject->getAccessType()=="ajxp_conf"){
+            if($repositoryObject->getAccessType()=="ajxp_conf" && $userObject != null){
                 if(AuthService::usersEnabled() && !$userObject->isAdmin()){
                     continue;
                 }else{
@@ -356,7 +356,7 @@ class ConfService
             if($repositoryObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
                 continue;
             }
-            if($repositoryObject->getUniqueUser() && (!AuthService::usersEnabled() || $userObject->getId() == "shared" || $userObject->getId() != $repositoryObject->getUniqueUser() )){
+            if($repositoryObject->getUniqueUser() && (!AuthService::usersEnabled() || $userObject == null  || $userObject->getId() == "shared" || $userObject->getId() != $repositoryObject->getUniqueUser() )){
                 continue;
             }
             if($userObject == null || $userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) || $details) {

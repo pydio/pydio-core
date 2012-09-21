@@ -122,11 +122,8 @@ Class.create("RoleEditor", AbstractEditor, {
             var response = transport.responseJSON;
             if(response.SUCCESS){
                 ajaxplorer.displayMessage("SUCCESS", "Role updated successfully");
-                response.REPOSITORIES = this.roleData.REPOSITORIES;
-                if(this.roleData.USER_ROLES)response.USER_ROLES = this.roleData.USER_ROLES;
-                if(this.roleData.ALL_ROLES)response.ALL_ROLES = this.roleData.ALL_ROLES;
-                if(this.roleData.USER_PROFILE)response.USER_PROFILE = this.roleData.USER_PROFILE;
-                if(this.roleData.ALL_PROFILES)response.ALL_PROFILES = this.roleData.ALL_PROFILES;
+                response.ALL = this.roleData.ALL;
+                if(this.roleData.USER)response.USER = this.roleData.USER;
                 this.initJSONResponse(response);
                 ajaxplorer.fireContextRefresh();
                 this.setClean();
@@ -207,7 +204,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
     updateRoles : function(selection){
         // DIFF
-        var orig = this.roleData.USER_ROLES || $A();
+        var orig = this.roleData.USER.ROLES || $A();
         var currentUserId = this.roleId.replace("AJXP_USR_/", "");
         orig.each(function(el){
             if(!selection[el]) {
@@ -241,12 +238,17 @@ Class.create("RoleEditor", AbstractEditor, {
         var f = new FormManager();
         if(scope == "user"){
             // MAIN INFO
-            var rolesChoicesString = this.roleData.ALL_ROLES.join(",");
-            var profilesChoices = this.roleData.ALL_PROFILES.join(",");
+            var rolesChoicesString = this.roleData.ALL.ROLES.join(",");
+            var profilesChoices = this.roleData.ALL.PROFILES.join(",");
+            var repos = [];
+            $H(this.roleData.ALL.REPOSITORIES).each(function(pair){
+                repos.push(pair.key+"|"+pair.value);
+            });
             var defs = [
                 $H({"name":"login",label:"User identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
-                $H({"name":"rights",label:"Specific Rights","type":"select", choices:profilesChoices, default:this.roleData.USER_PROFILE}),
-                $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER_ROLES.join(",")})
+                $H({"name":"rights",label:"Specific Rights","type":"select", choices:profilesChoices, default:this.roleData.USER.PROFILE}),
+                $H({"name":"default_repository",label:"Default Repository","type":"select", choices:repos.join(","),default:this.roleData.USER.DEFAULT_REPOSITORY}),
+                $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER.ROLES.join(",")})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
@@ -259,6 +261,22 @@ Class.create("RoleEditor", AbstractEditor, {
                 this.updateRoleAccumulator = window.setTimeout(function(){
                     this.updateRoles(rolesSelect.getValue());
                 }.bind(this) , 500);
+            }.bind(this) );
+
+            var defaultRepoSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="default_repository"]');
+            defaultRepoSelect.observe("change", function(){
+                var conn = new Connexion();
+                conn.setParameters(new Hash({
+                    get_action:'save_user_preference',
+                    user_id:this.roleId.replace("AJXP_USR_/", ""),
+                    pref_name_0:'force_default_repository',
+                    pref_value_0:defaultRepoSelect.getValue()
+                }));
+                conn.onComplete = function(transport){
+                    ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                    this.setClean();
+                }.bind(this);
+                conn.sendAsync();
             }.bind(this) );
 
             // BUTTONS
@@ -301,7 +319,7 @@ Class.create("RoleEditor", AbstractEditor, {
                     barContainer:pane.down('#pwd_strength_container')
                 });
             }.bind(this));
-            var locked = this.roleData.USER_LOCK ? true : false;
+            var locked = this.roleData.USER.LOCK ? true : false;
             var b1 = new Element("a", {className:'m-2'}).update((locked?"Reactivate user":"Lock out user"));
             buttonPane.insert(b1);
             var userId = this.roleId.replace("AJXP_USR_/", "");
@@ -380,7 +398,7 @@ Class.create("RoleEditor", AbstractEditor, {
             }catch(e){}
             if(param.get("name").endsWith("DISPLAY_NAME") && param.get("default")){
                 var display = param.get("default");
-                if(this.roleData.USER_LOCK) display += " (locked)";
+                if(this.roleData.USER.LOCK) display += " (locked)";
                 this.element.down("span.header_label").update(display);
             }
             param.set("name", "AJXP_REPO_SCOPE_ALL/" + plugId + "/" + param.get("name"));
@@ -497,7 +515,7 @@ Class.create("RoleEditor", AbstractEditor, {
     },
 
     feedRepositoriesSelectors : function(){
-        var repositories = this.roleData.REPOSITORIES;
+        var repositories = this.roleData.ALL.REPOSITORIES;
         this.element.select("select.repository_selector").each(function(select){
             select.select("option").invoke("remove");
             select.insert(new Element("option", {value:-1}).update(""));
@@ -513,7 +531,7 @@ Class.create("RoleEditor", AbstractEditor, {
    		var rightsPane = this.element.down('#pane-acls');
    		var rightsTable = rightsPane.down('#acls-selected');
         rightsTable.update("");
-        var repositories = this.roleData.REPOSITORIES;
+        var repositories = this.roleData.ALL.REPOSITORIES;
         //repositories.sortBy(function(element) {return XPathGetSingleNodeText(element, "label");});
         //var defaultRepository = XPathGetSingleNodeText(xmlData, '//pref[@name="force_default_repository"]/@value');
    		for(var repoId in repositories){
@@ -569,13 +587,13 @@ Class.create("RoleEditor", AbstractEditor, {
         for(var repoScope in actionsData){
             for(var pluginId in actionsData[repoScope]){
                 for(var actionName in actionsData[repoScope][pluginId]){
-                    if(repoScope != "AJXP_REPO_SCOPE_ALL" && ! this.roleData.REPOSITORIES[repoScope]){
+                    if(repoScope != "AJXP_REPO_SCOPE_ALL" && ! this.roleData.ALL.REPOSITORIES[repoScope]){
                         continue;
                     }
                     var el = new Element("div");
                     var remove = new Element("span", {className:"list_remove_item"}).update("Remove");
                     el.insert(remove);
-                    var repoLab = (repoScope == "AJXP_REPO_SCOPE_ALL" ? "All Repositories" : this.roleData.REPOSITORIES[repoScope]);
+                    var repoLab = (repoScope == "AJXP_REPO_SCOPE_ALL" ? "All Repositories" : this.roleData.ALL.REPOSITORIES[repoScope]);
                     var pluginLab = (pluginId == "all_plugins" ? "All Plugins" : pluginId);
                     var state = actionsData[repoScope][pluginId][actionName] === false ? "disabled":"enabled";
                     el.insert(repoLab + " &gt; " + pluginLab + " &gt; " + actionName + " - "+ state);
@@ -606,6 +624,7 @@ Class.create("RoleEditor", AbstractEditor, {
             return;
         }
         var conn = new Connexion();
+        conn.setMethod('post');
         conn.setParameters({
             get_action:'parameters_to_form_definitions',
             json_parameters : Object.toJSON(actionsData)
@@ -629,7 +648,7 @@ Class.create("RoleEditor", AbstractEditor, {
                     scopeLabel = "All Repositories";
                     setTop = true;
                 }
-                else scopeLabel = this.roleData.REPOSITORIES[id];
+                else scopeLabel = this.roleData.ALL.REPOSITORIES[id];
                 var tab = new Element("li", {"data-PaneID":"params-form-" + id}).update('<span>'+scopeLabel+'</span>');
                 if(setTop){
                     parametersPane.down("ul.tabrow").insert({top:tab});
@@ -706,6 +725,12 @@ Class.create("RoleEditor", AbstractEditor, {
                     return;
                 }else{
                     delete this.roleWrite.ACTIONS[scope][plugin][action];
+                    if(!$H(this.roleWrite.ACTIONS[scope][plugin]).size()){
+                        delete this.roleWrite.ACTIONS[scope][plugin];
+                        if(!$H(this.roleWrite.ACTIONS[scope]).size()){
+                            delete this.roleWrite.ACTIONS[scope];
+                        }
+                    }
                 }
                 this.computeRoleRead();
             }catch(e){}
@@ -722,6 +747,12 @@ Class.create("RoleEditor", AbstractEditor, {
         return function(){
             try{
                 delete this.roleWrite.PARAMETERS[scope][plugin][parameter];
+                if(!$H(this.roleWrite.PARAMETERS[scope][plugin]).size()){
+                    delete this.roleWrite.PARAMETERS[scope][plugin];
+                    if(!$H(this.roleWrite.PARAMETERS[scope]).size()){
+                        delete this.roleWrite.PARAMETERS[scope];
+                    }
+                }
                 this.computeRoleRead();
             }catch(e){}
             this.populateParametersPane();

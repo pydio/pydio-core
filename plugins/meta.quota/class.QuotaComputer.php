@@ -91,14 +91,7 @@ class QuotaComputer extends AJXP_Plugin
 
     private function getAuthorized(){
         if(self::$loadedQuota != null) return self::$loadedQuota;
-        $q = $this->options["DEFAULT_QUOTA"];
-        if(!empty($this->options["CUSTOM_DATA_FIELD"])){
-            $cdField = $this->options["CUSTOM_DATA_FIELD"];
-            $t = AuthService::getLoggedUser()->getPref("CUSTOM_PARAMS");
-            if(is_array($t) && array_key_exists($cdField, $t)){
-                $q = $t[$cdField];
-            }
-        }
+        $q = $this->getFilteredOption("DEFAULT_QUOTA");
         self::$loadedQuota = AJXP_Utils::convertBytes($q);
         return self::$loadedQuota;
     }

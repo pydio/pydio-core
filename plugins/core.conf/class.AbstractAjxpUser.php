@@ -384,6 +384,30 @@ abstract class AbstractAjxpUser
             $this->personalRole->setAcl($rightKey, $rightValue);
             unset($this->rights[$rightKey]);
         }
+        // Move old CUSTOM_DATA values to personal role parameter
+        $customValue = $this->getPref("CUSTOM_PARAMS");
+        $custom = ConfService::getConfStorageImpl()->getOption("CUSTOM_DATA");
+        if(is_array($custom) && count($custom)){
+            foreach($custom as $key => $value){
+                if(isSet($customValue[$key])){
+                    $this->personalRole->setParameterValue(ConfService::getConfStorageImpl()->getId(), $key, $customValue[$key]);
+                }
+            }
+        }
+
+        // Move old WALLET values to personal role parameter
+        $wallet = $this->getPref("AJXP_WALLET");
+        if(is_array($wallet) && count($wallet)){
+            foreach($wallet as $repositoryId => $walletData){
+                $repoObject = ConfService::getRepositoryById($repositoryId);
+                if($repoObject == null) continue;
+                $accessType = "access.".$repoObject->getAccessType();
+                foreach($walletData as $paramName => $paramValue){
+                    $this->personalRole->setParameterValue($accessType, $paramName, $paramValue, $repositoryId);
+                }
+            }
+        }
+
     }
 
     protected function orderRoles($r1, $r2){

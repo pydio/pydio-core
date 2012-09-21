@@ -102,6 +102,21 @@ class AJXP_Plugin implements Serializable{
 		$this->options = $options;
 		//$this->loadRegistryContributions();
 	}
+
+    protected function getFilteredOption($optionName, $repositoryScope = AJXP_REPO_SCOPE_ALL){
+        if(isSet($this->options[$optionName])){
+            if(AuthService::getLoggedUser() != null){
+                return AuthService::getLoggedUser()->mergedRole->filterParameterValue(
+                    $this->getId(),
+                    $optionName,
+                    $repositoryScope,
+                    $this->options[$optionName]
+                );
+            }
+            return $this->options[$optionName];
+        }
+        return null;
+    }
 	/**
 	 * Perform initialization checks, and throw exception if problems found.
 	 * @throws Exception

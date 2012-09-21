@@ -230,6 +230,18 @@ class AJXP_Safe{
 				}
 			}
 		}
+        // 2bis. Wallet is now a custom parameter
+        if($user ==""){
+            $loggedUser = AuthService::getLoggedUser();
+            if($loggedUser != null){
+                $u = $loggedUser->mergedRole->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."USER", $repository->getId(), "");
+                $p = $loggedUser->mergedRole->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."PASS", $repository->getId(), "");
+                if(!empty($u) && !empty($p)){
+                    $user = $u;
+                    $password = $loggedUser->decodeUserPassword($p);
+                }
+            }
+        }
 		// 3. Try from repository config
 		if($user==""){
 			$user = $repository->getOption($optionsPrefix."USER");
