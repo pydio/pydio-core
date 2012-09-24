@@ -151,6 +151,8 @@ Class.create("FormManager", {
                     if(param.get("binary_context")){
                         imgSrc += "&" + param.get("binary_context");
                     }
+                }else if(param.get("defaultImage")){
+                    imgSrc = param.get("defaultImage");
                 }
                 element = "<div class='SF_image_block'><img src='"+imgSrc+"' class='SF_image small'><span class='SF_image_link'>"+
                     (param.get("uploadLegend")?param.get("uploadLegend"):"update")+"</span>" +

@@ -1248,6 +1248,19 @@ img.simple_button_arrow{
 	cursor: pointer;
 }
 
+.user_widget_label.withImage{
+    position: relative;
+    padding-left: 23px;
+}
+
+img.user_widget_mini{
+    position: absolute;
+    height: 16px;
+    border: 1px solid white;
+    top: 5px;
+    left: 2px;
+    box-shadow: 1px 1px 0px #666;
+}
 
 .locationbar_title
 {

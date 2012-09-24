@@ -570,13 +570,13 @@ class ShareCenter extends AJXP_Plugin{
 
         foreach ($users as $userId => $userObject) {
             if($userObject->getId() == $loggedUser->getId()) continue;
-            $ri = $userObject->getAcl($repoId);
+            $ri = $userObject->personalRole->getAcl($repoId);
             if(!empty($ri)){
                 $entry =  array(
                     "ID"    => $userId,
                     "TYPE"  => $userObject->hasParent()?"tmp_user":"user",
                     "LABEL" => $userId,
-                    "RIGHT" => $userObject->getAcl($repoId)
+                    "RIGHT" => $userObject->personalRole->getAcl($repoId)
                 );
                 if(!$mixUsersAndGroups){
                     $sharedEntries[$userId] = $entry;
