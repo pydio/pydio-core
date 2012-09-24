@@ -743,6 +743,22 @@ input.SF_input.SF_number{
     height: 3px;
 }
 
+.SF_image_block{
+    max-width: 80px;
+    float: left;
+}
+
+.SF_image.small{
+    max-width: 80px;
+    max-height: 80px;
+}
+.SF_image_link{
+    display: inline-block;
+    width: 80px;
+    cursor: pointer;
+    text-align: center;
+}
+
 .accordion_toggle_failed {
 	background-color: #D8B0B0 !important;
 }

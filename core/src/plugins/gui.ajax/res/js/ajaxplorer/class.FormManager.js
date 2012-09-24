@@ -23,16 +23,12 @@
  */
 Class.create("FormManager", {
 
-    /**
-     * @var AbstractEditor
-     */
-    editor: null,
-
+    modalParent : null,
 	/**
 	 * Constructor
 	 */
-	initialize: function(editor){
-		if(editor) this.editor = editor;
+	initialize: function(modalParent){
+        if(modalParent) this.modalParent = modalParent;
 	},
 
     parseParameters : function (xmlDocument, query){
@@ -149,10 +145,17 @@ Class.create("FormManager", {
                 }
                 element += '</select>';
             }else if(type == "image" && param.get("uploadAction")){
-                element = "<img src='"+defaultValue+"' class='SF_image small'>" +
-                    "<input type='hidden' name='"+param.get("name")+"_original_binary' value='"+ defaultValue +"' data-ajxp_type='string'>";
-                    "<input type='hidden' name='"+param.get("name")+"' data-ajxp_type='binary'>";
-                var link = new Element("span").update(param.get("uploadLegend")?param.get("uploadLegend"):"update");
+                if(defaultValue){
+                    var conn = new Connexion();
+                    var imgSrc = conn._baseUrl + "&get_action=" +param.get("loadAction") + "&binary_id=" + defaultValue;
+                    if(param.get("binary_context")){
+                        imgSrc += "&" + param.get("binary_context");
+                    }
+                }
+                element = "<div class='SF_image_block'><img src='"+imgSrc+"' class='SF_image small'><span class='SF_image_link'>"+
+                    (param.get("uploadLegend")?param.get("uploadLegend"):"update")+"</span>" +
+                    "<input type='hidden' name='"+param.get("name")+"' data-ajxp_type='binary'>" +
+                    "<input type='hidden' name='"+param.get("name")+"_original_binary' value='"+ defaultValue +"' data-ajxp_type='string'></div>";
             }
 			var div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
 
@@ -167,10 +170,10 @@ Class.create("FormManager", {
             }
             // INSERT ELEMENT
             div.insert(element);
-            if(link){
-                div.insert({bottom:link});
-                link.observe("click", function(){
-                    this.createUploadForm(div.down('img'), param);
+            if(type == "image"){
+                var imgLink = div.down("span.SF_image_link");
+                imgLink.observe("click", function(){
+                    this.createUploadForm(form, div.down('img'), param);
                 }.bind(this));
             }
 			if(desc){
@@ -301,32 +304,35 @@ Class.create("FormManager", {
         }
 	},
 
-    createUploadForm : function(imgSrc, param){
-        if(this.editor && this.editor.simpleModalElement){
-            var conn = new Connexion();
-            var url = conn._baseUrl + "&get_action=" + param.get("uploadAction");
-            if(!$("formManager_hidden_iframe")){
-                $$("body")[0].insert(new Element("iframe", {id:"formManager_hidden_iframe"}));
-            }
-            var paramName = param.get("name");
-            var pane = new Element("div");
-            pane.update("<form id='formManager_uploader' enctype='multipart/form-data' target='formManager_hidden_iframe' method='post' action='"+url+"'>" +
-                "<div class='dialogLegend'>Select an image on your computer</div> " +
-                "<input type='file' name='userfile' style='width: 270px;'>" +
-                "</form>")
-            this.editor.simpleModal(this.editor.simpleModalElement, pane, function(){
-                window.formManagerHiddenIFrameSubmission = function(result){
-                    imgSrc.src = conn._baseUrl + "&get_action=" + param.get("loadAction")+"&tmp_file="+result.trim();
-                    imgSrc.next("input[type='hidden']").setValue(result.trim());
-                    imgSrc.next("input[type='hidden']").setAttribute("data-ajxp_type", "tmp_binary");
-                    window.formManagerHiddenIFrameSubmission = null;
-                };
-                pane.down("#formManager_uploader").submit();
-                return true;
-            }.bind(this) , function(){
-                return true;
-            }.bind(this) );
+    createUploadForm : function(modalParent, imgSrc, param){
+        if(this.modalParent) modalParent = this.modalParent;
+        var conn = new Connexion();
+        var url = conn._baseUrl + "&get_action=" + param.get("uploadAction");
+        if(param.get("binary_context")){
+            url += "&" + param.get("binary_context");
         }
+        if(!$("formManager_hidden_iframe")){
+            $$("body")[0].insert(new Element("iframe", {id:"formManager_hidden_iframe"}));
+        }
+        var paramName = param.get("name");
+        var pane = new Element("div");
+        pane.update("<form id='formManager_uploader' enctype='multipart/form-data' target='formManager_hidden_iframe' method='post' action='"+url+"'>" +
+            "<div class='dialogLegend'>Select an image on your computer</div> " +
+            "<input type='file' name='userfile' style='width: 270px;'>" +
+            "</form>")
+        modal.showSimpleModal(modalParent, pane, function(){
+            window.formManagerHiddenIFrameSubmission = function(result){
+                imgSrc.src = conn._baseUrl + "&get_action=" + param.get("loadAction")+"&tmp_file="+result.trim();
+                imgSrc.next("input[type='hidden']").setValue(result.trim());
+                imgSrc.next("input[type='hidden']").setAttribute("data-ajxp_type", "binary");
+                window.formManagerHiddenIFrameSubmission = null;
+            };
+            pane.down("#formManager_uploader").submit();
+            return true;
+        }.bind(this) , function(){
+            return true;
+        }.bind(this) );
+
     },
 
 	serializeParametersInputs : function(form, parametersHash, prefix, skipMandatoryWarning){

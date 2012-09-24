@@ -294,6 +294,39 @@ Class.create("Modal", {
 		};
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},
+
+    showSimpleModal : function(element, content, okCallback, cancelCallback, position){
+        var box = new Element("div", {className:"dialogBox css_boxshadow"});
+        box.insert(content);
+        content.addClassName("dialogContent");
+        addLightboxMarkupToElement(element);
+        $(element).down("#element_overlay").insert({after:box});
+        this.addSubmitCancel(content, cancelCallback, (cancelCallback==null), position);
+        content.down(".dialogButtons").select("input").each(function(button){
+            if(((cancelCallback==null) && button.getAttribute("name") == "close") || button.getAttribute("name") == "ok"){
+                button.observe("click", function(event){
+                    Event.stop(event);
+                    var res = okCallback();
+                    if(res){
+                        box.remove();
+                        removeLightboxFromElement(element);
+                    }
+                });
+            }else{
+                button.stopObserving("click");
+                button.observe("click", function(event){
+                    Event.stop(event);
+                    var res = cancelCallback();
+                    if(res){
+                        box.remove();
+                        removeLightboxFromElement(element);
+                    }
+                });
+            }
+        });
+    },
+
+
 	/**
 	 * Returns the current form, the real one.
 	 * @returns HTMLForm

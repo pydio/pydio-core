@@ -392,6 +392,21 @@ class serialConfDriver extends AbstractConfDriver {
         }
     }
 
+    protected function getBinaryPathStorage($context){
+        $storage = AJXP_DATA_PATH."/plugins/conf.serial/binaries";
+        if(isSet($context["USER"])){
+            $storage.="/users/".$context["USER"];
+        }else if(isSet($context["REPO"])){
+            $storage.="/repos/".$context["REPO"];
+        }else if(isSet($context["ROLE"])){
+            $storage.="/roles/".$context["REPO"];
+        }
+        if(!isSet($this->options["FAST_CHECKS"]) || $this->options["FAST_CHECKS"] !== true){
+            if(!is_dir($storage)) @mkdir($storage, 0755, true);
+        }
+        return $storage;
+    }
+
     /**
      * @param array $context
      * @param String $fileName
@@ -400,7 +415,13 @@ class serialConfDriver extends AbstractConfDriver {
      */
     function saveBinary($context, $fileName, $ID = null)
     {
-        // TODO: Implement saveBinary() method.
+        if(empty($ID)){
+            $ID = substr(md5(microtime()*rand(0,100)), 0, 12);
+            $ID .= ".".pathinfo($fileName, PATHINFO_EXTENSION);
+        }
+        copy($fileName, $this->getBinaryPathStorage($context)."/".$ID);
+
+        return $ID;
     }
 
     /**
@@ -411,6 +432,11 @@ class serialConfDriver extends AbstractConfDriver {
      */
     function loadBinary($context, $ID, $outputStream = null)
     {
-        // TODO: Implement loadBinary() method.
+        if(is_file($this->getBinaryPathStorage($context)."/".$ID)){
+            if($outputStream == null){
+                header("Content-Type: ".AJXP_Utils::getImageMimeType($ID));
+                readfile($this->getBinaryPathStorage($context)."/".$ID);
+            }
+        }
     }
 }
