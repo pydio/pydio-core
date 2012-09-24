@@ -721,7 +721,7 @@ class ShareCenter extends AJXP_Plugin{
                 foreach($removeUsers as $user){
                     if(AuthService::userExists($user)){
                         $userObject = $confDriver->createUserObject($user);
-                        $userObject->removeRights($newRepo->getUniqueId());
+                        $userObject->personalRole->setAcl($newRepo->getUniqueId(), "");
                         $userObject->save("superuser");
                     }
                 }
@@ -732,7 +732,7 @@ class ShareCenter extends AJXP_Plugin{
                 foreach($removeGroups as $groupId){
                     $role = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($groupId));
                     if($role !== false){
-                        $role->removeRights($newRepo->getUniqueId());
+                        $role->setAcl($newRepo->getUniqueId(), "");
                         AuthService::updateRole($role);
                     }
                 }
@@ -751,7 +751,7 @@ class ShareCenter extends AJXP_Plugin{
                 }
                 AuthService::createUser($userName, $pass);
                 $userObject = $confDriver->createUserObject($userName);
-                $userObject->clearRights();
+                $userObject->personalRole->clearAcls();
                 $userObject->setParent($loggedUser->id);
                 $userObject->setGroupPath($loggedUser->getGroupPath());
                 AJXP_Controller::applyHook("user.after_create", array($userObject));
@@ -765,7 +765,7 @@ class ShareCenter extends AJXP_Plugin{
         foreach($groups as $group){
             $grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
             $grRole->setAcl($newRepo->getUniqueId(), $uRights[$group]);
-            $grRole->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
+            $grRole->setActionState("action.share", "share", $newRepo->getUniqueId(), false);
             AuthService::updateRole($grRole);
         }
 

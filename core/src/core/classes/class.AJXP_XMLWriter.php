@@ -459,6 +459,9 @@ class AJXP_XMLWriter
                         $atts .= "$k='$v' ";
                     }
                 }
+                if(isset($prefData["pluginId"])){
+                    $atts .=  "pluginId='".$prefData["pluginId"]."' ";
+                }
                 if($prefData["type"] == "string"){
                     $buffer.="<pref name=\"$prefName\" value=\"".$prefData["value"]."\" $atts/>";
                 }else if($prefData["type"] == "json"){

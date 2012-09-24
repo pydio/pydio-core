@@ -52,21 +52,21 @@ Class.create("IMagickPreviewer", Diaporama, {
         this.resize();
 	},
 	
-	open : function($super, userSelection)
+	open : function($super, node)
 	{
-		this.src_file = userSelection.getUniqueFileName();
+		this.src_file = node.getPath();
 		this.downloadButton.onclick = function(){
 			if(!this.currentFile) return;		
-			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+userSelection.getUniqueFileName());
+			ajaxplorer.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.src_file);
 			return false;
 		}.bind(this);
 				
-		this.currentIM = getBaseName(userSelection.getUniqueFileName());
+		this.currentIM = getBaseName(this.src_file);
 		// Extract the pages and load result!
 		var connexion = new Connexion();
 		connexion.addParameter("get_action", "imagick_data_proxy");
 		connexion.addParameter("all", "true");
-		connexion.addParameter("file", userSelection.getUniqueFileName());
+		connexion.addParameter("file", this.src_file);
 		connexion.onComplete = function(transport){
 			this.removeOnLoad();
 			var result = transport.responseJSON;

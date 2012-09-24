@@ -25,9 +25,9 @@ Class.create("CodePressEditor", TextEditor, {
 	},
 	
 	
-	open : function($super, userSelection){
-		this.userSelection = userSelection;
-		var fileName = userSelection.getUniqueFileName();
+	open : function($super, node){
+		this.inputNode = node;
+		var fileName = node.getPath();
 		// CREATE GUI
 		var cpStyle = this.codePressStyle(getBaseName(fileName));
 		var textarea;

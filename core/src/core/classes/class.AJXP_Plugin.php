@@ -316,6 +316,10 @@ class AJXP_Plugin implements Serializable{
 		}catch (Exception $e){
 			throw $e;
 		}
+        $id = $this->manifestDoc->documentElement->getAttribute("id");
+        if(empty($id) || $id != $this->getId()){
+            $this->manifestDoc->documentElement->setAttribute("id", $this->getId());
+        }
 		$this->xPath = new DOMXPath($this->manifestDoc);
 		$this->loadMixins();
         $this->detectStreamWrapper();

@@ -1179,8 +1179,7 @@ class AJXP_Utils
         foreach ($repDef as $key => $value)
         {
             $value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
-            if(strpos($key, $prefix)!== false
-                && strpos($key, $prefix)==0
+            if( ( ( !empty($prefix) &&  strpos($key, $prefix)!== false && strpos($key, $prefix)==0 ) || empty($prefix) )
                 && strpos($key, "ajxptype") === false
                 && strpos($key, "_replication") === false
                 && strpos($key, "_checkbox") === false){

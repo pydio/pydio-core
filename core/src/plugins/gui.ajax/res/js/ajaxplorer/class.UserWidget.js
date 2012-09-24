@@ -62,8 +62,8 @@ Class.create("UserWidget", {
 			if(oUser.id != 'guest') 
 			{
                 var label = oUser.id;
-                if(oUser.getPreference('CUSTOM_PARAM_DISPLAY_NAME')){
-                    label = oUser.getPreference('CUSTOM_PARAM_DISPLAY_NAME');
+                if(oUser.getPreference('USER_DISPLAY_NAME')){
+                    label = oUser.getPreference('USER_DISPLAY_NAME');
                 }
 				logging_string = '<div class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ label +' </i></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
 				this.element.removeClassName('disabled');

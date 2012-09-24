@@ -51,11 +51,10 @@ Class.create("PixlrEditor", AbstractEditor, {
 		conn.sendAsync();
 	},
 	
-	open : function($super, userSelection)
+	open : function($super, node)
 	{
-		$super(userSelection);		
 		this.setOnLoad(true);
-		this.currentNode = userSelection.getUniqueNode();
+		this.currentNode = node;
 		var fName = this.currentNode.getPath();
 		var src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_server&file=" + base64_encode(fName) + "&parent_url=" + base64_encode(getRepName(document.location.href));
 		this.contentMainContainer.src = src;

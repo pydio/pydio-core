@@ -324,7 +324,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $data["USER"] = array();
                         $data["USER"]["LOCK"] = $userObject->getLock();
                         $data["USER"]["DEFAULT_REPOSITORY"] = $userObject->getPref("force_default_repository");
-                        $data["USER"]["PROFILE"] = $userObject->getAjxpProfile();
+                        $data["USER"]["PROFILE"] = $userObject->getProfile();
                         $data["ALL"]["PROFILES"] = array("standard|Standard","admin|Administrator","shared|Shared","guest|Guest");
                         $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
                         $data["ALL"]["ROLES"] = array_keys(AuthService::getRolesList(array(), true));
@@ -376,6 +376,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $roleData["PARAMETERS"][$repoScope][$plugId] = $parsed;
                     }
                 }
+                if(isSet($userObject) && isSet($data["USER"]) && isSet($data["USER"]["PROFILE"])){
+                    $userObject->setAdmin(($data["USER"]["PROFILE"] == "admin"));
+                    $userObject->setProfile($data["USER"]["PROFILE"]);
+                }
 
                 $output = array();
                 try{
@@ -413,103 +417,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             break;
 
-			case "update_role_default" :
-
-				if(!isSet($httpVars["role_id"])
-					|| !isSet($httpVars["default_value"]))
-				{
-					AJXP_XMLWriter::header();
-					AJXP_XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-					AJXP_XMLWriter::close();
-					return ;
-				}
-				$role = AuthService::getRole($httpVars["role_id"]);
-				if($role === false) {
-					throw new Exception("Cannot find role!");
-				}
-                $role->setDefault(($httpVars["default_value"] == "true"));
-				AuthService::updateRole($role);
-				AJXP_XMLWriter::header("admin_data");
-				print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
-				AJXP_XMLWriter::close("admin_data");
-
-			break;
-
-			case "get_custom_params" :
-				$confStorage = ConfService::getConfStorageImpl();
-				AJXP_XMLWriter::header("admin_data");
-				$confDriver = ConfService::getConfStorageImpl();
-				$customData = $confDriver->options['CUSTOM_DATA'];
-				if(is_array($customData) && count($customData)>0 ){
-					print("<custom_data>");
-					foreach($customData as $custName=>$custValue){
-						print("<param name=\"$custName\" type=\"string\" label=\"$custValue\" description=\"\" value=\"\"/>");
-					}
-					print("</custom_data>");
-				}
-				AJXP_XMLWriter::close("admin_data");
-				
-			break;
-			
-			case "edit_user" : 
-				$confStorage = ConfService::getConfStorageImpl();	
-				$userId = $httpVars["user_id"];	
-				if(!AuthService::userExists($userId)){
-					throw new Exception("Invalid user id!");
-				}
-				$userObject = $confStorage->createUserObject($userId);		
-				AJXP_XMLWriter::header("admin_data");
-				AJXP_XMLWriter::sendUserData($userObject, true);
-				
-				// Add CUSTOM USER DATA
-				$confDriver = ConfService::getConfStorageImpl();
-				$customData = $confDriver->options['CUSTOM_DATA'];
-				if(is_array($customData) && count($customData)>0 ){
-					$userCustom = $userObject->getPref("CUSTOM_PARAMS");
-					print("<custom_data>");
-                    foreach($customData as $custName=>$custValue){
-                        $value = isset($userCustom[$custName]) ? $userCustom[$custName] : '';
-                        if(is_array($custValue)){
-                            print("<param  name=\"$custName\" value='$value' ");
-                            foreach($custValue as $attName => $attValue) print ($attName."='".$attValue."' ");
-                            print("/>");
-                        }else{
-                            print("<param name=\"$custName\" type=\"string\" label=\"$custValue\" description=\"\" value=\"$value\"/>");
-                        }
-					}
-					print("</custom_data>");
-				}
-				// Add WALLET DATA : DEFINITIONS AND VALUES
-				print("<drivers>");
-				print(AJXP_XMLWriter::replaceAjxpXmlKeywords(ConfService::availableDriversToXML("user_param")));
-				print("</drivers>");				
-				$wallet = $userObject->getPref("AJXP_WALLET");
-				if(is_array($wallet) && count($wallet)>0){
-					print("<user_wallet>");
-					foreach($wallet as $repoId => $options){
-						foreach ($options as $optName=>$optValue){
-							print("<wallet_data repo_id=\"$repoId\" option_name=\"$optName\" option_value=\"$optValue\"/>");
-						}
-					}
-					print("</user_wallet>");
-				}
-				$editPass = ($userId!="guest"?"1":"0");
-				$authDriver = ConfService::getAuthDriverImpl();
-				if(!$authDriver->passwordsEditable()){
-					$editPass = "0";
-				}
-				print("<edit_options edit_pass=\"".$editPass."\" edit_admin_right=\"".(($userId!="guest"&&$userId!=$loggedUser->getId())?"1":"0")."\" edit_delete=\"".(($userId!="guest"&&$userId!=$loggedUser->getId()&&$authDriver->usersEditable())?"1":"0")."\"/>");
-				print("<ajxp_roles>");
-				foreach (AuthService::getRolesList(array(), !$this->listSpecialRoles) as $roleId => $roleObject){
-                    //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
-                    if(!AuthService::canAssign($roleObject)) continue;
-					print("<role id=\"$roleId\"/>");
-				}
-				print("</ajxp_roles>");
-				AJXP_XMLWriter::close("admin_data");
-				
-			break;
-			
 			case "create_user" :
 				
 				if(!isset($httpVars["new_user_login"]) || $httpVars["new_user_login"] == "" ||!isset($httpVars["new_user_pwd"]) || $httpVars["new_user_pwd"] == "")
@@ -539,11 +446,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $newUser->setGroupPath($basePath);
                 }
 
-				$customData = array();
-				$this->parseParameters($httpVars, $customData);
-				if(is_array($customData) && count($customData)>0)
-					$newUser->setPref("CUSTOM_PARAMS", $customData);
-				
 				$newUser->save("superuser");
 				AJXP_XMLWriter::header();
 				AJXP_XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
@@ -1492,7 +1394,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 			AJXP_XMLWriter::renderNode("/roles/".$roleId, $roleId, true, array(
 				"icon" => "user-acl.png",
 				"rights_summary" => $rightsString,
-                "is_default"    => ($roleObject->isDefault() ? $mess[440]:$mess[441]),
+                "is_default"    => implode(",", $roleObject->listAutoApplies()), //($roleObject->autoAppliesTo("standard") ? $mess[440]:$mess[441]),
 				"ajxp_mime" => "role"
 			));
 		}

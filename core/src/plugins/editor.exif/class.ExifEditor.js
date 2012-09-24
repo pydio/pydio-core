@@ -39,9 +39,9 @@ Class.create("ExifEditor", AbstractEditor, {
 	},
 	
 	
-	open : function($super, userSelection){
-		$super(userSelection);
-		var fileName = userSelection.getUniqueFileName();
+	open : function($super, node){
+		$super(node);
+		var fileName = node.getPath();
 		// LOAD FILE NOW
 		this.contentMainContainer = new Element("div", {id:"exifContainer",style:"overflow:auto;font-family:Trebuchet MS"});
 		this.element.insert(this.contentMainContainer);

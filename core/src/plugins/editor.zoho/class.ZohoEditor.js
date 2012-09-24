@@ -46,11 +46,11 @@ Class.create("ZohoEditor", AbstractEditor, {
 	},
 
 	
-	open : function($super, userSelection)
+	open : function($super, node)
 	{
-		$super(userSelection);		
+		$super(node);
 		this.setOnLoad(true);
-		this.currentNode = userSelection.getUniqueNode();
+		this.currentNode = node;
 		var fName = this.currentNode.getPath();
 		var src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_zohoserver&file=" + base64_encode(fName) + "&parent_url=" + base64_encode(getRepName(document.location.href));
 		this.contentMainContainer.src = src;

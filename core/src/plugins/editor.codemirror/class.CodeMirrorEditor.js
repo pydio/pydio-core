@@ -104,9 +104,9 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 	},
 	
 	
-	open : function($super, userSelection){
-		$super(userSelection);
-		var fileName = userSelection.getUniqueFileName();
+	open : function($super, nodeOrNodes){
+		$super(nodeOrNodes);
+		var fileName = nodeOrNodes.getPath();
 		
 		var path = 'plugins/editor.codemirror/CodeMirror/';
 		var extension = getFileExtension(fileName);
@@ -294,9 +294,8 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 	prepareSaveConnexion : function(){
 		var connexion = new Connexion();
 		connexion.addParameter('get_action', 'put_content');
-		connexion.addParameter('file', this.userSelection.getUniqueFileName());
-		connexion.addParameter('dir', this.userSelection.getCurrentRep());	
-		connexion.onComplete = function(transp){
+        connexion.addParameter('file', this.inputNode.getPath());
+        connexion.onComplete = function(transp){
 			this.parseXml(transp);			
 		}.bind(this);
 		this.setOnLoad(this.contentMainContainer);

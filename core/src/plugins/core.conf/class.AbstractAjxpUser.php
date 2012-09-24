@@ -144,11 +144,18 @@ abstract class AbstractAjxpUser
         }
 	}
 
-    function getAjxpProfile(){
+    function getProfile(){
+        if(isSet($this->rights["ajxp.profile"])) {
+            return $this->rights["ajxp.profile"];
+        }
         if($this->isAdmin()) return "admin";
         if($this->hasParent()) return "shared";
         if($this->getId() == "guest") return "guest";
         return "standard";
+    }
+
+    function setProfile($profile){
+        $this->rights["ajxp.profile"] = $profile;
     }
 
     function setLock($lockAction){
@@ -226,22 +233,7 @@ abstract class AbstractAjxpUser
 	function getRight($rootDirId){
         return $this->mergedRole->getAcl($rootDirId);
 	}
-	
-	function setRight($rootDirId, $rightString){
-        $this->personalRole->setAcl($rootDirId, $rightString);
-        $this->recomputeMergedRole();
-	}
-	
-	function removeRights($rootDirId){
-        $this->personalRole->setAcl($rootDirId, "");
-        $this->recomputeMergedRole();
-	}
 
-    function clearRights(){
-        $this->personalRole->clearAcls();
-        $this->recomputeMergedRole();
-    }
-	
 	function getPref($prefName){
 		if(isSet($this->prefs[$prefName])) return $this->prefs[$prefName];
 		return "";

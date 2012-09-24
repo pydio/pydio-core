@@ -74,9 +74,9 @@ Class.create("AjxpCkEditor", TextEditor, {
 	},	
 	
 	
-	open : function($super, userSelection){
-		this.userSelection = userSelection;
-		var fileName = userSelection.getUniqueFileName();
+	open : function($super, node){
+		this.inputNode = node;
+		var fileName = node.getPath();
 		var textarea;
 		this.textareaContainer = new Element('div');
 		this.textarea = new Element('textarea');
