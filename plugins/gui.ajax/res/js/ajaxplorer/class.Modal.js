@@ -87,7 +87,6 @@ Class.create("Modal", {
 			var newForm = document.createElement('form');
 			newForm.id = 'modal_action_form';
 			newForm.setAttribute('name','modal_action_form');
-			newForm.setAttribute('action', 'cont.php');
 			newForm.appendChild(formDiv.cloneNode(true));
 			var reloadIFrame = null;
 			if($(newForm).getElementsByTagName("iframe")[0])
@@ -273,7 +272,7 @@ Class.create("Modal", {
 	 * Find an editor using the editorData and initialize it
 	 * @param editorData Object
 	 */
-	openEditorDialog : function(editorData){
+	openEditorDialog : function(editorData, editorArgument){
 		if(!editorData.formId){
 			ajaxplorer.displayMessage('ERROR', 'Error, you must define a formId attribute in your &lt;editor&gt; manifest (or set it as openable="false")');
 			return;
@@ -286,8 +285,12 @@ Class.create("Modal", {
 			}else{
 				ajaxplorer.actionBar.editor = new editorKlass(oForm);
 			}
-			ajaxplorer.actionBar.editor.open(ajaxplorer.getUserSelection());
-			//ajaxplorer.actionBar.editor.resize();
+            if(editorArgument){
+                ajaxplorer.actionBar.editor.open(editorArgument);
+            }else{
+                ajaxplorer.actionBar.editor.open(ajaxplorer.getUserSelection().getUniqueNode());
+            }
+            //ajaxplorer.actionBar.editor.resize();
 		};
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},

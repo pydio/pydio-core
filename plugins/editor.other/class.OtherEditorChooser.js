@@ -45,9 +45,8 @@ Class.create("OtherEditorChooser", AbstractEditor, {
         };
     },
 	
-	open : function($super, userSelection){
-		$super(userSelection);
-		var node = userSelection.getUniqueNode();
+	open : function($super, node){
+		$super(node);
 		var allEditors = this.findActiveEditors(node.getAjxpMime());
 		var selector = this.element.down('#editor_selector');
         var clearAssocLink = this.element.down('#clear_assoc_link');

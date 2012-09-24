@@ -42,7 +42,11 @@ Class.create("AbstractEditor" , {
 	/**
 	 * @var Hash For the moment supported options are "fullscreen", "closable", "floatingToolbar".
 	 */
-	editorOptions:null, 
+	editorOptions:null,
+    /**
+     * @var An AjxpNode or an array of nodes
+     */
+    inputNode : null,
 	
 	/**
 	 * Standard contructor
@@ -209,8 +213,8 @@ Class.create("AbstractEditor" , {
 	 * Opens the editor with the current model
 	 * @param userSelection AjxpDataModel the data model
 	 */
-	open : function(userSelection){
-		this.userSelection = userSelection;
+	open : function(nodeOrNodes){
+		this.inputNode = nodeOrNodes;
 	},
 	/**
 	 * Updates the editor title

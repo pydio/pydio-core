@@ -104,10 +104,10 @@
 					var loadFunc = function(oForm){
 						if(!ajaxplorer.actionBar.configEditor){
 							ajaxplorer.actionBar.configEditor = new ConfigEditor(oForm);
-						}	
+						}
 						ajaxplorer.actionBar.configEditor.setForm(oForm);
 						ajaxplorer.actionBar.configEditor.loadCreateUserForm();
-						
+
 						new Protopass(oForm.down('input[name="new_user_pwd"]'), {
 							barContainer:$('pwd_strength_container'),
 							barPosition:'bottom'

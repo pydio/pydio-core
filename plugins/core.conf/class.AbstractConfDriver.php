@@ -45,6 +45,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                 $n->setAttribute("description", $value);
                 $n->setAttribute("type", "string");
                 $n->setAttribute("scope", "user");
+                $n->setAttribute("expose", "true");
                 $serverSettings->appendChild($n);
             }
             $this->reloadXPath();
@@ -316,7 +317,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     }
                     $name = $xmlNode->getAttribute("name");
                     $value = $userObject->mergedRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "");
-                    $prefs["CUSTOM_PARAM_".$name] = array("value" => $value, "type" => "string");
+                    $prefs[$name] = array("value" => $value, "type" => "string", "pluginId" => $pluginId);
                 }
             }
         }
@@ -451,7 +452,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
                 $userObject = AuthService::getLoggedUser();
                 $data = array();
-                AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "CUSTOM_PARAM_");
+                AJXP_Utils::parseStandardFormParameters($httpVars, $data, null, "PREFERENCES_");
 
                 $paramNodes = AJXP_PluginsService::searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
                 $rChanges = false;
@@ -465,7 +466,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                             }
                             $name = $xmlNode->getAttribute("name");
                             if(isSet($data[$name])){
-                                if($userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]){
+                                if($userObject->parentRole == null || $userObject->parentRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]){
                                     $userObject->personalRole->setParameterValue($pluginId, $name, $data[$name]);
                                     $rChanges = true;
                                 }
@@ -660,7 +661,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     $loggedUser = AuthService::getLoggedUser();
                     // Make sure we do not override remotely set rights
                     $loggedUser->load();
-                    $loggedUser->removeRights($repoId);
+                    $loggedUser->personalRole->setAcl($repoId, "");
                     $loggedUser->save("superuser");
                     AuthService::updateUser($loggedUser);
 

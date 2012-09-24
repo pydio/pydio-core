@@ -21,11 +21,9 @@ Class.create("BrowserOpener", AbstractEditor, {
 
 	initialize: function($super, oFormObject){},
 	
-	open : function($super, userSelection){
-        var fileName =  ajaxplorer.getUserSelection().getUniqueFileName();
-        var node = ajaxplorer.getUserSelection().getUniqueNode();
+	open : function($super, node){
         if(node.getAjxpMime() == "url"){
-        	this.openURL(fileName);
+        	this.openURL(node.getPath());
         	return;
         } 
         var repo = ajaxplorer.user.getActiveRepository();
@@ -33,7 +31,7 @@ Class.create("BrowserOpener", AbstractEditor, {
         if(loc.indexOf("?") !== -1) loc = loc.substring(0, loc.indexOf("?"));
         var url = loc.substring(0, loc.lastIndexOf('/'));
         var nonSecureAccessPath = ajxpServerAccessPath.substring(0, ajxpServerAccessPath.lastIndexOf('?'));
-        var open_file_url = url + "/" + nonSecureAccessPath + "?get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(fileName);
+        var open_file_url = url + "/" + nonSecureAccessPath + "?get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
         var myRef = window.open(open_file_url);
         if(!Modernizr.boxshadow){
             window.setTimeout('hideLightBox()', 1500);

@@ -31,9 +31,9 @@ Class.create("OLViewer", AbstractEditor, {
 	},
 	
 	
-	open : function($super, userSelection){
-		$super(userSelection);
-		var ajxpNode = userSelection.getUniqueNode();
+	open : function($super, node){
+		$super(node);
+		var ajxpNode = node;
 		this.updateTitle(getBaseName(ajxpNode.getPath()));
 		this.mapDiv = new Element('div', {id:'openlayer_map', style:'width:100%'});
 		this.contentMainContainer = this.mapDiv;

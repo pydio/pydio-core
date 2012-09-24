@@ -285,15 +285,16 @@ Class.create("Diaporama", AbstractEditor, {
 		this.element.fire("editor:resize", size);
 	},
 	
-	open : function($super, userSelection)
+	open : function($super, node)
 	{
-		$super(userSelection);
+		$super(node);
+        var userSelection = ajaxplorer.getUserSelection();
 		var allNodes, sCurrentFile;
 		if(userSelection.isUnique()){
-			allItems = userSelection.getContextNode().getChildren();
-			sCurrentFile = userSelection.getUniqueFileName();
+			var allItems = userSelection.getContextNode().getChildren();
+			sCurrentFile = node.getPath();
 		}else{
-			allItems = userSelection.getSelectedNodes();
+			var allItems = userSelection.getSelectedNodes();
 		}
 		this.items = new Array();
 		this.nodes = new Hash();

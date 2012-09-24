@@ -23,7 +23,7 @@
  * @class ConfigEditor
  * Configurations editor
  */
-ConfigEditor = Class.create({
+Class.create("ConfigEditor",{
 
 	formManager:null,
 	
@@ -188,11 +188,11 @@ ConfigEditor = Class.create({
 		this.submitForm("create_user", 'create_user', parameters, null, function(responseXML){
             // success callback
             hideLightBox();
-            var loadFunc = function(oForm){
-                this.setForm(oForm);
-                this.loadUser(newUserName);
-            }.bind(this);
-            modal.showDialogForm('', 'edit_config_box', loadFunc, function(){hideLightBox();}, null, true);
+            var editorData = ajaxplorer.findEditorById("editor.ajxp_role");
+            ajaxplorer.loadEditorResources(editorData.resourcesManager);
+            var node = new AjxpNode(currentPath + "/"+newUserName, true);
+            node.getMetadata().set("ajxp_mime", "user");
+            modal.openEditorDialog(editorData, node);
         }.bind(this), function(responseXML){
             // error callback;
         });
@@ -237,8 +237,28 @@ ConfigEditor = Class.create({
 		return;
 		
 	},
-		
-	/*************************************/
+
+    encodePassword : function(password){
+        // First get a seed to check whether the pass should be encoded or not.
+        var sync = new Connexion();
+        var seed;
+        sync.addParameter('get_action', 'get_seed');
+        sync.onComplete = function(transport){
+            seed = transport.responseText;
+        };
+        sync.sendSync();
+        var encoded;
+        if(seed != '-1'){
+            encoded = hex_md5(password);
+        }else{
+            encoded = password;
+        }
+        return encoded;
+
+    },
+
+
+    /*************************************/
 	/*       REPOSITORIES FUNCTIONS      */
 	/*************************************/
 	initCreateRepoWizard : function(repositoryOrTemplate){

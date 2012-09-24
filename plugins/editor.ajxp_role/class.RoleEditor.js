@@ -109,6 +109,14 @@ Class.create("RoleEditor", AbstractEditor, {
         }.bind(this));
 
         fullPostData['ROLE'] = this.roleWrite;
+
+        if(this.roleData.USER){
+            this.roleData.USER.PROFILE = this.element.down("#account_infos").down("select[name='profile']").getValue();
+            this.roleData.USER.DEFAULT_REPOSITORY = this.element.down("#account_infos").down("select[name='default_repository']").getValue();
+            this.roleData.USER.ROLES = this.element.down("#account_infos").down("select[name='roles']").getValue();
+            fullPostData["USER"] = this.roleData.USER;
+        }
+
         var conn = new Connexion();
         conn.setParameters({
             get_action:'edit',
@@ -136,9 +144,8 @@ Class.create("RoleEditor", AbstractEditor, {
 
     },
 
-	open : function($super, userSelection){
-		$super(userSelection);
-        var node = userSelection.getUniqueNode();
+	open : function($super, node){
+		$super(node);
         var mime = node.getAjxpMime();
         var scope = mime;
         if(mime == "role"){
@@ -246,7 +253,7 @@ Class.create("RoleEditor", AbstractEditor, {
             });
             var defs = [
                 $H({"name":"login",label:"User identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
-                $H({"name":"rights",label:"Specific Rights","type":"select", choices:profilesChoices, default:this.roleData.USER.PROFILE}),
+                $H({"name":"profile",label:"Specific Profile","type":"select", choices:profilesChoices, default:this.roleData.USER.PROFILE}),
                 $H({"name":"default_repository",label:"Default Repository","type":"select", choices:repos.join(","),default:this.roleData.USER.DEFAULT_REPOSITORY}),
                 $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER.ROLES.join(",")})
             ];
@@ -361,13 +368,19 @@ Class.create("RoleEditor", AbstractEditor, {
             // MAIN INFO
             var defs = [
                 $H({"name":"roleId",label:"Role identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
-                $H({"name":"rights",label:"Apply automatically to users with the right...","type":"select", multiple:true, choices:"admin|Administrator,shared|Shared,guest|Guest"})
+                $H({"name":"applies",label:"Apply automatically to users with profile...","type":"select", multiple:true, choices:"standard|All users,admin|Administrator,shared|Shared,guest|Guest"})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
 
             // REMOVE BUTTONS
             this.element.down("#pane-infos").down("#account_actions").remove();
+
+            var appliesSelect = this.element.down("#pane-infos").down("#account_infos").down('select[name="applies"]');
+            appliesSelect.setValue(this.roleRead.APPLIES);
+            appliesSelect.observe("change", function(){
+                this.roleWrite.APPLIES = appliesSelect.getValue();
+            }.bind(this) );
 
         }else if(scope == "group"){
             // MAIN INFO
@@ -398,7 +411,7 @@ Class.create("RoleEditor", AbstractEditor, {
             }catch(e){}
             if(param.get("name").endsWith("DISPLAY_NAME") && param.get("default")){
                 var display = param.get("default");
-                if(this.roleData.USER.LOCK) display += " (locked)";
+                if(this.roleData.USER && this.roleData.USER.LOCK) display += " (locked)";
                 this.element.down("span.header_label").update(display);
             }
             param.set("name", "AJXP_REPO_SCOPE_ALL/" + plugId + "/" + param.get("name"));
