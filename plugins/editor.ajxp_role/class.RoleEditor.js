@@ -56,7 +56,7 @@ Class.create("RoleEditor", AbstractEditor, {
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
         modal.setCloseValidation(function(){
             if(this.isDirty()){
-                var confirm = window.confirm("There are unsaved changes, are you sure you want to close?");
+                var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
                 if(!confirm) return false;
             }
             return true;
@@ -129,7 +129,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
             var response = transport.responseJSON;
             if(response.SUCCESS){
-                ajaxplorer.displayMessage("SUCCESS", "Role updated successfully");
+                ajaxplorer.displayMessage("SUCCESS", MessageHash["ajxp_role_editor.20"]);
                 response.ALL = this.roleData.ALL;
                 if(this.roleData.USER)response.USER = this.roleData.USER;
                 this.initJSONResponse(response);
@@ -252,10 +252,10 @@ Class.create("RoleEditor", AbstractEditor, {
                 repos.push(pair.key+"|"+pair.value);
             });
             var defs = [
-                $H({"name":"login",label:"User identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
-                $H({"name":"profile",label:"Specific Profile","type":"select", choices:profilesChoices, default:this.roleData.USER.PROFILE}),
-                $H({"name":"default_repository",label:"Default Repository","type":"select", choices:repos.join(","),default:this.roleData.USER.DEFAULT_REPOSITORY}),
-                $H({"name":"roles",label:"Roles (use Ctrl to select many)","type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER.ROLES.join(",")})
+                $H({"name":"login",label:MessageHash["ajxp_role_editor.21"],"type":"string", default:getBaseName(node.getPath()), readonly:true}),
+                $H({"name":"profile",label:MessageHash["ajxp_role_editor.22"],"type":"select", choices:profilesChoices, default:this.roleData.USER.PROFILE}),
+                $H({"name":"default_repository",label:MessageHash["ajxp_role_editor.23"],"type":"select", choices:repos.join(","),default:this.roleData.USER.DEFAULT_REPOSITORY}),
+                $H({"name":"roles",label:MessageHash["ajxp_role_editor.24"],"type":"select", multiple:true, choices:rolesChoicesString, default:this.roleData.USER.ROLES.join(",")})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
@@ -288,28 +288,28 @@ Class.create("RoleEditor", AbstractEditor, {
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
-            var b0 = new Element("a", {className:'m-2'}).update("Change Password");
+            var b0 = new Element("a", {className:'m-2'}).update(MessageHash["ajxp_role_editor.25"]);
             buttonPane.insert(b0);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b0.observe("click", function(){
                 var pane = new Element("div", {style:"width:200px;"});
-                pane.insert(new Element("div", {className:"dialogLegend"}).update("Enter the new password for this user"));
+                pane.insert(new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_role_editor.29"]));
                 var passEl1 = new Element("div", {className:"SF_element"});
-                passEl1.insert(new Element("div",{className:"SF_label"}).update("Password"));
+                passEl1.insert(new Element("div",{className:"SF_label"}).update(MessageHash[182]));
                 passEl1.insert(new Element("input",{type:"password",name:"password",className:"SF_input",id:"pass"}));
                 pane.insert(passEl1);
-                var passEl2 = passEl1.cloneNode(true);passEl2.down("div").update("Confirm"); passEl2.down("input").setAttribute("name", "pass_confirm");
+                var passEl2 = passEl1.cloneNode(true);passEl2.down("div").update(MessageHash["ajxp_role_editor.30"]); passEl2.down("input").setAttribute("name", "pass_confirm");
                 pane.insert(passEl2);
                 pane.insert('<div class="SF_element" id="pwd_strength_container"></div>');
                 this.simpleModal(this.element.down("#pane-infos"),pane, function(){
                     var p1 = passEl1.down("input").getValue();
                     var p2 = passEl2.down("input").getValue();
                     if(p2 != p1){
-                        alert("Passwords differ!");
+                        alert(MessageHash[238]);
                         return false;
                     }
                     if(p1.length < strength.options.minchar){
-                        alert("Password is too short!");
+                        alert(MessageHash[378]);
                         return false;
                     }
                     var conn = new Connexion();
@@ -327,7 +327,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 });
             }.bind(this));
             var locked = this.roleData.USER.LOCK ? true : false;
-            var b1 = new Element("a", {className:'m-2'}).update((locked?"Reactivate user":"Lock out user"));
+            var b1 = new Element("a", {className:'m-2'}).update((locked?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
             buttonPane.insert(b1);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b1.observe("click", function(){
@@ -341,11 +341,11 @@ Class.create("RoleEditor", AbstractEditor, {
                 if(!locked) conn.addParameter("lock_type", "logout");
                 conn.onComplete = function(transport){
                     locked = !locked;
-                    b1.update((locked?"Reactivate user":"Lock out user"));
+                    b1.update((locked?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
                 }.bind(this);
                 conn.sendAsync();
             }.bind(this) );
-            var b2 = new Element("a", {className:'m-2'}).update("Force Pass Change");
+            var b2 = new Element("a", {className:'m-2'}).update(MessageHash["ajxp_role_editor.28"]);
             buttonPane.insert(b2);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b2.observe("click", function(){
@@ -359,16 +359,12 @@ Class.create("RoleEditor", AbstractEditor, {
                 });
                 conn.sendAsync();
             });
-            /*
-            var b3 = new Element("a", {}).update("Force Pass Change");
-            buttonPane.insert(b3);
-            */
 
         }else if(scope == "role"){
             // MAIN INFO
             var defs = [
-                $H({"name":"roleId",label:"Role identifier","type":"string", default:getBaseName(node.getPath()), readonly:true}),
-                $H({"name":"applies",label:"Apply automatically to users with profile...","type":"select", multiple:true, choices:"standard|All users,admin|Administrator,shared|Shared,guest|Guest"})
+                $H({"name":"roleId",label:MessageHash["ajxp_role_editor.31"],"type":"string", default:getBaseName(node.getPath()), readonly:true}),
+                $H({"name":"applies",label:MessageHash["ajxp_role_editor.33"],"type":"select", multiple:true, choices:"standard|All users,admin|Administrator,shared|Shared,guest|Guest"})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
@@ -385,7 +381,7 @@ Class.create("RoleEditor", AbstractEditor, {
         }else if(scope == "group"){
             // MAIN INFO
             var defs = [
-                $H({"name":"groupId",label:"Group Label","type":"string", default:getBaseName(node.getPath())})
+                $H({"name":"groupId",label:MessageHash["ajxp_role_editor.34"],"type":"string", default:getBaseName(node.getPath())})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);
@@ -411,7 +407,7 @@ Class.create("RoleEditor", AbstractEditor, {
             }catch(e){}
             if(param.get("name").endsWith("DISPLAY_NAME") && param.get("default")){
                 var display = param.get("default");
-                if(this.roleData.USER && this.roleData.USER.LOCK) display += " (locked)";
+                if(this.roleData.USER && this.roleData.USER.LOCK) display += " ("+ MessageHash["ajxp_role_editor.36"] +")";
                 this.element.down("span.header_label").update(display);
             }
             param.set("name", "AJXP_REPO_SCOPE_ALL/" + plugId + "/" + param.get("name"));
@@ -501,7 +497,7 @@ Class.create("RoleEditor", AbstractEditor, {
         select.observe("change", function(){
             var actions = oManager.pluginsData[type][select.getValue()];
             nextSelect.select("*").invoke("remove");
-            nextSelect.insert(new Element("option", {value:-1}).update((type == "action" ? "Select an action...":"Select a parameter")));
+            nextSelect.insert(new Element("option", {value:-1}).update((type == "action" ? MessageHash["ajxp_role_editor.12a"]:MessageHash["ajxp_role_editor.12b"])));
             for(var key in actions){
                 if(!actions[key][type]) continue;
                 var label = actions[key]['label'];
@@ -518,7 +514,7 @@ Class.create("RoleEditor", AbstractEditor, {
             nextSelect.observeOnce("change", function(){
                 lastSelect.disabled = false;
                 lastSelect.focus();
-                lastSelect.down("option").update("Select one or all repositories...");
+                lastSelect.down("option").update(MessageHash["ajxp_role_editor.12c"]);
                 lastSelect.observeOnce("change", function(){
                     button.removeClassName("disabled");
                 } );
@@ -532,7 +528,7 @@ Class.create("RoleEditor", AbstractEditor, {
         this.element.select("select.repository_selector").each(function(select){
             select.select("option").invoke("remove");
             select.insert(new Element("option", {value:-1}).update(""));
-            select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_ALL"}).update("All Repositories"));
+            select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_ALL"}).update(MessageHash["ajxp_role_editor.12d"]));
             for(var key in repositories){
                 select.insert(new Element("option", {value:key}).update(repositories[key]));
             }
@@ -561,7 +557,7 @@ Class.create("RoleEditor", AbstractEditor, {
             rightsCell.insert(writeBox);
             rightsCell.insert('<label for="chck_'+repoId+'_write">' + MessageHash['ajxp_conf.30'] + '</label> ');
             rightsCell.insert(blockBox);
-            rightsCell.insert('<label for="chck_'+repoId+'_block">' + 'Deny' + '</label> ');
+            rightsCell.insert('<label for="chck_'+repoId+'_block">' + MessageHash["ajxp_role_editor.37"] + '</label> ');
    			var tr = new Element('div', {className:"repositoryEntry"});
    			var titleCell = new Element('div', {className:"repositoryLabel"}).update('<img src="'+ajxpResourcesFolder+'/images/mimes/16/folder_red.png" style="float:left;margin-right:5px;">');
             var theLabel = new Element("span",{style:'cursor:pointer;', 'data-repoId':repoId}).update(repoLabel);
@@ -570,12 +566,6 @@ Class.create("RoleEditor", AbstractEditor, {
                 theLabel.insert(" (inherited)");
                 theLabel.addClassName("inherited");
             }
-               /*
-               theLabel.observe("click", this.changeUserDefaultRepository.bind(this));
-               if(defaultRepository && repoId == defaultRepository){
-                  theLabel.setStyle({fontWeight:"bold"});
-               }
-               */
    			tr.insert(titleCell);
    			tr.insert(rightsCell);
    			rightsTable.insert({bottom:tr});
@@ -603,21 +593,24 @@ Class.create("RoleEditor", AbstractEditor, {
                     if(repoScope != "AJXP_REPO_SCOPE_ALL" && ! this.roleData.ALL.REPOSITORIES[repoScope]){
                         continue;
                     }
+                    if(Object.isArray(actionsData[repoScope][pluginId])) {
+                        continue;
+                    }
                     var el = new Element("div");
-                    var remove = new Element("span", {className:"list_remove_item"}).update("Remove");
+                    var remove = new Element("span", {className:"list_remove_item"}).update(MessageHash["ajxp_role_editor.41"]);
                     el.insert(remove);
                     var repoLab = (repoScope == "AJXP_REPO_SCOPE_ALL" ? "All Repositories" : this.roleData.ALL.REPOSITORIES[repoScope]);
                     var pluginLab = (pluginId == "all_plugins" ? "All Plugins" : pluginId);
                     var state = actionsData[repoScope][pluginId][actionName] === false ? "disabled":"enabled";
                     el.insert(repoLab + " &gt; " + pluginLab + " &gt; " + actionName + " - "+ state);
                     if(this.isInherited(['ACTIONS', repoScope, pluginId, actionName])){
-                        el.insert(" (inherited)");
+                        el.insert(" ("+MessageHash["ajxp_role_editor.38"]+")");
                         el.addClassName("inherited");
                         if(state == 'disabled'){
-                            remove.update("Enable");
+                            remove.update(MessageHash["ajxp_role_editor.40"]);
                             remove.setAttribute("data-ajxpEnable", "true");
                         }else{
-                            remove.update("Disable");
+                            remove.update(MessageHash["ajxp_role_editor.39"]);
                         }
                     }
                     actionsPane.insert(el);
@@ -658,7 +651,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 var scopeLabel;
                 var setTop = false;
                 if(id == "AJXP_REPO_SCOPE_ALL") {
-                    scopeLabel = "All Repositories";
+                    scopeLabel = MessageHash["ajxp_role_editor.12d"];
                     setTop = true;
                 }
                 else scopeLabel = this.roleData.ALL.REPOSITORIES[id];
@@ -678,7 +671,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 for(var k=0;k<formParams.length;k++){
                     var h = formParams[k];
                     if(this.isInherited(["PARAMETERS", id, h.get("group"), h.get("name")])){
-                        h.set("label", '<span class="inherited">' + h.get("label") + ' (inherited)' + '</span>');
+                        h.set("label", '<span class="inherited">' + h.get("label") + ' ('+ MessageHash["ajxp_role_editor.38"] +')' + '</span>');
                     }
                 }
                 formManager.createParametersInputs(pane, formParams, true, null, false, false, false);
@@ -693,7 +686,7 @@ Class.create("RoleEditor", AbstractEditor, {
             // UPDATE FORMS ELEMENTS
             parametersPane.select("div.SF_element").each(function(element){
                 if(!element.down("span.inherited")){
-                    var removeLink = new Element("span", {className:"list_remove_item"}).update("Remove");
+                    var removeLink = new Element("span", {className:"list_remove_item"}).update(MessageHash["ajxp_role_editor.41"]);
                     element.insert(removeLink);
                     removeLink.observe("click", this.parameterListRemoveObserver(element) );
                 }
