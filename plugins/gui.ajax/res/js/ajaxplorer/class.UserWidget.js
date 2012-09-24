@@ -61,11 +61,17 @@ Class.create("UserWidget", {
 		{
 			if(oUser.id != 'guest') 
 			{
-                var label = oUser.id;
+                var label = '<ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ oUser.id +' </i>';
                 if(oUser.getPreference('USER_DISPLAY_NAME')){
-                    label = oUser.getPreference('USER_DISPLAY_NAME');
+                    var img = '';
+                    if(oUser.getPreference("avatar")){
+                        var conn = new Connexion();
+                        var imgSrc = conn._baseUrl + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+                        img = '<img src="'+imgSrc+'" alt="avatar" class="user_widget_mini">';
+                    }
+                    label = '<i ajxp_message_title_id="189" title="'+MessageHash[189]+'">' + img + oUser.getPreference('USER_DISPLAY_NAME') + '</i>';
                 }
-				logging_string = '<div class="user_widget_label"><ajxp:message ajxp_message_id="142">'+MessageHash[142]+'</ajxp:message><i ajxp_message_title_id="189" title="'+MessageHash[189]+'">'+ label +' </i></div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
+				logging_string = '<div class="user_widget_label '+(img?'withImage':'')+'">'+label+'</div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0pt 5px 5px 0pt;border-radius: 0pt 5px 5px 0pt;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
 				this.element.removeClassName('disabled');
 				if(oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
