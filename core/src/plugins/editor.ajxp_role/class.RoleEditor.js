@@ -115,6 +115,9 @@ Class.create("RoleEditor", AbstractEditor, {
             this.roleData.USER.DEFAULT_REPOSITORY = this.element.down("#account_infos").down("select[name='default_repository']").getValue();
             this.roleData.USER.ROLES = this.element.down("#account_infos").down("select[name='roles']").getValue();
             fullPostData["USER"] = this.roleData.USER;
+        }else if(this.roleData.GROUP){
+            this.roleData.GROUP.LABEL = this.element.down("#account_infos").down("input[name='groupLabel']").getValue();
+            fullPostData["GROUP_LABEL"] = this.roleData.GROUP.LABEL;
         }
 
         var conn = new Connexion();
@@ -132,6 +135,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 ajaxplorer.displayMessage("SUCCESS", MessageHash["ajxp_role_editor.20"]);
                 response.ALL = this.roleData.ALL;
                 if(this.roleData.USER)response.USER = this.roleData.USER;
+                if(this.roleData.GROUP)response.GROUP = this.roleData.GROUP;
                 this.initJSONResponse(response);
                 ajaxplorer.fireContextRefresh();
                 this.setClean();
@@ -381,7 +385,8 @@ Class.create("RoleEditor", AbstractEditor, {
         }else if(scope == "group"){
             // MAIN INFO
             var defs = [
-                $H({"name":"groupId",label:MessageHash["ajxp_role_editor.34"],"type":"string", default:getBaseName(node.getPath())})
+                $H({"name":"groupId",label:MessageHash["ajxp_role_editor.34"],"type":"string", default:getBaseName(node.getPath()), readonly:true}),
+                $H({"name":"groupLabel",label:MessageHash["ajxp_role_editor.35"],"type":"string", default:this.roleData.GROUP.LABEL})
             ];
             defs = $A(defs);
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_infos"), defs, true, false, false, true);

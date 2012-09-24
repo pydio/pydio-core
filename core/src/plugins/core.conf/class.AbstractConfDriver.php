@@ -271,6 +271,15 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
     abstract function deleteGroup($groupPath);
 
 
+    /**
+     * @abstract
+     * @param string $groupPath
+     * @param string $groupLabel
+     * @return void
+     */
+    abstract function relabelGroup($groupPath, $groupLabel);
+
+
         /**
      * @param string $baseGroup
      * @return string[]

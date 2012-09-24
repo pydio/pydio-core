@@ -466,6 +466,10 @@ class sqlConfDriver extends AbstractConfDriver {
         dibi::query("INSERT INTO [ajxp_groups]", array("groupPath" => $groupPath, "groupLabel" => $groupLabel));
     }
 
+    function relabelGroup($groupPath, $groupLabel){
+        dibi::query("UPDATE [ajxp_groups] SET [groupLabel]=%s WHERE [groupPath]=%s", $groupLabel, $groupPath);
+    }
+
 
     function deleteGroup($groupPath){
         dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] = %s", $groupPath);

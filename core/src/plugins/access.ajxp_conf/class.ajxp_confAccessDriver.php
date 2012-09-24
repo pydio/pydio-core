@@ -297,7 +297,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $roleGroup = false;
                 if(strpos($roleId, "AJXP_GRP_") === 0){
                     $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_")));
+                    $groups = AuthService::listChildrenGroups(dirname($groupPath));
+                    if(!array_key_exists($groupPath, $groups)){
+                        throw new Exception("Cannot find group with this id!");
+                    }
                     $roleId = "AJXP_GRP_".$groupPath;
+                    $groupLabel = $groups[$groupPath];
                     $roleGroup = true;
                 }
                 if(strpos($roleId, "AJXP_USR_") === 0){
@@ -331,6 +336,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         if(isSet($userObject->parentRole)){
                             $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
                         }
+                    }else if(isSet($groupPath)){
+                        $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
                     }
                     echo json_encode($data);
                 }else{
@@ -347,6 +354,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(strpos($roleId, "AJXP_GRP_") === 0){
                     $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_")));
                     $roleId = "AJXP_GRP_".$groupPath;
+                    $groups = AuthService::listChildrenGroups(dirname($groupPath));
+                    if(!array_key_exists($groupPath, $groups)){
+                        throw new Exception("Cannot find group with this id!");
+                    }
+                    $groupLabel = $groups[$groupPath];
                     $roleGroup = true;
                 }
                 if(strpos($roleId, "AJXP_USR_") === 0){
@@ -379,6 +391,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(isSet($userObject) && isSet($data["USER"]) && isSet($data["USER"]["PROFILE"])){
                     $userObject->setAdmin(($data["USER"]["PROFILE"] == "admin"));
                     $userObject->setProfile($data["USER"]["PROFILE"]);
+                }
+                if(isSet($data["GROUP_LABEL"]) && isSet($groupLabel) && $groupLabel != $data["GROUP_LABEL"]){
+                    ConfService::getConfStorageImpl()->relabelGroup($groupPath, $data["GROUP_LABEL"]);
                 }
 
                 $output = array();
