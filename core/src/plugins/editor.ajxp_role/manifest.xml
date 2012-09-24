@@ -17,39 +17,39 @@
 			</div>
 			<div id="roleTabulator">
 			    <ul class="tabrow">
-                    <li class="selected" data-PaneID="pane-infos"><span>Info</span></li>
-                    <li class="" data-PaneID="pane-acls"><span>ACL</span></li>
-                    <li class="" data-PaneID="pane-actions"><span>Actions</span></li>
-                    <li class="" data-PaneID="pane-parameters"><span>Parameters</span></li>
+                    <li class="selected" data-PaneID="pane-infos"><span>AJXP_MESSAGE[ajxp_role_editor.3]</span></li>
+                    <li class="" data-PaneID="pane-acls"><span>AJXP_MESSAGE[ajxp_role_editor.4]</span></li>
+                    <li class="" data-PaneID="pane-actions"><span>AJXP_MESSAGE[ajxp_role_editor.5]</span></li>
+                    <li class="" data-PaneID="pane-parameters"><span>AJXP_MESSAGE[ajxp_role_editor.6]</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>
 	            <div id="pane-infos">
-	                <div class="innerTitle">Generic Informations</div>
+	                <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.7]</div>
                     <div id="account_infos"></div>
                     <div id="account_actions"></div>
-	                <div class="innerTitle">Custom Fields</div>
+	                <div class="innerTitle">AJXP_MESSAGE[ajxp_role_editor.8]</div>
                     <div id="account_custom"></div>
 	            </div>
                 <div id="pane-acls">
-                    <div class="dialogLegend">Select the repositories to which the use with this role will have access. Use the 'Deny' value to either override a value set by a previous role, or definitely deny the access to this repository even to inherited roles.</div>
+                    <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.9]</div>
                     <div id="acls-selected"></div>
                 </div>
                 <div id="pane-actions">
                     <div id="actions-selector">
-                        <div class="dialogLegend">Use the selectors below to select the actions you want to disabled for the users of this role. You can choose to disable the action for all repositories, or for a given repository only.</div>
+                        <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.10]</div>
                         <div class="SF_element">
-                            <div class="SF_label">Plugin Identifier</div>
-                            <select class="SF_input plugin_selector"><option value="-1">Select a plugin...</option></select>
+                            <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.11]</div>
+                            <select class="SF_input plugin_selector"><option value="-1">AJXP_MESSAGE[ajxp_role_editor.12]</option></select>
                         </div>
                         <div class="SF_element">
-                            <div class="SF_label">Action Name</div>
+                            <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.13]</div>
                             <select class="SF_input action_selector" disabled="true"></select>
                         </div>
                         <div class="SF_element">
-                            <div class="SF_label">Repository Scope</div>
+                            <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.14]</div>
                             <select class="SF_input repository_selector" disabled="true"></select>
-                            <div class="add_button disabled">Add action</div>
+                            <div class="add_button disabled">AJXP_MESSAGE[ajxp_role_editor.15]</div>
                         </div>
                         <div style="clear:both;"></div>
                     </div>
@@ -57,19 +57,19 @@
                 </div>
                 <div id="pane-parameters">
                     <div id="parameters-selector">
-                        <div class="dialogLegend">Use the selectors below to select the parameters you want to refine for the users of this role. Can be applied to all or one given repository only, although this may depend on the plugin context.</div>
+                        <div class="dialogLegend">AJXP_MESSAGE[ajxp_role_editor.16]</div>
                         <div class="SF_element">
-                            <div class="SF_label">Plugin Identifier</div>
-                            <select class="SF_input plugin_selector"><option value="-1">Select a plugin...</option></select>
+                            <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.11]</div>
+                            <select class="SF_input plugin_selector"><option value="-1">AJXP_MESSAGE[ajxp_role_editor.12]</option></select>
                         </div>
                         <div class="SF_element">
-                            <div class="SF_label">Parameter Name</div>
+                            <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.17]</div>
                             <select class="SF_input parameter_selector" disabled="true"></select>
                         </div>
                         <div class="SF_element">
-                            <div class="SF_label">Repository Scope</div>
+                            <div class="SF_label">AJXP_MESSAGE[ajxp_role_editor.14]</div>
                             <select class="SF_input repository_selector" disabled="true"></select>
-                            <div class="add_button disabled">Add parameter</div>
+                            <div class="add_button disabled">AJXP_MESSAGE[ajxp_role_editor.18]</div>
                         </div>
                         <div style="clear:both;"></div>
                     </div>
