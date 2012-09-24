@@ -199,7 +199,27 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * Specific queries
 	 */
 	abstract function countAdminUsers();
-	
+
+    /**
+     * @abstract
+     * @param array $context
+     * @param String $fileName
+     * @param String $ID
+     * @return String $ID
+     */
+    abstract function saveBinary($context, $fileName, $ID = null);
+
+    /**
+     * @abstract
+     * @param array $context
+     * @param String $ID
+     * @param Stream $outputStream
+     * @return boolean
+     */
+    abstract function loadBinary($context, $ID, $outputStream = null);
+
+
+
 	/**
 	 * Instantiate a new AbstractAjxpUser
 	 *
@@ -681,7 +701,48 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
             break;
 
-			default;
+            case "get_binary_param" :
+
+                if(isSet($httpVars["tmp_file"])){
+                    $file = AJXP_Utils::getAjxpTmpDir()."/".AJXP_Utils::securePath($httpVars["tmp_file"]);
+                    if(isSet($file)){
+                        header("Content-Type:image/png");
+                        readfile($file);
+                    }
+                }else if(isSet($httpVars["binary_id"])){
+                    if(isSet($httpVars["user_id"]) && AuthService::getLoggedUser() != null && AuthService::getLoggedUser()->isAdmin()){
+                        $context = array("USER" => $httpVars["user_id"]);
+                    }else{
+                        $context = array("USER" => AuthService::getLoggedUser()->getId());
+                    }
+                    $this->loadBinary($context, $httpVars["binary_id"]);
+                }
+            break;
+
+            case "store_binary_temp" :
+
+                if(count($fileVars)){
+                    $keys = array_keys($fileVars);
+                    $boxData = $fileVars[$keys[0]];
+                    $err = AJXP_Utils::parseFileDataErrors($boxData);
+                    if($err != null){
+
+                    }else{
+                        $rand = substr(md5(time()), 0, 6);
+                        $tmp = $rand."-". $boxData["name"];
+                        @move_uploaded_file($boxData["tmp_name"], AJXP_Utils::getAjxpTmpDir()."/". $tmp);
+                    }
+                }
+                if(isSet($tmp) && file_exists(AJXP_Utils::getAjxpTmpDir()."/".$tmp)) {
+                    print('<script type="text/javascript">');
+                    print('parent.formManagerHiddenIFrameSubmission("'.$tmp.'");');
+                    print('</script>');
+                }
+
+                break;
+
+
+            default;
 			break;
 		}
 		if(isset($logMessage) || isset($errorMessage))

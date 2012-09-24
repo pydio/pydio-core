@@ -8,6 +8,11 @@
 	<server_settings>
         <param name="ROLE_DISPLAY_NAME" scope="role" description="Role Label" label="Role Label" type="string" expose="true"/>
         <param name="USER_DISPLAY_NAME" scope="user" description="Full Name" label="Full name" type="string" expose="true" editable="true"/>
+        <param name="avatar" scope="user" description="Avatar" label="Avatar" type="image" expose="true"
+               editable="true"
+               uploadAction="store_binary_temp"
+               loadAction="get_binary_param"
+                />
         <param name="email" scope="user" description="Email" label="Email Address" type="string" expose="true" editable="true"/>
         <param name="country" scope="role,user" description="Country" label="Country" type="select" choices="fr|France,uk|United Kingdom,de|Germany" expose="true" editable="true"/>
         <param name="lang" scope="role,user" description="User Language" label="Language" type="select" choices="AJXP_AVAILABLE_LANGUAGES" expose="true" editable="true"/>

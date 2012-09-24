@@ -1173,7 +1173,7 @@ class AJXP_Utils
         @ini_set($paramName, $paramValue);
     }
 
-    public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_"){
+    public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null){
 
         $replicationGroups = array();
         foreach ($repDef as $key => $value)
@@ -1181,6 +1181,7 @@ class AJXP_Utils
             $value = AJXP_Utils::sanitize(SystemTextEncoding::magicDequote($value));
             if( ( ( !empty($prefix) &&  strpos($key, $prefix)!== false && strpos($key, $prefix)==0 ) || empty($prefix) )
                 && strpos($key, "ajxptype") === false
+                && strpos($key, "_original_binary") === false
                 && strpos($key, "_replication") === false
                 && strpos($key, "_checkbox") === false){
                 if(isSet($repDef[$key."_ajxptype"])){
@@ -1198,6 +1199,12 @@ class AJXP_Utils
                             $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
                             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
                             $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
+                        }
+                    }else if($type == "tmp_binary" && $binariesContext != null){
+                        $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
+                        if(file_exists($file)){
+                            $id=empty($repDef[$key."_original_binary"]) ? $repDef[$key."_original_binary"] : null;
+                            ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
                         }
                     }
                     unset($repDef[$key."_ajxptype"]);
