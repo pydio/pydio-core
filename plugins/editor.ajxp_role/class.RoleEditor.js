@@ -67,7 +67,7 @@ Class.create("RoleEditor", AbstractEditor, {
     save : function(){
         if(!this.isDirty()) return;
         var fullPostData = {};
-        var fManager = new FormManager(this);
+        var fManager = this.getFormManager();
         fullPostData['FORMS'] = {};
         this.element.down("#parameters-selected").select("div.role_edit-params-form").each(function(repoForm){
             var repoScope = repoForm.id.replace("params-form-", "");
@@ -81,7 +81,9 @@ Class.create("RoleEditor", AbstractEditor, {
                     var pName = pair.key.replace("ROLE_PARAM_", "");
                     if(pName.endsWith("_ajxptype") || pName.endsWith("_replication") || pName.endsWith("_checkbox")) return;
                     if(this.isInherited(['PARAMETERS', repoScope, pluginId, pName])){
-                        if(this.roleParent['PARAMETERS'][repoScope][pluginId][pName] == pair.value){
+                        if(this.roleParent['PARAMETERS'][repoScope] &&
+                            this.roleParent['PARAMETERS'][repoScope][pluginId]
+                            && this.roleParent['PARAMETERS'][repoScope][pluginId][pName] == pair.value){
                             parametersHash.unset(pair.key);
                         }
                     }
@@ -106,6 +108,15 @@ Class.create("RoleEditor", AbstractEditor, {
             if(!fullPostData['FORMS'][repoScope]) fullPostData['FORMS'][repoScope] = {};
             if(!fullPostData['FORMS'][repoScope][pluginId]) fullPostData['FORMS'][repoScope][pluginId] = $H({});
             fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName, pair.value);
+            if(customFieldsHash.get(pName + "_ajxptype")){
+                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_ajxptype", customFieldsHash.get(pName + "_ajxptype"));
+            }
+            if(customFieldsHash.get(pName + "_checkbox")){
+                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_checkbox", customFieldsHash.get(pName + "_checkbox"));
+            }
+            if(customFieldsHash.get(pName + "_replication")){
+                fullPostData['FORMS'][repoScope][pluginId].set("ROLE_PARAM_"+paramName+"_replication", customFieldsHash.get(pName + "_replication"));
+            }
         }.bind(this));
 
         fullPostData['ROLE'] = this.roleWrite;
@@ -246,8 +257,7 @@ Class.create("RoleEditor", AbstractEditor, {
     },
 
     buildInfoPane : function(node, scope){
-        var f = new FormManager(this);
-        this.simpleModalElement = this.element.down("#pane-infos");
+        var f = this.getFormManager();
         if(scope == "user"){
             // MAIN INFO
             var rolesChoicesString = this.roleData.ALL.ROLES.join(",");
@@ -306,7 +316,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 var passEl2 = passEl1.cloneNode(true);passEl2.down("div").update(MessageHash["ajxp_role_editor.30"]); passEl2.down("input").setAttribute("name", "pass_confirm");
                 pane.insert(passEl2);
                 pane.insert('<div class="SF_element" id="pwd_strength_container"></div>');
-                this.simpleModal(this.element.down("#pane-infos"),pane, function(){
+                modal.showSimpleModal(this.element.down("#pane-infos"),pane, function(){
                     var p1 = passEl1.down("input").getValue();
                     var p2 = passEl2.down("input").getValue();
                     if(p2 != p1){
@@ -401,6 +411,9 @@ Class.create("RoleEditor", AbstractEditor, {
         definitions.each(function(param){
             if(param.get("readonly")){
                 param.set("readonly", false);
+            }
+            if(param.get("type") == "image"){
+                this.updateBinaryContext(param);
             }
             var xmlNode = param.get("xmlNode");
             var plugNode = xmlNode.parentNode.parentNode;
@@ -649,7 +662,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
             // Parse result as a standard form
             var xml = transport.responseXML;
-            var formManager = new FormManager(this);
+            var formManager = this.getFormManager();
             var scopes = XPathSelectNodes(xml, "standard_form/repoScope");
             if(!scopes.length) return;
             for(var i=0;i<scopes.length;i++){
@@ -702,6 +715,20 @@ Class.create("RoleEditor", AbstractEditor, {
 
         }.bind(this);
         conn.sendAsync();
+    },
+
+    getFormManager : function(){
+        return new FormManager(this.element.down(".tabpanes"));
+    },
+
+    updateBinaryContext : function(parameter){
+        if(this.roleData.USER){
+            parameter.set("binary_context", "user_id="+this.roleId.replace("AJXP_USR_/", ""));
+        }else if(this.roleData.GROUP){
+            parameter.set("binary_context", "group_id="+this.roleId.replace("AJXP_GRP_/", ""));
+        }else{
+            parameter.set("binary_context", "role_id="+this.roleId);
+        }
     },
 
     addParameterToList: function(plugin, parameter, scope){

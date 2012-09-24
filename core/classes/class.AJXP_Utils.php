@@ -1175,6 +1175,9 @@ class AJXP_Utils
 
     public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null){
 
+        if($binariesContext == null){
+            $binariesContext = array("USER" => AuthService::getLoggedUser()->getId());
+        }
         $replicationGroups = array();
         foreach ($repDef as $key => $value)
         {
@@ -1200,11 +1203,12 @@ class AJXP_Utils
                             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
                             $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
                         }
-                    }else if($type == "tmp_binary" && $binariesContext != null){
+                    }else if($type == "binary" && $binariesContext != null){
                         $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
                         if(file_exists($file)){
                             $id=empty($repDef[$key."_original_binary"]) ? $repDef[$key."_original_binary"] : null;
-                            ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                            $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                            $value = $id;
                         }
                     }
                     unset($repDef[$key."_ajxptype"]);
