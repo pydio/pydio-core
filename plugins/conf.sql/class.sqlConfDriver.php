@@ -522,5 +522,27 @@ class sqlConfDriver extends AbstractConfDriver {
             throw new Exception('Failed to delete user, Reason: '.$e->getMessage());
         }
     }
+
+    /**
+     * @param array $context
+     * @param String $fileName
+     * @param String $ID
+     * @return String $ID
+     */
+    function saveBinary($context, $fileName, $ID = null)
+    {
+        // TODO: Implement saveBinary() method.
+    }
+
+    /**
+     * @param array $context
+     * @param String $ID
+     * @param Stream $outputStream
+     * @return boolean
+     */
+    function loadBinary($context, $ID, $outputStream = null)
+    {
+        // TODO: Implement loadBinary() method.
+    }
 }
 ?>

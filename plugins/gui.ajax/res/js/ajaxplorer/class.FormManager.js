@@ -22,12 +22,17 @@
  * An simple form generator 
  */
 Class.create("FormManager", {
-		
+
+    /**
+     * @var AbstractEditor
+     */
+    editor: null,
+
 	/**
 	 * Constructor
 	 */
-	initialize: function(){
-		
+	initialize: function(editor){
+		if(editor) this.editor = editor;
 	},
 
     parseParameters : function (xmlDocument, query){
@@ -39,15 +44,16 @@ Class.create("FormManager", {
     },
 
 	parameterNodeToHash : function(paramNode){
-		var paramsAtts = $A(['name', 'group', 'replicationGroup', 'type', 'label', 'description', 'default', 'mandatory', 'choices', 'readonly']);
+        var paramsAtts = paramNode.attributes;
 		var paramsHash = new Hash();
-		paramsAtts.each(function(attName){
-            var value = (XPathGetSingleNodeText(paramNode, '@'+attName) || '');
+        for(var i=0; i<paramsAtts.length; i++){
+            var attName = paramsAtts.item(i).nodeName;
+            var value = paramsAtts.item(i).nodeValue;
             if( (attName == "label" || attName == "description" || attName == "group") && MessageHash[value] ){
                 value = MessageHash[value];
             }
 			paramsHash.set(attName, value);
-		});
+		}
         paramsHash.set("xmlNode", paramNode);
 		return paramsHash;
 	},
@@ -142,6 +148,11 @@ Class.create("FormManager", {
                     element += '<option value="'+cValue+'"'+selectedString+'>'+cLabel+'</option>';
                 }
                 element += '</select>';
+            }else if(type == "image" && param.get("uploadAction")){
+                element = "<img src='"+defaultValue+"' class='SF_image small'>" +
+                    "<input type='hidden' name='"+param.get("name")+"_original_binary' value='"+ defaultValue +"' data-ajxp_type='string'>";
+                    "<input type='hidden' name='"+param.get("name")+"' data-ajxp_type='binary'>";
+                var link = new Element("span").update(param.get("uploadLegend")?param.get("uploadLegend"):"update");
             }
 			var div = new Element('div', {className:"SF_element" + (addFieldCheckbox?" SF_elementWithCheckbox":"")});
 
@@ -156,6 +167,12 @@ Class.create("FormManager", {
             }
             // INSERT ELEMENT
             div.insert(element);
+            if(link){
+                div.insert({bottom:link});
+                link.observe("click", function(){
+                    this.createUploadForm(div.down('img'), param);
+                }.bind(this));
+            }
 			if(desc){
 				modal.simpleTooltip(div.select('.SF_label')[0], '<div class="simple_tooltip_title">'+label+'</div>'+desc);
 			}
@@ -283,13 +300,41 @@ Class.create("FormManager", {
             });
         }
 	},
-	
+
+    createUploadForm : function(imgSrc, param){
+        if(this.editor && this.editor.simpleModalElement){
+            var conn = new Connexion();
+            var url = conn._baseUrl + "&get_action=" + param.get("uploadAction");
+            if(!$("formManager_hidden_iframe")){
+                $$("body")[0].insert(new Element("iframe", {id:"formManager_hidden_iframe"}));
+            }
+            var paramName = param.get("name");
+            var pane = new Element("div");
+            pane.update("<form id='formManager_uploader' enctype='multipart/form-data' target='formManager_hidden_iframe' method='post' action='"+url+"'>" +
+                "<div class='dialogLegend'>Select an image on your computer</div> " +
+                "<input type='file' name='userfile' style='width: 270px;'>" +
+                "</form>")
+            this.editor.simpleModal(this.editor.simpleModalElement, pane, function(){
+                window.formManagerHiddenIFrameSubmission = function(result){
+                    imgSrc.src = conn._baseUrl + "&get_action=" + param.get("loadAction")+"&tmp_file="+result.trim();
+                    imgSrc.next("input[type='hidden']").setValue(result.trim());
+                    imgSrc.next("input[type='hidden']").setAttribute("data-ajxp_type", "tmp_binary");
+                    window.formManagerHiddenIFrameSubmission = null;
+                };
+                pane.down("#formManager_uploader").submit();
+                return true;
+            }.bind(this) , function(){
+                return true;
+            }.bind(this) );
+        }
+    },
+
 	serializeParametersInputs : function(form, parametersHash, prefix, skipMandatoryWarning){
 		prefix = prefix || '';
 		var missingMandatory = $A();
         var checkboxesActive = false;
 		form.select('input,textarea').each(function(el){
-			if(el.type == "text" || el.type == "password" || el.nodeName.toLowerCase() == 'textarea'){
+			if(el.type == "text" || el.type == "hidden" || el.type == "password" || el.nodeName.toLowerCase() == 'textarea'){
 				if(el.getAttribute('data-ajxp_mandatory') == 'true' && el.value == '' && !el.disabled){
 					missingMandatory.push(el);
 				}

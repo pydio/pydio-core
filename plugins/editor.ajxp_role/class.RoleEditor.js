@@ -67,7 +67,7 @@ Class.create("RoleEditor", AbstractEditor, {
     save : function(){
         if(!this.isDirty()) return;
         var fullPostData = {};
-        var fManager = new FormManager();
+        var fManager = new FormManager(this);
         fullPostData['FORMS'] = {};
         this.element.down("#parameters-selected").select("div.role_edit-params-form").each(function(repoForm){
             var repoScope = repoForm.id.replace("params-form-", "");
@@ -246,7 +246,8 @@ Class.create("RoleEditor", AbstractEditor, {
     },
 
     buildInfoPane : function(node, scope){
-        var f = new FormManager();
+        var f = new FormManager(this);
+        this.simpleModalElement = this.element.down("#pane-infos");
         if(scope == "user"){
             // MAIN INFO
             var rolesChoicesString = this.roleData.ALL.ROLES.join(",");
@@ -648,7 +649,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
             // Parse result as a standard form
             var xml = transport.responseXML;
-            var formManager = new FormManager();
+            var formManager = new FormManager(this);
             var scopes = XPathSelectNodes(xml, "standard_form/repoScope");
             if(!scopes.length) return;
             for(var i=0;i<scopes.length;i++){

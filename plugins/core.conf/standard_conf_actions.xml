@@ -150,6 +150,16 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>
 		</action>
+		<action name="get_binary_param">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
+		<action name="store_binary_temp">
+			<processing>
+				<serverCallback methodName="switchAction"></serverCallback>
+			</processing>
+		</action>
 		<action name="switch_language">
 			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false">
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>

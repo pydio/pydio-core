@@ -376,6 +376,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $data = json_decode($httpVars["json_data"], true);
                 $roleData = $data["ROLE"];
                 $forms = $data["FORMS"];
+                $binariesContext = array();
+                if(isset($userObject)){
+                    $binariesContext = array("USER" => $userObject->getId());
+                }
                 foreach($forms as $repoScope => $plugData){
                     foreach($plugData as $plugId => $formsData){
                         $parsed = array();
@@ -383,7 +387,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             $formsData,
                             $parsed,
                             ($userObject!=null?$usrId:null),
-                            "ROLE_PARAM_"
+                            "ROLE_PARAM_",
+                            $binariesContext
                         );
                         $roleData["PARAMETERS"][$repoScope][$plugId] = $parsed;
                     }
@@ -726,7 +731,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 AJXP_XMLWriter::close();
 
             break;
-	
+
 			case  "get_drivers_definition":
 
 				AJXP_XMLWriter::header("drivers", array("allowed" => $currentUserIsGroupAdmin ? "false" : "true"));
