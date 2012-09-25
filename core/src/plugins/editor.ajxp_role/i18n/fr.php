@@ -35,6 +35,7 @@ $mess=array(
 "12b" => "Selectionner un paramètre...",
 "12c" => "Choisir un ou tous les dépôts...",
 "12d" => "Tous les dépôts",
+"12e" => "Dépôts partagés",
 "13" => "Nom de l'action",
 "14" => "Portée des dépôts",
 "15" => "Ajouter cette action",

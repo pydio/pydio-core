@@ -35,6 +35,7 @@ $mess=array(
 "12b" => "Select a parameter...",
 "12c" => "Pick one or all repositories...",
 "12d" => "All Repositories",
+"12e" => "Shared Repositories",
 "13" => "Action name",
 "14" => "Repository Scope",
 "15" => "Add Action",

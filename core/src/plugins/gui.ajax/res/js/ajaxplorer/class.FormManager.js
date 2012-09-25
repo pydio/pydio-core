@@ -106,7 +106,7 @@ Class.create("FormManager", {
 				element = '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" value="true" '+(selectTrue?'checked':'')+''+disabledString+'> '+MessageHash[440];
 				element = element + '<input type="radio" data-ajxp_type="'+type+'" class="SF_box" name="'+name+'" '+(selectFalse?'checked':'')+' value="false"'+disabledString+'> '+MessageHash[441];
 				element = '<div class="SF_input">'+element+'</div>';
-			}else if(type == 'select' && param.get('choices')){
+			}else if(type == 'select'){
                 var choices, json_list;
                 if(Object.isString(param.get("choices"))){
                     if(param.get("choices").startsWith("json_list:")){
@@ -124,6 +124,7 @@ Class.create("FormManager", {
                 }else{
                     choices = param.get("choices");
                 }
+                if(!choices) choices = [];
                 var multiple = param.get("multiple") ? "multiple='true'":"";
                 element = '<select class="SF_input" name="'+name+'" data-ajxp_mandatory="'+(mandatory?'true':'false')+'" '+multiple+'>';
                 if(!mandatory && !multiple) element += '<option value=""></option>';

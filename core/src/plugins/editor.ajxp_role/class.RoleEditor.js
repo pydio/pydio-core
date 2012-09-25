@@ -548,6 +548,7 @@ Class.create("RoleEditor", AbstractEditor, {
             select.select("option").invoke("remove");
             select.insert(new Element("option", {value:-1}).update(""));
             select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_ALL"}).update(MessageHash["ajxp_role_editor.12d"]));
+            select.insert(new Element("option", {value:"AJXP_REPO_SCOPE_SHARED"}).update(MessageHash["ajxp_role_editor.12e"]));
             for(var key in repositories){
                 select.insert(new Element("option", {value:key}).update(repositories[key]));
             }
@@ -609,7 +610,8 @@ Class.create("RoleEditor", AbstractEditor, {
         for(var repoScope in actionsData){
             for(var pluginId in actionsData[repoScope]){
                 for(var actionName in actionsData[repoScope][pluginId]){
-                    if(repoScope != "AJXP_REPO_SCOPE_ALL" && ! this.roleData.ALL.REPOSITORIES[repoScope]){
+                    if(repoScope != "AJXP_REPO_SCOPE_ALL" && repoScope != "AJXP_REPO_SCOPE_SHARED"
+                        && ! this.roleData.ALL.REPOSITORIES[repoScope]){
                         continue;
                     }
                     if(Object.isArray(actionsData[repoScope][pluginId])) {
@@ -618,7 +620,10 @@ Class.create("RoleEditor", AbstractEditor, {
                     var el = new Element("div");
                     var remove = new Element("span", {className:"list_remove_item"}).update(MessageHash["ajxp_role_editor.41"]);
                     el.insert(remove);
-                    var repoLab = (repoScope == "AJXP_REPO_SCOPE_ALL" ? "All Repositories" : this.roleData.ALL.REPOSITORIES[repoScope]);
+                    var repoLab;
+                    if(repoScope == "AJXP_REPO_SCOPE_ALL") repoLab = MessageHash["ajxp_role_editor.12d"];
+                    else if(repoScope == "AJXP_REPO_SCOPE_SHARED") repoLab = MessageHash["ajxp_role_editor.12e"];
+                    else repoLab = this.roleData.ALL.REPOSITORIES[repoScope];
                     var pluginLab = (pluginId == "all_plugins" ? "All Plugins" : pluginId);
                     var state = actionsData[repoScope][pluginId][actionName] === false ? "disabled":"enabled";
                     el.insert(repoLab + " &gt; " + pluginLab + " &gt; " + actionName + " - "+ state);
@@ -671,6 +676,9 @@ Class.create("RoleEditor", AbstractEditor, {
                 var setTop = false;
                 if(id == "AJXP_REPO_SCOPE_ALL") {
                     scopeLabel = MessageHash["ajxp_role_editor.12d"];
+                    setTop = true;
+                }else if(id == "AJXP_REPO_SCOPE_SHARED"){
+                    scopeLabel = MessageHash["ajxp_role_editor.12e"];
                     setTop = true;
                 }
                 else scopeLabel = this.roleData.ALL.REPOSITORIES[id];

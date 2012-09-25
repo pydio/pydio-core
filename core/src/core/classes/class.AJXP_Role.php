@@ -23,6 +23,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 define('AJXP_VALUE_CLEAR', "AJXP_VALUE_CLEAR");
 define('AJXP_REPO_SCOPE_ALL',"AJXP_REPO_SCOPE_ALL");
+define('AJXP_REPO_SCOPE_SHARED',"AJXP_REPO_SCOPE_SHARED");
 define('AJXP_PLUGINS_SCOPE_ALL',"plugin_all");
 
 class AJXP_Role implements AjxpGroupPathProvider
@@ -222,11 +223,22 @@ class AJXP_Role implements AjxpGroupPathProvider
         return $this->actions;
     }
 
-    public function listActionsStatesFor($repositoryId){
-        if(isSet($this->actions[$repositoryId])){
-            return $this->actions[$repositoryId];
+    /**
+     * @param Repository $repository
+     * @return array
+     */
+    public function listActionsStatesFor($repository){
+        $actions = array();
+        if(isSet($this->actions[AJXP_REPO_SCOPE_ALL])){
+            $actions = $this->actions[AJXP_REPO_SCOPE_ALL];
         }
-        return array();
+        if(isSet($this->actions[AJXP_REPO_SCOPE_SHARED]) && $repository->hasParent()){
+            $actions = array_merge($actions, $this->actions[AJXP_REPO_SCOPE_SHARED]);
+        }
+        if(isSet($this->actions[$repository->getId()])){
+            $actions = array_merge($actions, $this->actions[$repository->getId()]);
+        }
+        return $actions;
     }
 
     /**

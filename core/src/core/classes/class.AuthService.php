@@ -466,6 +466,19 @@ class AuthService
 		}
 	}
 
+    /**
+     * @static
+     * @param AbstractAjxpUser $userObject
+     */
+    static function updateAutoApplyRole(&$userObject){
+        foreach(AuthService::getRolesList(array(), true) as $roleId => $roleObject){
+            if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
+            if($roleObject->autoAppliesTo($userObject->getProfile()) || $roleObject->autoAppliesTo("all")){
+                $userObject->addRole($roleId);
+            }
+        }
+    }
+
     static function updateAuthProvidedData(&$userObject){
         ConfService::getAuthDriverImpl()->updateUserObject($userObject);
     }

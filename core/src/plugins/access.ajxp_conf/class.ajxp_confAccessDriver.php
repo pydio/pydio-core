@@ -111,7 +111,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 break;
             case "parameters_to_form_definitions" :
 
-                $data = json_decode($httpVars["json_parameters"], true);
+                $data = json_decode(AJXP_Utils::decodeSecureMagic($httpVars["json_parameters"]), true);
                 AJXP_XMLWriter::header("standard_form");
                 foreach($data as $repoScope => $pluginsData){
                     echo("<repoScope id='$repoScope'>");
@@ -340,10 +340,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
                     }
                     echo json_encode($data);
-                }else{
-                    AJXP_XMLWriter::header("admin_data");
-                    print(AJXP_XMLWriter::writeRoleRepositoriesData($role));
-                    AJXP_XMLWriter::close("admin_data");
                 }
 			break;
 
@@ -373,7 +369,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     throw new Exception("Cant find role! ");
                 }
 
-                $data = json_decode($httpVars["json_data"], true);
+                $jsonData = AJXP_Utils::decodeSecureMagic($httpVars["json_data"]);
+                $data = json_decode($jsonData, true);
                 $roleData = $data["ROLE"];
                 $forms = $data["FORMS"];
                 $binariesContext = array();
@@ -1623,7 +1620,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 	function updateUserRole($userId, $roleId, $addOrRemove, $updateSubUsers = false){
 		$confStorage = ConfService::getConfStorageImpl();		
 		$user = $confStorage->createUserObject($userId);
-		if($user->hasParent()) return $user;
+		//if($user->hasParent()) return $user;
 		if($addOrRemove == "add"){
 			$user->addRole($roleId);
 		}else{

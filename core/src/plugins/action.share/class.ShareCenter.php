@@ -606,7 +606,7 @@ class ShareCenter extends AJXP_Plugin{
 			return 100;
 		}
 		$loggedUser = AuthService::getLoggedUser();
-		$actRights = $loggedUser->getSpecificActionsRights($repository->id);
+		$actRights = $loggedUser->mergedRole->listActionsStatesFor($repository);
 		if(isSet($actRights["share"]) && $actRights["share"] === false){
 			return 103;
 		}
@@ -758,14 +758,13 @@ class ShareCenter extends AJXP_Plugin{
             }
             // CREATE USER WITH NEW REPO RIGHTS
             $userObject->personalRole->setAcl($newRepo->getUniqueId(), $uRights[$userName]);
-            $userObject->setSpecificActionRight($newRepo->getUniqueId(), "share", false);
+            $userObject->setProfile("shared");
             $userObject->save("superuser");
         }
 
         foreach($groups as $group){
             $grRole = AuthService::getRole("AJXP_GRP_".AuthService::filterBaseGroup($group), true);
             $grRole->setAcl($newRepo->getUniqueId(), $uRights[$group]);
-            $grRole->setActionState("action.share", "share", $newRepo->getUniqueId(), false);
             AuthService::updateRole($grRole);
         }
 
