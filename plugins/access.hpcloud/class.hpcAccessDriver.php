@@ -36,23 +36,16 @@ class hpcAccessDriver extends fsAccessDriver
 	protected $urlBase;
 
     public function performChecks(){
-        // Check CURL, OPENSSL & AWS LIBRARY
+        // Check CURL, OPENSSL & AWS LIBRARY & PHP5.3
+        if(version_compare(phpversion(), "5.3.0") < 0){
+            throw new Exception("Php version 5.3+ is required for this plugin (must support namespaces)");
+        }
    	}
 
 		
 	function initRepository(){
 
-        require_once($this->getBaseDir()."/HPCloud/Bootstrap.php");
-        \HPCloud\Bootstrap::useAutoloader();
-        \HPCloud\Bootstrap::useStreamWrappers();
-
-        \HPCloud\Bootstrap::setConfiguration(array(
-            'username' => $this->repository->getOption("USERNAME"),
-            'password' => $this->repository->getOption("PASSWORD"),
-            'tenantid' => $this->repository->getOption("TENANT_ID"),
-            'endpoint' => $this->repository->getOption("ENDPOINT"),
-            'transport.ssl.verify' => false
-        ));
+        include_once("libraryLoader.php");
 
 		if(is_array($this->pluginConf)){
 			$this->driverConf = $this->pluginConf;
