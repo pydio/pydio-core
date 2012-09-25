@@ -202,20 +202,7 @@ abstract class AbstractAjxpUser
         if(!empty($this->rights["ajxp.lock"])) return false;
         return $this->mergedRole->canWrite($rootDirId);
     }
-	
-	function getSpecificActionsRights($rootDirId){
-        $all = $this->mergedRole->listActionsStatesFor(AJXP_REPO_SCOPE_ALL);
-        $repo = $this->mergedRole->listActionsStatesFor($rootDirId);
-        return array_merge($all, $repo);
-	}
-	
-	function setSpecificActionRight($rootDirId, $actionName, $allowed){
 
-        $this->personalRole->setActionState("plugin.all", $actionName, $rootDirId, $allowed);
-        $this->recomputeMergedRole();
-
-	}
-	
 	/**
 	 * Test if user can switch to this repository
 	 *

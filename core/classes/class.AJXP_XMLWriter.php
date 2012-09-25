@@ -526,45 +526,6 @@ class AJXP_XMLWriter
 		$st .= "</repositories>";
 		return $st;
 	}
-	
-	/**
-	 * Send repositories access for given role as XML
-	 *
-	 * @param AjxpRole $role
-	 * @return string
-	 */
-	static function writeRoleRepositoriesData($role){
-		$st = "<repositories>";
-		foreach (ConfService::getRepositoriesList() as $repoId => $repoObject)
-		{		
-			$toLast = false;
-            if(!AuthService::canAssign($repoObject)) continue;
-			if($repoObject->getAccessType() == "ajxp_conf") continue;
-			if($repoObject->isTemplate) continue;
-			if($repoObject->getAccessType() == "ajxp_shared" && !AuthService::usersEnabled()){
-				continue;
-			}
-            if($repoObject->hasOwner()) continue;
-			$rightString = " r=\"".($role->canRead($repoId)?"1":"0")."\" w=\"".($role->canWrite($repoId)?"1":"0")."\"";
-			$string = "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$rightString><label>".SystemTextEncoding::toUTF8(AJXP_Utils::xmlEntities($repoObject->getDisplay()))."</label></repo>";
-			if($toLast){
-				$lastString = $string;
-			}else{
-				$st .= $string;
-			}
-		}
-		if(isSet($lastString)){
-			$st.= $lastString;
-		}
-		$st .= "</repositories>";
-		$st .= "<actions_rights>";
-		foreach ($role->getSpecificActionsRights("ajxp.all") as $actionId => $actionValue){
-			$st.="<action name=\"$actionId\" value=\"".($actionValue?"true":"false")."\"/>";
-		}
-		$st .= "</actions_rights>";
-        $st .= "<role is_default=\"".($role->isDefault()?"true":"false")."\"/>";
-		return $st;
-	}
 	/**
      * Writes a <logging_result> tag
      * @static

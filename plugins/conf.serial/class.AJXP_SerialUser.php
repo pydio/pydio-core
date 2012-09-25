@@ -63,7 +63,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
         $this->registerForSave = array();
     }
 
-    protected function getStoragePath(){
+    public function getStoragePath(){
         $subDir = trim($this->getGroupPath(), "/");
         $id = $this->getId();
         if(AuthService::ignoreUserCase()) $id = strtolower($id);

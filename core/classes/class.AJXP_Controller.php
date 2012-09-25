@@ -72,7 +72,7 @@ class AJXP_Controller{
 		if($crtRepo != null && is_a($crtRepo, "Repository")){
 			$crtRepoId = $crtRepo->getId();
 		}
-		$actionRights = $loggedUser->getSpecificActionsRights($crtRepoId);
+		$actionRights = $loggedUser->mergedRole->listActionsStatesFor($crtRepo);
 		$changes = false;
 		$xPath = new DOMXPath($registry);
         foreach($actionRights as $pluginName => $actions){

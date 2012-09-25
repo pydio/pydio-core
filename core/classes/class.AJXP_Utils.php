@@ -1204,11 +1204,15 @@ class AJXP_Utils
                             $value = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($userId."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB, $iv));
                         }
                     }else if($type == "binary" && $binariesContext != null){
-                        $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
-                        if(file_exists($file)){
-                            $id=empty($repDef[$key."_original_binary"]) ? $repDef[$key."_original_binary"] : null;
-                            $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
-                            $value = $id;
+                        if(!empty($value)){
+                            $file = AJXP_Utils::getAjxpTmpDir()."/".$value;
+                            if(file_exists($file)){
+                                $id=empty($repDef[$key."_original_binary"]) ? $repDef[$key."_original_binary"] : null;
+                                $id=ConfService::getConfStorageImpl()->saveBinary($binariesContext, $file, $id);
+                                $value = $id;
+                            }
+                        }else if(!empty($repDef[$key."_original_binary"])){
+                            $value = $repDef[$key."_original_binary"];
                         }
                     }
                     unset($repDef[$key."_ajxptype"]);
