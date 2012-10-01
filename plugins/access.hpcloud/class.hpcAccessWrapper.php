@@ -141,7 +141,12 @@ class hpcAccessWrapper extends fsAccessWrapper {
 		return $this->dH !== false;
 	}
 
-	
+	public function mkdir($path, $mode, $options){
+        $this->realPath = $this->initPath($path, "dir", true);
+        file_put_contents($this->realPath."/.marker", "tmpdata");
+        return true;
+    }
+
 	// DUPBLICATE STATIC FUNCTIONS TO BE SURE 
 	// NOT TO MESS WITH self:: CALLS
 	

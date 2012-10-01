@@ -917,6 +917,7 @@ class StreamWrapper {
       }
       // If there is an error, fall back to regular handling.
       catch (\HPCloud\Exception $e) {}
+
     }
     // End EXPERIMENTAL section.
 
@@ -1206,7 +1207,7 @@ class StreamWrapper {
     $url = $this->parseUrl($path);
       \AJXP_Logger::debug("STATING ".$path);
 
-      $base = dirname($path)."/";
+      $base = $url["host"]; //dirname($path)."/";
       $name = basename($path);
       if(isSet(self::$statCacheData["HPC_MAIN_PATH"]) && $path."/" == self::$statCacheData["HPC_MAIN_PATH"]){
           return $this->fakeStat(true);
