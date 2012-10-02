@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="mailer.phpmailer-lite" enabled="false" label="CONF_MESSAGE[PHPMailer-lite]" description="CONF_MESSAGE[A simple mailer]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <server_settings>
+        <global_param name="FROM" type="string" label="CONF_MESSAGE[Sender email]" description="CONF_MESSAGE[Adress of the sender]" mandatory="true" default=""/>
+        <global_param name="FROM_NAME" type="string" label="CONF_MESSAGE[Sender name]" description="CONF_MESSAGE[Name of the sender]" mandatory="true" default=""/>
+        <global_param name="MAILER" type="select" choices="sendmail|sendmail,mail|mail" label="CONF_MESSAGE[Mailer]" description="CONF_MESSAGE[Php mailer to use (see phpmail-lite documentation).'.]" mandatory="true" default="sendmail"/>
+    </server_settings>
+	<class_definition filename="plugins/mailer.phpmail-lite/class.PhpMailLiteMailer.php" classname="PhpMailLiteMailer"/>
+</ajxp_plugin>

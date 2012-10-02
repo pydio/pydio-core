@@ -22,7 +22,7 @@
 		</actions>
 	</registry_contributions>
 	<dependencies>
-		<activePlugin pluginName="access.fs|access.ftp"/>
-	</dependencies>			
+		<activePlugin pluginName="mailer+"/>
+	</dependencies>
 	<class_definition filename="plugins/notify.phpmail-lite/class.PhpMailLiteNotifier.php" classname="PhpMailLiteNotifier"/>
 </notify>
