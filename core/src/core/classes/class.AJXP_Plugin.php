@@ -439,7 +439,7 @@ class AJXP_Plugin implements Serializable{
 	}
     /**
      * Update dependencies dynamically
-     * @param $pluginService
+     * @param AJXP_PluginsService $pluginService
      * @return void
      */
 	public function updateDependencies($pluginService){
@@ -460,7 +460,8 @@ class AJXP_Plugin implements Serializable{
      * @return bool
      */
 	public function dependsOn($pluginName){
-		return in_array($pluginName, $this->dependencies);
+		return (in_array($pluginName, $this->dependencies)
+            || in_array(substr($pluginName, 0, strpos($pluginName, "."))."+", $this->dependencies));
 	}
 	/**
 	 * Get dependencies
@@ -476,7 +477,10 @@ class AJXP_Plugin implements Serializable{
 			$value = $attr->value;
 			if($value == "access.AJXP_STREAM_PROVIDER"){
 				$deps = array_merge($deps, $pluginService->getStreamWrapperPlugins());
-			}else{
+			}else if(strpos($value, "+") !== false){
+                $typed = $pluginService->getPluginsByType(substr($value, 0, strlen($value)-1));
+                foreach($typed as $typPlug) $deps[] = $typPlug->getId();
+            }else{
 				$deps = array_merge($deps, explode("|", $value));
 			}
 		}

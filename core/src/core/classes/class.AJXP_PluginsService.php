@@ -125,7 +125,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 		foreach ($dependencies as $dependencyId){
 			if(isSet($pluginsPool[$dependencyId])){
 				$this->recursiveLoadPlugin($pluginsPool[$dependencyId], $pluginsPool);
-			}
+			}else if(strpos($dependencyId, "+") !== false){
+                foreach(array_keys($pluginsPool) as $pId){
+                    if(strpos($pId, str_replace("+", "", $dependencyId)) === 0){
+                        $this->recursiveLoadPlugin($pluginsPool[$pId], $pluginsPool);
+                    }
+                }
+            }
 		}
 		$plugType = $plugin->getType();
 		if(!isSet($this->registry[$plugType])){
@@ -225,10 +231,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  		foreach ($arrayToSort as $plugId => $plugObject){
  			$plugObject->updateDependencies($this);
  			$dependencies = $plugObject->getDependencies();
- 			if(!count($dependencies)) return ;
+ 			if(!count($dependencies)) continue;// return ;
  			$found = false;
  			foreach ($dependencies as $requiredPlugId){
- 				if(isSet($arrayToSort[$requiredPlugId])){
+ 				if( strpos($requiredPlugId, "+") !== false || isSet($arrayToSort[$requiredPlugId])){
  					$found = true; break;
  				}
  			}
