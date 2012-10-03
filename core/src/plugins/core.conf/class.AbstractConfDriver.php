@@ -702,6 +702,49 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 
             break;
 
+            case "user_list_authorized_users" :
+
+                $defaultFormat = "html";
+
+                header("Content-type:text/html");
+                if(!ConfService::getAuthDriverImpl()->usersEditable()){
+                    break;
+                }
+                $loggedUser = AuthService::getLoggedUser();
+                $crtValue = $httpVars["value"];
+                if(!empty($crtValue)) $regexp = '^'.preg_quote($crtValue);
+                else $regexp = null;
+                $limit = min(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"), 20);
+                $allUsers = AuthService::listUsers("/", $regexp, 0, $limit, false);
+                $allGroups = AuthService::listChildrenGroups("/");
+                $users = "";
+                $index = 0;
+                if($regexp != null && !count($allUsers)){
+                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (create user)</span></li>";
+                }
+                if(count($allGroups)){
+                    if($regexp == null) $users .= "<li class='complete_group_entry' data-group='/' data-label='My Group'><span class='user_entry_label'>My Group</span></li>";
+                    foreach($allGroups as $groupId => $groupLabel){
+                        if($regexp == null ||  preg_match("/$regexp/i", $groupLabel)){
+                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label='$groupLabel'><span class='user_entry_label'>".$groupLabel."</span></li>";
+                        }
+                    }
+                }
+                foreach ($allUsers as $userId => $userObject){
+                    if( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ){
+                        if($regexp != null && !preg_match("/$regexp/i", $userId)) continue;
+                        $users .= "<li class='complete_user_entry' data-label='$userId'><span class='user_entry_label'>".$userId."</span></li>";
+                        $index ++;
+                    }
+                    if($index == $limit) break;
+                }
+                if(strlen($users)) {
+                    print("<ul>".$users."</ul>");
+                }
+
+
+                break;
+
             case "get_binary_param" :
 
                 if(isSet($httpVars["tmp_file"])){

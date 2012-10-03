@@ -1,0 +1,14 @@
+#mailer_message{
+
+}
+
+#mailer_message div.message_body input{
+    width: 250px;
+    margin: 5px 0;
+}
+
+#mailer_message div.message_body textarea{
+    width: 250px;
+    height: 150px;
+    padding: 2px;
+}
