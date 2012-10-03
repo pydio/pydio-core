@@ -365,7 +365,7 @@ class ConfService
                 // Do not display shared repositories otherwise.
                 if($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()){
                     // Display the repositories if allow_crossusers is ok
-                    if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING") !== true) continue;
+                    if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") !== true) continue;
                     // But still do not display its own shared repositories!
                     if($repositoryObject->getOwner() == $userObject->getId()) continue;
                 }

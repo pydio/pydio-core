@@ -35,15 +35,14 @@
                         ajaxplorer.actionBar.shareCenter.performShareAction();
                     ]]></clientCallback>
                         <clientForm id="share_form"><![CDATA[
-                        <div id="share_form" title="AJXP_MESSAGE[293]"  box_width="280" action="share">
-                            <fieldset style="display:none;" id="share_unshare">
-                                <legend ajxp_message_id="share_center.8">AJXP_MESSAGE[share_center.8]</legend>
+                        <div id="share_form" title="AJXP_MESSAGE[293]"  box_width="320" action="share">
+                            <div class="dialogContentMainTitle">Share file</div>
+                            <div style="display:none;margin: 10px 0;" id="share_unshare">
                                     <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
                                         <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
                                     </div>
-                            </fieldset>
-                            <fieldset id="share_optional_fields">
-                                <legend ajxp_message_id="307">AJXP_MESSAGE[307]</legend>
+                            </div>
+                            <div id="share_optional_fields" class="oneFieldForm">
                                 <div class="dialogLegend" ajxp_message_id="share_center.24">AJXP_MESSAGE[share_center.24]</div>
                                 <div class="SF_element SF_largeLabel">
                                     <div class="SF_label" ajxp_message_id="share_center.21">AJXP_MESSAGE[share_center.21]</div>
@@ -58,34 +57,32 @@
                                     <input type="password" name="password" value="" autocomplete="off"class="SF_input">
                                 </div>
                                 <div class="SF_element" id="public_pass_container"></div>
-                            </fieldset>
-                            <fieldset id="share_generate">
-                                <legend ajxp_message_id="308">AJXP_MESSAGE[308]</legend>
-                                <div align="center">
-                                    <div align="center" id="generate_publiclet" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/>AJXP_MESSAGE[309]</div>
+                                <div id="share_generate">
+                                    <div align="center">
+                                        <div align="center" id="generate_publiclet" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/>AJXP_MESSAGE[309]</div>
+                                    </div>
                                 </div>
-                            </fieldset>
-                            <fieldset style="display:none;position:relative;" id="share_result">
-                                <legend ajxp_message_id="296">AJXP_MESSAGE[296]</legend>
-                                <input type="text" style="width:200px;margin-right:1px;" id="share_container"/><div id="generate_indicator" style="position:absolute;top:24px;right:41px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
-                                <a id="email" title="AJXP_MESSAGE[323]"><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>
-                            </fieldset>
+                            </div>
+                            <div style="display:none;position:relative;" id="share_result">
+                                <div id="generate_indicator" style="position:absolute;top:24px;right:41px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
+                                <textarea id="share_container" style="padding: 2%;width: 96%;height: 47px;line-height: 17px;font-size: 13px;"></textarea>
+                                <!--<a id="email" title="AJXP_MESSAGE[323]"><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>-->
+                            </div>
                         </div>
                         <div id="share_folder_form" title="Share Folder"  box_width="320" action="share">
-                            <fieldset style="display:none;" id="share_unshare">
-                                <legend ajxp_message_id="share_center.10">AJXP_MESSAGE[share_center.10]</legend>
-                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
-                                        <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
-                                    </div>
-                            </fieldset>
-                            <fieldset id="target_repository">
-                                <legend ajxp_message_id="359">AJXP_MESSAGE[359]</legend>
-                                <div class="dialogLegend" ajxp_message_id="358">AJXP_MESSAGE[358]</div>
-                                <input type="text" value="" id="repo_label" name="repo_label" style="width:98%;"/>
-                            </fieldset>
-                            <fieldset id="target_user">
-                                <legend ajxp_message_id="353">AJXP_MESSAGE[353]</legend>
+                            <div class="dialogContentMainTitle">Share folder</div>
+                            <div id="target_repository" class="SF_element oneFieldForm">
+                                <div class="SF_label" ajxp_message_id="358" style="font-size:12px;">Repository Label</div>
+                                <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" style="float:right;font-size:12px;"/>
+                                <br style="clear:both;"/>
+                            </div>
+                            <div id="target_user">
                                 <div class="dialogLegend" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
+                                <div class="editable_users_header">
+                                    <span>Read</span>
+                                    <span>Write</span>
+                                    <span>Watch</span>
+                                </div>
                                 <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="Existing or new user" name="shared_user" id="shared_user"/>
                                 <div id="complete_indicator" style="position:absolute;top:8px;right:8px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <div id="shared_users_autocomplete_choices" class="autocomplete" style="margin-top:0px !important;z-index:20000 !important;"></div>
@@ -106,7 +103,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            </fieldset>
+                                <div style="display:none;margin-bottom:10px;" id="share_unshare">
+                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
+                                        <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         ]]>
                         </clientForm>

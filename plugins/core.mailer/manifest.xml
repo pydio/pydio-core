@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="core.mailer" label="Mailer Core config" description="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<client_settings>
+    <resources>
+        <js className="AjxpMailer" file="plugins/core.mailer/class.AjxpMailer.js" autoload="true"/>
+    </resources>
+</client_settings>
+</ajxp_plugin>

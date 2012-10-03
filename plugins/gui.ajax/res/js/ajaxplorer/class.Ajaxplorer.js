@@ -732,7 +732,13 @@ Class.create("Ajaxplorer", {
 		}
 		return configs;
 	},
-	
+
+    hasPluginOfType : function(type){
+       var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
+        if(node) return true;
+        return false;
+    },
+
 	/**
 	 * Find the currently active extensions by type
 	 * @param extensionType String "editor" or "uploader"

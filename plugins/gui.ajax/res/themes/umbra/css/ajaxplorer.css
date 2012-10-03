@@ -378,6 +378,17 @@ fieldSet input.dialogButton
     -moz-border-radius: 3px;
 }
 
+.dialogButtonsCheckbox{
+
+    float: left;
+    margin-top: 9px;
+
+}
+
+.dialogButtonsCheckbox label{
+    cursor: pointer;
+}
+
 .editContent, .editContent div
 {
     background-color: #fff;
@@ -442,15 +453,16 @@ textarea#myCode
 }
 
 .largeButton{
-    padding: 5px;
-    font-size: 14px;
+    padding: 4px;
+    font-size: 13px;
     text-align: center;
-    border: 1px solid #CCC;
-    -webkit-border-radius: 7px;
-    -moz-border-radius: 7px;
-    border-radius: 7px;
+    border: 1px solid #A7A7A7;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
     cursor: pointer;
-    text-shadow : 1px 1px 1px #FFFFFF;
+    text-shadow: 1px 1px 1px white;
+    box-shadow: inset 1px 1px 1px white;
 }
 .largeButton img{
     width:16px;
@@ -598,6 +610,26 @@ div.accordion_toggle_active{
 div.accordion_content{
     overflow: hidden;
     padding: 5px;
+}
+
+div.dialogContentMainTitle{
+    color: #2B70BE;
+    font-size: 20px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #2B70BE;
+    padding-bottom: 8px;
+}
+
+div.oneFieldForm{
+    margin-bottom: 13px;
+    background-color: #EEEEEE;
+    padding: 3px 6px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+div.oneFieldForm input.SF_input{
+    background: white !important;
 }
 
 /********************/
@@ -2563,12 +2595,13 @@ div.user_role{
 .editable_users_list{
 
     border: 1px solid #AAAAAA;
-    height: 130px;
+    height: 160px;
     overflow: auto;
     clear:left;
     position: relative;
-    margin-top: 5px;
+    margin-top: 2px;
     border-radius: 3px;
+
 
 }
 
@@ -2642,6 +2675,15 @@ li.complete_user_entry_temp span.user_entry_label,
     cursor: pointer;
 }
 
+span.user_entry_check{
+    display: inline-block;
+    padding: 0 5px;
+}
+
+.editable_users_list.user_entry_check_hidden span.user_entry_check{
+    display: none;
+}
+
 #create_shared_user{
     width: 84%;
     background-color: #EEE;
@@ -2654,6 +2696,28 @@ li.complete_user_entry_temp span.user_entry_label,
     top: -1px;
 }
 
+.editable_users_header{
+    float: right;
+    margin-top: 2px;
+    font-style: italic;
+    font-size: 9px;
+    color: #AAA;
+    padding: 2px;
+}
+
+.editable_users_header span,
+div.user_entry span.cbContainer
+{
+    display: inline-block;
+    padding: 0 2px;
+    width: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+div.user_entry span.cbContainer{
+
+}
 /***********************/
 /* EDITORS & DIAPORAMA */
 /***********************/

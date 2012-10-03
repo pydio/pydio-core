@@ -311,7 +311,7 @@ class AuthService
 		}
 		else{
 			if(!$user->hasParent() && $user_id != "guest"){
-				//$user->setRight("ajxp_shared", "rw");
+				//$user->setAcl("ajxp_shared", "rw");
 			}
 		}
 		$_SESSION["AJXP_USER"] = $user;
@@ -457,9 +457,9 @@ class AuthService
 			}
             foreach(AuthService::getRolesList(array(), true) as $roleId => $roleObject){
                 if(!self::allowedForCurrentGroup($roleObject, $userObject)) continue;
-                if($userObject->getRight("ajxp.shared") == "true" && $roleObject->autoAppliesTo("ajxp.shared")){
+                if($userObject->getProfile() == "shared" && $roleObject->autoAppliesTo("shared")){
                     $userObject->addRole($roleId);
-                }else if($roleObject->autoAppliesTo("all")){
+                }else if($roleObject->autoAppliesTo("standard")){
                     $userObject->addRole($roleId);
                 }
             }

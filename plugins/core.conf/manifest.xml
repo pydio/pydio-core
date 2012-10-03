@@ -19,5 +19,8 @@
         <param name="lang" scope="role,user" description="User Language" label="Language" type="select" choices="AJXP_AVAILABLE_LANGUAGES" expose="true" editable="true"/>
         <global_param name="USER_CREATE_REPOSITORY" group="CONF_MESSAGE[Generic Conf Features]"  type="boolean" label="CONF_MESSAGE[Let user create repositories]" description="Whether users can create their own repositories, based on predefined templates."  mandatory="false" default="false"/>
         <global_param name="SAVE_GUEST_PREFERENCES" group="CONF_MESSAGE[Generic Conf Features]"  type="boolean" label="CONF_MESSAGE[Remember guest preferences]" description="If the 'guest' user is enabled, remember her preferences accross sessions."  mandatory="true" default="false"/>
-	</server_settings>
+        <global_param description="CONF_MESSAGE[Maximum number of users displayed in the users autocompleter]" label="CONF_MESSAGE[Users completer limit]" name="USERS_LIST_COMPLETE_LIMIT" type="integer" default="20"/>
+        <global_param description="CONF_MESSAGE[Minimum number of characters to trigger the auto completion feature]" label="CONF_MESSAGE[Users completer min chars]" name="USERS_LIST_COMPLETE_MIN_CHARS" type="integer" default="3"/>
+        <global_param name="ALLOW_CROSSUSERS_SHARING" group="CONF_MESSAGE[Sharing]" type="boolean" label="CONF_MESSAGE[See existing users]" description="CONF_MESSAGE[Allow the users to pick an existing user when sharing a folder]" mandatory="false" default="true"/>
+    </server_settings>
 </ajxpcore>
