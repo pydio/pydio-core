@@ -37,12 +37,7 @@
                         <clientForm id="share_form"><![CDATA[
                         <div id="share_form" title="AJXP_MESSAGE[293]"  box_width="320" action="share">
                             <div class="dialogContentMainTitle">Share file</div>
-                            <div style="display:none;margin: 10px 0;" id="share_unshare">
-                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
-                                        <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
-                                    </div>
-                            </div>
-                            <div id="share_optional_fields" class="oneFieldForm">
+                            <div id="share_optional_fields" class="oneFieldForm" style="margin: 10px;">
                                 <div class="dialogLegend" ajxp_message_id="share_center.24">AJXP_MESSAGE[share_center.24]</div>
                                 <div class="SF_element SF_largeLabel">
                                     <div class="SF_label" ajxp_message_id="share_center.21">AJXP_MESSAGE[share_center.21]</div>
@@ -58,12 +53,17 @@
                                 </div>
                                 <div class="SF_element" id="public_pass_container"></div>
                                 <div id="share_generate">
-                                    <div align="center">
+                                    <div align="center" style="margin: 3px 60px;">
                                         <div align="center" id="generate_publiclet" class="largeButton"><img id="generate_image" src="AJXP_THEME_FOLDER/images/actions/16/share.png" height="16" width="16"/>AJXP_MESSAGE[309]</div>
                                     </div>
                                 </div>
+                                <div style="display:none;margin: 3px 60px;" id="share_unshare">
+                                        <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
+                                            <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
+                                        </div>
+                                </div>
                             </div>
-                            <div style="display:none;position:relative;" id="share_result">
+                            <div style="display:none;position:relative; margin:0 10px 10px;" id="share_result">
                                 <div id="generate_indicator" style="position:absolute;top:24px;right:41px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
                                 <textarea id="share_container" style="padding: 2%;width: 96%;height: 47px;line-height: 17px;font-size: 13px;"></textarea>
                                 <!--<a id="email" title="AJXP_MESSAGE[323]"><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>-->
@@ -71,13 +71,20 @@
                         </div>
                         <div id="share_folder_form" title="Share Folder"  box_width="320" action="share">
                             <div class="dialogContentMainTitle">Share folder</div>
-                            <div id="target_repository" class="SF_element oneFieldForm">
+                            <div class="dialogLegend" ajxp_message_id="share_center.26">The folder appears to the selected users as a repository with the following label.</div>
+                            <div id="target_repository" class="SF_element oneFieldForm" style="margin: 5px 10px 15px;">
                                 <div class="SF_label" ajxp_message_id="358" style="font-size:12px;">Repository Label</div>
                                 <input type="text" value="" id="repo_label" name="repo_label" class="SF_input" style="float:right;font-size:12px;"/>
                                 <br style="clear:both;"/>
+                                <div style="display:none;margin: 4px 54px;" id="share_unshare">
+                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
+                                        <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
+                                    </div>
+                                </div>
                             </div>
-                            <div id="target_user">
-                                <div class="dialogLegend" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
+                            <div class="dialogContentMainTitle">User Access</div>
+                            <div class="dialogLegend" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
+                            <div id="target_user" style="margin:0 10px;">
                                 <div class="editable_users_header">
                                     <span>Read</span>
                                     <span>Write</span>
@@ -101,11 +108,6 @@
                                             <input type="image" name="ok" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK">
                                             <input type="image" name="can" height="22" width="22" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" title="CANCEL">
                                         </div>
-                                    </div>
-                                </div>
-                                <div style="display:none;margin-bottom:10px;" id="share_unshare">
-                                    <div id="unshare_button" class="largeButton" title="AJXP_MESSAGE[share_center.7]" >
-                                        <img src="AJXP_THEME_FOLDER/images/actions/16/editdelete.png" height="16" width="16" id="stop_sharing_indicator" valign="middle"> AJXP_MESSAGE[share_center.6]
                                     </div>
                                 </div>
                             </div>
