@@ -1035,7 +1035,7 @@ Class.create("Ajaxplorer", {
 	 */
 	cancelCopyOrMove: function(){
 		this.actionBar.treeCopyActive = false;
-		hideLightBox();
+		//hideLightBox();
 		return false;
 	},
 		

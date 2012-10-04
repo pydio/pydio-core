@@ -35,6 +35,13 @@ Class.create("Modal", {
 	 */
 	initialize: function(){
 	},
+
+    /**
+     * CurrentLightBox
+     */
+    currentLightBoxElement : null,
+    currentLightBoxModal : null,
+
 	/**
 	 * Find the forms
 	 */
@@ -301,6 +308,8 @@ Class.create("Modal", {
         content.addClassName("dialogContent");
         addLightboxMarkupToElement(element);
         $(element).down("#element_overlay").insert({after:box});
+        this.currentLightBoxElement = $(element);
+        this.currentLightBoxModal = box;
         this.addSubmitCancel(content, cancelCallback, (cancelCallback==null), position);
         content.down(".dialogButtons").select("input").each(function(button){
             if(((cancelCallback==null) && button.getAttribute("name") == "close") || button.getAttribute("name") == "ok"){
@@ -310,8 +319,10 @@ Class.create("Modal", {
                     if(res){
                         box.remove();
                         removeLightboxFromElement(element);
+                        this.currentLightBoxElement = null;
+                        this.currentLightBoxModal = null;
                     }
-                });
+                }.bind(this));
             }else{
                 button.stopObserving("click");
                 button.observe("click", function(event){
@@ -320,8 +331,10 @@ Class.create("Modal", {
                     if(res){
                         box.remove();
                         removeLightboxFromElement(element);
+                        this.currentLightBoxElement = null;
+                        this.currentLightBoxModal = null;
                     }
-                });
+                }.bind(this));
             }
         });
     },

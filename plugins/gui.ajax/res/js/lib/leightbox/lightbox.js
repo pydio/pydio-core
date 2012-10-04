@@ -204,7 +204,14 @@ function initialize(){
 		{
 			ajaxplorer.cancelCopyOrMove();
 			//modal.close();
-			hideLightBox();
+            if(modal.currentLightBoxElement){
+                removeLightboxFromElement(modal.currentLightBoxElement);
+                modal.currentLightBoxModal.remove();
+                modal.currentLightBoxElement = null;
+                modal.currentLightBoxModal = null;
+            }else{
+                hideLightBox();
+            }
 		}
 		if(e.keyCode == 9) return false;
 		return true;
