@@ -156,6 +156,28 @@ class UserSelection
 	{
 		return $this->files[0];
 	}
+
+    /**
+     * @param AbstractAccessDriver $accessDriver
+     * @return AJXP_Node
+     * @throws Exception
+     */
+    function getUniqueNode(AbstractAccessDriver $accessDriver){
+
+        $repo = $accessDriver->repository;
+        $user = AuthService::getLoggedUser();
+        if(!AuthService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())){
+            throw new Exception("You have no right on this action.");
+        }
+
+        $currentFile = $this->getUniqueFile();
+        $wrapperData = $accessDriver->detectStreamWrapper(false);
+        $urlBase = $wrapperData["protocol"]."://".$accessDriver->repository->getId();
+        $ajxpNode = new AJXP_Node($urlBase.$currentFile);
+        return $ajxpNode;
+
+    }
+
 	/**
      * Is this selection empty?
      * @return bool

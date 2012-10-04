@@ -21,7 +21,85 @@
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-abstract class AjxpMailer extends AJXP_Plugin
+class AjxpMailer extends AJXP_Plugin
 {
-    abstract public function sendMail($recipients, $subject, $body);
+    public function sendMail($recipients, $subject, $body, $from = null){
+        // TO BE IMPLEMENTED BY CHILD CLASS
+    }
+
+    public function sendMailAction($actionName, $httpVars, $fileVars){
+        AJXP_Logger::debug("Send email", $httpVars);
+        $mailers = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer");
+        if(!count($mailers)){
+            throw new Exception("No mailer found");
+        }
+        // Fake to type
+        $mailer = new AjxpMailer("id", "basedir");
+
+        $mailer = array_pop($mailers);
+
+        $toUsers = array_merge(explode(",", $httpVars["users_ids"]), explode(",", $httpVars["to"]));
+        $toGroups =  explode(",", $httpVars["groups_ids"]);
+
+        $emails = array();
+
+        foreach($toUsers as $userId){
+            $userId = trim($userId);
+            if(AuthService::userExists($userId)){
+                // ADD USER
+                // VERIFY IT'S AN AUTHORIZED USER
+
+                $u = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $email = $u->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+                if($this->validateEmail($email)){
+                    array_push($emails, $email);
+                }
+            }else if($this->validateEmail($userId)){
+                array_push($emails, $userId);
+            }
+        }
+
+        if($this->validateEmail($httpVars["from"])){
+            $from = $httpVars["from"];
+        }else{
+            $loggedUser = AuthService::getLoggedUser();
+            $loggedEmail = $loggedUser->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+            if(!empty($loggedEmail)){
+                $from = $loggedEmail;
+            }
+        }
+        if(!isSet($from)){
+            $from = ConfService::getCoreConf("WEBMASTER_EMAIL");
+        }
+
+        $emails = array_unique($emails);
+        $subject = $httpVars["subject"];
+        $body = $httpVars["message"];
+
+        $mailer->sendMail($emails, $subject, $body, $from);
+
+    }
+
+
+    function validateEmail($email){
+        if(function_exists("filter_var")){
+            return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+        }
+
+        $atom   = '[-a-z0-9!#$%&\'*+\\/=?^_`{|}~]';
+        $domain = '([a-z0-9]([-a-z0-9]*[a-z0-9]+)?)';
+
+        $regex = '/^' . $atom . '+' .
+            '(\.' . $atom . '+)*' .
+            '@' .
+            '(' . $domain . '{1,63}\.)+' .
+            $domain . '{2,63}$/i';
+
+        if (preg_match($regex, $email)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
