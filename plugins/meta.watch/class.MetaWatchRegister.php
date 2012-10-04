@@ -25,6 +25,74 @@ class MetaWatchRegister extends AJXP_Plugin{
         $this->metaStore->initMeta($accessDriver);
     }
 
+    /**
+     * @param AJXP_Node $node
+     * @param $userId
+     * @param $namespace
+     */
+    public function setWatchOnFolder($node, $userId, $namespace){
+
+        $meta = $this->metaStore->retrieveMetadata(
+            $node,
+            $namespace,
+            false,
+            AJXP_METADATA_SCOPE_REPOSITORY
+        );
+        if(isSet($meta) && isSet($meta[$userId])){
+            unset($meta[$userId]);
+            $this->metaStore->removeMetadata($node, $namespace, false, AJXP_METADATA_SCOPE_REPOSITORY);
+        }
+        $meta[$userId] = true;
+        if(count($meta)){
+            $this->metaStore->setMetadata(
+                $node,
+                $namespace,
+                $meta,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
+        }
+
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @param $userId
+     * @param $namespace
+     */
+    public function removeWatchFromFolder($node, $userId, $namespace){
+
+        $meta = $this->metaStore->retrieveMetadata(
+            $node,
+            $namespace,
+            false,
+            AJXP_METADATA_SCOPE_REPOSITORY
+        );
+        if(isSet($meta) && isSet($meta[$userId])){
+            unset($meta[$userId]);
+            $this->metaStore->removeMetadata($node, $namespace, false, AJXP_METADATA_SCOPE_REPOSITORY);
+        }
+
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @param $userId
+     * @param $namespace
+     * @return bool
+     */
+    public function hasWatchOnFolder($node, $userId, $namespace){
+
+        $meta = $this->metaStore->retrieveMetadata(
+            $node,
+            $namespace,
+            false,
+            AJXP_METADATA_SCOPE_REPOSITORY
+        );
+        return (isSet($meta) && isSet($meta[$userId]));
+
+    }
+
     public function switchActions($actionName, $httpVars, $fileVars){
 
 
@@ -53,11 +121,9 @@ class MetaWatchRegister extends AJXP_Plugin{
                 if(isSet($meta) && isSet($meta[$userId])){
                     unset($meta[$userId]);
                     $this->metaStore->removeMetadata($node, $namespace, false, AJXP_METADATA_SCOPE_REPOSITORY);
-
-                }else{
+                }else if(strpos($cmd, "watch_stop_") === false){
                     $meta[$userId] = true;
                 }
-
 
                 if(count($meta)){
                     $this->metaStore->setMetadata(
