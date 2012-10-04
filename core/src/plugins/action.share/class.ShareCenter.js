@@ -46,13 +46,14 @@ Class.create("ShareCenter", {
             var updateUserEntryAfterCreate = function(li, assignedRights){
                 if(assignedRights == undefined) assignedRights = "r";
                 var id = Math.random();
+                var watchBox = '';
+                if(ajaxplorer.hasPluginOfType("meta", "watch")){
+                    watchBox = '<span class="cbContainer"><input id="n'+id+'" type="checkbox" name="n"></span>';
+                }
                 li.insert({top:'<div class="user_entry_rights">' +
                     '<span class="cbContainer"><input type="checkbox" id="r'+id+'" name="r" '+(assignedRights.startsWith("r")?"checked":"") +'></span>' +
-                    //'<label for="r'+id+'">'+MessageHash[361]+'</label>' +
                     '<span class="cbContainer"><input id="w'+id+'" type="checkbox" name="w"  '+(assignedRights.endsWith("w")?"checked":"") +'></span>' +
-                    //'<label for="w'+id+'">'+MessageHash[362]+'</label>' +
-                    '<span class="cbContainer"><input id="n'+id+'" type="checkbox" name="n"></span>' +
-                    //'<label for="n'+id+'">Watch</label>' +
+                     watchBox +
                     '</div>'
                 });
             };
@@ -94,6 +95,24 @@ Class.create("ShareCenter", {
                     $('share_folder_form').autocompleter.activate();
                 });
             }
+            if(ajaxplorer.hasPluginOfType("meta", "watch")){
+                oForm.down('#target_user').down('#header_watch').show();
+            }else{
+                oForm.down('#target_user').down('#header_watch').hide();
+            }
+            oForm.down('.editable_users_header').select("span").each(function(span){
+                span.observe("click", function(event){
+                    var checked = !event.target.status;
+                    $('shared_users_summary').select("div.user_entry").each(function(entry){
+                        var boxes = entry.select('input[type="checkbox"]');
+                        if(event.target.id == 'header_read') boxes[0].checked = checked;
+                        else if(event.target.id == 'header_write') boxes[1].checked = checked;
+                        else if(event.target.id == 'header_watch' && boxes[2]) boxes[2].checked = checked;
+                    });
+                    event.target.status = checked;
+                    event.target.setStyle({fontWeight: checked ? 'bold' : 'normal'});
+                });
+            });
             this.updateDialogButtons($("share_folder_form").next("div.dialogButtons"), "folder");
         }.bind(this);
         var closeFunc = function (oForm){
@@ -319,7 +338,8 @@ Class.create("ShareCenter", {
                 var mailer = new AjxpMailer();
                 var usersList = null;
                 if(shareType) usersList = oForm.down(".editable_users_list");
-                modal.showSimpleModal(dialogButtons.up(".dialogContent"), mailer.buildMailPane("AjaXplorer Share", message, usersList), function(){
+                modal.showSimpleModal(dialogButtons.up(".dialogContent"), mailer.buildMailPane("AjaXplorer Share", message, usersList, "Send invitation"), function(){
+                    mailer.postEmail();
                     return true;
                 },function(){
                     return true;

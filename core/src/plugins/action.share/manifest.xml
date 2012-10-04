@@ -86,9 +86,9 @@
                             <div class="dialogLegend" ajxp_message_id="share_center.26">AJXP_MESSAGE[share_center.26]</div>
                             <div id="target_user" style="margin:0 10px;">
                                 <div class="editable_users_header">
-                                    <span>Read</span>
-                                    <span>Write</span>
-                                    <span>Watch</span>
+                                    <span id="header_read">Read</span>
+                                    <span id="header_write">Write</span>
+                                    <span id="header_watch">Watch</span>
                                 </div>
                                 <input type="text" class="dialogFocus" value="" style="width:98%;" placeholder="Existing or new user" name="shared_user" id="shared_user"/>
                                 <div id="complete_indicator" style="position:absolute;top:8px;right:8px;display:none;"><img src="AJXP_THEME_FOLDER/images/autocompleter-loader.gif"></div>
