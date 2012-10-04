@@ -733,8 +733,12 @@ Class.create("Ajaxplorer", {
 		return configs;
 	},
 
-    hasPluginOfType : function(type){
-       var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
+    hasPluginOfType : function(type, name){
+        if(name == null){
+            var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
+        }else{
+            var node = XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[@id="'+type+'.'+name+'"] | plugins/' + type + '[@id="'+type+'.'+name+'"]');
+        }
         if(node) return true;
         return false;
     },
