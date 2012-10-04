@@ -19,8 +19,11 @@
  */
 Class.create("ShareCenter", {
 
+    currentNode : null,
+
     performShareAction : function(){
         var userSelection = ajaxplorer.getUserSelection();
+        this.currentNode = userSelection.getUniqueNode();
         if(userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))){
             this.shareRepository(userSelection);
         }else{
@@ -43,12 +46,14 @@ Class.create("ShareCenter", {
                 barPosition:'bottom'
             });
             var mailerDetected = ajaxplorer.hasPluginOfType("mailer");
-            var updateUserEntryAfterCreate = function(li, assignedRights){
+            var updateUserEntryAfterCreate = function(li, assignedRights, watchValue){
                 if(assignedRights == undefined) assignedRights = "r";
                 var id = Math.random();
                 var watchBox = '';
                 if(ajaxplorer.hasPluginOfType("meta", "watch")){
-                    watchBox = '<span class="cbContainer"><input id="n'+id+'" type="checkbox" name="n"></span>';
+                    if(watchValue) watchValue = ' checked';
+                    else watchValue = '';
+                    watchBox = '<span class="cbContainer"><input id="n'+id+'" type="checkbox" name="n"'+watchValue+'></span>';
                 }
                 li.insert({top:'<div class="user_entry_rights">' +
                     '<span class="cbContainer"><input type="checkbox" id="r'+id+'" name="r" '+(assignedRights.startsWith("r")?"checked":"") +'></span>' +
@@ -86,9 +91,12 @@ Class.create("ShareCenter", {
                     oForm.down('#complete_indicator').hide();
                     $A(json['entries']).each(function(u){
                         var newItem =  $('share_folder_form').autocompleter.createUserEntry(u.TYPE=="group", u.TYPE =="tmp_user", u.ID, u.LABEL);
-                        updateUserEntryAfterCreate(newItem, (u.RIGHT?u.RIGHT:""));
+                        updateUserEntryAfterCreate(newItem, (u.RIGHT?u.RIGHT:""), u.WATCH);
                         newItem.appendToList($('shared_users_summary'));
                     });
+                    if(json["element_watch"]){
+                        oForm.down("#watch_folder").checked = true;
+                    }
                 }.bind(this));
             }else{
                 $('shared_user').observeOnce("focus", function(){
@@ -144,12 +152,18 @@ Class.create("ShareCenter", {
                 conn.addParameter("user_"+index, entry.getAttribute("data-entry_id"));
                 conn.addParameter("right_read_"+index, entry.down('input[name="r"]').checked ? "true":"false");
                 conn.addParameter("right_write_"+index, entry.down('input[name="w"]').checked ? "true":"false");
+                if(entry.down('input[name="n"]')){
+                    conn.addParameter("right_watch_"+index, entry.down('input[name="n"]').checked ? "true":"false");
+                }
                 if(entry.NEW_USER_PASSWORD){
                     conn.addParameter("user_pass_"+index, entry.NEW_USER_PASSWORD);
                 }
                 conn.addParameter("entry_type_"+index, entry.hasClassName("group_entry")?"group":"user");
                 index++;
             });
+            if(oForm.down("#watch_folder")){
+                conn.addParameter("self_watch_folder",oForm.down("#watch_folder").checked?"true":"false");
+            }
             conn.onComplete = function(transport){
                 var response = parseInt(transport.responseText);
                 if(response == 200){
@@ -215,6 +229,9 @@ Class.create("ShareCenter", {
                         optionsPane.down("[name='downloadlimit']").insert({after:resetLink});
                         optionsPane.select("input").each(function(el){el.disabled = true;});
                         oForm.down('[id="share_container"]').select();
+                        if(json["element_watch"]){
+                            oForm.down("#watch_folder").checked = true;
+                        }
 
                     }.bind(this));
                     oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
@@ -324,9 +341,22 @@ Class.create("ShareCenter", {
     },
 
     updateDialogButtons : function(dialogButtons, shareType){
+        if(ajaxplorer.hasPluginOfType("meta", "watch")){
+            dialogButtons.insert("<div class='dialogButtonsCheckbox'><input type='checkbox' id='watch_folder'><label for='watch_folder'>Watch this "+(shareType=="folder"?"folder":"file activity")+"</label></div>");
+            if(shareType == "file"){
+                dialogButtons.down("#watch_folder").observe("change", function(event){
+                    var conn = new Connexion();
+                    conn.setParameters({
+                        get_action: "toggle_watch",
+                        watch_action : event.target.checked ?  "watch_change" : "watch_stop_change",
+                        file : this.currentNode.getPath()
+                    });
+                    conn.sendAsync();
+                }.bind(this));
+            }
+        }
         if(ajaxplorer.hasPluginOfType("mailer")){
             var oForm = dialogButtons.parentNode;
-            dialogButtons.insert("<div class='dialogButtonsCheckbox'><input type='checkbox' id='watch_folder'><label for='watch_folder'>Watch this "+(shareType=="folder"?"folder":"file activity")+"</label></div>");
             dialogButtons.insert({top:'<input type="image" name="mail" src="plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png" height="22" width="22" title="Notify by email..." class="dialogButton dialogFocus">'});
             dialogButtons.down('input[name="mail"]').observe("click", function(event){
                 Event.stop(event);
