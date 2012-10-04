@@ -20,27 +20,59 @@
 
 Class.create("AjxpMailer", {
 
+    _mailerPane: null,
+
     initialize : function(){
         var res = new ResourcesManager();
         res.loadCSSResource("plugins/core.mailer/AjxpMailer.css");
     },
 
-    buildMailPane:function(subject, body, recipientsList){
+    buildMailPane:function(subject, body, recipientsList, paneTitle){
         if(!$("mailer_message")){
-            var recipientString = '';
-            if(recipientsList){
-                recipientsList.select("span.user_entry_label").each(function(el){
-                    recipientString += el.innerHTML + ", ";
-                });
-            }
-            var fromString = ajaxplorer.user.id;
-            $(document.body).insert("<div id='mailer_message'><div class='message_body'>" +
-                "<input type='text' name='from' value='From :"+fromString+"'/>" +
-                "<input type='text' name='to' value='To      :"+recipientString+"'/>" +
-                "<textarea>"+body+"</textarea>" +
-                "</div></div>");
+            $(document.body).insert("<div id='mailer_message'></div>");
         }
+        var recipientString = '';
+        var hiddenRecipientString = [];
+        var hiddenGroupsString = [];
+        if(recipientsList){
+            recipientsList.select("div.user_entry").each(function(el){
+                recipientString += el.down("span.user_entry_label").innerHTML + ", ";
+                if(el.hasClassName("group_entry")){
+                    hiddenGroupsString.push(el.getAttribute("data-entry_id"));
+                }else{
+                    hiddenRecipientString.push(el.getAttribute("data-entry_id"));
+                }
+            });
+            recipientString = recipientString.substring(0, recipientString.length-2);
+            hiddenGroupsString = hiddenGroupsString.join(",");
+            hiddenRecipientString = hiddenRecipientString.join(",");
+        }
+        var fromString = ajaxplorer.user.id;
+        $("mailer_message").update("<div id='mailer_message'><div class='message_body'><form>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>From:</span><input class='mailer_input_field' type='text' name='from' value='"+fromString+"'/></div>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>To:</span><input class='mailer_input_field' type='text' name='to' value='"+recipientString+"'/></div>" +
+            "<div class='grey_gradient_light_inputs mailer_input_line'><span class='mailer_input_label'>Subject:</span><input class='mailer_input_field' type='text' name='subject' value='"+subject+"'/></div>" +
+            "<textarea name='message' class='grey_gradient_light_inputs'>"+body+"</textarea>" +
+            "<input type='hidden' name='users_ids' value='"+ hiddenRecipientString +"'/> " +
+            "<input type='hidden' name='groups_ids' value='"+ hiddenGroupsString +"'/> " +
+            "</form></div></div>");
+        if(paneTitle){
+            $("mailer_message").insert({top:new Element("div", {className:"dialogContentMainTitle"}).update(paneTitle)});
+        }
+
+        this._mailerPane = $("mailer_message");
         return $("mailer_message");
+    },
+
+    postEmail : function(){
+        var params = $H({get_action:"send_mail"});
+        this._mailerPane.down("form").getElements().each(function(el){
+            params.set(el.name, el.getValue());
+        });
+        var connexion = new Connexion();
+        connexion.setMethod("post");
+        connexion.setParameters(params);
+        connexion.sendSync();
     }
 
 });

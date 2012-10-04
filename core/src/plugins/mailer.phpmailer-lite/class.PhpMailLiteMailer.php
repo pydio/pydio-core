@@ -27,7 +27,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PhpMailLiteMailer extends AjxpMailer {
 
-    public function sendMail($recipients, $subject, $body){
+    public function sendMail($recipients, $subject, $body, $from = null){
         require("lib/class.phpmailer-lite.php");
         $realRecipients = array();
         // Recipients can be either AbstractAjxpUser objects, either array(adress, name), either "adress".
@@ -60,9 +60,17 @@ class PhpMailLiteMailer extends AjxpMailer {
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
 		$mail = new PHPMailerLite(true);
 		$mail->Mailer = $this->pluginConf["MAILER"];
-		$mail->SetFrom(trim($this->pluginConf["FROM"]), trim($this->pluginConf["FROM_NAME"]));
+        if($from == null){
+            $mail->SetFrom(trim($this->pluginConf["FROM"]), trim($this->pluginConf["FROM_NAME"]));
+        }else{
+            $mail->setFrom($from);
+        }
 		foreach ($realRecipients as $address){
-			$mail->AddAddress(trim($address["adress"]), trim($address["name"]));
+            if($address["adress"] == $address["name"]){
+                $mail->AddAddress(trim($address["adress"]));
+            }else{
+                $mail->AddAddress(trim($address["adress"]), trim($address["name"]));
+            }
 		}
 		$mail->WordWrap = 50;                                 // set word wrap to 50 characters
 		$mail->IsHTML(true);                                  // set email format to HTML

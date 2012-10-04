@@ -12,3 +12,26 @@
     height: 150px;
     padding: 2px;
 }
+
+.mailer_input_line{
+    border: 1px solid #AAA;
+    border-radius: 2px;
+    margin-bottom: 4px;
+}
+
+.mailer_input_label{
+    display: inline-block;
+    width: 17%;
+    padding: 5px 3px;
+    background-color: #E2E2E2;
+    text-align: right;
+    font-weight: bold;
+}
+
+.mailer_input_field{
+    background: none !important;
+    border: none !important;
+    margin: 1px !important;
+    width: 78% !important;
+    display: inline-block !important;
+}

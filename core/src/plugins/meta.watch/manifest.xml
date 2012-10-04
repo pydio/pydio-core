@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta id="meta.watch" label="CONF_MESSAGE[Watch Metadata]" description="CONF_MESSAGE[Register watched on files or folders]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/meta.watch/class.MetaWatchRegister.php" classname="MetaWatchRegister"/>
+    <client_settings>
+        <resources>
+            <img_library alias="meta.watch" path="plugins/meta.watch/icons"/>
+            <i18n namespace="meta.watch" path="plugins/meta.watch/i18n"/>
+        </resources>
+    </client_settings>
+    <registry_contributions>
+        <actions>
+            <action name="toggle_watch">
+                <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2">
+                    <context dir="true" recycle="false" selection="true" actionBar="false" contextMenu="true"></context>
+                    <selectionContext dir="true" file="true" recycle="false" unique="true"/>
+                </gui>
+                <subMenu>
+                    <dynamicBuilder><![CDATA[
+                    var n = ajaxplorer.getUserSelection().getUniqueNode();
+					var context = window.builderContext;
+					context.builderMenuItems = $A([]);
+                    if(n.getMetadata().get("meta_watched")){
+                        context.builderMenuItems.push({
+                            name:MessageHash['meta.watch.3'],
+                            alt:MessageHash['meta.watch.4'],
+                            isDefault : true,
+                            image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
+                            callback:function(e){
+                                window.metaWatchCmd = "watch_stop_" + n.getMetadata().get("meta_watched");
+                                this.apply();
+                            }.bind(context)
+                        });
+                    }else{
+                        context.builderMenuItems.push({
+                            name:'Modifications',
+                            alt:'Watch for modifications',
+                            isDefault : true,
+                            image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
+                            callback:function(e){
+                                window.metaWatchCmd = "watch_change";
+                                this.apply();
+                            }.bind(context)
+                        });
+                        context.builderMenuItems.push({
+                            name:'Consultation',
+                            alt:'Watch for consultation',
+                            isDefault : false,
+                            image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
+                            callback:function(e){
+                                window.metaWatchCmd = "watch_read";
+                                this.apply();
+                            }.bind(context)
+                        });
+                    }
+                    ]]></dynamicBuilder>
+                </subMenu>
+                <processing>
+                    <clientCallback><![CDATA[
+
+                            var node = ajaxplorer.getUserSelection().getUniqueNode();
+                            var conn = new Connexion();
+                            conn.setParameters({
+                                get_action: "toggle_watch",
+                                watch_action : window.metaWatchCmd,
+                                file : node.getPath()
+                            });
+                            conn.onComplete = function(transport){
+                                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                            };
+                            conn.sendAsync();
+
+                            ]]></clientCallback>
+                    <serverCallback methodName="switchActions"/>
+                </processing>
+            </action>
+        </actions>
+        <hooks>
+            <serverCallback methodName="processReadHook" hookName="node.read" defer="true"/>
+            <serverCallback methodName="processChangeHook" hookName="node.change" defer="true"/>
+            <serverCallback methodName="enrichNode" hookName="node.info"/>
+        </hooks>
+    </registry_contributions>
+</meta>

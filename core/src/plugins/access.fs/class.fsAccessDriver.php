@@ -190,6 +190,8 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 							throw new Exception("Cannot find file!");
 						}
 					}
+                    $node = $selection->getUniqueNode($this);
+                    AJXP_Controller::applyHook("node.read", array(&$node));
 				}else{
 					$zip = true;
 				}
@@ -214,7 +216,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
 				$chunkCount = intval($httpVars["chunk_count"]);
 				$fileId = $this->urlBase.$selection->getUniqueFile();
-				$sessionKey = "chunk_file_".md5($fileId.time());
+                $sessionKey = "chunk_file_".md5($fileId.time());
 				$totalSize = $this->filesystemFileSize($fileId);
 				$chunkSize = intval ( $totalSize / $chunkCount ); 
 				$realFile  = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $fileId, true);
@@ -230,7 +232,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				HTMLWriter::charsetHeader("application/json");
 				print(json_encode($chunkData));
 
-			break;
+                $node = $selection->getUniqueNode($this);
+                AJXP_Controller::applyHook("node.read", array(&$node));
+
+                break;
 			
 			case "download_chunk" :
 				
@@ -305,8 +310,10 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}else{
 					$this->readFile($this->urlBase.$selection->getUniqueFile(), "plain");
 				}
-				
-			break;
+                $node = $selection->getUniqueNode($this);
+                AJXP_Controller::applyHook("node.read", array(&$node));
+
+                break;
 			
 			case "put_content":	
 				if(!isset($httpVars["content"])) break;
@@ -699,6 +706,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				}
 				$parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
                 $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));
+                AJXP_Controller::applyHook("node.read", array(&$parentAjxpNode));
                 if(AJXP_XMLWriter::$headerSent == "tree"){
                     AJXP_XMLWriter::renderAjxpNode($parentAjxpNode, false);
                 }else{
