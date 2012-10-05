@@ -63,15 +63,20 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$this->extractAll = false;
 			if(isSet($httpVars["all"])) $this->extractAll = true;		
 			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-			
-			if(($size = filesize($destStreamURL."/".$file)) === false) {
+
+            if(($size = filesize($destStreamURL.$file)) === false) {
 				return ;
 			}else{
 				if($size > $flyThreshold) $this->useOnTheFly = true;
 				else $this->useOnTheFly = false;
 			}
-			
-			$cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $destStreamURL.$file, array($this, "generateJpegsCallback"));
+
+            if($this->extractAll){
+                $node = new AJXP_Node($destStreamURL.$file);
+                AJXP_Controller::applyHook("node.read", array($node));
+            }
+
+            $cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $destStreamURL.$file, array($this, "generateJpegsCallback"));
 			$cacheData = $cache->getData();
 
 			if(!$this->useOnTheFly && $this->extractAll){ // extract all on first view
@@ -106,7 +111,8 @@ class IMagickPreviewer extends AJXP_Plugin {
 				
 				if($this->useOnTheFly) $this->onTheFly = true;
 				$this->generateJpegsCallback($destStreamURL.$srcfile, $file);
-			}
+
+            }
 			if(!is_file($file)) return ;
 			header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
 			header("Content-Length: ".filesize($file));

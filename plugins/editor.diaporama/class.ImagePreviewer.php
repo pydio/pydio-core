@@ -67,8 +67,11 @@ class ImagePreviewer extends AJXP_Plugin {
 
 			}else{
 	 			//$filesize = filesize($destStreamURL.$file);
-	 			
-	 			$fp = fopen($destStreamURL.$file, "r");
+
+                $node = new AJXP_Node($destStreamURL.$file);
+                AJXP_Controller::applyHook("node.read", array($node));
+
+                $fp = fopen($destStreamURL.$file, "r");
                 $stat = fstat($fp);
                 $filesize = $stat["size"];
 				header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");

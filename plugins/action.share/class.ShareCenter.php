@@ -216,7 +216,7 @@ class ShareCenter extends AJXP_Plugin{
                 }
                 $elementWatch = false;
                 if($this->watcher != false){
-                    $elementWatch = $this->watcher->hasWatchOnFolder(
+                    $elementWatch = $this->watcher->hasWatchOnNode(
                         $node,
                         AuthService::getLoggedUser()->getId(),
                         MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE
@@ -599,7 +599,7 @@ class ShareCenter extends AJXP_Plugin{
                     "RIGHT" => $userObject->personalRole->getAcl($repoId)
                 );
                 if($this->watcher !== false){
-                    $entry["WATCH"] = $this->watcher->hasWatchOnFolder(new AJXP_Node($this->baseProtocol."://".$repoId."/"), $userId, MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE);
+                    $entry["WATCH"] = $this->watcher->hasWatchOnNode(new AJXP_Node($this->baseProtocol."://".$repoId."/"), $userId, MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE);
                 }
                 if(!$mixUsersAndGroups){
                     $sharedEntries[$userId] = $entry;
