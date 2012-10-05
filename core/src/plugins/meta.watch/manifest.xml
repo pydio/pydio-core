@@ -80,9 +80,9 @@
             </action>
         </actions>
         <hooks>
-            <serverCallback methodName="processReadHook" hookName="node.read" defer="true"/>
-            <serverCallback methodName="processChangeHook" hookName="node.change" defer="true"/>
-            <serverCallback methodName="enrichNode" hookName="node.info"/>
+            <serverCallback hookName="node.read" methodName="processReadHook" defer="true"/>
+            <serverCallback hookName="node.change" methodName="processChangeHook" defer="true"/>
+            <serverCallback hookName="node.info" methodName="enrichNode" />
         </hooks>
     </registry_contributions>
 </meta>

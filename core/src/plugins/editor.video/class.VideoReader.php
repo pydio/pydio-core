@@ -40,12 +40,15 @@ class VideoReader extends AJXP_Plugin {
     	$destStreamURL = $streamData["protocol"]."://".$repository->getId();
 		    	
 		if($action == "read_video_data"){
-			AJXP_Logger::debug("REading video");
-			session_write_close();
-			$file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
- 			$filesize = filesize($destStreamURL.$file);
+			AJXP_Logger::debug("Reading video");
+            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+            $node = new AJXP_Node($destStreamURL.$file);
+            AJXP_Controller::applyHook("node.read", array($node));
+            session_write_close();
+            $filesize = filesize($destStreamURL.$file);
  			$filename = $destStreamURL.$file;
- 			//$fp = fopen($destStreamURL.$file, "r");
+
+            //$fp = fopen($destStreamURL.$file, "r");
  			if(preg_match("/\.ogv$/", $file)){
 				header("Content-Type: video/ogg; name=\"".basename($file)."\"");
  			}else if(preg_match("/\.mp4$/", $file)){
@@ -105,7 +108,7 @@ class VideoReader extends AJXP_Plugin {
 				fflush($stream);
 				fclose($stream);
 			}
-			//exit(1);
+            //exit(1);
 		}else if($action == "get_sess_id"){
 			HTMLWriter::charsetHeader("text/plain");
 			print(session_id());

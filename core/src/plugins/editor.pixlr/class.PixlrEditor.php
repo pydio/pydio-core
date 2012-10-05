@@ -48,7 +48,11 @@ class PixlrEditor extends AJXP_Plugin {
       $tmp = SystemTextEncoding::fromUTF8($tmp);
       $fData = array("tmp_name" => $tmp, "name" => urlencode(basename($file)), "type" => "image/jpg");
       //var_dump($fData);
-      $httpClient = new HttpClient("pixlr.com");
+        $node = new AJXP_Node($destStreamURL.$file);
+        AJXP_Controller::applyHook("node.read", array($node));
+
+
+        $httpClient = new HttpClient("pixlr.com");
       //$httpClient->setDebug(true);
       $postData = array();              
       $httpClient->setHandleRedirects(false);
@@ -105,7 +109,8 @@ class PixlrEditor extends AJXP_Plugin {
       }
       fclose($orig);
       fclose($target);
-      
+
+        AJXP_Controller::applyHook("node.change", array(&$node));
       //header("Content-Type:text/plain");
       //print($mess[115]);
       

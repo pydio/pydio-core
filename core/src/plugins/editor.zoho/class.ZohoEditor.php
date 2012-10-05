@@ -59,7 +59,10 @@ class ZohoEditor extends AJXP_Plugin {
 			$tmp = call_user_func(array($streamData["classname"], "getRealFSReference"), $destStreamURL.$file);			
 			$tmp = SystemTextEncoding::fromUTF8($tmp);
 
-			$extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
+            $node = new AJXP_Node($destStreamURL.$file);
+            AJXP_Controller::applyHook("node.read", array($node));
+
+            $extension = strtolower(pathinfo(urlencode(basename($file)), PATHINFO_EXTENSION));
 			$httpClient = new http_class();
             $httpClient->request_method = "POST";
 
@@ -147,7 +150,7 @@ class ZohoEditor extends AJXP_Plugin {
                     echo "MODIFIED";
                 }
             }
-
+            AJXP_Controller::applyHook("node.change", array(&$node));
         }
 
 

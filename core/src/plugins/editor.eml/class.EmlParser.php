@@ -50,8 +50,12 @@ class EmlParser extends AJXP_Plugin{
 		if(empty($httpVars["file"])) return;
     	$file = $destStreamURL.AJXP_Utils::decodeSecureMagic($httpVars["file"]);
     	$mess = ConfService::getMessages();
-    	
-    	switch($action){
+
+        $node = new AJXP_Node($file);
+        AJXP_Controller::applyHook("node.read", array($node));
+
+
+        switch($action){
     		case "eml_get_xml_structure":
     			$params = array(
     				'include_bodies' => false,

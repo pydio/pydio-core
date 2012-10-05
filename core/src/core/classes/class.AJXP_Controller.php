@@ -351,7 +351,7 @@ class AJXP_Controller{
      * @param array $args
      * @return
      */
-	public static function applyHook($hookName, $args){
+	public static function applyHook($hookName, $args, $forceNonDefer = false){
 		$xPath = self::initXPath();
 		$callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
 		if(!$callbacks->length) return ;
@@ -364,6 +364,7 @@ class AJXP_Controller{
           	}
             //$fake1; $fake2; $fake3;
             $defer = ($callback->attributes->getNamedItem("defer") != null && $callback->attributes->getNamedItem("defer")->nodeValue == "true");
+            if($defer && $forceNonDefer) $defer = false;
             self::applyCallback($xPath, $callback, $fake1, $fake2, $fake3, $args, $defer);
 		}
 	}	

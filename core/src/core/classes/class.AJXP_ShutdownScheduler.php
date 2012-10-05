@@ -72,9 +72,11 @@ class AJXP_ShutdownScheduler
      }
      public function callRegisteredShutdown() {
         session_write_close();
-        header("Connection: close");
-        $size = ob_get_length();
-        header("Content-Length: $size");
+         if(!headers_sent()){
+             header("Connection: close");
+             $size = ob_get_length();
+             header("Content-Length: $size");
+         }
         ob_end_flush();
         flush();
         foreach ($this->callbacks as $arguments) {

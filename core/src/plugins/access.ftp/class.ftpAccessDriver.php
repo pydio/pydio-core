@@ -90,9 +90,11 @@ class ftpAccessDriver extends fsAccessDriver {
 				//$destPath = AJXP_Utils::decodeSecureMagic($destPath);
 				// DO NOT "SANITIZE", THE URL IS ALREADY IN THE FORM ajxp.ftp://repoId/filename
 				$destPath = SystemTextEncoding::fromPostedFileName($destPath);
+                $node = new AJXP_Node($destPath);
 				AJXP_Logger::debug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
 				try {
-					$fp = fopen($destPath, "w");
+                    AJXP_Controller::applyHook("node.before_change", array(&$node));
+                    $fp = fopen($destPath, "w");
 					$fSource = fopen($fData["tmp_name"], "r");
 					while(!feof($fSource)){
 						fwrite($fp, fread($fSource, 4096));						
@@ -104,7 +106,9 @@ class ftpAccessDriver extends fsAccessDriver {
 					fclose($fp);
 					AJXP_Logger::debug("FTP Upload : end of ftp copy");
 					@unlink($fData["tmp_name"]);
-				}catch (Exception $e){
+                    AJXP_Controller::applyHook("node.change", array(&$node));
+
+                }catch (Exception $e){
 					AJXP_Logger::debug("Error during ftp copy", array($e->getMessage(), $e->getTrace()));
 				}
 				AJXP_Logger::debug("FTP Upload : shoud trigger next or reload nextFile=$nextFile");
@@ -261,11 +265,15 @@ class ftpAccessDriver extends fsAccessDriver {
 	
 	
     function storeFileToCopy($fileData){
-            $user = AuthService::getLoggedUser();
-            $files = $user->getTemporaryData("tmp_upload");
-            AJXP_Logger::debug("Saving user temporary data", array($fileData));
-            $files[] = $fileData;
-            $user->saveTemporaryData("tmp_upload", $files);
+        $user = AuthService::getLoggedUser();
+        $files = $user->getTemporaryData("tmp_upload");
+        AJXP_Logger::debug("Saving user temporary data", array($fileData));
+        $files[] = $fileData;
+        $user->saveTemporaryData("tmp_upload", $files);
+        if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client")
+            || strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-java-client")){
+            $this->uploadActions("next_to_remote", array(), array());
+        }
     }
 
     function getFileNameToCopy(){
@@ -292,4 +300,3 @@ class ftpAccessDriver extends fsAccessDriver {
 	
 	
 }
-?>
