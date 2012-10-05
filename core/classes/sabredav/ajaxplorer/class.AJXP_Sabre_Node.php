@@ -48,7 +48,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
             ConfService::getConfStorageImpl();
             $this->accessDriver = ConfService::loadRepositoryDriver();
             if(!$this->accessDriver instanceof AjxpWebdavProvider){
-                throw new ezcBaseFileNotFoundException( $this->repository->getUniqueId() );
+                throw new Sabre_DAV_Exception_FileNotFound( $this->repository->getUniqueId() );
             }
             $this->accessDriver->detectStreamWrapper(true);
         }else{
