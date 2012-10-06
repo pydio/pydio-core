@@ -124,10 +124,20 @@ class serialConfDriver extends AbstractConfDriver {
 		AJXP_Utils::saveSerialFile($this->rolesSerialFile, $roles);
 	}
 
-    function updateRole($role){
-        $all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);
-        $all[$role->getId()] = $role;
-        AJXP_Utils::saveSerialFile($this->rolesSerialFile, $all);
+    /**
+     * @param AJXP_Role $role
+     * @param AbstractAjxpUser|null $userObject
+     */
+    function updateRole($role, $userObject = null){
+        if($userObject != null){
+            // This a personal role, save differently
+            $userObject->personalRole = $role;
+            $userObject->save("superuser");
+        }else{
+            $all = AJXP_Utils::loadSerialFile($this->rolesSerialFile);
+            $all[$role->getId()] = $role;
+            AJXP_Utils::saveSerialFile($this->rolesSerialFile, $all);
+        }
     }
 
     function deleteRole($role){

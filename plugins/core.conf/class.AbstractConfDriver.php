@@ -505,7 +505,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
                     }
                 }
                 if($rChanges){
-                    AuthService::updateRole($userObject->personalRole);
+                    AuthService::updateRole($userObject->personalRole, $userObject);
                     $userObject->recomputeMergedRole();
                     AuthService::updateUser($userObject);
                 }

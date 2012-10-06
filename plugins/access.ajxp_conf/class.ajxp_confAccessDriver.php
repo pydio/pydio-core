@@ -402,8 +402,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 try{
                     $originalRole->bunchUpdate($roleData);
                     if(isSet($userObject)){
-                        $userObject->personalRole = $originalRole;
-                        $userObject->save("superuser");
+                        //$userObject->personalRole = $originalRole;
+                        //$userObject->save("superuser");
+                        AuthService::updateRole($originalRole, $userObject);
                     }else{
                         AuthService::updateRole($originalRole);
                     }

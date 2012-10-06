@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin id="core.mailer" label="Mailer Core config" description="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="AjxpMailer" filename="plugins/core.mailer/class.AjxpMailer.php"/>
+    <server_settings>
+        <global_param name="FROM" type="string" label="CONF_MESSAGE[Sender email]" description="CONF_MESSAGE[Adress of the sender]" mandatory="true" default=""/>
+        <global_param name="FROM_NAME" type="string" label="CONF_MESSAGE[Sender name]" description="CONF_MESSAGE[Name of the sender]" mandatory="true" default=""/>
+    </server_settings>
     <client_settings>
         <resources>
             <js className="AjxpMailer" file="plugins/core.mailer/class.AjxpMailer.js" autoload="true"/>
