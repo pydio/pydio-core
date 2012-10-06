@@ -194,6 +194,10 @@ class ShareCenter extends AJXP_Plugin{
                             AJXP_METADATA_SCOPE_REPOSITORY
                         );
                     }
+                    $hash = md5(serialize($data));
+                    if($this->watcher !== false && isSet($httpVars["watch_link"])){
+                        // TODO : WATCH FOR THIS FILE ON THIS USER!!!
+                    }
 	                header("Content-type:text/plain");
 	                echo $url;
             	}
@@ -218,8 +222,7 @@ class ShareCenter extends AJXP_Plugin{
                 if($this->watcher != false){
                     $elementWatch = $this->watcher->hasWatchOnNode(
                         $node,
-                        AuthService::getLoggedUser()->getId(),
-                        MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE
+                        AuthService::getLoggedUser()->getId()
                     );
                 }
                 if(count($metadata)){
@@ -256,7 +259,10 @@ class ShareCenter extends AJXP_Plugin{
                             "repositoryId"  => $repoId,
                             "label"         => $repo->getDisplay(),
                             "entries"       => $sharedEntries,
-                            "element_watch" => $elementWatch
+                            "element_watch" => $this->watcher->hasWatchOnNode(
+                                new AJXP_Node($this->baseProtocol."://".$repoId."/"),
+                                AuthService::getLoggedUser()->getId()
+                            )
                         );
                     }
                     echo json_encode($jsonData);
@@ -329,8 +335,6 @@ class ShareCenter extends AJXP_Plugin{
 	 * Else copy or move oldNode to newNode.
 	 *
 	 * @param AJXP_Node $oldNode
-	 * @param AJXP_Node $newNode
-	 * @param Boolean $copy
 	 */
 	public function updateNodeSharedData($oldNode/*, $newNode = null, $copy = false*/){
         if($this->accessDriver->getId() == "access.imap") return;
@@ -365,11 +369,12 @@ class ShareCenter extends AJXP_Plugin{
                      - ACTION      If set, action to perform
                      - USER        If set, the AJXP user
                      - EXPIRE_TIME If set, the publiclet will deny downloading after this time, and probably self destruct.
+     *               - AUTHOR_WATCH If set, will post notifications for the publiclet author each time the file is loaded
      * @param AbstractAccessDriver $accessDriver
      * @param Repository $repository
      * @return the URL to the downloaded file
     */
-    function writePubliclet($data, $accessDriver, $repository)
+    function writePubliclet(&$data, $accessDriver, $repository)
     {
     	$downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
     	if(!is_dir($downloadFolder)){
@@ -533,7 +538,8 @@ class ShareCenter extends AJXP_Plugin{
         $hash = md5(serialize($data));
         PublicletCounter::increment($hash);
 
-        AuthService::logUser($data["OWNER_ID"], "", true);
+        //AuthService::logUser($data["OWNER_ID"], "", true);
+        AuthService::logTemporaryUser($data["OWNER_ID"], $hash);
         if($driver->hasMixin("credentials_consumer") && isSet($data["SAFE_USER"]) && isSet($data["SAFE_PASS"])){
             // FORCE SESSION MODE
             AJXP_Safe::getInstance()->forceSessionCredentialsUsage();
@@ -599,7 +605,10 @@ class ShareCenter extends AJXP_Plugin{
                     "RIGHT" => $userObject->personalRole->getAcl($repoId)
                 );
                 if($this->watcher !== false){
-                    $entry["WATCH"] = $this->watcher->hasWatchOnNode(new AJXP_Node($this->baseProtocol."://".$repoId."/"), $userId, MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE);
+                    $entry["WATCH"] = $this->watcher->hasWatchOnNode(
+                        new AJXP_Node($this->baseProtocol."://".$repoId."/"),
+                        $userId
+                    );
                 }
                 if(!$mixUsersAndGroups){
                     $sharedEntries[$userId] = $entry;
@@ -798,11 +807,10 @@ class ShareCenter extends AJXP_Plugin{
                 if($uWatches[$userName] == "true"){
                     $this->watcher->setWatchOnFolder(new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
                         $userName,
-                        MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE);
+                        MetaWatchRegister::$META_WATCH_CHANGE);
                 }else{
                     $this->watcher->removeWatchFromFolder(new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
-                        $userName,
-                        MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE);
+                        $userName);
                 }
             }
         }
@@ -810,13 +818,13 @@ class ShareCenter extends AJXP_Plugin{
             $watchDir = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             $id = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
             if($httpVars["self_watch_folder"] == "true"){
-                $this->watcher->setWatchOnFolder(new AJXP_Node($this->urlBase.$watchDir),
+                $this->watcher->setWatchOnFolder(
+                    new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
                     AuthService::getLoggedUser()->getId(),
-                    MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE);
+                    MetaWatchRegister::$META_WATCH_CHANGE);
             }else{
-                $this->watcher->removeWatchFromFolder(new AJXP_Node($this->urlBase.$watchDir),
-                    AuthService::getLoggedUser()->getId(),
-                    MetaWatchRegister::$META_NAMESPACE_WATCH_CHANGE);
+                $this->watcher->removeWatchFromFolder(new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
+                    AuthService::getLoggedUser()->getId());
             }
         }
 
@@ -847,7 +855,7 @@ class ShareCenter extends AJXP_Plugin{
      * @param String $type
      * @param String $element
      * @param AbstractAjxpUser $loggedUser
-     * @return void
+     * @throws Exception
      */
     public static function deleteSharedElement($type, $element, $loggedUser){
         $mess = ConfService::getMessages();

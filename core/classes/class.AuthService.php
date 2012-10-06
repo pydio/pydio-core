@@ -228,6 +228,25 @@ class AuthService
         setcookie("AjaXplorer-remember", "", time()-3600);
     }
 
+    static function logTemporaryUser($parentUserId, $temporaryUserId){
+        $parentUserId = self::filterUserSensitivity($parentUserId);
+        $temporaryUserId = self::filterUserSensitivity($temporaryUserId);
+        $confDriver = ConfService::getConfStorageImpl();
+        $parentUser = $confDriver->createUserObject($parentUserId);
+        $temporaryUser = $confDriver->createUserObject($temporaryUserId);
+        $temporaryUser->mergedRole = $parentUser->mergedRole;
+        $temporaryUser->setGroupPath($parentUser->getGroupPath());
+        $temporaryUser->setParent($parentUserId);
+        AJXP_Logger::logAction("Log in", array("temporary user" => $temporaryUserId, "owner" => $parentUserId));
+        self::updateUser($temporaryUser);
+        register_shutdown_function(array("AuthService", "clearTemporaryUser"), $temporaryUserId);
+    }
+
+    static function clearTemporaryUser($temporaryUserId){
+        AJXP_Logger::logAction("Log out", array("temporary user"), $temporaryUserId);
+        self::disconnect();
+    }
+
     /**
      * Log the user from its credentials
      * @static
