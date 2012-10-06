@@ -27,14 +27,12 @@ class AjxpScheduler extends AJXP_Plugin{
 
     function __construct($id, $baseDir){
         parent::__construct($id, $baseDir);
-        $this->db =AJXP_DATA_PATH."/plugins/action.scheduler/calendar.json" ;
-        if(!is_dir(dirname($this->db))) mkdir(dirname($this->db), 0755, true);
+        $this->db = $this->getPluginWorkDir(true). "/calendar.json" ;
     }
 
     function unserialize($serialized){
         parent::unserialize($serialized);
-        $this->db =AJXP_DATA_PATH."/plugins/action.scheduler/calendar.json" ;
-        if(!is_dir(dirname($this->db))) mkdir(dirname($this->db), 0755, true);
+        $this->db = $this->getPluginWorkDir(true). "/calendar.json" ;
     }
 
 

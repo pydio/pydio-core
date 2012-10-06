@@ -100,7 +100,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 * Returns an array of options=>values merged from various sources (.inc.php, implementation source)
 	 * @return Array
 	 * @param String $pluginType
-	 * @param String $pluginId
+	 * @param String $pluginName
 	 */
 	function loadPluginConfig($pluginType, $pluginName){
 		$options = array();
@@ -129,10 +129,8 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	abstract function _loadPluginConfig($pluginId, &$options);
 	
 	/**
-	 * 
-	 * @param String $pluginType
 	 * @param String $pluginId
-	 * @param String $configHash
+	 * @param String $options
 	 */
 	abstract function savePluginConfig($pluginId, $options);
 	
@@ -310,6 +308,21 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	function getOption($optionName){
 		return (isSet($this->options[$optionName])?$this->options[$optionName]:"");	
 	}
+
+    /**
+     * @abstract
+     * @param string $queueName
+     * @param Object $object
+     * @return bool
+     */
+    abstract function storeObjectToQueue($queueName, $object);
+
+    /**
+     * @abstract
+     * @param string $queueName Name of the queue
+     * @return array An array of arbitrary objects, understood by the caller
+     */
+    abstract function consumeQueue($queueName);
 
     /**
      * @param AbstractAjxpUser $userObject

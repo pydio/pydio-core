@@ -94,6 +94,27 @@ class AJXP_Plugin implements Serializable{
 		$this->actions = array();
 		$this->dependencies = array();
 	}
+
+    protected function getPluginWorkDir($check = false){
+        $d = AJXP_DATA_PATH.DIRECTORY_SEPARATOR."plugins".DIRECTORY_SEPARATOR.$this->getId();
+        if(!$check) return $d;
+        if(!is_dir($d)){
+            $res = @mkdir($d, 0755, true);
+            if(!$res) throw new Exception("Error while creating plugin directory for ".$this->getId());
+        }
+        return $d;
+    }
+
+    protected function getPluginCacheDir($shared = false, $check = false){
+        $d = ($shared ? AJXP_SHARED_CACHE_DIR : AJXP_CACHE_DIR).DIRECTORY_SEPARATOR."plugins".DIRECTORY_SEPARATOR.$this->getId();
+        if(!$check) return $d;
+        if(!is_dir($d)){
+            $res = @mkdir($d, 0755, true);
+            if(!$res) throw new Exception("Error while creating plugin cache directory for ".$this->getId());
+        }
+        return $d;
+    }
+
     /**
      * @param $options
      * @return void
