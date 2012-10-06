@@ -544,5 +544,24 @@ class sqlConfDriver extends AbstractConfDriver {
     {
         // TODO: Implement loadBinary() method.
     }
+
+    /**
+     * @param string $queueName
+     * @param Object $object
+     * @return bool
+     */
+    function storeObjectToQueue($queueName, $object)
+    {
+        // TODO: Implement storeObjectToQueue() method.
+    }
+
+    /**
+     * @param string $queueName Name of the queue
+     * @return array An array of arbitrary objects, understood by the caller
+     */
+    function consumeQueue($queueName)
+    {
+        // TODO: Implement consumeQueue() method.
+    }
 }
 ?>

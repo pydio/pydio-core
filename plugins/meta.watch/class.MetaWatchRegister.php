@@ -207,11 +207,12 @@ class MetaWatchRegister extends AJXP_Plugin{
 
     public function processChangeHook(AJXP_Node $oldNode=null, AJXP_Node $newNode=null, $copy = false){
 
-        $newNotif = AJXP_NotificationCenter::getInstance()->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "new");
+        $notificationCenter = AJXP_PluginsService::findPluginById("core.notifications");
+        $newNotif = $notificationCenter->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "new");
         if($newNotif->getNode() !== false){
             $ids = $this->getWatchesOnNode($newNode, self::$META_NAMESPACE_WATCH_CHANGE);
             if(count($ids)){
-                foreach($ids as $id) AJXP_NotificationCenter::getInstance()->postNotification($newNotif, $id);
+                foreach($ids as $id) $notificationCenter->postNotification($newNotif, $id);
             }
             $parentNode = new AJXP_Node(dirname($newNode->getUrl()));
             $ids = $this->getWatchesOnNode($parentNode, self::$META_NAMESPACE_WATCH_CHANGE);
@@ -221,15 +222,15 @@ class MetaWatchRegister extends AJXP_Plugin{
                 $parentNotif->setNode($parentNode);
                 $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
                 $parentNotif->setRelatedNotification($newNotif);
-                foreach($ids as $id) AJXP_NotificationCenter::getInstance()->postNotification($parentNotif, $id);
+                foreach($ids as $id) $notificationCenter->postNotification($parentNotif, $id);
             }
         }
         if($oldNode != null && $newNode != null && $oldNode->getUrl() == $newNode->getUrl()) return;
-        $oldNotif =  AJXP_NotificationCenter::getInstance()->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "old");
+        $oldNotif =  $notificationCenter->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "old");
         if($oldNotif->getNode() !== false){
             $ids = $this->getWatchesOnNode($oldNode, self::$META_NAMESPACE_WATCH_CHANGE);
             if(count($ids)){
-                foreach($ids as $id) AJXP_NotificationCenter::getInstance()->postNotification($oldNotif, $id);
+                foreach($ids as $id) $notificationCenter->postNotification($oldNotif, $id);
             }
             $parentNode = new AJXP_Node(dirname($oldNode->getUrl()));
             $ids = $this->getWatchesOnNode($parentNode, self::$META_NAMESPACE_WATCH_CHANGE);
@@ -239,7 +240,7 @@ class MetaWatchRegister extends AJXP_Plugin{
                 $parentNotif->setNode($parentNode);
                 $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
                 $parentNotif->setRelatedNotification($oldNode);
-                foreach($ids as $id) AJXP_NotificationCenter::getInstance()->postNotification($parentNotif, $id);
+                foreach($ids as $id) $notificationCenter->postNotification($parentNotif, $id);
             }
         }
 
@@ -249,12 +250,14 @@ class MetaWatchRegister extends AJXP_Plugin{
 
     public function processReadHook(AJXP_Node $node){
 
+        $notificationCenter = AJXP_PluginsService::findPluginById("core.notifications");
+
         $ids = $this->getWatchesOnNode($node, self::$META_NAMESPACE_WATCH_READ);
         $notif = new AJXP_Notification();
         $notif->setAction(AJXP_NOTIF_NODE_VIEW);
         $notif->setNode($node);
         if(count($ids)){
-            foreach($ids as $id) AJXP_NotificationCenter::getInstance()->postNotification($notif, $id);
+            foreach($ids as $id) $notificationCenter->postNotification($notif, $id);
         }
         $parentNode = new AJXP_Node(dirname($node->getUrl()));
         $ids = $this->getWatchesOnNode($parentNode, self::$META_NAMESPACE_WATCH_READ);
@@ -264,7 +267,7 @@ class MetaWatchRegister extends AJXP_Plugin{
             $parentNotif->setNode($parentNode);
             $parentNotif->setAction(AJXP_NOTIF_NODE_VIEW);
             $parentNotif->setRelatedNotification($notif);
-            foreach($ids as $id) AJXP_NotificationCenter::getInstance()->postNotification($parentNotif, $id);
+            foreach($ids as $id) $notificationCenter->postNotification($parentNotif, $id);
         }
 
     }

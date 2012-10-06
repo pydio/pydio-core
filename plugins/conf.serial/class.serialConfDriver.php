@@ -403,7 +403,7 @@ class serialConfDriver extends AbstractConfDriver {
     }
 
     protected function getBinaryPathStorage($context){
-        $storage = AJXP_DATA_PATH."/plugins/conf.serial/binaries";
+        $storage = $this->getPluginWorkDir()."/binaries";
         if(isSet($context["USER"])){
             $storage.="/users/".$context["USER"];
         }else if(isSet($context["REPO"])){
@@ -448,5 +448,42 @@ class serialConfDriver extends AbstractConfDriver {
                 readfile($this->getBinaryPathStorage($context)."/".$ID);
             }
         }
+    }
+
+    /**
+     * @param string $queueName
+     * @param Object $object
+     * @return bool
+     */
+    function storeObjectToQueue($queueName, $object)
+    {
+        $data = array();
+        $fExists = false;
+        if(file_exists($this->getPluginWorkDir()."/queues/$queueName.ser")){
+            $fExists = true;
+            $data = unserialize(file_get_contents($this->getPluginWorkDir()."/queues/$queueName.ser"));
+        }
+        $data[] = $object;
+        if(!$fExists){
+            if(!is_dir($this->getPluginWorkDir()."/queues")){
+                mkdir($this->getPluginWorkDir()."/queues", 0755, true);
+            }
+        }
+        $res = file_put_contents($this->getPluginWorkDir()."/queues/$queueName.ser", serialize($data), LOCK_EX);
+        return $res;
+    }
+
+    /**
+     * @param string $queueName Name of the queue
+     * @return array An array of arbitrary objects, understood by the caller
+     */
+    function consumeQueue($queueName)
+    {
+        $data = array();
+        if(file_exists($this->getPluginWorkDir()."/queues/$queueName.ser")){
+            $data = unserialize(file_get_contents($this->getPluginWorkDir()."/queues/$queueName.ser"));
+            file_put_contents($this->getPluginWorkDir()."/queues/$queueName.ser", array(), LOCK_EX);
+        }
+        return $data;
     }
 }

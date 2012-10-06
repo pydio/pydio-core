@@ -23,30 +23,17 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Notification dispatcher
  */
-class AJXP_NotificationCenter
+class AJXP_NotificationCenter extends AJXP_Plugin
 {
     /**
      * @var AJXP_NotificationCenter
      */
     static private $instance;
     private $userId;
-    private $useQueue = false;
+    private $useQueue = true ;
 
-    /**
-     * @static
-     * @return AJXP_NotificationCenter
-     */
-    static function getInstance(){
-
-        AJXP_Notification::autoload();
-
-        if(!isSet(self::$instance)){
-            self::$instance = new AJXP_NotificationCenter();
-        }
-        return self::$instance;
-    }
-
-    public function __construct(){
+    public function init($options){
+        parent::init($options);
         $this->userId = AuthService::getLoggedUser() !== null ? AuthService::getLoggedUser()->getId() : "shared";
     }
 
@@ -90,6 +77,15 @@ class AJXP_NotificationCenter
         return $notif;
     }
 
+    public function consumeQueue($action, $httpVars, $fileVars){
+        if($action != "consume_notification_queue") return;
+        $queueObjects = ConfService::getConfStorageImpl()->consumeQueue("user_notifications");
+        AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
+        foreach($queueObjects as $notification){
+            $this->dispatch($notification);
+        }
+    }
+
     /**
      * @param AJXP_Notification $notif
      * @param string $targetId
@@ -112,6 +108,8 @@ class AJXP_NotificationCenter
         if(!$this->useQueue){
             AJXP_Logger::debug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
             $this->dispatch($notification);
+        }else{
+            ConfService::getConfStorageImpl()->storeObjectToQueue("user_notifications", $notification);
         }
     }
 
@@ -124,7 +122,8 @@ class AJXP_NotificationCenter
                 $mailer->sendMail(
                     array($notification->getTarget()),
                     $notification->getDescriptionShort(),
-                    $notification->getDescriptionLong()
+                    $notification->getDescriptionLong(),
+                    $notification->getAuthor()
                 );
             }catch (Exception $e){
                 AJXP_Logger::logAction("ERROR : ".$e->getMessage());
