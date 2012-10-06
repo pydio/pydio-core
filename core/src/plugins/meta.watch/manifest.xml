@@ -20,39 +20,56 @@
                     if(n){
                         var context = window.builderContext;
                         context.builderMenuItems = $A([]);
+                        var metaValue;
                         if(n.getMetadata().get("meta_watched")){
+                            var metaValue = n.getMetadata().get("meta_watched");
+                        }
+                        context.builderMenuItems.push({
+                            name:'Modifications',
+                            alt:'Watch for modifications',
+                            isDefault : (metaValue && metaValue == "META_WATCH_CHANGE"),
+                            image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_CHANGE")?'':'_faded')+'.png', '',  22),
+                            callback:function(e){
+                                window.metaWatchCmd = "watch_change";
+                                this.apply();
+                            }.bind(context)
+                        });
+                        context.builderMenuItems.push({
+                            name:'Consultation',
+                            alt:'Watch for consultation',
+                            isDefault : (metaValue && metaValue == "META_WATCH_READ"),
+                            image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_READ")?'':'_faded')+'.png', '',  22),
+                            callback:function(e){
+                                window.metaWatchCmd = "watch_read";
+                                this.apply();
+                            }.bind(context)
+                        });
+                        context.builderMenuItems.push({
+                            name:'Both',
+                            alt:'Watch for consultation and modifications',
+                            isDefault : (metaValue && metaValue == "META_WATCH_BOTH"),
+                            image:resolveImageSource('meta.watch/ICON_SIZE/watch'+((metaValue && metaValue == "META_WATCH_BOTH")?'':'_faded')+'.png', '',  22),
+                            callback:function(e){
+                                window.metaWatchCmd = "watch_both";
+                                this.apply();
+                            }.bind(context)
+                        });
+                        if(metaValue){
+                            context.builderMenuItems.push({
+                                separator:true
+                            });
                             context.builderMenuItems.push({
                                 name:MessageHash['meta.watch.3'],
                                 alt:MessageHash['meta.watch.4'],
-                                isDefault : true,
-                                image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
-                                callback:function(e){
-                                    window.metaWatchCmd = "watch_stop_" + n.getMetadata().get("meta_watched");
-                                    this.apply();
-                                }.bind(context)
-                            });
-                        }else{
-                            context.builderMenuItems.push({
-                                name:'Modifications',
-                                alt:'Watch for modifications',
                                 isDefault : false,
                                 image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
                                 callback:function(e){
-                                    window.metaWatchCmd = "watch_change";
-                                    this.apply();
-                                }.bind(context)
-                            });
-                            context.builderMenuItems.push({
-                                name:'Consultation',
-                                alt:'Watch for consultation',
-                                isDefault : false,
-                                image:resolveImageSource('meta.watch/ICON_SIZE/watch.png', '',  22),
-                                callback:function(e){
-                                    window.metaWatchCmd = "watch_read";
+                                    window.metaWatchCmd = "watch_stop";
                                     this.apply();
                                 }.bind(context)
                             });
                         }
+
                     }
                     ]]></dynamicBuilder>
                 </subMenu>

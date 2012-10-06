@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 $mess = array(
-    "1" => "Watch",
+    "1" => "Watch for...",
     "2" => "Watch this folder for changes",
     "3" => "Stop watching",
     "4" => "Stop watching this folder for changes",
