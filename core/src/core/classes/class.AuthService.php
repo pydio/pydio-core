@@ -760,8 +760,8 @@ class AuthService
 	 *
 	 * @param AJXP_Role $roleObject
 	 */
-	static function updateRole($roleObject){
-        ConfService::getConfStorageImpl()->updateRole($roleObject);
+	static function updateRole($roleObject, $userObject = null){
+        ConfService::getConfStorageImpl()->updateRole($roleObject, $userObject);
 	}
 	/**
      * Delete a role by its id

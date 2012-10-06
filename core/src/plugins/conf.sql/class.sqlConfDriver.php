@@ -421,7 +421,7 @@ class sqlConfDriver extends AbstractConfDriver {
     /**
      * @param AJXP_Role $role
      */
-    function updateRole($role){
+    function updateRole($role, $userObject = null){
         dibi::query("DELETE FROM [ajxp_roles] WHERE [role_id]=%s", $role->getId());
         dibi::query("INSERT INTO [ajxp_roles]", array(
                 'role_id' => $role->getId(),

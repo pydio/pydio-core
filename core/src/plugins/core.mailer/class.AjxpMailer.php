@@ -41,43 +41,82 @@ class AjxpMailer extends AJXP_Plugin
         $toUsers = array_merge(explode(",", $httpVars["users_ids"]), explode(",", $httpVars["to"]));
         $toGroups =  explode(",", $httpVars["groups_ids"]);
 
-        $emails = array();
+        $emails = $this->resolveAdresses($toUsers);
+        $from = $this->resolveFrom($httpVars["from"]);
 
-        foreach($toUsers as $userId){
-            $userId = trim($userId);
-            if(AuthService::userExists($userId)){
-                // ADD USER
-                // VERIFY IT'S AN AUTHORIZED USER
-
-                $u = ConfService::getConfStorageImpl()->createUserObject($userId);
-                $email = $u->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
-                if($this->validateEmail($email)){
-                    array_push($emails, $email);
-                }
-            }else if($this->validateEmail($userId)){
-                array_push($emails, $userId);
-            }
-        }
-
-        if($this->validateEmail($httpVars["from"])){
-            $from = $httpVars["from"];
-        }else{
-            $loggedUser = AuthService::getLoggedUser();
-            $loggedEmail = $loggedUser->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
-            if(!empty($loggedEmail)){
-                $from = $loggedEmail;
-            }
-        }
-        if(!isSet($from)){
-            $from = ConfService::getCoreConf("WEBMASTER_EMAIL");
-        }
-
-        $emails = array_unique($emails);
         $subject = $httpVars["subject"];
         $body = $httpVars["message"];
 
         $mailer->sendMail($emails, $subject, $body, $from);
 
+    }
+
+    function resolveFrom($fromAdress = null){
+        $fromResult = array();
+        if($fromAdress != null){
+            $arr = $this->resolveAdresses(array($fromAdress));
+            if(count($arr)) $fromResult = $arr[0];
+        }else if(AuthService::getLoggedUser() != null){
+            $arr = $this->resolveAdresses(array(AuthService::getLoggedUser()));
+            if(count($arr)) $fromResult = $arr[0];
+        }else{
+            $f = ConfService::getCoreConf("FROM", "mailer");
+            $fName = ConfService::getCoreConf("FROM_NAME", "mailer");
+            $fromResult = array("adress" => $f, "name" => $fName );
+        }
+        return $fromResult;
+    }
+
+    /**
+     * @param array $recipients
+     * @return array
+     *
+     */
+    function resolveAdresses($recipients){
+        $realRecipients = array();
+        // Recipients can be either AbstractAjxpUser objects, either array(adress, name), either "adress".
+        foreach($recipients as $recipient){
+            if(is_object($recipient) && is_a($recipient, "AbstractAjxpUser")){
+                $resolved = $this->abstractUserToAdress($recipient);
+                if($resolved !== false){
+                    $realRecipients[] = $resolved;
+                }
+            }else if(is_array($recipient)){
+                if(array_key_exists("adress", $recipient)){
+                    if(!array_key_exists("name", $recipient)){
+                        $recipient["name"] = $recipient["name"];
+                    }
+                    $realRecipients[] = $recipient;
+                }
+            }else if(is_string($recipient)){
+                if(strpos($recipient, ":") !== false){
+                    $parts = explode(":", $recipient, 2);
+                    $realRecipients[] = array("name" => $parts[0], "adress" => $parts[2]);
+                }else{
+                    if($this->validateEmail($recipient)){
+                        $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
+                    }else if(AuthService::userExists($recipient)){
+                        $user = ConfService::getConfStorageImpl()->createUserObject($recipient);
+                        $res = $this->abstractUserToAdress($user);
+                        if($res !== false) $realRecipients[] = $res;
+                    }
+                }
+            }
+        }
+
+        return $realRecipients;
+    }
+
+    function abstractUserToAdress(AbstractAjxpUser $user){
+        // TODO
+        // SHOULD CHECK THAT THIS USER IS "AUTHORIZED" TO AVOID SPAM
+        $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+        if(empty($userEmail)) {
+            return false;
+        }
+        $displayName = $user->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+        if(empty($displayName)) $displayName = $user->getId();
+        return array("name" => $displayName, "adress" => $userEmail);
     }
 
 

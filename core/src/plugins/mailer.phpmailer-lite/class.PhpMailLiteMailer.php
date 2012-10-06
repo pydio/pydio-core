@@ -29,41 +29,16 @@ class PhpMailLiteMailer extends AjxpMailer {
 
     public function sendMail($recipients, $subject, $body, $from = null){
         require("lib/class.phpmailer-lite.php");
-        $realRecipients = array();
-        // Recipients can be either AbstractAjxpUser objects, either array(adress, name), either "adress".
-        foreach($recipients as $recipient){
-            if(is_object($recipient) && is_a($recipient, "AbstractAjxpUser")){
-                $userEmail = $recipient->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
-                if(empty($userEmail)) {
-                    continue;
-                }
-                $displayName = $recipient->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
-                if(empty($displayName)) $displayName = $recipient->getId();
-                $realRecipients[] = array("name" => $displayName, "adress" => $userEmail);
-            }else if(is_array($recipient)){
-                if(array_key_exists("adress", $recipient)){
-                    if(!array_key_exists("name", $recipient)){
-                        $recipient["name"] = $recipient["name"];
-                    }
-                    $realRecipients[] = $recipient;
-                }
-            }else if(is_string($recipient)){
-                if(strpos($recipient, ":") !== false){
-                    $parts = explode(":", $recipient, 2);
-                    $realRecipients[] = array("name" => $parts[0], "adress" => $parts[2]);
-                }else{
-                    $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
-                }
-            }
-        }
+        $realRecipients = $this->resolveAdresses($recipients);
 
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
 		$mail = new PHPMailerLite(true);
 		$mail->Mailer = $this->pluginConf["MAILER"];
-        if($from == null){
-            $mail->SetFrom(trim($this->pluginConf["FROM"]), trim($this->pluginConf["FROM_NAME"]));
+        $from = $this->resolveFrom($from);
+        if($from["adress"] != $from["name"]){
+            $mail->SetFrom($from["adress"], $from["name"]);
         }else{
-            $mail->setFrom($from);
+            $mail->setFrom($from["adress"]);
         }
 		foreach ($realRecipients as $address){
             if($address["adress"] == $address["name"]){

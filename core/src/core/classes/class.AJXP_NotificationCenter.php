@@ -119,7 +119,7 @@ class AJXP_NotificationCenter
         $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
         $mailer = new AjxpMailer("id", "basedir");
         if(count($mailers)){
-            $mailer = $mailers[0];
+            $mailer = array_pop($mailers);
             try{
                 $mailer->sendMail(
                     array($notification->getTarget()),
