@@ -72,6 +72,9 @@ Class.create("AjxpMailer", {
         var connexion = new Connexion();
         connexion.setMethod("post");
         connexion.setParameters(params);
+        connexion.onComplete = function(transport){
+            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+        };
         connexion.sendSync();
     }
 

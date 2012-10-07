@@ -26,10 +26,10 @@ class MetaWatchRegister extends AJXP_Plugin{
     public static $META_WATCH_CHANGE = "META_WATCH_CHANGE";
     public static $META_WATCH_READ = "META_WATCH_READ";
     public static $META_WATCH_BOTH = "META_WATCH_BOTH";
-    private static $META_WATCH_NAMESPACE = "META_WATCH";
+    public static $META_WATCH_NAMESPACE = "META_WATCH";
 
     public static $META_WATCH_USERS = "META_WATCH_USERS";
-    private static $META_WATCH_USERS_NAMESPACE = "META_WATCH_USERS";
+    public static $META_WATCH_USERS_NAMESPACE = "META_WATCH_USERS";
 
     /**
      * @var MetaStoreProvider
@@ -154,9 +154,10 @@ class MetaWatchRegister extends AJXP_Plugin{
     /**
      * @param AJXP_Node $node
      * @param $userId
+     * @param string $ns Watch namespace
      * @return string|bool the type of watch
      */
-    public function hasWatchOnNode($node, $userId, $ns = "META_WATCH_USERS"){
+    public function hasWatchOnNode($node, $userId, $ns = "META_WATCH"){
 
         $meta = $this->metaStore->retrieveMetadata(
             $node,
