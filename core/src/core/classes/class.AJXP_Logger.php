@@ -74,7 +74,17 @@ class AJXP_Logger {
 		}		
 		$logger->write($message, LOG_LEVEL_INFO);		
 	}
-	
+
+    public static function getClientAdress(){
+        if(isSet($_SERVER['REMOTE_ADDR'])){
+            $msg = $_SERVER['REMOTE_ADDR'];
+        }else if(php_sapi_name() == "cli"){
+            $msg = "PHP_CLI";
+        }else{
+            $msg = "Unknown Origin";
+        }
+        return $msg;
+    }
 	
 	/**
 	 * returns an instance of the AJXP_Logger object
