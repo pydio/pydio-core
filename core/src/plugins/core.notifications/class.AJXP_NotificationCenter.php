@@ -30,11 +30,12 @@ class AJXP_NotificationCenter extends AJXP_Plugin
      */
     static private $instance;
     private $userId;
-    private $useQueue = true ;
+    private $useQueue = false ;
 
     public function init($options){
         parent::init($options);
         $this->userId = AuthService::getLoggedUser() !== null ? AuthService::getLoggedUser()->getId() : "shared";
+        $this->useQueue = $this->pluginConf["USE_QUEUE"];
     }
 
     /**
