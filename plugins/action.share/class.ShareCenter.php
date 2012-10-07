@@ -197,6 +197,11 @@ class ShareCenter extends AJXP_Plugin{
                     $hash = md5(serialize($data));
                     if($this->watcher !== false && isSet($httpVars["watch_link"])){
                         // TODO : WATCH FOR THIS FILE ON THIS USER!!!
+                        $this->watcher->setWatchOnFolder(
+                            new AJXP_Node($this->urlBase.$file),
+                            AuthService::getLoggedUser()->getId(),
+                            MetaWatchRegister::$META_WATCH_USER.":".$hash
+                        );
                     }
 	                header("Content-type:text/plain");
 	                echo $url;

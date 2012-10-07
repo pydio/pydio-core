@@ -41,8 +41,12 @@ class AJXP_VarsFilter {
 			if(AuthService::usersEnabled()){
 				$loggedUser = AuthService::getLoggedUser();
 				if($loggedUser != null){
-					$loggedUser = $loggedUser->getId();
-					$value = str_replace("AJXP_USER", $loggedUser, $value);
+                    if($loggedUser->hasParent() && $loggedUser->getResolveAsParent()){
+                        $loggedUserId = $loggedUser->getParent();
+                    }else{
+                        $loggedUserId = $loggedUser->getId();
+                    }
+					$value = str_replace("AJXP_USER", $loggedUserId, $value);
 				}else{
 					return "";
 				}
