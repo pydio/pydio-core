@@ -39,6 +39,7 @@ abstract class AbstractAjxpUser
 	var $bookmarks;
 	var $version;
 	var $parentUser;
+    var $resolveAsParent = false;
 
     var $groupPath = "/";
     /**
@@ -395,6 +396,16 @@ abstract class AbstractAjxpUser
         if(strpos($r1, "AJXP_USR_") === 0) return 1;
         if(strpos($r2, "AJXP_USR_") === 0) return -1;
         return 0;
+    }
+
+    public function setResolveAsParent($resolveAsParent)
+    {
+        $this->resolveAsParent = $resolveAsParent;
+    }
+
+    public function getResolveAsParent()
+    {
+        return $this->resolveAsParent;
     }
 
 }

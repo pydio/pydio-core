@@ -237,6 +237,7 @@ class AuthService
         $temporaryUser->mergedRole = $parentUser->mergedRole;
         $temporaryUser->setGroupPath($parentUser->getGroupPath());
         $temporaryUser->setParent($parentUserId);
+        $temporaryUser->setResolveAsParent(true);
         AJXP_Logger::logAction("Log in", array("temporary user" => $temporaryUserId, "owner" => $parentUserId));
         self::updateUser($temporaryUser);
         register_shutdown_function(array("AuthService", "clearTemporaryUser"), $temporaryUserId);
