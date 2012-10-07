@@ -80,8 +80,8 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     public function consumeQueue($action, $httpVars, $fileVars){
         if($action != "consume_notification_queue") return;
         $queueObjects = ConfService::getConfStorageImpl()->consumeQueue("user_notifications");
-        AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
         if(is_array($queueObjects)){
+            AJXP_Logger::debug("Processing notification queue, ".count($queueObjects)." notifs to handle");
             foreach($queueObjects as $notification){
                 $this->dispatch($notification);
             }

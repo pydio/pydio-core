@@ -196,11 +196,11 @@ class ShareCenter extends AJXP_Plugin{
                     }
                     $hash = md5(serialize($data));
                     if($this->watcher !== false && isSet($httpVars["watch_link"])){
-                        // TODO : WATCH FOR THIS FILE ON THIS USER!!!
                         $this->watcher->setWatchOnFolder(
                             new AJXP_Node($this->urlBase.$file),
                             AuthService::getLoggedUser()->getId(),
-                            MetaWatchRegister::$META_WATCH_USER.":".$hash
+                            MetaWatchRegister::$META_WATCH_USERS,
+                            array($hash)
                         );
                     }
 	                header("Content-type:text/plain");
@@ -224,12 +224,6 @@ class ShareCenter extends AJXP_Plugin{
                     );
                 }
                 $elementWatch = false;
-                if($this->watcher != false){
-                    $elementWatch = $this->watcher->hasWatchOnNode(
-                        $node,
-                        AuthService::getLoggedUser()->getId()
-                    );
-                }
                 if(count($metadata)){
                     header("Content-type:application/json");
 
@@ -243,31 +237,40 @@ class ShareCenter extends AJXP_Plugin{
                         }else{
                             $link = $this->buildPublicletLink($metadata["element"]);
                         }
+                        if($this->watcher != false){
+                            $elementWatch = $this->watcher->hasWatchOnNode(
+                                $node,
+                                AuthService::getLoggedUser()->getId(),
+                                MetaWatchRegister::$META_WATCH_USERS
+                            );
+                        }
                         $jsonData = array(
-                                         "publiclet_link"   => $link,
-                                         "download_counter" => PublicletCounter::getCount($metadata["element"]),
-                                         "download_limit"   => $pData["DOWNLOAD_LIMIT"],
-                                         "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
-                                         "has_password"     => (!empty($pData["PASSWORD"])),
-                                         "element_watch"    => $elementWatch
-                                         );
+                             "publiclet_link"   => $link,
+                             "download_counter" => PublicletCounter::getCount($metadata["element"]),
+                             "download_limit"   => $pData["DOWNLOAD_LIMIT"],
+                             "expire_time"      => ($pData["EXPIRE_TIME"]!=0?date($messages["date_format"], $pData["EXPIRE_TIME"]):0),
+                             "has_password"     => (!empty($pData["PASSWORD"])),
+                             "element_watch"    => $elementWatch
+                             );
                     }else if( $elementType == "repository"){
                         $repoId = $metadata["element"];
                         $repo = ConfService::getRepositoryById($repoId);
                         if($repo->getOwner() != AuthService::getLoggedUser()->getId()){
                             throw new Exception("You are not allowed to access this data");
                         }
-
+                        if($this->watcher != false){
+                            $elementWatch = $this->watcher->hasWatchOnNode(
+                                new AJXP_Node($this->baseProtocol."://".$repoId."/"),
+                                AuthService::getLoggedUser()->getId()
+                            );
+                        }
                         $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId);
 
                         $jsonData = array(
                             "repositoryId"  => $repoId,
                             "label"         => $repo->getDisplay(),
                             "entries"       => $sharedEntries,
-                            "element_watch" => $this->watcher->hasWatchOnNode(
-                                new AJXP_Node($this->baseProtocol."://".$repoId."/"),
-                                AuthService::getLoggedUser()->getId()
-                            )
+                            "element_watch" => $elementWatch
                         );
                     }
                     echo json_encode($jsonData);
@@ -561,7 +564,9 @@ class ShareCenter extends AJXP_Plugin{
                 $params["PLUGINS_DATA"] = $data["PLUGINS_DATA"];
             }
             AJXP_Controller::findActionAndApply($data["ACTION"], $params, null);
+            register_shutdown_function(array("AuthService", "clearTemporaryUser"), $hash);
         }catch (Exception $e){
+            AuthService::clearTemporaryUser($hash);
         	die($e->getMessage());
         }
     }

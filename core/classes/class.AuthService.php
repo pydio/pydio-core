@@ -240,12 +240,17 @@ class AuthService
         $temporaryUser->setResolveAsParent(true);
         AJXP_Logger::logAction("Log in", array("temporary user" => $temporaryUserId, "owner" => $parentUserId));
         self::updateUser($temporaryUser);
-        register_shutdown_function(array("AuthService", "clearTemporaryUser"), $temporaryUserId);
     }
 
     static function clearTemporaryUser($temporaryUserId){
         AJXP_Logger::logAction("Log out", array("temporary user"), $temporaryUserId);
-        self::disconnect();
+        if(isSet($_SESSION["AJXP_USER"])){
+            AJXP_Logger::logAction("Log Out");
+            unset($_SESSION["AJXP_USER"]);
+            if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
+                AJXP_Safe::clearCredentials();
+            }
+        }
     }
 
     /**
