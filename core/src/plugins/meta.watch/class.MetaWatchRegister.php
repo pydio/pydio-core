@@ -26,8 +26,10 @@ class MetaWatchRegister extends AJXP_Plugin{
     public static $META_WATCH_CHANGE = "META_WATCH_CHANGE";
     public static $META_WATCH_READ = "META_WATCH_READ";
     public static $META_WATCH_BOTH = "META_WATCH_BOTH";
-    public static $META_WATCH_USER = "META_WATCH_USER";
     private static $META_WATCH_NAMESPACE = "META_WATCH";
+
+    public static $META_WATCH_USERS = "META_WATCH_USERS";
+    private static $META_WATCH_USERS_NAMESPACE = "META_WATCH_USERS";
 
     /**
      * @var MetaStoreProvider
@@ -57,54 +59,94 @@ class MetaWatchRegister extends AJXP_Plugin{
 
     /**
      * @param AJXP_Node $node
-     * @param $userId
-     * @param $watchType
+     * @param string $userId
+     * @param string $watchType
+     * @param array $targetUsers Optional list of specific users to watch
      */
-    public function setWatchOnFolder($node, $userId, $watchType){
+    public function setWatchOnFolder($node, $userId, $watchType, $targetUsers = array()){
 
-        $meta = $this->metaStore->retrieveMetadata(
-            $node,
-            self::$META_WATCH_NAMESPACE,
-            false,
-            AJXP_METADATA_SCOPE_REPOSITORY
-        );
-        if(isSet($meta) && isSet($meta[$userId])){
-            unset($meta[$userId]);
-            $this->metaStore->removeMetadata(
-                $node,
-                self::$META_WATCH_NAMESPACE,
-                false,
-                AJXP_METADATA_SCOPE_REPOSITORY
-            );
-        }
-        $meta[$userId] = $watchType;
-        if(count($meta)){
+        if($watchType == self::$META_WATCH_USERS && count($targetUsers)){
+            $usersMeta = $this->metaStore->retrieveMetadata($node, self::$META_WATCH_USERS_NAMESPACE);
+            if(is_array($usersMeta) && is_array($usersMeta[$userId])){
+                $usersMeta[$userId] = array_merge($usersMeta[$userId], $targetUsers);
+            }else{
+                if(!is_array($usersMeta)) $usersMeta = array();
+                $usersMeta[$userId] = $targetUsers;
+            }
             $this->metaStore->setMetadata(
                 $node,
-                self::$META_WATCH_NAMESPACE,
-                $meta,
+                self::$META_WATCH_USERS_NAMESPACE,
+                $usersMeta,
                 false,
                 AJXP_METADATA_SCOPE_REPOSITORY
             );
+        }else{
+            $meta = $this->metaStore->retrieveMetadata(
+                $node,
+                self::$META_WATCH_NAMESPACE,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
+            if(isSet($meta) && isSet($meta[$userId])){
+                unset($meta[$userId]);
+                $this->metaStore->removeMetadata(
+                    $node,
+                    self::$META_WATCH_NAMESPACE,
+                    false,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+            }
+            $meta[$userId] = $watchType;
+            if(count($meta)){
+                $this->metaStore->setMetadata(
+                    $node,
+                    self::$META_WATCH_NAMESPACE,
+                    $meta,
+                    false,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+            }
         }
-
     }
 
     /**
      * @param AJXP_Node $node
      * @param $userId
+     * @param bool $clearUsers
      */
-    public function removeWatchFromFolder($node, $userId){
+    public function removeWatchFromFolder($node, $userId, $clearUsers = false){
 
-        $meta = $this->metaStore->retrieveMetadata(
-            $node,
-            self::$META_WATCH_NAMESPACE,
-            false,
-            AJXP_METADATA_SCOPE_REPOSITORY
-        );
-        if(isSet($meta) && isSet($meta[$userId])){
-            unset($meta[$userId]);
-            $this->metaStore->removeMetadata($node, self::$META_WATCH_NAMESPACE, false, AJXP_METADATA_SCOPE_REPOSITORY);
+        if($clearUsers){
+            $usersMeta = $this->metaStore->retrieveMetadata(
+                $node,
+                self::$META_WATCH_USERS_NAMESPACE,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
+            if(isSet($usersMeta) && isSet($usersMeta[$userId])){
+                $this->metaStore->removeMetadata(
+                    $node,
+                    self::$META_WATCH_USERS_NAMESPACE,
+                    false,
+                    AJXP_METADATA_SCOPE_REPOSITORY);
+            }
+        }else{
+
+            $meta = $this->metaStore->retrieveMetadata(
+                $node,
+                self::$META_WATCH_NAMESPACE,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
+            if(isSet($meta) && isSet($meta[$userId])){
+                $this->metaStore->removeMetadata(
+                    $node,
+                    self::$META_WATCH_NAMESPACE,
+                    false,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+            }
+
         }
 
     }
@@ -114,11 +156,11 @@ class MetaWatchRegister extends AJXP_Plugin{
      * @param $userId
      * @return string|bool the type of watch
      */
-    public function hasWatchOnNode($node, $userId){
+    public function hasWatchOnNode($node, $userId, $ns = "META_WATCH_USERS"){
 
         $meta = $this->metaStore->retrieveMetadata(
             $node,
-            self::$META_WATCH_NAMESPACE,
+            $ns,
             false,
             AJXP_METADATA_SCOPE_REPOSITORY
         );
@@ -139,9 +181,24 @@ class MetaWatchRegister extends AJXP_Plugin{
             false,
             AJXP_METADATA_SCOPE_REPOSITORY
         );
-        if(isSet($meta)){
+        if(AuthService::getLoggedUser() != null){
+            $usersMeta = $this->metaStore->retrieveMetadata(
+                $node,
+                self::$META_WATCH_USERS_NAMESPACE,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY
+            );
+        }
+        if(isSet($meta) && is_array($meta)){
             foreach($meta as $id => $type){
                 if($type == $watchType || $type == self::$META_WATCH_BOTH){
+                    $IDS[] = $id;
+                }
+            }
+        }
+        if(isSet($usersMeta) && is_array($usersMeta)){
+            foreach($usersMeta as $id => $targetUsers){
+                if(in_array(AuthService::getLoggedUser()->getId(), $targetUsers)){
                     $IDS[] = $id;
                 }
             }
