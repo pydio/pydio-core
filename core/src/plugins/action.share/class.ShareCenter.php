@@ -195,17 +195,44 @@ class ShareCenter extends AJXP_Plugin{
                         );
                     }
                     $hash = md5(serialize($data));
-                    if($this->watcher !== false && isSet($httpVars["watch_link"])){
-                        $this->watcher->setWatchOnFolder(
-                            new AJXP_Node($this->urlBase.$file),
-                            AuthService::getLoggedUser()->getId(),
-                            MetaWatchRegister::$META_WATCH_USERS,
-                            array($hash)
-                        );
-                    }
 	                header("Content-type:text/plain");
 	                echo $url;
             	}
+            break;
+
+            case "toggle_link_watch":
+
+                $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                $watchValue = $httpVars["set_watch"] == "true" ? true : false;
+                $node = new AJXP_Node($this->urlBase.$file);
+                $metadata = $this->metaStore->retrieveMetadata(
+                    $node,
+                    "ajxp_shared",
+                    true,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+                $elementId = $metadata["element"];
+
+                if($this->watcher !== false){
+                    if($watchValue){
+                        $this->watcher->setWatchOnFolder(
+                            $node,
+                            AuthService::getLoggedUser()->getId(),
+                            MetaWatchRegister::$META_WATCH_USERS,
+                            array($elementId)
+                        );
+                    }else{
+                        $this->watcher->removeWatchFromFolder(
+                            $node,
+                            AuthService::getLoggedUser()->getId(),
+                            true
+                        );
+                    }
+                }
+                AJXP_XMLWriter::header();
+                AJXP_XMLWriter::sendMessage("Successfully updated watch status", null);
+                AJXP_XMLWriter::close();
+
             break;
 
             case "load_shared_element_data":
@@ -261,7 +288,8 @@ class ShareCenter extends AJXP_Plugin{
                         if($this->watcher != false){
                             $elementWatch = $this->watcher->hasWatchOnNode(
                                 new AJXP_Node($this->baseProtocol."://".$repoId."/"),
-                                AuthService::getLoggedUser()->getId()
+                                AuthService::getLoggedUser()->getId(),
+                                MetaWatchRegister::$META_WATCH_NAMESPACE
                             );
                         }
                         $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId);
@@ -617,7 +645,8 @@ class ShareCenter extends AJXP_Plugin{
                 if($this->watcher !== false){
                     $entry["WATCH"] = $this->watcher->hasWatchOnNode(
                         new AJXP_Node($this->baseProtocol."://".$repoId."/"),
-                        $userId
+                        $userId,
+                        MetaWatchRegister::$META_WATCH_NAMESPACE
                     );
                 }
                 if(!$mixUsersAndGroups){

@@ -453,8 +453,8 @@ textarea#myCode
 }
 
 .largeButton{
-    padding: 4px;
-    font-size: 13px;
+    padding: 2px 4px 1px;
+    font-size: 12px;
     text-align: center;
     border: 1px solid #A7A7A7;
     -webkit-border-radius: 4px;
@@ -463,6 +463,9 @@ textarea#myCode
     cursor: pointer;
     text-shadow: 1px 1px 1px white;
     box-shadow: inset 1px 1px 1px white;
+    width: 95px;
+    display: inline-block !important;
+    margin: 0 6px;
 }
 .largeButton img{
     width:16px;
@@ -615,9 +618,9 @@ div.accordion_content{
 div.dialogContentMainTitle{
     color: #2B70BE;
     font-size: 20px;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
     border-bottom: 1px solid #2B70BE;
-    padding-bottom: 6px;
+    padding-bottom: 0px;
 }
 
 div.oneFieldForm{

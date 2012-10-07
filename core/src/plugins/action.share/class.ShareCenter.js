@@ -25,17 +25,20 @@ Class.create("ShareCenter", {
         var userSelection = ajaxplorer.getUserSelection();
         this.currentNode = userSelection.getUniqueNode();
         if(userSelection.hasDir() && !userSelection.hasMime($A(['ajxp_browsable_archive']))){
-            this.shareRepository(userSelection);
+            this.shareRepository();
         }else{
             this.shareFile(userSelection);
         }
     },
 
-    shareRepository : function(userSelection){
+    shareRepository : function(reload){
 
         var loadFunc = function(oForm){
 
-            var nodeMeta = userSelection.getUniqueNode().getMetadata();
+            if(reload){
+                addLightboxMarkupToElement(oForm.up(".dialogContent"));
+            }
+            var nodeMeta = this.currentNode.getMetadata();
             if(nodeMeta.get("ajxp_shared")){
                 // Reorganize
                 var repoFieldset = oForm.down('div#target_repository');
@@ -62,7 +65,7 @@ Class.create("ShareCenter", {
                     '</div>'
                 });
             };
-            oForm.down('#repo_label').setValue(getBaseName(userSelection.getUniqueNode().getPath()));
+            oForm.down('#repo_label').setValue(getBaseName(this.currentNode.getPath()));
             if(!$('share_folder_form').autocompleter){
                 var pref = ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_TMP_PREFIX");
                 $('share_folder_form').autocompleter = new AjxpUsersCompleter(
@@ -83,9 +86,9 @@ Class.create("ShareCenter", {
             this._currentRepositoryId = null;
             if(nodeMeta.get("ajxp_shared")){
                 oForm.down('div#share_unshare').show();
-                oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
+                oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
                 oForm.down('#complete_indicator').show();
-                this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
+                this.loadSharedElementData(this.currentNode, function(json){
                     oForm.down('input#repo_label').value = json['label'];
                     this._currentRepositoryId = json['repositoryId'];
                     oForm.down('#complete_indicator').hide();
@@ -96,6 +99,10 @@ Class.create("ShareCenter", {
                     });
                     if(json["element_watch"]){
                         oForm.down("#watch_folder").checked = true;
+                    }
+                    if(reload){
+                        removeLightboxFromElement(oForm.up(".dialogContent"));
+                        ajaxplorer.fireContextRefresh();
                     }
                 }.bind(this));
             }else{
@@ -172,11 +179,15 @@ Class.create("ShareCenter", {
                     }else{
                         ajaxplorer.displayMessage('SUCCESS', MessageHash['share_center.18']);
                     }
-                    ajaxplorer.fireContextRefresh();
-                    hideLightBox(true);
+                    //hideLightBox(true);
+                    this.currentNode.getMetadata().set("ajxp_shared", true);
+                    this.shareRepository(true);
                 }else{
                     var messages = {100:349, 101:352, 102:350, 103:351};
                     ajaxplorer.displayMessage('ERROR', MessageHash[messages[response]]);
+                    if(response == 101){
+                        oForm.down("#repo_label").focus();
+                    }
                 }
             }.bind(this);
             conn.sendAsync();
@@ -201,7 +212,7 @@ Class.create("ShareCenter", {
                     barPosition:'bottom',
                     minchar : 0
                 });
-                var nodeMeta = userSelection.getUniqueNode().getMetadata();
+                var nodeMeta = this.currentNode.getMetadata();
                 if(nodeMeta.get("ajxp_shared")){
                     oForm.down('div#share_unshare').show();
                     //oForm.down('div#share_optional_fields').hide();
@@ -209,7 +220,7 @@ Class.create("ShareCenter", {
                     oForm.down('div#share_result').show();
                     //oForm.down('div#share_result legend').update(MessageHash[296]);
                     oForm.down('div#generate_indicator').show();
-                    this.loadSharedElementData(userSelection.getUniqueNode(), function(json){
+                    this.loadSharedElementData(this.currentNode, function(json){
                         oForm.down('[id="share_container"]').value = json['publiclet_link'];
                         oForm.down('div#generate_indicator').hide();
                         var optionsPane = oForm.down('div#share_optional_fields');
@@ -234,12 +245,12 @@ Class.create("ShareCenter", {
                         }
 
                     }.bind(this));
-                    oForm.down('div[id="unshare_button"]').observe("click", this.performUnshareAction.bind(this));
                     this.updateDialogButtons(oForm.down("div.dialogButtons"), "file");
                 }else{
                     var button = $(oForm).down('div#generate_publiclet');
                     button.observe("click", this.generatePublicLinkCallback.bind(this));
                 }
+                oForm.down('#unshare_button').observe("click", this.performUnshareAction.bind(this));
             }.bind(this),
             function(oForm){
                 oForm.down('div#generate_publiclet').stopObserving("click");
@@ -264,12 +275,11 @@ Class.create("ShareCenter", {
     },
 
     performUnshareAction : function(){
-        var userSelection = ajaxplorer.getUserSelection();
         modal.getForm().down("img#stop_sharing_indicator").src=window.ajxpResourcesFolder+"/images/autocompleter-loader.gif";
         var conn = new Connexion();
         conn.addParameter("get_action", "unshare");
-        conn.addParameter("file", userSelection.getUniqueNode().getPath());
-        conn.addParameter("element_type", userSelection.getUniqueNode().isLeaf()?"file":"repository");
+        conn.addParameter("file", this.currentNode.getPath());
+        conn.addParameter("element_type", this.currentNode.isLeaf()?"file":"repository");
         conn.onComplete = function(){
             var oForm = modal.getForm();
             if(oForm.down('div#generate_publiclet')){
@@ -322,12 +332,14 @@ Class.create("ShareCenter", {
             new Effect.Fade(oForm.down('div[id="share_generate"]'), {
                 duration:0.5,
                 afterFinish : function(){
+                    oThis.updateDialogButtons(oForm.down("div.dialogButtons"), "file");
+                    oForm.down('#share_unshare').show();
+                    oForm.down('#share_optional_fields').select("input").each(function(el){el.disabled = true;});
                     modal.refreshDialogAppearance();
                     new Effect.Appear(oForm.down('div[id="share_result"]'), {
                         duration:0.5,
                         afterFinish : function(){
                             cont.select();
-                            oThis.updateDialogButtons(oForm.down("div.dialogButtons"), "file");
                             modal.refreshDialogAppearance();
                             modal.setCloseAction(function(){
                                 ajaxplorer.fireContextRefresh();
@@ -347,18 +359,27 @@ Class.create("ShareCenter", {
                 dialogButtons.down("#watch_folder").observe("change", function(event){
                     var conn = new Connexion();
                     conn.setParameters({
-                        get_action: "toggle_watch",
-                        watch_action : event.target.checked ?  "watch_change" : "watch_stop_change",
+                        get_action: "toggle_link_watch",
+                        set_watch : event.target.checked ?  "true" : "false",
                         file : this.currentNode.getPath()
                     });
+                    conn.onComplete = function(transport){
+                        ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                    }
                     conn.sendAsync();
                 }.bind(this));
             }
         }
         if(ajaxplorer.hasPluginOfType("mailer")){
             var oForm = dialogButtons.parentNode;
-            dialogButtons.insert({top:'<input type="image" name="mail" src="plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png" height="22" width="22" title="Notify by email..." class="dialogButton dialogFocus">'});
-            dialogButtons.down('input[name="mail"]').observe("click", function(event){
+            var unShare = oForm.down("#unshare_button");
+            var mailerButton = unShare.cloneNode(true);
+            mailerButton.writeAttribute("title", "Send invitations by email to the users you have shared this file with.");
+            mailerButton.down("span").update("Invitations");
+            mailerButton.down("img").writeAttribute("src","plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png");
+            unShare.insert({after:mailerButton});
+            //dialogButtons.insert({top:'<input type="image" name="mail" src="plugins/gui.ajax/res/themes/umbra/images/actions/22/mail_generic.png" height="22" width="22" title="Notify by email..." class="dialogButton dialogFocus">'});
+            mailerButton.observe("click", function(event){
                 Event.stop(event);
                 if(shareType == "file"){
                     var message = "AjaXplorer user is sharing a link with you! \n\n " + oForm.down('[id="share_container"]').getValue();
@@ -368,7 +389,7 @@ Class.create("ShareCenter", {
                 var mailer = new AjxpMailer();
                 var usersList = null;
                 if(shareType) usersList = oForm.down(".editable_users_list");
-                modal.showSimpleModal(dialogButtons.up(".dialogContent"), mailer.buildMailPane("AjaXplorer Share", message, usersList, "Send invitation"), function(){
+                modal.showSimpleModal(oForm.up(".dialogContent"), mailer.buildMailPane("AjaXplorer Share", message, usersList, "Send invitation"), function(){
                     mailer.postEmail();
                     return true;
                 },function(){

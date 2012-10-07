@@ -47,8 +47,16 @@ class AjxpMailer extends AJXP_Plugin
         $subject = $httpVars["subject"];
         $body = $httpVars["message"];
 
-        $mailer->sendMail($emails, $subject, $body, $from);
-
+        if(count($emails)){
+            $mailer->sendMail($emails, $subject, $body, $from);
+            AJXP_XMLWriter::header();
+            AJXP_XMLWriter::sendMessage("Email sent succsesfully to ".count($emails)." users", null);
+            AJXP_XMLWriter::close();
+        }else{
+            AJXP_XMLWriter::header();
+            AJXP_XMLWriter::sendMessage(null, "No email adresses fonud to send the email!");
+            AJXP_XMLWriter::close();
+        }
     }
 
     function resolveFrom($fromAdress = null){
