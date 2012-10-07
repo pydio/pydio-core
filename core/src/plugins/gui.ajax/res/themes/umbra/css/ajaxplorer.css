@@ -881,7 +881,8 @@ div.editor_header{
 }
 
 div.editor_header > div.editor_action_bar {
-    float: right;
+    position: absolute;
+    right: 0;
     padding-right: 8px;
     background: none;
     padding-top: 15px;
@@ -895,7 +896,7 @@ div.editor_header > div.editor_action_bar > div.separator{
 
 div.editor_header > span.header_label{
     font-size: 24px;
-    width: 52%;
+    width: 100%;
     padding: 15px 0 0 62px;
     display: inline-block;
     background-image: url('../images/mimes/64/user-acl.png');
@@ -903,6 +904,7 @@ div.editor_header > span.header_label{
     background-repeat: no-repeat;
     background-position: 14px 9px;
     text-shadow: 1px 1px 5px black;
+    overflow: visible;
 }
 
 .action_bar.text_only{

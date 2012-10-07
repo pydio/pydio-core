@@ -343,7 +343,7 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role,group,user,user_editable" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="role,group,user,user_editable,repository,repository_editable" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
@@ -368,7 +368,7 @@
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="change" inZip="false">
 				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="repository,repository_editable,ajxp_plugin" behaviour="hidden"></selectionContext></gui>
+				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="ajxp_plugin" behaviour="hidden"></selectionContext></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""></rightsContext>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
