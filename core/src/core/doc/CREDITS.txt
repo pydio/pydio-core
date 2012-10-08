@@ -40,7 +40,7 @@ Translators : see mention in translation files
 	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
 	
 [Core PHP Classes]
-	EZC WebDAV Backend http://www.ezcomponents.org/ (New BSD)
+	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
 	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)
 	Pclzip : http://www.phpconcept.net/pclzip/ (LGPL)
 
