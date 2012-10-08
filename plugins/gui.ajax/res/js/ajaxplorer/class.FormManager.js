@@ -315,7 +315,7 @@ Class.create("FormManager", {
             url += "&" + param.get("binary_context");
         }
         if(!$("formManager_hidden_iframe")){
-            $$("body")[0].insert(new Element("iframe", {id:"formManager_hidden_iframe"}));
+            $('hidden_frames').insert(new Element("iframe", {id:"formManager_hidden_iframe", name:"formManager_hidden_iframe"}));
         }
         var paramName = param.get("name");
         var pane = new Element("div");
