@@ -715,7 +715,7 @@ class AJXP_Plugin implements Serializable{
             else $pInfo["plugin_uri"] = "N/A";
         }
         if($pInfo["plugin_uri"] != "N/A"){
-            $pInfo["plugin_uri"] = "<a href='".$pInfo["plugin_uri"]."' title='".$pInfo["plugin_uri"]."' target='_blank'>".substr($pInfo["plugin_uri"], 0, 20)."[...]</a>";
+            $pInfo["plugin_uri"] = "<a href='".$pInfo["plugin_uri"]."' title='".$pInfo["plugin_uri"]."' target='_blank'>".$pInfo["plugin_uri"]."</a>";
         }
         if($pInfo["core_packaged"]){
             unset($pInfo["plugin_version"]);
