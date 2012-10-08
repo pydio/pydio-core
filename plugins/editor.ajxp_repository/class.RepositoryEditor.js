@@ -57,6 +57,26 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
     save : function(){
         if(!this.isDirty()) return;
+
+        var toSubmit = new Hash();
+        toSubmit.set("action", "edit");
+        toSubmit.set("sub_action", "edit_repository_data");
+        toSubmit.set("repository_id", this.repositoryId);
+        var missing = this.formManager.serializeParametersInputs(this.infoPane, toSubmit, 'DRIVER_OPTION_', this.currentRepoIsTemplate);
+        if(missing && ! this.currentRepoIsTemplate){
+            ajaxplorer.displayMessage("ERROR", MessageHash['ajxp_conf.36']);
+        }else{
+            var conn = new Connexion();
+            conn.setParameters(toSubmit);
+            conn.setMethod("post");
+            conn.onComplete = function(transport){
+                ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                this.loadRepository(this.repositoryId);
+                this.setClean();
+            }.bind(this);
+            conn.sendAsync();
+        }
+
     },
 
     open : function($super, node){
@@ -144,6 +164,10 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
         if(this.infoPane.SF_accordion){
             this.infoPane.SF_accordion.openAll();
+            this.infoPane.select("div.SF_element").each(function(element){
+                element.select("input,textarea,select").invoke("observe", "change", this.setDirty.bind(this));
+                element.select("input,textarea").invoke("observe", "keydown", this.setDirty.bind(this));
+            }.bind(this) );
             var toggles = this.infoPane.select(".accordion_toggle");
             toggles.invoke("removeClassName", "accordion_toggle");
             toggles.invoke("removeClassName", "accordion_toggle_active");

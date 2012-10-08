@@ -321,10 +321,7 @@ Class.create("ShareCenter", {
         var oThis = this;
         conn.onComplete = function(transport){
             var cont = oForm.down('[id="share_container"]');
-            if(cont){
-                cont.setValue(transport.responseText);
-                cont.select();
-            }
+            cont.setValue(transport.responseText);
             var email = oForm.down('a[id="email"]');
             if (email){
                 email.setAttribute('href', 'mailto:unknown@unknown.com?Subject=UPLOAD&Body='+transport.responseText);

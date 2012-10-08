@@ -303,7 +303,7 @@ Class.create("RoleEditor", AbstractEditor, {
 
             // BUTTONS
             var buttonPane = this.element.down("#pane-infos").down("#account_actions");
-            var b0 = new Element("a", {className:'m-2'}).update(MessageHash["ajxp_role_editor.25"]);
+            var b0 = new Element("span", {className:'m-2'}).update(MessageHash["ajxp_role_editor.25"]);
             buttonPane.insert(b0);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b0.observe("click", function(){
@@ -342,7 +342,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 });
             }.bind(this));
             var locked = this.roleData.USER.LOCK ? true : false;
-            var b1 = new Element("a", {className:'m-2'}).update((locked?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
+            var b1 = new Element("span", {className:'m-2'}).update((locked?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
             buttonPane.insert(b1);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b1.observe("click", function(){
@@ -360,7 +360,7 @@ Class.create("RoleEditor", AbstractEditor, {
                 }.bind(this);
                 conn.sendAsync();
             }.bind(this) );
-            var b2 = new Element("a", {className:'m-2'}).update(MessageHash["ajxp_role_editor.28"]);
+            var b2 = new Element("span", {className:'m-2'}).update(MessageHash["ajxp_role_editor.28"]);
             buttonPane.insert(b2);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b2.observe("click", function(){

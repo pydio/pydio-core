@@ -307,7 +307,27 @@ Class.create("Modal", {
         box.insert(content);
         content.addClassName("dialogContent");
         addLightboxMarkupToElement(element);
-        $(element).down("#element_overlay").insert({after:box});
+        if(Prototype.Browser.IE){
+            $("all_forms").insert(box);
+            var outBox = element.up(".dialogBox");
+            if(outBox){
+                box.setStyle({
+                    display:"block",
+                    zIndex : outBox.getStyle("zIndex"),
+                    top: parseInt(outBox.getStyle('top')),
+                    left: parseInt(outBox.getStyle('left'))
+                });
+            }else{
+                box.setStyle({
+                    display:"block",
+                    zIndex : 2000,
+                    top: parseInt(element.getStyle('top')),
+                    left: parseInt(element.getStyle('left'))
+                });
+            }
+        }else{
+            $(element).down("#element_overlay").insert({after:box});
+        }
         this.currentLightBoxElement = $(element);
         this.currentLightBoxModal = box;
         this.addSubmitCancel(content, cancelCallback, (cancelCallback==null), position);

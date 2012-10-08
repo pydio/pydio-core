@@ -13,7 +13,7 @@
         </resources>
 	</client_settings>
 	<clientForm id="plugin_edit_box"><![CDATA[
-		<div id="plugin_edit_box" class="tabbed_editor" box_width="460" box_height="80%" box_resize="true" box_padding="0">
+		<div id="plugin_edit_box" class="tabbed_editor" box_width="560" box_height="80%" box_resize="true" box_padding="0">
 		    <div class="editor_header">
                 <div class="action_bar">
                     <a href="#" onclick="return false;" class="disabled" id="saveButton" onclick="return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a>

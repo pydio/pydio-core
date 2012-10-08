@@ -1,5 +1,5 @@
 div.tabbed_editor{
-    background-color: #195470;
+    background-color: #194172;
 }
 
 div.tabbed_editor div.editor_header{
@@ -172,27 +172,38 @@ div#parameters-selected span.list_remove_item{
     right: 0;
 }
 
-a.m-2 {
-    background: -webkit-gradient( linear, left top, left bottom, from(#2A93C5), to(#226C8F) );
+span.m-2 {
     border: 1px solid #14528f;
-	-webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
-	color: #fff;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
-	-webkit-transition: -webkit-box-shadow .1s linear;
-	-webkit-border-radius: 3px;
-	font: bold 11px "Helvetica Neue", Arial, Geneva, sans-serif;
-	padding: 4px 7px;
-	cursor: pointer;
-	display: inline-block;
+    display: inline-block;
+    -webkit-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
+    -moz-box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, .25);
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .25);
+    -webkit-transition: -webkit-box-shadow .1s linear;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    font: bold 11px "Helvetica Neue", Arial, Geneva, sans-serif;
+    padding: 4px 7px;
+    cursor: pointer;
 	text-decoration: none;
     margin-right: 8px;
+
+    background: #2a93c5; /* Old browsers */
+    background: -moz-linear-gradient(top, #2a93c5 0%, #226c8f 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2a93c5), color-stop(100%,#226c8f)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #2a93c5 0%,#226c8f 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #2a93c5 0%,#226c8f 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #2a93c5 0%,#226c8f 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #2a93c5 0%,#226c8f 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2a93c5', endColorstr='#226c8f',GradientType=0 ); /* IE6-9 */
 }
 
-a.m-2:hover {
+span.m-2:hover {
 	-webkit-box-shadow: 0 0 5px #6496ff;
 }
 
-a.m-2:active {
+span.m-2:active {
 	background: -webkit-gradient(
 			linear,
 			left top,
@@ -203,7 +214,7 @@ a.m-2:active {
 	-webkit-box-shadow: inset 0 0 5px rgba(255, 255, 255, .25);
 }
 
-a.m-2.disabled {
+span.m-2.disabled {
 	background: -webkit-gradient(
 			linear,
 			left top,
