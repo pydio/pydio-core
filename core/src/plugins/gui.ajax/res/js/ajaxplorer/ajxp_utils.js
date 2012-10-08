@@ -429,7 +429,16 @@ function XPathSelectSingleNode(element, query){
  */
 function XPathSelectNodes(element, query){
 	if(Prototype.Browser.IE){
-		return $A(element.selectNodes(query));
+        try{
+            if(element.ownerDocument){
+                element.ownerDocument.setProperty("SelectionLanguage", "XPath");
+            }else{
+                element.setProperty("SelectionLanguage", "XPath");
+            }
+        }catch(e){
+            if(console) console.log(e);
+        }
+        return $A(element.selectNodes(query));
 	}
 
     var xpe = window.__xpe;
