@@ -360,6 +360,7 @@
                         modal.openEditorDialog(editorData);
                     }
                 ]]></clientCallback>
+                <serverCallback methodName="switchAction"/>
             </processing>
         </action>
         <!--
