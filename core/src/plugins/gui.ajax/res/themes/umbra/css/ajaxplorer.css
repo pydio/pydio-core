@@ -3219,7 +3219,7 @@ td.ip_geo_cell{
 
 .pluginfo_list li {
     list-style: none;
-    padding: 2px 0;
+    padding: 5px 2px;
     overflow: hidden;
 }
 
