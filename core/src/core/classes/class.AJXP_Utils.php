@@ -656,6 +656,10 @@ class AJXP_Utils
      */
     static function detectServerURL()
     {
+        $setUrl = ConfService::getCoreConf("SERVER_URL");
+        if(!empty($setUrl)){
+            return $setUrl;
+        }
         $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http');
         $port = (($protocol === 'http' && $_SERVER['SERVER_PORT'] == 80 || $protocol === 'https' && $_SERVER['SERVER_PORT'] == 443)
                 ? "" : ":" . $_SERVER['SERVER_PORT']);
