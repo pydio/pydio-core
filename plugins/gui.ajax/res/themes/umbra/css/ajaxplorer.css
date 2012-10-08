@@ -1221,7 +1221,8 @@ a.carousel-control img{
    background-color: rgba(255, 255, 255, 0.7);
 }
 
-.inline_disabled img
+.inline_disabled img,
+.SF_disabled img
 {
 	filter:alpha(opacity=30);
 	opacity: 0.3;

@@ -45,7 +45,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         this.actions.get("saveButton").observe("click", this.save.bind(this) );
         modal.setCloseValidation(function(){
             if(this.isDirty()){
-                var confirm = window.confirm(MessageHash["ajxp_repository_editor.19"]);
+                var confirm = window.confirm(MessageHash["ajxp_role_editor.19"]);
                 if(!confirm) return false;
             }
             return true;
@@ -67,6 +67,13 @@ Class.create("RepositoryEditor", AbstractEditor, {
         }else{
             this.repositoryId = getBaseName(node.getPath());
             this.element.down("span.header_label").update(node.getMetadata().get("text"));
+            var icon = resolveImageSource(node.getIcon(), "/images/mimes/64");
+            this.element.down("span.header_label").setStyle(
+                {
+                    backgroundImage:"url('"+icon+"')",
+                    backgroundSize : '34px'
+                });
+
         }
         this.node = node;
         this.formManager = this.getFormManager();
@@ -146,7 +153,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             if(this.currentRepoWriteable){
                 this.feedMetaSourceForm(xmlData, this.metaPane);
             }else{
-                this.metaPane.update(MessageHash['ajxp_conf.88']);
+                this.metaPane.update(MessageHash['ajxp_repository_editor.15']);
             }
         }
 
@@ -182,22 +189,22 @@ Class.create("RepositoryEditor", AbstractEditor, {
                 accordionContent.insert(form);
                 var saveButton = null;
                 if(insertSave){
-                    accordionContent.insert("<div tabindex='0' name='edit_meta_source' class='largeButton disabled' style='width:100px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">Save</span></div>");
+                    accordionContent.insert("<div tabindex='0' name='edit_meta_source' class='largeButton SF_disabled' style='min-width:70px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">Save</span></div>");
                     saveButton = accordionContent.down("div[name='edit_meta_source']");
                 }
-                accordionContent.insert("<div  tabindex='0' name='delete_meta_source' class='largeButton' style='width:100px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\"><span class=\"title\">Remove</span></div>");
+                accordionContent.insert("<div  tabindex='0' name='delete_meta_source' class='largeButton' style='min-width:70px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/editdelete.png\"><span class=\"title\">Remove</span></div>");
                 metaPane.insert(title);
                 metaPane.insert(accordionContent);
                 if(saveButton){
                     form.select("div.SF_element").each(function(element){
                         element.select("input,textarea,select").invoke("observe", "change", function(event){
                             var but = Event.findElement(event, "div.accordion_content").down("div[name='edit_meta_source']");
-                            but.removeClassName("disabled");
+                            but.removeClassName("SF_disabled");
                             this.setDirty();
                         }.bind(this));
                         element.select("input,textarea").invoke("observe", "keydown", function(event){
                             var but = Event.findElement(event, "div.accordion_content").down("div[name='edit_meta_source']");
-                            but.removeClassName("disabled");
+                            but.removeClassName("SF_disabled");
                             this.setDirty();
                         }.bind(this));
                     }.bind(this) );
@@ -224,22 +231,30 @@ Class.create("RepositoryEditor", AbstractEditor, {
         }
 
         var addForm = new Element("div", {className:"metaPane"});
-        var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>"+MessageHash['ajxp_conf.12']+" :</div>");
+        var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>"+MessageHash['ajxp_repository_editor.12']+" :</div>");
         this.metaSelector = new Element("select", {name:'new_meta_source', className:'SF_input'});
         var choices = XPathSelectNodes(xmlData, 'admin_data/metasources/meta');
         this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
+        var prevType = "";
+        var currentGroup;
         for(var i=0;i<choices.length;i++){
             var id = choices[i].getAttribute("id");
+            var type = id.split(".").shift();
             var label = choices[i].getAttribute("label");
-            this.metaSelector.insert(new Element("option",{value:id}).update(label));
+            if(!currentGroup || type != prevType){
+                currentGroup = new Element("optgroup", {label:MessageHash["ajxp_repository_editor.9"].replace("%s", type)});
+                this.metaSelector.insert(currentGroup);
+            }
+            prevType = type;
+            currentGroup.insert(new Element("option",{value:id}).update(label));
         }
         addForm.insert(formEl);
         formEl.insert(this.metaSelector);
         metaPane.insert({top:addForm});
-        addForm.insert({before: new Element("div", {className:"innerTitle"}).update("Select features")});
-        addForm.insert({before: new Element("div", {className:"dialogLegend"}).update("Use the selector below to activate plugins that will add more functionnalities to the repository.")});
-        addForm.insert({after : new Element("div", {className:"dialogLegend"}).update("Click on an active plugin to edit its parameters")});
-        addForm.insert({after : new Element("div", {className:"innerTitle"}).update("Edit parameters")});
+        addForm.insert({before: new Element("div", {className:"innerTitle"}).update(MessageHash["ajxp_repository_editor.5"])});
+        addForm.insert({before: new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_repository_editor.7"])});
+        addForm.insert({after : new Element("div", {className:"dialogLegend"}).update(MessageHash["ajxp_repository_editor.8"])});
+        addForm.insert({after : new Element("div", {className:"innerTitle"}).update(MessageHash["ajxp_repository_editor.6"])});
         var addFormDetail = new Element("div");
         addForm.insert(addFormDetail);
 
@@ -256,7 +271,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             }
             modal.refreshDialogAppearance();
             modal.refreshDialogPosition();
-            addFormDetail.insert("<div class='largeButton' style='width:100px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">"+MessageHash['ajxp_conf.11']+"</span></div>");
+            addFormDetail.insert("<div class='largeButton' style='width:100px;clear:both;margin-top: 7px;margin-left: 0'><img src=\""+ajxpResourcesFolder+"/images/actions/16/filesave.png\"><span class=\"title\">"+MessageHash['ajxp_repository_editor.11']+"</span></div>");
             addFormDetail.down(".largeButton")._form = addForm;
             addFormDetail.down(".largeButton").observe("click", this.metaActionClick.bind(this));
         }.bind(this));
@@ -288,7 +303,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         params.set('repository_id', this.repositoryId);
         this.formManager.serializeParametersInputs(form, params, "DRIVER_OPTION_");
         if(params.get('get_action') == 'add_meta_source' && params.get('DRIVER_OPTION_new_meta_source') == ''){
-            alert(MessageHash['ajxp_conf.42']);
+            alert(MessageHash['ajxp_repository_editor.14']);
             return;
         }
         if(params.get('DRIVER_OPTION_new_meta_source')){
@@ -296,7 +311,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             params.unset('DRIVER_OPTION_new_meta_source');
         }
         if(params.get('get_action') == 'delete_meta_source'){
-            var res = confirm(MessageHash['ajxp_conf.13']);
+            var res = confirm(MessageHash['ajxp_repository_editor.13']);
             if(!res) return;
         }
 
@@ -306,7 +321,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
             this.loadRepository(this.repositoryId, true);
             if(button && action == "edit_meta_source"){
-                button.addClassName("disabled");
+                button.addClassName("SF_disabled");
                 this.setClean();
             }
         }.bind(this);

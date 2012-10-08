@@ -2,13 +2,14 @@
 <editor id="editor.ajxp_repository" openable="true" order="10" text="ajxp_repository_editor.2"
         title="ajxp_repository_editor.1" icon="edit.png" className="RepositoryEditor"
         mimes="repository,repository_editable" formId="repository_edit_box" label="CONF_MESSAGE[Repository Editor]"
-        description="CONF_MESSAGE[Administrator Repository Editor]"
+        description="CONF_MESSAGE[Repository Editor]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
             <js file="plugins/editor.ajxp_repository/class.RepositoryEditor.js" className="RepositoryEditor"/>
             <css file="plugins/editor.ajxp_role/rolesEditor.css" />
+            <i18n namespace="ajxp_repository_editor" path="plugins/editor.ajxp_repository/i18n"/>
         </resources>
 	</client_settings>
 	<clientForm id="repository_edit_box"><![CDATA[
@@ -21,8 +22,8 @@
 			</div>
 			<div id="repositoryTabulator">
 			    <ul class="tabrow">
-                    <li class="selected" data-PaneID="pane-infos"><span>Driver Options</span></li>
-                    <li class="" data-PaneID="pane-metas"><span>Repository Features</span></li>
+                    <li class="selected" data-PaneID="pane-infos"><span ajxp_message_id="ajxp_repository_editor.3">AJXP_MESSAGE[ajxp_repository_editor.3]</span></li>
+                    <li class="" data-PaneID="pane-metas"><span ajxp_message_id="ajxp_repository_editor.4">AJXP_MESSAGE[ajxp_repository_editor.4]</span></li>
 	            </ul>
 	            <div class="tabpanes">
 	            </div>
