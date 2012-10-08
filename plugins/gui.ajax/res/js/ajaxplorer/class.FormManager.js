@@ -24,9 +24,7 @@
 Class.create("FormManager", {
 
     modalParent : null,
-	/**
-	 * Constructor
-	 */
+
 	initialize: function(modalParent){
         if(modalParent) this.modalParent = modalParent;
 	},
@@ -222,7 +220,7 @@ Class.create("FormManager", {
                 var gDiv = groupDivs.get(group) || new Element('div', {className:'accordion_content'});
                 b.insert(div);
                 var lab = div.down('.SF_label');
-                var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?20:0);
+                var ref = parseInt(form.getWidth()) + (Prototype.Browser.IE?40:0);
                 lab.setStyle({fontSize:'11px'});
                 lab.setStyle({width:parseInt(39*ref/100)+'px'});
                 if( parseInt(lab.getHeight()) > 30){
@@ -324,7 +322,7 @@ Class.create("FormManager", {
         pane.update("<form id='formManager_uploader' enctype='multipart/form-data' target='formManager_hidden_iframe' method='post' action='"+url+"'>" +
             "<div class='dialogLegend'>Select an image on your computer</div> " +
             "<input type='file' name='userfile' style='width: 270px;'>" +
-            "</form>")
+            "</form>");
         modal.showSimpleModal(modalParent, pane, function(){
             window.formManagerHiddenIFrameSubmission = function(result){
                 imgSrc.src = conn._baseUrl + "&get_action=" + param.get("loadAction")+"&tmp_file="+result.trim();
