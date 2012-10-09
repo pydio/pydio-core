@@ -69,7 +69,9 @@ Class.create("ActionsManager", {
 		this.oUser = oUser;
 		if(oUser != null && ajaxplorer  && oUser.id != 'guest' && oUser.getPreference('lang') != null 
 			&& oUser.getPreference('lang') != "" 
-			&& oUser.getPreference('lang') != ajaxplorer.currentLanguage) 
+			&& oUser.getPreference('lang') != ajaxplorer.currentLanguage
+            && !oUser.lock
+            )
 		{
 			ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
 		}

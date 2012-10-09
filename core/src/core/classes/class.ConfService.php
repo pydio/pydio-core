@@ -337,7 +337,7 @@ class ConfService
      * @param bool $labelOnly
      * @return Repository[]
      */
-    public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false){
+    public static function getAccessibleRepositories($userObject=null, $details=false, $labelOnly = false, $skipShared = false){
         $result = array();
         foreach (ConfService::getRepositoriesList() as $repositoryId => $repositoryObject)
         {
@@ -363,6 +363,9 @@ class ConfService
                 // Do not display standard repositories even in details mode for "sub"users
                 if($userObject != null && $userObject->hasParent() && !($userObject->canRead($repositoryId) || $userObject->canWrite($repositoryId) )) continue;
                 // Do not display shared repositories otherwise.
+                if($repositoryObject->hasOwner() && $skipShared){
+                    continue;
+                }
                 if($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()){
                     // Display the repositories if allow_crossusers is ok
                     if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") !== true) continue;
