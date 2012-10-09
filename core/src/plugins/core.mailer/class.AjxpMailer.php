@@ -24,7 +24,12 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class AjxpMailer extends AJXP_Plugin
 {
     public function sendMail($recipients, $subject, $body, $from = null){
-        // TO BE IMPLEMENTED BY CHILD CLASS
+        AJXP_Logger::debug("SENDING EMAIL TO ".implode(",", $recipients));
+        $this->sendMailImpl($recipients, $subject, $body, $from = null);
+    }
+
+    protected function sendMailImpl($recipients, $subject, $body, $from = null){
+
     }
 
     public function sendMailAction($actionName, $httpVars, $fileVars){
@@ -33,8 +38,6 @@ class AjxpMailer extends AJXP_Plugin
         if(!count($mailers)){
             throw new Exception("No mailer found");
         }
-        // Fake to type
-        $mailer = new AjxpMailer("id", "basedir");
 
         $mailer = array_pop($mailers);
 

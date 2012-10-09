@@ -44,7 +44,7 @@ class ShareCenter extends AJXP_Plugin{
     /**
      * @var MetaWatchRegister
      */
-    private $watcher;
+    private $watcher = false;
 
 	protected function parseSpecificContributions(&$contribNode){
 		parent::parseSpecificContributions($contribNode);
@@ -99,8 +99,10 @@ class ShareCenter extends AJXP_Plugin{
         $this->metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if($this->metaStore !== false){
             $this->metaStore->initMeta($this->accessDriver);
+            if(array_key_exists("meta.watch", AJXP_PluginsService::getInstance()->getActivePlugins())){
+                $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
+            }
         }
-        $this->watcher = AJXP_PluginsService::getInstance()->getPluginById("meta.watch");
     }
 
     function switchAction($action, $httpVars, $fileVars){
@@ -292,7 +294,7 @@ class ShareCenter extends AJXP_Plugin{
                                 MetaWatchRegister::$META_WATCH_NAMESPACE
                             );
                         }
-                        $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId);
+                        $sharedEntries = $this->computeSharedRepositoryAccessRights($repoId, true, $this->urlBase.$file);
 
                         $jsonData = array(
                             "repositoryId"  => $repoId,
@@ -603,7 +605,7 @@ class ShareCenter extends AJXP_Plugin{
      * @param String $repoId
      * @return array
      */
-    function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups = true){
+    function computeSharedRepositoryAccessRights($repoId, $mixUsersAndGroups, $currentFileUrl){
 
         $loggedUser = AuthService::getLoggedUser();
         $users = AuthService::listUsers();
@@ -644,9 +646,9 @@ class ShareCenter extends AJXP_Plugin{
                 );
                 if($this->watcher !== false){
                     $entry["WATCH"] = $this->watcher->hasWatchOnNode(
-                        new AJXP_Node($this->baseProtocol."://".$repoId."/"),
+                        new AJXP_Node($currentFileUrl),
                         $userId,
-                        MetaWatchRegister::$META_WATCH_NAMESPACE
+                        MetaWatchRegister::$META_WATCH_USERS
                     );
                 }
                 if(!$mixUsersAndGroups){
@@ -793,10 +795,11 @@ class ShareCenter extends AJXP_Plugin{
             ConfService::addRepository($newRepo);
         }
 
+        $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
 
         if(isSet($editingRepo)){
 
-            $currentRights = $this->computeSharedRepositoryAccessRights($httpVars["repository_id"], false);
+            $currentRights = $this->computeSharedRepositoryAccessRights($httpVars["repository_id"], false, $this->urlBase.$file);
             $originalUsers = array_keys($currentRights["USERS"]);
             $removeUsers = array_diff($originalUsers, $users);
             if(count($removeUsers)){
@@ -843,26 +846,34 @@ class ShareCenter extends AJXP_Plugin{
             $userObject->setProfile("shared");
             $userObject->save("superuser");
             if($this->watcher !== false){
+                // Register a watch on the current folder for shared user
                 if($uWatches[$userName] == "true"){
-                    $this->watcher->setWatchOnFolder(new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
+                    $this->watcher->setWatchOnFolder(
+                        new AJXP_Node($this->urlBase.$file),
                         $userName,
-                        MetaWatchRegister::$META_WATCH_CHANGE);
+                        MetaWatchRegister::$META_WATCH_USERS,
+                        array(AuthService::getLoggedUser()->getId())
+                    );
                 }else{
-                    $this->watcher->removeWatchFromFolder(new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
-                        $userName);
+                    $this->watcher->removeWatchFromFolder(
+                        new AJXP_Node($this->urlBase.$file),
+                        $userName,
+                        true
+                    );
                 }
             }
         }
+
         if($this->watcher !== false){
-            $watchDir = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
-            $id = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
+            // Register a watch on the new repository root for current user
             if($httpVars["self_watch_folder"] == "true"){
                 $this->watcher->setWatchOnFolder(
                     new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
                     AuthService::getLoggedUser()->getId(),
-                    MetaWatchRegister::$META_WATCH_CHANGE);
+                    MetaWatchRegister::$META_WATCH_BOTH);
             }else{
-                $this->watcher->removeWatchFromFolder(new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
+                $this->watcher->removeWatchFromFolder(
+                    new AJXP_Node($this->baseProtocol."://".$newRepo->getUniqueId()."/"),
                     AuthService::getLoggedUser()->getId());
             }
         }
@@ -875,7 +886,6 @@ class ShareCenter extends AJXP_Plugin{
 
         // METADATA
         if(!isSet($editingRepo) && $this->metaStore != null){
-            $file = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
             $this->metaStore->setMetadata(
                 new AJXP_Node($this->urlBase.$file),
                 "ajxp_shared",
