@@ -97,6 +97,9 @@
 			<processing>				
 				<clientCallback prepareModal="true" dialogOpenForm="pass_change_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
+					    if(ajaxplorer.user.lock){
+					        modal.getForm().insert({top:new Element("div", {className:"dialogLegend"}).update(MessageHash[444])});
+					    }
 						$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
 						// Update pass_seed
 						var connexion = new Connexion();
@@ -136,17 +139,27 @@
 								userPass = hex_md5($('user_change_ownpass1').value);
 								userOldPass = hex_md5( hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
 							}				
-							var onComplete = function(transport){								
+							var onComplete = function(transport){
+								var addition = '';
+								var logout = false;
+								if(ajaxplorer.user.lock){
+								    addition = '\n ' + MessageHash[445];
+								}
 								if(userPass != null){
 									if(transport.responseText == 'PASS_ERROR'){
 										alert(MessageHash[240]);
 									}else if(transport.responseText == 'SUCCESS'){
-										ajaxplorer.displayMessage('SUCCESS', MessageHash[197]);
+										ajaxplorer.displayMessage('SUCCESS', MessageHash[197] + addition);
+										if(addition) logout = true;
 										hideLightBox(true);
 									}
 								}else{
-									ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+									ajaxplorer.displayMessage('SUCCESS', MessageHash[241] + addition);
+									if(addition) logout = true;
 									hideLightBox(true);
+								}
+								if(logout){
+								    ajaxplorer.actionBar.fireAction("logout");
 								}
 							};
 							var conn = new Connexion();
