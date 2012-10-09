@@ -290,7 +290,7 @@ class MetaWatchRegister extends AJXP_Plugin{
     public function processChangeHook(AJXP_Node $oldNode=null, AJXP_Node $newNode=null, $copy = false){
 
         $newNotif = $this->notificationCenter->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "new");
-        if($newNotif->getNode() !== false){
+        if($newNotif !== false && $newNotif->getNode() !== false){
             $ids = $this->getWatchesOnNode($newNode, self::$META_WATCH_CHANGE);
             if(count($ids)){
                 foreach($ids as $id) $this->notificationCenter->postNotification($newNotif, $id);
@@ -308,7 +308,7 @@ class MetaWatchRegister extends AJXP_Plugin{
         }
         if($oldNode != null && $newNode != null && $oldNode->getUrl() == $newNode->getUrl()) return;
         $oldNotif =  $this->notificationCenter->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "old");
-        if($oldNotif->getNode() !== false){
+        if($oldNotif !== false && $oldNotif->getNode() !== false){
             $ids = $this->getWatchesOnNode($oldNode, self::$META_WATCH_CHANGE);
             if(count($ids)){
                 foreach($ids as $id) $this->notificationCenter->postNotification($oldNotif, $id);
