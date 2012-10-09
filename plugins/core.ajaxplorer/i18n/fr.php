@@ -488,6 +488,7 @@ $mess=array(
 "441" => "Non",
 "442" => "Mon Compte",
 "443" => "Mettre à jour vos informations",
+"444" => "Please update your password, you will not be able to log in otherwise.",
+"445" => "You will now be logged out, please log back using your new password, thank you!",
 /* END SENTENCE */
 );
-?>
