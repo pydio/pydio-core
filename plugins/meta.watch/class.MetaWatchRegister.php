@@ -183,6 +183,7 @@ class MetaWatchRegister extends AJXP_Plugin{
             AJXP_METADATA_SCOPE_REPOSITORY
         );
         if(AuthService::getLoggedUser() != null){
+            $currentUserId = AuthService::getLoggedUser()->getId();
             $usersMeta = $this->metaStore->retrieveMetadata(
                 $node,
                 self::$META_WATCH_USERS_NAMESPACE,
@@ -199,7 +200,7 @@ class MetaWatchRegister extends AJXP_Plugin{
         }
         if(isSet($usersMeta) && is_array($usersMeta)){
             foreach($usersMeta as $id => $targetUsers){
-                if(in_array(AuthService::getLoggedUser()->getId(), $targetUsers)){
+                if(in_array($currentUserId, $targetUsers)){
                     $IDS[] = $id;
                 }
             }
@@ -207,6 +208,11 @@ class MetaWatchRegister extends AJXP_Plugin{
         if(count($IDS)){
             $changes = false;
             foreach($IDS as $index => $id){
+                if($currentUserId == $id && !AJXP_SERVER_DEBUG){
+                    // In non-debug mode, do not send notifications to watcher!
+                    unset($IDS[$index]);
+                    continue;
+                }
                 if(!AuthService::userExists($id)){
                     $changes = true;
                     unset($meta[$id]);
