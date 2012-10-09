@@ -296,13 +296,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				$roleId = SystemTextEncoding::magicDequote($httpVars["role_id"]);
                 $roleGroup = false;
                 if(strpos($roleId, "AJXP_GRP_") === 0){
-                    $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_")));
+                    $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_/")));
                     $groups = AuthService::listChildrenGroups(dirname($groupPath));
-                    if(!array_key_exists($groupPath, $groups)){
+                    $key = "/".basename($groupPath);
+                    if(!array_key_exists($key, $groups)){
                         throw new Exception("Cannot find group with this id!");
                     }
                     $roleId = "AJXP_GRP_".$groupPath;
-                    $groupLabel = $groups[$groupPath];
+                    $groupLabel = $groups[$key];
                     $roleGroup = true;
                 }
                 if(strpos($roleId, "AJXP_USR_") === 0){
@@ -318,7 +319,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
                     HTMLWriter::charsetHeader("application/json");
                     $roleData = $role->getDataArray();
-                    $repos = ConfService::getAccessibleRepositories($userObject, true, true);
+                    $repos = ConfService::getAccessibleRepositories($userObject, true, true, ($userObject == null ? true:false));
                     $data = array(
                         "ROLE" => $roleData,
                         "ALL"  => array(
@@ -351,10 +352,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $groupPath = AuthService::filterBaseGroup(substr($roleId, strlen("AJXP_GRP_")));
                     $roleId = "AJXP_GRP_".$groupPath;
                     $groups = AuthService::listChildrenGroups(dirname($groupPath));
-                    if(!array_key_exists($groupPath, $groups)){
+                    $key = "/".basename($groupPath);
+                    if(!array_key_exists($key, $groups)){
                         throw new Exception("Cannot find group with this id!");
                     }
-                    $groupLabel = $groups[$groupPath];
+                    $groupLabel = $groups[$key];
                     $roleGroup = true;
                 }
                 if(strpos($roleId, "AJXP_USR_") === 0){

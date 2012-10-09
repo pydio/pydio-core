@@ -171,7 +171,7 @@ Class.create("RoleEditor", AbstractEditor, {
             this.roleId = "AJXP_USR_/" + getBaseName(node.getPath());
             scope = "user";
         }
-        this.element.down("span.header_label").update(this.roleId);
+        this.element.down("span.header_label").update(getBaseName(node.getPath()));
         this.node = node;
         this.scope = scope;
         this.loadRoleData(true);
@@ -434,6 +434,9 @@ Class.create("RoleEditor", AbstractEditor, {
         if(!definitions.length){
             this.element.down("#pane-infos").down("#account_custom").previous().remove();
         }else{
+            if(scope == "role"){
+                this.element.down("#pane-infos").down("#account_custom").update("Role custom data");
+            }
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_custom"), definitions, true, false, false, true);
         }
 

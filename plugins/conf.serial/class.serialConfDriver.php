@@ -307,7 +307,7 @@ class serialConfDriver extends AbstractConfDriver {
         foreach($groups as $id => $path){
             if(substr($path, 0, strlen($baseGroup)) == $baseGroup && strlen($path) >  strlen($baseGroup)){
                 $parts = explode("/", ltrim(substr($path, strlen($baseGroup)), "/"));
-                $sub = array_shift($parts);
+                $sub = "/".array_shift($parts);
                 if(!isset($levelGroups[$sub])) $levelGroups[$sub] = $path;
                 if(substr($id, 0, strlen("AJXP_GROUP:")) == "AJXP_GROUP:"){
                     $labels[$path] = array_pop(explode(":", $id, 2));
