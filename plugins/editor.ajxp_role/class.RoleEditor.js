@@ -435,7 +435,7 @@ Class.create("RoleEditor", AbstractEditor, {
             this.element.down("#pane-infos").down("#account_custom").previous().remove();
         }else{
             if(scope == "role"){
-                this.element.down("#pane-infos").down("#account_custom").update("Role custom data");
+                this.element.down("#pane-infos").down("#account_custom").previous("div.innerTitle").update(MessageHash["ajxp_role_editor.42"]);
             }
             f.createParametersInputs(this.element.down("#pane-infos").down("#account_custom"), definitions, true, false, false, true);
         }

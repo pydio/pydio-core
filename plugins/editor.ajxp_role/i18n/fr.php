@@ -65,6 +65,5 @@ $mess=array(
 "39" => "Désactiver",
 "40" => "Activer",
 "41" => "Supprimer",
-
+"42" => "Données du rôle",
 );
-?>
