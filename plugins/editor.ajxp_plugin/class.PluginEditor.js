@@ -134,12 +134,19 @@ Class.create("PluginEditor", AbstractEditor, {
             }
             var form = new Element('div', {className:'driver_form'});
             if(documentation){
-                var docDiv = new Element('div', {style:'height:100%;'}).insert(documentation.firstChild.nodeValue);
+                var docDiv = new Element('div', {style:'height:100%;'}).insert("<div class='documentation'>" + documentation.firstChild.nodeValue + "</div>");
                 docDiv.select('img').each(function(img){
                     img.setStyle({width:'220px'});
                     img.setAttribute('src', 'plugins/'+ this.pluginId+'/'+img.getAttribute('src'));
                 });
                 this.docPane.insert({bottom:docDiv});
+
+                var pluginfo = docDiv.down("ul.pluginfo_list");
+                var docum = docDiv.down("div.documentation");
+                docum.insert({before:pluginfo});
+                docum.setStyle({padding:'0 10px'});
+                pluginfo.setStyle({padding:'0 10px 10px'});
+
                 docDiv.down("ul.pluginfo_list").insert({before:new Element("div",{className:"innerTitle"}).update("Plugin Info")});
                 docDiv.down("ul.pluginfo_list").insert({after:new Element("div",{className:"innerTitle"}).update("Plugin Documentation")});
             }
