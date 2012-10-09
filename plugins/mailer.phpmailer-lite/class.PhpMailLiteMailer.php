@@ -27,7 +27,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PhpMailLiteMailer extends AjxpMailer {
 
-    public function sendMail($recipients, $subject, $body, $from = null){
+    protected function sendMailImpl($recipients, $subject, $body, $from = null){
+
         require_once("lib/class.phpmailer-lite.php");
         $realRecipients = $this->resolveAdresses($recipients);
 
@@ -60,6 +61,7 @@ class PhpMailLiteMailer extends AjxpMailer {
 			$message .= "Mailer Error: " . $mail->ErrorInfo;
 			throw new Exception($message);
 		}
+
     }
 
 }

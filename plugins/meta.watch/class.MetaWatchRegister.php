@@ -182,7 +182,7 @@ class MetaWatchRegister extends AJXP_Plugin{
             false,
             AJXP_METADATA_SCOPE_REPOSITORY
         );
-        if(AuthService::getLoggedUser() != null){
+        if($watchType == self::$META_WATCH_CHANGE && AuthService::getLoggedUser() != null){
             $currentUserId = AuthService::getLoggedUser()->getId();
             $usersMeta = $this->metaStore->retrieveMetadata(
                 $node,

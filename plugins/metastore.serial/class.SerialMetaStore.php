@@ -140,6 +140,7 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
 	protected function loadMetaFileData($ajxpNode, $scope, $userId){
         $currentFile = $ajxpNode->getUrl();
         $fileKey = $ajxpNode->getPath();
+        if($fileKey == null) $fileKey = "/";
         if(isSet($this->options["METADATA_FILE_LOCATION"]) && $this->options["METADATA_FILE_LOCATION"] == "outside"){
             // Force scope
             $scope = AJXP_METADATA_SCOPE_REPOSITORY;
