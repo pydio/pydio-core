@@ -60,5 +60,13 @@ CREATE TABLE ajxp_plugin_configs (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE ajxp_simple_store (
+   object_id VARCHAR(255) NOT NULL,
+   store_id VARCHAR(50) NOT NULL,
+   serialized_data LONGTEXT NULL,
+   binary_data LONGBLOB NULL,
+   related_object_id VARCHAR(255) NULL,
+   PRIMARY KEY(object_id, store_id)
+)
 
 CREATE INDEX ajxp_repo_options_uuid_idx ON ajxp_repo_options ( uuid );

@@ -1025,9 +1025,11 @@ class AJXP_Utils
      * Stores an Array as a serialized string inside a file.
      *
      * @param String $filePath Full path to the file
-     * @param Array $value The value to store
+     * @param Array|Object $value The value to store
      * @param Boolean $createDir Whether to create the parent folder or not, if it does not exist.
      * @param bool $silent Silently write the file, are throw an exception on problem.
+     * @param string $format
+     * @throws Exception
      */
     static function saveSerialFile($filePath, $value, $createDir = true, $silent = false, $format="ser")
     {
