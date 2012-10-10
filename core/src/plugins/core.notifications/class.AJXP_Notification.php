@@ -61,9 +61,9 @@ class AJXP_Notification
     var $secondaryNode;
 
     /**
-     * @var AJXP_Notification
+     * @var AJXP_Notification[]
      */
-    var $relatedNotification;
+    var $relatedNotifications;
 
     public static function autoload(){
 
@@ -79,7 +79,7 @@ class AJXP_Notification
             "AJXP_PARENT_LABEL"     => basename(dirname($this->getNode()->getPath())),
             "AJXP_REPOSITORY_ID"    => $repoId,
             "AJXP_REPOSITORY_LABEL" => $repoLabel,
-            "AJXP_LINK"             => AJXP_Utils::detectServerURL()."?repository_id=$repoId&folder=".$this->node->getPath(),
+            "AJXP_LINK"             => AJXP_Utils::detectServerURL(true)."/?repository_id=$repoId&folder=".$this->node->getPath(),
             "AJXP_USER"             => $this->getTarget(),
             "AJXP_DATE"             => date($mess["date_format"], $this->getDate()),
         );
@@ -95,13 +95,26 @@ class AJXP_Notification
         return $this->replaceVars($tpl, $mess);
     }
 
+
     /**
      * @return string
      */
     public function getDescriptionLong(){
         $mess = ConfService::getMessages();
-        $tpl = $mess["notification.tpl.long.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action];
-        return $this->replaceVars($tpl, $mess);
+
+        if(count($this->relatedNotifications)){
+            $key = "notification.tpl.group.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action;
+            $tpl = $this->replaceVars($mess[$key], $mess).": ";
+            $tpl .= "<ul>";
+            foreach($this->relatedNotifications as $relatedNotification){
+                $tpl .= "<li>".$relatedNotification->getDescriptionLong()."</li>";
+            }
+            $tpl .= "</ul>";
+        }else{
+            $tpl = $this->replaceVars($mess["notification.tpl.long.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action], $mess);
+        }
+        $tpl .= "<br><br>".$this->replaceVars($mess["notification.tpl.long.ajxp_link"], $mess);
+        return $tpl;
     }
 
     public function setAction($action)
@@ -171,17 +184,17 @@ class AJXP_Notification
     }
 
     /**
-     * @param \AJXP_Notification $relatedNotification
+     * @param AJXP_Notification $relatedNotification
      */
-    public function setRelatedNotification($relatedNotification)
+    public function addRelatedNotification($relatedNotification)
     {
-        $this->relatedNotification = $relatedNotification;
+        $this->relatedNotifications[] = $relatedNotification;
     }
 
     /**
-     * @return \AJXP_Notification
+     * @return AJXP_Notification
      */
-    public function getRelatedNotification()
+    public function getRelatedNotifications()
     {
         return $this->relatedNotification;
     }
