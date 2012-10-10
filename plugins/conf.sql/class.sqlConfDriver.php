@@ -637,7 +637,9 @@ class sqlConfDriver extends AbstractConfDriver {
             $arr[] = unserialize($row["serialized_data"]);
             $deleted[] = $row["object_id"];
         }
-        dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id] IN (%s)", "queues.$queueName", $deleted);
+        if(count($deleted)){
+            dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id] IN (%s)", "queues.$queueName", $deleted);
+        }
         return $arr;
     }
 }

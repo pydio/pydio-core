@@ -165,9 +165,48 @@
                 <serverCallback methodName="switchAction"></serverCallback>
             </processing>
         </action>
+        <action name="custom_data_edit">
+      			<gui text="442" title="443" src="edit_user.png" accessKey="" hasAccessKey="false">
+      				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+      			</gui>
+      			<processing>
+      				<clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
+      					<dialogOnOpen><![CDATA[
+      					    var f = new FormManager();
+                              var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
+                              f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, ajaxplorer.user.preferences, false, true);
+      					]]></dialogOnOpen>
+      					<dialogOnComplete hideDialog="true"><![CDATA[
+      					    var params = $H();
+      					    var f = new FormManager();
+                              f.serializeParametersInputs(oForm.down('#custom_data_edit'), params, 'PREFERENCES_');
+                              var conn = new Connexion();
+                              params.set("get_action", "custom_data_edit");
+                              conn.setParameters(params);
+                              conn.setMethod("POST");
+                              conn.onComplete = function(transport){
+                                  ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
+                                  document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
+                                      if(event.memo != "user/preferences") return;
+                                      ajaxplorer.logXmlUser(ajaxplorer.getXmlRegistry());
+                                  });
+                                  ajaxplorer.loadXmlRegistry(false, "user/preferences");
+                              };
+                              conn.sendAsync();
+      					]]></dialogOnComplete>
+      					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
+      				</clientCallback>
+      				<clientForm id="custom_data_edit"><![CDATA[
+      					<div id="custom_data_edit" action="custom_data_edit" box_width="250">
+      					</div>
+      				]]></clientForm>
+      				<serverCallback methodName="switchAction"></serverCallback>
+      			</processing>
+      		</action>
+        <!--
 		<action name="switch_language">
 			<gui text="190" title="190" src="flag.png" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
@@ -217,47 +256,10 @@
 				<serverCallback methodName="switchAction"></serverCallback>
 			</processing>		
 		</action>
-		<action name="custom_data_edit">
-			<gui text="442" title="443" src="edit_user.png" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
-			</gui>
-			<processing>
-				<clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
-					<dialogOnOpen><![CDATA[
-					    var f = new FormManager();
-                        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
-                        f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, ajaxplorer.user.preferences, false, true);
-					]]></dialogOnOpen>
-					<dialogOnComplete hideDialog="true"><![CDATA[
-					    var params = $H();
-					    var f = new FormManager();
-                        f.serializeParametersInputs(oForm.down('#custom_data_edit'), params, 'PREFERENCES_');
-                        var conn = new Connexion();
-                        params.set("get_action", "custom_data_edit");
-                        conn.setParameters(params);
-                        conn.setMethod("POST");
-                        conn.onComplete = function(transport){
-                            ajaxplorer.actionBar.parseXmlMessage(transport.responseXML);
-                            document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
-                                if(event.memo != "user/preferences") return;
-                                ajaxplorer.logXmlUser(ajaxplorer.getXmlRegistry());
-                            });
-                            ajaxplorer.loadXmlRegistry(false, "user/preferences");
-                        };
-                        conn.sendAsync();
-					]]></dialogOnComplete>
-					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
-				</clientCallback>
-				<clientForm id="custom_data_edit"><![CDATA[
-					<div id="custom_data_edit" action="custom_data_edit" box_width="250">
-					</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction"></serverCallback>
-			</processing>
-		</action>
+		-->
 		<action name="webdav_preferences">
 			<gui text="403" title="403" src="drive_remote.png" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="true" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
+				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
             <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""></rightsContext>
 			<processing>				

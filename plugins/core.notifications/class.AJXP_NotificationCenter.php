@@ -122,7 +122,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
 
     public function dispatch(AJXP_Notification $notification){
         $mailers = AJXP_PluginsService::getInstance()->getPluginsByType("mailer");
-        $mailer = new AjxpMailer("id", "basedir");
         if(count($mailers)){
             $mailer = array_pop($mailers);
             try{
