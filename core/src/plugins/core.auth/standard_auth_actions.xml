@@ -92,7 +92,7 @@
 		</action>		
 		<action name="pass_change">
 			<gui text="194" title="194" src="yast_security.png" accessKey="" hasAccessKey="false">
-				<context selection="false" dir="" recycle="true" ajxpWidgets="UserWidget::logging_string"></context>
+				<context selection="false" dir="" recycle="true" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"></context>
 			</gui>
 			<processing>				
 				<clientCallback prepareModal="true" dialogOpenForm="pass_change_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
