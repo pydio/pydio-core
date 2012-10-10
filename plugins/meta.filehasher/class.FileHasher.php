@@ -98,6 +98,7 @@ class FileHasher extends AJXP_Plugin
                     $deltaFile = $uploadedData;
                     rsync_patch_file($file, $deltaFile, $patched);
                     rename($patched, $file);
+                    unlink($deltaFile);
                     header("Content-Type:text/plain");
                     echo md5_file($file);
                 }
