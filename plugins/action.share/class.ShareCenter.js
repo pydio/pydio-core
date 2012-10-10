@@ -79,7 +79,8 @@ Class.create("ShareCenter", {
                             panel : $("create_shared_user"),
                             pass  : $("shared_pass"),
                             confirmPass: $("shared_pass_confirm")
-                        }
+                        },
+                        minChars:parseInt(ajaxplorer.getPluginConfigs("ajxp_plugin[@name='share']").get("SHARED_USERS_LIST_MINIMUM"))
                     }
                 );
             }
@@ -209,8 +210,7 @@ Class.create("ShareCenter", {
             function(oForm){
                 new Protopass(oForm.down('input[name="password"]'), {
                     barContainer : $('public_pass_container'),
-                    barPosition:'bottom',
-                    minchar : 0
+                    barPosition:'bottom'
                 });
                 var nodeMeta = this.currentNode.getMetadata();
                 if(nodeMeta.get("ajxp_shared")){
