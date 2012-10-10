@@ -1269,7 +1269,6 @@ img.simple_button_arrow{
 {
     font-style: normal;
     cursor: pointer;
-	margin-left:3px;
 	margin-right:7px;
 	margin-top:-4px;
 }
@@ -1288,11 +1287,21 @@ img.simple_button_arrow{
 
 .user_widget_label.withImage{
     position: relative;
-    padding-left: 23px;
+    padding:0;
+}
+
+.user_widget_label.withImage i{
+    font-weight: bold;
+    line-height: 22px;
+    display: inline-block;
+    padding: 0 4px 0 8px;
+}
+
+.user_widget_label.withImage i img{
 }
 
 img.user_widget_mini{
-    position: absolute;
+    vertical-align: middle;
     height: 16px;
     border: 1px solid white;
     top: 5px;
