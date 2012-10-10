@@ -437,7 +437,7 @@ class serialConfDriver extends AbstractConfDriver {
     /**
      * @param array $context
      * @param String $ID
-     * @param Stream $outputStream
+     * @param Resource $outputStream
      * @return boolean
      */
     function loadBinary($context, $ID, $outputStream = null)
@@ -446,6 +446,8 @@ class serialConfDriver extends AbstractConfDriver {
             if($outputStream == null){
                 header("Content-Type: ".AJXP_Utils::getImageMimeType($ID));
                 readfile($this->getBinaryPathStorage($context)."/".$ID);
+            }else if(is_resource($outputStream)) {
+                fwrite($outputStream, $this->getBinaryPathStorage($context)."/".$ID);
             }
         }
     }

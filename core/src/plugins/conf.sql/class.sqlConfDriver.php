@@ -460,7 +460,6 @@ class sqlConfDriver extends AbstractConfDriver {
      * @param string $groupPath
      * @param string $groupLabel
      * @return mixed
-     * @todo
      */
     function createGroup($groupPath, $groupLabel){
         dibi::query("INSERT INTO [ajxp_groups]", array("groupPath" => $groupPath, "groupLabel" => $groupLabel));
@@ -478,7 +477,6 @@ class sqlConfDriver extends AbstractConfDriver {
     /**
      * @param string $baseGroup
      * @return string[]
-     * @todo
      */
     function getChildrenGroups($baseGroup = "/"){
         $res = dibi::query("SELECT * FROM [ajxp_groups] WHERE [groupPath] LIKE %s", $baseGroup."%");
@@ -523,6 +521,53 @@ class sqlConfDriver extends AbstractConfDriver {
         }
     }
 
+    protected function simpleStoreSet($storeID, $dataID, $data, $dataType = "serial", $relatedObjectId = null){
+        $values = array(
+            "store_id" => $storeID,
+            "object_id" => $dataID
+        );
+        if($relatedObjectId != null){
+            $values["related_object_id"] = $relatedObjectId;
+        }
+        if($dataType == "serial"){
+            $values["serialized_data"] = serialize($data);
+        }else if($dataType == "binary"){
+            $values["binary_data"] = $data;
+        }else{
+            throw new Exception("Unsupported format type ".$dataType);
+        }
+        dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
+        dibi::query("INSERT INTO [ajxp_simple_store]", $values);
+    }
+
+    protected function simpleStoreGet($storeID, $dataID, $dataType = "serial", &$data){
+        $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
+        $value = $children_results->fetchAll();
+        if(!count($value)) return false;
+        $value = $value[0];
+        if($dataType == "serial"){
+            $data = unserialize($value["serialized_data"]);
+        }else{
+            $data = $value["binary_data"];
+        }
+        if(isSet($value["related_object_id"])){
+            return $value["related_object_id"];
+        }else{
+            return false;
+        }
+    }
+
+    protected function binaryContextToStoreID($context){
+        $storage = null;
+        if(isSet($context["USER"])){
+            $storage ="users_binaries.".$context["USER"];
+        }else if(isSet($context["REPO"])){
+            $storage ="repos_binaries.".$context["REPO"];
+        }else if(isSet($context["ROLE"])){
+            $storage ="roles_binaries.".$context["REPO"];
+        }
+        return $storage;
+    }
     /**
      * @param array $context
      * @param String $fileName
@@ -531,18 +576,32 @@ class sqlConfDriver extends AbstractConfDriver {
      */
     function saveBinary($context, $fileName, $ID = null)
     {
-        // TODO: Implement saveBinary() method.
+        if(empty($ID)){
+            $ID = substr(md5(microtime()*rand(0,100)), 0, 12);
+            $ID .= ".".pathinfo($fileName, PATHINFO_EXTENSION);
+        }
+        $store = $this->binaryContextToStoreID($context);
+        $this->simpleStoreSet($store, $ID, file_get_contents($fileName), "binary");
+        return $ID;
     }
 
     /**
      * @param array $context
      * @param String $ID
-     * @param Stream $outputStream
+     * @param Resource $outputStream
      * @return boolean
      */
     function loadBinary($context, $ID, $outputStream = null)
     {
-        // TODO: Implement loadBinary() method.
+        $store = $this->binaryContextToStoreID($context);
+        $data = "";
+        $this->simpleStoreGet($store, $ID, "binary", $data);
+        if($outputStream != null ){
+            fwrite($outputStream, $data, strlen($data));
+        } else{
+            header("Content-Type: ".AJXP_Utils::getImageMimeType($ID));
+            echo $data;
+        }
     }
 
     /**
@@ -552,7 +611,16 @@ class sqlConfDriver extends AbstractConfDriver {
      */
     function storeObjectToQueue($queueName, $object)
     {
-        // TODO: Implement storeObjectToQueue() method.
+        $r = dibi::query("SELECT MAX( [object_id] ) FROM [ajxp_simple_store] WHERE [store_id]=%s", "queues.$queueName");
+        $index = $r->fetchSingle();
+        if($index == null) $index = 1;
+        else $index = intval($index)+1;
+        $values = array(
+            "store_id" => "queues.$queueName",
+            "object_id" => $index,
+            "serialized_data" => serialize($object)
+        );
+        dibi::query("INSERT INTO [ajxp_simple_store]", $values);
     }
 
     /**
@@ -561,7 +629,16 @@ class sqlConfDriver extends AbstractConfDriver {
      */
     function consumeQueue($queueName)
     {
-        // TODO: Implement consumeQueue() method.
+        $results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s ORDER BY [object_id] ASC", "queues.$queueName");
+        $rows = $results->fetchAll();
+        $arr = array();
+        $deleted = array();
+        foreach($rows as $row){
+            $arr[] = unserialize($row["serialized_data"]);
+            $deleted[] = $row["object_id"];
+        }
+        dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id] IN (%s)", "queues.$queueName", $deleted);
+        return $arr;
     }
 }
 ?>
