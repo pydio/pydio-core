@@ -78,7 +78,7 @@ class AJXP_Node{
     }
 
     /**
-     * @param $boolean Leaf or Collection?
+     * @param bool $boolean Leaf or Collection?
      * @return void
      */
     public function setLeaf($boolean){

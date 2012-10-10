@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class AjxpMailer extends AJXP_Plugin
 {
     public function sendMail($recipients, $subject, $body, $from = null){
-        AJXP_Logger::debug("SENDING EMAIL TO ".implode(",", $recipients));
+        AJXP_Logger::debug("SENDING EMAIL TO ".implode(",", $recipients)." Subject : $subject\n$body");
         $this->sendMailImpl($recipients, $subject, $body, $from = null);
     }
 
