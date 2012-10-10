@@ -78,7 +78,7 @@ Class.create("Modal", {
 	 * @param bOkButtonOnly Boolean Wether to hide cancel button
 	 * @param skipButtons Boolean Wether to hide all buttons
 	 */
-	showDialogForm: function(sTitle, sFormId, fOnLoad, fOnComplete, fOnCancel, bOkButtonOnly, skipButtons){
+	showDialogForm: function(sTitle, sFormId, fOnLoad, fOnComplete, fOnCancel, bOkButtonOnly, skipButtons, useNextButtons){
 		this.clearContent(this.dialogContent);
 		//this.dialogTitle.innerHTML = sTitle;
 		var newForm;
@@ -111,7 +111,7 @@ Class.create("Modal", {
 			}		
 		}
 		if(!this.cachedForms.get(sFormId) && !skipButtons){
-			this.addSubmitCancel(newForm, fOnCancel, bOkButtonOnly);
+			this.addSubmitCancel(newForm, fOnCancel, bOkButtonOnly, "bottom", useNextButtons);
 		}
 		this.dialogContent.appendChild(newForm);
 		var boxPadding = $(sFormId).getAttribute("box_padding");
@@ -448,18 +448,21 @@ Class.create("Modal", {
 	 * @param position String Position.insert() allowed key.
 	 * @returns HTMLElement
 	 */
-	addSubmitCancel: function(oForm, fOnCancel, bOkButtonOnly, position){
+	addSubmitCancel: function(oForm, fOnCancel, bOkButtonOnly, position, useNextButton){
 		var contDiv = new Element('div', {className:'dialogButtons'});
+        if(useNextButton){
+            contDiv.setStyle({direction:'rtl'});
+        }
 		var okButton = new Element('input', {
 			type:'image',
 			name:(bOkButtonOnly?'close':'ok'),
-			src:ajxpResourcesFolder+'/images/actions/22/dialog_'+(bOkButtonOnly?'close':'ok_apply')+'.png',
+			src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?'dialog_close':(useNextButton?'forward':'dialog_ok_apply'))+'.png',
 			height:22,
 			width:22,
 			title:MessageHash[48]});
 		okButton.addClassName('dialogButton');
 		okButton.addClassName('dialogFocus');
-		contDiv.insert(okButton);
+        contDiv.insert(okButton);
 		if(!bOkButtonOnly)
 		{
 			var caButton = new Element('input', {
@@ -478,8 +481,9 @@ Class.create("Modal", {
 				caButton.observe("click",function(e){hideLightBox();Event.stop(e);return false;});
 			}
 			contDiv.insert(caButton);
-		}	
-		if(!position){
+		}
+
+        if(!position){
 			position = 'bottom';
 		}
 		var obj = {}; 
