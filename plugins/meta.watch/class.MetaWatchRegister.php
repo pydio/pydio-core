@@ -309,7 +309,8 @@ class MetaWatchRegister extends AJXP_Plugin{
                 $parentNotif = new AJXP_Notification();
                 $parentNotif->setNode($parentNode);
                 $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
-                $parentNotif->setRelatedNotification($newNotif);
+                $this->notificationCenter->prepareNotification($newNotif);
+                $parentNotif->addRelatedNotification($newNotif);
                 foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
             }
         }
@@ -328,7 +329,8 @@ class MetaWatchRegister extends AJXP_Plugin{
                 $parentNotif = new AJXP_Notification();
                 $parentNotif->setNode($parentNode);
                 $parentNotif->setAction(AJXP_NOTIF_NODE_CHANGE);
-                $parentNotif->setRelatedNotification($oldNotif);
+                $this->notificationCenter->prepareNotification($oldNotif);
+                $parentNotif->addRelatedNotification($oldNotif);
                 foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
             }
         }
@@ -354,7 +356,8 @@ class MetaWatchRegister extends AJXP_Plugin{
             $parentNotif = new AJXP_Notification();
             $parentNotif->setNode($parentNode);
             $parentNotif->setAction(AJXP_NOTIF_NODE_VIEW);
-            $parentNotif->setRelatedNotification($notif);
+            $this->notificationCenter->prepareNotification($notif);
+            $parentNotif->addRelatedNotification($notif);
             foreach($ids as $id) $this->notificationCenter->postNotification($parentNotif, $id);
         }
 

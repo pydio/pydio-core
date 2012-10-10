@@ -6,6 +6,7 @@
         <resources>
             <i18n namespace="notification.tpl.short" path="plugins/core.notifications/templates/short"/>
             <i18n namespace="notification.tpl.long" path="plugins/core.notifications/templates/long"/>
+            <i18n namespace="notification.tpl.group" path="plugins/core.notifications/templates/group"/>
         </resources>
     </client_settings>
     <server_settings>

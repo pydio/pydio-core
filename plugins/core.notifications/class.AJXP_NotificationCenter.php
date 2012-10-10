@@ -49,6 +49,7 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         $type = "";
         $primaryNode = null;
         $secondNode = null;
+        $notif = new AJXP_Notification();
         if($oldNode == null){
             if($targetNotif == "old") return false;
             $type = AJXP_NOTIF_NODE_ADD;
@@ -58,7 +59,10 @@ class AJXP_NotificationCenter extends AJXP_Plugin
             $type = AJXP_NOTIF_NODE_DEL;
             $primaryNode = $oldNode;
         }else{
-            if($targetNotif == "new"){
+            if($oldNode->getUrl() == $newNode->getUrl()){
+                $type = AJXP_NOTIF_NODE_CHANGE;
+                $primaryNode = $newNode;
+            }else if($targetNotif == "new"){
                 $type = $copy ? AJXP_NOTIF_NODE_COPY_FROM : AJXP_NOTIF_NODE_MOVE_FROM;
                 $primaryNode = $newNode;
                 $secondNode = $oldNode;
@@ -68,7 +72,6 @@ class AJXP_NotificationCenter extends AJXP_Plugin
                 $secondNode = $newNode;
             }
         }
-        $notif = new AJXP_Notification();
         $notif->setNode($primaryNode);
         $notif->setAction($type);
         if($secondNode != null){
@@ -89,20 +92,21 @@ class AJXP_NotificationCenter extends AJXP_Plugin
         }
     }
 
+
+    public function prepareNotification(AJXP_Notification &$notif){
+
+        $notif->setAuthor($this->userId);
+        $notif->setDate(time());
+
+    }
     /**
      * @param AJXP_Notification $notif
      * @param string $targetId
      */
     public function postNotification(AJXP_Notification $notif, $targetId){
 
-        if($this->userId == $targetId) {
-            // Do not auto-notify my self :-)
-            // return;
-        }
-        $notif->setAuthor($this->userId);
-        $notif->setDate(time());
+        $this->prepareNotification($notif);
         $notif->setTarget($targetId);
-
         $this->sendToQueue($notif);
 
     }

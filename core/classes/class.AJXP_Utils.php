@@ -654,17 +654,24 @@ class AJXP_Utils
      * @static
      * @return string
      */
-    static function detectServerURL()
+    static function detectServerURL($withURI = false)
     {
         $setUrl = ConfService::getCoreConf("SERVER_URL");
         if(!empty($setUrl)){
             return $setUrl;
         }
+        if(php_sapi_name() == "cli"){
+            AJXP_Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD THE MAIL ADRESS WHEN WORKING IN CLI");
+        }
         $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http');
         $port = (($protocol === 'http' && $_SERVER['SERVER_PORT'] == 80 || $protocol === 'https' && $_SERVER['SERVER_PORT'] == 443)
                 ? "" : ":" . $_SERVER['SERVER_PORT']);
         $name = $_SERVER["SERVER_NAME"];
-        return "$protocol://$name$port";
+        if(!$withURI){
+            return "$protocol://$name$port";
+        }else{
+            return "$protocol://$name$port".dirname($_SERVER["REQUEST_URI"]);
+        }
     }
 
     /**
