@@ -26,8 +26,8 @@ define('AJXP_NOTIF_NODE_CHANGE', "change");
 define('AJXP_NOTIF_NODE_VIEW', "view");
 define('AJXP_NOTIF_NODE_COPY_TO', "copy_to");
 define('AJXP_NOTIF_NODE_MOVE_TO', "move_to");
-define('AJXP_NOTIF_NODE_COPY_FROM', "copy_to");
-define('AJXP_NOTIF_NODE_MOVE_FROM', "move_to");
+define('AJXP_NOTIF_NODE_COPY_FROM', "copy_from");
+define('AJXP_NOTIF_NODE_MOVE_FROM', "move_from");
 /**
  * Simple properties container
  */
@@ -69,18 +69,39 @@ class AJXP_Notification
 
     }
 
+    protected function replaceVars($tplString, $mess){
+        $repoId = $this->getNode()->getRepositoryId();
+        $repoLabel = ConfService::getRepositoryById($repoId)->getDisplay();
+        $replaces = array(
+            "AJXP_NODE_PATH"        => $this->getNode()->getPath(),
+            "AJXP_NODE_LABEL"       => $this->getNode()->getLabel(),
+            "AJXP_PARENT_PATH"      => dirname($this->getNode()->getPath()),
+            "AJXP_PARENT_LABEL"     => basename(dirname($this->getNode()->getPath())),
+            "AJXP_REPOSITORY_ID"    => $repoId,
+            "AJXP_REPOSITORY_LABEL" => $repoLabel,
+            "AJXP_LINK"             => AJXP_Utils::detectServerURL()."?repository_id=$repoId&folder=".$this->node->getPath(),
+            "AJXP_USER"             => $this->getTarget(),
+            "AJXP_DATE"             => date($mess["date_format"], $this->getDate()),
+        );
+        return str_replace(array_keys($replaces), array_values($replaces), $tplString);
+    }
+
     /**
      * @return string
      */
     public function getDescriptionShort(){
-        return "This is a short description, should be template based!";
+        $mess = ConfService::getMessages();
+        $tpl = $mess["notification.tpl.short.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action];
+        return $this->replaceVars($tpl, $mess);
     }
 
     /**
      * @return string
      */
     public function getDescriptionLong(){
-        return "this is a long description, also template based";
+        $mess = ConfService::getMessages();
+        $tpl = $mess["notification.tpl.long.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action];
+        return $this->replaceVars($tpl, $mess);
     }
 
     public function setAction($action)

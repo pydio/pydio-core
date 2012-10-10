@@ -2,6 +2,12 @@
 <ajxp_plugin label="CONF_MESSAGE[Notification Center]" description="CONF_MESSAGE[Handle users watches and notification]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition classname="AJXP_NotificationCenter" filename="plugins/core.notifications/class.AJXP_NotificationCenter.php"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="notification.tpl.short" path="plugins/core.notifications/templates/short"/>
+            <i18n namespace="notification.tpl.long" path="plugins/core.notifications/templates/long"/>
+        </resources>
+    </client_settings>
     <server_settings>
         <global_param description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
     </server_settings>

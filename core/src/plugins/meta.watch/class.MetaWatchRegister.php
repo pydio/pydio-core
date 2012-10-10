@@ -302,6 +302,7 @@ class MetaWatchRegister extends AJXP_Plugin{
                 foreach($ids as $id) $this->notificationCenter->postNotification($newNotif, $id);
             }
             $parentNode = new AJXP_Node(dirname($newNode->getUrl()));
+            $parentNode->setLeaf(false);
             $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
             if(count($ids)){
                 // POST NOW : PARENT FOLDER IS AFFECTED
@@ -320,6 +321,7 @@ class MetaWatchRegister extends AJXP_Plugin{
                 foreach($ids as $id) $this->notificationCenter->postNotification($oldNotif, $id);
             }
             $parentNode = new AJXP_Node(dirname($oldNode->getUrl()));
+            $parentNode->setLeaf(false);
             $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_CHANGE);
             if(count($ids)){
                 // POST NOW : PARENT FOLDER IS AFFECTED
@@ -345,6 +347,7 @@ class MetaWatchRegister extends AJXP_Plugin{
             foreach($ids as $id) $this->notificationCenter->postNotification($notif, $id);
         }
         $parentNode = new AJXP_Node(dirname($node->getUrl()));
+        $parentNode->setLeaf(false);
         $ids = $this->getWatchesOnNode($parentNode, self::$META_WATCH_READ);
         if(count($ids)){
             // POST NOW : PARENT FOLDER IS AFFECTED
