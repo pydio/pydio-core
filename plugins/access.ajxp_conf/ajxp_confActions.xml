@@ -113,7 +113,7 @@
 							barPosition:'bottom'
 						});
 					};
-					modal.showDialogForm('Create User', 'create_user_box', loadFunc, completeFunc);
+					modal.showDialogForm('Create User', 'create_user_box', loadFunc, completeFunc, null, null, null, true);
 					]]></clientCallback>
 				<clientForm id="create_user_box"><![CDATA[
 					<div id="create_user_box" action="create_user" box_width="210">
@@ -262,8 +262,8 @@
                             </div>
 						</div>
 						<div id="driver_form" style="margin-top:32px;"></div>
-						<div class="dialogButtons">
-							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
+						<div class="dialogButtons" style="direction:rtl;">
+							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/forward.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
 							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
 						</div>
 					</div>				
