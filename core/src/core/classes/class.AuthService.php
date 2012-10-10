@@ -391,8 +391,14 @@ class AuthService
 			 AuthService::createUser("admin", $adminPass, true);
 			 if(ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD)
 			 {
-				 $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial common password 'admin'. \\nPlease log in as admin and change the password now!";
+                 if(AuthService::changePasswordEnabled()){
+                     $userObject = ConfService::getConfStorageImpl()->createUserObject("admin");
+                     $userObject->setLock("pass_change");
+                     $userObject->save("superuser");
+                 }
+                 $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial password '". INITIAL_ADMIN_PASSWORD ."'. \\nPlease log in as admin and change the password now!";
 			 }
+            AuthService::updateUser($userObject);
 		}else if($adminCount == -1){
 			// Here we may come from a previous version! Check the "admin" user and set its right as admin.
 			$confStorage = ConfService::getConfStorageImpl();
