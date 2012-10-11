@@ -56,10 +56,6 @@ $PLUGINS = array(
 			"ROLES_FILEPATH"		=> "AJXP_DATA_PATH/plugins/auth.serial/roles.ser",
 			"USERS_DIRPATH"			=> "AJXP_DATA_PATH/plugins/auth.serial",
             "FAST_CHECKS"		    => false,
-			"CUSTOM_DATA"			=> array(
-					"email"	=> "Email",
-					"country" => "Country"
-				)
 			)
 	),
 	"AUTH_DRIVER" => array(
