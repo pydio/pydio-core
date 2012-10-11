@@ -23,8 +23,22 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class AjxpMailer extends AJXP_Plugin
 {
+
+    var $mailCache;
+
+    public function init($options){
+        parent::init($options);
+        if(AJXP_SERVER_DEBUG){
+            $this->mailCache = $this->getPluginWorkDir(true)."/mailbox";
+        }
+    }
+
     public function sendMail($recipients, $subject, $body, $from = null){
-        AJXP_Logger::debug("SENDING EMAIL TO ".implode(",", $recipients)." Subject : $subject\n$body");
+        if(AJXP_SERVER_DEBUG){
+            $rec = implode(",", $recipients);
+            $line = "------------------------------------------------------------------------\n";
+            file_put_contents($this->mailCache, "Sending mail from $from to $rec\n\n$subject\n\n$body\n".$line, FILE_APPEND);
+        }
         $this->sendMailImpl($recipients, $subject, $body, $from = null);
     }
 

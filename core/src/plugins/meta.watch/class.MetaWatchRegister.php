@@ -176,6 +176,10 @@ class MetaWatchRegister extends AJXP_Plugin{
     public function getWatchesOnNode($node, $watchType){
 
         $IDS = array();
+        $currentUserId = "shared";
+        if(AuthService::getLoggedUser() != null){
+            $currentUserId = AuthService::getLoggedUser()->getId();
+        }
         $meta = $this->metaStore->retrieveMetadata(
             $node,
             self::$META_WATCH_NAMESPACE,
@@ -183,7 +187,6 @@ class MetaWatchRegister extends AJXP_Plugin{
             AJXP_METADATA_SCOPE_REPOSITORY
         );
         if($watchType == self::$META_WATCH_CHANGE && AuthService::getLoggedUser() != null){
-            $currentUserId = AuthService::getLoggedUser()->getId();
             $usersMeta = $this->metaStore->retrieveMetadata(
                 $node,
                 self::$META_WATCH_USERS_NAMESPACE,
