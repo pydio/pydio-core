@@ -408,11 +408,12 @@ class AuthService
 			 AuthService::createUser("admin", $adminPass, true);
 			 if(ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD)
 			 {
+                 $userObject = ConfService::getConfStorageImpl()->createUserObject("admin");
+                 $userObject->setAdmin(true);
                  if(AuthService::changePasswordEnabled()){
-                     $userObject = ConfService::getConfStorageImpl()->createUserObject("admin");
                      $userObject->setLock("pass_change");
-                     $userObject->save("superuser");
                  }
+                 $userObject->save("superuser");
                  $START_PARAMETERS["ALERT"] .= "Warning! User 'admin' was created with the initial password '". INITIAL_ADMIN_PASSWORD ."'. \\nPlease log in as admin and change the password now!";
 			 }
             AuthService::updateUser($userObject);
@@ -484,7 +485,7 @@ class AuthService
             if(!self::allowedForCurrentGroup($repoObject, $adminUser)) continue;
 			$adminUser->personalRole->setAcl($repoId, "rw");
 		}
-		$adminUser->save();
+		$adminUser->save("superuser");
 		return $adminUser;
 	}
 	
