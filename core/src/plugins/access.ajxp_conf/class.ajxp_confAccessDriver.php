@@ -991,6 +991,18 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 							$repo->addOption($key, $value);
 						}
 					}
+                    if($repo->getOption("DEFAULT_RIGHTS")){
+                        $gp = $repo->getGroupPath();
+                        if(empty($gp) || $gp == "/"){
+                            $defRole = AuthService::getRole("ROOT_ROLE");
+                        }else{
+                            $defRole = AuthService::getRole("AJXP_GRP_".$gp, true);
+                        }
+                        if($defRole !== false){
+                            $defRole->setAcl($repId, $repo->getOption("DEFAULT_RIGHTS"));
+                            AuthService::updateRole($defRole);
+                        }
+                    }
 					if(is_file(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php")){
 					    chdir(AJXP_TESTS_FOLDER."/plugins");
 						include(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php");
