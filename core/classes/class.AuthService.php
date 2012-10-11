@@ -381,6 +381,23 @@ class AuthService
 	public static function bootSequence(&$START_PARAMETERS){
 
         if(@file_exists(AJXP_CACHE_DIR."/admin_counted")) return;
+        $rootRole = AuthService::getRole("ROOT_ROLE", false);
+        if($rootRole === false){
+            $rootRole = new AJXP_Role("ROOT_ROLE");
+            $rootRole->setLabel("Root Role");
+            $rootRole->setAutoApplies(array("standard"));
+            foreach (ConfService::getRepositoriesList() as $repositoryId => $repoObject)
+            {
+                if($repoObject->isTemplate) continue;
+                $gp = $repoObject->getGroupPath();
+                if(empty($gp) || $gp == "/"){
+                    if($repoObject->getDefaultRight() != ""){
+                        $rootRole->setAcl($repositoryId, $repoObject->getDefaultRight());
+                    }
+                }
+            }
+            AuthService::updateRole($rootRole);
+        }
 		$adminCount = AuthService::countAdminUsers();
 		if($adminCount == 0){
 			$authDriver = ConfService::getAuthDriverImpl();

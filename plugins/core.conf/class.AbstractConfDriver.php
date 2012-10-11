@@ -226,7 +226,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
 	 */
 	function createUserObject($userId){
 		$abstractUser = $this->instantiateAbstractUserImpl($userId);
-		if(!$abstractUser->storageExists()){			
+		if(!$abstractUser->storageExists()){
 			AuthService::updateDefaultRights($abstractUser);
 		}
         AuthService::updateAutoApplyRole($abstractUser);
@@ -243,10 +243,11 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
     abstract function deleteUser($userId, &$deletedSubUsers);
 
 
-        /**
+    /**
 	 * Instantiate the right class
 	 *
-	 * @param AbstractAjxpUser $userId
+	 * @param string $userId
+     * @return AbstractAjxpUser
 	 */
 	abstract function instantiateAbstractUserImpl($userId);
 	
