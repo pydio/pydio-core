@@ -6,6 +6,88 @@ Demo : http://ajaxplorer.info/demo
 Date : ##VERSION_DATE##
 Rev Number : ##REVISION##
 
+This is a DEVELOPMENT version that should not be used in a production environement.
+
+AUTH/CONF COMPONENTS MASSIVE REWRITE
+. Groups implementation : users can now be part of “groups“, and a user can be administrator of a sub-group only. Repositories and roles can be marked with a given group as well, making them accessible only to the users of the group and below. This is a good step toward multi-tenancy. Groups are also accessible for sharing : ability to share with a whole group at once.
+. Roles generalization : The role concept is now a generic container for a extended set of data : ACL, but also plugins Parameters and plugins actions set to be disabled. Roles can be manually created, but a user will by default inherit its rights from a default "personal" role, and from roles attached to its groups. This is making the configurations/ACL ultra-flexible, and you can for example set different configs parameters for two different groups, and then override these for a specific user if necessary.  These parameters and actions can also be applied to a chosen "scope" for repositories : All Repositories, Shared Repositories, or each repository one by one. See this page for more info : http://ajaxplorer.info/documentation/administration/4b-configs-roles-ajaxplorer-5/
+. The old "CUSTOM_DATA" fields defined in the conf drivers options are now actually brought by plugins manifest, and a "scope" attribute allows to attach these custom fields to either the users, the groups, or the roles (or all of them).
+. Roles (and by extension users and groups), Repositories and Plugins now have their own brand new editors.
+. A “lock" property of the users can trigger a predefined action just after login, useful for either forcing pass change, or setting a GUC to validate. If set to "logout", the user just cannot log.
+
+WEBDAV COMPONENT REPLACEMENT
+The WebDAV component, previously powered by ezComponent, was entirely replaced by SabreDAV, which is by far a more active and stable project. As a result, webDAV should be working way better, litmus tests are passing 100%, even with MacOS Finder! As a bonus, we added the possibility to point to the parent url (/shares/) with a listing of all available repositories depending on the user logged. Finally, a WEBDAV_BROWSER_LISTING option allows you to access the very simple webdav list directly in the web browser.
+WARNING : THIS NOW ADD A REQUIREMENT TO PHP5.3!
+
+NEW PLUGINS
+[access.hpcloud] First implementation of HPCloud Object Storage access, based on their PHP bindings + patch. See if possible to send back the changes.
+[cypher.encfs] Experimental implementation of encfs : dynamically create / mount / umount an encfs filesystem. Nice trick to handle the creation via STDIN. Requires web-server user to have sudo access to encfs and encfsctl commands. Implementation is using specific folder prefixes and node filtering. New "force_copy_delete" parameter in fsAccessDriver when moving directories from/to a mounted folder. Automatically unmount all folders at logout/repo_switch, pass the XML template & password as plugin configurations. Remind to add www-data or equivalent to sudoers for encfs and encfsctl commands.
+[metastore.xattr] XAttr metastore implementation, seems to be working quite well. Requires xattr, libattr (libattr1-dev on debian), and pecl xattr extension.
+[meta.watch] Update Mailer, new meta "watch" for watching a folder and getting notification on it. How to watch a root folder? Share and Watch together
+[core.mailer] Generic plugin for sending email. Unique implementation yet is using phpmailer-lite.
+[core.notification] USE_QUEUE parameter in NotificationCenter / Base for notification templates via i18n library
+[mailer.phpmailer-lite] Mailer implementation
+
+
+PLUGINS FIXES
+[meta.git] Fix performChecks function
+[editor.diaporama] Compute image ratio using JS when not available via metadata.
+[editor.diaporama] Optimize for remote wrappers by caching references to real file whenever possible.
+[editor.diaporama] PThumb : deprecated join calls
+Fix spaces (rmeske)
+[Access.dropbox] better error handling (could trigger a memory fault)
+[log.text] : send syslog error when recursive problem.
+[access.fs] Catch opendir failed call error / Remove unused countFiles call for recycle bin.
+[editor.soundmanager] : totally disable for IE < 9 .
+[conf.serial] Fixes in conf.serial/AJXP_User and in ldapAuthDriver for case sensitivity problems.
+[action.scheduler] Add a log in fakeLongTask
+[auth.ldap] Do not initialize the LDAP Connection in init() function, otherwise it's triggered for no reason most of the time.
+[action.share] Resolve AJXP_USER as parent only in a controlled environnement > Better logs for shared links actions (do not mix with author login anymore)
+[meta.filehasher] Fix : filling /tmp/ dir with filehasher_patch files...
+[conf.sql] New table ajxp_simple_store for multi-purpose storage. This is getting closer to JCR / PHPCR approach !!!
+[meta.quota] Implement SoftQuota
+[meta.filehasher] Meta.filehasher : remove rsync actions to "advertise" the fact that rsync is not on the server.
+
+
+CORE FRAMEWORK (PluginService & Controller)
+New variables filters AJXP_GROUP_PATH, AJXP_ALLOW_SUB_PATH
+Ability to load manifests contribs including external files (for listing actions).
+Add ajxp_folder mime_type to "ls" action, to allow the actions discrimination by mime types for folders as well. To be checked for side-effects!
+Set GROUP_PATH as repository standard option.
+LoadRegistryContribution only when building the registry - Try filtering options with role parameters.
+Ability to depend on a type of plugin being present (mailer+)
+Basis for attaching binary data to users/roles - Handle images for avatars
+Add node.read hook wherever possible
+Abstract updateUserObject() function can be call to let the AUTH drivers enrich the CONF users object, implementation sample on LDAP, by automatically mapping ldap attributes to CUSTOM_DATA_ parameters.
+Fix exception loop
+Fix logger : when using CLI, REMOTE_ADRESS not available, display PHP_CLI instead.
+
+CORE UI (gui.ajax)
+Actions : new attribute evalMetadata on selectionContext
+MetaStoreProvider interface now declares an inherentMetaMove() method to be implemented.
+ShareCenter : Update node metadata on before_change instead of change, otherwise automoving metastore will move metadata before checking the node.
+Move Conf / Auth group methods to abstract classes, SQL conf to be implemented. Code cleaning.
+ShareCenter : Handle group sharing from start to end.
+In FormManager, ability to set a field readonly .
+IE : always LoadAutoLoadResources() after registry is loaded
+Connexion : display error message, not error object.
+IE XPath : set SelectionLanguage property to be able to use contains() expression.
+Display a NEXT instead of OK for create_user and create_repository
+
+
+
+
+----
+
+AjaXplorer 4.2.2 Release Note
+
+License : Affero GPL
+Copyright : Charles du Jeu 2012
+Demo : http://ajaxplorer.info/demo
+Date : 2012-07-23
+Rev Number : 3035
+
+
 This is a bug fix release, and introduce two new features : simple but efficient documents automatic-versionning based on GIT,
 and Amazon S3 driver. Other clouds drivers will come soon (Swift from Open Stack among others).
 
