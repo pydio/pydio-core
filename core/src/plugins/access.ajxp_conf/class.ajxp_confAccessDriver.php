@@ -1427,7 +1427,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				"icon" => "user-acl.png",
 				"rights_summary" => $rightsString,
                 "is_default"    => implode(",", $roleObject->listAutoApplies()), //($roleObject->autoAppliesTo("standard") ? $mess[440]:$mess[441]),
-				"ajxp_mime" => "role"
+				"ajxp_mime" => "role",
+                "text"      => $roleObject->getLabel()
 			));
 		}
 	}
