@@ -71,7 +71,11 @@ class AJXP_Notification
 
     protected function replaceVars($tplString, $mess){
         $repoId = $this->getNode()->getRepositoryId();
-        $repoLabel = ConfService::getRepositoryById($repoId)->getDisplay();
+        if(ConfService::getRepositoryById($repoId) != null){
+            $repoLabel = ConfService::getRepositoryById($repoId)->getDisplay();
+        }else{
+            $repoLabel = "Repository";
+        }
         $replaces = array(
             "AJXP_NODE_PATH"        => $this->getNode()->getPath(),
             "AJXP_NODE_LABEL"       => $this->getNode()->getLabel(),
