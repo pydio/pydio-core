@@ -101,7 +101,7 @@ Class.create("UserWidget", {
         var groups = {};
 
         actions.each(function(action){
-            var bGroup
+            var bGroup;
             try{
                 bGroup = action.context.actionBarGroup;
             }catch (e){}
