@@ -410,6 +410,7 @@ class AuthService
 			 {
                  $userObject = ConfService::getConfStorageImpl()->createUserObject("admin");
                  $userObject->setAdmin(true);
+                 AuthService::updateAdminRights($userObject);
                  if(AuthService::changePasswordEnabled()){
                      $userObject->setLock("pass_change");
                  }
