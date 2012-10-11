@@ -76,6 +76,15 @@ class AJXP_Notification
         }else{
             $repoLabel = "Repository";
         }
+        $uLabel = "";
+        if(strstr($tplString, "AJXP_USER") !== false && AuthService::userExists($this->getAuthor())){
+            $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
+            $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+        }
+        if(empty($uLabel)){
+            $uLabel = $this->getAuthor();
+        }
+
         $replaces = array(
             "AJXP_NODE_PATH"        => $this->getNode()->getPath(),
             "AJXP_NODE_LABEL"       => $this->getNode()->getLabel(),
@@ -84,9 +93,16 @@ class AJXP_Notification
             "AJXP_REPOSITORY_ID"    => $repoId,
             "AJXP_REPOSITORY_LABEL" => $repoLabel,
             "AJXP_LINK"             => AJXP_Utils::detectServerURL(true)."/?repository_id=$repoId&folder=".$this->node->getPath(),
-            "AJXP_USER"             => $this->getTarget(),
+            "AJXP_USER"             => $uLabel,
             "AJXP_DATE"             => date($mess["date_format"], $this->getDate()),
         );
+
+        if((strstr($tplString, "AJXP_TARGET_FOLDER") !== false || strstr($tplString, "AJXP_SOURCE_FOLDER")) &&
+            isSet($this->secondaryNode)
+        ){
+            $replaces["AJXP_TARGET_FOLDER"] = $replaces["AJXP_SOURCE_FOLDER"] = $this->secondaryNode->getPath();
+        }
+
         return str_replace(array_keys($replaces), array_values($replaces), $tplString);
     }
 
@@ -103,7 +119,7 @@ class AJXP_Notification
     /**
      * @return string
      */
-    public function getDescriptionLong(){
+    public function getDescriptionLong($skipLink = false){
         $mess = ConfService::getMessages();
 
         if(count($this->relatedNotifications)){
@@ -111,13 +127,15 @@ class AJXP_Notification
             $tpl = $this->replaceVars($mess[$key], $mess).": ";
             $tpl .= "<ul>";
             foreach($this->relatedNotifications as $relatedNotification){
-                $tpl .= "<li>".$relatedNotification->getDescriptionLong()."</li>";
+                $tpl .= "<li>".$relatedNotification->getDescriptionLong(true)."</li>";
             }
             $tpl .= "</ul>";
         }else{
             $tpl = $this->replaceVars($mess["notification.tpl.long.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action], $mess);
         }
-        $tpl .= "<br><br>".$this->replaceVars($mess["notification.tpl.long.ajxp_link"], $mess);
+        if(!$skipLink){
+            $tpl .= "<br><br>".$this->replaceVars($mess["notification.tpl.long.ajxp_link"], $mess);
+        }
         return $tpl;
     }
 
