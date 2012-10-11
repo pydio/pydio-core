@@ -49,9 +49,15 @@ $REPOSITORIES[0] = array(
 				"meta_labels"		=> "Comment",
                 "meta_visibility"   => "hidden"
 			),
+            "meta.filehasher"   => array(),
+            "meta.watch"        => array(),
+            "meta.exif"   => array(
+                "meta_fields" => "COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude",
+                "meta_labels" => "Latitude,Longitude"
+            ),
             "index.lucene" => array(
                 "index_meta_fields" => "comment"
-            )
+            ),
 		)
 	),
 
@@ -80,6 +86,12 @@ $REPOSITORIES[1] = array(
 				"meta_labels"		=> "Comment",
                 "meta_visibility"   => "hidden"
 			),
+            "meta.filehasher"   => array(),
+            "meta.watch"        => array(),
+            "meta.exif"   => array(
+                "meta_fields" => "COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude",
+                "meta_labels" => "Latitude,Longitude"
+            ),
             "index.lucene" => array(
                 "index_meta_fields" => "comment"
             )
@@ -130,6 +142,12 @@ $REPOSITORIES["fs_template"] = array(
 				"meta_labels"		=> "Comment",
                 "meta_visibility"   => "hidden"
 			),
+            "meta.filehasher"   => array(),
+            "meta.watch"        => array(),
+            "meta.exif"   => array(
+                "meta_fields" => "COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude",
+                "meta_labels" => "Latitude,Longitude"
+            ),
             "index.lucene" => array(
                 "index_meta_fields" => "comment"
             )

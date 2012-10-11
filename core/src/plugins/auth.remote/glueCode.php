@@ -47,7 +47,8 @@ $pServ = AJXP_PluginsService::getInstance();
 ConfService::init();
 $confPlugin = ConfService::getInstance()->confPluginSoftLoad($pServ);
 $pServ->loadPluginsRegistry("$FRAMEWORK_PATH/plugins", $confPlugin);
-require_once("$FRAMEWORK_PATH/plugins/conf.".$confPlugin->getName()."/class.AJXP_User.php");
+$userClassName = $confPlugin->getUserClassFileName();
+require_once($userClassName);
 ConfService::start();
 
 $plugInAction = $AJXP_GLUE_GLOBALS["plugInAction"];

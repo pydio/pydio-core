@@ -18,7 +18,7 @@
 			<template name="bottom" element="ajxp_desktop" position="after"><![CDATA[
 				<div id="optional_bottom_div" style="font-family:arial;padding:10px;">This CDATA section will be overriden by the PHP part of the plugin</div>
 			]]></template>
-			<template name="head" element="ajxp_desktop" position="top"><![CDATA[
+			<template name="head" element="ajxp_desktop" position="before"><![CDATA[
 				<div id="optional_header_div" style="background-color: #999; color: white;font-family:arial;padding:10px;">Your custom header content</div>
 			]]></template>
 		</client_configs>
