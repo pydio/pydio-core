@@ -36,8 +36,14 @@ class FileHasher extends AJXP_Plugin
 
     public function parseSpecificContributions(&$contribNode){
         parent::parseSpecificContributions($contribNode);
-        if(!self::rsyncEnabled()){
-            // REMOVE rsync actions get_filesignature
+        if(!self::rsyncEnabled() && $contribNode->nodeName == "actions"){
+            // REMOVE rsync actions, this will advertise the fact that
+            // rsync is not enabled.
+            $xp = new DOMXPath($contribNode->ownerDocument);
+            $children = $xp->query("action", $contribNode);
+            foreach($children as $child){
+                $contribNode->removeChild($child);
+            }
         }
     }
 
