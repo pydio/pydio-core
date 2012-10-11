@@ -66,10 +66,6 @@ $PLUGINS = array(
 		"NAME"		=> "sql",
 		"OPTIONS"	=> array(
 			"SQL_DRIVER"	=> $sqlDriver,
-			"CUSTOM_DATA"			=> array(
-					"email"	=> "Email",
-					"country" => "Country"
-				)
 			)
 	),
     "LOG_DRIVER"    => array(
