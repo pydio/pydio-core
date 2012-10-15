@@ -1629,7 +1629,12 @@ class StreamWrapper {
             $serviceCatalog = self::$serviceCatalogCache[$token];
         }
         if(empty($endpoint)){
-            $endpoint= $serviceCatalog[0]['endpoints'][0]['publicURL'];
+            for($i=0;$i<count($serviceCatalog);$i++){
+                if($serviceCatalog[$i]['type'] == "object-store"){
+                    $endpoint= $serviceCatalog[$i]['endpoints'][0]['publicURL'];
+                    break;
+                }
+            }
         };
     }
 
