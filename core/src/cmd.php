@@ -31,8 +31,8 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-cache, must-revalidate");
 header("Pragma: no-cache");
 require_once(AJXP_BIN_FOLDER."/class.AJXP_Logger.php");
-set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
-set_exception_handler(array("AJXP_XMLWriter", "catchException"));
+//set_error_handler(array("AJXP_XMLWriter", "catchError"), E_ALL & ~E_NOTICE );
+//set_exception_handler(array("AJXP_XMLWriter", "catchException"));
 
 $pServ = AJXP_PluginsService::getInstance();
 ConfService::init();
@@ -76,6 +76,24 @@ if(strpos($optUser,",") !== false){
     $nextUsers = explode(",", $optUser);
     $optUser = array_shift($nextUsers);
     $nextUsers = implode(",",$nextUsers);
+}else if(strpos($optUser, "queue:") === 0){
+    $optUserQueue = substr($optUser, strlen("queue:"));
+    $optUser = false;
+    echo("QUEUE : ".$optUserQueue);
+    if(is_file($optUserQueue)){
+        $lines = file($optUserQueue);
+        if(count($lines) && !empty($lines[0])){
+            $allUsers = explode(",", $lines[0]);
+            $optUser = array_shift($allUsers);
+            file_put_contents($optUserQueue, implode(",", $allUsers));
+        }
+    }
+    if($optUser === false){
+        if(is_file($optUserQueue)){
+            unlink($optUserQueue);
+        }
+        die("No more users inside queue");
+    }
 }
 
 
@@ -88,7 +106,7 @@ if(strpos($optRepoId,",") !== false){
     $nextRepositories = implode(",", $nextRepositories);
 }
 
-//echo("REPOSITORY : ".$optRepoId." USER : ".$optUser."\n");
+echo("REPOSITORY : ".$optRepoId." USER : ".$optUser."\n");
 
 $optDetectUser = $options["detect_user"] OR false;
 $detectedUser = false;
@@ -208,11 +226,19 @@ if($xmlResult !== false && $xmlResult != ""){
 }
 //echo("NEXT REPO ".$nextRepositories." (".$options["r"].")\n");
 //echo("NEXT USERS ".$nextUsers." ( ".$originalOptUser." )\n");
-if(!empty($nextUsers) || !empty($nextRepositories)){
+if(!empty($nextUsers) || !empty($nextRepositories) || !empty($optUserQueue) ){
 
     if(!empty($nextUsers)){
         sleep(1);
         $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, $nextUsers, $optStatusFile);
+        if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
+            file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
+        }
+    }
+    if(!empty($optUserQueue)){
+        sleep(1);
+        echo("Should go to next with $optUserQueue");
+        $process = AJXP_Controller::applyActionInBackground($options["r"], $optAction, $optArgs, "queue:".$optUserQueue, $optStatusFile);
         if($process != null && is_a($process, "UnixProcess") && isSet($optStatusFile)){
             file_put_contents($optStatusFile, "RUNNING:".$process->getPid());
         }
