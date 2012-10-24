@@ -71,14 +71,15 @@ SelectableElements = Class.create({
 			if (e == null) e = oElement.ownerDocument.parentWindow.event;
 			this.dblClick(e);
 		}.bind(this);
-	
+
 		if (oElement.addEventListener){
 			oElement.addEventListener("click", this._onclick, false);
 		}else if (oElement.attachEvent){
 			oElement.attachEvent("onclick", this._onclick);
 			oElement.attachEvent("ondblclick", this._ondblclick);
 		}
-		
+        oElement.observe("touchend", this._onclick);
+
 		this.eventMouseUp = this.dragEnd.bindAsEventListener(this);
 		this.eventMouseDown = this.dragStart.bindAsEventListener(this);
 		this.eventMouseMove = this.drag.bindAsEventListener(this);
