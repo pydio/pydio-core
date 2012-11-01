@@ -31,14 +31,14 @@ class AJXP_Sabre_RootCollection extends Sabre_DAV_SimpleCollection
         $this->children = array();
         $u = AuthService::getLoggedUser();
         if($u != null){
-            $repos = ConfService::getRepositoriesList();
+            $repos = ConfService::getAccessibleRepositories($u);
+            // Refilter to make sure the driver is an AjxpWebdavProvider
             foreach($repos as $repository){
                 $accessType = $repository->getAccessType();
                 $driver = AJXP_PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
-                if($u->canSwitchTo($repository->getUniqueId()) && is_a($driver, "AjxpWebdavProvider")){
+                if(is_a($driver, "AjxpWebdavProvider")){
                     $this->children[$repository->getSlug()] = new Sabre_DAV_SimpleCollection($repository->getSlug());
                 }
-
             }
         }
         return $this->children;
