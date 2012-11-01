@@ -62,7 +62,8 @@ $baseURI = ConfService::getCoreConf("WEBDAV_BASEURI");
 
 $requestUri = $_SERVER["REQUEST_URI"];
 $end = trim(substr($requestUri, strlen($baseURI."/")));
-if(!empty($end) && $end[0] != "?"){
+$rId = null;
+if((!empty($end) || $end ==="0") && $end[0] != "?"){
 
     $parts = explode("/", $end);
     $pathBase = $parts[0];
@@ -80,6 +81,7 @@ if(!empty($end) && $end[0] != "?"){
         die('You are not allowed to access this service');
     }
 
+    $rId = $repositoryId;
     $rootDir =  new AJXP_Sabre_Collection("/", $repository, null);
     $server = new Sabre_DAV_Server($rootDir);
     $server->setBaseUri($baseURI."/".$pathBase);
@@ -94,7 +96,7 @@ if(!empty($end) && $end[0] != "?"){
 }
 
 
-$authBackend = new AJXP_Sabre_AuthBackend(0);
+$authBackend = new AJXP_Sabre_AuthBackend($rId);
 $authPlugin = new Sabre_DAV_Auth_Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
 $server->addPlugin($authPlugin);
 

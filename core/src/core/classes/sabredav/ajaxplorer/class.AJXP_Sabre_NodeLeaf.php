@@ -51,14 +51,14 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
         // Warning, passed by ref
         $p = $this->path;
 
-        $this->accessDriver->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
+        $this->getAccessDriver()->nodeWillChange($p, intval($_SERVER["CONTENT_LENGTH"]));
 
-        $stream = fopen($this->url, "w");
+        $stream = fopen($this->getUrl(), "w");
         stream_copy_to_stream($data, $stream);
         fclose($stream);
 
         $toto = null;
-        $this->accessDriver->nodeChanged($toto, $p);
+        $this->getAccessDriver()->nodeChanged($toto, $p);
 
         return $this->getETag();
     }
@@ -71,7 +71,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
      * @return mixed
      */
     function get(){
-        return fopen($this->url, "r");
+        return fopen($this->getUrl(), "r");
     }
 
     /**
@@ -86,7 +86,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
         if ( $this->options->useMimeExts && ezcBaseFeatures::hasExtensionSupport( 'fileinfo' ) )
         {
             $fInfo = new fInfo( FILEINFO_MIME );
-            $mimeType = $fInfo->file( $this->url );
+            $mimeType = $fInfo->file( $this->getUrl() );
 
             // The documentation tells to do this, but it does not work with a
             // current version of pecl/fileinfo
@@ -98,7 +98,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
         // Check if extension ext/mime-magic is usable.
         if ( $this->options->useMimeExts &&
             ezcBaseFeatures::hasExtensionSupport( 'mime_magic' ) &&
-            ( $mimeType = mime_content_type( $this->url ) ) !== false )
+            ( $mimeType = mime_content_type( $this->getUrl() ) ) !== false )
         {
             return $mimeType;
         }
@@ -130,7 +130,7 @@ class AJXP_Sabre_NodeLeaf extends AJXP_Sabre_Node implements Sabre_DAV_IFile
      * @return int
      */
     function getSize(){
-        return filesize($this->url);
+        return filesize($this->getUrl());
     }
 
 

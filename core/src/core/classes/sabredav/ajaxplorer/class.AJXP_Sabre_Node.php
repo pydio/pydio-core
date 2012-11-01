@@ -43,19 +43,38 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
 
     function __construct($path, $repository, $accessDriver = null){
         $this->repository = $repository;
-        if($accessDriver == null){
-            ConfService::switchRootDir($repository->getUniqueId());
+        $this->path = $path;
+        if($accessDriver != null){
+            $this->accessDriver = $accessDriver;
+        }
+    }
+
+    /**
+     * @return AjxpWebdavProvider
+     * @throws Sabre_DAV_Exception_FileNotFound
+     */
+    function getAccessDriver(){
+        if(!isset($this->accessDriver)){
+            $RID = ($this->repository->isWriteable() ? $this->repository->getUniqueId() : $this->repository->getId());
+            ConfService::switchRootDir($RID);
             ConfService::getConfStorageImpl();
             $this->accessDriver = ConfService::loadRepositoryDriver();
             if(!$this->accessDriver instanceof AjxpWebdavProvider){
-                throw new Sabre_DAV_Exception_FileNotFound( $this->repository->getUniqueId() );
+                throw new Sabre_DAV_Exception_FileNotFound( $RID );
             }
             $this->accessDriver->detectStreamWrapper(true);
-        }else{
-            $this->accessDriver = $accessDriver;
         }
-        $this->path = $path;
-        $this->url = $this->accessDriver->getRessourceUrl($path);
+        return $this->accessDriver;
+    }
+
+    /**
+     * @return String
+     */
+    function getUrl(){
+        if(!isSet($this->url)){
+            $this->url = $this->getAccessDriver()->getRessourceUrl($this->path);
+        }
+        return $this->url;
     }
 
     /**
@@ -87,7 +106,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      * @return string
      */
     function getName(){
-        return basename($this->url);
+        return basename($this->getUrl());
     }
 
     /**
@@ -106,7 +125,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
         ), array());
         ob_get_flush();
         $this->putResourceData(array());
-        $this->putResourceData($data, dirname($this->url)."/".$name);
+        $this->putResourceData($data, dirname($this->getUrl())."/".$name);
     }
 
     /**
@@ -115,7 +134,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
      * @return int
      */
     function getLastModified(){
-        return filemtime($this->url);
+        return filemtime($this->getUrl());
     }
 
 
@@ -177,7 +196,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
 
         $metaStore = $this->getMetastore();
         if($metaStore != false){
-            $metaStore->setMetadata(new AJXP_Node(($newURL!=null?$newURL:$this->url)), "SABRE_DAV", $array, false, AJXP_METADATA_SCOPE_GLOBAL);
+            $metaStore->setMetadata(new AJXP_Node(($newURL!=null?$newURL:$this->getUrl())), "SABRE_DAV", $array, false, AJXP_METADATA_SCOPE_GLOBAL);
         }
 
     }
@@ -187,7 +206,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
         $metaStore = $this->getMetastore();
         $data = array();
         if($metaStore != false){
-            $data = $metaStore->retrieveMetadata(new AJXP_Node($this->url), "SABRE_DAV", false, AJXP_METADATA_SCOPE_GLOBAL);
+            $data = $metaStore->retrieveMetadata(new AJXP_Node($this->getUrl()), "SABRE_DAV", false, AJXP_METADATA_SCOPE_GLOBAL);
         }
         if (!isset($data['properties'])) $data['properties'] = array();
         return $data;
@@ -200,7 +219,7 @@ class AJXP_Sabre_Node implements Sabre_DAV_INode, Sabre_DAV_IProperties
     protected function getMetastore(){
         $metaStore = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
         if($metaStore === false) return false;
-        $metaStore->initMeta($this->accessDriver);
+        $metaStore->initMeta($this->getAccessDriver());
         return $metaStore;
     }
 
