@@ -62,6 +62,7 @@ Class.create("AjxpDataModel", {
 	 * @param forceReload Boolean If set to true, the node will be reloaded even if already loaded.
 	 */
 	requireContextChange : function(ajxpNode, forceReload){
+        if(ajxpNode == null) return;
 		var path = ajxpNode.getPath();
 		if((path == "" || path == "/") && ajxpNode != this._rootNode){
 			ajxpNode = this._rootNode;
@@ -96,6 +97,27 @@ Class.create("AjxpDataModel", {
 		ajxpNode.observeOnce("loaded", function(){
 			this.setContextNode(ajxpNode, true);			
 			this.publish("context_loaded");
+            if(this.getPendingSelection()){
+                var selPath = ajxpNode.getPath() + (ajxpNode.getPath() == "/" ? "" : "/" ) +this.getPendingSelection();
+                var selNode =  ajxpNode.findChildByPath(selPath);
+                if(selNode) {
+                    this.setSelectedNodes([selNode], this);
+                }else{
+                    if(ajxpNode.getMetadata().get("paginationData") && arguments.length < 3){
+                        var newPage;
+                        var currentPage = ajxpNode.getMetadata().get("current");
+                        this.loadPathInfoSync(selPath, function(foundNode){
+                            newPage = foundNode.getMetadata().get("page_position");
+                        });
+                        if(newPage && newPage != currentPage){
+                            ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
+                            this.requireContextChange(ajxpNode, true, true);
+                            return;
+                        }
+                    }
+                }
+                this.clearPendingSelection();
+            }
 		}.bind(this));
 		ajxpNode.observeOnce("error", function(message){
 			ajaxplorer.displayMessage("ERROR", message);
@@ -115,7 +137,11 @@ Class.create("AjxpDataModel", {
 			this.publish("context_loaded");
 		}
 	},
-	
+
+    loadPathInfoSync: function (path, callback){
+        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback);
+    },
+
 	/**
 	 * Sets the root of the data store
 	 * @param ajxpRootNode AjxpNode The parent node

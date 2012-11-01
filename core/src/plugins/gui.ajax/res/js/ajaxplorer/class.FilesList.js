@@ -266,6 +266,7 @@ Class.create("FilesList", SelectableElements, {
 				ajaxplorer.user.setPreference("columns_visibility", data, true);				
 			}			
 			this.initGUI();
+            this.empty(true);
 			this.fill(this.crtContext);
 			if(ajaxplorer && ajaxplorer.user){
 				ajaxplorer.user.savePreference("columns_visibility");
@@ -280,6 +281,7 @@ Class.create("FilesList", SelectableElements, {
 	contextObserver : function(e){
 		if(!this.crtContext) return;
 		//console.log('FILES LIST : FILL');
+        this.empty();
 		this.fill(this.crtContext);
 		this.removeOnLoad();
 	},
@@ -807,9 +809,9 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	switchDisplayMode: function(mode){
         var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
-		dm.setPendingSelection(dm.getSelectedNodes());
+		//dm.setPendingSelection(dm.getSelectedNodes());
         this.removeCurrentLines(true);
-        
+
         if(mode){
             this._displayMode = mode;
         }else{
@@ -817,7 +819,8 @@ Class.create("FilesList", SelectableElements, {
         }
 
 		this.initGUI();
-		this.reload();
+        this.empty(true);
+		this.fill(this.getCurrentContextNode());
 		this.fireChange();
 		if(ajaxplorer && ajaxplorer.user){
 			ajaxplorer.user.setPreference("display", this._displayMode);
@@ -899,58 +902,62 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	reload: function(additionnalParameters){
 		if(this.getCurrentContextNode()){
+            this.empty();
 			this.fill(this.getCurrentContextNode());
 		}
 	},
 	/**
 	 * Attach a pending selection that will be applied after rows are populated
 	 * @param pendingFilesToSelect $A()
-	 */
 	setPendingSelection: function(pendingFilesToSelect){
 		this._pendingFile = pendingFilesToSelect;
 	},
-		
+     */
+
+    empty : function(skipFireChange){
+        this.imagesHash = new Hash();
+      		if(this.protoMenu){
+      			this.protoMenu.removeElements('.ajxp_draggable');
+      			this.protoMenu.removeElements('.selectable_div');
+      		}
+      		for(var i = 0; i< AllAjxpDroppables.length;i++){
+      			var el = AllAjxpDroppables[i];
+      			if(this.isItem(el)){
+      				Droppables.remove(AllAjxpDroppables[i]);
+      				delete(AllAjxpDroppables[i]);
+      			}
+      		}
+      		for(i = 0;i< AllAjxpDraggables.length;i++){
+      			if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
+                      if(AllAjxpDraggables[i].element.IMAGE_ELEMENT){
+                          try{
+                              if(AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
+                                  AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
+                              }
+                              AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
+                              delete AllAjxpDraggables[i].element.IMAGE_ELEMENT;
+                          }catch(e){}
+                      }
+      				Element.remove(AllAjxpDraggables[i].element);
+      			}
+      		}
+      		AllAjxpDraggables = $A([]);
+
+      		var items = this.getSelectedItems();
+      		var setItemSelected = this.setItemSelected.bind(this);
+      		for(var i=0; i<items.length; i++)
+      		{
+      			setItemSelected(items[i], false);
+      		}
+      		this.removeCurrentLines(skipFireChange);
+    },
+
 	/**
 	 * Populates the list with the children of the passed contextNode
 	 * @param contextNode AjxpNode
 	 */
 	fill: function(contextNode){
-		this.imagesHash = new Hash();
-		if(this.protoMenu){
-			this.protoMenu.removeElements('.ajxp_draggable');
-			this.protoMenu.removeElements('.selectable_div');
-		}
-		for(var i = 0; i< AllAjxpDroppables.length;i++){
-			var el = AllAjxpDroppables[i];
-			if(this.isItem(el)){
-				Droppables.remove(AllAjxpDroppables[i]);
-				delete(AllAjxpDroppables[i]);
-			}
-		}
-		for(i = 0;i< AllAjxpDraggables.length;i++){
-			if(AllAjxpDraggables[i] && AllAjxpDraggables[i].element && this.isItem(AllAjxpDraggables[i].element)){
-                if(AllAjxpDraggables[i].element.IMAGE_ELEMENT){
-                    try{
-                        if(AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement){
-                            AllAjxpDraggables[i].element.IMAGE_ELEMENT.destroyElement();
-                        }
-                        AllAjxpDraggables[i].element.IMAGE_ELEMENT = null;
-                        delete AllAjxpDraggables[i].element.IMAGE_ELEMENT;
-                    }catch(e){}
-                }
-				Element.remove(AllAjxpDraggables[i].element);
-			}			
-		}
-		AllAjxpDraggables = $A([]);
-				
-		var items = this.getSelectedItems();
-		var setItemSelected = this.setItemSelected.bind(this);
-		for(var i=0; i<items.length; i++)
-		{
-			setItemSelected(items[i], false);
-		}
-		this.removeCurrentLines();
-		
+
 		var refreshGUI = false;
 		this.gridStyle = 'file';
 		this.even = false;
@@ -1011,24 +1018,18 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.updateHeaderArrows();
 		}
         var dm = (this._dataModel?this._dataModel:ajaxplorer.getContextHolder());
-		if(dm.getPendingSelection())
+		if(dm.getSelectedNodes())
 		{
-			var pendingFile = dm.getPendingSelection();
-			if(Object.isString(pendingFile))
-			{
-				this.selectFile(pendingFile);
-			}else if(pendingFile.length){
-				for(var f=0;f<pendingFile.length; f++){
-                    if(Object.isString(pendingFile[f])){
-                        this.selectFile(pendingFile[f], true);
-                    }else{
-                        this.selectFile(pendingFile[f].getPath(), true);
-                    }
-				}
-			}
+			var selectedNodes = dm.getSelectedNodes();
+            for(var f=0;f<selectedNodes.length; f++){
+                if(Object.isString(selectedNodes[f])){
+                    this.selectFile(selectedNodes[f], true);
+                }else{
+                    this.selectFile(selectedNodes[f].getPath(), true);
+                }
+            }
 			this.hasFocus = true;
-			dm.clearPendingSelection();
-		}	
+		}
 		if(this.hasFocus){
 			window.setTimeout(function(){ajaxplorer.focusOn(this);}.bind(this),200);
 		}

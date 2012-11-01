@@ -68,6 +68,35 @@ Class.create("RemoteNodeProvider", {
 		}.bind(this);	
 		conn.sendAsync();
 	},
+
+    /**
+   	 * Load a node
+   	 * @param node AjxpNode
+   	 * @param nodeCallback Function On node loaded
+   	 * @param childCallback Function On child added
+   	 */
+   	loadLeafNodeSync : function(node, nodeCallback){
+   		var conn = new Connexion();
+   		conn.addParameter("get_action", "ls");
+   		conn.addParameter("options", "al");
+   		conn.addParameter("dir", getRepName(node.getPath()));
+        conn.addParameter("file", getBaseName(node.getPath()));
+   		if(this.properties){
+   			$H(this.properties).each(function(pair){
+   				conn.addParameter(pair.key, pair.value);
+   			});
+   		}
+   		conn.onComplete = function (transport){
+   			try{
+   				this.parseNodes(node, transport, null, nodeCallback);
+   			}catch(e){
+   				if(ajaxplorer) ajaxplorer.displayMessage('ERROR', 'Loading error :'+e.message);
+   				else alert('Loading error :'+ e.message);
+   			}
+   		}.bind(this);
+   		conn.sendSync();
+   	},
+
 	/**
 	 * Parse the answer and create AjxpNodes
 	 * @param origNode AjxpNode

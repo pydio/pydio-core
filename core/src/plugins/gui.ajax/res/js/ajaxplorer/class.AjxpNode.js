@@ -139,7 +139,8 @@ Class.create("AjxpNode", {
 	addChild : function(ajxpNode){
 		ajxpNode.setParent(this);
 		if(this._iNodeProvider) ajxpNode._iNodeProvider = this._iNodeProvider;
-		if(existingNode = this.findChildByPath(ajxpNode.getPath())){
+        var existingNode = this.findChildByPath(ajxpNode.getPath());
+		if(existingNode && !Object.isString(existingNode)){
 			existingNode.replaceBy(ajxpNode);
 		}else{			
 			this._children.push(ajxpNode);
@@ -289,7 +290,8 @@ Class.create("AjxpNode", {
 		for(var i=0;i<pathParts.length;i++){
 			if(pathParts[i] == "") continue;
 			crtPath = crtPath + "/" + pathParts[i];
-			if(node = crtParentNode.findChildByPath(crtPath)){
+            var node = crtParentNode.findChildByPath(crtPath);
+			if(node && !Object.isString(node)){
 				crtNode = node;
 			}else{
 				crtNode = new AjxpNode(crtPath, false, getBaseName(crtPath));
