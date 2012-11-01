@@ -246,10 +246,16 @@ class AJXP_Utils
     {
         $output["EXT_REP"] = "/";
 
-        if (isSet($parameters["repository_id"]) && isSet($parameters["folder"])) {
-            $repository = ConfService::getRepositoryById($parameters["repository_id"]);
+        if (isSet($parameters["repository_id"]) && isSet($parameters["folder"]) || isSet($parameters["goto"])) {
+            if(isSet($parameters["goto"])){
+                $repoId = array_shift(explode("/", ltrim($parameters["goto"], "/")));
+                $parameters["folder"] = str_replace($repoId, "", ltrim($parameters["goto"], "/"));
+            }else{
+                $repoId = $parameters["repository_id"];
+            }
+            $repository = ConfService::getRepositoryById($repoId);
             if ($repository == null) {
-                $repository = ConfService::getRepositoryByAlias($parameters["repository_id"]);
+                $repository = ConfService::getRepositoryByAlias($repoId);
                 if ($repository != null) {
                     $parameters["repository_id"] = $repository->getId();
                 }
@@ -607,7 +613,7 @@ class AJXP_Utils
     static function xmlEntities($string, $toUtf8 = false)
     {
         $xmlSafe = str_replace(array("&", "<", ">", "\"", "\n", "\r"), array("&amp;", "&lt;", "&gt;", "&quot;", "&#13;", "&#10;"), $string);
-        if ($toUtf8) {
+        if ($toUtf8 && SystemTextEncoding::getEncoding() != "UTF-8") {
             return SystemTextEncoding::toUTF8($xmlSafe);
         } else {
             return $xmlSafe;

@@ -81,12 +81,15 @@ class SystemTextEncoding
      * @return string
      */
 	static function getEncoding(){
-	       global $_SESSION;
-	       // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
-	       if (isset($_SESSION["AJXP_CHARSET"]) && strlen($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
-	       // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
            if(self::$currentCharsetValue == null){
-               self::$currentCharsetValue = self::parseCharset(setlocale(LC_CTYPE, 0));
+               global $_SESSION;
+               if (isset($_SESSION["AJXP_CHARSET"]) && strlen($_SESSION["AJXP_CHARSET"])) {
+    	       // Check if the session get an assigned charset encoding (it's the case for remote SSH for example)
+                   self::$currentCharsetValue = $_SESSION["AJXP_CHARSET"];
+               }else{
+	       // Get the current locale (expecting the filesystem is in the same locale, as the standard says)
+                   self::$currentCharsetValue = self::parseCharset(setlocale(LC_CTYPE, 0));
+               }
            }
 	       return self::$currentCharsetValue;
 	}

@@ -147,40 +147,38 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
         }
         if($scope == AJXP_METADATA_SCOPE_GLOBAL){
             $metaFile = dirname($currentFile)."/".$this->options["METADATA_FILE"];
-            //if(self::$currentMetaName == $metaFile && is_array(self::$metaCache))return;
-            // Cannot store metadata inside zips...
             if(preg_match("/\.zip\//",$currentFile)){
-                self::$fullMetaCache = array();
+                self::$fullMetaCache[$metaFile] = array();
                 self::$metaCache = array();
                 return ;
             }
             $fileKey = basename($fileKey);
         }else{
-            // already loaded?
-            //if(is_array(self::$fullMetaCache)) return;
             $metaFile = $this->globalMetaFile."_".$ajxpNode->getRepositoryId();
         }
         self::$metaCache = array();
-		if((!isSet(self::$fullMetaCache) || self::$currentMetaName != $metaFile  ) && @is_file($metaFile) && is_readable($metaFile)){
+		if(!isSet(self::$fullMetaCache[$metaFile])){
             self::$currentMetaName = $metaFile;
-			$rawData = file_get_contents($metaFile);
-            self::$fullMetaCache = unserialize($rawData);
+			$rawData = @file_get_contents($metaFile);
+            if($rawData !== false){
+                self::$fullMetaCache[$metaFile] = unserialize($rawData);
+            }
         }
-        if(isSet(self::$fullMetaCache) && is_array(self::$fullMetaCache)){
-            if(isSet(self::$fullMetaCache[$fileKey][$userId])){
-                self::$metaCache = self::$fullMetaCache[$fileKey][$userId];
+        if(isSet(self::$fullMetaCache[$metaFile]) && is_array(self::$fullMetaCache[$metaFile])){
+            if(isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])){
+                self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
             }else{
-                if($this->options["UPGRADE_FROM_METASERIAL"] == true && count(self::$fullMetaCache) && !isSet(self::$fullMetaCache["AJXP_METASTORE_UPGRADED"])){
-                    self::$fullMetaCache = $this->upgradeDataFromMetaSerial(self::$fullMetaCache);
-                    if(isSet(self::$fullMetaCache[$fileKey][$userId])){
-                        self::$metaCache = self::$fullMetaCache[$fileKey][$userId];
+                if($this->options["UPGRADE_FROM_METASERIAL"] == true && count(self::$fullMetaCache[$metaFile]) && !isSet(self::$fullMetaCache[$metaFile]["AJXP_METASTORE_UPGRADED"])){
+                    self::$fullMetaCache[$metaFile] = $this->upgradeDataFromMetaSerial(self::$fullMetaCache[$metaFile]);
+                    if(isSet(self::$fullMetaCache[$metaFile][$fileKey][$userId])){
+                        self::$metaCache = self::$fullMetaCache[$metaFile][$fileKey][$userId];
                     }
                     // Save upgraded version
-                    file_put_contents($metaFile, serialize(self::$fullMetaCache));
+                    file_put_contents($metaFile, serialize(self::$fullMetaCache[$metaFile]));
                 }
             }
 		}else{
-            self::$fullMetaCache = array();
+            self::$fullMetaCache[$metaFile] = array();
 			self::$metaCache = array();
 		}
 	}
@@ -208,16 +206,19 @@ class SerialMetaStore extends AJXP_Plugin implements MetaStoreProvider {
             $metaFile = $this->globalMetaFile."_".$repositoryId;
         }
 		if((@is_file($metaFile) && call_user_func(array($this->accessDriver, "isWriteable"), $metaFile)) || call_user_func(array($this->accessDriver, "isWriteable"), dirname($metaFile)) || ($scope=="repository") ){
-            if(!isset(self::$fullMetaCache[$fileKey])){
-                self::$fullMetaCache[$fileKey] = array();
+            if(!isset(self::$fullMetaCache[$metaFile])){
+                self::$fullMetaCache[$metaFile] = array();
             }
-            if(!isset(self::$fullMetaCache[$fileKey][$userId])){
-                self::$fullMetaCache[$fileKey][$userId] = array();
+            if(!isset(self::$fullMetaCache[$metaFile][$fileKey])){
+                self::$fullMetaCache[$metaFile][$fileKey] = array();
             }
-            self::$fullMetaCache[$fileKey][$userId] = self::$metaCache;
+            if(!isset(self::$fullMetaCache[$metaFile][$fileKey][$userId])){
+                self::$fullMetaCache[$metaFile][$fileKey][$userId] = array();
+            }
+            self::$fullMetaCache[$metaFile][$fileKey][$userId] = self::$metaCache;
 			$fp = fopen($metaFile, "w");
             if($fp !== false){
-                @fwrite($fp, serialize(self::$fullMetaCache), strlen(serialize(self::$fullMetaCache)));
+                @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
             }
 			if($scope == AJXP_METADATA_SCOPE_GLOBAL){
