@@ -670,12 +670,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 			//	XML LISTING
 			//------------------------------------
 			case "ls":
-			
+
 				if(!isSet($dir) || $dir == "/") $dir = "";
 				$lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 								
 				$startTime = microtime();
-				
+                if(isSet($httpVars["file"])){
+                    $uniqueFile = AJXP_Utils::decodeSecureMagic($httpVars["file"]);
+                }
 				$dir = AJXP_Utils::securePath(SystemTextEncoding::magicDequote($dir));
 				$path = $this->urlBase.($dir!= ""?($dir[0]=="/"?"":"/").$dir:"");
                 $nonPatchedPath = $path;
@@ -689,13 +691,18 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 								
 				$countFiles = $this->countFiles($path, !$lsOptions["f"]);
 				if($countFiles > $threshold){
-					$offset = 0;
-					$crtPage = 1;
-					if(isSet($page)){
-						$offset = (intval($page)-1)*$limitPerPage; 
-						$crtPage = $page;
-					}
-					$totalPages = floor($countFiles / $limitPerPage) + 1;
+                    if(isSet($uniqueFile)){
+                        $originalLimitPerPage = $limitPerPage;
+                        $offset = $limitPerPage = 0;
+                    }else{
+                        $offset = 0;
+                        $crtPage = 1;
+                        if(isSet($page)){
+                            $offset = (intval($page)-1)*$limitPerPage;
+                            $crtPage = $page;
+                        }
+                        $totalPages = floor($countFiles / $limitPerPage) + 1;
+                    }
 				}else{
 					$offset = $limitPerPage = 0;
 				}					
@@ -739,7 +746,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 				//while(strlen($nodeName = readdir($handle)) > 0){
 				foreach ($nodes as $nodeName){
 					if($nodeName == "." || $nodeName == "..") continue;
-					
+					if(isSet($uniqueFile) && $nodeName != $uniqueFile){
+                        $cursor ++;
+                        continue;
+                    }
+                    if($offset > 0 && $cursor < $offset){
+                        $cursor ++;
+                        continue;
+                    }
 					$isLeaf = "";
 					if(!$this->filterNodeName($path, $nodeName, $isLeaf, $lsOptions)){
 						continue;
@@ -748,11 +762,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 						continue;
 					}
 					
-					if($offset > 0 && $cursor < $offset){
-						$cursor ++;
-						continue;
-					}
-					if($limitPerPage > 0 && ($cursor - $offset) >= $limitPerPage) {				
+					if($limitPerPage > 0 && ($cursor - $offset) >= $limitPerPage) {
 						break;
 					}					
 					
@@ -771,6 +781,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
                     if(!empty($node->metaData["mimestring_id"]) && array_key_exists($node->metaData["mimestring_id"], $mess)){
                         $node->mergeMetadata(array("mimestring" =>  $mess[$node->metaData["mimestring_id"]]));
                     }
+                    if(isSet($originalLimitPerPage) && $cursor > $originalLimitPerPage){
+                        $node->mergeMetadata(array("page_position" => floor($cursor / $originalLimitPerPage) +1));
+                    }
 
                     $nodeType = "d";
                     if($node->isLeaf()){
@@ -786,6 +799,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
 
 					$fullList[$nodeType][$nodeName] = $node;
 					$cursor ++;
+                    if(isSet($uniqueFile) && $nodeName != $uniqueFile){
+                        break;
+                    }
 				}
                 if(isSet($httpVars["recursive"]) && $httpVars["recursive"] == "true"){
                     foreach($fullList["d"] as $nodeDir){
@@ -1183,12 +1199,19 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWebdavProvider
         if($handle === false){
             throw new Exception("Error while trying to open directory ".$dirName);
         }
+        if($foldersOnly && !call_user_func(array($this->wrapperClassName, "isRemote"))){
+            closedir($handle);
+            $path = call_user_func(array($this->wrapperClassName, "getRealFSReference"), $dirName);
+            $dirs = glob($path."/*", GLOB_ONLYDIR|GLOB_NOSORT);
+            if($dirs === false) return 0;
+            return count($dirs);
+        }
 		$count = 0;
 		while (strlen($file = readdir($handle)) > 0)
 		{
 			if($file != "." && $file !=".." 
-				&& !(AJXP_Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])
-				&& !($foldersOnly && is_file($dirName."/".$file)) ){
+				&& !(AJXP_Utils::isHidden($file) && !$this->driverConf["SHOW_HIDDEN_FILES"])){
+                if($foldersOnly && is_file($dirName."/".$file)) continue;
 				$count++;
 				if($nonEmptyCheckOnly) break;
 			}			

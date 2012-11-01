@@ -142,7 +142,7 @@ class ExifMetaManager extends AJXP_Plugin {
 	 */
 	public function extractMeta(&$ajxpNode){
 		$currentFile = $ajxpNode->getUrl();
-        if(is_dir($currentFile) || preg_match("/\.zip\//",$currentFile)) return ;
+        if(!$ajxpNode->isLeaf() || preg_match("/\.zip\//",$currentFile)) return ;
       	if(!preg_match("/\.jpg$|\.jpeg$|\.tif$|\.tiff$/i",$currentFile)) return ;
 		$definitions = $this->getMetaDefinition();
 		if(!count($definitions)) return ;
