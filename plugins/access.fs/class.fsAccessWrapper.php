@@ -222,7 +222,7 @@ class fsAccessWrapper implements AjxpWrapper {
     
     public static function changeMode($path, $chmodValue){
     	$realPath = self::initPath($path, "file");
-    	chmod($realPath, $chmodValue);
+    	@chmod($realPath, $chmodValue);
     }
     
     /**
