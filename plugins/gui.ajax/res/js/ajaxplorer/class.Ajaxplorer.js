@@ -575,10 +575,8 @@ Class.create("Ajaxplorer", {
 				this._initLoadRep = null;
 				rootNode.observeOnce("first_load", function(){
 						setTimeout(function(){
-							if(this.pathExists(copy)){
-								this.goTo(new AjxpNode(copy));
-							}
-							this.skipLsHistory = false;
+                            this.goTo(copy);
+                            this.skipLsHistory = false;
 						}.bind(this), 1000);
 				}.bind(this));
 			}else{
@@ -601,25 +599,37 @@ Class.create("Ajaxplorer", {
 		var connexion = new Connexion();
 		connexion.addParameter("get_action", "stat");
 		connexion.addParameter("file", dirName);
-		this.tmpResTest = false;
+		var result = false;
 		connexion.onComplete = function(transport){
-			if(transport.responseJSON && transport.responseJSON.mode) this.tmpResTest = true;
+			if(transport.responseJSON && transport.responseJSON.mode) result = true;
 		}.bind(this);
 		connexion.sendSync();		
-		return this.tmpResTest;
+		return result;
 	},
 	
 	/**
 	 * Require a context change to the given path
 	 * @param nodeOrPath AjxpNode|String A node or a path
+     * @param leaf AjxpNode|String path to the leaf item to be selected
 	 */
-	goTo: function(nodeOrPath){		
+	goTo: function(nodeOrPath){
+        var path;
 		if(Object.isString(nodeOrPath)){
-			node = new AjxpNode(nodeOrPath);
+			path = nodeOrPath
 		}else{
-			node = nodeOrPath;
+			path = nodeOrPath.getPath();
 		}
-		this._contextHolder.requireContextChange(node);
+
+        var gotoNode;
+        this._contextHolder.loadPathInfoSync(path, function(foundNode){
+            if(foundNode.isLeaf()) {
+                this._contextHolder.setPendingSelection(getBaseName(path));
+                gotoNode = new AjxpNode(getRepName(foundNode));
+            }else{
+                gotoNode = foundNode;
+            }
+        }.bind(this));
+		this._contextHolder.requireContextChange(gotoNode);
 	},
 	
 	/**

@@ -360,8 +360,7 @@ Class.create("SearchEngine", AjxpPane, {
 		else
 		{
 			divElement.observe("click", function(e){
-				ajaxplorer.getContextHolder().setPendingSelection(fileName);
-				ajaxplorer.goTo(folderName);
+				ajaxplorer.goTo(folderName+"/"+fileName);
 			});
 		}
 	},
