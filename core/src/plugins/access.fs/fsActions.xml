@@ -366,7 +366,7 @@
 		<action name="ajxp_link">
 			<gui text="369" title="369" src="ajxp-link.png" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false" actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="true"/>
-				<selectionContext dir="true" file="false" recycle="false" unique="true"/>
+				<selectionContext dir="true" file="true" recycle="false" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
 			<processing>
@@ -386,7 +386,7 @@
 							var slug = ajaxplorer.user.repositories.get(repoId).getSlug();
 							if(slug) repoId = slug;
 						}
-						link = url + '?repository_id=' + repoId + '&folder=' + encodeURIComponent(ajaxplorer.getUserSelection().getUniqueFileName());
+						link = url + '?goto=' + repoId + encodeURIComponent(ajaxplorer.getUserSelection().getUniqueNode().getPath());
 						input.value = link;
                         var email = oForm.down('a[id="email"]');
                         if (email){ 
