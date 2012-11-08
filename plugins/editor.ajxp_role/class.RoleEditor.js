@@ -407,38 +407,37 @@ Class.create("RoleEditor", AbstractEditor, {
         }
 
         // CUSTOM DATA
-        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "//param[contains(@scope,'"+scope+"')]");
-        definitions.each(function(param){
+        var definitions = $A(this.roleData["SCOPE_PARAMS"]);
+        var updatedDefs = $A();
+        definitions.each(function(paramObject){
+            var param = $H(paramObject);
             if(param.get("readonly")){
                 param.set("readonly", false);
             }
             if(param.get("type") == "image"){
                 this.updateBinaryContext(param);
             }
-            var xmlNode = param.get("xmlNode");
-            var plugNode = xmlNode.parentNode.parentNode;
-            var plugId = plugNode.getAttribute("id");
-            if(!plugId){
-                plugId = plugNode.nodeName + "." + plugNode.getAttribute("name");
-            }
+            var paramName = param.get("name");
+            var parts = paramName.split("/");
             try{
-                param.set("default", this.roleRead.PARAMETERS["AJXP_REPO_SCOPE_ALL"][plugId][param.get("name")]);
+                param.set("default", this.roleRead.PARAMETERS[parts[0]][parts[1]][parts[2]]);
             }catch(e){}
             if(param.get("name").endsWith("DISPLAY_NAME") && param.get("default")){
                 var display = param.get("default");
                 if(this.roleData.USER && this.roleData.USER.LOCK) display += " ("+ MessageHash["ajxp_role_editor.36"] +")";
                 this.element.down("span.header_label").update(display);
             }
-            param.set("name", "AJXP_REPO_SCOPE_ALL/" + plugId + "/" + param.get("name"));
+            updatedDefs.push(param);
         }.bind(this));
-        if(!definitions.length){
+        if(!updatedDefs.length){
             this.element.down("#pane-infos").down("#account_custom").previous().remove();
         }else{
             if(scope == "role"){
                 this.element.down("#pane-infos").down("#account_custom").previous("div.innerTitle").update(MessageHash["ajxp_role_editor.42"]);
             }
-            f.createParametersInputs(this.element.down("#pane-infos").down("#account_custom"), definitions, true, false, false, true);
+            f.createParametersInputs(this.element.down("#pane-infos").down("#account_custom"), updatedDefs, true, false, false, true);
         }
+
 
         // UPDATE FORMS ELEMENTS
         this.element.down("#pane-infos").select("div.SF_element").each(function(element){
