@@ -340,6 +340,23 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }else if(isSet($groupPath)){
                         $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
                     }
+
+                    $scope = "role";
+                    if($roleGroup) $scope = "group";
+                    else if(isSet($userObject)) $scope = "user";
+                    $data["SCOPE_PARAMS"] = array();
+                    $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
+                    foreach($nodes as $node){
+                        $pId = $node->parentNode->parentNode->attributes->getNamedItem("id")->nodeValue;
+                        $origName = $node->attributes->getNamedItem("name")->nodeValue;
+                        $node->attributes->getNamedItem("name")->nodeValue = "AJXP_REPO_SCOPE_ALL/".$pId."/".$origName;
+                        $nArr = array();
+                        foreach($node->attributes as $attrib){
+                            $nArr[$attrib->nodeName] = AJXP_XMLWriter::replaceAjxpXmlKeywords($attrib->nodeValue);
+                        }
+                        $data["SCOPE_PARAMS"][] = $nArr;
+                    }
+
                     echo json_encode($data);
                 }
 			break;
