@@ -345,6 +345,7 @@ div.shadow_class
 	border-radius : 0px;
     border:none;
     filter: none;
+    background: none;
 }
 
 .dialogLegend
