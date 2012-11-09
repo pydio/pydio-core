@@ -4,6 +4,7 @@
     <class_definition filename="plugins/meta.quota/class.QuotaComputer.php" classname="QuotaComputer"/>
     <server_settings>
         <param description="Authorized quota. Use php.ini like values (20M, 2G), etc." label="Default Quota" name="DEFAULT_QUOTA" type="string"/>
+        <param description="Store computed quota value in the user preferences, to avoid triggering computation each time it is requested. This may introduce some lag if the repository is shared by many users." label="Cache value" name="CACHE_QUOTA" type="boolean" default="true"/>
         <param description="Limit that will trigger an alert when approaching the end of the quota. Use a percent value" label="Soft Limit (%)"
                name="SOFT_QUOTA"
                type="integer"/>
