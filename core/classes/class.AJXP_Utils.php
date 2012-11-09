@@ -251,7 +251,7 @@ class AJXP_Utils
             if ($repository == null) {
                 $repository = ConfService::getRepositoryByAlias($parameters["repository_id"]);
                 if ($repository != null) {
-                    $parameters["repository_id"] = $repository->getId();
+                    $parameters["repository_id"] = ($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
                 }
             }
             require_once(AJXP_BIN_FOLDER . "/class.SystemTextEncoding.php");
