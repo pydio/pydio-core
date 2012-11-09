@@ -313,7 +313,7 @@ class PThumb{
             if (!file_exists($image)){
                 return $this -> set_error("Method print_thumbnail: Error. The file '$image' you specified does not exists or cannot be accessed.");
             }
-            $image_data = @join(file($image));  
+            $image_data = @implode("",file($image));
         }
         
         if (!is_string($image_data)){
@@ -359,7 +359,7 @@ class PThumb{
 					else{
 						header("Content-Disposition: attachment; filename=\"".time().".".$this->file_ext[$format]."\"");
 					}
-                	print(join(file($cache_file)));
+                	print(implode("",file($cache_file)));
                 	die();
                 	
 					//Prepare redirectional URL
@@ -370,7 +370,7 @@ class PThumb{
                     die();
                 }
                 else{
-                    return join(file($cache_file));
+                    return implode("",file($cache_file));
                 }
             }
             //Check that an older version does not exists and if it does, delete it
@@ -461,7 +461,7 @@ class PThumb{
         }
         if ($target_file != false){
             $wrappers = stream_get_wrappers();
-            $wrappers_re = '(' . join('|', $wrappers) . ')';
+            $wrappers_re = '(' . implode('|', $wrappers) . ')';
             $isStream = (preg_match( "!^$wrappers_re://!", $target_file ) === 1);
             if($isStream){
                 $backToStreamTarget = $target_file;
@@ -511,7 +511,7 @@ class PThumb{
 				header("Content-Disposition: attachment; filename=\"".time().".".$this -> file_ext[$format]."\"");
 			}
 			if ($this -> is_cacheable()){
-                echo join(file($cache_file));
+                echo implode("",file($cache_file));
             }
             else{
                 switch ($format){
@@ -541,7 +541,7 @@ class PThumb{
         }
         else{
             if ($this -> is_cacheable()){
-                return join(file($cache_file));
+                return implode("",file($cache_file));
             }
             else{
                 return $this -> set_error("Method print_thumbnail: Cannot return image '$image'! Cache must be enabled!");
@@ -853,7 +853,7 @@ class PThumb{
             	$data .= fread($fp, 4096);
             }
             fclose($fp);
-            //$data = @join(file($url));
+            //$data = @implode("",file($url));
             if (strlen($data) > 0){
                 $this -> data_cache[sha1($url)] = $data;
                 return $data;
@@ -932,7 +932,7 @@ class PThumb{
 			$filename = 'remote_'.sha1($file)."_".time();
 			//Check for file existence
 			if (file_exists($this -> cache_dir.$filename) && $this -> remote_check == false){
-				$data = join(file($this -> cache_dir.$filename));
+				$data = implode("",file($this -> cache_dir.$filename));
 			}
 			else{
 				$data = $this -> retrieve_remote_file($file);
