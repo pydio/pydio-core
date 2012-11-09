@@ -137,3 +137,23 @@ $REPOSITORIES["fs_template"] = array(
 	),
 
 );
+
+// UNCOMMENT THIS TO SET UP A WEBFTP INSTALL
+// SEE conf/templates/bootstrap_plugins.webftp.php
+/*
+$REPOSITORIES["predefined_ftp"] = array(
+
+    "DISPLAY"    => "FTP Server",
+    "DRIVER"    => "ftp",
+    "DRIVER_OPTIONS" => array(
+        // SET THIS TO true IF YOU WANT THE USER TO CONNECT TO ANY FTP SERVER
+        "DYNAMIC_FTP"               => false,
+        // OR USE THESE PARAMETERS TO PREDEFINE AN FTP SERVER
+        //"FTP_HOST"                  => "ftp.yourserver.com",
+        //"FTP_PORT"                  => "21",
+        "DEFAULT_RIGHTS"            => "rw",
+        "USE_SESSION_CREDENTIALS"   => true,
+    )
+
+);
+*/
