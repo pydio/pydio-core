@@ -105,7 +105,8 @@ class PixlrEditor extends AJXP_Plugin {
       }
       fclose($orig);
       fclose($target);
-      
+
+      AJXP_Controller::applyHook("node.change", array(&$node));
       //header("Content-Type:text/plain");
       //print($mess[115]);
       
