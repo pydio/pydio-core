@@ -42,6 +42,9 @@ class QuotaComputer extends AJXP_Plugin
 
     protected function getWorkingPath(){
         $repo = ConfService::getRepository();
+        if($repo->hasParent()){
+            $repo = ConfService::getRepositoryById($repo->getParentId());
+        }
         $path = $repo->getOption("PATH");
         return $path;
     }
@@ -135,7 +138,7 @@ class QuotaComputer extends AJXP_Plugin
     private function getUsage($dir){
         $data = $this->getUserData();
         $repo = ConfService::getRepository()->getId();
-        if(!isSet($data["REPO_USAGES"][$repo])) {
+        if(!isSet($data["REPO_USAGES"][$repo]) || $this->options["CACHE_QUOTA"] === false) {
             $quota = $this->computeDirSpace($dir);
             if(!isset($data["REPO_USAGES"])) $data["REPO_USAGES"] = array();
             $data["REPO_USAGES"][$repo] = $quota;
