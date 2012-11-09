@@ -97,7 +97,10 @@ class IMagickPreviewer extends AJXP_Plugin {
 				header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
 				header("Content-Length: ".strlen($cacheData));
 				header('Cache-Control: public');
-				print($cacheData);
+                header("Pragma:");
+                header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
+                header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
+                print($cacheData);
 				return;
 			}			
 			
