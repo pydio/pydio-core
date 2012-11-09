@@ -112,14 +112,18 @@ class AJXP_User extends AbstractAjxpUser
         $serialDir = $this->storage->getOption("USERS_DIRPATH");
         $fastCheck = $this->storage->getOption("FAST_CHECKS");
         $fastCheck = ($fastCheck == "true" || $fastCheck == true);
-        if(isSet($this->registerForSave["rights"]) || $this->create){
-            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
-        }
-        if(isSet($this->registerForSave["prefs"])){
-            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
-        }
-        if(isSet($this->registerForSave["bookmarks"])){
-            AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
+        try{
+            if(isSet($this->registerForSave["rights"]) || $this->create){
+                AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/rights.ser", $this->rights, !$fastCheck);
+            }
+            if(isSet($this->registerForSave["prefs"])){
+                AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/prefs.ser", $this->prefs, !$fastCheck);
+            }
+            if(isSet($this->registerForSave["bookmarks"])){
+                AJXP_Utils::saveSerialFile($serialDir."/".$this->getId()."/bookmarks.ser", $this->bookmarks, !$fastCheck);
+            }
+        }catch (Exception $e){
+
         }
         $this->registerForSave = array();
     }
