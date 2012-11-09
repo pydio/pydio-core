@@ -288,7 +288,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 				print("<edit_options edit_pass=\"".$editPass."\" edit_admin_right=\"".(($userId!="guest"&&$userId!=$loggedUser->getId())?"1":"0")."\" edit_delete=\"".(($userId!="guest"&&$userId!=$loggedUser->getId()&&$authDriver->usersEditable())?"1":"0")."\"/>");
 				print("<ajxp_roles>");
 				foreach (AuthService::getRolesList() as $roleId => $roleObject){
-					print("<role id=\"$roleId\"/>");
+					print("<role id=\"".AJXP_Utils::xmlEntities($roleId)."\"/>");
 				}
 				print("</ajxp_roles>");
 				AJXP_XMLWriter::close("admin_data");
