@@ -13,7 +13,12 @@
 	<class_definition filename="plugins/auth.ftp/class.ftpAuthDriver.php" classname="ftpAuthDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/action[@name='login'],actions/action[@name='get_seed'],actions/action[@name='get_secure_token'],actions/action[@name='get_captcha'],actions/action[@name='back']" exclude=""/>
-		<actions>
+        <client_configs>
+            <template element="ajxp_desktop" name="hide_remember_me" position="bottom"><![CDATA[
+                    <style type="text/css"> form#login_form > div > div.SF_element:last-child{ display:none; }</style>
+                    ]]></template>
+        </client_configs>
+        <actions>
 			<action name="set_ftp_data">
 				<rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""></rightsContext>
 				<processing>
