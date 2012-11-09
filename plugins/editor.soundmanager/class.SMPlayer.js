@@ -18,7 +18,7 @@
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
 window.SM2_DEFER = true;
-if(!window.soundManager && ajaxplorer.findEditorById("editor.soundmanager")){
+if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager && ajaxplorer.findEditorById("editor.soundmanager")){
     var conn = new Connexion();
     conn._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
     conn.loadLibrary('360-player/script/berniecode-animator.js');
@@ -36,17 +36,17 @@ if(!window.soundManager && ajaxplorer.findEditorById("editor.soundmanager")){
             window.threeSixtyPlayer.config.useEQData = true;
             // enable this in SM2 as well, as needed
             if (window.threeSixtyPlayer.config.useWaveformData) {
-              window.soundManager.flash9Options.useWaveformData = true;
+                window.soundManager.flash9Options.useWaveformData = true;
             }
             if (window.threeSixtyPlayer.config.useEQData) {
-              window.soundManager.flash9Options.useEQData = true;
+                window.soundManager.flash9Options.useEQData = true;
             }
             if (window.threeSixtyPlayer.config.usePeakData) {
-              window.soundManager.flash9Options.usePeakData = true;
+                window.soundManager.flash9Options.usePeakData = true;
             }
             if (window.threeSixtyPlayer.config.useWaveformData || window.threeSixtyPlayer.flash9Options.useEQData || window.threeSixtyPlayer.flash9Options.usePeakData) {
-              // even if HTML5 supports MP3, prefer flash so the visualization features can be used.
-              window.soundManager.preferFlash = true;
+                // even if HTML5 supports MP3, prefer flash so the visualization features can be used.
+                window.soundManager.preferFlash = true;
             }
 
             window.soundManager.useFastPolling = true; // increased JS callback frequency, combined with useHighPerformance = true
@@ -190,12 +190,12 @@ function addVolumeButton(){
 
 Class.create("SMPlayer", AbstractEditor, {
 
-	fullscreenMode: false,
-	
-	initialize: function($super, oFormObject){
-	},
-		
-	getPreview : function(ajxpNode, rich){
+    fullscreenMode: false,
+
+    initialize: function($super, oFormObject){
+    },
+
+    getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){
             var im = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
             return im;
@@ -216,6 +216,11 @@ Class.create("SMPlayer", AbstractEditor, {
                     marginLeft:parseInt((element.width-256)/2)+24+"px",
                     marginTop:'-15px'
                 });
+                if(Prototype.Browser.IE) {
+                    try{
+                        player.up("div").up("div").next("div.panelHeader").setStyle({width:'100%'});
+                    }catch (e){}
+                }
             }else{
                 if(element.height >= 50)
                 {
@@ -256,7 +261,7 @@ Class.create("SMPlayer", AbstractEditor, {
     },
 
     filterElement : function(element, ajxpNode){
-        
+
     }
 
 });
