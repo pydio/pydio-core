@@ -514,7 +514,7 @@ Class.create("FilesList", SelectableElements, {
 			}
 
             if(this.options.selectable == undefined || this.options.selectable === true){
-                this.initSelectableItems(oElement, true, contentContainer);
+                this.initSelectableItems(oElement, true, contentContainer, true);
             }else{
                 this.initNonSelectableItems(oElement);
             }

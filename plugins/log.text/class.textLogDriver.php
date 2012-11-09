@@ -177,12 +177,12 @@ class textLogDriver extends AbstractLogDriver {
 	 * @return String the formatted message.
 	 */
 	function formatMessage($message, $severity) {
-		$msg = date("m-d-y") . " " . date("G:i:s") . "\t"; 
-		$msg .= $_SERVER['REMOTE_ADDR'];
-		
-		$msg .= "\t".strtoupper($severity)."\t";
-		
-		// Get the user if it exists
+		$msg = date("m-d-y") . " " . date("G:i:s") . "\t";
+
+        $msg .= AJXP_Logger::getClientAdress()."\t";
+        $msg .= strtoupper($severity)."\t";
+
+        // Get the user if it exists
 		$user = "No User";
 		if(AuthService::usersEnabled()){
 			$logged = AuthService::getLoggedUser();
