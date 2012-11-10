@@ -141,8 +141,9 @@ class ConfService
                 $toActivate[$pObject->getId()] = $pObject ;
             }
         }
-        uksort($toActivate, array("AJXP_PluginsService", "sortByDependencyIds"));
-        foreach ($toActivate as $id => $pObject) {
+        $o = $pServ->getOrderByDependency($toActivate, false);
+        foreach ($o as $id) {
+            $pObject = $toActivate[$id];
             $pObject->init(array());
             try{
                 $pObject->performChecks();

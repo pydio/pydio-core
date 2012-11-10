@@ -1178,18 +1178,44 @@ class AJXP_Utils
     {
         @unlink($file);
     }
+
     /**
      * Try to set an ini config, without errors
      * @static
      * @param string $paramName
      * @param string $paramValue
-     * @return
+     * @return void
      */
     public static function safeIniSet($paramName, $paramValue)
     {
         $current = ini_get($paramName);
         if ($current == $paramValue) return;
         @ini_set($paramName, $paramValue);
+    }
+
+    /**
+     * @static
+     * @param string $url
+     * @return bool|mixed|string
+     */
+    public static function getRemoteContent($url){
+        if(ini_get("allow_url_fopen")){
+            return file_get_contents($url);
+        }else if(function_exists("curl_init")){
+            $ch = curl_init();
+            $timeout = 30; // set to zero for no timeout
+            curl_setopt ($ch, CURLOPT_URL, $url);
+            curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+            $return = curl_exec($ch);
+            curl_close($ch);
+            return $return;
+        }else{
+            $i = parse_url($url);
+            $httpClient = new HttpClient($i["host"]);
+            $httpClient->timeout = 30;
+            return $httpClient->quickGet($url);
+        }
     }
 
     public static function parseStandardFormParameters(&$repDef, &$options, $userId = null, $prefix = "DRIVER_OPTION_", $binariesContext = null){
@@ -1262,5 +1288,3 @@ class AJXP_Utils
     }
 
 }
-
-?>
