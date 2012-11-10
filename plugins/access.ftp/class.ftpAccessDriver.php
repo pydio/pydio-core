@@ -261,11 +261,17 @@ class ftpAccessDriver extends fsAccessDriver {
 	
 	
     function storeFileToCopy($fileData){
-            $user = AuthService::getLoggedUser();
-            $files = $user->getTemporaryData("tmp_upload");
-            AJXP_Logger::debug("Saving user temporary data", array($fileData));
-            $files[] = $fileData;
-            $user->saveTemporaryData("tmp_upload", $files);
+        $user = AuthService::getLoggedUser();
+        $files = $user->getTemporaryData("tmp_upload");
+        AJXP_Logger::debug("Saving user temporary data", array($fileData));
+        $files[] = $fileData;
+        $user->saveTemporaryData("tmp_upload", $files);
+        if(strpos($_SERVER["HTTP_USER_AGENT"], "ajaxplorer-ios-client") !== false
+            || strpos($_SERVER["HTTP_USER_AGENT"], "Apache-HttpClient") !== false){
+            AJXP_Logger::logAction("Up from ".$_SERVER["HTTP_USER_AGENT"] ." - direct triger of next to remote");
+            $this->uploadActions("next_to_remote", array(), array());
+        }
+
     }
 
     function getFileNameToCopy(){
