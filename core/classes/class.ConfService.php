@@ -672,7 +672,7 @@ class ConfService
         $crtLang = self::getLanguage();
         $messageCacheDir = dirname(AJXP_PLUGINS_MESSAGES_FILE)."/i18n";
         $messageFile = $messageCacheDir."/".$crtLang."_".basename(AJXP_PLUGINS_MESSAGES_FILE);
-        if(isSet($this->configs["MESSAGES"]) && !$forceRefresh){
+        if(isSet($this->configs["MESSAGES"]) && !$forceRefresh && !AJXP_SKIP_CACHE){
             return $this->configs["MESSAGES"];
         }
         if(!isset($this->configs["MESSAGES"]) && is_file($messageFile)){
