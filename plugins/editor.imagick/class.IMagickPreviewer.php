@@ -197,13 +197,14 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$unoconv = $this->pluginConf["UNOCONV"];
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 		}
-		$repository = ConfService::getRepository();
-		$streamData = $repository->streamData;
-        $masterFile = call_user_func(array($streamData["classname"], "getRealFSReference"), $masterFile);
+
+        $extension = pathinfo($masterFile, PATHINFO_EXTENSION);
+        $node = new AJXP_Node($masterFile);
+        $masterFile = $node->getRealFile();
+
         if(DIRECTORY_SEPARATOR == "\\"){
             $masterFile = str_replace("/", "\\", $masterFile);
         }
-		$extension = pathinfo($masterFile, PATHINFO_EXTENSION);
         $wrappers = stream_get_wrappers();
         $wrappers_re = '(' . join('|', $wrappers) . ')';
         $isStream = (preg_match( "!^$wrappers_re://!", $targetFile ) === 1);
@@ -249,7 +250,7 @@ class IMagickPreviewer extends AJXP_Plugin {
 				if($this->extractAll) $tmpFileThumb = str_replace(".jpg", "-0.jpg", $tmpFileThumb);
 			}
 		}
-		$params = ($this->extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"]);
+		$params = ($this->extractAll?"-quality ".$this->pluginConf["IM_VIEWER_QUALITY"]:"-resize 250 -quality ".$this->pluginConf["IM_THUMB_QUALITY"].(isSet($this->pluginConf["IM_CUSTOM_OPTIONS"])?" ".$this->pluginConf["IM_CUSTOM_OPTIONS"]:""));
 		$cmd = $this->pluginConf["IMAGE_MAGICK_CONVERT"]." ".escapeshellarg(($masterFile).$pageLimit)." ".$params." ".escapeshellarg($tmpFileThumb);
 		AJXP_Logger::logAction("IMagick Command : $cmd");
 		session_write_close(); // Be sure to give the hand back
