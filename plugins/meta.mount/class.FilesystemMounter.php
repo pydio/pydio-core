@@ -61,7 +61,7 @@ class FilesystemMounter extends AJXP_Plugin
     protected function getOption($name, $user="", $pass=""){
         $opt = $this->options[$name];
         $opt = str_replace("AJXP_USER", $user, $opt);
-        $opt = str_replace("AJXP_PASS", $pass, $opt);
+        $opt = str_replace("AJXP_PASS",  "'$pass'", $opt);
         $opt = str_replace("AJXP_SERVER_UID", posix_getuid(), $opt);
         $opt = str_replace("AJXP_SERVER_GID", posix_getgid(), $opt);
         if(stristr($opt, "AJXP_REPOSITORY_PATH") !== false){

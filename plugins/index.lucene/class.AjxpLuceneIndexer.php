@@ -222,6 +222,7 @@ class AjxpLuceneIndexer extends AJXP_Plugin{
         }else{
        		$index =  $this->loadIndex(ConfService::getRepository()->getId());
         }
+        Zend_Search_Lucene_Analysis_Analyzer::setDefault( new Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
         if($oldNode != null && $copy == false){
             $oldDocId = $this->getIndexedDocumentId($index, $oldNode);

@@ -39,7 +39,7 @@ class BitlyShortener extends AJXP_Plugin {
         $format = 'json';
         $version = '2.0.1';
         $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
-        $response = file_get_contents($bitly);
+        $response = AJXP_Utils::getRemoteContent($bitly);
         $json = json_decode($response, true);
         if(isSet($json['results'][$url]['shortUrl'])){
             print($json['results'][$url]['shortUrl']);
