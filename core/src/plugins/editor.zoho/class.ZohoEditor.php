@@ -138,7 +138,7 @@ class ZohoEditor extends AJXP_Plugin {
             AJXP_Controller::applyHook("node.before_change", array(&$node));
 
             if($this->pluginConf["USE_ZOHO_AGENT"]){
-                $data = file_get_contents($this->pluginConf["ZOHO_AGENT_URL"]."?ajxp_action=get_file&name=".$id);
+                $data = AJXP_Utils::getRemoteContent($this->pluginConf["ZOHO_AGENT_URL"]."?ajxp_action=get_file&name=".$id);
                 if(strlen($data)){
                     file_put_contents($targetFile, $data);
                     echo "MODIFIED";

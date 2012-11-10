@@ -203,13 +203,14 @@ class IMagickPreviewer extends AJXP_Plugin {
 			$unoconv = $this->pluginConf["UNOCONV"];
 			$officeExt = array('xls', 'xlsx', 'ods', 'doc', 'docx', 'odt', 'ppt', 'pptx', 'odp', 'rtf');
 		}
-		$repository = ConfService::getRepository();
-		$streamData = $repository->streamData;
-        $masterFile = call_user_func(array($streamData["classname"], "getRealFSReference"), $masterFile);
+
+        $extension = pathinfo($masterFile, PATHINFO_EXTENSION);
+        $node = new AJXP_Node($masterFile);
+        $masterFile = $node->getRealFile();
+
         if(DIRECTORY_SEPARATOR == "\\"){
             $masterFile = str_replace("/", "\\", $masterFile);
         }
-		$extension = pathinfo($masterFile, PATHINFO_EXTENSION);
         $wrappers = stream_get_wrappers();
         $wrappers_re = '(' . join('|', $wrappers) . ')';
         $isStream = (preg_match( "!^$wrappers_re://!", $targetFile ) === 1);

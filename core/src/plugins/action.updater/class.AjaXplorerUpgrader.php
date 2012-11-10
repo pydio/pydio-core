@@ -86,7 +86,7 @@ class AjaXplorerUpgrader {
     }
 
     static function getUpgradePath($url, $format = "php", $channel="stable"){
-        $json = file_get_contents($url."?version=".AJXP_VERSION."&channel=".$channel, null, self::$context);
+        $json = AJXP_Utils::getRemoteContent($url."?version=".AJXP_VERSION."&channel=".$channel, null, self::$context);
         if($format == "php") return json_decode($json, true);
         else return $json;
     }
@@ -135,7 +135,7 @@ class AjaXplorerUpgrader {
         if($this->debugMode && is_file($this->archive)) {
             return "Already downloaded";
         }
-        $content = file_get_contents($this->archiveURL, null, self::$context);
+        $content = AJXP_Utils::getRemoteContent($this->archiveURL, null, self::$context);
         if($content === false || strlen($content) == 0){
             throw new Exception("Error while downloading");
         }
