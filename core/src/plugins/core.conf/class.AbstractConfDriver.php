@@ -336,6 +336,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin {
         if( $userObject->getId()=="guest" && ConfService::getCoreConf("SAVE_GUEST_PREFERENCES", "conf") === false){
             return array();
         }
+        if( ConfService::getCoreConf("SKIP_USER_HISTORY", "conf") === true ){
+            $stringPrefs = array_diff($stringPrefs, array("history/last_repository"));
+            $jsonPrefs = array("columns_size", "columns_visibility", "gui_preferences");
+        }
         foreach($stringPrefs as $pref){
             if(strstr($pref, "/")!==false){
                 $parts = explode("/", $pref);
