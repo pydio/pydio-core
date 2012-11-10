@@ -267,6 +267,52 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
          return 0;
      }
 
+     public function getOrderByDependency($plugins, $withStatus = true){
+         $orders = array();
+         $keys = array();
+         $unkowns = array();
+         if($withStatus){
+             foreach($plugins as $pid => $status){
+                 if($status) $keys[] = $pid;
+             }
+         }else{
+             $keys = array_keys($plugins);
+         }
+         $result = array();
+         while(count($keys) > 0){
+             $test = array_shift($keys);
+             $testObject = $this->getPluginById($test);
+             $deps = $testObject->getActiveDependencies(self::getInstance());
+             if(!count($deps)){
+                 $result[] = $test;
+                 continue;
+             }
+             $found = false;
+             $inOriginalPlugins = false;
+             foreach($deps as $depId){
+                 if(in_array($depId, $result)) {
+                     $found = true;
+                     break;
+                 }
+                 if(!$inOriginalPlugins && array_key_exists($depId, $plugins) && (!$withStatus || $plugins[$depId] == true)){
+                     $inOriginalPlugins = true;
+                 }
+             }
+             if($found){
+                 $result[] = $test;
+             }else{
+                 if($inOriginalPlugins) $keys[] = $test;
+                 else {
+                     unset($plugins[$test]);
+                     $unkowns[] = $test;
+                 }
+             }
+         }
+         return array_merge($result, $unkowns);
+     }
+
+
+
 
 	/**
      * All the plugins of a given type
