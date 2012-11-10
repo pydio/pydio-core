@@ -134,19 +134,24 @@ class ConfService
 	public function initActivePluginsInst(){
 		$pServ = AJXP_PluginsService::getInstance();
         $detected = $pServ->getDetectedPlugins();
+        $toActivate = array();
         foreach ($detected as $pType => $pObjects){
             if(in_array($pType, array("conf", "auth", "log", "access", "meta","metastore", "index"))) continue;
             foreach ($pObjects as $pName => $pObject){
-                $pObject->init(array());
-                try{
-                    $pObject->performChecks();
-                    if(!$pObject->isEnabled()) continue;
-                    $pServ->setPluginActiveInst($pType, $pName, true);
-                }catch (Exception $e){
-                    //$this->errors[$pName] = "[$pName] ".$e->getMessage();
-                }
-
+                $toActivate[$pObject->getId()] = $pObject ;
             }
+        }
+        uksort($toActivate, array("AJXP_PluginsService", "sortByDependencyIds"));
+        foreach ($toActivate as $id => $pObject) {
+            $pObject->init(array());
+            try{
+                $pObject->performChecks();
+                if(!$pObject->isEnabled()) continue;
+                $pServ->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
+            }catch (Exception $e){
+                //$this->errors[$pName] = "[$pName] ".$e->getMessage();
+            }
+
         }
 	}
 	/**
@@ -752,10 +757,12 @@ class ConfService
 					$lang = "en"; // Default language, minimum required.
 				}
 				if(is_file($path."/".$lang.".php")){
-					require($path."/".$lang.".php");					
-					foreach ($mess as $key => $message){
-						$this->configs["MESSAGES"][(empty($nameSpace)?"":$nameSpace.".").$key] = $message;
-					}
+					require($path."/".$lang.".php");
+                    if(isSet($mess)){
+                        foreach ($mess as $key => $message){
+                            $this->configs["MESSAGES"][(empty($nameSpace)?"":$nameSpace.".").$key] = $message;
+                        }
+                    }
 				}
                 $lang = $crtLang;
                 if(!is_file($path."/conf/".$crtLang.".php")){
@@ -1115,4 +1122,3 @@ class ConfService
     } 	
 	
 }
-?>

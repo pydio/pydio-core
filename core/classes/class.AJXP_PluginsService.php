@@ -243,36 +243,31 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  			}
  		}
  	}
- 	/**
- 	 * User function for sorting
- 	 *
- 	 * @param AJXP_Plugin $pluginA
- 	 * @param AJXP_Plugin $pluginB
-      * @return integer
- 	 */
- 	private function sortByDependency($pluginA, $pluginB){
- 		//var_dump("Checking " . $pluginA->getId() . " vs " . $pluginB->getId());
- 		if($pluginA->getId() == $pluginB->getId()){
- 			//var_dump("should not check");
- 			return 0;
- 		}
- 		if($pluginA->dependsOn($pluginB->getId())) {
- 			return 1;
- 		}
- 		if($pluginB->dependsOn($pluginA->getId())) {
- 			return -1;
- 		}
- 		return 0;
- 	}
 
      /**
-      * @param $tableau
-      * @return
+      * User function for sorting
+      *
+      * @param $pluginIdA
+      * @param $pluginIdB
+      * @internal param String $pluginA
+      * @internal param String $pluginB
+      * @return integer
       */
-	private function usort(&$tableau){
-		uasort($tableau, array($this, "sortByDependency"));
-		return ;
-    }
+     public static function sortByDependencyIds($pluginIdA, $pluginIdB){
+         if($pluginIdA == $pluginIdB) return 0;
+         $pluginA = self::findPluginById($pluginIdA);
+         $pluginB = self::findPluginById($pluginIdB);
+         if($pluginA == null || $pluginB == null) return 0;
+         if($pluginA->dependsOn($pluginIdB)) {
+             return 1;
+         }
+         if($pluginB->dependsOn($pluginIdA)) {
+             return -1;
+         }
+         return 0;
+     }
+
+
 	/**
      * All the plugins of a given type
      * @param string $type
