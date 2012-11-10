@@ -116,6 +116,7 @@ function hookToFilesList(){
     var fList = fLists[0];
     fList.observe("rows:didInitialize", function(){
         if(fList.getDisplayMode() != "list" || !window.soundManager || !window.soundManager.enabled) return;
+        if(!ajaxplorer.findEditorById("editor.soundmanager")) return;
         var resManager = ajaxplorer.findEditorById("editor.soundmanager").resourcesManager;
         if(!resManager.loaded){
             resManager.load();

@@ -17,6 +17,11 @@
  *
  * The latest code can be found at <http://www.ajaxplorer.info/>.
  */
+#sm2-container{
+    position: absolute;
+    top:-1000px;
+}
+
 .ui360container{
     background-image: url("player_bg_icon.png");
     background-position: center;

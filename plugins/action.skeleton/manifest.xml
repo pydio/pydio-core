@@ -65,4 +65,7 @@
         </actions>
 	</registry_contributions>
 	<class_definition filename="plugins/action.skeleton/class.PluginSkeleton.php" classname="PluginSkeleton"/>
+    <dependencies>
+        <activePlugin pluginName="gui.ajax"/>
+    </dependencies>
 </ajxp_plugin>

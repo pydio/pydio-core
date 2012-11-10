@@ -134,21 +134,28 @@ class ConfService
 	public function initActivePluginsInst(){
 		$pServ = AJXP_PluginsService::getInstance();
         $detected = $pServ->getDetectedPlugins();
+        $toActivate = array();
         foreach ($detected as $pType => $pObjects){
             if(in_array($pType, array("conf", "auth", "log", "access", "meta","metastore", "index"))) continue;
             foreach ($pObjects as $pName => $pObject){
-                $pObject->init(array());
-                try{
-                    $pObject->performChecks();
-                    if(!$pObject->isEnabled()) continue;
-                    $pServ->setPluginActiveInst($pType, $pName, true);
-                }catch (Exception $e){
-                    //$this->errors[$pName] = "[$pName] ".$e->getMessage();
-                }
-
+                $toActivate[$pObject->getId()] = $pObject ;
             }
         }
-	}
+        uksort($toActivate, array("AJXP_PluginsService", "sortByDependencyIds"));
+        foreach ($toActivate as $id => $pObject) {
+            $pObject->init(array());
+            try{
+                $pObject->performChecks();
+                if(!$pObject->isEnabled()) continue;
+                $pServ->setPluginActiveInst($pObject->getType(), $pObject->getName(), true);
+            }catch (Exception $e){
+                //$this->errors[$pName] = "[$pName] ".$e->getMessage();
+            }
+
+        }
+
+    }
+
 	/**
      * Initialize the "unique" plugins (CONF, AUTH, LOG)
      * @throws Exception

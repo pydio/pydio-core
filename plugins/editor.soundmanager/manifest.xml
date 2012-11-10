@@ -21,5 +21,6 @@
     </registry_contributions>
     <dependencies>
         <pluginClass pluginName="editor.audio"/>
+        <activePlugin pluginName="editor.audio"/>
     </dependencies>
 </editor>
