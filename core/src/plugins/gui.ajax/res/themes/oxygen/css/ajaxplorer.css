@@ -901,6 +901,31 @@ a.carousel-control img{
 	cursor: pointer;
 }
 
+.user_widget_label.withImage{
+    position: relative;
+    padding:0;
+}
+
+.user_widget_label.withImage i{
+    font-weight: bold;
+    line-height: 22px;
+    display: inline-block;
+    padding: 0 4px 0 8px;
+}
+
+.user_widget_label.withImage i img{
+}
+
+img.user_widget_mini{
+    vertical-align: middle;
+    height: 16px;
+    border: 1px solid white;
+    top: 5px;
+    left: 2px;
+    box-shadow: 1px 1px 0px #666;
+}
+
+
 
 .locationbar_title
 {
