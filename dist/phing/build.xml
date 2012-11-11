@@ -7,7 +7,7 @@
     <property file="build.properties"/>
     <property name="env" value="testing"/>
     <property name="skip_deploy" value="false"/>
-    <property name="build_channel" value="dev"/>
+    <property name="build_channel" value="stable"/>
     <property name="build.source_folder" value="${build.working_folder}/source"/>
     <property name="svn.local_folder" value="${build.working_folder}/svnwc"/>
     <taskdef classname="lib.AjxpPluginDiscriminate" name="plugindiscriminate"/>
