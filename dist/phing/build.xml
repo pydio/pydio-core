@@ -65,7 +65,7 @@
 
     <target name="usage" description="Describe this script usage">
         <echo message="For releasing and deploying : phing -Denv=release -Dskip_deploy=false -Dprevious_revision=2861 -Dprevious_version=4.0.4 -Dnew_version=4.2.0"/>
-        <echo message="For tagging : phing tag -Dversion=4.2.0 -Dnext_version=4.3.0"/>
+        <echo message="For tagging : phing tag_version -Dversion=4.2.0 -Dnext_version=4.3.0"/>
     </target>
 
     <target name="deploy" description="Send package to FTP">
@@ -223,17 +223,15 @@
         </if>        
         <property name="packaged_zip" value="${package_name}.zip"/>
         <property name="packaged_tar" value="${package_name}.tar.gz"/>
-        <zip
-                basedir="${build.source_folder}"
+        <zip                
                 destfile="${build.working_folder}/build/${packaged_zip}"
                 includeemptydirs="true"
-                />
+                ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></zip>
         <tar
-                basedir="${build.source_folder}"
                 destfile="${build.working_folder}/build/${packaged_tar}"
                 includeemptydirs="true"
                 compression="gzip"
-            />
+            ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
         <phingcall target="build_external_plugins"/>
         <if>
         	<not><equals arg1="${env}" arg2="testing"/></not>
@@ -250,10 +248,9 @@
         <mkdir dir="${build.working_folder}/build/upgrade" />
         <property name="packaged_zip" value="ajaxplorer-core-upgrade-${previous_version}-${new_version}.zip"/>
         <zip
-                basedir="${build.working_folder}/upgrade/export/"
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
-                />
+                ><fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false"><include name="*/**"/></fileset></zip>
     </target>
 
     <target name="build_external_plugins">
@@ -269,16 +266,15 @@
         <property name="packaged_plugin" value="plugin-${filename}-${DSTAMP}.zip"/>
         <property name="packaged_plugin_tar" value="plugin-${filename}-${DSTAMP}.tar.gz"/>
         <zip
-                basedir="${absfilename}"
                 destfile="${build.working_folder}/build/plugins/${packaged_plugin}"
                 includeemptydirs="true"
-        />
+        ><fileset dir="${absfilename}" defaultexcludes="false"><include name="*/**"/></fileset></zip>
         <tar
                 basedir="${absfilename}"
                 destfile="${build.working_folder}/build/plugins/${packaged_plugin_tar}"
                 includeemptydirs="true"
                 compression="gzip"
-        />
+        ><fileset dir="${absfilename}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
     </target>
 
     <target name="linux_packages" description="Trigger RPM and Debian packages builds, release ZIP only.">
@@ -318,7 +314,7 @@
 			<fileset dir="${build.working_folder}/dist/deb">
 				<include name="**/*"/>
 			</fileset>
-			<fileset dir="${build.source_folder}/">
+			<fileset dir="${build.source_folder}/" defaultexcludes="false">
 				<include name="**/*"/>
 			</fileset>
 		</copy>
