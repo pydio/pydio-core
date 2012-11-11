@@ -86,8 +86,8 @@ $mess=array(
 "61" => "GZ File",
 "62" => "Root directory",
 "63" => "Log out",
-"64" => "XLS File",
-"65" => "Word File",
+"64" => "Spreadsheet",
+"65" => "Word Document",
 "66" => "Copy",
 "67" => "Selected file",
 "68" => "Paste in",
@@ -486,5 +486,5 @@ $mess=array(
 "439" => "Main Options",
 "440" => "Yes",
 "441" => "No",
+"442" => "Presentation",
 );
-?>
