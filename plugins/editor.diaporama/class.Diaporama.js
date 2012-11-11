@@ -614,7 +614,7 @@ Class.create("Diaporama", AbstractEditor, {
 	getPreview : function(ajxpNode){
 		var img = new Element('img', {
             src:Diaporama.prototype.getThumbnailSource(ajxpNode),
-            border:0,
+            className:'thumbnail_iconlike_shadow',
             align:"absmiddle"
         });
 		var div = new Element('div');

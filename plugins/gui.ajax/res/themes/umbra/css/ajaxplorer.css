@@ -188,6 +188,13 @@ textarea{
    border-radius : 5px;
 }
 
+.thumbnail_iconlike_shadow{
+    border: 1px solid white;
+    -webkit-box-shadow: 0 0 5px #666666;
+    -moz-box-shadow: 0 0 5px #666666;
+    box-shadow: 0 0 5px #666666;
+}
+
 .selectable_div div.selected{
    border: 1px solid #ddd;
     /*
