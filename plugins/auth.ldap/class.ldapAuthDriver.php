@@ -54,7 +54,7 @@ class ldapAuthDriver extends AbstractAuthDriver {
             $this->ldapFilter = "(objectClass=person)";
         }
         if ($options["LDAP_USERATTR"]){
-			$this->ldapUserAttr = $options["LDAP_USERATTR"]; 
+			$this->ldapUserAttr = strtolower($options["LDAP_USERATTR"]);
 		}else{ 
 			$this->ldapUserAttr = 'uid' ; 
 		}        
@@ -177,12 +177,11 @@ class ldapAuthDriver extends AbstractAuthDriver {
 	function userExists($login){
         $entries = $this->getUserEntries($login);
         if(!is_array($entries)) return false;
-        if(AuthService::ignoreUserCase() && strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
-            return false;
-        }else if(strcmp($login, $entries[0][$this->ldapUserAttr][0]) != 0 ) {
-            return false;
+        if(AuthService::ignoreUserCase()) {
+            return (strcasecmp($login, $entries[0][$this->ldapUserAttr][0]) == 0);
+        }else {
+            return (strcmp($login, $entries[0][$this->ldapUserAttr][0]) == 0 );
         }
-		return true;
     }
 
     function checkPassword($login, $pass, $seed){
